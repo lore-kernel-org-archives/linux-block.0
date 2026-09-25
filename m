@@ -1,157 +1,149 @@
-Received: from mail-oi2-f13.google.com (mail-oi2-f13.google.com [74.125.231.205])
+Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5959356777
-	for <linux-block@vger.kernel.org>; Fri, 25 Sep 2026 07:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.205
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790319657; cv=pass; b=RhWHvqv/USPszBk9biRyWRTF/GSYFArAtFvL3Rdd87nuJdSyTQc8kJNztkUAWR8OELfI7Y80jWG9VU3GGsr2JZeDVma66+d0YYD1dbYr8AQA4Y/Y6bWRBLWTjGtJfvmd8wfpAF4QptjAjE56PpOh7dUzoo8FKIFKMuAnPUHsXE0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790319657; c=relaxed/simple;
-	bh=yW1j8DeY8ApZV6Ko2dzi4EzUT0F1I7IAr6qbeR25e4M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HcWQ4viHNphXXMOJO1inpGJmdaEukc4nhexsH8B6g4By7YAvGfLmUCBW5AOqP1vA/jtuEkQcIPH7K5o2IDee5lyTKK/Bc36IMdtsG/FJmhmab9Y6ERjOcLCBYF8kaVGFEOsfL2GtTZC67h+SZUsAa5EtyaqFKYQI2shYh1d87Gk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DjQGvKro; arc=pass smtp.client-ip=74.125.231.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A064349BD
+	for <linux-block@vger.kernel.org>; Fri, 25 Sep 2026 09:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790330380; cv=none; b=ofwFuJiZZrzy7pmqoRTQgLEwy0TKTmv/3p9iUt4cXHHMn+ngtfoTXgUGJ6R6ydzkWR++59hQd+h3etqofayDBXdhMcismWbK4nwfTqMXA0UQjkgCw5F3gB4fkDEALArm/cJ7JdGZCITUQVQcZcLqvWAsm+u/1jUQiQDWEe3baBc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790330380; c=relaxed/simple;
+	bh=3wuIbZJ8bFkmwk3yPngoJC5LLgfogAdH4lIaqG+juGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LHLiCgVEs2lrUatizZ8yxKV35Uq6Sm89+LoDoCOowCssDNIWH5uRjyG4aczPW9S4OySIq/Z1vM1UmJZfQkuK0sj50T379uA+a6iISGAlW9Uov7qX0bAl6n3My6cD89JI7okwzWZWLr4n1vaFTZpQGX5eCHCPW1JFMp+4sxh0NaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TaazaTwe; arc=none smtp.client-ip=74.125.225.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DjQGvKro"
-Received: by mail-oi2-f13.google.com with SMTP id 5614622812f47-4c6d6660191so370378b6e.2
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2026 00:00:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790319654; cv=none;
-        d=google.com; s=arc-20260327;
-        b=QzrHsRUvkEM1e0Hcww8GU4irbOCoigiuO0+UcLoCR4D2wJyE5EejR8aqEneGCaHZjh
-         1USLMFOnSDYy3W91QxogY6QsZ7kMG3kwWklPWmx4aw745MR33kDBm/1WOU0APL/vjy0U
-         oTH1zVIjNchO4UsJYer0kSQvVv88dkQoSIvs7Za+49bdyNgawwdwcH6T2sLckbFFXpWj
-         bTk0HdlSbxa9jGucBdZ0Br6nDxO6vMc29qI97m9ULAtPatAOmiSAKIhU5ziX3MgjCuEu
-         WTD/lnNEKFmWdv3j63JJRsMfGwOSKWUmT3H8MzSIppZ1ULoVqATTsOIsijK04Ndo99PL
-         2BOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=S1fXxaoehIopV1PeW/nrL+gXG87cQGpcsm5CRZuB4kM=;
-        fh=ABpFi7nCzGDZyndhsq1F1ZkQ62jeA6kA1gK1irqAgKE=;
-        b=OItXghBEdyLufF3UPI56r+B8zWdKYY3oHY3ZfG9pwhXQ3dBmQGn1Fhze5j8qLg4eBr
-         zjk8WLEqHfvsm7i078H3J7ZV9msDkdyc+L8sKWAerE2OaotYKJ7lpq4/0MZEmwPY+pF2
-         nlRefVA6vwIORa53gOLrXBBvQ0+c45DEQXPbJguo/9Vg2MsJAzB/7Lykv3gJfcu7GSqm
-         sLrnClFMP73u0Ym4rHNt6JBKtdwVJWw8z913vzWqmayz0aL2sxU4iv9VGvGeXzzgOygB
-         BIKZDJ8yrDQIATM5FCea9vKD6gHOaQRwUz15WkCqUMC5HlAlUjLfRo6i8yAiUZn/1zwO
-         GoaA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TaazaTwe"
+Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-482f63546c5so537115f8f.2
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2026 02:59:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790319654; x=1790924454; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+        d=suse.com; s=google; t=1790330377; x=1790935177; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=S1fXxaoehIopV1PeW/nrL+gXG87cQGpcsm5CRZuB4kM=;
-        b=DjQGvKroGER4zTPaCXicv/a04cOxxx0hHV/QVmta6kTNX//vJoWdZt1+TRO1bY4jMD
-         63OoOlP9Clca1Nm8aTNMlEcB98LFBSLvlO+M54vMlbK0s1HOWMo9nDjI5q9KYbvIW9fF
-         dB7J4VAGNI/pxuseLs2aCjZ8erPdsRq8Ehy3VahvZPSt8hIXKk+HnWrDPcE9Aq2+rOcb
-         Es6ZftgeiQiO34B97IyT7x+re4YmCC/vmwWwRuOkXP/zuYYmranlsWFkqI9bwa+5crrv
-         0z1ZsFkA6l9hg6dQbz11gt5gYCP3tHV7PvuyepdhzG35gH7z6KS1Y0l6oMbYIL7/rhAL
-         PqTg==
+        bh=GrJoJ2ytny91PPyFUjjfr4sdS6p1y6Xpxf8VbUCYFbo=;
+        b=TaazaTwepfO/Nn3RZjRxrk/PoRkBXrAQMWZj6y7Gl7+W4nQg8C2TCW26X1Nt7vOau1
+         KfMHiALUAJh6n1MUHBOLQhw6Yi7J78CrzKXHNvKSLuWLacjdk8wV/E8nwOVdCQJiQYNA
+         lE+bQyKGEctiyKpoGd24io6VpF+34sVyN1LAkzx+B8uPBA6VFimjuvdjnKsfTY8j2jZM
+         w8MRtdn37Nr+rLVbufuAAnYCeybRMmkaiYftoPzRIBBbqMV5c3ymntn1QD555gIhnK8Z
+         zDaLCmcyCsuP7/Y23tTAU8QbTwGYBBPKgIxdDPHsIa0XrMt58eFRVW7X3g7dTdJcyaqL
+         utEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790319654; x=1790924454;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20260707; t=1790330377; x=1790935177;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=S1fXxaoehIopV1PeW/nrL+gXG87cQGpcsm5CRZuB4kM=;
-        b=NguDhIXGKOY4OISjCJ0kH3dzYPiVJY3J2AUDWNTHb6JzocPAbAS5XgUwa74q7ZjnOw
-         5yaMga/gOvwgpI/fR/dMrce+vdq8rtvjRuTZga4JxNrvihwUkCBJkjpG5utIvFXLycHB
-         55Ak22+cScTcEANZIwXYt4UbQY3GhDaGYeF2YItmQs/8gXfCqu5Xc51Tr8XWEx6LgU95
-         q/DWZcoEIS46eaZ53XO4U+wrFCgt2qvjN923LwgUJdaR2b+BoQTPUb5zPWkHqqCbA70J
-         lxRZZjFae8EEpdeO7KPjkoD4HSwXeFCWDpF9yGl2cLb5P7M9rnEE2fn3+wGPqx/H/9CV
-         2YEQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwiyjXIXeoF8+R3WOhtTSXc0yHVWe7KPA8Rz0Rh37PP7u97DXDisGVB+t8Mrx1LxNlj/gNqbk7kU8wVzw==@vger.kernel.org
-X-Gm-Message-State: AFuF++kM7+PCzAFb3k8am5gVNO1WekTe2yoC7apQdNuwmafBbSqvyAjz
-	Uc+2qPh5YfaJQB6EPaekh+okUX7N5YeKvrPvqeZA15xQlxAX14RzICQZ3rJBNcFgLI4lG36ye5Q
-	hYyonCNZOL2EmKEDCEZI1QvVPIhmPCr8=
-X-Gm-Gg: AYBFou3mdMsukKXTdWfNghbYjl3WtamctKOijwxFPRqjZF0ObpkNUVxZjIThZKgKPnn
-	Qab9/Sd1MHFCxiiudWhqf5gAxz4ghmW4Ht4tDd1B/+dBc04JOd24rqmdi4MbyiuMwCl1pi5Hxg1
-	s9Qf3BcOg12zjVK6waCcyQLOEGvabkb10ggeoBvBYDu8JmcaA/PkuoLEtyWWji+kbBLYCgpthdC
-	6bvHOS5pougRe8c6YR2OK4+W4r/EU7wIcaJ7AwcYCFSaSISZTyjZTGbCn/t4JIUlOhSz+oYDzIs
-	aksU6fZ70r5smyYGk4MYb/oBsuVkjr3oWYu1bVDtLWV+GdGCNVsdda7XSolChRlZZPWKufcUbNG
-	GBef7ATAJEhLudQr2oUV2Wg==
-X-Received: by 2002:a05:6808:159b:b0:4b9:a829:f01c with SMTP id
- 5614622812f47-4d72e16431dmr5142881b6e.40.1790319654501; Fri, 25 Sep 2026
- 00:00:54 -0700 (PDT)
+        bh=GrJoJ2ytny91PPyFUjjfr4sdS6p1y6Xpxf8VbUCYFbo=;
+        b=2AzuxC/ZgZYZUwf3QuCGNjxc+RprBGGERPBlkIwWJY7YVRC9Gle0m/K06EKOAxclOv
+         vR5Ys/RZZPT+sWZM6ENje3IVnK2uSTxY16AR8RkQSEi4XzKh932nPEg5VnYxSaJQxAxr
+         gbJ0EE2hGXpjfn0Q7mhBASZr+o2qdvOrPxavUOe1OU8ndm6Iquqsd4rGtZijC4ChG9Io
+         EHugYtv/rw5A0oTbIW5nQOl+MbFV6SP7dEN+az1XGtCjn73CLhsXoOBlOKoAnbDmTcLn
+         Jmy5072EcPwdYktrFXSeU+I9Ki5N1akJAr7j0Qfbszh6M4CUGWKYY8Xb0mmGTDhLGJVc
+         c7/Q==
+X-Forwarded-Encrypted: i=1; AKwUvBx9RSlddGuVtqnlnDg5qeBoP3laPsm833Epp+hQImuQm4YSOZizc2WVuDTxP8g1kuI/NEaBxt18cVh+yw==@vger.kernel.org
+X-Gm-Message-State: AFuF++kXRBYhGKx8Hy6OQDzyApVlD85VrVpnMNSiG3aXLl9m1VlSPUYp
+	6LClFmLWX/DRvU/Z9goqFy0gFO/Ue9qceIGvyGI58ba/dBLBnXlLzU5AU4VWTAt7Gqk=
+X-Gm-Gg: AYBFou19VNcibWWSHuhqF5nPMilPulIYQfnnMqHaUzxRzxeehJepUnla2g8+iudiZcv
+	iUsiwwL0D1/J1FLw2XTI7iH5MzypmUmqA25RB+K01it48280sP41Z8ptj+J8yaokRKGhNl86hux
+	h9d8+M06VnBOnLd42alZkVBz1Z8JXuYyXfycdg13LCXEJa5O3HY9Vj3g1j0jwPLG7WVtQQ3OOFi
+	gzm/STf2NYl/pJDx3sEKLW5k4oIJjtl5qfNxFOy43bg2vhsFCOKtRk96O5JUKaGah348Vn1DMr4
+	4h0lK9HPOCVRWR7EhlGSXJoBoMNGGAitjPJ/J9URVjuM/0iweDJArqGqSOm3bTXDL6LxacSmH79
+	FsbV6QhaxQOY+j+H3GJxLEnp+b6JIcAO3NnDK7Z4oFLiMg9EtY07frsK9wJTMbe+Kb3vs/wH5sb
+	jkLbWhNtNNybsLJfZQkNXN3cwJVzcuj2R7a+TYovHTy8a+NiQz9/kkxTeTspHyEvKAPhx2PADe3
+	X3V6g8i4ojIrw==
+X-Received: by 2002:a05:6000:26d2:b0:488:5af8:eabc with SMTP id ffacd0b85a97d-4887175d8a4mr10728228f8f.26.1790330376886;
+        Fri, 25 Sep 2026 02:59:36 -0700 (PDT)
+Received: from localhost.localdomain ([2001:af0:8000:1409:193:86:92:181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4887a2acb4dsm5878334f8f.0.2026.09.25.02.59.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Sep 2026 02:59:36 -0700 (PDT)
+Date: Fri, 25 Sep 2026 11:59:34 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: peng yu <yupeng0921@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	Chaitanya Kulkarni <kch@nvidia.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
+	Maurizio Lombardi <mlombard@arkamax.eu>, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] nvmet: add cgroup_path to charge namespace I/O to a
+ cgroup
+Message-ID: <arZFtIkV0vg_aQR7@localhost.localdomain>
+References: <20260923152653.40953-1-yupeng0921@gmail.com>
+ <arP0TmdK3FnNfbwH@localhost.localdomain>
+ <CAG3TDc0bQJATmJR5dF5j9RoDp1ti-tbAiUkLRGq4zX2CYD3unQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260924053121.17703-1-yupeng0921@gmail.com> <arS-38fE5r638g4Z@slm.duckdns.org>
-In-Reply-To: <arS-38fE5r638g4Z@slm.duckdns.org>
-From: peng yu <yupeng0921@gmail.com>
-Date: Fri, 25 Sep 2026 00:00:43 -0700
-X-Gm-Features: AclHuK80rKmiL3-JKRQwzW_6XT8TAtbFUe0xI3YnKDyMTZWe3I0aCFGT4xVZq5g
-Message-ID: <CAG3TDc0DZs5+E1tEBCn7uQyWJwZOY-brXBKTx8fBCy3HJqaqiQ@mail.gmail.com>
-Subject: Re: [PATCH v4] nvmet: add cgroup_path to charge namespace I/O to a cgroup
-To: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
-	Maurizio Lombardi <mlombard@arkamax.eu>, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="4zjvtwofog4yq6f5"
+Content-Disposition: inline
+In-Reply-To: <CAG3TDc0bQJATmJR5dF5j9RoDp1ti-tbAiUkLRGq4zX2CYD3unQ@mail.gmail.com>
+
+
+--4zjvtwofog4yq6f5
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3] nvmet: add cgroup_path to charge namespace I/O to a
+ cgroup
+MIME-Version: 1.0
 
-On Wed, Sep 23, 2026 at 11:10=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote:
->
-> Hello,
->
-> On Wed, Sep 23, 2026 at 10:31:21PM -0700, Peng Yu wrote:
-> ...
-> > +#ifdef CONFIG_BLK_CGROUP
-> > +static int nvmet_blkcg_ns_enable(struct nvmet_ns *ns)
-> > +{
-> ...
-> > +     cgrp =3D cgroup_get_from_id(ns->cgroup_id);
-> > +     if (IS_ERR(cgrp)) {
-> > +             pr_err("failed to resolve cgroup id %llu: %ld\n",
-> > +                    ns->cgroup_id, PTR_ERR(cgrp));
-> > +             return PTR_ERR(cgrp);
-> > +     }
-> > +
-> > +     css =3D cgroup_get_e_css(cgrp, &io_cgrp_subsys);
-> > +     if (!css || css->cgroup !=3D cgrp) {
-> > +             pr_err("the io controller is not enabled in cgroup %llu\n=
-",
-> > +                    ns->cgroup_id);
-> > +             if (css)
-> > +                     css_put(css);
-> > +             cgroup_put(cgrp);
-> > +             return -EINVAL;
-> > +     }
-> > +     ns->blkcg_css =3D css;
->
-> This is really odd from interface POV. The user specified "associate IOs =
-to
-> this cgroup" and that can fail if blkcg is not enabled on the cgroup. Eve=
-n
-> if it succeeds, if blkcg gets disabled and re-enabled on the cgroup, the
-> device is still going to be issuing IOs as the old draining blkcg.
->
-> What the user can express is the target cgroup and the IOs should follow
-> whatever IO control that specified cgroup is under at the time of each IO
-> issue. Currently, cgroup_e_css() has to walk up the tree to find the
-> effective css for a given subsystem but updating cgroup code to add e_css=
-[]
-> array on each cgroup to avoid the overhead shouldn't be too difficult.
->
-> Thanks.
->
-> --
-> tejun
+On Wed, Sep 23, 2026 at 09:34:48PM -0700, peng yu <yupeng0921@gmail.com> wr=
+ote:
+> The LVMs are close to my real use case, so I mentioned them to explain why
+> I need this feature.
+> When I write the testing code, I try to demonstrate the usage in a
+> simpler way, so
+> I use RAM devices.
+> Sorry for the inconsistency.
 
-How about this:
-1. Add a one line change in the cgroup code: export the cgroup_e_css
-2. The nvmet invokes the cgroup_e_css for each bio and under
-    the rcu protection.
+Understood.
 
-I think we don't need to add an e_css[] array on each cgroup. At least in
-my case I don't expect to have a very deep cgroup hierarchy, so we won't
-spend too much time on the cgroup_e_css.
+> > > * The subsystems are exported to different users.
+> > > * We should provide each user a specific iops/bps quota, thus a noisy
+> > >   neighbor won't impact the performance of other logical volumes.
+> >
+> > Why cannot you place users into respective cgroups and configure
+> > appropriate per-device limits?
+>=20
+> I export the devices to nvme target. Per my understanding, the IOs are
+> controlled by kernel threads. The users are remote users, so I can't find
+> a way to put them in a local cgroup.
+
+I see, so the core of the issue is that local storage is exported
+remotely as NVME (over TCP) and you want to regulate IO on the local
+storage.
+
+1) resembles loopback devices where original task's blkcg is transferred
+   to the kthread issuing actual IO. Is there any userspace component
+   fronting the clients? (whose cgroup the IO could be associated with.)
+
+2) it also resembles FC app ids (blkcg_set_fc_appid()/blkcg_get_fc_appid())
+   Could you look at that whether a common concept could be used? (I
+   haven't looked into detail how the client side is handled [*].)
+
+Thanks,
+Michal
+
+[*] And now when I'm thinking about it, I'm not sure one can trust any
+    app ID that is sent over...
+
+--4zjvtwofog4yq6f5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCarZGARsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMiwyLDIACgkQfj0C55Tb+AjBEAD/RgvrgWqx1vN7nwvnz6LZ
+kUdSY5YucNYWhEz/l2B6FdIA+wdvKZi11fYFtWArfARj5k2swH2W5L9SKaCFbKx9
+EhsJ
+=C5Iy
+-----END PGP SIGNATURE-----
+
+--4zjvtwofog4yq6f5--
