@@ -1,64 +1,62 @@
-Received: from mail-wr2-f35.google.com (mail-wr2-f35.google.com [74.125.225.99])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E43E38237B
-	for <linux-block@vger.kernel.org>; Sat, 26 Sep 2026 16:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F9E137923
+	for <linux-block@vger.kernel.org>; Sat, 26 Sep 2026 17:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790440569; cv=none; b=W4XxukZZIvU3lUzRTpYCLgYQzDmzm070YMHm7WDyWJudqIrVy4zEeezR5OSzfTjvfxrwucn08FzChNhW3UlF68cU5cdsXsAI/IvuuKDSsQvKwkaoB64PgL6l/jFcj+EThvykWzgIMGYfASLJfrgAXkZNM/AeiKmq8z/QmyCIAKw=
+	t=1790444002; cv=none; b=mXFkfk3E/MKsmUQNvKC/ptggProBDyJ6V6tGr0DjvsXnSYlG4q1Vkkuz1e0pDWsJDOK3O0nwcDwttZPt6+6njPsfhRObxKdfpFbWHnsSfPWgoR3cQriO+ZRR3wu+/W6iXx2rbMClml2DoMXNLANAbyNeLIrh0MHkYlp4i9nkQ4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790440569; c=relaxed/simple;
-	bh=bG4MyftsdfdbaBykmDiiNfkzsWo9nnA1ngVnb4LMZM8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K2Wy7JI0qDd22rKhm8pocWsBzRwHVm2FcVxucAwL5BVSQClkqqKbjzJsYPN7Yx0tpSA6rtW1GxCKryMQARYwYfQeDSf3UAp8oJzlPpJoZLvVNqfxx1cKjBoUbYh2esWDZLraAmnpQKlTfjGCEhSAV3ETMTcaby0ty53d1OuOXQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iYLy7tXS; arc=none smtp.client-ip=74.125.225.99
+	s=arc-20240116; t=1790444002; c=relaxed/simple;
+	bh=qjlZJ639bP4madGVmc2k1ZgbLWYVq7n6GdvWsoP1Veo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=njOwF1vnZxyxYYzGxxQ3VLj2GtEyieuAEHcLkBVafH/R6ZstRPyPclx5uHNb/uyrgxR2s4yw0xZffze9TBJe1ec826i9PXP5TfB6khcI4I3JpLyMSRJOjxrglurYIC9OuNNunkS5YiT85Nbc/DpioeamyVsnUYXAXVYHIQWh3nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pyubcm4Y; arc=none smtp.client-ip=74.125.225.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iYLy7tXS"
-Received: by mail-wr2-f35.google.com with SMTP id ffacd0b85a97d-4885a1480a2so984953f8f.3
-        for <linux-block@vger.kernel.org>; Sat, 26 Sep 2026 09:36:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pyubcm4Y"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ffb83bf7aso4882595e9.2
+        for <linux-block@vger.kernel.org>; Sat, 26 Sep 2026 10:33:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790440563; x=1791045363; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=iPw5CBxQDFpFXhy4vfMV2uncUCg9SZRmO0QrAN2QOdE=;
-        b=iYLy7tXShZxTAhG2W3NNlmxf6L4RtJ38na9e0k0glaO097X12jiRsivDkfbSyepjNU
-         3pZlupDMTTZxyjrRJBXMkORkTV7uqGPkKP4MY9832Zj3Va5oa4ZfHOWACt+JrlVuE3hH
-         7daMOWjwXyXxE4pTP7lsJ5nzRipcmElXadRxRY5OhrdwclMXFwTVHo/lLs6W9ro7Cicg
-         OhObvRR8xsXr6FcsG3tuz13C/F/+JmWMrnWG68OuWA761fCDy0utcPCfHqAExz9YUB/A
-         dwDCh+05CYuMU24D9C1CtIvYjY4A3maP0kPbJkaX0QJT0nj0r3+Xoa1Gwv6G/wH8J3wb
-         zRxA==
+        d=gmail.com; s=20251104; t=1790443998; x=1791048798; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=paso3MHh8XUGJdfP/nJDVx+gtPLafb5aKnJ/gNlnGsk=;
+        b=Pyubcm4YIY+aDJXWA6Cqq5iehVgJmKHC4f0kCxJw2HKChLvKHzwigGm8vmmSXSJGAp
+         hYzBtV4Txms39gUuvLgd6r9auiWQGe/WPfyFfhI/+QgVZhufh9Hkn1a8i3+qU/ojI4qS
+         2YD3WdO34hBNgbRWNIhFMWkmr38EYzsScwvEL5aB0bOy1lBTxLrpDNhf3S70SdgZg1mk
+         srmFl92EJHhzVx+WgzJLpZA6QjtLvTSh45J3/2AAcu/Aeb7wESqxJnHb6+lqgTu208DC
+         Gzug7vLcszZldEtT2+viT+RQdx/nH1w3JoKCLn/CWMT2SvSv4JJu2dbbSN4DHveg9VSA
+         URtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790440563; x=1791045363;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=iPw5CBxQDFpFXhy4vfMV2uncUCg9SZRmO0QrAN2QOdE=;
-        b=p5jNMefktSG46gbq8cPg8DCW6WF+0l1++7N8xwqcNg1yDoldj9mKaXwyj2K7Xlurp5
-         J7n5cY8oc/if+zpdTtNf1rJPuNuBmbFgXXmSlajz35QN3gn3MTph/PSxJEo/MV4G4Iid
-         K/Ne1y9Y5muPEE5P5G36xa1F3BnTCqK4jNu5jgEnEvX19YeEE86Ndn21hXDz49LxBO5w
-         c0dKslExY2CThF1RMdU9+OV7Bp4G+mY8NvdAF6oOUyLqjW+zs8/BOalCffmChj7wGQpN
-         JnRUooCYXQe3FHGdnAd5CcEc7uRfHb5Q7/1M/M95P41FVVpeB4GELG/J39sbYTw0IeNn
-         uKjw==
-X-Forwarded-Encrypted: i=1; AKwUvBwcppaF4h/VuvQ2fmPZyW5J++4g00QeDQbqLhLcddmTzse9Cjea29I92OCoWv4rsc1DFqI4ThIFXBQweQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYK1lyE1r0OqI7wYAuMswdlPuOId8I95GmTvCXcahXlOhgMytB/8
-	wehs6HKuOzJeECkR/enCfSeyntxB4vP1NSZdTSvcAHHiqV8Esg4SY6Wn
-X-Gm-Gg: AYBFou0F9qmIyhuCWKWAIs+z9Jwb66FJchc6XRFkEPOZAqA1AFhzeVA1jaLQ5OxINbB
-	InZoNO9b1YOGdliEKf61t5M9NSHgXMUme5Xgrm7Y6jNcNP326mGcTy/Y+ig3Fx+4r+lwxBJDQjH
-	tG1UJssmXnbrPkFiCeo9CyQE2TpUeEE2SOC7CLOoAnFgJtfHlMsNwHlXYW/e8lOjWbMLqRhGsnv
-	d3lBkqcoYF8TWuvo8uXUuq8NCzXaMwc7SH18ulb8zTsXud+MPbvQThu4lBbvdHN2hS4GejVJIUf
-	kyd/AA9OU4lXCeVQjm0h9ACfeRfJs5dM0Go+D/oVmz+Z8Icp/NYT3IQ6ddukEOTB7rsGGq4PdOO
-	90qy9o61loEbjk4w16N+2hh8pxNkzFua4ARKBh977f2JGlOt59R0XzMFOgdRDnZ91wiYXJ51vH3
-	WGz3suCboaWJne8UR8J7NkhdvUs4dYR5ODUiwGnO5xLKoEhiKPHgeHVlIG+z8p7OHqP+87GFYGF
-	sAVBKWlil6N2W1LPZD6y+Eg54F1ITwUm2R+ekOe7Yrwi/Bsa9zA/rf3+OMTSMutBxQ=
-X-Received: by 2002:a05:6000:2999:10b0:488:79e5:cb2b with SMTP id ffacd0b85a97d-48879e5ce9emr7985352f8f.43.1790440563055;
-        Sat, 26 Sep 2026 09:36:03 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1790443998; x=1791048798;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=paso3MHh8XUGJdfP/nJDVx+gtPLafb5aKnJ/gNlnGsk=;
+        b=TismzXfkBLTpruAepWXrGbb2CcCt0nnzo2QTnGRMBXeOPIqiUNmMT1i+u7KloE+phS
+         wExSl1h+ETnSaaG+Mt+tPKtJC5HllIoSXYHEPzRr1JfUoq40NbvYsdi43zqEslsIS9JT
+         lTH8qZziDt9IcDLgo7uPGfZL2UzZG1w5qyPYOzSVRKS2hRPACoiuucdO88l1vpMfEZhR
+         X5ajl5qTGJ/f8odL0WdGA+NPlHQdnAt1Zr3Eu8gqI+OpHZJjf/AvO5vGuEkWpE1DXbN7
+         rM89spLoUrqlzldYSwQvFSm7CKG9tLAnEBSGniWQixtow04ySTvdcUUJH6SHM1olEkk2
+         xdCA==
+X-Forwarded-Encrypted: i=1; AKwUvByTwxM6EIN/8he5LsPjhW/cUrYoP4M8PqOpEk4rlh1Au2gXrxSs6hXxSMg/zSfLsKj7lBWN0XExGH+Tiw==@vger.kernel.org
+X-Gm-Message-State: AFuF++maiR63YROFxWS0MEZB/mxiSFXDUF6XFinn7YbynyUsO0LSDZnQ
+	KOudEYfi1y56xG39GV6bvS36jcxZQ6ecZGHzkGospI7B1ZNO7v4T8dIG
+X-Gm-Gg: AYBFou2C4gsglXIo8QZJJ4oDbBeu3ZyWGRqxYN47dYc0p1QN+C2VBJOXOfW6Sm9zv0c
+	Fd5rN88W7hqSRXOATgF2NrbDUNJoNreAta+BmPAt7JTS4EJOYcOiXT9J+e+q3BZZ284sWqzUKqY
+	5HiTx8BviyfhGZc1ItUKHWBS0j1hVKMxAOGAnukLKzYWo0+sfkU+UPS98DuQA3Ocf+cfJVT3bTp
+	qdJSESD+5r03+fYqoYkUsfx9c8+Zkv7y7pW/Xg+GCKzAD3NKozLCffQowfeolI91uY9HWg1W/fN
+	5z5wRDop01GarckKdBUZy28GUda66sFPbVfzfser32CDdZc3ZWJzWOSEwMjeA7djAAHf6ZIl3c1
+	KWKzNdUOGPNoOQmAYnqwV4gYqe9IJWiJQ5TTlFP6FMQaXMjJMxmIFnMzWWqmcVyyJyTVO9UexGk
+	0YsNxQji2L3D7MO82z5WoEhq7hAy8aV7DS4nHDzmY1Io6ncyZP55RQaYG73TByUPILZVkjisYrK
+	ZFAn4gyb0zqgdatuVJYWNpXgHvQf7c6dGRXsnXOelOwawIbE66xkAlXXBbvxYgRVXg=
+X-Received: by 2002:a05:600c:1389:b0:49f:dcc8:c735 with SMTP id 5b1f17b1804b1-49fe66f4c7dmr153040265e9.18.1790443998088;
+        Sat, 26 Sep 2026 10:33:18 -0700 (PDT)
 Received: from moosama76.. ([102.44.245.127])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4887a355d96sm16176146f8f.17.2026.09.26.09.36.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fe5de4de4sm246200495e9.8.2026.09.26.10.33.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Sep 2026 09:36:02 -0700 (PDT)
+        Sat, 26 Sep 2026 10:33:17 -0700 (PDT)
 From: Mohamed Osama <mohamed.osama189110@gmail.com>
 To: ojeda@kernel.org
 Cc: boqun@kernel.org,
@@ -79,12 +77,10 @@ Cc: boqun@kernel.org,
 	linux-serial@vger.kernel.org,
 	rust-for-linux@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 5/5] rust: sync: lock: use DropGuard
-Date: Sat, 26 Sep 2026 19:35:51 +0300
-Message-ID: <20260926163551.52371-6-mohamed.osama189110@gmail.com>
+Subject: [PATCH v3 0/5] rust: add DropGuard
+Date: Sat, 26 Sep 2026 20:33:10 +0300
+Message-ID: <20260926173315.56772-1-mohamed.osama189110@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260926163551.52371-1-mohamed.osama189110@gmail.com>
-References: <20260926163551.52371-1-mohamed.osama189110@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -93,41 +89,40 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Replace the ScopeGuard usage in the Rust locking implementation with
-DropGuard.
+Add the Rust kernel DropGuard API and migrate the existing ScopeGuard
+users in the block, serdev, and locking code.
 
-The guard preserves the existing scope-exit cleanup behavior while using
-the DropGuard API from the Rust kernel memory module.
+DropGuard runs a FnOnce callback when dropped and provides dismiss() to
+take ownership of the wrapped value without running the cleanup callback.
 
-Signed-off-by: Mohamed Osama <mohamed.osama189110@gmail.com>
----
- rust/kernel/sync/lock.rs | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Changes since v2:
+- Clarified why DropGuard is added alongside the existing ScopeGuard.
+- Fixed the core imports in mem.rs to follow the Rust kernel import style.
 
-diff --git a/rust/kernel/sync/lock.rs b/rust/kernel/sync/lock.rs
-index 10b6b5e9b024..15f9cbe76c8d 100644
---- a/rust/kernel/sync/lock.rs
-+++ b/rust/kernel/sync/lock.rs
-@@ -7,8 +7,9 @@
- 
- use super::LockClassKey;
- use crate::{
-+    mem::DropGuard,
-     str::{CStr, CStrExt as _},
--    types::{NotThreadSafe, Opaque, ScopeGuard},
-+    types::{NotThreadSafe, Opaque},
- };
- use core::{cell::UnsafeCell, marker::PhantomPinned, pin::Pin};
- use pin_init::{pin_data, pin_init, PinInit, Wrapper};
-@@ -242,7 +243,7 @@ pub(crate) fn do_unlocked<U>(&mut self, cb: impl FnOnce() -> U) -> U {
-         // SAFETY: The caller owns the lock, so it is safe to unlock it.
-         unsafe { B::unlock(self.lock.state.get(), &self.state) };
- 
--        let _relock = ScopeGuard::new(||
-+        let _relock = DropGuard::new((), |_|
-                 // SAFETY: The lock was just unlocked above and is being relocked now.
-                 unsafe { B::relock(self.lock.state.get(), &mut self.state) });
- 
+The series was previously tested with:
+- make LLVM=1 rustfmtcheck
+- make LLVM=1 rustdoc
+- make LLVM=1 -j$(nproc)
+- git diff --check
+- scripts/checkpatch.pl
+
+The changes in v3 are limited to the import style and commit-message
+clarification.
+
+Mohamed Osama (5):
+  rust: add DropGuard KUnit test configuration
+  rust: mem: add DropGuard
+  rust: block: gen_disk: use DropGuard
+  rust: serdev: use DropGuard
+  rust: sync: lock: use DropGuard
+
+ rust/kernel/Kconfig.test         |  10 +++
+ rust/kernel/block/mq/gen_disk.rs |  11 +--
+ rust/kernel/mem.rs               | 121 +++++++++++++++++++++++++++++++
+ rust/kernel/serdev.rs            |  10 +--
+ rust/kernel/sync/lock.rs         |   5 +-
+ 5 files changed, 144 insertions(+), 13 deletions(-)
+
 -- 
 2.43.0
 
