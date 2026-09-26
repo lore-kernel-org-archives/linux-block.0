@@ -1,275 +1,159 @@
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
+Received: from mail-oi2-f42.google.com (mail-oi2-f42.google.com [74.125.231.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0A135202A
-	for <linux-block@vger.kernel.org>; Sat, 26 Sep 2026 03:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790394219; cv=none; b=BHaAq+m/n7ThMe4ncHgnw2QZaDgVQpyEMQ+OJCxoi7oyf/kP1+tZPih5GTfV0dD2J5PgvtTVtELgJY6PdBfuElZH9sG3JU0Q6WwfJjERS/Jbve5AIyte4nKZcROcy7IovDbwrsmEBD2KLIWJhNTNDkjQDffVmErMOHmgrmzbblE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790394219; c=relaxed/simple;
-	bh=wWM7R5ZQsiSnbrgcOHKR9c/zY1X8rLuCD5XcSaVI3j8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Dvy/aj9exL1xYP5EqXZdS2yu0TWdqisFY0qQ8syVZPJLUs5BNYQ/5jhHb8NqVqVlfWyjFAwEUKyw1Xz5VBhT+Dj+jC2ADogKP1kR65X+3CB5zIfr4QkVZ505cvyzFclxqJaYY4Z+eobtN9oYB+kbVEPXjiJdy20r1pYpAq37VmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4b2f2b8d88fso2669025b6e.2
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2026 20:43:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DDC332EC1
+	for <linux-block@vger.kernel.org>; Sat, 26 Sep 2026 05:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.234
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790400273; cv=pass; b=gdDmP4rsNci2xg1Gz14l/Sr8jyGKqxbXbnGKrYyaEyQX412h1wJ2o5e/Xdq2QlnhfI8bZ4Ay6L/4TwbVlfhqFzRhW/EgtXLGzQc6Daf6pDNDGUfEeUfLmRzZAZpeZxnWMWTKRHQjN61lPY/y+oh9THwN7EeOE2gLwnjtyI335yc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790400273; c=relaxed/simple;
+	bh=Ze+iI4MPN/oMczfNs2a3p2CNrjiokST60jo3zEacJNo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nPEJBacpAx/TTO0amxt4qur3PgQ5anRQQhJ9mf8Ac1Ba+Jl1vPKfaY2gP8f30EKEN2FH6kCS12Xhwes8BBSScPpfvcVwuQtKZoWgTVFmWIquzy6XYNA6srvETJ4PWtFu56fLhP1Ey6d4+Vr3Zak3pqlScryo8dnrgDWXTqUZ7U8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lhC413f0; arc=pass smtp.client-ip=74.125.231.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lhC413f0"
+Received: by mail-oi2-f42.google.com with SMTP id 5614622812f47-4db3c747ad8so962219b6e.2
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2026 22:24:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790400271; cv=none;
+        d=google.com; s=arc-20260327;
+        b=bmOSAoDj6Kc+SHcshsGNUwsTLzG8ix0+YU4pYIuQ0jkrBdugDPvuFhVz/5AL4TpglV
+         nuvTvoHJ/hme5PVvKxIMXAubwaN/4BzcAz4w1CqCvnPXBj+iLn+U1kQ7aldbGcYBCuMk
+         7OtSTia7EwxSeewvO2MkSVvbSMHajfVPeg55X0NcQimRkS54O+igRNrgDX4SOufp8ejr
+         fJPxkINqVxWhn3hPVVJWcAMhLbvrp4RfgEh9WkYbMuS0ESIXl98yQPIBhVL1A/m5apBw
+         VqE0wS90V31BS52ZG9gGAHKTqfwYCLdW9tj+qR4VlzDwDEUrnP1jIN0OP/p0o6asCazI
+         XACA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=pVIiyRqhME2rfVYUFjEtU86And7QcpxR5cM22u9g16Y=;
+        fh=4QmCaoLNu0/neogvBYL0LbXbChITkiszS5F24wtM5vM=;
+        b=bsFfcZW9Wy8rdAs48LHEqdgDYE2/uUBYt9i5+QI1eJHnKwFLeAf7e87AOTst7Sv0PP
+         N+/kmV4stq6XefwcfdXWqA1KY9S+wMnmjf78HglsrT16PgHHtbOeS69c/2gskVRADzM7
+         e/MVJNT+h655n/yECbYILXZXraCpiKXtMsuEAWWWWe1wskHpthdVF/V7sLlKr9OsWr2I
+         6avRnc1g0ULfx2FTAfFhyFutvkI/zlYisachXXPC1iyIx/WDi0UhGgvF0uaGGUmNDOw3
+         nP59UAuUlPyGi+fSKyoOnyuqikkux62NLn/Ex4RbkMaCSA/uY/o4aOXg4Cv2b7uNAp9J
+         YxHQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790400271; x=1791005071; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=pVIiyRqhME2rfVYUFjEtU86And7QcpxR5cM22u9g16Y=;
+        b=lhC413f0KgQOdC+OVF69nUzsAbBPV2R89p7MwBEF/7uqDsT1WzPKVJvV/YGxJ3C1dv
+         Ww475qQIypBc7OJKcWv7NtfbP6gZwG1NeE1X7UO6OQZKhL0AxjqQaJBJrpmHq2vzbqc7
+         JfOcLAyXy8x2K9tyXEf/uywRrPoB8+HxiFmNo1Cefb4kkMsdj8iEdjW/y8ewFKygyw55
+         1pGkzijpJQ+yyGP2LBZkvO5SnEu4TAnQ2hwvXY2Vrj2p0J0z1zv+B4Gxw9PrVzNz03q0
+         6mMzXBMR3z4t3kQ6EczX1ZM5ZJaIuJqyEuhK70ICrpYUq+slBNo0EfOh0r56JHDtssgP
+         bNnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790394214; x=1790999014;
-        h=content-type:to:from:subject:message-id:date:mime-version
+        d=1e100.net; s=20260707; t=1790400271; x=1791005071;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=m2z6tUl0ZMVMS5NVheiYbVnlHfU4wooxdjmTT4h9Zss=;
-        b=k2dhFkVy18fOPYrf/y+ddy2Kepypau3mKgi4YPxIw6qu2f63/f+DXSjmlJ/rHPnSnN
-         l69JQy4D9FtV2BF3IvL0Cbf/oTVbxJ9Za0Mcwzje4fkdw5yF3yptSwedqonZXQudHMM3
-         xSK05YYeu/M+C5J05uQLXC0lHvr6h6wwtPT7yV5St10aNKHTYMgPW4YLNPe0NidlXSqX
-         8IcyY8+MY+4xkXZEOEL8hMvovDTjp/YvAsXA5QSoGUpDzYMP3WGlOzcbwKY9uSXIgprK
-         FlXtsA9u/p/urBVJC/JvYWirIEtchJcPSilKvJw+el1AFynCkVJu/2D18SqCkS7Fj1IR
-         SBaA==
-X-Forwarded-Encrypted: i=1; AKwUvByK9sKJ27XeoicOe4G7G3/kErJjVb5NHzGKTm5TSdRFChWcStI9v9t3u3spZI2RzIT8SNqZF+10OwaPyA==@vger.kernel.org
-X-Gm-Message-State: AFuF++l7Cd60j7XCLOC6/kOfDfRERe+6NPwx5tInu1JLqblQ3pKsng6p
-	gkYV4N5/QDRM5iGAl6PegiYAwPWi+CJI5nlTEBiF7kRv3WvpRK2ND+eT1Ua1xNh50LTIQqdRerK
-	14UTJ22kpzgwrAbEeXSueEwhII5IlC9ISgoY13Qpg2OeS29giE2qXZJ45ooo=
+        bh=pVIiyRqhME2rfVYUFjEtU86And7QcpxR5cM22u9g16Y=;
+        b=DlnxjnBaZrtY9tgBua+y6z7s3uTheJmCHlq1XCVbJUy7r2ruWWP8AgKk38NZehFKZ6
+         tLe8nqD6pl+OlmBwRC8hJmC4aySIKaaZm4uPbKp+ZvRfNz7uKtMQcIfNqFH7zeoYMIDA
+         iMy9lNsmwnZuODsmaTIxYYmHYANbK7yGltVfihf1PAeNINp2sKqXbsdSNQYmwz0DnUDz
+         KtrLJnEeimI9r1vZ5uCjo2iMP7YuMMkNWjKRxeWN5wZkHCj7ch+mrKPf63lsi19Pa5Oq
+         D8dG9Kc6Wo1kZ7ZvMmm+18Wv5FeIps8CuzpyLEz2fGLgMnt3pGXac3Z4qPioDtfvOjbe
+         MnEQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwTBj5yj53qw4QZZ2sV5QUPf96VcpFSOlmcljlNWkO6IUyurI1p8bOBW6vQTEzcXwftPE4l7Ekt5mtDzw==@vger.kernel.org
+X-Gm-Message-State: AFuF++liI07mhRZKPIIyF/bA3dl+GruIkop2+zg7xBfQrSeSs3tP8UVE
+	P9cY7vCdZHaq1NzxgW6CwPgHWvW8mhpIV9nv3cqjdGHwvIt+izPpqFcgEauFloFghbvsMkmw67x
+	v3JDfEgzC0Pxg6dRcTx+zpgcAU8r2mAM=
+X-Gm-Gg: AYBFou396lqk4+MV3zHyKbyUCXZ7tKUpO6dsrdi6lOgRG5Lx1cl96AmqM4yJRw3Yk9R
+	VNhYwgOF+oUtfT2JvcSJsbNaKDsqGBUtGegR3bGR/u/5tVrf3wCp5TU/w8w9yOxAOwQd5w/HDlv
+	ujCmMXYg1a/6dp0zLHSYzqhCpSfPb0HGJVM2f7qbKQW9OuqQ57atuOjfCGXxOtSwpwnNBsiujQe
+	HUbUlOeQeHPIl5yVlv1EWzChV2yowqiWVEgiidAM4xWY/zWX8fsIarYBbRZpRaX4yCILQOwBvvT
+	/1TeW9YEwA3VlpS7aehuBclVRx8hiyL7OHnszSuBYbocs57qWeDw30Bao0Y+xm0ZrLmA1A0mEi1
+	3qZBzwkVdMt7zbSe1iaRlMnk=
+X-Received: by 2002:a05:6808:1782:b0:4d6:92d4:c806 with SMTP id
+ 5614622812f47-4d72be3a1f7mr8385532b6e.62.1790400270638; Fri, 25 Sep 2026
+ 22:24:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:244d:b0:4cb:f21c:a794 with SMTP id
- 5614622812f47-4d72982faf8mr8432441b6e.28.1790394213837; Fri, 25 Sep 2026
- 20:43:33 -0700 (PDT)
-Date: Fri, 25 Sep 2026 20:43:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6ab73f65.80e1c6cc.1e8e5f.0041.GAE@google.com>
-Subject: [syzbot] [block?] INFO: task hung in __bio_queue_enter (3)
-From: syzbot <syzbot+90895f5bfaa7243c2d20@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20260923152653.40953-1-yupeng0921@gmail.com> <arP0TmdK3FnNfbwH@localhost.localdomain>
+ <CAG3TDc0bQJATmJR5dF5j9RoDp1ti-tbAiUkLRGq4zX2CYD3unQ@mail.gmail.com> <arZFtIkV0vg_aQR7@localhost.localdomain>
+In-Reply-To: <arZFtIkV0vg_aQR7@localhost.localdomain>
+From: peng yu <yupeng0921@gmail.com>
+Date: Fri, 25 Sep 2026 22:24:19 -0700
+X-Gm-Features: AclHuK_i4TetM7wyRpEb-4NCnm73C_jTw7zDqMN5n0xOhknlW_0BTd0EVzLx3Ao
+Message-ID: <CAG3TDc0zdhUaTYy1tk39VcSE6PipiTLDMXU0cUZ04yOijOgWOw@mail.gmail.com>
+Subject: Re: [PATCH v3] nvmet: add cgroup_path to charge namespace I/O to a cgroup
+To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Jens Axboe <axboe@kernel.dk>, Maurizio Lombardi <mlombard@arkamax.eu>, cgroups@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, Sep 25, 2026 at 2:59=E2=80=AFAM Michal Koutn=C3=BD <mkoutny@suse.co=
+m> wrote:
+>
+> On Wed, Sep 23, 2026 at 09:34:48PM -0700, peng yu <yupeng0921@gmail.com> =
+wrote:
+> > The LVMs are close to my real use case, so I mentioned them to explain =
+why
+> > I need this feature.
+> > When I write the testing code, I try to demonstrate the usage in a
+> > simpler way, so
+> > I use RAM devices.
+> > Sorry for the inconsistency.
+>
+> Understood.
+>
+> > > > * The subsystems are exported to different users.
+> > > > * We should provide each user a specific iops/bps quota, thus a noi=
+sy
+> > > >   neighbor won't impact the performance of other logical volumes.
+> > >
+> > > Why cannot you place users into respective cgroups and configure
+> > > appropriate per-device limits?
+> >
+> > I export the devices to nvme target. Per my understanding, the IOs are
+> > controlled by kernel threads. The users are remote users, so I can't fi=
+nd
+> > a way to put them in a local cgroup.
+>
+> I see, so the core of the issue is that local storage is exported
+> remotely as NVME (over TCP) and you want to regulate IO on the local
+> storage.
+>
+> 1) resembles loopback devices where original task's blkcg is transferred
+>    to the kthread issuing actual IO. Is there any userspace component
+>    fronting the clients? (whose cgroup the IO could be associated with.)
 
-syzbot found the following issue on:
-
-HEAD commit:    12fec40907fa Merge tag 'nf-26-09-18' of git://git.kernel.o..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=1112c515580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c3be6e434b07ebb6
-dashboard link: https://syzkaller.appspot.com/bug?extid=90895f5bfaa7243c2d20
-compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178f7525580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12213805580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a49602a7524f/disk-12fec409.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/62c2686deb3b/vmlinux-12fec409.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/22e54abf9b3b/bzImage-12fec409.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+90895f5bfaa7243c2d20@syzkaller.appspotmail.com
-
-INFO: task udevd:5676 blocked for more than 143 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:udevd           state:D stack:25736 pid:5676  tgid:5676  ppid:4984   task_flags:0x400140 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5526 [inline]
- __schedule+0x17db/0x58f0 kernel/sched/core.c:7277
- __schedule_loop kernel/sched/core.c:7354 [inline]
- schedule+0x164/0x2b0 kernel/sched/core.c:7369
- __bio_queue_enter+0x369/0x7f0 block/blk-core.c:396
- bio_queue_enter block/blk.h:99 [inline]
- blk_mq_submit_bio+0x776/0x2a70 block/blk-mq.c:3127
- __submit_bio_noacct_mq block/blk-core.c:756 [inline]
- submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
- bh_submit fs/buffer.c:1146 [inline]
- block_read_full_folio+0x581/0x810 fs/buffer.c:2359
- filemap_read_folio+0x12c/0x3a0 mm/filemap.c:2520
- do_read_cache_folio+0x354/0x590 mm/filemap.c:4156
- read_mapping_folio include/linux/pagemap.h:1015 [inline]
- read_part_sector+0xb6/0x2b0 block/partitions/core.c:724
- adfspart_check_ICS+0xb1/0x960 block/partitions/acorn.c:357
- check_partition block/partitions/core.c:143 [inline]
- blk_add_partitions block/partitions/core.c:591 [inline]
- bdev_disk_changed+0x851/0x17a0 block/partitions/core.c:695
- blkdev_get_whole+0x372/0x510 block/bdev.c:793
- bdev_open+0x324/0xd70 block/bdev.c:1002
- blkdev_open+0x461/0x600 block/fops.c:674
- do_dentry_open+0x816/0x1380 fs/open.c:996
- vfs_open+0x3b/0x340 fs/open.c:1101
- do_open fs/namei.c:4837 [inline]
- path_openat+0x1443/0x1d60 fs/namei.c:5000
- do_file_open+0x23e/0x4a0 fs/namei.c:5029
- do_sys_openat2+0x115/0x200 fs/open.c:1417
- do_sys_open fs/open.c:1423 [inline]
- __do_sys_openat fs/open.c:1439 [inline]
- __se_sys_openat fs/open.c:1434 [inline]
- __x64_sys_openat+0x138/0x170 fs/open.c:1434
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f77b02a7407
-RSP: 002b:00007ffe9ad1c750 EFLAGS: 00000202 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 00007f77b0965880 RCX: 00007f77b02a7407
-RDX: 00000000000a0800 RSI: 000055a197e52f80 RDI: ffffffffffffff9c
-RBP: 000055a197e39910 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 000055a197e4dba0
-R13: 000055a197e47190 R14: 0000000000000000 R15: 000055a197e4dba0
- </TASK>
-INFO: task syz.0.17:5845 blocked for more than 143 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.0.17        state:D stack:24640 pid:5845  tgid:5844  ppid:5783   task_flags:0x480140 flags:0x00080002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5526 [inline]
- __schedule+0x17db/0x58f0 kernel/sched/core.c:7277
- __schedule_loop kernel/sched/core.c:7354 [inline]
- schedule+0x164/0x2b0 kernel/sched/core.c:7369
- blk_mq_freeze_queue_wait+0x101/0x180 block/blk-mq.c:191
- blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
- queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
- nbd_set_size+0x4c5/0x7d0 drivers/block/nbd.c:383
- nbd_genl_size_set drivers/block/nbd.c:2111 [inline]
- nbd_genl_reconfigure+0x7e1/0x1040 drivers/block/nbd.c:2444
- genl_family_rcv_msg_doit+0x233/0x340 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x614/0x7a0 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2575
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1338 [inline]
- netlink_unicast+0x7bd/0x940 net/netlink/af_netlink.c:1364
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1919
- sock_sendmsg_nosec+0x13a/0x180 net/socket.c:800
- __sock_sendmsg net/socket.c:815 [inline]
- ____sys_sendmsg+0x54e/0x850 net/socket.c:2713
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2767
- __sys_sendmsg net/socket.c:2799 [inline]
- __do_sys_sendmsg net/socket.c:2804 [inline]
- __se_sys_sendmsg net/socket.c:2802 [inline]
- __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2802
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f5d2239e159
-RSP: 002b:00007f5d232a7028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f5d22625fa0 RCX: 00007f5d2239e159
-RDX: 0000000000040080 RSI: 0000200000000280 RDI: 0000000000000004
-RBP: 00007f5d2243506b R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f5d22626038 R14: 00007f5d22625fa0 R15: 00007fff9d2e9788
- </TASK>
-
-Showing all locks held in the system:
-locks held by khungtaskd/31: 1, last CPU#0:
- #0: ffffffff8ed5c8e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
- #0: ffffffff8ed5c8e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff8ed5c8e0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6871
-locks held by getty/5374: 2, on CPU#1:
- #0: ffff88803565e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: ffffc9000322b2e8 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x45a/0x1360 drivers/tty/n_tty.c:2211
-locks held by udevd/5676: 1, on CPU#0:
- #0: ffff888025b18350 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0xde/0xd70 block/bdev.c:990
-locks held by syz.0.17/5845: 6, on CPU#0:
- #0: ffffffff902c4448 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1217
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10b/0x7a0 net/netlink/genetlink.c:1208
- #2: ffff888025a59260 (&nbd->config_lock){+.+.}-{4:4}, at: nbd_genl_reconfigure+0x4a6/0x1040 drivers/block/nbd.c:2435
- #3: ffff888025c90fe8 (&q->limits_lock){+.+.}-{4:4}, at: queue_limits_start_update include/linux/blkdev.h:1101 [inline]
- #3: ffff888025c90fe8 (&q->limits_lock){+.+.}-{4:4}, at: nbd_set_size+0x284/0x7d0 drivers/block/nbd.c:375
- #4: ffff888025c909b0 (&q->q_usage_counter(io)#49){++++}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
- #4: ffff888025c909b0 (&q->q_usage_counter(io)#49){++++}-{0:0}, at: queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
- #5: ffff888025c909e8 (&q->q_usage_counter(queue)#33){+.+.}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
- #5: ffff888025c909e8 (&q->q_usage_counter(queue)#33){+.+.}-{0:0}, at: queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
-locks held by syz-executor/5847: 2, on CPU#1:
- #0: ffffffff902c4448 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1217
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10b/0x7a0 net/netlink/genetlink.c:1208
-locks held by syz-executor/5871: 2, on CPU#1:
- #0: ffffffff902c4448 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1217
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10b/0x7a0 net/netlink/genetlink.c:1208
-locks held by syz-executor/5897: 2, on CPU#1:
- #0: ffffffff902c4448 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1217
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
- #1: ffffffff902c4280 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10b/0x7a0 net/netlink/genetlink.c:1208
-
-=============================================
-
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 31 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- nmi_cpu_backtrace+0x274/0x2d0 lib/nmi_backtrace.c:123
- nmi_trigger_cpumask_backtrace+0x17d/0x390 lib/nmi_backtrace.c:66
- trigger_all_cpu_backtrace include/linux/nmi.h:164 [inline]
- __sys_info lib/sys_info.c:157 [inline]
- sys_info+0x135/0x170 lib/sys_info.c:165
- check_hung_uninterruptible_tasks kernel/hung_task.c:353 [inline]
- watchdog+0xfd7/0x1030 kernel/hung_task.c:561
- kthread+0x38b/0x480 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
-RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:64
-Code: ac 88 02 c3 cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d b3 c1 23 00 fb f4 <e9> 8c 08 03 00 cc cc cc cc cc cc cc cc cc cc cc cc 90 90 90 90 90
-RSP: 0018:ffffc900001a7e40 EFLAGS: 00000246
-RAX: 00000000000caff3 RBX: ffffffff819bb370 RCX: 8000000000000001
-RDX: 0000000000000001 RSI: ffffffff8e4140f9 RDI: ffffffff8c6da080
-RBP: ffffc900001a7f10 R08: ffff8880b8733a1b R09: 1ffff110170e6743
-R10: dffffc0000000000 R11: ffffed10170e6744 R12: 0000000000000000
-R13: 1ffff11003cd1bb8 R14: 1ffff92000034fd0 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff888124dce000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fb7e3889e9c CR3: 000000000eb48000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- arch_safe_halt arch/x86/kernel/process.c:767 [inline]
- default_idle+0x9/0x20 arch/x86/kernel/process.c:768
- default_idle_call+0x72/0xb0 kernel/sched/idle.c:122
- cpuidle_idle_call kernel/sched/idle.c:199 [inline]
- do_idle+0x2e0/0x540 kernel/sched/idle.c:355
- cpu_startup_entry+0x43/0x60 kernel/sched/idle.c:454
- start_secondary+0x101/0x110 arch/x86/kernel/smpboot.c:312
- common_startup_64+0x13e/0x157
- </TASK>
+I'm using tcp-nvmeof. Per my understanding, there is no local userspace
+component. The tcp-nvmeof listens on a tcp port in kernel space and
+sends the IOs to the kernel block layer. So I can't find a userspace proces=
+s
+and assign a cgroup to it.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 2) it also resembles FC app ids (blkcg_set_fc_appid()/blkcg_get_fc_appid(=
+))
+>    Could you look at that whether a common concept could be used? (I
+>    haven't looked into detail how the client side is handled [*].)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+The FC app ids export the host side cgroup. But I want to not rely on the
+host side information, limit the iops/bps on the target side. I'm not sure
+what I can use about it. If I miss-understand anything, please let me know.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> Thanks,
+> Michal
+>
+> [*] And now when I'm thinking about it, I'm not sure one can trust any
+>     app ID that is sent over...
