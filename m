@@ -1,140 +1,100 @@
-Received: from mail-dy2-f42.google.com (mail-dy2-f42.google.com [74.125.229.42])
+Received: from sonic312-24.consmr.mail.ne1.yahoo.com (sonic312-24.consmr.mail.ne1.yahoo.com [66.163.191.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731143B8D4F
-	for <linux-block@vger.kernel.org>; Sun, 27 Sep 2026 14:20:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F3F42E004
+	for <linux-block@vger.kernel.org>; Sun, 27 Sep 2026 18:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.191.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790518851; cv=none; b=XEL0hHPO4Q1QNK3aeRtmRDHWIzGOPGA05dja5/5DDkfMhxRaYHVxew77RLu1yOJKaRV+wZRnkZ0jurHvZ0fQWj5XfdoxrtsTI33SvzwMBsO+xKDHyoUNlt+mVLxNi37i5WzNSB/fUaWk8qMjIMEgXX23bhuK5RSlYZs9f+qL00I=
+	t=1790534869; cv=none; b=fMsbLR+KU02azKSZ5hUb5o4+sQATNCkUH+97XrFNuAxeLQfk1BQ9dl37vL8Yl8s9K4X/kGZFx9b/G+BlWxXRwEjBu8sEBc6WSVRqCuYGXWTriJhPPLOt4pYr4ijTUWS0bsPckNtcQj8RP6Va2n2f6l1v5hnF+w9qAtENg4Ce9Sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790518851; c=relaxed/simple;
-	bh=rewYJ804mTzQ60NoVNjxyHcEpuHioue73AiOm0aU4D4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nlJQypOaI2cv5ZpGldRL5lflcvSVqtiuiIUyAAfSbe7cqjh86bSG4FMlLIH3sFKX5oTBh6Z7d2Ow+HB16kmuCavGAnDI7IVFJLEUHZPK8SploQAeN5adAf+S/2fbVbB7R1Bl12fPW4+Fj/7/ChopX1IqOlynUTeaXdB6yG0g+Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HiZVZYJX; arc=none smtp.client-ip=74.125.229.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790534869; c=relaxed/simple;
+	bh=ViNBLSklZPQRM0ds8F+WFFkGEzCtYSc+f0YcLyNmEi8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=imxiWCQyBhE55aCVGnxWx8z2XLwHeaqn3icY8REj3P33Vb+Qi9ZS0nZgijawiLEvEYLw4X6UEVIrx4mUJRMS6BL/bWWmruNlnIklvbU0ux+/Gz7HYZ0oQzVcG9pgLl3H7ZpGWsV981jeFgR/kL4cysNclGluRRdZ/v1F4HcIUUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=Vy+L0Yog; arc=none smtp.client-ip=66.163.191.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HiZVZYJX"
-Received: by mail-dy2-f42.google.com with SMTP id 5a478bee46e88-3427493501eso885299eec.1
-        for <linux-block@vger.kernel.org>; Sun, 27 Sep 2026 07:20:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790518849; x=1791123649; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=QuFiE8Sn5ZCiAo2F3P+hWDb2ouMekTqqlvB4M0L/MQ8=;
-        b=HiZVZYJXNFvEUFnGqmna20rmJwC9EhanTDGZOYOp21a57gwfBiM1R30OzwL01Wr+r8
-         fLV3ZESNzy+6LtaILsb3zqrMNlQ+jxn70MfnxrgJLJVDK1rVPb+9qLkwVQTSvVCME7Ae
-         akOM5VdfxMcyYbSRKeJXzU7vzTaDsllYoBItS4w0Kjlaof8zoe+RuIH7uGlWOodRxGUn
-         jAStjmjKwcZ49njgPihE7oTOStxrUrQOFkJRon+CoIhu/ZTY/2hCSxthMSq8CAryMvFM
-         wK4BycH3aZF4m/ewt3waW30jhWfhgmsrU6LuzIHVLXI7CUgOfL3LSC+h1urWFRd5jRlk
-         Y3UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790518849; x=1791123649;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=QuFiE8Sn5ZCiAo2F3P+hWDb2ouMekTqqlvB4M0L/MQ8=;
-        b=d3PfSR0sb3HgFcoFiAJwy/foE+UlpaMXp5hJb1/SBIQ64IliUaUlkrDE9IUwMAOamr
-         aO+eHrmnrKy3JE1M5RaFvxBryIehqAdVRmD5uCRkCR7fNlH7tTBWyACWks5Mt1Inw/MR
-         WLU47/vvc9vhPUkNEpB2n8YZ0HUj1azKxymjKEpLWNp5XKZRxv+yzsMOdPHYgz5MeAB7
-         3H7yFayFwb5dkqXbBULV4w/TyULv2mz0p/B/Oa5f/mQfdd9N1QfWW6y6fBLGWmEKdeaX
-         NMo/dg9NMjYGX53Q76oy2QyrnpMIBypDcgIwpcglvzlOix4QW7ssIoTl/zjIa85+2e03
-         wa9g==
-X-Forwarded-Encrypted: i=1; AKwUvBy5/S5oMdqBB9zyBCEQZGjco1R/70YiF46MyASqIAlmf7tt68AuGNbV+8EYsgc9SbUnMUSFHABGBDmGVg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKagUR64ZOXxHm0/dwRgIH5750KdChfy19QjQKzSIFp1HF59p8K
-	tW8vc1mKSj2LLHQyYFw2a0Cq2s2DeALZ0TSP6ySvHg369JGwbdBkRSRv
-X-Gm-Gg: AYBFou1Onu+XxYulpWOxsqlDnw5BMx67oULIFvgK3oI+oRr/90QfrYabbWsqdPZqHJd
-	c9FTug0GjdPKzLCDgsGefUiL3HPp1L1dR952BO+oWbgrX9hL2p+9+Hz3VD9Jngh/po/L8QlpXM3
-	dV1myq6Q/y6gRWI7FFbNpkWDffeSOqIT3AC08hioO1UvPAw1BIbhSNII2H5eSsulmwYQ5A1rpoT
-	rfTW3YTXw1KqXPi7i/eSiIHFMtyGP5JhlJgCXNeNtQGIBNPFuAN7UFUewIf6DIdNZtGWj6mxXz3
-	S7w+GMulMW2jw4w3Y2jilEyQCg/7gDKL56xy8TYxjcdjIviLM+DDlBuPMkNUgXOKf+keOYVKTNt
-	8mozTHs1Ol1GDtX5cf0H2HADZB1DWbcVgKhsEhm3JFc9iGHCPrvO1xtvV4WFrlMhGkA8r+5REMe
-	+O0GGbLOrgRbD+vI6wHWmzoIhPAKtZ+i4dakKs909cHPec39QaFv1pI4o2dNo1OEegyvVO02tom
-	TOBakGTABYwYpUD25xZwo3Rx4KRGxzs
-X-Received: by 2002:a05:693c:87d6:10b0:346:7c2c:1d23 with SMTP id 5a478bee46e88-3467c2c2597mr1464216eec.13.1790518849337;
-        Sun, 27 Sep 2026 07:20:49 -0700 (PDT)
-Received: from 192.168.50.3 ([198.176.50.208])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3414504fae2sm22534911eec.20.2026.09.27.07.20.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Sep 2026 07:20:48 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	co+4618907cccdeffa@bugs.sh,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] drbd: keep discarded packet size unsigned
-Date: Sun, 27 Sep 2026 22:20:34 +0800
-Message-ID: <20260927142033.297349-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Vy+L0Yog"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1790534867; bh=l53zxW3mCIqtbpXnl7Mu35EpsHI8eZf/mbtge73hUQ0=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=Vy+L0YogdamuW9cgbz74vKDaR2D1Spx/rT06jLoPa4kfB0qIDi3L8+fC015KHNR7VzlOZa1Iy4/qHVsfywv0GHObumSLRZytAQMdmSes7MsyI5O9aQ6bg4SVJDgZbSRkRvFc91nADO/470HiEVibpVdA3es0DVkLWlbEiTSjnldjRKX8R7tmWnDq91t22ecNSFGnzca+q2ESzIDquLdQ4tK0lor8WbcNO6y4iUModNvSA5xckYCzEuyUZqv53LjePcWURc0yN6kMTLeJFnGaqWfab7CzEnCJguaFNB9yRe7HmxNabyblQJgbIFxk9E1zDWgOqMrV8Kv/Gw/R6++wHg==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1790534867; bh=LugiFqXJOnDgHWKsocEQBizTmjOA8GR1+2QoKPuaLEs=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=f6mMk6qLhpVtk0nmydFn8pBZJSFVdU7QVLBBSoK5F3eQ1GSYxvq+U5tvQ2mWV3gOMtbccJHShByae2NFe0KPoqocWl1O9uXkrXpC/P82svUoFUrjTksVT154UMb+goaS2zR/O0dClBXzjI/RdJ9MZKexn9z8rFjISI6RiZK0TSiGdlOZurEpcOYXOzRAMa9xCk0695HGkXf9dJl8NYboucSLhf2wAdPM+heitlOlgU+3DO92cIvuUapUJp8fQeI3tqRqLohddzN9jJU2eyOqrplmha69yRo9+MQxWoIkrcTj6IM6IVTcWtnbi1Pnm0PAWBtkwtLhxLqUVBadOHDWjQ==
+X-YMail-OSG: xYfplhkVM1mxsvHTHnldBsjV5XavcaBdPHT1GJ2Ol3vK9gkxkGo0g4hB.NDegvm
+ 5hd_zqVT4QaPNftYeeQiWGRA4yAcNwMBbDHn48trJobpstiLB0R47gZUSSz_yu3sOEMjqUCW.qa_
+ qqlsPtKAyF3M_k3IjnG6VBRtCk4WeKHijHBUzwsZ6RfZp.iZcmzHadi_ncpcYQov6nvboO5JkJRe
+ P0vvoIkR_DJJEXP3pDH.ZD9BcMIDoHtKM0Yt7dvbhnsGSCJ5_ypb9Phx8MZy9XNBIx_kLXhL2we0
+ bIJNFD7Q4xebDRNoPxQBHG0Kbr.RcuLWU.lh99vEsjAS_lQMd3UIurswkvWtfKbt1LH._DrP161v
+ TBak4yaHdodQBvyx7PaBSxlyubMnRTLNtHTb1TAPNxasVgxajpNoR3ImJYGhkr.0n28RLZGiuAKv
+ bQLU7sTeR8cD_Iv8D7reiU.ATrCA2Ory0dsne6Pe3psz6pY4ADLfopziTw.cZI0Aie4JQFxGyT7f
+ IByZ7JN_FBkoKon1FKO0sS3.V6ns4WgTZVGM9cTJrOm7_vOlQwj.Is30rn72BQGQqhDevGbOGez7
+ .BcfC5UaF3jh6IQLf4hM1VoJzpzoIkuT.drKmgYYwqOyICax9qWdbCfvDmuSE44Z7jODjwiFfaNK
+ hinamxHTQfVNzeMd069.ar4aW8jpJZlQT.WyoO7E2dXr06csWNAWhLTRyKy3jN9HvnT1JaNTj7U1
+ 8ypMEUmk_FtyKqqix09us..u3kuAPrRGJqR8Y6PutU2_YlqH4SIUCVh97dWB5oXqfEKFGuX.8p6p
+ k4GnW.Q.OBrNttRVxKuIsaDEOqoyJmRm7j8bSe1Cku17oPGHlZJeZxgKm_jjGyWjo_Mqy.iQhA8l
+ d_ekzgqa4WPUSyP3XNH3LSGmqGNfFuA8xXIbEe5R0AFgxKI6YZ7JMywQd_iQXySTL1PxfQIm_toh
+ .xODmeDsTvWT5.hkwWnN8CqRZ6aZc4Y0iCvuZY5N3hmg8LYekKnGjCiH7h0dJT2oLNRUewth9VrN
+ LUNfpHx4_a2RAmhIaOYOWZkvO2pnlKbzcia0gG3S7UbKr.QMcuXuPB73JKW5umQ6Hl3zf32jfQUj
+ t3JKt.E._WSJgv0Mm1vat6BXP.t8aQZ.qjvvt5NZruMkaelFynIa.lqoTm1Pf2YG81AuDDW3Q7OQ
+ mtmTXrndBWOh_x5SIthDwqWZwoejqjFu7sWVJnWBJGKBJzlfxQppmoEgIPMskE.kHCGUPV2ZVGeG
+ S1Vw3719I7mYyIFf3741VxwC2JTcuGe2IjWoJvImfQBw4g5w3vKRIdS43yxf.w4gHvZzAOYLqvhP
+ CbZMTQ6lBrC.ySyAEkWxxhlgcrSvI7qZSyFwFyT0bhpqyiVRsz6DL31stge.mjJbgxuZEPvizkEZ
+ w2GN8fSZuSadDRd5L1w.PvrgQEOqj9w3f4iasXib_AEJQPFmCzbRDN0g58tv8wydUEWvftGOoWf7
+ txhy8pJnTX2KUZ89UskIPoxxunRobgC1R7XS7bHXcCj_uaY2QcNHocNr.Tntzsk4yS64c1o3N7pg
+ 4eMN9NkSbBkmy5y8Cdr1rsUV27qyaKlP_rIbzlaYv2m6mx.JxIrIueeS3mBxsUyZfdYwSQaD3pcE
+ DmIpZU3dh_D8Pu6e9g.aYrcqVCQrRNqbVikCBBQwzrjVGwp3sxIDKIjOchb_dA4Pmt9_ZRObyyGV
+ _yiG5kVvXOxRGz6UcBt.TIMGQu2h17dDBTf.P36wP8VpoBK9bpkpjX4ovuxK73HwRsL4VsQAJwdU
+ khd14r_cFYzk1aX8AHJ6gfoYVd8VyntZxDwdsizc5Sj8u5J1.mNMKzJvRl.d_GD1vaxaV7doOrS_
+ vbERA.ALYoOVo1gxtcTjr_O6vGSHFKSaeZ_RHOsWeIykL.yBFhWqOUVSU.A5x6ylwQOO1uZDtQs_
+ 1meFtHEJbf143t9XsjDsJryvqO_xJXEfQqQ0QRE.wiUegWWCsQ2vImCOwuAwrsG.kAhbjkWcMAkU
+ 9kJKh0g6AA5uf.P987afPHAULaOCV4u04ZLMjJXL7I3w1LXoKDkecKP1oYVvXDadabXRK3yur.Wx
+ Pd.OoQmG0DeLWV5iSk1aNC8yUMMu6uQDUtFSYEoFH84soV_hn28w720tfnnXyA7Ds_xtsAcx17xP
+ tniO0MEmRWIiwSfN3gXkqEJ3iUD3vvFJN8s5zCcPMfaJRiaORPKOjPkEhX9aVck.DoGtypYInsXh
+ U6dUnbb6LBtNpUFSRzBfsdIH5iaptiQpTrlU416sFeJL7oHdAZ.nLk7naEuD1Xp5fojFz89AhzT9
+ xUbfYQy.G7Oc34GM-
+X-Sonic-MF: <userm57@yahoo.com>
+X-Sonic-ID: f88932c3-cdf9-4ed3-b867-a233ce767963
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic312.consmr.mail.ne1.yahoo.com with HTTP; Sun, 27 Sep 2026 18:47:47 +0000
+Received: by hermes--production-ne1-6dbcb84f44-dbq4q (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 5fc8a42aabb9384b77faa8729bc76f6a;
+          Sun, 27 Sep 2026 18:27:09 +0000 (UTC)
+Message-ID: <392982a8-f62b-41e2-9b2b-7b5b54ad7839@yahoo.com>
+Date: Sun, 27 Sep 2026 12:27:08 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] block/swim: Minor fixes
+To: Finn Thain <fthain@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Laurent Vivier <laurent@vivier.eu>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Joshua Thompson
+ <funaho@jurai.org>, linux-block@vger.kernel.org,
+ linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
+References: <cover.1790408363.git.fthain@linux-m68k.org>
+Content-Language: en-US
+From: "Stanley J. Johnson" <userm57@yahoo.com>
+In-Reply-To: <cover.1790408363.git.fthain@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.26577 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-Packet lengths are decoded into an unsigned int, but
-ignore_remaining_packet() stores pi->size in an int.  Values above
-INT_MAX therefore become negative; min_t(int, ...) preserves the negative
-value and drbd_recv() converts it to size_t, allowing the receive to
-overrun the 4 KiB rbuf.
+Tested-by: Stan Johnson <userm57@yahoo.com>
 
-Keep the remaining size unsigned and clamp it as an unsigned value so that
-each receive is bounded by DRBD_SOCKET_BUFFER_SIZE.
+This patch series was successfully tested on a Mac IIci and a PowerBook 
+Wallstreet (G3 Series).
 
-A KASAN reproducer reported:
-
-  BUG: KASAN: slab-out-of-bounds in _copy_to_iter
-  Write of size 32672 at addr ffff888027129000 by task drbd_r_r0/5002
-  Call Trace:
-   _copy_to_iter lib/iov_iter.c:197
-   simple_copy_to_iter net/core/datagram.c:521
-   __skb_datagram_iter net/core/datagram.c:435
-   skb_copy_datagram_iter net/core/datagram.c:537
-   tcp_recvmsg_locked net/ipv4/tcp.c:2846
-   tcp_recvmsg net/ipv4/tcp.c:2949
-   inet_recvmsg net/ipv4/af_inet.c:896
-   sock_recvmsg net/socket.c:1159
-   drbd_recv_short drivers/block/drbd/drbd_receiver.c:322
-   drbd_recv drivers/block/drbd/drbd_receiver.c:331
-   config_unknown_volume drivers/block/drbd/drbd_receiver.c:3624
-   receive_SyncParam drivers/block/drbd/drbd_receiver.c:3671
-   drbd_receiver drivers/block/drbd/drbd_receiver.c:5366
-
-Fixes: 4a76b1612f35 ("drbd: Map from (connection, volume number) to device in the receive handlers")
-Cc: stable@vger.kernel.org
-Reported-by: <co+4618907cccdeffa@bugs.sh>
-Assisted-by: LLM
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- drivers/block/drbd/drbd_receiver.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 58b95bf4bdca6..3fb73fbfd5f27 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -3616,10 +3616,10 @@ static struct crypto_shash *drbd_crypto_alloc_digest_safe(
- static int ignore_remaining_packet(struct drbd_connection *connection, struct packet_info *pi)
- {
- 	void *buffer = connection->data.rbuf;
--	int size = pi->size;
-+	unsigned int size = pi->size;
- 
- 	while (size) {
--		int s = min_t(int, size, DRBD_SOCKET_BUFFER_SIZE);
-+		int s = min_t(unsigned int, size, DRBD_SOCKET_BUFFER_SIZE);
- 		s = drbd_recv(connection, buffer, s);
- 		if (s <= 0) {
- 			if (s < 0)
--- 
-2.55.0
-
+On 9/26/26 1:39 AM, Finn Thain wrote:
+> Two old bugs were reported to me by Stan Johnson while he was testing
+> my recent patch series, "[PATCH v3] block/swim: Fixes and improvements".
+> The following patches fix those bugs.
+>
+> ---
+>
+> Finn Thain (2):
+>    swim: Return -EROFS when opened with BLK_OPEN_WRITE flag
+>    swim: Fix FDEJECT ioctl for exclusive open
+>
+>   drivers/block/swim.c  | 5 +++--
+>   drivers/block/swim3.c | 2 +-
+>   2 files changed, 4 insertions(+), 3 deletions(-)
+>
