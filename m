@@ -1,115 +1,116 @@
-Received: from mail-pz2-f40.google.com (mail-pz2-f40.google.com [74.125.228.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4314476045
-	for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 08:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B553FC5AE;
+	Mon, 28 Sep 2026 08:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790584055; cv=none; b=OvhmfL20IRv92a/7tPnlbGnkYqfY+HZ57xIosTR1+amR4hjdq7UF6Tpql8dZtJZBzpe2IMybKNZSrssqMNB9+mXzS9h783DVcbtoX4asGGD0TV2Y6hu+70ABHA7PWwrtiqACPdpO2RBXdlC1/9Uu/5FAWUqTS7RUHGQyTCYqzC8=
+	t=1790585096; cv=none; b=cNA6/xLPW9ioG5KbsFcNMOkFKQxD/6BIb1iJzKOX8GU0ztWKA9r1V8M9Foc1+bA80Tmi/0JNx7BGa7Cs9GzPgPzn7cpJJpezGF4h17Yhwu4wJt6S4iuz5f6XWlx0KTYsvp952DtNe/MoWA6bvr1ccIdYfjiMbKn+gN24XHPvSnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790584055; c=relaxed/simple;
-	bh=qAKPddpqFgfHmTQw4mD4LolSxZQhiX47J3WLDmhJNXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uxQprENDGhRw3xk1KOQpNe/ujPfJ+VsDZw0VgI6dqagRk0yMMYOU7y6qLVwcMsTOLJmI5Cv3cvkhyqzx+ZX8jW60u335sD5utoWEiJ9cp2sniCOVYeOhrilY9XsL3b/slMQZK4ufpzUu1kwPbZMpC7MxHkcp3Qi4MLjIY1uq2Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=LU0862Q2; arc=none smtp.client-ip=74.125.228.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1790585096; c=relaxed/simple;
+	bh=iDGp7P3BEvSWs1L7iNJIWjF45NYDB+xMs1LHa1Er8uQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=pfVyHmoq/Q2gQ9ebu3eQEWsXTWUPT4NHNHmPcFjQ+8UGE6UQNtsJfEr6vEGPjXVoCQA9YwGRQqHNObSz9szPhIhfNHxaXKrgFh8SO7NBcG+M39TySQxTEXDQ2VVV5Ep8S+kp14dgFxn4MLU5vPNGlv4KjAcCQ6+WDhfWt0ZEqHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Il61np93; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LU0862Q2"
-Received: by mail-pz2-f40.google.com with SMTP id d2e1a72fcca58-87c90648f99so2101200b3a.0
-        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 01:27:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1790584053; x=1791188853; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=XfTNwTEf8cXEoiVJjaR2wzaM0AVgLL//fGyHvTOkwQs=;
-        b=LU0862Q2vbkM8L70ECClA6fPi7+gq6ZxFDngKIrBT1sWsKXYt7AxZveVgNS+4JaQhy
-         lJOMXW681dRW8Xtvr/0MGGXEV0h2vmvn6xXc4TQD8jvvHVHow0M747uwJW6/XauN8QOV
-         6lShKGYxn5my6xEmfiRRNtCxRBdJ5KQlc9T1Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790584053; x=1791188853;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=XfTNwTEf8cXEoiVJjaR2wzaM0AVgLL//fGyHvTOkwQs=;
-        b=M9DQn8zzxDgbZ7EE76bCsOpIZbwHrUidlbu4RYNGFeYcKNQFj2klN0nHehAwVGFEQJ
-         30F5glosZ7zM6MsOW5DAghkv3rcKNTCEqGRZ74IZc6YXLin9AfKyzlnQ0xEWZFnbdYaj
-         gav5Xtq5YhhX3xEGSaUXyxch/ekFUwvUdb2Raw+zYm+har8+5bhL97byzmdl0LOe77mK
-         zQ5tzOIPjFCn2W8FZtcGn50x3KmNeQQHf1NYLQOgBvUGrwzJNH0KSYX0VlM1H+ZSFcvW
-         UU/PuzcV3vM1D3w9KbNbVeWAkAe0fj60h7DL0iNmZ+a/mQn8aguZOvatct927x7ohlvT
-         VHlg==
-X-Forwarded-Encrypted: i=1; AKwUvBwId2kWarzq58fdZNkZ0k2ZqSWuCXNGCb70nusqY0gsfmK0Ss2evfv8OlLPMrnFWBDeZeL9hn+gfVmrmQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++msSigwjWfxvFhH7qxbamqWCzHjaMoYzJLDp4fDEdJZ4VNe+vfZ
-	4j8++4wpPvrGCz97F46udYXwzkg0/9fpcgoOCdI1rIpJSgii9QUE+DuLg4WKa3usiA==
-X-Gm-Gg: AYBFou2iiAHZFa0URtXYW6cI7kXbp2BAZPLSYteb3GE902I2yxnkY89mkuwaxi2Cr+A
-	w++FMNWjoj2qFZ+4K7XmhZG+TtrpCVdWFUdJ1RbbjMp5mEeU6kTpwtAJ+Mr84lqhQTsz359r04I
-	CeGTBk76ruoFWwuqB6it2APdBqkfk0bg2Ci/uvZzTSgDvPvafTSvAhQVbj5ANMdLPbAsxANuvdn
-	Dh53/UM2M/0Yh19ZcgZCheUPfiwchIypOZ+ZR+Y0Qiv43hwUoQ3j8PFTTQ3vsPvnYJmUMsyvsYE
-	/kuxArbe4S/PU/gNRLAKW+9h5qrdlx5SaC34WQ+KzESHr+nw7t3VFPrQcGAGGSbSts1K8MG5K4Z
-	gMV2WRMIJncHdp1GE6RyIv5HMGLzgLMlbcfuVjTHFTc2kxOUaextWS7BnOcNQUVGnTyw+Ib+uRm
-	JpJXQmJX49eb9CsyKYIEG/krZGL7fy2xr+M2zb2z1dMLbeQNM7w5GQgrPhRimlraowkdB6QlCvv
-	Hvo/3C1JwHGwkY/9FYGxFPMbmy5o+RHTkpzZ7k=
-X-Received: by 2002:a05:6a00:7619:b0:880:8fe8:a3ea with SMTP id d2e1a72fcca58-8808fe8a798mr3659738b3a.45.1790584053122;
-        Mon, 28 Sep 2026 01:27:33 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:fdbe:318b:98fe:bd96])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-87feae8d827sm3676965b3a.36.2026.09.28.01.27.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 01:27:32 -0700 (PDT)
-Date: Mon, 28 Sep 2026 17:27:23 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Michal Wilczynski <m.wilczynski@samsung.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-block@vger.kernel.org, 
-	Yann Collet <yann.collet.73@gmail.com>, Nick Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>, 
-	Chao Yu <chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Phillip Lougher <phillip@squashfs.org.uk>, 
-	Sungguk <sungguk.na@samsung.com>, Jaehoon Chung <jh80.chung@samsung.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, linux-erofs@lists.ozlabs.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH RFC 0/9] lib/lz4: stop forking upstream LZ4, vendor it
- instead
-Message-ID: <arokqo4gVQVglkBa@google.com>
-References: <CGME20260925113450eucas1p2fcf838f00f35e1bce0ca04a694cd0cd2@eucas1p2.samsung.com>
- <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
- <arnr-Su0uJdK_rOb@google.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Il61np93"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=iDGp7P3BEvSWs1L7iNJIWjF45NYDB+xMs1LHa1Er8uQ=;
+	b=Il61np93Mzpfh1Yw6ZTaudK8+nCQ4+DjNBs7VntEmE0tZXcn7sPEF3AumdIjHPSk2gTjz273a
+	wBOH1W7k/4xR4wPV7l62M9UPquFd63zSevJQns1zbf6BGnLBtZpCHWpqVhapwho/G5mndn+Ez1O
+	jCI6EYJd4AynyN7whX7Q3xA=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4htZM82gK2zcb3G;
+	Mon, 28 Sep 2026 16:33:08 +0800 (CST)
+Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
+	by mail.maildlp.com (Postfix) with ESMTPS id A9A0740579;
+	Mon, 28 Sep 2026 16:44:41 +0800 (CST)
+Received: from [10.67.109.91] (10.67.109.91) by whupemk100010.china.huawei.com
+ (7.152.184.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Mon, 28 Sep
+ 2026 16:44:37 +0800
+Message-ID: <f697efa0-81c9-4ace-b9cc-d672b98dfc9d@huawei.com>
+Date: Mon, 28 Sep 2026 16:44:35 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <arnr-Su0uJdK_rOb@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC -next 03/12] fs: pass struct path to xattr helpers
+To: Amir Goldstein <amir73il@gmail.com>
+CC: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
+	<jmorris@namei.org>, <serge@hallyn.com>, <corbet@lwn.net>,
+	<skhan@linuxfoundation.org>, <rdunlap@infradead.org>,
+	<gregkh@linuxfoundation.org>, <rafael@kernel.org>, <dakr@kernel.org>,
+	<dlemoal@kernel.org>, <hch@lst.de>, <axboe@kernel.dk>,
+	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
+	<dhowells@redhat.com>, <code@tyhicks.com>, <linkinjeon@kernel.org>,
+	<sj1557.seo@samsung.com>, <yuezhang.mo@sony.com>,
+	<hirofumi@mail.parknet.co.jp>, <cel@kernel.org>, <jlayton@kernel.org>,
+	<neil@brown.name>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
+	<tom@talpey.com>, <miklos@szeredi.hu>, <senozhatsky@chromium.org>,
+	<chenxiaosong@chenxiaosong.com>, <zohar@linux.ibm.com>,
+	<roberto.sassu@huawei.com>, <dmitry.kasatkin@gmail.com>,
+	<eric.snowberg@oracle.com>, <stephen.smalley.work@gmail.com>,
+	<omosnacek@gmail.com>, <casey@schaufler-ca.com>, <nanx95726@gmail.com>,
+	<djwong@kernel.org>, <daniel@iogearbox.net>,
+	<linux-security-module@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <driver-core@lists.linux.dev>,
+	<linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<netfs@lists.linux.dev>, <ecryptfs@vger.kernel.org>, <exfat@lists.linux.dev>,
+	<linux-nfs@vger.kernel.org>, <linux-unionfs@vger.kernel.org>,
+	<linux-cifs@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
+	<selinux@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<xiujianfeng@huawei.com>, <lujialin4@huawei.com>
+References: <20260924104831.1081137-1-caixinchen1@huawei.com>
+ <20260924104831.1081137-4-caixinchen1@huawei.com>
+ <CAOQ4uxhMhcxq5+crz84f8xj+Wi1bHhNqa_TecP-RvipheBR+ug@mail.gmail.com>
+Content-Language: en-US
+From: Cai Xinchen <caixinchen1@huawei.com>
+In-Reply-To: <CAOQ4uxhMhcxq5+crz84f8xj+Wi1bHhNqa_TecP-RvipheBR+ug@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ whupemk100010.china.huawei.com (7.152.184.41)
 
-On (26/09/28 13:25), Sergey Senozhatsky wrote:
-> On my x86_64 build .text size change seems to be quite significant:
-> 
->  ./scripts/bloat-o-meter lib/lz4/lz4_compress-old.ko lib/lz4/lz4_compress.ko
-> add/remove: 0/2 grow/shrink: 5/1 up/down: 8022/-1755 (6267)
-> Function                                     old     new   delta
-> LZ4_compress_fast_continue                  6028   10486   +4458
-> LZ4_compress_destSize                        158    3112   +2954
-> LZ4_compress_fast_extState                  4078    4597    +519
-> LZ4_saveDict                                  82     153     +71
-> __UNIQUE_ID_modinfo_466                       52      72     +20
-> __pfx_LZ4_compress_destSize_generic           16       -     -16
-> LZ4_loadDict                                 261     204     -57
-> LZ4_compress_destSize_generic               1682       -   -1682
-> Total: Before=14756, After=21023, chg +42.47%
+Thank you for review
 
-D'oh you actually point that out in the commit message, sorry for the noise.
+I will switched to ovl_path_real in the next version.
+
+ovl_creds is a prepare_creds() clone of the mounter, so unless
+the mounter itself was sandboxed, the clone carries no Landlock
+domain and every check short-circuits. The new rights are also
+enforced at the security_inode_*xattr() call sites in fs/xattr.c,
+which run with the user-visible overlay path.
+
+The exception is an unprivileged overlay mount by an already
+sandboxed mounter: the domain is inherited into
+creator_cred through the cred_prepare hook, so the internal
+real-path calls *do* get checked there.  For this series that
+means:
+
+- ovl_xattr_get/set/ovl_listxattr() forwarding and the
+   ovl_setattr() -> ovl_do_notify_change() forwarding would be
+   checked against the upper/lower paths;
+- copy-up would newly require the metadata rights on the backing
+   directories too (ovl_copy_xattr() calls the security-checking
+   vfs_listxattr()/vfs_setxattr());
+- stat() is unaffected: ovl_getattr() goes through the _nosec
+   variant.
+
+This is not Landlock-specific: every LSM
+that keeps its state in the cred blob inherits the mounter's
+context into creator_cred through cred_prepare.
+
+On 9/24/2026 7:12 PM, Amir Goldstein wrote:
+> that's ovl_path_real()
+>
+> I have no technical issue with the ovl patch bits in this series.
+> Anyway, I guess landlock is not going to enforce anything on the
+> private mnt with ovl_creds anyway?
