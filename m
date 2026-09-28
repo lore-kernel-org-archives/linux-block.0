@@ -1,65 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB19130F95C;
-	Sun, 27 Sep 2026 20:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963373264FD
+	for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 00:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790540792; cv=none; b=DdVFYS+iHFEcCIxOZVMnKpG3DHwy7SUlvHvJbcJM5qvPRdERRU1QjDtBnz6+DUfqVmLpU/uA+LjqkMAJB0SSAIYaibat6e2znGuyUDTudC+CeQsRE+AprZB6CFNJYTAoiL56nhcfDm0vBzCFPwLnf7Wo81hiwdRBWDkTC/pQ608=
+	t=1790556812; cv=none; b=t1dS04Vbxny3RipDsMbMnWiXubz52I2nDvkWie1yZMGV1fpu32GsnGcF/4mTNd/iwVouw7aeeg5vjx4kdXSEBqbCmojgW9D+RlCZgeZfbSMHK2W4o7xjwgvILy/GN3f6U3Y192jULfrk6bTKuWkirZMyd1z0XK1+J/OCzQ83qrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790540792; c=relaxed/simple;
-	bh=7ofVbKI7UwbZtzf8DCr38YnkemcRoO+lOYfaE/MEjJM=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=ZhBUQaaY8myRXvIjqy3+BFVsDEYYubagVpq7WG95G4hohN7BsJ+irZG0qZP70onEI4Spqdcc62GHPBZN8kBgpcgdYSfP7Zdbd/UPKZ8jGcpvMpNAqZbkCpOuIFQZk8xFxoIvEfdKqqt1rloliHMBrihuoIpo100Z62VkXojGAv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=fKhzG8Id; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790556812; c=relaxed/simple;
+	bh=HO8h1KmYA4yTXRSNwVs9EHHpVuK0s9w8gUGdNTIU3X4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=MOD14OI9M+Usj4XzUh72MEEFTJr6+9d2/xGJcFVtsg9+t2ciTb4US4/9yWSuvWfgD+HNTqylGF+ybPyLEgFxkV+RJfyuRdk67RjI/4orLMgZZuAsL0KNieoTD7qn8c7U17DeVDJRYsiuCmYvQj7WRqiWwjLMHGGPZaxH4FwLEXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=g40PEYi1; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="fKhzG8Id"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D446D1F000FF;
-	Sun, 27 Sep 2026 20:26:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux-foundation.org; s=korg; t=1790540791;
-	bh=Wtc36Zd26DF0UV6qt4ILyxcIdl7ocFhXmsZv9Dy+w+Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=fKhzG8IdBSyYx4WwzMQqnpwOPZCr3ooh55LHrwrwCvxbLPkvxBO5t+3+ccAfMHSzE
-	 gjHo4hWgMwEazfMjspTgDHCK6Rt8WL8Jiop6CSr+TZqw73IJUiiQm93mcCE9E0f5Ei
-	 a0w+rkZtrFS+ecXZrAa+HYyVW7xszMLOpwQAwMzE=
-Date: Sun, 27 Sep 2026 13:26:30 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Julian Sun <sunjunchao@bytedance.com>
-Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org,
- linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
- hannes@cmpxchg.org, mhocko@kernel.org, roman.gushchin@linux.dev,
- shakeel.butt@linux.dev, muchun.song@linux.dev, willy@infradead.org,
- jack@suse.cz, tj@kernel.org
-Subject: Re: [PATCH v8 0/3] memcg,writeback: flush foreign bdev mappings
- separately
-Message-Id: <20260927132630.eef2d0f1704534c7bde8e538@linux-foundation.org>
-In-Reply-To: <b5da5c30-7c8b-4c60-aa3b-d2e3603e82c1@bytedance.com>
-References: <20260922125015.3435215-1-sunjunchao@bytedance.com>
-	<b5da5c30-7c8b-4c60-aa3b-d2e3603e82c1@bytedance.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="g40PEYi1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=HO
+	8h1KmYA4yTXRSNwVs9EHHpVuK0s9w8gUGdNTIU3X4=; b=g40PEYi1Ryph3xdNle
+	mvHQi5IoNW3kwV0786SZl7Cd8i0HJ20YbwvhPm8ADZp0giXOcLkPbe8bbxyJOKjM
+	VJzW6JwXwjhF/rM3GaYB8NuEX5PX1XxrPax8EqsbJIcRj4Jm6zQogJyaP8/Hti3+
+	pJ9re95s3H1RF0zL+YDzaA3vs=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3_+l8urlqsULWBA--.48987S2;
+	Mon, 28 Sep 2026 08:53:16 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+To: shinichiro.kawasaki@wdc.com
+Cc: hch@lst.de,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] block/049: test polled dio with user PI metadata
+Date: Mon, 28 Sep 2026 08:53:16 +0800
+Message-Id: <20260928005316.141036-1-yangxiuwei@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <arZyUmncVJSolXLg@shinmob>
+References: <arZyUmncVJSolXLg@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3_+l8urlqsULWBA--.48987S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Xr4DXF18XF1fXrW8Wry8Zrb_yoWfWwbE9w
+	1jqr9rCw48ArWUK3yfG3W7WF47KayUu3yUXryIqrW0ga4fZFyvqrs3tFyFy34rZa1fKr9I
+	kw4rGF9ag342gjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xREsqXJUUUUU==
+Sender: yangxiuwei2025@163.com
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6RzWZ2q5unyFqQAA39
 
-On Sun, 27 Sep 2026 19:48:26 +0800 Julian Sun <sunjunchao@bytedance.com> wrote:
+Hi Shin'ichiro,
 
-> Do you have any further thoughts on this series?
+On Thu, Sep 25, 2026 at 01:16:00PM +0000, Shin'ichiro Kawasaki wrote:
+> I understand the concern. My current policy is to wait for the kernel side
+> fix gets upstreamed to Linus master branch, then add the test case to blktests.
+> This way we can keep blktests runs healthy with Linus master branch. It can
+> cause the failure with stable kernels, but I expect it will work as the signal
+> to encourage backport of the fix. So, let's wait for the kernel side fix to
+> get settled on Linus master branch.
 
-I'd like to see some feedback from memcg maintainers, please.
+That makes sense. I will wait until the kernel fix lands in Linus' tree,
+then resend the blktests patch.
 
-> Should I rename bdev_flush_by_dev() to bdev_writeback_by_dev()
-> and send the next revision?
+> Your copyright is missing here.
 
-Yes please.  "flush" is a pet peeve of mine.  It's used to mean either
-"writeback" or "invalidate" in various places.  Or both.  Annoying!
+Will add it in the next version.
 
-Also, I agree with the "dont check alloc succeeded in __init code". 
-Both places.  Maybe save this little cleanup for the next development
-cycle.
+> I recommend _have_loadable_scsi_debug instead of "_have_module scsi_debug".
+
+Will switch to _have_loadable_scsi_debug.
+
+Thanks for reviewing and for confirming the test behavior.
+
+Thanks,
+Yang Xiuwei
 
