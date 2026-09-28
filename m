@@ -1,125 +1,193 @@
-Received: from mail-qk2-f40.google.com (mail-qk2-f40.google.com [74.125.230.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-42a8.mail.infomaniak.ch (smtp-42a8.mail.infomaniak.ch [84.16.66.168])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8A7385509
-	for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 18:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FE24F30D8
+	for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 19:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.168
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790620531; cv=none; b=V1mDBTqaweJAKVBZsF0fgkdya/Q02wJAcxOqefL8r3Bi1scKCgCy9cbollgWbQUSPOrsGcBkFw3TFjjP+32o2OiW9R9LJdGspghg5ZlI1T3nHeCWkBKBXydMi51E2xA90OtACTzGt4Whif0nKPuzonyZPlFfU3kD8zrqau95WkQ=
+	t=1790623590; cv=none; b=PVJbKrOb4ZfuxrGFs5nNb3pM1TEqhxH3AD4hlPgFT6FvHTpHti1LgXblPeMd0d/ixMNRL4937Y47Sutf0qFjfIfgmvFkVCbjpp/tuPDHplt+uht7R83TQAhtEQI0qr87kglCe3JsfBFnD4eAxGqSaaXBAN0VLE0Kv9uHAFNZ91U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790620531; c=relaxed/simple;
-	bh=Fa7UETDgObC9pq8R4zODrgE9VeFREK6fLvCloveBz6Y=;
+	s=arc-20240116; t=1790623590; c=relaxed/simple;
+	bh=a/fVDOxXWPf4pRO+JMUIkEs0kESCcu/HaVc7rPzOchg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K50Ej/q+BSO8MVxDkjtDrd4O2pp7nFOS0xoMMv3Id9Daa9zpJ3KXZBt/fMPiwPQOiq+4BE6Zkblf2tjy8pC73k7Zi706X/9jn3Ux2GXygn2rlNwQC7kEJV7BV9SopwxvnryXf7d/DUGTMIPkkvuok6qdb8/NeRz37JL0qIRTHtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=pass smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b=OCQvMRWF; arc=none smtp.client-ip=74.125.230.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toxicpanda.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=WAvByny57f9jZcAO1XNaxjw+NZDYkt8E5UyBDZnlKYYoIGZIuXhK23RcSyn9vbKIsx2HEpvVLa1dDNVezLmM++3Jhavb+gH5TFTwYDe+l/Xx/SzD+/qGqfqIWXs1WWPI5PpQeu0lSlEZirIVsCkxd1HRtKXfG/38XR6JsZIYXiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=sXM4jCYk; arc=none smtp.client-ip=84.16.66.168
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b="OCQvMRWF"
-Received: by mail-qk2-f40.google.com with SMTP id d75a77b69052e-53324cfe178so20814321cf.3
-        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 11:35:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda.com; s=google; t=1790620528; x=1791225328; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=dxYWdnG9XxFrqCAEGe9EqULQHLeOXuQ+tsemj8NQgPs=;
-        b=OCQvMRWFaaG7PG+jWRdM+wDB+dmQ16r3yAiNRv9fmJLd7/4TvTRZetCx55AE2QH99U
-         VywUQNpucSdncZWLk2G/X0+OJXbe9HxD7j5bhPUYgV+JS5WGWQZWuK65kgRWeOT2yW15
-         sBz9LdDqgvu9sy/GEIYpNtD/B5o4lYfFEp8ytTs/+L1umwr6DosXzrXW2X0MZxvfyBAn
-         ie42fcimUeX6gVesioD+18VLGjpbZg+P+PULtAtIYIGFXfwBHGY/43SjAr/ONuNLxcbu
-         9aQDetwYd3Sd5nQeCJr4gwuRn4vqEBzo05vZB/1CiV7MC/EptfO6U3RPLlBwoF7Mjkfq
-         Bwbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790620528; x=1791225328;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=dxYWdnG9XxFrqCAEGe9EqULQHLeOXuQ+tsemj8NQgPs=;
-        b=aQ6mBliaTWY3BmJngz92FMx1h1C+2IRFg2E0BKWlgIJSexCrrN8FiewOh6oFiIZFS7
-         sqkcLq3mFxXRiPYGRye1Zbc+7fI+qKwQjijaklp1nA5pyxBs3FdOtyOh7Fre/WtvW+Zn
-         rnCdoU7d7MlhpRDGhvnlYjNtnAkNaUXv+RrrvwctLjeQ8d3AmDwYLJTaawrG0AtZN87F
-         1SqHYUqMvSVHDT0FgX5cZGr2DN2OEtymHpImQmUcATeYiIbfy3qocOKLrCqsROc2OhEN
-         pLjaquPQB1Bzt8ekY1N31nUKpXlFpCuy+P/HvThAIBzlU4kJx49520bzqbzYAq0S+2Zr
-         wMPg==
-X-Forwarded-Encrypted: i=1; AKwUvBwVuzE8rzQrz42aJcx9FuP5Ep2lSgJ/yB49w3Re0xPerGYJSWgSPqeI9If2yEu6DMgR3jl5hcERkNyHEQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++nn3aIltQZV4rmo+J1+YvgWn94uMAS6HPHWtMCjAHNIxesfJ+ZB
-	Am14keFYpa1h5/wBIIdm+7o8bj2OxClQ9APd6v4BrQjg1ZfIFWdRRH9LnboiBOCgamcji7VdgJW
-	Q9poHMNU=
-X-Gm-Gg: AYBFou0Wr3IMTdvAjSGJbo1vM+JXjfqjNruykpN+lTgW25CNhjiDIbxcvGsjmks40Tw
-	8Z+I/M2EbauUL1XdB/x2KjSX9XkxTYhqtHssLjJKUawBSRQeOJQFoAsll2kiD+MAP0D1gB3A9GV
-	PtOUbLRwFx3QvXN/WEOFGKU6OB6W6eg89VGL+qWGxjI3xzA9oAj8/rzypj9LCpe8SYgU5G5vWyx
-	rPYyPQttlB0asT3AyJHYpZ180+37PxdQCPv8vd3iDLK+KzbfuDVv5bG1Xq9RsI8Y3eGA5tqeu94
-	7xrKYNKg3xnbkSnP3xdqZrsCJ6DezIVnsIQkOMM0LD8eYoew8ocNGeY7BvinuOrePAMcKgPTaSD
-	XJgWAGwu4Ew/Ca3BzihcXLJdrcdC56RliGjDOVsrqM2tNoPWhO4qbgQm93/6au6hkPShgyoeJrZ
-	e5AJx3Petsz+yzopEoPNDtdOnh4URIsxaOSspRiSpI0TG0efsaLNweBnAffZ3XY5ZP4xySwnL+O
-	Lx8SHqFAd+3Xss=
-X-Received: by 2002:a05:622a:14a:b0:533:427e:11c5 with SMTP id d75a77b69052e-533427e1705mr80457491cf.56.1790620527932;
-        Mon, 28 Sep 2026 11:35:27 -0700 (PDT)
-Received: from toxicpanda.com ([153.61.196.249])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5332240741asm69846731cf.26.2026.09.28.11.35.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 11:35:27 -0700 (PDT)
-Date: Mon, 28 Sep 2026 18:34:13 +0000
-From: Josef Bacik <josef@toxicpanda.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 1/9] ublk: keep queue canceling over canceled commands
-Message-ID: <aop36p477swqzqcn7u7ib3wx5g7sjytcfnya6jjuaukihlgfwn@d6adnvllypd6>
-References: <20260928-b4-ublk-cancel-stop-v1-0-4a4360232a46@toxicpanda.com>
- <20260928-b4-ublk-cancel-stop-v1-1-4a4360232a46@toxicpanda.com>
- <CADUfDZpg0O89whqqCD4tASkS1KxV6b7xWn9mH8TTPQPo6KSFFg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="sXM4jCYk"
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246c])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4htrrm2x2VzWj0;
+	Mon, 28 Sep 2026 21:26:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1790623575;
+	bh=CrjvvaHMWaKYxoFcBUB4DJe92VZuzwdQ8u7IVRkbMcU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sXM4jCYkfSMLVOJD3ZTes7bDu0d+mQkq46RD27THmJWjN2OLGRENiHtu/kk3q9MmY
+	 1rS3gQ42pIxSGI6Jri5E1rvadGfwYZ013Om7EwYKUsN0PhD4mOifCDvQNxdEVSmMKd
+	 jevpWMMN/ZmoE0TF9iizmsTOaz0QYQtwFwzl6pHE=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4htrrF6HTKzphQ;
+	Mon, 28 Sep 2026 21:25:48 +0200 (CEST)
+Date: Mon, 28 Sep 2026 21:25:44 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Justin Suess <utilityemal77@gmail.com>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, 
+	Cai Xinchen <caixinchen1@huawei.com>, gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, 
+	serge@hallyn.com, corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, 
+	gregkh@linuxfoundation.org, rafael@kernel.org, dakr@kernel.org, dlemoal@kernel.org, 
+	hch@lst.de, axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	jack@suse.cz, dhowells@redhat.com, code@tyhicks.com, linkinjeon@kernel.org, 
+	sj1557.seo@samsung.com, yuezhang.mo@sony.com, hirofumi@mail.parknet.co.jp, 
+	cel@kernel.org, jlayton@kernel.org, neil@brown.name, okorniev@redhat.com, 
+	Dai.Ngo@oracle.com, tom@talpey.com, miklos@szeredi.hu, amir73il@gmail.com, 
+	senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com, zohar@linux.ibm.com, 
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, 
+	stephen.smalley.work@gmail.com, omosnacek@gmail.com, casey@schaufler-ca.com, nanx95726@gmail.com, 
+	djwong@kernel.org, daniel@iogearbox.net, linux-security-module@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, driver-core@lists.linux.dev, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev, 
+	ecryptfs@vger.kernel.org, exfat@lists.linux.dev, linux-nfs@vger.kernel.org, 
+	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org, xiujianfeng@huawei.com, 
+	lujialin4@huawei.com
+Subject: Re: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and
+ WRITE_METADATA access rights
+Message-ID: <20260928.eithae8Oov4p@digikod.net>
+References: <20260924104831.1081137-1-caixinchen1@huawei.com>
+ <araxO4ze0KZBz756@suesslenovo>
+ <20260926.255b951d3013@gnoack.org>
+ <arqcbjWLN1CLkL_Y@suesslenovo>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CADUfDZpg0O89whqqCD4tASkS1KxV6b7xWn9mH8TTPQPo6KSFFg@mail.gmail.com>
-X-Mutt-Resume-Draft: 1
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <arqcbjWLN1CLkL_Y@suesslenovo>
+X-Infomaniak-Routing: alpha
 
-On Mon, Sep 28, 2026 at 09:46:04AM -0700, Caleb Sander Mateos wrote:
-> On Mon, Sep 28, 2026 at 9:02 AM Josef Bacik <josef@toxicpanda.com> wrote:
-> > +       for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
-> > +               WRITE_ONCE(ublk_get_queue(ub, i)->force_abort, false);
->
-> I think this has already been done in
-> https://lore.kernel.org/linux-block/20260821103047.369522-2-yangxiuwei@kylinos.cn/
+On Mon, Sep 28, 2026 at 01:13:35PM -0400, Justin Suess wrote:
+> On Sat, Sep 26, 2026 at 09:56:28AM +0200, Günther Noack wrote:
+> > Hello!
+> > 
+> > On Fri, Sep 25, 2026 at 02:03:05PM -0400, Justin Suess wrote:
+> > > On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
+> > > > This series adds two new Landlock filesystem access rights,
+> > > > LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
+> > > > which control access to file and directory metadata such as inode
+> > > > attributes (mode, ownership, timestamps), extended attributes and POSIX
+> > > > ACLs.  It picks up the work from the "landlock: add chmod and chown
+> > > > support" series [1] and follows the coarse-grained grouping discussed in
+> > > > that thread [2]: instead of separate chmod/chown rights, metadata
+> > > > operations are grouped into one read and one write right.
+> > > > 
+> > > > Landlock evaluates access rights on a per-path basis, but the metadata
+> > > > related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
+> > > > inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
+> > > > inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
+> > > > object.  Patches 1-7 therefore first pass struct path instead of dentry
+> > > > through the metadata-related VFS helpers and LSM hooks.  This is a pure
+> > > > refactoring with no behavior change, split so that every patch builds
+> > > > and works on its own:
+> > > >
+> > > I like these patches, but is the ability to read metadata already
+> > > sorta controlled by LANDLOCK_ACCESS_FS_READ_DIR on the parent
+> > > directory?
+> > > 
+> > > The one case I see this being different is:
+> > > 
+> > > 1. if you wanted to grant read access to the file, but not metadata
+> > > read access, but I can't think of any usecase for being able to read
+> > > the contents of a file, but not the metadata. (see below)
+> > > 
+> > > 2. If you had the absolute path already and didn't need READ_DIR.
+> > > 
+> > > I see introducing this READ_METADATA as causing potential
+> > > hard-to-diagnose issues.
+> > > 
+> > > Say you handle READ_METADATA and READ_FILE, but only grant READ_FILE.
+> > > 
+> > > The program can technically open the file with the READ_FILE permission,
+> > > but it may error out because the stat() on it beforehand failed.
+> > > It's pretty common for programs to do that kind of thing (stat before
+> > > open), like for checking for config files (strace bash and you see it
+> > > stat .profile, /etc/profile)
+> > > 
+> > > There may be other bugs, because being able to set permissions to read
+> > > a file *but not read it's metadata* isn't possible currently in posix
+> > > acl and userspace may not work well if that assumption no longer holds.
+> > >
+> * posix acl and linux DAC.
+> 
+> > > So maybe WRITE_METADATA is good enough?
+> > 
+> > The existing use cases are the combinations of (a) READ_DIR
+> > allowed/denied and (b) READ_METADATA allowed/denied.  Because these
+> > two access rights overlap slightly, it seems likely that for a given
+> > directory or file, users will want to either grant both, or deny both.
+> > 
+> > At the moment, where the (not yet existing) READ_METADATA is
+> > implicitly always allowed, the problematic case is the one where the
+> > Landlock user wants to deny READ_DIR, but where much of the same
+> > metadata is still available through stat() and the various
+> > get-attribute syscalls.  (c.f. the warning box in the Landlock docs
+> > [1])
+> > 
+> > In my view the READ_METADATA right closes a gap that READ_DIR left
+> > open (which is also potentially surprising to callers if they did not
+> > read the docs closely).  Also, if its implementation is symmetric to
+> > WRITE_METADATA, I feel that it's worth having it in the same patch
+> > set.
+> > 
+> > –Günther
+> > 
+> > P.S.: I know, even after we can control stat(), there are likely ways
+> > to infer the presence of a file by observing Landlock error codes.
+> > This would be nice to fix as well, but is harder to do without
+> > controlling the path walk itself [2].  But also, the fact that this is
+> > currently not controllable is not an excuse for leaving READ_METADATA
+> > open IMHO.
+> >
+> I'm still sort of concerned about the case where read access is allowed,
+> but metadata isn't, due to how many applications will not cleanly handle
+> such an unexpected condition. You can reproduce this with a seccomp
+> policy forbidding stat().
 
-Not quite. Yang's patch went in as 8a14be55bdc6 ("ublk: clear
-force_abort in ublk_queue_reset_io_flags()") and this series is on top
-of it, so that clear is still there. The problem is that this patch has
-the ready transition of a UBLK_F_BATCH_IO queue look at ->force_abort to
-decide whether the queue has to stay canceling, and it reads the flag
-before 8a14be55bdc6 clears it. A ->force_abort left over from the old
-server's quiesce then keeps the new server's queue canceling and the
-recovery fails, so it has to be cleared earlier, when the old server
-goes away.
+I agree that wrong policies could cause userspace to break, but that the
+same for any kind of access control/restriction (e.g. your seccomp
+example).
 
-You're right that clearing it in two places makes no sense though. For
-v2 I'll move the clear instead of adding one: drop it from
-ublk_queue_reset_io_flags(), since the release work covers Yang's case
-too (START_USER_RECOVERY can't happen until the old server has
-released /dev/ublkcN), and say so in the changelog.
+This series fill a gap which is to forbid access to metadata.  As for
+other kind of access rights, this should be use wisely, and (user space)
+libraries can help.
 
-> > -       io->flags &= ~UBLK_IO_FLAG_CANCELED;
-> >         ublk_fill_io_cmd(io, cmd);
-> > +       spin_unlock(&ubq->cancel_lock);
->
-> And this looks like it may also duplicate
-> https://lore.kernel.org/linux-block/20260508123746.242018-1-tom.leiming@gmail.com/
+To be able to deny reading or modifying file's attributes, following the
+Landlock model means to "handle" the related access rights, and
+potentially to add exceptions to that with rules.
 
-That one is f7700a4415af ("ublk: fix use-after-free in
-ublk_cancel_cmd()"), and it orders ublk_cancel_cmd() against the reset
-path, ublk_reset_ch_dev() clearing io->cmd. This hunk is the fetch side,
-which f7700a4415af left alone: __ublk_fetch() drops the stale
-UBLK_IO_FLAG_CANCELED and then publishes io->cmd. A cancel that runs in
-between sets CANCELED again, the fetch clears it, and the queue goes
-ready over a command that was already completed. Same lock, different
-race. I'll mention f7700a4415af in the changelog so that's clearer. Thanks,
+Your concern is legitimate and the documentation should warn about this
+case (i.e. most of the time, users should tie READ_FILE with
+READ_METADATA...).
 
-Josef
+> 
+> Would it make sense to have the existing READ rights
+> (READ_DIR/READ_FILE) imply READ_METADATA on the files/directories 
+> if READ_METADATA is handled? Reading a file's contents should always
+> imply that you can read the metadata.
+
+That would make the kernel code more complex, especially wrt nested
+domains.  However, user space libraries/configurations can make that the
+default.  Anyway, if user space break with this kind of too strict
+policy, I guess it would be quite loud and then fixed quickly.
+
+Also, some tailored user space programs may not need to read metadata.
+
+> 
+> Thanks,
+> Justin
+> > [1] https://docs.kernel.org/userspace-api/landlock.html#filesystem-flags
+> > [2] https://github.com/landlock-lsm/linux/issues/9
+> 
