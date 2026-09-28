@@ -1,103 +1,230 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1086390C81;
-	Mon, 28 Sep 2026 06:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A88377A8A;
+	Mon, 28 Sep 2026 06:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790576646; cv=none; b=dmH7tsWkrkgz0QYu1C1Bvm4h5uGQuM4OAbRfTZZ/DQ2bg+58/ymDomEc0BsH6n6T8H/YnklhYXmMJc2bHPUHbDcgPzggH+ld8TM0toOrdf1rFqIxlPjsHAUpFd4mZLMsGm9uTQ2r4C/yFCuZ3IjsUbshWd6lRAsrch4H5pAGYj0=
+	t=1790578347; cv=none; b=GhwIK7rpTDFxDUOJlupaujJhou+zSk77wFLi5hZRFNnsm1pkbtt4aPdoBulJG9nAfmlQ+udvIlmgpD+QiO+mzLfn1qoJjI8UjT8TVLnUEoblB0gOfRk1E7bbIUjRqMoFE5AQdmezaGL8w9mQsKyi5Yd3bAGz2TJUUt91yWkUzJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790576646; c=relaxed/simple;
-	bh=Z8hcR5Go5z5dVx+mFfXo4yccX9Q0+zJAOiaLnyrUtTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LuK46Ds6W5AhlJ3d0b7GwAW/ckjDTc0+CAhTmIPtDdzmxoKAQsPUonC4QuG1wNwmqtfcaewZKVYagcv6JCaf/fdX8lPuw7O+qwzm2g8tnlg+S5yclCIhUa2nCOqRKgeq1vh+rxGETB3dr355KXxBUpI2v9Df+e5+HRz/7WidcbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=keukrEB2; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1790578347; c=relaxed/simple;
+	bh=l99O4EFuTYgaVlJE6vpUwnoIBIsWomYu6FImDHQefNw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Pcc4+n5IQamy6p4GXCQFIaMjKD5/vQh/ap5biYCdEQHtTg3vdY+Nf5fyt9VlzdICR3Rp9prLIyepv1SpmMXZqb5bE4mhOeZyAlrn9NPiH8cidCQm2QZ3Co7MtTPc/gj4ImoOk8etUBNP3ZReiHmMapeKKaezTDMGHLQMVQiutGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=tZ+wKmOM; arc=none smtp.client-ip=113.46.200.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="keukrEB2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=DR/hwaEZILg/9rvVDgZU74EvXnZO71agIm5YgCpk650=; b=keukrEB25vjEoqL/8zVNNWoGFM
-	2FBJRmD+w+My6XUr8jIFsV/2GBFZ2lG14Za7h23vhi1GJDZi9mMJtwcASd+HqE+mJ0ah8L66hc7a2
-	3HG8FJStZ8ItddZyxkLFDuerZh4rpvbjp1c1tGJPxKjpE4vdKHTtfjAVjF6/ffMIf4nMsWl+RYrmP
-	Sob/bxS39PhpKuYbIZThEFM2e9HyDBcLjN9dZQRNXoW6IBZ5BT5/AUvSsKnUvFbURriMxPPPd0P21
-	HOiTaTHd3KzuYOVj/wmFcvAK49SbIB3DqGqmi28XpaYDnZamfZNx8BgAoseyofHdpsGIvv/mnsAK5
-	Pog5nVMg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1xB4mQ-0000000HRoj-1T7I;
-	Mon, 28 Sep 2026 06:24:02 +0000
-Date: Sun, 27 Sep 2026 23:24:02 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Julian Sun <sunjunchao@bytedance.com>, linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org, linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org, axboe@kernel.dk, hannes@cmpxchg.org,
-	mhocko@kernel.org, roman.gushchin@linux.dev, shakeel.butt@linux.dev,
-	muchun.song@linux.dev, willy@infradead.org, tj@kernel.org,
-	akpm@linux-foundation.org, Boris Burkov <boris@bur.io>
-Subject: Re: [PATCH v9 1/3] block: introduce bdev_flush_by_dev()
-Message-ID: <aroIAqoCNDBPlB2A@infradead.org>
-References: <20260925064444.3944820-1-sunjunchao@bytedance.com>
- <20260925064444.3944820-2-sunjunchao@bytedance.com>
- <arYaMbJUh6unvz_t@infradead.org>
- <3w6vfwfkojmfqy2qs5j4q2s2366ajqiwmqf624lyn3odrv42v2@va2r7a6ngfz6>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="tZ+wKmOM"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=bF8dwco2OpD4jw+50IjUaWbm2lJ2kGH1r7RGZwU0W0U=;
+	b=tZ+wKmOMTbZczy4gL36DV6korVrDaOkEMaU77eNpngM0R1q31v2+V3uXwl+/ZcznRLqzPasUl
+	eIce1fwk7YKmARooBYj6Lqiw3GAaNlYP/36f2E2tCuWM4AXAFAu9UNw4dtAJP6Ye0pJE5lBixZP
+	fRIxJ9kXCs/c6I2hGflDe9Q=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4htWrY3DnCzKmWP;
+	Mon, 28 Sep 2026 14:39:57 +0800 (CST)
+Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2F7F640572;
+	Mon, 28 Sep 2026 14:52:09 +0800 (CST)
+Received: from [10.67.109.91] (10.67.109.91) by whupemk100010.china.huawei.com
+ (7.152.184.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Mon, 28 Sep
+ 2026 14:52:03 +0800
+Message-ID: <a6a40c38-0e1c-4a3f-a705-e4a38c575c25@huawei.com>
+Date: Mon, 28 Sep 2026 14:52:02 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3w6vfwfkojmfqy2qs5j4q2s2366ajqiwmqf624lyn3odrv42v2@va2r7a6ngfz6>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and
+ WRITE_METADATA access rights
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>
+CC: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
+	<jmorris@namei.org>, <serge@hallyn.com>, <corbet@lwn.net>,
+	<skhan@linuxfoundation.org>, <rdunlap@infradead.org>,
+	<gregkh@linuxfoundation.org>, <rafael@kernel.org>, <dakr@kernel.org>,
+	<dlemoal@kernel.org>, <hch@lst.de>, <axboe@kernel.dk>,
+	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
+	<dhowells@redhat.com>, <code@tyhicks.com>, <linkinjeon@kernel.org>,
+	<sj1557.seo@samsung.com>, <yuezhang.mo@sony.com>,
+	<hirofumi@mail.parknet.co.jp>, <cel@kernel.org>, <jlayton@kernel.org>,
+	<neil@brown.name>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
+	<tom@talpey.com>, <miklos@szeredi.hu>, <amir73il@gmail.com>,
+	<senozhatsky@chromium.org>, <chenxiaosong@chenxiaosong.com>,
+	<zohar@linux.ibm.com>, <roberto.sassu@huawei.com>,
+	<dmitry.kasatkin@gmail.com>, <eric.snowberg@oracle.com>,
+	<stephen.smalley.work@gmail.com>, <omosnacek@gmail.com>,
+	<casey@schaufler-ca.com>, <nanx95726@gmail.com>, <djwong@kernel.org>,
+	<daniel@iogearbox.net>, <linux-security-module@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<driver-core@lists.linux.dev>, <linux-block@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <netfs@lists.linux.dev>,
+	<ecryptfs@vger.kernel.org>, <exfat@lists.linux.dev>,
+	<linux-nfs@vger.kernel.org>, <linux-unionfs@vger.kernel.org>,
+	<linux-cifs@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
+	<selinux@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<xiujianfeng@huawei.com>, <lujialin4@huawei.com>, <bpf@vger.kernel.org>,
+	<kpsingh@kernel.org>, <matt@bobrowski.net>, <alexei.starovoitov@gmail.com>
+References: <20260924104831.1081137-1-caixinchen1@huawei.com>
+ <20260926.e0135fe7712f@gnoack.org>
+Content-Language: en-US
+From: Cai Xinchen <caixinchen1@huawei.com>
+In-Reply-To: <20260926.e0135fe7712f@gnoack.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ whupemk100010.china.huawei.com (7.152.184.41)
 
-On Fri, Sep 25, 2026 at 12:34:52PM +0200, Jan Kara wrote:
-> On Thu 24-09-26 23:52:33, Christoph Hellwig wrote:
-> > On Fri, Sep 25, 2026 at 02:44:42PM +0800, Julian Sun wrote:
-> > > Add bdev_flush_by_dev() to submit page-cache writeback for a device
-> > > identified by dev_t without requiring callers to hold a persistent
-> > > device reference.
-> > 
-> > This isn't really a flush is it?  This is writeback.
-> 
-> So bdev_writeback_by_dev()? Fine by me.
+Thank you for review!
 
-Yes.
+I will link the feature request
+(https://github.com/landlock-lsm/linux/issues/11) in the v2 cover letter.
 
-> Well, Julian is explaining that in the cover letter. We don't want memcgs
-> to hold bdev references just for foreign flush tracking. There's no easy
-> way to get rid of them so they could pin bdevs for a long time leading to
-> strange artifacts.
+For https://github.com/landlock-lsm/linux/issues/18, the current
+READ_METADATA cannot solve this problem, and I don't have a good idea 
+for now.
 
-I have to admit I didn't get it when flying over the cover letter.
-But this also really belongs into the patch where it is more obvious,
-or even better into code comments.
+For path_* rename, I'd rather keep the inode_* names:
 
-> 
-> As you write, we could just hold a reference to the bdev inode. Those get
-> unhashed when the device dies (__del_gendisk()) so memcgs would be just
-> wasting some memory by holding these inodes alive. But still, transitioning
-> from inode to proper bdev reference verifying bdev is still alive will add
-> a bit of hairy code (essentially what blkdev_get_no_open() does plus
-> verification inode is still hashed). Plus when replacing foreign flush
-> entries you're under irqsafe xa_lock so doing iput() from there is kind of
-> a nogo.
-> 
-> So I think tracking devices by dev_t is a good way of dealing with these
-> problems. But then when flushing you have to transition from dev_t to
-> struct block_device and blkdev_get_no_open() is the canonical way of doing
-> that (and note this use is just internal to block/bdev.c).
+* There is precedent for the mismatch: the inode_getattr hook
+   upstream already takes a "const struct path *" (this series just
+   aligns the other metadata hooks with it).
 
-I'd really prefer not to grow more blkdev_get_no_open users.
+* The path_* prefix has an established meaning in the LSM hook
+   interface: it denotes the pathname-based (TOMOYO/AppArmor-style)
+   hooks that are invoked at the VFS path level *before* the
+   corresponding inode_* hook, as a paired, duplicate check
+   serving a different class of LSMs.  For example, a chmod(2)
+   currently runs security_path_chmod() (fs/open.c, for TOMOYO and
+   AppArmor) and then, via notify_change(),
+   security_inode_setattr() (for SELinux, Smack and now Landlock);
+   vfs_mknod() similarly calls both security_path_mknod() and
+   security_inode_mknod().  Renaming inode_setattr to
+   path_setattr would put two path_-prefixed hooks with different
+   call contracts into the same syscall, and path_chown(path,
+   uid, gid) next to a path_setattr(path, attr) would read as a
+   redundant pair, even though they belong to different hook
+   families.  Landlock itself already uses the path_* family for
+   its real path-level hooks (e.g. path_truncate for the TRUNCATE
+   right), so mixing renamed inode hooks into that prefix would
+   also blur its own hook table.
 
-But the more I look at this I wonder why we even bother.  Trying to
-attribute individual bits of dirty metadata to cgroups is pretty much
-insane.  Why don't we bypass memcg accounting for buffer_heads like we
-always did for the XFS buffer cache, and what btrfs switched to last
-year? See commit b55102826d7d ("btrfs: set AS_KERNEL_FILE on the
-btree_inode") for the btrfs side.
+* If the consensus is that these hooks should be renamed, I think
+   that should be a standalone, tree-wide rename series (including
+   inode_getattr), so that BPF programs only break once instead of
+   twice.
+
+On 9/26/2026 4:27 PM, Günther Noack wrote:
+> On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
+>> This series adds two new Landlock filesystem access rights,
+>> LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
+>> which control access to file and directory metadata such as inode
+>> attributes (mode, ownership, timestamps), extended attributes and POSIX
+>> ACLs.  It picks up the work from the "landlock: add chmod and chown
+>> support" series [1] and follows the coarse-grained grouping discussed in
+>> that thread [2]: instead of separate chmod/chown rights, metadata
+>> operations are grouped into one read and one write right.
+>>
+>> Landlock evaluates access rights on a per-path basis, but the metadata
+>> related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
+>> inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
+>> inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
+>> object.  Patches 1-7 therefore first pass struct path instead of dentry
+>> through the metadata-related VFS helpers and LSM hooks.  This is a pure
+>> refactoring with no behavior change, split so that every patch builds
+>> and works on its own:
+>>
+>>    1: notify_change() and its callers
+>>    2: inode_setsecctx hook (must come before 3: the SELinux and Smack
+>>       implementations call __vfs_setxattr_locked internally)
+>>    3: xattr helpers, which also drops a redundant EVM xattr size sanity
+>>       check whose vfs_getxattr() call only has a dentry and therefore
+>>       cannot be migrated to the new path-based signature
+>>    4: POSIX ACL helpers
+>>    5: inode_setattr hook
+>>    6: inode xattr hooks
+>>    7: inode POSIX ACL hooks
+>>
+>> Two deliberate scoping decisions for this refactor:
+>>
+>> - The hooks consistently take struct path rather than struct file.  The
+>>    VFS call sites involved (chmod(2), chown(2), utimensat(2), xattr(2)
+>>    and ACL syscalls) operate on paths, and several of them (lstat(2),
+>>    lchown(2), llistxattr(2), ...) have no struct file to begin with.
+>>
+>> - struct inode_operations->setattr still receives (idmap, dentry, attr).
+>>    Only the VFS boundary (notify_change()) and the LSM hook layer see the
+>>    path, which keeps the refactor contained to fs/attr.c and the LSM
+>>    infrastructure instead of touching every filesystem.
+>>
+>> Patches 8-12 then implement the new rights, their tests, the sandboxer
+>> sample and the documentation.  Semantics:
+>>
+>> - READ_METADATA covers stat(2) and friends, getxattr(2) and friends,
+>>    listxattr(2) and friends, and POSIX ACL reads.
+>> - WRITE_METADATA covers chmod(2), chown(2), utimensat(2), setxattr(2),
+>>    removexattr(2) and friends, and POSIX ACL set and remove.
+>> - Only explicit metadata changes requested by user space are restricted.
+>>    Implicit changes performed by the kernel (e.g. timestamp updates on
+>>    write(2), size changes on truncate(2)) are not, and neither are
+>>    chmod(2)/chown(2) calls that change nothing (e.g. chown(2) with
+>>    (-1, -1), which never reaches the hook), matching the SELinux
+>>    inode_setattr behavior.
+>> - Kernel-internal accesses performed with override_creds() (e.g.
+>>    overlayfs, cachefiles) and kernel threads without a Landlock domain
+>>    (e.g. nfsd, ksmbd) are not restricted.
+>>
+>> The Landlock ABI version is incremented from 11 to 12.
+>>
+>> The series is based on linux-next commit 5c4d4169604b ("Add linux-next
+>> specific files for 20260921").
+>>
+>> Testing: each patch has been built for aarch64 (gcc, -Werror) and the
+>> landlock selftests (445 tests, including the new ones) pass in QEMU on
+>> aarch64; base_test reports ABI v12.
+>>
+>> [1] https://lore.kernel.org/all/20220827111215.131442-1-xiujianfeng@huawei.com/
+>> [2] https://lore.kernel.org/all/abc960a1-e66e-792e-6869-cfd201c29dbe@digikod.net/
+> Thank you for sending this patch set!
+>
+> Some meta-remarks at the beginning:
+>
+> * You might want to link the bugtracker feature request:
+>    https://github.com/landlock-lsm/linux/issues/11
+> * In the final version, I think it's preferred to merge patches 8
+>    (adding the access right enums) and 9 (adding the LSM hooks that use
+>    them).  Having the feature as an atomic commit makes it harder to
+>    accidentally mess it up during a backport, because you can't patch 8
+>    without 9.
+> * As Paul alluded to, the changes to the LSM hook interface and to the
+>    existing callers in VFS are likely the hardest part of this patch
+>    set.  Alexei from the BPF subsystem has also reiterated recently
+>    that he wants BPF to be looped into such changes.  BPF hooks do not
+>    give the same backwards compatibility guarantees as the syscall
+>    layer, but there are existing users of LSM hooks specifically
+>    through the BPF LSM.
+>
+> * In https://github.com/landlock-lsm/linux/issues/18, we came across
+>    statfs(), which returns file system meta-information based for the
+>    file system that a given file belongs to.  I have weak confidence
+>    that READ_METADATA would be the right access right to protect this
+>    with, but it's a somewhat related operation.  Maybe you have some
+>    thoughts on this?
+>
+> More concrete questions:
+>
+> * If a "inode" LSM hook gets a "path" argument now, should it be
+>    renamed from "inode_..." to "path_..."?
+>
+>    (Maybe the BPF people can chime in about to what extent that would
+>    cause additional churn for BPF users, in a situation where they
+>    anyway already need to make a change due to the changing function
+>    signature?)
+>
+> –Günther
