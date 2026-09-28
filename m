@@ -1,169 +1,127 @@
-Received: from mail-244121.protonmail.ch (mail-244121.protonmail.ch [109.224.244.121])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15EE45FFB8;
-	Mon, 28 Sep 2026 07:46:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.121
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E587547042;
+	Mon, 28 Sep 2026 08:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790581623; cv=none; b=THTNExwNtjz2yyPBsf7tGT4xQvvov+fBBXj4SVqtd+JtOJKlzu/l0QMO2/ksBvCruLzHm0RFvwk4r6s8gRhXvqaCZHt1rpSAWJuvvvdK/6JkgpIpvHbvnXLi5cHHjmooxm+AfSjrOwwCjaD2jo5biHpCE/JjKgRAUZPbYDRxOa8=
+	t=1790583563; cv=none; b=TXAh/UCawLwEtsd5hvGaaKMy9Gl0mutENA0taw2vzFwSafAZV9Bp98HPrdflfi4jvWGLLUHIOV6StFEyrGVj4JsKxSIggxzYpXQQaXf/XTN1ofVNSbcdIpqRItrSey7/5Fxvoc72ailFV5/Wl1cc1e60pdpwXKP2+jwR18fuN4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790581623; c=relaxed/simple;
-	bh=3uL0OH7uoI48C0wUPDnpLShG9KGihTHNPp5zyAXkClQ=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=J/1pbWH/ZIuUeuzqzEzszaxwUd41f0nXDtsXeyFj52SauJn9DYtkanaao76gPs/ed95Tcgnxz0EtNTwYm2F9DDWI4i1FFdmq5unseRIgbPT7rLk8s1mzypxEaHksSse/+tu/XU9X68B+UxEi3mnTUGIYcM5HKJefv9L767YGKWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=TjY2uBV5; arc=none smtp.client-ip=109.224.244.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="TjY2uBV5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1790581616; x=1790840816;
-	bh=3uL0OH7uoI48C0wUPDnpLShG9KGihTHNPp5zyAXkClQ=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=TjY2uBV5xbxgxCIREXPfLqaoeI8lhtialO/upkdFKbf6yEuUk8hygeRE+K8UVg/id
-	 Q6QyYMPC1kxYtm9LUADsGnjfIsIWDQqVS3MTaIKDFkyO5bYLNcYXButkfddWOAApd5
-	 87f1qx+GPuOYBzXY8YWC9nSboTTI3qo7QP861eIqciZ8R0QHAqE+qXpHmDsaEvbi6q
-	 oKWm6D0oGH0K8kwKwAjbEDCLdm59htzaJ9kt8RSuiTNsG3ZCjZfgr8G8OKTaMOJjnn
-	 zt0xiJ8lcOP6qUFgAJE5o/1LQT5WfwFmN/6KpPt7hwpQoxmhYFNDHT7CH7l+eScl6Y
-	 bIlccDHlbRzPg==
-Date: Mon, 28 Sep 2026 07:46:52 +0000
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, linux-mm@vger.kernel.org
-From: clkernel@pm.me
-Subject: Re: [syzbot] [block?] INFO: task hung in read_cache_folio (6) (extid 9db0864859224b833108)
-Message-ID: <8aba9733-29aa-4103-a2f9-7f047b792ad3@pm.me>
-Feedback-ID: 224698563:user:proton
-X-Pm-Message-ID: 10f936aa06acafce2e352ff16b6b59257a8dc9b8
+	s=arc-20240116; t=1790583563; c=relaxed/simple;
+	bh=FslY3hhSlsoCA+5u1eBS3KOV+FIBlHTLGGXzBMm8t4Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MbL2bEE1x1SxxwuHGgezx2kyD+RIjabEGPxOtA16jThcZSkUbfGxS1m/F9FmYtX4oTU6mjWAUoslc5e4BPKU8hU+hnDMTDNf9e4gm0PrB5YF9dJC7L/njGHGRMMi5oazl19gxi7u+lEXwkB5SMD53HgMrG+bLZry1nDF13daFO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr; spf=pass smtp.mailfrom=ghiti.fr; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ghiti.fr
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0DE633E972;
+	Mon, 28 Sep 2026 08:19:08 +0000 (UTC)
+From: Alexandre Ghiti <alex@ghiti.fr>
+To: linux-mm@kvack.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	david@kernel.org,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Yosry Ahmed <yosry@kernel.org>,
+	Nhat Pham <nphamcs@gmail.com>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Chris Li <chrisl@kernel.org>,
+	Kairui Song <kasong@tencent.com>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Baoquan He <baoquan.he@linux.dev>,
+	Barry Song <baohua@kernel.org>,
+	Youngjun Park <youngjun.park@lge.com>,
+	Alexandre Ghiti <alex@ghiti.fr>
+Subject: [RFC PATCH 0/4] mm/zswap: make shrinker writeback work with iocost
+Date: Mon, 28 Sep 2026 10:18:35 +0200
+Message-ID: <20260928081900.4187482-1-alex@ghiti.fr>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alex@ghiti.fr
+X-GND-Cause: dmFkZTGDAZTY8FQdfIVgvulh8+Ontt0UHMbNx7VW+SvuP9n/VVpAc15RJUj4OtlP0SQbUn0HcGGGXbzBBp/gASYJS6oVdftruFjiFnihosDaklSoEd+62bXrJAa+/zYSAu4+cl39U0CVLr5WdN46E9L7/Q4tx8ccKm2agYzkHguBa9KkrBths7Yplh0gcXVyS/ngPeLDw2DIh5qJimb0bfwD/0AAsWD/yQvch5ezsNCOkJmyoS5Ic79ZDd4epkxJsioHDkWZtsqSMBR4l6eWELikjxrpKV1btwsNT0QmoHq2jaEkavqSkNYTANQPyP/F43M8V95d8uz5FKIpAMEzb+qV/E9dGOHIu6lbBID3PkMkIQV5fgazvuUzv/CoI1oXR4+kwQITGwxKOht1As2puZhGtjvctCEYLf8n0WF2BN02NFlSuIm7Ob81iipQvFD9c0tP8ElxA7CRRvK581ykoOTp6LX+oErRGuC5JM2LML+EvRXGmcK98f5pELREKePtj8Vgmh+LSRm/ycwcL8UvHQ2po8WykCFDm9GbWnsk8a3kjTw6raq8YKYK1lyUZHmgb6jjStz7q+NbcvKyvNwkbWwi6OzszuZRYfzsQE/tUNwsRLt/dvK7SJ2cUPLiJvDP0Hz8hU3fgPjueoU3fH1OPk894aWjFDSfAOcCZ9Mq8Uo/F8V2ig
+X-GND-State: clean
+X-GND-Score: -100
 
-On Fri, 03 Jul 2026, syzbot wrote:
-> syzbot found the following issue on:
-> ...
-> folio_wait_bit_common+0x6b8/0xa30 mm/filemap.c:1324
-> folio_put_wait_locked mm/filemap.c:1493 [inline]
-> do_read_cache_folio+0x23c/0x5a8 mm/filemap.c:4089
-> read_cache_folio+0x68/0x88 mm/filemap.c:4139
-> read_part_sector+0xcc/0x708 block/partitions/core.c:724
+We want to enable the zswap shrinker on our fleet, which runs iocost,
+but with it on, a large production workload is slower than with it
+off. Two reasons:
 
-A second observation of the same wait site: on x86-64 servers we see=20
-reader threads (a database reader in a busy server workload) parked=20
-D-state in folio_wait_bit_common's io_schedule, entered through the same=20
-folio_put_wait_locked -> do_read_cache_folio -> read_cache_folio path=20
-this report shows. Observed on 7.0.0-30, 7.0.0-31 and 7.2.5, reproduced N=
-=3D3.
+1. zswap writeback is REQ_SWAP, so the IO controllers issue it as root
+   and charge it to the cgroup afterwards, as debt. The workload pays it
+   back: its swapin and page cache reads wait, and iocost eventually
+   stalls its allocations, which in turn stalls the application.
+   Patches 1-3 let zswap writeback be throttled instead, by marking it
+   REQ_BACKGROUND.
 
-Three measurements, per repro:
+2. A throttled write sleeps in its submitter, which for the shrinker is
+   whoever entered reclaim, often an application thread in a page fault.
+   Patch 4 moves that writeback to a per-lruvec kworker.
 
-1. the pinned folio's lock is FREE while the waiter sleeps: a fresh read=20
-of the exact pinned pages answers in 4-108 ms while the thread stays D=20
-in the same wait;
-2. each later lock/unlock of that folio wakes the waiter for one ~4KB=20
-read: the blocked read's offsets crawl one page per unlock cycle (~one=20
-page per 10 s under churn), so the syscall can sit in the same wait for=20
-minutes to days;
-3. the discriminator: read /proc/<tid>/syscall while the waiter sits=20
-inside the wait, then dd the same page range fresh. The dd returns=20
-immediately; the waiter does not move.
+Large production workload, 10 hosts per arm, CPU matched, one 24h run
+per comparison. Change with this series:
 
-Root cause (established from source, then observed directly on a local=20
-build; measured): folio_wake_bit() wakes the hashed folio waitqueue=20
-through __wake_up_locked_key(), i.e. __wake_up_common(...,=20
-nr_exclusive=3D1). The walk in kernel/sched/wait.c stops at the first=20
-WQ_FLAG_EXCLUSIVE entry it wakes:
+                     vs shrinker off    vs stock shrinker
+  p50                    -0.7%               -5.8%
+  p99                    -0.2%               -6.5%
+  memory PSI full        -52%                -94%
+  zswap pool             -97%                +12%
 
-if (ret && (flags & WQ_FLAG_EXCLUSIVE) && !--nr_exclusive)
-break;
+The benchmarks below run with iocost enabled, in a cgroup whose
+memory.max (the "cap") is smaller than their working set, so they are
+under constant memcg reclaim.
 
-folio_wait_bit_common() queued every waiter with=20
-__add_wait_queue_entry_tail(), so a non-exclusive waiter could sit=20
-behind an exclusive folio_lock() waiter on the same folio. When the fill=20
-completed, folio_end_read()'s wake woke the exclusive waiter and=20
-stopped. The shared/DROP waiter behind it was never visited:=20
-WQ_FLAG_WOKEN never set, although the wake itself ran. PG_locked was=20
-already clear and the folio uptodate (so a fresh read of that page=20
-answers through the uptodate fast path, measurement 1), and PG_waiters=20
-stayed set, so the sleeper only ran when some later lock/unlock of the=20
-same folio address reached the queue (measurement 2: one page per wake,=20
-crawling until traffic arrived).
+UCacheBench, 12G cap, 5 runs:
 
-Same mechanism explains this report's hang: the waiters are the DROP=20
-ones (folio_put_wait_locked), which drop their folio reference before=20
-sleeping and re-lookup only after a wake that arrives late or never.
+                     shrinker off    stock shrinker    this series
+  ops/s                  469k             280k             634k
+  errors                  0%               44%              0%
+  p99.9                 5.8 ms           16.6 ms          4.3 ms
 
-Observation on a debug build, same queue after folio_wake_bit() returned=20
-(a read-only walk counting matching non-exclusive entries left=20
-unvisited): 363 events per 10-minute run of readers racing=20
-punch/fault/truncate churn under reclaim pressure on an unmodified=20
-queue; 1 per run after queueing non-exclusive waiters at the head side=20
-only; 0 after the same change at softleaf_entry_wait_on_locked (the=20
-other non-exclusive enqueue on this queue).
+MySQL, sysbench OLTP, 256M cap, 5 runs per host:
 
-The fix (mm/filemap.c, attached): queue non-exclusive waiters with=20
-__add_wait_queue() (wait.h's own default head-side insert) and keep=20
-exclusive folio_lock waiters on __add_wait_queue_entry_tail(). With that=20
-order every non-exclusive full-match waiter is visited before any walk=20
-break can fire, which restores the "wake all shared waiters, then one=20
-exclusive" contract of nr_exclusive=3D1; exclusive waiters keep their FIFO=
-=20
-tail and their one-at-a-time wake. Same change at both non-exclusive=20
-enqueue sites (folio_wait_bit_common and softleaf_entry_wait_on_locked).
+                     shrinker off    stock shrinker    this series
+  TPS, host 1            OOM               413              609
+  TPS, host 2            OOM               399              666
+  p99, host 1            OOM             334 ms            90 ms
+  p99, host 2            OOM             273 ms            44 ms
 
-One known sibling waits on a follow-up: __folio_lock_async's entry=20
-(io_uring buffered reads with ki_waitq) enqueues non-exclusive at the=20
-tail. Same class, unreachable from the workloads above.
+FeedSim, 16G cap:
 
-Reproducer shape: threads pread a file while others block in folio_lock=20
-on the same pages (hole punch, truncate, or mmap faults) under reclaim=20
-churn. On an unmodified queue the waitqueue walk above counts the=20
-skipped waiters within seconds. The harness, traces or configs are yours=20
-on request.
+                     shrinker off    stock shrinker    this series
+  QPS                    4.7              30.2             32.4
+  p95                  1306 ms           495 ms           494 ms
 
-The same change cherry-picks clean onto v7.2.6 (mm/filemap.o builds=20
-there). Happy to send a [PATCH] for stable@ if the fix is wanted on the=20
-7.2.x queue.
+kbuild, defconfig -j4, 600M cap, 3 runs per host:
 
----
-mm/filemap.c | 16 +++++++++++++---
-1 file changed, 13 insertions(+), 3 deletions(-)
+                     shrinker off    stock shrinker    this series
+  build time, host 1    784 s             788 s            778 s
+  build time, host 2    691 s             696 s            680 s
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 00fd89cf6f55..383701407843 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1294,8 +1294,18 @@ static inline int folio_wait_bit_common(struct=20
-folio *folio, int bit_nr,
-*/
-spin_lock_irq(&q->lock);
-folio_set_waiters(folio);
-- if (!folio_trylock_flag(folio, bit_nr, wait))
-- __add_wait_queue_entry_tail(q, wait);
-+ if (!folio_trylock_flag(folio, bit_nr, wait)) {
-+ /*
-+ * A non-exclusive (shared/DROP) waiter must queue ahead of
-+ * exclusive folio_lock waiters: the nr_exclusive=3D1 wake walk
-+ * stops at the first exclusive match, so a non-exclusive
-+ * waiter behind one is never visited and never woken.
-+ */
-+ if (behavior =3D=3D EXCLUSIVE)
-+ __add_wait_queue_entry_tail(q, wait);
-+ else
-+ __add_wait_queue(q, wait);
-+ }
-spin_unlock_irq(&q->lock);
-/*
-@@ -1429,7 +1439,7 @@ void softleaf_entry_wait_on_locked(softleaf_t=20
-entry, spinlock_t *ptl)
-spin_lock_irq(&q->lock);
-folio_set_waiters(folio);
-if (!folio_trylock_flag(folio, PG_locked, wait))
-- __add_wait_queue_entry_tail(q, wait);
-+ __add_wait_queue(q, wait);
-spin_unlock_irq(&q->lock);
-/*
+Alexandre Ghiti (4):
+  block: do not issue background swap bios as root
+  mm/zswap: turn shrink_memcg_cb()'s argument into a flags word
+  mm/zswap: allow writeback to be throttled by the cgroup IO controllers
+  mm/zswap: move reclaim-driven writeback to a kworker
+
+ block/blk-cgroup.h       |   8 ++-
+ include/linux/swap_ops.h |   1 +
+ include/linux/zswap.h    |   4 ++
+ mm/page_io.c             |   7 +-
+ mm/zswap.c               | 148 ++++++++++++++++++++++++++++++++++-----
+ 5 files changed, 146 insertions(+), 22 deletions(-)
+
+
+base-commit: fe2ec83746e501645709761605c2464a44fd2929
+-- 
+2.53.0-Meta
 
