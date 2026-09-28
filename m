@@ -1,387 +1,182 @@
-Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020080.outbound.protection.outlook.com [52.101.196.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv2-f43.google.com (mail-qv2-f43.google.com [74.125.230.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E6B4E9C0A;
-	Mon, 28 Sep 2026 15:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790610854; cv=fail; b=I/teMcI+gAOpMVxEPB1WW0Ug3rugP5qtaFsqriA5PK8Cfccax8gPLNMCIWPF6TBHBEJb8eJR/sobv1VHEaNHk05NQs6/IdntrZrLdZE/06D04BnZso6tpsLsBwdFKk03AQK3Xr/uC2/tLXRk7W+mgtAqQ3rmCjs0YnuSygYILBM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790610854; c=relaxed/simple;
-	bh=c8C/OWuGIDcyeeKjdU7UlAW25ZyeMK93TF9A/brUVAk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=TUqeo12AY34hnTp0qM1yGbwLP1DsRMHd20xvUE/omqFh0wR/ygkekjWsCisZbCZJgQIH7CBMYzF4FcH4pjGD5ab+2UljSq8W8ZL/xh9MWSKpNvlMkVWLtnmMvzBJUwVCuIemOzODwpL1agDD5IYA/7Hqa4Z9dtD8PeNhB3eI2qs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.196.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FMlLIeyDnYUnCzCoEdOgIFhi0z2LdPCxBTSIMZgqZIilqF7vgeRwKT+JbXO5ikKxKG8/WsveJRisWtaLhvwOuKJgDcVT0yVXBmY07E6YaIdgZ+4TP2gcIWZvz7i4IDfd8sZ2kftdsZO3bt7qpue27U7L9K7Qx4zkmhj6B17VDx0CTwtMYU7Yr2MyMSlNFUwQSXeH3vc8TSx91tz48YPkApDHhKAt2PEAq6WmwTLq87TYd/v30hyJxSLip0ArATiciRFxaiIPIPid5kl4ZIHR9KlGDo75GHD6GEn2zKPPRnNg5rIg8yIOJD9RlAcijSrQpb7kkI2gs5bVLep1pNi8bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=dBWGcI3wM3CW7z/nk6hnn1XEFgtKCtSPQt64Ito0tKM=;
- b=GZPB+kbwTQZfJlPAXaurC4kYsjO4JyGdhwAXMB7uOIhI1nxZOtuwF+lLQ8hcSJ+BV9di5ojr40LTbtQm9T0ehy0AG6Swf9ePTRbLN/au3AP5EZoJK/20InrVtlG7XDaHxy7LLz6TYO+Q8bWbGpP6DtsOdanhM8APR4/39GypCcnwzLEl3n172IMRU8hAeOMh9WK0ukHJ1+Rlvrwa4sOuVq3DwjSkp9Z+wZGlsp37arxAWRhY3ursiesff60ugbC5Q6FPb8cS+IL5Fjg03Tu1ShrYKRayLSJuvVNFaQIZRYyyXnzpLDt7VO5TQ85uPxva4g7jTd4gf4q8iPvihG9LdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by LO2P123MB3664.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:12e::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.451.23; Mon, 28 Sep
- 2026 15:54:00 +0000
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0451.022; Mon, 28 Sep 2026
- 15:53:59 +0000
-Date: Mon, 28 Sep 2026 11:53:55 -0400
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: Ionut Nechita <ionut.nechita@windriver.com>
-Cc: axboe@kernel.dk, bigeasy@linutronix.de, corbet@lwn.net, 
-	frederic@kernel.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org, marco.crivellari@suse.com, 
-	mingo@redhat.com, mkp@kernel.org, neelx@suse.com, peterz@infradead.org, 
-	tglx@kernel.org, vincent.guittot@linaro.org
-Subject: Re: [PATCH v16 0/9] blk: honor isolcpus configuration
-Message-ID: <ul7xqsblqnrzx67s7urmtc34qpemuf3jeduxmsuwxwlnky7eli@mzdpwwgug3hg>
-References: <20260917154455.386769-1-ionut.nechita@windriver.com>
- <20260921135353.317688-1-ionut.nechita@windriver.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260921135353.317688-1-ionut.nechita@windriver.com>
-X-ClientProxiedBy: BN9PR03CA0944.namprd03.prod.outlook.com
- (2603:10b6:408:108::19) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:183::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805424E73D2
+	for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 16:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790611292; cv=none; b=gkQO+olcV9d1sd9bB0Sssm6XE20f3m7CqMfH2D9SaEimXJJtAXH+YwSUzXEK4fjA42a0G4xDOP6fH0LHPf9RMLH5RQqpKfcW40/6MkarTfLYjX7L7SHe7sO4eSW/hZ/6RvSXXm2+pUOlnnIOlEdNycRKMG7NMApm0LNpMdfzoOs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790611292; c=relaxed/simple;
+	bh=Fv8XnK5WCN7eV0DQaaWOcaHLnKI55rjDGdONGhecXhw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=L325K571n5O1YWS/LTiX/iRnPy6YKFHVoELYI6QNQcj5gsxPDOmrOM2fgs28Iwjy5Ao5pDBZHUV5z0sa64DdioNtDcxYw338suPYWMPkOclQRmrm+JLlcu0YJZngwPCR+kpmn3+0XzKTZOFnseU47mIgrrF6XEziyYcVfjYkg3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=pass smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b=fDiXpyNk; arc=none smtp.client-ip=74.125.230.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b="fDiXpyNk"
+Received: by mail-qv2-f43.google.com with SMTP id 6a1803df08f44-91434eba57fso24392506d6.2
+        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 09:01:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda.com; s=google; t=1790611289; x=1791216089; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=VGma3cu2c3yEsc5fJWd/7eqGv+CXXOFaMIKpvSIhYLg=;
+        b=fDiXpyNksp/DLcq5R7R3XsTOsspHQLUvesZyKMcAPt+cB/J/CKaBAbLMHVdEFiXF6k
+         UJUm3XkKcfWFW5KKIc5KN3ColLyENh5mXdyExJEBHyEa2VMCOrwicMmEf+gqgHNjS+Os
+         2NQWyz5fnR8OUt51lv5KnMy9Q93oRpPnbMz/aFHcOd7VHa/+RGSNt+5u6MJKcuS5NlyY
+         iauq3GlP2ufmSVRVKWjAYcPQkcn7Xfli8AsCOFwd6q/olOvRSgqMgh9XNBVVuJvUJQjU
+         UNcOJmabqoPFou1SFHfA3Z2wAdf5sDKDP2J0p3p4AzFDRzNcG/Nw+R7Yxe5Sa6ejbIFy
+         nKIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790611289; x=1791216089;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=VGma3cu2c3yEsc5fJWd/7eqGv+CXXOFaMIKpvSIhYLg=;
+        b=paCE1BPwQy454WL0z9iVuPPrn5e8qEDuEPpLBENPdu5LQi0tkwl2LQdrR/cFEdWOix
+         kDh6nvPxw3JSdBb3dfK+7c8uehZJn/1oqTmtoXJvDKU4IguTH3s2eBbnL9BHT8TYqlWD
+         EDgf1sijX1Zkn8LgKM1wEKMLm2kKWm74wOl/GV3M5VCbHnfe7WQ3PVve2ydV+dSx2nAl
+         bYXkvCjPV/QLE7Uh5I5ZnkWsNUQLQCSeywle/BnJYtpWWsDZSjkCGIyzLaTfKTx3h1zv
+         X2G74DrIZwMRVRzdgkPkQS9FNqRCWmXKMZE79wN6Wjdn1KdSHBFo+BGa2PT1KRaf6orh
+         wfZQ==
+X-Gm-Message-State: AFuF++m051Tw5X8hGnii6lRdk6u6BDmt7/TiOo7fkZ6ODSSlh3jRKCty
+	ckLnk6MvZYyubT7P8vQ9kOLt/r/yVNyB8doX3S+g+mnZeIkZjnRRUW9enZ071OkH4iTEi5u8QkX
+	W6qxf/zg=
+X-Gm-Gg: AYBFou3dtUWNQ1SqnLl5FQMpkPIxBJHTsjFjs4YEeJf5wYZ0EWQ5R/XSF6rXJUVRu+Q
+	wNrDbT09jbMy4Hnni5VkUjmNMwhjNVaRAle8Yp24IYlrxcUNif+Zp+23f6Apm9FU0/U0G3Bl9JO
+	pHwRXqHFDZk7H3FLezcWCBfq8YUEQkvl3Voapv1ivB782Ayh3JYNW/Kd2bKO6UQbYTMzRMrCIlg
+	Q/DO1xXUGpSY1Ek5tWutxNOqrjPSplRbcY56fd07NMGjkdl3K/DOhI3HzUjR69mt+W8mjH6Rnx6
+	dtOmy1J2apxhmzOtpgcVQYS1Zpl3calZDZFxNdL+hiBjPf+hI6NZBqzyY0t8KN2WGiA5zN2UjOn
+	XexGZbeLN59Jx2aU16W4Hj02Wb+YE96vS11eJWx4NpKS7dk4gQNriWg0X9zYBReOeUo2pXk/KPm
+	HB3IKcMaQ4YxGSswW5lmC+ls9TYd7SGp4UCyd4nuMiDqkbxNWcwBV0KcEQmaEGBc1WUSEv/Txuy
+	LvSRPxU6/59Zt0=
+X-Received: by 2002:a05:620a:7004:b0:93c:5f3c:f482 with SMTP id af79cd13be357-93c5f3cfbd3mr1548872685a.33.1790611288926;
+        Mon, 28 Sep 2026 09:01:28 -0700 (PDT)
+Received: from toxicpanda.com ([153.61.196.254])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93c815a47a6sm178125585a.47.2026.09.28.09.01.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Sep 2026 09:01:27 -0700 (PDT)
+From: Josef Bacik <josef@toxicpanda.com>
+Subject: [PATCH 0/9] ublk: fix dispatch to canceled io commands
+Date: Mon, 28 Sep 2026 16:00:36 +0000
+Message-Id: <20260928-b4-ublk-cancel-stop-v1-0-4a4360232a46@toxicpanda.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LO2P123MB3664:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9a9a1e0-4e6a-4dfe-d111-08df1d78b5d5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|376014|366016|23010399003|6133799003|22082099003|18002099003|3023799007|56012099006|5023799004|10067099003|4143699003;
-X-Microsoft-Antispam-Message-Info:
-	uR872L4mh7Ju4rMatP/C/fmdhjvAWZ7SGmjnOqxK+uOgzZkiKA2KIQAY2fwl5hSh5iP0F/oGwcutnvTajSc9C9I4Fr6AkhfEYkbV7+cnX7jTeG5fnu4RlgkiR8fFh0hrGeNKm/8ZRaBjPfrk06auMLEHRvQ1A2c2BZ9F24L7W8O5lWvXdSuN/J7KuAo8y1FQJgYTCWj8cbyUcBctB0pF/fS1vW9yUmPaA1m5seA/FFYFzLG+s/gAVcprZQptz9PavXyjLaQC9uTMBpT9mW3BcemXPAnePIYhFeXw0GzosYUrDgwBcVj04Idrg6F6UGISGa17u/ztgvzlnZlLq0D9L0w3kDDvPfFODDMnhhbkvlFKI0EZrga6J7HJBoR5GfYsrVHLzQrBCER5r6kErk9zLKFBDFkWKsGk8jUmrZxXDrVQY1X7afpJsTon6XjiKZQnG6xbNPAJdDf/6SfO6Yv6/UgOIMcHk3ksIlvYElGjs4pvl+5z0UWpjuyyNyOn0cpqDQc78G7Q8PfDZcSM2GxB1ZuxKBNm2pbH0cm8hnQ3YOHc9wtRtuBgfX58Lq/70T9Ilq8jTCjDEA6IpZ9X0DWF1PzZebJNw19AvjGft7ErVgBt0V4A+e/jxUzh0+QdVK8VNFstODTanpZhVOMjEE5WC70B5wNj1wonBAV17fwnBE8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(23010399003)(6133799003)(22082099003)(18002099003)(3023799007)(56012099006)(5023799004)(10067099003)(4143699003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZUhvSk5PenU2UHA3eEM0SHl5SWFyYU5mVFg1N1Bab2JZOU14MGJYam5pYlhN?=
- =?utf-8?B?UHM3NlpHOEdqeGpEZTV0RS80RVlob1lzZERlaERINGpqWkp3NGQ1L2RPUXBq?=
- =?utf-8?B?SS95OC9MSGk0bW9kZTJNSkVRQW81WnQ5aGZzVm9oeWZOM3BpZ3UyU1JtTUcz?=
- =?utf-8?B?TllRcmhzaVFZMGVXY2N5S01uQk42WU93UVhCdXZwa3FqVnphRmZqK2ovc0hG?=
- =?utf-8?B?VzlIR2ppcllSNm8rYWtEbGtiS2lpMXpGOUpXU2F2RlNvcXpBZHhzOWRac21U?=
- =?utf-8?B?Q09XTDRtNllJdW8za0FLYnJxU09iUTc5VjMzak43TjRvYW44SHRvQ0ZPajdh?=
- =?utf-8?B?RUdkeUY4ZHZCeGFwd0V1WmNtM045RzErTDR6YVd3VWFqUXRhSzZkV1dCc3hB?=
- =?utf-8?B?cUFVT3djeE1qNGYrQzdrb0pNOWg1TUJuMGtQU1lvYVByTWM4NGQ4NzdlRnBJ?=
- =?utf-8?B?WVNBS1VTd2thNjNBU2F1RzBWT0l2YTNKdFJQcHJyRUp2ejlFeHQ3OUhiZU44?=
- =?utf-8?B?eEs2RVRnSlFUYkpjQlh4RVhjZVBtQytJc2QyZFcwWnAyMVRuN3dXLzN3RGdH?=
- =?utf-8?B?SWRiVmVhQmtNUFZEZkc4NVVIbllPajhpbDhtOHIxSXhld3JoOHZIUGtia1hD?=
- =?utf-8?B?WkRVSXFieWg1UEtQZjdEcURESG1RTGpVMlFTOFFtWTUrbHN3OUM5UUppR3hu?=
- =?utf-8?B?QWVUZ1Y2OFFjcHkya3Q3aVFYZGNEdjl5Q1ZpRVIrZTdLamd3R1lPUkR1MWVr?=
- =?utf-8?B?bVAxNklSYmMwWkFUWGJqOHlhU2phUmkwRGtjNEpuSlVLTW40c3pQZUVoWUNh?=
- =?utf-8?B?REZMaFkyTkh2WFF2R2N3OTRGcTc4Vm82VTJIa0g1TDQxTGhYZE9iWmZlTzBl?=
- =?utf-8?B?Wk5tY2hiYk0yY3NkRXpoWDdiV2hYQzY3aTBmVUo5SFc0bW1MVUlLUDdWZkRH?=
- =?utf-8?B?a1dPekZFRWZpWmNCcEVBT1FFSnBFQWZLTTAvTzZqZjZ4WU1iZHdOMXJWZjBP?=
- =?utf-8?B?UWRieWpLNnpxaGdhaEdza2tlSTFQVGtvR2lLaUVtZlpFaUZSMTNycnZPR3gx?=
- =?utf-8?B?STVSS2dBZDA5ZXArNUpkWXJQQXV5ZGwzQ25uS1FZZHBvZVNpS1U1dmh1WnBC?=
- =?utf-8?B?SFpnek5tMzRPcG5rVEE0eENUUnJYOVhaUEFlVE1nMlJtU3RCRnYwYXZmS2RS?=
- =?utf-8?B?WmxGc1IrN25JdEVCOGdPalhYQWR6blJpalpHNGxUNktxOTdIRjlseis2VEVT?=
- =?utf-8?B?eElkVzlGbHZWSUJQOFltVzVFRWpKY0RRYWsyUlJ1eERhRDZicTg2N01tRGV4?=
- =?utf-8?B?WFNxZUtrUXBYUlg3N0ZtWStzekxXNzN1TjZNNGM0UlhJVEVjNWpUK2dUOHhr?=
- =?utf-8?B?eXpKRHFQeTZ0ZVFUWTd6WTZpanZoMjUvTzY5SS9IWWdNTkdNdEdEM24wL084?=
- =?utf-8?B?a1dwbW5Vb0o0SnZYRlNyVyt5czFrK1pkaGlZMkhuSWt4dzlhOC81V3Q1Qmp6?=
- =?utf-8?B?d0FyUy9hRlNra1VSaXVnOWdDTWtZS0RTN1UxZFpkeFhTZThlK3RwQzQ2OUI2?=
- =?utf-8?B?SDhuTWVzY0F2THV1OVozcHBWdHZJUmZseEZ0Vm11L3FqWW1zQlFpdGpLa2U5?=
- =?utf-8?B?bkRYbEhPdDlGWHhwS3o4d1MrQmYzZmhVc05VckxnOHNvM014dXMzNVJ4T3dv?=
- =?utf-8?B?SEZuU3FWMmxKak9PQ1JDdU00dnlOSWNCMTB4c3JheTRvODhONExxYlpEMFVZ?=
- =?utf-8?B?NFFzdjgvSEwzK0dvWWNwSGsraXZTajlnOGszb2FJTnYwSU15Ny9pOTEvY0FH?=
- =?utf-8?B?M1FvOWZab3ZtWFA5cGFnK2YwUjg0Mi9LNjM3TUVMbklQQmNtSTdBV3pmSWt3?=
- =?utf-8?B?dFFldUhhdnNuSjJFM3hCWkl3ejgwSTVWL0RzUkZleHZYS3J4cDc3Y2ZzL3ZQ?=
- =?utf-8?B?RzNNMndSZjdFN2ZwNU8xek9VOXlkWGIxbkJEV1BaVHovZW5NMTZ3NnFNbnhw?=
- =?utf-8?B?bTY1dzFhZmFoaVpKWm5iNDQ1THNRUVZ3SzdLK05pcXBvZlo1YXVuY01BWUxo?=
- =?utf-8?B?VEN3Ni9mMzltVk9iNXRRMWc1UzFxb2ZjRGZjaWFKVTdQTlo0bVBtcVRDeXZy?=
- =?utf-8?B?UG9jSC9UV0d4MEFKLzd3U1d0dmNIM1BqWGQ2cmRzSk5tWEM1UytCT1QzdGxL?=
- =?utf-8?B?OW93VkpsSzdIQ0hyOXhXbWNFLzA1WFQ1WVprKzZ0aytPMDluWXI0UzBSRUlE?=
- =?utf-8?B?TFRXcWZPWG1IU1o3ZWZ5eEMwSmcyS3UyeEl4L3Q0bkhPaFJPVUUvVTBNNkNz?=
- =?utf-8?B?QXlGUEF6Qys0ZHJnTHZzOVUvOUpEL1AwOEhoaHJoeHJxbHJUQzhndz09?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9a9a1e0-4e6a-4dfe-d111-08df1d78b5d5
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2026 15:53:59.6507
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: szqaNIMFpWhvVzpjnjlBHaNM21Yt+HgUuw3GRFN5xDkJYu+EnhmTv8tEx+1mFLhVXZojF6ncpIMC3vi5cKQAEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P123MB3664
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACaPumoC/12NQQrDIBBFrxJm3SFWJGCvUrpQMzY2oqJJWgi5e
+ zXddfn+/P9mh0LZUYFbt0OmzRUXQ4XrpQMzqfAkdGNl4IwPTHKBWuCq/YxGBUMeyxITjoNgykq
+ rpLJQlymTdZ/Ten/8uKz6RWZpqtbQqhDqXB1Ti3zqTXzHPFPuz9P/CziOL8CjpdGrAAAA
+X-Change-ID: 20260924-b4-ublk-cancel-stop-d640af9fa9af
+To: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
+ Caleb Sander Mateos <csander@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openssh-sha256; t=1790611253; l=4747;
+ i=josef@toxicpanda.com; h=from:subject:message-id;
+ bh=Fv8XnK5WCN7eV0DQaaWOcaHLnKI55rjDGdONGhecXhw=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgUBr36M/n0nWN0DNbnxwzIiCZez6MG
+ JiruuNaSCI/zXsAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QIDP5VCB4B1NEqIg/MBiBQuSHhWm27DjTvAT1L7BxI6iMSUS7G/xOdwa4JvCuHuhn3P7tKEhQrT
+ EK3sHYeScsQg=
+X-Developer-Key: i=josef@toxicpanda.com; a=openssh;
+ fpr=SHA256:C8kOX2QUJCMqnCX+KEeoqRAjLo9L+ELOSH2NSAJHqGA
 
-On Mon, Sep 21, 2026 at 04:53:38PM +0300, Ionut Nechita wrote:
-> 
-> Hi Aaron, Daniel,
-> 
-> As promised, here are the end-to-end results from exercising v16 on our
-> 6.18 LTS PREEMPT_RT tree. Short version: managed_irq_strict behaves
-> exactly as documented on multiqueue NVMe with a deliberately narrow
-> housekeeping pool, including the nr_vectors >= nr_cpus case.
-> 
-> Series under test (as backported to 6.18 LTS)
-> ---------------------------------------------
->   0001 scsi-aacraid: use block-layer helpers for queue count
->   0002 lib/group_cpus: remove dead SMP code
->   0003 lib/group_cpus: add group_mask_cpus_evenly()
->   0004 sched/isolation: prevent out-of-bounds read in isolcpus parsing
->   0005 isolation: introduce the managed_irq_strict isolcpus type
->   0006 blk-mq: use housekeeping CPUs only with isolcpus=managed_irq_strict
->   0007 blk-mq: prevent offlining housekeeping CPUs with online-associated
->        queues
->   0008 genirq/affinity: restrict managed IRQ affinity to housekeeping CPUs
->   0009 docs: document the managed_irq_strict isolcpus flag
->   0010 genirq/affinity: confine reserved pre/post vectors to housekeeping
->        CPUs
+ublk can dispatch a block request to an io command which is completed
+already, and the kernel oopses in ublk_queue_rq() on a NULL io->cmd.
+Before commit f7700a4415af ("ublk: fix use-after-free in
+ublk_cancel_cmd()") it is a freed io_uring request instead. Commit
+1133b93fc7f6 ("ublk: set canceling flag even when disk is not
+allocated") fixed the io_uring exit route before the first start.
+These are the routes next to it:
 
-Hi Ionut,
+  1. STOP_DEV on a device which is ready but not started, then
+     START_DEV. ublk_stop_dev() cancels the fetched commands after
+     dropping ub->mutex, without marking the queues as canceling.
+  2. A partial FETCH round whose task exits, once another task
+     completes the round.
+  3. During recovery, the task of a queue which is ready already
+     exiting before the last queue is ready.
 
-First of all, please accept my apologies for the delay in getting back to you on this.
+Patch 1 keeps a queue canceling at its ready transition when one of its
+commands was canceled after the fetch, which closes route 2. Patch 2
+clears ub->canceling as soon as a queue clears its own flag, so that a
+later cancel marks and quiesces the queues again.
 
-Thank you very much for this comprehensive and thorough test report.
-A few comments inline below.
+Patches 3 to 6 prepare for the control paths claiming commands while
+the server still commits requests. Patches 3 and 4 put the switch of
+io->cmd in the commit paths and the reads of a cancel under io->lock.
+Patch 5 has the issue path complete a command which a cancel took
+before io_uring put it on its list of cancelable commands, and patch 6
+splits the claim of a command from its completion.
 
+Patch 7 makes ublk_uring_cmd_cancel_fn() mark the queues and the
+command in one cancel_mutex section, so that the ready transition of
+route 3 cannot come in between. Patch 8 marks the queues and claims the
+commands in ublk_stop_dev() before ub->mutex is dropped and completes
+them afterwards, for route 1. Setting ->canceling there is not enough
+on its own, the last FETCH of the round can still come in before any
+command is marked and clear it again.
 
-> Note: 0010 is a local follow-up (see section 3), not part of the
-> upstream v16 series.
-> 
-> Test environment
-> ----------------
->   Kernel:   6.18.15-rt and 6.18.52-rt (PREEMPT_RT), v16 backported
->             (6.18.52 is the current 6.18 LTS; behaviour is identical on
->             both, the data below is from 6.18.15)
->   CPU:      single-socket Intel Xeon (Granite Rapids), 40C/80T,
->             1 NUMA node (all 80 CPUs on node0)
->   Storage:  2x NVMe (SK hynix PE9010), b6:00.0 and b7:00.0
->   NICs:     8-port E830-CC + 4-port E825-C (managed IRQs)
->   MSI-X:    2235 vectors allocated system-wide
-> 
->   cmdline (relevant bits):
->     nohz_full=2-38,42-78
->     isolcpus=nohz,domain,managed_irq_strict,2-38,42-78
->     rcu_nocbs=2-39,42-79 kthread_cpus=0-1,40-41 irqaffinity=39,79
-> 
->   => isolated (isolcpus) = 2-38,42-78   (74 CPUs)
->      housekeeping (HK)   = 0,1,39,40,41,79   (6 CPUs)
-> 
-> Because HK is only 6 CPUs while the box carries 2235 vectors, this is
-> squarely the "narrow housekeeping pool, nr_vectors >= nr_cpus" scenario.
-> 
-> 1) blk-mq queue allocation and mapping (patches 6, 7)
-> -----------------------------------------------------
-> Both NVMe devices allocate exactly 6 hardware queues, matching the HK
-> weight. Each hctx is owned by exactly one HK CPU:
-> 
->     nvme0n1 / nvme1n1:
->       hctx0: 0   hctx1: 1   hctx2: 39
->       hctx3: 40  hctx4: 41  hctx5: 79
-> 
-> No isolated CPU owns a queue. The sysfs cpu_list only shows the HK CPUs
-> because blk_mq_map_swqueue() strips the isolated CPUs from hctx->cpumask
-> (as intended). The full software-context routing from debugfs confirms
-> the 74 isolated CPUs are still mapped onto these 6 HK queues rather than
-> left unserved, evenly (~12-13 isolated CPUs per queue), so I/O submitted
-> from an isolated core completes on a housekeeping CPU:
-> 
->     hctx0 (owner 0):  0,2,8,14,20,26,32,38,47,53,59,65,71,77
->     hctx1 (owner 1):  1,3,9,15,21,27,33,42,48,54,60,66,72,78
->     hctx2 (owner 39): 4,10,16,22,28,34,39,43,49,55,61,67,73
->     hctx3 (owner 40): 5,11,17,23,29,35,40,44,50,56,62,68,74
->     hctx4 (owner 41): 6,12,18,24,30,36,41,45,51,57,63,69,75
->     hctx5 (owner 79): 7,13,19,25,31,37,46,52,58,64,70,76,79
-> 
-> All 80 CPUs are covered exactly once. This also lines up with the
-> hotplug guard below: isolated CPU 3 is routed to hctx1 (owned by HK CPU
-> 1), which is precisely why offlining CPU 1 is refused.
+Patch 9 changes behaviour and is the one I would like feedback on. With
+patches 1 to 8, as with 1133b93fc7f6 alone, START_DEV brings up a disk
+on which every request fails. With UBLK_F_USER_RECOVERY and without
+UBLK_F_USER_RECOVERY_FAIL_IO the requests are requeued and never
+kicked, which leaves the partition scan hanging under
+disk->open_mutex. Patch 9 makes START_DEV and END_USER_RECOVERY return
+-ENODEV instead. The server cannot fetch those commands again anyway. If
+that is not wanted, patches 1 to 8 stand on their own.
 
-This is brilliant to see. It verifies that group_mask_cpus_evenly() and the
-updated blk_mq_map_swqueue() logic distribute the isolated submission
-contexts evenly across the housekeeping hardware contexts without leaving
-any core unserved or over-subscribing a single queue.
+UBLK_CMD_QUIESCE_DEV has problems of its own, which this series does
+not fix. Its one cancel pass skips a command whose request is with the
+server or still started at that moment, a COMMIT_AND_FETCH then queues
+a new command on the canceling queue, nothing completes it, and the
+server never exits, so the device stays LIVE. The path is the same on
+for-next, but with this series the hang shows up about twice as often
+in my testing, roughly 4% of quiesces under fio against 2%, possibly
+because the claim now takes io->lock for each command. Sent again after
+a new server fetched its commands, QUIESCE_DEV can also leave some of
+them canceled. I am working on those separately, tying the cancel to
+the server it is meant for.
 
-> 
-> 2) Managed IRQ affinity (patch 8)
-> ---------------------------------
-> Every NVMe completion-queue vector has its effective_affinity confined
-> to the HK set:
-> 
->     nvme0q1..q6 eff = 0, 1, 39, 40, 41, 79
->     nvme1q1..q6 eff = 0, 1, 39, 40, 41, 79
-> 
-> No managed interrupt targets an isolated CPU.
+ublk_batch_attach() publishing a fetch command before io_uring marks it
+cancelable is not touched either, it is the same on for-next and I will
+send a separate fix for it.
 
-Excellent.
+Tested under QEMU with KASAN and lockdep, and in a KCSAN build: a small
+io_uring reproducer for each route, with restart after a server exit
+and a full USER_RECOVERY cycle as controls, the ublk selftests, and a
+script racing ADD_DEV against STOP_DEV and DEL_DEV and running both
+under fio, on each commit path including UBLK_F_BATCH_IO. On for-next
+the reproducers oops. With the series they end in -ENODEV or pass.
 
-> 
-> 3) Reserved pre/post vectors
-> ----------------------------
-> The NVMe admin (pre_vector) queues also stay off the isolated set:
-> 
->     nvme0q0 eff = 79
->     nvme1q0 eff = 39
-> 
-> Note: in the stock series the reserved pre/post vectors still default to
-> irq_default_affinity, which on this config spans the isolated CPUs, so a
-> freshly probed admin queue can briefly land on an isolated core before
-> any userspace re-steer. On PREEMPT_RT that stray wakeup is precisely
-> what we are trying to avoid, so we carry a small follow-up that confines
-> the affd->pre_vectors / post_vectors to the housekeeping mask when
-> HK_TYPE_MANAGED_IRQ_STRICT is set. The affinities above are with that
-> follow-up applied. Happy to post it separately if there is interest in
-> closing that gap upstream.
+Thanks,
 
-Okay. In kernel/irq/affinity.c, irq_create_affinity_masks() copies
-irq_default_affinity for the pre_vectors and post_vectors loops. When
-isolcpus=managed_irq_strict is in effect, have you written something
-similiar to the following:
+Josef
 
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -30,6 +30,7 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
-     struct irq_affinity_desc *masks = NULL;
-     const struct cpumask *hk_mask = housekeeping_cpumask(HK_TYPE_MANAGED_IRQ_STRICT);
-     bool hk_enabled = housekeeping_enabled(HK_TYPE_MANAGED_IRQ_STRICT);
-+    const struct cpumask *def_mask;
+---
+Josef Bacik (9):
+      ublk: keep queue canceling over canceled commands
+      ublk: clear ub->canceling with the queue's own flag
+      ublk: publish io->cmd under io->lock in the commit paths
+      ublk: read the io under io->lock in ublk_cancel_cmd()
+      ublk: complete a command canceled before it was marked from its issuer
+      ublk: split ublk_claim_cmd() out of ublk_cancel_cmd()
+      ublk: mark queues and command in one cancel_mutex hold
+      ublk: claim commands under ub->mutex in ublk_stop_dev()
+      ublk: refuse to go live over canceled io commands
 
-     /*
-      * Determine the number of vectors which need interrupt affinities
-@@ -63,9 +64,14 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
-     if (!masks)
-         return NULL;
+ Documentation/block/ublk.rst |  15 +-
+ drivers/block/ublk_drv.c     | 394 ++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 344 insertions(+), 65 deletions(-)
+---
+base-commit: d70609a2f68c9c89231fbce6600c90feca65e262
+change-id: 20260924-b4-ublk-cancel-stop-d640af9fa9af
 
-+    if (hk_enabled)
-+        def_mask = hk_mask;
-+    else
-+        def_mask = irq_default_affinity;
-+
-     /* Fill out vectors at the beginning that don't need affinity */
-     for (curvec = 0; curvec < affd->pre_vectors; curvec++)
--        cpumask_copy(&masks[curvec].mask, irq_default_affinity);
-+        cpumask_copy(&masks[curvec].mask, def_mask);
-
-     /*
-      * Spread on present CPUs starting from affd->pre_vectors. If we
-@@ -104,7 +110,7 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
-     else
-         curvec = affd->pre_vectors + usedvecs;
-     for (; curvec < nvecs; curvec++)
--        cpumask_copy(&masks[curvec].mask, irq_default_affinity);
-+        cpumask_copy(&masks[curvec].mask, def_mask);
-
-     /* Mark the managed interrupts */
-     for (i = affd->pre_vectors; i < nvecs - affd->post_vectors; i++)
-
-
-The intention would be to fold the above into Patch 8 ("genirq/affinity:
-Restrict managed IRQ affinity to housekeeping CPUs"). However, we would
-welcome your patch. Please feel free to post your follow-up patch to the
-list so we can review it, or alternatively, we will use the above (or
-similiar), and fold it directly into the upcoming v17 revision.
-
-> 
-> 4) blk-mq hotplug guard (patch 7)
-> ---------------------------------
-> Offlining a housekeeping CPU that still serves an online isolated CPU is
-> refused:
-> 
->     # echo 0 > /sys/devices/system/cpu/cpu1/online
->     -> fails (-EINVAL)
->     blk-mq: cannot offline CPU 1: online isolated CPU 3 is still
->             mapped to hctx1
-> 
-> After offlining the dependent isolated CPUs first, offlining the HK CPU
-> succeeds. suspend/hibernate (cpuhp_tasks_frozen) is correctly exempted.
-
-Very glad to see the hotplug notifier path operating cleanly and rejecting
-the teardown with informative diagnostic output.
-
-> 
-> 5) Vector count / probe robustness (patch 8)
-> --------------------------------------------
-> With 2235 vectors against 6 HK CPUs, no device aborted probe: no -ENOSPC
-> and no nr_io_queues=0. The minimum-vector safety net in
-> irq_calc_affinity_vectors() holds on this narrow-HK box.
-
-This confirms that irq_calc_affinity_vectors() gracefully handles vector
-exhaustion risks while maintaining minimum required driver vector bounds.
-
-> 6) Runtime completion locality (PREEMPT_RT threaded IRQs)
-> ---------------------------------------------------------
-> fio randread 64k, 4 jobs, iodepth=64, 120s, pinned to a single isolated
-> CPU via a device-plugin extended resource on Kubernetes.
-> 
->   Results:
->     IOPS       : 56.9k
->     Bandwidth  : 3559 MiB/s (3732 MB/s), 417 GiB in 120s
->     clat       : avg 4489us, stdev 30.99us, p99 4555us
->     total IOs  : 6,833,178
-> 
-> While fio was submitting from that isolated CPU, every threaded NVMe
-> IRQ handler on the host was scheduled on a housekeeping CPU
-> (SCHED_FIFO, as expected on PREEMPT_RT). `ps -eLo psr,cls,comm |
-> grep irq.*nvme` during the run:
-> 
->    0 FF irq/195-nvme0q3   0 FF irq/196-nvme0q4   0 FF irq/198-nvme0q6
->    1 FF irq/187-nvme1q2   1 FF irq/188-nvme1q3   1 FF irq/194-nvme0q2
->   39 FF irq/185-nvme1q0
->   40 FF irq/186-nvme1q1  40 FF irq/189-nvme1q4  40 FF irq/193-nvme1q6
->   41 FF irq/191-nvme1q5  41 FF irq/192-nvme0q1  41 FF irq/197-nvme0q5
->   79 FF irq/190-nvme0q0
-> 
-> All 14 threaded handlers land on {0,1,39,40,41,79} = HK. Zero
-> irq/*-nvme* threads scheduled on any of the 74 isolated CPUs.
-> 
-> The /proc/interrupts delta over the 120s run confirms it at the counter
-> level. Every nvme* IRQ that fired incremented only on an HK CPU:
-> 
->   irq 192 nvme0q1 CPU0 : +6,809,271   (fio's IOs, one HK owner)
->   irq 187 nvme1q2 CPU1 : +684
->   irq 186 nvme1q1 CPU0 : +598
->   irq 189 nvme1q4 CPU40: +568
->   irq 191 nvme1q5 CPU41: +512
->   irq 188 nvme1q3 CPU39: +304
->   irq 193 nvme1q6 CPU79: +271
->   irq 196 nvme0q4 CPU40: +4
->   irq 194 nvme0q2 CPU1 : +3
-> 
-> Every single delta is on {0,1,39,40,41,79}. Zero completions on any of
-> the 74 isolated CPUs. I/O submitted by a task pinned to an isolated
-> core completes entirely on housekeeping cores.
-
-These figures provide definitive proof of completion locality. Over 6.8
-million I/O completions and threaded interrupt wakeups without a single
-stray interrupt or context switch landing on an isolated core is exactly
-the guarantee managed_irq_strict aims to provide.
-
-> 
-> Still on my list: a negative-control boot with plain managed_irq to
-> show the confinement disappears. I will follow up with that.
-> 
-> On option 1 vs option 2, my earlier preference stands: keep
-> managed_irq_strict as an explicit opt-in and leave managed_irq
-> semantics unchanged, to avoid a silent behavioural change for existing
-> deployments.
-> 
-> Tested-by: Ionut Nechita <ionut.nechita@windriver.com>
-> 
-> Thanks,
-> Ionut
-
-Thank you again for your time and testing efforts. We will add your
-Tested-by tag to the respective patches in v17.
-
-Kind regards,
--- 
-Aaron Tomlin
