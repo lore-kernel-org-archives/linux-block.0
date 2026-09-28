@@ -1,244 +1,196 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-yx2-f42.google.com (mail-yx2-f42.google.com [74.125.224.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03BA4B95BF
-	for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 16:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BA44F393A
+	for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 17:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790614168; cv=none; b=eP+WLYBPHB5rvjVHF0DRPoqY+SzFdsl1DlXiJwe5lFOAJS5ruJZoAzVNifkgC43sgvF2XnbkAkf5oOJAkVl898LNXFanrM5qPujm0MSVj6vm/6bljjdOo0QuxAf7DuLpDqbPDqpht1avK+62NE0GXKq+9TsHiTh4vmQ5bRu7zl4=
+	t=1790615651; cv=none; b=uUwbiFj/GTitQ57C3vOT17pVxUVs5OlvCLmrHbJgnZKyKeFHn1m3EAXy9Hf1s3aqEZstYDpeNSj0ck7MUyTLnX2SvFtpvilD6P9WmHGh7sfP+ZC0ljVXrURPKjL9M2fdNmP+0/YDlGGiNuO/MioDss22Ap3esbXpzE8m8N2vsRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790614168; c=relaxed/simple;
-	bh=bp+qWhqWaR9Lz830v75yldw0X9URi4cGTw7lByuKNn0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gSyFWVuK21uyi0nNxQ8G4JkIkdEcvsNcpqbiOcnFt/ZNcAA09mUpT8lVYgow1wophtv3H/utZvSBKSxuKJ6f5i2WY/GN4FQ8R8ki4psN5XIlW41EguTw7ve3VH5cSW3cYhKE9na+eTXxFrh7vCGxmUmXkfv5oHSsFA9x0dOtVG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HfKPSmhL; arc=none smtp.client-ip=209.85.208.51
+	s=arc-20240116; t=1790615651; c=relaxed/simple;
+	bh=MbYUL73La3phT6CWXVxz3A2hkcPLAKJyAdn49kkRKFc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iB09zHJ4HAPI9aDUL0zrCtEv/RT3PSJ9Oy57vrBoHZvlfoU1JMDBRqYpIG1/CMp+MyFraxEMWsSVrFpTDKiQ/bZOyHVDRIZBCsqPWrEgDKfS4pyVi/b1NHPolBT9Dlp0lgktSU7RwvdRxpR02Liisw2QVFxA0na0CgPOkFLEM8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpEt8Q/R; arc=none smtp.client-ip=74.125.224.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HfKPSmhL"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6aaf28a86b9so72609a12.1
-        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 09:49:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpEt8Q/R"
+Received: by mail-yx2-f42.google.com with SMTP id 956f58d0204a3-6729ca45e37so3421898d50.2
+        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 10:14:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790614165; x=1791218965; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=xejTefUm/OK3UUWyW9Ph3jbUHFaoxjGvqLJqChvouko=;
-        b=HfKPSmhL1mSfI/omSQRd3bzq9EcoUjfM0sq964iCCu4bnn3RktFWcxWd9DP0ru0yhK
-         kcXGxY1m7TX8z3oMnS/YdM5QSMC6OXuJj2EsZXIQtXo+SngOQ6lP5PT0EQwtAh3CLO6+
-         7oMxOPqnvOG4dfb9JBUpJinWnuepar3GEH4EcRZdLyvqiCYpcnOGS90pvb+emSBO8dg/
-         T8h5gxwQaWZWzQP2bSeW7sYkMML9BqQI15uwuZv18lQf5SQngSqP/WmGga9TsLe25Fm+
-         0V8WvYZ+iGa7bmH7vtv0gSQCjYQW+vA4I725Kz4L6l/fSzBcJZ/CJ0kbMgVukTzR4W0V
-         yk6A==
+        d=gmail.com; s=20251104; t=1790615647; x=1791220447; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=MmJ/EW0KwY0F0cm8LaUC3Fhj6N704NFs3EmzLQEffnQ=;
+        b=DpEt8Q/Rtt6CU3VVCy088mlM94gI41xgFL8/OIpF7pLSuO5iZe0mNZsHnYrtDAxXH0
+         hJUBdhVhN4oej1WlPQhTfYlrf8FVZLn/Kqq6kzE7jSdpa5rY1Prk7NIoKnPW7z9n+klw
+         mWAtVjQboIZziiPgP+TY2Bge/YSusfHHOvkSn59MNZR1OAL3agPO+Lq0bqe90fr4z29l
+         BZDEZFONCqNi35OL8P0pUwsiDVQddf++iE7GOXMf2O6JOD4jkWmv+EUpdgqp/9MwXfbE
+         bhVWF7vK2Q+15ah7ydijagIGn6QwcNK70wA1I1/gAJIHvjji3tEm5JUboSICRcvCP8nh
+         fHZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790614165; x=1791218965;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xejTefUm/OK3UUWyW9Ph3jbUHFaoxjGvqLJqChvouko=;
-        b=NzUg52Vlwc3DWAhGpIWeZ0G31LvFHbMZ0yasqj+EYJV/0yTLY5t8+sGgGnnMDZ4Ct8
-         xAlPAxvBENKV2c0+WzcvlNWKjt97oqz6yRZeCWs79PL1Fbi/Kqnf0RjBgIdW+xZFzWgY
-         KeM18HPa7DQR3PxqkOWAVfHLEyLOHZLVNx9dkR48qMoD6Pn/ZGT4RDuWy2K4EBgaAIzL
-         Sd1r6/gp3jOAnrnwwexUVHu9SlSGe45bzdBf6f42T00BP8vM5YxfBF1QAgGDkLdMxq1/
-         aV9BcV/gKEFen3hZfnxin1eLq2GpsZHZ6Vjv3GzW8SrDkudKXVgON9bteBsGV1ddru5f
-         zOyQ==
-X-Forwarded-Encrypted: i=1; AKwUvBydWqzTTcIF0bWq/Xwcm/LYMi+FwBYuOV1r3zfPyU7vh2meLbWdBL0Co5WZvXimqzNvppLypZEokflKLg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKCabImBpwHI19K/K7+Osi4JGt/rRgXLW0XrmKmOCB4MAG4k6O9
-	jOnUks9XTsGtmjRrbFMXa1IZ4oNcnSJZDGkCvPsBJ8aelsXXFlSv5yQS
-X-Gm-Gg: AYBFou1gZYFEZcF006LNOELbZ+XDQdQ9pVspXjiZwwLP9HIJfHIpt5kQSCbgLkpNOS2
-	XqJoLtaRGNvqAokwfR+AuYAUXcYiQ1+ewI+zYiSqBCm+YM4uPjxJFzNy25Daqu7v7BTSRN+QBM0
-	KVKwZbDjz6k5tYY1E54RAuOX4QU1B5ofb24oUjfktirAzmnBDQuKkSRG7zRz/ZJeMgav792eAn+
-	k9GfkTwZ7CD0t7WHpDEFSh+c51B9kWvjaOOz8JpLOpxz+POCNgVIXkQU6ihjZUhhDDP6SlT/71H
-	CAMLPXztxs6xCkDU3WDklxGH8lSJke5LjjxkbriSmC1HTWyIRNDQyuMyQOqFPvK0D991rnroS3P
-	j7F0tndZ+wHpkI3qZgoV8+DKY4AtvYAOT2IZqucGOz2BMHYFfYp8Ovjamwq6o+biMTfX9VElgzp
-	isUMHpt5oNHJ49LGWwb9E9rZUwPkzKjtV+Gd7ht5XGxsae5EjmTVCqGrb+Yk9IIUNkfVrsNfXQk
-	+9u6YwA/3uBKaVBvC3lhbvQrhxgbWU+RdsfdFEDickScYe7heOnMhBMH20Wpzgg9z0fGWjkPa7m
-	xEHY4JNbPL4=
-X-Received: by 2002:aa7:d1c8:0:b0:6aa:f83e:1da7 with SMTP id 4fb4d7f45d1cf-6aaf83e1fedmr5025670a12.0.1790614164665;
-        Mon, 28 Sep 2026 09:49:24 -0700 (PDT)
-Received: from localhost.localdomain (84-216-182-59.customers.ownit.se. [84.216.182.59])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6ab5be57b13sm3066998a12.33.2026.09.28.09.49.23
+        d=1e100.net; s=20260707; t=1790615647; x=1791220447;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=MmJ/EW0KwY0F0cm8LaUC3Fhj6N704NFs3EmzLQEffnQ=;
+        b=1zzVhj14sVy+RKU9rYjXFSd+kZfcqZoCCj84QfL+40h0US2NhsqcFlTp9Jxc5gX3SE
+         vjsEDtI5UnC3471wlhUwoTGxKMrV7I+gc2QUONSa5PcGj22+zsHrERWUU1BzUzR0ICWb
+         H29VZG2w5/1DuBvr5DikxllDK+DOnC6d0ri+d8TIH04bJ4fHjN1mrieDSX2o0xm4zf8t
+         NIS/0XtEI1qLbjtsJxfUa1Zh1U4MkqUYMJpBDLfnmClTAZxQI4UqBLUW3otaOx6B4TvC
+         Se3ohi2iYJ7flrCKWP8a6e3pNgN+riwBaFBhOuWfOTQRk4gXjaz96X2dL06LH0jmWypK
+         PjIA==
+X-Forwarded-Encrypted: i=1; AKwUvByqoCjcyDlMdTb9RZEp53ORXniLGEdYVQtBnwRO9oXO4+EXxqbZMLM6zH58o6IH6PlqHegO4IRYEYj+7Q==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLakWz5gduHuh3Af+Uq42fmpW+zDPas/q5jc8Q95c5HBubjQ4Sy
+	hL3ar0l0Ghx27+rzr9MuMLkaeVxu1DFegb1RkkSUW2Dac+keRJwCjQWB
+X-Gm-Gg: AYBFou1XjJol/eK75pdMZ83SvsuNvgihtKtYoVhatdcuxzx7ajQoNN9NAKDatZGpkIb
+	rAznazUTc6UXth/+C22W3X+qiTTpktjUIEkGXSjdjqOTvKjHEcZe3aYyE3NKd73g9QM1UWwS5FU
+	IgOELAq2FDmOd9S1lkTWTwdhG2MQw48GOuNdB/NMrPTF4Sz9QL4ooIbam1/4Bi4aVZZNh3qTm4i
+	vj7N0G5B2A8B3z6OTvNZ7qIqD+Gb8+3XfuMEU30NCf76ECYblTJy+HQx3AqjORhJhutRswCk2L5
+	XPqBjrNlhXJcdqXXoSLVlX/Lv9EFhrTqctKvdjlpyGaiHGnScdizJIZ7oimZhtp20VZOTBf2xy9
+	NouMsV0MjUNclCpFbUTub21RTeTa+Iogxn6ldNxysstgMXF1ZA39Kl56AKK3/T279Cjka1N7yU6
+	lRXPVRFcR/iQWy1oaMrIdsoRqiBIhMuNfM67VdcardRAI6/2CIb0GuWtpzJbbwWV466fj3KQUKI
+	Uo=
+X-Received: by 2002:a53:ac98:0:b0:671:1398:648d with SMTP id 956f58d0204a3-674111a8a77mr3399078d50.9.1790615647178;
+        Mon, 28 Sep 2026 10:14:07 -0700 (PDT)
+Received: from suesslenovo ([71.132.185.69])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6740ee940a0sm4752038d50.3.2026.09.28.10.14.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 09:49:24 -0700 (PDT)
-From: Pooyan Azad <pooyan.azadparvar@gmail.com>
-To: Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] zram: fix short reads from block_state
-Date: Mon, 28 Sep 2026 18:48:26 +0200
-Message-ID: <20260928164826.24858-1-pooyan.azadparvar@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CANC3H+LdtoydSp+o2ecErAw7k6R2+gRf9LyxcaoHv_mGhJmyQQ@mail.gmail.com>
-References: <CANC3H+LdtoydSp+o2ecErAw7k6R2+gRf9LyxcaoHv_mGhJmyQQ@mail.gmail.com>
+        Mon, 28 Sep 2026 10:14:06 -0700 (PDT)
+Date: Mon, 28 Sep 2026 13:13:35 -0400
+From: Justin Suess <utilityemal77@gmail.com>
+To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>
+Cc: Cai Xinchen <caixinchen1@huawei.com>, mic@digikod.net, 
+	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
+	corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, 
+	gregkh@linuxfoundation.org, rafael@kernel.org, dakr@kernel.org, dlemoal@kernel.org, 
+	hch@lst.de, axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	jack@suse.cz, dhowells@redhat.com, code@tyhicks.com, linkinjeon@kernel.org, 
+	sj1557.seo@samsung.com, yuezhang.mo@sony.com, hirofumi@mail.parknet.co.jp, 
+	cel@kernel.org, jlayton@kernel.org, neil@brown.name, okorniev@redhat.com, 
+	Dai.Ngo@oracle.com, tom@talpey.com, miklos@szeredi.hu, amir73il@gmail.com, 
+	senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com, zohar@linux.ibm.com, 
+	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, 
+	stephen.smalley.work@gmail.com, omosnacek@gmail.com, casey@schaufler-ca.com, nanx95726@gmail.com, 
+	djwong@kernel.org, daniel@iogearbox.net, linux-security-module@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, driver-core@lists.linux.dev, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev, 
+	ecryptfs@vger.kernel.org, exfat@lists.linux.dev, linux-nfs@vger.kernel.org, 
+	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org, xiujianfeng@huawei.com, 
+	lujialin4@huawei.com
+Subject: Re: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and
+ WRITE_METADATA access rights
+Message-ID: <arqcbjWLN1CLkL_Y@suesslenovo>
+References: <20260924104831.1081137-1-caixinchen1@huawei.com>
+ <araxO4ze0KZBz756@suesslenovo>
+ <20260926.255b951d3013@gnoack.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260926.255b951d3013@gnoack.org>
 
-read_block_state() formats each entry directly into the buffer supplied
-by read(). If the remaining buffer is too small for one complete record,
-snprintf() returns the full record length and the function stops without
-copying data or advancing the file position. A read smaller than a record
-therefore returns zero at a non-EOF position and cannot make progress.
+On Sat, Sep 26, 2026 at 09:56:28AM +0200, Günther Noack wrote:
+> Hello!
+> 
+> On Fri, Sep 25, 2026 at 02:03:05PM -0400, Justin Suess wrote:
+> > On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
+> > > This series adds two new Landlock filesystem access rights,
+> > > LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
+> > > which control access to file and directory metadata such as inode
+> > > attributes (mode, ownership, timestamps), extended attributes and POSIX
+> > > ACLs.  It picks up the work from the "landlock: add chmod and chown
+> > > support" series [1] and follows the coarse-grained grouping discussed in
+> > > that thread [2]: instead of separate chmod/chown rights, metadata
+> > > operations are grouped into one read and one write right.
+> > > 
+> > > Landlock evaluates access rights on a per-path basis, but the metadata
+> > > related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
+> > > inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
+> > > inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
+> > > object.  Patches 1-7 therefore first pass struct path instead of dentry
+> > > through the metadata-related VFS helpers and LSM hooks.  This is a pure
+> > > refactoring with no behavior change, split so that every patch builds
+> > > and works on its own:
+> > >
+> > I like these patches, but is the ability to read metadata already
+> > sorta controlled by LANDLOCK_ACCESS_FS_READ_DIR on the parent
+> > directory?
+> > 
+> > The one case I see this being different is:
+> > 
+> > 1. if you wanted to grant read access to the file, but not metadata
+> > read access, but I can't think of any usecase for being able to read
+> > the contents of a file, but not the metadata. (see below)
+> > 
+> > 2. If you had the absolute path already and didn't need READ_DIR.
+> > 
+> > I see introducing this READ_METADATA as causing potential
+> > hard-to-diagnose issues.
+> > 
+> > Say you handle READ_METADATA and READ_FILE, but only grant READ_FILE.
+> > 
+> > The program can technically open the file with the READ_FILE permission,
+> > but it may error out because the stat() on it beforehand failed.
+> > It's pretty common for programs to do that kind of thing (stat before
+> > open), like for checking for config files (strace bash and you see it
+> > stat .profile, /etc/profile)
+> > 
+> > There may be other bugs, because being able to set permissions to read
+> > a file *but not read it's metadata* isn't possible currently in posix
+> > acl and userspace may not work well if that assumption no longer holds.
+> >
+* posix acl and linux DAC.
 
-Convert block_state to seq_file so formatted records are buffered
-independently of the userspace read size. Keep dev_lock held across each
-seq_file iteration and continue to protect individual entries with their
-slot locks.
+> > So maybe WRITE_METADATA is good enough?
+> 
+> The existing use cases are the combinations of (a) READ_DIR
+> allowed/denied and (b) READ_METADATA allowed/denied.  Because these
+> two access rights overlap slightly, it seems likely that for a given
+> directory or file, users will want to either grant both, or deny both.
+> 
+> At the moment, where the (not yet existing) READ_METADATA is
+> implicitly always allowed, the problematic case is the one where the
+> Landlock user wants to deny READ_DIR, but where much of the same
+> metadata is still available through stat() and the various
+> get-attribute syscalls.  (c.f. the warning box in the Landlock docs
+> [1])
+> 
+> In my view the READ_METADATA right closes a gap that READ_DIR left
+> open (which is also potentially surprising to callers if they did not
+> read the docs closely).  Also, if its implementation is symmetric to
+> WRITE_METADATA, I feel that it's worth having it in the same patch
+> set.
+> 
+> –Günther
+> 
+> P.S.: I know, even after we can control stat(), there are likely ways
+> to infer the presence of a file by observing Landlock error codes.
+> This would be nice to fix as well, but is harder to do without
+> controlling the path walk itself [2].  But also, the fact that this is
+> currently not controllable is not an excuse for leaving READ_METADATA
+> open IMHO.
+>
+I'm still sort of concerned about the case where read access is allowed,
+but metadata isn't, due to how many applications will not cleanly handle
+such an unexpected condition. You can reproduce this with a seccomp
+policy forbidding stat().
 
-Fixes: c0265342bff4 ("zram: introduce zram memory tracking")
-Closes: https://lore.kernel.org/r/CANC3H+LdtoydSp+o2ecErAw7k6R2+gRf9LyxcaoHv_mGhJmyQQ@mail.gmail.com/
-Signed-off-by: Pooyan Azad <pooyan.azadparvar@gmail.com>
----
-Compile-tested with:
+Would it make sense to have the existing READ rights
+(READ_DIR/READ_FILE) imply READ_METADATA on the files/directories 
+if READ_METADATA is handled? Reading a file's contents should always
+imply that you can read the metadata.
 
-  make O=/tmp/zram-build W=1 -j$(nproc) \
-       drivers/block/zram/zram_drv.o
-
-No runtime testing of the patched kernel was performed.
-
- drivers/block/zram/zram_drv.c | 101 ++++++++++++++++++----------------
- 1 file changed, 53 insertions(+), 48 deletions(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index a9b3bb1d3bef..66a2fdb1274b 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1542,68 +1542,73 @@ static void zram_debugfs_destroy(void)
- 	debugfs_remove_recursive(zram_debugfs_root);
- }
- 
--static ssize_t read_block_state(struct file *file, char __user *buf,
--				size_t count, loff_t *ppos)
-+static void *zram_block_state_start(struct seq_file *seq, loff_t *pos)
- {
--	char *kbuf;
--	unsigned long index;
--	ssize_t written = 0;
--	struct zram *zram = file->private_data;
-+	struct zram *zram = seq->private;
- 	unsigned long nr_pages;
- 
--	kbuf = kvmalloc(count, GFP_KERNEL);
--	if (!kbuf)
--		return -ENOMEM;
--
--	guard(rwsem_read)(&zram->dev_lock);
--	if (!init_done(zram)) {
--		kvfree(kbuf);
--		return -EINVAL;
--	}
-+	down_read(&zram->dev_lock);
-+	if (!init_done(zram))
-+		return ERR_PTR(-EINVAL);
- 
- 	nr_pages = zram->disksize >> PAGE_SHIFT;
-+	if (*pos >= nr_pages)
-+		return NULL;
- 
--	for (index = *ppos; index < nr_pages; index++) {
--		int copied;
-+	return &zram->table[*pos];
-+}
- 
--		slot_lock(zram, index);
--		if (!slot_allocated(zram, index))
--			goto next;
-+static void *zram_block_state_next(struct seq_file *seq, void *v, loff_t *pos)
-+{
-+	struct zram *zram = seq->private;
-+	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
- 
--		copied = snprintf(kbuf + written, count,
--			"%12lu %12u.%06d %c%c%c%c%c%c\n",
--			index, zram->table[index].attr.ac_time, 0,
--			test_slot_flag(zram, index, ZRAM_SAME) ? 's' : '.',
--			test_slot_flag(zram, index, ZRAM_WB) ? 'w' : '.',
--			test_slot_flag(zram, index, ZRAM_HUGE) ? 'h' : '.',
--			test_slot_flag(zram, index, ZRAM_IDLE) ? 'i' : '.',
--			get_slot_comp_priority(zram, index) ? 'r' : '.',
--			test_slot_flag(zram, index,
--				       ZRAM_INCOMPRESSIBLE) ? 'n' : '.');
--
--		if (count <= copied) {
--			slot_unlock(zram, index);
--			break;
--		}
--		written += copied;
--		count -= copied;
--next:
-+	++*pos;
-+	if (*pos >= nr_pages)
-+		return NULL;
-+
-+	return &zram->table[*pos];
-+}
-+
-+static void zram_block_state_stop(struct seq_file *seq, void *v)
-+{
-+	struct zram *zram = seq->private;
-+
-+	up_read(&zram->dev_lock);
-+}
-+
-+static int zram_block_state_show(struct seq_file *seq, void *v)
-+{
-+	struct zram *zram = seq->private;
-+	struct zram_table_entry *entry = v;
-+	unsigned long index = entry - zram->table;
-+
-+	slot_lock(zram, index);
-+	if (!slot_allocated(zram, index)) {
- 		slot_unlock(zram, index);
--		*ppos += 1;
-+		return SEQ_SKIP;
- 	}
- 
--	if (copy_to_user(buf, kbuf, written))
--		written = -EFAULT;
--	kvfree(kbuf);
-+	seq_printf(seq, "%12lu %12u.%06d %c%c%c%c%c%c\n",
-+		   index, zram->table[index].attr.ac_time, 0,
-+		   test_slot_flag(zram, index, ZRAM_SAME) ? 's' : '.',
-+		   test_slot_flag(zram, index, ZRAM_WB) ? 'w' : '.',
-+		   test_slot_flag(zram, index, ZRAM_HUGE) ? 'h' : '.',
-+		   test_slot_flag(zram, index, ZRAM_IDLE) ? 'i' : '.',
-+		   get_slot_comp_priority(zram, index) ? 'r' : '.',
-+		   test_slot_flag(zram, index, ZRAM_INCOMPRESSIBLE) ? 'n' : '.');
-+	slot_unlock(zram, index);
- 
--	return written;
-+	return 0;
- }
- 
--static const struct file_operations proc_zram_block_state_op = {
--	.open = simple_open,
--	.read = read_block_state,
--	.llseek = default_llseek,
-+static const struct seq_operations zram_block_state_sops = {
-+	.start = zram_block_state_start,
-+	.next = zram_block_state_next,
-+	.stop = zram_block_state_stop,
-+	.show = zram_block_state_show,
- };
-+DEFINE_SEQ_ATTRIBUTE(zram_block_state);
- 
- static void zram_debugfs_register(struct zram *zram)
- {
-@@ -1613,7 +1618,7 @@ static void zram_debugfs_register(struct zram *zram)
- 	zram->debugfs_dir = debugfs_create_dir(zram->disk->disk_name,
- 						zram_debugfs_root);
- 	debugfs_create_file("block_state", 0400, zram->debugfs_dir,
--				zram, &proc_zram_block_state_op);
-+				zram, &zram_block_state_fops);
- }
- 
- static void zram_debugfs_unregister(struct zram *zram)
--- 
-2.43.0
+Thanks,
+Justin
+> [1] https://docs.kernel.org/userspace-api/landlock.html#filesystem-flags
+> [2] https://github.com/landlock-lsm/linux/issues/9
