@@ -1,59 +1,104 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8667235DA61;
-	Mon, 28 Sep 2026 06:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54087451983
+	for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 07:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790578643; cv=none; b=HBJbe3vvrBP+kt/q1HWAjigZ7dpY5yzJEiKHO6ceF2L4GTJWyDfxer+lPbAO9FgzorFwCoU7GDdABp+oMfvy/LEN5XsVTzJ6TrHaeihNRqUvlml6SNP9JmVf1FY9XbkM0Jc2/B52h/7GXQcrfwL0rJPCyxCQzqgaaKt2ODkR0Pg=
+	t=1790580263; cv=none; b=l1gaAem53vdwQe2aWZIULN4FwpIPJ6Z6FLMC+FP5bq3ZNq3aXFpaFaxVGtaORtZD3kBSu7UuqQKmEFG1JwlPLEXiQ1DO+ySu5CmPCyHcrbfLhr4FSnw32MOcfrPmiimbnhj3fAZkJNV/rDblmKXUoLQLsUDB+puXIk1AyJjIcY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790578643; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f3Y/NfkKFqXVq07qyh501tFp+GNKjw7pp03jm7Oz66pqPnIJAiAE+cDFLyMC0vTO2fOdbgeuupmzzDgJxEq//LVJ+thbDi8C7VtnMUewAUOVysphcisIzBg3AA6jSpQXkPLGEeyT6RX3X5GFAifTNrZ3JWJo41v6NDIY/o7yH40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3dw4dRPo; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1790580263; c=relaxed/simple;
+	bh=MA6bIy1E25HEicgt4OV+3SH0EFpqWL7MFB/vEVKg5h8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oZ+vSCHVjPavQwl4o1eBErGuFh0JkBPdcWxbxVFLfQIB4wvaAgENRLuIo4175tKjRs+jAoyJ9fz5xTa4B/qtNWfDwSA9C0a3u0moNUnLM6ITg0LHs2p0eTUkWUk89IHKUnq7NdxzVdPUuqrrQV5AcNrfFrNbYSqOT+QWyA1efQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pjb/qke2; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3dw4dRPo"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=3dw4dRPoG9nMb7t53Ao+OKUWDk
-	+3oHLlzs6blkum2/7S+i+kRSA29V5HcoLET/wFUGx3khd8lNsZw/CaIts7M+eQmKG1uuBj0EqD6SB
-	epkPZszCLkhaAhxqRS2eRZ5Km7QjNlFzY2+Kyzf5QDTtep4GLnxXqCH92O6f/hbfNb9pQv9tHoc1Y
-	ftQzeObjCnbTJOLJaDJecDiMtom8D+oL8t/d/JkiaVc+H5w4BKSt4+MDZEyQTnU8zoea2NG3GMWTJ
-	1NMjQXmemir/gqRZrmdJkTavt6bYkQn7dHQkIBXHUoRTrwPfx02STfj8VLrRCcrrEa7cqhlw1cRl8
-	AmJW736A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1xB5Ie-0000000HV7x-3K6f;
-	Mon, 28 Sep 2026 06:57:20 +0000
-Date: Sun, 27 Sep 2026 23:57:20 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Hannes Reinecke <hare@suse.com>,
-	syzbot+afa7aef0c237038586e7@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] block: make blkdev_fallocate() zeroout killable
-Message-ID: <aroP0D-aLyqI3dVa@infradead.org>
-References: <20260927051528.34698-1-ngocthang2710.1999@gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pjb/qke2"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1790580256; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=L2mpZblW46NK5z8PpQY1UAqcYsDp8oxMtRMfEQDOh2s=;
+	b=pjb/qke2X28JujoRVDP8vmKp7PHPcTbHrbv4UelCU3xdQFwX3T/VzjQVCSoVCxMU+bNZiAWxTs4L4oigtOjAmn7wJSdkY30VnT4HcWsn8lL9O1NjOhHzN2K20P9hIB3iGlETGVY8jymMZ3AR/iI9WoR44m3gylQ08tzHFpKJBPk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0XBk5eiv_1790580255;
+Received: from localhost(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0XBk5eiv_1790580255 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 28 Sep 2026 15:24:16 +0800
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+To: Josef Bacik <josef@toxicpanda.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	nbd@other.debian.org
+Subject: [PATCH 1/2] nbd: mark the socket dead when a partial send times out
+Date: Mon, 28 Sep 2026 15:24:14 +0800
+Message-Id: <20260928072415.2239692-1-joseph.qi@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260927051528.34698-1-ngocthang2710.1999@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 
-Looks good:
+nbd_pending_cmd_work() completes the request with BLK_STS_IOERR once its
+retry loop passes req->deadline, but leaves nsock->pending set.  Nothing
+else clears it: nbd_send_cmd() only does so at its out: label after a
+complete send, and nbd_requeue_cmd() does not touch it.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Every later request on that socket then takes this branch in
+nbd_handle_cmd():
+
+	if (unlikely(nsock->pending && nsock->pending != req)) {
+		nbd_requeue_cmd(cmd);
+
+and is requeued again, forever, since the requeue path does not clear
+->pending either.  If the tag is recycled first, ->pending matches the new
+request instead and nbd_send_cmd() resumes it in place of the abandoned
+one, skipping its header and leaving cmd_cookie alone.
+
+Neither case leaves a usable socket.  The header went out and the rest of
+the payload never will, so the stream no longer matches what the server
+expects.  Mark the socket dead, which shuts it down and clears the partial
+send state.  nbd_xmit_timeout() does the same for a timed out request and
+only skips it here because NBD_CMD_PARTIAL_SEND makes it defer to this
+work function.
+
+Without this, a write issued after the deadline fires never completes and
+the device has to be torn down to recover.
+
+Reproduced by making the resumed send never progress, so the retry loop
+runs out req->deadline.  With the socket marked dead a later request is
+dispatched instead of requeued, and a reconnect afterwards does clean
+O_DIRECT I/O with no oops or warning.
+
+Fixes: 8337b029f788 ("nbd: fix partial sending")
+Cc: stable@vger.kernel.org
+Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+---
+ drivers/block/nbd.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index ffce519bf008..c2c3dbdd631f 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -838,6 +838,14 @@ static void nbd_pending_cmd_work(struct work_struct *work)
+ 		/* don't bother timeout handler for partial sending */
+ 		if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >= deadline) {
+ 			cmd->status = BLK_STS_IOERR;
++			/*
++			 * The header is on the wire but the rest of the payload
++			 * never will be, so the stream is out of sync with the
++			 * server.  Marking the socket dead also drops the stale
++			 * nsock->pending, which would otherwise make
++			 * nbd_handle_cmd() requeue every later request forever.
++			 */
++			nbd_mark_nsock_dead(nbd, nsock, 1);
+ 			blk_mq_complete_request(req);
+ 			break;
+ 		}
+-- 
+2.39.3
 
