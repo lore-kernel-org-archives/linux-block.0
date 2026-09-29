@@ -1,172 +1,122 @@
-Received: from mail-oo2-f38.google.com (mail-oo2-f38.google.com [74.125.231.166])
+Received: from mta1.migadu.com (out-142.mta1.migadu.com [95.215.58.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A542A231832
-	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 01:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.166
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790644556; cv=pass; b=s7YaJgtI0DXpUmOGdoiQJltB9IKuHPyVlD74OeVZ9cC6VbFMX1qi6073eMGK9euWWjxotarc4x4k/LY0H+s9Wp0zM8R1tLlrVfkTobSuAZ/Ue1e8DbfJqywytc0lkhgDC3qMN0Nwv0qyLiclz7HAhbuHD6YRodzPaFMZgAiPKM4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790644556; c=relaxed/simple;
-	bh=6KsV4rDAdDxcusMqf5nBXP8iJDyqcK6OlXAetdFDhjI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r+PCk3g9DyN6woiZpGG2RSWSLIQPFYbAj0u2Dsuz23wZ4Mtg6rJZU+GTSndVLIfnW2Eyrx/++OHZxj7Mlhqd7mQB+TndQegN/J8bsxkmYXUYpqvaiVLPc8/J2IVhcUMM5q0vlFl4B4uIzJTX5MjeTj8EOyF/fBjkGjcrCP2apQk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WLLPde6Q; arc=pass smtp.client-ip=74.125.231.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C28331EB2
+	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 02:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.142
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790647712; cv=none; b=cD1FXdaJ7dKvIrfFQjv08DnYx0XOIRpOIbjgPKqGU8Ue+dW/wcqZlmkRHjfx1vuVRNhKpnPgok5+KMozshRf5APFHG8HnC2yA5Edx8H7nBQY25uZW5XFfGZNdjh9m4r3rGF021EQenKTVOIpmp2092EN/hg6jxXko/GDfdFDq5E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790647712; c=relaxed/simple;
+	bh=yWN2pXrEgudmQV5/KdTupS8SIlaev88MpOoEz+dBiaU=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=jzrm7QIzfU2QrcPS8+IPKuhnMcIUNUUXuwLOLpfJ32P6QwU1cq0DHDq1TMjl4Fa6Zm+Hbtr75C+mcIlA1I94cF3j/o7u673zFav0bp98Rb3B4czIc7NrLbKnTRn4PoC9Rjmb/CjaWmkwW3X9b9qQyke9GhQejqriVak6k8XZaMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=scCFfK1M; arc=none smtp.client-ip=95.215.58.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WLLPde6Q"
-Received: by mail-oo2-f38.google.com with SMTP id 46e09a7af769-801cb343a92so552082a34.1
-        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 18:15:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790644552; cv=none;
-        d=google.com; s=arc-20260327;
-        b=hdKIa+VEb0XMqbemuT7CQmyb4Jc5d6yw3RbPdDdAwZ576JnKub3gc1CeVhdmZGKdN8
-         Afu6YO/tld5WcDtiBOpEfw3krZyQkJ4wNrQDcOzgq7L4vJkQ8+wCYrXAhMdvDESbH9Tj
-         sELin5hCq8nW63gSOeoNNFvKMjMpyDaToHOTzXcgzHBLMtMDiPZeqKdbrnu1+2YaSnoa
-         MtY4CASiwoJxZzvyca8QB+WhG758hiJXBEh1ZNXcYIx49gQREpCh3Yb5QSP5WblI+Buw
-         /NVB+332spfNL7B1nEYJbFQdAgjcMAR2DfZcEwMYCQTio1KzssmAVSk0bfXg6JWRE2wM
-         nbUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=5pLeu4YqgZECtiedNQxbKwtzen0HMS5vwbUNTX6n4u0=;
-        fh=E0zYFgWQnRTwmrgtZPUTH0KaIfXJ0qV/axiaj0Ae3hE=;
-        b=nmflLLoSzFzwUUJUWOBesum9KWaLUu1x81nGZinCkNT9W38f8l8HEMwqUySa6JKbZH
-         XONzpVmvEwyxPa8MVwI0LyJuhlzDBfTby4uBKXrd+MraHlPRUJ3RjeG+986AZGN76dkL
-         64OWPTbexcx/bN9+BUy5xYsf67VwxZpWzIbqVaucWtTeUbQhlK5X+lznCWCgqtjpSZtP
-         Nvg+Q1YIS73cVEKKta4muiQJcxxH6FRVtqMLOTS6ejQSJ1+SE/Jwwm0h4wIo4jSHrZcL
-         vz3LVxuHbOPMd3KP0/zXNVk9qTzL4jAVR0COMK7gYYGUwnWdzZDHcB7r3rfMVBvOng4d
-         nzPA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1790644552; x=1791249352; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=5pLeu4YqgZECtiedNQxbKwtzen0HMS5vwbUNTX6n4u0=;
-        b=WLLPde6QqrGEQ7TlZnh6GBtwyEECzYPwNnwovqyCfe1nP6Rtl6cWfxOeP3v27T7+P3
-         JO0RswXenQ3JCaWZLyrCZkHn/AqJHIeWnIVkVqqK7Bh4ONqjh6AJ3ZMIxqKxOF8tTBYs
-         DGVx/ZdRRA3ng/3HZmmZD/Ugj2AGjzLyF8HdvvxasSWEujXdLZ4nUmvCXCRYa3RE0yRC
-         URNtGEhe5UkwBmRgEecwiBRJ1kmnjqbw95t4pkc/S9muhj+DYZzBdnsaKKtNyIfLwjLH
-         1D/kEnjt7dUyOT5ifyQp6U/0PPYcmijYeqVcAiqlt9Id3+2ViYXJFnlMm7rxBisMolUG
-         LaVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790644552; x=1791249352;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=5pLeu4YqgZECtiedNQxbKwtzen0HMS5vwbUNTX6n4u0=;
-        b=iO/oCSHbw1G6WNBxq5QHnWHmU1gnanp3XK/JeKruzNdzUe/vBrWEKObOdk7xMPKmPb
-         0u9VMDsTpHjYC3dq7ETMx7zRjRrhDDS9ssl5ye9tI6WPLtZAom1hqVe4gr9LZ0nPTXUu
-         0wPxtKFByn+x9QkQYPpqQkE9oPdlpWS+QEt2VD6BAH5fhKI28a+mOTxmvTcxaOwPlkmt
-         sqwOAJIuOEPNlLWpK0dHzeha9FxTsJD9OfabeFO8uajsbTtrum1it8g2pLx3qhqenrvX
-         q642LpANC1pMfta89+NrTwhkNm1UCFq2Oj77xqF9F2fxjL4x7+T3dvngpsXESSCUAuMj
-         0NwA==
-X-Forwarded-Encrypted: i=1; AKwUvBz61Yoxve5yVYELBG+lu4VsepgnJNs6x0Kuh5rZ+o0Sid+KTcKaX6Tz4JvrPhBg1Voy2cd3V2isBxwX0Q==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJfKe2UXSyrds3AS4SZquzt5VE1Dpq7IlBTUcxnP4k6pFU6/buy
-	Gyqpo86y1rss3FMEURoh1EIyysHKv9JPnU0zIIm0sdXh6RJWgjPkVi94Qyd5SOMisawwWvRnVjA
-	oKQGHYLaCOx83DdzKv/Q/Tk2BwwKtj3qEV/D3SiKToQ==
-X-Gm-Gg: AYBFou2g816gmc6GSfhhBniIrWncirWegYQ225pRXf/dddmshXPniSSMYKnMGT0HZ+n
-	ABoZX3lH2tuhevic34V3XkNVCkl6k0sHLNq5fBrr3cQuLIDe7LIvtbwD9YVKXqVxxRrc37BIRPQ
-	AhStnqiHqkg75zFzIksaTDjVzTxHFeW+tkfbrcS8yeTJw8gvKPTNJULkImSf4Qt0asWudct1D/O
-	OEqMniJ3nKeEBnz7I6jxUtuTEj7RbSmJbBpFwvH/3Gsht5tHh9qVm/HViND1z5y34QuvM9bVFTc
-	MfmV6ZG8jvO7Xt+BsilxSSWhxsvc89+zFiil54Xe51sMREhhItBmZak=
-X-Received: by 2002:a05:6870:f114:b0:47d:4630:5998 with SMTP id
- 586e51a60fabf-4930a82b841mr16313646fac.4.1790644552340; Mon, 28 Sep 2026
- 18:15:52 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="scCFfK1M"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=yWN2pXrEgudmQV5/KdTupS8SIlaev88MpOoEz+dBiaU=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790647709; v=1; x=1791252509;
+ b=scCFfK1MaLIyE9QrxVj0gSe29W34FqlGKfmJ+a6ZA1fIr5i9ebkRDoFRVsmC8HYw/+Sl/jcW
+ utXy9776ew2+mSCA5eYO7mph2er9EqtMaLe8BOV4sao6YX9W0vcXFs0+jKzWh7ZRjtgIJOPwL4E
+ LldtzF2wHPi/wVdPwyY0GnfU=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 754af4c4803bea6d;
+	Tue, 29 Sep 2026 02:08:28 +0000
+X-Mizu-Trace-ID: 754af4c4803bea6d
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <edfc22ef-799d-4f70-8668-bde0caf67bcf@linux.dev>
+Date: Tue, 29 Sep 2026 10:08:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260909222836.2475352-1-csander@purestorage.com>
-In-Reply-To: <20260909222836.2475352-1-csander@purestorage.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 28 Sep 2026 18:15:41 -0700
-X-Gm-Features: AclHuK9y1BkUmfj2CwBKzqVvJvr4htN1Ij_BtBFRlnLw9fnPEz3avSjdBXHF6AQ
-Message-ID: <CADUfDZorm3WsYxvKQkqr1DVAps=ejF7M4U5PLD4O-94GzmYt1g@mail.gmail.com>
-Subject: Re: [PATCH 0/6] io_uring/nvme: support fixed buffer for metadata
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, cuitao@kylinos.cn, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6] loop: defer the queue limits clear to a workqueue
+To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, hch@lst.de,
+ Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <20260928093512.3153646-1-cui.tao@linux.dev>
+ <df36224b-7fcb-45c4-ab78-d7e726bfeb9d@acm.org>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <df36224b-7fcb-45c4-ab78-d7e726bfeb9d@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi, any feedback on this series?
+Hi Bart,
 
-On a 4 KB io_uring NVMe passthru read workload with metadata, we
-measure 14% of the CPU time spent under iov_iter_extract_pages()
-(called from bio_integrity_map_user()) and bio_integrity_unmap_user().
-Using io_uring registered buffers for the metadata avoids this
-significant overhead.
+在 2026/9/29 01:26, Bart Van Assche 写道:
+> On 9/28/26 2:35 AM, Tao Cui wrote:
+>> @@ -1148,6 +1182,16 @@ static void __loop_clr_fd(struct loop_device *lo)
+>>       lo->lo_backing_file = NULL;
+>>       spin_unlock_irq(&lo->lo_lock);
+>>   +    /*
+>> +     * Invalidate any clear that was scheduled against the old backing
+>> +     * file.  Unbinding cannot race with in-flight I/O, so cancelling
+>> +     * here leaves no work item behind.
+>> +     */
+> 
+> This comment is wrong - asynchronous I/O can still be in progress here.
+
+You are right, asynchronous I/O can still be in flight in
+__loop_clr_fd(). I'll fix the comment.
+> See also
+> https://lore.kernel.org/linux-block/69960302-1535-441a-be4e-d652766d65c2@I-love.SAKURA.ne.jp/
+> 
+> Should this patch perhaps be rebased on top of Tetsuo's series?
+> 
+On rebasing on top of Tetsuo's series: since you recommend it, I
+can rebase this patch on top of it - the cancel inside
+__loop_clr_fd() just moves along with the new structure, and the
+I/O flush there makes that cancel airtight. 
+
+>> @@ -1783,7 +1827,9 @@ static void lo_free_disk(struct gendisk *disk)
+>>           destroy_workqueue(lo->workqueue);
+>>       loop_free_idle_workers(lo, true);
+>>       timer_shutdown_sync(&lo->timer);
+>> +    cancel_work_sync(&lo->clear_limits_work);
+>>       mutex_destroy(&lo->lo_mutex);
+>> +    mutex_destroy(&lo->clear_limits_lock);
+>>       kfree(lo);
+>>   }
+> 
+> Is the above new cancel_work_sync() call really necessary?
+> 
+>> @@ -2140,6 +2188,12 @@ static int loop_add(int i)
+>>     static void loop_remove(struct loop_device *lo)
+>>   {
+>> +    /*
+>> +     * Cancel early: the queue may already be in RCU-delayed freeing
+>> +     * by the time lo_free_disk() cancels the work item.
+>> +     */
+>> +    cancel_work_sync(&lo->clear_limits_work);
+>> +
+>>       /* Make this loop device unreachable from pathname. */
+>>       del_gendisk(lo->lo_disk);
+>>       blk_mq_free_tag_set(&lo->tag_set);
+> 
+> Is the above new cancel_work_sync() call necessary since there is
+> already an identical call in __loop_clr_fd()?
+> 
+On the cancel in loop_remove(): i think this one is needed because
+asynchronous I/O may still complete after __loop_clr_fd() has run
+and queue the work item. Since the queue becomes eligible for
+RCU-delayed freeing before lo_free_disk() is reached,
+cancel_work_sync() before del_gendisk() ensures no pending
+clear_limits_work remains against that queue.
+
+I'll send v7 with the comment fixed and the redundant cancel removed once Tetsuo's series has landed.
 
 Thanks,
-Caleb
+Tao.
+> Thanks,
+> 
+> Bart.
 
-On Wed, Sep 9, 2026 at 3:29=E2=80=AFPM Caleb Sander Mateos
-<csander@purestorage.com> wrote:
->
-> io_uring NVMe passthrough supports using a "fixed" (registered) buffer
-> for data, but not metadata. On high-IOPS workloads, the pinning and
-> unpinning overhead for the metadata pages is significant and could be
-> avoided if fixed metadata buffers were supported.
->
-> This patch series adds the necessary plumbing to allow NVMe passthrough
-> commands to use fixed buffers for their metadata. The metadata and data
-> fixed buffer indices can be specified (or omitted) independently.
-> Supporting separate fixed buffers is important as metadata buffers are
-> often stored in separate memory from the corresponding data buffers. For
-> ublk zero-copy I/Os, sharing a buffer index would be impossible as the
-> data buffer is a kernel registered buffer while the metadata buffer is a
-> userspace registered buffer.
->
-> My main question is which layer the metadata fixed buffer should belong
-> to: core io_uring, io_uring_cmd, or NVMe passthrough? In this initial
-> implementation, the io_uring_cmd layer stores the metadata buffer node
-> and the NVMe passthrough layer defines the UAPI.
->
-> The main argument for moving the implementation to a more generic layer
-> would be to reuse it for other io_uring request types. For example,
-> IORING_RW_ATTR_FLAG_PI could also benefit from a fixed metadata buffer
-> option, though this series doesn't implement it yet.
->
-> On the other hand, core io_uring_sqe and io_kiocb space is very limited,
-> so it may be undesirable to dedicate it for a somewhat niche use case.
-> The metadata buffer node storage could be pushed to the NVMe passthrough
-> layer after my in-flight series [1] to reclaim nvme_uring_cmd_pdu space.
-> However, managing request-scoped resources from a ->uring_cmd()
-> implementation is a pain, as the same request can call ->uring_cmd()
-> multiple times and may or may not complete when ->uring_cmd() returns,
-> depending on the ->uring_cmd() return value. io_req_uring_cleanup(), in
-> contrast, provides a single cleanup path for all uring_cmds.
->
-> [1]: https://lore.kernel.org/io-uring/20260909155848.2069290-1-csander@pu=
-restorage.com/T/
->
-> Caleb Sander Mateos (6):
->   bio-integrity: remove dead bio_integrity_copy_user() error path
->   nvme/ioctl: remove struct nvme_uring_data
->   blk-integrity: pass iov_iter to blk_rq_integrity_map_user()
->   nvme/ioctl: pass iov_iter to nvme_map_user_request()
->   io_uring/cmd: support fixed buffer for metadata
->   nvme/ioctl: support fixed buffer for metadata
->
->  block/bio-integrity.c           | 51 ++++++++++--------
->  block/blk-integrity.c           |  7 +--
->  drivers/nvme/host/ioctl.c       | 91 +++++++++++++++++++--------------
->  include/linux/bio-integrity.h   |  1 +
->  include/linux/blk-integrity.h   |  6 +--
->  include/linux/io_uring/cmd.h    | 12 ++++-
->  include/uapi/linux/nvme_ioctl.h |  5 +-
->  io_uring/rsrc.c                 | 28 ++++------
->  io_uring/rsrc.h                 | 17 ++++++
->  io_uring/uring_cmd.c            | 30 ++++++++++-
->  10 files changed, 160 insertions(+), 88 deletions(-)
->
-> --
-> 2.55.0
->
