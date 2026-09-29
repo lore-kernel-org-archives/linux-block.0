@@ -1,191 +1,172 @@
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo2-f38.google.com (mail-oo2-f38.google.com [74.125.231.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAA13612DB
-	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 01:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790643772; cv=none; b=Ev6sDDnuDIgaWsZ9s1f7/jT7Yb17d14DpWnaDFuYZpNfuDxh0j95DHEc4KQqhAOdi0TrV8Tl3+1EXUrq+SzJhb8LaoCoRnvlE46uNgOkP95PEwOOXnBwy7QU/OI5bPZ1ZTLAaz6tyPGWp2KLzqDM/AQ4pVApBnW3+fDATIYMEMA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790643772; c=relaxed/simple;
-	bh=ANNkJxR3/ChrTjPG4Dts/JsR1B14whDVjR7zy47PeCM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jhgCLUh2XKaXv+dgtRSPwhMXebS3RGFlY7AkKHLfUpxdBF9mHnlFVWVmJYJCTe1A+93/0c/IpuCK0vaetxP0jgSudOJb40XHHbRfSimh3c/L48yB+ZfFJNN2pM0i/Qd2Hp2aPE2mLwIpSz9USc+PMxBZCQ5Wn6IMS+1baZwcf6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lArfSTYM; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A542A231832
+	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 01:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790644556; cv=pass; b=s7YaJgtI0DXpUmOGdoiQJltB9IKuHPyVlD74OeVZ9cC6VbFMX1qi6073eMGK9euWWjxotarc4x4k/LY0H+s9Wp0zM8R1tLlrVfkTobSuAZ/Ue1e8DbfJqywytc0lkhgDC3qMN0Nwv0qyLiclz7HAhbuHD6YRodzPaFMZgAiPKM4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790644556; c=relaxed/simple;
+	bh=6KsV4rDAdDxcusMqf5nBXP8iJDyqcK6OlXAetdFDhjI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r+PCk3g9DyN6woiZpGG2RSWSLIQPFYbAj0u2Dsuz23wZ4Mtg6rJZU+GTSndVLIfnW2Eyrx/++OHZxj7Mlhqd7mQB+TndQegN/J8bsxkmYXUYpqvaiVLPc8/J2IVhcUMM5q0vlFl4B4uIzJTX5MjeTj8EOyF/fBjkGjcrCP2apQk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WLLPde6Q; arc=pass smtp.client-ip=74.125.231.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lArfSTYM"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1790643766; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=i6UohfTDEtrOZmN1+kGyzSeiwH1Za//Zz5svk6oDlAI=;
-	b=lArfSTYM9TmrFY32tXjrSme45NkP7j21GpkDBVAdGlozKUQlLbCdQDhZyKHQLdngFqmufyIsvWsP9B9ZgrHn7ozHNfm4TAHtng82UV3nYvESTlRoJZdaGnTr0S7EPs1/on06iVFpsEbwtdBLVUorZ/yEo33wdEAT/skHraVl6dg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037026112;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0XBrLlLz_1790643764;
-Received: from 30.221.128.147(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0XBrLlLz_1790643764 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 29 Sep 2026 09:02:45 +0800
-Message-ID: <616f687a-417e-4fd5-b0dc-9bd519db3920@linux.alibaba.com>
-Date: Tue, 29 Sep 2026 09:02:44 +0800
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WLLPde6Q"
+Received: by mail-oo2-f38.google.com with SMTP id 46e09a7af769-801cb343a92so552082a34.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2026 18:15:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790644552; cv=none;
+        d=google.com; s=arc-20260327;
+        b=hdKIa+VEb0XMqbemuT7CQmyb4Jc5d6yw3RbPdDdAwZ576JnKub3gc1CeVhdmZGKdN8
+         Afu6YO/tld5WcDtiBOpEfw3krZyQkJ4wNrQDcOzgq7L4vJkQ8+wCYrXAhMdvDESbH9Tj
+         sELin5hCq8nW63gSOeoNNFvKMjMpyDaToHOTzXcgzHBLMtMDiPZeqKdbrnu1+2YaSnoa
+         MtY4CASiwoJxZzvyca8QB+WhG758hiJXBEh1ZNXcYIx49gQREpCh3Yb5QSP5WblI+Buw
+         /NVB+332spfNL7B1nEYJbFQdAgjcMAR2DfZcEwMYCQTio1KzssmAVSk0bfXg6JWRE2wM
+         nbUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=5pLeu4YqgZECtiedNQxbKwtzen0HMS5vwbUNTX6n4u0=;
+        fh=E0zYFgWQnRTwmrgtZPUTH0KaIfXJ0qV/axiaj0Ae3hE=;
+        b=nmflLLoSzFzwUUJUWOBesum9KWaLUu1x81nGZinCkNT9W38f8l8HEMwqUySa6JKbZH
+         XONzpVmvEwyxPa8MVwI0LyJuhlzDBfTby4uBKXrd+MraHlPRUJ3RjeG+986AZGN76dkL
+         64OWPTbexcx/bN9+BUy5xYsf67VwxZpWzIbqVaucWtTeUbQhlK5X+lznCWCgqtjpSZtP
+         Nvg+Q1YIS73cVEKKta4muiQJcxxH6FRVtqMLOTS6ejQSJ1+SE/Jwwm0h4wIo4jSHrZcL
+         vz3LVxuHbOPMd3KP0/zXNVk9qTzL4jAVR0COMK7gYYGUwnWdzZDHcB7r3rfMVBvOng4d
+         nzPA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1790644552; x=1791249352; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=5pLeu4YqgZECtiedNQxbKwtzen0HMS5vwbUNTX6n4u0=;
+        b=WLLPde6QqrGEQ7TlZnh6GBtwyEECzYPwNnwovqyCfe1nP6Rtl6cWfxOeP3v27T7+P3
+         JO0RswXenQ3JCaWZLyrCZkHn/AqJHIeWnIVkVqqK7Bh4ONqjh6AJ3ZMIxqKxOF8tTBYs
+         DGVx/ZdRRA3ng/3HZmmZD/Ugj2AGjzLyF8HdvvxasSWEujXdLZ4nUmvCXCRYa3RE0yRC
+         URNtGEhe5UkwBmRgEecwiBRJ1kmnjqbw95t4pkc/S9muhj+DYZzBdnsaKKtNyIfLwjLH
+         1D/kEnjt7dUyOT5ifyQp6U/0PPYcmijYeqVcAiqlt9Id3+2ViYXJFnlMm7rxBisMolUG
+         LaVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790644552; x=1791249352;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=5pLeu4YqgZECtiedNQxbKwtzen0HMS5vwbUNTX6n4u0=;
+        b=iO/oCSHbw1G6WNBxq5QHnWHmU1gnanp3XK/JeKruzNdzUe/vBrWEKObOdk7xMPKmPb
+         0u9VMDsTpHjYC3dq7ETMx7zRjRrhDDS9ssl5ye9tI6WPLtZAom1hqVe4gr9LZ0nPTXUu
+         0wPxtKFByn+x9QkQYPpqQkE9oPdlpWS+QEt2VD6BAH5fhKI28a+mOTxmvTcxaOwPlkmt
+         sqwOAJIuOEPNlLWpK0dHzeha9FxTsJD9OfabeFO8uajsbTtrum1it8g2pLx3qhqenrvX
+         q642LpANC1pMfta89+NrTwhkNm1UCFq2Oj77xqF9F2fxjL4x7+T3dvngpsXESSCUAuMj
+         0NwA==
+X-Forwarded-Encrypted: i=1; AKwUvBz61Yoxve5yVYELBG+lu4VsepgnJNs6x0Kuh5rZ+o0Sid+KTcKaX6Tz4JvrPhBg1Voy2cd3V2isBxwX0Q==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJfKe2UXSyrds3AS4SZquzt5VE1Dpq7IlBTUcxnP4k6pFU6/buy
+	Gyqpo86y1rss3FMEURoh1EIyysHKv9JPnU0zIIm0sdXh6RJWgjPkVi94Qyd5SOMisawwWvRnVjA
+	oKQGHYLaCOx83DdzKv/Q/Tk2BwwKtj3qEV/D3SiKToQ==
+X-Gm-Gg: AYBFou2g816gmc6GSfhhBniIrWncirWegYQ225pRXf/dddmshXPniSSMYKnMGT0HZ+n
+	ABoZX3lH2tuhevic34V3XkNVCkl6k0sHLNq5fBrr3cQuLIDe7LIvtbwD9YVKXqVxxRrc37BIRPQ
+	AhStnqiHqkg75zFzIksaTDjVzTxHFeW+tkfbrcS8yeTJw8gvKPTNJULkImSf4Qt0asWudct1D/O
+	OEqMniJ3nKeEBnz7I6jxUtuTEj7RbSmJbBpFwvH/3Gsht5tHh9qVm/HViND1z5y34QuvM9bVFTc
+	MfmV6ZG8jvO7Xt+BsilxSSWhxsvc89+zFiil54Xe51sMREhhItBmZak=
+X-Received: by 2002:a05:6870:f114:b0:47d:4630:5998 with SMTP id
+ 586e51a60fabf-4930a82b841mr16313646fac.4.1790644552340; Mon, 28 Sep 2026
+ 18:15:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] nbd: fix NULL pointer dereference in
- nbd_pending_cmd_work()
-To: Bart Van Assche <bvanassche@acm.org>, Josef Bacik <josef@toxicpanda.com>,
- Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, nbd@other.debian.org
-References: <20260928091021.2456652-1-joseph.qi@linux.alibaba.com>
- <20260928091021.2456652-2-joseph.qi@linux.alibaba.com>
- <9e43373f-9202-4fa7-b0c8-f1bc80fd81de@acm.org>
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-In-Reply-To: <9e43373f-9202-4fa7-b0c8-f1bc80fd81de@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20260909222836.2475352-1-csander@purestorage.com>
+In-Reply-To: <20260909222836.2475352-1-csander@purestorage.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 28 Sep 2026 18:15:41 -0700
+X-Gm-Features: AclHuK9y1BkUmfj2CwBKzqVvJvr4htN1Ij_BtBFRlnLw9fnPEz3avSjdBXHF6AQ
+Message-ID: <CADUfDZorm3WsYxvKQkqr1DVAps=ejF7M4U5PLD4O-94GzmYt1g@mail.gmail.com>
+Subject: Re: [PATCH 0/6] io_uring/nvme: support fixed buffer for metadata
+To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Bart,
+Hi, any feedback on this series?
 
-On 9/28/26 10:19 PM, Bart Van Assche wrote:
-> On 9/28/26 2:10 AM, Joseph Qi wrote:
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index c2c3dbdd631f..9909774dbfbb 100644
->> --- a/drivers/block/nbd.c
->> +++ b/drivers/block/nbd.c
->> @@ -63,6 +63,7 @@ struct nbd_sock {
->>       int fallback_index;
->>       int cookie;
->>       struct work_struct work;
->> +    struct request *partial_req;
->>   };
->>     struct recv_thread_args {
->> @@ -637,12 +638,24 @@ static void nbd_sched_pending_work(struct nbd_device *nbd,
->>   {
->>       struct request *req = blk_mq_rq_from_pdu(cmd);
->>   -    /* pending work should be scheduled only once */
->> -    WARN_ON_ONCE(test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags));
->> -
->>       nsock->pending = req;
->>       nsock->sent = sent;
->> -    set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
->> +
->> +    /*
->> +     * Already armed: this is nbd_pending_cmd_work() re-entering because the
->> +     * resumed send was interrupted again.  Its work is still running, so
->> +     * just refresh the resume point above and let its loop pick it up
->> +     * instead of taking another config reference and requeueing the work.
->> +     */
->> +    if (test_and_set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags))
->> +        return;
->> +
->> +    /*
->> +     * nbd_mark_nsock_dead() clears ->pending, so the work function cannot
->> +     * rely on it to find the request it owns.  Keep a copy that only it
->> +     * clears.
->> +     */
->> +    nsock->partial_req = req;
->>       refcount_inc(&nbd->config_refs);
->>       schedule_work(&nsock->work);
->>   }
->> @@ -817,11 +830,12 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
->>   static void nbd_pending_cmd_work(struct work_struct *work)
->>   {
->>       struct nbd_sock *nsock = container_of(work, struct nbd_sock, work);
->> -    struct request *req = nsock->pending;
->> +    struct request *req = nsock->partial_req;
->>       struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
->>       struct nbd_device *nbd = cmd->nbd;
->>       unsigned long deadline = READ_ONCE(req->deadline);
->>       unsigned int wait_ms = 2;
->> +    bool complete = false;
->>         mutex_lock(&cmd->lock);
->>   @@ -830,6 +844,18 @@ static void nbd_pending_cmd_work(struct work_struct *work)
->>           goto out;
->>         mutex_lock(&nsock->tx_lock);
->> +    /*
->> +     * nbd_mark_nsock_dead() can tear the socket down between schedule_work()
->> +     * and here, and it clears ->pending and ->sent.  The header is already
->> +     * on the wire so this request can never be answered; fail it rather than
->> +     * resuming a send on a socket that is gone.
->> +     */
->> +    if (!nsock->pending) {
->> +        cmd->status = BLK_STS_IOERR;
->> +        __clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
->> +        complete = true;
->> +        goto unlock;
->> +    }
->>       while (true) {
->>           nbd_send_cmd(nbd, cmd, cmd->index);
->>           if (!nsock->pending)
->> @@ -846,16 +872,36 @@ static void nbd_pending_cmd_work(struct work_struct *work)
->>                * nbd_handle_cmd() requeue every later request forever.
->>                */
->>               nbd_mark_nsock_dead(nbd, nsock, 1);
->> -            blk_mq_complete_request(req);
->> +            complete = true;
->>               break;
->>           }
->>           msleep(wait_ms);
->>           wait_ms *= 2;
->>       }
->> +unlock:
->> +    /*
->> +     * nbd_sched_pending_work() writes partial_req under tx_lock, and
->> +     * cmd->lock is per-command, so this has to be under tx_lock too.
->> +     */
->> +    nsock->partial_req = NULL;
->>       mutex_unlock(&nsock->tx_lock);
->>       clear_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
->>   out:
->>       mutex_unlock(&cmd->lock);
->> +
->> +    /*
->> +     * Complete before nbd_config_put(): if this is the last config
->> +     * reference, nbd_put() runs nbd_dev_remove() inline unless
->> +     * NBD_DESTROY_ON_DISCONNECT is set, and del_gendisk() would then wait
->> +     * in blk_mq_freeze_queue_wait() for the q_usage_counter that this
->> +     * request holds until it is completed.  The config reference is what
->> +     * keeps nbd itself alive across the completion, but cmd must not be
->> +     * touched afterwards, since nbd_complete_rq() may run inline and ends
->> +     * the request without taking cmd->lock.
->> +     */
->> +    if (complete)
->> +        blk_mq_complete_request(req);
->> +
->>       nbd_config_put(nbd);
->>   }
->>   
-> 
-> These changes add significant complexity and hence make the NBD driver
-> harder to maintain. Has it been considered to increase the request
-> reference count while nsock->pending != NULL? See also req_ref_inc_not_zero() and blk_mq_put_rq_ref().
-> 
-
-Thanks for taking a look.
-
-It seems a request reference can't replace the extra pointer, since the
-two answer different questions.
-
-A reference keeps the request object alive, but it doesn't stop
-nsock->pending from being cleared, which is what breaks the worker:
-
-  nbd_mark_nsock_dead()
-    nsock->dead = true;
-    nsock->pending = NULL;
-    nsock->sent = 0;
-
-  nbd_pending_cmd_work()
-    struct request *req = nsock->pending;
-    struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
-    struct nbd_device *nbd = cmd->nbd;
-
-Nothing between schedule_work() and the worker starting takes a lock the
-teardown path also takes, so pinning the request still leaves the worker
-reading NULL from ->pending and faulting on cmd->nbd.
+On a 4 KB io_uring NVMe passthru read workload with metadata, we
+measure 14% of the CPU time spent under iov_iter_extract_pages()
+(called from bio_integrity_map_user()) and bio_integrity_unmap_user().
+Using io_uring registered buffers for the metadata avoids this
+significant overhead.
 
 Thanks,
-Joseph
+Caleb
 
+On Wed, Sep 9, 2026 at 3:29=E2=80=AFPM Caleb Sander Mateos
+<csander@purestorage.com> wrote:
+>
+> io_uring NVMe passthrough supports using a "fixed" (registered) buffer
+> for data, but not metadata. On high-IOPS workloads, the pinning and
+> unpinning overhead for the metadata pages is significant and could be
+> avoided if fixed metadata buffers were supported.
+>
+> This patch series adds the necessary plumbing to allow NVMe passthrough
+> commands to use fixed buffers for their metadata. The metadata and data
+> fixed buffer indices can be specified (or omitted) independently.
+> Supporting separate fixed buffers is important as metadata buffers are
+> often stored in separate memory from the corresponding data buffers. For
+> ublk zero-copy I/Os, sharing a buffer index would be impossible as the
+> data buffer is a kernel registered buffer while the metadata buffer is a
+> userspace registered buffer.
+>
+> My main question is which layer the metadata fixed buffer should belong
+> to: core io_uring, io_uring_cmd, or NVMe passthrough? In this initial
+> implementation, the io_uring_cmd layer stores the metadata buffer node
+> and the NVMe passthrough layer defines the UAPI.
+>
+> The main argument for moving the implementation to a more generic layer
+> would be to reuse it for other io_uring request types. For example,
+> IORING_RW_ATTR_FLAG_PI could also benefit from a fixed metadata buffer
+> option, though this series doesn't implement it yet.
+>
+> On the other hand, core io_uring_sqe and io_kiocb space is very limited,
+> so it may be undesirable to dedicate it for a somewhat niche use case.
+> The metadata buffer node storage could be pushed to the NVMe passthrough
+> layer after my in-flight series [1] to reclaim nvme_uring_cmd_pdu space.
+> However, managing request-scoped resources from a ->uring_cmd()
+> implementation is a pain, as the same request can call ->uring_cmd()
+> multiple times and may or may not complete when ->uring_cmd() returns,
+> depending on the ->uring_cmd() return value. io_req_uring_cleanup(), in
+> contrast, provides a single cleanup path for all uring_cmds.
+>
+> [1]: https://lore.kernel.org/io-uring/20260909155848.2069290-1-csander@pu=
+restorage.com/T/
+>
+> Caleb Sander Mateos (6):
+>   bio-integrity: remove dead bio_integrity_copy_user() error path
+>   nvme/ioctl: remove struct nvme_uring_data
+>   blk-integrity: pass iov_iter to blk_rq_integrity_map_user()
+>   nvme/ioctl: pass iov_iter to nvme_map_user_request()
+>   io_uring/cmd: support fixed buffer for metadata
+>   nvme/ioctl: support fixed buffer for metadata
+>
+>  block/bio-integrity.c           | 51 ++++++++++--------
+>  block/blk-integrity.c           |  7 +--
+>  drivers/nvme/host/ioctl.c       | 91 +++++++++++++++++++--------------
+>  include/linux/bio-integrity.h   |  1 +
+>  include/linux/blk-integrity.h   |  6 +--
+>  include/linux/io_uring/cmd.h    | 12 ++++-
+>  include/uapi/linux/nvme_ioctl.h |  5 +-
+>  io_uring/rsrc.c                 | 28 ++++------
+>  io_uring/rsrc.h                 | 17 ++++++
+>  io_uring/uring_cmd.c            | 30 ++++++++++-
+>  10 files changed, 160 insertions(+), 88 deletions(-)
+>
+> --
+> 2.55.0
+>
