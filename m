@@ -1,144 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from outbound.baidu.com (mx14.baidu.com [220.181.3.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C61148594B;
-	Tue, 29 Sep 2026 09:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF10F4FC8FA;
+	Tue, 29 Sep 2026 09:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.3.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790674547; cv=none; b=UdwZ8zZ/CyGTSX9vQyGeoHBWRziGnoR+QjCrX4Nlf8ZjaSdPP0Ngv5FZBfm4mR10zGRCdHY0dotuGwe4lc+pFifP8lV2RWl4jVma9CI5z3CZGsVH7INz9n/Kw80Vz155sK4vOh/Bwr5K1+RsLNBiZQvVir3glCvA7lmM1RPzJA4=
+	t=1790675658; cv=none; b=UB+C4AggBq7rryNUj53icmOOu1Tuuox/mmRSL2r71OigpI1celNRzflBL5ICXCimlzKU5zD/wpOOSBKTqNUhiSnEpze2j8pCq196uEW/uc9qzXjGLUZZbikRr4vQDl22m/kv5X54Uek51j99+9M1i+yLwDGQUQ7v/j7O3mo00VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790674547; c=relaxed/simple;
-	bh=JWUgTW58DKJa+SF20VPBKXZN5xw3rbFKDUJVZsaDaUs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=A4W3PZSUjJT4fayAhMmrH9yFk8jPSPlNd4djIolGfuqwlQQ/4uKUxedmHYhJ024z/17AecvD+DZQP/S/OTUDRYbCheFtWHGInA++Y7WMYeTojNJZMa/ea2G8q5vEzI65ELt9Rv1DNy/n39Fol9kN1TWNXNmNKEe9iZdHRVjo5A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VdWMe9T6; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790675658; c=relaxed/simple;
+	bh=VUIBHRTw5WOaMZ8kpJ70cqMnvCHykFCiPPcRBqZDdUY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=p164vofeqihiZWSMiemqg24wAnn0HVC2QizmihKfHEDSyTBrCuKD0UtKlTWKU+bbxTgIT7L2BkxlKRz7m/i935ZgF3hEQLrhtqD48sXJ33uHytIYvGnZckq0nBk8AcT+Q0KNRUUQS0BBAGjiQo7ZauTPi6dHaDDk92GZFA5z+hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b=muRQDqn2; arc=none smtp.client-ip=220.181.3.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VdWMe9T6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C7F1F000FF;
-	Tue, 29 Sep 2026 09:35:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790674546;
-	bh=StXmc2LqbHdixuPvvg8ubUtbQsp0wahYjgdRPfdzTKM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=VdWMe9T64Z/qCJaqlBMit803Sq1//0IIpO67rg3qEgmAYlUPijxj10JHpi3LFYEuQ
-	 NpJLDsLAJ7ewRxyvTBDFk1u8fvZkJzNsli8apmii/pDz12ZEUoO1IlsBV0WwTF3wCK
-	 w9GhCJdhIOmLfAayBWmF5oSfURxTthrMjhPA2VKp7pLe2fgXpJ1X4wKxMAqhKCHrzF
-	 u85ypEcaDviItMKC8xIGPGVaOI9zumpBkRWuhQt9axwNoHOX04IhcmLCrUdKoZNu9S
-	 uxZb3AY1VbKhZpcYBptisYL61jnf4G7PqF11RWmd6iSNXbVUqevqvQJyRs15z7BA3O
-	 XglKgFIxQe/Rw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 29 Sep 2026 11:34:03 +0200
-Subject: [PATCH GIT PULL 5/9] rust: block: gen_disk: set fops.owner from
- driver module pointer
+	dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b="muRQDqn2"
+X-MD-Sfrom: lirongqing@baidu.com
+X-MD-SrcIP: 172.31.50.46
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: Ming Lei <tom.leiming@gmail.com>
+CC: Jens Axboe <axboe@kernel.dk>, Andreas Hindborg <a.hindborg@kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: =?gb2312?B?tPC4tDogWz8/Pz9dIFJlOiBbUEFUQ0hdIHVibGs6IHVzZSBnbG9iYWwgaW5k?=
+ =?gb2312?Q?ex_for_reported_zones?=
+Thread-Topic: [????] Re: [PATCH] ublk: use global index for reported zones
+Thread-Index: AQHdT+AwmaOdPayA5UiJ0vz00ipqW7bkwGcAgACP+sA=
+Date: Tue, 29 Sep 2026 09:51:51 +0000
+Message-ID: <899fc8e55bbf4622a4a75b8d367d8cd0@baidu.com>
+References: <20260929070012.2325-1-lirongqing@baidu.com>
+ <aruBzOsvpYoWAO51@fedora-laptop>
+In-Reply-To: <aruBzOsvpYoWAO51@fedora-laptop>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260929-rust-block-for-v7-4-rc1-b4-v1-5-642a4c1aebd7@kernel.org>
-References: <20260929-rust-block-for-v7-4-rc1-b4-v1-0-642a4c1aebd7@kernel.org>
-In-Reply-To: <20260929-rust-block-for-v7-4-rc1-b4-v1-0-642a4c1aebd7@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Tamir Duberstein <tamird@kernel.org>, 
- Alexandre Courbot <acourbot@nvidia.com>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
- linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2664; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=b7Nrhx/lRf7Kc2gzxnShGkiGd+OZ0loDoAZS400fyJ4=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqu4YXOBxIGpTgdJX+iVF3j8XKtuPXRAgCJISQH
- h3cm7q6dbWJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaruGFwAKCRD6UCkIqsW9
- 0HwlEACX0HM/3ggs+3LqLGQ63dtAgm8A7dz/vIGMfOrEacwEb2J8pQu2eTnrlY6JAB3MgRE+jMh
- co0UGascrc7YFEIJKYGsWXLrpfs/Tzvd0fgTDysTRDqSz5mFAPUfFM6AftjzNMmZffyIhmiCVYY
- T8sbKZLn4T+lmIAWeQua10EojUr4wZkXVM9hBzZ/sXOc02ArPLaV331g0AYR4ik+DtCrlKPPRVw
- CeWb2qUll+xedow/R1nXSe0n3B/wXH2oyYZ5IWprXNPDGPsthAwShFObyotC0HU/uwjS2/XN54f
- Fg6WViiNsd6dTxKG8zXuK5StJNfYfchcSi3s9k1ZDTjjAWtnGgSnnX1/LNXyQq4+zgZ46d62MZ+
- txHWWsNiQfA6J6h8eFqhAkrBxm8npGBzVR35LH0VGtuSvkTeqPS37l7+AhmAC8jgn76XGRSJKPO
- uWHCdlTYdMqzaO0//yYmNN+qLBDFkQeD+l9VNDlkyaAosj7S6wpo5VlDSxssfVnuHYb3e3EfL5m
- 8Iwm92dwKl+Da+kjbohmlaX1V/TPysFwL4u2I6WdmGf2jvlBmPPWCQGMfx/BXgAZBNvcgcohOus
- lVFqssbq/O4CfMRqWB9Mtk8DmTUFzjTiUl0JA0XC7KBmnDSJfv4zrNZsCCcXXZPV98/wiIfQn1g
- XrEE9Osk8oVlJGA==
-X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
- fpr=3108C10F46872E248D1FB221376EB100563EF7A7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=baidu.com;
+	s=selector1; t=1790675515;
+	bh=VUIBHRTw5WOaMZ8kpJ70cqMnvCHykFCiPPcRBqZDdUY=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
+	b=muRQDqn2EjzzJLRi9BzRYwYR4eJreSUrCALLWkp13g+2O/MJq7IXES7FfGjzPCmg4
+	 sXcyo+fGM2vId2n9949Ls+nME7R4ix2zAEnawjfLfcvEb9krfXr4ASbyrcZ51MtmzF
+	 g48GDhennTRxdIEDmQ1XQqM9JDFmJ1U+Sj3v1hk71GOywg9Z/NRSiVGXdiUz1jm6Os
+	 V2ie/tTFGFKvOh2N6ezD5aCAmTtDqC2pt33SKPQL9WPpc0lCezTDm+1bB4Q4qU5LLu
+	 wApthaCPzCd080NvXwYzQ8hXfnK3PsxGTnD3uJNoNrQHmOsop0RNRFRkm4KQNU+eTa
+	 x2SpprQLPg5gg==
 
-From: Alvin Sun <alvin.sun@linux.dev>
-
-Set `fops.owner` from the driver module pointer via
-`this_module::<T::OwnerModule>().as_ptr()` instead of defaulting to
-null, so the module cannot be unloaded while a block device is still
-in use.
-
-Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
-Link: https://msgid.link/20260811-fix-gendisk-owner-v1-1-c0fe4a449ecb@linux.dev
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
----
- rust/kernel/block/mq/gen_disk.rs | 34 ++++++++++------------------------
- 1 file changed, 10 insertions(+), 24 deletions(-)
-
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 080dedb5d5d9..90d364ab3bf2 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -137,30 +137,9 @@ pub fn build<T: Operations>(
-             )
-         })?;
- 
--        const TABLE: bindings::block_device_operations = bindings::block_device_operations {
--            submit_bio: None,
--            open: None,
--            release: None,
--            ioctl: None,
--            compat_ioctl: None,
--            check_events: None,
--            unlock_native_capacity: None,
--            getgeo: None,
--            set_read_only: None,
--            swap_slot_free_notify: None,
--            report_zones: None,
--            devnode: None,
--            alternative_gpt_sector: None,
--            get_unique_id: None,
--            // TODO: Set to `THIS_MODULE`.
--            owner: core::ptr::null_mut(),
--            pr_ops: core::ptr::null_mut(),
--            free_disk: None,
--            poll_bio: None,
--        };
--
--        // SAFETY: `gendisk` is a valid pointer as we initialized it above
--        unsafe { (*gendisk).fops = &TABLE };
-+        // SAFETY: `gendisk` is a valid pointer. We have exclusive access,
-+        // since the disk is not added to the VFS yet.
-+        unsafe { (*gendisk).fops = &GenDisk::<T>::VTABLE };
- 
-         let cleanup_failure = ScopeGuard::new_with_data((gendisk, data), |(gendisk, data)| {
-             // SAFETY: `gendisk` came from `__blk_mq_alloc_disk()` above and
-@@ -223,6 +202,13 @@ pub struct GenDisk<T: Operations> {
-     gendisk: *mut bindings::gendisk,
- }
- 
-+impl<T: Operations> GenDisk<T> {
-+    const VTABLE: bindings::block_device_operations = bindings::block_device_operations {
-+        owner: crate::module::this_module::<T::OwnerModule>().as_ptr(),
-+        ..pin_init::zeroed()
-+    };
-+}
-+
- // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
- // `TagSet`. It is safe to send this to other threads as long as these two are `Send`.
- unsafe impl<T> Send for GenDisk<T>
-
--- 
-2.54.0
-
-
+DQpuZXMoKSBtYXkgc3BsaXQgYSB6b25lIHJlcG9ydCBpbnRvIG11bHRpcGxlIHJlcXVlc3RzDQo+
+ID4gd2hlbiB0aGUgbnVtYmVyIG9mIHpvbmVzIGV4Y2VlZHMgdGhlIHRlbXBvcmFyeSBidWZmZXIg
+Y2FwYWNpdHkuIFRoZQ0KPiA+IGluZGV4IHBhc3NlZCB0byBkaXNrX3JlcG9ydF96b25lKCkgbXVz
+dCByZWZlciB0byB0aGUgem9uZSBwb3NpdGlvbiBpbg0KPiA+IHRoZSB3aG9sZSByZXBvcnQsIHJh
+dGhlciB0aGFuIHRoZSBwb3NpdGlvbiB3aXRoaW4gdGhlIGN1cnJlbnQgcmVxdWVzdC4NCj4gPg0K
+PiA+IEN1cnJlbnRseSwgdGhlIHBlci1yZXF1ZXN0IGxvb3AgaW5kZXggaXMgdXNlZCBhcyB0aGUg
+Y2FsbGJhY2sgaW5kZXgsDQo+ID4gY2F1c2luZyBlYWNoIGNodW5rIGFmdGVyIHRoZSBmaXJzdCBv
+bmUgdG8gcmVzdGFydCBmcm9tIHplcm8uIFRoaXMgY2FuDQo+ID4gbWFrZSB1c2Vyc3BhY2UgY2Fs
+bGJhY2tzIHJlY2VpdmUgZHVwbGljYXRlIHpvbmUgaW5kaWNlcyBhbmQgbWF5IHJlc3VsdA0KPiA+
+IGluIGJsa19yZXZhbGlkYXRlX2Rpc2tfem9uZXMoKSB1cGRhdGluZyBpbmNvcnJlY3QgZW50cmll
+cyBpbiBpdHMgem9uZQ0KPiA+IHN0YXRlIGFycmF5Lg0KPiA+DQo+ID4gVXNlIHRoZSBudW1iZXIg
+b2Ygem9uZXMgYWxyZWFkeSByZXBvcnRlZCBhcyB0aGUgYmFzZSBpbmRleCBmb3IgZWFjaA0KPiA+
+IHJlcXVlc3Qgc28gdGhhdCB6b25lIGluZGljZXMgcmVtYWluIGNvbnRpbnVvdXMgYWNyb3NzIGFs
+bCBjaHVua3MuDQo+ID4NCj4gPiBGaXhlczogMjk4MDJkN2NhMzNiICgidWJsazogZW5hYmxlIHpv
+bmVkIHN0b3JhZ2Ugc3VwcG9ydCIpDQo+ID4gU2lnbmVkLW9mZi1ieTogTGkgUm9uZ1FpbmcgPGxp
+cm9uZ3FpbmdAYmFpZHUuY29tPg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJzL2Jsb2NrL3VibGtfZHJ2
+LmMgfCAzICsrLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0
+aW9uKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay91YmxrX2Rydi5jIGIv
+ZHJpdmVycy9ibG9jay91YmxrX2Rydi5jIGluZGV4DQo+ID4gNjZlYjU1ZS4uMDA3ZTcwMyAxMDA2
+NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2Jsb2NrL3VibGtfZHJ2LmMNCj4gPiArKysgYi9kcml2ZXJz
+L2Jsb2NrL3VibGtfZHJ2LmMNCj4gPiBAQCAtNjQ5LDYgKzY0OSw3IEBAIHN0YXRpYyBpbnQgdWJs
+a19yZXBvcnRfem9uZXMoc3RydWN0IGdlbmRpc2sgKmRpc2ssDQo+IHNlY3Rvcl90IHNlY3RvciwN
+Cj4gPiAgCQl1bnNpZ25lZCBpbnQgcmVtYWluaW5nX3pvbmVzID0gbnJfem9uZXMgLSBkb25lX3pv
+bmVzOw0KPiA+ICAJCXVuc2lnbmVkIGludCB6b25lc19pbl9yZXF1ZXN0ID0NCj4gPiAgCQkJbWlu
+X3QodW5zaWduZWQgaW50LCByZW1haW5pbmdfem9uZXMsIG1heF96b25lc19wZXJfcmVxdWVzdCk7
+DQo+ID4gKwkJdW5zaWduZWQgaW50IGJhdGNoX3N0YXJ0ID0gZG9uZV96b25lczsNCj4gPiAgCQlz
+dHJ1Y3QgcmVxdWVzdCAqcmVxOw0KPiA+ICAJCXN0cnVjdCB1YmxrX3pvbmVkX3JlcG9ydF9kZXNj
+IGRlc2M7DQo+ID4gIAkJYmxrX3N0YXR1c190IHN0YXR1czsNCj4gPiBAQCAtNjg3LDcgKzY4OCw3
+IEBAIHN0YXRpYyBpbnQgdWJsa19yZXBvcnRfem9uZXMoc3RydWN0IGdlbmRpc2sgKmRpc2ssDQo+
+IHNlY3Rvcl90IHNlY3RvciwNCj4gPiAgCQkJaWYgKCF6b25lLT5sZW4pDQo+ID4gIAkJCQlicmVh
+azsNCj4gPg0KPiA+IC0JCQlyZXQgPSBkaXNrX3JlcG9ydF96b25lKGRpc2ssIHpvbmUsIGksIGFy
+Z3MpOw0KPiA+ICsJCQlyZXQgPSBkaXNrX3JlcG9ydF96b25lKGRpc2ssIHpvbmUsIGJhdGNoX3N0
+YXJ0ICsgaSwgYXJncyk7DQo+IA0KPiBgZG9uZV96b25lc2AgY2FuIGJlIHBhc3NlZCBkaXJlY3Rs
+eSwgdGhlbiB3ZSBjYW4gc2F2ZSBvbmUgbG9jYWwgdmFyaWFibGUsDQo+IG90aGVyd2lzZSwgdGhp
+cyBwYXRjaCBsb29rcyBmaW5lOg0KPiANCg0KVGhhbmtzLCBJIHdpbGwgc2VuZCB2Mg0KDQpbTGks
+Um9uZ3FpbmddIA0KDQoNCj4gUmV2aWV3ZWQtYnk6IE1pbmcgTGVpIDx0b20ubGVpbWluZ0BnbWFp
+bC5jb20+DQo+IA0KPiANCj4gVGhhbmtzLA0KPiBNaW5nDQo=
