@@ -1,63 +1,65 @@
-Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
+Received: from mail-pj2-f39.google.com (mail-pj2-f39.google.com [74.125.227.167])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D334078F5
-	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 23:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157764E73AC
+	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 23:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.167
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790724258; cv=none; b=FY73hxHWqd0UyiKjvVTqY3EoxIly/XnJ2+I0r3y8HVu5c67LNgGuFFXnfz94KnrxFbmm5MEB9vnJoCSkyEqTkzMHH7x0oGtaDwh0TTXAoBMoWZ0PZa8E0HrywqtG3Slq+quTP0eEHaccxrOueNuBXm8Xb0OSaEc+7Cju+CT7hPo=
+	t=1790724260; cv=none; b=ebvRgoSFW5bc3zvY6TsPXv33fD3mO+yU/ryAcM1r7XlmfyCIBMb2gz7Ipu5iFO1+j5zic1MvbnDHBecKvIpyrxCYhanG58/OUAODEOzzIKl/74BbM4SIzRsqPwrNrMijfugtfNw266quhAI4tmedmcFbD6XsPcFhaERm4IVG3FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790724258; c=relaxed/simple;
-	bh=l+ODbziUsCsodJP0tJtfa6YvEYqHs3zu/ydWE/aLqaM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qXLe7K+6/ZpetC8huEOUkZ8GEPZt7ErOp5cyPX/DMujw2B9DhmS8aIu8mBbcbAdPbblp2CqvUb59zRW9wAOtiaAhvG8vuXh6Mq13y7aUwpchMWKCyQeWpr70lorFJK1JybWWR0RtbD1WWUQ9srqbwqrB2fBO5Wa2JrWSUmwoYlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qRZ3p9eS; arc=none smtp.client-ip=74.125.227.141
+	s=arc-20240116; t=1790724260; c=relaxed/simple;
+	bh=LgWd2u8T3YWbYCyxO85qNd7/8gnpOPW0sYJNS4gdAEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=n9NWERgMBzWNTDCs9YJJbyUDsDHvxqqa5BoZK6iDAFwNXJoigaPh6bQhghn8Jzto65QpcWuIXjbqXt2SqSh24RaxwfGXRTvnlq00gkS0jvbDh/AY1LSRwRW+xa3heYJsoFuM81qbXo88nO16dlxt2aYyHYrvuAkAdn6WzbbXg0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OpLMx7yW; arc=none smtp.client-ip=74.125.227.167
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qRZ3p9eS"
-Received: by mail-pj2-f13.google.com with SMTP id d9443c01a7336-2d8fbef5018so32345275ad.0
-        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 16:24:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OpLMx7yW"
+Received: by mail-pj2-f39.google.com with SMTP id 98e67ed59e1d1-3a49b6bb21eso1072989a91.3
+        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 16:24:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790724256; x=1791329056; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=IS6TByWFgsxOTPGaMQkR8btgGIqLwW1a4rgcn4lxTW4=;
-        b=qRZ3p9eSe+bkKOXVduSJEEVKhmkz6mwtKLf/bt+n+c/2XUc+NczhxV5lrLMConx3l+
-         oqM4vTm4LhdXyUSMLQNMSbfyo8rC5TlMSIOZ2/yOyKXBZsueNfF/6TdRK1CKGlHLf9to
-         N71JKw3Fquo+eBwjHJ4Py6Un5T6yyje6xNMLllpVMtV8Noz8FzWvSrEYv0u4L+Bg6g1n
-         qJWub5Q2FwzYOJ7FyugV3e+Ef/2Rtz95gu90TAI8vQxUvhdr7D044OpzGDnQVYJrNUBt
-         IgoOyHcOTENzfheigP8rUWV7XF47F+9dGeb9kFMnAbo5nDQJi7dUkw1VABPZyDtMxsU0
-         2dQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790724256; x=1791329056;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1790724258; x=1791329058; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=IS6TByWFgsxOTPGaMQkR8btgGIqLwW1a4rgcn4lxTW4=;
-        b=U1OsEHiauSB+2ThmFkDxOfjBoAQkdWw+CFCFn9B5L886gsBWBLiwoNn/pql7XuldPm
-         /Kq9oMg6lzdATB23Dn8p1Po8QWRAAjichM+oCl8KVueeH4iRG702ne5uxpWGYwco7dnS
-         9pBRgJlI5gDRFAqJ3NF9UC6RpeAzAX1BZm9Rgnqz+LcVewOmIvMCXaYT5NkyLC673HHV
-         HVnSj8UhIUnoXrGeKdcBLlMbRL1b5QT4x4fUE3jN6UiUraRlhBT1byCjaigUdjAosTBA
-         g3PjU7lG87Jasn3nB2gKQBuwGxvUJPjh2SUME0gBQf0iAOHgNdzO2GUawoTSz2ixDtWd
-         OtGQ==
-X-Forwarded-Encrypted: i=1; AKwUvByPN9SKQs0qG5QxasW3rO0wdOBpd+3+lAOb6g5vcgaRFXRFzGDegjUBnJwGjbetEE3uh/HU0RSMx97F2w==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ/YdTBjOSNex4nR9httE53OuUxzGfFytO/ouaXvIHo0pMDC9+s
-	PXlSNLvQDrwzk1yP7VPiheMOqxBvXDT9XtM4ercb3+2LPSvgsSR/0+Mo
-X-Gm-Gg: AYBFou2RlXfVparyNR+IPQQYvrUaqx4RNaB2ZY4N/dgaJDP2DhGtB+5TwYv9QX5RE6f
-	iM0llx2qtZl2mFUWeArpVP/CoMaGURHHi/IwzYdJZJdUIAMYZFiNdTWHuve6cVBRDvUuXc6SkCx
-	cYjpTGT7LGqihU8FLEAG+XoVbQE0RlxwaLw/Kfy+40fyInTFjR/P5uxpUtYgTtuxoTd2F70/FTC
-	AlzVZ9XYXTSF0rgAuBuYL0Od0yydLKQidLU5m7+asDD/zx3hvgNHNTxyrFHyRLBDllXKmaQQVlv
-	DohGaJ9lFNuwLsNRNAnQ3udu65juP2JHKrIljBXO170UpvQEn37p/8F4fnZW4s8VfSpy9UCmSHE
-	+nLSCQqHdc+ZQc1KpVXT2zgx+IYF/M9EKJ33vIApUjkC4AzbVxoxcvJxlU62VCIK01XibVgMDc7
-	XmyDaJJMLx2SDiok/DNlkdbsUOyQPfjG6k2FfoSxOUVnjagF+bsNSJsLUdN2lGUbhzZyQRtctK8
-	MRllJEcY2sImFAcYatlDY3x5OQUxZSIVoWyE6DQJdVUHPbTFGFHV5QtGnt4zh+ZnvOr54cxrVGR
-	dLI=
-X-Received: by 2002:a17:90b:4f89:b0:3a0:4444:ef1e with SMTP id 98e67ed59e1d1-3a4bfe73db9mr752355a91.29.1790724256010;
-        Tue, 29 Sep 2026 16:24:16 -0700 (PDT)
+        bh=LqO5rqFvyRue6UM+wZoeSHLBr6tsHYDgvKbTW7jcYak=;
+        b=OpLMx7yW8t6g48M0kgM7me/z/rrlbS8uv5IdFzZimSnmdXfh2NJh5xUtJ3KPyxPUba
+         VnMn7xngHLsFLkXgMhYAH1AtYjnhJKoh0KcbHi75Z+MflHaT/KBYvEpLrrwAOsNz/7lT
+         uyVj/O3XDUSswiu6dbWgqCY5fLLHeaWMCXi63jy/uPefjYBTQky4EBWxzw2hxFA9IADq
+         RaIAcp6WR6nxuRMjPlUcbf3LPYRqhMzYQSZ2jjz0nN3TvHNAIfdogoY7ZZGlyTk1OL52
+         gfP9WXFejO+qKcZszjZlPr3K2727QFTR3xS812Xwnwyw+xUw+KjuWnVLDPP1wTCR7OfV
+         IvxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790724258; x=1791329058;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=LqO5rqFvyRue6UM+wZoeSHLBr6tsHYDgvKbTW7jcYak=;
+        b=yDN+VEXeAAYWKyTXFGlFKpnDhEsFdUzUqA4QzzVQFhlswC9pX3lH1w8glcUht4H1+e
+         ml5f+gndkIu88e+qA/5mAYvrBDiCCW8aE53zP0gLDcRBD19JIsduFKLfBXtHTSKm5OMd
+         omg1ZXuIRyT6LCI1WMo7pnGznPlxqPIhV6Q+J1ZfMCUf4NuC8xk+Y7DOG5XB2Ogg8gov
+         dic2qt5i2xjFiAiFhzueL4NlN/aOev1B6Y6dKWXATZBj7ryABQWH1fGb0Ua6z/A6Eckz
+         IYKUqCiDO1/TkuB5YntYJ+qL8bNkQeZW88bnTWYj0/yAkLHoo7rV4Pb7KlrFTh7UNWPa
+         tShA==
+X-Forwarded-Encrypted: i=1; AKwUvBxo7WCWxcPhyqeJBBA/FhkuEh/sgrFiQW+Eh0adotZX7vmHjmqz9QwcOkuM7Ec+aWkTCZ5iUUPXhJy76A==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIjHi6Mc8fcTYYusRqvtl6KRHF2cKqdQwB5incZlI20qieCrdw0
+	Ar3B3daQwW1YYczs1JwQJuzmRagAPBcwXIws3MHnCDIy8DbdqnnShzli
+X-Gm-Gg: AYBFou2R9WVrpkuDrHizkhMWZpdvUzmf7oo6UVPBI8UbreKhZhTFEUd8ZzFBt7I88Ng
+	s3hmNxMsjG9Bxla6ZmV2dbRj9WKCODUDW33ojGrW9ulnJidHydV5uNAQFb7NVoTUL+8MU2vvifv
+	KCve4jRTqIkTekNsTtn4fXDF3Ws15/q7pKu4HUv7eD8ejhItfeYXICMUd+fpOy2+ZWqJXGFiU8v
+	HXSvnGnO0oLqGpfQUBDJY24WpCPx73VRu54gn6B6ryz+tG7BZk72aEGKeqX80Ixa1kXaBjXMjyT
+	CKJJFvBRLn+gJl2KKrdrHci/mGeGBv8OU0Yk39vglTt64zLIQmikuDiEgKJqiZzjcmfJJMLe3B/
+	Gy9EpZCXUrQaG4gpqBgwlbFXb7Eqc9rJIxFpxS3oDl1Ssd3kfQAdO7fK7SfzDvURnpQV/mrIMIC
+	X1iCcJDi+91eYShZJQuewveAniUwjXamFanaCTQFBqSBGbMl4+PsUwrEtXL7L2OI36LbtMt6Y+2
+	a9ctXaqv3aWb0lvXUcdxiHLlvtbqtEBcMkG0P4625/ZVjxtjqoI9orGh0DSGmE4NSNsb1RcoxCH
+	ViE=
+X-Received: by 2002:a17:90a:d448:b0:3a2:b036:ed62 with SMTP id 98e67ed59e1d1-3a4bff0ef48mr451780a91.37.1790724258206;
+        Tue, 29 Sep 2026 16:24:18 -0700 (PDT)
 Received: from yupeng-XPS-15-9520.. (c-73-169-192-12.hsd1.wa.comcast.net. [73.169.192.12])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a4ca78102csm138700a91.4.2026.09.29.16.24.14
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a4ca78102csm138700a91.4.2026.09.29.16.24.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2026 16:24:15 -0700 (PDT)
+        Tue, 29 Sep 2026 16:24:17 -0700 (PDT)
 From: Peng Yu <yupeng0921@gmail.com>
 To: Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
@@ -73,10 +75,12 @@ Cc: Tejun Heo <tj@kernel.org>,
 	linux-nvme@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Peng Yu <yupeng0921@gmail.com>
-Subject: [PATCH v7 0/2] nvmet: add cgroup_id to charge namespace I/O to a cgroup
-Date: Tue, 29 Sep 2026 16:24:09 -0700
-Message-ID: <20260929232411.101087-1-yupeng0921@gmail.com>
+Subject: [PATCH v7 1/2] cgroup: track the effective css in each cgroup
+Date: Tue, 29 Sep 2026 16:24:10 -0700
+Message-ID: <20260929232411.101087-2-yupeng0921@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260929232411.101087-1-yupeng0921@gmail.com>
+References: <20260929232411.101087-1-yupeng0921@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,195 +89,171 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Change since v6:
-* 1/2: Explain in the commit message why the effective css is tracked,
-  and add comments on e_css[] and in init_cgroup_root() (Tejun).
-* 2/2: Use cgroup_get_e_css() and css_put() in nvmet_blkcg_set_bio()
-  instead of cgroup_e_css() under rcu_read_lock() (Tejun).
-* Drop "cgroup: export cgroup_e_css()", which is no longer needed (Tejun).
+cgroup_e_css() and cgroup_get_e_css() find the effective css by walking
+up the hierarchy until they reach a cgroup that has the subsystem
+enabled. Per-I/O users such as nvmet need this lookup to be O(1).
 
-Change since v5:
-* Add "cgroup: track the effective css in each cgroup", so looking up
-  the effective css for each I/O is O(1) (Tejun).
+Track the effective css in each cgroup and make cgroup_e_css() and
+cgroup_get_e_css() use it. When a css is brought online or offline,
+update the effective css of its cgroup and of all descendants.
 
-Change since v4:
-* Hold the cgroup and look up its effective io css for each I/O,
-  instead of pinning one io css when the namespace is enabled (Tejun).
-* Allow a cgroup that doesn't have the io controller enabled (Tejun).
-* Add "cgroup: export cgroup_e_css()".
+Signed-off-by: Peng Yu <yupeng0921@gmail.com>
+Assisted-by: Claude:claude-fable-5 [Claude Code]
+Assisted-by: Claude:claude-opus-5-5 [Claude Code]
+---
+ include/linux/cgroup-defs.h |  8 +++++
+ kernel/cgroup/cgroup.c      | 60 ++++++++++++++++++++++++-------------
+ 2 files changed, 47 insertions(+), 21 deletions(-)
 
-The two patches don't depend on each other: 2/2 only uses symbols that
-are already exported and works without 1/2, with the slower lookup.
-1/2 can go through the cgroup tree and 2/2 through the nvme tree.
-
-v6: https://lore.kernel.org/all/20260928061417.1574676-1-yupeng0921@gmail.com/
-v5: https://lore.kernel.org/all/20260926063328.257023-1-yupeng0921@gmail.com/
-v4: https://lore.kernel.org/all/20260924053121.17703-1-yupeng0921@gmail.com/
-v3: https://lore.kernel.org/all/20260923152653.40953-1-yupeng0921@gmail.com/
-v2: https://lore.kernel.org/all/20260922065115.22508-1-yupeng0921@gmail.com/
-v1: https://lore.kernel.org/all/20260908011214.11344-1-yupeng0921@gmail.com/
-
-Scenario:
-* Create multiple nvmet subsystems/namespaces.
-* The namespaces are backed by different LVM logical volumes.
-* Some of the logical volumes share the same physical volumes.
-* The subsystems are exported to different users.
-* We should provide each user a specific iops/bps quota, thus a noisy
-  neighbor won't impact the performance of other logical volumes.
-
-Test:
-1 Load kernel modules.
-sudo modprobe brd rd_nr=2 rd_size=1048576
-sudo modprobe nvmet
-sudo modprobe nvmet_tcp
-sudo modprobe nvme_tcp
-
-2 The two brd devices are used for a bdev backed namespace and a file
-backed namespace, remember their major/minor.
-lsblk --noheadings --nodeps --output NAME,MAJ:MIN,SIZE /dev/ram0 /dev/ram1
-ram0   1:0      1G
-ram1   1:1      1G
-
-3 Enable the io controller and create two cgroups, one for the bdev
-backed namespace, another for the file backed namespace.
-echo "+io" | sudo tee /sys/fs/cgroup/cgroup.subtree_control
-sudo mkdir -p /sys/fs/cgroup/nvmet-bdev
-sudo mkdir -p /sys/fs/cgroup/nvmet-file
-
-4 Create a file system and a file on ram0.
-sudo mkfs.ext4 /dev/ram0
-sudo mkdir -p /mnt/nvmet-file
-sudo mount -o noatime /dev/ram0 /mnt/nvmet-file
-sudo dd if=/dev/zero of=/mnt/nvmet-file/ns.img bs=1M count=512 oflag=direct
-
-5 Create the bdev backed subsystem and namespace.
-sudo mkdir -p /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev/namespaces/1
-echo 1 | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev/attr_allow_any_host
-echo /dev/ram1 | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev/namespaces/1/device_path
-stat -c %i /sys/fs/cgroup/nvmet-bdev | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev/namespaces/1/cgroup_id
-echo 1 | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev/namespaces/1/enable
-
-6 Create the file backed subsystem and namespace.
-sudo mkdir -p /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file/namespaces/1
-echo 1 | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file/attr_allow_any_host
-echo /mnt/nvmet-file/ns.img | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file/namespaces/1/device_path
-stat -c %i /sys/fs/cgroup/nvmet-file | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file/namespaces/1/cgroup_id
-echo 1 | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file/namespaces/1/enable
-
-7 Export the two subsystems to 127.0.0.1.
-sudo mkdir -p /sys/kernel/config/nvmet/ports/1
-echo ipv4 | sudo tee /sys/kernel/config/nvmet/ports/1/addr_adrfam
-echo tcp | sudo tee /sys/kernel/config/nvmet/ports/1/addr_trtype
-echo 127.0.0.1 | sudo tee /sys/kernel/config/nvmet/ports/1/addr_traddr
-echo 4420 | sudo tee /sys/kernel/config/nvmet/ports/1/addr_trsvcid
-sudo ln -s /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev /sys/kernel/config/nvmet/ports/1/subsystems/nqn.2026-09.io.test01:bdev
-sudo ln -s /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file /sys/kernel/config/nvmet/ports/1/subsystems/nqn.2026-09.io.test01:file
-
-8 Connect the two subsystems from 127.0.0.1.
-sudo nvme connect -t tcp -a 127.0.0.1 -s 4420 -n nqn.2026-09.io.test01:bdev
-sudo nvme connect -t tcp -a 127.0.0.1 -s 4420 -n nqn.2026-09.io.test01:file
-sudo udevadm settle
-
-9 Set riops to 20k and run fio.
-echo "1:1 riops=20000 wiops=max rbps=max wbps=max" | sudo tee /sys/fs/cgroup/nvmet-bdev/io.max
-echo "1:0 riops=20000 wiops=max rbps=max wbps=max" | sudo tee /sys/fs/cgroup/nvmet-file/io.max
-
-sudo fio --name=t --filename=/dev/nvme0n1 --rw=randread --bs=4k --iodepth=32 --numjobs=1 \
---direct=1 --ioengine=libaio --time_based --runtime=10 --ramp_time=3 \
---group_reporting 2>/dev/null | grep -E '^ +(read|write): IOPS'
-  read: IOPS=20.0k, BW=78.1MiB/s (81.9MB/s)(781MiB/10001msec)
-
-sudo fio --name=t --filename=/dev/nvme1n1 --rw=randread --bs=4k --iodepth=32 --numjobs=1 \
---direct=1 --ioengine=libaio --time_based --runtime=10 --ramp_time=3 \
---group_reporting 2>/dev/null | grep -E '^ +(read|write): IOPS'
-  read: IOPS=20.0k, BW=78.2MiB/s (82.0MB/s)(782MiB/10001msec)
-
-10 Set rbps to 100M and run fio.
-echo "1:1 riops=max wiops=max rbps=104857600 wbps=max" | sudo tee /sys/fs/cgroup/nvmet-bdev/io.max
-echo "1:0 riops=max wiops=max rbps=104857600 wbps=max" | sudo tee /sys/fs/cgroup/nvmet-file/io.max
-
-sudo fio --name=t --filename=/dev/nvme0n1 --rw=read --bs=1M --iodepth=32 --numjobs=1 \
---direct=1 --ioengine=libaio --time_based --runtime=10 --ramp_time=3 \
---group_reporting 2>/dev/null | grep -E '^ +(read|write): IOPS'
-  read: IOPS=97, BW=100MiB/s (105MB/s)(1041MiB/10399msec)
-
-sudo fio --name=t --filename=/dev/nvme1n1 --rw=read --bs=1M --iodepth=32 --numjobs=1 \
---direct=1 --ioengine=libaio --time_based --runtime=10 --ramp_time=3 \
---group_reporting 2>/dev/null | grep -E '^ +(read|write): IOPS'
-  read: IOPS=97, BW=100MiB/s (105MB/s)(1031MiB/10299msec)
-
-11 Set wiops to 20k and run fio.
-echo "1:1 riops=max wiops=20000 rbps=max wbps=max" | sudo tee /sys/fs/cgroup/nvmet-bdev/io.max
-echo "1:0 riops=max wiops=20000 rbps=max wbps=max" | sudo tee /sys/fs/cgroup/nvmet-file/io.max
-
-sudo fio --name=t --filename=/dev/nvme0n1 --rw=randwrite --bs=4k --iodepth=32 --numjobs=1 \
---direct=1 --ioengine=libaio --time_based --runtime=10 --ramp_time=3 \
---group_reporting 2>/dev/null | grep -E '^ +(read|write): IOPS'
-  write: IOPS=20.0k, BW=78.1MiB/s (81.9MB/s)(781MiB/10001msec); 0 zone resets
-
-sudo fio --name=t --filename=/dev/nvme1n1 --rw=randwrite --bs=4k --iodepth=32 --numjobs=1 \
---direct=1 --ioengine=libaio --time_based --runtime=10 --ramp_time=3 \
---group_reporting 2>/dev/null | grep -E '^ +(read|write): IOPS'
-  write: IOPS=20.0k, BW=78.1MiB/s (81.9MB/s)(781MiB/10002msec); 0 zone resets
-
-12 Set wbps to 100M and run fio.
-echo "1:1 riops=max wiops=max rbps=max wbps=104857600" | sudo tee /sys/fs/cgroup/nvmet-bdev/io.max
-echo "1:0 riops=max wiops=max rbps=max wbps=104857600" | sudo tee /sys/fs/cgroup/nvmet-file/io.max
-
-sudo fio --name=t --filename=/dev/nvme0n1 --rw=write --bs=1M --iodepth=32 --numjobs=1 \
---direct=1 --ioengine=libaio --time_based --runtime=10 --ramp_time=3 \
---group_reporting 2>/dev/null | grep -E '^ +(read|write): IOPS'
-  write: IOPS=97, BW=100MiB/s (105MB/s)(1032MiB/10307msec); 0 zone resets
-
-sudo fio --name=t --filename=/dev/nvme1n1 --rw=write --bs=1M --iodepth=32 --numjobs=1 \
---direct=1 --ioengine=libaio --time_based --runtime=10 --ramp_time=3 \
---group_reporting 2>/dev/null | grep -E '^ +(read|write): IOPS'
-  write: IOPS=97, BW=100MiB/s (105MB/s)(1033MiB/10296msec); 0 zone resets
-
-13 Cleanup the environment.
-sudo nvme disconnect -n nqn.2026-09.io.test01:bdev
-sudo nvme disconnect -n nqn.2026-09.io.test01:file
-sudo udevadm settle
-
-sudo rm -f /sys/kernel/config/nvmet/ports/1/subsystems/nqn.2026-09.io.test01:bdev
-sudo rm -f /sys/kernel/config/nvmet/ports/1/subsystems/nqn.2026-09.io.test01:file
-sudo rmdir /sys/kernel/config/nvmet/ports/1
-
-echo 0 | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev/namespaces/1/enable
-sudo rmdir /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev/namespaces/1
-sudo rmdir /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev
-
-echo 0 | sudo tee /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file/namespaces/1/enable
-sudo rmdir /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file/namespaces/1
-sudo rmdir /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:file
-
-sudo umount /mnt/nvmet-file
-sudo rmdir /mnt/nvmet-file
-sudo modprobe -r brd
-
-sudo rmdir /sys/fs/cgroup/nvmet-bdev
-sudo rmdir /sys/fs/cgroup/nvmet-file
-
-sudo rmmod nvme_tcp
-sudo rmmod nvmet_tcp
-sudo rmmod nvmet
-
-Peng Yu (2):
-  cgroup: track the effective css in each cgroup
-  nvmet: add cgroup_id to charge namespace I/O to a cgroup
-
- drivers/nvme/target/configfs.c    | 47 ++++++++++++++++++++++++
- drivers/nvme/target/core.c        | 54 ++++++++++++++++++++++++++++
- drivers/nvme/target/io-cmd-bdev.c | 18 +++++++++-
- drivers/nvme/target/io-cmd-file.c | 21 +++++++++--
- drivers/nvme/target/nvmet.h       | 58 ++++++++++++++++++++++++++++++
- drivers/nvme/target/zns.c         |  5 +++
- include/linux/cgroup-defs.h       |  8 +++++
- kernel/cgroup/cgroup.c            | 60 ++++++++++++++++++++-----------
- 8 files changed, 247 insertions(+), 24 deletions(-)
-
-
-base-commit: 2ee54f01f07c0307deaf90ca8691a4643ae0357b
+diff --git a/include/linux/cgroup-defs.h b/include/linux/cgroup-defs.h
+index 3754d697854b..cbfe8937647c 100644
+--- a/include/linux/cgroup-defs.h
++++ b/include/linux/cgroup-defs.h
+@@ -555,6 +555,14 @@ struct cgroup {
+ 	/* Private pointers for each registered subsystem */
+ 	struct cgroup_subsys_state __rcu *subsys[CGROUP_SUBSYS_COUNT];
+ 
++	/*
++	 * Effective css for each subsystem: the css of the nearest ancestor,
++	 * including this cgroup, that has the subsystem enabled, or the root
++	 * css if the subsystem isn't bound to this hierarchy. Updated under
++	 * cgroup_mutex and read under RCU.
++	 */
++	struct cgroup_subsys_state __rcu *e_css[CGROUP_SUBSYS_COUNT];
++
+ 	/*
+ 	 * Keep track of total number of dying CSSes at and below this cgroup.
+ 	 * Protected by cgroup_mutex.
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 2d532bf2c0c7..54b207d246bd 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -548,20 +548,11 @@ static struct cgroup_subsys_state *cgroup_e_css_by_mask(struct cgroup *cgrp,
+ struct cgroup_subsys_state *cgroup_e_css(struct cgroup *cgrp,
+ 					 struct cgroup_subsys *ss)
+ {
+-	struct cgroup_subsys_state *css;
+-
+ 	if (!CGROUP_HAS_SUBSYS_CONFIG)
+ 		return NULL;
+ 
+-	do {
+-		css = cgroup_css(cgrp, ss);
+-
+-		if (css)
+-			return css;
+-		cgrp = cgroup_parent(cgrp);
+-	} while (cgrp);
+-
+-	return init_css_set.subsys[ss->id];
++	return rcu_dereference_check(cgrp->e_css[ss->id],
++				     lockdep_is_held(&cgroup_mutex));
+ }
+ 
+ /**
+@@ -585,17 +576,10 @@ struct cgroup_subsys_state *cgroup_get_e_css(struct cgroup *cgrp,
+ 
+ 	rcu_read_lock();
+ 
+-	do {
+-		css = cgroup_css(cgrp, ss);
+-
+-		if (css && css_tryget_online(css))
+-			goto out_unlock;
+-		cgrp = cgroup_parent(cgrp);
+-	} while (cgrp);
++	css = cgroup_e_css(cgrp, ss);
++	while (!css_tryget_online(css))
++		css = cgroup_e_css(cgroup_parent(css->cgroup), ss);
+ 
+-	css = init_css_set.subsys[ss->id];
+-	css_get(css);
+-out_unlock:
+ 	rcu_read_unlock();
+ 	return css;
+ }
+@@ -2131,12 +2115,24 @@ void init_cgroup_root(struct cgroup_fs_context *ctx)
+ {
+ 	struct cgroup_root *root = ctx->root;
+ 	struct cgroup *cgrp = &root->cgrp;
++	struct cgroup_subsys *ss;
++	int ssid;
+ 
+ 	INIT_LIST_HEAD_RCU(&root->root_list);
+ 	atomic_set(&root->nr_cgrps, 1);
+ 	cgrp->root = root;
+ 	init_cgroup_housekeeping(cgrp);
+ 
++	/*
++	 * A root cgroup's effective css is always the root css in
++	 * init_css_set.subsys[], whichever hierarchy the subsystem is bound
++	 * to, so rebind_subsystems() doesn't need to update e_css[]. For
++	 * cgrp_dfl_root this runs before the root csses exist, and
++	 * online_css() sets the entries when they come online.
++	 */
++	for_each_subsys(ss, ssid)
++		RCU_INIT_POINTER(cgrp->e_css[ssid], init_css_set.subsys[ssid]);
++
+ 	/* DYNMODS must be modified through cgroup_favor_dynmods() */
+ 	root->flags = ctx->flags & ~CGRP_ROOT_FAVOR_DYNMODS;
+ 	if (ctx->release_agent)
+@@ -5856,6 +5852,22 @@ static void init_and_link_css(struct cgroup_subsys_state *css,
+ 	BUG_ON(cgroup_css(cgrp, ss));
+ }
+ 
++static void cgroup_update_e_css(struct cgroup *cgrp, struct cgroup_subsys *ss)
++{
++	struct cgroup_subsys_state *d_css;
++
++	lockdep_assert_held(&cgroup_mutex);
++
++	css_for_each_descendant_pre(d_css, &cgrp->self) {
++		struct cgroup *dsct = d_css->cgroup;
++		struct cgroup_subsys_state *css = cgroup_css(dsct, ss);
++
++		if (!css)
++			css = cgroup_e_css(cgroup_parent(dsct), ss);
++		rcu_assign_pointer(dsct->e_css[ss->id], css);
++	}
++}
++
+ /* invoke ->css_online() on a new CSS and mark it online if successful */
+ static int online_css(struct cgroup_subsys_state *css)
+ {
+@@ -5869,6 +5881,7 @@ static int online_css(struct cgroup_subsys_state *css)
+ 	if (!ret) {
+ 		css->flags |= CSS_ONLINE;
+ 		rcu_assign_pointer(css->cgroup->subsys[ss->id], css);
++		cgroup_update_e_css(css->cgroup, ss);
+ 
+ 		atomic_inc(&css->online_cnt);
+ 		if (css->parent) {
+@@ -5895,6 +5908,7 @@ static void offline_css(struct cgroup_subsys_state *css)
+ 
+ 	css->flags &= ~CSS_ONLINE;
+ 	RCU_INIT_POINTER(css->cgroup->subsys[ss->id], NULL);
++	cgroup_update_e_css(css->cgroup, ss);
+ 
+ 	wake_up_all(&css->cgroup->offline_waitq);
+ }
+@@ -5966,6 +5980,7 @@ static struct cgroup *cgroup_create(struct cgroup *parent, const char *name,
+ {
+ 	struct cgroup_root *root = parent->root;
+ 	struct cgroup *cgrp, *tcgrp;
++	struct cgroup_subsys *ss;
+ 	struct kernfs_node *kn;
+ 	int i, level = parent->level + 1;
+ 	int ret;
+@@ -6010,6 +6025,9 @@ static struct cgroup *cgroup_create(struct cgroup *parent, const char *name,
+ 	for (tcgrp = cgrp; tcgrp; tcgrp = cgroup_parent(tcgrp))
+ 		cgrp->ancestors[tcgrp->level] = tcgrp;
+ 
++	for_each_subsys(ss, i)
++		RCU_INIT_POINTER(cgrp->e_css[i], cgroup_e_css(parent, ss));
++
+ 	/*
+ 	 * New cgroup inherits effective freeze counter, and
+ 	 * if the parent has to be frozen, the child has too.
 -- 
 2.53.0
 
