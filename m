@@ -1,134 +1,134 @@
-Received: from mail-qv2-f41.google.com (mail-qv2-f41.google.com [74.125.230.169])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D5351A14F
-	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 13:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790687253; cv=none; b=A2ovw/EfFq5gkeUnlmemRh771KJJ0UTII42sTrsGX09JrTWBmETRTLQ5/7KQ2ZeYu0Qiq7mUb4AcmamldvJvDy993nKPo8I0otxYoldL4u9ymYK6jfnohnXjdFi928iaVoEY7wSkes13GYgYdhf0rU5LiHpRUKbIrCNQ04nuFmY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790687253; c=relaxed/simple;
-	bh=PUrN0XLKKmcY4+BzdqcUirV+08xJH2NYk9oyUJnLOKY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MLRsPpH9Mg1+0yeF9+1P2E+4z8z1SQAxlineV62ymvm5Fv4JZJXgKmRVJTN13+x97ua+8wMkARg+ZeDzRLEP7/F8zwXji/O4ElQuIqbaSVVThXBx5yqaHPYsccFQ7VfllOu2f6v9uiAa8jONsg9GJKWUkUD9oiXmvJpcrwnBgBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=pass smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b=sGoAyW/c; arc=none smtp.client-ip=74.125.230.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toxicpanda.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C294FD7B2
+	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 13:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.225.140
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790687670; cv=pass; b=OuzhdOB2XZNRkoURGIjPpk/fQFQyZsUDU9uBIXrSEFMTQ8LMit5L8siLP2/GQpfNu/w/xwskd6nEoFqOXvrHttEOwZJ7GNKVyX+ueaAKNIRThioFVsDzV7Gi3eVXheErC5s1FgNhpnlzKQGRcO0ldANm5Z0ppXlCast2kjSTssY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790687670; c=relaxed/simple;
+	bh=mc9ZngTcAoluBbUuX2lmbdpcrwmnX9oPwgK3aLjWg04=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qk8pLfE8o8pa6rHnXtCu7DNICaH0IAPcLithjpd3lE5yCc6tp6BcNAtmAjCIkxNeXLZxIjMMPKauzW0jWaB7Q4rUkdxkdk6CXHJy/VZPeAZQEgyhUgUR+P3MCAgajYLBghYjkHnolqyQY/Xh2jBBK13qGoci7CdbnNW64rlgHrg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iCg4rfp1; arc=pass smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b="sGoAyW/c"
-Received: by mail-qv2-f41.google.com with SMTP id 6a1803df08f44-91784fbb60dso9837256d6.1
-        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 06:07:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iCg4rfp1"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ffa15f67fso17932775e9.2
+        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 06:14:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790687667; cv=none;
+        d=google.com; s=arc-20260327;
+        b=pkEcXnIDODAJgwzsriF1LQGWJnI6CeHdBVD4im6jEGMWNjHMZvNXVsGBQSEBnEOGK7
+         NPzAenQzePTo+uemHMIfAHRvWUiYuRTW8V0lGAUshAlCeSteUDAjd5eEuXF2zFsPK5L3
+         AH2ev4fEquOQWv6Ag5PHbmlkrvvqLtfYalqwr9KNm1P6Il8cgDG47gmHsU3X47fWAWph
+         O4rcI0rSgAp9flp5t5chFY9QcFbeEeFNyPWYU4TX0as+iFpTgVuaMWVg1jLcxX0n9ZAy
+         0I+DDRxpITAbQSUUnIPDSvK1g141EABd92fRKH3V4tW337jX7dgB2ZARk3mjScq+9QHO
+         l0vA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=SYRpRMxccbtbpG1laeX3wfTBykfDUuE+jqqX7h3vEZ0=;
+        fh=kLW4rnCFy7Acr0qdxgvvcEAD1qYXKmOZj9ELQgRpE+4=;
+        b=MwvUkJJLoGCKRV4aWk20QrsnhC4i+x7UoIwokEfjsFSqwcWW79rdadpbTQSMU2BnSz
+         qbZiy5BIbuk3MqozPD8gcCqwDZ1vS1iQ+baickoQtIP+bxEsTxzTpjgW8fgjHDXrM4Ci
+         knw7WjqVouvcwx2owdcDUF7H29THVdIuqQRCmt78564lyX4v8McrAxZroZxCzN0oQO62
+         rLaQktgGX9FZONlTNkikpzWAFtoxTuv+HsU4scQkaBHoptSsS3GEcSF0SjHU/ucJQnrL
+         rS3lNuS1ypT/qjzXSN15+EWM4k4GhiSuZpf3899jS62vvUvTgM1WumjQ9SPZpqWakInO
+         VZwA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda.com; s=google; t=1790687247; x=1791292047; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:content-type:references
-         :in-reply-to:subject:cc:to:from:message-id:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1790687667; x=1791292467; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=s2+9C75fPvA5g6i7G+PRMeW8ilNW2Hk9NJmcPsE1jGE=;
-        b=sGoAyW/cBDUOjNP/dhva8ysA7RPUsTwMJ8xLzsDjxnrHpZ8NwtRL8fvltqg6ECe6uk
-         4bSH/ClMNhb5xWEM48s783LJiRt6RHjWDUZLjJTTSOJnJYKhL/YuPXQkC7g2xGL+ha9X
-         eap9ibADGLP/UaXukTYZfE7vg7NOClXT2SgcR3xekoUB+3eJFaOISd4mlCfpA+kPLcx4
-         jAt+oDTYPvPUHlWadsoosVfKAuDRA/O1LvlgL1idYqQNiSmq2wYGHhP+fYfdjkaOTssm
-         a8O5jRbN1JVD3+bX6NCG8XOzg/cQULYHziQOTmEP+dRSGQ1yD+q05MWpiHqn877tFCej
-         5AiQ==
+        bh=SYRpRMxccbtbpG1laeX3wfTBykfDUuE+jqqX7h3vEZ0=;
+        b=iCg4rfp14eSuBBOibIB2qwEDqX7qD8s2MEzh1y2AaasArYmYpvIeJXGhXNRMYFmkb2
+         zuMGGQb4SGdrYm7nI4bg4/0ILMs/+6qhTny2PiYw+Gie0KPZWt9QtXLLRtlf5Hk0uA41
+         T/Y1M4g7dLbSk5wVWRqxrTGC0hia7y2DBuFGbdzRrWWIeHFvXfR6XgP+/rojWvSpuI8+
+         cVnTEMvUbJp8zYOUiVrMbC0cB8jMw7X+Q3bquNiYLmUIefX43lG9i/VsyuTCFPgU8Uw/
+         kgqO4u+ZkZSsXWN6n8w3pw1Wo2ejmrwPDpkVTTZL8A0IyhYaFho+gZaDWO30x69a5ux0
+         PFhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790687247; x=1791292047;
-        h=mime-version:content-transfer-encoding:content-type:references
-         :in-reply-to:subject:cc:to:from:message-id:date:x-gm-gg
+        d=1e100.net; s=20260707; t=1790687667; x=1791292467;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=s2+9C75fPvA5g6i7G+PRMeW8ilNW2Hk9NJmcPsE1jGE=;
-        b=NmdVHPVTfIHNl0JiwaVLsEzBQV0GRWG5nGVr2ODN8S2rcILp2t/rkNM6IjZQbF+w7j
-         4PjrHGB8A2xsV9V2wXz4LXxO5Wmwzfw3Dl6xhKGXZfzGRgwwfWXFQHHrH+3VJuOU4AbC
-         TyXAJkXA23KuIvgcdNIK9Zv+5WgOuZ1OptOgaBhgOf8IH/G3YXxZTdRBLyzPttJvKLH9
-         3u6ExPvxS4K8MfWF+g+WinMHwGMaH3HSYxuvNSOc0EjZAvM8YdwtVkNr2HExKZjA/nrP
-         wwpekgvL2CqQoB314QsHtWwIJGp5Km3TSedI3/QUhoSjttT2X8riOZq8gHDkEqxyR9V9
-         4+tQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxMfL7c0hV35MLW/ERwQNrmNew6bIq+i5jt7+/oz87XIlY88yAigaP8iTjJWfXncuTSj3fKvb5GCWEbsA==@vger.kernel.org
-X-Gm-Message-State: AFuF++k/ZeOuqAQw1LvRC/zreNn6wjSpjNkiqexXIUKTAZREiOaHmUlh
-	QdOoCD183E6Xi50cmyuVg+5vSzw/u1uHxCY/QCNagKMQOo53IDI80HxOhbeMZvMc+6g=
-X-Gm-Gg: AYBFou3XFh4hIcPW5EvnnDhzThHCWzdnEPa4oBUQe94dq1K28mqesGEEAVqGgBG8LIW
-	F6g0GktUYeiR15YiWmRCWez5jaWQbuMpP0NTYjQpRZa/iFFvqU8rp3UmOulOu9bZtZ5PjqPOvXg
-	jVXmAl+pSdga54BbXf8ZmPBnLj/g40FSKT8W+JtXTnXAOewk/41pa0SgEWtcu+j6BNyiUqtKQxg
-	ZUY+SOLx+Jj/8a3hop0ht0ST+NwURLrhblMgUDSh7N3v9n4h5EM38q+HTootU1LMiGdUYhYwg0P
-	b0AplzN9TSJP/h3NCOVuF7YBEOn4HORoOr3YY2KZC8tptvx/3opPVp+Ty6vSd4loIVDJCXu/sYK
-	fRmGr87idL/i18WQjby2Rk55/sMDDGVcaeL8XOUKK9sYLZPJgY/8subsuV2N4QTHS/UWKhycqlK
-	oCDydU8Q+DU2x2GfGBWqoZ44ScmT27rrs9YWEu1kfSKDjgJnfzGPwd90FxKRncxelXpH1ugYhPo
-	uUltIqB1PTnyzM=
-X-Received: by 2002:a05:6214:2f8b:b0:913:ffb2:e8d9 with SMTP id 6a1803df08f44-9142f93e820mr258725566d6.40.1790687246832;
-        Tue, 29 Sep 2026 06:07:26 -0700 (PDT)
-Received: from toxicpanda.com ([153.61.196.255])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9178d1bcfabsm9993486d6.2.2026.09.29.06.07.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2026 06:07:26 -0700 (PDT)
-Date: Tue, 29 Sep 2026 13:06:49 +0000
-Message-ID: <f3880ecc0f95cc12f0b8fbb019f7efef.josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 3/9] ublk: publish io->cmd under io->lock in the commit paths
-In-Reply-To: <CADUfDZqDZEM4=uw+By6RnxvLqXbc-iPf8RCUQtQB5_Z_Di84Aw@mail.gmail.com>
-References: <20260928-b4-ublk-cancel-stop-v1-0-4a4360232a46@toxicpanda.com> <20260928-b4-ublk-cancel-stop-v1-3-4a4360232a46@toxicpanda.com> <CADUfDZqDZEM4=uw+By6RnxvLqXbc-iPf8RCUQtQB5_Z_Di84Aw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        bh=SYRpRMxccbtbpG1laeX3wfTBykfDUuE+jqqX7h3vEZ0=;
+        b=X83hFmqI6ghEwPzHtLo+IG9MZIU98A3PKmfqgc4TsKTL0t8B8aiJlzOyngbqp9M54G
+         z2oXZ9nbSw75oxCu5aAYD1dMFTTu+j2T5CorM2zvLVNZIuGQhuWvyK2MhxmOp1hdQonS
+         ImKFjzpDb/FiFeYrvZaYiE+XHbaiHOYvLFh6fOBv7+WrprB4PnnYyOPFH2boJXronMmh
+         NnPOUv3R4Zhe/yITWHWkjrx3PO49ICyV2hQV2YPQZl+O1U4BX0MWwfuirbYBlpUQniwK
+         V2qXe2Py+Vp/Xz5em8oIyADOwaqJHy3Pr5FyMH3Usg9rJh7+uw4Gu0MfNcA0Qvr34jkP
+         iEOA==
+X-Forwarded-Encrypted: i=1; AKwUvBzz2ZPEmln2VLZ7c1SfSdGnXCMhBwVBsAEs8KCWsYYwDtH0NmmCb3KALWVIX/dVUvJNRW8/DAKdtFbhPQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++kyzygRZjc1G4gALJm/XqChQv/YT4A43sAKEV2XH9qz0c327h0N
+	Cj7NllVYkHsNYx9/De6tgNn69C6bAJbKg7n9ho6vBQ/OTUs+AOwV1nqPjiTQJTUbFMM45/C+TxL
+	RJjJjv7Ho/8X2qhFOzaqSaFABotmhZJA=
+X-Gm-Gg: AYBFou3+ecJpvIpTKpvt3Vo7pJNUNS+BzdtPVWB+Ru9YEyVy9o0i4s2A3hosrHELMI8
+	TyBCezDwwvKfMGwln4pZX7dHxHYIiIB7FOmdW3fLMgUXD7P5/b3z68qALNkl5i7MSzBetWiB/1k
+	yACzERbOdSPQtxOFcbZ6ARIm0/hT0M6RiB0BE2dSfUYkQZvn2SJkFn9iiQbSlNaEaBhbtdICkyd
+	oDyJ1vdAeU7TjQtbkquTyTwjVKy6q0Ftoj+DcM1oP1jyZnMoR77qzIfhihR3A8n9oWoJzBm728F
+	aQx8FnvjBCacLTXBNZsv2yo4Vn2YgRfku3XxlJlVNcH2JOSKbGOsXl/7JqZWWPJpjhXyL1IS4Dy
+	eBz+WpsyA5G3bgb/liMicmyQDcBM=
+X-Received: by 2002:a05:600c:310b:b0:49c:ee20:e787 with SMTP id
+ 5b1f17b1804b1-49fe66c8959mr264819315e9.1.1790687666921; Tue, 29 Sep 2026
+ 06:14:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260928081900.4187482-1-alex@ghiti.fr>
+In-Reply-To: <20260928081900.4187482-1-alex@ghiti.fr>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Tue, 29 Sep 2026 14:14:13 +0100
+X-Gm-Features: AclHuK-gHF1dvlctEtmdSR2RHiaD0wcMX6yQUH1GuqMtNTGrIvszFdFCGGkiTPs
+Message-ID: <CAKEwX=MzVBTF46m6qBedUtpSgZFksRNonG6Gkw0kEMaCF17SBA@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/4] mm/zswap: make shrinker writeback work with iocost
+To: Alexandre Ghiti <alex@ghiti.fr>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, david@kernel.org, 
+	Johannes Weiner <hannes@cmpxchg.org>, Yosry Ahmed <yosry@kernel.org>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Josef Bacik <josef@toxicpanda.com>, Chris Li <chrisl@kernel.org>, 
+	Kairui Song <kasong@tencent.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
+	Baoquan He <baoquan.he@linux.dev>, Barry Song <baohua@kernel.org>, 
+	Youngjun Park <youngjun.park@lge.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 28, 2026 at 10:53:38AM -0700, Caleb Sander Mateos wrote:
-> On Mon, Sep 28, 2026 at 9:03 AM Josef Bacik <josef@toxicpanda.com> wrote:
-> > +               ublk_io_lock(io);
-> >                 req = ublk_fill_io_cmd(io, cmd);
-> > +               ublk_io_unlock(io);
+On Mon, Sep 28, 2026 at 9:19=E2=80=AFAM Alexandre Ghiti <alex@ghiti.fr> wro=
+te:
 >
-> Taking a spinlock for every ublk I/O completion will be very
-> expensive. Is it not possible all paths calling ublk_cancel_dev() to
-> wait for all tags to go idle?
+> We want to enable the zswap shrinker on our fleet, which runs iocost,
+> but with it on, a large production workload is slower than with it
+> off. Two reasons:
+>
+> 1. zswap writeback is REQ_SWAP, so the IO controllers issue it as root
+>    and charge it to the cgroup afterwards, as debt. The workload pays it
+>    back: its swapin and page cache reads wait, and iocost eventually
+>    stalls its allocations, which in turn stalls the application.
+>    Patches 1-3 let zswap writeback be throttled instead, by marking it
+>    REQ_BACKGROUND.
+>
+> 2. A throttled write sleeps in its submitter, which for the shrinker is
+>    whoever entered reclaim, often an application thread in a page fault.
+>    Patch 4 moves that writeback to a per-lruvec kworker.
 
-I measured it on a c6id.metal (Xeon 8375C) under KVM: an 8 vCPU guest,
-kublk null target with 4 queues, fio 4k randread with 4 jobs at iodepth
-32, ten interleaved rounds of three kernels: for-next, this series, and
-this series with io->lock taken back out of the commit path. That last
-one also drops the second lock/unlock pair patch 5 adds after
-ublk_prep_cancel(), so it isolates both. The guests weren't pinned and
-landed at two throughput levels about 15% apart, so I compared within a
-level.
+Yeah that tracks with an older experiment of mine, where I add some
+manual throttling to zswap shrinker to reduce latency :) So I think
+this problem is real - thanks for root-causing this, Alex!
 
-Series against the no-lock kernel, IOPS / CPU time per I/O:
+I'm a bit nervous about adding multiple kworker threads though, hmmm.
+Per-lruvec sounds like a lot of threads... Do we have to scale this by
+lruvec? Why not per-cpu, or just a global thread? Is there any data to
+support this autoscaling?
 
-  plain      -0.04% / +0.7%  (high level)   -0.7% / +0.7%  (low level)
-  zero copy  -0.6%  / +1.1%                 +1.5% / -1.2%
-
-Batch mode, which runs the same per-I/O code on both kernels, differs by
--0.03% / +1.2% and +0.4% / +0.5%, so the lock is inside the noise of
-this setup, which is under 1% of about 3.5us per I/O. Against for-next
-the series is +0.4% IOPS / +1.0% CPU per I/O in plain mode at the high
-level. I'm rerunning with pinned guests to tighten that and will follow
-up if it moves.
-
-It's one lock per io that only the task committing that io takes, so
-it's uncontended, which fits those numbers.
-
-Waiting for the tags to go idle doesn't close the race this is for,
-though. The control path claims io->cmd while the server can still
-commit on the same io, and what matters is ordering the claim against
-the commit switching the io from the request to the new command. Idle
-doesn't give you that: a tag can be idle when you look and be re-armed
-by a COMMIT_AND_FETCH right after. That's the QUIESCE_DEV hang on
-for-next today, its cancel pass skips a tag whose request is with the
-server, the server commits and re-arms it, and nothing ever completes
-that command.
-
-Also, ublk_wait_for_idle_io() can't actually wait as it is.
-blk_mq_tagset_busy_iter() only visits started requests and
-ublk_count_busy_req() only counts requests that aren't started, so the
-count is always 0. I'll send a fix for that separately with the
-QUIESCE_DEV work.
-
-If the numbers show a real cost I'd rather find a way to keep the lock
-off the fast path than lose the ordering, so I'm open to ideas.
-
-Thanks,
-Josef
+And do we have any concerns with work (CPU) accounting, from a cgroup
+perspective...?
