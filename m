@@ -1,74 +1,75 @@
-Received: from mail-pz2-f39.google.com (mail-pz2-f39.google.com [74.125.228.39])
+Received: from mail-oi2-f42.google.com (mail-oi2-f42.google.com [74.125.231.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE704503EE
-	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 08:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2562D4E66C0
+	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 09:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790670976; cv=none; b=U158qhW+8VWMwX43LeoufLjG8E2fMw4Sbn02LolMNmy7YlqnKC2LzyHSvrPrwNGeC9klDVWqaf4l8gy331JO6yu3qGzHKgALt9c5BlIJMUxtvZBL4rtvwdGrn44xNMrQ4MDn7736GwcvTm06zNY8dD2lLRAnhL2iO1nzktvaRPI=
+	t=1790672603; cv=none; b=MLdsDmLMQSCjk72bhww2tTF7DTlkmnZLNSSfDVXAf6DOWS6NNCeYXdgjAYilq+59u4EgUcDcG6DSUmaYkox9aoh+iamtyPC93thOfI3hCiZVCmzEnxOcCG01bfYgTIzFvd66FPMZ9DHnkyF+tEhnvmIkfIioijts9/0T+kViyNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790670976; c=relaxed/simple;
-	bh=VRAOKD8IQiv5Doj3zfyFa4TmmxoE+pNf7XnBp7cBamM=;
+	s=arc-20240116; t=1790672603; c=relaxed/simple;
+	bh=xhk9l8xxQFNWZtQaW52fwQ5oIWX98eS9UVwsxlLpHxQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OWQxPcIesllfRJADH3LUA8PNkvEz7rc0+rM72kgLqLMHoMRD24cT25KM0jkpps8hlMIKeskrElA9RrV6oEcg5UYYPZjXkAPxp1JDbTbuR2ywP+B6yfNwVY25jUIJJyuDjKiFMksNDjMpqL1DNiqLaI4UMqG3Cre7cNFwdczEb2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=gCKSrm8k; arc=none smtp.client-ip=74.125.228.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=U1rKEPQxoNZzxK7J6xp+CZkPnkIjdsHmI9m4xb3cSicMBofwaq6REOTDddDtNQhqbfrB3VxXmDw1bGn3qKIrD6QkNiObanFNv57e0r6LmM4bVtZVy9D9kxbmhoBOPJpthWTx6l1x73mT8BbrtyC1O4OUBjOOgjOJYexKBrzMo9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hja9/JYf; arc=none smtp.client-ip=74.125.231.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gCKSrm8k"
-Received: by mail-pz2-f39.google.com with SMTP id 41be03b00d2f7-cc7979d1dedso1136293a12.3
-        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 01:36:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hja9/JYf"
+Received: by mail-oi2-f42.google.com with SMTP id 5614622812f47-4e6eede34baso1368250b6e.0
+        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 02:03:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1790670967; x=1791275767; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790672590; x=1791277390; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=wqIX/K8+VwYyF/xC9PmKKDDvSH4cgd5EwORlAHhZrEs=;
-        b=gCKSrm8kWVAQuscs8wlwU0pm78XNEwx96TPwSd1D7QSM41nZ9IgUycfbIMNk8oXEz/
-         +9Gzcb7XDuQI3KK0Ufpap2f8MbdpJBu5cdjWK//V/LItFlBO60fv/TRXUnisbMSW1DrK
-         kScCkr+CyDoRtfy1KlPyuY0IjKIQuj/pHVjYU=
+        bh=7G7xbrBwpX8Qk9XyyBKXMy8SiEP3FiPmOY4KjiWkS7Y=;
+        b=Hja9/JYfcko8ZgOk+o/n5RGGDKwYGVpieAFJJOB6vq7A/LfWJeSHI8GLeuwbtHJaQo
+         /CvGN/Ui0RslLc5eXgAJYvUX25P3PIgKNi09/N72WfvQg/TOy2KGEq9eXJ3sRL50rqKs
+         NSWMU0uTJj+/THjJEQlst8zUZq1Dq8hUSrJATlBKgJpXyCDwZ1DZosP0L6B/V4LWsOBI
+         h78tcnNPX4sSJEXvYM3AUSBYraFR/SxOy7leeixxHsLKOkgwtVad9cZqNCGRfR9NaeSJ
+         qv+Y+8VeC0xj4UPGnljaRXsnl0ZHBFkKuU0JL3Tb42H7+Rrbjl2bUxm5/QduAc2YbHCZ
+         pbBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790670967; x=1791275767;
+        d=1e100.net; s=20260707; t=1790672590; x=1791277390;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=wqIX/K8+VwYyF/xC9PmKKDDvSH4cgd5EwORlAHhZrEs=;
-        b=c8kqQvQOIZL1pQjB3RXf6ukHTqxHB/cIGAs4PfXfbteTtVz4JWm1s5ACt4r1jzV8rb
-         X7fuiXqQxkN26F3DvcaM3wCKcXer3DjWyLtzQMA/STYdXVhn+HnSKkSz8AcFR+pUvaBv
-         8Vy3NTZkINlW97RrVbe3VluQQ+ecBGEXD7nrrsbBz0mLWMYftDMqE/7mNW2hzIUPFLYp
-         d4F5rrdORaaKtTEfc4BmAfSSeS84Dup0j7pDKA4A61iw6LdWysA8aNIEAp99ydcdURi4
-         3i531WiCS0p/ZSZ2ISaJk7evodff8T2ls55XtWYvcOMCiIkp7Tfe2hA7sJwl5PoOetVn
-         W9Jg==
-X-Forwarded-Encrypted: i=1; AKwUvBwz7/8/Vc3Uabret0wBtdf/7mdiII9R5Cemcyy6r7/42o7xc7+SI+/hQ3TVeVk6/0TOx6ifunS5mpdIdQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLQtW9JFeuM0J261bzyR/9xepnvNdi8tJPhqqsVTuy9QIzJp/aX
-	F+lOVZS9G664T8GCMVh9Q6renid4cPKO68ASc78KvMx+/p9wTcB5z8UvvotTSuppKPj4ZwxSSq6
-	zMSo=
-X-Gm-Gg: AYBFou3IrX0OarGWazeDqZpZSg526MtfXGBksOlwDQCBL5s1rJaa46g5qh7Uqc7UxMq
-	Wv3wKjEfMVeiCZxKMoXA9Qw94Ys5lc5EINfELd7QEajxd0FmHtEACLeh9pNWdYN2X8iPaiUX0k2
-	9qxDPBEO3rQmy/30vQwDeFbNAWxO5wcE5aMpdipgEXTgtagNYBIVDHPt/kK4l9ynlZl2dH0Tnp6
-	hasFcYFjjD6ei0gd0/cjwCBFYZQTPHZyTP9bBfdbXOP87paKhicsvJMhk7bZDs6pfBXa6CYFYLj
-	HImaEeiQpuMTlIX+3jfOs1DCJVQnso9MzPM7iHYlsLRxRsq5GePcyNiu4Evj3fVG36qqyNSmVec
-	u+WqoKJGfStweHUv6gVjfLtiSqDOQnbrNgeBDDjxtgLeCEwyT5Ap1/4Hb1DzbaLv/rVu0HmIqOk
-	fsA2xisjEnW2BOg2xWTgJIf750lDOplKV82+Xc9AFa3/+YqSSq434A5gl8OTtDDEGlGNafLHk+C
-	xgPI/YlukuCKtptqJgB1ss7ahK7JXE9GlEI27XqbcdF2oGmazA=
-X-Received: by 2002:a17:90b:55cb:b0:3a0:f4ee:d2a6 with SMTP id 98e67ed59e1d1-3a0f4eee43emr6338930a91.19.1790670967013;
-        Tue, 29 Sep 2026 01:36:07 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:31b3:f8c3:893a:d0bb])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a492dfc5absm2202607a91.3.2026.09.29.01.36.05
+        bh=7G7xbrBwpX8Qk9XyyBKXMy8SiEP3FiPmOY4KjiWkS7Y=;
+        b=DIhz33k0ZXuqW1n/kXcG0Ky5EM7Vi7a0zEyQ3UjwWJ5+0hgTcbk2fR1BHqPwAK37yT
+         o8ta5eQ4HRcQ1d5we6YxzH1m2oUFcqz8iTeRH/MozUxe4E8T5ILXzCfPc12fI93rvK4G
+         D7DYRuI9B4uT9DdDD0wx7wbhseypBmOEl8ie3Jln+GjZEsVlqsOHGGgBmd4zyZ8muw+T
+         yUN2foOK+xsZBeGK+Ai+mPXfEJedfBVUo2uEupPcdO5elw1r7gELoKVpxbNuDFH/6X64
+         4/rES4jNV5jmSmn/thRQdhCwC0gD4e8S6XZAXV+rfivo5xtAnYVAX3XADw8YZOhsjKgZ
+         Skuw==
+X-Forwarded-Encrypted: i=1; AKwUvBxl1rhNerv1zO/9UTnY81dz2W2IpJgRkR73LbLInB8MPC/MmfDrAI/HACXkTTftczuAzfu03HpO1nqDfw==@vger.kernel.org
+X-Gm-Message-State: AFuF++koNRFIx1225NAcGp5E2BsGuYSPRI9Z33PnPZe37Ae3kGnKWlG4
+	giPkZj3C/l1JLgks+WH4Vzjx//+xAT81H1eUkWAnE+yANfMGUl74FJnZPAPvtQ==
+X-Gm-Gg: AYBFou2gSGZG5EMay3NFI6S66U7XR+7O2bXZ6UNwJbtVlPbM7d580s/eTOx89dDlEgV
+	QTfBSAZMNlESlxI4ZSb8bZjh4Zz2ebI0zNJu3lOYQOrzMHcz2VjVaa8vclOWTr+TywVxJQ3FZF1
+	cs1MJrpkevm+9kPQxjg3qPcIgYhyFqfrlK+p34gNDI69S9RSgwAII3qYyXcbVFJ7iZwimUXydgh
+	ZBJyS0yz6FhIRtWwyZd1XO9M3tb1gHpPh7/D2oV6LG2DvgSNxzFGiiwMp7jfYVmMlBtvwGmS85z
+	kRjaNivu2ISlnvQMuNZzWWuB8DFbAjhFbfYf77DIg/soBAdfluMS44PZvoff4y5FgEHCCmBDLzh
+	6y6sT72WUpXqDZghnVNpLxh9J3mPVYMa5IjmN7lniyXti6KiPSCKc/6qvMJnSIY8h5xzI7fBUsb
+	dThVvwzyGr1gHh5d+gSXCx0ToYxlwlcvSS6hpzZ7ueM/1hCqEwYhCGHvyZ35HqYzsX2gsz0tPY5
+	fJ4eeLGwetlrUHS3iddgvnbhX0J9nvIQpPjdZ6CcyvlAHKE5qlUFGorQOyI1WXhgI2+jPXY2BwZ
+	mPnTuvUzh7Gwlw==
+X-Received: by 2002:a05:6808:4f6c:b0:4e5:79ec:5bf8 with SMTP id 5614622812f47-4e579ec5e82mr7824808b6e.67.1790672589708;
+        Tue, 29 Sep 2026 02:03:09 -0700 (PDT)
+Received: from fedora-laptop ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4ebbd25c871sm4044188b6e.15.2026.09.29.02.03.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2026 01:36:06 -0700 (PDT)
-Date: Tue, 29 Sep 2026 17:36:03 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
-	Pooyan Azad <pooyan.azadparvar@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] zram: fix short reads from block_state
-Message-ID: <art30sD5xpFZx9QG@google.com>
-References: <20260928164826.24858-1-pooyan.azadparvar@gmail.com>
- <20260929071846.24829-1-pooyan.azadparvar@gmail.com>
+        Tue, 29 Sep 2026 02:03:09 -0700 (PDT)
+Date: Tue, 29 Sep 2026 04:03:03 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: Re: [PATCH v2 1/2] nbd: mark the socket dead when a partial send
+ times out
+Message-ID: <art-x7GV6bebIk1K@fedora-laptop>
+References: <20260928091021.2456652-1-joseph.qi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,23 +78,66 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260929071846.24829-1-pooyan.azadparvar@gmail.com>
+In-Reply-To: <20260928091021.2456652-1-joseph.qi@linux.alibaba.com>
 
-On (26/09/29 09:18), Pooyan Azad wrote:
-> read_block_state() formats each entry directly into the buffer supplied
-> by read(). If the remaining buffer is too small for one complete record,
-> snprintf() returns the full record length and the function stops without
-> copying data or advancing the file position. A read smaller than a record
-> therefore returns zero at a non-EOF position and cannot make progress.
+On Mon, Sep 28, 2026 at 05:10:20PM +0800, Joseph Qi wrote:
+> nbd_pending_cmd_work() completes the request with BLK_STS_IOERR once its
+> retry loop passes req->deadline, but leaves nsock->pending set.  Nothing
+> else clears it: nbd_send_cmd() only does so at its out: label after a
+> complete send, and nbd_requeue_cmd() does not touch it.
 > 
-> Convert block_state to seq_file so formatted records are buffered
-> independently of the userspace read size. Keep dev_lock held across each
-> seq_file iteration and continue to protect individual entries with their
-> slot locks.
+> Every later request on that socket then takes this branch in
+> nbd_handle_cmd():
 > 
-> Fixes: c0265342bff4 ("zram: introduce zram memory tracking")
-> Closes: https://lore.kernel.org/r/CANC3H+LdtoydSp+o2ecErAw7k6R2+gRf9LyxcaoHv_mGhJmyQQ@mail.gmail.com/
-> Signed-off-by: Pooyan Azad <pooyan.azadparvar@gmail.com>
+> 	if (unlikely(nsock->pending && nsock->pending != req)) {
+> 		nbd_requeue_cmd(cmd);
+> 
+> and is requeued again, forever, since the requeue path does not clear
+> ->pending either.  If the tag is recycled first, ->pending matches the new
+> request instead and nbd_send_cmd() resumes it in place of the abandoned
+> one, skipping its header and leaving cmd_cookie alone.
+> 
+> Neither case leaves a usable socket.  The header went out and the rest of
+> the payload never will, so the stream no longer matches what the server
+> expects.  Mark the socket dead, which shuts it down and clears the partial
+> send state.  nbd_xmit_timeout() does the same for a timed out request and
+> only skips it here because NBD_CMD_PARTIAL_SEND makes it defer to this
+> work function.
+> 
+> Without this, a write issued after the deadline fires never completes and
+> the device has to be torn down to recover.
+> 
+> Reproduced by making the resumed send never progress, so the retry loop
+> runs out req->deadline.  With the socket marked dead a later request is
+> dispatched instead of requeued, and a reconnect afterwards does clean
+> O_DIRECT I/O with no oops or warning.
+> 
+> Fixes: 8337b029f788 ("nbd: fix partial sending")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+> ---
+>  drivers/block/nbd.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index ffce519bf008..c2c3dbdd631f 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -838,6 +838,14 @@ static void nbd_pending_cmd_work(struct work_struct *work)
+>  		/* don't bother timeout handler for partial sending */
+>  		if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >= deadline) {
+>  			cmd->status = BLK_STS_IOERR;
+> +			/*
+> +			 * The header is on the wire but the rest of the payload
+> +			 * never will be, so the stream is out of sync with the
+> +			 * server.  Marking the socket dead also drops the stale
+> +			 * nsock->pending, which would otherwise make
+> +			 * nbd_handle_cmd() requeue every later request forever.
+> +			 */
+> +			nbd_mark_nsock_dead(nbd, nsock, 1);
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Tested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+
+
+Thanks,
+Ming
