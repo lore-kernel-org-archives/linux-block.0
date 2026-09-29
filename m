@@ -1,111 +1,181 @@
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.smtpout.orange.fr (smtp-77.smtpout.orange.fr [80.12.242.77])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D464D3B47F1
-	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 16:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25A33AE6FC
+	for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 16:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790698103; cv=none; b=oGsMGIrO6FM6tt3EQ603oUo0LlBIadYbX3Ud1QItTzoc/qpo1XMBzlMVuQe5hi/EjrvyqabVtXkWIA1JU/u6PV6maa4ShPbk8PbUyVjEvlVKjsVlzBu1TNMe3cyo29NsC2dw72ncGajkMLy/2eJZtPAhs78fdS/avekgH760zSQ=
+	t=1790698439; cv=none; b=gp3S5tUhQu/qQu0lj9eKxBJdCQagM9qJyRvIWlrgL3C0erqz9sTiwv8n3wYt6oq+acb4OXKHO4EnF96YBMagm2l3d6BFB3ifjbMn2ZyNY2yEEFDdJDeKr4D3TymhNjB4Yrp3EUTiX+KbI8yecqTlcn5MT3HRVorcs9yi25PS4Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790698103; c=relaxed/simple;
-	bh=mJ9tvcXfVa1pMa0zT+towPPM94a7YZ0aB36t0A/lU08=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Lt5cUlxlRXBv46/XrS35K+mBNYZGJGaGuBpAiKgVwgNocncFR9dcHqe8pgRjVdWxS/NBzCzZPkufA7VBoMEXRI//ffzXiixuh7O6VDQy7eP4md7bn/wtmJiKLu+oFLmj1PdC0Ry++lG/h3ttgTvSft9rcFrET38vtAYIekHNS3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tadamsjr.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JjnATNyn; arc=none smtp.client-ip=209.85.216.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tadamsjr.bounces.google.com
+	s=arc-20240116; t=1790698439; c=relaxed/simple;
+	bh=SPsJ46zQ3cpUQvCQs2LGwEVPCihPlg7Yokg21P/WkrE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=YV1/jkVOoWFhZbDbDZ42ymFFjvKs639474O6KmfTtnYHMlAJ/ePWbpLNsdm8aVpPfX0MZ1q/PNsNPtJ0igc7mH89Oa5SNZA4jVJktbHPAszwTFG1oSFuFoM3sHxRMzd+pDurq99GbKdH0IOG5U5+N4aOvMQ7UhTO5JmWMRQKZYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=eORPkq/K; arc=none smtp.client-ip=80.12.242.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JjnATNyn"
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-39d865b11b4so4956608a91.3
-        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 09:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790698101; x=1791302901; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=iUFYZBBxsO9sVJ8mJtnVnz6Y+mSx3S7AjcZnY2SauxU=;
-        b=JjnATNynrmTHNs9ZbqD9R1BsWh1U8i58FZO8VmsglZJwO7J3261fNMj0NCCgfb3kXB
-         8X9N4urUrMUPv6ZaoSXwByKn9+PEw0MopwRFfYCAnXhCWy1wrI+G6nbmJdhvOMcWP6uz
-         T5tAqu+IM9rR49cqLIrlf5W0eD1xhzflYbq49qffmGd9UU6grGzsVJhPCcCpRaSEchDq
-         IXiMQomoqUJDpg3F1z6hrFcHPEyD6BIwBub0T4Z9AwK1Lj1QgZkos+jZdR2tyRDUIT/z
-         4GII4wklx86P+1a412ktppu6Xvra4ieszcCKK5loFOZAZbAFuP3FRqmadPnizWxNiDBL
-         ykoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790698101; x=1791302901;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iUFYZBBxsO9sVJ8mJtnVnz6Y+mSx3S7AjcZnY2SauxU=;
-        b=1B1531noVG5Z5UB8i0qeZhcYHB+JxQVkNK7sJ57qtkO2mKsnB9px39ZN7jHl6R5mgl
-         /lKZ01XlenAvNvWaPcE2mXOeZAUqZhTkx/2bZ3/Rsseoy7+954Rqx3wpGWeJjPOkZfe/
-         Owrsc8GvZUz2RcaV5HHIHPUKzp+YATt/6gnlddARyEkq/rj7no8nMBCfHyJuRtYeXeoS
-         GzGw3Q52DXT31ujlB9w8Wr/+Nq5CZf5F2PM0vNtcMiYitKRknz+XVTH7y8jNMKpDJfbJ
-         DlREbXxICMkQhR1fF2AJ8NcjvlMWC+BkGCOJYfLIirifjnhd4UC4+z599bHlomeBIokO
-         FZJg==
-X-Forwarded-Encrypted: i=1; AKwUvByV2MBcw2lMjdCwhkpGKVUK/+nYUQFOmscttrp/JzyJkdg7mzg2114z2X0SXbgzIkTPy0QtvdabFXJ9JQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJmp7epEueHOP2X2LRahlZcWP3zP61W9SWOITn6701gKM7atk93
-	+php/Lq/4Qhyv4gO3hIe0eIXfCmqkBVAwF4HWu4oSNJ7PaErpS/0ibKz/UddCDP7Y2zYbzUjV69
-	MZkeLPSWpND2wPQ==
-X-Received: from pgbdp8.prod.google.com ([2002:a05:6a02:f08:b0:cc7:a092:edd9])
- (user=tadamsjr job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:4b0f:b0:39e:4c80:f67f with SMTP id 98e67ed59e1d1-3a098983faemr14188233a91.30.1790698100830;
- Tue, 29 Sep 2026 09:08:20 -0700 (PDT)
-Date: Tue, 29 Sep 2026 09:08:13 -0700
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="eORPkq/K"
+Received: from [IPV6:2a01:cb10:785:b00:26fb:aefb:6cd2:db0e] ([10.65.86.61])
+	by smtp.orange.fr with ESMTP
+	id BaRhx92f8ikczBaRhxXw2o; Tue, 29 Sep 2026 18:12:45 +0200
+Received: from [IPV6:2a01:cb10:785:b00:26fb:aefb:6cd2:db0e]
+ ([IPv6:2a01:cb10:785:b00:26fb:aefb:6cd2:db0e])
+	by smtp.orange.fr with ESMTPSA
+	id BaRRx1oDtLJYiBaRSxYYGg; Tue, 29 Sep 2026 18:12:38 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1790698358;
+	bh=/CYIGon90Dpyxdyj2gt7ks36c8ww0+aJ1J2OviNXcD4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=eORPkq/KW8MQ+EAJSBy1x5irQF+H5qrTe5xccMDxElj9P2uXgSBHPxUwVpHTVCll6
+	 5SVS/MDDhsDAZGN4AAL0A+pqjb3JpY0oiJi4RmA5a2LsMfvbHjAfYgoydzIlArDdd3
+	 1gNGXNA6SYakaOVh4qsBVXhu7PPIDqHRVc+uJ/UQNcK+k5bW0OlHVkqB8NEKLzVQbj
+	 WrWFK64mS0JYUGD9+lH3bZ6lo+erqhiqIDJbsj/gkK48oHXui/eMVQUzABmKt1pdft
+	 A2BL3SeatpaJfbpiuXOHSGDlcAsarPXrMFwp14ziu6eev4OWwWLbbyK8angPUWfxcq
+	 OziQJNEFIbFpw==
+X-ME-Helo: [IPV6:2a01:cb10:785:b00:26fb:aefb:6cd2:db0e]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 29 Sep 2026 18:12:38 +0200
+X-ME-IP: 2a01:cb10:785:b00:26fb:aefb:6cd2:db0e
+Message-ID: <2620af49-ddd9-4df6-848a-d7c93e8a1c03@wanadoo.fr>
+Date: Tue, 29 Sep 2026 18:12:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <20260929160813.1599129-1-tadamsjr@google.com>
-Subject: [PATCH] block: advance iterator after copy-in for SG_DXFER_TO_FROM_DEV
-From: TJ Adams <tadamsjr@google.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Christian A . Ehrhardt" <lk@c--e.de>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, TJ Adams <tadamsjr@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 01/13] dma-buf: introduce initial file I/O
+ infrastructure
+To: Pavel Begunkov <asml.silence@gmail.com>
+References: <cover.1790602223.git.asml.silence@gmail.com>
+ <c33046bbadce5a2f14aa1874270ec2d10def58ef.1790602223.git.asml.silence@gmail.com>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Content-Language: en-US, fr-FR
+Cc: agk@redhat.com, akpm@linux-foundation.org, anuj20.g@samsung.com,
+ axboe@kernel.dk, bmarzins@redhat.com, brauner@kernel.org,
+ christian.koenig@amd.com, dm-devel@lists.linux.dev,
+ dri-devel@lists.freedesktop.org, hch@lst.de, io-uring@vger.kernel.org,
+ jack@suse.cz, joshi.k@samsung.com, kbusch@kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-nvme@lists.infradead.org,
+ matthew.brost@intel.com, mpatocka@redhat.com, nj.shetty@samsung.com,
+ phil.cayton@intel.com, sagi@grimberg.me, snitzer@kernel.org,
+ sumit.semwal@linaro.org, tushar.gohad@intel.com, viro@zeniv.linux.org.uk,
+ william.power@intel.com
+In-Reply-To: <c33046bbadce5a2f14aa1874270ec2d10def58ef.1790602223.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-When a passthrough request uses transfer direction SG_DXFER_TO_FROM_DEV,
-bio_copy_user_iov() sets up a temporary iterator iter2 with
-data_source = ITER_SOURCE to copy user data into the bio pages before
-execution.
+Le 28/09/2026 à 15:32, Pavel Begunkov a écrit :
+> The goal is to be able to natively use dma-buf in the read-write / IO
+> path. This patch adds basic building blocks serving as a glue and API
+> between drivers and upper layer subsystems providing the uAPI. Later
+> patches implement it for NVMe raw block devices and expose it to the
+> user space via io_uring.
+> 
+> There are two main objects. struct dma_buf_io_ctx and struct
+> dma_buf_io_map. The ctx is used during initial registration and serves
+> as an interface between the upper layer user like io_uring and to the
+> importer subsystem / driver. The map represents the actual dma map
+> established for the target device[s] with dma_buf_map_attachment() and
+> stored in a device specific format. The context is created via a new
+> file operation ->init_dma_buf_io_ctx.
+> 
+> The ctx-map separation exists to support map invalidation (see
+> dma_buf_io_invalidate_mappings()). A ctx can create
+> multiple maps during its lifetime, but there can only be no more than
+> one (active) map attached to it. Invalidation drops the active map
+> if present, and the next map will only be attempted to be created
+> once there is a new request that wants to use the dma-buf IO ctx.
+> 
+> The primary task of the dma_buf_io_map object is to count requests
+> using it and to wait for their completion when we want to destroy the
+> DMA map.
+> 
+> [un]mapping and any work with dma addresses is delegated to the
+> importer driver via an ops table stored in the ctx, see struct
+> dma_buf_io_ops. Only the target driver / subsystem knows about devices
+> it wants to use the dma-buf with, especially in case of multi-device
+> filesystems or stacking in the future.
+> 
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
 
-bio_copy_from_iter(bio, &iter2) copies the data and advances iter2, but
-the original iter is never advanced. Consequently, iov_iter_count(&i)
-remains non-zero in the caller loop in blk_rq_map_user_iov():
+Hi,
+a few nitpicks below, should it help
 
-	i = *iter;
-	do {
-		if (copy)
-			ret = bio_copy_user_iov(rq, map_data, &i, gfp_mask);
+
+> +static void dma_buf_io_kill_maps(struct dma_buf_io_ctx *ctx, bool final)
+> +{
+> +	struct dma_buf_io_map *map;
+> +
+> +	scoped_guard(mutex, &ctx->map_mutex) {
+
+guard() is enough. This saves indentation.
+
+> +		if (final)
+> +			ctx->maps_killed = true;
+> +
+> +		map = rcu_dereference_protected(ctx->map,
+> +					lockdep_is_held(&ctx->map_mutex));
+> +		if (!map)
+> +			return;
+> +		rcu_assign_pointer(ctx->map, NULL);
+> +		percpu_ref_kill(&map->refs);
+> +	}
+> +}
+
 ...
-	} while (iov_iter_count(&i));
 
-Because i is never advanced, blk_rq_map_user_iov() loops indefinitely,
-continually allocating bios and consuming map_data pages until it
-exhausts pages and fails with -EINVAL.
+> +int dma_buf_io_ctx_create(struct file *file,
+> +			   struct dma_buf *dmabuf,
+> +			   enum dma_data_direction dir,
+> +			   struct dma_buf_io_ctx **out_ctx)
+> +{
+> +	struct dma_buf_io_ctx *ctx;
+> +	int ret;
+> +
+> +	if (!file->f_op->init_dma_buf_io_ctx)
+> +		return -EOPNOTSUPP;
+> +
+> +	ctx = kmalloc_obj(*ctx);
 
-Fix this by calling iov_iter_advance(iter, bio->bi_iter.bi_size) in the
-map_data && map_data->from_user branch after bio_copy_from_iter().
+kzalloc_obj() and save the memset() below
 
-Fixes: 13f3956eb568 ("block: Fix WARNING in _copy_from_iter")
-Signed-off-by: Terrence Adams <tadamsjr@google.com>
-Assisted-by: LLM
----
- block/blk-map.c | 1 +
- 1 file changed, 1 insertion(+)
+> +	if (!ctx)
+> +		return -ENOMEM;
+> +
+> +	memset(ctx, 0, sizeof(*ctx));
+> +	ctx->dir = dir;
+> +	ctx->dmabuf = dmabuf;
+> +	get_dma_buf(dmabuf);
+> +	mutex_init(&ctx->map_mutex);
+> +	mutex_init(&ctx->map_create_mutex);
+> +	atomic_set(&ctx->active_maps, 0);
+> +	atomic_set(&ctx->all_maps, 0);
+> +	refcount_set(&ctx->refs, 1);
+> +	init_waitqueue_head(&ctx->maps_wq);
+> +
+> +	ret = file->f_op->init_dma_buf_io_ctx(file, ctx);
+> +	if (ret) {
+> +		kfree(ctx);
+> +		dma_buf_put(dmabuf);
+> +		return ret;
+> +	}
+> +
+> +	if (WARN_ON_ONCE(!ctx->dev_ops ||
+> +			 !ctx->dev_ops->map ||
+> +			 !ctx->dev_ops->unmap ||
+> +			 !ctx->dev_ops->release))
+> +		return -EINVAL;
+> +
+> +	*out_ctx = ctx;
+> +	return 0;
+> +}
+...
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 9cb9605d1f62..2685f6177ceb 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -236,6 +236,7 @@ static int bio_copy_user_iov(struct request *rq, struct rq_map_data *map_data,
- 		ret = bio_copy_from_iter(bio, &iter2);
- 		if (ret)
- 			goto cleanup;
-+		iov_iter_advance(iter, bio->bi_iter.bi_size);
- 	} else {
- 		if (bmd->is_our_pages)
- 			zero_fill_bio(bio);
--- 
-2.56.0.rc1.315.gc6ed9934b7-goog
+CJ
 
