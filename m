@@ -1,117 +1,84 @@
-Received: from outbound.baidu.com (mx16.baidu.com [111.202.115.101])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id C830C36212C;
-	Wed, 30 Sep 2026 03:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.115.101
+Received: from mta1.migadu.com (out-113.mta1.migadu.com [95.215.58.113])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BB8366816
+	for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 04:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790740208; cv=none; b=nyLOv6jL+6EuZMvnMCmp+ZXQxlXmxckAyFBsw5hGm58jvr62T3xbvJ9OoKavdM57y1AT7uFIZeRIxIaHUqhHTx5YxkJZhXdZSy3xK4hCBcJBtB3f/j7OB9IR59hh84YA6QBGJzLiyiEaeYiHcok0q+AyPHFbL2+q+uF2q1EYQqc=
+	t=1790741542; cv=none; b=SQh32clKqLmxeTf3ZRTAEU0Wjl63mAmfDNKQpYOWmatGAQWOGHiW+CZpWgu/i4sEdXKdToM3LLCH4wDqZFIRQ+KBO+ZPWFv/qz3c/bHLDe/w0kX92tTz167c2W3V/1JMT85hVK5NJKqfqlG2PmXpyk0OJM/wrMzCigQgNMEgaBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790740208; c=relaxed/simple;
-	bh=Ic8nqWQeCEBR/NN+vIdgf9HuTys7Ex96tdp1kivxrIc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kg2sYhfkrWij6i5G9pb/cqogZM9zdLnUlM4sITIxwmy2+mULx8MIOgi+AHAo7yYA8moivDvAsINxcsrV7kEx7AbpgODZSFqrae4wgCDEWzk5mhXRFqfQiKjrZqyU2e1KJeru9XkzC5N1C7FqmNBMNrPT6CLCoh9G6MtILc9IfYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b=b5BH2Hn9; arc=none smtp.client-ip=111.202.115.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+	s=arc-20240116; t=1790741542; c=relaxed/simple;
+	bh=5ZodmMk5mazCcATEXU3st4ZtMCZZcl1LFNQi48kL3+c=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=HO7wAHMYUrSA6U5K63Nt12BeElQc5amr2j4mpGfkwAsr2GC7t0zYBIS+1tv40dYt5oY18P9xF2LKXuUqM6P/JMZTVKVhaaT2SSdfgCThThe6MSHHSC3lDYQsAORzpXVGiL88IuhR32YuHky0TX6MT1u4doAwYwDuCQiCYJrYNCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HiODBe9H; arc=none smtp.client-ip=95.215.58.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b="b5BH2Hn9"
-X-MD-Sfrom: lirongqing@baidu.com
-X-MD-SrcIP: 172.31.50.47
-From: lirongqing <lirongqing@baidu.com>
-To: Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>, Geliang Tang
-	<geliang@kernel.org>, Xiao Ni <xni@redhat.com>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH] badblocks: actually round to block boundaries in set/clear/check
-Date: Wed, 30 Sep 2026 11:49:41 +0800
-Message-ID: <20260930034941.1814-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HiODBe9H"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=5ZodmMk5mazCcATEXU3st4ZtMCZZcl1LFNQi48kL3+c=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790741537; v=1; x=1791346337;
+ b=HiODBe9HJYSiStjIaj0hKbWEyCJHh2u7tZa3Sy5HEHm61R7IQSiGrQ3mSNfRPDkakKiNXhUy
+ JC/6NYE9rgobU5kOYroEBvdFT+ardKefMXCg5ge7Qi/MGKQGBVg6D34YjixFFVXkQKWkF9Tn3sT
+ EdRAj5dmvG3ibtbLXaTKc6/8=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 8e53c0bfa2c49de2;
+	Wed, 30 Sep 2026 04:12:17 +0000
+X-Mizu-Trace-ID: 8e53c0bfa2c49de2
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <693c4abd-e074-463d-a859-ac8033982c81@linux.dev>
+Date: Wed, 30 Sep 2026 12:09:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjkjy-exc5.internal.baidu.com (172.31.50.49) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=baidu.com;
-	s=selector1; t=1790740190;
-	bh=/33CsaBKM/LGw8D9fyhF4Ou5EfH0WoXT3K9BKseATzc=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
-	b=b5BH2Hn91Wse1eo3fAaEhpfffAAJWksKYSq55K74HHrnuV2IbS5ezlCflKPfe9DDc
-	 G9kfiWsN/O0bmkxYcAoQbBsAg4HiinHNHz738esREYU3D789EwuplhbXy8XLrjYAJX
-	 O0BrHNtkX4aqjMq06cL54MG27wZLu6bqTgjtESZwIs+453wt9+vL2/I5P9+8hLXnDM
-	 KxwegkgCY1olj4BsIEXgEcmhk8vTQQRpM8Vp3nWJG/HPAbPGrqjnWrng8x36S+VY2Z
-	 w2Ob7YXXJMZmwy5xijrhph6sB2zsvNCiaOXYjphuRZwyHS4yVnPRIXaFKNqW4r8KWD
-	 hfpyBnLDLK7KA==
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>,
+ ameryhung@gmail.com, alexei.starovoitov@gmail.com
+Subject: Re: [RFC PATCH v7 0/4] blk-iocost: BPF struct_ops cost model
+To: Tejun Heo <tj@kernel.org>
+References: <20260924054549.2271705-1-cui.tao@linux.dev>
+ <6f80eca83c87b60398110c3a6d735aec@kernel.org>
+ <4f1571a1-7e56-4264-aa7f-8dce32931ddb@linux.dev>
+ <44f02289433805946d1e3272f626a925@kernel.org>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <44f02289433805946d1e3272f626a925@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: Li RongQing <lirongqing@baidu.com>
+Hello, Tejun.
 
-_badblocks_set(), _badblocks_clear() and badblocks_check() intend to
-round the start/end of a range to the bb->shift block boundary before
-operating on the bad-blocks table. They call rounddown()/roundup() as
-bare statements:
+在 2026/9/30 00:27, Tejun Heo 写道:
+> Hello, Tao.
+> 
+> On Tue, 29 Sep 2026 21:39:00 +0800, Tao Cui wrote:
+>> To make sure I understood correctly: attaching switches the active
+>> model to the attached BPF model, while model=linear and model=bpf
+>> only switch between the attached model and the builtin model without
+>> affecting the attachment itself.  The attachment survives enable=0,
+>> and only .unreg removes it.  Please shout if I still got that wrong.
+> 
+> Yes, except that removing the device also removes the attachment, as
+> ioc_rqos_exit() ejects the model.
+> 
 
-	rounddown(s, 1 << bb->shift);
-	roundup(next, 1 << bb->shift);
-	sectors = next - s;
+Thanks for confirming.  I had left out the device removal case in
+the summary.  v8 keeps the attachment independent from controller state
+and model selection; only .unreg and device removal (where
+ioc_rqos_exit() ejects the model) remove the attachment.
 
-But rounddown()/roundup() (include/linux/math.h) are value-returning
-statement-expression macros; they do not modify their argument in
-place. The results were discarded, so s and next/target were never
-rounded and "sectors = next - s" collapsed back to the original
-length. The whole "if (bb->shift)" block was a no-op, and ranges on
-devices with bb->shift > 0 were stored/queried at raw sector
-granularity instead of being block-aligned -- exactly the "think a
-block is not bad when it is" hazard the _badblocks_clear() comment
-warns about.
-
-Assign the rounded values back so the alignment takes effect.
-
-Fixes: 3ea3354cb9f0 ("badblocks: improve badblocks_check() for multiple ranges handling")
-Fixes: db448eb68629 ("badblocks: improve badblocks_clear() for multiple ranges handling")
-Fixes: 1726c7746783 ("badblocks: improve badblocks_set() for multiple ranges handling")
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- block/badblocks.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/block/badblocks.c b/block/badblocks.c
-index ece64e7..eafdb6a 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -857,8 +857,8 @@ static bool _badblocks_set(struct badblocks *bb, sector_t s, sector_t sectors,
- 		/* round the start down, and the end up */
- 		sector_t next = s + sectors;
- 
--		rounddown(s, 1 << bb->shift);
--		roundup(next, 1 << bb->shift);
-+		s = rounddown(s, 1 << bb->shift);
-+		next = roundup(next, 1 << bb->shift);
- 		sectors = next - s;
- 	}
- 
-@@ -1071,8 +1071,8 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
- 		 * isn't than to think a block is not bad when it is.
- 		 */
- 		target = s + sectors;
--		roundup(s, 1 << bb->shift);
--		rounddown(target, 1 << bb->shift);
-+		s = roundup(s, 1 << bb->shift);
-+		target = rounddown(target, 1 << bb->shift);
- 		sectors = target - s;
- 	}
- 
-@@ -1307,8 +1307,8 @@ int badblocks_check(struct badblocks *bb, sector_t s, sector_t sectors,
- 		/* round the start down, and the end up */
- 		sector_t target = s + sectors;
- 
--		rounddown(s, 1 << bb->shift);
--		roundup(target, 1 << bb->shift);
-+		s = rounddown(s, 1 << bb->shift);
-+		target = roundup(target, 1 << bb->shift);
- 		sectors = target - s;
- 	}
- 
--- 
-2.9.4
+Thanks.
+Tao> Thanks.
+> 
+> --
+> tejun
 
