@@ -1,140 +1,228 @@
-Received: from mail-pz2-f39.google.com (mail-pz2-f39.google.com [74.125.228.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C278837AA95
-	for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 06:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE80457E7D;
+	Wed, 30 Sep 2026 07:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790748489; cv=none; b=uBJ2AvZpWCaszmMuhk66cFE5Ma8+6AjJlnb70NnxBLxH9aFy1/G07PDF/8N3tXJx8Fjj3iZJOrqwgRCEK843z7J2FEG22FNEyXT4KhjtWve6j/PGWneBwyt5RDcdHOCH/qIlW/Bf5ZRg1duc1WbfCcgXi/FxX+rrTNjNTjBrrh0=
+	t=1790751633; cv=none; b=cTQvJbmx5Bkmjfe9oxY2L9mALnpQgzkyrVooAe7P5TiMGOCBbLRmo25DhMRv1bGQvl+xNMtmUh7Xhqomay/bkjEk00jUze3OUqAioK3QdDQHotEI/zkpBa6lOLnOMJA35JRbuZdrpkNpONo5JMCBK92MBgcQ2r4wovtyhT1yyW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790748489; c=relaxed/simple;
-	bh=FQT7C9mEtUI9zyQeAiy/rz7mwvm/L9IqR2P4MCxmtag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pJKDZcnzH+2jAyESJOMvJIV1HdvjF1agxe5SafmTeM9n0q/8vSTUX+88Eua4APy0+qFZRjitunv+YBUJOF5DxENddmyN7D4LljRjSudi+ZNbHNJfGh6Ma1ZU9C+Xe/tABGs1wI1JM78/MJYD9oVRjThIv0fEOdqpKPjpDiDzf0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=GpLOQ885; arc=none smtp.client-ip=74.125.228.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1790751633; c=relaxed/simple;
+	bh=trLXQFtHYQ5ZAwvXSMUt8kTeK7KPe1F8rnyEm70OdBc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A6YosPDxAzL6807OxnF9ioy0X08Lk/vzGAZmhkO447HLlc3PrVsO/K33c87oJOJzQJYMpqwJr1YqObVjTJ0Ak76cdjOGGU4nckB1X8vB047gjOvSB9lJCuaQFaSUnhmdxvnvGs6kRbNKnUt2K8UWauW8rzOkP61Q5D7XK6krf0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=Ep++CEmq; arc=none smtp.client-ip=45.254.49.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GpLOQ885"
-Received: by mail-pz2-f39.google.com with SMTP id 41be03b00d2f7-cc78d59bb02so1884232a12.1
-        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2026 23:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1790748487; x=1791353287; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=CgFmFj2igJGpmbRflOSd7wans++uMlq7r70gUY54Vy0=;
-        b=GpLOQ885YueQnMRr7aYksbM090881sDEr8Fe1usp/q0pr6fKEwx2Cglw8wGIeuqXfo
-         z9+qdro7WLQlY5O7IK5f2JeUGmrO0obUFcd+Na/uUiQIuolwIOhoYcdmwDhyJuUCflos
-         uNc3Zr3tAz8ZSh0r82sTNNcJOP6oSeRIpn2Zg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790748487; x=1791353287;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CgFmFj2igJGpmbRflOSd7wans++uMlq7r70gUY54Vy0=;
-        b=JpgUNGYSFSte6YOmVjHMUyokgzxpgXZmKRX5ZJc04/pwQFi+Zk0HDB4R7giM+6/WBy
-         A+G/PtGmI5torbZ2mmc7WdrZJ8JoIXCxUBsFue9nZrm7bEmksxWlmsI0ub2tYdLHeirL
-         wqhFSPD+gyUy8Dt+KmbOgwAciCWPQY4wx/eI7+YgATSPYPnVSlBw8ByO0lktFQZBKFIf
-         7NxBxmpurFros1V9Eugq8kPgb3t6jOj3yNmVAOrOeGOIyienMXbI+OBQsOZ+ikNAiIi0
-         Cg6Z8Fwx/m5UI9gxOIMnRqpqgep1nkPiQDJLvc/OgVS+SfxQi6hdcfPyfVRZLyrW4V6E
-         fmFQ==
-X-Forwarded-Encrypted: i=1; AKwUvByB7Vy5H6FSfQRWah0373Iknn9ILFH0OwnYn1gR8Xor+XzaszNXge1OqSeHSh8RKsSHuDD4HW562fkgEg==@vger.kernel.org
-X-Gm-Message-State: AFuF++mT9U674Pej2ZuwymyhxSmjvSMZtm46gDM1U8KgGw65sbYGPqv0
-	6K2b1ArFS048yHQ7b9iJsSs099V+yYTjh8GGv50kjjSS0SB9pMLtxgeFgoxQ7PZXeQ==
-X-Gm-Gg: AYBFou3fgq+mycH8DVIEOn9zy9nIRObqyAKSWrURi7UakV40JRmGtje1oBUWDlHjt0a
-	hREiUN0BSTbmdueyVzPs/jHp6g4iIYf82cKtlopa1roDYuMWkT7RgArQmR6ZOBOZITLbBSqLn/b
-	U5FYJypv8YrT8BSoiHmjX3CM788dsb1oiRBxC53HvJEMTMIwUYXjZaVZk7jc35TxrlroKIxDbRq
-	UYMMFp7v+d6iOxVk4VLs92n6IrWIVkX8tRZ/XHPsyZTJmHK8vqeLvBYKvnGYih0Y1/OAGemeg5B
-	0tEVoziWXBh+CJ8U3w31DXgrVmwCtdrUXj1/sfF58qyIKeVAkIau6R0aqi6Ia4RS9BX23LIhPQH
-	+LWOsMGbpLRra5v9rRLEHp1us5msUKuBwEUr/ntQO2QgM04IUvMUtpIG30ueiyTDsemQFyNBw3r
-	HrjaOD8Z3D1CF+JnWRUzrVV6Knb53oPFR5vg7+PvC1n+rQUZ1fyNdAKOjNcV6ubSas89+wvXdp5
-	FIGsM8gxkdWUbznt9zrF59rkXPD4N2Fd4tcVeNeHl2feF5hsA==
-X-Received: by 2002:a05:6a21:492:b0:3de:3bd5:604c with SMTP id adf61e73a8af0-3de9e87f358mr387844637.41.1790748487167;
-        Tue, 29 Sep 2026 23:08:07 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:31b3:f8c3:893a:d0bb])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-88725d68389sm247895b3a.39.2026.09.29.23.08.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2026 23:08:06 -0700 (PDT)
-Date: Wed, 30 Sep 2026 15:07:56 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Michal Wilczynski <m.wilczynski@samsung.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org, 
-	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>, 
-	Nick Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Phillip Lougher <phillip@squashfs.org.uk>, Sungguk <sungguk.na@samsung.com>, 
-	Jaehoon Chung <jh80.chung@samsung.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH RFC 1/9] lib/lz4: import upstream LZ4 sources verbatim
-Message-ID: <aryehUJml8fTy0o-@google.com>
-References: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
- <CGME20260925113452eucas1p170bfdb34dfbf670a14a6f8f0c2f5094a@eucas1p1.samsung.com>
- <20260925-lz4-vendor-upstream-v1-1-1c7ffbe21c4b@samsung.com>
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="Ep++CEmq"
+Received: from PC-202605011814.localdomain (unknown [58.241.16.34])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 4f9a97a15;
+	Wed, 30 Sep 2026 14:59:57 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Runyu Xiao <runyu.xiao@seu.edu.cn>,
+	Jianhao Xu <jianhao.xu@seu.edu.cn>
+Subject: [PATCH] block: amiflop: synchronize flush timer before track flush
+Date: Wed, 30 Sep 2026 14:59:51 +0800
+Message-Id: <20260930065951.2932739-1-runyu.xiao@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260925-lz4-vendor-upstream-v1-1-1c7ffbe21c4b@samsung.com>
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0aa0f11ce3aa03a1kunm3d7b0fb226d9c3
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaThpOVkoeSEpIQh0YTElPTFYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlOQ1VJT0pVSk1VSE9ZV1kWGg8SFR0UWUFZT0tIVUpLSEpPSE
+	xVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=Ep++CEmq9AB3RQYZNT3ZduHjDuR0DwLUdehd8g3DfVoad9Z2Pjg4pYNoKR6Sx3k+Q/ezI1eeZrCFZno2A5rHe9XCC+w7CHhHo+bPYYwdVsu/9pByiEQM6TotkfVPneT6azCtdIb71djT35xyG0m/d4AaQdhx1dDnzfsj66pFMKc=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=DQqyLL+SSO/iW0ae41xQdf0MHTe1MePD0M0BuhNBpko=;
+	h=date:mime-version:subject:message-id:from;
 
-On (26/09/25 13:27), Michal Wilczynski wrote:
-[..]
+The amiflop track buffer is shared with the timer callback. timer_delete()
+does not wait for an in-flight callback, and that callback can rearm itself
+when it cannot acquire the floppy controller. A synchronous track flush can
+therefore race with the callback.
 
-> +void LZ4_resetStream_fast(LZ4_stream_t* ctx) {
-> +    LZ4_prepareTable(&(ctx->internal_donotuse), 0, byU32);
-> +}
+Stop the timer before synchronous track writes and use timer_delete_sync()
+to wait for any callback already running. Keep callback rearming disabled
+until the write is complete. Apply this to the FDFMTTRK path as well.
 
-[..]
+FDFLUSH, FDFMTTRK and close-time flushes run outside the blk-mq
+request callback. Freeze their queues so an in-flight request cannot
+change the shared track buffer while it is encoded and written. Restart
+the timer if a track remains dirty after a failed flush.
 
-> +void LZ4_attach_dictionary(LZ4_stream_t* workingStream, const LZ4_stream_t* dictionaryStream)
-> +{
-> +    const LZ4_stream_t_internal* dictCtx = (dictionaryStream == NULL) ? NULL :
-> +        &(dictionaryStream->internal_donotuse);
-> +
-> +    DEBUGLOG(4, "LZ4_attach_dictionary (%p, %p, size %u)",
-> +             workingStream, dictionaryStream,
-> +             dictCtx != NULL ? dictCtx->dictSize : 0);
-> +
-> +    if (dictCtx != NULL) {
-> +        /* If the current offset is zero, we will never look in the
-> +         * external dictionary context, since there is no value a table
-> +         * entry can take that indicate a miss. In that case, we need
-> +         * to bump the offset to something non-zero.
-> +         */
-> +        if (workingStream->internal_donotuse.currentOffset == 0) {
-> +            workingStream->internal_donotuse.currentOffset = 64 KB;
-> +        }
-> +
-> +        /* Don't actually attach an empty dictionary.
-> +         */
-> +        if (dictCtx->dictSize == 0) {
-> +            dictCtx = NULL;
-> +        }
-> +    }
-> +    workingStream->internal_donotuse.dictCtx = dictCtx;
-> +}
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+---
+ drivers/block/amiflop.c | 71 ++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 63 insertions(+), 8 deletions(-)
 
-Just a side note,
-there is a bunch of new helpful API added in this release.  Currently,
-we do some memcpy hacks to avoid re-init of lz4 C/D-dict in zram, but
-once this series lands I'll be happy to send some trivial EXPORT_SYMBOL
-patches so that zram (and other lz4 users) can use standard lz4 dict
-API instead of hacks.
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 2932b6653b6f0..a477ada6b1ef5 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -265,6 +265,8 @@ static struct fd_data_type data_types[] = {
+ static struct amiga_floppy_struct unit[FD_MAX_UNITS];
+ 
+ static struct timer_list flush_track_timer[FD_MAX_UNITS];
++static DEFINE_SPINLOCK(flush_track_timer_lock);
++static bool flush_track_timer_stopped[FD_MAX_UNITS];
+ static struct timer_list post_write_timer;
+ static unsigned long post_write_timer_drive;
+ static struct timer_list motor_on_timer;
+@@ -1370,11 +1372,22 @@ static void flush_track_callback(struct timer_list *timer)
+ 					sizeof(flush_track_timer[0]);
+ 
+ 	nr&=3;
++	spin_lock(&flush_track_timer_lock);
++	if (flush_track_timer_stopped[nr]) {
++		spin_unlock(&flush_track_timer_lock);
++		return;
++	}
++	spin_unlock(&flush_track_timer_lock);
++
+ 	writefromint = 1;
+ 	if (!try_fdc(nr)) {
+ 		/* we might block in an interrupt, so try again later */
+-		flush_track_timer[nr].expires = jiffies + 1;
+-		add_timer(flush_track_timer + nr);
++		spin_lock(&flush_track_timer_lock);
++		if (!flush_track_timer_stopped[nr]) {
++			flush_track_timer[nr].expires = jiffies + 1;
++			add_timer(flush_track_timer + nr);
++		}
++		spin_unlock(&flush_track_timer_lock);
+ 		return;
+ 	}
+ 	get_fdc(nr);
+@@ -1421,6 +1434,35 @@ static int non_int_flush_track (unsigned long nr)
+ 	return 1;
+ }
+ 
++static void flush_track_timer_stop(unsigned int drive)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&flush_track_timer_lock, flags);
++	flush_track_timer_stopped[drive] = true;
++	spin_unlock_irqrestore(&flush_track_timer_lock, flags);
++
++	timer_delete_sync(flush_track_timer + drive);
++}
++
++static void flush_track_timer_start(unsigned int drive)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&flush_track_timer_lock, flags);
++	flush_track_timer_stopped[drive] = false;
++	if (unit[drive].dirty)
++		mod_timer(flush_track_timer + drive, jiffies + 1);
++	spin_unlock_irqrestore(&flush_track_timer_lock, flags);
++}
++
++static void flush_track_timer_sync(unsigned int drive)
++{
++	flush_track_timer_stop(drive);
++	non_int_flush_track(drive);
++	flush_track_timer_start(drive);
++}
++
+ static int get_track(int drive, int track)
+ {
+ 	int error, errcnt;
+@@ -1435,8 +1477,7 @@ static int get_track(int drive, int track)
+ 	}
+ 
+ 	if (unit[drive].dirty == 1) {
+-		timer_delete(flush_track_timer + drive);
+-		non_int_flush_track (drive);
++		flush_track_timer_sync(drive);
+ 	}
+ 	errcnt = 0;
+ 	while (errcnt < MAX_ERRORS) {
+@@ -1562,6 +1603,12 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 	case FDFMTTRK:
+ 		if (param < p->type->tracks * p->type->heads)
+ 		{
++			flush_track_timer_stop(drive);
++			if (unit[drive].dirty == 1 &&
++			    !non_int_flush_track(drive)) {
++				flush_track_timer_start(drive);
++				return -EIO;
++			}
+ 			get_fdc(drive);
+ 			if (fd_seek(drive,param) != 0){
+ 				memset(p->trackbuf, FD_FILL_BYTE,
+@@ -1570,6 +1617,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 			}
+ 			floppy_off(drive);
+ 			rel_fdc();
++			flush_track_timer_start(drive);
+ 		}
+ 		else
+ 			return -EINVAL;
+@@ -1591,8 +1639,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 	case FDDEFPRM:
+ 		return -EINVAL;
+ 	case FDFLUSH: /* unconditionally, even if not needed */
+-		timer_delete(flush_track_timer + drive);
+-		non_int_flush_track(drive);
++		flush_track_timer_sync(drive);
+ 		break;
+ #ifdef RAW_IOCTL
+ 	case IOCTL_RAW_TRACK:
+@@ -1611,9 +1658,15 @@ static int fd_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 			     unsigned int cmd, unsigned long param)
+ {
+ 	int ret;
++	unsigned int memflags = 0;
++	bool freeze_queue = cmd == FDFMTTRK || cmd == FDFLUSH;
+ 
+ 	mutex_lock(&amiflop_mutex);
++	if (freeze_queue)
++		memflags = blk_mq_freeze_queue(bdev->bd_disk->queue);
+ 	ret = fd_locked_ioctl(bdev, mode, cmd, param);
++	if (freeze_queue)
++		blk_mq_unfreeze_queue(bdev->bd_disk->queue, memflags);
+ 	mutex_unlock(&amiflop_mutex);
+ 
+ 	return ret;
+@@ -1711,11 +1764,12 @@ static void floppy_release(struct gendisk *disk)
+ {
+ 	struct amiga_floppy_struct *p = disk->private_data;
+ 	int drive = p - unit;
++	unsigned int memflags;
+ 
+ 	mutex_lock(&amiflop_mutex);
++	memflags = blk_mq_freeze_queue(disk->queue);
+ 	if (unit[drive].dirty == 1) {
+-		timer_delete(flush_track_timer + drive);
+-		non_int_flush_track (drive);
++		flush_track_timer_sync(drive);
+ 	}
+   
+ 	if (!fd_ref[drive]--) {
+@@ -1725,6 +1779,7 @@ static void floppy_release(struct gendisk *disk)
+ #ifdef MODULE
+ 	floppy_off (drive);
+ #endif
++	blk_mq_unfreeze_queue(disk->queue, memflags);
+ 	mutex_unlock(&amiflop_mutex);
+ }
+ 
+-- 
+2.34.1
+
