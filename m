@@ -1,169 +1,124 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C434E4C38
-	for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 12:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5CF448B9B
+	for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 12:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790772567; cv=none; b=Z9htvnzFl2nTq2/k5IXtzn0h/44SLxUrjV9xlUUKqJgQx9PlkEh/HirvlBikaqejOHy0CiQpxv1P4vMbvaUwIAJHyGGjMUs8QeGqkqDHo+M0i3X95DmNk4oPwtF5CRlXHAqFZaQvgSNzZsGWL7OUZ2QAJ9ohJgHAcU1S5mQBu+Q=
+	t=1790772809; cv=none; b=bKEvHQzO11xpL9JUoH2v8y2h/jemMj/4NC9lylflcQc3J7Wn6xKiakPOYSGCXuIGNclngD/JOj/IB/Tmn9bWb1BXXkZhIBDx9O4qGvwEXBVIjEzhUlaQ3KRFInyRhsujYYPHVRXBF9I1nGGOK/ucTG58T6dVxiDfN+dlvrO++LQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790772567; c=relaxed/simple;
-	bh=TdyzSTHL7WYOVSGbZvbctK9FEuEdU7OX2Rp7WBlcsZU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gn0soShgO6JGlnHnjRygwQQE5UQpcT1eAcQI4qsbVgKY2YsXRnLBBoZ5A18q5p66d2Hyj5r/RDYG0j9D5NPXDeYIYY7S3V1LlctptXNu8wnVKrUX9og918iFdd9GfN1K3skVTUZDHfFw4m0BzRuTKrTTXzHng8oBvjvuT0UYsLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E2krLUjP; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790772809; c=relaxed/simple;
+	bh=FFbefN2Y4qRJn5vswr2Uy9xuWqjQECbgHAQFP+xEhfc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LeI3qGbYi9RH9P0RaY9qJxQd43W5ruBWth3OEDTw09I/5P8iNLZcqZ1p/jMhMuB2t62tiQoln3RLY5WFT+uQQ1d1n5r3eoYAXvSn8VSfxU4Io8H6oVGYtz1ELmAeQPXnxkxhwUGJsVEV093h2/4Ih/dpfllazJHxUBZSHwXuvXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h1mDB9BJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E2krLUjP"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ffde3cec6so22696665e9.3
-        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 05:49:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790772554; x=1791377354; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/dhWIKwIs8lapn2MMhEevzHPS2BYYvsR1AqGmdi+y+4=;
-        b=E2krLUjPpvrjrc3xDD1ruwYeGrnztUDpB0EbXuqQ64ya+ghgwLzJB+1E5NNBi3dNmk
-         ewgRuZ2yH28PCIEOpx8O5+lO4q6b7LiYehDLuET1lwy0FEs/jtsNRqUavw+Sm9UpWepO
-         HFH3PDxavM68qWrzFfHptgwr0V/ux8XT8/IEzXHe/L1fwZSIFaTgSkv3seMwvR6eYmMh
-         o4xgSUAIq1BWV8z5HbTekS6MAGp3aFxVP+7DLov7ntg9RGoIb/IwiFYaTTDU3biKzWZq
-         yDB9TY9Rj4BnIA7cY177iiWNXZCg0b7gsuuRyq+8qlvtW9lcwTN748kT+6OZNQI2TXkU
-         CduQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790772554; x=1791377354;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/dhWIKwIs8lapn2MMhEevzHPS2BYYvsR1AqGmdi+y+4=;
-        b=v8Eu7aSxyKM7YMEUghMw/Jh3BMnH17U58KwjcTF5XZjMU14+Nq1S57i6wnpF4L1YIt
-         ohDpx8uCxBf8fn3n2QC6s49xrEuoISagM5RnCYoQBK+VqqKR6UnEA/YGhbNLVK8i3Xcf
-         1bq64VeGAuExc91ZA/3iSClwkcLr4fCtsnyJciBMoGEnrIgePgXFW6hCmXCvpvr4Y6DE
-         AZ4zWmqIcIi/SSCVtlwxHvNGo6HZsg6tvf+eTZ4RIF0H4/YSjA6rlVMwh4bEe1C6Z4wE
-         YR0oP7Nmu5SBrJN6ARH3EQXYGU5VKSjZgClC6ABg0ww/2Jhjzg46cS6YHTSJtxXTzpza
-         kGRA==
-X-Gm-Message-State: AFuF++mmXVXFmYXYA1OZ2K+deoaLZtQzR2WGtPp4aMmgUqh6C6/jSxI9
-	hoqzEjE5nWZATuOA+3M5XUIcM9FWTnjCogZKZkN5UrFZqUJT+QTivKuf
-X-Gm-Gg: AYBFou1djOD0S5T0XC7D6tRA1/ltklJB/lG460hj8JQUOPCNWtZwSrCZJd4qO1xojAY
-	cRxE72JTmr6VyympKdtiiI/AbSDzD61y4pHwtaqJWP+9SagM29y0MGC8P9c8QHeRTfHg94zryvv
-	ZzL+FAnioQxCv8V0aHzLR0UL2fvp8rcgBSEBRniDivZG3r56UhQhWeQDaGLlrv9qlsFxVFMHJEQ
-	HnsfB94voxBYV7lVJ1Bd4MQmmjU5AUHIk46hTcUvcvf0TbaNURjNMJScV1nCywcKyg0BjV+Wvxr
-	sZynxJRU8YXMhOdn/xBU9hkDlTQVC8oTx0WD3hUIv3BOj0CSirmLAMjmLSF/ZVIIIQgOrhJiUuW
-	TcafbMUCawv2MAhcfbh8Jygt6Z5iGfu8kY10I9ra8tLubo3eChCoc/YOqnU9qJ3YxMeAlJ9oIt0
-	P4sWY/j/3/QR91YUOfH2hpI7TjTSjVa0aP1iV3G+lj+gQosixwMVJ9Zfz8EzyV5L1msBoR2HjCb
-	t3JUHcNBFChRu2ZgHdb+23CPgcxrW8Ie+pPtQs2QOQKor6B07MswdloQ2v0AYQtADNNPDVIdy5X
-	QVwGAMjHwpJAWzzQHEa05F3YAheRZnO3RGss
-X-Received: by 2002:a05:600d:864b:10b0:4a0:2dd:7573 with SMTP id 5b1f17b1804b1-4a01b12b666mr16604625e9.33.1790772554145;
-        Wed, 30 Sep 2026 05:49:14 -0700 (PDT)
-Received: from [10.54.182.141] (82-132-212-25.dab.02.net. [82.132.212.25])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a01cb8abc1sm3766935e9.0.2026.09.30.05.48.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Sep 2026 05:48:57 -0700 (PDT)
-Message-ID: <c07404e0-33f6-4e5f-a80a-e1901b42dc39@gmail.com>
-Date: Wed, 30 Sep 2026 13:48:49 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1mDB9BJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790772794;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TrGq5iY6/w2n25N0igq41iNBSv1Z7z5H/VJULRFdP7Y=;
+	b=h1mDB9BJ2qtCTL0yRbrH+f8NEgddzXzm+dTu3i7oisMN1JV4pfYaiI3XFVsRmSgrLRFOJr
+	yVyl5Cm4qGr3wgXBjBfPizeOZuJb3IPwab0ZNGC+N+BL/PwOoMy2aNxALVKYSeeswkJEeh
+	Vn6/+ycVKX30NpKxZ01utBjoww4pdyc=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-583--1saaqWWPBOqK-NNFMlbfg-1; Wed,
+ 30 Sep 2026 08:53:10 -0400
+X-MC-Unique: -1saaqWWPBOqK-NNFMlbfg-1
+X-Mimecast-MFC-AGG-ID: -1saaqWWPBOqK-NNFMlbfg_1790772788
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8309718A5C7F;
+	Wed, 30 Sep 2026 12:53:06 +0000 (UTC)
+Received: from warthog.com (unknown [10.44.32.54])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CA49C1800361;
+	Wed, 30 Sep 2026 12:52:59 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH v14 01/10] Add a function to kmap one page of a multipage bio_vec
+Date: Wed, 30 Sep 2026 13:52:36 +0100
+Message-ID: <20260930125247.3232130-2-dhowells@redhat.com>
+In-Reply-To: <20260930125247.3232130-1-dhowells@redhat.com>
+References: <20260930125247.3232130-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 01/13] dma-buf: introduce initial file I/O
- infrastructure
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: Matthew Brost <matthew.brost@intel.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
- Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
- William Power <william.power@intel.com>, Phil Cayton
- <phil.cayton@intel.com>, Alasdair Kergon <agk@redhat.com>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
-References: <cover.1789997898.git.asml.silence@gmail.com>
- <5490ee42c4452fd4198b245ead20fcf7438c066e.1789997898.git.asml.silence@gmail.com>
- <arx7ZQ8o9aeHsAqS@gsse-cloud1.jf.intel.com>
- <447c04dd-6bfa-4c45-99e7-37d25a7ab539@gmail.com>
-Content-Language: en-US
-In-Reply-To: <447c04dd-6bfa-4c45-99e7-37d25a7ab539@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 9/30/26 11:08, Pavel Begunkov wrote:
-> On 9/30/26 04:00, Matthew Brost wrote:
->> On Mon, Sep 21, 2026 at 02:38:45PM +0100, Pavel Begunkov wrote:
-> ...>> +struct dma_buf_io_map *dma_buf_io_create_map(struct dma_buf_io_ctx *ctx)
->>> +{
->>> +    struct dma_buf *dmabuf = ctx->dmabuf;
->>> +    struct dma_buf_io_map *map;
->>> +    long ret;
->>> +
->>> +    guard(mutex)(&ctx->map_create_mutex);
->>> +
->>> +    scoped_guard(mutex, &ctx->map_mutex) {
->>> +        if (ctx->maps_killed)
->>> +            return ERR_PTR(-ENOENT);
->>> +        /* recheck under the lock in case it has already been re-created */
->>> +        map = __dma_buf_io_get_map(ctx);
->>> +        if (map)
->>> +            return map;
->>> +    }
->>> +
->>> +    dma_buf_io_wait_active_maps(ctx);
->>> +
->>> +    ret = dma_resv_lock_interruptible(dmabuf->resv, NULL);
->>> +    if (ret)
->>> +        return ERR_PTR(ret);
->>> +
->>> +    ret = dma_resv_wait_timeout(dmabuf->resv, DMA_RESV_USAGE_KERNEL,
->>> +                    true, MAX_SCHEDULE_TIMEOUT);
->>> +    if (ret <= 0) {
->>> +        if (!ret)
->>> +            ret = -EAGAIN;
->>> +        dma_resv_unlock(dmabuf->resv);
->>> +        return ERR_PTR(ret);
->>> +    }
->>> +
->>> +    map = ctx->dev_ops->map(ctx);
->>
->> I'm playing around this code now.
->>
->> I think you need the dma_resv_wait_timeout after the 'map'?
->>
->> If a device doesn't support p2p ->map() will typically trigger an async
->> migrate to system memory and data will be moving but the map is valid -
->> Xe 100% does this, I checked AMDGPU and fairly confident it has the same
->> async behavior.
-> 
-> There is a wait right before because I read somewhere in dma-buf
-> comments that I need to do that, sounds a bit odd if I need to
-> wait on fences before and after. I can add it, just curious how
-> come that other dma_buf_map_attachment() callers don't need to do
-> that. Or maybe they wait somewhere else?
+Add a function to kmap one page of a multipage bio_vec by offset (which is
+added to the offset in the bio_vec internally).  The caller is responsible
+for calculating how much of the page is then available.
 
-I can't find it, so maybe it was the comment below and I mixed
-sth up back then. I'll move it after ->map().
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: linux-block@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ include/linux/bvec.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-
-* Note that for non-dynamic exporters the driver must guarantee that
-* that the memory is available for use and cleared of any old data by
-* the time this function returns.  Drivers which pipeline their buffer
-* moves internally must wait for all moves and clears to complete.
-* Dynamic exporters do not need to follow this rule: For non-dynamic
-* importers the buffer is already pinned through @pin, which has the
-* same requirements. Dynamic importers otoh are required to obey the
-* dma_resv fences.
-*
-
--- 
-Pavel Begunkov
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index fc566ee1c1ff..df9ce860e787 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -343,4 +343,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+ 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
+ }
+ 
++/**
++ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
++ * @bvec: bvec to map
++ * @offset: Offset into bvec
++ *
++ * Map the page containing the byte at @offset into the kernel virtual address
++ * space.  The caller is responsible for making sure this doesn't overrun.
++ *
++ * Call kunmap_local on the returned address to unmap.
++ */
++static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
++{
++	offset += bvec->bv_offset;
++
++	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
++		(offset & ~PAGE_MASK);
++}
++
+ #endif /* __LINUX_BVEC_H */
 
