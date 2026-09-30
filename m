@@ -1,128 +1,128 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906CF38F249;
-	Wed, 30 Sep 2026 19:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DA9443E28;
+	Wed, 30 Sep 2026 19:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790797461; cv=none; b=RZ82BSLaRu2cH+owV992iOSmKy7CjSLmKbzoOR6TMCZTaRpk0NkvzY/RgqF/+7b02jcS1hHbSVbzm7IHXpikjZLhXQrbizZOOMU72b8My64t4PHy91QZ5WyPAi51JEmUnEZR1Qu4ln0XdjpSX/kAnsFT8un7oOx0Sxy/THwFX5g=
+	t=1790797814; cv=none; b=PiLf5ETrCjNwC53Y+XcoJ/Iy4uLn5m6Ilksa4WqMpG0y4evvTEvxbWIhyJI8rKEWx+EGgt4gTKssmO4YHINvsRd650579wTajfKBv4uR1HH0m/9wd4OLip5OjAwX+0ZTQlEoaxXAwCw932W8eWQYQGCllaD1u4+ZXcqJSy1k5lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790797461; c=relaxed/simple;
-	bh=leG+KYeMecwefNn3L8fO7Ys/JSrQICGvkRv9x3AvfgE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CAp3oRyVv/+BMSxlm2BCMrUd8V/XAYfIU9u+0i7EkSbcpyfG8U10Ry0yzuqFTa+OtKkTfs7LeT1AzaCSJODXzjq5sZbdfS7b8zjtqHRajmaeH4fKKRzY+Gc2T1RUpne5KZpBK0CVxj1+cx3bF72zWOt1RxibadKfyEHGP5oDM6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LPNkegk9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790797814; c=relaxed/simple;
+	bh=r64/YGNqeKa/6cWMFRJ2ShfQThhxpAU8t2rpVlkX/xE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=GQdOrWV9RnOpcZbFjSJk55SIxvmeiYqxcKYb5zdq/yaDN3nWQ5QiZ397iyXDIuS38J1GJIOKG2FGyoB3HORX8WyL7Q6BmYPinqiHp5rHFo0uyxWc6qwecdLGAAPqp38CRLbklgJQckQ/JTCw85VnQ1Tx5gqWbtx80oVQKpDcjdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMCJ/Vfn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LPNkegk9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4431D1F000FF;
-	Wed, 30 Sep 2026 19:44:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMCJ/Vfn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 311641F000FF;
+	Wed, 30 Sep 2026 19:50:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790797460;
-	bh=OFImjkr9ZJupqvHYnBoqpp0icOp41KnUwRZeP8bQc5I=;
-	h=From:Date:Subject:To:Cc;
-	b=LPNkegk9RXC05RGxdiAl4ldyTuAeoeyViY0lP+p34gdbBl6CcI6PNu7f6q08ghDGT
-	 NL6rN8YsDe3YEcIxBxUO2jbgoMw0egQzmF7ivQ1EsvMEM427qqQgVhUBUdRvRnfba2
-	 TbtLNRUgZ3EkmHvOw0OBcKYpsDacdqFZB9jZt1KapL+pQurYP4icnrZZsw9XB+PRRd
-	 ZNBX78lSQK6Ejg3Oa9febQIigI5NvUi+nCDRLvQYZYmZzZj/Wo9299VkUlqbCOWB31
-	 Si/D3X+k5HrfBpz+YyqjtATXApXhN8ZaA8P0e6fQufzNRNq9C6/Y549/CF1Roma6O8
-	 NCtVUK0gQzTEw==
+	s=k20260515; t=1790797811;
+	bh=RdjWz/lV3EZK739lTtEqZ4pnzC5Y8vW4LYebFMoQQmA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=WMCJ/VfnLq/+bhqf9NwAj05iZJwhJMSV9tlZ8zUMftderxjWUyAAMtL0oQ0DrWIn4
+	 fcOYSZ3xUU4T6JdNQnTB/vCSrLNzIGd1JCKe0wXiAxgoSFZVECg18PNQPDJV5r/Cub
+	 k2/miVS3iqdFK2jNmAskwfpOQCMkevMWPPjVQeaBdx5zO/3eqT7uUHkNigsht7qoSz
+	 SZhsn1BniXa3ASqkWpi2vk8psvkLJ/kvjGV/hc8GUL4IlOj0sonyrm9c1bVWfziTBL
+	 f7Nw/S7oB/B7dbFOP1ZUAKE3SAiI4zzBIgF129FB+jYGbtEq4fTPC0znG9akaphUqI
+	 X/ixEouMTuZew==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Wed, 30 Sep 2026 21:43:55 +0200
-Subject: [PATCH] rust: block: implement `Send` and `Sync` for `TagSet`
+To: Gary Guo <gary@garyguo.net>, Thorsten Leemhuis <linux@leemhuis.info>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: Boqun Feng <boqun@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Gary Guo
+ <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Benno
+ Lossin <lossin@kernel.org>, Alice
+ Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo
+ Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>,
+ Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
+ <acourbot@nvidia.com>, Onur =?utf-8?Q?=C3=96zkan?= <work@onurozkan.dev>,
+ linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alvin
+ Sun <alvin.sun@linux.dev>, stable@vger.kernel.org, Priya Bala
+ Govindasamy <pgovind2@uci.edu>, Dylan Zueck <dzueck@uci.edu>, Yuan Tan
+ <ytan089@ucr.edu>, Sophon Z <aiqubits@hotmail.com>, Qingxiao Xu
+ <qingxiao@tamu.edu>, Malte Wechter <maltewechter@gmail.com>, Mark Brown
+ <broonie@kernel.org>, Linux kernel regressions list
+ <regressions@lists.linux.dev>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: [GIT PULL PATCH 0/9] Rust changes for v7.4-rc1
+In-Reply-To: <DLSRC2ORPMSV.2W8O7S95JLAXM@garyguo.net>
+References: <20260929-rust-block-for-v7-4-rc1-b4-v1-0-642a4c1aebd7@kernel.org>
+ <179068244058.1205226.1765319338142659278.b4-ty@b4>
+ <d1381ed8-eab8-4fd7-8b15-1e94876d7099@leemhuis.info>
+ <DLSRC2ORPMSV.2W8O7S95JLAXM@garyguo.net>
+Date: Wed, 30 Sep 2026 21:49:56 +0200
+Message-ID: <87zewya597.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260930-tag-set-send-sync-v1-1-51acdb36f4bb@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAHpmvWoC/yXMMQ6DMBBE0augrVnJJoAEV4koiD0hm8JEXoMSI
- e6OIcUUr5i/kSIKlPpio4hVVOaQYcuC3GsME1h8NlWmak13M5zGiRUpL3jWX3Dsat/WjW1gYSj
- /PhFP+V7N+/C3Lo83XDpDtO8HiZZuRnUAAAA=
-X-Change-ID: 20260930-tag-set-send-sync-c4d64515e1e0
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Thorsten Leemhuis <linux@leemhuis.info>, Boqun Feng <boqun@kernel.org>, 
- Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Tamir Duberstein <tamird@kernel.org>, 
- Alexandre Courbot <acourbot@nvidia.com>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
- linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2010; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=leG+KYeMecwefNn3L8fO7Ys/JSrQICGvkRv9x3AvfgE=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqvWaAXiJhiIrfd2oNYRlrnpRfVkoC3C6m8r4DH
- VY6XRN7LkyJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCar1mgAAKCRD6UCkIqsW9
- 0JYED/4n5gj6Blm4y7ot1QcNTsHXJ+I1rgKjbWpH2WbtKyBSUTjmHFwJ68YPJ2C58FfNE3yntOy
- FS6FkfYYmt40M5KXL9Fg1ZAwKEBWIQdYAM0SFWc1ZzorNBEgxqzZDfnL19TB562O/zoUEwhe7fY
- Ru9jbfOeRKTiQviVkd1uiN9zA+i0KXoStglEgoceL4u15dBqeGaBkV6GSpkH17l4AqzL7K/tOQW
- kpAWqH0GooXvncxrRwsHMKZptJqd5R5745Z1A7Ge6WjTzLam1uV2y3jJsATizbtH44jrtwRs+gw
- 2VzxfEZneBnoTIEperYhFc7WrPS8l74A0yV9CM8nvkRwNu0NTn6ysVosxeornosqhKF1qrjfh3X
- umXd4lmvkgVDvxsjd5PUBd6yjj+ssQV0tsACJ48/jCTgyR5GeDW8dDSGAtM9YHZTTW6FlpSQqQi
- fGyla98K74N5YrXBJrZ6ykT1YeI9Y+kwuVOjCKhEJ4XkXBD/nGbvhkZQ5NhkMBHKN/YbaBM0Ayu
- /OFiMupuwKTbNFGhUrp3Pz+JLne7QIFXt5PZ1yjOIidTorLoUiv0jmDdmzr/IF/K3Gtoeu6F8op
- 8EkVV8kexsffyfv1LibkAdRdiS3g2bTNtsSrjjAwuQP0QtkHlZySVeinvN18xYpH7iF4UWmlKIP
- aOGYoMqmsdCbytA==
-X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
- fpr=3108C10F46872E248D1FB221376EB100563EF7A7
+Content-Type: text/plain
 
-`TagSet` never implemented `Send` or `Sync`. This did not matter until
-commit "rust: block: fix `Send` bound for `GenDisk`" made `GenDisk: Send`
-depend on `Arc<TagSet<T>>: Send`, which in turn requires `TagSet<T>: Send +
-Sync`. With that bound unsatisfiable, `GenDisk` is never `Send`, and the
-rnull driver fails to build once configfs requires `GroupOperations::Child:
-Send`.
+"Gary Guo" <gary@garyguo.net> writes:
 
-`TagSet` owns no data typed by `T`. It only wraps the C `struct
-blk_mq_tag_set`, which can be dropped from any thread by calling
-`blk_mq_free_tag_set`. Thus, implement `Send` and `Sync` for `TagSet`
-unconditionally.
+> On Wed Sep 30, 2026 at 4:06 PM BST, Thorsten Leemhuis wrote:
+>> On 9/29/26 13:47, Jens Axboe wrote:
+>>> On Tue, 29 Sep 2026 11:33:58 +0200, Andreas Hindborg wrote:
+>>>> I have a number of Rust block layer patches I would ask you to pick for
+>>>> v7.4. I have collected them into a patch series as well as a pull request
+>>>> so you can use whatever is easier.
+>>>>
+>>>> The changes cover
+>>>>
+>>>>  - Style and formatting changes.
+>>>>  - Documentation fixes.
+>>>>  - Fixes for missing trait bounds that can cause API unsoundness.
+>>>>  - A change to set the owner of the file operations vtable in `GenDisk`.
+>>>>  - Two bug fixes for the rnull driver.
+>>>>
+>>>> [...]
+>>> 
+>>> Applied, thanks!
+>>>  [...]
+>>
+>> This series showed up in next today and broke the build for me on
+>> various Fedora releases for aarch64 and x86_64; reverting this series
+>> fixed that from a quick build test limited to drivers/block/rnull/
+>>
+>> The full error msg is quote long, find the top of it below. Full log:
+>> https://download.copr.fedorainfracloud.org/results/@kernel-vanilla/next/fedora-rawhide-aarch64/11055137-next-next-all/builder-live.log.gz
+>
+> The `Child: Send` bound is introduced in configfs:
+> https://lore.kernel.org/all/tencent_05937A22D2DA2BAE808EF19E491AA109BC09@qq.com/.
+> So this is more or less a semantic conflict.
 
-Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
-Closes: https://lore.kernel.org/r/d1381ed8-eab8-4fd7-8b15-1e94876d7099@leemhuis.info
-Suggested-by: Gary Guo <gary@garyguo.net>
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
----
-Hi Jens,
+I did not consider the interactions of the two trees together. Good
+thing we have linux-next.
 
-Please pick this patch to resolve a problematic rust configfs/block
-interaction in linux-next [1].
+> However, the fundamental issue is that TagSet never implements Send/Sync, which
+> means that "rust: block: fix `Send` bound for `GenDisk`" will unconditionally
+> strip away the Send implementation, which is problematic.
+>
+> Something like this should fix the issue:
+>
+>     unsafe impl<T: Operations<QueueData: Send>> Send for TagSet<T> {}
+>     unsafe impl<T: Operations<QueueData: Send>> Sync for TagSet<T> {}
+>
+> That said, I am not sure why the GenDisk need to carry `Arc<TagSet<T>>: Send`
+> bound in the first place. Removing it should also fix the issue.
+
+`GenDisk<T>` has a field of type `Arc<TagSet<T>>`, so for `GenDisk` to be
+send, so must `Arc<TagSet<T>>`. That `Arc` may be dropped with the
+`GenDisk` if it is the last reference.
+
+> Also, the `QueueData: Send` bound should be part of the `Operations` trait and
+> not carried around everywhere.
+
+`QueueData` is not involved here. An unconditional implementation is
+fine. I submitted a patch here [1], hopefully Jens can pick it soon so
+next can be unbroken tomorrow.
 
 Best regards,
 Andreas Hindborg
 
-[1] https://lore.kernel.org/r/d1381ed8-eab8-4fd7-8b15-1e94876d7099@leemhuis.info
----
- rust/kernel/block/mq/tag_set.rs | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
-index dae9df408a86..00d29688f920 100644
---- a/rust/kernel/block/mq/tag_set.rs
-+++ b/rust/kernel/block/mq/tag_set.rs
-@@ -83,3 +83,10 @@ fn drop(self: Pin<&mut Self>) {
-         unsafe { bindings::blk_mq_free_tag_set(self.inner.get()) };
-     }
- }
-+
-+// SAFETY: It is safe to transfer ownership of `TagSet` between threads.
-+unsafe impl<T: Operations> Send for TagSet<T> {}
-+
-+// SAFETY: It is safe to share `&TagSet` across threads. `TagSet` exposes no
-+// `&self` methods that mutate the contained `blk_mq_tag_set`.
-+unsafe impl<T: Operations> Sync for TagSet<T> {}
-
----
-base-commit: df2908090cda368b01ff43709f51890076c56157
-change-id: 20260930-tag-set-send-sync-c4d64515e1e0
-
-Best regards,
---  
-Andreas Hindborg <a.hindborg@kernel.org>
-
+[1] https://lore.kernel.org/r/20260930-tag-set-send-sync-v1-1-51acdb36f4bb@kernel.org
 
