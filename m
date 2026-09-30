@@ -1,120 +1,146 @@
-Received: from mta0.migadu.com (out-100.mta0.migadu.com [91.218.175.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DBF3921ED
-	for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 04:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DE23988F1;
+	Wed, 30 Sep 2026 04:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790741795; cv=none; b=iuJ5Gm+xJMLluJGX+K5ydfV5JDvqqk8Fui4V8pSZvpzX5FD+TlFAp4YJddjb/HW4UCVF1rMDLx+3LVJoYCCSXAZBifCydRPTqBWAl22Sg7Vo1I5S+noHAqXghWY9KOvOgVisixS9zfeXoXypXhpkQihqQfhBTSG4x8+lOm7cMkw=
+	t=1790742229; cv=none; b=lh+j9srww16irO4JwrMiyaJfzT5CX3yuSVz1jvwhMiBDBnK8vOI13QrdoyEGfKnC259mlktpkr9++51zyq4Y8trhzYNodVmEAQBXBn91snQOumMBktfQ+nE34oJZwcY7u5d+lFCqwCjisSXWzRRoT8wlRSoq/lzybnDW7SpsaI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790741795; c=relaxed/simple;
-	bh=tPVU3foMwqReFRMovxRBgLvssWCyPO87vgRcah7Bfo0=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=VFEP2pF4uBHdHDCqD5f/g5bFndNdLePLYjoJG+f9DRCCDuO5C15cNVe0yZMoohZQFsBcsVftC0AIvA+He5ysmxcythDrNIHUm5v3My8wuxJB/L2xcCDzv+vcAQklN2f3Qf7Ep22A29RPAkzZ3VQ4Twnb6lKRiAoBGYkJLZrwzeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wqHb2/ug; arc=none smtp.client-ip=91.218.175.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790742229; c=relaxed/simple;
+	bh=tEvoVm92SRcc3wR2MAis5aion0yu5fgJNFcw/tBO724=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Wc1FXdvmMEmxnodbuOVA4UKUP57WPCgBfR/KyFp4qA36EOjJ/5WGo+alOA6L5mGADZjxXlk3s+xFBdZZHEfTPkGulSHp7AX1fgPGYwm6e5lMQgIOXd5xctMuwaoAjRA57Gx6GYUdaY3MjUCHXNvokTWExJW3X4+BGfV/KDGeYPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=MkPkekU5; arc=none smtp.client-ip=52.35.192.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wqHb2/ug"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=tPVU3foMwqReFRMovxRBgLvssWCyPO87vgRcah7Bfo0=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790741791; v=1; x=1791346591;
- b=wqHb2/ughpwmo8Yqw76dAyYf7g5CO7kMsJKwMBDIduf8Fhwl3YG1mLNjo2AACvtpNK8JqrD5
- Lvk1oFby5Xa4LsgBJzWuBuCsFK7uL/32KA9P9/F0j79yyGNCmcR1wjzuINwzmBQf9UWqy/DBUVS
- t6DWFuxq0qbzoE379Uw4QUqE=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id ac3d7e7d4a45a171;
-	Wed, 30 Sep 2026 04:16:31 +0000
-X-Mizu-Trace-ID: ac3d7e7d4a45a171
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <4f0e79fc-9413-4017-93a2-414b4370781f@linux.dev>
-Date: Wed, 30 Sep 2026 12:14:57 +0800
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="MkPkekU5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1790742226; x=1822278226;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RQ6LqhJbtStj/8tHMNPMmnW3TQt00oYBZzWuVKWCB3Q=;
+  b=MkPkekU582gC53PSM1CoPia5UWPvOuE3oMzmgA1SIwNtySYw+58tOogn
+   K70KFW3r0AGTsY8zffuMiW1VsS0OZh0AsLfie50qjN8Hwk15MiGcPEkAk
+   O2tb+zrMtirAMBWzoVsjUGLMX1bvCZsXxrbxYUfXzN9n/vnU9HFnNZgxu
+   FcD2ZWL1rCfEknBzt6CWKUH/crKrTiltUWU/cc/dqSr8FF/nKcpxiec7I
+   7zK0INTFRrqlYTilYSRfLVXBJ+Zd072X+jlG4gQgBR/P+1ocX5quVQT6u
+   b4SHpAek0XqJOsoenchqPTyyFWWxJtOZm8ze8KP3M6TZcfpCTT499vJdP
+   w==;
+X-CSE-ConnectionGUID: cdD7yDeQRGqxoLYNo2TGHg==
+X-CSE-MsgGUID: aIOTW6p8QnOm+r5EJIID6w==
+X-IronPort-AV: E=Sophos;i="6.27,130,1787011200"; 
+   d="scan'208";a="29768869"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2026 04:23:45 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:20470]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.150:2525] with esmtp (Farcaster)
+ id 1ec46623-0066-4971-b55b-0db7cef9ddf5; Wed, 30 Sep 2026 04:23:45 +0000 (UTC)
+X-Farcaster-Flow-ID: 1ec46623-0066-4971-b55b-0db7cef9ddf5
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Wed, 30 Sep 2026 04:23:45 +0000
+Received: from 6c7e67c92ceb.amazon.com (10.187.170.60) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Wed, 30 Sep 2026 04:23:45 +0000
+From: Nathan Gao <zcgao@amazon.com>
+To: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>, Nathan Gao <zcgao@amazon.com>
+Subject: [PATCH] ublk: return from ublk_wait_dev_ready_and_lock() on group exit
+Date: Tue, 29 Sep 2026 21:23:35 -0700
+Message-ID: <20260930042335.16199-1-zcgao@amazon.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>,
- ameryhung@gmail.com, alexei.starovoitov@gmail.com
-Subject: Re: [RFC PATCH v7 1/4] blk-iocost: add BPF struct_ops cost model
- support
-To: Tejun Heo <tj@kernel.org>
-References: <20260924054549.2271705-1-cui.tao@linux.dev>
- <20260924054549.2271705-2-cui.tao@linux.dev>
- <4412563645504aa9a87d3cafd544c97c@kernel.org>
- <daf428f7-d666-447f-9b6e-a77da4194e91@linux.dev>
- <aeb50cff4d3014a43ded85247a5786da@kernel.org>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <aeb50cff4d3014a43ded85247a5786da@kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hello, Tejun.
+START_DEV and END_USER_RECOVERY wait in ublk_wait_dev_ready_and_lock()
+until the server has issued a FETCH for every I/O tag. ublk defers both
+commands to io-wq, so the wait runs on one of the server's io-wq
+workers.
 
-在 2026/9/30 00:27, Tejun Heo 写道:
-> Hello, Tao.
-> 
-> On Tue, 29 Sep 2026 21:42:51 +0800, Tao Cui wrote:
->> That leaves one race: .unreg may observe a non-NULL ops->q before
->> ioc_rqos_exit() clears it, then block on rq_qos_mutex while the
->> ejection drops the last bdev reference.  This looks analogous to
->> hid_bpf's .unreg vs. destroy_device synchronization.
->>
->> Does that seem acceptable here too, or would you rather have .unreg
->> own the final reference unconditionally?
-> 
-> No, there can't be a crash window like that. The underlying problem is
-> that .unreg sleeps on a mutex inside a queue it holds no reference on. The
-> model should still be ejected when the device goes away, but exactly when
-> doesn't matter much as long as it happens in a reasonable amount of time.
-> 
-> request_queues are RCU-freed, so maybe .unreg can rcu_dereference() ops->q
-> and try to get a queue reference under rcu_read_lock()? blk_get_queue()
-> fails on a dying queue, so this would need a tryget wrapper around
-> q->refs. Holding its own reference, .unreg can then take rq_qos_mutex and
-> test ops->q for NULL to tell whether removal already ejected the model.
-> 
+If the server is killed after fetching only some of the tags, the device
+can never become ready, and the wait can only end on a signal. The
+worker receives the SIGKILL too, but io-wq workers consume it without
+exiting and then run the queued command anyway, so the wait starts with
+no signal pending and never wakes up. Meanwhile the dying server waits
+for that worker in io_wq_put_and_exit(), because io_uring_files_cancel()
+does not cancel a uring_cmd on a non-io_uring file.
 
-.unreg now takes a queue reference before entering the queue: it
-rcu_dereferences ops->q under rcu_read_lock() and uses a queue
-reference tryget helper to keep the queue valid across the mutex wait.  With
-the reference held, .unreg freezes and quiesces the queue, takes
-rq_qos_mutex and re-checks ops->q for NULL, so it can handle both the
-normal detach path and the case where removal has already ejected
-the model.
-> Also, when .unreg detaches, the device is still live and the BPF code may
-> be running. Freezing and quiescing the queue covers the IO paths but not
-> iocg_init() and iocg_free() called from ioc_pd_init() and ioc_pd_free(),
-> so the iocg_free() walk and clearing the model need to be synchronized
-> against those too.
-> 
+The server is left unkillable in D state, and a warning shows up in
+dmesg from WARN_ON_ONCE(time_after(jiffies, warn_timeout)) in
+io_wq_exit_workers():
 
-Clearing the model and the iocg_free() walk are now synchronized
-under q->blkcg_mutex.  This is the same mutex used when
-blkg_create() and blkg_free_workfn() invoke pd_init_fn() and
-pd_free_fn(), so the detach path is synchronized with the normal pd
-callback paths.
+  WARNING: io_uring/io-wq.c:1373 at io_wq_put_and_exit+0x10f/0x2d0, CPU#5: kublk/215924
+  Call Trace:
+   io_uring_clean_tctx+0x85/0xb0
+   io_uring_cancel_generic+0x171/0x340
+   do_exit+0xb7/0x470
+   do_group_exit+0x2c/0x80
+   get_signal+0x8f8/0x940
+   arch_do_signal_or_restart+0x24/0xf0
+   exit_to_user_mode_loop+0xed/0x440
+   do_syscall_64+0x22d/0x500
+   entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-While reworking the attach path, I also fixed two related issues I
-noticed: the attach path no longer uses the ioc after releasing
-rq_qos_mutex, and blkdev_get_no_open() failures are handled
-correctly for unknown dev_t values.
+tools/testing/selftests/ublk/test_generic_17.sh, which kills the server
+part-way through a recovery fetch, hits this in a few percent of runs.
 
-v8 will follow shortly.
+Fix it by returning -EINTR at the top of the wait loop once
+SIGNAL_GROUP_EXIT is set. The flag lives in the signal_struct shared by
+all threads, is set before SIGKILL is sent to each of them, and is never
+cleared, so the worker still sees it after its SIGKILL is gone. If the
+kill arrives after the check, the worker is woken with SIGKILL pending
+and the wait is interrupted as before.
 
-Thanks.
-Tao
+The hang goes back to commit fa8e442e832a ("ublk: honor
+IO_URING_F_NONBLOCK for handling control command"), which moved these
+commands onto io-wq; before it, the wait ran in the thread that receives
+the fatal signal.
 
-> Thanks.
-> 
-> --
-> tejun
+Fixes: fa8e442e832a ("ublk: honor IO_URING_F_NONBLOCK for handling control command")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Nathan Gao <zcgao@amazon.com>
+---
+Tested on v7.3-rc5: unpatched, test_generic_17.sh hangs within 3-45
+iterations; patched, 150 iterations with no hang.
+
+ drivers/block/ublk_drv.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 66eb55e7162e..dac3084cb86a 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -4440,6 +4440,14 @@ static bool ublk_validate_user_pid(struct ublk_device *ub, pid_t ublksrv_pid)
+ static int ublk_wait_dev_ready_and_lock(struct ublk_device *ub)
+ {
+ 	while (true) {
++		/*
++		 * A dying server can never make the device ready. On an io-wq
++		 * worker the SIGKILL may already have been consumed, so check
++		 * the group exit flag rather than signal_pending().
++		 */
++		if (READ_ONCE(current->signal->flags) & SIGNAL_GROUP_EXIT)
++			return -EINTR;
++
+ 		if (wait_var_event_interruptible(&ub->nr_queue_ready,
+ 						 ublk_dev_ready(ub)))
+ 			return -EINTR;
+
+base-commit: 551c722f40809618230001baccf219193e22fc5a
+-- 
+2.50.1
 
