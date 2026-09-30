@@ -1,36 +1,36 @@
-Received: from mta1.migadu.com (out-113.mta1.migadu.com [95.215.58.113])
+Received: from mta0.migadu.com (out-100.mta0.migadu.com [91.218.175.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BB8366816
-	for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 04:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DBF3921ED
+	for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 04:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790741542; cv=none; b=SQh32clKqLmxeTf3ZRTAEU0Wjl63mAmfDNKQpYOWmatGAQWOGHiW+CZpWgu/i4sEdXKdToM3LLCH4wDqZFIRQ+KBO+ZPWFv/qz3c/bHLDe/w0kX92tTz167c2W3V/1JMT85hVK5NJKqfqlG2PmXpyk0OJM/wrMzCigQgNMEgaBI=
+	t=1790741795; cv=none; b=iuJ5Gm+xJMLluJGX+K5ydfV5JDvqqk8Fui4V8pSZvpzX5FD+TlFAp4YJddjb/HW4UCVF1rMDLx+3LVJoYCCSXAZBifCydRPTqBWAl22Sg7Vo1I5S+noHAqXghWY9KOvOgVisixS9zfeXoXypXhpkQihqQfhBTSG4x8+lOm7cMkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790741542; c=relaxed/simple;
-	bh=5ZodmMk5mazCcATEXU3st4ZtMCZZcl1LFNQi48kL3+c=;
+	s=arc-20240116; t=1790741795; c=relaxed/simple;
+	bh=tPVU3foMwqReFRMovxRBgLvssWCyPO87vgRcah7Bfo0=;
 	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=HO7wAHMYUrSA6U5K63Nt12BeElQc5amr2j4mpGfkwAsr2GC7t0zYBIS+1tv40dYt5oY18P9xF2LKXuUqM6P/JMZTVKVhaaT2SSdfgCThThe6MSHHSC3lDYQsAORzpXVGiL88IuhR32YuHky0TX6MT1u4doAwYwDuCQiCYJrYNCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HiODBe9H; arc=none smtp.client-ip=95.215.58.113
+	 In-Reply-To:Content-Type; b=VFEP2pF4uBHdHDCqD5f/g5bFndNdLePLYjoJG+f9DRCCDuO5C15cNVe0yZMoohZQFsBcsVftC0AIvA+He5ysmxcythDrNIHUm5v3My8wuxJB/L2xcCDzv+vcAQklN2f3Qf7Ep22A29RPAkzZ3VQ4Twnb6lKRiAoBGYkJLZrwzeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wqHb2/ug; arc=none smtp.client-ip=91.218.175.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HiODBe9H"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wqHb2/ug"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=5ZodmMk5mazCcATEXU3st4ZtMCZZcl1LFNQi48kL3+c=;
+DKIM-Signature: a=rsa-sha256; bh=tPVU3foMwqReFRMovxRBgLvssWCyPO87vgRcah7Bfo0=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790741537; v=1; x=1791346337;
- b=HiODBe9HJYSiStjIaj0hKbWEyCJHh2u7tZa3Sy5HEHm61R7IQSiGrQ3mSNfRPDkakKiNXhUy
- JC/6NYE9rgobU5kOYroEBvdFT+ardKefMXCg5ge7Qi/MGKQGBVg6D34YjixFFVXkQKWkF9Tn3sT
- EdRAj5dmvG3ibtbLXaTKc6/8=
+ t=1790741791; v=1; x=1791346591;
+ b=wqHb2/ughpwmo8Yqw76dAyYf7g5CO7kMsJKwMBDIduf8Fhwl3YG1mLNjo2AACvtpNK8JqrD5
+ Lvk1oFby5Xa4LsgBJzWuBuCsFK7uL/32KA9P9/F0j79yyGNCmcR1wjzuINwzmBQf9UWqy/DBUVS
+ t6DWFuxq0qbzoE379Uw4QUqE=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 8e53c0bfa2c49de2;
-	Wed, 30 Sep 2026 04:12:17 +0000
-X-Mizu-Trace-ID: 8e53c0bfa2c49de2
+Received: by smtp.migadu.com with ESMTPS id ac3d7e7d4a45a171;
+	Wed, 30 Sep 2026 04:16:31 +0000
+X-Mizu-Trace-ID: ac3d7e7d4a45a171
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <693c4abd-e074-463d-a859-ac8033982c81@linux.dev>
-Date: Wed, 30 Sep 2026 12:09:39 +0800
+Message-ID: <4f0e79fc-9413-4017-93a2-414b4370781f@linux.dev>
+Date: Wed, 30 Sep 2026 12:14:57 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,14 +44,16 @@ Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
  eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
  linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>,
  ameryhung@gmail.com, alexei.starovoitov@gmail.com
-Subject: Re: [RFC PATCH v7 0/4] blk-iocost: BPF struct_ops cost model
+Subject: Re: [RFC PATCH v7 1/4] blk-iocost: add BPF struct_ops cost model
+ support
 To: Tejun Heo <tj@kernel.org>
 References: <20260924054549.2271705-1-cui.tao@linux.dev>
- <6f80eca83c87b60398110c3a6d735aec@kernel.org>
- <4f1571a1-7e56-4264-aa7f-8dce32931ddb@linux.dev>
- <44f02289433805946d1e3272f626a925@kernel.org>
+ <20260924054549.2271705-2-cui.tao@linux.dev>
+ <4412563645504aa9a87d3cafd544c97c@kernel.org>
+ <daf428f7-d666-447f-9b6e-a77da4194e91@linux.dev>
+ <aeb50cff4d3014a43ded85247a5786da@kernel.org>
 From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <44f02289433805946d1e3272f626a925@kernel.org>
+In-Reply-To: <aeb50cff4d3014a43ded85247a5786da@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
@@ -60,24 +62,58 @@ Hello, Tejun.
 在 2026/9/30 00:27, Tejun Heo 写道:
 > Hello, Tao.
 > 
-> On Tue, 29 Sep 2026 21:39:00 +0800, Tao Cui wrote:
->> To make sure I understood correctly: attaching switches the active
->> model to the attached BPF model, while model=linear and model=bpf
->> only switch between the attached model and the builtin model without
->> affecting the attachment itself.  The attachment survives enable=0,
->> and only .unreg removes it.  Please shout if I still got that wrong.
+> On Tue, 29 Sep 2026 21:42:51 +0800, Tao Cui wrote:
+>> That leaves one race: .unreg may observe a non-NULL ops->q before
+>> ioc_rqos_exit() clears it, then block on rq_qos_mutex while the
+>> ejection drops the last bdev reference.  This looks analogous to
+>> hid_bpf's .unreg vs. destroy_device synchronization.
+>>
+>> Does that seem acceptable here too, or would you rather have .unreg
+>> own the final reference unconditionally?
 > 
-> Yes, except that removing the device also removes the attachment, as
-> ioc_rqos_exit() ejects the model.
+> No, there can't be a crash window like that. The underlying problem is
+> that .unreg sleeps on a mutex inside a queue it holds no reference on. The
+> model should still be ejected when the device goes away, but exactly when
+> doesn't matter much as long as it happens in a reasonable amount of time.
+> 
+> request_queues are RCU-freed, so maybe .unreg can rcu_dereference() ops->q
+> and try to get a queue reference under rcu_read_lock()? blk_get_queue()
+> fails on a dying queue, so this would need a tryget wrapper around
+> q->refs. Holding its own reference, .unreg can then take rq_qos_mutex and
+> test ops->q for NULL to tell whether removal already ejected the model.
 > 
 
-Thanks for confirming.  I had left out the device removal case in
-the summary.  v8 keeps the attachment independent from controller state
-and model selection; only .unreg and device removal (where
-ioc_rqos_exit() ejects the model) remove the attachment.
+.unreg now takes a queue reference before entering the queue: it
+rcu_dereferences ops->q under rcu_read_lock() and uses a queue
+reference tryget helper to keep the queue valid across the mutex wait.  With
+the reference held, .unreg freezes and quiesces the queue, takes
+rq_qos_mutex and re-checks ops->q for NULL, so it can handle both the
+normal detach path and the case where removal has already ejected
+the model.
+> Also, when .unreg detaches, the device is still live and the BPF code may
+> be running. Freezing and quiescing the queue covers the IO paths but not
+> iocg_init() and iocg_free() called from ioc_pd_init() and ioc_pd_free(),
+> so the iocg_free() walk and clearing the model need to be synchronized
+> against those too.
+> 
+
+Clearing the model and the iocg_free() walk are now synchronized
+under q->blkcg_mutex.  This is the same mutex used when
+blkg_create() and blkg_free_workfn() invoke pd_init_fn() and
+pd_free_fn(), so the detach path is synchronized with the normal pd
+callback paths.
+
+While reworking the attach path, I also fixed two related issues I
+noticed: the attach path no longer uses the ioc after releasing
+rq_qos_mutex, and blkdev_get_no_open() failures are handled
+correctly for unknown dev_t values.
+
+v8 will follow shortly.
 
 Thanks.
-Tao> Thanks.
+Tao
+
+> Thanks.
 > 
 > --
 > tejun
