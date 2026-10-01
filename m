@@ -1,138 +1,143 @@
-Received: from mail-dy2-f42.google.com (mail-dy2-f42.google.com [74.125.229.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [46.38.247.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32574397E96
-	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 03:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB64A37CD40;
+	Thu,  1 Oct 2026 04:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.247.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790824253; cv=none; b=dpW6A8Ps4fhDjDfOKoiyJHyxNOTgCEvPXylEQ/ry6IZ7indWaO4JZI1ibRykzK3J9TzDtLimWWbkbMwnxHHmlAja08/Pbf+rAokiO+cEp8zs0f0RL7xMUBFUtK7k0PC2eyM5BHCbVMqvk9I4ZLJ9xmsrmYq9KpsVUOiMxw8JixY=
+	t=1790828256; cv=none; b=Q6W3X5WgPRlRik/C/NyUfejSylc2HaEd9h5l9C8AkKBnc5LUHAtkkg4gkQsUueQwPpPWXRVbkkcAlQTGs6tY02qDA2Z7D5OqY8IEKKjFswK7ZzjVUk/jn7XzZeJrT04JHm2O0kRduS4GMSGXcZ2rLnfpDQQ1QCApJ/W5HTVgO9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790824253; c=relaxed/simple;
-	bh=TAte18zOMn93bR8XRFFWxm1cVoOW/U+R0wMOuUoYc0g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=h6cSxSP+MpwVVUdEIELL7+dmRLCX4SuPo/vDwVPZKqN5LndjsASiteyx/qI8+dRyqA72gueKA9/RFFN0hABxBqK59s0a768n5kW5nSQsQuxJkQ1Sck9wawNdyc4OGJrONQnqgMTCbJLB4OAk5DXiGP7xh71/pwQ1GLI2Hk01i54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JKor5eIm; arc=none smtp.client-ip=74.125.229.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790828256; c=relaxed/simple;
+	bh=r4LZXEjnB17/+JSKbqBAL1vyHkFAwGxdyOI1qvGqdG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FQJ+Js2GGklTxVIfAj5huS+dCcjnjgMGlCJBJeVKyYAdE3GlsrHSLfFeP9QFyS8qPh1ShjvuRqVqvQSitdiJXmhwuRiB7nEKcv+eTupG/L0UsCPJHdgWXQJxHqwEyV1DghEQKbys9Ph8lzcFPKipf1sKKdmixWjIgu13INZ1uFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=SIr1BUZo; arc=none smtp.client-ip=46.38.247.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JKor5eIm"
-Received: by mail-dy2-f42.google.com with SMTP id 5a478bee46e88-341d0522b4dso9366439eec.1
-        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 20:10:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790824251; x=1791429051; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=RjqjSmJYD2hGrFXmbh8r2sbLcORlAU84VyhXxxLNgFA=;
-        b=JKor5eImY7XQFwLFOdnohyopCiYLhha+Bvf9eEBGFjf7jjTPMJNz47UNBn5263l8+L
-         wXaCFrcSKR3QCS7ifhCkbMrUb1WoS1JfX2piO1YJTIUAPpI+sDZaqUHuJPFyVsK2Mv0V
-         zgi0NBovSBjXJHtvuuFrwioyChb+xfvFG52eQ1zBooAj2zYNhN5bBpIaw9DdHxzmsPOg
-         /cRJvkRcN1C32y1fpz7c/aJPACikJ9SWL5bQoy7WPnxbuSLNwghwVO9SThkOhPOk+6rb
-         SJgDkybNV8cyUk8RUaqKIihYKLN/zOq9lHvYHHSgKBNUhQA5vnEFg8rpIVTm6sDgJMYn
-         TP2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790824251; x=1791429051;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=RjqjSmJYD2hGrFXmbh8r2sbLcORlAU84VyhXxxLNgFA=;
-        b=yb7ArakL4S8bQdky0THRVoSiEUDf44EQM+TW8tjxVzZ620ehG5vaa9SRG6zUBLsdTa
-         kRsyBGBLetyQDDWjAanOqT68hktRIkcnu5C4+agtZHO8yO8WWYHAp6e3joVngR59h0Eb
-         Rp6b1F0Jer766WEb9j3ZsNX+tm6oWiqnygJaJMScC8g4zXcIymS4dJyDGLuhLpOOR602
-         2jGa7kidkNC0vmgh41bA8RYyGJVZD3T6VCm+/djXiNas/A22mLAR6NGZ6iPzj/72I6QG
-         xnOrpacLDiCMitajXmrn/pZhONNNoGYv7C0854oAqwxR4CCXnkIQaTbUcdCn6X3NXXpm
-         6a3w==
-X-Gm-Message-State: AFq9FYLb7rZP/qLvKKVfaZYwSUSVBvqr7zy/fjMc23PjYsX97sNBZYhP
-	6fxE90MVTk2yeLz+Codj7J3czqzL60aAV+bph7YElP9dzUjoOP7CdKPc
-X-Gm-Gg: AYBFou1izPvDtLuFKgTXPrIt9T+hDxZFd52vI6YcqE4sKKmjfXh1EVn2Tdzb694nXMR
-	9YlIgmQqm3UacV7NqQdGQ1k3gHJsR7AQstQA5pdV8e2t7hnzHo+z2XHiAbDIi/kSdvGBaBFQNZ+
-	7HQqckjgni68xkCssgJCmUtY63i8QXUMaxFCKY+6bawH5HvR21tleICPbQwFoAJfVoBnm8HGJ4y
-	kQcNfHsdE3Jf+djBZSXxtGVA6g4qMJhe9srui7DH2XxfdM8VrEk6x6qd3LGlPKbFGKU6M1zZnQ4
-	JL8LS1CiVf5fdYz/LNXANzoKIj6h49FABN1uuxIxSvSpNTa3y7eKaJH5UYNz6h7VBycJNXJ7bOW
-	Ky+ZE7BZuurJ9GJXoGDToCnZNRs2nZvsqL5DhaZUHsoShyQGEuW302vR7Xn8lHwsYisRfx9BhnN
-	+g+e+RIq1UQOLmSmC+hlkweSHRIolq9aZAWCUvJIxt3gwb05CA702QjYrhVoQd46i7hg==
-X-Received: by 2002:a05:7301:2624:b0:34c:7d49:35cd with SMTP id 5a478bee46e88-34cdbbd5d9dmr3934437eec.11.1790824250861;
-        Wed, 30 Sep 2026 20:10:50 -0700 (PDT)
-Received: from [127.0.1.1] ([23.254.208.9])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34db4c1ef93sm3249517eec.28.2026.09.30.20.10.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Sep 2026 20:10:50 -0700 (PDT)
-From: Qiliang Yuan <odys.yuan@gmail.com>
-Date: Thu, 01 Oct 2026 11:10:47 +0800
-Subject: [PATCH] ublk: drop the device reference outside ublk_ctl_mutex in
- DEL_DEV
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="SIr1BUZo"
+Received: from mors-relay-8404.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4hwJPl0S3gz8K94;
+	Thu,  1 Oct 2026 06:11:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1790827883;
+	bh=r4LZXEjnB17/+JSKbqBAL1vyHkFAwGxdyOI1qvGqdG8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SIr1BUZoFhILUJUaTeF5SteiQI8l8asOfJ7Wr0G/aCi1Dl144gWvHErj5ZLYLNeIf
+	 lJUzLSWApp52RK9U7YK9BZim/dvZoj+mrpB4qUTN4xEyHVoMKEJaFGgFVNOoWBs4vr
+	 o6m0lNfSV98oE+5tw5fqEdt0XKQJLZpt1h+FfCD5/AoVsYZH96CtzGdO7Q+PU/skH+
+	 rkHSnNEM3TyJWCy9VYkTcXyRzb5RqExNCDXvsVW/5X8Cf3BeLGq0EAuU5nQPjVheEQ
+	 dE7ja4Q6FAiUN9MSiE4ENathBo8y2uFmVqIc4+WqyafPX59TkOKfCzOPZ4FZlKSt+9
+	 gFYQ0wI/u2/mQ==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4hwJPj16csz4yCp;
+	Thu,  1 Oct 2026 06:11:21 +0200 (CEST)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4hwJPg6hPBz8svJ;
+	Thu,  1 Oct 2026 06:11:19 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id A318E5F8CD;
+	Thu,  1 Oct 2026 06:11:14 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=linux@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <b4b051e1-b312-46e7-ae68-395491aa900e@leemhuis.info>
+Date: Thu, 1 Oct 2026 06:11:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] rust: block: implement `Send` and `Sync` for `TagSet`
+To: Andreas Hindborg <a.hindborg@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Boqun Feng <boqun@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
+ Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>,
+ Daniel Almeida <daniel.almeida@collabora.com>,
+ Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
+ <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
+ linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260930-tag-set-send-sync-v1-1-51acdb36f4bb@kernel.org>
+From: Thorsten Leemhuis <linux@leemhuis.info>
+Content-Language: de-DE, en-US
+Autocrypt: addr=linux@leemhuis.info; keydata=
+ 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 MEK4
+In-Reply-To: <20260930-tag-set-send-sync-v1-1-51acdb36f4bb@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261001-bug-ublk-del-dev-put-unlocked-v1-1-18e9bb9be727@gmail.com>
-X-B4-Tracking: v=1; b=H4sIADbPvWoC/x3MMQqAMAxA0atIZgOpQ1GvIg61jRosVVorgnh3i
- 8Mf3vIfSByFE/TVA5EvSbKHAlVXYFcTFkZxxdBQoxWRwikvmCe/oWNfuvDIJ+bgd7uxQ9NZq4g
- 1mbaD8jgiz3L//2F83w9M2O9ybwAAAA==
-To: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Qiliang Yuan <odys.yuan@gmail.com>
-X-Mailer: b4 0.13.0
+X-PPP-Message-ID: 
+ <179082787537.2579116.13506696519933318079@mxe9fb.netcup.net>
+X-Rspamd-Server: rspamd-worker-8404
+X-Rspamd-Queue-Id: A318E5F8CD
+X-NC-CID: QVa47mM8NdeD0IAwGNPZMwoUR/hzYsIhYPSY7O3itRyp2IJX21o=
 
-ublk_ctrl_del_dev() drops its reference to the device while holding the
-global ublk_ctl_mutex. When this is the last reference, ublk_cdev_rel()
-frees the tag set, and blk_mq_free_tag_set() waits for the pending SRCU
-callbacks of the tag set with srcu_barrier(). Every DEL_DEV thus waits
-for an SRCU grace period with the mutex held, and deleting devices from
-several threads serializes on it.
+On 9/30/26 21:43, Andreas Hindborg wrote:
+> `TagSet` never implemented `Send` or `Sync`. This did not matter until
+> commit "rust: block: fix `Send` bound for `GenDisk`" made `GenDisk: Send`
+> depend on `Arc<TagSet<T>>: Send`, which in turn requires `TagSet<T>: Send +
+> Sync`. With that bound unsatisfiable, `GenDisk` is never `Send`, and the
+> rnull driver fails to build once configfs requires `GroupOperations::Child:
+> Send`.
+> 
+> `TagSet` owns no data typed by `T`. It only wraps the C `struct
+> blk_mq_tag_set`, which can be dropped from any thread by calling
+> `blk_mq_free_tag_set`. Thus, implement `Send` and `Sync` for `TagSet`
+> unconditionally.
+> 
+> Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
+> Closes: https://lore.kernel.org/r/d1381ed8-eab8-4fd7-8b15-1e94876d7099@leemhuis.info
 
-The release path doesn't need ublk_ctl_mutex. The device number is freed
-under ublk_idr_lock, and the last reference is already dropped without
-the mutex when the ublk server still has the char device open at
-DEL_DEV time, from ublk_ch_release_work_fn().
+Thx, this fixes is for me! Just in case anyone cares:
 
-Drop the reference after unlocking ublk_ctl_mutex.
+Tested-by: Thorsten Leemhuis <linux@leemhuis.info>
 
-ublk null target, 4000 single-queue devices, STOP_DEV + DEL_DEV issued
-from N threads, 16 vCPU KVM guest:
-
-  threads     before      after
-        1     77.6 s     77.6 s
-        4     20.1 s     19.4 s
-        8     19.3 s      9.0 s
-       16     19.2 s      4.1 s
-
-Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
----
- drivers/block/ublk_drv.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 66eb55e7162e5..5d237aae51b7b 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -4901,10 +4901,15 @@ static int ublk_ctrl_del_dev(struct ublk_device **p_ub, bool wait)
- 		set_bit(UB_STATE_DELETED, &ub->state);
- 	}
- 
--	/* Mark the reference as consumed */
-+	mutex_unlock(&ublk_ctl_mutex);
-+
-+	/*
-+	 * Drop the reference outside ublk_ctl_mutex: if it is the last one,
-+	 * the release frees the tag set, which waits for an SRCU grace period,
-+	 * and holding the mutex would serialize concurrent deletions on it.
-+	 */
- 	*p_ub = NULL;
- 	ublk_put_device(ub);
--	mutex_unlock(&ublk_ctl_mutex);
- 
- 	/*
- 	 * Wait until the idr is removed, then it can be reused after
-
----
-base-commit: 551c722f40809618230001baccf219193e22fc5a
-change-id: 20261001-bug-ublk-del-dev-put-unlocked-a9cc10e60a89
-
-Best regards,
--- 
-Qiliang Yuan <odys.yuan@gmail.com>
-
+Ciao, Thorsten
