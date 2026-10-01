@@ -1,64 +1,65 @@
-Received: from mail-dl2-f12.google.com (mail-dl2-f12.google.com [74.125.229.140])
+Received: from mail-dy2-f42.google.com (mail-dy2-f42.google.com [74.125.229.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B4B2DECBF
-	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 03:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32574397E96
+	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 03:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790824246; cv=none; b=gieLcEQF5amozbNAUeNgepDG+JpYWsc7Pi4F3I4IGqQ+5IRl45ur4BFM1rr89ydfenwfSR7V5g/e6sKa9ojmwRt8HRnwYQ66C5185vASye/pmxHJ9bMfU2rjZQ/UZQRWyr1GxRdLB+N7c4URGII6VmRboaQMc0FgEXfNy2T+ASQ=
+	t=1790824253; cv=none; b=dpW6A8Ps4fhDjDfOKoiyJHyxNOTgCEvPXylEQ/ry6IZ7indWaO4JZI1ibRykzK3J9TzDtLimWWbkbMwnxHHmlAja08/Pbf+rAokiO+cEp8zs0f0RL7xMUBFUtK7k0PC2eyM5BHCbVMqvk9I4ZLJ9xmsrmYq9KpsVUOiMxw8JixY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790824246; c=relaxed/simple;
-	bh=7//85heVGXO9H7UfS8HzbcjadhZneA7l3g7DTGwUt4s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=dILUKIZ6sNJbbD4g0LU2pGrx5BEr6qWM17B7os15q8MTlDIwei6WTKXeAqs11vYkeNSZ2RFbyCwREzLD2m4g2JaTirptB3UHIQQdTywyCMxzMl97CXoy6VPY68LdlOuyh+aaALaLM2ObTvtzwLl6QLZect38znVhggnKZtL/280=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QqdTAd1N; arc=none smtp.client-ip=74.125.229.140
+	s=arc-20240116; t=1790824253; c=relaxed/simple;
+	bh=TAte18zOMn93bR8XRFFWxm1cVoOW/U+R0wMOuUoYc0g=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=h6cSxSP+MpwVVUdEIELL7+dmRLCX4SuPo/vDwVPZKqN5LndjsASiteyx/qI8+dRyqA72gueKA9/RFFN0hABxBqK59s0a768n5kW5nSQsQuxJkQ1Sck9wawNdyc4OGJrONQnqgMTCbJLB4OAk5DXiGP7xh71/pwQ1GLI2Hk01i54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JKor5eIm; arc=none smtp.client-ip=74.125.229.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QqdTAd1N"
-Received: by mail-dl2-f12.google.com with SMTP id a92af1059eb24-142dd025d07so5321590c88.2
-        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 20:10:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JKor5eIm"
+Received: by mail-dy2-f42.google.com with SMTP id 5a478bee46e88-341d0522b4dso9366439eec.1
+        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 20:10:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790824244; x=1791429044; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790824251; x=1791429051; darn=vger.kernel.org;
         h=cc:to:message-id:content-transfer-encoding:content-type
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=du/Qj4NGycFo/+y1OZ+i6rvXhibgURTGLPw6IzkgrIM=;
-        b=QqdTAd1NJqRaqEOPthZLgo3Uldv9YmO90+cu/ylqIf4yUlBBUBr0UmVVDX0GW3Ktzq
-         QXQ0Ypo5BtV3LHJTv2TCzMoOJKVfW2MMsKv0PK3J4AUoiuubkoHoJT85e9z/9HvKkWAJ
-         7MNASBeI0Ky+bohLUEtaNtqYhMEiRQmWSoMJDcPctkMTp7/euy9yhJkG4RaQ0d6nc7yy
-         6BtDfqFfMRCVMnuDubaqmz3Z3YtGJ+hKp5OOGIU2gXMWDnvm4guhQrJxrwH6Nnugsiq1
-         Iow2qejziQcqH9UBxXmM0Z3bA3rr6vjqFmA2BDPMm3RKWQLD1wPhwvclWskTwd1m57FN
-         asdw==
+        bh=RjqjSmJYD2hGrFXmbh8r2sbLcORlAU84VyhXxxLNgFA=;
+        b=JKor5eImY7XQFwLFOdnohyopCiYLhha+Bvf9eEBGFjf7jjTPMJNz47UNBn5263l8+L
+         wXaCFrcSKR3QCS7ifhCkbMrUb1WoS1JfX2piO1YJTIUAPpI+sDZaqUHuJPFyVsK2Mv0V
+         zgi0NBovSBjXJHtvuuFrwioyChb+xfvFG52eQ1zBooAj2zYNhN5bBpIaw9DdHxzmsPOg
+         /cRJvkRcN1C32y1fpz7c/aJPACikJ9SWL5bQoy7WPnxbuSLNwghwVO9SThkOhPOk+6rb
+         SJgDkybNV8cyUk8RUaqKIihYKLN/zOq9lHvYHHSgKBNUhQA5vnEFg8rpIVTm6sDgJMYn
+         TP2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790824244; x=1791429044;
+        d=1e100.net; s=20260707; t=1790824251; x=1791429051;
         h=cc:to:message-id:content-transfer-encoding:content-type
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=du/Qj4NGycFo/+y1OZ+i6rvXhibgURTGLPw6IzkgrIM=;
-        b=y8eIeTkEqOIAcRUctac3QNDtVymhkxAS/N8EFMAtTDU/T2dRQJunUjW83bUperLsIO
-         vOPW3z+ujL10WH91lkKHeyaWoC62aOcF9PEq8Hn0bRSCSgrCAQqMNqZG3tnYz4CZoiU6
-         Pw3d2ajxQFvJPeOoYeKvHtre0yRJGY63gcsjV+QS+zJNaFZ1Rc9FQ12q3Hj9SSRgY+sY
-         QDWQopNXqRZWiJUOucOtvIJqOxlt1eGCSg3TejV2s3RXtYPr1NROh8QfNQ1lUEakGdhp
-         Molk0E0IkFrze9BHc44uhOM1vsWu+A5SKbw7cYRP9PVrP8JXv725ypUul1NH0r8qbrG2
-         hmcQ==
-X-Gm-Message-State: AFq9FYI/LWieeTOXw0+az8YTlNHEEdnH4esp+1fXjhD+vEZfSCgaNc8F
-	7DNcqC5MppPQ2gXldHoblFBtWG7DYnmW+G+JYibpGsbCMfn1aQx9FbNw
-X-Gm-Gg: AYBFou2lVQOrEZtBAhBqQnTx69EYqBNua9FU7SAakgAT9z+L2jB+sWKg3cp5IJURpPT
-	cSori/RkIuqhQd2ZXkmhFz4IKxgfTVo6HGEK493WkKsLA5pJpSLEXoc8ucqLJVzwD+1HCqLta3v
-	Qh4osVRXz4z+EUYGMb+ZTw77ib4ZWj6lf8xIGMuEkyMtbDbMLgDVdTLUSj7xgxa7An7baR4C6vv
-	I4faLWYDkpRx3u8f57zcTIGhevDp5rQBe+bzpmYmvI1J3HMyBKcNz+hiBPaf4FhsWlY0+025SSX
-	tUjuNxytTE12XbW5O9Uw36MiuyNs5wGE1Vxu69qUnP7KLZAr0FpyoAue37CPoO3fWzvXgxnqpf2
-	ZBrTMhFIW7HnJLVgUPqT7KarCOtRsaZNt/3XP8lOyn0aB3U5bQqBFBwllsRfGc+GvevWtbym/oi
-	mfhMjUo0/6XpPpraETR/1YMrExnQ5xddQhbKmqQFtXWdyTAsUoPeetKga6Pay5qS+Mlg==
-X-Received: by 2002:a05:7301:3a94:b0:339:79c9:a711 with SMTP id 5a478bee46e88-34cdcfaaccbmr3339009eec.33.1790824243878;
-        Wed, 30 Sep 2026 20:10:43 -0700 (PDT)
+        bh=RjqjSmJYD2hGrFXmbh8r2sbLcORlAU84VyhXxxLNgFA=;
+        b=yb7ArakL4S8bQdky0THRVoSiEUDf44EQM+TW8tjxVzZ620ehG5vaa9SRG6zUBLsdTa
+         kRsyBGBLetyQDDWjAanOqT68hktRIkcnu5C4+agtZHO8yO8WWYHAp6e3joVngR59h0Eb
+         Rp6b1F0Jer766WEb9j3ZsNX+tm6oWiqnygJaJMScC8g4zXcIymS4dJyDGLuhLpOOR602
+         2jGa7kidkNC0vmgh41bA8RYyGJVZD3T6VCm+/djXiNas/A22mLAR6NGZ6iPzj/72I6QG
+         xnOrpacLDiCMitajXmrn/pZhONNNoGYv7C0854oAqwxR4CCXnkIQaTbUcdCn6X3NXXpm
+         6a3w==
+X-Gm-Message-State: AFq9FYLb7rZP/qLvKKVfaZYwSUSVBvqr7zy/fjMc23PjYsX97sNBZYhP
+	6fxE90MVTk2yeLz+Codj7J3czqzL60aAV+bph7YElP9dzUjoOP7CdKPc
+X-Gm-Gg: AYBFou1izPvDtLuFKgTXPrIt9T+hDxZFd52vI6YcqE4sKKmjfXh1EVn2Tdzb694nXMR
+	9YlIgmQqm3UacV7NqQdGQ1k3gHJsR7AQstQA5pdV8e2t7hnzHo+z2XHiAbDIi/kSdvGBaBFQNZ+
+	7HQqckjgni68xkCssgJCmUtY63i8QXUMaxFCKY+6bawH5HvR21tleICPbQwFoAJfVoBnm8HGJ4y
+	kQcNfHsdE3Jf+djBZSXxtGVA6g4qMJhe9srui7DH2XxfdM8VrEk6x6qd3LGlPKbFGKU6M1zZnQ4
+	JL8LS1CiVf5fdYz/LNXANzoKIj6h49FABN1uuxIxSvSpNTa3y7eKaJH5UYNz6h7VBycJNXJ7bOW
+	Ky+ZE7BZuurJ9GJXoGDToCnZNRs2nZvsqL5DhaZUHsoShyQGEuW302vR7Xn8lHwsYisRfx9BhnN
+	+g+e+RIq1UQOLmSmC+hlkweSHRIolq9aZAWCUvJIxt3gwb05CA702QjYrhVoQd46i7hg==
+X-Received: by 2002:a05:7301:2624:b0:34c:7d49:35cd with SMTP id 5a478bee46e88-34cdbbd5d9dmr3934437eec.11.1790824250861;
+        Wed, 30 Sep 2026 20:10:50 -0700 (PDT)
 Received: from [127.0.1.1] ([23.254.208.9])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34db4926277sm3131875eec.25.2026.09.30.20.10.42
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34db4c1ef93sm3249517eec.28.2026.09.30.20.10.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Sep 2026 20:10:43 -0700 (PDT)
+        Wed, 30 Sep 2026 20:10:50 -0700 (PDT)
 From: Qiliang Yuan <odys.yuan@gmail.com>
-Date: Thu, 01 Oct 2026 11:10:40 +0800
-Subject: [PATCH] ublk: don't use an I/O scheduler by default
+Date: Thu, 01 Oct 2026 11:10:47 +0800
+Subject: [PATCH] ublk: drop the device reference outside ublk_ctl_mutex in
+ DEL_DEV
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,63 +68,69 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261001-bug-ublk-no-sched-by-default-v1-1-0bc91b6f075e@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAC/PvWoC/x3MQQ6DIBAAwK+YPXcTsJaoX2l6AFlwo0EDpdEY/
- i7pcS5zQaLIlGBsLoj048RbqJCPBqZZB0/Ithpa0SophESTPWazLhg2TNNMFs2JlpzO6xeVez2
- d7vp+IAW12CM5Pv79+1PKDf8HhtpuAAAA
+Message-Id: <20261001-bug-ublk-del-dev-put-unlocked-v1-1-18e9bb9be727@gmail.com>
+X-B4-Tracking: v=1; b=H4sIADbPvWoC/x3MMQqAMAxA0atIZgOpQ1GvIg61jRosVVorgnh3i
+ 8Mf3vIfSByFE/TVA5EvSbKHAlVXYFcTFkZxxdBQoxWRwikvmCe/oWNfuvDIJ+bgd7uxQ9NZq4g
+ 1mbaD8jgiz3L//2F83w9M2O9ybwAAAA==
 To: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Qiliang Yuan <odys.yuan@gmail.com>
 X-Mailer: b4 0.13.0
 
-Requests of a ublk device are handed to the ublk server through
-io_uring, and the server does its own queueing and ordering, so an I/O
-scheduler in front of the device only adds overhead. A single-queue
-ublk device still gets mq-deadline by default, which costs throughput
-on every I/O and an elevator setup on every START_DEV.
+ublk_ctrl_del_dev() drops its reference to the device while holding the
+global ublk_ctl_mutex. When this is the last reference, ublk_cdev_rel()
+frees the tag set, and blk_mq_free_tag_set() waits for the pending SRCU
+callbacks of the tag set with srcu_barrier(). Every DEL_DEV thus waits
+for an SRCU grace period with the mutex held, and deleting devices from
+several threads serializes on it.
 
-Set BLK_MQ_F_NO_SCHED_BY_DEFAULT so that add_disk() selects "none", as
-loop does since commit 2112f5c1330a ("loop: Select I/O scheduler 'none'
-from inside add_disk()"). Doing it in the kernel also avoids switching
-the scheduler from user space after the device has been added, which
-waits for RCU grace periods. A scheduler can still be selected through
-sysfs. Zoned ublk devices don't need mq-deadline either, zone write
-plugging serializes writes per zone in the block layer since
-commit fde02699c242 ("block: mq-deadline: Remove support for zone write
-locking").
+The release path doesn't need ublk_ctl_mutex. The device number is freed
+under ublk_idr_lock, and the last reference is already dropped without
+the mutex when the ublk server still has the char device open at
+DEL_DEV time, from ublk_ch_release_work_fn().
 
-ublk null target, single-queue devices with depth 16, fio io_uring 4k
-randread at iodepth=16, 16 vCPU KVM guest:
+Drop the reference after unlocking ublk_ctl_mutex.
 
-                                 mq-deadline       none
-  1 device                          111K IOPS   342K IOPS
-  4 devices                         286K IOPS  1070K IOPS
-  START_DEV p50 (1000 devices)        8.53ms      0.36ms
+ublk null target, 4000 single-queue devices, STOP_DEV + DEL_DEV issued
+from N threads, 16 vCPU KVM guest:
+
+  threads     before      after
+        1     77.6 s     77.6 s
+        4     20.1 s     19.4 s
+        8     19.3 s      9.0 s
+       16     19.2 s      4.1 s
 
 Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
 ---
-Zoned ublk devices were not tested at runtime: none of the ublk servers
-at hand (ublksrv, the kublk selftest server) serves zoned I/O.
----
- drivers/block/ublk_drv.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/block/ublk_drv.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 66eb55e7162e5..8053666c04482 100644
+index 66eb55e7162e5..5d237aae51b7b 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -4389,6 +4389,7 @@ static int ublk_add_tag_set(struct ublk_device *ub)
- 	ub->tag_set.nr_hw_queues = ub->dev_info.nr_hw_queues;
- 	ub->tag_set.queue_depth = ub->dev_info.queue_depth;
- 	ub->tag_set.numa_node = NUMA_NO_NODE;
-+	ub->tag_set.flags = BLK_MQ_F_NO_SCHED_BY_DEFAULT;
- 	ub->tag_set.driver_data = ub;
- 	return blk_mq_alloc_tag_set(&ub->tag_set);
- }
+@@ -4901,10 +4901,15 @@ static int ublk_ctrl_del_dev(struct ublk_device **p_ub, bool wait)
+ 		set_bit(UB_STATE_DELETED, &ub->state);
+ 	}
+ 
+-	/* Mark the reference as consumed */
++	mutex_unlock(&ublk_ctl_mutex);
++
++	/*
++	 * Drop the reference outside ublk_ctl_mutex: if it is the last one,
++	 * the release frees the tag set, which waits for an SRCU grace period,
++	 * and holding the mutex would serialize concurrent deletions on it.
++	 */
+ 	*p_ub = NULL;
+ 	ublk_put_device(ub);
+-	mutex_unlock(&ublk_ctl_mutex);
+ 
+ 	/*
+ 	 * Wait until the idr is removed, then it can be reused after
 
 ---
 base-commit: 551c722f40809618230001baccf219193e22fc5a
-change-id: 20261001-bug-ublk-no-sched-by-default-6f53fa4889e6
+change-id: 20261001-bug-ublk-del-dev-put-unlocked-a9cc10e60a89
 
 Best regards,
 -- 
