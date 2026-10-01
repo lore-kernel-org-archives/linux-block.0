@@ -1,52 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71FB389E04;
-	Thu,  1 Oct 2026 18:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839A942668E
+	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 20:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790878234; cv=none; b=N/M/Eu3cWn4aBRXyYLaRn4rcWI6c0Yue9prY+BtiIIQbo071DWJ+eVzWb5SrLpwJjbRTGOwqRbJIIvpzLLOl/MAv6xL2VNTLzAqixw6NiWHz4cwzSChJhlIZ57IZ5WSraCOginmmOEzI3up9wOhTCidFhBwKoVeEi76RLuTTj/I=
+	t=1790886570; cv=none; b=ezU4fP4+344Qsds/wEYctgphSuhlV2WU40Rq5DBifnBw7da7FZTznYdd3fGMuMFDxbJMU+uVMRRXfn3qO/BvXmXqQx0EwkuaBrdDJheEx1OhY3My/VkNeqIuJNJv8YSMnN6iNcatutGJVpuWRhy9vlOows/GahWD2BB6/aWnAR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790878234; c=relaxed/simple;
-	bh=9Y4pAK88qjMP8X+cySTC8/pCIkPvhO450+5FFkVjxkY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PyGG37Ip8oSrka3mhcCQjuc9QIiK5+vouNZoiSmtlpWJWCJwHiBP+q7Z06E2ECeVIgc1tzosBek3UzrFy7bcM8NmD5eNhCKGkGO8lj4sf0pXcAd+QsKsEdEtHq8Rjb6ihlLuzTfWdf6cQQ9I4kLOCHnnyDAcF5mpEQSbEuRqt4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ac2A2e/1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790886570; c=relaxed/simple;
+	bh=cNzMFgEjieaz9zl5rXlk4ye1Ut2AxlMaToY3MXxg6DA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uuYXPSwNSfDRoWuzs7RQirM7/VyTJ20lNs1px00F6N+DPOsT3CSOVubvG/XLDyXek8wCARzhdMsRMcXFNLDnmYnO2XveSfx48AAKqb1wklB8RHhYePTLAL4atu0SRNmSYpDpz2WAYKJgBwh9N3ONkofTbhVm8ms9g6hNIrqeaRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b3hUx74h; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ac2A2e/1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 623CD1F000FF;
-	Thu,  1 Oct 2026 18:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790878228;
-	bh=KofKL6DMyNwNkFRP22JD3bKVkyzb29TfyRjV0Y0r2Ug=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ac2A2e/1DeJpjHbdIlYtlc+6CQqqF/PXDx6JHdS/ed69jP1C9UqP2vRJsvXiPHGmz
-	 ws0jxuHv4us6LHnU1dg4EB+0EssuL4AuT+JTnkMiFLq54ZkYlsIGfzVc6y/5sRR5nI
-	 /YESSgJG389pcBLZH9S2PTODgL9d0gaDFwux97KyvDkCuifnTB8R04D4ijp0xjP1CL
-	 x8a/ZaVyjlJON9QokgNIBAUKTxFHvbaFzSQeNu8hnNQyKzeb5h3FEy6zAq67rqHkOG
-	 pUjG4deHNgVvZXKH9IFBFm57bI6tbkJ3o1OZ9+z2dms7aId7MSaxFwCexNezcmbV2o
-	 5A3o/TJxPJZQA==
-Date: Thu, 01 Oct 2026 08:10:27 -1000
-Message-ID: <b214a375adad1579b2b17c0e9a0f4869@kernel.org>
-From: Tejun Heo <tj@kernel.org>
-To: Peng Yu <yupeng0921@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Maurizio Lombardi <mlombard@arkamax.eu>,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 2/2] nvmet: add cgroup_id to charge namespace I/O to a
- cgroup
-In-Reply-To: <20260929232411.101087-3-yupeng0921@gmail.com>
-References: <20260929232411.101087-1-yupeng0921@gmail.com>
- <20260929232411.101087-3-yupeng0921@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3hUx74h"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790886566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Byn2vYVxVM2zX7HqHro8W77S+GvekDCAcWSAeTMj660=;
+	b=b3hUx74hZSurZHhR43xImPIGh1KIVgS/MxzyXCMUonAXrJ5BsTCCsY9Qt0KSFIUc8T+IN7
+	TiCSOZhk33SDol/zxJoBxhqiKaMPdrHTHsNqvAQfAXNFROYDJCjT5OU8XHb2qdlgRSvG5X
+	u1YTrXZM2eIip9IVl7ALepLUBkhsBQU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-130-0tLfxaTsNXyxIX-pmQWXeQ-1; Thu,
+ 01 Oct 2026 16:29:21 -0400
+X-MC-Unique: 0tLfxaTsNXyxIX-pmQWXeQ-1
+X-Mimecast-MFC-AGG-ID: 0tLfxaTsNXyxIX-pmQWXeQ_1790886559
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D0D851800619;
+	Thu,  1 Oct 2026 20:29:18 +0000 (UTC)
+Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C1F3E1800446;
+	Thu,  1 Oct 2026 20:29:17 +0000 (UTC)
+Date: Thu, 1 Oct 2026 16:29:16 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Yuho Choi <oss.patchbox@gmail.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowangio@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Jean-Philippe Brucker <jpb@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH v1] virtio_blk: Reset device on probe error paths after
+ DRIVER_OK
+Message-ID: <20261001202916.GC378684@shajnocz.csb>
+References: <20260922211207.523999-1-oss.patchbox@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,51 +64,44 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20260922211207.523999-1-oss.patchbox@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hello, Peng.
+On Tue, Sep 22, 2026 at 05:11:41PM -0400, Yuho Choi wrote:
+> virtblk_probe() marks the device ready before revalidating zones and
+> adding the disk, and either of those can fail.  The out_cleanup_disk path
+> they take goes on to delete the virtqueues, but nothing tells the device
+> to stop first, so it is still live when the rings are freed.
+> 
+> Reset the device at out_cleanup_disk, which is only reachable after
+> virtio_device_ready().  virtblk_remove() and virtblk_freeze_priv() both
+> reset before deleting the virtqueues for the same reason.
+> 
+> Fixes: dbb301f91fc8 ("virtio_blk: add error handling support for add_disk()")
+> Signed-off-by: Yuho Choi <oss.patchbox@gmail.com>
+> ---
+>  drivers/block/virtio_blk.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-On Tue, Sep 29, 2026 at 04:24:11PM -0700, Peng Yu wrote:
-> Implementation:
-> * Add a `cgroup_id` attribute under the nvmet namespace folder, e.g.:
->   /sys/kernel/config/nvmet/subsystems/nqn.2026-09.io.test01:bdev/namespaces/1/cgroup_id
-> * We can write a cgroup id to it, then that cgroup will control
->   the IOs used by the namespace.
+Thanks for the fix!
 
-This doesn't follow the usual description format or content. Can you
-write it as prose explaining why the change is needed and what it does,
-along the lines of the scenario section in the cover letter?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> +CONFIGFS_ATTR(nvmet_ns_, cgroup_id);
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 32bf3ba07a9dc..ed97dafebe164 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -1547,6 +1547,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	return 0;
+>  
+>  out_cleanup_disk:
+> +	virtio_reset_device(vdev);
+>  	put_disk(vblk->disk);
+>  out_free_tags:
+>  	blk_mq_free_tag_set(&vblk->tag_set);
+> -- 
+> 2.43.0
+> 
 
-Documentation/ABI/stable/configfs-nvmet has an entry for each namespace
-attribute. Can you add one for cgroup_id? It should say that it takes a
-cgroup2 ID, that 0 clears it, that it can only be changed while the
-namespace is disabled, and that the namespace's I/Os are charged to the
-cgroup's effective io css.
-
-> +static inline void nvmet_blkcg_set_bio(struct nvmet_ns *ns, struct bio *bio)
-> +{
-> +	struct cgroup_subsys_state *css;
-> +
-> +	if (!ns->cgrp)
-> +		return;
-> +
-> +	css = cgroup_get_e_css(ns->cgrp, &io_cgrp_subsys);
-> +	bio_associate_blkg_from_css(bio, css);
-> +	css_put(css);
-> +}
-
-bio_init() and bio_alloc() already associate the bio with the current
-kthread's blkcg, so each of these bios gets associated twice. If the rw
-and zone append paths wrapped their bio allocations in
-nvmet_blkcg_begin()/end() like the discard and flush paths do, this
-function wouldn't be needed and chained bios would be covered
-automatically. Not a blocker either way.
-
-Otherwise, from the cgroup side, this looks fine to me.
-
-Thanks.
-
---
-tejun
