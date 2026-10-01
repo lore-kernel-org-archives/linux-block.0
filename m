@@ -1,66 +1,64 @@
-Received: from mail-dy2-f21.google.com (mail-dy2-f21.google.com [74.125.229.21])
+Received: from mail-dl2-f12.google.com (mail-dl2-f12.google.com [74.125.229.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00CD02DECBF
-	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 03:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B4B2DECBF
+	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 03:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790824239; cv=none; b=WIirMIbJWKCX60AjOl748dVrzz2MiBE8xM5hAAwh2JYvEI9uphZp35Xj4JMk5pMVESwzodueYiVVQ4UHWTbp5xXTAwoYZIBC3oqP7WOMLpOG2KNpDsEMq3yDnyGiq3y67uW4U3jf08Wo+xDlJMJYE7S743VXnFAoGge+S1bTQEE=
+	t=1790824246; cv=none; b=gieLcEQF5amozbNAUeNgepDG+JpYWsc7Pi4F3I4IGqQ+5IRl45ur4BFM1rr89ydfenwfSR7V5g/e6sKa9ojmwRt8HRnwYQ66C5185vASye/pmxHJ9bMfU2rjZQ/UZQRWyr1GxRdLB+N7c4URGII6VmRboaQMc0FgEXfNy2T+ASQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790824239; c=relaxed/simple;
-	bh=rr7pg8W4Ev03sHh2U6WrIqNwqklnpWb+YCSRGZmb9D0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=PsT6S8XDtDAKXHr/dsMIEW3/XXYS+45QvBaN3iJRNwcgvv/jUtX0ykkjz7K2Ojsw/M8uSyoFlUVWNgRG9LhD+oNbsUwwHj6nv6qihMwD+qw3/10mX8K4F7DkWo3G9MRDISWueH+e4IV47+pgOC7UTymaLGUSDs9ee4ulcdvflps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CvJiXvcf; arc=none smtp.client-ip=74.125.229.21
+	s=arc-20240116; t=1790824246; c=relaxed/simple;
+	bh=7//85heVGXO9H7UfS8HzbcjadhZneA7l3g7DTGwUt4s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=dILUKIZ6sNJbbD4g0LU2pGrx5BEr6qWM17B7os15q8MTlDIwei6WTKXeAqs11vYkeNSZ2RFbyCwREzLD2m4g2JaTirptB3UHIQQdTywyCMxzMl97CXoy6VPY68LdlOuyh+aaALaLM2ObTvtzwLl6QLZect38znVhggnKZtL/280=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QqdTAd1N; arc=none smtp.client-ip=74.125.229.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CvJiXvcf"
-Received: by mail-dy2-f21.google.com with SMTP id 5a478bee46e88-33e46a156f4so3485598eec.0
-        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 20:10:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QqdTAd1N"
+Received: by mail-dl2-f12.google.com with SMTP id a92af1059eb24-142dd025d07so5321590c88.2
+        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 20:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790824237; x=1791429037; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790824244; x=1791429044; darn=vger.kernel.org;
         h=cc:to:message-id:content-transfer-encoding:content-type
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=bKmSym7NamtEMfhbkbwVj/i7VYaex0n/r9jJ2yJ7jA4=;
-        b=CvJiXvcfwx7Q1sRVwPgyIr/a+AO6oCY1V3gQpFKJmFPCeP2eYIGLLjalJA/PYAttV6
-         /nu54bhkNuqzXDmSSqfAYPIO7ZDDG1keBH5PZU6qimVq/A38QuwHO99UIOv60VDfHDLL
-         4LXA8zqGjAAuy52nFxCs4UuzhLRl/bSZd+nKr/T2+QFDotlOUnrDtjkjAgX+kQrPHzbC
-         DbLvv6FyeCkWf5R7agou3KUrwDX6Om0wr7GqjLRmrm0R2RIXgupaKN7rLQeDcanftHhz
-         EvweHpV6mbis77WC05sugj1CWH3UhFh/pYe57ToE0uo1n8QJYlVreNdKD69PFJ2cbUTI
-         Gs3Q==
+        bh=du/Qj4NGycFo/+y1OZ+i6rvXhibgURTGLPw6IzkgrIM=;
+        b=QqdTAd1NJqRaqEOPthZLgo3Uldv9YmO90+cu/ylqIf4yUlBBUBr0UmVVDX0GW3Ktzq
+         QXQ0Ypo5BtV3LHJTv2TCzMoOJKVfW2MMsKv0PK3J4AUoiuubkoHoJT85e9z/9HvKkWAJ
+         7MNASBeI0Ky+bohLUEtaNtqYhMEiRQmWSoMJDcPctkMTp7/euy9yhJkG4RaQ0d6nc7yy
+         6BtDfqFfMRCVMnuDubaqmz3Z3YtGJ+hKp5OOGIU2gXMWDnvm4guhQrJxrwH6Nnugsiq1
+         Iow2qejziQcqH9UBxXmM0Z3bA3rr6vjqFmA2BDPMm3RKWQLD1wPhwvclWskTwd1m57FN
+         asdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790824237; x=1791429037;
+        d=1e100.net; s=20260707; t=1790824244; x=1791429044;
         h=cc:to:message-id:content-transfer-encoding:content-type
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=bKmSym7NamtEMfhbkbwVj/i7VYaex0n/r9jJ2yJ7jA4=;
-        b=QgTzGMm/qESgBeXtZRKqndgTGuLZoHCchNMM4qmb/a1LVrR9JSi2XrvovsXEHBqHz9
-         QvpnSdJck7BRIpgehU8WrfHs2zlLG18z6lmcKKLA2gOEeXjB/zkivFwlhnfNrZNqm9r2
-         Yij3K1lRs6i5eIQhMgcYlrLabcPoZ7Vls7+IKiY12NJJPuZ7284/wa0QtrbefG5A8ywf
-         aj//uaK6epQXY1Ubz4sV4UABrHx2ilxiKfYiSD4tGi2gjjypniW09ZKKQSqYvAwBWjo+
-         hE+SFv4UCNlGxPB0wwZSB1aJ8/9O85ohQUFAWMKIR1GGmZtFF+zj5kyFAOrFAilFvTwg
-         kt3w==
-X-Gm-Message-State: AFq9FYKtnjikFTvrJ+bHVSps8c8+gZB6DpVQzV07kYt7JnvfRIq6VmyW
-	3F9YckvX+P48U9KpGm//eWkR2nL79SDRxEk7rW3G22+u3NRSQEGBmBu3
-X-Gm-Gg: AYBFou3mIS50k2Tpq+9SmCQ+C5GJJUrfgQMEeXJswpZ+aGt3tBWREFCS1lcQWeFr93p
-	tyQN77TrVA9ft9ykc5RIWq5Wz8FP/a4PPcPv7iHZu7yT1M4ZhMcwmNpMy1OmH6GYv6ptaQor0RQ
-	N4wZz0USNRS9fj7UfOtBA6ZE3FrwZJH4YFS7fTbZmUZlew6WUvT3hGDVd+pRcF8yhsU9XKhU9ud
-	b/Ek7QfU3uUPWVXPRC9jCQCgX3BYrMlfHQXNi75RBXEV0oBe4+gFzO9u3F1la/yndoNN2p1GgzF
-	D2A1ZIvs3wa8PJRNVIX8gzE51cUV/IVavROFNyaFr6xfmzTrhrEsVS9ls2IpHBVCtnIahnZHQYh
-	rE68dQdT5ZVU6t/ABYATkLhFgADN7cro6NlNH8ykZsdXd5xdydw15hfTjXtcNAxqElp+3uwB3vn
-	hWFQRmzqGb9NLHyTRDoENiQUHGYm5j3f0WqrYybUw48HjProknJIvoNTYpv0I2JIqvWXmwB7L6x
-	3jl
-X-Received: by 2002:a05:7301:6498:b0:342:5098:a983 with SMTP id 5a478bee46e88-34cdb8e5484mr3635037eec.11.1790824236911;
-        Wed, 30 Sep 2026 20:10:36 -0700 (PDT)
+        bh=du/Qj4NGycFo/+y1OZ+i6rvXhibgURTGLPw6IzkgrIM=;
+        b=y8eIeTkEqOIAcRUctac3QNDtVymhkxAS/N8EFMAtTDU/T2dRQJunUjW83bUperLsIO
+         vOPW3z+ujL10WH91lkKHeyaWoC62aOcF9PEq8Hn0bRSCSgrCAQqMNqZG3tnYz4CZoiU6
+         Pw3d2ajxQFvJPeOoYeKvHtre0yRJGY63gcsjV+QS+zJNaFZ1Rc9FQ12q3Hj9SSRgY+sY
+         QDWQopNXqRZWiJUOucOtvIJqOxlt1eGCSg3TejV2s3RXtYPr1NROh8QfNQ1lUEakGdhp
+         Molk0E0IkFrze9BHc44uhOM1vsWu+A5SKbw7cYRP9PVrP8JXv725ypUul1NH0r8qbrG2
+         hmcQ==
+X-Gm-Message-State: AFq9FYI/LWieeTOXw0+az8YTlNHEEdnH4esp+1fXjhD+vEZfSCgaNc8F
+	7DNcqC5MppPQ2gXldHoblFBtWG7DYnmW+G+JYibpGsbCMfn1aQx9FbNw
+X-Gm-Gg: AYBFou2lVQOrEZtBAhBqQnTx69EYqBNua9FU7SAakgAT9z+L2jB+sWKg3cp5IJURpPT
+	cSori/RkIuqhQd2ZXkmhFz4IKxgfTVo6HGEK493WkKsLA5pJpSLEXoc8ucqLJVzwD+1HCqLta3v
+	Qh4osVRXz4z+EUYGMb+ZTw77ib4ZWj6lf8xIGMuEkyMtbDbMLgDVdTLUSj7xgxa7An7baR4C6vv
+	I4faLWYDkpRx3u8f57zcTIGhevDp5rQBe+bzpmYmvI1J3HMyBKcNz+hiBPaf4FhsWlY0+025SSX
+	tUjuNxytTE12XbW5O9Uw36MiuyNs5wGE1Vxu69qUnP7KLZAr0FpyoAue37CPoO3fWzvXgxnqpf2
+	ZBrTMhFIW7HnJLVgUPqT7KarCOtRsaZNt/3XP8lOyn0aB3U5bQqBFBwllsRfGc+GvevWtbym/oi
+	mfhMjUo0/6XpPpraETR/1YMrExnQ5xddQhbKmqQFtXWdyTAsUoPeetKga6Pay5qS+Mlg==
+X-Received: by 2002:a05:7301:3a94:b0:339:79c9:a711 with SMTP id 5a478bee46e88-34cdcfaaccbmr3339009eec.33.1790824243878;
+        Wed, 30 Sep 2026 20:10:43 -0700 (PDT)
 Received: from [127.0.1.1] ([23.254.208.9])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34dae0ad3a8sm3042252eec.0.2026.09.30.20.10.34
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34db4926277sm3131875eec.25.2026.09.30.20.10.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Sep 2026 20:10:36 -0700 (PDT)
+        Wed, 30 Sep 2026 20:10:43 -0700 (PDT)
 From: Qiliang Yuan <odys.yuan@gmail.com>
-Date: Thu, 01 Oct 2026 11:10:32 +0800
-Subject: [PATCH] block: don't quiesce the queue when setting the default
- elevator
+Date: Thu, 01 Oct 2026 11:10:40 +0800
+Subject: [PATCH] ublk: don't use an I/O scheduler by default
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,101 +67,63 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261001-bug-block-elevator-init-quiesce-v1-1-5c85fa0ec59b@gmail.com>
-X-B4-Tracking: v=1; b=H4sIACjPvWoC/x3NQQ6DIBBA0auYWXcSBLXRqzQuBEad1ICCGhPC3
- Uu6/Jv3E0QKTBGGKkGgmyN7V6J+VWDWyS2EbEuDFLITvRKorwX15s0XaaN7On1AdnzicRXGEKr
- WvtXc66aTFoqyB5r5+R8+Y84/JXkFfHEAAAA=
-To: Jens Axboe <axboe@kernel.dk>, Nilay Shroff <nilay@linux.ibm.com>, 
- Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
+Message-Id: <20261001-bug-ublk-no-sched-by-default-v1-1-0bc91b6f075e@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAC/PvWoC/x3MQQ6DIBAAwK+YPXcTsJaoX2l6AFlwo0EDpdEY/
+ i7pcS5zQaLIlGBsLoj048RbqJCPBqZZB0/Ithpa0SophESTPWazLhg2TNNMFs2JlpzO6xeVez2
+ d7vp+IAW12CM5Pv79+1PKDf8HhtpuAAAA
+To: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Qiliang Yuan <odys.yuan@gmail.com>
+ Qiliang Yuan <odys.yuan@gmail.com>
 X-Mailer: b4 0.13.0
 
-elevator_set_default() runs from blk_register_queue() while the disk is
-still being added: the block device is not visible yet and uevents are
-suppressed, so no file system I/O can be issued. elevator_change()
-freezes the queue and cancels the dispatch work before switching, which
-is enough to drain dispatch activity from passthrough requests, as the
-comment in elevator_change() already states.
+Requests of a ublk device are handed to the ublk server through
+io_uring, and the server does its own queueing and ordering, so an I/O
+scheduler in front of the device only adds overhead. A single-queue
+ublk device still gets mq-deadline by default, which costs throughput
+on every I/O and an elevator setup on every START_DEV.
 
-elevator_switch() still quiesces the queue unconditionally, though, so
-every disk added with a default elevator waits for an RCU grace period.
-Commit 245a489e81e1 ("block: avoid to quiesce queue in
-elevator_init_mq") had removed this wait from the default elevator
-setup, and it came back when that setup was folded into
-elevator_change().
+Set BLK_MQ_F_NO_SCHED_BY_DEFAULT so that add_disk() selects "none", as
+loop does since commit 2112f5c1330a ("loop: Select I/O scheduler 'none'
+from inside add_disk()"). Doing it in the kernel also avoids switching
+the scheduler from user space after the device has been added, which
+waits for RCU grace periods. A scheduler can still be selected through
+sysfs. Zoned ublk devices don't need mq-deadline either, zone write
+plugging serializes writes per zone in the block layer since
+commit fde02699c242 ("block: mq-deadline: Remove support for zone write
+locking").
 
-The wait is paid in full by callers that add disks one at a time. ublk
-adds the disk of a single-queue device from START_DEV, which takes 7.7ms
-at p50 in a 16 vCPU KVM guest, most of it in blk_mq_quiesce_queue()
-called from elevator_set_default().
+ublk null target, single-queue devices with depth 16, fio io_uring 4k
+randread at iodepth=16, 16 vCPU KVM guest:
 
-Skip quiescing in elevator_switch() when setting the default elevator.
+                                 mq-deadline       none
+  1 device                          111K IOPS   342K IOPS
+  4 devices                         286K IOPS  1070K IOPS
+  START_DEV p50 (1000 devices)        8.53ms      0.36ms
 
-ublk null target, 1000 single-queue devices created one by one:
-
-                     before      after
-  START_DEV p50      7.74ms     0.68ms
-  START_DEV p99     14.61ms     1.32ms
-  devices/s             114        971
-
-Fixes: 1e44bedbc921 ("block: unifying elevator change")
-Cc: stable@vger.kernel.org
 Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
 ---
- block/elevator.c | 7 +++++--
- block/elevator.h | 2 ++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+Zoned ublk devices were not tested at runtime: none of the ublk servers
+at hand (ublksrv, the kublk selftest server) serves zoned I/O.
+---
+ drivers/block/ublk_drv.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 2161b6eea680c..da9ba70ac9321 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -573,7 +573,8 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
- 			return -EINVAL;
- 	}
- 
--	blk_mq_quiesce_queue(q);
-+	if (!ctx->no_quiesce)
-+		blk_mq_quiesce_queue(q);
- 
- 	if (q->elevator) {
- 		ctx->old = q->elevator;
-@@ -594,7 +595,8 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
- 	blk_add_trace_msg(q, "elv switch: %s", ctx->name);
- 
- out_unfreeze:
--	blk_mq_unquiesce_queue(q);
-+	if (!ctx->no_quiesce)
-+		blk_mq_unquiesce_queue(q);
- 
- 	if (ret) {
- 		pr_warn("elv: switch to \"%s\" failed, falling back to \"none\"\n",
-@@ -731,6 +733,7 @@ void elevator_set_default(struct request_queue *q)
- 	struct elv_change_ctx ctx = {
- 		.name = "mq-deadline",
- 		.no_uevent = true,
-+		.no_quiesce = true,
- 	};
- 	int err;
- 
-diff --git a/block/elevator.h b/block/elevator.h
-index 3eb32516be0b1..3886d97427e33 100644
---- a/block/elevator.h
-+++ b/block/elevator.h
-@@ -43,6 +43,8 @@ struct elevator_resources {
- struct elv_change_ctx {
- 	const char *name;
- 	bool no_uevent;
-+	/* the disk isn't added yet, so skip quiescing the queue */
-+	bool no_quiesce;
- 
- 	/* for unregistering old elevator */
- 	struct elevator_queue *old;
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 66eb55e7162e5..8053666c04482 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -4389,6 +4389,7 @@ static int ublk_add_tag_set(struct ublk_device *ub)
+ 	ub->tag_set.nr_hw_queues = ub->dev_info.nr_hw_queues;
+ 	ub->tag_set.queue_depth = ub->dev_info.queue_depth;
+ 	ub->tag_set.numa_node = NUMA_NO_NODE;
++	ub->tag_set.flags = BLK_MQ_F_NO_SCHED_BY_DEFAULT;
+ 	ub->tag_set.driver_data = ub;
+ 	return blk_mq_alloc_tag_set(&ub->tag_set);
+ }
 
 ---
 base-commit: 551c722f40809618230001baccf219193e22fc5a
-change-id: 20260930-bug-block-elevator-init-quiesce-35d73f9b462d
+change-id: 20261001-bug-ublk-no-sched-by-default-6f53fa4889e6
 
 Best regards,
 -- 
