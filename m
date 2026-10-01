@@ -1,105 +1,123 @@
-Received: from mail-oa2-f34.google.com (mail-oa2-f34.google.com [74.125.231.98])
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE073A784F
-	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 14:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A195218A3
+	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 15:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790865807; cv=none; b=Wy3AUg3lSvIIY8EFNjCm/y6qcUx0HQjGYUH220uV7XxR59HiOrvSaNeaabOua1+DuDO7OqaGW+RwSIz07l1jY5byDyIg0O7lFlWmc5d0TO6dcmMKPWbMhg3ZvXj4L1L0+Kt6a+lYwZj4fNdocgdEMy1ZryZH1ONu7Cfojc68I7M=
+	t=1790867458; cv=none; b=TRykoyotY/9mDk4xHQ0iMijiNYyG+qtt2WqfvTKIJ2n4sh+aUiLL9I4wYsqXm7nzel+Qwp2Ofasb0XkLmHvF5t+DwUkXL6m4AfMhuqNW2J1ed7dIa0E/YV5I2c10r0dj6kpWET26Pr8Te2aIbDmdRANRdFbLb5/h40YAI+2SafY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790865807; c=relaxed/simple;
-	bh=CJ410Hnuw7HxUN1V6vTAjlcL9lvaHvFeCOJ1Ey0FcDE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=J2h3zqcDa9pxzIzB2GjgkPqyPj7dh+RIJB5NnBp968ZJjGX0dgj46Awa7e4kS8Q8ojd9dvWINKtk2Dsc2wn0Bql1kDrkiiLrj6bmHxa6DtrOo8xVfEhbT06Wah43vGFR8D4cvLR2nlGl8iqkPbN+ED8wAy7m7/PpNApu4pSyGlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=UEG0Df7I; arc=none smtp.client-ip=74.125.231.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1790867458; c=relaxed/simple;
+	bh=v/g5V0DvX7DbXaWcxFQ+1tPtcUqZhm9i5DBwg6+5XvQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i1oHffcUlf1VJDqXhCcucVGwDzSCUYTt6jkSTMBzARbvRD4ObNi13d/MPDuvU6LKoHGxcK/wSZ4shH+j2rE/EPapbgCsxAXDYrCr/ng1MOoVxaKamjCyKYnM9+en4UJQIWGS5plMs3FsH969isJhD7fooy0whvdefYnzExMCCHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AiP95NAI; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="UEG0Df7I"
-Received: by mail-oa2-f34.google.com with SMTP id 586e51a60fabf-494ab4d6128so4738789fac.0
-        for <linux-block@vger.kernel.org>; Thu, 01 Oct 2026 07:43:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AiP95NAI"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-4a00d8bec5aso19991085e9.2
+        for <linux-block@vger.kernel.org>; Thu, 01 Oct 2026 08:10:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1790865803; x=1791470603; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=0lw+Zx3Ctji2MKAhZ1Qo8iu3S4OiHZVAXCS35rHrty8=;
-        b=UEG0Df7IWlrbq1QmAq8rbT6UOXeeR5gp6ulSqm1bOjdOJDUhPnqFZa9GdUXgb9hKsf
-         uBsBgfk3Rt8ned53uqKeJyyMVkJVfBPfK7JU8sLCX5mmfLLvG1wiek9oCfpHuUhFht56
-         Vqr974Aqy99KYFHW3UpZ6HYwPmCv9rcvVKm1Rj4pxtVnJlIenPsarkQnV8ce1v13JiDX
-         X0C9fV1bsxgGloLzwe2uDx2ZXziGbH6EiG8sjAVvK4Gaj5Usx0UwlbPmKfUOFEYYgQmO
-         4RXNYMO3VRlgCVuZLsaNVI3qYqi9b3OnoOl+r+T5pCX2fKeVRej+FHsk9A7bSooAKrRu
-         lsrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790865803; x=1791470603;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=suse.com; s=google; t=1790867454; x=1791472254; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=0lw+Zx3Ctji2MKAhZ1Qo8iu3S4OiHZVAXCS35rHrty8=;
-        b=P8zlDL80sH1K0Bk/p2PCAoC8r/z9OHrDs+bQvskn4Gk+L9OfKOAlI/nFnnmXtktMgp
-         5cATv88p84lJu3teb9A+SK67GawsQm0gV+yWMg5Vfrrl7j8lJ2oTRt5hm4k5TYaZY9YU
-         K9vvHoQUZsTRUJ6ELFLtlkPiMGTSB43Dfx0Zjl6ByQe0hMC7bJV6JdV3PB1zAVwyy/qC
-         8pd7SU/s1kk+E5fbGf3pvZ4DbYh0vlf2hbIYmsAMZlQ3Ssiu+vVfRr+syAf+XNM55cCM
-         b2ZLqg01lK/mHnt4Us8+ZW6FesnTVvogKTke8bpfqajLV133+x1KfeiWf2cvtW/tiUms
-         A6sw==
-X-Gm-Message-State: AFq9FYI4vKtRZ/uHOg2S+PdnxnkJdJ0urlU8204f1/J3Se9EZX8/aJOS
-	wIOvlMgiyxvNmag+Xc+cW1mFsHBYnd2dDvEnLta8HbuE+ULf/qjVSOlKURl1C9P76bE=
-X-Gm-Gg: AYBFou0i2v429Ei2JpyoTBMsc3AbUP+OOq+9Qw77w8IZy10R2+0v6QWmIl7FXKLuKWS
-	p6k9QlDQyesp5J/Fp9w/jEdOyrHb97IrvWW1VFjPHEEPzsfUYFwR0JLFjCXW5xerpZOMDoPN+VI
-	cMD/dJsm2LRKQRBHePUmqJyAEkUcagfNAUJqDiLXRlnjgyi6OfTd3P/WMYVukwi3wFbLE97DwVp
-	TMuUDKUWsGFCN1XzRwft7NjG0bEuyvaASnv3NOPaemTKEgYfSYE+cooPM181dUzUkXU5UcVWmUz
-	GmN0qVh8qz9cD5UxnLk4cjOuxFu2QITXSzK7ocySbAScEhAcfcX37O4I/+K/QykeGYnKC4qdOIT
-	0nMLMO13/aAu+Fo0Y4ZodIUYQ0v/01QR0OSL6a286iSn8xUnpNj5sV+d60cZeduUUT0rnZtxhE7
-	2xrbaMgLKq1TWNx0REePAeUok4IUdEpTPeEm67FRarfIcs/5FJSywIG9+mrZ9LWn6QkMWvzdAsJ
-	CY9WE7wNfu8M52X9sJHWYsN6rFFfQWBdoPL3Qh5dee7+RA3td3osUI=
-X-Received: by 2002:a05:6870:e121:b0:48f:fd06:76c7 with SMTP id 586e51a60fabf-49ddd510ac4mr4912248fac.9.1790865803330;
-        Thu, 01 Oct 2026 07:43:23 -0700 (PDT)
-Received: from [192.168.2.38] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-49ded14d8a0sm2638009fac.5.2026.10.01.07.43.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Oct 2026 07:43:22 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Runyu Xiao <runyu.xiao@seu.edu.cn>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Jianhao Xu <jianhao.xu@seu.edu.cn>
-In-Reply-To: <20260930065951.2932739-1-runyu.xiao@seu.edu.cn>
-References: <20260930065951.2932739-1-runyu.xiao@seu.edu.cn>
-Subject: Re: [PATCH] block: amiflop: synchronize flush timer before track
- flush
-Message-Id: <179086580223.1687323.6325589264595491998.b4-ty@b4>
-Date: Thu, 01 Oct 2026 08:43:22 -0600
+        bh=uEqFwwmiLgxzbUfdtxr/SjfsZs2IKekOzMd4LW1gk/0=;
+        b=AiP95NAIGlVILCdx2fiDa96u9dnETu0eV6g2YlJVBoBtvumBMglaWOXWFSV84t6/kz
+         BqOsphx4VuiYuLRPu99byiKeo8RE2xooIDYIHfbh86TZkkv/5UeVSnstEr8348Rz46hZ
+         fve2SenUs/pMePKaFO4+N1wd1ixb8hEaZN5poOv/ul25F2BJ8HpDB1gllxiD829mumCo
+         KwMqRHG1dPu5KZz2QJQ8Nw84T5h2jVBTdjFjfgHVSIpynmep6z56Mo6OL//CvuK2cJIR
+         lzjG/fg06VwwJIAAujnM6PMf0N+p3DPRGdZnLrjVb5AzeoHbOF6WDB6PB/4aecr4uK+l
+         Ck5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790867454; x=1791472254;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=uEqFwwmiLgxzbUfdtxr/SjfsZs2IKekOzMd4LW1gk/0=;
+        b=eXzxPj562z/Ld9nfuhlM+l326QbcZmXYn4tOluuZ0jbl11Be4hDKXRx5/9jPdMUhLF
+         7tEIfzgOci2vrJQc3fMp8dTPTW0d87IvIgyUG6U952Gyl7Vw3ucYRKP56lbVARPj5/tm
+         tFGWFBFrWM/KItoT826ER4URuREFO98QUeNTg4w7wvl8KQqJtk863IyBL2L8x/VG0mXS
+         qhxCO/0OYGSlw7voHET+VKU9zuu/BdMX970VuVCv02a0l3uXuBzTqDMTcPq97/uGBb0S
+         XPhaAa3sR+tfrlWGbSJCsBjtx2mPNQLrtrpsYF8YLTyZXbRlwCHEUj6j8yGOa54EP2aL
+         AaJw==
+X-Forwarded-Encrypted: i=1; AKwUvByfw90S7LLZonRHOujDDhNAIc/qC208taGQMYUEI2mfP0VwLsK4Kh6s7P5RP9pgdKMiBWl/zyHxrXuy3Q==@vger.kernel.org
+X-Gm-Message-State: AFuF++lZuDYenKhXgDm3G/J/VjyJixlt1F0aKuSzdDUlu6omKXxTHtk4
+	F9i8rbiPgCYfAKeLjI/4IrvFzmmvdYwxv145ODiVSUNI3GzoNSYW4//P/ENpUtDjDOI=
+X-Gm-Gg: AYBFou3aFJHRxUidc9ii5YXYfi74w84CdCgRt12p2e/oS3KYKV4o3tJCf1qjm4kq06D
+	ps+4W+RdcwR9lEAmyZqdL+700bqL6OUWuctOIATjAHdiQwdVSdd4WUBgLTYP+txLgJBKc2ihhBZ
+	XnAVvhn+wrhOv8jXrdvNrurh86TLBKMFDcdCehOSJiOohtHLcUK/Pib0dwlZ99oLK57GaqcTzJc
+	xC3neeMx356YDwP3UGdgwh1iU1I3jolvs+AMF4iSc3Iuss4PlM2kKd5/XzLBEn0tnBnHNH/f4Rj
+	RdhAeXKIr2qyRTxGB5OKmfCHbQs/OUOQLrfzt5Ifmkyj07fbZDlEME8lTqFkXK7i7kSljpvhBNv
+	O1B2u5RTQ5Nuyx3tbuxLRclVhyxxfkUgNpFIl4TiDYxs/BgrfTWGzfGkRhksb9IfY/wreS42Kpk
+	/t9uDPEKHGBt33AJa2ADH3RwXH3a7vzscz/4h0XDeoGsvO1fNHCG+JWc3NcFVx0FPXOsp6LgHGD
+	pFl9d4/sCvoxdfDjvAG8IDCP037FzNTwSQ=
+X-Received: by 2002:a05:600d:8499:20b0:4a0:1e68:d27d with SMTP id 5b1f17b1804b1-4a01e68d354mr47259215e9.9.1790867454233;
+        Thu, 01 Oct 2026 08:10:54 -0700 (PDT)
+Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48b06a2fc98sm6247090f8f.35.2026.10.01.08.10.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Oct 2026 08:10:51 -0700 (PDT)
+Message-ID: <ca910292-5d3d-47b5-ae40-7ca1688f3c06@suse.com>
+Date: Thu, 1 Oct 2026 17:10:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] Remove the error-injection.h include from
+ linux/module.h
+To: petr.pavlu@suse.com
+Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jani Nikula <jani.nikula@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Tvrtko Ursulin <tursulin@ursulin.net>,
+ Matthew Brost <matthew.brost@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Simon Horman <horms@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Francois Dugast
+ <francois.dugast@intel.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
+ Aaron Tomlin <atomlin@atomlin.com>, linux-block@vger.kernel.org,
+ netdev@vger.kernel.org, linux-api@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-modules@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260911-module-include-error_injection-v1-0-5da895d8c84d@suse.com>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20260911-module-include-error_injection-v1-0-5da895d8c84d@suse.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
 
-
-On Wed, 30 Sep 2026 14:59:51 +0800, Runyu Xiao wrote:
-> The amiflop track buffer is shared with the timer callback. timer_delete()
-> does not wait for an in-flight callback, and that callback can rearm itself
-> when it cannot acquire the floppy controller. A synchronous track flush can
-> therefore race with the callback.
+On 9/11/26 5:04 PM, Petr Pavlu wrote:
+> linux/module.h appears in roughly 15k #include directives across the
+> kernel. This makes it a "hot" header, so it should avoid pulling in
+> unnecessary definitions.
 > 
-> Stop the timer before synchronous track writes and use timer_delete_sync()
-> to wait for any callback already running. Keep callback rearming disabled
-> until the write is complete. Apply this to the FDFMTTRK path as well.
+> The header currently includes linux/error-injection.h to obtain the
+> definition of `struct error_injection_entry`. However, this is unnecessary
+> because the type is only referenced in the file as a pointer, for which an
+> incomplete type is sufficient.
 > 
-> [...]
+> Add explicit includes of linux/error-injection.h to files that use the
+> ALLOW_ERROR_INJECTION() macro and currently rely on it being provided
+> indirectly via linux/module.h. Then remove the linux/error-injection.h
+> include from linux/module.h.
+> 
+> The first five patches can go through their respective trees if preferred.
+> The final patch depends on the preceding cleanups.
 
-Applied, thanks!
+I've queued the series on modules-next for 7.4-rc1.
 
-[1/1] block: amiflop: synchronize flush timer before track flush
-      commit: 9690943353cec1690a715e000ba6a74e5139f530
-
-Best regards,
 -- 
-Jens Axboe
-
-
-
+Thanks,
+Petr
