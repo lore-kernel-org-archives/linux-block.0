@@ -1,78 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2005B49B458;
-	Thu,  1 Oct 2026 08:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FAD4C10F0
+	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 09:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790844714; cv=none; b=Rsm9U72e1KzkgchdTZMfqepoB18qPtc6zTYZVnSN5RcWb4sC0em8uBVD+XaO3Ha92T6ZsoRJmh2sZauS+u5Cw61aTLdfA86a+jjvhDgwIHpsV6ZJPONlvCuB4igd068/R2LOdjRQSJ7ge7WOqO3nI+03OEcV9EF5wukr8grHrug=
+	t=1790845990; cv=none; b=VjQNrx2lBAmV1+hbAhMAAiAagCidt3S6Zvud/PtCW+9dLrLuYFqJ4IxDP0BhS5OctgCQFgT6seM42JDJBGjE3LqxJaPtCl1Xgh3BQ4Q1fD6jKt7HCEnRlBEGsfss3AMPLPQ+TaS139j+dJUzlrkfrPDpKFtzbDWFHpK8JOz8ysw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790844714; c=relaxed/simple;
-	bh=20vxqPyJSRRLu9b2ZvPPeoQxUC6/G86+1VrsPASW06w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vowfcz1wauQ220iEL961Gwo8kXM3qy1T+sbuQ5WZBH9sQ2uf10/aKZDO6wbT2zS19vUNW/ofB8oHrm0lBxF+qfYY0NaK9YeJQ78Ata0PN+2FCN3GsuIQgBq9tH2VlZM0ozooEgq87g17ZaNSXqWGbQqKeoCK0X6d+aMaH/H3GHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hy5Uwf3w; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790845990; c=relaxed/simple;
+	bh=FFbefN2Y4qRJn5vswr2Uy9xuWqjQECbgHAQFP+xEhfc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jOXOwiYUQ7Asir8Qq/fSVxdW0xPmXPTB86ZiHOMBpPOWqwRxLrrC0NVCcMrwcGCxK5HMm/WwBJ8jJvnSt/98i4HW/0LWU39yrYh39eIW/PzUovkvZJN/i7Dzl9pKiqzOdyMjfQIKqANNiDuPIyt9pohb3JsGPUV1NI1FMCit7A0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xt1x5zGW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hy5Uwf3w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 956A71F000FF;
-	Thu,  1 Oct 2026 08:51:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790844712;
-	bh=VFmHqNJs/e1nltgkWcvpQVUCOuSiRU8X8wD2+ugwFhM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hy5Uwf3wsXCio6yGPrRvZv8pybyLhRqoMs1tNdqOeN1NjlIC14rRiy9LavVIb+JKI
-	 JN4bV8SLHisoNwmUHW0ZKP2n4E263WohbH2SnAaUlzluhXKGKnpXGr5xT7suXtH6IP
-	 mf+1TNsRhKz1r/7vUkeOdpe0SZ0SEIZxFiyAg974agEG/P88v3W79FsWOOZWx6iN+w
-	 87WrcIStEwG8UKNSPhLs1tXTptaN6JrxcrAclzF6OM95C1FE1TcUdXJxnel/b3kiPR
-	 32gx+P3ChP2Y2efc9IY832ly+arLxJrS3RD77M6hHZ5rW+wJehNXtLGQ3i7sZybBU0
-	 Qok+C0I/R3wGg==
-Date: Thu, 1 Oct 2026 10:51:48 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Georgi Djakov <georgi.djakov@oss.qualcomm.com>
-Cc: andersson@kernel.org, konradybcio@kernel.org, abelvesa@kernel.org, 
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, minchan@kernel.org, 
-	senozhatsky@chromium.org, axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	djakov@kernel.org
-Subject: Re: [PATCH 4/6] zram: Add QPaCE zcomp backend
-Message-ID: <20261001-dramatic-hasty-pug-68ebfd@quoll>
-References: <20260930145215.3380977-1-georgi.djakov@oss.qualcomm.com>
- <20260930145215.3380977-5-georgi.djakov@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xt1x5zGW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790845986;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TrGq5iY6/w2n25N0igq41iNBSv1Z7z5H/VJULRFdP7Y=;
+	b=Xt1x5zGWG7dOIy3gW3XhzyqdY7x5FvZrk4T3nJGBskFZ+XGFTdCZuCG20HGh+27X6kbaRq
+	2HYyVtsXFJe10a0g0k5jEs4cLYEFziNSfrUkoajbH8XhnVRmKnBtFwXtKFnYX8GzrCViP9
+	A+anFBJTeXKdgoZwe2eopq8g+sY3J50=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-458-3QCnMg68Mte5z_0MKene0w-1; Thu,
+ 01 Oct 2026 05:13:03 -0400
+X-MC-Unique: 3QCnMg68Mte5z_0MKene0w-1
+X-Mimecast-MFC-AGG-ID: 3QCnMg68Mte5z_0MKene0w_1790845980
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D17F19774E7;
+	Thu,  1 Oct 2026 09:12:58 +0000 (UTC)
+Received: from warthog.com (unknown [10.44.32.54])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5011C180029C;
+	Thu,  1 Oct 2026 09:12:50 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH v15 01/10] Add a function to kmap one page of a multipage bio_vec
+Date: Thu,  1 Oct 2026 10:12:29 +0100
+Message-ID: <20261001091239.3343034-2-dhowells@redhat.com>
+In-Reply-To: <20261001091239.3343034-1-dhowells@redhat.com>
+References: <20261001091239.3343034-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260930145215.3380977-5-georgi.djakov@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Wed, Sep 30, 2026 at 07:52:13AM -0700, Georgi Djakov wrote:
-> Add a zcomp backend for the Qualcomm Page Compression Engine (QPaCE) so
-> zram can expose qpace-lz4 as a selectable compression algorithm when the
-> QPaCE driver is available.
-> 
-> Compress and decompress operations are handled via the QPaCE urgent
-> synchronous path: each request DMA-maps the source and destination
-> buffers, issues a blocking hardware command, and returns the result size.
-> 
-> Signed-off-by: Georgi Djakov <georgi.djakov@oss.qualcomm.com>
-> ---
->  drivers/block/zram/Kconfig         |  11 +++
->  drivers/block/zram/Makefile        |   1 +
->  drivers/block/zram/backend_qpace.c | 134 +++++++++++++++++++++++++++++
+Add a function to kmap one page of a multipage bio_vec by offset (which is
+added to the offset in the bio_vec internally).  The caller is responsible
+for calculating how much of the page is then available.
 
-So entire qpace should go here, no? Why did you create this entire layer
-of indirection, singleton management under drivers/soc?
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: linux-block@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ include/linux/bvec.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
->  drivers/block/zram/backend_qpace.h |  13 +++
->  drivers/block/zram/zcomp.c         |  11 ++-
->  5 files changed, 168 insertions(+), 2 deletions(-)
->  create mode 100644 drivers/block/zram/backend_qpace.c
->  create mode 100644 drivers/block/zram/backend_qpace.h
-
-Best regards,
-Krzysztof
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index fc566ee1c1ff..df9ce860e787 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -343,4 +343,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+ 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
+ }
+ 
++/**
++ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
++ * @bvec: bvec to map
++ * @offset: Offset into bvec
++ *
++ * Map the page containing the byte at @offset into the kernel virtual address
++ * space.  The caller is responsible for making sure this doesn't overrun.
++ *
++ * Call kunmap_local on the returned address to unmap.
++ */
++static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
++{
++	offset += bvec->bv_offset;
++
++	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
++		(offset & ~PAGE_MASK);
++}
++
+ #endif /* __LINUX_BVEC_H */
 
