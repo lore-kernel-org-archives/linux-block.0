@@ -1,70 +1,171 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy2-f21.google.com (mail-dy2-f21.google.com [74.125.229.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E640282F1B;
-	Thu,  1 Oct 2026 00:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00CD02DECBF
+	for <linux-block@vger.kernel.org>; Thu,  1 Oct 2026 03:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790814062; cv=none; b=J5Ag5XBzLA887aWmZKVCtGwWsa1WudeeYS8RPguPge9JUyv/JhBZMPzfPhP1szlg4gv+Bid+D5Xt5ctkj2d7eIjnWPBKST4voXJBJpnNdYXfZ3tstRwoE7LlSEYMyhuFCZJMCCZBNB7JeVWlr7yk3Yt6YDVkp9Za7jxu4NTT/6s=
+	t=1790824239; cv=none; b=WIirMIbJWKCX60AjOl748dVrzz2MiBE8xM5hAAwh2JYvEI9uphZp35Xj4JMk5pMVESwzodueYiVVQ4UHWTbp5xXTAwoYZIBC3oqP7WOMLpOG2KNpDsEMq3yDnyGiq3y67uW4U3jf08Wo+xDlJMJYE7S743VXnFAoGge+S1bTQEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790814062; c=relaxed/simple;
-	bh=zeHVgwVQCOpZGPbuV62NoIgPlJtExvO0see6x6+V+ec=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References; b=mmF8kauLNSP877v143hYGcrMHJBGvvqYft2H5cL1fzWCFB8nq4w2jV3haU4NFjU2z7NOtPWfWeIX73V3s0PrMTF7sJDfIAmr10Oac9FynIRbPXOtV/y17/vkf3c/PgD3qf17M37/Liv7nLPO9fGAKUW/yx2eKKzvJuZMf/zqMpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A1qlvmsR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790824239; c=relaxed/simple;
+	bh=rr7pg8W4Ev03sHh2U6WrIqNwqklnpWb+YCSRGZmb9D0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=PsT6S8XDtDAKXHr/dsMIEW3/XXYS+45QvBaN3iJRNwcgvv/jUtX0ykkjz7K2Ojsw/M8uSyoFlUVWNgRG9LhD+oNbsUwwHj6nv6qihMwD+qw3/10mX8K4F7DkWo3G9MRDISWueH+e4IV47+pgOC7UTymaLGUSDs9ee4ulcdvflps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CvJiXvcf; arc=none smtp.client-ip=74.125.229.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A1qlvmsR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E5E41F000FF;
-	Thu,  1 Oct 2026 00:21:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790814060;
-	bh=MewAlD5aSkZUtyyg83a3AwFjqYwD/VRSwZs4SdrxEIc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=A1qlvmsRclnrJENovY2lSglSpAReArBZURRYsuf4IzM2ie8lBU4QaR9U2gTdTDk00
-	 Py74PGm/smkybm+uisQp0IV8VAz+kho6nxbfxumWCTAwbNFVLge6nNt6TZIsueX8bN
-	 VM6zN6NnSQLLaIVkTKO0jYiZiJQO8c2AA5bX3D9uqHeshq31NsR42dJC0ZQ7CDrw8B
-	 MFFCvEsqLHONsYb2e71Vd+oh2SHTgJnOR9ygMTByMGMY+nUfTxHhB9PBg1bLVkuRYE
-	 R8kfElHV8KJ4rQ6t+Xi5qMSut+ZpcfdEL7RI/tnZNl3N8WgRlw0N47ametf57apq3r
-	 kbS0joADhj0Eg==
-Date: Wed, 30 Sep 2026 14:20:59 -1000
-Message-ID: <95edaf582303f1a9404c989f9f0e6501@kernel.org>
-From: Tejun Heo <tj@kernel.org>
-To: Tao Cui <cui.tao@linux.dev>
-Cc: josef@toxicopanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, andrii@kernel.org, eddyz87@gmail.com,
-	ast@kernel.org, daniel@iogearbox.net, linux-kselftest@vger.kernel.org,
-	Tao Cui <cuitao@kylinos.cn>, ameryhung@gmail.com,
-	alexei.starovoitov@gmail.com
-Subject: Re: [RFC PATCH v8 4/4] docs: cgroup-v2: document the iocost BPF cost
- model attachment
-In-Reply-To: <20260930075154.189958-5-cui.tao@linux.dev>
-References: <20260930075154.189958-1-cui.tao@linux.dev>
-	<20260930075154.189958-5-cui.tao@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CvJiXvcf"
+Received: by mail-dy2-f21.google.com with SMTP id 5a478bee46e88-33e46a156f4so3485598eec.0
+        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2026 20:10:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790824237; x=1791429037; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=bKmSym7NamtEMfhbkbwVj/i7VYaex0n/r9jJ2yJ7jA4=;
+        b=CvJiXvcfwx7Q1sRVwPgyIr/a+AO6oCY1V3gQpFKJmFPCeP2eYIGLLjalJA/PYAttV6
+         /nu54bhkNuqzXDmSSqfAYPIO7ZDDG1keBH5PZU6qimVq/A38QuwHO99UIOv60VDfHDLL
+         4LXA8zqGjAAuy52nFxCs4UuzhLRl/bSZd+nKr/T2+QFDotlOUnrDtjkjAgX+kQrPHzbC
+         DbLvv6FyeCkWf5R7agou3KUrwDX6Om0wr7GqjLRmrm0R2RIXgupaKN7rLQeDcanftHhz
+         EvweHpV6mbis77WC05sugj1CWH3UhFh/pYe57ToE0uo1n8QJYlVreNdKD69PFJ2cbUTI
+         Gs3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790824237; x=1791429037;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=bKmSym7NamtEMfhbkbwVj/i7VYaex0n/r9jJ2yJ7jA4=;
+        b=QgTzGMm/qESgBeXtZRKqndgTGuLZoHCchNMM4qmb/a1LVrR9JSi2XrvovsXEHBqHz9
+         QvpnSdJck7BRIpgehU8WrfHs2zlLG18z6lmcKKLA2gOEeXjB/zkivFwlhnfNrZNqm9r2
+         Yij3K1lRs6i5eIQhMgcYlrLabcPoZ7Vls7+IKiY12NJJPuZ7284/wa0QtrbefG5A8ywf
+         aj//uaK6epQXY1Ubz4sV4UABrHx2ilxiKfYiSD4tGi2gjjypniW09ZKKQSqYvAwBWjo+
+         hE+SFv4UCNlGxPB0wwZSB1aJ8/9O85ohQUFAWMKIR1GGmZtFF+zj5kyFAOrFAilFvTwg
+         kt3w==
+X-Gm-Message-State: AFq9FYKtnjikFTvrJ+bHVSps8c8+gZB6DpVQzV07kYt7JnvfRIq6VmyW
+	3F9YckvX+P48U9KpGm//eWkR2nL79SDRxEk7rW3G22+u3NRSQEGBmBu3
+X-Gm-Gg: AYBFou3mIS50k2Tpq+9SmCQ+C5GJJUrfgQMEeXJswpZ+aGt3tBWREFCS1lcQWeFr93p
+	tyQN77TrVA9ft9ykc5RIWq5Wz8FP/a4PPcPv7iHZu7yT1M4ZhMcwmNpMy1OmH6GYv6ptaQor0RQ
+	N4wZz0USNRS9fj7UfOtBA6ZE3FrwZJH4YFS7fTbZmUZlew6WUvT3hGDVd+pRcF8yhsU9XKhU9ud
+	b/Ek7QfU3uUPWVXPRC9jCQCgX3BYrMlfHQXNi75RBXEV0oBe4+gFzO9u3F1la/yndoNN2p1GgzF
+	D2A1ZIvs3wa8PJRNVIX8gzE51cUV/IVavROFNyaFr6xfmzTrhrEsVS9ls2IpHBVCtnIahnZHQYh
+	rE68dQdT5ZVU6t/ABYATkLhFgADN7cro6NlNH8ykZsdXd5xdydw15hfTjXtcNAxqElp+3uwB3vn
+	hWFQRmzqGb9NLHyTRDoENiQUHGYm5j3f0WqrYybUw48HjProknJIvoNTYpv0I2JIqvWXmwB7L6x
+	3jl
+X-Received: by 2002:a05:7301:6498:b0:342:5098:a983 with SMTP id 5a478bee46e88-34cdb8e5484mr3635037eec.11.1790824236911;
+        Wed, 30 Sep 2026 20:10:36 -0700 (PDT)
+Received: from [127.0.1.1] ([23.254.208.9])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34dae0ad3a8sm3042252eec.0.2026.09.30.20.10.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Sep 2026 20:10:36 -0700 (PDT)
+From: Qiliang Yuan <odys.yuan@gmail.com>
+Date: Thu, 01 Oct 2026 11:10:32 +0800
+Subject: [PATCH] block: don't quiesce the queue when setting the default
+ elevator
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261001-bug-block-elevator-init-quiesce-v1-1-5c85fa0ec59b@gmail.com>
+X-B4-Tracking: v=1; b=H4sIACjPvWoC/x3NQQ6DIBBA0auYWXcSBLXRqzQuBEad1ICCGhPC3
+ Uu6/Jv3E0QKTBGGKkGgmyN7V6J+VWDWyS2EbEuDFLITvRKorwX15s0XaaN7On1AdnzicRXGEKr
+ WvtXc66aTFoqyB5r5+R8+Y84/JXkFfHEAAAA=
+To: Jens Axboe <axboe@kernel.dk>, Nilay Shroff <nilay@linux.ibm.com>, 
+ Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, Qiliang Yuan <odys.yuan@gmail.com>
+X-Mailer: b4 0.13.0
 
-Hello, Tao.
+elevator_set_default() runs from blk_register_queue() while the disk is
+still being added: the block device is not visible yet and uevents are
+suppressed, so no file system I/O can be issued. elevator_change()
+freezes the queue and cancels the dispatch work before switching, which
+is enough to drain dispatch activity from passthrough requests, as the
+comment in elevator_change() already states.
 
-The following is a Claude-generated review.
+elevator_switch() still quiesces the queue unconditionally, though, so
+every disk added with a default elevator waits for an RCU grace period.
+Commit 245a489e81e1 ("block: avoid to quiesce queue in
+elevator_init_mq") had removed this wait from the default elevator
+setup, and it came back when that setup was folded into
+elevator_change().
 
-On Wed, 30 Sep 2026 15:51:54 +0800, Tao Cui wrote:
-> +	When CONFIG_BLK_CGROUP_IOCOST_BPF is enabled, a BPF cost model
-> +	can be attached to a device by loading an "iocost_model_ops"
-> +	struct_ops with the whole disk's major:minor in its "dev" member
-...
-> +	switches back to the builtin model, and neither detaches the
-> +	struct_ops; only detaching removes the model, after which
-> +	"model=bpf" fails.  "ctrl" keeps describing the builtin
+The wait is paid in full by callers that add disks one at a time. ublk
+adds the disk of a single-queue device from START_DEV, which takes 7.7ms
+at p50 in a 16 vCPU KVM guest, most of it in blk_mq_quiesce_queue()
+called from elevator_set_default().
 
-Attaching, not loading, binds the model. The test loads a second model
-fine and only its attach fails. Device removal also removes the model,
-and the user still has to tear down the struct_ops link afterwards. Can
-you mention that too?
+Skip quiescing in elevator_switch() when setting the default elevator.
 
-Thanks.
+ublk null target, 1000 single-queue devices created one by one:
 
---
-tejun
+                     before      after
+  START_DEV p50      7.74ms     0.68ms
+  START_DEV p99     14.61ms     1.32ms
+  devices/s             114        971
+
+Fixes: 1e44bedbc921 ("block: unifying elevator change")
+Cc: stable@vger.kernel.org
+Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
+---
+ block/elevator.c | 7 +++++--
+ block/elevator.h | 2 ++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/block/elevator.c b/block/elevator.c
+index 2161b6eea680c..da9ba70ac9321 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -573,7 +573,8 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+ 			return -EINVAL;
+ 	}
+ 
+-	blk_mq_quiesce_queue(q);
++	if (!ctx->no_quiesce)
++		blk_mq_quiesce_queue(q);
+ 
+ 	if (q->elevator) {
+ 		ctx->old = q->elevator;
+@@ -594,7 +595,8 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+ 	blk_add_trace_msg(q, "elv switch: %s", ctx->name);
+ 
+ out_unfreeze:
+-	blk_mq_unquiesce_queue(q);
++	if (!ctx->no_quiesce)
++		blk_mq_unquiesce_queue(q);
+ 
+ 	if (ret) {
+ 		pr_warn("elv: switch to \"%s\" failed, falling back to \"none\"\n",
+@@ -731,6 +733,7 @@ void elevator_set_default(struct request_queue *q)
+ 	struct elv_change_ctx ctx = {
+ 		.name = "mq-deadline",
+ 		.no_uevent = true,
++		.no_quiesce = true,
+ 	};
+ 	int err;
+ 
+diff --git a/block/elevator.h b/block/elevator.h
+index 3eb32516be0b1..3886d97427e33 100644
+--- a/block/elevator.h
++++ b/block/elevator.h
+@@ -43,6 +43,8 @@ struct elevator_resources {
+ struct elv_change_ctx {
+ 	const char *name;
+ 	bool no_uevent;
++	/* the disk isn't added yet, so skip quiescing the queue */
++	bool no_quiesce;
+ 
+ 	/* for unregistering old elevator */
+ 	struct elevator_queue *old;
+
+---
+base-commit: 551c722f40809618230001baccf219193e22fc5a
+change-id: 20260930-bug-block-elevator-init-quiesce-35d73f9b462d
+
+Best regards,
+-- 
+Qiliang Yuan <odys.yuan@gmail.com>
+
