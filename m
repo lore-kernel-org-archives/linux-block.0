@@ -1,181 +1,274 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mta0.migadu.com (out-141.mta0.migadu.com [91.218.175.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B7B218E91;
-	Fri,  2 Oct 2026 11:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C62470EB1
+	for <linux-block@vger.kernel.org>; Fri,  2 Oct 2026 14:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790939463; cv=none; b=C6rZk5iChv9InXGTQR29OzLRRiHaDilfPY0wRtRu7orihDJWVurm0hY6v5c51KMdld/eEKPK0N1+QfewsMaxhGgdjpSvLfmmr7FlKNV+HhNh53iS5KWV9Nnqr8x7BINxcjqzKa1Rw7ar8OXIuXbyEgy6xq8MOpM68dP6d0qpbyg=
+	t=1790950674; cv=none; b=ii+fANCoHHRPQhxx3vrPReB02vUd5Q5tUwOfvN3d0T41iGjY9RqpkkhSEJ1rsvguyfOPFdyVZDU0RFVOiyjZhm5bWx+JCuHhCZJh7bOE3DTJegp5EYQ2LfmS06sLXrCTBtApfieL1AsCxXDUKS9JsUimgLja9yVlAgYNCrR02HQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790939463; c=relaxed/simple;
-	bh=L1kKBgNe+bBQFflO4Yid6xY8Xi+E9XsTKHIkojvlkcw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DkARugud9kaMNlHfy6j4OG3imsTcfPyif1w8WHESNL4ByPH4NJTPw2Tch+547asXRbFUVscYNiTqowxRjRztvRqGByJisnqmEZzoIoMIxfmO4f/Z+KaCSDcY1L8GuBn/btNAily77sY03E1I/mRCeKLz9Y+1GQStfWfX3SkVHrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=sMe4+Qlm; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4h/s4NNa; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=RgXx8RmF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8i2NzZnr; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1790950674; c=relaxed/simple;
+	bh=KVvd3mTqD0OezG5YoQKXKSUl1mfAZ3w3xJhCc5bbS0w=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Wu2Nd0jgGiW2nUDROGsqWgIBdJT6+lh3RR6u4I3ETFJEAmr0T385GvH6FnB7Yi09Me3cuHFVwzkcPPTBe3Np5nwav6Vj7OwADUBVrTs2z7OJOxxUl+zZcfGplDb/Ueh54olmvMyFZaaPpVThECJb3CJMWOoCktK2jFkgxXF2yfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xugd8xf6; arc=none smtp.client-ip=91.218.175.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="sMe4+Qlm";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4h/s4NNa";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="RgXx8RmF";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8i2NzZnr"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 5DE5F21D91;
-	Fri,  2 Oct 2026 11:10:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1790939455; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sfEfBWrNG2dSSShC5UWTM6bV5UZX53RFwxm/btMyTAU=;
-	b=sMe4+QlmuP0qwaDghsFrDHaofCGOeIjA8EswEDuJd2Lc1q/JSCzYhjp1IwTnOA9Qe0NRxH
-	0HxevK9BIEgwZpay+C4z8JP7uUhJH6bDsMU4jGXyqy4V273+MAMeY8ZLXfyPODpQ1PayLz
-	NN3H53J+luJ05+A6YlTKU3hkRSVXQTo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1790939455;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sfEfBWrNG2dSSShC5UWTM6bV5UZX53RFwxm/btMyTAU=;
-	b=4h/s4NNa+NlhLl+I2kPIewI8F+oxwK8uqVLNcVmvVVxVFIZDOeRuzZKppj6F5hrOYcZXYb
-	eeZ9wtYg8ljQXNBQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=RgXx8RmF;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=8i2NzZnr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1790939451; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sfEfBWrNG2dSSShC5UWTM6bV5UZX53RFwxm/btMyTAU=;
-	b=RgXx8RmF69ZqV1QwybR/NHa58iXFSAvl0YFksIro+jJ+9Sk5PkRiMT2A9U54VMv1TxhHZa
-	pSm5ZzY3GUZTP5+xTNkWzQuYAFot69mxFnYxnh/I/Y9hkydagld+ntL8Q+xLEIbeIf2ILJ
-	7pHQ2uEwlgJTITWv1seuyW/FQwdqlMw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1790939451;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sfEfBWrNG2dSSShC5UWTM6bV5UZX53RFwxm/btMyTAU=;
-	b=8i2NzZnrxC0zQCAvZVCkdaStr7qCHRiBrv/0u6jq3Z6wRIg4iQCJP9L3ymZjwVnIuK6zGI
-	0O9FA73dOsGkiKBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 30C8E13C08;
-	Fri,  2 Oct 2026 11:10:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /7CAAzuRv2ppagAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 02 Oct 2026 11:10:51 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id B0F78A13C2; Fri, 02 Oct 2026 13:10:42 +0200 (CEST)
-Date: Fri, 2 Oct 2026 13:10:42 +0200
-From: Jan Kara <jack@suse.cz>
-To: Julian Sun <sunjunchao@bytedance.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, 
-	linux-block@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, axboe@kernel.dk, hannes@cmpxchg.org, mhocko@kernel.org, 
-	roman.gushchin@linux.dev, shakeel.butt@linux.dev, muchun.song@linux.dev, 
-	willy@infradead.org, tj@kernel.org, akpm@linux-foundation.org, 
-	Boris Burkov <boris@bur.io>
-Subject: Re: [PATCH v9 1/3] block: introduce bdev_flush_by_dev()
-Message-ID: <5my3hyw54ej2tw24dqnacsy7xppywdjovvnwvrevmczsllzq7c@berxapmobgfa>
-References: <20260925064444.3944820-1-sunjunchao@bytedance.com>
- <20260925064444.3944820-2-sunjunchao@bytedance.com>
- <arYaMbJUh6unvz_t@infradead.org>
- <3w6vfwfkojmfqy2qs5j4q2s2366ajqiwmqf624lyn3odrv42v2@va2r7a6ngfz6>
- <aroIAqoCNDBPlB2A@infradead.org>
- <9e9c02fe-e94d-4f70-a21b-47b46bab2c3b@bytedance.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xugd8xf6"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=KVvd3mTqD0OezG5YoQKXKSUl1mfAZ3w3xJhCc5bbS0w=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790950670; v=1; x=1791555470;
+ b=Xugd8xf6lf0ZhY1tQHrRgLBONtg9vpCiToKhkCPLaG+9OiaOalCdjZ7yrxxeLqnXo9xDfNzH
+ bjcWDEdTQBaM596FZk61Qcn0KVQQXaR7yau5xcQhL5k0+TediTCDCPMYYfWKJ8ZzSaMQo1SHNEA
+ 0zj5EBX3UHF5bKKaHzEOg1xM=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 74ad76f5439c6670;
+	Fri, 02 Oct 2026 14:17:50 +0000
+X-Mizu-Trace-ID: 74ad76f5439c6670
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <b83447c2-564a-4d9a-af24-60ad675f59ff@linux.dev>
+Date: Fri, 2 Oct 2026 22:17:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e9c02fe-e94d-4f70-a21b-47b46bab2c3b@bytedance.com>
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 5DE5F21D91
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim,suse.com:email];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Spam-Flag: NO
-X-Spam-Score: -4.01
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>,
+ ameryhung@gmail.com, alexei.starovoitov@gmail.com
+Subject: Re: [RFC PATCH v8 1/4] blk-iocost: add BPF struct_ops cost model
+ support
+To: Tejun Heo <tj@kernel.org>
+References: <20260930075154.189958-1-cui.tao@linux.dev>
+ <20260930075154.189958-2-cui.tao@linux.dev>
+ <6c97ba9ada55be8e7191f78c4db8bcf9@kernel.org>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <6c97ba9ada55be8e7191f78c4db8bcf9@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon 28-09-26 17:51:09, Julian Sun wrote:
-> On 9/28/26 2:24 PM, Christoph Hellwig wrote:
-> >> So I think tracking devices by dev_t is a good way of dealing with these
-> >> problems. But then when flushing you have to transition from dev_t to
-> >> struct block_device and blkdev_get_no_open() is the canonical way of doing
-> >> that (and note this use is just internal to block/bdev.c).
-> > 
-> > I'd really prefer not to grow more blkdev_get_no_open users.
-> > 
-> > But the more I look at this I wonder why we even bother.  Trying to
-> > attribute individual bits of dirty metadata to cgroups is pretty much
-> > insane.  Why don't we bypass memcg accounting for buffer_heads like we
-> > always did for the XFS buffer cache, and what btrfs switched to last
-> > year? See commit b55102826d7d ("btrfs: set AS_KERNEL_FILE on the
-> > btree_inode") for the btrfs side.
+Hello, Tejun.
+
+在 2026/10/1 08:20, Tejun Heo 写道:
+> Hello, Tao.
 > 
-> That sounds reasonable. However, IMHO, the main difference is that ext4
-> stores this metadata in the bdev page cache rather than a separate metadata
-> cache as btrfs and XFS do. The same bdev->bd_mapping is also used for buffered
-> reads of the raw block device from userspace. Setting AS_KERNEL_FILE on that
-> mapping would therefore also charge newly allocated page-cache folios from
-> those reads to the root memcg rather than the reader's memcg, bypassing its
-> memory limits.
+> The following is a Claude-generated review.
 > 
-> If we pass a flag from ext4's metadata buffer-cache allocation sites and
-> check it in grow_buffers() to charge new folios to the root memcg, accounting
-> them as kernel-file pages would still require persistent per-folio state.
-> When a folio is removed from the page cache, the allocation context is gone,
-> so we cannot tell whether it was counted as a kernel-file folio.
+> On Wed, 30 Sep 2026 15:51:51 +0800, Tao Cui wrote:
+>> Add the iocost_model_ops struct_ops.  Attachment follows the
+>> hid_bpf_ops model: the struct_ops instance is per-device, the target
+>> device is set in the dev member from userspace before load, .reg
+>> attaches the model to that device and switches it away from the
+>> builtin linear model, and .unreg detaches it and restores the builtin
+>> model.  The struct_ops core owns the program lifetime, so there is no
+>> name registry and no bound-state bookkeeping.
+> ...
+>> The cgroup callbacks are bound to the iocg policy init/free paths,
+>> one (cgroup, device) pair per invocation, matching the builtin
+>> cursor's lifetime, instead of the blkcg css lifecycle, which also
+>> drops the mutex from the cgroup online/offline paths.
 > 
-> Separating ext4's metadata cache from the bdev page cache would address this,
-> but that seems like a much larger, longer-term change.
+> The description is written against earlier versions. There is no name
+> registry, css lifecycle binding or mutex in the tree, so a reader of the
+> commit can't follow it. Can you open with why a pluggable model is wanted
+> and then describe what the patch does: attach creates the ioc and
+> switches the model under the same freeze as io.cost.model writes,
+> model=bpf and model=linear select between the attached and builtin
+> models, device removal ejects the model, and so on? Also, the model
+> prices every charged IO, not every IO. Root cgroup IOs and IOs while the
+> controller is disabled never reach it.
+> 
 
-FWIW I share Julian's concern here. It would be fine to use AS_KERNEL_FILE
-for ext4 metadata but I think just unconditionally setting AS_KERNEL_FILE
-for bdev mappings will cause issues because some users may be using bdevs
-directly for their workloads and they could still expect proper memcg
-accounting to work in that case.
+The commit message is rewritten to open with why a pluggable model
+is wanted and describe the current behavior.  It also clarifies that
+the model prices every charged IO rather than every IO.
 
-We could set AS_KERNEL_FILE when opening bdev for a filesystem (and remove
-it when releasing bdev) but that would have to make sure there are no
-folios in the bdev mapping when changing the flag as otherwise the
-accounting would go wrong. Looks it might be doable but getting all the
-cornercases right will be hairy and overall not very appealing to me...
+>> +bool blk_get_queue_rcu(struct request_queue *q)
+>> +{
+>> +	return refcount_inc_not_zero(&q->refs);
+>> +}
+>> +EXPORT_SYMBOL(blk_get_queue_rcu);
+> ...
+>> +struct block_device *blkdev_get_no_open(dev_t dev, bool autoload);
+>> +void blkdev_put_no_open(struct block_device *bdev);
+>> +bool blk_get_queue_rcu(struct request_queue *q);
+>> +void blk_put_queue(struct request_queue *q);
+> 
+> blk_get_queue_rcu() has no prototype in any header, so every build warns
+> on it. Can you declare it in block/blk.h, include "blk.h" from
+> blk-iocost-bpf.c and drop these local prototypes? blkdev_get_no_open()
+> and blkdev_put_no_open() are already in blk.h and blk_put_queue() in
+> blkdev.h. The export isn't needed either as the only user is built-in.
+> 
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Done: declared in block/blk.h without the export, and blk-iocost-bpf.c
+includes "blk.h" instead of carrying local prototypes.
+
+>> +	case offsetof(struct iocost_model_ops, bdev):
+> ...
+>> +	case offsetof(struct iocost_model_ops, q):
+> 
+> The struct_ops core rejects non-zero non-function members that
+> init_member doesn't claim and kvalue starts zeroed, so these two cases
+> can go. Same for the name lookup in .init, the core has already found the
+> struct by then.
+> 
+
+The bdev and q cases in .init_member() are gone, and the redundant
+name lookup is removed from .init().
+
+>> +	rcu_read_lock();
+>> +	q = rcu_dereference(ops->q);
+> 
+> ops->q isn't __rcu annotated, so sparse will complain here. Either
+> annotate it and use RCU_INIT_POINTER() for the stores, or READ_ONCE() it.
+> The RCU section protects the queue, not the ops pointer.
+> 
+
+ops->q and the owning link are written with WRITE_ONCE() and read
+with READ_ONCE().
+
+>> +#ifdef CONFIG_BLK_CGROUP_IOCOST_BPF
+>> +	{
+>> +		struct iocost_model_ops *ops;
+>> +
+>> +		spin_lock_irq(&ioc->lock);
+>> +		ops = (struct iocost_model_ops *)rcu_dereference_protected(
+>> +				ioc->attached, lockdep_is_held(&ioc->lock));
+>> +		rcu_assign_pointer(ioc->attached, NULL);
+>> +		rcu_assign_pointer(ioc->model, NULL);
+>> +		spin_unlock_irq(&ioc->lock);
+>> +
+>> +		/* eject the model completely on device removal */
+>> +		if (ops) {
+>> +			WRITE_ONCE(ops->q, NULL);
+>> +			blkdev_put_no_open(ops->bdev);
+>> +		}
+>> +	}
+>> +#endif
+> 
+> Once ops->q is NULL, .unreg returns without taking rq_qos_mutex, the link
+> can go away and the struct_ops map which holds ops can be freed after a
+> grace period. This path isn't in an RCU read section, so reading
+> ops->bdev after the store is a use-after-free window. Read bdev first and
+> make the NULL store the last access.
+> 
+
+Done: the ejection reads bdev into a local before clearing ops->q.
+
+> This is also a block scoping a variable. Can you make it an
+> ioc_bpf_eject() helper next to attach and detach, with an empty stub for
+> !CONFIG_BLK_CGROUP_IOCOST_BPF? That removes the #ifdef and the const
+> cast. The remaining #ifdefs in ioc_cost_model_write() would go away too
+> if the two pointers in struct ioc were unconditional.
+> 
+
+Done: ioc_bpf_eject() with a stub drops the #ifdef from
+ioc_rqos_exit(), and the attached and model pointers in struct ioc are
+unconditional, so the remaining #ifdefs in ioc_cost_model_write() are
+gone too.
+
+>> + * Deliver iocg_init()/iocg_free() to the cgroups which already have a
+>> + * blkg on the queue, the same q->blkg_list walk the blkcg policy
+>> + * teardown uses.  The queue is frozen and quiesced and blkcg_mutex
+>> + * serializes against blkg creation and destruction.  Cgroups without
+>> + * a blkg on the device yet are not missed: their blkg is created
+>> + * later and ioc_pd_init()/ioc_pd_free() deliver the callbacks then.
+>> + */
+> 
+> blkcg_mutex doesn't serialize blkg creation. The IO path creates blkgs
+> from bio_associate_blkg() through blkg_lookup_create(), before
+> bio_queue_enter(), so the freeze doesn't stop it either, and
+> blkg_create() runs pd_init and then list_add() to q->blkg_list under
+> queue_lock only. Against the attach:
+> 
+> 1. ioc->attached is published, blkg_create() runs ioc_pd_init() which
+>    delivers iocg_init(), then list_add(), then the walk delivers
+>    iocg_init() again.
+> 
+> 2. blkg_create() runs ioc_pd_init() while attached is NULL, the walk runs
+>    before list_add(), and the blkg never gets iocg_init() but gets
+>    iocg_free() from ioc_pd_free() or the detach walk.
+> 
+> Detach has the mirror cases. The walk is also the only q->blkg_list
+> walker without queue_lock, and a plain list_for_each_entry() against a
+> concurrent list_add() isn't safe. The teardown walk this mirrors holds
+> blkcg_mutex and queue_lock. Can you publish and clear ioc->attached and
+> walk under queue_lock as well? ioc_pd_init() already calls iocg_init()
+> under queue_lock, so nothing changes for the BPF side.
+> 
+> While at it, the walk goes newest first, so children usually get
+> iocg_init() before their parents. blkcg_activate_policy() walks in
+> reverse for that reason.
+> 
+
+You were right that blkcg_mutex alone did not serialize against blkg
+creation from the IO path.  The attachment is now published and
+cleared under blkcg_mutex and queue_lock, and the blkg walk is
+performed under the same locking; the init walk goes parents first
+like blkcg_activate_policy().
+
+>> +	/* prevent multiple attach of the same struct_ops */
+>> +	if (ops->q)
+>> +		return -EINVAL;
+> 
+> On the link path the map stays READY after .unreg, so a map can be
+> attached again through a new link. If the device goes away, the ejection
+> clears ops->q while the old link is still open, a device with the same
+> dev_t comes back and a new link attaches the same map, closing the old
+> link then detaches the new attachment. Recording the owning link in the
+> ops and having .unreg detach only when it matches would close that.
+> 
+
+Done: .unreg records the owning link in the ops and only detaches
+when the closing link matches.
+
+>> +	/*
+>> +	 * check liveness and create the ioc under rq_qos_mutex, like
+>> +	 * blkg_conf_open_bdev() does; enabling stays with io.cost.qos
+>> +	 *
+>> +	 * the queue reference is held across the unlocked window below:
+>> +	 * the bdev reference does not pin the queue, bdev only holds a
+>> +	 * raw bd_queue pointer, and concurrent device removal may eject
+>> +	 * the model and free the ioc while we are off the mutex, so
+>> +	 * without our own reference the second mutex_lock() would touch
+>> +	 * a freed queue
+>> +	 */
+>> +	mutex_lock(&q->rq_qos_mutex);
+>> +	if (!disk_live(disk) || !blk_get_queue(q)) {
+> ...
+>> +	ioc = q_to_ioc(q);
+>> +	if (!ioc) {
+>> +		ret = blk_iocost_init(disk);
+>> +		mutex_unlock(&q->rq_qos_mutex);
+> 
+> Why drop rq_qos_mutex here? ioc_cost_model_write() holds it from
+> blkg_conf_open_bdev() across blk_iocost_init() and its own freeze and
+> quiesce, so attach can hold it from the disk_live() check through the
+> unfreeze. Then the ioc can't be freed under us and the queue reference,
+> the second q_to_ioc() check and this comment go away. The comment is also
+> wrong: a whole-disk no-open bdev reference holds the disk device, and
+> disk_release() is what drops the queue reference.
+> 
+
+Done: the attach holds rq_qos_mutex from the disk_live() check
+through the unfreeze, like ioc_cost_model_write() does, so the unlock
+window, the queue reference, the second q_to_ioc() and its comment
+are gone.
+
+Thanks.
+Tao
+
+> Thanks.
+> 
+> --
+> tejun
+
