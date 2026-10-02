@@ -1,211 +1,611 @@
-Received: from mail-oo2-f42.google.com (mail-oo2-f42.google.com [74.125.231.170])
+Received: from mail-pz2-f37.google.com (mail-pz2-f37.google.com [74.125.228.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766E348643F
-	for <linux-block@vger.kernel.org>; Fri,  2 Oct 2026 14:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C874E0B8F
+	for <linux-block@vger.kernel.org>; Fri,  2 Oct 2026 15:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790952616; cv=none; b=mzMEtAWAdIlwlOdIx7dc7JJD3NnU0rV0nqGlwP/NgjLV++HzIlOdzFnWc6sStUnrW4S3OWgYOhMxFvF/IdhnuggfXj5uVqq41RMKkth8GihCRgWUTbfDwRF/esZ4H1h4Oszie1ngd53BsRqBuKYtU3SfX2j04UU/NdjRkEk729g=
+	t=1790954910; cv=none; b=CK1FVdVVc6uli65BSceHz/18Usnt0d0iqZlhbXrveuUJKV2vXlCfoPlO9FanUB1YYY3Ug5cXI5iGDjQ7MsHsTNHLxiqEuy8Z70SN9yQ1/IUoa1VrIHMYtQ5YqwHgOWhOSf0yxQUI1kHlcYT4Yh0vwsIm3oqX6y0ksLwOYLOFVls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790952616; c=relaxed/simple;
-	bh=GoIGu+wB1q43xuG+LdcOwTO9LYFLXk1QZ5++plePqwU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=YI2i9AWSZgWGKpvS8Oc9UfCWvIbVGCj3/qfDFWgEPJ9nI1Z16YikjdpGmheaxB6HHMfz35E5efBsd+UK3o6Qa8hXzbi+NVGSHYuF2K6knwgIS2++CcPWmNygDvtNYGCyRVROkSSY4Evp/NhVQo4YGuCMhvTHjIuBYmj5fSyYth0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=tOxvr6j3; arc=none smtp.client-ip=74.125.231.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1790954910; c=relaxed/simple;
+	bh=YzfQJQg0LJCEqt2N/A+DuLAijTLd3dNDFgzcCtEfigo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XF9mi9o7fy6QQa4Qq49OQtBRO2QhHmk1583WFhhRtOOlGY/ULyp1i5qr/Ix36ysGTQDgWvpSdrMMQiVcPzOf5kZFrhSdn7B/vlXGWU6tW26T9RdC1PX19gXz/gvug+s1ZopWvjCq0dCsa9JvHi48q2lpNGXOPev8QOoUnVBeiAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OGniCHue; arc=none smtp.client-ip=74.125.228.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="tOxvr6j3"
-Received: by mail-oo2-f42.google.com with SMTP id 46e09a7af769-81be5042c51so142398a34.1
-        for <linux-block@vger.kernel.org>; Fri, 02 Oct 2026 07:50:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OGniCHue"
+Received: by mail-pz2-f37.google.com with SMTP id 41be03b00d2f7-cc7d1403bbaso1922144a12.1
+        for <linux-block@vger.kernel.org>; Fri, 02 Oct 2026 08:28:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1790952613; x=1791557413; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=iB5FlA1zvnKKRmCxed3WM+NQCuN6INMb+DWlDxqFuXY=;
-        b=tOxvr6j361ju+oGq/amfwpdAD4GCQ8TYmZEY70AXFN/bXxHp0n5YwYtNVfi3ypeICb
-         WQj2MlO5Qs6oCHd2pNCB7C9YOXzzCCKE0+dsnYShCZCpwzHzKqvPkF1TAIUega9BykpF
-         ANT1N3bagvmmjVNuA/xJ0FUGtUeioQ5o/DhGq1WZG9eAimPBAq1WxOIAmsxJxTpxbYRI
-         +xsRjubehd1TzYiTZ1qtsdSlKmXQ+FgHQtNf97OHbpgNBm9p+rVKjZG0jBwlLWIkh7Pc
-         qeJfMdO5o6C5a32jQQDLZcmp50g584rZCbS+sftWdrivSzbSS7kRD8Tq6+nfQHWeuEJi
-         xCnA==
+        d=gmail.com; s=20251104; t=1790954905; x=1791559705; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=xEXQq4H1e+S1FyS8d0fL7o60+B7DNsEj0LYRUI5ESlw=;
+        b=OGniCHuetmd6TOBJZb+29SamUWCRNgFGvhH40GN6xcDAA01mru5fMp9ygZHvfcRlLo
+         m1/T4gN78hFaTSJSqk9REt96TqYnvsOHyYJ21b2IPCw7NKZn0b+6GXTN/eStRIuKHfQU
+         wfJ49Hnmq157/IJDXkQ2ATKk/CrGSI7rFcjkJ8G4Ex62vdcctaSBp8Ui1Rr/HsDOFXEr
+         r7w90CU7Ab2idH+9itVcpM/P7KSjKAcowYD29wII+juvQ9XGufvdhVYIhVsoclgLa2on
+         R/TgntxOnPNbYNBD1oVhw/h7bKN2trh8XnRR+b6Xn90x76WP6mvs4v0ZOj8RGuctEB6w
+         TVlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790952613; x=1791557413;
-        h=content-transfer-encoding:content-type:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iB5FlA1zvnKKRmCxed3WM+NQCuN6INMb+DWlDxqFuXY=;
-        b=nVdf2Div3c3L7E9xnriFLzCrupv3uEIRRurUZkV7Hs6f9VEdnqxE4q065xWKM50Sfr
-         VCLANSajeK2va1t3qAXyIkiSyzerNKTpYR6b1o1+VSWFxizQn62Bm/2EDUFJtl9hNR0t
-         AnklFghRlKddhnqlyCvZp0z/lJD0s4BjNfATYuWHOQytQslwsLpPgWY20UAXDzFnrmJn
-         CtgOXkdtgC/pWm0jQMb6/UvlJQtXmsZ9lrQWOOCBMr8WzJSu/o/p538kZODCWtJzZeuz
-         G+gaiOmAw0zT9YX8hEN4aRRqhOE7+OUDzkFsecikAwVKa1JrQIXiu/bbxMTTxxBC86Op
-         zlrg==
-X-Gm-Message-State: AFuF++m2qbgeRCzJTc/fmkDzpRbslyXAoJr11IIA9GX27DU6fUY0sFSX
-	DBIhFAdRzNB3GbFZKuikxicQw2mhsNUI+zsNpphy4qjgfL97qaXGQXMLJ1iBfeQfsNGANbT7PwG
-	XWknCtxM=
-X-Gm-Gg: AYBFou0tbjy9BqhqI6iazwz7K3e1d3RP9JZyaCGLjwDgMQL+ekUlpBbO5F3+WMwfc5A
-	59N3piRtowKFr0BMtc5UnM5u0jGGy6lhlAungQB1lSgASZjtLQwv3sKc00iO8nUSTMUmG9h93pz
-	qz1vO0DFCpVT+KNfYwhUCC/k3aQ6gsk/cOlldVKqjRJZxxRoi+V/PIWnQstDsACC1WCPBHk7cZM
-	EHitm7SkOgwBEnYMOyZzB0Pm1GTOYWtlSl7udCTdD0AvloN+FWF0/7itumKpTeLXgHdN6MX0LQu
-	a/jB/PSUESlym9/SGd1puTxPx5NnMV1RgNatqHgYtHihDfFBlrRkqYgjo2mk0F780K/oBBjtELW
-	zGyrQZMoZ6lmCjpVnLNb594WLS+3paR2vuRvW/FTi3PXUoyG3FOTLjbdoz75w5fStexqUChSEgh
-	Q2/avpWmJf8aS7twakk6y2f7L0csog+imMP8g9fNqDwlogRz+Ty9IM+PKBKXkctrwOG0koDw654
-	bpAov5k+h0gQSKRmaofUt+VTh7oDZzML/uuOvzjtuATWrwIlhau74c=
-X-Received: by 2002:a05:6830:700d:b0:7f8:4ebe:2854 with SMTP id 46e09a7af769-8227f994594mr3444393a34.4.1790952613046;
-        Fri, 02 Oct 2026 07:50:13 -0700 (PDT)
-Received: from [192.168.2.38] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-82279d738bbsm3064215a34.15.2026.10.02.07.50.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Oct 2026 07:50:12 -0700 (PDT)
-Message-ID: <4fbdea09-538d-4be2-8492-bca0aa570e15@kernel.dk>
-Date: Fri, 2 Oct 2026 08:50:11 -0600
+        d=1e100.net; s=20260707; t=1790954905; x=1791559705;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=xEXQq4H1e+S1FyS8d0fL7o60+B7DNsEj0LYRUI5ESlw=;
+        b=MYgtNcl63otMX9FfouOjrTWVznF7ym2IJh/4P4qIuJtKS3QAnYBtHUMynhdLz6Lqul
+         taTMqHLbZyw9l5JyXu9goLyk36Lk9+GqZel9kVO/+pCEiyPYR/oKYuAT7+uee5NKGvVM
+         aJ6RKfo7gCunWAXJqymnmsjcRGJKIKnLe+QnV5gVj+ELSV/GKH219Z51Z2rLBEDfcl+/
+         cjIyaHKem5pdRjGk+hsB1qojmoHk5XxD8Fa0Apf1HPSBwsX5T89j/S+aMEaYpT3Nu0dD
+         G9I63ChftOPm0PE1w82hng/s2uSp7CScMZb/LR1m6lHdT60G6Ae4CcplKWZbUx9rCfuX
+         Ak2w==
+X-Forwarded-Encrypted: i=1; AKwUvByqkE5NJKLTXZwMuYlbSJ1gNj+XvDl6GgrN0rrqWx1Hd3v4TtdgF/gu51VgDSLfB0qVDggigeW760RwzQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYK+aAKvb+OPrYvfDphN5+FauJ7RCBXoMWKGNUqjv10gkBwg7xE3
+	IhrLBMGyyEt1dHAh23wslwZHjkIuqR0OkojqbkCkhiwZ1q/kx6nZxdf2
+X-Gm-Gg: AYBFou0+kyqW21zp9B5zQw8lsYmkfJ9L8KtgCnd+57QytLViR6lbaZowgy9Sk8RyEn8
+	nZPcbtCPbITo4qScfKYDc0rNaEs0J4PY+El43UqRA46IFdCaZc3EVliOdPgzHtv8LeegMizY5f7
+	vH3IwAr7J/2bbT2tUqxfx6SfXs5/2VkwNmvMdFPeDNxTa+AssCjcFw5za83DGNa+AN+0CMNlCff
+	EEi2CN/Dd0etI4No39dHXt0nb+2Xqo/qzQvApfXVUA65SNbCMjfyPIq28/rXCJ0wHoC4PtODfj3
+	dXO9BQeh0yncALRGQgwJ1Hgagm20wXRiYFy69YVUI3VhLXIkVSD4/AFY+gUMtVEYN7XMb3HojOK
+	VM4QDiaPx/Q+//g2GfwLHbmHv/Ju/jjbvhbi4HgOj+JiodOVO8NA+MYbdpG2ru827Z63/S12b3g
+	5Q9j2r3bHT9bv+vzxI5r+UrTT9Z2+cS3TPUZ/0sMtreAsISHxqcVZzc0wZVqpC5q3X1XMuq3XnR
+	stIazqE2v0NjBlxcRM2k2gHIf9FmiFsX4WqCUyZzwpJdLVvnWDtdbSvN8QT8OsaQIJR0DZlEtdx
+	bTBo
+X-Received: by 2002:a17:902:d2ce:b0:2dd:c100:7cc3 with SMTP id d9443c01a7336-2e49b6ec19dmr28454465ad.63.1790954905271;
+        Fri, 02 Oct 2026 08:28:25 -0700 (PDT)
+Received: from yupeng-XPS-15-9520.. (c-73-169-192-12.hsd1.wa.comcast.net. [73.169.192.12])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e4b068a060sm5938495ad.56.2026.10.02.08.28.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Oct 2026 08:28:24 -0700 (PDT)
+From: Peng Yu <yupeng0921@gmail.com>
+To: Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Maurizio Lombardi <mlombard@arkamax.eu>,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Peng Yu <yupeng0921@gmail.com>
+Subject: [PATCH v8] nvmet: add cgroup_id to charge namespace I/O to a cgroup
+Date: Fri,  2 Oct 2026 08:28:21 -0700
+Message-ID: <20261002152821.410591-1-yupeng0921@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 7.3-rc6
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Linus,
+nvmet issues namespace I/O from kernel threads, which are in the root
+cgroup, so io.max and the other io controller settings can't be applied
+per namespace. When namespaces on shared storage, e.g. LVM volumes on
+the same physical volumes, are exported to different users, nothing
+stops a noisy user from slowing down the others. Unlike loop, there is
+no userspace process whose cgroup could be used instead.
 
-A set of block fixes for this week. Mostly NVMe via a pull from Keith,
-but also a few core block and driver fixes. This pull request contains:
+Add a cgroup_id namespace attribute that takes a cgroup2 ID. While the
+namespace is enabled, nvmet holds the cgroup and charges each command's
+I/O to the cgroup's effective io css. Block device and file backed
+namespaces are supported, but not buffered_io: buffered writes are
+written back later by flusher threads that don't know the namespace's
+cgroup.
 
-- NVMe fixes via Keith:
-	- Fix an out-of-bounds write in nvmet_auth_challenge(), where
-	  sizeof() on a void pointer undercounted the challenge header and
-	  let a short AUTH_RECEIVE buffer pass the check
-	- nvme-multipath fixes for an ANA log bounds check underflow, the
-	  command effects log lifetime for multipath heads, and only
-	  setting BLK_FEAT_ZONED after the zone info is known.
-	- nvmet fixes for ns->enabled teardown ordering, rejecting I/O
-	  after the percpu ns reference is killed, device path preservation
-	  on allocation failure, and too-short SGL segments in pci-epf
-	- nvme-tcp: revert the per-socket dynamic lockdep keys, and delay
-	  the socket reclassification
-	- A DMA pool alignment quirk for the Micron 4100AT
-	- Controller state/reset race fixes, and -Wformat-security
-	  workarounds
+Signed-off-by: Peng Yu <yupeng0921@gmail.com>
+Assisted-by: Claude:claude-fable-5 [Claude Code]
+Assisted-by: Claude:claude-opus-5-5 [Claude Code]
+---
+Change since v7:
+* Write the commit message as prose (Tejun).
+* Add a Documentation/ABI/stable/configfs-nvmet entry for cgroup_id
+  (Tejun).
+* Associate the read/write, flush and zone append bios through
+  nvmet_blkcg_begin()/end() and drop nvmet_blkcg_set_bio(), so each
+  bio is associated only once (Tejun).
+* v7 1/2 was applied to cgroup/for-7.4 as d5632ae01502 ("cgroup: Track
+  the effective css in each cgroup"). This patch doesn't depend on it.
 
-- blk-mq: set RQF_USE_SCHED when the operation is known, and allow
-  cached requests to be used for flush operations
+v7 (with test steps): https://lore.kernel.org/all/20260929232411.101087-1-yupeng0921@gmail.com/
 
-- Reject polled dio with user integrity metadata
+ Documentation/ABI/stable/configfs-nvmet | 15 +++++++
+ drivers/nvme/target/configfs.c          | 47 +++++++++++++++++++++
+ drivers/nvme/target/core.c              | 54 +++++++++++++++++++++++++
+ drivers/nvme/target/io-cmd-bdev.c       | 22 +++++++++-
+ drivers/nvme/target/io-cmd-file.c       | 21 +++++++++-
+ drivers/nvme/target/nvmet.h             | 42 +++++++++++++++++++
+ drivers/nvme/target/zns.c               |  7 ++++
+ 7 files changed, 205 insertions(+), 3 deletions(-)
 
-- Save the IRQ state in blkg_tryget_closest()
+diff --git a/Documentation/ABI/stable/configfs-nvmet b/Documentation/ABI/stable/configfs-nvmet
+index 36b587404ee7..bdcb705aa8c9 100644
+--- a/Documentation/ABI/stable/configfs-nvmet
++++ b/Documentation/ABI/stable/configfs-nvmet
+@@ -314,6 +314,21 @@ Description:
+ 		attr_subsys_vendor_id: Shows or sets the PCI subsystem
+ 		vendor ID. Displayed in "0x%x" format.
+ 
++What:		/config/nvmet/subsystems/NAME/namespaces/NSID/cgroup_id
++Date:		October 2026
++KernelVersion:	7.4
++Contact:	Peng Yu <yupeng0921@gmail.com>
++Description:
++		Shows or sets the cgroup2 ID of the cgroup to charge this
++		namespace's I/O to. Writing 0 clears it. The I/O is
++		charged to the cgroup's effective io css: the cgroup
++		itself or its nearest ancestor with the io controller
++		enabled. The namespace must be disabled before
++		modification. Enabling the namespace fails if the cgroup
++		can't be found or if buffered_io is set.
++
++		Only available when CONFIG_BLK_CGROUP is enabled.
++
+ What:		/config/nvmet/hosts/HOSTNQN/dhchap_key
+ What:		/config/nvmet/hosts/HOSTNQN/dhchap_ctrl_key
+ What:		/config/nvmet/hosts/HOSTNQN/dhchap_hash
+diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
+index 6286e38436dd..cef832303d72 100644
+--- a/drivers/nvme/target/configfs.c
++++ b/drivers/nvme/target/configfs.c
+@@ -561,6 +561,50 @@ static ssize_t nvmet_ns_device_path_store(struct config_item *item,
+ 
+ CONFIGFS_ATTR(nvmet_ns_, device_path);
+ 
++#ifdef CONFIG_BLK_CGROUP
++static ssize_t nvmet_ns_cgroup_id_show(struct config_item *item, char *page)
++{
++	struct nvmet_ns *ns = to_nvmet_ns(item);
++	struct nvmet_subsys *subsys = ns->subsys;
++	ssize_t ret;
++
++	mutex_lock(&subsys->lock);
++	ret = snprintf(page, PAGE_SIZE, "%llu\n", ns->cgroup_id);
++	mutex_unlock(&subsys->lock);
++	return ret;
++}
++
++static ssize_t nvmet_ns_cgroup_id_store(struct config_item *item,
++		const char *page, size_t count)
++{
++	struct nvmet_ns *ns = to_nvmet_ns(item);
++	struct nvmet_subsys *subsys = ns->subsys;
++	u64 cgroup_id;
++	int ret;
++
++	ret = kstrtou64(page, 0, &cgroup_id);
++	if (ret)
++		return ret;
++
++	mutex_lock(&subsys->lock);
++
++	if (ns->enabled) {
++		ret = -EBUSY;
++		goto out_unlock;
++	}
++
++	/* Writing 0 clears the association. */
++	ns->cgroup_id = cgroup_id;
++	ret = count;
++
++out_unlock:
++	mutex_unlock(&subsys->lock);
++	return ret;
++}
++
++CONFIGFS_ATTR(nvmet_ns_, cgroup_id);
++#endif /* CONFIG_BLK_CGROUP */
++
+ #ifdef CONFIG_PCI_P2PDMA
+ static ssize_t nvmet_ns_p2pmem_show(struct config_item *item, char *page)
+ {
+@@ -833,6 +877,9 @@ static struct configfs_attribute *nvmet_ns_attrs[] = {
+ 	&nvmet_ns_attr_buffered_io,
+ 	&nvmet_ns_attr_revalidate_size,
+ 	&nvmet_ns_attr_resv_enable,
++#ifdef CONFIG_BLK_CGROUP
++	&nvmet_ns_attr_cgroup_id,
++#endif
+ #ifdef CONFIG_PCI_P2PDMA
+ 	&nvmet_ns_attr_p2pmem,
+ #endif
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index 43871a8f56ca..6d9d55eb11eb 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -4,6 +4,7 @@
+  * Copyright (c) 2015-2016 HGST, a Western Digital Company.
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++#include <linux/cgroup.h>
+ #include <linux/hex.h>
+ #include <linux/module.h>
+ #include <linux/random.h>
+@@ -474,8 +475,57 @@ void nvmet_put_namespace(struct nvmet_ns *ns)
+ 	percpu_ref_put(&ns->ref);
+ }
+ 
++#ifdef CONFIG_BLK_CGROUP
++static int nvmet_blkcg_ns_enable(struct nvmet_ns *ns)
++{
++	struct cgroup *cgrp;
++
++	if (!ns->cgroup_id)
++		return 0;
++
++	/*
++	 * Buffered writes will be handled by a separate thread,
++	 * these IOs have no namespace/cgroup information at that time,
++	 * so we don't support buffered io.
++	 */
++	if (ns->buffered_io) {
++		pr_err("cgroup_id is not supported with buffered_io: %s\n",
++		       ns->device_path);
++		return -EINVAL;
++	}
++
++	cgrp = cgroup_get_from_id(ns->cgroup_id);
++	if (IS_ERR(cgrp)) {
++		pr_err("failed to resolve cgroup id %llu: %ld\n",
++		       ns->cgroup_id, PTR_ERR(cgrp));
++		return PTR_ERR(cgrp);
++	}
++
++	ns->cgrp = cgrp;
++	return 0;
++}
++
++static void nvmet_blkcg_ns_disable(struct nvmet_ns *ns)
++{
++	if (ns->cgrp) {
++		cgroup_put(ns->cgrp);
++		ns->cgrp = NULL;
++	}
++}
++#else
++static inline int nvmet_blkcg_ns_enable(struct nvmet_ns *ns)
++{
++	return 0;
++}
++
++static inline void nvmet_blkcg_ns_disable(struct nvmet_ns *ns)
++{
++}
++#endif /* CONFIG_BLK_CGROUP */
++
+ static void nvmet_ns_dev_disable(struct nvmet_ns *ns)
+ {
++	nvmet_blkcg_ns_disable(ns);
+ 	nvmet_bdev_ns_disable(ns);
+ 	nvmet_file_ns_disable(ns);
+ }
+@@ -602,6 +652,10 @@ int nvmet_ns_enable(struct nvmet_ns *ns)
+ 	if (ret)
+ 		goto out_unlock;
+ 
++	ret = nvmet_blkcg_ns_enable(ns);
++	if (ret)
++		goto out_dev_disable;
++
+ 	ret = nvmet_p2pmem_ns_enable(ns);
+ 	if (ret)
+ 		goto out_dev_disable;
+diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
+index f2d9e8901df4..615a403d2e06 100644
+--- a/drivers/nvme/target/io-cmd-bdev.c
++++ b/drivers/nvme/target/io-cmd-bdev.c
+@@ -262,6 +262,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
+ 	struct sg_mapping_iter prot_miter;
+ 	unsigned int iter_flags;
+ 	unsigned int total_len = nvmet_rw_data_len(req) + req->metadata_len;
++	bool associated;
+ 
+ 	if (!nvmet_check_transfer_len(req, total_len))
+ 		return;
+@@ -289,6 +290,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
+ 
+ 	sector = nvmet_lba_to_sect(req->ns, req->cmd->rw.slba);
+ 
++	associated = nvmet_blkcg_begin(req->ns);
+ 	if (nvmet_use_inline_bvec(req)) {
+ 		bio = &req->b.inline_bio;
+ 		bio_init(bio, req->ns->bdev, req->inline_bvec,
+@@ -315,6 +317,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
+ 				rc = nvmet_bdev_alloc_bip(req, bio,
+ 							  &prot_miter);
+ 				if (unlikely(rc)) {
++					nvmet_blkcg_end(associated);
+ 					bio_io_error(bio);
+ 					return;
+ 				}
+@@ -331,6 +334,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
+ 		sector += sg->length >> 9;
+ 		sg_cnt--;
+ 	}
++	nvmet_blkcg_end(associated);
+ 
+ 	if (req->metadata_len) {
+ 		rc = nvmet_bdev_alloc_bip(req, bio, &prot_miter);
+@@ -347,6 +351,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
+ static void nvmet_bdev_execute_flush(struct nvmet_req *req)
+ {
+ 	struct bio *bio = &req->b.inline_bio;
++	bool associated;
+ 
+ 	if (!bdev_write_cache(req->ns->bdev)) {
+ 		nvmet_req_complete(req, NVME_SC_SUCCESS);
+@@ -356,8 +361,10 @@ static void nvmet_bdev_execute_flush(struct nvmet_req *req)
+ 	if (!nvmet_check_transfer_len(req, 0))
+ 		return;
+ 
++	associated = nvmet_blkcg_begin(req->ns);
+ 	bio_init(bio, req->ns->bdev, req->inline_bvec,
+ 		 ARRAY_SIZE(req->inline_bvec), REQ_OP_WRITE | REQ_PREFLUSH);
++	nvmet_blkcg_end(associated);
+ 	bio->bi_private = req;
+ 	bio->bi_end_io = nvmet_bio_done;
+ 
+@@ -366,10 +373,16 @@ static void nvmet_bdev_execute_flush(struct nvmet_req *req)
+ 
+ u16 nvmet_bdev_flush(struct nvmet_req *req)
+ {
++	bool associated;
++	int ret;
++
+ 	if (!bdev_write_cache(req->ns->bdev))
+ 		return 0;
+ 
+-	if (blkdev_issue_flush(req->ns->bdev))
++	associated = nvmet_blkcg_begin(req->ns);
++	ret = blkdev_issue_flush(req->ns->bdev);
++	nvmet_blkcg_end(associated);
++	if (ret)
+ 		return NVME_SC_INTERNAL | NVME_STATUS_DNR;
+ 	return 0;
+ }
+@@ -380,9 +393,11 @@ static void nvmet_bdev_execute_discard(struct nvmet_req *req)
+ 	struct nvme_dsm_range range;
+ 	struct bio *bio = NULL;
+ 	sector_t nr_sects;
++	bool associated;
+ 	int i;
+ 	u16 status = NVME_SC_SUCCESS;
+ 
++	associated = nvmet_blkcg_begin(ns);
+ 	for (i = 0; i <= le32_to_cpu(req->cmd->dsm.nr); i++) {
+ 		status = nvmet_copy_from_sgl(req, i * sizeof(range), &range,
+ 				sizeof(range));
+@@ -394,6 +409,7 @@ static void nvmet_bdev_execute_discard(struct nvmet_req *req)
+ 				nvmet_lba_to_sect(ns, range.slba), nr_sects,
+ 				GFP_KERNEL, &bio);
+ 	}
++	nvmet_blkcg_end(associated);
+ 
+ 	if (bio) {
+ 		bio->bi_private = req;
+@@ -431,6 +447,7 @@ static void nvmet_bdev_execute_write_zeroes(struct nvmet_req *req)
+ 	struct bio *bio = NULL;
+ 	sector_t sector;
+ 	sector_t nr_sector;
++	bool associated;
+ 	int ret;
+ 
+ 	if (!nvmet_check_transfer_len(req, 0))
+@@ -440,8 +457,11 @@ static void nvmet_bdev_execute_write_zeroes(struct nvmet_req *req)
+ 	nr_sector = (((sector_t)le16_to_cpu(write_zeroes->length) + 1) <<
+ 		(req->ns->blksize_shift - 9));
+ 
++	associated = nvmet_blkcg_begin(req->ns);
+ 	ret = __blkdev_issue_zeroout(req->ns->bdev, sector, nr_sector,
+ 			GFP_KERNEL, &bio, 0);
++	nvmet_blkcg_end(associated);
++
+ 	if (bio) {
+ 		bio->bi_private = req;
+ 		bio->bi_end_io = nvmet_bio_done;
+diff --git a/drivers/nvme/target/io-cmd-file.c b/drivers/nvme/target/io-cmd-file.c
+index 0b22d183f927..570e65259ad8 100644
+--- a/drivers/nvme/target/io-cmd-file.c
++++ b/drivers/nvme/target/io-cmd-file.c
+@@ -79,6 +79,8 @@ static ssize_t nvmet_file_submit_bvec(struct nvmet_req *req, loff_t pos,
+ 	struct kiocb *iocb = &req->f.iocb;
+ 	ssize_t (*call_iter)(struct kiocb *iocb, struct iov_iter *iter);
+ 	struct iov_iter iter;
++	bool associated;
++	ssize_t ret;
+ 	int rw;
+ 
+ 	if (req->cmd->rw.opcode == nvme_cmd_write) {
+@@ -97,7 +99,10 @@ static ssize_t nvmet_file_submit_bvec(struct nvmet_req *req, loff_t pos,
+ 	iocb->ki_filp = req->ns->file;
+ 	iocb->ki_flags = ki_flags | iocb->ki_filp->f_iocb_flags;
+ 
+-	return call_iter(iocb, &iter);
++	associated = nvmet_blkcg_begin(req->ns);
++	ret = call_iter(iocb, &iter);
++	nvmet_blkcg_end(associated);
++	return ret;
+ }
+ 
+ static void nvmet_file_io_done(struct kiocb *iocb, long ret)
+@@ -251,7 +256,13 @@ static void nvmet_file_execute_rw(struct nvmet_req *req)
+ 
+ u16 nvmet_file_flush(struct nvmet_req *req)
+ {
+-	return errno_to_nvme_status(req, vfs_fsync(req->ns->file, 1));
++	bool associated;
++	int ret;
++
++	associated = nvmet_blkcg_begin(req->ns);
++	ret = vfs_fsync(req->ns->file, 1);
++	nvmet_blkcg_end(associated);
++	return errno_to_nvme_status(req, ret);
+ }
+ 
+ static void nvmet_file_flush_work(struct work_struct *w)
+@@ -274,10 +285,12 @@ static void nvmet_file_execute_discard(struct nvmet_req *req)
+ 	int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
+ 	struct nvme_dsm_range range;
+ 	loff_t offset, len;
++	bool associated;
+ 	u16 status = 0;
+ 	int ret;
+ 	int i;
+ 
++	associated = nvmet_blkcg_begin(req->ns);
+ 	for (i = 0; i <= le32_to_cpu(req->cmd->dsm.nr); i++) {
+ 		status = nvmet_copy_from_sgl(req, i * sizeof(range), &range,
+ 					sizeof(range));
+@@ -300,6 +313,7 @@ static void nvmet_file_execute_discard(struct nvmet_req *req)
+ 			break;
+ 		}
+ 	}
++	nvmet_blkcg_end(associated);
+ 
+ 	nvmet_req_complete(req, status);
+ }
+@@ -336,6 +350,7 @@ static void nvmet_file_write_zeroes_work(struct work_struct *w)
+ 	int mode = FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE;
+ 	loff_t offset;
+ 	loff_t len;
++	bool associated;
+ 	int ret;
+ 
+ 	offset = le64_to_cpu(write_zeroes->slba) << req->ns->blksize_shift;
+@@ -347,7 +362,9 @@ static void nvmet_file_write_zeroes_work(struct work_struct *w)
+ 		return;
+ 	}
+ 
++	associated = nvmet_blkcg_begin(req->ns);
+ 	ret = vfs_fallocate(req->ns->file, mode, offset, len);
++	nvmet_blkcg_end(associated);
+ 	nvmet_req_complete(req, ret < 0 ? errno_to_nvme_status(req, ret) : 0);
+ }
+ 
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index dbda55895f4f..db46f8fd583d 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -21,6 +21,8 @@
+ #include <linux/radix-tree.h>
+ #include <linux/t10-pi.h>
+ #include <linux/kfifo.h>
++#include <linux/kthread.h>
++#include <linux/cgroup.h>
+ 
+ #define NVMET_DEFAULT_VS		NVME_VS(2, 1, 0)
+ 
+@@ -115,6 +117,16 @@ struct nvmet_ns {
+ 	struct nvmet_subsys	*subsys;
+ 	const char		*device_path;
+ 
++#ifdef CONFIG_BLK_CGROUP
++	u64			cgroup_id;
++	/*
++	 * Resolved from ->cgroup_id when the namespace is enabled and
++	 * released when it is disabled, so it has the same lifetime and
++	 * visibility rules as ->bdev and ->file.
++	 */
++	struct cgroup		*cgrp;
++#endif
++
+ 	struct config_group	device_group;
+ 	struct config_group	group;
+ 
+@@ -732,6 +744,36 @@ void nvmet_bdev_execute_zone_mgmt_recv(struct nvmet_req *req);
+ void nvmet_bdev_execute_zone_mgmt_send(struct nvmet_req *req);
+ void nvmet_bdev_execute_zone_append(struct nvmet_req *req);
+ 
++#ifdef CONFIG_BLK_CGROUP
++static inline bool nvmet_blkcg_begin(struct nvmet_ns *ns)
++{
++	struct cgroup_subsys_state *css;
++
++	if (!ns->cgrp || !in_task() || !(current->flags & PF_KTHREAD))
++		return false;
++
++	css = cgroup_get_e_css(ns->cgrp, &io_cgrp_subsys);
++	kthread_associate_blkcg(css);
++	css_put(css);
++	return true;
++}
++
++static inline void nvmet_blkcg_end(bool associated)
++{
++	if (associated)
++		kthread_associate_blkcg(NULL);
++}
++#else
++static inline bool nvmet_blkcg_begin(struct nvmet_ns *ns)
++{
++	return false;
++}
++
++static inline void nvmet_blkcg_end(bool associated)
++{
++}
++#endif /* CONFIG_BLK_CGROUP */
++
+ static inline u32 nvmet_rw_data_len(struct nvmet_req *req)
+ {
+ 	return ((u32)le16_to_cpu(req->cmd->rw.length) + 1) <<
+diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
+index 23a17c02abee..c6cc4730285b 100644
+--- a/drivers/nvme/target/zns.c
++++ b/drivers/nvme/target/zns.c
+@@ -480,8 +480,11 @@ static void nvmet_bdev_zmgmt_send_work(struct work_struct *w)
+ 	struct block_device *bdev = req->ns->bdev;
+ 	sector_t zone_sectors = bdev_zone_sectors(bdev);
+ 	u16 status = NVME_SC_SUCCESS;
++	bool associated;
+ 	int ret;
+ 
++	associated = nvmet_blkcg_begin(req->ns);
++
+ 	if (op == REQ_OP_LAST) {
+ 		req->error_loc = offsetof(struct nvme_zone_mgmt_send_cmd, zsa);
+ 		status = NVME_SC_ZONE_INVALID_TRANSITION | NVME_STATUS_DNR;
+@@ -511,6 +514,7 @@ static void nvmet_bdev_zmgmt_send_work(struct work_struct *w)
+ 		status = blkdev_zone_mgmt_errno_to_nvme_status(ret);
+ 
+ out:
++	nvmet_blkcg_end(associated);
+ 	nvmet_req_complete(req, status);
+ }
+ 
+@@ -542,6 +546,7 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
+ 	struct scatterlist *sg;
+ 	u32 data_len = nvmet_rw_data_len(req);
+ 	struct bio *bio;
++	bool associated;
+ 	int sg_cnt;
+ 
+ 	/* Request is completed on len mismatch in nvmet_check_transfer_len() */
+@@ -572,6 +577,7 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
+ 		goto out;
+ 	}
+ 
++	associated = nvmet_blkcg_begin(req->ns);
+ 	if (nvmet_use_inline_bvec(req)) {
+ 		bio = &req->z.inline_bio;
+ 		bio_init(bio, req->ns->bdev, req->inline_bvec,
+@@ -579,6 +585,7 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
+ 	} else {
+ 		bio = bio_alloc(req->ns->bdev, req->sg_cnt, opf, GFP_KERNEL);
+ 	}
++	nvmet_blkcg_end(associated);
+ 
+ 	bio->bi_end_io = nvmet_bdev_zone_append_bio_done;
+ 	bio->bi_iter.bi_sector = sect;
 
-- Set the zone write granularity in virtio_blk
-
-- ublk selftest fixes
-
-Please pull!
-
-
-The following changes since commit 94b1a3ca9b8db3151f1416263704c159a9470da5:
-
-  selftests: ublk: add batch IO cases to recover_03 (2026-09-10 20:19:21 -0600)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.3-20261002
-
-for you to fetch changes up to 684b413b5483f57c890c171b9400076a0143b918:
-
-  virtio_blk: set the zone write granularity (2026-09-29 12:54:47 -0600)
-
-----------------------------------------------------------------
-block-7.3-20261002
-
-----------------------------------------------------------------
-Arnd Bergmann (3):
-      drbd: remove unused drbd_nl_mcgrps[] array
-      nvme: work around -Wformat-security warning
-      nvme: work around all -Wformat-security warnings
-
-Bean Huo (1):
-      nvme-pci: add NVME_QUIRK_DMAPOOL_ALIGN_512 for Micron 4100AT
-
-Daehyeon Ko (2):
-      nvme-multipath: fix underflow in ANA log bounds checks
-      nvmet: pci-epf: reject too-short SGL segments
-
-Dirk Gouders (1):
-      selftests: ublk: fix unused_result error
-
-Eric Dumazet (1):
-      nvme-tcp: delay nvme_tcp_reclassify_socket()
-
-Guixin Liu (2):
-      nvmet: copy the hostid into the ctrl before creating PR pc_refs
-      nvme-multipath: set BLK_FEAT_ZONED only after the zone info is known
-
-Hao Zhang (1):
-      blk-cgroup: save IRQ state in blkg_tryget_closest()
-
-Jens Axboe (1):
-      Merge tag 'nvme-7.3-2026-09-25' of git://git.infradead.org/nvme into block-7.3
-
-Julian Sun (1):
-      nvmet: preserve device path on allocation failure
-
-Keith Busch (2):
-      blk-mq: set RQF_USE_SCHED when the operation is known
-      blk-mq: allow cached requests to be used for flush operations
-
-Maurizio Lombardi (2):
-      nvme-fc: do not warn on controller removal race
-      nvme: do not reset controllers in NVME_CTRL_NEW state
-
-Niklas Cassel (1):
-      virtio_blk: set the zone write granularity
-
-Nilay Shroff (2):
-      nvmet: defer setting ns->enabled to false in nvmet_ns_disable()
-      nvmet: don't allow I/O admission after percpu ns reference is killed
-
-Shin'ichiro Kawasaki (1):
-      Revert "nvme-tcp: lockdep: use dynamic lockdep keys per socket instance"
-
-Weiming Shi (1):
-      nvmet-auth: fix out-of-bounds write in nvmet_auth_challenge()
-
-Yang Xiuwei (1):
-      block: reject polled dio with user integrity metadata
-
-Yao Sang (1):
-      nvme: fix command effects log lifetime for multipath heads
-
- block/blk-cgroup.c                     |  5 +--
- block/blk-mq.c                         | 63 ++++++++++++++++++++--------------
- block/fops.c                           |  5 +++
- block/mq-deadline.c                    |  2 +-
- drivers/block/drbd/drbd_nl_gen.c       |  4 ---
- drivers/block/virtio_blk.c             |  1 +
- drivers/nvme/host/core.c               | 63 +++++++++++++++-------------------
- drivers/nvme/host/fc.c                 |  2 +-
- drivers/nvme/host/multipath.c          | 19 +++++-----
- drivers/nvme/host/nvme.h               |  9 ++---
- drivers/nvme/host/pci.c                |  2 ++
- drivers/nvme/host/sysfs.c              |  4 +--
- drivers/nvme/host/tcp.c                | 39 +++++++--------------
- drivers/nvme/target/configfs.c         |  9 +++--
- drivers/nvme/target/core.c             | 33 +++++++++++-------
- drivers/nvme/target/fabrics-cmd-auth.c |  2 +-
- drivers/nvme/target/nvmet.h            |  2 ++
- drivers/nvme/target/pci-epf.c          |  3 ++
- tools/testing/selftests/ublk/kublk.c   |  2 +-
- 19 files changed, 139 insertions(+), 130 deletions(-)
-
+base-commit: 2ee54f01f07c0307deaf90ca8691a4643ae0357b
 -- 
-Jens Axboe
+2.53.0
 
