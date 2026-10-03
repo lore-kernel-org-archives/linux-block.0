@@ -1,95 +1,133 @@
-Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5B236F8E6
-	for <linux-block@vger.kernel.org>; Sat,  3 Oct 2026 20:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A073AEF45;
+	Sat,  3 Oct 2026 22:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791060357; cv=none; b=Ow6atghaKB/JN4LxYS7Jk44wgb133F8Sf06huZIW+LEsYlY/l0Cw6prkifaZbgwS7lc211lG26t3MHYBJU5dTWGuT+7CLH1sjGGn8OcBZD1c8vDi4mGdGgz8EenUiDcXLPS/uddP1NF1zHSDXltF2ePPnO9SJRnEkQT0qD+VxCQ=
+	t=1791067515; cv=none; b=gON947QdjuPuU2zGXsYPF21cOiGZUF+wWISRoUsSBD1FJBj/ZXr1dWxyWTRAShgwZEU+LMODly4dS6sRbMNfU5KqRjM+Z7eYKxUWGU4h8NAwd1KfsbbAmMh7DYlE0PyKM5y25l9tl98NLGdFmoXP4wc5pgaNYfAEqezEiJLDXPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791060357; c=relaxed/simple;
-	bh=FRp4Cct50HXCeTViDVPkOvyv0qHQZnD+X0WubEU1Bpg=;
-	h=Content-Type:Date:Message-Id:From:To:Cc:Subject:In-Reply-To:
-	 References:MIME-Version; b=KmIbL+4gp3DX44ZPqzR2tuK8j3c9JpI1ywK8/56t+XshDPcCvlPfXiAM15/i+HK04J5eGBX3CEY+wORQw8H0JoFQjfVhuGjG6qmQUp4t4ERnWbiUpqFt/CcOnBNO+1mcpeM78X4hGfmd54fvM4MTqT4ZVa60xXEubV9l3FrTtm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n8Zkw1si; arc=none smtp.client-ip=74.125.227.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791067515; c=relaxed/simple;
+	bh=W21SRaEwpj9rNXOhq+Ty48iMmU1uKpvKeWtWaSSd1JM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=bR9s/8S8Hd7D9keLFi6OXHvF9fI6mclT5+W+Azyuh98MyH74vfpYjz+9KQprVuKTz/dFsQZMtmHPxQhIj0StJ5yN1Xa+YxRzmtaFwPOaqAtww88OSFFPBJO57WLh7aFtyMvRBuegolFTaz+UTuMvDb/4o5ZyckuS43rCpF2pf3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=RLbFDHwu; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n8Zkw1si"
-Received: by mail-pj2-f12.google.com with SMTP id d9443c01a7336-2d90ba1d807so4245665ad.3
-        for <linux-block@vger.kernel.org>; Sat, 03 Oct 2026 13:45:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791060355; x=1791665155; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :subject:cc:to:from:message-id:date:content-type:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=FRp4Cct50HXCeTViDVPkOvyv0qHQZnD+X0WubEU1Bpg=;
-        b=n8Zkw1sihXcl4/Pod6zhjI9skgCU8j8F1VKkIOWyX5CldojzAfWimmAks5nfi9OI3O
-         LbN7M7jT2pSdPqOjAibpwHGhCfkmKEeJa16o1lM2yFRjyEhm4MeQNUwLEe02xZF4vbj4
-         NeZadT6r48WSu8JRikuJCVsKoEhQMgAxyyGz7+cPMHDGRx2a07APhzA/cXMI5ZAkknsi
-         +8Qoz0NWe0WKvKeW4oFLFGxdiBrgDzayaQPcO0bTL6xSS8av6YHG6ltu0YR4yjKo1gb2
-         gbzTkclD39paWI8LoyivQfZbiFf+84u6SYhDpdYnX/ohVVesjMuxLL5xG1Uye/24m7/6
-         Ta2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791060355; x=1791665155;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :subject:cc:to:from:message-id:date:content-type:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=FRp4Cct50HXCeTViDVPkOvyv0qHQZnD+X0WubEU1Bpg=;
-        b=koZX2Ibm7wihk9rwh6b+I95FVWlFZeAGKQE3cBY5XHXTavEVBSDbjB74oVDhG312Ah
-         6Zv+wUo7m2LW4uE6EmCw8Am77itlhMoQurcutLk6X8auCdNoS+8xVCOR3ufdWCgPAKIT
-         mMp18d0gO5rdeJ+BzYenTbJVxo/go8IH1aoCJXiFfnAUraJo3zYQVBEAA6twK5GZn2zs
-         e5htCS+uIYCajm9WEE78SlC4jyB9gAu74Lf8nPw8nVyHg0t8nYJ0WHojcPFAqS/JYh0Y
-         TTIV//yoQFoRFQ3VJc4clDg4Dv6rsdImwxbNo/eEoMa4FmGwmUSYMhHZHi+us0SowiFG
-         JhUA==
-X-Forwarded-Encrypted: i=1; AKwUvBwYqmY8h6Am6yjBbpXGiPk47kgiSSSLs4PvUAzqCw2cNpsYsPp6PjF1cq1wz6mNTxEiR4q64GkBL1rsVA==@vger.kernel.org
-X-Gm-Message-State: AFq9FYL1RiVOQ6oQRmastURLTcVwZw2dfu1u3TreAN0DOm2OgwDBwCq8
-	Ggfwv4Zis9LahfDY51dBeOntpaY/Y9wuKG2HR+JuIpk66JgyROPnPDd+
-X-Gm-Gg: AYBFou27/6BZD/v2s9xasmPiD0ZN88iBa4WFwt2f2S5HOw9QpACtZEB6P7RNER2XTpg
-	4XIQbsWuZjwKBSnB9OmdcVVQgZ4yF/MpSiTo2ByEfQlV1RjN+4+fmfjAN+1kq3XLSnMtLzX8qws
-	PCQKsIfdZ6PNo93WuHrz3HN5rERDg0/QiZRUCn8vwuMEXVF55a+8w9nP7Q39AyBZX16ChHmrnuA
-	NWEUDWgb7ndCd+yYb2BGIUh2NM5Cvjr8rhzRrmGrSwLpiufM0Gq/8AAPSfdqmucJRWXQxLPe/lu
-	2+pVPG4Y3Cr5Ov8pkmZx7TtNJW1w3Q6++M2x//dKWemMdt4Svmf0Xr35TSegoewgJaPRfbQgCjS
-	D8hJJphpeXR2Uv6NTFwYjPYdKvLodJLqJLh8kIfuIiNZhg7w3WPL3bsjbrPyARExTgWHNJNNhDk
-	Kmok1papilpLogTeF2Aopdh7gUZ+wtLHAK/PI7sjnVGdmWfV93WzXBZ3yXCJ33xLKBk/2ocMq0X
-	0n6X7TZHBrslpuLzyQsDs+nP28zfv0GHRfuH2F3TQdDtYp/pqDH+iGw+brBsBDc7bMZ7L58CGPc
-	a4zNSpPOT3y66Q==
-X-Received: by 2002:a17:902:da91:b0:2df:83ce:724f with SMTP id d9443c01a7336-2e49b615cf2mr61626695ad.30.1791060355061;
-        Sat, 03 Oct 2026 13:45:55 -0700 (PDT)
-Received: from localhost ([153.61.198.243])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e533e8397bsm7343265ad.78.2026.10.03.13.45.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Oct 2026 13:45:54 -0700 (PDT)
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 03 Oct 2026 20:45:53 +0000
-Message-Id: <DLVHWNL0AVKU.NV007WEHWST8@gmail.com>
-From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
-To: "Tao Cui" <cui.tao@linux.dev>, <tj@kernel.org>, <josef@toxicopanda.com>,
- <axboe@kernel.dk>
-Cc: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>, <andrii@kernel.org>,
- <eddyz87@gmail.com>, <daniel@iogearbox.net>,
- <linux-kselftest@vger.kernel.org>, <cuitao@kylinos.cn>,
- <ameryhung@gmail.com>
-Subject: Re: [RFC PATCH v10 1/4] blk-iocost: add BPF struct_ops cost model
- support
-In-Reply-To: <20261003124045.1289305-2-cui.tao@linux.dev>
-References: <20261003124045.1289305-1-cui.tao@linux.dev> <20261003124045.1289305-2-cui.tao@linux.dev>
-X-Mailer: mkdraft (claude review draft; edit before sending)
-Content-Transfer-Encoding: 8bit
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="RLbFDHwu"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20261003224508euoutp02c41c30b489eaee9363e860f2478d6027~bJmji_WXc2979329793euoutp02u;
+	Sat,  3 Oct 2026 22:45:08 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20261003224508euoutp02c41c30b489eaee9363e860f2478d6027~bJmji_WXc2979329793euoutp02u
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1791067508;
+	bh=vFhGMCg6Ji/JXdFQ3B6wXXIZQgQ9xvpb3HvqRmvxgSk=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=RLbFDHwuh3NRChlB5DbAnpf5fbQ/9VI4LqGu4llTjFUiXPQ562rniZUJozx7F6f0C
+	 O998yLIejmOOpMfO2undeRdQGMIbbwvHHW6qvrglXgdLXRekz3Vq8zAZ0mrAGgSxG4
+	 yLsO68CPN7a6ZuBi2t//4zMj/AdCV8fhYFGTexlA=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20261003224507eucas1p200ece20a05f4aac2eeb0180f041df0fe~bJmigAu1f3080530805eucas1p2D;
+	Sat,  3 Oct 2026 22:45:07 +0000 (GMT)
+Received: from [192.168.1.44] (unknown [106.210.136.40]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20261003224505eusmtip1f6ac4f841c43fd74cce4c31cdfba487f~bJmg3wbbL2072920729eusmtip1D;
+	Sat,  3 Oct 2026 22:45:05 +0000 (GMT)
+Message-ID: <9c5913c0-11c8-4db8-844b-ea2ef29bf5db@samsung.com>
+Date: Sun, 4 Oct 2026 00:45:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 9/9] MAINTAINERS: add an entry for the LZ4
+ compression library
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+	<justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, Thomas
+	Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+	<James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, Heiko
+	Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander
+	Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
+	<borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
+	Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>, Sergey
+	Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Andrew
+	Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-block@vger.kernel.org, Yann Collet
+	<yann.collet.73@gmail.com>, Nick Terrell <terrelln@meta.com>, Gao Xiang
+	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Jaegeuk Kim
+	<jaegeuk@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Phillip
+	Lougher <phillip@squashfs.org.uk>, Sungguk <sungguk.na@samsung.com>, Jaehoon
+	Chung <jh80.chung@samsung.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+	linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-crypto@vger.kernel.org
+Content-Language: en-US
+From: Michal Wilczynski <m.wilczynski@samsung.com>
+In-Reply-To: <20260925213926.GA1903@quark>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20261003224507eucas1p200ece20a05f4aac2eeb0180f041df0fe
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260925113507eucas1p2ddb94f2077b679426aa86dd1d492eaf3
+X-EPHeader: CA
+X-CMS-RootMailID: 20260925113507eucas1p2ddb94f2077b679426aa86dd1d492eaf3
+References: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
+	<CGME20260925113507eucas1p2ddb94f2077b679426aa86dd1d492eaf3@eucas1p2.samsung.com>
+	<20260925-lz4-vendor-upstream-v1-9-1c7ffbe21c4b@samsung.com>
+	<20260925213926.GA1903@quark>
 
-On Sat, Oct 03, 2026 at 08:40 PM Tao Cui <cui.tao@linux.dev> wrote:
 
-v10 was sent 11 hours after v9.
-Patch 1 grew from 712 to 789 lines and device removal is still
-not tested.
-Pls slow down. Wait for Tejun before sending v11.
 
-pw-bot: cr
+On 9/25/26 23:39, Eric Biggers wrote:
+> On Fri, Sep 25, 2026 at 01:27:39PM +0200, Michal Wilczynski wrote:
+>> lib/lz4/ has never had one: get_maintainer.pl returns only the LKML
+>> fallback for every file in it, including include/linux/lz4.h, which eight
+>> subsystems build against.
+>>
+>> This matters more now than it did. With the previous patches lib/lz4 is
+>> vendored upstream sources, and someone has to bump them to new upstream
+>> releases and decide what the kernel-side glue may do. I am willing to do
+>> that, so add myself as its maintainer.
+>>
+>> Signed-off-by: Michal Wilczynski <m.wilczynski@samsung.com>
+>> ---
+>>  MAINTAINERS | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index cc3cae2e378b34aeb705cef654c720ca9f2ba223..989e1b5fab21432dd7042d1e60c4bbad85beb925 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -15606,6 +15606,12 @@ S:	Supported
+>>  F:	drivers/net/pcs/pcs-lynx.c
+>>  F:	include/linux/pcs-lynx.h
+>>  
+>> +LZ4 COMPRESSION LIBRARY
+>> +M:	Michal Wilczynski <m.wilczynski@samsung.com>
+>> +S:	Maintained
+>> +F:	include/linux/lz4.h
+>> +F:	lib/lz4/
+>> +
+> 
+> Should this entry cover lib/decompress_unlz4.c and
+> include/linux/decompress/unlz4.h as well?
+
+Yes I'll add both in v2.
+Thanks a lot for looking at the series as a whole.
+
+> 
+> - Eric
+> 
+
+Best regards,
+-- 
+Michal Wilczynski <m.wilczynski@samsung.com>
