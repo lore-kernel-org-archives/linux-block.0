@@ -1,161 +1,138 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128231FA859;
-	Mon,  5 Oct 2026 16:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E16C3093D8
+	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 18:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791217565; cv=none; b=pS+5y834GcLsL9xB31nhvkFK91rREtQjTibu8iLYhhsg3R92FqOdpK5KT8AK2c7k2kDgUMyORUQwoobRDWuI95a6sfTs5GNHTXxJHrTPeejC/LC/3S0dZdlI4vcoKpQlL73PGAx7f8cDkOFsy5G0Cb/nKlJvNAVJMWVAHT3uz2U=
+	t=1791226253; cv=none; b=P5z/ZS+t0FdSoHQI1BivT0gjPV0TQ1kZP1M5MAnGQyDIR6nM3EnoQ0R0k+HvwEt9YKRqa6DiaN/Cd0u250htfbwDJ+IqaQ8HCl9NzUMFPnqtgdfKqUmvFw5NmguIEOcy+nfUS7koAstf5jx4zBW1xgVjriCmFauj4/o9dFQ4cWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791217565; c=relaxed/simple;
-	bh=aX00HN74P56Ti0fjxmYSIF8ai5X/I1u1ihtfnIbPfrM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BQTNrZ8nMAhISOYUROGjV5EkTJeoC+o/xkPP/xCIk3Hn7R4QKPeiENTQwku6q0V/laWd1b/ulGwVm7ZatbOT/QDtQj6j9K/YiB6bkSwUJXRRrT8hAAWU0KWX4llcGiDIwBEN4nmGMbqbkt9nRcrCNSQKpVHLqHXpldYyxh/onck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k5ruQcs/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/uqe5lrM; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Bna+jeUN; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ljolE5FX; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1791226253; c=relaxed/simple;
+	bh=nyvN1OHB9IcGP7zWj7MFUTcv8md1UFswrZ+n2nVrcgY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=dZSy+q2gMYHg2GvhtWB+F4tUuQMarwXNvekfEjlvCwVpZKuycA6OCrBrsfqGeCC7No03UaMAu291l1bY7QTO+6JB4hubn+bYfNiZoOWaqfMrPTKvFL8hYQqtbaenUAAiE7or+S9KU85XfJh+KcKLJv+KVmDkp/0P+etApTQ/HEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=pass smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b=giAjdzT2; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toxicpanda.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k5ruQcs/";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/uqe5lrM";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Bna+jeUN";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ljolE5FX"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 534A521CC9;
-	Mon,  5 Oct 2026 16:25:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1791217557; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3QCxilX6Jn3NHwpmrQszL9nBtZP+KGRKGSWPtHz/iVU=;
-	b=k5ruQcs/on2VIzOXmxqSS4IfZ8wf8r/4SV8G3Fdr+JJby1qa2X7bl98nKgAAgmZd7yJal0
-	otTQlTiFFDc4hYaJCiCJkvNAQdvOiPbNod2YvcEkkXtdLYNSTuoBho0LcCoqlRHhD/EPzb
-	uzIYbioILKr1owBgdsDbD40Qq/c2pnw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1791217557;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3QCxilX6Jn3NHwpmrQszL9nBtZP+KGRKGSWPtHz/iVU=;
-	b=/uqe5lrMr+KbBX+d1oDtcrnwCe1K7WykRsGn5rf3yW6RV1/KVRPYtWEVdt9FhzndnPexep
-	HxTgMuod5n952/Bw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1791217553; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3QCxilX6Jn3NHwpmrQszL9nBtZP+KGRKGSWPtHz/iVU=;
-	b=Bna+jeUN7vDJuAQDE0OYULGaLBRqrJz0GjUweYJBDTlet0ToeEucKYTWFl+8qfEt9gnXE4
-	xqCTx1ilWdrVH7SHLfJ9pKPNEVugJPw7/Y6UD8bGfiXkY3vwAiseYC6RimegfTLJsR1LXU
-	txWfS2NAwOIRp/jrk+uoZ/aErveQLzs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1791217553;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3QCxilX6Jn3NHwpmrQszL9nBtZP+KGRKGSWPtHz/iVU=;
-	b=ljolE5FXb6fhoA41wVfhQWOHSZPyVH3M4vv8Vv0KneEzDxhIsyyBZWCJeZXMqNPzvMFl0d
-	D7QPKOBnXMfcu4Bw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E0F3013688;
-	Mon,  5 Oct 2026 16:25:52 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id TpvxLpDPw2qXMwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 05 Oct 2026 16:25:52 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 1CB3CA13FC; Mon, 05 Oct 2026 18:25:52 +0200 (CEST)
-Date: Mon, 5 Oct 2026 18:25:52 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jan Kara <jack@suse.cz>, Julian Sun <sunjunchao@bytedance.com>, 
-	linux-block@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, axboe@kernel.dk, hannes@cmpxchg.org, mhocko@kernel.org, 
-	roman.gushchin@linux.dev, shakeel.butt@linux.dev, muchun.song@linux.dev, 
-	willy@infradead.org, tj@kernel.org, akpm@linux-foundation.org, 
-	Boris Burkov <boris@bur.io>
-Subject: Re: [PATCH v9 1/3] block: introduce bdev_flush_by_dev()
-Message-ID: <bsb5vk2s3vyqglw6bv6pgpoqqvkho2p5kfnskfwfban5azi2vt@sceqd6t36yai>
-References: <20260925064444.3944820-1-sunjunchao@bytedance.com>
- <20260925064444.3944820-2-sunjunchao@bytedance.com>
- <arYaMbJUh6unvz_t@infradead.org>
- <3w6vfwfkojmfqy2qs5j4q2s2366ajqiwmqf624lyn3odrv42v2@va2r7a6ngfz6>
- <aroIAqoCNDBPlB2A@infradead.org>
- <9e9c02fe-e94d-4f70-a21b-47b46bab2c3b@bytedance.com>
- <5my3hyw54ej2tw24dqnacsy7xppywdjovvnwvrevmczsllzq7c@berxapmobgfa>
- <asNfNHd-kcsI4B1S@infradead.org>
+	dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b="giAjdzT2"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-93e6eb77f0bso109466385a.3
+        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 11:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda.com; s=google; t=1791226250; x=1791831050; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:content-type:references
+         :in-reply-to:subject:cc:to:from:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=YCFsb7Gq/U2gwTPLiXcefSi3ZBILSVLHbw6W+P4Oq8Y=;
+        b=giAjdzT2uhOwWjTyDWnNlB8ewWQvjWxw3PDvFjdvZ1KK1h8jtBp9RmNC8gDQg4puv7
+         KEdAWP2kVeS6eUI+5PBc+6vPLWXOQa/BG8S6XFLEXiU41cizry3Ihyy3DkHWFoD3Ei6R
+         9TFU2BC425FJ4uazhsjJl35HDr0WevhYeesSLk15KHXKcpWoZxTE8Ns3AQw5J2HA8XtK
+         cgvQNGr6zK/uMYjA21UNskRBvqYHlcNzNTR3yYFT6HK2rzXNgXGfeNGXgA4/Es56jdI0
+         QEv2LfM0e8lD3KPfdwo3nF/AAdA4rxZ4/Z7xL07wk1OKIPA+mXYmYlcxPRsh/E0CgKtk
+         DFmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791226250; x=1791831050;
+        h=mime-version:content-transfer-encoding:content-type:references
+         :in-reply-to:subject:cc:to:from:message-id:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=YCFsb7Gq/U2gwTPLiXcefSi3ZBILSVLHbw6W+P4Oq8Y=;
+        b=GPzuuvAjrZPyJX7UUcZY9fsU5DwqKTuVABdVsNOwXDnZIxq4nehAtZGXP+KTrRSyPV
+         nIZ7DbcNLbUGDpfkDMl5Ubo52ArAFC37vQ2Ctgd7V9yQPgcO3SaigLtRsfx6IgGkFhWU
+         lW7syEp0nxW59TP8HZSKIicXzR9L1YmKL23ndbJSbQsBRicmmpMy1fXn4QoHYc5wFFrs
+         Wjc2hJaKNafT7gDBJ0wPBGIzYEnVQvgCjROmKcEJJjBdB/VOrh8YxARIlWzQ6Y/Q/zpU
+         +ze0eo72tN+vYI3wGS2Oxliz9S/oI1/zZ/dzPeJfkdQrmKYlLb10up9xQu0ABytIGOfd
+         Zjsw==
+X-Gm-Message-State: AFuF++mlmVc/gIl433QUBeAJT7bXv3qI2hTtL9mWuRTxhRbAEvCu1Fu5
+	o59ieN3vmn8p/r0TVRdHhfOmKh2X2hlUOXImlK3f5Z2EsNsYnRVJBvr2iQKbvUhH8BAPmAKdpem
+	tKjJp
+X-Gm-Gg: AYBFou2bieSdIHr5PjESfNwUIV4V8ftiK1rJX6Uqj0Z+L0flxssVZuCCBhN7Si9MGoY
+	qexBc+iubBhAp8GHpa5EP77ZCySXxTx5gHI83cGMhnVEscn1p9+kGTwXfnxPvJrgEJOMdM2BqGR
+	M4h7HVbXac94qhWVUSJ7PVGPS1JN4kqLO0EIRvxF/+pxrXXCGxQiXjRS2xyMoy+Ai3RyziCeMgD
+	cFpeUJQkXS/RTUunbdRmI2wLO74vKIe4C5wJQS8RQoqxfhk15NpIfvE1ok62W+65aNjUVN97Mxt
+	aC9N7qa/UIfGpKj0zCzPc1k/6DDBlYbIaRB2uVLi4GsuRU0kzpI47ioDrg/aG7lagLZjEsDxxIe
+	HGzJppADVaCbaynAnRZsNIr/IEyvzO4B0QMbo8i/eTMAdsNWbSdAoizfjayLwUMS82SDKYtaRmG
+	JEPlojv5MpIZsBe5X70uVhOJ5SnTnDcflGrHErLBbRJvkq5rJD9jqE+FxXEMse90vK6k/39gVyn
+	3n9PZkivSUlS3GRxWfXOxUEjQ==
+X-Received: by 2002:a05:620a:711c:b0:937:6de8:b40 with SMTP id af79cd13be357-93e50f80e78mr1614579685a.15.1791226250403;
+        Mon, 05 Oct 2026 11:50:50 -0700 (PDT)
+Received: from toxicpanda.com ([153.61.196.252])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93cca1a7a40sm933243985a.7.2026.10.05.11.50.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Oct 2026 11:50:49 -0700 (PDT)
+Date: Mon, 05 Oct 2026 18:50:35 +0000
+Message-ID: <63d8149c093169706e7478e779116b61.josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH 0/8] ublk: don't dispatch to canceled io commands
+In-Reply-To: <20261001125422.1364260-1-tom.leiming@gmail.com>
+References: <20261001125422.1364260-1-tom.leiming@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <asNfNHd-kcsI4B1S@infradead.org>
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -3.80
-X-Spam-Level: 
 
-On Mon 05-10-26 01:26:28, Christoph Hellwig wrote:
-> On Fri, Oct 02, 2026 at 01:10:42PM +0200, Jan Kara wrote:
-> > FWIW I share Julian's concern here. It would be fine to use AS_KERNEL_FILE
-> > for ext4 metadata but I think just unconditionally setting AS_KERNEL_FILE
-> > for bdev mappings will cause issues because some users may be using bdevs
-> > directly for their workloads and they could still expect proper memcg
-> > accounting to work in that case.
-> 
-> Agreed that it should not set unconditionally.
-> 
-> > We could set AS_KERNEL_FILE when opening bdev for a filesystem (and remove
-> > it when releasing bdev) but that would have to make sure there are no
-> > folios in the bdev mapping when changing the flag as otherwise the
-> > accounting would go wrong. Looks it might be doable but getting all the
-> > cornercases right will be hairy and overall not very appealing to me...
-> 
-> I'd rather not support special case writeback code just for this legacy
-> fs abuses bdev buffer cache case.  And we basically need to tear
-> down pagecache at unmount anyway, as i_blkbits can change, so while
-> we do need to be careful, I don't think it really is a major issue.
+On Thu, Oct 01, 2026 at 07:54:14AM -0500, Ming Lei wrote:
+> Hi,
+>
+> Josef reported three ways in which ublk dispatches a request to a
+> canceled io command, which oopses on the NULL io->cmd.
 
-OK, after some more thought yes, I think we can make that work.
+Thanks Ming. I ran 1-8 on top of for-next (d70609a2f68c) under QEMU with
+KASAN and lockdep: my reproducers for the three routes plus the restart,
+recovery and QUIESCE_DEV controls, the ublk selftests including your
+generic_18, and my ADD vs STOP_DEV/DEL_DEV race script. No oops or
+lockdep report anywhere, and generic_18 passes. A few things though.
 
-> We might be able to restrict to setting it when
-> CONFIG_BLK_DEV_WRITE_MOUNTED is disabled to avoid the problem of non-fs
-> shared mmap writers, as anyone using a modern kernel and cgroups really
-> should have that disabled.
+1. kublk's batch daemon dies when PREP_IO_CMDS hits the new STOPPING
+   check. With patch 6, __ublk_fetch() returns UBLK_IO_RES_ABORT while
+   UB_STATE_STOPPING is set, and batch PREP goes through it, so a PREP
+   racing STOP_DEV completes with -ENODEV. kublk asserts cqe->res == 0
+   in ublk_batch_compl_commit_cmd(), the daemon aborts before it writes
+   the start eventfd, and the parent of `kublk add` sits in
+   eventfd_read() forever. My race script hangs on the first or second
+   iteration with -b; the per-io servers handle the abort fine. The
+   kernel side is fine, but kublk needs to fail the queue cleanly there,
+   and generic_18 has no batch mode, which is why it doesn't see it.
 
-I don't think that's really needed. If such writes are happening, they are
-*very* limited and done by a system administrator only (as they are very
-dangerous) so the fact the writes will get charged to the root cgroup is
-not an issue.
+2. Routes 2 and 3 still bring the device up. START_DEV returns 0 and
+   every request on the new disk fails, and after END_USER_RECOVERY the
+   device is LIVE with the reads on the dead task's queue parked forever
+   with plain USER_RECOVERY (generic_18 accepts both, and turns off the
+   partition scan, which is what parks under disk->open_mutex otherwise).
+   I'll send a follow-up on top of your series that returns -ENODEV from
+   START_DEV and END_USER_RECOVERY while ub->canceling is set; with it
+   generic_18 still passes.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+3. The same follow-up has ublk_start_cancel() read ub->ub_disk under
+   cancel_mutex, with START_DEV publishing it in the same section. Today
+   it samples the disk before taking the mutex, so a server dying during
+   its own START_DEV can mark the queues without quiescing a disk that
+   START_DEV published in between, with first I/O already past the
+   canceling check. Narrow, and older than this series.
+
+4. Patch 5: the release work decides there is no disk before it takes
+   ub->mutex and doesn't look again, so a START_DEV that slips in with
+   the exiting server's pid can go LIVE first and the work then resets
+   a LIVE device. It needs START_DEV pending while the node is released,
+   e.g. a separate control process, and nothing oopses (every queue is
+   still canceling), but the device ends up LIVE with requests failing
+   or parked until STOP_DEV/DEL_DEV.
+
+5. Patch 6 changes STOP_DEV's contract: a server that still holds
+   /dev/ublkcN after STOP_DEV gets ABORT on FETCH/PREP and -EBUSY on
+   START_DEV until it closes the node, even if it had fetched nothing.
+   That's fine by me, but it should go in Documentation/block/ublk.rst,
+   since servers that STOP_DEV and restart on the same fd will see it.
+
+For 1-6, with kublk fixed for 1:
+
+Tested-by: Josef Bacik <josef@toxicpanda.com>
+
+Thanks,
+Josef
