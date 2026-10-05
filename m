@@ -1,90 +1,140 @@
-Received: from outbound.baidu.com (mx22.baidu.com [220.181.50.185])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id F3EE7476074;
-	Mon,  5 Oct 2026 10:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.50.185
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDE941A563;
+	Mon,  5 Oct 2026 10:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791196929; cv=none; b=C7odAGyv2qULHIHzrYGuo5yWvHv1LXZarM4iGlI9ReDaBz1YITbnBCKqHsx8v/nUqOZMtKYSPYvKuKTuOcaFJxbf/wlCzMM/c3sdcaTMMRE3zRiqFCWWvScL4jEXZif29E948nEW60POipCcKKoH7GVT1RNa95nEnoCxkQPYYc0=
+	t=1791197121; cv=none; b=fDyhHqkI6Zt2Glm9iLGHHT+kavP5kfotvkcQri/xOk7ug4UA48V39ZNKw+FfUjqv3QUlQWaAd/dfBjkTE4gLXyJX4Eh+z8HWx7la3/5Bygw0YcpixmRxa3m3MFHt2kVfLjWgDzaX+nplvseomVaohA9dunfAgu7wj9vkagJNAP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791196929; c=relaxed/simple;
-	bh=cFRXjCyCKLwgZ9Ciphpk4T6X3+FfggMoNBULj+b9Uzg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r6E1JWDLv9DkVqitgmD53OAIeAJjVO6Zw3h4F0PU01kz1KLX6Q+If7S+Xr+t4eUp40C/ggmLhDRMlWUNQgmp6l2zisBY7HWRD4wUBGMX7bS2940WhgP1gFv+0GjfckB82sK0StYk/n+Pflz5yMVGsy+JupJAeoO4NOPivc1U5fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b=XNUGYZ5c; arc=none smtp.client-ip=220.181.50.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+	s=arc-20240116; t=1791197121; c=relaxed/simple;
+	bh=hqrVZ7eLDvyJ+APK7sQ+UC7k/AAA0TqCmgXNBjyJtgQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ngW4zoeUACy2uwNuXuO0RCON1vL9YEoN1GDJ7oQ1ssouuM78LspHbSJVgGOYWsxuKZ1ZK8S05nCew6/BbgWVBauQC10++LfGxwhMrcq6uUWzDlM/x0GyyOjdeA+REDuD3Ue2M02knLcpPIxQLr/I13rhLRufOBWHgHlUcfTJ8w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=a1NURU+U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Rgomq2F8; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=i3f8xTK/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ISHBS8Hx; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b="XNUGYZ5c"
-X-MD-Sfrom: lirongqing@baidu.com
-X-MD-SrcIP: 172.31.50.47
-From: lirongqing <lirongqing@baidu.com>
-To: Yu Kuai <yukuai@fygo.io>, Jens Axboe <axboe@kernel.dk>, Damien Le Moal
-	<damien.lemoal@opensource.wdc.com>, Davide Zini <davidezini2@gmail.com>,
-	Paolo Valente <paolo.valente@linaro.org>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH] block, bfq: initialize active lists for all actuators
-Date: Mon, 5 Oct 2026 18:41:42 +0800
-Message-ID: <20261005104142.1871-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="a1NURU+U";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Rgomq2F8";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="i3f8xTK/";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ISHBS8Hx"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DF0C51F786;
+	Mon,  5 Oct 2026 10:45:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1791197113; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AQL23iedUfQmZWx1bXu3AepEqpmnYcVTLikcXH2ufTU=;
+	b=a1NURU+UQliLJHHpDxXiqikkO95HPAB5atzw2xKbrE6kxTGq9J2kceRvgGXGWoBDMG8kQh
+	6w18J09n8p1jm8NxBK88oGW6iOQomrNbO0XWQbqxXdunXfgLOOFp/w2zjYSP4THcHH1YEb
+	3si75igcXzqX7WNvYuXk0h2voTFW+/I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1791197113;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AQL23iedUfQmZWx1bXu3AepEqpmnYcVTLikcXH2ufTU=;
+	b=Rgomq2F8IXWjPCmiPZx0g0pQKUBrllBahv3h1AJa0RScPnILPUF+nwPTbCCBvptvN5zdgW
+	9DUDEkKo5Yx1M2Bw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1791197108; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AQL23iedUfQmZWx1bXu3AepEqpmnYcVTLikcXH2ufTU=;
+	b=i3f8xTK/t1BWdA5xAlGX+P125WXXTrG6w+4PvWVmJGGhoguCn5QcfpgVH9tJ1ODWJCAHWS
+	bAN4aJwAVfVuD/zCUlxWeAQXgLYdx2Lz7jf+pXeZO8ShPnu1Ws/Xwd+VDdH2yBvPceTs6b
+	Rg0nHRTqqOZRAEPYOipSlFI+znwt/TI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1791197108;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AQL23iedUfQmZWx1bXu3AepEqpmnYcVTLikcXH2ufTU=;
+	b=ISHBS8HxFtOtcC72He7MOu84xyUBtKJkqU6MF2UMd4SWTQm1wpVTvZXSRmBCLBlA+joUJH
+	US5gD3T9RTDxQPDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B0172132D3;
+	Mon,  5 Oct 2026 10:45:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id IRqfHLR/w2rDOAAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 05 Oct 2026 10:45:08 +0000
+Message-ID: <9eb2eec7-f465-4227-aebf-527f89fc735d@suse.de>
+Date: Mon, 5 Oct 2026 12:45:08 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjhj-exc9.internal.baidu.com (172.31.3.19) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=baidu.com;
-	s=selector1; t=1791196913;
-	bh=u72lnYnxiPTqf4Tu0gVWfJ2mqBuag2BucdLy2h9aGgs=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
-	b=XNUGYZ5c4s9yecgKKJYSqVxoULitCSQy0pPHIk2x/2Y/6KJURw0ZdMPaL4rEhpXt6
-	 gbFdSydN2G6AFTf3hHg6tB1Hui4ZWVkz0/ZgFJO4f8uNJBqjujLuqI+UijGCoNjOCj
-	 YCH3COM5/KzsWSL6gO9qAwRh35/owchXoJLr7epSp2QU6bz8r/uFDpBNtrsh013iaO
-	 DWjoPufvLs24eXWVsFijX2sLXcykv0BlqikVv234gHpN0AT91ORLe6hy+3Kx+kke72
-	 jQ6MPTEh2EEasbUJt6LQtVeTwesMq/wu5lWUztNT/qsosv5uutWfa4p3WXVPfuoUZT
-	 b5XzhhhbfQMgA==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/7] block: fail reads to offline zones early
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ linux-scsi@vger.kernel.org, "Martin K . Petersen"
+ <martin.petersen@oracle.com>
+References: <20261005094632.580753-1-dlemoal@kernel.org>
+ <20261005094632.580753-2-dlemoal@kernel.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20261005094632.580753-2-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 
-From: Li RongQing <lirongqing@baidu.com>
+On 10/5/26 11:46 AM, Damien Le Moal wrote:
+> Any BIO targeting an offline zone of a zoned block device will fail,
+> including read commands. So there is no point in issuing read BIOs.
+> Fail these early if we ever see one, and be quiet about the error.
+> 
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>   block/blk-core.c  |  5 +++++
+>   block/blk-zoned.c | 18 ++++++++++++++++++
+>   block/blk.h       |  6 ++++++
+>   3 files changed, 29 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-Commit 2d31c684a053 ("block, bfq: inject I/O to underutilized
-actuators") extended bfqd->active_list from a single list_head to an
-array indexed by actuator, but bfq_init_queue() still only initialized
-the first two entries:
+Cheers,
 
-        INIT_LIST_HEAD(&bfqd->active_list[0]);
-        INIT_LIST_HEAD(&bfqd->active_list[1]);
-
-For devices with more than two independent access ranges, the remaining
-list heads stay zeroed by kzalloc() and are never set up as empty lists.
-When BFQ later adds a bfq_queue to one of those lists, list_add() writes
-through head->next, which is NULL, corrupting the list or crashing the
-kernel.
-
-Initialize every actuator's active list using bfqd->num_actuators,
-which is already set up earlier in bfq_init_queue().
-
-Fixes: 2d31c684a053 ("block, bfq: inject I/O to underutilized actuators")
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- block/bfq-iosched.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0f75301..b21ddba 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7273,8 +7273,8 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
- 	bfqd->num_groups_with_pending_reqs = 0;
- #endif
- 
--	INIT_LIST_HEAD(&bfqd->active_list[0]);
--	INIT_LIST_HEAD(&bfqd->active_list[1]);
-+	for (i = 0; i < bfqd->num_actuators; i++)
-+		INIT_LIST_HEAD(&bfqd->active_list[i]);
- 	INIT_LIST_HEAD(&bfqd->idle_list);
- 	INIT_HLIST_HEAD(&bfqd->burst_list);
- 
+Hannes
 -- 
-2.9.4
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
