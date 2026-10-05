@@ -1,61 +1,61 @@
-Received: from mail-pj2-f40.google.com (mail-pj2-f40.google.com [74.125.227.168])
+Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FFC376A1F
-	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 12:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825AC480324
+	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 12:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791202884; cv=none; b=KmaqKBgHlJBwIyJP0Ukz98AKXaOzUSmFVmaawVSHtLjnqdEe3u9STtDrhQ+Bqnmi68AeD6tGcLXkQjvqJqKu9ofdkIzHJU9cLaLKhM2NLQJUBmU2m8E9riOjp19nPY5KLI4Hqnt6wLBH84SWQsOLPyqvnAE2ul6VVwTb4+3jGOs=
+	t=1791202886; cv=none; b=moXXMwRiUCwi+oFQ32DX7XzZVQF7q7DupkIcok/hz+fl0Vlx030Wk9RXR/yfb/TLlEviDdxu45hKD1H7rRjscOD0XDG4i0CFjEHrtqzOTp677VDrvTtK5KezdAlCsjpzioInUw9gANXNqZ0UdRnf4EpfnpocTvnT8g97VL5Cmp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791202884; c=relaxed/simple;
-	bh=lBml+U1eFhDx0wepMPRnl38IF8v/v+UY2aHg/ppLZyw=;
+	s=arc-20240116; t=1791202886; c=relaxed/simple;
+	bh=cjmbppIMXyRMAGCgsAgIdXMu/Hehztl+4Vbc76WLIMk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h56bZbI6GGcyesnbMIkXNAp90NZxtxxMvsy8wppzjZ/2qmpUtW4mLPh0iQ/gOj8hpceDfJCokH7hBWvq3v1mYxWSwGC6y9ZgeFwFPocMgxV2df37Lw53QA0eumSE+//iyX7vJbdHu3vKT2w6fUlgkAaSnShxIkxgrwxIMF5lnh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Y8TTX5ze; arc=none smtp.client-ip=74.125.227.168
+	 MIME-Version; b=UK/mkPXcKqUCHiCu8g8WphGZ7JEvELFF4teoegoROBZipkMmhTyAHzNIZtAt1ospuupJY2sz6gr03Mq721Uk2mzgv+KZtHEUxBxlvTnoI2VZyTXvpuIDE+ocIskOFhOgth5OpfVA/RNKev9kViEHUY21n8iH0IpctnW7xQ7OyuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=e2hkHvHl; arc=none smtp.client-ip=74.125.227.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y8TTX5ze"
-Received: by mail-pj2-f40.google.com with SMTP id 98e67ed59e1d1-3a0eeda3e03so690876a91.1
-        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 05:21:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="e2hkHvHl"
+Received: by mail-pj2-f12.google.com with SMTP id 98e67ed59e1d1-396ccb652d7so866158a91.0
+        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 05:21:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1791202877; x=1791807677; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1791202880; x=1791807680; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=0qz2g+oCCXDG8XSKh0DkoVq9FZFfH7mkIafQRkfkoYY=;
-        b=Y8TTX5zeTxNdlryzp64ax8noFeATPcBh+9yZGDXtCgTSZg4aaF9pL8V//yHPOlTl6C
-         u1nA7DxWvImVUbbPLtAiaeLxGw3WueC6mgNhmJQY/iY48tO5Fo/85a4WUIYQNtXHFOL7
-         2cOfVzvkzlkjZyP68/1UgowJqP6/QQ3L3prqw=
+        bh=lBooGZSw2IxfoAxzLlFw+KVKnhFoUqum4OQR7iUI4RU=;
+        b=e2hkHvHl0vUm51qQH+a7mHpxLyTGWKdQSNkc/d7byN5c8B+WbynWAb1iZ7/nuBOF1H
+         +cJFL8/zbqXxS3wKuHJipAUGaYfnUNu6bQvmjWfDQikjmVNOJH9gu/ME5gROC1y6K10J
+         oTIctDeqgrtH/08eFMHYz5xoUDi2m2bcBeP14=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791202877; x=1791807677;
+        d=1e100.net; s=20260707; t=1791202880; x=1791807680;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=0qz2g+oCCXDG8XSKh0DkoVq9FZFfH7mkIafQRkfkoYY=;
-        b=CCT5Yw3wnSvNEYR/W771rKiAO1fMQuJRkJPCYSjBfFQH1mEC5vHOE5KFrsuhMjeg/F
-         ejx6SmJYPdm0e5uQZ4I4m+d8alzu0ZuxO/4ae5pnW+cfdTSo1+K5ti3cuWPwqd/oqLX7
-         paAR+eI9fpJWRNudXMuBY+0gTmXXz4zE6j43M7HrPBJ4xmR1q+s+ApynYEG04bS1EdQ0
-         b+KhVCXEE2DoUf1fCexeciNS3zdQqnnIBhUaAJ2d2l2dpS+s42kWC6KorZglZuBWNZqg
-         1TjjbIPsTC2vQ4Vn1XPjiuS8ppTI+EI/lzcKqn/+c5nJyd4zkIoqeao3jpqKpsa5gy1e
-         40+w==
-X-Forwarded-Encrypted: i=1; AKwUvBy04SyHzMtR07T8LUjxih6LZZjeHj65iaqikqc/+zcekYI8tfXLmXxUrSJbKf7z6t6FH8I5oKwqVCA/IQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLZe8/YOl53Ybj3aUTXZj3b/LQrWK0iGQxf6EvUqwvJNlvdEAV+
-	ViUM7eSoNWtvar/eMQ+D8eJ/jsBZ3O3ocmsax0ant51GOocHw8hp3x5X3/5iKu+zmQ==
-X-Gm-Gg: AYBFou0IH5Hd3W6Tj0Yi0rX1tORNLnBoZqOPkSL5ykbAaL3WCdB1+Uck5GyffbWMWQ3
-	DOaCN8OlZw/I50nj4rQnnmFqCEsNCnHj1AjGfglgf2ntTC+/sqZ9x7mNUc/9BK6qOF5gkUvw0iB
-	1VsR5CRyrXeBGXU3XTJoC//rJtAofSqAqCkRJLJt38Ok8HZKxCQhZINSkxH29WIeDv1RiDTb9+z
-	rIYRj36sIspXl2oQ96qegR2m8C5/xGG34E+AvZKQtekf2YjS8V4vV/E40v/uengO+YQe2JCUdUh
-	wxYi/RVRiL7Slq5RO4eChZRVr2bXyon7WMTsEPBQi/V5Kmp0Ox3xFI3ZavX5nS6ZthT9c1TCVO5
-	zxbTtZIYjhULfHsSGxUS0kmn+XG3fGgsyDQcA8H/UcwgY2f4dgjF4nhjPlMNGOaS4xBDpym0qyU
-	tKVZ6rWPCaxaTrNtobH0kVEuV6VevFnBzou2s/BWu5H8Mwnx79wlRcAPBeH+moYfS2VfjiIGQIv
-	glvAATwmsz4WJK+sNB3gRrD+ZzxzJGTgEOJf2hYzNoRxlmlg7FBN01y8+R/rCsGcn7B4vfccg==
-X-Received: by 2002:a17:90b:1a90:b0:3a0:aa50:48bb with SMTP id 98e67ed59e1d1-3a6ce79881bmr4533629a91.29.1791202876826;
-        Mon, 05 Oct 2026 05:21:16 -0700 (PDT)
+        bh=lBooGZSw2IxfoAxzLlFw+KVKnhFoUqum4OQR7iUI4RU=;
+        b=V1sijopPNAi0HJ7WYeKwemyu6lbWq0eAoVpArw30Mp67CEkc59Ti9Qr82jLsTmd15K
+         f9HINGEuzooEeakuM6zd2e+pGznzzfmRitN6LtzFtSIEimKa9anlMLKy8rHpwtNC13J0
+         nbMqRK+cyoDD+Knb3+KOGzWDzMr8jcO9PqftXKZklsPqZXxlCIF49aSRN4on5EodxGyC
+         AChbQyzdLrlQosKAulnKyFrbpYzx7wWijGtEDN7GzBoa8rFHHXGq3Q/Hvh0absSpqxg7
+         fF5HiUA7pBTlu28WAyRKBK1yV/trtuD+GhSCLNt3UmD+VkxgZQL7ETTD2T4UcunDti27
+         UrYg==
+X-Forwarded-Encrypted: i=1; AKwUvBx3vdYoVhfSnjl6yOhBXLFFoaTnge/dGFdVkGrv9g38qrdmwDlTtOZQAGchuZTiGfdmRys8sqkcBb76dQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLbk2XUzwVu9wtPsnFRNHW8cf2Dnkg8KV7KRFc3+MYfMR5IZ2jm
+	MsBf/Q2ly4dgHiSIPquX1HlYffu1n4HID3TCpOUVetliSrz9pHB13yxaBEcfVgYRHw==
+X-Gm-Gg: AYBFou2OYBxzL/f50bxaigYCcjHiZvc/pmH+57/5z0PWIhFJhdR5plM6gmwbzAvZVeD
+	tkB24gSZgJG9UCSjKxVgy3fH8G+uciQvBH1ze4J7hVulrJpgTazuWno55QXaRagzwUPVOaTPnG+
+	wO/D3Dz8wQwQsGXMzSXPjWibWPnJULOvUCNN+WaUGiqF7ZWNvjrl+7HsWZrpBt4TN+mXaYxsFao
+	Bdvxs3FfTnT71mM7tTQ6+MOwDSQuyMnJ635o62YYXrRWgWibOF5iTN0sAgLJ9M/HSw8ZnuZFQWw
+	TUJ73lha3BnX8xaQXCBsUtQHrhfuO9a3p8mgvLsK2Zl5pq1AeRtsR+x/tG36pmiEi3t7pzqnzPl
+	qn7W6HTH1N4PepVJ7SQ5Su1pYt3SBzET1DKUdusBAa14zkGNl4O1EMHF1SGg6TeSsowVKHl4t8F
+	rWSMt7bMutTTOO7S6ZXBOG6CgneDTzF0PVWL67zgRRTPeSrSSx0rSNHLUT1bbKHREqgzxFLjRc9
+	hWCx7aGCdU0hgd6F2KoFT8Fv6Dg9J4ZxxNktKkfD6o3C94DoJ7sFNVJO0gEV/o=
+X-Received: by 2002:a17:90a:fc45:b0:3a4:945e:bc33 with SMTP id 98e67ed59e1d1-3a6ce82bf0dmr6782414a91.47.1791202879907;
+        Mon, 05 Oct 2026 05:21:19 -0700 (PDT)
 Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:9211:ddf0:3c6a:bf9e])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a7e4b00de6sm3342997a91.1.2026.10.05.05.21.11
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a7e4b00de6sm3342997a91.1.2026.10.05.05.21.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2026 05:21:13 -0700 (PDT)
+        Mon, 05 Oct 2026 05:21:18 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Brian Geffon <bgeffon@google.com>,
@@ -65,9 +65,9 @@ Cc: Brian Geffon <bgeffon@google.com>,
 	linux-block@vger.kernel.org,
 	linux-mm@kvack.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH 06/10] zram: lz4hc: use LZ4_decompress_safe_usingDict()
-Date: Mon,  5 Oct 2026 21:20:21 +0900
-Message-ID: <20261005122036.718976-7-senozhatsky@chromium.org>
+Subject: [PATCH 07/10] zram: zstd: do not use kvzalloc() for zstd allocations
+Date: Mon,  5 Oct 2026 21:20:22 +0900
+Message-ID: <20261005122036.718976-8-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
 In-Reply-To: <20261005122036.718976-1-senozhatsky@chromium.org>
 References: <20261005122036.718976-1-senozhatsky@chromium.org>
@@ -79,139 +79,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use LZ4_decompress_safe_usingDict() in lz4hc_decompress() to avoid
-needing a per-CPU LZ4_streamDecode_t structure.  Drop struct lz4hc_ctx
-as well and store the compression workspace directly in ctx->context,
-matching backend_lz4.
+When a dictionary is configured, zstd allocates all of its memory (C/D
+dictionaries, compression and decompression contexts and compression
+workspaces) via zstd_custom_alloc().  zstd_custom_alloc() uses
+kvzalloc(), which falls back to vmalloc() only when kmalloc() fails,
+and kmalloc() rounds such sizes up to a power-of-two number of pages.
 
-Using vmalloc(LZ4HC_MEM_COMPRESS) instead of kzalloc() for cstrm when a
-dictionary is configured also avoids power-of-2 page rounding (~256 KB
-rounded up to 512 KB), saving ~252 KB per CPU.
+For example, on x86_64 with a 110K dictionary, switching from
+kvzalloc() to __vmalloc() reduces allocations from:
+- CDict (level 3):            512 KB -> 400 KB
+- CDict (levels 12+):        2048 KB -> 1552 KB
+- DCtx (per-CPU):             128 KB -> 96 KB
+- CCtx workspace (level 3):   128 KB -> 84 KB (per-CPU)
+- CCtx workspace (level 14+): 1024 KB -> 764 KB (per-CPU)
+
+Use __vmalloc() for allocations larger than PAGE_SIZE (and kzalloc()
+for smaller ones), which is also how zram allocates zstd workspaces
+when no dictionary is configured.  zstd_custom_free() already uses
+kvfree(), which handles both.
 
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/backend_lz4hc.c | 70 +++++-------------------------
- 1 file changed, 11 insertions(+), 59 deletions(-)
+ drivers/block/zram/backend_zstd.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/zram/backend_lz4hc.c b/drivers/block/zram/backend_lz4hc.c
-index f3656c27af21..b62736b26622 100644
---- a/drivers/block/zram/backend_lz4hc.c
-+++ b/drivers/block/zram/backend_lz4hc.c
-@@ -4,18 +4,10 @@
- 
- #include <linux/kernel.h>
- #include <linux/lz4.h>
--#include <linux/slab.h>
- #include <linux/vmalloc.h>
- 
- #include "backend_lz4hc.h"
- 
--struct lz4hc_ctx {
--	void *mem;
--
--	LZ4_streamDecode_t *dstrm;
--	LZ4_streamHC_t *cstrm;
--};
--
- static void lz4hc_release_params(struct zcomp_params *params)
+diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+index b367049f131d..7a8b5ff186f2 100644
+--- a/drivers/block/zram/backend_zstd.c
++++ b/drivers/block/zram/backend_zstd.c
+@@ -26,10 +26,17 @@ struct zstd_params {
+ /*
+  * For C/D dictionaries we need to provide zstd with zstd_custom_mem,
+  * which zstd uses internally to allocate/free memory when needed.
++ *
++ * zstd allocations (C/D dictionaries and contexts) are large and
++ * long-lived.  Don't use kvzalloc() for them: when enough physically
++ * contiguous memory is available it serves them from kmalloc(), which
++ * rounds them up to a power-of-two number of pages.
+  */
+ static void *zstd_custom_alloc(void *opaque, size_t size)
  {
- 	LZ4_streamHC_t *dict_stream = params->drv_data;
-@@ -65,61 +57,32 @@ static int lz4hc_setup_params(struct zcomp_params *params)
- 
- static void lz4hc_destroy(struct zcomp_ctx *ctx)
- {
--	struct lz4hc_ctx *zctx = ctx->context;
--
--	if (!zctx)
--		return;
--
--	kfree(zctx->dstrm);
--	kfree(zctx->cstrm);
--	vfree(zctx->mem);
--	kfree(zctx);
-+	vfree(ctx->context);
+-	return kvzalloc(size, GFP_NOIO | __GFP_NOWARN);
++	if (size <= PAGE_SIZE)
++		return kzalloc(size, GFP_NOIO | __GFP_NOWARN);
++	return __vmalloc(size, GFP_NOIO | __GFP_NOWARN | __GFP_ZERO);
  }
  
- static int lz4hc_create(struct zcomp_params *params, struct zcomp_ctx *ctx)
- {
--	struct lz4hc_ctx *zctx;
-+	BUILD_BUG_ON(sizeof(LZ4_streamHC_t) != LZ4HC_MEM_COMPRESS);
- 
--	zctx = kzalloc_obj(*zctx);
--	if (!zctx)
-+	ctx->context = vmalloc(LZ4HC_MEM_COMPRESS);
-+	if (!ctx->context)
- 		return -ENOMEM;
--
--	ctx->context = zctx;
--	if (params->dict_sz == 0) {
--		zctx->mem = vmalloc(LZ4HC_MEM_COMPRESS);
--		if (!zctx->mem)
--			goto error;
--	} else {
--		zctx->dstrm = kzalloc_obj(*zctx->dstrm);
--		if (!zctx->dstrm)
--			goto error;
--
--		zctx->cstrm = kzalloc_obj(*zctx->cstrm);
--		if (!zctx->cstrm)
--			goto error;
--	}
--
- 	return 0;
--
--error:
--	lz4hc_destroy(ctx);
--	return -EINVAL;
- }
- 
- static int lz4hc_compress(struct zcomp_params *params, struct zcomp_ctx *ctx,
- 			  struct zcomp_req *req)
- {
--	struct lz4hc_ctx *zctx = ctx->context;
- 	int ret;
- 
--	if (!zctx->cstrm) {
-+	if (!params->drv_data) {
- 		ret = LZ4_compress_HC(req->src, req->dst, req->src_len,
- 				      req->dst_len, params->level,
--				      zctx->mem);
-+				      ctx->context);
- 	} else {
- 		/* Cstrm needs to be reset */
--		memcpy(zctx->cstrm, params->drv_data, sizeof(*zctx->cstrm));
--		ret = LZ4_compress_HC_continue(zctx->cstrm, req->src, req->dst,
-+		memcpy(ctx->context, params->drv_data, sizeof(LZ4_streamHC_t));
-+		ret = LZ4_compress_HC_continue(ctx->context, req->src, req->dst,
- 					       req->src_len, req->dst_len);
- 	}
- 	if (!ret)
-@@ -131,22 +94,11 @@ static int lz4hc_compress(struct zcomp_params *params, struct zcomp_ctx *ctx,
- static int lz4hc_decompress(struct zcomp_params *params, struct zcomp_ctx *ctx,
- 			    struct zcomp_req *req)
- {
--	struct lz4hc_ctx *zctx = ctx->context;
- 	int ret;
- 
--	if (!zctx->dstrm) {
--		ret = LZ4_decompress_safe(req->src, req->dst, req->src_len,
--					  req->dst_len);
--	} else {
--		/* Dstrm needs to be reset */
--		ret = LZ4_setStreamDecode(zctx->dstrm, params->dict,
--					  params->dict_sz);
--		if (!ret)
--			return -EINVAL;
--		ret = LZ4_decompress_safe_continue(zctx->dstrm, req->src,
--						   req->dst, req->src_len,
--						   req->dst_len);
--	}
-+	ret = LZ4_decompress_safe_usingDict(req->src, req->dst, req->src_len,
-+					    req->dst_len, params->dict,
-+					    params->dict_sz);
- 	if (ret < 0)
- 		return -EINVAL;
- 	return 0;
+ static void zstd_custom_free(void *opaque, void *address)
 -- 
 2.56.0.rc1.315.gc6ed9934b7-goog
 
