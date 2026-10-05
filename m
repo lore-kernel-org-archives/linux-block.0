@@ -1,41 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FCA3CF1ED;
-	Mon,  5 Oct 2026 08:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85AF41A57D;
+	Mon,  5 Oct 2026 08:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791189927; cv=none; b=frVvfnP8qGcHJY+sMNNKuOov6SwF9O9kAObIJzH0ECwQ1U8bLh3yxl2aV3gQcgo0LIh2WEP2KLgCudoJdcKsj3gRZM8Hxd8NOhoP5dYirUmNAl6Yt39MALlBoujWK3OjvgFh+wm72H56NysNAaJ+u+UHb+/zE6+ZyUDzRqRuGEA=
+	t=1791190165; cv=none; b=ir+FL9jq4+Bbt4Ea9DyGi90n4V+a8Q96FTXWIHftjiwn0s5+DTskt2E0uRyS/ZkQfO9jpQICpQKNDH/II0mbknj6MzSoBLAJC19X2LwBHY8YPHUR6/WDd+fMTFrJIuo3cTWurhuIYsrM9uAOan3trGXnlrxKBFsxIlBqXGcyqCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791189927; c=relaxed/simple;
-	bh=686E5WSAPr757d6zxKAuCXXLt3xrkWdVpLk8MUETUl4=;
+	s=arc-20240116; t=1791190165; c=relaxed/simple;
+	bh=BRHpivnfsreuPPDvprMRRzoL7r3zQjMBdXjcrpgtSnY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eG8vmEZg2/vnZVdZG9mXB3JrMR7smZAHpzXrjEjXvz/mj1OYcMOhq5oNvB+ZUS2amdezB3bYEnP8y52pYasXuxu5J/Ct6ZC2ca2Rlf0lsK27bKHzWMCW7erZ4P0PKSnBDEbOa3pem96ZB/U/AspSaRbUt9nTsN6Ne/sO716GXRk=
+	 Content-Type:Content-Disposition:In-Reply-To; b=J0AHHWSZWWTIJc9R14z2HZcBENdpc2kK4HDnQvYCHIjTtKHLkrpSomvlGHX0+EXV/n3LVcH4gqHlQfBm/AwFbYqN5cns/k5qwERxwRcCECJMEcgHoqwgvf/rqvt3Ecu1RE1D9G3unKgHH1qipO2B0fAdJ9QHQdju0na+KaFWHCM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 86E9768BFE; Mon,  5 Oct 2026 10:45:21 +0200 (CEST)
-Date: Mon, 5 Oct 2026 10:45:21 +0200
+	id 1657368BFE; Mon,  5 Oct 2026 10:49:18 +0200 (CEST)
+Date: Mon, 5 Oct 2026 10:49:17 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Jan Kara <jack@suse.cz>, linux-block <linux-block@vger.kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brian Foster <bfoster@redhat.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Hillf Danton <hdanton@sina.com>,
-	Markus Elfring <Markus.Elfring@web.de>,
-	Ming Lei <tom.leiming@gmail.com>, Qu Wenruo <wqu@suse.com>,
-	Tao Cui <cui.tao@linux.dev>, kernel test robot <lkp@intel.com>,
-	rust-for-linux@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Nilay Shroff <nilay@linux.ibm.com>
-Subject: Re: [PATCH v5 1/2] block: Add post_release() operation
-Message-ID: <20261005084521.GA8879@lst.de>
-References: <69960302-1535-441a-be4e-d652766d65c2@I-love.SAKURA.ne.jp> <472c3bcd-45d4-477b-9e81-3c68601dc18f@acm.org>
+To: Md Haris Iqbal <haris.iqbal@linux.dev>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org
+Subject: Re: [v3 for-next 1/3] block: Reject unknown status tags in error
+ injection rules
+Message-ID: <20261005084917.GA9160@lst.de>
+References: <20260928221634.43239-1-haris.iqbal@linux.dev> <20260928221634.43239-2-haris.iqbal@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,21 +35,111 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <472c3bcd-45d4-477b-9e81-3c68601dc18f@acm.org>
+In-Reply-To: <20260928221634.43239-2-haris.iqbal@linux.dev>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Sep 28, 2026 at 10:29:42AM -0700, Bart Van Assche wrote:
-> On 9/22/26 10:09 PM, Tetsuo Handa wrote:
->> Add post_release() block device operation which provides a hook for
->> performing synchronous cleanup without disk->open_mutex held, which is
->> needed by the loop devices.
->
-> Hi Jens,
->
-> This patch series fixes a longstanding race condition. I haven't seen
-> any objections to this patch series. There is at least one other patch
-> that conflicts with this patch series: "[PATCH v6] loop: defer the queue
-> limits clear to a workqueue". Please consider merging this patch series.
+On Tue, Sep 29, 2026 at 12:16:32AM +0200, Md Haris Iqbal wrote:
+> tag_to_blk_status() returns BLK_STS_OK both for the "OK" tag and for a
+> tag it does not recognize, so a caller cannot tell the two apart. The
+> block error injection code (which is the sole user of this function
+> currently) relies on error_inject_add() later to reject adding a rule with
+> status=BLK_STS_OK. This is okay for the current state of error injection.
+> 
+> The delay option added in the next commit makes the rule with status=OK
+> valid, meaning the function tag_to_blk_status() now needs to explicitly
+> match BLK_STS_OK for it, and fail for a tag it does not recognize. Hence
+> make tag_to_blk_status() take a second param to update the matched status,
+> and return true in case of a successful match. If a match is not found,
+> the function tag_to_blk_status() returns false and *status remains
+> unchanged.
+> 
+> A repeated status= where an invalid tag comes first is now rejected
+> instead of being overridden by the later one.
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Assisted-by: Claude:claude-opus-5
+> Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
+> ---
+>  block/blk-core.c        | 14 ++++++--------
+>  block/blk.h             |  2 +-
+>  block/error-injection.c |  7 ++++---
+>  3 files changed, 11 insertions(+), 12 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 13dc70e8f55d..c45846b9c50d 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -225,21 +225,19 @@ const char *blk_status_to_tag(blk_status_t status)
+>  	return blk_errors[idx].tag;
+>  }
+>  
+> -blk_status_t tag_to_blk_status(const char *tag)
+> +bool tag_to_blk_status(const char *tag, blk_status_t *status)
+>  {
+>  	int i;
+>  
+>  	for (i = 0; i < ARRAY_SIZE(blk_errors); i++) {
+>  		if (blk_errors[i].tag &&
+> -		    !strcmp(blk_errors[i].tag, tag))
+> -			return (__force blk_status_t)i;
+> +		    !strcmp(blk_errors[i].tag, tag)) {
+> +			*status = (__force blk_status_t)i;
+> +			return true;
+> +		}
+>  	}
+>  
+> -	/*
+> -	 * Return BLK_STS_OK for mismatches as this function is intended to
+> -	 * parse error status values.
+> -	 */
+> -	return BLK_STS_OK;
+> +	return false;
+>  }
+>  
+>  /**
+> diff --git a/block/blk.h b/block/blk.h
+> index 2cc03aa54c53..5fa54162c686 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -52,7 +52,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
+>  
+>  const char *blk_status_to_str(blk_status_t status);
+>  const char *blk_status_to_tag(blk_status_t status);
+> -blk_status_t tag_to_blk_status(const char *tag);
+> +bool tag_to_blk_status(const char *tag, blk_status_t *status);
+>  enum req_op str_to_blk_op(const char *op);
+>  
+>  bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
+> diff --git a/block/error-injection.c b/block/error-injection.c
+> index e14bc4b723ef..db543fe27630 100644
+> --- a/block/error-injection.c
+> +++ b/block/error-injection.c
+> @@ -171,15 +171,16 @@ static int match_op(substring_t *args, enum req_op *op)
+>  static int match_status(substring_t *args, blk_status_t *status)
+>  {
+>  	const char *tag;
+> +	bool found;
+>  
+>  	tag = match_strdup(args);
+>  	if (!tag)
+>  		return -ENOMEM;
+> -	*status = tag_to_blk_status(tag);
+> -	if (!*status)
+> +	found = tag_to_blk_status(tag, status);
+> +	if (!found)
+>  		pr_warn("invalid status '%s'\n", tag);
+>  	kfree(tag);
+> -	return 0;
+> +	return found ? 0 : -EINVAL;
 
-No, adding magic out of lock extra ops is a no-go, and we've been
-through that before.
+	if (!found) {
+  		pr_warn("invalid status '%s'\n", tag);
+		return -EINVAL;
+	}
+	return 0;
+
+to keep the code a bit more readable.
+
+Otherwise looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
