@@ -1,61 +1,61 @@
-Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825AC480324
-	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 12:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF4C7262E
+	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 12:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791202886; cv=none; b=moXXMwRiUCwi+oFQ32DX7XzZVQF7q7DupkIcok/hz+fl0Vlx030Wk9RXR/yfb/TLlEviDdxu45hKD1H7rRjscOD0XDG4i0CFjEHrtqzOTp677VDrvTtK5KezdAlCsjpzioInUw9gANXNqZ0UdRnf4EpfnpocTvnT8g97VL5Cmp4=
+	t=1791202889; cv=none; b=pYDdWp+cNr8mtUFvD1fWAVB1TtLBBMYfAH01xDT+HMVQBwEgvbvlWh6cCsGqagjZbgPPcj37jlt6aQs4e9SP8o7InLzv3x+hX6Cg2WufaWMN8hnEO4ofAKhmtF1Fe1zlspyrKFZeXK5HvzoWLyTlH3nKVWqSrVRDnwfEmK4smn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791202886; c=relaxed/simple;
-	bh=cjmbppIMXyRMAGCgsAgIdXMu/Hehztl+4Vbc76WLIMk=;
+	s=arc-20240116; t=1791202889; c=relaxed/simple;
+	bh=TsYDKEkC7DrnJjoJ3bjAVeXMyRvjIspkjmI/66uJvgU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UK/mkPXcKqUCHiCu8g8WphGZ7JEvELFF4teoegoROBZipkMmhTyAHzNIZtAt1ospuupJY2sz6gr03Mq721Uk2mzgv+KZtHEUxBxlvTnoI2VZyTXvpuIDE+ocIskOFhOgth5OpfVA/RNKev9kViEHUY21n8iH0IpctnW7xQ7OyuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=e2hkHvHl; arc=none smtp.client-ip=74.125.227.140
+	 MIME-Version; b=TaCGNu8vfBiun9p23nxlNLtL60BnePna4HMIsXExg54unBZn4fGcMy20vwr3KqkH59v2btX1gTAItNgMNHysAA+VoSZ0kBQFGD8e1o0PxEp1LBKFNgzsQuSZYAeIychooP9Vv2h92EWCayf/OgSgJdX3rTFa8dgWZteXo9jupuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=lq1LDvU1; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="e2hkHvHl"
-Received: by mail-pj2-f12.google.com with SMTP id 98e67ed59e1d1-396ccb652d7so866158a91.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 05:21:21 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lq1LDvU1"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-cc4c02ddd62so569054a12.0
+        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 05:21:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1791202880; x=1791807680; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1791202882; x=1791807682; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=lBooGZSw2IxfoAxzLlFw+KVKnhFoUqum4OQR7iUI4RU=;
-        b=e2hkHvHl0vUm51qQH+a7mHpxLyTGWKdQSNkc/d7byN5c8B+WbynWAb1iZ7/nuBOF1H
-         +cJFL8/zbqXxS3wKuHJipAUGaYfnUNu6bQvmjWfDQikjmVNOJH9gu/ME5gROC1y6K10J
-         oTIctDeqgrtH/08eFMHYz5xoUDi2m2bcBeP14=
+        bh=JEfqKq8AUXff9rV1VBfaaWIWwsRhsIZ+aEa8DBn6+DQ=;
+        b=lq1LDvU1MSLUbGEFw8gTcDcoyGTw4rtn7sOPFDbOu6JJZHhVeHGu5Eilpp/fmmKRvc
+         XroKCuAwln6Awl3fJdhVRik+kKPtZjuNEQYSvtz3fFpNk0KbjCDvsvcKKxbyvszHI3wH
+         v6Pv2FYGWC+hEVnTUCBZPSpRZdaa9fDPN14uk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791202880; x=1791807680;
+        d=1e100.net; s=20260707; t=1791202882; x=1791807682;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=lBooGZSw2IxfoAxzLlFw+KVKnhFoUqum4OQR7iUI4RU=;
-        b=V1sijopPNAi0HJ7WYeKwemyu6lbWq0eAoVpArw30Mp67CEkc59Ti9Qr82jLsTmd15K
-         f9HINGEuzooEeakuM6zd2e+pGznzzfmRitN6LtzFtSIEimKa9anlMLKy8rHpwtNC13J0
-         nbMqRK+cyoDD+Knb3+KOGzWDzMr8jcO9PqftXKZklsPqZXxlCIF49aSRN4on5EodxGyC
-         AChbQyzdLrlQosKAulnKyFrbpYzx7wWijGtEDN7GzBoa8rFHHXGq3Q/Hvh0absSpqxg7
-         fF5HiUA7pBTlu28WAyRKBK1yV/trtuD+GhSCLNt3UmD+VkxgZQL7ETTD2T4UcunDti27
-         UrYg==
-X-Forwarded-Encrypted: i=1; AKwUvBx3vdYoVhfSnjl6yOhBXLFFoaTnge/dGFdVkGrv9g38qrdmwDlTtOZQAGchuZTiGfdmRys8sqkcBb76dQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLbk2XUzwVu9wtPsnFRNHW8cf2Dnkg8KV7KRFc3+MYfMR5IZ2jm
-	MsBf/Q2ly4dgHiSIPquX1HlYffu1n4HID3TCpOUVetliSrz9pHB13yxaBEcfVgYRHw==
-X-Gm-Gg: AYBFou2OYBxzL/f50bxaigYCcjHiZvc/pmH+57/5z0PWIhFJhdR5plM6gmwbzAvZVeD
-	tkB24gSZgJG9UCSjKxVgy3fH8G+uciQvBH1ze4J7hVulrJpgTazuWno55QXaRagzwUPVOaTPnG+
-	wO/D3Dz8wQwQsGXMzSXPjWibWPnJULOvUCNN+WaUGiqF7ZWNvjrl+7HsWZrpBt4TN+mXaYxsFao
-	Bdvxs3FfTnT71mM7tTQ6+MOwDSQuyMnJ635o62YYXrRWgWibOF5iTN0sAgLJ9M/HSw8ZnuZFQWw
-	TUJ73lha3BnX8xaQXCBsUtQHrhfuO9a3p8mgvLsK2Zl5pq1AeRtsR+x/tG36pmiEi3t7pzqnzPl
-	qn7W6HTH1N4PepVJ7SQ5Su1pYt3SBzET1DKUdusBAa14zkGNl4O1EMHF1SGg6TeSsowVKHl4t8F
-	rWSMt7bMutTTOO7S6ZXBOG6CgneDTzF0PVWL67zgRRTPeSrSSx0rSNHLUT1bbKHREqgzxFLjRc9
-	hWCx7aGCdU0hgd6F2KoFT8Fv6Dg9J4ZxxNktKkfD6o3C94DoJ7sFNVJO0gEV/o=
-X-Received: by 2002:a17:90a:fc45:b0:3a4:945e:bc33 with SMTP id 98e67ed59e1d1-3a6ce82bf0dmr6782414a91.47.1791202879907;
-        Mon, 05 Oct 2026 05:21:19 -0700 (PDT)
+        bh=JEfqKq8AUXff9rV1VBfaaWIWwsRhsIZ+aEa8DBn6+DQ=;
+        b=BjAknTMJq4ipbN6+e/K4eLxoqZBlx9AyeFNZPoVpwURn7YhN2ls7uhQ9Zi797TaEfI
+         YJrKljwwdN8uk/RW+jNkF2mdZ2FKbsR7R6UcEiYxuh6gJ1Vb4r06TetI53gzktUdcjy8
+         N0mq6F6pOySLEBdbheAqryylk9pVvvIffzQt02HIvuAYu+mVSDTf4/giB7gctwMyXsn3
+         F7ZpcmfM77iXRwwcnYnfxBLP9jZVlIM19cnh1tgS/8NFgncEIXnm31YNjCFTj2rHZnfE
+         tgnlZ3fmdptX8pPmUlr31uQn7La2enQIi2K4ZNykViu8yuqzdjprbyr8ClRnh4ptFMIJ
+         i1/g==
+X-Forwarded-Encrypted: i=1; AKwUvByw+4nBplNUYpXJUBMVL4UFomSVe1Xqhk0jSUbn0wFK4QwBk9QY0aKWfxxgPWUFCLjwElIqczyMaUEx0Q==@vger.kernel.org
+X-Gm-Message-State: AFq9FYINV8cj4cXc7guacwZfncAMhJgUzZE5YFjglJyDntQ/FY2Eo1+d
+	XKcZgbjOmmPTfvFR5prrxlLVrUXDwAzkaKknM0mqzWBJ1nRDbNE4JjN2U7cfEJ3aPg==
+X-Gm-Gg: AYBFou3TnS6+KQXQoh/37hPOFdeUtxkmeBiJcHqRj6qG33QqTtXubKC0imPfv4EqQkx
+	qITnVLYhb3oN1xEw5G7GLP4AKFuAQcSDDBy0imIDSzyzlBjnrOh+AZSeh6wIhUYS166CgWlQkFj
+	I0nQv0GaRfDEzDHxLkppb9VQgFPlVXR4qFUArckimxuc7NB37PcHnwUtF2xBTxJCFkPVC4+fu3i
+	6h8ACsvy+R6I491ZEd0vox1pmGHu/A/5UAtbHU3KEmvBWOcGqGW6fSLWZlkWCglsPr1jiL9xsHy
+	uJadjZ7EOMrY6GLg8h0by9EjejgZJOTYvvkeH7Trzc1Eq+aRDd6bhMO18R+pG5ThVbv1CJKvIPk
+	VPNhK35KnKUnPDQzDIeB37GAa7EsbT7xtvrS1/VcGLx32PWuX+1ALH7Zf3lHUkpwHQDkuBl4rxy
+	pqq1KhdBOJUbzeIFf1qUuqN3Dr7y1ZbhlPeCnaE8V74HYAB4ePe7CJbA7fMLLZlsyYNPLinLxLJ
+	FoOV6h0jOzRAajfGmEr3/nelrtIOVDbxBIsLXpScssRu+8WOorXa4G5zCGhvOI=
+X-Received: by 2002:a17:90b:380f:b0:3a4:eebd:2410 with SMTP id 98e67ed59e1d1-3a7873df65amr5816685a91.37.1791202882532;
+        Mon, 05 Oct 2026 05:21:22 -0700 (PDT)
 Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:9211:ddf0:3c6a:bf9e])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a7e4b00de6sm3342997a91.1.2026.10.05.05.21.17
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a7e4b00de6sm3342997a91.1.2026.10.05.05.21.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2026 05:21:18 -0700 (PDT)
+        Mon, 05 Oct 2026 05:21:21 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Brian Geffon <bgeffon@google.com>,
@@ -65,9 +65,9 @@ Cc: Brian Geffon <bgeffon@google.com>,
 	linux-block@vger.kernel.org,
 	linux-mm@kvack.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH 07/10] zram: zstd: do not use kvzalloc() for zstd allocations
-Date: Mon,  5 Oct 2026 21:20:22 +0900
-Message-ID: <20261005122036.718976-8-senozhatsky@chromium.org>
+Subject: [PATCH 08/10] zram: reset writeback state in zram_reset_device()
+Date: Mon,  5 Oct 2026 21:20:23 +0900
+Message-ID: <20261005122036.718976-9-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
 In-Reply-To: <20261005122036.718976-1-senozhatsky@chromium.org>
 References: <20261005122036.718976-1-senozhatsky@chromium.org>
@@ -79,53 +79,45 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When a dictionary is configured, zstd allocates all of its memory (C/D
-dictionaries, compression and decompression contexts and compression
-workspaces) via zstd_custom_alloc().  zstd_custom_alloc() uses
-kvzalloc(), which falls back to vmalloc() only when kmalloc() fails,
-and kmalloc() rounds such sizes up to a power-of-two number of pages.
+Reset all writeback state to its initial defaults on device reset.
+We used to keep writeback related data in zram->stats, which
+zram_reset_device() clears, but commit 1d69a3f8ae77 ("zram: idle
+writeback fixes and cleanup") moved it (along with the newly added
+wb_limit_enable) to struct zram, after which neither of them was
+reset anymore.  wb_batch_size and compressed_wb, which were added
+later, are not reset either.
 
-For example, on x86_64 with a 110K dictionary, switching from
-kvzalloc() to __vmalloc() reduces allocations from:
-- CDict (level 3):            512 KB -> 400 KB
-- CDict (levels 12+):        2048 KB -> 1552 KB
-- DCtx (per-CPU):             128 KB -> 96 KB
-- CCtx workspace (level 3):   128 KB -> 84 KB (per-CPU)
-- CCtx workspace (level 14+): 1024 KB -> 764 KB (per-CPU)
-
-Use __vmalloc() for allocations larger than PAGE_SIZE (and kzalloc()
-for smaller ones), which is also how zram allocates zstd workspaces
-when no dictionary is configured.  zstd_custom_free() already uses
-kvfree(), which handles both.
-
+Fixes: 1d69a3f8ae77 ("zram: idle writeback fixes and cleanup")
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/backend_zstd.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/block/zram/zram_drv.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
-index b367049f131d..7a8b5ff186f2 100644
---- a/drivers/block/zram/backend_zstd.c
-+++ b/drivers/block/zram/backend_zstd.c
-@@ -26,10 +26,17 @@ struct zstd_params {
- /*
-  * For C/D dictionaries we need to provide zstd with zstd_custom_mem,
-  * which zstd uses internally to allocate/free memory when needed.
-+ *
-+ * zstd allocations (C/D dictionaries and contexts) are large and
-+ * long-lived.  Don't use kvzalloc() for them: when enough physically
-+ * contiguous memory is available it serves them from kmalloc(), which
-+ * rounds them up to a power-of-two number of pages.
-  */
- static void *zstd_custom_alloc(void *opaque, size_t size)
- {
--	return kvzalloc(size, GFP_NOIO | __GFP_NOWARN);
-+	if (size <= PAGE_SIZE)
-+		return kzalloc(size, GFP_NOIO | __GFP_NOWARN);
-+	return __vmalloc(size, GFP_NOIO | __GFP_NOWARN | __GFP_ZERO);
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 593fa4ae47c4..0e1aa0da11aa 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -694,6 +694,7 @@ static void reset_bdev(struct zram *zram)
+ 	zram->disk->fops = &zram_devops;
+ 	kvfree(zram->bitmap);
+ 	zram->bitmap = NULL;
++	zram->nr_pages = 0;
  }
  
- static void zstd_custom_free(void *opaque, void *address)
+ static ssize_t backing_dev_show(struct device *dev,
+@@ -2881,6 +2882,12 @@ static void zram_reset_device(struct zram *zram)
+ 	zram_destroy_comps(zram);
+ 	memset(&zram->stats, 0, sizeof(zram->stats));
+ 	reset_bdev(zram);
++#ifdef CONFIG_ZRAM_WRITEBACK
++	zram->wb_limit_enable = false;
++	zram->bd_wb_limit = 0;
++	zram->wb_batch_size = 32;
++	zram->compressed_wb = false;
++#endif
+ }
+ 
+ static ssize_t disksize_store(struct device *dev, struct device_attribute *attr,
 -- 
 2.56.0.rc1.315.gc6ed9934b7-goog
 
