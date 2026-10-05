@@ -1,80 +1,67 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4425441BA61;
-	Mon,  5 Oct 2026 11:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FB847CC99
+	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 11:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791200916; cv=none; b=IpDpaZc8CjeBp9fT/349zho0V3lFmlzBrXHN1LkzCTOKpF9yVPeT4lXbfkADuY2NkdFiPWSam7iIGWe0AdBGhjYGo2fZmpBz26yxXDeXkpWX1+ALHiFjAKWyib8M7M7KUCBqij6jEfF3Nq/9IyHW8h0+4k1ILwo/XEPLS5+elQI=
+	t=1791200963; cv=none; b=ej35raitydvIJ5HR4PJvXbvg93kQvzsZUxx7LZvSDnZBF7MR2e/WT2F6HsjhmEUnQ4nboiLwU0CWdXh+mIaqsRyKSQ847J5Wv7wMSDtO901Pcko0OaQizY/AHFHsP9pyAn2JDDEEkPjgQQfHeI1UHI7VsdH3ULWbX5cdO0PtIqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791200916; c=relaxed/simple;
-	bh=dbRmjjAVsEDYci4CTOG6atVVQUySG8H0zGY8R97LliE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ix4Y/rhTEZph2wZX9wYcy1NhY/vkpMrFEjX+hbsGff7INSwr89qqsOBljZTmwsaseWoiA4q8f9hK2s/3iVDuCd4memEDr3cSf15tCFGCSClQUWkHc5yGH+8A7+cMSh02URzxDJYnWpHQIqYDu6H+o9z8gt8lBByuoqhwvZZIsNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Qe2sLSQZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=uYfhT2ti; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FpZ7DO2G; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TpX+L9OH; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1791200963; c=relaxed/simple;
+	bh=C4rWPxAM+gG+nBkU+Lpq5+tCLNPh5lzEfMeHsRf0DPA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rg32is6ScyIx9VttP52O2ewzebrzhnkKrkG+dC/+GxICQQvuuFYEzYxeriAMPQ267MJ2W/ayWkkhjmKIW5IGACPovT4BdwCL4sw/N3yjQvd4sn3YzNA1uBsVg3hR89S/pYX6z8tB8IIuWiLndpVdhafwxIh7A2eXt9tQcYHon00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oe2e4wNU; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Qe2sLSQZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="uYfhT2ti";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FpZ7DO2G";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TpX+L9OH"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D222C1F45B;
-	Mon,  5 Oct 2026 11:48:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791200909; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YhIf2SelFsBR3VCy8S0BpZaH4Ib73u2oUMwj5zODYmA=;
-	b=Qe2sLSQZ2NowA8G4SW50XMHh8WFEKzlBr4J+7ujj9vnOSsnwyxgTkMusvZjM3Z/yueco6Y
-	kLlbdTzdu6kVHsxwVXJjH30tyDcfvN5yhFjBeoXIfpCQdboh4SbLg21Xn2u3lUV64Hr/7o
-	FZimtsb3lHzN4Hph08uCHApa2p6RC6I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791200909;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YhIf2SelFsBR3VCy8S0BpZaH4Ib73u2oUMwj5zODYmA=;
-	b=uYfhT2tijS5lsOvLE5PI0fy9AZsPDqso4ZPOLc3ZLqi4IPIZAdjrev1C4QVpDQW7pKCJg3
-	MNCQneGhho8/m3CA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791200904; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YhIf2SelFsBR3VCy8S0BpZaH4Ib73u2oUMwj5zODYmA=;
-	b=FpZ7DO2GXKsLPGsKCCaF0pdTELtzMXmaCv0cNLN/eAplis+/Kznl+9Ud8rYxjCU9uIYCDs
-	PkGCV+13pwTaTOrsfyu08gIS1t6lIi2tTz7FL7ySDVIjv7VydSverqJPMsP05TtoTRy+Ib
-	ndIvh9YRBSkzSQOPJu3lj2ENbZT6rSg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791200904;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YhIf2SelFsBR3VCy8S0BpZaH4Ib73u2oUMwj5zODYmA=;
-	b=TpX+L9OHdO2n86grwfP4gGtEY25XTr5JGWGH4AkLTtONWhcK/sjs9vK5UvM8NWc+Zih7M0
-	oWGmTD6TRCumcBCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7961C13A61;
-	Mon,  5 Oct 2026 11:48:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id S6NBE4iOw2pbfAAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 05 Oct 2026 11:48:24 +0000
-Message-ID: <dfa4731e-b2d1-484a-a1dd-30e5e04a30d3@suse.de>
-Date: Mon, 5 Oct 2026 13:48:24 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oe2e4wNU"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49d1fb0cf5eso14151125e9.3
+        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 04:49:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791200959; x=1791805759; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=tN32JBtkwvrpOHkqPOwCz1peQMff+9nW+9FnKuTc/9Y=;
+        b=oe2e4wNU3lig5ckdIY4pln90NFMoBuzqjjQp9ZzJ8X5L77pYYYqB8QGUGhNn5BK7ag
+         teomHdKgtcHPMlz/WiXvHlG4Mqk0rycrnXJ912uIw6GEYYvPKxEuLdPx15bRUCANE2uv
+         ElhJ5VhfFNTy7CEgJukBL5HhoL0XKvCSIG556r/Nj1BH3XRFpc1MA1+5+ZVLdT3ilJvY
+         W0bKiKQ9tO8NasBmu7RcIKz5cRszVG0qmcnUvvCR2Zv0WtGFQyYVQGXvgo0gFlVlHf4X
+         JKNl84nvM/LvHX0h4AUV4kuiFJiMSkSxDwbWQhuoEtIxtOwK7scS6B0zruBGFZZJE8ZU
+         b51w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791200959; x=1791805759;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=tN32JBtkwvrpOHkqPOwCz1peQMff+9nW+9FnKuTc/9Y=;
+        b=s2k3RS3VOLEdKrdUl8FBS6WDIlObzuixoaRpAVvztjNFgd+MHdBLUOgqAyyBGR/PKB
+         Q4b+uqSK4TYwqq6Hyji2QQKZnYo3lrWjXd7KtezDEMgVQaskVvsfaECkbgnyf9dD5wiF
+         Ajv8o6UeKThvaXgV98AmGfUzmrlIe/Svr8USNGLQYHDqeDRQ1spNQypyNZg6MybclAXs
+         BT36mR4/eto+bFs7IsL7tWNoLl9ilfOy1EGBka4S17DI6ad9j2idFOijyQndOotLi2IM
+         OE5RatP2K9l+vwdG3WcKJc2ncHaI2SrBgh9dg90G13UxPJPuQ+enG7YF+XCac3qyX+6C
+         ghFQ==
+X-Gm-Message-State: AFuF++lH2WMFZ/qD6H96gLLi4YhAljUBHmJ87e/6CiQFxx1NT3kHcSnv
+	D2KTLaVwPAMjdSnxksGtOUZJNprCmlUu9ugixjl9LZOZ1l+U0p100dsO
+X-Gm-Gg: AYBFou0rXF5DkXNWjLu5iPMOrfPTf9Jrwina20ESrO3B7MqvvMbXqiAUrsrGQVAX3nw
+	Ni2w/LuZq4QI2qzEaxAbOx4sWmEEUBpteardkiPQr9ceWZOtXuoT5mo4CQDqj4OpCY9hCqSx9o0
+	14ByuVr547bmnCIqqbtxXphIDt05bmPxA7pQM0I8QxxvWtmg/46L2y+5QkwwsPa/eD3m8rOguWY
+	qOf5HsFGc1Mlm2WGQvcVwteKW8N7L5yE7t8mw7oqPeXcvd6JdKibgUwPpMMd76CgUoZyHY4dHGs
+	U/ghvJlLexKHNP6vNjFs5QU7rY8ut6+oZMjUhp8NSnhm9qSl3tx4bpzcoalvA/PCD3CGHJWZIdx
+	2XkyShj1kCt8UTUA7xhxqV3oCGJORnwux01V/GX5yxwK+LP6D1iV3Z4ORu3XxGbhi/JMbH4wuU9
+	6dcnVOqmAfb7HTZazVsGtF7E+jPmb7S+CEWdpWpSUCxl+z9SNN+7uqRU9twMj9GGyBezB+880V0
+	TqQJ8RUNlNUCSn94AVItS3S6GzvErpyxF1J5USeWlfyd+EnH5xXIjbL/VgFVNNwzHwONg0C2fs=
+X-Received: by 2002:a05:600c:1c08:b0:4a1:722a:d2a3 with SMTP id 5b1f17b1804b1-4a1722ad405mr52583605e9.23.1791200959268;
+        Mon, 05 Oct 2026 04:49:19 -0700 (PDT)
+Received: from [10.41.30.1] ([161.12.45.16])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a027727cecsm346670305e9.9.2026.10.05.04.49.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Oct 2026 04:49:18 -0700 (PDT)
+Message-ID: <c15a7ff3-121e-481b-93e4-466f89520ae4@gmail.com>
+Date: Mon, 5 Oct 2026 12:49:15 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,60 +69,135 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] scsi: sd_zbc: define storage element management
- operations
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>
-References: <20261005094632.580753-1-dlemoal@kernel.org>
- <20261005094632.580753-8-dlemoal@kernel.org>
+Subject: Re: [PATCH v6 01/13] dma-buf: introduce initial file I/O
+ infrastructure
+To: Matthew Brost <matthew.brost@intel.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Alasdair Kergon <agk@redhat.com>,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
+References: <cover.1789997898.git.asml.silence@gmail.com>
+ <5490ee42c4452fd4198b245ead20fcf7438c066e.1789997898.git.asml.silence@gmail.com>
+ <arx7ZQ8o9aeHsAqS@gsse-cloud1.jf.intel.com>
+ <447c04dd-6bfa-4c45-99e7-37d25a7ab539@gmail.com>
+ <c07404e0-33f6-4e5f-a80a-e1901b42dc39@gmail.com>
+ <ar1md2N4PkoXSE/N@gsse-cloud1.jf.intel.com>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261005094632.580753-8-dlemoal@kernel.org>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ar1md2N4PkoXSE/N@gsse-cloud1.jf.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email]
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spam-Flag: NO
 
-On 10/5/26 11:46 AM, Damien Le Moal wrote:
-> Define the storage element management operations using struct
-> blk_storage_elements_ops. These operations are valid only on SMR disks
-> supporting the storage element depopulation feature.
+On 9/30/26 20:43, Matthew Brost wrote:
+> On Wed, Sep 30, 2026 at 01:48:49PM +0100, Pavel Begunkov wrote:
+>> On 9/30/26 11:08, Pavel Begunkov wrote:
+>>> On 9/30/26 04:00, Matthew Brost wrote:
+>>>> On Mon, Sep 21, 2026 at 02:38:45PM +0100, Pavel Begunkov wrote:
+>>> ...>> +struct dma_buf_io_map *dma_buf_io_create_map(struct dma_buf_io_ctx *ctx)
+>>>>> +{
+>>>>> +    struct dma_buf *dmabuf = ctx->dmabuf;
+>>>>> +    struct dma_buf_io_map *map;
+>>>>> +    long ret;
+>>>>> +
+>>>>> +    guard(mutex)(&ctx->map_create_mutex);
+>>>>> +
+>>>>> +    scoped_guard(mutex, &ctx->map_mutex) {
+>>>>> +        if (ctx->maps_killed)
+>>>>> +            return ERR_PTR(-ENOENT);
+>>>>> +        /* recheck under the lock in case it has already been re-created */
+>>>>> +        map = __dma_buf_io_get_map(ctx);
+>>>>> +        if (map)
+>>>>> +            return map;
+>>>>> +    }
+>>>>> +
+>>>>> +    dma_buf_io_wait_active_maps(ctx);
+>>>>> +
+>>>>> +    ret = dma_resv_lock_interruptible(dmabuf->resv, NULL);
+>>>>> +    if (ret)
+>>>>> +        return ERR_PTR(ret);
+>>>>> +
+>>>>> +    ret = dma_resv_wait_timeout(dmabuf->resv, DMA_RESV_USAGE_KERNEL,
+>>>>> +                    true, MAX_SCHEDULE_TIMEOUT);
+>>>>> +    if (ret <= 0) {
+>>>>> +        if (!ret)
+>>>>> +            ret = -EAGAIN;
+>>>>> +        dma_resv_unlock(dmabuf->resv);
+>>>>> +        return ERR_PTR(ret);
+>>>>> +    }
+>>>>> +
+>>>>> +    map = ctx->dev_ops->map(ctx);
+>>>>
+>>>> I'm playing around this code now.
+>>>>
+>>>> I think you need the dma_resv_wait_timeout after the 'map'?
+>>>>
+>>>> If a device doesn't support p2p ->map() will typically trigger an async
+>>>> migrate to system memory and data will be moving but the map is valid -
+>>>> Xe 100% does this, I checked AMDGPU and fairly confident it has the same
+>>>> async behavior.
+>>>
+>>> There is a wait right before because I read somewhere in dma-buf
+>>> comments that I need to do that, sounds a bit odd if I need to
+>>> wait on fences before and after. I can add it, just curious how
+>>> come that other dma_buf_map_attachment() callers don't need to do
+>>> that. Or maybe they wait somewhere else?
 > 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   drivers/scsi/sd.c     |   1 +
->   drivers/scsi/sd.h     |   4 +
->   drivers/scsi/sd_zbc.c | 210 ++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 215 insertions(+)
+> In GPU drivers, when we receive a foreign object and map it in Xe or
+> AMDGPU, this logic sits deep in the stack. However, the top-level call
+> is typically ttm_bo_validate(), which in both drivers eventually
+> resolves to the TTM ->move() vfunc. That path calls
+> dma_buf_map_attachment(), which in turn invokes the dma-buf's ->map()
+> callback.
 > 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
+> That ->map() callback can trigger a asynchronous move on a different
+> device, where the top-level call is again ttm_bo_validate().
+> We then end up back in the TTM ->move() vfunc, where kernel fences are
+> installed. I realize that's a lot of layers, but the call chain can end
+> up looking like this.
+> 
+> Now we have a mapping and an object with kernel fences attached. Before
+> the object can be used by either the exec IOCTL (batch buffer
+> submission), the VM bind IOCTL (mapping into the GPU address space), or
+> a CPU page fault (not relevant for dma-bufs since they cannot be
+> CPU-mapped, but a useful example of a normal BO move), we wait on those
+> kernel fences.
+>   
+> In the case of the exec IOCTL or VM bind IOCTL, the kernel fences are
+> added as dependencies to a drm_sched job, delaying its execution until
+> the fences signal. That is where the wait occurs. In the case of a CPU
+> page fault, the kernel waits directly on the fences before installing
+> the CPU page mappings.
+> 
+> So the TL;DR is if you want to immediately hand back a valid mapping,
+> the kernel fences must be waited on before returning after ->map() call.
 
-Cheers,
+Thanks for the overview! I'll add the wait after ->map in v8
 
-Hannes
+>> I can't find it, so maybe it was the comment below and I mixed
+>> sth up back then. I'll move it after ->map().
+>>
+>>
+>> * Note that for non-dynamic exporters the driver must guarantee that
+>> * that the memory is available for use and cleared of any old data by
+>> * the time this function returns.  Drivers which pipeline their buffer
+>> * moves internally must wait for all moves and clears to complete.
+>> * Dynamic exporters do not need to follow this rule: For non-dynamic
+>> * importers the buffer is already pinned through @pin, which has the
+>> * same requirements. Dynamic importers otoh are required to obey the
+>> * dma_resv fences.
+>> *
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Pavel Begunkov
+
