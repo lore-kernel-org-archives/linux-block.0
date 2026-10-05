@@ -1,32 +1,48 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5022840A95F;
-	Mon,  5 Oct 2026 08:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F1242FCA9;
+	Mon,  5 Oct 2026 09:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791190618; cv=none; b=IStvgBSPMPTau+Y3R6U8nssylEqPejqCgRrO8O7OKiJLJyl78qVk5uNHXwmKlfZL9SN0+gKHs1Uc6ELC438fFC/k0VmjhQZAkb+dvruNeMk3Pi7VcZrujfnn3xMO2ykH0k+WPB4hUcqbwkNAfEiIVuefqAdpqcC+k7Eq/YJ2lWo=
+	t=1791191415; cv=none; b=jUYEifFURLb6EyduCGNf3D0Aj09kWhO1+2Y/FjAXXNGUSkxo807WiAySvy2WXe5OklIMhNYvNES80zN2vVBZ3TmUvufN2Sm6++NtyHsCyobY7xlklo6IeMSeq8Z1LHoq8o9WQxOJAxU9x5ZZygBJoplHuw3d1CF2126bAcV/EQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791190618; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1791191415; c=relaxed/simple;
+	bh=hNmAJf53nuCegwa5Bo6KwYtz5NCdOGq2JIipG/i7568=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZJuAQLw0xCG2WvQcByQ7VCeUJ0md/1v5fJ9B4+pDFOLvADV8jxhhhFbyDLME38MMIkvKPnCKrd/KYssvBLZNcY+8CVj8KcatMmNU1thrc3RcLeA+JWuPb8RIctdtfDfKA7gdMruHqbrWTDi/wVA/DaAB7P/Ajmoym3WSd25SMI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=nqzPJtmTUdwG1Lrov6+b4kC3Wg6D4Q3nAAZcAtJg0cyLZ1iLfQOn6OujskawFnd+1rkxrkMXlSbO0xUInjWRl1LRDTihG5u6Q/45X+9fFZgZQqdbzD34sh397OvFvvt5v67lWxl3WjpPovblREdVxiyC6FmbK1c0Eh0kv/ajN2k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8593F68BFE; Mon,  5 Oct 2026 10:56:53 +0200 (CEST)
-Date: Mon, 5 Oct 2026 10:56:53 +0200
+	id 8EEDC68BFE; Mon,  5 Oct 2026 11:10:08 +0200 (CEST)
+Date: Mon, 5 Oct 2026 11:10:08 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Md Haris Iqbal <haris.iqbal@linux.dev>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org
-Subject: Re: [v3 for-next 3/3] Documentation: block: document error
- injection delay feature
-Message-ID: <20261005085653.GC9160@lst.de>
-References: <20260928221634.43239-1-haris.iqbal@linux.dev> <20260928221634.43239-4-haris.iqbal@linux.dev>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>, Nitesh Shetty <nj.shetty@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Tushar Gohad <tushar.gohad@intel.com>,
+	William Power <william.power@intel.com>,
+	Phil Cayton <phil.cayton@intel.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
+Subject: Re: [PATCH v7 02/13] iov_iter: add iterator type for dmabuf maps
+Message-ID: <20261005091008.GA10727@lst.de>
+References: <cover.1790602223.git.asml.silence@gmail.com> <74a9d65f5c4f9acce5f57ad5921a9fadc6eda712.1790602223.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,9 +51,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260928221634.43239-4-haris.iqbal@linux.dev>
+In-Reply-To: <74a9d65f5c4f9acce5f57ad5921a9fadc6eda712.1790602223.git.asml.silence@gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Looks good:
+On Mon, Sep 28, 2026 at 02:32:18PM +0100, Pavel Begunkov wrote:
+> Introduce a new iterator type for dmabuf maps. The map in an opaque
+> object with internals and format specific to the subsystem / driver, and
+> only it can use that subsystem / driver for issuing IO. The task of the
+> middle layers is to pass the map / iterator further down, maybe doing
+> basic splitting and length checking. The iterator can only be used by
+> operations of the file the associated map was created for.
+> 
+> Suggested-by: Keith Busch <kbusch@kernel.org>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+FYI, I think the Sashiko complaint about iterate_and_advance2
+is correct here.  We don't really hit that in the series, but leaving
+iov_iter methods partially implemented and fall through to others
+seems dangerous.  At minimum that needs a WARN_ON to catch that case.
+
