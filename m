@@ -1,203 +1,138 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+Received: from mail-pz2-f38.google.com (mail-pz2-f38.google.com [74.125.228.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FB847CC99
-	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 11:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5236B448BB7
+	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 12:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791200963; cv=none; b=ej35raitydvIJ5HR4PJvXbvg93kQvzsZUxx7LZvSDnZBF7MR2e/WT2F6HsjhmEUnQ4nboiLwU0CWdXh+mIaqsRyKSQ847J5Wv7wMSDtO901Pcko0OaQizY/AHFHsP9pyAn2JDDEEkPjgQQfHeI1UHI7VsdH3ULWbX5cdO0PtIqY=
+	t=1791202854; cv=none; b=LsuTMMOAjZj0ECz7knMsbwV+NNDhY8OXqI6gcCQXMy6/KBqR9wI5CvNvkcTQIO0UTKeIrAlD1nB/uBNB0gnJiS0TcL7vkf2FCxtA82YV+u0NumC2GGqvj9s/k/1MnWJj+KwEH19yuAB1CuIAP9hMLeiQLYUskZ+iyyVsQeqfHYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791200963; c=relaxed/simple;
-	bh=C4rWPxAM+gG+nBkU+Lpq5+tCLNPh5lzEfMeHsRf0DPA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rg32is6ScyIx9VttP52O2ewzebrzhnkKrkG+dC/+GxICQQvuuFYEzYxeriAMPQ267MJ2W/ayWkkhjmKIW5IGACPovT4BdwCL4sw/N3yjQvd4sn3YzNA1uBsVg3hR89S/pYX6z8tB8IIuWiLndpVdhafwxIh7A2eXt9tQcYHon00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oe2e4wNU; arc=none smtp.client-ip=74.125.225.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791202854; c=relaxed/simple;
+	bh=zFTvQAxkM3SuPhSa2uIrosbgACuuPg4vv+RgSgCkJ7s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=krnFvrepO+2h+ANNq9Ovr35j2EPk6p0r1tiMUWGKTaT0s43rpopfywZhSG7iZIoVGNYULNOcSyTaxQ6DL0JhbddIFTMXo04wdF1BS+5IuPqMTWK3+9Z2BWcXBy7RhMh0pl6dqeOjQUT3Md5BwWMm2dijwO3rTNFguCEsjK8fgTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=obCpUzPS; arc=none smtp.client-ip=74.125.228.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oe2e4wNU"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49d1fb0cf5eso14151125e9.3
-        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 04:49:20 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="obCpUzPS"
+Received: by mail-pz2-f38.google.com with SMTP id 41be03b00d2f7-cc79a5bdf9fso340407a12.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 05:20:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791200959; x=1791805759; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=tN32JBtkwvrpOHkqPOwCz1peQMff+9nW+9FnKuTc/9Y=;
-        b=oe2e4wNU3lig5ckdIY4pln90NFMoBuzqjjQp9ZzJ8X5L77pYYYqB8QGUGhNn5BK7ag
-         teomHdKgtcHPMlz/WiXvHlG4Mqk0rycrnXJ912uIw6GEYYvPKxEuLdPx15bRUCANE2uv
-         ElhJ5VhfFNTy7CEgJukBL5HhoL0XKvCSIG556r/Nj1BH3XRFpc1MA1+5+ZVLdT3ilJvY
-         W0bKiKQ9tO8NasBmu7RcIKz5cRszVG0qmcnUvvCR2Zv0WtGFQyYVQGXvgo0gFlVlHf4X
-         JKNl84nvM/LvHX0h4AUV4kuiFJiMSkSxDwbWQhuoEtIxtOwK7scS6B0zruBGFZZJE8ZU
-         b51w==
+        d=chromium.org; s=google; t=1791202852; x=1791807652; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=kr2/73o+y15EzbO0RQo9G5wswmWW+XAsy0BXTjIVojc=;
+        b=obCpUzPSCnYo8NvWMz8Jz551lkVmSXqKv9uFEPOCrFFD0MQ8R9T8Qsg4XJINS6bcCf
+         UlZeEcPVH81OO3I5frgn2kii5RaB50jBWB1MELVDnCTVvwetfMMBavLHW0EEBgvlyfFm
+         0XykiFNOmnsEsGHCcPbodI9g4wfUqfgJD7jO8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791200959; x=1791805759;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20260707; t=1791202852; x=1791807652;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=tN32JBtkwvrpOHkqPOwCz1peQMff+9nW+9FnKuTc/9Y=;
-        b=s2k3RS3VOLEdKrdUl8FBS6WDIlObzuixoaRpAVvztjNFgd+MHdBLUOgqAyyBGR/PKB
-         Q4b+uqSK4TYwqq6Hyji2QQKZnYo3lrWjXd7KtezDEMgVQaskVvsfaECkbgnyf9dD5wiF
-         Ajv8o6UeKThvaXgV98AmGfUzmrlIe/Svr8USNGLQYHDqeDRQ1spNQypyNZg6MybclAXs
-         BT36mR4/eto+bFs7IsL7tWNoLl9ilfOy1EGBka4S17DI6ad9j2idFOijyQndOotLi2IM
-         OE5RatP2K9l+vwdG3WcKJc2ncHaI2SrBgh9dg90G13UxPJPuQ+enG7YF+XCac3qyX+6C
-         ghFQ==
-X-Gm-Message-State: AFuF++lH2WMFZ/qD6H96gLLi4YhAljUBHmJ87e/6CiQFxx1NT3kHcSnv
-	D2KTLaVwPAMjdSnxksGtOUZJNprCmlUu9ugixjl9LZOZ1l+U0p100dsO
-X-Gm-Gg: AYBFou0rXF5DkXNWjLu5iPMOrfPTf9Jrwina20ESrO3B7MqvvMbXqiAUrsrGQVAX3nw
-	Ni2w/LuZq4QI2qzEaxAbOx4sWmEEUBpteardkiPQr9ceWZOtXuoT5mo4CQDqj4OpCY9hCqSx9o0
-	14ByuVr547bmnCIqqbtxXphIDt05bmPxA7pQM0I8QxxvWtmg/46L2y+5QkwwsPa/eD3m8rOguWY
-	qOf5HsFGc1Mlm2WGQvcVwteKW8N7L5yE7t8mw7oqPeXcvd6JdKibgUwPpMMd76CgUoZyHY4dHGs
-	U/ghvJlLexKHNP6vNjFs5QU7rY8ut6+oZMjUhp8NSnhm9qSl3tx4bpzcoalvA/PCD3CGHJWZIdx
-	2XkyShj1kCt8UTUA7xhxqV3oCGJORnwux01V/GX5yxwK+LP6D1iV3Z4ORu3XxGbhi/JMbH4wuU9
-	6dcnVOqmAfb7HTZazVsGtF7E+jPmb7S+CEWdpWpSUCxl+z9SNN+7uqRU9twMj9GGyBezB+880V0
-	TqQJ8RUNlNUCSn94AVItS3S6GzvErpyxF1J5USeWlfyd+EnH5xXIjbL/VgFVNNwzHwONg0C2fs=
-X-Received: by 2002:a05:600c:1c08:b0:4a1:722a:d2a3 with SMTP id 5b1f17b1804b1-4a1722ad405mr52583605e9.23.1791200959268;
-        Mon, 05 Oct 2026 04:49:19 -0700 (PDT)
-Received: from [10.41.30.1] ([161.12.45.16])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a027727cecsm346670305e9.9.2026.10.05.04.49.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Oct 2026 04:49:18 -0700 (PDT)
-Message-ID: <c15a7ff3-121e-481b-93e4-466f89520ae4@gmail.com>
-Date: Mon, 5 Oct 2026 12:49:15 +0100
+        bh=kr2/73o+y15EzbO0RQo9G5wswmWW+XAsy0BXTjIVojc=;
+        b=sw0YUa4yEWOJjn3T0of/lwmSTIrdzWyMFk0FZeiqGzpt2Y2ZPTUktcjeNbVCkeQ3kP
+         Zwe2F91uAWZRMWeBIWSSMuuZJxRmeLiO/zrIkgeuvl7vncZhB6c86lapv1wjTtY2miqj
+         3wnA5bLdcX/+lXmb8Vbi0UieVIPdbOUGMrtRSjKeDEvIzu3y3i3QnXJit57XHNeedLIS
+         hRKAndruYpHCMrjC2XudfZL+MZQpub3hptVdMoB2wubVbf0R+e6u446SkrNmdKGZhqpr
+         U2at7/A3Q1v3DGEpyZqixznJyfzmjZMCO/6igzyDvhpFeSGz3VHYOI9zYbIRWP6RtU9c
+         4edQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwjytRCwRosMuLhjBzw25Zy4Ia0RXDiVRBlNT6H5sTbMI2aUpZC6x8gmoK2gPMozGjM9pu8FPcKSFVzIQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIxLh0ymG0PHCNnWfhHzJvE+G2JXqmIFpSv21MTgYHuV9xa47ov
+	DrCclSoWNLMXgCWZbqtkCNFtvBDo9SYv+VVB67Q4lgZhyt2CIkvKh/7Ax2xvL9pijQ==
+X-Gm-Gg: AYBFou3z8wpv6MySEb7OFiKj9TC71y810BuY9+pQuRDvgXrTo6KPuMUT5E5FtaNbFvv
+	Fm6EU205fhGgdj8I09jRw5HN/uNTcNbznn6FZk6C2tkkn/fzCXnwXPPwAbkSjTS51TE8cjJqjMA
+	kMWX3JBlGbEeiUVDYJKnvennf8Hs8N3CWTc67QXgeBb7PSmY6YvPHaarstcNz9ed3gHkLXkMNJ5
+	jFJaTG4VK/oVtDQXZtOJi5G0r1M4YIRsvLq90UngDgYC2FPRzuSG1V30U929G6H5KBJUVGHQ3iP
+	uU7oN6wjh0P4vr0a2UXP4C31fKKVtVJdkKdfl0ikxgdKci1LkPxSOEbwaDrJkhFa189IgAH/1OL
+	ttuHXV/eLvN+moLKgKgvE1yRb+tyKgTdGoX3WVU6654VBZt5HQpjicFRsw5nXrCvK5RYLC3xMpV
+	AyC9FCGh4oN/i176DKAj/WfxS0Pt3IdsPbIZwalrkXk3HDA4hF2VWfZdIHzQgk8nfkMjNjJs9Io
+	P6dwdoFNndxPfgklBhr5rHIRARDM3aVgK5uBYBmulME2avm8PcHotpWVxsCcTUv
+X-Received: by 2002:a17:90b:3ec7:b0:3a0:2900:f55e with SMTP id 98e67ed59e1d1-3a6cec20416mr6577046a91.29.1791202851545;
+        Mon, 05 Oct 2026 05:20:51 -0700 (PDT)
+Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:9211:ddf0:3c6a:bf9e])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a7e4b00de6sm3342997a91.1.2026.10.05.05.20.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Oct 2026 05:20:50 -0700 (PDT)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Brian Geffon <bgeffon@google.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Richard Chang <richardycc@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH 00/10] zram: redesign zcomp and rework backends
+Date: Mon,  5 Oct 2026 21:20:15 +0900
+Message-ID: <20261005122036.718976-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 01/13] dma-buf: introduce initial file I/O
- infrastructure
-To: Matthew Brost <matthew.brost@intel.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
- Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
- William Power <william.power@intel.com>, Phil Cayton
- <phil.cayton@intel.com>, Alasdair Kergon <agk@redhat.com>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
-References: <cover.1789997898.git.asml.silence@gmail.com>
- <5490ee42c4452fd4198b245ead20fcf7438c066e.1789997898.git.asml.silence@gmail.com>
- <arx7ZQ8o9aeHsAqS@gsse-cloud1.jf.intel.com>
- <447c04dd-6bfa-4c45-99e7-37d25a7ab539@gmail.com>
- <c07404e0-33f6-4e5f-a80a-e1901b42dc39@gmail.com>
- <ar1md2N4PkoXSE/N@gsse-cloud1.jf.intel.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ar1md2N4PkoXSE/N@gsse-cloud1.jf.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 9/30/26 20:43, Matthew Brost wrote:
-> On Wed, Sep 30, 2026 at 01:48:49PM +0100, Pavel Begunkov wrote:
->> On 9/30/26 11:08, Pavel Begunkov wrote:
->>> On 9/30/26 04:00, Matthew Brost wrote:
->>>> On Mon, Sep 21, 2026 at 02:38:45PM +0100, Pavel Begunkov wrote:
->>> ...>> +struct dma_buf_io_map *dma_buf_io_create_map(struct dma_buf_io_ctx *ctx)
->>>>> +{
->>>>> +    struct dma_buf *dmabuf = ctx->dmabuf;
->>>>> +    struct dma_buf_io_map *map;
->>>>> +    long ret;
->>>>> +
->>>>> +    guard(mutex)(&ctx->map_create_mutex);
->>>>> +
->>>>> +    scoped_guard(mutex, &ctx->map_mutex) {
->>>>> +        if (ctx->maps_killed)
->>>>> +            return ERR_PTR(-ENOENT);
->>>>> +        /* recheck under the lock in case it has already been re-created */
->>>>> +        map = __dma_buf_io_get_map(ctx);
->>>>> +        if (map)
->>>>> +            return map;
->>>>> +    }
->>>>> +
->>>>> +    dma_buf_io_wait_active_maps(ctx);
->>>>> +
->>>>> +    ret = dma_resv_lock_interruptible(dmabuf->resv, NULL);
->>>>> +    if (ret)
->>>>> +        return ERR_PTR(ret);
->>>>> +
->>>>> +    ret = dma_resv_wait_timeout(dmabuf->resv, DMA_RESV_USAGE_KERNEL,
->>>>> +                    true, MAX_SCHEDULE_TIMEOUT);
->>>>> +    if (ret <= 0) {
->>>>> +        if (!ret)
->>>>> +            ret = -EAGAIN;
->>>>> +        dma_resv_unlock(dmabuf->resv);
->>>>> +        return ERR_PTR(ret);
->>>>> +    }
->>>>> +
->>>>> +    map = ctx->dev_ops->map(ctx);
->>>>
->>>> I'm playing around this code now.
->>>>
->>>> I think you need the dma_resv_wait_timeout after the 'map'?
->>>>
->>>> If a device doesn't support p2p ->map() will typically trigger an async
->>>> migrate to system memory and data will be moving but the map is valid -
->>>> Xe 100% does this, I checked AMDGPU and fairly confident it has the same
->>>> async behavior.
->>>
->>> There is a wait right before because I read somewhere in dma-buf
->>> comments that I need to do that, sounds a bit odd if I need to
->>> wait on fences before and after. I can add it, just curious how
->>> come that other dma_buf_map_attachment() callers don't need to do
->>> that. Or maybe they wait somewhere else?
-> 
-> In GPU drivers, when we receive a foreign object and map it in Xe or
-> AMDGPU, this logic sits deep in the stack. However, the top-level call
-> is typically ttm_bo_validate(), which in both drivers eventually
-> resolves to the TTM ->move() vfunc. That path calls
-> dma_buf_map_attachment(), which in turn invokes the dma-buf's ->map()
-> callback.
-> 
-> That ->map() callback can trigger a asynchronous move on a different
-> device, where the top-level call is again ttm_bo_validate().
-> We then end up back in the TTM ->move() vfunc, where kernel fences are
-> installed. I realize that's a lot of layers, but the call chain can end
-> up looking like this.
-> 
-> Now we have a mapping and an object with kernel fences attached. Before
-> the object can be used by either the exec IOCTL (batch buffer
-> submission), the VM bind IOCTL (mapping into the GPU address space), or
-> a CPU page fault (not relevant for dma-bufs since they cannot be
-> CPU-mapped, but a useful example of a normal BO move), we wait on those
-> kernel fences.
->   
-> In the case of the exec IOCTL or VM bind IOCTL, the kernel fences are
-> added as dependencies to a drm_sched job, delaying its execution until
-> the fences signal. That is where the wait occurs. In the case of a CPU
-> page fault, the kernel waits directly on the fences before installing
-> the CPU page mappings.
-> 
-> So the TL;DR is if you want to immediately hand back a valid mapping,
-> the kernel fences must be waited on before returning after ->map() call.
+The series has a number of memory usage optimisations and fixes
+that result in savings from double digits KB to triple digits
+KB per-context/per-CPU, depending on backend and its configuration.
+More details are in the corresponding commit messages.
 
-Thanks for the overview! I'll add the wait after ->map in v8
+The zcomp redesign and backend rework happen in the final two
+patches.  zcomp part, basically, attempts to address the priority
+inversion problem, that is seen on some setups.  In zcomp, we have
+always kept Read and Write contexts together in per-CPU streams.
+With preemptible zram this becomes a bit of a problem, as a higher
+priority Reader can preempt a Writer, which may hold a stream
+lock, but since the compression stream is locked by the preempted
+Writer, the Reader gets blocked on the very same stream lock.
+However, we don't have any reasons to have Read and Write contexts
+share and compete for the stream, because Read (decompression) and
+Write (compression) paths are completely independent, they never
+touch each other's buffers.  Thus, we can split compression streams
+into per-CPU Read streams and per-CPU Write streams, so that Readers
+and Writers don't block each other anymore.  Kudos to Barry Song
+for the idea.  Decoupling Reads and Writes results in noticeable
+performance improvements on synthetic tests.
 
->> I can't find it, so maybe it was the comment below and I mixed
->> sth up back then. I'll move it after ->map().
->>
->>
->> * Note that for non-dynamic exporters the driver must guarantee that
->> * that the memory is available for use and cleared of any old data by
->> * the time this function returns.  Drivers which pipeline their buffer
->> * moves internally must wait for all moves and clears to complete.
->> * Dynamic exporters do not need to follow this rule: For non-dynamic
->> * importers the buffer is already pinned through @pin, which has the
->> * same requirements. Dynamic importers otoh are required to obey the
->> * dma_resv fences.
->> *
+The last patch in the series builds atop of decoupled Read and
+Write streams and reworks the way secondary streams are
+handled.  Secondary compression streams are only used from
+recompression, which is serialized by device lock, IOW it's
+single-threaded.  However, we still allocated secondary streams
+per-CPU (we needed to permit concurrent Reads of recompressed
+objects).  Because we now have dedicated R/W streams, we can
+allocate a singleton compression context (for recompression) yet
+still have per-CPU decompression contexts.  This saves a notable
+amount of memory with some backends and configurations (e.g. zstd,
+deflate, lz4hc).
+
+Sergey Senozhatsky (10):
+  zram: prefix backends printk-s
+  zram: remove debugfs entry on init failure
+  zram: zstd: do not allocate empty C/D-dictionaries
+  zram: lz4hc: pre-initialize dictionary stream in setup_params
+  zram: lz4: use LZ4_decompress_safe_usingDict()
+  zram: lz4hc: use LZ4_decompress_safe_usingDict()
+  zram: zstd: do not use kvzalloc() for zstd allocations
+  zram: reset writeback state in zram_reset_device()
+  zram: split zcomp into separate R/W streams
+  zram: use a singleton compression context for recompression
+
+ drivers/block/zram/backend_842.c     |   6 +-
+ drivers/block/zram/backend_deflate.c |  98 ++++++++------
+ drivers/block/zram/backend_lz4.c     |  85 +++---------
+ drivers/block/zram/backend_lz4hc.c   | 105 ++++++---------
+ drivers/block/zram/backend_lzo.c     |   6 +-
+ drivers/block/zram/backend_lzorle.c  |   6 +-
+ drivers/block/zram/backend_zstd.c    | 133 ++++++++++++-------
+ drivers/block/zram/zcomp.c           | 189 ++++++++++++++++++++++-----
+ drivers/block/zram/zcomp.h           |  35 +++--
+ drivers/block/zram/zram_drv.c        |  51 +++++---
+ 10 files changed, 421 insertions(+), 293 deletions(-)
+
 -- 
-Pavel Begunkov
+2.56.0.rc1.315.gc6ed9934b7-goog
 
