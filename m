@@ -1,48 +1,40 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D194334BC;
-	Mon,  5 Oct 2026 09:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79A7434999;
+	Mon,  5 Oct 2026 09:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791191478; cv=none; b=g266cl6mcTJGzCEbHJHSvB1O/pmNRV+XrERT+kOLBKGGFb4uCs/7mGU/80yYDxneYiw44TP7NJrNiUIDoHaWknSu6Orcp6uA0M+3/O069t3JJsDxtDJbGT1tYs2enE3RKibqAJGSJaSmUc8BDUZSU20dVGe4TlvvSwWjjMMfRis=
+	t=1791191545; cv=none; b=now/hl6uC8KWKkdDz7qUDJSjjAgSKYmJYmvVicyvrQAuuJboUqw7aysVjB6dQR6Mz340b+S+/quSKJhWQvz372udQwYrtAkmUEbWvNSt75IomdfPFJcg4UX3vebzVPoz4bE26zdvNe2sI95ogerKPdLt2lWX+HvdJeGmiDUwV8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791191478; c=relaxed/simple;
-	bh=GPIZUU+3LzlHpt8dWN7uSDKYHB5h2wSJfQNyM6QkLWc=;
+	s=arc-20240116; t=1791191545; c=relaxed/simple;
+	bh=FvFbmcoqy+CS1e+9F4qS80J5W1BvvY9zD9RwiyhJe2w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r0YGps6l/N2C9LeWB4q8c7Mduhi9N/KNplOYR6GkaobkdtTqb00tVsvsEPH29UzRvIGfwLRktEaHik0O7iHAhUfHP9V4DCmXWyOHitCZCVQK18x18ca61HV9vin9HOKPXQBPlZq3h7Ke9I2azyocu1RkMtgUP3bu+ArYAn+aJCI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qjdwa5hDvIOKsvLSThf/ZJddaW0XSFrWI8xJ1uoRIg1uD3ETZbiggJBroFgfukWz5UrbbqWBeIzD7cBG9JWufkYncC43X8/5nvJecfuFwz5qhDFVaFkdQ5OUj8ssOYVjkSpMXCHaYqhjnQ2/hSaFTdWlW06wFVaNBK/koyhqY0k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id BD5A468C4E; Mon,  5 Oct 2026 11:11:11 +0200 (CEST)
-Date: Mon, 5 Oct 2026 11:11:11 +0200
+	id 86A1B68BFE; Mon,  5 Oct 2026 11:12:19 +0200 (CEST)
+Date: Mon, 5 Oct 2026 11:12:19 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>, Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
-Subject: Re: [PATCH v7 05/13] block: add dma-buf support for raw bdev
-Message-ID: <20261005091111.GB10727@lst.de>
-References: <cover.1790602223.git.asml.silence@gmail.com> <a6b81e65b1f09b6ed1f71f294e5a94896ea1ead7.1790602223.git.asml.silence@gmail.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, agk@redhat.com,
+	akpm@linux-foundation.org, anuj20.g@samsung.com, axboe@kernel.dk,
+	bmarzins@redhat.com, brauner@kernel.org, christian.koenig@amd.com,
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+	hch@lst.de, io-uring@vger.kernel.org, jack@suse.cz,
+	joshi.k@samsung.com, kbusch@kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-nvme@lists.infradead.org,
+	matthew.brost@intel.com, mpatocka@redhat.com, nj.shetty@samsung.com,
+	phil.cayton@intel.com, sagi@grimberg.me, snitzer@kernel.org,
+	sumit.semwal@linaro.org, tushar.gohad@intel.com,
+	viro@zeniv.linux.org.uk, william.power@intel.com
+Subject: Re: [PATCH v7 06/13] nvme-pci: implement dma-buf backed requests
+Message-ID: <20261005091219.GC10727@lst.de>
+References: <cover.1790602223.git.asml.silence@gmail.com> <e99dd5221c71cbf9aafb5737468d814cb83b9174.1790602223.git.asml.silence@gmail.com> <5a35ad21-c9d4-4dab-a4f0-97baee6e2301@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,18 +43,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a6b81e65b1f09b6ed1f71f294e5a94896ea1ead7.1790602223.git.asml.silence@gmail.com>
+In-Reply-To: <5a35ad21-c9d4-4dab-a4f0-97baee6e2301@wanadoo.fr>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Sep 28, 2026 at 02:32:21PM +0100, Pavel Begunkov wrote:
-> Add a simple proxy implementation of init_dma_buf_io_ctx() forwarding
-> the call to a new struct block_device_operations operation. Also reject
-> dma-buf backed iterators for buffered IO.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> [pavel: reject dma-buf without O_DIRECT]
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+On Tue, Sep 29, 2026 at 05:45:39PM +0200, Christophe JAILLET wrote:
+>> @@ -27,6 +27,8 @@
+>>   #include <linux/io-64-nonatomic-lo-hi.h>
+>>   #include <linux/io-64-nonatomic-hi-lo.h>
+>>   #include <linux/sed-opal.h>
+>> +#include <linux/dma-buf-io.h>
+>> +#include <linux/dma-resv.h>
+>
+> Move up, to keep better alphabetical order ?
 
-The Sashiko report about the errno on fallback here looks real,
-and is probably easily fixed by setting a proper errno.
+Doesn't really matter.
+
+>>   +struct nvme_dmabuf_map {
+>> +	struct dma_buf_io_map base;
+>> +	struct sg_table *sgt;
+>> +	unsigned nr_entries;
+>> +	dma_addr_t dma_list[];
+>
+> Add __counted_by(nr_entries) and update nvme_dma_buf_io_map() so that 
+> nr_entries is set at the right time ?
+
+Yeah, that would be useful.
 
