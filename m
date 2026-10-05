@@ -1,32 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85AF41A57D;
-	Mon,  5 Oct 2026 08:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D01A401492;
+	Mon,  5 Oct 2026 08:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791190165; cv=none; b=ir+FL9jq4+Bbt4Ea9DyGi90n4V+a8Q96FTXWIHftjiwn0s5+DTskt2E0uRyS/ZkQfO9jpQICpQKNDH/II0mbknj6MzSoBLAJC19X2LwBHY8YPHUR6/WDd+fMTFrJIuo3cTWurhuIYsrM9uAOan3trGXnlrxKBFsxIlBqXGcyqCE=
+	t=1791190580; cv=none; b=WD8p9kWpwVvP/av52rFnPH4kbKuJ8kvkIctH0X09QaYwgkSm5opwpdkBGXCtPR6ympFOaWKP0XDFAQCZI5NdNptoAV03goQsJHSZ7AfIKGIC7Wk34xHhFBtywIC/aRMXSCC5idM8sPVXVTKWCCDyaYlAHIQluTINysE2r5EKh/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791190165; c=relaxed/simple;
-	bh=BRHpivnfsreuPPDvprMRRzoL7r3zQjMBdXjcrpgtSnY=;
+	s=arc-20240116; t=1791190580; c=relaxed/simple;
+	bh=lmzl3i3Eu5fcNfLgReC8s0rQZ7zIUSnmHYRnCTrbNfM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J0AHHWSZWWTIJc9R14z2HZcBENdpc2kK4HDnQvYCHIjTtKHLkrpSomvlGHX0+EXV/n3LVcH4gqHlQfBm/AwFbYqN5cns/k5qwERxwRcCECJMEcgHoqwgvf/rqvt3Ecu1RE1D9G3unKgHH1qipO2B0fAdJ9QHQdju0na+KaFWHCM=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ojhoCcO9ZHjswnk36wgrypIOvI3tVVaH2ajk+2vg8aD8hf6pC7a/jA7UM7LA1JOt5aeKxBz0K2/JBsOx5+3rd+cSpAlw7rE1C7JzeO1mymoQZNjXKHum0XKnvwegGVh7jXM2nAmRLZQ2luF0LugHZqtrgjmM1f7j5g56WvRed9Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1657368BFE; Mon,  5 Oct 2026 10:49:18 +0200 (CEST)
-Date: Mon, 5 Oct 2026 10:49:17 +0200
+	id AA0C168BFE; Mon,  5 Oct 2026 10:56:13 +0200 (CEST)
+Date: Mon, 5 Oct 2026 10:56:13 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Md Haris Iqbal <haris.iqbal@linux.dev>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
 	Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	linux-doc@vger.kernel.org
-Subject: Re: [v3 for-next 1/3] block: Reject unknown status tags in error
- injection rules
-Message-ID: <20261005084917.GA9160@lst.de>
-References: <20260928221634.43239-1-haris.iqbal@linux.dev> <20260928221634.43239-2-haris.iqbal@linux.dev>
+Subject: Re: [v3 for-next 2/3] block: allow error injection rules to delay
+ bios
+Message-ID: <20261005085613.GB9160@lst.de>
+References: <20260928221634.43239-1-haris.iqbal@linux.dev> <20260928221634.43239-3-haris.iqbal@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,111 +35,106 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260928221634.43239-2-haris.iqbal@linux.dev>
+In-Reply-To: <20260928221634.43239-3-haris.iqbal@linux.dev>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Sep 29, 2026 at 12:16:32AM +0200, Md Haris Iqbal wrote:
-> tag_to_blk_status() returns BLK_STS_OK both for the "OK" tag and for a
-> tag it does not recognize, so a caller cannot tell the two apart. The
-> block error injection code (which is the sole user of this function
-> currently) relies on error_inject_add() later to reject adding a rule with
-> status=BLK_STS_OK. This is okay for the current state of error injection.
-> 
-> The delay option added in the next commit makes the rule with status=OK
-> valid, meaning the function tag_to_blk_status() now needs to explicitly
-> match BLK_STS_OK for it, and fail for a tag it does not recognize. Hence
-> make tag_to_blk_status() take a second param to update the matched status,
-> and return true in case of a successful match. If a match is not found,
-> the function tag_to_blk_status() returns false and *status remains
-> unchanged.
-> 
-> A repeated status= where an invalid tag comes first is now rejected
-> instead of being overridden by the later one.
-> 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Assisted-by: Claude:claude-opus-5
-> Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
-> ---
->  block/blk-core.c        | 14 ++++++--------
->  block/blk.h             |  2 +-
->  block/error-injection.c |  7 ++++---
->  3 files changed, 11 insertions(+), 12 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 13dc70e8f55d..c45846b9c50d 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -225,21 +225,19 @@ const char *blk_status_to_tag(blk_status_t status)
->  	return blk_errors[idx].tag;
->  }
->  
-> -blk_status_t tag_to_blk_status(const char *tag)
-> +bool tag_to_blk_status(const char *tag, blk_status_t *status)
->  {
->  	int i;
->  
->  	for (i = 0; i < ARRAY_SIZE(blk_errors); i++) {
->  		if (blk_errors[i].tag &&
-> -		    !strcmp(blk_errors[i].tag, tag))
-> -			return (__force blk_status_t)i;
-> +		    !strcmp(blk_errors[i].tag, tag)) {
-> +			*status = (__force blk_status_t)i;
-> +			return true;
-> +		}
->  	}
->  
-> -	/*
-> -	 * Return BLK_STS_OK for mismatches as this function is intended to
-> -	 * parse error status values.
-> -	 */
-> -	return BLK_STS_OK;
-> +	return false;
->  }
->  
->  /**
-> diff --git a/block/blk.h b/block/blk.h
-> index 2cc03aa54c53..5fa54162c686 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -52,7 +52,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
->  
->  const char *blk_status_to_str(blk_status_t status);
->  const char *blk_status_to_tag(blk_status_t status);
-> -blk_status_t tag_to_blk_status(const char *tag);
-> +bool tag_to_blk_status(const char *tag, blk_status_t *status);
->  enum req_op str_to_blk_op(const char *op);
->  
->  bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
-> diff --git a/block/error-injection.c b/block/error-injection.c
-> index e14bc4b723ef..db543fe27630 100644
-> --- a/block/error-injection.c
-> +++ b/block/error-injection.c
-> @@ -171,15 +171,16 @@ static int match_op(substring_t *args, enum req_op *op)
->  static int match_status(substring_t *args, blk_status_t *status)
->  {
->  	const char *tag;
-> +	bool found;
->  
->  	tag = match_strdup(args);
->  	if (!tag)
->  		return -ENOMEM;
-> -	*status = tag_to_blk_status(tag);
-> -	if (!*status)
-> +	found = tag_to_blk_status(tag, status);
-> +	if (!found)
->  		pr_warn("invalid status '%s'\n", tag);
->  	kfree(tag);
-> -	return 0;
-> +	return found ? 0 : -EINVAL;
+On Tue, Sep 29, 2026 at 12:16:33AM +0200, Md Haris Iqbal wrote:
+> +static void blk_error_inject_delay_work(struct work_struct *work)
+> +{
+> +	struct blk_error_inject_delay *d = container_of(to_delayed_work(work),
+> +			struct blk_error_inject_delay, dwork);
+> +	struct bio *bio = d->bio;
+> +	struct gendisk *disk = bio->bi_bdev->bd_disk;
+> +	blk_status_t status = d->status;
+> +
+> +	kfree(d);
+> +
+> +	if (status != BLK_STS_OK) {
+> +		pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
+> +				disk->part0, blk_status_to_str(status),
+> +				blk_op_str(bio_op(bio)), bio->bi_iter.bi_sector,
+> +				bio_sectors(bio));
+> +		bio->bi_status = status;
+> +		bio_endio(bio);
 
-	if (!found) {
-  		pr_warn("invalid status '%s'\n", tag);
-		return -EINVAL;
-	}
-	return 0;
+This duplicates the tail of __blk_error_inject, please share the code.
 
-to keep the code a bit more readable.
+> +	} else {
 
-Otherwise looks good:
+And return after this to keep the other path straight line.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> +/*
+> + * Hand the bio to a workqueue that submits or fails it once the delay has
+> + * expired.  Both blk_mq_submit_bio() and ->submit_bio can sleep, so this can't
+> + * be completed from the timer itself.
+> + *
+> + * Returns false if the bio can't be delayed, in which case the caller handles
+> + * it immediately instead.
+> + */
+
+I'd drop the comment, it just states what is obvious from the code
+below.
+
+> +static bool blk_error_inject_delay(struct gendisk *disk, struct bio *bio,
+> +		blk_status_t status, unsigned int delay_us)
+> +{
+> +	struct blk_error_inject_delay *d;
+> +
+> +	/* never block a bio that asked not to be blocked */
+> +	if (bio->bi_opf & REQ_NOWAIT)
+> +		return false;
+
+We should probably complete it with BLK_STS_AGAIN as we would do
+for a real delay? 
+
+> +
+> +	d = kmalloc_obj(*d, GFP_NOIO);
+> +	if (!d)
+> +		return false;
+
+Should we log a warning that the intended delay did not happen?
+
+> +	/*
+> +	 * Mark the bio before queueing the work, which can complete it as soon
+> +	 * as it is queued.  Splitting happens below the injection hook, but
+> +	 * bio_submit_split_bioset() resubmits the remainder through the hook
+> +	 * again, and as bio_split() only advances the original bio that
+> +	 * remainder still matches the same rule.  Without this a bio would be
+> +	 * delayed once per split.
+> +	 */
+
+Over-eager comment.  But we should probably also set the flag for
+non-delayed bios anyway and do it as soon as any rule matches?
+
+> +static int __init blk_error_injection_init_wq(void)
+> +{
+> +	/*
+> +	 * WQ_MEM_RECLAIM so that a delayed bio on the reclaim path can still
+> +	 * find a worker under memory pressure.  Note that this only guarantees
+> +	 * a worker exists, not that it is free: submitting a bio can block on
+> +	 * a queue freeze or on tag allocation, so a delayed bio can still be
+> +	 * held up behind another one.
+> +	 */
+
+Very long comment explaining the obvious, everything doing I/O needs
+WQ_MEM_RECLAIM.  Please drop it.
+
+> +	blk_error_inject_wq = alloc_workqueue("blk_error_inject", WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
+
+Overly long line.
+
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 98e21b4cbf32..50e28dc0f1f9 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -323,6 +323,7 @@ enum {
+>  	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
+>  	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
+>  	BIO_COMPLETE_IN_TASK, /* complete bi_end_io() in task context */
+> +	BIO_ERROR_INJECTED, /* error injection rules already applied */
+>  	BIO_FLAG_LAST
+>  };
+
+With this we've used up the last BIO_ flag.  I hope this won't
+cause problems in the future..
+
