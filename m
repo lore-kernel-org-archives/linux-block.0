@@ -1,80 +1,67 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wr2-f42.google.com (mail-wr2-f42.google.com [74.125.225.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9BB3A9639;
-	Mon,  5 Oct 2026 11:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A752E47ECF1
+	for <linux-block@vger.kernel.org>; Mon,  5 Oct 2026 11:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791199179; cv=none; b=KiDtBi5YWKfKmhVxfaaeU20Bi2zm4kCPgkMk4L72VBk1XM4xvTtQAUidXlSj4upyUd9H5QjBlZzI21UU131jGW/ZuVjUw3n8cRu68amc+v/UBG2WfAD+KPanoy3PoSvq/8AmMCnb6M/FrkLrjOTgon/8K3gEmywvD4pmhN34geA=
+	t=1791200601; cv=none; b=rw6W81f9OjSvchwyJSrVw0SBOyTGVDV7rA+II78vCLiRlzuyZ+W3uvHHpYVWasq3v7lwAa2TEfz3rkUhhzA7CTMtnWsNLK3ECHHMeuz77lal5mn6gRQZXPIduptGJDkiGf3diVhPK4O0nCWb1bWq4e0Nh/8XqlfckQO3rb5Yq9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791199179; c=relaxed/simple;
-	bh=h9uN2wfs7yIf8qLZmsHIutD82EzVNiikGNmtoGlrk8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=KRtLUzju40kGJHq3x91T4EB4DW0lal4NcwfyqZl7vihZQ5ykQQOO9lNVbMh4/25goL+BLEdG07jM5rZdo3epoP1FJTiEOAOJVXqH2Pl1phgK6CjPuQ59VjqsaP7oZYDKM3SDAcyya1z+02mpltVjqx6FcQwUmFi0DPEynkyXBj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=u6kA+Akh; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AgtmruS3; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fGVkIUK/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7+gZeI6T; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1791200601; c=relaxed/simple;
+	bh=GDkG/OW+aHwhFfekfJ1LFx1PPwGsHQVlhAiMqfGU5IE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P1h+fzTIS3efl5uRFOTRU69LlEnK9alWVRD3bOtKgC5Bo4mkCAiSK4g1hzx2jnnBRd9ovWN9PNcNVMsGuolw4qYoEcFxzdxXjYXgqAAL7bh5ITgL705Q/qwNIWfex72zyxSCTMe10AD5U5WMkjQZmmCNgDQ0CDCtIc3/6rDK1n4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BvIJ1x4s; arc=none smtp.client-ip=74.125.225.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="u6kA+Akh";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AgtmruS3";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fGVkIUK/";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7+gZeI6T"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B9CF621CF2;
-	Mon,  5 Oct 2026 11:19:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791199171; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L8X0efBnY2o17JWI+KRrWiD0krP+t8S4QB/t7rQHlFU=;
-	b=u6kA+AkhSRFv7aEh44nYxkPVpgia/EuxoOZQ+CE3RdFNGME0SDBAPGTmDSvM8pc/v6kskG
-	waqTETCyoqocDeGy9/55LSNWcy24PjjhlkNLUhgnDenMzUsc9Nq2+Tf6VoQt3oyc3HA/Pj
-	h2gEz3oZTkRGujr/xzqmuyFLhSRbCDg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791199171;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L8X0efBnY2o17JWI+KRrWiD0krP+t8S4QB/t7rQHlFU=;
-	b=AgtmruS3cjCpMasskZzD5+y22PAWqJr/G9hKHO0DQaGnAF3V03rv1ExUvhPbkfQUjTg4pe
-	dLhDfJvOHMiF9wAw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791199167; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L8X0efBnY2o17JWI+KRrWiD0krP+t8S4QB/t7rQHlFU=;
-	b=fGVkIUK/iyEwbpwavYcWscdc/Xh7xcud9tp6Gu+9ZT4bCsgzAVflD0o35f6JlDjNwqQTFe
-	BK3GQeyMMJ90DR1pPcR6/OVCfzbHFEXq+DxzDXEHjn3mRkNyK+oHFYETafFyzMp88tmSNC
-	hmooxgI06DZSgJEcvAACgkC8S/4nvI8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791199167;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L8X0efBnY2o17JWI+KRrWiD0krP+t8S4QB/t7rQHlFU=;
-	b=7+gZeI6TwUb0mc2hGgfZA22acOE+hQUb7HNp9DitCvAYk1utm/GH1FuZN9ZUns/RD0CW3B
-	8XBYSK3iM3dUurAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 821AC13A2D;
-	Mon,  5 Oct 2026 11:19:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id mZrbGL+Hw2piXQAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 05 Oct 2026 11:19:27 +0000
-Message-ID: <9f31bd88-e149-4003-812e-c97a803180d9@suse.de>
-Date: Mon, 5 Oct 2026 13:19:27 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BvIJ1x4s"
+Received: by mail-wr2-f42.google.com with SMTP id ffacd0b85a97d-48b0622cc90so780548f8f.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2026 04:43:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791200598; x=1791805398; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=25uBlo4GDqcGkj4VAPKdolkwb50w3Is4u8TLMjz2GGs=;
+        b=BvIJ1x4s6MUzWWR9XYmDbGyghJnknXMQvG8Nno4rdsD7Cb6nEIbjkk5Hg8WCqMOpbP
+         hE3M6K/r6KpjTo/jqvUir1UuTOeawd4UKnnrPcmmc5eDgp+7APCvvMv4CdBS9XnxYwm6
+         zDtlV4515obtGUL+0Dbr17KuUdQmfLVwnUm3XaDDCG2bSTbzVPtfuQ2Tcf/NAYiecz8f
+         zkv3q42Ua+gBUrQcZgFzj8lmDFKwglIkBBY6yOm3DPxUq5GOegS56io+rlV7Ok0i3NeH
+         9o8uj1d4Ui2TxddURIsf6l6bvzO12YI06MBBjne4UC4AA0NrC2RGtBkhcqC/wnI3Cqus
+         S4Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791200598; x=1791805398;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=25uBlo4GDqcGkj4VAPKdolkwb50w3Is4u8TLMjz2GGs=;
+        b=IJS9H3MP6TvJhWpNmHatEeK43FW2sWuN1myOAThljyDcqIcAN2+T2j3mcCvCdOpF9Q
+         FIc+x2soXDkv/Bdg9Es3PH8u14Bo2SadR8GKooLBnTXcCWeLTLaKmaIJwliPGFksukVE
+         ED9Sm/0sqmFy9RDPwqBzXVf/RoT7yhzI94QhaMlgcrw9SJECmDNmSGqvxvrMp656zfAz
+         IHXLcLoFMhVggv7/ydQQIDLIqlWxI6OEpQ37CWpefaoZrM9eQfGf7exPbbyZjs3fOCx0
+         MbNIGCAIuu/Wg6Ki5tKmHdqAdm15EvYjhfV+LK+2SzeCG43pvJPJAbP/92S117uBPekb
+         wu2g==
+X-Gm-Message-State: AFq9FYJ3ZFIU0fx7ooOV4nUuw1Ng//AWNPtH/tPLHRIUHiEwR+rZ8ZbC
+	5U1uVhMxNNJauLz7XpcsQZF3/CoPI0eA7rt6wlcTwG64yav88e8pmmtq
+X-Gm-Gg: AYBFou0rrx61GHngx1+qemHdf5hrjB7sd8PprUAFAenGSV4JJ+I9BbqMppjtaXYc1u1
+	6q5hpDkFS3ZSYJSN6pV19B0euNh8IU6+TWSOqlJLl4H6vqACaU/8rTRnyXIqTvL47XVDp7T89PR
+	mpzG7zKNep92Ecp6lYcjfQoShil2tCNjzr29e4EMOS5dXgkWt5ldtL3dlIK3HSUe9E75XTgiO6V
+	o4s30Mqzpi6M/HyKlA8FpkPwYrfYiau21I1r0t/bQhpOeTZo+TvLSDja/6wjAJ9QW9m3cfnQ8f5
+	VTZl5vtBlg71FE/en8rIw2IkYhvYSeLTqZw9IfLLAzwR2HkIkyDbtOzNbWmNd8daaChcYUHJCwB
+	iy0J1V3BJhxzNm/duo0eZt6dM34azv6f8eDgI02GbSHv+rVedp1R/xG76bpNBcQFbC8geT77QGM
+	ufiufI799HmRjOX+lPzh0MowEGiEdGGlA4riQV/uPpfLPKkziY7zZ8h7P5QkeW0dt5KXhwNfnr0
+	WAW3TPDiW6z+DKiwrEQptdzijolVK1OCy9uDXEVcqcLZNSKV+EmA2AmO9vqi83NFF15I0uJcfo=
+X-Received: by 2002:a05:6000:40de:b0:48b:d2d:2fcc with SMTP id ffacd0b85a97d-48b1272d0c6mr17543670f8f.9.1791200597696;
+        Mon, 05 Oct 2026 04:43:17 -0700 (PDT)
+Received: from [10.41.30.1] ([161.12.45.16])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48c622704a5sm6943895f8f.15.2026.10.05.04.43.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Oct 2026 04:43:17 -0700 (PDT)
+Message-ID: <be0012e5-872f-42f3-bace-5066a09cd9e6@gmail.com>
+Date: Mon, 5 Oct 2026 12:43:14 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,75 +69,51 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/7] scsi: sd_zbc: always revalidate zones for disks
- supporting head depopulation
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>
-References: <20261005094632.580753-1-dlemoal@kernel.org>
- <20261005094632.580753-7-dlemoal@kernel.org>
+Subject: Re: [PATCH v7 05/13] block: add dma-buf support for raw bdev
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Matthew Brost <matthew.brost@intel.com>,
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
+References: <cover.1790602223.git.asml.silence@gmail.com>
+ <a6b81e65b1f09b6ed1f71f294e5a94896ea1ead7.1790602223.git.asml.silence@gmail.com>
+ <20261005091111.GB10727@lst.de>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261005094632.580753-7-dlemoal@kernel.org>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20261005091111.GB10727@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 7bit
 
-On 10/5/26 11:46 AM, Damien Le Moal wrote:
-> sd_zbc_revalidate_zones() skips revalidating the zones of a ZBC device if
-> the zone size and total number of zones of the disk has not changed. This
-> is to avoid a call to the rather slow blk_revalidate_disk_zones().
+On 10/5/26 10:11, Christoph Hellwig wrote:
+> On Mon, Sep 28, 2026 at 02:32:21PM +0100, Pavel Begunkov wrote:
+>> Add a simple proxy implementation of init_dma_buf_io_ctx() forwarding
+>> the call to a new struct block_device_operations operation. Also reject
+>> dma-buf backed iterators for buffered IO.
+>>
+>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>> [pavel: reject dma-buf without O_DIRECT]
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 > 
-> However, for ZBC devices that support data preserving head depopulation
-> (REMOVE ELEMENT AND MODIFY ZONES command), a disk capacity and number of
-> zones does not change after a head is depopulated but the condition of
-> zones changes as the zones served by the head that was depopulated become
-> either read-only or offline. In this case, not calling
-> blk_revalidate_disk_zones() prevents the block layer from taking
-> appropriate actions on the zone write plugs of the disk for the zones that
-> became read-only or offline.
-> 
-> Avoid any issue with the block layer view of the zone conditions by not
-> skipping the call to blk_revalidate_disk_zones() for disks that support
-> the REMOVE ELEMENT AND MODIFY ZONES command. This check is done from
-> sd_zbc_read_zones() using the helper function sd_zbc_check_modify_zones().
-> The new scsi disk flag modify_zones_supported is defined to remember the
-> result of this check.
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   drivers/scsi/sd.h     |  1 +
->   drivers/scsi/sd_zbc.c | 26 +++++++++++++++++++++++++-
->   2 files changed, 26 insertions(+), 1 deletion(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
+> The Sashiko report about the errno on fallback here looks real,
+> and is probably easily fixed by setting a proper errno.
 
-Cheers,
+I'm going to move the check into blkdev_buffered_write(),
+this should cover both paths. direct_write_fallback() will
+see -EOPNOTSUPP and fail appropriately.
 
-Hannes
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Pavel Begunkov
+
