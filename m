@@ -1,124 +1,86 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE26B3B3BFE
-	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 11:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664E53EB0F2
+	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 12:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791286581; cv=none; b=jrUxRv60YB9nJCTrHNC1XXRclqO2y3QALXV9vfdKiCzAeLSIg8qqDhDMVoKE2hHeXyHI8Q23AV6QGn6yXc73z4qsy6jX+D9RsvqY+ZbJrkCRm/5LBs6BxCku3GQ0EoyiNcoRuymCUZPnBTGexmucm0Y3LbZyGzUanLVw4SjIR44=
+	t=1791288102; cv=none; b=J1NiEzQYtCNhKt5wKASBE4lCh3U5G02YfqTi4kD+pU2F+PUhgK4zx84hOVnR05qFigrgerW41EEUh2dlr+TFxJphazGFAR1lCooeUVCi6UvthQQPokp0CSbnuG+2YQAKJ8Sf4VcXPHqsqaGT1EaS2PGLe6uifN7b8s15Cll0IGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791286581; c=relaxed/simple;
-	bh=Uyl8fsKqF2hZuM9YDMoKvgjEFiqVl+i1dh3r2f/VXKY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vi2XKSZZGKmubnHw04mnt2OBEo/bXn0iE7jZBeb5eznUJLKjyb1sHaYq06seuLFxY8V69Bv9cZbpd2p/F5WDLf8MH0F1Cg8cd2IJI8op45jEx7Ec2fB49EI3mIoc49a9nDEr/GL3AbY5r6gMfTIfyHUDyvl4bREzhoN8AyUuqss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-48afbd2c386so528526f8f.3
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 04:36:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791286578; x=1791891378;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ndzzUuEtcbTKrn4r7tACpiIJyXYLhlhQwb4ACs5k4Lo=;
-        b=Z6GrqYwJRNuGqefXFLx5mONc6JL2POofEl5RxRWIkelGEnT6oHiXPpaB6iyL/3CrfR
-         3Q5Gv31LFrPBDWDF+1gGykVcsDe0g2LtpYiSEdKQkHmVhF5l4sp+3MzBb4lWCOtHPIZq
-         D+0XI7j+86QPQRPIvB0Do/7fkyVB8SWITBZSRrlg6AdXeHwXTKBykJ2as1hagvULYgLQ
-         3auB1XSCpHTWrOcY3oJ8ug0Kv/pM1nJVL7szlyvranooa0jV1uW8iFhz5SFPUhu/EwT8
-         u3jx9R+EwNoTI4GLyLB0WhNiyOmd7HDSaS6HgddvQlkSrOAtkPmn0j3rYBWl0oU+8RYI
-         xp0A==
-X-Gm-Message-State: AFuF++neOwwO4e0Bb0Jbz3vR3TVSx8HPXLkG186gr5ZQmvkQ3M/KMfu3
-	dwQGEK2mJii6aqlsyOl5KENXugB/q0/BmXRv0iHYKCOjD2danWzT8ca41LtumB2ZqUg=
-X-Gm-Gg: AYBFou1IKtLrluR+U+H9SkPb2LQWChT3fwhG8FkRTJxHb8cxcN9gO2YIWLxVOmhX937
-	bUOiIKqZU3dq8/0gpvZS2bGCimREP0KpDzKG3hdpxW4HhNVFulRB3yXI3f8GG9TOQEpwcYN9RYL
-	+Fd5afByedwdmmrpqe1k8sKPiYBUEKLftlLVD2BwA/KS/b/7Lv8L6znkyCMuSqbHw1tRX5dCyFd
-	avsc0QO0GNHIjf7FOxNJ1EwFR4XPmq6eABthXqkUHETDTfPr67qQFbdZ2rTfKmlLxJL5J7X6+kb
-	XR9o2IliHn0KaST0MLuPOzTKSP6FJZEkHmLhQB+c3N0uq4GcSgeYZa3MDFNXgc1e2+mATPy9+za
-	u0ev2LN5dFrkO5YjQORBqJ868UDU1ws6X0tb0YNQRdin61IkqfQRocO/NU1cZ7x/PwZMG+H8iCZ
-	qD77pH8qw4H7j4AWEGU27BR10NRwgQZC07J0gjA5zwB9iU0urwhqwIjWCtyug0or394XR6tV8Hi
-	BglAFrpotEPKljQx0E8N8HBVG8=
-X-Received: by 2002:a05:600c:1c16:b0:4a0:258a:8de4 with SMTP id 5b1f17b1804b1-4a17b4f410emr22540365e9.4.1791286577693;
-        Tue, 06 Oct 2026 04:36:17 -0700 (PDT)
-Received: from white (bba-217-165-185-173.alshamil.net.ae. [217.165.185.173])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4a178c5d8dfsm70158865e9.14.2026.10.06.04.36.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 04:36:17 -0700 (PDT)
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	"Denis Efremov (Oracle)" <efremov@linux.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] floppy: take floppy_lock when rescheduling the timeout in queue_rq
-Date: Tue,  6 Oct 2026 15:35:47 +0400
-Message-ID: <20261006113547.2099599-1-efremov@linux.com>
-X-Mailer: git-send-email 2.55.0
+	s=arc-20240116; t=1791288102; c=relaxed/simple;
+	bh=PbTc9zVxyG98vDiYvlbm9ND3T8uXtfdYff1hqXqXeS4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TvAXwNeUfCMMLF129XObXFHnDWm6ZhHP9VzbQp1xdLARUcZ44gD6mWE47uNg6mhSnoapVeA9zyM/HpeD4+439eGpWbyr3r0/sOj3lnQiQGdEim/s/Fb9UpmyJQhbZFrNOlwjE35nn0AUsliG3HI6DmV3Rp83st7SjIg5GE93cxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 696C1aSn043934;
+	Tue, 6 Oct 2026 21:01:36 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 696C1a9l043931
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 6 Oct 2026 21:01:36 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <5026bd9c-c6cc-4179-8703-13d2843b5ae7@I-love.SAKURA.ne.jp>
+Date: Tue, 6 Oct 2026 21:01:33 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6] loop: Wait for I/O completion in __loop_clr_fd()
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Nilay Shroff <nilay@linux.ibm.com>, Edward Adam Davis <eadavis@qq.com>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net, Jens Axboe <axboe@kernel.dk>
+References: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav112.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-__reschedule_timeout() expects floppy_lock to be held. floppy_queue_rq()
-still calls it without the lock, which was fine when the request function
-ran under the queue lock, i.e. floppy_lock, but not since the conversion
-to blk-mq. With lockdep_assert_held(&floppy_lock) added to
-__reschedule_timeout(), the first read from the drive triggers:
+On 2026/10/06 6:06, Bart Van Assche wrote:
+> From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> 
+> Syzbot reports a NULL pointer dereference in lo_rw_aio(). This crash
+> probably happens because commit b15e4310633f ("jfs: Set the lbmDONE flag at
+> the end of lbmIODone"), merged in the 7.1 merge window, lets the JFS log
+> code report a write as finished while it is still in flight. JFS then tears
+> down and releases the loop device with that write still sitting in the loop
+> workqueue.
+> 
+> Although the root cause is in JFS, improve the loop driver by waiting in
+> __loop_clr_fd() for ongoing I/O. Release &disk->open_mutex temporarily
+> because otherwise a deadlock would be triggered.
+> 
+> This patch introduces a behavior change: openers racing with teardown now
+> get -ENXIO instead of waiting.
+> 
+Are you sure that commit b15e4310633f ("jfs: Set the lbmDONE flag at the end of
+lbmIODone") is the root cause for JFS case? If yes, it is a step forward fixing
+this regression in JFS side.
 
-  WARNING: drivers/block/floppy.c:671 at __reschedule_timeout+0x180/0x1e0, CPU#0: dd/561
-  Call Trace:
-   <TASK>
-   floppy_queue_rq+0x17e/0x300
-   blk_mq_dispatch_rq_list+0x3e9/0x1f30
-   __blk_mq_sched_dispatch_requests+0xcfa/0x16e0
-   blk_mq_sched_dispatch_requests+0xd5/0x1c0
-   blk_mq_run_hw_queue+0x341/0x670
-   blk_mq_dispatch_list+0x50c/0x16f0
-   blk_mq_flush_plug_list+0x131/0x600
-   ...
-   blkdev_read_iter+0x2b5/0x4e0
-   vfs_read+0x7fd/0xaf0
-   ksys_read+0x12a/0x250
-   do_syscall_64+0x106/0x5f0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   </TASK>
+Was your concern "releasing and reacquiring disk->open_mutex from __loop_clr_fd()
+seems risky to me"
+( https://lkml.kernel.org/r/e5518546-701e-4d3c-a077-18e34aa8c188@I-love.SAKURA.ne.jp )
+dissolved?
 
-Use reschedule_timeout(), which takes the lock.
+sashiko commented at
+https://sashiko.dev/#/patchset/fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche%40acm.org
+that blk_mq_quiesce_queue() / flush_workqueue() are redundant if we call
+blk_mq_freeze_queue() first.
 
-Cc: stable@vger.kernel.org
-Fixes: a9f38e1dec10 ("floppy: convert to blk-mq")
-Signed-off-by: Denis Efremov (Oracle) <efremov@linux.com>
----
-There is a small ordering conflict with "floppy: select FDC before arming
-timeout work" [1], which moves the same call below set_fdc(0). I will
-resolve it when applying the patches, so that the timeout is armed with
-reschedule_timeout() after set_fdc(0).
-
-That is also why this patch switches to reschedule_timeout() instead of
-moving __reschedule_timeout() into the floppy_lock section a couple of
-lines above: there it would be armed before set_fdc(0) again.
-
-[1] https://lore.kernel.org/linux-block/20260504032853.316099-1-zzzccc427@gmail.com/
-
- drivers/block/floppy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index f04397b8e381..5bbd385f837c 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -2872,7 +2872,7 @@ static blk_status_t floppy_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	spin_unlock_irq(&floppy_lock);
- 
- 	command_status = FD_COMMAND_NONE;
--	__reschedule_timeout(MAXTIMEOUT, "fd_request");
-+	reschedule_timeout(MAXTIMEOUT, "fd_request");
- 	set_fdc(0);
- 	process_fd_request();
- 	is_alive(__func__, "");
-
-base-commit: 22430ae5d90ab288b0ee2ad99ae941f4a666b694
--- 
-2.55.0
+Even without releasing and reacquiring disk->open_mutex, I think we can silence
+lockdep by removing synchronize_rcu() / drain_workqueue() because these are
+optional as long as we call blk_mq_freeze_queue(). But is calling
+blk_mq_freeze_queue() with disk->open_mutex held guaranteed to be safe?
 
