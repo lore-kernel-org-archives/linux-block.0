@@ -1,86 +1,129 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664E53EB0F2
-	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 12:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C649423784;
+	Tue,  6 Oct 2026 12:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791288102; cv=none; b=J1NiEzQYtCNhKt5wKASBE4lCh3U5G02YfqTi4kD+pU2F+PUhgK4zx84hOVnR05qFigrgerW41EEUh2dlr+TFxJphazGFAR1lCooeUVCi6UvthQQPokp0CSbnuG+2YQAKJ8Sf4VcXPHqsqaGT1EaS2PGLe6uifN7b8s15Cll0IGY=
+	t=1791290726; cv=none; b=ZvShD8IqyBa2t3YohJvQoXNOsevjzyOAtuV5kOnZ2Ce9ksxBmBzaud3ZZW8grAxbSLJqvZg3R0nGlpv3KAV0Lbv7xM2oj6z9fHdus9u6XqAEcGWxyqLJsJe+3Blwn0a57sI9n0vnMaZ7hZbcmE2xrHQXVnjXBLhWNJnqf8H4a0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791288102; c=relaxed/simple;
-	bh=PbTc9zVxyG98vDiYvlbm9ND3T8uXtfdYff1hqXqXeS4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TvAXwNeUfCMMLF129XObXFHnDWm6ZhHP9VzbQp1xdLARUcZ44gD6mWE47uNg6mhSnoapVeA9zyM/HpeD4+439eGpWbyr3r0/sOj3lnQiQGdEim/s/Fb9UpmyJQhbZFrNOlwjE35nn0AUsliG3HI6DmV3Rp83st7SjIg5GE93cxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 696C1aSn043934;
-	Tue, 6 Oct 2026 21:01:36 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 696C1a9l043931
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 6 Oct 2026 21:01:36 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <5026bd9c-c6cc-4179-8703-13d2843b5ae7@I-love.SAKURA.ne.jp>
-Date: Tue, 6 Oct 2026 21:01:33 +0900
+	s=arc-20240116; t=1791290726; c=relaxed/simple;
+	bh=koOoHfQDZcEIx4WvekhR9X8Q0eh66NYUeTC8a72hSSY=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GY+umdGRud0csY8YARhtte9DKLuuxuGEeSfz8EJLMZRdoOLfJyimw2qMVycF6kU9zIxenS6EzwHiYsg7OrlWtAkDE7dNMHGfkALyN9p8fxumrPgqlZ7tvwpDYwKBm7V+FTybucW+TyXMJ1m41E4gv7CxzHGndxtLcoqyMkn1uHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KJTIsU28; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KJTIsU28"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6852D1F00893;
+	Tue,  6 Oct 2026 12:45:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791290713;
+	bh=yHDROnBjd1ynNnW7MzmMCKXs4l5uSHYT9QWtZJ0TEzc=;
+	h=From:To:Subject:Date:In-Reply-To:References;
+	b=KJTIsU28ORMP2D1ubdTskq+lstPVTYf7u1rQ8FtRPsbKgtSLkpOCX9ubsMrrWZCE2
+	 T2j6lUG76bpYNcZ1QZEXBUzp0YRmoKm5EM39z9RDdgGMeHaic/0SW0dRgr3cakWnDX
+	 IxEHj5/It/90JF+QAqW+Eo7A478rdkZphWxLAfkyqgDOC+EmAFcBROQvjXusudwdY1
+	 jwrQqj9FS78FrgsZgLiI/XvEnFEPojjwAz43Vj4lJG5BMYEDLjP6ElULSmKDPUp9br
+	 yLzGccz4DvBvI17JOgORBHczUbbkjnwtbXdfMQIuM8TRlArbRwEql7GUZSCpuZt5lV
+	 7Kl5HLtjc7eVQ==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH v2 1/7] block: fail reads to offline zones early
+Date: Tue,  6 Oct 2026 21:45:04 +0900
+Message-ID: <20261006124510.882017-2-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20261006124510.882017-1-dlemoal@kernel.org>
+References: <20261006124510.882017-1-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6] loop: Wait for I/O completion in __loop_clr_fd()
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Nilay Shroff <nilay@linux.ibm.com>, Edward Adam Davis <eadavis@qq.com>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net, Jens Axboe <axboe@kernel.dk>
-References: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav112.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Transfer-Encoding: 8bit
 
-On 2026/10/06 6:06, Bart Van Assche wrote:
-> From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> 
-> Syzbot reports a NULL pointer dereference in lo_rw_aio(). This crash
-> probably happens because commit b15e4310633f ("jfs: Set the lbmDONE flag at
-> the end of lbmIODone"), merged in the 7.1 merge window, lets the JFS log
-> code report a write as finished while it is still in flight. JFS then tears
-> down and releases the loop device with that write still sitting in the loop
-> workqueue.
-> 
-> Although the root cause is in JFS, improve the loop driver by waiting in
-> __loop_clr_fd() for ongoing I/O. Release &disk->open_mutex temporarily
-> because otherwise a deadlock would be triggered.
-> 
-> This patch introduces a behavior change: openers racing with teardown now
-> get -ENXIO instead of waiting.
-> 
-Are you sure that commit b15e4310633f ("jfs: Set the lbmDONE flag at the end of
-lbmIODone") is the root cause for JFS case? If yes, it is a step forward fixing
-this regression in JFS side.
+Any BIO targeting an offline zone of a zoned block device will fail,
+including read commands. So there is no point in issuing read BIOs.
+Fail these read operations early if we ever see one.
 
-Was your concern "releasing and reacquiring disk->open_mutex from __loop_clr_fd()
-seems risky to me"
-( https://lkml.kernel.org/r/e5518546-701e-4d3c-a077-18e34aa8c188@I-love.SAKURA.ne.jp )
-dissolved?
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ block/blk-core.c  |  3 +++
+ block/blk-zoned.c | 18 ++++++++++++++++++
+ block/blk.h       |  6 ++++++
+ 3 files changed, 27 insertions(+)
 
-sashiko commented at
-https://sashiko.dev/#/patchset/fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche%40acm.org
-that blk_mq_quiesce_queue() / flush_workqueue() are redundant if we call
-blk_mq_freeze_queue() first.
-
-Even without releasing and reacquiring disk->open_mutex, I think we can silence
-lockdep by removing synchronize_rcu() / drain_workqueue() because these are
-optional as long as we call blk_mq_freeze_queue(). But is calling
-blk_mq_freeze_queue() with disk->open_mutex held guaranteed to be safe?
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 13dc70e8f55d..d420c80d2d93 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -866,6 +866,9 @@ void submit_bio_noacct(struct bio *bio)
+ 
+ 	switch (bio_op(bio)) {
+ 	case REQ_OP_READ:
++		if (bdev_is_zoned(bdev) &&
++		    bdev_zone_is_offline(bdev, bio->bi_iter.bi_sector))
++			goto end_io;
+ 		break;
+ 	case REQ_OP_WRITE:
+ 		if (bio->bi_opf & REQ_ATOMIC) {
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 19268afb8752..131c9f50b3da 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -308,6 +308,24 @@ bool bdev_zone_is_seq(struct block_device *bdev, sector_t sector)
+ }
+ EXPORT_SYMBOL_GPL(bdev_zone_is_seq);
+ 
++/**
++ * bdev_zone_is_offline - check if a sector belongs to an offline zone
++ * @bdev:       block device to check
++ * @sector:     sector number
++ *
++ * Check if @sector on @bdev is contained in an offline zone.
++ */
++bool bdev_zone_is_offline(struct block_device *bdev, sector_t sector)
++{
++	enum blk_zone_cond cond;
++
++	if (!bdev_is_zoned(bdev))
++		return false;
++
++	cond = disk_zone_get_cond(bdev->bd_disk, sector);
++	return cond == BLK_ZONE_COND_OFFLINE;
++}
++
+ /**
+  * bdev_zone_mgmt_allowed - check if management operations are allowed on a zone
+  * @bdev:       block device to check
+diff --git a/block/blk.h b/block/blk.h
+index 2cc03aa54c53..c2d07347a3ad 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -578,6 +578,7 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, unsigned int cmd,
+ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		unsigned int cmd, unsigned long arg);
+ bool bdev_zone_mgmt_allowed(struct block_device *bdev, sector_t sector);
++bool bdev_zone_is_offline(struct block_device *bdev, sector_t sector);
+ #else /* CONFIG_BLK_DEV_ZONED */
+ static inline void disk_init_zone_resources(struct gendisk *disk)
+ {
+@@ -625,6 +626,11 @@ static inline bool bdev_zone_mgmt_allowed(struct block_device *bdev,
+ {
+ 	return false;
+ }
++static inline bool bdev_zone_is_offline(struct block_device *bdev,
++					sector_t sector)
++{
++	return false;
++}
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno);
+-- 
+2.55.0
 
