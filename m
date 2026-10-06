@@ -1,72 +1,72 @@
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012016.outbound.protection.outlook.com [52.101.48.16])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010052.outbound.protection.outlook.com [52.101.85.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2793C108E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7019C3C4542
 	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 08:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.16
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791276964; cv=fail; b=cA8/YjeeOrpbL9GTJq2ynUiAbMJtAhgq/RI4Rzd6TIaNHGv3xmsipoLAUaPsA9zfdoJrBsA9HCJg6mloN3WCRB8FUyVZWeaZ+Gyw4RZ9YGFESJPQmEUhGbtUjs2wiQGlJ608IYkCAKZalYtG9GVH9w7ie/8Jeh8f8FTxZJrKPJg=
+	t=1791276965; cv=fail; b=dLwhG6mjTdLd0sRNn/N6Yoktl8kkUY4GAG/wG6gw6rvInsDdE1ag7SWRnJW1+IYmpjlNYMnJd88arZpCYXg2DJAnfnY+vVxdLmTRhp8hfLwwF1f7bpVtx+3SGpHw8tRHXSIv9IoLbIjRJHIb5mI1obxQ0c/4HfygZqd4CZNqa4E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791276964; c=relaxed/simple;
-	bh=FiRm0Ms2T4ctR4oTI+2YCI4+Yhot86zUW7XwB2hVbuI=;
+	s=arc-20240116; t=1791276965; c=relaxed/simple;
+	bh=TBwFcTP90/SJAYzDA9KON8f/e+HT342/j915WrdI8AY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q7EDHrRsBAmFMd1VAAGhZot4iOJl+DuUPtjDEE4qW7vmWmCnqZp+IZdGdPAdAYW7aZuTN4ANTqf3m+t1NyC+xgm03kOL2KIGRY6YTaph/OvRk8oMXpN9R0hidkPOtSVILjsQisR25cPe4vFjwHQEZVJM2sU10aHwmrQ3kbOE/hc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OnDhAO7P; arc=fail smtp.client-ip=52.101.48.16
+	 MIME-Version:Content-Type; b=ZCaBpuJ8YyLTXCcfmqG6NlRqgM5BSPKutchRcyu2V1D2DkJaASZXZl/2NtQ4GdOACoi+jRaHkuixRTYvUGBZRfKreBLNC8KmRW7I+vjJl7RIuGUwaesNJRhpuBuAGvaRP0v9c3xUqWgPFPe8gkQ8KqvgzBWm7GtChCUQ4LS48Jg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Tsj6M/M8; arc=fail smtp.client-ip=52.101.85.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OnDhAO7P"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Tsj6M/M8"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=zVsZBWkN/M++2ESjwB8nKZ4ctMOrTc9V4gaDIQdsorPyhfHeaYFWXZ+doDp+iU29k4VCVYI5ApNnGUx6e62BpsGMpqZruTgrlfl6X9IxEJlCPZ0WPqCdSsrOoO6DuVLeGz/siGZjr9UkRgtja9sjfEF0Vxf+7QbGITL9Lqp+BNR9kOe0/fc10STEy40y5BPl9DvXcS20Dbs8fh/cAAiezcqOhPhXdP45Pr/+lrtEJe+SbEYOABtn1SUJ1MU4IYy6nSi/GzO2L/T+l+8vJIHqaVipyGyBtcTAHvy3WtuDUeMT4Vpx6cbLI4bAaOZFANclpzeWVfswCPRTI4+NYLQGaw==
+ b=rNBt/VSV4m0QECfbdf258FVIUqS5s3N8WlUofBrXG5Azc8+SdojBdgkUDK2cX4D7fVC81K9y4bCTDiy8NNgEF5otbtWSjJkpo/fqyBgaFiuL0U2n+lEeOMjQls5/n4zOC6breFhs0rgyl9apcn0zfcOENJgd3sHsSx+V7JnghXHp5QbXO0yClxUdpZyVlOOyQqEAaG5x7+YUbWrCF47y7cuENF76vTB5VuA889SarAhWk1bkWhtoD6P1bvkncyeLfkCSDl4+PxF1h4l1LgA2WbZc/OHPCVOtYF8FuocHpW7MNmhp3kENq4TNT+7OZmUvfXGzBKXC/e1YQ+3KJCdrkA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xGRErY/bwGb/MOf7gUnnO55rJ3sWBQUc4AfbhoSDpbY=;
- b=dXhbp/wUWtKEt5JsvI9oMg1SzDgiUhJ7r45R35VQeuknlQlQWFUNVqURRym0u8TT02Qfagum7p/EplKZ8b4fryReTKAmcwVg/8axO4VacOlz5CghPUTjvlMcmrzNkp6o7m2zPVZZIFkV44jJ9x+L+OG8kUIwyxAXg315KUgP5/tdRWB6QTpp/fUocig1plilyISx4ycWSo3rW0xK7zbC+VDgigugXe/8lZjUHW6i6dfdOy7WdTTOL8QWzpw2aQFjpao8Nzhuqh+0FqMQY9kJ1F2J+rSxS3vx47P0kql7vsn347n5eYYz6zCEY9FmJjrXUK/SlnC1zmjxtORWRDczAw==
+ bh=i/yVC65grSlKLljAUYUj800bZeeujFr0BgdbwdAW91M=;
+ b=J3xhjvlmrKaZzMPKqF+ezszrb/RXD5lv2tiMvK+8FeH4unhGR2jkA4In2l9vyxpTOcm8PIykUgpQ6fRPBmwEJiJZTSFujl80EaGT3rUeBQHwxQtHFjsMHzKwrHlTDeex59anDjJsZTafuwcJQ+Y4idBibpYtZz4xL8B6Rc8j0Gj7c5OseEE0nO7IBp9xgqewrr6oxSDwmULMXiVMRHWyzIiT/iYBvzySV83KEQ+nTv8++LZL/IIS4FQ+Hmr5y+XyTAECr5g5tw6TxDL/eeXWXC3qRuiVUBMTRPmSQek+00CjVbWRrQECTaS/UDJreo5EjCn0UkDWYaIoH/2JgyHoAQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xGRErY/bwGb/MOf7gUnnO55rJ3sWBQUc4AfbhoSDpbY=;
- b=OnDhAO7PFHbot1s3c00oF3QL4F3zrOJ0xVv0yyXppwsInEwr7gUky3weUBF5dJ6FwuXPWZJuvdvpeE3qQyqi3UZ1mjn9kz6jBcfkSPy23J+zXsd7rxQu3lMZ6bZbiwbwblspN966ww3SdOzVzewrA3c2CcVsKs+NsMq4gUojYhwaeESHGCUF/Fa7lELHGGLn6LRZyS4MgybbzjhZ2HN819rwqgVzU/iVy4z2DsjVHB4Z1XvYilaoeULQSL32GIy8ODTdjAPADlVnsMuEl6CC93QItyLRrhclK+ZQS2zpu/TmXEHHjWZ2w9YjXwB9RYn1jhj9K4hznZfjJNtqx88AaA==
-Received: from CH2PR14CA0030.namprd14.prod.outlook.com (2603:10b6:610:60::40)
- by PH8PR12MB999274.namprd12.prod.outlook.com (2603:10b6:510:40d::16) with
+ bh=i/yVC65grSlKLljAUYUj800bZeeujFr0BgdbwdAW91M=;
+ b=Tsj6M/M8KDkEiea05H+AZWtNIgINLhjZMe9zwiAJXyHK63zq07wBZDh9VQIqfIyr8YF4D6RMKT8fxbecRZTEOU9msqHGGZ3jnvny0RMzXTJHId/0zJgjNerur9fvZOjAzceHlIgBZhHILl4kcFHAvC/oWwEg4VfBSlAOOIqzH3GfVkEYh2GIUFjjDAlUQqX7oUZ3as19x81YoF3/QnqinTxAX90RYAIHOTiCou+5f6vOCmMszKOpIqN7goLeTV3yLCLuhH25CTNvvDWNZkI+9KQbOevwLualiswEkVf+47D2RGjMHD0gfXsn3EpO7uTS0hbmhDkL3Ic6WAuRQ9c9Bw==
+Received: from CH5PR03CA0015.namprd03.prod.outlook.com (2603:10b6:610:1f1::13)
+ by SN7PR12MB6909.namprd12.prod.outlook.com (2603:10b6:806:263::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.472.20; Tue, 6 Oct
- 2026 08:55:59 +0000
-Received: from CH3PEPF0000000F.namprd04.prod.outlook.com
- (2603:10b6:610:60:cafe::43) by CH2PR14CA0030.outlook.office365.com
- (2603:10b6:610:60::40) with Microsoft SMTP Server (version=TLS1_3,
+ 2026 08:55:58 +0000
+Received: from CH2PEPF00000145.namprd02.prod.outlook.com
+ (2603:10b6:610:1f1:cafe::34) by CH5PR03CA0015.outlook.office365.com
+ (2603:10b6:610:1f1::13) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.472.20 via Frontend Transport; Tue, 6
- Oct 2026 08:55:59 +0000
+ Oct 2026 08:55:58 +0000
 X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.117.160) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ is 216.228.117.161) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH3PEPF0000000F.mail.protection.outlook.com (10.167.244.40) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF00000145.mail.protection.outlook.com (10.167.244.102) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.496.14 via Frontend Transport; Tue, 6 Oct 2026 08:55:58 +0000
+ 15.21.496.14 via Frontend Transport; Tue, 6 Oct 2026 08:55:57 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Tue, 6 Oct
- 2026 01:55:37 -0700
+ 2026 01:55:34 -0700
 Received: from yoav-mlt.nvidia.com (10.126.231.37) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Tue, 6 Oct
- 2026 01:55:35 -0700
+ 2026 01:55:31 -0700
 From: Yoav Cohen <yoav@nvidia.com>
 To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
 	<linux-block@vger.kernel.org>, <csander@purestorage.com>
 CC: <jholzman@nvidia.com>, <omril@nvidia.com>, Yoav Cohen <yoav@nvidia.com>
-Subject: [PATCH 2/2] selftests: ublk: add test for rq_affinity completion redirection
-Date: Tue, 6 Oct 2026 11:55:17 +0300
-Message-ID: <20261006085517.33974-3-yoav@nvidia.com>
+Subject: [PATCH 1/2] ublk: complete requests via blk_mq_complete_request() so rq_affinity applies
+Date: Tue, 6 Oct 2026 11:55:16 +0300
+Message-ID: <20261006085517.33974-2-yoav@nvidia.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20261006085517.33974-1-yoav@nvidia.com>
 References: <20261006085517.33974-1-yoav@nvidia.com>
@@ -82,116 +82,182 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF0000000F:EE_|PH8PR12MB999274:EE_
-X-MS-Office365-Filtering-Correlation-Id: fb927363-b3bf-4074-da85-08df2387a40f
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000145:EE_|SN7PR12MB6909:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5652631a-4033-4b7b-8fba-08df2387a38f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|23010399003|1800799024|82310400026|376014|18002099003|22082099003|6133799003|10067099003|56012099006|11063799006;
+	BCL:0;ARA:13230040|36860700016|376014|82310400026|23010399003|1800799024|11063799006|5023799004|56012099006|22082099003|10067099003|18002099003|6133799003;
 X-Microsoft-Antispam-Message-Info:
-	tXgBRPPTPaCFmbA8dYoJx+cLphx1WiI7FIpzX0HGYMgaIqmoPGUBFQ++EMBy2xoGW5SJ84c771opnEIRgYzgz5d9ZVi4Y7tSDw99zOuBeeZHUuGIHlQEt44jPlaqUjb6IFYBCtwXKfarTBfKSzhalCT1aTm9laep66wouUsEhU5Lvc59wcCYFpZC+UDB9yeSDPSU5xdXUTc2ZxIkd0l7KBbcVeJKRe9D0PYQG3pCCt+CL9dwK3bvpABvV1ifIXLRi02zC5LeRTdQv+OzJrra1WXgUSc1tKApeHh0lj0lcXC6sbwuI4dmC8W/7yc69rkCL/5ocvjOB6W1xWP+6GODIfHZbuOAI08fYDPhF36ybJq6fUow0Dy3i2GKlp7mdzuXa5RNYOdvmF+haTEh1YD5YdYE15tnAbSosTuYD4ee+3f/vJjwR7/9N3u5J6ygqUvbnWGO3BsmyISyd238EU8a7y2ZjaVzPgk6Xud0R2zYycs1cryEj3HTjFyOlScOoDZc9uG0pw0U21XWWJArNH2zL40axICi0PT46K4A68XCffCpKjakUHV/yfU3cp6XYi1u6Rk4OuHREQJIHG/LSY4vdxf9THzWA/28YorUbOKNb0iMVD6Ti4jMGvn/UMeA7iMgq0qSsBy2AWrQJTQM1p4gDNCMcOq0zHuKfVmRQ8B0feoBAUOHVD9/x4aaS8JoGKmi5a0tYdHyYzJErcb4cT09lQ==
+	rpa8pzOT/WHQdOp6dxKaEeakND2LQY37ycoe00OocNVAhJ9kd1IfvULw0LK9K1aiUT8RNo8dLMNpnv9lUoUDzpdCjkj4ismUdawNU/Uk33UnnmDarDpGq6VH6swHTMKJoCROTFcb9NvWbVmOYpAiDUSutSAsciOiIZg9LEpvILekJ+P6wl29QJ/RrES/PrqCLh2yH6Xz8NTSjR6AjP5Spj473vQcI9LPaF9bt8GR7VHlcUhmZ6YuFGefSpI2o58uH1KWmRH0RINvm8sQhy5vgWN2j97Gg/bJEhsUONzn/RpkD4kko2Sls04JhY7EtNNTPbkpX+ssizEVQcLCaJLZX2uNxFHrKMU3KSuhpCpYRXwc6sX9ZNgvprILIbh0KWECcxQ2BorjNizWgNocQJAa8HiqVqcrWoJPKndFZB+6t6gUlxAi9bF6CTYXg4NBEmsirVFmSCY3okf/3L2S6tZEoNwD4B/nV51bIZmslArsazf822MaPcAd2dcPW/KFutRKZahDdXJd8RKnqJmnUSPNWhNgBccscP6yFg2wRT9nDPcFU5LASgXgVyxUZCLD6QDSO0goUf9B/duLoX4DrIYQ9qiBDJ2NM/nCXNuKVKS1+lc6G3CDDs1688tTMCWrBN9cYCENQYAwNg+DXjzDLnK6WMv6a6okos3CqePK/WMBQNA57fC0+5dCeX7RAZdPiv2WEY5OcRbjD7+QdH8tGdovGQ==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(23010399003)(1800799024)(82310400026)(376014)(18002099003)(22082099003)(6133799003)(10067099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(376014)(82310400026)(23010399003)(1800799024)(11063799006)(5023799004)(56012099006)(22082099003)(10067099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	GPkCdlUiUbkMH5vFvHYWEL58jYY7aC+xM1cWXEt463slyRsr6f8fSY/jdAbRBUJYPsZV34I0R8u+TGVis0Z6/1eibpYSwmnC1QrLOXZG98ILrwqEpKCC/POOHMNH5bIGiBtgbO8nlFWn6qsISuDMED07naJQyCNqADJiiY1L3Dzxv371rW6JZ6l0lQGxPWPg2Jk/DRbz3UEGyzlfYI+yovb9SwgwQ1fW+bMJsOm/JgVomFNa2bty/Q5/Wfl+FWdze1uLKy2su+wDvSCcSsLDCGJCFk/9QoAww6Wy+l9I+Thnl/r5ZDRckzX7+vO3YNTznzjRgEauFhArsA2kMUcF9CyZS+d+eTO/rtR4p3yd239HR1Km6y1tJ8Eyt2I/i5UPDq5Xcd7/XncPrMQ6+09pdcMQkom0CJcHYdpSVgfbmOB8wvWQ3CXn5t6yCEBDIXqJ
+	o4Lsj4ly1XgPRNYBQQ5Cd3FDbM1kRuYFa77K/y/Rsi1nnlV70uP9ChywPHJ3/G2BpVGv4xU5xoOsZ/9HQNdfyzxNMCJFdFnPEbJo48woZ4ckjvAyTmpSJEnxAkbhhd6wJPpdMOtqytwe5c17BvHJXUhDGo2V9HuSfscyINpbWov3JpmacmEhTuW2G4W1yX2g93y+TIpxrfOBfMwkQy4StQyArUD9InGF61JNsWQaOZn6eMzsr0+5Zux1R/mg4SF89rgXXFuxmzWebZHTZ7okyDMnjQHgMibjrfEvHsztGk9j2dL2QqqUzSnL9YLYPdR6N6Api9r909kfFMCT3PKyBbU6eb1tbhO1NaH13at4W2CjICQ5M6ULHoyhkJOpL3/MVG+BLtVxRAPM+GAxitWyowq3iqFnc5U/ip3SB+59vnoWIx6ZfghbaB1j90GLpt9E
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Oct 2026 08:55:58.8483
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Oct 2026 08:55:57.9964
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb927363-b3bf-4074-da85-08df2387a40f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5652631a-4033-4b7b-8fba-08df2387a38f
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF0000000F.namprd04.prod.outlook.com
+	CH2PEPF00000145.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB999274
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6909
 
-Add UBLK_F_SUPPORT_RQ_AFFINITY to kublk's feature table, and add
-test_generic_18.sh: writes and verifies data on a loop device with
-I/O pinned to one CPU while cycling rq_affinity through 0, 1 and 2.
-Skipped on kernels without UBLK_F_SUPPORT_RQ_AFFINITY.
+ublk ends successfully completed requests inline on the server thread
+that issued UBLK_IO_COMMIT_AND_FETCH_REQ, so rq_affinity never
+redirects completion back to the submitting CPU, unlike NVMe, SCSI,
+virtio-blk, loop, nbd and rnbd.
+
+Route completion through blk_mq_complete_request_remote(), with a new
+->complete() callback, ublk_end_rq(). Add UBLK_F_SUPPORT_RQ_AFFINITY
+so servers can detect support via UBLK_CMD_GET_FEATURES.
 
 Signed-off-by: Yoav Cohen <yoav@nvidia.com>
 ---
- tools/testing/selftests/ublk/Makefile         |  1 +
- tools/testing/selftests/ublk/kublk.c          |  1 +
- .../testing/selftests/ublk/test_generic_18.sh | 42 +++++++++++++++++++
- 3 files changed, 44 insertions(+)
- create mode 100755 tools/testing/selftests/ublk/test_generic_18.sh
+ drivers/block/ublk_drv.c      | 72 +++++++++++++++++++++++++----------
+ include/uapi/linux/ublk_cmd.h |  8 ++++
+ 2 files changed, 59 insertions(+), 21 deletions(-)
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index 37883e9d50ec..d12e9879b89a 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -19,6 +19,7 @@ TEST_PROGS += test_generic_12.sh
- TEST_PROGS += test_generic_13.sh
- TEST_PROGS += test_generic_16.sh
- TEST_PROGS += test_generic_17.sh
-+TEST_PROGS += test_generic_18.sh
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 66eb55e7162e..48bdb5d782ee 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -90,7 +90,8 @@
+ 		| UBLK_F_BATCH_IO \
+ 		| UBLK_F_NO_AUTO_PART_SCAN \
+ 		| UBLK_F_SHMEM_ZC \
+-		| UBLK_F_IO_DESC_SIZE)
++		| UBLK_F_IO_DESC_SIZE \
++		| UBLK_F_SUPPORT_RQ_AFFINITY)
  
- TEST_PROGS += test_batch_01.sh
- TEST_PROGS += test_batch_02.sh
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 2400b4615766..c750e10a69bf 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -2083,6 +2083,7 @@ static int cmd_dev_get_features(void)
- 		FEAT_NAME(UBLK_F_NO_AUTO_PART_SCAN),
- 		FEAT_NAME(UBLK_F_SHMEM_ZC),
- 		FEAT_NAME(UBLK_F_IO_DESC_SIZE),
-+		FEAT_NAME(UBLK_F_SUPPORT_RQ_AFFINITY),
- 	};
- 	struct ublk_dev *dev;
- 	__u64 features = 0;
-diff --git a/tools/testing/selftests/ublk/test_generic_18.sh b/tools/testing/selftests/ublk/test_generic_18.sh
-new file mode 100755
-index 000000000000..5afb202f1ef5
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_generic_18.sh
-@@ -0,0 +1,42 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
+ #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+ 		| UBLK_F_USER_RECOVERY_REISSUE \
+@@ -1549,13 +1550,54 @@ static void ublk_end_request(struct request *req, blk_status_t error)
+ 	local_bh_enable();
+ }
+ 
++/*
++ * Update @req with its result and requeue it if it was only partially
++ * completed. Returns true if @req was requeued, in which case the caller
++ * must not touch it any further.
++ *
++ * Run bio->bi_end_io() with softirqs disabled. If the final fput happens
++ * off this path, then that will prevent ublk's blkdev_release() from
++ * being called on current's task work, see fput() implementation.
++ *
++ * This matters for the caller completing @req locally on the ublk
++ * server's own thread: it may already be holding disk->open_mutex, e.g.
++ * reading the partition table from bdev_open(), and an fput() running
++ * inline there could deadlock on it. Preferably we would not be doing
++ * IO with a mutex held that is also used for release, but this
++ * work-around will suffice for now. A caller reached instead via
++ * blk_mq_complete_request_remote()'s softirq/IPI redirect never runs on
++ * that thread, so it isn't exposed to this hazard, but disabling
++ * softirqs here is harmless for it too.
++ */
++static inline bool ublk_update_and_requeue(struct request *req,
++					   struct ublk_io *io)
++{
++	bool requeue;
 +
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++	local_bh_disable();
++	requeue = blk_update_request(req, BLK_STS_OK, io->res);
++	local_bh_enable();
++	if (requeue)
++		blk_mq_requeue_request(req, true);
++	return requeue;
++}
 +
-+ERR_CODE=0
++static void ublk_end_rq(struct request *req)
++{
++	struct ublk_queue *ubq = req->mq_hctx->driver_data;
++	struct ublk_io *io = &ubq->ios[req->tag];
 +
-+if ! _have_program fio; then
-+	exit "$UBLK_SKIP_CODE"
-+fi
++	if (!ublk_update_and_requeue(req, io) &&
++	    likely(!blk_should_fake_timeout(req->q)))
++		__blk_mq_end_request(req, BLK_STS_OK);
++}
 +
-+if ! _have_feature "SUPPORT_RQ_AFFINITY"; then
-+	exit "$UBLK_SKIP_CODE"
-+fi
+ /* todo: handle partial completion */
+ static inline void __ublk_complete_rq(struct request *req, struct ublk_io *io,
+ 				      bool need_map, struct io_comp_batch *iob)
+ {
+ 	unsigned int unmapped_bytes;
+ 	blk_status_t res = BLK_STS_OK;
+-	bool requeue;
+ 
+ 	/* failed read IO if nothing is read */
+ 	if (!io->res && req_op(req) == REQ_OP_READ)
+@@ -1588,25 +1630,11 @@ static inline void __ublk_complete_rq(struct request *req, struct ublk_io *io,
+ 		io->res = unmapped_bytes;
+ 	}
+ 
+-	/*
+-	 * Run bio->bi_end_io() with softirqs disabled. If the final fput
+-	 * happens off this path, then that will prevent ublk's blkdev_release()
+-	 * from being called on current's task work, see fput() implementation.
+-	 *
+-	 * Otherwise, ublk server may not provide forward progress in case of
+-	 * reading the partition table from bdev_open() with disk->open_mutex
+-	 * held, and causes dead lock as we could already be holding
+-	 * disk->open_mutex here.
+-	 *
+-	 * Preferably we would not be doing IO with a mutex held that is also
+-	 * used for release, but this work-around will suffice for now.
+-	 */
+-	local_bh_disable();
+-	requeue = blk_update_request(req, BLK_STS_OK, io->res);
+-	local_bh_enable();
+-	if (requeue)
+-		blk_mq_requeue_request(req, true);
+-	else if (likely(!blk_should_fake_timeout(req->q))) {
++	if (blk_mq_complete_request_remote(req))
++		return;
 +
-+_prep_test "loop" "write and verify I/O across rq_affinity settings"
++	if (!ublk_update_and_requeue(req, io) &&
++	    likely(!blk_should_fake_timeout(req->q))) {
+ 		if (blk_mq_add_to_batch(req, iob, false, blk_mq_end_request_batch))
+ 			return;
+ 		__blk_mq_end_request(req, BLK_STS_OK);
+@@ -2347,6 +2375,7 @@ static const struct blk_mq_ops ublk_mq_ops = {
+ 	.queue_rqs      = ublk_queue_rqs,
+ 	.init_hctx	= ublk_init_hctx,
+ 	.timeout	= ublk_timeout,
++	.complete	= ublk_end_rq,
+ };
+ 
+ static const struct blk_mq_ops ublk_batch_mq_ops = {
+@@ -2355,6 +2384,7 @@ static const struct blk_mq_ops ublk_batch_mq_ops = {
+ 	.queue_rqs      = ublk_batch_queue_rqs,
+ 	.init_hctx	= ublk_init_hctx,
+ 	.timeout	= ublk_timeout,
++	.complete	= ublk_end_rq,
+ };
+ 
+ static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index 33b25dd13965..47b5fba9519c 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -420,6 +420,14 @@ struct ublk_shmem_buf_reg {
+ /* ublksrv_io_desc size is specified by ublksrv_ctrl_dev_info's io_desc_size */
+ #define UBLK_F_IO_DESC_SIZE (1ULL << 20)
+ 
++/*
++ * Request completion honors the block device's rq_affinity setting
++ * (/sys/block/ublkbN/queue/rq_affinity): the submitting CPU's completion
++ * work can run there instead of always on the ublk server's CPU. Without
++ * this feature, rq_affinity has no effect on ublk devices.
++ */
++#define UBLK_F_SUPPORT_RQ_AFFINITY (1ULL << 21)
 +
-+_create_backfile 0 256M
-+
-+dev_id=$(_add_ublk_dev -t loop "${UBLK_BACKFILES[0]}")
-+_check_add_dev $TID $?
-+
-+rq_affinity_path=/sys/block/ublkb"${dev_id}"/queue/rq_affinity
-+
-+for affinity in 0 1 2; do
-+	echo "${affinity}" > "${rq_affinity_path}"
-+
-+	# Pin submission to a single CPU so rq_affinity has somewhere to
-+	# redirect completion to.
-+	taskset -c 0 fio --name=verify --rw=randwrite --direct=1 \
-+		--ioengine=libaio --bs=8k --iodepth=32 --verify=crc32c \
-+		--do_verify=1 --verify_state_save=0 \
-+		--filename=/dev/ublkb"${dev_id}" --size=256M > /dev/null
-+	if [ $? -ne 0 ]; then
-+		echo "fio verify failed with rq_affinity=${affinity}"
-+		ERR_CODE=255
-+		break
-+	fi
-+done
-+
-+_cleanup_test
-+_show_result $TID $ERR_CODE
+ /* device state */
+ #define UBLK_S_DEV_DEAD	0
+ #define UBLK_S_DEV_LIVE	1
 -- 
 2.50.1 (Apple Git-155)
 
