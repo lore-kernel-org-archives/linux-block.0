@@ -1,137 +1,137 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B0E3009F2
-	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 17:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FE04A1DE4
+	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 17:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791306948; cv=none; b=DDeQmC/C7XzajBhWanV9mkRWfEJn8rBgQ6OGwe81R7f0/1HWGUdgU6vN9XZ9RS6dtaUjHmIvGo8QPnCdZ919tgpyu73ptTzRP0oCxDmSeOU/lifj4ZDfJzz9i+tGjweVVbtDt7/goztY9tMytXigHH1WrKivhjdlbaPUna8eIHg=
+	t=1791306951; cv=none; b=FqIcPAGHlxASpirAF0qTbGuYh1qsBhHMaUroCkGXCowdM5EpMIHH3eOevzPHtoOnZ7zlp/cpEiB+7qKau21khHs3i5Z255SJf22uWbzFknJytZWfP5Z6WnwZX/EYWZBWiKyMKfEemsWvf9Un0XaH0PjXJA0VGqKFcxUqCqMh8+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791306948; c=relaxed/simple;
-	bh=d8S055UBj/5wN71BcPPpjejTrrppkWE71ziPbZmIhNo=;
-	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=B02y/qxpJF8jc7qI0lW6t/Wk63v13o5YnRd6MDId7t2ZCfgmJAo5twa2niKy8Lesb2KRR7m6BoGKZoU8HPjEPj2F12uBs9DWKsiWlJcDttAqYqjEE0qR/C8Rkdt0fSI7Tf1X8fopsx1a1mpyyyTNaw8ZKEg8uYhBk0RuG+OwrBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=pass smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b=IOXpxqkv; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toxicpanda.com
+	s=arc-20240116; t=1791306951; c=relaxed/simple;
+	bh=pMTh8OILP/knIia4xXbccXzUqmnVlKecVpWNIRB94To=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dDmySj87dTl+jyvoG8rlwkMCsS9McdwGJlCU8oIX6QhyKKxwUznVi5MGmRX/1YjVrndNLqs4RE4jRUJThhFEU+wl4RFnfVE+6Ih6/wJMHC+uv6cL+JGdX0cpm4fOQumj0I7yWb15mngKUt5D7h3Jd9ybUkoTbAWvBagq6Vg5NQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=t+uU8+aF; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b="IOXpxqkv"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-53505bc6524so24584741cf.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 10:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda.com; s=google; t=1791306945; x=1791911745; darn=vger.kernel.org;
-        h=cc:to:subject:date:from:references:in-reply-to:message-id:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=tb6m6q3lI6SI4f4aZTEHuBTNP07WEiV8+eieTwoYduY=;
-        b=IOXpxqkvfhkZJDlXEkl09ZDv9f6QrHSc9XpFT6btkZ9QwfqU/yK/CvaScr9U5WwCtf
-         3XI8/504BhydaVbO8DiID6lwRTuQgnQMJ1FeytLD7g3ybZAxOp2cNnErNBhzTh7YBJ1r
-         Gql7gRDaBYnx3XV/N4BngNBOnrO1HogmIuFzdCsPOOfUZ+R5HK3d8cZuXQ01yxpJhDHo
-         QKqQuBwsBsaaR6as+q7uOZhFDp/a9NdS/rn2AozRZUAi6pyLzzziUUYupow11m80HohJ
-         fIZpeJztgwo0I97IWTmKxL8u/ipCG2IQmYAUUSmS8iUEd8HEZfk8kZk/uhcuKf2/xY2S
-         W7Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791306945; x=1791911745;
-        h=cc:to:subject:date:from:references:in-reply-to:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=tb6m6q3lI6SI4f4aZTEHuBTNP07WEiV8+eieTwoYduY=;
-        b=PUkTcMTuZEGVJ8vRY9hutxNCzgfLT0ufN9tGkhQjzM1NNoYshBGg+MlesPpBvgMHJl
-         lyox9+WfkxSwjEAyImzmustpTt+dgdXyhatMFV0HMFr0lfSWeGpDVSpaYOtJlWq1Kn0T
-         ny7pAC+HVsyJqaQMM3bWuB7kbWdVfJYeeNiOzF/e+2yiOpVFZQ7msVGKouGHUShHZRwf
-         Ae3+bxayN3xDkkUnlJfRZWlxzBf6vRYASo+xHkrON2BY/bolHuasL0wsdBw+apxbb2fJ
-         h/H5WzoJ8au8L7YkhEeZCh6e7Lkx4BDi4SfQ3admsSrAW921Kw89tGixgjM8YG+8Q2HX
-         ic2g==
-X-Forwarded-Encrypted: i=1; AKwUvBy+ruUH/dlo0UbPTTjvnz6jGbMYghe6vgGvXW39738AsKkv4q4WX1NBNI4FHDxGmKOLZalqelN0g8/hxQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++nCay9nZvGB/159xkWW56brT/4vgUZMVv5RLCCT9RlFl1xdkqxc
-	4IFImRQV17ia1AaZDBQlLdLB+SXhJZSN5jUVrOM64fHApUeWpL6gmHQDl/yVWBy3WhE=
-X-Gm-Gg: AYBFou1PslZ6tFOCs0se2zuaIBVs2MCITZ7bNL7VKNTwVloOukDMYHGMZA1HGlalIMK
-	rEQS75tonD68WaWpFitEiK/x9zdTuZrv9/SpETX4DHuljMU6jAAZjXLo2wsxhyhGtlyHSOd+rm7
-	vTf9e/ExS/Yvq1ZEhbTfT4ddhS9eF1Pv2AJ+OZsxvkTe4gRcPsbTtzWpCLT7fRP+obUgqWs2Xx4
-	s3C+wnxhPmtD95cPuIBo28IzMDqGQwf5iQqUgx3c/xU5BeZowWS9MQMTOiCnGirxWwg80NG32tc
-	YJsBR2jxc+GAK+E4xqQ7++0B1HdEsUTfA5Mg4fn3WFEeDWN6TrwycIHRqu84WBc2onmOEB5oz5P
-	VEuxT+O7mw5KvNxYjx0fXAZr7K+vGu9eTGTEZradRpN6XBB+EFFUb+m5608jxNrXhxcgC+CMeG3
-	CiURjESPlv2FDPWrpqCn0qml4JcMRur9t/qltt9xXoa6bbZthMMTP+zZ6c1gG8jmrFLz4Q6BQxM
-	+L2nJT40gb7sxnzkDcicGqc5Q==
-X-Received: by 2002:ac8:7e93:0:b0:533:37ff:92c1 with SMTP id d75a77b69052e-535668c9ad1mr33799181cf.8.1791306945270;
-        Tue, 06 Oct 2026 10:15:45 -0700 (PDT)
-Received: from toxicpanda.com ([153.61.196.249])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-53571f185d7sm675691cf.2.2026.10.06.10.15.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 10:15:43 -0700 (PDT)
-Message-ID: <cover.1791303049.git.josef@toxicpanda.com>
-In-Reply-To: <20261001125422.1364260-1-tom.leiming@gmail.com>
-References: <20261001125422.1364260-1-tom.leiming@gmail.com>
-From: Josef Bacik <josef@toxicpanda.com>
-Date: Tue, 6 Oct 2026 16:10:49 +0000
-Subject: [PATCH 0/4] ublk: fix UBLK_CMD_QUIESCE_DEV leaving commands behind
-To: Ming Lei <tom.leiming@gmail.com>,
-    Jens Axboe <axboe@kernel.dk>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-    linux-block@vger.kernel.org,
-    linux-kernel@vger.kernel.org
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="t+uU8+aF"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4hzjZX5Jfhz1XM4Tl;
+	Tue,  6 Oct 2026 17:15:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1791306942; x=1793898943; bh=GG0ZOgRygc5B20PrWaq1zT2P
+	RT7ThIZd6hHYSh5aOKU=; b=t+uU8+aFC/vV7kaI8EY4qFGi1ZC9S4dTeC9aCTaD
+	qAhVwO7zFIJoYb0e1N59P33k8ZSOyqO8MUQBBoYoMB+0uxwy/FbkyqhJB60KoTIH
+	7ueWF0YY9QdEhgob+UvjurAw/Sd+TGau8+pHIimdZqYUIRdFy3DAjrQuAZD0AQOO
+	bWXjY/B/3eEjuWobzlprHP/3XveXTVWeHApHkyub3Z4eOZZPpwh1YKy0nNVkDbHd
+	ruG1T/Hg7lhs4QwK12RiZMPzFoQMMLIituP4DDKaKdFI7h5Kp2PrMZO0UeMUg41y
+	E5gbfljBRdTlrQZGPfe9HbqRifYZyNCClmc+v4v9pYhIfg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 7nZmg3Khj2D1; Tue,  6 Oct 2026 17:15:42 +0000 (UTC)
+Received: from [IPV6:2a00:79e0:2ed2:d:c218:dfd1:de79:d1ff] (unknown [104.135.182.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4hzjZM60pNz1XM4TB;
+	Tue,  6 Oct 2026 17:15:39 +0000 (UTC)
+Message-ID: <dd6ef42b-cf9f-495f-b813-a3bdeaee5a1b@acm.org>
+Date: Tue, 6 Oct 2026 10:15:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6] loop: Wait for I/O completion in __loop_clr_fd()
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Nilay Shroff <nilay@linux.ibm.com>, Edward Adam Davis <eadavis@qq.com>,
+ Dave Kleikamp <shaggy@kernel.org>, jfs-discussion@lists.sourceforge.net,
+ Jens Axboe <axboe@kernel.dk>
+References: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
+ <5026bd9c-c6cc-4179-8703-13d2843b5ae7@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <5026bd9c-c6cc-4179-8703-13d2843b5ae7@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-UBLK_CMD_QUIESCE_DEV has two problems the fixes for STOP_DEV and the
-FETCH rounds don't touch.
+On 10/6/26 5:01 AM, Tetsuo Handa wrote:
+> On 2026/10/06 6:06, Bart Van Assche wrote:
+>> From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+>>
+>> Syzbot reports a NULL pointer dereference in lo_rw_aio(). This crash
+>> probably happens because commit b15e4310633f ("jfs: Set the lbmDONE flag at
+>> the end of lbmIODone"), merged in the 7.1 merge window, lets the JFS log
+>> code report a write as finished while it is still in flight. JFS then tears
+>> down and releases the loop device with that write still sitting in the loop
+>> workqueue.
+>>
+>> Although the root cause is in JFS, improve the loop driver by waiting in
+>> __loop_clr_fd() for ongoing I/O. Release &disk->open_mutex temporarily
+>> because otherwise a deadlock would be triggered.
+>>
+>> This patch introduces a behavior change: openers racing with teardown now
+>> get -ENXIO instead of waiting.
+>>
+> Are you sure that commit b15e4310633f ("jfs: Set the lbmDONE flag at the end of
+> lbmIODone") is the root cause for JFS case? If yes, it is a step forward fixing
+> this regression in JFS side.
 
-Sent to a device that is not LIVE, it still cancels after it returns 0.
-A device whose server died is QUIESCED, and a new server may be
-fetching its commands for recovery at that point, so the cancel takes
-them without marking anything and END_USER_RECOVERY brings the device
-up over NULL io->cmd. Patch 1 makes it cancel nothing then.
+I'm not completely sure. But all the console logs that I checked on the
+Syzbot dashboard include JFS error messages. I think that's a strong
+indication.
 
-On a LIVE device it cancels in one pass, which skips every command
-whose request is with the server. The server's COMMIT_AND_FETCH arms
-the command again right after, nothing ever completes it, and the
-server, which waits for all its commands, never exits. The device stays
-LIVE. Same for the active fetch command of a UBLK_F_BATCH_IO queue. The
-kublk selftest server hangs this way within a few quiesce and recover
-cycles under fio, on every kind of queue.
+> Was your concern "releasing and reacquiring disk->open_mutex from __loop_clr_fd()
+> seems risky to me"
+> ( https://lkml.kernel.org/r/e5518546-701e-4d3c-a077-18e34aa8c188@I-love.SAKURA.ne.jp )
+> dissolved?
 
-Patch 2 drops ublk_wait_for_idle_io(), which never waited and would
-hold ub->mutex against a stalled server if it did. Patch 3 has
-COMMIT_AND_FETCH and NEED_GET_DATA give their new command back on a
-canceling queue instead of publishing it, deciding inside an RCU read
-section, so the I/O path gains no lock or barrier. Patch 4 has
-QUIESCE_DEV wait for that with synchronize_rcu() and then keep taking
-the armed commands until the server owes none, bounded by its timeout,
-and stop once the server's FETCH round is over, so the next server's
-commands are left alone.
+After I wrote that comment I noticed that lo->lo_state == Lo_rundown
+while __loop_clr_fd() releases disk->open_mutex. lo_open() fails if
+lo->lo_state == Lo_rundown. Hence, bdev_open() will fail while
+__loop_clr_fd() releases disk->open_mutex. This is a behavior change
+but I hope that this is acceptable.
 
-QUIESCE_DEV now returns -EBUSY or -EINTR when its timeout or a signal
-ends that wait with commands still owed, where it returned 0 after one
-pass before.
+> sashiko commented at
+> https://sashiko.dev/#/patchset/fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche%40acm.org
+> that blk_mq_quiesce_queue() / flush_workqueue() are redundant if we call
+> blk_mq_freeze_queue() first.
 
-This applies on top of Ming's "[PATCH 0/8] ublk: don't dispatch to
-canceled io commands" [1] and my "ublk: refuse to go live after an io
-command was canceled" [2].
+Sashiko is a great and very useful tool but in this case Sashiko is
+wrong. From queue_zoned_qd1_writes_store():
 
-Tested under QEMU with KASAN and lockdep. Without the series, 20
-quiesce and recover cycles under fio hang in every round on getdata,
-zero copy and user copy devices and in some on batch ones, and the
-quiesce-twice reproducer oopses. With it, 3 rounds of 20 cycles on each
-kind of device pass, the reproducer is fine, and the ublk selftests
-including generic_18 pass.
+	memflags = blk_mq_freeze_queue(q);
+	blk_mq_quiesce_queue(q);
+	[ ... ]
+	blk_mq_unquiesce_queue(q);
+	blk_mq_unfreeze_queue(q, memflags);
 
-[1] https://lore.kernel.org/linux-block/20261001125422.1364260-1-tom.leiming@gmail.com/
-[2] https://lore.kernel.org/linux-block/9b876f2c061abc401ec4b9b3c2529eda.josef@toxicpanda.com/
+If calling blk_mq_quiesce_queue() after blk_mq_freeze_queue() would be
+redundant, the blk_mq_quiesce_queue() call would never have been
+introduced in that code path. There are more occurrences of the above
+pattern in the block layer, e.g. in blk_throtl_init().
+
+Calling flush_workqueue() is necessary because calling
+blk_mq_quiesce_queue() doesn't guarantee that all queued work has
+finished.
+
+> Even without releasing and reacquiring disk->open_mutex, I think we can silence
+> lockdep by removing synchronize_rcu() / drain_workqueue() because these are
+> optional as long as we call blk_mq_freeze_queue(). But is calling
+> blk_mq_freeze_queue() with disk->open_mutex held guaranteed to be safe?
+
+My patch unlocks disk->open_mutex before blk_mq_freeze_queue() is
+called, isn't it?
 
 Thanks,
-Josef
 
-Josef Bacik (4):
-  ublk: don't cancel commands in QUIESCE_DEV on a device that isn't live
-  ublk: drop QUIESCE_DEV's wait for an idle command
-  ublk: give the command back from COMMIT_AND_FETCH on a canceling queue
-  ublk: keep canceling in QUIESCE_DEV until the server's commands are
-    taken
-
- drivers/block/ublk_drv.c | 286 +++++++++++++++++++++++++++++++--------
- 1 file changed, 230 insertions(+), 56 deletions(-)
-
--- 
-2.55.0
-
+Bart.
