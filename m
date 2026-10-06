@@ -1,97 +1,69 @@
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2CC54704E
-	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 20:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92ECE3C8C52;
+	Tue,  6 Oct 2026 21:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791318812; cv=none; b=oAL2He1b95wFdZUixjHT+1Osg+5UFE/krdbUBaXV7nHbA9lVNgPDoclyUN6vt4hwiVAChsULpR5OA8X7UxSjmUYLmlBPLSDT5ImpgI78M5Rsfv6hlHe6IBxSCODCkceT7hs7qXsS+b2zFNMPNenPHmg9QvP5scDjk0X+yWQj1MY=
+	t=1791322568; cv=none; b=HEAGMyeHUzJ/8RO7lepRlfanNM/eLAqwzKDKQ4ZQapvcSE297xvyc9N4Uc5N13Z9JQeZCdcVZum939BeG+67hZVsw+/xnAy5wCVzyp0lsCLB2FM7WNXcLu3bXKotF+fzphSaRyluh6Buj6zEBlgnrlFXEzVznhZTUqBx3UbutWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791318812; c=relaxed/simple;
-	bh=qi1LRU5YBq+7DHQZcDM5R+WbyGVSyvY4zL7bGgrD/T0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jVPIKWRrjqGM2fCEsSNoA+HDlvp/v1OHmr8hKuI8H6rjW61jmdax7+xTiVuTUi6+vvjHfFDywmpNuc3FvOgkZIO3JYj7X8RoCP+zbH4HAh6VtyBSsTxA81s7f/6bH3NkrN9+Jnr+uGLk0lARoI0feR+R+/M/pNl+9H6MAv+53zA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-4c467e19391so5742540b6e.3
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 13:33:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791318809; x=1791923609;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=bEiv9FmNjfte+qMUNS6gqynthoGLCc8MNAJTrEvbY2Y=;
-        b=t11GE7qeaOijWONYF34ghIDAO4PANy0jO5CJ1mvz19ux2jhAm3x5Se7l8AIzm8Z+Na
-         DJLeJOmWFqd4ARAnJHNMguke4cKY/OgowFRllqTMCZQbUszPG2p1RoSbP7bYAJxfM4wM
-         c3iPP9NJf0dy1VRAW4gvrtuE+XUKcd+ksZJPELviuLYetzWsa5hbEh1o90Ql7mHVH9FX
-         73Hq2IlYXpEpv7aAhkIX0oWeFV5KCENlDXHJitvvF44KVt7HAnjmAQxFcNGuMtoD+X7S
-         M74GcaFtZANrBJ90ZImywJ9aLcMr56XxS+E6VouDtM9622b99O98E8obR6ZigjJpT28u
-         tQWA==
-X-Gm-Message-State: AFuF++lOvVnB2AKN0LFAfKK3vINiOwKzi9p2X5365ZqX198trVcsgwbE
-	wCjYzE6bPlRPp5vKeVYDrJzQthP0CXoZDjxfMww9tAOV/bCV2HX9lWOB06QFNk0tS/UWaLqRcGc
-	NLzWQWx/Wu/0sSXtoGWRaHUFp15MASUGA3SC9Vn0yGA7DyFF7Ve9idorAVec=
+	s=arc-20240116; t=1791322568; c=relaxed/simple;
+	bh=wzNHqEJjWNi72fZg6cy5i4gnBrxb/M1yVd0cLJ+SVhA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mooZDwiqtsUwCvL+/opooCMPfWZZWygbnJ+cAndavZvc0N2ZUuXH5dOPJcZKG+YJWPXLWNidIO5vzIHb09/QwBvNhydeYvaCOQFK0rKsjM+NDz6cATJm6f55NWTKlDmQC5sAzFL7kfb0oBSIu2A9Oe5P9rAwbU+jGZaYo7y9wTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/dHxYeV; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/dHxYeV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFA911F0089B;
+	Tue,  6 Oct 2026 21:36:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791322567;
+	bh=CBaaGXm2X2r+R/E5m2P3fbU4KMUvDVLEd+FSy+4Gwpw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=j/dHxYeVY3hqRuGcSpFUO06PEnkce51tuns0LUJQ42O8YF7IbbyjpXaEqViWwOOO6
+	 Yc6EP9R39iMQacmT8eFSRMveLu+Xf8i8CysRI6NmoOASv+QTrhe2NPVSxfoLAj4KQV
+	 lonUZLs7K0xI4ShEQn/4BXO8QyW6Og6FF8lNHPmheRWC4K+ysm4zDS60EOXLUDxDme
+	 7X9mfjwALPGOJ3JiRf4NnQ32+MjfxsK5nH4mYOjQZVUxY86OyeoNGRvGZ+5p3ToQRJ
+	 223EK5fuNHmmK7GRytV1YGOKXkxhd3ZTA0z6ovKobyKKLEzZdSDRwYJy63aWJdcZOj
+	 oUDJHmrl/whwg==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Dan Schatzberg <schatzberg.dan@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Ming Lei <ming.lei@canonical.com>
+Cc: Sasha Levin <sashal@kernel.org>,
+	Benjamin Robin <benjamin.robin@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jan Kara <jack@suse.cz>,
+	"Miguel Gazquez (Schneider Electric)" <miguel.gazquez@bootlin.com>
+Subject: Re: [PATCH 5.10.y] loop: Fix use-after-free issues
+Date: Tue,  6 Oct 2026 17:35:35 -0400
+Message-ID: <2026-10-06-1-daily-reply-0003-loop-uaf-5.10@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261005-cve-2023-53111-v1-1-d844a2fc5e57@bootlin.com>
+References: <20261005-cve-2023-53111-v1-1-d844a2fc5e57@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:c3ee:b0:4fb:a089:bf26 with SMTP id
- 5614622812f47-4fc483da4d3mr363014b6e.56.1791318809646; Tue, 06 Oct 2026
- 13:33:29 -0700 (PDT)
-Date: Tue, 06 Oct 2026 13:33:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6ac55b19.fe639fcc.32b100.000a.GAE@google.com>
-Subject: [syzbot] Monthly block report (Oct 2026)
-From: syzbot <syzbot+listef51fe61e4284ca4e920@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello block maintainers/developers,
+> [ Upstream commit 9b0cb770f5d7b1ff40bea7ca385438ee94570eec ]
+>
+> do_req_filebacked() calls blk_mq_complete_request() synchronously or
+> asynchronously when using asynchronous I/O unless memory allocation fails.
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+Queued for 5.10, thanks.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 32 issues are still open and 119 have already been fixed.
-There are also 32 low-priority issues.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  1744    Yes   INFO: task hung in blkdev_fallocate
-                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<2>  1435    Yes   possible deadlock in blkg_conf_prep
-                   https://syzkaller.appspot.com/bug?extid=144a1c0e22e53a08ef5a
-<3>  220     Yes   INFO: task hung in __rq_qos_throttle (2)
-                   https://syzkaller.appspot.com/bug?extid=53706c567afab5131044
-<4>  141     No    INFO: task hung in read_cache_folio (6)
-                   https://syzkaller.appspot.com/bug?extid=9db0864859224b833108
-<5>  46      No    BUG: unable to handle kernel paging request in blk_mq_complete_request_remote
-                   https://syzkaller.appspot.com/bug?extid=2e3bf0bd49acd9b21d4b
-<6>  22      Yes   BUG: corrupted list in blk_mq_request_bypass_insert
-                   https://syzkaller.appspot.com/bug?extid=f4353e96f7004ae5a09e
-<7>  21      No    WARNING in blk_mq_alloc_tag_set
-                   https://syzkaller.appspot.com/bug?extid=18431bc7dccedc61778f
-<8>  21      No    WARNING in blk_mq_dispatch_rq_list
-                   https://syzkaller.appspot.com/bug?extid=49b69d460fb5134ee1d7
-<9>  19      No    BUG: unable to handle kernel paging request in __blk_mq_alloc_driver_tag
-                   https://syzkaller.appspot.com/bug?extid=b380cbb218c1ef0fe808
-<10> 34      Yes   KASAN: slab-out-of-bounds Read in blk_mq_free_rqs
-                   https://syzkaller.appspot.com/bug?extid=e90526cab23b9efcd03c
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+-- 
+Thanks,
+Sasha
