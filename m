@@ -1,297 +1,243 @@
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4EB03E5EF1;
-	Tue,  6 Oct 2026 13:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.166.238
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791295164; cv=fail; b=c0/2kSfZ2mnJsu2iPIU/yDWmxaXCS18nzxKPvBDRtK87kY4bcGCnQbEhRS1TFe3DQLsW/ccWvepfEfoyW82Szz9UhYQha/tQRSYhjCbja3tAAi2u5AYIKFTl3geIfu6/qImvSHjxmFQEm+M0cawgb5gnpD2Oh7MbgPwEcglleX4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791295164; c=relaxed/simple;
-	bh=fVfnyvni5uaFsiCqVKj81r5BedN1R95fOKAPeRSiHTg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e2ZLkf6Dq47mIHG8WaVYq9XqG/eobCpBPt/nLpoiYgI4cuOF0nwBCiRNZlgxuuGxgY5X9Uxu4kgFIfYKiG7eEv0ekrIk1o4obrYCzMVRcbSIbTL+nPdoAA20NOzNqVNay/QmVi1K20ICU6Az2qcJJPVpX3DFZZtWHvFvKIq9JmA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=HxEnMipI; arc=fail smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AC746C856
+	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 14:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791296104; cv=none; b=aKOQLYdsXuh17fTlN6rH39ZnHgUKZVK8+SOUWrLWRaQ3mSAEDandKvsRzZrAYkPJqNrRzs20T4l2HWzkb1TzZsYipe3JAu3JJYjFPaxN1HKOD7sco7eoXAsVr/+FaCOn91fZfhqPNUJrMmNHPb/FY47zsbp6ogR7eKwtQwwxhyY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791296104; c=relaxed/simple;
+	bh=Nt8VaQlj73La3K/WOXPeZWp5Egiw8ElYDzr2tV/tnAY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VV2usZ/NBdi/lolRb75FBqpeKDJxiWeB1F4kp4bp9Poxp8P2/NpzT7O+b8GlgWkmffmJK8IDfJhTSzekbMQ1E/BnWOdUdiFlx/NOjrKib2tdP1E+wazyR/Owl5CUfBsp+36zI9c0QqFFU5/lzN44YY0Dm6e0DAnyk7YaDjSt5DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0fr23E8; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="HxEnMipI"
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 696DVif9675698;
-	Tue, 6 Oct 2026 06:58:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	PPS06212021; bh=8XwUySrKGdMC7hzT8M9e3v6V3n4V0VASVF4JmX+VHVE=; b=
-	HxEnMipI6IAuz+M2qxZyyFIGKmhWE8s85ffCohORuAYtVfeIXUaqyTK5bQEPom0a
-	Z42MPq2Q6o1LI4okBz9mVdLyfwDy+uduhQ/EjcrqAMa7bteISymdAPgpzwHbIab+
-	+XEBh8y1B7yL/sEA5Nt/xvFvz92e7LAY0ls+g0rCdI7ifqCliBOvaGf0XJ7jbm8q
-	reYVy0vXXnep7srVWv7kXxgUoUO8Kh7NhEax2bMxTFmte784EkUzL5wVez1Bn9xH
-	hBx3289oKyZMXYircTefMZcvEerw4El2BiiHDzlaPqcbZ0feT/BgOiVgtne8fvwD
-	O4eDtIBkHI/1uurF/z9EvA==
-Received: from ch1pr05cu001.outbound.protection.outlook.com (mail-northcentralusazon11020140.outbound.protection.outlook.com [52.101.193.140])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4h2w013w84-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 06 Oct 2026 06:58:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=D2EdYkkzSuGqdyPLvg5wBrBYerxNAfPY5kWD99UJqtxYw/ClLsrXsBCr8h9tvkIUzPYhnWiYmc/Q1y3Fz9vm6/xV158NFIyzqnm4+jC9mjOQPaOLxYEbDjgcrKx2bLWXiuL3YuwOpDWwx7WNJfaQt9BPCLH0r+5GE8ZmfzvouwMpKOEeBTZPWDLactC3p0BciMbb4zCnyisiH+F0MbXEzqCdgd8PIHUauDIv7e135vzJH6lY+0OHa2ZwUCuHMEs7p9FYeBnsXJlJTfsqKUJ//oKABqEcwVTrCC4zqp478W1Z6JfQDl4cxyxupNriZ8ClddUjKQ/91HWh/QdfR3dc6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8XwUySrKGdMC7hzT8M9e3v6V3n4V0VASVF4JmX+VHVE=;
- b=ltNveTL+UIEQgjCPbOUFYlnKmPR3U34lDgyqmgWsMwLiMxNHq1VLtrBtJy+ukygiCRg6cR2e0XO79Bhy+e8qF9b5uhWn2kP0PjZ84N5WNimKLfnX8McEQfo6tr2/09SwDfTuss4Vz29z/T7GjQDIODuuFiBMLmOcLCCa99u6dFZ53o/69sJO1utcy1WSUjHKJzS55JnXnyR7ADTYwQ//svvUhP0MiqI/l5SLF7+wlYcni7JO84FaOh6BZ7FfvAdS+3hKMYpW1UTO534agxbLhsCaUNgWjMsIDNyM+2jTSwc/p3copBgtykUTb5srbW12SdWwjm1OBL/MiuMsR9QeSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=windriver.com;
-Received: from SJ2PR11MB7546.namprd11.prod.outlook.com (2603:10b6:a03:4cc::8)
- by MN6PR11MB8217.namprd11.prod.outlook.com (2603:10b6:208:47d::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.472.16; Tue, 6 Oct
- 2026 13:58:09 +0000
-Received: from SJ2PR11MB7546.namprd11.prod.outlook.com
- ([fe80::ca9b:dcf:8881:bced]) by SJ2PR11MB7546.namprd11.prod.outlook.com
- ([fe80::ca9b:dcf:8881:bced%4]) with mapi id 15.21.0472.016; Tue, 6 Oct 2026
- 13:58:08 +0000
-From: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
-To: atomlin@atomlin.com
-Cc: axboe@kernel.dk, bigeasy@linutronix.de, corbet@lwn.net,
-        frederic@kernel.org, ionut.nechita@windriver.com,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        marco.crivellari@suse.com, mingo@redhat.com, mkp@kernel.org,
-        neelx@suse.com, peterz@infradead.org, tglx@kernel.org,
-        vincent.guittot@linaro.org
-Subject: Re: [PATCH v16 0/9] blk: honor isolcpus configuration
-Date: Tue,  6 Oct 2026 16:57:44 +0300
-Message-ID: <20261006135749.348637-1-ionut.nechita@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261005152449.468696-1-ionut.nechita@windriver.com>
-References: <ul7xqsblqnrzx67s7urmtc34qpemuf3jeduxmsuwxwlnky7eli@mzdpwwgug3hg> <20261005152449.468696-1-ionut.nechita@windriver.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR0P281CA0170.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b4::8) To SJ2PR11MB7546.namprd11.prod.outlook.com
- (2603:10b6:a03:4cc::8)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0fr23E8"
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-82621039b6bso1517477a34.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 07:15:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791296101; x=1791900901; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=iyocPZgXU+y/fKJyewKMKQMG8bpfMm3V+MoJuTgAH+Q=;
+        b=C0fr23E8OkKiRLmpkJ8gBXyQ3l9t1BuX+90uFkhhPKSw8OOXKAGvU5s4IRpyg6yOyX
+         VK3n5Ux1dxLZBviRlBO011IFfOhNPCHypcjCsNQUfTjvwZQRbOpehQOSjmWIGoFK1loz
+         NEcyu7noCvoD9gsP4yrIgaNIVQTzeHOi5q4i33uTZvo53tud5x+Ki7DQFrrR/izyO076
+         4vhMfFFu4FfBdQW6aC6laVF4pCHesds0SvAWxALMl3iZgVAsc77xAmLYBFbNkMdG6tN+
+         GuzsJTiHmrrbnqU1aRgapNiCDSsMEKBRJAAHJGpWZBUQqqOJ4GqfAsRzvEWJra9aIGng
+         Co0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791296101; x=1791900901;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=iyocPZgXU+y/fKJyewKMKQMG8bpfMm3V+MoJuTgAH+Q=;
+        b=t7B7z/Vpgg+xGbCVck0SULkVFIg7koYdPabKlmTc+95AyStowC959drtrh1hB3qJtz
+         tCJcVfotkoELaujv3S8NdmlsyqANO4O5nF+jpJ+ziWPZZZIF52z+NmrW3Z+mCHmyJ59R
+         YuRcYc2b3w7JazPWkzs97TW8yd7ZqT3liwWd8mPaGfUo/whWREmFgol2WGjJGkb75Eqb
+         IeDIhYctU+2v/WK/XLwHLMO8tNyRXjGwH+CItmU5eOQqpXcqtshxzSYREuwWkZ93pIto
+         d1W99v2zbzQ1VaWBV9XYEa0MY3seZIIMYA8NUM4bKOfFzy1UkQ4O0DZ+Y34C9aetDhMZ
+         cViA==
+X-Forwarded-Encrypted: i=1; AKwUvBzq5Bwqn9VWRrvihfTQUSE5zWGoTcBIVLJyI+AjRCkKVdqFInF+gfpvsHIDy0hFKmZrm/ui6Fx1VNW2Lw==@vger.kernel.org
+X-Gm-Message-State: AFuF++lMmGF2fhGfOLNryiwLLKoHZBtDEc1/mpSfwLHFfFMGsdCYf7YU
+	zbAj9/bPcmUE876IVSi5C7H3wCycI2p9Q/cX2qibCubt+BujRihuxuMpAY6T5A==
+X-Gm-Gg: AYBFou0xomrm8x4MI8Ed652xl4O2wsCjl1I9ciMlGP32kCo77LD0LgHAmd7i10bKeKl
+	u7m9262wYyhuUgNqD+0aaJAqquvIsWfhQ2GC9viZlHVW/ivVKhw33+hHT88ypQNbqGTi9qKFSQx
+	KKY+xYx0JzRncdBunbeZ58jf8zZsa3mnSz/KJwZYFx9kX1zloDMGPE6Akid0npiSMk5YFQFtB5H
+	9Ndk86HFxAPXv9USz4GlL3mFlcKwvKlAne9yzAlE2TBlyQAh08bL/ic/nvHQIu5Le5DSJIVhMDP
+	mAeCukn+FcSQdvxoCZD0mO3KL7odf+9IcY4D/C65soG2b5yLuLfmmuBaYELo3gJqhgY07M2TE49
+	IhfxEa379XOI11GvUIAz59TgMbKhtpTvDIz8oisK1zL9Chtx3zH+yaaDL3TObNAS3QZ7YcI2BUv
+	EIReJB7hNMUsknadvEDgcQxMRk0L2zLI8NR11YpZNfSikmOdBvFCrRKNu+M6YmPClWmgrEBH+Gv
+	TQeA8dHjbaBZ4UbfJ+MvNum3ILkFYlQAVR2A9hCJrTlce4cV2bl3qDnKWDa2wV6CAFytFo7Vm55
+	QTLJZ2Hyvj85Wg==
+X-Received: by 2002:a05:6830:349b:b0:81d:8057:9b7f with SMTP id 46e09a7af769-828a30409b5mr1482854a34.28.1791296101506;
+        Tue, 06 Oct 2026 07:15:01 -0700 (PDT)
+Received: from fedora-laptop ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8281acf807csm2432876a34.0.2026.10.06.07.14.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Oct 2026 07:15:00 -0700 (PDT)
+Date: Tue, 6 Oct 2026 09:14:50 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH] ublk: refuse to go live after an io command was canceled
+Message-ID: <asUCWjKXMxXFwBNQ@fedora-laptop>
+References: <20261001125422.1364260-1-tom.leiming@gmail.com>
+ <9b876f2c061abc401ec4b9b3c2529eda.josef@toxicpanda.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR11MB7546:EE_|MN6PR11MB8217:EE_
-X-MS-Office365-Filtering-Correlation-Id: bbd74f63-cb97-4a87-d781-08df23b1d9a4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|52116014|376014|366016|7416014|23010399003|11063799006|4143699003|10067099003|38350700014|56012099006|18002099003|22082099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	lnjyi5FpKsx6bsi0YwSCWjUlew3xoknUv0IYhPUjHFUXWitY3CZXWEY13XN8Vogj4vonEAn3petxNvXHlyVVYm3JAeTiUidELBKOXdDqn1X+hv4m9yzwqMjwuX2GK3NINdrF/44/SyXqwCULVxupTSuP4DERL9AKCfDoAR5Ni4kihgOwFQzqWBiM9DPn9WXO3Lb7qNd+i5GXN8T7EBmWFnMDPXkFiQHkFif0LSwfw9rnTGjfsS0Pfy5l/RXiZ0nfO7r2CbG1aiSIasoYZnvGY5e7YvNInaurB6it5N250Ev9ohLUernb8aMm7k54pUhmmMpjFDESGoTgx3ZsjwgV7bUSHkNAXDiST8/wz6q08uXWPQ2btqE4FH8qDSyCxYSaaZXKiW87Sp7rAmnK1UkebPs4lfVCysQNM+ILbElKzvrmQ/i+x6zfodtIVpI76TwT9/2oJ9bPL4BJuA54ZdJo2uj5F1/fns9DlLzmJnS1IvY9mU8/nmGs0dHu/u7VGQyCKa8uW7/Sjt8qdhFksnUCRc5OMorzwKeU4lrEt22b2X1JSMiBDDJKpCgqNKNOn9DxvqI2l9DVKNuVOQfLxvTAMDMclFjszEeGskERl8ndcbU8dVDdwVCzM9b9FEvtUJDxrYkzztK+g6Ne3PD9Y76U2YenZBGJ+jHTUhOvf+Fciz8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7546.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(376014)(366016)(7416014)(23010399003)(11063799006)(4143699003)(10067099003)(38350700014)(56012099006)(18002099003)(22082099003)(6133799003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?XWZAEzbm55kSzp87e123h4jbafoXvBre0J8lO4I/WyCdlPAqZy19gfC6lREr?=
- =?us-ascii?Q?GHOX7fEEB3QCpSlglL5w4e/61Bu2uGEtvPOsi9NvpaQd9UM3dvJeVfyNGjSX?=
- =?us-ascii?Q?cLFwB3O8Gnp6SpXMb2WDNrWF9W3opiEVLqV4vFnxjMb7koqBXqc2p+QGrw2d?=
- =?us-ascii?Q?bL14tNBlBR4sbxYX9BJVLYEIeL2nDvnRI7jSQfQP7VbsBffvvW6EJHGT9U3Z?=
- =?us-ascii?Q?nsEX08DG73ieg3qwn1k63tWRqasMubXB/ul/UOtePznc3uStqfTFgpklkq7Z?=
- =?us-ascii?Q?qeuXTnxSe14Gp+ckWehongxyx7TC4eXNW8V7GxTUp1I9dDJTHY0MX88u7Xef?=
- =?us-ascii?Q?fQbI3x9MmZBJXHhh+rZPEsyK8ILZHw+m/StPWNnEt9o+9I2eeXcGu8i9x+Ck?=
- =?us-ascii?Q?d9/TZTuHTzN4h2+S76JgZFNQLlXQfxtIvgIFuYc9GkXIiyT20JDGe5dyv1vH?=
- =?us-ascii?Q?qHBwiZWE1CEnSmFDn8E9hJeR65IvcxD73c4BDNBhu8ipLMLirdkjJw5Lm2tY?=
- =?us-ascii?Q?yGInhIiE2H7sq3zTztZWo4IimaJmS2hgz42A9yLeW4956rRwrDByHGGIAiXd?=
- =?us-ascii?Q?5L/LPUPLrbdKRVqP6FjgXAXd2NTeFjWjEq7Oqy5o03wMKZPKMoZ4dU6Zn0GF?=
- =?us-ascii?Q?yA9r5GNjRj5/fowh0mKy15fM0Nn+BRJrbty3E+yInffHd+VPyPoeW5iNJWyI?=
- =?us-ascii?Q?XJH0VdW1DCxZaCgcdoir6IQ60fFMJPgmPvRS/FZEPIUArH6nQGlEbTSbeOGs?=
- =?us-ascii?Q?seoF1FXEZgLwCpK6aLDqik7m7MympxajCzX9dUowqo8BRfXwRpB9NNgcSzyH?=
- =?us-ascii?Q?c7rVG8OKC/jYdFM/06nMIZ2MRgm4loyYBeENAtDcXkCqvCQad6hTruMhxbB7?=
- =?us-ascii?Q?uQcgasRKYvg1in7EKO8g2E4zglGoSj9Kz77AMEHVC14ESoWbV28WychZrxmt?=
- =?us-ascii?Q?sSM0e9fCaGzjPd6UoKOf7mDte/OJfVo5x1C54sNBDWRGB59JeYhkGNdCgM3w?=
- =?us-ascii?Q?S4yfTHR9SozHTxzdw/v6p9V5uiTbxBaQ2xFavSaDQjiF+ljVXNrWfd5IzsBe?=
- =?us-ascii?Q?sujO4BmDNDw4OsR+/Rdh5XlwQyDHa/NNJnV4TZwbDfeZ7RNBxDEMDOTjfFUF?=
- =?us-ascii?Q?0UtVqVirUMRkrugw6zd9bnWAjtVROBTAVaIA44xVpqQcLh+Sib+JSet0EWX4?=
- =?us-ascii?Q?Lp1qG+8bqjLd+8k6RNyPa5bE6UNJ0//C8BCL3AqFCdECT2O770g6HwcB1J0U?=
- =?us-ascii?Q?zpyvinPfTvSdkLyva0BAra4UYNTpGB/8oB3pbx7K7S2CyhDVrkL4osp4r4l1?=
- =?us-ascii?Q?n1grxfeRGBrksQKU2HJWfk2dwv/I3lfL7C97n5FhLXLetsLom3gEzNtATnzm?=
- =?us-ascii?Q?qRTIqCsK0v6aFkbkBABno2LFHpsowVw3czVKgQ9VkfdO65O+BCfe/eUdsXnM?=
- =?us-ascii?Q?FjgwAVc1vLIgCR1knW+7/XU3q7sIO6KDbt18x6JhBCevw9BpmwCRzopGhQmT?=
- =?us-ascii?Q?zGyx2ZVUN614YUnyVFtcv9GZM3fd12WIryn9sK2nYIC8ldjA9+wK/UNEUJEf?=
- =?us-ascii?Q?xdlKxysict/qi2jtwHL8nQPzcFExLGnG997W0CMRRSLoj/JZq2T7pFAI8t+4?=
- =?us-ascii?Q?Vwdlb/6ViA9gLqwNV9Y/UMcDJxNYsYxZoNV1UGqbIoZ62n6quZTyro4OyF5y?=
- =?us-ascii?Q?HTgZ8EEHfMNBQXbCRMO6yIDq45QWM0han7XM8wgCBZeTagAKNhduJpgciuDp?=
- =?us-ascii?Q?cKKEcO8AjZTpAkOXoXTQWkgrFM1WtWU=3D?=
-X-Exchange-RoutingPolicyChecked:
-	CrP+qbyEOl1+IVzL7VqamNWc5SmiJoiRgS5VX0pJlCIpf7189PJVroAdOvpFJjWxyYwvUuXJPD8kbaOMt6AChO99Ki7u9dRKbOwx5pCFfPchzhboDadAByKjfBzS+SOV4QbFfqs7W6gAGfVZ5KMS+TyXfrybnbGP3RPbXMB+AqgQS5selfyS6DP9AoabZfI1ZbSzogpe85y15Lez74uJan77zKgm4VBVEO0WpEbwMUspgcpB3othSyh4mQwVwNfwIqSjOVCyrDfgn4EnP3mg91GEwkhnSD15yVy9NzvfZ2A0KOdgWPh1BfkuLMfc0oyIuIHwwAJ59RlVriGvnGKvXw==
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbd74f63-cb97-4a87-d781-08df23b1d9a4
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7546.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Oct 2026 13:58:08.1024
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fCumIvkFMhNdZibm+Rpf9PaiEbcwmVFdx6JlK/YjyD/NjWYEcfdESslqhqracuWp3/5FZTGtnPHVbMz7hqLlNC2RkYv7qm4rqDyZJPorEdI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8217
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA2MDA1NSBTYWx0ZWRfXxoKC9gSelYZV
- ceXDUfVEW2shP50z29eIYBo+Z6Lye2QX/JCQ4Ooc+xGa3/7ZKn0cf1idE8uc7d/vXK50RcJMLy5
- LQXj5m2UdaQpmlKlbABgynxRRUHJxUcR+K34xW56ceGq4vxFWvvp
-X-Authority-Analysis: v=2.4 cv=fKesTpae c=1 sm=1 tr=0 ts=6ac4fe76 cx=c_pps
- a=Wk45V16OzwFZ9uDPeOR8rw==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
- a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
- a=xqWC_Br6kY4A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=bi6dqmuHe4P4UrxVR6um:22 a=HK-ge7EqtdluswH-FwHe:22 a=xV5-xVNmMFwFGRjQoTcA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA2MDA1NSBTYWx0ZWRfX6nzeEOSFMLqN
- HukXHgtMvESZBN3ERpctu/GZYAI9Xe9mSocq5q9zTZqfIbYAmgxHPCqEVKhrvur0KZLhfPuX2V2
- rsv04p3z7prrqHHORDKPgpQHLouo+kzwv7GRszAE14mM0gXDJOoGHemw+512M1uniYb4yEg3H8M
- v1tqp3Ma03IBV57vupmJxfLxq5av8mD4uAuSuhD3xCKBHiIBexwpybrIfozHm7FcwNziB5BLVJV
- 6CaJ9I4860blenE20wtKCtBMPD7FD4uTQBpKEd6fFvc+tUF6kVQSGXI3SY1u91V38kUUUHs8I60
- gzawPrvGBZseLakqbNDvdsBg8iitzJil6RsrFU6xP+nufpxluP+avPATSgHHLZnYIP1vueOH3Vj
- cZLAx9D2a3plXQUyooL/ybLb5+NPDAueg8VCI6pbFsRok6pwzQPiwc7YIxOsIZL1m3FIjlEASR1
- OxTRFXgIj0ayj/xrbpg==
-X-Proofpoint-ORIG-GUID: Orh3Wb6e7FFuHH-aSlsdScKa1u6jx_Vj
-X-Proofpoint-GUID: Orh3Wb6e7FFuHH-aSlsdScKa1u6jx_Vj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-06_04,2026-10-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
- phishscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610060055
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9b876f2c061abc401ec4b9b3c2529eda.josef@toxicpanda.com>
 
-Hi Aaron,
+On Mon, Oct 05, 2026 at 04:23:51PM +0000, Josef Bacik wrote:
+> Since commit "ublk: keep a canceled FETCH round canceling until the
+> server is gone", a device whose FETCH round saw a cancel keeps its
+> queues canceling until the server goes away, but START_DEV and
+> END_USER_RECOVERY still bring it up. Without UBLK_F_USER_RECOVERY, or
+> with UBLK_F_USER_RECOVERY_FAIL_IO, every request of the new disk fails.
+> With UBLK_F_USER_RECOVERY, requests are requeued and never kicked: after
+> START_DEV the partition scan hangs under disk->open_mutex, and after
+> END_USER_RECOVERY every read parks while the command returned 0. The
+> server cannot fetch the canceled commands again, so the device can't
+> serve I/O until it restarts anyway.
+> 
+> Return -ENODEV from START_DEV and END_USER_RECOVERY while ub->canceling
+> is set. In ublk_ctrl_start_dev() check it and publish ub->ub_disk in one
+> cancel_mutex section, and have ublk_start_cancel() read the disk in its
+> cancel_mutex section. Today ublk_start_cancel() samples the disk before
+> taking the mutex, so a server dying during its own START_DEV can mark
+> the queues without quiescing a disk START_DEV published in between, with
+> its first I/O past the canceling check. Now either START_DEV sees the
+> cancel, or the cancel sees the disk and quiesces it before marking. The
+> END_USER_RECOVERY check is best effort: the disk exists there, and a
+> cancel after it is the ordinary death of the new server, which
+> ublk_start_cancel() handles by quiescing and marking.
+> 
+> Assisted-by: LLM
+> Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+> ---
+> This applies on top of Ming's "[PATCH 0/8] ublk: don't dispatch to
+> canceled io commands" and needs patch 1 of it for ub->canceling to stay
+> set for the whole FETCH round. generic_18 still passes with it.
+> 
+>  Documentation/block/ublk.rst | 10 ++++++++--
+>  drivers/block/ublk_drv.c     | 38 ++++++++++++++++++++++++++++++++++--
+>  2 files changed, 44 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+> index 28300fee22bf..b7875a3cf3fc 100644
+> --- a/Documentation/block/ublk.rst
+> +++ b/Documentation/block/ublk.rst
+> @@ -118,7 +118,11 @@ managing and controlling ublk devices with help of several control commands:
+>    After the server prepares userspace resources (such as creating I/O handler
+>    threads & io_uring for handling ublk IO), this command is sent to the
+>    driver for allocating & exposing ``/dev/ublkb*``. Parameters set via
+> -  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device.
+> +  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device. The command
+> +  fails with ``-ENODEV`` if an I/O command fetched by the current server
+> +  was canceled, because its io_uring is gone. The server can't fetch it
+> +  again, and the device can be started again once the server has closed
+> +  ``/dev/ublkc*``.
+>  
+>  - ``UBLK_CMD_STOP_DEV``
+>  
+> @@ -195,7 +199,9 @@ managing and controlling ublk devices with help of several control commands:
+>    command is accepted after ublk device is quiesced and a new process has
+>    opened ``/dev/ublkc*`` and get all ublk queues be ready. When this command
+>    returns, ublk device is unquiesced and new I/O requests are passed to the
+> -  new process.
+> +  new process. It fails with ``-ENODEV`` if an I/O command of the new
+> +  process was canceled already. The recovery can be started over once the
+> +  new process has closed ``/dev/ublkc*``.
+>  
+>  - user recovery feature description
+>  
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index f57d544c1da2..39eb7775a351 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -2759,9 +2759,11 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
+>  
+>  static void ublk_start_cancel(struct ublk_device *ub)
+>  {
+> -	struct gendisk *disk = ublk_get_disk(ub);
+> +	struct gendisk *disk;
+>  
+> +	/* sync with ublk_ctrl_start_dev() publishing the disk */
+>  	mutex_lock(&ub->cancel_mutex);
+> +	disk = ublk_get_disk(ub);
+>  	if (ub->canceling)
+>  		goto out;
+>  
+> @@ -4575,6 +4577,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+>  		.dma_alignment		= 3,
+>  	};
+>  	struct gendisk *disk;
+> +	bool canceled;
+>  	int ret = -EINVAL;
+>  
+>  	if (ublksrv_pid <= 0)
+> @@ -4665,8 +4668,24 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+>  	disk->fops = &ub_fops;
+>  	disk->private_data = ub;
+>  
+> +	/*
+> +	 * A command of this FETCH round was canceled and can't be fetched
+> +	 * again, don't bring up a disk over it.  Check and publish the disk
+> +	 * in one cancel_mutex section: either this sees ub->canceling, or
+> +	 * ublk_start_cancel() sees the disk and quiesces it before marking
+> +	 * the queues.
+> +	 */
+> +	mutex_lock(&ub->cancel_mutex);
+> +	canceled = ub->canceling;
+> +	if (!canceled)
+> +		ub->ub_disk = disk;
+> +	mutex_unlock(&ub->cancel_mutex);
+> +	if (canceled) {
+> +		put_disk(disk);
+> +		ret = -ENODEV;
+> +		goto out_unlock;
+> +	}
+>  	ub->dev_info.ublksrv_pid = ub->ublksrv_tgid;
+> -	ub->ub_disk = disk;
+>  
+>  	ublk_apply_params(ub);
+>  
+> @@ -5238,6 +5257,7 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+>  		const struct ublksrv_ctrl_cmd *header)
+>  {
+>  	int ublksrv_pid = (int)header->data[0];
+> +	bool canceled;
+>  	int ret = -EINVAL;
+>  
+>  	pr_devel("%s: Waiting for all FETCH_REQs, dev id %d...\n", __func__,
+> @@ -5261,6 +5281,20 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+>  		ret = -EBUSY;
+>  		goto out_unlock;
+>  	}
+> +
+> +	/*
+> +	 * As in ublk_ctrl_start_dev(), a canceled command can't be fetched
+> +	 * again.  Best effort: the disk exists here, and a cancel after this
+> +	 * check is the ordinary death of the new server, which
+> +	 * ublk_start_cancel() handles by quiescing and marking.
+> +	 */
+> +	mutex_lock(&ub->cancel_mutex);
+> +	canceled = ub->canceling;
+> +	mutex_unlock(&ub->cancel_mutex);
+> +	if (canceled) {
+> +		ret = -ENODEV;
+> +		goto out_unlock;
+> +	}
+>  	ub->dev_info.ublksrv_pid = ub->ublksrv_tgid;
+>  	ub->dev_info.state = UBLK_S_DEV_LIVE;
+>  	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
 
-Follow-up with the controlled data I promised, and a correction. I was
-wrong to point at your series in my first mail. After a clean A/B the
-control-plane stall is a shared blk-mq queue-contention problem on a
-shared disk, reproducible on *plain* managed_irq. Your series does not
-introduce it -- but it does remove the per-CPU-queue separation that
-otherwise keeps it from happening, so I think there is still a real
-I/O-QoS question for you. Details below, each claim backed by a debugfs
-capture.
+Hi Josef,
 
-Setup
------
-  Kernel:   6.18.15-rt (PREEMPT_RT), v16 applied
-  CPU:      2x Intel Xeon Gold 6338N, 128 CPUs, 2 NUMA nodes
-            112 isolated, 16 housekeeping (8 carrying managed IRQs)
-  Storage:  Dell PERC / MegaRAID (megaraid_sas) fronting a SATA SSD
-            (Samsung PM893), passthrough. etcd and the fio target share
-            the SAME physical disk (sda4 / cgts-vg).
-  Workload: one fio pod, libaio iodepth=256 numjobs=4 direct=1,
-            SCHED_OTHER (NOT RT -- RT is not required to reproduce),
-            pinned to one isolated CPU (CPU 2) via the StarlingX
-            isolcpus device-plugin label (verified with ps -eLo psr).
-  Method:   per-hctx in-flight snapshot from
-            /sys/kernel/debug/block/sda/hctx*/busy during the run,
-            cross-referenced with each queue's mq/*/cpu_list and with
-            etcd's CPU set (ps psr).
+Thanks for the follow-up. The check and the cancel_mutex ordering
+look right to me, but I'd suggest -EBUSY instead of -ENODEV.
 
-The decisive observable is not "etcd alive/dead" but which single
-blk-mq queue the isolated pod's I/O lands on, and whether one of etcd's
-CPUs is mapped to that same queue.
+-ENODEV means the ublk device is gone, and it isn't true in the
+START_DEV/END_RECOVERY cases.
 
-The clean A/B (identical kernel = plain managed_irq, identical fio 4k
-randread, identical nr_requests=5089, fio always on isolated CPU 2;
-only the device's blk-mq queue count differs)
-----------------------------------------------------------------------
+With -EBUSY:
 
-  (B) default MSI-X -> 120 blk-mq queues, ~1 CPU per queue
-      All ~35 in-flight land on hctx61, a queue mapped to the isolated
-      submitter and NOT used by any etcd CPU.
-      -> no collision. etcd healthy. Device load ~82k IOPS 4k,
-         sda aqu-sz ~1020, r_await ~12.3 ms.
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-  (C) megaraid_sas.msix_vectors=16 -> 15 blk-mq queues, ~8 CPUs each
-      All ~33 in-flight land on hctx7, mapped to CPUs {0,4,64,68}.
-      etcd runs on CPU0 and CPU68 -> same queue.
-      -> collision. etcd apply 2-7 s, "request timed out",
-         "context deadline exceeded", /registry/health failing.
-         Control plane down -- on plain managed_irq, WITHOUT your series.
 
-Same kernel, same disk, same fio, same depth; the only thing that
-changed is whether there were enough hardware queues for the isolated
-CPU to get one that etcd does not also use. That is the whole bug.
-
-Supporting data point on the strict kernel
-------------------------------------------
-I also have one capture on the managed_irq_strict image (earlier run,
-so not parameter-matched to B/C: it was a 64 KB read profile, and
-/sys/block/sda/queue/nr_requests was already capped to 64 -- that cap
-was my doing, the only way I could keep etcd / kube-apiserver alive
-enough for the node to stay up and for me to collect the capture at
-all; the default 5089 took the control plane down hard). It is still
-informative directionally: with 0006 active, sda is confined to 16
-blk-mq queues on the HK CPUs, fio on isolated CPU 2 funnels all ~30
-in-flight onto hctx0 == CPU1, and CPU1 is an etcd CPU -> even with that
-nr_requests=64 cap in place, etcd apply still blows out to multi-second
-with context-deadline / health-probe failures. So strict reproduces the
-same collision by construction, and the nr_requests knob only partially
-masks it there.
-
-Conclusion
-----------
-The failure is not strict-vs-non-strict. It is whether the isolated
-pod's submission queue coincides with a queue an etcd CPU also uses:
-
-  - On a device with enough hardware queues, plain managed_irq gives
-    the isolated CPU its own blk-mq queue, disjoint from etcd's, and
-    the heavy pod I/O does not head-of-line-block etcd (B).
-  - Shrink the queue count until CPUs must share a queue -- via a low
-    MSI-X count (C), or via your 0006 "use HK CPUs only" confinement
-    (strict) -- and the isolated pod's deep queue lands on a queue etcd
-    uses, and etcd starves.
-
-So this is pre-existing shared-queue contention on a shared slow disk,
-not a bug your series introduces. I retract the implication in my
-previous mail. (It is also device-level, not CPU: during the stall 7 of
-8 IRQ-HK cores are idle and the backlog is pure block-layer queueing,
-aqu-sz ~1020 at ~70% util.)
-
-Where I think the series is still relevant
-------------------------------------------
-0006 confines blk-mq to the HK CPUs unconditionally. On a
-well-provisioned device (B, 120 queues) that is exactly the config that
-*removes* the per-CPU-queue separation which was keeping isolated bulk
-I/O off etcd's queues. In other words, strict turns a
-"only on queue-starved devices" problem into "always, because every
-isolated submission is forced onto the HK queue set the control plane
-also lives on." That is a deliberate and correct part of the design --
-isolated CPUs must not host the queues -- but it makes an I/O-QoS gap
-unavoidable rather than incidental.
-
-Mitigation
-----------
-Capping /sys/block/sda/queue/nr_requests on this device (megaraid_sas
-with the SATA SSD exposed transparently / passthrough, e.g. 5089 -> a
-small value in the 32-64 range -- lower for a slower disk) shortens the
-head-of-line backlog and helps, but note it is weaker under strict/low-
-queue configs: when all submissions pile on one etcd-shared queue, even
-a depth of 32-64 on that single queue still hurts etcd. For production I'd
-prefer cgroup v2 io.max / io.latency to protect control-plane I/O, or a
-dedicated device for etcd.
-
-Questions
----------
-  1. When 0006 forces all isolated-pod block I/O onto the HK queue set,
-     do you consider protecting co-located latency-critical services
-     (etcd/kube-apiserver) from that I/O an operator concern
-     (io.latency/io.weight, dedicated device), or is there a case for
-     the series to leave a per-CPU submission path / reserved HK queue
-     so bulk isolated I/O cannot head-of-line-block them?
-  2. Is there an assumed minimum HK queue count relative to the
-     aggregate block I/O of isolated pods? 8 IRQ-HK vs 112 isolated on
-     one shared disk makes the HK queue set trivial to saturate on
-     depth even while it is CPU-idle.
-
-Raw debugfs hctx snapshots + iostat/etcd logs available on request.
-Net: not a v16 regression; a shared-disk I/O-QoS gap that v16 makes
-unavoidable by design, which may or may not be something you want to
-address in the series rather than leave to operators.
-
-Thanks, and sorry for the premature pointer in the first mail,
-Ionut
+thanks,
+Ming
