@@ -1,55 +1,56 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8873A7848
-	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 10:03:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE26B3B3BFE
+	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 11:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791281011; cv=none; b=GTcVnkau5ygNiRDdYZofCvT6iJ9QFyEWi++EcDczg9fX/PtC/DIsDK9OUwaKUUVBp5RJkzSlhDnpdJJHVudjOj/+wwWqNmtbVUtudyNWCc4OPZnGhik2LmShLaSi8r0NVXFXCsDO/D7idjYktV+pDgbFYyg8rvZCfbCXBjRAw54=
+	t=1791286581; cv=none; b=jrUxRv60YB9nJCTrHNC1XXRclqO2y3QALXV9vfdKiCzAeLSIg8qqDhDMVoKE2hHeXyHI8Q23AV6QGn6yXc73z4qsy6jX+D9RsvqY+ZbJrkCRm/5LBs6BxCku3GQ0EoyiNcoRuymCUZPnBTGexmucm0Y3LbZyGzUanLVw4SjIR44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791281011; c=relaxed/simple;
-	bh=4yADt5rjladWeKpuNOSKS3cLtKhVa7EPDWv8TcMsBeY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RZNUxKa2bweu7iBejll3Ls8RYB1yy3SFZxEykJOKomnR8wgNODD4iXxd8gtNs/PJQrlJsiHOGIBmNBADndscdviB6P26ndqMufzYkxcioGVI3y7YiwW7KabsSFbbzHpMdCY9UK0VigaHDxVgb04d62rB3sKZb1RDqQSH8QDQwp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1791286581; c=relaxed/simple;
+	bh=Uyl8fsKqF2hZuM9YDMoKvgjEFiqVl+i1dh3r2f/VXKY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vi2XKSZZGKmubnHw04mnt2OBEo/bXn0iE7jZBeb5eznUJLKjyb1sHaYq06seuLFxY8V69Bv9cZbpd2p/F5WDLf8MH0F1Cg8cd2IJI8op45jEx7Ec2fB49EI3mIoc49a9nDEr/GL3AbY5r6gMfTIfyHUDyvl4bREzhoN8AyUuqss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4a018dc1f98so5109695e9.3
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 03:03:29 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-48afbd2c386so528526f8f.3
+        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 04:36:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791281008; x=1791885808;
+        d=1e100.net; s=20260707; t=1791286578; x=1791891378;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=uVXG+Hhha7ESqpwxCWCC5IkRzxzgl7i/i73esx9czc4=;
-        b=cO2OnkZOpJDNAC74+SMp9W34rrEVlxGROWkFoVubRf11SpetbmBqOtQ/FE1/RHj+jH
-         qknnB8kPyFxGtL1mxuCXmCzpP+iivxde0WfCNFCv9a3u5vPlJKcWw7zY7aAjAi+akuuO
-         GYmdWGHPVE4IetH43Vm6Puy+WJ6UUoGzvyd5XwQWVBfrdHEPrO6kJyDex0oGp4QBeBVY
-         lR1X8iHS04SStJPOB9FUaQ4O/5Dg9ww745ZA1nunJ4v4DZDpEIkmZ4113jVOgXB8es4o
-         rtOD7up0VPbZGlLKnqzzWJuKDzFo1Br80XoTAKNdV5z4uSeOR8zW5NAt4bC9qhzosj4H
-         q7+w==
-X-Gm-Message-State: AFuF++nWkRXAbgNNAjtP31T23hl4nfNx8jH7Onr5WPj9iFi0GzznPrpJ
-	OHl0fqbll1eA13D4w61VswAT81Rkib2kszKPzPrQ8rsoIyMK/BVZMna5VvJpC73vCY8=
-X-Gm-Gg: AYBFou24drZgCMIRK04xgoKy14fi0lS1U/WuFpvojGFVmt7+cDstcboX+/kBS5gLk2z
-	OnOPpi/TXfBM88l12t4TNf4mbvH2sk/J2iDJ+Vf1beRPJtPdf5I4EXH0ycZlb20t5tz+xUmpiAs
-	nObSa7YqR1DIzqn7KlQ1q8dPm9fL8HbvWk4uF8il4FtGayVPUZzIMUAK23qjZ5vw7WkvYc4dOMK
-	rV9/wReAKL+jtkPUWD+6reFSOubW6/nW6sQGwdEJjNNB6qyhgeJuib0ZmOZaoK8LNDW5KO7O/Vp
-	tOMEYa0qqpGezEd5bFnwd8i2XkcOVt6wzAlDQeBqVpB4t3G6rUHteR60rKIpGgfrbI57QKFCvNo
-	EufKB0sLWHMczr+Zq56sMpdaYOl7bu+Ke/+2mNpt+fcsKXJkkr4/Tqaq9FGO63jgGsmTjXlih77
-	BKHAXNLp2oLZMX4s2AZNKal5P9/gkjBSyyavQtrkJEWPDhMK+HIjkl5NpA8ug7JlNNW3L+vESQn
-	PxfEUekikr7yO1TuCdRD6blfFM=
-X-Received: by 2002:a05:600c:4e42:b0:4a0:2867:d8a9 with SMTP id 5b1f17b1804b1-4a17b558ba3mr12102095e9.30.1791281008098;
-        Tue, 06 Oct 2026 03:03:28 -0700 (PDT)
+        bh=ndzzUuEtcbTKrn4r7tACpiIJyXYLhlhQwb4ACs5k4Lo=;
+        b=Z6GrqYwJRNuGqefXFLx5mONc6JL2POofEl5RxRWIkelGEnT6oHiXPpaB6iyL/3CrfR
+         3Q5Gv31LFrPBDWDF+1gGykVcsDe0g2LtpYiSEdKQkHmVhF5l4sp+3MzBb4lWCOtHPIZq
+         D+0XI7j+86QPQRPIvB0Do/7fkyVB8SWITBZSRrlg6AdXeHwXTKBykJ2as1hagvULYgLQ
+         3auB1XSCpHTWrOcY3oJ8ug0Kv/pM1nJVL7szlyvranooa0jV1uW8iFhz5SFPUhu/EwT8
+         u3jx9R+EwNoTI4GLyLB0WhNiyOmd7HDSaS6HgddvQlkSrOAtkPmn0j3rYBWl0oU+8RYI
+         xp0A==
+X-Gm-Message-State: AFuF++neOwwO4e0Bb0Jbz3vR3TVSx8HPXLkG186gr5ZQmvkQ3M/KMfu3
+	dwQGEK2mJii6aqlsyOl5KENXugB/q0/BmXRv0iHYKCOjD2danWzT8ca41LtumB2ZqUg=
+X-Gm-Gg: AYBFou1IKtLrluR+U+H9SkPb2LQWChT3fwhG8FkRTJxHb8cxcN9gO2YIWLxVOmhX937
+	bUOiIKqZU3dq8/0gpvZS2bGCimREP0KpDzKG3hdpxW4HhNVFulRB3yXI3f8GG9TOQEpwcYN9RYL
+	+Fd5afByedwdmmrpqe1k8sKPiYBUEKLftlLVD2BwA/KS/b/7Lv8L6znkyCMuSqbHw1tRX5dCyFd
+	avsc0QO0GNHIjf7FOxNJ1EwFR4XPmq6eABthXqkUHETDTfPr67qQFbdZ2rTfKmlLxJL5J7X6+kb
+	XR9o2IliHn0KaST0MLuPOzTKSP6FJZEkHmLhQB+c3N0uq4GcSgeYZa3MDFNXgc1e2+mATPy9+za
+	u0ev2LN5dFrkO5YjQORBqJ868UDU1ws6X0tb0YNQRdin61IkqfQRocO/NU1cZ7x/PwZMG+H8iCZ
+	qD77pH8qw4H7j4AWEGU27BR10NRwgQZC07J0gjA5zwB9iU0urwhqwIjWCtyug0or394XR6tV8Hi
+	BglAFrpotEPKljQx0E8N8HBVG8=
+X-Received: by 2002:a05:600c:1c16:b0:4a0:258a:8de4 with SMTP id 5b1f17b1804b1-4a17b4f410emr22540365e9.4.1791286577693;
+        Tue, 06 Oct 2026 04:36:17 -0700 (PDT)
 Received: from white (bba-217-165-185-173.alshamil.net.ae. [217.165.185.173])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4a178daa062sm61246235e9.8.2026.10.06.03.03.26
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4a178c5d8dfsm70158865e9.14.2026.10.06.04.36.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 03:03:27 -0700 (PDT)
+        Tue, 06 Oct 2026 04:36:17 -0700 (PDT)
 From: "Denis Efremov (Oracle)" <efremov@linux.com>
 To: linux-block@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
-	"Denis Efremov (Oracle)" <efremov@linux.com>
-Subject: [PATCH] floppy: fail the open when floppy_revalidate() fails
-Date: Tue,  6 Oct 2026 14:02:58 +0400
-Message-ID: <20261006100258.1871870-1-efremov@linux.com>
+	"Denis Efremov (Oracle)" <efremov@linux.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] floppy: take floppy_lock when rescheduling the timeout in queue_rq
+Date: Tue,  6 Oct 2026 15:35:47 +0400
+Message-ID: <20261006113547.2099599-1-efremov@linux.com>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -59,41 +60,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-floppy_open() ignores what floppy_revalidate() returns. If lock_fdc() is
-interrupted, or __floppy_read_block_0() can't allocate its page, the open
-can succeed without the disk check.
+__reschedule_timeout() expects floppy_lock to be held. floppy_queue_rq()
+still calls it without the lock, which was fine when the request function
+ran under the queue lock, i.e. floppy_lock, but not since the conversion
+to blk-mq. With lockdep_assert_held(&floppy_lock) added to
+__reschedule_timeout(), the first read from the drive triggers:
 
-Commit a0c80efe5956 ("floppy: fix lock_fdc() signal handling") made
-floppy_revalidate() return -EINTR instead of going on without the FDC
-lock, but the error was dropped. Return the error instead.
+  WARNING: drivers/block/floppy.c:671 at __reschedule_timeout+0x180/0x1e0, CPU#0: dd/561
+  Call Trace:
+   <TASK>
+   floppy_queue_rq+0x17e/0x300
+   blk_mq_dispatch_rq_list+0x3e9/0x1f30
+   __blk_mq_sched_dispatch_requests+0xcfa/0x16e0
+   blk_mq_sched_dispatch_requests+0xd5/0x1c0
+   blk_mq_run_hw_queue+0x341/0x670
+   blk_mq_dispatch_list+0x50c/0x16f0
+   blk_mq_flush_plug_list+0x131/0x600
+   ...
+   blkdev_read_iter+0x2b5/0x4e0
+   vfs_read+0x7fd/0xaf0
+   ksys_read+0x12a/0x250
+   do_syscall_64+0x106/0x5f0
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
 
-Fixes: 4a6f3d480edc ("floppy: use bdev_check_media_change")
+Use reschedule_timeout(), which takes the lock.
+
+Cc: stable@vger.kernel.org
+Fixes: a9f38e1dec10 ("floppy: convert to blk-mq")
 Signed-off-by: Denis Efremov (Oracle) <efremov@linux.com>
 ---
- drivers/block/floppy.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+There is a small ordering conflict with "floppy: select FDC before arming
+timeout work" [1], which moves the same call below set_fdc(0). I will
+resolve it when applying the patches, so that the timeout is armed with
+reschedule_timeout() after set_fdc(0).
+
+That is also why this patch switches to reschedule_timeout() instead of
+moving __reschedule_timeout() into the floppy_lock section a couple of
+lines above: there it would be armed before set_fdc(0) again.
+
+[1] https://lore.kernel.org/linux-block/20260504032853.316099-1-zzzccc427@gmail.com/
+
+ drivers/block/floppy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index f04397b8e381..85eac9adc385 100644
+index f04397b8e381..5bbd385f837c 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
-@@ -4052,8 +4052,12 @@ static int floppy_open(struct gendisk *disk, blk_mode_t mode)
- 			drive_state[drive].last_checked = 0;
- 			clear_bit(FD_OPEN_SHOULD_FAIL_BIT,
- 				  &drive_state[drive].flags);
--			if (disk_check_media_change(disk))
--				floppy_revalidate(disk);
-+			if (disk_check_media_change(disk)) {
-+				res = floppy_revalidate(disk);
-+				if (res)
-+					goto out;
-+			}
-+			res = -ENXIO;
- 			if (test_bit(FD_DISK_CHANGED_BIT, &drive_state[drive].flags))
- 				goto out;
- 			if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags))
+@@ -2872,7 +2872,7 @@ static blk_status_t floppy_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	spin_unlock_irq(&floppy_lock);
+ 
+ 	command_status = FD_COMMAND_NONE;
+-	__reschedule_timeout(MAXTIMEOUT, "fd_request");
++	reschedule_timeout(MAXTIMEOUT, "fd_request");
+ 	set_fdc(0);
+ 	process_fd_request();
+ 	is_alive(__func__, "");
 
-base-commit: 2c3418fffa9d037b2038a6db48be63f9e2291806
+base-commit: 22430ae5d90ab288b0ee2ad99ae941f4a666b694
 -- 
 2.55.0
 
