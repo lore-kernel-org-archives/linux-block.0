@@ -1,243 +1,145 @@
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AC746C856
-	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 14:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648F2470116
+	for <linux-block@vger.kernel.org>; Tue,  6 Oct 2026 14:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791296104; cv=none; b=aKOQLYdsXuh17fTlN6rH39ZnHgUKZVK8+SOUWrLWRaQ3mSAEDandKvsRzZrAYkPJqNrRzs20T4l2HWzkb1TzZsYipe3JAu3JJYjFPaxN1HKOD7sco7eoXAsVr/+FaCOn91fZfhqPNUJrMmNHPb/FY47zsbp6ogR7eKwtQwwxhyY=
+	t=1791296126; cv=none; b=B4Ggu5wow8J+QhQpV9XbseJcB/X0Nc25vZrhBAedMeZ5bdPkVJS/bSmRpDChKbPBX/J4tqdaXJoUFKCGDO66HLDwcp03ozphRGGZi5WAgUcx2m+AniZ1ZJlszEBUZ/1FoVxZobHpCHWAmkKpkPo7HsMlgNUE/iat5Iho+TR3Lgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791296104; c=relaxed/simple;
-	bh=Nt8VaQlj73La3K/WOXPeZWp5Egiw8ElYDzr2tV/tnAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VV2usZ/NBdi/lolRb75FBqpeKDJxiWeB1F4kp4bp9Poxp8P2/NpzT7O+b8GlgWkmffmJK8IDfJhTSzekbMQ1E/BnWOdUdiFlx/NOjrKib2tdP1E+wazyR/Owl5CUfBsp+36zI9c0QqFFU5/lzN44YY0Dm6e0DAnyk7YaDjSt5DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0fr23E8; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791296126; c=relaxed/simple;
+	bh=3twLCOUVctvgm+7HXE5YvCiR9KmGS4GbaF3cOWVcIN8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LtcGbgbN+MAi9xDqj6+699kw2ZPi7thx85CBZukDz0yZfYc78pou0/Y9mVH/eG3v5OnE1WE50pR/SSkvJmHJGJBKjSfzFMy2JczzZLLFFgxJyZj7r/zTkTySks5G1r5+ln6lWlV34aEOz8WOlUc/kcslwvolbFPjnIG2SQhtgrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=isslab.korea.ac.kr; spf=none smtp.mailfrom=isslab.korea.ac.kr; dkim=pass (2048-bit key) header.d=isslab-korea-ac-kr.20251104.gappssmtp.com header.i=@isslab-korea-ac-kr.20251104.gappssmtp.com header.b=G7RLSNBO; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=isslab.korea.ac.kr
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=isslab.korea.ac.kr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0fr23E8"
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-82621039b6bso1517477a34.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 07:15:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=isslab-korea-ac-kr.20251104.gappssmtp.com header.i=@isslab-korea-ac-kr.20251104.gappssmtp.com header.b="G7RLSNBO"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-38d489b6b71so368639a91.0
+        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 07:15:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791296101; x=1791900901; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=iyocPZgXU+y/fKJyewKMKQMG8bpfMm3V+MoJuTgAH+Q=;
-        b=C0fr23E8OkKiRLmpkJ8gBXyQ3l9t1BuX+90uFkhhPKSw8OOXKAGvU5s4IRpyg6yOyX
-         VK3n5Ux1dxLZBviRlBO011IFfOhNPCHypcjCsNQUfTjvwZQRbOpehQOSjmWIGoFK1loz
-         NEcyu7noCvoD9gsP4yrIgaNIVQTzeHOi5q4i33uTZvo53tud5x+Ki7DQFrrR/izyO076
-         4vhMfFFu4FfBdQW6aC6laVF4pCHesds0SvAWxALMl3iZgVAsc77xAmLYBFbNkMdG6tN+
-         GuzsJTiHmrrbnqU1aRgapNiCDSsMEKBRJAAHJGpWZBUQqqOJ4GqfAsRzvEWJra9aIGng
-         Co0w==
+        d=isslab-korea-ac-kr.20251104.gappssmtp.com; s=20251104; t=1791296123; x=1791900923; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=5d+qEg9Unyo+IXTg1hjwRDAAFeW42uTSWnzee3KFft8=;
+        b=G7RLSNBOyl7q6oJ5DCDgFc20nYvj+MuWuWqvWLXjPvhI+jQ9v4a4BfNd0oJ6nOlB5a
+         dWKMPgiBndfBGXUcoFeXreslawCRgRRPu7c2oNc776W47h3FYjxmyQLfLcwkHQ5ZqIZy
+         rxVHW3ZiaBwUDiCmz/pJamWSiNcdLBVabaW49ZgnXrgZtosyZ7jyHRQQwX2qxfla/4LF
+         PXrNib9ED3+y1w7ZxBHPFECdCiZXYFHzKk4iRMJHw3H3mdlJj+j5IR891OWhUm7MYfUq
+         OmhAcfw66GqiZ5haQwMFYnB73gEVTehC6XPdxE6sLg52kbCmtdO9Ii7QH2U8ZlxWgs8Z
+         DAEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791296101; x=1791900901;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iyocPZgXU+y/fKJyewKMKQMG8bpfMm3V+MoJuTgAH+Q=;
-        b=t7B7z/Vpgg+xGbCVck0SULkVFIg7koYdPabKlmTc+95AyStowC959drtrh1hB3qJtz
-         tCJcVfotkoELaujv3S8NdmlsyqANO4O5nF+jpJ+ziWPZZZIF52z+NmrW3Z+mCHmyJ59R
-         YuRcYc2b3w7JazPWkzs97TW8yd7ZqT3liwWd8mPaGfUo/whWREmFgol2WGjJGkb75Eqb
-         IeDIhYctU+2v/WK/XLwHLMO8tNyRXjGwH+CItmU5eOQqpXcqtshxzSYREuwWkZ93pIto
-         d1W99v2zbzQ1VaWBV9XYEa0MY3seZIIMYA8NUM4bKOfFzy1UkQ4O0DZ+Y34C9aetDhMZ
-         cViA==
-X-Forwarded-Encrypted: i=1; AKwUvBzq5Bwqn9VWRrvihfTQUSE5zWGoTcBIVLJyI+AjRCkKVdqFInF+gfpvsHIDy0hFKmZrm/ui6Fx1VNW2Lw==@vger.kernel.org
-X-Gm-Message-State: AFuF++lMmGF2fhGfOLNryiwLLKoHZBtDEc1/mpSfwLHFfFMGsdCYf7YU
-	zbAj9/bPcmUE876IVSi5C7H3wCycI2p9Q/cX2qibCubt+BujRihuxuMpAY6T5A==
-X-Gm-Gg: AYBFou0xomrm8x4MI8Ed652xl4O2wsCjl1I9ciMlGP32kCo77LD0LgHAmd7i10bKeKl
-	u7m9262wYyhuUgNqD+0aaJAqquvIsWfhQ2GC9viZlHVW/ivVKhw33+hHT88ypQNbqGTi9qKFSQx
-	KKY+xYx0JzRncdBunbeZ58jf8zZsa3mnSz/KJwZYFx9kX1zloDMGPE6Akid0npiSMk5YFQFtB5H
-	9Ndk86HFxAPXv9USz4GlL3mFlcKwvKlAne9yzAlE2TBlyQAh08bL/ic/nvHQIu5Le5DSJIVhMDP
-	mAeCukn+FcSQdvxoCZD0mO3KL7odf+9IcY4D/C65soG2b5yLuLfmmuBaYELo3gJqhgY07M2TE49
-	IhfxEa379XOI11GvUIAz59TgMbKhtpTvDIz8oisK1zL9Chtx3zH+yaaDL3TObNAS3QZ7YcI2BUv
-	EIReJB7hNMUsknadvEDgcQxMRk0L2zLI8NR11YpZNfSikmOdBvFCrRKNu+M6YmPClWmgrEBH+Gv
-	TQeA8dHjbaBZ4UbfJ+MvNum3ILkFYlQAVR2A9hCJrTlce4cV2bl3qDnKWDa2wV6CAFytFo7Vm55
-	QTLJZ2Hyvj85Wg==
-X-Received: by 2002:a05:6830:349b:b0:81d:8057:9b7f with SMTP id 46e09a7af769-828a30409b5mr1482854a34.28.1791296101506;
-        Tue, 06 Oct 2026 07:15:01 -0700 (PDT)
-Received: from fedora-laptop ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8281acf807csm2432876a34.0.2026.10.06.07.14.57
+        d=1e100.net; s=20260707; t=1791296123; x=1791900923;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=5d+qEg9Unyo+IXTg1hjwRDAAFeW42uTSWnzee3KFft8=;
+        b=AJKjz8lMM1duV9l8wayrfktlzgoYFweBMLUhtsqcoGE7jEzUOi4VSn4RP03gIjs2kr
+         MgXieghYYrl9U4nu3xM5CF8eRUwv49VKmLGtRGACglscPWiKYysIiLsE5Ud5QOqotsyf
+         i4TGlMxtXk1VfdC2w+23zcJDMP4DcIOeNirbkeM79F+mTeRICYsYkfqTRydIYiBbT5sr
+         3kOz+IQ5EaL2uGZkHRnysC7I7oo/bVZkophjRb1Cwko2wjMNIzhU8JM4O5SuAoFiOekE
+         xeRr6NKkfJMG8yuxv+ExXD9jku5hAaW4y2hKLiRZQSkybpsz4lPvXHo9nyfS0z+IbGp0
+         1QEw==
+X-Forwarded-Encrypted: i=1; AKwUvBwoNW9uOICaBG5qIZcwZco5TMQDhKikOhPnOEyZIdNZzFN4Gsk8UqY1IPENV7Z6ZIGMXH5aBKrWCnmNbg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYK7YuqdlgYJa04PBcJvVj4ZGiRMZPo+kEwAzDGh4SKEuEwxyb+R
+	Hd0so14gqicEGHYrawXYIxgN8US+b26NmX3jex4aPHqpDSvw86f+NbnSqesAse0DHbE=
+X-Gm-Gg: AYBFou0hoHdOxk21C7p+ncV10AM9OYoSNsCzON5QpAlB+IWpLbBXLoONmXT2yOYhAVo
+	OhAUOQR9vy46rqdc8KIPexCGxHrspa5zRTwp0xx9p6+HxFVTGquoph6g5lkJXJGSo70ONGdwQnm
+	oCm+O5ylPVMe7LqLiVdjnAnGnKPCeA9O9sxoEVGoVgtMU/gNlHO4aMfooOjayLBf3h2WpXxTr/y
+	CORdlVZ8Ahy9qwvc82YtQw5y1KJVAnCJCmmN5VoNnORBoLj9W3VDssDkuMt3SR1UiAyxC/gjS78
+	4Ru4yrBY4dUqkibR/ai76XFriuvyE3w8+4g9Nk0GeqwoKWdJ9Qt6Tuy4hfSL3JtwzBNV7ix01lZ
+	jIL9XFzf5sa190Hi0uzcEvhDkQyI9tht5g3WisM/jxUvaLH87sEAdiSpvgVM6gAR9KDUZlq+MMH
+	IOpHZVqRfbVw+6wPGhhv2buv6gGNca2dF64ZNs0WaonpniTEh3mCyKs8osycBKZKEUUrYe4ILAo
+	mhOhKQkLt0Imd55UaEMGw==
+X-Received: by 2002:a17:90b:4b04:b0:3a8:5543:5572 with SMTP id 98e67ed59e1d1-3a872551602mr689793a91.1.1791296123414;
+        Tue, 06 Oct 2026 07:15:23 -0700 (PDT)
+Received: from yhlee-960QFG.Davolink ([2406:5900:1044:110c:a229:268f:9226:1ba3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a8533aba95sm5917618a91.2.2026.10.06.07.15.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 07:15:00 -0700 (PDT)
-Date: Tue, 6 Oct 2026 09:14:50 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Josef Bacik <josef@toxicpanda.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH] ublk: refuse to go live after an io command was canceled
-Message-ID: <asUCWjKXMxXFwBNQ@fedora-laptop>
-References: <20261001125422.1364260-1-tom.leiming@gmail.com>
- <9b876f2c061abc401ec4b9b3c2529eda.josef@toxicpanda.com>
+        Tue, 06 Oct 2026 07:15:22 -0700 (PDT)
+From: Yehyeong Lee <yhlee@isslab.korea.ac.kr>
+To: Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	drbd-dev@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Yehyeong Lee <yhlee@isslab.korea.ac.kr>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] drbd: reject an out-of-range offset when decoding a compressed bitmap
+Date: Tue,  6 Oct 2026 23:15:07 +0900
+Message-ID: <20261006141509.521128-1-yhlee@isslab.korea.ac.kr>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b876f2c061abc401ec4b9b3c2529eda.josef@toxicpanda.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 05, 2026 at 04:23:51PM +0000, Josef Bacik wrote:
-> Since commit "ublk: keep a canceled FETCH round canceling until the
-> server is gone", a device whose FETCH round saw a cancel keeps its
-> queues canceling until the server goes away, but START_DEV and
-> END_USER_RECOVERY still bring it up. Without UBLK_F_USER_RECOVERY, or
-> with UBLK_F_USER_RECOVERY_FAIL_IO, every request of the new disk fails.
-> With UBLK_F_USER_RECOVERY, requests are requeued and never kicked: after
-> START_DEV the partition scan hangs under disk->open_mutex, and after
-> END_USER_RECOVERY every read parks while the command returned 0. The
-> server cannot fetch the canceled commands again, so the device can't
-> serve I/O until it restarts anyway.
-> 
-> Return -ENODEV from START_DEV and END_USER_RECOVERY while ub->canceling
-> is set. In ublk_ctrl_start_dev() check it and publish ub->ub_disk in one
-> cancel_mutex section, and have ublk_start_cancel() read the disk in its
-> cancel_mutex section. Today ublk_start_cancel() samples the disk before
-> taking the mutex, so a server dying during its own START_DEV can mark
-> the queues without quiescing a disk START_DEV published in between, with
-> its first I/O past the canceling check. Now either START_DEV sees the
-> cancel, or the cancel sees the disk and quiesces it before marking. The
-> END_USER_RECOVERY check is best effort: the disk exists there, and a
-> cancel after it is the ordinary death of the new server, which
-> ublk_start_cancel() handles by quiescing and marking.
-> 
-> Assisted-by: LLM
-> Signed-off-by: Josef Bacik <josef@toxicpanda.com>
-> ---
-> This applies on top of Ming's "[PATCH 0/8] ublk: don't dispatch to
-> canceled io commands" and needs patch 1 of it for ub->canceling to stay
-> set for the whole FETCH round. generic_18 still passes with it.
-> 
->  Documentation/block/ublk.rst | 10 ++++++++--
->  drivers/block/ublk_drv.c     | 38 ++++++++++++++++++++++++++++++++++--
->  2 files changed, 44 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-> index 28300fee22bf..b7875a3cf3fc 100644
-> --- a/Documentation/block/ublk.rst
-> +++ b/Documentation/block/ublk.rst
-> @@ -118,7 +118,11 @@ managing and controlling ublk devices with help of several control commands:
->    After the server prepares userspace resources (such as creating I/O handler
->    threads & io_uring for handling ublk IO), this command is sent to the
->    driver for allocating & exposing ``/dev/ublkb*``. Parameters set via
-> -  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device.
-> +  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device. The command
-> +  fails with ``-ENODEV`` if an I/O command fetched by the current server
-> +  was canceled, because its io_uring is gone. The server can't fetch it
-> +  again, and the device can be started again once the server has closed
-> +  ``/dev/ublkc*``.
->  
->  - ``UBLK_CMD_STOP_DEV``
->  
-> @@ -195,7 +199,9 @@ managing and controlling ublk devices with help of several control commands:
->    command is accepted after ublk device is quiesced and a new process has
->    opened ``/dev/ublkc*`` and get all ublk queues be ready. When this command
->    returns, ublk device is unquiesced and new I/O requests are passed to the
-> -  new process.
-> +  new process. It fails with ``-ENODEV`` if an I/O command of the new
-> +  process was canceled already. The recovery can be started over once the
-> +  new process has closed ``/dev/ublkc*``.
->  
->  - user recovery feature description
->  
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index f57d544c1da2..39eb7775a351 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -2759,9 +2759,11 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
->  
->  static void ublk_start_cancel(struct ublk_device *ub)
->  {
-> -	struct gendisk *disk = ublk_get_disk(ub);
-> +	struct gendisk *disk;
->  
-> +	/* sync with ublk_ctrl_start_dev() publishing the disk */
->  	mutex_lock(&ub->cancel_mutex);
-> +	disk = ublk_get_disk(ub);
->  	if (ub->canceling)
->  		goto out;
->  
-> @@ -4575,6 +4577,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->  		.dma_alignment		= 3,
->  	};
->  	struct gendisk *disk;
-> +	bool canceled;
->  	int ret = -EINVAL;
->  
->  	if (ublksrv_pid <= 0)
-> @@ -4665,8 +4668,24 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->  	disk->fops = &ub_fops;
->  	disk->private_data = ub;
->  
-> +	/*
-> +	 * A command of this FETCH round was canceled and can't be fetched
-> +	 * again, don't bring up a disk over it.  Check and publish the disk
-> +	 * in one cancel_mutex section: either this sees ub->canceling, or
-> +	 * ublk_start_cancel() sees the disk and quiesces it before marking
-> +	 * the queues.
-> +	 */
-> +	mutex_lock(&ub->cancel_mutex);
-> +	canceled = ub->canceling;
-> +	if (!canceled)
-> +		ub->ub_disk = disk;
-> +	mutex_unlock(&ub->cancel_mutex);
-> +	if (canceled) {
-> +		put_disk(disk);
-> +		ret = -ENODEV;
-> +		goto out_unlock;
-> +	}
->  	ub->dev_info.ublksrv_pid = ub->ublksrv_tgid;
-> -	ub->ub_disk = disk;
->  
->  	ublk_apply_params(ub);
->  
-> @@ -5238,6 +5257,7 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
->  		const struct ublksrv_ctrl_cmd *header)
->  {
->  	int ublksrv_pid = (int)header->data[0];
-> +	bool canceled;
->  	int ret = -EINVAL;
->  
->  	pr_devel("%s: Waiting for all FETCH_REQs, dev id %d...\n", __func__,
-> @@ -5261,6 +5281,20 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
->  		ret = -EBUSY;
->  		goto out_unlock;
->  	}
-> +
-> +	/*
-> +	 * As in ublk_ctrl_start_dev(), a canceled command can't be fetched
-> +	 * again.  Best effort: the disk exists here, and a cancel after this
-> +	 * check is the ordinary death of the new server, which
-> +	 * ublk_start_cancel() handles by quiescing and marking.
-> +	 */
-> +	mutex_lock(&ub->cancel_mutex);
-> +	canceled = ub->canceling;
-> +	mutex_unlock(&ub->cancel_mutex);
-> +	if (canceled) {
-> +		ret = -ENODEV;
-> +		goto out_unlock;
-> +	}
->  	ub->dev_info.ublksrv_pid = ub->ublksrv_tgid;
->  	ub->dev_info.state = UBLK_S_DEV_LIVE;
->  	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
+recv_bm_rle_bits() decodes a run-length-encoded bitmap from the peer and
+accumulates the bit position s across the runs.  The bound was only
+applied where bits are actually set: a clear run advanced s with no check
+at all, so a peer could leave c->bit_offset past the end of the bitmap
+once the bitstream ran out mid-sequence.  receive_bitmap() then carries
+that offset into the next packet, where the plain-bitmap path computes
+c->bm_words - c->word_offset, underflows it, and hands the result to
+drbd_bm_merge_lel(), which only WARN_ON()s an out-of-range word offset
+before reaching bm_word_to_page_idx() and its BUG_ON().
 
-Hi Josef,
+Check each run against the remaining bitmap before advancing s.  A single
+VLI code decodes to a run length of up to about 2^56, so checking after
+the loop would leave s free to move far out of range (and in principle to
+wrap) in the middle of the sequence; bounding every run instead keeps
+s <= c->bm_bits as an invariant, which also means c->bm_bits - s cannot
+underflow.  The set-run bound becomes redundant once that holds --
+e >= c->bm_bits is exactly rl > c->bm_bits - s -- so drop it rather than
+leave a check that can no longer fire.
 
-Thanks for the follow-up. The check and the cancel_mutex ordering
-look right to me, but I'd suggest -EBUSY instead of -ENODEV.
+Fixes: b411b3637fa7 ("The DRBD driver")
+Cc: stable@vger.kernel.org
+Suggested-by: Philipp Reisner <philipp.reisner@linbit.com>
+Signed-off-by: Yehyeong Lee <yhlee@isslab.korea.ac.kr>
+---
+v2: per Philipp Reisner's review -- check each run before advancing s so
+    s stays <= c->bm_bits throughout (a single VLI run can be ~2^56),
+    instead of only after the loop.  The set-run bound is then redundant
+    and is dropped.
+v1: https://lore.kernel.org/all/20261006034333.351130-1-yhlee@isslab.korea.ac.kr/
 
--ENODEV means the ublk device is gone, and it isn't true in the
-START_DEV/END_RECOVERY cases.
+ drivers/block/drbd/drbd_receiver.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-With -EBUSY:
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 2135c14354a85..1febb5e089cc1 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -4529,12 +4529,19 @@ recv_bm_rle_bits(struct drbd_peer_device *peer_device,
+ 		if (bits <= 0)
+ 			return -EIO;
+ 
++		/*
++		 * A single run can be up to about 2^56, so check it before
++		 * advancing s: that keeps s <= c->bm_bits throughout and
++		 * leaves no way for s to wrap in the middle of the loop.
++		 */
++		if (rl > c->bm_bits - s) {
++			drbd_err(peer_device, "bitmap overflow (s:%lu rl:%llu) while decoding bm RLE packet\n",
++				 s, (unsigned long long)rl);
++			return -EIO;
++		}
++
+ 		if (toggle) {
+ 			e = s + rl -1;
+-			if (e >= c->bm_bits) {
+-				drbd_err(peer_device, "bitmap overflow (e:%lu) while decoding bm RLE packet\n", e);
+-				return -EIO;
+-			}
+ 			_drbd_bm_set_bits(peer_device->device, s, e);
+ 		}
+ 
+-- 
+2.43.0
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
-
-
-thanks,
-Ming
