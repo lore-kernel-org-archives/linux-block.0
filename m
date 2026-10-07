@@ -1,62 +1,64 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21B5332637
-	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 01:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7C93403F1
+	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 01:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791337392; cv=none; b=UTl3n9VqfaBd8SulpqgUV7qvYVwinMh97kddAcUShvCXt88b2gqEdkTDJbL5qfnFv3G/Qms5q/bCgIX/YqwTxBOQKiUEDB4vyjQZgubK2JJ/grbdMN4TjZYdQwN7mg4VCrfyFOEEVbt5eItaic2MvwL5jze41Q3NzmF2Zv7/eSU=
+	t=1791337394; cv=none; b=BSpLKoMiLfLD/JGmutg0hc5ksmX0u3AZkkOZbSsM+yYz1BBN5f6+uoIAym32CZmdwAlJGqyzeN+YVvCbJHH1eQg/umR0wl0y1x4+O6rLMLzDBq1nRt6Ien/vd04IYIPr/kSahxCcdKkLzSepExXdsI8y+BOwjZBrfT14MEsorl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791337392; c=relaxed/simple;
-	bh=rOFroLHcZ9vJ/CtI4ZEaKRG0FzGWCcmE9/Hztq/BZ+s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R8DTcaPoh87DsFI8tliq7Nx97WG4ucEJdp9r12Fsx+rCuB1bdDDcn2w8yzEZ0wU6GwF9PXzBWiYEEI5wzdHsad5x31ekc4mYsNNVINW5gE9WItwZr1BC89S7bbtIRoWQlclFS7rlZYyynyknxm9z/VE4qM9g7wENIYM4mZHM/kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xp3UaNhO; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1791337394; c=relaxed/simple;
+	bh=74XT/YcpL6u3pCQJh393Sbt1vl2bLCbf4FmkhI3qmoI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tITCZlqV2ZUT6iH7Qx81Ij587LqoTUHsAJiCNgl72VtVwpicWJJiHfGYI3WjbDBSKUID5Rk1vrKEhdUl5L1SjhP8en60q9QewmdYG2jgomiIbF0xnkhLMifH8TXYJNRZwHWywcsnSLRnjf7YsuZ+WFremv4D5TxqQqdFfdqt4wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W96iVFeW; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xp3UaNhO"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-49e73611928so8952125e9.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 18:43:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W96iVFeW"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4a161d9b8c7so9627925e9.3
+        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 18:43:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791337389; x=1791942189; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=fc70of9qa63H69HPY6cKldSOdAbIZywdpsgVw4Pfjac=;
-        b=Xp3UaNhOTStI1WfwK53zsneDHVAAad4P/MZIo3igWo454loYaJb49wapCAjVh1sxFS
-         GnpICV77CocjQFKTRS2lRDgzddm6SUi5Hd8G+13wGdnyc90eXOTeTjT11ApfDXYrwC15
-         2QLlL/M69jnpG+JtxORNPU8VVTAUwqMDTGpdbjzIMpqzvXeV2MJhpKqXsEkSximWfhqh
-         TTx82FYENgy1BJPeGyrJyiZigxuqYBhjkPyMmSxaBZGyik/24wA5+xjJVzDbnsBAUv2J
-         95725MXvsQNUCu/HC8I6EkISNrY/HAB9OZ20aTubglwL9irLGtCxQl7nn9OZzD7CV7Fw
-         QY5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791337389; x=1791942189;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1791337390; x=1791942190; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=fc70of9qa63H69HPY6cKldSOdAbIZywdpsgVw4Pfjac=;
-        b=AJzvAY5+jxZ5Z1xr0dkpIPKb8YoMi0lMcn+VmWscJJZBO52hchfNNU9dEtMsjPZlRO
-         ZaadYNiBvKZQLL0lPkPAwaKxdGKmJ77oIKdHniCGjJK/hSvjfrjd6mPXCraE74wD3Ejd
-         rK4OF8K57kRPswUh1w5obAVjgClpjt2y8VXgdYMvsejkrRAS6vpoCFaNWIPNM9CJrkNI
-         9AT9WWQZ0dOUtkZp7OvtOUWxA+N8jBUehfeN6q0ImFbzKVAbHy7qfE6NecR5mtvLGU6b
-         9LIRL4UJ1hN1EIXTrmNATeuG9w+YHZFyiBC3tB9OQdwuEnXt2gXkPJBCg2nuAIahSvwW
-         v2kw==
-X-Gm-Message-State: AFuF++krD/fvJ/SorkymYgzazIkhrtxh7b/tAyiFKpwGms52HmLxnjBZ
-	zeNrL0L55OoLao5bdraeCB50aAzZ4nrCp43675L9WyiTHUJGedVUTE5YRE4IKw==
-X-Gm-Gg: AYBFou0Iu7+5OIs344SQ0r0vx4RP8q8dV0qy61TZn4wY6ZVAFMbGrxaFvS3Bk8HzoIZ
-	t/eLomjoOcXqHJdKGbM1dQdG20y0ZbAIAfpPAgbb3jLjgLlOSIRe9fuW7N3dW/KvwX7ezlroV9V
-	UyapRJmcmTed4X4qQ5WsqG0A7raGaVEAOj56XuODmTH2aDgZAbkonSANF98eftl1i6ViO0Swb91
-	wpqNyQ1YI4oGU7pH8hn/h/6hYiecTxrjFOO5ITOzT4l3AvaydadMniN2RNYUap+ejypMMuVtHB9
-	aTMPKtzrR4bnTCnzk6+1f/JGXHoEI9e0S/dY7aRec2bFHOfNQYV5v9q36AhDC62Q8kUqBwbBOcj
-	MlCqQgFF5zPMqOFQt8iC1oycwLE2rtvaTFfttHoPy3JKcYruifHNRQK+1p64qglmVDk4OeRXVQb
-	GIZGm5IpC6AmPKcykxZT1vQbY+29xrj5FPcr0467TnE8/A9phZpnwvwNiJkDVdsfHtDeFTKpwnl
-	AVw+TOOwsS1gMh1Cu9/kKKPZ1ir2sqfEbo6v/jmsQ1tGQ8Tq4H9afbvzzcvgYIdec0bcfYq0jwG
-	vmDMdvC08B8=
-X-Received: by 2002:a05:600c:820d:b0:4a1:7a1e:6910 with SMTP id 5b1f17b1804b1-4a1802ea26fmr8467945e9.4.1791337389107;
-        Tue, 06 Oct 2026 18:43:09 -0700 (PDT)
+        bh=A+VjBFsuZYeJUSxMs311afilNm9e5ulL53j6D1D3BK4=;
+        b=W96iVFeWOzmqA6XJi5NljeTN4azUolJRUgjDDT3st0QZod2unj0NodvUtlhWuL0FL+
+         /uylAVmnbshvk5Zs+p9mtt9OK+yKy6VTNxfBsf1dGAjoapr5pBoSz24oZEzHm/Ob6Pac
+         Vn4msF78A3EPoAn5cY5lUodWNGFfPuvf5jMcLXktg//6nVHmHq8iUaX29hqw/fYHjO0P
+         /9BdCO07ySsIq6xpd43QRBAQpnkDtzd1e9nPMcd7R+F48F+1CXaJt2rVQFaomJqqyst3
+         9gDsd7WTBvt+vUSb2EN5g49uRAeb58VJp2G9LE3a+dGdFgYcymcFwGfgCXn69F9N2SlO
+         eJsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791337390; x=1791942190;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=A+VjBFsuZYeJUSxMs311afilNm9e5ulL53j6D1D3BK4=;
+        b=X0Vu42zC/UYz6l7lWAITJOb3xnUB/rk08eRnSYnk8H8Sq42IoxcgTfRGpkX7GaVblF
+         s5DsLVa+mqWDbi/cKBbnOH0WK0d41z2du68y5sAORehYjdsUJ1KNSwBRVvmDAxz3ix7D
+         NtOVOjLFOo1MF1pAw3r3hCRZACzEu9USZOIoyWrTq/E92wX/M9a9RaIR3E3Wm3FMVA9y
+         rtcO11bpMiEgn56tQ0tDYeR9P9q+lUe2Cx/wZsjwNMeBs2NEmoSb4tYAYROnKwnQCX72
+         a/MHS7rDLhv4jWTkxDTuHpg/Dq0tE2wjiaz8sbAVgUPuNfUzXhCg20UIXpIyEmtfsbfE
+         eqSg==
+X-Gm-Message-State: AFuF++lGLV0rq+K3gos0TRFfqwze+pJd/CmevcHkIK25sBV8fftbj/Q+
+	1tu+sgxJzlAONjvJYocQiub4RY8z1HAyRM82OfOy2/gALLNd3a/wCcgg7HDUjw==
+X-Gm-Gg: AYBFou3gf3G3YjHyNEP0aTJ7EvW3czV9WnO1S8wtUPRnVaXUn/6nmZC9GUepcc3JDB/
+	/hndAHboTwLkii9y1kTO6JxRfJ/D5BJDOvQ7JhG/SizQAYSU8flieYLeMBvNr4J7tql/ykOAmE7
+	ckvlh0XNGSqhQ+8EKGldiXOf3XyrKEi5823GJszty4vxNK8dbnl1CVBkolQ433iiqplmjp7ZfXu
+	YHCGE+DJJ5O1+nMaEfg+r5gtUJDihulZgGWvA5r7nNwY585ibQjinRNWNIrhSJo6OAVdJmxkFYO
+	SKHUskZubXOeBMl1H3ZFv+lz6XDtbb6vN9Eqj8GEtoQUl5MFPqEEM6qgnR+0zME2RiQq7I6Dj58
+	pqTHyG2mxU50U7+jizUBoT1rVGvw6N7kLJCcHsNi4TqXkqgiYARQk+zBhfTlDp+kY7dCX6jF/RH
+	bd7apAlGtMVRg5atLpaL/cd1N12v9PcU3B+1RncKCFShg+VHOH9LG4HbOubKRFxYNKDo0Ec2jes
+	izn6ODd6m1KxvyppAjtJkO+eI2WiWQg1f50iT7nd9up5qkyucTptK2irgYol2jlB2XI/V/GgdQ5
+	qu5GFEWAHvc=
+X-Received: by 2002:a05:600c:a00e:b0:4a0:1a18:b742 with SMTP id 5b1f17b1804b1-4a1800d3de4mr8466785e9.2.1791337390371;
+        Tue, 06 Oct 2026 18:43:10 -0700 (PDT)
 Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a17f653d7csm26423895e9.14.2026.10.06.18.43.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a17f653d7csm26423895e9.14.2026.10.06.18.43.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 18:43:08 -0700 (PDT)
+        Tue, 06 Oct 2026 18:43:09 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: linux-block@vger.kernel.org
 Cc: asml.silence@gmail.com,
@@ -88,10 +90,12 @@ Cc: asml.silence@gmail.com,
 	Mikulas Patocka <mpatocka@redhat.com>,
 	Benjamin Marzinski <bmarzins@redhat.com>,
 	dm-devel@lists.linux.dev
-Subject: [PATCH v9 00/13] Add dmabuf read/write via io_uring
-Date: Wed,  7 Oct 2026 02:42:43 +0100
-Message-ID: <cover.1791336930.git.asml.silence@gmail.com>
+Subject: [PATCH v9 01/13] dma-buf: introduce initial file I/O infrastructure
+Date: Wed,  7 Oct 2026 02:42:44 +0100
+Message-ID: <b44df9fed6e346110c504ee312bb0083c7e75574.1791336930.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <cover.1791336930.git.asml.silence@gmail.com>
+References: <cover.1791336930.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -100,172 +104,377 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The patch set allows to register a dmabuf to an io_uring instance for
-a specified file and use it with io_uring read / write requests. The
-infrastructure is not tied to io_uring and there could be more users
-in the future. A similar idea was attempted some years ago by Keith [1],
-from where I borrowed a number of changes. Later it was brough back up
-to life by Tushar and Vishal.
+The goal is to be able to natively use dma-buf in the read-write / IO
+path. This patch adds basic building blocks serving as a glue and API
+between drivers and upper layer subsystems providing the uAPI. Later
+patches implement it for NVMe raw block devices and expose it to the
+user space via io_uring.
 
-It's an opt-in feature for files, and they need to implement a new
-file operation to use it. Only NVMe block devices are supported in this
-series. The user API is built on top of io_uring's "registered buffers",
-where a dmabuf is registered in a special way, but after it can be used
-as any other "registered buffer" with IORING_OP_{READ,WRITE}_FIXED
-requests. It's created via a new file operation and the resulted map is
-then passed through the I/O stack in a new iterator type. There is some
-additional infrastructure to glue it together, count requests, manage
-lifetime and implement invalidation.
+There are two main objects. struct dma_buf_io_ctx and struct
+dma_buf_io_map. The ctx is used during initial registration and serves
+as an interface between the upper layer user like io_uring and to the
+importer subsystem / driver. The map represents the actual dma map
+established for the target device[s] with dma_buf_map_attachment() and
+stored in a device specific format. The context is created via a new
+file operation ->init_dma_buf_io_ctx.
 
-Tushar, William, Phil did a lot of testing and experimentation on various
-devices with previous versions of the patch set, and I've received lots
-of help from Anuj, Kanchan and Nitesh with investigations, testing, and
-patching. Earlier benchmarks by Anuj for IOMMU optimisations with udmabuf
-showed:
+The ctx-map separation exists to facilitate map invalidation (see
+dma_buf_io_invalidate_mappings()). A ctx can create
+multiple maps during its lifetime, but there can only be no more than
+one (active) map attached to it. Invalidation drops the active map
+if present, and any new I/O request will try to create a new one.
 
-STRICT: before = 570 KIOPS, after = 5.01 MIOPS
-LAZY: before = 1.93 MIOPS, after = 5.01 MIOPS
-PASSTHROUGH: before = 5.01 MIOPS, after = 5.01 MIOPS
+The primary task of dma_buf_io_map is to count requests using it
+and wait for their completion when we want to destroy the DMA map.
 
-# Patch set structure:
-- Patches 1-2 introduce internal API and infrastructure mediating
-  io_uring and target subsystem / devices
-- Patches 3-5: block layer support + prep patches
-- Patches 6-8 implement NVMe support
-- Patches 9-13 add io_uring support and uapi.
+[un]mapping and any work with dma addresses is delegated to the
+importer driver via an ops table stored in the ctx, see struct
+dma_buf_io_ops. Only the target driver / subsystem knows about devices
+it wants to use the dma-buf with, especially in case of multi-device
+filesystems or stacking in the future.
 
-There are some liburing tests that can serve as an example:
-git: https://github.com/isilence/liburing.git rw-dmabuf-tests-v8
-url: https://github.com/isilence/liburing/tree/rw-dmabuf-tests-v8
-
-The patches are based on Jens' for-next. Also available as a branch:
-git: https://github.com/isilence/linux.git rw-dmabuf-v9
-url: https://github.com/isilence/linux/tree/rw-dmabuf-v9
-
-[1] https://lore.kernel.org/io-uring/20220805162444.3985535-1-kbusch@fb.com/
-
-v9 - resend
-
-v8: - fix blkdev_buffered_write() returning 0
-    - fix kvmalloc-kfree mismatch
-    - fix invalidation hang
-    - remove cpu dma sync as unnecessary for dev-to-dev transfers
-    - move nvme dma-buf code into a new file
-    - tighten dma-buf [re]export around io_uring issue
-    - simplify dma-buf-io locking/sync as proposed by Matthew Brost
-
-v7: - refcount *_io_ctx 
-    - wait rcu grace period for ctx->map before freeing maps
-    - increment map counters under dma resv lock
-    - more comments about bio splitting
-    - make ->unmap responsible for freeing maps to match ->map
-    - replace dma_sync_single* with full table sync
-    - detach dma-buf on nvme reset after cancel nvme_cancel_tagset
-
-v6: - remove fences and wait on invalidation synchronously
-    - report all map requests are detached earlier, outside of wq
-    - handle nvme removal
-    - gate nvme_free_descriptors() on iod->nr_descriptors 
-    - fix error handling in nvme_rq_setup_dmabuf_map() 
-    - fix iov_iter_alignment()
-    - relax the 1G io_uring registered dma-buf limit
-    - fix type overflow issue in bio split
-    - allocate struct dma_buf_io_ctx inside the dma-buf-io code
-    - harden block checks against dma-buf + buffered io
-
-v5: - Reject dma-buf with buffered IO for raw bdev
-    - Add lim->max_segments bio splitting
-    - Add bio_iov_iter_set() helper
-    - Fix io_uring uapi validation
-    - Other minor changes
-    NVMe:
-    - Rename nvme_pci_sgl_set_data() to nvme_pci_dma_iter_set_sgl(), split 
-      into its own prep patch.
-    - Convert segment walk loops to do-while.
-    - Drop adjacent segment coalescing logic.
-    - Drop first_dma/first_len from nvme_pci_dmabuf_sgl_nents()
-    - Remove entries > NVME_MAX_SEGS bailout; moving to the block layer.
-    - Factor SGL vs PRP decision making into a helper.
-
-v4: - https://lore.kernel.org/all/cover.1785274111.git.asml.silence@gmail.com/
-    - Add sgl support from Anuj
-    - Move it under drivers/dma-buf/ and rename
-    - Fix mis-sized allocations
-    - Fix io_uring re-import mishandling
-    - Drop map before io_uring "task work"
-    - Move blk-mq callback to block_device_operations
-    - Convert bio flag to REQ_OP*
-    - Other small changes
-
-v3: https://lore.kernel.org/io-uring/cover.1777475843.git.asml.silence@gmail.com/
-    - Rework io_uring registration
-    - Move token/map infrastructure code out of blk-mq
-    - Simplify callbacks: remove a separate blk-mq table, which was
-      mostly just forwarding calls (to nvme).
-    - Don't skip dma sync depending on request direction
-    - Fix a couple of hangs
-    - Rename s/dma/dmabuf/
-    - Other small changes
-
-v2: - Don't pass raw dma addresses, wrap it into a driver specific object
-    - Split into two objects: token and map
-    - Implement move_notify
-
-Anuj Gupta (2):
-  nvme-pci: rename nvme_pci_sgl_set_data to nvme_pci_dma_iter_set_sgl
-  nvme-pci: add SGL support for the dmabuf path
-
-Pavel Begunkov (11):
-  dma-buf: introduce initial file I/O infrastructure
-  iov_iter: add iterator type for dmabuf maps
-  block: always adjust bi_offset on bio_advance_iter
-  block: introduce dma map backed bio type
-  block: add dma-buf support for raw bdev
-  nvme-pci: implement dma-buf backed requests
-  io_uring/rsrc: introduce buf registration structure
-  io_uring/rsrc: extend buffer update
-  io_uring/rsrc: add uncloneable regbuf flag
-  io_uring/rsrc: add regbuf import flags
-  io_uring/rsrc: add dmabuf backed registered buffers
-
- block/bio.c                    |  15 +-
- block/blk-merge.c              |  50 +++++++
- block/fops.c                   |  24 +++-
- drivers/dma-buf/Makefile       |   2 +-
- drivers/dma-buf/dma-buf-io.c   | 183 ++++++++++++++++++++++++
- drivers/md/dm-io-rewind.c      |   6 +-
- drivers/nvme/host/Makefile     |   1 +
- drivers/nvme/host/core.c       |  12 ++
- drivers/nvme/host/nvme.h       |   2 +
- drivers/nvme/host/pci-dmabuf.c | 164 ++++++++++++++++++++++
- drivers/nvme/host/pci-dmabuf.h |  73 ++++++++++
- drivers/nvme/host/pci.c        | 249 ++++++++++++++++++++++++++++++++-
- include/linux/bio.h            |  21 +--
- include/linux/blk-mq.h         |   7 +
- include/linux/blk_types.h      |  14 +-
- include/linux/blkdev.h         |   2 +
- include/linux/bvec.h           |   3 +-
- include/linux/dma-buf-io.h     | 105 ++++++++++++++
- include/linux/fs.h             |   2 +
- include/linux/io_uring_types.h |   5 +
- include/linux/iov_iter.h       |   2 +
- include/linux/uio.h            |  11 ++
- include/uapi/linux/io_uring.h  |  31 +++-
- io_uring/Makefile              |   1 +
- io_uring/dma-buf.c             |  68 +++++++++
- io_uring/dma-buf.h             |  67 +++++++++
- io_uring/rsrc.c                | 172 +++++++++++++++++------
- io_uring/rsrc.h                |  32 ++++-
- io_uring/rw.c                  |  33 +++--
- lib/iov_iter.c                 |  29 +++-
- 30 files changed, 1301 insertions(+), 85 deletions(-)
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ drivers/dma-buf/Makefile     |   2 +-
+ drivers/dma-buf/dma-buf-io.c | 183 +++++++++++++++++++++++++++++++++++
+ include/linux/dma-buf-io.h   | 105 ++++++++++++++++++++
+ include/linux/fs.h           |   2 +
+ 4 files changed, 291 insertions(+), 1 deletion(-)
  create mode 100644 drivers/dma-buf/dma-buf-io.c
- create mode 100644 drivers/nvme/host/pci-dmabuf.c
- create mode 100644 drivers/nvme/host/pci-dmabuf.h
  create mode 100644 include/linux/dma-buf-io.h
- create mode 100644 io_uring/dma-buf.c
- create mode 100644 io_uring/dma-buf.h
 
+diff --git a/drivers/dma-buf/Makefile b/drivers/dma-buf/Makefile
+index b25d7550bacf..523731b0f83e 100644
+--- a/drivers/dma-buf/Makefile
++++ b/drivers/dma-buf/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ obj-y := dma-buf.o dma-fence.o dma-fence-array.o dma-fence-chain.o \
+-	 dma-fence-unwrap.o dma-resv.o dma-buf-mapping.o
++	 dma-fence-unwrap.o dma-resv.o dma-buf-mapping.o dma-buf-io.o
+ obj-$(CONFIG_DMABUF_HEAPS)	+= dma-heap.o
+ obj-$(CONFIG_DMABUF_HEAPS)	+= heaps/
+ obj-$(CONFIG_SYNC_FILE)		+= sync_file.o
+diff --git a/drivers/dma-buf/dma-buf-io.c b/drivers/dma-buf/dma-buf-io.c
+new file mode 100644
+index 000000000000..9ba9c17f900a
+--- /dev/null
++++ b/drivers/dma-buf/dma-buf-io.c
+@@ -0,0 +1,183 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Common infrastructure for supporing dma-buf in the I/O path.
++ *
++ * Copyright (C) 2026 Pavel Begunkov <asml.silence@gmail.com>
++ */
++#include <linux/dma-buf-io.h>
++#include <linux/dma-resv.h>
++
++static void dma_buf_io_map_release(struct dma_buf_io_map *map)
++{
++	struct dma_buf_io_ctx *ctx = map->ctx;
++
++	dma_resv_assert_held(ctx->dmabuf->resv);
++
++	percpu_ref_exit(&map->refs);
++	ctx->dev_ops->unmap(ctx, map);
++}
++
++static void dma_buf_io_map_refs_cb(struct percpu_ref *ref)
++{
++	struct dma_buf_io_map *map = container_of(ref, struct dma_buf_io_map, refs);
++
++	complete(&map->drained);
++}
++
++static void dma_buf_io_kill_map(struct dma_buf_io_ctx *ctx)
++{
++	struct dma_buf_io_map *map;
++
++	dma_resv_assert_held(ctx->dmabuf->resv);
++
++	map = rcu_dereference_protected(ctx->map,
++				dma_resv_held(ctx->dmabuf->resv));
++	if (!map)
++		return;
++
++	rcu_assign_pointer(ctx->map, NULL);
++	percpu_ref_kill(&map->refs);
++	/* make sure the map is not visible via ctx->map */
++	synchronize_rcu_expedited();
++	wait_for_completion(&map->drained);
++	dma_buf_io_map_release(map);
++}
++
++int dma_buf_io_init_map(struct dma_buf_io_ctx *ctx, struct dma_buf_io_map *map,
++			struct sg_table *sgt)
++{
++	unsigned seg_shift = ~0U;
++	struct scatterlist *sg;
++	unsigned long tmp;
++	int ret;
++
++	for_each_sgtable_dma_sg(sgt, sg, tmp)
++		seg_shift = min(seg_shift, __ffs(sg_dma_len(sg)));
++
++	ret = percpu_ref_init(&map->refs, dma_buf_io_map_refs_cb, 0, GFP_KERNEL);
++	if (ret)
++		return ret;
++	init_completion(&map->drained);
++	map->min_seg_shift = seg_shift;
++	map->ctx = ctx;
++	return 0;
++}
++EXPORT_SYMBOL_NS_GPL(dma_buf_io_init_map, "DMA_BUF");
++
++static struct dma_buf_io_map *__dma_buf_io_create_map(struct dma_buf_io_ctx *ctx)
++{
++	struct dma_buf *dmabuf = ctx->dmabuf;
++	struct dma_buf_io_map *map;
++	long ret;
++
++	dma_resv_assert_held(dmabuf->resv);
++
++	if (ctx->is_dead)
++		return ERR_PTR(-ENOENT);
++
++	map = __dma_buf_io_get_map(ctx);
++	if (map)
++		return map;
++
++	map = ctx->dev_ops->map(ctx);
++	if (IS_ERR(map))
++		return map;
++
++	if (WARN_ON_ONCE(!map->min_seg_shift))
++		return ERR_PTR(-EFAULT);
++
++	ret = dma_resv_wait_timeout(dmabuf->resv, DMA_RESV_USAGE_KERNEL,
++				    true, MAX_SCHEDULE_TIMEOUT);
++	if (ret <= 0) {
++		if (!ret)
++			ret = -EAGAIN;
++		dma_buf_io_map_release(map);
++		return ERR_PTR(ret);
++	}
++
++	/* get a reference for the caller */
++	percpu_ref_get(&map->refs);
++	rcu_assign_pointer(ctx->map, map);
++	return map;
++}
++
++struct dma_buf_io_map *dma_buf_io_create_map(struct dma_buf_io_ctx *ctx)
++{
++	struct dma_buf_io_map *map;
++	int ret;
++
++	ret = dma_resv_lock_interruptible(ctx->dmabuf->resv, NULL);
++	if (ret)
++		return ERR_PTR(ret);
++
++	map = __dma_buf_io_create_map(ctx);
++	dma_resv_unlock(ctx->dmabuf->resv);
++	return map;
++}
++
++static void dma_buf_io_ctx_shutdown(struct dma_buf_io_ctx *ctx)
++{
++	dma_resv_lock(ctx->dmabuf->resv, NULL);
++	ctx->is_dead = true;
++	dma_buf_io_kill_map(ctx);
++	dma_resv_unlock(ctx->dmabuf->resv);
++}
++
++int dma_buf_io_ctx_create(struct file *file,
++			   struct dma_buf *dmabuf,
++			   enum dma_data_direction dir,
++			   struct dma_buf_io_ctx **out_ctx)
++{
++	struct dma_buf_io_ctx *ctx;
++	int ret;
++
++	if (!file->f_op->init_dma_buf_io_ctx)
++		return -EOPNOTSUPP;
++
++	ctx = kzalloc_obj(*ctx);
++	if (!ctx)
++		return -ENOMEM;
++	ctx->dir = dir;
++	ctx->dmabuf = dmabuf;
++	get_dma_buf(dmabuf);
++
++	ret = file->f_op->init_dma_buf_io_ctx(file, ctx);
++	if (ret) {
++		kfree(ctx);
++		dma_buf_put(dmabuf);
++		return ret;
++	}
++
++	if (WARN_ON_ONCE(!ctx->dev_ops ||
++			 !ctx->dev_ops->map ||
++			 !ctx->dev_ops->unmap ||
++			 !ctx->dev_ops->release))
++		return -EINVAL;
++
++	*out_ctx = ctx;
++	return 0;
++}
++
++void dma_buf_io_ctx_release(struct dma_buf_io_ctx *ctx)
++{
++	dma_buf_io_ctx_shutdown(ctx);
++
++	if (WARN_ON_ONCE(rcu_dereference_protected(ctx->map, true)))
++		return;
++
++	ctx->dev_ops->release(ctx);
++	dma_buf_put(ctx->dmabuf);
++	kfree(ctx);
++}
++
++void dma_buf_io_invalidate_mappings(struct dma_buf_io_ctx *ctx)
++{
++	dma_buf_io_kill_map(ctx);
++}
++EXPORT_SYMBOL_NS_GPL(dma_buf_io_invalidate_mappings, "DMA_BUF");
++
++void dma_buf_io_detach(struct dma_buf_io_ctx *ctx)
++{
++	dma_buf_io_ctx_shutdown(ctx);
++}
++EXPORT_SYMBOL_NS_GPL(dma_buf_io_detach, "DMA_BUF");
+diff --git a/include/linux/dma-buf-io.h b/include/linux/dma-buf-io.h
+new file mode 100644
+index 000000000000..8ac338df51ff
+--- /dev/null
++++ b/include/linux/dma-buf-io.h
+@@ -0,0 +1,105 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __DMA_BUF_IO_H__
++#define __DMA_BUF_IO_H__
++
++#include <linux/dma-buf.h>
++
++struct dma_buf_io_ctx;
++struct dma_buf_io_map;
++
++struct dma_buf_io_ops {
++	/*
++	 * Create a new map for the given ctx. Called with the reservation
++	 * lock held.
++	 */
++	struct dma_buf_io_map *(*map)(struct dma_buf_io_ctx *ctx);
++
++	/*
++	 * Clean up device specific parts of the @map. Called with the
++	 * reservation lock held.
++	 */
++	void (*unmap)(struct dma_buf_io_ctx *ctx, struct dma_buf_io_map *map);
++
++	/*
++	 * The user tries to destroy the ctx. Release all device specific
++	 * parts of the token.
++	 */
++	void (*release)(struct dma_buf_io_ctx *);
++};
++
++struct dma_buf_io_map {
++	/*
++	 * Counts attached requests and other users. Device specific unmapping
++	 * is deferred until all refs are dropped.
++	 */
++	struct percpu_ref		refs;
++	/*
++	 * Shift for the minimum segment size of the mapping.
++	 */
++	unsigned			min_seg_shift;
++
++	struct dma_buf_io_ctx		*ctx;
++	struct completion		drained;
++};
++
++struct dma_buf_io_ctx {
++	struct dma_buf_io_map __rcu		*map;
++	struct dma_buf				*dmabuf;
++	enum dma_data_direction			dir;
++	bool					is_dead;
++
++	void					*dev_priv;
++	const struct dma_buf_io_ops		*dev_ops;
++};
++
++int dma_buf_io_ctx_create(struct file *file,
++			   struct dma_buf *dmabuf,
++			   enum dma_data_direction dir,
++			   struct dma_buf_io_ctx **ctx);
++void dma_buf_io_ctx_release(struct dma_buf_io_ctx *ctx);
++
++struct dma_buf_io_map *dma_buf_io_create_map(struct dma_buf_io_ctx *ctx);
++
++static inline struct dma_buf_io_map *
++__dma_buf_io_get_map(struct dma_buf_io_ctx *ctx)
++{
++	struct dma_buf_io_map *map;
++
++	guard(rcu)();
++
++	map = rcu_dereference(ctx->map);
++	if (unlikely(!map || !percpu_ref_tryget_live_rcu(&map->refs)))
++		return NULL;
++
++	return map;
++}
++
++static inline struct dma_buf_io_map *
++dma_buf_io_get_map(struct dma_buf_io_ctx *ctx, bool nowait)
++{
++	struct dma_buf_io_map *map;
++
++	map = __dma_buf_io_get_map(ctx);
++	if (likely(map))
++		return map;
++
++	if (nowait)
++		return ERR_PTR(-EAGAIN);
++	return dma_buf_io_create_map(ctx);
++}
++
++static inline void dma_buf_io_map_drop(struct dma_buf_io_map *map)
++{
++	percpu_ref_put(&map->refs);
++}
++
++/*
++ * Device API
++ */
++
++void dma_buf_io_invalidate_mappings(struct dma_buf_io_ctx *ctx);
++int dma_buf_io_init_map(struct dma_buf_io_ctx *ctx, struct dma_buf_io_map *map,
++			struct sg_table *sgt);
++void dma_buf_io_detach(struct dma_buf_io_ctx *ctx);
++
++#endif
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index f9d1e05e8ae6..05c1ff495732 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1914,6 +1914,7 @@ struct dir_context {
+ #define COPY_FILE_SPLICE		(1 << 0)
+ 
+ struct io_uring_cmd;
++struct dma_buf_io_ctx;
+ struct offset_ctx;
+ 
+ struct file_operations {
+@@ -1960,6 +1961,7 @@ struct file_operations {
+ 	int (*uring_cmd_iopoll)(struct io_uring_cmd *, struct io_comp_batch *,
+ 				unsigned int poll_flags);
+ 	int (*mmap_prepare)(struct vm_area_desc *);
++	int (*init_dma_buf_io_ctx)(struct file *, struct dma_buf_io_ctx *);
+ } __randomize_layout;
+ 
+ /* Supports async buffered reads */
 -- 
 2.54.0
 
