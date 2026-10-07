@@ -1,68 +1,33 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356B62C1788
-	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 14:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418B5492E5D;
+	Wed,  7 Oct 2026 14:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791381941; cv=none; b=YSK7YrmDTBtxYdxYQQDvhRSClZeF+1w6zYFLeXk20tFBqRbtIrcRaNgalPGD/Dx29IKIS7QrqkVXaydy02vfosr8h+nnHJWHPeK5+QLYqK0Hz8cvCxQpkK51PByb9LlV9jcYfjcZ3R9OdSt2auKpli0fSSbxN5ngCbXciE6h6CE=
+	t=1791383503; cv=none; b=jJxyncRET8FwZ8EGwKqsN19JSEg+MT4AzfXvZT/L42oYX19vMUoSLCa2HZkj+B+Kacf6ClITC3qPNi4vojDN1QxKPnK1pf6m1MVtqSCpqCctIEIKqz6FAPEzR6mYeaZ9K5We0Wgj3Cr7Y4WrrSXBS12lMN5V5iZX2EIrHt+bHu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791381941; c=relaxed/simple;
-	bh=V7wCXFfMiY8I3U4QW7xgovTFawhq2OF8NsZcAprNCLc=;
+	s=arc-20240116; t=1791383503; c=relaxed/simple;
+	bh=BS9M//oQZOQJced0Q6bIEbQyo5kBMEyRMzQ0Sx1ac1A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bRbgJjcM/z+uHHxwQBMhV9i229g93NZ8RuTKYcSeezJCB9sa2zs9oOGG+MwD4uJSlYJG5s+Uw2o5kMXW2BOCqevhsRvAwn/A/Bxla7DrA0GTdObLxckWpe/alzWyz409cI0D1taS5hOkQA7cOk2/FLVISmVq2mO+Hf6GY04Ym7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=PDA4CzXZ; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=Bh8P5EZo5dNM1LKmbixma/23LCwWEum0xYqbRgVCGDGXo8eNBs5kGiPMYfBUBBhofDuDxE/KWa/pdLRiJAAKnSzWhNumyaBa9d4VbKPnvlvVnC6BCTHTyI/U1cxtlb6Dkkzg3ZffIPaKxgjNaBdqLsIGho3NXVjpS5NtiGGM05g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ax6dbSpY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="PDA4CzXZ"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3a0a911e8d6so2093870a91.1
-        for <linux-block@vger.kernel.org>; Wed, 07 Oct 2026 07:05:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1791381933; x=1791986733; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=2tZULonu7kKZiIqDdMHG3M16ndJSJFse/YYFR6ZGm68=;
-        b=PDA4CzXZVp6XIMVR4rSohNCjpWBfkxope7IT5M2ZWrsgom480Z/UP01vKISCHF2G2Z
-         CCpY+z5xLDtaGFvhS2U/L74Jm9YVzBJVqHUn+OBzaPEXtDCna5adkSXhG8h6FFIQ87ks
-         LvJEMmHWWSyWBy9scoIlPZjgNX/EtGID24DRyYNg2B9sfk8OkpbDxeuXhUeNjhJwEpmm
-         heiICQJXz+gjxuQXlR6+Pz3YwyEj1fXtUCkRotDcOuNbpEmrhtt7LAM8WvS6CF43vj7L
-         Vne4sw9XzFQ19KaacvBgudTsfUoept3pFiO5znr3scvW1kgrig6bjCR/tRiZI6VBFc+2
-         rJHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791381933; x=1791986733;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=2tZULonu7kKZiIqDdMHG3M16ndJSJFse/YYFR6ZGm68=;
-        b=R0Hx/oowZ/HNH+LBTrJjhxV3g1zxFPS7EnoECd3cfOgvHpnYcLyMcMxOcQEFWqI8wa
-         Z9M46QR4Zk9SvFq69ziWtQc4X+D4nvk9Nbj+RnFOtSudHKzr7c+ka92x/vj8fsHZ3mQX
-         ME6+xZEM1bO8KD1Co3sZ5Sx3IhKTJgOKiTOnjKPFoY6JA0+JFDaI/zXAQJVkcVWQRtqP
-         LzTyGVATfCMR6gn2onBCG+cQ0M5bY0Dn6qtCwBrrNq7b1CKNhly4LAIhu2eIggh5atZt
-         nx8xeDnMToCii5VePTbnoavK7ozbi6qPfluzQc7d5uILwYWJwUdlFNHGfrMkPcOcfdlN
-         H9Tw==
-X-Forwarded-Encrypted: i=1; AKwUvBxt+FqZ820tQq67gecW8J1ejNxXiLVpWM5ax4V3c3mMd7VffPIKONLV5/Fj+a+tNwgdDUmbH/z7jbGsHw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIuZ+e6pBZzsQroaUTTdLwBsnXWyjpIAMOXTbQMDEXNp6k45l6R
-	2TwTZrsf8DtR+P+9SxHlfaYPcwx2sIet2YuH6okOnNRGQjbkD8preV71tfDIddkPndE=
-X-Gm-Gg: AYBFou0iI0gRZR3tjTdMB/QR2oKxMy1OV9AsX9W9xHkpyanNhxzUr8YB4Uuk2u7u6Cn
-	WmcUgD6KLXFgy9/GSI4Euw2r/+6o8BQzrpnhSeIu88RA1M6xmCc8vtxthTF3FQOWmDuMamNPhKG
-	/sg3g5ZkwLvKKEBo2FF7KvDyVPB7BtiAQmorx2okO4ndG0gkbxQGUqWR9lFpjXu8XL4nTgccFmC
-	8qT6rqJkKzkXg/AH5c4yqH7Dp+fNbG+Hsw1zVv01T7KT1/Xxx4z00m9mHCU9J+bkoEB+j2PLrkb
-	WN75VJX+AIhiShnZ6FqHk/0JOWpnMkfXUGXmESwIsVlCN5eqytCjXKcYv4zzQuzoQZJyb4Yp8N/
-	dSSx4mtJ+jf1gX1ioU0ylBDhFmCHM/jMvpupD/NFHKtsIeUaPRcd/XlBP3puVxJL75rBdwZbiUg
-	iY9M/f0gQo8Z6ymI/TeGu0frMSg6fbVeOvKwVIAJ63XjK/X5vfycetyie+o1tFlEPcWvAHVS7SQ
-	7VDp3Vx+3FFEI5HF4dTvFO++WCp+jch2xmGyx1TJPNo5qmdlpxTo6b4+A==
-X-Received: by 2002:a17:90b:4d02:b0:3a4:6f38:f2a2 with SMTP id 98e67ed59e1d1-3a8a1ac0562mr1978385a91.25.1791381933049;
-        Wed, 07 Oct 2026 07:05:33 -0700 (PDT)
-Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a8543b0c1fsm13716636a91.14.2026.10.07.07.05.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Oct 2026 07:05:32 -0700 (PDT)
-Message-ID: <960b1305-c5a6-4554-8bab-1cf4244fa11b@kernel.dk>
-Date: Wed, 7 Oct 2026 08:05:23 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ax6dbSpY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7EE91F0089B;
+	Wed,  7 Oct 2026 14:31:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791383499;
+	bh=3coKYYmHCujO5E+dsek64SjGAecOQubds/IWYX/LEV8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=ax6dbSpYIgF309W8djwZk38JRV6uzH4fmtkWdazDc6Qr2tYTzk3CXqQwOTIMU/iWd
+	 jR23AeYzskyZA+5qCspSelAhNZH8fTvlpBL5j11WD/Oi8y0relTmC5h7y4LDUan0qI
+	 XZQtFpxqVCIdpinwh4KlDjtaygZedq2OC8/ziftZhHO4YrjvNlVdJODC2yDo+lzFpu
+	 oOTQPgcRnfmci0ILY2kkGdzSiD1CLmId/9DexK367Qr6CnXtcN/4NTvwM5N9hY5Xtl
+	 6EsHPKB3JGZJbEsv4w/88ytjqYJigqET7ga/85fDGlk9/5KsLDcZGle5fz4PHt3aVg
+	 ehM2m7cvheUzg==
+Message-ID: <777cbd7d-0ea6-4263-9dfa-92f3422d5330@kernel.org>
+Date: Wed, 7 Oct 2026 16:31:36 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,61 +35,34 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/9] block device fixes for large block sizes,
- IOCB_NOWAIT, and direct I/O
-To: Tal Zussman <tz2294@columbia.edu>, Christoph Hellwig <hch@lst.de>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- John Garry <john.garry@linux.dev>, Christian Brauner <brauner@kernel.org>,
- "Darrick J. Wong" <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
- "Martin K. Petersen" <mkp@kernel.org>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- Sashiko <sashiko-bot@kernel.org>
-References: <20260923-blkdev-fixes-v5-0-89e60d66eb38@columbia.edu>
+Subject: Re: [PATCH v3 1/7] block: fail reads to offline zones early
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, "Martin K . Petersen"
+ <martin.petersen@oracle.com>
+References: <20261007082344.1049179-1-dlemoal@kernel.org>
+ <20261007082344.1049179-2-dlemoal@kernel.org> <20261007132905.GA31906@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260923-blkdev-fixes-v5-0-89e60d66eb38@columbia.edu>
+Organization: Western Digital Research
+In-Reply-To: <20261007132905.GA31906@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 9/23/26 5:56 PM, Tal Zussman wrote:
-> A set of independent fixes for the block device file operations. The
-> first two were found by Sashiko while reviewing the RWF_DONTCACHE series
-> [1]. The fourth and fifth were found by Sashiko's review of v1 of this
-> series, and the rest came from asking an LLM to find any similar or
-> related issues. Each issue has been reproduced, with the fixes resolving
-> the issues.
+On 2026/10/07 15:29, Christoph Hellwig wrote:
+> On Wed, Oct 07, 2026 at 05:23:38PM +0900, Damien Le Moal wrote:
+>> Any BIO targeting an offline zone of a zoned block device will fail,
+>> including read commands. So there is no point in issuing read BIOs.
+>> Fail these read operations early if we ever see one.
 > 
-> Patch 1 fixes silently lost mmap writes with CONFIG_BUFFER_HEAD=n.
-> 
-> Patches 2 and 3 take i_rwsem around the direct I/O write fallback and
-> the splice read path, which race set_blocksize() changing the mapping's
-> minimum folio order.
-> 
-> Patch 4 makes the buffered read path honor IOCB_NOWAIT instead of
-> blocking on i_rwsem.
-> 
-> Patch 5 makes IOCB_ATOMIC writes fail instead of tearing, and patch 6
-> stops the buffered fallback from retrying an atomic write. Block
-> devices can reject both paths into the fallback before submitting any
-> I/O, so we fail rather than issue a WARN() like ext4 does. Patch 7
-> makes iomap_file_buffered_write() reject IOCB_ATOMIC, so no other
-> buffered fallback can complete an atomic write either.
-> 
-> Patch 8 fixes leaked page pins in bio_iov_iter_align_down(), and patch
-> 9 removes dead metadata handling in the async direct I/O path.
-> 
-> These issues are currently unlikely to be hit in practice due to the
-> specific configurations required to trigger them.
-> 
-> The reproducer for patch 1 is in blktests as block/048, and tests for
-> patches 2, 3 and 8 are posted at [2].
+> Sashiko things this can race with zone updates.  Which is real, at least
+> sorta.  Maybe we should just do this in the drivers instead where we
+> are under freeze protection?  A bit uglier due to duplication, but not
+> really any more complicated.  And drivers right now would basically
+> just be sd and zloop anyway.
 
-This is based against the 7.3 series for some reason, can you please
-resend against the 7.4 based branch, for-7.4/block.
+Yep, I will drop this patch and add a zloop and sd patch.
 
 -- 
-Jens Axboe
+Damien Le Moal
+Western Digital Research
