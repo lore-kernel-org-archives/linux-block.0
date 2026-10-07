@@ -1,40 +1,130 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FC039902D;
-	Wed,  7 Oct 2026 13:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356B62C1788
+	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 14:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791380424; cv=none; b=GQEC1RjGJOcedFESHmjxSv7litxpVoCaxaN1U5PcR1w9jkT5K9uYsKw3Wt88xToDTAbsNIMepzRqcaxKmniSamYO7HfAGy9yhSST1tUV9vbAuZ8skN6Vu4y1JzVHboZKddXQoetYtHHzkFRGKG7XYYuFF91+OUudacT4n6zkBF8=
+	t=1791381941; cv=none; b=YSK7YrmDTBtxYdxYQQDvhRSClZeF+1w6zYFLeXk20tFBqRbtIrcRaNgalPGD/Dx29IKIS7QrqkVXaydy02vfosr8h+nnHJWHPeK5+QLYqK0Hz8cvCxQpkK51PByb9LlV9jcYfjcZ3R9OdSt2auKpli0fSSbxN5ngCbXciE6h6CE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791380424; c=relaxed/simple;
-	bh=FPnMeekD/5d0Me+3dtqbkRXBg6pG9f7jYIlbPyLCY5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m6pQfm9WXOIm405HpAfNLEFbChBLbmS5blrQjn6VsVhdouzSAASR5T+ePmG9H7feF8eRdCO8HG8OjMinyAKziYiSdXHLGBqX3TJIRZYPuEGAKFjUsfdwGzIQ8gnuNECdK5k28fW+ijY85OlSyhSMhrriVIf7o7fHEsvMms2zoME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 37A2C227A88; Wed,  7 Oct 2026 15:40:13 +0200 (CEST)
-Date: Wed, 7 Oct 2026 15:40:12 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3 4/7] zloop: add storage element emulation
-Message-ID: <20261007134012.GD31906@lst.de>
-References: <20261007082344.1049179-1-dlemoal@kernel.org> <20261007082344.1049179-5-dlemoal@kernel.org>
+	s=arc-20240116; t=1791381941; c=relaxed/simple;
+	bh=V7wCXFfMiY8I3U4QW7xgovTFawhq2OF8NsZcAprNCLc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bRbgJjcM/z+uHHxwQBMhV9i229g93NZ8RuTKYcSeezJCB9sa2zs9oOGG+MwD4uJSlYJG5s+Uw2o5kMXW2BOCqevhsRvAwn/A/Bxla7DrA0GTdObLxckWpe/alzWyz409cI0D1taS5hOkQA7cOk2/FLVISmVq2mO+Hf6GY04Ym7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=PDA4CzXZ; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="PDA4CzXZ"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3a0a911e8d6so2093870a91.1
+        for <linux-block@vger.kernel.org>; Wed, 07 Oct 2026 07:05:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1791381933; x=1791986733; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=2tZULonu7kKZiIqDdMHG3M16ndJSJFse/YYFR6ZGm68=;
+        b=PDA4CzXZVp6XIMVR4rSohNCjpWBfkxope7IT5M2ZWrsgom480Z/UP01vKISCHF2G2Z
+         CCpY+z5xLDtaGFvhS2U/L74Jm9YVzBJVqHUn+OBzaPEXtDCna5adkSXhG8h6FFIQ87ks
+         LvJEMmHWWSyWBy9scoIlPZjgNX/EtGID24DRyYNg2B9sfk8OkpbDxeuXhUeNjhJwEpmm
+         heiICQJXz+gjxuQXlR6+Pz3YwyEj1fXtUCkRotDcOuNbpEmrhtt7LAM8WvS6CF43vj7L
+         Vne4sw9XzFQ19KaacvBgudTsfUoept3pFiO5znr3scvW1kgrig6bjCR/tRiZI6VBFc+2
+         rJHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791381933; x=1791986733;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=2tZULonu7kKZiIqDdMHG3M16ndJSJFse/YYFR6ZGm68=;
+        b=R0Hx/oowZ/HNH+LBTrJjhxV3g1zxFPS7EnoECd3cfOgvHpnYcLyMcMxOcQEFWqI8wa
+         Z9M46QR4Zk9SvFq69ziWtQc4X+D4nvk9Nbj+RnFOtSudHKzr7c+ka92x/vj8fsHZ3mQX
+         ME6+xZEM1bO8KD1Co3sZ5Sx3IhKTJgOKiTOnjKPFoY6JA0+JFDaI/zXAQJVkcVWQRtqP
+         LzTyGVATfCMR6gn2onBCG+cQ0M5bY0Dn6qtCwBrrNq7b1CKNhly4LAIhu2eIggh5atZt
+         nx8xeDnMToCii5VePTbnoavK7ozbi6qPfluzQc7d5uILwYWJwUdlFNHGfrMkPcOcfdlN
+         H9Tw==
+X-Forwarded-Encrypted: i=1; AKwUvBxt+FqZ820tQq67gecW8J1ejNxXiLVpWM5ax4V3c3mMd7VffPIKONLV5/Fj+a+tNwgdDUmbH/z7jbGsHw==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIuZ+e6pBZzsQroaUTTdLwBsnXWyjpIAMOXTbQMDEXNp6k45l6R
+	2TwTZrsf8DtR+P+9SxHlfaYPcwx2sIet2YuH6okOnNRGQjbkD8preV71tfDIddkPndE=
+X-Gm-Gg: AYBFou0iI0gRZR3tjTdMB/QR2oKxMy1OV9AsX9W9xHkpyanNhxzUr8YB4Uuk2u7u6Cn
+	WmcUgD6KLXFgy9/GSI4Euw2r/+6o8BQzrpnhSeIu88RA1M6xmCc8vtxthTF3FQOWmDuMamNPhKG
+	/sg3g5ZkwLvKKEBo2FF7KvDyVPB7BtiAQmorx2okO4ndG0gkbxQGUqWR9lFpjXu8XL4nTgccFmC
+	8qT6rqJkKzkXg/AH5c4yqH7Dp+fNbG+Hsw1zVv01T7KT1/Xxx4z00m9mHCU9J+bkoEB+j2PLrkb
+	WN75VJX+AIhiShnZ6FqHk/0JOWpnMkfXUGXmESwIsVlCN5eqytCjXKcYv4zzQuzoQZJyb4Yp8N/
+	dSSx4mtJ+jf1gX1ioU0ylBDhFmCHM/jMvpupD/NFHKtsIeUaPRcd/XlBP3puVxJL75rBdwZbiUg
+	iY9M/f0gQo8Z6ymI/TeGu0frMSg6fbVeOvKwVIAJ63XjK/X5vfycetyie+o1tFlEPcWvAHVS7SQ
+	7VDp3Vx+3FFEI5HF4dTvFO++WCp+jch2xmGyx1TJPNo5qmdlpxTo6b4+A==
+X-Received: by 2002:a17:90b:4d02:b0:3a4:6f38:f2a2 with SMTP id 98e67ed59e1d1-3a8a1ac0562mr1978385a91.25.1791381933049;
+        Wed, 07 Oct 2026 07:05:33 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a8543b0c1fsm13716636a91.14.2026.10.07.07.05.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Oct 2026 07:05:32 -0700 (PDT)
+Message-ID: <960b1305-c5a6-4554-8bab-1cf4244fa11b@kernel.dk>
+Date: Wed, 7 Oct 2026 08:05:23 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261007082344.1049179-5-dlemoal@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/9] block device fixes for large block sizes,
+ IOCB_NOWAIT, and direct I/O
+To: Tal Zussman <tz2294@columbia.edu>, Christoph Hellwig <hch@lst.de>,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, Hannes Reinecke <hare@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ John Garry <john.garry@linux.dev>, Christian Brauner <brauner@kernel.org>,
+ "Darrick J. Wong" <djwong@kernel.org>, Keith Busch <kbusch@kernel.org>,
+ "Martin K. Petersen" <mkp@kernel.org>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ Sashiko <sashiko-bot@kernel.org>
+References: <20260923-blkdev-fixes-v5-0-89e60d66eb38@columbia.edu>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260923-blkdev-fixes-v5-0-89e60d66eb38@columbia.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Looks good modulo the corner cases pointed out by Sashiko.
+On 9/23/26 5:56 PM, Tal Zussman wrote:
+> A set of independent fixes for the block device file operations. The
+> first two were found by Sashiko while reviewing the RWF_DONTCACHE series
+> [1]. The fourth and fifth were found by Sashiko's review of v1 of this
+> series, and the rest came from asking an LLM to find any similar or
+> related issues. Each issue has been reproduced, with the fixes resolving
+> the issues.
+> 
+> Patch 1 fixes silently lost mmap writes with CONFIG_BUFFER_HEAD=n.
+> 
+> Patches 2 and 3 take i_rwsem around the direct I/O write fallback and
+> the splice read path, which race set_blocksize() changing the mapping's
+> minimum folio order.
+> 
+> Patch 4 makes the buffered read path honor IOCB_NOWAIT instead of
+> blocking on i_rwsem.
+> 
+> Patch 5 makes IOCB_ATOMIC writes fail instead of tearing, and patch 6
+> stops the buffered fallback from retrying an atomic write. Block
+> devices can reject both paths into the fallback before submitting any
+> I/O, so we fail rather than issue a WARN() like ext4 does. Patch 7
+> makes iomap_file_buffered_write() reject IOCB_ATOMIC, so no other
+> buffered fallback can complete an atomic write either.
+> 
+> Patch 8 fixes leaked page pins in bio_iov_iter_align_down(), and patch
+> 9 removes dead metadata handling in the async direct I/O path.
+> 
+> These issues are currently unlikely to be hit in practice due to the
+> specific configurations required to trigger them.
+> 
+> The reproducer for patch 1 is in blktests as block/048, and tests for
+> patches 2, 3 and 8 are posted at [2].
 
+This is based against the 7.3 series for some reason, can you please
+resend against the 7.4 based branch, for-7.4/block.
+
+-- 
+Jens Axboe
