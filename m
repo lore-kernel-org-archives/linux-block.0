@@ -1,166 +1,259 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0928817D6
-	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 00:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798121E9B37
+	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 01:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791331478; cv=none; b=Nxayy0HWVIwZkACmAKjnijkp176QNdPHHUj39OJsdMUiuiBft3pdqQMrk0qUJ65mzw6WkdT3EKUymj4ArDh6O+LOxm7ycXL/5ahl8Onx1aXaQJhoSLr68jkIeEx0fbBqRLsKnDAkKpoQSr8szyOxo6EkxtxMR1s7UwAKRex0EMo=
+	t=1791336737; cv=none; b=VT8Qte2OxPcJl/Vne3Jo4FOntZxOJ5hygylcoo8cmdFM6I8l3gROz+6Q09gr0c5X/05uWo1UFOwCv6FWWSips13MMIvZZZ6SdnB5MPI88m/XP8ed0QnSOsU7lAQ0LZ3dZHAdO6mHCt8vSEm/qrSTo2P3HmA4PbH/GLBhnxJdXL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791331478; c=relaxed/simple;
-	bh=VO4HprmEH26bPDpYKpkRUcTkm48LKb/lQGoubvhwlB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uBJWfA3rq75tSx0M8elC8AZ19WnIdECAMFHnwCv1ewVtkvcxhOW+AUNI/41VdIqiSF+ssZAwXwpjZDUGhpldZxOQK4+3RovsSY2ultyE/jNPAjloFYT0KPaPyvmRw5qzZP/dxU/n+KUmO1FXbQmYbxAgs7vRYLzC5vdU5/GloHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Tas6yyzW; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=c57Toj9Y; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1791336737; c=relaxed/simple;
+	bh=QiaXich+youzrooQKoppxmyMfy3XmwjU4ozTtqYqLIo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ffphWYQ7010JZG2n7Y2P2vRm30sWKhhOZTqt4/aXb+HTsN1ZBG85rOpkLC85e+YLj4cmFFpqtre4LHHlOttotW2Q84cJGSx/MyJeJqvwQ6kiuJJbXmDiiH5mK2QJoEYU8sJDP9R8+OQ6fQtMfseAxXozj8rz/TNt4j6IEhBjAcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=btfPN0Bq; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Tas6yyzW";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="c57Toj9Y"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 696LekxB2011602
-	for <linux-block@vger.kernel.org>; Wed, 7 Oct 2026 00:04:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	R3JSQSkvd1It0UiMktc5j45ZpdPQLK3YDm6tjbqw98c=; b=Tas6yyzWLItqucKS
-	dl8jKUO4sIMPfRmjsoIwJHH65AtlbBDNF38QAKrvnnYDFYDVUBumtF5eBNxc8jXW
-	bYI5kMo5syUPyHzMdl7XUOCWMqPwhXIYl0WJzs8c38bj6jx2pmYgztfoUkpnEoca
-	QddmSkahpwP06C0ciybD+Fj25oizt/IXikLsx+T/ELm37UQ1ZXoAJLSVgRJofKT3
-	IbeKzchhTCEN2yNXdFgxeSzGhSO19G4mzz+TG9LCEEjMWFDUlEyoi+IBZ23FaDQ1
-	pC9zhRkxANkzOhYDAPbmlpSdwyv7UDR/sJgO7yCmdQX3BlDIJ0tAb4JKBZ9kWGxk
-	832VfQ==
-Received: from mail-dl1-f71.google.com (mail-dl1-f71.google.com [74.125.82.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h4xc9u912-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 07 Oct 2026 00:04:35 +0000 (GMT)
-Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-1416f32fe11so6887483c88.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 17:04:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="btfPN0Bq"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4a140e7405dso33693095e9.3
+        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 18:32:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1791331475; x=1791936275; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=R3JSQSkvd1It0UiMktc5j45ZpdPQLK3YDm6tjbqw98c=;
-        b=c57Toj9YzAPhJltkkBuYGHSPDSwIaYGl6Ad8JAxEDeJ+u73NuWtLfdMaBD120TQtV/
-         hYX5+tmuLqWlu3S5m2u7lgLO+XKwLQnCydBj3IC+ocE1GU/yPN/2Ebwd2qzQiPYJUs1F
-         /aMxOWeljwG6WlTIayQ/WC5lST1jTq4RaZFbOX4xIG9D80O/gLPXf73M+jKOmsvoKwZf
-         DhbYma8Jb2uw/bZNaDinvKn5NtICae44tmmDMmtJCKj+b89Dw53sjFUm+pVnDxhJ3mZy
-         kMVlF485n5CHLqPzS0lTdXckyCYJQz8rUwNTeQNYGtyqiCx/YXC0VY5FKmeFL/HPPp59
-         kHCA==
+        d=gmail.com; s=20251104; t=1791336733; x=1791941533; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=hvzB42gUMiV/KR6lqPvi8GnnActkQyAM+I4+Sj3I6TM=;
+        b=btfPN0BqGEmD7+CM3Z1lZhknO6acCyjQ+VgZeeOd4DvRnGUobYDjvgpNg3w0x5z7fC
+         PeEC/BNaKpfHGg9K3gHJrHaLN5eivJ06o/hUqyzTxX3rvMGCpaacU+uaYkiHrM5L/0iQ
+         WgfpeYy2N5ZUF/LeqjETRpkWeqq8iRCSC7+OCkcbBAweU93AIhhcQ+A0Dc5E8v1vjyQc
+         7gJbEfCpSgKY8Xuj9dyaONqXPRH7wrYoob1BSdrPHaFEE8fbP8PSOGtgfrfu9rcudWkS
+         +H59848huFe8LeXHoz4eoyG6BzAmjma+Oauz47CXbX1xp0QEbaXNUWLplL3+Cd9y73cv
+         kMZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791331475; x=1791936275;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20260707; t=1791336733; x=1791941533;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=R3JSQSkvd1It0UiMktc5j45ZpdPQLK3YDm6tjbqw98c=;
-        b=l2PBy5a0I/0fWVOhFGRdWiMs+t4HBQb+CqEl72/DKyEFcVflNWwz5iMn2al+gdnH68
-         eInwwWgp6aUefdGxfcFqDQ9sdivTTQ1TEOR/BfzD9k8Fn1KUNLpb14NFXbHycAe9fl4g
-         m0wwgqcOseXitIfX5en909wzDH4dm2/RpPsFIpZgl3rZEbM9F2b46wvBlfUORLxi1Q0E
-         2pfRr2mJgM/cplxMSTCDGfGi3qhTqOaYcQJHiaU+Gy0aE0a9Sa+DRH9lv+ytjA/s3UxQ
-         x9yYpAe8p++QGiHGrK5KIYCDPmbDoj0pqqlVDhdhcEMDiBiic34KlekL/R6tCD3nqO7K
-         aPEw==
-X-Forwarded-Encrypted: i=1; AKwUvBz+E8y0irK6sgxtRjl57qqEZSzjZq8nEAPm87kWxfvMKVsLYLJPOyDtBTzPcvhyahYBKOYEiARt3dBv9A==@vger.kernel.org
-X-Gm-Message-State: AFuF++nhOoTr70Ep2Ox9FoHHrRBNvfMfq6J/uBTgFfTDSwHlx8YoF3ZN
-	FIaDjrtFtO8sBAY8HVVgtEhxJlIkLKzCAzOZpWTl+1x+l545SVm/G8hXK6t/9noFIQB6soT1/cb
-	FlrsvDLgiJD6Wxcm8fNJ0DWlvdSWXl7pH8nAOEOeW+ZKYUyTr7qgXVuwmFIWlAGKm2w==
-X-Gm-Gg: AYBFou2++/6MQbER7sW5jyZzNZsqg1VYwKCUskbx+Bv1HzCbowN2UaryVU9KXvfhV+7
-	vFBLHQoLEcpN+r8u+wKj3Mo0FUh7dWd07z8B5s/iCADdRLE8XdLo9tJ9DkSmEpcXRyqboNQ5vHb
-	dCV4v4jud1UrRasrSN1K8Lm0Va9ROh7zgDnLwg3Si6f4xQ50lFKfdAeRD5vfkhj4CQAfVguOJ1C
-	q1WlV2sq9La0b7lF5zRlL9VkPkrUGeFGxEZkLmdi42k/RS/uDN4COLey3lxmYkXqVqzi0Le+Z+1
-	vC5iULZ3BJYtBaoiTsJehEzwm4IMbS8u5MTd86dnq8u8KuG3to3CvEGWBFuVqAI+U+wgMzSvxnO
-	Nc7IOPvfGIZt0QtPOuFCPhRQCqraiQtBlmgidh/OTbO6+BAbflj/wB2vLY75Bt0E=
-X-Received: by 2002:a05:7022:225:b0:148:8aa2:91e2 with SMTP id a92af1059eb24-16207d7ca8bmr589564c88.38.1791331474585;
-        Tue, 06 Oct 2026 17:04:34 -0700 (PDT)
-X-Received: by 2002:a05:7022:225:b0:148:8aa2:91e2 with SMTP id a92af1059eb24-16207d7ca8bmr589063c88.38.1791331465559;
-        Tue, 06 Oct 2026 17:04:25 -0700 (PDT)
-Received: from [10.71.184.34] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-16166121f2asm1995815c88.4.2026.10.06.17.04.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Oct 2026 17:04:24 -0700 (PDT)
-Message-ID: <27eafbb4-22cf-4706-b551-34c0c8d30ae2@oss.qualcomm.com>
-Date: Tue, 6 Oct 2026 17:04:23 -0700
+        bh=hvzB42gUMiV/KR6lqPvi8GnnActkQyAM+I4+Sj3I6TM=;
+        b=umidANAD/EWrSzGtnxQkgJmk7LplF043uHJdmqA947aETwGQORzOFa4A0YfLLcX8AQ
+         z4+Zp9xqd+KhvWPmYOvKvIXpSqWs9PglSDKsr0LJTxjn7UHEywZdTbu3GjuQVzhXvzAy
+         bj1IQ5GFijwbvZagDuBRXtcB6wUkT1jBjrQaUI32QXM5pjdx/D7HPg8pthueFw5Xvv4X
+         e6JAbiCQ7+cVtZFeybcyWkan37EyO/9pJA4ZTftER4BJI3C24zeNe+K1U9Q0sxGLzvxr
+         x5TkFYLPav3eVqupoylgzuuEd077FhObM/ZZVVUw0g8C9WnNoU0wqK4OB7hRoUSpLwn+
+         KFwA==
+X-Gm-Message-State: AFuF++n0zzOdnbUsz4Gh1I30AbpSrw/sEWnfNyZZ0h5F+wiaEJgdKrqj
+	Oh0oddWbxJw+psDiHiW69mlg1VUFU5AU4reebU9jTg4JPbJ3PLFGFUW9qGCxww==
+X-Gm-Gg: AYBFou1zKsvujrqMzP3/59XAhu8D0LQx3nOxD4bDtvLhTW9imI5yLDveiqoCQRmrYbI
+	eE1FRboqjLmSvDzThrhBbxE/H7IXvZXW7oyNxrG2rjUjP1wty5Pflpx4lOHzkxK95Zp55Gq90sM
+	I0kR4+wo9fvs1ms+1/sYc7Z84u3bfhfDtyx0RKSKwakjphOvWu9qCfIkRrV1IpikTEQE85TyfgR
+	/ys0Uj5C/J0VzxLggHr+wDnmyJpGLdXU3nG8cYsCGDb+fCr7UUS3s0e3/z9/a5zBqdi5XQhmhRD
+	0+AiyGjd4bPcRgTv/q3OjSWbmZWbL5bot8SDAttyeSiMde+ifQzejgJ4DzxNxCAgLFs82rpAOcN
+	4DJcpB/4n8EfKBBtrR9q7hZ9iMsATUBf+hTzAXx3POVYDWd8tIEAiXX+jZb3bCn57C5Uv2MVdF0
+	DPB2hkEfU/7t6XMzuV6ft9IFh00MT1wJJM/S7VzGDz1ur/z0/+tW98UxQvPhC1dvf+YDVTatNVh
+	oL5VXp6M4V/16jtaJucZgVW2ZL1xlH3cIj4Q4/NZA9nJmd9FCKjLTn7PihMSryZEZjjRYswv8lt
+X-Received: by 2002:a05:600c:3f16:b0:4a0:23f:8b0d with SMTP id 5b1f17b1804b1-4a1800d3f2emr7099925e9.2.1791336732453;
+        Tue, 06 Oct 2026 18:32:12 -0700 (PDT)
+Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a17f6538b7sm21183615e9.13.2026.10.06.18.32.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Oct 2026 18:32:11 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org,
+	linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Tushar Gohad <tushar.gohad@intel.com>,
+	William Power <william.power@intel.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	dm-devel@lists.linux.dev
+Subject: [PATCH v8 00/13] Add dmabuf read/write via io_uring
+Date: Wed,  7 Oct 2026 02:31:43 +0100
+Message-ID: <cover.1791336002.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] zram: Add QPaCE zcomp backend
-To: Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Georgi Djakov <georgi.djakov@oss.qualcomm.com>, andersson@kernel.org,
-        konradybcio@kernel.org, abelvesa@kernel.org, robh@kernel.org,
-        krzk+dt@kernel.org, conor+dt@kernel.org, minchan@kernel.org,
-        axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
-        mathieu.desnoyers@efficios.com, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        djakov@kernel.org
-References: <20260930145215.3380977-1-georgi.djakov@oss.qualcomm.com>
- <20260930145215.3380977-5-georgi.djakov@oss.qualcomm.com>
- <20261001-dramatic-hasty-pug-68ebfd@quoll> <ar4070oH8lRCJMRw@google.com>
-Content-Language: en-US
-From: Oreoluwa Babatunde <oreoluwa.babatunde@oss.qualcomm.com>
-In-Reply-To: <ar4070oH8lRCJMRw@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=ctMOAF4i c=1 sm=1 tr=0 ts=6ac58c93 cx=c_pps
- a=JYo30EpNSr/tUYqK9jHPoA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=EUspDBNiAAAA:8 a=UI1gRxWom6vz8qzGwdkA:9 a=QEXdDO2ut3YA:10
- a=Fk4IpSoW4aLDllm1B1p-:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA3MDAwMCBTYWx0ZWRfX+sCFqjuOV7PV
- VH+bViOzOxVqFC5sZaZXALKUGbzGbCNhf1Y60R0FLts35CR97DfqrX5pXhiGucNaSH1fpdP1B9Q
- JO7qcnZv9RMC8t71WI/abqEv5dDshUM=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA3MDAwMCBTYWx0ZWRfX9qFfXjuTmKf8
- YpbaVb40dOv8R93a4la6I4rNeZJEqeVf+/b5agGtcbqpXc9bw4uaQO5v9ONqk2zW07m4bwloCEo
- +NFmR2OkQO+GTaGbXAWvfXHWmbepxFnCJdrItkLr+2lOXz+Rm1RtKmatyoyBXAUrT1xT06HSaZT
- Npw9515JgZYfyDIB5BxqjanBdNR5dFzZUFt7R+ktjADekfSFXHbs3wOD1I/GOpIYlS2sjUQwixz
- +PL3H+0oDv91Sk8lqX2wbiZXpcFR+8xqAhtPiMxvpZ7XZoC31ByE/g8KZttk9VgJYhnFX6v6TBz
- CNLXP1f8/2hTud1kceb64h02fb1rq/tLSJbzvP30LTvoV0boeHauShwTewZfQz5D+LsaTj/2Aia
- kyQwxDUp9WUKLXzjfLbxWtrr89+hRna8qfjtHS31Z+wH78UwPpePwNKVrbfWqs2uM23NBlOcdps
- ftodleavrvsph0GFGXw==
-X-Proofpoint-ORIG-GUID: Q4wsx9CZrzn2X4T6P1K1RBB7KIis3yfs
-X-Proofpoint-GUID: Q4wsx9CZrzn2X4T6P1K1RBB7KIis3yfs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-06_05,2026-10-06_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 phishscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
- bulkscore=0 suspectscore=0 spamscore=0 malwarescore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610070000
+Content-Transfer-Encoding: 8bit
 
-On 10/1/2026 3:27 AM, Sergey Senozhatsky wrote:
-> On (26/10/01 10:51), Krzysztof Kozlowski wrote:
->> On Wed, Sep 30, 2026 at 07:52:13AM -0700, Georgi Djakov wrote:
->>> Add a zcomp backend for the Qualcomm Page Compression Engine (QPaCE) so
->>> zram can expose qpace-lz4 as a selectable compression algorithm when the
->>> QPaCE driver is available.
->>>
->>> Compress and decompress operations are handled via the QPaCE urgent
->>> synchronous path: each request DMA-maps the source and destination
->>> buffers, issues a blocking hardware command, and returns the result size.
->>>
->>> Signed-off-by: Georgi Djakov <georgi.djakov@oss.qualcomm.com>
->>> ---
->>>   drivers/block/zram/Kconfig         |  11 +++
->>>   drivers/block/zram/Makefile        |   1 +
->>>   drivers/block/zram/backend_qpace.c | 134 +++++++++++++++++++++++++++++
->>
->> So entire qpace should go here, no? Why did you create this entire layer
->> of indirection, singleton management under drivers/soc?
-> 
-> qpace seems to be standalone/independent arch/soc specific, and can gain
-> users outside of zram (fs compression, zswap, etc.).  zram's backends
-> potentially can disappear all together, if we switch to acomp crypto API.
+The patch set allows to register a dmabuf to an io_uring instance for
+a specified file and use it with io_uring read / write requests. The
+infrastructure is not tied to io_uring and there could be more users
+in the future. A similar idea was attempted some years ago by Keith [1],
+from where I borrowed a number of changes. Later it was brough back up
+to life by Tushar and Vishal.
 
-ACK
+It's an opt-in feature for files, and they need to implement a new
+file operation to use it. Only NVMe block devices are supported in this
+series. The user API is built on top of io_uring's "registered buffers",
+where a dmabuf is registered in a special way, but after it can be used
+as any other "registered buffer" with IORING_OP_{READ,WRITE}_FIXED
+requests. It's created via a new file operation and the resulted map is
+then passed through the I/O stack in a new iterator type. There is some
+additional infrastructure to glue it together, count requests, manage
+lifetime and implement invalidation.
 
-Thanks,
-Oreoluwa
+Tushar, William, Phil did a lot of testing and experimentation on various
+devices with previous versions of the patch set, and I've received lots
+of help from Anuj, Kanchan and Nitesh with investigations, testing, and
+patching. Earlier benchmarks by Anuj for IOMMU optimisations with udmabuf
+showed:
+
+STRICT: before = 570 KIOPS, after = 5.01 MIOPS
+LAZY: before = 1.93 MIOPS, after = 5.01 MIOPS
+PASSTHROUGH: before = 5.01 MIOPS, after = 5.01 MIOPS
+
+# Patch set structure:
+- Patches 1-2 introduce internal API and infrastructure mediating
+  io_uring and target subsystem / devices
+- Patches 3-5: block layer support + prep patches
+- Patches 6-8 implement NVMe support
+- Patches 9-13 add io_uring support and uapi.
+
+There are some liburing tests that can serve as an example:
+git: https://github.com/isilence/liburing.git rw-dmabuf-tests-v8
+url: https://github.com/isilence/liburing/tree/rw-dmabuf-tests-v8
+
+The patches are based on Jens' for-next. Also available as a branch:
+git: https://github.com/isilence/linux.git rw-dmabuf-v8
+url: https://github.com/isilence/linux/tree/rw-dmabuf-v8
+
+[1] https://lore.kernel.org/io-uring/20220805162444.3985535-1-kbusch@fb.com/
+
+v8: - fix blkdev_buffered_write() returning 0
+    - fix kvmalloc-kfree mismatch
+    - fix invalidation hang
+    - remove cpu dma sync as unnecessary for dev-to-dev transfers
+    - move nvme dma-buf code into a new file
+    - tighten dma-buf [re]export around io_uring issue
+    - simplify dma-buf-io locking/sync as proposed by Matthew Brost
+
+v7: - refcount *_io_ctx 
+    - wait rcu grace period for ctx->map before freeing maps
+    - increment map counters under dma resv lock
+    - more comments about bio splitting
+    - make ->unmap responsible for freeing maps to match ->map
+    - replace dma_sync_single* with full table sync
+    - detach dma-buf on nvme reset after cancel nvme_cancel_tagset
+
+v6: - remove fences and wait on invalidation synchronously
+    - report all map requests are detached earlier, outside of wq
+    - handle nvme removal
+    - gate nvme_free_descriptors() on iod->nr_descriptors 
+    - fix error handling in nvme_rq_setup_dmabuf_map() 
+    - fix iov_iter_alignment()
+    - relax the 1G io_uring registered dma-buf limit
+    - fix type overflow issue in bio split
+    - allocate struct dma_buf_io_ctx inside the dma-buf-io code
+    - harden block checks against dma-buf + buffered io
+
+v5: - Reject dma-buf with buffered IO for raw bdev
+    - Add lim->max_segments bio splitting
+    - Add bio_iov_iter_set() helper
+    - Fix io_uring uapi validation
+    - Other minor changes
+    NVMe:
+    - Rename nvme_pci_sgl_set_data() to nvme_pci_dma_iter_set_sgl(), split 
+      into its own prep patch.
+    - Convert segment walk loops to do-while.
+    - Drop adjacent segment coalescing logic.
+    - Drop first_dma/first_len from nvme_pci_dmabuf_sgl_nents()
+    - Remove entries > NVME_MAX_SEGS bailout; moving to the block layer.
+    - Factor SGL vs PRP decision making into a helper.
+
+v4: - https://lore.kernel.org/all/cover.1785274111.git.asml.silence@gmail.com/
+    - Add sgl support from Anuj
+    - Move it under drivers/dma-buf/ and rename
+    - Fix mis-sized allocations
+    - Fix io_uring re-import mishandling
+    - Drop map before io_uring "task work"
+    - Move blk-mq callback to block_device_operations
+    - Convert bio flag to REQ_OP*
+    - Other small changes
+
+v3: https://lore.kernel.org/io-uring/cover.1777475843.git.asml.silence@gmail.com/
+    - Rework io_uring registration
+    - Move token/map infrastructure code out of blk-mq
+    - Simplify callbacks: remove a separate blk-mq table, which was
+      mostly just forwarding calls (to nvme).
+    - Don't skip dma sync depending on request direction
+    - Fix a couple of hangs
+    - Rename s/dma/dmabuf/
+    - Other small changes
+
+v2: - Don't pass raw dma addresses, wrap it into a driver specific object
+    - Split into two objects: token and map
+    - Implement move_notify
+
+Anuj Gupta (2):
+  nvme-pci: rename nvme_pci_sgl_set_data to nvme_pci_dma_iter_set_sgl
+  nvme-pci: add SGL support for the dmabuf path
+
+Pavel Begunkov (11):
+  block: always adjust bi_offset on bio_advance_iter
+  block: introduce dma map backed bio type
+  block: add dma-buf support for raw bdev
+  nvme-pci: implement dma-buf backed requests
+  nvme seaparate file
+  nvme sgl fixup
+  io_uring/rsrc: introduce buf registration structure
+  io_uring/rsrc: extend buffer update
+  io_uring/rsrc: add uncloneable regbuf flag
+  io_uring/rsrc: add regbuf import flags
+  io_uring/rsrc: add dmabuf backed registered buffers
+
+ block/bio.c                    |  15 +-
+ block/blk-merge.c              |  50 +++++++
+ block/fops.c                   |  24 +++-
+ drivers/md/dm-io-rewind.c      |   6 +-
+ drivers/nvme/host/Makefile     |   1 +
+ drivers/nvme/host/core.c       |  12 ++
+ drivers/nvme/host/nvme.h       |   2 +
+ drivers/nvme/host/pci-dmabuf.c | 164 ++++++++++++++++++++++
+ drivers/nvme/host/pci-dmabuf.h |  73 ++++++++++
+ drivers/nvme/host/pci.c        | 249 ++++++++++++++++++++++++++++++++-
+ include/linux/bio.h            |  21 +--
+ include/linux/blk-mq.h         |   7 +
+ include/linux/blk_types.h      |  14 +-
+ include/linux/blkdev.h         |   2 +
+ include/linux/bvec.h           |   3 +-
+ include/linux/io_uring_types.h |   5 +
+ include/uapi/linux/io_uring.h  |  31 +++-
+ io_uring/Makefile              |   1 +
+ io_uring/dma-buf.c             |  68 +++++++++
+ io_uring/dma-buf.h             |  67 +++++++++
+ io_uring/rsrc.c                | 172 +++++++++++++++++------
+ io_uring/rsrc.h                |  32 ++++-
+ io_uring/rw.c                  |  33 +++--
+ 23 files changed, 974 insertions(+), 78 deletions(-)
+ create mode 100644 drivers/nvme/host/pci-dmabuf.c
+ create mode 100644 drivers/nvme/host/pci-dmabuf.h
+ create mode 100644 io_uring/dma-buf.c
+ create mode 100644 io_uring/dma-buf.h
+
+-- 
+2.54.0
+
