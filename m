@@ -1,63 +1,63 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38083345ED2
-	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 01:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22D8342CB2
+	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 01:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791337407; cv=none; b=ciPuoQ7+FGNHg65EDJLQpw3VhxKMz/yMvFTWKOh9ITO4weAMxyRfY2KjKA2nzid/rIyAdzw8bMcv4fYfgm/sDss++qwtO2Lhh5Vn7J0HHDYkD3rhFtPsAcwTLFpulA6FSBu3LXLO5WaufoBJCy5Du5PuoVleM1oI7EDH9Ue8s1c=
+	t=1791337410; cv=none; b=SMj/crudgwrH02cKSVCF4lXqG2OqrLw8qBsoACHqzbL8P2g9bAUXdJhbFkSc1fJn3BrvO2YaXq1h7iHaDrkrV2DfXViGCTaXhdhsu+bv5vTESwMnfIvy6R5/GcnJXOwiuaQGxcJrtI53tD/x7/VvLpKF+05MN+RCrH9lMX2GLe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791337407; c=relaxed/simple;
-	bh=0a99AkCdYYlGDSLNyvcoHvxyA0h7cLM0HZDY04APdmg=;
+	s=arc-20240116; t=1791337410; c=relaxed/simple;
+	bh=3Fg4fgarhp43AXGD3uCEPBH0DKGK1BrLFUwZDank6PA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=itJAy/hkGJsDbpBSiHIcG+Mc3hP9XWN9r1WZ4JXbqwja1Ncr5mINbieA1mhU/AT60ZbOfxtOjgtWrmE8niNARa7OfqVS5iX9OfKsR7nHow2VsKfkIAPP8mYzO3c1VLDUAL6woXcm3v/paXmnfNq7/nW83uto+HQXPNBCf5OqYtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f27ty6mO; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=tv5bMSfTRcRL25JdyaQFZJ4XCB6hL7zbP/h4CQKP9JZL9H/zAhQsnhEVCV1vmJtnS2Y9s5Zi7wLZTEm7mYPu0A+jWIrkpKq4rt+7KePTkIpTu+sLt6/SNxzqzNTDTjntdnvvn2Jn+8b+2554WTFo8k/w3U5CHDiHi7L91wftc40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YqSNZ5qk; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f27ty6mO"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a171b677d2so9192935e9.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 18:43:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YqSNZ5qk"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4a16bc2278aso9552045e9.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2026 18:43:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791337399; x=1791942199; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791337405; x=1791942205; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=SVgIYOF9sl5M4BcUqDAxFWbO5yiW+j2eX94ter+J4Q4=;
-        b=f27ty6mORd8iV0R/oG+qG8LoZ4ztJUp5V/I6qO/Smujo/cToOggNECPqGLhxNCVjeS
-         7is2ZvQ62x70H7sSSPf2IqOvzLiLKTjy4xDzFY+C7mD+zAszqqtJhFzgPOxEdVu0WH49
-         GPxmNLP2mq7FJ9Idk8MHBU46Otf0P/B9OplADmA2KnytGpnM6/cULygVJfD5x3cLs5KH
-         plSq+YnxUAzbcMKPQYD9pi1lPD2GUOaFqqNpBgeyJG3BZC9kgY+lfpKH/DtpEcHUj1Xd
-         i1v3Zl+7hi0ooHz3Appux/AdHcE2PtVdTF6fqfRGWJ5DEK/Zwk8AxlZXFiCWUZVUWGbT
-         0Txg==
+        bh=TBD7LAGhjErBgJ6Wm5F1SHztZSPVsK9gsGPfOw+QBug=;
+        b=YqSNZ5qkQcLj7Z/Am/VKzas78A+ifCaj44BgioYiK2/agpBkcouIRBePNtNuuPZCnO
+         SPX0WoBTcP4T5vRu2atIbH1kppyR2/hje50UeqECH3gq3YzEpjtADOdDF/8oHjMpbShb
+         vnuwgf7nQv+ymslEEKkSjrplhWlGhG+oAcIHyoBRv8k/gosVtrqYY0l/OrEeCeyXJpYM
+         /zJ/9TpRMSCfB6r0O+0mzfD8LU53GAdX8w0N22wQ8UZAC34D7xC0o6DFOlFOL7CN7P2+
+         3EHVOz+UflKKNAAO6dd1RNfBKAGO1IVVZ7uefQVUlX0USAjSiLY6ffy1P0Cwfn0zAzAV
+         k94g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791337399; x=1791942199;
+        d=1e100.net; s=20260707; t=1791337405; x=1791942205;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=SVgIYOF9sl5M4BcUqDAxFWbO5yiW+j2eX94ter+J4Q4=;
-        b=TBVSsDq0itOziIyV2dNIHCVUb1zA6bTmEIff9/Lpe0vFuFRQZZUuWhflkBvPbp8dLL
-         FPmgPxOQ24T2qCjFL9lhVlpMX2PGXoXxYpnK8HoyZg+N5W0BrbTfOyp+hn8qKaY8OMJU
-         dYOqjC6Tp0wnQFWpekhNcn+nYN3LFGj0BYgmOSSaIY5FokCJ4SpzWgfyOSWpH+iq+Rya
-         UH+e66gcNU1aW3x6GUYxS84FkoB66mExIJ2cQMfWur8UZOseWw5g5k3DLrhBcCpFKg/L
-         g3Cvzj5EFzBfXxIM93Xgw+vaAj7XMMJnPbd/A6HG2RTR0e5d/jGMdUw5U2RHd+M1DSvD
-         1wrw==
-X-Gm-Message-State: AFuF++m82FdOBvaXsWO/datQSAWwH+qfKxgVs+OHHU7xtsWT529pYBP1
-	F9PV+Cyc3M97gkV+bqrYHugP1d4f70XbzI2YXg4lkFvB6ofrDBEX4fAckyurdQ==
-X-Gm-Gg: AYBFou1NeduF3avGhHi0JLxQin7p+OIAWlO5qeSHPexP2hEmT/pR/uT0psobSGra2cF
-	AzV2azZUh2m1XvLYfldBxxaAqTQ90OgcJlTnpzpFLK0mmFs5UQ4Vyvw+9uXvXwFfF9iPqmZdizQ
-	CLsWPiup3ACdZmTkuqLhI/kjYcOV8E1Yi/66u1o6o5/6HSqptMPIxo+sU+jqMBSuGLVf+PpWpfI
-	3LNadf/UqDbLkjjTQElK3+s43IKoOeNivJhsVBNTc7sNlWLPj5WBmqaFanHoPmcWWPA3JNA1akX
-	VfXPdnfNJ2XX6SQxK5cNTjaYhQkYc6fGq+8F2avm4/3QZpHvINM4I/LG4q2athkiM+OYzMO2i/e
-	Tq1lr+pLdK96SqjnRQqOu4knqqV7IELm2VmqRae5YMNU00+Ut6F0xzccdKquWeBU6tlmddTxsL4
-	gHYjS07AH4QccgRZxWFcEbEYg0R2pbLkDk2obTDqR+OGcsQm7wjzbqBQKGr7s/uKszFaLNt0UTf
-	6AfSqmrEz4PpXtT9yvSXFjacJ6GT3iuPBiuP6fxuZLJVFRrF2UzBR2HXOTY87QbbHaPCE45o4Po
-X-Received: by 2002:a05:600c:348f:b0:49f:dd9f:6038 with SMTP id 5b1f17b1804b1-4a18043b38dmr6958715e9.25.1791337399492;
-        Tue, 06 Oct 2026 18:43:19 -0700 (PDT)
+        bh=TBD7LAGhjErBgJ6Wm5F1SHztZSPVsK9gsGPfOw+QBug=;
+        b=V6GISSGjzQbJBFcWaaRY7ZoYPP5WX/IJkn8qmV8cCmg/ZjZmb7lgNk2fgUAocCUd/3
+         olX8WTkA7AzkND7Gi3EQRByUmy0kmc/uhcuimqjozO1W/ahuoNVF458U+uNPPiDqAwdo
+         vaRH+IHzDQQnK2uR3WjmsvB9OpYR2M6dt3XZN2hfO0AqROolH1IqaBuAKrksTHGPl70P
+         EKIMdyOemfTdqWi/cAx3gcTm1AGzlUJounWv/0Sn9bXnfknKq6dmJJm41LgfoQ40XQcn
+         3Uz52oz3YFWgDksa9/GJHUHvO2MpCZ7RfFPIMBHd/y/su5nJOKbBZHl/FXnnH9yL3QNC
+         cvbA==
+X-Gm-Message-State: AFuF++nnb/fsIK3ymj0SfEJsTIxvtv8PljtFlVpRRk2i2Ny2Bd9Xq3Sk
+	KGz7wnZg972IGbMDpESbcyc+Tptyd1md8xntGT3RV5Blq2xTWm+4wrPbzSRXrQ==
+X-Gm-Gg: AYBFou0O2HVurSm2axz5an06k9x0zavTtVvZv13JifWxW4QLoiKzvBVx6LM+E/ZUODf
+	7XMTk/9qApuQ6W8BiHiKsezJdAzPA8+wyw0F6FSMqQoeVZbUtEbSlMietn3OcMGyKAT5u6TWybq
+	4ZCsIUJRyQREjEhGNfLCyiJZG7QDHuw8yhhflNJ2dvelQkg+bD8zIAC1h5nNAnY+smgOqXlQLaV
+	DgfUXIdgW2RlkK6JSiCst20IBmcnGF6LLa5plForRRenRA18cxzKhMSEp2FIjGcP7WFWyao8l1o
+	BS0hVc0cYydXvGW19Sizv44mD8kilXdKJUu7R+cJfuRWOB8rWRg6A94b6thK6KxvhT0C5d+qKsD
+	qdHQPk0UuRC28usDAJci/fTFPN8lwjHg1vX7NBabLMoOn/s2yLhkZ2D3JQAG7s2PUw2VE7mneZ6
+	VYl+stYcOt/BdnMMAkkfZqr5fj1tORgHpn8oGRGdhLwrbMMwAU4A+cBk8t6bIL8MPvBhKNOYyRL
+	uh3DDHc6csSJLNVEa5IdX+cRoVXT2p79pxZGDz9nA+/jllPr927ZC/EDUeLWypWpiC7mKSB02Ll
+X-Received: by 2002:a05:600c:3e16:b0:49d:2536:402e with SMTP id 5b1f17b1804b1-4a1806649afmr7712265e9.30.1791337405094;
+        Tue, 06 Oct 2026 18:43:25 -0700 (PDT)
 Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a17f653d7csm26423895e9.14.2026.10.06.18.43.18
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a17f653d7csm26423895e9.14.2026.10.06.18.43.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 18:43:18 -0700 (PDT)
+        Tue, 06 Oct 2026 18:43:23 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: linux-block@vger.kernel.org
 Cc: asml.silence@gmail.com,
@@ -89,9 +89,9 @@ Cc: asml.silence@gmail.com,
 	Mikulas Patocka <mpatocka@redhat.com>,
 	Benjamin Marzinski <bmarzins@redhat.com>,
 	dm-devel@lists.linux.dev
-Subject: [PATCH v9 06/13] nvme-pci: rename nvme_pci_sgl_set_data to nvme_pci_dma_iter_set_sgl
-Date: Wed,  7 Oct 2026 02:42:49 +0100
-Message-ID: <2f8b57f68fd3e432085b3a7767971778bc7d1919.1791336930.git.asml.silence@gmail.com>
+Subject: [PATCH v9 09/13] io_uring/rsrc: introduce buf registration structure
+Date: Wed,  7 Oct 2026 02:42:52 +0100
+Message-ID: <82a5ed8b6de7015b9ec3c6aac51ec2597749a1df.1791336930.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <cover.1791336930.git.asml.silence@gmail.com>
 References: <cover.1791336930.git.asml.silence@gmail.com>
@@ -103,66 +103,152 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Anuj Gupta <anuj20.g@samsung.com>
+In preparation to following changes, instead of passing an iovec for
+buffer registration introduce a new structure. It'll be moved to uapi
+later, but for now it's initialised early from a user provided iovec.
 
-Rename the blk_dma_iter based nvme_pci_sgl_set_data() to
-nvme_pci_dma_iter_set_sgl().
-
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- drivers/nvme/host/pci.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ io_uring/rsrc.c | 47 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 32 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 77317e5d00f9..a65b77726e4b 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1147,7 +1147,7 @@ static blk_status_t nvme_pci_setup_data_prp(struct request *req,
- 	return BLK_STS_IOERR;
- }
+diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+index 1efaf29514e8..7e58e9d96055 100644
+--- a/io_uring/rsrc.c
++++ b/io_uring/rsrc.c
+@@ -27,8 +27,13 @@ struct io_rsrc_update {
+ 	u32				offset;
+ };
  
--static void nvme_pci_sgl_set_data(struct nvme_sgl_desc *sge,
-+static void nvme_pci_dma_iter_set_sgl(struct nvme_sgl_desc *sge,
- 		struct blk_dma_iter *iter)
++struct io_uring_regbuf_desc {
++	__u64 uaddr;
++	__u64 size;
++};
++
+ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+-						   struct iovec *iov);
++						   struct io_uring_regbuf_desc *desc);
+ 
+ static int hpage_acct_ref(struct io_ring_ctx *ctx, struct page *hpage,
+ 			  bool *acct_new)
+@@ -81,6 +86,15 @@ static bool hpage_acct_unref(struct io_ring_ctx *ctx, struct page *hpage)
+ 
+ #define IO_CACHED_BVECS_SEGS	32
+ 
++static void io_iov_to_regbuf_desc(const struct iovec *iov,
++				  struct io_uring_regbuf_desc *desc)
++{
++	*desc = (struct io_uring_regbuf_desc) {
++		.uaddr = (u64)(uintptr_t)iov->iov_base,
++		.size = iov->iov_len,
++	};
++}
++
+ int __io_account_mem(struct user_struct *user, unsigned long nr_pages)
  {
- 	sge->addr = cpu_to_le64(iter->addr);
-@@ -1177,7 +1177,7 @@ static blk_status_t nvme_pci_setup_data_sgl(struct request *req,
- 	iod->cmd.common.flags = NVME_CMD_SGL_METABUF;
+ 	unsigned long page_limit, cur_pages, new_pages;
+@@ -398,6 +412,7 @@ static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
+ 		return -EINVAL;
  
- 	if (entries == 1 || blk_rq_dma_map_coalesce(&iod->dma_state)) {
--		nvme_pci_sgl_set_data(&iod->cmd.common.dptr.sgl, iter);
-+		nvme_pci_dma_iter_set_sgl(&iod->cmd.common.dptr.sgl, iter);
- 		iod->total_len += iter->len;
- 		return BLK_STS_OK;
- 	}
-@@ -1199,7 +1199,7 @@ static blk_status_t nvme_pci_setup_data_sgl(struct request *req,
- 			iter->status = BLK_STS_IOERR;
+ 	for (done = 0; done < nr_args; done++) {
++		struct io_uring_regbuf_desc desc;
+ 		struct io_rsrc_node *node;
+ 		u64 tag = 0;
+ 
+@@ -411,7 +426,9 @@ static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
+ 			err = -EFAULT;
  			break;
  		}
--		nvme_pci_sgl_set_data(&sg_list[mapped++], iter);
-+		nvme_pci_dma_iter_set_sgl(&sg_list[mapped++], iter);
- 		iod->total_len += iter->len;
- 	} while (blk_rq_dma_map_iter_next(req, nvmeq->dev->dev, iter));
+-		node = io_sqe_buffer_register(ctx, iov);
++
++		io_iov_to_regbuf_desc(iov, &desc);
++		node = io_sqe_buffer_register(ctx, &desc);
+ 		if (IS_ERR(node)) {
+ 			err = PTR_ERR(node);
+ 			break;
+@@ -870,26 +887,26 @@ bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
+ }
  
-@@ -1359,13 +1359,13 @@ static blk_status_t nvme_pci_setup_meta_iter(struct request *req)
- 	iod->cmd.common.metadata = cpu_to_le64(sgl_dma);
- 	if (entries == 1) {
- 		iod->meta_total_len = iter.len;
--		nvme_pci_sgl_set_data(sg_list, &iter);
-+		nvme_pci_dma_iter_set_sgl(sg_list, &iter);
- 		return BLK_STS_OK;
+ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+-						   struct iovec *iov)
++						   struct io_uring_regbuf_desc *desc)
+ {
++	unsigned long uaddr = (unsigned long)desc->uaddr;
++	size_t size = desc->size;
+ 	struct io_mapped_ubuf *imu = NULL;
+ 	struct page **pages = NULL;
+ 	struct io_rsrc_node *node;
+ 	unsigned long off;
+-	size_t size;
+ 	int ret, nr_pages, i;
+ 	struct io_imu_folio_data data;
+ 	bool coalesced = false;
+ 
+-	if (!iov->iov_base) {
+-		if (iov->iov_len)
++	if (!uaddr) {
++		if (size)
+ 			return ERR_PTR(-EFAULT);
+ 		/* remove the buffer without installing a new one */
+ 		return NULL;
  	}
  
- 	sgl_dma += sizeof(*sg_list);
- 	do {
--		nvme_pci_sgl_set_data(&sg_list[++i], &iter);
-+		nvme_pci_dma_iter_set_sgl(&sg_list[++i], &iter);
- 		iod->meta_total_len += iter.len;
- 	} while (blk_rq_integrity_dma_map_iter_next(req, dev->dev, &iter));
+-	ret = io_validate_user_buf_range((unsigned long)iov->iov_base,
+-					 iov->iov_len);
++	ret = io_validate_user_buf_range(uaddr, size);
+ 	if (ret)
+ 		return ERR_PTR(ret);
  
+@@ -898,8 +915,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	ret = -ENOMEM;
+-	pages = io_pin_pages((unsigned long) iov->iov_base, iov->iov_len,
+-				&nr_pages);
++	pages = io_pin_pages(uaddr, size, &nr_pages);
+ 	if (IS_ERR(pages)) {
+ 		ret = PTR_ERR(pages);
+ 		pages = NULL;
+@@ -921,10 +937,9 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+ 	if (ret)
+ 		goto done;
+ 
+-	size = iov->iov_len;
+ 	/* store original address for later verification */
+-	imu->ubuf = (unsigned long) iov->iov_base;
+-	imu->len = iov->iov_len;
++	imu->ubuf = uaddr;
++	imu->len = size;
+ 	imu->folio_shift = PAGE_SHIFT;
+ 	imu->release = io_release_ubuf;
+ 	imu->priv = imu;
+@@ -934,7 +949,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+ 		imu->folio_shift = data.folio_shift;
+ 	refcount_set(&imu->refs, 1);
+ 
+-	off = (unsigned long)iov->iov_base & ~PAGE_MASK;
++	off = uaddr & ~PAGE_MASK;
+ 	if (coalesced)
+ 		off += data.first_folio_page_idx << PAGE_SHIFT;
+ 
+@@ -986,6 +1001,7 @@ int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
+ 		memset(iov, 0, sizeof(*iov));
+ 
+ 	for (i = 0; i < nr_args; i++) {
++		struct io_uring_regbuf_desc desc;
+ 		struct io_rsrc_node *node;
+ 		u64 tag = 0;
+ 
+@@ -1009,7 +1025,8 @@ int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
+ 			}
+ 		}
+ 
+-		node = io_sqe_buffer_register(ctx, iov);
++		io_iov_to_regbuf_desc(iov, &desc);
++		node = io_sqe_buffer_register(ctx, &desc);
+ 		if (IS_ERR(node)) {
+ 			ret = PTR_ERR(node);
+ 			break;
 -- 
 2.54.0
 
