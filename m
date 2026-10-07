@@ -1,82 +1,91 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3496835E1BC
-	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 13:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E314908AE;
+	Wed,  7 Oct 2026 13:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791380179; cv=none; b=cggaHs7G1Qzknut37qKZoeV7HvxZL5H14W7m0n1CWCSxQ6tpILHKRhRq6hz3mDZFpqTVfoe0f54nlJCm+diHs+HysPi0H17WtNercEPWuv3DI1QEDa4mjZQNCOzZ7x43WM32eRrgC3M434NETc8z+sZC8DyNrYGuwgHRxZrTBQk=
+	t=1791380373; cv=none; b=YfqFZM1cVfvLEkrfnyTUsZ010eqPvBnhRd8dhgWn8kqlBuBu/+1LEdSTPQTUtU7QMgKsC63rdELA2+zt4AQaU7SKI46oTvPQLsgDD8kREI1r7RjP2gxuQ8elwZT2aeEK5CofMV7kfFAo8X2E/TA6Of9m9CM8l6vvlYI/LlrDuZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791380179; c=relaxed/simple;
-	bh=ETRHvYs4cdwdVUjJXotuVsY46P8swuGD+YBiFPLAyiY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oU9RWbVWzCZlc73+tbM1NvFTNUrpbWt3onBQ2QJBoKu1mipAvhi9VMxqfOEcwTZOPF7nD5TQM3o7gfZ9yEYJNueBV5V5f8ML0mmgAyosPHtLbdgZ+2ayvodmOInZm4WHR/iqlRX0FRCv2eYlBgXzBoejcTF4OYzv5B5VwmJfj4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 697DZwMS020642;
-	Wed, 7 Oct 2026 22:35:58 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 697DZwCk020639
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 7 Oct 2026 22:35:58 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <4d7c7365-259c-402e-9cf5-d55ad9333200@I-love.SAKURA.ne.jp>
-Date: Wed, 7 Oct 2026 22:35:53 +0900
+	s=arc-20240116; t=1791380373; c=relaxed/simple;
+	bh=nMaVLPy8+GNG9HTg3E9YIlSUHKlOP4mVjRrdQS4ezZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WVDU5fiZy1sRa7CM5RhHoYeFru/Pm3M50ffFbfQF6uMVMHyRG+6tV3DdeMbsHgjG6rfuiA3YmYOD0cJy0lvd2E5rg+gfY2BePtFc/Zu3oPQkE2VHnuADUbfhD93quc5Aj3HKoyUsYi5f4LlxzlnAFfYDWFYhyghu0aPErNwMkQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 6B2C0227A88; Wed,  7 Oct 2026 15:39:22 +0200 (CEST)
+Date: Wed, 7 Oct 2026 15:39:22 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v3 3/7] block: add storage element management ioctls
+Message-ID: <20261007133922.GC31906@lst.de>
+References: <20261007082344.1049179-1-dlemoal@kernel.org> <20261007082344.1049179-4-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6] loop: Wait for I/O completion in __loop_clr_fd()
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>,
-        Edward Adam Davis <eadavis@qq.com>, Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net,
-        Bart Van Assche <bvanassche@acm.org>
-References: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
- <20261007130851.GA30117@lst.de>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20261007130851.GA30117@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav212.rs.sakura.ne.jp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261007082344.1049179-4-dlemoal@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 2026/10/07 22:08, Christoph Hellwig wrote:
-> On Mon, Oct 05, 2026 at 02:06:02PM -0700, Bart Van Assche wrote:
->> From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
->>
->> Syzbot reports a NULL pointer dereference in lo_rw_aio(). This crash
->> probably happens because commit b15e4310633f ("jfs: Set the lbmDONE flag at
->> the end of lbmIODone"), merged in the 7.1 merge window, lets the JFS log
->> code report a write as finished while it is still in flight. JFS then tears
->> down and releases the loop device with that write still sitting in the loop
->> workqueue.
-> 
-> Why do we go offtrack messing with loop instead of investigating the
-> file system misbehavior?
+> +	if (copy_from_user(&rep, argp,
+> +			   sizeof(struct blk_storage_elements_report)))
 
-How can we investigate the file system misbehavior?
-Earlier versions of this patch
-( https://lkml.kernel.org/r/30ccdd3c-6353-4a0f-bdc7-230ec3bf4765@I-love.SAKURA.ne.jp )
-included debug code for emitting BUG: message, which is intended for helping filesystem
-developers identify the caller of an I/O request that failed to wait for completion,
-but I got no response. Please show us viable approaches.
+Can we shorten the name of the struct a bit?  blk_se_report?
+Similar for other identifiers?
 
-> 
->> Although the root cause is in JFS, improve the loop driver by waiting in
->> __loop_clr_fd() for ongoing I/O. Release &disk->open_mutex temporarily
->> because otherwise a deadlock would be triggered.
-> 
-> We can't just drop the held lock.
-> 
+> +		return -EFAULT;
+> +
+> +	ret = bdev_report_storage_elements(bdev, NULL, &nr_elements);
+> +	if (ret)
+> +		return ret;
+> +
+> +	nr_elements = min(rep.nr_elements, nr_elements);
+> +	if (!nr_elements)
+> +		return -EINVAL;
+> +
+> +	elements = kzalloc_objs(struct blk_storage_element, nr_elements);
 
-That's why I proposed a new callback which you are refusing to add.
+This doesn't work as it could race.  We'll always need to allocate
+the space for all the elements the user asked for?
+
+> +	retc = copy_to_user(argp + sizeof(struct blk_storage_elements_report),
+> +			    elements,
+> +			    sizeof(struct blk_storage_element) * nr_elements);
+> +	if (retc) {
+> +		ret = -EFAULT;
+> +		goto free_elements;
+> +	}
+> +
+> +	rep.nr_elements = nr_elements;
+> +	retc = copy_to_user(argp, &rep,
+> +			    sizeof(struct blk_storage_elements_report));
+
+Why not copy back the entire struct in one go?
+
+> +		ret = truncate_bdev_range(bdev, mode, 0,
+> +			(get_capacity(bdev->bd_disk) << SECTOR_SHIFT) - 1);
+
+Use bdev_nr_bytes() here?
+
+> +	/*
+> +	 * Storage element restoration is a destructive operation that will
+> +	 * reset all zones. So fflush the device volatile write cache and
+> +	 * invalidate all cached data that we may have.
+> +	 */
+> +	filemap_invalidate_lock(bdev->bd_mapping);
+> +	ret = blkdev_issue_flush(bdev->bd_disk->part0);
+> +	if (!ret)
+> +		ret = truncate_bdev_range(bdev, mode, 0,
+> +			(get_capacity(bdev->bd_disk) << SECTOR_SHIFT) - 1);
+
+Same.  Also what about factoring the duplicate code block into a helper?
 
