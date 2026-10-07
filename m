@@ -1,52 +1,169 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FDD4B95D2;
-	Wed,  7 Oct 2026 15:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28223803F7
+	for <linux-block@vger.kernel.org>; Wed,  7 Oct 2026 17:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791386900; cv=none; b=BjBDE/ZuRWhtTtvYXYwDArq7OhNS3R8isfTebzr3Wd03OxbmSkhSKyRN0NHkjXFWAiRKeRUvT27JvJK/6OxmxlH+WCa1uD+vgSTpNqnfTR3aSfhEHo6KxRZBWukc2V5m7MFkWEKpoY9JcMpgFb1Yu4u3wX4hTu4LSfpyULdtjWM=
+	t=1791395578; cv=none; b=YVf5LuvGuXwlrUI0VlBCe+SzTK/7hz34pgVwhrO/B2L7R7lz1jnTLfk1/q0darigcWwJiu0stLv8RYoFO3OR6VoDqhZ7nU97+dW/f+jK7Dmpd5MSOKaTOHGBg18uwJyOmSayvFziN/fVjBF6WKNcIHlXh2I6FDKZ1O5g/MD1v2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791386900; c=relaxed/simple;
-	bh=Z0X/5MuDO4O6Ru409BZr22KTPo7lPVJOcbmclQN/eQI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WK/c9dYFF6D99D6zdk4HghOn+4mcBOUXavMfD+0unn0HZQTCr+tjcKl5BiO49oJjLpaSADyeU6Km9d3SJsy22hERLpi+b7Hf+Wc5xCgOZzjYXuKCDCZAmT4ujseqjCGkK95poWjWBIWmWUZTOb/qRYD5b8Yz9g18/v0JH/VjvXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 95D7268AFE; Wed,  7 Oct 2026 17:28:11 +0200 (CEST)
-Date: Wed, 7 Oct 2026 17:28:11 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3 3/7] block: add storage element management ioctls
-Message-ID: <20261007152811.GA8435@lst.de>
-References: <20261007082344.1049179-1-dlemoal@kernel.org> <20261007082344.1049179-4-dlemoal@kernel.org> <20261007133922.GC31906@lst.de> <e11de48b-e719-4cfc-a08d-916a8603782d@kernel.org>
+	s=arc-20240116; t=1791395578; c=relaxed/simple;
+	bh=uhtxMQ0fKAbNPofLk84gSjQ9sJxGeJ5klNaWx5ma9IY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=EJkm0xI1vzwd4kgI8KRT8CZP21RjCzxGI1pkFU1Uj2SafFryYG3eU5hLN2SqCSKRbsXrGm4CZylmpeA6imRl0qcEVLvW//0cv6qSLCBzAjUZEAdht+oFDZpROtEAX1OvM2c1mWa9Q0BGd2iJBm1EK4EAsupTe69UjiyMnoa4VM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=pass smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b=WNuV+NxG; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=toxicpanda.com header.i=@toxicpanda.com header.b="WNuV+NxG"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-5337fb43c16so20757081cf.3
+        for <linux-block@vger.kernel.org>; Wed, 07 Oct 2026 10:52:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda.com; s=google; t=1791395575; x=1792000375; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=d3zIfpdGBSQTp6Jg+3lyricoE8je8WFz2Mt+j1XHJNY=;
+        b=WNuV+NxGTGt88QZ7mzjmoYdepj5/F/qfIa6lLZFPJ7LM8IvPfRyb6mIvqQATvqlhyu
+         23u3ozWxdZ2OzgindQmBzP4+HYWK8Ko2bQTHmP+ownSH8fmHIi0cMzBilZWW5nvrkLpT
+         ILcelfz5qp4iyIg7CPoDwCAkhtK6ftECHJQlF/iNjAjVEw2dpZqf+qH9gO+Gdk6InN9g
+         gAqbXY8agAYJQWTXXAqcMZchSDuxaARzH7QVd8yeK+B3qOieyKP3SldevyOvf4YubKZM
+         0WYCmY+Q8J1diw99Dod6xIeqgBPLohtWroBBCG8rgYyPB1DbkOxZsQCDTwMk7WMSSser
+         owxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791395575; x=1792000375;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=d3zIfpdGBSQTp6Jg+3lyricoE8je8WFz2Mt+j1XHJNY=;
+        b=2MGtipTxKxuH4HWrjif7KF+04bqLO7axmENTNStFURHoF55wpChU8xksS8q6fQ+K2Q
+         I2744G/DHqma3/P/RE6qBmN6w9iIJh5e919cKpP+CZi/IOWEb8DOE877U9feZH9yo9iH
+         5KhoVsQaMnpgkN38ffvCenBq9eHDC7gNT5K9JWuFU3R/trwbeixxvC+fgPrDBXxHpUt6
+         EelQ0bCdcv6NUzbsEX/YYM+RqNVfBCw4EPiptpPb2jt3faIxSjOfdnE4RPcL16iQUkHn
+         X50cwFfiSZXWA5LqnYU9FseQQOy3ank+k3OBlHvg//sj8ypjWnXVavI7eKaFP0Km4IV8
+         shkg==
+X-Gm-Message-State: AFuF++kDAKKB4vrbsFjKuWZYPyDJZkYWogYSs0bwkKWMpnYZjMRHmy2t
+	hWRoYDOpUbC1GiQkMXtjvQuxhxI1aukk1rLy5T+lyUV6TjbQwXDhxBgjlagRp7rY8hY=
+X-Gm-Gg: AYBFou2lM552ZpGKmWlRmzNyj5B/4+67OMidnIS2bLxJhs53FHF7/8nkF9lQvykftZw
+	Q+SVFVoa0di9TwqeDGzv41WgST6/tYo38yddj6FlB02sJDLfjFhTVBRhWGQ/qYx6fN0qgHHgAVM
+	h3ocK08Oz6HscgN21vLthqChXBJlBTCB40uuAbrw2fHR0QpDoXqMsSBhF3clDM1t8fh2rpGm1+8
+	x3/jmsZ5NF7JKz50FdW5q4pn2E2oichRpFUwSC2ZI1D8kcFqHq/MEI2ZSLBUPhZWBBW+PEjd16j
+	wjUgzgCWroUcc4Om3faMMO8nZqtD+oaR27lhOR2YgoFXiJ9KksjDVcq5A5CIDofRCuJreGLpXgO
+	C7EHxvx/dbmFormWqozpJiNMZJw0A2tmTAF77mf+S0o0LnNEYbkCQMNwjQ0TgFHYD0zbulfCCTk
+	9AEdAOGQ1kHXSsU0/mp1xO5Fihvepgxb46IDPMZgyhu9YBjo84gyijupjolghE8IsGNLG/boWoC
+	2n2vbcrMTgEoUhXZmPzpxu74g==
+X-Received: by 2002:a05:622a:17c6:b0:535:1b18:202 with SMTP id d75a77b69052e-5357563d9f8mr47366621cf.16.1791395575210;
+        Wed, 07 Oct 2026 10:52:55 -0700 (PDT)
+Received: from toxicpanda.com ([153.61.196.250])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5357211719csm25028491cf.16.2026.10.07.10.52.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Oct 2026 10:52:54 -0700 (PDT)
+From: Josef Bacik <josef@toxicpanda.com>
+Date: Wed, 07 Oct 2026 17:52:29 +0000
+Subject: [PATCH] aoe: pull in the headers each received packet type reads
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e11de48b-e719-4cfc-a08d-916a8603782d@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261007-b4-aoe-short-packets-v1-1-db5155f7bb9c@toxicpanda.com>
+X-B4-Tracking: v=1; b=H4sIANyGxmoC/2WMQQ6CMBBFr0Jm7YQCFZGrGBdtGWzVlKZTjQnh7
+ ra4dPle/n8rMEVHDGO1QqS3Y7f4DM2hAmOVvxG6KTO0ou0bIXrUEtVCyHaJCYMyD0qMc0enqTs
+ OYpBnyNcQaXafPXu5/phf+k4mlVZZaMWEOipvbFHPUGtZ7/KvDtv2BY7wDHinAAAA
+X-Change-ID: 20261006-b4-aoe-short-packets-f3e7d3580849
+To: Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openssh-sha256; t=1791395563; l=2933;
+ i=josef@toxicpanda.com; h=from:subject:message-id;
+ bh=uhtxMQ0fKAbNPofLk84gSjQ9sJxGeJ5klNaWx5ma9IY=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgUBr36M/n0nWN0DNbnxwzIiCZez6MG
+ JiruuNaSCI/zXsAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QICch1SptbjdEqliDJi5bIfqQFjyvXfuQRQghFUUBpL14qU7EZUB++3LF5qv0bdlru6xEHz9eLY
+ I9yG4e82eIAA=
+X-Developer-Key: i=josef@toxicpanda.com; a=openssh;
+ fpr=SHA256:C8kOX2QUJCMqnCX+KEeoqRAjLo9L+ELOSH2NSAJHqGA
 
-On Wed, Oct 07, 2026 at 04:37:49PM +0200, Damien Le Moal wrote:
-> >> +	elements = kzalloc_objs(struct blk_storage_element, nr_elements);
-> > 
-> > This doesn't work as it could race.  We'll always need to allocate
-> > the space for all the elements the user asked for?
-> 
-> I am not following... The number of elements of a drive never changes, and that
-> is what nr_elements indicates. So getting the min with the user indicated value
-> still gives all elements, and that also creates a bound in case we get a crazy
-> large value from the user.
+aoenet_rcv() only pulls the AoE and ATA headers into the skb head when
+the packet is long enough to hold both.  A shorter packet goes through
+unpulled, and aoenet_rcv() reads the AoE header from it anyway.  CFG
+responses go on to aoecmd_cfg_rsp(), which reads the config header
+after it, and ATA responses get queued for ktiocomplete(), which
+skb_pull()s both headers.  Ethernet pads frames to 60 bytes, so this
+mostly takes a virtual link, but nothing stops a short frame from
+getting here.
 
-The explicitly pass the bound in.  Or have it struct gendisk as a
-fixed value.
+Pull the AoE header up front and drop the packet if it isn't there,
+then pull the ATA or config header in the switch arm that hands the
+packet on, so each path gets the headers it reads.  This also replaces
+the open-coded __pskb_pull_tail() with pskb_may_pull().
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+---
+Tested by sending AoE responses at a veth pair.  Without this patch a
+26 byte CFG response and a 20 byte frame cut off inside the AoE header
+each created an aoe device from bytes past the end of the packet.  With
+it they're dropped, and a normal CFG response still creates the
+device and gets an ATA identify back.
+
+Thanks,
+Josef
+---
+ drivers/block/aoe/aoenet.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/block/aoe/aoenet.c b/drivers/block/aoe/aoenet.c
+index 66e617664c14..cd7c735bb43b 100644
+--- a/drivers/block/aoe/aoenet.c
++++ b/drivers/block/aoe/aoenet.c
+@@ -131,9 +131,7 @@ static int
+ aoenet_rcv(struct sk_buff *skb, struct net_device *ifp, struct packet_type *pt, struct net_device *orig_dev)
+ {
+ 	struct aoe_hdr *h;
+-	struct aoe_atahdr *ah;
+ 	u32 n;
+-	int sn;
+ 
+ 	if (dev_net(ifp) != &init_net)
+ 		goto exit;
+@@ -144,12 +142,8 @@ aoenet_rcv(struct sk_buff *skb, struct net_device *ifp, struct packet_type *pt,
+ 	if (!is_aoe_netif(ifp))
+ 		goto exit;
+ 	skb_push(skb, ETH_HLEN);	/* (1) */
+-	sn = sizeof(*h) + sizeof(*ah);
+-	if (skb->len >= sn) {
+-		sn -= skb_headlen(skb);
+-		if (sn > 0 && !__pskb_pull_tail(skb, sn))
+-			goto exit;
+-	}
++	if (!pskb_may_pull(skb, sizeof(*h)))
++		goto exit;
+ 	h = (struct aoe_hdr *) skb->data;
+ 	n = get_unaligned_be32(&h->tag);
+ 	if ((h->verfl & AOEFL_RSP) == 0 || (n & 1<<31))
+@@ -171,10 +165,14 @@ aoenet_rcv(struct sk_buff *skb, struct net_device *ifp, struct packet_type *pt,
+ 
+ 	switch (h->cmd) {
+ 	case AOECMD_ATA:
++		if (!pskb_may_pull(skb, sizeof(*h) + sizeof(struct aoe_atahdr)))
++			goto exit;
+ 		/* ata_rsp may keep skb for later processing or give it back */
+ 		skb = aoecmd_ata_rsp(skb);
+ 		break;
+ 	case AOECMD_CFG:
++		if (!pskb_may_pull(skb, sizeof(*h) + sizeof(struct aoe_cfghdr)))
++			goto exit;
+ 		aoecmd_cfg_rsp(skb);
+ 		break;
+ 	default:
+
+---
+base-commit: a3b346d7b1730db9900bb9e17f5bb8ea27e6ae2c
+change-id: 20261006-b4-aoe-short-packets-f3e7d3580849
 
