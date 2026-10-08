@@ -1,129 +1,106 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E98D4968FC
-	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 12:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6BF48032C
+	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 14:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791462478; cv=none; b=fjBZgY7GzhabMbrmfsPFssHGzXGYU4HXTsVqNdhIHCX4Ji2IOxEvdJmVV6r2c6tbL/SUc2iSqQZyMdlblyEVUj0brkUwQ7xhH010fjOHJ4t0RW/6STlnHdZpb2olNWrMU7NUwgjqX2bkatavNMQYfSssCqdyl4xfCeECppddp9Y=
+	t=1791470758; cv=none; b=NDT3jxkqYhaOnkSS8ot+wNl/8OnTFuZ38N0B3kLv9asBcsVG1low/3edHeWYz+zlE8fxYtVLPh5h0dGDAxzXJdjbL7sjr4XlMySEhqGtojFxtA46iNEMvBN9FBOVLQ5nPwZ2Yb+eH8kdPEQSFQrrl9tcBXF5Sl0OoEGFOTtgicA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791462478; c=relaxed/simple;
-	bh=M/of0yKyhsge6MIBInUspqDhJmPuNOVFyiktJawrHXk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=J/5FCwPKYA5LlBOCFDTNHKNZ2qWiBSqCWCSk52FCgb9Jx0X/TFSYe3KvBPxDIaK1ZquqCQa2hyr9g5/T58lOlJ5nBEkQTOPWI0Jb3Rt8y19HMDn/7XRrYPJBqQx4czngMfidqjnHZTxPaD1eDaXE684pi0wD5385yA0VoRxNIe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=tdC5+MT+; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1791470758; c=relaxed/simple;
+	bh=QWiEB4RSp+V5dH/Aqgan5cJwk52VX6Ezefo/QbSJRDo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Txgrrcpc0z4aiypJQwaRneIN+of8ucKJYu0D1+R3+2s5GRlPu2hQXCHi4jhql8X1jtT3XExUqsVVgARMLu6U/7r24M+ld7Ex2qjXIkY7pV7Wvhbgjar228cLn5ZNyp3wEVI2CSbUD7ow9HMNRmoNcKjirtZK0sCmy0ZZ/vMw9HU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IjcKIrXu; arc=none smtp.client-ip=74.125.82.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="tdC5+MT+"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20261008122753epoutp026daf443a936e5b2d698fea5a8b73e422~cjaDGlJeM0521205212epoutp02Z
-	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 12:27:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20261008122753epoutp026daf443a936e5b2d698fea5a8b73e422~cjaDGlJeM0521205212epoutp02Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1791462473;
-	bh=y3JROMvSkErlghFufMEpz2e3fgBQWeAkOo4JhswqA7k=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=tdC5+MT+GmAi5muBRq1BT1yN1ZKyFBL9HVTHiJoMUk9qir3KHpRlhz35ERD8YB6Bl
-	 i1eJ514gd7g1gNeb0KlrladiC9kKg0NHCB+yBiTYgiBHVNFGcUFtxIU50PqOf5+JRY
-	 f9jIGFX133rc42c6pXTmJz1rl62OYAb4OJmJKBEI=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
-	20261008122752epcas5p3d0e2b9158c0268ad04675e87ce26f1a2~cjaCjkMAU1506315063epcas5p3z;
-	Thu,  8 Oct 2026 12:27:52 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.93]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4j0q5M5zGqz3hhT3; Thu,  8 Oct
-	2026 12:27:51 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20261008122751epcas5p1c1717e88968c87ac8cd3f6f7cd53fd94~cjaBJv_6d1842018420epcas5p1H;
-	Thu,  8 Oct 2026 12:27:51 +0000 (GMT)
-Received: from [107.122.10.194] (unknown [107.122.10.194]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20261008122747epsmtip1643989c6f636e89fda3b56fc37de2645~cjZ9_NBhB1436814368epsmtip1X;
-	Thu,  8 Oct 2026 12:27:47 +0000 (GMT)
-Message-ID: <bbb87d6b-b7a3-487a-8be4-27f3f9ce4a1b@samsung.com>
-Date: Thu, 8 Oct 2026 17:57:47 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IjcKIrXu"
+Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-34c4a0868b6so4907157eec.0
+        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2026 07:45:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791470746; x=1792075546; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=j461oAza6kS+xdmD4uBj9+ZclxkG9bJ1dHy6LksUEcc=;
+        b=IjcKIrXuDd07i4JEO77UIWs+t/F2XhdlV87wEUaxb/jFhJA9sbLeb8pWl5blS2YDsi
+         biJKt+hz7GULWp9p1fQoPR3lX29DtuUWcs/AH3VAIwBQUHW+jzl1afA38CNVK/OQzIb8
+         +Z3Zzj4w+niFJ+AJ1mpmkg1zpY4nzeFjH320u0BjnjLn95Bc1KBoyWBh/yAsSMR8CY+5
+         MlMtY//M306gy7jQglNwvhijXN/VeS2abtK6DNWyNBO7ZEXrFwE2FLmltaWqf7JI4zoh
+         KgAs8xPvC//dJK7k//s+bI+8kmsH+NhYKn29TY9KAeSZqerKTK15DBCjmHuzAs162+BA
+         yx6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791470746; x=1792075546;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=j461oAza6kS+xdmD4uBj9+ZclxkG9bJ1dHy6LksUEcc=;
+        b=wD4bC2IElQ/fttc8S3DeTSx928LFwXcx3dcwFgL7mo3ZCsfQ5FO3EZyRqjwf2j42LQ
+         LDMvNtQFogRSdq3FQVv+crpAFe98etwbGLxSuRMU2qeQbH68BpIDkckzLBWSIkaztIQC
+         4zLPCvE18jxYUqb7DdPg0DJEZEk5/ouD5uHV3bJ20VLSzbrrs0yam8STzkDWau8jHiyo
+         4JCRir15GPgojzy+ewNjL7KjEuFQA/IvY2IgfjQGK2TqpvZuQFF+XSfeEv81Ebi96ogZ
+         vT+McGgpzgcQTeqbcYRtrV5RfrTngQ+Zrp9KJ04Mv+mdXRIDK7OJkTr9tX9Z7QC/B9Lf
+         oyHQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwc2zR5nekrb2eHVGXOAkEJQw3DgF2NjdQR3ZWn0bd+lKOMejSKMjSGCQX4yCQ/99fKqthGIOfFnonESw==@vger.kernel.org
+X-Gm-Message-State: AFuF++kbZ50Llt4oZQJ1tJUqfoawwz1WrsvJmRceXjYuRtGV2CJ2gSQp
+	BOhqp7wUN9++f7MGxnJiaTjK6LWw7jdtYF4DBvM7YyPJ2A/U9HYClFjd
+X-Gm-Gg: AYBFou3CEynEHSBdKZ+iOBCLph8PhD3h4pStN4gOVg9D9EKWl80IsWvQcPPfv/UXXXn
+	B+gw8BQwimoR47CsttKUM8v/tiHTkp6ygpBJVFhOftx6C1qgoBD8kV/w2l7JGVJJF78Wk8Jw4BN
+	JYIgrqZOvdPyBAL5VdQCCmdoQFSoBukYeBaNqsMEZSKRLkA1FyISNXiGU7RZ9NewBHnTD3ELbbv
+	od5Z3prAdJP6XnkBBCN+heAcPBpylh42bFlI05kyNfX49Qj+Hkcpmqju7pdAfCvYcOuLmdalF4D
+	4DO5Pl3NXBAE0q/RFe6uQHD/tiLTZlau6eh5RfYiUN0tZfGm5EPLHyfR5/+H5BewAjSqWLYjDpJ
+	+4sP0zKAttMWdSe3WKmLk2PNEjF9W6Syhq9gUNI287CF/6w6VVLLtP+pY2bRzE5hb5fve1Kx3kd
+	SEE4LKjiLXS02jMXGeW9XC0EJHFY0+F0YWloedzKHEc7KeDsAikvsYZUbDianCv7sppw==
+X-Received: by 2002:a05:7301:1291:b0:343:5f5f:eef0 with SMTP id 5a478bee46e88-351778bb61fmr4464528eec.21.1791470745880;
+        Thu, 08 Oct 2026 07:45:45 -0700 (PDT)
+Received: from [127.0.1.1] ([23.254.208.9])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3515aff5dd6sm17913731eec.26.2026.10.08.07.45.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Oct 2026 07:45:44 -0700 (PDT)
+From: Qiliang Yuan <odys.yuan@gmail.com>
+Subject: [PATCH 0/2] selftests: ublk: fix the fault_inject delay
+Date: Thu, 08 Oct 2026 22:45:38 +0800
+Message-Id: <20261008-bug-ublk-selftest-fault-inject-delay-v1-0-a96af7ead06e@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 05/13] block: add dma-buf support for raw bdev
-To: Pavel Begunkov <asml.silence@gmail.com>, linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>, Sumit Semwal
-	<sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?=
-	<christian.koenig@amd.com>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg
-	<sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
-	Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Andrew Morton
-	<akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>, Nitesh Shetty
-	<nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, Mike Snitzer
-	<snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Benjamin
-	Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
-Content-Language: en-US
-From: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>
-In-Reply-To: <af2b48a490186edf38f1d4a5dfd9513574f7a350.1791336930.git.asml.silence@gmail.com>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20261008122751epcas5p1c1717e88968c87ac8cd3f6f7cd53fd94
-X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20261007014324epcas5p2a7f3b03f118c9a1d1c633fe839ed1e46
-References: <cover.1791336930.git.asml.silence@gmail.com>
-	<CGME20261007014324epcas5p2a7f3b03f118c9a1d1c633fe839ed1e46@epcas5p2.samsung.com>
-	<af2b48a490186edf38f1d4a5dfd9513574f7a350.1791336930.git.asml.silence@gmail.com>
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJKsx2oC/x3NQQrCMBBA0auUWTuQhBDEq4iLSTupoyFKJilK6
+ d0NLt/m/x2Uq7DCZdqh8iYqrzJgTxPMdyoroyzD4IwL1pgzxr5ij/mJyjk11oaJem4o5cFzw4U
+ zfdEHJm99JOcCjNS7cpLPf3O9HccPoattinYAAAA=
+To: Ming Lei <tom.leiming@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+ Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Qiliang Yuan <odys.yuan@gmail.com>
+X-Mailer: b4 0.13.0
 
-On 10/7/2026 7:12 AM, Pavel Begunkov wrote:
-> +static int blkdev_init_dma_buf_io_ctx(struct file *file,
-> +				      struct dma_buf_io_ctx *ctx)
-> +{
-> +	struct block_device *bdev = file_bdev(file);
-> +	struct gendisk *disk = bdev->bd_disk;
-> +
-> +	if (!(file->f_flags & O_DIRECT))
-> +		return -EINVAL;
-> +	if (!disk->fops->init_dma_buf_io_ctx)
-> +		return -EOPNOTSUPP;
+The delay set by --delay_us on the fault_inject target is lost in two
+ways. Its timespec is read after it has gone out of scope, which makes
+generic_06 fail, and any other completion on the ring ends it early when
+more than one I/O is in flight. Patch 1 keeps the timespec alive until
+the SQE is submitted, and patch 2 makes the delay a pure timeout.
 
-dma-buf doesn't work with PI: bi_dmabuf_map aliases bi_io_vec, and 
-blk_integrity_iterate() walks it as bvecs to generate/verify the 
-checksum. rw-dmabuf liburing test hangs on a PI enabled NVMe. Something 
-like below is needed:
+With both patches, a 1 s delay holds every I/O for 1.000 s at queue
+depth 4.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e929f94b25c7..1b7f8cbbda8b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3150,6 +3150,12 @@ void blk_mq_submit_bio(struct bio *bio)
-                 goto queue_exit;
-         }
+Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
+---
+Qiliang Yuan (2):
+      selftests: ublk: don't keep the fault_inject timespec on the stack
+      selftests: ublk: make the fault_inject delay a pure timeout
 
-+       if (unlikely(op_is_dmabuf(bio->bi_opf) &&
-+               bdev_has_integrity_csum(bio->bi_bdev))) {
-+               bio_endio_status(bio, BLK_STS_NOTSUPP);
-+               goto queue_exit;
-+       }
-+
-         if ((bio->bi_opf & REQ_POLLED) && !blk_mq_can_poll(q)) {
-                 bio_endio_status(bio, BLK_STS_NOTSUPP);
-                 goto queue_exit;
-diff --git a/block/fops.c b/block/fops.c
-index e9da48ab73be..6c6700df943c 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -976,6 +976,8 @@ static int blkdev_init_dma_buf_io_ctx(struct file *file,
-                 return -EINVAL;
-         if (!disk->fops->init_dma_buf_io_ctx)
-                 return -EOPNOTSUPP;
-+       if (bdev_has_integrity_csum(bdev))
-+               return -EOPNOTSUPP;
-         return disk->fops->init_dma_buf_io_ctx(bdev, ctx);
-  }
+ tools/testing/selftests/ublk/fault_inject.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+---
+base-commit: e1274a6bc40a4618f6fbaebbdc51cca865d51bed
+change-id: 20261008-bug-ublk-selftest-fault-inject-delay-46ea414ba226
+
+Best regards,
+-- 
+Qiliang Yuan <odys.yuan@gmail.com>
 
