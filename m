@@ -1,126 +1,111 @@
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6AD4B44A1
-	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 14:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3734C3CB570
+	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 21:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791470765; cv=none; b=Oc/vU5ysvJB74PE05Kqahow3FfivV4FUD2KUqIFANdzmOFzpt453xdKZqkR5UreqlAiMeJmki2JDSgdK9ve37ln9eWVRksClFt3zxwtWOudjL4ZUbrn+5V/s4xeP/FmeBF4VpMnxLKHlzpjG7YWn+REdx5n9S+vgjtDZ7EKFtN4=
+	t=1791495836; cv=none; b=c8I38ShZUu37Q8u5IVEXqiriGiD5UUPlcPifZhH2xj4X/r53/sbtxoGy/sjPWDlHy+FpIK06ZZlnsQDOsyO+CjqY4rLE9X9IXFPNWpHIsmiGWEm4Jnjfm04GS+aRgP8YxxsUNP4DCfGNdOC/hgyK1pOuVHtw5PRnftYyThn87KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791470765; c=relaxed/simple;
-	bh=MLOJVwWzQhd0d/DLT4Tfa5XEt/KHRPHFFa0NUDNSgO0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Kj6zVoz1MNlFUrfZlFB79UDwmjtL9yX6swztjInzR5JqQD18bPEm0dorITlEZDePqgwHgIclOEMw6x5d21NbydqmGI+QCcnpOMFrVFl0hvmn+Ks0/oG5oHBtbJdO4NW35NL/hDhb7hq4okrV/uaor9k9usFuzVLyVCjqwgS3ZrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dmsAG0fD; arc=none smtp.client-ip=74.125.82.169
+	s=arc-20240116; t=1791495836; c=relaxed/simple;
+	bh=rjfDai8SpMWRSvJXTYPEduLGynEZhxYgh3aoDjNLf14=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H0c86tmBOuhUeBmzoM+cbCNIafKC3/A+0+v6YVD+0oPBPFZYfsbMbxHcO+dt4zNvx6UxepFjOfCWzmgrxe0a5pL1h1ECFBKZwCDXpd/sDK8u8Jo9NjEqF+k2ISoZXQxcNyydlJoHABYmAbeFyMuGen+S4suaJjrex7c9i2HY+VM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jMxHwNAT; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dmsAG0fD"
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-35154cb9de2so4462622eec.1
-        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2026 07:45:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMxHwNAT"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-917a4b69a79so37379156d6.1
+        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2026 14:43:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791470754; x=1792075554; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/o2LgKVqbpmnkP4q3l7vgAMjWCFk5nWYZQGCoCxnxtE=;
-        b=dmsAG0fDkR35OVLVnhsRwXKECQTh9i98gwAjyqXq9tM/F4x2UcKF1671P0g4jpXS2N
-         +wqmgtdcDZKSZ2NdJOe2LTSknMCrJonv4hGXg2mx2xwMjTiMQg/lDzatZzwp2OG+sqAW
-         q/QyvqJo6lXEjijEXJ2PcjOBSUTD/qfVfycs1JpKux4W/pvpXTPGBiQ9szZkTecZ8H6b
-         6YneUfFehGyVPnGhHHewzFsNT4MvyeJauyKHsUOYrT6mRVQhrar/rMjQbj1r1nZtlsJU
-         cribDhsFCuA1xoCJbdbqT/UvxR+6kCU55p/WpqeLxBvz9BRiHKFkFS67IgdgOvIaA0cb
-         81yg==
+        d=gmail.com; s=20251104; t=1791495834; x=1792100634; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=sI8Tp1gxu2k4vbKe+if+9VifCpYJLR1GitVkoGAT3O4=;
+        b=jMxHwNATWXoNff+SLe7yuHIsOHvSLZRPdJKcL+HQCvNvLDc5jTuMRb6pTGJBs9m6dJ
+         oVM65p6gkfySJLVbKjk2SaewvkF2un7RzPUW5RxmA7hYJ+4FjtBfjybqViDi9U4XrMLf
+         PbDzqLp1dtN5Tp9wxprS1gOiFWawPgYlpmu4SCZUBVOwShESEgighDmfKlHpHsaIFikl
+         N8YuBkUJSo+4jykpyLGl64Q/EI4C5+RGjESQY+04VmdH0vtDG8810Bh6UWoSJ0kURASM
+         v1+/3aM/oVZyrUN5pNNZCfyBGVnf06NQK40b5XYOCo/Ox6NNobTBT4s1V+Hjx0e6q0VJ
+         3SZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791470754; x=1792075554;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/o2LgKVqbpmnkP4q3l7vgAMjWCFk5nWYZQGCoCxnxtE=;
-        b=IOridPMMX0WR++hh1ixHMtsksTtQ7AumGbXzFr+1ktaQDWIHIMpAeizowcHuCymfQf
-         ImW/5mM5xa0TRDKRzktUYl0mIn3tveG2AsxbktC5AKz0HBI7g+Ojd7hWxphgTsbZKKR8
-         nRDWsrY7v7+BvLKzQSPAbQnQarnJ4IyUmX1oNVChE2F9nZZdYzBjBkCOsm8ZDT9+2dTn
-         +jYSU+ZcPlVOJUAL045tHt8Bc/1a4+CSe/INv7LoWllDdiGqcZ44CxzMUEXEXIK6sI+C
-         xwxl6DL9e5ZsBV62jXX6JBX6R+wUkfxYa/X4daXAbUDso6k7nYNkpJOpgvcNV5IquqN0
-         7nCA==
-X-Forwarded-Encrypted: i=1; AKwUvBz2vpV4fw0u+vrbrNvqZ0IMD3fiLTzPZ7bq3DF5IlKhfXkjmql30QjTb5u6gtUOm8Wlg/1WxfkP5BKCxQ==@vger.kernel.org
-X-Gm-Message-State: AFuF++n8pp7Ex76qrnx9IRpx160dGzOtJu+wLmJgZMh3T0aXfSxXdb+o
-	MWPCC+mFGM2bUFTrx9K+JXgzCJiHMlX/QonLRPDvHd/d+mkJbsQXd1P9
-X-Gm-Gg: AYBFou3I9rgQSaD9cow1RTdxs5nvsG1W9pD9K3Fcy0NNfEnjWwdbIGpfiTE1hqnQfqP
-	vbJLwcFzanTiPyKnjVuN7zFy8Vbcw2VNG4aK9YCwQma+FE0zoSFXRJgWmjOA2yoeQIvED+UQiEs
-	4HSZKQuAbLm1iFeXk4/t5OVwU6SP9rgTRR3fx4mlUZILKYlmEYzauMvqk4keYgNktdmOz2Wgaxb
-	lNBwF0IKzSeRJLOh2mPWvGiazQRKlKheWK5LrZJkIyxX762ltH0kaft1b3usa2o3pMIpK/2Nz1G
-	lr3KjTh2KaPK5GregtMH2dMR0Y0/T7Teh3mvbwoNHn9hZnjOienZc6ca4R5FG0fooreBubdsFNM
-	MDgc3QBECsC1JERi3ogCEloVYQBm0PuuMDeUFGgB/muekiB5A/vPUDE4uHIVyegwn7zpa7ERA36
-	j9orweUiARswLs+cwgNAUGEJdyfiQhNw4xrck0r3pZZ7Fwu2ehbQmIT4AT/B9Y3nERX/D46EtRT
-	x8I
-X-Received: by 2002:a05:693c:6518:b0:33c:e72:5b3b with SMTP id 5a478bee46e88-3515de5e146mr7540017eec.25.1791470754147;
-        Thu, 08 Oct 2026 07:45:54 -0700 (PDT)
-Received: from [127.0.1.1] ([23.254.208.9])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3515aff5dd6sm17913731eec.26.2026.10.08.07.45.49
+        d=1e100.net; s=20260707; t=1791495834; x=1792100634;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sI8Tp1gxu2k4vbKe+if+9VifCpYJLR1GitVkoGAT3O4=;
+        b=Gox+UngzMgd3iAcwZDiZ68deezD/uzn2g7jz7zT4kjkIYpD1AUGenklBO6oVpDT5kQ
+         GMc9aDdrSUKvJovugtrhXLOYFkcoBLFAh3Hl8yUWbSXHRgkBaU+dk84yLm6R+56FMf17
+         tTKsnB98dh/TbV897gC8aNHNQweDedOwTQ78q2bi3qo7COmuv9HeZMW6HXRhNpA28BZ8
+         uefC4VFzay5wvobpd3w1sdVJ/47T5UQHtxMqIcdTQXqxuoazSrxWflxUfut8qVQnEDTq
+         lE8javeBrT7IqL2yMIjjvM/ki5Th8kISyOQI5XjbcMErIRIB+O8rbTXTvS6Aqiv7iZyK
+         Sxsg==
+X-Forwarded-Encrypted: i=1; AKwUvBzckXGICkj825yfKE9z0ZGY8ZedffGMaT5b/h6zFOR3OiHynYcyX1ppSa3r7sDNwGgyc34O9XLyMF5CYA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYL6LQAC+wqZ2nrVK6UZcMyV91hVbl9ma1FHpK9XD5xtVUkY0zsc
+	r7JeYEGgIxbJt5LdnWf3xlck7HTjPOPXnbdzx4MT8mKwlO4WZIrN9CldABlP3/w6BP0=
+X-Gm-Gg: AYBFou3WZX8X68apqG0CPLxjrM1wTVrIdMgYiWloJ2OA37UrjEFhkGSEJQOQEMxuKOI
+	HGEpbhCQpVML87u2LTF8zhjzeXc1klxQT8z9ToYii67O4wFoAzFdwXI17lIfR5G/dzQMcYAWg32
+	/Tuixr3J5bF/uaA4bmyt2xwvQNeSXDyagscZqs4azV6EpLynJ1s5crxhnhqGSy98efgtk87HhTE
+	7Y5bQz5YePIAbT7q9DwWKNGvRubL4iJxFgvLJ03ebYoJ+uaaB05hYRGHTPqCWIj3iALe0u0tIHJ
+	5i86ZvtwBnt/ux07FdRtSmX5cRcu5chS7GKuOY2ZAnkeCQu7+v7GzKqh0G/08V2r5611KN44E+P
+	0RFvCBp+nVd4MYyubfeNtY81omAfH+r2I+Fe0Q7zx9dcszEIIvScTGwe7gcNU2hGVbJgLhV/Khp
+	GoR4VqATdgkkTSq3Qdc0hs1djHqNMz792n+9+hQptIxOmDgVHyrg6H5z8A4qNdX9IsvIsavIz2k
+	QO1viw=
+X-Received: by 2002:a05:6214:4505:b0:917:bfa7:2598 with SMTP id 6a1803df08f44-91b55578a45mr802446d6.18.1791495834104;
+        Thu, 08 Oct 2026 14:43:54 -0700 (PDT)
+Received: from debian.lan ([172.245.89.240])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91b5507646fsm903406d6.28.2026.10.08.14.43.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 07:45:53 -0700 (PDT)
-From: Qiliang Yuan <odys.yuan@gmail.com>
-Date: Thu, 08 Oct 2026 22:45:40 +0800
-Subject: [PATCH 2/2] selftests: ublk: make the fault_inject delay a pure
- timeout
+        Thu, 08 Oct 2026 14:43:53 -0700 (PDT)
+From: Maks <mi9992828@gmail.com>
+To: axboe@kernel.dk
+Cc: Maks Ivanov <mi9992828@gmail.com>,
+	io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Question about asynchronous blk-mq tag waiting for io_uring
+Date: Fri,  9 Oct 2026 00:41:37 +0300
+Message-ID: <20261008214137.1267424-1-mi9992828@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261008-bug-ublk-selftest-fault-inject-delay-v1-2-a96af7ead06e@gmail.com>
-References: <20261008-bug-ublk-selftest-fault-inject-delay-v1-0-a96af7ead06e@gmail.com>
-In-Reply-To: <20261008-bug-ublk-selftest-fault-inject-delay-v1-0-a96af7ead06e@gmail.com>
-To: Ming Lei <tom.leiming@gmail.com>, Shuah Khan <shuah@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Qiliang Yuan <odys.yuan@gmail.com>
-X-Mailer: b4 0.13.0
+Content-Transfer-Encoding: quoted-printable
 
-ublk_fault_inject_queue_io() queues the delay of each I/O as an
-IORING_OP_TIMEOUT with a completion count of 1. Such a timeout also
-completes as soon as any other CQE is posted on the ring.
+From: Maks Ivanov <mi9992828@gmail.com>=0D
 
-With more than one I/O in flight, the completion of one I/O ends the
-delay of the others, and ublk_fault_inject_tgt_io_done() reports every
-early completion as "unexpected cqe res 0".
-
-Pass a count of 0 so that only the expiry of the timer completes the
-timeout.
-
-fio 4k random reads for 10 s at queue depth 4 on a fault_inject device
-with --delay_us 1000000:
-
-                            before      after   expected
-  I/Os                     2263170         40         40
-  mean latency             16.3 us    1.000 s        1 s
-  "unexpected cqe res 0"   2263169          0          0
-
-Fixes: 81586652bb1f ("selftests: ublk: add generic_06 for covering fault inject")
-Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
----
- tools/testing/selftests/ublk/fault_inject.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/ublk/fault_inject.c b/tools/testing/selftests/ublk/fault_inject.c
-index e055f51a65447..4b59f17a918c0 100644
---- a/tools/testing/selftests/ublk/fault_inject.c
-+++ b/tools/testing/selftests/ublk/fault_inject.c
-@@ -92,7 +92,7 @@ static int ublk_fault_inject_queue_io(struct ublk_thread *t,
- 	 * reads it only when the SQE is submitted.
- 	 */
- 	ublk_io_alloc_sqes(t, &sqe, 1);
--	io_uring_prep_timeout(sqe, &opts->delay, 1, 0);
-+	io_uring_prep_timeout(sqe, &opts->delay, 0, 0);
- 	sqe->user_data = build_user_data(tag, ublksrv_get_op(iod), 0, q->q_id, 1);
- 
- 	ublk_queued_tgt_io(t, q, tag, 1);
-
--- 
-2.43.0
-
+Hi,=0D
+=0D
+I read your comment in liburing issue #1492 about callback-based retry=0D
+when storage tags are exhausted:=0D
+=0D
+https://github.com/axboe/liburing/issues/1492#issuecomment-4696489936=0D
+=0D
+I'm considering this direction for my bachelor's thesis and would like=0D
+to clarify its scope and design.=0D
+=0D
+The initial scope would be io_uring direct reads on raw block devices.=0D
+For requests without explicit RWF_NOWAIT, the mechanism would register=0D
+a continuation when tag allocation cannot complete immediately, then=0D
+retry submission when a tag becomes available.=0D
+Explicit RWF_NOWAIT requests would retain their existing=0D
+behaviour when tag allocation would require waiting.=0D
+=0D
+Could you clarify a few points?=0D
+=0D
+- Is this still an open direction worth investigating?=0D
+- Is there related work or an existing approach I should look at first?=0D
+- Which layer should own the continuation: io_uring, the block submission=0D
+  path, or blk-mq?=0D
+- What lifetime and cancellation constraints would such a mechanism need=0D
+  to satisfy?=0D
+=0D
+I would also appreciate pointers to other open problems in io_uring or=0D
+the block layer that could suit a focused implementation and validation=0D
+project. Existing bug reports, design discussions, or TODOs would be=0D
+very helpful.=0D
+=0D
+Thanks,=0D
+Maks Ivanov=0D
