@@ -1,32 +1,66 @@
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924333DA7DF
-	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 07:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189333F9F25
+	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 08:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791444184; cv=none; b=eRJ6MS1eGa1deH7L9vORrbi33ST/6zhuxd6CyfOE9poqhGyrqaRhKs0UZXeCiNGGaYMAV+JLAI0V9bGhAyzVCfB14KQ7XR2k5qQ7reHFHxSN/czDqcgWpBnnWGQGijEp3QoN6roNCRfD4IbYA8mMQwRIfvJ5kj7RNS9QgX7TOpU=
+	t=1791446424; cv=none; b=R74PN1SFwajLotjBY66yjNS4XFgXez0SZxatLVD6zCp9e574W/IyfLQ5qDSsPIwiFGMOBYy/tXXq0gPtrD7fJ3RgVE5mXwnWTwCQuQmtINaun6196+YNQZ75rvl4V8ubiKne2yrCT0vxAcEOWYEDUSgn//e24b9T7oJsPraWRfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791444184; c=relaxed/simple;
-	bh=BEf8ea4KUWXQP7PqJDC14lFvT3DyCU6vO5/oXn5nRGU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XBM6QsXy3/AhuJcb48jDqHm9ptBzuS7ejaLeFp9OcukzlIJY4acFpFC3SWloWNNQWyeeLXRLoG/c3/YG7oeGMFM9dILTZ3//xOUXBd8lx0vufs2HTtxRxdSvCZCxSX8vR1r81fIKWHUXK0SPI9ajbUb1Pjqhf/2wxMnRtI1AgAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=e8LdoWGJ; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1791446424; c=relaxed/simple;
+	bh=pn1ZYnsLKWKZKMLis4Mb4WSGKnhfbJ9BIt1r9rb52E0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pA+QvIRZhO6IyyeQQvbXfZBaj/7h78fxAXyjGGZ96VUWwN6E7PuL+SCPTnagU3+OfOvw3AsbDV2D3FgKizZ83kNafzaOufUr2kzgK1x/7AR6pPEfM7dLYPhY7Bl2eGi55kNsYnTQJHynNWa3YLhYaL/Qd2UfDv9cYRtbXo8kMsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=lYGntjqN; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="e8LdoWGJ"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1791444176; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=MMu468jDucZH5s69Sf32AKBFRvEDOHfr8VAVh/kduzk=;
-	b=e8LdoWGJfJ+G0ccQviMWA4fQki7cMwuoA4jbBlY9auIUvHoL6yzj14jldkCU5jSBiRC/HllzrhZR7KvCurHovG1YwQdMX90BkczJTEMNc5bmiyyhlm7w0uo4k0gBaNhKpkxvePSOy1aHI3hp0ekCfF2B9lTVh19TxDwUsCcnSq4=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037033178;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0XCM1-Xa_1791444174;
-Received: from 30.221.149.122(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0XCM1-Xa_1791444174 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 08 Oct 2026 15:22:55 +0800
-Message-ID: <8a5d8f09-2388-4cc3-9012-884718c813de@linux.alibaba.com>
-Date: Thu, 8 Oct 2026 15:22:54 +0800
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="lYGntjqN"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-381b831d535so4882779a91.0
+        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2026 01:00:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1791446420; x=1792051220; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=CEGNX9o2ekofmi3CaUGlBm2/+Xc2Ba7w+559DPi52mQ=;
+        b=lYGntjqNq9YB2wtGRshdUZvQYShq/rw9kU4KVffTfSM9ptUbRqXOmWTE0SsnwV0dt6
+         Foe/aZ97fTwkZJuxA31Tae7XHKtkCSQ2aLxCd3rJttf6yljZOVTRVk2/HrnXiEelMTc9
+         XyniCLaM6s8v1Wn+cI91x/DRv2kOijyU5apHiq9hPz9rLfiE3YbJIscGbr3T3t5wr1hT
+         nkMQ4G6g0+agTvLH6EbAgxiniOdO2jmBAKLZawzDpLf3DlNE/aSucOJRBFF4yae8iycF
+         FBZ75fkdFobvI/8IwH7v1JqHUbUYODbgrHt6GVV0E72GnpY1650gf+APjget08NVCc9P
+         f6fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791446420; x=1792051220;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=CEGNX9o2ekofmi3CaUGlBm2/+Xc2Ba7w+559DPi52mQ=;
+        b=SEOdGvRJT3CcZJvbbDGYh5foentg6WFxQsXdltduGIvfMIbWHSnIidQRri9a/IbIz6
+         s+dgSPFTtdlMqMajrywx5aJNsJCv+yQBuCm1Kese6549cvj5TexeBHJRO458ZSDF16jA
+         yvZj2+Wj7kQw+HUGJv0lhs5H58VuY+I8kh6M+rVrfQ5nbM2hPJwC0YPXoh7laAO31E8t
+         uYGfOzft+Qn/VnzkLHvHYFmdbINskJL2gNMQEWLhYxmsiKXOknvVv9fgjzCl2Xuywitk
+         0odhS6hK6z0UGI/c8xkVeUoYR2IgvPCUWgDIucgoEaRadnOxO+yNXnZSqOuwN+AlC1b4
+         ni+g==
+X-Gm-Message-State: AFq9FYI1JQNae3wQ6OY68Dyi+DJG4XQxjibf0Zws9saYztzdxmFO15FF
+	lylgrl4VsVx6NSdCzK6oqyWNG9liWkIudAeBp3706KcdI+4hGkJqV/FWEnbV1w/YG9w=
+X-Gm-Gg: AYBFou1XdGxjTVR4cFQFBdJgBFNaRgz/HSzQe7/fZ8fAjpVMiqHh3Yim6096M0kV0n5
+	d3HKaH+99F46tRkkMjhScRhz/O8qPKzrDDKOk/nKUJdKsXkz4GnJLMogXwrhpgNZ3Vz+1X8QK6P
+	KKRa+6YIuI/a3no8apcNJTWA0kTsyTBqWLgiCWEzFCiLrzLK2l0MRLTYoyhLYkXMDzM7swJLknf
+	mYInVMQjMMBpQfQfjq0CwYss68MipS1POnRzCifywtC1Yo1fOqbcVb+yh9Mx1WKbbIDAXRjwDcT
+	9e6xR5A+E1ldO4Q5PzFUPBqUWQfOwXEBT2P+4UZ4Re6jGC21jjwfYiEc6MoPBIA3Jaj+fqltp7j
+	O7LjtEjZ6pYP7PJ6++JIWs3/i8Tod9rWaXmwPV8oTthaXoZAjsWVSafXjDMlVHeKSXDzsx2GQZZ
+	X1reEEa6ESPtQ5w+AoJWjGiD6lNm0zpsXQ4LVNk6RRAXjLRcA1oV/4p+7IkXPEKMc2f3ed10++w
+	fC2TiwVPoq+GedqnLBXhI1NbhHNNKO1g94cR7nwggYicjqV3DSR
+X-Received: by 2002:a17:90b:534f:b0:3a8:5d1f:59ad with SMTP id 98e67ed59e1d1-3a8a1b04025mr3670596a91.43.1791446420072;
+        Thu, 08 Oct 2026 01:00:20 -0700 (PDT)
+Received: from [100.81.25.52] ([61.213.176.59])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a9ff7ab32bsm3141344a91.3.2026.10.08.01.00.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Oct 2026 01:00:19 -0700 (PDT)
+Message-ID: <c4d76912-581f-4174-95a7-d0ecaae79d3d@bytedance.com>
+Date: Thu, 8 Oct 2026 16:00:13 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,164 +68,186 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] nbd: fix NULL pointer dereference in
- nbd_pending_cmd_work()
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-To: Bart Van Assche <bvanassche@acm.org>, Ming Lei <tom.leiming@gmail.com>,
- Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, nbd@other.debian.org
-References: <20260928091021.2456652-1-joseph.qi@linux.alibaba.com>
- <20260928091021.2456652-2-joseph.qi@linux.alibaba.com>
- <9e43373f-9202-4fa7-b0c8-f1bc80fd81de@acm.org>
- <616f687a-417e-4fd5-b0dc-9bd519db3920@linux.alibaba.com>
-In-Reply-To: <616f687a-417e-4fd5-b0dc-9bd519db3920@linux.alibaba.com>
+Subject: Re: [PATCH v9 1/3] block: introduce bdev_flush_by_dev()
+To: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
+ linux-fsdevel@vger.kernel.org, axboe@kernel.dk, hannes@cmpxchg.org,
+ mhocko@kernel.org, roman.gushchin@linux.dev, shakeel.butt@linux.dev,
+ muchun.song@linux.dev, willy@infradead.org, tj@kernel.org,
+ akpm@linux-foundation.org, Boris Burkov <boris@bur.io>
+References: <20260925064444.3944820-1-sunjunchao@bytedance.com>
+ <20260925064444.3944820-2-sunjunchao@bytedance.com>
+ <arYaMbJUh6unvz_t@infradead.org>
+ <3w6vfwfkojmfqy2qs5j4q2s2366ajqiwmqf624lyn3odrv42v2@va2r7a6ngfz6>
+ <aroIAqoCNDBPlB2A@infradead.org>
+ <9e9c02fe-e94d-4f70-a21b-47b46bab2c3b@bytedance.com>
+ <5my3hyw54ej2tw24dqnacsy7xppywdjovvnwvrevmczsllzq7c@berxapmobgfa>
+ <asNfNHd-kcsI4B1S@infradead.org>
+ <bsb5vk2s3vyqglw6bv6pgpoqqvkho2p5kfnskfwfban5azi2vt@sceqd6t36yai>
+From: Julian Sun <sunjunchao@bytedance.com>
+In-Reply-To: <bsb5vk2s3vyqglw6bv6pgpoqqvkho2p5kfnskfwfban5azi2vt@sceqd6t36yai>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On 9/29/26 9:02 AM, Joseph Qi wrote:
-> Hi Bart,
-> 
-> On 9/28/26 10:19 PM, Bart Van Assche wrote:
->> On 9/28/26 2:10 AM, Joseph Qi wrote:
->>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->>> index c2c3dbdd631f..9909774dbfbb 100644
->>> --- a/drivers/block/nbd.c
->>> +++ b/drivers/block/nbd.c
->>> @@ -63,6 +63,7 @@ struct nbd_sock {
->>>       int fallback_index;
->>>       int cookie;
->>>       struct work_struct work;
->>> +    struct request *partial_req;
->>>   };
->>>     struct recv_thread_args {
->>> @@ -637,12 +638,24 @@ static void nbd_sched_pending_work(struct nbd_device *nbd,
->>>   {
->>>       struct request *req = blk_mq_rq_from_pdu(cmd);
->>>   -    /* pending work should be scheduled only once */
->>> -    WARN_ON_ONCE(test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags));
->>> -
->>>       nsock->pending = req;
->>>       nsock->sent = sent;
->>> -    set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
->>> +
->>> +    /*
->>> +     * Already armed: this is nbd_pending_cmd_work() re-entering because the
->>> +     * resumed send was interrupted again.  Its work is still running, so
->>> +     * just refresh the resume point above and let its loop pick it up
->>> +     * instead of taking another config reference and requeueing the work.
->>> +     */
->>> +    if (test_and_set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags))
->>> +        return;
->>> +
->>> +    /*
->>> +     * nbd_mark_nsock_dead() clears ->pending, so the work function cannot
->>> +     * rely on it to find the request it owns.  Keep a copy that only it
->>> +     * clears.
->>> +     */
->>> +    nsock->partial_req = req;
->>>       refcount_inc(&nbd->config_refs);
->>>       schedule_work(&nsock->work);
->>>   }
->>> @@ -817,11 +830,12 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
->>>   static void nbd_pending_cmd_work(struct work_struct *work)
->>>   {
->>>       struct nbd_sock *nsock = container_of(work, struct nbd_sock, work);
->>> -    struct request *req = nsock->pending;
->>> +    struct request *req = nsock->partial_req;
->>>       struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
->>>       struct nbd_device *nbd = cmd->nbd;
->>>       unsigned long deadline = READ_ONCE(req->deadline);
->>>       unsigned int wait_ms = 2;
->>> +    bool complete = false;
->>>         mutex_lock(&cmd->lock);
->>>   @@ -830,6 +844,18 @@ static void nbd_pending_cmd_work(struct work_struct *work)
->>>           goto out;
->>>         mutex_lock(&nsock->tx_lock);
->>> +    /*
->>> +     * nbd_mark_nsock_dead() can tear the socket down between schedule_work()
->>> +     * and here, and it clears ->pending and ->sent.  The header is already
->>> +     * on the wire so this request can never be answered; fail it rather than
->>> +     * resuming a send on a socket that is gone.
->>> +     */
->>> +    if (!nsock->pending) {
->>> +        cmd->status = BLK_STS_IOERR;
->>> +        __clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
->>> +        complete = true;
->>> +        goto unlock;
->>> +    }
->>>       while (true) {
->>>           nbd_send_cmd(nbd, cmd, cmd->index);
->>>           if (!nsock->pending)
->>> @@ -846,16 +872,36 @@ static void nbd_pending_cmd_work(struct work_struct *work)
->>>                * nbd_handle_cmd() requeue every later request forever.
->>>                */
->>>               nbd_mark_nsock_dead(nbd, nsock, 1);
->>> -            blk_mq_complete_request(req);
->>> +            complete = true;
->>>               break;
->>>           }
->>>           msleep(wait_ms);
->>>           wait_ms *= 2;
->>>       }
->>> +unlock:
->>> +    /*
->>> +     * nbd_sched_pending_work() writes partial_req under tx_lock, and
->>> +     * cmd->lock is per-command, so this has to be under tx_lock too.
->>> +     */
->>> +    nsock->partial_req = NULL;
->>>       mutex_unlock(&nsock->tx_lock);
->>>       clear_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
->>>   out:
->>>       mutex_unlock(&cmd->lock);
->>> +
->>> +    /*
->>> +     * Complete before nbd_config_put(): if this is the last config
->>> +     * reference, nbd_put() runs nbd_dev_remove() inline unless
->>> +     * NBD_DESTROY_ON_DISCONNECT is set, and del_gendisk() would then wait
->>> +     * in blk_mq_freeze_queue_wait() for the q_usage_counter that this
->>> +     * request holds until it is completed.  The config reference is what
->>> +     * keeps nbd itself alive across the completion, but cmd must not be
->>> +     * touched afterwards, since nbd_complete_rq() may run inline and ends
->>> +     * the request without taking cmd->lock.
->>> +     */
->>> +    if (complete)
->>> +        blk_mq_complete_request(req);
->>> +
->>>       nbd_config_put(nbd);
->>>   }
->>>   
+On 10/6/26 12:25 AM, Jan Kara wrote:
+> On Mon 05-10-26 01:26:28, Christoph Hellwig wrote:
+>> On Fri, Oct 02, 2026 at 01:10:42PM +0200, Jan Kara wrote:
+>>> FWIW I share Julian's concern here. It would be fine to use AS_KERNEL_FILE
+>>> for ext4 metadata but I think just unconditionally setting AS_KERNEL_FILE
+>>> for bdev mappings will cause issues because some users may be using bdevs
+>>> directly for their workloads and they could still expect proper memcg
+>>> accounting to work in that case.
 >>
->> These changes add significant complexity and hence make the NBD driver
->> harder to maintain. Has it been considered to increase the request
->> reference count while nsock->pending != NULL? See also req_ref_inc_not_zero() and blk_mq_put_rq_ref().
+>> Agreed that it should not set unconditionally.
 >>
+>>> We could set AS_KERNEL_FILE when opening bdev for a filesystem (and remove
+>>> it when releasing bdev) but that would have to make sure there are no
+>>> folios in the bdev mapping when changing the flag as otherwise the
+>>> accounting would go wrong. Looks it might be doable but getting all the
+>>> cornercases right will be hairy and overall not very appealing to me...
+>>
+>> I'd rather not support special case writeback code just for this legacy
+>> fs abuses bdev buffer cache case.  And we basically need to tear
+>> down pagecache at unmount anyway, as i_blkbits can change, so while
+>> we do need to be careful, I don't think it really is a major issue.
 > 
-> Thanks for taking a look.
+> OK, after some more thought yes, I think we can make that work.
 > 
-> It seems a request reference can't replace the extra pointer, since the
-> two answer different questions.
+>> We might be able to restrict to setting it when
+>> CONFIG_BLK_DEV_WRITE_MOUNTED is disabled to avoid the problem of non-fs
+>> shared mmap writers, as anyone using a modern kernel and cgroups really
+>> should have that disabled.
 > 
-> A reference keeps the request object alive, but it doesn't stop
-> nsock->pending from being cleared, which is what breaks the worker:
-> 
->   nbd_mark_nsock_dead()
->     nsock->dead = true;
->     nsock->pending = NULL;
->     nsock->sent = 0;
-> 
->   nbd_pending_cmd_work()
->     struct request *req = nsock->pending;
->     struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
->     struct nbd_device *nbd = cmd->nbd;
-> 
-> Nothing between schedule_work() and the worker starting takes a lock the
-> teardown path also takes, so pinning the request still leaves the worker
-> reading NULL from ->pending and faulting on cmd->nbd.
-> 
+> I don't think that's really needed. If such writes are happening, they are
+> *very* limited and done by a system administrator only (as they are very
+> dangerous) so the fact the writes will get charged to the root cgroup is
+> not an issue.
 
-Any more comments on this? Or am I missing something?
+Hi, Jan, Christoph.
+
+Thanks for your suggestions.
+
+One remaining concern: while ext4 is mounted, buffered reads of the raw
+block device would also charge page-cache allocations to the root memcg,
+bypassing the reader's memcg memory limits. Is that acceptable?
+
+I've attached a preliminary diff. Does this approach look reasonable?
+If so, I'll split this into a formal patch series.
+
+diff --git a/block/bdev.c b/block/bdev.c
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -79,7 +79,7 @@ static void bdev_write_inode(struct bloc
+ }
+
+ /* Kill _all_ buffers and pagecache , dirty or not.. */
+-static void kill_bdev(struct block_device *bdev)
++void kill_bdev(struct block_device *bdev)
+ {
+ 	struct address_space *mapping = bdev->bd_mapping;
+
+@@ -89,6 +89,7 @@ static void kill_bdev(struct block_devic
+ 	invalidate_bh_lrus();
+ 	truncate_inode_pages(mapping, 0);
+ }
++EXPORT_SYMBOL_GPL(kill_bdev);
+
+ /* Invalidate clean unused buffers and pagecache. */
+ void invalidate_bdev(struct block_device *bdev)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1706,6 +1706,7 @@ bool disk_live(struct gendisk *disk);
+ unsigned int block_size(struct block_device *bdev);
+
+ #ifdef CONFIG_BLOCK
++void kill_bdev(struct block_device *bdev);
+ void invalidate_bdev(struct block_device *bdev);
+ int sync_blockdev(struct block_device *bdev);
+ int sync_blockdev_range(struct block_device *bdev, loff_t lstart, loff_t lend);
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -1279,6 +1279,56 @@ static void ext4_flex_groups_free(struct
+ 	}
+ }
+
++/*
++ * Account ext4 metadata cache to the root cgroup. This filesystem-wide
++ * metadata is shared across users, so it is not naturally attributable
++ * to a single user cgroup.
++ *
++ * A bdev inode can contain metadata pages charged to many memory cgroups.
++ * Dirtying these pages can trigger foreign writeback of its entire owner wb,
++ * including unrelated file data. Premature writeback of buffered overwrites
++ * reduces write coalescing, increasing disk traffic and consuming bandwidth
++ * that could serve foreground direct I/O. This can hurt performance,
++ * particularly on bandwidth-limited devices such as HDDs.
++ *
++ * This does not depend on CONFIG_BLK_DEV_WRITE_MOUNTED. Writing directly to
++ * a mounted block device is dangerous and intended for system administration.
++ * Charging the cache from these writes to the root cgroup is acceptable.
++ */
++static void ext4_bdev_set_kernel_file(struct block_device *bdev, bool enable)
++{
++	struct address_space *mapping = bdev->bd_mapping;
++	struct inode *inode = mapping->host;
++
++	inode_lock(inode);
++	filemap_invalidate_lock(mapping);
++
++	if (!!test_bit(AS_KERNEL_FILE, &mapping->flags) == enable)
++		goto out;
++
++	/*
++	 * Folio removal uses the mapping's current accounting mode. Remove old
++	 * folios before changing it, excluding new raw-I/O cache allocations.
++	 */
++	sync_blockdev(bdev);
++	kill_bdev(bdev);
++
++	if (enable)
++		set_bit(AS_KERNEL_FILE, &mapping->flags);
++	else
++		clear_bit(AS_KERNEL_FILE, &mapping->flags);
++out:
++	filemap_invalidate_unlock(mapping);
++	inode_unlock(inode);
++}
++
+ static void ext4_put_super(struct super_block *sb)
+ {
+ 	struct ext4_sb_info *sbi = EXT4_SB(sb);
+@@ -1387,6 +1437,7 @@ static void ext4_put_super(struct super_
+ #if IS_ENABLED(CONFIG_UNICODE)
+ 	utf8_unload(sb->s_encoding);
+ #endif
++	ext4_bdev_set_kernel_file(sb->s_bdev, false);
+ 	kfree(sbi);
+ }
+
+@@ -5852,6 +5903,8 @@ static int ext4_fill_super(struct super_
+ 	if (ctx->spec & EXT4_SPEC_s_sb_block)
+ 		sbi->s_sb_block = ctx->s_sb_block;
+
++	ext4_bdev_set_kernel_file(sb->s_bdev, true);
++
+ 	ret = __ext4_fill_super(fc, sb);
+ 	if (ret < 0)
+ 		goto free_sbi;
+@@ -5877,6 +5930,7 @@ static int ext4_fill_super(struct super_
+ 	return 0;
+
+ free_sbi:
++	ext4_bdev_set_kernel_file(sb->s_bdev, false);
+ 	ext4_free_sbi(sbi);
+ 	fc->s_fs_info = NULL;
+ 	return ret;
+
+
+> 
+> 								Honza
 
 Thanks,
-Joseph
+-- 
+Julian Sun <sunjunchao@bytedance.com>
