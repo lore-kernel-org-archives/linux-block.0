@@ -1,108 +1,197 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2EC3B636A
-	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 03:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924333DA7DF
+	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 07:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791431551; cv=none; b=nYuQKRKOmj0sxnJojWhNG34R6rp7mArlk5U+Ap5ybFKmT2yKvGzx93EHPG8Jaoa4IzqwLCbtszEv5RqDwJvp903V3/0QZzZu4hhWh6DCpETfOrtbRYxCMQBPyYmNMxekcdnWi2/9qdSVDVcNZrfnYBfLsdtpoGomfEmiDXA25TY=
+	t=1791444184; cv=none; b=eRJ6MS1eGa1deH7L9vORrbi33ST/6zhuxd6CyfOE9poqhGyrqaRhKs0UZXeCiNGGaYMAV+JLAI0V9bGhAyzVCfB14KQ7XR2k5qQ7reHFHxSN/czDqcgWpBnnWGQGijEp3QoN6roNCRfD4IbYA8mMQwRIfvJ5kj7RNS9QgX7TOpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791431551; c=relaxed/simple;
-	bh=+S7+6b0tE0OmnLFC+QstPEqY3o50EFg74OIiryzh5ws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LHUIDxZPa7N54F/I4lfaRdhdQ5Jo1/BeezafdvwKstccQtyi2L2h5iJguz9CcMS0XcjvT//bw/R4k0D4bRQ3sIQUpnmEVfrlmiX80x46CntqFvA0tTLdfo6ip6mS58bzuAJQMqo3UrGWIdsOhhjeC3JTlRaQJoKByMjnKMzkUWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=c+JIULFa; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1791444184; c=relaxed/simple;
+	bh=BEf8ea4KUWXQP7PqJDC14lFvT3DyCU6vO5/oXn5nRGU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=XBM6QsXy3/AhuJcb48jDqHm9ptBzuS7ejaLeFp9OcukzlIJY4acFpFC3SWloWNNQWyeeLXRLoG/c3/YG7oeGMFM9dILTZ3//xOUXBd8lx0vufs2HTtxRxdSvCZCxSX8vR1r81fIKWHUXK0SPI9ajbUb1Pjqhf/2wxMnRtI1AgAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=e8LdoWGJ; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c+JIULFa"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8897e83332fso108428b3a.1
-        for <linux-block@vger.kernel.org>; Wed, 07 Oct 2026 20:52:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1791431550; x=1792036350; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Vy0poknliGswHcpdQnidx1yFhBPlUDC+lTCKJfWkmRg=;
-        b=c+JIULFawh9O9VQ87fwLeM+LvkiSl70/x6DXs5EcnJs4AIMY1GEWJp8ObgBPZGJB4x
-         Mv05UncODjqv2XyRjoBKQVbMrhjwEpgHXgw9TY63vhs/aUwuE3SSQTJZSrZUcCc/8UiJ
-         ddvf+4LXB6MROmkpIb8AqBcLQdRz76QjzjoX0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791431550; x=1792036350;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Vy0poknliGswHcpdQnidx1yFhBPlUDC+lTCKJfWkmRg=;
-        b=chbMDf/6anIXdz/8xzYjPVOb7wzRxPOACVxsJkbjbVDBK67RsfsFIAwwZM+Yp4Ns7X
-         JC3t8CAMRXkyXhBrFKA6ubQWRlf0VIdhxNnpbWubhoOfjmdcwqFs8cAB0iZUKQ4GXofx
-         FhBjB5zPycVhsDTzQvEiEoG1W/Y8t/u1l1bmUy7LPR585Fmo9aevnRBXiQZN9m1MMH6n
-         dUxyTBnzpd7BwtXWZm/WoBlfJ7c8XqQX53lq2LIFNxYxwG3h8pdpkJ+e1B1uzyFjQiQs
-         mz0J/b4UE+tXIRP+W+nDvxzUEAoIB/EbT2ow8htZZ17FjefvCo0kaeCidVwDIGjD6vy+
-         R2Sg==
-X-Forwarded-Encrypted: i=1; AKwUvBwYpAbWVMNO4xdP9bjVjntXpPhppaw3nQeoLwMcLUXJ0U6LN45eLTcu4OV1psZEpGNHOE+3iMe8pLOC3Q==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKSNNxXOz6Pqryo7ajQZWv91NJSBHTT+4X6CaBkcDaM1+VZQd0I
-	5FWLKVqm55w7F3Wv+GkJw28GKDYx2B0cF9Nxy/oqpRt8KakgnJ0E3CLbvjcT8fD0LQ==
-X-Gm-Gg: AYBFou33qtIXidpyzAZmncleqzhqKb745Qnsop+A8R3xSsVFa4wPlFBSWO54bn23GLl
-	I/vLuCWhrO5w6DIH9Hs6gwoEzlx2kgCAo9MVs5+scxvcW08U19ruqzKpMe3/eqwlCBwOLT/JLpp
-	Mbytl959hmJ+s1XCRbaaXVKxO3te0jpAbfsL6hzAk/Kj2Uauzg4QtZRrhprrYn3RMmU0bzijm3F
-	H+BgoE2Wav5jkd+QiE+8kV9Ssc4U41bTyb/Vv62N+FSsL9EhIQqlIZFjjvXEVUGSVk+Jetmu5I9
-	fPZY78lK05qTb1+U01IqoHCiJStYZoFHhzoFZK8V8Gjc/PdJjaPBSg3kvOj5tCM80EohHqpBFrG
-	PMr+/tTOrMcWWuWVzUO5Kp3BNNnv8M0lmddnhnXlHAXgA2yZHsxBajJmNc1GX8JcxagwvFSUahp
-	AkfgCizl5Fm8nq865r5zVioZq8ve/qdm1Jan9INYze4gWzLmZKxlzRomKMrxvzOVpu0d04DZRD8
-	na2RDInAzHWKdPpZTddfsxUc3quBhJ+zM6n5g==
-X-Received: by 2002:a05:6a00:4b4f:b0:880:f22a:b123 with SMTP id d2e1a72fcca58-8930d0045e0mr655238b3a.36.1791431549972;
-        Wed, 07 Oct 2026 20:52:29 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:97d3:292:91b3:138d])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-892bb49a188sm977281b3a.33.2026.10.07.20.52.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2026 20:52:29 -0700 (PDT)
-Date: Thu, 8 Oct 2026 12:52:23 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Oreoluwa Babatunde <oreoluwa.babatunde@oss.qualcomm.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Georgi Djakov <georgi.djakov@oss.qualcomm.com>, andersson@kernel.org, konradybcio@kernel.org, 
-	abelvesa@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	minchan@kernel.org, axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	djakov@kernel.org
-Subject: Re: [PATCH 4/6] zram: Add QPaCE zcomp backend
-Message-ID: <ascS2nPCSQJxOGDS@google.com>
-References: <20260930145215.3380977-1-georgi.djakov@oss.qualcomm.com>
- <20260930145215.3380977-5-georgi.djakov@oss.qualcomm.com>
- <ar3yt8Kl3WUV93lP@google.com>
- <4ed3f09f-74fc-4f07-8897-5c773fbde0b2@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="e8LdoWGJ"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1791444176; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+	bh=MMu468jDucZH5s69Sf32AKBFRvEDOHfr8VAVh/kduzk=;
+	b=e8LdoWGJfJ+G0ccQviMWA4fQki7cMwuoA4jbBlY9auIUvHoL6yzj14jldkCU5jSBiRC/HllzrhZR7KvCurHovG1YwQdMX90BkczJTEMNc5bmiyyhlm7w0uo4k0gBaNhKpkxvePSOy1aHI3hp0ekCfF2B9lTVh19TxDwUsCcnSq4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037033178;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0XCM1-Xa_1791444174;
+Received: from 30.221.149.122(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0XCM1-Xa_1791444174 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 08 Oct 2026 15:22:55 +0800
+Message-ID: <8a5d8f09-2388-4cc3-9012-884718c813de@linux.alibaba.com>
+Date: Thu, 8 Oct 2026 15:22:54 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ed3f09f-74fc-4f07-8897-5c773fbde0b2@oss.qualcomm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] nbd: fix NULL pointer dereference in
+ nbd_pending_cmd_work()
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+To: Bart Van Assche <bvanassche@acm.org>, Ming Lei <tom.leiming@gmail.com>,
+ Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, nbd@other.debian.org
+References: <20260928091021.2456652-1-joseph.qi@linux.alibaba.com>
+ <20260928091021.2456652-2-joseph.qi@linux.alibaba.com>
+ <9e43373f-9202-4fa7-b0c8-f1bc80fd81de@acm.org>
+ <616f687a-417e-4fd5-b0dc-9bd519db3920@linux.alibaba.com>
+In-Reply-To: <616f687a-417e-4fd5-b0dc-9bd519db3920@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On (26/10/06 16:53), Oreoluwa Babatunde wrote:
-> On 9/30/2026 10:43 PM, Sergey Senozhatsky wrote:
-> > On (26/09/30 07:52), Georgi Djakov wrote:
-> > [..]
-> > > @@ -80,10 +87,10 @@ static const struct zcomp_ops *lookup_backend_ops(const char *comp)
-> > >   	while (backends[i]) {
-> > >   		if (sysfs_streq(comp, backends[i]->name))
-> > > -			break;
-> > > +			return backends[i];
-> > >   		i++;
-> > >   	}
-> > > -	return backends[i];
-> > > +	return NULL;
-> > >   }
-> > 
-> > This hunk looks unrelated to the patch in question.
-> ACK. Will remove this.
+Hi,
 
-Thanks, if you are going to add qpace zcomp backend, please note
-that zcomp API is undergoing some architectural changes [1] (shouldn't
-be too much extra work to adapt.)
+On 9/29/26 9:02 AM, Joseph Qi wrote:
+> Hi Bart,
+> 
+> On 9/28/26 10:19 PM, Bart Van Assche wrote:
+>> On 9/28/26 2:10 AM, Joseph Qi wrote:
+>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>> index c2c3dbdd631f..9909774dbfbb 100644
+>>> --- a/drivers/block/nbd.c
+>>> +++ b/drivers/block/nbd.c
+>>> @@ -63,6 +63,7 @@ struct nbd_sock {
+>>>       int fallback_index;
+>>>       int cookie;
+>>>       struct work_struct work;
+>>> +    struct request *partial_req;
+>>>   };
+>>>     struct recv_thread_args {
+>>> @@ -637,12 +638,24 @@ static void nbd_sched_pending_work(struct nbd_device *nbd,
+>>>   {
+>>>       struct request *req = blk_mq_rq_from_pdu(cmd);
+>>>   -    /* pending work should be scheduled only once */
+>>> -    WARN_ON_ONCE(test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags));
+>>> -
+>>>       nsock->pending = req;
+>>>       nsock->sent = sent;
+>>> -    set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
+>>> +
+>>> +    /*
+>>> +     * Already armed: this is nbd_pending_cmd_work() re-entering because the
+>>> +     * resumed send was interrupted again.  Its work is still running, so
+>>> +     * just refresh the resume point above and let its loop pick it up
+>>> +     * instead of taking another config reference and requeueing the work.
+>>> +     */
+>>> +    if (test_and_set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags))
+>>> +        return;
+>>> +
+>>> +    /*
+>>> +     * nbd_mark_nsock_dead() clears ->pending, so the work function cannot
+>>> +     * rely on it to find the request it owns.  Keep a copy that only it
+>>> +     * clears.
+>>> +     */
+>>> +    nsock->partial_req = req;
+>>>       refcount_inc(&nbd->config_refs);
+>>>       schedule_work(&nsock->work);
+>>>   }
+>>> @@ -817,11 +830,12 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+>>>   static void nbd_pending_cmd_work(struct work_struct *work)
+>>>   {
+>>>       struct nbd_sock *nsock = container_of(work, struct nbd_sock, work);
+>>> -    struct request *req = nsock->pending;
+>>> +    struct request *req = nsock->partial_req;
+>>>       struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
+>>>       struct nbd_device *nbd = cmd->nbd;
+>>>       unsigned long deadline = READ_ONCE(req->deadline);
+>>>       unsigned int wait_ms = 2;
+>>> +    bool complete = false;
+>>>         mutex_lock(&cmd->lock);
+>>>   @@ -830,6 +844,18 @@ static void nbd_pending_cmd_work(struct work_struct *work)
+>>>           goto out;
+>>>         mutex_lock(&nsock->tx_lock);
+>>> +    /*
+>>> +     * nbd_mark_nsock_dead() can tear the socket down between schedule_work()
+>>> +     * and here, and it clears ->pending and ->sent.  The header is already
+>>> +     * on the wire so this request can never be answered; fail it rather than
+>>> +     * resuming a send on a socket that is gone.
+>>> +     */
+>>> +    if (!nsock->pending) {
+>>> +        cmd->status = BLK_STS_IOERR;
+>>> +        __clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
+>>> +        complete = true;
+>>> +        goto unlock;
+>>> +    }
+>>>       while (true) {
+>>>           nbd_send_cmd(nbd, cmd, cmd->index);
+>>>           if (!nsock->pending)
+>>> @@ -846,16 +872,36 @@ static void nbd_pending_cmd_work(struct work_struct *work)
+>>>                * nbd_handle_cmd() requeue every later request forever.
+>>>                */
+>>>               nbd_mark_nsock_dead(nbd, nsock, 1);
+>>> -            blk_mq_complete_request(req);
+>>> +            complete = true;
+>>>               break;
+>>>           }
+>>>           msleep(wait_ms);
+>>>           wait_ms *= 2;
+>>>       }
+>>> +unlock:
+>>> +    /*
+>>> +     * nbd_sched_pending_work() writes partial_req under tx_lock, and
+>>> +     * cmd->lock is per-command, so this has to be under tx_lock too.
+>>> +     */
+>>> +    nsock->partial_req = NULL;
+>>>       mutex_unlock(&nsock->tx_lock);
+>>>       clear_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
+>>>   out:
+>>>       mutex_unlock(&cmd->lock);
+>>> +
+>>> +    /*
+>>> +     * Complete before nbd_config_put(): if this is the last config
+>>> +     * reference, nbd_put() runs nbd_dev_remove() inline unless
+>>> +     * NBD_DESTROY_ON_DISCONNECT is set, and del_gendisk() would then wait
+>>> +     * in blk_mq_freeze_queue_wait() for the q_usage_counter that this
+>>> +     * request holds until it is completed.  The config reference is what
+>>> +     * keeps nbd itself alive across the completion, but cmd must not be
+>>> +     * touched afterwards, since nbd_complete_rq() may run inline and ends
+>>> +     * the request without taking cmd->lock.
+>>> +     */
+>>> +    if (complete)
+>>> +        blk_mq_complete_request(req);
+>>> +
+>>>       nbd_config_put(nbd);
+>>>   }
+>>>   
+>>
+>> These changes add significant complexity and hence make the NBD driver
+>> harder to maintain. Has it been considered to increase the request
+>> reference count while nsock->pending != NULL? See also req_ref_inc_not_zero() and blk_mq_put_rq_ref().
+>>
+> 
+> Thanks for taking a look.
+> 
+> It seems a request reference can't replace the extra pointer, since the
+> two answer different questions.
+> 
+> A reference keeps the request object alive, but it doesn't stop
+> nsock->pending from being cleared, which is what breaks the worker:
+> 
+>   nbd_mark_nsock_dead()
+>     nsock->dead = true;
+>     nsock->pending = NULL;
+>     nsock->sent = 0;
+> 
+>   nbd_pending_cmd_work()
+>     struct request *req = nsock->pending;
+>     struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
+>     struct nbd_device *nbd = cmd->nbd;
+> 
+> Nothing between schedule_work() and the worker starting takes a lock the
+> teardown path also takes, so pinning the request still leaves the worker
+> reading NULL from ->pending and faulting on cmd->nbd.
+> 
 
-[1] https://lore.kernel.org/linux-kernel/20261005122036.718976-1-senozhatsky@chromium.org
+Any more comments on this? Or am I missing something?
+
+Thanks,
+Joseph
