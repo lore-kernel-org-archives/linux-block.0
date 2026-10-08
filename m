@@ -1,189 +1,278 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98BFF2E64D
-	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 00:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165DB36F914
+	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 03:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791418137; cv=none; b=MHMEHoAgO/OF8VqdquM1d3FrV2VQUsRiSYl7qYbgRbgGERR28vPZhFHY+fgw66SmaNsc1eqPJqwMzmV0y77m16O1QyYLgtgrEB4N+/Ur8WaU9m0F5RQFsbwiUI4NRCAr6r0GIEyPWLW/EfQxHErQ+6yODwfzbGdf6ar/5lBwqSM=
+	t=1791429460; cv=none; b=LgrnET5O5mhbha3BMt0+EeToas80xTeNHnCyDDEzOtT58MzaX3XpBTwQI/YIwkTy58PtBEjkdXlQxyoBVDCtSExJbuOngqd/iKhoLu1r9ONeE8AmzrwVzBa4sjYnoCZtTib/WsoPda9D362SXJXhZ191/jKEewBF5u38/ZjGK+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791418137; c=relaxed/simple;
-	bh=x2KkVoMQI1NXabI2h0N7BvI/fSRL3yWbK0MtUn7sBiI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SjML2US99eo+y0H3y+BHRrm8sojlPOJ8Ohk7AHxgaQ+PP+HGb1gkoFtE97VWXeXgkjKT2vEpj/wyFeyekYTWfxvWY8UZpgxWqwe3zYKLrHIEP351yIXTqaorCGbw0zUadvOx64dyv/dzsBu80G2ayG+utEPTHy/AUMPwcZ2cJG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=BiKb4yPm; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=aZlgjjt8; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1791429460; c=relaxed/simple;
+	bh=5oXFHZiNjK6+JCQ4bbNGLRfkNxgbRr8G3SVmcTZpvyY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h/kb4nti2WRUUjsBi/bTFLeNkxpAF8RgfQ2jWarphfb5MGJ6qrWgXeM36dZmlF8v7K4oJkmDIU4GM+0XtSmWcAibhaVsxdGjykgbiJY41svxtxCHohsKN/2EskrpIPMvxl9Jqc4Ln2yP73j75SFtFnnDJDmE1E2Ins3i3V9JZOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=RT23i8BI; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="BiKb4yPm";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="aZlgjjt8"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 697LvoSe1470261
-	for <linux-block@vger.kernel.org>; Thu, 8 Oct 2026 00:08:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	wmy83IDApREsOlkuwuGw8eMok3UVFkoyyp0K97hFwN0=; b=BiKb4yPmNEbSAUIb
-	14/I5FvUmndSoBTWkx57rSDWqaiDeLehQ5sxGe1Sn98VlfxJT91h0QuQaO4On1fb
-	MH6TJZXimpc3VSgdRISOrgU+mBS9Jb7TRbAEDnV4xgWCUgpHzDwsT05EcGedJ+SG
-	hkUyqBPEltDltkRKzjhU54UMgC6Gc9jVkho8TxSqVVaTegarMci1ett/Xsi5ssba
-	R17vmJ76UwRl6ryUN0DdPfaG12Cxs4bShJpTkqGsoofitle/EKMn5iJFB0XS7ZbD
-	FhhmJbb8H8V2AlCMDyBx06SkNwRImIAdiZig1f2kskhpe+EIpbIDQP7AdvgC1SI4
-	zF71uQ==
-Received: from mail-dl1-f70.google.com (mail-dl1-f70.google.com [74.125.82.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h5xe40d5j-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 08 Oct 2026 00:08:53 +0000 (GMT)
-Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-139b62317d0so16329960c88.0
-        for <linux-block@vger.kernel.org>; Wed, 07 Oct 2026 17:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1791418132; x=1792022932; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=wmy83IDApREsOlkuwuGw8eMok3UVFkoyyp0K97hFwN0=;
-        b=aZlgjjt8dRdLa14ang7d5wSHVO3Nv5zHX63nzRCgun8VoZoDwn+foFyT+bsg2yuq3y
-         77BzWB+Sb4DCsoI/Renajlte6Z8i6iKSNKeQYSxcTVJEycb9WrFmhJk4NMwwLpr4fbkT
-         xyCynggGnIgOgmsCUjV+aLTbpRMweCQ/uxQRvnkGXFo5BLq+t3WOK4Tzd0HTZGfd1DCI
-         dfMc/Q/D9HAFJsqphrGHi3TSiF8ax6T1hHYqJTsf8oVwNggQRY66IBvRi+hpkQBhLAaX
-         2MwqunqIM1NxWIp7SNu1BGfwe2tQKr5qD0baOZkFdNf3CsNgJR5sXAPTYioZ4NPYUTAr
-         sBZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791418132; x=1792022932;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wmy83IDApREsOlkuwuGw8eMok3UVFkoyyp0K97hFwN0=;
-        b=IEtbRWgxQ3oiEHR8Xkgco7Pw4aF1d7+jGHN0TdIE2935cgmHCgU/NIueZrJytLOfTI
-         hHPYO2T+7/R+juD5HVWrDygsroDB5dRGxciiNXCHelguYW9Bk33geWM+yXWdynSOpL92
-         B/IFYYbZYrYqHbjJQq58Cw905Lpdm3LN+D8/IoprO6/R7YE3vF3okCrhvUmli4dDKSAB
-         /aP07StT3BCF+CuReal/Ys+5TmwcggXDMcbBqly9YKZ7Rtb5QKFzpH8dNYtmZSp0FzQ6
-         1DnReYGZVosndRkvp+oi1GeOhNNPI4/3bCQHjJoXFr6yV4z/jvIdWMxsrHRxXtsxOm3H
-         eeKQ==
-X-Forwarded-Encrypted: i=1; AKwUvBy9Xh0vtbgsufu+xnLRmZ+vPX4Jk5M9PSx6Iqbs2sEd4Jy2FIMF7uAcYDnmdKQD8V5M/ekzf8hjzrtAHw==@vger.kernel.org
-X-Gm-Message-State: AFuF++nQFepgMewjhJvq0tD2kDt0TGi6Y9EJcNldJu9c7oiSE3b1SKP/
-	9AYee2LvvgqVsG88Xj3reu0E8ZDcKphj5OYRqWyh0zLBPOq/FLMi5Xjxo/epbUYfHpqpKDyVPVy
-	WnzafGCAactkR1oxU0KFGMgVkAfmwwlQyF+K/H5ihbx6INksVDFy3ogm7L82JHF/fdw==
-X-Gm-Gg: AYBFou3tl8ewcA9Rb2cITLyCozVOqmo0d534Mo1CXUgwblXn6Sr9GOdhKIhAojyZiLS
-	08MwiWnBUXsLA2UGOsKcffMR7YJ+ndPvEDSG/LpZMZGGCQOgc8AyTVSoW9WwK70NC6b7ubWqVZI
-	+zFYC20xvDNQqzpGp6ZYK6Lxmx3JZaF/ejVoecpOve2y+KPlaPy1xCvulAoTNowIV3OcyS37LQF
-	2GI/S3tHJUGPupLJRX6Pr4d7R+cF8zCbhbFosVpizW53TTsvpES8JIKSXqGFIu0QWcDel9dcYkW
-	Jb+xC4fCKjM+etoo6JYHGL5xUbOILAuIqe3Wz4vhlnU3mEnxKNd3+KYqn2zdC+x9GjGuyCpPUmh
-	nQyhjbZERKfo8EQcNCo8p5gysC4wbZcLpxDc4oVJZurJVu7dMM+eSocG5r1uGPYk=
-X-Received: by 2002:a05:701b:241a:b0:151:ceb3:e105 with SMTP id a92af1059eb24-162047a17dcmr4490635c88.11.1791418132435;
-        Wed, 07 Oct 2026 17:08:52 -0700 (PDT)
-X-Received: by 2002:a05:701b:241a:b0:151:ceb3:e105 with SMTP id a92af1059eb24-162047a17dcmr4490583c88.11.1791418131519;
-        Wed, 07 Oct 2026 17:08:51 -0700 (PDT)
-Received: from [10.71.184.34] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-16166216f39sm11910314c88.6.2026.10.07.17.08.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Oct 2026 17:08:51 -0700 (PDT)
-Message-ID: <46903bb4-67ee-49a4-bf53-e7ba2c34256d@oss.qualcomm.com>
-Date: Wed, 7 Oct 2026 17:08:35 -0700
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="RT23i8BI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=uo
+	ACNr0Jcf0C3z1t+ue2OZhf3ecjkLKBBRk7KWQPF0c=; b=RT23i8BIfDETjgYCIB
+	XJgjULvgTxb8UUsGykxxJtvHuScOu9yUvDcrJDeg6CCiVCHl9m70F9UZRR4/RMye
+	d6IJSZNyhC+Gi2G9oKlnyBQXQXSplibYSoiyqNLjVtPNJKS2s7HtiiCb9LxN7Tcj
+	WqOtRilC6p1QshOaW59+JQ1MA=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wD33+g8C8dqODi9DA--.41456S2;
+	Thu, 08 Oct 2026 11:17:17 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Yang Xiuwei <yangxiuwei@kylinos.cn>
+Subject: [PATCH blktests v2] block/049: test polled dio with user PI metadata
+Date: Thu,  8 Oct 2026 11:17:14 +0800
+Message-Id: <20261008031714.529202-1-yangxiuwei@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/6] soc: qcom: qpace: Add Qualcomm Page Compression
- Engine driver
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Georgi Djakov <georgi.djakov@oss.qualcomm.com>
-Cc: andersson@kernel.org, konradybcio@kernel.org, abelvesa@kernel.org,
-        robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-        minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk,
-        rostedt@goodmis.org, mhiramat@kernel.org,
-        mathieu.desnoyers@efficios.com, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        djakov@kernel.org
-References: <20260930145215.3380977-1-georgi.djakov@oss.qualcomm.com>
- <20260930145215.3380977-3-georgi.djakov@oss.qualcomm.com>
- <20261001-hopping-belligerent-spider-876e7b@quoll>
- <fed665c5-3062-462b-928d-ab60976ce839@oss.qualcomm.com>
- <b12214fc-2e06-4e52-8bda-6c6f9a76bd7a@kernel.org>
-Content-Language: en-US
-From: Oreoluwa Babatunde <oreoluwa.babatunde@oss.qualcomm.com>
-In-Reply-To: <b12214fc-2e06-4e52-8bda-6c6f9a76bd7a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: 5A-Rc5BD_YP3A2N9Ath1Tla46W97g3S4
-X-Authority-Analysis: v=2.4 cv=AbwkjHXG c=1 sm=1 tr=0 ts=6ac6df15 cx=c_pps
- a=SvEPeNj+VMjHSW//kvnxuw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
- a=EUspDBNiAAAA:8 a=8u56npouWohDfDDlGUsA:9 a=QEXdDO2ut3YA:10
- a=Kq8ClHjjuc5pcCNDwlU0:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA4MDAwMCBTYWx0ZWRfX+HaVL2O10/8V
- TgCa/KT6WHa/TsuiyhvwEJxt4m4XoOT2FYAHepeFKXyyU9fu5cZM4hURPFeRYRkpTWL0M7qUE+m
- 3KGqcvLYw8sNyRGFPJ5MEYFoaYaa/xk=
-X-Proofpoint-ORIG-GUID: 5A-Rc5BD_YP3A2N9Ath1Tla46W97g3S4
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA4MDAwMCBTYWx0ZWRfX9BJP3se7xD+N
- ISXznPmcL0B8qWMdhyuiwZBOlTKFPQ0Hs2Gs3eD5FSIFaou2TQOZzhAHb6sAEy4zLVqYYYmmhxM
- tl46epL0zPZVpDZDMXEMBhPmpPln8rcaz5vZ22/zQODnuCHADINI1SrzQg99FChZHuXu8UsJrlK
- maJBT02RWP3ZcY5FbC3dzAbdfhSbUAVISZcKrioICpuVbVBvYN7c8rDN8lu8xGV/Qd5prJY59/x
- BjYWapn9+PkjF81yDMY88P1ccgQXa8B7Gb7yMsCmumru1JH/K5Vmk5CVkqQ3NB5q92+QF5MwJkW
- vcCgShp4DmhGDqNn91kXIR3q9l64sG/e/Ph8HvhY1fNOYVFtd/E6mYCbn2VDIlJrSczd3AltRNm
- 8J09psocHeQXrbLeqdlVMaPNAns0eD68BhXqGiGsBpPlIWM9MTun8FuipSrv+1uaa6BzgFJZd05
- q6cXIR0a449+cyYrfAQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-07_07,2026-10-06_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0
- clxscore=1015 suspectscore=0 priorityscore=1501 adultscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610020000 definitions=main-2610080000
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD33+g8C8dqODi9DA--.41456S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3Ar4DXFyUCr45JF45GrW3KFg_yoW7uF47p3
+	y0qFyrGrZ7KrnrWF93CF43uFy5Aa18Cay7JFZF934jvr13Za42yF4xKF15XF98XrWfW3y5
+	Aw4vqFWqkr4UXa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UU-BiUUUUU=
+Sender: yangxiuwei2025@163.com
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwR1e7mrHCz1EQAAA3z
 
-On 10/7/2026 12:51 AM, Krzysztof Kozlowski wrote:
-> On 07/10/2026 01:51, Oreoluwa Babatunde wrote:
->> On 10/1/2026 1:50 AM, Krzysztof Kozlowski wrote:
->>> On Wed, Sep 30, 2026 at 07:52:11AM -0700, Georgi Djakov wrote:
->>>> Add a platform driver for the Qualcomm Page Compression Engine (QPaCE), a
->>>> hardware block that accelerates compression and decompression of memory
->>>> pages.
->>>>
->>>> Provide the urgent command path for synchronous single-page compression and
->>>> decompression. This exposes the low-latency operations needed by
->>>> compressed-memory users such as zram, especially for page decompression on
->>>> the read path.
->>>>
->>>> Signed-off-by: Georgi Djakov <georgi.djakov@oss.qualcomm.com>
->>>> ---
->>>>    drivers/soc/qcom/Kconfig          |  14 +
->>>>    drivers/soc/qcom/Makefile         |   1 +
->>>>    drivers/soc/qcom/qpace.c          | 764 ++++++++++++++++++++++++++++++
->>>>    drivers/soc/qcom/qpace_internal.h |  84 ++++
->>>>    include/linux/soc/qcom/qpace.h    | 154 ++++++
->>>>    5 files changed, 1017 insertions(+)
->>>>    create mode 100644 drivers/soc/qcom/qpace.c
->>>>    create mode 100644 drivers/soc/qcom/qpace_internal.h
->>>>    create mode 100644 include/linux/soc/qcom/qpace.h
->>>>
->>>> diff --git a/drivers/soc/qcom/Kconfig b/drivers/soc/qcom/Kconfig
->>>> index 535c8619197b..6bcb86dcd726 100644
->>>> --- a/drivers/soc/qcom/Kconfig
->>>
->>> Sorry, but no. Soc is not a dumping ground. This has clear function of
->>> compression offload, so it should have some dedicated maintainers like
->>> other offload engines.
->>
->> The reason for putting this in soc/qcom is because this is a qcom HW
-> 
-> Every qcom HW driver is a qcom HW driver and they DO NOT go to drivers/soc.
-> 
-> Again: soc is not a dumping ground.
-> 
-ACK. We are looking at the crypto driver to see if it fits our use of 
-the qpace HW block.
+IOPOLL combined with a PI attribute used to leave iocb->private as a
+uio_meta and oops in bio_poll(). The kernel rejects that combination
+with -EOPNOTSUPP. Add a scsi_debug reproducer that expects this result.
 
-Do you have other suggestions for where this would better fit besides 
-the crypto framework?
+Assisted-by: LLM
+Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+---
+v2:
+- Resend now that 2a42e6fe1293 ("block: reject polled dio with user
+  integrity metadata") is in Linus' tree.
+- Add the copyright in src/metadata-iopoll.c.
+- Use _have_loadable_scsi_debug instead of "_have_module scsi_debug".
+- Skip kernels without IORING_FEAT_RW_ATTR.
 
-Thanks,
-Oreoluwa
+v1: https://lore.kernel.org/linux-block/20260924025526.298050-1-yangxiuwei@kylinos.cn/
+
+ src/Makefile          |   1 +
+ src/metadata-iopoll.c | 112 ++++++++++++++++++++++++++++++++++++++++++
+ tests/block/049       |  56 +++++++++++++++++++++
+ tests/block/049.out   |   2 +
+ 4 files changed, 171 insertions(+)
+ create mode 100644 src/metadata-iopoll.c
+ create mode 100755 tests/block/049
+ create mode 100644 tests/block/049.out
+
+diff --git a/src/Makefile b/src/Makefile
+index dd64694..1e571c6 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -31,6 +31,7 @@ C_TARGETS := \
+ 	zbdioctl
+ 
+ C_URING_TARGETS := metadata \
++	metadata-iopoll \
+ 	nvme-passthru-admin-uring
+ C_UBLK_TARGETS := miniublk
+ 
+diff --git a/src/metadata-iopoll.c b/src/metadata-iopoll.c
+new file mode 100644
+index 0000000..a452b04
+--- /dev/null
++++ b/src/metadata-iopoll.c
+@@ -0,0 +1,112 @@
++// SPDX-License-Identifier: GPL-3.0+
++// Copyright (C) 2026 Yang Xiuwei <yangxiuwei@kylinos.cn>
++/*
++ * IOPOLL direct read with a PI attribute. The fixed kernel completes it
++ * with -EOPNOTSUPP.
++ */
++#include <errno.h>
++#include <fcntl.h>
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <liburing.h>
++
++#ifndef IORING_RW_ATTR_FLAG_PI
++#define PI_URING_COMPAT
++#define IORING_RW_ATTR_FLAG_PI (1U << 0)
++struct io_uring_attr_pi {
++	__u16 flags;
++	__u16 app_tag;
++	__u32 len;
++	__u64 addr;
++	__u64 seed;
++	__u64 rsvd;
++};
++#endif
++
++#ifndef IO_INTEGRITY_CHK_GUARD
++#define IO_INTEGRITY_CHK_GUARD  (1U << 0)
++#define IO_INTEGRITY_CHK_REFTAG (1U << 1)
++#endif
++
++#ifndef IORING_FEAT_RW_ATTR
++#define IORING_FEAT_RW_ATTR	(1U << 16)
++#endif
++
++#define DATA_LEN 4096
++#define META_LEN 64
++
++static void on_alarm(int sig)
++{
++	(void)sig;
++	dprintf(STDERR_FILENO, "timed out\n");
++	_exit(1);
++}
++
++int main(int argc, char **argv)
++{
++	struct io_uring ring;
++	struct io_uring_sqe *sqe;
++	struct io_uring_cqe *cqe;
++	struct io_uring_attr_pi pi = {
++		.flags = IO_INTEGRITY_CHK_GUARD | IO_INTEGRITY_CHK_REFTAG,
++		.len = META_LEN,
++		.seed = 1,
++	};
++	void *data, *meta;
++	int fd, ret;
++
++	if (argc != 2)
++		return 1;
++
++	signal(SIGALRM, on_alarm);
++	alarm(10);
++
++	fd = open(argv[1], O_RDONLY | O_DIRECT);
++	if (fd < 0) {
++		perror("open");
++		return 1;
++	}
++	if (posix_memalign(&data, 4096, DATA_LEN) ||
++	    posix_memalign(&meta, 4096, META_LEN)) {
++		perror("posix_memalign");
++		return 1;
++	}
++	pi.addr = (__u64)(uintptr_t)meta;
++
++	ret = io_uring_queue_init(8, &ring, IORING_SETUP_IOPOLL);
++	if (ret < 0) {
++		fprintf(stderr, "queue_init: %s\n", strerror(-ret));
++		return 1;
++	}
++	if (!(ring.features & IORING_FEAT_RW_ATTR))
++		return 2;
++	sqe = io_uring_get_sqe(&ring);
++	if (!sqe)
++		return 1;
++	io_uring_prep_read(sqe, fd, data, DATA_LEN, 0);
++#ifdef PI_URING_COMPAT
++	sqe->__pad2[0] = IORING_RW_ATTR_FLAG_PI;
++	sqe->addr3 = (__u64)&pi;
++#else
++	sqe->attr_type_mask = IORING_RW_ATTR_FLAG_PI;
++	sqe->attr_ptr = (__u64)&pi;
++#endif
++	ret = io_uring_submit(&ring);
++	if (ret < 1) {
++		fprintf(stderr, "submit: %d\n", ret);
++		return 1;
++	}
++	ret = io_uring_wait_cqe(&ring, &cqe);
++	if (ret < 0) {
++		fprintf(stderr, "wait: %s\n", strerror(-ret));
++		return 1;
++	}
++	if (cqe->res != -EOPNOTSUPP) {
++		fprintf(stderr, "cqe %d\n", cqe->res);
++		return 1;
++	}
++	return 0;
++}
+diff --git a/tests/block/049 b/tests/block/049
+new file mode 100755
+index 0000000..5ceefbe
+--- /dev/null
++++ b/tests/block/049
+@@ -0,0 +1,56 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Yang Xiuwei <yangxiuwei@kylinos.cn>
++#
++# IOPOLL combined with a PI attribute used to oops in bio_poll(). The kernel
++# rejects that combination with -EOPNOTSUPP.
++#
++# Regression test for kernel commit 2a42e6fe1293 ("block: reject polled dio
++# with user integrity metadata").
++#
++# Kernels without IORING_FEAT_RW_ATTR are skipped. Kernels that advertise the
++# feature but lack 2a42e6fe1293 oops in bio_poll().
++
++. tests/block/rc
++. common/scsi_debug
++
++DESCRIPTION="iopoll dio with user PI metadata returns -EOPNOTSUPP"
++QUICK=1
++
++requires() {
++	_have_kernel_option IO_URING
++	_have_kernel_option BLK_DEV_INTEGRITY
++	_have_loadable_scsi_debug
++	_have_src_program metadata-iopoll
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	if ! _init_scsi_debug dif=1 dix=1 dev_size_mb=64 sector_size=512 \
++			submit_queues=2 poll_queues=1; then
++		return 1
++	fi
++
++	local dev="${SCSI_DEBUG_DEVICES[0]}"
++
++	if [[ "$(<"/sys/block/${dev}/queue/io_poll")" != 1 ]]; then
++		SKIP_REASONS+=("scsi_debug has no poll queue")
++		_exit_scsi_debug
++		return
++	fi
++
++	src/metadata-iopoll "/dev/${dev}" >>"$FULL" 2>&1
++	local rc=$?
++
++	_exit_scsi_debug
++	if ((rc == 2)); then
++		SKIP_REASONS+=("io_uring PI attributes not supported")
++		return
++	fi
++	if ((rc)); then
++		echo "metadata-iopoll failed"
++		return 1
++	fi
++	echo "Test complete"
++}
+diff --git a/tests/block/049.out b/tests/block/049.out
+new file mode 100644
+index 0000000..c88edfe
+--- /dev/null
++++ b/tests/block/049.out
+@@ -0,0 +1,2 @@
++Running block/049
++Test complete
+-- 
+2.25.1
 
