@@ -1,73 +1,73 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55E33ACEF9
-	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 11:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39905477981
+	for <linux-block@vger.kernel.org>; Thu,  8 Oct 2026 11:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791459576; cv=none; b=SSnH1FCcBlQuJBc3Mxi2A1qr8LBUpDuZUfNwXqVNhmS/a33u4fJjt7WOs3d+AB6dfljntfi4Rsyze0HzGkrFUvkSj3oFMARXLBlrnE3/O9gDZEZu3UvPke/GqF8bATNPI+FIW2YFrC+P8L85ocjrfXG8OPKqqCBo3n1Y2Kqrm6I=
+	t=1791459578; cv=none; b=G/kxneymI9HSUJGRLl9NGVGfauwXe5S5ooI2ndNEK2wpjyfzXuZ5AZXhLF5Dn/KRHOcbalIPlmCRxDm0qL7nsRtJIBu9Pk5nZgtWox0OUM7RM2bR35gk9DgEAdjyijeUkN2lg3tiHkFtfkYzZMs2gmIp1VMmxzCtT6t5jPgfuIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791459576; c=relaxed/simple;
-	bh=QsusyigYZvGLQiZSdlb+xLnhFphhI2dxm7bFiLbOMeg=;
+	s=arc-20240116; t=1791459578; c=relaxed/simple;
+	bh=oUyzpLntyEgJF+f9grjWYn6w5iSVBhX5j8Y+i+9jafg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CYWi+8MG19cnfQ8EASmsH1E8H+eMdOSi6TTLRmqhTVToXzncG/ssAiJox+9TTw0/TensE0FoyBXHHx+qx8B/9fGCaB4/sHgqdOHb/sfXZHwQu6BgY384B7Nlr9F3U6T/VybZx11o+xufOisH8lQVkejxPnBmqINjQM+0C0+Ti/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GPtZdWpp; arc=none smtp.client-ip=209.85.210.50
+	 MIME-Version; b=DD8M+FbR71CbkqSui5w5oJKklI9QWoP5hsndBjovPFfpqUCzzrLljtry5oSHclfK50u5TbMEFGH7x6L5nmDUweTdW5dRT6lreYUxtM0n3080Fcy4piKQKqFd3kLsXG9Ph1wzC/eOECXQlIndcggqqmGDeEcnmMIBfTk7A7y1WiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ObTmEqt6; arc=none smtp.client-ip=209.85.210.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GPtZdWpp"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-81c5aac8478so1738599a34.0
-        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2026 04:39:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ObTmEqt6"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-81b54d0cb17so2436435a34.1
+        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2026 04:39:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791459573; x=1792064373; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791459576; x=1792064376; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=VqiF4hMaOUDHr0lOLxu6QfcPt/9XdxDI99BwaagnhD0=;
-        b=GPtZdWppDU876orrh5QnyklqDrXHcHYa2vZgOPx357K7JCMC/emMpv+/wqBsyrqlRS
-         F3E1w+RSGEwoGL/c9LvqL2q88xgk80GW6tPyCG5JlRM6fjC2MLJfve/NbcTGBZPxRZvI
-         rCdK/CrnjCvPll4eRY3kjGs0W3t9KPZeTYSfIvauyERqUXIPGsTmAd1PvOqJcZiNu1Cp
-         A6UvwkAw60Zspitb8LjqFHeY0GUaNwpj6URrZ5OPYCJ8iJ5r39DYvExdU1dGcaJ56VRY
-         eNqGZkV8cE12dwTAzumR5P8pJx4BvgW0y2tpBiM5loYxMSgKeeHAuGnzks9BWyIe7xLz
-         A4+Q==
+        bh=355CzK4j7uNkVtDtuyRXZSw8VPaaw6+P9Oy+XhPlNpA=;
+        b=ObTmEqt6pbLmwx5Qi57liJRf5km1Trc8TM7HJ+ofDT2r3WA1uTbdRHJeZzUPi8f8dZ
+         Z7743PvTBaFBsI3tPGkd9yeeKKzs25vv5Ayu5pGPtTpkU1yBiK5i7xYPr3qwgP+1+WV3
+         32Q/d/4o5Ko6rBeCli6waykRwDu1SmCYmfgbBZnBI8eJ70aT42Ygp7M+lMRnxK53+b5e
+         Tn/RN2w36JGAyFtes+4W9t4GswT89vQiAEpTKFpeQ7eOqR4qLbnDrfHDNdBoKCqgw0FJ
+         YCLtBtA7io2p+JCYxpLUC7V37N5RWJuGY8wczhUee3v/U8GxZrM9IjcliLHxYEMrsZXT
+         qAlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791459573; x=1792064373;
+        d=1e100.net; s=20260707; t=1791459576; x=1792064376;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=VqiF4hMaOUDHr0lOLxu6QfcPt/9XdxDI99BwaagnhD0=;
-        b=mxuIXRArLX4YkFOK8N1eq+0Cn9GtnXvoI98/9fP9/JBl2VkFYbCWU4uwYnnDXxsEdz
-         mCeOmgPFiTHYpcVkf44/1CwKZLpPjJ42PGNoqqqnSVJyvfj9CT8gYNeh3ul5Xr+tRDLW
-         2QKK5k2ghwcHjMcLkQrlZtOZ5iFuvmOqf5KBszLb6ImzPshhGuBJvwq5YMNc6RlpuQAI
-         KBFWZRYNql0E1VFuY5/s0oA0PiEKeLzSRJ0MBTZll2dOTbIWypR7BSH89zRvUzJa22FN
-         VF7MKT7dbYzyfjTS5gg8I7PXOXOcylIcM5QPBPIbnM65s8E6/heankqCijLKGSkU8LvB
-         ZOmA==
-X-Gm-Message-State: AFuF++mskl+SY+iIWVTZYCZldtkclylneyE4cdgjRHTX61B48ZGzz8JK
-	6yoCbbTRxYOy5lSCDCnd2gLKx1wyzhtdBlGAiO7AwnHL8NTCo7z2Vf3Y70r08TSo
-X-Gm-Gg: AYBFou1qlp4wNwtfIFPbzjwloGqKFQRHSzZHZ0qAgMCvs5CdlFlrx5GbViR8EfSa2UT
-	f8+PuH97+cjo8X2Z9o/qwoHC3ThWmaCu5xkS9iOvH3bTEPG41cjSPd0fIf7JV/6tGRQf22NIwdm
-	fdwSW1YZjP1ZhEPmPyyB8yWkHsz3LiV353xv0r0mIEKWehTimxzor4cwGHjDSTlYTMLgzxvaPfa
-	HkEtt044bNI6k2V/nK77NRCAHFuEaxo+vcLCRAtzod9hS7l95QMmFoOqBsmPzXR2q6xUiNRwl60
-	9PyIhCkxgCZwYXwKpVdGLrQu1+brTixt+LWXamyVUexICiLELCglcv5DAlGJVylYQw+ZdZocwKe
-	aRzTARnawqcsZScXzz2lZ6gzeB2sLu5QSM5zMNyNWZ0Uk9HV3Dx+uAUawEhhAfd1O8KLsJyfK5d
-	KtFktQquxmlaedywnUAEjVueaxK9MTsq9KCZscL1nur9mj8w8pOqWrEF5lbNN7gYBlLPUGZB62O
-	sGA4RwJnAOphtyKvo/pIuXOK4FGKw6Ewtsr9IcZlQNBDeSZOsLvaDxIpv+LSU5u/5CJvoza5Jzy
-	twhbPnR1xVib0FtSyKPHxcqE2U4=
-X-Received: by 2002:a05:6830:6d23:b0:814:b62d:3122 with SMTP id 46e09a7af769-82ad01bf819mr5868407a34.22.1791459573321;
-        Thu, 08 Oct 2026 04:39:33 -0700 (PDT)
+        bh=355CzK4j7uNkVtDtuyRXZSw8VPaaw6+P9Oy+XhPlNpA=;
+        b=W5pknD7ToejvznHKwO6tA6kIPDxlcjLiF/FVZ/nVkzDGJXXWNaRgaccyEFj6h0l7ID
+         eyVI7JDOws3mJO8Z0RdDeXiny4EpBoD48AgT8r9HFTxMng9a3cBFWX5DinEqgxs1i3x4
+         WTLGB5yK/daBpiJ6FJe144fL2th4wrrniCHFg5X5AiJhGyf8yzKXz6FpRSR/IZYcBp+A
+         iAQrQal9rJaY0djNclwNW1lCncZxYz9Htwp57CUwytihUH9B+1O4TlwgD1xoNEzS6G8x
+         gCEbY4fJcICViOff2/H0Uak1DdvZal54Q5aVzuo77JL0/yCS9NrQAxLy6QO+Pjn406NW
+         1SIw==
+X-Gm-Message-State: AFuF++m5hEOf7F+xTg/SopyhNnGsAty7lJU/WHDhYs/6cbPipwGqrFq/
+	d4uD8UvpqBzisdI5v/uMdKJ6WtyJAxOJQIfX/amy3K9fplDhr5EOylyVvQsYs10B
+X-Gm-Gg: AYBFou1rI4RUIYecx4MFFaO72xRG1wN02qqXbUDT8HOswIK2llQii/Urymr3CuqE4Jy
+	CcmQG7NmBXB/D9OiPXFzIDKGj8dZnPgZBPLdi9UiqlbuzLPphQdvqbiENyRzekmzxdfJyau+VpO
+	FxsBTHWaeK9xeh8UfHyLbV8T0LlC9vOOXJHCXI0ZoLLj3OyIJ0DjmGV0JQhsdpjpSxVitwd1dqf
+	uZC4uu/8ZEUFrLK7Hj9vbYCRvDiL5RJP2WGEw3Oy0VVI3voNAHFAD5uHC/koktiK3Hy9xIHAkI8
+	UsiG1y5Qg/Wj7WNmCyJEwD7pmqyzW5hxHFD7zc0ZtRIq0+DtC/iAl5mZz1jV81VTLkaPFiNbo8n
+	Wgx4QgRlvZg/Uak3isstoADSS546DSUiuNmEd7M95Cr1557FoHGUd338WtYBGi0RMXqHP1qzWC/
+	3KAslCPgzhIeOStrQ+TqOTU86r5OCDg+Utz2ipikqjysU9+9JSANrxwomVQ9DUYAnjd2F+jKPTC
+	zD4yh1EZLV/0fdLervBCVvesTQzU69S5mDblPx+A44zDf3uZ4rz4WDCnYGIAjPAJq184mjVC0+9
+	Cbza0Si56At6uHbgMEh4CsfFNMA=
+X-Received: by 2002:a05:6830:dca:b0:817:bb8:cb7d with SMTP id 46e09a7af769-82ad0abcb46mr5915336a34.18.1791459576004;
+        Thu, 08 Oct 2026 04:39:36 -0700 (PDT)
 Received: from fedora-laptop.tail348456.ts.net ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-82adcb187c8sm6045154a34.22.2026.10.08.04.39.30
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-82adcb187c8sm6045154a34.22.2026.10.08.04.39.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 04:39:32 -0700 (PDT)
+        Thu, 08 Oct 2026 04:39:35 -0700 (PDT)
 From: Ming Lei <tom.leiming@gmail.com>
 To: linux-block@vger.kernel.org
-Cc: Ming Lei <tom.leiming@gmail.com>,
+Cc: Josef Bacik <josef@toxicpanda.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Caleb Sander Mateos <csander@purestorage.com>,
-	Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH v2 07/11] ublk: let STOP_DEV cancel the server's commands before its release
-Date: Thu,  8 Oct 2026 06:39:03 -0500
-Message-ID: <20261008113907.4000838-8-tom.leiming@gmail.com>
+	Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 08/11] ublk: refuse to go live after an io command was canceled
+Date: Thu,  8 Oct 2026 06:39:04 -0500
+Message-ID: <20261008113907.4000838-9-tom.leiming@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261008113907.4000838-1-tom.leiming@gmail.com>
 References: <20261008113907.4000838-1-tom.leiming@gmail.com>
@@ -79,241 +79,147 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-STOP_DEV cancels the fetched commands after dropping ub->mutex, so
-START_DEV and FETCH can run in between:
+From: Josef Bacik <josef@toxicpanda.com>
 
-  STOP_DEV                          START_DEV / FETCH
-  lock ub->mutex
-    ublk_stop_dev_unlocked()        (not started: does nothing)
-  unlock ub->mutex
-                                    START_DEV goes live, schedules scan
-                                    FETCH publishes a new command
-  cancel_work_sync(scan)            cancels the new disk's scan
-  ublk_cancel_dev()                 takes the new command: NULL io->cmd
-                                    on a queue which isn't canceling
+Since commit "ublk: keep a canceled FETCH round canceling until the
+server is gone", a device whose FETCH round saw a cancel keeps its
+queues canceling until the server goes away, but START_DEV and
+END_USER_RECOVERY still bring it up. Without UBLK_F_USER_RECOVERY, or
+with UBLK_F_USER_RECOVERY_FAIL_IO, every request of the new disk fails.
+With UBLK_F_USER_RECOVERY, requests are requeued and never kicked: after
+START_DEV the partition scan hangs under disk->open_mutex, and after
+END_USER_RECOVERY every read parks while the command returned 0. The
+server cannot fetch the canceled commands again, so the device can't
+serve I/O until it restarts anyway.
 
-A START_DEV after STOP_DEV also goes live over the canceled commands.
+Return -EBUSY from START_DEV and END_USER_RECOVERY while ub->canceling
+is set. In ublk_ctrl_start_dev() check it and publish ub->ub_disk in one
+cancel_mutex section, and have ublk_start_cancel() read the disk in its
+cancel_mutex section. Today ublk_start_cancel() samples the disk before
+taking the mutex, so a server dying during its own START_DEV can mark
+the queues without quiescing a disk START_DEV published in between, with
+its first I/O past the canceling check. Now either START_DEV sees the
+cancel, or the cancel sees the disk and quiesces it before marking. The
+END_USER_RECOVERY check is best effort: the disk exists there, and a
+cancel after it is the ordinary death of the new server, which
+ublk_start_cancel() handles by quiescing and marking.
 
-Hold a reference on the server's /dev/ublkcN while canceling:
-
-  STOP_DEV
-  lock ub->mutex
-    ublk_stop_dev_unlocked()
-    cancel_work_sync(scan)
-    server attached: take a reference on its file, set STOPPING
-  unlock ub->mutex
-  ublk_cancel_dev()
-  drop the reference
-
- - STOPPING makes FETCH and PREP get UBLK_IO_RES_ABORT and START_DEV
-   -EBUSY; a START_DEV or END_USER_RECOVERY waiting for the device
-   to get ready wakes up too; the reset in the server's release
-   clears it
- - the release can't run before the reference is dropped, so no new
-   server can attach, and the cancel only meets this server's commands
- - the cancel still runs after the unlock: io_uring_cmd_done() may take
-   uring_lock, under which FETCH takes ub->mutex
-
-ublk_ch_open() saves the file in ->ch_file and ublk_ch_release() clears
-it, under cancel_mutex. The release runs after the last reference is
-gone, so take ours with file_ref_get(). Drop it with __fput_sync(): if
-it is the last one, fput() would defer the release to this task, which
-DEL_DEV then makes wait for the device to be freed.
-
-A server which opened the device but hasn't fetched is stopped too.
-Document what a server sees after STOP_DEV in ublk.rst.
-
-Fixes: 85248d670b71 ("ublk: move ublk_cancel_dev() out of ub->mutex")
-Cc: stable@vger.kernel.org
-Reported-by: Josef Bacik <josef@toxicpanda.com>
-Closes: https://lore.kernel.org/linux-block/20260928-b4-ublk-cancel-stop-v1-0-4a4360232a46@toxicpanda.com/
-Tested-by: Josef Bacik <josef@toxicpanda.com>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Assisted-by: LLM
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 ---
- Documentation/block/ublk.rst |  7 ++++
- drivers/block/ublk_drv.c     | 80 ++++++++++++++++++++++++++++++++----
- 2 files changed, 79 insertions(+), 8 deletions(-)
+ Documentation/block/ublk.rst | 10 ++++++++--
+ drivers/block/ublk_drv.c     | 38 ++++++++++++++++++++++++++++++++++--
+ 2 files changed, 44 insertions(+), 4 deletions(-)
 
 diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index 28300fee22bf..ed3285e361ad 100644
+index ed3285e361ad..f07611b0d489 100644
 --- a/Documentation/block/ublk.rst
 +++ b/Documentation/block/ublk.rst
-@@ -126,6 +126,13 @@ managing and controlling ublk devices with help of several control commands:
-   ublk server will release resources (such as destroying I/O handler threads &
-   io_uring).
+@@ -118,7 +118,11 @@ managing and controlling ublk devices with help of several control commands:
+   After the server prepares userspace resources (such as creating I/O handler
+   threads & io_uring for handling ublk IO), this command is sent to the
+   driver for allocating & exposing ``/dev/ublkb*``. Parameters set via
+-  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device.
++  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device. The command
++  fails with ``-EBUSY`` if an I/O command fetched by the current server
++  was canceled, because its io_uring is gone. The server can't fetch it
++  again, and the device can be started again once the server has closed
++  ``/dev/ublkc*``.
  
-+  If a server has ``/dev/ublkc*`` open, its fetched I/O commands complete with
-+  ``UBLK_IO_RES_ABORT``. Until it closes ``/dev/ublkc*``, new
-+  ``UBLK_IO_FETCH_REQ`` and ``UBLK_U_IO_PREP_IO_CMDS`` commands complete with
-+  ``UBLK_IO_RES_ABORT`` too, and ``UBLK_CMD_START_DEV`` fails with ``-EBUSY``,
-+  even if the server hadn't fetched anything. The device can be started again
-+  by a server that opens ``/dev/ublkc*`` after that.
-+
- - ``UBLK_CMD_DEL_DEV``
+ - ``UBLK_CMD_STOP_DEV``
  
-   Remove ``/dev/ublkc*``. When this command returns, the allocated ublk device
+@@ -202,7 +206,9 @@ managing and controlling ublk devices with help of several control commands:
+   command is accepted after ublk device is quiesced and a new process has
+   opened ``/dev/ublkc*`` and get all ublk queues be ready. When this command
+   returns, ublk device is unquiesced and new I/O requests are passed to the
+-  new process.
++  new process. It fails with ``-EBUSY`` if an I/O command of the new
++  process was canceled already. The recovery can be started over once the
++  new process has closed ``/dev/ublkc*``.
+ 
+ - user recovery feature description
+ 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 2fd0c265ed20..176fbf84737c 100644
+index 176fbf84737c..ecadcf5e3e33 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -321,6 +321,8 @@ struct ublk_device {
- #define UB_STATE_OPEN		0
- #define UB_STATE_USED		1
- #define UB_STATE_DELETED	2
-+/* STOP_DEV canceled the server's commands, until its release */
-+#define UB_STATE_STOPPING	3
- 	unsigned long		state;
- 	int			ub_number;
+@@ -2759,9 +2759,11 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
  
-@@ -334,6 +336,8 @@ struct ublk_device {
- 	u16			nr_queue_ready;
- 	bool 			unprivileged_daemons;
- 	struct mutex cancel_mutex;
-+	/* the open /dev/ublkcN, protected by cancel_mutex */
-+	struct file *ch_file;
- 	/*
- 	 * A cancel started in this FETCH round. Set by ublk_set_canceling(),
- 	 * cleared only by ublk_reset_ch_dev() when a new round starts. While
-@@ -2406,6 +2410,9 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
- 		return -EBUSY;
- 	filp->private_data = ub;
- 	ub->ublksrv_tgid = current->tgid;
-+	mutex_lock(&ub->cancel_mutex);
-+	ub->ch_file = filp;
-+	mutex_unlock(&ub->cancel_mutex);
- 	return 0;
- }
- 
-@@ -2432,6 +2439,7 @@ static void ublk_reset_ch_dev(struct ublk_device *ub)
- 	ub->nr_queue_ready = 0;
- 	ub->unprivileged_daemons = false;
- 	ub->ublksrv_tgid = -1;
-+	clear_bit(UB_STATE_STOPPING, &ub->state);
- }
- 
- static struct gendisk *ublk_get_disk(struct ublk_device *ub)
-@@ -2635,6 +2643,9 @@ static int ublk_ch_release(struct inode *inode, struct file *filp)
+ static void ublk_start_cancel(struct ublk_device *ub)
  {
- 	struct ublk_device *ub = filp->private_data;
+-	struct gendisk *disk = ublk_get_disk(ub);
++	struct gendisk *disk;
  
-+	mutex_lock(&ub->cancel_mutex);
-+	ub->ch_file = NULL;
-+	mutex_unlock(&ub->cancel_mutex);
- 	/*
- 	 * Grab ublk device reference, so it won't be gone until we are
- 	 * really released from work function.
-@@ -3026,13 +3037,54 @@ static void ublk_stop_dev_unlocked(struct ublk_device *ub)
- 	put_disk(disk);
- }
++	/* sync with ublk_ctrl_start_dev() publishing the disk */
+ 	mutex_lock(&ub->cancel_mutex);
++	disk = ublk_get_disk(ub);
+ 	if (ub->canceling)
+ 		goto out;
  
-+static struct file *ublk_get_ch_file(struct ublk_device *ub)
-+{
-+	struct file *file;
-+
-+	mutex_lock(&ub->cancel_mutex);
-+	file = ub->ch_file;
-+	if (file && !file_ref_get(&file->f_ref))
-+		file = NULL;
-+	mutex_unlock(&ub->cancel_mutex);
-+	return file;
-+}
-+
- static void ublk_stop_dev(struct ublk_device *ub)
- {
-+	struct file *file;
-+
+@@ -4575,6 +4577,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 		.dma_alignment		= 3,
+ 	};
+ 	struct gendisk *disk;
++	bool canceled;
+ 	int ret = -EINVAL;
+ 
+ 	if (ublksrv_pid <= 0)
+@@ -4665,8 +4668,24 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 	disk->fops = &ub_fops;
+ 	disk->private_data = ub;
+ 
 +	/*
-+	 * FETCH, PREP and START_DEV take ub->mutex. If a server has
-+	 * /dev/ublkcN open, set STOPPING, which turns it away, and hold a
-+	 * reference on the file: the server's release, whose reset clears
-+	 * STOPPING and lets a new server attach, can't run before we drop it.
-+	 * So the cancel can run after the unlock and only meets this server's
-+	 * commands; it has to: io_uring_cmd_done() may take uring_lock, under
-+	 * which FETCH takes ub->mutex.
++	 * A command of this FETCH round was canceled and can't be fetched
++	 * again, don't bring up a disk over it.  Check and publish the disk
++	 * in one cancel_mutex section: either this sees ub->canceling, or
++	 * ublk_start_cancel() sees the disk and quiesces it before marking
++	 * the queues.
 +	 */
- 	mutex_lock(&ub->mutex);
- 	ublk_stop_dev_unlocked(ub);
--	mutex_unlock(&ub->mutex);
- 	cancel_work_sync(&ub->partition_scan_work);
-+	file = ublk_get_ch_file(ub);
-+	if (file) {
-+		/*
-+		 * The server has to close /dev/ublkcN before this device can
-+		 * be started again: the reset in its release clears STOPPING.
-+		 */
-+		set_bit(UB_STATE_STOPPING, &ub->state);
-+		/* for wake_up_var() below, see wake_up_bit() */
-+		smp_mb__after_atomic();
-+	}
-+	mutex_unlock(&ub->mutex);
-+
-+	/* no server: nothing to cancel */
-+	if (!file)
-+		return;
-+
-+	/* wake a START_DEV waiting for the device to get ready */
-+	wake_up_var(&ub->nr_queue_ready);
- 	ublk_cancel_dev(ub);
-+	__fput_sync(file);
- }
- 
- static void ublk_reset_io_flags(struct ublk_queue *ubq, struct ublk_io *io)
-@@ -3298,6 +3350,9 @@ static int ublk_check_fetch_buf(const struct ublk_device *ub, __u64 buf_addr)
- static int __ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub,
- 			struct ublk_io *io, u16 q_id)
- {
-+	if (test_bit(UB_STATE_STOPPING, &ub->state))
-+		return UBLK_IO_RES_ABORT;
-+
- 	/* UBLK_IO_FETCH_REQ is only allowed before dev is setup */
- 	if (ublk_dev_ready(ub))
- 		return -EBUSY;
-@@ -4476,22 +4531,27 @@ static bool ublk_validate_user_pid(struct ublk_device *ub, pid_t ublksrv_pid)
- 	return ub->ublksrv_tgid == ublksrv_pid;
- }
- 
-+static bool ublk_dev_ready_or_stopping(const struct ublk_device *ub)
-+{
-+	return ublk_dev_ready(ub) || test_bit(UB_STATE_STOPPING, &ub->state);
-+}
-+
- /*
-- * Wait until all queues have fetched their I/O commands, and return with
-- * ub->mutex held and readiness guaranteed. The queues stay canceling if
-- * this round saw a cancel, see ublk_queue_reset_io_flags(). Ready may
-- * regress between wakeup and mutex_lock() (F_BATCH UNPREP, daemon death),
-- * so re-check it under the mutex and wait again.
-+ * Wait until all queues have fetched their I/O commands, or STOP_DEV set
-+ * UB_STATE_STOPPING, and return with ub->mutex held. The queues stay
-+ * canceling if this round saw a cancel, see ublk_queue_reset_io_flags().
-+ * Ready may regress between wakeup and mutex_lock() (F_BATCH UNPREP,
-+ * daemon death), so re-check it under the mutex and wait again.
-  */
- static int ublk_wait_dev_ready_and_lock(struct ublk_device *ub)
- {
- 	while (true) {
- 		if (wait_var_event_interruptible(&ub->nr_queue_ready,
--						 ublk_dev_ready(ub)))
-+						 ublk_dev_ready_or_stopping(ub)))
- 			return -EINTR;
- 
- 		mutex_lock(&ub->mutex);
--		if (ublk_dev_ready(ub))
-+		if (ublk_dev_ready_or_stopping(ub))
- 			return 0;
- 		mutex_unlock(&ub->mutex);
- 	}
-@@ -4591,6 +4651,10 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
- 		ret = -EEXIST;
- 		goto out_unlock;
- 	}
-+	if (test_bit(UB_STATE_STOPPING, &ub->state)) {
++	mutex_lock(&ub->cancel_mutex);
++	canceled = ub->canceling;
++	if (!canceled)
++		ub->ub_disk = disk;
++	mutex_unlock(&ub->cancel_mutex);
++	if (canceled) {
++		put_disk(disk);
 +		ret = -EBUSY;
 +		goto out_unlock;
 +	}
+ 	ub->dev_info.ublksrv_pid = ub->ublksrv_tgid;
+-	ub->ub_disk = disk;
  
- 	disk = blk_mq_alloc_disk(&ub->tag_set, &lim, NULL);
- 	if (IS_ERR(disk)) {
+ 	ublk_apply_params(ub);
+ 
+@@ -5238,6 +5257,7 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+ 		const struct ublksrv_ctrl_cmd *header)
+ {
+ 	int ublksrv_pid = (int)header->data[0];
++	bool canceled;
+ 	int ret = -EINVAL;
+ 
+ 	pr_devel("%s: Waiting for all FETCH_REQs, dev id %d...\n", __func__,
+@@ -5261,6 +5281,20 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+ 		ret = -EBUSY;
+ 		goto out_unlock;
+ 	}
++
++	/*
++	 * As in ublk_ctrl_start_dev(), a canceled command can't be fetched
++	 * again.  Best effort: the disk exists here, and a cancel after this
++	 * check is the ordinary death of the new server, which
++	 * ublk_start_cancel() handles by quiescing and marking.
++	 */
++	mutex_lock(&ub->cancel_mutex);
++	canceled = ub->canceling;
++	mutex_unlock(&ub->cancel_mutex);
++	if (canceled) {
++		ret = -EBUSY;
++		goto out_unlock;
++	}
+ 	ub->dev_info.ublksrv_pid = ub->ublksrv_tgid;
+ 	ub->dev_info.state = UBLK_S_DEV_LIVE;
+ 	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
 -- 
 2.55.0
 
