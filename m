@@ -1,22 +1,22 @@
 Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D4C3D4108;
-	Fri,  9 Oct 2026 09:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D137449E5FA;
+	Fri,  9 Oct 2026 09:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791539887; cv=none; b=ZP3+UeHx1dCfJw+xCY7BAA032d2Jzn4RjdpLeEAl0u/yLVRl1yaf78RaesKqDWp9/ttgZ/0301ZMLKga873l6D84umwaghXr/SEbuAJUkLFo8EXj3/aU/LMpzNY1paqPenwE/Ob577dRJ3TMo4Ne7dUbTkaLRKAaqO/7IWLv6AI=
+	t=1791539888; cv=none; b=CffcveyolDwW37I12KqX2kipRD9d5RbgJDpWhCLOtTYOO5n7AVXkMw4ojqBkoT5/OWY5ax0YU/bMGWvAwUNyzbOVvGWxsk9pTuaHv5zSeuoWq05raEVLLGur6D5/fvYhz9r/TR/V6WSFWwJQ4z711rGTieEQaB+RciPEJv6VKUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791539887; c=relaxed/simple;
-	bh=ewf7NH8t7OoqvNF5e3ebUOK1+u01wdvsIhxf8gIXJJA=;
+	s=arc-20240116; t=1791539888; c=relaxed/simple;
+	bh=G+Hl+S713u6HFCVAgh1Hce+A8qQGvf8fQE8yjtToW2M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c9R0qCLd5K+khwigvLzGd0jbMf7K+KAE1lVYDgbdxUQx3K6luC1w0h0Nx7Fcq1Z2YJCBuVx5iJO+huJygbNb1nmOqxqt/ZHHqNmuY2YKKiIXfymD+NuyYdHEUZuvVcu4NqG8nEmWz3wHxAWzSSaZgIV4PS9ZkurdjSE0ikjFzPg=
+	 MIME-Version; b=bp8RKHG3imKrD5p8AxkKDMasT8kNR/gxZ9ENymVqGPK6d5vQMG9/qQ+K9EYFnfifpsProY2cU/nTPwdRgJ9pKfZTt4VhJ2b5IIXyJ17i02aqf+wRvlqaDSmnDnTPyDyU2F8NcxHK9nfUoaA+4fgheI53rZ+9D4eVAEKX2lwfb1A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
 Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 9F2ED4797F;
-	Fri, 09 Oct 2026 11:58:02 +0200 (CEST)
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 0745147950;
+	Fri, 09 Oct 2026 11:58:05 +0200 (CEST)
 From: Lukas Sichert <l.sichert@proxmox.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
@@ -28,9 +28,9 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Lukas Sichert <l.sichert@proxmox.com>
-Subject: [RFC PATCH 2/4] buffer: writeback: batch contiguous async-write buffers per folio
-Date: Fri,  9 Oct 2026 11:57:49 +0200
-Message-ID: <20261009095754.430875-3-l.sichert@proxmox.com>
+Subject: [RFC PATCH 4/4] selftests: filesystems: add blkdev writeback coalescing test
+Date: Fri,  9 Oct 2026 11:57:51 +0200
+Message-ID: <20261009095754.430875-5-l.sichert@proxmox.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261009095754.430875-1-l.sichert@proxmox.com>
 References: <20261009095754.430875-1-l.sichert@proxmox.com>
@@ -42,199 +42,307 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
-X-Bm-Transport-Timestamp: 1791539881350
+X-Bm-Transport-Timestamp: 1791539882331
 
-Writeback of a folio with several buffers submits one bio per buffer
-head, even when the buffers are contiguous on disk. That is a lot of
-small bios, and the block layer has to merge them again or not at all.
-Build one bio per run of contiguous buffers instead.
-
-Buffers only merge if they target the same bdev and have the same
-REQ_META/REQ_PRIO state, since bh_submit() applies those bits per
-buffer. A bio that does not complete in task context cannot take
-folios marked dropbehind, so a new bio is started for those.
-
-Such a bio completes a whole run of buffers at once, so let
-bh_complete_folio_write() clear BH_Async_Write on the run while
-taking the folio's uptodate lock only once.
+Test bio coalescing in blkdev_writepages() and buffer_head batching
+within a folio, using buffered writes to a loop device with a block
+size below PAGE_SIZE. Contiguous, gapped and scattered writes are
+checked against the backing file, and a concurrent writer/fsync run
+checks for kernel warnings and crashes.
 
 Signed-off-by: Lukas Sichert <l.sichert@proxmox.com>
 ---
- fs/buffer.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 113 insertions(+), 8 deletions(-)
+ .../testing/selftests/filesystems/.gitignore  |   1 +
+ tools/testing/selftests/filesystems/Makefile  |   2 +-
+ .../filesystems/blkdev_writeback_test.c       | 259 ++++++++++++++++++
+ 3 files changed, 261 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/filesystems/blkdev_writeback_test.c
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 3389d866a85c..ae350d443b27 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -399,17 +399,20 @@ static void bh_complete_write(struct buffer_head *bh, bool success)
- 	}
- }
+diff --git a/tools/testing/selftests/filesystems/.gitignore b/tools/testing/selftests/filesystems/.gitignore
+index 9eb185fb2f9d..ed90ff2bf086 100644
+--- a/tools/testing/selftests/filesystems/.gitignore
++++ b/tools/testing/selftests/filesystems/.gitignore
+@@ -7,3 +7,4 @@ anon_inode_test
+ kernfs_test
+ idmapped_tmpfile
+ ustat_test
++blkdev_writeback_test
+diff --git a/tools/testing/selftests/filesystems/Makefile b/tools/testing/selftests/filesystems/Makefile
+index 03be337c1f35..4236aa18a73b 100644
+--- a/tools/testing/selftests/filesystems/Makefile
++++ b/tools/testing/selftests/filesystems/Makefile
+@@ -2,7 +2,7 @@
  
--static void bh_complete_folio_write(struct folio *folio, struct buffer_head *bh)
-+static void bh_complete_folio_write(struct folio *folio, struct buffer_head *bh,
-+				    unsigned nr)
- {
- 	struct buffer_head *first = folio_buffers(folio);
--	struct buffer_head *tmp;
-+	struct buffer_head *tmp = bh;
- 	unsigned long flags;
+ CFLAGS += $(KHDR_INCLUDES)
+ TEST_GEN_PROGS := devpts_pts file_stressor anon_inode_test kernfs_test fclog ustat_test
+-TEST_GEN_PROGS += idmapped_tmpfile
++TEST_GEN_PROGS += idmapped_tmpfile blkdev_writeback_test
+ TEST_GEN_PROGS_EXTENDED := dnotify_test
+ 
+ include ../lib.mk
+diff --git a/tools/testing/selftests/filesystems/blkdev_writeback_test.c b/tools/testing/selftests/filesystems/blkdev_writeback_test.c
+new file mode 100644
+index 000000000000..307d67b150e6
+--- /dev/null
++++ b/tools/testing/selftests/filesystems/blkdev_writeback_test.c
+@@ -0,0 +1,259 @@
++// SPDX-License-Identifier: GPL-2.0
++#define _GNU_SOURCE
++
++#include <fcntl.h>
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++#include <unistd.h>
++#include <sys/ioctl.h>
++#include <sys/stat.h>
++#include <sys/wait.h>
++
++#include <linux/fs.h>
++#include <linux/loop.h>
++
++#include "kselftest_harness.h"
++
++#define DEV_SIZE	(4 * 1024 * 1024)
++#define SOFT_BLKSIZE	1024U	/* < PAGE_SIZE: several buffer_heads/folio */
++
++#define STRESS_DURATION_SEC	30
++#define STRESS_MAX_CHUNK_BLKS	8
++
++FIXTURE(blkdev_writeback) {
++	int fd_backing;
++	int fd_dev;
++	char dev_path[32];
++};
++
++static void fill_pattern(char *buf, size_t len, unsigned seed)
++{
++	size_t i;
++
++	for (i = 0; i < len; i++)
++		buf[i] = (char)(seed + i);
++}
++
++static void write_pattern(struct __test_metadata *_metadata,
++			  FIXTURE_DATA(blkdev_writeback) *self,
++			  off_t offset, size_t len, unsigned seed)
++{
++	char *buf = malloc(len);
++
++	ASSERT_NE(buf, NULL);
++	fill_pattern(buf, len, seed);
++	ASSERT_EQ(pwrite(self->fd_dev, buf, len, offset), (ssize_t)len);
++	free(buf);
++}
++
++static void verify_pattern(struct __test_metadata *_metadata,
++			   FIXTURE_DATA(blkdev_writeback) *self,
++			   off_t offset, size_t len, unsigned seed)
++{
++	char *expected = malloc(len);
++	char *actual = malloc(len);
++	size_t i;
++
++	ASSERT_NE(expected, NULL);
++	ASSERT_NE(actual, NULL);
++	fill_pattern(expected, len, seed);
++
++	ASSERT_EQ(fsync(self->fd_dev), 0);
++	ASSERT_EQ(pread(self->fd_backing, actual, len, offset), (ssize_t)len);
++
++	for (i = 0; i < len; i++)
++		ASSERT_EQ(actual[i], expected[i])
++			TH_LOG("mismatch at backing file offset %zu",
++			       (size_t)offset + i);
++
++	free(expected);
++	free(actual);
++}
++
++static void verify_zero(struct __test_metadata *_metadata,
++			FIXTURE_DATA(blkdev_writeback) *self,
++			off_t offset, size_t len)
++{
++	char *actual = malloc(len);
++	size_t i;
++
++	ASSERT_NE(actual, NULL);
++	ASSERT_EQ(pread(self->fd_backing, actual, len, offset), (ssize_t)len);
++
++	for (i = 0; i < len; i++)
++		ASSERT_EQ(actual[i], 0)
++			TH_LOG("unexpected write at backing file offset %zu",
++			       (size_t)offset + i);
++
++	free(actual);
++}
++
++FIXTURE_SETUP(blkdev_writeback)
++{
++	int fd_ctl, loop_nr, blksize = SOFT_BLKSIZE;
++	char template[] = "/tmp/blkdev_writeback_test_XXXXXX";
++	struct loop_config config = { 0 };
++
++	self->fd_backing = -1;
++	self->fd_dev = -1;
++
++	if (geteuid() != 0)
++		SKIP(return, "Test requires root to attach a loop device");
++
++	self->fd_backing = mkstemp(template);
++	ASSERT_GE(self->fd_backing, 0);
++	ASSERT_EQ(unlink(template), 0);
++	ASSERT_EQ(ftruncate(self->fd_backing, DEV_SIZE), 0);
++
++	fd_ctl = open("/dev/loop-control", O_RDWR);
++	if (fd_ctl < 0)
++		SKIP(return, "Loop device support is not available");
++	loop_nr = ioctl(fd_ctl, LOOP_CTL_GET_FREE);
++	ASSERT_GE(loop_nr, 0);
++	ASSERT_EQ(close(fd_ctl), 0);
++
++	snprintf(self->dev_path, sizeof(self->dev_path), "/dev/loop%d", loop_nr);
++	self->fd_dev = open(self->dev_path, O_RDWR);
++	ASSERT_GE(self->fd_dev, 0);
++
++	config.fd = self->fd_backing;
++	ASSERT_EQ(ioctl(self->fd_dev, LOOP_CONFIGURE, &config), 0);
++	ASSERT_EQ(ioctl(self->fd_dev, BLKBSZSET, &blksize), 0);
++}
++
++FIXTURE_TEARDOWN(blkdev_writeback)
++{
++	if (self->fd_dev >= 0) {
++		fsync(self->fd_dev);
++		ioctl(self->fd_dev, LOOP_CLR_FD);
++		close(self->fd_dev);
++	}
++	if (self->fd_backing >= 0)
++		close(self->fd_backing);
++}
++
++/*
++ * A single write spanning many contiguous folios should still read back
++ * correctly regardless of how many bios blkdev_writepages() coalesced it
++ * into.
++ */
++TEST_F(blkdev_writeback, contiguous_multi_folio)
++{
++	write_pattern(_metadata, self, 0, 512 * 1024, 0);
++	verify_pattern(_metadata, self, 0, 512 * 1024, 0);
++}
++
++/*
++ * Two writes separated by an untouched gap must each land correctly,this means the
++ * non-contiguous block run must close out the current bio/run rather than merge across
++ * the hole.
++ */
++TEST_F(blkdev_writeback, gapped_regions)
++{
++	const off_t region_a = 0;
++	const off_t region_b = 192 * 1024;
++	const size_t region_len = 64 * 1024;
++	const off_t gap = 64 * 1024;
++	const size_t gap_len = region_b - gap;
++
++	write_pattern(_metadata, self, region_a, region_len, 0xa5);
++	write_pattern(_metadata, self, region_b, region_len, 0x3c);
++
++	verify_pattern(_metadata, self, region_a, region_len, 0xa5);
++	verify_pattern(_metadata, self, region_b, region_len, 0x3c);
++	verify_zero(_metadata, self, gap, gap_len);
++}
++
++/*
++ * Many small, mutually non-adjacent writes force repeated run/bio splits
++ * in __bh_bio_append(), stressing the tracking of buffer runs within a
++ * coalesced bio.
++ */
++TEST_F(blkdev_writeback, scattered_writes)
++{
++	const size_t chunk_len = 4096;
++	const unsigned nr_chunks = 32;
++	const size_t stride = DEV_SIZE / nr_chunks;
 +	unsigned i;
- 
- 	spin_lock_irqsave(&first->b_uptodate_lock, flags);
- 
--	clear_buffer_async_write(bh);
--	unlock_buffer(bh);
--	tmp = bh->b_this_page;
-+	for (i = 0; i < nr; i++, tmp = tmp->b_this_page) {
-+		clear_buffer_async_write(tmp);
-+		unlock_buffer(tmp);
-+	}
- 	while (tmp != bh) {
- 		if (buffer_async_write(tmp)) {
- 			BUG_ON(!buffer_locked(tmp));
-@@ -441,7 +444,7 @@ void bh_end_async_write(struct bio *bio)
- 	struct folio *folio = bh->b_folio;
- 
- 	bh_complete_write(bh, success);
--	bh_complete_folio_write(folio, bh);
-+	bh_complete_folio_write(folio, bh, 1);
- }
- EXPORT_SYMBOL(bh_end_async_write);
- 
-@@ -1164,6 +1167,100 @@ void bh_submit(struct buffer_head *bh, blk_opf_t opf, bio_end_io_t end_io)
- }
- EXPORT_SYMBOL(bh_submit);
- 
-+static void __bh_bio_append(struct bio **biop, struct buffer_head *bh,
-+			    blk_opf_t opf, enum rw_hint write_hint,
-+			    struct writeback_control *wbc, bio_end_io_t end_bio)
-+{
-+	const enum req_op op = opf & REQ_OP_MASK;
-+	sector_t sector = bh->b_blocknr * (bh->b_size >> 9);
-+	struct bio *bio = *biop;
 +
-+	BUG_ON(!buffer_locked(bh));
-+	BUG_ON(!buffer_mapped(bh));
-+	BUG_ON(buffer_delay(bh));
-+	BUG_ON(buffer_unwritten(bh));
++	for (i = 0; i < nr_chunks; i++) {
++		/* write in reverse order so nothing is naturally contiguous */
++		unsigned idx = nr_chunks - 1 - i;
 +
-+	/*
-+	 * Only clear out a write error when rewriting
-+	 */
-+	if (test_set_buffer_req(bh) && (op == REQ_OP_WRITE))
-+		clear_buffer_write_io_error(bh);
-+
-+	/*
-+	 * The open bio can only be extended with a buffer head if it passes
-+	 * every check below. If any one of them fails, submit the bio as it
-+	 * is and start a new one for this buffer head.
-+	 *
-+	 * The buffer head does not fit if:
-+	 * - it is written to a different block device
-+	 * - its REQ_META or REQ_PRIO property differs from the bio's, as
-+	 *   these apply to the bio as a whole
-+	 * - its write hint differs from the bio's
-+	 * - its folio is dropbehind, but the bio would complete in IRQ
-+	 *   context instead of task context
-+	 * - it does not start on disk right where the bio's data ends, for
-+	 *   example because the file is fragmented
-+	 * - its fscrypt key differs or its data unit numbers would not
-+	 *   continue those of the bio
-+	 * - bio_add_folio() cannot take it, for example because the bio is
-+	 *   full. This is checked last because it adds the buffer on success.
-+	 */
-+	if (bio &&
-+	    (bio->bi_bdev != bh->b_bdev ||
-+	     !!(bio->bi_opf & REQ_META) != buffer_meta(bh) ||
-+	     !!(bio->bi_opf & REQ_PRIO) != buffer_prio(bh) ||
-+	     bio->bi_write_hint != write_hint ||
-+	     (!bio_flagged(bio, BIO_COMPLETE_IN_TASK) &&
-+	      folio_test_dropbehind(bh->b_folio)) ||
-+	     bio_end_sector(bio) != sector ||
-+	     !fscrypt_mergeable_bio(bio, bh->b_folio->mapping->host,
-+				    folio_pos(bh->b_folio) + bh_offset(bh)) ||
-+	     !bio_add_folio(bio, bh->b_folio, bh->b_size, bh_offset(bh)))) {
-+		guard_bio_eod(bio);
-+		blk_crypto_submit_bio(bio);
-+		bio = NULL;
++		write_pattern(_metadata, self, idx * stride, chunk_len, idx);
 +	}
 +
-+	if (!bio) {
-+		bio = bh_bio_alloc(bh, opf, write_hint, end_bio);
-+		if (wbc)
-+			wbc_init_bio(wbc, bio);
-+		bio_add_folio_nofail(bio, bh->b_folio, bh->b_size, bh_offset(bh));
-+	}
-+
-+	if (wbc)
-+		wbc_account_cgroup_owner(wbc, bh->b_folio, bh->b_size);
-+
-+	*biop = bio;
++	for (i = 0; i < nr_chunks; i++)
++		verify_pattern(_metadata, self, i * stride, chunk_len, i);
 +}
 +
-+static void bh_end_async_write_range(struct bio *bio)
++static void stress_writer(FIXTURE_DATA(blkdev_writeback) *self)
 +{
-+	bool success = bio->bi_status == BLK_STS_OK;
-+	bool quiet = bio_flagged(bio, BIO_QUIET);
-+	struct folio_iter fi;
++	char buf[STRESS_MAX_CHUNK_BLKS * SOFT_BLKSIZE];
++	unsigned seed = getpid();
 +
-+	bio_for_each_folio_all(fi, bio) {
-+		struct folio *folio = fi.folio;
-+		struct buffer_head *first_bh = folio_buffers(folio);
-+		struct buffer_head *bh;
-+		unsigned int i, nr;
++	srand(seed);
++	for (;;) {
++		size_t blks = 1 + rand_r(&seed) % STRESS_MAX_CHUNK_BLKS;
++		size_t len = blks * SOFT_BLKSIZE;
++		size_t max_off_blks = (DEV_SIZE - len) / SOFT_BLKSIZE;
++		off_t off = (rand_r(&seed) % max_off_blks) * SOFT_BLKSIZE;
 +
-+		while (bh_offset(first_bh) < fi.offset)
-+			first_bh = first_bh->b_this_page;
-+
-+		nr = DIV_ROUND_UP(fi.length, first_bh->b_size);
-+		for (i = 0, bh = first_bh; i < nr; i++, bh = bh->b_this_page) {
-+			if (quiet)
-+				set_bit(BH_Quiet, &bh->b_state);
-+			bh_complete_write(bh, success);
-+		}
-+
-+		bh_complete_folio_write(folio, first_bh, nr);
++		fill_pattern(buf, len, seed);
++		if (pwrite(self->fd_dev, buf, len, off) != (ssize_t)len)
++			exit(1);
 +	}
-+	bio_put(bio);
 +}
 +
- static struct buffer_head *__bread_slow(struct buffer_head *bh)
- {
- 	lock_buffer(bh);
-@@ -1745,6 +1842,7 @@ int __block_write_full_folio(struct inode *inode, struct folio *folio,
- 	size_t blocksize;
- 	int nr_underway = 0;
- 	blk_opf_t write_flags = wbc_to_write_flags(wbc);
-+	struct bio *bio;
- 
- 	head = folio_create_buffers(folio, inode,
- 				    (1 << BH_Dirty) | (1 << BH_Uptodate));
-@@ -1828,16 +1926,23 @@ int __block_write_full_folio(struct inode *inode, struct folio *folio,
- 	BUG_ON(folio_test_writeback(folio));
- 	folio_start_writeback(folio);
- 
-+	bio = NULL;
- 	do {
- 		struct buffer_head *next = bh->b_this_page;
- 		if (buffer_async_write(bh)) {
--			__bh_submit(bh, REQ_OP_WRITE | write_flags,
-+			__bh_bio_append(&bio, bh, REQ_OP_WRITE | write_flags,
- 					inode->i_write_hint, wbc,
--					bh_end_async_write);
-+					bh_end_async_write_range);
- 			nr_underway++;
- 		}
- 		bh = next;
- 	} while (bh != head);
++static void stress_syncer(FIXTURE_DATA(blkdev_writeback) *self)
++{
++	for (;;) {
++		if (fsync(self->fd_dev) < 0)
++			exit(1);
++	}
++}
 +
-+	if (bio) {
-+		guard_bio_eod(bio);
-+		blk_crypto_submit_bio(bio);
++/*
++ * Concurrent writers dirtying overlapping, adjacent and disjoint ranges
++ * while syncers repeatedly force writing the bio. Data content is not checked
++ * (writes overlap by design), the point is to survive the duration without a
++ * kernel-side warning or crash.
++ */
++TEST_F_TIMEOUT(blkdev_writeback, stress_concurrent_writeback, STRESS_DURATION_SEC + 30)
++{
++	long nr_procs = sysconf(_SC_NPROCESSORS_ONLN);
++	pid_t pids[2 * nr_procs];
++	int i;
++
++	for (i = 0; i < nr_procs; i++) {
++		pids[i] = fork();
++		ASSERT_GE(pids[i], 0);
++		if (pids[i] == 0)
++			stress_writer(self);
++	}
++	for (i = 0; i < nr_procs; i++) {
++		pids[nr_procs + i] = fork();
++		ASSERT_GE(pids[nr_procs + i], 0);
++		if (pids[nr_procs + i] == 0)
++			stress_syncer(self);
 +	}
 +
- 	folio_unlock(folio);
- 
- 	err = 0;
++	ASSERT_EQ(clock_nanosleep(CLOCK_MONOTONIC, 0,
++			&(struct timespec){ .tv_sec = STRESS_DURATION_SEC }, NULL), 0);
++
++	for (i = 0; i < 2 * nr_procs; i++)
++		kill(pids[i], SIGKILL);
++
++	for (i = 0; i < 2 * nr_procs; i++) {
++		int wstatus;
++
++		ASSERT_EQ(waitpid(pids[i], &wstatus, 0), pids[i]);
++		/* an exit before we killed it means it hit a real error */
++		ASSERT_FALSE(WIFEXITED(wstatus) && WEXITSTATUS(wstatus) != 0);
++	}
++}
++
++TEST_HARNESS_MAIN
 
