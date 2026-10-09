@@ -1,83 +1,131 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5E9175A74
-	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 02:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B150F4AEEF
+	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 03:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791513181; cv=none; b=MI1+bWdf3KiONOp4+bAXadTSKKM8TjgbDQaeNzXzBjwtUeLhDv5D9OEb3tOsHvNc0dusCd4hHCqxx4ozkkepWbEJ3cTYWy52nk+QL5jZ8LwYZ4BIunfc8njt1JT3vKAYP/QSTMFAt2A4kHJdlXGdgV6UarixKEMjDh8phGaZ1+Y=
+	t=1791514895; cv=none; b=X3WgDggTl/zb1fvDsulSuCdk4T5L92Y8N/7aqhPMMlrBTP2pCGyD/opL/567zkOisLe0Ot4NDFPDwz1I2XGLyiAmeiexQGsoGAyTQxi+sbCWOzINaub6gMAqF73kR4JhmFF4gFB906xdDl9GWpXype5SY20NgLIuVOOvhdgYT6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791513181; c=relaxed/simple;
-	bh=2UDSRshdfMAn0ym0C1sfJVH+j5wJB2oVO9MnQt811hM=;
-	h=Date:Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc; b=puI2J72rP08qM+3+yF6Y1ws0ni2HtxWL3bw0wAkHSoFcMdAG13EjRQL61+zdFz8iMBobksU7WB3ekTNB+EGE1dav+pU/HLSdyJqViT0dWpqtx5GG5qwG4oPMoYi0Fryj9bg7aI9PFraCZYvE9g23L8eGUaoDioaEiWvf/Pr+Dnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=hpkvYSKI; arc=none smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1791514895; c=relaxed/simple;
+	bh=YrxOXGS2JpS78v8REuNcVwokEtv5Whbe4izZmskN9BU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EyumnuPS4f7SuAk2wr+I4URN2ATJulC1i7WDE9iuVGCEeKPrKllpYW8LgwzkMZftv1Mf3n9oiY6obisz+TAlvnOcOacb2clXL73/G5UiLAXZWOw4Ej9AW5nxvmcz0h8g+W6vnOd9mVzgL801XbfoD0jHakE3mDn9zAmVM0kDeHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=smartx.com; spf=pass smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20251104.gappssmtp.com header.i=@smartx-com.20251104.gappssmtp.com header.b=F77CkqZ/; arc=none smtp.client-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smartx.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hpkvYSKI"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1791513180; x=1823049180;
-  h=date:mime-version:message-id:in-reply-to:references:
-   subject:from:to:cc;
-  bh=2UDSRshdfMAn0ym0C1sfJVH+j5wJB2oVO9MnQt811hM=;
-  b=hpkvYSKI/buH44x6Ci7sYoJjDfDR0IdyxnlcY5ILPEJyT5+UX1SdTR+9
-   sMJuwwxdacL73+ZGdCcA9Q11Ss8V3L+b8zD4T6ydYBue+4gSvGTLRdXVC
-   sz6I1K5ParscMbvVA7eAMNIeGRKobDeaoCwRwKAothXihCKsxXtJlnLjJ
-   NuCIy+Jvw9hXNBebiqu9FrYQ9BU38ZgxU/dgmPpDnwofF/e9BsDL/Pxmv
-   g8LJn4ZZTsE0Z0e8ygBCoHKPU0ABsekK4M87J+zEgzstaMDDtTikMwq7I
-   h7pyFxv4CCo8ZJISPkAQaZ/wcCjni2N3U7Rr4OpgiyRhUC/QAEqJj5cGm
-   Q==;
-X-CSE-ConnectionGUID: G6yb9PYrSEOkBWkeidV2hw==
-X-CSE-MsgGUID: 9JHGLhw/QQ2hKDGW+0/wAw==
-X-IronPort-AV: E=Sophos;i="6.27,147,1786982400"; 
-   d="scan'208";a="153453057"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-esad1-o.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Oct 2026 10:32:53 +0800
-X-CSE-ConnectionGUID: jSP0JERyQeedQmPa73Qlwg==
-X-CSE-MsgGUID: 4IjzLz8aQMmW8cbiFATyJQ==
-IronPort-SDR: 6ac85255_h0zPl/7PwRnnovwio150Fl/4wvLqPTU6rLo+O39ngixD6sT
- 8SkRAmI6/Y8l7cAHvgmf4jSZYs08Q9Hd3XHsBag==
-Received: from uls-op-esai3-o.wdc.com ([10.248.3.41])
-  by uls-op-esad1-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Oct 2026 19:32:53 -0700
-X-CSE-ConnectionGUID: yZfagQLwRI2utQVE1jbW/w==
-X-CSE-MsgGUID: vfbYjnG5Qam1uCF+jP6lYA==
-Date: 08 Oct 2026 19:32:53 -0700
-WDCIronportException: Internal
-Received: from unknown (HELO kpd-linux-block-557bf6c7f7-td27w) ([10.149.64.6])
-  by uls-op-esai3-o.wdc.com with ESMTP; 08 Oct 2026 19:32:53 -0700
-Content-Type: multipart/mixed; boundary="===============8888216248260521241=="
+	dkim=pass (2048-bit key) header.d=smartx-com.20251104.gappssmtp.com header.i=@smartx-com.20251104.gappssmtp.com header.b="F77CkqZ/"
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-351775aa1c0so2189244eec.0
+        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2026 20:01:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20251104.gappssmtp.com; s=20251104; t=1791514892; x=1792119692; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=xk4cQ5w6rgcfSik2vkPhBRPqtZG+6WqFpZrQIqGQzLA=;
+        b=F77CkqZ/QmW3GXhtWyYRUdGad3yGLgGDwKAgiNHut1gPISa5hCRHslfhVUODA3FlaO
+         Is5HxKI3QrQhJuYdPgWBqzJvudC00yQyA/Cds1R47845foW8u4Yo1//tarO2Al9qipCj
+         hdvJB+p6kdLOE5npHt3ubdiUappwEC9YWjOlJrmxYa9aQW7Dg84S49oux5sTX56m3aGk
+         5jJZcUSiKg5Q4FfbRp70jB+3JySYo8hXe4xkRl/cAh6FSyTHEdJuMjCD03705OwwW1kb
+         iyxNR89F5dEblUxACUWQltzkwlXiaueDLzmHxexFXN73TMZ8bhwWX2dj2NNWceZldb7D
+         YNDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791514892; x=1792119692;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=xk4cQ5w6rgcfSik2vkPhBRPqtZG+6WqFpZrQIqGQzLA=;
+        b=Iv84ufCWnejXQlW65J5Yi7mKxqUYlrDJq6AOHEsXrJ7ac53z/FD9PO61KTS6TdwsgT
+         G+TZwZrYMwiOvaeIhomSvKdQa48lAkXP6t+cEnf8YLGAbf8B6HCGDHZ/PSqLBeuNDVCG
+         1Di/fHlOdWRM7zaDeLz5Aidv4QBdua0emW3ej5lBvijrEyevk+1QuCC88cVQoMUd++hj
+         K6jJOEgdI1YwdTbEI3tmnp4K7SPE5F2to1ipNQCS0o2LLg7r46THCNy6NwyGHBu06P8N
+         sL+sS3taIBgssKDilT4hjk9FLfuJ2Y5ZltIjcDXHpOmNKX0rp3v+mtH2E8BEjadj79tO
+         Wy2Q==
+X-Gm-Message-State: AFq9FYJwBNYUYYJKLrYSw5nB6QT/MjnD3gXUxS6X8wG+PcWmwlAWDKwt
+	kAwFN5/vKRaKjTvriin6nSaFNhNnpuLEnJDdkX6fYOBlVJxWCgRVLbDv71hfphmae43TuOVtmx7
+	gMZWhu7nSmGXFO8jHu2C9fL0/I5tcHnrcitP1j+/ZswVJDHSvPbNq0C6XIkZig5qbYWKgkjOn7A
+	==
+X-Gm-Gg: AYBFou3dRJMN5rmRJlVzUBK9S98KyttgKBkA/0ZuIMwdeu4klhLkonMlfcOUtKERb2B
+	sfYhP3dIISLpk/C0WaqkLkGABThed1cvUqfXAnF5Yz4vLN9jniTZTh9pQsXwQKX/9raLaqsfa22
+	t8vsMeShtNjfei0a+3KwQouu+l+kFvMgxms1yOzizkTPWxGO60hKMTGI2wfBvA6uap3ikQeP5oo
+	Xavfo7hqPSJsdRFNln2SgYJDDKNKkWKfbehYvnjMiv349gsWqRiNbZ4SwsQD8VDkMiLSL8aKghE
+	PqtmoD4XxnFTI+Z2bDPNEmwDLSau/ehrOKi5DNYcjXvfgE6/Zp21QsiMdSEKBaiVSiunytC4wVV
+	7VLPxHVKxgvdjzN/Bw+vOi67qihfyi9ZSwqiwlWXxa/vxvYXkCvgBqudOqxdKMdi9zEQd+wcT4K
+	rGniQ/p5nW+pmDvCLma8+5uSQf5cKll6zQucKkYFnpiybbCq3+Q5Rd8XpztywX2wZ7e5BTTg/NB
+	A2N35hOIA==
+X-Received: by 2002:a05:7301:454c:b0:351:6009:9a6 with SMTP id 5a478bee46e88-3537dfc6a59mr947149eec.12.1791514892374;
+        Thu, 08 Oct 2026 20:01:32 -0700 (PDT)
+Received: from localhost.localdomain ([23.148.204.128])
+        by smtp.googlemail.com with ESMTPSA id 5a478bee46e88-3537cb1e02asm2427626eec.27.2026.10.08.20.01.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Oct 2026 20:01:31 -0700 (PDT)
+From: Lei Chen <lei.chen@smartx.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lei Chen <lei.chen@smartx.com>
+Subject: [PATCH v1 0/4] Expose blk-mq tag sets through debugfs
+Date: Fri,  9 Oct 2026 11:01:07 +0800
+Message-ID: <20261009030111.57784-1-lei.chen@smartx.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <1e4fffa0bafa64446846b2a520cf8a96808da89c50cdf22606fbfc91048cb036@mailrelay.wdc.com>
-In-Reply-To: <20260921132058.2091567-1-usama.arif@linux.dev>
-References: <20260921132058.2091567-1-usama.arif@linux.dev>
-Subject: Re: [PATCH v2] blk-cgroup: skip rstat flush for cgroups without blkgs
-From: shinichiro.kawasaki@wdc.com
-To: linux-block@vger.kernel.org
-Cc: blktests-ci-bot@kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8888216248260521241==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Block debugfs provides views of request queues and hardware contexts, but
+not the tag set they share. This series adds a tag set view for inspecting
+configuration, CPU mappings and driver tags, with links from request queue
+directories to identify queues using the same tag set.
 
-Dear patch submitter,
+The series first removes a stale CPU mapping comment and moves driver tag
+allocation and reclamation from individual request queue initialization to
+the tag set level. This gives the debugfs tag files a lifetime that can be
+coordinated with tag allocation and release. It then adds tagset/<id>
+directories under the debugfs root and links each request queue to its tag
+set directory.
 
-Blktests CI has tested the following submission:
-Status:     FAILURE
-Name:       [v2] blk-cgroup: skip rstat flush for cgroups without blkgs
-Patchwork:  https://patchwork.kernel.org/series/1170402/&state=*
-Run record: https://github.com/linux-blktests/linux-block/actions/runs/37647078673
+Tag reads hold a debugfs active reference only while copying tag fields to
+local variables. Releasing it before copying to userspace lets tag file
+removal complete even if a reader faults on its user buffer and needs I/O
+to a frozen queue.
 
+Based on Linux v7.3-rc2.
 
-Failed test cases: block/034
+Testing on a 192-CPU x86_64 host with KASAN and lockdep enabled included:
 
+  - null_blk queue growth and shrink under concurrent direct I/O and
+    debugfs reads, including 100 cycles between 1 and 192 queues.
+  - Shared tag sets, shared tag bitmaps, three-map configurations, and
+    repeated device teardown and recreation with old file descriptors.
+  - Unmapped tag reclamation with 256 poll queues: tracing confirmed
+    allocation, reclamation, reallocation and reclamation again for
+    indices that became unmapped as the queue count changed.
+  - Task-local allocation fault injection, including hctx allocation
+    failures that rolled the hardware queue count back.
+  - NVMe loop with two namespaces, 50 controller resets and data-checked
+    direct I/O. These resets retained the same hardware queue count.
+  - userfaultfd-controlled stalls in tag reads: null_blk queue resizing
+    and NVMe loop controller deletion completed while copying to the
+    user buffer was blocked.
 
+No KASAN or lockdep reports were observed in these tests. A hardware queue
+count change with NVMe queues already frozen has not been tested.
 
---===============8888216248260521241==--
+Lei Chen (4):
+  blk-mq: remove stale comment about non-present CPU mapping
+  blk-mq: manage driver tags at the tag set level
+  block: expose blk-mq tag sets through debugfs
+  block: link request queue debugfs directories to tag sets
+
+ block/blk-mq-debugfs.c | 298 +++++++++++++++++++++++++++++++++++++++++
+ block/blk-mq-debugfs.h |  22 +++
+ block/blk-mq.c         | 143 +++++++++++++++-----
+ include/linux/blk-mq.h |  13 ++
+ 4 files changed, 445 insertions(+), 31 deletions(-)
+
+-- 
+2.43.0
+
