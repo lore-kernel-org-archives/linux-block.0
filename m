@@ -1,94 +1,275 @@
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F9B4D4897
-	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 14:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791556855; cv=none; b=K0AE6Z8YanwexAhtUifZ6nFe1bxAIX6I3A4Q3M/GKr6VCU9ymdI3Qq+l3gFUVqaWPTNO7qLuVZFllhJ975iUt7fM6VA+bBOF47kG9jLM+mURwoxEr32iwQCeRBJ45ja2B9fEaJDIwgkcPc69E6aln9yJwEV5GsZsSh396FfDStU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791556855; c=relaxed/simple;
-	bh=iQapXPqyzCyW0yh+hLQEmt32QweFEdb0Dwc5kwmIrgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oeoJ1uFuGmFlNORDltob8X4GHd13iiZ6sgw/V7rrX9usjryEpTfmmk/TYE3rMbM7Q9AXbjEbUo6Zmi+2Fi3h4K3edgN7KlBSpCnOUTBmNPFIkPoNZ7+ZNY0op6IDOL2rqq0PI/JHuuk9c3oeyiIRC0lLYEWLKwZDylRZgoKeSCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=Hk6VkITb; arc=none smtp.client-ip=74.125.82.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72284C8C50
+	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 15:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791559568; cv=pass; b=GWa+b01wZFLdTvgRTB1kK8pSG+vCu/NE71sq3O6ZiEZH2VWji5OVxH7fgWtmBHHUyAfPxmsV0ojAH+4lGPHXWnqKtdpjkURe+1C2Gr+C0ULgOAG7NAyp1tbSYylbGs45BXBBL8oVczWCqvIbk+sovEjrnZ3qLa+iuIq2Ad4Dt+k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791559568; c=relaxed/simple;
+	bh=ewbTpagjgKK2y0HY2dKNvkT5DR7bYdLc8tvq4oQT+qQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t2jgl1/j9jzE4eYONWZ6ptkaQp7/Fmt1MZF1uDd+xBXxV2xVQgALEpEFyX0Qez5NIuB6J2inV/jjvd7FHCYquzlYWhyNrjL4uWNoPhJ2OOk1Fqh90zDLB45f2/axYrIU2zfRalrRNwCdgrTBTlwpojCBL9YYBuVZpCduHGip7vQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WxDndKbZ; arc=pass smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="Hk6VkITb"
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-351775aa1c0so2893030eec.0
-        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 07:40:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WxDndKbZ"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-82362eea7daso379787a34.0
+        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 08:26:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791559565; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Hhgzc5xrTsP2NT3bk/qtnJWiDzQ6BeGVm9LW7fmyUhsUHVgpKUNQFoe2cRA9i2O50D
+         fXAHy6WMPNibGvUp3XuYak3lg/uHLFXBsiA63UzwLlUYVdfzlzl1a7WPwedUsx2oi0cn
+         HWsYw+7HYQmWpwSNQmAVv5WwB8hNuKS5inJ8xRwEJlYFZSnve5UkBwB470unxiPZU5TY
+         apwfAJa42V/xrKKhDWqzpb6Jqtg5TFGKMhAfWOmWQx87Q/PX8HL6OGDhTqwu0NYLPtIQ
+         LTwF8t6H6vHY9IepJzjPKaKSbpjBVjB1yBeJ6w2sZPv3qTsR0yQFcYtYObrU4Vowb7+9
+         MQTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=XtP8Z2xn/UaYhcehwEDXzz9Gb8Ee2/a9xVmwng5F4h8=;
+        fh=ndNtr4/TUtxGugiGba3rfAabILkX3wZX14KOMi4wHs0=;
+        b=WS3UWlrHNqOAMs0A+xOo3bX+tlSgXHXSL+lme5VJ2XvfXaY2djdTj1Bg9M4HSz2E/g
+         hj+oR1RY0V3ylp31ScBcVjTCG2wxMr59Di1PBvyoFgSg05e/d/NR42377u79sjnPTVLN
+         e4yPmByic0L/iOiCU3FLRsnEhX2Q6yU2PdA6eQmGOBTHJTCBOMHDe+N5YDAbhiTRcreq
+         +H61mkiBJyU1IcPIY2fmYPjnX4H5+yP5sRx0Go9z264Gu09+H2nybS8Z4Kbpu8KVJu0T
+         bxDuISqtL/t5Z3mP4wGRk2PPfrWWIcdDmiDFYH3O8d5Ol7TqBL6dbcdK8Csog/KLCh5O
+         1N2g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1791556853; x=1792161653; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=E8pCZ9jzEXeu3V91z7yTFHUowpIkdOUOpn2JEuBADS4=;
-        b=Hk6VkITbP++OIKKGM96V5JWIPH2alq8yYq+kvdhRa627RHSFbdlVAfDETgZLVhsk1V
-         /+1mFiSiWczDfcdg1Hoo8Qr9vTt7XcBBqD8tgw62N5mwYIx+gSHcpIOGd9OvLn2oMidV
-         gTaAWkjK6RE7eNvieLP+xzwd19d+lQV2gDcQvXIGI8MpVS7LRu/CxoZJhq5AeyajaLM1
-         LRjXR7AvPuApZ4kuq6iMvC6dwPgZexvkZNOP1Tuz61hYYXt7t8mSmkyJM0MQrLjn2SfO
-         8svGStNVGSR0/BPgIPpFya4P17AHN9+jcoTXEa2IMWvFg8KOIO9SnC/u2cLi8t940JNx
-         pVVg==
+        d=purestorage.com; s=google2022; t=1791559565; x=1792164365; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=XtP8Z2xn/UaYhcehwEDXzz9Gb8Ee2/a9xVmwng5F4h8=;
+        b=WxDndKbZtXo14uoLfiOvwKKWc7vCmEx8q7gPDxGLDjg1DJbkKahd05wE4eQAKlA8Pi
+         0qAaZwu022Dl26kxulpg2uTr5tBxscv57qgzVefFoxDSUAnGLOIkhybyUSOqEwFsEBTJ
+         fJBvh1FLtw6ZqfVNWDQfTSwsNpI0BR8a8Ztr0Ubm6yTsyOd+fZSl5Umd9uQRQ+GIwsUL
+         ePAOVhoAU+9ej6pVK0zFZaUDu7rc5jwQA5+CSgrArthD/sm9rJNsbBJtHD1IkmUr/JUv
+         eZdYYhfWn6jWQLx2SH3m0ec5Pp88S2h5JRrt7tGTzxGeI0zL2cbqDuOQlHrvXfIW/Ury
+         fn5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791556853; x=1792161653;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=E8pCZ9jzEXeu3V91z7yTFHUowpIkdOUOpn2JEuBADS4=;
-        b=Oj8euJ1kr14ng24/A1aU8HOaur4PCko6oHBPpXyLPyGr0ykxMeqCCNNleF4npBxjIj
-         q6a7tlIaQVgmnkTDO7K83k7IXAh+NKWdAZkZEmSG9oJGSFoGB3+sn/Gk1hbnZOJzeTnH
-         ISM79PHHW2PSRYA3wTU8gQiuirPyVzk5tBa/zQN0PpSuCTq0cZLadzQFfMl7XTKhXTHu
-         eSdYKoRd33svkEDNt33oIYvssBLBlggfKoESzUNxQyMBdebUpcpUvZbtPH+wQIngRjK7
-         fW8GMrxn2g1aqWKiWl7X1mkAh8vVvNXGDENUTgi6SUz+LAgwV/A/vvH3Hjn1W5tnfA6B
-         hbdQ==
-X-Forwarded-Encrypted: i=1; AKwUvBymYGGLu9oV1iEAvbIowcV7qslMJZS88t54IRqNxTi6YfLlsGN068qRpbzeILjzXhk2zBUSdg69L4Igxw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYInCPA0XmYOYIi1ARmiGiAyc0KR6lXddUtiTiltPy6xb6xZnFyv
-	MaW9HbZY0SQLfWXHxhd9GyYF97v5I97zU+gi/P6V7tYX+89YgWgbzTBn7NPA5TV4+lM=
-X-Gm-Gg: AYBFou2whXW93RwmFZanX2fksdgNQtVr11Bc88mIlj2795KRKYmDSCQu3CfxhQWvr07
-	35OjcfLK+oF8AfnfU3CUqQjolOl3bl4Lm5p/0JDzFwWoME3BoWsFItVqxVy+HuGc3yZuIOvW1Mg
-	WvURP3SbiLFYq+uGdt9rn32HfQ37I3HQxsMZsK1TD4KQxJF6wU6vFHKl4Qo99bpf9mX2j9bRDv0
-	2MwhPapeSjYhLlnK56X/NrVclZNV392r2Q3XpjvKPKfS/70q9gzxIRn9/D4I8dU+hZSmZ0qcO1u
-	w2JPMDZvTCCudmDyX42WWrLKPYH0GdjJQhAfCqqqUdQ/Av2yUfYEo9UgwTOMBK46nq2gLpT7ukl
-	CtQqY4ZuAb/Y0+4onKeFwZhSyED4mpCvGpmyML5eJr2dw9Xho6mzYeP4T6exNzz08nBDGodtPLp
-	+DEia6M/dKXRSrnMvNzIH8J987MsTRLAWIZePQfYFgpVqunN1c0UvxIoYJi3XeLKScS5tj5n1P7
-	FUTPX+IDS7x1gQKRAGtmlFjU6xsDjgY7O+a0HYDgu3yonIo/tGX8P8DxMYXG5HFvD/bHv86Qo+P
-X-Received: by 2002:a05:7301:fc18:b0:341:2466:2d68 with SMTP id 5a478bee46e88-3537e0cf2a1mr2938047eec.38.1791556852849;
-        Fri, 09 Oct 2026 07:40:52 -0700 (PDT)
-Received: from [10.61.8.29] ([155.98.132.5])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537ca0e64csm7578272eec.10.2026.10.09.07.40.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Oct 2026 07:40:51 -0700 (PDT)
-Message-ID: <3b0edaa8-75e4-4282-8310-0dfb878484be@kernel.dk>
-Date: Fri, 9 Oct 2026 08:40:50 -0600
+        d=1e100.net; s=20260707; t=1791559565; x=1792164365;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=XtP8Z2xn/UaYhcehwEDXzz9Gb8Ee2/a9xVmwng5F4h8=;
+        b=Nunyn1/QQX7NZvLpPonGvOUQUe4Ad4E77k19b+CCfCKiyULzC/JIwoBkQhTG6FTcFr
+         fQll0fRMy9dJwHK/HE90XxjFqMRg2KGIw64iEWe3OOd+jb06WyzSnF+/4EioAGPIf1Z/
+         pIXG3MxIPM4SIvX+GvckFvczlqCx5Sg5W5TstHFLT7HTWFNTwmlBssiak6xN6CUFfASj
+         CHWz/Cq5akTIiuvq/oxJ50SWpnrxTE4HHh8tjBbqCCV3U3gpjlXpW0KbGDAjur9pYms0
+         FIkYxqViLdid3Mumx3xq3RMBPwM1u+6IFAe71plhVF+7l4Ydrpu/igptiSP2CzPxdUKY
+         cPeg==
+X-Forwarded-Encrypted: i=1; AKwUvBxbNm11aQWfpDXlr1ZLSwbUNd2Kbdh87lU6UpLm/P4KPGFLuph9HJbfiicgGl415JGcu64WwIWHPDdqdQ==@vger.kernel.org
+X-Gm-Message-State: AFuF++lBFwoQyncdT/RH6xN+18TKKNNGGGTl52WhFhdB1yCpSXzHRpI/
+	B9dlDw30LyLowECceP0Z4NwSxsQIV3vgf3Gf7hsCCYjtV0WTq1rOB4KQ1mcOGHyXWe7uegLuRwS
+	4QhDzo6bHoi1CDg/Iv2Z1yLmo+lOz00odn45QVkBCGA==
+X-Gm-Gg: AYBFou3lXJdYx4Uh9yRnd4h73k+onpaIaW2LCOuYKNFRv1DF4PJ96nQglDr7twoXZDN
+	DUB8FfjRIh9viDLiRVuRn8kGfsgQaFtUDP5kiBv7TPAB9ZonIHS77G2qOLP7e1OY190MrqZxhHa
+	vZ/VFN1wgX2z0myttKSBy1HE2w7AossjhmJIS2eT2hPykYHlCm8b3V+PfO6List3GJtsi405j3v
+	j78orAQ7nEWTv+O5WsaUvFZGErooAeiro87XYYaFvR4KawORABWUET8utOXGzuQR+PZF4cHatQ0
+	afaP7CSVQy7BlA0ayi2B5RffbuwOQsem0d/dm6f2KpJhRjYsvqEF4DT9
+X-Received: by 2002:a05:6830:6606:b0:811:7b6e:d533 with SMTP id
+ 46e09a7af769-83090e1be2bmr2354116a34.1.1791559563396; Fri, 09 Oct 2026
+ 08:26:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] aoe: pull in the headers each received packet type reads
-To: Christoph Hellwig <hch@infradead.org>, Josef Bacik <josef@toxicpanda.com>
-Cc: Justin Sanders <justin@coraid.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20261007-b4-aoe-short-packets-v1-1-db5155f7bb9c@toxicpanda.com>
- <asdpwPEpGFxfLDNz@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <asdpwPEpGFxfLDNz@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20261006190348.85094-1-yoav@nvidia.com> <20261006190348.85094-2-yoav@nvidia.com>
+ <CADUfDZrX7v+0-Zxv7AwoJBH-e0ohLcAgm_dvPoDpGv2jZfN2XA@mail.gmail.com> <asjveZylpV0swnp8@fedora-laptop>
+In-Reply-To: <asjveZylpV0swnp8@fedora-laptop>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Fri, 9 Oct 2026 08:25:50 -0700
+X-Gm-Features: AclHuK-ptyoOsQHQVr1IOUdvYf8CJUq35JMWMyFogkkHTkfL8u3eQfTtddyT8jk
+Message-ID: <CADUfDZrM5VvEGtYqKdvYXtfPEw+WW93E41gZit636qS6QxFWjQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] ublk: honor rq_affinity on request completion
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Yoav Cohen <yoav@nvidia.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	jholzman@nvidia.com, omril@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/8/26 4:00 AM, Christoph Hellwig wrote:
-> Can we plus just kill the aoe driver given how buggy both the driver
-> and the protocol is instead of playing whack-a-mole?
+On Fri, Oct 9, 2026 at 6:43=E2=80=AFAM Ming Lei <tom.leiming@gmail.com> wro=
+te:
+>
+> On Tue, Oct 06, 2026 at 02:53:47PM -0700, Caleb Sander Mateos wrote:
+> > On Tue, Oct 6, 2026 at 12:04=E2=80=AFPM Yoav Cohen <yoav@nvidia.com> wr=
+ote:
+> > >
+> > > ublk ends successfully completed requests inline on the server thread
+> > > that issued UBLK_IO_COMMIT_AND_FETCH_REQ, so rq_affinity never
+> > > redirects completion back to the submitting CPU, unlike NVMe, SCSI,
+> > > virtio-blk, loop, nbd and rnbd.
+> > >
+> > > Route completion through blk_mq_complete_request_remote(), with a new
+> > > ->complete() callback, ublk_end_rq(). This covers every completion
+> > > outcome -- reads, writes, flush/discard, errors, and the zero-copy/
+> > > user-copy/auto-buf-reg/shmem-zc paths that skip the copy-back step --
+> > > not just the classic-copy-mode successful-read case, since
+> > > ublk_end_rq() re-derives which of those __ublk_complete_rq() took fro=
+m
+> > > @req and @io state rather than assuming one.
+> > >
+> > > Gate it behind a new UBLK_F_SUPPORT_RQ_AFFINITY flag that a server
+> > > must request at ADD_DEV time; servers that don't ask for it keep
+> > > today's always-local completion unchanged. Add ublk_support_rq_affini=
+ty()
+> > > alongside the existing ublk_support_*() helpers, and check it before
+> > > calling blk_mq_complete_request_remote() at both call sites.
+> > >
+> > > Signed-off-by: Yoav Cohen <yoav@nvidia.com>
+> > > ---
+> > >  drivers/block/ublk_drv.c      | 98 +++++++++++++++++++++++++++------=
+--
+> > >  include/uapi/linux/ublk_cmd.h |  8 +++
+> > >  2 files changed, 84 insertions(+), 22 deletions(-)
+> > >
+> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > index 66eb55e7162e..b94293296b73 100644
+> > > --- a/drivers/block/ublk_drv.c
+> > > +++ b/drivers/block/ublk_drv.c
+> > > @@ -90,7 +90,8 @@
+> > >                 | UBLK_F_BATCH_IO \
+> > >                 | UBLK_F_NO_AUTO_PART_SCAN \
+> > >                 | UBLK_F_SHMEM_ZC \
+> > > -               | UBLK_F_IO_DESC_SIZE)
+> > > +               | UBLK_F_IO_DESC_SIZE \
+> > > +               | UBLK_F_SUPPORT_RQ_AFFINITY)
+> > >
+> > >  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+> > >                 | UBLK_F_USER_RECOVERY_REISSUE \
+> > > @@ -452,6 +453,11 @@ static inline bool ublk_support_user_copy(const =
+struct ublk_queue *ubq)
+> > >         return ubq->flags & UBLK_F_USER_COPY;
+> > >  }
+> > >
+> > > +static inline bool ublk_support_rq_affinity(const struct ublk_queue =
+*ubq)
+> > > +{
+> > > +       return ubq->flags & UBLK_F_SUPPORT_RQ_AFFINITY;
+> > > +}
+> > > +
+> > >  static inline bool ublk_dev_support_user_copy(const struct ublk_devi=
+ce *ub)
+> > >  {
+> > >         return ub->dev_info.flags & UBLK_F_USER_COPY;
+> > > @@ -1468,6 +1474,14 @@ static inline bool ublk_need_unmap_req(const s=
+truct request *req)
+> > >                (req_op(req) =3D=3D REQ_OP_READ || req_op(req) =3D=3D =
+REQ_OP_DRV_IN);
+> > >  }
+> > >
+> > > +/* Whether __ublk_complete_rq() takes the copy-back/partial-completi=
+on path */
+> > > +static inline bool ublk_rq_need_unmap(const struct ublk_queue *ubq,
+> > > +                                     struct request *req)
+> > > +{
+> > > +       return ublk_need_map_io(ubq) && ublk_need_unmap_req(req) &&
+> > > +              !ublk_iod_is_shmem_zc(ubq, req->tag);
+> > > +}
+> > > +
+> > >  static unsigned int ublk_map_io(const struct request *req,
+> > >                                 const struct ublk_io *io)
+> > >  {
+> > > @@ -1549,13 +1563,62 @@ static void ublk_end_request(struct request *=
+req, blk_status_t error)
+> > >         local_bh_enable();
+> > >  }
+> > >
+> > > +/*
+> > > + * Update @req with its result and requeue it if it was only partial=
+ly
+> > > + * completed. Returns true if @req was requeued, in which case the c=
+aller
+> > > + * must not touch it any further.
+> > > + *
+> > > + * Run bio->bi_end_io() with softirqs disabled. If the final fput ha=
+ppens
+> > > + * off this path, then that will prevent ublk's blkdev_release() fro=
+m
+> > > + * being called on current's task work, see fput() implementation.
+> > > + *
+> > > + * This matters for the caller completing @req locally on the ublk
+> > > + * server's own thread: it may already be holding disk->open_mutex, =
+e.g.
+> > > + * reading the partition table from bdev_open(), and an fput() runni=
+ng
+> > > + * inline there could deadlock on it. Preferably we would not be doi=
+ng
+> > > + * IO with a mutex held that is also used for release, but this
+> > > + * work-around will suffice for now. A caller reached instead via
+> > > + * blk_mq_complete_request_remote()'s softirq/IPI redirect never run=
+s on
+> > > + * that thread, so it isn't exposed to this hazard, but disabling
+> > > + * softirqs here is harmless for it too.
+> > > + */
+> > > +static inline bool ublk_update_and_requeue(struct request *req,
+> > > +                                          struct ublk_io *io)
+> > > +{
+> > > +       bool requeue;
+> > > +
+> > > +       local_bh_disable();
+> > > +       requeue =3D blk_update_request(req, BLK_STS_OK, io->res);
+> > > +       local_bh_enable();
+> > > +       if (requeue)
+> > > +               blk_mq_requeue_request(req, true);
+> > > +       return requeue;
+> > > +}
+> > > +
+> > > +static void ublk_end_rq(struct request *req)
+> > > +{
+> > > +       struct ublk_queue *ubq =3D req->mq_hctx->driver_data;
+> > > +       struct ublk_io *io =3D &ubq->ios[req->tag];
+> > > +
+> > > +       /* matches the two outcomes __ublk_complete_rq() may have red=
+irected */
+> > > +       if (io->res >=3D 0 && ublk_rq_need_unmap(ubq, req)) {
+> > > +               if (!ublk_update_and_requeue(req, io) &&
+> > > +                   likely(!blk_should_fake_timeout(req->q)))
+> > > +                       __blk_mq_end_request(req, BLK_STS_OK);
+> > > +               return;
+> > > +       }
+> > > +
+> > > +       ublk_end_request(req, io->res < 0 ? errno_to_blk_status(io->r=
+es) :
+> > > +                                           BLK_STS_OK);
+> > > +}
+> > > +
+> > >  /* todo: handle partial completion */
+> > >  static inline void __ublk_complete_rq(struct request *req, struct ub=
+lk_io *io,
+> > >                                       bool need_map, struct io_comp_b=
+atch *iob)
+> > >  {
+> > > +       struct ublk_queue *ubq =3D req->mq_hctx->driver_data;
+> >
+> > mq_hctx->driver_data and ubq->flags are likely to both be cache misses
+> > on a ublk server thread servicing many queues. req->mq_hctx is
+> > probably a hit as it's in the same cache line as req->cmd_flags
+> > accessed just before in ublk_ch_uring_cmd_local() for the req_op(req)
+> > =3D=3D REQ_OP_ZONE_APPEND check. It would be nice to avoid these
+> > additional dereferences, can we prevent queue_rq_affinity_store() from
+> > setting rq_affinity to a value other than 0 if
+> > UBLK_F_SUPPORT_RQ_AFFINITY isn't enabled? Perhaps indicated via a new
+> > BLK_FEAT_SUPPORTS_RQ_AFFINITY flag in struct queue_limits's features
+> > field?
+>
+> ubq is only for ublk_support_rq_affinity(ubq), `maybe rq_affinity` can be
+> passed by __ublk_complete_rq() parameter via
+> ublk_dev_support_rq_affinity(ub).
+>
+> BTW, the one for ublk_iod_is_shmem_zc() can't be avoided.
 
-I'd love to, but not sure it's feasible. I'll have to go search emails
-for details, but I know there are people using this driver still,
-unfortunately.
+Yes, but ublk_iod_is_shmem_zc() is only called in the need_map case. I
+would expect most modern ublk servers to enable user copy and/or zero
+copy, so they wouldn't take that path.
 
--- 
-Jens Axboe
+Best,
+Caleb
