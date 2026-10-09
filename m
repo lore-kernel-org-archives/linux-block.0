@@ -1,88 +1,88 @@
-Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC253F1055
-	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 23:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071393C819C
+	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 23:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791590035; cv=none; b=U7Algx9zHMRBcwp0L8VYvOzuKon5LfGg1FDTVWE1HOuz5ni1vETBHCQvVdmscU7ZJx3pQJr2Tiz+Qp92O8fYJa3BKpDJOgqMiYalcYGERvkvAqlCAGR6MXbInjxnhMrXBqvKD/czYFm81+Us0jDwkr52vGKn+QFdlQ595HsHaTg=
+	t=1791590036; cv=none; b=SGRWf1QwKDz4za2p3d1LGgd5lKH3EqYWZWDhT8t9TIkHd6GOczB9DWGRN6+9rH30KKakAQoNGTdiZfzgS/sqDxxkk5Gmfpy0QqvhTtc6gZ2B2v6602+CTAJBAqQPopV1cMjY388Jym9c2DgR7QTa5NMWm0P/mZ0+NnCRc90g5nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791590035; c=relaxed/simple;
-	bh=Mw0KXNQRrJhxH78r4DflzN0lDBE0g92kYlOB7ULQXc0=;
+	s=arc-20240116; t=1791590036; c=relaxed/simple;
+	bh=fbF5VGsWOxEbePw/cfXIojB0XGj+6U18dcekk9CtXd0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rcQb7HYPtQoMWV3TlU5CzV4x96Z/Zwzo/oS8TiFtrhLgkOakrsfW1a9X1iSRkhP3l6g8d2njk0TmaVq+7W48T6Vppk8o2hONwRjtWk4C1URahcexjXaORGQI1ySIkddNnkWhjiEs7ZLXyRu5sfE3snXNxlkusww6UZpI8KLiG9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=DQQA+SBf; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=g17MTE32; arc=none smtp.client-ip=148.163.139.74
+	 In-Reply-To:To:Cc; b=pMRphOvQZQBqwjSGl4reOL8VpBnwv1p+OkcXorn+J68Eqv2lGe5Lpa5JIjaLKjB8KFzS9q3eR60l7EHpUvBG6hEPJTqiXIpwzhfmm1eFjMbif36V9aXW5oW/dxsj7nuRT37AhvqtgqOO6Vxk99MaHQZFOiSdJ3K91vTIvotiQrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=pRDzAvWn; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=zg/V3aEv; arc=none smtp.client-ip=148.163.135.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="DQQA+SBf";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="g17MTE32"
-Received: from pps.filterd (m0167073.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 699MYOUv1392940
-	for <linux-block@vger.kernel.org>; Fri, 9 Oct 2026 19:53:52 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="pRDzAvWn";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="zg/V3aEv"
+Received: from pps.filterd (m0167072.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 699MYEOg419716
+	for <linux-block@vger.kernel.org>; Fri, 9 Oct 2026 19:53:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=8tci
-	ogFsGD2Ws7aLXYXgi4IZlNxhxAX90NgewKRnmzU=; b=DQQA+SBfl5S+kpNnZs7F
-	LSUy/I99mnh4PM5KFN/BP3q0Plz81XikzLAsZGJIX3kH/z511hlBzLo4tu3nql9B
-	e2t7DZWSVwPC3f97JMSfmlXMdpFr5lguQ8/eq7ZZK8lZL9zFB0q61RiohU5asUcb
-	IwxAtA5orCVu9dbmqFdCUzDSlWtyZ3BqIldm5Diy9eSNUt28iQcGYxfKg8RqG09W
-	eQYpjQSzQsPqIkf7gyi39xVCrL5i9kCGg5y8xJ15sQKCZsqR09O0zKaGSbMOtDaJ
-	5b6i3jzt0mpzvKA894cvXIYBEi/yYW6Q4AGP2R1hDMDKmr6Zs7tlBYGc6w43+OZV
-	LA==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4h74ta3452-1
+	:message-id:mime-version:references:subject:to; s=pps01; bh=Nk98
+	OBNsibiOyRMUX1gr9GF4BaWFCcMBN67+RzqRJho=; b=pRDzAvWn0FBcpAgWSwzF
+	ZlGAxf9mhULhmYdbB6tMgxCf/n5SgUgCw8NEGm7EF4Kr55pR5Uac2dSgTbBMPEjj
+	g0hPP16MX4tLqrqz2R/FfpWTgpbQc1Y7S4stIf3u4xQfqIF/ioe4r8pgYL0Qyyo3
+	g8UNAWjEyLnCuAHFCOILnPjbxsJENPl4AjAyV/OUClnzF3h9vx98m8nlZnfNwKSW
+	8K6cugjjL4iWcgrhQ1JIZJD87bMoqPpvxJKg6ln2LFAObxmS7/U3XR5lfkIobiLk
+	hZhBBadroCxe4upSEXFFf9Vsa6DjlvsGlmXDWbJwz7APZ+7weM7dGS4WcpyT7SXG
+	Rw==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4h74tdjfgf-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 19:53:52 -0400 (EDT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-53397338004so6990851cf.2
-        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 16:53:52 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 19:53:54 -0400 (EDT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-93cc0b31ecaso43135885a.1
+        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 16:53:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1791590032; x=1792194832; darn=vger.kernel.org;
+        d=columbia.edu; s=lionmail; t=1791590033; x=1792194833; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=8tciogFsGD2Ws7aLXYXgi4IZlNxhxAX90NgewKRnmzU=;
-        b=g17MTE32j5mM3qKl/daWmz/LQANmzxRIMK7qxjUflm7QUU62c34hJ/FDfU6abuHozQ
-         Ev6S1JuYdReo5k3UBCDWcd5pQ/8UImu5GKLbC+7oiWud53aQuE65Nf8f1UJAfsHc5Kue
-         b9XsPKgNW4UW2tGght/Y5aGrd32hKJhunI/B1Kfve130CdwiHzdGLZazU5PFaZJg6IEt
-         5sDcJIorYvzRdKjblgKh+Zs9FV7bthxtPeE2DtLD08GA8w2TvGRJobeu6np9+DlExQv2
-         b0YKv12GFsW79m2vZgOLN9ifWbC4SIONoezsVJK+2OBInq+xUu2KO1NYsNnqxAlIVlGO
-         IF0w==
+        bh=Nk98OBNsibiOyRMUX1gr9GF4BaWFCcMBN67+RzqRJho=;
+        b=zg/V3aEvTUN/iV0GcXQyTN1zCpchHzqXS08GoRRPF378Vi7bhzIceZk7qKO6yHuB6N
+         xMxmJ4zsruko7/bntjg7DBYUebsFNyEPh3UypEF3wTstBWn0ScbG03KcpYPLr5KAPo+m
+         e1w7xjtyfkfovPmHGb9/IbVgtUNe4z6wpikcC95WOweY17jtJbsMqmGlVzR3tJx5IjJM
+         szB6VOHPQ4IhGmcvuTPaSs5et7Z4WjZp+phVVh/FMG2mEzWYZHH85X9TlwSf6xgTFpFq
+         44TZEX/Lbx8qFjD+/26Es8yL2NnDmfW2jNrzLuNlSeh9oXo7WMG9gpqHiZ6fp3ysMq17
+         9p9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791590032; x=1792194832;
+        d=1e100.net; s=20260707; t=1791590033; x=1792194833;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=8tciogFsGD2Ws7aLXYXgi4IZlNxhxAX90NgewKRnmzU=;
-        b=k5hTp22nJ5SpQ/wX3MsLkwJ1C7ze3Pjl6568QjSqWoL8gYYVj32ZK49y/aRhsjhWmd
-         BvFWIyoum1e8Fz+3sRZanpCHw8GQj7bTZkzN5HkpX8UJmH5Z8mlcL2XnOpzA4nMG954s
-         inp/4MmHR2dVJoAPVKnwsystOppVlBvGU6x/2CG4X1guS1eRjF5aNzAe15wt9JFsyVqF
-         4QWg65YQfiuLT/MCjmLcOSD0dBRUFh2n/hotxsZ+/S/HgqqFEl/R8U5cGouMRUgVtvqB
-         vv3+zJ1z1TOlTxxRgx1Tuf2dWvJxumiJTqM/LO+2Fix8dn6VWGllyhmORBSU70oWhjbZ
-         opKw==
-X-Forwarded-Encrypted: i=1; AKwUvBzV9JkDVrvnVcwZk5z+Qo6nc1c+iWl0u0N8QJVXDFoffu4Jr6iSGQTVZLmeHu3icmBGw4JnPhHzhfEM3w==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKuj9SKPJjN1yIijXcDzGmmd4TASHQ13TEiFZkSgEOycDyqqwVH
-	4qr8RyWE+QHr9JF1Z8OX3XzZCVvW5UssdW/lEDcr8fscpzz/ZiDma010n42+5DY3EV2SySe9xAa
-	vJk8SUGdxAZKPQzojs7mFwsYetdBE/ZMtvyMujzA18sRUycvdcU9S/OgSrB3z
-X-Gm-Gg: AYBFou1By/uzU9o7OWSNHzHsJ9iEx3ePMbKJCbuCpoHhRUj+ajrcOXMM0u9jQ4KAQcA
-	ywTosnLFQitwTv6iamEYKMh5NAmqwS8gVLeoYGpeKxUPFAsa4KmNrhdaxPmQLLW1yVniDGI4KF+
-	r8NsnOIK4/4DZiWH8noNx9AkBW7AzJBgmKQdNEY1qzscF3RnrgbfZ704DaBBk086wMWYldX7Q4S
-	U4lNhRhJlE7KYerm6rhEKDn19UJbf4sD8lUuFM7MVkAaEL0g1Q6EuaAyeuwloDJeD3m+4I/c2ds
-	Lf8UtctYS+tzvnhd8xaF85QOzDpFRgST8Tu0uNzReP2ntuXtELMBqliTkh7NR9+Px6EPi5P2Ntv
-	x+Vle798JpH0JF42uvLsNwJyzWHtkYMBStsLQaFli8gS0278=
-X-Received: by 2002:a05:620a:4611:b0:93c:5bfb:9a80 with SMTP id af79cd13be357-93ebd0c0178mr565344085a.3.1791590031511;
-        Fri, 09 Oct 2026 16:53:51 -0700 (PDT)
-X-Received: by 2002:a05:620a:4611:b0:93c:5bfb:9a80 with SMTP id af79cd13be357-93ebd0c0178mr565341885a.3.1791590031073;
-        Fri, 09 Oct 2026 16:53:51 -0700 (PDT)
+        bh=Nk98OBNsibiOyRMUX1gr9GF4BaWFCcMBN67+RzqRJho=;
+        b=ikYyK29QmNQdneyBJqVtYvxbk8ep7MY2J1gIByauVFntZgOf4Cnm7UWBvbtMD3WARh
+         mOVANmGfQtzb7KiZiYv3flXHyjidc8jY6M1QoaCw4ujkt/PzXx8bBMo36pIXLwI3mBmk
+         ft5uod8zt+fMW9DNGPb19edNEJJpDf+uIROkujWqDjKtnCgkgOSBLqIxN6w3E1X+QXhw
+         F1E67pjlmRS/GjzndrsG+xAqBd6mmSxmkO0osXpTYaXFwr8PHLhbXAcbF1/EhsUJEgid
+         Wfyeun8XSH8DbhXgC+5+MHX/er+A2lIAMvMuumrzW64FJJ/f56eQyvwF4CM6BbFOH5V2
+         MZ3Q==
+X-Forwarded-Encrypted: i=1; AKwUvByp7KnkJDaP6yAPKi1biyslMS6jKCUcW2NvlMqzrmGtZW0Va974i7anHrkKbqFHRV1i+EN6+s7D7Yb99g==@vger.kernel.org
+X-Gm-Message-State: AFq9FYL6LhUyVVCW8ve8S3dOc/dMZ7c3/zTyElYBTThp6jI+lbZT2r5N
+	0Ks1c61+8Hhw1AyqZNUTH+6IUbVFVGPj8LuFHRl1I5TuZTB6kc05XFM+VzXxAASXdo0fpI86Suh
+	CXDK7V8vbS7V8IsFBsvja9fPPU0sJeB5fgGsdrlzMWBvIkPh/yvhpI7PEc+xb0RBJIfjj
+X-Gm-Gg: AYBFou0fGWKt3Q3bCNjw/JKdE+GTtQcH7EDdw/PW1W+iMztdUaooKVWan+SI7UfoKV7
+	AUwA6Sdg4FLTlX3ZtMKGQvBc2378ntM6vPAap9ltpG+M1HzaE9F9KyyU7f9S46XOE9fTvk27Bot
+	ouA8yv5uQWkZ8PKpuvdMKXAQE4aMba9PL9t9oShsWiEfCSz3KDph3QxZPMt50E/7V8AAJJ/VC76
+	27Vvx/3QYSU24aTiRkqJz+q+a2MR/o5VZ/XwyWVGmqzUvrL8m5UamRQAVT+MLP+vm3yAl8zAlFL
+	wG5iNVey2CuAmdlfBjlfQk6Oo0+NTkIDwBxrNNuVDDuUcSn5NI7t/2mf6C7O+zUIJNfOArNici4
+	zmAE9l6bwAOLvuG2ZGiosO4vGQVhhWXqNIrVmsQGik5sikZA=
+X-Received: by 2002:a05:620a:462b:b0:93e:92f1:4222 with SMTP id af79cd13be357-93ebd0e57c4mr556859585a.4.1791590033014;
+        Fri, 09 Oct 2026 16:53:53 -0700 (PDT)
+X-Received: by 2002:a05:620a:462b:b0:93e:92f1:4222 with SMTP id af79cd13be357-93ebd0e57c4mr556857385a.4.1791590032580;
+        Fri, 09 Oct 2026 16:53:52 -0700 (PDT)
 Received: from [127.0.1.1] (nat-128-59-178-194.net.columbia.edu. [128.59.178.194])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93eb984889fsm304517485a.13.2026.10.09.16.53.50
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93eb984889fsm304517485a.13.2026.10.09.16.53.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Oct 2026 16:53:50 -0700 (PDT)
+        Fri, 09 Oct 2026 16:53:52 -0700 (PDT)
 From: Tal Zussman <tz2294@columbia.edu>
-Date: Fri, 09 Oct 2026 19:53:46 -0400
-Subject: [PATCH blktests v2 2/4] block/050: add a splice read race test for
- block devices
+Date: Fri, 09 Oct 2026 19:53:48 -0400
+Subject: [PATCH blktests v2 4/4] block/052: add a torn atomic write test
+ for block devices
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -91,7 +91,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261009-blkdev-fixes-tests-v2-2-fcb3599e47f7@columbia.edu>
+Message-Id: <20261009-blkdev-fixes-tests-v2-4-fcb3599e47f7@columbia.edu>
 References: <20261009-blkdev-fixes-tests-v2-0-fcb3599e47f7@columbia.edu>
 In-Reply-To: <20261009-blkdev-fixes-tests-v2-0-fcb3599e47f7@columbia.edu>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
@@ -99,337 +99,312 @@ To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
 Cc: Christoph Hellwig <hch@lst.de>, John Garry <john.garry@linux.dev>,
         Tal Zussman <tz2294@columbia.edu>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1791590027; l=7576;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1791590027; l=7920;
  i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=Mw0KXNQRrJhxH78r4DflzN0lDBE0g92kYlOB7ULQXc0=;
- b=C4vwqaKU5mTCQDOBm03gUsvY/UI7svEQo/iWpD1h76x5re4v2faq6cMzHZhiMxBerbsDnf0Pr
- jospWowt3xDAlXKm6ByaeHl1LPs141lgQU3SCCwupjprR+sDKSpGjbH
+ bh=fbF5VGsWOxEbePw/cfXIojB0XGj+6U18dcekk9CtXd0=;
+ b=sKzjVH7oLMGnD2YP1h6Y87Xv6bzJycBRzkOKwS67O1BDGdyFAbGO8TBVD2AMJL4TuieuT5WK5
+ dh90OhemqLzAEC9ensVFLJajPa7bnB6k7HtT+Wz+z5BnwOwfRImT7bb
 X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
  pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA5MDA5NSBTYWx0ZWRfX50AaZfTryn0z
- 27L0FcK8gYmZpIjLF2v83fjuD9BKOGzzVX0oGPyMm/me5nleIZpOfT2pJp4SpI1KIFUGnrQlFmV
- M3px/uWL7GUUaXraMpHCH95L69mpkf++fNCm/bxErzzsmE6uwg3l980/k+7pgycaknyQcLRYJwC
- Use+cm0QRIau6gJX5E87ynL3N827lqF1Rw++ymJgamvxlaIdBN3D+bkRkzx+rxVIzQqpWnnm8wB
- /SAK+f8R8vIUuwP4nrkGmDkZaAf5Qilq19Ivc0hpjxM1QNxovv8NJxQby5M/0sNGkkCGtkm0PyQ
- lkQESWHc2Np2C6BkbuRxGkjGZdsfKK14Q7bdnKr4pilfpEP3O2UNNs2M3KyprU+k2+aoo5JSzTn
- yQPb6ha25znYMweOKX1YoldRM2RRoJ6qnH25Fx+QlU+KRu5Pl6F5Il7QV4JYwqpPHNTsHB8BmcX
- lP6d48rN3CKdMhucuKw==
-X-Proofpoint-ORIG-GUID: 2vg3WV94RSggZQAF40hiABvNbLzEx0SG
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA5MDA5NSBTYWx0ZWRfX5sviRVZ6IBmc
- +YjBOhWOYtKO1mS0N2iHsNS8ikMveKcecX4xzPXMViZPSm+YKU9H6uyfCTs/Y2Evu2rJQcTgPR5
- D/nkgn3DUpUIMNPpT2TQT0f+ml5Vl4znOKWkgS8dNbwwXFVcHNIN
-X-Proofpoint-GUID: 2vg3WV94RSggZQAF40hiABvNbLzEx0SG
-X-Authority-Analysis: v=2.4 cv=Lu8HWXdc c=1 sm=1 tr=0 ts=6ac97e90 cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=u0MKzLA9JmpizDwXU9Rxjg==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA5MDA5NSBTYWx0ZWRfX0Iw3uownA0hb
+ mbcpySKYcjutBuLckUgrpCtKK1Azwy11sIMYD5AWp9Y/MEcPp9ZWIR12XyCUV4HTulUg29uov/h
+ W1p0VbdAyB25nzgmwZ9GITfloJhxwuhEHbL7O8Tyj8V0gnazVL9hk7obFvGuD/EKlcDAiw7l+rO
+ h3ksvuZ0YlSsjgChrZQNs8H1wwT6zIHqB3seEhqzLtWfMkJ68ATmJd2X54QNyUdwc814xsoUIlP
+ 3eNqkYsew2aglWyJsMQrRioaMzPfHvL+QnmJ2k4+iv9LrLf/2XQc7fu5eTsS+fp64okR5cQG4fp
+ JiobjnpO/CREUl/0srMOXsY31YQQFD+wAo+rbhRIGNCzuDwtc//ejdnHtfdhPDPSiBn9OHwvmnT
+ GX5HcosWVsQ36e3BT3eBc9KaQmVCccW7slO24SjM+CSLIQ1N0r87k9OSikgmIGGPJ7myXs+VmkV
+ 1MFRILZ/uek6ac6nznA==
+X-Authority-Analysis: v=2.4 cv=PKSaavqC c=1 sm=1 tr=0 ts=6ac97e92 cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=u0MKzLA9JmpizDwXU9Rxjg==:17
  a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=jHxIr1HyPKZ_Q5_91PL3:22
- a=VwQbUJbxAAAA:8 a=BO-O2x_ebyKE4gWa1f0A:9 a=QEXdDO2ut3YA:10
- a=kacYvNCVWA4VmyqE58fU:22
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=SsB-OO3BMngHh3ZO9fOt:22
+ a=VwQbUJbxAAAA:8 a=4RRKgcBwZ_zBFEaqlmYA:9 a=QEXdDO2ut3YA:10
+ a=NFOGd7dJGGMPyQGDc5-O:22
+X-Proofpoint-ORIG-GUID: 04j0_05nhgjO5j1gslKtlb-EGMIqM-kT
+X-Proofpoint-GUID: 04j0_05nhgjO5j1gslKtlb-EGMIqM-kT
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA5MDA5NSBTYWx0ZWRfX6my/+WK3Z58G
+ UFU8eoi87Rk8vmLxAVLwwx0YRDxMtSv8PzPc+b7uHdRt1IrzwUabgZ7oWcHOVPg0RhFGdMKfHi9
+ /n73nR22RoevY17fDDfhtjg3VKlcgLUrL5o/8P5LbFS9ZFm2gsld
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11930
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=10 adultscore=0 spamscore=0 phishscore=0 priorityscore=1501
- lowpriorityscore=10 bulkscore=10 suspectscore=0 clxscore=1015 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610090095
+ adultscore=0 spamscore=0 malwarescore=0 clxscore=1015 phishscore=0
+ impostorscore=10 suspectscore=0 bulkscore=10 lowpriorityscore=10
+ priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2610080000
+ definitions=main-2610090095
 
-The block device splice read path has to hold i_rwsem like the plain
-read path, so that it does not race set_blocksize() raising the
-mapping's minimum folio order and add a folio that is too small for the
-mapping.
+An atomic write is submitted as a single bio, so when its buffer can't
+be fully pinned, the direct I/O path has to fail the write rather than
+submit the pinned part. Otherwise, it submits what was pinned with
+REQ_ATOMIC set and leaves the rest to the buffered fallback, tearing the
+write at the pin boundary.
 
 This is a regression test for that issue, fixed in the kernel patch
-"block: take i_rwsem for the splice read path" [1].
+"block: fail a short atomic pin in bio_iov_iter_get_pages()" [1].
 
-splice() from a memory-backed null_blk device into a pipe while toggling
-the block size between 512 bytes and 64K with BLKBSZSET. A
-CONFIG_DEBUG_VM kernel reports the folio order mismatch as a BUG, which
-blktests picks up from dmesg.
+Issue pwritev2() with RWF_ATOMIC to a scsi_debug device with atomic_wr=1
+from a buffer whose last page is PROT_NONE, so that pinning the buffer
+stops one page short, then read the range back with O_DIRECT and fail if
+it holds a mix of old and new data.
 
-The minimum folio order only moves with block sizes above the page size,
-i.e. with CONFIG_TRANSPARENT_HUGEPAGE raising BLK_MAX_BLOCK_SIZE to 64K.
+The write has to span at least two pages so that one can be left
+unpinnable, and the device has to support it atomically. Use the largest
+power of two up to 16K that the device's atomic write unit max allows,
+and skip the test if that is below two pages.
 
-[1]: https://lore.kernel.org/linux-block/20261009-blkdev-fixes-v6-3-307939c387df@columbia.edu/
+[1]: https://lore.kernel.org/linux-block/20261009-blkdev-fixes-v6-5-307939c387df@columbia.edu/
 
 Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 ---
- src/.gitignore      |   1 +
- src/Makefile        |   3 +-
- src/splice-race.c   | 171 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/block/050     |  54 +++++++++++++++++
- tests/block/050.out |   2 +
- 5 files changed, 230 insertions(+), 1 deletion(-)
+ src/.gitignore          |   1 +
+ src/Makefile            |   1 +
+ src/atomic-write-torn.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/052         |  70 ++++++++++++++++++++++++++
+ tests/block/052.out     |   2 +
+ 5 files changed, 205 insertions(+)
 
 diff --git a/src/.gitignore b/src/.gitignore
-index 754beef..dbebc22 100644
+index 92c08d1..76a1c5e 100644
 --- a/src/.gitignore
 +++ b/src/.gitignore
-@@ -11,6 +11,7 @@
- /mount_clear_sock
- /nbdsetsize
- /openclose
-+/splice-race
- /sg/dxfer-from-dev
- /sg/syzkaller1
- /zbdioctl
+@@ -1,3 +1,4 @@
++/atomic-write-torn
+ /bio-bounce-read
+ /bio-full-trim
+ /bio-trim-pin-leak
 diff --git a/src/Makefile b/src/Makefile
-index 4590639..b7e8ca9 100644
+index 0bdfd05..54335d9 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -33,7 +33,8 @@ C_TARGETS := \
- C_URING_TARGETS := metadata \
- 	nvme-passthru-admin-uring
- C_UBLK_TARGETS := miniublk
--C_THREAD_TARGETS := dio-fallback-race
-+C_THREAD_TARGETS := dio-fallback-race \
-+	splice-race
+@@ -14,6 +14,7 @@ HAVE_C_DEF = $(shell if printf '$(H)include <%s>\n$(H)ifdef %s\nHAVE_%s\n$(H)end
+ 		then echo 1;else echo 0; fi)
  
- HAVE_LIBURING := $(call HAVE_C_MACRO,liburing.h,IORING_OP_URING_CMD)
- HAVE_UBLK_HEADER := $(call HAVE_C_HEADER,linux/ublk_cmd.h,1)
-diff --git a/src/splice-race.c b/src/splice-race.c
+ C_TARGETS := \
++	atomic-write-torn \
+ 	bio-bounce-read \
+ 	bio-full-trim \
+ 	bio-trim-pin-leak \
+diff --git a/src/atomic-write-torn.c b/src/atomic-write-torn.c
 new file mode 100644
-index 0000000..e411752
+index 0000000..e8ebba3
 --- /dev/null
-+++ b/src/splice-race.c
-@@ -0,0 +1,171 @@
++++ b/src/atomic-write-torn.c
+@@ -0,0 +1,131 @@
 +// SPDX-License-Identifier: GPL-3.0+
 +/*
 + * Copyright (C) 2026 Tal Zussman
 + *
-+ * Race splice() from a block device against BLKBSZSET.
++ * Check that a RWF_ATOMIC direct write to a block device is all or nothing
++ * when only part of its buffer can be pinned.
 + *
-+ * Splicer threads splice from the device into a pipe while another thread
-+ * toggles the block size between 512 bytes and 64K with BLKBSZSET.
++ * Fill a range of the device with one byte value, then issue a pwritev2()
++ * with RWF_ATOMIC of a buffer holding another value whose last page is
++ * PROT_NONE, so that pinning the buffer stops one page short. The direct
++ * I/O path must fail the write outright rather than submit what it pinned.
 + *
-+ * The splice read path has to run under i_rwsem like the plain read path.
-+ * If it does not, it races set_blocksize() raising the mapping's minimum
-+ * folio order and adds a folio that is too small for the mapping, which a
-+ * CONFIG_DEBUG_VM kernel reports as a BUG. The caller checks dmesg.
++ * Read the range back with O_DIRECT and count the bytes of each value. A
++ * mix of old and new bytes means the write was torn.
 + *
-+ * usage: splice-race <blockdev> <seconds>
++ * usage: atomic-write-torn <blockdev> <length>
 + *
-+ * exit:  0 = ran for <seconds>
++ * <length> is the size of the atomic write, a power of two of at least two
++ * pages that the device supports. The first <length> bytes of <blockdev>
++ * are overwritten.
++ *
++ * exit:  0 = the write was all or nothing
 + *        1 = setup error
++ *        2 = the write was torn
 + */
 +#define _GNU_SOURCE
++#include <errno.h>
 +#include <fcntl.h>
-+#include <pthread.h>
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
-+#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <sys/uio.h>
 +#include <unistd.h>
 +
-+#include <linux/fs.h>
++#ifndef RWF_ATOMIC
++#define RWF_ATOMIC	0x00000040
++#endif
 +
-+#define CHUNK		(64 * 1024)
-+#define RANGE		(2 * 1024 * 1024)	/* keep the race on a few folios */
-+#define NR_SPLICERS	4
++#define EXIT_TORN	2
 +
-+#define SMALL_BS	512
-+#define LARGE_BS	(64 * 1024)
-+
-+static const char *dev;
-+static int bszfd;
-+static volatile int stop;
-+static int failed;
-+
-+/* filemap_splice_read() from the device */
-+static void *splicer(void *arg)
-+{
-+	int pipefd[2];
-+	loff_t off = 0;
-+	char *sink;
-+	int fd;
-+
-+	fd = open(dev, O_RDONLY);
-+	if (fd < 0) {
-+		perror("open");
-+		failed = 1;
-+		return NULL;
-+	}
-+
-+	if (pipe(pipefd)) {
-+		perror("pipe");
-+		failed = 1;
-+		return NULL;
-+	}
-+
-+	sink = malloc(CHUNK);
-+	if (!sink) {
-+		perror("malloc");
-+		failed = 1;
-+		return NULL;
-+	}
-+
-+	while (!stop) {
-+		ssize_t n = splice(fd, &off, pipefd[1], NULL, CHUNK, 0);
-+
-+		if (n < 0) {
-+			perror("splice");
-+			failed = 1;
-+			break;
-+		}
-+
-+		/* drain the pipe so the next splice does not block on it */
-+		while (n > 0) {
-+			ssize_t d = read(pipefd[0], sink, n);
-+
-+			if (d <= 0) {
-+				perror("read");
-+				failed = 1;
-+				return NULL;
-+			}
-+			n -= d;
-+		}
-+
-+		if (off >= RANGE)
-+			off = 0;
-+	}
-+
-+	return NULL;
-+}
-+
-+/* change i_blkbits and the mapping's minimum folio order underneath them */
-+static void *resizer(void *arg)
-+{
-+	int bs = SMALL_BS;
-+
-+	while (!stop) {
-+		if (ioctl(bszfd, BLKBSZSET, &bs)) {
-+			perror("BLKBSZSET");
-+			failed = 1;
-+			break;
-+		}
-+		bs = bs == SMALL_BS ? LARGE_BS : SMALL_BS;
-+	}
-+
-+	return NULL;
-+}
-+
-+static int spawn(pthread_t *t, void *(*fn)(void *))
-+{
-+	int err = pthread_create(t, NULL, fn, NULL);
-+
-+	if (err)
-+		fprintf(stderr, "pthread_create: %s\n", strerror(err));
-+
-+	return err;
-+}
++#define OLD	'A'
++#define NEW	'B'
 +
 +int main(int argc, char **argv)
 +{
-+	pthread_t splicers[NR_SPLICERS];
-+	pthread_t resizer_t;
-+	int bs = LARGE_BS;
-+	int i;
++	size_t old_bytes = 0, new_bytes = 0;
++	size_t len, pgsz, i;
++	struct iovec iov;
++	char *buf, *check;
++	ssize_t ret;
++	int fd;
 +
 +	if (argc != 3) {
-+		fprintf(stderr, "usage: %s <blockdev> <seconds>\n", argv[0]);
-+		return EXIT_FAILURE;
++		fprintf(stderr, "usage: %s <blockdev> <length>\n", argv[0]);
++		return 1;
 +	}
 +
-+	dev = argv[1];
++	pgsz = sysconf(_SC_PAGESIZE);
++	len = strtoul(argv[2], NULL, 0);
++	if (len < 2 * pgsz || (len & (len - 1))) {
++		fprintf(stderr, "length must be a power of two of at least two pages\n");
++		return 1;
++	}
 +
-+	bszfd = open(dev, O_RDONLY);
-+	if (bszfd < 0) {
++	fd = open(argv[1], O_RDWR | O_DIRECT);
++	if (fd < 0) {
 +		perror("open");
-+		return EXIT_FAILURE;
++		return 1;
 +	}
 +
-+	/*
-+	 * The minimum folio order only moves with block sizes above the page
-+	 * size, which needs BLK_MAX_BLOCK_SIZE above PAGE_SIZE, i.e.
-+	 * CONFIG_TRANSPARENT_HUGEPAGE.
-+	 */
-+	if (ioctl(bszfd, BLKBSZSET, &bs)) {
-+		perror("BLKBSZSET");
-+		return EXIT_FAILURE;
++	buf = mmap(NULL, len, PROT_READ | PROT_WRITE,
++		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	if (buf == MAP_FAILED) {
++		perror("mmap");
++		return 1;
 +	}
 +
-+	for (i = 0; i < NR_SPLICERS; i++) {
-+		if (spawn(&splicers[i], splicer))
-+			return EXIT_FAILURE;
++	/* Write the old contents. */
++	memset(buf, OLD, len);
++	if (pwrite(fd, buf, len, 0) != (ssize_t)len) {
++		perror("pwrite");
++		return 1;
 +	}
-+	if (spawn(&resizer_t, resizer))
-+		return EXIT_FAILURE;
 +
-+	sleep(atoi(argv[2]));
-+	stop = 1;
++	/* Fill in the new contents and make the last page unreadable. */
++	memset(buf, NEW, len);
++	if (mprotect(buf + len - pgsz, pgsz, PROT_NONE)) {
++		perror("mprotect");
++		return 1;
++	}
 +
-+	for (i = 0; i < NR_SPLICERS; i++)
-+		pthread_join(splicers[i], NULL);
-+	pthread_join(resizer_t, NULL);
++	iov.iov_base = buf;
++	iov.iov_len = len;
++	ret = pwritev2(fd, &iov, 1, 0, RWF_ATOMIC);
++	if (ret < 0)
++		printf("pwritev2(RWF_ATOMIC) failed: %s\n", strerror(errno));
++	else
++		printf("pwritev2(RWF_ATOMIC) returned %zd of %zu\n", ret, len);
 +
-+	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
++	/* Read the range back past the page cache. */
++	if (posix_memalign((void **)&check, pgsz, len)) {
++		perror("posix_memalign");
++		return 1;
++	}
++	if (pread(fd, check, len, 0) != (ssize_t)len) {
++		perror("pread");
++		return 1;
++	}
++
++	for (i = 0; i < len; i++) {
++		if (check[i] == OLD)
++			old_bytes++;
++		else if (check[i] == NEW)
++			new_bytes++;
++	}
++	printf("on disk: %zu old bytes, %zu new bytes, %zu other\n",
++	       old_bytes, new_bytes, len - old_bytes - new_bytes);
++
++	free(check);
++	munmap(buf, len);
++	close(fd);
++
++	if (old_bytes != len) {
++		printf("atomic write was torn: %zu of %zu bytes written\n",
++		       new_bytes, len);
++		return EXIT_TORN;
++	}
++	printf("atomic write was all or nothing\n");
++	return 0;
 +}
-diff --git a/tests/block/050 b/tests/block/050
+diff --git a/tests/block/052 b/tests/block/052
 new file mode 100755
-index 0000000..64c0406
+index 0000000..8ec115a
 --- /dev/null
-+++ b/tests/block/050
-@@ -0,0 +1,54 @@
++++ b/tests/block/052
+@@ -0,0 +1,70 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2026 Tal Zussman
 +#
-+# Race splice() from a block device against BLKBSZSET. The splice read path
-+# has to hold i_rwsem like the plain read path so that it does not race
-+# set_blocksize() raising the mapping's minimum folio order. Without it, the
-+# splice adds a folio that is too small for the mapping, which a
-+# CONFIG_DEBUG_VM kernel reports as a BUG.
++# Issue a RWF_ATOMIC direct write to a block device from a buffer whose last
++# page cannot be pinned and check that the write is all or nothing. An atomic
++# write is submitted as a single bio, so the direct I/O path has to fail the
++# write outright when pinning its buffer comes up short. Without that, it
++# submits what was pinned with REQ_ATOMIC set and leaves the rest to the
++# buffered fallback, tearing the write at the pin boundary.
 +#
-+# Regression test for patch "block: take i_rwsem for the splice read path".
++# Regression test for patch "block: fail a short atomic pin in
++# bio_iov_iter_get_pages()".
 +
 +. tests/block/rc
-+. common/null_blk
++. common/scsi_debug
 +
-+DESCRIPTION="race splice() from a block device against BLKBSZSET"
-+TIMED=1
++DESCRIPTION="check that a partially pinned atomic write is not torn"
++QUICK=1
 +
 +requires() {
-+	_have_null_blk
-+	_have_kernel_option TRANSPARENT_HUGEPAGE
-+	_have_kernel_option DEBUG_VM
-+	_have_src_program splice-race
-+	if (( $(_get_page_size) >= 65536 )); then
-+		SKIP_REASONS+=("a 64K block size is not above the page size")
-+		return 1
-+	fi
++	_have_scsi_debug
++	_have_module_param scsi_debug atomic_wr
++	_have_src_program atomic-write-torn
 +}
 +
 +test() {
 +	echo "Running ${TEST_NAME}"
 +
-+	: "${TIMEOUT:=30}"
++	local dev len page_size unit_max ret
 +
-+	if ! _configure_null_blk nullb1 blocksize=512 memory_backed=1 \
-+	     size=64 power=1; then
-+		echo "configuring null_blk failed"
++	if ! _configure_scsi_debug delay=0 atomic_wr=1 dev_size_mb=16; then
++		echo "configuring scsi_debug failed"
 +		return 1
 +	fi
++	dev="/dev/${SCSI_DEBUG_DEVICES[0]}"
 +
-+	if ! blockdev --setbsz 65536 /dev/nullb1; then
-+		SKIP_REASONS+=("kernel does not support a 64K block size")
-+		_exit_null_blk
++	# The largest power of two the device can write atomically, capped at
++	# 16K. It has to span at least two pages so that one can be left
++	# unpinnable.
++	page_size=$(_get_page_size)
++	unit_max=$(< "/sys/block/${SCSI_DEBUG_DEVICES[0]}/queue/atomic_write_unit_max_bytes")
++	len=16384
++	while (( len > unit_max )); do
++		len=$(( len / 2 ))
++	done
++	if (( len < 2 * page_size )); then
++		SKIP_REASONS+=("atomic write unit max ${unit_max} is below two pages")
++		_exit_scsi_debug
 +		return
 +	fi
 +
-+	if ! src/splice-race /dev/nullb1 "${TIMEOUT}" >>"${FULL}" 2>&1; then
-+		echo "splice-race helper failed"
-+	fi
++	src/atomic-write-torn "${dev}" "${len}" >>"${FULL}" 2>&1
++	ret=$?
 +
-+	_exit_null_blk
++	_exit_scsi_debug
++
++	case $ret in
++	0)
++		;;
++	2)
++		echo "atomic write was torn"
++		;;
++	*)
++		echo "atomic-write-torn helper failed"
++		;;
++	esac
 +
 +	echo "Test complete"
 +}
-diff --git a/tests/block/050.out b/tests/block/050.out
+diff --git a/tests/block/052.out b/tests/block/052.out
 new file mode 100644
-index 0000000..fc4e537
+index 0000000..71c1f0a
 --- /dev/null
-+++ b/tests/block/050.out
++++ b/tests/block/052.out
 @@ -0,0 +1,2 @@
-+Running block/050
++Running block/052
 +Test complete
 
 -- 
