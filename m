@@ -1,88 +1,88 @@
 Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071393C819C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072493EB0F0
 	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 23:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791590036; cv=none; b=SGRWf1QwKDz4za2p3d1LGgd5lKH3EqYWZWDhT8t9TIkHd6GOczB9DWGRN6+9rH30KKakAQoNGTdiZfzgS/sqDxxkk5Gmfpy0QqvhTtc6gZ2B2v6602+CTAJBAqQPopV1cMjY388Jym9c2DgR7QTa5NMWm0P/mZ0+NnCRc90g5nQ=
+	t=1791590037; cv=none; b=Iv7oRZc8ePsDoJ+jnkNjwTdfHsaWNmg+nupaA5sWzqhre4BT9XRSxKatU57TJ+sVjzTqOSw8DCIOv0Lcxx3Y7tceqiwIcK8zS3p4icL8pusQ2MZT0mif+rsfmZxgUFHx1nsZX9StkUqXlG7w1124/q8iIXcKlsEvrlBl+A3AOvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791590036; c=relaxed/simple;
-	bh=fbF5VGsWOxEbePw/cfXIojB0XGj+6U18dcekk9CtXd0=;
+	s=arc-20240116; t=1791590037; c=relaxed/simple;
+	bh=VyXhtFiMq/Wr2840EFICxA95Eq3mSO7AkJu6UmBlNYY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pMRphOvQZQBqwjSGl4reOL8VpBnwv1p+OkcXorn+J68Eqv2lGe5Lpa5JIjaLKjB8KFzS9q3eR60l7EHpUvBG6hEPJTqiXIpwzhfmm1eFjMbif36V9aXW5oW/dxsj7nuRT37AhvqtgqOO6Vxk99MaHQZFOiSdJ3K91vTIvotiQrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=pRDzAvWn; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=zg/V3aEv; arc=none smtp.client-ip=148.163.135.74
+	 In-Reply-To:To:Cc; b=SSuA9p0qemTXgzVabRAyYb7z1CPqhbVkCukvBnqW+HsXbFZalvKxcSjje/V/4eP2j4BBumeI92dm0XfM1dJpk15IX51IKA0IRWfiBbAbSc54pgueFuTJG2zUtrlThqov0xeDPnAa3GYbnczmJXvDuaSnrcIksJBmQpCUA7Nnu6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=jfkjdiLs; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=rHmMC0G1; arc=none smtp.client-ip=148.163.135.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="pRDzAvWn";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="zg/V3aEv"
-Received: from pps.filterd (m0167072.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 699MYEOg419716
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="jfkjdiLs";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="rHmMC0G1"
+Received: from pps.filterd (m0167071.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 699MZ1Bd2056584
 	for <linux-block@vger.kernel.org>; Fri, 9 Oct 2026 19:53:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=Nk98
-	OBNsibiOyRMUX1gr9GF4BaWFCcMBN67+RzqRJho=; b=pRDzAvWn0FBcpAgWSwzF
-	ZlGAxf9mhULhmYdbB6tMgxCf/n5SgUgCw8NEGm7EF4Kr55pR5Uac2dSgTbBMPEjj
-	g0hPP16MX4tLqrqz2R/FfpWTgpbQc1Y7S4stIf3u4xQfqIF/ioe4r8pgYL0Qyyo3
-	g8UNAWjEyLnCuAHFCOILnPjbxsJENPl4AjAyV/OUClnzF3h9vx98m8nlZnfNwKSW
-	8K6cugjjL4iWcgrhQ1JIZJD87bMoqPpvxJKg6ln2LFAObxmS7/U3XR5lfkIobiLk
-	hZhBBadroCxe4upSEXFFf9Vsa6DjlvsGlmXDWbJwz7APZ+7weM7dGS4WcpyT7SXG
-	Rw==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4h74tdjfgf-1
+	:message-id:mime-version:references:subject:to; s=pps01; bh=wLpq
+	/5lQU7VvbTNVr7RRaDzQbiXzex1T413zsN3LIzQ=; b=jfkjdiLsHF/LnKawxHD3
+	FkpYvGnMsTuNkdMv92b+hnrBZG7gEHGvzwNKpYXJ32g/P0LcsWMD+H1bJhdSdfDx
+	08/2wbMuyVc4z8XWV4spq9rxxIEpe4oZeAjfNLHWAD5U9cEXAFQfncWhSvosUImz
+	eUe97sOUoBz3Qz6O/jhlgMyzbSeeJblJZWi00yiDQsva0p9utpJWhktGfVYZaXy9
+	s5DMyM1y+/y3A4i95/0Nbo9D6HB1XPmz7yzixJaimnMr/gbm40XLQxnQlT7QxmsD
+	Q76MbhpPdZkbwJlLFNkG/RTuhsqRSclBRXtpxhZvwQsmpRDqtXZmPD2BC5shZY0S
+	tQ==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4h74tcjfk9-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 19:53:54 -0400 (EDT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-93cc0b31ecaso43135885a.1
+	for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 19:53:53 -0400 (EDT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-93e834ff4d0so55455785a.3
         for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 16:53:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1791590033; x=1792194833; darn=vger.kernel.org;
+        d=columbia.edu; s=lionmail; t=1791590032; x=1792194832; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Nk98OBNsibiOyRMUX1gr9GF4BaWFCcMBN67+RzqRJho=;
-        b=zg/V3aEvTUN/iV0GcXQyTN1zCpchHzqXS08GoRRPF378Vi7bhzIceZk7qKO6yHuB6N
-         xMxmJ4zsruko7/bntjg7DBYUebsFNyEPh3UypEF3wTstBWn0ScbG03KcpYPLr5KAPo+m
-         e1w7xjtyfkfovPmHGb9/IbVgtUNe4z6wpikcC95WOweY17jtJbsMqmGlVzR3tJx5IjJM
-         szB6VOHPQ4IhGmcvuTPaSs5et7Z4WjZp+phVVh/FMG2mEzWYZHH85X9TlwSf6xgTFpFq
-         44TZEX/Lbx8qFjD+/26Es8yL2NnDmfW2jNrzLuNlSeh9oXo7WMG9gpqHiZ6fp3ysMq17
-         9p9g==
+        bh=wLpq/5lQU7VvbTNVr7RRaDzQbiXzex1T413zsN3LIzQ=;
+        b=rHmMC0G1+uOxspy1KtQPtpR98tZNMUWgEojsVq5ai/27PI+ec4xmNuY/MxRkGnNvCT
+         Qei/M4ecIMOYPrLO3uK9UMqg6QJWFUxpPLcz9ArOXDe6W/L6yMwl9+JlExdhoLHHO48B
+         qreiO62mBBXJa8L/HifysA8EXofdZY2qyEdn6hNcebD6Qn6O/6GxLKanOiBfBN8zmmdm
+         LQvckjJSBtThBQ85iPbVrHk1QaUkyo+kfdwdu4kNeGI3koPrz98RLi8DHhOjv3tuIANv
+         SD16uKcmoy5Pxt794PvA+YH9rLiij6D3jjra7lumhWMeEKGee0NASY5Odv2DKzC99+lz
+         xk6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791590033; x=1792194833;
+        d=1e100.net; s=20260707; t=1791590032; x=1792194832;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Nk98OBNsibiOyRMUX1gr9GF4BaWFCcMBN67+RzqRJho=;
-        b=ikYyK29QmNQdneyBJqVtYvxbk8ep7MY2J1gIByauVFntZgOf4Cnm7UWBvbtMD3WARh
-         mOVANmGfQtzb7KiZiYv3flXHyjidc8jY6M1QoaCw4ujkt/PzXx8bBMo36pIXLwI3mBmk
-         ft5uod8zt+fMW9DNGPb19edNEJJpDf+uIROkujWqDjKtnCgkgOSBLqIxN6w3E1X+QXhw
-         F1E67pjlmRS/GjzndrsG+xAqBd6mmSxmkO0osXpTYaXFwr8PHLhbXAcbF1/EhsUJEgid
-         Wfyeun8XSH8DbhXgC+5+MHX/er+A2lIAMvMuumrzW64FJJ/f56eQyvwF4CM6BbFOH5V2
-         MZ3Q==
-X-Forwarded-Encrypted: i=1; AKwUvByp7KnkJDaP6yAPKi1biyslMS6jKCUcW2NvlMqzrmGtZW0Va974i7anHrkKbqFHRV1i+EN6+s7D7Yb99g==@vger.kernel.org
-X-Gm-Message-State: AFq9FYL6LhUyVVCW8ve8S3dOc/dMZ7c3/zTyElYBTThp6jI+lbZT2r5N
-	0Ks1c61+8Hhw1AyqZNUTH+6IUbVFVGPj8LuFHRl1I5TuZTB6kc05XFM+VzXxAASXdo0fpI86Suh
-	CXDK7V8vbS7V8IsFBsvja9fPPU0sJeB5fgGsdrlzMWBvIkPh/yvhpI7PEc+xb0RBJIfjj
-X-Gm-Gg: AYBFou0fGWKt3Q3bCNjw/JKdE+GTtQcH7EDdw/PW1W+iMztdUaooKVWan+SI7UfoKV7
-	AUwA6Sdg4FLTlX3ZtMKGQvBc2378ntM6vPAap9ltpG+M1HzaE9F9KyyU7f9S46XOE9fTvk27Bot
-	ouA8yv5uQWkZ8PKpuvdMKXAQE4aMba9PL9t9oShsWiEfCSz3KDph3QxZPMt50E/7V8AAJJ/VC76
-	27Vvx/3QYSU24aTiRkqJz+q+a2MR/o5VZ/XwyWVGmqzUvrL8m5UamRQAVT+MLP+vm3yAl8zAlFL
-	wG5iNVey2CuAmdlfBjlfQk6Oo0+NTkIDwBxrNNuVDDuUcSn5NI7t/2mf6C7O+zUIJNfOArNici4
-	zmAE9l6bwAOLvuG2ZGiosO4vGQVhhWXqNIrVmsQGik5sikZA=
-X-Received: by 2002:a05:620a:462b:b0:93e:92f1:4222 with SMTP id af79cd13be357-93ebd0e57c4mr556859585a.4.1791590033014;
-        Fri, 09 Oct 2026 16:53:53 -0700 (PDT)
-X-Received: by 2002:a05:620a:462b:b0:93e:92f1:4222 with SMTP id af79cd13be357-93ebd0e57c4mr556857385a.4.1791590032580;
+        bh=wLpq/5lQU7VvbTNVr7RRaDzQbiXzex1T413zsN3LIzQ=;
+        b=Jl0ARiYx8rK0CkgER8uKn0AychhfWLSWjTqxuaWZxtQlJRkz2UAC97tgeH2qJ5jUZL
+         lFC6hz4Z+j8gG1VEhdC3mVM32bOSdbn/LJoLw9UtCUQci8sLVvS39s74I/R3m/+0YZYz
+         M520k2STGDsZketTMWgd1dG0NQAp8NwJjDTwbOF1f4wEXX3DPm2VjtAt1S6CMBwyrjM+
+         goSYitSqx3ggIpWEN+q0O7/f2ldcVuEjvSqEAopX9MlZmckaFV4zT87Pe8EX30aXNRYz
+         VQJbs6moGq+oP2W99URcwg7SCgDztqlie5AKvX59wX3XjFH9lk8f/G6DARwyar+YdI64
+         a4RQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzfS6AOV1ujs5HdOMNiBrgwl7XHe17OS+d5GjpY5/trFYladTBg30UTtq/1PEmE1Q4WN+K8WZUJafWpSg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYK6p3RnLlUgCY9auJW3YvgN1Xh/4nZxjv+D8BwQsYC14hwNjbbz
+	PHzx8+2pmmYmAYN/HatnsHKbtvDcqdzk85zZTyRPAy3jHWkA4mGB7yDnjpr9cYVc96g8d6As7LO
+	xqpq6RsqW5fvB8xt6z5UsLAXoaWfOhbs4N/qvMn45bavTwdHxA7WvF/bl2S8/
+X-Gm-Gg: AYBFou2nUqc0EV0GFM/5ecZhLSjkykYwKlBlA4UpgmRFQTRZ6EwxZP5TLIvHkph6Iyh
+	n6jGrGTbvMGcLjAKwHDJQYJZ1aZhUB62K8O0LkTB8cTgrmoh+uGfbTG+EzyAXAXf2spO3tFfj8+
+	QtKbcYcbLgqEIhyB/XGA0pojgC9iVwdHGYixjDo1qZ1q1ygkF5hIc/w7nR0/vyeA6yk3+EtUkfh
+	jd/BEAWNy3fesVsvJtO5EiaaAUBkVUC19Rw3s/iMxJy39QUTBmrQi9BXfbN4ljxgaDeViBAhaVP
+	G37eXngDpP/WqvrNxr/UNYJR+ban8pYOCY2TwpHGxjeEWdrWNCDGLc7PMvTmHCJSGyMyDOhDZMP
+	PQsFwSwR6+BdV32wmZT5HtwBHNqj0TFRZ7qAX9LGcuxgikco=
+X-Received: by 2002:a05:620a:230c:20b0:93e:c12c:fbc6 with SMTP id af79cd13be357-93ec12d10b1mr347853585a.83.1791590032405;
         Fri, 09 Oct 2026 16:53:52 -0700 (PDT)
+X-Received: by 2002:a05:620a:230c:20b0:93e:c12c:fbc6 with SMTP id af79cd13be357-93ec12d10b1mr347852185a.83.1791590031874;
+        Fri, 09 Oct 2026 16:53:51 -0700 (PDT)
 Received: from [127.0.1.1] (nat-128-59-178-194.net.columbia.edu. [128.59.178.194])
         by smtp.gmail.com with ESMTPSA id af79cd13be357-93eb984889fsm304517485a.13.2026.10.09.16.53.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Oct 2026 16:53:52 -0700 (PDT)
+        Fri, 09 Oct 2026 16:53:51 -0700 (PDT)
 From: Tal Zussman <tz2294@columbia.edu>
-Date: Fri, 09 Oct 2026 19:53:48 -0400
-Subject: [PATCH blktests v2 4/4] block/052: add a torn atomic write test
- for block devices
+Date: Fri, 09 Oct 2026 19:53:47 -0400
+Subject: [PATCH blktests v2 3/4] block/051: add a pinned page leak test for
+ trimmed direct writes
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -91,7 +91,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261009-blkdev-fixes-tests-v2-4-fcb3599e47f7@columbia.edu>
+Message-Id: <20261009-blkdev-fixes-tests-v2-3-fcb3599e47f7@columbia.edu>
 References: <20261009-blkdev-fixes-tests-v2-0-fcb3599e47f7@columbia.edu>
 In-Reply-To: <20261009-blkdev-fixes-tests-v2-0-fcb3599e47f7@columbia.edu>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
@@ -99,312 +99,371 @@ To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
 Cc: Christoph Hellwig <hch@lst.de>, John Garry <john.garry@linux.dev>,
         Tal Zussman <tz2294@columbia.edu>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1791590027; l=7920;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1791590027; l=9801;
  i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=fbF5VGsWOxEbePw/cfXIojB0XGj+6U18dcekk9CtXd0=;
- b=sKzjVH7oLMGnD2YP1h6Y87Xv6bzJycBRzkOKwS67O1BDGdyFAbGO8TBVD2AMJL4TuieuT5WK5
- dh90OhemqLzAEC9ensVFLJajPa7bnB6k7HtT+Wz+z5BnwOwfRImT7bb
+ bh=VyXhtFiMq/Wr2840EFICxA95Eq3mSO7AkJu6UmBlNYY=;
+ b=VNuPzIa6LfarlBVOsogRBK3rEUoXaVoR/ApkpgYGCgMgXd97kQcym+8iWXan/L1eRWV7D4nSN
+ IAwUG+5Q2DaDL3A+UZ1TJnmvP1KQ/48ggc9wRZjpIBSuzM6HUOmAdjA
 X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
  pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA5MDA5NSBTYWx0ZWRfX0Iw3uownA0hb
- mbcpySKYcjutBuLckUgrpCtKK1Azwy11sIMYD5AWp9Y/MEcPp9ZWIR12XyCUV4HTulUg29uov/h
- W1p0VbdAyB25nzgmwZ9GITfloJhxwuhEHbL7O8Tyj8V0gnazVL9hk7obFvGuD/EKlcDAiw7l+rO
- h3ksvuZ0YlSsjgChrZQNs8H1wwT6zIHqB3seEhqzLtWfMkJ68ATmJd2X54QNyUdwc814xsoUIlP
- 3eNqkYsew2aglWyJsMQrRioaMzPfHvL+QnmJ2k4+iv9LrLf/2XQc7fu5eTsS+fp64okR5cQG4fp
- JiobjnpO/CREUl/0srMOXsY31YQQFD+wAo+rbhRIGNCzuDwtc//ejdnHtfdhPDPSiBn9OHwvmnT
- GX5HcosWVsQ36e3BT3eBc9KaQmVCccW7slO24SjM+CSLIQ1N0r87k9OSikgmIGGPJ7myXs+VmkV
- 1MFRILZ/uek6ac6nznA==
-X-Authority-Analysis: v=2.4 cv=PKSaavqC c=1 sm=1 tr=0 ts=6ac97e92 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=u0MKzLA9JmpizDwXU9Rxjg==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDA5MDA5NSBTYWx0ZWRfX2QOWeis27IV+
+ DIwmjsNPh3iB4LTvUrCqRHARZu1gGgaetcB9FYKuj0jUW2sWHNHLjmbmFF5fgWD7Erespc3iHHp
+ VJGmi2abGHtazjoBlWc8/9ZxaJgB1cdaIA/QhJ/OHJgVy0+zAKD6AG0ax+rscnyCkI1OztIKb57
+ k1K3cw7BMK8OrdXlPkSazMFN9tz8WGtID9t6Yb+spLXNtbzi8KyXpMV17EViu8AOmAajjkl+IBw
+ 0GaNBjF1PzU7GSTeBgR1xQ61DeoT/emXhylMDDoYd3FbIwsX3jbNwERO9re2qarf/oy/Hmq6HQf
+ BOVmTo24xYl9tzl4aZi8d0YQSvViMHrlOHVrgtqMptGuplGCvCN0yHZ2I8SNuwQ5jPL5uKYENQ5
+ LJm0vTkK1JyNrqP210qTVZAUIJfIcmV4tdl6ThPZ/QERtm3bAMjblCZLOMDprML/CGwMZMWBrxr
+ z52i4tDz6eH0S1ynKHg==
+X-Authority-Analysis: v=2.4 cv=TKTQ2Fla c=1 sm=1 tr=0 ts=6ac97e91 cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=u0MKzLA9JmpizDwXU9Rxjg==:17
  a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=SsB-OO3BMngHh3ZO9fOt:22
- a=VwQbUJbxAAAA:8 a=4RRKgcBwZ_zBFEaqlmYA:9 a=QEXdDO2ut3YA:10
- a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-ORIG-GUID: 04j0_05nhgjO5j1gslKtlb-EGMIqM-kT
-X-Proofpoint-GUID: 04j0_05nhgjO5j1gslKtlb-EGMIqM-kT
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA5MDA5NSBTYWx0ZWRfX6my/+WK3Z58G
- UFU8eoi87Rk8vmLxAVLwwx0YRDxMtSv8PzPc+b7uHdRt1IrzwUabgZ7oWcHOVPg0RhFGdMKfHi9
- /n73nR22RoevY17fDDfhtjg3VKlcgLUrL5o/8P5LbFS9ZFm2gsld
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=79PYxaXUQd1wl-QFWJnA:22
+ a=VwQbUJbxAAAA:8 a=BPaW7FqENuk_g8a1aMAA:9 a=QEXdDO2ut3YA:10
+ a=PEH46H7Ffwr30OY-TuGO:22
+X-Proofpoint-ORIG-GUID: rRtuhjbkJYPA-5cdMBe6uF0Xj7OIQnXo
+X-Proofpoint-GUID: rRtuhjbkJYPA-5cdMBe6uF0Xj7OIQnXo
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDA5MDA5NSBTYWx0ZWRfX23rzlvbWCdZ8
+ GKobyXAAvkELKMKlNk9rj7ybb6cfk+wJeiX2ulDOGR8Gs+GiPdeYrlE5RWPXQdmSXX8z5TRmRpv
+ b3q/EUEgC4FRPM1gi54IOyn1qEwwTIMUXJwBWBjxSkQpcbDp3ueM
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11930
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 spamscore=0 malwarescore=0 clxscore=1015 phishscore=0
- impostorscore=10 suspectscore=0 bulkscore=10 lowpriorityscore=10
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2610080000
- definitions=main-2610090095
+ phishscore=0 lowpriorityscore=10 adultscore=0 suspectscore=0 clxscore=1015
+ impostorscore=10 priorityscore=1501 spamscore=0 malwarescore=0 bulkscore=10
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610090095
 
-An atomic write is submitted as a single bio, so when its buffer can't
-be fully pinned, the direct I/O path has to fail the write rather than
-submit the pinned part. Otherwise, it submits what was pinned with
-REQ_ATOMIC set and leaves the rest to the buffered fallback, tearing the
-write at the pin boundary.
+bio_iov_iter_align_down() trims a direct I/O bio down to the logical
+block size and unpins the pages it drops. A bvec can span several pages
+of one folio, each with its own pin, and dropping or shrinking such a
+bvec has to release all of them. When it does not, the folio is never
+freed.
 
 This is a regression test for that issue, fixed in the kernel patch
-"block: fail a short atomic pin in bio_iov_iter_get_pages()" [1].
+"block: unpin all pages of a bvec in bio_iov_iter_align_down()" [1].
 
-Issue pwritev2() with RWF_ATOMIC to a scsi_debug device with atomic_wr=1
-from a buffer whose last page is PROT_NONE, so that pinning the buffer
-stops one page short, then read the range back with O_DIRECT and fail if
-it holds a mix of old and new data.
+Issue O_DIRECT pwritev() from a hugetlb mapping to a memory-backed
+null_blk device with a 64K logical block size, with a first segment that
+ends half a block past a block boundary and an unreadable second
+segment, so that the bio is trimmed by several pages of one huge page.
+Place the first segment across two huge pages so the tail is its own
+bvec and gets dropped, and inside one huge page so the tail is the end
+of a larger bvec and gets shrunk, to cover both paths. Compare
+HugePages_Free before and after, and fail if huge pages leaked.
 
-The write has to span at least two pages so that one can be left
-unpinnable, and the device has to support it atomically. Use the largest
-power of two up to 16K that the device's atomic write unit max allows,
-and skip the test if that is below two pages.
+The leak needs a logical block size above the page size, i.e.
+CONFIG_TRANSPARENT_HUGEPAGE raising BLK_MAX_BLOCK_SIZE to 64K, and a
+large folio backing the buffer, which hugetlb provides. Reserve huge
+pages for the test and restore the previous count afterwards.
 
-[1]: https://lore.kernel.org/linux-block/20261009-blkdev-fixes-v6-5-307939c387df@columbia.edu/
+[1]: https://lore.kernel.org/linux-block/20261009-blkdev-fixes-v6-8-307939c387df@columbia.edu/
 
 Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 ---
  src/.gitignore          |   1 +
  src/Makefile            |   1 +
- src/atomic-write-torn.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++++
- tests/block/052         |  70 ++++++++++++++++++++++++++
- tests/block/052.out     |   2 +
- 5 files changed, 205 insertions(+)
+ src/bio-trim-pin-leak.c | 191 ++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/051         |  64 ++++++++++++++++
+ tests/block/051.out     |   2 +
+ 5 files changed, 259 insertions(+)
 
 diff --git a/src/.gitignore b/src/.gitignore
-index 92c08d1..76a1c5e 100644
+index dbebc22..92c08d1 100644
 --- a/src/.gitignore
 +++ b/src/.gitignore
-@@ -1,3 +1,4 @@
-+/atomic-write-torn
+@@ -1,5 +1,6 @@
  /bio-bounce-read
  /bio-full-trim
- /bio-trim-pin-leak
++/bio-trim-pin-leak
+ /dio-fallback-race
+ /dio-offsets
+ /discontiguous-io
 diff --git a/src/Makefile b/src/Makefile
-index 0bdfd05..54335d9 100644
+index b7e8ca9..0bdfd05 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -14,6 +14,7 @@ HAVE_C_DEF = $(shell if printf '$(H)include <%s>\n$(H)ifdef %s\nHAVE_%s\n$(H)end
- 		then echo 1;else echo 0; fi)
- 
+@@ -16,6 +16,7 @@ HAVE_C_DEF = $(shell if printf '$(H)include <%s>\n$(H)ifdef %s\nHAVE_%s\n$(H)end
  C_TARGETS := \
-+	atomic-write-torn \
  	bio-bounce-read \
  	bio-full-trim \
- 	bio-trim-pin-leak \
-diff --git a/src/atomic-write-torn.c b/src/atomic-write-torn.c
++	bio-trim-pin-leak \
+ 	dio-offsets \
+ 	loblksize \
+ 	loop_change_fd \
+diff --git a/src/bio-trim-pin-leak.c b/src/bio-trim-pin-leak.c
 new file mode 100644
-index 0000000..e8ebba3
+index 0000000..54af181
 --- /dev/null
-+++ b/src/atomic-write-torn.c
-@@ -0,0 +1,131 @@
++++ b/src/bio-trim-pin-leak.c
+@@ -0,0 +1,191 @@
 +// SPDX-License-Identifier: GPL-3.0+
 +/*
 + * Copyright (C) 2026 Tal Zussman
 + *
-+ * Check that a RWF_ATOMIC direct write to a block device is all or nothing
-+ * when only part of its buffer can be pinned.
++ * Check that a direct write trimmed to the logical block size unpins all the
++ * pages it drops.
 + *
-+ * Fill a range of the device with one byte value, then issue a pwritev2()
-+ * with RWF_ATOMIC of a buffer holding another value whose last page is
-+ * PROT_NONE, so that pinning the buffer stops one page short. The direct
-+ * I/O path must fail the write outright rather than submit what it pinned.
++ * Issue O_DIRECT pwritev() from a hugetlb mapping with a two-segment iovec
++ * whose first segment ends half a block past a block boundary and whose
++ * second segment is an unreadable PROT_NONE mapping. The direct path pins the
++ * first segment, fails to pin the second and trims the bio down to a block
++ * boundary. The trimmed tail spans several pages of one huge page, each with
++ * its own pin. If the trim releases at most one of them, the huge page
++ * never returns to the pool, which shows up as a drop in HugePages_Free.
 + *
-+ * Read the range back with O_DIRECT and count the bytes of each value. A
-+ * mix of old and new bytes means the write was torn.
++ * The tail is either its own bvec, when the first segment straddles two huge
++ * pages, or the end of a larger one, when it sits inside a single huge page.
++ * Each iteration issues one write of each kind. The direct I/O fallback
++ * finishes the trimmed half block through the page cache, so each write
++ * returns one and a half blocks.
 + *
-+ * usage: atomic-write-torn <blockdev> <length>
++ * The tail only holds several pins when it spans several pages of a large
++ * folio, so the device needs a logical block size of at least four pages and
++ * the buffer comes from a hugetlb mapping.
 + *
-+ * <length> is the size of the atomic write, a power of two of at least two
-+ * pages that the device supports. The first <length> bytes of <blockdev>
-+ * are overwritten.
++ * usage: bio-trim-pin-leak <blockdev> <iterations>
 + *
-+ * exit:  0 = the write was all or nothing
++ * exit:  0 = no huge pages leaked
 + *        1 = setup error
-+ *        2 = the write was torn
++ *        2 = huge pages leaked
 + */
 +#define _GNU_SOURCE
-+#include <errno.h>
 +#include <fcntl.h>
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
++#include <sys/ioctl.h>
 +#include <sys/mman.h>
 +#include <sys/uio.h>
 +#include <unistd.h>
 +
-+#ifndef RWF_ATOMIC
-+#define RWF_ATOMIC	0x00000040
-+#endif
++#include <linux/fs.h>
 +
-+#define EXIT_TORN	2
++#define EXIT_LEAKED	2
 +
-+#define OLD	'A'
-+#define NEW	'B'
++static long meminfo(const char *key)
++{
++	char line[256];
++	long val = -1;
++	FILE *f;
++
++	f = fopen("/proc/meminfo", "r");
++	if (!f) {
++		perror("fopen");
++		return -1;
++	}
++
++	while (fgets(line, sizeof(line), f)) {
++		if (!strncmp(line, key, strlen(key))) {
++			val = strtol(line + strlen(key), NULL, 10);
++			break;
++		}
++	}
++
++	fclose(f);
++	return val;
++}
 +
 +int main(int argc, char **argv)
 +{
-+	size_t old_bytes = 0, new_bytes = 0;
-+	size_t len, pgsz, i;
-+	struct iovec iov;
-+	char *buf, *check;
-+	ssize_t ret;
-+	int fd;
++	struct iovec iov[2];
++	long pgsz, hpsz;
++	long before, after;
++	char *badseg;
++	char *map;
++	int lbs, iters;
++	int fd, i;
 +
 +	if (argc != 3) {
-+		fprintf(stderr, "usage: %s <blockdev> <length>\n", argv[0]);
-+		return 1;
++		fprintf(stderr, "usage: %s <blockdev> <iterations>\n", argv[0]);
++		return EXIT_FAILURE;
 +	}
 +
++	iters = atoi(argv[2]);
++
 +	pgsz = sysconf(_SC_PAGESIZE);
-+	len = strtoul(argv[2], NULL, 0);
-+	if (len < 2 * pgsz || (len & (len - 1))) {
-+		fprintf(stderr, "length must be a power of two of at least two pages\n");
-+		return 1;
++	if (pgsz < 0) {
++		perror("sysconf");
++		return EXIT_FAILURE;
++	}
++
++	hpsz = meminfo("Hugepagesize:") * 1024;
++	if (hpsz <= 0) {
++		fprintf(stderr, "no hugetlb page size in /proc/meminfo\n");
++		return EXIT_FAILURE;
 +	}
 +
 +	fd = open(argv[1], O_RDWR | O_DIRECT);
 +	if (fd < 0) {
 +		perror("open");
-+		return 1;
++		return EXIT_FAILURE;
 +	}
 +
-+	buf = mmap(NULL, len, PROT_READ | PROT_WRITE,
-+		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+	if (buf == MAP_FAILED) {
++	if (ioctl(fd, BLKSSZGET, &lbs)) {
++		perror("BLKSSZGET");
++		return EXIT_FAILURE;
++	}
++	printf("logical block size: %d, page size: %ld, huge page size: %ld\n",
++	       lbs, pgsz, hpsz);
++
++	/*
++	 * The trimmed tail is half a block, and it has to span at least two
++	 * pages for a pin to leak.
++	 */
++	if (lbs < 4 * pgsz) {
++		fprintf(stderr, "logical block size %d is below four pages\n",
++			lbs);
++		return EXIT_FAILURE;
++	}
++	if (hpsz < 2 * lbs) {
++		fprintf(stderr, "huge page size %ld is below two blocks\n", hpsz);
++		return EXIT_FAILURE;
++	}
++
++	badseg = mmap(NULL, lbs, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	if (badseg == MAP_FAILED) {
 +		perror("mmap");
-+		return 1;
++		return EXIT_FAILURE;
 +	}
 +
-+	/* Write the old contents. */
-+	memset(buf, OLD, len);
-+	if (pwrite(fd, buf, len, 0) != (ssize_t)len) {
-+		perror("pwrite");
-+		return 1;
++	before = meminfo("HugePages_Free:");
++	if (before < 2 * iters + 2) {
++		fprintf(stderr, "HugePages_Free is %ld, need at least %d\n",
++			before, 2 * iters + 2);
++		return EXIT_FAILURE;
 +	}
 +
-+	/* Fill in the new contents and make the last page unreadable. */
-+	memset(buf, NEW, len);
-+	if (mprotect(buf + len - pgsz, pgsz, PROT_NONE)) {
-+		perror("mprotect");
-+		return 1;
++	for (i = 0; i < iters; i++) {
++		map = mmap(NULL, 2 * hpsz, PROT_READ | PROT_WRITE,
++			   MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
++		if (map == MAP_FAILED) {
++			perror("mmap");
++			return EXIT_FAILURE;
++		}
++		memset(map, 'A', 2 * hpsz);
++
++		iov[0].iov_len = lbs + lbs / 2;
++		iov[1].iov_base = badseg;
++		iov[1].iov_len = lbs / 2;
++
++		/*
++		 * One block from the end of the first huge page and half a
++		 * block from the start of the second, then an unreadable
++		 * segment: the bio is trimmed by half a block, dropping the
++		 * bvec pinned from the second huge page.
++		 */
++		iov[0].iov_base = map + hpsz - lbs;
++		if (pwritev(fd, iov, 2, 0) != lbs + lbs / 2) {
++			perror("pwritev");
++			return EXIT_FAILURE;
++		}
++
++		/*
++		 * The same write from the start of the first huge page: the
++		 * pinned segment is a single bvec, and the trim shrinks it
++		 * by half a block instead of dropping one.
++		 */
++		iov[0].iov_base = map;
++		if (pwritev(fd, iov, 2, 0) != lbs + lbs / 2) {
++			perror("pwritev");
++			return EXIT_FAILURE;
++		}
++
++		if (munmap(map, 2 * hpsz)) {
++			perror("munmap");
++			return EXIT_FAILURE;
++		}
 +	}
 +
-+	iov.iov_base = buf;
-+	iov.iov_len = len;
-+	ret = pwritev2(fd, &iov, 1, 0, RWF_ATOMIC);
-+	if (ret < 0)
-+		printf("pwritev2(RWF_ATOMIC) failed: %s\n", strerror(errno));
-+	else
-+		printf("pwritev2(RWF_ATOMIC) returned %zd of %zu\n", ret, len);
++	after = meminfo("HugePages_Free:");
++	printf("HugePages_Free: %ld -> %ld over %d iterations\n",
++	       before, after, iters);
 +
-+	/* Read the range back past the page cache. */
-+	if (posix_memalign((void **)&check, pgsz, len)) {
-+		perror("posix_memalign");
-+		return 1;
-+	}
-+	if (pread(fd, check, len, 0) != (ssize_t)len) {
-+		perror("pread");
-+		return 1;
++	if (after < before) {
++		printf("%ld huge pages leaked\n", before - after);
++		return EXIT_LEAKED;
 +	}
 +
-+	for (i = 0; i < len; i++) {
-+		if (check[i] == OLD)
-+			old_bytes++;
-+		else if (check[i] == NEW)
-+			new_bytes++;
-+	}
-+	printf("on disk: %zu old bytes, %zu new bytes, %zu other\n",
-+	       old_bytes, new_bytes, len - old_bytes - new_bytes);
-+
-+	free(check);
-+	munmap(buf, len);
-+	close(fd);
-+
-+	if (old_bytes != len) {
-+		printf("atomic write was torn: %zu of %zu bytes written\n",
-+		       new_bytes, len);
-+		return EXIT_TORN;
-+	}
-+	printf("atomic write was all or nothing\n");
-+	return 0;
++	printf("no huge pages leaked\n");
++	return EXIT_SUCCESS;
 +}
-diff --git a/tests/block/052 b/tests/block/052
+diff --git a/tests/block/051 b/tests/block/051
 new file mode 100755
-index 0000000..8ec115a
+index 0000000..a4edec2
 --- /dev/null
-+++ b/tests/block/052
-@@ -0,0 +1,70 @@
++++ b/tests/block/051
+@@ -0,0 +1,64 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2026 Tal Zussman
 +#
-+# Issue a RWF_ATOMIC direct write to a block device from a buffer whose last
-+# page cannot be pinned and check that the write is all or nothing. An atomic
-+# write is submitted as a single bio, so the direct I/O path has to fail the
-+# write outright when pinning its buffer comes up short. Without that, it
-+# submits what was pinned with REQ_ATOMIC set and leaves the rest to the
-+# buffered fallback, tearing the write at the pin boundary.
++# Issue partial O_DIRECT writes from a hugetlb mapping to a block device with
++# a 64K logical block size and check that no huge pages leak. The bio of such
++# a write is trimmed down to a block boundary, and the pages it drops each
++# hold their own pin when a large folio backs the buffer. If the trim
++# releases at most one of them, whether it drops a whole bvec or shrinks one,
++# the huge page never returns to the pool.
 +#
-+# Regression test for patch "block: fail a short atomic pin in
-+# bio_iov_iter_get_pages()".
++# Regression test for patch "block: unpin all pages of a bvec in
++# bio_iov_iter_align_down()".
 +
 +. tests/block/rc
-+. common/scsi_debug
++. common/null_blk
 +
-+DESCRIPTION="check that a partially pinned atomic write is not torn"
++DESCRIPTION="check for pinned page leaks from trimmed direct writes"
 +QUICK=1
 +
 +requires() {
-+	_have_scsi_debug
-+	_have_module_param scsi_debug atomic_wr
-+	_have_src_program atomic-write-torn
++	_have_null_blk
++	_have_kernel_option TRANSPARENT_HUGEPAGE
++	_have_kernel_option HUGETLBFS
++	_have_src_program bio-trim-pin-leak
++	if (( $(_get_page_size) > 16384 )); then
++		SKIP_REASONS+=("a 64K block size is below four pages")
++		return 1
++	fi
 +}
 +
 +test() {
 +	echo "Running ${TEST_NAME}"
 +
-+	local dev len page_size unit_max ret
++	local nr_hugepages ret
 +
-+	if ! _configure_scsi_debug delay=0 atomic_wr=1 dev_size_mb=16; then
-+		echo "configuring scsi_debug failed"
-+		return 1
-+	fi
-+	dev="/dev/${SCSI_DEBUG_DEVICES[0]}"
-+
-+	# The largest power of two the device can write atomically, capped at
-+	# 16K. It has to span at least two pages so that one can be left
-+	# unpinnable.
-+	page_size=$(_get_page_size)
-+	unit_max=$(< "/sys/block/${SCSI_DEBUG_DEVICES[0]}/queue/atomic_write_unit_max_bytes")
-+	len=16384
-+	while (( len > unit_max )); do
-+		len=$(( len / 2 ))
-+	done
-+	if (( len < 2 * page_size )); then
-+		SKIP_REASONS+=("atomic write unit max ${unit_max} is below two pages")
-+		_exit_scsi_debug
++	if ! _configure_null_blk nullb1 blocksize=65536 memory_backed=1 \
++	     size=64 power=1; then
++		SKIP_REASONS+=("null_blk does not support a 64K block size")
 +		return
 +	fi
 +
-+	src/atomic-write-torn "${dev}" "${len}" >>"${FULL}" 2>&1
++	nr_hugepages=$(cat /proc/sys/vm/nr_hugepages)
++	echo $((nr_hugepages + 40)) > /proc/sys/vm/nr_hugepages
++
++	src/bio-trim-pin-leak /dev/nullb1 16 >>"${FULL}" 2>&1
 +	ret=$?
 +
-+	_exit_scsi_debug
++	echo "${nr_hugepages}" > /proc/sys/vm/nr_hugepages
++	_exit_null_blk
 +
 +	case $ret in
 +	0)
 +		;;
 +	2)
-+		echo "atomic write was torn"
++		echo "huge pages leaked by trimmed direct writes"
 +		;;
 +	*)
-+		echo "atomic-write-torn helper failed"
++		echo "bio-trim-pin-leak helper failed"
 +		;;
 +	esac
 +
 +	echo "Test complete"
 +}
-diff --git a/tests/block/052.out b/tests/block/052.out
+diff --git a/tests/block/051.out b/tests/block/051.out
 new file mode 100644
-index 0000000..71c1f0a
+index 0000000..e9a2745
 --- /dev/null
-+++ b/tests/block/052.out
++++ b/tests/block/051.out
 @@ -0,0 +1,2 @@
-+Running block/052
++Running block/051
 +Test complete
 
 -- 
