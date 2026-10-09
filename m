@@ -1,148 +1,109 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6531F37E2E9
-	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 14:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791555717; cv=pass; b=LLrYwue2tLxyIa+UPXPKPoO8fqmZrb/Qe2QiqJw43kBHkUDDfWf/2I0mrbO7elsHZvjXDKHIyD74WM6W+vbL+4gENUL7X7oB84o9lZhtMRtuB55Reg0ZHk168dBkwQNtg56P2lNMY/xxaA42YpgeA8bhZnn8VOWPeFsFe94SJNg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791555717; c=relaxed/simple;
-	bh=30eMmtxo9dZdwlJ3E6z4UwQCm88BiouFKOwsHyXsVEg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=TlidADuVNnj57wutKfMU9XC79ScieoQ2DU4piVEJ5MemDRZ8NUC5AL2Lw0Ji6XNx5286F5zUY/C2rfcgXMDGW4Q6SZYpTQOBxcCs9S8aDgA0bDM9O00ZynnfBXcgpAxVW84BCQW5KhI7G/INgWmgrwhiUA5GIqlRJ92a8je07Co=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YY+D3gQr; arc=pass smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A703D9DDB
+	for <linux-block@vger.kernel.org>; Fri,  9 Oct 2026 14:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791556670; cv=none; b=mqCpzxefkSdgVHWWz7ly8Pvt3VDAPNYWkvlDAKD7i8GFyCV1SwZsY+foulw1kS3CiKL9KaK0mprBeszqdSzHLz/Yb+Dv2kyKpDEpDa6DZdGf1/a7fHXdlYncwa/P+FzCY5MkK4uKbksq8ec95ne9GcSdov1/rpl8BDyNgaV8Qcc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791556670; c=relaxed/simple;
+	bh=p1F8safINLCSBZ9wkY6CcuBdKpiRtmwSdSx4OkzmuDc=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=GuG3CdBTfdyPHD8NDj0xMaRMl8uskU1Xjua180vTZ20GkYNlgmA6Ls10JVw0K485+etDINdIqfBSbf8o/3klt/4yIs6Zw+Ch8gCOjjalBJoOp0y2O1xfcGCiOhsF8FcmDShG69xpM6SCUk1YWcd1Tb8Shb0OQu2QS8Hm+mXKp6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=osYILKjJ; arc=none smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YY+D3gQr"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6b16824c0fcso2301206a12.3
-        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 07:21:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791555713; cv=none;
-        d=google.com; s=arc-20260327;
-        b=S670v8sGdXw/v8m4MBS+m2hjytkMvF9FooW2GIAGd3annlTpYwSzc+MMwc8V/UPoru
-         9Kmur6NIf1BV8clj/QCq8a0KIGxffuqio3rw34SALt16OFiHcKzTZnt1IWaUzuiG+IRQ
-         Zqq6VzwqcFenYa5jnefXQqc8Lww2my7d4vgzlHl3c/070F35Ooy8dPTpAjTj9QEy/TN/
-         mmsWJH88DZt7v+bNLKEo7UZ8ZlQg5AyMy4SU8cm8WR4vG1YEoMZ4smMtUCz/Bu6dubK+
-         yrGype1OdQMQ5pjHfQoDXc2Y98dhCXH9t6ksjBS2eeXHOMn0lC46ct9Y1SN0OaIlUbMR
-         fYiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=R5SiVnaUQQN34hVlYPHW4REpkY55paPFDk59rozrL+o=;
-        fh=MU5HNJXXg509sP1LckMOKYPTGn76SDWI4tkGNago4b4=;
-        b=K2p8DC4wTILxRt3ayRf5whKgIZRZTWaEKVvjNGqcofDrpF+UONzyV9/Jc09wKXirig
-         xYmbSasPSVrd4hLN5ARLYBxlt7aWvg386qCDXjYOZ4+VYO8v9iYbxEmjbBlkhaede27K
-         c40SHItBkhoUHeBc7d+g8n2lBbS/ZaGbNKxWhTGpOWbTvkl1V68k9rF2Nh4G1Ev5057s
-         qrqoFiYF1OkBY0yV99SOeS8gDQaaJttzTzmW4Q5ZSpFWUF9ulFpMOlmxi+ONgUtb42kT
-         5LxxpxqrzT7vA6wXC1V9M5nn6pHjkFYojF3Ozbx2FaEzBkHatkH/mU2hLZZnPWzcfjxd
-         MvyA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="osYILKjJ"
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-3514e7cbbbaso8709641eec.1
+        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 07:37:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791555713; x=1792160513; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=R5SiVnaUQQN34hVlYPHW4REpkY55paPFDk59rozrL+o=;
-        b=YY+D3gQrC+336SpGwPsxLOFGXQY/22sAb16i0oZXkhbu2hWoMaJiBtQcVQW31RA8oO
-         A+tjU04kf6EDmmIfO9bxCQIF6jXwXfYfc4uBt6m98cmnIliyqA2ulBIBVad63AMKI/zY
-         6iXZL0moiOvhI/Oo9cZuT0+kZeu+ixziAoeDxzBjT9wvN4Sbw3ka3cXneqvjiIoFPcEG
-         Hr/xc0wGHGnofsAlfuhcaZ6t1NYEbTAWp5p+3FdIMEmrX2OPjkna7RI92sXX7PPbW6rU
-         7NWR5ImfLBdI725E9B8TOVvyWQ62GSTlViBrgudFX4JcEoTXM1s5aedeoJZ91qzqXIWV
-         VXGw==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1791556668; x=1792161468; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=h9da5zk0GHj2rwz2lfan29dlM/wk/e0PgyHn2IrcmKk=;
+        b=osYILKjJnqtc0TkJ88vYBKZzNr9hTIkvA63C9nZnyMdxiK+zfxashWq0tcUZvasZKY
+         kuISinulQXkq+rOjFEk4POY3fAN4MeRQf4ek0ERdJPlbJQepFBlq5nBVd1xYXFW481Mc
+         BcNKx0VnuDOWSxjdPJtd64Ggo6eBSwJ28g8JPzny6x9rkuCMF9g0F26QjTlk1VSILKgC
+         DxJ1kQ3+9P4f7vlLVYvw3aG15OBhuC4Iovyn7LteW4NZgr1rMW+6Mpm1odD0hI6vAVeo
+         0Rc9ZRlFe4PMQbrVNCkIoknQfZyusGKvLRhwZqDMXoUvfxBvTuazkMC+UHc7hHsPWtTy
+         dIvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791555713; x=1792160513;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=R5SiVnaUQQN34hVlYPHW4REpkY55paPFDk59rozrL+o=;
-        b=bBv8qNL/vvaMLoF809cu9pdvvcBY8ocS7EDti2Xc2LdH3BNNaK6fcHzUchW6jaae55
-         D7aZWjRwjqVwYkPSlc+KdBWqUD/VzuEW0T5b3sNQu0UQFhG43P9Kg9PDhlzlC8mGGKaj
-         ulU0VkLtDAseTe5bymKv7xRrGNWnFTOiVAnNQDqhH4GljBnh36BFPqAM5+POKwjMs8Yp
-         tQ2FbvvwUB6eHeipF3Niy2SQ0yTFxlTm+wEeL8zL2ttFY+ySVt6wjqxf5yukM2NvfWmu
-         Xv5AKSR5eR0pMeagFYSYn0qI5C2NJ0BoD0Cl8aYL68hHRXmUTGwnKdZ64eVihCzHYO6t
-         tagw==
-X-Forwarded-Encrypted: i=1; AKwUvBwnaO7rcUY5ppBJ/KScSPhCtvDEmQG/a0zkzFJDfvwNm6OBKkFhUWQ80+32yeJ6KAVzByNARNQSgV29zw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ/ix1ZM5H2IOuzxPuruDGr7tnQAKP+1A+pIvVI/qE5rIevju/M
-	xfqtE0i8dUZNU0I/s6J5QnxaOmM71PwlRhgSmGnmCajLIvaciWA4TDKCfj8ulRViFe9NGE3brp+
-	wr0iacMgRbTN+jUWLZi3vpPtlWt6qba0=
-X-Gm-Gg: AYBFou1Ll0jnudzt9pRavURf6StyL7n110qDUY9eQMZL9am8UNrtZb92zA6tWQBQeBJ
-	6wtdXf9aoxpuPeq15yYwPvb0dOzGXJubqaXSlJ9ngH28G1jdaAdSDJY+iV7t1ILjrxpnWYiB5cm
-	4c660aI3VbexfhcXV05mN17TLroP20bRpXP0kbYAbDi+xHRuOS9Gvk+hY6UAv+8oMr8CptLBOBc
-	SawVOu3/YSILadcMCpbUr0G4my2jSEnTVCXP/PdSQYgk6Gpfa2FTSprcq1euxK8kQQfE2aY3UPO
-	LlzHYLK6nsEPX8UUGe/yoxzB7b08D9kIY/PQN6/Dlat/gtApsBUEl2Uo7MsRZQdl/rjHJox7
-X-Received: by 2002:a05:6402:254e:b0:6aa:b39e:f794 with SMTP id
- 4fb4d7f45d1cf-6b17c28fedemr1748598a12.42.1791555712392; Fri, 09 Oct 2026
- 07:21:52 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1791556668; x=1792161468;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=h9da5zk0GHj2rwz2lfan29dlM/wk/e0PgyHn2IrcmKk=;
+        b=R0sMKUnfBxvPLCq+MXk7jVspX8E0rxjGVvu5V5y3cbDw8sNs0Yv1xfjDPg42J8iPxv
+         mQmm3jFAVB/830/QT6rW/7R5tCPndDR5OATSIxf11fR3YhzkAIcFB7vG0F0srb6BklfA
+         IiYwHBXNpGj2PyYkqkQdJZiwkUF07of6tydom9QWBUBFkLbXi0kq0CDctd4Ef9ZY6mm1
+         ZrH5ISOFsT+Xf8Uj3mmLjpyWEMjPqEO05O3aRJVzvKG95whM1XzetrLBehdaYqUrhM2U
+         YqNAWx2vmS7WDDBL5cnBdgOV8zzDUXMmHavzOryvSkaG8ktz7ye26yymuK6p+xbL8KgZ
+         LBqA==
+X-Forwarded-Encrypted: i=1; AKwUvBxRb9p/8AMXTbJsyrUHcbk4ZNnbNQLw4VQs3LFZzgtdUz8GqjqqXmiJUZVp3UcwkeRZnEttvPBek5vWqw==@vger.kernel.org
+X-Gm-Message-State: AFuF++nVLT4bTacR+XBK8Brj4uxeWNcOhGltHvQGBV9tn8sjXyhHe1H2
+	stykl+Yh6yz1re/HAC+TTmSch+a9yN8Ub4xXj8cDg1QNJOiqorlF/NIVaCo+Qtz1EZM=
+X-Gm-Gg: AYBFou2kvXjk4HOO5hZzBVTOp7H2GvRsl9/xLMjiQiXBAJUqsARMzNwvxaCrBsUV87D
+	SpFTP1nTVl4qftSOShjdjVSHYIoVPakI1CInCuD7sja7UDFow3gBwVwrZvkc7Pw3Eryts7aZ7C6
+	cWve0h26OlrlUM7rl+lGMbpMdFbdQFw6F7AxdYXNVsfZ9yVwOM1/xMqcVnmzLw6pp3IUAWFk2tw
+	+q9ANyATkA6WWGcKkyPf5MGM1ImAqi6OFf67/o4Q3tORmY0dfBgHnMEv2UQw5RK9TI/BcRzmWd5
+	L35uHwLnPuCXFayP6BQzMwyAB66oBZwc9nGUOj71RNhoujvkWjc4u/TGUsKqpuFge2Jtk10O6bV
+	mrs71m3oHZ042UrvuWNRtHmrhFL6IGEiwPlgAeRER/C4lSo6zXGsyw5PYeWg3K8xKup6hT3aHDy
+	v6UZo2udqKgIa23G5Jf4N0FrylH3ZLRDKv2MY4KPyQkpVPNvO1uETXo2zF/ShFE4BtAxpNgBYu7
+	pnSEEx0fMUmSwC3IZBsVAsadBtlMG4mSuj/TwfXfza0bcZmoMMAoWpajaH5VaI7nge2dSO5ZvR+
+	9XjhpLbpCQ==
+X-Received: by 2002:a05:7022:7f10:b0:143:3c9f:10a6 with SMTP id a92af1059eb24-16a57734472mr2827175c88.4.1791556668232;
+        Fri, 09 Oct 2026 07:37:48 -0700 (PDT)
+Received: from xps16.local ([155.98.132.5])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a2d2db98sm6603150c88.10.2026.10.09.07.37.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Oct 2026 07:37:46 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <tom.leiming@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+ Uday Shankar <ushankar@purestorage.com>, Qiliang Yuan <odys.yuan@gmail.com>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20261008-bug-ublk-selftest-fault-inject-delay-v1-0-a96af7ead06e@gmail.com>
+References: <20261008-bug-ublk-selftest-fault-inject-delay-v1-0-a96af7ead06e@gmail.com>
+Subject: Re: [PATCH 0/2] selftests: ublk: fix the fault_inject delay
+Message-Id: <179155666606.221695.3172868322177231667.b4-ty@b4>
+Date: Fri, 09 Oct 2026 08:37:46 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Martin Leitner-Ankerl <martin.ankerl@gmail.com>
-Date: Fri, 9 Oct 2026 16:21:40 +0200
-X-Gm-Features: AclHuK-62QwvTT56LJQI5jAhTvpHHwM53Qctdf4WmrpYFSOHVx_FT6G7Rry0i7g
-Message-ID: <CAAFOosa2WLf--T17cujJu5CUsN12NNjgTitOvno2LY7jAr1gfw@mail.gmail.com>
-Subject: [RFC] seqlz: a compressor for zram, between lz4 and zstd
-To: Sergey Senozhatsky <senozhatsky@chromium.org>, Minchan Kim <minchan@kernel.org>
-Cc: linux-mm@kvack.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-Hi Sergey, Minchan,
 
-I wrote a compressor only for zram's pages, as a personal project of
-mine. Before I send patches I'd like to know if you would consider a new
-algorithm for zram at all. Much of the code was written with an AI
-coding assistant, with me deciding the design and checking the results.
+On Thu, 08 Oct 2026 22:45:38 +0800, Qiliang Yuan wrote:
+> The delay set by --delay_us on the fault_inject target is lost in two
+> ways. Its timespec is read after it has gone out of scope, which makes
+> generic_06 fail, and any other completion on the ring ends it early when
+> more than one I/O is in flight. Patch 1 keeps the timespec alive until
+> the SQE is submitted, and patch 2 makes the delay a pure timeout.
+> 
+> With both patches, a 1 s delay holds every I/O for 1.000 s at queue
+> depth 4.
+> 
+> [...]
 
-seqlz stores pages almost as small as zstd and swaps them in close to
-lz4. On a Xiaomi Mi 9T with its own Linux 4.14, seqlz as a module,
-20 000 pages from the phone's zram, the whole page fault per page:
+Applied, thanks!
 
-          bytes/page   swap-in warm, A76 / A55   swap-out, A76 / A55
-  lz4        1300          5.3 / 16.2 us        10.3 /  31.2 us
-  lzo        1216          6.4 / 17.4           11.2 /  33.9
-  zstd 3      898         16.9 / 47.5           34.7 / 133
-  seqlz       935          6.0 / 17.9           12.4 /  38.8
+[1/2] selftests: ublk: don't keep the fault_inject timespec on the stack
+      commit: 955cba87d9ed334fbe0b669b35b4abcddd7f9929
+[2/2] selftests: ublk: make the fault_inject delay a pure timeout
+      commit: 69ae59173a5668d015ab2733c8628ed542f00ccc
 
-So 28% fewer bytes than lz4 and 4% more than zstd. Swap-in is 11% to
-13% slower than lz4 warm and 17% to 25% cold, swap-out 20% to 24%
-slower. With 25 apps launched in turn, 1.5 GiB locked away and the same
-disksize for all, seqlz had 3 cold launches in 3 runs, lz4 24 and zstd
-6. With the disksize scaled so that each algorithm gets the same RAM,
-lz4 had 54 cold launches in 3 runs and seqlz none.
+Best regards,
+-- 
+Jens Axboe
 
-It is LZ with Huffman coding, but with static tables that are part of
-the format, so a page carries no tables. It needs less work memory per
-CPU than lz4. The format is written down, and a second decoder written
-from that description alone was fuzzed against the real one for over a
-billion inputs without a difference.
 
-The backend works on your series of 5th October, "zram: redesign zcomp
-and rework backends", applied to mm-unstable at fb0fbeb37, and on
-mainline without it (986c24e0fe44). Under KASAN and lockdep it swapped
-12.7 million pages on the tree with your series, and 34.9 million on
-mainline with UBSan too, preempt=full and lazy, no report and no page
-that came back different. The zram selftests pass, and there are KUnit
-tests.
 
-What I don't know yet: the phone numbers are from 4.14 only, I have no
-rooted phone with a current kernel. With 16 KiB pages seqlz needs more
-work memory per CPU than lz4.
-
-My questions:
-
-1. Would you consider a new algorithm for zram, next to lz4, lzo-rle
-   and zstd?
-2. You wrote in March that zcomp will move to the acomp API [1], and
-   your series of October reworks zcomp instead. Should seqlz come as a
-   zram backend on top of that series, or as an acomp algorithm?
-3. What would you want to see measured to decide?
-
-The code, the format and all measurements are at
-https://github.com/martinus/quetschn
-
-Thanks,
-Martin
-
-[1] https://lore.kernel.org/r/aa9tz-EIh7kOF3RM@google.com
