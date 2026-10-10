@@ -1,55 +1,56 @@
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA3D480951
-	for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 11:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916B4495AC4
+	for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 13:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791630963; cv=none; b=Ri2eVOoNE+IGO3vfvabVE29CD1Adc+NzEvw31pD1WHHJ8/jAeY4pIZKbp4jeA1iL+u6dGyxdUjFWkx4bFYL3xN05da9AAh89aZpdPG8OYtXK+rja0VeX5VVLwsvk7NGflillQo/GLFllP6ZGbq/vsc26TRaX/bmvJOdt5Ic+7R4=
+	t=1791638863; cv=none; b=R87jecnI0445LGkjH39VBWe5w8R9lFpbLVCanCjtjMwGTeq+dWBtMdTx5PyhJ9qANVktztQx2Yh/r7M9yDEhCWBc+0y0ayfkwoUamtfrsgmq+meuvL0yVtf+xr9pNUk9JhwcmMbyoUSwiTM+l7ndia9yHU0EX1WlmhTuR+BQsuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791630963; c=relaxed/simple;
-	bh=5CzusKcxVyXaR3QsGDMDR2qgmjRv/fJBLlwlaaARS3g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VPXbr2XI30ViNXAb/+lpO3wkaI5TFFFsiHs9VushatQ4Qc0gdHQCb6W1fT0OuugF/uibBJmS9G8JNJWnXz1aJgALyewOVAnQTYSDFm+n/iFfpYsuENKwJR3zS6ZfqgzuJof76VsMtm+iBKZPrn716h5pzjaz/k6QCA9MhPLRlSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.224.41
+	s=arc-20240116; t=1791638863; c=relaxed/simple;
+	bh=mtxITmcWvc3yGWXuvwVSycVUTwppjDUjTMGMhK5QZoc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KMd4kvZg6NxoGoqHDEV/y312uXT3/amigc8MZAeqc5zBVnH6k/nnIKhTWlxLHBTelj8oJ2OOd5B/KglVpMMo2LNsdMu20gVB/bUuR2MWfL4gT5xchu4XnfmGaDD5oQrWPnoxdgGUxJFjQKEyC/qsinv+vKnC+XW9YCR/u/3LZ3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-66c9995ca60so2584228d50.1
-        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 04:15:59 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4a1880e1bf1so5595385e9.1
+        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 06:27:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791630958; x=1792235758;
+        d=1e100.net; s=20260707; t=1791638860; x=1792243660;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=7FLKHNVxY/mArmCUsnuC+Ob3WlxaCdcNFSgH2tcREQM=;
-        b=e54hvTxf5yO1XCLy6N+fjECFDZzsf0MNUZDW9sM7U4C25BRlPToHd0mEK8eztvUj1N
-         hW7EovQ5rBANwLxZXRMFWq65m/NptSvYR1HYgyXjSAd43lWgnWrjq4mIaD6I4eXlgF75
-         RzLoKNvihwLzLsPwKmvjIUlVO5k3eRHCt5YJbFN/kdwDPyYVV0cndmuef/6Jzvr2oMPj
-         BUKP+b3401PbwLR7/beO6ylxw3bMWUY8d2mG8xJT5OLl+dgEXKxbW/mLJIlR7WWX/+Kv
-         /fzMnRDKdR3c7HF5MZKsgTyJqR7pmYUKnv6ygrFjkeQshhpxAopovdMgWzaan35Z7Sw2
-         P6OA==
-X-Gm-Message-State: AFq9FYKzVp/87z+q2BpzQCo4h9N45Jdiv6LLfUfILQap5TGMPlVRh6yD
-	VGrWXxwLS34onVbhbkRQV2R9S4nLRTKTB9ZqNNiElCD5Ch6lJrutAFYmtHNTGgtqibQ=
-X-Gm-Gg: AYBFou0f/mFetaqIlwdOWLFjL/LqkxfyOs1H7gTmFuG03WLEL22usVce6V8xDXd5oGp
-	5E2MSATyzpquR1Os0weX5dzna3kp5KL9VJPoi2vAUC4nSA3RUsRb0AvoCEekxnjOpaP1bnMp2wv
-	7RpPENKi6Fo+IKyHeKUKH4iLUXpNGfLmHvlF8SW7D94dpyC3Eiwuj7+LqUSCbwXV0DqPGrE4siH
-	UCGdhShL2GjAh82kR8HYYUV4fOdgr8n/fLqiql70rw9Tk1TCh7Vn3neH5plKMe3k9pZQKUTGOB0
-	oxyh3lUhczjRuVYDwxTI0ioiZRwQarG1573t/F95eBrvSWhB8tuLeo1aSR/3XohYDkwf6f0BA32
-	llrjNe0uIjcwyx44KBh7TqnyZIutrwhSTZOXu/4hS7eJZXpLy2L43uP7ugtrlcp4xGPoBFrecNC
-	JC+kNUso/ABZ7vz3N7W/R8qlrzSVoRFPhDsw2jRR5VTO0ZrkzTBDhDwj/50goBEhHbF4s54M1oI
-	yBaeAbzWjZJzN5xMSsAjvAVPns=
-X-Received: by 2002:a05:690c:4990:b0:8b0:88c7:f184 with SMTP id 00721157ae682-8b088c7f2cemr9045237b3.4.1791630958518;
-        Sat, 10 Oct 2026 04:15:58 -0700 (PDT)
+        bh=BP0D00lIkZpItx8yyC8l4SZFagNyd56ZgQAemQMRUvc=;
+        b=Zbnj8hGKgjZ+yn+LoyRG/0XWrG3YofOmLyMqlAxfHkp6ZPHJkBirJ7Rh03ovxgjsIc
+         I9LErCSGzQP8XGSHbqfrQYvLCKJzk0Lv4F2WSj+QTZ3o1qrfMro8GqSThgmABe7BtaBY
+         7dr7+l7Zjt7AEKsEOdiz1syc/BzEXqIlf9QAF8sDHE4BLMiJK9qgVHZ6mzv8UWPoXSzR
+         zpdoYW9ilim+q9wCx7o209OV96KUxQr/Lk/tg9+IYmvQF7pM0+7QsxPZtF27CXXN7/+a
+         WjNL+sVr09vFQzk0PM06SCGDKvM2z3/xdbwCojKQNEByuCzRICAI+lSO2qDBw+1FL6P0
+         OWNA==
+X-Gm-Message-State: AFq9FYLPWKl5t86lSymxnDW6GY/syoWQWfSNhrsE8mL/gDTSOvWRTDT+
+	EhzFLCK9GjzEj+VHCt+QfIGRPFOpAFHqPcE+BsRxNkGdhobPB8uShHqTMBPRokpbSio=
+X-Gm-Gg: AYBFou0m71E82vsdn63OJVPX+svFwGWTrb9x74M7Qp6ZI6inLNX+Ly9qqmGbcHPT18I
+	YrkqmaD529SPJcsBR/ZbgHe1XdEqC4hEH8PxYNtirGMSW+a5n6JUUzCBPEImXvwbqtfHSmGccdX
+	F++mdlKXMjj+oSn7S2nnjRHlyfS0v5Y60r/NtbVZOAflTInDw+Lgm9sI+cIVqAf145MNHyEvvKe
+	QCLmD/NF/jkTQ0ButXqQLCwCXmceWTy79fVzXfe9OHRxHvZXBwFTouxrxeS9fE8ZYyappYtjIJN
+	oA+7i8y0Pb7euP28R2BehyQ0/mU456a1GxYLlcz8fz6/KMoRNMWZdFVVEIjDzAPZx2RXCob5fTi
+	/VqF5zashdhQdllbrwE1Y4dunaPlPAzn9YTAEJsPk78fF7+bUilQsR3ePmlc884vc50w6tIwLdx
+	nSKpFJnv8veTBtag35zy+nw1lUgkpLdBxbuETI74pkmXPbiQVtvBjGDAnxpID9t618jg5n2vbo+
+	rQZTRN0ULz7Z0IMD/HjgwFFRYo=
+X-Received: by 2002:a05:600d:6413:10b0:4a1:88d7:4e6a with SMTP id 5b1f17b1804b1-4a19470eccamr21770965e9.27.1791638859558;
+        Sat, 10 Oct 2026 06:27:39 -0700 (PDT)
 Received: from white (bba-217-165-185-173.alshamil.net.ae. [217.165.185.173])
-        by smtp.googlemail.com with ESMTPSA id 00721157ae682-8b07f25ae62sm17263837b3.43.2026.10.10.04.15.54
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-48db94e33c7sm9648731f8f.10.2026.10.10.06.27.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Oct 2026 04:15:56 -0700 (PDT)
+        Sat, 10 Oct 2026 06:27:39 -0700 (PDT)
 From: "Denis Efremov (Oracle)" <efremov@linux.com>
 To: linux-block@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
-	"Denis Efremov (Oracle)" <efremov@linux.com>
-Subject: [PATCH] floppy: fix the message printed by floppy_set_flags()
-Date: Sat, 10 Oct 2026 15:15:25 +0400
-Message-ID: <20261010111525.1337458-1-efremov@linux.com>
+	"Denis Efremov (Oracle)" <efremov@linux.com>,
+	Sashiko <sashiko-bot@kernel.org>
+Subject: [PATCH] floppy: register the block major after the disks are added
+Date: Sat, 10 Oct 2026 17:27:05 +0400
+Message-ID: <20261010132705.1693690-1-efremov@linux.com>
 X-Mailer: git-send-email 2.56.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -59,34 +60,67 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-floppy_set_flags() sets the flag in param2 when param is non-zero and
-clears it otherwise, but its message picks "Setting" or "Clearing" from
-param2 and prints param as the flag. So floppy=thinkpad prints "Setting
-flag 0x1", and floppy=0,thinkpad prints "Setting flag 0x0" while it
-clears FD_INVERTED_DCL.
+do_floppy_init() registers the block major, and with it floppy_probe(),
+before it has detected the controllers and added disks[drive][0]. Once
+a controller is found, opening a device node for another media format
+makes floppy_probe() add disks[drive][type]. If init then fails, the
+error path removes only disks[drive][0] and frees the tag sets, leaving
+the probed disks registered on top of freed memory.
 
-Swap the two arguments, so that these print "Setting flag 0x80" and
-"Clearing flag 0x80".
+add_disk() does not need the major, so register it last. floppy_probe()
+can then only run once init has succeeded.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: 302cfee15029 ("floppy: use a separate gendisk for each media format")
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Link: https://sashiko.dev/#/patchset/20260708105703.747262-1-lgs201920130244%40gmail.com
 Signed-off-by: Denis Efremov (Oracle) <efremov@linux.com>
 ---
- drivers/block/floppy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/floppy.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index f04397b8e381..b6f73a11bff4 100644
+index f04397b8e381..23a7a0fa76f6 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
-@@ -4321,7 +4321,7 @@ static void __init floppy_set_flags(int *ints, int param, int param2)
- 		else
- 			default_drive_params[i].params.flags &= ~param2;
+@@ -4602,13 +4602,9 @@ static int __init do_floppy_init(void)
+ 		timer_setup(&motor_off_timer[drive], motor_off_callback, 0);
  	}
--	DPRINT("%s flag 0x%x\n", param2 ? "Setting" : "Clearing", param);
-+	DPRINT("%s flag 0x%x\n", param ? "Setting" : "Clearing", param2);
- }
  
- static void __init daring(int *ints, int param, int param2)
+-	err = __register_blkdev(FLOPPY_MAJOR, "fd", floppy_probe);
+-	if (err)
+-		goto out_put_disk;
+-
+ 	err = platform_driver_register(&floppy_driver);
+ 	if (err)
+-		goto out_unreg_blkdev;
++		goto out_put_disk;
+ 
+ 	for (i = 0; i < 256; i++)
+ 		if (ITYPE(i))
+@@ -4733,6 +4729,14 @@ static int __init do_floppy_init(void)
+ 			goto out_remove_drives;
+ 	}
+ 
++	/*
++	 * Register last: floppy_probe() adds disks for the other formats,
++	 * which the error path below does not remove.
++	 */
++	err = __register_blkdev(FLOPPY_MAJOR, "fd", floppy_probe);
++	if (err)
++		goto out_remove_drives;
++
+ 	return 0;
+ 
+ out_remove_drives:
+@@ -4748,8 +4752,6 @@ static int __init do_floppy_init(void)
+ 		floppy_release_irq_and_dma();
+ out_unreg_driver:
+ 	platform_driver_unregister(&floppy_driver);
+-out_unreg_blkdev:
+-	unregister_blkdev(FLOPPY_MAJOR, "fd");
+ out_put_disk:
+ 	destroy_workqueue(floppy_wq);
+ 	for (drive = 0; drive < N_DRIVE; drive++) {
 
 base-commit: 3857c2fe5449541e24afc5efdb0f81a8a8f9a3a0
 -- 
