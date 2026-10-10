@@ -1,181 +1,220 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50F1246783
-	for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 04:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791605898; cv=pass; b=Vv1SyRcMKQUTBmQjz32N0IltycOJ8sf7d07yZYgosHew5j3OmcfPeRpUGaiq/XWojvvpc635r3/oEMWzei8y5fyjmJmvVYQt5Pes74YjK+NbT6EceL53WI9r4Zl1b88BN/G2cSgsqAJcRZlcknT6vbxQRZaMjYsU6yk7pCh624E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791605898; c=relaxed/simple;
-	bh=KYy6VegmlTUaxOe7PFlSpF96TjgUY4FSEQt4j5zRT20=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MEIwIxi9iTnVilJomhPAuXuDEJ5O7TZQhqYa4AK1kCNox3vqHdJ7pDMO7Pp3HzRL+xUvNdUuhfTtf90RknqY+Jv6HdMTzVOZlY7eWJINhuYnNbxi6P1hbWxaJYCt1fakHLZ+LTja2FbcklwWJ6HwygGt5i5NTPnt59Ka9oNNNk8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OxwPN3z2; arc=pass smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB46372EDD;
+	Sat, 10 Oct 2026 04:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791608333; cv=none; b=Ti5qpcTZUFwvjdX2LOECJi8GdJurPt3yBmL+yCXkH8RnFXuO7N5kfHnoFGSVhDel4a+6lQhPQUDBue3rKUGD/Ntbcb1fDnagNEN30cOYigdToUhD1MxnCB2LHgnmiuQ49Ww1R0dEGoLwB6lGYiREXYce4WBarcsSLzMvtEyzHuI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791608333; c=relaxed/simple;
+	bh=wPLfCe6T+S/gCrFoE2GfzPMLJXw739UlhNUlKDcz5Qo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sCcCBfFfrV4AjFLkILJkVVLz9l6k90RrsVGeIi9gaC+yLecNiTHC2Utp9MJ+8fhxEkLIHnn+no+06dk3dhY225TnXL9Rm3B0R6+CYLJM5KAsZgoV2EHJyxTubUFt8BYechaTq2UOBb7carCH8IAyt3JzFUJYMX+5KULmyrydFW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xouw0ooQ; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OxwPN3z2"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-6df5e315bd1so304768eaf.2
-        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2026 21:18:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791605895; cv=none;
-        d=google.com; s=arc-20260327;
-        b=OMUMu1ak2QnqmJlauzRLm9iZtrxMWHwhsC8jJkVjRwishhLgPh3IgYF7V6b7Byinb/
-         H94aNb101zWIeJKVNkzpjZOWPrxKFitLlYWSO0PU3e/HfhBMyHsbBrwKy45Svd+hZP6G
-         IXwzuRzAaqXsp3G0R5KBJziwLzWBzGaROhiiPVT+/2p4zFHzfJjUb1X+J8nC/4vvDGEl
-         X+9NyOP1AFiL7RR6rEieM20eDEzNX2yuBHHiD9bMx/n2LbHIPFW5264R20/hGSFh9Pwj
-         Mgs1LDqmPxdD1+8t+eF6s03qqGXX2d5W4va6B09shDKGm+GW3j5yGIklVgat8zMOh0/Q
-         Cz1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Ew33P9923AzoJpuAktLckP37GCcxC9qHFUOjrnQW1Ik=;
-        fh=YXn9rJPcoMvpbJhfmXpR+rAdpeHg3EQsMont24gwkqg=;
-        b=Ot1yifwoFuBtQbacJtbOuXF4r9Lbyee1tZjSjS3RuNgWRgyCRSs/vqoPeDy92qiqQj
-         dAKgSIzzxnfSSHPUyP6Rs4qYTpVLMaZfAaCEFQN2Dyu5wslq4xY1llpqJYk1RE7BFrdH
-         algH9pQZeD966W1FgWkwF1laSRAAaNy0KGPwEctyHXt4DATA+1m00wBGMN8hWHig8OHm
-         /Z5kdHoEvy3Pr3KQGeqLSgcIN9EUZ3NdgJJc20Y+hO1Beq5KW1MBRFs9hHV47W6KWiWA
-         D6C8IwAMe/CJpAu4onO4vkbj8cdUA3ghej3gd47vpQjKOAvYYdTAleJRR7eFrppUVH2Q
-         MATw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791605895; x=1792210695; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Ew33P9923AzoJpuAktLckP37GCcxC9qHFUOjrnQW1Ik=;
-        b=OxwPN3z2Qz8oUwvwhqV8qNluN4gvU/XIaloMEhRouQnKBX5awGvC1nhoxLjPFyIQ7u
-         DV3EiJm9Ieqo4hI0bJ/MF6sbCni4DbDsLnE7s8oAWWXxzD4FXfhyk3JfNMA0vvJuRUQn
-         DbjnHf5C5cI67mieFz1E36SjXNwSYq5u9iby+wu9S54Op6T1sIn54U8o4l/dEiqW7UuQ
-         nGgOsf1drkrgL0CRVP1/ZgUY0Gkbe6zGIyk3wWzdCVQbL4jkQn7FH3nI7Nf6NTBrQTNf
-         YdmDsbc1lfhFlsFBEObW4MODgwE+CAj0WcyV2RadszbAc0Hbd7I7rAL6D2R1x6b5CFTf
-         8j/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791605895; x=1792210695;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Ew33P9923AzoJpuAktLckP37GCcxC9qHFUOjrnQW1Ik=;
-        b=cCUqnD+ldIgI73iKRR5cqekNANIIyZWMHc7ghuZL1BA764Ud1mTwZmCBrDjtVvFT0Y
-         t6sCBNbdkYv33nSPNAlmNe2K2XjfvzPNDG14u/jgchJwdJlUOS2Iqiyr2k+EY0uLnEGH
-         zicnFTnjon0AXSo27r70l+HYQbZSmbYgdNpzTtkZPfkoIR2viRyb3v4/zI9U8RnNs18W
-         r2zTmI1gWCpDY8WP9FFqawXfKmbayC6TwBxSHmRHqjF8GW++eRKtdpr0AveqtHGr/Qj1
-         ZxHdx/bvPtIJpVGGaFDhQ+FzXNnFFiENlzw88lNJNIuoJ2WGvT58R4EC4gpUjA9D5Yic
-         8czg==
-X-Forwarded-Encrypted: i=1; AKwUvBwr53k1I62f1pdZkvCkBsBv3qiglssJsRbJoLA5zSTVYIh/CJiws8f82gUIUj0Lea5Kgk9775m9Vidykw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYITJeZkz/lc22Br7TXRfVDWAIFIlBiLcD3HC6zew5famH/hbOji
-	Bgb5NFIMGJGZmRC88tw9aGUjEJll/TWrqcLu6/Uypl/TskiOvyGN61PGw2NJ8RsUWeyR2Xv7Can
-	HV4bewGCABXYSaB5fd4LFxB3+OdB7erU=
-X-Gm-Gg: AYBFou10tQ0JYEMyoj6S4ib5FLcQ2R4Wjx7Tpx9aPQZIFG2DdwgOoQHB89jOcpyoRDN
-	gZjlJS+ymGxCs//C/4mEG0x9rLgO5nCe4BjgJtgRxINFkb1gvHkrfjpiYl2mHffFeh4r5fpZZYv
-	ZpgEqqWZpqiYEmypFyaz03HeZxj94MNW1goJnd4MqgdszUCjgte2rvJeGs4CYX/hq1pLVI+f6iZ
-	r1WdwW546SLzfSE+C7KPVm123gLS+nlZn5cjFIIIvvk5IqGS9lqWyEebLflkjrP119W5bxY5TEF
-	qIHipbtoVzRCmReVwEB9FlLGOuRIHI6GntgEPRG9xNRNQfSvVyQJ9G2KIdv41jG11fu8RFZZI+f
-	ehXKC3Qh44vER5jLPSKR6BaX7YGQyimjolQ1/VHDfwUN9o1MsI6He0XM=
-X-Received: by 2002:a05:6820:984:b0:6e2:3d8b:a01c with SMTP id
- 006d021491bc7-6ef0e9dc2d0mr2797147eaf.19.1791605895411; Fri, 09 Oct 2026
- 21:18:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xouw0ooQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1791608332; x=1823144332;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wPLfCe6T+S/gCrFoE2GfzPMLJXw739UlhNUlKDcz5Qo=;
+  b=Xouw0ooQCD+gpCVToIy+q3e30HTH9N2Hj8qucDomCrC9pxk+XteEbd/I
+   Nrvc65CUFWCDIcX2E/iS214ZCtqwnrRidpgH0W6rapi6OA3Y1TO+ToKL/
+   c382H5TYXyLoginOJxaOcDi7jEb3KSujc9A1BCpdZG6ydt/NYT4u6UK9n
+   fIyBgOTE2fmUlU4oUUFS5dJctffPKz4GigICsGPa0YP2tz04gV1FrGz5t
+   8/h5HosaGXSkaAMZUYmQ+pRnkLwfotSd6mWa1gqVeRK+y9YkLxJIvbkCm
+   bc8FryfJ3wS/0ecQG2hBOEF/zejBOtpb9+CEVEO0ONO2jn3mUG5k4Ei4q
+   g==;
+X-CSE-ConnectionGUID: Z0ac+qITQ0CSAT+x85JzCg==
+X-CSE-MsgGUID: Ts70k95VSa2Bye8vnaTldQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11930"; a="419635"
+X-IronPort-AV: E=Sophos;i="6.27,149,1787036400"; 
+   d="scan'208";a="419635"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2026 21:58:51 -0700
+X-CSE-ConnectionGUID: aNlxjUvIR1K9yDLAbMhm9A==
+X-CSE-MsgGUID: ob+7cjSZQbqK+04lE0pgWw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,149,1787036400"; 
+   d="scan'208";a="926771"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 09 Oct 2026 21:58:49 -0700
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xFPAT-000000006VZ-2EwS;
+	Sat, 10 Oct 2026 04:58:45 +0000
+Date: Sat, 10 Oct 2026 12:58:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>, mst@redhat.com,
+	jasowangio@gmail.com, axboe@kernel.dk, ebiggers@kernel.org,
+	stefanha@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, pbonzini@redhat.com, eperezma@redhat.com,
+	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/2] virtio_blk: add inline encryption support
+Message-ID: <202610101218.PA25qZJG-lkp@intel.com>
+References: <20261009041727.3170811-3-linlin.zhang@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261001-bug-block-elevator-init-quiesce-v1-1-5c85fa0ec59b@gmail.com>
-In-Reply-To: <20261001-bug-block-elevator-init-quiesce-v1-1-5c85fa0ec59b@gmail.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Fri, 9 Oct 2026 23:18:04 -0500
-X-Gm-Features: AclHuK_aaavcIOhZXQjbCJpj_zTwHfB7pXCx3pPddER2n9m6mNEdfh2htsXEqCI
-Message-ID: <CACVXFVNVC4cBuL6gFMMo+FktZnXdy18YJ-Wu81NqNfW7E4_6WA@mail.gmail.com>
-Subject: Re: [PATCH] block: don't quiesce the queue when setting the default elevator
-To: Qiliang Yuan <odys.yuan@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Nilay Shroff <nilay@linux.ibm.com>, Hannes Reinecke <hare@suse.de>, 
-	Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261009041727.3170811-3-linlin.zhang@oss.qualcomm.com>
 
-On Wed, Sep 30, 2026 at 10:12=E2=80=AFPM Qiliang Yuan <odys.yuan@gmail.com>=
- wrote:
->
-> elevator_set_default() runs from blk_register_queue() while the disk is
-> still being added: the block device is not visible yet and uevents are
-> suppressed, so no file system I/O can be issued. elevator_change()
-> freezes the queue and cancels the dispatch work before switching, which
-> is enough to drain dispatch activity from passthrough requests, as the
-> comment in elevator_change() already states.
->
-> elevator_switch() still quiesces the queue unconditionally, though, so
-> every disk added with a default elevator waits for an RCU grace period.
-> Commit 245a489e81e1 ("block: avoid to quiesce queue in
-> elevator_init_mq") had removed this wait from the default elevator
-> setup, and it came back when that setup was folded into
-> elevator_change().
->
-> The wait is paid in full by callers that add disks one at a time. ublk
-> adds the disk of a single-queue device from START_DEV, which takes 7.7ms
-> at p50 in a 16 vCPU KVM guest, most of it in blk_mq_quiesce_queue()
-> called from elevator_set_default().
->
-> Skip quiescing in elevator_switch() when setting the default elevator.
->
-> ublk null target, 1000 single-queue devices created one by one:
->
->                      before      after
->   START_DEV p50      7.74ms     0.68ms
->   START_DEV p99     14.61ms     1.32ms
->   devices/s             114        971
->
-> Fixes: 1e44bedbc921 ("block: unifying elevator change")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
-> ---
->  block/elevator.c | 7 +++++--
->  block/elevator.h | 2 ++
->  2 files changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 2161b6eea680c..da9ba70ac9321 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -573,7 +573,8 @@ static int elevator_switch(struct request_queue *q, s=
-truct elv_change_ctx *ctx)
->                         return -EINVAL;
->         }
->
-> -       blk_mq_quiesce_queue(q);
-> +       if (!ctx->no_quiesce)
-> +               blk_mq_quiesce_queue(q);
->
->         if (q->elevator) {
->                 ctx->old =3D q->elevator;
-> @@ -594,7 +595,8 @@ static int elevator_switch(struct request_queue *q, s=
-truct elv_change_ctx *ctx)
->         blk_add_trace_msg(q, "elv switch: %s", ctx->name);
->
->  out_unfreeze:
-> -       blk_mq_unquiesce_queue(q);
-> +       if (!ctx->no_quiesce)
-> +               blk_mq_unquiesce_queue(q);
->
->         if (ret) {
->                 pr_warn("elv: switch to \"%s\" failed, falling back to \"=
-none\"\n",
-> @@ -731,6 +733,7 @@ void elevator_set_default(struct request_queue *q)
->         struct elv_change_ctx ctx =3D {
->                 .name =3D "mq-deadline",
->                 .no_uevent =3D true,
-> +               .no_quiesce =3D true,
->         };
->         int err;
+Hi Linlin,
 
-Looks good given elevator_set_default() is only called on new added disk,
+kernel test robot noticed the following build errors:
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+[auto build test ERROR on axboe/for-next]
+[also build test ERROR on mst-vhost/linux-next linus/master v7.3-rc6 next-20261008]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Linlin-Zhang/virtio_blk-Add-control-virtqueue-support/20261008-211713
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
+patch link:    https://lore.kernel.org/r/20261009041727.3170811-3-linlin.zhang%40oss.qualcomm.com
+patch subject: [PATCH v4 2/2] virtio_blk: add inline encryption support
+config: x86_64-defconfig (https://download.01.org/0day-ci/archive/20261010/202610101218.PA25qZJG-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261010/202610101218.PA25qZJG-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202610101218.PA25qZJG-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/block/virtio_blk.c: In function 'virtblk_setup_cmd':
+>> drivers/block/virtio_blk.c:414:61: error: 'struct request' has no member named 'crypt_keyslot'
+     414 |                                 blk_crypto_keyslot_index(req->crypt_keyslot));
+         |                                                             ^~
+>> drivers/block/virtio_blk.c:417:58: error: 'struct request' has no member named 'crypt_ctx'
+     417 |                                 cpu_to_virtio64(vdev, req->crypt_ctx->bc_dun[i]);
+         |                                                          ^~
+   drivers/block/virtio_blk.c: At top level:
+   drivers/block/virtio_blk.c:1066:12: warning: 'virtblk_ctrl_vq_request' defined but not used [-Wunused-function]
+    1066 | static int virtblk_ctrl_vq_request(struct virtio_blk *vblk,
+         |            ^~~~~~~~~~~~~~~~~~~~~~~
 
 
+vim +414 drivers/block/virtio_blk.c
 
-Thanks,
-Ming Lei
+   318	
+   319	static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
+   320					      struct request *req,
+   321					      struct virtblk_req *vbr)
+   322	{
+   323		size_t in_hdr_len = sizeof(vbr->in_hdr.status);
+   324		bool unmap = false;
+   325		u32 type;
+   326		u64 sector = 0;
+   327		int i;
+   328	
+   329		if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) && op_is_zone_mgmt(req_op(req)))
+   330			return BLK_STS_NOTSUPP;
+   331	
+   332		/* Set fields for all request types */
+   333		vbr->out_hdr.base.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
+   334	
+   335		switch (req_op(req)) {
+   336		case REQ_OP_READ:
+   337			if (is_crypto_request(req))
+   338				type = VIRTIO_BLK_T_CRYPTO_IN;
+   339			else
+   340				type = VIRTIO_BLK_T_IN;
+   341			sector = blk_rq_pos(req);
+   342			break;
+   343		case REQ_OP_WRITE:
+   344			if (is_crypto_request(req))
+   345				type = VIRTIO_BLK_T_CRYPTO_OUT;
+   346			else
+   347				type = VIRTIO_BLK_T_OUT;
+   348			sector = blk_rq_pos(req);
+   349			break;
+   350		case REQ_OP_FLUSH:
+   351			type = VIRTIO_BLK_T_FLUSH;
+   352			break;
+   353		case REQ_OP_DISCARD:
+   354			type = VIRTIO_BLK_T_DISCARD;
+   355			break;
+   356		case REQ_OP_WRITE_ZEROES:
+   357			type = VIRTIO_BLK_T_WRITE_ZEROES;
+   358			unmap = !(req->cmd_flags & REQ_NOUNMAP);
+   359			break;
+   360		case REQ_OP_SECURE_ERASE:
+   361			type = VIRTIO_BLK_T_SECURE_ERASE;
+   362			break;
+   363		case REQ_OP_ZONE_OPEN:
+   364			type = VIRTIO_BLK_T_ZONE_OPEN;
+   365			sector = blk_rq_pos(req);
+   366			break;
+   367		case REQ_OP_ZONE_CLOSE:
+   368			type = VIRTIO_BLK_T_ZONE_CLOSE;
+   369			sector = blk_rq_pos(req);
+   370			break;
+   371		case REQ_OP_ZONE_FINISH:
+   372			type = VIRTIO_BLK_T_ZONE_FINISH;
+   373			sector = blk_rq_pos(req);
+   374			break;
+   375		case REQ_OP_ZONE_APPEND:
+   376			type = VIRTIO_BLK_T_ZONE_APPEND;
+   377			sector = blk_rq_pos(req);
+   378			in_hdr_len = sizeof(vbr->in_hdr.zone_append);
+   379			break;
+   380		case REQ_OP_ZONE_RESET:
+   381			type = VIRTIO_BLK_T_ZONE_RESET;
+   382			sector = blk_rq_pos(req);
+   383			break;
+   384		case REQ_OP_ZONE_RESET_ALL:
+   385			type = VIRTIO_BLK_T_ZONE_RESET_ALL;
+   386			break;
+   387		case REQ_OP_DRV_IN:
+   388			/*
+   389			 * Out header has already been prepared by the caller (virtblk_get_id()
+   390			 * or virtblk_submit_zone_report()), nothing to do here.
+   391			 */
+   392			return 0;
+   393		default:
+   394			WARN_ON_ONCE(1);
+   395			return BLK_STS_IOERR;
+   396		}
+   397	
+   398		/* Set fields for non-REQ_OP_DRV_IN request types */
+   399		vbr->in_hdr_len = in_hdr_len;
+   400		vbr->out_hdr.base.type = cpu_to_virtio32(vdev, type);
+   401		vbr->out_hdr.base.sector = cpu_to_virtio64(vdev, sector);
+   402	
+   403		if (type == VIRTIO_BLK_T_DISCARD || type == VIRTIO_BLK_T_WRITE_ZEROES ||
+   404		    type == VIRTIO_BLK_T_SECURE_ERASE) {
+   405			if (virtblk_setup_discard_write_zeroes_erase(req, unmap))
+   406				return BLK_STS_RESOURCE;
+   407		}
+   408	
+   409		if (type == VIRTIO_BLK_T_CRYPTO_IN || type == VIRTIO_BLK_T_CRYPTO_OUT) {
+   410			memset(&vbr->out_hdr.crypto_append.msg, 0,
+   411				sizeof(vbr->out_hdr.crypto_append.msg));
+   412			vbr->out_hdr.crypto_append.msg.slot =
+   413				cpu_to_virtio32(vdev,
+ > 414					blk_crypto_keyslot_index(req->crypt_keyslot));
+   415			for (i = 0; i < ARRAY_SIZE(vbr->out_hdr.crypto_append.msg.dun); i++) {
+   416				vbr->out_hdr.crypto_append.msg.dun[i] =
+ > 417					cpu_to_virtio64(vdev, req->crypt_ctx->bc_dun[i]);
+   418			}
+   419		}
+   420	
+   421		return 0;
+   422	}
+   423	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
