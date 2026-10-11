@@ -1,194 +1,211 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF86D332909
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 16:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D443433688F;
+	Sun, 11 Oct 2026 17:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791736785; cv=none; b=TEj3/OItvPT8Aa33RJe3EHog6Pb5wUKbE2SpT5W053mzpZxHE+TwPT/MubgELHlrCPRxfsKX+ci4Vr+25alfMrWSmTK5uRq5aVtTXwTNkF5vPIC3BtywAglQTH64qXffREQNJdCZz6ZAuos0rVQ/NuPmHi+i4gXSI5MuF+Tu9Pw=
+	t=1791738639; cv=none; b=OXPwmdVMKO33oEBUa06RTX1qwHxw4yRBO1Pr1wH0AKc9vOu9Hcvi816ef/IAW8DaRp8gVROVygYEYYkYW75Zkc9qy0ibjGVuEB9HPe8xMMp/dhLC4busdtRFP5QKaWGulbFin/RWLNi9+7beqGL67aXvHG9jEiJBFQts6QEO9ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791736785; c=relaxed/simple;
-	bh=dl5hrH+smJip14LzvfHJH3jCTVWaPluDa+G3BDxYydM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=poIKM4OAL2Bpe27OwdZ48/UqTiZ/iaXtng7ucx5oqCZxew9kTeLz08znMU6FPJ593LB8oJJB796V8cyXGGfNwbGjZsWEBxVlt8k54pKFY3pEdIQEuu8TnU6x8LFnyC9y5imXUNGOiFeXkQX98tkJ3F3b52aisVnUCvMF221hQhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BiOh+Z+L; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791738639; c=relaxed/simple;
+	bh=i1AKA9Rbieg0uq+Ol4Zm6DAICaaxNtdS2B4Gz69OAZg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FZwVJunGmKSE2sl/+DrTQ3WI2sfNqqY8/cg85XALXLoa+CPt6eZr61vNcg7juZa2weXwMiMIyKLm5acNkZZpCPDdbAXr32paxRK5abrU5Ltfh3A7sIqXcq6Ny2a2VCjuyPkjcUpUEVdHJ60A5Ff9u1yj+vk63i6itenIu7eRaJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qJAb2LEv; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BiOh+Z+L"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-890d52c7c7bso983457b3a.2
-        for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 09:39:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791736782; x=1792341582; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=cyWt7m8yvkMD5S5xv62WgOXim74V6tY37hkhkyC0Oj8=;
-        b=BiOh+Z+LN8Oj7lEy9rFuCUAZYd/HQA7BKiBKa2fnONl5dt7QRfy9tyOpf7d8umXgu1
-         SZe2tARSGhlPFBKurwy72p0fIIX2XiG/dmNgCbvMqT5XEhXUDOTkbkZhhZANXhseKYlt
-         0mA0NLerw/U6Eh7UNILHORMFw67Uf+zUPS3AzC1Di+nahrBld97hHdLDqFOSqcav8kRU
-         C1KCekahW470QkDVJYuVsNpib9F1tEUzVutU44h3bZnml+lpyIqdaSl6IkMbfIj9yk6H
-         7XMcg8bhwmV/J+I2rxru1fvkeIZWRDe7rJH9KmKW5IQGBkpjMYLdEI0Yp0U6fgn/+xkV
-         3xLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791736782; x=1792341582;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=cyWt7m8yvkMD5S5xv62WgOXim74V6tY37hkhkyC0Oj8=;
-        b=Vs8x2Ia3vkmmCAyGmpMdnEkFqYAV6dtqh23LtOEUqEpuvmGzhB4o6TuDOy/3L6SsD/
-         SEmWgRcIJFWBgP8VZ97ghBOj9oxhKGuT9XCt8FW1sDt90rA8fIOFbbxYD3CfzgagYX1N
-         eW8RcME/hXbSQ9S9AXFw31OgrwptFjAKi+WqAIBE2H3/s8t1aS/3ZMABB9hnWfgG6qU0
-         RNg+lq0uVExWcMM5FQOoxjRYOGFlkLVCDtWejEqHHLQSOeKc24hqVs9YcCEMXktOAH3n
-         QAYBNvYHh6BSLF2KfEkGty1NS+xv9ImavWN1D3R1crWwz/FYdzkIdqnRkkw/yWQr/MRl
-         Wi/A==
-X-Forwarded-Encrypted: i=1; AKwUvBz2Bs6tWGMB2KhnGanlVKuF4M+3K+jec5cv9E1x0TMqJBJJSV0NoHtN65LBK1ooguCFQy3aH9gIyEbE3g==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJWZE+oxf4446Pa2x+9qODJ9tK/wZHH0ECglJ7hgScWLMzv3vYa
-	pcqvlosfgu8XauAx7iewe5gggJK9LubmBqOcPNDX/jCQhotJxCbJGnjI
-X-Gm-Gg: AYBFou3r5eJuGMXWMOHZ1t7+mWY99A6Xuzija/bdShI0v6gAHT8WKxTwTEe7/1G0u2U
-	Y/1tmlS1A6GwT1Rl1WNAa8/ax6I9eKIIT1tAAAB/hG8xvFrsoIYGgbiszt7DmFHteZafJE0EmdD
-	ONYOc0RjGr2ynZdsIkPmi37rPJ/8K9sAy9DeBMk5Xm9FVpwpx5r0DrZAT/rZkJBU1K57l06vQ95
-	5LsZfmmEJxjoa1eqNSTP5E16SK8ua6U72RH1RMyiD0ku5AEPLWkpcF2vfpaQSvnAN1xX3ZqQ0mw
-	SPj7e7npVllKgslPster/oOa66OCtrImsbCo4pV4F3jedzMxBGf4CqgKYWBwtgEGfu/EiwIqX4N
-	anaEplBM2cKPWYVCCqb2ZP/yUkUXFBK0BYG3dEysNrQYjCcc9BV1R+XQIOV/Xeu7qRy7XGH/Ees
-	Ywc3F/re9f9Ruy1v9zmWzRRaqW76H0FHFteEV7vLtDzuLa2tsEqh3fQnZYC2PwH1muhZ0JjWd3
-X-Received: by 2002:a05:6a00:b8d:b0:857:726d:2e96 with SMTP id d2e1a72fcca58-897c70107f9mr6888598b3a.19.1791736782085;
-        Sun, 11 Oct 2026 09:39:42 -0700 (PDT)
-Received: from thangnn-ASUS.. ([2a09:bac5:d45a:2646::3d0:17])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-896c3106de6sm3201429b3a.14.2026.10.11.09.39.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Oct 2026 09:39:41 -0700 (PDT)
-From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qJAb2LEv"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1791738628; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	bh=e2xfrCux33PommZlTWIe34vU/fAdJcdkEYByLUe3jDQ=;
+	b=qJAb2LEv5/SIghgW5wj/lMO20zljUjdV0XR9Cvxx3lOWbjidyHGPystInRj2qwo9mxoMAVjyPeDfq4M2FK2t6co1oUf6RiNRu8ZxJuIPbqoqTwCV/Noz+I72/uIR8XFhkJMCeLSlh7OwQQg9lpYDJd5SuuFhha+0PItrlfM+PR4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037026112;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0XCYQXKg_1791738598;
+Received: from x31h02109.sqa.na131.tbsite.net(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XCYQXKg_1791738598 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 12 Oct 2026 01:10:26 +0800
+From: Baokun Li <libaokun@linux.alibaba.com>
+To: linux-ext4@vger.kernel.org
+Cc: linux-fscrypt@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>,
-	syzbot+1eb53c83ab8b0a0302a6@syzkaller.appspotmail.com
-Subject: [PATCH] block: release the freeze lockdep maps under mq_freeze_lock
-Date: Sun, 11 Oct 2026 23:39:36 +0700
-Message-ID: <20261011163936.22576-1-ngocthang2710.1999@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	ebiggers@kernel.org,
+	jaegeuk@kernel.org,
+	axboe@kernel.dk,
+	hch@lst.de,
+	djwong@kernel.org,
+	brauner@kernel.org,
+	tytso@mit.edu,
+	berto@igalia.com,
+	adilger.kernel@dilger.ca,
+	jack@suse.cz,
+	yi.zhang@huawei.com,
+	ojaswin@linux.ibm.com,
+	ritesh.list@gmail.com
+Subject: [PATCH 00/13] block, ext4: allow encryption with a block size larger than the page size
+Date: Mon, 12 Oct 2026 01:09:45 +0800
+Message-ID: <20261011170958.1759230-1-libaokun@linux.alibaba.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The lockdep maps taken for a queue freeze are released based on
-q->mq_freeze_disk_dead and q->mq_freeze_queue_dying, which are sampled
-when the outermost freeze starts. __blk_mq_unfreeze_queue() drops
-mq_freeze_lock, and only afterwards the callers release the maps. In
-that window the depth is already zero, so a new freezer can rewrite the
-flags, e.g. del_gendisk() on a disk that owns its queue, which sets
-DYING and GD_DEAD first. The old owner then skips the release and
-returns to userspace with the maps still held:
+Motivation
+==========
 
-  WARNING: lock held when returning to user space!
-  syz.0.452/6787 is leaving the kernel with locks still held!
-  2 locks held by syz.0.452/6787:
-   #0: (&q->io_lockdep_map){++++}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
-   #0: (&q->io_lockdep_map){++++}-{0:0}, at: blk_throtl_init+0x1f0/0x420 block/blk-throttle.c:1332
-   #1: (&q->q_lockdep_map){+.+.}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
-   #1: (&q->q_lockdep_map){+.+.}-{0:0}, at: blk_throtl_init+0x1f0/0x420 block/blk-throttle.c:1332
+ext4 supports a block size larger than the page size (LBS), e.g. a 32k
+block size on a machine with 4k pages [1].  Encryption, however, is
+still refused on such a filesystem: file contents used to be encrypted
+page by page in the fs-layer path, which cannot handle a folio that
+covers several data units, so the checks that refuse encryption with
+such a block size stayed in place.
 
-It is triggered by writing a blk-throttle limit while a null_blk device
-is being removed through configfs.
+Since commit 5acc6f649a68 ("fscrypt: Always use blk-crypto for
+contents on block-based filesystems") file contents are always
+encrypted through blk-crypto.  Inline encryption hardware can already
+en/decrypt a data unit that spans several pages, but the fallback and
+the block layer cannot carry such a data unit:
 
-Release the maps from __blk_mq_unfreeze_queue() while still holding
-mq_freeze_lock, where the flags can't change. del_gendisk() then only
-needs the explicit release when the queue is not unfrozen there.
+  1. blk-crypto-fallback en/decrypts a data unit with the bio_vecs of
+     a single page-clamped segment, so a larger data unit fails with
+     BLK_STS_INVAL;
+  2. the block layer requires every bio_vec of an encrypted bio to be
+     data unit aligned, and splits such a bio without rounding the
+     split size down to the data unit size;
+  3. iomap cuts the direct I/O bios of an encrypted file only at the
+     logical block size of the device, so a bio can end in the middle
+     of a data unit.
 
-Reported-by: syzbot+1eb53c83ab8b0a0302a6@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1eb53c83ab8b0a0302a6
-Fixes: 6f491a8d4b92 ("block: track disk DEAD state automatically for modeling queue freeze lockdep")
-Fixes: f6661b1d0525 ("block: track queue dying state automatically for modeling queue freeze lockdep")
-Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-Reproduced in QEMU (KASAN + lockdep). The window is tiny, so I widened it
-with a 300ms msleep() after mq_freeze_lock is dropped in
-blk_mq_unfreeze_queue_nomemrestore() for nullb1, while threads write
-"<maj:min> 1" to blkio.throttle.write_iops_device and the main thread
-toggles null_blk power via configfs. Unpatched: the warning above (2 locks
-held) within ~10s. Patched, with the same delay after the unfreeze: no
-warning. Only the null_blk path was tested.
+This series adds the missing pieces on all three layers, removes the
+refusals, and enables large folios for encrypted files on the way.
 
----
- block/blk-mq.c | 13 +++++--------
- block/blk.h    |  2 +-
- block/genhd.c  |  8 +++++---
- 3 files changed, 11 insertions(+), 12 deletions(-)
+[1]: https://lore.kernel.org/all/20251121090654.631996-1-libaokun@huaweicloud.com
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a26a11c73ee3..da52e3ab5c7c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -208,10 +208,8 @@ void blk_mq_freeze_queue_nomemsave(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_nomemsave);
- 
--bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
-+void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- {
--	bool unfreeze;
--
- 	mutex_lock(&q->mq_freeze_lock);
- 	if (force_atomic)
- 		q->q_usage_counter.data->force_atomic = true;
-@@ -221,16 +219,15 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- 		percpu_ref_resurrect(&q->q_usage_counter);
- 		wake_up_all(&q->mq_freeze_wq);
- 	}
--	unfreeze = blk_unfreeze_check_owner(q);
-+	/* release under the lock: a new freezer may rewrite the lockdep flags */
-+	if (blk_unfreeze_check_owner(q))
-+		blk_unfreeze_release_lock(q);
- 	mutex_unlock(&q->mq_freeze_lock);
--
--	return unfreeze;
- }
- 
- void blk_mq_unfreeze_queue_nomemrestore(struct request_queue *q)
- {
--	if (__blk_mq_unfreeze_queue(q, false))
--		blk_unfreeze_release_lock(q);
-+	__blk_mq_unfreeze_queue(q, false);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue_nomemrestore);
- 
-diff --git a/block/blk.h b/block/blk.h
-index 50abfd932886..16388de6c541 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -55,7 +55,7 @@ const char *blk_status_to_tag(blk_status_t status);
- blk_status_t tag_to_blk_status(const char *tag);
- enum req_op str_to_blk_op(const char *op);
- 
--bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
-+void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
- bool blk_queue_start_drain(struct request_queue *q);
- bool __blk_freeze_queue_start(struct request_queue *q,
- 			      struct task_struct *owner);
-diff --git a/block/genhd.c b/block/genhd.c
-index 10ca8b4d6eea..97dd290909c0 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -772,11 +772,13 @@ static void __del_gendisk(struct gendisk *disk)
- 	 * If the disk does not own the queue, allow using passthrough requests
- 	 * again.  Else leave the queue frozen to fail all I/O.
- 	 */
--	if (!test_bit(GD_OWNS_QUEUE, &disk->state))
-+	if (!test_bit(GD_OWNS_QUEUE, &disk->state)) {
- 		__blk_mq_unfreeze_queue(q, true);
--	else if (queue_is_mq(q))
--		blk_mq_exit_queue(q);
-+		return;
-+	}
- 
-+	if (queue_is_mq(q))
-+		blk_mq_exit_queue(q);
- 	if (start_drain)
- 		blk_unfreeze_release_lock(q);
- }
+Patch Overview
+==============
+
+  * Patches 1-2 (ext4, from Alberto Garcia) [2]: Refuse to set an
+    encryption policy when the block size is larger than the page size,
+    and reject encrypted inodes of such a filesystem.  They are the
+    fix for the stable branches; patch 11 removes the refusals again
+    for mainline.  They are carried along unchanged so that the series
+    applies cleanly on its own and avoids adaptation conflicts with
+    the stable fix.
+
+  * Patch 3 (blk-crypto): Reject the data unit sizes that
+    blk-crypto-fallback can't handle when the key is set up, instead of
+    failing every I/O with BLK_STS_INVAL.
+
+  * Patches 4-6 (blk-crypto-fallback): En/decrypt one data unit per
+    crypto request, so that a data unit can span several bio_vecs, and
+    support the data units that are larger than a page, whose bio_vecs
+    and scatterlists come from a mempool.
+
+  * Patch 7 (iomap): Cut the direct I/O bios of encrypted files at the
+    block size, so that they cover whole data units.
+
+  * Patches 8-10 (block): Round the split size of an encrypted bio
+    down to the data unit size, warn when a bio that must be split
+    cannot be split into a valid request, and drop the per-bio_vec data
+    unit alignment requirement, which a data unit larger than a page
+    cannot satisfy.  The contract is documented: an encrypted bio
+    starts at a data unit boundary and covers whole data units.
+
+  * Patches 11-13 (ext4): Remove the refusals, route the folios that
+    cover a data unit number wraparound to the buffer_head read path,
+    and enable large folios for encrypted files.
+
+[2]: https://lore.kernel.org/r/cover.1790343958.git.berto@igalia.com
+
+Benchmark
+=========
+
+Hardware: 96-core machine, 3.84T NVMe, 512G memory
+Filesystem: ext4, encryption on the fallback path
+
+Buffered sequential 1M writes and reads (1G, fsync) in MiB/s; medians
+of 3 runs.
+
+Base tree, 4k-block filesystem:
+
+  job         4k plain    4k enc
+  --------    --------    ------
+  seqwrite        1966      1134
+  seqread         1878       996
+
+With LBS enabled, encrypted 4k-block vs 32k-block filesystem:
+
+  job         4k enc    32k enc    32k plain    4k->32k
+  --------    ------    -------    ---------    -------
+  seqwrite      1044       1399         2062       +34%
+  seqread        931       1793         1791       +93%
+
+Buffered sequential writes (1G, fsync) of the encrypted 4k-block
+filesystem across request sizes, base tree vs this series:
+
+  bs      Before    After    gain
+  ----    ------    -----    ----
+  4k        1118     1162     +4%
+  16k       1260     1756    +39%
+  64k       1272     1977    +55%
+  256k      1308     2081    +59%
+  1M        1260     1455    +15%
+
+Testing
+=======
+
+  * kvm-xfstests -c ext4/all -g encrypt (which includes ext4/32k) has
+    been executed with no new failures.
+
+  * Manually verified read/write, fallocate -z and punch hole on 4k,
+    8k, 16k and 32k block sizes, and direct I/O with a properly
+    aligned user buffer on 4k, 8k and 32k block sizes.
+
+  * Manually verified fsx and fsstress on a 64k block size, and direct
+    I/O to an encrypted file on a 64k block size with a user buffer
+    backed by large folios.
+
+Comments and questions are, as always, welcome.
+
+Thanks,
+Baokun
+
+Alberto Garcia (2):
+  ext4: refuse encryption when block size > page size
+  ext4: reject encrypted inodes when block size > page size
+
+Baokun Li (11):
+  blk-crypto: reject fallback data unit sizes it can't handle
+  blk-crypto: decrypt one data unit per crypto request
+  blk-crypto: encrypt one data unit per crypto request
+  blk-crypto: support data units larger than a page
+  iomap: align the direct I/O bios of encrypted files to the block size
+  block: split encrypted bios at data unit boundaries
+  block: warn about bios that can't be split
+  block: don't require data unit aligned bio_vecs for encrypted bios
+  ext4: allow encryption with a block size larger than the page size
+  ext4: send folios that cover a wraparound to the buffer_head path
+  ext4: allow large folios for encrypted files
+
+ Documentation/block/inline-encryption.rst |  13 +
+ block/blk-crypto-fallback.c               | 446 +++++++++++++++++-----
+ block/blk-crypto-internal.h               |   4 +-
+ block/blk-crypto.c                        |  40 +-
+ block/blk-merge.c                         |  48 ++-
+ fs/crypto/block.c                         |   3 +
+ fs/ext4/readpage.c                        |  11 +
+ fs/ext4/super.c                           |  22 +-
+ fs/iomap/direct-io.c                      |  10 +
+ 9 files changed, 462 insertions(+), 135 deletions(-)
+
+
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
 -- 
-2.43.0
+2.43.7
 
