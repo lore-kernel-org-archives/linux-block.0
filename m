@@ -1,31 +1,31 @@
 Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307A638B7A5
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 10:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDE53C10A3
+	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 11:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791715065; cv=none; b=a8mk8rtYGXHxlpwxYtuIHr50pdXF7BqrDHQbWpiMbNAcuD24kZ8TDZ/aq2C1f/v3tsZ2CoQ0z25KEh6yR7zSIpos738dqVO40S5FlR7vWnZpPRF+CLgs20fdHigw72Pk9BEvT/PjkeFDe/Yu7OGN7NbcpQ/jiM8U0yKOI+Ep4o0=
+	t=1791718183; cv=none; b=Lv9SGNwmo2KTqxj6ecgy+zqam0qxANL/Ps1B3vPH/Pq5yODSXhq7TGNtdKuBWx4ybCxlRaTg3X9CxfacNhiSj/dIoNRmMLj083mFfo6hcL9f5fG5C7m1YNobWmQpMYV3k66k2jdqi+KYLlh0eNdlSnDVeuRKtQrzfDdVcOFgmi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791715065; c=relaxed/simple;
-	bh=IVxVDsxwAK0Mfeh7ik7k3M5R5wgiz0DpE1L17MZMuD8=;
+	s=arc-20240116; t=1791718183; c=relaxed/simple;
+	bh=c5SMHbwYwm7MT3Qv5fwem7upOXdhpnLyO+x99mG5OHg=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rfJpQ9zORfyBTWJL0RPoD1IPaAxhmH8XSA/GnHUDKpoqECGVg/UwKTqz1UbNGvXpQk9lVMfCotVjpzslm7FpAnF268iWOIxEw9ynrTMeaj9yn4bUkbNnn/07TsZPKKlCOUPUpuyVTJajedE/ynYkxS2br7SyO7LcjMjUaZmrWTY=
+	 In-Reply-To:Content-Type; b=ooFp8QuObuUBlouhYede0NFw91AQhU0zY6hOtm68xxVcIO6y+Ut9JAaVcNgqgTdnHbTG6zvT5v8PqskDw8FH71vDMjvAoaiQmG5RkIXdNkARC94dEXbDff47xToNEYun39Fuyd0FTUQZb+ybfoYaHm90B+723aqwO4BHUXaabMc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
 Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 69BAbRZK067766;
-	Sun, 11 Oct 2026 19:37:27 +0900 (JST)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 69BBTX0p008195;
+	Sun, 11 Oct 2026 20:29:33 +0900 (JST)
 	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
 Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
 	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 69BAbR8O067761
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 69BBTXuH008191
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 11 Oct 2026 19:37:27 +0900 (JST)
+	Sun, 11 Oct 2026 20:29:33 +0900 (JST)
 	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <380f04ef-902d-4664-9ae3-228692d2efb9@I-love.SAKURA.ne.jp>
-Date: Sun, 11 Oct 2026 19:37:27 +0900
+Message-ID: <696e5e7c-e3f1-4181-be2a-8915fd1753cf@I-love.SAKURA.ne.jp>
+Date: Sun, 11 Oct 2026 20:29:33 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,7 +33,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH] loop: Detect write requests that failed to wait for
+Subject: [PATCH v2] loop: Detect write requests that failed to wait for
  completion.
 From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
@@ -44,12 +44,13 @@ Cc: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>,
 References: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
  <20261007130851.GA30117@lst.de>
  <4d7c7365-259c-402e-9cf5-d55ad9333200@I-love.SAKURA.ne.jp>
+ <380f04ef-902d-4664-9ae3-228692d2efb9@I-love.SAKURA.ne.jp>
 Content-Language: en-US
-In-Reply-To: <4d7c7365-259c-402e-9cf5-d55ad9333200@I-love.SAKURA.ne.jp>
+In-Reply-To: <380f04ef-902d-4664-9ae3-228692d2efb9@I-love.SAKURA.ne.jp>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav215.rs.sakura.ne.jp
 X-Virus-Status: clean
-X-Anti-Virus-Server: fsav415.rs.sakura.ne.jp
 
 This is a debug patch which will be reverted after we observed what is
 happening. This patch does not attempt to fix the problem itself.
@@ -107,16 +108,36 @@ Link: https://lkml.kernel.org/r/fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKU
 Assisted-by: Gemini-Pro
 Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 ---
-Sashiko, does this analysis look correct for you?
+Changes in v2:
+  - Include linux/stacktrace.h file.
+  - Sashiko's review spotted that lo->lo_state is already Lo_unbound
+    by the time fput() is called. Therefore, don't check lo->lo_state
+    value, and check from only loop_handle_cmd() path. Since syzbot is
+    reporting that kworker is finding inflight I/O, this change should
+    still be able to catch [1] and [2] above.
+  - I would like to introduce a kernel config option like
+    CONFIG_DEBUG_AID_FOR_SYZBOT for gating debug code used by syzbot.
+    But that will be a different discussion.
+  - Not using ratelimit for reporting, for there should be only few
+    if any when loop_handle_cmd() finds one. Not checking from 
+    loop_queue_rq() path should reduce the amount of output a lot.
 
- drivers/block/loop.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ drivers/block/loop.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 758c20678bf6..09b72138543d 100644
+index 758c20678bf6..11fbe7691367 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -86,8 +86,27 @@ struct loop_cmd {
+@@ -36,6 +36,7 @@
+ #include <linux/blk-mq.h>
+ #include <linux/spinlock.h>
+ #include <uapi/linux/loop.h>
++#include <linux/stacktrace.h>
+ 
+ /* Possible states of device */
+ enum {
+@@ -86,6 +87,12 @@ struct loop_cmd {
  	struct bio_vec *bvec;
  	struct cgroup_subsys_state *blkcg_css;
  	struct cgroup_subsys_state *memcg_css;
@@ -128,23 +149,8 @@ index 758c20678bf6..09b72138543d 100644
 +#endif
  };
  
-+static void loop_check_io_race(struct loop_device *lo, struct loop_cmd *cmd)
-+{
-+#ifdef CONFIG_KCOV
-+	if (unlikely(READ_ONCE(lo->lo_state) == Lo_rundown &&
-+		     disk_openers(lo->lo_disk) == 0)) {
-+		pr_err("BUG: %s/%u is doing I/O request on loop%d in Lo_rundown state.\n",
-+		       cmd->comm, cmd->pid, lo->lo_number);
-+		printk("Call Trace:\n");
-+		stack_trace_print(cmd->stack_entries, cmd->stack_nr, 4);
-+	}
-+#endif
-+}
-+
  #define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
- #define LOOP_DEFAULT_HW_Q_DEPTH 128
- 
-@@ -1879,10 +1898,18 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+@@ -1879,6 +1886,12 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
  	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
  	struct loop_device *lo = rq->q->queuedata;
  
@@ -156,19 +162,19 @@ index 758c20678bf6..09b72138543d 100644
 +
  	blk_mq_start_request(rq);
  
--	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
-+	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound) {
-+		loop_check_io_race(lo, cmd);
- 		return BLK_STS_IOERR;
-+	}
- 
- 	switch (req_op(rq)) {
- 	case REQ_OP_FLUSH:
-@@ -1925,6 +1952,7 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+ 	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
+@@ -1925,6 +1938,14 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
  	int ret = 0;
  	struct mem_cgroup *old_memcg = NULL;
  
-+	loop_check_io_race(lo, cmd);
++#ifdef CONFIG_KCOV
++	if (unlikely(disk_openers(lo->lo_disk) == 0)) {
++		pr_err("BUG: loop%d has no users, but backend found I/O issued by %s/%u.\n",
++		       lo->lo_number, cmd->comm, cmd->pid);
++		printk("Call Trace:\n");
++		stack_trace_print(cmd->stack_entries, cmd->stack_nr, 4);
++	}
++#endif
  	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
  		ret = -EIO;
  		goto failed;
