@@ -1,48 +1,33 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19E73E44ED;
-	Sun, 11 Oct 2026 13:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D80390600;
+	Sun, 11 Oct 2026 14:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791725724; cv=none; b=eealgFnU3JoCU1lBp6efrzba0kmP+l0jY2mpjkazauM81PWr7B7lynV+fMQI5GKql4DlyrSc0QJlHMIAPbcad9TrZxZgzN0t0uiwnEuUZSv3S+8By0h6Y5r2rry26yq2Zn7+FqBbq0OA/AvkCVo8AuJEdVDkbHuqeC4n3Uq0ZEk=
+	t=1791729981; cv=none; b=UySlXBVzG61T6iyM6GJCEJBEJh/IH2O8MpV8xD+mXl0B/I3pNkfPO+sM1Jb2FMR1IxvkDbKK9mSyOllAEeREd90aCEEPYJx5PDu+70D5qLkpr2TO2rjyfVASlNg/GPwyybIpGfgYRhiMeP3SIlb1SXhzwJxX33ig/J8OStGSP80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791725724; c=relaxed/simple;
-	bh=olEQ7uTMIRyhlqZfPRhlLG7sAoLaTK+ei5OoxwQo/wg=;
+	s=arc-20240116; t=1791729981; c=relaxed/simple;
+	bh=fyocAXO7Xsf5Sy3fD//8BuOiTzegYpqX4ZZ/0j4J71w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I/HNAyo8rRfdB5FSsJE2ZYs/PW22ODSzKcvPpir7VV63S3MpuBwdoo/etlXt2ctUgF1obhbKQoZ3iOUBIV9bBcWY1suuI1uqWIPAdH37n+hMwxfqEgy/dyhE2FmugYRvqSw/hrkfP6pHp/YGIwqsEcW0x6FCPElWNMCqEMHdnwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=eTrTf8PY; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=QCCAq2RMDwPPcuvT0kb4Ydo7weh9WQaefNiUFFnO/q8s5C4tix2JvGPHgcd+EuBghtSo+yZ2wVWmRPqTIeCW22HTDuJvJti9xsKXkUkoFw/QdBFZOUdNvmgHgUSa47y/pxAtB6nk47hj0uhz2ke6PK/0ls8Ai1jqxbyY6ugk4Wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/Fz1a/h; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="eTrTf8PY"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4j2hRk0hfRzlfvpn;
-	Sun, 11 Oct 2026 13:35:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1791725709; x=1794317710; bh=2BBs7ABEyUHXGEcdvbeBCH4b
-	I40jWt5rrxWkfA8f2As=; b=eTrTf8PYm4gxE/vGgQAQ588nJLoYW/+HqvRCg5ZQ
-	V/x9+Z2MGz9jWa6HgfWRWv5KmOmgx1rdLIi9FJZIkv9AW1DvE3C6xnro/Ub+CC3i
-	d/nyCNZYN3REiF5kuyOqCJVCIATijNcVJiB4M/N6IfS2A0ez1wqvqZcch1jySg3x
-	iVoMblvqjGKMqkdBcilC3v5AU5kI7nY3GdsYTTfD7qpuV/EiYuMeW0Dbe0mk2J7b
-	dZwQ6HFXFxuaB0JWms7pwuS4KxHawvK1ZQcsdOscxSd5wWxVXr0eskPZWbWWu3Vt
-	6XXXdmNKLZfad0lZ+UOJYHvI2xmBktgi5tx288gci6WlxA==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id GMHwyDnBMJAp; Sun, 11 Oct 2026 13:35:09 +0000 (UTC)
-Received: from [192.168.51.14] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4j2hRc45mMzlfvpb;
-	Sun, 11 Oct 2026 13:35:08 +0000 (UTC)
-Message-ID: <8733b34f-45be-4395-8575-53690c1c406f@acm.org>
-Date: Sun, 11 Oct 2026 06:35:06 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/Fz1a/h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7B281F0089B;
+	Sun, 11 Oct 2026 14:46:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791729979;
+	bh=a8Wq7xaJ9QHjtkQKXx8Mftm0gxTB/vSerG9iKyW/5no=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=a/Fz1a/hRmosoQNBGgjBEsicc19lP+o6pFwRH/IOtEyOtvYFnDh63aH1GN94nDfrd
+	 0rAwHamoL/vdJ2y61h9/zaKytQjExxLYpqlQ0dWeNkH8Cxp+TDoHrGJh2A2jLG9nqI
+	 oL5tszm9c9VfWkcbIs+GSRhxMpNdIsMCbT5wrVa+uLWB4dQ6XoxDz97lxKkiZfyI4t
+	 KVDBQaSDwxWEMpNqbzFD8LLWRkPN6ZuteqIulaf1bSo+N3skpNtNTsQ096+HEd8jOP
+	 A0jQD8DBWeZy419Rk0OmxH2F0Qa/kmpv9DNw2CMXF7IoF3p9AilBpbdoMC04QtwbwQ
+	 DiGGlVvIFYBug==
+Message-ID: <e146448b-5210-4215-821f-181c91625141@kernel.org>
+Date: Sun, 11 Oct 2026 16:46:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,73 +35,103 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nbd: fail requests stuck on a dead socket when timeout is
- 0
-To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>, josef@toxicpanda.com,
- axboe@kernel.dk
-Cc: mchristi@redhat.com, linux-block@vger.kernel.org, nbd@other.debian.org,
- linux-kernel@vger.kernel.org,
- syzbot+90895f5bfaa7243c2d20@syzkaller.appspotmail.com
-References: <20261011033739.18434-1-ngocthang2710.1999@gmail.com>
+Subject: Re: [PATCH 1/2] block: only use the cached zone report if
+ BLK_ZONE_REP_CACHED is set
+To: Shashank Mohan Jain <jain.sm@gmail.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>,
+ "Martin K. Petersen" <mkp@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20261011051906.60397-1-jain.sm@gmail.com>
+ <20261011051906.60397-2-jain.sm@gmail.com>
+From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20261011033739.18434-1-ngocthang2710.1999@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Organization: Western Digital Research
+In-Reply-To: <20261011051906.60397-2-jain.sm@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/10/26 8:37 PM, Nguyen Ngoc Thang wrote:
-> With a zero command timeout, nbd_xmit_timeout() only logs a "possible
-> stuck request" message and resets the timer. A request already sent on
-> a socket that has since died is never completed this way, because
-> nothing will ever answer it.
+On 2026/10/11 7:19, Shashank Mohan Jain wrote:
+> BLKREPORTZONEV2 takes the flags field of struct blk_zone_report as an
+> input. With BLK_ZONE_REP_CACHED the report is built from the zone
+> information cached by the block layer. Without it, BLKREPORTZONEV2 is
+> documented to behave like BLKREPORTZONE and to get the report from the
+> device: this is what the changelog of the commit that added the ioctl
+> and the comments in include/uapi/linux/blkzoned.h say.
 > 
-> That blocks nbd_set_size(), which freezes the queue while holding
-> nbd->config_lock and genl_mutex. The freeze waits for the stuck request
-> forever, and reconnecting a socket (which would change the cookie and
-> get the request requeued) can't happen as it is handled later by the
-> same reconfigure call. Everything touching the device then hangs,
-> including partition scanning in udev:
+> blkdev_report_zones_ioctl() only uses the flag to validate the input
+> and calls blkdev_report_zones_cached() for every BLKREPORTZONEV2
+> request. A caller that passes flags == 0 gets the cached report, in
+> which implicitly open, explicitly open and closed zones all have the
+> condition BLK_ZONE_COND_ACTIVE, and an explicitly opened empty zone is
+> reported as empty.
 > 
->    INFO: task udevd blocked for more than 143 seconds.
->     __bio_queue_enter+0x369/0x7f0 block/blk-core.c:396
->     blk_mq_submit_bio+0x776/0x2a70 block/blk-mq.c:3127
->     ...
->    INFO: task syz.0.17 blocked for more than 143 seconds.
->     blk_mq_freeze_queue_wait+0x101/0x180 block/blk-mq.c:191
->     queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
->     nbd_set_size+0x4c5/0x7d0 drivers/block/nbd.c:383
->     nbd_genl_reconfigure+0x7e1/0x1040 drivers/block/nbd.c:2444
+> Example with a zoned null_blk device (10 MiB, 4 MiB zones) after
+> BLKOPENZONE on zone 0, and a write of 8 sectors to zone 1 followed by
+> BLKCLOSEZONE:
 > 
-> Requeue the request when its socket is dead, as is already done when
-> the socket was replaced. The submit path then waits for a reconnect up
-> to dead_conn_timeout and otherwise fails the request with an I/O error.
+>   BLKREPORTZONE:             zone 0 cond 0x3 (EXP_OPEN)
+>                              zone 1 cond 0x4 (CLOSED)
+>   BLKREPORTZONEV2, flags 0:  zone 0 cond 0x1 (EMPTY)
+>                              zone 1 cond 0xff (ACTIVE)
 > 
-> Reported-by: syzbot+90895f5bfaa7243c2d20@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=90895f5bfaa7243c2d20
-> Fixes: 2da22da57348 ("nbd: fix zero cmd timeout handling v2")
-> Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+> The uapi header marks BLKREPORTZONE as deprecated in favour of
+> BLKREPORTZONEV2. A program that follows this and does not ask for
+> cached information can no longer tell open zones from closed ones, and
+> is handed BLK_ZONE_COND_ACTIVE, which is only defined for the cached
+> report.
+> 
+> Call blkdev_report_zones_cached() only if BLK_ZONE_REP_CACHED is set,
+> and blkdev_report_zones() otherwise.
+> 
+> Tested with zoned null_blk devices in qemu: a program that compares
+> the reports of BLKREPORTZONE and BLKREPORTZONEV2 with flags 0 after
+> the sequence above finds the differences before this change and none
+> with it. The report with BLK_ZONE_REP_CACHED is unchanged.
+> 
+> Fixes: b30ffcdc0c15 ("block: introduce BLKREPORTZONESV2 ioctl")
+> Cc: stable@vger.kernel.org
+> Assisted-by: LLM
+> Signed-off-by: Shashank Mohan Jain <jain.sm@gmail.com>
 > ---
->   drivers/block/nbd.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> Prepared with Claude Code (Anthropic), model Claude Opus 5.5
+> (claude-opus-5-5).
 > 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index ffce519bf008..218b99f9e1ef 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -532,7 +532,8 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
->   			blk_rq_bytes(req), (req->timeout / HZ) * cmd->retries);
->   
->   		mutex_lock(&nsock->tx_lock);
-> -		if (cmd->cookie != nsock->cookie) {
-> +		/* A dead socket will never complete this request. */
-> +		if (cmd->cookie != nsock->cookie || nsock->dead) {
->   			nbd_requeue_cmd(cmd);
->   			mutex_unlock(&nsock->tx_lock);
->   			mutex_unlock(&cmd->lock);
+>  block/blk-zoned.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 475aa16bc4..9555eae91a 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -400,6 +400,13 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, unsigned int cmd,
+>  	case BLKREPORTZONEV2:
+>  		if (rep.flags & ~BLK_ZONE_REPV2_INPUT_FLAGS)
+>  			return -EINVAL;
+> +		if (!(rep.flags & BLK_ZONE_REP_CACHED)) {
+> +			ret = blkdev_report_zones(bdev, rep.sector,
+> +						  rep.nr_zones,
+> +						  blkdev_copy_zone_to_user,
+> +						  &args);
+> +			break;
+> +		}
+>  		ret = blkdev_report_zones_cached(bdev, rep.sector, rep.nr_zones,
+>  					 blkdev_copy_zone_to_user, &args);
 
-If AI was used to create this patch an Assisted-by tag should be added.
-See also Documentation/process/coding-assistants.rst. Anyway, since this
-patch looks good to me:
+Can you reverse this if to be "if (rep.flags & BLK_ZONE_REP_CACHED) {" and to
+call blkdev_report_zones_cached if the condition is true? That would be a lot
+more logical.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Also, the condition should probably be:
 
+	if ((rep.flags & BLK_ZONE_REP_CACHED) &&
+	    blkdev_has_cached_report_zones(bdev))
+
+to be more efficient and avoid a call to blkdev_report_zones_cached() which will
+turn into a regular device report zones.
+
+
+-- 
+Damien Le Moal
+Western Digital Research
