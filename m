@@ -1,74 +1,74 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B00139A07B
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 06:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451703630AC
+	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 06:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791700597; cv=none; b=DkR/PYzPh9sp2+LEG1RLLpploKNKIcTqKonAtWZcr02CVZt0+5T2un67E1P6TElq0VqSnEpmZKExAFnIyzN6+d2M7rg4lzC56wjxYK8o3VAiTZ8KUMaSQZsCvQGrK/AZDAzwj6I+taUe12xRRY6WKWgQycFriIAs2GORjFsAHHA=
+	t=1791700603; cv=none; b=kD58bpskOocNKoa321IIktBvvV6Ww8/GI5eBNIhsP4giRcLVITadpP95VtZFJoogRXgIEeI8PDK28Ysn0CZRKKa22KiVONf8EeBuOBwwuA0OWuda50RKQGBoIlPs4vzgyFtKTDN/b6iTKWs1vbgsd429jayJ7Iy1gkGdyWuSsY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791700597; c=relaxed/simple;
-	bh=RpcUXo8JS3Tnr+IjBRaJ28jv2kPklpyCxmGiXtOkWXk=;
+	s=arc-20240116; t=1791700603; c=relaxed/simple;
+	bh=v3qfm6wklJ5sYDyK9S5DVrUEAXOJSlLaBvPqwOkqw8E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aTNv10eCO0e0XhdCLj9S47PFo9JnP89/sn5pujfEelUElT/S/Xkx1fPKzA0IZE/DYIm9BgUxzSE0pNk6timgR7dgWTmeLOCSU88H+SM69oVNGw0JDsKYDyUGxwNFvPNYpjrUuqsaYPATq4nVFO2T/DpvBq1Huw8gvle/ysqezew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VzspeA2u; arc=none smtp.client-ip=209.85.210.51
+	 MIME-Version; b=pPv0DeSTDa2medLITvB/EXN3HwKZbArqI3D5G046afQU1Mv/E7vD+UkxTlx0jHOhecHeyrEms0c5Kp++ReuTnzbAqPi/T2dfd/PfMsa1nYkmzkj6wGrZAt58awtSZrfyisZBK26gOBXDlFqF8b5m09pu2gOejPZFlvdHZVi7Gf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rPfBGgcm; arc=none smtp.client-ip=209.85.210.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VzspeA2u"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-81c5aac8478so702911a34.0
-        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 23:36:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rPfBGgcm"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-8241a56cd70so711388a34.3
+        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 23:36:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791700595; x=1792305395; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791700600; x=1792305400; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=a4J8rnXiyNcxfokn0csdzG80qUwxn8x6ELC14oqLC1E=;
-        b=VzspeA2unTNlh6fOmnCpaBT9uMKSSvLOb5E1h7O+RQeBFVn9K1ewOAXFZsYH6ouaEY
-         Qd4nNhFZzHnRRzlcC9goa+lqrUITgvMaDNo7xRL1SNfLNaE8HtpfcX6cDKF2uIzP2DXR
-         DZ95Inmt8dTXVJxJkU/Mi3f+/LAaeC80Lq6Q6SbVIH7IZ6CAs0PH9KvyIwTxIQli+2Vn
-         vqg5SPPYNTT4gmp7dZaOuk7B/qiDWiWGoJs1l4JpuZroXfkzJhmzM8q4S1LpvV5Sh0bY
-         EhwtJd3Y0gjyPsztk5NtkpzheH2cE9Vd/fIKG16UOnRD7Dn2JMwYaY3UhzS5oqnvthE/
-         dbTQ==
+        bh=JzVDiQ4vdqH2cufVW1Y1Q62RqmOwAfXu8K2JkT+aQDc=;
+        b=rPfBGgcmeFbN6yJq5Cq4Lxxo+PShNqDJDhov5uXyPVQ4VOjz4dookQoCy29jiIpWQf
+         g831Xv5KQiZ7R+et2PF2Pmjwiux7jvuoboZvX9yOCaeN6i+znWhjx7nGurSCovVsHM+z
+         4oFCEok0x9WCJjqG1CeAjYTXIh1+JH7My7B0rNhv43Wz2Jn/cZP30z0fx9ZlVSA2BDL/
+         RBKFAgHmwZotkNTllguinx8ScrY9fuxzQPwuqpEgQzwm9a148QqNo629Bcs837yhSYGk
+         pqTdgA7M1bNoVDmWRLzyYgCRHL2Ev02gIk6+SHyob/GCApembLod0coM9tb2dnhdQhQR
+         KG6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791700595; x=1792305395;
+        d=1e100.net; s=20260707; t=1791700600; x=1792305400;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=a4J8rnXiyNcxfokn0csdzG80qUwxn8x6ELC14oqLC1E=;
-        b=UtPaLReknak8lWIsUb6Jr5wqUlV0QgXaQKdd3UtVDxfH42ENfuNwqplMkSlCpLiJ3G
-         ryoNjo7l8llef64k3rNlIFh8mY8oMF0ZHDA7ocj4HApA2QNYtRiOL+G/W1wVhsyTQG1D
-         s19fpouua6W3At+f8F4uleAU37LTbwEekmolC0f4gRzIsTuj8iyPrmQoLTbXTlF6QDPR
-         pzuSBKf2WvBXTtsw/5yRe0aOoooQDleTUGZuqdXohk5JYuydqDDHP7Xmslpy5Mc+aZKl
-         AYt8r7/sM+C3uSJCTJ1FQwgz5ZdDyrF4ywSrVMSKVL+IVIrhsDWiQDwcD7ixggpTIxxN
-         Yv4w==
-X-Gm-Message-State: AFq9FYJvQQ5s6RxgyKLNIYp9HZg/OD1euxvfxm9XUAw6PiAUdo4MVinN
-	qe8M/ed4BlCTpeGrElaHJbWx6G15oE3Gg1tYeFp+PekwVUmlVe9kZmtbopaHNBYQ
-X-Gm-Gg: AYBFou2iRXbkBqroMZ2Tfdvb8N8hJd2DyIfJWepAqfSwSfbukC6jA7G1ZxOowVlC+o8
-	5w2ifu9ewDTh8V0Y6IiR2m9BfzU+y8hCcm4Xdn777Cu/65Cx8JHW7qMdLUpPSzeaTji7MTWTm22
-	WB9i62bYVwUp7wuEOMXH22GTwbBRmLhtWClpa2txR6SpiMBgJ5pDGTsBEjSB8H7hYpx3JRQsB7M
-	Rcx97RnugHer7bKpAmphuqFEzGwhcfW2t5OgdNOEi0h1bmV8uTJ/242oquveKsfMs7zLhNJ6c3N
-	XSlr55eTET2IeGDapZ7DsUGyNlr9r1dehsasvdCgu8LIe5WSfnkIsa5ec0gpFc7ZK9jAkVvi6Tl
-	2zkiJ6QPb2MrT/6Q55CfF87yAY+WK6TpWIi28bu5C1HN8Bqz8F7INkdePb58Y6iNCDl+HoSv6Rp
-	u9e3T4g08nHTRvWZEYPHmvSXJ9kGC5XtQ2t0O2PkVnB9vZayy1N34y1QVUWMHZO3Sc2fAlo8XJJ
-	uQg/WirpKaliQvApFgaB9afQIM5I1T0UkuPeLaTRSVDfA/uhkACXGPbDBWIgB8QehRzyBZvMpsx
-	G821aAAy6Xul3uUV8dDvUNMzip7TZDL4q5zOSw==
-X-Received: by 2002:a05:6830:6a8e:b0:7fa:ab72:9e01 with SMTP id 46e09a7af769-83097c63007mr5772120a34.25.1791700595335;
-        Sat, 10 Oct 2026 23:36:35 -0700 (PDT)
+        bh=JzVDiQ4vdqH2cufVW1Y1Q62RqmOwAfXu8K2JkT+aQDc=;
+        b=iuw/hLQ93A+yxvo+xN6pO4YXvRHHaLruynEwGk8/FPN231Y47Y+7P/DGAIfoSEwelX
+         8XvTQd7U0Fr7Z5oxHR8jMqValQhMCwQG824mkAAltE5m4NnUHnr+I284oPrg0yTbpM7C
+         +LVjgHkFvFq74LMCztKVcknELLdOvosqlkeJF5PlfojaJAMH7Ps2z4RluZwLKHNitLmj
+         ZbhhloISYTfOfUGfZUAMo3B5ZKJOh0cr2x8nkgSYU84ZwuVAV8EJnEIvJKnfDgmGE3QQ
+         nP5aFj4vB6x+Gb5QfgFI9QumsoO6w5kRhBe83czfluC/DLzKP/h482q8HKwafA1mMMdT
+         qwQQ==
+X-Gm-Message-State: AFq9FYL67SyBdIP4wTkAbAns5cd9RUK70dLN8QF/bwC7nYqfbhzfDpGT
+	u9OziwFUilExPVRBNgViT3kgVYHuE80fSwCXy3X192WnqLLA7AC2qI7lh5ZoXaht
+X-Gm-Gg: AYBFou3uQprHSETjb4LIHOPp8HvvunXRjOnBabYqPnAHqXNACFJ44SiGwhmxmgII3Cu
+	DrZw/29ZBSQwXxYlPtYmGuE0gyYRyQHZuDn6rVisVuSz+syiYTYQ4vzgyOuVwxlPJkty/ZzxV5z
+	rhkbl1ifGCXPpgEPOmfClj1HoFcHxx+WpYO/YY9rpwx0zxLTOnuiwEECmh3KQZigSMZlqEn7pIw
+	rjVs+Wo9rK95KXeuku5Wwdk0LLxaO53M0CsK4Hyaf9y8GtssdqiGIWDpVlR6UaawHinaJqqjU6M
+	kSTEbrZowRendK7eew1g04tsgXdOveKK/DWGYbmUMI5FYAumdHkZI0xpkXO9EHrt2LU5sHTcBN7
+	B4Uw3swDT+XCVoUHLjmHGpBRCN5rFVreW1uGAQ4jWmF4xg3eOHxhMaEUMduqAeTH07tqf/ZTgWq
+	FjX2qUpCFl8IjL1rxg7/BDgsQib8BtZKk65j5yCcCVyg5v9GLJQwKMepOAkWVgNKY/0FgtPf9hs
+	tDaOYcVXyARRYxX4TCj4A3t9PCJfpncca67J2K4Z44ZD4h5kA/d97+hCkpFD/HtST5yUXfiXUuZ
+	nut0PxcSvXaRsa+CCE/NIpI/caxZFXS/I2/8TQ==
+X-Received: by 2002:a05:6820:6ae3:b0:6c1:6bdc:466c with SMTP id 006d021491bc7-6ef0d333ad3mr4355409eaf.20.1791700600092;
+        Sat, 10 Oct 2026 23:36:40 -0700 (PDT)
 Received: from fedora-laptop.tail348456.ts.net ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8303a515aa9sm6593164a34.25.2026.10.10.23.36.32
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8303a515aa9sm6593164a34.25.2026.10.10.23.36.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Oct 2026 23:36:35 -0700 (PDT)
+        Sat, 10 Oct 2026 23:36:39 -0700 (PDT)
 From: Ming Lei <tom.leiming@gmail.com>
 To: linux-block@vger.kernel.org
-Cc: Josef Bacik <josef@toxicpanda.com>,
+Cc: Ming Lei <tom.leiming@gmail.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Caleb Sander Mateos <csander@purestorage.com>,
-	Li RongQing <lirongqing@baidu.com>,
-	Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 08/12] ublk: refuse to go live after an io command was canceled
-Date: Sun, 11 Oct 2026 01:35:51 -0500
-Message-ID: <20261011063555.1142277-9-tom.leiming@gmail.com>
+	Josef Bacik <josef@toxicpanda.com>,
+	Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH v3 09/12] selftests: ublk: move the control command helpers into ctrl.c
+Date: Sun, 11 Oct 2026 01:35:52 -0500
+Message-ID: <20261011063555.1142277-10-tom.leiming@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261011063555.1142277-1-tom.leiming@gmail.com>
 References: <20261011063555.1142277-1-tom.leiming@gmail.com>
@@ -80,148 +80,645 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Josef Bacik <josef@toxicpanda.com>
+Move the ublk_ctrl_*() helpers and ublk_setup_ring() out of kublk.c,
+so a small test program can send control commands without copying
+them. kublk still links every *.c file, ctrl.c included.
 
-Since commit "ublk: keep a canceled FETCH round canceling until the
-server is gone", a device whose FETCH round saw a cancel keeps its
-queues canceling until the server goes away, but START_DEV and
-END_USER_RECOVERY still bring it up. Without UBLK_F_USER_RECOVERY, or
-with UBLK_F_USER_RECOVERY_FAIL_IO, every request of the new disk fails.
-With UBLK_F_USER_RECOVERY, requests are requeued and never kicked: after
-START_DEV the partition scan hangs under disk->open_mutex, and after
-END_USER_RECOVERY every read parks while the command returned 0. The
-server cannot fetch the canceled commands again, so the device can't
-serve I/O until it restarts anyway.
+ublk_ctrl_deinit() now also exits the control ring, and ublk_ctrl_init()
+checks the allocation and closes /dev/ublk-control when the ring setup
+fails. kublk calls them only around its own lifetime, but a test which
+opens a control handle per thread must not leak.
 
-Return -EBUSY from START_DEV and END_USER_RECOVERY while ub->canceling
-is set. In ublk_ctrl_start_dev() check it and publish ub->ub_disk in one
-cancel_mutex section, and have ublk_start_cancel() read the disk in its
-cancel_mutex section. Today ublk_start_cancel() samples the disk before
-taking the mutex, so a server dying during its own START_DEV can mark
-the queues without quiescing a disk START_DEV published in between, with
-its first I/O past the canceling check. Now either START_DEV sees the
-cancel, or the cancel sees the disk and quiesces it before marking. The
-END_USER_RECOVERY check is best effort: the disk exists there, and a
-cancel after it is the ordinary death of the new server, which
-ublk_start_cancel() handles by quiescing and marking.
+No functional change for kublk.
 
-Assisted-by: LLM
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- Documentation/block/ublk.rst | 10 ++++++++--
- drivers/block/ublk_drv.c     | 38 ++++++++++++++++++++++++++++++++++--
- 2 files changed, 44 insertions(+), 4 deletions(-)
+ tools/testing/selftests/ublk/ctrl.c  | 268 ++++++++++++++++++++++++++
+ tools/testing/selftests/ublk/kublk.c | 271 ---------------------------
+ tools/testing/selftests/ublk/kublk.h |  32 ++++
+ 3 files changed, 300 insertions(+), 271 deletions(-)
+ create mode 100644 tools/testing/selftests/ublk/ctrl.c
 
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index ed3285e361ad..f07611b0d489 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -118,7 +118,11 @@ managing and controlling ublk devices with help of several control commands:
-   After the server prepares userspace resources (such as creating I/O handler
-   threads & io_uring for handling ublk IO), this command is sent to the
-   driver for allocating & exposing ``/dev/ublkb*``. Parameters set via
--  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device.
-+  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device. The command
-+  fails with ``-EBUSY`` if an I/O command fetched by the current server
-+  was canceled, because its io_uring is gone. The server can't fetch it
-+  again, and the device can be started again once the server has closed
-+  ``/dev/ublkc*``.
- 
- - ``UBLK_CMD_STOP_DEV``
- 
-@@ -202,7 +206,9 @@ managing and controlling ublk devices with help of several control commands:
-   command is accepted after ublk device is quiesced and a new process has
-   opened ``/dev/ublkc*`` and get all ublk queues be ready. When this command
-   returns, ublk device is unquiesced and new I/O requests are passed to the
--  new process.
-+  new process. It fails with ``-EBUSY`` if an I/O command of the new
-+  process was canceled already. The recovery can be started over once the
-+  new process has closed ``/dev/ublkc*``.
- 
- - user recovery feature description
- 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index a0b8b730e4f5..24a7f80e191c 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -2759,9 +2759,11 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
- 
- static void ublk_start_cancel(struct ublk_device *ub)
- {
--	struct gendisk *disk = ublk_get_disk(ub);
-+	struct gendisk *disk;
- 
-+	/* sync with ublk_ctrl_start_dev() publishing the disk */
- 	mutex_lock(&ub->cancel_mutex);
-+	disk = ublk_get_disk(ub);
- 	if (ub->canceling)
- 		goto out;
- 
-@@ -4575,6 +4577,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
- 		.dma_alignment		= 3,
- 	};
- 	struct gendisk *disk;
-+	bool canceled;
- 	int ret = -EINVAL;
- 
- 	if (ublksrv_pid <= 0)
-@@ -4665,8 +4668,24 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
- 	disk->fops = &ub_fops;
- 	disk->private_data = ub;
- 
-+	/*
-+	 * A command of this FETCH round was canceled and can't be fetched
-+	 * again, don't bring up a disk over it.  Check and publish the disk
-+	 * in one cancel_mutex section: either this sees ub->canceling, or
-+	 * ublk_start_cancel() sees the disk and quiesces it before marking
-+	 * the queues.
-+	 */
-+	mutex_lock(&ub->cancel_mutex);
-+	canceled = ub->canceling;
-+	if (!canceled)
-+		ub->ub_disk = disk;
-+	mutex_unlock(&ub->cancel_mutex);
-+	if (canceled) {
-+		put_disk(disk);
-+		ret = -EBUSY;
-+		goto out_unlock;
-+	}
- 	ub->dev_info.ublksrv_pid = ub->ublksrv_tgid;
--	ub->ub_disk = disk;
- 
- 	ublk_apply_params(ub);
- 
-@@ -5243,6 +5262,7 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
- 		const struct ublksrv_ctrl_cmd *header)
- {
- 	int ublksrv_pid = (int)header->data[0];
-+	bool canceled;
- 	int ret = -EINVAL;
- 
- 	pr_devel("%s: Waiting for all FETCH_REQs, dev id %d...\n", __func__,
-@@ -5266,6 +5286,20 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
- 		ret = -EBUSY;
- 		goto out_unlock;
- 	}
+diff --git a/tools/testing/selftests/ublk/ctrl.c b/tools/testing/selftests/ublk/ctrl.c
+new file mode 100644
+index 000000000000..53d54799f909
+--- /dev/null
++++ b/tools/testing/selftests/ublk/ctrl.c
+@@ -0,0 +1,268 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+	/*
-+	 * As in ublk_ctrl_start_dev(), a canceled command can't be fetched
-+	 * again.  Best effort: the disk exists here, and a cancel after this
-+	 * check is the ordinary death of the new server, which
-+	 * ublk_start_cancel() handles by quiescing and marking.
-+	 */
-+	mutex_lock(&ub->cancel_mutex);
-+	canceled = ub->canceling;
-+	mutex_unlock(&ub->cancel_mutex);
-+	if (canceled) {
-+		ret = -EBUSY;
-+		goto out_unlock;
++/* ublk control commands, shared by kublk and ublk_cancel_ready */
++
++#include "kublk.h"
++
++static void ublk_ctrl_init_cmd(struct ublk_dev *dev,
++		struct io_uring_sqe *sqe,
++		struct ublk_ctrl_cmd_data *data)
++{
++	struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
++	struct ublksrv_ctrl_cmd *cmd = (struct ublksrv_ctrl_cmd *)ublk_get_sqe_cmd(sqe);
++
++	sqe->fd = dev->ctrl_fd;
++	sqe->opcode = IORING_OP_URING_CMD;
++	sqe->ioprio = 0;
++
++	if (data->flags & CTRL_CMD_HAS_BUF) {
++		cmd->addr = data->addr;
++		cmd->len = data->len;
 +	}
- 	ub->dev_info.ublksrv_pid = ub->ublksrv_tgid;
- 	ub->dev_info.state = UBLK_S_DEV_LIVE;
- 	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
++
++	if (data->flags & CTRL_CMD_HAS_DATA)
++		cmd->data[0] = data->data[0];
++
++	cmd->dev_id = info->dev_id;
++	cmd->queue_id = -1;
++
++	ublk_set_sqe_cmd_op(sqe, data->cmd_op);
++
++	io_uring_sqe_set_data(sqe, cmd);
++}
++
++int __ublk_ctrl_cmd(struct ublk_dev *dev,
++		struct ublk_ctrl_cmd_data *data)
++{
++	struct io_uring_sqe *sqe;
++	struct io_uring_cqe *cqe;
++	int ret = -EINVAL;
++
++	sqe = io_uring_get_sqe(&dev->ring);
++	if (!sqe) {
++		ublk_err("%s: can't get sqe ret %d\n", __func__, ret);
++		return ret;
++	}
++
++	ublk_ctrl_init_cmd(dev, sqe, data);
++
++	ret = io_uring_submit(&dev->ring);
++	if (ret < 0) {
++		ublk_err("uring submit ret %d\n", ret);
++		return ret;
++	}
++
++	ret = io_uring_wait_cqe(&dev->ring, &cqe);
++	if (ret < 0) {
++		ublk_err("wait cqe: %s\n", strerror(-ret));
++		return ret;
++	}
++	io_uring_cqe_seen(&dev->ring, cqe);
++
++	return cqe->res;
++}
++
++void ublk_ctrl_deinit(struct ublk_dev *dev)
++{
++	io_uring_queue_exit(&dev->ring);
++	close(dev->ctrl_fd);
++	free(dev);
++}
++
++struct ublk_dev *ublk_ctrl_init(void)
++{
++	struct ublk_dev *dev = (struct ublk_dev *)calloc(1, sizeof(*dev));
++	struct ublksrv_ctrl_dev_info *info;
++	int ret;
++
++	if (!dev)
++		return NULL;
++	info = &dev->dev_info;
++	dev->ctrl_fd = open(CTRL_DEV, O_RDWR);
++	if (dev->ctrl_fd < 0) {
++		free(dev);
++		return NULL;
++	}
++
++	info->max_io_buf_bytes = UBLK_IO_MAX_BYTES;
++
++	ret = ublk_setup_ring(&dev->ring, UBLK_CTRL_RING_DEPTH,
++			UBLK_CTRL_RING_DEPTH, IORING_SETUP_SQE128);
++	if (ret < 0) {
++		ublk_err("queue_init: %s\n", strerror(-ret));
++		close(dev->ctrl_fd);
++		free(dev);
++		return NULL;
++	}
++	dev->nr_fds = 1;
++
++	return dev;
++}
++
++int ublk_ctrl_stop_dev(struct ublk_dev *dev)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_STOP_DEV,
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_try_stop_dev(struct ublk_dev *dev)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_TRY_STOP_DEV,
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_start_dev(struct ublk_dev *dev,
++		int daemon_pid)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_START_DEV,
++		.flags	= CTRL_CMD_HAS_DATA,
++	};
++
++	dev->dev_info.ublksrv_pid = data.data[0] = daemon_pid;
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_start_user_recovery(struct ublk_dev *dev)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_START_USER_RECOVERY,
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_end_user_recovery(struct ublk_dev *dev, int daemon_pid)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_END_USER_RECOVERY,
++		.flags	= CTRL_CMD_HAS_DATA,
++	};
++
++	dev->dev_info.ublksrv_pid = data.data[0] = daemon_pid;
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_add_dev(struct ublk_dev *dev)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_ADD_DEV,
++		.flags	= CTRL_CMD_HAS_BUF,
++		.addr = (__u64) (uintptr_t) &dev->dev_info,
++		.len = sizeof(struct ublksrv_ctrl_dev_info),
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_del_dev(struct ublk_dev *dev)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op = UBLK_U_CMD_DEL_DEV,
++		.flags = 0,
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_get_info(struct ublk_dev *dev)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_GET_DEV_INFO,
++		.flags	= CTRL_CMD_HAS_BUF,
++		.addr = (__u64) (uintptr_t) &dev->dev_info,
++		.len = sizeof(struct ublksrv_ctrl_dev_info),
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_set_params(struct ublk_dev *dev,
++		struct ublk_params *params)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_SET_PARAMS,
++		.flags	= CTRL_CMD_HAS_BUF,
++		.addr = (__u64) (uintptr_t) params,
++		.len = sizeof(*params),
++	};
++	params->len = sizeof(*params);
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_get_params(struct ublk_dev *dev,
++		struct ublk_params *params)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_GET_PARAMS,
++		.flags	= CTRL_CMD_HAS_BUF,
++		.addr = (__u64)params,
++		.len = sizeof(*params),
++	};
++
++	params->len = sizeof(*params);
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_get_features(struct ublk_dev *dev,
++		__u64 *features)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_GET_FEATURES,
++		.flags	= CTRL_CMD_HAS_BUF,
++		.addr = (__u64) (uintptr_t) features,
++		.len = sizeof(*features),
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_update_size(struct ublk_dev *dev,
++		__u64 nr_sects)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_UPDATE_SIZE,
++		.flags	= CTRL_CMD_HAS_DATA,
++	};
++
++	data.data[0] = nr_sects;
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_quiesce_dev(struct ublk_dev *dev, unsigned int timeout_ms)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_QUIESCE_DEV,
++		.flags	= CTRL_CMD_HAS_DATA,
++	};
++
++	data.data[0] = timeout_ms;
++	return __ublk_ctrl_cmd(dev, &data);
++}
++
++int ublk_ctrl_reg_buf(struct ublk_dev *dev, void *addr, size_t size,
++		      __u32 flags)
++{
++	struct ublk_shmem_buf_reg buf_reg = {
++		.addr = (unsigned long)addr,
++		.len = size,
++		.flags = flags,
++	};
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op = UBLK_U_CMD_REG_BUF,
++		.flags = CTRL_CMD_HAS_BUF,
++		.addr = (unsigned long)&buf_reg,
++		.len = sizeof(buf_reg),
++	};
++
++	return __ublk_ctrl_cmd(dev, &data);
++}
+diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
+index 2400b4615766..15ba060ce7a3 100644
+--- a/tools/testing/selftests/ublk/kublk.c
++++ b/tools/testing/selftests/ublk/kublk.c
+@@ -37,203 +37,6 @@ static const struct ublk_tgt_ops *ublk_find_tgt(const char *name)
+ 	return NULL;
+ }
+ 
+-static inline int ublk_setup_ring(struct io_uring *r, int depth,
+-		int cq_depth, unsigned flags)
+-{
+-	struct io_uring_params p;
+-
+-	memset(&p, 0, sizeof(p));
+-	p.flags = flags | IORING_SETUP_CQSIZE;
+-	p.cq_entries = cq_depth;
+-
+-	return io_uring_queue_init_params(depth, r, &p);
+-}
+-
+-static void ublk_ctrl_init_cmd(struct ublk_dev *dev,
+-		struct io_uring_sqe *sqe,
+-		struct ublk_ctrl_cmd_data *data)
+-{
+-	struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
+-	struct ublksrv_ctrl_cmd *cmd = (struct ublksrv_ctrl_cmd *)ublk_get_sqe_cmd(sqe);
+-
+-	sqe->fd = dev->ctrl_fd;
+-	sqe->opcode = IORING_OP_URING_CMD;
+-	sqe->ioprio = 0;
+-
+-	if (data->flags & CTRL_CMD_HAS_BUF) {
+-		cmd->addr = data->addr;
+-		cmd->len = data->len;
+-	}
+-
+-	if (data->flags & CTRL_CMD_HAS_DATA)
+-		cmd->data[0] = data->data[0];
+-
+-	cmd->dev_id = info->dev_id;
+-	cmd->queue_id = -1;
+-
+-	ublk_set_sqe_cmd_op(sqe, data->cmd_op);
+-
+-	io_uring_sqe_set_data(sqe, cmd);
+-}
+-
+-static int __ublk_ctrl_cmd(struct ublk_dev *dev,
+-		struct ublk_ctrl_cmd_data *data)
+-{
+-	struct io_uring_sqe *sqe;
+-	struct io_uring_cqe *cqe;
+-	int ret = -EINVAL;
+-
+-	sqe = io_uring_get_sqe(&dev->ring);
+-	if (!sqe) {
+-		ublk_err("%s: can't get sqe ret %d\n", __func__, ret);
+-		return ret;
+-	}
+-
+-	ublk_ctrl_init_cmd(dev, sqe, data);
+-
+-	ret = io_uring_submit(&dev->ring);
+-	if (ret < 0) {
+-		ublk_err("uring submit ret %d\n", ret);
+-		return ret;
+-	}
+-
+-	ret = io_uring_wait_cqe(&dev->ring, &cqe);
+-	if (ret < 0) {
+-		ublk_err("wait cqe: %s\n", strerror(-ret));
+-		return ret;
+-	}
+-	io_uring_cqe_seen(&dev->ring, cqe);
+-
+-	return cqe->res;
+-}
+-
+-static int ublk_ctrl_stop_dev(struct ublk_dev *dev)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_STOP_DEV,
+-	};
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_try_stop_dev(struct ublk_dev *dev)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_TRY_STOP_DEV,
+-	};
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_start_dev(struct ublk_dev *dev,
+-		int daemon_pid)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_START_DEV,
+-		.flags	= CTRL_CMD_HAS_DATA,
+-	};
+-
+-	dev->dev_info.ublksrv_pid = data.data[0] = daemon_pid;
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_start_user_recovery(struct ublk_dev *dev)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_START_USER_RECOVERY,
+-	};
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_end_user_recovery(struct ublk_dev *dev, int daemon_pid)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_END_USER_RECOVERY,
+-		.flags	= CTRL_CMD_HAS_DATA,
+-	};
+-
+-	dev->dev_info.ublksrv_pid = data.data[0] = daemon_pid;
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_add_dev(struct ublk_dev *dev)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_ADD_DEV,
+-		.flags	= CTRL_CMD_HAS_BUF,
+-		.addr = (__u64) (uintptr_t) &dev->dev_info,
+-		.len = sizeof(struct ublksrv_ctrl_dev_info),
+-	};
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_del_dev(struct ublk_dev *dev)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op = UBLK_U_CMD_DEL_DEV,
+-		.flags = 0,
+-	};
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_get_info(struct ublk_dev *dev)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_GET_DEV_INFO,
+-		.flags	= CTRL_CMD_HAS_BUF,
+-		.addr = (__u64) (uintptr_t) &dev->dev_info,
+-		.len = sizeof(struct ublksrv_ctrl_dev_info),
+-	};
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_set_params(struct ublk_dev *dev,
+-		struct ublk_params *params)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_SET_PARAMS,
+-		.flags	= CTRL_CMD_HAS_BUF,
+-		.addr = (__u64) (uintptr_t) params,
+-		.len = sizeof(*params),
+-	};
+-	params->len = sizeof(*params);
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_get_params(struct ublk_dev *dev,
+-		struct ublk_params *params)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_GET_PARAMS,
+-		.flags	= CTRL_CMD_HAS_BUF,
+-		.addr = (__u64)params,
+-		.len = sizeof(*params),
+-	};
+-
+-	params->len = sizeof(*params);
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_get_features(struct ublk_dev *dev,
+-		__u64 *features)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_GET_FEATURES,
+-		.flags	= CTRL_CMD_HAS_BUF,
+-		.addr = (__u64) (uintptr_t) features,
+-		.len = sizeof(*features),
+-	};
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+ static int parse_param_types(const char *arg, __u32 *types)
+ {
+ 	char buf[128], *save = NULL, *tok;
+@@ -283,30 +86,6 @@ static void ublk_init_params_from_ctx(const struct dev_ctx *ctx,
+ 	};
+ }
+ 
+-static int ublk_ctrl_update_size(struct ublk_dev *dev,
+-		__u64 nr_sects)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_UPDATE_SIZE,
+-		.flags	= CTRL_CMD_HAS_DATA,
+-	};
+-
+-	data.data[0] = nr_sects;
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+-static int ublk_ctrl_quiesce_dev(struct ublk_dev *dev,
+-				 unsigned int timeout_ms)
+-{
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op	= UBLK_U_CMD_QUIESCE_DEV,
+-		.flags	= CTRL_CMD_HAS_DATA,
+-	};
+-
+-	data.data[0] = timeout_ms;
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+ static const char *ublk_dev_state_desc(struct ublk_dev *dev)
+ {
+ 	switch (dev->dev_info.state) {
+@@ -426,38 +205,6 @@ static void ublk_ctrl_dump(struct ublk_dev *dev)
+ 	fflush(stdout);
+ }
+ 
+-static void ublk_ctrl_deinit(struct ublk_dev *dev)
+-{
+-	close(dev->ctrl_fd);
+-	free(dev);
+-}
+-
+-static struct ublk_dev *ublk_ctrl_init(void)
+-{
+-	struct ublk_dev *dev = (struct ublk_dev *)calloc(1, sizeof(*dev));
+-	struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
+-	int ret;
+-
+-	dev->ctrl_fd = open(CTRL_DEV, O_RDWR);
+-	if (dev->ctrl_fd < 0) {
+-		free(dev);
+-		return NULL;
+-	}
+-
+-	info->max_io_buf_bytes = UBLK_IO_MAX_BYTES;
+-
+-	ret = ublk_setup_ring(&dev->ring, UBLK_CTRL_RING_DEPTH,
+-			UBLK_CTRL_RING_DEPTH, IORING_SETUP_SQE128);
+-	if (ret < 0) {
+-		ublk_err("queue_init: %s\n", strerror(-ret));
+-		free(dev);
+-		return NULL;
+-	}
+-	dev->nr_fds = 1;
+-
+-	return dev;
+-}
+-
+ static size_t __ublk_queue_cmd_buf_sz(const struct ublk_queue *q, __u16 depth)
+ {
+ 	size_t size = depth * (size_t)q->io_desc_size;
+@@ -1283,24 +1030,6 @@ static void ublk_shmem_unregister_all(void)
+ 	shmem_count = 0;
+ }
+ 
+-static int ublk_ctrl_reg_buf(struct ublk_dev *dev, void *addr, size_t size,
+-			     __u32 flags)
+-{
+-	struct ublk_shmem_buf_reg buf_reg = {
+-		.addr = (unsigned long)addr,
+-		.len = size,
+-		.flags = flags,
+-	};
+-	struct ublk_ctrl_cmd_data data = {
+-		.cmd_op = UBLK_U_CMD_REG_BUF,
+-		.flags = CTRL_CMD_HAS_BUF,
+-		.addr = (unsigned long)&buf_reg,
+-		.len = sizeof(buf_reg),
+-	};
+-
+-	return __ublk_ctrl_cmd(dev, &data);
+-}
+-
+ /*
+  * Handle one client connection: receive memfd, mmap it, register
+  * the VA range with kernel, send back the assigned index.
+diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
+index d98f3d612d88..99b8ceff853c 100644
+--- a/tools/testing/selftests/ublk/kublk.h
++++ b/tools/testing/selftests/ublk/kublk.h
+@@ -294,6 +294,38 @@ struct ublk_dev {
+ 
+ extern int ublk_queue_io_cmd(struct ublk_thread *t, struct ublk_io *io);
+ 
++static inline int ublk_setup_ring(struct io_uring *r, int depth,
++		int cq_depth, unsigned int flags)
++{
++	struct io_uring_params p;
++
++	memset(&p, 0, sizeof(p));
++	p.flags = flags | IORING_SETUP_CQSIZE;
++	p.cq_entries = cq_depth;
++
++	return io_uring_queue_init_params(depth, r, &p);
++}
++
++/* ctrl.c: control commands */
++struct ublk_dev *ublk_ctrl_init(void);
++void ublk_ctrl_deinit(struct ublk_dev *dev);
++int __ublk_ctrl_cmd(struct ublk_dev *dev, struct ublk_ctrl_cmd_data *data);
++int ublk_ctrl_add_dev(struct ublk_dev *dev);
++int ublk_ctrl_del_dev(struct ublk_dev *dev);
++int ublk_ctrl_get_info(struct ublk_dev *dev);
++int ublk_ctrl_set_params(struct ublk_dev *dev, struct ublk_params *params);
++int ublk_ctrl_get_params(struct ublk_dev *dev, struct ublk_params *params);
++int ublk_ctrl_get_features(struct ublk_dev *dev, __u64 *features);
++int ublk_ctrl_start_dev(struct ublk_dev *dev, int daemon_pid);
++int ublk_ctrl_stop_dev(struct ublk_dev *dev);
++int ublk_ctrl_try_stop_dev(struct ublk_dev *dev);
++int ublk_ctrl_start_user_recovery(struct ublk_dev *dev);
++int ublk_ctrl_end_user_recovery(struct ublk_dev *dev, int daemon_pid);
++int ublk_ctrl_update_size(struct ublk_dev *dev, __u64 nr_sects);
++int ublk_ctrl_quiesce_dev(struct ublk_dev *dev, unsigned int timeout_ms);
++int ublk_ctrl_reg_buf(struct ublk_dev *dev, void *addr, size_t size,
++		      __u32 flags);
++
+ static inline int __ublk_use_batch_io(__u64 flags)
+ {
+ 	return flags & UBLK_F_BATCH_IO;
 -- 
 2.55.0
 
