@@ -1,161 +1,194 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4608B2D322E
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 16:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791735146; cv=fail; b=G/tV8ihwieKXcJJIdPEuSSbBILcH91rE02456zjbpO2z+ZpbkdmxxMLEh+ijVM4vwLra2GUXiJG/H+K0HoiTh0eh2b1YDSqsOzd636sP+crqA8m2zO8F/82qReYFKDngM2oVFYhfbtjqKTvpY5aOB5oaYKWJpyadsdYY8tDp47U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791735146; c=relaxed/simple;
-	bh=l5mBdzG6Me+//o1/7PoG2bQ6+PSunb1MVGcu6cRGuSI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=BOz33WZFFbg0qcTVOtmm5ZzLPaJO6Y3nltBToCZzmS+1l5ljc3nnR/fWBxxtqmlo4QaR10aOlAk0Igfc41VJIBe0oCvUY6SMrvu9ADZJYtfmq1otFUUmLHYo04obcnoLUTojqSqCsDJcJ4FxI+KK4SD9DHYgIzNAdjRZJPXYV0A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=SxwrWDRM; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=sfjlcTyF; arc=fail smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF86D332909
+	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 16:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791736785; cv=none; b=TEj3/OItvPT8Aa33RJe3EHog6Pb5wUKbE2SpT5W053mzpZxHE+TwPT/MubgELHlrCPRxfsKX+ci4Vr+25alfMrWSmTK5uRq5aVtTXwTNkF5vPIC3BtywAglQTH64qXffREQNJdCZz6ZAuos0rVQ/NuPmHi+i4gXSI5MuF+Tu9Pw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791736785; c=relaxed/simple;
+	bh=dl5hrH+smJip14LzvfHJH3jCTVWaPluDa+G3BDxYydM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=poIKM4OAL2Bpe27OwdZ48/UqTiZ/iaXtng7ucx5oqCZxew9kTeLz08znMU6FPJ593LB8oJJB796V8cyXGGfNwbGjZsWEBxVlt8k54pKFY3pEdIQEuu8TnU6x8LFnyC9y5imXUNGOiFeXkQX98tkJ3F3b52aisVnUCvMF221hQhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BiOh+Z+L; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SxwrWDRM";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="sfjlcTyF"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1791735145; x=1823271145;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=l5mBdzG6Me+//o1/7PoG2bQ6+PSunb1MVGcu6cRGuSI=;
-  b=SxwrWDRMi8QWyzR73KrnXjpke710zdlfdkKOGYB+/aZnWka/T+Tyclfi
-   o+u8KUScNsMN5UIXWRAil6URe+bIa9RptlGDq5t/UJu7MLThAO2HVgnQu
-   8mF56YxWTL2OExSLeVrndo4GRp5/GAcKsBnMY0QN+e2umCsf+lVHX19Fp
-   A42jOKXUYHK/NARzZpjF5F8yTor3Ki2+b+cL952JqUSkdFAaMP19/CJgU
-   rE43zS9Ur/pkLAV53V8eXLQmIyPuH2bIHxaNv5EdGDI9D48lhq080VTAn
-   vJcZPpaPviWP5T/tbHHoJ0CqZ5B+vOLaY+Us14QaNRCoDF5II720YXIuB
-   w==;
-X-CSE-ConnectionGUID: H+PsHp8rTsmmBI0VA36jOg==
-X-CSE-MsgGUID: KqRrVpTyRMy8CX5iXt9rJA==
-X-IronPort-AV: E=Sophos;i="6.27,151,1786982400"; 
-   d="scan'208";a="153613434"
-Received: from mail-southcentralusazon11011066.outbound.protection.outlook.com (HELO SN4PR0501CU005.outbound.protection.outlook.com) ([40.93.194.66])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Oct 2026 00:12:18 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XfcvcZJ6Yb1AHXvj8/HxTg8BIR6rZOQ4AyJNyvU+b6M1DWfCuK5cpWU5qQFrsDKvZNgvYLmuVBnxUh6SNis0LCDWehSBdUNHNPYEnyFrqK6crP7w5hSYB0FXaqOsw+vrJSjtw1CwOM5BYBudYBN0x9XX5frXLUuel2UUjdubYybkjzR+AhwEbHp70vfSZAAu1CLLvjfDqz+N98g/mdXeHsM4PiIN/ZnpPZ3MkoN44xxWID62BWL1X9/QXgiFxzF7QRfi1y3sIEO2Ch+VOLt62Uc4CwV3/fjsUUuP2DFnS9YzEU9canL5NBODwMF46q6iW3ewILpLanYBdSM8pqDFrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=72EgjevZ5InErfHcw1ALOBbx3sWfFG9MvPo1JID+1Bo=;
- b=CGFR08KmLHYstjtFc3BPyhcFBPGVyo8MszGrUN3xyqFhC7sEA8Rf0z4yTBgNqsgY20y1ir3v/W+OTRpBbSWVnIXfQAFEBMSGgLXi8ChGc9+dRBGQhDSzNGhh72OO3QV/5KYq2brvWjSm58atEnOhx8lVeyAY2DgzTTyRArVucLEr+dTnDAEGSR37hjRlr7Ri1ifUv71QCJhnUmYjnjzbYQQbeQqpw4v2hkJLHUWR21PH6HaxZcm404CkLg9sq4syLycD2N+tEXWEnzSZE4+beqU6lwPsV+UFtDzN2XhlcoaFPDNqqk/zMzETWf4lO++5KwZbwt4xWf4pdRcyHZUnxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BiOh+Z+L"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-890d52c7c7bso983457b3a.2
+        for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 09:39:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=72EgjevZ5InErfHcw1ALOBbx3sWfFG9MvPo1JID+1Bo=;
- b=sfjlcTyF3QcAlJhV8AOf17ZeACPBRm1PzUnJPWTAOLt7b6TOhxTcS6DKHOKWm/+shcl6tHY1aw+zdvOAzga1DRfaMrqIR0zYaKFl5kG8zU22nRARsCybwvzWrQ2ElTR84rC8nEYn+VTwDLBlvOuTZnTDljsQljATno1Pl4IAawA=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by LV2PR04MB994494.namprd04.prod.outlook.com
- (2603:10b6:408:41a::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.20; Sun, 11 Oct
- 2026 16:12:16 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%5]) with mapi id 15.21.0496.019; Sun, 11 Oct 2026
- 16:12:16 +0000
-Date: Sun, 11 Oct 2026 18:12:09 +0200
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: blktests-ci-bot@kernel.org
-Subject: Re: [PATCH v2] blk-cgroup: skip rstat flush for cgroups without blkgs
-Message-ID: <asu03AokPh9MO2p_@shinmob>
-References: <20260921132058.2091567-1-usama.arif@linux.dev>
- <1e4fffa0bafa64446846b2a520cf8a96808da89c50cdf22606fbfc91048cb036@mailrelay.wdc.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1e4fffa0bafa64446846b2a520cf8a96808da89c50cdf22606fbfc91048cb036@mailrelay.wdc.com>
-X-ClientProxiedBy: TY4P301CA0050.JPNP301.PROD.OUTLOOK.COM
- (2603:1096:405:36b::9) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+        d=gmail.com; s=20251104; t=1791736782; x=1792341582; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=cyWt7m8yvkMD5S5xv62WgOXim74V6tY37hkhkyC0Oj8=;
+        b=BiOh+Z+LN8Oj7lEy9rFuCUAZYd/HQA7BKiBKa2fnONl5dt7QRfy9tyOpf7d8umXgu1
+         SZe2tARSGhlPFBKurwy72p0fIIX2XiG/dmNgCbvMqT5XEhXUDOTkbkZhhZANXhseKYlt
+         0mA0NLerw/U6Eh7UNILHORMFw67Uf+zUPS3AzC1Di+nahrBld97hHdLDqFOSqcav8kRU
+         C1KCekahW470QkDVJYuVsNpib9F1tEUzVutU44h3bZnml+lpyIqdaSl6IkMbfIj9yk6H
+         7XMcg8bhwmV/J+I2rxru1fvkeIZWRDe7rJH9KmKW5IQGBkpjMYLdEI0Yp0U6fgn/+xkV
+         3xLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791736782; x=1792341582;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=cyWt7m8yvkMD5S5xv62WgOXim74V6tY37hkhkyC0Oj8=;
+        b=Vs8x2Ia3vkmmCAyGmpMdnEkFqYAV6dtqh23LtOEUqEpuvmGzhB4o6TuDOy/3L6SsD/
+         SEmWgRcIJFWBgP8VZ97ghBOj9oxhKGuT9XCt8FW1sDt90rA8fIOFbbxYD3CfzgagYX1N
+         eW8RcME/hXbSQ9S9AXFw31OgrwptFjAKi+WqAIBE2H3/s8t1aS/3ZMABB9hnWfgG6qU0
+         RNg+lq0uVExWcMM5FQOoxjRYOGFlkLVCDtWejEqHHLQSOeKc24hqVs9YcCEMXktOAH3n
+         QAYBNvYHh6BSLF2KfEkGty1NS+xv9ImavWN1D3R1crWwz/FYdzkIdqnRkkw/yWQr/MRl
+         Wi/A==
+X-Forwarded-Encrypted: i=1; AKwUvBz2Bs6tWGMB2KhnGanlVKuF4M+3K+jec5cv9E1x0TMqJBJJSV0NoHtN65LBK1ooguCFQy3aH9gIyEbE3g==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJWZE+oxf4446Pa2x+9qODJ9tK/wZHH0ECglJ7hgScWLMzv3vYa
+	pcqvlosfgu8XauAx7iewe5gggJK9LubmBqOcPNDX/jCQhotJxCbJGnjI
+X-Gm-Gg: AYBFou3r5eJuGMXWMOHZ1t7+mWY99A6Xuzija/bdShI0v6gAHT8WKxTwTEe7/1G0u2U
+	Y/1tmlS1A6GwT1Rl1WNAa8/ax6I9eKIIT1tAAAB/hG8xvFrsoIYGgbiszt7DmFHteZafJE0EmdD
+	ONYOc0RjGr2ynZdsIkPmi37rPJ/8K9sAy9DeBMk5Xm9FVpwpx5r0DrZAT/rZkJBU1K57l06vQ95
+	5LsZfmmEJxjoa1eqNSTP5E16SK8ua6U72RH1RMyiD0ku5AEPLWkpcF2vfpaQSvnAN1xX3ZqQ0mw
+	SPj7e7npVllKgslPster/oOa66OCtrImsbCo4pV4F3jedzMxBGf4CqgKYWBwtgEGfu/EiwIqX4N
+	anaEplBM2cKPWYVCCqb2ZP/yUkUXFBK0BYG3dEysNrQYjCcc9BV1R+XQIOV/Xeu7qRy7XGH/Ees
+	Ywc3F/re9f9Ruy1v9zmWzRRaqW76H0FHFteEV7vLtDzuLa2tsEqh3fQnZYC2PwH1muhZ0JjWd3
+X-Received: by 2002:a05:6a00:b8d:b0:857:726d:2e96 with SMTP id d2e1a72fcca58-897c70107f9mr6888598b3a.19.1791736782085;
+        Sun, 11 Oct 2026 09:39:42 -0700 (PDT)
+Received: from thangnn-ASUS.. ([2a09:bac5:d45a:2646::3d0:17])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-896c3106de6sm3201429b3a.14.2026.10.11.09.39.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Oct 2026 09:39:41 -0700 (PDT)
+From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>,
+	syzbot+1eb53c83ab8b0a0302a6@syzkaller.appspotmail.com
+Subject: [PATCH] block: release the freeze lockdep maps under mq_freeze_lock
+Date: Sun, 11 Oct 2026 23:39:36 +0700
+Message-ID: <20261011163936.22576-1-ngocthang2710.1999@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|LV2PR04MB994494:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5cb35cf5-ca9d-44fc-86e1-08df27b26ad5
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|23010399003|376014|19092799006|56012099006|11063799006|5023799004|4143699003|261009223027099003|10067099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	MymCsU45Tr3B0xGHPKTT/+tIW4D4xgWQt7aA4qZR8FF2grPntnMVy0IqX9VkP4fy9yn61ACf8p0lnlqIu+vGBoTOZ6JGo+czleY0YxoJtAV84qs9oHNXQh9bBKldVuGba3oBoA7q7PV2vsHkdhK1ADEPj9XJZ2frG3MgstnDbUMDMCIdBWyv0tfKENAxkyq4UBpCxzztgg9ZKcil2eZLb/FvAbYizf0JlNOy7/GLNgu9Pm41Mkm0ceYlleG6KMk4MuNsba5Vl+o/Jc2NyyuY43dY9irqCWuGq8SM1wHDpk9ntDBbp8a0WLuckkmO7kodFrYQ3VnUcd0+0r1qbuemEOCBICUu0tVYOk7uK5RRRwFb+bfVvXx5MGWEKRD7p3EYzEFjakIXM3/itB9ExPB5Q84Lyh2oiCToLPvQ3ChcXn2drEcdddn/c1fOgjE0fMRwN/YO4RwIjYKrZqrjxBCTLCqswlTWPfO8keIAgYnyZsy1CjoYZG1EpbI/UQkafSbHROw6K49u3c4dLQlbC1zTRSWehgLln6r5FnetpU7qfBKT/lcvL1WS8596Xr9lq0vLdHAnFfz4DQYyZf/A1vkfzbgFnxrHL8yTwxuIGkHFS9TAqf1f2M9rlcSXp+LTlTZvOQ+jdpgxkYPie+wlp2F0jYc2pLC4QJkY58O4Nt56x3Q=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(376014)(19092799006)(56012099006)(11063799006)(5023799004)(4143699003)(261009223027099003)(10067099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+fdkXTPTbWUR+N1YYcykUv1V02ZmsMaskJs4m+OkHqoxmb0UEZ/jFnx1YBLf?=
- =?us-ascii?Q?wD5Hb4TrNx8FB/kJZKL1S/YuzQj86FDulTi0tv+jRhyi7Rc093sJxF97fb6U?=
- =?us-ascii?Q?q9sHqEay3R7DzBGMyP6r/ZxpYk5G2/vHVskUWJbNc7MPbQ3aw040sH+Ike7J?=
- =?us-ascii?Q?cvhOHWXZXZ1199BRaoS7TxaZG/piDab/W9LGthp4WZZXwQgqH+a8FG0ztoZq?=
- =?us-ascii?Q?zZtbXOjl7ESdgM9r7g2EFVNDKWA/BJAB6QWrJIqmEw5vW/9xIHsLdasTx/n8?=
- =?us-ascii?Q?fMmrAXCJ8dQ2bFoG5dvhLEoPA0SEZrXvuttbInuVDQYyRYyrd+IkRJ++Z5Qr?=
- =?us-ascii?Q?YycyV46XLn6+hNF6D7i8cWJ9aiJwmwkyo4YDMtgoRA118zuS0MnFM+ShWvA0?=
- =?us-ascii?Q?r8Rh+EKcDgz/xAxmpaLv9zvem/Ch1M0ex4o1UsUjHSNs5/gaeE6vMIOOA2Gn?=
- =?us-ascii?Q?Vaxk+RB1VEBAaG8qQbf9Z9Y4ykiBPy2ZEoiMCxrwKu85jOdqSuWbCWkGo/zs?=
- =?us-ascii?Q?kFg0HPo0CqHkKY3a6v12/nst7wvJ1jR/LHCBoG/RbQzx54ASWvJprWfTPpga?=
- =?us-ascii?Q?+WJXOOLDJUNBRnEylJquMjc0lTEiDrTOFZKcJgcT2jRBgfBpQ+L0TI7f+iX+?=
- =?us-ascii?Q?rS9FYfxHMpgyr9+L39YtpMiPM+vKyrVeEQk7uBpd7RMURu5Xxy6wyssw+0+Z?=
- =?us-ascii?Q?GAk4wLaIxX45sHzResVw2upAsEcyOoywx8TQXc371eQMR/7NZajpXsriqZf3?=
- =?us-ascii?Q?eLMF+f4I3M8eOmNLz7mW2kA77TiXsF/WMYhoQ3XcYUFrMkgIkVyIoQSh3Xh8?=
- =?us-ascii?Q?RYF9JLqNfYHYJvMJ2PljZqVEAIkfSZMzIQigUiXdQPQqdmTTMKVm5d/yfDby?=
- =?us-ascii?Q?veboBD9QJD0mUZEmW1krE7a8P0hXSztUbaCFl6rrMopl2qfY7htGskyQdGOO?=
- =?us-ascii?Q?YfTvTNwDqHvHgfJfX1T6WkyVIHz36DEDo+heaiPEvqaFyvSluy+QEdN8UrHM?=
- =?us-ascii?Q?D7/q3yKo3Wj1mGQZ6nzjF0l/8fX8rKoCZwt/3cQkAiLI/zIlicmInD6edA6g?=
- =?us-ascii?Q?RjJCdofOci/m+ylo8BhmxVqlUlI9dRMGC2zig8CNab6p5KB7DajqlQY/CuaE?=
- =?us-ascii?Q?ivYTsAqSDuWVSjzWBiVDRKCJzlwQATNxACRQwNAPQUYuabWqWio/i6QayhTH?=
- =?us-ascii?Q?ZsSn53KwWE/WBgttp/sMvZrN0Do8rTj3/2NTzqybNgk/xPI4qYGpIyRzwZUq?=
- =?us-ascii?Q?k/KbulPmu/9qTNzJ7CTHCItKkFRhXyUP6VYArOPEuXOtGwJmwZeCl1PAm6SB?=
- =?us-ascii?Q?CSTh+o+BT+cO9vWTAy1uVU8am0x4ayNKjloV5sCAzrBVxP9SZfnVrX6qZo1N?=
- =?us-ascii?Q?AptYo4oOvHjOnRt+Vdm0H+Cm6b69MKRX2osbxxgNwj8DT6AaAJRA8PHkaoX1?=
- =?us-ascii?Q?KJSRtbMUCbMbeqYeTBU7FWc+Iz63CYKOXSodtD1iFiTX9Hu/zeEUpfD61Uqw?=
- =?us-ascii?Q?qok15wuvxBW2meK5ByrDUnVkz7VFfVhsQ6daj9QUl738uvVWSwrMvgS1pHQl?=
- =?us-ascii?Q?jzkD3ThSYpnbnTLDFp/OA2ZbpqOnhrW8nlLPnp8aR6ceYel1tYvIQFQOlYem?=
- =?us-ascii?Q?igNbWEnnCEOFGWW78HoutrlX4QXoTfnqgBgZ9oEVW2xyM+E42LKm2kInLS3K?=
- =?us-ascii?Q?X2ElrpTkdzIcnszcOQFiQoHVFn8ppvrL3pCE4WS5pDg20mZtypmSEdDnhxGv?=
- =?us-ascii?Q?CFDjBdp1sym6gow+wKnJc2xLGYfgcpE=3D?=
-X-Exchange-RoutingPolicyChecked:
-	KEvihT2MmiKedCNvWt2cEf2V2H3BX+R2HLG2hkWbbcWEKgNqwceFuSci3MjPvhRhUy6wmfGXoYc+L8tYv8xCbektW9ALo6jbrUD0Exw+/KZGb59wUe0ZqRmq2ubDMLsUr/rBjFxUpRepcuVJB0pjQBxpJxQMyGbgZ+AdfguuTPs5ywsdJwqPrQy4MADliZO849PMFXcL6BDnznC6Tf8URu+5XkUflNrGEy7B8iREUHE1BB6/9E5bYLI2OgSbKAIqMIsJRHrJFbhgrWu0CDI7JjEx5f2NF7r7O++HN/+JygdbbH/WSFX6wn+v+b9hXJYhV/soxT3LOpPs2q2uvpfIZQ==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	Cp49LP1Z1pDjF8fKJ7bHwG8rcHj31pQCB/7Vt2QJ+qjUpQ/G7UA1IV9lPRtoxWxwC+j8GeUFZBoGaFscFofa4XVXjpeqS22VnVxx8/giU2T3zWHKzMx4sRYiHwjdle2+MMnlMfWIa7tJHHboHBPGiOFTUrrOGg4M+aVSMV01Xzmy602ZsQ9FoJ23/BMYE3304WZ07NK7GO0sxHnU7F9qFIA4M5xR95WwWm3tny1EI508BBYoYqQkRkxsZM7Aoognh3qifjX9AeF02dv/ppIdKQXikeu9MUlF3ItaMIBdl8NFYj3oq9KgtOSaj3/0FvQvJbiMWHEUxzxqqnIggGqWrjntxJjIxDVfUVZ0xlrOdasigUSqCX059MvuGzA2Oyl4+1dx+q2brMaHBv3SLPCQcGbrHtf2ZjbkOpW0qI7ij508ZuvlIsrNbkRHjJ4LqFTYuR/XkZftire+ezqMviogjZHvo1K/1DXtp0ePSOiEMi4HahUcAu+19GjBSNoYK/0mczKW4HQ3fDjzjlvAMa40vi5wlnlPh3ySLti7dYdjomE8HipJ9gUVkcTk9RMXZPQWebGTNPQC4ILlVhoKuGwom6Mk/tTTrmazKh93VMWqhqol9tvnexSHlKiYrF8PgwD+
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5cb35cf5-ca9d-44fc-86e1-08df27b26ad5
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2026 16:12:16.0791
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G5mtIlgrAhpOc88SQL8Zm9+6UFu+VbAWFq4hmeouA1GD2ptGnp3hw9PgdXq+87zAaIn6c75SY/WcV4dfHYt2CjXxxuN0fiIncP4Y/NM8NtU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR04MB994494
+Content-Transfer-Encoding: 8bit
 
-On Oct 08, 2026 / 19:32, shinichiro.kawasaki@wdc.com wrote:
-> Dear patch submitter,
-> 
-> Blktests CI has tested the following submission:
-> Status:     FAILURE
-> Name:       [v2] blk-cgroup: skip rstat flush for cgroups without blkgs
-> Patchwork:  https://patchwork.kernel.org/series/1170402/&state=*
-> Run record: https://github.com/linux-blktests/linux-block/actions/runs/37647078673
-> 
-> 
-> Failed test cases: block/034
+The lockdep maps taken for a queue freeze are released based on
+q->mq_freeze_disk_dead and q->mq_freeze_queue_dying, which are sampled
+when the outermost freeze starts. __blk_mq_unfreeze_queue() drops
+mq_freeze_lock, and only afterwards the callers release the maps. In
+that window the depth is already zero, so a new freezer can rewrite the
+flags, e.g. del_gendisk() on a disk that owns its queue, which sets
+DYING and GD_DEAD first. The old owner then skips the release and
+returns to userspace with the maps still held:
 
-Please ignore this failure report. The blktests test case block/034 failed in
-the automated CI test run for the patch titled. However, the test case has
-nothing to do with blk-cgroup. Sorry for the noise.
+  WARNING: lock held when returning to user space!
+  syz.0.452/6787 is leaving the kernel with locks still held!
+  2 locks held by syz.0.452/6787:
+   #0: (&q->io_lockdep_map){++++}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
+   #0: (&q->io_lockdep_map){++++}-{0:0}, at: blk_throtl_init+0x1f0/0x420 block/blk-throttle.c:1332
+   #1: (&q->q_lockdep_map){+.+.}-{0:0}, at: blk_mq_freeze_queue include/linux/blk-mq.h:956 [inline]
+   #1: (&q->q_lockdep_map){+.+.}-{0:0}, at: blk_throtl_init+0x1f0/0x420 block/blk-throttle.c:1332
+
+It is triggered by writing a blk-throttle limit while a null_blk device
+is being removed through configfs.
+
+Release the maps from __blk_mq_unfreeze_queue() while still holding
+mq_freeze_lock, where the flags can't change. del_gendisk() then only
+needs the explicit release when the queue is not unfrozen there.
+
+Reported-by: syzbot+1eb53c83ab8b0a0302a6@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=1eb53c83ab8b0a0302a6
+Fixes: 6f491a8d4b92 ("block: track disk DEAD state automatically for modeling queue freeze lockdep")
+Fixes: f6661b1d0525 ("block: track queue dying state automatically for modeling queue freeze lockdep")
+Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Reproduced in QEMU (KASAN + lockdep). The window is tiny, so I widened it
+with a 300ms msleep() after mq_freeze_lock is dropped in
+blk_mq_unfreeze_queue_nomemrestore() for nullb1, while threads write
+"<maj:min> 1" to blkio.throttle.write_iops_device and the main thread
+toggles null_blk power via configfs. Unpatched: the warning above (2 locks
+held) within ~10s. Patched, with the same delay after the unfreeze: no
+warning. Only the null_blk path was tested.
+
+---
+ block/blk-mq.c | 13 +++++--------
+ block/blk.h    |  2 +-
+ block/genhd.c  |  8 +++++---
+ 3 files changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a26a11c73ee3..da52e3ab5c7c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -208,10 +208,8 @@ void blk_mq_freeze_queue_nomemsave(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_nomemsave);
+ 
+-bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
++void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
+ {
+-	bool unfreeze;
+-
+ 	mutex_lock(&q->mq_freeze_lock);
+ 	if (force_atomic)
+ 		q->q_usage_counter.data->force_atomic = true;
+@@ -221,16 +219,15 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
+ 		percpu_ref_resurrect(&q->q_usage_counter);
+ 		wake_up_all(&q->mq_freeze_wq);
+ 	}
+-	unfreeze = blk_unfreeze_check_owner(q);
++	/* release under the lock: a new freezer may rewrite the lockdep flags */
++	if (blk_unfreeze_check_owner(q))
++		blk_unfreeze_release_lock(q);
+ 	mutex_unlock(&q->mq_freeze_lock);
+-
+-	return unfreeze;
+ }
+ 
+ void blk_mq_unfreeze_queue_nomemrestore(struct request_queue *q)
+ {
+-	if (__blk_mq_unfreeze_queue(q, false))
+-		blk_unfreeze_release_lock(q);
++	__blk_mq_unfreeze_queue(q, false);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue_nomemrestore);
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 50abfd932886..16388de6c541 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -55,7 +55,7 @@ const char *blk_status_to_tag(blk_status_t status);
+ blk_status_t tag_to_blk_status(const char *tag);
+ enum req_op str_to_blk_op(const char *op);
+ 
+-bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
++void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
+ bool blk_queue_start_drain(struct request_queue *q);
+ bool __blk_freeze_queue_start(struct request_queue *q,
+ 			      struct task_struct *owner);
+diff --git a/block/genhd.c b/block/genhd.c
+index 10ca8b4d6eea..97dd290909c0 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -772,11 +772,13 @@ static void __del_gendisk(struct gendisk *disk)
+ 	 * If the disk does not own the queue, allow using passthrough requests
+ 	 * again.  Else leave the queue frozen to fail all I/O.
+ 	 */
+-	if (!test_bit(GD_OWNS_QUEUE, &disk->state))
++	if (!test_bit(GD_OWNS_QUEUE, &disk->state)) {
+ 		__blk_mq_unfreeze_queue(q, true);
+-	else if (queue_is_mq(q))
+-		blk_mq_exit_queue(q);
++		return;
++	}
+ 
++	if (queue_is_mq(q))
++		blk_mq_exit_queue(q);
+ 	if (start_drain)
+ 		blk_unfreeze_release_lock(q);
+ }
+-- 
+2.43.0
 
