@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D80390600;
-	Sun, 11 Oct 2026 14:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630EB22173D;
+	Sun, 11 Oct 2026 14:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791729981; cv=none; b=UySlXBVzG61T6iyM6GJCEJBEJh/IH2O8MpV8xD+mXl0B/I3pNkfPO+sM1Jb2FMR1IxvkDbKK9mSyOllAEeREd90aCEEPYJx5PDu+70D5qLkpr2TO2rjyfVASlNg/GPwyybIpGfgYRhiMeP3SIlb1SXhzwJxX33ig/J8OStGSP80=
+	t=1791730048; cv=none; b=h6vcAoszfoQckD/sodz+AglTBHMn8Ley8vdvhMnV0ggL7eOiPEEXs84W2nEuiRS05xtqWL4fyV9olkEul4pxF7G8UYwZLgcYUxMCfhznqzcbGGAjBw8d3k32XuhQqw2h2HpjkzZmWtFGXyZnjm9aBMQr89HOQtM+UNmVSzBQwWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791729981; c=relaxed/simple;
-	bh=fyocAXO7Xsf5Sy3fD//8BuOiTzegYpqX4ZZ/0j4J71w=;
+	s=arc-20240116; t=1791730048; c=relaxed/simple;
+	bh=hurh2VWq85iUm4YSd057rwam7uoSEd34z8apnlv5u/Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QCCAq2RMDwPPcuvT0kb4Ydo7weh9WQaefNiUFFnO/q8s5C4tix2JvGPHgcd+EuBghtSo+yZ2wVWmRPqTIeCW22HTDuJvJti9xsKXkUkoFw/QdBFZOUdNvmgHgUSa47y/pxAtB6nk47hj0uhz2ke6PK/0ls8Ai1jqxbyY6ugk4Wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/Fz1a/h; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=gqbEiIbGXsC9Nbxk4y/eW4ra8J6glL6PGL+Rb3CgXTWzkvdCVt/iAWKGUgj7XZzXkVWBEd6mEGH04qWmva7TsMOaZbKv/eb7S8NuPR3WffwCrztoIg3326ZdoieID2CmMIXrWbcp88gkDbLqpfxhxh8UuSBBLKDeNzs7wPPmgII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hek6Wk+p; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/Fz1a/h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7B281F0089B;
-	Sun, 11 Oct 2026 14:46:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hek6Wk+p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65AC61F0089B;
+	Sun, 11 Oct 2026 14:47:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791729979;
-	bh=a8Wq7xaJ9QHjtkQKXx8Mftm0gxTB/vSerG9iKyW/5no=;
+	s=k20260515; t=1791730047;
+	bh=BQIqip95oa55W8hj4ZgxkP5jfpQrNG9dQFtpXX0xEh8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=a/Fz1a/hRmosoQNBGgjBEsicc19lP+o6pFwRH/IOtEyOtvYFnDh63aH1GN94nDfrd
-	 0rAwHamoL/vdJ2y61h9/zaKytQjExxLYpqlQ0dWeNkH8Cxp+TDoHrGJh2A2jLG9nqI
-	 oL5tszm9c9VfWkcbIs+GSRhxMpNdIsMCbT5wrVa+uLWB4dQ6XoxDz97lxKkiZfyI4t
-	 KVDBQaSDwxWEMpNqbzFD8LLWRkPN6ZuteqIulaf1bSo+N3skpNtNTsQ096+HEd8jOP
-	 A0jQD8DBWeZy419Rk0OmxH2F0Qa/kmpv9DNw2CMXF7IoF3p9AilBpbdoMC04QtwbwQ
-	 DiGGlVvIFYBug==
-Message-ID: <e146448b-5210-4215-821f-181c91625141@kernel.org>
-Date: Sun, 11 Oct 2026 16:46:15 +0200
+	b=Hek6Wk+pErCFNPvYAJblp1ESgyA/MVg4+hU30iyWT0FQdlqvBf8wFYGr8N3DF3Ubh
+	 mLkGRgCWNCEcxNLlnDfByvYFqT6tH+lslbBDVxA+LnzGKIeGn5mjoZSrtSWmWe1ww7
+	 ObrtSXsI/BZUmJiySOpctlruek9B/kbyx7wSD+d45/M45F7BPIkyUUa/I65Nnskhi9
+	 xYNr6R1ca4p7zxgQII3lik71SjxShHBHe6bWV6GBOjSnxovb9WP2pFbtrrhqYKlVOr
+	 95OcGkFretPMbzkzaRa6Ms95Xg/iNhKkwfHASais4Aam4n0TfTjI6F40u18j3WnI1r
+	 1rjWyyBE6qNQw==
+Message-ID: <83cfc6c0-b76d-448c-8f9c-3ef5091bdd22@kernel.org>
+Date: Sun, 11 Oct 2026 16:47:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: only use the cached zone report if
- BLK_ZONE_REP_CACHED is set
+Subject: Re: [PATCH 2/2] block: fix the length of a smaller last zone in
+ blkdev_get_zone_info()
 To: Shashank Mohan Jain <jain.sm@gmail.com>, Jens Axboe <axboe@kernel.dk>
 Cc: Christoph Hellwig <hch@lst.de>,
  Johannes Thumshirn <johannes.thumshirn@wdc.com>,
@@ -44,93 +44,51 @@ Cc: Christoph Hellwig <hch@lst.de>,
  "Martin K. Petersen" <mkp@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20261011051906.60397-1-jain.sm@gmail.com>
- <20261011051906.60397-2-jain.sm@gmail.com>
+ <20261011051906.60397-3-jain.sm@gmail.com>
 From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <20261011051906.60397-2-jain.sm@gmail.com>
+In-Reply-To: <20261011051906.60397-3-jain.sm@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2026/10/11 7:19, Shashank Mohan Jain wrote:
-> BLKREPORTZONEV2 takes the flags field of struct blk_zone_report as an
-> input. With BLK_ZONE_REP_CACHED the report is built from the zone
-> information cached by the block layer. Without it, BLKREPORTZONEV2 is
-> documented to behave like BLKREPORTZONE and to get the report from the
-> device: this is what the changelog of the commit that added the ioctl
-> and the comments in include/uapi/linux/blkzoned.h say.
+> blkdev_get_zone_info() sets the length of every zone to the zone size
+> of the device. The last zone of a zoned block device may be smaller
+> than the others: blk_revalidate_zone_cb() accepts that and remembers
+> the capacity of that zone in disk->last_zone_capacity. For such a zone
+> the length reported from the cached information is too large, and
+> start + len is beyond the end of the device. A conventional last zone
+> is also given the capacity of a full zone.
 > 
-> blkdev_report_zones_ioctl() only uses the flag to validate the input
-> and calls blkdev_report_zones_cached() for every BLKREPORTZONEV2
-> request. A caller that passes flags == 0 gets the cached report, in
-> which implicitly open, explicitly open and closed zones all have the
-> condition BLK_ZONE_COND_ACTIVE, and an explicitly opened empty zone is
-> reported as empty.
+> Example with a zoned null_blk device of 10 MiB (20480 sectors) with
+> 4 MiB zones, last zone:
 > 
-> Example with a zoned null_blk device (10 MiB, 4 MiB zones) after
-> BLKOPENZONE on zone 0, and a write of 8 sectors to zone 1 followed by
-> BLKCLOSEZONE:
+>   BLKREPORTZONE:       start 16384 len 4096 capacity 4096
+>   BLKREPORTZONEV2 with
+>   BLK_ZONE_REP_CACHED: start 16384 len 8192 capacity 4096
 > 
->   BLKREPORTZONE:             zone 0 cond 0x3 (EXP_OPEN)
->                              zone 1 cond 0x4 (CLOSED)
->   BLKREPORTZONEV2, flags 0:  zone 0 cond 0x1 (EMPTY)
->                              zone 1 cond 0xff (ACTIVE)
+> Limit the length to what is left of the device. disk_zone_is_last()
+> still recognises the last zone, as start + len is then equal to the
+> capacity of the device. The capacity of a conventional zone is equal
+> to its length, which blk_revalidate_conv_zone() checks, so use the
+> length there.
 > 
-> The uapi header marks BLKREPORTZONE as deprecated in favour of
-> BLKREPORTZONEV2. A program that follows this and does not ask for
-> cached information can no longer tell open zones from closed ones, and
-> is handed BLK_ZONE_COND_ACTIVE, which is only defined for the cached
-> report.
+> Tested with zoned null_blk devices in qemu (all zones sequential, and
+> two conventional zones followed by sequential ones, both with a smaller
+> last zone): the start, length and capacity of all zones in the cached
+> report are the same as in the report from the device with this change.
+> null_blk cannot create a device with a conventional last zone, so that
+> case is not tested.
 > 
-> Call blkdev_report_zones_cached() only if BLK_ZONE_REP_CACHED is set,
-> and blkdev_report_zones() otherwise.
-> 
-> Tested with zoned null_blk devices in qemu: a program that compares
-> the reports of BLKREPORTZONE and BLKREPORTZONEV2 with flags 0 after
-> the sequence above finds the differences before this change and none
-> with it. The report with BLK_ZONE_REP_CACHED is unchanged.
-> 
-> Fixes: b30ffcdc0c15 ("block: introduce BLKREPORTZONESV2 ioctl")
+> Fixes: f2284eec5053 ("block: introduce blkdev_get_zone_info()")
 > Cc: stable@vger.kernel.org
 > Assisted-by: LLM
 > Signed-off-by: Shashank Mohan Jain <jain.sm@gmail.com>
-> ---
-> Prepared with Claude Code (Anthropic), model Claude Opus 5.5
-> (claude-opus-5-5).
-> 
->  block/blk-zoned.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-> index 475aa16bc4..9555eae91a 100644
-> --- a/block/blk-zoned.c
-> +++ b/block/blk-zoned.c
-> @@ -400,6 +400,13 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, unsigned int cmd,
->  	case BLKREPORTZONEV2:
->  		if (rep.flags & ~BLK_ZONE_REPV2_INPUT_FLAGS)
->  			return -EINVAL;
-> +		if (!(rep.flags & BLK_ZONE_REP_CACHED)) {
-> +			ret = blkdev_report_zones(bdev, rep.sector,
-> +						  rep.nr_zones,
-> +						  blkdev_copy_zone_to_user,
-> +						  &args);
-> +			break;
-> +		}
->  		ret = blkdev_report_zones_cached(bdev, rep.sector, rep.nr_zones,
->  					 blkdev_copy_zone_to_user, &args);
 
-Can you reverse this if to be "if (rep.flags & BLK_ZONE_REP_CACHED) {" and to
-call blkdev_report_zones_cached if the condition is true? That would be a lot
-more logical.
+Doh! Good catch.
 
-Also, the condition should probably be:
-
-	if ((rep.flags & BLK_ZONE_REP_CACHED) &&
-	    blkdev_has_cached_report_zones(bdev))
-
-to be more efficient and avoid a call to blkdev_report_zones_cached() which will
-turn into a regular device report zones.
-
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
 -- 
 Damien Le Moal
