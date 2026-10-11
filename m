@@ -1,109 +1,63 @@
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C44348445;
-	Sun, 11 Oct 2026 17:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682BC348C77
+	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 18:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791738665; cv=none; b=Tuok9YNeMXR8/rZ+xV2lpDvQUfJbDggIdm/hSPGCVErDzxcUktkSavMODsZFpsL6nWI5E68O8Wqyq4IdWBta/XMs951xyJrPtiMmZMKKGYxP/8Q6e8cZst5uVhIoZ63WMh9sLIWndrvp4wrYS5muL/x/BPCtpMyqwUcrDoRyee4=
+	t=1791742683; cv=none; b=jF0zKX15ex+EEtRNesXSu5mL2pT32lzmgZ7X1kMgEeIGlAeCyhgSDvz7Ua8WZyZPAuAX7ZsOZlcToYIUYw798nB8apE/D1Zmtcjh6qKnVlUtohuZxInshkliT5mghEgcIJSIBDrVQPSo79v9gvRi66BQfUAIUj7TDRf2q6LvFWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791738665; c=relaxed/simple;
-	bh=+rARsB6qbJMD+EqSp3kNWjX4INkebtLZwP8y3c1zRlE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e/f6hMFz4xf/fMvd231jfjf6OheC/zdyBKxeQ1yTxg6ntdm32dszr/yzUFqEyyin4wqEfZuKk8Rrez4VPL6bWSKnKcufwWxO8nFcVd9eftRjSwc9IqB3cHw9u7OqLM3Wkw3kgjVuGTynzqrlGeNDAEmbClUlIFDTchsG5+Kctw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lp8XF2az; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1791742683; c=relaxed/simple;
+	bh=6bUWNVh9Un8BdioMLfas7piVaoglcE8nneJf+zPrBkw=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=DZff3WmYROOKinEuqsTpxhar/z9PBvigHnSCH4ean0ILD1rhMlO7o3FFk7QCxhA9QUbPsXpfCa3BdfObMnwwxSl2j8RPa06t0AIUViRYme47eVunlcodeJJg+Jl4DIyLiLEUWWjfe3IoP2LmGy5k+10pRshEihOx9NEfDV2ZYKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StFWiRhz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lp8XF2az"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1791738645; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=6QTfjxNJiEIz7iir6m8FkfgBMO2ZQ0s5GMO5wK8WRoQ=;
-	b=lp8XF2az39yIXaosKYkKMj9MA9foSj8U1A4dNoFqY+v12XXCRblxuHBMiBvnYzKv+XTn2owQS4aeqcapKlc7YIpr3mmuhRBvKtYKQGPjs8yPhoDc1lk8iAyRI6o2QNyMscswExpm7KDqqWWqs7C7NFyDW5epOFReOGAq/kEYyZk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R781e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0XCYQXYX_1791738643;
-Received: from x31h02109.sqa.na131.tbsite.net(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XCYQXYX_1791738643 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 12 Oct 2026 01:10:43 +0800
-From: Baokun Li <libaokun@linux.alibaba.com>
-To: linux-ext4@vger.kernel.org
-Cc: linux-fscrypt@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	ebiggers@kernel.org,
-	jaegeuk@kernel.org,
-	axboe@kernel.dk,
-	hch@lst.de,
-	djwong@kernel.org,
-	brauner@kernel.org,
-	tytso@mit.edu,
-	berto@igalia.com,
-	adilger.kernel@dilger.ca,
-	jack@suse.cz,
-	yi.zhang@huawei.com,
-	ojaswin@linux.ibm.com,
-	ritesh.list@gmail.com
-Subject: [PATCH 13/13] ext4: allow large folios for encrypted files
-Date: Mon, 12 Oct 2026 01:09:58 +0800
-Message-ID: <20261011170958.1759230-14-libaokun@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20261011170958.1759230-1-libaokun@linux.alibaba.com>
-References: <20261011170958.1759230-1-libaokun@linux.alibaba.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StFWiRhz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F7661F0089B;
+	Sun, 11 Oct 2026 18:18:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791742682;
+	bh=XXPvDakrvfz5a/NtgtDLaNGU4atoajh/4YclHL2RtTU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=StFWiRhzEc+Kpcx3ykhovEjohM64Vi1qHFAJ8vFrlKsuky6xAaGlPlrjgCxGa/Q5I
+	 qKruI414uubCX3OL96m5cs1pA9HNqfjt7Dq9vrGR6yhhndj0KtFajAlmGpMMly3ZoF
+	 PlNWewmzOz3pGNM2Vl+/vq81AGJDRXmOeBQCSn3krF0jiAMD/ZTWVUEUkUUF5sHAjp
+	 PJNAkMq4giZFCwZJz7N3cWMEXC/VwNhr77BDaLke5J/2ocA6M49bMrz2uIpCmwiVi2
+	 QIXoivU6xx1hMMobHtAgplpr9ec0g6w3Q6/RioMYuiN4t40fCRjseEc7rxX9SIh6zc
+	 YWnKb58Z0bU+A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A28938119D3;
+	Sun, 11 Oct 2026 18:18:02 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 7.3-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <130f6944-5862-4c10-ba2c-48ccd1b2088f@kernel.dk>
+References: <130f6944-5862-4c10-ba2c-48ccd1b2088f@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <130f6944-5862-4c10-ba2c-48ccd1b2088f@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.3-20261010
+X-PR-Tracked-Commit-Id: 41cab3a71dc7be62114d91cc849424879062d324
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4375b45d7060a6a3f41e14a9181c5c913ea474a4
+Message-Id: <179174268082.2129915.13947965720510235474.pr-tracker-bot@kernel.org>
+Date: Sun, 11 Oct 2026 18:18:00 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Encrypted filesystems keep their folio order at s_min_folio_order,
-because the read path could not handle a folio that covers a data
-unit number wraparound.  The read path now sends such folios to the
-buffer_head based path, so drop the restriction and give large folios
-to all encrypted files, including the ones whose block size is not
-larger than the page size.
+The pull request you sent on Sun, 11 Oct 2026 07:13:48 -0600:
 
-Writes and direct I/O don't need the same treatment: ext4_writepages()
-checks fscrypt_mergeable_bio() for every block, so a write bio never
-spans a wraparound, and the bios of direct I/O are cut at the block
-size.
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.3-20261010
 
-Performance:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4375b45d7060a6a3f41e14a9181c5c913ea474a4
 
-Hardware: 96-core machine, 3.84T NVMe, 512G memory
-Filesystem: ext4 with a 4k block size, encryption on the fallback path
+Thank you!
 
-Buffered sequential writes (1G, fsync) in MiB/s; medians of 3 runs.
-
-  bs      Before     After    gain
-  ----    ------    ------    ----
-  4k        1118      1162     +4%
-  16k       1260      1756    +39%
-  64k       1272      1977    +55%
-  256k      1308      2081    +59%
-  1M        1260      1455    +15%
-
-Signed-off-by: Baokun Li <libaokun@linux.alibaba.com>
----
- fs/ext4/super.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 9cd5b7445a27..a788613a53a4 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -5116,8 +5116,7 @@ static void ext4_set_max_mapping_order(struct super_block *sb)
- {
- 	struct ext4_sb_info *sbi = EXT4_SB(sb);
- 
--	if (test_opt(sb, DATA_FLAGS) == EXT4_MOUNT_JOURNAL_DATA ||
--	    ext4_has_feature_encrypt(sb))
-+	if (test_opt(sb, DATA_FLAGS) == EXT4_MOUNT_JOURNAL_DATA)
- 		sbi->s_max_folio_order = sbi->s_min_folio_order;
- 	else
- 		sbi->s_max_folio_order = EXT4_MAX_PAGECACHE_ORDER(sb);
 -- 
-2.43.7
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
