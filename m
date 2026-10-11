@@ -1,75 +1,74 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38563E2771
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 06:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4D63630AC
+	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 06:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791700586; cv=none; b=borpBUP70xcz3m7Jg7DlqRL1hTOrWHQMRGNTRzPUG9p+Jwz/ssImbiXTMrOYZjo1Kb+JhUq7541xGko7Xz3s8XPOdulKP6mcmhoECo/zf0iLBCHXaG6hGbCLZF1BR/B1JDJ9ILZBYsAbIkyiZxfVA/9fXe1gVGPiOaF9bc2ebg4=
+	t=1791700589; cv=none; b=JVNx2HrvNZ2WXg5I32fg5Pke+94PMNSZjmF6IvX9WbTQdm2oFbQIxsfDZ65R8CEDbJm0eGdp+lv+0Rdl2UjAKTU/+ee2R4EEH/Jdrg2RJD5bb9oR9QpioYjKl6+YgWtlhQ9IxJ9qtdT7FHMCGo69rVssV+HJ7mWKuzoHkkJt/dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791700586; c=relaxed/simple;
-	bh=MJdZAqQoRvDESjCWOSGLRoKTNHYvmiaDqWUgdsbaPRw=;
+	s=arc-20240116; t=1791700589; c=relaxed/simple;
+	bh=Ej+hBWaozkqTfJ4vKiUhC+XVQBaBBPNnqwS2N4rVKJc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OGK8wdSmNQiJihez7DECrNehRvA6NMP8gsZhortZrjdwtIMpZBOlm3pnItcFDRVNmfrnB7buALwePnLwOdryyuwkaM9yri/DNtaa0pwRaEBLNgM9k6ZwC7uNxpi5V5mtm50JhsyAV1l9pvWXUX3r4J0pDpZ0ATFVhHgnk2tXsDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OlIXZa9C; arc=none smtp.client-ip=209.85.210.53
+	 MIME-Version; b=pcHDJQE6Uw5cHH+ofzJpJH+GNR1JQC+iboWoAXNJc9E67EGbHGpGsmUvNuJT/uEbqoQ/e+YKiHGxN8ZOsl/mSP80Juuz13aNfNv++0asG3Sda5bEWDi+mJ0Bt/bBL0/GolesebNwYbcJ5CFJjALQAbOeP5SN7mfuNJRuD68sDSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M29oV9GU; arc=none smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlIXZa9C"
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-82380b0f55dso496864a34.1
-        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 23:36:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M29oV9GU"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-821a7bee9b2so1049191a34.0
+        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 23:36:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791700584; x=1792305384; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791700587; x=1792305387; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=fxxBxgxHonrxwrz6achWv2sTpl8log3r+s+LcLjZPzI=;
-        b=OlIXZa9CnCYmUzAUeMOBo4kDKW9zihMJYy9u9sSaC1l0mUwYmW6sLvX4zm3mYOZ5l3
-         4r41LNDXwJgkD+cS5Op7im3cGBYP/bfDw9BSFfoDUbwKdij2y8tMme2P4YJ2nntkHq5K
-         Gx9WkDsvSt2Qr+o3nz9CuTpgNba1N2exiW6WtdfBFv/SEe9t0de81wr1bnxOu8U1eFI5
-         gbkjEZ3aRGxWJcVqUhPi3cDzWdLnQ2ZzidGrzdFHCosmGRUpNHRxlk385t6Iapa/5dk1
-         w0H13+yFN0FCWBYVTSe3ca/QmnOQmTpsJMb9ZV8YgRYDs4CcFoXtTlmLBRKE09TxBCYy
-         2oIA==
+        bh=KyTqb85boO6sjAdVqtm8uviHY4bLTi6KSEdsKIQQNKo=;
+        b=M29oV9GUSpkSthqmL+gPzbwERci8a842oYxlE95yjDzCrYUrUTiOipRwbulkCXdJ98
+         eOxiRZ56p0/YT6KyGf7i8GUvkJGMdJ+UyXnc72Hbn6GFqCEQmzf04lCEPnAltvEoyMjY
+         Hf8N26MWThnDlWDPCGSBK36UglD1mJ2O/0/e+24vzsu9uBVnzrHpyURdhAW+bIreRBZ5
+         XGBT6+yvztuDgWa1b+FWOBW0f7VArRg7GeouTX3oZjtNSuRkENeAcKUkgV8cJ4959QS0
+         9dckAnm7+TSODOr+54z/Qn3mC9a9yG1zv/2vG2eYGs2HurQeeszAZGq5Nd2u7r95FuPp
+         cBUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791700584; x=1792305384;
+        d=1e100.net; s=20260707; t=1791700587; x=1792305387;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=fxxBxgxHonrxwrz6achWv2sTpl8log3r+s+LcLjZPzI=;
-        b=iqIrSXwp7XPivYJxyfCR/mgmqzy/IOslsqKeVriw+VgjEyOM+BkfyIQwfJZzcmMSUN
-         5GGnUZ+p1eEFHKopka3+viCVgwpIclyprPLm83OgIM8MgynvKe8U1xT5VvSxRdDibBkJ
-         +ufF8zu57765jq2Nw1meMgdXD0qoim3pO6D/Sx4vEBLp3kSuo1/vU7joZaf5ZCz/tmJM
-         sTflsuOVsgtYUAtMJl8/GU4XyVLoCGQl5ysWn/bW0v6W9xdz6yXHV5Q2dBV5a728ABSh
-         sjlD+BAOQSx/366XSERZSSIWG5nAjb+cxdeQpUm9G2uhS9g6NC2kPrCBq3ogZ/k7tcE3
-         M7wQ==
-X-Gm-Message-State: AFq9FYL806eOp0aGNtuuYotP9p38AlJcCBI/jJ1EBweV/glp5E2wqohb
-	6OtF4MZZalyiB0zmcGbL4fcoJlJ/BhDATIx/CdZ8SGRNLWTSAWa7/QFP5rYOh5Ug
-X-Gm-Gg: AYBFou1WriRpLDPvIrO5sr2eKS7wje4PUzt9WvbvwfKZV+6ZV08H2HFlk3OQRatB4+g
-	2NJbQaKpkQcEZOKXMrha3/1FSlADRQNf0UrE9p1pLsZyNpTi3vZGHfyK5arxG+QWylkt8R1fSqV
-	VJ1AQVJt8VKPJzLCaa86ZeNt0NVTkfuW6oH9MwRGE/TC4gJ7VC+xhlyvyTDTv1NGGuiSuFIjWFP
-	8jD3Zxlf2p4hSQaafX3GcWCCJp1u/7dIOrmHaSKfJ4AU0lj54bNcOwR0CQ8W4oa+iSAatP5ZgTd
-	kOH7VvMSDBru5wj8KwBEjkmVJRjiYPn7bR5rooWx+x69nm0lhnPO2Wy9MZjuF4bBx7csKBtuu8w
-	QWW6S6QaSPPDHd+G13cItdATQUP33PfsZwdr2PllACmW5wGUyx7cxvjmfy/pCkxAem05w12dLPS
-	ZbRJTt6o9fjPLoyOmkPaK8UhvqtJ4mKWbawJ6KivkPB+ZbLIBc+JbTHvNc9gC8OY2BfYbqfhJV0
-	2hyQp+Ik4LzaNFOYjRNXhE9LgMOentxjkCryhXT3twPE9WAjyBIo6onkCTLj00djNoNNXaZUUE6
-	aFf2QewtnBo7Odi93qWNLf4VNt8nt62xu5fi1A==
-X-Received: by 2002:a05:6830:81da:b0:802:68c:1b51 with SMTP id 46e09a7af769-8309525d6bfmr6756378a34.11.1791700583716;
-        Sat, 10 Oct 2026 23:36:23 -0700 (PDT)
+        bh=KyTqb85boO6sjAdVqtm8uviHY4bLTi6KSEdsKIQQNKo=;
+        b=C9hhW6D5bQ4QVK904RZnU0kMgvPcQVtHnho3/pqMWbby4YaDUY83WHHyN5R8cm4QSZ
+         L7fk2j/CZz2/hr3K5FOBXuaTLvb5peoSAAHIIsnp1h3MqW5b8yHoPF5LELE3ilmsXJtN
+         HPFfZp0WmnhcP+0nJBm5fmHgeWDo12x9d3ozoThtb7m079aqs6QbbMoWk1mDJXCqA75c
+         shd+n+MkE8Y+ngtUnbwMssBFxcDglS53G5ZbM3lhQ151rcfPahmf/D8mWvPgdRrGzk4s
+         F5kPmsC3zkSCvo5R8U0bZQN63Isu6gc/2RgF0HTVJhnDV1C6wcU7i22WG452UADj9j2C
+         8pmg==
+X-Gm-Message-State: AFq9FYLiI+afx0/RfWA0gw/JSRY18jEqag71UuABUQAaCWi41e0g1NMx
+	DqEp9DIL7LNp6vidi7U8FpMkqHNZ+JTU6i9I18lCMu2UOtjLwpYAJLE/MzabNh3a
+X-Gm-Gg: AYBFou27aKhIjdF9tTpVIoMlgsFVX1rGGDpvJ9H3F4Or2982uMWuCORvl1mp9sjunA5
+	EK3/TEmBHBr3df/tR/gA4DYku+b5jMPYNTBQy37CK7x5Etgku0cdT9pdXRTWK45HvfXdRaFpARP
+	A9UdMRx3Itd+LDFMYYYVMUBrpPbxwQkdFxcx+5M3geqgHoYd9PLc8uct/q5Ubs/kEfHaXubp0we
+	B2TkSJH1zKACLqQWDrYekNHdwzs5HkhBGB9/ge5QxyzR59IZ2waMfS+lw3CbOZBY4zufnGYESuJ
+	SnbAcdRcJVbbKrsHEVkG0FihLF2pleUCFG/Xuhv6qB3C1IB9ZaZCY1RkT4r+nWHal0K0w0NtpCF
+	KdTjUb7JDnbBFOBaems88oq9wyxI6+PDzIFO7K95fGvzijsvMZxEJ6ouIlbp3rbAfvLb7Rre9X/
+	boGZ/EU80B+2ce5omzsd/0xhn/H/t5W2FEfIZFIDVkxKwTXCcrm6cat5H8WJwGlJtg0pIV9Q0vu
+	8pHeDbeqTWEf2reTNKk2D3MNKvylnzocPsiVEzhI7p/zch6OpVJzwCivZsVFjR6azaa2NBaIDY2
+	7pX2AcMLIKFz/sL5yPVMs6NN5WU=
+X-Received: by 2002:a9d:69ce:0:b0:82a:1141:e62 with SMTP id 46e09a7af769-83029527d51mr3199193a34.20.1791700587438;
+        Sat, 10 Oct 2026 23:36:27 -0700 (PDT)
 Received: from fedora-laptop.tail348456.ts.net ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8303a515aa9sm6593164a34.25.2026.10.10.23.36.19
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8303a515aa9sm6593164a34.25.2026.10.10.23.36.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Oct 2026 23:36:23 -0700 (PDT)
+        Sat, 10 Oct 2026 23:36:27 -0700 (PDT)
 From: Ming Lei <tom.leiming@gmail.com>
 To: linux-block@vger.kernel.org
 Cc: Ming Lei <tom.leiming@gmail.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Josef Bacik <josef@toxicpanda.com>,
-	Li RongQing <lirongqing@baidu.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v3 05/12] ublk: reset the FETCH round under ub->mutex
-Date: Sun, 11 Oct 2026 01:35:48 -0500
-Message-ID: <20261011063555.1142277-6-tom.leiming@gmail.com>
+	Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH v3 06/12] ublk: allow a NULL io->cmd in the cancel callback
+Date: Sun, 11 Oct 2026 01:35:49 -0500
+Message-ID: <20261011063555.1142277-7-tom.leiming@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261011063555.1142277-1-tom.leiming@gmail.com>
 References: <20261011063555.1142277-1-tom.leiming@gmail.com>
@@ -81,72 +80,52 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The release work resets the FETCH round without ub->mutex, while
-START_DEV checks it under ub->mutex:
+A cancel from the control path, like STOP_DEV's ublk_cancel_dev() after
+dropping ub->mutex, takes the command and clears io->cmd under
+cancel_lock, then completes it with io_uring_cmd_done(), which takes
+uring_lock to remove it from the cancelable list. The server's io_uring
+cancel runs ublk_uring_cmd_cancel_fn() under uring_lock in between:
 
-  START_DEV (ub->mutex)               release work
-  all queues ready? yes
-  ublksrv_tgid matches? yes
-                                      ublk_reset_ch_dev():
-                                        io->cmd = NULL, nr_queue_ready = 0
-  go live: a request then reaches ublk_queue_cmd() with a NULL io->cmd
+  control path cancel                    io_uring cancel (uring_lock)
+  io->cmd = NULL, CANCELED
+  io_uring_cmd_done()
+    waits for uring_lock                 cmd still on the list
+                                         ublk_uring_cmd_cancel_fn(cmd)
+                                           io->cmd == NULL: WARN
 
-Do the reset under ub->mutex. Then START_DEV sees the round either ready
-or reset. The work already takes ub->mutex when there is a disk, after
-it has aborted the requests; nothing holding ub->mutex waits for it.
+ublk_cancel_cmd() then sees CANCELED and leaves the command alone, so
+nothing is wrong; only warn if io->cmd holds another command.
 
-Fixes: 728cbac5fe21 ("ublk: move device reset into ublk_ch_release()")
-Cc: stable@vger.kernel.org
+Fixes: ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue daemon")
 Tested-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/ublk_drv.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ drivers/block/ublk_drv.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 35202789cf98..b65b33c1996d 100644
+index b65b33c1996d..4ff37119a11c 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -2556,8 +2556,10 @@ static void ublk_ch_release_work_fn(struct work_struct *work)
- 	 * reset, so that a new server can fetch and start the device.
- 	 */
- 	disk = ublk_get_disk(ub);
--	if (!disk)
-+	if (!disk) {
-+		mutex_lock(&ub->mutex);
- 		goto reset;
-+	}
+@@ -2896,6 +2896,7 @@ static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd,
+ {
+ 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+ 	struct ublk_queue *ubq = pdu->ubq;
++	struct io_uring_cmd *cur;
+ 	struct task_struct *task;
+ 	struct ublk_io *io;
  
- 	/*
- 	 * All uring_cmd are done now, so abort any request outstanding to
-@@ -2589,7 +2591,7 @@ static void ublk_ch_release_work_fn(struct work_struct *work)
+@@ -2912,7 +2913,9 @@ static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd,
  
- 	/* double check after grabbing lock */
- 	if (!ub->ub_disk)
--		goto unlock;
-+		goto reset;
+ 	ublk_start_cancel(ubq->dev);
  
- 	/*
- 	 * Transition the device to the nosrv state. What exactly this
-@@ -2615,12 +2617,14 @@ static void ublk_ch_release_work_fn(struct work_struct *work)
- 				WRITE_ONCE(ublk_get_queue(ub, i)->fail_io, true);
- 		}
- 	}
--unlock:
--	mutex_unlock(&ub->mutex);
--	ublk_put_disk(disk);
- reset:
--	/* all uring_cmd has been done now, reset device & ubq */
-+	/*
-+	 * All uring_cmd has been done now, reset device & ubq. Under
-+	 * ub->mutex, so START_DEV sees the round either ready or reset.
-+	 */
- 	ublk_reset_ch_dev(ub);
-+	mutex_unlock(&ub->mutex);
-+	ublk_put_disk(disk);
- 	clear_bit(UB_STATE_OPEN, &ub->state);
+-	WARN_ON_ONCE(io->cmd != cmd);
++	/* NULL if a cancel from the control path took it meanwhile */
++	cur = READ_ONCE(io->cmd);
++	WARN_ON_ONCE(cur && cur != cmd);
+ 	ublk_cancel_cmd(ubq, pdu->tag, issue_flags);
+ }
  
- 	/* put the reference grabbed in ublk_ch_release() */
 -- 
 2.55.0
 
