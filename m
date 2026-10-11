@@ -1,168 +1,143 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C1339B49E
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 11:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7852DF128
+	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 13:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791718190; cv=none; b=o1wqJnqQOWhEh/KvfAwU3I/7K5sjFU0SOU9xn7WnSOwEs2FnQkzyjq7Byhv7WPuoWTTdPXB+Dsvk7CIrAY6sklC8PisJVIK5vz6vtRTCTbXZzXcjlBxDkAqaT3+CcOqd9e8Pk6VIdCAMfvQSjf6AmZcJfYPqXUBgpPJxMSnh/Lo=
+	t=1791724432; cv=none; b=e6Ltvxv6MwHuUklK+KFPqJn4TkShRq519U6OeprwzjdPmPbKVmFhX1ffxCU3HZzhNxInvyz+3C/GZbBuHr5p5xEf2XYR65Q2F3lNAE61Pj1RBVG7krJxB1fNNSkjV8OjVnUi/J5fWHWcRFmQR2wRUhHhQsWDuUsQLDSTT7nDAOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791718190; c=relaxed/simple;
-	bh=gAL8T4h+HBYQA5Bvh/Z/nk8McyOoNQ2RxR8PtExl584=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VDOdOaU+C43if2g9q2IzJd5JhIr9vrMN1jpdIgDf1slMWx617ar7M3obKiINQcZL26siMK6FKmOY7GGQTzh3tIUx6Jp1Vsk18A2hGbnfU3sjaNpinuZxOhoeYPsfKCMPP92env3aC2dxyTAw21zxRHlgx/chqi/IMWnAerYYNwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bxPInLPx; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791724432; c=relaxed/simple;
+	bh=GxZZ+OsF9+7O4mF5jiRbT4IgcwTzNCMBor1OFRt1jeE=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=WCYAlShokQLJJnNOk6/aXKnI2iqLwcHmf7wSoLmO5oHPpELFTK4qN4Vg5Z8GpqC95b/oauhpZq/IyA6zQgiUMWbMjGRmVQKef+Rj7olMZ8y8UFAq07XySS/H89yu2iD+ggntZ0cpbjuUHNTvTunPuuqz9+gjW9mZ7Qg0GG4/c9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=ABgXx9M8; arc=none smtp.client-ip=74.125.82.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxPInLPx"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3ab60ff4273so910157a91.0
-        for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 04:29:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="ABgXx9M8"
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-16ad92569b5so964187c88.1
+        for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 06:13:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791718186; x=1792322986; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=T8upKFc4zwF7GAlleDsmhpQF6jhE16xCYO/bJ2qmSMQ=;
-        b=bxPInLPxuCoXqW8OGyPwkSTqBNrLxYZfhEsGfVVCw9TOstR1616Yd3gzwSXnhfjh2S
-         EiADYgdJ75re/vQY1tmBCAonr7G1tEMf//HCLL/CcMA0yneLTnvz+MjhSpY6vFr8TKzT
-         tbXPOtSUwy56ixzZLH8HaR5I3Vb5XCma53F/fYGkwuTARHlyWrujC4VWRLqWEyheawWg
-         80JgGjHFnamyKPnxhgPwRXQrlNiHYYTztiSGGolYQbM76NaEStxXSVnBQ3ezOvvcySEs
-         7Rh5F4XIiw8EM/02IgRfLpTIB4YoU7+WrbwKo7a7ZiJmEKEUNCLk5e9XZRor1qpfFdSp
-         uCTg==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1791724430; x=1792329230; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=mGjUmhiwF6oiBGk9x9oXFbdVhxwnAl2b2IlIZ+Qcd4I=;
+        b=ABgXx9M8XRlNYTFO3qvRznBiZ4GsS2jKcSjpjHF8KfmWJH8HUbO63vqHyk/bDBoZ1Y
+         hdJBQPMlkUrVBQMC3yw7SZnI2lOtE/Dpw/UF+6OZ1bs/hWMPOWh9po2eg00EPjJEilUR
+         nVVutYJtN/rLG5bNqpfktpYn13JCSjEeMQhkdow+cUemYKnFr5bMawUWLwGI0h6TDsAa
+         Ax29VnqDcOm7lpInttZl8qNsplVZ6hOPoiqjJ7kYotN7RaGzXYAeg/5bFTYE7HmeXw1x
+         ZfkCHiO0L83Otm14ww+OkZm4ZOfClDzG0F8xVvaMQJkc/bpFB17gbUfW7wLjqlqheqkK
+         ZDYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791718186; x=1792322986;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=T8upKFc4zwF7GAlleDsmhpQF6jhE16xCYO/bJ2qmSMQ=;
-        b=Cd+/YtG356f50vfa03Cs3R8sOfjebuPgsvZthNC/GfBzL8C3gTHhFPpcur6W7Vq7tb
-         Ur7JxpYrvnghCst2NMMvPL9AiCTXjorc8gPNJuzwG3KHE/LfLiq3pLp4oEpOGjyV2TMg
-         2gRWgxBIeDBmWGoQdkKYAO9Zl0mhet5hF/oW681Pd8uLfANRmG6I3PRfEM4VXicJeKJp
-         sNDEidhBtnaodqx+6kOqaO+zu8jM5/UmccBLvik2SrIyliuguaf1+O4qqRFCcSKU+dqI
-         lffFND7SOBIe57A8N3BzUxIVVArgqsAoO8HaNGsnbJWP7IpbH+aJZAs63E/bZXPf1MEc
-         R3gw==
-X-Forwarded-Encrypted: i=1; AKwUvBw191QvOhKGmnRk+d9yR1D4wBiCT5lC58bncn5GVUdL6leBApfDOgT0uD/VHfT3fUCusgHXVvUTT71DDQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJcHPNIbVci4hT0GaJ8b7WoWlEBlq59KH1jdABh0u2zv+mYBgbH
-	3j4r29/Bj16ZVM8ujj5610rnW0qifeQ7+aFXGBbo7dA3H2eVunfYYkh6
-X-Gm-Gg: AYBFou0piBcHVb7ahafKtS+2KoHd7EeuyKGePB0Psl7LEF8LTqTqmo93MOfsWW3FKcY
-	01ngci/omGbd9LaTdL18ebkcKyl0zzqn1TY5T0/3GW2WP/RCuSgq/6xBMRH9rwp7YaO3NkFM9Cs
-	c9MacmngnFfxB0LefQyypt3lb9+SoJx0loAsxd7iOvk9elLlMl+lGnBKVQqRxt+UNkBKApv8jbC
-	aAM6KAE3ibVF1vyOfWuEfG6k/88wZGVkNuAwlKFiuJfXEmf0Qtjr2AGLCLe4wO8FM1ZgTTg6adT
-	FDn3w0SgBbRHRyEyXOPCSNkWgP4wINp+GjQMU2Bb/t9RBTmDybCx9sPfzoi81CR1ei8eLgv/YKH
-	AMYIwlbCbsD+sxKPoUQtCl0sM1XezOIiGuFYETnjySAoLIfiNUrpTwYp7FsTwF+4RjvM9Ye+CS6
-	xa9V/Qi1/iCgBg6NcouNetkPeM3QwIjxn//+ZVABrlcW1ReCu5wq7UpVfeTmgCSz3tGhc7WDjT
-X-Received: by 2002:a17:90a:d2c7:b0:39d:f4a8:75ef with SMTP id 98e67ed59e1d1-3ab3a33da74mr5986183a91.1.1791718186275;
-        Sun, 11 Oct 2026 04:29:46 -0700 (PDT)
-Received: from thangnn-ASUS.. ([2a09:bac5:d45a:16c8::245:79])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ab397920b4sm6957832a91.4.2026.10.11.04.29.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Oct 2026 04:29:45 -0700 (PDT)
-From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-To: Matthew Wilcox <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>,
-	syzbot+e0624b5bf72b99131402@syzkaller.appspotmail.com
-Subject: [PATCH] mm/filemap: mark lockless accesses to mapping->nrpages
-Date: Sun, 11 Oct 2026 18:29:40 +0700
-Message-ID: <20261011112940.455497-1-ngocthang2710.1999@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20260707; t=1791724430; x=1792329230;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=mGjUmhiwF6oiBGk9x9oXFbdVhxwnAl2b2IlIZ+Qcd4I=;
+        b=zcVv7AELiVyiCBajFdRcitv+4fENqzFHjPCelJ0pCndLmJgXiBaAstMcm6w3074txV
+         /FSG3RglBlXWkcePU9zjZDDUMVm0LfK83pzU8Yje/wS/ndC7jawRh1OU+5sMy08MYGda
+         7L/cvUedK0fO1OfeoO/enQBZicM3yreZWIAABQljCAND8OicPm64K4WIyZFBkwUiqZYj
+         DoxA2ThEALD7e/bgIn/mek1RXoxG8rI0jXlIwCiNDyMkCykHhQv/BXv98KTp7qnnr0a0
+         l62Zux6dKFC63t/NYiER7hr/puaF6h7zBtTSI3bvzkPASFKLbu+CJXzhLOU3telK5QPO
+         PzUQ==
+X-Gm-Message-State: AFq9FYKEQbaA4yx3wjW0w7o3HHGIElB4ItEGyl2RTxAzet5VRQZiZFOg
+	vptDj0x/YaGeWO6inRkjAXA5jap8dRs/NUtXH17UN5DCLaaM4AWqWu3d0hMZb6Xf0YvpBebn31E
+	6OUK4ja0=
+X-Gm-Gg: AYBFou2uI+79bijDDj/ug99x/XH3vD03XJb0sqPbDpVIdld7WSQTVrtvg6Dbau7GLE5
+	eqrudFi2bjBMh/wYhmZHbyXbLPgwt1JN63Sra4rCEemrNDWp8xH5JRxvDaNElX3mmsPNnxERIIC
+	wJCMpjTGgqlo1Px7gSwjLXqC2Pl160fXL9vWcPgo+HWw1Y74s+aPUQN9DlXQKdr8yt3uAXfBWKm
+	NzjlB7txgTd5qB7hphJHANh+JBhnIcOKWojXO0RPXgEqry4lVdRdkcEQEQbFqrrQ9E29rChhmT3
+	b5jY7pFz0X0cgnY4KjEfPDJpA8W9EM9sq9zRg8G+xNGU1UJLK+sh7BlJ8fkF2bhHsxS2fT8miTi
+	7xUVMScExnoWICcX7hGAkLew+KDmdgTborckuAQZGoRnsZh59Y2KzqH/QcoEkAPphqtsBpulJar
+	csp6374LkWJJ8Om8lnV1I+vGLsQ/Ufb48l7/bQQKMzkk9BA1TWZVhfHommEur7Ad8OngouZPU4r
+	OYfxtcKSQxikSNeQOcT3M6s/F3uG08FHjhfsBK070T03iMFTxur1j7JvZUFxH4eh6h2+Q==
+X-Received: by 2002:a05:701b:454a:20b0:128:d4be:7428 with SMTP id a92af1059eb24-16a5bf3f3fdmr9347464c88.19.1791724429935;
+        Sun, 11 Oct 2026 06:13:49 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a6021e49sm21604093c88.20.2026.10.11.06.13.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 11 Oct 2026 06:13:49 -0700 (PDT)
+Message-ID: <130f6944-5862-4c10-ba2c-48ccd1b2088f@kernel.dk>
+Date: Sun, 11 Oct 2026 07:13:48 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 7.3-rc7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-mapping->nrpages is updated under the i_pages lock but is read locklessly
-as a cheap "anything cached?" hint, e.g. in invalidate_bdev() and
-mapping_needs_writeback(). KCSAN reports the race:
+Hi Linus,
 
-  BUG: KCSAN: data-race in __filemap_add_folio / invalidate_bdev
+A few block fixes for this week, mostly NVMe via a pull from Keith:
 
-  read-write to 0xffff8881004c4178 of 8 bytes by task 3600 on cpu 0:
-   __filemap_add_folio+0x6b7/0x910 mm/filemap.c:919
-   filemap_add_folio+0x1cd/0x380
-   page_cache_ra_unbounded+0x1a4/0x3a0
-   ...
-   blkdev_read_iter+0x21e/0x2d0
-  read to 0xffff8881004c4178 of 8 bytes by task 3601 on cpu 1:
-   invalidate_bdev+0x25/0x70 block/bdev.c:98
-   ext4_fill_super+0x2ccb/0x37b0
+- NVMe fixes via Keith:
+	- Fix swapped ZRASF zone state values for full and read only
+	- nvme-multipath revalidate head zones after unfreezing the head
+	  queue
+	- Revert "nvme: do not reset controllers in NVME_CTRL_NEW state",
+	  which broke things
+	- nvmet fixes for invalid NSIDs on feature 82h and using the
+	  local P2P device on metadata allocation failure
 
-The same counter also races with filemap_write_and_wait_range() through
-mapping_needs_writeback().
+- zloop: zero out only the unread tail of a short read
 
-The race is benign: a stale value only makes the caller do or skip a
-harmless invalidate/flush pass. Annotate the readers with READ_ONCE() and
-the writers in filemap with WRITE_ONCE().
+Please pull!
 
-Reported-by: syzbot+e0624b5bf72b99131402@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=e0624b5bf72b99131402
-Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
----
- block/bdev.c | 2 +-
- mm/filemap.c | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index cd8323083740..d97071160e86 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -95,7 +95,7 @@ void invalidate_bdev(struct block_device *bdev)
- {
- 	struct address_space *mapping = bdev->bd_mapping;
- 
--	if (mapping->nrpages) {
-+	if (READ_ONCE(mapping->nrpages)) {
- 		invalidate_bh_lrus();
- 		lru_add_drain_all();	/* make sure all lru add caches are flushed */
- 		invalidate_mapping_pages(mapping, 0, -1);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 00fd89cf6f55..007fe10b2e1d 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -144,7 +144,7 @@ static void page_cache_delete(struct address_space *mapping,
- 
- 	folio->mapping = NULL;
- 	/* Leave folio->index set: truncation lookup relies upon it */
--	mapping->nrpages -= nr;
-+	WRITE_ONCE(mapping->nrpages, mapping->nrpages - nr);
- }
- 
- static void filemap_unaccount_folio(struct address_space *mapping,
-@@ -314,7 +314,7 @@ static void page_cache_delete_batch(struct address_space *mapping,
- 		xas_store(&xas, NULL);
- 		total_pages += folio_nr_pages(folio);
- 	}
--	mapping->nrpages -= total_pages;
-+	WRITE_ONCE(mapping->nrpages, mapping->nrpages - total_pages);
- }
- 
- void delete_from_page_cache_batch(struct address_space *mapping,
-@@ -631,7 +631,7 @@ EXPORT_SYMBOL(filemap_fdatawait_keep_errors);
- /* Returns true if writeback might be needed or already in progress. */
- static bool mapping_needs_writeback(struct address_space *mapping)
- {
--	return mapping->nrpages;
-+	return READ_ONCE(mapping->nrpages);
- }
- 
- bool filemap_range_has_writeback(struct address_space *mapping,
-@@ -916,7 +916,7 @@ noinline int __filemap_add_folio(struct address_space *mapping,
- 		if (xas_error(&xas))
- 			goto unlock;
- 
--		mapping->nrpages += nr;
-+		WRITE_ONCE(mapping->nrpages, mapping->nrpages + nr);
- 
- 		/* hugetlb pages do not participate in page cache accounting */
- 		if (!huge) {
+The following changes since commit 684b413b5483f57c890c171b9400076a0143b918:
+
+  virtio_blk: set the zone write granularity (2026-09-29 12:54:47 -0600)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.3-20261010
+
+for you to fetch changes up to 41cab3a71dc7be62114d91cc849424879062d324:
+
+  Merge tag 'nvme-7.3-2026-10-05' of git://git.infradead.org/nvme into block-7.3 (2026-10-05 08:41:38 -0600)
+
+----------------------------------------------------------------
+block-7.3-20261010
+
+----------------------------------------------------------------
+Guixin Liu (1):
+      nvmet: return Invalid Field for invalid NSIDs feature 82h
+
+Jens Axboe (1):
+      Merge tag 'nvme-7.3-2026-10-05' of git://git.infradead.org/nvme into block-7.3
+
+Karl Bonde Torp (1):
+      nvme: fix swapped ZRASF zone state values for full and read only
+
+Keith Busch (1):
+      Revert "nvme: do not reset controllers in NVME_CTRL_NEW state"
+
+Palla Raghunath (1):
+      nvme-multipath: revalidate head zones after unfreezing the head queue
+
+Sang-Hoon Choi (1):
+      nvmet: use the local P2P device on metadata allocation failure
+
+Shin'ichiro Kawasaki (1):
+      zloop: zero out only the unread tail of short reads
+
+ drivers/block/zloop.c      | 31 ++++++++++++++++++++++++-------
+ drivers/nvme/host/core.c   | 12 +++++++++++-
+ drivers/nvme/target/core.c |  2 +-
+ drivers/nvme/target/pr.c   |  4 ++++
+ include/linux/nvme.h       |  4 ++--
+ 5 files changed, 42 insertions(+), 11 deletions(-)
+
 -- 
-2.43.0
+Jens Axboe
 
