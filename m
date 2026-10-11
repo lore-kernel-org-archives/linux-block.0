@@ -1,131 +1,119 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87672E7372
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 03:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F7F1B142D
+	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 04:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791689867; cv=none; b=h1MofHgPTQbcOGIOyMc67sGX9RY3KHCSEfOYia3OpD9T0I9j5Eb2Wunmx58qoepq9fLbtlTSdUhZ5HSWXdsJf+L+RDpfim5501tDd7T6zb6JItu+P5EkWvNk/Lf57lmvG31Twqr3N8T3V1Rpdjushl3xFmIwKk/soPd9pW7gGVQ=
+	t=1791692890; cv=none; b=oKMaSo87UlxkUycU8hx3BbffNsty6RlJQ+fwVvsh6J3JnzbEjPkma49hdRz/WHaLoFWYJ7isUDL1dQRzeaxjpVBOoxU8tJkZkN08EhQcwwr0Hr7qpjczqvX3Aov1c44HsEQlcOLebXN7cjkVvlWhC/uU40yaeQ19WvQwvtxuf24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791689867; c=relaxed/simple;
-	bh=WL9TgnhpQEvY90Ll4HmdAvQl1G42rWomuaVXMzpGasQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FjRQaHx7Sgx6v9ZwV2hqIeUE9onSNuroYFlOMcB4/Xuo2LCjK4KddhWRXDymANZdt4lEO6Xl8QiSd05D2cIlS9DNJw68t1/ixiL2vWO3Ap4vos6tegm8ctJXWJPODJIzKHS2d6fCKbXxs43QUx99dHPdIEX/Z48QQ3KMX9MmoEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V4sCo/T1; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791692890; c=relaxed/simple;
+	bh=NUKj3EZm97qkLDRMMjG9360voWGZgERsw4v1velbTR8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bOt84T5qHS2w2Ibu5fRIsNfK8jGOoo2sz5470IOYdM1zTTobbcFxAjxdvdPNFeugzggYcR2yZLYjZODsDSRKd9aqDoOBBuBqhUIv7Fg+Gh4BI23LEFnxcOvfr3gdrXDqGlchGubfpIwvqiyB2OIKBAzOC/xWKF6Un+6v5Blb3r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=A+js9uAG; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V4sCo/T1"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2e5378b281aso4241455ad.2
-        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 20:37:45 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="A+js9uAG"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3a7cfe8f761so1888636a91.1
+        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2026 21:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791689865; x=1792294665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ZGdZTphdielncpBx9OT9jLr3XakXHovVsOh5FWf782Y=;
-        b=V4sCo/T1VkB/KTGub0UnuGW0idPk33oHGfCqezdBRlh24BIV3GFwoUaJrKMvyG8JW2
-         cNmID4vEEzWL9SoqHAZOjZLiGZ3An9NCm7Ph/PU/Kok0D7/7LO+EgR4otNaiNnOxbUrG
-         +/lIwCVZvketkeP3u5PoJjBFOudLNr+1N/kqE3Qdr2jafflNP5u2w4UQtxHsKWMLYLch
-         V8OpIckmA6+2rMb/dJIW6k+5mM4Uo6qW2swttNoPlB2ep1PQ+U2kUmuBgpuuAWX0zGsx
-         YDqyMgfG9Jk5FfogA/YHi4Qqd4NCUWhTs7SAAzSILyAFQkIOwgApCiCccFfYQyaIRsEb
-         vZcQ==
+        d=chromium.org; s=google; t=1791692889; x=1792297689; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=VgUBQDdodR1jUKBZJnt7Hs3MkCVZjH756ozkqdENr9k=;
+        b=A+js9uAGkzq/KqoVVUu4Rs9vLb2eRzVIEzc4yTu4oLveDL6jxCuHCgBM5xCqS+b4V4
+         sGx3VhsrOPlv5cymWkHxRpE8t9fK8B3r721RmhWUNx+CSXRU1fgn9HcAjFpo/nuio9Yb
+         LG4HenxlRPUojJB26n3ku32RLIAvCJv6rhWXI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791689865; x=1792294665;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ZGdZTphdielncpBx9OT9jLr3XakXHovVsOh5FWf782Y=;
-        b=p2ndlv9lWBIBBGWNhoVYBQAuVCiOjuGKm1cn4LawZnMaS7diX7mocLSdtqpnmsNq6U
-         4IfW8EVs6428NAgK+VWXnUiQI5JT1BLlBY46t8SPOGf3PE/f08GhvdE1UCE3vHSpW1T7
-         8ghlYdiDFdbOMbG2wa1qmEYNopozaa81Q8x6m/vxe7+l4FkmTD43ve6SuqGYCMZgoZbr
-         LXH6CWK+/DzUvjPlwjrTKpkLfjqS9PHGZLtGCO2NN1l7S6v1tP9nlyxtTlvXcUmQUMTn
-         qhN/GCyegAWqLqeI8olGTRHwz8ouWEvglKbt4n3EqpWmCDohTw+HiE6wRz8ew3nSx/Ga
-         xU3w==
-X-Forwarded-Encrypted: i=1; AKwUvBxol9A0i53Vag+IcPA24+/Nn3vyn+SOvNCnkNE2hVhLeE25iqg0MnpXUVtFZr/04iV2uacBZhJOsWOtNg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIT/YxJFcaJJiThq5kgoCPMoQnzVmne2CjxHOQdq97cgrUNontn
-	hdqenRgPUxjaPxPeYDoDY1Msou+CSBFsL1GjjvGMe8HlDvb2l+khwBlD
-X-Gm-Gg: AYBFou2iL6pLrIyOrCXwXlTmqH6GyjHmkbSRsbRfESyhr/hY/WwzNWjxI3ZhY8ACqKR
-	YCmYAsw0jymshNFqXfk/qUeG+5UHfPuw5vtO9o2kt4FgyOOWEJT4iiZfPuxfxMJp4vm6cJdud60
-	jxp32Yfb9DoxdxUXUwFnxWz7Q6RyUqkMlBjv5n4Sb659bUoIkCnZF/3tnfVzVpjxecXLHUskbEr
-	vw+v2JR9P1QhkICd2x2QWSIe5on3PX13dYs/zkdGPKa5sWRSykuGqb5CtoLNTlsG2M9/AUFUYyi
-	KIw7h28R6KZZXs1vRYOPgiadopRefCdBg7xjBgCGHClz4ijSYSvcq0cHCrj2j22BXBR5afeIZcU
-	Im5echaQmu0cM/qPrTBFuAbDgfX7GVygUMFBx9IrqXmzL9v3STVwxx3k6mkiBt5OPpx9mXZeRYa
-	tvLNi8D4uchqCMVm+cb81v84sIvJ6yqDtkWINZf+f4mMp3L9KwBsQzMuaaXq5XzUt5lz2vRY50L
-	Q==
-X-Received: by 2002:a17:902:cf4b:b0:2df:a803:efaf with SMTP id d9443c01a7336-2e842bbf513mr52153315ad.23.1791689865185;
-        Sat, 10 Oct 2026 20:37:45 -0700 (PDT)
-Received: from thangnn-ASUS.. ([2a09:bac5:d45a:16c8::245:79])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e8422b8c6esm27212895ad.61.2026.10.10.20.37.42
+        d=1e100.net; s=20260707; t=1791692889; x=1792297689;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VgUBQDdodR1jUKBZJnt7Hs3MkCVZjH756ozkqdENr9k=;
+        b=1hCkqTaUdQwbun9K5lIKcxN5tXzXXhqFDJJRMCf0VaIaENjWBLVMm2Xg5rtaJWEodB
+         K96cjtCBW+AqD4WxFNy+w0vjvNqat/1ynGM+nZlfFgKiTzq7uP1OceewOj1YID3sC/m8
+         xZfn6NFZrumQj43UPUIuk67PfmmReYi/iz+z3RpeprQQnGU5ppwlibxPhwDo+3RzIjLU
+         yxRMqCW1MGK1HMLI0k8JC7sqP97dqI6enmdtqXsuPu3Q3eWLyvPl6DQrpzDRGHIBJtWo
+         i2msfDMamYgyrBB6FL2M1f7N7Aoz++YacDYY3LgNF85qwEFaBTz8sJzESCe9EFuVZqdR
+         3egQ==
+X-Forwarded-Encrypted: i=1; AKwUvByTKtDhKftZLvyYR9KWaErNMm7Q7+hGvlIiF0SbuGocY6Ul53NJnHkyLDsjY44XYN8tZEmZQUUrKcTcGg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIedF9Kts3zFJmr9JQnhvZxLWUnoFzmiMGOf7S4RbZbg18UASA7
+	nru1lt5UjYUk1nDkPXr+L9psdzBa8ilz9KsTeYEY/oLnhdduKqnLAdHzKeJ2LYhQOQ==
+X-Gm-Gg: AYBFou3jVyD8odwGqeTo3iIGo9KUdDHyBAl/XdC/MvS6rNz9viPQXehkoiLm8zfiLoJ
+	YFO0CBO61N2IZgmFxAKk/57U6DoCh7B+xvj9lzHmjlmuUmxxlKrp+SG4vqyVcZjmGTJlJVRuOFB
+	K78XumC2d3xwh8hVhgTBhkSUrcGqieEluFnkbBFRaMlI9sCbBYpoc76LdcOoMTg3LFzAqQF9Gm9
+	cOjnOk0sT8k5yC+Cc73/DfODfvOXcOZmMuJ/IlrnLP58pmqFFtlF7D+iz9K0XBeSXrksHlwQpvG
+	t7nLefXj28cNs8sJ39jYUPm617dfndBZeHCst86ZRZCbn0VhYxSb854XM05ecAOHsIB6f+9lJkg
+	ebhqs3ZibuBtTdm2gNBADtFPTKT5A2RR1WZizgaxFrPtdAIV/hFRvmbJFfllzL+o4n+gj+MP4zC
+	tL6V7mNsui3iTjjrtUfkLssRYne03Qm4epM20O6D+qfu5w+SM3c8+bsTPzYEX5J3S4w9xfIfeXC
+	q8ISNugYkpFE+cpEOeHdjzUh3fsmm19Yd6fUkU=
+X-Received: by 2002:a17:90b:3b84:b0:3a0:d7f2:5a58 with SMTP id 98e67ed59e1d1-3ab3a369ebamr3764665a91.3.1791692888901;
+        Sat, 10 Oct 2026 21:28:08 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:75d8:6a8c:e079:f021])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ab37163e21sm11921110a91.14.2026.10.10.21.28.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Oct 2026 20:37:44 -0700 (PDT)
-From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-To: josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: mchristi@redhat.com,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	linux-kernel@vger.kernel.org,
-	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>,
-	syzbot+90895f5bfaa7243c2d20@syzkaller.appspotmail.com
-Subject: [PATCH] nbd: fail requests stuck on a dead socket when timeout is 0
-Date: Sun, 11 Oct 2026 10:37:39 +0700
-Message-ID: <20261011033739.18434-1-ngocthang2710.1999@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Sat, 10 Oct 2026 21:28:07 -0700 (PDT)
+Date: Sun, 11 Oct 2026 13:28:01 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Brian Geffon <bgeffon@google.com>, Minchan Kim <minchan@kernel.org>, 
+	Richard Chang <richardycc@google.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-mm@kvack.org
+Subject: Re: [PATCH v2 11/11] zram: use rw_semaphore for decompression streams
+Message-ID: <assQJStvoDK0nepk@google.com>
+References: <20261009071157.3730698-1-senozhatsky@chromium.org>
+ <20261009071157.3730698-12-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261009071157.3730698-12-senozhatsky@chromium.org>
 
-With a zero command timeout, nbd_xmit_timeout() only logs a "possible
-stuck request" message and resets the timer. A request already sent on
-a socket that has since died is never completed this way, because
-nothing will ever answer it.
+On (26/10/09 16:11), Sergey Senozhatsky wrote:
+> Currently, per-CPU decompression streams use a mutex, so there is
+> a chance for priority inversion - a low priority Reader can get
+> preempted by a higher priority Reader, which simply will get
+> blocked on the stream mutex.
+> 
+> Switch zcomp_dstrm lock from mutex to rw_semaphore to permit parallel
+> usage.  However, things are not completely straightforward.  Many
+> backends have stateless decompression and don't modify decompression
+> context, so those can be used concurrently.  But then there are backends
+> that do modify decompression context.  We also can have compressed
+> object span across physical pages, which zcomp linearises using stream's
+> ->local_copy buffer before decompression.  That buffer, clearly, cannot
+> be used concurrently.
+> 
+> When the backend has no per-stream decompression context (stateless)
+> and zsmalloc object fits in a single page (ZCOMP_DECOMP_INPLACE), take
+> the stream lock in shared mode (read).  Otherwise, when ->local_copy
+> is needed (ZCOMP_DECOMP_BOUNCE) or the backend has a decompression
+> context (zstd, deflate), take the lock in exclusive mode (write).
+> 
+> A quick synthetic fio test on 24 CPUs (preempt=full, lz4, 48 low
+> priority (nice 19) readers, 24 normal priority (nice 0) CPU hogs
+> and 24 high priority (nice -19) readers):
+> 
+>   Metric           Base               Patched
+>   ----------------------------------------------------------
+>   Read IOPS        473k               680k          (+43.8%)
+>   Read clat avg    35.98 us           21.28 us      (-40.9%)
+>   Read clat p99.95 55.55 us           20.86 us      (-2.7x)
+>   Read clat p99.99 6,717 us           2,834 us      (-2.4x)
+>   Read clat max    2,005,100 us       1,614,300 us  (-19.5%)
+> 
+> Suggested-by: Brian Geffon <bgeffon@google.com>
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 
-That blocks nbd_set_size(), which freezes the queue while holding
-nbd->config_lock and genl_mutex. The freeze waits for the stuck request
-forever, and reconnecting a socket (which would change the cookie and
-get the request requeued) can't happen as it is handled later by the
-same reconfigure call. Everything touching the device then hangs,
-including partition scanning in udev:
-
-  INFO: task udevd blocked for more than 143 seconds.
-   __bio_queue_enter+0x369/0x7f0 block/blk-core.c:396
-   blk_mq_submit_bio+0x776/0x2a70 block/blk-mq.c:3127
-   ...
-  INFO: task syz.0.17 blocked for more than 143 seconds.
-   blk_mq_freeze_queue_wait+0x101/0x180 block/blk-mq.c:191
-   queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
-   nbd_set_size+0x4c5/0x7d0 drivers/block/nbd.c:383
-   nbd_genl_reconfigure+0x7e1/0x1040 drivers/block/nbd.c:2444
-
-Requeue the request when its socket is dead, as is already done when
-the socket was replaced. The submit path then waits for a reconnect up
-to dead_conn_timeout and otherwise fails the request with an I/O error.
-
-Reported-by: syzbot+90895f5bfaa7243c2d20@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=90895f5bfaa7243c2d20
-Fixes: 2da22da57348 ("nbd: fix zero cmd timeout handling v2")
-Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
----
- drivers/block/nbd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index ffce519bf008..218b99f9e1ef 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -532,7 +532,8 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
- 			blk_rq_bytes(req), (req->timeout / HZ) * cmd->retries);
- 
- 		mutex_lock(&nsock->tx_lock);
--		if (cmd->cookie != nsock->cookie) {
-+		/* A dead socket will never complete this request. */
-+		if (cmd->cookie != nsock->cookie || nsock->dead) {
- 			nbd_requeue_cmd(cmd);
- 			mutex_unlock(&nsock->tx_lock);
- 			mutex_unlock(&cmd->lock);
--- 
-2.43.0
-
+JFI
+I have completely reworked this patch.  Will run tests and then
+send out v3.
