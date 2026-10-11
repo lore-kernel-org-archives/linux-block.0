@@ -1,31 +1,48 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2317A248F57
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 13:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19E73E44ED;
+	Sun, 11 Oct 2026 13:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791725184; cv=none; b=gIBcCUepENctddY7zh3ak8jSWS2fnb9IMQtuDAYTS2dfcT82waUtitXY1biBksDszo8qPZIYeEXC6Ub8zUS51jO789tUb4OrOuds9weJVZFXmimWG36LxiVDZRgvRKegrBI/Q1gpaXO1MNbW4+YhmQzKg+qEQYo+byqsc6qoU24=
+	t=1791725724; cv=none; b=eealgFnU3JoCU1lBp6efrzba0kmP+l0jY2mpjkazauM81PWr7B7lynV+fMQI5GKql4DlyrSc0QJlHMIAPbcad9TrZxZgzN0t0uiwnEuUZSv3S+8By0h6Y5r2rry26yq2Zn7+FqBbq0OA/AvkCVo8AuJEdVDkbHuqeC4n3Uq0ZEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791725184; c=relaxed/simple;
-	bh=sQm1/mpAxNNejTpNFmmdNDvibcXSDMXfhBsCVsnycyQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=PNltSuKIK0nwgtKdKXjs7bJ2smsikfpwFpT+ouRLlEQpylXTQaghJ+++79iIuGLg1aWkSPAWvst4VhWaEiniMtWZ72mNt7qWCHjgRvZlRgpk9igJZgPn+BrAhu1eNPgZ3LqsVmuKesVh9PxNLImMJkRaOs4ALX4FNw5WANkS53Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 69BDQJ5q036034;
-	Sun, 11 Oct 2026 22:26:19 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 69BDQJh7036031
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 11 Oct 2026 22:26:19 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <cc2910d3-3113-44d4-94ef-0c8d365fac9c@I-love.SAKURA.ne.jp>
-Date: Sun, 11 Oct 2026 22:26:18 +0900
+	s=arc-20240116; t=1791725724; c=relaxed/simple;
+	bh=olEQ7uTMIRyhlqZfPRhlLG7sAoLaTK+ei5OoxwQo/wg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I/HNAyo8rRfdB5FSsJE2ZYs/PW22ODSzKcvPpir7VV63S3MpuBwdoo/etlXt2ctUgF1obhbKQoZ3iOUBIV9bBcWY1suuI1uqWIPAdH37n+hMwxfqEgy/dyhE2FmugYRvqSw/hrkfP6pHp/YGIwqsEcW0x6FCPElWNMCqEMHdnwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=eTrTf8PY; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="eTrTf8PY"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4j2hRk0hfRzlfvpn;
+	Sun, 11 Oct 2026 13:35:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1791725709; x=1794317710; bh=2BBs7ABEyUHXGEcdvbeBCH4b
+	I40jWt5rrxWkfA8f2As=; b=eTrTf8PYm4gxE/vGgQAQ588nJLoYW/+HqvRCg5ZQ
+	V/x9+Z2MGz9jWa6HgfWRWv5KmOmgx1rdLIi9FJZIkv9AW1DvE3C6xnro/Ub+CC3i
+	d/nyCNZYN3REiF5kuyOqCJVCIATijNcVJiB4M/N6IfS2A0ez1wqvqZcch1jySg3x
+	iVoMblvqjGKMqkdBcilC3v5AU5kI7nY3GdsYTTfD7qpuV/EiYuMeW0Dbe0mk2J7b
+	dZwQ6HFXFxuaB0JWms7pwuS4KxHawvK1ZQcsdOscxSd5wWxVXr0eskPZWbWWu3Vt
+	6XXXdmNKLZfad0lZ+UOJYHvI2xmBktgi5tx288gci6WlxA==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id GMHwyDnBMJAp; Sun, 11 Oct 2026 13:35:09 +0000 (UTC)
+Received: from [192.168.51.14] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4j2hRc45mMzlfvpb;
+	Sun, 11 Oct 2026 13:35:08 +0000 (UTC)
+Message-ID: <8733b34f-45be-4395-8575-53690c1c406f@acm.org>
+Date: Sun, 11 Oct 2026 06:35:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,164 +50,73 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH v3] loop: Detect write requests that failed to wait for
- completion.
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>,
-        Edward Adam Davis <eadavis@qq.com>, Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net,
-        Bart Van Assche <bvanassche@acm.org>
-References: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
- <20261007130851.GA30117@lst.de>
- <4d7c7365-259c-402e-9cf5-d55ad9333200@I-love.SAKURA.ne.jp>
- <380f04ef-902d-4664-9ae3-228692d2efb9@I-love.SAKURA.ne.jp>
- <696e5e7c-e3f1-4181-be2a-8915fd1753cf@I-love.SAKURA.ne.jp>
+Subject: Re: [PATCH] nbd: fail requests stuck on a dead socket when timeout is
+ 0
+To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>, josef@toxicpanda.com,
+ axboe@kernel.dk
+Cc: mchristi@redhat.com, linux-block@vger.kernel.org, nbd@other.debian.org,
+ linux-kernel@vger.kernel.org,
+ syzbot+90895f5bfaa7243c2d20@syzkaller.appspotmail.com
+References: <20261011033739.18434-1-ngocthang2710.1999@gmail.com>
 Content-Language: en-US
-In-Reply-To: <696e5e7c-e3f1-4181-be2a-8915fd1753cf@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20261011033739.18434-1-ngocthang2710.1999@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav111.rs.sakura.ne.jp
 
-This is a debug patch which will be reverted after we observed what is
-happening. This patch does not attempt to fix the problem itself.
+On 10/10/26 8:37 PM, Nguyen Ngoc Thang wrote:
+> With a zero command timeout, nbd_xmit_timeout() only logs a "possible
+> stuck request" message and resets the timer. A request already sent on
+> a socket that has since died is never completed this way, because
+> nothing will ever answer it.
+> 
+> That blocks nbd_set_size(), which freezes the queue while holding
+> nbd->config_lock and genl_mutex. The freeze waits for the stuck request
+> forever, and reconnecting a socket (which would change the cookie and
+> get the request requeued) can't happen as it is handled later by the
+> same reconfigure call. Everything touching the device then hangs,
+> including partition scanning in udev:
+> 
+>    INFO: task udevd blocked for more than 143 seconds.
+>     __bio_queue_enter+0x369/0x7f0 block/blk-core.c:396
+>     blk_mq_submit_bio+0x776/0x2a70 block/blk-mq.c:3127
+>     ...
+>    INFO: task syz.0.17 blocked for more than 143 seconds.
+>     blk_mq_freeze_queue_wait+0x101/0x180 block/blk-mq.c:191
+>     queue_limits_commit_update_frozen+0x55/0xd0 block/blk-settings.c:590
+>     nbd_set_size+0x4c5/0x7d0 drivers/block/nbd.c:383
+>     nbd_genl_reconfigure+0x7e1/0x1040 drivers/block/nbd.c:2444
+> 
+> Requeue the request when its socket is dead, as is already done when
+> the socket was replaced. The submit path then waits for a reconnect up
+> to dead_conn_timeout and otherwise fails the request with an I/O error.
+> 
+> Reported-by: syzbot+90895f5bfaa7243c2d20@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=90895f5bfaa7243c2d20
+> Fixes: 2da22da57348 ("nbd: fix zero cmd timeout handling v2")
+> Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+> ---
+>   drivers/block/nbd.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index ffce519bf008..218b99f9e1ef 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -532,7 +532,8 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
+>   			blk_rq_bytes(req), (req->timeout / HZ) * cmd->retries);
+>   
+>   		mutex_lock(&nsock->tx_lock);
+> -		if (cmd->cookie != nsock->cookie) {
+> +		/* A dead socket will never complete this request. */
+> +		if (cmd->cookie != nsock->cookie || nsock->dead) {
+>   			nbd_requeue_cmd(cmd);
+>   			mutex_unlock(&nsock->tx_lock);
+>   			mutex_unlock(&cmd->lock);
 
-syzbot is reporting NULL pointer dereference in lo_rw_aio() [1][2].
-An analysis by the Gemini AI collaborator [3] considers that this problem
-is caused by a timing shift primarily exposed by commit 65565ca5f99b
-("block: unify the synchronous bi_end_io callbacks"), along with helper
-refactorings like commit 92c3737a2473 ("block: add a bio_submit_or_kill
-helper").
+If AI was used to create this patch an Assisted-by tag should be added.
+See also Documentation/process/coding-assistants.rst. Anyway, since this
+patch looks good to me:
 
-But due to difficulty of reproducing this race, discussion about what is
-happening and how to fix this problem is stalling. Also, we haven't
-identified how many filesystems are subjected to this problem. Therefore,
-we need to proceed to debug printk() approach, for syzbot cannot find a
-reproducer for this problem.
-
-Another analysis by the Gemini AI collaborator found possibility of
-sync_blockdev() not waiting for write requests due to skipping
-__filemap_fdatawait_range() when filemap_fdatawrite_range() returned -EIO.
-
-  Step 1: A test process is created and calls unshare().
-  Step 2: That process extracts a crafted JFS image to a memfd storage.
-  Step 3: That process binds that image to a loop device.
-  Step 4: That process mounts that loop device as read-write.
-  Step 5: That process issues some buffered write requests.
-  Step 6: That process is killed before writeback for Step 5 starts.
-  Step 7: Automatic unmount operation starts due to teardown of a mount
-          namespace.
-  Step 8: jfs_umount() calls filemap_write_and_wait() (directly or via
-          sync_blockdev()).
-  Step 9: filemap_fdatawrite_range() returns -EIO due to filesystem errors
-          after several submit_bio() have been already issued.
-  Step 10: jfs_umount() completes without calling
-           __filemap_fdatawait_range() which should wait for completion of
-           I/O requests issued by Step 5 due to Step 9.
-  Step 11: fput() is called from __loop_clr_fd() from lo_release(), and
-           destruction of "struct file" starts after returning from
-           lo_release().
-  Step 12: The in-flight I/O request issued by Step 9 is finally processed
-           by the loop backend kworker. However, since the backing "struct
-           file" (and its associated structures) is already under
-           destruction, the kworker attempts to dereference now-invalid
-           fields, leading to WARN_ON_ONCE().
-
-In order to check whether the steps described above is actually happening,
-add debug code to the loop module for reporting I/O requests that are
-processed after __loop_clr_fd() started. Note that this debug code is
-enabled only if CONFIG_KCOV=y, for this check is a waste of computation
-resources for almost all users.
-
-Link: https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28 [1]
-Link: https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3 [2]
-Link: https://lkml.kernel.org/r/fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp [3]
-Assisted-by: Gemini-Pro
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-Changes in v3:
-  - Use "loop device is no longer bound" and "there is no users" as
-    the conditions to report.
-
-Changes in v2:
-  - Include linux/stacktrace.h file.
-  - Sashiko's review spotted that lo->lo_state is already Lo_unbound
-    by the time fput() is called. Therefore, don't check lo->lo_state
-    value, and check from only loop_handle_cmd() path. Since syzbot is
-    reporting that kworker is finding inflight I/O, this change should
-    still be able to catch [1] and [2] above.
-  - I would like to introduce a kernel config option like
-    CONFIG_DEBUG_AID_FOR_SYZBOT for gating debug code used by syzbot.
-    But that will be a different discussion.
-  - Not using ratelimit for reporting, for there should be only few
-    if any when loop_handle_cmd() finds one. Not checking from 
-    loop_queue_rq() path should reduce the amount of  output a lot.
-
- drivers/block/loop.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 758c20678bf6..191807599bf7 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -36,6 +36,7 @@
- #include <linux/blk-mq.h>
- #include <linux/spinlock.h>
- #include <uapi/linux/loop.h>
-+#include <linux/stacktrace.h>
- 
- /* Possible states of device */
- enum {
-@@ -86,6 +87,12 @@ struct loop_cmd {
- 	struct bio_vec *bvec;
- 	struct cgroup_subsys_state *blkcg_css;
- 	struct cgroup_subsys_state *memcg_css;
-+#if defined(CONFIG_KCOV) && defined(CONFIG_STACKTRACE)
-+	unsigned long stack_entries[30];
-+	int stack_nr;
-+	pid_t pid;
-+	char comm[TASK_COMM_LEN];
-+#endif
- };
- 
- #define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
-@@ -1910,6 +1917,13 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- #endif
- 	}
- #endif
-+
-+#if defined(CONFIG_KCOV) && defined(CONFIG_STACKTRACE)
-+	cmd->stack_nr = stack_trace_save(cmd->stack_entries, ARRAY_SIZE(cmd->stack_entries), 0);
-+	cmd->pid = current->pid;
-+	get_task_comm(cmd->comm, current);
-+#endif
-+
- 	loop_queue_work(lo, cmd);
- 
- 	return BLK_STS_OK;
-@@ -1925,6 +1939,21 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 	int ret = 0;
- 	struct mem_cgroup *old_memcg = NULL;
- 
-+#if defined(CONFIG_KCOV) && defined(CONFIG_STACKTRACE)
-+	/*
-+	 * This request was queued after checking lo->lo_state == Lo_bound
-+	 * in loop_queue_rq(). The state should remain unchanged unless
-+	 * __loop_clr_fd() by error starts before blk_mq_complete_request()
-+	 * is called.
-+	 */
-+	if (unlikely(data_race(READ_ONCE(lo->lo_state)) != Lo_bound &&
-+		     disk_openers(lo->lo_disk) == 0)) {
-+		pr_err("BUG: found I/O issued by %s/%u but loop%d is no longer bound.\n",
-+		       cmd->comm, cmd->pid, lo->lo_number);
-+		printk("Call Trace:\n");
-+		stack_trace_print(cmd->stack_entries, cmd->stack_nr, 4);
-+	}
-+#endif
- 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
- 		ret = -EIO;
- 		goto failed;
--- 
-2.56.0
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
