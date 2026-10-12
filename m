@@ -1,325 +1,220 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EAA40EBA9;
-	Mon, 12 Oct 2026 12:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791809238; cv=none; b=on8GRERwdjk1z1wB/5G8ZOjDSIqKVXfItdwc6PqX6h67Jo8TOKyZGxNiRlCLkzEuG5qQIgCUzU378iVwvexNGZolL7Z0S5W4p1nAPZGJNnrHhV7B885hb0h/eL1YgjisdW+S3PDGDoXiY9h+WocYJLpdOBNsFYjlhCxaYlVd4fM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791809238; c=relaxed/simple;
-	bh=Mhs3ax/hINqxPEVVgXVJ4W8q+DG17IY3+xWjfK9L6Xw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VD6njJEaYh4Kq1jtKhzFh5315sFcm9oZYqzOL8tL4Wlnjvc1JjXZ27ys920Hg6xQuuTrxqDp9nbwlpfVJIlYokC1XWkaK4dk6ohokeX60OEJ2tVtL1pFoPHRqHs4zYMoOqcu5Awepm2gFk9reaRF9ezZNE1xS9cNkFzbtuWczqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hKZulPTr; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85249488223
+	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 12:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791809601; cv=pass; b=LSCi6eJPGxO+FX7ugTs6tX+HtRLUsfU6vF1WsI03O/7TG8nFtGOTfTSyR/QrgJf56T5XuKD8PNCRDCsv5V29T+u9THbsMPIBN+S0hKr/ySwqvg/f6OVfgJDk5p1P4o30AxZ2rR6L4PtTofcIUR597da9us5YqYEzjxz9T/mwIbc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791809601; c=relaxed/simple;
+	bh=wKnvnUg5jeqtUViASSyTcDwggGYu/7K8r7VVVI2zi7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i4hx5Oy7jrUdC4HaFx7Nwy845rY/G33/sLaqSojhf3r8cpbXiRrahLrglWg6e8WitPUPeju9YqMXSSRP/tzxrdeX74l3qX5/IRhISYqAREMjJv1/1nhQN+Wuq4H2nmon8BnxyW830asZx/knoP7BL9BzXUE8pIxPlqmiywt1lIM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YZb8Yd1b; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hKZulPTr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACB621F0089B;
-	Mon, 12 Oct 2026 12:47:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791809236;
-	bh=CJqp91vLCmZU11djrbL3LV8j9Css7TUeJ1VmYQefYEo=;
-	h=From:Date:Subject:To:Cc;
-	b=hKZulPTrtOS80yeF0nWCZbBznUxZRutslSHruRKTFReDDh6QkY0VEwafd7MGNOkWF
-	 286bVrA9umPrui0PFu1yX2MrBbhtTnCOv02vBmaF/5xUjO6z8enZ0WNcXOrZMFm9Dw
-	 U0gmzmIqQ4Y+HSp91LD2xsow0HkQKZgi699PItQ+b6w70LLXZpH9GgpGU/DUaoXpZj
-	 KD1JdLwuPWc6tBzCnMUMRZfWb2eGaHhoWhhFwySROv7kD8xSsaoAKtxi9+Vh1c9Z/1
-	 8Ecal5LoI8V09bQ0l7jExlEv0pmQqHlsVv5rmKmYOtIr9Gw+ZNSyvZkxoYb0ZZ979z
-	 nbFkgd6Q3HPLw==
-From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 12 Oct 2026 14:47:08 +0200
-Subject: [PATCH] loop: remove support for swapping loop fds
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZb8Yd1b"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-535199ac562so19653391cf.3
+        for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 05:53:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791809599; cv=none;
+        d=google.com; s=arc-20260327;
+        b=LU2luHbLr8kTJHFRbxw9Hy3q+0WVcCSyEYjSuNPDttSHsashE0CjueJ/FZx8by8nQv
+         /Akkq/EIdP4jvy6tIFw2XwvLY28zsdA9xvKhvFeSZZJUfGuLbZlh6PTrZSNEnqumXKp1
+         bg7XULEzDmXTAqzerRqakDZObGjKhLbIICJsIsRlWw7d9PJs74/XEeICZMBvoEAmtHQh
+         rAcA3qYs4JrNj03daozRONvkkCro1n/La5GTcHqaNBqcY4hgFvnBcb42cIGGR32+XUIt
+         FsYUlvmPJyihu0ljBF3mzN6osohaRXFrDzc8wtLMa2FuldQdCW9/z/OhVK8HPuFBE8U0
+         ODWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=84e/fUzVu16zYMHxqQTBH3g/SK35jLe3Za6UZxvtqCI=;
+        fh=rSRx33JtRPuwO4gTme5xoSk3tWnV2nCKTi0mBVXHP14=;
+        b=TMnf8hs5dA2NuM5MC4FLOFK1VfSGTRfD0BS1IwNAcaiStRFSCTaufWeXTXWBnCx41C
+         uXLDVsLIA27RKqmOsUKcnf6BXkRA958u0mZl/wUjP3okgNFctUrXwt2WWXzKHYlnRzLO
+         aqUN/KmN8/eT/IX8dGg18CFRpbnW4zwryHqEYhrStit6SFSf0ZD1bVF6KNY3wiLsm5yn
+         FJXxp44gE3LpkySZ5XXnApjZMMk4ONTnIlp+9r39il9wf5kRNsLWblWNrXROFh7Poc0f
+         pfzMVMNIeiTT43pLLwJlJ9qXAi7ZZ40ZmmeXsD9PaymWPDvgUkODEgAlMYirK1r2vAhq
+         XhEQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791809599; x=1792414399; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=84e/fUzVu16zYMHxqQTBH3g/SK35jLe3Za6UZxvtqCI=;
+        b=YZb8Yd1byhNKyu0thPddzeY00NBeh1bChnBaReDa1KdorbkpaJuIygi3YrjD1GnXqp
+         ihyAgFtawaOSj3riBSCwu89vScAsiMzQKYtO6OAtgZr5x+Po27Oujye6UE7fqCyr/CYx
+         6Xf9pLqKLG3cB1b/x10A3JxScOI2OSp6zksMG7iBhY335Xn524Zf4l9myG5dqG7beeG2
+         ABRAZQwYzfJDrKPW60DK9YdzV5HMfmleMNrJCTgQoGsHLzno03TUCLaoKMcWkrwyzrJd
+         V9BCN811PQzIxh0fRrTmtTzHCX2ZQSrsdmqvLQimUFT6Dw0tlrsamr/3/i6fk7WVsQHx
+         sWTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791809599; x=1792414399;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=84e/fUzVu16zYMHxqQTBH3g/SK35jLe3Za6UZxvtqCI=;
+        b=iqmfPdBifou9rFOtX0CMg7qbSSmripto0zXb8ERpxIEXsk1iW3GgHM/dI3cz+aQEmv
+         x5NuoQwt2VqI+Xr+2vLqy7XxUiJQ/zkmVK1eWEh1J5yVUkjaX4oeVvNAxH7eCFy9/sx6
+         lPRSD2G/46g+haGlHzkxdM/EFd0Z9prwdjzQJ2wTGI8psrXa6j2yJc/WE3z2XJr9ceST
+         hyt9fpIMff1RKiCtn2qRjb0Mfx1vzggoCGM0FRbwGlmGh9NVzz2WYkMZL2a2MPk/6acQ
+         UNNx8/QZg5GhfBuOYiZWjCCEps3u6hhDK6TIeoz+7fR5eFPUA9zOp41UX2ImQQDJiHFn
+         yaAg==
+X-Forwarded-Encrypted: i=1; AKwUvBz2Eg2qZMcl3/6DtpLK976+hcDJAdgrB4L9OV1cAhx1ocvjWg9KyGViJ8DaYSvJYu4mDHKnim8gKyWfmQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKpVlYM2PTR2ShKFAy2Y7I3lW9xnSWkL5TmiNwv12vPIJlQGXLK
+	PTh9jpH5F4/jjOXEY0aphJIJkf/EUIXWbHBjLCrNQ5Is4lo1Lc71karsp5GlCjs+U9hnhgZ7/a2
+	vxlV6s9ZM0W6OTsyiekI4EBXLImRcu6g=
+X-Gm-Gg: AYBFou3dit0Ja2S0k7QyFLxoa2cU1DBzL/Mf+UHAAUVJCHHJWgPVjbXlSDfQnpsrfgb
+	UYD/8gClXFagicSjT6tMnLOsJL7DsGlWL8WH5rZc2QNbcR6qEgo/3l1KMl728X8JhFqYL8UyxzM
+	HKG04Qc6f+aEdNVmAz5vKou8gX84WCCrOE7cLwr48jjxnoXFTr9JWBFfnJ9SEZ5l+HW01p8SVnF
+	4oDg2ngJq3bPpxqwGukJLvoWWZecXgjycYs04inxj0m8JGoXU4CoZRQ1YFg6GAdBdph8YqAM4W3
+	4+TvfmBAwQxSmAFvbrmSr4upSSohn2zdSOOwbTM1w5q58ScHifoQXMor+RR+sPLteFThf28unlF
+	t1ugrqGYwg7Tg+HZk0kof0+ofyWTqxlYnyPxlUDUlwydqWn66MQ1K7pg1EyqT4qUYgLGwm+o/Tx
+	zizNDhk4jvuBTgK6eb687dbuC7246sT2SIU4uxjevBil13BnerIhsIU+qsCiiOggnLKXprasMSW
+	xueGC0Q5aCqFtg3m+SY7UVy9swSDQ==
+X-Received: by 2002:ac8:7f4a:0:b0:535:162c:2e83 with SMTP id
+ d75a77b69052e-5359fa6e9c1mr159066511cf.16.1791809599240; Mon, 12 Oct 2026
+ 05:53:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261012-work-loop-change_fd-v1-1-3cf4ec349bbb@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/z2M2QrCMBBFf6XMsxOaqH3wV0Qky8RGJSkTNyj9d
- zMWfDx3OTNU4kQVDt0MTK9UU8kN9KYDP9p8IUyhMZjeDLrXBt+Fb3gvZcK1P8eAQzT7rdeGdiF
- Ce05MMX1+1uNp5fp0V/IPUcnC2Uro2GY/SiRSJVL1lyqZwLJ8ASaFvnWiAAAA
-X-Change-ID: 20261012-work-loop-change_fd-6f253c12e4df
-To: Chris Mason <mason@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
- Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Christian Brauner <brauner@kernel.org>, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>
-X-Mailer: b4 0.17-dev-3d1b8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10668; i=brauner@kernel.org;
- h=from:subject:message-id; bh=Mhs3ax/hINqxPEVVgXVJ4W8q+DG17IY3+xWjfK9L6Xw=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSduXahwnp3q1XhvJTEX4sMxObr7DmxpXLfx5nmRyQnR
- ij5fF0yr6OUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAi5qmMDCt32syWLv/s8r/j
- 35KeXDGW8IvaWztsGfqyX07tfz37VRUjwwS5le9rH8YFXpkre27SZ/MXORVLe6Ye1NO5I5/5fsX
- FWWwA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+References: <20261011051906.60397-1-jain.sm@gmail.com> <20261011051906.60397-3-jain.sm@gmail.com>
+ <20261012122112.GA31242@lst.de> <CA+FWx=n=66eHOgMFb=unfgqFrhw3prW0EOf1bYHfLATV2-o1_A@mail.gmail.com>
+ <09399f27-11eb-431b-914d-397f42de9dc3@kernel.org> <CA+FWx=kgeR8tz46tijYE-s=v+PTJjGfM+3ucQOo0ZuDyqFdYQw@mail.gmail.com>
+ <0da1bc26-b3ed-4bfa-b75d-2d1696cc0cfb@kernel.org>
+In-Reply-To: <0da1bc26-b3ed-4bfa-b75d-2d1696cc0cfb@kernel.org>
+From: shashank Jain <jain.sm@gmail.com>
+Date: Mon, 12 Oct 2026 18:23:07 +0530
+X-Gm-Features: AclHuK-hgOEROBeWXuLQCKsHn1ZXmfjcLp_D23POYYJAVJN5_TClkWxDbLCW3KI
+Message-ID: <CA+FWx=ko-dj3SORcHcvDpP7abWAmD1JH0o4COPsZc2U7kimTvw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] block: fix the length of a smaller last zone in blkdev_get_zone_info()
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>, Hannes Reinecke <hare@suse.de>, 
+	Chaitanya Kulkarni <kch@nvidia.com>, "Martin K. Petersen" <mkp@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-LOOP_CHANGE_FD swaps the backing file of a bound read-only loop device
-for another file of the same size. The comment above loop_change_fd()
-says this is for installers that want to free the original image and
-for HA setups that want to switch to another copy of the image. When we
-discussed deprecating it in 2023 (cf. [1]) we found no users at all:
-zero hits on codesearch.debian.net, GitHub code search and
-cs.android.com. The only things that exercise it are strace, LTP,
-stress-ng and blktests. Everyone agreed to drop it. I just never sent
-the patch.
+On Mon, Oct 12, 2026, Damien Le Moal wrote:
+> I was thinking on adding a "--cached" option to control the use of
+> BLK_ZONE_REP_CACHED.
+> If you want to take on such patch, go ahead. CC me on it and I will revie=
+w.
 
-Since then we found several more problems with it and all of them are
-structural. The ioctl changes what a block device is backed by after a
-filesystem has been mounted on it and nothing else in the kernel does
-that.
+Thanks - yes, I will take it: a "--cached" option to "blkzone report"
+that selects BLKREPORTZONEV2 with BLK_ZONE_REP_CACHED, leaving the
+default report via the device (BLKREPORTZONE) unchanged. I will post it
+to util-linux and CC you. The blktests reproducer will then use
+"blkzone report --cached" rather than a bundled helper.
 
-(1) It creates a lock order cycle.
+Thanks,
+Shashank
 
-    loop_change_fd() is the only loop operation that calls
-    disk_force_media_change() on a bound device while a filesystem can
-    be mounted on it. loop_configure() calls it before the device is
-    bound and __loop_clr_fd() after the last opener is gone. And it
-    calls it with lo->lo_mutex held.
-
-    Since v6.6 disk_force_media_change() doesn't just bump the disk
-    sequence number. It calls bdev_mark_dead() which calls into the
-    holder, i.e., fs_bdev_mark_dead(), which takes sb->s_umount of
-    every superblock on that device. So LOOP_CHANGE_FD gives us:
-
-        lo_mutex -> s_umount
-
-    Mounting a filesystem takes s_umount in sget_fc() and then opens
-    the block device in setup_bdev_super(). That takes
-    disk->open_mutex and calls lo_open() which takes lo_mutex:
-
-        s_umount -> open_mutex -> lo_mutex
-
-    That's a cycle. Lockdep reports it as soon as LOOP_CHANGE_FD is
-    used on a device that has a filesystem mounted on it. This was
-    recently hit with erofs where LOOP_CHANGE_FD raced with umount and
-    a concurrent open of the loop device. And it is a real deadlock:
-    the mounter holds s_umount and waits for open_mutex, the opener
-    holds open_mutex and waits in lo_open() for lo_mutex, and the
-    LOOP_CHANGE_FD caller holds lo_mutex and waits in
-    fs_bdev_mark_dead() for that superblock.
-
-    Note that we went through the block layer in v6.7 to guarantee
-    that s_umount is never taken under open_mutex. LOOP_CHANGE_FD is
-    the reverse direction and it was simply never considered.
-
-(2) The use-case it was added for doesn't work anymore.
-
-    fs_bdev_mark_dead() shuts the filesystem down. For ext4, xfs and
-    btrfs that means ->shutdown() is called and the mounted filesystem
-    returns -EIO from then on. So swapping the image under a mounted
-    filesystem can't work for any filesystem that implements shutdown.
-    It only survives on erofs because erofs deliberately doesn't
-    implement ->shutdown() and ->remove_bdev(). Commit 69139a62a918
-    ("erofs: open via dedicated fs bdev helpers") explicitly cites
-    loop_change_fd() as the reason why it shouldn't. IOW, an ioctl
-    without users dictates what a filesystem is allowed to do on
-    device removal.
-
-    And it never worked on partitions. disk_force_media_change() only
-    acts on disk->part0 so a filesystem mounted on loop0p1 isn't told
-    anything when the image under it is swapped.
-
-(3) It can create superblock pin cycles.
-
-    loop_validate_file() only guards against loop-on-loop recursion.
-    It doesn't stop LOOP_CHANGE_FD from pointing a bound device at a
-    file on the filesystem that is mounted from that very device, or
-    two devices at files on each other's filesystems, or a device at a
-    file on a fuse mount whose passthrough backing file lives on the
-    loop mount. Static setups can't form these cycles because the
-    backing file is opened before the filesystem on top of it exists.
-    LOOP_CHANGE_FD is the only block layer path where the edge is
-    added afterwards.
-
-    The result is a cycle of superblocks: the backing file pins the
-    mount, the mount pins the superblock, the superblock holds the
-    device open and the device holds the backing file. umount detaches
-    the mounts but nothing ever frees them and the mount namespace
-    they live in leaks with them. This is not a cycle of mounts so
-    nothing in mount teardown can break it. It's root-only, but it is
-    a permanent leak that can't be undone.
-
-(4) It makes filesystem stacking dynamic.
-
-    s_stack_depth assumes that the dependencies between filesystems
-    are fixed when a filesystem is mounted. With LOOP_CHANGE_FD the
-    image of a mounted filesystem can be moved onto another filesystem
-    at any later time, so a loop-mounted filesystem is at stacking
-    depth 0 no matter what its image ends up on. That is the hole in
-    the stacking deadlock discussion for fanotify pre-content events
-    (cf. [2]).
-
-The partition handling of LOOP_CHANGE_FD has been broken since v7.1
-and nobody noticed until Daan ran into it in August (cf. [3]). That's
-about the level of use this ioctl sees.
-
-So let's remove it. LOOP_CHANGE_FD now returns -EOPNOTSUPP.
-
-[1]: https://lore.kernel.org/r/20231023-biberbau-spatzen-282ccea0825a@brauner
-     https://lore.kernel.org/r/20231024-entfuhr-sachbezogen-aab33dec4087@brauner
-[2]: https://lore.kernel.org/r/CAOQ4uxi2Mx4ZB48DhQJWOvt6UBur3LnrkttgRjo72U4+Cu81iQ@mail.gmail.com
-     https://lore.kernel.org/r/20260617-vorfahren-haften-nullnummer-b0d6fccadae3@brauner
-[3]: https://lore.kernel.org/r/20260806-b4-loop-nbd-stale-partitions-v1-1-67bb75a8d7be@amutable.com
-
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
-Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
----
- drivers/block/loop.c | 112 ++-------------------------------------------------
- 1 file changed, 4 insertions(+), 108 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 758c20678bf6..aabaaacdb4fa 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -105,7 +105,7 @@ static DEFINE_MUTEX(loop_validate_mutex);
-  *
-  * Since loop_validate_file() traverses on other "struct loop_device" if
-  * is_loop_device() is true, we need a global lock for serializing concurrent
-- * loop_configure()/loop_change_fd()/__loop_clr_fd() calls.
-+ * loop_configure()/__loop_clr_fd() calls.
-  */
- static int loop_global_lock_killable(struct loop_device *lo, bool global)
- {
-@@ -537,109 +537,6 @@ static int loop_check_backing_file(struct file *file)
- 	return 0;
- }
- 
--/*
-- * loop_change_fd switched the backing store of a loopback device to
-- * a new file. This is useful for operating system installers to free up
-- * the original file and in High Availability environments to switch to
-- * an alternative location for the content in case of server meltdown.
-- * This can only work if the loop device is used read-only, and if the
-- * new backing store is the same size and type as the old backing store.
-- */
--static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
--			  unsigned int arg)
--{
--	struct file *file = fget(arg);
--	struct file *old_file;
--	unsigned int memflags;
--	int error;
--	bool partscan;
--	bool is_loop;
--
--	if (!file)
--		return -EBADF;
--
--	error = loop_check_backing_file(file);
--	if (error) {
--		fput(file);
--		return error;
--	}
--
--	/* suppress uevents while reconfiguring the device */
--	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
--
--	is_loop = is_loop_device(file);
--	error = loop_global_lock_killable(lo, is_loop);
--	if (error)
--		goto out_putf;
--	error = -ENXIO;
--	if (lo->lo_state != Lo_bound)
--		goto out_err;
--
--	/* the loop device has to be read-only */
--	error = -EINVAL;
--	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY))
--		goto out_err;
--
--	error = loop_validate_file(file, bdev);
--	if (error)
--		goto out_err;
--
--	old_file = lo->lo_backing_file;
--
--	error = -EINVAL;
--
--	/* size of the new backing store needs to be the same */
--	if (lo_calculate_size(lo, file) != lo_calculate_size(lo, old_file))
--		goto out_err;
--
--	/*
--	 * We might switch to direct I/O mode for the loop device, write back
--	 * all dirty data the page cache now that so that the individual I/O
--	 * operations don't have to do that.
--	 */
--	vfs_fsync(file, 0);
--
--	/* and ... switch */
--	disk_force_media_change(lo->lo_disk);
--	memflags = blk_mq_freeze_queue(lo->lo_queue);
--	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
--	loop_assign_backing_file(lo, file);
--	loop_update_dio(lo);
--	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
--	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
--	loop_global_unlock(lo, is_loop);
--
--	/*
--	 * Flush loop_validate_file() before fput(), for l->lo_backing_file
--	 * might be pointing at old_file which might be the last reference.
--	 */
--	if (!is_loop) {
--		mutex_lock(&loop_validate_mutex);
--		mutex_unlock(&loop_validate_mutex);
--	}
--	/*
--	 * We must drop file reference outside of lo_mutex as dropping
--	 * the file ref can take open_mutex which creates circular locking
--	 * dependency.
--	 */
--	fput(old_file);
--	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
--	if (partscan)
--		loop_reread_partitions(lo);
--
--	error = 0;
--done:
--	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
--	return error;
--
--out_err:
--	loop_global_unlock(lo, is_loop);
--out_putf:
--	fput(file);
--	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
--	goto done;
--}
--
- /* loop sysfs attributes */
- 
- static ssize_t loop_attr_show(struct device *dev, char *page,
-@@ -1215,12 +1112,11 @@ static int loop_clr_fd(struct loop_device *lo)
- 
- 	/*
- 	 * Since lo_ioctl() is called without locks held, it is possible that
--	 * loop_configure()/loop_change_fd() and loop_clr_fd() run in parallel.
-+	 * loop_configure() and loop_clr_fd() run in parallel.
- 	 *
- 	 * Therefore, use global lock when setting Lo_rundown state in order to
- 	 * make sure that loop_validate_file() will fail if the "struct file"
--	 * which loop_configure()/loop_change_fd() found via fget() was this
--	 * loop device.
-+	 * which loop_configure() found via fget() was this loop device.
- 	 */
- 	err = loop_global_lock_killable(lo, true);
- 	if (err)
-@@ -1566,7 +1462,7 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		return loop_configure(lo, mode, bdev, &config);
- 	}
- 	case LOOP_CHANGE_FD:
--		return loop_change_fd(lo, bdev, arg);
-+		return -EOPNOTSUPP;
- 	case LOOP_CLR_FD:
- 		return loop_clr_fd(lo);
- 	case LOOP_SET_STATUS:
-
----
-base-commit: 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
-change-id: 20261012-work-loop-change_fd-6f253c12e4df
-
+On Mon, Oct 12, 2026 at 6:15=E2=80=AFPM Damien Le Moal <dlemoal@kernel.org>=
+ wrote:
+>
+> On 2026/10/12 14:41, shashank Jain wrote:
+> > On Mon, Oct 12, 2026, Damien Le Moal wrote:
+> >> How do you plan to issue a BLK_ZONE_REP_CACHED report? "blkzone report=
+"
+> >> does not have that yet. I am planning to send a patch for it.
+> >
+> > Good point. Two options, and I am happy to follow your preference:
+> >
+> > - Use "blkzone report" with the cached flag once your util-linux patch
+> >   lands - that matches the existing zbd tests and avoids a bundled tool=
+.
+> >   I would hold the blktests submission until it is available.
+>
+> We should leave "blkzone report" to get the device report as before, to a=
+void
+> breaking anything for user with the "active" condition being returned.
+> I was thinking on adding a "--cached" option to control the use of
+> BLK_ZONE_REP_CACHED.
+>
+> If you want to take on such patch, go ahead. CC me on it and I will revie=
+w. The
+> patches I need to send to add depop support will take some more time.
+>
+> > - Or carry a small C helper in the blktests src/ directory that issues
+> >   BLKREPORTZONEV2 with BLK_ZONE_REP_CACHED directly, so the test is
+> >   self-contained and does not depend on the util-linux version.
+> >
+> > I lean towards the first, to match the zbd conventions and your blkzone
+> > work; tell me which you prefer and I will align the test with it.
+> >
+> > Thanks,
+> > Shashank
+> >
+> > On Mon, Oct 12, 2026 at 6:07=E2=80=AFPM Damien Le Moal <dlemoal@kernel.=
+org> wrote:
+> >>
+> >> On 2026/10/12 14:29, shashank Jain wrote:
+> >>> On Mon, Oct 12, 2026, Christoph Hellwig wrote:
+> >>>> Can you add this to blktests as a reproducer?
+> >>>
+> >>> Will do. I'll send a blktests test under tests/zbd/ that sets up a zo=
+ned
+> >>> null_blk device with a smaller last zone and checks that BLKREPORTZON=
+EV2
+> >>> without BLK_ZONE_REP_CACHED matches BLKREPORTZONE, and that the cache=
+d
+> >>> report's last-zone length does not extend past the device. I'll post =
+it
+> >>> to the blktests project separately and reference this series.
+> >>
+> >> How do you plan to issue a BLK_ZONE_REP_CACHED report? "blkzone report=
+" does not
+> >> have that yet. I am planning to send a patch for it.
+> >>
+> >>>
+> >>> Thanks,
+> >>> Shashank
+> >>>
+> >>> On Mon, Oct 12, 2026 at 5:51=E2=80=AFPM Christoph Hellwig <hch@lst.de=
+> wrote:
+> >>>>
+> >>>> On Sun, Oct 11, 2026 at 10:49:06AM +0530, Shashank Mohan Jain wrote:
+> >>>>> blkdev_get_zone_info() sets the length of every zone to the zone si=
+ze
+> >>>>> of the device. The last zone of a zoned block device may be smaller
+> >>>>> than the others: blk_revalidate_zone_cb() accepts that and remember=
+s
+> >>>>> the capacity of that zone in disk->last_zone_capacity. For such a z=
+one
+> >>>>> the length reported from the cached information is too large, and
+> >>>>> start + len is beyond the end of the device. A conventional last zo=
+ne
+> >>>>> is also given the capacity of a full zone.
+> >>>>>
+> >>>>> Example with a zoned null_blk device of 10 MiB (20480 sectors) with
+> >>>>> 4 MiB zones, last zone:
+> >>>>>
+> >>>>>   BLKREPORTZONE:       start 16384 len 4096 capacity 4096
+> >>>>>   BLKREPORTZONEV2 with
+> >>>>>   BLK_ZONE_REP_CACHED: start 16384 len 8192 capacity 4096
+> >>>>
+> >>>> Can you add this to blktests as a reproducer?
+> >>>>
+> >>>> The patch looks good:
+> >>>>
+> >>>>
+> >>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> >>
+> >>
+> >> --
+> >> Damien Le Moal
+> >> Western Digital Research
+>
+>
+> --
+> Damien Le Moal
+> Western Digital Research
