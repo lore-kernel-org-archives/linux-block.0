@@ -1,60 +1,31 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4980446C00;
-	Mon, 12 Oct 2026 08:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDA0285058
+	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 09:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791793587; cv=none; b=VSiSo7vYFjHtBWdiwPD1H3vOnw635QPIIJg3yUf1XxuT6A9MJOS2HY/TV/Q7tOsa0aXZ13zuGmptRtGpOxIYZFcg7MGP/1gec9krA7BwPTX65idnbbrXe1E1kh79NU3UmhxwS9HYf6jiD1pJi1jJU7CBAsmT3OOXA/P80Gf66fU=
+	t=1791796312; cv=none; b=JZ+uZ+Qy/xDfUNsnM0+nW3w802s9Vl5VIZG2LNE6zXIqSv5tK14zGZE2bD+wsXt898vQHseIRoVtczleLJUGITxxdSdEEBv1BpbNuXsbDRQ8SdCAuwSseRPvKqDncTkfVuCs0dw8PTMlBsim7Sc1uyraIdD50aTDMujBBtkHIvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791793587; c=relaxed/simple;
-	bh=uTGExs3kULdIbyMdWoKvXjVNc5Hw27I3W5SvGXJSCBU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OcIi4OEl1S/RjfIZ/h7y0zihInHmcZk7jcYiNUWVGV9n/YKucjQluBDr9svLfhq6Htcylk0MeaL1HsVVnC98XfUxA8g5IiMuhDFqyMYVZhsSkiKFrQ9A8pTRYTx+wOzGshv6LMxbcEujdsX6kbfb5QIwRFNO2X9qDPhZ8LHAO/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HRZ7ic2k; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HRZ7ic2k"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69C5EtSo3566222;
-	Mon, 12 Oct 2026 08:26:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=/CsAHV
-	V7wIz75xaHKMcYPMKlWO5lfc8tcMIl3MXOIzU=; b=HRZ7ic2kVtXfGhTSNxhE8j
-	lACuXBkp8A7sDH2HOu77UVtAPrFbP1QYQjaW12lp1y3hR29UiM8lYrR2F3VH5ppt
-	go3TISjPokxvr/jHqIgJ14nQzSQ8wAabUhcHVfQUYxACuUURuAJa5JJiSbHhCwwb
-	DhmshzqxShrEUouZC8r1dDhiPY5xlvF8qEOcWqUbqCdPl0DQ95kG20oDt56pQl88
-	WEZI3YA3rkosmyMUdxTr+1/I33We70jJAw8cmILdDG39Q1teBlfIaVZQ+A8+jTqH
-	JTk8x9YPEP/EMhnMxMvvKE+B7sN//+TlqSAKW1eLr/QILx98hWEnvliOyLfrjcqQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4h7dug7x1p-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 12 Oct 2026 08:26:19 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69C8JxsR964540;
-	Mon, 12 Oct 2026 08:26:18 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4h7yppmg3d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 Oct 2026 08:26:18 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 69C8QI1818416134
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 12 Oct 2026 08:26:18 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2DCB45805B;
-	Mon, 12 Oct 2026 08:26:18 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C3FCA58059;
-	Mon, 12 Oct 2026 08:26:15 +0000 (GMT)
-Received: from [9.61.185.118] (unknown [9.61.185.118])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 12 Oct 2026 08:26:15 +0000 (GMT)
-Message-ID: <0c3a6b07-b6ca-4ef2-abcd-6b4e5a5c3fbe@linux.ibm.com>
-Date: Mon, 12 Oct 2026 13:56:14 +0530
+	s=arc-20240116; t=1791796312; c=relaxed/simple;
+	bh=/xokTDjggRfafbpZBpoOuv+geFJPhJ/x6fi887A2ZoA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Izbo96BID3VcDT09mbwY3vVcA9BkB3FDsBwlp181ryrf9JavIet5ACe1gnqyGJ5DjaNJJWfHoXJVjqacLhyxMWdFyqnZRpdW9nzLt3ogTFSZnZ4Fet4qK8oDn2JKDpoxhHf1RMckg+gJbjSz20+je3FIua0uMSgkB7wO/4TzuL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 69C8Q6kG075490;
+	Mon, 12 Oct 2026 17:26:06 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 69C8Q685075486
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 12 Oct 2026 17:26:06 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <53c3ccf7-1a5e-4861-afc0-7cbfd3284655@I-love.SAKURA.ne.jp>
+Date: Mon, 12 Oct 2026 17:26:05 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,112 +33,112 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: don't quiesce the queue when setting the default
- elevator
-To: Qiliang Yuan <odys.yuan@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20261001-bug-block-elevator-init-quiesce-v1-1-5c85fa0ec59b@gmail.com>
+Subject: [PATCH] block: Wait for inflight requests in bdev_release()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>,
+        Edward Adam Davis <eadavis@qq.com>, Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net,
+        Bart Van Assche <bvanassche@acm.org>
+References: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
+ <20261007130851.GA30117@lst.de>
+ <4d7c7365-259c-402e-9cf5-d55ad9333200@I-love.SAKURA.ne.jp>
+ <380f04ef-902d-4664-9ae3-228692d2efb9@I-love.SAKURA.ne.jp>
+ <696e5e7c-e3f1-4181-be2a-8915fd1753cf@I-love.SAKURA.ne.jp>
+ <cc2910d3-3113-44d4-94ef-0c8d365fac9c@I-love.SAKURA.ne.jp>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20261001-bug-block-elevator-init-quiesce-v1-1-5c85fa0ec59b@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <cc2910d3-3113-44d4-94ef-0c8d365fac9c@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=Cr0q4X4D c=1 sm=1 tr=0 ts=6acc99ac cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
- a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8 a=6xKE9iGDAtwx3dwle_cA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: fEyHqStj6MB8fjQoHm2POadY9GYtVjze
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDEyMDAzMiBTYWx0ZWRfX6AZDXQACvPLo
- MJ0ywzl2TxiKrVW4A7AsiFzjwhMKcoGpwi8DqggFF2/ypiv8Jx45DckQhoJkBptVNN5wHD8uRzh
- aECANETmpLqDrP7tSWMmHCbeO2NcPUPq8jtsOX4B5B7Zw/QHNKd8BUeAzMhJXq0wckn03Zwah24
- qIl03D7WZLxJ0AJkCUqaBqUKy4Qi7j6eXHrZLI5rP0qrw6hkMbez/nR+5jusEiZnoi6ehzM5paW
- Haby63HpAW7sx4c3vjXcTdmemi4+SxdJvyQjBPFOCDiEtZJvIpFsXxtlVEOLl5CsxjEqDxPRvHz
- 4ma97wXfS9OxkqcRhrnnzfzBGaiWRyKKL50cSEmKtNJ9cha54lSIEpUM+I5nkaH8drzo0xhJBff
- iXET2XGyKpLpq1+ZMRKQ8uNL706ZzeHy/qgtPx5gLs/AyDtK4PYtNimxw42w7HNYRYCk1xcfG1Z
- 0kVQ6aY/YSin7vUF+4w==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDEyMDAzMiBTYWx0ZWRfXwYZZD5Yy7K0x
- U3MKznYxv28g5HiseYsmhCBeqPdMHIjyEHAJgZPmnnYDhwSxpKX8oWVPELSPNMO6ugrOSgnDGsV
- 1pebeBwNjysFjk+KrjBzN9vxmOT7Yno=
-X-Proofpoint-ORIG-GUID: iNNUSd_VMQtGntdRwn789mpakV0IsmA4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-12_02,2026-10-09_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501 suspectscore=0
- malwarescore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610120032
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav415.rs.sakura.ne.jp
 
-On 10/1/26 8:40 AM, Qiliang Yuan wrote:
-> elevator_set_default() runs from blk_register_queue() while the disk is
-> still being added: the block device is not visible yet and uevents are
-> suppressed, so no file system I/O can be issued. elevator_change()
-> freezes the queue and cancels the dispatch work before switching, which
-> is enough to drain dispatch activity from passthrough requests, as the
-> comment in elevator_change() already states.
-> 
-> elevator_switch() still quiesces the queue unconditionally, though, so
-> every disk added with a default elevator waits for an RCU grace period.
-> Commit 245a489e81e1 ("block: avoid to quiesce queue in
-> elevator_init_mq") had removed this wait from the default elevator
-> setup, and it came back when that setup was folded into
-> elevator_change().
-> 
-> The wait is paid in full by callers that add disks one at a time. ublk
-> adds the disk of a single-queue device from START_DEV, which takes 7.7ms
-> at p50 in a 16 vCPU KVM guest, most of it in blk_mq_quiesce_queue()
-> called from elevator_set_default().
-> 
-> Skip quiescing in elevator_switch() when setting the default elevator.
-> 
-> ublk null target, 1000 single-queue devices created one by one:
-> 
->                       before      after
->    START_DEV p50      7.74ms     0.68ms
->    START_DEV p99     14.61ms     1.32ms
->    devices/s             114        971
-> 
-> Fixes: 1e44bedbc921 ("block: unifying elevator change")
-> Cc:stable@vger.kernel.org
-> Signed-off-by: Qiliang Yuan<odys.yuan@gmail.com>
-> ---
->   block/elevator.c | 7 +++++--
->   block/elevator.h | 2 ++
->   2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 2161b6eea680c..da9ba70ac9321 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -573,7 +573,8 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
->   			return -EINVAL;
->   	}
->   
-> -	blk_mq_quiesce_queue(q);
-> +	if (!ctx->no_quiesce)
-> +		blk_mq_quiesce_queue(q);
->   
->   	if (q->elevator) {
->   		ctx->old = q->elevator;
-> @@ -594,7 +595,8 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
->   	blk_add_trace_msg(q, "elv switch: %s", ctx->name);
->   
->   out_unfreeze:
-> -	blk_mq_unquiesce_queue(q);
-> +	if (!ctx->no_quiesce)
-> +		blk_mq_unquiesce_queue(q);
->   
-One minor nit: Since we only unquiesce the queue at the out_unfreeze label,
-could you rename it to out_unquiesce while you're at it? I realize this label
-predates your change, but the new name would better reflect what happens there.
+syzbot is reporting a NULL pointer dereference [1] and invalid reading of
+destroyed "struct file" [2] in lo_rw_aio() within the loop driver. Also,
+syzbot-ci is reporting read attempt on a no-longer bound loop device [3].
+These reports are caused by current implementation that a block device's
+backing storage and associated structures (such as "struct file") are
+invalidated before all outstanding asynchronous or file-system-driven I/O
+requests have fully completed.
 
-Otherwise, this change looks good to me.
+Investigation revealed that filesystems can leak outstanding non-blocking
+Read/Write requests during error-rollbacks in the mount failure path or
+during standard unmount sequences:
 
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+1. Write Leaks via -EIO: When filemap_fdatawrite_range() returns an error
+   (such as -EIO due to filesystem errors), filemap_write_and_wait_range()
+   skips the subsequent __filemap_fdatawait_range() call. As a result,
+   sync_blockdev() returns prematurely without waiting for the completion
+   of write requests already sitting in flight.
+2. Read Leaks via Readahead: Asynchronous metadata readahead requests are
+   entirely ignored by sync_blockdev(), allowing ongoing Read I/O to bypass
+   data synchronization entirely.
 
+When these leaked requests later complete or attempt backend processing via
+loop's kworker (loop_handle_cmd()), they dereference now-invalid or
+nullified fields.
 
+While earlier attempts tried to address this regression inside the loop
+driver by temporarily releasing disk->open_mutex [4] or proposing a core
+layer post_release() callback [5], these approaches were rejected because
+they either introduced invasive driver-specific hooks into the block layer
+or broke the core mutual exclusion semantics that the block layer relies
+upon.
+
+To fix this comprehensively without introducing deadlocks or altering
+driver-specific semantics, enforce an explicit queue freeze in the core
+VFS close path inside bdev_release(), right before disk->open_mutex is
+acquired:
+
+1. Lock-Free Congestion Clearing: Calling blk_mq_freeze_queue() before
+   acquiring disk->open_mutex avoids any circular locking dependencies
+   (disk->open_mutex => wq_completion => VFS locks => disk->open_mutex),
+   guaranteeing that the lockdep hierarchy remains perfectly undisturbed.
+2. Guaranteed Quenching: Freezing the queue ensures that all outstanding
+   asynchronous Direct I/O (cmd->use_aio != 0) and page-cache readahead
+   requests are physically completed and drained before the loop device
+   proceeds to teardown and unbind the backing file via fput().
+
+This architecture-compliant fix should be able to ensure data integrity
+and lifecycle synchronization across all virtual block devices without
+muddying block layer locks.
+
+Reported-by: syzbot+cd8a9a308e879a4e2c28@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28 [1]
+Reported-by: syzbot+bc273027d5643e48e5b3@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3 [2]
+Link: https://lkml.kernel.org/r/6acbe268.8cdf6287.1eb53.00ed.GAE@google.com [3]
+Link: https://lkml.kernel.org/r/8dedfc40-9cae-44ff-9960-e0eb1825e963@I-love.SAKURA.ne.jp [4]
+Link: https://lkml.kernel.org/r/69960302-1535-441a-be4e-d652766d65c2@I-love.SAKURA.ne.jp [5]
+Assisted-by: Gemini-Pro
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ block/bdev.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index cd8323083740..2ddffc65f9da 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -1170,6 +1170,19 @@ void bdev_release(struct file *bdev_file)
+ 	if (atomic_read(&bdev->bd_openers) == 1)
+ 		sync_blockdev(bdev);
+ 
++	/*
++	 * Always wait for all inflight read/write requests to complete.
++	 *
++	 * We can't omit this wait when it does not look like we're the last
++	 * one, for it is possible that two processes concurrently call
++	 * bdev_release() and see atomic_read(&bdev->bd_openers) > 1 and then
++	 * sequentially call blkdev_put_whole() with disk->open_mutex held.
++	 *
++	 * Also, we can't wait with disk->open_mutex held because there is
++	 * possibility of deadlock.
++	 */
++	blk_mq_unfreeze_queue(bdev->bd_queue, blk_mq_freeze_queue(bdev->bd_queue));
++
+ 	mutex_lock(&disk->open_mutex);
+ 	bdev_yield_write_access(bdev_file);
+ 
+-- 
+2.56.0
