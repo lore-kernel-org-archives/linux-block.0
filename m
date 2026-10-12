@@ -1,454 +1,173 @@
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020088.outbound.protection.outlook.com [52.101.196.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D58636B914
-	for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 19:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791746667; cv=none; b=MR7OfukWToVawE3HBoYl/nzuNzj/KtB5c0nJLeKIpHR/eJR+MGoPhy4a+sLBlvgFNXFNGZ9g8bL0laTDFWp4Rg60m3ufZykuXdEWsADLqUf6m4MRx7XBq9uhNkK9cKotRwhoeEuYum4/GBQM3+1/JGpi7PuipT9YNI+3lu53NKc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791746667; c=relaxed/simple;
-	bh=wpYc3lbbpqid/00g/0ScDAWXCp0HRT4O4CEe5wgLaHc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=NnVZpM+QhS9GffJpL6Ugwnn8XkLxaUiIcu2ZvNlGpnYelRLbtsgdGC6+V560fQXmbnTe4dvgbutmyvbvrNvjRuJErpGkkSFnWweTgu4d/FxtGCd7kLgX/73JGpt+wyfIoeysvigfiBVTQ3Jq+o39x6g7GhW0suzgWJrMIkip98M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4db3db8687fso2367937b6e.0
-        for <linux-block@vger.kernel.org>; Sun, 11 Oct 2026 12:24:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791746664; x=1792351464;
-        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=FWl80TccLNk2610N0Xq751vCiHR/5oCRZPlaW3S7xE0=;
-        b=L4mxa2LdYmzx2IgjckH3FUi1S/CCvG83yfXuF8U1FBLSVHX/oLy36yBBxT4EQ7oDV2
-         xOXWSynLESnSbGXMQga9korCTG0btxL7K3Rb26dLULXoWudM0h+WLyyGP8Ft41igWh+d
-         xGLksKncIGalXDO6j6eXFYf5rB2fEU+0EavWFptxMOWcLo26geZ4tJYg4C2bAqd9a/FQ
-         pHAlqTa0W2xvBDkNDwVEGf0hHI+Qh4oaL5pM1aEkqFhYgnHZqXrtr1TXDg8NqJax/TI4
-         KbYmF99fj0jBanfKr7aDonS2FT/1KfXpUOAUlNglxsmmmnwNqznkCfGjORylcS9hxJZn
-         Le1A==
-X-Forwarded-Encrypted: i=1; AKwUvByX+Dn17U06IZE8Jqo3Ia6SIw8lKhYzDUrfBrZpwHIQHueQhKN9uLg04bOLHck6HT5TMnVgNwnPCV2ykw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLEMhF0zL8VYIOOjzkq5s78NxdQY6eSncux9Ztoc5Gb1tCwNw41
-	I4USWJTrOgQDUEz8RqE/VQeWws74TvIGqQEyseV72QLB2oSX25vR+Aowo6C0ncl0cpi8VuIpjnX
-	DIek6MKmVh1BvjdKKJ3CPloiq+9Orke7JOzjCX4qqUxzwFSL43oWphPxNtj4=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075F22BF3F3;
+	Mon, 12 Oct 2026 01:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791768555; cv=fail; b=pZ+ijJ5Gr0YRxaSLHeoZQtLEahJlbsdMc9aN5nr8C7uLflTgrXf999H4tqUVTLjVqFUVnbCXJrEDvuzJrdvsRmBG7MGcSp/2onwANXZbiksMiv5EjtNsaj6hKzMLHjGTvVaXH9hbfZEr7Rn6O6a+F9mtUs2RAWxuPjDnLyprsFk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791768555; c=relaxed/simple;
+	bh=taW9B5hy6hpwTZ05nVw9IMW1U0q6lSexJKJ1GwnopYI=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=uzS/kqzHaC12JqN8Vn2AQITcxxggkxUyfv7UlBdfexwYQD2A3n/InOoBgz6fq7rOh+DvlKkS1zo58By4lh1XV2kY+5H9OaWjXad5VmWvgUzagC+V5rg42BE8VCNHvBR0c4M5UxNCMIiyYrPrR5V3DgUVrild+doCvgstIb62jTc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.196.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VxzB6WtqSsU1K3ob+p3pYuT9iDKMaeWRwQwjfhQpReBauoAXs/SHVcSITC0+3HXKxtJtexGS81zGAGRfRJpM5C6f+N0zYurm8IofK2Iy5cCQXigGFCb+YD5C83RkM0AQG9vZKSWP7bWrt+geKf9k0bjpVD0M7b/PV3QQd81OtoDXcus1NyRyDNYLYbNNedmyPPER62xhwvW61AB8kdvYH5EW55uwlyeWv9bjkjnSz8c4gI2RPGpyFujWz9ZrKu0S1CosNjm0hm6yD0cvkKRWl8Dev984M5uFZyOyebmYR84VyIiQGjUwyRDPVwBkw2ky5hQW520TnwYpqxp4fC08iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
+ bh=hi20PcVx5j/rEk/BQ+7VtpcAYS5mlc7WpcFes2HKqmg=;
+ b=M7sITXh+5kMZGu3eySPXtG4JUEK2Zbx3SGOjES6Ps1DHDSv6g1AtDWGT48BMsl+kZrdBU+2PN70hbB6I9nblo25tt2k2fHH4WnUN5CHx/tLMZKPy0+3GV42DA8yv0mrcE+XZatcuAE5q4BELxcrPXTOe1HpDh75j+Kj/fVFAtHJlrYQkNg0n1z0tMggJz+Dl4JDA8bmObIkErOntpIzjjfwig20OamwoRFiN6Lvun9drbVgN6Rrxkfxq6PJujuaZFPnGV+PToOc984jCuXkyCuNHtSdIiICJ/PTChZz4vyZB4KHeXHeRIM/xqs2UJTKv8kgtQjX6NwLgToJrkiYNKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
+ by CWLP123MB7027.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:1f3::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.21; Mon, 12 Oct
+ 2026 01:29:09 +0000
+Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0496.020; Mon, 12 Oct 2026
+ 01:29:09 +0000
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: axboe@kernel.dk
+Cc: tom.leiming@gmail.com,
+	hare@suse.de,
+	atomlin@atomlin.com,
+	sean@ashe.io,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] blk-mq: dispatch kworker to housekeeping CPU when hctx cpumask is empty
+Date: Sun, 11 Oct 2026 21:29:05 -0400
+Message-ID: <20261012012905.267920-1-atomlin@atomlin.com>
+X-Mailer: git-send-email 2.55.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BN9PR03CA0952.namprd03.prod.outlook.com
+ (2603:10b6:408:108::27) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:183::5)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:bd3:b0:4d6:93c3:3e90 with SMTP id
- 5614622812f47-50c5bf0c2e4mr6824743b6e.67.1791746664193; Sun, 11 Oct 2026
- 12:24:24 -0700 (PDT)
-Date: Sun, 11 Oct 2026 12:24:24 -0700
-In-Reply-To: <cc2910d3-3113-44d4-94ef-0c8d365fac9c@I-love.SAKURA.ne.jp>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6acbe268.8cdf6287.1eb53.00ed.GAE@google.com>
-Subject: [syzbot ci] Re: loop: Detect write requests that failed to wait for completion.
-From: syzbot ci <syzbot+ci472e62ec00dbd79b@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, bvanassche@acm.org, eadavis@qq.com, hch@lst.de, 
-	jfs-discussion@lists.sourceforge.net, linux-block@vger.kernel.org, 
-	nilay@linux.ibm.com, penguin-kernel@i-love.sakura.ne.jp, shaggy@kernel.org
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|CWLP123MB7027:EE_
+X-MS-Office365-Filtering-Correlation-Id: b7359ab9-8210-4b41-889d-08df280036a5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|1800799024|23010399003|56012099006|18002099003|6133799003|261009223027099003|10067099003;
+X-Microsoft-Antispam-Message-Info:
+	HnpAb7CuceWRbdlZD6TqRJ8UPHrst+3ZEx7zQENGbGdqA/32fFJrsCJD0dblOk4+YV636k4yHFmVyav67A+XnJmoxdAmuYrl0COeE4pmJh9xiFSRY2oJY+NJxiQzcl8J1MKwMfVNayCgkZu4SChrRDJ2AhDFUZPu1LPK4mSK3q+IFWFFbU9AoTEg1W4qhfCXzDn9pHYjc8n4rT6FJ477zexAfw+xpD2vqQ0AQcaH/LdURYWiiAR/e7FTvKKjmjSmjnjjbdtdpMqzCbv695c52s1D+XE6LG3zqqKYuZVhRWGae9SzXgM8JI3+QcUbIQRJNq7irYvmQHzwhyPWfm6klYPqwPg45mPxIwxJKqCVN++3Jo0RQ5RXrfyIs29cdF7dOC92e6rseBQsDWozCZlLoyjek8tcBaaVOou1bQSM0RjY/Q3mjiMvdOHjIdur+UgRBzvj2mz4a+7t5Do/jn84u+hIPbZgmZYolrD9tPpnOO5FIADw5KA6732OmAtq1/0sztMoaXpG3DuJR7blZNb0DUT+MWTDsmsWXyv2CRGa9fMem4Y34cYx6MzC2dizyKCTYjE3XFbBl8H2lzDlIUhXshn5i4UlwOR+nGXOD+kBGpa4gOQ5pn9zuWM5EtvDsdDFodpx7R9eafLLpLDKiZclNbYrwfi4+fA7H01rBXLmHAk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(23010399003)(56012099006)(18002099003)(6133799003)(261009223027099003)(10067099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QD7PAQk0cyqiRAmrJYozwY0Nx8rt4CA38ndDoqgMOCISUqrHmC++hie+QH4Q?=
+ =?us-ascii?Q?CNOpdz06SVy5FKL2Q51OwQj8DN9TpuF9tgGyvh22lc+Osz0aLMu/u1KqjFbj?=
+ =?us-ascii?Q?L5brKDASmmHt/frZGtAJqXLtzQZ3H4xD7WPsF77J5DgrmyvK2h7GJ2E6acx2?=
+ =?us-ascii?Q?gLxmk9k6I/ILvze0PkL+5o7dYG11AKK9nl5c7FgWlqh4pWh/fN3MtZN7Bt0e?=
+ =?us-ascii?Q?ghrpk2Rwj5qlMdSsnV7BpB2urYJvUI926Nfjd8R7mjaPmsxOamtQUkurXa1U?=
+ =?us-ascii?Q?W0XAyQgq9UtONP9/HhNs6P4mIBJ0bA9RDuL8V7U7OFphGkJkLk20U+qKkDU2?=
+ =?us-ascii?Q?G0hH1xQU1h1Ipon/R4/4bQmyjsqMwFMSNBS7oUgJquDhM5FYDKOg1gr56Rrt?=
+ =?us-ascii?Q?aOjHMOmWFwmqRKThy4E+n6VIeRKBkHr2DfXwSpPFXFLRnlpaNHB+LO3766D9?=
+ =?us-ascii?Q?Fm7H7NbuQwm7YTFx8m9k+fquHPpfzIcoP8GzLRc9eVmmXYksw70ETUOw0Wqe?=
+ =?us-ascii?Q?/GPL17Vo9zdol0SSgF8HawUYXEo7m/oPC8gLUstqpCcir9vM7Q+j/ydYHfae?=
+ =?us-ascii?Q?urc8VDrLKJDs1hLqvHH4x752M1W8nc/G8v5KlNJld+Bd1vA+XBjwYtdl0IBQ?=
+ =?us-ascii?Q?DB9AIBOwGmCy391Q3MHq/1zvtIxMv+ilGzGbEw8z0cZlPPC3yiBsgB7XnARH?=
+ =?us-ascii?Q?Z/ZNhwA+sJsPtoeftJFwc60V7blpki3FhPhVXtdK3jtWa+yZyeAjYiNTGYyd?=
+ =?us-ascii?Q?n1BNYMfRV2kfn3IR0vAqQHIDjyIZYfYYzcnm3gMyuy4gQLy6IN4woUS/8HLZ?=
+ =?us-ascii?Q?Bas5eq+P1RmByoOkNaL5/8wf8JFp6tNrAqmf0pGylXtqPSozFCJkvmOf30uT?=
+ =?us-ascii?Q?cNIpFF7R5qtTcIA86aqj9S3Mc/WLYpIjB4nOVWHu5kLxOA/f9z6zaxbKGLGK?=
+ =?us-ascii?Q?Ch9qTvdtNzlP98MGJi5Q7BkyibiifNluQaTMnYJ9QWnTeY9EmlY9c4s2MSCE?=
+ =?us-ascii?Q?wifL8fEu4/iMWSOvKC7F8Z2BOK5IasUNjbedoe6EO5P8ttmRRFlEvRtZBcQg?=
+ =?us-ascii?Q?acc5T5FHs8VlMI8jnnMzP/mrK+Lm5nocl7PCvMmjbFAZnoIaj5LXUsEB+J/I?=
+ =?us-ascii?Q?biesZ+TxgtL74CojjMoIbXEUctX7tCoPjKE3AKPBSsABHsPzb0Qge1yGYk4M?=
+ =?us-ascii?Q?WEcj6qa8HvBh+n4UibxflZbmVLXZYvvCR22KqJK4w5Bdbb59XSexPv5rYNoI?=
+ =?us-ascii?Q?7jMu2JHFSlerwXLHnNM2zIXSQVuqJjp2hjG3ED6PThkfQIMsZAA7T6iEE0f9?=
+ =?us-ascii?Q?SDcHbwLZ+Lbml4VvRUvyu0nKuu+MtXR4jo7HJdFgIGiOp+jFZymbfRccMWwJ?=
+ =?us-ascii?Q?fpXYKaBWJ6Gh5VXl7RPE7Fmb5oFtnN8QnA3/sDBsngRePvoYBh55KHQ87PVU?=
+ =?us-ascii?Q?GZBChakkR9NmLkFFufs3YH9Vma45L3DC9XvMv7O+eZ/rID8CEJu9rgpAUw02?=
+ =?us-ascii?Q?xAnk1ObV8hIOW0kRhOF5cb7JnGZ3MT18u9P3QtLmlABt1qhukjCaPXElJu4b?=
+ =?us-ascii?Q?egE3s4DSZsi9/BK4LqensuHyW2gJkkVxNNsStFjZv1n3lePOo4qQjnmRUExd?=
+ =?us-ascii?Q?kbGmUrQWv7iCvAN88S4//KE3q434LEX4O9t4jtXqa9pLpbHbH57IBMJ9v9gu?=
+ =?us-ascii?Q?M/RGWfq6zFQjX5tpyZejnJIO3Z4xRnVSn0Hq+bv9rAHPr0p4vAi6Z5nx1OJd?=
+ =?us-ascii?Q?mvnDxkN55A=3D=3D?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7359ab9-8210-4b41-889d-08df280036a5
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2026 01:29:09.3722
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MW+uXnMa0SkOip7cq6F5hfOlH2CL14rtN51JunLt/Ey6v3vW8agsGt3fJqYXr60jYy7H5R40tBH/atfqspOX5w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP123MB7027
 
-syzbot ci has tested the following series
+Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated
+CPUs") excluded isolated CPUs from hctx->cpumask to prevent worker
+threads from executing block work on isolated CPUs. When all CPUs mapped
+to a hardware queue are isolated (i.e. blk_mq_hctx_empty_cpumask(hctx)
+evaluates to true), blk_mq_hctx_next_cpu() returns WORK_CPU_UNBOUND with
+the intention of offloading execution.
 
-[v3] loop: Detect write requests that failed to wait for completion.
-https://lore.kernel.org/all/cc2910d3-3113-44d4-94ef-0c8d365fac9c@I-love.SAKURA.ne.jp
-* [PATCH v3] loop: Detect write requests that failed to wait for completion.
+However, kblockd_workqueue is allocated as a per-CPU workqueue
+(WQ_PERCPU). When WORK_CPU_UNBOUND is queued on a per-CPU workqueue, the
+workqueue core resolves the target CPU via raw_smp_processor_id().
+Consequently, if a task executing on an isolated CPU submits I/O and
+triggers an asynchronous queue dispatch with zero delay, &hctx->run_work
+is queued directly onto the local isolated CPU's worker pool. This
+causes the local per-CPU high-priority kworker
+(e.g. "kworker/6:1H-kblockd") to be scheduled on the isolated CPU,
+introducing unwanted latency jitter and execution delays, thereby
+defeating the original objective of commit a46c27026da1.
 
-and found the following issues:
-* BUG: found I/O issued by syz.NUM.NUM/NUM but loop0 is no longer bound.
-* BUG: found I/O issued by syz.NUM.NUM/NUM but loop2 is no longer bound.
+Rectify this by selecting an online housekeeping CPU via
+housekeeping_any_cpu(HK_TYPE_TIMER) when blk_mq_hctx_empty_cpumask(hctx)
+is true. This ensures that:
+    1.  The delayed work is cleanly offloaded to a housekeeping CPU.
 
-Full report is available here:
-https://ci.syzbot.org/series/d3a0b036-fd1e-44c6-8869-386ea1642385
+    2.  The per-CPU high-priority kworker on the isolated CPU is not
+        scheduled.
 
-***
+    3.  Hardware queues with valid mapped CPUs preserve their per-CPU
+        locality and batch round-robin behaviour.
 
-BUG: found I/O issued by syz.NUM.NUM/NUM but loop0 is no longer bound.
-
-tree:      axboe
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/axboe/linux.git
-base:      4da93acb4f2ed06640255ad98801d0f0c734ff07
-arch:      amd64
-compiler:  Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-config:    https://ci.syzbot.org/builds/a23afb97-88bb-4fba-8885-d3062b5890e2/config
-syz repro: https://ci.syzbot.org/findings/c9ad5ff9-784f-4528-805f-7971e0359600/syz_repro
-
-BUG: found I/O issued by syz.0.760/7647 but loop0 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.0.760/7647 but loop0 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-
-***
-
-BUG: found I/O issued by syz.NUM.NUM/NUM but loop2 is no longer bound.
-
-tree:      axboe
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/axboe/linux.git
-base:      4da93acb4f2ed06640255ad98801d0f0c734ff07
-arch:      amd64
-compiler:  Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
-config:    https://ci.syzbot.org/builds/a23afb97-88bb-4fba-8885-d3062b5890e2/config
-syz repro: https://ci.syzbot.org/findings/bad9ae98-7887-4209-8226-7e84bb070faa/syz_repro
-
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-BUG: found I/O issued by syz.2.866/7955 but loop2 is no longer bound.
-Call Trace:
-     loop_queue_rq+0x232/0xc90 drivers/block/loop.c:1922
-     __blk_mq_issue_directly block/blk-mq.c:2708 [inline]
-     blk_mq_try_issue_directly+0x3f4/0x880 block/blk-mq.c:2768
-     blk_mq_submit_bio+0x21de/0x2bb0 block/blk-mq.c:3220
-     __submit_bio_noacct_mq block/blk-core.c:756 [inline]
-     submit_bio_noacct_nocheck+0x2f4/0xa40 block/blk-core.c:790
-     bh_submit fs/buffer.c:1146 [inline]
-     __bh_read fs/buffer.c:2943 [inline]
-     bh_readahead include/linux/buffer_head.h:437 [inline]
-     __breadahead+0x15c/0x1f0 fs/buffer.c:1359
-     nilfs_search_super_root+0x2be/0x1530 fs/nilfs2/recovery.c:891
-     load_nilfs+0x363/0xfb0 fs/nilfs2/the_nilfs.c:259
-     nilfs_fill_super+0x1a0/0x4e0 fs/nilfs2/super.c:1073
-     nilfs_get_tree+0x491/0x850 fs/nilfs2/super.c:1226
-     vfs_get_tree+0x92/0x2a0 fs/super.c:1932
-     fc_mount fs/namespace.c:1198 [inline]
-     do_new_mount_fc fs/namespace.c:3772 [inline]
-     do_new_mount+0x319/0xdc0 fs/namespace.c:3848
-     do_mount fs/namespace.c:4181 [inline]
-     __do_sys_mount fs/namespace.c:4397 [inline]
-     __se_sys_mount+0x31d/0x420 fs/namespace.c:4374
-     do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-     do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
+Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: stable@vger.kernel.org
+Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
 ---
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+ block/blk-mq.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-To test a fix for this bug, please reply with `#syz test`
-(on a separate line) and attach the patch to the email.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 025a799f35b9..9480c3aac898 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2252,8 +2252,11 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 	bool tried = false;
+ 	int next_cpu = hctx->next_cpu;
+ 
+-	/* Switch to unbound if no allowable CPUs in this hctx */
+-	if (hctx->queue->nr_hw_queues == 1 || blk_mq_hctx_empty_cpumask(hctx))
++	/* Switch to housekeeping CPU if no allowable CPUs in this hctx */
++	if (blk_mq_hctx_empty_cpumask(hctx))
++		return housekeeping_any_cpu(HK_TYPE_TIMER);
++
++	if (hctx->queue->nr_hw_queues == 1)
+ 		return WORK_CPU_UNBOUND;
+ 
+ 	if (--hctx->next_cpu_batch <= 0) {
+-- 
+2.55.0
 
-Notes:
-- The patch will be applied on top of the tested series (as an
-  incremental fix).
-- To test a new version of the whole series, please send it directly
-  to syzbot@lists.linux.dev.
-- Arguments like custom git repos and branches are not supported.
