@@ -1,85 +1,87 @@
-Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481754848B2
-	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 17:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEEE4B95C1
+	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 17:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791825479; cv=none; b=oqEX1qivS2isQZ9vkEIoQ7cjIJ2nzeflXS17/CmP77cl1wgOFeql2f6CvTe3fiRTrqB8F0j7cOe/+00zlnaOeneICmU5QrUcGYN1ZJXRqcZOp6iIAuhOVg5MXzO0HgnU9NKjX7aScAMyU9Or9qjqSTYOJ1/wzQs5qqUqFDHWDKw=
+	t=1791825482; cv=none; b=lK1T4PkRcXDir6n3rBGU+rXQd8rXG2IMNnwGmIxJQPWG6GgA9wVyYfDV/LukutlDGkUaPLw3/qzjlAnNii575ebvRXn+ZNropIcUlx8o9KM7k+udhheCmjSoY1w2CaILwiyMmdoTrfrziYZN5fl8jsjH92NE3oHI8AtsghjofwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791825479; c=relaxed/simple;
-	bh=VwcAIDWhgnfIn32IVgjlHKqi3+DSTWH8Hd3zm2RoHxY=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pKcjPlHI3dpciHwjBGenQotgc1B8g71lKKWDMo3CFfOKPbJIqWES2jVgbBwmvibAIrANCkUnNwyJ20eZj0g2dqFq0i8a7CigasTM1v5MvzUdgAstfso7X4jJFuvl5d/AT+4aWbZGeU1Odx8DaytBTXFgfLdYoyo+rG5jAH+9Gqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=jZVfrS6B; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=TWhHVT8F; arc=none smtp.client-ip=148.163.139.74
+	s=arc-20240116; t=1791825482; c=relaxed/simple;
+	bh=QBIcsQLcF0lGzSWLBeS00QzPICpzsDSCLhjaLY/pBiI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=eXyLLBls8uRX49rbdFhrZq9rbHHW3dLymSjIiWZJr7X51yhl6dVLGIpVXsmg1CAUAiSVcHYJUlyI5Q0RfrYmZ+TyUgOdaV1Us4lNPb3LRGsY9dR7YQX1ShaYqeAjRJSQ/Gq1eBcZTzs78jIuZRP9tNNTYSOZgNTT+U6fhiKcNaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=XpqjHG3x; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=3gBZ1QCH; arc=none smtp.client-ip=148.163.135.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="jZVfrS6B";
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="TWhHVT8F"
-Received: from pps.filterd (m0167077.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69CGcEpU799959
-	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 13:17:57 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="XpqjHG3x";
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="3gBZ1QCH"
+Received: from pps.filterd (m0167068.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69CGaYvW1303684
+	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 13:18:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pps01; bh=gC9IoZKL1jmjVDGSQBCOs0WSnE
-	J04v+LLCo5re+IopE=; b=jZVfrS6BMkcN6xF7wmJMksC8JBjbOGAsArPipJxydr
-	ezuoAPWyeNvN8ir8YAiRFNJ0R6BBy7Km68L/QZrgiE30XDKjRbDaniJZJXl3NBHI
-	0jgVTO/gj0/tcp+1KT6M5YiRHbKb8/qLkF3A5q0pgTPg3sjz9GDafQzOzWpydqWZ
-	DOhP5OgqN0PwoguvF8/z4qv1ilwDVk4ItGK3sd8epoOQc2EvU9UXTVi+5e+6TIri
-	h2Cq9xx7Q8krRZCuc+U/0nk0wjF5fzkfuEY4yQcT1Di8rzWvD4KLRoxviIL4wTB8
-	UyFxtRhymolxTYjJEUXKIerpo75sAUfniHjx4AMgd1cg==
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4h91x6sbyq-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps01; bh=KtKA
+	qYq+gxnKs1Lb3GJx6ekyg+ZNrhCScOr9M/h0lLM=; b=XpqjHG3xA2SkybAu3DiB
+	PwBHJb9RM/1gTxZSYQMca5dt9ab4Z4YULEC+CgCh6cBIQq79Fc1YIh3PDj4uhsg7
+	9cYSYIx3UFmoGycVgUyyTLDcIUjsuZbZEcyOfjX6fMeefbI+Yih58fuDWGC48NUQ
+	6i5ax/BIp+Fodm50tozPEapXGcSwr+to2fT4ZgJLIOwwGOjdbGFSEkUMolcVLnoe
+	t9Qmqu6CjwvNMfDiqkA6w8DqdSaON4iVHPhaaR5UdkWvzVlHTqKR8No4eQuau+7h
+	ZVlAH97SK4/ZkTrsY63bNKbiJ4dcGuiHyul/bnZU4C2a822oko84g7QSLyM5je9z
+	wQ==
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4h91bwhs86-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 13:17:56 -0400 (EDT)
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-535213e3a7aso48453641cf.1
-        for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 10:17:56 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 13:17:59 -0400 (EDT)
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-53397b6e05aso48215521cf.1
+        for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 10:17:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=columbia.edu; s=lionmail; t=1791825476; x=1792430276; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:content-type:mime-version
-         :message-id:date:subject:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=gC9IoZKL1jmjVDGSQBCOs0WSnEJ04v+LLCo5re+IopE=;
-        b=TWhHVT8FcA3ar+qzbrOcBHQ/D+ExY2lx3qyyW9yXzyC9h7lnE8mEVYjL6D5ENESwbn
-         3WVjtC7JwreoE7MOGVbjl1lwKDvaaAqUuIHyIuILqbKxfQhrQTH14bs9ez3MN3UPkMhE
-         56ekvPHANyrJcXy17b89bQGm/QN8TyJzq41y01ylgfQQJFTdffX7RPktRouoHwiO1s0p
-         QdLbUpnxqRh2/wAAIOyLkBPnmwTxFm3qvQHrJApGONK1WeIbGsP18aKz20y1qzhVEjMg
-         SIjBrow37QdEbRLPqeCCBRlyFZ2qTuxOXwvHAK+xQjyvrlMOLQiGS4GSs+x1f+rrwWpu
-         /bGg==
+        d=columbia.edu; s=lionmail; t=1791825478; x=1792430278; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=KtKAqYq+gxnKs1Lb3GJx6ekyg+ZNrhCScOr9M/h0lLM=;
+        b=3gBZ1QCHYGtcjuFvCsuxTPjqz+tjBC/IGlyCuTnePS17WFzQT9kqNFl8juPWmmnNWm
+         rVR6gv+JnRha5IKYQARoq9GrbofxrPVxTqiufig5u05SQ0Zn56Bjq53ic0U57dokqw+H
+         vfQ/0MUxlQJNPIvLAK/3sWkLO4kY84ZdTw2h5VQM/CdcJXtLsuml+ASRdihcpMPpFrm1
+         8r9TKn5t/cSYVY7RVXQTVOVB76w6gwM1F7w6rwdQcWkqgzKpPvpQIwufEmqOPyfWh57f
+         bL8Udg6ktqZP2JaKrkmtrAT5RoN/B56yT+DxvcPXxP7rMoWy5foEmdiCm3b0O9J8hBYo
+         LjZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791825476; x=1792430276;
-        h=cc:to:content-transfer-encoding:content-type:mime-version
-         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=gC9IoZKL1jmjVDGSQBCOs0WSnEJ04v+LLCo5re+IopE=;
-        b=TiRhWm/qMSgqXA8jr2EAFZRPdIVRjBSWpufQ9pNsA/24X1AO3syat4Ix/5tqXQnLOX
-         FrErEuXcvmc+bMJJuAxhOqZQ9gf+yQjN4d3buWl1EQ9x6BUFDe1sLFDLyzJHOqgMJav4
-         /ck+RmXhxSRqC62vQAQ9T/uI2htKq1/Rcvsghyd5S8bPvRwxCDg32CGkmymmxOwPA/LQ
-         rfkRT/NqWvQQ0Ee/7rdip18e3GLv6yPjK42T4IY1G/alABgbzw0Xub758YipbWXzFmp2
-         VcRBdvjc6qz4RrJn0VcyTCJefDMkT5BObYWtNCdlJ5ASLbqGMmNvVyp+KJgSrgpPtHbg
-         Y5kw==
-X-Gm-Message-State: AFq9FYL1uNYzalxqXrFRUP8FUSOAaFj4HZU+Z1e12vOaCKIupHrIl9He
-	B4DHF9cd3wj+2Rg+ZaaRIT/YsVFtcL/zWJ2Sgh8LbWOQBQJPRypea7/gwmlh1tXduU2b9WEh57A
-	hWnrhTY50RadpZYH/FDVgVjEv01cpjYxTzT38FkfSYM69airNL8IvLaJjlMin
-X-Gm-Gg: AYBFou34UTwD/k3UPEb4tAMBF8U6aqARet0etFGol/Pc6YMrFwURX4TjV4SEYog6L2S
-	i6/x4jXvQLTDGu14nyhE0d+xzJqBJzxkRsn2LdYGrbrUsRTnrejd7ITKmUhfhQHmJYEyIQhr+w7
-	y1VkkkI+XWc41WGzKN1w940bYTvhpvmFe8GU/hXkryo4OCpAIHDwZkG2m4QP26xnezwZ5p90OQg
-	lUHkMwkVVo4k0BLEhtxCdElDQJaYaS+r1rdWp0pLrEpWRMsagDhkxV+56YbIraCcqjbU54FcTrq
-	Vtigj6jWxY0NatOEz4RocwKpTnRvZY5qbWbBQ/8ApbIPY/HOaYABW7KnoMIp7LoxFh1oIwRXzUZ
-	EMpQIASy8/U5Dap4SZJ6xfuK018aLEgzR56C7RyyeaDjZy+w=
-X-Received: by 2002:a05:622a:1b89:b0:535:70b4:3f81 with SMTP id d75a77b69052e-5359fe556b8mr172345571cf.71.1791825476267;
-        Mon, 12 Oct 2026 10:17:56 -0700 (PDT)
-X-Received: by 2002:a05:622a:1b89:b0:535:70b4:3f81 with SMTP id d75a77b69052e-5359fe556b8mr172344981cf.71.1791825475513;
-        Mon, 12 Oct 2026 10:17:55 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1791825478; x=1792430278;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=KtKAqYq+gxnKs1Lb3GJx6ekyg+ZNrhCScOr9M/h0lLM=;
+        b=IdZqtQRr38S3kM3I1gGAcahnDDzf65eUKHjrs7K44SK2Y+XBiqbSbWqLKqDx7i7B8z
+         FnX/Msi7DFESPhMxZ+JcbW/iniOkn2Evl05sGNiR99+VNs5rDRbsGQO6NvUJXHxiWsyi
+         VqPgCSpNv3JMeInNEQ73V0AKMZK/2a/jpyg86We+YuiRrb2+nfBl11Bi0RfwKHMqjOyA
+         bfrocKzWOJ/9i+xLh/AiKTrzvyjH978W9TL0HrZfT7SoSUEsD6m7k/pmoMYGpUL6ccvY
+         udquVeVNtFvsDHwtFIErjHouFZ2c5R1zQPc5cn/5dcIoEC/7nD5NfoT1jR5vXIPTZNY1
+         19vA==
+X-Gm-Message-State: AFq9FYKjqk8amwTcmhocS/y+EGxRpo9wQa5DgxeXMXLX2eHMfbsievYY
+	fsOXl6+XYSNxAHtEPkCpy3D9gNDCAsIDquTT7DnnwQ3h2TCVUYNAIqzkv6fADZrgUtWOj0rGe6s
+	QUHGEHeQxF5xx2mm12w9QPnrscm1lbooopSNleQ3yLH6qvBO/W4e4Zb8FdvNK
+X-Gm-Gg: AYBFou0q4sn+V0h5RuK54IX011Rzy7+JwuEGQpcr73UYBgB9NmO1+sDAjaehoMy7x7K
+	0OhpxWcLW3iccdGdMo9uYiFzGW/6ITZ9mZe/2jH//XIYl3DO0eRd9hpDD7wL5aDnA3dzNDdHOyT
+	HFBTFyv3ZH4GljvtV19roTe7Zs0F2dTJpL3HhGdaSrZLgkzAKSi8HmeZNRknJh2lshA5ouNAMz9
+	1J0Eh34W2juwjLNOjjbE4RRGmUc46jn108BPNlp9NAe32vhouYdy2dFxE6MbvgiXO8yJZXbxGeC
+	36vlTKwOvIytYXt1QoKYLHEoMlCmdj1bZhSmZ2Y7UlNQsNz/s9WV0s7vL6IiSnlE8VTHyMNYY6C
+	Mm+FRLBcmQ6JbFQ3qdBrIPTJYxr42uoEKrI61kDgWORt0yLM=
+X-Received: by 2002:a05:622a:551a:b0:535:2283:20a3 with SMTP id d75a77b69052e-5359fb5bbf6mr176677291cf.33.1791825478587;
+        Mon, 12 Oct 2026 10:17:58 -0700 (PDT)
+X-Received: by 2002:a05:622a:551a:b0:535:2283:20a3 with SMTP id d75a77b69052e-5359fb5bbf6mr176676791cf.33.1791825477958;
+        Mon, 12 Oct 2026 10:17:57 -0700 (PDT)
 Received: from [127.0.1.1] (nat-128-59-178-231.net.columbia.edu. [128.59.178.231])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5359b79a186sm84105241cf.20.2026.10.12.10.17.53
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5359b79a186sm84105241cf.20.2026.10.12.10.17.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 10:17:53 -0700 (PDT)
+        Mon, 12 Oct 2026 10:17:56 -0700 (PDT)
 From: Tal Zussman <tz2294@columbia.edu>
-Subject: [PATCH RFC v2 0/3] ext4: don't complete atomic writes through
- buffered I/O
-Date: Mon, 12 Oct 2026 13:17:39 -0400
-Message-Id: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
+Date: Mon, 12 Oct 2026 13:17:40 -0400
+Subject: [PATCH RFC v2 1/3] ext4: reject atomic writes on inodes that can't
+ do direct I/O
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -88,11 +90,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIADMWzWoC/4WNQQ6CMBREr0L+2pq2WExdmZh4ALeGRVt+pQrUt
- IVgCHcX8AAuZ/LmzQQRg8MIp2yCgIOLzndL4LsMTK26BxJXLRk45QWVVBIc04Go5FtnSOeJVU2
- jlXkRzYSg6qhyayws63dA68bNfIfb9QLlr4y9fqJJq3PFaheTD5/tf2Ab/PdqYIQRoQotRS4Np
- fxsfNO32qk9Vj2U8zx/AXXf3yDYAAAA
-X-Change-ID: 20260909-ext4-atomic-no-fallback-b1550a7a3fcf
+Message-Id: <20261012-ext4-atomic-no-fallback-v2-1-c4b30c60e500@columbia.edu>
+References: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
+In-Reply-To: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
 To: Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>,
         Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>,
         Ojaswin Mujoo <ojaswin@linux.ibm.com>,
@@ -104,86 +104,118 @@ Cc: linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-kernel@vger.kernel.org, Sashiko <sashiko-bot@kernel.org>,
         Tal Zussman <tz2294@columbia.edu>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1791825472; l=2239;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1791825472; l=3165;
  i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=VwcAIDWhgnfIn32IVgjlHKqi3+DSTWH8Hd3zm2RoHxY=;
- b=4nuovofsOXeVA4WMPAoybjCcbpaZs5uqfbQUypnaxQDRlltD3EGo1W5xmcmwVOtiHwmwXYVCp
- lxx3G+HvUHICM+LIhVmmkOMIFhT7F1PBlxEUkkx5tHNwR/9kWBWO/WX
+ bh=QBIcsQLcF0lGzSWLBeS00QzPICpzsDSCLhjaLY/pBiI=;
+ b=YS6Dulle1AWPmZZj/9tTcUzDGQR6mW9u3i7+Q+9LD8k5tWNoa1C+HBP8CsbcX8l0y66V4OkBs
+ +sg6up/2J0TCIKqdPA7vpTXo2thcxsYPjr5iUDRuOXu8DsZpXKBCLb7
 X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
  pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Proofpoint-GUID: jW43ctvJKAWw6rcYa_HLFgIhZrx1v74J
-X-Proofpoint-ORIG-GUID: jW43ctvJKAWw6rcYa_HLFgIhZrx1v74J
-X-Authority-Analysis: v=2.4 cv=DrDDa2/+ c=1 sm=1 tr=0 ts=6acd1644 cx=c_pps
- a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=9fnr1hFzp71kSIFw8uYQYA==:17
+X-Proofpoint-GUID: 1rBWTcTM-9pXYQ04JPBBH86pu6T6ME_n
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDEyMDA2OCBTYWx0ZWRfX28UeTTbNo/oW
+ uv9zPhJOBrWXEgGakZPCZUR1CTPzTAKVdzmwQkdG+arv3wt76yJozZCn5G872wgBeFSTcKoWXzo
+ AhCNuI/H4Q7ARtDNaHjHjrt56zgUy3E9VStC4NjtelKfjZnh/Qhm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDEyMDA2OCBTYWx0ZWRfX5/AyxlalgKMI
+ chBuUIxgK9q0081VWek+BbNFZlBNvxhtgUPtVsYtIHV6S/S/g7seF2584I5K+1Lb6E9jJEv9cMO
+ Df2KFNQ9vzu85BexwQKhU0cT1/weT/x8p7sgI7WPVtG+N3dlxPyIZxmkam0DW+lR0b9MFReQERP
+ 2bVe1c4q/b3Qyj6gAtXO/5OMm1UBuaodIgi0jh0fex3k7p1uL96kgW9oFg4zl4Mapg7N6OI4JRT
+ ZVLsk0vGECbUvFFkLmQeVgZS+uvRmhfK1zHlkHjFDzXzZMNICqhPsAxfl6OtYliJ8URjbYGdhqz
+ j6JGDt5r9OkQu8hg4tA9uUVRRnYvuIWUU0QcXvortI2oJrzqO+30nZoGuXvhZPA/C8SEgiwV9/C
+ 1xfh66jsTbaJKsW9AIPXO8aaqd62imF0E6i/+S1uYRntxZTQ+35mocyWQ8Se5qvaHr5jiwScsJj
+ yEykwKVZuqndrv4XNWg==
+X-Authority-Analysis: v=2.4 cv=VOpIDNPX c=1 sm=1 tr=0 ts=6acd1647 cx=c_pps
+ a=WeENfcodrlLV9YRTxbY/uA==:117 a=9fnr1hFzp71kSIFw8uYQYA==:17
  a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=QOCMdifcju39GKoXhKua:22
- a=bC-a23v3AAAA:8 a=7FDvDFWMCw6z-JPjW7kA:9 a=QEXdDO2ut3YA:10
- a=dawVfQjAaf238kedN5IG:22 a=FO4_E8m0qiDe52t0p3_H:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDEyMDA2OCBTYWx0ZWRfX+M1US9stVnUP
- CJ0P88zOyw6Ndji4DIUeMmz+ksBTE8YoiSVLc8FcpGTmc/TpJ1bbYvQ1f26QTVsBGlXwYYEaxOR
- IyIwf5YBeRIlPN1NCub4F1HD9GanpNrvX7OfkWHFBmb9tleUfY0kx31Of7/CsQ0wBJAMXl8C040
- SoQ/zbejCaMRHQUDLfBa+x5gBym7rp6BRbaSihfyBPl25lJyT8wBiHWO9o6ndiXljPkxCoQwtPv
- cpr65luY4vLDzWfxzKgwQ6QGb2wtrrprHAIli+p2BCEWdS9BtBGGX+s8ww8IThFWb2+58GA46+b
- pI44+VQ+7PzwSdtIiFKPkzZvZTTiKWwnjaQChIzU0VFhFBAg9RrX1p1/tKdAP5buWaEII++e+Xg
- WQcIPONVy0YNUcWcHhehw+J2IcrsEx/7c2YLYh4Ocvu08gI7OtL/HOg5seY5u3WGRUpAUZhaJPA
- AqbVrb0S3dJq4yEL7Pg==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDEyMDA2OCBTYWx0ZWRfX7+WyOS7f92cv
- 0tra3CkEdL07eXOiJk4q704xb8ZZvgSPjGdW4l499S92ODf1BIuVNDN1vUpOnviiLYNkLxA4MSz
- RHuodPGTOZgyERPD5I5YcyOgFzMwDzrlRR7bX2QgjdaPe9LfaO8w
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=usPcmh10W0ubT8QP8_c3:22
+ a=c92rfblmAAAA:8 a=VwQbUJbxAAAA:8 a=kI3bK8AaFqafbXCuNFkA:9 a=QEXdDO2ut3YA:10
+ a=kacYvNCVWA4VmyqE58fU:22 a=GvGzcOZaWPEFPQC_NcjD:22
+X-Proofpoint-ORIG-GUID: 1rBWTcTM-9pXYQ04JPBBH86pu6T6ME_n
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11933
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 bulkscore=10 priorityscore=1501 adultscore=0 suspectscore=0
- clxscore=1015 impostorscore=10 phishscore=0 spamscore=0 lowpriorityscore=10
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610120068
+ clxscore=1015 malwarescore=0 priorityscore=1501 lowpriorityscore=10
+ suspectscore=0 adultscore=0 phishscore=0 bulkscore=10 impostorscore=10
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2610080000
+ definitions=main-2610120068
 
-ext4_dio_write_iter() has two ways to finish a write through the page
-cache: the fallback for inodes that can't do direct I/O at all, and the
-completion of a short direct write. Neither provides torn-write
-protection, and neither refuses IOCB_ATOMIC.
+ext4_dio_write_iter() falls back to buffered I/O when the inode can't do
+direct I/O at all, i.e. journaled data, inline data or verity. That
+fallback runs before any atomic write handling, and
+ext4_buffered_write_iter() doesn't look at IOCB_ATOMIC, so an atomic
+write to such an inode is silently done as a plain buffered write with
+no torn-write protection.
 
-Patch 1 fixes a reachable bug: an atomic write to a data-journaled
-inode is advertised by statx() and then silently done as a buffered
-write. Patch 2 makes a short atomic direct write fail with -EIO instead
-of falling back. That path should be unreachable today, so this is
-defensive. Patch 3 closes the same kind of gap for DAX inodes,
-which ext4_file_write_iter() hands to the DAX path before any atomic
-write handling. No DAX-capable device advertises atomic write limits
-today, so this one is defensive too, and matches XFS.
+ext4_inode_can_atomic_write() makes it worse for journaled data by
+advertising atomic writes for those inodes: statx() reports atomic write
+limits and the file gets FMODE_CAN_ATOMIC_WRITE, so the write passes the
+VFS checks and reaches the fallback. This is reachable with
+data=journal, or with chattr +j on a nodelalloc mount. Inline data
+inodes don't have the extents flag and verity files can't be opened for
+writing, so those are refused before ext4 sees the write, but the
+fallback would still accept them.
 
-With a scsi_debug device, on a data=journal mount, and with chattr +j on
-a nodelalloc mount, the unpatched kernel reports atomic write limits via
-statx() and completes an O_DIRECT RWF_ATOMIC pwritev2() as a buffered
-write. With the series, statx() reports awu_min=0 and the write fails
-with -EOPNOTSUPP. Ordinary extent files still complete atomic writes,
-and the WARN_ON_ONCE() in patch 2 did not fire under an fio atomic
-direct write workload.
+Reject IOCB_ATOMIC in ext4_buffered_write_iter(), next to the existing
+IOCB_NOWAIT rejection, so neither fallback into it can complete an
+atomic write non-atomically. Also require ext4_dio_alignment() to be
+nonzero in ext4_inode_can_atomic_write(), so statx() stops advertising
+atomic writes for these inodes and VFS refuses RWF_ATOMIC early. The
+runtime check is still needed, as the journal data flag can be changed
+on an open file.
 
+Fixes: b7987a7d69a4 ("ext4: Support setting FMODE_CAN_ATOMIC_WRITE")
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Link: https://sashiko.dev/#/patchset/20260909-ext4-atomic-no-fallback-v1-1-5a6b9539c002%40columbia.edu
+Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 ---
-Changes in v2:
-- Patch 1 (new): Reject atomic writes on inodes that can't do direct
-  I/O at all, where the fallback to buffered I/O is reachable, per
-  Sashiko.
-- Patch 2: Fail a short atomic direct write with -EIO and keep the
-  WARN_ON_ONCE(), instead of returning the short count.
-- Patch 3 (new): don't advertise atomic writes for DAX inodes.
-- Link to v1: https://patch.msgid.link/20260909-ext4-atomic-no-fallback-v1-1-5a6b9539c002@columbia.edu
+ fs/ext4/ext4.h | 8 +++++++-
+ fs/ext4/file.c | 8 ++++++++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
----
-Tal Zussman (3):
-      ext4: reject atomic writes on inodes that can't do direct I/O
-      ext4: never fall back to buffered I/O for atomic direct writes
-      ext4: don't advertise atomic writes for DAX inodes
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index 724a27e8be61..5115f067a9f5 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -4057,12 +4057,18 @@ static inline int ext4_buffer_uptodate(struct buffer_head *bh)
+ 	return buffer_uptodate(bh);
+ }
+ 
++/*
++ * Atomic writes are only supported through direct I/O, so an inode that
++ * can't do direct I/O at all (journaled data, inline data, verity) can't do
++ * atomic writes either.
++ */
+ static inline bool ext4_inode_can_atomic_write(struct inode *inode)
+ {
+ 
+ 	return S_ISREG(inode->i_mode) &&
+ 		ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS) &&
+-		EXT4_SB(inode->i_sb)->s_awu_min > 0;
++		EXT4_SB(inode->i_sb)->s_awu_min > 0 &&
++		ext4_dio_alignment(inode) != 0;
+ }
+ 
+ extern int ext4_block_write_begin(handle_t *handle, struct folio *folio,
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index 374b4bc25bd5..19a8843ac420 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -339,6 +339,14 @@ static ssize_t ext4_buffered_write_iter(struct kiocb *iocb,
+ 	if (iocb->ki_flags & IOCB_NOWAIT)
+ 		return -EOPNOTSUPP;
+ 
++	/*
++	 * Buffered I/O provides no torn-write protection. The direct I/O path
++	 * falls back here for inodes that can't do direct I/O at all, so an
++	 * atomic write must be rejected rather than silently done non-atomically.
++	 */
++	if (iocb->ki_flags & IOCB_ATOMIC)
++		return -EOPNOTSUPP;
++
+ 	inode_lock(inode);
+ 
+ 	/*
 
- fs/ext4/ext4.h |  9 ++++++++-
- fs/ext4/file.c | 17 +++++++++++++----
- 2 files changed, 21 insertions(+), 5 deletions(-)
----
-base-commit: df2908090cda368b01ff43709f51890076c56157
-change-id: 20260909-ext4-atomic-no-fallback-b1550a7a3fcf
-
-Best regards,
---  
-Tal Zussman <tz2294@columbia.edu>
+-- 
+2.39.5
 
