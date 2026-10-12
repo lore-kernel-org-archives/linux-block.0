@@ -1,180 +1,84 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD19488231;
-	Mon, 12 Oct 2026 14:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B535C2E8DEA
+	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 14:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791814288; cv=none; b=Kc06ALBPtZAmEagxnRuGYQe1iYOj/fW/uGxKxWolMleZpnJ/532FIUrPLYl+3IhQ11fQCCY/Bta1sPwUmiW51QQ4OxHL2Ei2hxNWPMfJeY3oWCK8hInzIuirnVmjyrrDrwvLmqkYzQggtC7gBYUJMlvUGfjLIe2PaHwX3Dfckkc=
+	t=1791814558; cv=none; b=TsvDo9HeKizTLrpFERpAN8anSeZN+VH/hZMJsy4QqXbuooVqGCMgpvxuFODlUjFRod5vDIpxH7h7zN8ywnoxQuj4IxVMzAg5mi98JtTKXMyipCbL6oqMaGjZt8aRVDRHHMSaoBWY+9t22iIPHisips6BoKVWrNA4H040/SPCXRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791814288; c=relaxed/simple;
-	bh=O/sYz3hEDtYzWeOz8YVEvIUVPQJcn4FymHOI0/mQ3Os=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HTH3tqi0P7XffYd6TNafWZrKroflepXKi0XG8FMnrYyJexbrkcaoDJEpzzQJg3EDx1j7NNMZi/Jn+fs/bf5qdPCvEIMEWjflB1LrSUOGYI3P26FOsnT/WErI9kTGjN1gPdV1VhvENMo5Px1VJMqL+6b2gOgDEXx8QbISJlDbIys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Q/ItDqlP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=LRIAU1qp; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Q/ItDqlP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=LRIAU1qp; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1791814558; c=relaxed/simple;
+	bh=KNPHM08XBUMmpjECqyvnNVWHVLagsxbfRsADgvksY2w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WTVsSAo4WNDd84/VL2+9nAFac3wLvIddiMrebQjyswpMoJ4ut07Ijsy93nmcNI/umwZi4MD05GasCOVZR2e1bveuKtLJJHQYn3PR/7Epm8dqszjusmfv7eRXts0cmEiQ23j9Oz/aLLv09vw+F1AqfRX7M3IeawTuAERMH9d6bIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gojoXDSL; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Q/ItDqlP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="LRIAU1qp";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Q/ItDqlP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="LRIAU1qp"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F38631F38C;
-	Mon, 12 Oct 2026 14:11:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1791814284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DPswPjxS+qpu6i6zUA1Kx2e7xk6K1phiFUxlGK+8LzY=;
-	b=Q/ItDqlP4+w6WAkwfX1k0X6ujm7G5QavPCe48S224sz6BsucbPMJNtLmPOqv7Iw1sey5dp
-	HztsPyQnoX2GdkoGZJjnTzxEzFj1wb6Q9Ul4k04zOj38m0UWtk/PDuaFk9ML5xEJUxkqxc
-	qXo4ZqYGAGyU1KkQ1CnYcNqJ7pdJz+s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1791814284;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DPswPjxS+qpu6i6zUA1Kx2e7xk6K1phiFUxlGK+8LzY=;
-	b=LRIAU1qpo+jKKhvV0DnAfTof5Tws0j22vsCLRZkQC8mjOBkp6Z2hipd8JsI89ugai94uMv
-	zISIs3YOUTzdbABQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="Q/ItDqlP";
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=LRIAU1qp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1791814284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DPswPjxS+qpu6i6zUA1Kx2e7xk6K1phiFUxlGK+8LzY=;
-	b=Q/ItDqlP4+w6WAkwfX1k0X6ujm7G5QavPCe48S224sz6BsucbPMJNtLmPOqv7Iw1sey5dp
-	HztsPyQnoX2GdkoGZJjnTzxEzFj1wb6Q9Ul4k04zOj38m0UWtk/PDuaFk9ML5xEJUxkqxc
-	qXo4ZqYGAGyU1KkQ1CnYcNqJ7pdJz+s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1791814284;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DPswPjxS+qpu6i6zUA1Kx2e7xk6K1phiFUxlGK+8LzY=;
-	b=LRIAU1qpo+jKKhvV0DnAfTof5Tws0j22vsCLRZkQC8mjOBkp6Z2hipd8JsI89ugai94uMv
-	zISIs3YOUTzdbABQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CA4DB13314;
-	Mon, 12 Oct 2026 14:11:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id mJoYKYvqzGrFHwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 12 Oct 2026 14:11:23 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 55267A1407; Mon, 12 Oct 2026 16:11:23 +0200 (CEST)
-Date: Mon, 12 Oct 2026 16:11:23 +0200
-From: Jan Kara <jack@suse.cz>
-To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-Cc: axboe@kernel.dk, willy@infradead.org, jack@suse.cz, 
-	akpm@linux-foundation.org, linux-block@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+e0624b5bf72b99131402@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] mm/filemap: annotate lockless reads of
- mapping->nrpages
-Message-ID: <zzneb5ezerl2353crj7xzivjbpdv5vgvqqvxkbvg77nwhdmldn@fenjftsskl34>
-References: <20261012120636.16106-1-ngocthang2710.1999@gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gojoXDSL"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=W06pHCVplIpL7TJP9Oggjp6aGSOXxyPQlLU025IqIcw=; b=gojoXDSL5ENwkuAt+WuiHy1j9a
+	1JamFCdUx+RS+LB4x4hLvMNPeGefjnCFEKMYs1RCK2HzDxRUcVc9DHhsZnnwCBHR2wgIQv0qGhwoL
+	ubj250EJ58zB3/IPRlKbVcHIh72SbsU68Xtv0whGs9saOZRaLyb4CDWj+IkpGLnJzSGvzMwLaQssU
+	Q1s84fKheyLO6aZ+zosh8o3XG/m48h5+EL/K1AzsIr2YisGpiL/8rtPDlTFnCSzWHpHunB+X4fjB4
+	31MhyJZXSRH57xUbRCw+Firk9f5mOxZ+Sqveb68QYJMfPIkBRgCWTFAxuuRyQe0vedf7Rb1VXXFM7
+	dZi4npAw==;
+Received: from 2a02-8389-2301-9f00-e8f6-a58b-9f49-a02b.cable.dynamic.v6.surfer.at ([2a02:8389:2301:9f00:e8f6:a58b:9f49:a02b] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1xGGok-0000000AfPv-16Kc;
+	Mon, 12 Oct 2026 14:15:54 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	dlemoal@kernel.org
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH v2] zloop: explicitly mention zone condition when a write fails to it
+Date: Mon, 12 Oct 2026 16:15:34 +0200
+Message-ID: <20261012141551.1336261-1-hch@lst.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261012120636.16106-1-ngocthang2710.1999@gmail.com>
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: F38631F38C
-X-Rspamd-Action: no action
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[e0624b5bf72b99131402];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email,syzkaller.appspot.com:url,appspotmail.com:email,suse.cz:dkim]
-X-Spam-Flag: NO
-X-Spam-Score: -2.51
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon 12-10-26 19:06:36, Nguyen Ngoc Thang wrote:
-> mapping->nrpages is updated under the i_pages lock but is read locklessly
-> as a cheap "anything cached?" hint, e.g. in invalidate_bdev() and
-> mapping_needs_writeback(). KCSAN reports the race:
-> 
->   BUG: KCSAN: data-race in __filemap_add_folio / invalidate_bdev
-> 
->   read-write to 0xffff8881004c4178 of 8 bytes by task 3600 on cpu 0:
->    __filemap_add_folio+0x6b7/0x910 mm/filemap.c:919
->    filemap_add_folio+0x1cd/0x380
->    page_cache_ra_unbounded+0x1a4/0x3a0
->    ...
->    blkdev_read_iter+0x21e/0x2d0
->   read to 0xffff8881004c4178 of 8 bytes by task 3601 on cpu 1:
->    invalidate_bdev+0x25/0x70 block/bdev.c:98
->    ext4_fill_super+0x2ccb/0x37b0
-> 
-> The same counter also races with filemap_write_and_wait_range() through
-> mapping_needs_writeback().
-> 
-> The race is benign: a stale value only makes the caller do or skip a
-> harmless invalidate/flush pass. Mark the two lockless readers with
-> data_race().
-> 
-> Reported-by: syzbot+e0624b5bf72b99131402@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=e0624b5bf72b99131402
-> Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Don't print the impossibly large write pointer, but directly mention
+the zone condition when a write to a zone in a condition that does
+not allow writes is received.
 
-...
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
 
-> diff --git a/mm/filemap.c b/mm/filemap.c
-> index 00fd89cf6f55..4c9d98efb7fb 100644
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
-> @@ -631,7 +631,8 @@ EXPORT_SYMBOL(filemap_fdatawait_keep_errors);
->  /* Returns true if writeback might be needed or already in progress. */
->  static bool mapping_needs_writeback(struct address_space *mapping)
->  {
-> -	return mapping->nrpages;
-> +	/* Lockless hint; a stale value is harmless */
-> +	return data_race(mapping->nrpages);
->  }
+Changes since v1:
+ - print the zone condition
 
-Rather than annotating inside mapping_needs_writeback() it would be more
-future-proof to annotate the two callers of mapping_needs_writeback(). Just
-in case some user which require reliable answer appears in the future...
+ drivers/block/zloop.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-								Honza
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 394dc2408ed7..8f485ef51557 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -603,8 +603,13 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
+ 		}
+ 	} else {
+ 		if (cmd->sector != zone->wp) {
+-			pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
+-			       zone_no, cmd->sector, zone->wp);
++			if (zone->wp == ULLONG_MAX)
++				pr_err("Zone %u: write to %s zone: sect %llu\n",
++				       zone_no, blk_zone_cond_str(zone->cond),
++				       cmd->sector);
++			else
++				pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
++				       zone_no, cmd->sector, zone->wp);
+ 			ret = -EIO;
+ 			goto out_unlock;
+ 		}
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.53.0
+
