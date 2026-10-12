@@ -1,73 +1,74 @@
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906423ABD8E
-	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 18:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C7A3B19B2
+	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 18:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791831082; cv=none; b=SxzC0bhakoc5tCIb5ScycKtdswZxayueatvtXKAz5LvZ6xxL8XrmJLXZe7ISt1m7noyDV6EEchgXsupt8AsfM6HvQFpjA2bKxAv6Q/FEJDJ3WkQh4ZwE62/tyguE6P/4ynMKgQQsWB0TikSFYoAxQSskwT1vaJO8veaI+psNq3o=
+	t=1791831082; cv=none; b=Sb/I/BcHC/1BO4+2xRxUxCtWoYXUw6Ohu58+5DKhfJfi82vUUcT221tvy0f5y2fnEmudbQsAMJ+ZaaTOUnQG8QSBbJNr3iWCPCfaAuxliJ4UJgk62qtPOwDRSYIT1eD5oG+vvthT2D0iphLq9s4dwoQ/JNLfdKPp0GMJ+p0fRRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1791831082; c=relaxed/simple;
-	bh=tV93B2USbWXjjDndwiQAqRO3pt+vPvH7KAQSCxUonWM=;
+	bh=3WpCOKLM5eH0ofgWhYMhdkbzvcK1n7FYnumuHOxNnC0=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=V/AhgoESjrfgyIfnzfqjvUlZSADOq8Cflil0P/fHakh+cQxOQHJ+x2GTAYmnZVniNB7beTavUFfjNzKr/F3ydh6KJVokpZhkc/SBC/pMbIZ+V+DLJhVtUDziNlBykxQE7cL31w43Q+5wuLaxT4NbtkW5hqQdJ9ABbhHZ+pk/v8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=kWE3T0e6; arc=none smtp.client-ip=74.125.82.48
+	 MIME-Version:Content-Type; b=k3BzIeKZOJDYdD1AqEf7Ypze6BOcF0yFI6u3A9VaKvmqMZdZZF9WtH84LGLwbouVAh8sMDum2xNH7k0edE+ZzlJ2xmM/9cetgRU5clApObmUG/+vks76ieLQN5krAE+m9D+ZWmPkuXsAHC83U4J1ofLiORu+rNh2TyizIamRaJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=Sdvnn7l1; arc=none smtp.client-ip=74.125.82.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="kWE3T0e6"
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-1433e7b057fso1505172c88.1
-        for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 11:51:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="Sdvnn7l1"
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-170135e43c7so1197415c88.0
+        for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 11:51:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1791831080; x=1792435880; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=dCiWRkzKBlt1QS3CoF+R9/K21AAXjdQ5fMMqNpuft5k=;
-        b=kWE3T0e6peJc0+CAnW4iUJdOOsMw1/vH14krHqomruCKhaAaAzqRor9o5u2ZUdSQ6k
-         Ep0I84FLdi79/fVA1aSSsGEZd0I4/mSqvJ74eBNCfPKeA6bBXetYQJ364DyNRjbYGp9D
-         ITxUHYdFM1ySOL8E/67BVi8PDxtKfnNF+MPVXocQnuZtAMKUr1xLZGSaedjn6lFlhkoO
-         Ovp1YhARaADzjFet+xiuK/YIP0PaBbC1aTvu/qA6KYgle7VcnYysD9Xkd2JtoTe5t6Ly
-         VcdaqxiHpjPdUE+HTsFVHXHmga3p8t3zOmb96WlCy2dJmOAykpzEMbBQKVF/AfW4Z8F0
-         83nw==
+        bh=XN1DukgqKuQofhM9/wBf3QCNQ1gztt8YbKc/xQVj+XY=;
+        b=Sdvnn7l1m6Ryn1QlZNpM0FYfy92iqFgBmEUHjjSK/P/NrJAsUo+vX9hyi6sFzXJ9Sg
+         kk4OXllz+xsAwOyMGiy+JQcSe94Ru96wVWCr9IIVCbn/Axpr3eMEGzHmZ+wxlqQfr6zR
+         +5F1We4jmFfMsQgCvxNiCMJ319c2uBd7DTqRpao3NelubAzj/i8KLQeeJ1B9X6Z3PjKy
+         sOQQXavI80ajhsXhU/QgTtr3np3x+FvETEgxcSgvTuD6WxYUite+Ot907IImehq9jE4O
+         xrWtxbGuGr5ch1yBEJE76s4IxqG2a3HdBOZ7Fxbo/OXAxJTrXM935uiX3RbnzpfsChrT
+         Ye/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1791831080; x=1792435880;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=dCiWRkzKBlt1QS3CoF+R9/K21AAXjdQ5fMMqNpuft5k=;
-        b=C+QjDZ7i1VIZ1Y/RpjSiqlsDAfJkCaDKNu+65cWxZh7htds71mDp/Mc3fhMPPbrk3B
-         DA6YScNi0T2HGnBhP00ei8wYs8JFaRPmyABCB5L/KcwrQmVNWaQH94EQo0SePj0SxL/T
-         8o2pgPCXi597JEu23uXljzkk4vgNOW9wq7frwS6I2ewWtrAEnEVX9Y/cjTyVLSCRlbAQ
-         3Kv2neUnGcuqaacg57TAcFpeAr+7adGGsV7KlPVuK5nZ5MoHoz711xLXyw1lJqfqsnNQ
-         1KSyZ+zuD3Ni4v9Yosw+UYW8rn6O6Ryx276BMcIZTQV4T7CmZJXSJF4ON9oYcRk0oC+w
-         ijpg==
-X-Gm-Message-State: AFq9FYJxFoScdvYqj9slVfAt9Ud6gYVkGqBD4drg/lXiHZlPLCMp858z
-	pJGRqAqzfaY4r/h9Kwbz+OPtU/8UXng+3ytVfpbyzuH6pxs31JYbsUINxjL2viGzYuE=
-X-Gm-Gg: AYBFou3koCVgnI6nhR/x1PDDvBATSRtijGmAsv6DA47df3E3FaIIKJ2FINlLJ31qCwS
-	CMI70wp9jqy/LE0YetNbdXYO6Pm3oFgFwroec9aN8GGRDm2mCRaHLuXz9UwjLFU6u19gx7UpRR+
-	/TcanAobf1FcNKl7mb+A/C4Ih762X8OumEEL27zIqHXSbHKwzm7PqPLprqLBOQ4f3WgMmP3yOql
-	LKFMnix1yVx4dAihikYFnNoT5NbrWLodx9owETSyOYt7Gz5QrCtWSZ+oAN8SmKHPULVBEFyoCZp
-	v32lO7NRdT5oNywLLM55rH4tGPIFgs9JeM8x+5pJUHN/kD7SIbHuQFwlU1cUuJlz1i85RGHZMZV
-	6qks96HJod0XrD2a/ESzXhlMyBpxdf5Y49/VE/aVldo8l6RRzYHLcy4tx0ToRZt0brQPEV3CkWv
-	0zAld1GDcnTEppBL6tKyj/6JojHRftirBiMtjv8YN+8/k71P37GQQmAMZ2s7t9wGXMqHF46Pvzh
-	JIaIPhgDOPtCGCiRI0E5U8T6TVLijVQjrkFoxjOreAmi6Ax7bTH3w0DFQ==
-X-Received: by 2002:a05:7022:296:20b0:175:c19:93f3 with SMTP id a92af1059eb24-1750c199477mr4258063c88.38.1791831077751;
-        Mon, 12 Oct 2026 11:51:17 -0700 (PDT)
+        bh=XN1DukgqKuQofhM9/wBf3QCNQ1gztt8YbKc/xQVj+XY=;
+        b=x0+WGPQ8Aoi65gCkJ8Lxa/K1OZxvfMN6bQrNiC1x20HtJ26ZToNuo9Hz/YItHruD4X
+         GFleRp7EfXWTmagPKfUol3ud9pgyLZJ8yndJ4iiHBkTvZhWjwCDynoaxddMhCO2kdrjG
+         M6QfC39d/h+bqu9Z1VwRCzkDAGPv7uv6+GDGayUPkPVZC6xUDd3soNq21WAFvGUD9TVV
+         xCnIARhPuZvhrBlYPguOIBjzUsUU76hqSTGETKsiAiQGotz9NOWVxDblOiGJ42s/SrD2
+         NfX79F3Ukze6FYl8Z3zAsLHfdeBF7Em39y10oFjg0oMcV3uTDXTEh7Dkm186KUqqtwHq
+         MorA==
+X-Gm-Message-State: AFq9FYL2mFPlq6ocEUu6ikMCUPrZka8cXI4JOUWCq9utCkCIdxU7Vy5Y
+	SGzC9Rjw2q0+2HLbe9CJ91laGy09SnJdkh8TgfA1N8abjza/U/lka2xdUm4gNN9Q4Rju/PGOrYZ
+	gvSeORwg=
+X-Gm-Gg: AYBFou2+i9TyF6Uk0VyWWWWZK+/mcuete3PI3KIxPejtjbT3cD5juuGv5bY13NY8Xwp
+	n+Op5sjcJRNe3hI6lUO0Vejny9Wwt2wwdYw65kE7WXMuTudotZonFqibJKCXek4EqzfxZeTKNo9
+	l+9oohP1EwzGZfqxh9QA0oUEF0ZcJJQ0hXTbq2W9E72N7cCaGsRQlQXwfoBbKuONQhZv4k+b7qJ
+	YK97OxE5u0r3pU9mwLQrtI2H5vodyqEx7JFmYvc6Tq4C4MBjkhVmTI4qgY8N9Cekz1bqSApC+lA
+	kIUtWgV+h846kMrZlwfcjLxLqJl65fTvpWS3ptUpmGp778iI8ACxWpy9izGeBfpcYfX1zn9QM0m
+	vg0iudIFT4YMer+4F9M26T52PZYzSjSSSpd6JgEembjMABrr6z7pKi00nd5aPi3BaOl1oWzY0K2
+	Ruicl/ZMnhV1eE9oxM5QWXT5F5goos4a+RfVeNQ/iwHuSmJ1vVjFFQzEms4Rtoblyn+qLnn3Nud
+	8ArnU7bBuD45G/aLYYfrkqo/AXwuycEVOJllxKyPSiS8Urm4KPWlzvz8w==
+X-Received: by 2002:a05:701b:2094:20b0:163:a197:722d with SMTP id a92af1059eb24-172d6173e24mr6676813c88.4.1791831080431;
+        Mon, 12 Oct 2026 11:51:20 -0700 (PDT)
 Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a2f17feasm41738221c88.9.2026.10.12.11.51.17
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a2f17feasm41738221c88.9.2026.10.12.11.51.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 11:51:17 -0700 (PDT)
+        Mon, 12 Oct 2026 11:51:19 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Chris Mason <mason@kernel.org>, Jan Kara <jack@suse.cz>, 
- linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20261012-work-loop-change_fd-v1-1-3cf4ec349bbb@kernel.org>
-References: <20261012-work-loop-change_fd-v1-1-3cf4ec349bbb@kernel.org>
-Subject: Re: [PATCH] loop: remove support for swapping loop fds
-Message-Id: <179183107703.215281.4436365988182227970.b4-ty@b4>
-Date: Mon, 12 Oct 2026 12:51:17 -0600
+To: dlemoal@kernel.org, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20261012141551.1336261-1-hch@lst.de>
+References: <20261012141551.1336261-1-hch@lst.de>
+Subject: Re: [PATCH v2] zloop: explicitly mention zone condition when a
+ write fails to it
+Message-Id: <179183107974.215281.8699580955682245557.b4-ty@b4>
+Date: Mon, 12 Oct 2026 12:51:19 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,23 +80,15 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Mon, 12 Oct 2026 14:47:08 +0200, Christian Brauner wrote:
-> LOOP_CHANGE_FD swaps the backing file of a bound read-only loop device
-> for another file of the same size. The comment above loop_change_fd()
-> says this is for installers that want to free the original image and
-> for HA setups that want to switch to another copy of the image. When we
-> discussed deprecating it in 2023 (cf. [1]) we found no users at all:
-> zero hits on codesearch.debian.net, GitHub code search and
-> cs.android.com. The only things that exercise it are strace, LTP,
-> stress-ng and blktests. Everyone agreed to drop it. I just never sent
-> the patch.
-> 
-> [...]
+On Mon, 12 Oct 2026 16:15:34 +0200, Christoph Hellwig wrote:
+> Don't print the impossibly large write pointer, but directly mention
+> the zone condition when a write to a zone in a condition that does
+> not allow writes is received.
 
 Applied, thanks!
 
-[1/1] loop: remove support for swapping loop fds
-      commit: d4fabede1da0be116fd4cbd34ffd275e394526eb
+[1/1] zloop: explicitly mention zone condition when a write fails to it
+      commit: a408a6e0745ab5b75bd5f1d79ae4dc73d80ea302
 
 Best regards,
 -- 
