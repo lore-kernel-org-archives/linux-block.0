@@ -1,213 +1,394 @@
-Received: from CWXP265CU010.outbound.protection.outlook.com (mail-ukwestazon11022077.outbound.protection.outlook.com [52.101.101.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E672E4A499F;
-	Mon, 12 Oct 2026 16:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.101.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791821196; cv=fail; b=jSVRWDn/6ZNTCsEGdmpaQNehpkC42nsC6rGV6YhYiuUYriIqXeWTUHMdJEr8V30fvo+/iFB3qPi/VDZo/xf4+zArxlBFkU5/xRtmAw7tSOqjLYUbp8IUI7G9e7Qnnf6JNQY8OIRy+5bWxdmA65RIuDaKKIFdsyUCEF36jDyt2vQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791821196; c=relaxed/simple;
-	bh=XkgEY4BJh1GMthR1Pm0aJw9KLOpcpcvWjtgUwpRkNVI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=JZJjKSW7Pphdk5GeIZ7ZsxXTzbOcl3GwlIZWaWfCAf7WJlXjBYMHAMW6VywfBUGENG+ZbXzjJBafyLgyTrBxhQL6uM67H/kQeurRLQ24iZN5VYxRDfzqJwumUHgMW+pUoZ9fHLyuvOb5veep78ia7+sL2Vqditztk1DxPasynmc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.101.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xwZkCCz/IqZRlV7LIQ5UIeTqhjxrjnKP52+El3N7pMbyRgh1Cx7jfnK3Q8dPKDmV0W38L73pgP8EK6OraUEPTqKReFN4GZZnPmJADWZX7XJclSPR0YQioqrp305JyQOdEcHBH1pt3l2lvlyMXie6vZFEgZzemD6Wa0i2f72DdJ9HtDbjFgE1UehlQKZzfuxwnWIlUtccCzCsyNSuxqXYW+yHXYJPVf4c0TABOGVhRj5xT9pcCVz7g/VEA36/qNuoqRZiubOI57thTIxpdPMhzBC7x7268fW/JQi1L5t4mbAstgZTdRh4mYEABDs0M4ygf84mypJkrdhxfT4JYydlWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=6UlGVb8yqOyKxBL28u3gWHa732jfYEvAfw3EiaQSFOY=;
- b=fO/OwB1zqb+BxQdI91M1I6vwLkw8uWHSbw0Oi1Ml7l0ac9qH3UGhjyf793jzHt0zKNHZh7Nknrdqd0UaemxVDdGoHJ4bP+TPfQDtZnDDYj4yvbtx+UXkhwIbi6fIRiBen2tzmqirV9jY3FY/W5bIR2ZdKeDej/wpEyMbGUD02Y3DX5JRO3Sl5F+heDbPQZwIlej1hLvzKdsLm0uQisEPzNH4AbFxz7q9k2MNPDn9P0OtDJ/H5skm8HaVUleNgw96YTuh3djdrz2q/9Jg1U171253HsvR8bDN8B+oP7ffdGaOGDPBwNNxXVX3bNWKRyIgcJHq7tABKhhOa4XAQK+kEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by LOYP123MB3119.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:e7::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.16; Mon, 12 Oct
- 2026 16:06:30 +0000
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0496.021; Mon, 12 Oct 2026
- 16:06:30 +0000
-Date: Mon, 12 Oct 2026 12:06:25 -0400
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: axboe@kernel.dk, hare@suse.de, sean@ashe.io, tj@kernel.org, 
-	neelx@suse.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: dispatch kworker to housekeeping CPU when hctx
- cpumask is empty
-Message-ID: <pvnvyzf3cbebpxmobjntvovrruxgnygm7pwgx3tl2jczc7ji5z@ygmd6z4cfxh4>
-References: <20261012012905.267920-1-atomlin@atomlin.com>
- <CACVXFVMTr8mORGSVM4JWHrLYgk+9O0J20bjaL_08uYmRCbzC3A@mail.gmail.com>
- <o2hxbjxbkg3wv25lyj3nluwv4e6cb6q5qaukrhjzwg2hodwk5c@wgpc25peito7>
- <asxLLWOQQzolER0a@fedora-laptop>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <asxLLWOQQzolER0a@fedora-laptop>
-X-ClientProxiedBy: BLAPR05CA0023.namprd05.prod.outlook.com
- (2603:10b6:208:36e::25) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:183::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7143049DBBE;
+	Mon, 12 Oct 2026 16:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791822011; cv=none; b=dOSfnqb/jQK1ZrvpnuraWUJ9gJo5z4wyKj/wjeUhJmGAiE7mSd3tSO+cThcZd/vEDbxyynYDnYd1xxWPZMpN/JJZyeC+7xRL0LOKWaXTN9WToo+a5m/5kIEDPvqxu3TkmHWrorOrkhFSnBtU0vD73LrkaZ/OLOdzty/IZCpHtuw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791822011; c=relaxed/simple;
+	bh=kO93aitcBxbOSi4zGd9ru2v2wHJ5Op+vEndRRdSXYjM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJFXGEQ4MVX9GaRtNqFrXqQnCqhpiI/b74fqn01vJCUl8waIZx7xZ1U/J8lbji5LeX0ZnrMwbN5NJMSonv9wg43V8Nq4g4oGc9iZrCyOlffTzE+zsucH3MS3BOb+lWi+G5VZmLGCpnNx5cV9UHKxq7ZvCndh4Le0+54394D9kgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1J9DTO4G; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=EgB6HGqK; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1J9DTO4G; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=EgB6HGqK; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1J9DTO4G";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="EgB6HGqK";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1J9DTO4G";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="EgB6HGqK"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5669821E98;
+	Mon, 12 Oct 2026 16:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1791822007; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6bRY4vEnulv6c2i3pDBb2xB0Sanm46PHOiOl8wSsVcA=;
+	b=1J9DTO4GOJ6Cl7ql4im1J7LIQoadUx74oak7156BD+uPE+Q68cZOOWJkG5VeJOdo/FHQfT
+	Zmi5jjDan3rtnw9Kpp9Wa+/yrub33Cu/8ngp90KusXWuc2Nn1yp7qIc1OXiBcCxHZXPtIE
+	xOkxbmYDZwrPj2BZjiDNf+BTzL2RWoM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1791822007;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6bRY4vEnulv6c2i3pDBb2xB0Sanm46PHOiOl8wSsVcA=;
+	b=EgB6HGqKgGDt6vnI2YE3dfb8QHn++LgPy7Sz4LTF0QSeUsET3YacHf76xUVjfNgZNImnOM
+	eGPL2y1+eP27JtDA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1791822007; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6bRY4vEnulv6c2i3pDBb2xB0Sanm46PHOiOl8wSsVcA=;
+	b=1J9DTO4GOJ6Cl7ql4im1J7LIQoadUx74oak7156BD+uPE+Q68cZOOWJkG5VeJOdo/FHQfT
+	Zmi5jjDan3rtnw9Kpp9Wa+/yrub33Cu/8ngp90KusXWuc2Nn1yp7qIc1OXiBcCxHZXPtIE
+	xOkxbmYDZwrPj2BZjiDNf+BTzL2RWoM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1791822007;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6bRY4vEnulv6c2i3pDBb2xB0Sanm46PHOiOl8wSsVcA=;
+	b=EgB6HGqKgGDt6vnI2YE3dfb8QHn++LgPy7Sz4LTF0QSeUsET3YacHf76xUVjfNgZNImnOM
+	eGPL2y1+eP27JtDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 091A113314;
+	Mon, 12 Oct 2026 16:20:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id eO5TNbYIzWqTKwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 12 Oct 2026 16:20:07 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 86689A1405; Mon, 12 Oct 2026 18:19:58 +0200 (CEST)
+Date: Mon, 12 Oct 2026 18:19:58 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Chris Mason <mason@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] loop: remove support for swapping loop fds
+Message-ID: <mc5zuqsdwguhejwaei73gfvwv623xz6eljnpyfx77pbndmdv3s@nsb54zzoxfdz>
+References: <20261012-work-loop-change_fd-v1-1-3cf4ec349bbb@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LOYP123MB3119:EE_
-X-MS-Office365-Filtering-Correlation-Id: 671725e3-5c78-4871-c5a6-08df287ac6a9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|56012099006|261009223027099003|10067099003|4143699003|18002099003|22082099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	Na8dD7iov+YqIcUDQBXJCNZqH2X9fzp9cXwQ8VTQTd2lSFsJqtQ1qkubEcaNj4GkYXJPhLf4/tMH8z5VtD5Ya4sg7herWFbEt8eAXfBhHYcQV+dBomVsFrBL+Tyq5DKJZ8szfyoJR8ycwVtkeF4CnKxKjXjuml6Ji4nTvNDLMZ+mrXWhIoZIMz1PZ5/EHaSs/KFnLCxp5Tx9RbKZQ0IAcfPsC14SNoxOskdEMpH8IHb73iPMw5fRnNRNMha7JMVTd9DIy0Cs2ngzhXKVJY4pEmMY8WvoSQEqG6JQz2DbMV3biFJcRe8OYUOPoSfPQ09azzYe+Hd4l26gVyGBXcXgS1FW5jNLmt+ZDcycX+1dOd8/l/EGKoUuqlCZuaF3o0B2TBOOiH6xtDd14299wyUJU/hSIuovMkjj6EBZYDZwfajbI7p+SPHJ2pJ3btvgmPQRBdH19fKQyPUFfJN9ZibWtNuLQFe5ev0SAjotAitkuJhabtewZ7k+edmfls/o1nfAt7bBlgWH6Ccd5dFOFsQQBWSG6pxY61vvcmktcGtk9M9slw03f0X2AcDR/NOkNdWp221yBgaX1bKyi6kNkRN0roD3wOO+kygNP5vztMBN4AdVoRkqxoXQAWO4dBiK4/bJiy7fj0320YL57zkgBp8+RDGZ9IbmwmIKu3pKb8GqlQw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(56012099006)(261009223027099003)(10067099003)(4143699003)(18002099003)(22082099003)(6133799003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?K2pOaFlRYjRQLzZ0UytZVXNPbmV4RnZ0YllJdVpJcVpDaDRLRXVxT3YxM2lB?=
- =?utf-8?B?SkY4MDNuSEJrQUtiNUFaV0U3MnpKempuazkvajBkK3JsNGU2Uklvc0hONHBU?=
- =?utf-8?B?amU4Tmg4eGlpVHBuSVpyVGI1dHB4VDNHWDNVY0trZjAyakRSdWNVSSthRnZa?=
- =?utf-8?B?RGhtWE14MEFwdjdzVE5veXRGOGJSck1PSGJKaWRhZ1M0NGc2ckd3NmVRaWxk?=
- =?utf-8?B?VkJJMGF4WXRwb0hTYmFRVlBpL01iaHQ5QUFkVTlLNUZSSlpzbHpYRmpyQmFN?=
- =?utf-8?B?d0RPdnRKbzVyYTdMWHdGd2dTczEvTi9RSGNXU2NOeWhKc0laZ3I2ZlV3bmFD?=
- =?utf-8?B?aVBLZlp4b3ZQRlVSSmZrekZ0T2JQRFczcFRFNWw0QkczTWxXV2NULy9lU294?=
- =?utf-8?B?MnozdmV6NGVsMnJFSGl2TlYzRlB6ZytOcXNwSnowbGdqaGZYcHdGaWJPU3N1?=
- =?utf-8?B?eXJlVGFKY0locmdwVWhCQ2hSbzFHVE9FOFFVRUsxcjNJV2NmU01ZM2R0cFNV?=
- =?utf-8?B?dkRlbE1kSnBtL0dRcVlhNlk1Nzl1QWd5Rk1jSnptaE5YRzBOSW1DUm5NTFI4?=
- =?utf-8?B?ZXZLY3lxbTJQZUFaNGF0MkdrSldCdFZDR003QjhwMDV4UmsxVXlaQUxKTzFq?=
- =?utf-8?B?QmhtTUVEdDI4dTN3WEpRMzYzVlZwUG5BTndkM0V0djBuaTBBZTJGU3ZHb2V4?=
- =?utf-8?B?d2REei9IVlVyajVaQXJlUHV4R1g1OURLU1NMSzVCbGhwT2tBZGRQTm5NSmdO?=
- =?utf-8?B?TlZHR0Evc0F6ZFhFWXJJR2tSdi96VndESWtQb2VsdStmMlg4RG14Vzkxalh1?=
- =?utf-8?B?MHpmN3lodTgybGZLZys0WVdKaXdZUlQ3M21pT2lwNEF5QzdVMzdJSVpUM2hR?=
- =?utf-8?B?UzRzVisycGdIUkxyWmwzeEdvc1F0cWlGUXJjdnlKMkRyRndXc3JLZG1vcmQz?=
- =?utf-8?B?UG96ZXhOeGhjY0lRTUVaWUQvcnN4cHh0em0yNS81cGNTaVZOQ1R3b29jV3gw?=
- =?utf-8?B?MitCUGFvcTBMWVBnbnpYU01uYkFNM21ROXZ6TjFIbnplNFFPd0x1VWpSaDVz?=
- =?utf-8?B?R3lWU09EcURpNTdrWXhxWHRLUVJYNGIwcGZtKzJhMzdrWkZ3dnR6bFZHK1I0?=
- =?utf-8?B?SzB4KzQ5Z1NKY1d1SUxXQnpnNEZraDlnbG1GWUZyZWdUTkl0cDF0ZXFPei9K?=
- =?utf-8?B?MFZYdFd3Y3FNY2tVa3Q0SGh0TURVNEJrUWtaWHBQZ2dnQTA3ZklDaGtuZzhC?=
- =?utf-8?B?aXpYMjc0WGZ5NVc4bWhpU1owQ1JqMmp4MEphT0ZnVWZrcmFDaXV3d2JtUmxO?=
- =?utf-8?B?QW8xS3VxazRvSElqWndkQTloQUU0ZkF1RmdWMTFoYmlJTys4Q0tXeFoxcExu?=
- =?utf-8?B?RVVHMmZPRk5Gczg2RDVoUjA5ZFhMVUVPaWQ0cWRwVis4ZkVVM0lUdEFEaHp0?=
- =?utf-8?B?MFhzdFdsWk5sc2hBS2FqQ3lSM3pnemk2Q01sTzNGOEhONTdjVldYUWhOMVJ2?=
- =?utf-8?B?ZjkrOVZrNGQ3NjZJeHNoeHU1S1RSRko0c3JEMjlxUi9JeEQ4WGxlYTVCWlA2?=
- =?utf-8?B?NVVHYVVpT291ZGlxbWVTcUY3NlkycXN5aWV1TjBBL0lXOTNWOXpES2JMZ041?=
- =?utf-8?B?TnM0Z3VrazZTa0cxUTJGTEJjVDh1dXowVGxXdGg0SWtWZ0RPOERpeXc4cHJn?=
- =?utf-8?B?RStmYVFQRTliS1FvaHdDSGdqTDVOT2pzeEFTNU9NU0J4cWNhcWp1VGxxVkxz?=
- =?utf-8?B?UXp4WlYycldpR0NDTXkybi82Z0VYUjduajFjQjFCZXJZazV4RTF2Q09PVURa?=
- =?utf-8?B?anVwRFEwNUNORzBsQVhLeVBOSkJqckRFMUtpZ1MvQVI5UFhDNnc5NTlIbE5v?=
- =?utf-8?B?VXZYSVoxbm1JZ2djSFN4YlZSbWZzOFg0V0o1ejJ0a0g4YVBsWUtYb1pTWEZh?=
- =?utf-8?B?TjFRbmxtdTBVT2VWSnFPelZINTJvVEZMVEFKVnhTaS9kUElJKzU5Y01vYW1r?=
- =?utf-8?B?ZFJvSzVxcjBNajd0VnEwb2ZydE1UUkx4bGxQSDVKbUw5Sy9rYzBmZkhZNjF5?=
- =?utf-8?B?VHBuWXFPS0tNU1dVZVhhMHVITGRqdWd5L0lEKzNPa2N0RXpaLzEzcXNLai9i?=
- =?utf-8?B?SDN5NkRFclQ3SGxJcHU3bE9UTkNUYmJUTVBkdXpGK21XUWtZQ2J0cnpUM1Fz?=
- =?utf-8?B?M05IK1NIK25SQXBWdDlZc0Z3VTdnWENmelZIQWlEcEp1L2hXSkxCVEphOWlQ?=
- =?utf-8?B?S3NnRmgvOWpHbEs2NFJRdlE1S3RzSGxveG1xZDZZWHJ2d09tQmthM3luY3h2?=
- =?utf-8?B?MFV1QWVJNDRRMG11bjJPNGRiYUtScXF5RlFZbUVFWUx0YlBSdG1NZz09?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 671725e3-5c78-4871-c5a6-08df287ac6a9
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2026 16:06:29.7465
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TpDa6dYblYvn4KYZ/KUCU7NhY5m/GBkjqBMyPvYBuGrfOPCE3z1oOHVdHI9MB3l/qlc2GuTTYrJ1c6NCxerDRg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LOYP123MB3119
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261012-work-loop-change_fd-v1-1-3cf4ec349bbb@kernel.org>
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	URIBL_BLOCKED(0.00)[suse.cz:email,imap1.dmz-prg2.suse.org:helo,suse.com:email,android.com:url];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email]
 
-On Sun, Oct 11, 2026 at 09:51:25PM -0500, Ming Lei wrote:
-> > Since kblockd_workqueue is WQ_PERCPU, the responsibility rests with blk-mq
-> > to provide a non-isolated CPU when dispatching &hctx->run_work, no?
+On Mon 12-10-26 14:47:08, Christian Brauner wrote:
+> LOOP_CHANGE_FD swaps the backing file of a bound read-only loop device
+> for another file of the same size. The comment above loop_change_fd()
+> says this is for installers that want to free the original image and
+> for HA setups that want to switch to another copy of the image. When we
+> discussed deprecating it in 2023 (cf. [1]) we found no users at all:
+> zero hits on codesearch.debian.net, GitHub code search and
+> cs.android.com. The only things that exercise it are strace, LTP,
+> stress-ng and blktests. Everyone agreed to drop it. I just never sent
+> the patch.
 > 
-> Does every WORK_CPU_UNBOUND user have to handle it?
-
-[Adding Tejun Heo]
-
-No, because almost all other subsystems passing WORK_CPU_UNBOUND do so on
-unbound workqueues (e.g. system_unbound_wq).
-
-In kernel/workqueue.c, when WORK_CPU_UNBOUND is queued on a WQ_UNBOUND
-workqueue, workqueue core already handles CPU isolation automatically via
-wq_select_unbound_cpu(), which respects wq_unbound_cpumask and steers the
-work item to a housekeeping CPU.
-
-kblockd_workqueue is unique in that it is allocated as WQ_PERCPU to
-preserve per-CPU locality for multi-queue devices. For WQ_PERCPU
-workqueues, workqueue core cannot silently migrate WORK_CPU_UNBOUND to a
-remote CPU because callers of bound per-CPU workqueues expect local per-CPU
-execution. Thus, blk-mq is in the unusual position of passing
-WORK_CPU_UNBOUND to a bound per-CPU workqueue with the expectation that it
-avoids isolated cores.
-
-> > I suspect, steering the asynchronous dispatch to a housekeeping CPU is both
-> > architecturally necessary and fully aligned with the rest of the kernel,
-> > no? When a queue is plugged, throttled, or returns BLK_STS_RESOURCE, blk-mq
-> > defers execution to a background workqueue. That work runs asynchronously
-> > at some indeterminate time in the future, long after the thread has
-> > returned to its time-critical user loop. Having a kworker suddenly preempt
-> > the thread later is likely not desired.
+> Since then we found several more problems with it and all of them are
+> structural. The ioctl changes what a block device is backed by after a
+> filesystem has been mounted on it and nothing else in the kernel does
+> that.
 > 
-> We are talking about `if a task executing on an isolated CPU submits I/O `.
+> (1) It creates a lock order cycle.
 > 
-> If the task has been submitting IO on isolated CPU, why can't we keep
-> scheduling WQ on isolated CPU for running blk-mq queue? I am not sure your change
-> makes any difference from user viewpoint.
+>     loop_change_fd() is the only loop operation that calls
+>     disk_force_media_change() on a bound device while a filesystem can
+>     be mounted on it. loop_configure() calls it before the device is
+>     bound and __loop_clr_fd() after the last opener is gone. And it
+>     calls it with lo->lo_mutex held.
+> 
+>     Since v6.6 disk_force_media_change() doesn't just bump the disk
+>     sequence number. It calls bdev_mark_dead() which calls into the
+>     holder, i.e., fs_bdev_mark_dead(), which takes sb->s_umount of
+>     every superblock on that device. So LOOP_CHANGE_FD gives us:
+> 
+>         lo_mutex -> s_umount
+> 
+>     Mounting a filesystem takes s_umount in sget_fc() and then opens
+>     the block device in setup_bdev_super(). That takes
+>     disk->open_mutex and calls lo_open() which takes lo_mutex:
+> 
+>         s_umount -> open_mutex -> lo_mutex
+> 
+>     That's a cycle. Lockdep reports it as soon as LOOP_CHANGE_FD is
+>     used on a device that has a filesystem mounted on it. This was
+>     recently hit with erofs where LOOP_CHANGE_FD raced with umount and
+>     a concurrent open of the loop device. And it is a real deadlock:
+>     the mounter holds s_umount and waits for open_mutex, the opener
+>     holds open_mutex and waits in lo_open() for lo_mutex, and the
+>     LOOP_CHANGE_FD caller holds lo_mutex and waits in
+>     fs_bdev_mark_dead() for that superblock.
+> 
+>     Note that we went through the block layer in v6.7 to guarantee
+>     that s_umount is never taken under open_mutex. LOOP_CHANGE_FD is
+>     the reverse direction and it was simply never considered.
+> 
+> (2) The use-case it was added for doesn't work anymore.
+> 
+>     fs_bdev_mark_dead() shuts the filesystem down. For ext4, xfs and
+>     btrfs that means ->shutdown() is called and the mounted filesystem
+>     returns -EIO from then on. So swapping the image under a mounted
+>     filesystem can't work for any filesystem that implements shutdown.
+>     It only survives on erofs because erofs deliberately doesn't
+>     implement ->shutdown() and ->remove_bdev(). Commit 69139a62a918
+>     ("erofs: open via dedicated fs bdev helpers") explicitly cites
+>     loop_change_fd() as the reason why it shouldn't. IOW, an ioctl
+>     without users dictates what a filesystem is allowed to do on
+>     device removal.
+> 
+>     And it never worked on partitions. disk_force_media_change() only
+>     acts on disk->part0 so a filesystem mounted on loop0p1 isn't told
+>     anything when the image under it is swapped.
+> 
+> (3) It can create superblock pin cycles.
+> 
+>     loop_validate_file() only guards against loop-on-loop recursion.
+>     It doesn't stop LOOP_CHANGE_FD from pointing a bound device at a
+>     file on the filesystem that is mounted from that very device, or
+>     two devices at files on each other's filesystems, or a device at a
+>     file on a fuse mount whose passthrough backing file lives on the
+>     loop mount. Static setups can't form these cycles because the
+>     backing file is opened before the filesystem on top of it exists.
+>     LOOP_CHANGE_FD is the only block layer path where the edge is
+>     added afterwards.
+> 
+>     The result is a cycle of superblocks: the backing file pins the
+>     mount, the mount pins the superblock, the superblock holds the
+>     device open and the device holds the backing file. umount detaches
+>     the mounts but nothing ever frees them and the mount namespace
+>     they live in leaks with them. This is not a cycle of mounts so
+>     nothing in mount teardown can break it. It's root-only, but it is
+>     a permanent leak that can't be undone.
+> 
+> (4) It makes filesystem stacking dynamic.
+> 
+>     s_stack_depth assumes that the dependencies between filesystems
+>     are fixed when a filesystem is mounted. With LOOP_CHANGE_FD the
+>     image of a mounted filesystem can be moved onto another filesystem
+>     at any later time, so a loop-mounted filesystem is at stacking
+>     depth 0 no matter what its image ends up on. That is the hole in
+>     the stacking deadlock discussion for fanotify pre-content events
+>     (cf. [2]).
+> 
+> The partition handling of LOOP_CHANGE_FD has been broken since v7.1
+> and nobody noticed until Daan ran into it in August (cf. [3]). That's
+> about the level of use this ioctl sees.
+> 
+> So let's remove it. LOOP_CHANGE_FD now returns -EOPNOTSUPP.
+> 
+> [1]: https://lore.kernel.org/r/20231023-biberbau-spatzen-282ccea0825a@brauner
+>      https://lore.kernel.org/r/20231024-entfuhr-sachbezogen-aab33dec4087@brauner
+> [2]: https://lore.kernel.org/r/CAOQ4uxi2Mx4ZB48DhQJWOvt6UBur3LnrkttgRjo72U4+Cu81iQ@mail.gmail.com
+>      https://lore.kernel.org/r/20260617-vorfahren-haften-nullnummer-b0d6fccadae3@brauner
+> [3]: https://lore.kernel.org/r/20260806-b4-loop-nbd-stale-partitions-v1-1-67bb75a8d7be@amutable.com
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-When a task submits I/O, synchronous submission occurs directly in syscall
-context. Note, in the following example, IOCB_DIRECT is applied since the
-file was opened with file->f_flags & O_DIRECT:
+Yes please. Feel free to add:
 
-  __x64_sys_write
-    ksys_write
-      vfs_write
-        else if (file->f_op->write_iter)
-          new_sync_write(file, buf, count, pos)
-            // filp->f_op->write_iter(&kiocb, &iter)
-            ext4_file_write_iter
-              if (iocb->ki_flags & IOCB_DIRECT)
-               ext4_dio_write_iter(iocb, from) 
-                 iomap_dio_rw(iocb, from, &ext4_iomap_ops,
-                              &ext4_dio_write_ops, dio_flags, NULL, 0)
-                   __iomap_dio_rw
-                     ...
-                     iomap_dio_submit_bio
-                       blk_crypto_submit_bio(bio)
-                         if (!bio_has_crypt_ctx(bio) ...)
-                           submit_bio(bio)
-                            ...
-                             __submit_bio
-                               blk_mq_submit_bio(bio)
-                                 // blk_mq_run_dispatch_ops(q, blk_mq_try_issue_directly(hctx, rq))
-                                 __blk_mq_run_dispatch_ops(q, true blk_mq_try_issue_directly(hctx, rq))
-                                   blk_mq_try_issue_directly(hctx, rq)
-                                     __blk_mq_issue_directly(hctx, rq, true)
-                                       // q->mq_ops->queue_rq(hctx, &bd)
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
 
 
-However, if dispatch must be deferred (e.g. BLK_STS_RESOURCE),
-blk-mq queues &hctx->run_work. Now, if &hctx->run_work is queued on the
-isolated CPU, it must be executed by the local kworker. Because that
-kworker runs under SCHED_NORMAL, the user's SCHED_FIFO task completely
-starves the kworker. As a result, blk_mq_run_work_fn() never executes,
-hardware dispatch stalls, and the I/O pipeline hangs indefinitely.
-Albeit, I believe an enabled Fair server, under the EEVDF scheduler, will
-prevent this stall.
-
-Anyhow, offloading deferred dispatch to an online housekeeping CPU allows
-the kworker to run immediately and complete dispatch without priority
-inversion. As noted in commit a46c27026da1:
-    "it isn't expected to let block IO disturb these CPUs. blk-mq kworker
-     shouldn't be scheduled on isolated CPUs."
-
-
-Kind regards,
+> ---
+> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+> ---
+>  drivers/block/loop.c | 112 ++-------------------------------------------------
+>  1 file changed, 4 insertions(+), 108 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 758c20678bf6..aabaaacdb4fa 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -105,7 +105,7 @@ static DEFINE_MUTEX(loop_validate_mutex);
+>   *
+>   * Since loop_validate_file() traverses on other "struct loop_device" if
+>   * is_loop_device() is true, we need a global lock for serializing concurrent
+> - * loop_configure()/loop_change_fd()/__loop_clr_fd() calls.
+> + * loop_configure()/__loop_clr_fd() calls.
+>   */
+>  static int loop_global_lock_killable(struct loop_device *lo, bool global)
+>  {
+> @@ -537,109 +537,6 @@ static int loop_check_backing_file(struct file *file)
+>  	return 0;
+>  }
+>  
+> -/*
+> - * loop_change_fd switched the backing store of a loopback device to
+> - * a new file. This is useful for operating system installers to free up
+> - * the original file and in High Availability environments to switch to
+> - * an alternative location for the content in case of server meltdown.
+> - * This can only work if the loop device is used read-only, and if the
+> - * new backing store is the same size and type as the old backing store.
+> - */
+> -static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+> -			  unsigned int arg)
+> -{
+> -	struct file *file = fget(arg);
+> -	struct file *old_file;
+> -	unsigned int memflags;
+> -	int error;
+> -	bool partscan;
+> -	bool is_loop;
+> -
+> -	if (!file)
+> -		return -EBADF;
+> -
+> -	error = loop_check_backing_file(file);
+> -	if (error) {
+> -		fput(file);
+> -		return error;
+> -	}
+> -
+> -	/* suppress uevents while reconfiguring the device */
+> -	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
+> -
+> -	is_loop = is_loop_device(file);
+> -	error = loop_global_lock_killable(lo, is_loop);
+> -	if (error)
+> -		goto out_putf;
+> -	error = -ENXIO;
+> -	if (lo->lo_state != Lo_bound)
+> -		goto out_err;
+> -
+> -	/* the loop device has to be read-only */
+> -	error = -EINVAL;
+> -	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY))
+> -		goto out_err;
+> -
+> -	error = loop_validate_file(file, bdev);
+> -	if (error)
+> -		goto out_err;
+> -
+> -	old_file = lo->lo_backing_file;
+> -
+> -	error = -EINVAL;
+> -
+> -	/* size of the new backing store needs to be the same */
+> -	if (lo_calculate_size(lo, file) != lo_calculate_size(lo, old_file))
+> -		goto out_err;
+> -
+> -	/*
+> -	 * We might switch to direct I/O mode for the loop device, write back
+> -	 * all dirty data the page cache now that so that the individual I/O
+> -	 * operations don't have to do that.
+> -	 */
+> -	vfs_fsync(file, 0);
+> -
+> -	/* and ... switch */
+> -	disk_force_media_change(lo->lo_disk);
+> -	memflags = blk_mq_freeze_queue(lo->lo_queue);
+> -	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
+> -	loop_assign_backing_file(lo, file);
+> -	loop_update_dio(lo);
+> -	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+> -	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+> -	loop_global_unlock(lo, is_loop);
+> -
+> -	/*
+> -	 * Flush loop_validate_file() before fput(), for l->lo_backing_file
+> -	 * might be pointing at old_file which might be the last reference.
+> -	 */
+> -	if (!is_loop) {
+> -		mutex_lock(&loop_validate_mutex);
+> -		mutex_unlock(&loop_validate_mutex);
+> -	}
+> -	/*
+> -	 * We must drop file reference outside of lo_mutex as dropping
+> -	 * the file ref can take open_mutex which creates circular locking
+> -	 * dependency.
+> -	 */
+> -	fput(old_file);
+> -	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+> -	if (partscan)
+> -		loop_reread_partitions(lo);
+> -
+> -	error = 0;
+> -done:
+> -	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
+> -	return error;
+> -
+> -out_err:
+> -	loop_global_unlock(lo, is_loop);
+> -out_putf:
+> -	fput(file);
+> -	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+> -	goto done;
+> -}
+> -
+>  /* loop sysfs attributes */
+>  
+>  static ssize_t loop_attr_show(struct device *dev, char *page,
+> @@ -1215,12 +1112,11 @@ static int loop_clr_fd(struct loop_device *lo)
+>  
+>  	/*
+>  	 * Since lo_ioctl() is called without locks held, it is possible that
+> -	 * loop_configure()/loop_change_fd() and loop_clr_fd() run in parallel.
+> +	 * loop_configure() and loop_clr_fd() run in parallel.
+>  	 *
+>  	 * Therefore, use global lock when setting Lo_rundown state in order to
+>  	 * make sure that loop_validate_file() will fail if the "struct file"
+> -	 * which loop_configure()/loop_change_fd() found via fget() was this
+> -	 * loop device.
+> +	 * which loop_configure() found via fget() was this loop device.
+>  	 */
+>  	err = loop_global_lock_killable(lo, true);
+>  	if (err)
+> @@ -1566,7 +1462,7 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
+>  		return loop_configure(lo, mode, bdev, &config);
+>  	}
+>  	case LOOP_CHANGE_FD:
+> -		return loop_change_fd(lo, bdev, arg);
+> +		return -EOPNOTSUPP;
+>  	case LOOP_CLR_FD:
+>  		return loop_clr_fd(lo);
+>  	case LOOP_SET_STATUS:
+> 
+> ---
+> base-commit: 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
+> change-id: 20261012-work-loop-change_fd-6f253c12e4df
+> 
 -- 
-Aaron Tomlin
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
