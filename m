@@ -1,360 +1,213 @@
-Received: from mta1.migadu.com (out-155.mta1.migadu.com [95.215.58.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CWXP265CU010.outbound.protection.outlook.com (mail-ukwestazon11022077.outbound.protection.outlook.com [52.101.101.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7154AB1A3
-	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 16:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.155
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791821055; cv=none; b=BrgK9w2IV2ccqeMAg6loYlh1SR0oWjGiqJWW2Xy368F+jscJs78Ml45y0LwUd1L6mjuQjXWpuUJJXmcr8GuhUphNymfxvKICdzUnVr9pmn6MIboeet+rUD5jQU8HBHXQ0p1QgTCmK1vlbBizJClahgsWKhsCz94d+qFMT3cAcqo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791821055; c=relaxed/simple;
-	bh=2v1+d/J72fW/gR2wzEGQhtsLU3oAtt3xczGUdzI/RFY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EW3xfQzZm5E5kkQHtRcWM8VnNUaVA73/XoS3n7VWGaPYrr9ydinIsdpui/iMyAcsMlAmi6rfkALrxFkCDndTOk/EgYw/x+XVClJgPW7Kea2btmxh5io6stbFsl7fkLSP3sVKOwTWK702KHosckoziGEre2GxMYpFqYLk9t9h+74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vMVz0zux; arc=none smtp.client-ip=95.215.58.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vMVz0zux"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=2v1+d/J72fW/gR2wzEGQhtsLU3oAtt3xczGUdzI/RFY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791821048; v=1; x=1792425848;
- b=vMVz0zuxd+ceBw6pJpU0SCtna3laSON+37kzK9Mae4wbWUc9q4kEAJvoLMutaiCpnDd9pzlz
- r1j7Z3nDW4W8VwJCmc8N/Guif7h26dm3fWq8Vp8c/LJ0XfCXLA1h6o9OZypO1Adgu6odIWXxouh
- zFzQUMaqn21gQsMyHma1rVqc=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta12.migadu.com with ESMTPS id 281f01c82cb28851;
-	Mon, 12 Oct 2026 16:04:08 +0000
-X-Mizu-Trace-ID: 281f01c82cb28851
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <7d331842-5d6c-44e9-929d-2ac730a9cda7@linux.dev>
-Date: Mon, 12 Oct 2026 17:04:03 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E672E4A499F;
+	Mon, 12 Oct 2026 16:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.101.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791821196; cv=fail; b=jSVRWDn/6ZNTCsEGdmpaQNehpkC42nsC6rGV6YhYiuUYriIqXeWTUHMdJEr8V30fvo+/iFB3qPi/VDZo/xf4+zArxlBFkU5/xRtmAw7tSOqjLYUbp8IUI7G9e7Qnnf6JNQY8OIRy+5bWxdmA65RIuDaKKIFdsyUCEF36jDyt2vQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791821196; c=relaxed/simple;
+	bh=XkgEY4BJh1GMthR1Pm0aJw9KLOpcpcvWjtgUwpRkNVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=JZJjKSW7Pphdk5GeIZ7ZsxXTzbOcl3GwlIZWaWfCAf7WJlXjBYMHAMW6VywfBUGENG+ZbXzjJBafyLgyTrBxhQL6uM67H/kQeurRLQ24iZN5VYxRDfzqJwumUHgMW+pUoZ9fHLyuvOb5veep78ia7+sL2Vqditztk1DxPasynmc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.101.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xwZkCCz/IqZRlV7LIQ5UIeTqhjxrjnKP52+El3N7pMbyRgh1Cx7jfnK3Q8dPKDmV0W38L73pgP8EK6OraUEPTqKReFN4GZZnPmJADWZX7XJclSPR0YQioqrp305JyQOdEcHBH1pt3l2lvlyMXie6vZFEgZzemD6Wa0i2f72DdJ9HtDbjFgE1UehlQKZzfuxwnWIlUtccCzCsyNSuxqXYW+yHXYJPVf4c0TABOGVhRj5xT9pcCVz7g/VEA36/qNuoqRZiubOI57thTIxpdPMhzBC7x7268fW/JQi1L5t4mbAstgZTdRh4mYEABDs0M4ygf84mypJkrdhxfT4JYydlWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
+ bh=6UlGVb8yqOyKxBL28u3gWHa732jfYEvAfw3EiaQSFOY=;
+ b=fO/OwB1zqb+BxQdI91M1I6vwLkw8uWHSbw0Oi1Ml7l0ac9qH3UGhjyf793jzHt0zKNHZh7Nknrdqd0UaemxVDdGoHJ4bP+TPfQDtZnDDYj4yvbtx+UXkhwIbi6fIRiBen2tzmqirV9jY3FY/W5bIR2ZdKeDej/wpEyMbGUD02Y3DX5JRO3Sl5F+heDbPQZwIlej1hLvzKdsLm0uQisEPzNH4AbFxz7q9k2MNPDn9P0OtDJ/H5skm8HaVUleNgw96YTuh3djdrz2q/9Jg1U171253HsvR8bDN8B+oP7ffdGaOGDPBwNNxXVX3bNWKRyIgcJHq7tABKhhOa4XAQK+kEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
+ by LOYP123MB3119.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:e7::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.16; Mon, 12 Oct
+ 2026 16:06:30 +0000
+Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0496.021; Mon, 12 Oct 2026
+ 16:06:30 +0000
+Date: Mon, 12 Oct 2026 12:06:25 -0400
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: axboe@kernel.dk, hare@suse.de, sean@ashe.io, tj@kernel.org, 
+	neelx@suse.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: dispatch kworker to housekeeping CPU when hctx
+ cpumask is empty
+Message-ID: <pvnvyzf3cbebpxmobjntvovrruxgnygm7pwgx3tl2jczc7ji5z@ygmd6z4cfxh4>
+References: <20261012012905.267920-1-atomlin@atomlin.com>
+ <CACVXFVMTr8mORGSVM4JWHrLYgk+9O0J20bjaL_08uYmRCbzC3A@mail.gmail.com>
+ <o2hxbjxbkg3wv25lyj3nluwv4e6cb6q5qaukrhjzwg2hodwk5c@wgpc25peito7>
+ <asxLLWOQQzolER0a@fedora-laptop>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <asxLLWOQQzolER0a@fedora-laptop>
+X-ClientProxiedBy: BLAPR05CA0023.namprd05.prod.outlook.com
+ (2603:10b6:208:36e::25) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:183::5)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2 4/4] block/052: add a torn atomic write test
- for block devices
-To: Tal Zussman <tz2294@columbia.edu>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20261009-blkdev-fixes-tests-v2-0-fcb3599e47f7@columbia.edu>
- <20261009-blkdev-fixes-tests-v2-4-fcb3599e47f7@columbia.edu>
-Content-Language: en-US
-From: John Garry <john.garry@linux.dev>
-In-Reply-To: <20261009-blkdev-fixes-tests-v2-4-fcb3599e47f7@columbia.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LOYP123MB3119:EE_
+X-MS-Office365-Filtering-Correlation-Id: 671725e3-5c78-4871-c5a6-08df287ac6a9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|56012099006|261009223027099003|10067099003|4143699003|18002099003|22082099003|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	Na8dD7iov+YqIcUDQBXJCNZqH2X9fzp9cXwQ8VTQTd2lSFsJqtQ1qkubEcaNj4GkYXJPhLf4/tMH8z5VtD5Ya4sg7herWFbEt8eAXfBhHYcQV+dBomVsFrBL+Tyq5DKJZ8szfyoJR8ycwVtkeF4CnKxKjXjuml6Ji4nTvNDLMZ+mrXWhIoZIMz1PZ5/EHaSs/KFnLCxp5Tx9RbKZQ0IAcfPsC14SNoxOskdEMpH8IHb73iPMw5fRnNRNMha7JMVTd9DIy0Cs2ngzhXKVJY4pEmMY8WvoSQEqG6JQz2DbMV3biFJcRe8OYUOPoSfPQ09azzYe+Hd4l26gVyGBXcXgS1FW5jNLmt+ZDcycX+1dOd8/l/EGKoUuqlCZuaF3o0B2TBOOiH6xtDd14299wyUJU/hSIuovMkjj6EBZYDZwfajbI7p+SPHJ2pJ3btvgmPQRBdH19fKQyPUFfJN9ZibWtNuLQFe5ev0SAjotAitkuJhabtewZ7k+edmfls/o1nfAt7bBlgWH6Ccd5dFOFsQQBWSG6pxY61vvcmktcGtk9M9slw03f0X2AcDR/NOkNdWp221yBgaX1bKyi6kNkRN0roD3wOO+kygNP5vztMBN4AdVoRkqxoXQAWO4dBiK4/bJiy7fj0320YL57zkgBp8+RDGZ9IbmwmIKu3pKb8GqlQw=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(56012099006)(261009223027099003)(10067099003)(4143699003)(18002099003)(22082099003)(6133799003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?K2pOaFlRYjRQLzZ0UytZVXNPbmV4RnZ0YllJdVpJcVpDaDRLRXVxT3YxM2lB?=
+ =?utf-8?B?SkY4MDNuSEJrQUtiNUFaV0U3MnpKempuazkvajBkK3JsNGU2Uklvc0hONHBU?=
+ =?utf-8?B?amU4Tmg4eGlpVHBuSVpyVGI1dHB4VDNHWDNVY0trZjAyakRSdWNVSSthRnZa?=
+ =?utf-8?B?RGhtWE14MEFwdjdzVE5veXRGOGJSck1PSGJKaWRhZ1M0NGc2ckd3NmVRaWxk?=
+ =?utf-8?B?VkJJMGF4WXRwb0hTYmFRVlBpL01iaHQ5QUFkVTlLNUZSSlpzbHpYRmpyQmFN?=
+ =?utf-8?B?d0RPdnRKbzVyYTdMWHdGd2dTczEvTi9RSGNXU2NOeWhKc0laZ3I2ZlV3bmFD?=
+ =?utf-8?B?aVBLZlp4b3ZQRlVSSmZrekZ0T2JQRFczcFRFNWw0QkczTWxXV2NULy9lU294?=
+ =?utf-8?B?MnozdmV6NGVsMnJFSGl2TlYzRlB6ZytOcXNwSnowbGdqaGZYcHdGaWJPU3N1?=
+ =?utf-8?B?eXJlVGFKY0locmdwVWhCQ2hSbzFHVE9FOFFVRUsxcjNJV2NmU01ZM2R0cFNV?=
+ =?utf-8?B?dkRlbE1kSnBtL0dRcVlhNlk1Nzl1QWd5Rk1jSnptaE5YRzBOSW1DUm5NTFI4?=
+ =?utf-8?B?ZXZLY3lxbTJQZUFaNGF0MkdrSldCdFZDR003QjhwMDV4UmsxVXlaQUxKTzFq?=
+ =?utf-8?B?QmhtTUVEdDI4dTN3WEpRMzYzVlZwUG5BTndkM0V0djBuaTBBZTJGU3ZHb2V4?=
+ =?utf-8?B?d2REei9IVlVyajVaQXJlUHV4R1g1OURLU1NMSzVCbGhwT2tBZGRQTm5NSmdO?=
+ =?utf-8?B?TlZHR0Evc0F6ZFhFWXJJR2tSdi96VndESWtQb2VsdStmMlg4RG14Vzkxalh1?=
+ =?utf-8?B?MHpmN3lodTgybGZLZys0WVdKaXdZUlQ3M21pT2lwNEF5QzdVMzdJSVpUM2hR?=
+ =?utf-8?B?UzRzVisycGdIUkxyWmwzeEdvc1F0cWlGUXJjdnlKMkRyRndXc3JLZG1vcmQz?=
+ =?utf-8?B?UG96ZXhOeGhjY0lRTUVaWUQvcnN4cHh0em0yNS81cGNTaVZOQ1R3b29jV3gw?=
+ =?utf-8?B?MitCUGFvcTBMWVBnbnpYU01uYkFNM21ROXZ6TjFIbnplNFFPd0x1VWpSaDVz?=
+ =?utf-8?B?R3lWU09EcURpNTdrWXhxWHRLUVJYNGIwcGZtKzJhMzdrWkZ3dnR6bFZHK1I0?=
+ =?utf-8?B?SzB4KzQ5Z1NKY1d1SUxXQnpnNEZraDlnbG1GWUZyZWdUTkl0cDF0ZXFPei9K?=
+ =?utf-8?B?MFZYdFd3Y3FNY2tVa3Q0SGh0TURVNEJrUWtaWHBQZ2dnQTA3ZklDaGtuZzhC?=
+ =?utf-8?B?aXpYMjc0WGZ5NVc4bWhpU1owQ1JqMmp4MEphT0ZnVWZrcmFDaXV3d2JtUmxO?=
+ =?utf-8?B?QW8xS3VxazRvSElqWndkQTloQUU0ZkF1RmdWMTFoYmlJTys4Q0tXeFoxcExu?=
+ =?utf-8?B?RVVHMmZPRk5Gczg2RDVoUjA5ZFhMVUVPaWQ0cWRwVis4ZkVVM0lUdEFEaHp0?=
+ =?utf-8?B?MFhzdFdsWk5sc2hBS2FqQ3lSM3pnemk2Q01sTzNGOEhONTdjVldYUWhOMVJ2?=
+ =?utf-8?B?ZjkrOVZrNGQ3NjZJeHNoeHU1S1RSRko0c3JEMjlxUi9JeEQ4WGxlYTVCWlA2?=
+ =?utf-8?B?NVVHYVVpT291ZGlxbWVTcUY3NlkycXN5aWV1TjBBL0lXOTNWOXpES2JMZ041?=
+ =?utf-8?B?TnM0Z3VrazZTa0cxUTJGTEJjVDh1dXowVGxXdGg0SWtWZ0RPOERpeXc4cHJn?=
+ =?utf-8?B?RStmYVFQRTliS1FvaHdDSGdqTDVOT2pzeEFTNU9NU0J4cWNhcWp1VGxxVkxz?=
+ =?utf-8?B?UXp4WlYycldpR0NDTXkybi82Z0VYUjduajFjQjFCZXJZazV4RTF2Q09PVURa?=
+ =?utf-8?B?anVwRFEwNUNORzBsQVhLeVBOSkJqckRFMUtpZ1MvQVI5UFhDNnc5NTlIbE5v?=
+ =?utf-8?B?VXZYSVoxbm1JZ2djSFN4YlZSbWZzOFg0V0o1ejJ0a0g4YVBsWUtYb1pTWEZh?=
+ =?utf-8?B?TjFRbmxtdTBVT2VWSnFPelZINTJvVEZMVEFKVnhTaS9kUElJKzU5Y01vYW1r?=
+ =?utf-8?B?ZFJvSzVxcjBNajd0VnEwb2ZydE1UUkx4bGxQSDVKbUw5Sy9rYzBmZkhZNjF5?=
+ =?utf-8?B?VHBuWXFPS0tNU1dVZVhhMHVITGRqdWd5L0lEKzNPa2N0RXpaLzEzcXNLai9i?=
+ =?utf-8?B?SDN5NkRFclQ3SGxJcHU3bE9UTkNUYmJUTVBkdXpGK21XUWtZQ2J0cnpUM1Fz?=
+ =?utf-8?B?M05IK1NIK25SQXBWdDlZc0Z3VTdnWENmelZIQWlEcEp1L2hXSkxCVEphOWlQ?=
+ =?utf-8?B?S3NnRmgvOWpHbEs2NFJRdlE1S3RzSGxveG1xZDZZWHJ2d09tQmthM3luY3h2?=
+ =?utf-8?B?MFV1QWVJNDRRMG11bjJPNGRiYUtScXF5RlFZbUVFWUx0YlBSdG1NZz09?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 671725e3-5c78-4871-c5a6-08df287ac6a9
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2026 16:06:29.7465
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TpDa6dYblYvn4KYZ/KUCU7NhY5m/GBkjqBMyPvYBuGrfOPCE3z1oOHVdHI9MB3l/qlc2GuTTYrJ1c6NCxerDRg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LOYP123MB3119
 
-On 10/10/26 00:53, Tal Zussman wrote:
-> An atomic write is submitted as a single bio, so when its buffer can't
-> be fully pinned, the direct I/O path has to fail the write rather than
-> submit the pinned part. Otherwise, it submits what was pinned with
-> REQ_ATOMIC set and leaves the rest to the buffered fallback, tearing the
-> write at the pin boundary.
+On Sun, Oct 11, 2026 at 09:51:25PM -0500, Ming Lei wrote:
+> > Since kblockd_workqueue is WQ_PERCPU, the responsibility rests with blk-mq
+> > to provide a non-isolated CPU when dispatching &hctx->run_work, no?
 > 
-> This is a regression test for that issue, fixed in the kernel patch
-> "block: fail a short atomic pin in bio_iov_iter_get_pages()" [1].
+> Does every WORK_CPU_UNBOUND user have to handle it?
+
+[Adding Tejun Heo]
+
+No, because almost all other subsystems passing WORK_CPU_UNBOUND do so on
+unbound workqueues (e.g. system_unbound_wq).
+
+In kernel/workqueue.c, when WORK_CPU_UNBOUND is queued on a WQ_UNBOUND
+workqueue, workqueue core already handles CPU isolation automatically via
+wq_select_unbound_cpu(), which respects wq_unbound_cpumask and steers the
+work item to a housekeeping CPU.
+
+kblockd_workqueue is unique in that it is allocated as WQ_PERCPU to
+preserve per-CPU locality for multi-queue devices. For WQ_PERCPU
+workqueues, workqueue core cannot silently migrate WORK_CPU_UNBOUND to a
+remote CPU because callers of bound per-CPU workqueues expect local per-CPU
+execution. Thus, blk-mq is in the unusual position of passing
+WORK_CPU_UNBOUND to a bound per-CPU workqueue with the expectation that it
+avoids isolated cores.
+
+> > I suspect, steering the asynchronous dispatch to a housekeeping CPU is both
+> > architecturally necessary and fully aligned with the rest of the kernel,
+> > no? When a queue is plugged, throttled, or returns BLK_STS_RESOURCE, blk-mq
+> > defers execution to a background workqueue. That work runs asynchronously
+> > at some indeterminate time in the future, long after the thread has
+> > returned to its time-critical user loop. Having a kworker suddenly preempt
+> > the thread later is likely not desired.
 > 
-> Issue pwritev2() with RWF_ATOMIC to a scsi_debug device with atomic_wr=1
-> from a buffer whose last page is PROT_NONE, so that pinning the buffer
-> stops one page short, then read the range back with O_DIRECT and fail if
-> it holds a mix of old and new data.
+> We are talking about `if a task executing on an isolated CPU submits I/O `.
 > 
-> The write has to span at least two pages so that one can be left
-> unpinnable, and the device has to support it atomically. Use the largest
-> power of two up to 16K that the device's atomic write unit max allows,
-> and skip the test if that is below two pages.
-> 
-> [1]: https://lore.kernel.org/linux-block/20261009-blkdev-fixes-v6-5-307939c387df@columbia.edu/
-> 
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
-> ---
->   src/.gitignore          |   1 +
->   src/Makefile            |   1 +
->   src/atomic-write-torn.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++++
->   tests/block/052         |  70 ++++++++++++++++++++++++++
->   tests/block/052.out     |   2 +
->   5 files changed, 205 insertions(+)
-> 
-> diff --git a/src/.gitignore b/src/.gitignore
-> index 92c08d1..76a1c5e 100644
-> --- a/src/.gitignore
-> +++ b/src/.gitignore
-> @@ -1,3 +1,4 @@
-> +/atomic-write-torn
->   /bio-bounce-read
->   /bio-full-trim
->   /bio-trim-pin-leak
-> diff --git a/src/Makefile b/src/Makefile
-> index 0bdfd05..54335d9 100644
-> --- a/src/Makefile
-> +++ b/src/Makefile
-> @@ -14,6 +14,7 @@ HAVE_C_DEF = $(shell if printf '$(H)include <%s>\n$(H)ifdef %s\nHAVE_%s\n$(H)end
->   		then echo 1;else echo 0; fi)
->   
->   C_TARGETS := \
-> +	atomic-write-torn \
->   	bio-bounce-read \
->   	bio-full-trim \
->   	bio-trim-pin-leak \
-> diff --git a/src/atomic-write-torn.c b/src/atomic-write-torn.c
-> new file mode 100644
-> index 0000000..e8ebba3
-> --- /dev/null
-> +++ b/src/atomic-write-torn.c
-> @@ -0,0 +1,131 @@
-> +// SPDX-License-Identifier: GPL-3.0+
-> +/*
-> + * Copyright (C) 2026 Tal Zussman
-> + *
-> + * Check that a RWF_ATOMIC direct write to a block device is all or nothing
-> + * when only part of its buffer can be pinned.
-> + *
-> + * Fill a range of the device with one byte value, then issue a pwritev2()
-> + * with RWF_ATOMIC of a buffer holding another value whose last page is
-> + * PROT_NONE, so that pinning the buffer stops one page short. The direct
-> + * I/O path must fail the write outright rather than submit what it pinned.
-> + *
-> + * Read the range back with O_DIRECT and count the bytes of each value. A
-> + * mix of old and new bytes means the write was torn.
-> + *
-> + * usage: atomic-write-torn <blockdev> <length>
-> + *
-> + * <length> is the size of the atomic write, a power of two of at least two
-> + * pages that the device supports. The first <length> bytes of <blockdev>
-> + * are overwritten.
-> + *
-> + * exit:  0 = the write was all or nothing
-> + *        1 = setup error
-> + *        2 = the write was torn
-> + */
-> +#define _GNU_SOURCE
-> +#include <errno.h>
-> +#include <fcntl.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/mman.h>
-> +#include <sys/uio.h>
-> +#include <unistd.h>
-> +
-> +#ifndef RWF_ATOMIC
-> +#define RWF_ATOMIC	0x00000040
-> +#endif
-> +
-> +#define EXIT_TORN	2
-> +
-> +#define OLD	'A'
-> +#define NEW	'B'
-> +
-> +int main(int argc, char **argv)
+> If the task has been submitting IO on isolated CPU, why can't we keep
+> scheduling WQ on isolated CPU for running blk-mq queue? I am not sure your change
+> makes any difference from user viewpoint.
 
-This code should really test that the block device is atomically 
-writable, ideally via statx.
+When a task submits I/O, synchronous submission occurs directly in syscall
+context. Note, in the following example, IOCB_DIRECT is applied since the
+file was opened with file->f_flags & O_DIRECT:
 
-> +{
-> +	size_t old_bytes = 0, new_bytes = 0;
-> +	size_t len, pgsz, i;
-> +	struct iovec iov;
-> +	char *buf, *check;
-> +	ssize_t ret;
-> +	int fd;
-> +
-> +	if (argc != 3) {
-> +		fprintf(stderr, "usage: %s <blockdev> <length>\n", argv[0]);
-> +		return 1;
-> +	}
-> +
-> +	pgsz = sysconf(_SC_PAGESIZE);
-> +	len = strtoul(argv[2], NULL, 0);
-> +	if (len < 2 * pgsz || (len & (len - 1))) {
-> +		fprintf(stderr, "length must be a power of two of at least two pages\n");
-> +		return 1;
-> +	}
-> +
-> +	fd = open(argv[1], O_RDWR | O_DIRECT);
-> +	if (fd < 0) {
-> +		perror("open");
-> +		return 1;
-> +	}
-> +
-> +	buf = mmap(NULL, len, PROT_READ | PROT_WRITE,
-> +		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> +	if (buf == MAP_FAILED) {
+  __x64_sys_write
+    ksys_write
+      vfs_write
+        else if (file->f_op->write_iter)
+          new_sync_write(file, buf, count, pos)
+            // filp->f_op->write_iter(&kiocb, &iter)
+            ext4_file_write_iter
+              if (iocb->ki_flags & IOCB_DIRECT)
+               ext4_dio_write_iter(iocb, from) 
+                 iomap_dio_rw(iocb, from, &ext4_iomap_ops,
+                              &ext4_dio_write_ops, dio_flags, NULL, 0)
+                   __iomap_dio_rw
+                     ...
+                     iomap_dio_submit_bio
+                       blk_crypto_submit_bio(bio)
+                         if (!bio_has_crypt_ctx(bio) ...)
+                           submit_bio(bio)
+                            ...
+                             __submit_bio
+                               blk_mq_submit_bio(bio)
+                                 // blk_mq_run_dispatch_ops(q, blk_mq_try_issue_directly(hctx, rq))
+                                 __blk_mq_run_dispatch_ops(q, true blk_mq_try_issue_directly(hctx, rq))
+                                   blk_mq_try_issue_directly(hctx, rq)
+                                     __blk_mq_issue_directly(hctx, rq, true)
+                                       // q->mq_ops->queue_rq(hctx, &bd)
 
-Are you intentionally not handling close(fd)?
 
-> +		perror("mmap");
-> +		return 1;
-> +	}
-> +
-> +	/* Write the old contents. */
-> +	memset(buf, OLD, len);
-> +	if (pwrite(fd, buf, len, 0) != (ssize_t)len) {
-> +		perror("pwrite");
- > +		return 1;> +	}
+However, if dispatch must be deferred (e.g. BLK_STS_RESOURCE),
+blk-mq queues &hctx->run_work. Now, if &hctx->run_work is queued on the
+isolated CPU, it must be executed by the local kworker. Because that
+kworker runs under SCHED_NORMAL, the user's SCHED_FIFO task completely
+starves the kworker. As a result, blk_mq_run_work_fn() never executes,
+hardware dispatch stalls, and the I/O pipeline hangs indefinitely.
+Albeit, I believe an enabled Fair server, under the EEVDF scheduler, will
+prevent this stall.
 
-I suppose that it would be total paranoia to re-read and test vs expected.
+Anyhow, offloading deferred dispatch to an online housekeeping CPU allows
+the kworker to run immediately and complete dispatch without priority
+inversion. As noted in commit a46c27026da1:
+    "it isn't expected to let block IO disturb these CPUs. blk-mq kworker
+     shouldn't be scheduled on isolated CPUs."
 
-> +
-> +	/* Fill in the new contents and make the last page unreadable. */
-> +	memset(buf, NEW, len);
-> +	if (mprotect(buf + len - pgsz, pgsz, PROT_NONE)) {
-> +		perror("mprotect");
-> +		return 1;
-> +	}
-> +
-> +	iov.iov_base = buf;
-> +	iov.iov_len = len;
-> +	ret = pwritev2(fd, &iov, 1, 0, RWF_ATOMIC);
-> +	if (ret < 0)
-> +		printf("pwritev2(RWF_ATOMIC) failed: %s\n", strerror(errno));
-> +	else
-> +		printf("pwritev2(RWF_ATOMIC) returned %zd of %zu\n", ret, len);
 
-As a sanity check we could test the error code is -EINVAL. That's always 
-expected, right?
-
-> +
-> +	/* Read the range back past the page cache. */
-> +	if (posix_memalign((void **)&check, pgsz, len)) {
-
-Can you just re-use buf?
-
-> +		perror("posix_memalign");
-> +		return 1;
-> +	}
-> +	if (pread(fd, check, len, 0) != (ssize_t)len) {
-> +		perror("pread");
-> +		return 1;
-> +	}
-> +
-> +	for (i = 0; i < len; i++) {
-> +		if (check[i] == OLD)
-> +			old_bytes++;
-> +		else if (check[i] == NEW)
-> +			new_bytes++;
-> +	}
-> +	printf("on disk: %zu old bytes, %zu new bytes, %zu other\n",
-> +	       old_bytes, new_bytes, len - old_bytes - new_bytes);
-> +
-> +	free(check);
-> +	munmap(buf, len);
-> +	close(fd);
-> +
-> +	if (old_bytes != len) {
-> +		printf("atomic write was torn: %zu of %zu bytes written\n",
-> +		       new_bytes, len);
-
-So what happens if we did write all the new bytes (even though it should 
-not happen)? That's not a torn write. This really goes back to testing 
-pwritev2() error code, above.
-
-> +		return EXIT_TORN;
-> +	}
-> +	printf("atomic write was all or nothing\n");
-> +	return 0;
-> +}
-> diff --git a/tests/block/052 b/tests/block/052
-> new file mode 100755
-> index 0000000..8ec115a
-> --- /dev/null
-> +++ b/tests/block/052
-> @@ -0,0 +1,70 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2026 Tal Zussman
-> +#
-> +# Issue a RWF_ATOMIC direct write to a block device from a buffer whose last
-> +# page cannot be pinned and check that the write is all or nothing. An atomic
-> +# write is submitted as a single bio, so the direct I/O path has to fail the
-> +# write outright when pinning its buffer comes up short. Without that, it
-> +# submits what was pinned with REQ_ATOMIC set and leaves the rest to the
-> +# buffered fallback, tearing the write at the pin boundary.
-> +#
-> +# Regression test for patch "block: fail a short atomic pin in
-> +# bio_iov_iter_get_pages()".
-
-Please run shellcheck on this if not already done so. JFYI, the 
-maintainer asks for this.
-
-> +
-> +. tests/block/rc
-> +. common/scsi_debug
-> +
-> +DESCRIPTION="check that a partially pinned atomic write is not torn"
- > +QUICK=1
-> +
-> +requires() {
-> +	_have_scsi_debug
-> +	_have_module_param scsi_debug atomic_wr
-> +	_have_src_program atomic-write-torn
-> +}
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	local dev len page_size unit_max ret
-> +
-> +	if ! _configure_scsi_debug delay=0 atomic_wr=1 dev_size_mb=16; then
-
-I think that delay defaults to zero now.
-
-> +		echo "configuring scsi_debug failed"
-> +		return 1
-> +	fi
-> +	dev="/dev/${SCSI_DEBUG_DEVICES[0]}"
-> +
-> +	# The largest power of two the device can write atomically, capped at
-> +	# 16K. It has to span at least two pages so that one can be left
-> +	# unpinnable.
-> +	page_size=$(_get_page_size)
-> +	unit_max=$(< "/sys/block/${SCSI_DEBUG_DEVICES[0]}/queue/atomic_write_unit_max_bytes")
-> +	len=16384
-> +	while (( len > unit_max )); do
-> +		len=$(( len / 2 ))
-> +	done
-> +	if (( len < 2 * page_size )); then
-> +		SKIP_REASONS+=("atomic write unit max ${unit_max} is below two pages")
-
-Can you set params for scsi_debug such that this does not happen?
-
-> +		_exit_scsi_debug
-> +		return
-> +	fi
-> +
-> +	src/atomic-write-torn "${dev}" "${len}" >>"${FULL}" 2>&1
-> +	ret=$?
-> +
-> +	_exit_scsi_debug
-> +
-> +	case $ret in
-> +	0)
-> +		;;
-> +	2)
-> +		echo "atomic write was torn"
-> +		;;
-> +	*)
-> +		echo "atomic-write-torn helper failed"
-> +		;;
-> +	esac
-> +
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/block/052.out b/tests/block/052.out
-> new file mode 100644
-> index 0000000..71c1f0a
-> --- /dev/null
-> +++ b/tests/block/052.out
-> @@ -0,0 +1,2 @@
-> +Running block/052
-> +Test complete
-> 
-
+Kind regards,
+-- 
+Aaron Tomlin
