@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BA248D881;
-	Mon, 12 Oct 2026 12:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D78548A2D1;
+	Mon, 12 Oct 2026 12:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791809109; cv=none; b=mSU7OGJ2nWrHZLjO+YhHxQg87S55hw1gEIBvrCYKwMW96D7FqQPxgna4O8dS1nhInFaypNjzqNQ2UjMvM51tQsdz9bFESeiV1szQbJ/bfiXctp0tWPIr6avzSLspIuADzGQRSFKjlgPrV1lMAG4scnnw/YIuKeHZvj89jNZgxPU=
+	t=1791809186; cv=none; b=gsVbN2u6YBUKJ59+S44iVxaoeCjTOk4FPR/qbdIvCFzzOKzThb9YhIFP88ddszvlpHTezr73ve+xR4eM6w5i9mwu0K150Vb6Y16SVYVi6NXJY6v4uxrgoAVEQNQbN8N8IpZ6fPfOeN9rfpwZ98A4zsEexFYZR1yGUGb7Cs+hREs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791809109; c=relaxed/simple;
-	bh=7onryS3WXoTzyRLHywb8CcJjQKdfQO3P4/LDi/suQMc=;
+	s=arc-20240116; t=1791809186; c=relaxed/simple;
+	bh=nq42yptSw/RlcpiwDOE5kUYPRplLqvQjbJSAYj+oX3M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n8czGD31gtwxqBMTUhIIMtuUi/XtUt76mOCKlfDZXDSdTvABNgvqAW6kdD01t/76MV5gU3VhGViFwJKUcPKJ1QEnkOG+ugJxsGNHGGknJk7ngFVrCVNtAq/Xom5fSTFePI3ZSRtER+FtDeC8ngl0hTu6B4i4z6fZuDgXSP/OgBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fq6VXQqd; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=Tk9EXtpOKXNTiAFKJx/SXmHQME6aRDiX8vZy04IjyzK3FSwMmB7Yu1taxQi/IJQitUhXxGMTdfYU92jBONptqXfnEbVX3/M8+whZEzKqFG+WkBw00gs6SB5P8pwIFWW51uwBqHteUsQV9lZcmz9sJnue55EcJZPJuiKT9LukW+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LH7pDh6J; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fq6VXQqd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49C6C1F0089B;
-	Mon, 12 Oct 2026 12:45:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LH7pDh6J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 959B91F0089B;
+	Mon, 12 Oct 2026 12:46:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791809107;
-	bh=/lL5RFvdq/NZ9SYbWZFMZ+sYpkJ8535UqQ+OACHhXNo=;
+	s=k20260515; t=1791809185;
+	bh=QiEZQ7DvZhE3m3MhQISynkWcztSVNF+s1I8gL37uXgg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=Fq6VXQqdmjqUIUf0X/31Cdoet0fMqrFrN7kGIa4hoRzsEKokeBhWpT2wjZ9ROgTuS
-	 4DZdgCXB33v43zlLcuhiDNsHs1/ix8KsWWe1Tg3zuwv4uJLrh2sCTkHtW2s8b1FuFW
-	 KtoO9Tac30DDu2d8JCqW8QmiSYXdl9eDXP0O4tOAAdVd8xnq7xXfRveiNfdL2CICGq
-	 iBRQdCx9kiNj/6qfmeS8vB5apwVYbqln8L2msCsTIsngT2tp1P38nri5Qa3vIePw0W
-	 pwY97ah2KXHP+hZXNjGEhgdOe0Y+lG+S8EH8VqiZOQeUhuMfClDD8I3A9V6m8uS6yM
-	 nWYj2dOFVLLsg==
-Message-ID: <0da1bc26-b3ed-4bfa-b75d-2d1696cc0cfb@kernel.org>
-Date: Mon, 12 Oct 2026 14:45:04 +0200
+	b=LH7pDh6Jhr2bo9Of+JFs0lD+77L+6IoaBBIagPkMHHr4p1pLXXMESTnjuHlpDBFMt
+	 W0uI94kdjdme0JdIPl0fCPiJ9rMv/yW5ExhAUuPntNLCaEFknsr/EWRmE/A8qmCGRf
+	 3xnNS5cDJZrFrWxptdveR1sjBTKszUrOxj4hyqyZw+szjDJk8hvlCMExApoDKUxOY2
+	 DfeSwyudoPnK/tWP+e9kE5jPEITYwVk8ZeJtPP9kFkwQOXIi6gyKmTEnJpEfaXYstk
+	 u+gPetdgaxvmmrO+wpqVKCON8EF/og3cQ2MmUlq2xUpoFQzazp7YRUw+aiQsmJo6tX
+	 uiwmBcG45arzQ==
+Message-ID: <cfd38ed0-4e3f-4276-97a7-e172922d4ef6@kernel.org>
+Date: Mon, 12 Oct 2026 14:46:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,7 +53,7 @@ Content-Language: en-US
 Organization: Western Digital Research
 In-Reply-To: <CA+FWx=kgeR8tz46tijYE-s=v+PTJjGfM+3ucQOo0ZuDyqFdYQw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 On 2026/10/12 14:41, shashank Jain wrote:
 > On Mon, Oct 12, 2026, Damien Le Moal wrote:
@@ -65,74 +65,15 @@ On 2026/10/12 14:41, shashank Jain wrote:
 > - Use "blkzone report" with the cached flag once your util-linux patch
 >   lands - that matches the existing zbd tests and avoids a bundled tool.
 >   I would hold the blktests submission until it is available.
-
-We should leave "blkzone report" to get the device report as before, to avoid
-breaking anything for user with the "active" condition being returned.
-I was thinking on adding a "--cached" option to control the use of
-BLK_ZONE_REP_CACHED.
-
-If you want to take on such patch, go ahead. CC me on it and I will review. The
-patches I need to send to add depop support will take some more time.
-
 > - Or carry a small C helper in the blktests src/ directory that issues
 >   BLKREPORTZONEV2 with BLK_ZONE_REP_CACHED directly, so the test is
 >   self-contained and does not depend on the util-linux version.
 > 
 > I lean towards the first, to match the zbd conventions and your blkzone
 > work; tell me which you prefer and I will align the test with it.
-> 
-> Thanks,
-> Shashank
-> 
-> On Mon, Oct 12, 2026 at 6:07 PM Damien Le Moal <dlemoal@kernel.org> wrote:
->>
->> On 2026/10/12 14:29, shashank Jain wrote:
->>> On Mon, Oct 12, 2026, Christoph Hellwig wrote:
->>>> Can you add this to blktests as a reproducer?
->>>
->>> Will do. I'll send a blktests test under tests/zbd/ that sets up a zoned
->>> null_blk device with a smaller last zone and checks that BLKREPORTZONEV2
->>> without BLK_ZONE_REP_CACHED matches BLKREPORTZONE, and that the cached
->>> report's last-zone length does not extend past the device. I'll post it
->>> to the blktests project separately and reference this series.
->>
->> How do you plan to issue a BLK_ZONE_REP_CACHED report? "blkzone report" does not
->> have that yet. I am planning to send a patch for it.
->>
->>>
->>> Thanks,
->>> Shashank
->>>
->>> On Mon, Oct 12, 2026 at 5:51 PM Christoph Hellwig <hch@lst.de> wrote:
->>>>
->>>> On Sun, Oct 11, 2026 at 10:49:06AM +0530, Shashank Mohan Jain wrote:
->>>>> blkdev_get_zone_info() sets the length of every zone to the zone size
->>>>> of the device. The last zone of a zoned block device may be smaller
->>>>> than the others: blk_revalidate_zone_cb() accepts that and remembers
->>>>> the capacity of that zone in disk->last_zone_capacity. For such a zone
->>>>> the length reported from the cached information is too large, and
->>>>> start + len is beyond the end of the device. A conventional last zone
->>>>> is also given the capacity of a full zone.
->>>>>
->>>>> Example with a zoned null_blk device of 10 MiB (20480 sectors) with
->>>>> 4 MiB zones, last zone:
->>>>>
->>>>>   BLKREPORTZONE:       start 16384 len 4096 capacity 4096
->>>>>   BLKREPORTZONEV2 with
->>>>>   BLK_ZONE_REP_CACHED: start 16384 len 8192 capacity 4096
->>>>
->>>> Can you add this to blktests as a reproducer?
->>>>
->>>> The patch looks good:
->>>>
->>>>
->>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>
->>
->> --
->> Damien Le Moal
->> Western Digital Research
 
+Yes, let's avoid the small helper. Having access to the cached report with
+blkzone will be useful for many things anyway, and the patch should be easy.
 
 -- 
 Damien Le Moal
