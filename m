@@ -1,36 +1,60 @@
-Received: from mta1.migadu.com (out-236.mta1.migadu.com [95.215.58.236])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91665339B41
-	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 08:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.236
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4980446C00;
+	Mon, 12 Oct 2026 08:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791792740; cv=none; b=d/CkCYgHGLnjcyE6VWQowup5EOQzzJKkqTUyivC3OzPow1pFcoN/yLyKA9Tle6L6e2NI5nu8ms6c3N7Uz5aPm6E3Q3YJ2LI0zgVJ1EgxdQZvylEwxPqcjZ3m4NBKovmfc0y4K5V98Tks2or9m0F6HeZM7RUq+9tT03Nx4AiD2G8=
+	t=1791793587; cv=none; b=VSiSo7vYFjHtBWdiwPD1H3vOnw635QPIIJg3yUf1XxuT6A9MJOS2HY/TV/Q7tOsa0aXZ13zuGmptRtGpOxIYZFcg7MGP/1gec9krA7BwPTX65idnbbrXe1E1kh79NU3UmhxwS9HYf6jiD1pJi1jJU7CBAsmT3OOXA/P80Gf66fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791792740; c=relaxed/simple;
-	bh=XLJPITQZKsw44OZ97abkcVkwSGp8wEmGJ174ENO+1wg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XZM+fYs5T38AmOeYCqPi4mNKDFttvf0urDYWLeqROgSeXpAlbFnNPXSIwSG45q+ZOS98WFRl6Y0qer3ebDawlTeo3KGYPcaCii/4rd8qLXswffuvbU90YBrARQWO4O26pc/28OQ6Ywc8Gw+iyuJgrG/dHo0a8Z6ED0dUXC62adU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oh2w/wxN; arc=none smtp.client-ip=95.215.58.236
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791793587; c=relaxed/simple;
+	bh=uTGExs3kULdIbyMdWoKvXjVNc5Hw27I3W5SvGXJSCBU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OcIi4OEl1S/RjfIZ/h7y0zihInHmcZk7jcYiNUWVGV9n/YKucjQluBDr9svLfhq6Htcylk0MeaL1HsVVnC98XfUxA8g5IiMuhDFqyMYVZhsSkiKFrQ9A8pTRYTx+wOzGshv6LMxbcEujdsX6kbfb5QIwRFNO2X9qDPhZ8LHAO/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HRZ7ic2k; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oh2w/wxN"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=XLJPITQZKsw44OZ97abkcVkwSGp8wEmGJ174ENO+1wg=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791792736; v=1; x=1792397536;
- b=oh2w/wxNrnBA6MJsrg0O4++JaoE7hQK+NGzYZ9quOa/OUBRK7GSN2Ia6z1aPtio7wVhV4wWH
- 5SQXOrCO7dolVMH3P58LeqEPDohDpCwTMfRD5U+kWshRjN8de90GkJ3yuRZT78CMvY5H+8OSepX
- BpmAGJJjdO7MPTvk9F93qtcI=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta10.migadu.com with ESMTPS id 929dcb69c7496456;
-	Mon, 12 Oct 2026 08:12:16 +0000
-X-Mizu-Trace-ID: 929dcb69c7496456
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <7e6e2875-29f7-4cad-94f6-5f0e07569481@linux.dev>
-Date: Mon, 12 Oct 2026 09:12:10 +0100
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HRZ7ic2k"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69C5EtSo3566222;
+	Mon, 12 Oct 2026 08:26:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=/CsAHV
+	V7wIz75xaHKMcYPMKlWO5lfc8tcMIl3MXOIzU=; b=HRZ7ic2kVtXfGhTSNxhE8j
+	lACuXBkp8A7sDH2HOu77UVtAPrFbP1QYQjaW12lp1y3hR29UiM8lYrR2F3VH5ppt
+	go3TISjPokxvr/jHqIgJ14nQzSQ8wAabUhcHVfQUYxACuUURuAJa5JJiSbHhCwwb
+	DhmshzqxShrEUouZC8r1dDhiPY5xlvF8qEOcWqUbqCdPl0DQ95kG20oDt56pQl88
+	WEZI3YA3rkosmyMUdxTr+1/I33We70jJAw8cmILdDG39Q1teBlfIaVZQ+A8+jTqH
+	JTk8x9YPEP/EMhnMxMvvKE+B7sN//+TlqSAKW1eLr/QILx98hWEnvliOyLfrjcqQ
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4h7dug7x1p-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 12 Oct 2026 08:26:19 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69C8JxsR964540;
+	Mon, 12 Oct 2026 08:26:18 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4h7yppmg3d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Oct 2026 08:26:18 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 69C8QI1818416134
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 12 Oct 2026 08:26:18 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2DCB45805B;
+	Mon, 12 Oct 2026 08:26:18 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C3FCA58059;
+	Mon, 12 Oct 2026 08:26:15 +0000 (GMT)
+Received: from [9.61.185.118] (unknown [9.61.185.118])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 12 Oct 2026 08:26:15 +0000 (GMT)
+Message-ID: <0c3a6b07-b6ca-4ef2-abcd-6b4e5a5c3fbe@linux.ibm.com>
+Date: Mon, 12 Oct 2026 13:56:14 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,49 +62,112 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: John Garry <john.garry@linux.dev>
-Subject: Re: [PATCH blktests v2 4/4] block/052: add a torn atomic write test
- for block devices
-To: Tal Zussman <tz2294@columbia.edu>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20261009-blkdev-fixes-tests-v2-0-fcb3599e47f7@columbia.edu>
- <20261009-blkdev-fixes-tests-v2-4-fcb3599e47f7@columbia.edu>
+Subject: Re: [PATCH] block: don't quiesce the queue when setting the default
+ elevator
+To: Qiliang Yuan <odys.yuan@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20261001-bug-block-elevator-init-quiesce-v1-1-5c85fa0ec59b@gmail.com>
 Content-Language: en-US
-In-Reply-To: <20261009-blkdev-fixes-tests-v2-4-fcb3599e47f7@columbia.edu>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20261001-bug-block-elevator-init-quiesce-v1-1-5c85fa0ec59b@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=Cr0q4X4D c=1 sm=1 tr=0 ts=6acc99ac cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
+ a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8 a=6xKE9iGDAtwx3dwle_cA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: fEyHqStj6MB8fjQoHm2POadY9GYtVjze
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDEyMDAzMiBTYWx0ZWRfX6AZDXQACvPLo
+ MJ0ywzl2TxiKrVW4A7AsiFzjwhMKcoGpwi8DqggFF2/ypiv8Jx45DckQhoJkBptVNN5wHD8uRzh
+ aECANETmpLqDrP7tSWMmHCbeO2NcPUPq8jtsOX4B5B7Zw/QHNKd8BUeAzMhJXq0wckn03Zwah24
+ qIl03D7WZLxJ0AJkCUqaBqUKy4Qi7j6eXHrZLI5rP0qrw6hkMbez/nR+5jusEiZnoi6ehzM5paW
+ Haby63HpAW7sx4c3vjXcTdmemi4+SxdJvyQjBPFOCDiEtZJvIpFsXxtlVEOLl5CsxjEqDxPRvHz
+ 4ma97wXfS9OxkqcRhrnnzfzBGaiWRyKKL50cSEmKtNJ9cha54lSIEpUM+I5nkaH8drzo0xhJBff
+ iXET2XGyKpLpq1+ZMRKQ8uNL706ZzeHy/qgtPx5gLs/AyDtK4PYtNimxw42w7HNYRYCk1xcfG1Z
+ 0kVQ6aY/YSin7vUF+4w==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDEyMDAzMiBTYWx0ZWRfXwYZZD5Yy7K0x
+ U3MKznYxv28g5HiseYsmhCBeqPdMHIjyEHAJgZPmnnYDhwSxpKX8oWVPELSPNMO6ugrOSgnDGsV
+ 1pebeBwNjysFjk+KrjBzN9vxmOT7Yno=
+X-Proofpoint-ORIG-GUID: iNNUSd_VMQtGntdRwn789mpakV0IsmA4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-10-12_02,2026-10-09_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501 suspectscore=0
+ malwarescore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610120032
 
-On 10/10/26 00:53, Tal Zussman wrote:
-> An atomic write is submitted as a single bio,
-
-nit: A HW-based atomic write is always a single bio. A SW-based atomic 
-write - like which xfs supports - does not have such a limit.
-
-> so when its buffer can't
-> be fully pinned, the direct I/O path has to fail the write rather than
-> submit the pinned part. Otherwise, it submits what was pinned with
-> REQ_ATOMIC set and leaves the rest to the buffered fallback, tearing the
-> write at the pin boundary.
+On 10/1/26 8:40 AM, Qiliang Yuan wrote:
+> elevator_set_default() runs from blk_register_queue() while the disk is
+> still being added: the block device is not visible yet and uevents are
+> suppressed, so no file system I/O can be issued. elevator_change()
+> freezes the queue and cancels the dispatch work before switching, which
+> is enough to drain dispatch activity from passthrough requests, as the
+> comment in elevator_change() already states.
 > 
-> This is a regression test for that issue, fixed in the kernel patch
-> "block: fail a short atomic pin in bio_iov_iter_get_pages()" [1].
+> elevator_switch() still quiesces the queue unconditionally, though, so
+> every disk added with a default elevator waits for an RCU grace period.
+> Commit 245a489e81e1 ("block: avoid to quiesce queue in
+> elevator_init_mq") had removed this wait from the default elevator
+> setup, and it came back when that setup was folded into
+> elevator_change().
 > 
-> Issue pwritev2() with RWF_ATOMIC to a scsi_debug device with atomic_wr=1
-> from a buffer whose last page is PROT_NONE, so that pinning the buffer
-> stops one page short, then read the range back with O_DIRECT and fail if
-> it holds a mix of old and new data.
+> The wait is paid in full by callers that add disks one at a time. ublk
+> adds the disk of a single-queue device from START_DEV, which takes 7.7ms
+> at p50 in a 16 vCPU KVM guest, most of it in blk_mq_quiesce_queue()
+> called from elevator_set_default().
 > 
-> The write has to span at least two pages so that one can be left
-> unpinnable, and the device has to support it atomically. Use the largest
-> power of two up to 16K that the device's atomic write unit max allows,
-> and skip the test if that is below two pages.
+> Skip quiescing in elevator_switch() when setting the default elevator.
+> 
+> ublk null target, 1000 single-queue devices created one by one:
+> 
+>                       before      after
+>    START_DEV p50      7.74ms     0.68ms
+>    START_DEV p99     14.61ms     1.32ms
+>    devices/s             114        971
+> 
+> Fixes: 1e44bedbc921 ("block: unifying elevator change")
+> Cc:stable@vger.kernel.org
+> Signed-off-by: Qiliang Yuan<odys.yuan@gmail.com>
+> ---
+>   block/elevator.c | 7 +++++--
+>   block/elevator.h | 2 ++
+>   2 files changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/elevator.c b/block/elevator.c
+> index 2161b6eea680c..da9ba70ac9321 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -573,7 +573,8 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+>   			return -EINVAL;
+>   	}
+>   
+> -	blk_mq_quiesce_queue(q);
+> +	if (!ctx->no_quiesce)
+> +		blk_mq_quiesce_queue(q);
+>   
+>   	if (q->elevator) {
+>   		ctx->old = q->elevator;
+> @@ -594,7 +595,8 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+>   	blk_add_trace_msg(q, "elv switch: %s", ctx->name);
+>   
+>   out_unfreeze:
+> -	blk_mq_unquiesce_queue(q);
+> +	if (!ctx->no_quiesce)
+> +		blk_mq_unquiesce_queue(q);
+>   
+One minor nit: Since we only unquiesce the queue at the out_unfreeze label,
+could you rename it to out_unquiesce while you're at it? I realize this label
+predates your change, but the new name would better reflect what happens there.
 
-As you probably saw, we have other atomic writes tests and they use 
-xfsprogs (xfs_io, specifically) to issue the atomic write and statx.
+Otherwise, this change looks good to me.
 
-Is there scope to use xfsprogs again here? I suppose that the gap is the 
-mmap and mprotect call.
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 
 
