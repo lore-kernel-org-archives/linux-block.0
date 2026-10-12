@@ -1,91 +1,180 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60580362156
-	for <linux-block@vger.kernel.org>; Mon, 12 Oct 2026 13:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD19488231;
+	Mon, 12 Oct 2026 14:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791811892; cv=none; b=l4zEGoEpo46zkdQ6jcl/837APRgLbKAQK4eUJxljdx+ZNw8Z4EAIIRE7emwKRQYHQIuht5I3JxIkMtr3ols50UCjcA2wjRHUBnauAEM+PX8ODWR4LQslDZhH9/AtHyReRBS7JRvYAHaqD7cr9dbLQIqxDiEqhigBupW1VTev4qU=
+	t=1791814288; cv=none; b=Kc06ALBPtZAmEagxnRuGYQe1iYOj/fW/uGxKxWolMleZpnJ/532FIUrPLYl+3IhQ11fQCCY/Bta1sPwUmiW51QQ4OxHL2Ei2hxNWPMfJeY3oWCK8hInzIuirnVmjyrrDrwvLmqkYzQggtC7gBYUJMlvUGfjLIe2PaHwX3Dfckkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791811892; c=relaxed/simple;
-	bh=e8NoWuZd6g2nPC6LRrkgdR58Uuwe7iKZv0GO2AHRhSI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nQJX066/gNo42FLaZYCckI7iSUTt1IvrGGSmB/yjfHKhkbeDlHBdHbQ0xrIVhh56Pz/3AAyEnX638PmZjwa3x3KltotNPq4MVQxfBwqOUQ+ACezj7I5uBZ+ExH29aXZIdLKwnI8f87aIur5x9oaw+4upqnEDzFOPPzal5jumBnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NsByhSuu; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791814288; c=relaxed/simple;
+	bh=O/sYz3hEDtYzWeOz8YVEvIUVPQJcn4FymHOI0/mQ3Os=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HTH3tqi0P7XffYd6TNafWZrKroflepXKi0XG8FMnrYyJexbrkcaoDJEpzzQJg3EDx1j7NNMZi/Jn+fs/bf5qdPCvEIMEWjflB1LrSUOGYI3P26FOsnT/WErI9kTGjN1gPdV1VhvENMo5Px1VJMqL+6b2gOgDEXx8QbISJlDbIys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Q/ItDqlP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=LRIAU1qp; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Q/ItDqlP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=LRIAU1qp; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NsByhSuu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E531F0089B;
-	Mon, 12 Oct 2026 13:31:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791811890;
-	bh=U2FjSEAoHuybBsxcJ6vcM0DX+aTerz0clOSDqKghaxY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=NsByhSuum89fDsyJO5WQu/Z3f0bWB+DIcA3yj7IfYe8IxUjSrc2Pda7h+Fbj9Baek
-	 ASQSHgGhnTRzPFAZhcw18KQM+d33j3BZuoBwLaXOUCXrKPIFGxUP1FePS40WUGRHGp
-	 P90l9b23qRlQiFfHOZ3PodwIvRIXPeNyJPoiLaL3me/zD17iRQcyDaLempDWT07vRl
-	 MVZv4EXJoCRwkneU7oVe64f/ETrNsuUDyT4SUO1H9GiJc5lrthkVKEswCq0CMGwI6/
-	 FrjWDU5yMS+FwNQmU6FS7pbWZgnJbANzOF0Qf7Sze8yY6v37pTc6tiKKYBoHe8fhX1
-	 uH5X11OLGyo2Q==
-Message-ID: <ab8aa336-94ce-4c97-98b6-7d7049621f87@kernel.org>
-Date: Mon, 12 Oct 2026 15:31:27 +0200
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Q/ItDqlP";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="LRIAU1qp";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Q/ItDqlP";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="LRIAU1qp"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id F38631F38C;
+	Mon, 12 Oct 2026 14:11:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1791814284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DPswPjxS+qpu6i6zUA1Kx2e7xk6K1phiFUxlGK+8LzY=;
+	b=Q/ItDqlP4+w6WAkwfX1k0X6ujm7G5QavPCe48S224sz6BsucbPMJNtLmPOqv7Iw1sey5dp
+	HztsPyQnoX2GdkoGZJjnTzxEzFj1wb6Q9Ul4k04zOj38m0UWtk/PDuaFk9ML5xEJUxkqxc
+	qXo4ZqYGAGyU1KkQ1CnYcNqJ7pdJz+s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1791814284;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DPswPjxS+qpu6i6zUA1Kx2e7xk6K1phiFUxlGK+8LzY=;
+	b=LRIAU1qpo+jKKhvV0DnAfTof5Tws0j22vsCLRZkQC8mjOBkp6Z2hipd8JsI89ugai94uMv
+	zISIs3YOUTzdbABQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="Q/ItDqlP";
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=LRIAU1qp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1791814284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DPswPjxS+qpu6i6zUA1Kx2e7xk6K1phiFUxlGK+8LzY=;
+	b=Q/ItDqlP4+w6WAkwfX1k0X6ujm7G5QavPCe48S224sz6BsucbPMJNtLmPOqv7Iw1sey5dp
+	HztsPyQnoX2GdkoGZJjnTzxEzFj1wb6Q9Ul4k04zOj38m0UWtk/PDuaFk9ML5xEJUxkqxc
+	qXo4ZqYGAGyU1KkQ1CnYcNqJ7pdJz+s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1791814284;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DPswPjxS+qpu6i6zUA1Kx2e7xk6K1phiFUxlGK+8LzY=;
+	b=LRIAU1qpo+jKKhvV0DnAfTof5Tws0j22vsCLRZkQC8mjOBkp6Z2hipd8JsI89ugai94uMv
+	zISIs3YOUTzdbABQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CA4DB13314;
+	Mon, 12 Oct 2026 14:11:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id mJoYKYvqzGrFHwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 12 Oct 2026 14:11:23 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 55267A1407; Mon, 12 Oct 2026 16:11:23 +0200 (CEST)
+Date: Mon, 12 Oct 2026 16:11:23 +0200
+From: Jan Kara <jack@suse.cz>
+To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Cc: axboe@kernel.dk, willy@infradead.org, jack@suse.cz, 
+	akpm@linux-foundation.org, linux-block@vger.kernel.org, linux-mm@kvack.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+e0624b5bf72b99131402@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] mm/filemap: annotate lockless reads of
+ mapping->nrpages
+Message-ID: <zzneb5ezerl2353crj7xzivjbpdv5vgvqqvxkbvg77nwhdmldn@fenjftsskl34>
+References: <20261012120636.16106-1-ngocthang2710.1999@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] zloop: explicitly mention full zone when writing to it
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-References: <20261012132556.1307034-1-hch@lst.de>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20261012132556.1307034-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261012120636.16106-1-ngocthang2710.1999@gmail.com>
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: F38631F38C
+X-Rspamd-Action: no action
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	ARC_NA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[e0624b5bf72b99131402];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email,syzkaller.appspot.com:url,appspotmail.com:email,suse.cz:dkim]
+X-Spam-Flag: NO
+X-Spam-Score: -2.51
 
-On 2026/10/12 15:25, Christoph Hellwig wrote:
-> Don't print the impossibly large write pointer, but directly mention
-> the full zone when a write to one is received.
+On Mon 12-10-26 19:06:36, Nguyen Ngoc Thang wrote:
+> mapping->nrpages is updated under the i_pages lock but is read locklessly
+> as a cheap "anything cached?" hint, e.g. in invalidate_bdev() and
+> mapping_needs_writeback(). KCSAN reports the race:
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/block/zloop.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+>   BUG: KCSAN: data-race in __filemap_add_folio / invalidate_bdev
 > 
-> diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-> index 394dc2408ed7..f8988f9b5d04 100644
-> --- a/drivers/block/zloop.c
-> +++ b/drivers/block/zloop.c
-> @@ -603,8 +603,12 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
->  		}
->  	} else {
->  		if (cmd->sector != zone->wp) {
-> -			pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
-> -			       zone_no, cmd->sector, zone->wp);
-> +			if (zone->wp == ULLONG_MAX)
+>   read-write to 0xffff8881004c4178 of 8 bytes by task 3600 on cpu 0:
+>    __filemap_add_folio+0x6b7/0x910 mm/filemap.c:919
+>    filemap_add_folio+0x1cd/0x380
+>    page_cache_ra_unbounded+0x1a4/0x3a0
+>    ...
+>    blkdev_read_iter+0x21e/0x2d0
+>   read to 0xffff8881004c4178 of 8 bytes by task 3601 on cpu 1:
+>    invalidate_bdev+0x25/0x70 block/bdev.c:98
+>    ext4_fill_super+0x2ccb/0x37b0
+> 
+> The same counter also races with filemap_write_and_wait_range() through
+> mapping_needs_writeback().
+> 
+> The race is benign: a stale value only makes the caller do or skip a
+> harmless invalidate/flush pass. Mark the two lockless readers with
+> data_race().
+> 
+> Reported-by: syzbot+e0624b5bf72b99131402@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=e0624b5bf72b99131402
+> Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
 
-ULLONG_MAX is used also for reporting the write pointer of read-only and offline
-zones. So maybe we should mention the condition here using blk_zone_cond_str()
-instead of hard coding "full" in the message.
+...
 
-> +				pr_err("Zone %u: write to full zone: sect %llu\n",
-> +				       zone_no, cmd->sector);
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index 00fd89cf6f55..4c9d98efb7fb 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -631,7 +631,8 @@ EXPORT_SYMBOL(filemap_fdatawait_keep_errors);
+>  /* Returns true if writeback might be needed or already in progress. */
+>  static bool mapping_needs_writeback(struct address_space *mapping)
+>  {
+> -	return mapping->nrpages;
+> +	/* Lockless hint; a stale value is harmless */
+> +	return data_race(mapping->nrpages);
+>  }
 
-				pr_err("Zone %u: write to %s zone: sect %llu\n",
-				       zone_no, blk_zone_cond_str(zone->cond),
-				       cmd->sector);
+Rather than annotating inside mapping_needs_writeback() it would be more
+future-proof to annotate the two callers of mapping_needs_writeback(). Just
+in case some user which require reliable answer appears in the future...
 
-> +			else
-> +				pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
-> +				       zone_no, cmd->sector, zone->wp);
->  			ret = -EIO;
->  			goto out_unlock;
->  		}
-
-
+								Honza
 -- 
-Damien Le Moal
-Western Digital Research
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
