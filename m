@@ -1,188 +1,266 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D69F4FECE8;
-	Tue, 13 Oct 2026 12:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512E73B71C0
+	for <linux-block@vger.kernel.org>; Tue, 13 Oct 2026 13:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791894608; cv=none; b=ivCFMJFa0luaeVXaQxZzxeCACj/xpDE8+NLsEb2ZiHHfuedhW9TdFMgy3xAXWRtADraGxOFMZijI83oIYbFhOb94IsACbJZJ1/I85dGRT3QChvf8lucZLr0w822Vib3pBynsVC4YkASJtunqdFCXT+yfs0KbUiLGjhScfv7D5m4=
+	t=1791898034; cv=none; b=DTNhQoMpV5dVvqTYAFq3hVYuEldb8Usk2OrI3sHxBp7tJz/GtcpsHzsUzy/+td1Muu+ylk6oksMcnmlaLcZ0aGVDPb6WheK/S8jx3H5YcC6AhmiO+FYHRIc/oQIlbQA1vCls02u1vOa4rjPilOLr91p2v9m1UbW/L3pczgQ9BYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791894608; c=relaxed/simple;
-	bh=Ayu+ZZlgY2on5YZW0cNyNphAR0yz/HXy7y7bN70sK7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DWq1PL61Iu+uBti04wlQlkwbI5B5aGc2jShmeOe7vcTXP7orKOA5qAPZ4TCpDVoqkoASEqPuc8hjPBzaDEjlD6UEIKlqVi9pb1I2t6S23Sy7SsWpUkIXLYXi8X/oTB+CgnqVI8Rm2EQj90662TY7XLzj66LT9p41nlQmStMhUtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=EMbC6/Cv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=xG6wX5Y7; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=EMbC6/Cv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=xG6wX5Y7; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1791898034; c=relaxed/simple;
+	bh=NWurmtMdk1iCQy/jvDuOguTbKlkAdVuo1eJca4ASPNw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q8jq576HO5m7mC8Le9KgoHW5uoRwPVdpottsOeuFz2YedxqwcSdy5Z5meFWZhOv2xFu15JZ3CamzJOyUK7USbTlb6/kQfhx8f/ESsPFCIqHRBXIhpsR61wYpaXdSTknOb95O+3PslDKettU1cC7ZE8YXR7SaWvNIBnDMYJL0Bx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TC2Jn9pQ; arc=none smtp.client-ip=209.85.214.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="EMbC6/Cv";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="xG6wX5Y7";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="EMbC6/Cv";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="xG6wX5Y7"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 29A6B1F38E;
-	Tue, 13 Oct 2026 12:30:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1791894605; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cFheiXYtfEekRBAhIA+Nz/nS7Q4aVob7Ow/4nCSrKgo=;
-	b=EMbC6/CvMjxydx1OJbLFS2pv32Jll3CdsAaJJ86df97L9TisOUWOBOpfKdmLOkupI/GxBK
-	ZC1vz8+xcJRUH2xdhX+WwZQBsHGALHr3dYLYgIN01PlK65DjGuJTvfD+yV3pUcoLZLKVjx
-	cAaVU+peVCq+j0uxstliD1k/lj4Dkik=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1791894605;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cFheiXYtfEekRBAhIA+Nz/nS7Q4aVob7Ow/4nCSrKgo=;
-	b=xG6wX5Y7hYWa5XClLbYlcfvh2aLv73G1F1yiaAiFFl0BF/UCKzIDfVQtALe/s30AHFt+FI
-	HQrwsDiLsXT6HSBA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="EMbC6/Cv";
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=xG6wX5Y7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1791894605; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cFheiXYtfEekRBAhIA+Nz/nS7Q4aVob7Ow/4nCSrKgo=;
-	b=EMbC6/CvMjxydx1OJbLFS2pv32Jll3CdsAaJJ86df97L9TisOUWOBOpfKdmLOkupI/GxBK
-	ZC1vz8+xcJRUH2xdhX+WwZQBsHGALHr3dYLYgIN01PlK65DjGuJTvfD+yV3pUcoLZLKVjx
-	cAaVU+peVCq+j0uxstliD1k/lj4Dkik=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1791894605;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cFheiXYtfEekRBAhIA+Nz/nS7Q4aVob7Ow/4nCSrKgo=;
-	b=xG6wX5Y7hYWa5XClLbYlcfvh2aLv73G1F1yiaAiFFl0BF/UCKzIDfVQtALe/s30AHFt+FI
-	HQrwsDiLsXT6HSBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F214D13341;
-	Tue, 13 Oct 2026 12:30:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sSKJMkwkzmpdMQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 13 Oct 2026 12:30:04 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 900B9A1407; Tue, 13 Oct 2026 14:30:00 +0200 (CEST)
-Date: Tue, 13 Oct 2026 14:30:00 +0200
-From: Jan Kara <jack@suse.cz>
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: Theodore Ts'o <tytso@mit.edu>, 
-	Andreas Dilger <adilger.kernel@dilger.ca>, Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>, 
-	Ojaswin Mujoo <ojaswin@linux.ibm.com>, "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, 
-	Zhang Yi <yi.zhang@huawei.com>, Christoph Hellwig <hch@lst.de>, 
-	John Garry <john.garry@linux.dev>, "Darrick J. Wong" <djwong@kernel.org>, 
-	linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 3/3] ext4: don't advertise atomic writes for DAX
- inodes
-Message-ID: <pycrveoklzarjr7lx7g34dpaijaoicud2qgv32xvhdqaboybnz@yafkgkmdyydl>
-References: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
- <20261012-ext4-atomic-no-fallback-v2-3-c4b30c60e500@columbia.edu>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TC2Jn9pQ"
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2e61a8eb087so54125745ad.0
+        for <linux-block@vger.kernel.org>; Tue, 13 Oct 2026 06:27:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1791898031; x=1792502831; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Tz3XQeMDsa80BNjtP5zSjVPIr7ggAOeydAFlJIaMfm8=;
+        b=TC2Jn9pQGIovZpzSvkpXqGEmoZ7/MgmXTj+26ZKVTkUiZdzqbskVOrMy57Ekm660KY
+         H3I47iCJk8D9B/W2jKNxe/qT/OIUby7zU5qRYhhb3Og65fUDzvyMl4uW3C4J7uOKEI0u
+         Oqwxu54biQ+q0tceuqlbbpZlPXe9knRVvt59IocRj3C9cwZjR9BYZOFre373HAezUfD7
+         379P2ojXvEuxLZvl07yDlXlqRVYYcruccSKEz57tHJ8C6L+Cyfqd/PWlkmgpaWDSJKoV
+         JCy0PoIiwe9EsgLX+J+Je97sQVvKc0h8xZ43FqZawKN7AfGz0Ib8p1gaTFtyZj50ItNi
+         dc3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791898031; x=1792502831;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Tz3XQeMDsa80BNjtP5zSjVPIr7ggAOeydAFlJIaMfm8=;
+        b=m/o84grj8iFh7u3le8lKushCrVELHv40ZywC9DBO6FbO0fsytsevOjNC9IiRNTretK
+         zr68pTf0s6QDyxx0SfSI6FWtGVDCulbGRkd8jmJCuOWu0cXPTec1xky7d0xVgX7CCEK8
+         zfAlpqdnnX48YpUA7SR2dg/W++tzqqxuoDIf4W5jCCfMK3O1w1UewOujX3zXbPHqxemv
+         Px21lbJHT7pRZypIWBWCVKG8RdSHsI6+e2xvAXHrftK4jQF+2lMOo3KMvTqxt2QzXt0a
+         Hi783dki45WI26cTOvcdTKA8xkrhA0juckDpSzHp2Y8Aw/rTQc9RpGrdpmePWnBUqUpN
+         dc5g==
+X-Forwarded-Encrypted: i=1; AKwUvByhirdTPNoteZaIpGpyRcF/2Du+72+UFJF4wuhbqvmo93ZHjK04UJoYYCvYKv5+s+VE1wCRQfTiqSoPgw==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKcXw5lUYM7HfJ0VL+xlq6/EGZOeC7sy3hFz6E7GnWmNebRYisS
+	EENg9Kq9I7UcN10DWsXD6fPuNuJZNB9JcLEL/+CniPSRWeD24B/WVGetAcg09rerZYNCxjInqDP
+	8PENeTEfiptBMTakzeNOX0Q==
+X-Received: from plbjx17.prod.google.com ([2002:a17:903:1391:b0:2e9:64c:38da])
+ (user=stanleyjhu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:f60e:b0:2e7:ff92:25f5 with SMTP id d9443c01a7336-2e8431428b2mr100542525ad.61.1791898030303;
+ Tue, 13 Oct 2026 06:27:10 -0700 (PDT)
+Date: Tue, 13 Oct 2026 21:27:08 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261012-ext4-atomic-no-fallback-v2-3-c4b30c60e500@columbia.edu>
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 29A6B1F38E
-X-Rspamd-Action: no action
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[mit.edu,dilger.ca,linux.alibaba.com,suse.cz,linux.ibm.com,gmail.com,huawei.com,lst.de,linux.dev,kernel.org,vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email,suse.cz:email,suse.cz:dkim,columbia.edu:email];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	MISSING_XM_UA(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from]
-X-Spam-Flag: NO
-X-Spam-Score: -2.51
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.385.gd3acb90ef8-goog
+Message-ID: <20261013132708.1669415-1-stanleyjhu@google.com>
+Subject: [PATCH] scsi: bsg: Pass reply_len to bsg_setup_queue() to fit UFS
+ ARPMB replies
+From: Stanley Jhu <stanleyjhu@google.com>
+To: Jens Axboe <axboe@kernel.dk>, 
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>, 
+	"Martin K . Petersen" <mkp@kernel.org>, Bart Van Assche <bvanassche@acm.org>, 
+	Alim Akhtar <alim.akhtar@samsung.com>
+Cc: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>, Kashyap Desai <kashyap.desai@broadcom.com>, 
+	Sumit Saxena <sumit.saxena@broadcom.com>, Sreekanth Reddy <sreekanth.reddy@broadcom.com>, 
+	Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>, 
+	Mike Christie <michael.christie@oracle.com>, Bean Huo <beanhuo@micron.com>, 
+	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	mpi3mr-linuxdrv.pdl@broadcom.com, open-iscsi@googlegroups.com, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon 12-10-26 13:17:42, Tal Zussman wrote:
-> ext4_file_write_iter() hands DAX inodes to ext4_dax_write_iter() before
-> any of the atomic write handling, and the DAX path neither checks
-> IOCB_ATOMIC nor provides torn-write protection.
-> ext4_inode_can_atomic_write() doesn't exclude DAX inodes, so on a device
-> that supported both DAX and atomic writes, statx() would advertise
-> atomic writes for such an inode and the VFS would let an RWF_ATOMIC
-> write through to a plain DAX write.
-> 
-> No DAX-capable block device advertises atomic write limits today, so
-> this isn't reachable. When XFS gained its corresponding check, Ritesh
-> Harjani suggested excluding DAX inodes in ext4 anyway [1], so that what
-> is advertised matches what the write path can do. XFS does the same in
-> xfs_inode_can_hw_atomic_write() and xfs_inode_can_sw_atomic_write().
-> 
-> Link: https://lore.kernel.org/linux-ext4/87a54e4cdn.fsf@gmail.com/ [1]
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+bsg-lib allocates a 96-byte (SCSI_SENSE_BUFFERSIZE) reply buffer per
+job, but struct ufs_rpmb_reply is 104 bytes: a 40-byte struct
+ufs_bsg_reply followed by a 64-byte EHS. When an Advanced RPMB command
+returns an EHS, ufshcd_advanced_rpmb_req_handler() copies it right
+after the 40-byte header and writes 8 bytes past the end of the buffer.
 
-Looks good. Feel free to add:
+Let each BSG transport pass its reply buffer size to bsg_setup_queue()
+and have ufs_bsg request sizeof(struct ufs_rpmb_reply), so the full
+reply reaches user space. Other transports keep SCSI_SENSE_BUFFERSIZE.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Fixes: 6ff265fc5ef6 ("scsi: ufs: core: bsg: Add advanced RPMB support in ufs_bsg")
+Cc: stable@vger.kernel.org
+Signed-off-by: Stanley Jhu <stanleyjhu@google.com>
+---
+Tested on QEMU arm64 with KASAN: the reproducer no longer triggers.
 
-								Honza
+ block/bsg-lib.c                     | 13 ++++++++++---
+ drivers/scsi/mpi3mr/mpi3mr_app.c    |  2 +-
+ drivers/scsi/scsi_transport_fc.c    |  6 ++++--
+ drivers/scsi/scsi_transport_iscsi.c |  2 +-
+ drivers/scsi/scsi_transport_sas.c   |  6 ++++--
+ drivers/ufs/core/ufs_bsg.c          |  2 +-
+ include/linux/bsg-lib.h             |  3 ++-
+ 7 files changed, 23 insertions(+), 11 deletions(-)
 
-> ---
->  fs/ext4/ext4.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
-> index 5115f067a9f5..1520baf581b6 100644
-> --- a/fs/ext4/ext4.h
-> +++ b/fs/ext4/ext4.h
-> @@ -4060,12 +4060,13 @@ static inline int ext4_buffer_uptodate(struct buffer_head *bh)
->  /*
->   * Atomic writes are only supported through direct I/O, so an inode that
->   * can't do direct I/O at all (journaled data, inline data, verity) can't do
-> - * atomic writes either.
-> + * atomic writes either. DAX inodes bypass the direct I/O path entirely.
->   */
->  static inline bool ext4_inode_can_atomic_write(struct inode *inode)
->  {
->  
->  	return S_ISREG(inode->i_mode) &&
-> +		!IS_DAX(inode) &&
->  		ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS) &&
->  		EXT4_SB(inode->i_sb)->s_awu_min > 0 &&
->  		ext4_dio_alignment(inode) != 0;
-> 
-> -- 
-> 2.39.5
-> 
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 895db30a7033..536cee4430a7 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -23,11 +23,14 @@ struct bsg_set {
+ 	struct bsg_device	*bd;
+ 	bsg_job_fn		*job_fn;
+ 	bsg_timeout_fn		*timeout_fn;
++	unsigned int		reply_len;
+ };
+ 
+ static int bsg_transport_sg_io_fn(struct request_queue *q, struct sg_io_v4 *hdr,
+ 		bool open_for_write, unsigned int timeout)
+ {
++	struct bsg_set *bset =
++		container_of(q->tag_set, struct bsg_set, tag_set);
+ 	struct bsg_job *job;
+ 	struct request *rq;
+ 	struct bio *bio;
+@@ -50,7 +53,7 @@ static int bsg_transport_sg_io_fn(struct request_queue *q, struct sg_io_v4 *hdr,
+ 	reply = job->reply;
+ 	memset(job, 0, sizeof(*job));
+ 	job->reply = reply;
+-	job->reply_len = SCSI_SENSE_BUFFERSIZE;
++	job->reply_len = bset->reply_len;
+ 	job->dd_data = job + 1;
+ 
+ 	job->request_len = hdr->request_len;
+@@ -301,9 +304,10 @@ static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx *hctx,
+ static int bsg_init_rq(struct blk_mq_tag_set *set, struct request *req,
+ 		       unsigned int hctx_idx, int numa_node)
+ {
++	struct bsg_set *bset = container_of(set, struct bsg_set, tag_set);
+ 	struct bsg_job *job = blk_mq_rq_to_pdu(req);
+ 
+-	job->reply = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_KERNEL);
++	job->reply = kzalloc(bset->reply_len, GFP_KERNEL);
+ 	if (!job->reply)
+ 		return -ENOMEM;
+ 	return 0;
+@@ -358,10 +362,12 @@ static const struct blk_mq_ops bsg_mq_ops = {
+  * @job_fn: bsg job handler
+  * @timeout: timeout handler function pointer
+  * @dd_job_size: size of LLD data needed for each job
++ * @reply_len: size of the reply buffer needed for each job
+  */
+ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 		struct queue_limits *lim, bsg_job_fn *job_fn,
+-		bsg_timeout_fn *timeout, int dd_job_size)
++		bsg_timeout_fn *timeout, int dd_job_size,
++		unsigned int reply_len)
+ {
+ 	struct bsg_set *bset;
+ 	struct blk_mq_tag_set *set;
+@@ -374,6 +380,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 
+ 	bset->job_fn = job_fn;
+ 	bset->timeout_fn = timeout;
++	bset->reply_len = reply_len;
+ 
+ 	set = &bset->tag_set;
+ 	set->ops = &bsg_mq_ops;
+diff --git a/drivers/scsi/mpi3mr/mpi3mr_app.c b/drivers/scsi/mpi3mr/mpi3mr_app.c
+index 1353a8ff9c85..094490713d69 100644
+--- a/drivers/scsi/mpi3mr/mpi3mr_app.c
++++ b/drivers/scsi/mpi3mr/mpi3mr_app.c
+@@ -3053,7 +3053,7 @@ void mpi3mr_bsg_init(struct mpi3mr_ioc *mrioc)
+ 	}
+ 
+ 	q = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), &lim,
+-			mpi3mr_bsg_request, NULL, 0);
++			mpi3mr_bsg_request, NULL, 0, SCSI_SENSE_BUFFERSIZE);
+ 	if (IS_ERR(q)) {
+ 		ioc_err(mrioc, "%s: bsg registration failed\n",
+ 		    dev_name(bsg_dev));
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index 173ed6373f04..b66365a382c7 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -4345,7 +4345,8 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+ 	scsi_init_limits(shost, &lim);
+ 	lim.max_segments = min_not_zero(lim.max_segments, i->f->max_bsg_segments);
+ 	q = bsg_setup_queue(dev, bsg_name, &lim, fc_bsg_dispatch,
+-			fc_bsg_job_timeout, i->f->dd_bsg_size);
++			fc_bsg_job_timeout, i->f->dd_bsg_size,
++			SCSI_SENSE_BUFFERSIZE);
+ 	if (IS_ERR(q)) {
+ 		dev_err(dev,
+ 			"fc_host%d: bsg interface failed to initialize - setup queue\n",
+@@ -4378,7 +4379,8 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
+ 	scsi_init_limits(shost, &lim);
+ 	lim.max_segments = min_not_zero(lim.max_segments, i->f->max_bsg_segments);
+ 	q = bsg_setup_queue(dev, dev_name(dev), &lim, fc_bsg_dispatch_prep,
+-				fc_bsg_job_timeout, i->f->dd_bsg_size);
++				fc_bsg_job_timeout, i->f->dd_bsg_size,
++				SCSI_SENSE_BUFFERSIZE);
+ 	if (IS_ERR(q)) {
+ 		dev_err(dev, "failed to setup bsg queue\n");
+ 		return PTR_ERR(q);
+diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
+index 8aa76f813bcd..b50ff8a1d0a9 100644
+--- a/drivers/scsi/scsi_transport_iscsi.c
++++ b/drivers/scsi/scsi_transport_iscsi.c
+@@ -1545,7 +1545,7 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
+ 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
+ 	scsi_init_limits(shost, &lim);
+ 	q = bsg_setup_queue(dev, bsg_name, &lim, iscsi_bsg_host_dispatch, NULL,
+-			0);
++			0, SCSI_SENSE_BUFFERSIZE);
+ 	if (IS_ERR(q)) {
+ 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
+ 			     "initialize - no request queue\n");
+diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
+index d689b9ed08a6..a825966f60e5 100644
+--- a/drivers/scsi/scsi_transport_sas.c
++++ b/drivers/scsi/scsi_transport_sas.c
+@@ -199,7 +199,8 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 
+ 	if (rphy) {
+ 		q = bsg_setup_queue(&rphy->dev, dev_name(&rphy->dev), NULL,
+-				sas_smp_dispatch, NULL, 0);
++				sas_smp_dispatch, NULL, 0,
++				SCSI_SENSE_BUFFERSIZE);
+ 		if (IS_ERR(q))
+ 			return PTR_ERR(q);
+ 		rphy->q = q;
+@@ -208,7 +209,8 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 
+ 		snprintf(name, sizeof(name), "sas_host%d", shost->host_no);
+ 		q = bsg_setup_queue(&shost->shost_gendev, name, NULL,
+-				sas_smp_dispatch, NULL, 0);
++				sas_smp_dispatch, NULL, 0,
++				SCSI_SENSE_BUFFERSIZE);
+ 		if (IS_ERR(q))
+ 			return PTR_ERR(q);
+ 		to_sas_host_attrs(shost)->q = q;
+diff --git a/drivers/ufs/core/ufs_bsg.c b/drivers/ufs/core/ufs_bsg.c
+index 7a66917b3fc0..156637dd76c8 100644
+--- a/drivers/ufs/core/ufs_bsg.c
++++ b/drivers/ufs/core/ufs_bsg.c
+@@ -258,7 +258,7 @@ int ufs_bsg_probe(struct ufs_hba *hba)
+ 		goto out;
+ 
+ 	q = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), NULL, ufs_bsg_request,
+-			NULL, 0);
++			NULL, 0, sizeof(struct ufs_rpmb_reply));
+ 	if (IS_ERR(q)) {
+ 		ret = PTR_ERR(q);
+ 		device_del(bsg_dev);
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index 14fa93268630..a697246feeac 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -66,7 +66,8 @@ void bsg_job_done(struct bsg_job *job, int result,
+ 		  unsigned int reply_payload_rcv_len);
+ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 		struct queue_limits *lim, bsg_job_fn *job_fn,
+-		bsg_timeout_fn *timeout, int dd_job_size);
++		bsg_timeout_fn *timeout, int dd_job_size,
++		unsigned int reply_len);
+ void bsg_remove_queue(struct request_queue *q);
+ void bsg_job_put(struct bsg_job *job);
+ int __must_check bsg_job_get(struct bsg_job *job);
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.56.0.385.gd3acb90ef8-goog
+
