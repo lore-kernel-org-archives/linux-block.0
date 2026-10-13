@@ -1,215 +1,122 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307AD1F91F6;
-	Tue, 13 Oct 2026 12:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A09C4F7CDE;
+	Tue, 13 Oct 2026 12:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791894448; cv=none; b=KsXICt6XGy6kjVVq/1mViLG6Ql/WCmnU4idi/uFGEwXTGbUNV7TA66FEhUeN1Ie5oLm0Yr8OYZwZXxApnWHWbysJvdZps3mbMtqhnKdiXmPkB2IfoZrIoUf3lu5Bnm6ZXgBDrgNM3T0Y3V+zOb70noGnbC/A1eNslTdBEdD77hQ=
+	t=1791894474; cv=none; b=QTbaiMzFeu6UuDuv4N64tid/88QxwPR7up3pv0K0091It7s1+oULi2YSIR6JX9QQIuRmk2tw9eKxX3J2uWsxJ+1Ktenhw9YivT1r2Lu1Vwv+I+AVCYQvumuubuOmSDihp6sd9a2WEy6kw2NBVVaaMt6iuwCKRYVubO0CwaJcEP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791894448; c=relaxed/simple;
-	bh=LsqRiRT9h/fhM0hOL9YyO/pZkazR0OUZ8W80Cm+GM1E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Iap3BM0x93Ms+r7hif3UWWjpa6wZktZBaMg6LFkCfJBe2hN5cpCcZRQZsgT8j2qbkzB75M30uUjV/85rFFPO9HNwYkSX+J6l7uSfDRyRX4Nj1UDIXhXq+5bIWvMdsHWF5OEFj7Esvbesl/gmr50Xh7IC7qHknF+kAmQeWbQ14og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=GPWqjMJ8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pGcR327c; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=iIDIhD2C; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4bE8LT9l; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1791894474; c=relaxed/simple;
+	bh=NlSGd8voogXvhYUu+UwAiHMJt5zFSS136LnNYjDK3TI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Atu9LjKDXmxNwwneMln0mzF/kV6q9IQ0BZGQH8Rs9ZKg4zQHdTJpTgILy7FvKqlPbLas2DdB5T+aus/aW6Uuy2Te1VXJ3cQ0tVF2BframsyRHuUPa3QDcyiwgAGvb4dGmBfaig8B/w802cZrO32toBD77e012Pxmiw9/ZZNxmzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dijji771; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="GPWqjMJ8";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pGcR327c";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="iIDIhD2C";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4bE8LT9l"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 5BD1F1F38E;
-	Tue, 13 Oct 2026 12:27:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1791894445; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zWVAE1lZRQsxqhvh+wudpgfIToirCW/Iu1gheVKptcc=;
-	b=GPWqjMJ8zlWbUypp8KwTPOCyiQ9EFDNlz0Dqnj7KwqkFBjzyrFXAH0h4IwJvlMzFA3NqMJ
-	hRr1GsFv4he5jK9hkV7qANz3J8R18fPPb4I/sQ/E2N6qMqP93ihcguQQPLdtMnC7FuNe9G
-	Yb+q72dte4Z3aVXj9Hsat1K7VfykfhY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1791894445;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zWVAE1lZRQsxqhvh+wudpgfIToirCW/Iu1gheVKptcc=;
-	b=pGcR327cbsogNdP+m+WGWG+x4zJ0ee3pRJan5C68zFF1Vl6Fw9TyGhtrV/gdbtu53t2gvW
-	UyaZCzrJFbU/30Cg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1791894443; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zWVAE1lZRQsxqhvh+wudpgfIToirCW/Iu1gheVKptcc=;
-	b=iIDIhD2CDaVoXIIJfYQcTNuXou3RjOYPHLU2SFVUE/32uDqbxswz56LrMXWCdGr86Lq5Xc
-	h9cFYQReblC+Hr7XXLNNdvpUirFLIw7JbdMxrgfuhWjSww3LJH37ZXOWVlsIkXSWdIlBw/
-	Y1B10vKF/rRAR5a9mZYWbgwaycfpwyQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1791894443;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zWVAE1lZRQsxqhvh+wudpgfIToirCW/Iu1gheVKptcc=;
-	b=4bE8LT9lZDYlIv/gbCyEnqCcPxsaP0o82x7ZjMSjSw25PP64g/GfMjh/BzEdPyAsJxBF/2
-	iGTEIbgJHsic4+Bg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 292E313341;
-	Tue, 13 Oct 2026 12:27:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +b8MAasjzmoQLgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 13 Oct 2026 12:27:23 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id A8A0AA1407; Tue, 13 Oct 2026 14:27:18 +0200 (CEST)
-Date: Tue, 13 Oct 2026 14:27:18 +0200
-From: Jan Kara <jack@suse.cz>
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: Theodore Ts'o <tytso@mit.edu>, 
-	Andreas Dilger <adilger.kernel@dilger.ca>, Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>, 
-	Ojaswin Mujoo <ojaswin@linux.ibm.com>, "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, 
-	Zhang Yi <yi.zhang@huawei.com>, Christoph Hellwig <hch@lst.de>, 
-	John Garry <john.garry@linux.dev>, "Darrick J. Wong" <djwong@kernel.org>, 
-	linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sashiko <sashiko-bot@kernel.org>
-Subject: Re: [PATCH RFC v2 1/3] ext4: reject atomic writes on inodes that
- can't do direct I/O
-Message-ID: <4ob5pj55nwlizyuftsuioyk3jlvpzm2mmf6hs4fzlbxo6ierca@2sq3zbflyakh>
-References: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
- <20261012-ext4-atomic-no-fallback-v2-1-c4b30c60e500@columbia.edu>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dijji771"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 607C71F00893;
+	Tue, 13 Oct 2026 12:27:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791894473;
+	bh=ycxOM4TzPLsGmQH6ulsf1AgoyN4SkD22jB62HRw8+hc=;
+	h=From:To:Subject:Date;
+	b=dijji771V8ZIG44fNl8uSjRjYcSeAMtiD0BYhIi2Ca23Sm2CPS1RvfyIrVX/t8y3d
+	 r5zPOzj7EQHMypOrdYb3UCjiXrDF7utoBabX3ZlqYcVyQqrfPvEsj3xd858oV23DBs
+	 InDfksjniQG8dvSwutenT5utl6NsFIOJt3yzxT0LXJatjPTevSDaKb09ePuHS8lGTI
+	 GhWQIa0yw3HME6KhgyLACKUpwflSt0h2j+CQWd/nvCGdtcjAub41WC0i/OtcgLQ3lr
+	 qreY7cFFcrFVzeGYBWG8tPKh8tWbAIg3bsmaP9I1cY1gmFX7/RfeTUf3DKzaO7JL/5
+	 JZV62ZuXIhHUg==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH v6 00/10] Add support for storage element depopulation
+Date: Tue, 13 Oct 2026 21:27:40 +0900
+Message-ID: <20261013122750.2237843-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261012-ext4-atomic-no-fallback-v2-1-c4b30c60e500@columbia.edu>
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_RCPT(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[mit.edu,dilger.ca,linux.alibaba.com,suse.cz,linux.ibm.com,gmail.com,huawei.com,lst.de,linux.dev,kernel.org,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,suse.com:email,imap1.dmz-prg2.suse.org:helo,columbia.edu:email,suse.cz:email]
+Content-Transfer-Encoding: 8bit
 
-On Mon 12-10-26 13:17:40, Tal Zussman wrote:
-> ext4_dio_write_iter() falls back to buffered I/O when the inode can't do
-> direct I/O at all, i.e. journaled data, inline data or verity. That
-> fallback runs before any atomic write handling, and
-> ext4_buffered_write_iter() doesn't look at IOCB_ATOMIC, so an atomic
-> write to such an inode is silently done as a plain buffered write with
-> no torn-write protection.
-> 
-> ext4_inode_can_atomic_write() makes it worse for journaled data by
-> advertising atomic writes for those inodes: statx() reports atomic write
-> limits and the file gets FMODE_CAN_ATOMIC_WRITE, so the write passes the
-> VFS checks and reaches the fallback. This is reachable with
-> data=journal, or with chattr +j on a nodelalloc mount. Inline data
-> inodes don't have the extents flag and verity files can't be opened for
-> writing, so those are refused before ext4 sees the write, but the
-> fallback would still accept them.
-> 
-> Reject IOCB_ATOMIC in ext4_buffered_write_iter(), next to the existing
-> IOCB_NOWAIT rejection, so neither fallback into it can complete an
-> atomic write non-atomically. Also require ext4_dio_alignment() to be
-> nonzero in ext4_inode_can_atomic_write(), so statx() stops advertising
-> atomic writes for these inodes and VFS refuses RWF_ATOMIC early. The
-> runtime check is still needed, as the journal data flag can be changed
-> on an open file.
-> 
-> Fixes: b7987a7d69a4 ("ext4: Support setting FMODE_CAN_ATOMIC_WRITE")
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Link: https://sashiko.dev/#/patchset/20260909-ext4-atomic-no-fallback-v1-1-5a6b9539c002%40columbia.edu
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+Jens,
 
-Looks good. Feel free to add:
+These patches define a new set of block device operations for generically
+using from the block layer the storage element depopulation feature of
+zoned block devices. Support for this feature is added to the SCSI disk
+driver and an emulation of this feature added to the zloop driver.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+The management operations can be accessed using block layer API, which is
+intended for file systems (e.g. zonefs and XFS), as well as using ioctls
+for users using zoned disks directly from user space.
 
-								Honza
+Changes from v5:
+ - Rebased on latest block/for-next
+ - Addressed Christoph's comments on patch 3
+ - Added patch 5 to address a potential deadlock in zloop (signaled by
+   sashiko)
+ - Reworked the restoration of storage elements in patch 6 to avoid an
+   inconsistent state of storage elements in case of error. Also added
+   protection against disk removal during storage element removal and
+   restoration execution.
+ - Added review tags
 
-> ---
->  fs/ext4/ext4.h | 8 +++++++-
->  fs/ext4/file.c | 8 ++++++++
->  2 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
-> index 724a27e8be61..5115f067a9f5 100644
-> --- a/fs/ext4/ext4.h
-> +++ b/fs/ext4/ext4.h
-> @@ -4057,12 +4057,18 @@ static inline int ext4_buffer_uptodate(struct buffer_head *bh)
->  	return buffer_uptodate(bh);
->  }
->  
-> +/*
-> + * Atomic writes are only supported through direct I/O, so an inode that
-> + * can't do direct I/O at all (journaled data, inline data, verity) can't do
-> + * atomic writes either.
-> + */
->  static inline bool ext4_inode_can_atomic_write(struct inode *inode)
->  {
->  
->  	return S_ISREG(inode->i_mode) &&
->  		ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS) &&
-> -		EXT4_SB(inode->i_sb)->s_awu_min > 0;
-> +		EXT4_SB(inode->i_sb)->s_awu_min > 0 &&
-> +		ext4_dio_alignment(inode) != 0;
->  }
->  
->  extern int ext4_block_write_begin(handle_t *handle, struct folio *folio,
-> diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-> index 374b4bc25bd5..19a8843ac420 100644
-> --- a/fs/ext4/file.c
-> +++ b/fs/ext4/file.c
-> @@ -339,6 +339,14 @@ static ssize_t ext4_buffered_write_iter(struct kiocb *iocb,
->  	if (iocb->ki_flags & IOCB_NOWAIT)
->  		return -EOPNOTSUPP;
->  
-> +	/*
-> +	 * Buffered I/O provides no torn-write protection. The direct I/O path
-> +	 * falls back here for inodes that can't do direct I/O at all, so an
-> +	 * atomic write must be rejected rather than silently done non-atomically.
-> +	 */
-> +	if (iocb->ki_flags & IOCB_ATOMIC)
-> +		return -EOPNOTSUPP;
-> +
->  	inode_lock(inode);
->  
->  	/*
-> 
-> -- 
-> 2.39.5
-> 
+Changes from v4:
+ - Rebased on latest block/for-next
+ - Added review tags to patch 1 and 2
+ - Reworked patch 3, 4 and 5 to address Christoph's and sashiko comments
+
+Changes from v3:
+ - Reworked patch 1 to only provide the disk_zone_is_offline() helper
+   function. Failing of read operations to offline zones is handled
+   directly by the zloop driver and the new patch 7 is added to handle
+   failing early read operations to offline zones of ZBC SCSI disks.
+ - Added patch 2
+ - Addressed further valid comments from Sashiko
+   The biggest changes are in patch 2 to save the number of storage
+   elements of a disk in struct gendisk and to serialize the execution of
+   the storage element management operations using the zone revalidation
+   mutex.
+ - Rebased on latest block/for-next
+
+Changes from v2:
+ - Addressed further valid comments from Sashiko
+ - Rebased on latest block/for-next
+
+Changes from v1:
+ - Addressed the many valid comments that Sashiko had
+ - Rebased on latest block/for-next
+
+Damien Le Moal (10):
+  block: introduce disk_zone_is_offline()
+  block: refactor blk_revalidate_disk_zones()
+  block: introduce storage element management
+  block: add storage element management ioctls
+  zloop: avoid potential wp_lock deadlocks
+  zloop: add storage element emulation
+  zloop: add degrade_element control command
+  scsi: sd: fail read commands to offline zones early
+  scsi: sd_zbc: always revalidate zones for disks supporting head depopulation
+  scsi: sd_zbc: define storage element management operations
+
+ .../admin-guide/blockdev/zoned_loop.rst       |  29 +-
+ block/blk-zoned.c                             | 504 ++++++++++-
+ block/blk.h                                   |  14 +
+ block/genhd.c                                 |   4 +
+ block/ioctl.c                                 |   4 +
+ drivers/block/zloop.c                         | 803 ++++++++++++++++--
+ drivers/scsi/sd.c                             |  11 +-
+ drivers/scsi/sd.h                             |   3 +
+ drivers/scsi/sd_zbc.c                         | 259 +++++-
+ include/linux/blkdev.h                        |  31 +
+ include/uapi/linux/blkzoned.h                 |  98 +++
+ include/uapi/linux/fs.h                       |   1 +
+ 12 files changed, 1673 insertions(+), 88 deletions(-)
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.55.0
+
