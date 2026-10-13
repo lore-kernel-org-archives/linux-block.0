@@ -1,143 +1,215 @@
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C68C3EA97A;
-	Tue, 13 Oct 2026 09:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307AD1F91F6;
+	Tue, 13 Oct 2026 12:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791885100; cv=none; b=XtaRPHzH+5ZKEyRSWojselUamlSspGM0O5+00KpVz76HFx0hZ1sGV7eaP9KmbGkq5roftgMWyal8J5+7BnfSQc2WXSpfDqBtnI60suVwX9C+JxvWgSx17M3TM3nQBBHwWkiO+xQA/1ex9iBwND6ZRXLjdxiCddbw/SK094zk740=
+	t=1791894448; cv=none; b=KsXICt6XGy6kjVVq/1mViLG6Ql/WCmnU4idi/uFGEwXTGbUNV7TA66FEhUeN1Ie5oLm0Yr8OYZwZXxApnWHWbysJvdZps3mbMtqhnKdiXmPkB2IfoZrIoUf3lu5Bnm6ZXgBDrgNM3T0Y3V+zOb70noGnbC/A1eNslTdBEdD77hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791885100; c=relaxed/simple;
-	bh=uzrXPLMvqXiBDcQftrpFHfqmH5aI7M4XqJ0tPb6ooRw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hetMTDjaKWy1dP2kXdPcukJvNN6Bvwbh+8O/8/GJGi33KNfhre+zKr/Er3uMfxJlKbuy5oExRR4tYH4xZeKFzNqHVBOjhnSOlCe2PgD3Hw2zidVTz7oq6RO1l0ckruFDLfRSOU4jhv1N9tzvuiulZWwYDV396tymbt+y9WWPH+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lL28Tkmw; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1791894448; c=relaxed/simple;
+	bh=LsqRiRT9h/fhM0hOL9YyO/pZkazR0OUZ8W80Cm+GM1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iap3BM0x93Ms+r7hif3UWWjpa6wZktZBaMg6LFkCfJBe2hN5cpCcZRQZsgT8j2qbkzB75M30uUjV/85rFFPO9HNwYkSX+J6l7uSfDRyRX4Nj1UDIXhXq+5bIWvMdsHWF5OEFj7Esvbesl/gmr50Xh7IC7qHknF+kAmQeWbQ14og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=GPWqjMJ8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pGcR327c; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=iIDIhD2C; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4bE8LT9l; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lL28Tkmw"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1791885089; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	bh=mHJmlxh0JQdpNiWV3C7IoHHFL2rjw3jyGHSsWS10e0M=;
-	b=lL28TkmwRy4o4DkqFESGvDjfVtHZjutdQoOzKS1g7GlBF8tLi2PuqNcHf/GcxIqaiT5utuZe7oZQhK1NvSiSFQpQW8+YILCpjl3XDiLKA5lbaeuIMRy5K3quWRzx39w46BzZ0I1/vSlbMbwN+poSWRymIR45zfZihQAcWofXrow=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R311e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0XClPKIU_1791885066;
-Received: from x31h02109.sqa.na131.tbsite.net(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XClPKIU_1791885066 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 13 Oct 2026 17:51:28 +0800
-From: Baokun Li <libaokun@linux.alibaba.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Cc: ebiggers@kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	hch@lst.de,
-	bvanassche@acm.org,
-	dm-devel@lists.linux.dev,
-	mpatocka@redhat.com,
-	linlin.zhang@oss.qualcomm.com,
-	libaokun@linux.alibaba.com,
-	stable@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="GPWqjMJ8";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pGcR327c";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="iIDIhD2C";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4bE8LT9l"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 5BD1F1F38E;
+	Tue, 13 Oct 2026 12:27:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1791894445; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zWVAE1lZRQsxqhvh+wudpgfIToirCW/Iu1gheVKptcc=;
+	b=GPWqjMJ8zlWbUypp8KwTPOCyiQ9EFDNlz0Dqnj7KwqkFBjzyrFXAH0h4IwJvlMzFA3NqMJ
+	hRr1GsFv4he5jK9hkV7qANz3J8R18fPPb4I/sQ/E2N6qMqP93ihcguQQPLdtMnC7FuNe9G
+	Yb+q72dte4Z3aVXj9Hsat1K7VfykfhY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1791894445;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zWVAE1lZRQsxqhvh+wudpgfIToirCW/Iu1gheVKptcc=;
+	b=pGcR327cbsogNdP+m+WGWG+x4zJ0ee3pRJan5C68zFF1Vl6Fw9TyGhtrV/gdbtu53t2gvW
+	UyaZCzrJFbU/30Cg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1791894443; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zWVAE1lZRQsxqhvh+wudpgfIToirCW/Iu1gheVKptcc=;
+	b=iIDIhD2CDaVoXIIJfYQcTNuXou3RjOYPHLU2SFVUE/32uDqbxswz56LrMXWCdGr86Lq5Xc
+	h9cFYQReblC+Hr7XXLNNdvpUirFLIw7JbdMxrgfuhWjSww3LJH37ZXOWVlsIkXSWdIlBw/
+	Y1B10vKF/rRAR5a9mZYWbgwaycfpwyQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1791894443;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zWVAE1lZRQsxqhvh+wudpgfIToirCW/Iu1gheVKptcc=;
+	b=4bE8LT9lZDYlIv/gbCyEnqCcPxsaP0o82x7ZjMSjSw25PP64g/GfMjh/BzEdPyAsJxBF/2
+	iGTEIbgJHsic4+Bg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 292E313341;
+	Tue, 13 Oct 2026 12:27:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +b8MAasjzmoQLgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 13 Oct 2026 12:27:23 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id A8A0AA1407; Tue, 13 Oct 2026 14:27:18 +0200 (CEST)
+Date: Tue, 13 Oct 2026 14:27:18 +0200
+From: Jan Kara <jack@suse.cz>
+To: Tal Zussman <tz2294@columbia.edu>
+Cc: Theodore Ts'o <tytso@mit.edu>, 
+	Andreas Dilger <adilger.kernel@dilger.ca>, Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>, 
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>, "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, 
+	Zhang Yi <yi.zhang@huawei.com>, Christoph Hellwig <hch@lst.de>, 
+	John Garry <john.garry@linux.dev>, "Darrick J. Wong" <djwong@kernel.org>, 
+	linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sashiko <sashiko-bot@kernel.org>
-Subject: [PATCH] blk-crypto: fix NULL deref and UAF in __blk_crypto_evict_key()
-Date: Tue, 13 Oct 2026 17:51:06 +0800
-Message-ID: <20261013095106.881914-1-libaokun@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.7
+Subject: Re: [PATCH RFC v2 1/3] ext4: reject atomic writes on inodes that
+ can't do direct I/O
+Message-ID: <4ob5pj55nwlizyuftsuioyk3jlvpzm2mmf6hs4fzlbxo6ierca@2sq3zbflyakh>
+References: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
+ <20261012-ext4-atomic-no-fallback-v2-1-c4b30c60e500@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261012-ext4-atomic-no-fallback-v2-1-c4b30c60e500@columbia.edu>
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_RCPT(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[mit.edu,dilger.ca,linux.alibaba.com,suse.cz,linux.ibm.com,gmail.com,huawei.com,lst.de,linux.dev,kernel.org,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,suse.com:email,imap1.dmz-prg2.suse.org:helo,columbia.edu:email,suse.cz:email]
 
-Sashiko reported a possible NULL pointer dereference, triggered by the
-following flow:
+On Mon 12-10-26 13:17:40, Tal Zussman wrote:
+> ext4_dio_write_iter() falls back to buffered I/O when the inode can't do
+> direct I/O at all, i.e. journaled data, inline data or verity. That
+> fallback runs before any atomic write handling, and
+> ext4_buffered_write_iter() doesn't look at IOCB_ATOMIC, so an atomic
+> write to such an inode is silently done as a plain buffered write with
+> no torn-write protection.
+> 
+> ext4_inode_can_atomic_write() makes it worse for journaled data by
+> advertising atomic writes for those inodes: statx() reports atomic write
+> limits and the file gets FMODE_CAN_ATOMIC_WRITE, so the write passes the
+> VFS checks and reaches the fallback. This is reachable with
+> data=journal, or with chattr +j on a nodelalloc mount. Inline data
+> inodes don't have the extents flag and verity files can't be opened for
+> writing, so those are refused before ext4 sees the write, but the
+> fallback would still accept them.
+> 
+> Reject IOCB_ATOMIC in ext4_buffered_write_iter(), next to the existing
+> IOCB_NOWAIT rejection, so neither fallback into it can complete an
+> atomic write non-atomically. Also require ext4_dio_alignment() to be
+> nonzero in ext4_inode_can_atomic_write(), so statx() stops advertising
+> atomic writes for these inodes and VFS refuses RWF_ATOMIC early. The
+> runtime check is still needed, as the journal data flag can be changed
+> on an open file.
+> 
+> Fixes: b7987a7d69a4 ("ext4: Support setting FMODE_CAN_ATOMIC_WRITE")
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Link: https://sashiko.dev/#/patchset/20260909-ext4-atomic-no-fallback-v1-1-5a6b9539c002%40columbia.edu
+> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 
-  dm-inlinecrypt ctor            # first use of the fallback
-   ├─ blk_crypto_init_key()      # succeeds, ctx->key.size != 0
-   ├─ blk_crypto_start_using_key()
-   │   ├─ return -EOPNOTSUPP     # uninit profile, will NULL deref
-   │   └─ blk_crypto_fallback_start_using_key()
-   │      └─ blk_crypto_fallback_init() fails
-   │         └─ kfree(profile)   # not NULLed, will UAF
-   ├─ goto bad
-   └─ inlinecrypt_dtr()          # evicts whenever key.size is set
-      └─ blk_crypto_evict_key()
-         └─ blk_crypto_config_supported_natively() = false
-            └─ blk_crypto_fallback_evict_key()
-               └─ __blk_crypto_evict_key(blk_crypto_fallback_profile)
-                  └─ profile->num_slots # BOOM!!!
+Looks good. Feel free to add:
 
-This issue can be reproduced using the following commands:
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-  dd if=/dev/zero of=/tmp/backing bs=1M count=64
-  LOOP=$(losetup -f --show /tmp/backing)
-  SZ=$(blockdev --getsz $LOOP)
-  KEY=$(head -c 64 /dev/urandom | od -An -tx1 | tr -d ' \n')
-  dmsetup create ic --table "0 $SZ inlinecrypt aes-xts-plain64 \
-    $KEY 0 $LOOP 0 1 keytype:hw-wrapped"
+								Honza
 
-And the following oops is triggered:
-
-  ==================================================================
-  blk-crypto: loop0: no support for wrapped keys
-  Oops: general protection fault, probably for non-canonical address
-        0xdffffc000000000b: 0000 [#1] SMP KASAN PTI
-  KASAN: null-ptr-deref in range [0x0000000000000058-0x000000000000005f]
-  CPU: 5 UID: 0 PID: 901 Comm: dmsetup 7.3.0-rc3 #1 PREEMPT(lazy)
-  RIP: 0010:__blk_crypto_evict_key+0x2e/0x3b0
-  Call Trace:
-   blk_crypto_evict_key+0x24c/0x320
-   inlinecrypt_dtr+0xf6/0x160
-   inlinecrypt_ctr+0x2d3/0xbd0
-   dm_table_add_target+0x661/0xf40
-   table_load+0x1c4/0x490
-   ctl_ioctl+0x32f/0x5f0
-   dm_ctl_ioctl+0xe/0x20
-  ==================================================================
-
-Fix this by checking the profile for NULL in __blk_crypto_evict_key()
-to avoid the NULL pointer dereference, and by clearing the profile
-pointer after it is freed to avoid the use-after-free.
-
-Fixes: e7f57d2c47e2 ("dm-inlinecrypt: add target for inline block device encryption")
-Cc: stable@vger.kernel.org # v7.2+
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Closes: https://patch.msgid.link/sashiko-outbox-167341@kernel.org
-Signed-off-by: Baokun Li <libaokun@linux.alibaba.com>
----
- block/blk-crypto-fallback.c | 1 +
- block/blk-crypto-profile.c  | 3 +++
- 2 files changed, 4 insertions(+)
-
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index 2a8f40a65158..b7890ee1951c 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -605,6 +605,7 @@ static int blk_crypto_fallback_init(void)
- 	blk_crypto_profile_destroy(blk_crypto_fallback_profile);
- fail_free_profile:
- 	kfree(blk_crypto_fallback_profile);
-+	blk_crypto_fallback_profile = NULL;
- fail_free_bioset:
- 	bioset_exit(&enc_bio_set);
- out:
-diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
-index 53126c091b0b..1c5feca3b856 100644
---- a/block/blk-crypto-profile.c
-+++ b/block/blk-crypto-profile.c
-@@ -346,6 +346,9 @@ int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
- 	struct blk_crypto_keyslot *slot;
- 	int err;
- 
-+	if (!profile)
-+		return 0;
-+
- 	if (profile->num_slots == 0) {
- 		if (profile->ll_ops.keyslot_evict) {
- 			blk_crypto_hw_enter(profile);
-
-base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+> ---
+>  fs/ext4/ext4.h | 8 +++++++-
+>  fs/ext4/file.c | 8 ++++++++
+>  2 files changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+> index 724a27e8be61..5115f067a9f5 100644
+> --- a/fs/ext4/ext4.h
+> +++ b/fs/ext4/ext4.h
+> @@ -4057,12 +4057,18 @@ static inline int ext4_buffer_uptodate(struct buffer_head *bh)
+>  	return buffer_uptodate(bh);
+>  }
+>  
+> +/*
+> + * Atomic writes are only supported through direct I/O, so an inode that
+> + * can't do direct I/O at all (journaled data, inline data, verity) can't do
+> + * atomic writes either.
+> + */
+>  static inline bool ext4_inode_can_atomic_write(struct inode *inode)
+>  {
+>  
+>  	return S_ISREG(inode->i_mode) &&
+>  		ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS) &&
+> -		EXT4_SB(inode->i_sb)->s_awu_min > 0;
+> +		EXT4_SB(inode->i_sb)->s_awu_min > 0 &&
+> +		ext4_dio_alignment(inode) != 0;
+>  }
+>  
+>  extern int ext4_block_write_begin(handle_t *handle, struct folio *folio,
+> diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+> index 374b4bc25bd5..19a8843ac420 100644
+> --- a/fs/ext4/file.c
+> +++ b/fs/ext4/file.c
+> @@ -339,6 +339,14 @@ static ssize_t ext4_buffered_write_iter(struct kiocb *iocb,
+>  	if (iocb->ki_flags & IOCB_NOWAIT)
+>  		return -EOPNOTSUPP;
+>  
+> +	/*
+> +	 * Buffered I/O provides no torn-write protection. The direct I/O path
+> +	 * falls back here for inodes that can't do direct I/O at all, so an
+> +	 * atomic write must be rejected rather than silently done non-atomically.
+> +	 */
+> +	if (iocb->ki_flags & IOCB_ATOMIC)
+> +		return -EOPNOTSUPP;
+> +
+>  	inode_lock(inode);
+>  
+>  	/*
+> 
+> -- 
+> 2.39.5
+> 
 -- 
-2.43.7
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
