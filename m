@@ -1,334 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10ADA4CB8A8;
-	Tue, 13 Oct 2026 12:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E784E1C81;
+	Tue, 13 Oct 2026 12:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791894485; cv=none; b=GzNZePu8NyX8pfUylccBJClTAels2bag54vBelZ8+Z3XJVZydG+F3fSYiZTSedfgKR+g+bHE5EEqZZr3h3w6sdkRDxjpMD497GyDKaNMT36y33kL7M8PuxYmOoRuXImc1cN/K8ihcGN0wBfidkBcAg+iOn+NGOZhUvTSc33OMeY=
+	t=1791894532; cv=none; b=uSPaUnzxJBAEAADO9noBEwlQWxQzg7+gnCnTyYffy/7Lb2Cnut/gDAdqqHI/1UzTXb5wTUlv/lmUVyNzCoyZnvyWyL4xpJFtFQtfjcVqyZu9jxSpUEhRLaufrWvsMRk4sivFwWVmzL01EdP8SNPlL6bINITJ0QUUuj7D+hoTJQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791894485; c=relaxed/simple;
-	bh=gLDkhLBvEQe2BjaUhqjboPl1tPz211nOzKnVbMSSWYo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bc8ovPLmWcvHkofNQJ7Znmnk287mlnfhCVlZXdCovQgmOH1bhezc0XARZtjDhBPNGF9KRQx7lMCH1RI2OO14xe2mPPHvCudNwr/ELeo6+B+8Qj36rI062yobI3wY55GR2hdCn8IrVQUVZNS6wvSQUHqpOBfqN3LLYsvHBW5Ads4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i3ph7wFC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791894532; c=relaxed/simple;
+	bh=HNcxujrc0rrQuzgKBt20U4O1Vu0rkLeMsQ+RhP+JRlA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j/wXwWtJk2YiykAnwpeW7aH5v9Ux1i0CV3wXorGu8EI/01cLaAX71H5RGwMclW+I0F+diBkTxvSx0Ph/qPDon5tHakjQYO+hfgE2C5oDkFG99x5OomAxiiTnH3mtv67U2APaBP/vhIz0Mje4R8wYm/mKrnrW1bhA0YgnLh3EOEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=A2DP+Mwz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FaVCg0Rt; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=rwqSa5ZQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MMRut3Pi; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3ph7wFC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F8F1F000FF;
-	Tue, 13 Oct 2026 12:28:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791894484;
-	bh=4z/FZ99t8In8a/pReIwN4iTvcvj4HfARz97cWJPafa4=;
-	h=From:To:Subject:Date:In-Reply-To:References;
-	b=i3ph7wFCpnZtlwTdTKAvlPcTmB/gNJLWxRN7LF30WLtRP3toVOh9h+32so8qP/J3W
-	 HTl5SJIJnet0T4DmeFksaMpEf5XLCsjYLFkMweXN4I2qePMa6z+pFB+DKnZynHZ8u+
-	 rYUU+5yPl2sRH/5vVHP//UXh5P6x9gq42xiqdZTmLb0nYTXFiGMRFwcshHdld1uaj8
-	 L2+egyCM4F9tBsZtrAEEJi+EnEDGd1c22/JcWEGIMYSeG63u+A+eUsA40sMxkJRcuF
-	 zHWu6izw3Vrss7TBMaitY1R11p6uVKnU3IwL7/IHYYo71+MyzXqyrmOPfQ7HEwq2eu
-	 Fv8EYMZ9m6pZg==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v6 10/10] scsi: sd_zbc: define storage element management operations
-Date: Tue, 13 Oct 2026 21:27:50 +0900
-Message-ID: <20261013122750.2237843-11-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20261013122750.2237843-1-dlemoal@kernel.org>
-References: <20261013122750.2237843-1-dlemoal@kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="A2DP+Mwz";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FaVCg0Rt";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="rwqSa5ZQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MMRut3Pi"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6A2A11F443;
+	Tue, 13 Oct 2026 12:28:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1791894528; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xGG18Y66fbsHodnkVp2rq+uaKysJfSv7BxMclrURpkA=;
+	b=A2DP+MwzX0eWf+jVRkDZPv+eV4HJioHJWt9Y9gW1Jx0SMu2dSrIjP2ulZL4dzJR8IahaqY
+	nnlw53lzlxQ/y8t/k8dRVzBC3vrGaLUZUyow9FPXzBhlSuzbe4O3vyTvxnsr9vHrmYp0dL
+	M14v8POAvAyAf159yA5HAYa1YUSG0fo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1791894528;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xGG18Y66fbsHodnkVp2rq+uaKysJfSv7BxMclrURpkA=;
+	b=FaVCg0RtBXG1TTPkevr+IbfjK7U91ppQoB/EvQ8rSbD/0NNysL98BMb36HtVlSgn9w3xSI
+	IHHDOqmrDWXQuuCQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=rwqSa5ZQ;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=MMRut3Pi
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1791894527; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xGG18Y66fbsHodnkVp2rq+uaKysJfSv7BxMclrURpkA=;
+	b=rwqSa5ZQc61apzsl0qrEpknxL5k6rBU7yZrRMAfCgMxrxjYt4xC6K+p02nlXBMzF6MTmHA
+	yvcbIEKRKHckBYhhBtX53nw4V3bmKcyb3+y8AdfTfbCeywFCOMQGajKBif4t8f87fUqLRA
+	gl+51LIXcDj2cvs+dZmQ68GN5g2ltuM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1791894527;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xGG18Y66fbsHodnkVp2rq+uaKysJfSv7BxMclrURpkA=;
+	b=MMRut3Pi07xnoYzUnucCKkEGGjLhsoJUOVpymLylNMqduHvQGT9lExrtnop7XXIHVIUgia
+	fIVpo+yZOI67PoDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 41E0613341;
+	Tue, 13 Oct 2026 12:28:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5b6qBv8jzmo4MAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 13 Oct 2026 12:28:47 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id D04D0A1407; Tue, 13 Oct 2026 14:28:42 +0200 (CEST)
+Date: Tue, 13 Oct 2026 14:28:42 +0200
+From: Jan Kara <jack@suse.cz>
+To: Tal Zussman <tz2294@columbia.edu>
+Cc: Theodore Ts'o <tytso@mit.edu>, 
+	Andreas Dilger <adilger.kernel@dilger.ca>, Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>, 
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>, "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, 
+	Zhang Yi <yi.zhang@huawei.com>, Christoph Hellwig <hch@lst.de>, 
+	John Garry <john.garry@linux.dev>, "Darrick J. Wong" <djwong@kernel.org>, 
+	linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v2 2/3] ext4: never fall back to buffered I/O for
+ atomic direct writes
+Message-ID: <dcft3zw2kxwxr47x4ulg5l7jpcqhsghxe6tsupgspfx5ia3rau@c6663nup2pe3>
+References: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
+ <20261012-ext4-atomic-no-fallback-v2-2-c4b30c60e500@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261012-ext4-atomic-no-fallback-v2-2-c4b30c60e500@columbia.edu>
+X-Rspamd-Action: no action
+X-Spam-Score: -2.51
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[mit.edu,dilger.ca,linux.alibaba.com,suse.cz,linux.ibm.com,gmail.com,huawei.com,lst.de,linux.dev,kernel.org,vger.kernel.org];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:dkim,columbia.edu:email,suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Spam-Level: 
+X-Rspamd-Queue-Id: 6A2A11F443
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
 
-Define the storage element management operations using struct
-blk_storage_elements_ops. These operations are valid only on SMR disks
-supporting the storage element depopulation feature.
+On Mon 12-10-26 13:17:41, Tal Zussman wrote:
+> ext4_dio_write_iter() finishes a short direct write through the page
+> cache. ext4_buffered_write_iter() now rejects IOCB_ATOMIC, so a short
+> atomic write would warn and then fail with -EOPNOTSUPP, as if atomic
+> writes were unsupported on the inode.
+> 
+> This came out of a block device fix [1], where an IOCB_ATOMIC direct
+> write could complete short when only part of the buffer could be
+> pinned, with the rest going through the buffered fallback. Christoph
+> Hellwig noted that ext4 has the same fallback and only warns in it [2],
+> and John Garry agreed it should reject the write instead [3].
+> 
+> In contrast to the block device, nothing reaches the branch on ext4
+> today: iomap requires the mapping to cover the whole atomic write, a
+> buffer that can't be pinned in full fails in iomap before the bio is
+> submitted, and a failed page cache invalidation returns -EAGAIN rather
+> than reaching the buffered fallback. A short atomic write is therefore
+> a bug, and neither a short count nor -EOPNOTSUPP is a valid result for
+> one. Fail the write with -EIO before the fallback, keeping the WARN()
+> so any future bug is visible.
+> 
+> Link: https://lore.kernel.org/linux-block/20260828-blkdev-fixes-v2-0-32f3f40cebed@columbia.edu/ [1]
+> Link: https://lore.kernel.org/linux-block/20260907071217.GD934@lst.de/ [2]
+> Link: https://lore.kernel.org/linux-block/a7752d1e-8ec1-44d1-a266-c287c315e8ab@oracle.com/ [3]
+> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/sd.c     |   3 +
- drivers/scsi/sd.h     |   2 +
- drivers/scsi/sd_zbc.c | 233 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 238 insertions(+)
+Looks good. Feel free to add:
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index db7c19d1c2ff..48c46f4a1ace 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3943,6 +3943,9 @@ static const struct block_device_operations sd_fops = {
- 	.get_unique_id		= sd_get_unique_id,
- 	.free_disk		= scsi_disk_free_disk,
- 	.pr_ops			= &sd_pr_ops,
-+#ifdef CONFIG_BLK_DEV_ZONED
-+	.se_ops			= &sd_zbc_se_ops,
-+#endif
- };
- 
- /**
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 6a72371fee78..fc8c49903811 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -243,6 +243,8 @@ unsigned int sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
- int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,
- 		unsigned int nr_zones, struct blk_report_zones_args *args);
- 
-+extern const struct blk_se_ops sd_zbc_se_ops;
-+
- #else /* CONFIG_BLK_DEV_ZONED */
- 
- static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 2c77f878ab3f..39cd4f9fcce5 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -548,6 +548,239 @@ static void sd_zbc_print_zones(struct scsi_disk *sdkp)
- 			  sdkp->zone_info.zone_blocks);
- }
- 
-+static void sd_zbc_parse_storage_element(struct scsi_disk *sdkp, u8 *desc,
-+					 struct blk_se *element)
-+{
-+	struct scsi_device *sdp = sdkp->device;
-+	sector_t zone_sectors = sd_zbc_zone_sectors(sdkp);
-+	u64 capacity;
-+
-+	memset(element, 0, sizeof(*element));
-+
-+	element->id = get_unaligned_be32(&desc[4]);
-+
-+	switch (desc[14]) {
-+	case SCSI_PHYS_ELEM_TYPE_ALL_ACCESS_STORAGE:
-+		element->type = BLK_SE_TYPE_RDWR;
-+		capacity = get_unaligned_be64(&desc[16]);
-+		if (!zone_sectors || capacity == ULLONG_MAX)
-+			element->nr_zones = 0;
-+		else
-+			element->nr_zones =
-+				logical_to_sectors(sdp, capacity) >>
-+					ilog2(zone_sectors);
-+		break;
-+	case SCSI_PHYS_ELEM_TYPE_FRAC_ACCESS_STORAGE:
-+		element->paired_id = get_unaligned_be32(&desc[16]);
-+		if (desc[20] & 0x01)
-+			element->type = BLK_SE_TYPE_READ;
-+		else
-+			element->type = BLK_SE_TYPE_WRITE;
-+		element->nr_zones = get_unaligned_be64(&desc[24]);
-+		break;
-+	default:
-+		element->type = BLK_SE_TYPE_UNKNOWN;
-+	}
-+
-+	switch (desc[15]) {
-+	case SCSI_PHYS_ELEM_HEALTH_WITHIN_SPEC_LIMITS:
-+	case SCSI_PHYS_ELEM_HEALTH_AT_SPEC_LIMITS:
-+		element->status = BLK_SE_STS_OK;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_OUTSIDE_SPEC_LIMITS:
-+		element->status = BLK_SE_STS_DEGRADED;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_REVOKE_ERR:
-+		element->status = BLK_SE_STS_RESTORE_ERROR;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_REVOKE_IN_PROGRESS:
-+		element->status = BLK_SE_STS_RESTORE_IN_PROGRESS;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_ERR:
-+		element->status = BLK_SE_STS_REMOVE_ERROR;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_IN_PROGRESS:
-+		element->status = BLK_SE_STS_REMOVE_IN_PROGRESS;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_OK:
-+		element->status = BLK_SE_STS_REMOVED;
-+		element->restore_allowed = desc[13] & 0x01;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_NOT_REPORTED:
-+	default:
-+		element->status = BLK_SE_STS_UNKNOWN;
-+		break;
-+	}
-+}
-+
-+/*
-+ * Large hard limit on the number of storage elements. This accommodates all
-+ * known devices today and likely forever :)
-+ */
-+#define SD_ZBC_MAX_STORAGE_ELEMENTS	255
-+
-+static int sd_zbc_report_storage_elements(struct gendisk *disk,
-+					  struct blk_se *elements,
-+					  unsigned int *nr_elements)
-+{
-+	struct scsi_disk *sdkp = scsi_disk(disk);
-+	struct scsi_device *sdp = sdkp->device;
-+	const int timeout = sdp->request_queue->rq_timeout;
-+	struct scsi_sense_hdr sshdr;
-+	const struct scsi_exec_args exec_args = {
-+		.sshdr = &sshdr,
-+	};
-+	unsigned char cmd[16];
-+	unsigned int nr_descs, nr_se;
-+	unsigned int buf_size;
-+	int i, ret = 0, result;
-+	u8 *desc, *buf;
-+
-+	if (!sdkp->modify_zones_supported)
-+		return -EOPNOTSUPP;
-+
-+	/*
-+	 * We need at least 32B for the report header and 32B for each
-+	 * descriptor.
-+	 */
-+	nr_se = min(SD_ZBC_MAX_STORAGE_ELEMENTS, *nr_elements);
-+	buf_size = ALIGN((nr_se + 1) * 32, SECTOR_SIZE);
-+
-+	buf = kzalloc(buf_size, GFP_NOIO);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	memset(cmd, 0, 16);
-+	cmd[0] = SERVICE_ACTION_IN_16;
-+	cmd[1] = SAI_GET_PHYSICAL_ELEMENT_STATUS;
-+	put_unaligned_be32(buf_size, &cmd[10]);
-+
-+	result = scsi_execute_cmd(sdp, cmd, REQ_OP_DRV_IN, buf, buf_size,
-+				  timeout, 1, &exec_args);
-+	if (result) {
-+		sd_printk(KERN_ERR, sdkp,
-+			  "GET PHYSICAL ELEMENT STATUS failed\n");
-+		sd_print_result(sdkp, "GET PHYSICAL ELEMENT STATUS", result);
-+		if (result > 0 && scsi_sense_valid(&sshdr))
-+			sd_print_sense_hdr(sdkp, &sshdr);
-+		ret = -EIO;
-+		goto free_buf;
-+	}
-+
-+	nr_descs = get_unaligned_be32(&buf[0]);
-+	if (!nr_descs) {
-+		sd_printk(KERN_ERR, sdkp,
-+			  "Invalid number of phys element descriptors\n");
-+		ret = -EIO;
-+		goto free_buf;
-+	}
-+	if (nr_descs > SD_ZBC_MAX_STORAGE_ELEMENTS) {
-+		sd_printk(KERN_ERR, sdkp,
-+			  "Too many phys element descriptors\n");
-+		ret = -EIO;
-+		goto free_buf;
-+	}
-+
-+	if (!elements) {
-+		*nr_elements = nr_descs;
-+		goto free_buf;
-+	}
-+
-+	nr_descs = get_unaligned_be32(&buf[4]);
-+	if (!nr_descs) {
-+		sd_printk(KERN_ERR, sdkp,
-+			"Invalid number of reported phys element descriptors\n");
-+		ret = -EIO;
-+		goto free_buf;
-+	}
-+
-+	desc = &buf[32];
-+	for (i = 0; i < min(nr_se, nr_descs); i++, desc += 32)
-+		sd_zbc_parse_storage_element(sdkp, desc, &elements[i]);
-+	*nr_elements = i;
-+
-+free_buf:
-+	kfree(buf);
-+
-+	return ret;
-+}
-+
-+static int sd_zbc_remove_storage_element(struct gendisk *disk,
-+					 unsigned int element_id)
-+{
-+	struct scsi_disk *sdkp = scsi_disk(disk);
-+	struct scsi_device *sdp = sdkp->device;
-+	const int timeout = sdp->request_queue->rq_timeout;
-+	struct scsi_sense_hdr sshdr;
-+	const struct scsi_exec_args exec_args = {
-+		.sshdr = &sshdr,
-+	};
-+	unsigned char cmd[16];
-+	int result;
-+
-+	if (!sdkp->modify_zones_supported)
-+		return -EOPNOTSUPP;
-+
-+	memset(cmd, 0, 16);
-+	cmd[0] = SERVICE_ACTION_IN_16;
-+	cmd[1] = SAI_REMOVE_ELEMENT_AND_MODIFY_ZONES;
-+	put_unaligned_be32(element_id, &cmd[10]);
-+
-+	result = scsi_execute_cmd(sdp, cmd, REQ_OP_DRV_IN, NULL, 0,
-+				  timeout, 1, &exec_args);
-+	if (result) {
-+		sd_printk(KERN_ERR, sdkp,
-+			  "REMOVE ELEMENT AND MODIFY ZONES failed\n");
-+		sd_print_result(sdkp,
-+				"REMOVE ELEMENT AND MODIFY ZONES", result);
-+		if (result > 0 && scsi_sense_valid(&sshdr))
-+			sd_print_sense_hdr(sdkp, &sshdr);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int sd_zbc_restore_storage_elements(struct gendisk *disk)
-+{
-+	struct scsi_disk *sdkp = scsi_disk(disk);
-+	struct scsi_device *sdp = sdkp->device;
-+	const int timeout = sdp->request_queue->rq_timeout;
-+	struct scsi_sense_hdr sshdr;
-+	const struct scsi_exec_args exec_args = {
-+		.sshdr = &sshdr,
-+	};
-+	unsigned char cmd[16];
-+	int result;
-+
-+	if (!sdkp->modify_zones_supported)
-+		return -EOPNOTSUPP;
-+
-+	memset(cmd, 0, 16);
-+	cmd[0] = SERVICE_ACTION_IN_16;
-+	cmd[1] = SAI_RESTORE_ELEMENTS_AND_REBUILD;
-+
-+	result = scsi_execute_cmd(sdp, cmd, REQ_OP_DRV_IN, NULL, 0,
-+				  timeout, 1, &exec_args);
-+	if (result) {
-+		sd_printk(KERN_ERR, sdkp,
-+			  "RESTORE ELEMENTS AND REBUILD failed\n");
-+		sd_print_result(sdkp,
-+				"RESTORE ELEMENTS AND REBUILD", result);
-+		if (result > 0 && scsi_sense_valid(&sshdr))
-+			sd_print_sense_hdr(sdkp, &sshdr);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+const struct blk_se_ops sd_zbc_se_ops = {
-+	.report_elements	= sd_zbc_report_storage_elements,
-+	.remove_element		= sd_zbc_remove_storage_element,
-+	.restore_elements	= sd_zbc_restore_storage_elements,
-+};
-+
- /*
-  * Call blk_revalidate_disk_zones() if any of the zoned disk properties have
-  * changed that make it necessary to call that function. Called by
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  fs/ext4/file.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+> index 19a8843ac420..11e375bd4ed1 100644
+> --- a/fs/ext4/file.c
+> +++ b/fs/ext4/file.c
+> @@ -679,11 +679,12 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>  		loff_t endbyte;
+>  
+>  		/*
+> -		 * There is no support for atomic writes on buffered-io yet,
+> -		 * we should never fallback to buffered-io for DIO atomic
+> -		 * writes.
+> +		 * Buffered I/O provides no torn-write protection, so never
+> +		 * finish an atomic write through the page cache. iomap must
+> +		 * not return a short atomic write, so treat one as a bug.
+>  		 */
+> -		WARN_ON_ONCE(iocb->ki_flags & IOCB_ATOMIC);
+> +		if (WARN_ON_ONCE(iocb->ki_flags & IOCB_ATOMIC))
+> +			return -EIO;
+>  
+>  		offset = iocb->ki_pos;
+>  		err = ext4_buffered_write_iter(iocb, from);
+> 
+> -- 
+> 2.39.5
+> 
 -- 
-2.55.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
