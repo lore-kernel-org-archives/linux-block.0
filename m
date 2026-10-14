@@ -1,123 +1,239 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78594387596
-	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 13:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BF050EC17;
+	Wed, 14 Oct 2026 13:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791983224; cv=none; b=U8RYZb+UvFbcISizZ4F9HAE+JA8hSzCYjnEJFoB/8Ob4iaWoQalqeUoqtbSnP3utHU26aOrfLE1ZU22K6edyanHxvJIMPdu5rbxymwh/iSPgLZFzIpKECW4UuZFP3SbuLKanECwKUyfBlVR3DiOW2atNAYw+lDfQ3DkOQU15w6g=
+	t=1791983763; cv=none; b=jHlcd0qaXQhZmqiXXGvFVJVSkv08Q+j1SsvXW+mEcW24hwxO0soMu3Vi1BNoQY5erHU1iluaVB42xs1azr4jiByxE7yG0U597kSU672kw5EIO5WC1t9uesvfHe/pAB4wQQDUbglePYoeXOj/aSml2vUG/xTdW4DZi6b3H3qxSBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791983224; c=relaxed/simple;
-	bh=OySODPiskWWvzQQMx1Yq/HwVMV7iyUkBWw0BjUbVY6s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hf6HwEg8TNyAi7Hc7egPff6d35w0PenDrEE2886PY5gl4OA2Tz/txaVb01NlderWb0KBy/9Xh+3WD2CaGb/IKJvSxHBDgH2Q3vizYcSLHPLSdUYtp3YaffLmgG/2/CT4rxzkOCukeP81lF8MzRvCBHfwqTECirQMGqPW+hHQDks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LttP+57Q; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LttP+57Q"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a022fee0caso38400915e9.1
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 06:07:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791983222; x=1792588022; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=k5Xx2GBklmLYql9VZXZ+CeE2dU9lwoFm77pkgYHcd38=;
-        b=LttP+57QkPAzmVVgUvRW/Pp91UXzLM8OE6jaXUaXULC9NYjzeL97NCoVyX/bypkvRk
-         peQUYRfnh5Y7MVpWP9KRooCb+/mVQrAcK3pfdPbFtHqN7CieKU5nDRqxKJs4KaykY5Mp
-         47FHCnhxBfn95ZlIQUM5t5uirtgnxgVmEnAsTSU8pPnjLE6qTS4hZ3q7rZwFqBphpimm
-         LGq0XY1fMplM7a0KAexltkifQNpAVK1FaCAC4DdwrUBEjs104BAMvmB6DmZ+xRfXWIk2
-         z3vVscEpYOosS5Z8V4hkMt6vyU+dMBCChD6MxSCniSCY6yv2aP/zXSFRlHwh6OdTiP4w
-         tZAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791983222; x=1792588022;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=k5Xx2GBklmLYql9VZXZ+CeE2dU9lwoFm77pkgYHcd38=;
-        b=dBcoFutdlHOqkAN3VLFhU48Bs5zUV2JR1MQXPsy9n4tXTvTBVEuMj2fMo0Tg/dDnyG
-         W14lG7kyAms9MKUzn5nKRJWKCMAt6GFNs8nh+P50mUOQsdHYBkoEE9JsRTuHnvJc6qb1
-         218yyoiPFSH2NWHHuJoKIPqP0MvFqnWeIgsxAjsl281XXFsoB4gMJ2QEg5sUs2W6igMf
-         EHzdTYtFcw3a2rA9eS01eJoxPzAwGZFRjRKyaqNNBQsefGubsXCJCY2ixx1QJQg3iT4l
-         ZDtxZGXtyWVuCNyDKIjNinyDCfAakQzFNTKxq0veJBg2wd+q35Z3n3kjPOFi8hexnV/H
-         fZJQ==
-X-Forwarded-Encrypted: i=1; AKwUvBx7m7okhtAPcKmnC6qOwhzVxvwA4IImXzGPOuAsI2oEZIOKAWl36NygNOlX7igAIedOX8/xETG5me5Akg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIWSMqQPyHtX0bZk8vv0qdUvcHGHRoo5UGfFMOyQ394uCN+Y0fw
-	sMvYQXUdDipUpzH+IqvLTg0UjXTNWkkndDYbPVxYk3S2nmSsLmXF80RN
-X-Gm-Gg: AYBFou1elUrw8z1X0l8BKg166434Ow3Q8ODf4iA2DFUGMksQMRyLJ2mNPv5No51dSVV
-	TDc0VAdJ0LsgJH5ejkvoAyB7LEB/fwi1PIieMapE/DCK29G3TbMbAFCZmovvApRgiG59Ku3UqED
-	hIXLULboMQtJFsyrcQUC0fPUbtbjj/OAQrBhtq4XV62EVfzkRl/iYMP2OUDUO6HUYUX/UV4H9kv
-	E6PxNIeQM0cmZ04JcZZQjCCJpu5pPQWsuroMNFHVt5j8wY+zQKwIgeUJOXyE6fE4v+SVshluB9z
-	QUbvPcVt/YK2SN2kekbxN51UGMPip268jAvhI9Y6BWOHAUFPRBSKBSFBPGYu8zuKSJ6Dv9mbdg8
-	3iHexK7ynZxOcB8u692BNO84RCS70y7vG3fC9eVYIHRl7JmnrblNP4nLX7iR+9/8LpGMBpQ0FJB
-	JBvivQzHzoAYZMmdgF1PCeZ/Uyn8zCz5rnwihA1/MctwpKkfnnL0zFFYgPL1K6+5umUZFrqw2V9
-	xax3k9Ac9DxNe0b8re4UaXFXGzr68VCxyfNq7yuC7bzlCX84dFCunfzaCYJVeSy3fyyLCbL5Db0
-	gEymysZAo6AdSdTfY8l/KFrME00/QNfbnfvmH+uf4ZvGxqMUQg==
-X-Received: by 2002:a05:600c:6994:b0:49c:dada:30b7 with SMTP id 5b1f17b1804b1-4a18e446f3bmr313643615e9.2.1791983221508;
-        Wed, 14 Oct 2026 06:07:01 -0700 (PDT)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1b3602990sm52779585e9.0.2026.10.14.06.07.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Oct 2026 06:07:00 -0700 (PDT)
-Message-ID: <8d0e7d1e-086b-413a-87de-20e21f519daa@gmail.com>
-Date: Wed, 14 Oct 2026 14:06:59 +0100
+	s=arc-20240116; t=1791983763; c=relaxed/simple;
+	bh=7hZHAYbEqX6vEEqDO7Z4wh4Ze6H9SBXsRpCf48HHToI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ejiRHfSNXMj6kWXXCYJwxvw6rXsmyzvwETObErp+8Nh9vfDYfQVlBu62ex8L8xp/t8bDQWG+PF0R2Vibkc+YsAR8RUSAKBqbxXIQIoJEzUV0skx511RqHPTxoozZVrHBoldQYjz7FegYKf2/xrsGFesmxNks7LpohnvvxkhWsyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 7236968B05; Wed, 14 Oct 2026 15:15:54 +0200 (CEST)
+Date: Wed, 14 Oct 2026 15:15:54 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>, Nitesh Shetty <nj.shetty@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Tushar Gohad <tushar.gohad@intel.com>,
+	William Power <william.power@intel.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
+Subject: Re: [PATCH v11 04/13] block: introduce dma map backed bio type
+Message-ID: <20261014131554.GA16467@lst.de>
+References: <cover.1791975048.git.asml.silence@gmail.com> <39b964cf7510f42755188563da63d3d5acaf2aa9.1791975048.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 01/13] dma-buf: introduce initial file I/O
- infrastructure
-To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, dm-devel@lists.linux.dev
-References: <cover.1791975048.git.asml.silence@gmail.com>
- <49e24334953262e85d5616c9afde88c680e4f3a3.1791975048.git.asml.silence@gmail.com>
- <b461d367-8965-4798-b7ac-cffd4301cd1b@amd.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <b461d367-8965-4798-b7ac-cffd4301cd1b@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <39b964cf7510f42755188563da63d3d5acaf2aa9.1791975048.git.asml.silence@gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 10/14/26 13:30, Christian König wrote:
-> On 10/14/26 13:01, Pavel Begunkov wrote:
-...>> +static void dma_buf_io_kill_map(struct dma_buf_io_ctx *ctx)
->> +{
->> +	struct dma_buf_io_map *map;
->> +
->> +	dma_resv_assert_held(ctx->dmabuf->resv);
->> +
->> +	map = rcu_dereference_protected(ctx->map,
->> +				dma_resv_held(ctx->dmabuf->resv));
->> +	if (!map)
->> +		return;
->> +
->> +	rcu_assign_pointer(ctx->map, NULL);
->> +	percpu_ref_kill(&map->refs);
->> +	/* make sure the map is not visible via ctx->map */
->> +	synchronize_rcu_expedited();
->> +	wait_for_completion(&map->drained);
->> +	dma_buf_io_map_release(map);
->> +}
->> +
->> +int dma_buf_io_init_map(struct dma_buf_io_ctx *ctx, struct dma_buf_io_map *map,
->> +			struct sg_table *sgt)
+On Wed, Oct 14, 2026 at 12:02:02PM +0100, Pavel Begunkov wrote:
+> Premapped buffers don't require a generic bio_vec since these have
+> already been dma mapped. Repurpose the bi_io_vec space to store dmabuf
+> maps as they are mutually exclusive.
 > 
-> You somehow forgotten the kerneldoc I asked for here.
+> The bio splitting differs from the normal path because it's already
+> pre-mapped and for the block layer it's just an offset into the dma-buf.
+> The actual segmentation is only available to the importer driver and not
+> the block layer, however, it doesn't contain alignment gaps and we don't
+> have to check it. For the same reason we can't precisely split by the
+> number of segments, but we use ->min_seg_shift stored in the map to
+> calculate the minimum number of bytes a request consisting of
+> lim->max_segments full segments can cover and split by that. It's
+> stricter and can add extra splitting. E.g. for a {4K, 4G} segmentation,
+> the min segment size is 4K, and we'll split it into bios of
+> (4K * lim->max_segments) bytes each, but it should be good enough for
+> now to cover the most popular use cases.
+> 
+> Suggested-by: Keith Busch <kbusch@kernel.org>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  block/bio.c               | 15 +++++++++--
+>  block/blk-merge.c         | 52 +++++++++++++++++++++++++++++++++++++++
+>  block/blk-mq.c            |  6 +++++
+>  block/fops.c              |  2 +-
+>  include/linux/bio.h       |  9 ++++---
+>  include/linux/blk-mq.h    |  7 ++++++
+>  include/linux/blk_types.h | 14 ++++++++++-
+>  include/linux/bvec.h      |  3 ++-
+>  8 files changed, 99 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index b48091c7663f..1e0d9714c541 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -881,7 +881,11 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
+>  	bio->bi_write_stream = bio_src->bi_write_stream;
+>  	bio->bi_bvec_gap_bit = bio_src->bi_bvec_gap_bit;
+>  	bio->bi_iter = bio_src->bi_iter;
+> -	bio->bi_io_vec = bio_src->bi_io_vec;
+> +
+> +	if (op_is_dmabuf(bio->bi_opf))
+> +		bio->bi_dmabuf_map = bio_src->bi_dmabuf_map;
+> +	else
+> +		bio->bi_io_vec = bio_src->bi_io_vec;
+>  
+>  	if (bio->bi_bdev) {
+>  		if (bio->bi_bdev == bio_src->bi_bdev &&
+> @@ -1204,16 +1208,23 @@ EXPORT_SYMBOL_GPL(__bio_release_pages);
+>  
+>  bool bio_iov_iter_set(struct bio *bio, const struct iov_iter *iter)
+>  {
+> -	if (!iov_iter_is_bvec(iter))
+> +	if (!iov_iter_is_bvec(iter) && !iov_iter_is_dmabuf_map(iter))
+>  		return false;
+>  
+>  	WARN_ON_ONCE(bio->bi_max_vecs);
+>  
+> +	static_assert(offsetof(struct bio, bi_io_vec) ==
+> +		      offsetof(struct bio, bi_dmabuf_map));
+> +	static_assert(offsetof(struct iov_iter, bvec) ==
+> +		      offsetof(struct iov_iter, dmabuf_map));
+> +
+>  	bio->bi_io_vec = (struct bio_vec *)iter->bvec;
+>  	bio->bi_iter.bi_idx = 0;
+>  	bio->bi_iter.bi_offset = iter->iov_offset;
+>  	bio->bi_iter.bi_size = iov_iter_count(iter);
+>  	bio_set_flag(bio, BIO_CLONED);
+> +	if (iov_iter_is_dmabuf_map(iter))
+> +		bio->bi_opf |= REQ_NOMERGE | REQ_DMABUF;
+>  	return true;
+>  }
+>  
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 258a726071d1..501ddc01c449 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -9,6 +9,7 @@
+>  #include <linux/blk-integrity.h>
+>  #include <linux/part_stat.h>
+>  #include <linux/blk-cgroup.h>
+> +#include <linux/dma-buf-io.h>
+>  
+>  #include <trace/events/block.h>
+>  
+> @@ -319,6 +320,41 @@ static inline unsigned int bvec_seg_gap(struct bio_vec *bvprv,
+>  	return bv->bv_offset | (bvprv->bv_offset + bvprv->bv_len);
+>  }
+>  
+> +static inline int bio_split_io_at_dmabuf(struct bio *bio,
+> +		const struct queue_limits *lim, unsigned *segs,
+> +		unsigned max_bytes, unsigned len_align_mask,
+> +		unsigned start_align_mask)
+> +{
+> +	unsigned bytes = min(bio->bi_iter.bi_size, max_bytes);
+> +	unsigned seg_shift = bio->bi_dmabuf_map->min_seg_shift;
+> +	unsigned offset = bio->bi_iter.bi_offset & ((1U << seg_shift) - 1);
+> +	u64 max_segs_bytes;
+> +
+> +	/*
+> +	 * dma-buf maps don't expose the underlying segmentation, but they're
+> +	 * guaranteed to not have alignment gaps, we only need to check the
+> +	 * start and length alignment.
+> +	 */
+> +	if ((bio->bi_iter.bi_offset & start_align_mask) ||
+> +	    (bio->bi_iter.bi_size & len_align_mask))
+> +		return -EINVAL;
+> +
+> +	/* Presented as a single contiguous range into the dma-buf */
+> +	*segs = 1;
+> +
+> +	/*
+> +	 * Limit by the number of segments by using the minimal segment size.
+> +	 * Any I/O consisting of N full segments should be able to cover at
+> +	 * least N multiplied by the segment size. It's stricter than walking
+> +	 * the segments and might cause extra splitting.
+> +	 */
+> +	max_segs_bytes = (u64)lim->max_segments << seg_shift;
+> +	bytes = min_t(u64, bytes, max_segs_bytes - offset);
+> +	if (bytes != bio->bi_iter.bi_size)
+> +		return bytes;
+> +	return 0;
+> +}
+> +
+>  /**
+>   * bio_split_io_at - check if and where to split a bio
+>   * @bio:  [in] bio to be split
+> @@ -346,6 +382,19 @@ int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
+>  		len_align_mask |= (bc->bc_key->crypto_cfg.data_unit_size - 1);
+>  	}
+>  
+> +	if (op_is_dmabuf(bio->bi_opf)) {
+> +		int ret;
+> +
+> +		ret = bio_split_io_at_dmabuf(bio, lim, &nsegs, max_bytes,
+> +					     len_align_mask, start_align_mask);
+> +		if (ret < 0)
+> +			return ret;
+> +		if (!ret)
+> +			goto out;
+> +		bytes = ret;
+> +		goto split;
+> +	}
+> +
+>  	bio_for_each_bvec(bv, bio, iter) {
+>  		if (bv.bv_offset & start_align_mask ||
+>  		    bv.bv_len & len_align_mask)
+> @@ -376,6 +425,7 @@ int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
+>  		bvprvp = &bvprv;
+>  	}
+>  
+> +out:
+>  	*segs = nsegs;
+>  	bio->bi_bvec_gap_bit = ffs(gaps);
+>  	return 0;
+> @@ -493,6 +543,8 @@ unsigned int blk_recalc_rq_segments(struct request *rq)
+>  
+>  	if (!rq->bio)
+>  		return 0;
+> +	if (op_is_dmabuf(rq->bio->bi_opf))
+> +		return 1;
+>  
+>  	switch (bio_op(rq->bio)) {
+>  	case REQ_OP_DISCARD:
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e929f94b25c7..1b7f8cbbda8b 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3150,6 +3150,12 @@ void blk_mq_submit_bio(struct bio *bio)
+>  		goto queue_exit;
+>  	}
+>  
+> +	if (unlikely(op_is_dmabuf(bio->bi_opf) &&
+> +		bdev_has_integrity_csum(bio->bi_bdev))) {
+> +		bio_endio_status(bio, BLK_STS_NOTSUPP);
 
-Ah yes, missed that function. I'll add it but perhaps in a separate
-patch, if you don't mind, depending whether we queue it for 7.4.
+Wrong indentation, conditions are never indented the same level as
+the following code block, even with the weirdest preferences.
 
-> Apart from that still looks good, but I had only time to skim over it.
--- 
-Pavel Begunkov
+/me note the patch from Anuj on the list actually got this right..
 
+Otherwise looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
