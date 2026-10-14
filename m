@@ -1,163 +1,90 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533D5486406;
-	Wed, 14 Oct 2026 19:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E02747F771;
+	Wed, 14 Oct 2026 20:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792007426; cv=none; b=qsqopM0I2KySsW882PHqnyfBKLBMJaI2pRWph5W2/kBuOdX8jIgDWgibXr02Dl1Bcst60LfxeNPFKBlDvsFyF3GD+EYmaGylFcS0WAdjtQesgkBmPVDquOhM7uyQyj22ogxLJlvlRbCxWKz59QsI/cCDuBbh5PTvsi78U5pf3kg=
+	t=1792008108; cv=none; b=U5W89hAqkNMNCDije8THxuG2EnJc0eanjzB1QR/q2YtkhLZtmb5y16bv/K3AV6syNgzwTTlX6wXGnahQmz/yc+BukLAdoKfntwXgtqSfZwb6q/BJ3lDac6WcJXVsVKuhiBrRohgvQM/enBJOgtxjlkevCb/pkTBtOxPEXW24DkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792007426; c=relaxed/simple;
-	bh=canbLA2SOamUFjLIrAaPoD6hNIYt9r51hATImDQ12Rw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IQSTQX0pp3aERxTDnHsEjxZybg/JxrynqCI94BmeNOx7Ahvgd69cW/+pS6ecpujON/zXfb9lgWDGJR5CZApGj1/f/BBuG2MqYS0LoBrA2aq8+ctVbDe2AMzTt5IAU2m+TpPlsImN00oM7dVoZ4REbL9CE7qHyXCEIz2WdJIiD1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=dmh0ZPmP; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1792008108; c=relaxed/simple;
+	bh=DgzexdvCeSP1i/H+Ue0+EZSaQXyBZ6e0vBQ9GEJNOuw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gpvpd0IxcQKstxyvKXl2edJ/wTOPv7iSnYrNIG6niwTm6TGQ3XJ967Sv+Q15YUjKndBmY1pULV3v5YojjYOzTLJFCyaltVqYQ/cjG7Ikw/9mWI632WE5GpTiGytpr6MpgNkUhEIP6tFCqg/Z5POXTVoQrn1j4oI55KCkglN3p94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BDvtWvHz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="dmh0ZPmP"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4j4hd54sFvz1XM5kD;
-	Wed, 14 Oct 2026 19:50:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1792007407; x=1794599408; bh=r7wqfoGl36He6xJQoAE153P3
-	E0igpkKOLHPD1TGIFZo=; b=dmh0ZPmPEyCtxcmc1uYgaryLOFeCFrUO23VzjlMZ
-	7ndZQa6UVUc4n63kAwZKMKK32mhNOrMartWIYDCaOgHfme5Qioo59Wb90ywb33yn
-	oqTq5C3tCB/fTlE5N9r+MxIJ5U7FvLBx+nb+5V6YFLTnqfxMU6nxhP3Z0iunFZcw
-	/EmbhQhoSA7tv+rlRFz4GPNur4i5eNbrAVWKRhR5pAWi9ftsfBCfQ8NqR0ApajwC
-	rQY0tnk8d2klgribKiXINRzCxBBxmKJCQy4iL3PMkNk6xdIAdIZosT2tXfGeppy7
-	AsfPyl0MCPjtFCdRjWfSWuFtsK5Aw0sHrzalR8A6L0+MGQ==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id fmm9AwGlRFjq; Wed, 14 Oct 2026 19:50:07 +0000 (UTC)
-Received: from [100.80.231.125] (unknown [104.135.182.41])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4j4hct0kxZz1XM4Tl;
-	Wed, 14 Oct 2026 19:50:06 +0000 (UTC)
-Message-ID: <889a01a1-cae0-4038-b0ad-2ad29231152b@acm.org>
-Date: Wed, 14 Oct 2026 12:50:05 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDvtWvHz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 176FE1F000C5;
+	Wed, 14 Oct 2026 20:01:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792008106;
+	bh=Z2c/x8kRyLdWlfUlyIfJHSMvGwSExpTZySUxGdeub3k=;
+	h=From:To:Cc:Subject:Date;
+	b=BDvtWvHz2a2m/WfCOeAC7NI4udN0I22y8qTt8xI4h0nJpI1ZRHPlV9n4NthYZn7Ka
+	 TXa8hPnqcRLoMHVZEknzSjgT3CLIXUyrjQt+FgRjLw+oa5wQpzgPjwgB7+zLpu+HCR
+	 OwGXEsH4n2Ic5DEXjjFKYoD2NjISnjggwOv6xNXHnTlL2U34wYrmDR9OsxSuQ+J8Cj
+	 0FeEK/m9LOt/yozHgndeM6c/zxKqPvrmLx7Se4VfRAbDeKgtO1owXn/r/FXLPzxwd8
+	 pAoIqMn9r3QWGxLScL9UZKu74vQozCVPgjgrSZs3fJfFwjVe2TdhKhus59y4QcTBUl
+	 OWzV4ouKUlGjA==
+From: Sasha Levin <sashal@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Sasha Levin <sashal@kernel.org>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] selftests/ublk: use the configured kernel UAPI headers
+Date: Wed, 14 Oct 2026 16:01:44 -0400
+Message-ID: <20261014200144.1364828-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?B?UmU6IOetlOWkjTog562U5aSNOiBbUEFUQ0ggdjUgMS8yXSBzY3NpOiBz?=
- =?UTF-8?Q?d=3A_mark_disk_dead_on_surprise_host_removal_to_avoid_I/O_hang?=
-To: =?UTF-8?B?6IOh6L+e5Yuk?= <hulianqin@vivo.com>,
- Christoph Hellwig <hch@lst.de>
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <mkp@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Alan Stern <stern@rowland.harvard.edu>, Jens Axboe <axboe@kernel.dk>,
- Hannes Reinecke <hare@suse.de>, Mike Christie <michael.christie@oracle.com>,
- Damien Le Moal <dlemoal@kernel.org>, John Garry <john.g.garry@oracle.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "usb-storage@lists.one-eyed-alien.net"
- <usb-storage@lists.one-eyed-alien.net>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>
-References: <TYUPR06MB6217DD31B1B3CD09E431CC12D2922@TYUPR06MB6217.apcprd06.prod.outlook.com>
- <20261012144923.GA10852@lst.de>
- <TYUPR06MB62172FD04314EFE34D8091EAD29E2@TYUPR06MB6217.apcprd06.prod.outlook.com>
- <9c28fbe7-089f-4d72-86be-5805bfebb213@acm.org>
- <TYUPR06MB62173975C70E0BBCE434475ED29D2@TYUPR06MB6217.apcprd06.prod.outlook.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <TYUPR06MB62173975C70E0BBCE434475ED29D2@TYUPR06MB6217.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On 10/13/26 7:20 PM, =E8=83=A1=E8=BF=9E=E5=8B=A4 wrote:
-> Given these, I went with SHOST_SURPRISE_REMOVAL as a more targeted
-> approach. If you think SDEV_OFFLINE is viable, I'd be happy to explore
-> it further.
+With generated headers in an output directory, the hardcoded source-tree
+include path falls through to distribution headers. New ublk flags and
+structure members, including UBLK_F_IO_DESC_SIZE, are then missing.
 
-Has something like the entirely untested patch below been considered?
-With this approach no new state variables are required.
+Use KHDR_INCLUDES to consume the headers from the kernel under test, and
+add the headers target as an order-only prerequisite of the ublk
+programs, as nolibc-test does, so that a standalone build installs them
+first. Baseline builds fail on the missing definitions; GCC 14 and Clang
+21 builds succeed with the output-directory headers and target liburing
+development files available.
 
-Thanks,
-
-Bart.
-
-Subject: [PATCH] scsi: sd: Mark the disk dead if runtime resume fails in=20
-sd_remove()
-
-If a SCSI disk is unplugged while runtime suspended, its request queue
-is still in the pm-only state when sd_remove() is called. The runtime
-resume attempted by scsi_autopm_get_device() fails because the parent
-device, e.g. a USB device in the USB_STATE_NOTATTACHED state, cannot be
-resumed. Hence, sdev_runtime_resume() is not called and the pm-only
-state is not cleared. Next, del_gendisk() calls
-blk_report_disk_dead(disk, false), which calls sync_filesystem(). Any
-bio submitted by the filesystem waits forever in __bio_queue_enter()
-because the queue will never leave the pm-only state and because
-GD_DEAD has not yet been set:
-
-  __bio_queue_enter+0xb8/0x174
-  blk_mq_submit_bio+0x640/0x7e4
-  [ ... ]
-  exfat_sync_fs+0xa4/0xe0
-  sync_filesystem+0xa8/0xdc
-  fs_bdev_mark_dead+0x30/0x88
-  bdev_mark_dead+0x54/0xc4
-  blk_report_disk_dead+0x8c/0xd4
-  del_gendisk+0xa0/0x2f8
-  sd_remove+0x30/0x60
-  [ ... ]
-  scsi_remove_host+0x88/0x18c
-  usb_stor_disconnect+0x68/0xf4
-
-Fix this hang by calling blk_mark_disk_dead() if runtime resume fails.
-This sets GD_DEAD, tells the filesystem that the disk has been removed
-without attempting to sync it, and wakes up any bios that are waiting
-in __bio_queue_enter(). Syncing the filesystem is not possible anyway
-if runtime resume failed, so no data is lost that could otherwise have
-been written. If runtime resume succeeds, behavior is not changed. Make
-this change in sd_remove() instead of in a SCSI LLD such that it works
-for all SCSI transports.
-
-Reported-by: Lianqin Hu <hulianqin@vivo.com>
-Closes:=20
-https://lore.kernel.org/all/TYUPR06MB6217DD31B1B3CD09E431CC12D2922@TYUPR0=
-6MB6217.apcprd06.prod.outlook.com/
-Fixes: 6f8191fdf41d ("block: simplify disk shutdown")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Fixes: e371b9d3368c ("selftests: ublk: kublk: fix include path")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-  drivers/scsi/sd.c | 10 +++++++++-
-  1 file changed, 9 insertions(+), 1 deletion(-)
+ tools/testing/selftests/ublk/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index a1b21ea14e54..208b915f25a2 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -4270,7 +4270,15 @@ static void sd_remove(struct scsi_device *sdp)
-  	struct device *dev =3D &sdp->sdev_gendev;
-  	struct scsi_disk *sdkp =3D dev_get_drvdata(dev);
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index 37883e9d50ec3..37db1ebcc7fb7 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-CFLAGS += -O3 -Wl,-no-as-needed -Wall -I $(top_srcdir)/usr/include
++CFLAGS += -O3 -Wl,-no-as-needed -Wall $(KHDR_INCLUDES)
+ ifneq ($(WERROR),0)
+ 	CFLAGS += -Werror
+ endif
+@@ -83,6 +83,7 @@ LOCAL_HDRS += $(wildcard *.h)
+ include ../lib.mk
+ 
+ $(OUTPUT)/kublk: $(filter-out $(STANDALONE_UTILS),$(wildcard *.c))
++$(TEST_GEN_PROGS_EXTENDED): | headers
+ 
+ check:
+ 	shellcheck -x -f gcc *.sh
 
--	scsi_autopm_get_device(sdkp->device);
-+	/*
-+	 * If runtime resume fails, e.g. because the device was unplugged
-+	 * while runtime suspended, the request queue stays in the pm-only
-+	 * state and any I/O submitted by del_gendisk(), e.g. from
-+	 * sync_filesystem(), would wait forever in __bio_queue_enter().
-+	 * Prevent this by marking the disk dead.
-+	 */
-+	if (scsi_autopm_get_device(sdkp->device) < 0)
-+		blk_mark_disk_dead(sdkp->disk);
-
-  	device_del(&sdkp->disk_dev);
-  	del_gendisk(sdkp->disk);
+base-commit: 4eb2586bd40db27d77cc5b724ca9386ed0c71d53
+-- 
+2.53.0
 
