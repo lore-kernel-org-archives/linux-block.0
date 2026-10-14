@@ -1,136 +1,123 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED1B4E9C29;
-	Wed, 14 Oct 2026 12:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78594387596
+	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 13:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791981994; cv=none; b=KLAhWs4BNND3g80ZRYIoaODBA0IzA2BLdnzY4uzyoEhtj8XyAfClGaJdz5APSzgV+WXWLhieQ8s0ntvHmjn8aQkHNHpuXzTUOvOVWOGiez4MFEorJ0lvJf+bNe7CEwHNAVYqLaq1mBrAZj79/yYDVJjLwxGX4Jvw1Q2EHwzBe/0=
+	t=1791983224; cv=none; b=U8RYZb+UvFbcISizZ4F9HAE+JA8hSzCYjnEJFoB/8Ob4iaWoQalqeUoqtbSnP3utHU26aOrfLE1ZU22K6edyanHxvJIMPdu5rbxymwh/iSPgLZFzIpKECW4UuZFP3SbuLKanECwKUyfBlVR3DiOW2atNAYw+lDfQ3DkOQU15w6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791981994; c=relaxed/simple;
-	bh=lraDbSUwAu7Z6xHj08mL74wjdccsueS4o1yJiXkADz8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DTARN4E+elCM4MIvjRC29WYjFjQyueKgKckVbKJAFaumAb7SK44bEw9jw6dT9YIBlmtcscsfVj7tL8zratvQUL4isz3or1FAsTm2nYXPub5k+h2YU0Z8JQ6yGdoeiB2ThMGCkJQxHYD4G4oVyJW83V/2D7pNV5mJwhmfwxBBjMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Y8wy5yfd; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Yrj976DB; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Y8wy5yfd; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Yrj976DB; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1791983224; c=relaxed/simple;
+	bh=OySODPiskWWvzQQMx1Yq/HwVMV7iyUkBWw0BjUbVY6s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hf6HwEg8TNyAi7Hc7egPff6d35w0PenDrEE2886PY5gl4OA2Tz/txaVb01NlderWb0KBy/9Xh+3WD2CaGb/IKJvSxHBDgH2Q3vizYcSLHPLSdUYtp3YaffLmgG/2/CT4rxzkOCukeP81lF8MzRvCBHfwqTECirQMGqPW+hHQDks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LttP+57Q; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Y8wy5yfd";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Yrj976DB";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Y8wy5yfd";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Yrj976DB"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2E1441FB60;
-	Wed, 14 Oct 2026 12:46:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791981976; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4yChObc0Pr5+TH+wCOECBsU64iiuVGH1brRjSQo7/o=;
-	b=Y8wy5yfdVq86Q5k04TxfBS38OWfohfpK1BVq6eZQXND0tTrbWUnl8uHBfdrIHynssv7VJb
-	XIjQoRX+rRrnYYdB3mgqtIvomogrpVaVtKH+XnUmG2/T9Bjp+SsXS802R83YO7y9otUgld
-	THgJSEN6Urr5x8gPNY50lA/E8DVa8bY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791981976;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4yChObc0Pr5+TH+wCOECBsU64iiuVGH1brRjSQo7/o=;
-	b=Yrj976DB4rU9pA3E8wU7wCw9IFFFaX7mPxnvh4eSK1s8LcxoMa7Hr9f0zX43R9fT6qi6bV
-	SWCSnsNkOTIbH9BA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791981976; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4yChObc0Pr5+TH+wCOECBsU64iiuVGH1brRjSQo7/o=;
-	b=Y8wy5yfdVq86Q5k04TxfBS38OWfohfpK1BVq6eZQXND0tTrbWUnl8uHBfdrIHynssv7VJb
-	XIjQoRX+rRrnYYdB3mgqtIvomogrpVaVtKH+XnUmG2/T9Bjp+SsXS802R83YO7y9otUgld
-	THgJSEN6Urr5x8gPNY50lA/E8DVa8bY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791981976;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4yChObc0Pr5+TH+wCOECBsU64iiuVGH1brRjSQo7/o=;
-	b=Yrj976DB4rU9pA3E8wU7wCw9IFFFaX7mPxnvh4eSK1s8LcxoMa7Hr9f0zX43R9fT6qi6bV
-	SWCSnsNkOTIbH9BA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B6D6A1368E;
-	Wed, 14 Oct 2026 12:46:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4fQEGJd5z2oXDQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 14 Oct 2026 12:46:15 +0000
-Date: Wed, 14 Oct 2026 14:46:10 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>, 
-	Surabhi Gogte <sgogte@purestorage.com>, Hannes Reinecke <hare@kernel.org>, 
-	Nilay Shroff <nilay@linux.ibm.com>, Frederic Weisbecker <frederic@kernel.org>, 
-	Aaron Tomlin <atomlin@atomlin.com>, Maurizio Lombardi <mlombard@redhat.com>, 
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Daniel Wagner <wagi@kernel.org>
-Subject: Re: [PATCH 1/5] nvme-tcp: initialize pf_cache_lock when allocating
- the controller
-Message-ID: <93fdde74-b362-4b06-a08e-c5027bd5619d@flourine.local>
-References: <20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org>
- <20261014-nvme-fabrics-isolcpu-v1-1-355156be27b2@kernel.org>
- <20261014110804.VsqI0ZaP@linutronix.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LttP+57Q"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a022fee0caso38400915e9.1
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 06:07:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791983222; x=1792588022; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=k5Xx2GBklmLYql9VZXZ+CeE2dU9lwoFm77pkgYHcd38=;
+        b=LttP+57QkPAzmVVgUvRW/Pp91UXzLM8OE6jaXUaXULC9NYjzeL97NCoVyX/bypkvRk
+         peQUYRfnh5Y7MVpWP9KRooCb+/mVQrAcK3pfdPbFtHqN7CieKU5nDRqxKJs4KaykY5Mp
+         47FHCnhxBfn95ZlIQUM5t5uirtgnxgVmEnAsTSU8pPnjLE6qTS4hZ3q7rZwFqBphpimm
+         LGq0XY1fMplM7a0KAexltkifQNpAVK1FaCAC4DdwrUBEjs104BAMvmB6DmZ+xRfXWIk2
+         z3vVscEpYOosS5Z8V4hkMt6vyU+dMBCChD6MxSCniSCY6yv2aP/zXSFRlHwh6OdTiP4w
+         tZAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791983222; x=1792588022;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=k5Xx2GBklmLYql9VZXZ+CeE2dU9lwoFm77pkgYHcd38=;
+        b=dBcoFutdlHOqkAN3VLFhU48Bs5zUV2JR1MQXPsy9n4tXTvTBVEuMj2fMo0Tg/dDnyG
+         W14lG7kyAms9MKUzn5nKRJWKCMAt6GFNs8nh+P50mUOQsdHYBkoEE9JsRTuHnvJc6qb1
+         218yyoiPFSH2NWHHuJoKIPqP0MvFqnWeIgsxAjsl281XXFsoB4gMJ2QEg5sUs2W6igMf
+         EHzdTYtFcw3a2rA9eS01eJoxPzAwGZFRjRKyaqNNBQsefGubsXCJCY2ixx1QJQg3iT4l
+         ZDtxZGXtyWVuCNyDKIjNinyDCfAakQzFNTKxq0veJBg2wd+q35Z3n3kjPOFi8hexnV/H
+         fZJQ==
+X-Forwarded-Encrypted: i=1; AKwUvBx7m7okhtAPcKmnC6qOwhzVxvwA4IImXzGPOuAsI2oEZIOKAWl36NygNOlX7igAIedOX8/xETG5me5Akg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIWSMqQPyHtX0bZk8vv0qdUvcHGHRoo5UGfFMOyQ394uCN+Y0fw
+	sMvYQXUdDipUpzH+IqvLTg0UjXTNWkkndDYbPVxYk3S2nmSsLmXF80RN
+X-Gm-Gg: AYBFou1elUrw8z1X0l8BKg166434Ow3Q8ODf4iA2DFUGMksQMRyLJ2mNPv5No51dSVV
+	TDc0VAdJ0LsgJH5ejkvoAyB7LEB/fwi1PIieMapE/DCK29G3TbMbAFCZmovvApRgiG59Ku3UqED
+	hIXLULboMQtJFsyrcQUC0fPUbtbjj/OAQrBhtq4XV62EVfzkRl/iYMP2OUDUO6HUYUX/UV4H9kv
+	E6PxNIeQM0cmZ04JcZZQjCCJpu5pPQWsuroMNFHVt5j8wY+zQKwIgeUJOXyE6fE4v+SVshluB9z
+	QUbvPcVt/YK2SN2kekbxN51UGMPip268jAvhI9Y6BWOHAUFPRBSKBSFBPGYu8zuKSJ6Dv9mbdg8
+	3iHexK7ynZxOcB8u692BNO84RCS70y7vG3fC9eVYIHRl7JmnrblNP4nLX7iR+9/8LpGMBpQ0FJB
+	JBvivQzHzoAYZMmdgF1PCeZ/Uyn8zCz5rnwihA1/MctwpKkfnnL0zFFYgPL1K6+5umUZFrqw2V9
+	xax3k9Ac9DxNe0b8re4UaXFXGzr68VCxyfNq7yuC7bzlCX84dFCunfzaCYJVeSy3fyyLCbL5Db0
+	gEymysZAo6AdSdTfY8l/KFrME00/QNfbnfvmH+uf4ZvGxqMUQg==
+X-Received: by 2002:a05:600c:6994:b0:49c:dada:30b7 with SMTP id 5b1f17b1804b1-4a18e446f3bmr313643615e9.2.1791983221508;
+        Wed, 14 Oct 2026 06:07:01 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1b3602990sm52779585e9.0.2026.10.14.06.07.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Oct 2026 06:07:00 -0700 (PDT)
+Message-ID: <8d0e7d1e-086b-413a-87de-20e21f519daa@gmail.com>
+Date: Wed, 14 Oct 2026 14:06:59 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261014110804.VsqI0ZaP@linutronix.de>
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,infradead.org:url]
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 01/13] dma-buf: introduce initial file I/O
+ infrastructure
+To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, dm-devel@lists.linux.dev
+References: <cover.1791975048.git.asml.silence@gmail.com>
+ <49e24334953262e85d5616c9afde88c680e4f3a3.1791975048.git.asml.silence@gmail.com>
+ <b461d367-8965-4798-b7ac-cffd4301cd1b@amd.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <b461d367-8965-4798-b7ac-cffd4301cd1b@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 14, 2026 at 01:08:04PM +0200, Sebastian Andrzej Siewior wrote:
-> > Initialize pf_cache_lock for all queues when allocating the controller
-> > and keep it for the lifetime of the controller.
-> > 
-> > Fixes: 61b0ed3be81b ("nvme-tcp: parallelize I/O queue allocation and startup")
+On 10/14/26 13:30, Christian König wrote:
+> On 10/14/26 13:01, Pavel Begunkov wrote:
+...>> +static void dma_buf_io_kill_map(struct dma_buf_io_ctx *ctx)
+>> +{
+>> +	struct dma_buf_io_map *map;
+>> +
+>> +	dma_resv_assert_held(ctx->dmabuf->resv);
+>> +
+>> +	map = rcu_dereference_protected(ctx->map,
+>> +				dma_resv_held(ctx->dmabuf->resv));
+>> +	if (!map)
+>> +		return;
+>> +
+>> +	rcu_assign_pointer(ctx->map, NULL);
+>> +	percpu_ref_kill(&map->refs);
+>> +	/* make sure the map is not visible via ctx->map */
+>> +	synchronize_rcu_expedited();
+>> +	wait_for_completion(&map->drained);
+>> +	dma_buf_io_map_release(map);
+>> +}
+>> +
+>> +int dma_buf_io_init_map(struct dma_buf_io_ctx *ctx, struct dma_buf_io_map *map,
+>> +			struct sg_table *sgt)
 > 
-> I only see 2a8513091d2f0 ("nvme-rdma: parallelize I/O queue allocation
-> and startup"). That tcp commit is not in next-20261013.
+> You somehow forgotten the kerneldoc I asked for here.
 
-The commit is in
+Ah yes, missed that function. I'll add it but perhaps in a separate
+patch, if you don't mind, depending whether we queue it for 7.4.
 
-https://git.infradead.org/?p=nvme.git;a=shortlog;h=refs/heads/nvme-7.4
+> Apart from that still looks good, but I had only time to skim over it.
+-- 
+Pavel Begunkov
 
-but I missed the nvme-rdma version of it. It's about time to merge this
-into common code.
-
-Thanks,
-Daniel
