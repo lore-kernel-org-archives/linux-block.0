@@ -1,83 +1,226 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FCC41A91E
-	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 07:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0C12FE05C;
+	Wed, 14 Oct 2026 07:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791962330; cv=none; b=QDkvYsbhGzGjSobz4MUJ3PGouE5Lvm0FQ7znDkj3vPrplLMLTYeeq81UdyisvD5Ei3rCduG6NjPb9f4I93YKFj5qICvY2CEAPT9dFr3sL/X3wLMXeeCUMW+gHkwZBJlxQwLeDg6pJq4Sgj1GiWs+dG6T6t7UfxvFYQPRLa10aV0=
+	t=1791962367; cv=none; b=nmUqDA8a3c94XzNIkQrFupBDjipnMtJUUXmN5mZHe5ewZ3KPUXPH87GWHTMvjLXtV+Ee7EheSmmX1Vrw2r/8csWmbDdYrPs0WudD1nEEqgveqxbeUo8ZX6Er+iiXEamsgpACj8CM2DzFrBJgt7ToIjN4hZTpSTi0z4YT1D2dhzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791962330; c=relaxed/simple;
-	bh=eAQNAfuKGfSEMrVOhnpNQ3PiE3c8p6iAqxpfyUaYd4Q=;
-	h=Date:Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc; b=SzzRu26rpAk9v43sN8GxdAeopa5FDtQVBjKFVH75tOYnT4onRIP70KG/WGadkoOuA3k/ey94lEnxfSTezUSzJvrc6nt0Qs/KxG9kOq0hVsslrefZSmQCRrkzBqz5l4nJP8gP/otqVjkbxidvRkisnFaOT+yxYSDoFf9YHYyJzUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=I0UQzVQZ; arc=none smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1791962367; c=relaxed/simple;
+	bh=cxuv37kw4+dGUCCYicymFCUgoZwkVNkYPqDBSXdjM+c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lt+awflM/+Zt+A63ACvM2FqcU2g0ezLIuSkgSt4jDhKDvnP+FSKdnw9FfL+TZgm8NiF3G1XHKmxY+x+wZIiJTOMaEUitdcBJJL59FKiA4QJITYY05x+mG0JhbDXKs70JPSpfl77FzE0AaVsBxE6ehLeA6GvKb7llz8n1M2BlhAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=inHz6b3z; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="I0UQzVQZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1791962328; x=1823498328;
-  h=date:mime-version:message-id:in-reply-to:references:
-   subject:from:to:cc;
-  bh=eAQNAfuKGfSEMrVOhnpNQ3PiE3c8p6iAqxpfyUaYd4Q=;
-  b=I0UQzVQZeGmxch5KLcLtUlrpCRY/Yd3PlmyvqZy7xgQs3LC8VoUR2a7E
-   Bi/tNVd6uFUXzsIdHMQBerGmEYyW5sdf5vVnyN63f+AUI08J4OwxzVnAF
-   pQOX11h2yXWLRAP3h+nCxDFPIHhWDUdbY8Sv4G6TYdozPPhLJJ5hBwnIG
-   1ErGeK2igoN74X/PVVd3jSXNAlbZo8nTMwpPf7Ie8N0Yv2g4lU/Y8aesO
-   91xVybVRBIgcs0p5MFb9Z6s4bq8dKfiNOV49OjjC8oU2WpJaKXfpuRgXN
-   3DwD1qguTMi958a67v5KnRfswZyP/+px2ItwuG11VlSRZdt8c+mIehEC5
-   g==;
-X-CSE-ConnectionGUID: vxxkxbDvT/OxZXec12gf0Q==
-X-CSE-MsgGUID: iNhPKp22RFC99+txEhOY+w==
-X-IronPort-AV: E=Sophos;i="6.27,157,1786982400"; 
-   d="scan'208";a="158058761"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-esad2-o.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Oct 2026 15:18:42 +0800
-X-CSE-ConnectionGUID: neAFQAzfQ8m2TmNBLrLA5g==
-X-CSE-MsgGUID: Bkp5yqjBS+Wggm9QuyffhA==
-IronPort-SDR: 6acf2cd2_cSPQqor3h0xp58SvULnB8/HZ8d11OrKFMW8e//m0gsuISyV
- S/aOqHnXOOGx7Ri7Ov2Ar82XmlBwqKUie4p6KEQ==
-Received: from uls-op-esai1-o.wdc.com ([10.248.3.45])
-  by uls-op-esad2-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Oct 2026 00:18:42 -0700
-X-CSE-ConnectionGUID: 6zAaSiOgRZqbryCnENSVWg==
-X-CSE-MsgGUID: f60O1g77SeumJpHJSVN/0A==
-Date: 14 Oct 2026 00:18:42 -0700
-WDCIronportException: Internal
-Received: from unknown (HELO kpd-linux-block-557bf6c7f7-td27w) ([10.149.64.6])
-  by uls-op-esai1-o.wdc.com with ESMTP; 14 Oct 2026 00:18:42 -0700
-Content-Type: multipart/mixed; boundary="===============6255565997434638926=="
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="inHz6b3z"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1791962355; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	bh=bEp3jXGj9Rn+RoKUGxCbUMyDYG5oy4+r82DsEtexLig=;
+	b=inHz6b3zMOBGfhNbE9AkeHFCKZ9XgkgixlQvlDnBGFwqHM7jz4NgB4w9ATsFuRzj7I+xl0osfNeAbAwiorw+mWwN8nIyKdl7/XPcrz4zfBwJaupVNsg0+RBZhqM0GL/uBH7ZpdeEtBMDF6gV/8PZ6Z/vRyyVVMC2mTpjLtwiUBw=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R881e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0XCoKYKA_1791962326;
+Received: from x31h02109.sqa.na131.tbsite.net(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XCoKYKA_1791962326 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 14 Oct 2026 15:19:15 +0800
+From: Baokun Li <libaokun@linux.alibaba.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Cc: ebiggers@kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	hch@lst.de,
+	dm-devel@lists.linux.dev,
+	mpatocka@redhat.com,
+	sweettea-kernel@dorminy.me,
+	satyat@google.com,
+	libaokun@linux.alibaba.com,
+	stable@vger.kernel.org,
+	Sashiko <sashiko-bot@kernel.org>
+Subject: [PATCH v2 1/2] blk-crypto: fix NULL deref and UAF in __blk_crypto_evict_key()
+Date: Wed, 14 Oct 2026 15:18:45 +0800
+Message-ID: <20261014071846.3666398-1-libaokun@linux.alibaba.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <2c91db255fa527e76f5aa74f020d439a33e89142dc397211579876d34b3db51d@mailrelay.wdc.com>
-In-Reply-To: <20261014053337.2328544-1-dlemoal@kernel.org>
-References: <20261014053337.2328544-1-dlemoal@kernel.org>
-Subject: Re: [PATCH v7 00/10] Add support for storage element depopulation
-From: shinichiro.kawasaki@wdc.com
-To: linux-block@vger.kernel.org
-Cc: blktests-ci-bot@kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============6255565997434638926==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Sashiko reported a possible NULL pointer dereference, triggered by the
+following flow:
 
-Dear patch submitter,
+  dm-inlinecrypt ctor            # first use of the fallback
+   ├─ blk_crypto_init_key()      # succeeds, ctx->key.size != 0
+   ├─ blk_crypto_start_using_key()
+   │   ├─ hw-wrapped key: -EOPNOTSUPP
+   │   │    # profile never allocated (NULL)
+   │   └─ raw key: fallback_start_using_mode()
+   │      └─ blk_crypto_fallback_init() fails
+   │         └─ kfree(profile)   # not NULLed
+   ├─ goto bad
+   └─ inlinecrypt_dtr()          # evicts whenever key.size is set
+      └─ blk_crypto_evict_key()
+         └─ blk_crypto_config_supported_natively() = false
+            └─ blk_crypto_fallback_evict_key()
+               └─ __blk_crypto_evict_key(blk_crypto_fallback_profile)
+                  └─ profile->num_slots # BOOM!!!
 
-Blktests CI has tested the following submission:
-Status:     FAILURE
-Name:       [v7,00/10] Add support for storage element depopulation
-Patchwork:  https://patchwork.kernel.org/series/1185265/&state=*
-Run record: https://github.com/linux-blktests/linux-block/actions/runs/38517856454
+This issue can be reproduced using the following commands:
 
+  dd if=/dev/zero of=/tmp/backing bs=1M count=64
+  LOOP=$(losetup -f --show /tmp/backing)
+  SZ=$(blockdev --getsz $LOOP)
+  KEY=$(head -c 64 /dev/urandom | od -An -tx1 | tr -d ' \n')
+  dmsetup create ic --table "0 $SZ inlinecrypt aes-xts-plain64 \
+    $KEY 0 $LOOP 0 1 keytype:hw-wrapped"
 
-Failed test cases: loop/006
+And the following oops is triggered:
 
+  ==================================================================
+  blk-crypto: loop0: no support for wrapped keys
+  Oops: general protection fault, probably for non-canonical address
+        0xdffffc000000000b: 0000 [#1] SMP KASAN PTI
+  KASAN: null-ptr-deref in range [0x0000000000000058-0x000000000000005f]
+  CPU: 5 UID: 0 PID: 901 Comm: dmsetup 7.3.0-rc3 #1 PREEMPT(lazy)
+  RIP: 0010:__blk_crypto_evict_key+0x2e/0x3b0
+  Call Trace:
+   blk_crypto_evict_key+0x24c/0x320
+   inlinecrypt_dtr+0xf6/0x160
+   inlinecrypt_ctr+0x2d3/0xbd0
+   dm_table_add_target+0x661/0xf40
+   table_load+0x1c4/0x490
+   ctl_ioctl+0x32f/0x5f0
+   dm_ctl_ioctl+0xe/0x20
+  ==================================================================
 
+dm-inlinecrypt is the only caller that can evict a key that was never
+started, as fscrypt frees such a key without evicting it.
 
---===============6255565997434638926==--
+Fix this by publishing blk_crypto_fallback_profile only after
+blk_crypto_fallback_init() succeeds, and by returning early from
+__blk_crypto_evict_key() when the profile is NULL.  The eviction path
+can then only observe either a NULL profile or a fully initialized
+profile that is never freed.  A key whose start failed cannot be in a
+keyslot, so there is nothing to evict.
+
+The profile pointer is published and read locklessly, so use
+smp_store_release()/smp_load_acquire() to guarantee that a reader in
+the eviction path that observes the pointer also observes the
+initialized profile.
+
+The bug has been latent since commit c984ff1423ae ("blk-crypto:
+dynamically allocate fallback profile") was merged in v6.5, and only
+became actually triggerable when commit e7f57d2c47e2 ("dm-inlinecrypt:
+add target for inline block device encryption") was merged in v7.2.
+
+Fixes: c984ff1423ae ("blk-crypto: dynamically allocate fallback profile")
+Cc: stable@vger.kernel.org
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Closes: https://patch.msgid.link/sashiko-outbox-167341@kernel.org
+Signed-off-by: Baokun Li <libaokun@linux.alibaba.com>
+---
+ block/blk-crypto-fallback.c | 31 +++++++++++++++++++------------
+ block/blk-crypto-profile.c  |  3 +++
+ 2 files changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index 2a8f40a65158..b5dbb092caea 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -524,12 +524,18 @@ bool blk_crypto_fallback_bio_prep(struct bio *bio)
+ 
+ int blk_crypto_fallback_evict_key(const struct blk_crypto_key *key)
+ {
+-	return __blk_crypto_evict_key(blk_crypto_fallback_profile, key);
++	struct blk_crypto_profile *profile;
++
++	/* Pairs with smp_store_release() in blk_crypto_fallback_init(). */
++	profile = smp_load_acquire(&blk_crypto_fallback_profile);
++
++	return __blk_crypto_evict_key(profile, key);
+ }
+ 
+ static bool blk_crypto_fallback_inited;
+ static int blk_crypto_fallback_init(void)
+ {
++	struct blk_crypto_profile *profile;
+ 	int i;
+ 	int err;
+ 
+@@ -543,26 +549,25 @@ static int blk_crypto_fallback_init(void)
+ 		goto out;
+ 
+ 	/* Dynamic allocation is needed because of lockdep_register_key(). */
+-	blk_crypto_fallback_profile = kzalloc_obj(*blk_crypto_fallback_profile);
+-	if (!blk_crypto_fallback_profile) {
++	profile = kzalloc_obj(*profile);
++	if (!profile) {
+ 		err = -ENOMEM;
+ 		goto fail_free_bioset;
+ 	}
+ 
+-	err = blk_crypto_profile_init(blk_crypto_fallback_profile,
+-				      blk_crypto_num_keyslots);
++	err = blk_crypto_profile_init(profile, blk_crypto_num_keyslots);
+ 	if (err)
+ 		goto fail_free_profile;
+ 	err = -ENOMEM;
+ 
+-	blk_crypto_fallback_profile->ll_ops = blk_crypto_fallback_ll_ops;
+-	blk_crypto_fallback_profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
+-	blk_crypto_fallback_profile->key_types_supported = BLK_CRYPTO_KEY_TYPE_RAW;
++	profile->ll_ops = blk_crypto_fallback_ll_ops;
++	profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
++	profile->key_types_supported = BLK_CRYPTO_KEY_TYPE_RAW;
+ 
+ 	/* All blk-crypto modes have a crypto API fallback. */
+ 	for (i = 0; i < BLK_ENCRYPTION_MODE_MAX; i++)
+-		blk_crypto_fallback_profile->modes_supported[i] = 0xFFFFFFFF;
+-	blk_crypto_fallback_profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
++		profile->modes_supported[i] = 0xFFFFFFFF;
++	profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
+ 
+ 	blk_crypto_wq = alloc_workqueue("blk_crypto_wq",
+ 					WQ_UNBOUND | WQ_HIGHPRI |
+@@ -590,6 +595,8 @@ static int blk_crypto_fallback_init(void)
+ 	if (!bio_fallback_crypt_ctx_pool)
+ 		goto fail_free_crypt_ctx_cache;
+ 
++	/* Pairs with smp_load_acquire() in blk_crypto_fallback_evict_key(). */
++	smp_store_release(&blk_crypto_fallback_profile, profile);
+ 	blk_crypto_fallback_inited = true;
+ 
+ 	return 0;
+@@ -602,9 +609,9 @@ static int blk_crypto_fallback_init(void)
+ fail_free_wq:
+ 	destroy_workqueue(blk_crypto_wq);
+ fail_destroy_profile:
+-	blk_crypto_profile_destroy(blk_crypto_fallback_profile);
++	blk_crypto_profile_destroy(profile);
+ fail_free_profile:
+-	kfree(blk_crypto_fallback_profile);
++	kfree(profile);
+ fail_free_bioset:
+ 	bioset_exit(&enc_bio_set);
+ out:
+diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
+index 53126c091b0b..1c5feca3b856 100644
+--- a/block/blk-crypto-profile.c
++++ b/block/blk-crypto-profile.c
+@@ -346,6 +346,9 @@ int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
+ 	struct blk_crypto_keyslot *slot;
+ 	int err;
+ 
++	if (!profile)
++		return 0;
++
+ 	if (profile->num_slots == 0) {
+ 		if (profile->ll_ops.keyslot_evict) {
+ 			blk_crypto_hw_enter(profile);
+-- 
+2.43.7
+
