@@ -1,48 +1,48 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E41E4CC604;
-	Wed, 14 Oct 2026 07:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C314CA27E;
+	Wed, 14 Oct 2026 07:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791964020; cv=none; b=MJtWTfW3U0ED990ts94o9K/ipQMeGeVKTHLrXnG3/oO3lN9qnpKQfNRkUEpZFKixz6DzJbsTjTQ5lGDPrJ1xW0FTKhM3v5tsm+4zCmmKlkjU9SnQiHsMtGDEIN7Po6EOMgv2RBW53s65R8xZ61CWMhB4vhR17f65iibS2tkfe0A=
+	t=1791964020; cv=none; b=iTyCYs8WLSsL9QoxqfbbfhjL2qLVUmeWcg4HcD52e/CIA6WBaxFiLg15rfCL/vEnAlhL1uzPZul3DXorJB58puIZuC0BP5clx34EJsYaTQy/Bn7g8FxKXLBMitn2CL4Q3crV9QVwrA6a56Sye7/GFnaPPz5EedXXxJqR6FnI0yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1791964020; c=relaxed/simple;
-	bh=7YcRDwUYFcYi4qQv3Wh5O+seIw+8qGT55KvXu43jlaI=;
+	bh=3DEo33YUDuQwvPKQ2f8xQGwPaPDI7kPE/XscXAKMfU0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HBfUeRURUdyFWbR4EZTeMbF2Oij14HsMbM/qGmkqIqr33IsVy46BnvD80XayA3klphqk4QR3+2hfBFnw7bAsxxDQE1w/XNdd3KIKiSGH+w7KydCA4CGVx1RSctisGiBEDpI5Ej+bID6ZQ0vp0sBS8vGoYDFuCQ/A5RwJ/YqZ1Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jZauYSYu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EYE+zoQE; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jZauYSYu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EYE+zoQE; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:To:Cc; b=TdXQwGIyNKR9EcYIb1OV0okYMLpCbd6BUTVtoO29KSElqzBzM0x6gZsSH6lKqZ/4ubgK23xtxfZTCJj2x2An0YGgC1Etrpclwcvs7u4pasZSa/juWF8Z8+tOYk3YRbJLDnM7hjkfg0vzZlsW2FJsxyRR152ENCLX7PmOWNQgBgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1rKGJwfL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=itqyUvXd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1rKGJwfL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=itqyUvXd; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jZauYSYu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EYE+zoQE";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jZauYSYu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EYE+zoQE"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1rKGJwfL";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="itqyUvXd";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1rKGJwfL";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="itqyUvXd"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1D2871F88F;
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DEF1E1F7C9;
 	Wed, 14 Oct 2026 07:46:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
 	t=1791964016; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TqZ/LtFYXZbY4tnxo+Y2y338DHABkSGDQWphlXXl9sU=;
-	b=jZauYSYupdzB72p3Cyllgv3TALhTj65siJCvY4cgYxlZIHGF+2lIYw5DV46WsQhBwj7TkL
-	NMNYJ7N7DkiSFlxNUlFlY0UW3i6iKYAPb/KIrpzRPVbbDGfXMwckggxr+ZBJW5enmBYJ+1
-	zcSUEgb9QkUz2b6IZqBPUogSU8c0TPk=
+	bh=pJgfewhS/Qo0qSoCFFBIIYpTqvWeEcsQsEgvekjT+eA=;
+	b=1rKGJwfLGtGUtPKk7PG1ULitToQnzBBj5E2n40XaDTjMG37x5oXj10u8q3AymyafFuziel
+	+QBHDSFBTlJWBpu8EYyDBDt61mzAn3BiiuMCwtEw/HcYlmxmCzxbI6NBSknY3Kk01wNskp
+	70bADXAfFnf2JAMOYv8a5ryOc7/B/CQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
 	s=susede2_ed25519; t=1791964016;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TqZ/LtFYXZbY4tnxo+Y2y338DHABkSGDQWphlXXl9sU=;
-	b=EYE+zoQEJgdQaz9DjGY2bSUpN4rV814OezP2el03OmYfPvVmIzFsTJBnXJ6dvQlmhAEmFz
-	GPAwMkfra7PMGuAQ==
+	bh=pJgfewhS/Qo0qSoCFFBIIYpTqvWeEcsQsEgvekjT+eA=;
+	b=itqyUvXdYVJce8n7XuWNC8k1ho6fD/j2YyFx6uQpCC0Pz8ZzNJFmicdFYSusHW1LHU9k4h
+	P++Rm69CjHGXWtAw==
 Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
@@ -50,33 +50,33 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TqZ/LtFYXZbY4tnxo+Y2y338DHABkSGDQWphlXXl9sU=;
-	b=jZauYSYupdzB72p3Cyllgv3TALhTj65siJCvY4cgYxlZIHGF+2lIYw5DV46WsQhBwj7TkL
-	NMNYJ7N7DkiSFlxNUlFlY0UW3i6iKYAPb/KIrpzRPVbbDGfXMwckggxr+ZBJW5enmBYJ+1
-	zcSUEgb9QkUz2b6IZqBPUogSU8c0TPk=
+	bh=pJgfewhS/Qo0qSoCFFBIIYpTqvWeEcsQsEgvekjT+eA=;
+	b=1rKGJwfLGtGUtPKk7PG1ULitToQnzBBj5E2n40XaDTjMG37x5oXj10u8q3AymyafFuziel
+	+QBHDSFBTlJWBpu8EYyDBDt61mzAn3BiiuMCwtEw/HcYlmxmCzxbI6NBSknY3Kk01wNskp
+	70bADXAfFnf2JAMOYv8a5ryOc7/B/CQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
 	s=susede2_ed25519; t=1791964016;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TqZ/LtFYXZbY4tnxo+Y2y338DHABkSGDQWphlXXl9sU=;
-	b=EYE+zoQEJgdQaz9DjGY2bSUpN4rV814OezP2el03OmYfPvVmIzFsTJBnXJ6dvQlmhAEmFz
-	GPAwMkfra7PMGuAQ==
+	bh=pJgfewhS/Qo0qSoCFFBIIYpTqvWeEcsQsEgvekjT+eA=;
+	b=itqyUvXdYVJce8n7XuWNC8k1ho6fD/j2YyFx6uQpCC0Pz8ZzNJFmicdFYSusHW1LHU9k4h
+	P++Rm69CjHGXWtAw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E609D133F1;
-	Wed, 14 Oct 2026 07:46:55 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B0958133F1;
+	Wed, 14 Oct 2026 07:46:56 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id w43pMW8zz2quOQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 14 Oct 2026 07:46:55 +0000
+	id 5Gk6JXAzz2qyOQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 14 Oct 2026 07:46:56 +0000
 From: Daniel Wagner <dwagner@suse.de>
-Date: Wed, 14 Oct 2026 09:46:39 +0200
-Subject: [PATCH 1/5] nvme-tcp: initialize pf_cache_lock when allocating the
- controller
+Date: Wed, 14 Oct 2026 09:46:40 +0200
+Subject: [PATCH 2/5] blk-mq: use a housekeeping CPU for passthrough
+ requests on isolated hctxs
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,7 +85,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261014-nvme-fabrics-isolcpu-v1-1-355156be27b2@kernel.org>
+Message-Id: <20261014-nvme-fabrics-isolcpu-v1-2-355156be27b2@kernel.org>
 References: <20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org>
 In-Reply-To: <20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org>
 To: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
@@ -107,90 +107,103 @@ X-Spamd-Result: default: False [-3.30 / 50.00];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	NEURAL_HAM_SHORT(-0.20)[-0.993];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FROM_HAS_DN(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RL67935bhfdkbndpbo95z3ogoo)];
 	TO_DN_SOME(0.00)[];
 	FROM_EQ_ENVFROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
+	RCVD_TLS_ALL(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_TLS_ALL(0.00)[]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
 
 From: Daniel Wagner <wagi@kernel.org>
 
-Since commit 61b0ed3be81b ("nvme-tcp: parallelize I/O queue allocation
-and startup") the I/O tag set is allocated before the I/O queues.
-blk_mq_alloc_tag_set calls nvme_tcp_init_request for every request,
-which takes pf_cache_lock of the request's queue, but nvme_tcp_alloc_queue
-initializes that mutex only later.  With CONFIG_DEBUG_MUTEXES the first
-connect triggers DEBUG_LOCKS_WARN_ON(lock->magic != lock) in
-__mutex_lock and lock debugging is disabled.
+Since commit a46c27026da1 ("blk-mq: don't schedule block kworker on
+isolated CPUs") isolated CPUs are removed from hctx->cpumask.  That
+commit assumed the mask is only used for kworker placement and CPU
+offline handling, but blk_mq_alloc_request_hctx uses it to pick the
+software context of the request.  If only isolated CPUs are mapped to a
+hardware context, the mask is empty and blk_mq_alloc_request_hctx fails
+with -EXDEV, although the isolated CPUs still submit I/O to it.
 
-Initialize pf_cache_lock for all queues when allocating the controller
-and keep it for the lifetime of the controller.
+The nvme fabrics transports allocate the Connect command for every I/O
+queue this way, so connecting a controller fails with isolcpus=domain
+or an isolated cpuset partition as soon as a hardware context only has
+isolated CPUs.
 
-Fixes: 61b0ed3be81b ("nvme-tcp: parallelize I/O queue allocation and startup")
+Passthrough requests are inserted directly into hctx->dispatch, so
+their software context only selects the CPU the completion runs on and
+the hint for freeing the tag.  Use the software context of an online CPU
+which is neither isolated from the scheduler domains nor from managed
+interrupts for them.  Other requests and inactive hardware contexts
+still fail.
+
+Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
 Signed-off-by: Daniel Wagner <wagi@kernel.org>
 ---
- drivers/nvme/host/tcp.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ block/blk-mq.c | 37 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index ec678ed07af8..f876375dffd2 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -1531,7 +1531,6 @@ static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
- 	kfree(queue->pdu);
- 	mutex_destroy(&queue->send_mutex);
- 	mutex_destroy(&queue->queue_lock);
--	mutex_destroy(&queue->pf_cache_lock);
- 
- #ifdef CONFIG_DEBUG_LOCK_ALLOC
- 	lockdep_unregister_key(&queue->nvme_tcp_sk_key);
-@@ -1861,7 +1860,6 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid,
- 	INIT_LIST_HEAD(&queue->send_list);
- 	mutex_init(&queue->send_mutex);
- 	INIT_WORK(&queue->io_work, nvme_tcp_io_work);
--	mutex_init(&queue->pf_cache_lock);
- 
- 	if (qid > 0)
- 		queue->cmnd_capsule_len = nctrl->ioccsz * 16;
-@@ -2002,7 +2000,6 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid,
- err_destroy_mutex:
- 	mutex_destroy(&queue->send_mutex);
- 	mutex_destroy(&queue->queue_lock);
--	mutex_destroy(&queue->pf_cache_lock);
- 	return ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a26a11c73ee3..79fb08400c48 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -697,6 +697,25 @@ struct request *blk_mq_alloc_request(struct request_queue *q, blk_opf_t opf,
  }
+ EXPORT_SYMBOL(blk_mq_alloc_request);
  
-@@ -3028,7 +3025,7 @@ static struct nvme_tcp_ctrl *nvme_tcp_alloc_ctrl(struct device *dev,
- 		struct nvmf_ctrl_options *opts)
- {
- 	struct nvme_tcp_ctrl *ctrl;
--	int ret;
-+	int ret, i;
- 
- 	ctrl = kzalloc_obj(*ctrl);
- 	if (!ctrl)
-@@ -3098,6 +3095,14 @@ static struct nvme_tcp_ctrl *nvme_tcp_alloc_ctrl(struct device *dev,
- 		goto out_free_ctrl;
- 	}
- 
-+	/*
-+	 * The I/O tag set is allocated before the I/O queues, and initializing
-+	 * its requests already allocates the PDUs from the page frag caches of
-+	 * the queues, so initialize their locks here.
-+	 */
-+	for (i = 0; i < ctrl->ctrl.queue_count; i++)
-+		mutex_init(&ctrl->queues[i].pf_cache_lock);
++/*
++ * Return an online CPU which is neither isolated from the scheduler domains
++ * nor from managed interrupts, or nr_cpu_ids if there is none.
++ */
++static unsigned int blk_mq_housekeeping_cpu(void)
++{
++	unsigned int cpu;
 +
- 	ctrl->net = get_net(current->nsproxy->net_ns);
++	rcu_read_lock();
++	for_each_online_cpu(cpu) {
++		if (!cpu_is_isolated(cpu) &&
++		    housekeeping_test_cpu(cpu, HK_TYPE_MANAGED_IRQ))
++			break;
++	}
++	rcu_read_unlock();
++
++	return cpu;
++}
++
+ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	blk_opf_t opf, blk_mq_req_flags_t flags, unsigned int hctx_idx)
+ {
+@@ -747,8 +766,22 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	if (!blk_mq_hw_queue_mapped(data.hctx))
+ 		goto out_queue_exit;
+ 	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
+-	if (cpu >= nr_cpu_ids)
+-		goto out_queue_exit;
++	if (cpu >= nr_cpu_ids) {
++		/*
++		 * Isolated CPUs are not part of hctx->cpumask, so it can be
++		 * empty although online CPUs are mapped to this hardware
++		 * context.  Passthrough requests are inserted directly into
++		 * hctx->dispatch, so use the software context of a
++		 * housekeeping CPU for them.  Inactive hardware contexts have
++		 * no online CPU left.
++		 */
++		if (!blk_op_is_passthrough(opf) ||
++		    test_bit(BLK_MQ_S_INACTIVE, &data.hctx->state))
++			goto out_queue_exit;
++		cpu = blk_mq_housekeeping_cpu();
++		if (cpu >= nr_cpu_ids)
++			goto out_queue_exit;
++	}
+ 	data.ctx = __blk_mq_get_ctx(q, cpu);
  
- 	ret = nvme_init_ctrl(&ctrl->ctrl, dev, &nvme_tcp_ctrl_ops, 0);
+ 	if (q->elevator)
 
 -- 
 2.56.0
