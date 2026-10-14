@@ -1,140 +1,123 @@
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B226502795
-	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 13:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791985403; cv=none; b=eSnyewTk2oPC38elDQLywLGOMqZkho2eSWMf+eUGG3RV9WWj/WXLKIfXKyJ0en581ljhQtkuZGbYEy1PxcrrFQqNfJc3AtIyD7kU76JcPEe3xB/QN2vdAORkaogfdzWgsP0t6gfS8Ti8iS6aGWA0ovOvC/ccqk4j7hU0Xy7ce+0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791985403; c=relaxed/simple;
-	bh=W4/9IswMV+nhf+i4xgS+WWcxFQT9qKFQQYu/KCal4N4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=fQXvJX5Xr+m6dph7z65HYrJDxeYYUMLLtHjSWtVSYG+n1JspSmgL9Q5rE6kzpSGHyoPLGGyhzjXYCV+uA3DuhXw/iHzwRwlY8obdD1e9kOyvxd9WH7yWYyhqjKYj1fjn8L+MtQuS7N9Cu3NE4xNW7xAgVGqfM0cJPBlxZP0UBDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=kLROKmT2; arc=none smtp.client-ip=209.85.161.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775D55448B2
+	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 14:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791988708; cv=pass; b=SYXIao3uVULKscIUk3BDdO8ze5/jHDkScXhN/wnfwIQlhoiaPW8XEzKudRlOXDDU7Podg1AizfdO6njz5VrmqqUhtUtnHAZ5vkuL4A7htH47BuXx264iaWtg565qvbk6EfAQH+2xNesywe00zdRsVpZhZyai59I7QGIswCl0HwI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791988708; c=relaxed/simple;
+	bh=Ht8GLTCoCKkoVxwpD5KYA+Pz/0xMc+C2begOQBfsCnM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LLiqn7fiCV028xCS36qWImGRmqKGHD8E8ul0XT/YwhFwK/eIjHIbQKoitTIwAAsxxgLGYPA7CR2cWlafLufoJBAP5vrpICWnVUcy1eunHeCFwMXkLKYNiU4b6Me7mJa7auAUZe5r//n3PN0eTYSWOPjuAVWvjrpELwwi2igbb4Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cngxshHk; arc=pass smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="kLROKmT2"
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-6de08b2e447so1751317eaf.3
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 06:43:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cngxshHk"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6b1aa4d71e7so990857a12.0
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 07:38:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791988705; cv=none;
+        d=google.com; s=arc-20260327;
+        b=V4zF/7i7kWQpEfPkLaXFcNuHS5xsggGis7+63k2uZxDc8jf0Pudsl2vd4myXXqKz2F
+         F2HcMkMzY6clykl+0hbxa4fncOA94pCRAOch2M98Qng2JEHDkdGQXO5duJNIApswz3UH
+         X+dEjQQmOIZeoznbGkqXZ0ZlLRqpkQDb4fX7mr09/dw2TnTNVgQusFYPO519s8UzGNij
+         JAnDkTXyuwnJA/JiEJ/KYg8ZHT+baGCZCF0PlNHCkBpQkV61XeMi183TIrO7bSKl4vEt
+         WLzPC8jgcaStrRlu3lH9ajh9Ud13OHGOQdw46xRMBUTGA5l5OVDJc2rqJouHvLxOaDJC
+         xxVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Ht8GLTCoCKkoVxwpD5KYA+Pz/0xMc+C2begOQBfsCnM=;
+        fh=a9079r63vn2+PGQPdS9qYozaH2t5qzDykXEW5VxYRcg=;
+        b=YCZG6mB0VoNcDt8keZnqvZLwCYnelNCBqEl9c5x4UFaLvaeMqiD69pYsFlyloxiXY7
+         UmXk59shkEbprt22Vn7bkqWvUJHNLwL7jMhgE6WhKiCr0yKggl1ifBJvLdx19WJzMHoW
+         dkzTeWkkx9RAWUoE7aBuXeKD6VAuAzt2wzXvmITaGoVORyHwuX4h7A8slUXl9mJBvaY6
+         AKZ6i3OqIRZFHLz2pbOBI0qZq8RfeQApLuT4Mnvv38rxKu8TH3kdEvU/er0GaFsSHSvP
+         mrrlipRznAJACIVPARAOuWlHjX5pOFyVYp/LfQ2NOYeHWW0jvdde/IH5qg390GwQuyl9
+         V09g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1791985400; x=1792590200; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/UfknVFgwY+ADn2+7Gfp8pJoPMV5PqQ31vPcFrLztQY=;
-        b=kLROKmT26XaiJ9Jhx/wSfPTgmiYMtcIZKIZZ4NvhjUUlLz+jhC/LMtiEpZk9Lz+n7a
-         5eBxNA/8dAK3Op6v28cXcfBdC6igqgkunU1dLbToiMNS0ffL8LwwDoUYkxMAOGcBmz9f
-         MOh64iVsLhij/9aexdZmjFZar8Z/kXuJtHhwrJIGodFii7WHY5ThNjfG34lGyYY++nIh
-         PHzfSrECEsmCq7q1ESdsNl09xl3zIKuJo0eZctV4Wm+y4rHG5oh3UMVFLjqsb3BHFPkj
-         i6PuBYLGJR4U2dwTAmvmkhsj9ChAfhLVVW7ZEveleh3DTB22nU+MJi8/vA9UPT9Qu0z2
-         oOSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791985400; x=1792590200;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1791988705; x=1792593505; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=/UfknVFgwY+ADn2+7Gfp8pJoPMV5PqQ31vPcFrLztQY=;
-        b=AJ2WGpbRvMYRnj36gOJOKazHP8xkPsQfyGmL/pSitWG9DfgCRdCpG6o2JvWT7ScWoH
-         zSC9xapSiQnbYjgUUkODcWduUwUQ0dn9j6wd2pWVOT5MwQPMOi5cplTjoNZs+gCJ8iOK
-         /aBGcZP0haf4e6Du719FSt7Ge18K5xUtOgJ4uMhGqQMEmA/tgmg3sxQpNFkI2wZLt9ok
-         hw3ztKLRVGF+rNeYRkwVEutBvf/G1HRheaBTlFsfcApIz+/BcGVrXET2vxDKd+YAdEIk
-         Yq5iKcjaNj/Cks1ZU4qmq8p16n6v9Bvp0J+lewHPE044OyWGwfjD/SJhlMCvmF2y7sXs
-         d7dg==
-X-Gm-Message-State: AFq9FYJ3UMoNQe9Vi9MiKXB83dxKkhFyKtRH8kd6NIqxisDdjlc9uiDP
-	qsCO1VXXgmzl0F1OUVjuipnDBMkdaYZ2BAcNK47NUs/bqesk9XaDyqkq8HcYOZKYR3E=
-X-Gm-Gg: AYBFou25S2C3rUgPg7NwHkFdaQefZ5OXNRtQgkji89tj58Ta2q/HVZQyN26v/A3etON
-	qRqg3C2S4i5G2ZLBoOg6/hK6ct6CAl1iKnlq2SAsXecJeycb+DirJq4YInC0tG3fJJqeeIKNWn3
-	VDlI7mK6rncYHoFshJmLEAs974Uh6YG2Ndd4JykuZqC5+dqsqHLzc/ogWGiJhIJYRPN1B1fR2ah
-	LMcRl/doqiWZPMRGwD2/96LzecKwTi7K5w6Hub+WyDGRFNKeDtgRob+TZYar3hGUSTfV/0O2qbM
-	wJ0BEimqSnBFLNDJoeEWNLNKXMKaYbRNXoECij+JdowBw0z9V+4h/WZI61rLmro+X9ZfKvxJFRN
-	pK5JHeOh5CgIc4Vgn/kYUXvRmmSu3SoJ6wm7y6cKwsovRBH5yrmoJWAS0EZreZd79fVqr6xo0M6
-	YqCGvj7SHHG1b/HEM3roxtlxDGQFqRCTJ6STujoS7f40muu4RJ8TXA/e6jjdtCCgoRV1rrC+DmU
-	XoTDYwwL1xz8bdf2CkdDmgBuyoIAbq0qkB9B8JiEe43efJhTQbz7pWnZQ==
-X-Received: by 2002:a05:6820:1c8d:b0:6fd:3c3e:3c66 with SMTP id 006d021491bc7-6fd3c3e3e7fmr1002063eaf.3.1791985400251;
-        Wed, 14 Oct 2026 06:43:20 -0700 (PDT)
-Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a6dfb4e92asm2073695fac.6.2026.10.14.06.43.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 06:43:19 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org, 
- io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
- Sumit Semwal <sumit.semwal@linaro.org>, 
- =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Andrew Morton <akpm@linux-foundation.org>, 
- Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, 
- Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>, 
- William Power <william.power@intel.com>, 
- Matthew Brost <matthew.brost@intel.com>, Alasdair Kergon <agk@redhat.com>, 
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, 
- Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
-In-Reply-To: <cover.1791975048.git.asml.silence@gmail.com>
-References: <cover.1791975048.git.asml.silence@gmail.com>
-Subject: Re: [PATCH v11 00/13] Add dmabuf read/write via io_uring
-Message-Id: <179198539824.583283.3195125120949504062.b4-ty@b4>
-Date: Wed, 14 Oct 2026 07:43:18 -0600
+        bh=Ht8GLTCoCKkoVxwpD5KYA+Pz/0xMc+C2begOQBfsCnM=;
+        b=cngxshHkw8vpezJT+yDObXyASEd/+1ZURQ3kSvVkslJTVzG3tDddeyu6Itpilt2JMA
+         ec1WM/YYgS3Rq+vyX4T4IeWYoQ6OxvUiPFQKj/JmDAP4bVMSF7iOJ9EhmAZeTB6IBdyW
+         hrr5fD+726lY+ajAr5CUAAonz79E10XEa2mHWfe7oiuU+5I4HQVr9qTl+RLPz1Diqx29
+         GtSbTklK5jEE1PNTzOz4Evx6U/DUQ6OIJjmi6onPw4b4rseZ8zc4j/e6G/SDgBZfMjcD
+         q01QWWumP4wG0aQUh+R5aOlmSu3VVONxsq4Rn1Mj6JpmuA+W5oTi/cpSHA+wcMS+164o
+         h7Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791988705; x=1792593505;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Ht8GLTCoCKkoVxwpD5KYA+Pz/0xMc+C2begOQBfsCnM=;
+        b=cPdLXUL6QxVsjg8c7T8HffK9ILJftTU4zRUHqHZtMaaACAmg2mzFCybChRFeZ2CgWu
+         CJ7duJRI0FCsNlKkU/5ambXW8ddXuN6j/Phwuo5cP79sCJjY+N7e0BSPgu5HLkAsEyJp
+         qzJPmSmoRrw915xHcwMV7prL1HX7jnAsEcOV57LV+Z+BkGaPUT0tziCEU3ohpZ95w5zy
+         mA5q2ecxlxb5PHcoo6IRguHq0rImTM50Dk7YmQUXkDNaAXQk9cl7n4N4OCfu6NFXOyMZ
+         xgphzoUVyyUoZnYTiQmXk1DMSu+Gq3TOgtgIoReIBJn3/rlUVwdtfm7nFqYold8x+bQb
+         yzkw==
+X-Gm-Message-State: AFq9FYKTpGXtnVB2flePaUKjoInoykNkFUTci+Kg393GJXTrMxRcZqzZ
+	SxMs8feAHr9GTVLtAexZaEvWblsXI1bNVONYpRfgEeMjq6iI0+5J8vsuhRCdXYFr8RwWuXS8ZLv
+	ASKvMmbrQvoanJye4AR2fqbbXN5xfbw==
+X-Gm-Gg: AYBFou2p6a6p5scLO7HVT7uNZ3LeHlc2n48ymj2hpUuNmRuuZ/7PdfgbPklr8LEte6S
+	+9cO6W9pBfjZOr6onLllElXpa6sVK360iYa7j7QjIcdcg99UPArcztBcRd8zWGQONopaJ+pUlpK
+	jpx1OSUuiB2z0wOdbIZF5SP6KixWXR4xf38lev1zSqx8EP0BKOXgCXOQWoaLigKZ5eMSqumJBvR
+	rrarSL5htvwod7cAHgtL9YUHle4cz+sV7Cgs8biMUEwNG7H8ZyKcAW+wjpetvDmGoijSa0H3IlE
+	L1FeAcxsi3ChmNsNQ8ZGwZ9NY7CTA22rMxF9yOPq70QgeiYBQHIPPAd5xskqx2F0aE7ALK5VLQI
+	GTyEyCIqNn3x2RGGZRKWSbfIFwht+jl/Tn8362fI=
+X-Received: by 2002:a05:6402:1912:b0:6ac:b9b5:8e8b with SMTP id
+ 4fb4d7f45d1cf-6b17c2a3670mr12616709a12.15.1791988704432; Wed, 14 Oct 2026
+ 07:38:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+References: <cover.1791975048.git.asml.silence@gmail.com>
+In-Reply-To: <cover.1791975048.git.asml.silence@gmail.com>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Wed, 14 Oct 2026 20:07:46 +0530
+X-Gm-Features: AclHuK8DZ9QwF2AgJ3SDr4lT4xl3Cf9evBnlWqjNFK8bj0mT2h6JXCYZXSbhb_A
+Message-ID: <CACzX3Ases=5auovox0XFNheDHY9iNmxv2BvB0dugC-W3mnjGLw@mail.gmail.com>
+Subject: Re: [PATCH v11 00/13] Add dmabuf read/write via io_uring
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linaro-mm-sig@lists.linaro.org, linux-nvme@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org, 
+	Christoph Hellwig <hch@lst.de>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>, 
+	Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, 
+	Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>, 
+	William Power <william.power@intel.com>, Matthew Brost <matthew.brost@intel.com>, 
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, dm-devel@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
+> Tushar, William, Phil did a lot of testing and experimentation on various
+> devices with previous versions of the patch set, and I've received lots
+> of help from Anuj, Kanchan and Nitesh with investigations, testing, and
+> patching. Earlier benchmarks by Anuj for IOMMU optimisations with udmabuf
+> showed:
+>
+> STRICT: before = 570 KIOPS, after = 5.01 MIOPS
+> LAZY: before = 1.93 MIOPS, after = 5.01 MIOPS
+> PASSTHROUGH: before = 5.01 MIOPS, after = 5.01 MIOPS
 
-On Wed, 14 Oct 2026 12:01:58 +0100, Pavel Begunkov wrote:
-> The patch set allows to register a dmabuf to an io_uring instance for
-> a specified file and use it with io_uring read / write requests. The
-> infrastructure is not tied to io_uring and there could be more users
-> in the future. A similar idea was attempted some years ago by Keith [1],
-> from where I borrowed a number of changes. Later it was brough back up
-> to life by Tushar and Vishal.
-> 
-> [...]
+I've been involved in the development of this series, so I won't add a
+Reviewed-by tag, but I tested it on NVMe with both an AMD GPU dma-buf
+and udmabuf exporter, using the liburing tests and custom fio plumbing.
 
-Applied, thanks!
-
-[01/13] dma-buf: introduce initial file I/O infrastructure
-        commit: 0d3120db2cbe0a8793650e19f0923968a406ca2e
-[02/13] iov_iter: add iterator type for dmabuf maps
-        commit: aeb3bb52052b3548b3acf0cc5606dbb5babb228b
-[03/13] block: always adjust bi_offset on bio_advance_iter
-        commit: 801503b9a66f7c2423b5e495d8e77e0f4447e5d4
-[04/13] block: introduce dma map backed bio type
-        commit: d88e44f43e939e6ac0ca8302c6f3c957b33aa5fe
-[05/13] block: add dma-buf support for raw bdev
-        commit: 839231d193932ca0d592c2859669066f7c43731c
-[06/13] nvme-pci: rename nvme_pci_sgl_set_data to nvme_pci_dma_iter_set_sgl
-        commit: a03648e2efda070322cd4066abf4dff15be093c4
-[07/13] nvme-pci: implement dma-buf backed requests
-        commit: ce5e386c110815e3a29e3ba27d97575c28589c39
-[08/13] nvme-pci: add SGL support for the dmabuf path
-        commit: d5c8cfd41d2575c65c3f1d543017949e578a92d3
-[09/13] io_uring/rsrc: introduce buf registration structure
-        commit: 727a66ad21b013555eedfd84559cd4707717463c
-[10/13] io_uring/rsrc: extend buffer update
-        commit: a5819c456b716fa8bcb7792b942ab02b15e07fc5
-[11/13] io_uring/rsrc: add uncloneable regbuf flag
-        commit: 13b1690bb4767d3f1c847baf71a704c5f2da99e2
-[12/13] io_uring/rsrc: add regbuf import flags
-        commit: d218f3e381908da0e68429f3a4b764e666564c60
-[13/13] io_uring/rsrc: add dmabuf backed registered buffers
-        commit: 62e4bf5b25d4458cf8aa9dece9022359f39f2294
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Feel free to add:
+Tested-by: Anuj Gupta <anuj20.g@samsung.com>
