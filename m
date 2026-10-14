@@ -1,62 +1,64 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC80D3F485E
-	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 17:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF01051CF4D
+	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 17:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791997257; cv=none; b=OAjpQiwVMqZVaNZg8GKG2KEDaEEx6KC28VbO+RsIvfv+LHAhYvjZw0+aIi6SktAx3uI3RQLmKLRIll93QeMD3F5ECAPliG54t6cq38w6Vf4bPuvmHjj3gKRyp5c5PfKaoh/TTSi8lEUXbDzmwQzOhJr7sJee7seUd7mPbgTXYK8=
+	t=1791997260; cv=none; b=gh8IeqD+JtEO6lw5NUw/nm96ILA+nF4LZi3p5wo0wzOLFwfLgxle6KORmLEGwuY7nzfM45vU127LIdNL9ysk3pshjIvGpejx55QK0zmckDzw8isLcCMsuFKHoiODkGh1NoC45DC0xPeX3O93Um5TGOFnsNOqV2BfT+6jXACwgVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791997257; c=relaxed/simple;
-	bh=b2df2aXNGqCs5jCIHwWB1+oFvAqwoJEyzyCztqI+mL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M0IW+Y7GAedjinjEOFsadc5I88TMRErT6X/EKAku8lAi5sBQOGZUD/o3KD31Ahget54igKDce8oKbcZlBbiIVM0iBnHP7jBaJW+B/8ZerSsSOkKNOh72PYQk/Z9aUVZjV0I+UvkTKG1x7MbS7jU3vDXCtESHnw3K87jcmCbO968=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NtHMnSUI; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1791997260; c=relaxed/simple;
+	bh=0L7C8ctYfi293cNCLCSW7hT8n4TfzolwC1rYjwjGgVQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=A6K0IgB0qzEuMa1dnqg3dYydEzz158zjJ2TnLvcXlU5nf+iEM4N2ESQvCmy/9KAeusWT7D6l8H4mvZcpl+Lf7ZiqPX4pJkHPGr3w8ojZ+m1Px77oeTiwI7FMm0L183FHkJMeaOSipXAqmvZ3jCy2v5WIoXKDryxB/FR//5TisxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hsApGbIv; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NtHMnSUI"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a022fee0caso41178755e9.1
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 10:00:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hsApGbIv"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a02667ccebso32050555e9.0
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 10:00:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791997254; x=1792602054; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=QOBgvIN3PYDY+cIEwUK+qMtv/Bkt+tCopG81B61mV0c=;
-        b=NtHMnSUIrejB+0TEyEYzbzaXlRA8ZBc357ih6M8+41Kr1b7juTmoqTHVmie8x90t+p
-         rFQohpP/I6kA54QHf/k5mFZ6SHyM4Ax9qJqSw1yHslJvdGZZTRuoLihXZ0PDXBHqK7ey
-         E28vIwlgqQ8XS03n5bEbEEiSjuFNWorpBOOo4nNlKiZ8lpvUr4ZmA/lt9l9GDn0ZZ/m/
-         ruN4+1uGATSQOPeOFci9DbMfFgO3hlcQGVuxeste42JYRP+JIOg4Nw+IP70u6EkLhb6G
-         zqJSfntXWWDsdfYDMYs2bApVh1uJvADhKOp8Ya8QJ0GKR4+7m+EZ1cqWkYgsGPD8HHqB
-         nd9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791997254; x=1792602054;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1791997257; x=1792602057; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=QOBgvIN3PYDY+cIEwUK+qMtv/Bkt+tCopG81B61mV0c=;
-        b=ydgauXFcHEgOf1C/F2Q7GUMazI1JEHWw62f4Z1Zh8b3NDY5bWBJ7SX4PaJwDn6FQUN
-         HN85VVM41+d8khaIiYNbPudXknTb0OVVSSIIq57WskFpM/TfblrNykHsJNWaHMNDZCj+
-         I1k53dl7UtGgvpRY3mO4TINM/YHh3tPMbME9YWYvhNjICdiYv8KbZSYsqvMdG1t982Jk
-         Qwp060UHT3Gh9hfMFe/wU1udKxg5+13du7n06zs+RMM1vcf3rlYeOx5m0Lca7qj0IEKh
-         /wVxR+seYfjFro5AABYtsY6OedSZeuZuIz8Kpy7UE2taXkZiIbCcjwFkYCiDUjj3YwvW
-         ps3w==
-X-Forwarded-Encrypted: i=1; AKwUvByYqBvD+nxp/V4zcdGqWPvMv+D4e3G9C4HCQ3GIUS3V0+ycLkl4Jt5oIIUwIVDBo4NqrZzDz78YeABdnw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKLSfngjl4qEofh/oyBgJjjmjVJcNT+Eyo4+XhfMQ7C96wvahPi
-	VbD/9a+GsOnSxS2maQfHYTdOqmo0amRIa5jyzGeQeQnoVi4A/t1BDiJu
-X-Gm-Gg: AYBFou1J5XxonLJtBt/+SJoAN/N6d3chN/WVilx8LcQsPd39GjWBT7eWfWqeBWSB7ya
-	0WGDQ9EbVrnF+gbQ+LuKL6JB5it1S9rZxOyKN82lmpbE5ejqhS2xcJaggMgL8UV65VVLODuPbyp
-	Qes5AJyclTy7LCBQ13Ef0AjXzZ6x0MJRTmjfTjpysUe8gpQf6si2t9Oh7LvIH4lM1r1av7tzBOl
-	gGCQgsDp+1y2vFb+TofU4xiJ4Ki5HGA/Ni9Z47e5KFNAY0k54n9RxeY3daWeoOLX3frzp6Jklfd
-	/D2BTKmaUyN91F38Fg5pj/jI7CCfVCCu4gzJK6rGhxfk+YHJJbQAFeeDHku6yKxY0OpNttsJGYN
-	2P4nwS+ThVCdwQvDC4fWfvGTiZOU8ofVXiieYJX+Y/BXP5z9g3Vd6prpjYaE3+iYdBHrutAbwhW
-	EJkHymi1s3FGEiiN+PWe1tvn5wkWjEu7xFXBCHGijZYND0MBscipwbyNvYXb3eCrWh97ZSTSJwd
-	BKJhpQGBRQBvEtd6dL+D6ILPE38WEJy8tVCvOfhqT1qsw==
-X-Received: by 2002:a05:600c:609b:b0:4a1:83f0:7c91 with SMTP id 5b1f17b1804b1-4a18e4ca1dcmr313482265e9.18.1791997253716;
-        Wed, 14 Oct 2026 10:00:53 -0700 (PDT)
+        bh=cLpXe4/u91k9DHDDYoXmFNxRFAC/Zm9beCfIpbWNzcY=;
+        b=hsApGbIvwlPnvYvA06B8Bfc9dES7svKX8kjnDoCuzUIq031bdXB2KShiHrQJZFFot0
+         CgSqDOklCBf52gBA0N75Qs5cfBKJtAJA9I0o89s2r+KMWgGjVbXE9BWSjzx1zEoF2X7S
+         +N/jwI+ZtcXpmcmjRAqwInFaHHmY75GnSJFybwBSl+Gdt/zdGbtUvUEbRgJtA02To8Mc
+         xK4iio/Nzvi/yG6wXLzHQmrsHwti2DjNq/Moxyikrkj8iQCvHF8B3unHy6OCXCiOkO0J
+         lJ8je+HDGwVJjT5DvPV/WsBf5MupX3KUpbllJrt/ndJ5I34Ba2ti1EHP/jy2EkNKf7u0
+         JG9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791997257; x=1792602057;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=cLpXe4/u91k9DHDDYoXmFNxRFAC/Zm9beCfIpbWNzcY=;
+        b=u6/oIbj739yNFjvsi6XmFjLbNhjXKXOetmeTjPMTv98r/l5pfSwpv3ft7jz0+90+hE
+         d75AE8psIe3yLkWCwC2rUXV+gY4PHvxmXXg4IKfczK5KWd9i7VetEP6mdgdNQ73tJ/g2
+         yLVHD13uPC3ryEvYgqNzYlHUL/NkJnNHi5k2aiSkTwPEQ6Cb08ulqakWhNPpcCBB5Pku
+         G9gOO9HzbmNccok6pAn3YNrf3DMx0LmRB82SkiZGP/WHKh/ia3yRqvyl5sKdobbIBRCa
+         lmIxAvxaF1gDoEsveBf1LzrvbDAu23HbYhrSO1jcmkPuoXnj8ipAUWdrVEJnr8otenVv
+         JJ7A==
+X-Forwarded-Encrypted: i=1; AKwUvBx7K2bw+bHyD14hR/LaJKbDZtzckywc1BF/oTvESGh2Udgkeg9IOYJS6rkX5CYWGYyK+DsNq/QqUoRXiQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJG+76IhUNfjFqR/wp5/l95KYwxOmtAD3R89C7r1xKF7EKlzo30
+	BfWXTTMFPPjZdnfLNmJYkHuuLr2qSSVOO38GQpsU5PD/f8Vos934/M6F
+X-Gm-Gg: AYBFou1FYAZ88wt0519PLzOFZR5BJ8BzEcQJt/n7L6KlYuG/m7ezTvZoDxoZXBtdPQn
+	HRkTOXPPAfde8oQjvrZsMax2yZP+Pbwkbg7eted6mBEcA7z1CHBBtPY+TOC2ZbCftY0fNBdxnVt
+	4KBmGxkH/0RTa8AqunISikotFcIbyTEG4okyPw/A6jJ3EtozNfOi/oF9gQbVokTt5z0lG8nprjT
+	22I45ld4SseFEmuWaf0bkHPJMTy/Ji6R8LIErgFKwvha+Vix10CHwY4g64R3HjiaE4y8hEHkps0
+	EY7mGykBHYSSyr+dFOVnNbqlQjNbM8o8w6nGfNSv+FgFLxvVyW8nYPJP2sTK/eS1Z463keGoVES
+	9l8y1u19/M7UW4lvIs0ZbVksw+94TUEh0GMAYxg3zFPpwzNkZYczMMGnxSLpCjGLnGFeP2fvfWl
+	MComD/P3aOVJ7ADsUqWyD5L4VFLy0Vk/ppkBEOvGvie/ZKAPDUHo6ctDjNSAwwDsMOKRoD7LG+L
+	kyOK237pBKnhE/1CKfTqaIeo8z2zlcu0kE5+rjLDw06Kw==
+X-Received: by 2002:a05:600c:190b:b0:4a1:82cc:1e9a with SMTP id 5b1f17b1804b1-4a18e4b2b25mr330216135e9.17.1791997256518;
+        Wed, 14 Oct 2026 10:00:56 -0700 (PDT)
 Received: from andreayoga.wind3.hub ([31.189.109.133])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bd9a8a22sm5349415e9.5.2026.10.14.10.00.52
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bd9a8a22sm5349415e9.5.2026.10.14.10.00.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 10:00:53 -0700 (PDT)
+        Wed, 14 Oct 2026 10:00:56 -0700 (PDT)
 From: Andrea Parri <parri.andrea@gmail.com>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
 	linux-block@vger.kernel.org
@@ -67,10 +69,12 @@ Cc: Andrea Parri <parri.andrea@gmail.com>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Daniel Wagner <dwagner@suse.de>,
 	linux-nvme@lists.infradead.org
-Subject: [PATCH blktests 0/4] nvme: add nvmet zone report and FC regression tests
-Date: Wed, 14 Oct 2026 19:00:37 +0200
-Message-ID: <20261014170046.2516-1-parri.andrea@gmail.com>
+Subject: [PATCH blktests 1/4] nvme/rc: add zoned null_blk target helpers
+Date: Wed, 14 Oct 2026 19:00:38 +0200
+Message-ID: <20261014170046.2516-2-parri.andrea@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261014170046.2516-1-parri.andrea@gmail.com>
+References: <20261014170046.2516-1-parri.andrea@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,58 +83,90 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add regression tests for three nvmet bugs fixed by the kernel series
-"nvmet: fix stale data exposure and ZNS validation" [1]:
+Add helpers that export a zoned null_blk device as a namespace of the
+default subsystem and connect to it, tear that setup down again, and
+issue a partial Zone Management Receive and check its completion status.
 
-  nvme/071  "nvmet-fc: only send read data for successful commands"
-  nvme/072  "nvmet: zns: don't leak stale memory in zone management receive"
-  nvme/073  "nvmet: zns: reject a NUMD whose byte count wraps"
+The zone report tests added next share them.
 
-The nvme/072 fix is already applied to nvme-7.4; the other two are still
-under review.
+Assisted-by: LLM
+Signed-off-by: Andrea Parri <parri.andrea@gmail.com>
+---
+ tests/nvme/rc | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
-Patch 1 adds the zoned null_blk target setup, cleanup and zone report
-status check that nvme/072 and nvme/073 share.  Patches 2-4 add one test
-each, with a small C helper for nvme/071 and nvme/072 where nvme-cli
-cannot express the check.
-
-All three tests run on every configured transport.  On a kernel without
-the fixes, nvme/072 and nvme/073 fail over loop, tcp, rdma and fc, and
-nvme/071 fails over fc, the only affected transport.  All three pass
-with the fixes applied.
-
-The tests take the next free numbers, nvme/071 to nvme/073.  If other
-nvme tests land first, I'm happy to renumber them and resend.
-
-[1] https://lore.kernel.org/r/20261012141239.156408-1-parri.andrea@gmail.com
-
-Andrea Parri (4):
-  nvme/rc: add zoned null_blk target helpers
-  nvme/071: test that nvmet sends no data for a failed read
-  nvme/072: test nvmet zone report initialization and length
-  nvme/073: test that nvmet rejects a zone report NUMD that wraps
-
- src/.gitignore           |   2 +
- src/Makefile             |   2 +
- src/nvme-sentinel-read.c |  89 +++++++++++++++++++++
- src/nvme-zone-report.c   | 165 +++++++++++++++++++++++++++++++++++++++
- tests/nvme/071           |  80 +++++++++++++++++++
- tests/nvme/071.out       |   2 +
- tests/nvme/072           |  68 ++++++++++++++++
- tests/nvme/072.out       |   2 +
- tests/nvme/073           |  46 +++++++++++
- tests/nvme/073.out       |   2 +
- tests/nvme/rc            |  61 +++++++++++++++
- 11 files changed, 519 insertions(+)
- create mode 100644 src/nvme-sentinel-read.c
- create mode 100644 src/nvme-zone-report.c
- create mode 100755 tests/nvme/071
- create mode 100644 tests/nvme/071.out
- create mode 100755 tests/nvme/072
- create mode 100644 tests/nvme/072.out
- create mode 100755 tests/nvme/073
- create mode 100644 tests/nvme/073.out
-
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index c415ca1234407..270fad19d61f1 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -408,6 +408,67 @@ _nvmet_passthru_target_cleanup() {
+ 	_remove_nvmet_host "${def_hostnqn}"
+ }
+ 
++# Export a zoned null_blk device as a namespace of the default subsystem and
++# connect to it. Callers must source common/null_blk.
++_nvmet_zoned_target_setup() {
++	if ! _init_null_blk nr_devices=0; then
++		return 1
++	fi
++	if ! _configure_null_blk nullb0 blocksize=512 size=1024 zoned=1 \
++	     zone_size=1 power=1 >>"$FULL" 2>&1; then
++		echo "could not configure zoned null_blk device"
++		return 1
++	fi
++
++	_nvmet_target_setup --blkdev none
++	_create_nvmet_ns --blkdev /dev/nullb0 --uuid "$def_subsys_uuid" \
++		>/dev/null
++	_nvme_connect_subsys
++}
++
++_nvmet_zoned_target_cleanup() {
++	_nvme_disconnect_subsys
++	_nvmet_target_cleanup
++	_exit_null_blk
++}
++
++# Test cleanup handler to register with _nvmet_zoned_target_setup().
++_cleanup_nvmet_zoned_target() {
++	_cleanup_nvmet
++	_exit_null_blk
++}
++
++# Issue a partial zone report from zone 0 of namespace device $1 with a
++# $2-byte data buffer and NUMD $3, and check that it completes with status
++# code $4, or succeeds if $4 is 0.
++_check_zone_report() {
++	local dev=$1 data_len=$2 numd=$3 expected=$4 desc err rc status
++
++	desc="zone report with $data_len bytes and NUMD $numd"
++	err=$(nvme io-passthru "$dev" --namespace-id=1 --opcode=0x7a --read \
++		--data-len="$data_len" --cdw10=0 --cdw11=0 --cdw12="$numd" \
++		--cdw13=0x10000 2>&1 >/dev/null)
++	rc=$?
++	status=$(sed -n \
++		's/^NVMe status:.*(\(0x[[:xdigit:]][[:xdigit:]]*\)).*/\1/p' \
++		<<<"$err")
++	printf '%s: exit=%d status=%s\n' "$desc" "$rc" "${status:-none}" \
++		>>"$FULL"
++
++	if ((expected == 0)); then
++		if ((rc != 0)); then
++			echo "$desc failed"
++		fi
++	elif ((rc == 0)); then
++		echo "$desc was not rejected"
++	elif [[ -z "$status" ]]; then
++		echo "$desc returned no NVMe status"
++	elif (((status & 0x7ff) != expected)); then
++		printf '%s returned status %s, expected %#x\n' "$desc" \
++			"$status" "$expected"
++	fi
++}
++
+ _discovery_genctr() {
+ 	local port=${1}
+ 
 -- 
 2.53.0
 
