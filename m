@@ -1,63 +1,63 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330EA4F4743
-	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 11:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3B24FDE69
+	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 11:02:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791975764; cv=none; b=uKeXkMc1P+1ap3t/VB5C51YRai3eudbluHevVqh6mNCtfpsVprXjVRkNX9oFyPs3IiVZsiJhW1vgcumwvS81uEYV44xLlwBTS+4oynfdn2eqGQ//FTntjuKJ8yHk8EqAqycqxnAw7swk9eaBJrfXVH+BkyBK3O6DHZ38dRHg098=
+	t=1791975769; cv=none; b=ZTRGFM7azj6cxVAN3xKbacP0E+0qAkwctQEie9e8bIxzJJmXdgzwl9mAIHwSi2aYYDQsMHxpZ/2NHNOnIMpBB8X0B8+o60JefzVV4QXMssKOY1QZXw8A2Cb0iJnLuorn0gVBYB5rLksiGx0aMazD/ZIJKBzZHbGFdXipzPxJ8zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791975764; c=relaxed/simple;
-	bh=ixhh2GRwYMc7RdtfH5U8ta21UkU3OCGiQaTzkgMFwUQ=;
+	s=arc-20240116; t=1791975769; c=relaxed/simple;
+	bh=VfD6HJzx1Y38GpK6rDkYF3jfCC0ZHJ/tqnfgL8fmZrk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q88KVSPfWEbGUAjFTuXFwXpALcP+uXZm+Cqz1TjiU2yyCwQRZZTw4wAVgw01gJrh/y4DhyogenrKfb8CepEXosXVITRJ/cgxYekVjeC47cmc1NwY08zBEkqU1RYYgQntmLYgFxg3p/OtkCXVyz2Sn2UuQ9q+UwArcF03CUtUpUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IxObNTWs; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=dsZAwlTaMFrCOqqBBDGGR3tbKDKhGFbJTHhnBcEe0VNUBcRKiCRhFTeaHGvIbQQppyKbFvZvc/1RyOApT2qFUOlwxEHS5LeQj0ASJhTU4XLHfMZnO7DlRvcUpSTqkGQZJ1B5M32lnY/wvBZemhHQMrJ9rRCOeOYCC+ai6c345yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E3TXbZ0F; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IxObNTWs"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4a022fee0caso37092815e9.1
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 04:02:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E3TXbZ0F"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-49d05d51553so5095885e9.2
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 04:02:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791975752; x=1792580552; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791975756; x=1792580556; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=dgD4ZRKr/dSiiTwqauwPBK2KpAxV+NZiR9fa1tWOdeA=;
-        b=IxObNTWs+PDB9SxaVo/xi/TR8A4oRf6WOMUUYDuW+6Oc9XKsSLDQwd16g/yhkcSOap
-         5fh8vZbP+Nsh+w+Bx574uiPaO8B0pve1FzLTWEHUZcZmddoSIKsToqmmwxpkSc21Usq5
-         LY3/jrepf4MRcithEC9Muzv3L8CGmqfTO/RfoujNuWwA+jKyMDK9spsofsuh3ZDxwVpf
-         Otcgbs704uqpzs1FnGtkxZDcQ7X+DB+KxAJemVSynnkIkT4H+bl12/J6oYzVwiBvbWSw
-         DSQ+wzNR+SQW2E5JbaxtIVMiV4SaN1EtPGgLtRxClcVq0jP4zolIz4TNTf/hCKOc23gQ
-         AnMw==
+        bh=XniK4D9I5IxaguHxPaSeNTaZUyaBimf3PNveaq2tpgg=;
+        b=E3TXbZ0FCh/WllUwLQrvmEis4IBA34kDY1oulmfCb5z5QhMLc6rbgbAXbTYOl6o6Am
+         xMiFRrCvYbQe8r/txbAws1RhwPEULtHySTadC7kW54UTrdC08T55wA+Wx1CMS3yXinEZ
+         RmVhIjK4TzvPHRG13lMTkHIuv8y5rDuujvjHeE0yceRaIqJ+Cg7vuDcv7KyVi2OzR06Y
+         pjsmdppc7XLFSUXuJtpo8epflMfy/QFxiFjgtfOAc+yrvbhk376kqbgFY0pesePWlKeK
+         WKJRYBTl/8c4tsSAQarZt25zgS7k7EnERHCq5JQO86bA4oZ6GXNtMOjkzrQ5Gxx8bZlO
+         FVGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791975752; x=1792580552;
+        d=1e100.net; s=20260707; t=1791975756; x=1792580556;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=dgD4ZRKr/dSiiTwqauwPBK2KpAxV+NZiR9fa1tWOdeA=;
-        b=lZ/8VSPReDAB1DEhu/EsQPTKLcfpPR/tOrQjlIB0bFiSgXeLAwDbS+nW2bXD4EAbEb
-         xhPnj7HiTCjZAFpgfnvA0ko/jEqwvyL+CFNcgiZ5zXGPp56/NB2tV41XGDXl7BxyabYM
-         +Q/Ek5lIrxMlLj6ovwbyOLjY4TlEHg77tjUAZiDCLLk/0J3H1j+iZmJPcGmc9Q01Hvo8
-         xBagi8Ti/2UPHR1I5mk9VBC3wAXyh0uFfc/nXrwcSvZqxorvvfsfcM+YMiWjgsh+1tx6
-         glCloRsNFpvBHq8tuipyhmehRhOmzhqhak8FUqb3ILHzdEnX8fnGuezMBIVhweGDbmZM
-         eXgQ==
-X-Gm-Message-State: AFq9FYKsiJBN5x/9eUQoaPtYH0N2hoV9jx5Y5rzmU5lpmvjAK9yq/SoA
-	GetHLi2GHu/lUbVGBT3E7jPUOXtzjqbuAGlZaNkn6kBADNpjcJu5DVeMXZjDFQ==
-X-Gm-Gg: AYBFou3SnaLUr9aHHJp2HiCgWFUEA7BBuldpWXLgCqCW2P5pm4xfRY4MDkkz5ODBxA4
-	XwzUZ10oEdkt8Q3g2nlcS0yt53fo4o3A10OLYqDnE0lhzgDdOSm7eIIm7n6/ZbZq51+x86/fmnP
-	A0PQWTIp9sFBW1N5tLjpaeZKIjOQEN10XfNqal9ZWhxIOenKgsUEi0IMU7+I5+nzZv8l6+yAG+u
-	bQ2KarDE+UfvSZb8rmlwYEawezooVCYYJ7jazI4hXn+6IaBKdjb41DKeLXt/SgI4JaFFjoBLdK0
-	P57DAHk4OEphzrlnzaeTDMtwy1WcBzADjbJkj9RkxZvgUBKJRlrGbrLGGGXjLlMi0SkJpU39QIs
-	e3poRHoxEM11J3Q/7hDXp6Y/8naavbZjCc966K1Jkc6Hu3g2I7rC6lq3ABDrStI9kIOzKo2Qxsr
-	tKf97YD/ezP3+m+l0btvHMtMX+A49RfHFFqWfrTWq2AFN86XuAVQxS+WzTmayFxt3GoCXKKa9OX
-	3DtfkoKOF57laQ3FBuK7BTSkjU5JSy9jHBvEuz5iLDRLsRJ4KonhP9w1Wdo9Wens1DI30H7YC77
-X-Received: by 2002:a05:600c:4e11:b0:4a1:7f41:b9dc with SMTP id 5b1f17b1804b1-4a18e4d67famr306600635e9.23.1791975751569;
-        Wed, 14 Oct 2026 04:02:31 -0700 (PDT)
+        bh=XniK4D9I5IxaguHxPaSeNTaZUyaBimf3PNveaq2tpgg=;
+        b=XAcjwuFP3zhnJ1XQ88UYEtga8MR+we1969EfalSyMiZTq9WjiAwsYYFKPUDDD5Axew
+         hnDLeyruliSYrGK30Ul/1dpuw4+JpMzoUbBwDeDN0IzMREbRabusXZSafvd2DlvkvU2I
+         OBIwO5R783e4WKUDU3Necxc3zCFp3VYk3AEdI8AxF4V3UJAK8Z+bdNE4cUiyGoyPutxp
+         0irf8P6DTdjNmBITfXhp1Cny5cbQ+rWg9tGBHLpwNeEmybHGvlmUCOk9lJrCQ43ibd+a
+         ye0ISiYJS6gagcruFexUZvMGHTccS6kxp0SUzpEUQ1KE4DFCO/xOughRh3Wk5jDVEwlc
+         ooaA==
+X-Gm-Message-State: AFq9FYL+7PIM8QXYI3AWj5/dn4krjNtNy3RE0tx3zuGDSglXEtBudqW3
+	sac69wKDHol+ZHEiVSL3rDF6oioZRSlBlN/x9F4XIwl4HWfdf3YG6dgLk8+aeQ==
+X-Gm-Gg: AYBFou1823FS6fYenlAIewmlQfb8vS7xd6nbKeYPsgmMUdQCWHR1yZ8SXnazW35k9HD
+	17S/EUY8WL7dzQ+85LiG/hUtOZcyJdB83IH4vdn+jPm90pw4mJ39gV2a/UAMa+LoU6f2EwYMyg0
+	a26m2B3a2yBypJM32f53ONxO8c4GIj2rzv5xkhXCP0YARoaNwDap4cuRbO/zRLLA49m70bMTkB1
+	Ug//KbvviMnwmi5i3A4mERR6RBnAT0MI3xpFmbdHMNbRMddmSsAWpvAOsXEAkiB1kojDbzjQeXa
+	lJrfAYdN/J1UwYtf6mJbDvJrzGaSX+ZFdU3/dmXztQYasrs39Bq4SD1LkXosUIdhUqtNTRxsNmr
+	tRFYPHNX8licW4PcXsAHpSQk5bpN6MfoPbNN/mTMbSiSEsCEhmbuyCEgFrpSuXD0Se/hXLtuIuo
+	a6K3TxOMtJhgHjt0R82JEXsu5nuB3KALOadDHM7O/PCx60vWM7H5mf9SdiUYpf8ZhSmcKlB8M4F
+	UIEr8dELh7bZGfsIeb+kvoBlqI3GdH2Bz7D+tNuDkkO78Gm9J645Zq+FXob0wTljVmZHgGfW5H6
+X-Received: by 2002:a05:600c:1549:b0:4a0:25c:8af2 with SMTP id 5b1f17b1804b1-4a18e491051mr343632765e9.17.1791975755701;
+        Wed, 14 Oct 2026 04:02:35 -0700 (PDT)
 Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1b45eb78csm38078845e9.2.2026.10.14.04.02.30
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1b45eb78csm38078845e9.2.2026.10.14.04.02.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 04:02:30 -0700 (PDT)
+        Wed, 14 Oct 2026 04:02:35 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: linux-block@vger.kernel.org
 Cc: asml.silence@gmail.com,
@@ -89,9 +89,9 @@ Cc: asml.silence@gmail.com,
 	Mikulas Patocka <mpatocka@redhat.com>,
 	Benjamin Marzinski <bmarzins@redhat.com>,
 	dm-devel@lists.linux.dev
-Subject: [PATCH v11 07/13] nvme-pci: implement dma-buf backed requests
-Date: Wed, 14 Oct 2026 12:02:05 +0100
-Message-ID: <9540e74b5d2dd1a5dc0d436bc0c2a6f5e18fc389.1791975048.git.asml.silence@gmail.com>
+Subject: [PATCH v11 09/13] io_uring/rsrc: introduce buf registration structure
+Date: Wed, 14 Oct 2026 12:02:07 +0100
+Message-ID: <178bbcbc7a0a9cf017284e8b15d5434fb546fcaf.1791975048.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <cover.1791975048.git.asml.silence@gmail.com>
 References: <cover.1791975048.git.asml.silence@gmail.com>
@@ -103,509 +103,155 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Enable BIO_DMABUF_MAP backed requests. On registration we map the
-dma-buf and store it as a prp list, which is then used to initialise
-requests. All attached contexts are stored in a new list dmabuf_ctxs,
-and additions/removals are synchronised with dmabuf_lock.
+In preparation to following changes, instead of passing an iovec for
+buffer registration introduce a new structure. It'll be moved to uapi
+later, but for now it's initialised early from a user provided iovec.
 
-Suggested-by: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- drivers/nvme/host/Makefile     |   1 +
- drivers/nvme/host/core.c       |  12 +++
- drivers/nvme/host/nvme.h       |   2 +
- drivers/nvme/host/pci-dmabuf.c | 169 +++++++++++++++++++++++++++++++++
- drivers/nvme/host/pci-dmabuf.h |  75 +++++++++++++++
- drivers/nvme/host/pci.c        |  93 ++++++++++++++++++
- 6 files changed, 352 insertions(+)
- create mode 100644 drivers/nvme/host/pci-dmabuf.c
- create mode 100644 drivers/nvme/host/pci-dmabuf.h
+ io_uring/rsrc.c | 50 ++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 35 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/nvme/host/Makefile b/drivers/nvme/host/Makefile
-index 67563a69f7dc..8288b986d713 100644
---- a/drivers/nvme/host/Makefile
-+++ b/drivers/nvme/host/Makefile
-@@ -21,6 +21,7 @@ nvme-core-$(CONFIG_NVME_HWMON)		+= hwmon.o
- nvme-core-$(CONFIG_NVME_HOST_AUTH)	+= auth.o
- 
- nvme-y					+= pci.o
-+nvme-$(CONFIG_DMA_SHARED_BUFFER)	+= pci-dmabuf.o
- 
- nvme-fabrics-y				+= fabrics.o
- 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 7eb0f9fe6b18..2f9b2262f77c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2708,6 +2708,17 @@ static int nvme_report_zones(struct gendisk *disk, sector_t sector,
- #define nvme_report_zones	NULL
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
-+static int nvme_init_dma_buf_io_ctx(struct block_device *bdev,
-+		struct dma_buf_io_ctx *ctx)
-+{
-+	struct nvme_ns *ns = bdev->bd_disk->private_data;
-+	struct nvme_ctrl *ctrl = ns->ctrl;
-+
-+	if (!ctrl->ops->init_dma_buf_io_ctx)
-+		return -EINVAL;
-+	return ctrl->ops->init_dma_buf_io_ctx(ctrl, ctx);
-+}
-+
- const struct block_device_operations nvme_bdev_ops = {
- 	.owner		= THIS_MODULE,
- 	.ioctl		= nvme_ioctl,
-@@ -2718,6 +2729,7 @@ const struct block_device_operations nvme_bdev_ops = {
- 	.get_unique_id	= nvme_get_unique_id,
- 	.report_zones	= nvme_report_zones,
- 	.pr_ops		= &nvme_pr_ops,
-+	.init_dma_buf_io_ctx = nvme_init_dma_buf_io_ctx,
+diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+index 1efaf29514e8..7234dcdb8372 100644
+--- a/io_uring/rsrc.c
++++ b/io_uring/rsrc.c
+@@ -27,8 +27,13 @@ struct io_rsrc_update {
+ 	u32				offset;
  };
  
- static int nvme_wait_ready(struct nvme_ctrl *ctrl, u32 mask, u32 val,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a643c4723a69..be32e9a5ca5a 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -668,6 +668,8 @@ struct nvme_ctrl_ops {
- 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
- 	void (*print_device_info)(struct nvme_ctrl *ctrl);
- 	bool (*supports_pci_p2pdma)(struct nvme_ctrl *ctrl);
-+	int (*init_dma_buf_io_ctx)(struct nvme_ctrl *ctrl,
-+				   struct dma_buf_io_ctx *ctx);
- 	unsigned long (*get_virt_boundary)(struct nvme_ctrl *ctrl, bool is_admin);
- };
- 
-diff --git a/drivers/nvme/host/pci-dmabuf.c b/drivers/nvme/host/pci-dmabuf.c
-new file mode 100644
-index 000000000000..161e4ffa6919
---- /dev/null
-+++ b/drivers/nvme/host/pci-dmabuf.c
-@@ -0,0 +1,169 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Code for supporting dma-buf I/O maps in the NVMe driver.
-+ * Copyright (C) 2026 Pavel Begunkov <asml.silence@gmail.com>
-+ */
-+
-+#include <linux/dma-resv.h>
-+
-+#include "pci-dmabuf.h"
-+
-+static void nvme_dmabuf_invalidate_mappings(struct dma_buf_attachment *attach)
-+{
-+	struct dma_buf_io_ctx *ctx = attach->importer_priv;
-+
-+	dma_buf_io_invalidate_mappings(ctx);
-+}
-+
-+static const struct dma_buf_attach_ops nvme_dmabuf_importer_ops = {
-+	.invalidate_mappings	= nvme_dmabuf_invalidate_mappings,
-+	.allow_peer2peer	= true,
++struct io_uring_regbuf_desc {
++	__u64 uaddr;
++	__u64 size;
 +};
 +
-+static struct dma_buf_io_map *nvme_dma_buf_io_map(struct dma_buf_io_ctx *ctx)
-+{
-+	unsigned nr_entries = ctx->dmabuf->size / NVME_CTRL_PAGE_SIZE;
-+	struct nvme_dma_buf_io_ctx *nvme_ctx = ctx->dev_priv;
-+	struct dma_buf_attachment *attach = nvme_ctx->attach;
-+	unsigned long tmp, i = 0;
-+	struct nvme_dmabuf_map *map;
-+	struct scatterlist *sg;
-+	struct sg_table *sgt;
-+	int ret;
-+
-+	dma_resv_assert_held(ctx->dmabuf->resv);
-+
-+	if (ctx->dmabuf->size % NVME_CTRL_PAGE_SIZE)
-+		return ERR_PTR(-EINVAL);
-+
-+	map = kvmalloc_flex(*map, dma_list, nr_entries);
-+	if (!map)
-+		return ERR_PTR(-ENOMEM);
-+	map->nr_entries = nr_entries;
-+
-+	sgt = dma_buf_map_attachment(attach, ctx->dir);
-+	if (IS_ERR(sgt)) {
-+		ret = PTR_ERR(sgt);
-+		sgt = NULL;
-+		goto err;
-+	}
-+
-+	for_each_sgtable_dma_sg(sgt, sg, tmp) {
-+		dma_addr_t dma_addr = sg_dma_address(sg);
-+		unsigned long sg_len = sg_dma_len(sg);
-+
-+		if ((sg_len % NVME_CTRL_PAGE_SIZE) ||
-+		    (dma_addr % NVME_CTRL_PAGE_SIZE)) {
-+			ret = -EINVAL;
-+			goto err;
-+		}
-+		while (sg_len) {
-+			map->dma_list[i++] = dma_addr;
-+			dma_addr += NVME_CTRL_PAGE_SIZE;
-+			sg_len -= NVME_CTRL_PAGE_SIZE;
-+		}
-+	}
-+
-+	ret = dma_buf_io_init_map(ctx, &map->base, sgt);
-+	if (ret)
-+		goto err;
-+	map->sgt = sgt;
-+	return &map->base;
-+err:
-+	if (sgt)
-+		dma_buf_unmap_attachment(attach, sgt, ctx->dir);
-+	kvfree(map);
-+	return ERR_PTR(ret);
-+}
-+
-+static void nvme_dma_buf_io_unmap(struct dma_buf_io_ctx *ctx,
-+		struct dma_buf_io_map *map_base)
-+{
-+	struct nvme_dma_buf_io_ctx *nvme_ctx = ctx->dev_priv;
-+	struct nvme_dmabuf_map *map = to_nvme_dmabuf_map(map_base);
-+
-+	dma_resv_assert_held(ctx->dmabuf->resv);
-+
-+	dma_buf_unmap_attachment(nvme_ctx->attach, map->sgt, ctx->dir);
-+	kvfree(map);
-+}
-+
-+static void nvme_dma_buf_io_release(struct dma_buf_io_ctx *base_ctx)
-+{
-+	struct nvme_dma_buf_io_ctx *ctx = base_ctx->dev_priv;
-+	struct nvme_dma_buf_list *buf_list = ctx->buf_list;
-+
-+	mutex_lock(&buf_list->lock);
-+	if (!list_empty(&ctx->list)) {
-+		dma_buf_detach(ctx->base->dmabuf, ctx->attach);
-+		list_del_init(&ctx->list);
-+	}
-+	mutex_unlock(&buf_list->lock);
-+
-+	nvme_put_ctrl(ctx->ctrl);
-+	kfree(ctx);
-+}
-+
-+void __nvme_pci_remove_dmabuf(struct nvme_dma_buf_list *list)
-+{
-+	struct nvme_dma_buf_io_ctx *ctx, *tmp;
-+
-+	mutex_lock(&list->lock);
-+	list->dead = true;
-+	list_for_each_entry_safe(ctx, tmp, &list->ctxs, list) {
-+		dma_buf_io_detach(ctx->base);
-+		dma_buf_detach(ctx->base->dmabuf, ctx->attach);
-+		list_del_init(&ctx->list);
-+	}
-+	mutex_unlock(&list->lock);
-+}
-+
-+const struct dma_buf_io_ops nvme_dma_buf_io_ops = {
-+	.map		= nvme_dma_buf_io_map,
-+	.unmap		= nvme_dma_buf_io_unmap,
-+	.release	= nvme_dma_buf_io_release,
-+};
-+
-+static int nvme_init_io_ctx_locked(struct nvme_ctrl *ctrl,
-+		struct nvme_dma_buf_list *buf_list,
-+		struct dma_buf_io_ctx *ctx)
-+{
-+	struct nvme_dma_buf_io_ctx *nvme_ctx;
-+	struct dma_buf_attachment *attach;
-+
-+	if (buf_list->dead)
-+		return -ENODEV;
-+
-+	nvme_ctx = kzalloc_obj(*nvme_ctx);
-+	if (!nvme_ctx)
-+		return -ENOMEM;
-+
-+	attach = dma_buf_dynamic_attach(ctx->dmabuf, ctrl->dev,
-+					&nvme_dmabuf_importer_ops, ctx);
-+	if (IS_ERR(attach)) {
-+		kfree(nvme_ctx);
-+		return PTR_ERR(attach);
-+	}
-+
-+	nvme_get_ctrl(ctrl);
-+	list_add(&nvme_ctx->list, &buf_list->ctxs);
-+	nvme_ctx->attach = attach;
-+	nvme_ctx->base = ctx;
-+	nvme_ctx->ctrl = ctrl;
-+	nvme_ctx->buf_list = buf_list;
-+	ctx->dev_priv = nvme_ctx;
-+	ctx->dev_ops = &nvme_dma_buf_io_ops;
-+	return 0;
-+}
-+
-+int __nvme_init_dma_buf_io_ctx(struct nvme_ctrl *ctrl,
-+		struct nvme_dma_buf_list *buf_list,
-+		struct dma_buf_io_ctx *ctx)
-+{
-+	int ret;
-+
-+	mutex_lock(&buf_list->lock);
-+	ret = nvme_init_io_ctx_locked(ctrl, buf_list, ctx);
-+	mutex_unlock(&buf_list->lock);
-+	return ret;
-+}
-diff --git a/drivers/nvme/host/pci-dmabuf.h b/drivers/nvme/host/pci-dmabuf.h
-new file mode 100644
-index 000000000000..b3c9fd485878
---- /dev/null
-+++ b/drivers/nvme/host/pci-dmabuf.h
-@@ -0,0 +1,75 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2026 Pavel Begunkov <asml.silence@gmail.com>
-+ */
-+
-+#ifndef _NVME_PCI_DMABUF_H
-+#define _NVME_PCI_DMABUF_H
-+
-+#include <linux/dma-buf-io.h>
-+
-+#include "nvme.h"
-+
-+struct nvme_dma_buf_list {
-+	struct list_head ctxs;
-+	struct mutex lock;
-+	bool dead;
-+};
-+
-+struct nvme_dma_buf_io_ctx {
-+	struct dma_buf_attachment *attach;
-+	struct nvme_dma_buf_list *buf_list;
-+	struct dma_buf_io_ctx *base;
-+	struct nvme_ctrl *ctrl;
-+	struct list_head list;
-+};
-+
-+struct nvme_dmabuf_map {
-+	struct dma_buf_io_map base;
-+	struct sg_table *sgt;
-+	unsigned nr_entries;
-+	dma_addr_t dma_list[] __counted_by(nr_entries);
-+};
-+
-+static inline struct nvme_dmabuf_map *to_nvme_dmabuf_map(
-+	struct dma_buf_io_map *map)
-+{
-+	return container_of(map, struct nvme_dmabuf_map, base);
-+}
-+
-+static inline struct nvme_dmabuf_map *nvme_req_to_map(struct request *req)
-+{
-+	struct dma_buf_io_map *map = req->bio->bi_dmabuf_map;
-+
-+	return to_nvme_dmabuf_map(map);
-+}
-+
-+void __nvme_pci_remove_dmabuf(struct nvme_dma_buf_list *list);
-+int __nvme_init_dma_buf_io_ctx(struct nvme_ctrl *ctrl,
-+		struct nvme_dma_buf_list *buf_list,
-+		struct dma_buf_io_ctx *ctx);
-+
-+static inline void nvme_pci_remove_dmabuf(struct nvme_dma_buf_list *list)
-+{
-+	if (IS_ENABLED(CONFIG_DMA_SHARED_BUFFER))
-+		__nvme_pci_remove_dmabuf(list);
-+}
-+
-+static inline int nvme_init_dma_buf_io_ctx(struct nvme_ctrl *ctrl,
-+		struct nvme_dma_buf_list *buf_list,
-+		struct dma_buf_io_ctx *ctx)
-+{
-+	if (!IS_ENABLED(CONFIG_DMA_SHARED_BUFFER))
-+		return -EOPNOTSUPP;
-+	return __nvme_init_dma_buf_io_ctx(ctrl, buf_list, ctx);
-+}
-+
-+static inline void nvme_init_buf_list(struct nvme_dma_buf_list *buf_list)
-+{
-+	INIT_LIST_HEAD(&buf_list->ctxs);
-+	mutex_init(&buf_list->lock);
-+	buf_list->dead = false;
-+}
-+
-+
-+#endif /* _NVME_PCI_DMABUF_H */
-\ No newline at end of file
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index a65b77726e4b..a0506c93fa16 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -30,6 +30,7 @@
+ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+-						   struct iovec *iov);
++						   struct io_uring_regbuf_desc *desc);
  
- #include "trace.h"
- #include "nvme.h"
-+#include "pci-dmabuf.h"
+ static int hpage_acct_ref(struct io_ring_ctx *ctx, struct page *hpage,
+ 			  bool *acct_new)
+@@ -81,6 +86,15 @@ static bool hpage_acct_unref(struct io_ring_ctx *ctx, struct page *hpage)
  
- #define SQ_SIZE(q)	((q)->q_depth << (q)->sqes)
- #define CQ_SIZE(q)	((q)->q_depth * sizeof(struct nvme_completion))
-@@ -318,6 +319,7 @@ struct nvme_dev {
- 	bool hmb;
- 	struct sg_table *hmb_sgt;
- 	mempool_t *dmavec_mempool;
-+	struct nvme_dma_buf_list dmabufs;
+ #define IO_CACHED_BVECS_SEGS	32
  
- 	/* shadow doorbell buffer support: */
- 	__le32 *dbbuf_dbs;
-@@ -865,6 +867,76 @@ static void nvme_free_descriptors(struct request *req)
- 	}
- }
- 
-+static blk_status_t nvme_rq_setup_dmabuf_map(struct request *req,
-+		struct nvme_queue *nvmeq)
++static void io_iov_to_regbuf_desc(const struct iovec *iov,
++				  struct io_uring_regbuf_desc *desc)
 +{
-+	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	struct nvme_dmabuf_map *map = nvme_req_to_map(req);
-+	unsigned bvec_done = req->bio->bi_iter.bi_offset;
-+	unsigned map_idx = bvec_done / NVME_CTRL_PAGE_SIZE;
-+	unsigned offset = bvec_done & (NVME_CTRL_PAGE_SIZE - 1);
-+	int length = blk_rq_payload_bytes(req) - (NVME_CTRL_PAGE_SIZE - offset);
-+	dma_addr_t *dma_list = map->dma_list;
-+	u64 prp1_dma = dma_list[map_idx++] + offset;
-+	u64 dma_addr, prp2_dma;
-+	dma_addr_t prp_dma;
-+	__le64 *prp_list;
-+	unsigned i;
-+
-+	if (length <= 0) {
-+		prp2_dma = 0;
-+		goto done;
-+	}
-+
-+	if (length <= NVME_CTRL_PAGE_SIZE) {
-+		prp2_dma = dma_list[map_idx];
-+		goto done;
-+	}
-+
-+	if (DIV_ROUND_UP(length, NVME_CTRL_PAGE_SIZE) <=
-+	    NVME_SMALL_POOL_SIZE / sizeof(__le64))
-+		iod->flags |= IOD_SMALL_DESCRIPTOR;
-+
-+	prp_list = dma_pool_alloc(nvme_dma_pool(nvmeq, iod), GFP_ATOMIC,
-+			&prp_dma);
-+	if (!prp_list)
-+		return BLK_STS_RESOURCE;
-+
-+	iod->descriptors[iod->nr_descriptors++] = prp_list;
-+	prp2_dma = prp_dma;
-+	i = 0;
-+	for (;;) {
-+		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
-+			__le64 *old_prp_list = prp_list;
-+
-+			prp_list = dma_pool_alloc(nvmeq->descriptor_pools.large,
-+					GFP_ATOMIC, &prp_dma);
-+			if (!prp_list)
-+				goto free_prps;
-+			iod->descriptors[iod->nr_descriptors++] = prp_list;
-+			prp_list[0] = old_prp_list[i - 1];
-+			old_prp_list[i - 1] = cpu_to_le64(prp_dma);
-+			i = 1;
-+		}
-+
-+		dma_addr = dma_list[map_idx++];
-+		prp_list[i++] = cpu_to_le64(dma_addr);
-+
-+		length -= NVME_CTRL_PAGE_SIZE;
-+		if (length <= 0)
-+			break;
-+	}
-+done:
-+	iod->cmd.common.dptr.prp1 = cpu_to_le64(prp1_dma);
-+	iod->cmd.common.dptr.prp2 = cpu_to_le64(prp2_dma);
-+	return BLK_STS_OK;
-+free_prps:
-+	iod->cmd.common.dptr.prp1 = cpu_to_le64(prp1_dma);
-+	iod->cmd.common.dptr.prp2 = cpu_to_le64(prp2_dma);
-+	nvme_free_descriptors(req);
-+	return BLK_STS_RESOURCE;
++	*desc = (struct io_uring_regbuf_desc) {
++		.uaddr = (u64)(uintptr_t)iov->iov_base,
++		.size = iov->iov_len,
++	};
 +}
 +
- static void nvme_free_prps(struct request *req, unsigned int attrs)
+ int __io_account_mem(struct user_struct *user, unsigned long nr_pages)
  {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-@@ -943,6 +1015,9 @@ static void nvme_unmap_data(struct request *req)
- 	struct device *dma_dev = nvmeq->dev->dev;
- 	unsigned int attrs = 0;
+ 	unsigned long page_limit, cur_pages, new_pages;
+@@ -398,6 +412,7 @@ static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
+ 		return -EINVAL;
  
-+	if (blk_mq_rq_is_dmabuf(req))
-+		goto out_free_desc;
+ 	for (done = 0; done < nr_args; done++) {
++		struct io_uring_regbuf_desc desc;
+ 		struct io_rsrc_node *node;
+ 		u64 tag = 0;
+ 
+@@ -411,7 +426,9 @@ static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
+ 			err = -EFAULT;
+ 			break;
+ 		}
+-		node = io_sqe_buffer_register(ctx, iov);
 +
- 	if (iod->flags & IOD_SINGLE_SEGMENT) {
- 		static_assert(offsetof(union nvme_data_ptr, prp1) ==
- 				offsetof(union nvme_data_ptr, sgl.addr));
-@@ -967,6 +1042,7 @@ static void nvme_unmap_data(struct request *req)
- 			nvme_free_prps(req, attrs);
++		io_iov_to_regbuf_desc(iov, &desc);
++		node = io_sqe_buffer_register(ctx, &desc);
+ 		if (IS_ERR(node)) {
+ 			err = PTR_ERR(node);
+ 			break;
+@@ -870,26 +887,29 @@ bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
+ }
+ 
+ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+-						   struct iovec *iov)
++						   struct io_uring_regbuf_desc *desc)
+ {
++	unsigned long uaddr = (unsigned long)desc->uaddr;
++	size_t size = desc->size;
+ 	struct io_mapped_ubuf *imu = NULL;
+ 	struct page **pages = NULL;
+ 	struct io_rsrc_node *node;
+ 	unsigned long off;
+-	size_t size;
+ 	int ret, nr_pages, i;
+ 	struct io_imu_folio_data data;
+ 	bool coalesced = false;
+ 
+-	if (!iov->iov_base) {
+-		if (iov->iov_len)
++	if (uaddr != desc->uaddr || size != desc->size)
++		return ERR_PTR(-EOVERFLOW);
++
++	if (!uaddr) {
++		if (size)
+ 			return ERR_PTR(-EFAULT);
+ 		/* remove the buffer without installing a new one */
+ 		return NULL;
  	}
  
-+out_free_desc:
- 	if (iod->nr_descriptors)
- 		nvme_free_descriptors(req);
- }
-@@ -1257,6 +1333,9 @@ static blk_status_t nvme_map_data(struct request *req)
- 	struct blk_dma_iter iter;
- 	blk_status_t ret;
+-	ret = io_validate_user_buf_range((unsigned long)iov->iov_base,
+-					 iov->iov_len);
++	ret = io_validate_user_buf_range(uaddr, size);
+ 	if (ret)
+ 		return ERR_PTR(ret);
  
-+	if (blk_mq_rq_is_dmabuf(req))
-+		return nvme_rq_setup_dmabuf_map(req, nvmeq);
-+
- 	/*
- 	 * Try to skip the DMA iterator for single segment requests, as that
- 	 * significantly improves performances for small I/O sizes.
-@@ -3357,6 +3436,9 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 			nvme_unquiesce_admin_queue(&dev->ctrl);
- 	}
- 	mutex_unlock(&dev->shutdown_lock);
-+
-+	if (shutdown)
-+		nvme_pci_remove_dmabuf(&dev->dmabufs);
- }
- 
- static int nvme_disable_prepare_reset(struct nvme_dev *dev, bool shutdown)
-@@ -3564,6 +3646,14 @@ static unsigned long nvme_pci_get_virt_boundary(struct nvme_ctrl *ctrl,
- 	return 0;
- }
- 
-+static int nvme_pci_init_dma_buf_io_ctx(struct nvme_ctrl *ctrl,
-+		struct dma_buf_io_ctx *ctx)
-+{
-+	struct nvme_dev *dev = to_nvme_dev(ctrl);
-+
-+	return nvme_init_dma_buf_io_ctx(ctrl, &dev->dmabufs, ctx);
-+}
-+
- static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.name			= "pcie",
- 	.module			= THIS_MODULE,
-@@ -3579,6 +3669,7 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.print_device_info	= nvme_pci_print_device_info,
- 	.supports_pci_p2pdma	= nvme_pci_supports_pci_p2pdma,
- 	.get_virt_boundary	= nvme_pci_get_virt_boundary,
-+	.init_dma_buf_io_ctx	= nvme_pci_init_dma_buf_io_ctx,
- };
- 
- static int nvme_dev_map(struct nvme_dev *dev)
-@@ -3701,6 +3792,7 @@ static struct nvme_dev *nvme_pci_alloc_dev(struct pci_dev *pdev,
+@@ -898,8 +918,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
  		return ERR_PTR(-ENOMEM);
- 	INIT_WORK(&dev->ctrl.reset_work, nvme_reset_work);
- 	mutex_init(&dev->shutdown_lock);
-+	nvme_init_buf_list(&dev->dmabufs);
  
- 	dev->nr_write_queues = write_queues;
- 	dev->nr_poll_queues = poll_queues;
-@@ -4346,5 +4438,6 @@ MODULE_AUTHOR("Matthew Wilcox <willy@linux.intel.com>");
- MODULE_LICENSE("GPL");
- MODULE_VERSION("1.0");
- MODULE_DESCRIPTION("NVMe host PCIe transport driver");
-+MODULE_IMPORT_NS("DMA_BUF");
- module_init(nvme_init);
- module_exit(nvme_exit);
+ 	ret = -ENOMEM;
+-	pages = io_pin_pages((unsigned long) iov->iov_base, iov->iov_len,
+-				&nr_pages);
++	pages = io_pin_pages(uaddr, size, &nr_pages);
+ 	if (IS_ERR(pages)) {
+ 		ret = PTR_ERR(pages);
+ 		pages = NULL;
+@@ -921,10 +940,9 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+ 	if (ret)
+ 		goto done;
+ 
+-	size = iov->iov_len;
+ 	/* store original address for later verification */
+-	imu->ubuf = (unsigned long) iov->iov_base;
+-	imu->len = iov->iov_len;
++	imu->ubuf = uaddr;
++	imu->len = size;
+ 	imu->folio_shift = PAGE_SHIFT;
+ 	imu->release = io_release_ubuf;
+ 	imu->priv = imu;
+@@ -934,7 +952,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+ 		imu->folio_shift = data.folio_shift;
+ 	refcount_set(&imu->refs, 1);
+ 
+-	off = (unsigned long)iov->iov_base & ~PAGE_MASK;
++	off = uaddr & ~PAGE_MASK;
+ 	if (coalesced)
+ 		off += data.first_folio_page_idx << PAGE_SHIFT;
+ 
+@@ -986,6 +1004,7 @@ int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
+ 		memset(iov, 0, sizeof(*iov));
+ 
+ 	for (i = 0; i < nr_args; i++) {
++		struct io_uring_regbuf_desc desc;
+ 		struct io_rsrc_node *node;
+ 		u64 tag = 0;
+ 
+@@ -1009,7 +1028,8 @@ int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
+ 			}
+ 		}
+ 
+-		node = io_sqe_buffer_register(ctx, iov);
++		io_iov_to_regbuf_desc(iov, &desc);
++		node = io_sqe_buffer_register(ctx, &desc);
+ 		if (IS_ERR(node)) {
+ 			ret = PTR_ERR(node);
+ 			break;
 -- 
 2.54.0
 
