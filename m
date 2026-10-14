@@ -1,457 +1,175 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF163FFFA1
-	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 08:27:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791966435; cv=none; b=WWIxK6T+mG+rjvWzhW1HdVOHK/kMgS6ZP5LnxoggkaK+SVn8klGC+rfpH+TGxpVQca0uv70bT//VqalflLZ2eI1bvSTGXBJGmeKTbm9bjsVIkjXmzhEUFfXylOPsqu5lfx96944xWhmHgxPmBq0UKKdaR0J1OR4JL58knzylLhU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791966435; c=relaxed/simple;
-	bh=+uDXX4unUdHNBxn9vOki+p5lSyVwmpx0BeZp0OjHjJk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qvMKC4GycPoO1WIjeghC3TadIMURf7iEjVK0OBA/bCCTD3+pe+pDCvKN8dUZnxeLebA69Zx6LmWrmBjlCbmTy9updCDzayDdkZH/9N6zfzk4z7n9+PbnjgEGB08IhZXFvEu+uRvS+6dZLUbsnIceiHNxlsglaebrI3bHVnTIT/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X1L0AA++; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45064BE43D
+	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 08:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791967686; cv=fail; b=tIXmqEVjqe2V3N6PxKGRWpcAJA6s2fB+jQwu86qk0pDuIe9PN8gmiatGvEX5sBOLXxZVTzIdymZiVT1BD0RKZt8t3IxMpsG7WFQcL/29kpD/SEHZtH+Z9jkYyh4nyIDvzUy81Zwa/UGcyUBucCJqDzqi3s/DwXpoyDqvhV+drc0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791967686; c=relaxed/simple;
+	bh=q64Ts9oexJz4YQmfQxhhks6JGfEAcLBQrvQLM53LrGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LJvMNhPi+9UyNQqt0jJ4TuQYKa8TdvVxiD2yXc93Cve3+Q9Y6/POEPVLQfU4O8nIvswfOwvZCQP2ti6/ut+GdOeWnVihW3qcW1vkivChvvHYswqW3Dtdv42pnUwFssoLWQaDQRE14HVLbuK8z5+Wp/8Cz1iwVXLz7eGMTAWTRSg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=CH8PI4cM; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=AmRV/Mt3; arc=fail smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1L0AA++"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2e8f2c3ad6bso13925605ad.1
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 01:27:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CH8PI4cM";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="AmRV/Mt3"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1791967682; x=1823503682;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=q64Ts9oexJz4YQmfQxhhks6JGfEAcLBQrvQLM53LrGE=;
+  b=CH8PI4cMXhEcBoMO4htjQYiS6OxICFM+2jnajzRy+eUOdULBuS+VzCK9
+   Tp5P0M4VZx/iBGuxAf2RejOIB8PfHog9VoiFtvBzSThGHMxgOMRpJ9M5e
+   6NFglJjdI6ZxWQ6MUANqDC4yzvsSU27RKVczlDhzrx/TAjiPudp7QrTsr
+   suxCXaXMCE7/BvwrniEdpcMs3w5cn/a2kFMkfINp6JXKEFt/psJR9EOgP
+   8cB1cQBrtentuD+8+VuZevPLYj+E6zp09Tiqi1pWc/Q8WzUqeHJIiS6uP
+   5JxpMWL1zlYxiu7orzWSl2dIsnfWFQT4E4/HstMS6IJx4DF4VmfenSNlU
+   Q==;
+X-CSE-ConnectionGUID: bz4uoblFRfCNL4CVwxRLgg==
+X-CSE-MsgGUID: 3EVzwfuARgu9nYo7z2SXmA==
+X-IronPort-AV: E=Sophos;i="6.27,157,1786982400"; 
+   d="scan'208";a="153838638"
+Received: from mail-southcentralusazon11013025.outbound.protection.outlook.com (HELO SA9PR02CU001.outbound.protection.outlook.com) ([40.93.196.25])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Oct 2026 16:47:56 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UBvGlVk6gb46/g99Ji5uaYlnYg5kLNpMgEYwNTaUE9XvRZzI5pDBOpjEk1OBOY8v0i8jb0l9mTami7/0ixT/NznN50OSrTVM83lLm9BqpPp4Pj60tKH8JpbfV3KXWuxn0oKhlkd652X4sAjspjHXK6+pAmC3xOLeRZJUqx9tAYz1q/ui7nnR8SR7INVF4OEii5NxDr0EXnpGzf386zntfLWysrFNqxHX34p2VgFiA61ptpcZswIen5/RLCbQ9U0cMNJC+p2XJYlOoPhUhMIgQ1qBheuRsGNaxjfvv4ane3lDHY+0LKmxUZqS0HTfy89KfgMccNoHCWRqJzqGpc2clQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zBqTuCo69TJolZzCU4ZOb/CbIptmkILs2scESGj2DdA=;
+ b=o6jWoCjUtRuYWK0jkbl4nKwZZ74XtYB22FDGBt+7chjTRpWJeRggyug1I0TtDcC9+B3vVXtm1BEcx1rltrtvBBl9u5L0C+i+Bm1l2tw34+vzW4KoUmhsUz5lhERpPrzoPesf6c2dQfL4PO+etAITwabtvh2MQVtdWgIDmZC5uF5kMeRTsXqEP+OTzVkzx69msCK2rk+dqCEef9RIru4rCz2zhvskfKkiwsf6oy1Xh4XRqxLlMm7Emxi0HWoAezkLj7ryAMyb9co4AbuYvIxrXguedyhgrSe9qNYVhnbG88ZlgnjkxpuOt7JY9eHlWk4idY4R+EUNC59I70t0EvpX0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791966433; x=1792571233; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8xXba+EvG6pZ4myUFR4ygzt+6MpiP4SZCUDpbeJmv3A=;
-        b=X1L0AA++NomQXGTxSJQFcdcfEejMwv6DSQGk5T9Zpcguzn1h4h0ra7xoYgo4s3VflA
-         rOuJTgWzJ0fxZXI9kBvKb34fYfX+T9CS6k9/A9SI7rvX2kE7fZQgHzicBDzuctB9o6M+
-         Qfyr4gK6ReGl0D2OmPfz3R/ymrQd+/v0FC41XqDbJ+aRdj6of4lbs9+tpvXs4zuAGS/p
-         MfYd4rBqPTKfUZowx7iZDMMsB/07KeaOLuB77w1LRRR0XZZDcHC9o+LDOKDO/33eKLfJ
-         CmYP+lkATfpNarJ6LTa1tArtdKCs8Qs8UA+g1U0jSYx6fMMWy4NgtuY3jV0zspyfgyYK
-         dcgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791966433; x=1792571233;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=8xXba+EvG6pZ4myUFR4ygzt+6MpiP4SZCUDpbeJmv3A=;
-        b=yR0umsRqFPrkSx7aQ0NaMiGllXFjOuag5aXXMEar2qBDaNS0cr588oNxLQvzBWWt8W
-         Tm13/BRG4Z/8+IOrZTYZKecCI1Pj38WKXOxScNuR7vXxLJiBwseMuNmhROBlTWBrFYQ4
-         eOGBemR5x9JOJ2OZymUesoaRsQRFBi5tCInd3FABEDIOZJuibVyV8yGkNFV7AAax+gzA
-         92vcizrocX/cThI6WkRV/UtVGeVouOfmvRs5F5fOeOP7HNVct8Wr6u6o7xkMP5CN6Y4w
-         xG6u7ifTcOm6PiMqL2TbqRaC5fqDyw1F/PAjCJhzspH1zpmSw60gas/tGpilvRrI1cT7
-         f1Qg==
-X-Forwarded-Encrypted: i=1; AKwUvBya7UFTd2adwsmh/Fj8Ksc2HaTWzdKB5JUXNjFYf9XD+ryaXWQyaVW0WCwK/4KMwPkutFa50G3jmeXFEg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJHxJx5bPIgq4LZ//osfTXZKvMtHv0FWhv0x7AvvvQm2D9Zc8wE
-	o0z/0zNJ4d15x3pHrLP9IOXXekXeRDfFk7qDXAoOUev3ttpGb1rW4vWgWcYDreg371SB
-X-Gm-Gg: AYBFou0mNFavAM/0ZYo87mg9gWpJEbRkEA5ntHU1dvebhUTEi40QrWYt5aGrktr3ndn
-	5MI4fBBf1pawhdByoCGh/o/zksUM4u0U9M/njvoL6T0170baYDqrfTp+6ZGZxQIk3vGn5B8lIDw
-	aX8zEjLmKH7b52GOrKTbr3o0e15FiBY1B+KpRPYZY4Pue02n+HM1wdyysq7b95Lhpi5H4JIED+q
-	Ybdo+F0QW00EEwcREic1Liz8PtKFNJrqPA1nhFAn8wHsewJ5cQLXOQKTwJ+JR5igGl6nab5i41u
-	KCTgYEp0TG6NFo1ddCWC6Jq1bSQMLWbV9NXL5hjlIlmcuVnsU0UczXcuH1TPsLyhfXnsDpL/u0A
-	KBOoFN5HltMkWeJnj8RyqlG974XX4Ev/m6ckTQypeutAUZ75aaWS7n122dRLHv2XRGcPv9TEMDI
-	/AGj5wJXuCGe7nLIYSuWJa5JefUX8qoJn6IO1err8j+1Ez6FW6ZhIxybhnotc8kMEXjAZPzB+Ss
-	ZA8KIcg
-X-Received: by 2002:a17:90a:d44b:b0:3ab:365f:ebdd with SMTP id 98e67ed59e1d1-3ab3ad2029bmr12131166a91.37.1791966432061;
-        Wed, 14 Oct 2026 01:27:12 -0700 (PDT)
-Received: from localhost.localdomain ([185.220.238.36])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cd3d9e1ee81sm6591992a12.12.2026.10.14.01.27.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 01:27:10 -0700 (PDT)
-From: Wang Yibo <szwyb123@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com
-Subject: [PATCH] lib/sbitmap: add KUnit test suite
-Date: Wed, 14 Oct 2026 16:27:04 +0800
-Message-Id: <20261014082704.33667-1-szwyb123@gmail.com>
-X-Mailer: git-send-email 2.25.1
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zBqTuCo69TJolZzCU4ZOb/CbIptmkILs2scESGj2DdA=;
+ b=AmRV/Mt3FSX82+IBJWvyRlbJ10/8Y1H+L2UMRcCLxF7m2NC95RZH1E9JITfEDGFdBiYr+SoxOxxrS2i8VcyF1OIcgdJuXsQZfka/XBTIE8GGrhRIgi5hUdjp0XUmhQjm0u+mDHCs/cPV13VnXx2g/lteIsBbYTUVfe5GZkHoYNA=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14) by SA0PR04MB7178.namprd04.prod.outlook.com
+ (2603:10b6:806:e7::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.23; Wed, 14 Oct
+ 2026 08:47:54 +0000
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85%5]) with mapi id 15.21.0496.021; Wed, 14 Oct 2026
+ 08:47:54 +0000
+Date: Wed, 14 Oct 2026 17:47:48 +0900
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: blktests-ci-bot@kernel.org, Jens Axboe <axboe@kernel.dk>, 
+	Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH] loop: remove support for swapping loop fds
+Message-ID: <as8-8rDJmUb1FxbP@shinmob>
+References: <20261012-work-loop-change_fd-v1-1-3cf4ec349bbb@kernel.org>
+ <49a2d2f1d44a018dbe2a3da155b5fedea30cf98ea484bdc19da2f9cf97c4e0da@mailrelay.wdc.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <49a2d2f1d44a018dbe2a3da155b5fedea30cf98ea484bdc19da2f9cf97c4e0da@mailrelay.wdc.com>
+X-ClientProxiedBy: TYCP286CA0224.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:3c5::8) To SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|SA0PR04MB7178:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e722932-599f-4cfc-252d-08df29cfd6b0
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|23010399003|366016|376014|1800799024|22082099003|10067099003|18002099003|261009223027099003|11063799006|4143699003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	UlkrC6Kz6Rs3PMdXLyR3HhB3gAayW7wa/XpIIMrDS1ee5cVy57rloylshvIpqbPbao+JEt18TXhvvYxDH5lavM4fNabu+XjfD1exDb/qgQvhiBVrPaVYt9bAb0zXGR3qSa7ne5ypA28AZkWOvNivDvUr1qxKxv0A/MFllQ4ppBsGLTs8q08lwZy5/VUWpmsdfbmfE4KqEtTMBut+625lL4sMCqoJZpEMAdrOwPGucSMoxwCHmzANEX6Ep2POz2AT4VJ2ta61735dvebhW+RKN4MMWQ1lZ3pzFKWQVxr5ZJj1SBv65OrFGMQ55JfpftMUfJOPhXhEG72MOce2m7Bovt6DpdLc0oLHaFQJ2YjNmwt6S6/GAx70qhQIYc6bezYUQke9VXfVtuQ69yrh7MiVj+0qGVWuwMTkMI89tj8khcuHBAl735NXTTlVzjT/S+AOTODNJwufjdrMJ1leWFv3kyUeitqH5IalfhSPd2qaWfLbyj4+PjGR4q7ETtVDJu4e/5DB4kjum55BTdFoGxQpmxZUWkTE/uv2oQp5mNni2m6QmcM8pHEUebtMT+MvE+Q3f773/G04UW6ceNgk5tK9dlNFDfX6erWEXAQqDnTC5bFmhqJ4dIPIdDW2uYf4XJ1g
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(23010399003)(366016)(376014)(1800799024)(22082099003)(10067099003)(18002099003)(261009223027099003)(11063799006)(4143699003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?7uOqwORMb9e992puEKmjGpK5VbM1G1w3haMvayXTn++c3QyB3B4P2QBvYHH6?=
+ =?us-ascii?Q?BdjbdlkdroTz1Ypj/4XIG0HNauqiFB/r7l5OdxUUm0ZNVWZvkz8eWGyv9o7o?=
+ =?us-ascii?Q?DHST85cc1J0Mg1oHp9mL2CfzxXEe9S7S4ZjDVTkHU2MAUHd1zjMWV3fP6GRv?=
+ =?us-ascii?Q?q4fi8qb+f+E1PkZY0PPSoGgSZHHb1mjne9snjL976ULbl2eGhjQagJt81sVA?=
+ =?us-ascii?Q?Dn3upGljla7phG1LvpDLb4QdJoiLzfnKGt6onOlQqQ7XaoUmFdDFFtcYTi3Z?=
+ =?us-ascii?Q?1+/Yz+/YQSx7zEUephn69QLkVd9xoqPu04YJuYG4r4UxtJRaHQ6137Tt3JKJ?=
+ =?us-ascii?Q?W2qNCS2dpylTVV2c3npd181kq85DoME09zs9TXlcM4Nt3oC63FOAb/4GQ8Bw?=
+ =?us-ascii?Q?ycPnYy+Rr5WQiiUD0IDhdARpg9qklb8IpMdlVOuwZbTCkDq9V+JLdH6D1gBA?=
+ =?us-ascii?Q?grpeXx+gPDvZpma/5H6nWx2pvQl1GfFxhiPZvKF/OfOVvu5Tb8F6ua7Ict0d?=
+ =?us-ascii?Q?mHi7zDhamBDppZ/iPDXTe+Q7zrUpd0q0QB0gaF2rc0PCFJ1enLSrM14lgZCv?=
+ =?us-ascii?Q?1Lu5ybtzHq9OvS27ru4YaXGevKkji6i3t94E+FgHFjHR29HPt2RdyjtPG7fr?=
+ =?us-ascii?Q?Z6vjNMAk8kYPcd5lVeYIsaGtWC2EadzF1HmezOP2+7xG2kOLIESG+hF3UdYa?=
+ =?us-ascii?Q?4oQozLjRZMQL+SR2qOYkgM5WmUGCYVznYuWy5ixVcIApbB5WDl6Gs8m5nr52?=
+ =?us-ascii?Q?syPSzXhd96c5ZHbZxyEoO2YMv2JMOZMdZIqGgQaAgXCnVJxvOyYR1zi4LecQ?=
+ =?us-ascii?Q?4HPiN6mZGBqzLoiE6Mz6JFXWI2ZlNDnJPwj7pUD6xUgYgrKYPbtal4qsGVbC?=
+ =?us-ascii?Q?0u3EuzYTUj0WOytuWp3TKyBs9MGnom4VBeJ89OdjVIoPhiu7m71YMVkB497K?=
+ =?us-ascii?Q?vY2V+aTn/xMHEPyjovpwKsh1UxmTO2XDBpH2yZ3fSKItbuXzT3WE2rIa6IU6?=
+ =?us-ascii?Q?FGRNEbWxmMVJ2QfTItmV/ZvsyX7Ggv0/QXVYiRxvkDk98S/55NrH7qarL54F?=
+ =?us-ascii?Q?0e/7vdewV7Q4znrBad4d0D45Lu1BFXFPzOhzj7gtQj3nUNi6OvMD+ZHYckU1?=
+ =?us-ascii?Q?i39yOG+chq3SLpG9fon8+VEbY0BlAVHVxAUUPvL3u4bYo8EnVsUjrAGNnCOl?=
+ =?us-ascii?Q?54gk2xKewFrqq9T7Te9gKgE0RQukNRnj+QdtcerpV3jDK/bSAkZSKcCcZuvM?=
+ =?us-ascii?Q?RJRND6aw1zzHSdE2Snd0INwPonZuJaNfdDHJDSWWqo025mmg6ewvGrcaViU4?=
+ =?us-ascii?Q?new9Jw7VBBhaZyH6u68Z2kdtH+9205b5+7htmFou9EieLoISjDesxvCnJEKB?=
+ =?us-ascii?Q?R+ptVlTI8SQkc3jG0bYH5QFBy4KG+4+HWhG3bmi4sM04PdR8iHu0riFiKT+3?=
+ =?us-ascii?Q?YVh4wJtBc4laXKV6zRB7FKPNwhZ7nk0r5cCMg5JSFyjME61AiwWQSxCE46yi?=
+ =?us-ascii?Q?bpITF30zgIcfyllC3JuHettI22Q+LXNUoNZahPSv7CtHqxgoqVXu4XoDBjvv?=
+ =?us-ascii?Q?L7cqQ1JTPXkjYcuXJE7tkVeA1hCFAg/fO5N2qx1qcca+3/90UXE3qV3PQfhO?=
+ =?us-ascii?Q?08y2lrnshFeOg5/pThV1uPdWk/lm8fEDoph72tgUY5mV6y74IC0Z6It61AAR?=
+ =?us-ascii?Q?K/i6xwYs8YkbermJF+I+l3SmFNL0kvLcWz4lgB76eNTmsxl7kH/sTPEPth83?=
+ =?us-ascii?Q?MeG6yDHJTChaqKMRoMx5hwyebrc0d7g=3D?=
+X-Exchange-RoutingPolicyChecked:
+	mE8044BdqESoXGWK7YWU8qzaa0IlYoLvFRp/S76zyPv4Ge9Wg2rqFGxCno6ltDEWuIf/14DAcdDXmAhNx+M+OJ0/3+LVrcFSdPMU3F8RDOeI1TpsWCZko17r0wrzK824VX0kIbpzn8lCA3RWpFySOm1tNe7DP2djzlPNNAAIAFEzCR6VfrHtSaX+n0GKeQh7V/VJxLFovgiRQC7D3xRKr3S5mRZGIUt/dF72hfzGOXBYhE/PPDtsFJyajf+0Qm+l0iC4AQcUl5Fi7BxmNK5yqeNsio8iqscydzBkkDunHLA62B/7q/5QFj/RA7nktOe6ozARcOL3myWyNcpHv8oA6A==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	lfPg6R8AxzwFrP/vbRChnK+jBI4hoL06cpS0uIb6/9ckY7wiePuTDOAlvL9LO/eL7/tYeJ16Zwa42TCKFatCLUKd/bwwOd/pEAzE6LLKt0RY6fr/3dnMGPKsLUZGDYNq5NjXTjjzRS1GSzV/GXxt855Lug8TdDg1FghrJEEqycjt2jpvzIXytEVrQQ5nPmfGJX3Is00mmkQIT67VXCq9BxKfr/KIyzRqZKhdpLgq1ozqbswVvpE6PU1fJdtXEDQRDI8JyEvc0BLAfSPybmZoAp1/ZN3vRTWvz/7hsazLfmfaM3X/xSrBIzMpKG5xQW+gI/ST+YG+/x8tz45tMUkZNmaAZ4QzBuoYH3JDCdDElN12ZbYCQd1o+H0HJPReaTAUluSPekz54ebpVa1fHdk/xWhs2pmg9UvooRbFqYrhD7hrgHDuYkQe+s4svgOgAXVz1SMeblRP/l2FKJC274SSZDpByx8WggzUv6w4YXnUQa3GQVAB0OB0Las9heQlZmP33e0xKtnQ0cmZtqoa+MhEpTfSzN7dthOrqOKrp3kniiy2c9FWoi7vMfvFQHXFA2UmfOxkxTiX7Wc3Yjcu9krulX3EXEFWql5H/TeyT4kl4yARaeuIL/P+orjftJ8bjkJ5
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e722932-599f-4cfc-252d-08df29cfd6b0
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2026 08:47:54.7825
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: un/1TFPAN6x3BrvhA5nbO9JdlntCfdcPo6P64fcM18oHvCKuqzIn7rIvJ0W2I6jUn/8U9Qll6jhfREDrQWslMfYvEcSTTMZefc2ZGbG68rA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR04MB7178
 
-sbitmap is the tag allocator used by blk-mq and the I/O schedulers
-built on top of it, but the plain, synchronous part of its API has no
-test coverage at all.
+On Oct 13, 2026 / 16:03, shinichiro.kawasaki@wdc.com wrote:
+> Dear patch submitter,
+> 
+> Blktests CI has tested the following submission:
+> Status:     FAILURE
+> Name:       loop: remove support for swapping loop fds
 
-Add a KUnit suite covering initialisation, allocation and exhaustion,
-deferred clears, round-robin ordering, resize, the bitmap helpers and
-sbitmap_for_each_set(), so that the behaviour is checked on every boot.
+This kernel patch removed the support of ioctl LOOP_CHANGE_FD.
 
-The new file is added to the BLOCK LAYER entry in MAINTAINERS, next to
-lib/sbitmap.c, so that it does not end up without a maintainer.
+> Patchwork:  https://patchwork.kernel.org/series/1183887/&state=*
+> Run record: https://github.com/linux-blktests/linux-block/actions/runs/38278109458
+> 
+> 
+> Failed test cases: loop/006
 
-Signed-off-by: Wang Yibo <szwyb123@gmail.com>
----
- MAINTAINERS               |   1 +
- lib/Kconfig.debug         |  13 ++
- lib/tests/Makefile        |   1 +
- lib/tests/sbitmap_kunit.c | 300 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 315 insertions(+)
- create mode 100644 lib/tests/sbitmap_kunit.c
+And this test case confirms that the ioctl LOOP_CHANGE_FD works well. After
+removing the ioctl, the test case failure is expected. Blktests CI caught it,
+and reported it with this e-mail.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f53047aa8d3c..c8510e6f1817 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4726,6 +4726,7 @@ F:	include/uapi/linux/blk*
- F:	include/uapi/linux/ioprio.h
- F:	kernel/trace/blktrace.c
- F:	lib/sbitmap.c
-+F:	lib/tests/sbitmap_kunit.c
- 
- BLOCK LAYER DEVICE DRIVER API [RUST]
- M:	Andreas Hindborg <a.hindborg@kernel.org>
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 6b24a2c89b84..f5fe7f5a0a4d 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -2456,6 +2456,19 @@ config PRINTF_KUNIT_TEST
- 
- 	  If unsure, say N.
- 
-+config SBITMAP_KUNIT_TEST
-+	tristate "KUnit test for sbitmap" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	depends on SBITMAP
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Enable to turn on sbitmap tests, running at boot or module load time.
-+
-+	  For more information on KUnit and unit tests in general, please refer
-+	  to the KUnit documentation in Documentation/dev-tools/kunit/.
-+
-+	  If unsure, say N.
-+
- config SCANF_KUNIT_TEST
- 	tristate "KUnit test scanf() family of functions at runtime" if !KUNIT_ALL_TESTS
- 	depends on KUNIT
-diff --git a/lib/tests/Makefile b/lib/tests/Makefile
-index 3cac3b63a752..1f49555f94c3 100644
---- a/lib/tests/Makefile
-+++ b/lib/tests/Makefile
-@@ -44,6 +44,7 @@ obj-$(CONFIG_OVERFLOW_KUNIT_TEST) += overflow_kunit.o
- obj-$(CONFIG_PRANDOM_KUNIT_TEST) += random32_kunit.o
- obj-$(CONFIG_PRINTF_KUNIT_TEST) += printf_kunit.o
- obj-$(CONFIG_RANDSTRUCT_KUNIT_TEST) += randstruct_kunit.o
-+obj-$(CONFIG_SBITMAP_KUNIT_TEST) += sbitmap_kunit.o
- obj-$(CONFIG_SCANF_KUNIT_TEST) += scanf_kunit.o
- obj-$(CONFIG_SEQ_BUF_KUNIT_TEST) += seq_buf_kunit.o
- obj-$(CONFIG_SIPHASH_KUNIT_TEST) += siphash_kunit.o
-diff --git a/lib/tests/sbitmap_kunit.c b/lib/tests/sbitmap_kunit.c
-new file mode 100644
-index 000000000000..4f3a588d15df
---- /dev/null
-+++ b/lib/tests/sbitmap_kunit.c
-@@ -0,0 +1,300 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KUnit tests for the scalable bitmap (sbitmap) implementation.
-+ *
-+ * sbitmap is the tag allocator used by blk-mq and the I/O schedulers built on
-+ * top of it, but it has no tests.  These tests pin down the observable
-+ * behaviour of the plain, synchronous parts of the API.
-+ *
-+ * Copyright (C) 2026 Wang Yibo <szwyb123@gmail.com>
-+ */
-+
-+#include <linux/bitmap.h>
-+#include <linux/gfp.h>
-+#include <linux/sbitmap.h>
-+
-+#include <kunit/test.h>
-+
-+/*
-+ * Big enough to span several words for any plausible BITS_PER_LONG, and not a
-+ * power of two so that the last word is partially used.
-+ */
-+#define SBITMAP_TEST_DEPTH	(3 * BITS_PER_LONG + 5)
-+
-+static void sbitmap_test_init(struct kunit *test)
-+{
-+	const unsigned int depth = 97;
-+	struct sbitmap sb;
-+	int ret;
-+
-+	ret = sbitmap_init_node(&sb, depth, -1, GFP_KERNEL, NUMA_NO_NODE,
-+				false, true);
-+	KUNIT_ASSERT_EQ(test, ret, 0);
-+	KUNIT_EXPECT_EQ(test, sb.depth, depth);
-+	KUNIT_EXPECT_EQ(test, sb.shift,
-+			(unsigned int)sbitmap_calculate_shift(depth));
-+	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, 1U << sb.shift));
-+	KUNIT_EXPECT_FALSE(test, sb.round_robin);
-+	KUNIT_EXPECT_NOT_NULL(test, sb.alloc_hint);
-+	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), 0U);
-+	sbitmap_free(&sb);
-+
-+	/* An explicitly requested shift is honoured. */
-+	ret = sbitmap_init_node(&sb, depth, 3, GFP_KERNEL, NUMA_NO_NODE,
-+				false, true);
-+	KUNIT_ASSERT_EQ(test, ret, 0);
-+	KUNIT_EXPECT_EQ(test, sb.shift, 3U);
-+	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, 1U << 3));
-+	sbitmap_free(&sb);
-+
-+	/* BITS_PER_LONG bits per word is the largest representable granularity. */
-+	ret = sbitmap_init_node(&sb, depth, ilog2(BITS_PER_LONG), GFP_KERNEL,
-+				NUMA_NO_NODE, false, true);
-+	KUNIT_ASSERT_EQ(test, ret, 0);
-+	KUNIT_EXPECT_EQ(test, sb.shift, (unsigned int)ilog2(BITS_PER_LONG));
-+	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, BITS_PER_LONG));
-+	sbitmap_free(&sb);
-+
-+	/* Anything above that cannot be represented and must be rejected. */
-+	ret = sbitmap_init_node(&sb, depth, ilog2(BITS_PER_LONG) + 1,
-+				GFP_KERNEL, NUMA_NO_NODE, false, true);
-+	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
-+}
-+
-+static void sbitmap_test_calculate_shift(struct kunit *test)
-+{
-+	/* Maps too small to spread over several words keep the default. */
-+	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(0), ilog2(BITS_PER_LONG));
-+	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(1), ilog2(BITS_PER_LONG));
-+	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(3), ilog2(BITS_PER_LONG));
-+
-+	/* Four bits map to one bit per word. */
-+	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4), 0);
-+
-+	/* The shift grows back as the depth increases. */
-+	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4 * BITS_PER_LONG - 1),
-+			ilog2(BITS_PER_LONG) - 1);
-+	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4 * BITS_PER_LONG),
-+			ilog2(BITS_PER_LONG));
-+}
-+
-+static void sbitmap_test_get_exhaust(struct kunit *test)
-+{
-+	DECLARE_BITMAP(seen, SBITMAP_TEST_DEPTH) = { 0 };
-+	struct sbitmap sb;
-+	unsigned int i;
-+	int bit;
-+
-+	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
-+						GFP_KERNEL, NUMA_NO_NODE,
-+						false, true), 0);
-+
-+	/* Every bit is handed out exactly once, then the map is empty. */
-+	for (i = 0; i < SBITMAP_TEST_DEPTH; i++) {
-+		bit = sbitmap_get(&sb);
-+		KUNIT_ASSERT_GE(test, bit, 0);
-+		KUNIT_ASSERT_LT(test, bit, (int)SBITMAP_TEST_DEPTH);
-+		KUNIT_ASSERT_FALSE(test, test_bit(bit, seen));
-+		__set_bit(bit, seen);
-+	}
-+
-+	KUNIT_EXPECT_TRUE(test, sbitmap_any_bit_set(&sb));
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
-+			(unsigned int)SBITMAP_TEST_DEPTH);
-+	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
-+
-+	sbitmap_free(&sb);
-+}
-+
-+static void sbitmap_test_put_reuse(struct kunit *test)
-+{
-+	struct sbitmap sb;
-+	unsigned int i;
-+	int bit;
-+
-+	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, BITS_PER_LONG, -1,
-+						GFP_KERNEL, NUMA_NO_NODE,
-+						true, true), 0);
-+
-+	for (i = 0; i < BITS_PER_LONG; i++)
-+		KUNIT_ASSERT_GE(test, sbitmap_get(&sb), 0);
-+
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), (unsigned int)BITS_PER_LONG);
-+	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
-+
-+	/*
-+	 * Freeing a single bit must make exactly that bit available again, no
-+	 * matter which bit it was.
-+	 */
-+	for (i = 0; i < BITS_PER_LONG; i++) {
-+		sbitmap_put(&sb, i);
-+		KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
-+				(unsigned int)BITS_PER_LONG - 1);
-+		bit = sbitmap_get(&sb);
-+		KUNIT_EXPECT_EQ(test, bit, (int)i);
-+		KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
-+				(unsigned int)BITS_PER_LONG);
-+		KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
-+	}
-+
-+	sbitmap_free(&sb);
-+}
-+
-+static void sbitmap_test_round_robin(struct kunit *test)
-+{
-+	struct sbitmap sb;
-+	unsigned int i;
-+	int bit, prev = -1;
-+
-+	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
-+						GFP_KERNEL, NUMA_NO_NODE,
-+						true, true), 0);
-+
-+	/*
-+	 * round_robin must hand out strictly increasing bit numbers while the
-+	 * map fills up from empty.
-+	 */
-+	for (i = 0; i < SBITMAP_TEST_DEPTH; i++) {
-+		bit = sbitmap_get(&sb);
-+		KUNIT_ASSERT_GE(test, bit, 0);
-+		KUNIT_ASSERT_LT(test, bit, (int)SBITMAP_TEST_DEPTH);
-+		if (prev != -1)
-+			KUNIT_ASSERT_GT(test, bit, prev);
-+		prev = bit;
-+	}
-+
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
-+			(unsigned int)SBITMAP_TEST_DEPTH);
-+	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
-+
-+	sbitmap_free(&sb);
-+}
-+
-+static void sbitmap_test_resize(struct kunit *test)
-+{
-+	const unsigned int depth = 4 * BITS_PER_LONG;
-+	struct sbitmap sb;
-+	unsigned int i;
-+
-+	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, depth, -1, GFP_KERNEL,
-+						NUMA_NO_NODE, true, true), 0);
-+
-+	for (i = 0; i < depth; i++)
-+		KUNIT_ASSERT_GE(test, sbitmap_get(&sb), 0);
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth);
-+
-+	/* Shrinking hides the bits past the new depth. */
-+	sbitmap_resize(&sb, depth / 2);
-+	KUNIT_EXPECT_EQ(test, sb.depth, depth / 2);
-+	KUNIT_EXPECT_EQ(test, sb.map_nr,
-+			DIV_ROUND_UP(depth / 2, 1U << sb.shift));
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth / 2);
-+	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
-+
-+	/* Growing makes them visible again; they are still allocated. */
-+	sbitmap_resize(&sb, depth);
-+	KUNIT_EXPECT_EQ(test, sb.depth, depth);
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth);
-+	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
-+
-+	sbitmap_free(&sb);
-+}
-+
-+static void sbitmap_test_set_clear_bit(struct kunit *test)
-+{
-+	static const unsigned int bits[] = {
-+		0, 1, BITS_PER_LONG - 1, BITS_PER_LONG,
-+		2 * BITS_PER_LONG + 3, SBITMAP_TEST_DEPTH - 1
-+	};
-+	struct sbitmap sb;
-+	unsigned int i;
-+
-+	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
-+						GFP_KERNEL, NUMA_NO_NODE,
-+						false, true), 0);
-+
-+	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
-+
-+	for (i = 0; i < ARRAY_SIZE(bits); i++) {
-+		sbitmap_set_bit(&sb, bits[i]);
-+		KUNIT_EXPECT_TRUE(test, sbitmap_test_bit(&sb, bits[i]));
-+	}
-+	KUNIT_EXPECT_TRUE(test, sbitmap_any_bit_set(&sb));
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), (unsigned int)ARRAY_SIZE(bits));
-+
-+	for (i = 0; i < ARRAY_SIZE(bits); i++) {
-+		sbitmap_clear_bit(&sb, bits[i]);
-+		KUNIT_EXPECT_FALSE(test, sbitmap_test_bit(&sb, bits[i]));
-+	}
-+	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
-+	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), 0U);
-+
-+	sbitmap_free(&sb);
-+}
-+
-+struct sbitmap_iter_ctx {
-+	struct kunit *test;
-+	DECLARE_BITMAP(visited, SBITMAP_TEST_DEPTH);
-+	unsigned int nr_visited;
-+};
-+
-+static bool sbitmap_iter_collect(struct sbitmap *sb, unsigned int bitnr,
-+				 void *data)
-+{
-+	struct sbitmap_iter_ctx *ctx = data;
-+
-+	KUNIT_ASSERT_LT(ctx->test, bitnr, SBITMAP_TEST_DEPTH);
-+	__set_bit(bitnr, ctx->visited);
-+	ctx->nr_visited++;
-+
-+	return true;
-+}
-+
-+static void sbitmap_test_iterate_set(struct kunit *test)
-+{
-+	static const unsigned int bits[] = {
-+		0, 5, BITS_PER_LONG - 1, BITS_PER_LONG, 130,
-+		SBITMAP_TEST_DEPTH - 1
-+	};
-+	struct sbitmap_iter_ctx ctx = { .test = test };
-+	struct sbitmap sb;
-+	unsigned int i;
-+
-+	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
-+						GFP_KERNEL, NUMA_NO_NODE,
-+						false, true), 0);
-+
-+	for (i = 0; i < ARRAY_SIZE(bits); i++)
-+		sbitmap_set_bit(&sb, bits[i]);
-+
-+	sbitmap_for_each_set(&sb, sbitmap_iter_collect, &ctx);
-+
-+	KUNIT_EXPECT_EQ(test, ctx.nr_visited, (unsigned int)ARRAY_SIZE(bits));
-+	for (i = 0; i < ARRAY_SIZE(bits); i++)
-+		KUNIT_EXPECT_TRUE(test, test_bit(bits[i], ctx.visited));
-+
-+	sbitmap_free(&sb);
-+}
-+
-+static struct kunit_case sbitmap_test_cases[] = {
-+	KUNIT_CASE(sbitmap_test_init),
-+	KUNIT_CASE(sbitmap_test_calculate_shift),
-+	KUNIT_CASE(sbitmap_test_get_exhaust),
-+	KUNIT_CASE(sbitmap_test_put_reuse),
-+	KUNIT_CASE(sbitmap_test_round_robin),
-+	KUNIT_CASE(sbitmap_test_resize),
-+	KUNIT_CASE(sbitmap_test_set_clear_bit),
-+	KUNIT_CASE(sbitmap_test_iterate_set),
-+	{}
-+};
-+
-+static struct kunit_suite sbitmap_test_suite = {
-+	.name = "sbitmap",
-+	.test_cases = sbitmap_test_cases,
-+};
-+
-+kunit_test_suite(sbitmap_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit test for sbitmap");
-+MODULE_LICENSE("GPL");
+The test case loop/006 is no longer valid, and its failure should be handled.
+I can think of two action candidates:
 
-base-commit: 4056b3c9d3c92ea45955641dbafeb9b960e146ef
--- 
-2.25.1
+  1) just remove the test case loop/006
+  2) skip the test case for kernel versions larger than v7.4, and keep it for
+     older kernel versions
 
+The ioctl has been broken for certain period, so I think action 1) is more
+appropriate. If anyone has different opinion, please share. Otherwise, I will
+post a patch to remove loop/006.
