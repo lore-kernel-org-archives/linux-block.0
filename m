@@ -1,83 +1,79 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890944D2EF4;
-	Wed, 14 Oct 2026 07:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B658D47F775
+	for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 07:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791964024; cv=none; b=NYyBE3FzRpUUSjzMLQiAHKdBqK/OYL3PziWp3ZAQNdw933l98r59fyp7yI4cwfs2jxeRWjn1vWjv1TRGC9B3PDZx+PGmZpnYFliaSbqbepcqkhTzhWYAhta4ZKStVoxJGn9rSD9KbLfybRXc7UwYM3E6BY5oiDy5GwQlzqehjSs=
+	t=1791964319; cv=none; b=snNNtzvxlxO5ZLz8Z2luf21V08A8nGnDt01RrOKa86cWeXnGUH2Gog5p0JqKAKZnizix0184MXroXAyJsj0kCz0DX4f0yKCX8UDW8yH4oIHxZ5pceuTTKnW/m3jUySYPDYefuv+pVfvxIKSbsr4yknZ6AnJ4T9F8zZXD5wMw8jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791964024; c=relaxed/simple;
-	bh=/rk6sJunTBYLfZHFAgxHUAun2icMRgNCX7DF/PkONoc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GkPauBJg44qdaV+XNNNn9pmE04Aq4CmnhmlYeayE0dbh73CYxOKKXqm4j7lP0f/K6G2SACPOW4ZsArpDdXudw39ovAkVz/M8VeVr7QDLuIoq8yLPRtfCAgVIMesZcOLTB4/+vO7qw4tXeXoXxEMrB6EEkERodAuknsoNNT+pYdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=WoGoHmWJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=raGNwvTo; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=WoGoHmWJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=raGNwvTo; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1791964319; c=relaxed/simple;
+	bh=/jIAw+yh+RCdIwON/KMt7cVbNi1WZZ6bQGIWKq+RrIs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pfREANnjGa0uq7RN6Om3llLeLfjrigln5FryGz9NnsyY5yJT5SygeI1hnPXwHur+Mc7v7e5BePtKiZZ8xVpf3gODFP6STvR4vM7UAyUWeS7wKRsFKD6CM8vJLb5zJd+CukR10Jjjcp4a6x5WaYkfuytinmPcPnyVCFnm4nF7Oo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=prntN53P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=zEw8vjc9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=prntN53P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=zEw8vjc9; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="WoGoHmWJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="raGNwvTo";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="WoGoHmWJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="raGNwvTo"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="prntN53P";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="zEw8vjc9";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="prntN53P";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="zEw8vjc9"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 5DE7F2210A;
-	Wed, 14 Oct 2026 07:47:00 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 67A7E21E5D;
+	Wed, 14 Oct 2026 07:51:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791964020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1791964314; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jY5uDs5ZYhzEMmozgqStfId9AG+h5B7c2v3Gd0MW/+A=;
-	b=WoGoHmWJnI+6kzfwl/E0FHJU+eTCu+pnLgU1Ok1mwBC+WnbKbrRQDZTSuYC76YmbVPcRyZ
-	j1b4Jptwc93vfne5+tnEFyyE7c7dCsgcAuyeNEqeM4MmSwPsxgQag5wg7Mgxd3GdRWgYTe
-	0BjJOqRP+tu0jYeq0SaD+yKz1cGM7UY=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HRTqqsF0Bv3kLAm3cpGKpYcVToU8tQ3kC08BJrZRjDI=;
+	b=prntN53PYwgbkDXydcGykg8IXmkQT2UPysjVEiuHSvh4l49vU349wZEqok/Ei15pGbSyNW
+	MG/psii915c4HfzHaitqeqCQsRraV2VeZTr5PDc9jRND2GmkfGdiKf3iEZAg6ORFo9XhSE
+	IzEF9zfrZHiL+dkiZwGXdifWghIyyd4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791964020;
+	s=susede2_ed25519; t=1791964314;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jY5uDs5ZYhzEMmozgqStfId9AG+h5B7c2v3Gd0MW/+A=;
-	b=raGNwvTopKDH9qU+gA5p444Xie7lvVChefJPII2wYy8m/dzFMstcEcuECmyt9rYvgySrf0
-	PhnFct9wCzxEcrAA==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HRTqqsF0Bv3kLAm3cpGKpYcVToU8tQ3kC08BJrZRjDI=;
+	b=zEw8vjc94gOzi+I/b6C67ykmGY1upqyhKfHc2wPcqd/ILJGC28SnpI9RY4MYw4KyWDG1/D
+	t0mlkqDoYz2huYAA==
 Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=WoGoHmWJ;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=raGNwvTo
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=prntN53P;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=zEw8vjc9
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791964020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1791964314; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jY5uDs5ZYhzEMmozgqStfId9AG+h5B7c2v3Gd0MW/+A=;
-	b=WoGoHmWJnI+6kzfwl/E0FHJU+eTCu+pnLgU1Ok1mwBC+WnbKbrRQDZTSuYC76YmbVPcRyZ
-	j1b4Jptwc93vfne5+tnEFyyE7c7dCsgcAuyeNEqeM4MmSwPsxgQag5wg7Mgxd3GdRWgYTe
-	0BjJOqRP+tu0jYeq0SaD+yKz1cGM7UY=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HRTqqsF0Bv3kLAm3cpGKpYcVToU8tQ3kC08BJrZRjDI=;
+	b=prntN53PYwgbkDXydcGykg8IXmkQT2UPysjVEiuHSvh4l49vU349wZEqok/Ei15pGbSyNW
+	MG/psii915c4HfzHaitqeqCQsRraV2VeZTr5PDc9jRND2GmkfGdiKf3iEZAg6ORFo9XhSE
+	IzEF9zfrZHiL+dkiZwGXdifWghIyyd4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791964020;
+	s=susede2_ed25519; t=1791964314;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jY5uDs5ZYhzEMmozgqStfId9AG+h5B7c2v3Gd0MW/+A=;
-	b=raGNwvTopKDH9qU+gA5p444Xie7lvVChefJPII2wYy8m/dzFMstcEcuECmyt9rYvgySrf0
-	PhnFct9wCzxEcrAA==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HRTqqsF0Bv3kLAm3cpGKpYcVToU8tQ3kC08BJrZRjDI=;
+	b=zEw8vjc94gOzi+I/b6C67ykmGY1upqyhKfHc2wPcqd/ILJGC28SnpI9RY4MYw4KyWDG1/D
+	t0mlkqDoYz2huYAA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2FEFE133F1;
-	Wed, 14 Oct 2026 07:47:00 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3771A1368E;
+	Wed, 14 Oct 2026 07:51:54 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id HCq5BHQzz2q9OQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 14 Oct 2026 07:47:00 +0000
+	id XUYZBZo0z2rEPwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 14 Oct 2026 07:51:54 +0000
 From: Daniel Wagner <dwagner@suse.de>
-Date: Wed, 14 Oct 2026 09:46:43 +0200
-Subject: [PATCH 5/5] nvme-fabrics: clear the poll map if no poll queues are
- mapped
+Subject: [PATCH blktests 0/5] nvme: tests for isolated CPUs and fabrics
+ queue mapping
+Date: Wed, 14 Oct 2026 09:51:46 +0200
+Message-Id: <20261014-nvme-isolcpu-v1-0-2fd175a8ef00@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -86,89 +82,87 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261014-nvme-fabrics-isolcpu-v1-5-355156be27b2@kernel.org>
-References: <20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org>
-In-Reply-To: <20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org>
-To: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc: Ming Lei <ming.lei@redhat.com>, Surabhi Gogte <sgogte@purestorage.com>, 
- Hannes Reinecke <hare@kernel.org>, Nilay Shroff <nilay@linux.ibm.com>, 
- Frederic Weisbecker <frederic@kernel.org>, 
- Aaron Tomlin <atomlin@atomlin.com>, Maurizio Lombardi <mlombard@redhat.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- linux-kernel@vger.kernel.org, Daniel Wagner <wagi@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMQQqDMBREryKzbiCREtCrSBcaf+pXGyU/iiDev
+ bFdvhneOyEUmQR1cSLSzsJLyGAeBdzQhjcp7jOj1KU12jxV2D95k2V266Yqr60h21bWe2RljeT
+ 5+OUadPOUSJLg9X9k60Zy6a7hur74i8aYegAAAA==
+X-Change-ID: 20261014-nvme-isolcpu-9f061e6a96ff
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ Daniel Wagner <wagi@kernel.org>
 X-Mailer: b4 0.16.0
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 67A7E21E5D
 X-Rspamd-Action: no action
-X-Spam-Score: -3.51
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.51 / 50.00];
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
-	MID_RHS_MATCH_TO(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
 	MX_GOOD(-0.01)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
 	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
 	RCVD_TLS_ALL(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL71uuc3g3e76oxfn4mu5aogan)];
+	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_COUNT_TWO(0.00)[2];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim];
 	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 5DE7F2210A
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
 
-From: Daniel Wagner <wagi@kernel.org>
+New tests for the bugs fixed by the kernel series "nvme-fabrics: fix
+connects with isolated CPUs and queue mapping bugs":
 
-blk_mq_alloc_tag_set sets the nr_queues of every map to nr_hw_queues.
-When nr_poll_queues is set but no queues are left for polling,
-nvmf_map_queues skips the poll map and leaves it this way, with all CPUs
-mapped to hctx 0.  The queue then claims poll support, polled I/O ends
-up on hctx 0, which isn't a poll queue, and hctx 0 is marked as a poll
-hctx, so even the Connect command of the first I/O queue is marked as
-polled.
+https://lore.kernel.org/linux-nvme/20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org/
 
-Clear the poll map when no poll queues are mapped, so polled I/O is
-rejected with -EOPNOTSUPP.
+  nvme/070  connect with an isolated CPU (cpuset partition), verified
+            I/O from a housekeeping and from the isolated CPU, traced on
+            the queue of the isolated CPU
+  nvme/071  more write and poll queues than online CPUs
+  nvme/072  no queues left for polling
+  nvme/073  reconnect with fewer I/O queues
 
-Fixes: 1a9460cef571 ("nvme-tcp: support simple polling")
-Fixes: 5651cd3c4336 ("nvme-rdma: fix queue mapping when queue count is limited")
+nvme/071-073 need write and poll queues and only run for tcp and rdma.
+Without the kernel series all four fail and nvme/073 crashes the kernel,
+with the series they pass. Tested with loop and tcp.
+
+Patch 1 stops _nvme_disconnect_ctrl() and _nvme_disconnect_subsys() from
+truncating $FULL, which dropped everything logged before the disconnect,
+e.g. the fio command lines.
+
 Signed-off-by: Daniel Wagner <wagi@kernel.org>
 ---
- drivers/nvme/host/fabrics.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Daniel Wagner (5):
+      common/nvme: don't truncate the full log when disconnecting
+      nvme/070: test connect with an isolated CPU
+      nvme/071: test I/O queue limits per queue type
+      nvme/072: test poll support without poll queues
+      nvme/073: test reconnect with fewer I/O queues
 
-diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
-index 27a8ce51d2b3..3d7ad86c1955 100644
---- a/drivers/nvme/host/fabrics.c
-+++ b/drivers/nvme/host/fabrics.c
-@@ -1199,6 +1199,13 @@ void nvmf_map_queues(struct blk_mq_tag_set *set, struct nvme_ctrl *ctrl,
- 			io_queues[HCTX_TYPE_DEFAULT] +
- 			io_queues[HCTX_TYPE_READ];
- 		blk_mq_map_queues(&set->map[HCTX_TYPE_POLL]);
-+	} else {
-+		/*
-+		 * blk_mq_alloc_tag_set sets nr_queues of all maps to
-+		 * nr_hw_queues.  Clear the poll map, otherwise the queue claims
-+		 * poll support and polled I/O ends up on hctx 0.
-+		 */
-+		set->map[HCTX_TYPE_POLL].nr_queues = 0;
- 	}
- 
- 	dev_info(ctrl->device,
+ common/nvme        |   4 +-
+ tests/nvme/070     | 196 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/070.out |   2 +
+ tests/nvme/071     | 104 ++++++++++++++++++++++++++++
+ tests/nvme/071.out |   2 +
+ tests/nvme/072     |  85 +++++++++++++++++++++++
+ tests/nvme/072.out |   2 +
+ tests/nvme/073     | 117 ++++++++++++++++++++++++++++++++
+ tests/nvme/073.out |   2 +
+ 9 files changed, 512 insertions(+), 2 deletions(-)
+---
+base-commit: 6f5a1dcb4551fe45c35e1fb1cdfa8343909f834a
+change-id: 20261014-nvme-isolcpu-9f061e6a96ff
 
--- 
-2.56.0
+Best regards,
+--  
+Daniel Wagner <wagi@kernel.org>
 
