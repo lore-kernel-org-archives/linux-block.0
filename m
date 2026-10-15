@@ -1,223 +1,89 @@
-Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022129.outbound.protection.outlook.com [52.101.96.129])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67B738DD3;
-	Thu, 15 Oct 2026 02:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.129
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792029755; cv=fail; b=WWG9P+Im4eGJHgL4udBUp/PFYX/8LLmkFbagazmJXeCFIlv7PYDzvIBAT0vjqf2NFg7lRYSx5WPo1/nj3dYUducgnfvhGLbLJPZxZVBs1WnHhF5HrW7HDMBO2oyF4j8ahLOitUxKbxb4YPsEiSwg54jV2IdWk6HrMsU12yJZiVs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792029755; c=relaxed/simple;
-	bh=LmFqJKo/ZL36Hvhu+HsGX/jnLE47Wrm0L4MgTP6hre0=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=XocDDU94MlR+1BjUqMAFgKYttyd2bY3s00ffEpkoPHbqAo8vTt1x71qLKMQ/DM+8lcwAJxr3APMjAdzxF6Lpj72H7uzv79khqD0wYaRH/20+OBBM5nuFIbK92ntlAiqTx5G56aIb3ssAhFPmWOhplURv+AMrMt6+1kUNirOzPr0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.96.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f6pWJH05BYTfc6XQywV481OncSzO5uYWImCcbzTMxhksAaZhRrXOlou9JbSvxE1P1pc3kb+zzBRIPofAbPUBn2g0tkmPeMJapxI2R0XNV0GPm46k5tD5MakRVuTxyscvnkmV/KsXMY/3LnYC5c5865ZAjfjzyzc+oCP+aKAlD/fYcSriM4JT4ETNBQSlDcc08wOL0v7v5IXZDHyNuVLpYHU9ScO4g84onFQGV71Ep+tcRKMFhWS3CE8X7o7WO/5K142hESS8ZkX/37hWYsycmiMteP8YRJ2RZi5Wm3zghR/sW5UPzYcD4sImOPPvHTpis7xXPLJ5GQWDU1KKRW3YgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=LKCmTLBE0nLTNqlkTW1dHWmovKsHW0QlP7iBP1IPDOY=;
- b=xWjLW/4vhGsuIscQyldMoFFLfnPfYrDmtdBrLAHDPQsocjb1w6nG7UuP1EUhKgd5DGJHFFM51vUaVwaMYeB/HC0x3YZTP9dbzU8eCiWgwfIGyDaxVC5gnCrHTIVx7bq78FqjF61gc34bPrQoyz5yf7BU1mfHnAZ3w7GSQDCE/tubJTI4PimaZ+TWPAKqw/r4D7VqTI16Dtg4Ugs03v/ii6zCeu18s/SMGH2mpam2GZCR3yp1Y7A+NjMBzTIdtFt2Okl0bGbgDyVSxB6YBcY7ih3Y8UrihI3pz+hc9/Nm4kRwB4F9v9aRWOm1FZGeItwuanPKEDToCt+dYALbg0HLIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by LO6P123MB7410.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:346::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.13; Thu, 15 Oct
- 2026 02:02:30 +0000
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0522.012; Thu, 15 Oct 2026
- 02:02:29 +0000
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com,
-	hare@suse.de,
-	dwagner@suse.de,
-	frederic@kernel.org,
-	tj@kernel.org,
-	atomlin@atomlin.com,
-	sean@ashe.io,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v2] blk-mq: dispatch kworker to housekeeping CPU when hctx cpumask is empty
-Date: Wed, 14 Oct 2026 22:02:25 -0400
-Message-ID: <20261015020225.422107-1-atomlin@atomlin.com>
-X-Mailer: git-send-email 2.55.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BN9PR03CA0379.namprd03.prod.outlook.com
- (2603:10b6:408:f7::24) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:183::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B1C221546
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 02:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792029849; cv=none; b=syZP5K/RAuQUHAF9ZkQfG/mSExj4jEO0UsaYAdJcN0mhh1NaBZEN1jdpFFoEdyxhMvqJXOC8PamsjU6nRx3E9Fn7gGQswUp7l9Hty/WBCv6wNjILO1bHJBuVP//ggqAvulO1t6eHM4SRPz4EyEV14gYjiEPcKdZoBheT7C9OtVo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792029849; c=relaxed/simple;
+	bh=5/R6V1sofD4k0McXJtl/Urnps5sOzFV+59970M1RyAg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TTLSyGW+txqCdHlNIEVCxUrQJ5FNKzvxXyxYpYKK75GVPkkNf64qNYEZB58lYrrLypL+wS46U5l3W0il4LsJnjz6YmMOpoF0lb7Pr58R8FJ0Nxy2ZNhZKgwx8YPWr577xsxzoKzLpmO2fZ49HHDaH7vlmeuQGO1v+5GWtM53N/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=DWVf8Kik; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DWVf8Kik"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3ac77270fbfso749449a91.2
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 19:04:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1792029847; x=1792634647; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+wgW4AUmqbNUpe4dZRuBCucz11edTIwYqEDP8LKuxdo=;
+        b=DWVf8KiknBxVj3QDwjr6EBhSZyNKrFhkcz0fZkHIgHbTD7vKtzHIlSNVF8PBAhtJWx
+         DCJLzkpxLIY77V0es6cyjZ/JtD0lv48mfEExATMMKoD0SSA9P4YRXRRDTbE62sQ1Q4/S
+         xwxJy7+vGQlnQif5TA8yeAdRby9GzOoGHv/c8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792029847; x=1792634647;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+wgW4AUmqbNUpe4dZRuBCucz11edTIwYqEDP8LKuxdo=;
+        b=qHQ8YV1zWFaEfZTHdSbzI3l25v8ieezUN9jPpP2Dv0h09kDC/oSMpMoiBFNOmbEmFZ
+         WTSgp8sGiey4GGsBn6t4CfxlXx6fZtliqxWXEPGzWatZZsllYw32bvTI2hsibqtm4D6o
+         sRl7cd/HsgtgLzVefji9MOXoRrUeH8OAGL9ZKJuxwLYE8M5P740PHyEZyb3Ik7Y459Wj
+         kmL4x+ESKSChweoSYExhz6144JtG9w4s2ZBWvlJHcNPbhbMVaHTr8d76uvNR+zwozzrT
+         OOidcXVuQthLPgY6s41tr68LXupZj7NB4Z+ARwnmjLVdOQkEb9PTxdGCWrdnQdDmtd+p
+         qtmg==
+X-Forwarded-Encrypted: i=1; AKwUvBy3OPs8T8CeBD0hyUsgARsBlWDg1Bum0Ev5FiDkwPFAPopWReWYj33xvpaRnQ3RKqVNOArMVuXDPasriw==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLtHbgRzkZ7DpAaYFrlmplgclEd947JOrdgqp+NXKJvd4HIGuua
+	/b3hr5c99V2EYl4e9dWY942J2apXDYztabhnktdVtiUsJNF2S8yn1LHw0M2GCrVZ3w==
+X-Gm-Gg: AYBFou2BsoyzHKghrOgp220E3IX9TYDI087L6Z6Iol8L570ZmFQ8GaHe6QbB/lGIQ9x
+	MyuajiUPK37vDyqv3Fc+yXRSlfaPT6K8oDNVv2BEFuprJJN2VYM/gWELDXB2TF5r83jclqip/Gq
+	Weqat5YhAI2p8DHNOmXYNQKbDRKNN61udShKa+fdQC5qwQQfGS3Qwb+FopPRlVxdy913Svo4+Ni
+	IDp4YgYLu7LJ0mHKVWx3b+Vgbj27G/ranPGH2ntbIMEIa2iJ1lg59BvojPiFZZel6RLq7c4qeh9
+	yiiTzrS6TG1atuFhusbSblzo7Mow0UV948vwmjwL1hkIACsVYTj/CGGm6UJXw0jS11I5xWckRLx
+	evNMQD92Ys2g6cyFCZjt8QJ31vZ9L8QxdevpZtFgthou3OfrwkPeKwZyMsF21P0we6fn4p3NIQg
+	YgtbGHspanfOtctWp2et7ALXX6wVO6gz3tRlVvjivkSc3HJRA4QTihYCBFAoGtedeLTnDWjUKQI
+	VRrtUs8i/VG0kkNnYYYlFrqlHhJVd2b59+3Pnc=
+X-Received: by 2002:a17:90b:5828:b0:3a4:ba6e:65c9 with SMTP id 98e67ed59e1d1-3ab3ac95f56mr12616470a91.59.1792029847508;
+        Wed, 14 Oct 2026 19:04:07 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:8455:7899:5a2e:26f8])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac94748c6csm1889088a91.10.2026.10.14.19.04.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Oct 2026 19:04:06 -0700 (PDT)
+Date: Thu, 15 Oct 2026 11:04:03 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Barry Song <baohua@kernel.org>
+Cc: Bo Zhang <zhangbo0325@gmail.com>, senozhatsky@chromium.org, 
+	akpm@linux-foundation.org, bgeffon@google.com, minchan@kernel.org, richardycc@google.com, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v3 10/11] zram: use rw_semaphore for decompression streams
+Message-ID: <atAzS6mTZQ80tTHM@google.com>
+References: <20261013035201.2809924-11-senozhatsky@chromium.org>
+ <20261014153603.1365617-1-zhangbo56@xiaomi.com>
+ <CAGsJ_4wuPCPR0DnbrLp7ebdO=Oih6K_yP4XxwETKQ+3U+THVjg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LO6P123MB7410:EE_
-X-MS-Office365-Filtering-Correlation-Id: 361c62ec-35c7-4b4a-dd31-08df2a605deb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|7416014|366016|376014|261009223027099003|10067099003|6133799003|56012099006|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	8fYNglJsBpqQXLoSPYiuWOSTTTChrG5ONsx0ytDu+Nhe6BvO5sRAe7Tf5NVr6apaOLKGHufNwtBheSVpNjiGh19UgDsiHWZIQE3Ye+o69TE4iCj5kpet0fL99nSjJ8v0d4rY2Tyb6iAbLcCGe1zh1OxMPBWW+LtcuuQqMNlb9F5OPbQYiNOtkzlSyGywiXm+yEY9SYTO8NR7H86jPPrZZ3naQnp/UQSLcGSxQucs8Aaiqx0YKK560AOcGBOY8jkgHBAeW15FMAD3bMlXs6ZJJOnVWEjKn4PON0x3v4C6GubNnWuOsFx/iGz3KT0fZWeqI3eloiN4IFYWX8moJgJSs9uXpG9eBgxABYtWA3tZDwi1xWUw5zx9bpV9nozxTkSRVxWnkVed/CBMorxdd8jibNFofLzZxDQSpiCwpBJitGq4g2BK3ioKoTw6wTTwtAjAQESWj6TY7QrlHv/CcQY0UmRT9DqUui9CNPrDHDJt80eFsDDiS+5XE1HSxig+3nwKhTOWlLD1Hcp5AdBicg6PdXfNiJIr8VjbHEfZn+lXf4yaibaSSyu7poRs7vha03QtJ5c2lUUtrbVwVxUCI/rEaTZ3Zr5cW2Hytn5cHfb7NENwI+GmcVMb1qHZRxmAsX5/
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(7416014)(366016)(376014)(261009223027099003)(10067099003)(6133799003)(56012099006)(18002099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?cuGVMnY8sYb2Sx2VFRv4S5OB/4vJQUjddMLZ7cxJ8hlqkB7VSAhuPQYPkjQ3?=
- =?us-ascii?Q?KbMbZgEr/dQEQ/DNWaefoV1AcsMACjJYIsuLnuPUUa/D5RJbFb9znRw1+l65?=
- =?us-ascii?Q?+UDCH5ZHjIqAckPsFc5Uy/1tdPNUISZwnSK7pCF4nYAYMJcV7LTPcvMQZ8zw?=
- =?us-ascii?Q?CcGYtgr9zXSDwrDWcPZNWax2pW4qaJ/7h1ImZCo05ia2vpKlXZ413zNdBb9U?=
- =?us-ascii?Q?MUiysKlMApAMhwLVN9YmoG9FY203vU+r7o8PfEX08ioyKefnbpzCcnFd9RG4?=
- =?us-ascii?Q?xNfkq9hN3ZbQpPCQ6SURVM5kIbzSPeqRWSUfSn5ok4k220tqyJhINnWN3L8w?=
- =?us-ascii?Q?sL6b+jNcby+ifIwDgi58xLoFq/yAJGnofp67NoSioUvQtQe+tIeNz2ivxGax?=
- =?us-ascii?Q?0HxPU6UTgeX+V48dCxuNhWq8/NMd6yScHK/4Vmrcw3joGJIfGwY6OYhqtbSF?=
- =?us-ascii?Q?Od7rMrWJIkXNEnQ1J/lYRj5WRC/rQ+zq5vlCJ8c1mMYp/UDauDDQCDOlwAeY?=
- =?us-ascii?Q?NfVXSZGjBzw+XKOzZ0VxQOlOZh9lcb/yaHanA1z9qVyRtlsJO5Wht9rFiHF6?=
- =?us-ascii?Q?XzBR7UEmFNtS6P+5jbfA/zkyopx1qTRqI5q3nNJegON3/wKqP1SGhPsR4D78?=
- =?us-ascii?Q?wS0H9xh5EDTEiN2/gWWmdH1a+9jxi+4siLxWP/7EK/SOPT+1UFUsB5abb6A8?=
- =?us-ascii?Q?AK34fJNAO2IUPtpf4ZT4/9TdzJUaS2Jif2tIVRnZ4pi/D/LZgj+tNIcuAuQo?=
- =?us-ascii?Q?cY0HTMu4YuP0Lk5PQCnzTGG0mEohT7povZN9aN0NJK/0rE4DJToebehIJ5kG?=
- =?us-ascii?Q?0XStvKzgHjIRFV6PtNuLr6cbPqtvaUN0cjbBVhUOkpHjOjvadNrHWHn/Kd87?=
- =?us-ascii?Q?4tBNF2Urg/VwyDAyqTnsL4KDgHNITkDmmRpynDdS8rPiePQLkKr6i1RHtCje?=
- =?us-ascii?Q?BjYToDW0vVvjVCBjUbYnM91EvzezS5/++8BOhROpUvkp/sF/XPXyO7HC+2+Y?=
- =?us-ascii?Q?/C5dForM3AGsWLJiMcWjazQHxuBNL75pm+6wPNfUdiy0Zrqo+9kaDPX6iqsl?=
- =?us-ascii?Q?eZLb8A5qlt7VjBHuCUSHhb1fR7SDQdYs0GFoSlavry0br48uwj7A5zUdzZPl?=
- =?us-ascii?Q?8nCHvpMBl3mdjxpu5AtiTQhPTHwuBsc043IevIcx9vvBy2QzjC/brnTNgt+W?=
- =?us-ascii?Q?prISht7F83pPGB+NwtstrRsbCeQRSFNnuo+eADAAeQHWlzpdotxnkRUyIVnJ?=
- =?us-ascii?Q?0p3yDe9t83rSMKsBm91NsVHnvMaSEi5/PCoqOOdyyNXMfMRPUqB5+DJD4lem?=
- =?us-ascii?Q?JqdK6eGhrlDjZPGVChLkb5/xk/624+i8Qg5mJc3FZbmzWSdsvVKh222oVgNf?=
- =?us-ascii?Q?2SvuxsoU1YQzKW03GEFzDtB+vcxAfAp1HWIjjvcUzUOfLkaf3ePhkoarGhnJ?=
- =?us-ascii?Q?zxAunzzC+fY4ndkGsn+vuKnRGm3SvtVwAsQ5u04f4O2/EKaH8adwLSifwXzj?=
- =?us-ascii?Q?PTASfyrj8Fg/mF2XIqSG5dzpX9q7NCLhy6hcoeZSnbO9KZAPKMlCaHEBSyc2?=
- =?us-ascii?Q?6E8pisIKX41T5wn8V0dMqCihG0Nv/8AAIrndI0gY+ABalntEqRMY1wWr1VRS?=
- =?us-ascii?Q?0qflsGDLYbFNdeq5VuYdYeKZCNN6H1oN4cHZAS4LkKjvfe7wLPJN6qAwV3og?=
- =?us-ascii?Q?YO/k/1UM/5tf418NEKmFzb51VrFyIf27RbfKVjARj18oifYK4TvOB8IyBx3Q?=
- =?us-ascii?Q?CLC7pEHkcQ=3D=3D?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 361c62ec-35c7-4b4a-dd31-08df2a605deb
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 02:02:29.3159
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Brau5zPiz+2MMJyaRTzaSJB6p5t5BDFds9Ux/MpnjDIZw8exws3wCxPfk8vDGhT/Jqug585z4p9wzWRtI3kqYw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO6P123MB7410
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGsJ_4wuPCPR0DnbrLp7ebdO=Oih6K_yP4XxwETKQ+3U+THVjg@mail.gmail.com>
 
-Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated
-CPUs") excluded isolated CPUs from hctx->cpumask to prevent worker
-threads from executing block work on isolated CPUs. When all CPUs mapped
-to a hardware queue are isolated (i.e. blk_mq_hctx_empty_cpumask(hctx)
-evaluates to true), blk_mq_hctx_next_cpu() returns WORK_CPU_UNBOUND with
-the intention of offloading execution.
+On (26/10/15 04:46), Barry Song wrote:
+> Also, with either deflate or zstd, create_dctx() will
+> always be present. So, what algorithm are we actually testing?
+> What happens if we switch to zstd?
 
-However, kblockd_workqueue is allocated as a per-CPU workqueue
-(WQ_PERCPU). When WORK_CPU_UNBOUND is queued on a per-CPU workqueue, the
-workqueue core resolves the target CPU via raw_smp_processor_id().
-Consequently, if a task executing on an isolated CPU submits I/O and
-triggers an asynchronous queue dispatch with zero delay (e.g. upon
-hardware queue congestion, tag/resource exhaustion returning
-BLK_STS_RESOURCE, or plugging), &hctx->run_work is queued directly onto
-the local isolated CPU's worker pool. This causes the local per-CPU
-high-priority kworker (e.g. "kworker/6:1H-kblockd") to be scheduled on
-the isolated CPU. In real-time environments, an active SCHED_FIFO workload
-will starve this SCHED_NORMAL worker, causing hardware dispatch to stall,
-in addition to introducing unwanted latency jitter on nohz_full cores,
-thereby defeating the original objective of commit a46c27026da1.
-
-Introduce blk_mq_hctx_unbound_cpu() to select an online housekeeping CPU
-via housekeeping_any_cpu(HK_TYPE_TIMER) when executing on an isolated
-CPU, and otherwise fall back to WORK_CPU_UNBOUND. Use this helper across
-the unbound fallback paths in blk_mq_hctx_next_cpu().
-
-This ensures that:
-    1.  When executing on an isolated CPU, deferred queue work is
-        cleanly offloaded to an online housekeeping CPU across single-queue
-        devices, hardware queues with empty cpumasks, and offline CPU
-        fallback paths.
-
-    2.  The per-CPU high-priority kworker on the isolated CPU is not
-        scheduled, avoiding priority inversion and latency jitter.
-
-    3.  When executing on a non-isolated CPU, WORK_CPU_UNBOUND is
-        preserved, maintaining optimal local execution with zero CPU
-        bouncing.
-
-Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: stable@vger.kernel.org
-Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
----
-Changes since v1:
-
- - Introduce the blk_mq_hctx_unbound_cpu() helper to steer deferred work
-   to an online housekeeping CPU only when executing on an isolated
-   core, preserving WORK_CPU_UNBOUND and local cache locality for
-   housekeeping cores
-
- - Apply blk_mq_hctx_unbound_cpu() across all unbound fallback paths in
-   blk_mq_hctx_next_cpu(), comprehensively covering single-queue devices
-   (nr_hw_queues == 1), empty hardware queue cpumasks, and the offline
-   CPU fallback path.
-
- - Elaborate in the commit log on the triggers for asynchronous queue
-   dispatch (e.g. tag exhaustion, BLK_STS_RESOURCE backpressure, and
-   plugging) and the SCHED_FIFO worker starvation hazard on isolated
-   cores
-
- - Link to v1: https://lore.kernel.org/lkml/20261012012905.267920-1-atomlin@atomlin.com/
----
- block/blk-mq.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 025a799f35b9..df6103b91e60 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2241,6 +2241,13 @@ static bool blk_mq_hctx_empty_cpumask(struct blk_mq_hw_ctx *hctx)
-         return hctx->next_cpu >= nr_cpu_ids;
- }
- 
-+static inline int blk_mq_hctx_unbound_cpu(void)
-+{
-+	if (cpu_is_isolated(raw_smp_processor_id()))
-+		return housekeeping_any_cpu(HK_TYPE_TIMER);
-+	return WORK_CPU_UNBOUND;
-+}
-+
- /*
-  * It'd be great if the workqueue API had a way to pass
-  * in a mask and had some smarts for more clever placement.
-@@ -2254,7 +2261,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 
- 	/* Switch to unbound if no allowable CPUs in this hctx */
- 	if (hctx->queue->nr_hw_queues == 1 || blk_mq_hctx_empty_cpumask(hctx))
--		return WORK_CPU_UNBOUND;
-+		return blk_mq_hctx_unbound_cpu();
- 
- 	if (--hctx->next_cpu_batch <= 0) {
- select_cpu:
-@@ -2281,7 +2288,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 		 */
- 		hctx->next_cpu = next_cpu;
- 		hctx->next_cpu_batch = 1;
--		return WORK_CPU_UNBOUND;
-+		return blk_mq_hctx_unbound_cpu();
- 	}
- 
- 	hctx->next_cpu = next_cpu;
--- 
-2.55.0
-
+Right.  Am not that concerned with deflate, but seeing zstd on that
+list is a tad sad.  zstd mutates decompression ctx, so it cannot be
+shared.  On the other hand, zstd_dctx_workspace_bound() is almost
+100KB so allocating dctx per-read request will be rather problematic.
