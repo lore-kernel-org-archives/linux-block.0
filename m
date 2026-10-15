@@ -1,184 +1,106 @@
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB3C5275B2;
-	Thu, 15 Oct 2026 12:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AE04FDE7C;
+	Thu, 15 Oct 2026 12:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792066879; cv=none; b=Kl65voyMA5gaaJkhf7n4i5sby3QCs6YQsr1JkGz5f71GbofsMIjd2oeR1cYZPt2VMtaTq35lreG1Z5genbVbJ3iVaL8jOxTPcNHLZ+2nE3vQrFibYAzvBZ5b36Cqu3lfzw08LZ30GRs8j5r9Pa6NMUGh10HDIZ7RXacCyjGClaI=
+	t=1792067379; cv=none; b=UhEtwloSKVkne/+WDyIvmr+/1JDmp8Jp3aog+VrWoTuULQOT9mK4t+mZOzeM6MTlOxpWuJbYHJltV3OEQ57MmG+6V1pPW5cHKAAPEISAvwqR3OyTyYTc5ZB9UP/MjIwJD6jp4LpZ52jfYp0tEXR/oZ0flo9IgfCSNjHO6L41B3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792066879; c=relaxed/simple;
-	bh=FLFyRRHhJi6tZU18s+v2YoKZn2fIoW7LNdezj0jo31A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iv1QuBRVqLULYOHQRPaKkcpTC/kNxSzv4oXnWyv2UCfHLGAphhYT1kx7NzmzmFnaHnt91f0R4s/N0NZwXk45eRkEWk5QUDrL0PhE1pJs+xKbSQ2e5UUREkGzlkhMtwQ1qYjW4GiAKVHcPa+I0M+MHJb8wneR0tB5EfIUn+y462k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=wNSiwWKR; arc=none smtp.client-ip=113.46.200.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1792067379; c=relaxed/simple;
+	bh=EdkoGLcjTyLAvjh/5BwakDPBCwlzJa0pxxqLHTIhYzE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RRj/4J28//Ibrl0AFqYjb52Z4O6fyn0bCa1K3BXnftw/Z2wXwQz9W5mmG/Mm3DFhp2wtbiUfzlH9yNphyED+WS3o5eSvhO264CJ6Nw8EU6B654twTCmDn8pLeJihWf3UQ3KrPCNj4Zi8BEfEBMYS/Mmp5zD14x+ej3DPsuLSkIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NDQaJqA1; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Diqi3L5P; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="wNSiwWKR"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=VESGW3TkU2bTfPpPgP4UR7E6JTjX0tkAQhUuZU9C/tM=;
-	b=wNSiwWKRvOV1fjcErXNkqErXQUmQG3eZuwQkj3Zu6VFMiHhxXORXqjDrFe8LUISRsPYsZW2e2
-	XQPGavZQkQgiZRnvDs0uHkrRCuZtCv9Ii/3WQe+SgmFIlieaRlAE3u38ZstYmsJIs87/e1uCN43
-	22ZWBtq2ZdGrbDeJX79IZTo=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4j56LH4HWVz1prLV;
-	Thu, 15 Oct 2026 20:08:55 +0800 (CST)
-Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
-	by mail.maildlp.com (Postfix) with ESMTPS id E96A04056E;
-	Thu, 15 Oct 2026 20:21:15 +0800 (CST)
-Received: from octopus.huawei.com (10.67.174.191) by
- whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Thu, 15 Oct 2026 20:21:10 +0800
-From: Cai Xinchen <caixinchen1@huawei.com>
-To: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
-	<jmorris@namei.org>, <serge@hallyn.com>, <corbet@lwn.net>,
-	<skhan@linuxfoundation.org>
-CC: <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
-	<eddyz87@gmail.com>, <memxor@gmail.com>, <martin.lau@linux.dev>,
-	<song@kernel.org>, <yonghong.song@linux.dev>, <jolsa@kernel.org>,
-	<emil@etsalapatis.com>, <ihor.solodrai@linux.dev>, <rdunlap@infradead.org>,
-	<gregkh@linuxfoundation.org>, <rafael@kernel.org>, <dakr@kernel.org>,
-	<johan@kernel.org>, <dlemoal@kernel.org>, <hch@lst.de>, <axboe@kernel.dk>,
-	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
-	<dhowells@redhat.com>, <code@tyhicks.com>, <linkinjeon@kernel.org>,
-	<sj1557.seo@samsung.com>, <yuezhang.mo@sony.com>,
-	<hirofumi@mail.parknet.co.jp>, <cel@kernel.org>, <jlayton@kernel.org>,
-	<neil@brown.name>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
-	<tom@talpey.com>, <hyc.lee@gmail.com>, <miklos@szeredi.hu>,
-	<amir73il@gmail.com>, <senozhatsky@chromium.org>,
-	<chenxiaosong@chenxiaosong.com>, <kpsingh@kernel.org>, <matt@bobrowski.net>,
-	<rostedt@goodmis.org>, <mhiramat@kernel.org>,
-	<mathieu.desnoyers@efficios.com>, <john.johansen@canonical.com>,
-	<georgia.garcia@canonical.com>, <zohar@linux.ibm.com>,
-	<roberto.sassu@huawei.com>, <dmitry.kasatkin@gmail.com>,
-	<eric.snowberg@oracle.com>, <stephen.smalley.work@gmail.com>,
-	<omosnacek@gmail.com>, <casey@schaufler-ca.com>, <takedakn@nttdata.co.jp>,
-	<penguin-kernel@I-love.SAKURA.ne.jp>, <xiujianfeng@huawei.com>,
-	<nanx95726@gmail.com>, <djwong@kernel.org>, <lujialin4@huawei.com>,
-	<bpf@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-	<driver-core@lists.linux.dev>, <linux-block@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <netfs@lists.linux.dev>,
-	<ecryptfs@vger.kernel.org>, <exfat@lists.linux.dev>,
-	<linux-nfs@vger.kernel.org>, <ntfs@lists.linux.dev>,
-	<linux-unionfs@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <apparmor@lists.ubuntu.com>,
-	<linux-integrity@vger.kernel.org>, <selinux@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-Subject: [PATCH v2 -next 18/18] Documentation: Update landlock doc for metadata rights
-Date: Thu, 15 Oct 2026 20:54:24 +0800
-Message-ID: <20261015125425.3246251-19-caixinchen1@huawei.com>
-X-Mailer: git-send-email 2.18.0.huawei.25
-In-Reply-To: <20261015125425.3246251-1-caixinchen1@huawei.com>
-References: <20261015125425.3246251-1-caixinchen1@huawei.com>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NDQaJqA1";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Diqi3L5P"
+Date: Thu, 15 Oct 2026 14:29:34 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1792067375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SiJnkX+uFAvEbBRKpsYNT584aijBABjRduz0e55KArA=;
+	b=NDQaJqA1XcisH3IazYB8/nWljI3F8weUNXOJLgfRscMyCTkuWSzsOJJkt0uwDzduEoBNNF
+	nEvVe7jMpMH0LOXP8UBg7jjT04JglRlk73NiKd5JCpEyD6prTvdfi6BRyB2VWw/6K5VJ+y
+	9JsSuM4qwR+0dJBHIxYLmM6oAo5w2qH4OmH48V3E2ZoLpoedS0QeOPmgWYa+G1gvQGny5u
+	NxJAR5l4TIzo0AnMf+WPmLWAraxfHhPGU/YUvtEm4cMsYw9/UTrEgpm/KTra+xsc9QfrWT
+	iIoIxIsajla/iGTyBGYjC2n4VML86fDIeKEWrePXA4tMpGWUMd9gb4CaWCSGAw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1792067375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SiJnkX+uFAvEbBRKpsYNT584aijBABjRduz0e55KArA=;
+	b=Diqi3L5PlE5sEU6DgUxl0lbiUUozIpHXpQKeV58bDnIvh2Ko9ik1GhSZQOZxl+A8vv5Jln
+	jizG5+8pAa0WvvDg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Daniel Wagner <dwagner@suse.de>
+Cc: Aaron Tomlin <atomlin@atomlin.com>, axboe@kernel.dk, tglx@kernel.org,
+	aacraid@microsemi.com, James.Bottomley@hansenpartnership.com,
+	mkp@kernel.org, frederic@kernel.org, ionut.nechita@windriver.com,
+	corbet@lwn.net, vincent.guittot@linaro.org, mingo@redhat.com,
+	peterz@infradead.org, radu@rendec.net, akpm@linux-foundation.org,
+	steve@abita.co, sean@ashe.io, chjohnst@gmail.com, neelx@suse.com,
+	mproche@gmail.com, nick.lange@gmail.com, marco.crivellari@suse.com,
+	rishil1999@outlook.com, linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v16 0/9] blk: honor isolcpus configuration
+Message-ID: <20261015122934.5itxaJ3l@linutronix.de>
+References: <20260910164237.500196-1-atomlin@atomlin.com>
+ <2f32ffb6-d889-4281-a612-d4185311ca0d@flourine.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- whupemk100010.china.huawei.com (7.152.184.41)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2f32ffb6-d889-4281-a612-d4185311ca0d@flourine.local>
 
-Update the user space documentation for the new
-LANDLOCK_ACCESS_FS_READ_METADATA and
-LANDLOCK_ACCESS_FS_WRITE_METADATA access rights: add them to the
-example ruleset attributes, extend the ABI version fallback switch
-to remove them for ABI < 13, and document their semantics in a new
-"File metadata" section, including the fact that only explicit
-metadata changes requested by user space are restricted.
+On 2026-10-15 13:22:35 [+0200], Daniel Wagner wrote:
+> During Plumbers we had several discussions on this series. This is what I
+> remember we discussed and decided:
+> 
+>   - The current managed_irq behavior doesn't match the other flags of isolcpus.
+> 
+>   - Instead of introducing managed_irq_strict, it's better to change the
+>     existing managed_irq to follow the strict interpretation.
+> 
+>   - The main existing user of the current managed_irq mapping is
+>     RH with OpenShift. After discussing with Juri, it doesn't look like
+>     it is a real blocker to change to the strict interpretation.
 
-The new section also warns that most of the time,
-LANDLOCK_ACCESS_FS_READ_METADATA should be granted together with
-LANDLOCK_ACCESS_FS_READ_FILE and LANDLOCK_ACCESS_FS_READ_DIR:
-programs commonly read metadata alongside file contents and
-directory listings (e.g. with stat(2)) and do not expect such calls
-to fail, while denying only READ_FILE or READ_DIR does not hide
-metadata.
+This is what I remember, too.
 
-Assisted-by: opencode: glm-5.3
-Signed-off-by: Cai Xinchen <caixinchen1@huawei.com>
----
- Documentation/userspace-api/landlock.rst | 47 +++++++++++++++++++++++-
- 1 file changed, 46 insertions(+), 1 deletion(-)
+>   - If there are complaints about the managed irq behavior change, it's
+>     better to introduce a different flag for this. Though there have been
+>     many discussions and proposals on how to deal with isolation during the
+>     conference, and the general mood was that the placement of resources
+>     should be done during runtime. Thus it is likely that the old behaviour
+>     is not necessary at all if runtime configuration is possible.
 
-diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
-index 3d45b956b640..62fe39a8b61e 100644
---- a/Documentation/userspace-api/landlock.rst
-+++ b/Documentation/userspace-api/landlock.rst
-@@ -87,7 +87,9 @@ to be explicit about the denied-by-default access rights.
-             LANDLOCK_ACCESS_FS_REFER |
-             LANDLOCK_ACCESS_FS_TRUNCATE |
-             LANDLOCK_ACCESS_FS_IOCTL_DEV |
--            LANDLOCK_ACCESS_FS_RESOLVE_UNIX,
-+            LANDLOCK_ACCESS_FS_RESOLVE_UNIX |
-+            LANDLOCK_ACCESS_FS_READ_METADATA |
-+            LANDLOCK_ACCESS_FS_WRITE_METADATA,
-         .handled_access_net =
-             LANDLOCK_ACCESS_NET_BIND_TCP |
-             LANDLOCK_ACCESS_NET_CONNECT_TCP |
-@@ -159,6 +161,10 @@ version, and only use the available subset of access rights:
-         ruleset_attr.handled_permissions &=
-             ~(LANDLOCK_PERMISSION_NAMESPACE_USE |
-               LANDLOCK_PERMISSION_CAPABILITY_USE);
-+        /* Removes metadata rights for ABI < 13 */
-+        ruleset_attr.handled_access_fs &=
-+            ~(LANDLOCK_ACCESS_FS_READ_METADATA |
-+              LANDLOCK_ACCESS_FS_WRITE_METADATA);
-     }
- 
- This enables the creation of an inclusive ruleset that will contain our rules.
-@@ -669,6 +675,45 @@ for writing, sidestepping the ``LANDLOCK_ACCESS_FS_TRUNCATE`` right.
- 
- The truncate right is associated with the opened file (see below).
- 
-+File metadata
-+-------------
-+
-+The ``LANDLOCK_ACCESS_FS_READ_METADATA`` right governs reading file and
-+directory metadata: :manpage:`stat(2)` and friends,
-+:manpage:`getxattr(2)`, :manpage:`listxattr(2)` and friends, and POSIX ACL
-+reads.
-+
-+The ``LANDLOCK_ACCESS_FS_WRITE_METADATA`` right governs explicit changes to
-+file and directory metadata: :manpage:`chmod(2)` and friends,
-+:manpage:`chown(2)` and friends, :manpage:`utimensat(2)`,
-+:manpage:`setxattr(2)`, :manpage:`removexattr(2)` and friends, and POSIX ACL
-+changes.  Both rights apply to files and directories alike.
-+
-+Implicit metadata changes performed by the kernel are not restricted by
-+``LANDLOCK_ACCESS_FS_WRITE_METADATA``: reading a file may update its access
-+time, writing a file updates its modification and change times and may change
-+the file size, and writing to or truncating a file with a set-user-ID or
-+set-group-ID bit clears these bits.  File size changes through
-+:manpage:`truncate(2)` and friends are governed by
-+``LANDLOCK_ACCESS_FS_TRUNCATE`` instead.  Metadata change requests that do
-+not change any attribute (e.g. :manpage:`chown(2)` with owner and group
-+``-1``) are not restricted either.
-+
-+.. warning::
-+
-+   Many programs read metadata as part of reading file contents or listing
-+   directories (e.g. calling :manpage:`stat(2)` before or after
-+   :manpage:`open(2)`), and do not expect such calls to fail with
-+   ``EACCES``.  Most of the time, ``LANDLOCK_ACCESS_FS_READ_METADATA``
-+   should therefore be granted together with
-+   ``LANDLOCK_ACCESS_FS_READ_FILE`` and ``LANDLOCK_ACCESS_FS_READ_DIR``.
-+   Conversely, denying only ``LANDLOCK_ACCESS_FS_READ_FILE`` or
-+   ``LANDLOCK_ACCESS_FS_READ_DIR`` does not hide metadata: it remains
-+   readable through :manpage:`stat(2)` and friends unless
-+   ``LANDLOCK_ACCESS_FS_READ_METADATA`` is denied as well.  Tailored
-+   programs that do not read metadata at all can still deny this right to
-+   further restrict their sandbox.
-+
- Rights associated with file descriptors
- ---------------------------------------
- 
--- 
-2.18.0.huawei.25
+The main argument/ problem is that managed_irq does not work as expected
+for the vast majority of users and should be fixed. This has only been
+"recently" documented.
 
+The whole isolcpus= was meant to be static and there was no argument why
+it needs to vanish. A dynamic interface for dynamic workloads is what
+you want especially if you have 80+ CPUs and workloads can change. But
+on <16 CPUs system the partition probably do not change. It is also not
+obvious if your driver(s) use managed_irqs or not.
+To get a runtime interface for this you would need to be able to
+reconfigure the managed_irq interrupt if "interrupts < CPUS". Otherwise
+it is just enable and disable like during CPU-hotplug but without it. If
+I remember it correctly, the device itself does not handle this at all
+but the block layers drains and starts queues during a hotplug event.
+
+> Hope this helps to move forward with this series,
+> Daniel
+
+Sebastian
