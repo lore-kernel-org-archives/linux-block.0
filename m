@@ -1,76 +1,44 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4BE3E763E
-	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 09:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+Received: from mailgw1.hygon.cn (unknown [101.204.27.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E8C503BD1;
+	Thu, 15 Oct 2026 09:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792055539; cv=none; b=oJhf+ADcWmesKHI12zyXuYl8OP6pTnq7nzNZuD/HtGMCJXimraKzFff9XH6UnqL+OdCOy/wV1d2iqMaaLi0M+eXXUjzUOuRARAXkJ6tNoFslz9MbfeAZzk3rQd82GRoXonPxuG40vCUYQZA+5Vxe2nDqD9XvNBcr8tqCeYZd7vU=
+	t=1792057254; cv=none; b=gBiB5S9h3JlvGsr28UHCAO0Dydo10uqnPAvQzsL43pYC0QbiFZr3CiElWmZb9RECd2oRNM+wlxRCDUlWTGgVHQOiWaIi1cxms8WodZWPJvQ1BwukVJ3FWcgCcA9UIzW3YUquHvgmxC50J7bd/msstV2GPUnK1JkCxiY7bpQcF+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792055539; c=relaxed/simple;
-	bh=uR6m+uWNfN2Yc6j/LIN6oH7sG1PGsCRjRis7NlxhRcM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=i0vL4oRhm6QxhRImSBjqY1+HnI8aYZUoXeFH0gEXCCmUQjyvFU0nMvpexvCYOxo3pmGxgaBnAJYOXP7QN4fOh5uzD22HklMB/ureqU1/R0Ztj3DZfDB/AxLETt6UPkuEpwgvgWHMAAwJor8spmwYNSG8QI5fkLuCucsGdhfqes8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=TZqRswby; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="TZqRswby"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3a8adb68d8bso3640902a91.1
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 02:12:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1792055538; x=1792660338; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mUtQyvHt2ryB24p7DORNQLnVbQrgtD+YNOuJHRPPYD0=;
-        b=TZqRswbyf3jRtEOV2cKOYJZ+cdgjW+P3kuIe9/h47Sl69s4aN3ZpeHP4ge6WmE0tri
-         HtZGid+gtsbEk0cA3ha+PKeKmfDhjyFGdLnAM/cBo/ajMhgUpfKDNJPDacX3rklofHWq
-         wcNtDhgrIzc1NZYh/Pwbdh9ZO2BSycbvETXh32w8bU3dXyZKrRI4mSYL4BildUhoK325
-         0kIojAYvmNqoQNE5vxV8u+yxaYKZ4wLY2P/HliaYA8iCJxYlAj5QmqDacA9bu8JelvJP
-         cf7Rn7sgfTqRxLxq+Bi2iPEMpkBgLYWFAK3FUxT4T+Cr0SFyGBmgLr7yneVyYVrnLS99
-         4cQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792055538; x=1792660338;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mUtQyvHt2ryB24p7DORNQLnVbQrgtD+YNOuJHRPPYD0=;
-        b=Mrh3d49jK0ARkJvPFXTkXTCVmnWzxdxz00gamdNXycsHrcblJYzqhPvPyEtd6xIsHu
-         rdJndee191JRL6JdeI2a3ETi3ec7PvAl1emtddHp94Xph3dL3/LirViD4NTxNu1XfkUx
-         IxWEW4nXA61+gTIjlTZsBOObC3cJ+bL5gsbkuSJ2B0ntbDVjtEp7UG0x6eUP80oKsVjj
-         scC8T7gqgqVJyUcc9mu2UzK47iOM4LT5K48kzhgWzG/G6jdSr/Tzi3vLTOP8YOMhYVDw
-         QJ16NVHlz7gqIKT5dO0SE1AVWF4mCXRjqM3MvVJ9UZdinzXJrOfAVlOH7LoUQHKdlF0G
-         koyQ==
-X-Gm-Message-State: AFq9FYKjlYwXqwnHPfExaSKUNktXozyRLWHZPHXJo1Tzg4RiJjMIjgQe
-	Tm5lReiQnQ9bsRtIdJgw/m3IZk0N2pTJPiiBNXCB2y5phu7arDb6eAu8iTYTzAyVNYgGZJAwTeV
-	TYEkj
-X-Gm-Gg: AYBFou2yY0Lbq5+mp7H17uZqNtJUXadDRd498Sfu32BFKcTz8pV5chmbv5UJXefs4Hi
-	sZoSigBf2WFyupl7qxaXEe9SKz7oOnssX/ba/WyqZIcdZNJ9Iu1t2OMdB72T9J3bdlfR+nqBhkb
-	ALrjjTRCURxMrH1QgPOTjI2jeJEp9u3pX0tXeKTNiKw6FBzHE/bwQlsAs7DwrmwcyiJDBoDR2tc
-	rxAAvvIA+vdiKsmBXrlir5VdKKzRPjU/y1luvMjPfh7oXfDzr68OuRfxkD9zoN/lfRl4XV516oc
-	X9hwRqCjwQZpmX+LX0vEES9izrECFTYUoEPDOyD1rY8QkmPgMThXfY7vturBR+iLNKS/5eR8r7N
-	jhyPZy9IK80pfboXALoEothR1i2OA3mdVW3NkSXw++NpREgIvRTAazNo8e0Cw5EyUa1Raz1nSoJ
-	2vM4AhxBbXZ0GyVoC6hBt9SjljXgEodsFZEGHWnXixeytcDgyZGoUTWEJWF1XYBrkw1amLkHlw
-X-Received: by 2002:a17:90b:390d:b0:3ac:85be:cd52 with SMTP id 98e67ed59e1d1-3ac85bed101mr3079120a91.59.1792055536305;
-        Thu, 15 Oct 2026 02:12:16 -0700 (PDT)
-Received: from localhost ([106.38.226.5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac943e821csm3386419a91.8.2026.10.15.02.11.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 02:12:15 -0700 (PDT)
-From: Julian Sun <sunjunchao@bytedance.com>
-To: linux-block@vger.kernel.org
-Cc: jack@suse.cz,
-	axboe@kernel.dk,
-	viro@zeniv.linux.org.uk,
-	mcgrof@kernel.org,
-	djwong@kernel.org
-Subject: [PATCH 2/2] block: take the inode lock for buffered write fallback
-Date: Thu, 15 Oct 2026 17:11:05 +0800
-Message-Id: <20261015091105.1315605-3-sunjunchao@bytedance.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20261015091105.1315605-1-sunjunchao@bytedance.com>
-References: <20261015091105.1315605-1-sunjunchao@bytedance.com>
+	s=arc-20240116; t=1792057254; c=relaxed/simple;
+	bh=QUmDIO21lFFlSts5XSmRSWXXX2WSM1FZf+XFYrY7P70=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iPDohncIAAijOeqYUFoOLhucgsRxm5AKMRFh1LazY7+4ts4QBpWJI0dnGyAoLHw74ZLe2LFymJpAPnhLrTeFQRCLR7GkgWGk5y5b98IaFlQLSktnDurmnQqx4MpIJvUo961RWI0jCZeZty7DnpYQehjvgFPnPs1xa/L8dG4xiGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn; spf=pass smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
+Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
+	by mailgw1.hygon.cn (Postfix) with ESMTP id 4j532y6DhDzCWwYc;
+	Thu, 15 Oct 2026 17:40:26 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
+	by mailgw1.hygon.cn (Postfix) with ESMTP id 4j532w2G0ZzCWwYX;
+	Thu, 15 Oct 2026 17:40:24 +0800 (CST)
+Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
+	by maildlp2.hygon.cn (Postfix) with ESMTPS id 9CCC930008F0;
+	Thu, 15 Oct 2026 17:35:14 +0800 (CST)
+Received: from hsj-2U-Workstation.hygon.cn (172.19.24.226) by
+ cncheex04.Hygon.cn (172.23.18.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 15 Oct 2026 17:40:20 +0800
+From: Huang Shijie <huangsj@hygon.cn>
+To: <axboe@kernel.dk>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>
+CC: <zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>, <yingzhiwei@hygon.cn>,
+	<jack@suse.cz>, <agruenba@redhat.com>, <mic@digikod.net>,
+	<gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
+	<serge@hallyn.com>, <aleksa@amutable.com>, <legion@kernel.org>,
+	<david@kernel.org>, <sandeen@redhat.com>, <ebiggers@kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <gfs2@lists.linux.dev>,
+	<linux-security-module@vger.kernel.org>, <sunjunchao@bytedance.com>, Huang
+ Shijie <huangsj@hygon.cn>
+Subject: [PATCH 0/3] vfs: add inode iteration method super_iter_inodes
+Date: Thu, 15 Oct 2026 17:38:51 +0800
+Message-ID: <20261015093854.2082600-1-huangsj@hygon.cn>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,67 +46,63 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
+ (172.23.18.114)
 
-Commit c0e473a0d226 ("block: fix race between set_blocksize and read
-paths") added shared inode locking around ordinary buffered writes,
-but missed the direct-I/O fallback path.
+This series adds a single superblock inode iteration helper,
+super_iter_inodes(), and converts the open-coded sb->s_inodes walks in
+the VFS to it.  The design is based on Dave Chinner's patch set:
+  "vfs: improving inode cache iteration scalability"
+  https://lore.kernel.org/all/20241002014017.3801899-1-david@fromorbit.com/
 
-Move the lock into blkdev_buffered_write() so both paths serialize
-with set_blocksize().
+The helper takes a callback, a private data pointer and flags:
 
-Also correct the comment claiming that this path takes invalidate_lock;
-it only takes i_rwsem.
+  int super_iter_inodes(struct super_block *sb, ino_iter_fn iter_fn,
+                        void *private_data, int flags);
 
-Fixes: c0e473a0d226 ("block: fix race between set_blocksize and read paths")
-Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
----
- block/fops.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+  - Without a flag, @iter_fn runs with a valid, referenced inode and may
+    block; the iterator owns the inode lifecycle and filters out
+    I_NEW/I_FREEING/I_WILL_FREE inodes.
 
-diff --git a/block/fops.c b/block/fops.c
-index 982a713b4c27..74e7a0713d1a 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -709,12 +709,22 @@ blkdev_direct_write(struct kiocb *iocb, struct iov_iter *from)
- 
- static ssize_t blkdev_buffered_write(struct kiocb *iocb, struct iov_iter *from)
- {
-+	struct inode *inode = bdev_file_inode(iocb->ki_filp);
-+	ssize_t ret;
-+
- 	/* Buffered fallback waits for writeback, which NOWAIT cannot allow. */
- 	if (iocb->ki_flags & IOCB_NOWAIT)
- 		return -EAGAIN;
- 
--	return iomap_file_buffered_write(iocb, from, &blkdev_iomap_ops, NULL,
--			NULL);
-+	/*
-+	 * Take i_rwsem to avoid racing with set_blocksize() changing
-+	 * i_blkbits/folio order and truncating the page cache.
-+	 */
-+	inode_lock_shared(inode);
-+	ret = iomap_file_buffered_write(iocb, from, &blkdev_iomap_ops, NULL,
-+					NULL);
-+	inode_unlock_shared(inode);
-+	return ret;
- }
- 
- /*
-@@ -773,14 +783,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 			ret = direct_write_fallback(iocb, from, ret,
- 					blkdev_buffered_write(iocb, from));
- 	} else {
--		/*
--		 * Take i_rwsem and invalidate_lock to avoid racing with
--		 * set_blocksize changing i_blkbits/folio order and punching
--		 * out the pagecache.
--		 */
--		inode_lock_shared(bd_inode);
- 		ret = blkdev_buffered_write(iocb, from);
--		inode_unlock_shared(bd_inode);
- 	}
- 
- 	if (ret > 0)
+  - %INO_ITER_F_REFERENCED additionally restricts the iteration to
+    inodes that still have a reference.  This preserves the "only handle
+    referenced inodes" rule of landlock's sb-delete walk.
+
+  - %INO_ITER_F_UNSAFE runs @iter_fn in atomic context (rcu_read_lock()
+    plus sb->s_inode_list_lock) without taking a reference.  The
+    callback must do its own state checks, must not block and must do its
+    own rescheduling by returning %INO_ITER_RET_ABORT.
+
+   Patch 1 adds the iterator.  
+   Patch 2 converts the callers that cannot use
+           referenced inodes (dquot removal, inode eviction, nr_blockdev_pages and
+           the generic_shutdown_super() poisoning loop) to %INO_ITER_F_UNSAFE.
+   Patch 3 converts the remaining callers (sync_bdevs, drop_pagecache_sb,
+           gfs2_kill_sb, add_dquot_ref and landlock's hook_sb_delete).
+
+BTW:
+  This patch set depends a small patch:
+  "fs/drop_caches: skip filesystems without fs writeback"
+  https://lkml.org/lkml/2026/9/23/675
+  
+
+Huang Shijie (3):
+  vfs: add inode iteration method super_iter_inodes
+  vfs: convert inode iterators to the unsafe super_iter_inodes()
+  vfs: convert sb->s_inodes iteration to super_iter_inodes()
+
+ block/bdev.c                   |  84 ++++++++-----------
+ fs/drop_caches.c               |  36 ++-------
+ fs/gfs2/ops_fstype.c           |  68 +++++-----------
+ fs/inode.c                     |  68 ++++++++--------
+ fs/quota/dquot.c               | 132 ++++++++++++++----------------
+ fs/super.c                     | 131 +++++++++++++++++++++++++++---
+ include/linux/fs/super_types.h |  14 ++++
+ security/landlock/fs.c         | 142 +++++++++++----------------------
+ 8 files changed, 340 insertions(+), 335 deletions(-)
+
 -- 
-2.39.5
+2.34.1
+
 
