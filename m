@@ -1,97 +1,122 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162E13B27D4
-	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 02:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34513D7D89
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 02:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792030310; cv=none; b=ZXqNp1mvfs25T2mjVNIqxryLoc3T/HPrmKKLfuwbmngJvWr9C/t3LBHTqcWPm7DB6vdxl/L+V3Z9Sb2F7EdFItrLk+brnoIg2PcCf43UId1MaM2yXozaQNkpenR2KhAefHcRUE+nPNxfGuh0Asr1MRsKmLskl84fbAl4tNdtF0c=
+	t=1792030611; cv=none; b=XbjJ1JRHr7eRAHq0zNWHVAHhj6spcPhZCmyyI3SiosDYoheolPh4o4n8tId/2eTdbtMBI7P0wuLxNpXRs7ppa4IDeu7W04Jz9S2Y6tK2XDYoY3gMFeKwtcN4HRhjgCzWaR2o5dphl17M8Uiz0zi9hd9e4e6oZd2sc4pQYgzT7pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792030310; c=relaxed/simple;
-	bh=Do0iA8uNsiwH96pQFdYvdEdXnoS+GP1Eort9RjA8HUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A+gPR3N83Hzt+B5nzQX5woRYkNeb3FFLknuNve0ineDswDOntN3BFHJ++xuDrts5tVnoMXlB8jT20OopKCFCvwJnFLRD2aUe3OOoS0Fhyq+0HqVMjO2WG5XXENLYohsbqVYVVlMEXMQQxWnLskSfuH4oqLJ5v17kJDbDgK412yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=k/antPzB; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1792030611; c=relaxed/simple;
+	bh=zifELv7LSa3E1qTgUq7IUXbs5CUOgdupnSadojsxUzo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pHnkEZoZ8II65VtUoPz6M61pjOtWo/kUc2sRlwb04WxM2R3HI9eC3XGRfm6PnN6OSratcAqtCYrY2IomCvAVhzfySSEyMUbK9qDeBnTncdrjps2q4xTFi5WSp9JgB3rx4gpZPMFG/BhlvG014mYDUVVO7Oy+VkpfLT3+1g0WOEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rtrXfjVN; arc=none smtp.client-ip=74.125.82.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="k/antPzB"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-383b4a3755fso686754a91.3
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 19:11:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rtrXfjVN"
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-353804b591eso8416331eec.0
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 19:16:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792030307; x=1792635107; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1792030608; x=1792635408; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=LvIiWBHgt9RJ8Lp49q+d6DWrLq7WNl23wUdd8hsh/fk=;
-        b=k/antPzBLeg485CCGqKBqHAUS2UL6GXz3uUQgsiwaj3tiJhn+Hhl59X3NpX7mYIBcV
-         ENBHJCi7xe6nZGtLgVaPiyaWjWqBUrrXfs1pjZAD5NqUdH26TpWtFW8Ku5OVnoT2jKX+
-         N8HbKOaQsZGbOvdRIvqr9/4dgcpSMDQjy912w=
+        bh=UPSE/oe/bGpQQ2hBx19c7dFdVLpuBesDAHcRIJbsOks=;
+        b=rtrXfjVNd/XoWK0Pvw5s0IUgXBacDf6LpkNG2yso7qa+Nn+oqB4xXzm95UfbyJX1XL
+         7ujUVPjiNXOXUqx7xsNOS4pdmKu2mkqi4BzAJfr6MFkebUBqydoL3Ruy82fLPSyKM4W/
+         yp35qKXUXxNBQSWuPBKMUC5mhZ/R+YdmURTYh93Mls8f4Kgbbm6ok4/aoZzJYj1eAteT
+         lI5gpFkAix7MAClZl+fFWY3hI1DL8Vi7945YBr/ImrRJKdOPaEUKq3EkyR9jWh28Yjlw
+         B2Gkot8oj1FfNqZU35ziah4aJZq4upoq4fAetK1bDaenWGVmbuUg1KbUNb+P8++5MvhR
+         9jQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792030307; x=1792635107;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20260707; t=1792030608; x=1792635408;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=LvIiWBHgt9RJ8Lp49q+d6DWrLq7WNl23wUdd8hsh/fk=;
-        b=aeKjmnrsN1ZoBjINJDq6igR9PYUSJ58xH2sFx4dMxkCUkVkmazQUgkpxqtcRQsxfwR
-         lmLiDUs4m/fOeL4yoKAcCdB4WVZ7i2AQDVloWHbd+WVaF1rI9pQu6gT2Nq0kR4namiYn
-         I86SktDlhhRu8bBns5ntg0xLkeMdNqNt8dArMuB06YiiCzaYcpd1flldK6kAKXZEy9Sv
-         FauvQs79gXfc2DnqPyzsI5U8pl6BpmXRWbftyp7P7txVZes2Ed0u5uMrfRcB2DKDyeFi
-         r8eLDJlQNQFnXI83quANQd4ZFPIeHrnd62NdErVadOk9Klre/f7fDTUC9G718Ycmfqlj
-         tSRA==
-X-Forwarded-Encrypted: i=1; AKwUvBy/iFTx4o9uiB2C5GgzsKlSuVsb7fDwIabruM0cNNLrzbs0V4ih1YFUezwJQ9EK20SufHB7gS2pwEjJKg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYINmzPbfuWL3lXSQEy+cbgoZ8H3s0GSPKG9fydE5dGreag60NtJ
-	puEZUi/jx2jANpncPIlxccQq0JqDX2NUOtKE6i9C8LWUjxy7aVP7CRK7y7E/apYwzA==
-X-Gm-Gg: AYBFou2bdQ4gPtv599XKDCzUrTsRsr+RrYWLDE8Xnaxh+dT429MPeoJ+abmUY7k5OEj
-	5USysnqTezAS22SdZSHAcy4kgedZf2qQQ05ZRxM88hMTTcnmjwR7Q5f+K3FuPrhvIXkYacL3te9
-	J32MtKwU6t45KVy5GDf4Y6sPMhR1iB8neTQ3pTU9A6+pvb28i568kpmgCDF1uHNwdsM1w2B1rrW
-	NIX0fxN3sps7xCup+xp3WjtsLyh8hLR0VVb0FTsx2Y//TeQBRw9+f6NPEV3gh0owXaASNvVphaC
-	ZRVSiZYaeGLKQxGpG5Fsh/W5gsv23NnadScWt4CBpN+wTOHqn7fjzw6XGm9+R3VeZZpeeygn1SS
-	NHo2S6xuxURSmemOnjWWDCutqWH6EorJQw7+fl4SS6Ha5/dytewG0/H5AQ8oDty/O9745jATE90
-	+yqulgNHrNv0PHR3HOrEwi4TpkEvN+pV3dPZESbyyxQV1aqcrjKQnOhAPFPieJ52Ih0OXhHHU1/
-	UiOBRz8l16teyIhMflveyGdEnadMVcTUPJM33E=
-X-Received: by 2002:a17:90a:e7ca:b0:3ab:36c4:b500 with SMTP id 98e67ed59e1d1-3ab3a39f232mr15295954a91.5.1792030307388;
-        Wed, 14 Oct 2026 19:11:47 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:8455:7899:5a2e:26f8])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac937f2d3bsm1227191a91.4.2026.10.14.19.11.44
+        bh=UPSE/oe/bGpQQ2hBx19c7dFdVLpuBesDAHcRIJbsOks=;
+        b=Ixmj7jrolGpkI8HGHhmthLn9ncBLNXaS67XB4oFF0fJCN4uTu78oVqSzm7uToiUKou
+         NMyAgEHCDiIbNaXYsLgjdYNBSMxTox+AJPA5k5s4aZeVzzjiIcKJq/L38X88/cpT1nAE
+         USTup0O8udTmJMXej6pC0aWO2J0dhvrrWHVvM0BBVpDVtKNFPyzFSowdKuVUmap9G3vm
+         ywy5cR55mi99U1GNbkl9JjHHY5nXxmsZtDf5jHC2YUCQerGCnWXRb7T2/sggiiZu6NKm
+         gOnfvXEAE9PXPDD0GeuMFsd1xLHZtcYUTiDI9EXEPvGCFM2LXjOHeyAOXqsuJIv1Kssr
+         lYGA==
+X-Forwarded-Encrypted: i=1; AKwUvByWW0VAO3K1ubAO6GOF5L4spBjg3PvXePXIhoxaNYIp0wMQEyGyb4ypGiujSaArWGo324ye4uNVZnMBkA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLmUBM+Nr9DU3S0bIR1VhA168XdE2YfDByIXO/p1fhLPcbJq2c+
+	sXJ/x+ej8nGJb5tN6Y+87/axynT/twL+gFprUqoF/S1TBmdh67xAi62U
+X-Gm-Gg: AYBFou35EC2BhAUwWsXFZJPgn2nlDybNOlbwbYXWqNomm8gsAJ48JBFGJ0WA+pQHnRD
+	Tpo88qkFvYwMcCYPLpCoqxmWgYCtceQAiRGv0YxIogWZK7ndJAyLY3P7qgdICZ3mJrGkutcGCx9
+	TO7DxJxjJKWTHnICj7u3kUXUxOjLLFqdFw/7KyPf8vUou0oKc8bvb9eJUfYrmdRQINyXMrSCkbq
+	gzHgFApUmFMDH33KOsDcBlpVCvoAT/g1OUtt/DNveTXa8VaiITCLbrHSg0+BNVgC9MuaeeuFuKO
+	Qy0cyq3YeoM8nP5IWuqN6JzwFjUwZRCV5XwY2wyDvpc6bvxjHkEntM59HMiq1T8Eois9oMTgx/Y
+	WE0Mql7iB+6tcMWx45xmfVskfxSoqK4QPaKl52gQ+a7dhMlHDtQyk+OUmK/z4aOXCTbSWtTf/lJ
+	o+4+AoNoe2Vqo7IxHk6KwpeoMyjaMxByNp0UWC3rNxIUdcN8yVl9xg1i1BhSoWDA==
+X-Received: by 2002:a05:7301:da11:b0:359:bd18:aab8 with SMTP id 5a478bee46e88-359bd18ac02mr15112565eec.5.1792030607890;
+        Wed, 14 Oct 2026 19:16:47 -0700 (PDT)
+Received: from ubuntu.. ([23.254.208.9])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-35b19c6c7b4sm31488866eec.24.2026.10.14.19.16.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 19:11:46 -0700 (PDT)
-Date: Thu, 15 Oct 2026 11:11:42 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Bo Zhang <zhangbo0325@gmail.com>, akpm@linux-foundation.org, 
-	bgeffon@google.com, minchan@kernel.org, richardycc@google.com, baohua@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 10/11] zram: use rw_semaphore for decompression streams
-Message-ID: <atA2JznFm8zLIMIb@google.com>
-References: <20261013035201.2809924-11-senozhatsky@chromium.org>
- <20261014153603.1365617-1-zhangbo56@xiaomi.com>
- <atAj9o5IgrAeiGiW@google.com>
+        Wed, 14 Oct 2026 19:16:46 -0700 (PDT)
+From: Qiliang Yuan <odys.yuan@gmail.com>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Wen Xiong <wenxiong@linux.ibm.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: run the hw queue synchronously for unplugged scheduler inserts
+Date: Thu, 15 Oct 2026 10:16:41 +0800
+Message-ID: <20261015021641.2948529-1-odys.yuan@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <asmrlzbmQ0TU3rO6@fedora-laptop>
+References: <20260930-bug-blk-mq-noplug-sched-dispatch-v1-1-ff1e49e52b00@gmail.com> <20261010023548.3666200-1-odys.yuan@gmail.com> <asmrlzbmQ0TU3rO6@fedora-laptop>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <atAj9o5IgrAeiGiW@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On (26/10/15 10:41), Sergey Senozhatsky wrote:
-[..]
-> +	if (zcomp_shared_decomp(comp)) {
-> +		struct page *pages[2];
-> +		unsigned int flags;
-> +
-> +		pages[0] = sg_page(sg);
-> +		pages[1] = sg_page(sg_next(sg));
-> +
-> +		flags = memalloc_noreclaim_save();
-			^^^
-			memalloc noio
+Hi Ming,
 
-> +		src = vm_map_ram(pages, 2, NUMA_NO_NODE);
-> +		memalloc_noreclaim_restore(flags);
-		^^^
-		memalloc noio
+On Fri, Oct 09, 2026 at 10:05:59PM -0500, Ming Lei wrote:
+> It is hard to say it is one regression cause 9cbbac29d752 is doing correct
+> thing, and single request isn't supposed to dispatch via plug list, and it
+> only recovers to previous behavior before 060406c61c7c
+> ("block: add plug while submitting IO").
+
+Agreed that 9cbbac29d752 itself is right, and this patch doesn't bring
+the plug back. What differs from the time before 060406c61c7c is how
+the async run gets scheduled: on v6.9 with PREEMPT_NONE the submitter
+context switched 0.23 times per I/O, so one run of kblockd still
+dispatched several requests, while on v7.3 with PREEMPT_LAZY the
+kworker preempts the submitter once per I/O.
+
+> Not sure you can observe big difference for other real SQ device.
+
+Here is a virtio-blk disk with a single queue, which gets mq-deadline
+by default, in a 16 vCPU KVM guest with the backing file in host
+memory. fio, io_uring, 4k, median of 3 runs:
+
+                        v7.3-rc5    patched
+  randread, qd16           89.3K     162.8K
+  randwrite, qd16          86.3K     156.7K
+  randread, qd1            14.3K      14.9K
+  psync randread           14.3K      14.9K
+  ctx switches/IO, qd16     0.99       0.04
+
+With none instead of mq-deadline the disk does 163K-177K random reads
+at qd16 on both kernels, so the patch brings mq-deadline close to none
+and leaves none alone.
+
+> For both SQ null & ublk, you can switch to none for better performance.
+
+Right, and ublk now defaults to none. But mq-deadline is still the
+default for every other single-queue device, and few users change it.
+
+Thanks,
+Qiliang
