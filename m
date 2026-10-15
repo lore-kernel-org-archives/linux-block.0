@@ -1,177 +1,238 @@
-Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020075.outbound.protection.outlook.com [52.101.195.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005A9221DAE;
-	Thu, 15 Oct 2026 01:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792027578; cv=fail; b=WnuN6T9fXvf2oDh1ZvaUqj5O83dTIRdjpTmXRRMfLj1uaQK5aFwDn32pOSM5qkBP9Aw2ADCJJ0ImQEClk1bX6HflPBmeCn+zmSKzgi0rhMkcCXsfC/3UcO4ib0rDTAV2cRLbygTF+yX+9PLfDss6BLFAWKyioXIjyjCLHn0L8U0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792027578; c=relaxed/simple;
-	bh=XxB3/jMuKFfA8d6XdaOek7hZRyOyBiVhBmRdDLqYx0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=VrJ/nkezFWlLdXgeKQOHG+0H1P4vOqPyh3m4pPR7TymEVcDd6GK45tY9UwgH9iOXBZqndEzrF9gFYJ7tF64eiIFQcLH9B9qswu9OpG1Pi/JuRyrWgpTlDjeoXyybgelJw+CPjHSgkwiFx0x/bzxaHlvPv9LWB9PZyyr+uSEmh9w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.195.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fdWeTqDzZaQ9EpMlQvx/TNjqy7qVUHvxraOekrhaASiuQAkDxZFwAyZ2SmqwKLkWewTNhIDN91yC/4ONMLCJ/QU4fj/p9cM4B+irAe7IKlEblJtDW2PWjeV4XZ7zZBeh1Eg/KpZIsJimkPUoz0m9lddOnV30oASWH7vLbvVo6lo6VNm0yQ9ERpwYqSisC1qKk41xXn3DYZ5w8k0cYyDx2Qg456QeooxsAKEFEp/pMsXtTXldTYLGkmLxT4lb8btO2y+8GNkawRupA/Ff8eipMKeNdM+VC0qTPy68bsba7RnCrv5EaNb/RTDu3VBvLBqFOqljSbw6aOY1+CLgukzh8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=ryfidRekTnhdPEcJqiZLf4z/B3LspQMgh8kXHDy21HI=;
- b=ZLCbpO3/YLEyQuTyvYvNnESBTTWvmo5RKauF3bPaqnBUshzJpvKTyEXQdvAbGgTXI7sSCtefJQsjqmXePC4IJqM/rhEIi/FbqX/m6sDSNV7w0ewlm27gj5TL4Yle9b79cd/KnYIEvzNcLA4brsas6wORwFlY7iobN0hgp0ZzgAssS6j/NBKKUSoO7me+o7mQKCF3svxPi/wTPjiCU+Io9iT/W7PYOFWw0EXaPwP4K6/xpBvAn14oqh0bUY+cb5nTg8sULP/C1HmpUg9QngdVACa9hav9Qy5TCb0VKeBcvY9y6yK229LrS+GUR8tz0+Cr3uX12K/mwsb9EyFnDEc0hg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by LOYP123MB2862.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:f2::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.12; Thu, 15 Oct
- 2026 01:26:13 +0000
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0522.012; Thu, 15 Oct 2026
- 01:26:13 +0000
-Date: Wed, 14 Oct 2026 21:26:09 -0400
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: Tejun Heo <tj@kernel.org>
-Cc: Ming Lei <tom.leiming@gmail.com>, axboe@kernel.dk, hare@suse.de, 
-	sean@ashe.io, neelx@suse.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: dispatch kworker to housekeeping CPU when hctx
- cpumask is empty
-Message-ID: <nid24ukygf5d76hbz7zt336fftcuiqixgnr5k4m4ubbmnnkepv@e32ydy6h7ker>
-References: <20261012012905.267920-1-atomlin@atomlin.com>
- <CACVXFVMTr8mORGSVM4JWHrLYgk+9O0J20bjaL_08uYmRCbzC3A@mail.gmail.com>
- <o2hxbjxbkg3wv25lyj3nluwv4e6cb6q5qaukrhjzwg2hodwk5c@wgpc25peito7>
- <asxLLWOQQzolER0a@fedora-laptop>
- <pvnvyzf3cbebpxmobjntvovrruxgnygm7pwgx3tl2jczc7ji5z@ygmd6z4cfxh4>
- <adebd7c36fe4c6e349aca65bd7820079@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <adebd7c36fe4c6e349aca65bd7820079@kernel.org>
-X-ClientProxiedBy: BN9PR03CA0734.namprd03.prod.outlook.com
- (2603:10b6:408:110::19) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:183::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32BA27A462
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 01:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792028470; cv=none; b=TWHY2rRVAPwU7VaJE2jtBA28SZx0NrhtxhQpwDOIMRuXd18SaC616K5zGxpekFom85Hwtms1Ft+cE/vVzX77x5M+xZEkYZyUTmRQ/n+/+z0w/vzNb9P+KrWm9ji2CGAN8ogn6klwXbb/RGQBWKi/TWaRnq/W2lqu/BQCetruzKo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792028470; c=relaxed/simple;
+	bh=/PyZD06xWmvGd/p8LwqxwkTt9hyKgcZxLnnoZSz488o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C3q9ltEU4Hy9D/s23q+12ebUMqQ14ardmpFA40GeJo9dMi8wASrIs0VxlplbdqCkpTWxHqi3HoTC1sZbOrvtL24QumZI17jIpQTf4xFZLt0DbplTOFPuesS1J6LRlgZ1YrNg3PoaV2V5O5eglMd36QZcJop963LyOVY3Md93wa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=gUNdQQLE; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gUNdQQLE"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2e831e86ebfso8929395ad.1
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 18:41:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1792028467; x=1792633267; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=2Rn/uJVhfyYtA3tBXf0jKeMnRRwU6eZkuv2ioiXCGGw=;
+        b=gUNdQQLE6cy0XPAn1mfHY5C0dH8lGaClBCPSNPJCBQywoe4WdLtWR7jjDTkYji458n
+         fzUz4/oprB5YsxuE/haRZ/uVBBoFE6b3IZMyzroV3kY21uYP0foNmsD6Bc0AuEJA5TYu
+         cHpE2iTYwWWcEBrJxbGAFiXsw5G+7dvF0mBQk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792028467; x=1792633267;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=2Rn/uJVhfyYtA3tBXf0jKeMnRRwU6eZkuv2ioiXCGGw=;
+        b=hs/YM+9dVQNMCwtLcz6cvz6jEWrR1HfG6rrcw+jH+8NAFJt3jMEUroxnHf84eQsnIr
+         rexfm8mG2o6iW4X2unJ6jEst5kdyRm8L+ismJYzMatRB6fG6yYmQTuRjYCll3M1um1aX
+         qWeekM4kcUWO6zU9bhvMcuMbFu5mugOQx11PQFMXdUL5SZQL47cYsfRbTORDQbFcCq38
+         +ZsO8f6ev39iTOacqQJT3YmafqyE1GAcpKMk2rjt22mQETjCj3Wkr9xcxkCisP5z3uMU
+         CGnM7zlk1Suc8yfkkBCXjAxrcObIYw52xSElojL0SIZivTh6TB2ywCQIwOH853e8Aby2
+         vvSg==
+X-Forwarded-Encrypted: i=1; AKwUvBw9NlG8KKDDJwsUTthqdFwwGEdyd6ilMRkdBCOyanPqmEtufjJq5tuDaa0pV4AZxiTHJATTBcC1e4Pa4Q==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKL6k0ccxRm3XVo0bibU4dBcRB0aCe4Hvv9imZITyZUiNEIUOjb
+	t/rO/jkffwCBAFUqYjwH7ZFZJZW2Dyj74qAfLqGlImdJXkVcqYUxFhuFwLnlYT3vpaJ4KAl3Qzg
+	grhg=
+X-Gm-Gg: AYBFou0w+nXOElAOg+nQXtbfyj+zyrnc/yqn34MCIhmzNKKK4US8oBI3sENXWsfvlpR
+	1P3SFNG8FJKkFtpsZ+1ljPzJrt3veBWPPifxSLLQh4R9ko8uxJ2+9bmfVrRFkk29+f7JdoQgT9g
+	+JP9+GT7mbtzGPm2WW6SNTITrZfXZn5Jhc+LuNV3+U0KdafP7NjxhZUj2XpxWUZnBB0OEpYMQ7B
+	t/MiF6g8/57j/ECGooLwvK2MA12ioi75k/yH+y1rbgBF5kZ1lnv0TIIZ8jeCI2S3hoZCWGQtHoq
+	Ql/a5t3m5+ITwOmPiSwA2NZPsHqNNsKA8K+CvjSTf+Fcq9oiAE0SjiunUeru0tQhKd8OoADJCJZ
+	DQCJLgkOZGHI/bMVWh6Iao2IKZq4r/BtLVYlHc5nVkrsOCqzf/OcAEEb8oqXaUtpShMJzXhisYa
+	oPu33VE9R7eG6zu/Kxusp+otlyDTS0lGTLowfpldc2FrgCNdCgYFJDtWGrKGa4LXSou0kv/uqUm
+	FSDPOfdQi7VxDrDeHSy7fySIaSggbI4GEgH9TgPcnzIJreCYA==
+X-Received: by 2002:a17:903:19e8:b0:2e8:79d:15ec with SMTP id d9443c01a7336-2e84280afc4mr161603165ad.6.1792028467036;
+        Wed, 14 Oct 2026 18:41:07 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:8455:7899:5a2e:26f8])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e94ba30f6asm9486375ad.57.2026.10.14.18.41.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Oct 2026 18:41:05 -0700 (PDT)
+Date: Thu, 15 Oct 2026 10:41:01 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Bo Zhang <zhangbo0325@gmail.com>
+Cc: senozhatsky@chromium.org, akpm@linux-foundation.org, 
+	bgeffon@google.com, minchan@kernel.org, richardycc@google.com, baohua@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v3 10/11] zram: use rw_semaphore for decompression streams
+Message-ID: <atAj9o5IgrAeiGiW@google.com>
+References: <20261013035201.2809924-11-senozhatsky@chromium.org>
+ <20261014153603.1365617-1-zhangbo56@xiaomi.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LOYP123MB2862:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8efde74f-14c4-4181-4d0b-08df2a5b4ce8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|366016|23010399003|56012099006|4143699003|261009223027099003|10067099003|22082099003|18002099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	pLqXC4fJOkvNGTcylWRJTMpsr/4KUlRirxxApBGT3fndBN2/vkrWp6Xe3ITWJa4XO3kB94b3IOuM0y70C2mDaLdkhRwjabckSIMSZsWoaPavtr09azwlAIi5UgT3UuoyDbX6B6OggsyKZFIcaV2DY61RupnDgp56kDPN7sIn0WdNTrAGJ6Jvh70vGWnp5DL5amCT2P1HP4iojqjK4CkINRhO8KsjWijHTAu6wkCZNrObNHyDmUDVPfl5NE7Q6Nm0xwIdv9cHbMiK5ub29rQji39F7dOocg0t9WpwW2f9KUHeP1AK8zgBY9wKODq0kH0u8rP6p5v8LLOBeXtazQ3A1JHfW+3tDVtmTdfuq7LgWgPng1CbSuMEgnbbiIuCijePpbJKcMxXuyUQFOrHb9FF3EVfftR9eE5TNW8dMd+8ULdXGhS/VlSraXIqMLeKRtKG8sMoVsi8AKw8zIbmENJ28BStpJ6ETVqHaT+Wjh5Tvuaym/707efrYJOzIQqxT7vV3fS8xw0KHl4eu01T3zvaKCmu4yh9tIka3OERJi+RmMFpVRuidqjf/jQLIvl3ckravo0Fb7AjHlRpJA1xBtLcVIlgwq0n5uvwtSbrNZgJgbyRYeHDVau1m+axRlKymUAADZALmdD0dpnQCSpKXDHOLTsA506lWF3KJTxPEDpQo6k=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(23010399003)(56012099006)(4143699003)(261009223027099003)(10067099003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cWN4aFd6NkQxRFRFaEdhUXErRTMyZTVUZDBLT3RZR0o3MDFDTHhRVk9hYlYr?=
- =?utf-8?B?SWFrREdnRXRXMzhkcEt2a0RlUWUxd2hBK05GWVE0TzJQNi9QM2N6ajY3TWdw?=
- =?utf-8?B?MkJiNmJERjIxbTBQaTRDVmhSWFhkWmYxWGJmRjBtRXpvRDdKVG5Sa1NuNDJj?=
- =?utf-8?B?d0lhcHp1SllYNFhYdldVaTVya3NHZUlWbVZ0QlA0ZFNoSGNZakswd1d2bDIr?=
- =?utf-8?B?V09lYVpVdlpXZDZWRENwdFRBYjd4MFNBQmJJcVVWUVlsb1MxYU5NYk5BQXlL?=
- =?utf-8?B?VmJ6WGE2SW5LSlZyam1FbkFaS0pFbVZLT2Q3RVJWYXpFdnhrMllpVDV5UDY2?=
- =?utf-8?B?cWVNWW1CTWdJY2hqM0VtT1NGRTVFY1UxVm11ekVJN3pLeG1xWGdpWEczOWZH?=
- =?utf-8?B?ZUVpVUk0Zjgvb3oveXAzOWliQUhLTytjU0dPYXYrVzdPYUlHcW5haUJqQlZL?=
- =?utf-8?B?anV5WGhKRC9rSzFPbTBEdkpFQ2FkUGFJOGZ4MmR1Vkd3WWlkcnU2aUoxdFlF?=
- =?utf-8?B?UnhJYTlsZXJOdndidXlKVmxxckpFK00zK1lSTFBiZlVKOUE1Rm1VcHFvVEdQ?=
- =?utf-8?B?bFV5UWtvZDA1ZVdxSXRyVlhlRkFkOG93ZFcrQ1BnKzdrWHRCdkZTQnJVN2ZE?=
- =?utf-8?B?NlA0YUJPWS9MZitJOC9wV1g2MEl3VHNyekRneURFbDFBTXdNZGwyaC82TndQ?=
- =?utf-8?B?czhJT2sxRUVscVBocDZyOGFrdmY5ZUxHelhyZ1lrdFBweGJlaTVtKzd2eCtj?=
- =?utf-8?B?QTlsTTVQb3E5ZW1nWm1oS2pEUWtPNnFoK1J0VjRjT2VIVFN0SThIS1dWMkVu?=
- =?utf-8?B?ck15WU5TOTBYNXRDNHpWMWZoMVFqaWxIMm1CLzI1Yzc4U29zUDY4R0xhN3hr?=
- =?utf-8?B?L1VFZU9BM2ZEZ1c4YUk3OC9uWXc2VU5IZjBaM0pTMUE0UDl6SXV2cERLV2pQ?=
- =?utf-8?B?cSttTWpTOXhhd3pNbE50M2IzczhNaVhUemRJZXBvbXlyMHcrbGNxTS9XaWNx?=
- =?utf-8?B?VDlFSU8yV3NDZG5McGczSXE5UjdGV0JsU1BLaGNzcHJHcmhydGllbU1iaW12?=
- =?utf-8?B?MTJ2MXRsQ2VuZU9IbEhzV1EwRHl2akJKanRqZkxaS3VvM2FxL2UvRDRMa3FJ?=
- =?utf-8?B?MnpxSzdxTTVta0F2NG9DcXFCZHhNcHB1UGhiS3dodmFLMFlhTVFLU3RBSDBk?=
- =?utf-8?B?dC8rdW1SbHVJOVhyWmlBK1pvKzZtbzdUWnFXYWNydEU2V1ZzbmxiakpaUHBn?=
- =?utf-8?B?VUczdWc4MFZFazBYS3F3N3N1MmFsb0QzSFZKOXpMSVFBbkMrMWYzeUl3NUVL?=
- =?utf-8?B?RDVwUnIvdXpPeUk0WHBsbHhoSk1xdDduekRTaURyZ0p1SnJueDRRSFNKeTZh?=
- =?utf-8?B?Y0ppV1A0dzNmaW9Jc0xzQmFrZER4ZG54cXhCSUw0TXUrUUNzeU83K2pqUVZk?=
- =?utf-8?B?bWFLRkZxNTBOZE5xb2pHNUZ2bC9oRW9uWmorZlMvN2s3ZHI4aHJIK2c0aUhR?=
- =?utf-8?B?WERFb2V3c3N0WWxKeHM1ZFFOdzRHUVlzeFNCZkZNQTM5NGxHUGZReXI5RWpw?=
- =?utf-8?B?RHZvc1A1Qm1HTVRTQXVLajZXZzFRMEZmRllhbXNZTWk4ZVhDeWt6ZGxJbmNi?=
- =?utf-8?B?YlJXNEd3bFJTSUZzWGgzLzBVZnNPUVgwQ3QvbXAvTk9ZMnZsd2orM2dKby9L?=
- =?utf-8?B?bXAyQmtZTFc3a1ZFVmR4bXJMWjBYRXFxUkcwb2tyZ0NHVmFNTkdsdzJEWXBp?=
- =?utf-8?B?TktCbHlUdHg3REk5aDhjS0FEeS9pUEJ3WTY4M3VRWVV5OXl6ZytweUZKYldm?=
- =?utf-8?B?SzZrZmo0ZWkweHFWeG9qQjM1VHAyTkRCbnV3Z3picmpiL3pLUm1PN2kwZzNP?=
- =?utf-8?B?cFE5RU15MmlGR1V5Y2hzMmNuT0FOeWNKWm40b3hEVzJoQThlZEh1ZVVlekVz?=
- =?utf-8?B?Zk55ZVBCSElaajZpbHUralB5SjI0S3FIVkhFRnZibmJSUHpBUUVRYTZoYmZl?=
- =?utf-8?B?b1JyZTVMaW9qRThQV3NDNkRzNWlmSlZTWXVWT3o4V3pyMW5kQzhNS3RTOU1E?=
- =?utf-8?B?Ymd1VVh3WVRudWdZTmUrOHc3ZGRZYTE2bEViaEhvNFI4SmV5aHdLWE5vSVhJ?=
- =?utf-8?B?RTRkSnVGZFd6bVdxVjB2ZVViYmFjblV2cDZXMm5ZNlgxZi8xbDk5Y1lKYmYz?=
- =?utf-8?B?bVJpaFFNdVgyVlkzQzgxNk1jOGV4WGFBM1ZYcDV5UEhJRVFneXlHV2N4K1ZJ?=
- =?utf-8?B?Y2ZxQzRXcG9BOEtQcUQvaHBzdDBMOExWQkMwWFFwaTVVU0V2RTNHbnJGVDBi?=
- =?utf-8?B?ZllTN05yT0xTMHdTeW1uN3dBWGlNL3FXUFpsL3ZXeDNzTCs4aEJhQT09?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8efde74f-14c4-4181-4d0b-08df2a5b4ce8
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 01:26:13.1595
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LrV7aF5P+aHmyU1gKXydIrWXKmZm7KkskFm8BvB/7KX5FxlA8B1Buv7in0hsexrXUPC49h0cDGCRp4l0aIIEjg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LOYP123MB2862
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261014153603.1365617-1-zhangbo56@xiaomi.com>
 
-On Wed, Oct 14, 2026 at 09:34:04AM -1000, Tejun Heo wrote:
-> Hello, Aaron.
+On (26/10/14 23:36), Bo Zhang wrote:
+> Following up on the RFC thread [1]: Sergey pointed me at this series as
+> the reworked version of the by-direction split I had tested, so I applied
+> patches 9 and 10 and re-ran the same A/B. Big improvement.
+
+Thanks!
+
+> I use decompress acquire count (swapped-in pages) as the comparability anchor
+> instead of swap volume, which stays within ~20% across builds.
 > 
-> On Mon, Oct 12, 2026 at 12:06:25PM -0400, Aaron Tomlin wrote:
-> > kblockd_workqueue is unique in that it is allocated as WQ_PERCPU to
-> > preserve per-CPU locality for multi-queue devices.
-> 
-> I haven't followed the earlier discussion, but if CPU locality is important
-> without requiring hard per-CPU affinity, an unbound workqueue with
-> non-strict "cpu" (or "smt" for core) affinity scope can provide both:
-> locality by default with flexibility to migrate when needed.
+>                       baseline   preempt-disable   9 + 10
+>   read contended      24,749     406               1,959
+>   read wait_ns total  239.8 s    3.78 s            ~12 s
+>   read wait_ns max    757 ms     51.7 ms           72-96 ms
+>   read acquire        3,948,150  4,305,078         3,510,610
 
-Hi Tejun,
+So... these numbers don't disappoint.  Combined with memory
+savings (and zcomp redesign) this series looks like a decent
+start.
 
-Thank you for your response.
+> Decompression on 9+10 splits into:
+>   shared (stateless backend, single-page): 76.7% -> down_read never
+>       blocked (dpin_contended = 0)
+>   exclusive (cross-page object): 23.3% -> excl_lock, ~1,959 contended
 
-That is an elegant solution. Moving kblockd_workqueue to an unbound
-workqueue with a non-strict "cpu" affinity scope (WQ_AFFN_CPU) would
-preserve the per-CPU/per-queue locality essential for multi-queue devices
-by default, while delegating CPU isolation natively to workqueue core via
-wq_unbound_cpumask. It would ultimately eliminate the need for blk-mq to
-maintain ad-hoc cpumask filtering or manual housekeeping redirection.
+23.3% is a slightly high bounce reads number, basically almost 1/4 of
+reads are exclusive.  I wonder if we can do better.  Technically, the
+number of bounce reads depends on the data.  Data that are not compressed
+good enough can results in much higher numbers.  E.g. if most of the
+objects compress to say 2500 bytes then every second object in the size
+class becomes a spanning object.
 
-The rationale behind the current patch is strictly as a targeted, low-risk
-bugfix. Commit a46c27026da1 ("blk-mq: don't schedule block kworker on
-isolated CPUs") attempted to offload queue dispatch when all mapped CPUs
-are isolated by falling back to WORK_CPU_UNBOUND:
+I have a quick and dirty patch that turns ->local_copy into a fallback
+slowpath and uses vm_map_ram() for fast path.
 
-        /* Switch to unbound if no allowable CPUs in this hctx */
-        if (hctx->queue->nr_hw_queues == 1 || blk_mq_hctx_empty_cpumask(hctx))
-            return WORK_CPU_UNBOUND;
+A synthetic fio test in VM (reader vs reader inversion test).
 
-However, because kblockd_workqueue is presently WQ_PERCPU, WORK_CPU_UNBOUND
-resolves straight to raw_smp_processor_id(). When deferred dispatch is
-triggered from an isolated core, the kworker is scheduled locally, where it
-faces severe priority inversion and starvation against SCHED_FIFO
-workloads.
+BASE (local_copy + excl_lock for spanning objects):
+ Run #0: 1,434k IOPS, avg 3.74 us, stdev 443.11 us, p99.99 23.94 us, max 741,374 us (741 ms)
+ Run #1: 1,465k IOPS, avg 3.36 us, stdev 99.88 us, p99.99 26.50 us, max 187,415 us (187 ms)
+ Run #2: 1,454k IOPS, avg 3.51 us, stdev 171.87 us, p99.99 24.45 us, max 257,715 us (258 ms)
+PATCHED (vm_map_ram() for spanning objects):
+ Run #0: 1,471k IOPS, avg 3.33 us, stdev 14.69 us, p99.99 28.29 us, max 2,844 us (2.8 ms)
+ Run #1: 1,463k IOPS, avg 3.32 us, stdev 15.93 us, p99.99 24.96 us, max 5,182 us (5.2 ms)
+ Run #2: 1,458k IOPS, avg 3.34 us, stdev 14.70 us, p99.99 24.96 us, max 5,619 us (5.6 ms)
 
-Given that commit a46c27026da1 was backported to stable kernels, this
-minimal change serves as an immediate fix suitable for stable trees without
-altering the concurrency and execution semantics of kblockd across the rest
-of the block layer.
+Just as an idea.
 
-That said, I would be very keen to explore transitioning kblockd_workqueue
-to an unbound workqueue with non-strict CPU affinity as a follow-up series.
+---
 
-
-Kind regards,
--- 
-Aaron Tomlin
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index 39d1f9384939..0a9bfa36f5ce 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -6,6 +6,7 @@
+ #include <linux/slab.h>
+ #include <linux/wait.h>
+ #include <linux/sched.h>
++#include <linux/sched/mm.h>
+ #include <linux/cpuhotplug.h>
+ #include <linux/highmem.h>
+ #include <linux/scatterlist.h>
+@@ -181,14 +182,13 @@ void zcomp_cstrm_put(struct zcomp_cstrm *zstrm)
+ 	mutex_unlock(&zstrm->lock);
+ }
+ 
+-bool zcomp_shared_decomp(struct zcomp *comp, struct scatterlist *sg)
++bool zcomp_shared_decomp(struct zcomp *comp)
+ {
+ 	/*
+ 	 * Shared decompression is only safe when the backend has no
+-	 * mutable per-stream decompression context and the object is
+-	 * contained within a single page (no ->local_copy bounce needed).
++	 * mutable per-stream decompression context.
+ 	 */
+-	return !comp->ops->create_dctx && sg_is_last(sg);
++	return !comp->ops->create_dctx;
+ }
+ 
+ struct zcomp_dstrm *zcomp_dstrm_get(struct zcomp *comp,
+@@ -257,22 +257,44 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_dstrm *zstrm,
+ 
+ 	might_sleep();
+ 	lockdep_assert_held(&zstrm->lock);
+-	if (!zcomp_shared_decomp(comp, sg))
++	if (!zcomp_shared_decomp(comp))
+ 		lockdep_assert_held(&zstrm->excl_lock);
+ 
+ 	if (sg_is_last(sg)) {
+ 		/* the object is contained within one page, read it in-place */
+ 		src = kmap_local_page(sg_page(sg));
+ 		req.src = src + sg->offset;
+-	} else {
+-		/* the object spans two pages, linearize it into local copy */
+-		sg_copy_to_buffer(sg, 2, zstrm->local_copy, src_len);
+-		req.src = zstrm->local_copy;
++		ret = comp->ops->decompress(comp->params, &zstrm->ctx, &req);
++		kunmap_local(src);
++		return ret;
+ 	}
+ 
++	if (zcomp_shared_decomp(comp)) {
++		struct page *pages[2];
++		unsigned int flags;
++
++		pages[0] = sg_page(sg);
++		pages[1] = sg_page(sg_next(sg));
++
++		flags = memalloc_noreclaim_save();
++		src = vm_map_ram(pages, 2, NUMA_NO_NODE);
++		memalloc_noreclaim_restore(flags);
++		if (src) {
++			req.src = src + sg->offset;
++			ret = comp->ops->decompress(comp->params, &zstrm->ctx,
++						    &req);
++			vm_unmap_ram(src, 2);
++			return ret;
++		}
++		mutex_lock(&zstrm->excl_lock);
++	}
++
++	/* the object spans two pages, linearize it into local copy */
++	sg_copy_to_buffer(sg, 2, zstrm->local_copy, src_len);
++	req.src = zstrm->local_copy;
+ 	ret = comp->ops->decompress(comp->params, &zstrm->ctx, &req);
+-	if (src)
+-		kunmap_local(src);
++	if (zcomp_shared_decomp(comp))
++		mutex_unlock(&zstrm->excl_lock);
+ 	return ret;
+ }
+ 
+diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
+index 924c4185abe9..6764818d2a9f 100644
+--- a/drivers/block/zram/zcomp.h
++++ b/drivers/block/zram/zcomp.h
+@@ -115,7 +115,7 @@ void zcomp_destroy(struct zcomp *comp);
+ struct zcomp_cstrm *zcomp_cstrm_get(struct zcomp *comp);
+ void zcomp_cstrm_put(struct zcomp_cstrm *zstrm);
+ 
+-bool zcomp_shared_decomp(struct zcomp *comp, struct scatterlist *sg);
++bool zcomp_shared_decomp(struct zcomp *comp);
+ struct zcomp_dstrm *zcomp_dstrm_get(struct zcomp *comp,
+ 				    enum zcomp_dstrm_mode mode);
+ void zcomp_dstrm_put(struct zcomp_dstrm *zstrm, enum zcomp_dstrm_mode mode);
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index ad244624d4a5..e608769bfad5 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -2128,7 +2128,7 @@ static int read_compressed_page(struct zram *zram, struct page *page,
+ 	prio = get_slot_comp_priority(zram, index);
+ 
+ 	zs_obj_read_sg_begin(zram->mem_pool, handle, sg, size);
+-	if (zcomp_shared_decomp(zram->comps[prio], sg))
++	if (zcomp_shared_decomp(zram->comps[prio]))
+ 		mode = ZCOMP_DSTRM_SHARED;
+ 
+ 	zstrm = zcomp_dstrm_get(zram->comps[prio], mode);
