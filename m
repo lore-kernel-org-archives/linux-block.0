@@ -1,308 +1,350 @@
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+Received: from mta0.migadu.com (out-86.mta0.migadu.com [91.218.175.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24058501F45
-	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 11:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895A951DAF2
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 12:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792063493; cv=none; b=vATpa2JrOWwErwYc8o0h4ByUeq1Rs6Q+Uzg1NZs6Of8UdN6y30FsXS+eAHByAJX03pNuE4D6SqneVB/+mTgBim/eTyOfD+nZ9CNHT/iYeyek7FrLpLjIf8R0Iz4LSC4b0KKIDiOC0GCFff0jakYZq3+1jQA2R/s1cdHLMENa8gk=
+	t=1792065657; cv=none; b=uVyEPse9sCxspzMa5dyo4SWX8AApa8q+LLIvngYBdz7ysNV/zK1ud0U5sLrO8W6//HAH/urZZHawraIhKa68CyoOuCrSOwkqddonivlyowHVFSSOZLNl+PSYy2VqA58aCONIdwSM7LU79aXW+pVq7Y31Oa5hcqpoFv/oPIrwhfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792063493; c=relaxed/simple;
-	bh=OuzZ0UmKpoG23RR+4wGy7RGYBwxYdgHUOlN9CNTGkWA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LWuxA5oGmTskJFBWGv/bMILPHv0Jz2FYmFV5KCJ/ZIl5Cgb3r6O2t5cQx+N8dgsOqVqo0AFYNdpBxs1eN62wxXftVtJOP1/lbk3V/HKneVeDvDYfm6zVZRaMMdZ0lOPhuFyuAVfEk5SzOxxuaQT/F3onkoiCFEH07Novv3B8DTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/MB9SQi; arc=none smtp.client-ip=74.125.82.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792065657; c=relaxed/simple;
+	bh=R99PCc1zJFx/7ZGSZ5Cra+MQV7lkkTtEbiGNQNkkiQA=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=AzOVDbfepFjGzKPHVY8GXr5SkSsoEsChH/tV3uqwBpP3KPNEtn6Kr483voFLQz34Pzfl+j5yt404YqDvU/T0yYIxXGshQnT57OYyhVkN3JpojoxGP5jIM/hNEgpYExCUY/oWUDQER6PsxR5JEtmuHRbQiEHiUV5yl7ZIIcNXKMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NKGoCTR2; arc=none smtp.client-ip=91.218.175.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/MB9SQi"
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-3535bf8b3e0so3037400eec.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 04:24:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792063488; x=1792668288; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mTGaRSiOlFT8MfguHaHZjIElUHA1XvWJ2csa7S+idE8=;
-        b=U/MB9SQi4oZt5Tc82p6jdlHsTAg/QP2/Ygny+DBOcNu0Wwb4YUjXeDuCtuaP/FsYnp
-         PtNr3CwBuA5RNk26HuVlQp4LVyd4En4gI8g5gGm2GPYfWII1F4qx+pY/Cf4d8bQwv/Qd
-         Jhg8FcGR1djQILMonewLyqr0aBV5eLlL14/oJzvQLN1aH3v2z4//hkpq5qxK07YXg6/W
-         MSjMh0aulMCesPp5CLzjV0pZnJ8ANBBHwiiHXPf67+fLC7I86RJ+H3FTxVHGvKLgKen+
-         ixaZ3ZOuI4BGpoFJXfn3P8Z5CAve5ZcLeaBAcGFHIsPHnvQ2wKLGXcL8Fo9ah3OMvGRG
-         yP7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792063488; x=1792668288;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mTGaRSiOlFT8MfguHaHZjIElUHA1XvWJ2csa7S+idE8=;
-        b=z1/SeRf5o4otZZYzWLDrhIlvKiK9iyaBWABTbG2l+hI24d29MOOgZoG82UgfefBi17
-         k+c8I7o2/j5hG4YDLDLIV7DGtwAMbkQPdLpLKCa9/FE/Mk3C+GfUvPbOOMGFZF5zWfx+
-         Zx4aP3mmUrsimdtU0kbqrWo4MK+7YRtIxo7oLAaeWD5kJyzpNCYwDIryH2NBTmbcfDMd
-         pobSXASOcX/KegdCCdFPHL3jYxu8EBdm5JJ4/Sxya9FYLIbi5AilhKzdHLsZX0lzXcVB
-         61hLNTArOiC/QMad5sTouyNowslpBV6/g487J75DGW0jCn8k2JD7Q8cAB5/wkMW/AXPG
-         XpLw==
-X-Forwarded-Encrypted: i=1; AKwUvBzWSZiqttcnuuluOSZbUorLxDUszAdOePJsNtXamqPDZLr/K7fmhy+VlrJxJUgHqXpWuSC2SGvOW5a11Q==@vger.kernel.org
-X-Gm-Message-State: AFq9FYL/V5C2zaBeOkGYpHfsfxazAb8p6I/ARJ1qiSh2kFtK1vHA1KO4
-	nvJjH+FgF4xDFEcTfBHQiJWlBeEij23SGEL46dUIteHZRa1RKbrOtH8T
-X-Gm-Gg: AYBFou1wH3+tyC0xDTf/fq1qylDjgE8uEKv+17Y2Ca4J7f4cScGVsnUta6aKSl35ixT
-	vVICTnk6agFe7yopLBKAePv9Y+fycPADn8FCBTowjlPuzUNOXKxSBFuLdNQ2sBYNBF9CQEK87Xx
-	jPgK8S19LWFSF/gEQjQjGwD1e8VXwQqTg0GbVQGZBjF1MNFnPt0TiYG0bHATH8eh/ZnGSFG0XJh
-	Qu5QYYaYGjhiZQzAhi1smQ8DcwZrw94iUVxXzXlFu/twhFM6+UpQkHDMcQ/7vsadf5qhNJzINow
-	Iwk/+Qr7B5WD6MUp2IS4CFUX3cAzh7NoF69pEhVMoCadjI3rDMmFXvb6e3P8Wq+0TVc1d3V24+d
-	Rshbs9m/UovuJRPTJBxjeB3ejxM2ej3LB3pyTRFMvdk5jyFmY6VnvyrsJrQ1tQcO+JkKo5hmcT1
-	vLZhCCmAuRyTAzAudh6QKqBSjcwstsHKfPrBGQdU0dJzNVmcpya0OR2IctT7o2Xbw7qIlU5Dmt2
-	JVUeD8D274iUKiR
-X-Received: by 2002:a05:693c:88c6:20b0:359:89b9:5e09 with SMTP id 5a478bee46e88-35989b98cabmr19639355eec.36.1792063487634;
-        Thu, 15 Oct 2026 04:24:47 -0700 (PDT)
-Received: from zhangbo56-PC.mioffice.cn ([43.224.245.235])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb6a279sm60818382eec.30.2026.10.15.04.24.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 04:24:47 -0700 (PDT)
-From: Bo Zhang <zhangbo0325@gmail.com>
-X-Google-Original-From: Bo Zhang <zhangbo56@xiaomi.com>
-To: senozhatsky@chromium.org
-Cc: akpm@linux-foundation.org,
-	baohua@kernel.org,
-	bgeffon@google.com,
-	minchan@kernel.org,
-	richardycc@google.com,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [PATCH v3 10/11] zram: use rw_semaphore for decompression streams
-Date: Thu, 15 Oct 2026 19:24:40 +0800
-Message-Id: <20261015112440.1491168-1-zhangbo56@xiaomi.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <atBh9xfpOji_A7A_@google.com>
-References: <atBh9xfpOji_A7A_@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NKGoCTR2"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=R99PCc1zJFx/7ZGSZ5Cra+MQV7lkkTtEbiGNQNkkiQA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792065650; v=1; x=1792670450;
+ b=NKGoCTR2om83DmcNmAuvw5SfyozQf9GYnaviA0YNixJ4LUbFJOsw6COwaTnuhWPJ5NNbqTeU
+ Qy/hgxBy6GA/NgAk5iNlzOHrDvjKo16Z/Vwv0u/pB5Q+ygjLc+FtTVg7/iS1bMPWS4SCaaZMASk
+ clVngPdkmGcLnYvEOzEucb7s=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id a62df552f173dbd5;
+	Thu, 15 Oct 2026 12:00:31 +0000
+X-Mizu-Trace-ID: a62df552f173dbd5
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <a3dfbc2d-8580-478c-8189-3794d49aee11@linux.dev>
+Date: Thu, 15 Oct 2026 20:00:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ linux-kselftest@vger.kernel.org, cuitao@kylinos.cn, ameryhung@gmail.com,
+ alexei.starovoitov@gmail.com
+Subject: Re: [RFC PATCH v10 0/4] blk-iocost: add BPF struct_ops cost model
+ support
+To: tj@kernel.org, josef@toxicopanda.com, axboe@kernel.dk
+References: <20261003124045.1289305-1-cui.tao@linux.dev>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20261003124045.1289305-1-cui.tao@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On Thu, 15 Oct 2026 12:19:49 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
-> Or perhaps we can avoid vm_map/unmap.  A slightly different approach.
-> kmalloc on fast path + memcpy (zsmalloc objects are strictly less than
-> PAGE_SIZE bytes)
+Hello，Tejun
 
-I applied the kmalloc+memcpy variant on-device and re-ran the same
-Android A/B. It removes the exclusive path entirely in our workload.
+在 2026/10/3 20:40, Tao Cui 写道:
+> From: Tao Cui <cuitao@kylinos.cn>
+> 
+> This is v10 of the RFC.  A BPF program can now take over the cost
+> model of one device: attaching an iocost_model_ops struct_ops creates
+> the ioc if needed and switches the device to the model, io.cost.model
+> selects between the attached and the builtin model, and detaching or
+> device removal restores the builtin one.  The attachment, the cgroup
+> callback pairing and the removal paths are serialized with what blkg
+> creation and destruction actually use.
+> 
 
-                      9+10       9+10 + kmalloc fastpath
-  read contended      ~1,959     0
-  read wait_ns total  ~12 s      0
-  read wait_ns max    72-96 ms   0
-  shared              76.7%      100%
-  exclusive           23.3%      0%
-  dpin_contended      0          0
+When you have a chance, could you take a look at this series? I'd
+appreciate your thoughts on whether the implementation still matches
+what we discussed, or whether it has drifted somewhere along the way.
 
-Every decompression now takes the shared (down_read) path, including the
-cross-page objects that previously had to go exclusive. The ~1,959
-residual contentions on the exclusive path are gone, and pin contention
-stays at zero, so the full read side runs concurrently with no stream
-contention.
+Meanwhile, two review points came in on v10. Both are already addressed
+for v11, which I'm holding until this thread settles, as Alexei
+suggested.
 
-Read-side contention end to end:
+Sashiko flagged a possible ABBA between the BPF paths and
+ioc_cost_model_write(): attach/detach take the queue freeze before
+q->rq_qos_mutex, while the cost-model write holds rq_qos_mutex across
+its freeze. That is indeed the current ordering, but I don't think this
+can deadlock because the queue freeze is a depth counter
+(mq_freeze_depth), not a lock: concurrent freezers simply stack, and
+while the write path holds the mutex it only waits for in-flight IO to
+drain, not for anything the attach path holds. A lockdep kernel under
+concurrent model-switch and attach/detach stress didn't report any
+lockdep warnings. If you'd prefer a uniform order anyway, the write path
+can take its freeze before the mutex, and I'm happy to restructure;
+either way this will be settled in v11.
 
-                 baseline   9+10      9+10 + kmalloc
-  read contended 24,749     ~1,959    0
-  shared         0%         76.7%     100%
-
-This is a stateless-backend result (lzo-rle). zstd/deflate have
-create_dctx and stay exclusive, so they don't benefit from shared reads
-at all - which, as you noted, is the sad part about zstd on that list.
-
-For those backends the serialization is unavoidable, but the actual
-root cause of the long waits is still the holder being preempted or
-migrated while holding the stream. So on top of 9+10+kmalloc I tried
-a quick-and-dirty preempt-disable for synchronous backends. Allocation
-can no longer sleep under the stream, so a two-stage zram_zs_malloc()
-does a non-sleeping attempt first and, on failure, bounces into a kmalloc()
-buffer, drops the stream and retries with a sleeping GFP_NOIO.
-
-zstd backend, same A/B workload, on top of 9+10+kmalloc:
-
-                       9+10+kmalloc   + preempt-disable
-  cwrite_contended     14,880         48          (-99.7%)
-  cwrite_wait_ns_total 137 s          0.32 s      (-99.8%)
-  cwrite_wait_ns_max   243 ms         43 ms       (-82%)
-  dexcl_contended      15,919         54          (-99.7%)
-  dexcl_wait_ns_total  109.6 s        0.68 s      (-99.4%)
-  dexcl_wait_ns_max    145 ms         34.6 ms     (-76%)
-
-zstd stays 100% exclusive either way; the win comes purely from the
-holder no longer being preempted/migrated, so the hold time stays short.
-It's the same mechanism that took lzo-rle read contention from 24,749 to
-406 earlier. So the two are complementary: shared reads remove
-reader-vs-reader queuing for stateless backends, and preempt-disable
-covers the exclusive/write serialization that stateful backends can't
-avoid.
-
-Quick and dirty, for discussion only - Patch below.
-
----
- drivers/block/zram/zcomp.c    | 17 +++++++++++---
- drivers/block/zram/zram_drv.c | 52 ++++++++++++++++++++++++++++++-------------
- 2 files changed, 51 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index bb2a8101445a..5c31bd58c616 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -165,8 +165,11 @@ struct zcomp_cstrm *zcomp_cstrm_get(struct zcomp *comp)
- 		 * so then unlock and re-try on the current CPU.
- 		 */
- 		mutex_lock(&zstrm->lock);
--		if (zstrm->buffer)
-+		if (zstrm->buffer) {
-+			if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-+				preempt_disable();
- 			return zstrm;
-+		}
- 		mutex_unlock(&zstrm->lock);
- 	}
- }
-@@ -174,6 +177,8 @@ struct zcomp_cstrm *zcomp_cstrm_get(struct zcomp *comp)
- void zcomp_cstrm_put(struct zcomp_cstrm *zstrm)
- {
- 	mutex_unlock(&zstrm->lock);
-+	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-+		preempt_enable();
- }
- 
- bool zcomp_shared_decomp(struct zcomp *comp)
-@@ -207,16 +212,22 @@ struct zcomp_dstrm *zcomp_dstrm_get(struct zcomp *comp,
- 		 * Exclusive requests additionally own ->local_copy and
- 		 * ->ctx and hence can only wait for each other.
- 		 */
--		if (mode == ZCOMP_DSTRM_EXCLUSIVE)
-+		if (mode == ZCOMP_DSTRM_EXCLUSIVE) {
- 			mutex_lock(&zstrm->excl_lock);
-+			if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-+				preempt_disable();
-+		}
- 		return zstrm;
- 	}
- }
- 
- void zcomp_dstrm_put(struct zcomp_dstrm *zstrm, enum zcomp_dstrm_mode mode)
- {
--	if (mode == ZCOMP_DSTRM_EXCLUSIVE)
-+	if (mode == ZCOMP_DSTRM_EXCLUSIVE) {
- 		mutex_unlock(&zstrm->excl_lock);
-+		if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-+			preempt_enable();
-+	}
- 	up_read(&zstrm->lock);
- }
- 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index b429c52cb37d..079796b17bde 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -2297,13 +2297,37 @@ static int write_incompressible_page(struct zram *zram, struct page *page,
- 	return 0;
- }
- 
-+static unsigned long zram_zs_malloc(struct zram *zram, struct zcomp_cstrm *zstrm,
-+				    size_t comp_len, const int nid, void **bounce)
-+{
-+	unsigned long handle;
-+
-+	handle = zs_malloc(zram->mem_pool, comp_len,
-+			__GFP_KSWAPD_RECLAIM | __GFP_NOWARN |
-+			__GFP_HIGHMEM | __GFP_MOVABLE, nid);
-+	if (!IS_ERR_VALUE(handle))
-+		return handle;
-+
-+	*bounce = kmalloc(comp_len, GFP_ATOMIC);
-+	if (!*bounce)
-+		return (unsigned long)ERR_PTR(-ENOMEM);
-+	memcpy(*bounce, zstrm->buffer, comp_len);
-+
-+	/* Drop the stream (re-enables preemption) before a sleeping alloc. */
-+	zcomp_cstrm_put(zstrm);
-+	handle = zs_malloc(zram->mem_pool, comp_len,
-+			GFP_NOIO | __GFP_NOWARN |
-+			__GFP_HIGHMEM | __GFP_MOVABLE, nid);
-+	return handle;
-+}
-+
- static int zram_write_page(struct zram *zram, struct page *page,
- 			   unsigned long index)
- {
- 	int ret = 0;
- 	unsigned long handle;
- 	unsigned int comp_len;
--	void *mem;
-+	void *mem, *bounce = NULL;
- 	struct zcomp_cstrm *zstrm;
- 	unsigned long element;
- 	bool same_filled;
-@@ -2331,22 +2355,20 @@ static int zram_write_page(struct zram *zram, struct page *page,
- 		return write_incompressible_page(zram, page, index);
- 	}
- 
--	handle = zs_malloc(zram->mem_pool, comp_len,
--			   GFP_NOIO | __GFP_NOWARN |
--			   __GFP_HIGHMEM | __GFP_MOVABLE, page_to_nid(page));
-+	handle = zram_zs_malloc(zram, zstrm, comp_len, page_to_nid(page), &bounce);
- 	if (IS_ERR_VALUE(handle)) {
--		zcomp_cstrm_put(zstrm);
-+		bounce ? kfree(bounce) : zcomp_cstrm_put(zstrm);
- 		return PTR_ERR((void *)handle);
- 	}
- 
- 	if (!zram_can_store_page(zram)) {
--		zcomp_cstrm_put(zstrm);
-+		bounce ? kfree(bounce) : zcomp_cstrm_put(zstrm);
- 		zs_free(zram->mem_pool, handle);
- 		return -ENOMEM;
- 	}
- 
--	zs_obj_write(zram->mem_pool, handle, zstrm->buffer, comp_len);
--	zcomp_cstrm_put(zstrm);
-+	zs_obj_write(zram->mem_pool, handle, bounce ? bounce : zstrm->buffer, comp_len);
-+	bounce ? kfree(bounce) : zcomp_cstrm_put(zstrm);
- 
- 	slot_lock(zram, index);
- 	slot_free(zram, index);
-@@ -2463,6 +2485,7 @@ static int recompress_slot(struct zram *zram, unsigned long index,
- 	unsigned int class_index_old;
- 	unsigned int class_index_new;
- 	void *src;
-+	void *bounce = NULL;
- 	int ret = 0;
- 
- 	handle_old = get_slot_handle(zram, index);
-@@ -2535,17 +2558,16 @@ static int recompress_slot(struct zram *zram, unsigned long index,
- 	 * modify zsmalloc API to return this information. For now, we will
- 	 * make do with the node of the page allocated for recompression.
- 	 */
--	handle_new = zs_malloc(zram->mem_pool, comp_len_new,
--			       GFP_NOIO | __GFP_NOWARN |
--			       __GFP_HIGHMEM | __GFP_MOVABLE,
--			       page_to_nid(page));
-+	handle_new = zram_zs_malloc(zram, zstrm, comp_len_new,
-+				    page_to_nid(page), &bounce);
- 	if (IS_ERR_VALUE(handle_new)) {
--		zcomp_cstrm_put(zstrm);
-+		bounce ? kfree(bounce) : zcomp_cstrm_put(zstrm);
- 		return PTR_ERR((void *)handle_new);
- 	}
- 
--	zs_obj_write(zram->mem_pool, handle_new, zstrm->buffer, comp_len_new);
--	zcomp_cstrm_put(zstrm);
-+	zs_obj_write(zram->mem_pool, handle_new,
-+		     bounce ? bounce : zstrm->buffer, comp_len_new);
-+	bounce ? kfree(bounce) : zcomp_cstrm_put(zstrm);
- 
- 	slot_free(zram, index);
- 	set_slot_handle(zram, index, handle_new);
+The other point came from Alexei Starovoitov, replying to patch 1:
+"device removal is still not tested." That's right. The selftest
+only used a device provided through $IOCOST_TEST_DEV. v11 adds a removal
+test to the same selftest: it creates its own null_blk instance through
+configfs, attaches to it, then removes the device out from under the
+attached model (rmdir of the configfs instance), and verifies that the
+ejection drops the device from the cgroup interface, that writes are
+rejected, and that detaching after the removal is a clean no-op; it then
+recreates the device, re-attaches and detaches again. I ran it locally
+under qemu on the v10 kernel; the new test passes cleanly with no dmesg
+warnings.
 
 Thanks,
-Bo
+Tao
+
+> Why a pluggable model at all
+> ----------------------------
+> 
+> When iocost landed in 2019, its commit message already promised that
+> "a later patch will also allow using bpf progs for cost models", and
+> the code has carried the split for it ever since: calc_vtime_cost()
+> is a dispatcher whose only implementation is calc_vtime_cost_builtin().
+> Seven years later the builtin linear model is still the only one.
+> This series fills that slot: builtin algorithms remain the default
+> while new ones can be prototyped in BPF.
+> 
+> The measured problems
+> ---------------------
+> 
+> The builtin model prices each IO with a binary sequential/random base
+> picked by a single per-cgroup cursor and a 16MB seek threshold, plus
+> a per-page cost.  On a virtio-blk device with the HDD autop profile,
+> a 4k IO costs ~24us when judged sequential and ~2.7ms when judged
+> random, a 112x spread, so a wrong judgement becomes a wrong price.
+> Three classes of mispricing, all measured:
+> 
+>  1. Heuristic rigidity.  Two legitimate sequential readers in one
+>     cgroup (a database with multiple tablespaces, a threaded backup)
+>     ping-pong the single cursor and are all priced random: a
+>     measured 89x overcharge collapses throughput under the same
+>     weight.  Random IO within a hot window smaller than the 16MB
+>     threshold is priced sequential: measured 107x undercharge, an
+>     accounting escape for hotspot workloads.  No setting of the six
+>     builtin parameters seems able to fix this: telling the streams
+>     apart requires per-IO state tracking, which looks like logic
+>     rather than coefficients.
+> 
+>  2. Device nonlinearity.  SLC-cache phases, SMR band placement and
+>     shared controllers (multiple NVMe namespaces multiplexing one
+>     device) make the real cost of an identical IO vary by an order
+>     of magnitude over time or across namespaces.  A static
+>     6-parameter linear model has no way to express that.
+> 
+>  3. Unpriced operations.  Flush and zone append fall through to a
+>     cost of zero and bypass throttling entirely, and the same pattern
+>     extends to device quirks the builtin model was never taught.
+> 
+> Mispricing feeds directly into the control loop: vtime budgets,
+> surplus donation and the vrate feedback all consume the model's
+> output, so a wrong model can skew the whole controller.
+> 
+> How
+> ---
+> 
+> Attachment follows the hid_bpf_ops model: the target device is set
+> in the dev member of the struct_ops from userspace before load; the
+> device is looked up with blkdev_get_no_open() and disk_live() is
+> checked under rq_qos_mutex, like blkg_conf_open_bdev().  Attaching
+> creates the ioc if needed, like an io.cost.model write does, and
+> switches the model under the same freeze and quiesce those writes
+> go through; enabling stays with io.cost.qos and wbt stays with it
+> too.  When the disk goes away, the model is ejected completely.
+> 
+> Attachment is independent of the model selection and of the
+> controller state: while a model is attached, "model" selects between
+> it and the builtin model - "model=bpf" switches to the attached
+> model, "model=linear" switches back to the builtin model, and
+> neither detaches the struct_ops; only detaching removes the model,
+> after which "model=bpf" fails.  "ctrl" keeps describing the builtin
+> coefficients, which are kept while the BPF model is in use and take
+> effect again when switched back.  Enabling and disabling the
+> controller, and with it the wbt handover, remains with io.cost.qos.
+> 
+> A bound model in use owns pricing for every charged IO on the
+> device: it is called from the bio charging path and prices every
+> operation including flushes.  The completion-time request sizing
+> which feeds the latency met/missed accounting uses the transfer cost
+> coefficients the struct_ops carries (vtime per page for reads and
+> writes), so the builtin latency tracking and vrate adjustment
+> follow the model's pricing while it is in use; extending the
+> model to the QoS side itself is left for a later interface.
+> 
+> The cgroup callbacks are bound to the iocg policy lifetime and pair
+> up: iocg_init() is delivered to every cgroup which already has a
+> blkg on the device when the model is attached, and to each one
+> appearing afterwards; iocg_free() is delivered to the cgroups which
+> still exist when the model is detached.  The existing iocgs are
+> walked over q->blkg_list under q->blkcg_mutex, the same walk the
+> blkcg policy teardown uses; cgroups without a blkg on the device
+> yet are not missed, as their callbacks are delivered at blkg
+> creation and destruction.
+> 
+>     u64 calc_cost(struct bio *bio, u64 model_flags)
+> 
+> The model reads whatever it needs from the bio itself: the
+> operation flags (the operation must be extracted with a mask, and
+> the REQ_* flag bits, including PREFLUSH/FUA, are part of it), the
+> size, the start sector and the issuing cgroup through
+> bio->bi_blkg.  model_flags carries iocost-specific metadata which
+> is not a property of the bio, such as whether the cost calculation
+> is for a merged request; the return value is vtime, clamped to 1
+> second of device time per IO.  Per-cgroup state can be stored in
+> BPF_MAP_TYPE_CGRP_STORAGE keyed by the cgroup of bi_blkg; it
+> follows the cgroup lifetime.  Sleepable models are rejected at
+> verification, since calc_cost() runs under RCU read lock.
+> 
+> Patch overview:
+> 
+>  1/4: the BPF struct_ops cost model support: Kconfig, ops
+>       definition, per-device attachment, unified dispatch and
+>       verifier checks
+>  2/4: selftests with two example models (the full builtin linear
+>       HDD formula at double cost, and a multi-stream sequentiality
+>       model) plus a runner and the selftest kernel config entries
+>  3/4: add an iocost_ioc_tick tracepoint emitting the per-period
+>       controller state, so model quality can be evaluated without
+>       drgn (existing events are state-change driven and silent in
+>       steady state)
+>  4/4: document the attachment in cgroup-v2.rst
+> 
+> Does it work
+> ------------
+> 
+> Mechanism, verified functionally on a virtio-blk device (HDD
+> profile, sequential-read workload from a 1%-weight cgroup, builtin
+> vs the 2x example model):
+> 
+>  - per-IO charge: 2882us -> 5722us, a factor of 1.985x; the
+>    completed IO count halves and total cost.usage is conserved,
+>    i.e. the model output drives both charging and budgeting
+>  - attachment: model=bpf readback while in use (ctrl keeps
+>    describing the builtin coefficients), EBUSY for a second model
+>    on the same device, a second device attaches an independent
+>    model, "model=linear"/"model=bpf" switch between the attached
+>    model and the builtin without detaching, detaching removes the
+>    model and "model=bpf" fails afterwards
+>  - edge cases: writing an unknown device fails and nothing is
+>    applied; the selftest runner checks the write error and errno
+>    of every step, including the restoration
+> 
+> Workload-shape verification (same setup, 4k IOs at weight 1000,
+> builtin vs the 2x example model):
+> 
+>  - flush-heavy workload (read/write/fsync alternating): priced
+>    1.99x the builtin, i.e. flushes no longer reset the cursor
+>    and misjudge the following IO as random
+>  - non-page-multiple IO (6 KiB): priced ~2x, matching the
+>    builtin's truncating page count
+>  - first IO from a high LBA (past 16 MiB): priced 2.01x, i.e.
+>    a fresh cgroup's zero cursor no longer misjudges the first IO
+>    as random
+> 
+> Payoff, demonstrated with the multi-stream example model (2/4) on
+> the same setup, 4k IOs at weight 1000, builtin vs the model:
+> 
+>  - two sequential readers in one cgroup: priced 1961us/op by builtin
+>    (both judged random by the single cursor) and 23us/op by the
+>    model (each stream keeps its own slot); the completed IO count
+>    rises by two orders of magnitude
+>  - random IO inside an 8M window: priced 24us/op by builtin
+>    (undercharge, an accounting escape) and 2607us/op by the model
+>  - single-stream sequential and whole-disk random pricing are
+>    unchanged, so the model fixes both directions of mispricing
+>    without introducing a new one
+> 
+> Non-interference, measured on enterprise NVMe: no measurable
+> overhead when the BPF model is not attached.
+> 
+> Changes in v9:
+> - the attach holds rq_qos_mutex from the disk_live() check through
+>   the unfreeze, like an io.cost.model write does, instead of
+>   releasing it between creating the ioc and switching the model;
+>   the queue reference, the second q_to_ioc() and the lockless
+>   traversal it needed are gone
+> - the attachment is published, cleared and the blkg list is walked
+>   under blkcg_mutex and queue_lock: blkg creation runs ioc_pd_init()
+>   and adds to q->blkg_list under queue_lock only, so the previous
+>   blkcg_mutex-only serialization could double-deliver iocg_init() or
+>   deliver iocg_free() without iocg_init().  The init walk now goes
+>   parents first, like blkcg_activate_policy()
+> - the device removal ejection reads ops->bdev before clearing ops->q:
+>   once q is NULL .unreg returns without a lock and the map can be
+>   freed, so touching ops afterwards was a use-after-free window.  The
+>   ejection moved to an ioc_bpf_eject() helper
+> - .unreg only detaches when the closing link is the one which owns
+>   the attachment, so a map re-attached to a new device through a
+>   newer link is not torn down by an old link; the v8 ops->q re-entry
+>   guard at .reg is gone, a second attach of an attached map now
+>   fails with -EBUSY like any other model would
+> - the ioc->attached and ioc->model pointers are unconditional and
+>   blk_get_queue_rcu() is declared in block/blk.h without an export,
+>   which drops the local prototypes and the remaining #ifdefs
+> - the unused struct_ops .init name lookup, the bdev/q cases in
+>   .init_member (the core already rejects nonzero non-function members
+>   it does not claim) and the unused write_cost_model() buffers are
+>   gone; the -EOPNOTSUPP selftest paths call test__skip()
+> - the selftest writes the dev member through the skeleton's typed
+>   struct_ops access instead of assuming it is the first member, and
+>   the maps are ".struct_ops.link" so closing the fd detaches; the
+>   example model's seek judgement is gated on a non-zero IO size so a
+>   dataless flush is priced sequentially, and write_cost_model()
+>   returns the negated errno ASSERT_ERR() expects
+> - the tick tracepoint's running field reports the active iocg list
+>   instead of ioc->running, which has not transitioned to IOC_IDLE at
+>   the emit point, so the final tick reads active=0 running=0
+> - the attach and detach take the queue freeze before rq_qos_mutex,
+>   like ioc_qos_write() does; taking the mutex around the freeze
+>   instead formed a lockdep cycle with the io.cost.qos write path,
+>   and .unreg's link recheck moved under the mutex inside
+>   ioc_bpf_detach()
+> - the io.cost.model documentation states that detaching restores the
+>   builtin model and that ctrl only accepts "auto" and "user" and
+>   never selects the model, says attaching rather than loading binds
+>   the model, and that removing the device removes the model as well,
+>   with the struct_ops link still having to be closed afterwards
+> 
+> Changes in v10:
+> - one map binds one device at a time: the attach rejects a second
+>   attach while the ops is still bound, which the v9 owning-link
+>   rework had dropped.  Without it, attaching the same map to a
+>   second device clobbered the single device slot, leaked the first
+>   bdev reference and left the first device pointing at the ops
+> - the detach takes the queue the caller holds a reference on as an
+>   argument instead of re-reading ops->q, fetches the ioc under
+>   rq_qos_mutex, and re-checks the owning link under the mutex, so
+>   closing an old link after an ejection and a re-attach no longer
+>   tears down the newer attachment
+> - iocg_free() is only delivered to a cgroup which received
+>   iocg_init(), tracked per iocg, so a blkg appearing between the
+>   attach walk and its own pd_init no longer gets an unpaired
+>   iocg_free(); a blkg whose radix_tree_insert() failed may still
+>   keep an iocg_init() without iocg_free(), which is now documented
+>   in the interface comment
+> 
+> 
+> Link: https://lore.kernel.org/r/20260908100143.47598-1-cui.tao@linux.dev # v1
+> Link: https://lore.kernel.org/r/20260910125817.223354-1-cui.tao@linux.dev # v2
+> Link: https://lore.kernel.org/r/20260914073356.791518-1-cui.tao@linux.dev # v3
+> Link: https://lore.kernel.org/r/20260916072302.1068871-1-cui.tao@linux.dev # v4
+> Link: https://lore.kernel.org/r/20260918031751.1255420-1-cui.tao@linux.dev # v5
+> Link: https://lore.kernel.org/r/20260918055001.1273840-1-cui.tao@linux.dev # v6
+> Link: https://lore.kernel.org/r/20260924054549.2271705-1-cui.tao@linux.dev # v7
+> Link: https://lore.kernel.org/r/20260930075154.189958-1-cui.tao@linux.dev # v8
+> Tao Cui (4):
+>   blk-iocost: add BPF struct_ops cost model support
+>   selftests/bpf: add iocost cost model test
+>   blk-iocost: add iocost_ioc_tick tracepoint for per-period device
+>     summary
+>   docs: cgroup-v2: document the iocost BPF cost model attachment
+> Link: https://lore.kernel.org/r/20261003013033.149288-1-cui.tao@linux.dev # v9
+
