@@ -1,216 +1,144 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567D33E639B
-	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 05:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F83B45D91E
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 06:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792041544; cv=none; b=nUvwImM/fusmXuJ0I1VoiYvCbQtIDiG+BWvSM/Qgm9DLpyqJ9ljb+1gfHmDOm3ZFm0Jhbh845/mjFXyt+8Tl/6G861ovDannuGf2gD6i9Fo7KI9u3f+TrEtuIDEFwnpIl1DPRE5JuyQQnJIplOgUYHfhbF3hwW+pQ9qy0Rutf3Y=
+	t=1792045168; cv=none; b=m59fBK1kDrboPKkGycyQgyX1jE4P5qgX9ZL28r8mh1mVncKetNeT+Go8uBUrlG7n4+Ae7VHcTp+ahTog6qnVbvDhThz0wg0OI2Lh6MAVK68WOSY+ffkWT8d9IcF08rXtvAH3c6cG2nqayyGYCAvRJCq6Hv0rZNtSgs7jaRMlhmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792041544; c=relaxed/simple;
-	bh=aF9SvMDmwlsn0gbumWIRW0qhCr0OjB8SXn9NS13t2HM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qoxvd+AQnaXpnaXM2UFrEEoyIX9tkGRrx8WF2sLqUYy15lWhxivTJVibgnroa3gkKa2jhbwgxJDqNaEgLHJ5PszD0VHZ8oNn/lBzFJn8xGPYR/oHo4hGaps2pg1uOA7W1GmnDjYemDaHAWcWWr5r0qjOKzyGioNiIxwbROzF9WA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Rrn5Z/Pp; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1792045168; c=relaxed/simple;
+	bh=SnTqnSHnJf1SyEgRppnLJtdvwZ/K9QpTpMoFZTST/So=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cnrYqTPGrID3kvo2qse6+ecIeuYl775HszLnI8k5sYtReipIWmxNgDGP87/SJo6y5VHrATciPd6LmldN99LXo6dLPpLICgsylq1bekAH3pYLKrURSmpuXUz8qK3XymZgGN7lUlQf+V8wj5OeDzuOqzHHvzN4i56QpElT7l5Qcl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eMsEg9vs; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Rrn5Z/Pp"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2e608cd460eso26466525ad.3
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 22:19:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eMsEg9vs"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3ac9f49b984so154923a91.1
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 23:19:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792041541; x=1792646341; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=aL42kwtpY9xz2nUxaLVspyn822mepZz266L04+MLaso=;
-        b=Rrn5Z/PpsExSK7JMfJgza25GCDKER2AU/R2fehrRTxt441Z9960ACvL83tmFrEdO70
-         ByjM4janZ3EaLUjWGpvskdOWQRPLH7bK8/t+fanNxfy7i+BbBAGZBc6tpYtmB7njI7t6
-         0s7HISMyQhnmFW06f3yyIDipBHR4Vx2C+gHWE=
+        d=gmail.com; s=20251104; t=1792045164; x=1792649964; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=LKqK4HrH78W1MTYoSkDNokUsDBo14132TDZJAUlwXh8=;
+        b=eMsEg9vsgz4JpZA/dQGmcIu7cuJhRpTt9bfXp/QLtE6wYb3AwFvj5xjTWMPOs90pPc
+         jE6uZFmpKp104w+kZDOf7V5ZRLT2gpxeYShesAyn4HMOtY1iyWj3X60jla8tnX/Zy+9A
+         1UR4iR8QOfZAmT6e5EXxja16F8HF8rUeJ6/M4OOztB9SNkCXc3CMVGph4MpXZwJ10v1j
+         SOa8zryzSZrFcdBgxRsIpOyN9GtV/KNfzEne6ZnZSSJlN0TabAn+Q5nC+ExwBe33LoKW
+         dpKAXHFm5eyP0BZv0aA2kmpJOn/vkmq2fvo7ikaX72ed9z4THTsBc2YHQwE4B2y1JeYm
+         UhVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792041541; x=1792646341;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=aL42kwtpY9xz2nUxaLVspyn822mepZz266L04+MLaso=;
-        b=FtMirpAqqMnkugPS24cYfskPLYeUGGelzcX4RDC1lM6ReLExQjJEysOa3h5LEwr5eY
-         ZqHMt+bR4V6eMiu0OOp2RhUvHK23qygGBY94PZ1b8YugCGpPCESntdzC2Hmgm2ttYSVm
-         ypK/EynTVrdRrqAeiekCR9QmZKJukOg6YJtwMYO0c+Rwn1Vd5wEIjimjL5I5ccqMqcxj
-         41qIjgPgC8HtatouvoL+ptQ91vycMZeOREt5jG6sX096HHLv7MlZTmjm6uhT1/PQhevR
-         e0teMt8SGmHMlmB8ewLtPYHlyAiTMqeSNiejRmlzTi9eNEDUd9+YE5hDoicnOcqGRg4I
-         86Gw==
-X-Forwarded-Encrypted: i=1; AKwUvBxsU7wIYaMLQhFkyKWozXr21kxn0AOyp0y2ImHmTfEkeki2+zR9OtPxhHq/b1yURcbIYcjPFNZoLCKQkw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJa80DapOA9IrmPG0sxC0n/bReSpuZvbFQsJMs1Y0h0KPF4njRX
-	N6HMCjBEitwnY5H07eYbNiRGWrgomnR/PtKplE8SK8OJEXBvpOTYV52YOm3W+6RZy8IpBOHAzrL
-	0M6w=
-X-Gm-Gg: AYBFou1dRQVzvNlvwH58CP+tM4dBTb2G3bRB4ZJmoHWIcc5G2E8bQ/G6Mun/KMXpYEa
-	4luoJJgjdvgQQDWYXtQ+O3h0iCTKD7wISbZvQ26OFvFwK0R09eElZ8xxpY4RjdpcIlN7EdzPlb8
-	JDsvukDVUvhUvW6WyBALUV+w71NH2lqZhHyWgKCOhL9NigBaWjdo6PPXi9/nSX/XxST1TWPDdg3
-	SdCw17axn4Su1BUM6XzZuMOxkK+ULB5ob25sGsw58z6CP1qssRqUx/4Aq6GURETeat2OBAuD/6O
-	lu2CIanO6wyB2bCBdQDo9wRQOTbEpDyU9RodLaEt7bzGnCoESQfH7wjf64yEG7jQycsyEnhm88B
-	CLBbcbzFPtlKlTG1mrEgFhHeLmkfFvajiGN1UFOhQ/YwCGpblXQq+atOAExs/sQtwKjMWaMCsAg
-	507pOHBsPZhINaJOTfk2T5gN9uxKwoLCvGUXAflWqwus+rYLAVJpfBgQcC7jSDZ2W8d/eQwTA6Y
-	+dipgV3ijXMneXC9VNYc/AMDUXi+YE2dZaSNko=
-X-Received: by 2002:a17:902:e748:b0:2dd:c053:e669 with SMTP id d9443c01a7336-2e842ab7902mr153442525ad.47.1792041541599;
-        Wed, 14 Oct 2026 22:19:01 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:8455:7899:5a2e:26f8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e8421b1562sm77412345ad.34.2026.10.14.22.18.57
+        d=1e100.net; s=20260707; t=1792045164; x=1792649964;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=LKqK4HrH78W1MTYoSkDNokUsDBo14132TDZJAUlwXh8=;
+        b=NCyRqu9k6HOLvZ/Gt7+8Usy3mjAFv+kJPO4wBM5vxJhr7V8tZ56cuZb+HDK3u7zX2A
+         eEp5QbfNswYPTV5ZsXfAuoF+e+NALpXZsy9t+7bqjOsE1mVr4ebufRNCUvXcYcwhZ2Ro
+         s18lR6hZXSNT51pjqTkjQiRvd40sWiP5mvUSZJDnKY2S/kk9dKh/9W1YNVO/41oBeHY7
+         nLsKXkuUr0ji+MPXdECf6bBF9J6dmEXlKsVXLoaFN1RLTq0FUIjpPW5t3ESNoFpysau1
+         w16uTUqR2I0WEmmbaNPFPck9+qjIl2wwCuEPcdMrBX/00uR+Ozus+3RgRZuPNpve63fF
+         2ssg==
+X-Forwarded-Encrypted: i=1; AKwUvBz8JsLGvoxNaP1LhMOwhLvDq7DYoc5vAfvRNgcOpa/vlFo1q8sHp4v4PF6yzw2C/a/phfv9aqtMeahMpA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLwfnfKP/Exd51LAoBb4RUxwcbVoMVmeujbmy0BCfGwHlsfpRWp
+	m6PAr5/CIL9Pt00706wGK6OAEE+4SJ3JDB4fFaWjpZKS40Hv0OpNx46D
+X-Gm-Gg: AYBFou1phTb9LdvtIOGujYEI6b0UejzXDGA2oKv4T3D4DaZokzXp05R1LbBj2qFAVuM
+	u/Z1a4qQsYQlSZTgFVkPQCLRDHBMkuothn2C1Wij7YcFyEHG/RBQqO6vqYHHyyEsyU/wH81FQ+X
+	SbbyQRP9xYwpVKuNtev6xAf7dx6etUwIg1lUpfssUPkNszGr+iju2bgg4fWSSGxJMqCeCVqSA6E
+	TrXL/3mL0lqpN46m7T4R+hanv7Z64epoJeJTNzpjLsR4z9OsWisnpUSzADgXWdXLJ9Q7PXUk+fO
+	LwCSvsG6C2xGuw+Ecl3hquHpDjpahfgmOTsaW7fzp6oHpfxB36sWYz4kqHva6g4oCqJ7ccyliMk
+	ImZrzeLbUOo3RJMItGNKFvlnVHSefmNc86njPjjlsMqvHNbo+5rziAu07cmrLFdCxEQgpg/vokN
+	HyySrPj3Jwf9vqqC//v2HCN2L4ipTfcIdCRpd5333gZzD7LsZLYi9NwKuh85YJG8T8X7pYz5Bad
+	RtUtS7zLU8y
+X-Received: by 2002:a17:90b:4b:b0:3a7:96d:feaf with SMTP id 98e67ed59e1d1-3ab3a9a0c59mr9385893a91.16.1792045163419;
+        Wed, 14 Oct 2026 23:19:23 -0700 (PDT)
+Received: from ancienth-X870E-Nova-WiFi ([125.186.72.2])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac9461d71esm2669111a91.7.2026.10.14.23.19.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 22:19:00 -0700 (PDT)
-Date: Thu, 15 Oct 2026 14:18:55 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Bo Zhang <zhangbo0325@gmail.com>, akpm@linux-foundation.org, 
-	bgeffon@google.com, minchan@kernel.org, richardycc@google.com, baohua@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 10/11] zram: use rw_semaphore for decompression streams
-Message-ID: <atBh9xfpOji_A7A_@google.com>
-References: <20261013035201.2809924-11-senozhatsky@chromium.org>
- <20261014153603.1365617-1-zhangbo56@xiaomi.com>
- <atAj9o5IgrAeiGiW@google.com>
- <atBAWZ3WZvat3UA1@google.com>
+        Wed, 14 Oct 2026 23:19:22 -0700 (PDT)
+From: Daehyeon Ko <4ncienth@gmail.com>
+To: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Hannes Reinecke <hare@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daehyeon Ko <4ncienth@gmail.com>
+Subject: [PATCH v2] iov_iter: validate extracted segment for bvec alignment
+Date: Thu, 15 Oct 2026 15:19:07 +0900
+Message-ID: <20261015061907.2713943-1-4ncienth@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <atBAWZ3WZvat3UA1@google.com>
+Content-Transfer-Encoding: 8bit
 
-On (26/10/15 12:19), Sergey Senozhatsky wrote:
-> Or perhaps we can avoid vm_map/unmap.  A slightly different approach.
-> kmalloc on fast path + memcpy (zsmalloc objects are strictly less than
-> PAGE_SIZE bytes)
-> 
->    Run #0: 1,475k IOPS, avg 3.26 us, stdev 14.24 us, p99.99 24.45 us, max 5,617 us (5.62 ms)
->    Run #1: 1,472k IOPS, avg 3.27 us, stdev 15.35 us, p99.99 23.94 us, max 5,619 us (5.62 ms)
->    Run #2: 1,473k IOPS, avg 3.29 us, stdev 15.37 us, p99.99 24.45 us, max 7,190 us (7.19 ms)
+iov_iter_extract_bvecs() validates iter_iov_addr() and iter_iov_len()
+before iov_iter_extract_pages() selects the first nonempty segment and
+limits it by iter->count.  The checks can therefore cover a different range
+after a leading empty segment or iov_iter_truncate().
 
-Just a better looking code (but same idea).
+An unprivileged O_DIRECT preadv() reproduced the empty-segment case: an
+aligned empty segment followed by a misaligned one completed 4096 bytes
+instead of returning -EINVAL.  A truncated iterator has the same mismatch
+when its full segment length is aligned but its remaining count is not.
 
+Bound the normal fast-path length by iter->count.  Keep
+first_iovec_segment() for leading empty segments so validation covers the
+remaining portion of the segment available for extraction.
+
+Closes: https://lore.kernel.org/r/20261012065520.1089147-1-4ncienth@gmail.com
+Fixes: 14b007e17881 ("block: validate user space vectors during extraction")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
 ---
- drivers/block/zram/zcomp.c    | 47 +++++++++++++++++++++++++----------
- drivers/block/zram/zcomp.h    |  2 +-
- drivers/block/zram/zram_drv.c |  2 +-
- 3 files changed, 36 insertions(+), 15 deletions(-)
+Changes in v2:
+- Bound the normal fast-path length by iter->count while retaining
+  first_iovec_segment() for leading empty segments.
+- Cover the truncated-iterator case raised by Andrew Morton and Sashiko.
 
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 39d1f9384939..81f21bad787e 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -181,14 +181,13 @@ void zcomp_cstrm_put(struct zcomp_cstrm *zstrm)
- 	mutex_unlock(&zstrm->lock);
+v1: https://lore.kernel.org/r/20261012065520.1089147-1-4ncienth@gmail.com
+
+ lib/iov_iter.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 2072c04e99d052..d21082fb251bf7 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1022,7 +1022,7 @@ static ssize_t iter_xarray_get_pages(struct iov_iter *i,
+ 	return maxsize;
  }
  
--bool zcomp_shared_decomp(struct zcomp *comp, struct scatterlist *sg)
-+bool zcomp_shared_decomp(struct zcomp *comp)
+-/* must be done on non-empty ITER_UBUF or ITER_IOVEC one */
++/* must be used on a non-empty ITER_UBUF, ITER_IOVEC or ITER_KVEC */
+ static unsigned long first_iovec_segment(const struct iov_iter *i, size_t *size)
  {
- 	/*
- 	 * Shared decompression is only safe when the backend has no
--	 * mutable per-stream decompression context and the object is
--	 * contained within a single page (no ->local_copy bounce needed).
-+	 * mutable per-stream decompression context.
- 	 */
--	return !comp->ops->create_dctx && sg_is_last(sg);
-+	return !comp->ops->create_dctx;
- }
+ 	size_t skip;
+@@ -1938,8 +1938,13 @@ ssize_t iov_iter_extract_bvecs(struct iov_iter *iter, struct bio_vec *bv,
+ 		   iter_is_iovec(iter) ||
+ 		   iov_iter_is_kvec(iter))) {
+ 		unsigned long start = (unsigned long)iter_iov_addr(iter);
++		size_t seg_size = min(iter_iov_len(iter), iter->count);
  
- struct zcomp_dstrm *zcomp_dstrm_get(struct zcomp *comp,
-@@ -244,6 +243,15 @@ int zcomp_compress(struct zcomp *comp, struct zcomp_cstrm *zstrm,
- 	return ret;
- }
- 
-+static int zcomp_decompress_buf(struct zcomp *comp, struct zcomp_dstrm *zstrm,
-+				struct scatterlist *sg, void *buf,
-+				struct zcomp_req *req)
-+{
-+	sg_copy_to_buffer(sg, 2, buf, req->src_len);
-+	req->src = buf;
-+	return comp->ops->decompress(comp->params, &zstrm->ctx, req);
-+}
-+
- int zcomp_decompress(struct zcomp *comp, struct zcomp_dstrm *zstrm,
- 		     struct scatterlist *sg, unsigned int src_len, void *dst)
- {
-@@ -252,27 +260,40 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_dstrm *zstrm,
- 		.src_len = src_len,
- 		.dst_len = PAGE_SIZE,
- 	};
--	void *src = NULL;
-+	void *src;
- 	int ret;
- 
- 	might_sleep();
- 	lockdep_assert_held(&zstrm->lock);
--	if (!zcomp_shared_decomp(comp, sg))
-+	if (!zcomp_shared_decomp(comp))
- 		lockdep_assert_held(&zstrm->excl_lock);
- 
- 	if (sg_is_last(sg)) {
- 		/* the object is contained within one page, read it in-place */
- 		src = kmap_local_page(sg_page(sg));
- 		req.src = src + sg->offset;
--	} else {
--		/* the object spans two pages, linearize it into local copy */
--		sg_copy_to_buffer(sg, 2, zstrm->local_copy, src_len);
--		req.src = zstrm->local_copy;
-+		ret = comp->ops->decompress(comp->params, &zstrm->ctx, &req);
-+		kunmap_local(src);
-+		return ret;
- 	}
- 
--	ret = comp->ops->decompress(comp->params, &zstrm->ctx, &req);
--	if (src)
--		kunmap_local(src);
-+	/* exclusive mode already holds ->excl_lock */
-+	if (!zcomp_shared_decomp(comp))
-+		return zcomp_decompress_buf(comp, zstrm, sg, zstrm->local_copy,
-+					    &req);
-+
-+	/* shared mode: try a per-request bounce buffer first */
-+	src = kmalloc(src_len, GFP_NOWAIT | __GFP_NOWARN);
-+	if (src) {
-+		ret = zcomp_decompress_buf(comp, zstrm, sg, src, &req);
-+		kfree(src);
-+		return ret;
-+	}
-+
-+	/* fall back to ->local_copy serialized by ->excl_lock */
-+	mutex_lock(&zstrm->excl_lock);
-+	ret = zcomp_decompress_buf(comp, zstrm, sg, zstrm->local_copy, &req);
-+	mutex_unlock(&zstrm->excl_lock);
- 	return ret;
- }
- 
-diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-index 924c4185abe9..6764818d2a9f 100644
---- a/drivers/block/zram/zcomp.h
-+++ b/drivers/block/zram/zcomp.h
-@@ -115,7 +115,7 @@ void zcomp_destroy(struct zcomp *comp);
- struct zcomp_cstrm *zcomp_cstrm_get(struct zcomp *comp);
- void zcomp_cstrm_put(struct zcomp_cstrm *zstrm);
- 
--bool zcomp_shared_decomp(struct zcomp *comp, struct scatterlist *sg);
-+bool zcomp_shared_decomp(struct zcomp *comp);
- struct zcomp_dstrm *zcomp_dstrm_get(struct zcomp *comp,
- 				    enum zcomp_dstrm_mode mode);
- void zcomp_dstrm_put(struct zcomp_dstrm *zstrm, enum zcomp_dstrm_mode mode);
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index ad244624d4a5..e608769bfad5 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -2128,7 +2128,7 @@ static int read_compressed_page(struct zram *zram, struct page *page,
- 	prio = get_slot_comp_priority(zram, index);
- 
- 	zs_obj_read_sg_begin(zram->mem_pool, handle, sg, size);
--	if (zcomp_shared_decomp(zram->comps[prio], sg))
-+	if (zcomp_shared_decomp(zram->comps[prio]))
- 		mode = ZCOMP_DSTRM_SHARED;
- 
- 	zstrm = zcomp_dstrm_get(zram->comps[prio], mode);
+-		if ((start | iter_iov_len(iter)) & mem_align_mask)
++		if (unlikely(!seg_size && iter->count)) {
++			seg_size = iter->count;
++			start = first_iovec_segment(iter, &seg_size);
++		}
++		if ((start | seg_size) & mem_align_mask)
+ 			return -EINVAL;
+ 	} else if (iov_iter_alignment(iter) & mem_align_mask) {
+ 		return -EINVAL;
+
+base-commit: 72d3fcf802c45d00b300f25b848a93c3a2bd7c7e
 -- 
-2.56.0.385.gd3acb90ef8-goog
+2.55.0
 
