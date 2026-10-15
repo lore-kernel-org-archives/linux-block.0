@@ -1,62 +1,64 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04D14A2617
-	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 09:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603044E1414
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 09:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792055481; cv=none; b=nFxepEa6bHNFWyLLf92DFXInuniyi+CJqgtPxndVp83dkIh1svk7b+ImVtUHxkuFBUfZzSDD8x9pmLUF/GD+aByC/8FsIYDVQWPYO+FZN5i1wszM+Nj1mHToleIe6L1eshYcUmVU0wA3hTht8bmpicdSewxahytVW1aWeebNen4=
+	t=1792055482; cv=none; b=DXAdSRy5RMTNok5vuMMZZk3epnwxTBGLLljL73U1/5ou47gAOGYq0p0s/VjXsI0gTfYfPhS7xRev4fd46gZrJc5YQmFTzLtzuf3xVyH29IIy2aDnrAGUVNsO9qMpiEXNPSL+sm+Su6/Sy4jrDLW9nUXM6EfjpaxE2tDTky/EUOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792055481; c=relaxed/simple;
-	bh=z7htjFtNdmyDjxtzMIUkA5kmK2peP8WrA+vCIBzfMQI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Uff5GKgpVOV0u0gzAk18VGZyKit8lZYCZ6S5omhCDvEsFiLqmpOmdwUFaxVX4a8kJloqooaDpiVGkpnfl3WLKM5v1ZYFM+WmgFgSex+vKhimE5ly44GMg3BRsWkRpjjMdvOh0kwYbryz0n24l5pdYPPolVUd2VYGKM/PQcO9WRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=aAM/lsE1; arc=none smtp.client-ip=209.85.215.182
+	s=arc-20240116; t=1792055482; c=relaxed/simple;
+	bh=G9kty0cmuqWHae7vsnxZGgEljENPB3gY9weHBSiEzAU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=rAkd2EO1tk0GGRiHRGbCljGoCtpRk1ZA1KB3aujukRi5Xoju4GjsPR5shm6voRQZQTwd3shY34qlOvoPWctHWASe0r+hTkHsBBqWhMI/MsykzbBv4M8MsdfiDLfepOlLLujAIwU1Hq/RtB16B41CgHy/86m0/KJwX/k8vlPHW34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=FfMyqaRu; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="aAM/lsE1"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cc50ad2d650so3854477a12.1
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 02:11:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="FfMyqaRu"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-887beafb714so2573375b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 02:11:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1792055476; x=1792660276; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mGOn0xOwuTcpXWjs4SNmPz8oRcx6kK3kpK0yQjNzznM=;
-        b=aAM/lsE1Y8rfvck3UgiqriLEM0WHIEw+n+XA3TSLCB2DQ6gK+FStNIuFXZOZmFDs5c
-         8Xury2EUxaKm4w34XvVFIcHD18YytFFb58jkZqXe9hlvoPnG97M4yPQh62lsO3re1nDG
-         W9FXXofzXJ4lU23MBEd5syyjq7nLMmMSCBxTezboYmr5adXrFEuU2tVVMw260gQhRm/a
-         HuRrBd57LlMI4lWMSogfGTDv2iEWw1fq9JNMLgTExoBbTsQws4rMo+ZTIDbxSQbrduxY
-         WVCtRntQlEAoH9i5u4hbh6atEuRRiQTgfs3rWIHIxNDj9VGiE5zZN/7afoNbXeJzfMeT
-         HXBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792055476; x=1792660276;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=bytedance.com; s=google; t=1792055481; x=1792660281; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=mGOn0xOwuTcpXWjs4SNmPz8oRcx6kK3kpK0yQjNzznM=;
-        b=Nd2P2Di2bFA5zLJmBssWjWWvoOelCOzmIF4waQ+v7vm8sjP2X4kJaWPYow9N9/9c72
-         hHttwcIbWOGYyE+RBEAPNyJp3jwGC/Ot1qZDv2YH9ntHF288K7BksoKTqZjMtShLSKF7
-         zK+pLQY1mkAKyfRikxelnVtSvO7iHNZOTESRRtCLT0XwbITgYqib7xfz5UVKisUMhY5Y
-         0EQcBoIm2iCa1LXl7hNbHadiBQ83z5xH940yD9T4ZWJrO9c7IhXbgj4fzpGb9eS0oMqK
-         KmSHnZ+ASvVdd2oHmFT2FWlJ+6/YzzlaNU1RpJzYjwj6VW6cK7CwCpvLPoej+heliR5m
-         MpHQ==
-X-Gm-Message-State: AFq9FYKrx3IoifaDQAhL5ZkEv3L4P2nk8BNKKxWtX75E6L6nGKRIqCo7
-	Okp0feWXl6jl7m3ktx1dGuh1ZA3QZNI8bxPgwrkIMKnaBrijGfFvsp6s8X6w+S2L4VvXr2bs9Jl
-	5ujev
-X-Gm-Gg: AYBFou0nFTSCHh119IKcRBPKaZmq4qH66Ll+Ca3jytz432nCynpNa8fM8F8+ZmE/+pI
-	h8J2r10c7zZnqp63FXEmT6IO8EGxOt9ScPDKEsJr4Q4PJkrgUoQ8M2bC4k6lXsSxijzuFO2MQ8g
-	SySZbS2q/lPFSY2hCAnlTCZNq8IJhH4Fvc7ZiaTmoJjYnP1IoSnK2Gdd2EywVCS/Q/sQrBtWybe
-	ugwnbkxsQ7zllkxTea034tFD3EwiMegrMECRn3TRdv2Ndc3wzeCJ++ZwH6ApqTDPpRA3j0vVwTJ
-	aeR950XxxiYEN8jQD6WioP9IghBmv2aTNtoLAQr89ijt6AMpg+7RpBYdWFJjV95AuLVXG0wi6Yh
-	5e+sVM8QbWGSss3KvRMikEcdjNLTGCn5EoL/e1wPM9j5qBDomXRUs0rL8O1aos2YLrOM8ISAMS4
-	ZED7rWUxlkCxwByUNKSTWf5Hde8F2SA360P/9oJBqqmlypdWD6pCs3U2CsuKknbamw98RiUsU3u
-	Q==
-X-Received: by 2002:a17:90b:4d88:b0:3a4:a850:6982 with SMTP id 98e67ed59e1d1-3ab3a7786e4mr16579148a91.26.1792055475591;
-        Thu, 15 Oct 2026 02:11:15 -0700 (PDT)
-Received: from localhost ([106.38.226.35])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac945e74bcsm3531055a91.3.2026.10.15.02.11.14
+        bh=kDoarhYVjO6GcDLXPC39BoDv5gAMZD7MR6J/y4jxP/g=;
+        b=FfMyqaRujkKDk1z3kR0kolvEg8mzf1fmAMG4WUfVeOPaYN+8ZAm8zFYr8LZfWf5Gek
+         qIXxpxhg5UfJDjXIdrsFLvM/h35FjhxiP9FbU+ohdpeG7AJpPXcGQKSabIWmWpq3wFO/
+         PC/rLqdkysABcNOEiLZQflJcloKiDgvz0DMNl1KiWNQ28eUPGgG75qOJj1d7usCa8BXu
+         K4qISCqZjJZTL0l1a/QuPhShm4gBj/F6LU3TkVXsh+pt4O+mbO1D0x8Rd7n7+V9vgzH+
+         JevQ5NuxAm+j8HEnsRVX9k4TsEuOxt1KQ7fKVEQ6xtZ07huaS+ysylpCTxEHJmNmB31V
+         Kcjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792055481; x=1792660281;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=kDoarhYVjO6GcDLXPC39BoDv5gAMZD7MR6J/y4jxP/g=;
+        b=soMixSwIesim4IFxCYDE2zib1HUzRjvls5j3Li332ru96w1v7DJsyGAtF2yJ74ZSto
+         RmuehGFFL7I0eQRuEY3yVAd6tZgU0WH4684z0ldT6BY8NC1VE90h0rXcYtgIziV8tskn
+         rdSpei/gJn06NzQmMCG5m19xBdqbgoyqiIvTIYt1LdWBcuo5Bu6xF8h63dFiiu16VVNN
+         OA2sit6voNa/szOBhSp3rfBMAzvizvLBQOfOddfTYo6oqyDh0ToLXYN+zEaNmaHCVZAO
+         nZgh/rXe2aEpjuFFfgudki2Qy9H2fO+1pIJWb51WmUfl74D2qs2eEjFQBUiDatnrdXyj
+         sDkg==
+X-Gm-Message-State: AFq9FYKoyoPxqDO+0aIyOVoiGaI9MVt2dl7JvWTEA5QVs6qBuQPqb9av
+	lgvZFZCVFHNAeBHS8+9ct2lp5ZZRGCeS//B23mv49oIVyTzScYU/Upr43NtGCWWqeDfwpdyfpKE
+	EwYBjRkc=
+X-Gm-Gg: AYBFou3UUAXMtBae5m3E0IDXrFEV2JA+AAFiyJbaZPGeHfqejuKgtsr05It1gbnlsEu
+	3kzKwLhUDwYqolGmtA/1Lmqv64Qy85km5/3dSlmrJFT0t2mrc2wwR/8ZM7aLrSUcqgDHK7g1HUt
+	Q9iKHRy7G9Vl8GMQcwFUJOg1RlHF/ETiFfGwL2rhtdqV/mGb+F3NoHFQePM+kogY+k6XQsengiN
+	Qg14yUUSJQrN+2NIN2ADZVC4OdhSSBlNTg2x1NONSFaj3n/f8wQHkptN7lwwqHkGW9Hs44uisES
+	2jBhsADNfpsVGO+a5B8LbpNtPR7xl1sCfSGYNmWD5KQ5whLz4suHxdSwlq1uzDw42J7OWVNGOhf
+	88pHfpPzUIVh/Spb8EPm15wVL70s4sGHOKkgyxgSgumIO3Ke7uIAA0mlp2Rp77E1tt7J1lcrALX
+	az8yxLKRWMZYTmNn6aejbglghpoGejk+TZtOjA4Q+mPMnRkLS+56jGmFndT1LInf3iYQxYZJ2zF
+	Tc=
+X-Received: by 2002:a05:6a00:4fce:b0:892:d40c:4f7b with SMTP id d2e1a72fcca58-897c653fe53mr16105745b3a.10.1792055480248;
+        Thu, 15 Oct 2026 02:11:20 -0700 (PDT)
+Received: from localhost ([106.38.226.135])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-89d7f5204dcsm2093895b3a.6.2026.10.15.02.11.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 02:11:15 -0700 (PDT)
+        Thu, 15 Oct 2026 02:11:19 -0700 (PDT)
 From: Julian Sun <sunjunchao@bytedance.com>
 To: linux-block@vger.kernel.org
 Cc: jack@suse.cz,
@@ -64,10 +66,12 @@ Cc: jack@suse.cz,
 	viro@zeniv.linux.org.uk,
 	mcgrof@kernel.org,
 	djwong@kernel.org
-Subject: [PATCH 0/2] block: fix NOWAIT handling and locking in buffered write fallback
-Date: Thu, 15 Oct 2026 17:11:03 +0800
-Message-Id: <20261015091105.1315605-1-sunjunchao@bytedance.com>
+Subject: [PATCH 1/2] block: reject NOWAIT buffered write fallback
+Date: Thu, 15 Oct 2026 17:11:04 +0800
+Message-Id: <20261015091105.1315605-2-sunjunchao@bytedance.com>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20261015091105.1315605-1-sunjunchao@bytedance.com>
+References: <20261015091105.1315605-1-sunjunchao@bytedance.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,20 +80,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+blkdev_write_iter() rejects NOWAIT buffered writes, but does not
+enforce this restriction when direct I/O falls back to buffered I/O.
+Successful fallback waits for writeback, violating NOWAIT semantics.
 
-This series fixes two issues in buffered fallback for direct writes to
-block devices.
+Reject NOWAIT requests in blkdev_buffered_write() with -EAGAIN.
 
-1. NOWAIT requests can fall back to buffered I/O and wait for writeback.
-2. The fallback path lacks shared inode locking against set_blocksize().
+Fixes: c35fc7a5abae ("block_dev: support RFW_NOWAIT on block device nodes")
+Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
+---
+ block/fops.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Julian Sun (2):
-  block: reject NOWAIT buffered write fallback
-  block: take the inode lock for buffered write fallback
-
- block/fops.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
-
+diff --git a/block/fops.c b/block/fops.c
+index 2ce7c6c4714e..982a713b4c27 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -709,6 +709,10 @@ blkdev_direct_write(struct kiocb *iocb, struct iov_iter *from)
+ 
+ static ssize_t blkdev_buffered_write(struct kiocb *iocb, struct iov_iter *from)
+ {
++	/* Buffered fallback waits for writeback, which NOWAIT cannot allow. */
++	if (iocb->ki_flags & IOCB_NOWAIT)
++		return -EAGAIN;
++
+ 	return iomap_file_buffered_write(iocb, from, &blkdev_iomap_ops, NULL,
+ 			NULL);
+ }
 -- 
 2.39.5
+
