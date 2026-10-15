@@ -1,30 +1,30 @@
 Received: from mailgw1.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7562A50391B;
-	Thu, 15 Oct 2026 09:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCD14A262C;
+	Thu, 15 Oct 2026 09:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792057254; cv=none; b=VHWk+BhOOBuI3KLdUwhrhD5bsLaxsb2ZsxE5N1U1ltDd3DkEjURYmSb0ueXpA4fj2yuyoxuPRKTMrUuM+OHvJ4L1cJjeDBwip/1UCj6kaFjCCOK3pgzHb+lKKu/1juATjsqHtT7Kx+Ki3TpVjZTlwPMEAW/jhBVHWL+5uKeRw64=
+	t=1792057256; cv=none; b=gbwQrBRIBn9r8ek49uzriGGyVQQgk5k0dc+JhTt5tAHRYwTZZhMZtpMn30HnsPoiHn35NaAW9d2usBlhfYQC8P0qbDBcFd4kEUefmj7YAQ1vFcHSPyIrTM5JIRJVEUDkP+OQBp75imAHKUuSoYT2mDyMtrG7QW875kQWkGKibXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792057254; c=relaxed/simple;
-	bh=q3a+s7fWOWA/5t77A7KlLe+uSvQtF1iKr385yU2yGzc=;
+	s=arc-20240116; t=1792057256; c=relaxed/simple;
+	bh=oO5P3EyDNIjmA1OYPv2gXSn0IF7rkYj/4HQ+3XqRQi8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zjfm8kLgLjEj7SVjEhAQnxZopDQUf60gfAjfTUbVmUs0umjuaStBSN2iKkDb8gxt0XuajfpOuTIiEI+3vOmvkE7wwxm4dKdfsCefNl/NNg77mMPwIevj62PQR5sRRyU11DJpF42MJ8TWTaOd8Lulf+br/eHw6qgIm9ZsW1xojqE=
+	 MIME-Version:Content-Type; b=CTZFJcxb5zC1ReuJ3lAc0+A9Qno8xyHz1Vpp6WsxL2+SBR6sm49g40H24KD7Xjg0mFqN/Eolo6aFYxQ9WISDeXsmhTyr6jsUOSmf46tXAJhmtFokVP+nYkfizzyXPoM7XF3iOUBzti3np82ZmET6kFwFWUs6Wi5RTMCayOU/m7M=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn; spf=pass smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
-	by mailgw1.hygon.cn (Postfix) with ESMTP id 4j532y6DkgzCWwYd;
-	Thu, 15 Oct 2026 17:40:26 +0800 (CST)
-Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
-	by mailgw1.hygon.cn (Postfix) with ESMTP id 4j532x0gd3zCWwYX;
-	Thu, 15 Oct 2026 17:40:25 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
+	by mailgw1.hygon.cn (Postfix) with ESMTP id 4j53316DsGzCWwYK;
+	Thu, 15 Oct 2026 17:40:29 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
+	by mailgw1.hygon.cn (Postfix) with ESMTP id 4j532z5Nn3zCWwYK;
+	Thu, 15 Oct 2026 17:40:27 +0800 (CST)
 Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp1.hygon.cn (Postfix) with ESMTPS id C09D716E7;
-	Thu, 15 Oct 2026 17:40:17 +0800 (CST)
+	by maildlp2.hygon.cn (Postfix) with ESMTPS id 10AA330004E2;
+	Thu, 15 Oct 2026 17:35:18 +0800 (CST)
 Received: from hsj-2U-Workstation.hygon.cn (172.19.24.226) by
  cncheex04.Hygon.cn (172.23.18.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 15 Oct 2026 17:40:23 +0800
+ 15.2.1544.36; Thu, 15 Oct 2026 17:40:26 +0800
 From: Huang Shijie <huangsj@hygon.cn>
 To: <axboe@kernel.dk>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>
 CC: <zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>, <yingzhiwei@hygon.cn>,
@@ -36,9 +36,9 @@ CC: <zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>, <yingzhiwei@hygon.cn>,
 	<linux-fsdevel@vger.kernel.org>, <gfs2@lists.linux.dev>,
 	<linux-security-module@vger.kernel.org>, <sunjunchao@bytedance.com>, Huang
  Shijie <huangsj@hygon.cn>
-Subject: [PATCH 1/3] vfs: add inode iteration method super_iter_inodes
-Date: Thu, 15 Oct 2026 17:38:52 +0800
-Message-ID: <20261015093854.2082600-2-huangsj@hygon.cn>
+Subject: [PATCH 2/3] vfs: convert inode iterators to the unsafe super_iter_inodes()
+Date: Thu, 15 Oct 2026 17:38:53 +0800
+Message-ID: <20261015093854.2082600-3-huangsj@hygon.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261015093854.2082600-1-huangsj@hygon.cn>
 References: <20261015093854.2082600-1-huangsj@hygon.cn>
@@ -53,186 +53,279 @@ Content-Type: text/plain
 X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
  (172.23.18.114)
 
-This will be used to replace the explicit sb->s_inodes iteration,
-with the caller supplying a callback function and a private data
-pointer that is passed to the callback along with each inode that is
-iterated.
-
-A single iteration function, super_iter_inodes(), is provided, with
-the iteration mode selected by the INO_ITER_F_UNSAFE flag. The
-INO_ITER_F_REFERENCED flag can additionally restrict the iteration to
-inodes that still have a reference.
-
-Without INO_ITER_F_UNSAFE, the callback is called with a valid,
-unlocked and referenced inode, so any inode operation, including
-blocking operations, is allowed. The iterator is responsible for
-inode lifecycle management, so the callback only needs to implement
-the operation it wants to perform on all inodes.
-
-With INO_ITER_F_UNSAFE set, the inodes are iterated without taking a
-reference and the callback is run in an atomic context that must not
-block. This mode is for internal VFS use only and runs under a RCU
-read lock so that the VFS inode is not freed from under the callback.
-It is needed for operations that require tight control over the state
-of the inodes they operate on.
-
-This mechanism allows the existing sb->s_inodes iteration models to
-be maintained, providing a generic implementation for iterating all
-cached inodes on the superblock.
+Convert VFS internal superblock inode iterators that cannot use
+referenced inodes to super_iter_inodes() with INO_ITER_F_UNSAFE set:
+  - Dquot removal
+  - inode eviction
+  - The nr_blockdev_pages()
+  - generic_shutdown_super()
 
 Signed-off-by: Huang Shijie <huangsj@hygon.cn>
 ---
- fs/super.c                     | 111 +++++++++++++++++++++++++++++++++
- include/linux/fs/super_types.h |  14 +++++
- 2 files changed, 125 insertions(+)
+ block/bdev.c     | 16 +++++++-----
+ fs/inode.c       | 68 +++++++++++++++++++++++-------------------------
+ fs/quota/dquot.c | 66 ++++++++++++++++++++++++++--------------------
+ fs/super.c       | 20 +++++++-------
+ 4 files changed, 92 insertions(+), 78 deletions(-)
 
-diff --git a/fs/super.c b/fs/super.c
-index 1d5ccf540a9b..3f7df0bcb642 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -171,6 +171,117 @@ static void super_wake(struct super_block *sb, unsigned int flag)
- 	wake_up_var(&sb->s_flags);
+diff --git a/block/bdev.c b/block/bdev.c
+index cd8323083740..18b4423b4e61 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -558,16 +558,20 @@ void bdev_drop(struct block_device *bdev)
+ 	iput(BD_INODE(bdev));
  }
  
-+static bool super_iter_iget(struct inode *inode, int flags)
++static int bdev_pages_count(struct inode *inode, void *data)
 +{
-+	bool ret = false;
++	long *pages = data;
++
++	*pages += inode->i_mapping->nrpages;
++	return INO_ITER_RET_DONE;
++}
++
+ long nr_blockdev_pages(void)
+ {
+-	struct inode *inode;
+ 	long ret = 0;
+ 
+-	spin_lock(&blockdev_superblock->s_inode_list_lock);
+-	list_for_each_entry(inode, &blockdev_superblock->s_inodes, i_sb_list)
+-		ret += inode->i_mapping->nrpages;
+-	spin_unlock(&blockdev_superblock->s_inode_list_lock);
+-
++	super_iter_inodes(blockdev_superblock, bdev_pages_count,
++			  &ret, INO_ITER_F_UNSAFE);
+ 	return ret;
+ }
+ 
+diff --git a/fs/inode.c b/fs/inode.c
+index a9d37be390a1..139c56ee9d11 100644
+--- a/fs/inode.c
++++ b/fs/inode.c
+@@ -853,8 +853,11 @@ static void evict(struct inode *inode)
+  * Dispose-list gets a local list with local inodes in it, so it doesn't
+  * need to worry about list corruption and SMP locks.
+  */
+-static void dispose_list(struct list_head *head)
++static bool dispose_list(struct list_head *head)
+ {
++	if (list_empty(head))
++		return false;
++
+ 	while (!list_empty(head)) {
+ 		struct inode *inode;
+ 
+@@ -864,6 +867,29 @@ static void dispose_list(struct list_head *head)
+ 		evict(inode);
+ 		cond_resched();
+ 	}
++	return true;
++}
++
++static int evict_inode_fn(struct inode *inode, void *data)
++{
++	struct list_head *dispose = data;
 +
 +	spin_lock(&inode->i_lock);
-+	if (inode_state_read(inode) & (I_NEW | I_FREEING | I_WILL_FREE))
-+		goto out_unlock;
++	if (icount_read(inode) ||
++	    (inode_state_read(inode) & (I_NEW | I_FREEING | I_WILL_FREE))) {
++		spin_unlock(&inode->i_lock);
++		return INO_ITER_RET_DONE;
++	}
 +
-+	if ((flags & INO_ITER_F_REFERENCED) && !icount_read(inode))
-+		goto out_unlock;
-+
-+	__iget(inode);
-+	ret = true;
-+out_unlock:
++	inode_state_set(inode, I_FREEING);
++	inode_lru_list_del(inode);
 +	spin_unlock(&inode->i_lock);
-+	return ret;
-+}
++	list_add(&inode->i_lru, dispose);
 +
-+static int generic_iter_inodes(struct super_block *sb, ino_iter_fn iter_fn,
-+			       void *private_data, int flags)
-+{
-+	struct inode *inode, *old_inode = NULL;
-+	int ret = INO_ITER_RET_DONE;
-+
-+	spin_lock(&sb->s_inode_list_lock);
-+	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
-+		if (!super_iter_iget(inode, flags))
-+			continue;
-+
-+		spin_unlock(&sb->s_inode_list_lock);
-+		iput(old_inode);
-+
-+		ret = iter_fn(inode, private_data);
-+
-+		old_inode = inode;
-+		if (ret == INO_ITER_RET_ABORT) {
-+			ret = INO_ITER_RET_DONE;
-+			goto out_loop;
-+		}
-+		if (ret < 0)
-+			goto out_loop;
-+
-+		cond_resched();
-+		spin_lock(&sb->s_inode_list_lock);
-+	}
-+	spin_unlock(&sb->s_inode_list_lock);
-+out_loop:
-+	iput(old_inode);
-+	return ret;
-+}
-+
-+/*
-+ * Unsafe iteration for internal VFS use only: @iter_fn runs in atomic
-+ * context with only an inode existence guarantee, so it must not block
-+ * and must perform its own inode state checks. Return INO_ITER_RET_ABORT
-+ * to stop the iteration early.
-+ */
-+static int generic_iter_inodes_unsafe(struct super_block *sb, ino_iter_fn iter_fn,
-+				      void *private_data)
-+{
-+	struct inode *inode;
-+	int ret = INO_ITER_RET_DONE;
-+
-+	rcu_read_lock();
-+	spin_lock(&sb->s_inode_list_lock);
-+	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
-+		ret = iter_fn(inode, private_data);
-+		if (ret == INO_ITER_RET_ABORT)
-+			break;
-+	}
-+	spin_unlock(&sb->s_inode_list_lock);
-+	rcu_read_unlock();
-+
-+	return ret;
-+}
-+
-+/**
-+ * super_iter_inodes - iterate all the cached inodes on a superblock
-+ * @sb: superblock to iterate
-+ * @iter_fn: callback to run on every inode found
-+ * @private_data: private data to pass to @iter_fn
-+ * @flags: inode iteration control flags
-+ *
-+ * This function iterates all cached inodes on a superblock that are not in
-+ * the process of being initialised or torn down. It will run @iter_fn() with
-+ * a valid, referenced inode, so it is safe for the caller to do anything it
-+ * wants with the inode except drop the reference the iterator holds.
-+ *
-+ * If @flags has %INO_ITER_F_REFERENCED set, inodes with a zero refcount are
-+ * skipped as well, so that they are not needlessly bounced through
-+ * __iget()/iput() (which would evict them from the inode cache).
-+ *
-+ * If @flags has %INO_ITER_F_UNSAFE set, the inodes are iterated without
-+ * taking a reference and @iter_fn is run in an atomic context that must not
-+ * block; %INO_ITER_F_REFERENCED is ignored in this mode. This is for internal
-+ * VFS operations only and almost certainly not what the caller wants.
-+ *
-+ * Return: %INO_ITER_RET_DONE on completion, a negative errno if @iter_fn()
-+ * returned an error (safe iteration only), or %INO_ITER_RET_ABORT if the
-+ * unsafe iteration was aborted early.
-+ */
-+int super_iter_inodes(struct super_block *sb, ino_iter_fn iter_fn,
-+		      void *private_data, int flags)
-+{
-+	if (flags & INO_ITER_F_UNSAFE)
-+		return generic_iter_inodes_unsafe(sb, iter_fn, private_data);
-+
-+	return generic_iter_inodes(sb, iter_fn, private_data, flags);
-+}
-+EXPORT_SYMBOL_GPL(super_iter_inodes);
-+
- /*
-  * One thing we have to be careful of with a per-sb shrinker is that we don't
-  * drop the last active reference to the superblock from within the shrinker.
-diff --git a/include/linux/fs/super_types.h b/include/linux/fs/super_types.h
-index ecd96aeb1cee..2fd8cd9bec5f 100644
---- a/include/linux/fs/super_types.h
-+++ b/include/linux/fs/super_types.h
-@@ -81,6 +81,20 @@ enum freeze_holder {
- 	FREEZE_EXCL		= (1U << 3),
- };
++	/* Abort so evict_inodes() can dispose of the queued inodes first. */
++	if (need_resched())
++		return INO_ITER_RET_ABORT;
++	return INO_ITER_RET_DONE;
+ }
  
-+/* Inode iteration callback return values */
-+#define INO_ITER_RET_DONE		0
-+#define INO_ITER_RET_ABORT		1
+ /**
+@@ -877,44 +903,16 @@ static void dispose_list(struct list_head *head)
+  */
+ void evict_inodes(struct super_block *sb)
+ {
+-	struct inode *inode;
+ 	LIST_HEAD(dispose);
+ 
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
+-		if (icount_read_once(inode))
+-			continue;
+-
+-		spin_lock(&inode->i_lock);
+-		if (icount_read(inode)) {
+-			spin_unlock(&inode->i_lock);
+-			continue;
+-		}
+-		if (inode_state_read(inode) & (I_NEW | I_FREEING | I_WILL_FREE)) {
+-			spin_unlock(&inode->i_lock);
+-			continue;
+-		}
+-
+-		inode_state_set(inode, I_FREEING);
+-		inode_lru_list_del(inode);
+-		spin_unlock(&inode->i_lock);
+-
++	do {
+ 		/*
+-		 * Keep this inode out of dispose so it stays on s_inodes while
+-		 * the list lock is dropped. I_FREEING prevents new references
+-		 * and leaves eviction to us, so we can resume the walk from it.
++		 * Taking references would keep the inodes we are trying to
++		 * evict alive, so use the unsafe iterator and let
++		 * evict_inode_fn() do the state checks and queue them.
+ 		 */
+-		if (need_resched()) {
+-			spin_unlock(&sb->s_inode_list_lock);
+-			cond_resched();
+-			dispose_list(&dispose);
+-			spin_lock(&sb->s_inode_list_lock);
+-		}
+-		list_add(&inode->i_lru, &dispose);
+-	}
+-	spin_unlock(&sb->s_inode_list_lock);
+-
+-	dispose_list(&dispose);
++		super_iter_inodes(sb, evict_inode_fn, &dispose, INO_ITER_F_UNSAFE);
++	} while (dispose_list(&dispose));
+ }
+ EXPORT_SYMBOL_GPL(evict_inodes);
+ 
+diff --git a/fs/quota/dquot.c b/fs/quota/dquot.c
+index 1c78c695d0dd..f9d7ee4dffcd 100644
+--- a/fs/quota/dquot.c
++++ b/fs/quota/dquot.c
+@@ -165,6 +165,11 @@ static struct kmem_cache *dquot_cachep;
+ /* workqueue for work quota_release_work*/
+ static struct workqueue_struct *quota_unbound_wq;
+ 
++struct dquot_ref_data {
++	int type;
++	int reserved;
++};
 +
-+/* Inode iteration control flags */
-+/* Iterate without taking a reference; @iter_fn must not block. */
-+#define INO_ITER_F_UNSAFE		(1U << 1)
-+/* Only iterate inodes that still have a reference. */
-+#define INO_ITER_F_REFERENCED		(1U << 2)
+ void register_quota_format(struct quota_format_type *fmt)
+ {
+ 	spin_lock(&dq_list_lock);
+@@ -1101,41 +1106,46 @@ static int add_dquot_ref(struct super_block *sb, int type)
+ 	return err;
+ }
+ 
+-static void remove_dquot_ref(struct super_block *sb, int type)
++static int remove_dquot_ref_fn(struct inode *inode, void *data)
+ {
+-	struct inode *inode;
+-#ifdef CONFIG_QUOTA_DEBUG
+-	int reserved = 0;
+-#endif
++	struct dquot_ref_data *ref = data;
+ 
+-	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
+-		/*
+-		 *  We have to scan also I_NEW inodes because they can already
+-		 *  have quota pointer initialized. Luckily, we need to touch
+-		 *  only quota pointers and these have separate locking
+-		 *  (dq_data_lock).
+-		 */
+-		spin_lock(&dq_data_lock);
+-		if (!IS_NOQUOTA(inode)) {
+-			struct dquot __rcu **dquots = i_dquot(inode);
+-			struct dquot *dquot = srcu_dereference_check(
+-				dquots[type], &dquot_srcu,
+-				lockdep_is_held(&dq_data_lock));
++	spin_lock(&dq_data_lock);
++	if (!IS_NOQUOTA(inode)) {
++		struct dquot __rcu **dquots = i_dquot(inode);
++		struct dquot *dquot = srcu_dereference_check(
++			dquots[ref->type], &dquot_srcu,
++			lockdep_is_held(&dq_data_lock));
+ 
+ #ifdef CONFIG_QUOTA_DEBUG
+-			if (unlikely(inode_get_rsv_space(inode) > 0))
+-				reserved = 1;
++		if (unlikely(inode_get_rsv_space(inode) > 0))
++			ref->reserved++;
+ #endif
+-			rcu_assign_pointer(dquots[type], NULL);
+-			if (dquot)
+-				dqput(dquot);
+-		}
+-		spin_unlock(&dq_data_lock);
++		rcu_assign_pointer(dquots[ref->type], NULL);
++		if (dquot)
++			dqput(dquot);
+ 	}
+-	spin_unlock(&sb->s_inode_list_lock);
++	spin_unlock(&dq_data_lock);
++	return INO_ITER_RET_DONE;
++}
 +
-+typedef int (*ino_iter_fn)(struct inode *inode, void *priv);
-+int super_iter_inodes(struct super_block *sb, ino_iter_fn iter_fn,
-+		      void *private_data, int flags);
++static void remove_dquot_ref(struct super_block *sb, int type)
++{
++	struct dquot_ref_data ref = {
++		.type = type,
++	};
 +
- struct super_operations {
- 	struct inode *(*alloc_inode)(struct super_block *sb);
- 	void (*destroy_inode)(struct inode *inode);
++	/*
++	 * We have to scan I_NEW inodes because they can already
++	 * have quota pointer initialized. Luckily, we need to touch
++	 * only quota pointers and these have separate locking
++	 * (dq_data_lock) so the existence guarantee that
++	 * super_iter_inodes(..., INO_ITER_F_UNSAFE) provides inodes passed to
++	 * remove_dquot_ref_fn() is sufficient for this operation.
++	 */
++	super_iter_inodes(sb, remove_dquot_ref_fn, &ref, INO_ITER_F_UNSAFE);
+ #ifdef CONFIG_QUOTA_DEBUG
+-	if (reserved) {
++	if (ref.reserved) {
+ 		printk(KERN_WARNING "VFS (%s): Writes happened after quota"
+ 			" was disabled thus quota information is probably "
+ 			"inconsistent. Please run quotacheck(8).\n", sb->s_id);
+diff --git a/fs/super.c b/fs/super.c
+index 3f7df0bcb642..aacb1ba67544 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -817,6 +817,15 @@ void retire_super(struct super_block *sb)
+ }
+ EXPORT_SYMBOL(retire_super);
+ 
++static int inode_poison_fn(struct inode *inode, void *data)
++{
++	inode->i_op = VFS_PTR_POISON;
++	inode->i_sb = VFS_PTR_POISON;
++	inode->i_mapping = VFS_PTR_POISON;
++
++	return INO_ITER_RET_DONE;
++}
++
+ /**
+  *	generic_shutdown_super	-	common helper for ->kill_sb()
+  *	@sb: superblock to kill
+@@ -875,15 +884,8 @@ void generic_shutdown_super(struct super_block *sb)
+ 			 * we can at least make it more likely that a later
+ 			 * iput_final() or such crashes cleanly.
+ 			 */
+-			struct inode *inode;
+-
+-			spin_lock(&sb->s_inode_list_lock);
+-			list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
+-				inode->i_op = VFS_PTR_POISON;
+-				inode->i_sb = VFS_PTR_POISON;
+-				inode->i_mapping = VFS_PTR_POISON;
+-			}
+-			spin_unlock(&sb->s_inode_list_lock);
++			super_iter_inodes(sb, inode_poison_fn, NULL,
++					  INO_ITER_F_UNSAFE);
+ 		}
+ 	}
+ 	/*
 -- 
 2.34.1
 
