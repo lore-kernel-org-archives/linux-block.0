@@ -1,76 +1,73 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F83B45D91E
-	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 06:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04D14A2617
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 09:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792045168; cv=none; b=m59fBK1kDrboPKkGycyQgyX1jE4P5qgX9ZL28r8mh1mVncKetNeT+Go8uBUrlG7n4+Ae7VHcTp+ahTog6qnVbvDhThz0wg0OI2Lh6MAVK68WOSY+ffkWT8d9IcF08rXtvAH3c6cG2nqayyGYCAvRJCq6Hv0rZNtSgs7jaRMlhmo=
+	t=1792055481; cv=none; b=nFxepEa6bHNFWyLLf92DFXInuniyi+CJqgtPxndVp83dkIh1svk7b+ImVtUHxkuFBUfZzSDD8x9pmLUF/GD+aByC/8FsIYDVQWPYO+FZN5i1wszM+Nj1mHToleIe6L1eshYcUmVU0wA3hTht8bmpicdSewxahytVW1aWeebNen4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792045168; c=relaxed/simple;
-	bh=SnTqnSHnJf1SyEgRppnLJtdvwZ/K9QpTpMoFZTST/So=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cnrYqTPGrID3kvo2qse6+ecIeuYl775HszLnI8k5sYtReipIWmxNgDGP87/SJo6y5VHrATciPd6LmldN99LXo6dLPpLICgsylq1bekAH3pYLKrURSmpuXUz8qK3XymZgGN7lUlQf+V8wj5OeDzuOqzHHvzN4i56QpElT7l5Qcl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eMsEg9vs; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792055481; c=relaxed/simple;
+	bh=z7htjFtNdmyDjxtzMIUkA5kmK2peP8WrA+vCIBzfMQI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Uff5GKgpVOV0u0gzAk18VGZyKit8lZYCZ6S5omhCDvEsFiLqmpOmdwUFaxVX4a8kJloqooaDpiVGkpnfl3WLKM5v1ZYFM+WmgFgSex+vKhimE5ly44GMg3BRsWkRpjjMdvOh0kwYbryz0n24l5pdYPPolVUd2VYGKM/PQcO9WRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=aAM/lsE1; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eMsEg9vs"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3ac9f49b984so154923a91.1
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2026 23:19:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="aAM/lsE1"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cc50ad2d650so3854477a12.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 02:11:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792045164; x=1792649964; darn=vger.kernel.org;
+        d=bytedance.com; s=google; t=1792055476; x=1792660276; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=LKqK4HrH78W1MTYoSkDNokUsDBo14132TDZJAUlwXh8=;
-        b=eMsEg9vsgz4JpZA/dQGmcIu7cuJhRpTt9bfXp/QLtE6wYb3AwFvj5xjTWMPOs90pPc
-         jE6uZFmpKp104w+kZDOf7V5ZRLT2gpxeYShesAyn4HMOtY1iyWj3X60jla8tnX/Zy+9A
-         1UR4iR8QOfZAmT6e5EXxja16F8HF8rUeJ6/M4OOztB9SNkCXc3CMVGph4MpXZwJ10v1j
-         SOa8zryzSZrFcdBgxRsIpOyN9GtV/KNfzEne6ZnZSSJlN0TabAn+Q5nC+ExwBe33LoKW
-         dpKAXHFm5eyP0BZv0aA2kmpJOn/vkmq2fvo7ikaX72ed9z4THTsBc2YHQwE4B2y1JeYm
-         UhVg==
+        bh=mGOn0xOwuTcpXWjs4SNmPz8oRcx6kK3kpK0yQjNzznM=;
+        b=aAM/lsE1Y8rfvck3UgiqriLEM0WHIEw+n+XA3TSLCB2DQ6gK+FStNIuFXZOZmFDs5c
+         8Xury2EUxaKm4w34XvVFIcHD18YytFFb58jkZqXe9hlvoPnG97M4yPQh62lsO3re1nDG
+         W9FXXofzXJ4lU23MBEd5syyjq7nLMmMSCBxTezboYmr5adXrFEuU2tVVMw260gQhRm/a
+         HuRrBd57LlMI4lWMSogfGTDv2iEWw1fq9JNMLgTExoBbTsQws4rMo+ZTIDbxSQbrduxY
+         WVCtRntQlEAoH9i5u4hbh6atEuRRiQTgfs3rWIHIxNDj9VGiE5zZN/7afoNbXeJzfMeT
+         HXBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792045164; x=1792649964;
+        d=1e100.net; s=20260707; t=1792055476; x=1792660276;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=LKqK4HrH78W1MTYoSkDNokUsDBo14132TDZJAUlwXh8=;
-        b=NCyRqu9k6HOLvZ/Gt7+8Usy3mjAFv+kJPO4wBM5vxJhr7V8tZ56cuZb+HDK3u7zX2A
-         eEp5QbfNswYPTV5ZsXfAuoF+e+NALpXZsy9t+7bqjOsE1mVr4ebufRNCUvXcYcwhZ2Ro
-         s18lR6hZXSNT51pjqTkjQiRvd40sWiP5mvUSZJDnKY2S/kk9dKh/9W1YNVO/41oBeHY7
-         nLsKXkuUr0ji+MPXdECf6bBF9J6dmEXlKsVXLoaFN1RLTq0FUIjpPW5t3ESNoFpysau1
-         w16uTUqR2I0WEmmbaNPFPck9+qjIl2wwCuEPcdMrBX/00uR+Ozus+3RgRZuPNpve63fF
-         2ssg==
-X-Forwarded-Encrypted: i=1; AKwUvBz8JsLGvoxNaP1LhMOwhLvDq7DYoc5vAfvRNgcOpa/vlFo1q8sHp4v4PF6yzw2C/a/phfv9aqtMeahMpA==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLwfnfKP/Exd51LAoBb4RUxwcbVoMVmeujbmy0BCfGwHlsfpRWp
-	m6PAr5/CIL9Pt00706wGK6OAEE+4SJ3JDB4fFaWjpZKS40Hv0OpNx46D
-X-Gm-Gg: AYBFou1phTb9LdvtIOGujYEI6b0UejzXDGA2oKv4T3D4DaZokzXp05R1LbBj2qFAVuM
-	u/Z1a4qQsYQlSZTgFVkPQCLRDHBMkuothn2C1Wij7YcFyEHG/RBQqO6vqYHHyyEsyU/wH81FQ+X
-	SbbyQRP9xYwpVKuNtev6xAf7dx6etUwIg1lUpfssUPkNszGr+iju2bgg4fWSSGxJMqCeCVqSA6E
-	TrXL/3mL0lqpN46m7T4R+hanv7Z64epoJeJTNzpjLsR4z9OsWisnpUSzADgXWdXLJ9Q7PXUk+fO
-	LwCSvsG6C2xGuw+Ecl3hquHpDjpahfgmOTsaW7fzp6oHpfxB36sWYz4kqHva6g4oCqJ7ccyliMk
-	ImZrzeLbUOo3RJMItGNKFvlnVHSefmNc86njPjjlsMqvHNbo+5rziAu07cmrLFdCxEQgpg/vokN
-	HyySrPj3Jwf9vqqC//v2HCN2L4ipTfcIdCRpd5333gZzD7LsZLYi9NwKuh85YJG8T8X7pYz5Bad
-	RtUtS7zLU8y
-X-Received: by 2002:a17:90b:4b:b0:3a7:96d:feaf with SMTP id 98e67ed59e1d1-3ab3a9a0c59mr9385893a91.16.1792045163419;
-        Wed, 14 Oct 2026 23:19:23 -0700 (PDT)
-Received: from ancienth-X870E-Nova-WiFi ([125.186.72.2])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac9461d71esm2669111a91.7.2026.10.14.23.19.20
+        bh=mGOn0xOwuTcpXWjs4SNmPz8oRcx6kK3kpK0yQjNzznM=;
+        b=Nd2P2Di2bFA5zLJmBssWjWWvoOelCOzmIF4waQ+v7vm8sjP2X4kJaWPYow9N9/9c72
+         hHttwcIbWOGYyE+RBEAPNyJp3jwGC/Ot1qZDv2YH9ntHF288K7BksoKTqZjMtShLSKF7
+         zK+pLQY1mkAKyfRikxelnVtSvO7iHNZOTESRRtCLT0XwbITgYqib7xfz5UVKisUMhY5Y
+         0EQcBoIm2iCa1LXl7hNbHadiBQ83z5xH940yD9T4ZWJrO9c7IhXbgj4fzpGb9eS0oMqK
+         KmSHnZ+ASvVdd2oHmFT2FWlJ+6/YzzlaNU1RpJzYjwj6VW6cK7CwCpvLPoej+heliR5m
+         MpHQ==
+X-Gm-Message-State: AFq9FYKrx3IoifaDQAhL5ZkEv3L4P2nk8BNKKxWtX75E6L6nGKRIqCo7
+	Okp0feWXl6jl7m3ktx1dGuh1ZA3QZNI8bxPgwrkIMKnaBrijGfFvsp6s8X6w+S2L4VvXr2bs9Jl
+	5ujev
+X-Gm-Gg: AYBFou0nFTSCHh119IKcRBPKaZmq4qH66Ll+Ca3jytz432nCynpNa8fM8F8+ZmE/+pI
+	h8J2r10c7zZnqp63FXEmT6IO8EGxOt9ScPDKEsJr4Q4PJkrgUoQ8M2bC4k6lXsSxijzuFO2MQ8g
+	SySZbS2q/lPFSY2hCAnlTCZNq8IJhH4Fvc7ZiaTmoJjYnP1IoSnK2Gdd2EywVCS/Q/sQrBtWybe
+	ugwnbkxsQ7zllkxTea034tFD3EwiMegrMECRn3TRdv2Ndc3wzeCJ++ZwH6ApqTDPpRA3j0vVwTJ
+	aeR950XxxiYEN8jQD6WioP9IghBmv2aTNtoLAQr89ijt6AMpg+7RpBYdWFJjV95AuLVXG0wi6Yh
+	5e+sVM8QbWGSss3KvRMikEcdjNLTGCn5EoL/e1wPM9j5qBDomXRUs0rL8O1aos2YLrOM8ISAMS4
+	ZED7rWUxlkCxwByUNKSTWf5Hde8F2SA360P/9oJBqqmlypdWD6pCs3U2CsuKknbamw98RiUsU3u
+	Q==
+X-Received: by 2002:a17:90b:4d88:b0:3a4:a850:6982 with SMTP id 98e67ed59e1d1-3ab3a7786e4mr16579148a91.26.1792055475591;
+        Thu, 15 Oct 2026 02:11:15 -0700 (PDT)
+Received: from localhost ([106.38.226.35])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac945e74bcsm3531055a91.3.2026.10.15.02.11.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 23:19:22 -0700 (PDT)
-From: Daehyeon Ko <4ncienth@gmail.com>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>,
-	Hannes Reinecke <hare@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daehyeon Ko <4ncienth@gmail.com>
-Subject: [PATCH v2] iov_iter: validate extracted segment for bvec alignment
-Date: Thu, 15 Oct 2026 15:19:07 +0900
-Message-ID: <20261015061907.2713943-1-4ncienth@gmail.com>
-X-Mailer: git-send-email 2.55.0
+        Thu, 15 Oct 2026 02:11:15 -0700 (PDT)
+From: Julian Sun <sunjunchao@bytedance.com>
+To: linux-block@vger.kernel.org
+Cc: jack@suse.cz,
+	axboe@kernel.dk,
+	viro@zeniv.linux.org.uk,
+	mcgrof@kernel.org,
+	djwong@kernel.org
+Subject: [PATCH 0/2] block: fix NOWAIT handling and locking in buffered write fallback
+Date: Thu, 15 Oct 2026 17:11:03 +0800
+Message-Id: <20261015091105.1315605-1-sunjunchao@bytedance.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,66 +76,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-iov_iter_extract_bvecs() validates iter_iov_addr() and iter_iov_len()
-before iov_iter_extract_pages() selects the first nonempty segment and
-limits it by iter->count.  The checks can therefore cover a different range
-after a leading empty segment or iov_iter_truncate().
+Hi,
 
-An unprivileged O_DIRECT preadv() reproduced the empty-segment case: an
-aligned empty segment followed by a misaligned one completed 4096 bytes
-instead of returning -EINVAL.  A truncated iterator has the same mismatch
-when its full segment length is aligned but its remaining count is not.
+This series fixes two issues in buffered fallback for direct writes to
+block devices.
 
-Bound the normal fast-path length by iter->count.  Keep
-first_iovec_segment() for leading empty segments so validation covers the
-remaining portion of the segment available for extraction.
+1. NOWAIT requests can fall back to buffered I/O and wait for writeback.
+2. The fallback path lacks shared inode locking against set_blocksize().
 
-Closes: https://lore.kernel.org/r/20261012065520.1089147-1-4ncienth@gmail.com
-Fixes: 14b007e17881 ("block: validate user space vectors during extraction")
-Cc: stable@vger.kernel.org
-Assisted-by: LLM
-Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
----
-Changes in v2:
-- Bound the normal fast-path length by iter->count while retaining
-  first_iovec_segment() for leading empty segments.
-- Cover the truncated-iterator case raised by Andrew Morton and Sashiko.
+Julian Sun (2):
+  block: reject NOWAIT buffered write fallback
+  block: take the inode lock for buffered write fallback
 
-v1: https://lore.kernel.org/r/20261012065520.1089147-1-4ncienth@gmail.com
+ block/fops.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
- lib/iov_iter.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 2072c04e99d052..d21082fb251bf7 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1022,7 +1022,7 @@ static ssize_t iter_xarray_get_pages(struct iov_iter *i,
- 	return maxsize;
- }
- 
--/* must be done on non-empty ITER_UBUF or ITER_IOVEC one */
-+/* must be used on a non-empty ITER_UBUF, ITER_IOVEC or ITER_KVEC */
- static unsigned long first_iovec_segment(const struct iov_iter *i, size_t *size)
- {
- 	size_t skip;
-@@ -1938,8 +1938,13 @@ ssize_t iov_iter_extract_bvecs(struct iov_iter *iter, struct bio_vec *bv,
- 		   iter_is_iovec(iter) ||
- 		   iov_iter_is_kvec(iter))) {
- 		unsigned long start = (unsigned long)iter_iov_addr(iter);
-+		size_t seg_size = min(iter_iov_len(iter), iter->count);
- 
--		if ((start | iter_iov_len(iter)) & mem_align_mask)
-+		if (unlikely(!seg_size && iter->count)) {
-+			seg_size = iter->count;
-+			start = first_iovec_segment(iter, &seg_size);
-+		}
-+		if ((start | seg_size) & mem_align_mask)
- 			return -EINVAL;
- 	} else if (iov_iter_alignment(iter) & mem_align_mask) {
- 		return -EINVAL;
-
-base-commit: 72d3fcf802c45d00b300f25b848a93c3a2bd7c7e
 -- 
-2.55.0
-
+2.39.5
