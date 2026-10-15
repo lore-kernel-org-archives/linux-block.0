@@ -1,346 +1,467 @@
-Received: from mx10.didiglobal.com (mx10.didiglobal.com [111.202.70.125])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 288CB52BE29;
-	Thu, 15 Oct 2026 14:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.70.125
+Received: from sphereful.davidgow.net (sphereful.davidgow.net [203.29.242.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20328439F75;
+	Thu, 15 Oct 2026 14:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.242.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792073007; cv=none; b=hzPc9JCkBVDyqhjQ0sflSGhbt4iQy5MEQYNbbpc+6EYW4Acc6muYte1t5bLvmE1WW0dC30T08nP42GQnMTCV8WEnD/Z7IXvx0XjZ81MMJp4OqxkwFKomGsow21hDaN4mHfBcz333mHUQTTT+mrZEIwknH7tPnrHbypVA28A39hU=
+	t=1792073542; cv=none; b=q2Jf9CgwfrfnM+hZ2QB8NNE9FLcRVyJugSkYZLbq/UNuXAxxnL9Mse6nL30VGgtpv+MpkQhuEAA/2DqwpFqvt7iRpUWpYFtrzaTn9+lB1IszWdESKvKa4a7WyoF8PpFQI0qPwkIqS/f7xULmibX95LKnyO8tXl6H970AQejuAY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792073007; c=relaxed/simple;
-	bh=Rez634XUXJFnkU6ETDVZZ221/YI/33k9K4C0697uO4Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Nla0MOPr8sHKIcK8J4VNE1pgPc3qf88gM4tDgh0fqTSxg5YemHODzQJi4pw8fR9adsLITuwYx2Na9hbTewo/ulQSB7iBMvA7XiT02RoH4bJrGshHmpMTEbkYZhuwCeOM+nxUjBwRn9YciTt97/7EpDRne8FZhL+XsMl04+ug2YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com; spf=pass smtp.mailfrom=didiglobal.com; dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b=YXmNsoGF; arc=none smtp.client-ip=111.202.70.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b="YXmNsoGF"
-Received: from mail.didiglobal.com (unknown [10.79.64.21])
-	by mx10.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id EF2721861844D6;
-	Thu, 15 Oct 2026 21:59:56 +0800 (CST)
-Received: from BJ01-ACTMBX-05.didichuxing.com (10.79.64.32) by
- BJ01-ACTMBX-02.didichuxing.com (10.79.64.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Thu, 15 Oct 2026 21:59:56 +0800
-Received: from ml-justfortest.ys (10.79.64.102) by
- BJ01-ACTMBX-05.didichuxing.com (10.79.64.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.45; Thu, 15 Oct 2026 21:59:56 +0800
-X-MD-Sfrom: daikunhai@didiglobal.com
-X-MD-SrcIP: 10.79.64.21
-From: Kunhai Dai <daikunhai@didiglobal.com>
-To: <tj@kernel.org>
-CC: <axboe@kernel.dk>, <josef@toxicpanda.com>, <yukuai@fygo.io>,
-	<cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
-	<mathieu.desnoyers@efficios.com>, <linux-trace-kernel@vger.kernel.org>
-Subject: [PATCH] blk-iocost: publish hweights as one atomic value
-Date: Thu, 15 Oct 2026 09:59:19 -0400
-Message-ID: <20261015135919.210740-1-daikunhai@didiglobal.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1792073542; c=relaxed/simple;
+	bh=zQjClWTlRSrEDvf3v/4znzjDecAtN82hnrlhsDrNbkw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fifkz3ZFe+s29sSOBdXIQvQVudTpezBtxIB09Xg+R6q6hrOeDpUsfMWSpYnB/bR3QalMke0kecQRpi9psLPZeLQeb9elHSoRhH32x4rW5/9xrc45SZe3rrVzyLzSjIoRsRW8Lj9fMVqGQ8J0ecwxOmItQEhLLF4rSD0uVIW4sqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=davidgow.net; spf=pass smtp.mailfrom=davidgow.net; arc=none smtp.client-ip=203.29.242.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=davidgow.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=davidgow.net
+Received: by sphereful.davidgow.net (Postfix, from userid 119)
+	id DBDE9200617; Thu, 15 Oct 2026 22:05:05 +0800 (AWST)
+X-Spam-Level: 
+Received: from [192.168.11.49] (ip-178-027-179-026.vkd86.pools.vodafone-ip.de [178.27.179.26])
+	by sphereful.davidgow.net (Postfix) with ESMTPSA id 4D784200611;
+	Thu, 15 Oct 2026 22:04:57 +0800 (AWST)
+Message-ID: <d6ea208a-0b53-4da8-998f-817a0e0b7c61@davidgow.net>
+Date: Thu, 15 Oct 2026 22:04:51 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] lib/sbitmap: add KUnit test suite
+To: Wang Yibo <szwyb123@gmail.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com
+References: <20261014082704.33667-1-szwyb123@gmail.com>
+Content-Language: en-US
+From: David Gow <david@davidgow.net>
+In-Reply-To: <20261014082704.33667-1-szwyb123@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BJ03-PUBMBX-01.didichuxing.com (10.79.71.11) To
- BJ01-ACTMBX-05.didichuxing.com (10.79.64.32)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=didiglobal.com;
-	s=2026; t=1792072803;
-	bh=y9XYAQWJLQjskYaRpaAgKQEqKsSVCy9b8K0r0Tqi8mE=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
-	b=YXmNsoGFH3epWKrpNZ5NpgudQX/xma0HyIouyna9SWa5iQySfrLI322UcDMR3pHEc
-	 FyfmYyoEyugyQ/ZfXNXD77ea+3lUPdmHM52WYmN/VT0n7Y7Ew7770eZZGGhJYEORJn
-	 eV1SS4rydH8SwyVvOXpnMEez2YJwUxo4CFgFIof8=
 
-current_hweight() uses separate plain stores for the cache generation and
-both weights. The compiler can publish the generation before the weights,
-letting an interrupt accept stale weights as current. Multiple refreshers
-can also interleave their stores. Invalid donation budgets may then lead
-to a divide error in transfer_surpluses().
+Le 14/10/2026 à 16:27, Wang Yibo a écrit :
+> sbitmap is the tag allocator used by blk-mq and the I/O schedulers
+> built on top of it, but the plain, synchronous part of its API has no
+> test coverage at all.
+> 
+> Add a KUnit suite covering initialisation, allocation and exhaustion,
+> deferred clears, round-robin ordering, resize, the bitmap helpers and
+> sbitmap_for_each_set(), so that the behaviour is checked on every boot.
+> 
+> The new file is added to the BLOCK LAYER entry in MAINTAINERS, next to
+> lib/sbitmap.c, so that it does not end up without a maintainer.
+> 
+> Signed-off-by: Wang Yibo <szwyb123@gmail.com>
+> ---
 
-Pack the generation and both weights into a single atomic64_t. Hierarchical
-weights are in [1, 65536], so storing each weight minus one preserves its
-full range in 16 bits and leaves 32 bits for the generation. Readers copy
-one complete entry, and refreshers publish one complete entry. Return the
-local snapshot instead of rereading fields another refresher can modify.
+Thanks for the test. I'll give it a closer look when I'm back from my 
+post-plumbers travel, but it seems that this is failing on a number of 
+architectures.
 
-Keep the existing lockless refresh and cache reuse behavior. A late
-refresh may replace a newer entry, but carries its own generation so the
-next reader can detect the mismatch. Preserve the existing barrier paired
-with commit_weights() and the allowance for approximate hierarchy reads.
+In partciular, sb.alloc_hint is annotated __percpu, which alas doesn't 
+work with KUNIT_EXPECT_NOT_NULL on, e.g., x86 where it uses a different 
+address space (__seg_fs or __seg_gs). This is probably something we 
+should work out how to address in KUnit, but for now you may be better 
+off with a different assertion.
 
-Keep the old weight fields solely as donation workspace. Update cache
-initialization, activation invalidation, tracepoints and the drgn monitor
-accordingly. Tracepoints decode one cached snapshot without recalculating
-or refreshing weights. Stop invalid donation calculations before applying
-leaf adjustments, and check donating before subtracting one.
+Equally, sbitmap_test_iterate_set is failing here on 32-bit UML (but 
+only when built with gcc, not clang):
 
-Validated against commit 24a19b953e2a ("Linux 7.3-rc7"):
-- clean application, whitespace and strict checkpatch checks;
-- W=1 compilation of blk-iocost.o with the existing x86-64 configuration
-  and PREEMPT_RT plus PROVE_LOCKING;
-- extracted production-function checks covering all weight values,
-  generation high bits, publication interleavings, donation cleanup and
-  400000 concurrent refresh calls using C11 atomic test stubs;
-- Python syntax and actual monitor-decoder checks;
-- x86-64 disassembly confirms a single 64-bit cache load and store.
+# sbitmap_test_iterate_set: EXPECTATION FAILED at 
+lib/tests/sbitmap_kunit.c:273
+  Expected ctx.nr_visited == (unsigned int)(sizeof(bits) / 
+sizeof((bits)[0]) + ((int)sizeof(struct 
+{_Static_assert(!(!(!__builtin_types_compatible_p(typeof((bits)), 
+typeof(&(bits)[0])))), "must be array");}))), but
+      ctx.nr_visited == 5 (0x5)
+      (unsigned int)(sizeof(bits) / sizeof((bits)[0]) + 
+((int)sizeof(struct 
+{_Static_assert(!(!(!__builtin_types_compatible_p(typeof((bits)), 
+typeof(&(bits)[0])))), "must be array");}))) == 6 (0x6)
+  [FAILED] sbitmap_test_iterate_set
+      # module: sbitmap_kunit
+  # sbitmap: pass:7 fail:1 skip:0 total:8
+# Totals: pass:7 fail:1 skip:0 total:8
+===================== [FAILED] sbitmap =====================
 
-Runtime kprobe injection on an x86-64 VM with 32 vCPUs completed three
-rounds without WARN or panic. With a 30 ms publication delay, the probe
-reported 23102 publication-point holds, 3234 cache-change observations
-within those windows and 72 matching-generation reader observations. The
-unpatched baseline panicked under the corresponding reproduction load.
+Not sure what's causing that yet: it may not be an issue with the test 
+itself.
 
-The runtime build predates this revision's tracepoint-only simplification;
-the packed-cache and donation logic are unchanged. The current tracepoint
-change has passed normal and PREEMPT_RT compilation, but has not been
-rerun in the runtime injection test. Performance regression testing has
-not been performed.
+Cheers,
+-- David
+>   MAINTAINERS               |   1 +
+>   lib/Kconfig.debug         |  13 ++
+>   lib/tests/Makefile        |   1 +
+>   lib/tests/sbitmap_kunit.c | 300 ++++++++++++++++++++++++++++++++++++++
+>   4 files changed, 315 insertions(+)
+>   create mode 100644 lib/tests/sbitmap_kunit.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index f53047aa8d3c..c8510e6f1817 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -4726,6 +4726,7 @@ F:	include/uapi/linux/blk*
+>   F:	include/uapi/linux/ioprio.h
+>   F:	kernel/trace/blktrace.c
+>   F:	lib/sbitmap.c
+> +F:	lib/tests/sbitmap_kunit.c
+>   
+>   BLOCK LAYER DEVICE DRIVER API [RUST]
+>   M:	Andreas Hindborg <a.hindborg@kernel.org>
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 6b24a2c89b84..f5fe7f5a0a4d 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -2456,6 +2456,19 @@ config PRINTF_KUNIT_TEST
+>   
+>   	  If unsure, say N.
+>   
+> +config SBITMAP_KUNIT_TEST
+> +	tristate "KUnit test for sbitmap" if !KUNIT_ALL_TESTS
+> +	depends on KUNIT
+> +	depends on SBITMAP
+> +	default KUNIT_ALL_TESTS
+> +	help
+> +	  Enable to turn on sbitmap tests, running at boot or module load time.
+> +
+> +	  For more information on KUnit and unit tests in general, please refer
+> +	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+> +
+> +	  If unsure, say N.
+> +
+>   config SCANF_KUNIT_TEST
+>   	tristate "KUnit test scanf() family of functions at runtime" if !KUNIT_ALL_TESTS
+>   	depends on KUNIT
+> diff --git a/lib/tests/Makefile b/lib/tests/Makefile
+> index 3cac3b63a752..1f49555f94c3 100644
+> --- a/lib/tests/Makefile
+> +++ b/lib/tests/Makefile
+> @@ -44,6 +44,7 @@ obj-$(CONFIG_OVERFLOW_KUNIT_TEST) += overflow_kunit.o
+>   obj-$(CONFIG_PRANDOM_KUNIT_TEST) += random32_kunit.o
+>   obj-$(CONFIG_PRINTF_KUNIT_TEST) += printf_kunit.o
+>   obj-$(CONFIG_RANDSTRUCT_KUNIT_TEST) += randstruct_kunit.o
+> +obj-$(CONFIG_SBITMAP_KUNIT_TEST) += sbitmap_kunit.o
+>   obj-$(CONFIG_SCANF_KUNIT_TEST) += scanf_kunit.o
+>   obj-$(CONFIG_SEQ_BUF_KUNIT_TEST) += seq_buf_kunit.o
+>   obj-$(CONFIG_SIPHASH_KUNIT_TEST) += siphash_kunit.o
+> diff --git a/lib/tests/sbitmap_kunit.c b/lib/tests/sbitmap_kunit.c
+> new file mode 100644
+> index 000000000000..4f3a588d15df
+> --- /dev/null
+> +++ b/lib/tests/sbitmap_kunit.c
+> @@ -0,0 +1,300 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * KUnit tests for the scalable bitmap (sbitmap) implementation.
+> + *
+> + * sbitmap is the tag allocator used by blk-mq and the I/O schedulers built on
+> + * top of it, but it has no tests.  These tests pin down the observable
+> + * behaviour of the plain, synchronous parts of the API.
+> + *
+> + * Copyright (C) 2026 Wang Yibo <szwyb123@gmail.com>
+> + */
+> +
+> +#include <linux/bitmap.h>
+> +#include <linux/gfp.h>
+> +#include <linux/sbitmap.h>
+> +
+> +#include <kunit/test.h>
+> +
+> +/*
+> + * Big enough to span several words for any plausible BITS_PER_LONG, and not a
+> + * power of two so that the last word is partially used.
+> + */
+> +#define SBITMAP_TEST_DEPTH	(3 * BITS_PER_LONG + 5)
+> +
+> +static void sbitmap_test_init(struct kunit *test)
+> +{
+> +	const unsigned int depth = 97;
+> +	struct sbitmap sb;
+> +	int ret;
+> +
+> +	ret = sbitmap_init_node(&sb, depth, -1, GFP_KERNEL, NUMA_NO_NODE,
+> +				false, true);
+> +	KUNIT_ASSERT_EQ(test, ret, 0);
+> +	KUNIT_EXPECT_EQ(test, sb.depth, depth);
+> +	KUNIT_EXPECT_EQ(test, sb.shift,
+> +			(unsigned int)sbitmap_calculate_shift(depth));
+> +	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, 1U << sb.shift));
+> +	KUNIT_EXPECT_FALSE(test, sb.round_robin);
+> +	KUNIT_EXPECT_NOT_NULL(test, sb.alloc_hint);
 
-Developed with assistance from OpenAI Codex.
+alloc_hint is declared __percpu, which is incompatible with 
+KUNIT_EXPECT_NOT_NULL() on x86.
 
-Assisted-by: LLM
-Signed-off-by: Kunhai Dai <daikunhai@didiglobal.com>
+> +	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), 0U);
+> +	sbitmap_free(&sb);
+> +
+> +	/* An explicitly requested shift is honoured. */
+> +	ret = sbitmap_init_node(&sb, depth, 3, GFP_KERNEL, NUMA_NO_NODE,
+> +				false, true);
+> +	KUNIT_ASSERT_EQ(test, ret, 0);
+> +	KUNIT_EXPECT_EQ(test, sb.shift, 3U);
+> +	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, 1U << 3));
+> +	sbitmap_free(&sb);
+> +
+> +	/* BITS_PER_LONG bits per word is the largest representable granularity. */
+> +	ret = sbitmap_init_node(&sb, depth, ilog2(BITS_PER_LONG), GFP_KERNEL,
+> +				NUMA_NO_NODE, false, true);
+> +	KUNIT_ASSERT_EQ(test, ret, 0);
+> +	KUNIT_EXPECT_EQ(test, sb.shift, (unsigned int)ilog2(BITS_PER_LONG));
+> +	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, BITS_PER_LONG));
+> +	sbitmap_free(&sb);
+> +
+> +	/* Anything above that cannot be represented and must be rejected. */
+> +	ret = sbitmap_init_node(&sb, depth, ilog2(BITS_PER_LONG) + 1,
+> +				GFP_KERNEL, NUMA_NO_NODE, false, true);
+> +	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
+> +}
+> +
+> +static void sbitmap_test_calculate_shift(struct kunit *test)
+> +{
+> +	/* Maps too small to spread over several words keep the default. */
+> +	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(0), ilog2(BITS_PER_LONG));
+> +	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(1), ilog2(BITS_PER_LONG));
+> +	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(3), ilog2(BITS_PER_LONG));
+> +
+> +	/* Four bits map to one bit per word. */
+> +	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4), 0);
+> +
+> +	/* The shift grows back as the depth increases. */
+> +	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4 * BITS_PER_LONG - 1),
+> +			ilog2(BITS_PER_LONG) - 1);
+> +	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4 * BITS_PER_LONG),
+> +			ilog2(BITS_PER_LONG));
+> +}
+> +
+> +static void sbitmap_test_get_exhaust(struct kunit *test)
+> +{
+> +	DECLARE_BITMAP(seen, SBITMAP_TEST_DEPTH) = { 0 };
+> +	struct sbitmap sb;
+> +	unsigned int i;
+> +	int bit;
+> +
+> +	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
+> +						GFP_KERNEL, NUMA_NO_NODE,
+> +						false, true), 0);
+> +
+> +	/* Every bit is handed out exactly once, then the map is empty. */
+> +	for (i = 0; i < SBITMAP_TEST_DEPTH; i++) {
+> +		bit = sbitmap_get(&sb);
+> +		KUNIT_ASSERT_GE(test, bit, 0);
+> +		KUNIT_ASSERT_LT(test, bit, (int)SBITMAP_TEST_DEPTH);
+> +		KUNIT_ASSERT_FALSE(test, test_bit(bit, seen));
+> +		__set_bit(bit, seen);
+> +	}
+> +
+> +	KUNIT_EXPECT_TRUE(test, sbitmap_any_bit_set(&sb));
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
+> +			(unsigned int)SBITMAP_TEST_DEPTH);
+> +	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
+> +
+> +	sbitmap_free(&sb);
+> +}
+> +
+> +static void sbitmap_test_put_reuse(struct kunit *test)
+> +{
+> +	struct sbitmap sb;
+> +	unsigned int i;
+> +	int bit;
+> +
+> +	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, BITS_PER_LONG, -1,
+> +						GFP_KERNEL, NUMA_NO_NODE,
+> +						true, true), 0);
+> +
+> +	for (i = 0; i < BITS_PER_LONG; i++)
+> +		KUNIT_ASSERT_GE(test, sbitmap_get(&sb), 0);
+> +
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), (unsigned int)BITS_PER_LONG);
+> +	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
+> +
+> +	/*
+> +	 * Freeing a single bit must make exactly that bit available again, no
+> +	 * matter which bit it was.
+> +	 */
+> +	for (i = 0; i < BITS_PER_LONG; i++) {
+> +		sbitmap_put(&sb, i);
+> +		KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
+> +				(unsigned int)BITS_PER_LONG - 1);
+> +		bit = sbitmap_get(&sb);
+> +		KUNIT_EXPECT_EQ(test, bit, (int)i);
+> +		KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
+> +				(unsigned int)BITS_PER_LONG);
+> +		KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
+> +	}
+> +
+> +	sbitmap_free(&sb);
+> +}
+> +
+> +static void sbitmap_test_round_robin(struct kunit *test)
+> +{
+> +	struct sbitmap sb;
+> +	unsigned int i;
+> +	int bit, prev = -1;
+> +
+> +	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
+> +						GFP_KERNEL, NUMA_NO_NODE,
+> +						true, true), 0);
+> +
+> +	/*
+> +	 * round_robin must hand out strictly increasing bit numbers while the
+> +	 * map fills up from empty.
+> +	 */
+> +	for (i = 0; i < SBITMAP_TEST_DEPTH; i++) {
+> +		bit = sbitmap_get(&sb);
+> +		KUNIT_ASSERT_GE(test, bit, 0);
+> +		KUNIT_ASSERT_LT(test, bit, (int)SBITMAP_TEST_DEPTH);
+> +		if (prev != -1)
+> +			KUNIT_ASSERT_GT(test, bit, prev);
+> +		prev = bit;
+> +	}
+> +
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
+> +			(unsigned int)SBITMAP_TEST_DEPTH);
+> +	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
+> +
+> +	sbitmap_free(&sb);
+> +}
+> +
+> +static void sbitmap_test_resize(struct kunit *test)
+> +{
+> +	const unsigned int depth = 4 * BITS_PER_LONG;
+> +	struct sbitmap sb;
+> +	unsigned int i;
+> +
+> +	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, depth, -1, GFP_KERNEL,
+> +						NUMA_NO_NODE, true, true), 0);
+> +
+> +	for (i = 0; i < depth; i++)
+> +		KUNIT_ASSERT_GE(test, sbitmap_get(&sb), 0);
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth);
+> +
+> +	/* Shrinking hides the bits past the new depth. */
+> +	sbitmap_resize(&sb, depth / 2);
+> +	KUNIT_EXPECT_EQ(test, sb.depth, depth / 2);
+> +	KUNIT_EXPECT_EQ(test, sb.map_nr,
+> +			DIV_ROUND_UP(depth / 2, 1U << sb.shift));
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth / 2);
+> +	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
+> +
+> +	/* Growing makes them visible again; they are still allocated. */
+> +	sbitmap_resize(&sb, depth);
+> +	KUNIT_EXPECT_EQ(test, sb.depth, depth);
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth);
+> +	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
+> +
+> +	sbitmap_free(&sb);
+> +}
+> +
+> +static void sbitmap_test_set_clear_bit(struct kunit *test)
+> +{
+> +	static const unsigned int bits[] = {
+> +		0, 1, BITS_PER_LONG - 1, BITS_PER_LONG,
+> +		2 * BITS_PER_LONG + 3, SBITMAP_TEST_DEPTH - 1
+> +	};
+> +	struct sbitmap sb;
+> +	unsigned int i;
+> +
+> +	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
+> +						GFP_KERNEL, NUMA_NO_NODE,
+> +						false, true), 0);
+> +
+> +	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
+> +
+> +	for (i = 0; i < ARRAY_SIZE(bits); i++) {
+> +		sbitmap_set_bit(&sb, bits[i]);
+> +		KUNIT_EXPECT_TRUE(test, sbitmap_test_bit(&sb, bits[i]));
+> +	}
+> +	KUNIT_EXPECT_TRUE(test, sbitmap_any_bit_set(&sb));
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), (unsigned int)ARRAY_SIZE(bits));
+> +
+> +	for (i = 0; i < ARRAY_SIZE(bits); i++) {
+> +		sbitmap_clear_bit(&sb, bits[i]);
+> +		KUNIT_EXPECT_FALSE(test, sbitmap_test_bit(&sb, bits[i]));
+> +	}
+> +	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
+> +	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), 0U);
+> +
+> +	sbitmap_free(&sb);
+> +}
+> +
+> +struct sbitmap_iter_ctx {
+> +	struct kunit *test;
+> +	DECLARE_BITMAP(visited, SBITMAP_TEST_DEPTH);
+> +	unsigned int nr_visited;
+> +};
+> +
+> +static bool sbitmap_iter_collect(struct sbitmap *sb, unsigned int bitnr,
+> +				 void *data)
+> +{
+> +	struct sbitmap_iter_ctx *ctx = data;
+> +
+> +	KUNIT_ASSERT_LT(ctx->test, bitnr, SBITMAP_TEST_DEPTH);
+> +	__set_bit(bitnr, ctx->visited);
+> +	ctx->nr_visited++;
+> +
+> +	return true;
+> +}
+> +
+> +static void sbitmap_test_iterate_set(struct kunit *test)
+> +{
+> +	static const unsigned int bits[] = {
+> +		0, 5, BITS_PER_LONG - 1, BITS_PER_LONG, 130,
+> +		SBITMAP_TEST_DEPTH - 1
+> +	};
+> +	struct sbitmap_iter_ctx ctx = { .test = test };
+> +	struct sbitmap sb;
+> +	unsigned int i;
+> +
+> +	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
+> +						GFP_KERNEL, NUMA_NO_NODE,
+> +						false, true), 0);
+> +
+> +	for (i = 0; i < ARRAY_SIZE(bits); i++)
+> +		sbitmap_set_bit(&sb, bits[i]);
+> +
+> +	sbitmap_for_each_set(&sb, sbitmap_iter_collect, &ctx);
+> +
+> +	KUNIT_EXPECT_EQ(test, ctx.nr_visited, (unsigned int)ARRAY_SIZE(bits));
 
----
-Reproduction outline (x86-64, cgroup v2):
-1. Enable BLK_CGROUP_IOCOST and KPROBES. Enable the io controller at each
-   parent, and configure io.cost.qos and io.cost.model for the test device.
-2. Create four leaves: rt/s1, rt/K/s2, rt/K/P/s3 and rt/K/P/C. Run continuous
-   direct 1 MiB writes in the first three; issue four direct 4 KiB writes
-   every 200 ms in C, keeping it active with low utilization.
-3. Every 300 ms, alternate the K/P/C chain weights between 1 and 10000,
-   with the sibling leaves s1/s2/s3 taking the opposite weights. This
-   repeatedly makes C's hierarchical share fall to the minimum of 1.
-4. On the unpatched build, confirm that the compiler placed the cached
-   generation store before the weight stores. Insert a kprobe delay of
-   30 ms after that generation store and before the weight stores.
-   Derive the instruction offset from the binary being tested.
-5. On the packed-cache build, delay just before the atomic cache store
-   instead: there is no separate generation-publication window. This
-   stresses concurrent refresh completion and late cache overwrites.
+This fails on 32-bit UML w/ gcc 16.2.1 (SUSE): nr_visited == 5, 
+ARRAY_SIZE(bits) == 7.
 
-Unpatched baseline, abbreviated crash and stack excerpt:
+Seems to be passing with clang 23.1.2, though.
 
-  iocg: invalid donation weights in /rt/K/P:
-        active=1 donating=1 after=0
-  Oops: divide error: 0000 [#1] SMP PTI
-  RIP: 0010:transfer_surpluses+0x43e/0x6b0
-  RAX: ffffffffffffffff  RCX: 0000000000000000
-   <IRQ>
-   ioc_timer_fn+0x1158/0x13b0
-   call_timer_fn+0x1e/0x100
-   __run_timer_base.part.36+0x1f0/0x220
-   [...]
-   handle_softirqs+0xa9/0x2a0
-   irq_exit_rcu+0x48/0xe0
-   sysvec_apic_timer_interrupt+0x6b/0x80
-   </IRQ>
-   [...]
-   win_pre+0x44/0x70 [repro_iocost]
-   [...]
-   ? current_hweight+0xc1/0x110
-   ? adjust_inuse_and_calc_cost+0x44/0x290
-   ? ioc_rqos_throttle+0x13e/0x590
-  Kernel panic - not syncing: Fatal exception in interrupt
+> +	for (i = 0; i < ARRAY_SIZE(bits); i++)
+> +		KUNIT_EXPECT_TRUE(test, test_bit(bits[i], ctx.visited));
+> +
+> +	sbitmap_free(&sb);
+> +}
+> +
+> +static struct kunit_case sbitmap_test_cases[] = {
+> +	KUNIT_CASE(sbitmap_test_init),
+> +	KUNIT_CASE(sbitmap_test_calculate_shift),
+> +	KUNIT_CASE(sbitmap_test_get_exhaust),
+> +	KUNIT_CASE(sbitmap_test_put_reuse),
+> +	KUNIT_CASE(sbitmap_test_round_robin),
+> +	KUNIT_CASE(sbitmap_test_resize),
+> +	KUNIT_CASE(sbitmap_test_set_clear_bit),
+> +	KUNIT_CASE(sbitmap_test_iterate_set),
+> +	{}
+> +};
+> +
+> +static struct kunit_suite sbitmap_test_suite = {
+> +	.name = "sbitmap",
+> +	.test_cases = sbitmap_test_cases,
+> +};
+> +
+> +kunit_test_suite(sbitmap_test_suite);
+> +
+> +MODULE_DESCRIPTION("KUnit test for sbitmap");
+> +MODULE_LICENSE("GPL");
+> 
+> base-commit: 4056b3c9d3c92ea45955641dbafeb9b960e146ef
 
- block/blk-iocost.c             | 65 ++++++++++++++++++++++++++++--------------
- include/trace/events/iocost.h  |  6 ++--
- tools/cgroup/iocost_monitor.py |  7 +++--
- 3 files changed, 53 insertions(+), 25 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 2745bffcd..fcc7ae866 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -472,8 +472,8 @@ struct ioc_gq {
- 	 *
- 	 * When an idle cgroup becomes active its `active` goes from 0 to
- 	 * `weight`.  `inuse` is the surplus adjusted active weight.
--	 * `active` and `inuse` are used to calculate `hweight_active` and
--	 * `hweight_inuse`.
-+	 * `active` and `inuse` determine the hierarchical weights cached in
-+	 * `hweight_cache`.
- 	 *
- 	 * `last_inuse` remembers `inuse` while an iocg is idle to persist
- 	 * surplus adjustments.
-@@ -520,7 +520,9 @@ struct ioc_gq {
- 	u64				child_active_sum;
- 	u64				child_inuse_sum;
- 	u64				child_adjusted_sum;
--	int				hweight_gen;
-+	/* Generation in bits 63:32; active - 1 and inuse - 1 in 31:16/15:0. */
-+	atomic64_t			hweight_cache;
-+	/* Donation workspace, protected by ioc->lock. */
- 	u32				hweight_active;
- 	u32				hweight_inuse;
- 	u32				hweight_donating;
-@@ -1154,13 +1156,17 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
- {
- 	struct ioc *ioc = iocg->ioc;
- 	int lvl;
--	u32 hwa, hwi;
--	int ioc_gen;
--
--	/* hot path - if uptodate, use cached */
--	ioc_gen = atomic_read(&ioc->hweight_gen);
--	if (ioc_gen == iocg->hweight_gen)
-+	u32 hwa, hwi, ioc_gen;
-+	u64 cache;
-+
-+	/* Read the generation and both weights as one atomic snapshot. */
-+	ioc_gen = (u32)atomic_read(&ioc->hweight_gen);
-+	cache = (u64)atomic64_read(&iocg->hweight_cache);
-+	if ((u32)(cache >> 32) == ioc_gen) {
-+		hwa = ((cache >> 16) & (WEIGHT_ONE - 1)) + 1;
-+		hwi = (cache & (WEIGHT_ONE - 1)) + 1;
- 		goto out;
-+	}
- 
- 	/*
- 	 * Paired with wmb in commit_weights(). If we saw the updated
-@@ -1194,14 +1200,22 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
- 		hwi = div64_u64((u64)hwi * inuse, inuse_sum);
- 	}
- 
--	iocg->hweight_active = max_t(u32, hwa, 1);
--	iocg->hweight_inuse = max_t(u32, hwi, 1);
--	iocg->hweight_gen = ioc_gen;
-+	hwa = max_t(u32, hwa, 1);
-+	hwi = max_t(u32, hwi, 1);
-+	/*
-+	 * Each weight is in [1, WEIGHT_ONE]. Subtracting one preserves its
-+	 * full range in 16 bits, leaving 32 bits for the generation. An
-+	 * interrupt or another CPU can only observe a complete snapshot.
-+	 * A late refresher may overwrite a newer cache, but its generation
-+	 * stays paired with its own weights and forces a future refresh.
-+	 */
-+	cache = ((u64)ioc_gen << 32) | ((u64)(hwa - 1) << 16) | (hwi - 1);
-+	atomic64_set(&iocg->hweight_cache, (s64)cache);
- out:
- 	if (hw_activep)
--		*hw_activep = iocg->hweight_active;
-+		*hw_activep = hwa;
- 	if (hw_inusep)
--		*hw_inusep = iocg->hweight_inuse;
-+		*hw_inusep = hwi;
- }
- 
- /*
-@@ -1300,10 +1314,12 @@ static bool iocg_activate(struct ioc_gq *iocg, struct ioc_now *now)
- 
- 	/*
- 	 * Activate, propagate weight and start period timer if not
--	 * running.  Reset hweight_gen to avoid accidental match from
--	 * wrapping.
-+	 * running. Invalidate the cached generation to avoid accidental match
-+	 * from wrapping.
- 	 */
--	iocg->hweight_gen = atomic_read(&ioc->hweight_gen) - 1;
-+	atomic64_set(&iocg->hweight_cache,
-+		     ((u64)(u32)(atomic_read(&ioc->hweight_gen) - 1) << 32) |
-+		     (u32)atomic64_read(&iocg->hweight_cache));
- 	list_add(&iocg->active_list, &ioc->active_iocgs);
- 
- 	propagate_weights(iocg, iocg->weight,
-@@ -1863,7 +1879,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
- 	list_for_each_entry(iocg, surpluses, surplus_list) {
- 		u32 hwa;
- 
--		current_hweight(iocg, &hwa, NULL);
-+		current_hweight(iocg, &hwa, &iocg->hweight_inuse);
- 		after_sum += iocg->hweight_after_donation;
- 
- 		if (iocg->hweight_after_donation > hwa) {
-@@ -1946,8 +1962,10 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
- 
- 		iocg->hweight_donating = min(iocg->hweight_donating,
- 					     iocg->hweight_active);
--		iocg->hweight_after_donation = min(iocg->hweight_after_donation,
--						   iocg->hweight_donating - 1);
-+		if (iocg->hweight_donating > 1)
-+			iocg->hweight_after_donation =
-+				min(iocg->hweight_after_donation,
-+				    iocg->hweight_donating - 1);
- 		if (WARN_ON_ONCE(iocg->hweight_active <= 1 ||
- 				 iocg->hweight_donating <= 1 ||
- 				 iocg->hweight_after_donation == 0)) {
-@@ -1956,6 +1974,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
- 			pr_cont(": active=%u donating=%u after=%u\n",
- 				iocg->hweight_active, iocg->hweight_donating,
- 				iocg->hweight_after_donation);
-+			goto out;
- 		}
- 	}
- 
-@@ -2054,6 +2073,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
- 		__propagate_weights(iocg, iocg->active, inuse, true, now);
- 	}
- 
-+out:
- 	/* walk list should be dissolved after use */
- 	list_for_each_entry_safe(iocg, tiocg, &inner_walk, walk_list)
- 		list_del_init(&iocg->walk_list);
-@@ -2360,7 +2380,7 @@ static void ioc_timer_fn(struct timer_list *timer)
- 				 */
- 				TRACE_IOCG_PATH(inuse_shortage, iocg, &now,
- 						iocg->inuse, iocg->active,
--						iocg->hweight_inuse, new_hwi);
-+						old_hwi, new_hwi);
- 
- 				__propagate_weights(iocg, iocg->active,
- 						    iocg->active, true, &now);
-@@ -3032,6 +3052,9 @@ static void ioc_pd_init(struct blkg_policy_data *pd)
- 	INIT_LIST_HEAD(&iocg->active_list);
- 	INIT_LIST_HEAD(&iocg->walk_list);
- 	INIT_LIST_HEAD(&iocg->surplus_list);
-+	atomic64_set(&iocg->hweight_cache,
-+		     ((u64)(u32)(atomic_read(&ioc->hweight_gen) - 1) << 32) |
-+		     U32_MAX);
- 	iocg->hweight_active = WEIGHT_ONE;
- 	iocg->hweight_inuse = WEIGHT_ONE;
- 
-diff --git a/include/trace/events/iocost.h b/include/trace/events/iocost.h
-index e772b1bc6..aac25edaa 100644
---- a/include/trace/events/iocost.h
-+++ b/include/trace/events/iocost.h
-@@ -34,6 +34,8 @@ DECLARE_EVENT_CLASS(iocost_iocg_state,
- 	),
- 
- 	TP_fast_assign(
-+		u64 cache = (u64)atomic64_read(&iocg->hweight_cache);
-+
- 		__assign_str(devname);
- 		__assign_str(cgroup);
- 		__entry->now = now->now;
-@@ -44,8 +46,8 @@ DECLARE_EVENT_CLASS(iocost_iocg_state,
- 		__entry->vtime = vtime;
- 		__entry->weight = iocg->weight;
- 		__entry->inuse = iocg->inuse;
--		__entry->hweight_active = iocg->hweight_active;
--		__entry->hweight_inuse = iocg->hweight_inuse;
-+		__entry->hweight_active = ((cache >> 16) & (WEIGHT_ONE - 1)) + 1;
-+		__entry->hweight_inuse = (cache & (WEIGHT_ONE - 1)) + 1;
- 	),
- 
- 	TP_printk("[%s:%s] now=%llu:%llu vrate=%llu "
-diff --git a/tools/cgroup/iocost_monitor.py b/tools/cgroup/iocost_monitor.py
-index bdd78ba27..8a4f844c9 100644
---- a/tools/cgroup/iocost_monitor.py
-+++ b/tools/cgroup/iocost_monitor.py
-@@ -149,8 +149,11 @@ class IocgStat:
-         self.weight = iocg.weight.value_() / WEIGHT_ONE
-         self.active = iocg.active.value_() / WEIGHT_ONE
-         self.inuse = iocg.inuse.value_() / WEIGHT_ONE
--        self.hwa_pct = iocg.hweight_active.value_() * 100 / WEIGHT_ONE
--        self.hwi_pct = iocg.hweight_inuse.value_() * 100 / WEIGHT_ONE
-+        hweight_cache = iocg.hweight_cache.counter.value_()
-+        hwa = ((hweight_cache >> 16) & (WEIGHT_ONE - 1)) + 1
-+        hwi = (hweight_cache & (WEIGHT_ONE - 1)) + 1
-+        self.hwa_pct = hwa * 100 / WEIGHT_ONE
-+        self.hwi_pct = hwi * 100 / WEIGHT_ONE
-         self.address = iocg.value_()
- 
-         vdone = iocg.done_vtime.counter.value_()
