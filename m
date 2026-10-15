@@ -1,150 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CE9595726;
-	Thu, 15 Oct 2026 20:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD7C598BE8
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 20:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792096012; cv=none; b=B2GrSxkXGKhH15LJzx3WOem3nDiiNB4/Zmobc4Fl8itpUAwRjB6OzktH6Hf0GH8trYaG5gU0CKqHc11BpfiPllTKqpl5UICJewcVjsuUAQRjq8GmrIE+FDuMZBrDAUc9NH9omJ6KC4nCB351OLj6keFRTe3kV+YvBXy6cGouwrE=
+	t=1792096474; cv=none; b=HxyFfXTNPx9mIZFKKvWpiHt4jHDjkAtISSax7cc/sHQefvbJqSJULaQeheXBv3XSw6tCon29ohXG5b9NYysYOCjys60y3C+azDXobisEHifCvXRc0f6lT89EIj5Pym1h9pI3eUrZ2aVoQb+Qy4LhSn4oxyAv2w2wegONi5J569c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792096012; c=relaxed/simple;
-	bh=E7Fv6ywQrgDjUslqsRvtfwPAj5PC8aBG+CjXR5SO+3o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VSwZbjux8kKFg3Era8K7mA8D9Y1d6nMQOeWPBwIvhQggKkupPmZPnyGcqzTM8EjhrbN/4AI1nC6/0+LYw4aHGkPvii+yLoA010b5/3w4PFWf8tK+NERfqKR9dmVh5jgP8OFtR9gdEavdbZtCPFLaZn8hBtOMybLBaiYJziZl8uM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+HLQ7e1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792096474; c=relaxed/simple;
+	bh=qWzTRRFlBrjKxhqo/bIT5/vkMosLcfmvltWqBsG2ARo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=O8LAEPCfaQ/ETZpBCgoLAPVmvkOhwZgQ0PLCeNwkDmq6sJUbMNMU/t/oeyEQJuAjmrjPq9ddnvTZALci7qdj0Sbrm12LkMU+0Lv7VJkp134rt+/DOIGzP/NzhiNBxbWpittLKmY/jmlWlGo9b0+U2Rte+eFkBng5+iqlk6xOvfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=wRdyCTqn; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+HLQ7e1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C18A1F000C5;
-	Thu, 15 Oct 2026 20:26:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792096006;
-	bh=0krRJ91DC1JqaPy8p2BdLjkFZFB7uv6gz8otZz1lamA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=N+HLQ7e1/GmU6TH/sE5snhDqVs0LO1RDZRPntxffBQMKi04UqKufzmuLAlkNPh72J
-	 OAruwhzav97R+HmhSGt3eVBMD7LK8UohREB88Awf7tXwUqiWzSh2P+ohmzYQTW3XBS
-	 k17ihrL+LD8u1Ny2SoWsuX7mtYGNIK4HAdPLaMhohFrjZjAg056/nQxZ8mDZrXbR0q
-	 kDfmv04b4VZlHe5/KhwnwCYHqpmMyaMa0i4F3pPxFQMQ7KHipk1wnHQDuTnjJjy/65
-	 UcFRaRMdXvCBSNhKGeA0/RF7yEkTc/heJJdwdaxn98ekWuPDlivbjWEDPgNgtCBGgR
-	 5M1crv539nYqA==
-Date: Thu, 15 Oct 2026 20:26:44 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: mst@redhat.com, jasowangio@gmail.com, axboe@kernel.dk,
-	stefanha@redhat.com, pbonzini@redhat.com, eperezma@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] virtio_blk: add inline encryption support
-Message-ID: <20261015202644.GA2317081@google.com>
-References: <20261009041727.3170811-1-linlin.zhang@oss.qualcomm.com>
- <20261009041727.3170811-3-linlin.zhang@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="wRdyCTqn"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-4f59ea27bd0so2047058b6e.0
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 13:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792096472; x=1792701272; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=BZVnmfGOWMEQB6LCOpiT/03uLBXyo08m720hSCcSffQ=;
+        b=wRdyCTqnheLsMAiS31O6SPFMMzaOLlU40iJ+4X7qvhemaBh6pnOQvZhFKksnNuvNcS
+         Y1Qhenkkn3cQ//ZfQIJYlAGjnDgj+FUKXiWHNXMzrQZI5YLIX2rLNtD/KeMwLNsu/Ip2
+         qNZ/dsJeRvbvq4z5hI1M+Ps04lAdN5Xbl5Gsc71XypIA1yfcJPXRBfNUMJ/GPt26daRG
+         5XMayzavh3jS+72LkVG/bGFkgqeqYFO8I7lNdexmDoQSQk1sZy+gIMZvngZH6uzf4L4E
+         4TudvkjHdNbtnfaH03tsnApSdds4XVIzfL70nNzeZBRHw5WMKIac+JM9xbNu5hONS4VY
+         ncvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792096472; x=1792701272;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=BZVnmfGOWMEQB6LCOpiT/03uLBXyo08m720hSCcSffQ=;
+        b=ozli/kjvRk4ftn0KYzPMmVSKsQ1hrFpYy55c0OIPd0ldgKhxpDnClztZbrjwyNbVwE
+         LSrpdUm5MTgHMAFzzckK2Wh/czPEBBQqoBY/tqoCG8aqZkB91UXd5x84q0HvuwZvVL96
+         zhrmiUIBMM6koTOF6aLOEr2FIpJj7rgZLbGlnc1D77Orsv6WFwmd7Kk+pzLQ54phHj1V
+         5nJ7qFPyCnPGP3NZaGf7DqgLrtAkR3e29z6u9wuqA78Yht9cWPKF9dx2IFssWn5F7cBI
+         FywlJtOoSc+Zb2xmFjbC0vV8s7e9xlAVvyABE+YF+/vbI3/qWE6rgbIxkZAKJAaABoab
+         SSPw==
+X-Gm-Message-State: AFq9FYJcFlvvRy0oQ8DVSkDQXoOuM14L6QMRVVMjspBG81NmNLlWhA3W
+	QAwpG5V4a7pQMXW0phjkH5C6KAyWRAI7koKEqbfTdVVxKkvTsjPQWXoPrmTs+SjiD4k=
+X-Gm-Gg: AYBFou0LbfBvi7MInRXO/8BFjuLhhSMeK9SLgbBfCQiz92VZqhOkT6lHFR4eQIlBrZd
+	PNiOSaGU7JsO+GOE2jDKvHlv8xGn8DmTR3z7/pIcIgIo2abiXjYiMMVM0BJ0vUpsnR/dVY+F8Cc
+	tSFeMebpz0e75XGSzOLR4/TAbpHtwETaIssl1CiFE4zJ0W89ZV6mdEhYWA8JZbJ/7fQzSCebzp+
+	vcO+GdTBPwDtfKTYitMDjKp6iiK7z9yIROMxdSkigJROb2vDag1E3cnBfO922LT1yA0Hi42Nx7O
+	3Ro8rtCY53Z75bku9QrzogebHyqWc6Ii+ErmDgPNRgdw/Eh3nfC7LGFsoiq/wyUAOLD5myczLw2
+	9HEps7SJcsksiFXGTyQ03Z8/3u19Izgw4HjMMsYgQWc64+MMNSn7uQF4knwgWiZawcLyTE43kln
+	OFbfxSWLupEDkeD/LftNC0IJjn2lF5kFaQerPlJR9O3IhwHvS0xaC8v0pOdanzceJiHwNdtFPo2
+	e2hL/UQFKh4iHAI3CAXL5cngNtBIWFeed/DT6yvvlvK7hpzs/pm048eO4x15gfBNCZi
+X-Received: by 2002:a05:6808:3510:b0:4c4:9f7e:92ce with SMTP id 5614622812f47-50c5464570dmr18523514b6e.38.1792096471991;
+        Thu, 15 Oct 2026 13:34:31 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-537b6f5169csm350539b6e.15.2026.10.15.13.34.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Oct 2026 13:34:29 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <tom.leiming@gmail.com>, 
+ Paolo Bertinetti <paolobertinetti200f4@proton.me>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ syzbot+b48868c46e62c1c4cb2c@syzkaller.appspotmail.com, 
+ syzkaller-bugs@googlegroups.com
+In-Reply-To: <179010105967.8478.2344875677216734809@proton.me>
+References: <179010105967.8478.2344875677216734809@proton.me>
+Subject: Re: [PATCH] ublk: hold RCU read lock in ublk_try_buf_match()
+Message-Id: <179209646794.1861240.13664201337469739319.b4-ty@b4>
+Date: Thu, 15 Oct 2026 14:34:27 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261009041727.3170811-3-linlin.zhang@oss.qualcomm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-On Thu, Oct 08, 2026 at 09:17:14PM -0700, Linlin Zhang wrote:
-> +config VIRTIO_BLK_INLINE_ENCRYPTION
-> +	tristate "Virtio block inline encryption support"
-> +	depends on VIRTIO_BLK && BLK_INLINE_ENCRYPTION
-> +	help
-> +	  Say 'Y or M' here will allow the virtio block driver to route crypto
-> +	  requests to a different operating system in a virtualized
-> +	  environment. This is useful to encrypt the data stored in the storage
-> +	  by using storage inline crypto engine. The control queue feature bit
-> +	  must be negotiated to enable this functionality.
-> +
-> +	  If unsure, say N.
 
-This should be a bool, not a tristate.  (Since it controls the inclusion
-of a feature in a module, rather than the inclusion of a module.)
+On Tue, 22 Sep 2026 18:17:43 +0000, Paolo Bertinetti wrote:
+> syzbot reports a lockdep splat when I/O is dispatched to a ublk device
+> with UBLK_F_SHMEM_ZC enabled:
+> 
+>   WARNING: suspicious RCU usage
+>   lib/maple_tree.c:720 suspicious rcu_dereference_check() usage!
+>   ...
+>   Call Trace:
+>    mas_root lib/maple_tree.c:720 [inline]
+>    mas_start+0x3cc/0x640 lib/maple_tree.c:1250
+>    mas_state_walk lib/maple_tree.c:3006 [inline]
+>    mas_walk+0x1db/0x490 lib/maple_tree.c:4458
+>    ublk_try_buf_match drivers/block/ublk_drv.c:5639 [inline]
+>    ublk_init_iod+0x5d2/0x1120 drivers/block/ublk_drv.c:521
+>    ublk_dispatch_req+0x97/0x9c0 drivers/block/ublk_drv.c:1776
+>    tctx_task_work_run+0x73d/0xa80 io_uring/tw.c:96
+> 
+> [...]
 
-> +#if IS_ENABLED(CONFIG_VIRTIO_BLK_INLINE_ENCRYPTION)
-> +static int virtblk_get_crypto_modes(struct virtio_blk *vblk,
-> +				    unsigned int *crypto_modes_supported)
-> +{
-> +	unsigned int nr_modes = VIRTIO_BLK_CRYPTO_MODE_MAX + 1;
-> +	struct scatterlist type_sg, resp_sg, status_sg, *sgs[3];
-> +	struct virtblk_ctrl_request *creq;
-> +	unsigned int i;
-> +	int err;
-> +
-> +	creq = kzalloc_obj(*creq, GFP_KERNEL);
-> +	if (!creq)
-> +		return -ENOMEM;
-> +
-> +	creq->type = cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_GET_CRYPTO_MODES);
-> +
-> +	sg_init_one(&type_sg, &creq->type, sizeof(creq->type));
-> +	sg_init_one(&resp_sg, &creq->in_resp.modes, sizeof(creq->in_resp.modes));
-> +	sg_init_one(&status_sg, &creq->status, sizeof(creq->status));
-> +	sgs[0] = &type_sg;
-> +	sgs[1] = &resp_sg;
-> +	sgs[2] = &status_sg;
-> +
-> +	err = virtblk_ctrl_vq_request(vblk, creq, sgs, 1, 2);
+Applied, thanks!
 
-What happens if the host follows a future version of the spec and wants
-to return more than VIRTIO_BLK_CRYPTO_MODE_MAX modes?
+[1/1] ublk: hold RCU read lock in ublk_try_buf_match()
+      commit: aaf49023041bc1f887a028a164d3bac714b65508
 
-> +static int virtblk_crypto_keyslot_program(struct blk_crypto_profile *profile,
-> +					   const struct blk_crypto_key *key,
-> +					   unsigned int slot)
-> +{
-> +	struct virtio_blk *vblk = virtblk_from_profile(profile);
-> +	struct scatterlist type_sg, out_req_sg, status_sg, *sgs[3];
-> +	struct virtblk_ctrl_request *creq;
-> +	int err;
-> +
-> +	mutex_lock(&vblk->vdev_mutex);
-> +	if (!vblk->vdev) {
-> +		err = -ENXIO;
-> +		goto out_unlock;
-> +	}
-> +
-> +	/*
-> +	 * GFP_NOIO: this callback runs on the bio-submission path, which
-> +	 * memory reclaim can reach while writing back dirty pages to this
-> +	 * same device; GFP_KERNEL here could recurse into that same reclaim
-> +	 * and self-deadlock.
-> +	 */
-> +	creq = kzalloc_obj(*creq, GFP_NOIO);
-> +	if (!creq) {
-> +		err = -ENOMEM;
-> +		goto out_unlock;
-> +	}
-> +
-> +	creq->type = cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_CRYPTO_KEYSLOT_PROGRAM);
-> +
-> +	err = set_virtblk_crypto_key_desc(vblk->vdev, creq, key, slot);
-> +	if (err)
-> +		goto out_free;
-> +
-> +	sg_init_one(&type_sg, &creq->type, sizeof(creq->type));
-> +	sg_init_one(&out_req_sg, &creq->out_req.key_desc, sizeof(creq->out_req.key_desc));
-> +	sg_init_one(&status_sg, &creq->status, sizeof(creq->status));
-> +	sgs[0] = &type_sg;
-> +	sgs[1] = &out_req_sg;
-> +	sgs[2] = &status_sg;
-> +
-> +	err = virtblk_ctrl_vq_request(vblk, creq, sgs, 2, 1);
-> +	if (err == -ETIMEDOUT)
-> +		goto out_unlock;
+Best regards,
+-- 
+Jens Axboe
 
-Is the -ETIMEDOUT handling really correct?  This basically turns this
-into an asynchronous operation; the host might still complete it later.
 
-> +/* Must be >= BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE in include/linux/blk-crypto.h */
-> +#define VIRTIO_BLK_CRYPTO_MAX_KEY_SIZE		128
 
-Does this value really need to be exposed in a UAPI header?  As
-documented in the comment above BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE, it's
-supposed to be possible to increase it if ever needed.  This change
-takes away that flexibility by making the current (somewhat arbitrarily
-chosen) value part of the UAPI.
-
-- Eric
