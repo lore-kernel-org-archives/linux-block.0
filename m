@@ -1,106 +1,109 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AE04FDE7C;
-	Thu, 15 Oct 2026 12:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D1B4C67F9
+	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 12:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792067379; cv=none; b=UhEtwloSKVkne/+WDyIvmr+/1JDmp8Jp3aog+VrWoTuULQOT9mK4t+mZOzeM6MTlOxpWuJbYHJltV3OEQ57MmG+6V1pPW5cHKAAPEISAvwqR3OyTyYTc5ZB9UP/MjIwJD6jp4LpZ52jfYp0tEXR/oZ0flo9IgfCSNjHO6L41B3s=
+	t=1792068077; cv=none; b=g07GJmWSwAlQKHEr7wbuBCv6eh65lC211V2OjFdCXSXQLeKrA/+kdo2Odxk4cWtKeCZRoc5xgaVNt/zMKXjwOzd0gPSpjpVdJo569D5qe1yN3i5dEXjmGiUEaH8whhobSsaXrfPA8VekO1EKm8iajBSorMP9DZyVQ2ULet/IBc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792067379; c=relaxed/simple;
-	bh=EdkoGLcjTyLAvjh/5BwakDPBCwlzJa0pxxqLHTIhYzE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RRj/4J28//Ibrl0AFqYjb52Z4O6fyn0bCa1K3BXnftw/Z2wXwQz9W5mmG/Mm3DFhp2wtbiUfzlH9yNphyED+WS3o5eSvhO264CJ6Nw8EU6B654twTCmDn8pLeJihWf3UQ3KrPCNj4Zi8BEfEBMYS/Mmp5zD14x+ej3DPsuLSkIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NDQaJqA1; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Diqi3L5P; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1792068077; c=relaxed/simple;
+	bh=0VkRb5EyS8A2bFkpkhk8wGvwDnW+nQDGlAudEbx1lUg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=mKlXLtbO2Qlf+3fYQZCMMoupCy+GsH+eZfKIYx9sE3u5wk/EBmRM5+TRK5CVXwbB6ZEx6b4pfgiOK8Y692AkPqZjCsObw90v+Mftk1/w5rl5hMGpEhp/s18T3VvrfqpWu3K+5kASwJTR9YMJ1HP9vTTkbQ9v4TChobcV+mVvHSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=nMiEL6qw; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NDQaJqA1";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Diqi3L5P"
-Date: Thu, 15 Oct 2026 14:29:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1792067375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SiJnkX+uFAvEbBRKpsYNT584aijBABjRduz0e55KArA=;
-	b=NDQaJqA1XcisH3IazYB8/nWljI3F8weUNXOJLgfRscMyCTkuWSzsOJJkt0uwDzduEoBNNF
-	nEvVe7jMpMH0LOXP8UBg7jjT04JglRlk73NiKd5JCpEyD6prTvdfi6BRyB2VWw/6K5VJ+y
-	9JsSuM4qwR+0dJBHIxYLmM6oAo5w2qH4OmH48V3E2ZoLpoedS0QeOPmgWYa+G1gvQGny5u
-	NxJAR5l4TIzo0AnMf+WPmLWAraxfHhPGU/YUvtEm4cMsYw9/UTrEgpm/KTra+xsc9QfrWT
-	iIoIxIsajla/iGTyBGYjC2n4VML86fDIeKEWrePXA4tMpGWUMd9gb4CaWCSGAw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1792067375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SiJnkX+uFAvEbBRKpsYNT584aijBABjRduz0e55KArA=;
-	b=Diqi3L5PlE5sEU6DgUxl0lbiUUozIpHXpQKeV58bDnIvh2Ko9ik1GhSZQOZxl+A8vv5Jln
-	jizG5+8pAa0WvvDg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Daniel Wagner <dwagner@suse.de>
-Cc: Aaron Tomlin <atomlin@atomlin.com>, axboe@kernel.dk, tglx@kernel.org,
-	aacraid@microsemi.com, James.Bottomley@hansenpartnership.com,
-	mkp@kernel.org, frederic@kernel.org, ionut.nechita@windriver.com,
-	corbet@lwn.net, vincent.guittot@linaro.org, mingo@redhat.com,
-	peterz@infradead.org, radu@rendec.net, akpm@linux-foundation.org,
-	steve@abita.co, sean@ashe.io, chjohnst@gmail.com, neelx@suse.com,
-	mproche@gmail.com, nick.lange@gmail.com, marco.crivellari@suse.com,
-	rishil1999@outlook.com, linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v16 0/9] blk: honor isolcpus configuration
-Message-ID: <20261015122934.5itxaJ3l@linutronix.de>
-References: <20260910164237.500196-1-atomlin@atomlin.com>
- <2f32ffb6-d889-4281-a612-d4185311ca0d@flourine.local>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="nMiEL6qw"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-6b1afdf5196so1760291eaf.2
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 05:41:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792068073; x=1792672873; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=rVT56IK98h4jI9P5ye9fE3iPJfDwMGiMmvMYw20b5GQ=;
+        b=nMiEL6qwiE/acaL3W+hCvEYQm9nToW2YVPYKPNVedM7fo3mN/exyrI/BXfTBeyizxh
+         Gt1+0FcfE935qQ7+fCXs5AliM4Xe5bes3P1jphtL/YLEwbF3q35Hpw58fLYuSLm36cL0
+         ePM1T04PipE07xY3966o8S6I0RomBtzqOe4b0XSRXx0LHLAVf4XOLqJnak8GkRMWVzuL
+         KrFSXhD+nDsyvd+lNOXB9mzNB5Gzcy53CS+hEh86HgPbSybD2evcRsW4KJENHZDPSxJ5
+         AtPMpshK7OJ3G0yWDdMYv3Bi/zEP+fWdCifPBBaglsBfkTpEFA7488fHYl3B54M33fbs
+         pH8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792068073; x=1792672873;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=rVT56IK98h4jI9P5ye9fE3iPJfDwMGiMmvMYw20b5GQ=;
+        b=lp+awMLSYqdcZbIJprJaoDmt0ml+8DpwRP3Vxhc4fVjbUMXcSeMFR0cQGfv8OkkIjR
+         OWX9gmgUSlf4qnbh+HtyZFKQ5GQrMmlq4dwsrMQVGXQuY2J3uAAayUFtnCFDWAzanH17
+         YfCK0zlsCsPkTpqnLP7Yk23xYjWi1brSJi+nDATCVypf4Zva67wYueN+j2luld5Tfm9l
+         SO/v2oH1/aMsB7zSujzmRnpPBlPrj+eNR2scyMTXdLhIuiYzHfr4UUhrajGOk0iQ2RXg
+         z+hzVOTXn9pujPlBWn2Ti0bepKpfJYtQaxgwDfjrxIGmaDMSO2IMd/c/iSVQSkmtrzM5
+         ovKw==
+X-Gm-Message-State: AFq9FYIMCuMDJYRjJ6iScaLVHte/Svo0qKgt71QBfi3VkNeVrKAbixvp
+	wB0svJod37NynSNbZIC9gMqcmSHLHjfvPWazVNEfNSlPwzA/iqk/QiMDhmcznQ4NlO3B2HrEiuZ
+	wY19zbPU=
+X-Gm-Gg: AYBFou2RABs83mycA84fFG4W1fo6AfYbtET5lZsJx9VPbF1t/elPBgLkuHUgRzDa5aF
+	vCshl5gzweZxlWkmPZiNc/HgwJU3c/7lc4ZV5pm6S/h51YskepvKC2X35Lfz9FLwXMnTsR1BWRM
+	d7JH0DKw2uUPUOVF6CSE+IV4wY26lQs4kDKEZAIB1fM8t9zfWpcvl49GennqdRsm1x4QoV0TH3Z
+	5h89ntIhxNWD02dIY3xtPosiDOrIrAy2QDDy0Gk9XtilLhz0k9c/YKpr0GpteVtGpv+DxhWGyYG
+	MHxqYHx+WkvBUX20X2MidqwtwRTvU1PkABTYvcLMfyIh2svqpAJr5pZLYKifbYNaKtqtOdXkBNL
+	lfWxQzXvjsgQsOr51BhcpOoWoZNegq9tGdNEDbeyxcUi6XaTKi2QiN/fQChQJgCerUrsH5+ISj3
+	nj0DIQae5TD84FO5ZUDmebr7c843w3e3TJjOy0HLQ/inBkWcmINkqbvhkej7hPyCZBmjLuwWZut
+	DqfAr9LZf5/BaTQKXhabvmUqXoN4bsC4L4FDMrWpoObrar6j5cBYHteA3FVqyhWc3Hw
+X-Received: by 2002:a05:6820:3503:10b0:6e4:116f:1cc9 with SMTP id 006d021491bc7-6f3cc9723cfmr7213248eaf.85.1792068073329;
+        Thu, 15 Oct 2026 05:41:13 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6ef03e39840sm16000474eaf.15.2026.10.15.05.41.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Oct 2026 05:41:11 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Julian Sun <sunjunchao@bytedance.com>
+Cc: jack@suse.cz, viro@zeniv.linux.org.uk, mcgrof@kernel.org, 
+ djwong@kernel.org
+In-Reply-To: <20261015091105.1315605-1-sunjunchao@bytedance.com>
+References: <20261015091105.1315605-1-sunjunchao@bytedance.com>
+Subject: Re: [PATCH 0/2] block: fix NOWAIT handling and locking in buffered
+ write fallback
+Message-Id: <179206807043.1369049.6734759519195457019.b4-ty@b4>
+Date: Thu, 15 Oct 2026 06:41:10 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2f32ffb6-d889-4281-a612-d4185311ca0d@flourine.local>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-On 2026-10-15 13:22:35 [+0200], Daniel Wagner wrote:
-> During Plumbers we had several discussions on this series. This is what I
-> remember we discussed and decided:
+
+On Thu, 15 Oct 2026 17:11:03 +0800, Julian Sun wrote:
+> This series fixes two issues in buffered fallback for direct writes to
+> block devices.
 > 
->   - The current managed_irq behavior doesn't match the other flags of isolcpus.
+> 1. NOWAIT requests can fall back to buffered I/O and wait for writeback.
+> 2. The fallback path lacks shared inode locking against set_blocksize().
 > 
->   - Instead of introducing managed_irq_strict, it's better to change the
->     existing managed_irq to follow the strict interpretation.
+> Julian Sun (2):
+>   block: reject NOWAIT buffered write fallback
+>   block: take the inode lock for buffered write fallback
 > 
->   - The main existing user of the current managed_irq mapping is
->     RH with OpenShift. After discussing with Juri, it doesn't look like
->     it is a real blocker to change to the strict interpretation.
+> [...]
 
-This is what I remember, too.
+Applied, thanks!
 
->   - If there are complaints about the managed irq behavior change, it's
->     better to introduce a different flag for this. Though there have been
->     many discussions and proposals on how to deal with isolation during the
->     conference, and the general mood was that the placement of resources
->     should be done during runtime. Thus it is likely that the old behaviour
->     is not necessary at all if runtime configuration is possible.
+[1/2] block: reject NOWAIT buffered write fallback
+      commit: a08bf4b9f87898628e70882430b8dd4260730dba
+[2/2] block: take the inode lock for buffered write fallback
+      commit: 1b1be9ea4e34ccede1e7cf9ff2b6317328a5b6ad
 
-The main argument/ problem is that managed_irq does not work as expected
-for the vast majority of users and should be fixed. This has only been
-"recently" documented.
+Best regards,
+-- 
+Jens Axboe
 
-The whole isolcpus= was meant to be static and there was no argument why
-it needs to vanish. A dynamic interface for dynamic workloads is what
-you want especially if you have 80+ CPUs and workloads can change. But
-on <16 CPUs system the partition probably do not change. It is also not
-obvious if your driver(s) use managed_irqs or not.
-To get a runtime interface for this you would need to be able to
-reconfigure the managed_irq interrupt if "interrupts < CPUS". Otherwise
-it is just enable and disable like during CPU-hotplug but without it. If
-I remember it correctly, the device itself does not handle this at all
-but the block layers drains and starts queues during a hotplug event.
 
-> Hope this helps to move forward with this series,
-> Daniel
 
-Sebastian
