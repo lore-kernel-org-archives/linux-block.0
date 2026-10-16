@@ -1,61 +1,64 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4598146EF93
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 12:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCD147884F
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 12:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792152602; cv=none; b=cck7WkLvEeJbmTAeCQi8uzxj3q2XJI8/f9Z4c+MF6kN2PTMCPVi8ivLFsNWcbaNwDn9ddtcDgTgLZqOak16V436Gd7Ze59gzMHeWFfLytr1pPwIg+ksOuMLYJWWk1P2ZeiTgzCN8Jy+oDmZMVMr+j/LsRdMbam7FHnKelI/oPi0=
+	t=1792152607; cv=none; b=TznPnqf+LH83MXoUICUvfyb+V2DEvmHHRRXShUI5abH+Lo10Drg3s9S80vLSb1OrcSddL/vgpCPUa3l9ljhYTDZXpx92ovOjndLjXomjus5kkJdTtl/Sz9ukHaxZP3aKMJ7DN30sUyCAJhe3yRomcv6uV19O9MkmNhHfS58GazU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792152602; c=relaxed/simple;
-	bh=2uqaJOE1ZflgZEPQal5CUnZ1clIz7YKu+QjcrMjDn8k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HerRCq42arX3HoXVswxfMxS76HcJJNoP6Q/pmNDYUMJXJAFG01E3LlomS1m+wywvQbdt9JInDtTv7zWcQAcDDtapFh1ZTgEFRe9xxTk4rm21I9qVH/rG66Z29VW/cpKQcX4fDMhiRNdTRGx/E67mVvg5TMDGQmVILkDAglipLuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hH5zc43P; arc=none smtp.client-ip=209.85.215.180
+	s=arc-20240116; t=1792152607; c=relaxed/simple;
+	bh=OO/CgimJeS//PNAiuvFScdjA7H5LsP/0X7yItHI+emg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=erE6nnB+bd+/QQraO4bmfWLoKmiVU9Uccs3w9OOvMFMdZtSwnnyvlmW/JnSX9ZqouVLDckTymY+PElpBh0ydbKtH5s3Moxk7eIra7Ppx5cmuVGhogrAR0CiDx3pki+Uhtpw9VmFzG9HVPNMYZOwcm4OUX4K1t5QnrtaO5xDmU2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQ6AxVmP; arc=none smtp.client-ip=209.85.215.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hH5zc43P"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-ccca948203aso2667482a12.3
-        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 05:10:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQ6AxVmP"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-cbedd5aece4so477020a12.0
+        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 05:10:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792152600; x=1792757400; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=pLob/vRQa3c1x4TgqQCsxa5ZzEfJKY3TcYiiw4aZMIU=;
-        b=hH5zc43PpPHNzsYnAhGwvO0vBjxGqbNBmBkpj4C01o+joFr7hE75VGkhA0g1h+3Dt6
-         kHoFxlr/EPZaABae8Fm4th20jKWqQHbU880+KRJR2Lcv39cgcBYCa+y4SQeR/3QjQGTc
-         S2v1/xzLkt48w8+Xy+BdqtPCSe1RLAm5C7dZ5hRIMfz7k7mZXmjmYXcOXDLQueq4IGcf
-         N73fV0cBi1gP2dFlrbRt8bwS20qSpMDNQFNM5NCEh4mrEZ/XM2vg680r7rxXUaG6Y3cy
-         MSYkxEC8gD/DG3IGJq8kx5EHwLRoengI3t6jKTvytVGXgbwgUyBr5uIB8sdFEQN0vet8
-         X05w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792152600; x=1792757400;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1792152605; x=1792757405; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=pLob/vRQa3c1x4TgqQCsxa5ZzEfJKY3TcYiiw4aZMIU=;
-        b=H9TEYaCLGIpD50Nl/2S8hf2Uv8AExY2CjcE2gyb8h8iaMjPJy+ilYjj7MWR7I+r0BD
-         6OFzYfoW06c0i8C3c4t0T/zz25eC5K4Tpps8fpHX9lFwV1A3K2IqB3xZosfDB7gt1zzH
-         Km74g9o/ywVgL0K60kr3w2yk+N6Gh7mBtkzPgWYKnRPt85QZolTgV7aLMyYYgztIXv2B
-         mljuUluaNF0x/BnyEfduaNrfhM1jmwFHBb7ZOWiYgEpWRStgj6QKB8OW/dEmqXlhZ5nE
-         K5WXnxuilfPnH3td/+5DwFRX7Qg3uKCjx8AG+EJLLrYVOlClkWNJvw2omqc9vEZ7ElZc
-         kiSA==
-X-Forwarded-Encrypted: i=1; AKwUvBzHqF0LRMGftpgOrgFkNTEztXtUP1pqyAts0IxOUNE0u2MHQ4lbRku03BUiHkg1o575xRMm1ENFugRXQg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJfGFCqU2REe1ShKqx+5/e78sFhoLVTsDUUwvRHQJdQ2usmv2AH
-	jYzdIc6oebrDGKQ0XDtZwdVo0EB5NI34JbvsYZ6Qn6M+YBxSOcpBLpi5pSso5aMfV2BtmKDQ
-X-Gm-Gg: AYBFou1wP9mR6VWzADbrP6safHlOZ4iZl/5+bLE2Il5jOWwUYfsLOBoTLT57rqkoO0r
-	UHeo8ZdJUcag1NvTJDUlL1exI7rcbnQ86KdBXk0F6WPrKQxXSwRBpibVSTmRGdK0nQsLSAjSOJJ
-	iBPlfbzois8JlU8KzQQ3O+yePBcO8kmYUH7xlAeVaXjjmVg3FBaZd+CZeKjjKv338pJa66Q9UHF
-	zbexoxGPFtBGCBHJyTtiBBYgbNMPvmREkhOZsMLqK1erFW3mNcQt7hbtN5HsoqbZxltUGp4aDaS
-	9ab3AvhPcsvXbyzFMYjDW9VcI6fLDhD7GB6GI+KWQ0xXM2zpkg3LAZMIcCKtMe4qyiMtS9xyiFC
-	IhWvk8HA8PbBCQpu0TPgp6QA3J26Qo3AEYTRsJ3G1HG7aLeLjnWT/UXhxifrHI6LMJkf5JdTXI5
-	tyLKH/9IZLlUtPNpGAQUy0QOreHlmZQTbZYaPo5Lwc7uPgZAH3mqKJfVmHJvTSsCsFd7fOmeDj
-X-Received: by 2002:a17:90b:224e:b0:3a0:ace4:d2b4 with SMTP id 98e67ed59e1d1-3ab3a9f42aamr16804358a91.23.1792152600469;
-        Fri, 16 Oct 2026 05:10:00 -0700 (PDT)
+        bh=qX4T5VNEZDCvos4GslZo2eKv8+vc1OatU8zENizVPSM=;
+        b=FQ6AxVmPc2dHpb5Stm7SojG6mbighVco8cK0IEccLe1lGL4s0ZC93A0Yp5X4XuWPZ/
+         Q2wfAqf613c1lB43szdhUP0IlxeM+BwftWPw0mcZMykrkj4vARJrr04qd2YjoE3HQrcv
+         2CM18tmUc6aDrhSY/OF7Ok229QGZqCJPGrM53aQcJQf+/OorZkbBA8T7znSOcdCoheFy
+         hk8+fSSL91xpuQORMgYvSUc/hH3HxNGlp2K+RfLgppjSOYiukp9J1BmwmeMYY92XPlua
+         3ZU2h6qoum6EEU7qswx4LVo2XJbUZdMahi436tI6JSHrG7CSAn72LEmL5sMfcuf8lU4g
+         TxPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792152605; x=1792757405;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=qX4T5VNEZDCvos4GslZo2eKv8+vc1OatU8zENizVPSM=;
+        b=2nS9o2qZKlmmtbqHZFk+1f/Bht6fTGBhjLs9ElnLJH2DbaEhT6wAhcEzVggVhnnJrU
+         cxFBXbHhf7GGp3HQ1M2SsoX5r6vwxdrfjLQXJcE6UcNqO+GK9i4CwzdbsOMNU2G/dYP7
+         Cdco9KECHeFvtL3etszBGHY5IPymzwRZinvvmRVAK7gfM2Da4MLdk27nbT09P9Zowgdt
+         4edehrnOl+T81x7TVoMNympPJFHEWEIWwqpmHWHhxOE6openAd3XAgV3WaIPk5EeJs8Z
+         wqCQvT/ZqbcdUy5Ucw9/8gozQqqn26SHqzhF0AXeSRoAmtE0mX8J85O7OdrCyPYu/u44
+         XEPA==
+X-Forwarded-Encrypted: i=1; AKwUvBw1SrTcyFwxysLGB0XBRMUIt28NMSR9fjtsGv1VIPhwHDLJx4/OpG4RRM8lh3WAMuWXifhd0lWRiJ8Gdg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLcfUfsR0dk47Q83acn+gnLnIMeMMloBVT6vvoIIgKQX3I+hgh0
+	oF9MWa3uh2a1gBDuciWS7wryLD06ANEdQwgyiAVw7tPh1Z1kh4SHCcrU
+X-Gm-Gg: AYBFou1rZnu0NvHlbVnd7TrufYl6Q64kdCNSoW6Aj9Z0GbUkKCSNWX7K2Bv2y84lwGw
+	Haea5bM0nBALPRvrrNVJ1+nWvqikOmDkftRZDk0SjzNdFFL2h3we1r6KtvEzAm3z5mengXgtebd
+	MdT9/RZJaSMIVnVPRrmUstyCG8JQH40XEJwq3jf3921o1CDb5tUZO1DuhGcYP98g728KPJTKESi
+	J/jAeYy7pEEpYIm8MmIw5Kpqn1sWtXe4NHm8CtF9PD71Jk/7MmN+jeT2GUj2oxoxMIF0z7H54Mb
+	f9cxSNPRETIwk5pSzWsrjWBStkJSRDhu6FBdNrRNjOxHAlbGG+/UDiagzQ0nhIYcc+3l93NWCVh
+	RiTngAt2ZbpbqBO7sa0zoAhvxlOaegpPpC0dehYm6BRFbM7pAJJ4WuBVxZM/8cYEPkeYhXg/VKN
+	9vq6gSVrf7HeLpDY48d2VmPZtsoA2a67Bynmqg0FjsMEUa9Ca7fMKTuv0cccfWdVneV0GVMgDJV
+	yh0r+umjNc=
+X-Received: by 2002:a17:90a:2cc4:b0:3ac:36c7:c144 with SMTP id 98e67ed59e1d1-3acbb86e111mr1340061a91.28.1792152604741;
+        Fri, 16 Oct 2026 05:10:04 -0700 (PDT)
 Received: from hongfeng.mioffice.cn ([43.224.245.240])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3acc48f4cadsm3908912a91.12.2026.10.16.05.09.56
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3acc48f4cadsm3908912a91.12.2026.10.16.05.10.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Oct 2026 05:10:00 -0700 (PDT)
+        Fri, 16 Oct 2026 05:10:04 -0700 (PDT)
 From: Hongfeng Chen <chenhongfeng0212@gmail.com>
 X-Google-Original-From: Hongfeng Chen <hongfengchen@xiaomi.com>
 To: Andrew Morton <akpm@linux-foundation.org>,
@@ -73,10 +76,12 @@ Cc: linux-mm@kvack.org,
 	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	Hongfeng Chen <hongfengchen@xiaomi.com>
-Subject: [RFC PATCH v4 0/2] mm/zsmalloc: defer object free to per-cpu batches
-Date: Fri, 16 Oct 2026 20:09:25 +0800
-Message-ID: <20261016120927.3191690-1-hongfengchen@xiaomi.com>
+Subject: [RFC PATCH v4 1/2] mm/zsmalloc: defer object free to per-cpu batches and a drain worker
+Date: Fri, 16 Oct 2026 20:09:26 +0800
+Message-ID: <20261016120927.3191690-2-hongfengchen@xiaomi.com>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20261016120927.3191690-1-hongfengchen@xiaomi.com>
+References: <20261016120927.3191690-1-hongfengchen@xiaomi.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,190 +90,348 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Freeing swap entries is expensive when unmapping a VMA that holds many of
-them. `zap_pte_range()` eventually calls `zram_slot_free_notify()`, which
-frees one compressed object per page. As a result, the unmapping task
-has to pay for every `zs_free()` itself. On Android, this slows down the
-exit of a task killed to reclaim memory, precisely when that memory is
-needed.
+Unmapping a VMA full of swap entries makes the unmapping task free every
+compressed object itself, one zs_free() call per page. On Android this
+slows down the exit of a task killed to reclaim memory.
 
-Two earlier attempts by Lei and Zhiguo introduced a new thread in the MM
-core to asynchronously collect and free swap entries [1][2], which
-seems overcomplicated. Wenchao's RFC v3 [3] moved the deferral into
-zsmalloc, but introduced push/drain callbacks that zram and zswap had
-to implement, potentially violating software layer boundaries. This v4
-RFC defers freeing inside `zs_free()` itself, leaving callers unchanged.
+Instead of freeing the object right away, zs_free() appends its handle to
+a per-cpu batch of 64 handles. A full batch goes to an unbound drain worker
+through a lockless list, and the worker frees the objects. This batches the
+release and moves it off the unmapping path, and the change stays within
+zsmalloc.
 
-Patch 1 makes `zs_free()` append the handle to a per-CPU batch of 64
-handles instead of freeing it immediately. Once the batch is full, it
-is handed to an unbound drain worker through a lockless list, and the
-worker frees the objects. Releasing empty zspages is also deferred to
-the worker. If the per-CPU state cannot be allocated, `zs_free()` falls
-back to its original path.
+Freeing empty zspages is left to the worker too: it does that directly when
+it can take the page locks, and reuses kick_deferred_free() to free them
+asynchronously when it cannot.
 
-With the zsmalloc work moved off the unmapping path by patch 1,
-contention on atomic operations in zram statistics becomes significant.
-Patch 2 moves the contended counters to per-CPU storage.
+Failing to allocate the per-cpu state is not fatal: pool->defer stays NULL
+and zs_free() keeps its old path.
 
+Signed-off-by: Hongfeng Chen <hongfengchen@xiaomi.com>
+---
+ mm/zsmalloc.c | 182 ++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 154 insertions(+), 28 deletions(-)
 
-Using the following microbenchmark:
-
-// SPDX-License-Identifier: GPL-2.0
-/* Times munmap() on a region pushed out to zram: MB. */
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <time.h>
-#include <unistd.h>
-
-#ifndef MADV_PAGEOUT
-#define MADV_PAGEOUT 21
-#endif
-
-static void die(const char *what)
-{
-	perror(what);
-	exit(1);
-}
-
-static double now_ms(void)
-{
-	struct timespec ts;
-
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	return ts.tv_sec * 1e3 + ts.tv_nsec / 1e6;
-}
-
-/* About 2.8:1 under lzo-rle, objects in 16 size classes. */
-static void fill_data(char *p, size_t bytes)
-{
-	size_t i, k, n;
-
-	memset(p, 0, bytes);
-	for (i = 0; i < bytes; i += 4096) {
-		long *q = (long *)(p + i);
-
-		n = 106 + i / 4096 % 16 * 8;
-		for (k = 0; k < n; k++)
-			q[k] = k * 8 * 2654435761UL;
-	}
-}
-
-static char *prepare(size_t bytes)
-{
-	char *p = mmap(NULL, bytes, PROT_READ | PROT_WRITE,
-		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-
-	if (p == MAP_FAILED)
-		die("mmap");
-	fill_data(p, bytes);
-	if (madvise(p, bytes, MADV_PAGEOUT))
-		die("madvise");
-	return p;
-}
-
-int main(int argc, char **argv)
-{
-	size_t bytes = (argc > 1 ? strtoul(argv[1], NULL, 10) : 256) << 20;
-	char *p = prepare(bytes);
-	double t0, t1;
-
-	raise(SIGSTOP);	/* ready */
-	t0 = now_ms();
-	munmap(p, bytes);
-	t1 = now_ms();
-	printf("%.6f %.6f\n", t0, t1);
-	return 0;
-}
-
-Performance results:
-
-ROCK 5B+ (RK3588: 4x Cortex-A55 at 1.8GHz, 4x Cortex-A76 at 2.4GHz,
-performance governor), single process munmap on A55:
-
-  times in ms, speedups over base
-              Base       Patch1       Patch1+2
-  size        time    time speedup   time speedup
-  64MB       13.81    3.62   3.81x   3.28   4.21x
-  128MB      28.50    7.18   3.97x   6.49   4.39x
-  192MB      42.19   10.71   3.94x   9.69   4.36x
-  256MB      56.06   14.26   3.93x   12.89  4.35x
-  512MB     109.50   28.43   3.85x   25.66  4.27x
-  1024MB    217.10   56.70   3.83x   51.15  4.24x
-
-Same machine, single process munmap on A76:
-
-  times in ms, speedups over base
-              Base       Patch1        Patch1+2
-  size        time    time speedup    time speedup
-  64MB        5.59    1.58   3.54x    1.49   3.76x
-  128MB      11.86    3.16   3.75x    2.95   4.02x
-  192MB      17.18    4.72   3.64x    4.45   3.86x
-  256MB      22.89    6.29   3.64x    5.87   3.90x
-  512MB      45.15   12.52   3.61x   11.64   3.88x
-  1024MB     89.16   24.75   3.60x   23.12   3.86x
-
-x86 (Intel Core i7-14700HX, P-cores locked at 2.1GHz with turbo off),
-single process munmap:
-
-  times in ms, speedups over base
-              Base       Patch1         Patch1+2
-  size        time    time speedup    time speedup
-  64MB        2.87    1.50   1.92x    1.14   2.53x
-  128MB       6.00    2.93   2.05x    2.21   2.71x
-  192MB       9.33    4.35   2.15x    3.33   2.80x
-  256MB      12.51    5.78   2.17x    4.38   2.85x
-  512MB      24.96   11.39   2.19x    8.62   2.90x
-  1024MB     50.19   22.78   2.20x   17.05   2.94x
-
-1-4 process munmap of 256MB each:
-
-  times in ms, speedups over base
-              Base       Patch1        Patch1+2
-  mode        time    time speedup   time speedup
-  1p         13.18    5.78   2.28x   4.35   3.03x
-  2p         25.83   14.41   1.79x   4.57   5.65x
-  3p         35.70   22.14   1.61x   4.68   7.63x
-  4p         44.25   28.71   1.54x   4.75   9.31x
-
-[1] https://lore.kernel.org/all/20240805153639.1057-1-justinjiang@vivo.com/
-[2] https://lore.kernel.org/all/20250909065349.574894-1-liulei.rjpt@vivo.com/
-[3] https://lore.kernel.org/linux-mm/20260508060724.3810904-1-haowenchao@xiaomi.com/
-
-Changes since v3:
-- Defer inside zs_free() only and drop the push/drain callbacks, so zram
-  and zswap do not change. Yosry and Nhat objected to the layering in v3;
-  Nhat also pointed out that v3 leaves torn-down entries on the zswap LRU.
-- Buffer handles in per-cpu batches of 64 allocated on demand, instead of
-  per-cpu pages rotated through a preallocated pool.
-- New patch 2: keep the hot zram statistics per cpu.
-- Link to v3: https://lore.kernel.org/linux-mm/20260508060724.3810904-1-haowenchao@xiaomi.com/
-
-Changes since v2:
-- Use per-cpu single-page buffers instead of a global list; the hot path
-  only writes into the local CPU's buffer with preemption disabled
-- Add a page pool for buffer rotation: when the current buffer is full,
-  swap it with a free page from the pool and queue the full page for drain
-- Introduce push/drain callback ops so that zram and zswap can each define
-  their own element size and drain logic (zram stores u32 slot indices,
-  zswap stores unsigned long handles)
-- Drop the lock optimization patches it will be submitted separately as
-  part of a dedicated zsmalloc lock contention series
-- Link to v2: https://lore.kernel.org/all/20260421121616.3298845-1-haowenchao@xiaomi.com/
-
-Hongfeng Chen (2):
-  mm/zsmalloc: defer object free to per-cpu batches and a drain worker
-  zram: keep the hot statistics per cpu
-
- drivers/block/zram/zram_drv.c | 171 +++++++++++++++++++++++++++-----
- drivers/block/zram/zram_drv.h |  16 ++-
- mm/zsmalloc.c                 | 182 ++++++++++++++++++++++++++++------
- 3 files changed, 309 insertions(+), 60 deletions(-)
-
-
-base-commit: f4e9810097537d862c128935c36216bcf0c31cb2
+diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
+index 7ef80e0da626..eacd771bd542 100644
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -43,6 +43,7 @@
+ #include <linux/zsmalloc.h>
+ #include <linux/fs.h>
+ #include <linux/workqueue.h>
++#include <linux/llist.h>
+ #include "zpdesc.h"
+ 
+ #define ZSPAGE_MAGIC	0x58
+@@ -267,6 +268,21 @@ struct link_free {
+ static struct kmem_cache *handle_cachep;
+ static struct kmem_cache *zspage_cachep;
+ 
++#define ZS_DEFER_BATCH	64
++
++struct zs_defer_batch {
++	struct llist_node node;
++	unsigned int count;
++	unsigned long handles[ZS_DEFER_BATCH];
++};
++
++struct zs_defer_percpu {
++	struct zs_defer_batch *active;
++	struct llist_head pending;
++	struct work_struct drain_work;
++	struct zs_pool *pool;
++};
++
+ struct zs_pool {
+ 	const char *name;
+ 
+@@ -282,12 +298,12 @@ struct zs_pool {
+ #ifdef CONFIG_ZSMALLOC_STAT
+ 	struct dentry *stat_dentry;
+ #endif
+-#ifdef CONFIG_COMPACTION
+ 	struct work_struct free_work;
+-#endif
+ 	/* protect zspage migration/compaction */
+ 	rwlock_t lock;
+ 	atomic_t compaction_in_progress;
++
++	struct zs_defer_percpu __percpu *defer;
+ };
+ 
+ static inline void zpdesc_inc_zone_page_state(struct zpdesc *zpdesc)
+@@ -428,13 +444,11 @@ static bool ZsHugePage(struct zspage *zspage)
+ 	return zspage->huge;
+ }
+ 
+-#ifdef CONFIG_COMPACTION
+ static void kick_deferred_free(struct zs_pool *pool);
+ static void init_deferred_free(struct zs_pool *pool);
++#ifdef CONFIG_COMPACTION
+ static void SetZsPageMovable(struct zs_pool *pool, struct zspage *zspage);
+ #else
+-static void kick_deferred_free(struct zs_pool *pool) {}
+-static void init_deferred_free(struct zs_pool *pool) {}
+ static void SetZsPageMovable(struct zs_pool *pool, struct zspage *zspage) {}
+ #endif
+ 
+@@ -684,7 +698,6 @@ static inline void zs_pool_stat_destroy(struct zs_pool *pool)
+ }
+ #endif
+ 
+-
+ /*
+  * For each size class, zspages are divided into different groups
+  * depending on their usage ratio. This function returns fullness
+@@ -1293,7 +1306,6 @@ static unsigned long obj_malloc(struct zs_pool *pool,
+ 	return obj;
+ }
+ 
+-
+ /**
+  * zs_malloc - Allocate block of given size from pool.
+  * @pool: pool to allocate from
+@@ -1371,7 +1383,6 @@ static void obj_free(int class_size, unsigned long obj)
+ 	unsigned int f_objidx;
+ 	void *vaddr;
+ 
+-
+ 	obj_to_location(obj, &f_zpdesc, &f_objidx);
+ 	f_offset = offset_in_page(class_size * f_objidx);
+ 	zspage = get_zspage(f_zpdesc);
+@@ -1447,7 +1458,7 @@ static inline void obj_class_get_and_lock(struct zs_pool *pool, unsigned long ha
+ }
+ #endif
+ 
+-void zs_free(struct zs_pool *pool, unsigned long handle)
++static void __zs_free_one(struct zs_pool *pool, unsigned long handle)
+ {
+ 	struct zspage *zspage;
+ 	unsigned long obj;
+@@ -1455,9 +1466,6 @@ void zs_free(struct zs_pool *pool, unsigned long handle)
+ 	int fullness;
+ 	struct zspage *zspage_to_free = NULL;
+ 
+-	if (IS_ERR_OR_NULL((void *)handle))
+-		return;
+-
+ 	obj_class_get_and_lock(pool, handle, &obj, &zspage, &class);
+ 
+ 	class_stat_sub(class, ZS_OBJS_INUSE, 1);
+@@ -1483,6 +1491,78 @@ void zs_free(struct zs_pool *pool, unsigned long handle)
+ 	}
+ 	cache_free_handle(handle);
+ }
++
++static void zs_defer_drain(struct zs_defer_percpu *defer)
++{
++	struct zs_pool *pool = defer->pool;
++	struct zs_defer_batch *batch, *n;
++	struct llist_node *first;
++
++	first = llist_del_all(&defer->pending);
++	llist_for_each_entry_safe(batch, n, first, node) {
++		unsigned int i;
++
++		for (i = 0; i < batch->count; i++)
++			__zs_free_one(pool, batch->handles[i]);
++		kfree(batch);
++		cond_resched();
++	}
++}
++
++static void zs_defer_drain_work(struct work_struct *work)
++{
++	zs_defer_drain(container_of(work, struct zs_defer_percpu, drain_work));
++}
++
++static bool zs_defer_push(struct zs_pool *pool, unsigned long handle)
++{
++	struct zs_defer_batch *new_batch = NULL, *batch;
++	struct zs_defer_percpu *defer;
++	bool queue = false;
++
++	if (!pool->defer)
++		return false;
++
++	defer = get_cpu_ptr(pool->defer);
++	if (!defer->active) {
++		put_cpu_ptr(pool->defer);
++		new_batch = kmalloc_obj(*new_batch, GFP_NOWAIT | __GFP_NOWARN);
++		if (!new_batch)
++			return false;
++		new_batch->count = 0;
++
++		defer = get_cpu_ptr(pool->defer);
++		if (!defer->active) {
++			defer->active = new_batch;
++			new_batch = NULL;
++		}
++	}
++
++	batch = defer->active;
++	batch->handles[batch->count++] = handle;
++	if (batch->count == ZS_DEFER_BATCH) {
++		llist_add(&batch->node, &defer->pending);
++		defer->active = NULL;
++		queue = true;
++	}
++	put_cpu_ptr(pool->defer);
++
++	if (unlikely(new_batch))
++		kfree(new_batch);
++
++	if (queue)
++		queue_work(system_dfl_wq, &defer->drain_work);
++	return true;
++}
++
++void zs_free(struct zs_pool *pool, unsigned long handle)
++{
++	if (IS_ERR_OR_NULL((void *)handle))
++		return;
++
++	if (!zs_defer_push(pool, handle))
++		__zs_free_one(pool, handle);
++}
+ EXPORT_SYMBOL_GPL(zs_free);
+ 
+ static void zs_object_copy(struct size_class *class, unsigned long dst,
+@@ -1671,7 +1751,6 @@ static int putback_zspage(struct size_class *class, struct zspage *zspage)
+ 	return fullness;
+ }
+ 
+-#ifdef CONFIG_COMPACTION
+ /*
+  * To prevent zspage destroy during migration, zspage freeing should
+  * hold locks of all pages in the zspage.
+@@ -1714,6 +1793,8 @@ static void lock_zspage(struct zspage *zspage)
+ 	zspage_read_unlock(zspage);
+ }
+ 
++#ifdef CONFIG_COMPACTION
++
+ static void replace_sub_page(struct size_class *class, struct zspage *zspage,
+ 				struct zpdesc *newzpdesc, struct zpdesc *oldzpdesc)
+ {
+@@ -1866,6 +1947,18 @@ const struct movable_operations zsmalloc_mops = {
+ 	.putback_page = zs_page_putback,
+ };
+ 
++static void SetZsPageMovable(struct zs_pool *pool, struct zspage *zspage)
++{
++	struct zpdesc *zpdesc = get_first_zpdesc(zspage);
++
++	do {
++		WARN_ON(!zpdesc_trylock(zpdesc));
++		__zpdesc_set_movable(zpdesc);
++		zpdesc_unlock(zpdesc);
++	} while ((zpdesc = get_next_zpdesc(zpdesc)) != NULL);
++}
++#endif /* CONFIG_COMPACTION */
++
+ /*
+  * Caller should hold page_lock of all pages in the zspage
+  * In here, we cannot use zspage meta data.
+@@ -1904,7 +1997,7 @@ static void async_free_zspage(struct work_struct *work)
+ 
+ static void kick_deferred_free(struct zs_pool *pool)
+ {
+-	schedule_work(&pool->free_work);
++	queue_work(system_dfl_wq, &pool->free_work);
+ }
+ 
+ static void zs_flush_migration(struct zs_pool *pool)
+@@ -1917,20 +2010,6 @@ static void init_deferred_free(struct zs_pool *pool)
+ 	INIT_WORK(&pool->free_work, async_free_zspage);
+ }
+ 
+-static void SetZsPageMovable(struct zs_pool *pool, struct zspage *zspage)
+-{
+-	struct zpdesc *zpdesc = get_first_zpdesc(zspage);
+-
+-	do {
+-		WARN_ON(!zpdesc_trylock(zpdesc));
+-		__zpdesc_set_movable(zpdesc);
+-		zpdesc_unlock(zpdesc);
+-	} while ((zpdesc = get_next_zpdesc(zpdesc)) != NULL);
+-}
+-#else
+-static inline void zs_flush_migration(struct zs_pool *pool) { }
+-#endif
+-
+ /*
+  *
+  * Based on the number of unused allocated objects calculate
+@@ -2127,6 +2206,48 @@ static int calculate_zspage_chain_size(int class_size)
+ 	return chain_size;
+ }
+ 
++static void zs_defer_destroy(struct zs_pool *pool)
++{
++	struct zs_defer_percpu __percpu *defer_pcp = pool->defer;
++	int cpu;
++
++	if (!defer_pcp)
++		return;
++
++	pool->defer = NULL;
++	for_each_possible_cpu(cpu) {
++		struct zs_defer_percpu *defer = per_cpu_ptr(defer_pcp, cpu);
++
++		cancel_work_sync(&defer->drain_work);
++		if (defer->active) {
++			llist_add(&defer->active->node, &defer->pending);
++			defer->active = NULL;
++		}
++		zs_defer_drain(defer);
++	}
++	free_percpu(defer_pcp);
++}
++
++static int zs_defer_init(struct zs_pool *pool)
++{
++	int cpu;
++
++	pool->defer = alloc_percpu(struct zs_defer_percpu);
++	if (!pool->defer)
++		return -ENOMEM;
++
++	for_each_possible_cpu(cpu) {
++		struct zs_defer_percpu *defer = per_cpu_ptr(pool->defer, cpu);
++
++		defer->active = NULL;
++		init_llist_head(&defer->pending);
++		defer->pool = pool;
++		INIT_WORK(&defer->drain_work, zs_defer_drain_work);
++	}
++
++	return 0;
++}
++
+ /**
+  * zs_create_pool - Creates an allocation pool to work from.
+  * @name: pool name to be created
+@@ -2151,6 +2272,10 @@ struct zs_pool *zs_create_pool(const char *name)
+ 	rwlock_init(&pool->lock);
+ 	atomic_set(&pool->compaction_in_progress, 0);
+ 
++	if (zs_defer_init(pool))
++		pr_info("deferred free unavailable for <%s>, freeing synchronously\n",
++			name);
++
+ 	pool->name = kstrdup(name, GFP_KERNEL);
+ 	if (!pool->name)
+ 		goto err;
+@@ -2253,6 +2378,7 @@ void zs_destroy_pool(struct zs_pool *pool)
+ 	int i;
+ 
+ 	zs_unregister_shrinker(pool);
++	zs_defer_destroy(pool);
+ 	zs_flush_migration(pool);
+ 	zs_pool_stat_destroy(pool);
+ 
 -- 
 2.54.0
 
