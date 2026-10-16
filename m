@@ -1,99 +1,117 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81ADE453A29
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 09:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29B24611E1
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 09:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792142441; cv=none; b=cQ1Pz4YS8cUwFRQGQd5MlwzJLZaTuXXJFlwQ+4Z1l5iLA9lIw/WdAYKeZixXB6nOFunciBXkyTMOlHYZcxrc0dxHN9+J1dMXwfeRSecjcllv+8cmV/S8WRYUa0wJBz2Eo379vRwNE20LKkpPnFAbZ4p1oCAJnv7dMOT+zs87reE=
+	t=1792142563; cv=none; b=iZ6V8bPB6BLGTCcpAm0hj8mXwrRPifU0I/FyZOfYDvc1Z2wOCJwg9dRdobd4cR6MPYkum6lO/H+MOMsLXKSG/HcQpnJsj/eHTQlsqaeSna4v+MTCmRfUjZ+BVBqcHGz4RMRPFh+l6yPbYES5pdhkelBlaknZ+sBO461RLRellfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792142441; c=relaxed/simple;
-	bh=9BdK+VeJvwsYM0Dk5L2ZSmQqrG4kh/m0+1A9f9hZy0o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OGXrJ4xKp+4P22NjGdyybD1SqLBh3HCX7ChC4T/qNmxTr7Wn9Q4ottACZqtMcf7XwiBvOtLjp+nflszA5SGaQ8Gn2QDQuMuyBMr73xcDlNn7Flm5aD96FaLWfXKifNLPjEDGkdqzDNgbT0JCT4wYRH2DJ057VOdvZwhEkhf/cc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cfp0mvG1; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1792142563; c=relaxed/simple;
+	bh=d+e6TUVdQg81gqZTNATl7FmVG9hllqTqWRa0eEaNMFg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bbB3PfC/m0fnLyxkVN/GnWO6LXxkSAUQ/nuTERR5G2cotjrjuSue/19zLrnwG2zGtYoEKB1Av2NDOGB/xPNek31cCqGVGUqo/IowGKUthV0lsnH2ISmghddOp2Fkf3MXCcw5g6FmHfnHui9VkafNqJ5pwkNXHZdTLjWDdhLYmuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j5AQXmNm; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cfp0mvG1"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4980fe6b3beso4848635e9.0
-        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 02:20:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j5AQXmNm"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a018792ab3so49002315e9.0
+        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 02:22:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792142439; x=1792747239; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=6BKgekFMvHD5DsVjwR+Gu2dMSmztQt4quCu9nPLUhKY=;
-        b=cfp0mvG1gf27ByQcrZcLrpzvujTDPekK5VK59l57ACALhoRXn/9ImlTqFmlsME8Csy
-         3bjS8QWdLK+bIW9dPY2owXNggsyNyBjDIZ8JGzUyEMQtIbVW7q5vyshrfDhx9ECpd98q
-         z/OIK3rdWiPJzxJMGVoYvOwPhvIDLfUzPiWneIXFetcOH5nRtozCTimIQ2pKC+PzBk1b
-         GJ/5ZQQjx0wmQsJF89YHkW150PZJTXlemeUiNJRMrrdlkyzdN2NpxBX7OaXfCouEJl0X
-         MoeLdXbBU2QF9FBb2cYEBPqkLengOi4ucCqUF/UKUlG0dUqEJy8GczvtbjTsJ+J1D3+N
-         EYdg==
+        d=gmail.com; s=20251104; t=1792142560; x=1792747360; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=5WdYVBznDcS74hZppO2I4uFcTaGORYJKgYLdvIcwqig=;
+        b=j5AQXmNmRcERv2x0CfU95ICqly+8K0o76DtHH6l0dyqaowhdi4KCrjEfoeZj6r6DIv
+         or0a07vPXDSPhTH64An55yaRY3nMPsauF5iFXIOEFAEuJHkGCVsV5OVHnvRPreOv6dhq
+         lrt5GvvklsDDuKFIZtiKYsuZE0X6/tDHA4Z3IdNztbOgb3RPG4S2XJBKjHQ3zJ6bP8HM
+         biDhT1kSlwQ4Df/h4y2Lj1sXESQz/WSIYXEpBfUWvDFxTQKkzn0S+YJfc8Wpn1qcz0zd
+         SlXwzqE1Yr0pXinPhh1IJC3rRjPq1tBrTE+c+zk74j8ROevv6VI/whDpnFb3enwNGyyK
+         nbYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792142439; x=1792747239;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20260707; t=1792142560; x=1792747360;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=6BKgekFMvHD5DsVjwR+Gu2dMSmztQt4quCu9nPLUhKY=;
-        b=qjYGkIJU+FU2fGmeQ4/+nhz7jxxARGLAp7wkJMi0gR9RHsT88WuShJ6KVpG37zlTRd
-         4WcGkKbUmONS3PGx8nUxIx+2Xu9ayZm6ESTDP+q86xVDqDJVyV+dHWIcBjsbUXav3XfB
-         vbZCshkc46LzXog0o9XPgy85oF7Qd6ZnEJeavpt43+j+1D2R1dAkFhDNKEFbVgTewrpl
-         jCDprsf03y+Brk/yi/ATx1pz/e+lzyjbT/4jHuyzwy+MJ0k8esWTATiRF0aT/X7U2DtT
-         2YN+HDYx8pQsYplhziXUbLppB5RoW8rUcfoYADpvyaqIM+/KoeYa99WBL2qN9FjzqJsC
-         Jg3w==
-X-Gm-Message-State: AFq9FYK+ESI+87a+LIZriXzILdzJKEIl0Dix3aaK2gB3bom28u7ZhhHO
-	9T0sGFThPP2M+FGvlLnjHithir4T7PUihABVgv7PgMwqSz/Um4CdFvzERRvz2g==
-X-Gm-Gg: AYBFou3D2f4MI39v5NtiMrgc39aHr/0riu0AXrQJApgTIoz1JEe0C7FqKMwLCzcuT93
-	BdmsrsyUNZGyF67Pun+i/jSQ+m1aVsOupSaY1DAEByrz+G1DytUYCIa9GN1Lpk0buQdGaahIZz6
-	9wnm/7QNK9M9ziy2GZkhkH8qN+jekQzwkuOEr1cBcgjhKX33OGY5/IGK+j+mIjj5uEbpGxiWgiU
-	mjwMBgDIQtjAi4og3iqnnl1JR8lvHQXEbAIOqCuBdsLnoX67Y0utXPW4ReBlVDNtjrocZ/Zo65v
-	Q0RRSO495xA30xDoH/jCPdVpQKPsLMoYIqRklOrWduTah9mY4AqUCFofak0uqbpCaujF8Or8Ty1
-	dcC/ywAL07mdornwA9G93Nrpo5ZlkEX/pzZQA9NzX5L6KbeBCmDTuYgv/cQn8n+ydjGM+eR60bb
-	HfYW6ATfrfEwu7y+UEGk8JFH+dnyoctITh6G1w30l+4rqJAa7izTN8224SgFoDmEfg4i0txtYLf
-	SvPHG3am663W/WPH4pE9zXxVz1i0UnN/zLleQio5ebymKYaFUWkMmuuNsEsux5SxWUouMi56Rb3
-	bQ==
-X-Received: by 2002:a05:600c:1f86:b0:4a1:c27d:e1a8 with SMTP id 5b1f17b1804b1-4a1c6672f2emr51826055e9.10.1792142438508;
-        Fri, 16 Oct 2026 02:20:38 -0700 (PDT)
-Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bd9b8b5fsm147408865e9.9.2026.10.16.02.20.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Oct 2026 02:20:37 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: asml.silence@gmail.com,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] block: fix indention for dma-buf checks
-Date: Fri, 16 Oct 2026 10:20:29 +0100
-Message-ID: <de91f480f8507d44ddf99c193ef63dec0f02c749.1792142187.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        bh=5WdYVBznDcS74hZppO2I4uFcTaGORYJKgYLdvIcwqig=;
+        b=0aro0Yosd96jJcowKt0kXPZe7PGZM8IyfaobxKshsnxa2UZHfrkc824HONrB6lUG02
+         HxnJorKlqzghyo84Z9GkCyY5SkivmpB2Uwjf+LibRVpWEgRJ31WVWrAGDJgOB666s8Hl
+         2eKP0ryf7QGAyNbMFjAKXPOlDX4qGAsBQkSdM/Z+kX5pRJ3FkFiOB84gUccL5pdios8N
+         yYxe56kyz0UTrWO1O8gQsFgfABcoGtuhk9NHVMq5SuI7ixBdWB4oR8wfFsQQunyrALgr
+         gCjQW0ymqaGbsQBhBKpFguNtIy9mknHXgeFZWI1RU73NKLS9KEiKZzUgj0BCHcsxHDD+
+         bK8Q==
+X-Gm-Message-State: AFq9FYIpq0Uih5S8zuESUC7XFWMcZoAmPyqi0b0AeL2o4TqIvLU0+Yxq
+	wuf4494asTh3KhPqfe+YyVQm28Ew2x7XA97SN/fYmVgiP0UYiXRuaTEsHQntZA==
+X-Gm-Gg: AYBFou3f2LsYQbtTCF89OxviW6MjsmZ5K0O9rZg5WnB72cwSoq7Un+2Y6O+dUNYhtDY
+	FlPxNE+NhBnk1msjUpHi6iOXiMdT2KqlOFDsAhE8adFtWa+7YWTiMDX3QjTR1BYMj3Lh2OMTRWX
+	btO20Sx4rx4PJ9f4UmQfugZVun5GpKXUw+JzoUHmlPI4r+xdrPhzTsPUS3iUlrWqIRdHEtI+gwD
+	H5mZBzJarjvi5iLRfBz1HFH5ngagVbM0UnMvHJDy2H1qMHdmb8qcc9mlJDTTlkWLb1d2nm8tr2j
+	nJRryeYLQHDKrhwdiBC/phI/m+9CSUrWhNDgBWCvRaSkfL+TtlOOPtFe6yCVsuJErLHEg7PYw/l
+	jFmLFdOR7hnQJ+h/GdD5vLGCI5ry2vtDojveUQvT9vQQtJbjjqLzn1t32GSxFAKfxPI3owrj/UW
+	MqOUL2GhQHo3M0y/oSVGwcOQslfh6c0ko8qiaJPO7WmLemhDAEYr7+btFH9ta9LPE66crl9rU3J
+	3WPd0psL7LOu3Vt69pRSkYCNvJNpxZTx5kabbmy0CZDwwM6Isj8WZabeI+Hycfb+u4gMwxklWgT
+	0NurgC5Qzqib/BSkoP1DhzmYSq67TrtZySsDRev3T7nkfrgf
+X-Received: by 2002:a05:600d:1b:b0:4a1:9661:14b7 with SMTP id 5b1f17b1804b1-4a196611b9amr320901815e9.32.1792142559985;
+        Fri, 16 Oct 2026 02:22:39 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bdc036a4sm160111735e9.11.2026.10.16.02.22.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Oct 2026 02:22:39 -0700 (PDT)
+Message-ID: <be2b6881-75bd-4113-bfcf-c3ac9ed2b80c@gmail.com>
+Date: Fri, 16 Oct 2026 10:22:37 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: fix indention for dma-buf checks
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+References: <de91f480f8507d44ddf99c193ef63dec0f02c749.1792142187.git.asml.silence@gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <de91f480f8507d44ddf99c193ef63dec0f02c749.1792142187.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-There is a weird indention I botched while rebasing, fix it.
+On 10/16/26 10:20, Pavel Begunkov wrote:
+> There is a weird indention I botched while rebasing, fix it.
+> 
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Can be squashed into the following commit, if that's preferred.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1b7f8cbbda8b..726de869a86f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3151,7 +3151,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 	}
- 
- 	if (unlikely(op_is_dmabuf(bio->bi_opf) &&
--		bdev_has_integrity_csum(bio->bi_bdev))) {
-+		     bdev_has_integrity_csum(bio->bi_bdev))) {
- 		bio_endio_status(bio, BLK_STS_NOTSUPP);
- 		goto queue_exit;
- 	}
+commit d88e44f43e939e6ac0ca8302c6f3c957b33aa5fe
+Author: Pavel Begunkov <asml.silence@gmail.com>
+Date:   Wed Oct 14 12:02:02 2026 +0100
+
+     block: introduce dma map backed bio type
+
+
+> ---
+>   block/blk-mq.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 1b7f8cbbda8b..726de869a86f 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3151,7 +3151,7 @@ void blk_mq_submit_bio(struct bio *bio)
+>   	}
+>   
+>   	if (unlikely(op_is_dmabuf(bio->bi_opf) &&
+> -		bdev_has_integrity_csum(bio->bi_bdev))) {
+> +		     bdev_has_integrity_csum(bio->bi_bdev))) {
+>   		bio_endio_status(bio, BLK_STS_NOTSUPP);
+>   		goto queue_exit;
+>   	}
+
 -- 
-2.54.0
+Pavel Begunkov
 
