@@ -1,59 +1,81 @@
-Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021093.outbound.protection.outlook.com [52.101.95.93])
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FEE231842;
-	Fri, 16 Oct 2026 05:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B5B3D3CF2
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 07:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792128133; cv=fail; b=W0d+52LCV7huPsvIxwgHIpbugh34N95rfbEsoX7x4xNzWmpWrGT2onpkxJrsH6ZUFGJYnWcOu2GSbGMF6YCCt/P8W/MasZ3xI6V8RJeREx4hnDh5e+6xRBYCYWttDJ6fxM2s0KYOCXODXJgTH3usJEdl1simd7qnqKoiyAJfFeo=
+	t=1792135870; cv=fail; b=Pwnydmzqvu3XbVEb96WsNGwaavGiTQ9TFBmhUmnOlSRJ51SZi60QKe9n3Or7KQctIhtPonas5AlfvwTimsharcT0pvG1ZiDbTCmIVxrIyXkgAkK93b3ZT2wraaKNK3leZsAL4cNVmmWxod0DHOgD6Q2kYT5czDU7RuOo3oIorbk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792128133; c=relaxed/simple;
-	bh=3P0bdV1ChZu3cbghzWNr8WuKxquRYC6y4h38BYKFHsg=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NbmxlgI4Hh+BFFLzi4hxqDEEZ0ATouQAENfsLi24AAlIObt6w6UoKzeoT99YaLRPTltgZSI5iuJ0TlEr5VGPauLPHxf1zEqUgTcK2rqrG2vq/B6FOgPI1md+1rc15+k0VxPIKFHgzUH44tG+VC80SK7tmDdR6D1W3XISP/uews4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.95.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+	s=arc-20240116; t=1792135870; c=relaxed/simple;
+	bh=8Rh4wXdudcB/QYRQclGpQFDgfE60tBFovN7uDCifbIc=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=RGgOdqnhfJIvKtRqpOcyN+z8Tvl7OaN7H7ScAekQ3fEOUx14HrDTSl35yDilgII9ofk6lwPQGON3NcHv4g4bB3x2PIehD1Ot9ryjFgUXoayygWG4k0OQyR81ZRAbTm1+8LxKXEbKtkSRwvxTDc6pwfkiF/R6JXUSdFgVJgM3zZE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=gAX8qk/Q; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=Wh/TViGZ; arc=fail smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gAX8qk/Q";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Wh/TViGZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1792135869; x=1823671869;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=8Rh4wXdudcB/QYRQclGpQFDgfE60tBFovN7uDCifbIc=;
+  b=gAX8qk/QQz0IbpcbKCXYnzbXAaj22509iqwNpgoLV1nESAe6mDz7S8/z
+   cYI6pPST5Oq4TWCtX5MH+A92aFCMlq/SbI7OzOMP6XTNTH9ivwHlbeWfR
+   L03ph8tMWEQpF1Ac5tRahQSuJNsN16IX8J1sbXU4wAixHY5yQ3NRGNLfn
+   vYUMNwDTiFWJUZgkPdpwwVtPUugcTwSOhafT/tMn1Tyf80QEvjPUqsZZQ
+   hBmJUMwXDn/pKjEfbsatm7zi0R4hEClfTSrZ8ghRXPl0tOMUWcuO+uijO
+   zzVEeYpsjm/9ZD40lCUUljxuIuA3Nsij5cUsRHEwkTw9kRo7Fh6GAHSdN
+   A==;
+X-CSE-ConnectionGUID: ociCp/hATHu+uWAB1dqddw==
+X-CSE-MsgGUID: FBenuKg6TPeM26A6BTmN/w==
+X-IronPort-AV: E=Sophos;i="6.27,161,1786982400"; 
+   d="scan'208";a="157288423"
+Received: from mail-westus3azon11011013.outbound.protection.outlook.com (HELO PH0PR06CU001.outbound.protection.outlook.com) ([40.107.208.13])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Oct 2026 15:31:03 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pXoCFZQkONubayyGtiz85jSub0ML38MARGp6ANS+pDDRtY9X6omAvFMXWLZwSYIqVr6jZChXBD0MTv//DMM5HSQMMs0e/rP94uK7Ax+Ir4nLPKwimtSSnfyMYvWaK2O8+h/mnM0t4EwAq55CnHf+5QjOeXRcRywg20FkamfOVht+YphTIdkkrkJWyct9cIFnpAcmKN6EeIhHuDYRC4qZDEGK+0rAOXxmnhWLqNFvZXw94jrPsFRJZwOlr1ou4CjxqaJL9veAKm37VjSx4Sr86c15WLe1hUJlljMgIjUqfpwX4zHeGSWRPHa/6gdvSuwMkn6UBa2agOSQ/UGxjvrKPQ==
+ b=f4845gsSXEP/No3oQKcN83KYiQWzaJ6Zs3BnHCzSY2wlgXC6Y5t+RqRukOCmk0Ava+AiwhUVOCa8AjqulHDemODvQUWKSyu/XyqqEnYSZ01HavNGrqUeQBV6psI/RawyRI8jsLMl0sNfb01y3t8J/XmfQWmXreJo0w8yr5He6tMB9XgGe15VulHLWetfl9w3ZsmnIK7A+r4gYT6/+AAhb0wyy3UR1x+7A0p2sGZeXzXsyFaVhN9z1NQkgHqplcMYgHXLoCGGSTDOTcwKQVbQXBMl4bkEXDJSN2/xCe7ufbLda8Q8g/gdR5O+yNwKSesV+I0880Z70bYBQMWwuTo58w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=i5XJPVHXQC5TRaKVj1mb+Ti+YsDitD6nePEV1Rk4cmY=;
- b=qPnpnPQ3Xk5U34paliLsEhhPSbNv1MzM2ZHNXmhWByDHh8A8BNG7zq3kCDblK0Vvb+C8QAOPVrmPrKcZN1qmFWln4LtQBoLud+SuYo8UJ7FmvHCmJyCvpQNBeX/T4l7A27E7auAZeiUZ6OWw/DnnmC3iaZWDF4BPCp9fSJN9xagpl9d2hwK39T2j4lmcA6hBKq+SYGuRgmS+xj42P9T3qyQXnLsr7TeOjZ4G4PRv2xXwTaaD9YTaYqEaktU6DHWC10Gx61mJPT9pMdhowis51pt0oV5siZO9FDcO6knZLztHzGefAtZ9QsH7jT1uiHkmn6vcguQ1y9CCsED0io0VkA==
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ksnnMRJ/CUqqi9I7m/r616NsOnltjpOxhh64WKJxJqQ=;
+ b=ZehmHFSA+nhA17v4HXcpbn8bv0XO6G3xX+w1RXv6p5BTqvDwBnRmRwQkLzfonljQBLnS7ZgV4WWoL+r5uCiXwT+jxv/6zKlRldTtyo+1XYVGrkjouw7pN6vGmohtKtno1dsXm3w5L3cx9l6ZEEqX5MzKU0k8SxZawP1w/X5ikvaWGO9t/v9uD6etCwJaS6OfJlvP3HvVhBa516m6xE/N0nqlXXZssuiRfYTTgHUyefFADwT+Zy6ZEppmnCbwHcct9jyxGHI7jjOWu75k20lU+fVZwkO69asnqrDTRv0HffGQc0Tm4YXSYc/0gzoCe+c7qrq9bJ8uR1JUhSo6aV8nXg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ksnnMRJ/CUqqi9I7m/r616NsOnltjpOxhh64WKJxJqQ=;
+ b=Wh/TViGZsuLC40TwqakQdn4I7Fvmn/m8fYnQ1aKwiBaY/6FYw0gI35DU8DptTLKjxl6fe9TuobU9htLoCkHwQhYNdAyHEsNcjmcQ6HbIokkIwVDT8ZvJNMwZgKGgFPPMMkNJTLSAtsggBP0adXvIw7EGmmq6LCr3MKRq0In2RPs=
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by CW1P123MB7541.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:1d9::20) with
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+Received: from SA6PR04MB9447.namprd04.prod.outlook.com (2603:10b6:806:436::21)
+ by SA0PR04MB403788.namprd04.prod.outlook.com (2603:10b6:806:ce::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.15; Fri, 16 Oct
- 2026 05:22:07 +0000
-Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- ([fe80::cec4:77ab:262e:d230%5]) with mapi id 15.21.0522.013; Fri, 16 Oct 2026
- 05:22:07 +0000
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com,
-	hare@suse.de,
-	dwagner@suse.de,
-	frederic@kernel.org,
-	tj@kernel.org,
-	atomlin@atomlin.com,
-	sean@ashe.io,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v3] blk-mq: dispatch kworker to housekeeping CPU when hctx cpumask is empty
-Date: Fri, 16 Oct 2026 01:22:03 -0400
-Message-ID: <20261016052203.489760-1-atomlin@atomlin.com>
-X-Mailer: git-send-email 2.55.0
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.14; Fri, 16 Oct
+ 2026 07:31:00 +0000
+Received: from SA6PR04MB9447.namprd04.prod.outlook.com
+ ([fe80::14c6:1c14:485f:1825]) by SA6PR04MB9447.namprd04.prod.outlook.com
+ ([fe80::14c6:1c14:485f:1825%4]) with mapi id 15.21.0522.013; Fri, 16 Oct 2026
+ 07:31:00 +0000
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH] zloop: print device that had errors
+Date: Fri, 16 Oct 2026 09:30:43 +0200
+Message-ID: <20261016073043.1164325-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.56.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BN9P221CA0019.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:408:10a::34) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:183::5)
+X-ClientProxiedBy: FR0P281CA0140.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:96::6) To SA6PR04MB9447.namprd04.prod.outlook.com
+ (2603:10b6:806:436::21)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,186 +83,163 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|CW1P123MB7541:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2010ffe8-8fbc-4464-e121-08df2b456bde
+X-MS-TrafficTypeDiagnostic: SA6PR04MB9447:EE_|SA0PR04MB403788:EE_
+X-MS-Office365-Filtering-Correlation-Id: caaa3ccd-ebb7-45ea-8d7b-08df2b576ce3
+WDCIPOUTBOUND: EOP-TRUE
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|376014|7416014|366016|6133799003|18002099003|10067099003|261009223027099003|56012099006;
+	BCL:0;ARA:13230040|366016|19092799006|23010399003|1800799024|376014|10070799003|10067099003|18002099003|11063799006|261009223027099003|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	mTgoklNhcJSc0AaA3OiQqd7s8sfwow4u/Nvo1CHhmWiNtlYtmrYl/QM6al0SIJ6UTrQlT/i2AGNL73AQUZsAjSmpNI0Wl5TiW4yJW2LuGQ/SU6IdiU+eZUfjN44ik/WsKoTRadfvqvRAw7wbLyHY3GQqwS3EI2yhY/GJfD7IUmksij+pJkOTgrYNcVXLq+WxwsOLXj0KQIWq7pXWMuqy8sEXeZFdA0IULXRuQgogUimNfaaGO3bcXmEaTi/f1zUmHLu9wWqlqMq7cm1avRWpJOixaUDe1SNfflAFDYHgSs6ANUQtF0aHt+k8FxYXLc2V/xEyYdR/AT+EmAO+MxR76K4uZOe9cGZ/M3VZ5CSJQVbQkgfyUqEOuHjiWZmCeiT5Ix76LdZ46mg+53R1+jGEwLaEhhfX0C2MYNOrn5CModxCpuVlbYSC/7j3zRPUXdXgzzRHT2YkRlGXQKq0ZF5FuorLUgvQa9x6OLlP9wpqLU/y8Pc9ZZjoTC3w+pOXPp6FopW2uMEpE2LEmwZuKcsk3ZdIG+M2QJEx0YIJnnbt3h6fIW/rcyBYB3m1tnq3c5zr0j8/txRD9I0Ro+cEYmmBC3D47qcD1TItGCqn9g6y+/T1pedlJZ1U/Ku6CeRFoVTI
+	Jj9OkQgSIz2anz8s+oD1Pxg7O3mcEsF729zIRsDw/reMqwp28X/+eCv+jhIAluuIPJdDm+JEGKdtsPY3YcGsU/Gr1lYauoXUKUyYbzj2dOz43H731dOsTzRs0V8v5+uohZX0kAF0ywcCWqH+Rn9dkz0mN/aM+8BimTXIYZqgYjRni0Y06rSEjkXTtRVjkFleEQV3VexZToiJF/tdRaOwGqbwMGgx9Wt4FLPtNk5bMbGdNo/WJPfIhUSvVPcuBP2s/Dfz6kKXCpOtTT45hBkv4NK0GU8s/EZDvz3Ll1B4Fz+mbTMYzlS6jo2nTZzmLPBGg3IWm94VbafIZcSzQgv4H+tqiRrR7Ec37Y6kr7x/+eSCgcX5rCsqB0W+3ImQI1VsVI4n0gmuZZcnHCBmAlyV78SmBMiMYCZyddTg4rZlsSnkfsYZhgm29Jbcf08fYNNBmK1Dsqzb/hQRwU1CXYaU7PG954y5KqeW0HilCOXvHHSCQhO2hcPAB2ME+gK7gEAlM3xs6oPD7/eCFqua++bLBzJ0n8LY2Bgx37SuIfMibu3bre/+u63nSltJzUl2W16ZGhrRmkDqRd+57DqGcesEp2JHozJwXNADtX87ITTdqXaZFK+iulQbya4NI8fLDFY8MtpVBHmCnndTL3/AaPVlW7WaRwHEOydeCwyVYjts4E4=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(7416014)(366016)(6133799003)(18002099003)(10067099003)(261009223027099003)(56012099006);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR04MB9447.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(23010399003)(1800799024)(376014)(10070799003)(10067099003)(18002099003)(11063799006)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QwRuUx7l/7Ng1v6wdr7YdPn+izFWOrzQr1mWhpfKDStarsON/xfuZtjVFyx0?=
- =?us-ascii?Q?81YcvLa4F6yC5dzOT3qWyMhdTlwGFyaz5cgPt7oOnAhNhu5X6PJg3XaAOgyv?=
- =?us-ascii?Q?Bs9CBCLPn/Lxm6yZOD3O+DeMHWxfw7XiHcLQaPGQ2jCCDBfZKceWUMMhCueO?=
- =?us-ascii?Q?2phWuMj+0+yG15deV2sdxLfQqdmuCbHtAjZV+0OwOpJos8xDKysV8Tbu3qY+?=
- =?us-ascii?Q?46kJ4scegQirNSzdPC216RMXAN+ral5vBuaa6EO+XhSHIzKmPJLEf4ED2nZf?=
- =?us-ascii?Q?TQcdTZtElfKt0/KiycnT12rBQHq7o9HR2Uf7ewZloBihq6ianVEASVJyCkbU?=
- =?us-ascii?Q?CkP3jWZSzMxem05JniBeVO8ox8MFNyEcuKvzYYXZp4VeVvKP7Ke/BkXTpqXA?=
- =?us-ascii?Q?FTM2c4oiuQM2X4dlD7ipDInImvXxaJRS8RoDGSU4GDZcMerXMSAghemWruyg?=
- =?us-ascii?Q?8rdjlq10YPSdh6jM1ZaOMJomVz6TT1TfdDlIOmGp6Vp9F2S+in1Dtu0HQSkt?=
- =?us-ascii?Q?yCFeKzRFVu5OLMM5JcS5PWH4g0yaHg0B4p7YdKVj89Y6hk8u+jdZaP2oIZkx?=
- =?us-ascii?Q?8JFYDfbjuVmWBaSnVaSLIjSHx6kXYlFueTQ5b2ISocoAKEF897bCoSe9XNK6?=
- =?us-ascii?Q?A41Cw2Aro6c7KTFYnefS0h/eZWVNrQps8ixd2P1JzKVHvPTz4KZH5DR8syeH?=
- =?us-ascii?Q?OCurdmwLFSDV/fGIsTB6X5krzSytC74LItcm4bgs3y/gVFFkHmLDMqsBPXBl?=
- =?us-ascii?Q?GS+IpNH0/Bvuf8B3F+YkCw87X48jbnwPqxlBL4y9k4Lb38HWXVkpRixXvlT+?=
- =?us-ascii?Q?KGsp+tjxC3+dw9rY/73VUbvGvTI10J/cZITVTOf+usLt9aS7M+9qBwcprgIw?=
- =?us-ascii?Q?Vj4Ar+tKpO2UNhkmfgIb8OtRF+WdJNKIWTKGo5BjD4j2zz9P5EZJuLpXIa6P?=
- =?us-ascii?Q?dPreHKiuSzLIsEoRKrb5mYEYmH87pBdewL0iK0vE0jxiMXu2midLpwkON0M6?=
- =?us-ascii?Q?5ilJZY7bqbEjqsyoI+uwSjaKOaUhAiP7jAKeaQ0FQNWJv/aOOV+twZBDVMxu?=
- =?us-ascii?Q?HwoQdAXprfbNFRqTIMt+AzctSlV7u23s4kdG2hDzIvJ1q02RInSMxTIiMbnZ?=
- =?us-ascii?Q?7jGIVpQ/BCi4SbpJ1JtduldRCEf6o34h6SVaXxbEPBmEL0HNB/RdUK9T4gu4?=
- =?us-ascii?Q?F3DmwmPwtsY5qdeObEySWb3YhyVOS2PrmVg8tDfAxVRvKZnWSle/Vd3iJ2BT?=
- =?us-ascii?Q?64UH7ztTw4Xm71Dn70Ej9tckGsIQRe5Cko8D+knOU71mhFRONGu9ToR1jLqM?=
- =?us-ascii?Q?z6js/NoZUZMDxtLBs0WZa05YhR4nSSgGKGmDV9/TBYVNNQCbgAwv0T9wx0QH?=
- =?us-ascii?Q?u6v/XDtcMhISRV+5kcLD61JvP2KsBs/rKC2jFnpxaeNxSD/IeGUDm/AyjJN5?=
- =?us-ascii?Q?MfKA5oV7uuppVQpr8Eobh9tyZigBSgrF5sbnUH50ec/91768EKiOldCMx4zm?=
- =?us-ascii?Q?FBkZctdHxt/upFqGKVV4pQShECdHy03oxFP9CSAgEwB5ZnM7nvH8tmboDAgU?=
- =?us-ascii?Q?u8ShYoiJrnLBAqTCDgoPkqTi4gRmI85ZFhalxVdbayET55eJMrJ+1B2b7ni7?=
- =?us-ascii?Q?LyjeRJZosQprayMYQbLWNZkdy+zrutGM6PAOiMUCq5QjQpydtjk3SWoz2eHU?=
- =?us-ascii?Q?DrBTKlUlzW+1J10ozYi5gzpuKbPYcIGTWcrjYktiJxHi01NaywhAjhO32kZo?=
- =?us-ascii?Q?E8vw16c1Hw=3D=3D?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2010ffe8-8fbc-4464-e121-08df2b456bde
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+	=?us-ascii?Q?VNi19Mut5VHD3uynpMMNxMcMgQ9HGUTOI/pmfdgjqngIIPYSL2xXrU0nZgod?=
+ =?us-ascii?Q?F3NUrPaaCgQh67XEp24eiihhapYMZ2thlxK7Hbq9+UnAFpPaGsbPD1WoaYD9?=
+ =?us-ascii?Q?CtHvzq5PTXbOLMCZGjqnkNRPDo3bprTA+vG+NhLMUHjts9FNkwQpG6dCLzeN?=
+ =?us-ascii?Q?ChmuktMt/1pnzK5FltA6ASUyKZ3xH/LAeGokAetVg/4eXPH2XZfEjldkt3DG?=
+ =?us-ascii?Q?bgucczQ/Zby/RF1KuLJ3IjoOMm6HpSX1QnqMMEQcpreacejgFKuD9TBWCIqe?=
+ =?us-ascii?Q?8yIjv58gI6ciVIv4Ead42Zd3fgI25j5HrFbrzkf/Z1bpKqDzd5xPEpUHkd5T?=
+ =?us-ascii?Q?+N5cm6lBHJ0Z0EqX9V62yD74SXoIbgvate7OlO+9gARjQIyeze8qkZc+/6dq?=
+ =?us-ascii?Q?uUQ1wqiFV+lO6QjvZtdNWCDRc1CLLgzerT4yV99SUOF0ky/AJxwK7/S8beZS?=
+ =?us-ascii?Q?PaQF9muY3ssltKtqcQFcbRNhEIC8qBp7bkUZWoNy51cGvgYBTbOoiKIhWemu?=
+ =?us-ascii?Q?Gr16H4dLdrN8/aZoC8HbyMAwcPZiHuzBhcuyIvnGWPvUdqAkZBqTjsXeg21K?=
+ =?us-ascii?Q?d3+d9/PbAmSOd2M4Jh4T17/JDjguhRYCmhLhKKXe715ElXiiYWKkhdJHWLFU?=
+ =?us-ascii?Q?gEvAPnk9H51PoZq8tu0DCJKM5ux/R0tZ5jbqoGdQSXl1hr7MtytTtzIwFC4b?=
+ =?us-ascii?Q?lbs3894Tfjs+qe1iA59NPDM1sqfOtwABm5tPmMTESoWnNYqDroWoLnm6MJ08?=
+ =?us-ascii?Q?rxxDOfCD24qc5gxkjHvfP+wbHLGoQdqRHYAWGV6F2NL5bdCS7sUyxg1WOTgT?=
+ =?us-ascii?Q?VHBKsVQBFjWv8r7MznRdGJr77BkSkMo1VSx08DdzTL9tNGQA9Np1mrl2Mi4x?=
+ =?us-ascii?Q?8ilUtpJMKofAZiiiZAohKxOv6RXqtYso6ffpbiGAzvx1A4Q4CP1+8oYeFfg2?=
+ =?us-ascii?Q?vHB998iKGB6ZfsQ1kQaX38O6sSAKT0kbOFpYipSCAA9Km1OcwK0sMf628ekK?=
+ =?us-ascii?Q?Hpcw+/TPG45NjtuK9U7VDi2fW+x3pIAfml3jNMwGEnpEuVPiDTyddjeqixoJ?=
+ =?us-ascii?Q?uLhsdA109Y5Sp1+/b88/hBqg3A5pfCXgtydv57m7lnp38BEsxZLd039D0CP4?=
+ =?us-ascii?Q?SEJ6DcwqqU0uyH7qyxJrf2j8S37QY1hVN3g4wox6vaZFrSvHrb0YDAhTCzbK?=
+ =?us-ascii?Q?y5ji2bGQnhTOL/QnEaaIqikoC3t66+eluZTsDPGJRGXKadVhzAl/LlUz9tFY?=
+ =?us-ascii?Q?QsHkIkSvFTymuY6YfHDtKxW4g/9XE12TCspSEtfKfZ5zPD4nSnlKX2j1TpRv?=
+ =?us-ascii?Q?qfSDQ41Plb6Y8d1VZE9ZQ5sYLsofWI9PehgInlXQFKyHuBXAqP4LghPhz0ve?=
+ =?us-ascii?Q?UR5MmGbhhlXgimXwlGmc85DxgC3JFopWvVuDCUAiQTKL3Qxt37WU1O2MdNz0?=
+ =?us-ascii?Q?FgTQTe0tnReGuoky2rseEqBuFWiaGdSVOLshNuVrppAnWvKYpF+WbgCbPGPh?=
+ =?us-ascii?Q?Fy5QHCkHvdV3i0VhmTA98M3fP4xZxwqH7OsToP5E/R78vJ8fif1WrG8tt69J?=
+ =?us-ascii?Q?dvyJEM3tESRFTh/50Bdh5JRdZOBnObLQdKfxm/34iwo4l3399EuntwEnCSDB?=
+ =?us-ascii?Q?VCi1TPcYFqlaaWA10AKGvM22AgA+b3gyofzYx2TP+4xvpjJcW1nQ1RkXbE5e?=
+ =?us-ascii?Q?yv9D6AtQW/qhvsK8dLLbCnfXizv5FByAhrq55WEMko0iMOEwzmXO7VgdvmVS?=
+ =?us-ascii?Q?QpZzwnoHIlwpGabkh4VZH/6I/UfUFiWOkUDvnt+zrMisJqmb7FalmVLT5XkF?=
+X-MS-Exchange-AntiSpam-MessageData-1: 6oJSAQ6BBOFM0aSTdom7byK5FDF9Gyu0Mh0=
+X-Exchange-RoutingPolicyChecked:
+	f9scijRuW4J9/s9taW4Yp2SDTtGXmw2g+U+7sXlwZJhAG0+1ZLqYf/U6LbsNf7yXoRaIFROuKg2WgdTIJl7/P831TcJVQHofzdh+0Ifhc3UwqB+2/ZnG6HJ4VhmI9o9hVit2EmEnp+EId947B3YZ/ceYt+kN61wGuFyei7gmJCJtJCaKfEbS7csKuGFt8goJ4Jy5ttRk9UDmMuRVcEsTSTQSZAJVt+vW+FFETeF0TYm3qyxX0z4RLYr/I97H6QkSIs37waguwHnrs/uo4eHsk6EMMxrXO+RdgGWHU6isvcW4xVO33AxsoGp48U8OYc+WfiorlcQtALguHi8RsvL0KQ==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	1ZpZrnsu+oNWHi2vucBgi4yh+/csowTUW4e4MVZECjzYCzIJDD22Y7COzAFst+ZkNAnv10i819eoxIoayZm4hgqgt6sxMUM4T3IDCM1pvPKMUY+iLK1g4eW3n2+4FmA3kI4MpAGTTUWvpP2wXkMeO0rTI6HsA68dn85G6KoQTOas/AQNv41hCY95PjLLDFvuNxW+juivwRso8ND4YyG/YIxZpqZCn++DnpnZ6iJKkfGSdRzO4WFkshoxklL96b3wQ+yjgw/fUfilSGIabGrIZFf/qgrqtRLUZwQaREkskmErSqSvNytTs/z0RJLcNjEcHo7W/pdghTLA2WM3n3WX+UBYfcsLl7/cV89YtN1QfETtaUWs63TZ8u3FE9/UYYdhfTgV0KVcz/yoZs653TtfLRcmz1PGR0LVGGw8CF/Cr/wQY3VyywMhRRMYk9+49pBrz55q8Q3FSXdPwwnOlhQLM72Ydk3eP2GBrkvPUpxhp0SY3HZgsz5ynrL+6TTgHkaUij7BA0X9CkhdqiG457Q9bJlsu/ORu+aqzlE5GxERqcGvnm2dzaS37wwsqC/FsZwN9VU6KwNR+TzZh3RiPC/3fWwVhAwp6Gye1NMT8b4R3JHjC1xKftOXqi3iYMUaKbQa
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: caaa3ccd-ebb7-45ea-8d7b-08df2b576ce3
+X-MS-Exchange-CrossTenant-AuthSource: SA6PR04MB9447.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2026 05:22:07.3645
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2026 07:30:59.9811
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +n0Jixwl/gIXk71+9yexOLjS7Hmu6rC6C3zxPkcYah/dcDG4NUbAE+jAXgePE0H5KiYeMbLKbKCh3B+neVV5BA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P123MB7541
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1bt8GUh3tbx7cFBfAJqSQkz2lHXNoiRCpS/8KpMwMmDwWqTNnj2MnpYTalByaoXkJE/FkRchOSU5jCpy7XG2gGZG9uDy9N11hwDuSje4edU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR04MB403788
 
-Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated
-CPUs") excluded isolated CPUs from hctx->cpumask to prevent worker
-threads from executing block work on isolated CPUs. When all CPUs mapped
-to a hardware queue are isolated (i.e. blk_mq_hctx_empty_cpumask(hctx)
-evaluates to true), blk_mq_hctx_next_cpu() returns WORK_CPU_UNBOUND with
-the intention of offloading execution.
+When testing zoned filesystems that span multiple zloop drives it can be
+difficult to figure out which devices access caused an error.
 
-However, kblockd_workqueue is allocated as a per-CPU workqueue
-(WQ_PERCPU). When WORK_CPU_UNBOUND is queued on a per-CPU workqueue, the
-workqueue core resolves the target CPU via raw_smp_processor_id().
-Consequently, if a task executing on an isolated CPU submits I/O and
-triggers an asynchronous queue dispatch with zero delay (e.g. upon
-hardware queue congestion, tag/resource exhaustion returning
-BLK_STS_RESOURCE, or plugging), &hctx->run_work is queued directly onto
-the local isolated CPU's worker pool. This causes the local per-CPU
-high-priority kworker (e.g. "kworker/6:1H-kblockd") to be scheduled on
-the isolated CPU. In real-time environments, an active SCHED_FIFO workload
-will starve this SCHED_NORMAL worker, causing hardware dispatch to stall,
-in addition to introducing unwanted latency jitter on nohz_full cores,
-thereby defeating the original objective of commit a46c27026da1.
+Prefix the error messages where we have the disk available with the disk
+name.
 
-Introduce blk_mq_hctx_unbound_cpu() to select an online housekeeping CPU
-from housekeeping_cpumask(HK_TYPE_DOMAIN) via
-cpumask_any_and_distribute() when executing on an isolated CPU, and
-otherwise fall back to WORK_CPU_UNBOUND. Use this helper across the
-unbound fallback paths in blk_mq_hctx_next_cpu()
-
-This ensures that:
-    1.  When executing on an isolated CPU, deferred queue work is
-        cleanly offloaded to an online housekeeping CPU across single-queue
-        devices, hardware queues with empty cpumasks, and offline CPU
-        fallback paths.
-
-    2.  The per-CPU high-priority kworker on the isolated CPU is not
-        scheduled, avoiding priority inversion and latency jitter.
-
-    3.  When executing on a non-isolated CPU, WORK_CPU_UNBOUND is
-        preserved, maintaining optimal local execution with zero CPU
-        bouncing.
-
-Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: stable@vger.kernel.org
-Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
-Changes since v2:
+ drivers/block/zloop.c | 37 +++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
 
- - Query housekeeping_cpumask(HK_TYPE_DOMAIN) instead of HK_TYPE_TIMER
-   to align with cpu_is_isolated(), workqueue affinity rules, and cpuset
-   isolated partitions
-
- - Query the housekeeping cpumask under guard(rcu)() to safely handle
-   dynamic cpuset updates without lockdep warnings
-
- - Validate that cpumask_any_and_distribute() returns a valid cpu ID
-   before returning, falling back cleanly to WORK_CPU_UNBOUND
-
- - Link to v2: https://lore.kernel.org/all/20261015020225.422107-1-atomlin@atomlin.com/
-
-Changes since v1:
-
- - Introduce the blk_mq_hctx_unbound_cpu() helper to steer deferred work
-   to an online housekeeping CPU only when executing on an isolated
-   core, preserving WORK_CPU_UNBOUND and local cache locality for
-   housekeeping cores
-
- - Apply blk_mq_hctx_unbound_cpu() across all unbound fallback paths in
-   blk_mq_hctx_next_cpu(), comprehensively covering single-queue devices
-   (nr_hw_queues == 1), empty hardware queue cpumasks, and the offline
-   CPU fallback path.
-
- - Elaborate in the commit log on the triggers for asynchronous queue
-   dispatch (e.g. tag exhaustion, BLK_STS_RESOURCE backpressure, and
-   plugging) and the SCHED_FIFO worker starvation hazard on isolated
-   cores
-
- - Link to v1: https://lore.kernel.org/lkml/20261012012905.267920-1-atomlin@atomlin.com/
----
- block/blk-mq.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 025a799f35b9..1a113679f15b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2241,6 +2241,21 @@ static bool blk_mq_hctx_empty_cpumask(struct blk_mq_hw_ctx *hctx)
-         return hctx->next_cpu >= nr_cpu_ids;
- }
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 8f485ef51557..9145e0f98d56 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -318,22 +318,23 @@ static int zloop_update_seq_zone(struct zloop_device *zlo, unsigned int zone_no)
  
-+static inline int blk_mq_hctx_unbound_cpu(void)
-+{
-+	if (cpu_is_isolated(raw_smp_processor_id())) {
-+		int cpu;
-+
-+		guard(rcu)();
-+
-+		cpu = cpumask_any_and_distribute(housekeeping_cpumask(HK_TYPE_DOMAIN),
-+						 cpu_online_mask);
-+		if (cpu < nr_cpu_ids)
-+			return cpu;
-+	}
-+	return WORK_CPU_UNBOUND;
-+}
-+
- /*
-  * It'd be great if the workqueue API had a way to pass
-  * in a mask and had some smarts for more clever placement.
-@@ -2254,7 +2269,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 
- 	/* Switch to unbound if no allowable CPUs in this hctx */
- 	if (hctx->queue->nr_hw_queues == 1 || blk_mq_hctx_empty_cpumask(hctx))
--		return WORK_CPU_UNBOUND;
-+		return blk_mq_hctx_unbound_cpu();
- 
- 	if (--hctx->next_cpu_batch <= 0) {
- select_cpu:
-@@ -2281,7 +2296,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 		 */
- 		hctx->next_cpu = next_cpu;
- 		hctx->next_cpu_batch = 1;
--		return WORK_CPU_UNBOUND;
-+		return blk_mq_hctx_unbound_cpu();
+ 	ret = vfs_getattr(&zone->file->f_path, &stat, STATX_SIZE, 0);
+ 	if (ret < 0) {
+-		pr_err("Failed to get zone %u file stat (err=%d)\n",
+-		       zone_no, ret);
++		pr_err("%pg: Failed to get zone %u file stat (err=%d)\n",
++		       zlo->disk->part0, zone_no, ret);
+ 		set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
+ 		return ret;
  	}
  
- 	hctx->next_cpu = next_cpu;
+ 	file_sectors = stat.size >> SECTOR_SHIFT;
+ 	if (file_sectors > zlo->zone_capacity) {
+-		pr_err("Zone %u file too large (%llu sectors > %llu)\n",
+-		       zone_no, file_sectors, zlo->zone_capacity);
++		pr_err("%pg: Zone %u file too large (%llu sectors > %llu)\n",
++		       zlo->disk->part0, zone_no, file_sectors,
++		       zlo->zone_capacity);
+ 		return -EINVAL;
+ 	}
+ 
+ 	if (!IS_ALIGNED(stat.size, zlo->block_size)) {
+-		pr_err("Zone %u file size (%llu) not aligned to block size %u\n",
+-		       zone_no, stat.size, zlo->block_size);
++		pr_err("%pg: Zone %u file size (%llu) not aligned to block size %u\n",
++		       zlo->disk->part0, zone_no, stat.size, zlo->block_size);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -604,12 +605,14 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
+ 	} else {
+ 		if (cmd->sector != zone->wp) {
+ 			if (zone->wp == ULLONG_MAX)
+-				pr_err("Zone %u: write to %s zone: sect %llu\n",
+-				       zone_no, blk_zone_cond_str(zone->cond),
++				pr_err("%pg: Zone %u: write to %s zone: sect %llu\n",
++				       zlo->disk->part0, zone_no,
++				       blk_zone_cond_str(zone->cond),
+ 				       cmd->sector);
+ 			else
+-				pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
+-				       zone_no, cmd->sector, zone->wp);
++				pr_err("%pg: Zone %u: unaligned write: sect %llu, wp %llu\n",
++				       zlo->disk->part0, zone_no, cmd->sector,
++				       zone->wp);
+ 			ret = -EIO;
+ 			goto out_unlock;
+ 		}
+@@ -837,8 +840,9 @@ static void zloop_complete_rq(struct request *rq)
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_READ:
+ 		if (cmd->ret < 0)
+-			pr_err("Zone %u: failed read sector %llu, %llu sectors\n",
+-			       zone_no, cmd->sector, cmd->nr_sectors);
++			pr_err("%pg: Zone %u: failed read sector %llu, %llu sectors\n",
++			       zlo->disk->part0, zone_no, cmd->sector,
++			       cmd->nr_sectors);
+ 
+ 		/* Short read. Zero out the unread tail beyond cmd->ret. */
+ 		if (cmd->ret >= 0 && cmd->ret != blk_rq_bytes(rq))
+@@ -847,14 +851,15 @@ static void zloop_complete_rq(struct request *rq)
+ 	case REQ_OP_WRITE:
+ 	case REQ_OP_ZONE_APPEND:
+ 		if (cmd->ret < 0)
+-			pr_err("Zone %u: failed %swrite sector %llu, %llu sectors\n",
+-			       zone_no,
++			pr_err("%pg: Zone %u: failed %swrite sector %llu, %llu sectors\n",
++			       zlo->disk->part0, zone_no,
+ 			       req_op(rq) == REQ_OP_WRITE ? "" : "append ",
+ 			       cmd->sector, cmd->nr_sectors);
+ 
+ 		if (cmd->ret >= 0 && cmd->ret != blk_rq_bytes(rq)) {
+-			pr_err("Zone %u: partial write %ld/%u B\n",
+-			       zone_no, cmd->ret, blk_rq_bytes(rq));
++			pr_err("%pg: Zone %u: partial write %ld/%u B\n",
++			       zlo->disk->part0, zone_no, cmd->ret,
++			       blk_rq_bytes(rq));
+ 			cmd->ret = -EIO;
+ 		}
+ 
 -- 
-2.55.0
+2.56.0
 
