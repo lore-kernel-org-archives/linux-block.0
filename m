@@ -1,142 +1,127 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A9E1397
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 00:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792109081; cv=pass; b=TImKGNLd5/yFtnnlqyjRVMiOrPJtWvzPakafJUIkoewqmidPetA0NjaS+oIQ4v09hRBIwt6MvM2BpvIvvmr7lFGVAVaaVawtZ3Ez1k8Aw0nASgcJjvwy/MVgPf5786dye3o61O+jSyt0UO53O8sDxpm5X+De1xQRZlrULrMUMtU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792109081; c=relaxed/simple;
-	bh=j4c+M9poQOSYaSwl0VXX2WTCeiqf8vrckGaQG5UJg5M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sBMvlobNOxMHYHlcdSnHE5USRrXJlsNfjgSIHXx5mDMKOA3t8Mfizm0ThOMAYxmfISSk8ViK1OGp+lKKdduCenk8LOSVh58/6PlPLMavIlg+CO8zGu2XU43wbULmW0NlciPlab4qvu3kEI0fjsJNLa/z1scVeiaUSSfDwb8d6y4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M0osczjk; arc=pass smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D509283FC4
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 00:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792110365; cv=none; b=nR1bwTkl9yNBt/wZqybvwbpEYGqeMgMw9YafwIWfyKlEj0dHcf6oN7c3I5HdgI0IYbhPoCMqa8JSJYlQyvrW7DraFDeT/TxlkCmAirIvx4wUPNtzEpERuTmc8ZDcfWNoFgf9F4Xs0un7lPsKWoZBr6OXCI4yBfghvrP+aharGcQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792110365; c=relaxed/simple;
+	bh=VVHJvToiSv0Qj9MmIjQY3/1H62GZzD8cehQmtHUEY6k=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Ae2CZFAuNd81FXs716qF3JRhpbARtW2rLRsK+2GUQIxQfLnRQSfc16Q/4hgJDqDWjy0/dwYtc10tNGT2S7SVJ4jOG0wnqaU0ELthv2HXD8aWbozViwjN/+dPEwO4xBGlMthPoCIxRW5Rf2zAY21SEQ8Rv7a1+YfBt40UeldH384=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=neQCYNdn; arc=none smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0osczjk"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7fccba9c675so723041a34.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 17:04:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792109079; cv=none;
-        d=google.com; s=arc-20260327;
-        b=jnXC5ogs53WJOpp68TUaUeVhrFnr/6FTHp6RrgRgGaCpGlVtFVTut0ko/xlQBD0j49
-         4RbmeA8m5+ZQr/RvfoaEkao/TlqEDZ4mP1eSQIypnlAfpjM2LePzdAhffE0gHUTqp/Mp
-         8fKlZM+VclKk8c/0zSw0I1OyoTcUYNlh1roLSRdXleW9bgFi7XQVAIybpcz98ZF6EYQ4
-         KnMcEUb9J4GzTba93JQHe7x9D6xEQ5FLwQreNKoK1LznqRE5+r1XQyIa8R8HO3xQeqoO
-         77eqNUctA4kYYGiz/nQ5rBtYp9pQ4hYipwasUOOk3rU/Cf/B1MLR5xtgnDCV3OtBm4b0
-         9wOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=txBXkaLeT2KKoYgqSxRnW4lP9rofYCCAvCoM08WY7xM=;
-        fh=KmqnLbr/WOtc9ounqMfs+zXqRdohDcKs6GuJncEKMu4=;
-        b=OggiHbeezfstzdiXKD+0du8sbMh/R8y4MaolcGUkhURJxo8baFEZhNu9tV0+lbwIfz
-         T1EEH/OHyNb8KHvuw2Dy0s8MMEur8+V0yoPRgJg2twSNJ0CTHN4LH1XVK9fYx1wJmahs
-         E/eHLUPQ2I5YUejuzOvP8R/AlH41act3O97b03Ahy61IBQGXCyxG/87eHFFPFHdygP+o
-         1vkIdoaN+EeaUMpjn/4TCOcU1ko5TjVYdUgnGfkNxtadTm3XALWCizSENEq2u6jKg7U8
-         0ijMSr22ysLQ2ZXpNR/M069LmR7rpIrOWHx8OBY7S8JYRoU5Zv6UCqoQ944elJ6po3xE
-         fCag==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="neQCYNdn"
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-6f8a519e215so510755eaf.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 17:26:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792109079; x=1792713879; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=txBXkaLeT2KKoYgqSxRnW4lP9rofYCCAvCoM08WY7xM=;
-        b=M0osczjkvYtGCarWTCv0zymeqCNNNvvAqY+R3nOp6P6YmXOH4x+kfaPUXKmIF0lhJC
-         oxqiXF3rDf2km5niWkRwQ+vEYvzg3zRzfyHHJXI99My6QlNbR6d6S3pXnm8a+bo35uwm
-         sHXyfvP84iPKoJqoUZbKhpzRqXH5JzeyH2xNGce6KT/yewykcYXh2zwzWZoYR8shlTHi
-         CKntSsxxKUV5kdcEBBlRAA5wF+CkgMg8n3255ZLIGfrV9pVFh2Pz+x1S9ia8FdFCWa0f
-         AshRqHvKh8tS9YT3Nh+NxFbuN4coGXTRGhw3TNuc12ODY8GuMA30GXA9ZNta8JE8Unaz
-         +WbQ==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792110361; x=1792715161; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iX2M7P0FJXo5H40qEueYVFWq+OgK2G9wQYuxMssplYg=;
+        b=neQCYNdnwEMRShife12WUcnWrZYbkyVl5/UNlWZl3D+fwrL0St6EdkWTW/gqWi3cXH
+         bZW6AxFLOjG1eB72FCR32XfjRxHLq2dHyeQgcgDPeDsUZkPLh0GPCz4wmBbm/F3dowSO
+         rZlL1FB2lg2bFmjv0UEkTV0zxRSxMGwv52Qe33bv5wEJa9siI9vQamwUY4VpmqCTwHrG
+         ctru9TTd0sC1amzY8WdcaKEDZ2tUnJcEAUQTPKo7oo+5nVFNCaQShpVaE3SI2dVdrBR7
+         DNTnavf04RA5T1k0UpJ90HWSwnaO9Tm1kncM6Z5oT1oxllhFNEWfEYJKB52guiyufchm
+         kGYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792109079; x=1792713879;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20260707; t=1792110361; x=1792715161;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=txBXkaLeT2KKoYgqSxRnW4lP9rofYCCAvCoM08WY7xM=;
-        b=ofZxBRKba+sre7iOVqglcfbEGPzvEq8ghvUkJpDxR4PYTsELzbwPAhTRcp2+J3TAgZ
-         3+bHt+BRgWGMcHoNCWP4OPNTe28hROtL+fkvw+Ecci//bb3NZTvAAXmtD9mtSDFHctWB
-         jWp7VxE7asaTCxEJwsd8/o3gRDxtW1Ty6wCgZbcrOSb5l40js10itmheeYfUJdOYt/fR
-         U0J3avXS6/q2s25nJT5zy+c364WcPItWS8yu1AUVmwhCmkGoV6r9qOEfPEFC0Q3QQybX
-         q5ijRONw0C5YHg9BUk12Li4wAsOqNaedKNynbvVXe7sLxKauPXJzBTlBEQYM9JX2XJcu
-         HdJQ==
-X-Gm-Message-State: AFq9FYLhANXCahwjdTg4SmCCSFJOUpXbHBgL1ofO7+Oj/NnjEWztqW9R
-	hNaneQdY18Oh6vYtye4chLztTyYB0k1DYllNF6VL7IMY5p1RG0qwObwK8D8n/MrLkjbOsQCVLIg
-	noburS/eYNOPWGDeVWkKooIincKIK8GP1GurR
-X-Gm-Gg: AYBFou0zix0htReUGeriucYeeTxU2gyTlD8TcJoN9HCVys+JfpoAzPu+usav8RVyLIa
-	8Jgy/pTRM8JNhp8r/Al7Ja5ADVAuEWIRqwBhd6uv/x2qYB2wQPj85Ek5XBdNPon3Bvnnd2thk/T
-	CVpgGWn9tODroeiJkEAham0kpAXIaGFVxDhvDmjs65XYPKibK0kOi7ciaxkqvKnXL7cqbRjidgb
-	vr0aTnOAo+Svdo2G4iSrt3HqCNATu2ZSJxPVyNQ4KBvKcUwvaRbROfvHtQiyJqdt4z5NKcP8j6k
-	tfiDe5el5LaopjLJh9OTD9QY0u4phYbXAs7ORHmCsZgsujKEJ9lPXDB6qctITuHKXOVQpJDRqDn
-	CWUO/zDSuk0cfx0OfxdxKY/QqUL0OIekFH2I36s/0UzKT12fXW/qlwUA=
-X-Received: by 2002:a05:6830:449f:b0:81d:9acd:ee04 with SMTP id
- 46e09a7af769-841f41853b4mr1136146a34.0.1792109078705; Thu, 15 Oct 2026
- 17:04:38 -0700 (PDT)
+        bh=iX2M7P0FJXo5H40qEueYVFWq+OgK2G9wQYuxMssplYg=;
+        b=KECo20pk2f5tNdOmHcoSJ62N8uomQO8+zK4nhz/BfQNIzEIjBIEERLnXSlHvZwAh3r
+         IVkJ9FTUy5XJfF0pKc9I2KpzWOPEoqBSJ2C3SJF84hAm1KcGrdfxvRsXEq3Fn6yuoYMj
+         XK0D4a0EJXs2DK3nmz8d1UQ6OL6aHhXvAkghMan93OgDipXM0ELXz8g/kHFSoMepjreg
+         XdNZKKVeEasrN1JDC+uWGsAjTzi1DGST/wyKGIwOu7qDH/inUs7r4x/Qv/IKPWQPx3qf
+         JMbPQXIddnyWiEkxD8KFGFiEf3X89L1sKebx+xK5/nOomuhM1IyDagEj1JOAD9QY5CNe
+         Wt3g==
+X-Gm-Message-State: AFq9FYJy48jFfvqR4OJsGfAozQ6VcuFTsegXDvdt1Fh0jZGmbVzE3Fgz
+	GjcYPTFUu5F+yKR1MtFvMk34kPNlMtKrrHhxtxT5gM7/7f9g/Mre1xDbSm+QqSWEVNfg7TjyPJU
+	iyT+rkLI=
+X-Gm-Gg: AYBFou0QLOnUZ7SIxMQvlmZhuhbgjeeUYC8bWLBciNbP4t9BRyg3rZFjoSaoL1BAykN
+	bbsQ2vFEzDpKR++IqS+FvTq6xVcT4t22ouF7IAY6KGLmwf0nAC2gYXQKGOi5IQJWftQzfY7ZuuP
+	ub51sJgzjbVlwPgUcIdB/RLD3cT6euXiWe3J+v5tZG/DSFkCXg6ztIV3PVWMSBRuxiLDwHIiq3k
+	+NS+mL/+yO4BO29UU9JYnjqBUMWDthFkW8ZpInR3k4Egj43CRgQg6xupwiYbasVdg6dNd4XCTeC
+	bJ8lwDFAVo6infJmA2ZIqoydTMtpXibkQaG6rlUhRGvNxODIVgfzGqUZkGg5TUbdrm/BNPRlizl
+	LAsdiIPqF6pJYkQMro52lXm8d0ql2IC4IGqwsMXubMORiZ7Fl4/gtErU4F3ipDnA96RajFByDKT
+	h60+xVF7iUjteb8NiAmkLGtM0kOwIYCeCM3+XYeEIKqUD6TJiRVmCxV9/izO+2POFc/JHiIl8yR
+	tkSaaED0qOBFBdBsmhb4VwQmzh8X/3y7eKLXLErpVISDiiOoLcAG6RRXw==
+X-Received: by 2002:a05:6820:2d49:b0:6cd:3fdc:2663 with SMTP id 006d021491bc7-70110172412mr1081549eaf.36.1792110361294;
+        Thu, 15 Oct 2026 17:26:01 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-7018fd92933sm609390eaf.9.2026.10.15.17.25.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Oct 2026 17:25:59 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Josef Bacik <josef@toxicpanda.com>, Li RongQing <lirongqing@baidu.com>
+In-Reply-To: <20261011063555.1142277-1-tom.leiming@gmail.com>
+References: <20261011063555.1142277-1-tom.leiming@gmail.com>
+Subject: Re: [PATCH v3 00/12] ublk: don't dispatch to canceled io commands
+Message-Id: <179211035881.1953571.17228596115085922697.b4-ty@b4>
+Date: Thu, 15 Oct 2026 18:25:58 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261011063555.1142277-1-tom.leiming@gmail.com>
-In-Reply-To: <20261011063555.1142277-1-tom.leiming@gmail.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Thu, 15 Oct 2026 19:04:23 -0500
-X-Gm-Features: AclHuK9LOxMl7nb84zHZ9YGe-WJrlOsrCZO04QbKEVOfbjW1hUJ1VOGEyNHI9RM
-Message-ID: <CACVXFVNrNzquXXU5jnOx_jEPhFputE67k+NSPiXDK0fX8dG14A@mail.gmail.com>
-Subject: Re: [PATCH v3 00/12] ublk: don't dispatch to canceled io commands
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Caleb Sander Mateos <csander@purestorage.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Li RongQing <lirongqing@baidu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-On Sun, Oct 11, 2026 at 1:36=E2=80=AFAM Ming Lei <tom.leiming@gmail.com> wr=
-ote:
->
-> Hi,
->
+
+On Sun, 11 Oct 2026 01:35:43 -0500, Ming Lei wrote:
 > Josef reported three ways in which ublk dispatches a request to a
 > canceled io command, which oopses on the NULL io->cmd in
 > ublk_queue_cmd() [1]:
->
+> 
 > 1) STOP_DEV, then START_DEV
 > 2) partial FETCH: a task fetches some tags and exits, then another task
 >    fetches the rest
 > 3) user recovery: one queue's task exits before all queues are ready
->
-> This series fixes them in a simpler way, without extra locking in the
-> I/O path:
->
-> - patch 1: a FETCH round which saw a cancel stays canceling until the
->   server is gone (2, 3)
-> - patch 2-3: an io command is marked cancelable before it is published
-> - patch 4-5: the release resets the FETCH round, also without a disk
->   and under ub->mutex
-> - patch 6: don't warn when the cancel callback finds io->cmd taken by a
->   cancel from the control path
-> - patch 7: STOP_DEV holds a reference on /dev/ublkcN while it cancels,
->   so no START_DEV, FETCH or new server can slip in (1)
-> - patch 8 (Josef): START_DEV and END_USER_RECOVERY refuse to go live
->   after an io command was canceled (2, 3)
-> - patch 9-11: selftests
-> - patch 12 (Li RongQing): ublk_report_zones() passes a per-chunk index
->   to disk_report_zone(); use the index in the whole report
->
-> Tested with all ublk selftests under lockdep on for-7.4/block; v1 was
-> also tested under KASAN.
->
-> V3:
-> - rebase on for-7.4/block
-> - add Li RongQing's "ublk: use global index for reported zones"
->   (patch 12)
+> 
+> [...]
 
-Hi Jens,
+Applied, thanks!
 
-Ping...
+[01/12] ublk: keep a canceled FETCH round canceling until the server is gone
+        commit: 4c454b5b2634d982caf797fbe477770c3edfc983
+[02/12] ublk: mark the io command cancelable before publishing it
+        commit: a261f0cacacc022e4fab5b8e38c59f74ce4942e8
+[03/12] ublk: mark the batch fetch command cancelable before linking it
+        commit: b59e96011d22e322fbf4d5d1d1124de538c278ed
+[04/12] ublk: reset the FETCH round in release also without a disk
+        commit: f06ca594eafcdf58a399a0f92480631192e06032
+[05/12] ublk: reset the FETCH round under ub->mutex
+        commit: 84824afdb5a4dc127fbd7036142d7611c5e53651
+[06/12] ublk: allow a NULL io->cmd in the cancel callback
+        commit: 4915dc0a1834457520ef0592bfd454b26901614f
+[07/12] ublk: let STOP_DEV cancel the server's commands before its release
+        commit: c8b349f9daf6d88ff21033028167d00e819dafb6
+[08/12] ublk: refuse to go live after an io command was canceled
+        commit: 7bf71ecab1c225d4f7d0717ec482638a03527be2
+[09/12] selftests: ublk: move the control command helpers into ctrl.c
+        commit: cdf6e5de86a91da6e4d621260bc70e99e2f3a25e
+[10/12] selftests: ublk: stop a batch thread when PREP_IO_CMDS fails
+        commit: 9703575564aa7c74d6746e4ed2d3f8a99af7590c
+[11/12] selftests: ublk: add test for going live over canceled io commands
+        commit: bcab0b98566b8f73f8e398d4f12a088b81885459
+[12/12] ublk: use global index for reported zones
+        commit: 80897c7e5ae5c56f37a2eb004328edcb4da7cdd1
 
-Thanks,
+Best regards,
+-- 
+Jens Axboe
+
+
+
