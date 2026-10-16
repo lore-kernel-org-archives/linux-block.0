@@ -1,477 +1,309 @@
-Received: from mta0.migadu.com (out-224.mta0.migadu.com [91.218.175.224])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D0344C50F
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 08:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56456282F1D
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 08:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792140842; cv=none; b=J1JZPXmB/NcCO9t/mWwv6oIrE7Mec1j6kD+Y/11nClMBscfdvaejamPAAU3HQs9W2vqwoMy471Um+XFWqFFpLtiYcK6Y5EYt2G5UaZ/J2trJcJvIAprB1aMnKGX3bFjPiy7MEfnwkpRc2C0vokt2JtdWJEEZT60wh1wrLs7jiYQ=
+	t=1792140876; cv=none; b=AzsKHB24QsjkLo3vOWADJyYOaKRu3lAFdAgef2/FYcdMw+uPrhyVvl6MHGckz25pCA8lmNA2z4E3rVWtyw4aB7MZJFyP8C6lyXhXWbRqNq6Ibpqu1GPxJGeLVwDNR9rkJ9naXGfvMW1Oz900Xk016vJih9G+HFcfZjftyf441VU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792140842; c=relaxed/simple;
-	bh=O6cq8jJ3qbtdwUdhhsrN6kPyHFWO2kPsF1jU3TrxXNM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=J9AfU3LAg2xfPN4mxl/a5DY/gqUtb6UT2+xiBSKIoAj/kkt0f6Uppe0F/b2rsrmloG7Ay3tEgcWbCBJy6HHVHYghOvyUIvVkBMUvoapqwB2f8nFe9sFBTyZk5LDPX1bGA/BEDaD5XK3brRGV3ixLKCgq6gX1qanc0rTPLp0d9Us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kpw9zrIa; arc=none smtp.client-ip=91.218.175.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1792140876; c=relaxed/simple;
+	bh=E+J09Xq85GRReMtNz7xiHKa0FuOgC3/TnFnR0m1+vBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mWr/Xc3/F3mgobaNxiRCcT+gGmPJF+cqdC+jSBqgxHin0G3e78rY9y4bNXYUvG9E657P93SS+DkCXHm8lDVtfeccplukLbfLjXKSlE0DuhpV4q128O+817xK6G/sj2fZ8BabSKmq6m3T5V5O+MY5R7kGjiCokgi3mp9CqTzekLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=XMZal2sx; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kpw9zrIa"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=O6cq8jJ3qbtdwUdhhsrN6kPyHFWO2kPsF1jU3TrxXNM=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792140832; v=1; x=1792745632;
- b=kpw9zrIajylJQ8X5GuDJXSD84KVxiwlWiyhEHMIZj+DNX+Wr0GXzFwkWfAilmWZPWXb391PE
- 5d6CPyZUhdAHKlqREqmLby76ey0lJPWRBuchN2D5T5rbjRkCBDNLr9YTptbPGenGI5fmQYToxQ2
- cT7WbM/JMX1QWSrsgGeFLf8Q=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta11.migadu.com with ESMTPS id 0852ad72b7d4d602;
-	Fri, 16 Oct 2026 08:53:50 +0000
-X-Mizu-Trace-ID: 0852ad72b7d4d602
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <8fff4ba1-1b19-4974-bbd1-16686c8b5bd2@linux.dev>
-Date: Fri, 16 Oct 2026 09:53:48 +0100
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XMZal2sx"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-cc4dbcf2b85so1538911a12.3
+        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 01:54:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1792140872; x=1792745672; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=tm0sQY97x/sO1vfolLCcmx0x50wapUOdk8gJkzj/4Rc=;
+        b=XMZal2sxCSeSCPj/G1trUJ/xv3bkEpM/4jZ4z8fGayrOk89MoIwxZ3yuIWVnOAayni
+         Bwd8ipzddLFuKfLIQ+uHXfPukYQYGAusDZJbtN+8fSEZ9kUjhNFIDBS7Y0zESB2M/cc7
+         c9pf2TwL7XkkOsrL/f+cLqgl3+yqDu3S1HWoM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792140872; x=1792745672;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=tm0sQY97x/sO1vfolLCcmx0x50wapUOdk8gJkzj/4Rc=;
+        b=Jl/SFTrbgLeeTtG0VNSgw5Sd1TTXsQ3xWIcZ6n17jkeMJ6hu6uTOiRjoAALGCgztaI
+         ijx2xp1wod2hioZ4Ij1BuwhK/3a6AuZXgese13QGfYc7q/AQsmfu43UE5m7blBCwQotL
+         zXrfCOFGcrhOUHWZ7NtNX+5WhggLavLS+bzf3uLTlT5oMKChm00kbHMdIo93QgUQ55gt
+         e8H7HjRspmUazMybEYcEDiWOjd/8Mjq1/gAJ+V4SXFCwRkPvC2NIJX/a5BzG9MJBhzNk
+         Myi8/DQbI8cHmUHeGzwtCl/XJh6HkLcJ01lxHX1Jy/9m6Ag8ZSQGfFumaah2jBIMdf5F
+         lfVQ==
+X-Forwarded-Encrypted: i=1; AKwUvBz7s3bTV1luyZixXsGa/dOwnZmzEmiGVMWEbc6G9FJAcXVnQN5iK9K4/Xt46um9w5RxTcqkQvl93/ovDg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKUZn252vQ7LoF5p5bKCaUeuLkjtx90tcd1iA2AsGlImUp9PNtR
+	wBrp2rdLZPQneL0zGjQH3E4yFPAsO6ZWEu6eFxIWDv5DBo3rN2LwPj+tofsIkpV3MQ==
+X-Gm-Gg: AYBFou0qrgf1qd6ZNbFCAMsR1AfOQM/fueSaqBOP9ltP6HrxeLrFmo/zB26gN2dEaRY
+	e9OUHLklPBw3gJiv+ish/BDc7O5EuMzJZPF2lxbLOB2KeQ/vnAbhUvlFIPs+E7sYU7jfcg6H7tI
+	GeqMpnfSEtMpnXNQe4m1fDzUVJYXMvxhSCYjFEuPBsbd2P6Y8+JtHg2HqZX0i2PiqoT1whRU7m0
+	/qfRIph+1oSn2JnHKIyaVjkb0R1xy1wW2fAKsJfJeE4Dvf2Kl5cU9s0EHspZznPFZmfFc4Kf15A
+	O78GT6zpk4935/dkwEHWt8D90KYHpSmfudwdhO71d2abGQe3h0+wG5K7ayndMTD/4agmoKqH175
+	HmRWoJ0M4tZI+pf/l1RlLR0lGy+NqkLM5amHFMp3IrMlMR/IC44JZNBiGBjH+erUGcWCbAknMd8
+	PSx2IAB5njMFung79oREcg1xwhU4xMi/s9KbjwjMqQulLJA5qd2fvMnLE9vEu4l99qDnZJWkpYB
+	wotxW2Y+K45TlN1sgk+WaQgXbFGgD9+YvlwN41elklwUXVMgDaxK4Nozk8Pwbtaynib3AnhN5zp
+	Pp05UxvUoFmSP8dGvxoq9n9ArtrMqBcywEzyPLRbYA==
+X-Received: by 2002:a17:90b:3a48:b0:3a7:f4d:b23d with SMTP id 98e67ed59e1d1-3ab3ac790dfmr19469341a91.52.1792140870404;
+        Fri, 16 Oct 2026 01:54:30 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:a579:8b87:8304:7ac2])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac945e74bcsm8425589a91.3.2026.10.16.01.54.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Oct 2026 01:54:29 -0700 (PDT)
+Date: Fri, 16 Oct 2026 17:54:25 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Bo Zhang <zhangbo0325@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	akpm@linux-foundation.org, baohua@kernel.org, bgeffon@google.com, minchan@kernel.org, 
+	richardycc@google.com, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-mm@kvack.org
+Subject: Re: [PATCH v3 10/11] zram: use rw_semaphore for decompression streams
+Message-ID: <atHftz13hWzGludk@google.com>
+References: <atBh9xfpOji_A7A_@google.com>
+ <20261015112440.1491168-1-zhangbo56@xiaomi.com>
+ <atGPwJL6XzlRaMva@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: John Garry <john.garry@linux.dev>
-Subject: Re: [PATCH blktests v3 4/4] block/053: add a torn atomic write test
- for block devices
-To: Tal Zussman <tz2294@columbia.edu>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20261015-blkdev-fixes-tests-v3-0-b6ffa6410514@columbia.edu>
- <20261015-blkdev-fixes-tests-v3-4-b6ffa6410514@columbia.edu>
-Content-Language: en-US
-In-Reply-To: <20261015-blkdev-fixes-tests-v3-4-b6ffa6410514@columbia.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <atGPwJL6XzlRaMva@google.com>
 
-On 10/15/26 17:29, Tal Zussman wrote:
-
-thanks, just some more comments
-
-> A block device atomic write is a hardware atomic write, submitted as a
-> single bio, so when its buffer can't be fully pinned, the direct I/O
-> path has to fail the write rather than submit the pinned part.
-> Otherwise, it submits what was pinned with REQ_ATOMIC set and leaves
-> the rest to the buffered fallback, tearing the write at the pin
-> boundary.
+On (26/10/16 11:50), Sergey Senozhatsky wrote:
+> > zstd backend, same A/B workload, on top of 9+10+kmalloc:
+> > 
+> >                        9+10+kmalloc   + preempt-disable
+> >   cwrite_contended     14,880         48          (-99.7%)
+> >   cwrite_wait_ns_total 137 s          0.32 s      (-99.8%)
+> >   cwrite_wait_ns_max   243 ms         43 ms       (-82%)
+> >   dexcl_contended      15,919         54          (-99.7%)
+> >   dexcl_wait_ns_total  109.6 s        0.68 s      (-99.4%)
+> >   dexcl_wait_ns_max    145 ms         34.6 ms     (-76%)
+> > 
+> > zstd stays 100% exclusive either way; the win comes purely from the
+> > holder no longer being preempted/migrated, so the hold time stays short.
+> > It's the same mechanism that took lzo-rle read contention from 24,749 to
+> > 406 earlier. So the two are complementary: shared reads remove
+> > reader-vs-reader queuing for stateless backends, and preempt-disable
+> > covers the exclusive/write serialization that stateful backends can't
+> > avoid.
+> > 
+> > Quick and dirty, for discussion only - Patch below.
 > 
-> This is a regression test for that issue, fixed in the kernel patch
-> "block: fail a short atomic pin in bio_iov_iter_get_pages()" [1].
-> 
-> Issue a two-page pwritev2() with RWF_ATOMIC to a scsi_debug device with
-> atomic_wr=1 from a buffer whose last page is PROT_NONE, so that pinning
-> the buffer stops one page short. Check with statx() that the device
-> supports an atomic write of that size, then check that the write fails
-> with EINVAL and that the range still reads back as the old data.
-> 
-> Two pages is the smallest write that leaves one page unpinnable, and
-> atomic_wr_max_length=256 raises the atomic write unit max to 128K so
-> that two pages fit for any page size up to 64K.
-> 
-> [1]: https://lore.kernel.org/linux-block/20261009-blkdev-fixes-v6-5-307939c387df@columbia.edu/
-> 
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
-> ---
->   src/.gitignore          |   1 +
->   src/Makefile            |   1 +
->   src/atomic-write-torn.c | 233 ++++++++++++++++++++++++++++++++++++++++++++++++
->   tests/block/053         |  60 +++++++++++++
->   tests/block/053.out     |   2 +
->   5 files changed, 297 insertions(+)
-> 
-> diff --git a/src/.gitignore b/src/.gitignore
-> index 92c08d1..76a1c5e 100644
-> --- a/src/.gitignore
-> +++ b/src/.gitignore
-> @@ -1,3 +1,4 @@
-> +/atomic-write-torn
->   /bio-bounce-read
->   /bio-full-trim
->   /bio-trim-pin-leak
-> diff --git a/src/Makefile b/src/Makefile
-> index f3f338b..b244405 100644
-> --- a/src/Makefile
-> +++ b/src/Makefile
-> @@ -14,6 +14,7 @@ HAVE_C_DEF = $(shell if printf '$(H)include <%s>\n$(H)ifdef %s\nHAVE_%s\n$(H)end
->   		then echo 1;else echo 0; fi)
->   
->   C_TARGETS := \
-> +	atomic-write-torn \
->   	bio-bounce-read \
->   	bio-full-trim \
->   	bio-trim-pin-leak \
-> diff --git a/src/atomic-write-torn.c b/src/atomic-write-torn.c
+> Yeah... I need to think about it, before I can join discussions
+> in a meaningful way.
 
-We are testing that the atomic write is untorn really (which it should 
-be), so please rename to atomic-write-untorn.c
+A quick and dirty patch, as usual, just to play around with.  This
+attempts to improve the reader side, because the reader is side
+much more sensitive.  Tested only with zstd.  We probably can do
+something for the writer side as well, but I'd prefer to postpone
+that, until we actually have to do something.
 
-> new file mode 100644
-> index 0000000..f6f3ccf
-> --- /dev/null
-> +++ b/src/atomic-write-torn.c
-> @@ -0,0 +1,233 @@
-> +// SPDX-License-Identifier: GPL-3.0+
-> +/*
-> + * Copyright (C) 2026 Tal Zussman
-> + *
-> + * Check that a RWF_ATOMIC direct write to a block device is all or nothing
-> + * when only part of its buffer can be pinned.
-> + *
-> + * Fill two pages of the device with one byte value, then issue a pwritev2()
-> + * with RWF_ATOMIC of a two-page buffer holding another value whose last page
-> + * is PROT_NONE, so that pinning the buffer stops one page short. The direct
-> + * I/O path must fail the write with EINVAL rather than submit what it pinned.
-> + *
-> + * Read the range back with O_DIRECT and count the bytes of each value, once
-> + * before the atomic write to check the baseline and once after it. The write
-> + * has to fail with EINVAL and leave only old bytes on the device.
-> + *
-> + * The device has to support atomic writes of two pages, which is checked
-> + * with statx(). The first two pages of <blockdev> are overwritten.
+A quick thinking-process dump:
+Our shared dstrm-s are almost non-pCPU at this point (we have a
+fall back bounce buffer in pCPU), so we can have any in-flight
+number of those.   Doing something similar for exclusive dstrm-s
+is more complicated, because those dctxes are beefy - zstd dctx
+sits at ~100KB.  And this rules out the "pool of idle dctxes"
+approach.  I decided to keep them pCPU, and implement exclusive
+dstrm borrowing (from remote CPUs) instead.
 
-I think that you can condense this description, as the functionality is 
-not too complex
+A quick (and a bit extreme) synthetic fio test for Reader vs Reader
+inversion on 24 CPUs (preempt=full, zstd, 48 low priority (nice 19)
+bg readers, 24 normal priority (nice 0) CPU hogs and 24 high priority
+(nice -19) fg readers).
 
-> + *
-> + * usage: atomic-write-torn <blockdev>
-> + *
-> + * exit:  0 = the write failed with EINVAL and the device is unchanged
-> + *        1 = setup error
-> + *        2 = the write was torn
-> + *        3 = the write did not fail with EINVAL, or went through
-> + */
-> +#define _GNU_SOURCE
-> +#include <errno.h>
-> +#include <fcntl.h>
-> +#include <stdbool.h>
-> +#include <stdint.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/mman.h>
-> +#include <sys/syscall.h>
-> +#include <sys/uio.h>
-> +#include <unistd.h>
-> +
-> +#ifndef RWF_ATOMIC
-> +#define RWF_ATOMIC	0x00000040
-> +#endif
-> +
-> +#ifndef STATX_WRITE_ATOMIC
-> +#define STATX_WRITE_ATOMIC	0x00010000U
-> +#endif
-> +#ifndef STATX_ATTR_WRITE_ATOMIC
-> +#define STATX_ATTR_WRITE_ATOMIC	0x00400000
-> +#endif
-> +
+fg reader results (average of 3 runs):
 
-Do we still really need these? Surely a test machine will be installing 
-the latest headers along with the new kernel, no?
+    Metric           Base               Patched
+    ----------------------------------------------------------
+    Read IOPS        396k               1,064k        (+2.7x)
+    Read clat avg    48.32 us           9.66 us       (-5.0x)
+    Read clat stdev  7,571.00 us        31.92 us      (-237x)
+    Read clat p99.99 5,707.10 us        2,233.68 us   (-2.6x)
+    Read clat max    3,555,300 us       6,287.57 us   (-565x)
 
-> +/*
-> + * The atomic write fields of struct statx are only in glibc 2.43 and later,
-> + * so use a local copy of the kernel's layout and call the syscall directly.
-> + */
-> +struct atomic_statx {
-> +	uint32_t stx_mask;
-> +	uint32_t stx_blksize;
-> +	uint64_t stx_attributes;
-> +	uint32_t stx_nlink;
-> +	uint32_t stx_uid;
-> +	uint32_t stx_gid;
-> +	uint16_t stx_mode;
-> +	uint16_t __spare0[1];
-> +	uint64_t stx_ino;
-> +	uint64_t stx_size;
-> +	uint64_t stx_blocks;
-> +	uint64_t stx_attributes_mask;
-> +	uint64_t stx_times[8];	/* stx_atime, stx_btime, stx_ctime, stx_mtime */
-> +	uint32_t stx_rdev_major;
-> +	uint32_t stx_rdev_minor;
-> +	uint32_t stx_dev_major;
-> +	uint32_t stx_dev_minor;
-> +	uint64_t stx_mnt_id;
-> +	uint32_t stx_dio_mem_align;
-> +	uint32_t stx_dio_offset_align;
-> +	uint64_t stx_subvol;
-> +	uint32_t stx_atomic_write_unit_min;
-> +	uint32_t stx_atomic_write_unit_max;
-> +	uint32_t stx_atomic_write_segments_max;
-> +	uint32_t stx_dio_read_offset_align;
-> +	uint32_t stx_atomic_write_unit_max_opt;
-> +	uint32_t __spare2[1];
-> +	uint64_t __spare3[8];
-> +};
+A quick note (the last one) - happy Friday!  Time to logoff for me.
 
-or this.
+---
+ drivers/block/zram/zcomp.c    | 75 +++++++++++++++++++++++++----------
+ drivers/block/zram/zcomp.h    |  5 ++-
+ drivers/block/zram/zram_drv.c |  4 +-
+ 3 files changed, 59 insertions(+), 25 deletions(-)
 
-> +
-> +_Static_assert(sizeof(struct atomic_statx) == 256, "struct statx is 256 bytes");
-> +
-> +#define EXIT_TORN	2
-> +#define EXIT_UNEXPECTED	3
-
-EXIT_FAILURE and EXIT_SUCCESS could be used here, no?
-
-> +
-> +#define OLD	'A'
-> +#define NEW	'B'
-> +
-> +/* Does the device support an atomic write of len bytes? */
-> +static bool can_write_atomically(int fd, size_t len)
-
-bdev_can_atomic_write_for_length() would be a better name and functionality
-
-> +{
-> +	struct atomic_statx stx = { 0 };
-> +
-> +	if (syscall(SYS_statx, fd, "", AT_EMPTY_PATH, STATX_WRITE_ATOMIC,
-> +		    &stx)) {
-> +		perror("statx");
-> +		return false;
-> +	}
-> +	if (!(stx.stx_mask & STATX_WRITE_ATOMIC) ||
-> +	    !(stx.stx_attributes & STATX_ATTR_WRITE_ATOMIC)) {
-> +		fprintf(stderr, "device does not support atomic writes\n");
-> +		return false;
-> +	}
-> +	printf("atomic write unit min %u, max %u\n",
-> +	       stx.stx_atomic_write_unit_min, stx.stx_atomic_write_unit_max);
-> +	if (len < stx.stx_atomic_write_unit_min ||
-> +	    len > stx.stx_atomic_write_unit_max) {
-> +		fprintf(stderr, "device cannot write %zu bytes atomically\n",
-> +			len);
-> +		return false;
-> +	}
-> +	return true;
-> +}
-> +
-> +/* Read the range back past the page cache and count the bytes of each value. */
-> +static int count_bytes(int fd, char *buf, size_t len, size_t *old_bytes,
-> +		       size_t *new_bytes)
-
-compare_bytes() may be a better name
-
-> +{
-> +	size_t i;
-> +
-> +	if (pread(fd, buf, len, 0) != (ssize_t)len) {
-> +		perror("pread");
-> +		return -1;
-> +	}
-> +
-> +	*old_bytes = *new_bytes = 0;
-> +	for (i = 0; i < len; i++) {
-> +		if (buf[i] == OLD)
-> +			(*old_bytes)++;
-> +		else if (buf[i] == NEW)
-> +			(*new_bytes)++;
-> +	}
-> +	printf("on disk: %zu old bytes, %zu new bytes, %zu other\n",
-> +	       *old_bytes, *new_bytes, len - *old_bytes - *new_bytes);
-
-Do we really need all these non-error messages? I just wonder if they 
-can be obvious and useful to someone examining the log.
-
-> +	return 0;
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	size_t old_bytes, new_bytes;
-> +	size_t len, pgsz;
-> +	struct iovec iov;
-> +	char *buf;
-> +	ssize_t ret;
-> +	int fd, err, status = 1;
-
-status = 1 seems a bit magic to me
-
-> +
-> +	if (argc != 2) {
-> +		fprintf(stderr, "usage: %s <blockdev>\n", argv[0]);
-> +		return 1;
-> +	}
-> +
-> +	pgsz = sysconf(_SC_PAGESIZE);
-> +	len = 2 * pgsz;
-> +
-> +	fd = open(argv[1], O_RDWR | O_DIRECT);
-> +	if (fd < 0) {
-> +		perror("open");
-> +		return 1;
-> +	}
-> +
-> +	if (!can_write_atomically(fd, len))
-> +		goto out_close;
-> +
-> +	buf = mmap(NULL, len, PROT_READ | PROT_WRITE,
-> +		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> +	if (buf == MAP_FAILED) {
-> +		perror("mmap");
-> +		goto out_close;
-> +	}
-> +
-> +	/* Write the old contents and check that they read back. */
-> +	memset(buf, OLD, len);
-> +	if (pwrite(fd, buf, len, 0) != (ssize_t)len) {
-> +		perror("pwrite");
-> +		goto out_unmap;
-> +	}
-> +	if (count_bytes(fd, buf, len, &old_bytes, &new_bytes))
-> +		goto out_unmap;
-> +	if (old_bytes != len) {
-> +		fprintf(stderr, "old contents did not read back\n");
-> +		goto out_unmap;
-> +	}
-
-Can all this functionality (count_bytes() and length compare) be 
-combined into a single function?
-
-> +
-> +	/* Fill in the new contents and make the last page unreadable. */
-> +	memset(buf, NEW, len);
-> +	if (mprotect(buf + len - pgsz, pgsz, PROT_NONE)) {
-> +		perror("mprotect");
-> +		goto out_unmap;
-> +	}
-> +
-> +	iov.iov_base = buf;
-> +	iov.iov_len = len;
-> +	ret = pwritev2(fd, &iov, 1, 0, RWF_ATOMIC);
-> +	err = errno;
-> +	if (ret < 0)
-> +		printf("pwritev2(RWF_ATOMIC) failed: %s\n", strerror(err));
-> +	else
-> +		printf("pwritev2(RWF_ATOMIC) returned %zd of %zu\n", ret, len);
-
-The message does not really make sense, specifically "returned %zd of %zu"
-
-> +
-> +	/* Make the last page readable again and reuse the buffer. */
-
-Comments like "reuse the buffer" are a bit verbose
-
-> +	if (mprotect(buf + len - pgsz, pgsz, PROT_READ | PROT_WRITE)) {
-> +		perror("mprotect");
-> +		goto out_unmap;
-> +	}
-> +	if (count_bytes(fd, buf, len, &old_bytes, &new_bytes))
-> +		goto out_unmap;
-> +
-> +	if (old_bytes != len && new_bytes != len) {
-> +		printf("atomic write was torn: %zu of %zu bytes written\n",
-> +		       new_bytes, len);
-> +		status = EXIT_TORN;
-> +	} else if (ret >= 0 || err != EINVAL) {
-> +		printf("atomic write did not fail with EINVAL\n");
-> +		status = EXIT_UNEXPECTED;
-> +	} else if (new_bytes) {
-> +		printf("atomic write went through despite the unreadable page\n");
-> +		status = EXIT_UNEXPECTED;
-> +	} else {
-> +		printf("atomic write failed with EINVAL and left the device unchanged\n");
-
-maybe, "atomic write failed with EINVAL and left the device unchanged, 
-as expected"
-
-
-> +		status = 0;
-> +	}
-> +
-> +out_unmap:
-> +	munmap(buf, len);
-> +out_close:
-> +	close(fd);
-> +	return status;
-> +}
-> diff --git a/tests/block/053 b/tests/block/053
-> new file mode 100755
-> index 0000000..c7a24b4
-> --- /dev/null
-> +++ b/tests/block/053
-> @@ -0,0 +1,60 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2026 Tal Zussman
-> +#
-> +# Issue a RWF_ATOMIC direct write to a block device from a buffer whose last
-> +# page cannot be pinned and check that the write is all or nothing. A block
-> +# device atomic write is a hardware atomic write, submitted as a single bio,
-> +# so the direct I/O path has to fail the write outright when pinning its
-> +# buffer comes up short. Without that, it submits what was pinned with
-> +# REQ_ATOMIC set and leaves the rest to the buffered fallback, tearing the
-> +# write at the pin boundary.
-
-This seems to repeat the comments from the C code
-
-> +#
-> +# Regression test for patch "block: fail a short atomic pin in
-> +# bio_iov_iter_get_pages()".
-> +
-> +. tests/block/rc
-> +. common/scsi_debug
-> +
-> +DESCRIPTION="check that a partially pinned atomic write is not torn"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_scsi_debug && _have_module_param scsi_debug atomic_wr
-> +	_have_src_program atomic-write-torn
-> +}
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	local ret
-> +
-> +	# The helper writes two pages atomically. An atomic write unit max of
-> +	# 256 blocks, 128K, covers page sizes up to 64K.
-> +	if ! _configure_scsi_debug delay=0 atomic_wr=1 atomic_wr_max_length=256 \
-> +	     dev_size_mb=16; then
-> +		echo "configuring scsi_debug failed"
-> +		return 1
-> +	fi
-> +
-> +	src/atomic-write-torn "/dev/${SCSI_DEBUG_DEVICES[0]}" >>"${FULL}" 2>&1
-> +	ret=$?
-> +
-> +	_exit_scsi_debug
-> +
-> +	case $ret in
-> +	0)
-> +		;;
-> +	2)
-> +		echo "atomic write was torn"
- > +		;;> +	3)
-> +		echo "atomic write did not fail cleanly"
-> +		;;
-> +	*)
-> +		echo "atomic-write-torn helper failed"
-> +		;;
-
-"atomic write did not fail cleanly" won't" help a tester much. If the 
-errors from the C code are logged, then that should help the tester know 
-know the issue.
-
-> +	esac
-> +
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/block/053.out b/tests/block/053.out
-> new file mode 100644
-> index 0000000..43d1b4b
-> --- /dev/null
-> +++ b/tests/block/053.out
-> @@ -0,0 +1,2 @@
-> +Running block/053
-> +Test complete>
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index 81f21bad787e..af1aaa1f9e9b 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -190,38 +190,66 @@ bool zcomp_shared_decomp(struct zcomp *comp)
+ 	return !comp->ops->create_dctx;
+ }
+ 
++static bool zcomp_dstrm_excl_trylock(struct zcomp_dstrm *zstrm)
++{
++	/* Cheap pre-check: don't touch a busy stream's cachelines */
++	if (mutex_is_locked(&zstrm->excl_lock))
++		return false;
++	/*
++	 * Pin the stream.  The write side of ->lock is only taken by
++	 * zcomp_cpu_dead(), which also sets ->local_copy to NULL.
++	 */
++	if (!down_read_trylock(&zstrm->lock))
++		return false;
++	if (zstrm->local_copy && mutex_trylock(&zstrm->excl_lock))
++		return true;
++	up_read(&zstrm->lock);
++	return false;
++}
++
++static struct zcomp_dstrm *zcomp_dstrm_excl_tryget(struct zcomp *comp)
++{
++	struct zcomp_dstrm *zstrm;
++	unsigned int cpu;
++
++	for_each_online_cpu_wrap(cpu, raw_smp_processor_id()) {
++		zstrm = per_cpu_ptr(comp->dstream, cpu);
++		if (zcomp_dstrm_excl_trylock(zstrm))
++			return zstrm;
++	}
++	return NULL;
++}
++
+ struct zcomp_dstrm *zcomp_dstrm_get(struct zcomp *comp,
+ 				    enum zcomp_dstrm_mode mode)
+ {
+-	for (;;) {
+-		struct zcomp_dstrm *zstrm = raw_cpu_ptr(comp->dstream);
+-
+-		/*
+-		 * Pin the stream.  The write side of ->lock is only taken
+-		 * by zcomp_cpu_dead(), so this never contends with other
+-		 * decompression requests, regardless of their mode.
+-		 */
+-		down_read(&zstrm->lock);
+-		if (!zstrm->local_copy) {
+-			/* The stream has been destroyed, re-try */
++	struct zcomp_dstrm *zstrm;
++
++	if (mode == ZCOMP_DSTRM_SHARED) {
++		for (;;) {
++			zstrm = raw_cpu_ptr(comp->dstream);
++			down_read(&zstrm->lock);
++			if (zstrm->local_copy)
++				return zstrm;
+ 			up_read(&zstrm->lock);
+-			continue;
+ 		}
+-
+-		/*
+-		 * Exclusive requests additionally own ->local_copy and
+-		 * ->ctx and hence can only wait for each other.
+-		 */
+-		if (mode == ZCOMP_DSTRM_EXCLUSIVE)
+-			mutex_lock(&zstrm->excl_lock);
+-		return zstrm;
+ 	}
++
++	/* wait_event() checks the condition first before touching the waitq */
++	wait_event(comp->dstrm_waitq, (zstrm = zcomp_dstrm_excl_tryget(comp)));
++	return zstrm;
+ }
+ 
+-void zcomp_dstrm_put(struct zcomp_dstrm *zstrm, enum zcomp_dstrm_mode mode)
++void zcomp_dstrm_put(struct zcomp *comp, struct zcomp_dstrm *zstrm,
++		     enum zcomp_dstrm_mode mode)
+ {
+-	if (mode == ZCOMP_DSTRM_EXCLUSIVE)
++	if (mode == ZCOMP_DSTRM_EXCLUSIVE) {
+ 		mutex_unlock(&zstrm->excl_lock);
++		up_read(&zstrm->lock);
++		if (wq_has_sleeper(&comp->dstrm_waitq))
++			wake_up(&comp->dstrm_waitq);
++		return;
++	}
+ 	up_read(&zstrm->lock);
+ }
+ 
+@@ -294,6 +322,8 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_dstrm *zstrm,
+ 	mutex_lock(&zstrm->excl_lock);
+ 	ret = zcomp_decompress_buf(comp, zstrm, sg, zstrm->local_copy, &req);
+ 	mutex_unlock(&zstrm->excl_lock);
++	if (wq_has_sleeper(&comp->dstrm_waitq))
++		wake_up(&comp->dstrm_waitq);
+ 	return ret;
+ }
+ 
+@@ -385,6 +415,7 @@ static int zcomp_init(struct zcomp *comp, struct zcomp_params *params,
+ 		ret = -ENOMEM;
+ 		goto cleanup;
+ 	}
++	init_waitqueue_head(&comp->dstrm_waitq);
+ 
+ 	for_each_possible_cpu(cpu) {
+ 		struct zcomp_dstrm *zstrm = per_cpu_ptr(comp->dstream, cpu);
+diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
+index 6764818d2a9f..39efefc43a13 100644
+--- a/drivers/block/zram/zcomp.h
++++ b/drivers/block/zram/zcomp.h
+@@ -5,6 +5,7 @@
+ 
+ #include <linux/mutex.h>
+ #include <linux/rwsem.h>
++#include <linux/wait.h>
+ 
+ struct scatterlist;
+ 
+@@ -96,6 +97,7 @@ struct zcomp_ops {
+ /* dynamic per-device compression frontend */
+ struct zcomp {
+ 	struct zcomp_dstrm __percpu *dstream;
++	wait_queue_head_t dstrm_waitq;
+ 	struct zcomp_cstrm __percpu *cstream;
+ 	struct zcomp_cstrm *recomp_cstream;
+ 	const struct zcomp_ops *ops;
+@@ -118,7 +120,8 @@ void zcomp_cstrm_put(struct zcomp_cstrm *zstrm);
+ bool zcomp_shared_decomp(struct zcomp *comp);
+ struct zcomp_dstrm *zcomp_dstrm_get(struct zcomp *comp,
+ 				    enum zcomp_dstrm_mode mode);
+-void zcomp_dstrm_put(struct zcomp_dstrm *zstrm, enum zcomp_dstrm_mode mode);
++void zcomp_dstrm_put(struct zcomp *comp, struct zcomp_dstrm *zstrm,
++		     enum zcomp_dstrm_mode mode);
+ 
+ int zcomp_compress(struct zcomp *comp, struct zcomp_cstrm *zstrm,
+ 		   const void *src, unsigned int *dst_len);
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index e608769bfad5..079f3723db31 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1382,7 +1382,7 @@ static int decompress_bdev_page(struct zram *zram, struct page *page,
+ 		copy_page(dst, zstrm->local_copy);
+ 		kunmap_local(dst);
+ 	}
+-	zcomp_dstrm_put(zstrm, ZCOMP_DSTRM_EXCLUSIVE);
++	zcomp_dstrm_put(zram->comps[prio], zstrm, ZCOMP_DSTRM_EXCLUSIVE);
+ 	slot_unlock(zram, index);
+ 
+ 	return ret;
+@@ -2135,7 +2135,7 @@ static int read_compressed_page(struct zram *zram, struct page *page,
+ 	dst = kmap_local_page(page);
+ 	ret = zcomp_decompress(zram->comps[prio], zstrm, sg, size, dst);
+ 	kunmap_local(dst);
+-	zcomp_dstrm_put(zstrm, mode);
++	zcomp_dstrm_put(zram->comps[prio], zstrm, mode);
+ 	zs_obj_read_sg_end(zram->mem_pool, handle);
+ 
+ 	return ret;
+-- 
+2.56.0.176.g3575e65682-goog
 
