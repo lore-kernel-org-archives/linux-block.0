@@ -1,76 +1,79 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B728376BC1
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 03:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2579F32692C
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 04:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792120426; cv=none; b=r+8D61lxvaQ9GLQqI99pw0dAlyEa449yAr0e7gvw6WP7ay8T+IT8T/4HGqSE935g/EptFeqEwk60AdWj9cUfmYyYrjWO2XGBdz3YXnamvJFA/MuyIxpdrNdnZoQd2Exscni9pYR9ENkb0AEOeaX6PYbgO5zLOVW9/6LxrhgK0NM=
+	t=1792124287; cv=none; b=TFbnAkDVWAsFPLb1jBipa7JWWuw6WH8i60t0RhzrruKVRbiSQXf+2cP+/trVsFQkqNWiOEClM8VJAoILdcgUJtbx1316UJGfY+f99gdNRy833hVmaf+lhDcIvhIvZ0HzXnHsPeP6kft3QD9qH0bqTuTE0Ug+ZHH5KxEsvFcVsUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792120426; c=relaxed/simple;
-	bh=wleMGtmNrjSRnjejVtlXOJUIdjEEXlRsTfBv/1SGjqs=;
+	s=arc-20240116; t=1792124287; c=relaxed/simple;
+	bh=bszKIuYos4/4nZ7PF45CtUCaMdKhDYhnKMxRNu1coKo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A84u4+agfsc9Zze+gATwNZmI/aZ7UmqCYTLSMUmM2+SX2sPlXUQIYLrqVcaxVYi10+DZ+aflpLsJ/vs+3Jjr4OysebZjIYyps8PKZ9q0qgLrt56TZUoTZzExL8MgfgkS6p6GkALoDLoObwNsBQI6p3UqOgfHdR40e6hGPfvDXNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=KIUgBDBP; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=BNWkyhJrEs/Yu6w07ClLAni4cqN9EBGbei2a3PIbFjLjb38EZhHTwxHwleEcc4JYdaYmIE7YCEiwIFZgAp5IKYLHQ8ByEtpl+vL8pj+VT19ogD7Y9SoVpde6LW1KCBYxmYjZvSqg22H0HUrUAgrzSHYb3MPQ1y3Ir/ZdwKAMMl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hE1pyWNZ; arc=none smtp.client-ip=209.85.167.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KIUgBDBP"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8897e83332fso390435b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 20:13:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hE1pyWNZ"
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-4b28d7c729fso1240591b6e.0
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 21:18:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792120424; x=1792725224; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792124284; x=1792729084; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=kncXSXLqdZsNjreOv88DLkZuZB0aSQpv0A/ER6BF3zo=;
-        b=KIUgBDBPJ7rpEDaORQ+17932OpplA8zMrI+rNMLATMBC/N+5+iGgpx12tfGI2n96qj
-         lri5vFQAAp4l+CYznJpto75ymAbgAcYCErP7f7iwwzRSEo/jTkA0ulCY0Ycu2EGN9OcD
-         jKhO/TnQnbn33HRL7QFmLvIr1ZVKxHu7/as+Q=
+        bh=gqgNfUlX3mCkm0/h/3yH5iAcgC/iBbjyQr+ygOjQ+Ok=;
+        b=hE1pyWNZ4KQBhDLFo3yvBKSwwEacqrgNrEydNfl4DuDH/efNZgO8NDZ1JNG415wNZ+
+         j9/k3lS3tCMFsifmIx2UE/IY7f//5jCBhE6VSWvvD+HWYo69GL1Vfiol3FgHFf/kJZj6
+         daTMa5OShAORdxj6wYdL/q4HkJneDqKha0+KXk9f8XPflFOAQiKS1H6YXJ9MVTDvz71Z
+         QxhMQnME/6raXr8behqeHfRmR9Ezsi/bti8PHlgjcyv3+3pxJ5MNVF5t66EYWLnbTVN+
+         UYbmySp5uAab4C3vX6VO5OzloHZIcCa4ZqpFDsVTlN/lpl7KTnbtMjIXCeJQTxr+gjkb
+         WEOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792120424; x=1792725224;
+        d=1e100.net; s=20260707; t=1792124284; x=1792729084;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=kncXSXLqdZsNjreOv88DLkZuZB0aSQpv0A/ER6BF3zo=;
-        b=Af2Tk4Ag9XHdK5sSZOUged36QxRgXS2LYYl3pjeehh8YZmDT+fLjGnikcJCK7aPcMx
-         mVWNNBzzSPTU5wg9vNL5JPQcUPyiMSL7gN2gwdhN34s8/Z6Uf+BbV/zVFSr2b2HD1zOc
-         qJqvvq4e5BfysPcPiPCOO8NjjaKDFaRths4MLalsBwO18cfjwgNMt401flZJ6Xpeh7Pc
-         A0mkLDvr+dZRByBc/lu7pX7/L6g9Amp8TM6zK+tPj1iJeP4+geo1RC8NdzRv5EyP5aYd
-         wAVfmsihCjfuqtvE9bVojldNauNEvKWSHhmFJ77+ioAukEIihfYSlILqcw8A4jbtTK0s
-         M0gA==
-X-Forwarded-Encrypted: i=1; AKwUvBwhI59bv4GDhL3Fk0xCIq9tV3sLQUoby3QbkSCYTE2hTmQAeqU78LwoLv/go2W07j++3bwujtImMaISuQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLej24d+Js5m5XKPilosNe5umaeAIHU6kjZRZ9kbaFHZ7LgCC49
-	paaXP0MDZFXTy9ak3Cmq3+7nHFh6WES1/1FtBu2dNiYXGg5HfixRPEf5Nu523JhukA==
-X-Gm-Gg: AYBFou3bBCZo8Q9SsXjAKFVdP90sak2/EHB29LpoCrSGG9Je7jNchb2Oxwtx9xEYtY5
-	9Cb5gp59O4FutGwPOf6eDMc8vcy0VoQ/H0AOnAh8BOrcz/Mcx0fkzlOCdziAbc5SC8tHBH2d9zB
-	RXaYfr5sMcz4HZbkvarxk+spCvCjJEZFoLGHD1U2+BaUlQHwxFo8eGuUxolNoBkpI4m1K1vOTPN
-	qBDUH4Tao+0cSY5R8C9nQwvdvJwoQJ+hGBi0kpsUWMjjXNHFOzWCSPjZ0h6UDwItrtFMfmZhmq5
-	AeVoEMiX7ctvz/LuLIdxmksEYcxHzZzrVhAUHEaspsiQ/0c6rfd8w52lWen7beNTiocdqbiNRQb
-	VSAVetwIWv+4PQxOIpwLozxYO/WbzndHKcptlgw9+lqEAGfbaWDFKDOqLFYNpfJdZva1gCEe0NZ
-	Yt9Tfbq8+g2Xjpjjrft4FeSkwjp92tY2XEpfP27n6x8iRrWm5xUU6dPCdli1AFH0sF4rai8bQwQ
-	TzHIZ2W1zjBxmvl0SIhpUYxc10RuKpWYgzp5s5JLmYGHy42esTPaOrPYObg++cgbAzlI8m4k3qs
-	FBqledqmvsNTNKjU25bO
-X-Received: by 2002:a05:6a20:3d19:b0:3e0:da23:8743 with SMTP id adf61e73a8af0-3e201efbf5dmr1523172637.23.1792120424479;
-        Thu, 15 Oct 2026 20:13:44 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:a579:8b87:8304:7ac2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-89f54b2eec9sm406056b3a.8.2026.10.15.20.13.41
+        bh=gqgNfUlX3mCkm0/h/3yH5iAcgC/iBbjyQr+ygOjQ+Ok=;
+        b=APnbKWmLGjMJLMhmw1wO575YgZy7vDqAGimx3qL85v7g59FuUAi6fT8JsQnhhwn23t
+         XlmYXsyYDZqpajbLz2GC+tlAb7mKXTdJTzVlUc29WZwzHwyO9neZeIPQ0YRzfgDsDfJ6
+         XGzqIaBo6cm8vVrM8R7n6tDFfkjuE83Pd4qElNn8u4OYfFWGOpJ+rLd5NFgOpXKGyCd/
+         U+SUP/mGd3YOLDxr5rKrNYVjZ7n71FtsN9IBykXa2QlyCsy/HmIlf/JbmgJvbH1WCx0K
+         7vFt8SgQ0Yxc++JxqWoJhqlF4ulSprNq1nlJC8X92AjglZuOu+kxylLHKif0eHPdQ4oj
+         D92g==
+X-Forwarded-Encrypted: i=1; AKwUvBzf7hik/6YuecrfdhxcPrAN1whnzECOfuljpS6oF+GrYPcZrF3cCkI198oUvk0NUI8WPTAEeZj0DWSwtw==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJtvuxzLHU8IoT/YX2Tr2W123CFwrehyKkq3k9xaAEJNESYbepT
+	goCPPIplUys09CmrqBje68WQEp1d1gvf9fVlpBM4JZ1impMS/KHILflJ
+X-Gm-Gg: AYBFou0IXHa2ffg4c2PLRDO7TcFcy4R5XmpAPAgO4EGozfmw1fAFnImlMYQ6r46PXF6
+	4BpYLA1DEmmy5cZO2pdJoCsGtWNlqFuRupEH2mJPSfVevbxdXYt6Q3YeX0AhWnsNrxt4OzmKI2+
+	7aEl1hX8nJGhu2SlEnj+GvundxTz9ZxQim7Q2/D3vgWvgn1RdPHlJ5/z5eNecQgiWLbx12baf1o
+	zwQgpPt+5eblRV2PRJ/mGADxPw4hOsZjrLKhQatyCTkUes+iLpdPTmnF9kO1yHKTE+1vUnEA8hf
+	QqVCbLq/SsBRNPJHnQ6H9RN0dy5nyMVnJ1WBhqrACgR1hcfB6t4RWfhGpmPoWRoXZWFGxf7TizR
+	ShAKjlNXnlhLj9zbiBwaNWCrlMQCbYU9V0kMLoaCl1kiZQLSPlBwQQrLy/fU7+XcM6pd6LdVlMO
+	aqIxBun4bw+KfrRqU2a8uBG8cVdKN4Z0qt9b7B4lxKqZ/ySJ1qp3PA0ScC+W/DNWW2wF536mK03
+	+MdLqL7jha7F3+yzgrgBpdvPp7PnTZjX6RBF3My3udafSoeS4ykKYm/xppca/V7hLuzgy3kfGEl
+	KTf7G6i7GSDDiw==
+X-Received: by 2002:a05:6808:19a9:b0:4b9:e65b:8c33 with SMTP id 5614622812f47-50c54177b94mr21799531b6e.33.1792124283942;
+        Thu, 15 Oct 2026 21:18:03 -0700 (PDT)
+Received: from fedora-laptop ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-5388c163591sm643029b6e.7.2026.10.15.21.17.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 20:13:42 -0700 (PDT)
-Date: Fri, 16 Oct 2026 12:13:39 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Barry Song <baohua@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Bo Zhang <zhangbo0325@gmail.com>, akpm@linux-foundation.org, bgeffon@google.com, 
-	minchan@kernel.org, richardycc@google.com, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 10/11] zram: use rw_semaphore for decompression streams
-Message-ID: <atGWIBSUdnwJ4sTX@google.com>
-References: <atBh9xfpOji_A7A_@google.com>
- <20261015112440.1491168-1-zhangbo56@xiaomi.com>
- <atGPwJL6XzlRaMva@google.com>
- <CAGsJ_4weqqSGH2JCh5EThtU8N3e96kRnhLtd9Fotia1t+7YqxQ@mail.gmail.com>
+        Thu, 15 Oct 2026 21:18:03 -0700 (PDT)
+Date: Thu, 15 Oct 2026 23:17:55 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Qiliang Yuan <odys.yuan@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai@fygo.io>,
+	Hannes Reinecke <hare@suse.de>,
+	"Martin K. Petersen" <mkp@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-mq: share one tags_srcu instance across all tag
+ sets
+Message-ID: <atGlc3-aaLfIHJH4@fedora-laptop>
+References: <20261001-bug-blk-mq-global-tags-srcu-v1-0-e8415da10d1b@gmail.com>
+ <20261001-bug-blk-mq-global-tags-srcu-v1-1-e8415da10d1b@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,44 +82,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGsJ_4weqqSGH2JCh5EThtU8N3e96kRnhLtd9Fotia1t+7YqxQ@mail.gmail.com>
+In-Reply-To: <20261001-bug-blk-mq-global-tags-srcu-v1-1-e8415da10d1b@gmail.com>
 
-Hi,
-
-On (26/10/16 11:10), Barry Song wrote:
-> > > I applied the kmalloc+memcpy variant on-device and re-ran the same
-> > > Android A/B. It removes the exclusive path entirely in our workload.
-> > >
-> > >                       9+10       9+10 + kmalloc fastpath
-> > >   read contended      ~1,959     0
-> > >   read wait_ns total  ~12 s      0
-> > >   read wait_ns max    72-96 ms   0
-> > >   shared              76.7%      100%
-> > >   exclusive           23.3%      0%
-> > >   dpin_contended      0          0
-> > >
-> > > Every decompression now takes the shared (down_read) path, including the
-> > > cross-page objects that previously had to go exclusive. The ~1,959
-> > > residual contentions on the exclusive path are gone, and pin contention
-> > > stays at zero, so the full read side runs concurrently with no stream
-> > > contention.
-> > >
-> > > Read-side contention end to end:
-> > >
-> > >                  baseline   9+10      9+10 + kmalloc
-> > >   read contended 24,749     ~1,959    0
-> > >   shared         0%         76.7%     100%
-> >
-> > Thank you.  I'll include kmalloc patch to v4 of the series.
+On Thu, Oct 01, 2026 at 05:17:50PM +0800, Qiliang Yuan wrote:
+> Freed request pages and flush queues are handed to call_srcu() so that
+> concurrent tag iterators never see them disappear. Each tag set embeds
+> its own srcu_struct for this, which blk_mq_free_tag_set() has to drain
+> with srcu_barrier() before cleanup_srcu_struct(). The barrier waits for
+> a full SRCU grace period even when the callbacks are long done, adding
+> 1-3 ms to every tag set teardown. Drivers that free tag sets under a
+> lock make it worse: ublk does it under the global ublk_ctl_mutex, so
+> deleting devices from many threads serializes on that grace period.
 > 
-> Hi Sergey, Bo,
+> The callbacks free memory that only blk-mq owns. They touch neither
+> the tag set nor driver code, so they don't need a per-set domain.
+> Replace the per-set srcu_struct with a single global one. Freeing a tag
+> set no longer waits for a grace period, and each tag set no longer
+> allocates per-CPU SRCU state. The read side is unchanged. The only cost
+> is that a long-running iterator can now delay these frees for other tag
+> sets too, which only postpones freeing memory.
 > 
-> I assume when Sergey sent v4, could tag for the patchset with
+> On 7.3-rc5 in a 16-vCPU VM, with 1 queue and depth 16 per ublk device,
+> median of 3 runs (5 for the 16-thread null_blk case):
 > 
-> Tested-by: Bo Zhang <zhangbo56@xiaomi.com>
+>                                        before     after
+>   ublk DEL_DEV p50, serial             3.45 ms    0.17 ms
+>   ublk delete 1000 devices, serial     19.5 s     14.9 s
+>   ublk delete 4000 devices, 16 thr     19.0 s     2.9 s
+>   null_blk destroy 500 devs, serial    9.97 s     9.25 s
+>   null_blk destroy 256 devs, 16 thr    5.15 s     4.30 s
+> 
+> Fixes: ad0d05dbddc1 ("blk-mq: Defer freeing of tags page_list to SRCU callback")
+> Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
 
-That would be great.
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-> also, Bo's data can be put in cover-letter?
 
-Sure, I can include it, along with my numbers.
+Thanks,
+Ming
