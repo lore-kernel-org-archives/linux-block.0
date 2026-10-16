@@ -1,149 +1,131 @@
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E6448DB3A
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 18:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B99270552;
+	Fri, 16 Oct 2026 19:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792176483; cv=none; b=a1EX5a+5nl5WJJ5KelR7qh9Y4aWjPda2H7AxZ5ALsps5Ityv+QJ1BJH/+4HoRL8M+/mmQJ4QmtvoRmuRvEukG9P0U5Eh6bRP4RgjnAQaadAs+WVsAKJv/OYemn3GZmKFNMhAfUfNR+JiX/2BKJckRzPslkXU20drbJ1bYB0QkUU=
+	t=1792179961; cv=none; b=p6gBmPv4wgHK0mS+V8Z753tDxag+FRdLGWeY2n93UV8qt6xogC6NJuv8DZzudRKValfoLGKou2kS2ovSkLpVl570bP2ru6mvuvjs1ENn/pZYCUm/1fO8nDNBn9kQGj1DLBiSSJrW7tmfXbUVQC8ZqbRcn9c6RKLr/tbkYGwMMRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792176483; c=relaxed/simple;
-	bh=/mlGGUmh4imtXySY7AXdz4KuC8XMU5x8T9TuD7xZIic=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tV0C7+RfxEYdsM6/v9062+jY4QQ3vTi8OGz9aSd80lGXcpe0NKPJwzAC9JIkOltLpVciyysVpugW8E4egVPWYX+aZZDQU4Mg4fHE+Z1BA19OpGW/o+rOSp3f6WTEbKC5K3scpuqJxhlLdjskPmJgR+cx5I7uS1mRFcS727LD/go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=U/cDlfZZ; arc=none smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trailofbits.com
+	s=arc-20240116; t=1792179961; c=relaxed/simple;
+	bh=DxKtbX+UudkFnUJj810JNJP/mKeLsk8jdvzDIz0fu2E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References; b=oTYs2VU6TQ6vO4dODJMEVGUAqWJNlcCz1nYs8g9gGljs3y6qaAWz29j+JBRH9eE2mxOF6qy2x8250t616NBl8iWPNjwuPbQUz6dvCDLzx6XwWH4zUnJXceGHPKMFAdIXSk1hTRNTQYsWVovQZrZWqmmt0xLL78+fAv/rd9fbWKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hl21KMTD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b="U/cDlfZZ"
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-141395927feso416808c88.0
-        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 11:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1792176481; x=1792781281; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=s7HjfQVA5Ug4OqWpNl1Z5zod/bI4WrApAYRfZdU17cg=;
-        b=U/cDlfZZcXsv84cy5ctJHrDSAaBCJFigmr7NBBo+tmYyo5xtvW3VMSAS4CHNjYawVm
-         kDWZKPsqkyXXwgAd9WDxr7PhB/zsymSp+gIwWIqEB6IpJ4UVy9p4YASucP6/ieTYACm5
-         nMH4zxt5lKtbU86Ea4FYREhu7193K/VSpASkbpmLOIX+RnyLFgUkaaQ+IwLJuhUcK2gW
-         dPqmRIyvp4zClnN3Jbn3W2NY9oHa9J0HNmjZlFLN+TjAkaRXnLRek2YVfAxPRpj1CRZg
-         pvMzcJE0BrmnSprOiWzsZjLK1d9XwGV3ed1lcMXIQpbaNpbU9TGI8ByFNXaOkcenNy7e
-         gPkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792176481; x=1792781281;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=s7HjfQVA5Ug4OqWpNl1Z5zod/bI4WrApAYRfZdU17cg=;
-        b=oOr3nkH8d1SapoxVkv5l7y4iQ2jkdJyMFFdOEJ5MtF/pxyigHZV7EY6VqqxqhPCz6n
-         nJ0+aIL135JR7PwGo5OxN2peStOifSGehYmGO7ZV+SsN8OEvTtNrwWy0e/rI5vX8rNZO
-         gFnokBeol7Cej2FtoOxcAUdvbM499DGXChRBHSaKB/TKpNwEbvzFpWNwU4fw/48KFN98
-         TChF211UK4rHIVxP6P7avrFcXPaLriG4ChepVhO5K+NbGktZTIM4UA0x3k1k275McyqS
-         67Xkgye2b9mBIxyRJjSwqbk2QPGo/n2cg5rY+UPal9vPqkKdxfYyezws6WEMFGqMpYwC
-         J3sw==
-X-Forwarded-Encrypted: i=1; AKwUvByiqI45D8Ri1aOFmGA/kY+gOC0NC1Qzg2K5xCsB+87zgUoT75WG84mlue4nB+vNVISn7haeaHILCkGuVw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIn904TH+XMvNsA0uFEGLX4fWErxbv6WQe07zg3syqJGF3i3X9R
-	J9yIDMfi23gktSY3MBt0ek5Za6sNsY7PeiXLpL/P/ym+G9RVCLm5VWDndHsDD+iFbqk=
-X-Gm-Gg: AYBFou2fmf9pSXPiS4QHAmQCUrAFunCsi+2PvLoH4wYZKFh7mUqnS4H6VW5vY2UZCon
-	vfqecdLdt6nhozug1lPji5jLqm9bKNB3NXJ1INL0PiFhY2nGStqEasJPmdAEAbgDXSwQWovl8g/
-	Q5qPiZ0kXfVr6iXDenD0LGZ4GqIPpc+BAgG3YlOzHOD6vkGNcvTr+LC3Z0fXzc9GjIFGBMcaOeM
-	Z2yguttRek9MmYAxMBes/XPoUKSYk0SkMpzYTeNWiEuJpn3csLcaoyO6mTD71XkZhuv4suVz2TN
-	kmLxVYjY9CB/Y6DZkCr8EijOmLwZBjNZCM5lH/oV+Ni4lXnkpEq/HqsosQApj3IGsnq9YsvXPje
-	Ck+B6idQaWgch4VsO5La3AYwF4R/B04rYOXUZ8NheMpX7rV/lUK88WGfaAzDC3vNNjhZIfvt2ij
-	R4KwI/9l07ldOmPCAqtUFlTfZCKZc70JLldWlu4j8M6lzyMujOMPXQBcvq8VhnfC8K29sPrArIc
-	204AtfsgwOG3Od2Dg3eyf47OBiqPkuCxrGOMVF+Affdl571wVvs+zncuRNeYqyfPpVQWvA=
-X-Received: by 2002:a05:7301:380a:b0:35a:ca1e:4d82 with SMTP id 5a478bee46e88-361a1c50083mr999407eec.20.1792176480952;
-        Fri, 16 Oct 2026 11:48:00 -0700 (PDT)
-Received: from localhost.localdomain ([2603:8001:5f01:8bab:85ee:eb9a:5637:424d])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36082784ec8sm8004502eec.22.2026.10.16.11.47.59
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 16 Oct 2026 11:48:00 -0700 (PDT)
-From: Artem Dinaburg <artem@trailofbits.com>
-To: stable@vger.kernel.org
-Cc: axboe@kernel.dk,
-	kbusch@kernel.org,
-	kch@nvidia.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6.6.y 2/2] blk-mq: reinsert cached request to the list
-Date: Fri, 16 Oct 2026 14:47:53 -0400
-Message-ID: <20261016184753.27189-3-artem@trailofbits.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20261016184753.27189-1-artem@trailofbits.com>
-References: <20261016184753.27189-1-artem@trailofbits.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hl21KMTD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D2C91F000C5;
+	Fri, 16 Oct 2026 19:45:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792179959;
+	bh=MjeGM9oEcnDgRdbsAdjLLEiqfKFfsdmxL0qkdGbRoJ0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=hl21KMTDL4RNfQXKr6L2iIpCeZcVsHaaklp7H95NhewZNPs3Hwgj/hKJlwP+8cwMI
+	 zegu9GRM3nMAZTDWDRAmWpPbC+HVbk+NCtrNl7nFEEYTs7tVxo3P/xuOqTWChmdpuV
+	 4kfEqv7RAY9hWPq+6QsIJPUOsgUYSCd5XGx+DQy/ovibdzdE36j147ZeH7OMRk7GBD
+	 uUyw1h47W/33031mUYqleGzJwo9zbFg0aDek/2df19ZZJqbem5ZLv9pnM4BOLlbZ89
+	 jr41wiLLyem3FEuLuy7veKzOs6rwzX3iExEf0iWwrqxFN4pEWyLjaTXAuLpQ5sGcl8
+	 fgOpLY5awGYwQ==
+Date: Fri, 16 Oct 2026 09:45:58 -1000
+Message-ID: <f000e148e875d6f1d2b587215117cedc@kernel.org>
+From: Tejun Heo <tj@kernel.org>
+To: Kunhai Dai <daikunhai@didiglobal.com>
+Cc: axboe@kernel.dk, josef@toxicpanda.com, yukuai@fygo.io,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
+	Tao Cui <cui.tao@linux.dev>
+Subject: Re: [PATCH] blk-iocost: publish hweights as one atomic value
+In-Reply-To: <20261015135919.210740-1-daikunhai@didiglobal.com>
+References: <20261015135919.210740-1-daikunhai@didiglobal.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Keith Busch <kbusch@kernel.org>
+Hello, Kunhai.
 
-[ Upstream commit b051bb6bf0a231117036aa607cadf55be8e63910 ]
+The following is a Claude-generated review.
 
-A previous commit removed an optimization out of caution for a scenario
-that turns out not to be real: all the "queue_exit" goto's are safe to
-reinsert the request into the cached_rq's plug list as they are either
-from a non-blocking path, or a successful merge that already holds the
-queue reference. This optimization is most needed for small sequential
-workloads that successfully merge into larger requests.
+On Thu, Oct 15, 2026 at 09:59:19AM -0400, Kunhai Dai wrote:
+> current_hweight() uses separate plain stores for the cache generation and
+> both weights. The compiler can publish the generation before the weights,
+> letting an interrupt accept stale weights as current. Multiple refreshers
+> can also interleave their stores. Invalid donation budgets may then lead
+> to a divide error in transfer_surpluses().
 
-Fixes: dc278e9bf2b9 ("blk-mq: pop cached request if it is usable")
-Suggested-by: Ming Lei <tom.leiming@gmail.com>
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Link: https://patch.msgid.link/20260526153531.2365935-1-kbusch@meta.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Assisted-by: LLM
-[ Backport to 6.6.y: Reinsert with rq_list_add() on each of the three
-  target preparation or merge exits; the target has a single cached_rq
-  list and no shared queue_exit label. ]
-Signed-off-by: Artem Dinaburg <artem@trailofbits.com>
----
-Hi,
+The second one is the main problem and doesn't need the compiler's help.
+The issue path refreshes the cache without ioc->lock, so CPUs issuing
+for the same iocg refresh it concurrently after each commit_weights().
+When one of them computed for the previous generation, its plain stores
+can interleave with the other's in program order and leave the current
+generation with a stale weight, which then stays until the next commit.
+The rereads at out: can also return another refresher's stores, even to
+the timer under ioc->lock. So the race isn't specific to a toolchain.
+Maybe lead the description with it and its effect: stale hweights used
+for the issue cost and the donation decisions, and the divide error?
 
-Please consider this backport of the corrective follow-up for
-CVE-2026-64017 to 6.6.y.
+The packed word fixes both, given that every weight change commits the
+generation before ioc->lock is released, which holds for all
+__propagate_weights() callers.
 
-The backport reinserts the cached request at each of the three older
-preparation or merge exits. See the bracketed backport note above.
+> Validated against commit 24a19b953e2a ("Linux 7.3-rc7"):
 
-The complete fix is already present in 6.12.y, 6.18.y and 7.2.y.
+The description could be a lot shorter: the bug, its effect and the fix.
+The validation details and the revision notes fit better below the ---
+line.
 
-Build-tested as part of a cumulative 6.6.y series on x86_64
-(allmodconfig, CONFIG_WERROR=y).
+> +	cache = ((u64)ioc_gen << 32) | ((u64)(hwa - 1) << 16) | (hwi - 1);
+> +	atomic64_set(&iocg->hweight_cache, (s64)cache);
 
-Thanks,
-Artem Dinaburg
+The encoding is open-coded in the store, the load, ioc_pd_init(),
+iocg_activate(), the tracepoint and the monitor. Maybe pack and unpack
+helpers with GENMASK_U64() and FIELD_PREP()/FIELD_GET() above the trace
+include? The tracepoint header already calls ioc_name() from
+blk-iocost.c, so it can use them too. Using WEIGHT_ONE - 1 as the field
+mask also ties the weight scale to the field width.
 
- block/blk-mq.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> +	atomic64_set(&iocg->hweight_cache,
+> +		     ((u64)(u32)(atomic_read(&ioc->hweight_gen) - 1) << 32) |
+> +		     (u32)atomic64_read(&iocg->hweight_cache));
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1ad77737b27d3233489b4d9f690c9e6ab77d2130..e3fb9222c5ee00c1fa2105e1194d5f9eba831092 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3024,16 +3024,16 @@ void blk_mq_submit_bio(struct bio *bio)
- 		if (unlikely(bio_may_exceed_limits(bio, &q->limits))) {
- 			bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
- 			if (!bio) {
--				blk_mq_free_request(rq);
-+				rq_list_add(&plug->cached_rq, rq);
- 				return;
- 			}
- 		}
- 		if (!bio_integrity_prep(bio)) {
--			blk_mq_free_request(rq);
-+			rq_list_add(&plug->cached_rq, rq);
- 			return;
- 		}
- 		if (blk_mq_attempt_bio_merge(q, bio, nr_segs)) {
--			blk_mq_free_request(rq);
-+			rq_list_add(&plug->cached_rq, rq);
- 			return;
- 		}
- 		rq_qos_throttle(rq->q, bio);
+What are the old weight bits kept for? If it's the iocg_activate
+tracepoint, a comment would help. Otherwise, writing just the stale
+generation would do.
+
+> -		current_hweight(iocg, &hwa, NULL);
+> +		current_hweight(iocg, &hwa, &iocg->hweight_inuse);
+
+This only feeds the inuse_transfer tracepoint further down. Maybe get
+the value with current_hweight() there instead of writing the scratch
+field from here?
+
+> +		if (iocg->hweight_donating > 1)
+> +			iocg->hweight_after_donation =
+> +				min(iocg->hweight_after_donation,
+> +				    iocg->hweight_donating - 1);
+
+Every case this changes still trips the WARN's donating <= 1 test below
+and takes the goto, so it only changes the after= value printed. Is it
+needed?
+
+> +			goto out;
+
+As Tao suggested, this would be better as a separate first patch with
+Fixes: e08d02aa5fc9 ("blk-iocost: implement Andy's method for donation
+weight updates") and Cc: stable, followed by the packed cache with
+Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost").
+
+On Tao's second point, with two or more over-donors the over_hwa rescale
+can floor a small donor's after to zero without any race, and an inner
+node with hwa equal to donating then gets a zero hweight_inuse and the
+same divide. This comes from arithmetic on a constructed hierarchy and
+hasn't been reproduced. If it's reachable, the WARN fires from a
+legitimate state. Would it be better to keep the rescaled after at 1 or
+more, with the goto as the safety net? The goto alone gives up donation
+for the whole period.
+
+Thanks.
+
+-- 
+tejun
