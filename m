@@ -1,61 +1,63 @@
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290413BE17E
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 09:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825B0453A29
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 09:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792142370; cv=none; b=KSRm3te1JTA18MjYglnoXU1DeyRuponTMYSJya5kgqWDi9kEBN8MN3rVrAk/cFrSCCl0+vTl6cSqc6Zlh3NLAcBe3MPTnRbe6H0CBcuSHzY2nCiuAMkBqdtC/iRQcBMnHZlY6GV+RfasZLTi5KQckHXEBqJG3La3nQeQ1JAgigw=
+	t=1792142417; cv=none; b=I6e3r2ipvFpTzbqcLiCxdchwh4osHKM/mwAUMJvoHBwQ203uNrbsMF8cC6E85wGs1t9xWVpolx5ZUFeaY06BXZecwXx9YnMMbenJBFR47qWftwXBgcIHt9TwHNuqdaToLnDItm8Kbp8L+60/CePsYDU3kL/Szbgpru88eneK//Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792142370; c=relaxed/simple;
-	bh=aTMUcqZURy19NxFvWbxUVqjPoyE/i6xWtuoBHgM6v5c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gFjyZ/shk7UC/YyCnT+wMVLvvDcCZ01g6B5Km/WpuIbvktD9JQJ90RV6sWh0Zten+mhnxb4zRoASF4yE7hle/EQo5wCJFpVbpb9Jf6xaLkfW+3RxbPGC11DgMuguGC+bSG6ECbNGEy4iGlXgOhj5a2ziUzFxubvzeqOIAwi+SFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FGFgvUJA; arc=none smtp.client-ip=74.125.82.53
+	s=arc-20240116; t=1792142417; c=relaxed/simple;
+	bh=Ycr52JERApajpnzpQEpfpa1Sk7Py2NlhuetofLIAJLE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EK4VQR672GWYxrS0yJX0Tmoh0dGhOUIVRWwjwhagvMsOUadACyHiuXpw94D1fV4k5L6OK3gtWt2H3sDct4ub8pzRr9uUNr9bKIzu6dd+kBZlhQwXrSIuBFl/izaWnSF8Fjf2ZMae5k30vs/xDLB68emkqnOFyezwkR8BO4nBbSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DuemZmJm; arc=none smtp.client-ip=74.125.82.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FGFgvUJA"
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-16079d54c17so568239c88.0
-        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 02:19:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DuemZmJm"
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-33fb4680717so2092624eec.1
+        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 02:20:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792142368; x=1792747168; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xKIcc9y2gPYr67ZGxXeokwj+kkWiL3V5XBf1VhWPUVU=;
-        b=FGFgvUJAv8s2A6YxIjHQoZU7x5wvf7kQ4xu+ZoTgCQWRbGCz1Xg9tKW93AcvOzwgAi
-         8LRnhT3op7JDqFFFmQhJ4CHy3tDzDHQq/eYpE7xf+7T08hE5qGPUvKu7A1V6tKUEqMrW
-         5rRbMspLxGfMii0OaJvlAtjKTnkXnh1k4qhjo0IfhzSLw28jh7uuFmG3QCeAQQKn7k4H
-         TwN4am2PyPHq0iS6sSwbdmsEjGQi+vItStQRrGaQDavCDjQJoP6a/OnKT0QxonRz6DUH
-         0A8hXHgezZb7NvG+bSP8Sjp7wAwRdQIxI2lWdw9ngKCyw7QFCCx01xdja1WWBgMAFpkO
-         3NcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792142368; x=1792747168;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1792142414; x=1792747214; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=xKIcc9y2gPYr67ZGxXeokwj+kkWiL3V5XBf1VhWPUVU=;
-        b=poj7Pzt2xLA76ITWOu3pqSn9WqTvu+HHbdFZu2eqkvmnPFwCJeS4fFBT+WViNH0iii
-         kNoBeLgqepVd0cZJnr1Kkedoh1h92nJ6u7QSG4R5KVjtQb3g+kGb3c1HgRzo+IqjT28L
-         gT6UtOXZRUc0QY0wtD8/NvCqa8KLXBWnSso+IeSmjKPZ/oPqkG2T68miMe9+U8gQqk9B
-         39jXmeRuHMyRTFwfCO6bBz++m7c3A9vP985UQA97GVknWSoGQhm95wikPfz7wvfS+J3g
-         Y5XgAJ/4qNa06oT5jtCa7ZuATuE09v3ZSCppEBiRhvfIPzYZ09ppu7Q+KiA6MePnXCfq
-         Zr4A==
-X-Gm-Message-State: AFq9FYIAxMABgy/4unnYztC/kEaW3SuA1YjmFbJyDb61CC8WNwAeROWp
-	Fi7fnkk9SB5O4LEO/YM4oRPfhdUYOVlPzK2iixceMSW/+YLNUQ9oiCI=
-X-Gm-Gg: AYBFou0r3zi05PBpTqwkQVuqRtZ6RiR/nzYsBEDUr9hJZ3iHXN0k+Ld1Otd67pRBiSM
-	stP9UZ/CtMD6Tcu9MwTPRx1wkJh5E+TEWxwBEKiNo4qTjdCWx5i1hXXD8Rl4iEh05kMPFQvbUoG
-	D53NZWpQDvsE/km0IVe94jxP4xjfq3teuXil2elEW2RyKd1Q3nl27WoVg09gZq1Q1nkqe4ORIvM
-	JMM8gLGWAMn7/rNDxzjSpicpk0+43dnG2uMSp6J//qkkuWXQMQinnvmYypO1vcYhzShGHZHSA9u
-	X7D4L+PuGAzohDZIBVoLqFyiwBJ+9H1cpSL/HkeGuJhRUCV6HxaRvB982wdluUAsb8iGEv/Buer
-	kFD8C8L6YjSjq6nXB5HC5EvFS1ENMWhZXg+TEe363WkTWoMhiTpPM+KWSseCQ9AblCkAnSZB8Q+
-	gm5G6+M7qSX71vwwzeCCJsREeM4wGHYS7b5g1NBHZirGGtp3wQJ5AISsKrLvlReSITWNGQNq43r
-	wrmaFwU8bKDmBABJ3Gvv93Ch6Kt+vC51idzQ1q4XpNJrsXaDGquPqvMek3IIYU=
-X-Received: by 2002:a05:701b:4544:10b0:144:c12b:dfc6 with SMTP id a92af1059eb24-16a60ce7b43mr28678298c88.44.1792142368095;
-        Fri, 16 Oct 2026 02:19:28 -0700 (PDT)
+        bh=7Jlt5MbUPW2eY7/M7ExgfYc+H3JDnkcPLDIxbgIvOrU=;
+        b=DuemZmJmewaN9aDAcVm0rAaxbPNqSkTNTdx94tOTSVZMOx8E666wm7/bwyl1ArfDy2
+         8n7cAg5lMK4ewF72jHFkOphHWzCE8QDqcxOwcJlnueh0JY9xDd70W5iZrI25qq0Tjfy+
+         YTMZaN2zVbWB6V5QuIwMQ/8OhhyutpWlEveAfaTLxDBdh0NPakl2zXFqu4pwqENft8iK
+         RjrvES7HKo5Y4+3qyL8MAdaJ5nEFLkbnrFN/Q4h39/NWUSwZW3PXqFZZfv2kMAYtsxWd
+         V+Bl4SszIAAwfR895IKawvq73q6vJ44zdPe3MvcAzoXVbOHBJt0ZpeQ3uC17vWUip/PV
+         pv9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792142414; x=1792747214;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=7Jlt5MbUPW2eY7/M7ExgfYc+H3JDnkcPLDIxbgIvOrU=;
+        b=F2NnlmtZ+1HTyXupR+6gDCkXY4aGIQg9Uf7lzjpQ2J8FBh2VRXAkw/e/3CCkGFmgBg
+         IY1OZ94PytcNgDdiYa7E7yWOwMeD2EDlcf1IDhr+VFgpdlzVudy+xzdmKjQNsghiaifB
+         W7C9/B9qP/og5I7WrNCL1a+WKGlM3W5TMuGacA4p6vgD706UlO9WOXZHkwkjuH0bmBO6
+         ZKJeGAAdJ5k3CClJUesCs+joI/tlmNWR/MjbXTj4qjiWbXKa1jfsV7UIksiWNsu8cDWb
+         XLdGF3+W5Frr5mD1vSSi3/+dDZfmQBjb64AKQv0mJiixjT5D+hexZ5PP4H76eZOQ+MuG
+         NIlw==
+X-Gm-Message-State: AFq9FYLBLcmdsqQxdaxKZaWdemVR9+YnnTNwu8+AbBoGFQkznJlDpgs3
+	uz72IZe7xaYn1paYx9Z5EFreuiRIEDt/Nyd6O8/0IQRvu2l2qrL+DZ0=
+X-Gm-Gg: AYBFou1swi+MGvfpIioc2iaRWTWdUvfv32LgHPoeQ3+TkDLM4wicuciZFBS7Ln7SPr9
+	iKSjvbwmxJXJdkjDiSZQ+r5mIovE7mm61xd6gzw37Oo3EUllempwPhDN3No/mrNVenBeWDZTbdh
+	yzAUMWNZlSSQkNIXjQ2WkvavxsoPwPjbKD6Mjrfvg5bPNTI+/RndKig1vB5rTkCnPkONXgKFmZo
+	PXvnjYLWvP6p1xi6wHcVi2cvtg3dS9HbPFwtUSG3shLWONuFhHSZXqH7rxyu7D9zIuqP/Rfhi+H
+	BUkkqtC+kN2OZk37tBpAO0clZOb9C0oZPJrI7Z9746O5sxaxFKEzxjW9/FEEgPMnpOrBREcPEJj
+	Mm8VSgMda1CAMbXTvD/HOc9Q+6u5JSpYFqDOafpNUC0wF2kHni2RXt0rfDzvaCruE/EbJfU9w1+
+	FB8xbfX6gKgVG7dX9WzR/I2w4bR+YqY8za64jgD3F9kvkbRClBSTBBK4gJzbapi0akIKyDc5dpd
+	wEvB5Zw/71dOQPeE/7yx/cVjW6WEsiQxdc2JQ8+fAzw9P3tMv8=
+X-Received: by 2002:a05:7300:da15:b0:359:6382:5e52 with SMTP id 5a478bee46e88-359638267cfmr24171298eec.17.1792142414309;
+        Fri, 16 Oct 2026 02:20:14 -0700 (PDT)
 Received: from anuj-MacBookPro.. ([2406:7400:63:e55a:7bfc:fc3a:e718:89f6])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36082a7b33bsm9840943eec.24.2026.10.16.02.19.23
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36082a7b33bsm9840943eec.24.2026.10.16.02.20.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Oct 2026 02:19:27 -0700 (PDT)
+        Fri, 16 Oct 2026 02:20:13 -0700 (PDT)
 From: Anuj Gupta <anuj1072538@gmail.com>
 To: asml.silence@gmail.com,
 	hch@lst.de,
@@ -69,10 +71,12 @@ Cc: linux-block@vger.kernel.org,
 	joshi.k@samsung.com,
 	anuj20.g@samsung.com,
 	nj.shetty@samsung.com
-Subject: [RFC 0/4] fs: support dma-buf backed direct I/O
-Date: Fri, 16 Oct 2026 14:49:10 +0530
-Message-ID: <20261016091919.971295-1-anuj1072538@gmail.com>
+Subject: [RFC 1/4] block: factor out bdev_init_dma_buf_io_ctx()
+Date: Fri, 16 Oct 2026 14:49:11 +0530
+Message-ID: <20261016091919.971295-2-anuj1072538@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261016091919.971295-1-anuj1072538@gmail.com>
+References: <20261016091919.971295-1-anuj1072538@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -81,34 +85,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series lets an application register a dma-buf against a file,
-so reads and writes go directly to the device as dma-buf backed
-bios with no per-command DMA mapping.
+From: Nitesh Shetty <nj.shetty@samsung.com>
 
-This series builds on Pavel Begunkov's dma-buf block support v11,
-https://lore.kernel.org/all/cover.1791975048.git.asml.silence@gmail.com/
-which is queued in Jens Axboe's tree:
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/log/?h=for-7.4/io_uring-dmabuf
+Factor the checks and driver setup into an exported helper that takes
+an explicit block device, so filesystems can initialize a dma-buf I/O
+context for the device backing a regular file. The block-device file
+operation becomes a wrapper using file_bdev(), so its behavior is
+unchanged.
 
-A separate kernel tree is present here:
-https://github.com/anuj7781/linux-kernel/tree/anuj/fs-dmabuf-rfc-v11-desc-v2
+Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+---
+ block/fops.c           | 12 +++++++++---
+ include/linux/blkdev.h |  3 +++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-Nitesh Shetty (4):
-  block: factor out bdev_init_dma_buf_io_ctx()
-  block: refuse a dma-buf bio for a disk the buffer was not registered
-    on
-  iomap: add dma-buf direct I/O guards and registration helper
-  xfs: support dma-buf registered buffers for direct I/O
-
- block/bio.c                | 15 +++++++++++++++
- block/fops.c               | 19 +++++++++++++++----
- fs/iomap/direct-io.c       | 31 ++++++++++++++++++++++++++++++-
- fs/xfs/xfs_file.c          | 30 ++++++++++++++++++++++++++++++
- include/linux/blkdev.h     |  3 +++
- include/linux/dma-buf-io.h |  2 ++
- include/linux/iomap.h      |  3 +++
- 7 files changed, 98 insertions(+), 5 deletions(-)
-
+diff --git a/block/fops.c b/block/fops.c
+index 49ae0302f123..18a755f6e0b0 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -934,10 +934,9 @@ static int blkdev_mmap_prepare(struct vm_area_desc *desc)
+ 	return generic_file_mmap_prepare(desc);
+ }
+ 
+-static int blkdev_init_dma_buf_io_ctx(struct file *file,
+-				      struct dma_buf_io_ctx *ctx)
++int bdev_init_dma_buf_io_ctx(struct file *file, struct block_device *bdev,
++			     struct dma_buf_io_ctx *ctx)
+ {
+-	struct block_device *bdev = file_bdev(file);
+ 	struct gendisk *disk = bdev->bd_disk;
+ 
+ 	if (!(file->f_flags & O_DIRECT))
+@@ -948,6 +947,13 @@ static int blkdev_init_dma_buf_io_ctx(struct file *file,
+ 		return -EOPNOTSUPP;
+ 	return disk->fops->init_dma_buf_io_ctx(bdev, ctx);
+ }
++EXPORT_SYMBOL_GPL(bdev_init_dma_buf_io_ctx);
++
++static int blkdev_init_dma_buf_io_ctx(struct file *file,
++				      struct dma_buf_io_ctx *ctx)
++{
++	return bdev_init_dma_buf_io_ctx(file, file_bdev(file), ctx);
++}
+ 
+ const struct file_operations def_blk_fops = {
+ 	.open		= blkdev_open,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 2d555a992e75..a0abdf94e7d6 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1609,6 +1609,9 @@ struct block_device_operations {
+ 	int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
+ };
+ 
++int bdev_init_dma_buf_io_ctx(struct file *file, struct block_device *bdev,
++			     struct dma_buf_io_ctx *ctx);
++
+ #ifdef CONFIG_COMPAT
+ extern int blkdev_compat_ptr_ioctl(struct block_device *, blk_mode_t,
+ 				      unsigned int, unsigned long);
 -- 
 2.43.0
 
