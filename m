@@ -1,59 +1,61 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B260383C96
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 04:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2269639891E
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 04:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792125883; cv=none; b=KHgWRv+YuxeojDqwt0NhgavqQss/vU/5dsJ86gEeOVn+qO5H1dmCyeMIGso03k2qwqCiGvV8R3PYlgUVjI/h1YHArlyoYOiA6huwFGDWnB0/wTrwcqLL9yOcYw7jO9el7l2CEzabwNainhvWIt4NaTmwCrC46UYzHZoYav2Mk2k=
+	t=1792125885; cv=none; b=mWaAV2rZWL1gYQpu7eN1ZXEVf5hj3kUvBh2mAw4Ld/8qd30frxlYKW/zz4PsA/mRDTXdd8HSacJABZFg4K2FAToiGtdWywKCuN7y1tDBlk5jfZJTT9IQ2ZcIKMcuwB3AWAmSuKN+4+UxP+d7DW05ZojdrXwtkeItUYIS9qQen0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792125883; c=relaxed/simple;
-	bh=oup3/Nyj6xj77m7I8em0NMpusQ7mg2GpioVp9Gew6ko=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NKHGcHBWeST1N4O2uJpVnUttmc/XFTiqe0TRGsU03SAYrBuC940lBkGuglnfDVepWfbmzTfEVL2+TLhbVyZxgvtz1c3TNPHIODXQOO1nty8aSw/yJKxZq8ZYP2WS7HklJAKTTG8SQr5ZTGNfse6X4iydlnmuf4Nf+n1nCG9IJbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YXN/3To3; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1792125885; c=relaxed/simple;
+	bh=RHYtUzD64UUQO0I5Gujz3c30bA6fMFthjuPZDuvoyFE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qjlNYEw+I2VI0dAquLeSxuVqbSw0lguORRdy/kPoKhIBMDYYELB8O66R7xCoFYjGday4nZXgchQ1bZTmWYsi/2m6FOihWn5t1PJ6V8X1gApwgw3S9aJgRYIbqPgLgURtGt0r00TRg9rYaDvnQWeSYJMOOre5xeJTLmi4qTQE9tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=oIkqTZre; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YXN/3To3"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2dd9cbb661bso43872455ad.3
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 21:44:36 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oIkqTZre"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2d71d1cc8b2so32708865ad.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 21:44:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792125876; x=1792730676; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=GBrnIo3XSNA4XGYMofOPHvvSVBtQNBIdSVaE9YyG9CE=;
-        b=YXN/3To3blV/tz22gvAssI1DnRiLmL2j0ugSyo5opEjyZwNpStQDbb9cDK1SrGvCqe
-         UUa9bJDskyGikuM1bu7A0hxPsRAoCHj1bDvVuwHEj08t8la4a2jCMCvoYxJVZUr9wgDJ
-         KKa39zP5IfXIwJK19NZh4rPqCCgzfwuA9CvoM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792125876; x=1792730676;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=chromium.org; s=google; t=1792125881; x=1792730681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GBrnIo3XSNA4XGYMofOPHvvSVBtQNBIdSVaE9YyG9CE=;
-        b=VBkS4/pxyNHfBn/dfTCuhEdFncWtP4tuaDY2PF0GOvmWWDl7kN5al5jc0TAFv2O82c
-         ARMbI9eyaXVBMRCkU25o2yqARhs0itXtIKxP1/P4BxM0nbxM/jlJdWomy+jnDWV+WUyq
-         uGYaC/5e5N6+NrcbKlZlaKDPpmvZczQ4uZftT21pSa1EN6JaoG/vKUuAAzCLHZSVs+tE
-         3+p65pI5J4PgLi9cIcZbRk6ppR6CVl0dgOmBCAIQZ+Dc7okKYldJoOLgqdeHKyohLkhb
-         +UKYo9uXUGUdb6wgVCt902twq6eksKuoaPEmn6aVDH7EfLNQNgM8xhzVbfkr/RbUdh+C
-         w1kg==
-X-Forwarded-Encrypted: i=1; AKwUvBzOk/z9Y+tWxwQ+EEkFgpQOjysbMK5ihh3fIxCp+lvdIjjyW5exy8xKkYKm2FHd13RZIHhWVJrKRnk6Ng==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJrzhbnvE1FxmM20DTwUPiFZMjzi06kocSUN3YRIfNkVu4R0WZc
-	HR/3wN6hAE1hxVHLUp82Q4vFWjqYeQhVzyXcWZXHunmvY6tF5kJoEJLscGBOO0k5SQ==
-X-Gm-Gg: AYBFou2AdpSJCGyulIfbu0xKfp3mvNmu7crXvc+UZampw3YmlC+VTADkoxdTY2oZDaL
-	hiXgmGD7BhlM2ZA/8Hcoczlk4ovWI3UEW2JV+vVrbuKic2vcOzzVQSofvkn9IrE+p2Q5NjgKEsU
-	C+vr7TIRp2XKEG5cWylLbaJJtY4eUh4vX3/ZggIYlzoaLjmUN3p8h4WV6FkEW3xelPLDOvqBatz
-	CAd4vRDKtGwviX3vn5zLulmgSETJR+3mgl6b/8nYmYw76UZiUOnVDcrKeEfzLLr1bP3WEviDNKD
-	TbcVzIm80pAPaLpbnM2Lv7NEWiQ/kA3bowY/8oSW0JwEKxNK/4lR+A2iqeigD2ADFDghxZdw8BJ
-	ue+TdzII/JLFS0DEwmFEBT3YtefAXK7xb938y0LUtBFnQvua/cjeUV2M+DLj+d26RqXX7OsxmwU
-	BgrnYpBMoFN3tvb7nSfFor9btTCcJX1bYzFigKe4uUcM0BePrVD+HL87RwZHrpbAYXBDopHA4lA
-	jYb3vWOZH5JZGWgPNv/VVSKCpUST1tVgO5Tey4P/HEvL4sxdGN46oFho4c0lMq2
-X-Received: by 2002:a17:903:1a0e:b0:2e8:4066:d247 with SMTP id d9443c01a7336-2e842ab27c7mr190565875ad.33.1792125876506;
-        Thu, 15 Oct 2026 21:44:36 -0700 (PDT)
+        bh=kSllIrSwa3+mZd7MmtH8oNKCmldtJhE3Jr9UEV+PDik=;
+        b=oIkqTZrewVMHmu6ULWHxqfoQlEUWJjaG4/sI3yWW2ifbpxlkUrGqgOt2E5fW7UZfvT
+         X/LwqZzKKkJ6JyKOlk4opSBRhA5gYZ4ikHhRHh+p4luFtjF/i2qAjf1uFRjrURPG2gQ8
+         J3qyx+a6wR4K/o58/ubpjZGCbBBTcIkeLCe1c=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792125881; x=1792730681;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=kSllIrSwa3+mZd7MmtH8oNKCmldtJhE3Jr9UEV+PDik=;
+        b=wrnm6829XaLr6wqBikEcoUPIFoKrZnam8x06ZhLPodFhBfbZ4VLHiRgnSjDxZBd1pr
+         J2rOhdlIZBcfEdGVtclNN0rOCrwu5Zwh0bVV5KKZurOIhF87AB3JQXpR5irJznnIrfDo
+         qtJolSzeLrhZqdFVIR5QkkdDGaqzioScbNIsg6eCns5B101E70dTJyTZHqooOicJZisH
+         +HZ4Q99ToAOKnZr6NurXNmkGD4wVh8wYS+R9Kptyg+ktGoinAnhB3oCeapOodxHfdYl5
+         ZFH3Mr+irDJcuVk8OGkTLUmylj+Wg0XksP8GTbcYVQ66YRU1b4eAEkq/eeB7VXKYyuqy
+         ggzA==
+X-Forwarded-Encrypted: i=1; AKwUvBzeufQrreCo86tXIDfEblSIMzOAZeL7zJaXGSlHQ6h8fYFZX1SVh4EyIfu9OQ/4SqUHC7L2P4Vf2BOeTQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJdIeDKoUvyGbwJSJ3RAdUFxFDp8H5gPZTzP9vTs3Z7viYnZ4Mo
+	x1dCH2/KOukBEl1BzRxRtPqRHRK3jn4EXZ+mWBgIu1TpZ2UK3tKGAnUY8tE8qYxIeA==
+X-Gm-Gg: AYBFou3rb0qtAl5V+L3KrExATaHBpZf7TSYxB49GphhQ6ydxDkRGiMB1ZTmtwAVUVgU
+	SkEoZWJdNthkEsMWALhPNICeOPJeewi1urbCH4Xb+DgJrOKlJHWeQkOQNgswDDvHJV1aMsrY/I8
+	KoMa+RtfgssljZRz1yC93wjJRAuBXr1zJTlU48OON7dabaxlJnROCi2IT57PKkEMiSO9vH5Y1az
+	zbJKA8//1BF0bD/QHUwoMrr8ee0Ed3XJ2I2PIXrDURtftwA/An+8qMIbvkfnaSnGKsmfionVhqi
+	D2/eIwGgYyUfFgghBPZQKDnHPZ4wGJ3lZvpbvmb2f8XKLsyYL/M7Ia+7QXdRXXnPQpbt9FAYPSP
+	BJ8MU8LO47C/ZBKQXq6iTv2Yx2NJqBjoaOCCZ61TwI3N/XpxgZdb4AX5nhtk1hymX4YcmlcarHF
+	V/LqAPIDUqDexXHA5aSMjKeMIe/AFPChvQe6MpW51aopAjRliPGSJBc9ku0ymJ7w8u4fI7jSQzF
+	s79HlGQtw9Rg5T/AyQCEENDzeEg+VVPSLllX+FeK2iTU/dpMm164/KTaHja8NM=
+X-Received: by 2002:a17:903:240b:b0:2e9:8505:5471 with SMTP id d9443c01a7336-2e985055683mr10946845ad.7.1792125881530;
+        Thu, 15 Oct 2026 21:44:41 -0700 (PDT)
 Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:a579:8b87:8304:7ac2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e97e8b1b5esm4137235ad.67.2026.10.15.21.44.34
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e97e8b1b5esm4137235ad.67.2026.10.15.21.44.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 21:44:35 -0700 (PDT)
+        Thu, 15 Oct 2026 21:44:41 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Brian Geffon <bgeffon@google.com>,
@@ -65,10 +67,12 @@ Cc: Brian Geffon <bgeffon@google.com>,
 	linux-block@vger.kernel.org,
 	linux-mm@kvack.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH v4 00/12] zram: redesign zcomp and rework backends
-Date: Fri, 16 Oct 2026 13:44:05 +0900
-Message-ID: <20261016044429.1304561-1-senozhatsky@chromium.org>
+Subject: [PATCH v4 02/12] zram: remove debugfs entry on init failure
+Date: Fri, 16 Oct 2026 13:44:07 +0900
+Message-ID: <20261016044429.1304561-3-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
+In-Reply-To: <20261016044429.1304561-1-senozhatsky@chromium.org>
+References: <20261016044429.1304561-1-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,73 +81,26 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The series has a number of memory usage optimisations and fixes
-that result in savings from double digits KB to triple digits
-KB per-context/per-CPU, depending on backend and its configuration.
-More details are in the corresponding commit messages.
+Do not leak the debugfs entry when zram_init() fails to register
+the block device.
 
-The zcomp redesign and backend rework happen in the final three
-patches.  zcomp part, basically, attempts to address the priority
-inversion problem, that is seen on some setups.  In zcomp, we have
-always kept Read and Write contexts together in per-CPU streams.
-With preemptible zram this becomes a bit of a problem, as a higher
-priority Reader can preempt a Writer, which may hold a stream
-lock, but since the compression stream is locked by the preempted
-Writer, the Reader gets blocked on the very same stream lock.
-However, we don't have any reasons to have Read and Write contexts
-share and compete for the stream, because Read (decompression) and
-Write (compression) paths are completely independent, they never
-touch each other's buffers.  Thus, we can split compression streams
-into per-CPU Read streams and per-CPU Write streams (Barry Song),
-so that Readers and Writers don't block each other anymore.
-Decoupling Reads and Writes results in noticeable performance
-improvements on synthetic tests.  The Reader vs Reader priority
-inversion is still possible.  To attack this problem we introduce
-shared decompression stream (Brian Geffon) which can be used when
-decompression is stateless.  We also now allocate a per-request
-(Read) bounce buffer for linearisation of spanning zsmalloc objects,
-so stateless decompression contexts do not block each other.
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ drivers/block/zram/zram_drv.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The final patch builds atop of decoupled Read and Write streams and
-reworks the way secondary streams are handled.  Secondary compression
-streams are only used from recompression, which is serialized by
-device lock, IOW it's single-threaded.  However, we still allocated
-secondary streams per-CPU (we needed to permit concurrent Reads
-of recompressed objects).  Because we now have dedicated R/W
-streams, we can allocate a singleton compression context (for
-recompression) yet still have per-CPU decompression contexts.
-This saves a notable amount of memory with some backends and
-configurations (e.g. zstd, deflate, lz4hc).
-
-v3 -> v4:
--- use a temp bounce buffer for read requests
-
-Sergey Senozhatsky (12):
-  zram: prefix backends printk-s
-  zram: remove debugfs entry on init failure
-  zram: zstd: do not allocate empty C/D-dictionaries
-  zram: lz4hc: pre-initialize dictionary stream in setup_params
-  zram: lz4: use LZ4_decompress_safe_usingDict()
-  zram: lz4hc: use LZ4_decompress_safe_usingDict()
-  zram: zstd: do not use kvzalloc() for zstd allocations
-  zram: reset writeback state in zram_reset_device()
-  zram: split zcomp into separate R/W streams
-  zram: introduce shared decompression streams
-  zram: allocate bounce buffer for spanning objects
-  zram: use a singleton compression context for recompression
-
- drivers/block/zram/backend_842.c     |   6 +-
- drivers/block/zram/backend_deflate.c |  98 ++++++----
- drivers/block/zram/backend_lz4.c     |  85 ++-------
- drivers/block/zram/backend_lz4hc.c   | 105 ++++-------
- drivers/block/zram/backend_lzo.c     |   6 +-
- drivers/block/zram/backend_lzorle.c  |   6 +-
- drivers/block/zram/backend_zstd.c    | 133 +++++++++-----
- drivers/block/zram/zcomp.c           | 265 ++++++++++++++++++++++-----
- drivers/block/zram/zcomp.h           |  50 ++++-
- drivers/block/zram/zram_drv.c        |  55 +++---
- 10 files changed, 506 insertions(+), 303 deletions(-)
-
---
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index ab064c84b092..593fa4ae47c4 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -3297,6 +3297,7 @@ static int __init zram_init(void)
+ 	if (zram_major <= 0) {
+ 		pr_err("Unable to get major number\n");
+ 		class_unregister(&zram_control_class);
++		zram_debugfs_destroy();
+ 		cpuhp_remove_multi_state(CPUHP_ZCOMP_PREPARE);
+ 		return -EBUSY;
+ 	}
+-- 
 2.56.0.176.g3575e65682-goog
 
