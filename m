@@ -1,202 +1,142 @@
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5F14F0539
-	for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 22:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792103286; cv=none; b=P2bBQyG9N1aGu7qUK3nux/Pf6W32wLJ1yiPrJmyOSacQObv+rxwF4JjgmM0cuZnQ0cvo8tYzbHwlA5bazzBoj+SAEdMYvDeU7hS6RHwacR3F9M3+95IPnnwpkZlK3II+h+X3O8ECoZ0kZEWCQVLceDqQLJmwdpswDkK6izxwWzU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792103286; c=relaxed/simple;
-	bh=bVJbmuh2Z6L0fhHJG0FQsb2y8FSWqxobc73yJaXV8aU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=slUxRclPm7/uObtQBsHR2XJorNhLJR2bKIWMIwb4pM9VsJKV0gAHIewPhCklbGVzlVTopGUHei0ys1zTVXRMeSYsaAN9ECXGW/qU0KSqkGPo5yL0PyNDJ2Og8zVsLJXqiitOsQrt3jhATPMqYOe+J8EJxTcHNcNTjU2a59z47Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lo/dFP8l; arc=none smtp.client-ip=74.125.82.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A9E1397
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 00:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792109081; cv=pass; b=TImKGNLd5/yFtnnlqyjRVMiOrPJtWvzPakafJUIkoewqmidPetA0NjaS+oIQ4v09hRBIwt6MvM2BpvIvvmr7lFGVAVaaVawtZ3Ez1k8Aw0nASgcJjvwy/MVgPf5786dye3o61O+jSyt0UO53O8sDxpm5X+De1xQRZlrULrMUMtU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792109081; c=relaxed/simple;
+	bh=j4c+M9poQOSYaSwl0VXX2WTCeiqf8vrckGaQG5UJg5M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sBMvlobNOxMHYHlcdSnHE5USRrXJlsNfjgSIHXx5mDMKOA3t8Mfizm0ThOMAYxmfISSk8ViK1OGp+lKKdduCenk8LOSVh58/6PlPLMavIlg+CO8zGu2XU43wbULmW0NlciPlab4qvu3kEI0fjsJNLa/z1scVeiaUSSfDwb8d6y4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M0osczjk; arc=pass smtp.client-ip=209.85.210.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lo/dFP8l"
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-144f79153f5so391086c88.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 15:28:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0osczjk"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7fccba9c675so723041a34.0
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2026 17:04:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792109079; cv=none;
+        d=google.com; s=arc-20260327;
+        b=jnXC5ogs53WJOpp68TUaUeVhrFnr/6FTHp6RrgRgGaCpGlVtFVTut0ko/xlQBD0j49
+         4RbmeA8m5+ZQr/RvfoaEkao/TlqEDZ4mP1eSQIypnlAfpjM2LePzdAhffE0gHUTqp/Mp
+         8fKlZM+VclKk8c/0zSw0I1OyoTcUYNlh1roLSRdXleW9bgFi7XQVAIybpcz98ZF6EYQ4
+         KnMcEUb9J4GzTba93JQHe7x9D6xEQ5FLwQreNKoK1LznqRE5+r1XQyIa8R8HO3xQeqoO
+         77eqNUctA4kYYGiz/nQ5rBtYp9pQ4hYipwasUOOk3rU/Cf/B1MLR5xtgnDCV3OtBm4b0
+         9wOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=txBXkaLeT2KKoYgqSxRnW4lP9rofYCCAvCoM08WY7xM=;
+        fh=KmqnLbr/WOtc9ounqMfs+zXqRdohDcKs6GuJncEKMu4=;
+        b=OggiHbeezfstzdiXKD+0du8sbMh/R8y4MaolcGUkhURJxo8baFEZhNu9tV0+lbwIfz
+         T1EEH/OHyNb8KHvuw2Dy0s8MMEur8+V0yoPRgJg2twSNJ0CTHN4LH1XVK9fYx1wJmahs
+         E/eHLUPQ2I5YUejuzOvP8R/AlH41act3O97b03Ahy61IBQGXCyxG/87eHFFPFHdygP+o
+         1vkIdoaN+EeaUMpjn/4TCOcU1ko5TjVYdUgnGfkNxtadTm3XALWCizSENEq2u6jKg7U8
+         0ijMSr22ysLQ2ZXpNR/M069LmR7rpIrOWHx8OBY7S8JYRoU5Zv6UCqoQ944elJ6po3xE
+         fCag==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792103284; x=1792708084; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=6uo7AcE10nfV9W8UwlYp+hn2TzXz6q+VsQs/rEy/+Mk=;
-        b=Lo/dFP8lSQ+r0fVrrhxnwhwBathR5tjD41ysL4wqZm8V7qg9b3pk6JMwBBB7/e/cUE
-         iYLmnkIm2zWhiVBs6FxKvBiIGKQc52OpTAnPdkmxk7QurP+lyKWku4L7aicH7eKXb2Ke
-         BjvRoVXiyLvPbekP1b5YSf3wXuXt0NIP1CjtZYEXru8YbbFOvns8XTopggnbX1lB5nGc
-         n2ImMWaJvnDeFgLQga4SriYsaByEW+Y48rkr1rYlbeSDDfdrMzInRUpvQLnVcqbtVA+M
-         +xbZcoq8UNNE1MpE98Rm3rHBp+/85Z3m/LKrrcaf6UWrrDet7GZP4ZeD/SQYVlKRhs02
-         RtZA==
+        d=gmail.com; s=20251104; t=1792109079; x=1792713879; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=txBXkaLeT2KKoYgqSxRnW4lP9rofYCCAvCoM08WY7xM=;
+        b=M0osczjkvYtGCarWTCv0zymeqCNNNvvAqY+R3nOp6P6YmXOH4x+kfaPUXKmIF0lhJC
+         oxqiXF3rDf2km5niWkRwQ+vEYvzg3zRzfyHHJXI99My6QlNbR6d6S3pXnm8a+bo35uwm
+         sHXyfvP84iPKoJqoUZbKhpzRqXH5JzeyH2xNGce6KT/yewykcYXh2zwzWZoYR8shlTHi
+         CKntSsxxKUV5kdcEBBlRAA5wF+CkgMg8n3255ZLIGfrV9pVFh2Pz+x1S9ia8FdFCWa0f
+         AshRqHvKh8tS9YT3Nh+NxFbuN4coGXTRGhw3TNuc12ODY8GuMA30GXA9ZNta8JE8Unaz
+         +WbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792103284; x=1792708084;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=6uo7AcE10nfV9W8UwlYp+hn2TzXz6q+VsQs/rEy/+Mk=;
-        b=sv2THZKz4kY1y7c/eZSqAh9271XoMt6/ls033tWPCp24pOovIF89fHgFW2YRvfBLDJ
-         M2UPoIHaL7sjv1dJnTpudeUvRDmwI1TwktrGz6bnFXl+Ym0rAaUn95MAb0ozQPoqLJnk
-         jroeseyzQTg0w9m6pmohIlsfsxmX+NmB4aGSLa56vFzbSZkT9C9ZiSJqe789gpdFNfo6
-         8R1AIVKzOfZgZcGpptiVjHkUGs0vo+U/GBf66LXMdnrT/6Y9Eyapl8R7UmcfifLTSCru
-         z+muMqCVlXWMTMv3RmHU08xyui14Z6yBNOztAgKchIbCGupWS3CM9H18eE7TxeeqxvYo
-         70ug==
-X-Forwarded-Encrypted: i=1; AKwUvBwxpP61XZSLWVXRR4PLxDwYdmrMf8k6lcQtlHmXj2F+3bNUNiYFqx5IA3BJWCDTKaDQOh+qjgvDqXpldQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIz6Ct1ZyavFr+UXK9ubS7N6rnBsMfPcJgjNttWoF8e5vsLnSuP
-	LVqRho8VrRbKzId3pxaTSrIl8Yy164xTX2sBP/dkyYTxNGAf77ciSDvX
-X-Gm-Gg: AYBFou1pdspfATt1BJIC9xdW8qZLuiTTOHJg1RlSCfVWJtxE+JizSOLnDkIIpW/tig4
-	5VGmYAcK4X1zkmcfDBZrr5L0lFkkMSsRUW7G/3UKmqa7+t90cdPFWvh+QO/oJo2bPsIS5vYYdBl
-	PegH2rECcEb0tktv93lKGghUib4iTHidv6ko/1bwJAkXzJ1Hbz+L0z10emc0xHjJptptwR/r0qd
-	V/gd6WGdhgJrpesADQYdq06siy0LLKSJOIPgn7aPEMOeYrG7S9TD4EudDsgVZ1+C7WnGtLS5Nuv
-	WKTy+oSg7gXfeItxej6fUta7rZyamRMIccuVX1o7Ya4yHGZ0b+MX7JvKQdkIFqYUvXhOUNwNj8z
-	YSR6ZHRYSn5X7YrDTiPXzn8ehGyCJlFa4oYb/qv+AH/1jx0+DkFAoIs3Ud9U4cHAaht9EOO1C2j
-	KYcIqs9YpDQurLgIiOe0FR4OzaOuPSHQdQ2Um0WNNzBc/p4X5HftdcPK8hDkZ7Ad/pJVDRPh9Uz
-	CpRpcORAVqKh0NRCF4yM2hjdFAj11CXpmq9zl5khKGkSILIO74s3/GiHD4w92SVsWtyR2AHwxw=
-X-Received: by 2002:a05:7022:3a8a:b0:15b:1959:15e0 with SMTP id a92af1059eb24-182570eccd1mr1740173c88.4.1792103283611;
-        Thu, 15 Oct 2026 15:28:03 -0700 (PDT)
-Received: from yibos-mbp.3500.dhcp.asu.edu ([2620:d8:8000:8078:404b:acf5:562d:50f2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36081fa5a6esm873307eec.16.2026.10.15.15.28.03
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 15 Oct 2026 15:28:03 -0700 (PDT)
-From: Yibo Liu <yiboliume@gmail.com>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yibo Liu <yiboliume@gmail.com>
-Subject: [PATCH 2/2] drbd: validate digest size in checksum resync and verify requests
-Date: Thu, 15 Oct 2026 15:28:00 -0700
-Message-Id: <20261015222800.85928-3-yiboliume@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20261015222800.85928-1-yiboliume@gmail.com>
-References: <20261015222800.85928-1-yiboliume@gmail.com>
+        d=1e100.net; s=20260707; t=1792109079; x=1792713879;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=txBXkaLeT2KKoYgqSxRnW4lP9rofYCCAvCoM08WY7xM=;
+        b=ofZxBRKba+sre7iOVqglcfbEGPzvEq8ghvUkJpDxR4PYTsELzbwPAhTRcp2+J3TAgZ
+         3+bHt+BRgWGMcHoNCWP4OPNTe28hROtL+fkvw+Ecci//bb3NZTvAAXmtD9mtSDFHctWB
+         jWp7VxE7asaTCxEJwsd8/o3gRDxtW1Ty6wCgZbcrOSb5l40js10itmheeYfUJdOYt/fR
+         U0J3avXS6/q2s25nJT5zy+c364WcPItWS8yu1AUVmwhCmkGoV6r9qOEfPEFC0Q3QQybX
+         q5ijRONw0C5YHg9BUk12Li4wAsOqNaedKNynbvVXe7sLxKauPXJzBTlBEQYM9JX2XJcu
+         HdJQ==
+X-Gm-Message-State: AFq9FYLhANXCahwjdTg4SmCCSFJOUpXbHBgL1ofO7+Oj/NnjEWztqW9R
+	hNaneQdY18Oh6vYtye4chLztTyYB0k1DYllNF6VL7IMY5p1RG0qwObwK8D8n/MrLkjbOsQCVLIg
+	noburS/eYNOPWGDeVWkKooIincKIK8GP1GurR
+X-Gm-Gg: AYBFou0zix0htReUGeriucYeeTxU2gyTlD8TcJoN9HCVys+JfpoAzPu+usav8RVyLIa
+	8Jgy/pTRM8JNhp8r/Al7Ja5ADVAuEWIRqwBhd6uv/x2qYB2wQPj85Ek5XBdNPon3Bvnnd2thk/T
+	CVpgGWn9tODroeiJkEAham0kpAXIaGFVxDhvDmjs65XYPKibK0kOi7ciaxkqvKnXL7cqbRjidgb
+	vr0aTnOAo+Svdo2G4iSrt3HqCNATu2ZSJxPVyNQ4KBvKcUwvaRbROfvHtQiyJqdt4z5NKcP8j6k
+	tfiDe5el5LaopjLJh9OTD9QY0u4phYbXAs7ORHmCsZgsujKEJ9lPXDB6qctITuHKXOVQpJDRqDn
+	CWUO/zDSuk0cfx0OfxdxKY/QqUL0OIekFH2I36s/0UzKT12fXW/qlwUA=
+X-Received: by 2002:a05:6830:449f:b0:81d:9acd:ee04 with SMTP id
+ 46e09a7af769-841f41853b4mr1136146a34.0.1792109078705; Thu, 15 Oct 2026
+ 17:04:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261011063555.1142277-1-tom.leiming@gmail.com>
+In-Reply-To: <20261011063555.1142277-1-tom.leiming@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 15 Oct 2026 19:04:23 -0500
+X-Gm-Features: AclHuK9LOxMl7nb84zHZ9YGe-WJrlOsrCZO04QbKEVOfbjW1hUJ1VOGEyNHI9RM
+Message-ID: <CACVXFVNrNzquXXU5jnOx_jEPhFputE67k+NSPiXDK0fX8dG14A@mail.gmail.com>
+Subject: Re: [PATCH v3 00/12] ublk: don't dispatch to canceled io commands
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Caleb Sander Mateos <csander@purestorage.com>, 
+	Josef Bacik <josef@toxicpanda.com>, Li RongQing <lirongqing@baidu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-receive_DataRequest() takes the digest length of P_CSUM_RS_REQUEST and
-P_OV_REPLY packets from the packet header and passes it to kmalloc()
-without any check. The worker later compares the received digest with
-one computed by the local csums or verify algorithm. A size mismatch is
-only reported by D_ASSERT(), and memcmp() runs anyway.
+On Sun, Oct 11, 2026 at 1:36=E2=80=AFAM Ming Lei <tom.leiming@gmail.com> wr=
+ote:
+>
+> Hi,
+>
+> Josef reported three ways in which ublk dispatches a request to a
+> canceled io command, which oopses on the NULL io->cmd in
+> ublk_queue_cmd() [1]:
+>
+> 1) STOP_DEV, then START_DEV
+> 2) partial FETCH: a task fetches some tags and exits, then another task
+>    fetches the rest
+> 3) user recovery: one queue's task exits before all queues are ready
+>
+> This series fixes them in a simpler way, without extra locking in the
+> I/O path:
+>
+> - patch 1: a FETCH round which saw a cancel stays canceling until the
+>   server is gone (2, 3)
+> - patch 2-3: an io command is marked cancelable before it is published
+> - patch 4-5: the release resets the FETCH round, also without a disk
+>   and under ub->mutex
+> - patch 6: don't warn when the cancel callback finds io->cmd taken by a
+>   cancel from the control path
+> - patch 7: STOP_DEV holds a reference on /dev/ublkcN while it cancels,
+>   so no START_DEV, FETCH or new server can slip in (1)
+> - patch 8 (Josef): START_DEV and END_USER_RECOVERY refuse to go live
+>   after an io command was canceled (2, 3)
+> - patch 9-11: selftests
+> - patch 12 (Li RongQing): ublk_report_zones() passes a per-chunk index
+>   to disk_report_zone(); use the index in the whole report
+>
+> Tested with all ublk selftests under lockdep on for-7.4/block; v1 was
+> also tested under KASAN.
+>
+> V3:
+> - rebase on for-7.4/block
+> - add Li RongQing's "ublk: use global index for reported zones"
+>   (patch 12)
 
-A digest that is shorter than the algorithm's digest size therefore
-makes w_e_end_csum_rs_req() and w_e_end_ov_reply() read past the end of
-the digest_info allocation:
+Hi Jens,
 
-  BUG: KASAN: slab-out-of-bounds in memcmp+0x1b8/0x1d8
-  Read of size 8 at addr ffff00000a638610 by task drbd_w_r1/212
-  Call trace:
-   memcmp
-   w_e_end_csum_rs_req
-   drbd_worker
-  Allocated by task 240:
-   __kmalloc_noprof
-   receive_DataRequest
-   drbd_receiver
+Ping...
 
-A digest length larger than the page allocator can serve triggers the
-WARN_ON_ONCE() for oversized allocations, as GFP_NOIO does not include
-__GFP_NOWARN:
-
-  WARNING: mm/page_alloc.c:5340 at __alloc_frozen_pages_noprof
-  Call trace:
-   ___kmalloc_large_node
-   __kmalloc_noprof
-   receive_DataRequest
-   drbd_receiver
-
-Reject these packets unless the digest length matches the digest size
-of the configured csums or verify algorithm, and also reject them when
-no such algorithm is configured. In the worker, only compare digests of
-the same size: the peer can switch csums-alg or verify-alg with
-P_SYNC_PARAM after the request was received, and a size mismatch is
-then treated as "not in sync" instead of reading out of bounds.
-
-Fixes: b411b3637fa7 ("The DRBD driver")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Yibo Liu <yiboliume@gmail.com>
----
-
-Notes:
-    - Reproduced in the same setup with csums-alg=sha1, the proxy rewriting
-      one P_CSUM_RS_REQUEST: a 0-byte digest gives the KASAN report above,
-      a 1 GiB digest length gives the WARNING above. With the patch both are
-      rejected with "CsumRSRequest: unexpected digest size ..." and there is
-      no KASAN report or warning. A complete csums-alg resync followed by an
-      online verify with verify-alg=sha1, without tampering, still passes.
-      The harness is available on request.
-    - In LINBIT's DRBD 9 tree, receive_digest() only rejects negative sizes
-      and the sender keeps the D_ASSERT() before memcmp(), so the pending
-      DRBD 9 rework series probably needs the same checks. I have not
-      checked the posted series itself.
-
- drivers/block/drbd/drbd_receiver.c | 9 +++++++++
- drivers/block/drbd/drbd_worker.c   | 8 ++++----
- 2 files changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 97b306676626..87e714477050 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -2629,6 +2629,7 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
- 	sector_t capacity;
- 	struct drbd_peer_request *peer_req;
- 	struct digest_info *di = NULL;
-+	struct crypto_shash *tfm;
- 	int size, verb;
- 	struct p_block_req *p =	pi->data;
- 
-@@ -2713,6 +2714,14 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
- 
- 	case P_OV_REPLY:
- 	case P_CSUM_RS_REQUEST:
-+		tfm = pi->cmd == P_OV_REPLY ? connection->verify_tfm :
-+					      connection->csums_tfm;
-+		if (!tfm || pi->size != crypto_shash_digestsize(tfm)) {
-+			drbd_err(device, "%s: unexpected digest size %u\n",
-+				 cmdname(pi->cmd), pi->size);
-+			goto out_free_e;
-+		}
-+
- 		di = kmalloc(sizeof(*di) + pi->size, GFP_NOIO);
- 		if (!di)
- 			goto out_free_e;
-diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-index 0697f99fed18..31e54960c5de 100644
---- a/drivers/block/drbd/drbd_worker.c
-+++ b/drivers/block/drbd/drbd_worker.c
-@@ -1174,8 +1174,8 @@ int w_e_end_csum_rs_req(struct drbd_work *w, int cancel)
- 		 * introducing more locking mechanisms */
- 		if (peer_device->connection->csums_tfm) {
- 			digest_size = crypto_shash_digestsize(peer_device->connection->csums_tfm);
--			D_ASSERT(device, digest_size == di->digest_size);
--			digest = kmalloc(digest_size, GFP_NOIO);
-+			if (digest_size == di->digest_size)
-+				digest = kmalloc(digest_size, GFP_NOIO);
- 		}
- 		if (digest) {
- 			drbd_csum_ee(peer_device->connection->csums_tfm, peer_req, digest);
-@@ -1301,8 +1301,8 @@ int w_e_end_ov_reply(struct drbd_work *w, int cancel)
- 		if (digest) {
- 			drbd_csum_ee(peer_device->connection->verify_tfm, peer_req, digest);
- 
--			D_ASSERT(device, digest_size == di->digest_size);
--			eq = !memcmp(digest, di->digest, digest_size);
-+			eq = digest_size == di->digest_size &&
-+			     !memcmp(digest, di->digest, digest_size);
- 			kfree(digest);
- 		}
- 	}
--- 
-2.39.5 (Apple Git-154)
-
+Thanks,
