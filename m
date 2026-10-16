@@ -1,245 +1,492 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B5B3D3CF2
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 07:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792135870; cv=fail; b=Pwnydmzqvu3XbVEb96WsNGwaavGiTQ9TFBmhUmnOlSRJ51SZi60QKe9n3Or7KQctIhtPonas5AlfvwTimsharcT0pvG1ZiDbTCmIVxrIyXkgAkK93b3ZT2wraaKNK3leZsAL4cNVmmWxod0DHOgD6Q2kYT5czDU7RuOo3oIorbk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792135870; c=relaxed/simple;
-	bh=8Rh4wXdudcB/QYRQclGpQFDgfE60tBFovN7uDCifbIc=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=RGgOdqnhfJIvKtRqpOcyN+z8Tvl7OaN7H7ScAekQ3fEOUx14HrDTSl35yDilgII9ofk6lwPQGON3NcHv4g4bB3x2PIehD1Ot9ryjFgUXoayygWG4k0OQyR81ZRAbTm1+8LxKXEbKtkSRwvxTDc6pwfkiF/R6JXUSdFgVJgM3zZE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=gAX8qk/Q; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=Wh/TViGZ; arc=fail smtp.client-ip=216.71.153.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662EC283FCE
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 07:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792135984; cv=none; b=j1KnmTZt+i20W7phUZusYLz6JOzVpgttzzLa/BGbep4oKtaGmp0tJIRpXII2D6Itl+K5upZIIqdf0xu4IVr6U8wcmM3mOJzeCIoIu508o+95k62jv0/4/niIw5NZpz5+v/KjWKyneRVmbHej+69Q6/zedDRrp1NhpIBo+qMFPLc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792135984; c=relaxed/simple;
+	bh=1UFzf7BnjxuTJMMsRGNzEo600moxklhxLQ+/r4XOoOQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iveqtJEnkEH1OJFB4MGC6BKvQxQuclIpsGuttYabdFeXF9md+v4qtJwL7HBJRpLgRBdbrBj/b+R6/xd+p7WF9hER2arNCXowX4AzbnEvA9sB5QvEoKNJiPdUX9t30n4Un5ZQTrxZxgFKpjkVtkoKJsphTCA+tIzYEFdLN+vvkgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hg8evDs5; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gAX8qk/Q";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Wh/TViGZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1792135869; x=1823671869;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=8Rh4wXdudcB/QYRQclGpQFDgfE60tBFovN7uDCifbIc=;
-  b=gAX8qk/QQz0IbpcbKCXYnzbXAaj22509iqwNpgoLV1nESAe6mDz7S8/z
-   cYI6pPST5Oq4TWCtX5MH+A92aFCMlq/SbI7OzOMP6XTNTH9ivwHlbeWfR
-   L03ph8tMWEQpF1Ac5tRahQSuJNsN16IX8J1sbXU4wAixHY5yQ3NRGNLfn
-   vYUMNwDTiFWJUZgkPdpwwVtPUugcTwSOhafT/tMn1Tyf80QEvjPUqsZZQ
-   hBmJUMwXDn/pKjEfbsatm7zi0R4hEClfTSrZ8ghRXPl0tOMUWcuO+uijO
-   zzVEeYpsjm/9ZD40lCUUljxuIuA3Nsij5cUsRHEwkTw9kRo7Fh6GAHSdN
-   A==;
-X-CSE-ConnectionGUID: ociCp/hATHu+uWAB1dqddw==
-X-CSE-MsgGUID: FBenuKg6TPeM26A6BTmN/w==
-X-IronPort-AV: E=Sophos;i="6.27,161,1786982400"; 
-   d="scan'208";a="157288423"
-Received: from mail-westus3azon11011013.outbound.protection.outlook.com (HELO PH0PR06CU001.outbound.protection.outlook.com) ([40.107.208.13])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Oct 2026 15:31:03 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f4845gsSXEP/No3oQKcN83KYiQWzaJ6Zs3BnHCzSY2wlgXC6Y5t+RqRukOCmk0Ava+AiwhUVOCa8AjqulHDemODvQUWKSyu/XyqqEnYSZ01HavNGrqUeQBV6psI/RawyRI8jsLMl0sNfb01y3t8J/XmfQWmXreJo0w8yr5He6tMB9XgGe15VulHLWetfl9w3ZsmnIK7A+r4gYT6/+AAhb0wyy3UR1x+7A0p2sGZeXzXsyFaVhN9z1NQkgHqplcMYgHXLoCGGSTDOTcwKQVbQXBMl4bkEXDJSN2/xCe7ufbLda8Q8g/gdR5O+yNwKSesV+I0880Z70bYBQMWwuTo58w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ksnnMRJ/CUqqi9I7m/r616NsOnltjpOxhh64WKJxJqQ=;
- b=ZehmHFSA+nhA17v4HXcpbn8bv0XO6G3xX+w1RXv6p5BTqvDwBnRmRwQkLzfonljQBLnS7ZgV4WWoL+r5uCiXwT+jxv/6zKlRldTtyo+1XYVGrkjouw7pN6vGmohtKtno1dsXm3w5L3cx9l6ZEEqX5MzKU0k8SxZawP1w/X5ikvaWGO9t/v9uD6etCwJaS6OfJlvP3HvVhBa516m6xE/N0nqlXXZssuiRfYTTgHUyefFADwT+Zy6ZEppmnCbwHcct9jyxGHI7jjOWu75k20lU+fVZwkO69asnqrDTRv0HffGQc0Tm4YXSYc/0gzoCe+c7qrq9bJ8uR1JUhSo6aV8nXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hg8evDs5"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-89e018e466eso1084281b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 00:33:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ksnnMRJ/CUqqi9I7m/r616NsOnltjpOxhh64WKJxJqQ=;
- b=Wh/TViGZsuLC40TwqakQdn4I7Fvmn/m8fYnQ1aKwiBaY/6FYw0gI35DU8DptTLKjxl6fe9TuobU9htLoCkHwQhYNdAyHEsNcjmcQ6HbIokkIwVDT8ZvJNMwZgKGgFPPMMkNJTLSAtsggBP0adXvIw7EGmmq6LCr3MKRq0In2RPs=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA6PR04MB9447.namprd04.prod.outlook.com (2603:10b6:806:436::21)
- by SA0PR04MB403788.namprd04.prod.outlook.com (2603:10b6:806:ce::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.14; Fri, 16 Oct
- 2026 07:31:00 +0000
-Received: from SA6PR04MB9447.namprd04.prod.outlook.com
- ([fe80::14c6:1c14:485f:1825]) by SA6PR04MB9447.namprd04.prod.outlook.com
- ([fe80::14c6:1c14:485f:1825%4]) with mapi id 15.21.0522.013; Fri, 16 Oct 2026
- 07:31:00 +0000
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH] zloop: print device that had errors
-Date: Fri, 16 Oct 2026 09:30:43 +0200
-Message-ID: <20261016073043.1164325-1-johannes.thumshirn@wdc.com>
-X-Mailer: git-send-email 2.56.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR0P281CA0140.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:96::6) To SA6PR04MB9447.namprd04.prod.outlook.com
- (2603:10b6:806:436::21)
+        d=gmail.com; s=20251104; t=1792135982; x=1792740782; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=9lzObHIWSDCCNYCjA2Ll3fvLIHrxT5aolRRJzJ0JUnI=;
+        b=hg8evDs5f6g547/xgNERLEfhxp7+fQ9+3t5AJZ/+RRLDuGwMAOBP/2kwaagfLicWgm
+         EyPechQUjxQXZeG5W6Gi4iynlBITevVdd+T8jifEMrKERGJtvfvjhAX2m8rkn2SDo2B5
+         rpheeE7FK+xECqGtNhhvnwHzZY3qq7LqRVx6VVqV8B2LdBxE3ocImBexLUn4oTaiXQ8Y
+         PPaDE7Q1AUoPjg5gEMJZe3xr/VUkupr0HhMlvx4IhHAXiTrdGxumjQ9GLgfYlTA8MpfD
+         7ff34PEttz8rZjlfFTHmZXgjevlYS/sppgTyhMNBHAU8BoTfY9TYBeFk5Jnn9X5jEERC
+         CKlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792135982; x=1792740782;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=9lzObHIWSDCCNYCjA2Ll3fvLIHrxT5aolRRJzJ0JUnI=;
+        b=ylPQbP4muQys835LW0u+jLP9x50+YTM9JjWyT0YmJ7cLWPZvJ0HIht95GkTd6m6fpt
+         DI22/5Y0Lu/IW8OnuHcvhaE4Sn26Ut7TAw963dG+DSfQEnYL33Rht9uwQuokc9IqLXfx
+         UFQTeDVobzsnekcINK2g94tRAmY6RW6rUmErML9KlntSFeSc/PAWxWqb2pISk+PyJVWx
+         Vo/GsbE3AH5diZqt5v6//79zGzp9fUVLMcOGpoRdY0PmbzMIFzAlHTX7NNoo1hZYlhsN
+         dcjn51HBeasMPM+M4HPC1/aM6NjYcd8roWI3HOI9L8tmBBgaIWkDGS4b0yADEiZYeoEu
+         0ZaA==
+X-Forwarded-Encrypted: i=1; AKwUvBxlDFDk3jCiDnNkX2eoDPP1D1yHJKY/+tNDqlNEqHaxltUAeC7IDxjNQli5hCG3w9amEpL3rpVs9ob5hg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKN4SQzh/zYwwpV8ZtA/Q7nbHo1/P3lI6Y5Ubf5VZc0CtxX68Ve
+	nOVhdgcU3Xwm1eTMJGy3+9lTbdJTfXAry5xZDY/y1GtgyPtyayYtojA=
+X-Gm-Gg: AYBFou0OrPtEWGGIT4/dhzsbImJcsTLaB1oEw2NkVpCZycowFE9X6LpBI0yzB0bYKTn
+	KfK1BxNieXUFPi+Y+OAtvZnXhTice1T+xBlPstmtroKq+qBR4oqUmQeeCIxoeA1D8h3Aoldqm5h
+	bqY9Vq2HkXmgzWdRnyVg9IunEp3N1RAkUvZR0tDyCm/ftd8EgKw5khj0buadOCIFQ0zhI+tHT5V
+	gIJPnvLOOcITM3AdKLjEffVudkTV9RmuucBsTlDiwk/CMXBZYny03SmFjFSMXG581OD6SNVbhtX
+	kYIzExLckCxL+68ZIHFK8Wz6MzZmyKMEdVChxWSPwoAJVbxDDL5036YsbTUxuTBq6jlRQPMAFwL
+	GZXoeqTQhQZn8WWzIVnUv8+AjzsiZSOzWrGw8OFykrTFmHmkc3phJsnUiT0sYx1pgoaWUezfo3z
+	SMLAogn2eu5GsSMduRoATBJotUr4R9AjbiGLe51Otiv+NlS/8ilhsEVwXcoM2xKmos/zxhDFVyq
+	uLzhxL6
+X-Received: by 2002:a05:6a00:3cca:b0:874:708d:b631 with SMTP id d2e1a72fcca58-897c79dd8c6mr18756274b3a.29.1792135980952;
+        Fri, 16 Oct 2026 00:33:00 -0700 (PDT)
+Received: from localhost.localdomain ([185.220.238.36])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-89f54b30ec4sm674788b3a.4.2026.10.16.00.32.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Oct 2026 00:32:59 -0700 (PDT)
+From: Wang Yibo <szwyb123@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	David Gow <david@davidgow.net>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com
+Subject: [PATCH v2] lib/sbitmap: add KUnit test suite
+Date: Fri, 16 Oct 2026 15:32:53 +0800
+Message-Id: <20261016073253.520971-1-szwyb123@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <d6ea208a-0b53-4da8-998f-817a0e0b7c61@davidgow.net>
+References: <d6ea208a-0b53-4da8-998f-817a0e0b7c61@davidgow.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA6PR04MB9447:EE_|SA0PR04MB403788:EE_
-X-MS-Office365-Filtering-Correlation-Id: caaa3ccd-ebb7-45ea-8d7b-08df2b576ce3
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|19092799006|23010399003|1800799024|376014|10070799003|10067099003|18002099003|11063799006|261009223027099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	Jj9OkQgSIz2anz8s+oD1Pxg7O3mcEsF729zIRsDw/reMqwp28X/+eCv+jhIAluuIPJdDm+JEGKdtsPY3YcGsU/Gr1lYauoXUKUyYbzj2dOz43H731dOsTzRs0V8v5+uohZX0kAF0ywcCWqH+Rn9dkz0mN/aM+8BimTXIYZqgYjRni0Y06rSEjkXTtRVjkFleEQV3VexZToiJF/tdRaOwGqbwMGgx9Wt4FLPtNk5bMbGdNo/WJPfIhUSvVPcuBP2s/Dfz6kKXCpOtTT45hBkv4NK0GU8s/EZDvz3Ll1B4Fz+mbTMYzlS6jo2nTZzmLPBGg3IWm94VbafIZcSzQgv4H+tqiRrR7Ec37Y6kr7x/+eSCgcX5rCsqB0W+3ImQI1VsVI4n0gmuZZcnHCBmAlyV78SmBMiMYCZyddTg4rZlsSnkfsYZhgm29Jbcf08fYNNBmK1Dsqzb/hQRwU1CXYaU7PG954y5KqeW0HilCOXvHHSCQhO2hcPAB2ME+gK7gEAlM3xs6oPD7/eCFqua++bLBzJ0n8LY2Bgx37SuIfMibu3bre/+u63nSltJzUl2W16ZGhrRmkDqRd+57DqGcesEp2JHozJwXNADtX87ITTdqXaZFK+iulQbya4NI8fLDFY8MtpVBHmCnndTL3/AaPVlW7WaRwHEOydeCwyVYjts4E4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR04MB9447.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(23010399003)(1800799024)(376014)(10070799003)(10067099003)(18002099003)(11063799006)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VNi19Mut5VHD3uynpMMNxMcMgQ9HGUTOI/pmfdgjqngIIPYSL2xXrU0nZgod?=
- =?us-ascii?Q?F3NUrPaaCgQh67XEp24eiihhapYMZ2thlxK7Hbq9+UnAFpPaGsbPD1WoaYD9?=
- =?us-ascii?Q?CtHvzq5PTXbOLMCZGjqnkNRPDo3bprTA+vG+NhLMUHjts9FNkwQpG6dCLzeN?=
- =?us-ascii?Q?ChmuktMt/1pnzK5FltA6ASUyKZ3xH/LAeGokAetVg/4eXPH2XZfEjldkt3DG?=
- =?us-ascii?Q?bgucczQ/Zby/RF1KuLJ3IjoOMm6HpSX1QnqMMEQcpreacejgFKuD9TBWCIqe?=
- =?us-ascii?Q?8yIjv58gI6ciVIv4Ead42Zd3fgI25j5HrFbrzkf/Z1bpKqDzd5xPEpUHkd5T?=
- =?us-ascii?Q?+N5cm6lBHJ0Z0EqX9V62yD74SXoIbgvate7OlO+9gARjQIyeze8qkZc+/6dq?=
- =?us-ascii?Q?uUQ1wqiFV+lO6QjvZtdNWCDRc1CLLgzerT4yV99SUOF0ky/AJxwK7/S8beZS?=
- =?us-ascii?Q?PaQF9muY3ssltKtqcQFcbRNhEIC8qBp7bkUZWoNy51cGvgYBTbOoiKIhWemu?=
- =?us-ascii?Q?Gr16H4dLdrN8/aZoC8HbyMAwcPZiHuzBhcuyIvnGWPvUdqAkZBqTjsXeg21K?=
- =?us-ascii?Q?d3+d9/PbAmSOd2M4Jh4T17/JDjguhRYCmhLhKKXe715ElXiiYWKkhdJHWLFU?=
- =?us-ascii?Q?gEvAPnk9H51PoZq8tu0DCJKM5ux/R0tZ5jbqoGdQSXl1hr7MtytTtzIwFC4b?=
- =?us-ascii?Q?lbs3894Tfjs+qe1iA59NPDM1sqfOtwABm5tPmMTESoWnNYqDroWoLnm6MJ08?=
- =?us-ascii?Q?rxxDOfCD24qc5gxkjHvfP+wbHLGoQdqRHYAWGV6F2NL5bdCS7sUyxg1WOTgT?=
- =?us-ascii?Q?VHBKsVQBFjWv8r7MznRdGJr77BkSkMo1VSx08DdzTL9tNGQA9Np1mrl2Mi4x?=
- =?us-ascii?Q?8ilUtpJMKofAZiiiZAohKxOv6RXqtYso6ffpbiGAzvx1A4Q4CP1+8oYeFfg2?=
- =?us-ascii?Q?vHB998iKGB6ZfsQ1kQaX38O6sSAKT0kbOFpYipSCAA9Km1OcwK0sMf628ekK?=
- =?us-ascii?Q?Hpcw+/TPG45NjtuK9U7VDi2fW+x3pIAfml3jNMwGEnpEuVPiDTyddjeqixoJ?=
- =?us-ascii?Q?uLhsdA109Y5Sp1+/b88/hBqg3A5pfCXgtydv57m7lnp38BEsxZLd039D0CP4?=
- =?us-ascii?Q?SEJ6DcwqqU0uyH7qyxJrf2j8S37QY1hVN3g4wox6vaZFrSvHrb0YDAhTCzbK?=
- =?us-ascii?Q?y5ji2bGQnhTOL/QnEaaIqikoC3t66+eluZTsDPGJRGXKadVhzAl/LlUz9tFY?=
- =?us-ascii?Q?QsHkIkSvFTymuY6YfHDtKxW4g/9XE12TCspSEtfKfZ5zPD4nSnlKX2j1TpRv?=
- =?us-ascii?Q?qfSDQ41Plb6Y8d1VZE9ZQ5sYLsofWI9PehgInlXQFKyHuBXAqP4LghPhz0ve?=
- =?us-ascii?Q?UR5MmGbhhlXgimXwlGmc85DxgC3JFopWvVuDCUAiQTKL3Qxt37WU1O2MdNz0?=
- =?us-ascii?Q?FgTQTe0tnReGuoky2rseEqBuFWiaGdSVOLshNuVrppAnWvKYpF+WbgCbPGPh?=
- =?us-ascii?Q?Fy5QHCkHvdV3i0VhmTA98M3fP4xZxwqH7OsToP5E/R78vJ8fif1WrG8tt69J?=
- =?us-ascii?Q?dvyJEM3tESRFTh/50Bdh5JRdZOBnObLQdKfxm/34iwo4l3399EuntwEnCSDB?=
- =?us-ascii?Q?VCi1TPcYFqlaaWA10AKGvM22AgA+b3gyofzYx2TP+4xvpjJcW1nQ1RkXbE5e?=
- =?us-ascii?Q?yv9D6AtQW/qhvsK8dLLbCnfXizv5FByAhrq55WEMko0iMOEwzmXO7VgdvmVS?=
- =?us-ascii?Q?QpZzwnoHIlwpGabkh4VZH/6I/UfUFiWOkUDvnt+zrMisJqmb7FalmVLT5XkF?=
-X-MS-Exchange-AntiSpam-MessageData-1: 6oJSAQ6BBOFM0aSTdom7byK5FDF9Gyu0Mh0=
-X-Exchange-RoutingPolicyChecked:
-	f9scijRuW4J9/s9taW4Yp2SDTtGXmw2g+U+7sXlwZJhAG0+1ZLqYf/U6LbsNf7yXoRaIFROuKg2WgdTIJl7/P831TcJVQHofzdh+0Ifhc3UwqB+2/ZnG6HJ4VhmI9o9hVit2EmEnp+EId947B3YZ/ceYt+kN61wGuFyei7gmJCJtJCaKfEbS7csKuGFt8goJ4Jy5ttRk9UDmMuRVcEsTSTQSZAJVt+vW+FFETeF0TYm3qyxX0z4RLYr/I97H6QkSIs37waguwHnrs/uo4eHsk6EMMxrXO+RdgGWHU6isvcW4xVO33AxsoGp48U8OYc+WfiorlcQtALguHi8RsvL0KQ==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	1ZpZrnsu+oNWHi2vucBgi4yh+/csowTUW4e4MVZECjzYCzIJDD22Y7COzAFst+ZkNAnv10i819eoxIoayZm4hgqgt6sxMUM4T3IDCM1pvPKMUY+iLK1g4eW3n2+4FmA3kI4MpAGTTUWvpP2wXkMeO0rTI6HsA68dn85G6KoQTOas/AQNv41hCY95PjLLDFvuNxW+juivwRso8ND4YyG/YIxZpqZCn++DnpnZ6iJKkfGSdRzO4WFkshoxklL96b3wQ+yjgw/fUfilSGIabGrIZFf/qgrqtRLUZwQaREkskmErSqSvNytTs/z0RJLcNjEcHo7W/pdghTLA2WM3n3WX+UBYfcsLl7/cV89YtN1QfETtaUWs63TZ8u3FE9/UYYdhfTgV0KVcz/yoZs653TtfLRcmz1PGR0LVGGw8CF/Cr/wQY3VyywMhRRMYk9+49pBrz55q8Q3FSXdPwwnOlhQLM72Ydk3eP2GBrkvPUpxhp0SY3HZgsz5ynrL+6TTgHkaUij7BA0X9CkhdqiG457Q9bJlsu/ORu+aqzlE5GxERqcGvnm2dzaS37wwsqC/FsZwN9VU6KwNR+TzZh3RiPC/3fWwVhAwp6Gye1NMT8b4R3JHjC1xKftOXqi3iYMUaKbQa
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: caaa3ccd-ebb7-45ea-8d7b-08df2b576ce3
-X-MS-Exchange-CrossTenant-AuthSource: SA6PR04MB9447.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2026 07:30:59.9811
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1bt8GUh3tbx7cFBfAJqSQkz2lHXNoiRCpS/8KpMwMmDwWqTNnj2MnpYTalByaoXkJE/FkRchOSU5jCpy7XG2gGZG9uDy9N11hwDuSje4edU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR04MB403788
+Content-Transfer-Encoding: 8bit
 
-When testing zoned filesystems that span multiple zloop drives it can be
-difficult to figure out which devices access caused an error.
+sbitmap is the tag allocator used by blk-mq and the I/O schedulers
+built on top of it, but the plain, synchronous part of its API has no
+test coverage at all.
 
-Prefix the error messages where we have the disk available with the disk
-name.
+Add a KUnit suite covering initialisation, allocation and exhaustion,
+deferred clears, round-robin ordering, resize, the bitmap helpers and
+sbitmap_for_each_set(), so that the behaviour is checked on every boot.
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+The new file is added to the BLOCK LAYER entry in MAINTAINERS, next to
+lib/sbitmap.c, so that it does not end up without a maintainer.
+
+Signed-off-by: Wang Yibo <szwyb123@gmail.com>
 ---
- drivers/block/zloop.c | 37 +++++++++++++++++++++----------------
- 1 file changed, 21 insertions(+), 16 deletions(-)
+v2:
+ - Test sb.alloc_hint as a plain boolean: KUNIT_EXPECT_NOT_NULL() passes
+   its argument through a const void *, which a __percpu pointer cannot do
+   on architectures that keep percpu data in a separate address space, so
+   the test did not build on x86 (David Gow).
+ - Use a BITS_PER_LONG-relative bit number in sbitmap_test_iterate_set().
+   The hardcoded 130 lies past the end of the test bitmap when
+   BITS_PER_LONG is 32, so that bit was never visited and the test failed;
+   assert the precondition while at it (David Gow).
 
-diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index 8f485ef51557..9145e0f98d56 100644
---- a/drivers/block/zloop.c
-+++ b/drivers/block/zloop.c
-@@ -318,22 +318,23 @@ static int zloop_update_seq_zone(struct zloop_device *zlo, unsigned int zone_no)
+Both issues were reproduced and the fixes verified:
+  - x86_64 (gcc 15.2, CONFIG_USE_X86_SEG_SUPPORT=y): v1 fails to build
+    with "comparison of pointers to disjoint address spaces" at the
+    KUNIT_EXPECT_NOT_NULL(sb.alloc_hint); v2 builds clean.
+  - i386, i.e. 32-bit (gcc): v1 fails sbitmap_test_iterate_set with
+    nr_visited == 5, as the out-of-range bit 130 is never visited;
+    v2 passes.
+  - v2 runs the whole suite green (8/8) under KUnit/QEMU on arm64,
+    i386 and x86_64.
+
+Link: https://lore.kernel.org/r/20261014082704.33667-1-szwyb123@gmail.com
+Link: https://lore.kernel.org/r/d6ea208a-0b53-4da8-998f-817a0e0b7c61@davidgow.net
+ MAINTAINERS               |   1 +
+ lib/Kconfig.debug         |  13 ++
+ lib/tests/Makefile        |   1 +
+ lib/tests/sbitmap_kunit.c | 308 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 323 insertions(+)
+ create mode 100644 lib/tests/sbitmap_kunit.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f53047aa8d3c..c8510e6f1817 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4726,6 +4726,7 @@ F:	include/uapi/linux/blk*
+ F:	include/uapi/linux/ioprio.h
+ F:	kernel/trace/blktrace.c
+ F:	lib/sbitmap.c
++F:	lib/tests/sbitmap_kunit.c
  
- 	ret = vfs_getattr(&zone->file->f_path, &stat, STATX_SIZE, 0);
- 	if (ret < 0) {
--		pr_err("Failed to get zone %u file stat (err=%d)\n",
--		       zone_no, ret);
-+		pr_err("%pg: Failed to get zone %u file stat (err=%d)\n",
-+		       zlo->disk->part0, zone_no, ret);
- 		set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
- 		return ret;
- 	}
+ BLOCK LAYER DEVICE DRIVER API [RUST]
+ M:	Andreas Hindborg <a.hindborg@kernel.org>
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 6b24a2c89b84..f5fe7f5a0a4d 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -2456,6 +2456,19 @@ config PRINTF_KUNIT_TEST
  
- 	file_sectors = stat.size >> SECTOR_SHIFT;
- 	if (file_sectors > zlo->zone_capacity) {
--		pr_err("Zone %u file too large (%llu sectors > %llu)\n",
--		       zone_no, file_sectors, zlo->zone_capacity);
-+		pr_err("%pg: Zone %u file too large (%llu sectors > %llu)\n",
-+		       zlo->disk->part0, zone_no, file_sectors,
-+		       zlo->zone_capacity);
- 		return -EINVAL;
- 	}
+ 	  If unsure, say N.
  
- 	if (!IS_ALIGNED(stat.size, zlo->block_size)) {
--		pr_err("Zone %u file size (%llu) not aligned to block size %u\n",
--		       zone_no, stat.size, zlo->block_size);
-+		pr_err("%pg: Zone %u file size (%llu) not aligned to block size %u\n",
-+		       zlo->disk->part0, zone_no, stat.size, zlo->block_size);
- 		return -EINVAL;
- 	}
- 
-@@ -604,12 +605,14 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
- 	} else {
- 		if (cmd->sector != zone->wp) {
- 			if (zone->wp == ULLONG_MAX)
--				pr_err("Zone %u: write to %s zone: sect %llu\n",
--				       zone_no, blk_zone_cond_str(zone->cond),
-+				pr_err("%pg: Zone %u: write to %s zone: sect %llu\n",
-+				       zlo->disk->part0, zone_no,
-+				       blk_zone_cond_str(zone->cond),
- 				       cmd->sector);
- 			else
--				pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
--				       zone_no, cmd->sector, zone->wp);
-+				pr_err("%pg: Zone %u: unaligned write: sect %llu, wp %llu\n",
-+				       zlo->disk->part0, zone_no, cmd->sector,
-+				       zone->wp);
- 			ret = -EIO;
- 			goto out_unlock;
- 		}
-@@ -837,8 +840,9 @@ static void zloop_complete_rq(struct request *rq)
- 	switch (req_op(rq)) {
- 	case REQ_OP_READ:
- 		if (cmd->ret < 0)
--			pr_err("Zone %u: failed read sector %llu, %llu sectors\n",
--			       zone_no, cmd->sector, cmd->nr_sectors);
-+			pr_err("%pg: Zone %u: failed read sector %llu, %llu sectors\n",
-+			       zlo->disk->part0, zone_no, cmd->sector,
-+			       cmd->nr_sectors);
- 
- 		/* Short read. Zero out the unread tail beyond cmd->ret. */
- 		if (cmd->ret >= 0 && cmd->ret != blk_rq_bytes(rq))
-@@ -847,14 +851,15 @@ static void zloop_complete_rq(struct request *rq)
- 	case REQ_OP_WRITE:
- 	case REQ_OP_ZONE_APPEND:
- 		if (cmd->ret < 0)
--			pr_err("Zone %u: failed %swrite sector %llu, %llu sectors\n",
--			       zone_no,
-+			pr_err("%pg: Zone %u: failed %swrite sector %llu, %llu sectors\n",
-+			       zlo->disk->part0, zone_no,
- 			       req_op(rq) == REQ_OP_WRITE ? "" : "append ",
- 			       cmd->sector, cmd->nr_sectors);
- 
- 		if (cmd->ret >= 0 && cmd->ret != blk_rq_bytes(rq)) {
--			pr_err("Zone %u: partial write %ld/%u B\n",
--			       zone_no, cmd->ret, blk_rq_bytes(rq));
-+			pr_err("%pg: Zone %u: partial write %ld/%u B\n",
-+			       zlo->disk->part0, zone_no, cmd->ret,
-+			       blk_rq_bytes(rq));
- 			cmd->ret = -EIO;
- 		}
- 
++config SBITMAP_KUNIT_TEST
++	tristate "KUnit test for sbitmap" if !KUNIT_ALL_TESTS
++	depends on KUNIT
++	depends on SBITMAP
++	default KUNIT_ALL_TESTS
++	help
++	  Enable to turn on sbitmap tests, running at boot or module load time.
++
++	  For more information on KUnit and unit tests in general, please refer
++	  to the KUnit documentation in Documentation/dev-tools/kunit/.
++
++	  If unsure, say N.
++
+ config SCANF_KUNIT_TEST
+ 	tristate "KUnit test scanf() family of functions at runtime" if !KUNIT_ALL_TESTS
+ 	depends on KUNIT
+diff --git a/lib/tests/Makefile b/lib/tests/Makefile
+index 3cac3b63a752..1f49555f94c3 100644
+--- a/lib/tests/Makefile
++++ b/lib/tests/Makefile
+@@ -44,6 +44,7 @@ obj-$(CONFIG_OVERFLOW_KUNIT_TEST) += overflow_kunit.o
+ obj-$(CONFIG_PRANDOM_KUNIT_TEST) += random32_kunit.o
+ obj-$(CONFIG_PRINTF_KUNIT_TEST) += printf_kunit.o
+ obj-$(CONFIG_RANDSTRUCT_KUNIT_TEST) += randstruct_kunit.o
++obj-$(CONFIG_SBITMAP_KUNIT_TEST) += sbitmap_kunit.o
+ obj-$(CONFIG_SCANF_KUNIT_TEST) += scanf_kunit.o
+ obj-$(CONFIG_SEQ_BUF_KUNIT_TEST) += seq_buf_kunit.o
+ obj-$(CONFIG_SIPHASH_KUNIT_TEST) += siphash_kunit.o
+diff --git a/lib/tests/sbitmap_kunit.c b/lib/tests/sbitmap_kunit.c
+new file mode 100644
+index 000000000000..284dcb5d7188
+--- /dev/null
++++ b/lib/tests/sbitmap_kunit.c
+@@ -0,0 +1,308 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * KUnit tests for the scalable bitmap (sbitmap) implementation.
++ *
++ * sbitmap is the tag allocator used by blk-mq and the I/O schedulers built on
++ * top of it, but it has no tests.  These tests pin down the observable
++ * behaviour of the plain, synchronous parts of the API.
++ *
++ * Copyright (C) 2026 Wang Yibo <szwyb123@gmail.com>
++ */
++
++#include <linux/bitmap.h>
++#include <linux/gfp.h>
++#include <linux/sbitmap.h>
++
++#include <kunit/test.h>
++
++/*
++ * Big enough to span several words for any plausible BITS_PER_LONG, and not a
++ * power of two so that the last word is partially used.
++ */
++#define SBITMAP_TEST_DEPTH	(3 * BITS_PER_LONG + 5)
++
++static void sbitmap_test_init(struct kunit *test)
++{
++	const unsigned int depth = 97;
++	struct sbitmap sb;
++	int ret;
++
++	ret = sbitmap_init_node(&sb, depth, -1, GFP_KERNEL, NUMA_NO_NODE,
++				false, true);
++	KUNIT_ASSERT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, sb.depth, depth);
++	KUNIT_EXPECT_EQ(test, sb.shift,
++			(unsigned int)sbitmap_calculate_shift(depth));
++	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, 1U << sb.shift));
++	KUNIT_EXPECT_FALSE(test, sb.round_robin);
++	/*
++	 * alloc_hint is a __percpu pointer, which the generic pointer
++	 * assertions cannot take: on x86, where percpu data lives in
++	 * __seg_gs, passing it through a const void * does not compile.
++	 * Test it as a plain boolean instead.
++	 */
++	KUNIT_EXPECT_TRUE(test, sb.alloc_hint);
++	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), 0U);
++	sbitmap_free(&sb);
++
++	/* An explicitly requested shift is honoured. */
++	ret = sbitmap_init_node(&sb, depth, 3, GFP_KERNEL, NUMA_NO_NODE,
++				false, true);
++	KUNIT_ASSERT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, sb.shift, 3U);
++	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, 1U << 3));
++	sbitmap_free(&sb);
++
++	/* BITS_PER_LONG bits per word is the largest representable granularity. */
++	ret = sbitmap_init_node(&sb, depth, ilog2(BITS_PER_LONG), GFP_KERNEL,
++				NUMA_NO_NODE, false, true);
++	KUNIT_ASSERT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, sb.shift, (unsigned int)ilog2(BITS_PER_LONG));
++	KUNIT_EXPECT_EQ(test, sb.map_nr, DIV_ROUND_UP(depth, BITS_PER_LONG));
++	sbitmap_free(&sb);
++
++	/* Anything above that cannot be represented and must be rejected. */
++	ret = sbitmap_init_node(&sb, depth, ilog2(BITS_PER_LONG) + 1,
++				GFP_KERNEL, NUMA_NO_NODE, false, true);
++	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
++}
++
++static void sbitmap_test_calculate_shift(struct kunit *test)
++{
++	/* Maps too small to spread over several words keep the default. */
++	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(0), ilog2(BITS_PER_LONG));
++	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(1), ilog2(BITS_PER_LONG));
++	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(3), ilog2(BITS_PER_LONG));
++
++	/* Four bits map to one bit per word. */
++	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4), 0);
++
++	/* The shift grows back as the depth increases. */
++	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4 * BITS_PER_LONG - 1),
++			ilog2(BITS_PER_LONG) - 1);
++	KUNIT_EXPECT_EQ(test, sbitmap_calculate_shift(4 * BITS_PER_LONG),
++			ilog2(BITS_PER_LONG));
++}
++
++static void sbitmap_test_get_exhaust(struct kunit *test)
++{
++	DECLARE_BITMAP(seen, SBITMAP_TEST_DEPTH) = { 0 };
++	struct sbitmap sb;
++	unsigned int i;
++	int bit;
++
++	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
++						GFP_KERNEL, NUMA_NO_NODE,
++						false, true), 0);
++
++	/* Every bit is handed out exactly once, then the map is empty. */
++	for (i = 0; i < SBITMAP_TEST_DEPTH; i++) {
++		bit = sbitmap_get(&sb);
++		KUNIT_ASSERT_GE(test, bit, 0);
++		KUNIT_ASSERT_LT(test, bit, (int)SBITMAP_TEST_DEPTH);
++		KUNIT_ASSERT_FALSE(test, test_bit(bit, seen));
++		__set_bit(bit, seen);
++	}
++
++	KUNIT_EXPECT_TRUE(test, sbitmap_any_bit_set(&sb));
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
++			(unsigned int)SBITMAP_TEST_DEPTH);
++	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
++
++	sbitmap_free(&sb);
++}
++
++static void sbitmap_test_put_reuse(struct kunit *test)
++{
++	struct sbitmap sb;
++	unsigned int i;
++	int bit;
++
++	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, BITS_PER_LONG, -1,
++						GFP_KERNEL, NUMA_NO_NODE,
++						true, true), 0);
++
++	for (i = 0; i < BITS_PER_LONG; i++)
++		KUNIT_ASSERT_GE(test, sbitmap_get(&sb), 0);
++
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), (unsigned int)BITS_PER_LONG);
++	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
++
++	/*
++	 * Freeing a single bit must make exactly that bit available again, no
++	 * matter which bit it was.
++	 */
++	for (i = 0; i < BITS_PER_LONG; i++) {
++		sbitmap_put(&sb, i);
++		KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
++				(unsigned int)BITS_PER_LONG - 1);
++		bit = sbitmap_get(&sb);
++		KUNIT_EXPECT_EQ(test, bit, (int)i);
++		KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
++				(unsigned int)BITS_PER_LONG);
++		KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
++	}
++
++	sbitmap_free(&sb);
++}
++
++static void sbitmap_test_round_robin(struct kunit *test)
++{
++	struct sbitmap sb;
++	unsigned int i;
++	int bit, prev = -1;
++
++	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
++						GFP_KERNEL, NUMA_NO_NODE,
++						true, true), 0);
++
++	/*
++	 * round_robin must hand out strictly increasing bit numbers while the
++	 * map fills up from empty.
++	 */
++	for (i = 0; i < SBITMAP_TEST_DEPTH; i++) {
++		bit = sbitmap_get(&sb);
++		KUNIT_ASSERT_GE(test, bit, 0);
++		KUNIT_ASSERT_LT(test, bit, (int)SBITMAP_TEST_DEPTH);
++		if (prev != -1)
++			KUNIT_ASSERT_GT(test, bit, prev);
++		prev = bit;
++	}
++
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb),
++			(unsigned int)SBITMAP_TEST_DEPTH);
++	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
++
++	sbitmap_free(&sb);
++}
++
++static void sbitmap_test_resize(struct kunit *test)
++{
++	const unsigned int depth = 4 * BITS_PER_LONG;
++	struct sbitmap sb;
++	unsigned int i;
++
++	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, depth, -1, GFP_KERNEL,
++						NUMA_NO_NODE, true, true), 0);
++
++	for (i = 0; i < depth; i++)
++		KUNIT_ASSERT_GE(test, sbitmap_get(&sb), 0);
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth);
++
++	/* Shrinking hides the bits past the new depth. */
++	sbitmap_resize(&sb, depth / 2);
++	KUNIT_EXPECT_EQ(test, sb.depth, depth / 2);
++	KUNIT_EXPECT_EQ(test, sb.map_nr,
++			DIV_ROUND_UP(depth / 2, 1U << sb.shift));
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth / 2);
++	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
++
++	/* Growing makes them visible again; they are still allocated. */
++	sbitmap_resize(&sb, depth);
++	KUNIT_EXPECT_EQ(test, sb.depth, depth);
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), depth);
++	KUNIT_EXPECT_EQ(test, sbitmap_get(&sb), -1);
++
++	sbitmap_free(&sb);
++}
++
++static void sbitmap_test_set_clear_bit(struct kunit *test)
++{
++	static const unsigned int bits[] = {
++		0, 1, BITS_PER_LONG - 1, BITS_PER_LONG,
++		2 * BITS_PER_LONG + 3, SBITMAP_TEST_DEPTH - 1
++	};
++	struct sbitmap sb;
++	unsigned int i;
++
++	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
++						GFP_KERNEL, NUMA_NO_NODE,
++						false, true), 0);
++
++	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
++
++	for (i = 0; i < ARRAY_SIZE(bits); i++) {
++		sbitmap_set_bit(&sb, bits[i]);
++		KUNIT_EXPECT_TRUE(test, sbitmap_test_bit(&sb, bits[i]));
++	}
++	KUNIT_EXPECT_TRUE(test, sbitmap_any_bit_set(&sb));
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), (unsigned int)ARRAY_SIZE(bits));
++
++	for (i = 0; i < ARRAY_SIZE(bits); i++) {
++		sbitmap_clear_bit(&sb, bits[i]);
++		KUNIT_EXPECT_FALSE(test, sbitmap_test_bit(&sb, bits[i]));
++	}
++	KUNIT_EXPECT_FALSE(test, sbitmap_any_bit_set(&sb));
++	KUNIT_EXPECT_EQ(test, sbitmap_weight(&sb), 0U);
++
++	sbitmap_free(&sb);
++}
++
++struct sbitmap_iter_ctx {
++	struct kunit *test;
++	DECLARE_BITMAP(visited, SBITMAP_TEST_DEPTH);
++	unsigned int nr_visited;
++};
++
++static bool sbitmap_iter_collect(struct sbitmap *sb, unsigned int bitnr,
++				 void *data)
++{
++	struct sbitmap_iter_ctx *ctx = data;
++
++	KUNIT_ASSERT_LT(ctx->test, bitnr, SBITMAP_TEST_DEPTH);
++	__set_bit(bitnr, ctx->visited);
++	ctx->nr_visited++;
++
++	return true;
++}
++
++static void sbitmap_test_iterate_set(struct kunit *test)
++{
++	static const unsigned int bits[] = {
++		0, 5, BITS_PER_LONG - 1, BITS_PER_LONG, 2 * BITS_PER_LONG + 3,
++		SBITMAP_TEST_DEPTH - 1
++	};
++	struct sbitmap_iter_ctx ctx = { .test = test };
++	struct sbitmap sb;
++	unsigned int i;
++
++	KUNIT_ASSERT_EQ(test, sbitmap_init_node(&sb, SBITMAP_TEST_DEPTH, -1,
++						GFP_KERNEL, NUMA_NO_NODE,
++						false, true), 0);
++
++	for (i = 0; i < ARRAY_SIZE(bits); i++) {
++		KUNIT_ASSERT_LT(test, bits[i], SBITMAP_TEST_DEPTH);
++		sbitmap_set_bit(&sb, bits[i]);
++	}
++
++	sbitmap_for_each_set(&sb, sbitmap_iter_collect, &ctx);
++
++	KUNIT_EXPECT_EQ(test, ctx.nr_visited, (unsigned int)ARRAY_SIZE(bits));
++	for (i = 0; i < ARRAY_SIZE(bits); i++)
++		KUNIT_EXPECT_TRUE(test, test_bit(bits[i], ctx.visited));
++
++	sbitmap_free(&sb);
++}
++
++static struct kunit_case sbitmap_test_cases[] = {
++	KUNIT_CASE(sbitmap_test_init),
++	KUNIT_CASE(sbitmap_test_calculate_shift),
++	KUNIT_CASE(sbitmap_test_get_exhaust),
++	KUNIT_CASE(sbitmap_test_put_reuse),
++	KUNIT_CASE(sbitmap_test_round_robin),
++	KUNIT_CASE(sbitmap_test_resize),
++	KUNIT_CASE(sbitmap_test_set_clear_bit),
++	KUNIT_CASE(sbitmap_test_iterate_set),
++	{}
++};
++
++static struct kunit_suite sbitmap_test_suite = {
++	.name = "sbitmap",
++	.test_cases = sbitmap_test_cases,
++};
++
++kunit_test_suite(sbitmap_test_suite);
++
++MODULE_DESCRIPTION("KUnit test for sbitmap");
++MODULE_LICENSE("GPL");
+
+base-commit: 4056b3c9d3c92ea45955641dbafeb9b960e146ef
 -- 
-2.56.0
+2.25.1
 
