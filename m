@@ -1,78 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC57599A43;
-	Fri, 16 Oct 2026 17:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792173000; cv=none; b=FsVhNILpihLRFDWigmeQqPi45DEzBahdPXlZRSxOlKk/12A1k9bT4V9+e/yOjUuRR5D5ikidrQKM52WOmBtvIq070+/4jBL4Mw0xHYiumIm7WwTD3NkJmomizXxni9Pgy099TdxCPFayfNA3nfF9Ktpe1TbWHv6VJCTmF47wjQY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792173000; c=relaxed/simple;
-	bh=sU4pZhbT1lb+nddSv3Vgs9evB7fIVdFzKSbtU/yz+Ig=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=poLehVPlGEu9E2r5vIThbco+p3JyiwlIhr0FqYu1ewpdW9QBV4vb0f6SpcLAVopMrGii3NaF0ttRZJSQqXeJT/UygPboOqI2N6lVoDcFfKKETufdv5UpnX0X9+/TE6y3UODylzhumETlKZC4zPz/4riYyH19o+fVe4ngJCXC6ZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bSpb6G4r; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DAF598BEC
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 17:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792173196; cv=pass; b=jqMGG9pHY5Pgvo4WcLzhMNud9KYtG5HGVo6wxP/qyzeiBKOCO5Yf7ZK5VHqddBpGJSIJSTHFIDALzz/AzB5N7q9chFYB0ekpR5fAWupVCXbHt6RHpIrbZGlYAyi9z+zzXuYpH0qKosy6XPjpxcut9pwghDPBA5hdjl5IA5wEH0k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792173196; c=relaxed/simple;
+	bh=qxhgwpxti99f3N2pyvpz0N4HLMGri6OKfQ339YhtyzA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iSeSYB4Y7Ft/ozWp7CIpnTRkIlqvYCXsi8nTRg5VK9sTzo0nUXCmkq6++Kx92E9cGFuGMVu4weV1AB2V8Mi48ka6aZe6lFJA+0oaTXKvjVbCwMao6pREjPwFOH9MijRDzbS2D/HzhdPqb3KrehgmcHetWUPS3jE+D80aEMTkJ+k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hnUYbNFw; arc=pass smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bSpb6G4r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA7701F000C4;
-	Fri, 16 Oct 2026 17:49:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792172999;
-	bh=xZAgAHLdYRRI5hQx62O9uzg561Z0UyCRFefGSVMPztc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=bSpb6G4rhiiKoVfyTfkTKOPs7nQOnArsPl/jclUJSS1MOTcMcisEcHtAYktKC/ewL
-	 ol3u8VwnvBIU985ghi6jVLGYTqlpKGANX/9vxIg/Ma8cERZdGPN6+sCfY3HClZXfRR
-	 HzFJrIXo62WIR1le20BRrW5V0hw9uAFyZ9M11wTvogI9kfBAUixCVN1XlUw7l0F39t
-	 khTyRRQyniMoNMg+cTkj3Oo+M7BmPO76Kw7QQ3jbRMF8pzcL6Z7LfMxDPtO1QafyWK
-	 3LS6siXOk+DCPQq+rHulXNljc7VSlSbQ4UTQl1K3WFpCuRejkchIGCD6EL/XuTkEdg
-	 L3e7NkUNm96Uw==
-Date: Fri, 16 Oct 2026 07:49:58 -1000
-Message-ID: <eae39daec12cf6f121cc5010574a6c03@kernel.org>
-From: Tejun Heo <tj@kernel.org>
-To: Tao Cui <cui.tao@linux.dev>
-Cc: josef@toxicopanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org,
- daniel@iogearbox.net, linux-kselftest@vger.kernel.org,
- Tao Cui <cuitao@kylinos.cn>, ameryhung@gmail.com,
- alexei.starovoitov@gmail.com
-Subject: Re: [RFC PATCH v10 4/4] docs: cgroup-v2: document the iocost BPF cost model attachment
-In-Reply-To: <20261003124045.1289305-5-cui.tao@linux.dev>
-References: <20261003124045.1289305-1-cui.tao@linux.dev>
- <20261003124045.1289305-5-cui.tao@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hnUYbNFw"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5be3d5927ceso169536e87.3
+        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 10:53:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792173193; cv=none;
+        d=google.com; s=arc-20260327;
+        b=PYYYC5f0ovqnovr0hxXf+SByFejuu2q62yWzoCLfp2C8LaFdFhc042JNmtLS2+HAG1
+         SIyNvnOKJC/18Xsimv4h7gRNzsFE7aVnGlIb9yVYJjUlYYWS2JoMIy5roldhDSEklcAT
+         4PWTUdskmnrOc/lGkCCRNiBrFgz8062c7N3AjKjfSiVzCR74AJmGaLWyE5piPQHn2eKl
+         x4UkghFILGGoSNyqcKNpyGOzTep0mT6nTnYhX8Zy1vJ8+ca/97envHJZw2NwnoCeKehi
+         E/lFm3ayJ4ay6+YcBXJK9WXMAa3GEUL+SvCYNOtTKh4qd24xxnsM0s7oCaFcMQiOsa5z
+         wrIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=3tvB3Clz576g5yH+PklBQfBq0dVAjbbpBq8eyXb6xzQ=;
+        fh=0+GXwI94Hgq+Afeyr+YAnhGXwTfE+gwRySXp8j+c9fc=;
+        b=ft8fUk8NGGJIc3zavW7bM3SGxGW9B2Russ4IP/QKFeTwyM7Bj4PoILkz/uhHeLyceo
+         69X8FFNUV43FM3SKfGLBX1alWULibHdHS2LLbXmmNnWQZd62OS6svxpi75BT4KZWVDF7
+         edUbk7hH71eGIv3xE1kyY4ZMtvyfFq6FpRDWxRVq3gw5QUhntLvjhBqVAOeovRH7tbqT
+         Swr4i7dA21uijCkbKJgaIZIeqZOqqmziMaUkzkNbOoiKgdKCBFfKu653J0f79ClDPoaY
+         ksJ3cOccXCb7fbd4Gbtr2+JHVdT9bkcIzmowIBV4Bhr9rgCjyXqAT1jByNTZSRzFS/93
+         u4yQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792173193; x=1792777993; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=3tvB3Clz576g5yH+PklBQfBq0dVAjbbpBq8eyXb6xzQ=;
+        b=hnUYbNFw3Ga8mMPBBPrjI2JM5G70Henf3gMwkyurJnPXl1IZjOLZ6QzuVfZ9dlco+4
+         D37AZv9f7aPG02FWgmKdk3gXc/pjX+BeNflM84Y2U8A70ergKVIeiPNC5sINRG/lvj4l
+         NVmlaac5JHWkigcvnRcktDrelFwnHQocMv3MCS2hYT46mlcLMS59G3PPGMZ7Ojlpfp34
+         pzGyvvmGlAqkV/227QnwjnFI9jVQADQr4sDykjnlxQOUh8LvvXuxpCdEYfWg1GPRtSq9
+         qzQBedmp3ONN8OcO5D563Q9cDcOTh6eqv+XSwsJ771cgkIAjxWT2n5mkVNx2eJQ6Ilcj
+         fHRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792173193; x=1792777993;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=3tvB3Clz576g5yH+PklBQfBq0dVAjbbpBq8eyXb6xzQ=;
+        b=pd9J07rChVzTXFcRQWRLonq3P9HVDwY4+LUWfCX4z9tioSFioF/7VqxnZVcb0PEU4G
+         wp6UXOwyQWSTyOEOiWn4TqY0jaO0WyXymHiNjJe70VyLUX78LTp2BOVsOv14STjjTlSI
+         Gr5k8i3yZWFWgu3rt8rIp833rjFKA50KlWi6mlVav2nWNp4UewJbs1M3Xqely1i4hxuV
+         UK7tFJgBqgjFUs2km1boZOdyqRDqUN+Q/mqu/Jloni1Mok65y4qnX1Qa5i3EbZOg8wsa
+         WlrjpakaR+f9U1XVpOkBK4nMM14s49P+NG0XR/uoi8M3NGI1v7DQDHeCDMJtnOn7iqHn
+         NbNQ==
+X-Forwarded-Encrypted: i=1; AKwUvBy4pvAMZFG42EE3XuCB/hJJ8XXLINBvlJE0ry8nE0Q+jYuhuzT3R90ldZZuv6U0Zn+CCFWUcizrbUCaYA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYL+Ry5hdipfk9j1k2syWKgVWM6+ZVTEzAM8rFZy4AtL3WTwcKbT
+	1UQbKn9xa9tF57ovIla42tzgEZkM4Ak8d6T7UwjWD4Zd8MimVuAyGLbIqZZvYbabIvEdzDCFh/i
+	6VBORy411QkwD07fs16UWOzfjrByUrVHH3AEGCI4XnqS1WjhY+64HavkJAcM=
+X-Gm-Gg: AYBFou16LjXxkiIE5t4SSI2HMzeSLolNW6UN1frM/Xtabs9xvRDe1AvLxELEbkfkQCk
+	YfjJlUClV3kc2f2yXXZKjvpoknC19FPKrEe88+G85joHu4SUleveGk6GEWYm6sia/Q/9pctAxlW
+	v9HNh6POJZEXRfy6JgMvClcGhZv3pwDYP4Nqe1tlXAf+BTkKVOHdaG6i8o212Haza/KCbvPfrHh
+	x38/P40IqDrUBau3eFwpQ9+DcDtysfKZDm57hkPZafg5baDw4iL7kYXDh0NDhL73J5SMh8PgvZe
+	gwZJooGG1P9v9A1jx8vBfhTWvxB9XpP2f8Mj/84UAmbcyJQRNae+Lekxzk8i9XB0hbG7AERaRQA
+	mtgFr+7YbcgYgEB5Jt3n6
+X-Received: by 2002:a05:6512:124a:b0:5bc:d0fd:8c13 with SMTP id
+ 2adb3069b0e04-5be50a739fcmr81558e87.30.1792173192356; Fri, 16 Oct 2026
+ 10:53:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+References: <20260929160813.1599129-1-tadamsjr@google.com>
+In-Reply-To: <20260929160813.1599129-1-tadamsjr@google.com>
+From: TJ Adams <tadamsjr@google.com>
+Date: Fri, 16 Oct 2026 10:52:51 -0700
+X-Gm-Features: AclHuK_4Rv34tv-YMDX0Nx2GVH6URUQBwfhaVfCGCmFbgDv_SHA6doaKWlcSpYM
+Message-ID: <CAL54Jgdt2QFZ1_p9nOXHviQsSHnXpOt=x55_Jm3srN5fqVsMoA@mail.gmail.com>
+Subject: Re: [PATCH] block: advance iterator after copy-in for SG_DXFER_TO_FROM_DEV
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Christian A . Ehrhardt" <lk@c--e.de>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello, Tao.
+On Tue, Sep 29, 2026 at 9:08 AM TJ Adams <tadamsjr@google.com> wrote:
+>
+> When a passthrough request uses transfer direction SG_DXFER_TO_FROM_DEV,
+> bio_copy_user_iov() sets up a temporary iterator iter2 with
+...
+>                 ret = bio_copy_from_iter(bio, &iter2);
+>                 if (ret)
+>                         goto cleanup;
+> +               iov_iter_advance(iter, bio->bi_iter.bi_size);
+>         } else {
+>                 if (bmd->is_our_pages)
+>                         zero_fill_bio(bio);
+> --
+> 2.56.0.rc1.315.gc6ed9934b7-goog
 
-On Sat, 03 Oct 2026 20:40:45 +0800, Tao Cui wrote:
->  	  model		The cost model in use - "linear"
-> +			or "bpf" while the BPF model
-> +			is in use
+Gentle ping on this fix. Please let me know if you have any questions or
+feedback.
 
-"linear" or "bpf" is enough here.
-
-> +	When CONFIG_BLK_CGROUP_IOCOST_BPF is enabled, a BPF cost model
-> +	can be bound to a device by attaching an "iocost_model_ops"
-> +	struct_ops carrying the whole disk's major:minor in its "dev"
-> +	member (a partition's major:minor is rejected).  Attaching
-> +	creates the controller if needed, like an io.cost.model write
-> +	does, and
-> +	switches the device's pricing to the model; enabling and
-
-Attaching now also populates the device's line, so the existing sentence
-saying the line is populated on the first write to "io.cost.qos" or
-"io.cost.model" needs updating. The paragraph also runs 21 lines with a
-leftover break after "does, and". Can it be split into three, attaching,
-model= selection and detaching, and removal and ctrl?
-
-Thanks.
-
--- 
-tejun
+Thanks,
+TJ Adams
