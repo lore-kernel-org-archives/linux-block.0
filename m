@@ -1,219 +1,477 @@
-Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazon11012034.outbound.protection.outlook.com [40.107.75.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-224.mta0.migadu.com [91.218.175.224])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC11A41D4FC;
-	Fri, 16 Oct 2026 08:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.75.34
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792137850; cv=fail; b=PQ0ZOambh+Qy61880IMcimMRIL1muIYQA40LIKLfNDIhToOZzdrsZQQpslcYOj+I+7srI8emOMzH8LVbmis1fiQdmgHb5HFw94gMvHZXzD97/uCzJnSMsCPaA0VNbWUm3AOOPHALVLIh3v1mCMCjIRQj4eftnqAdnh+e6siGipg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792137850; c=relaxed/simple;
-	bh=NSWMMFsHXPlfNn/nc5d9xixtj4hloUgwSx94FyFAsEc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=LJucY9TRDbltsRnsJNRPUxgzGoeMs73Ztgl9UJHu340BTVZgLNL3jQPheDSxZXW1PhVBnnF/Z2mnIGVO8XZLxK1f0ARqRfik8xSWFAOXkkT58pbcAXHJGCCrONpxQsqPMqasAr8BioglJpUQFnq9LwziKgZpV7CVbbhYXca3XKg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=na79dRmx; arc=fail smtp.client-ip=40.107.75.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D0344C50F
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 08:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.224
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792140842; cv=none; b=J1JZPXmB/NcCO9t/mWwv6oIrE7Mec1j6kD+Y/11nClMBscfdvaejamPAAU3HQs9W2vqwoMy471Um+XFWqFFpLtiYcK6Y5EYt2G5UaZ/J2trJcJvIAprB1aMnKGX3bFjPiy7MEfnwkpRc2C0vokt2JtdWJEEZT60wh1wrLs7jiYQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792140842; c=relaxed/simple;
+	bh=O6cq8jJ3qbtdwUdhhsrN6kPyHFWO2kPsF1jU3TrxXNM=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=J9AfU3LAg2xfPN4mxl/a5DY/gqUtb6UT2+xiBSKIoAj/kkt0f6Uppe0F/b2rsrmloG7Ay3tEgcWbCBJy6HHVHYghOvyUIvVkBMUvoapqwB2f8nFe9sFBTyZk5LDPX1bGA/BEDaD5XK3brRGV3ixLKCgq6gX1qanc0rTPLp0d9Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kpw9zrIa; arc=none smtp.client-ip=91.218.175.224
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="na79dRmx"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sTndON9xDaKfW8/rNdvIQI94K/rptaCslExCvg4LxRBgY5jhlcev9CA3ytiZd0B5E8nQckaOOQCh5rl+/o47DieUk3c1w5XpJPKIlw2dBMTY3jLtcVhsthGDm5xUvig/zjSuC22JS5HdmVLLBdSxa4XAQde2JDPLjJHU2ZbhY76PbQTTtoJjzfHbRYiYgzaupvQctF3csHVjR/k4rB5MbPCHF2vnBxxBctUpMoVV3DkSe3qhIX+kjgJDEIeBtP8txEKIt7ztdCd2xUI/xQrpsFtzdLtEJIWxR1jR2l6vTuKMV5PG5SMKTlvaTlNhq11wFtKoDmLNNItgfvfz4Ysh/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NSWMMFsHXPlfNn/nc5d9xixtj4hloUgwSx94FyFAsEc=;
- b=ak93gGYr9YXw/baSfrd5/4nnDaSAehOtuoDM49KizEqevN24e5i9sLKrcRiHoi6YaF8HZvs7WF1CzmJDABPyIHy1jhhRuYIRn2N9dTyVbcajkTAcCqfQI1Mi5tZM4Nb/Nz6NR9PY9leo3kSPaXj8W0oe/2MYKMX7AU997qNo8a8PUyYpZI1Wj6bh1H3HogbqXKvjzJHMUKdIiQj08e9iunrjXUcEdxUYSseS+7qyAT7KDO3SKM1zoWyIEaJKrV/aaWLotqJUntTjPzQGBYxQOGYPh6mE44eYXvJutpaT+4DdsZrvFOPJmBBHkdCQyPN9n5jmCrZ/CZ2ouL3ybK9oKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NSWMMFsHXPlfNn/nc5d9xixtj4hloUgwSx94FyFAsEc=;
- b=na79dRmxCVAZakDPBpXtFsSyAZ1V8AQeupD8bdTp6Y8Hy06LvJMYr+9Ooo+hVdVtEeSnM9w7vWPuZldf5jlkedNcaZiM5zV7aXx6ZCeNX3i9PcT9+qzn1Ga1KMmgRfbzG5uLEdTN+a2xkdVXfJuGuuM3G0QdlhOCiRVIeOtlY448Spb1T9LnA3DuXevba4nVUd1s78WiSh1phJbQAt1DmgocMOh14aOpuhOV9IXvT3xkOZKV12PdPgBrx9b+wWcPX+Tp5B5c3nFmoYho4E1gwsaNO2Vcgd4O8fFkT9UFYIb8mLGSB0ipF22jZfMyK5OGmEQLsAK+D/3zeH57BtN6QA==
-Received: from TYUPR06MB6217.apcprd06.prod.outlook.com (2603:1096:400:358::7)
- by PUZPR06MB5887.apcprd06.prod.outlook.com (2603:1096:301:117::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.14; Fri, 16 Oct
- 2026 08:04:02 +0000
-Received: from TYUPR06MB6217.apcprd06.prod.outlook.com
- ([fe80::8d51:58c7:42f3:ecc]) by TYUPR06MB6217.apcprd06.prod.outlook.com
- ([fe80::8d51:58c7:42f3:ecc%4]) with mapi id 15.21.0522.013; Fri, 16 Oct 2026
- 08:04:01 +0000
-From: =?gb2312?B?uvrBrMfa?= <hulianqin@vivo.com>
-To: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
-CC: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, "Martin K.
- Petersen" <mkp@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alan Stern <stern@rowland.harvard.edu>, Jens Axboe <axboe@kernel.dk>, Hannes
- Reinecke <hare@suse.de>, Mike Christie <michael.christie@oracle.com>, Damien
- Le Moal <dlemoal@kernel.org>, John Garry <john.g.garry@oracle.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"usb-storage@lists.one-eyed-alien.net"
-	<usb-storage@lists.one-eyed-alien.net>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject:
- =?gb2312?B?tPC4tDogtPC4tDogtPC4tDogW1BBVENIIHY1IDEvMl0gc2NzaTogc2Q6IG1h?=
- =?gb2312?B?cmsgZGlzayBkZWFkIG9uIHN1cnByaXNlIGhvc3QgcmVtb3ZhbCB0byBhdm9p?=
- =?gb2312?Q?d_I/O_hang?=
-Thread-Topic:
- =?gb2312?B?tPC4tDogtPC4tDogW1BBVENIIHY1IDEvMl0gc2NzaTogc2Q6IG1hcmsgZGlz?=
- =?gb2312?B?ayBkZWFkIG9uIHN1cnByaXNlIGhvc3QgcmVtb3ZhbCB0byBhdm9pZCBJL08g?=
- =?gb2312?Q?hang?=
-Thread-Index:
- Ad1X4Nn5DvzfrXBnSoCZVyBu705+6gCeASuAABfIUFAAG63OgAAVJJUAACZ6+YAADGEYMAA/Yf4g
-Date: Fri, 16 Oct 2026 08:04:01 +0000
-Message-ID:
- <TYUPR06MB6217FBAE5A652C085950869DD29B2@TYUPR06MB6217.apcprd06.prod.outlook.com>
-References:
- <TYUPR06MB6217DD31B1B3CD09E431CC12D2922@TYUPR06MB6217.apcprd06.prod.outlook.com>
- <20261012144923.GA10852@lst.de>
- <TYUPR06MB62172FD04314EFE34D8091EAD29E2@TYUPR06MB6217.apcprd06.prod.outlook.com>
- <9c28fbe7-089f-4d72-86be-5805bfebb213@acm.org>
- <TYUPR06MB62173975C70E0BBCE434475ED29D2@TYUPR06MB6217.apcprd06.prod.outlook.com>
- <889a01a1-cae0-4038-b0ad-2ad29231152b@acm.org>
- <TYUPR06MB621717C0153DFB5C495A93A7D29C2@TYUPR06MB6217.apcprd06.prod.outlook.com>
-In-Reply-To:
- <TYUPR06MB621717C0153DFB5C495A93A7D29C2@TYUPR06MB6217.apcprd06.prod.outlook.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYUPR06MB6217:EE_|PUZPR06MB5887:EE_
-x-ms-office365-filtering-correlation-id: fd5f46ea-3c99-4767-4a1a-08df2b5c0a44
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|376014|7416014|366016|1800799024|42112799006|38070700021|56012099006|4143699003|261009223027099003|11063799006|10067099003|22082099003|18002099003;
-x-microsoft-antispam-message-info:
- u6Y4u2+OfjARoIAD3/K1zY7LMdJnT8w+d+TXkJ+R7udQT/gDuRzRBxYF2mRbEhViY4Xv1We4jd8b+xXvNXKLHlzZDB1DfqHEmyI1gQpO8JT2L/J+u565vxKUu0Ys/WoVp8zoxIT7ylHSGajJKVRTb49wegz3mrmA2W/Dz5YPzJWLlE21tSRxPCiI6I2xcIYben9a9Y+3pranpqRPe5kzwbAlMaWmkM97pwm+QYy91AeVQ4QT6NFuyk6Al8iRRGbKf5+zcyS+1tqSfKJYuLz9LUY68nR+hb6kIwEepTDvAK4pJuamGkeC+HM+uyBwgpE1vIN2tBxlr4Ut7XzAtlYyMmkezL6y4MjILvVPzt9gdcNzRvRhNH8YCjURVOm8dZ/OmFecTYoucIbhlnv9EGjEPI2gnCO7blOEMh2ggAE6C5PRw36ZHZf90s2WtW7EC3njZQ5SY3RTk9udaxhjAt+U1RWqc0/vBcfV5lRiMnQZOZXaCtJOADS3dDzUBAaPyH3gPgbrugIZyuU8WA1cmt8qfmR2Ux9g9wn0DqsAR/UtgBuQ/USCfczsyLhucwNMbDVWtic7evN6v70LfcwQqar3UlmFEHaVXxR1yvhmFYY+PLmbW0T7z3gU8GqDew6i+Oi6M1KCZwxTq6pEF9y1tvXNjXqw4bF2oamLhE9DTWvP01dqA/G5OYZONnPZjviFqGcH
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYUPR06MB6217.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(366016)(1800799024)(42112799006)(38070700021)(56012099006)(4143699003)(261009223027099003)(11063799006)(10067099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?eDlaYnVuMTAremI0OVpMMnpzb1JraWpzWFFZTWJYZzRWWGdRY0taamVMYkpZ?=
- =?gb2312?B?SHQ2akRyeURWQXIxV2MvUDlzajlqY2pReXdRMFNWdCtHeVRVbEsyUWEvL28w?=
- =?gb2312?B?VHBHcVVVWG10cXFqMmFTODlld1BBbUtENUJ1b1F4Wmp1K2t2UE9VbWR4akll?=
- =?gb2312?B?cCt4MWZySUpiTVJDK09yM2pXT1QzTDRaSmVONzRKMEVOUXBEYXpSeEVXYU90?=
- =?gb2312?B?Q09xZ0QzMEpQdElpY0JycVJHRVlmR3d1S1RxWFFpNWs5ekhaclFvQW9xek0v?=
- =?gb2312?B?WGV3SVpOSWJjYXF5dzFNdDJFaTl6alg5aXpRWkRwOXdkM3gyenlUK1MzVFh0?=
- =?gb2312?B?d1Z3S01RMHlzR3pKWHFYc20wR3QxREM1U2hFLzluZ3lXVjlpZ0pNVUo0M25y?=
- =?gb2312?B?RnJvK1RnUVY5d3ZkVEc5NlV0cVJVWW5WUlM5RzZja29CdWNMYUNkaGFQY3hi?=
- =?gb2312?B?TlZzY1h0T2dWb0ROQ0Fqb0paTzArUFJnSFFGWWVsakI0UHlxeFpVR1VOK0Jl?=
- =?gb2312?B?QWhiZno5ZVBCb1BxMTZGeXlzdGZKam1mU3A2UXBzQkVsbkowTEtDOHRGVTNs?=
- =?gb2312?B?ZWRqL09va08xQ0hnREswS0ZiYXlaMytRWmo4SWltQTF4QXhLRXFiL1hmUVN0?=
- =?gb2312?B?djNIR2d5NTZrZ0RyUUVXRzRNaklrMW1mcUdnRkpjTVNyNjExYzZubkFiZ3lX?=
- =?gb2312?B?MWdiQnBUZHRXQXBFUE44V2ZURmt4Q2pWRVl2bHgxb1dqeG11U2Y2SlVQMng0?=
- =?gb2312?B?NDMwKzZIMFVsUEhUMWNvK0M0eGpOWUxzak1LNkxsUVlpanoyMjhDTDdONXUz?=
- =?gb2312?B?eC9lYVBtUGVnbVZ0OE9VZDJJVjdFN1pJd1VDOUxpOTRFbXpCd0VEZXRXekU0?=
- =?gb2312?B?TG02WnhmUTVvSEwreWFqQnFnd3ZtMUNOMVBaVnVDQWVtUjg3RENOd3ZQR0M3?=
- =?gb2312?B?eWh5Ty9pSDhIbWRZNXBXcFZOV0MrL1NZczBvdTRzdUtQUmZUSmsrVjRxYnpp?=
- =?gb2312?B?VmMySVhSOXYzNW4zSUZBRE93dVZPVmhlN0tkVmJvenJzMElaMHU0UVBqd3Vl?=
- =?gb2312?B?Mm9lT21JUFVsNiszYlRpYTJhRlgzN2pXVXo1UDFyVnBMUFhnUEhFdVhodmlE?=
- =?gb2312?B?ZEp6RnltVkk2aHRnS2J0T3JqYlJqTUVSN2hpdmVYWXVJaysrNU0wVjg4TVpk?=
- =?gb2312?B?WENuSi9iVGcxekttWkY0eGNvZmNXNWVFRWNKQWJlKzJGZk04dVg0YS9wOU9I?=
- =?gb2312?B?UCt1bkMyZFZMTVUrQXZGV1pISldySmZZUmZ0cGRLQTVMY0RtbU93NjBXejhK?=
- =?gb2312?B?QnBjM3FNNDZxVUd4bnM0aGd3ZmttaDdhb2psUE1iUUhwZk1JbkJJWFd0eER6?=
- =?gb2312?B?Zy9EZm9hc0NzbldGLzE1dXFrZDEwYTZqVXo0alpIbUNHWDhPWXlmamFJYzA2?=
- =?gb2312?B?M09sRGpUL1Q3UTBsWFRqa3V5N002K1JuNk5pYWwwcDJXdG85MTdyZ1NQZWRT?=
- =?gb2312?B?L2d6djhtUXU1aFcxOTFSdngzemlNMWJkSFRINGE1Wmp0NFQ4c0hpb3NkTE52?=
- =?gb2312?B?R2tCVkExdnMrM3RmOGdpVVhXK05WYjY0K0VkRklPeVBieWFCeHZ3V1pGYy9S?=
- =?gb2312?B?Qno5R1BvaXJNVDN4ZXZHMFp5UXdtWkxkREFCSnlBRUVYMDI4bVJhYTRucUs2?=
- =?gb2312?B?RHVKdW0xOGF0VEhuN1R5RXVwd1dRb3h4Z3Fjb0FzMEtkcURXa2RLM1RxYXZn?=
- =?gb2312?B?VWRROEJCcGtpZ0FabHZLMHFkUVJ2c09kRkdERkpkbE1BblV5QUdCZDh6RWNE?=
- =?gb2312?B?azltdWFlVml3SUZoV3dVWCtyMFZ1Vzd0cFdLbkY3T3oxQlRmcDZpVFloZUFN?=
- =?gb2312?B?VFhKVjM1UWNETjVwdDBKTDV0ZmR4emJVN1hKb21EN3lSSzlqeitTTS94N0tv?=
- =?gb2312?B?UUY0bmFKdVRZNjYzOW1IMEhMNWtqQkJiVUNaZVRTRGYvU1dENVR0bWtaZlQr?=
- =?gb2312?B?WFN4VnNHWGlyZXorZ3BjWFRtdjdQWnhXeklFZG5wK2dZb2w3VEJaMTY4UFMx?=
- =?gb2312?B?VE9SRGlHOElBbUJpQzBNcVFhZjRYR29wVkpRUHhuL0FwK01QV1ZibzVjcjR3?=
- =?gb2312?B?b2pLZkU1YUZ4TEh3dStaM3B2QWl6WVYxRFkrTlo3cE8yMVhnQlZhZTRBamR2?=
- =?gb2312?B?eGIydDczclV0bDhpMzJ3R0FkcHZ6SnpRZ1BVMkF2SFNrWlpwb0E5Y0syNG5T?=
- =?gb2312?Q?b32l4Onj4hpVXUEvLbGPjkNq42tY2Krx4EPxPtmxN4=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kpw9zrIa"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=O6cq8jJ3qbtdwUdhhsrN6kPyHFWO2kPsF1jU3TrxXNM=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792140832; v=1; x=1792745632;
+ b=kpw9zrIajylJQ8X5GuDJXSD84KVxiwlWiyhEHMIZj+DNX+Wr0GXzFwkWfAilmWZPWXb391PE
+ 5d6CPyZUhdAHKlqREqmLby76ey0lJPWRBuchN2D5T5rbjRkCBDNLr9YTptbPGenGI5fmQYToxQ2
+ cT7WbM/JMX1QWSrsgGeFLf8Q=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by mta11.migadu.com with ESMTPS id 0852ad72b7d4d602;
+	Fri, 16 Oct 2026 08:53:50 +0000
+X-Mizu-Trace-ID: 0852ad72b7d4d602
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <8fff4ba1-1b19-4974-bbd1-16686c8b5bd2@linux.dev>
+Date: Fri, 16 Oct 2026 09:53:48 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYUPR06MB6217.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd5f46ea-3c99-4767-4a1a-08df2b5c0a44
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2026 08:04:01.8783
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: r2TkiqKD2aH+UllssihG6HJpv4mrRiWmW+F6PujfefDxuuuJ9BhAUPO1LF/zde3lAfRZfF1ieTQoKCAvSjD1gA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR06MB5887
+User-Agent: Mozilla Thunderbird
+From: John Garry <john.garry@linux.dev>
+Subject: Re: [PATCH blktests v3 4/4] block/053: add a torn atomic write test
+ for block devices
+To: Tal Zussman <tz2294@columbia.edu>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20261015-blkdev-fixes-tests-v3-0-b6ffa6410514@columbia.edu>
+ <20261015-blkdev-fixes-tests-v3-4-b6ffa6410514@columbia.edu>
+Content-Language: en-US
+In-Reply-To: <20261015-blkdev-fixes-tests-v3-4-b6ffa6410514@columbia.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-SGkgQmFydCwNCg0KPiA+IFN1YmplY3Q6IFtQQVRDSF0gc2NzaTogc2Q6IE1hcmsgdGhlIGRpc2sg
-ZGVhZCBpZiBydW50aW1lIHJlc3VtZSBmYWlscyBpbg0KPiA+IHNkX3JlbW92ZSgpDQo+ID4NCj4g
-PiBJZiBhIFNDU0kgZGlzayBpcyB1bnBsdWdnZWQgd2hpbGUgcnVudGltZSBzdXNwZW5kZWQsIGl0
-cyByZXF1ZXN0IHF1ZXVlDQo+ID4gaXMgc3RpbGwgaW4gdGhlIHBtLW9ubHkgc3RhdGUgd2hlbiBz
-ZF9yZW1vdmUoKSBpcyBjYWxsZWQuIFRoZSBydW50aW1lDQo+ID4gcmVzdW1lIGF0dGVtcHRlZCBi
-eSBzY3NpX2F1dG9wbV9nZXRfZGV2aWNlKCkgZmFpbHMgYmVjYXVzZSB0aGUgcGFyZW50DQo+ID4g
-ZGV2aWNlLCBlLmcuIGEgVVNCIGRldmljZSBpbiB0aGUgVVNCX1NUQVRFX05PVEFUVEFDSEVEIHN0
-YXRlLCBjYW5ub3QgYmUNCj4gPiByZXN1bWVkLiBIZW5jZSwgc2Rldl9ydW50aW1lX3Jlc3VtZSgp
-IGlzIG5vdCBjYWxsZWQgYW5kIHRoZSBwbS1vbmx5DQo+ID4gc3RhdGUgaXMgbm90IGNsZWFyZWQu
-IE5leHQsIGRlbF9nZW5kaXNrKCkgY2FsbHMNCj4gPiBibGtfcmVwb3J0X2Rpc2tfZGVhZChkaXNr
-LCBmYWxzZSksIHdoaWNoIGNhbGxzIHN5bmNfZmlsZXN5c3RlbSgpLiBBbnkNCj4gPiBiaW8gc3Vi
-bWl0dGVkIGJ5IHRoZSBmaWxlc3lzdGVtIHdhaXRzIGZvcmV2ZXIgaW4gX19iaW9fcXVldWVfZW50
-ZXIoKQ0KPiA+IGJlY2F1c2UgdGhlIHF1ZXVlIHdpbGwgbmV2ZXIgbGVhdmUgdGhlIHBtLW9ubHkg
-c3RhdGUgYW5kIGJlY2F1c2UNCj4gPiBHRF9ERUFEIGhhcyBub3QgeWV0IGJlZW4gc2V0Og0KPiA+
-DQo+ID4gICBfX2Jpb19xdWV1ZV9lbnRlcisweGI4LzB4MTc0DQo+ID4gICBibGtfbXFfc3VibWl0
-X2JpbysweDY0MC8weDdlNA0KPiA+ICAgWyAuLi4gXQ0KPiA+ICAgZXhmYXRfc3luY19mcysweGE0
-LzB4ZTANCj4gPiAgIHN5bmNfZmlsZXN5c3RlbSsweGE4LzB4ZGMNCj4gPiAgIGZzX2JkZXZfbWFy
-a19kZWFkKzB4MzAvMHg4OA0KPiA+ICAgYmRldl9tYXJrX2RlYWQrMHg1NC8weGM0DQo+ID4gICBi
-bGtfcmVwb3J0X2Rpc2tfZGVhZCsweDhjLzB4ZDQNCj4gPiAgIGRlbF9nZW5kaXNrKzB4YTAvMHgy
-ZjgNCj4gPiAgIHNkX3JlbW92ZSsweDMwLzB4NjANCj4gPiAgIFsgLi4uIF0NCj4gPiAgIHNjc2lf
-cmVtb3ZlX2hvc3QrMHg4OC8weDE4Yw0KPiA+ICAgdXNiX3N0b3JfZGlzY29ubmVjdCsweDY4LzB4
-ZjQNCj4gPg0KPiA+IEZpeCB0aGlzIGhhbmcgYnkgY2FsbGluZyBibGtfbWFya19kaXNrX2RlYWQo
-KSBpZiBydW50aW1lIHJlc3VtZSBmYWlscy4NCj4gPiBUaGlzIHNldHMgR0RfREVBRCwgdGVsbHMg
-dGhlIGZpbGVzeXN0ZW0gdGhhdCB0aGUgZGlzayBoYXMgYmVlbiByZW1vdmVkDQo+ID4gd2l0aG91
-dCBhdHRlbXB0aW5nIHRvIHN5bmMgaXQsIGFuZCB3YWtlcyB1cCBhbnkgYmlvcyB0aGF0IGFyZSB3
-YWl0aW5nDQo+ID4gaW4gX19iaW9fcXVldWVfZW50ZXIoKS4gU3luY2luZyB0aGUgZmlsZXN5c3Rl
-bSBpcyBub3QgcG9zc2libGUgYW55d2F5DQo+ID4gaWYgcnVudGltZSByZXN1bWUgZmFpbGVkLCBz
-byBubyBkYXRhIGlzIGxvc3QgdGhhdCBjb3VsZCBvdGhlcndpc2UgaGF2ZQ0KPiA+IGJlZW4gd3Jp
-dHRlbi4gSWYgcnVudGltZSByZXN1bWUgc3VjY2VlZHMsIGJlaGF2aW9yIGlzIG5vdCBjaGFuZ2Vk
-LiBNYWtlDQo+ID4gdGhpcyBjaGFuZ2UgaW4gc2RfcmVtb3ZlKCkgaW5zdGVhZCBvZiBpbiBhIFND
-U0kgTExEIHN1Y2ggdGhhdCBpdCB3b3Jrcw0KPiA+IGZvciBhbGwgU0NTSSB0cmFuc3BvcnRzLg0K
-PiA+DQo+ID4gUmVwb3J0ZWQtYnk6IExpYW5xaW4gSHUgPGh1bGlhbnFpbkB2aXZvLmNvbT4NCj4g
-PiBDbG9zZXM6DQo+ID4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsL1RZVVBSMDZNQjYyMTdE
-RDMxQjFCM0NEMDlFNDMxQ0MxMkQyOTIyQFRZVVBSMDZNQjYyMTcuYXBjcHJkMDYucHJvZC5vdXRs
-b29rLmNvbS8NCj4gPiBGaXhlczogNmY4MTkxZmRmNDFkICgiYmxvY2s6IHNpbXBsaWZ5IGRpc2sg
-c2h1dGRvd24iKQ0KPiA+IENjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnDQo+ID4gU2lnbmVkLW9m
-Zi1ieTogQmFydCBWYW4gQXNzY2hlIDxidmFuYXNzY2hlQGFjbS5vcmc+DQo+ID4gLS0tDQo+ID4g
-ICBkcml2ZXJzL3Njc2kvc2QuYyB8IDEwICsrKysrKysrKy0NCj4gPiAgIDEgZmlsZSBjaGFuZ2Vk
-LCA5IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9k
-cml2ZXJzL3Njc2kvc2QuYyBiL2RyaXZlcnMvc2NzaS9zZC5jDQo+ID4gaW5kZXggYTFiMjFlYTE0
-ZTU0Li4yMDhiOTE1ZjI1YTIgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9zY3NpL3NkLmMNCj4g
-PiArKysgYi9kcml2ZXJzL3Njc2kvc2QuYw0KPiA+IEBAIC00MjcwLDcgKzQyNzAsMTUgQEAgc3Rh
-dGljIHZvaWQgc2RfcmVtb3ZlKHN0cnVjdCBzY3NpX2RldmljZSAqc2RwKQ0KPiA+ICAgCXN0cnVj
-dCBkZXZpY2UgKmRldiA9ICZzZHAtPnNkZXZfZ2VuZGV2Ow0KPiA+ICAgCXN0cnVjdCBzY3NpX2Rp
-c2sgKnNka3AgPSBkZXZfZ2V0X2RydmRhdGEoZGV2KTsNCj4gPg0KPiA+IC0Jc2NzaV9hdXRvcG1f
-Z2V0X2RldmljZShzZGtwLT5kZXZpY2UpOw0KPiA+ICsJLyoNCj4gPiArCSAqIElmIHJ1bnRpbWUg
-cmVzdW1lIGZhaWxzLCBlLmcuIGJlY2F1c2UgdGhlIGRldmljZSB3YXMgdW5wbHVnZ2VkDQo+ID4g
-KwkgKiB3aGlsZSBydW50aW1lIHN1c3BlbmRlZCwgdGhlIHJlcXVlc3QgcXVldWUgc3RheXMgaW4g
-dGhlIHBtLW9ubHkNCj4gPiArCSAqIHN0YXRlIGFuZCBhbnkgSS9PIHN1Ym1pdHRlZCBieSBkZWxf
-Z2VuZGlzaygpLCBlLmcuIGZyb20NCj4gPiArCSAqIHN5bmNfZmlsZXN5c3RlbSgpLCB3b3VsZCB3
-YWl0IGZvcmV2ZXIgaW4gX19iaW9fcXVldWVfZW50ZXIoKS4NCj4gPiArCSAqIFByZXZlbnQgdGhp
-cyBieSBtYXJraW5nIHRoZSBkaXNrIGRlYWQuDQo+ID4gKwkgKi8NCj4gPiArCWlmIChzY3NpX2F1
-dG9wbV9nZXRfZGV2aWNlKHNka3AtPmRldmljZSkgPCAwKQ0KPiA+ICsJCWJsa19tYXJrX2Rpc2tf
-ZGVhZChzZGtwLT5kaXNrKTsNCj4gPg0KPiA+ICAgCWRldmljZV9kZWwoJnNka3AtPmRpc2tfZGV2
-KTsNCj4gPiAgIAlkZWxfZ2VuZGlzayhzZGtwLT5kaXNrKTsNCj4gDQoNCkkgdGVzdGVkIHlvdXIg
-cGF0Y2ggb24gb3VyIGtlcm5lbCAodjYuMTgpIHdpdGggdGhlIGZvbGxvd2luZyBzY2VuYXJpbzoN
-ClVTQiBtYXNzIHN0b3JhZ2UgZGV2aWNlIHdpdGggZXhGQVQgZmlsZXN5c3RlbSwgYXV0b3N1c3Bl
-bmQgZW5hYmxlZCwNCnBoeXNpY2FsIHJlbW92YWwgZHVyaW5nIHN5c3RlbSBzdXNwZW5kLg0KDQpU
-ZXN0IHJlc3VsdDogMTUwMCBpdGVyYXRpb25zLCBubyBodW5nX3Rhc2sgb2JzZXJ2ZWQuIFRoZSBw
-cmV2aW91cw0KMTQ3KyBzZWNvbmQgaGFuZyBpcyBjb21wbGV0ZWx5IHJlc29sdmVkLg0KDQpUaGUg
-cGF0Y2ggd29ya3MgYXMgZXhwZWN0ZWQuIFRoYW5rIHlvdSBmb3IgdGhpcyBjbGVhbiBmaXguDQoN
-ClRlc3RlZC1ieTogTGlhbnFpbiBIdSA8aHVsaWFucWluQHZpdm8uY29tPg0KDQpUaGFua3MsDQpM
-aWFucWluDQo=
+On 10/15/26 17:29, Tal Zussman wrote:
+
+thanks, just some more comments
+
+> A block device atomic write is a hardware atomic write, submitted as a
+> single bio, so when its buffer can't be fully pinned, the direct I/O
+> path has to fail the write rather than submit the pinned part.
+> Otherwise, it submits what was pinned with REQ_ATOMIC set and leaves
+> the rest to the buffered fallback, tearing the write at the pin
+> boundary.
+> 
+> This is a regression test for that issue, fixed in the kernel patch
+> "block: fail a short atomic pin in bio_iov_iter_get_pages()" [1].
+> 
+> Issue a two-page pwritev2() with RWF_ATOMIC to a scsi_debug device with
+> atomic_wr=1 from a buffer whose last page is PROT_NONE, so that pinning
+> the buffer stops one page short. Check with statx() that the device
+> supports an atomic write of that size, then check that the write fails
+> with EINVAL and that the range still reads back as the old data.
+> 
+> Two pages is the smallest write that leaves one page unpinnable, and
+> atomic_wr_max_length=256 raises the atomic write unit max to 128K so
+> that two pages fit for any page size up to 64K.
+> 
+> [1]: https://lore.kernel.org/linux-block/20261009-blkdev-fixes-v6-5-307939c387df@columbia.edu/
+> 
+> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+> ---
+>   src/.gitignore          |   1 +
+>   src/Makefile            |   1 +
+>   src/atomic-write-torn.c | 233 ++++++++++++++++++++++++++++++++++++++++++++++++
+>   tests/block/053         |  60 +++++++++++++
+>   tests/block/053.out     |   2 +
+>   5 files changed, 297 insertions(+)
+> 
+> diff --git a/src/.gitignore b/src/.gitignore
+> index 92c08d1..76a1c5e 100644
+> --- a/src/.gitignore
+> +++ b/src/.gitignore
+> @@ -1,3 +1,4 @@
+> +/atomic-write-torn
+>   /bio-bounce-read
+>   /bio-full-trim
+>   /bio-trim-pin-leak
+> diff --git a/src/Makefile b/src/Makefile
+> index f3f338b..b244405 100644
+> --- a/src/Makefile
+> +++ b/src/Makefile
+> @@ -14,6 +14,7 @@ HAVE_C_DEF = $(shell if printf '$(H)include <%s>\n$(H)ifdef %s\nHAVE_%s\n$(H)end
+>   		then echo 1;else echo 0; fi)
+>   
+>   C_TARGETS := \
+> +	atomic-write-torn \
+>   	bio-bounce-read \
+>   	bio-full-trim \
+>   	bio-trim-pin-leak \
+> diff --git a/src/atomic-write-torn.c b/src/atomic-write-torn.c
+
+We are testing that the atomic write is untorn really (which it should 
+be), so please rename to atomic-write-untorn.c
+
+> new file mode 100644
+> index 0000000..f6f3ccf
+> --- /dev/null
+> +++ b/src/atomic-write-torn.c
+> @@ -0,0 +1,233 @@
+> +// SPDX-License-Identifier: GPL-3.0+
+> +/*
+> + * Copyright (C) 2026 Tal Zussman
+> + *
+> + * Check that a RWF_ATOMIC direct write to a block device is all or nothing
+> + * when only part of its buffer can be pinned.
+> + *
+> + * Fill two pages of the device with one byte value, then issue a pwritev2()
+> + * with RWF_ATOMIC of a two-page buffer holding another value whose last page
+> + * is PROT_NONE, so that pinning the buffer stops one page short. The direct
+> + * I/O path must fail the write with EINVAL rather than submit what it pinned.
+> + *
+> + * Read the range back with O_DIRECT and count the bytes of each value, once
+> + * before the atomic write to check the baseline and once after it. The write
+> + * has to fail with EINVAL and leave only old bytes on the device.
+> + *
+> + * The device has to support atomic writes of two pages, which is checked
+> + * with statx(). The first two pages of <blockdev> are overwritten.
+
+I think that you can condense this description, as the functionality is 
+not too complex
+
+> + *
+> + * usage: atomic-write-torn <blockdev>
+> + *
+> + * exit:  0 = the write failed with EINVAL and the device is unchanged
+> + *        1 = setup error
+> + *        2 = the write was torn
+> + *        3 = the write did not fail with EINVAL, or went through
+> + */
+> +#define _GNU_SOURCE
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <stdbool.h>
+> +#include <stdint.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <sys/mman.h>
+> +#include <sys/syscall.h>
+> +#include <sys/uio.h>
+> +#include <unistd.h>
+> +
+> +#ifndef RWF_ATOMIC
+> +#define RWF_ATOMIC	0x00000040
+> +#endif
+> +
+> +#ifndef STATX_WRITE_ATOMIC
+> +#define STATX_WRITE_ATOMIC	0x00010000U
+> +#endif
+> +#ifndef STATX_ATTR_WRITE_ATOMIC
+> +#define STATX_ATTR_WRITE_ATOMIC	0x00400000
+> +#endif
+> +
+
+Do we still really need these? Surely a test machine will be installing 
+the latest headers along with the new kernel, no?
+
+> +/*
+> + * The atomic write fields of struct statx are only in glibc 2.43 and later,
+> + * so use a local copy of the kernel's layout and call the syscall directly.
+> + */
+> +struct atomic_statx {
+> +	uint32_t stx_mask;
+> +	uint32_t stx_blksize;
+> +	uint64_t stx_attributes;
+> +	uint32_t stx_nlink;
+> +	uint32_t stx_uid;
+> +	uint32_t stx_gid;
+> +	uint16_t stx_mode;
+> +	uint16_t __spare0[1];
+> +	uint64_t stx_ino;
+> +	uint64_t stx_size;
+> +	uint64_t stx_blocks;
+> +	uint64_t stx_attributes_mask;
+> +	uint64_t stx_times[8];	/* stx_atime, stx_btime, stx_ctime, stx_mtime */
+> +	uint32_t stx_rdev_major;
+> +	uint32_t stx_rdev_minor;
+> +	uint32_t stx_dev_major;
+> +	uint32_t stx_dev_minor;
+> +	uint64_t stx_mnt_id;
+> +	uint32_t stx_dio_mem_align;
+> +	uint32_t stx_dio_offset_align;
+> +	uint64_t stx_subvol;
+> +	uint32_t stx_atomic_write_unit_min;
+> +	uint32_t stx_atomic_write_unit_max;
+> +	uint32_t stx_atomic_write_segments_max;
+> +	uint32_t stx_dio_read_offset_align;
+> +	uint32_t stx_atomic_write_unit_max_opt;
+> +	uint32_t __spare2[1];
+> +	uint64_t __spare3[8];
+> +};
+
+or this.
+
+> +
+> +_Static_assert(sizeof(struct atomic_statx) == 256, "struct statx is 256 bytes");
+> +
+> +#define EXIT_TORN	2
+> +#define EXIT_UNEXPECTED	3
+
+EXIT_FAILURE and EXIT_SUCCESS could be used here, no?
+
+> +
+> +#define OLD	'A'
+> +#define NEW	'B'
+> +
+> +/* Does the device support an atomic write of len bytes? */
+> +static bool can_write_atomically(int fd, size_t len)
+
+bdev_can_atomic_write_for_length() would be a better name and functionality
+
+> +{
+> +	struct atomic_statx stx = { 0 };
+> +
+> +	if (syscall(SYS_statx, fd, "", AT_EMPTY_PATH, STATX_WRITE_ATOMIC,
+> +		    &stx)) {
+> +		perror("statx");
+> +		return false;
+> +	}
+> +	if (!(stx.stx_mask & STATX_WRITE_ATOMIC) ||
+> +	    !(stx.stx_attributes & STATX_ATTR_WRITE_ATOMIC)) {
+> +		fprintf(stderr, "device does not support atomic writes\n");
+> +		return false;
+> +	}
+> +	printf("atomic write unit min %u, max %u\n",
+> +	       stx.stx_atomic_write_unit_min, stx.stx_atomic_write_unit_max);
+> +	if (len < stx.stx_atomic_write_unit_min ||
+> +	    len > stx.stx_atomic_write_unit_max) {
+> +		fprintf(stderr, "device cannot write %zu bytes atomically\n",
+> +			len);
+> +		return false;
+> +	}
+> +	return true;
+> +}
+> +
+> +/* Read the range back past the page cache and count the bytes of each value. */
+> +static int count_bytes(int fd, char *buf, size_t len, size_t *old_bytes,
+> +		       size_t *new_bytes)
+
+compare_bytes() may be a better name
+
+> +{
+> +	size_t i;
+> +
+> +	if (pread(fd, buf, len, 0) != (ssize_t)len) {
+> +		perror("pread");
+> +		return -1;
+> +	}
+> +
+> +	*old_bytes = *new_bytes = 0;
+> +	for (i = 0; i < len; i++) {
+> +		if (buf[i] == OLD)
+> +			(*old_bytes)++;
+> +		else if (buf[i] == NEW)
+> +			(*new_bytes)++;
+> +	}
+> +	printf("on disk: %zu old bytes, %zu new bytes, %zu other\n",
+> +	       *old_bytes, *new_bytes, len - *old_bytes - *new_bytes);
+
+Do we really need all these non-error messages? I just wonder if they 
+can be obvious and useful to someone examining the log.
+
+> +	return 0;
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	size_t old_bytes, new_bytes;
+> +	size_t len, pgsz;
+> +	struct iovec iov;
+> +	char *buf;
+> +	ssize_t ret;
+> +	int fd, err, status = 1;
+
+status = 1 seems a bit magic to me
+
+> +
+> +	if (argc != 2) {
+> +		fprintf(stderr, "usage: %s <blockdev>\n", argv[0]);
+> +		return 1;
+> +	}
+> +
+> +	pgsz = sysconf(_SC_PAGESIZE);
+> +	len = 2 * pgsz;
+> +
+> +	fd = open(argv[1], O_RDWR | O_DIRECT);
+> +	if (fd < 0) {
+> +		perror("open");
+> +		return 1;
+> +	}
+> +
+> +	if (!can_write_atomically(fd, len))
+> +		goto out_close;
+> +
+> +	buf = mmap(NULL, len, PROT_READ | PROT_WRITE,
+> +		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+> +	if (buf == MAP_FAILED) {
+> +		perror("mmap");
+> +		goto out_close;
+> +	}
+> +
+> +	/* Write the old contents and check that they read back. */
+> +	memset(buf, OLD, len);
+> +	if (pwrite(fd, buf, len, 0) != (ssize_t)len) {
+> +		perror("pwrite");
+> +		goto out_unmap;
+> +	}
+> +	if (count_bytes(fd, buf, len, &old_bytes, &new_bytes))
+> +		goto out_unmap;
+> +	if (old_bytes != len) {
+> +		fprintf(stderr, "old contents did not read back\n");
+> +		goto out_unmap;
+> +	}
+
+Can all this functionality (count_bytes() and length compare) be 
+combined into a single function?
+
+> +
+> +	/* Fill in the new contents and make the last page unreadable. */
+> +	memset(buf, NEW, len);
+> +	if (mprotect(buf + len - pgsz, pgsz, PROT_NONE)) {
+> +		perror("mprotect");
+> +		goto out_unmap;
+> +	}
+> +
+> +	iov.iov_base = buf;
+> +	iov.iov_len = len;
+> +	ret = pwritev2(fd, &iov, 1, 0, RWF_ATOMIC);
+> +	err = errno;
+> +	if (ret < 0)
+> +		printf("pwritev2(RWF_ATOMIC) failed: %s\n", strerror(err));
+> +	else
+> +		printf("pwritev2(RWF_ATOMIC) returned %zd of %zu\n", ret, len);
+
+The message does not really make sense, specifically "returned %zd of %zu"
+
+> +
+> +	/* Make the last page readable again and reuse the buffer. */
+
+Comments like "reuse the buffer" are a bit verbose
+
+> +	if (mprotect(buf + len - pgsz, pgsz, PROT_READ | PROT_WRITE)) {
+> +		perror("mprotect");
+> +		goto out_unmap;
+> +	}
+> +	if (count_bytes(fd, buf, len, &old_bytes, &new_bytes))
+> +		goto out_unmap;
+> +
+> +	if (old_bytes != len && new_bytes != len) {
+> +		printf("atomic write was torn: %zu of %zu bytes written\n",
+> +		       new_bytes, len);
+> +		status = EXIT_TORN;
+> +	} else if (ret >= 0 || err != EINVAL) {
+> +		printf("atomic write did not fail with EINVAL\n");
+> +		status = EXIT_UNEXPECTED;
+> +	} else if (new_bytes) {
+> +		printf("atomic write went through despite the unreadable page\n");
+> +		status = EXIT_UNEXPECTED;
+> +	} else {
+> +		printf("atomic write failed with EINVAL and left the device unchanged\n");
+
+maybe, "atomic write failed with EINVAL and left the device unchanged, 
+as expected"
+
+
+> +		status = 0;
+> +	}
+> +
+> +out_unmap:
+> +	munmap(buf, len);
+> +out_close:
+> +	close(fd);
+> +	return status;
+> +}
+> diff --git a/tests/block/053 b/tests/block/053
+> new file mode 100755
+> index 0000000..c7a24b4
+> --- /dev/null
+> +++ b/tests/block/053
+> @@ -0,0 +1,60 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2026 Tal Zussman
+> +#
+> +# Issue a RWF_ATOMIC direct write to a block device from a buffer whose last
+> +# page cannot be pinned and check that the write is all or nothing. A block
+> +# device atomic write is a hardware atomic write, submitted as a single bio,
+> +# so the direct I/O path has to fail the write outright when pinning its
+> +# buffer comes up short. Without that, it submits what was pinned with
+> +# REQ_ATOMIC set and leaves the rest to the buffered fallback, tearing the
+> +# write at the pin boundary.
+
+This seems to repeat the comments from the C code
+
+> +#
+> +# Regression test for patch "block: fail a short atomic pin in
+> +# bio_iov_iter_get_pages()".
+> +
+> +. tests/block/rc
+> +. common/scsi_debug
+> +
+> +DESCRIPTION="check that a partially pinned atomic write is not torn"
+> +QUICK=1
+> +
+> +requires() {
+> +	_have_scsi_debug && _have_module_param scsi_debug atomic_wr
+> +	_have_src_program atomic-write-torn
+> +}
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	local ret
+> +
+> +	# The helper writes two pages atomically. An atomic write unit max of
+> +	# 256 blocks, 128K, covers page sizes up to 64K.
+> +	if ! _configure_scsi_debug delay=0 atomic_wr=1 atomic_wr_max_length=256 \
+> +	     dev_size_mb=16; then
+> +		echo "configuring scsi_debug failed"
+> +		return 1
+> +	fi
+> +
+> +	src/atomic-write-torn "/dev/${SCSI_DEBUG_DEVICES[0]}" >>"${FULL}" 2>&1
+> +	ret=$?
+> +
+> +	_exit_scsi_debug
+> +
+> +	case $ret in
+> +	0)
+> +		;;
+> +	2)
+> +		echo "atomic write was torn"
+ > +		;;> +	3)
+> +		echo "atomic write did not fail cleanly"
+> +		;;
+> +	*)
+> +		echo "atomic-write-torn helper failed"
+> +		;;
+
+"atomic write did not fail cleanly" won't" help a tester much. If the 
+errors from the C code are logged, then that should help the tester know 
+know the issue.
+
+> +	esac
+> +
+> +	echo "Test complete"
+> +}
+> diff --git a/tests/block/053.out b/tests/block/053.out
+> new file mode 100644
+> index 0000000..43d1b4b
+> --- /dev/null
+> +++ b/tests/block/053.out
+> @@ -0,0 +1,2 @@
+> +Running block/053
+> +Test complete>
+
