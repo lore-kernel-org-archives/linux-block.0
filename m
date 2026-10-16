@@ -1,87 +1,36 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-212.mta1.migadu.com [95.215.58.212])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B035D46A60E
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 10:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829BF3BE632
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 11:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792147516; cv=none; b=bUmoK0NBRXtQFTu0YhnCAw9e7Fd/IwRmZ0fHzfsu2XlApCp33bw5c1sAvn6eUACdV2IkANPv6CG4ubAyNeCtlOfWEr0YGpZe6423jtZMMaijhy/aBAMO7ODLB2mwKjMwAWXTSMaN4ITL02gnWgvrbru3jsppyAceYRpOazuQeGo=
+	t=1792149230; cv=none; b=K/YGx+kMhyGcx9s7GGLzlxBK/J+QbJt+9HdNctNgx7272RCnP65xAn4jlt9BbKogT9UH9MjD75+HEGs/4VIoXuxm13p1Vm2iSuBR2CQyOTKXMKooSLYG6QStaWt67yzwWdfml/w9O6+RmwVmCRc7HMGWm3zjAWZmFtyJuJ0SPy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792147516; c=relaxed/simple;
-	bh=za3xPCzkeb/HbtLkfxowaJK9cwklSa6k6bFi2PQWCX8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LdMtyZ7bsfC+gUZDTl7s4r5+GBjpTF7rZXaaInSFeNKUAMacWCV7OrF3x4IZxBJJd+cGMA1MsmGqCKJfBoWDuefEtSvE/lCXH9OiaDVAW7awY3IRZGlp0bblgTxA5lszHjDlWrFYLClSlq225vMS0JZXlPNb+P0+JHYIpM+byak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=cqjC5hWj; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=JvoiwgQO; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1792149230; c=relaxed/simple;
+	bh=X58SwrkFFp3ztvH2Noq/jUoS6DiX16w1TaBG2g1bFV0=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Dyu+D7A2KQLsawDeSMb+GCA6PcmWpiedgTvWehdAgICukJb3iP+c0wXBtN4LBw12icq6U4gOtSQ3CW6iBpMj8qmztuGb175hMVyjfuu1CYWTKltOd9cT183fJdSycuj26sqZgNjnk/NxO0fb0cbH5riwhnGENfJo0T1wwuE4hKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YQwqGh2T; arc=none smtp.client-ip=95.215.58.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="cqjC5hWj";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="JvoiwgQO"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69GAAUS61647969
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 10:45:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	kXyFb2bWpRvXjn7PnLKNSg4kUzQ9j0D6sJu6sZHfQlA=; b=cqjC5hWjjuUoAN2r
-	fUvmguEvQmzjUOru8VPNLlR0Zj/In6bXgvtGRAZaZE8XZUkxH62CRIAs0qVj5Nqy
-	dYYzuzBg+munPZgSSPpYXfLVtoOxGrYsAUcUWCDd2AQHE1K3PL7ij4pv/if9XXDx
-	pmRslDDUIVc38faPIZEiXeDJK/l5Fwae+R2t5PsDB+bHLPyIyOwBN3BZlCYMUF38
-	mhyFamLnXVq7RGzqaxQkYRnz93kxqjtgXcMcjE2DFuoRkES+ndsTN+s8ZJBI1gO4
-	dm0R6/cAcRdlsi+2gliSOOK9iX5+InZNJXU725jeoQIsN1PHnBAlk69+Bq0fP4yO
-	qvFn7g==
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hbhumr4vd-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 10:45:12 +0000 (GMT)
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-898fe16133eso2315170b3a.0
-        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 03:45:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1792147511; x=1792752311; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=kXyFb2bWpRvXjn7PnLKNSg4kUzQ9j0D6sJu6sZHfQlA=;
-        b=JvoiwgQOB3hgsT/JnwYXPvjOW1rmGNrYeO83Nja4qhtyH077p1jPhzZwlDq+T43ykc
-         L2X0Tk75+kbjZIwGaUyymbxRqFjkB7kMXSxGoWzxiwNlF6husk8HIX3MX63CKXDPdD4D
-         RuB8fNPdiZQtNYP5IpuEmRTkLwNC10qEY/cT01tmiv+QwO95npRz7tHsy4IioTOiXPv1
-         CTGFxQ31C9Owo3GSIvwsSlH6JaxRWVJjYa2pNHygKgsvkumHBmm0uP2X137ZvfEFBu/J
-         OmGDezasUU2u/mroeGYZGn0fuG9/S8anzt6vZh56lf5mMfm1ywEMi2YmSBW9lLZSxHnZ
-         naLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792147511; x=1792752311;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=kXyFb2bWpRvXjn7PnLKNSg4kUzQ9j0D6sJu6sZHfQlA=;
-        b=dVzrtqC0MIiqxsuwa8H4iMpipOV0Ybzg3zPGDfBEXB6MII3Rt2LYeEMpwkURJBqGtx
-         NL/u1ItCyw/ctHKjrfQpZBw3ZhmX5gybsn/450BviUbUt9T0pWqb596e5aXNrXYqgsse
-         kO7c/FXU3YpkLsxBciZUondHQIOIHfhjPYCGsu3lJRc2GkoNSRnLRjWjMwcqc4SFIQec
-         D/6NxayeMKr2LzXa0rd14dXOSl1C70oe5yT6RyDlmJdVQePcpZWHuDO/HdaiABTVOt11
-         PAcDQ1tdQkxNVYLxe7qCZkbpZTQG7C6tNs4H6JZtz8mO1/h1eUjEvMIsylPJsWDDIFtI
-         NwgQ==
-X-Forwarded-Encrypted: i=1; AKwUvBy2dDAwD1xI/bR5DkSVxalJasVLDT73xY+sGR8FLgKzsT9k0cGdxZmTnnZtyU6OS53ZqDXrzydnNXfYkg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLc9TWS/R7cdg3vVkLIZ290ZtuftZKwYiKipi005CjYsm2SLOxD
-	2rVt4cy99kXhncO5Sczzxq5C8mgiMciaY9tE4rh0g7Bpj32vGbSn6QVLzrpAIce9S1Epv4j4epL
-	MEIq9IpYK+Uqwvl+NoiyVQVb3zs93x1xZ7tna5kKf/JzJdiiwNbAHALujOEYYxtBSLw==
-X-Gm-Gg: AYBFou3X/iaetrDxPVi4R1C0Xs4lkHSDKp3Afd/jP0WQCfeDGXoRtxv/s9pF/9YVoBk
-	siGe6VhA09rFF2iKCoM8SGJ8HUEo29/Dcy7oLAjhaQKLjf6OBNo/ZR8Q1N6TXtoNyo8DrXmJYmq
-	2tdyZgRHoAOQGm4dDSywulVluFd7O6xTRYStEg8RccdC9HA3DqByT821/uajzRYPEwwWQODzBt2
-	HUyTi7OpWOqAhIvN7g0GVYY8zP69Q2fPJTf3IOjQRcmYD5XVnu5qJo+p5Q5qHMrj1bumAINxdSi
-	OI/ORUHHJcY1GfnVu/1aXaCjzT0F+z/iumJ0hKf2Rni/QYklsrei4ViQQPNvu1KBBg+P5lTC0o3
-	nhG7ujY6Bq6skFLXFJt7KEtj/tXM=
-X-Received: by 2002:a05:6a00:ac89:b0:89f:3f60:cd81 with SMTP id d2e1a72fcca58-89f3f60dd06mr2297217b3a.51.1792147511401;
-        Fri, 16 Oct 2026 03:45:11 -0700 (PDT)
-X-Received: by 2002:a05:6a00:ac89:b0:89f:3f60:cd81 with SMTP id d2e1a72fcca58-89f3f60dd06mr2297188b3a.51.1792147510877;
-        Fri, 16 Oct 2026 03:45:10 -0700 (PDT)
-Received: from [10.239.132.237] ([114.94.8.21])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-89f57947fb2sm911384b3a.37.2026.10.16.03.45.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Oct 2026 03:45:10 -0700 (PDT)
-Message-ID: <c02ffaa1-88ad-4fc7-9171-f8eef64f9ea9@oss.qualcomm.com>
-Date: Fri, 16 Oct 2026 18:45:05 +0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YQwqGh2T"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=X58SwrkFFp3ztvH2Noq/jUoS6DiX16w1TaBG2g1bFV0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792149225; v=1; x=1792754025;
+ b=YQwqGh2TFMwprjHd9SRRoHIwB6ag3Qn9r3r8hUhyOpC2gE13hSL35wezjesYpYOATjJR0QkG
+ pXpmBrcUJYLHkJL3b7AuAdQgkiPVXk0Zskd6bCejjypCbBwDRyEFcAZl/oAab+NN6uAFjX4Lw2Q
+ hwIXf3C0xBs3EZlzTj6ZtS6Q=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 2a6eecbfcbc4b948;
+	Fri, 16 Oct 2026 11:13:44 +0000
+X-Mizu-Trace-ID: 2a6eecbfcbc4b948
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <81f61871-6852-4d30-b68a-bb08e56881f2@linux.dev>
+Date: Fri, 16 Oct 2026 19:13:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -89,113 +38,342 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] virtio_blk: use synchronous quiesce in
- virtblk_freeze_priv()
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowangio@gmail.com>,
-        Eugenio Perez <eperezma@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>
-Cc: linux-arm-msm@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20260928-virtblk_sync_quiesce-v3-1-a037e6e2fdf5@oss.qualcomm.com>
-Content-Language: en-US
-From: Cong Zhang <cong.zhang@oss.qualcomm.com>
-In-Reply-To: <20260928-virtblk_sync_quiesce-v3-1-a037e6e2fdf5@oss.qualcomm.com>
+Cc: cui.tao@linux.dev, axboe@kernel.dk, josef@toxicpanda.com, yukuai@fygo.io,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-iocost: publish hweights as one atomic value
+To: Kunhai Dai <daikunhai@didiglobal.com>, tj@kernel.org
+References: <20261015135919.210740-1-daikunhai@didiglobal.com>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20261015135919.210740-1-daikunhai@didiglobal.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDE2MDA0MiBTYWx0ZWRfX5xxXRyGZpalW
- NW0hcosH85FGVX9ZaOVW4C5ijcCqAuN+Y8yVsjFbfucA/nwrCEzLyQq4+MWWEDaK3wkIFprELlK
- xFeWYasoKiG/Kd+26OFxbWq81vuFux4=
-X-Authority-Analysis: v=2.4 cv=H+BOUOYi c=1 sm=1 tr=0 ts=6ad20038 cx=c_pps
- a=rEQLjTOiSrHUhVqRoksmgQ==:117 a=Uz3yg00KUFJ2y2WijEJ4bw==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=pGLkceISAAAA:8 a=20KFwNOVAAAA:8
- a=BM0rjV1Hin7eb0uZrgEA:9 a=QEXdDO2ut3YA:10 a=2VI0MkxyNR6bbpdq8BZq:22
-X-Proofpoint-GUID: zD-DJTF-2mbyKVZxXeH_fzpp6TLnsut_
-X-Proofpoint-ORIG-GUID: zD-DJTF-2mbyKVZxXeH_fzpp6TLnsut_
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDE2MDA0MiBTYWx0ZWRfX3RcjVyv7thVK
- NNTVclTn0zkWhGPWrwNdmXAtTAVu/Ei6SMdrs0E4GAzXH/cN5UU805jkZLiQ1P9ryqVUif9imz0
- gzDRNTKbaca25gMfGsjfo4hh1PzD3qq+hD6mJwE1fV2o8YJktzcBvwSQyTw1Tz/5F8Tt+1zgnUR
- Pggt1Kvk7pBHYgqkgdotxi9tFuprtC8yHazNdLeprNfIZjcVsJAjalRpTPTALGxMdrttKzJOAQZ
- Fb4qPcpZtGEsPKZeUspNRrZedCq+izagK2UPnwbO/wVqyfrdJ4flulTJZYy882KhEWOjIHECFbg
- mcPJ7mNHwDK+VxZz7q7KHKJfbMa4gBA+xaL33oL9W4pWXS1pt11Y4ERM+g+AArMs7nJoKJS+d03
- 5umQKWu47annN6X13Ve6tQsbS+uEEPeNcIxW0Nip+F2uZ9Hj29nUxFqm0mUjJ5m4vGOkgPQXAGC
- glzdtVk7gWPYBgyb1kA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-16_01,2026-10-14_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 bulkscore=0 phishscore=0 priorityscore=1501
- adultscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610160042
+Content-Transfer-Encoding: 8bit
 
+Hello，Kunhai
 
-Gentle reminder on this patch. Any feedback would be appreciated.
+在 2026/10/15 21:59, Kunhai Dai 写道:
+> current_hweight() uses separate plain stores for the cache generation and
+> both weights. The compiler can publish the generation before the weights,
+> letting an interrupt accept stale weights as current. Multiple refreshers
+> can also interleave their stores. Invalid donation budgets may then lead
+> to a divide error in transfer_surpluses().
+> 
+> Pack the generation and both weights into a single atomic64_t. Hierarchical
+> weights are in [1, 65536], so storing each weight minus one preserves its
+> full range in 16 bits and leaves 32 bits for the generation. Readers copy
+> one complete entry, and refreshers publish one complete entry. Return the
+> local snapshot instead of rereading fields another refresher can modify.
+> 
+> Keep the existing lockless refresh and cache reuse behavior. A late
+> refresh may replace a newer entry, but carries its own generation so the
+> next reader can detect the mismatch. Preserve the existing barrier paired
+> with commit_weights() and the allowance for approximate hierarchy reads.
+> 
+> Keep the old weight fields solely as donation workspace. Update cache
+> initialization, activation invalidation, tracepoints and the drgn monitor
+> accordingly. Tracepoints decode one cached snapshot without recalculating
+> or refreshing weights. Stop invalid donation calculations before applying
+> leaf adjustments, and check donating before subtracting one.
+> 
+> Validated against commit 24a19b953e2a ("Linux 7.3-rc7"):
+> - clean application, whitespace and strict checkpatch checks;
+> - W=1 compilation of blk-iocost.o with the existing x86-64 configuration
+>   and PREEMPT_RT plus PROVE_LOCKING;
+> - extracted production-function checks covering all weight values,
+>   generation high bits, publication interleavings, donation cleanup and
+>   400000 concurrent refresh calls using C11 atomic test stubs;
+> - Python syntax and actual monitor-decoder checks;
+> - x86-64 disassembly confirms a single 64-bit cache load and store.
+> 
+> Runtime kprobe injection on an x86-64 VM with 32 vCPUs completed three
+> rounds without WARN or panic. With a 30 ms publication delay, the probe
+> reported 23102 publication-point holds, 3234 cache-change observations
+> within those windows and 72 matching-generation reader observations. The
+> unpatched baseline panicked under the corresponding reproduction load.
+> 
+> The runtime build predates this revision's tracepoint-only simplification;
+> the packed-cache and donation logic are unchanged. The current tracepoint
+> change has passed normal and PREEMPT_RT compilation, but has not been
+> rerun in the runtime injection test. Performance regression testing has
+> not been performed.
+> 
 
-On 9/28/2026 7:58 PM, Cong Zhang wrote:
-> blk_mq_run_work_fn() can call blk_mq_sched_dispatch_requests() through
-> blk_mq_run_dispatch_ops(). The dispatcher checks QUEUE_FLAG_QUIESCED
-> while the flag is clear. It can then be preempted before it gets a
-> request. At that time, it has no queue usage reference, so
-> blk_mq_freeze_queue() does not wait for it.
+Thanks for the thorough patch. We tried your injection protocol on our side
+(linux-next 20261014, clang 17, qemu/KVM, nullb0, the rt/s1..C topology with
+1 <-> 10000 weight alternation, a 30ms kprobe hold at the publication
+stores). The patched kernel came through cleanly -- no WARN or oops even
+with a hold on every refresh, and the tracepoint decode of the final
+revision worked in all runs, which nicely covers the gap you disclosed in
+the commit message. We could not reproduce the divide error on the baseline,
+likely because our clang build orders the stores gen-last, so the direct
+window from your step 4 does not exist in our binary -- your repro's
+precondition is indeed toolchain-dependent.
+
+Two small observations:
+
+1. The goto out in transfer_surpluses() skips the donation tail for all
+   donors, so while a degenerate weight configuration persists, donation is
+   given up every period (and inuse_transfer tracepoints go quiet). Strictly
+   better than the old panic, but it might be worth a sentence in the commit
+   message.
+
+2. after == 0 may not be race-only: a boundary rounding in the over_hwa
+   rescale can also floor a small over-donor's after value to zero. So the
+   guard has some value even independent of the race.
+
+Along the same lines, would you consider splitting the patch? A small
+[1/2] with just the div0 guard (Fixes: e08d02aa5fc9, Cc: stable) would
+backport easily, while the packed hweight_cache plus tracepoint/monitor
+changes could go as [2/2] (Fixes: 7caa47151ab2). Also, the patch is
+currently missing Fixes: entirely.
+
+Thanks，
+Tao
+
+> Developed with assistance from OpenAI Codex.
 > 
-> virtblk_freeze_priv() then calls blk_mq_quiesce_queue_nowait() and
-> blk_mq_unfreeze_queue(). A new request can enter the queue. The old
-> dispatcher can run again, use its old flag check, get the new request,
-> and call virtio_queue_rq(). At the same time, virtblk_freeze_priv() can
-> reset the device, delete the virtqueues, and free vblk->vqs. The old
-> dispatcher can then use a deleted virtqueue or a NULL vblk->vqs, and the
-> kernel can crash.
+> Assisted-by: LLM
+> Signed-off-by: Kunhai Dai <daikunhai@didiglobal.com>
 > 
-> Fix this by using blk_mq_quiesce_queue(), which waits for dispatch code
-> that was already running. Keep the existing freeze and unfreeze order.
-> The queue remains quiesced until virtblk_restore_priv() calls
-> blk_mq_unquiesce_queue().
-> 
-> Fixes: 7678abee0867 ("virtio-blk: don't keep queue frozen during system suspend")
-> Cc: stable@vger.kernel.org
-> Acked-by: Jason Wang <jasowangio@gmail.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
 > ---
-> Changes in v3:
-> - Move the race description into the commit log.
-> - Remove the blank line between tags.
-> - Add Cc: stable@vger.kernel.org to the commit trailers.
-> - Link to v2: https://lore.kernel.org/20260912-virtblk_sync_quiesce-v2-1-09a001549b72@oss.qualcomm.com
+> Reproduction outline (x86-64, cgroup v2):
+> 1. Enable BLK_CGROUP_IOCOST and KPROBES. Enable the io controller at each
+>    parent, and configure io.cost.qos and io.cost.model for the test device.
+> 2. Create four leaves: rt/s1, rt/K/s2, rt/K/P/s3 and rt/K/P/C. Run continuous
+>    direct 1 MiB writes in the first three; issue four direct 4 KiB writes
+>    every 200 ms in C, keeping it active with low utilization.
+> 3. Every 300 ms, alternate the K/P/C chain weights between 1 and 10000,
+>    with the sibling leaves s1/s2/s3 taking the opposite weights. This
+>    repeatedly makes C's hierarchical share fall to the minimum of 1.
+> 4. On the unpatched build, confirm that the compiler placed the cached
+>    generation store before the weight stores. Insert a kprobe delay of
+>    30 ms after that generation store and before the weight stores.
+>    Derive the instruction offset from the binary being tested.
+> 5. On the packed-cache build, delay just before the atomic cache store
+>    instead: there is no separate generation-publication window. This
+>    stresses concurrent refresh completion and late cache overwrites.
 > 
-> Changes in v2:
-> - Cc stable@vger.kernel.org.
-> - Link to v1: https://lore.kernel.org/20260911-virtblk_sync_quiesce-v1-1-a883f8f31258@oss.qualcomm.com
-> ---
->  drivers/block/virtio_blk.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Unpatched baseline, abbreviated crash and stack excerpt:
 > 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 32bf3ba07a9d..7a570591e040 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -1595,7 +1595,7 @@ static int virtblk_freeze_priv(struct virtio_device *vdev)
+>   iocg: invalid donation weights in /rt/K/P:
+>         active=1 donating=1 after=0
+>   Oops: divide error: 0000 [#1] SMP PTI
+>   RIP: 0010:transfer_surpluses+0x43e/0x6b0
+>   RAX: ffffffffffffffff  RCX: 0000000000000000
+>    <IRQ>
+>    ioc_timer_fn+0x1158/0x13b0
+>    call_timer_fn+0x1e/0x100
+>    __run_timer_base.part.36+0x1f0/0x220
+>    [...]
+>    handle_softirqs+0xa9/0x2a0
+>    irq_exit_rcu+0x48/0xe0
+>    sysvec_apic_timer_interrupt+0x6b/0x80
+>    </IRQ>
+>    [...]
+>    win_pre+0x44/0x70 [repro_iocost]
+>    [...]
+>    ? current_hweight+0xc1/0x110
+>    ? adjust_inuse_and_calc_cost+0x44/0x290
+>    ? ioc_rqos_throttle+0x13e/0x590
+>   Kernel panic - not syncing: Fatal exception in interrupt
+> 
+>  block/blk-iocost.c             | 65 ++++++++++++++++++++++++++++--------------
+>  include/trace/events/iocost.h  |  6 ++--
+>  tools/cgroup/iocost_monitor.py |  7 +++--
+>  3 files changed, 53 insertions(+), 25 deletions(-)
+> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 2745bffcd..fcc7ae866 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -472,8 +472,8 @@ struct ioc_gq {
+>  	 *
+>  	 * When an idle cgroup becomes active its `active` goes from 0 to
+>  	 * `weight`.  `inuse` is the surplus adjusted active weight.
+> -	 * `active` and `inuse` are used to calculate `hweight_active` and
+> -	 * `hweight_inuse`.
+> +	 * `active` and `inuse` determine the hierarchical weights cached in
+> +	 * `hweight_cache`.
+>  	 *
+>  	 * `last_inuse` remembers `inuse` while an iocg is idle to persist
+>  	 * surplus adjustments.
+> @@ -520,7 +520,9 @@ struct ioc_gq {
+>  	u64				child_active_sum;
+>  	u64				child_inuse_sum;
+>  	u64				child_adjusted_sum;
+> -	int				hweight_gen;
+> +	/* Generation in bits 63:32; active - 1 and inuse - 1 in 31:16/15:0. */
+> +	atomic64_t			hweight_cache;
+> +	/* Donation workspace, protected by ioc->lock. */
+>  	u32				hweight_active;
+>  	u32				hweight_inuse;
+>  	u32				hweight_donating;
+> @@ -1154,13 +1156,17 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
+>  {
+>  	struct ioc *ioc = iocg->ioc;
+>  	int lvl;
+> -	u32 hwa, hwi;
+> -	int ioc_gen;
+> -
+> -	/* hot path - if uptodate, use cached */
+> -	ioc_gen = atomic_read(&ioc->hweight_gen);
+> -	if (ioc_gen == iocg->hweight_gen)
+> +	u32 hwa, hwi, ioc_gen;
+> +	u64 cache;
+> +
+> +	/* Read the generation and both weights as one atomic snapshot. */
+> +	ioc_gen = (u32)atomic_read(&ioc->hweight_gen);
+> +	cache = (u64)atomic64_read(&iocg->hweight_cache);
+> +	if ((u32)(cache >> 32) == ioc_gen) {
+> +		hwa = ((cache >> 16) & (WEIGHT_ONE - 1)) + 1;
+> +		hwi = (cache & (WEIGHT_ONE - 1)) + 1;
+>  		goto out;
+> +	}
 >  
->  	/* Ensure no requests in virtqueues before deleting vqs. */
->  	memflags = blk_mq_freeze_queue(q);
-> -	blk_mq_quiesce_queue_nowait(q);
-> +	blk_mq_quiesce_queue(q);
->  	blk_mq_unfreeze_queue(q, memflags);
+>  	/*
+>  	 * Paired with wmb in commit_weights(). If we saw the updated
+> @@ -1194,14 +1200,22 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
+>  		hwi = div64_u64((u64)hwi * inuse, inuse_sum);
+>  	}
 >  
->  	/* Ensure we don't receive any more interrupts */
-> 
-> ---
-> base-commit: 50d05c7c76c96b90462f24debacca971d2e86713
-> change-id: 20260910-virtblk_sync_quiesce-9b2c88d45416
-> 
-> Best regards,
-> --  
-> Cong Zhang <cong.zhang@oss.qualcomm.com>
-> 
+> -	iocg->hweight_active = max_t(u32, hwa, 1);
+> -	iocg->hweight_inuse = max_t(u32, hwi, 1);
+> -	iocg->hweight_gen = ioc_gen;
+> +	hwa = max_t(u32, hwa, 1);
+> +	hwi = max_t(u32, hwi, 1);
+> +	/*
+> +	 * Each weight is in [1, WEIGHT_ONE]. Subtracting one preserves its
+> +	 * full range in 16 bits, leaving 32 bits for the generation. An
+> +	 * interrupt or another CPU can only observe a complete snapshot.
+> +	 * A late refresher may overwrite a newer cache, but its generation
+> +	 * stays paired with its own weights and forces a future refresh.
+> +	 */
+> +	cache = ((u64)ioc_gen << 32) | ((u64)(hwa - 1) << 16) | (hwi - 1);
+> +	atomic64_set(&iocg->hweight_cache, (s64)cache);
+>  out:
+>  	if (hw_activep)
+> -		*hw_activep = iocg->hweight_active;
+> +		*hw_activep = hwa;
+>  	if (hw_inusep)
+> -		*hw_inusep = iocg->hweight_inuse;
+> +		*hw_inusep = hwi;
+>  }
+>  
+>  /*
+> @@ -1300,10 +1314,12 @@ static bool iocg_activate(struct ioc_gq *iocg, struct ioc_now *now)
+>  
+>  	/*
+>  	 * Activate, propagate weight and start period timer if not
+> -	 * running.  Reset hweight_gen to avoid accidental match from
+> -	 * wrapping.
+> +	 * running. Invalidate the cached generation to avoid accidental match
+> +	 * from wrapping.
+>  	 */
+> -	iocg->hweight_gen = atomic_read(&ioc->hweight_gen) - 1;
+> +	atomic64_set(&iocg->hweight_cache,
+> +		     ((u64)(u32)(atomic_read(&ioc->hweight_gen) - 1) << 32) |
+> +		     (u32)atomic64_read(&iocg->hweight_cache));
+>  	list_add(&iocg->active_list, &ioc->active_iocgs);
+>  
+>  	propagate_weights(iocg, iocg->weight,
+> @@ -1863,7 +1879,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
+>  	list_for_each_entry(iocg, surpluses, surplus_list) {
+>  		u32 hwa;
+>  
+> -		current_hweight(iocg, &hwa, NULL);
+> +		current_hweight(iocg, &hwa, &iocg->hweight_inuse);
+>  		after_sum += iocg->hweight_after_donation;
+>  
+>  		if (iocg->hweight_after_donation > hwa) {
+> @@ -1946,8 +1962,10 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
+>  
+>  		iocg->hweight_donating = min(iocg->hweight_donating,
+>  					     iocg->hweight_active);
+> -		iocg->hweight_after_donation = min(iocg->hweight_after_donation,
+> -						   iocg->hweight_donating - 1);
+> +		if (iocg->hweight_donating > 1)
+> +			iocg->hweight_after_donation =
+> +				min(iocg->hweight_after_donation,
+> +				    iocg->hweight_donating - 1);
+>  		if (WARN_ON_ONCE(iocg->hweight_active <= 1 ||
+>  				 iocg->hweight_donating <= 1 ||
+>  				 iocg->hweight_after_donation == 0)) {
+> @@ -1956,6 +1974,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
+>  			pr_cont(": active=%u donating=%u after=%u\n",
+>  				iocg->hweight_active, iocg->hweight_donating,
+>  				iocg->hweight_after_donation);
+> +			goto out;
+>  		}
+>  	}
+>  
+> @@ -2054,6 +2073,7 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
+>  		__propagate_weights(iocg, iocg->active, inuse, true, now);
+>  	}
+>  
+> +out:
+>  	/* walk list should be dissolved after use */
+>  	list_for_each_entry_safe(iocg, tiocg, &inner_walk, walk_list)
+>  		list_del_init(&iocg->walk_list);
+> @@ -2360,7 +2380,7 @@ static void ioc_timer_fn(struct timer_list *timer)
+>  				 */
+>  				TRACE_IOCG_PATH(inuse_shortage, iocg, &now,
+>  						iocg->inuse, iocg->active,
+> -						iocg->hweight_inuse, new_hwi);
+> +						old_hwi, new_hwi);
+>  
+>  				__propagate_weights(iocg, iocg->active,
+>  						    iocg->active, true, &now);
+> @@ -3032,6 +3052,9 @@ static void ioc_pd_init(struct blkg_policy_data *pd)
+>  	INIT_LIST_HEAD(&iocg->active_list);
+>  	INIT_LIST_HEAD(&iocg->walk_list);
+>  	INIT_LIST_HEAD(&iocg->surplus_list);
+> +	atomic64_set(&iocg->hweight_cache,
+> +		     ((u64)(u32)(atomic_read(&ioc->hweight_gen) - 1) << 32) |
+> +		     U32_MAX);
+>  	iocg->hweight_active = WEIGHT_ONE;
+>  	iocg->hweight_inuse = WEIGHT_ONE;
+>  
+> diff --git a/include/trace/events/iocost.h b/include/trace/events/iocost.h
+> index e772b1bc6..aac25edaa 100644
+> --- a/include/trace/events/iocost.h
+> +++ b/include/trace/events/iocost.h
+> @@ -34,6 +34,8 @@ DECLARE_EVENT_CLASS(iocost_iocg_state,
+>  	),
+>  
+>  	TP_fast_assign(
+> +		u64 cache = (u64)atomic64_read(&iocg->hweight_cache);
+> +
+>  		__assign_str(devname);
+>  		__assign_str(cgroup);
+>  		__entry->now = now->now;
+> @@ -44,8 +46,8 @@ DECLARE_EVENT_CLASS(iocost_iocg_state,
+>  		__entry->vtime = vtime;
+>  		__entry->weight = iocg->weight;
+>  		__entry->inuse = iocg->inuse;
+> -		__entry->hweight_active = iocg->hweight_active;
+> -		__entry->hweight_inuse = iocg->hweight_inuse;
+> +		__entry->hweight_active = ((cache >> 16) & (WEIGHT_ONE - 1)) + 1;
+> +		__entry->hweight_inuse = (cache & (WEIGHT_ONE - 1)) + 1;
+>  	),
+>  
+>  	TP_printk("[%s:%s] now=%llu:%llu vrate=%llu "
+> diff --git a/tools/cgroup/iocost_monitor.py b/tools/cgroup/iocost_monitor.py
+> index bdd78ba27..8a4f844c9 100644
+> --- a/tools/cgroup/iocost_monitor.py
+> +++ b/tools/cgroup/iocost_monitor.py
+> @@ -149,8 +149,11 @@ class IocgStat:
+>          self.weight = iocg.weight.value_() / WEIGHT_ONE
+>          self.active = iocg.active.value_() / WEIGHT_ONE
+>          self.inuse = iocg.inuse.value_() / WEIGHT_ONE
+> -        self.hwa_pct = iocg.hweight_active.value_() * 100 / WEIGHT_ONE
+> -        self.hwi_pct = iocg.hweight_inuse.value_() * 100 / WEIGHT_ONE
+> +        hweight_cache = iocg.hweight_cache.counter.value_()
+> +        hwa = ((hweight_cache >> 16) & (WEIGHT_ONE - 1)) + 1
+> +        hwi = (hweight_cache & (WEIGHT_ONE - 1)) + 1
+> +        self.hwa_pct = hwa * 100 / WEIGHT_ONE
+> +        self.hwi_pct = hwi * 100 / WEIGHT_ONE
+>          self.address = iocg.value_()
+>  
+>          vdone = iocg.done_vtime.counter.value_()
 
