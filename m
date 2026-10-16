@@ -1,142 +1,274 @@
-Received: from mta1.migadu.com (out-252.mta1.migadu.com [95.215.58.252])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330C92D9ECA
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 11:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4598146EF93
+	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 12:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792151876; cv=none; b=upDQ9aNRVYvCQUEmYraUJmG3qeQrzivb0qWaQLsAUzzlRfjTwIrF0P2Z6dFIS4imYt3T6jaUTfecINIWgxxCrmFxv6YbYp0Bhb/USezj0eiVMlFcWvDoqspfHmRxalyemOX1xIA5hvPwo4wH2XUAepgtRNx/T16prTTVAINZgO0=
+	t=1792152602; cv=none; b=cck7WkLvEeJbmTAeCQi8uzxj3q2XJI8/f9Z4c+MF6kN2PTMCPVi8ivLFsNWcbaNwDn9ddtcDgTgLZqOak16V436Gd7Ze59gzMHeWFfLytr1pPwIg+ksOuMLYJWWk1P2ZeiTgzCN8Jy+oDmZMVMr+j/LsRdMbam7FHnKelI/oPi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792151876; c=relaxed/simple;
-	bh=OwWBFTYYhXbAzBWFwYpcAukIpYu7osKaafrz3NBOKYM=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jcpl07n1jB9jroUhAZFGNliUx4AemnsZBbKpUPnVZgGLN5wSSlx3b5ru0skZ+94O5pgUF3a4bfHjH8HhHqVflHeB0V/Ss12wSL5cfqvorYX7IweLZq0AXm3YvpHoHFDUpXZVDqBYahUudEhxRBWbjIDU/zPUhWVm3tv3zLltvbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ADYsTFpO; arc=none smtp.client-ip=95.215.58.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1792152602; c=relaxed/simple;
+	bh=2uqaJOE1ZflgZEPQal5CUnZ1clIz7YKu+QjcrMjDn8k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HerRCq42arX3HoXVswxfMxS76HcJJNoP6Q/pmNDYUMJXJAFG01E3LlomS1m+wywvQbdt9JInDtTv7zWcQAcDDtapFh1ZTgEFRe9xxTk4rm21I9qVH/rG66Z29VW/cpKQcX4fDMhiRNdTRGx/E67mVvg5TMDGQmVILkDAglipLuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hH5zc43P; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ADYsTFpO"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=OwWBFTYYhXbAzBWFwYpcAukIpYu7osKaafrz3NBOKYM=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792151872; v=1; x=1792756672;
- b=ADYsTFpORoh3VxisOTJHr/7epeAQFvgBozncNsqwA9BhEOCU3wt0oBlQT/pv98ofGFYjJ5LH
- INZ8pU2dPJXxV1b8j96voXCpc8phOCkBEdhpBgDIU8EWWN29ZYzRXNkmx5EQxbbKVemGAlf2NHB
- SfcT8XriGf48KZIlQ4XvCKes=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 5a4d84d7abb71670;
-	Fri, 16 Oct 2026 11:57:52 +0000
-X-Mizu-Trace-ID: 5a4d84d7abb71670
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <86c0fdfe-7032-4f7e-b2e5-1c8301722044@linux.dev>
-Date: Fri, 16 Oct 2026 19:57:45 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hH5zc43P"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-ccca948203aso2667482a12.3
+        for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 05:10:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792152600; x=1792757400; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=pLob/vRQa3c1x4TgqQCsxa5ZzEfJKY3TcYiiw4aZMIU=;
+        b=hH5zc43PpPHNzsYnAhGwvO0vBjxGqbNBmBkpj4C01o+joFr7hE75VGkhA0g1h+3Dt6
+         kHoFxlr/EPZaABae8Fm4th20jKWqQHbU880+KRJR2Lcv39cgcBYCa+y4SQeR/3QjQGTc
+         S2v1/xzLkt48w8+Xy+BdqtPCSe1RLAm5C7dZ5hRIMfz7k7mZXmjmYXcOXDLQueq4IGcf
+         N73fV0cBi1gP2dFlrbRt8bwS20qSpMDNQFNM5NCEh4mrEZ/XM2vg680r7rxXUaG6Y3cy
+         MSYkxEC8gD/DG3IGJq8kx5EHwLRoengI3t6jKTvytVGXgbwgUyBr5uIB8sdFEQN0vet8
+         X05w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792152600; x=1792757400;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=pLob/vRQa3c1x4TgqQCsxa5ZzEfJKY3TcYiiw4aZMIU=;
+        b=H9TEYaCLGIpD50Nl/2S8hf2Uv8AExY2CjcE2gyb8h8iaMjPJy+ilYjj7MWR7I+r0BD
+         6OFzYfoW06c0i8C3c4t0T/zz25eC5K4Tpps8fpHX9lFwV1A3K2IqB3xZosfDB7gt1zzH
+         Km74g9o/ywVgL0K60kr3w2yk+N6Gh7mBtkzPgWYKnRPt85QZolTgV7aLMyYYgztIXv2B
+         mljuUluaNF0x/BnyEfduaNrfhM1jmwFHBb7ZOWiYgEpWRStgj6QKB8OW/dEmqXlhZ5nE
+         K5WXnxuilfPnH3td/+5DwFRX7Qg3uKCjx8AG+EJLLrYVOlClkWNJvw2omqc9vEZ7ElZc
+         kiSA==
+X-Forwarded-Encrypted: i=1; AKwUvBzHqF0LRMGftpgOrgFkNTEztXtUP1pqyAts0IxOUNE0u2MHQ4lbRku03BUiHkg1o575xRMm1ENFugRXQg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJfGFCqU2REe1ShKqx+5/e78sFhoLVTsDUUwvRHQJdQ2usmv2AH
+	jYzdIc6oebrDGKQ0XDtZwdVo0EB5NI34JbvsYZ6Qn6M+YBxSOcpBLpi5pSso5aMfV2BtmKDQ
+X-Gm-Gg: AYBFou1wP9mR6VWzADbrP6safHlOZ4iZl/5+bLE2Il5jOWwUYfsLOBoTLT57rqkoO0r
+	UHeo8ZdJUcag1NvTJDUlL1exI7rcbnQ86KdBXk0F6WPrKQxXSwRBpibVSTmRGdK0nQsLSAjSOJJ
+	iBPlfbzois8JlU8KzQQ3O+yePBcO8kmYUH7xlAeVaXjjmVg3FBaZd+CZeKjjKv338pJa66Q9UHF
+	zbexoxGPFtBGCBHJyTtiBBYgbNMPvmREkhOZsMLqK1erFW3mNcQt7hbtN5HsoqbZxltUGp4aDaS
+	9ab3AvhPcsvXbyzFMYjDW9VcI6fLDhD7GB6GI+KWQ0xXM2zpkg3LAZMIcCKtMe4qyiMtS9xyiFC
+	IhWvk8HA8PbBCQpu0TPgp6QA3J26Qo3AEYTRsJ3G1HG7aLeLjnWT/UXhxifrHI6LMJkf5JdTXI5
+	tyLKH/9IZLlUtPNpGAQUy0QOreHlmZQTbZYaPo5Lwc7uPgZAH3mqKJfVmHJvTSsCsFd7fOmeDj
+X-Received: by 2002:a17:90b:224e:b0:3a0:ace4:d2b4 with SMTP id 98e67ed59e1d1-3ab3a9f42aamr16804358a91.23.1792152600469;
+        Fri, 16 Oct 2026 05:10:00 -0700 (PDT)
+Received: from hongfeng.mioffice.cn ([43.224.245.240])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3acc48f4cadsm3908912a91.12.2026.10.16.05.09.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Oct 2026 05:10:00 -0700 (PDT)
+From: Hongfeng Chen <chenhongfeng0212@gmail.com>
+X-Google-Original-From: Hongfeng Chen <hongfengchen@xiaomi.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Barry Song <baohua@kernel.org>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Minchan Kim <minchan@kernel.org>,
+	Nhat Pham <nphamcs@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Yosry Ahmed <yosry@kernel.org>,
+	Wenchao Hao <haowenchao@xiaomi.com>,
+	Wenchao Hao <haowenchao22@gmail.com>
+Cc: linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Hongfeng Chen <hongfengchen@xiaomi.com>
+Subject: [RFC PATCH v4 0/2] mm/zsmalloc: defer object free to per-cpu batches
+Date: Fri, 16 Oct 2026 20:09:25 +0800
+Message-ID: <20261016120927.3191690-1-hongfengchen@xiaomi.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cuitao@kylinos.cn
-Subject: Re: [PATCH v4 0/4] blk-iocost: charge flushes and zone appends
-To: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk, hch@infradead.org
-References: <20260922043856.2020116-1-cui.tao@linux.dev>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <20260922043856.2020116-1-cui.tao@linux.dev>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Jens,
+Freeing swap entries is expensive when unmapping a VMA that holds many of
+them. `zap_pte_range()` eventually calls `zram_slot_free_notify()`, which
+frees one compressed object per page. As a result, the unmapping task
+has to pay for every `zs_free()` itself. On Android, this slows down the
+exit of a task killed to reclaim memory, precisely when that memory is
+needed.
 
-Gentle ping on this series, Tejun has acked it. Could you pick it up?
+Two earlier attempts by Lei and Zhiguo introduced a new thread in the MM
+core to asynchronously collect and free swap entries [1][2], which
+seems overcomplicated. Wenchao's RFC v3 [3] moved the deferral into
+zsmalloc, but introduced push/drain callbacks that zram and zswap had
+to implement, potentially violating software layer boundaries. This v4
+RFC defers freeing inside `zs_free()` itself, leaving callers unchanged.
 
-Thanks,
-Tao
+Patch 1 makes `zs_free()` append the handle to a per-CPU batch of 64
+handles instead of freeing it immediately. Once the batch is full, it
+is handed to an unbound drain worker through a lockless list, and the
+worker frees the objects. Releasing empty zspages is also deferred to
+the worker. If the per-CPU state cannot be allocated, `zs_free()` falls
+back to its original path.
 
-在 2026/9/22 12:38, Tao Cui 写道:
-> From: Tao Cui <cuitao@kylinos.cn>
-> 
-> 
-> While testing iocost's weight-based throttling under concurrent IO, we
-> observed that a cgroup limited to 1% weight could issue an unbounded
-> number of flushes without being throttled: an fsync loop produced ~510k
-> flushes in 12s with cost.usage staying at zero the entire time.  The
-> device was monopolized while iocost reported no activity.  Zone appends
-> were in the same position: the builtin linear cost model defines
-> coefficients only for READ and WRITE, so REQ_OP_ZONE_APPEND is priced
-> at zero and excluded from the latency statistics as well.
-> 
-> This series prices both, without changing the behavior of existing
-> setups:
-> 
->  1/4: add a flushiops entry to io.cost.model, translated like the
->       other iops coefficients (VTIME_PER_SEC / flushiops).  A bio with
->       REQ_PREFLUSH is charged one flush on top of its data cost, and a
->       bio with REQ_FUA one more flush on devices without native FUA
->       support (bdev_fua()), mirroring the pre-flush and post-flush the
->       block layer issues for them.  flushiops is zero in the builtin
->       profiles with no fallback to the write coefficients, so nothing
->       changes until it is configured.  Also documents flushiops in
->       cgroup-v2.rst.
->  2/4: treat zone appends as writes in the builtin cost model -
->       REQ_OP_ZONE_APPEND falls through to the REQ_OP_WRITE
->       coefficients.
->  3/4: count zone append completions in the latency window so the vrate
->       feedback loop can see ZA-induced latency.
->  4/4: fix a stale comment in ioc_rqos_throttle().
-> 
-> Measured on virtio-blk with a bio test module issuing bios from a
-> cgroup (300 bios per phase):
-> 
->   - plain writes cost 23.41 usec, unchanged
->   - with the default model, WRITE|PREFLUSH and standalone flushes cost
->     the same as before: the flush component is free until flushiops is
->     configured
->   - with flushiops=100, WRITE|PREFLUSH and WRITE|FUA are charged
->     +10000 usec per bio and WRITE|PREFLUSH|FUA +20000, exactly
->     VTIME_PER_SEC / 100 per flush (virtio-blk has no native FUA,
->     confirmed via queue/fua)
->   - standalone flushes are charged 10000.06 usec each, matching
->     VTIME_PER_SEC / 100
->   - with flushiops=10, a flush storm from a low-weight cgroup is
->     throttled to one flush per 100ms
-> 
-> Changes in v4:
-> - 1/4 only, addressed Tejun's review comments: remove the always-true
->   !is_merge wrapper and the separate flush_cost accumulator, charge
->   flushes directly into cost before the empty bio check, trim the
->   comment to the FUA case, and update the commit message and
->   cgroup-v2.rst wording. No behavioral change: the whitebox numbers
->   are identical.
-> - 2/4, 3/4 and 4/4 are unchanged except for the added Acked-by tags.
-> 
-> Changes in v2:
-> - charge the flush component of data-bearing REQ_PREFLUSH bios too,
->   not only standalone flushes (Christoph)
-> - skip the iocg->cursor update for dataless flush bios
-> 
-> Changes in v3:
-> - the write-coefficient flush pricing is replaced by the flushiops
->   model parameter: pricing a flush off the write coefficients is as
->   arbitrary as pricing it at zero and changes what existing setups
->   get charged, so flushes are only priced when flushiops is
->   configured (Tejun)
-> - the zone append patch is reduced to the minimal change: ZA falls
->   through to the REQ_OP_WRITE coefficients and the cursor is left
->   alone (Tejun)
-> - the Fixes tags on 2/4 and 3/4 point at 0512a75b98f8, which added
->   the op without pricing it; 3/4 is otherwise unchanged from v2
-> 
-> Tao Cui (4):
->   blk-iocost: add flush cost support with the flushiops model parameter
->   blk-iocost: charge zone appends as writes
->   blk-iocost: account zone append completions in latency stats
->   blk-iocost: fix stale comment in ioc_rqos_throttle()
-> 
->  Documentation/admin-guide/cgroup-v2.rst |  7 +++++
->  block/blk-iocost.c                      | 39 ++++++++++++++++++++-----
->  2 files changed, 38 insertions(+), 8 deletions(-)
-> 
+With the zsmalloc work moved off the unmapping path by patch 1,
+contention on atomic operations in zram statistics becomes significant.
+Patch 2 moves the contended counters to per-CPU storage.
+
+
+Using the following microbenchmark:
+
+// SPDX-License-Identifier: GPL-2.0
+/* Times munmap() on a region pushed out to zram: MB. */
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <time.h>
+#include <unistd.h>
+
+#ifndef MADV_PAGEOUT
+#define MADV_PAGEOUT 21
+#endif
+
+static void die(const char *what)
+{
+	perror(what);
+	exit(1);
+}
+
+static double now_ms(void)
+{
+	struct timespec ts;
+
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return ts.tv_sec * 1e3 + ts.tv_nsec / 1e6;
+}
+
+/* About 2.8:1 under lzo-rle, objects in 16 size classes. */
+static void fill_data(char *p, size_t bytes)
+{
+	size_t i, k, n;
+
+	memset(p, 0, bytes);
+	for (i = 0; i < bytes; i += 4096) {
+		long *q = (long *)(p + i);
+
+		n = 106 + i / 4096 % 16 * 8;
+		for (k = 0; k < n; k++)
+			q[k] = k * 8 * 2654435761UL;
+	}
+}
+
+static char *prepare(size_t bytes)
+{
+	char *p = mmap(NULL, bytes, PROT_READ | PROT_WRITE,
+		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+	if (p == MAP_FAILED)
+		die("mmap");
+	fill_data(p, bytes);
+	if (madvise(p, bytes, MADV_PAGEOUT))
+		die("madvise");
+	return p;
+}
+
+int main(int argc, char **argv)
+{
+	size_t bytes = (argc > 1 ? strtoul(argv[1], NULL, 10) : 256) << 20;
+	char *p = prepare(bytes);
+	double t0, t1;
+
+	raise(SIGSTOP);	/* ready */
+	t0 = now_ms();
+	munmap(p, bytes);
+	t1 = now_ms();
+	printf("%.6f %.6f\n", t0, t1);
+	return 0;
+}
+
+Performance results:
+
+ROCK 5B+ (RK3588: 4x Cortex-A55 at 1.8GHz, 4x Cortex-A76 at 2.4GHz,
+performance governor), single process munmap on A55:
+
+  times in ms, speedups over base
+              Base       Patch1       Patch1+2
+  size        time    time speedup   time speedup
+  64MB       13.81    3.62   3.81x   3.28   4.21x
+  128MB      28.50    7.18   3.97x   6.49   4.39x
+  192MB      42.19   10.71   3.94x   9.69   4.36x
+  256MB      56.06   14.26   3.93x   12.89  4.35x
+  512MB     109.50   28.43   3.85x   25.66  4.27x
+  1024MB    217.10   56.70   3.83x   51.15  4.24x
+
+Same machine, single process munmap on A76:
+
+  times in ms, speedups over base
+              Base       Patch1        Patch1+2
+  size        time    time speedup    time speedup
+  64MB        5.59    1.58   3.54x    1.49   3.76x
+  128MB      11.86    3.16   3.75x    2.95   4.02x
+  192MB      17.18    4.72   3.64x    4.45   3.86x
+  256MB      22.89    6.29   3.64x    5.87   3.90x
+  512MB      45.15   12.52   3.61x   11.64   3.88x
+  1024MB     89.16   24.75   3.60x   23.12   3.86x
+
+x86 (Intel Core i7-14700HX, P-cores locked at 2.1GHz with turbo off),
+single process munmap:
+
+  times in ms, speedups over base
+              Base       Patch1         Patch1+2
+  size        time    time speedup    time speedup
+  64MB        2.87    1.50   1.92x    1.14   2.53x
+  128MB       6.00    2.93   2.05x    2.21   2.71x
+  192MB       9.33    4.35   2.15x    3.33   2.80x
+  256MB      12.51    5.78   2.17x    4.38   2.85x
+  512MB      24.96   11.39   2.19x    8.62   2.90x
+  1024MB     50.19   22.78   2.20x   17.05   2.94x
+
+1-4 process munmap of 256MB each:
+
+  times in ms, speedups over base
+              Base       Patch1        Patch1+2
+  mode        time    time speedup   time speedup
+  1p         13.18    5.78   2.28x   4.35   3.03x
+  2p         25.83   14.41   1.79x   4.57   5.65x
+  3p         35.70   22.14   1.61x   4.68   7.63x
+  4p         44.25   28.71   1.54x   4.75   9.31x
+
+[1] https://lore.kernel.org/all/20240805153639.1057-1-justinjiang@vivo.com/
+[2] https://lore.kernel.org/all/20250909065349.574894-1-liulei.rjpt@vivo.com/
+[3] https://lore.kernel.org/linux-mm/20260508060724.3810904-1-haowenchao@xiaomi.com/
+
+Changes since v3:
+- Defer inside zs_free() only and drop the push/drain callbacks, so zram
+  and zswap do not change. Yosry and Nhat objected to the layering in v3;
+  Nhat also pointed out that v3 leaves torn-down entries on the zswap LRU.
+- Buffer handles in per-cpu batches of 64 allocated on demand, instead of
+  per-cpu pages rotated through a preallocated pool.
+- New patch 2: keep the hot zram statistics per cpu.
+- Link to v3: https://lore.kernel.org/linux-mm/20260508060724.3810904-1-haowenchao@xiaomi.com/
+
+Changes since v2:
+- Use per-cpu single-page buffers instead of a global list; the hot path
+  only writes into the local CPU's buffer with preemption disabled
+- Add a page pool for buffer rotation: when the current buffer is full,
+  swap it with a free page from the pool and queue the full page for drain
+- Introduce push/drain callback ops so that zram and zswap can each define
+  their own element size and drain logic (zram stores u32 slot indices,
+  zswap stores unsigned long handles)
+- Drop the lock optimization patches it will be submitted separately as
+  part of a dedicated zsmalloc lock contention series
+- Link to v2: https://lore.kernel.org/all/20260421121616.3298845-1-haowenchao@xiaomi.com/
+
+Hongfeng Chen (2):
+  mm/zsmalloc: defer object free to per-cpu batches and a drain worker
+  zram: keep the hot statistics per cpu
+
+ drivers/block/zram/zram_drv.c | 171 +++++++++++++++++++++++++++-----
+ drivers/block/zram/zram_drv.h |  16 ++-
+ mm/zsmalloc.c                 | 182 ++++++++++++++++++++++++++++------
+ 3 files changed, 309 insertions(+), 60 deletions(-)
+
+
+base-commit: f4e9810097537d862c128935c36216bcf0c31cb2
+-- 
+2.54.0
 
