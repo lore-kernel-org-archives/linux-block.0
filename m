@@ -1,184 +1,345 @@
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azolkn19011070.outbound.protection.outlook.com [52.103.23.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-70.mta1.migadu.com [95.215.58.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96053363C40;
-	Sat, 17 Oct 2026 08:46:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.23.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792226764; cv=fail; b=Fm+800HLv4c4m/uj9cwTQ6FPs8tUQYWX1p8cwONV8eKQ77YqaNL2gNAh2rt8NM8ABF4N+56Haau+r5qVERQYq3q/wdHLHbCV66sUXt6eisBIjaQxrq72d19kQiShEQyAlU4CtLw/o3koP/l2z4dGYLtZ1eAxvMywzDe//PJqbg4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792226764; c=relaxed/simple;
-	bh=tfUxumpML/F774vp3frD8Q9XNlNpoMxg/QzVCLm1iwE=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=fQXM1NkCyHwSG7feHCRjh1bDRhI+Ry3Jz/aFkFiZ2UuzOUAiRl4mAz2uKkMjI2Kvgfhisg6ONtvu+fhq9lJSL5E2QrgHv05FS4ENVymoFCRCrj4DOuz+gSeDn6K21iLy+EqeDPIy4kBGmFkLdfDXkRWj+EJg9PSa9MZhoTG85NA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=dZmhuG54; arc=fail smtp.client-ip=52.103.23.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1565B348463
+	for <linux-block@vger.kernel.org>; Sat, 17 Oct 2026 10:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.70
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792234460; cv=none; b=pNeCgd5tSVswAQDa8QOvXqOka4JypAqtBlXRmQLBN+mgZUlX1YooZ8WNKcrm53YatvbRnOIeqO76ttFOe7QLvUFeZtxgl6L7ZDZLn0dMStukdCAzB6fiqbBHYxXAjDYeAbmW+ezy6Nxb014pXYNvomZW7z/F4MryAfvQYa40Awg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792234460; c=relaxed/simple;
+	bh=2N9BQKz6AnVfddAOlxhaAFtPmyMyrlSN/sFqe0szwXI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GdqTacNfIkMEBhrX0SVvwGoIxfYGOlcQe8LHnOk5MJPzeiPvEhgz3nYORbxS9/GnsL4rEKM8WnmMDfyXg/RMfRuR3igVUOH4K3juP1dgI2URYddwn45FMVSp79KOFG9An2Np8aiduwuw5ud3VafGKwu2lPXdYPiAcp82LGErNnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xqm5loDr; arc=none smtp.client-ip=95.215.58.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="dZmhuG54"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=D2niGrA1m00t/zSsl0tfDUv0zi/dBJdBJ52hlu1b/KGU19/iJhpesMy/ewr6TXwwB/lylX45FKwmzfbKUwwYq/TTHG7Eg9csQWMLCq2lv13a8VBjONttSGWmHhWfY4Dn9INKQsnzDpSFZfVB21aIB3eUU6pahuIUwtOQUKBz3x9yIvE33jNFDRkN0lB5Gz/zSfEZ8OgyDR3OXzc8ASyMAaX48AkN83cG+EpoUriZZX8IIj9hL+fZwsY0gj1mzd0qOCW99UwXtAllY48lLKog4WB3cc9cvZ3S2TMea8zOKHYlm282lwfK3teHdO2wGTTV5LgiwqbVkuxlXfVybwJkNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=tfUxumpML/F774vp3frD8Q9XNlNpoMxg/QzVCLm1iwE=;
- b=aRTZHOwBW/RAduMk4RveGMmRnhyQM52+g19KIqsKd6EGAHM+FZX7HPBuFTjWF/6YikhcZ5cSCJu1RXpFPnMA0tXdaUoNagC7HfRQekuimPKzs+vY07LnXlg4t5zQwpjO7B0nY/bff6X+h9UGNx8GqKlvyO7etd0dWnxdP74PIZ0xm2cSPcCXAGODcKb4sFfoZU+lnsTGg+NbL0W3OWSJC/rX4/YZFgHxIuSmB8bPvD5Fjewg3TUXMMBCqZsoZBn7dChKskxHO7u+bhC9YuyqcX4hX+vqqmbK1Y0/3RZaBd6Q3mX7r1ha51vwJlvMc5bNb3tGEeeiJZEKScYN5cWxyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tfUxumpML/F774vp3frD8Q9XNlNpoMxg/QzVCLm1iwE=;
- b=dZmhuG54NcrNA0s4j/Tq9Z8KidoB1lsCXYhEng6s4+WSpm7B9pcRbE2Rk/K6oJG7MIb1t8VSjV/daqU2LYrqw6PDAp/zoqTT6CNl2SkyR7CSuu7cyj/C3SvMCFdltygfz8x0SZmUH7qK8Vgd4zELPT+TEHI0JF+l7ABP2Eb+Z5I8DY+8113uaWZ7ej9U0cbbpKaQBASPwGrHHeIDVN9HNXFteMgBNhKeqZyeefvniqVEst2NyoC7qrFw8ypLvYR3lyua6GiAB0qoThmPqR2AHWt7l/qhiPGUrVigbUg2wuB9OkfeIz/mX8CYXKvZIxz1YBdmrcBGFxcxfjUarxZTxA==
-Received: from SA3PR05MB10385.namprd05.prod.outlook.com
- (2603:10b6:806:39d::17) by LVWPR05MB998850.namprd05.prod.outlook.com
- (2603:10b6:408:3c2::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.17; Sat, 17 Oct
- 2026 08:46:00 +0000
-Received: from SA3PR05MB10385.namprd05.prod.outlook.com
- ([fe80::e22f:a0f5:fcb0:9b0d]) by SA3PR05MB10385.namprd05.prod.outlook.com
- ([fe80::e22f:a0f5:fcb0:9b0d%6]) with mapi id 15.21.0522.013; Sat, 17 Oct 2026
- 08:45:59 +0000
-From: Wang Yingjie <x-professor@outlook.com>
-To: "mkp@kernel.org" <mkp@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "fujita.tomonori@lab.ntt.co.jp" <fujita.tomonori@lab.ntt.co.jp>,
-	"James.Bottomley@HansenPartnership.com"
-	<James.Bottomley@HansenPartnership.com>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH] scsi: reject negative SG_SET_TIMEOUT values
-Thread-Topic: [PATCH] scsi: reject negative SG_SET_TIMEOUT values
-Thread-Index: AQHdXhPuhyn+OUhXA0G5zzrA0hoC1A==
-Date: Sat, 17 Oct 2026 08:45:59 +0000
-Message-ID: <20261017084547.2880694-1-x-professor@outlook.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR05MB10385:EE_|LVWPR05MB998850:EE_
-x-ms-office365-filtering-correlation-id: 489e120e-3ff5-4293-bc90-08df2c2b117b
-x-ms-exchange-slblob-mailprops:
- AlkLxVwsndm0VyxXF8Qt58maZsxVls0a2I5fzvdgN3RZoKuTUPsxVZ+nHL9CG65WHcWN2cNJSWBRV9vaKNUxwkwyp9BNtVu2uSEjsn6V9XX9RKWfTovXAbTNJuiQWvhuk32eBMgoP/KefI2meOg5Fdmp7PsyEgzejbqfK8u7qVsqrpz/r7gs/+5JLxztkx7xK/P8vOwq5dV7bPxj+qrdkcaGRI8vVcA+ybOekbHQD9nx37jy1ZL5uNPCsxSeE/H6Gn8HWDs6m1cz0a8FF2J0U5BaiXid3yu/6olnbTMK9qeyY7qHHknNBn03yaFlYFh66fs1qw/D2ALNwSxrRq3HkvaAiMtabnwVwgf7wM8dxwGKGvHZMcNDkjxF8X3pYX5/4TCo+X/0uV9aURl9tbhErNsbocPxQ6+714hWCv8YUZSf18iK3mTavWEyGfWqE0P1uwxlzzUtaMM5UTNwGsaa8FRl7KR3UsDLlR0jLa62UgwKrGeJnaPDlUJQ5FcvIG5KYFXEh3tkurSjOED/G74WGV8fp+VXu4727PkBjrE+RHNnl/K8wQX8WEn13Gj6nRIPi4SLVvmmgwnlyRXnXGfQVb8eObAjFipNHtgj4ozZrQGvdUdQAud7WK07pl8gCHvxavLRv7PTL1GQN1bcRh1ajxQEtrWi3KtbIkxqHmvaT789X/JqLfyDuIydYJz9chufOZnQHiDoGSwlloXSsSZ3ad9xSGqEHoF8VfaD2cMUH6rl+ZICWlIBRBWSnywr8ce29lpFYhu0fSxfZY0YZVgYz2cEZttWIuQB
-x-microsoft-antispam:
- BCL:0;ARA:14566002|38102599003|15080799012|24121999003|39105399006|22091999003|5062599005|24071999003|19110799012|8060799015|31061999003|8062599012|24021099003|20031999006|4140399003|41001999006|6050399003|102099032|440099028|3412199025|40105399003|26121999007|3430499035;
-x-microsoft-antispam-message-info:
- =?utf-8?B?djBaZ0lseWZRQmJGclI0L1lyWXN3OTJqampOSVJYeStJUndDMlJkb25QMFF4?=
- =?utf-8?B?Qzc4RWs1N1h6U2hYT0lWR0ZmdGVBY2VFVnhJYkk0ZEQrWjUxMTJaVkVyaTFp?=
- =?utf-8?B?VzdzSXIvVUVwa2p0WGdZVUdPS1RhcXJtUmpyY1NBQk9DZmVYRk5uWmU2Nk1E?=
- =?utf-8?B?ejE4U0FDc04wMDFZUVZYSHFLWU5SZzZxeTVxNmlKSzF2eFRRNWlsNTdpOEFu?=
- =?utf-8?B?TU9pdjJJL1krZGgvTVF1ODRkWnVveTNVa0VyWWRrL09XTVBwZlNYeVpvdk1l?=
- =?utf-8?B?bUtOWENRWmZuaEtrMHJrKys2QmgraXMyOUUyUWI5Y0xMVkNUanIySXhESDJy?=
- =?utf-8?B?UzJUWkZBMmZiY1N6QU5uSXhYWm5pSHBKQ1JQOXpHeFVjbHRyOUlJTW9iQzAy?=
- =?utf-8?B?ZmRSdUNXS2g0bzB4aVBpQkxUcExvOHFoM0swTmxvVVpEQXBVSFlwdS9PbWo1?=
- =?utf-8?B?MnhBeXY2NllGSDl6Z2RQVzdQWG42cjF4cEVDQkZrQzFaQ01DcExYajhtK1Ru?=
- =?utf-8?B?VEN5M0Z0cHFZcUwrZ25qMzFnWm9NdGc4ZTlrTURHdUN3bmNjN3MrOXQvdDhO?=
- =?utf-8?B?WkVNbXJpMmYyQmlDbEJCKzY3ai9QZ1VobjlmSVBsQWZRS01GOU9VbVJDVm8w?=
- =?utf-8?B?YTh0dzFEaVdTc29jcmVKdE43Q0Z4cnhwRjUrdjZ1K2laaTRkSWVmUU45cEhw?=
- =?utf-8?B?WnlqRDJmdXEzdHNzUmNNcTZZNjRDTHYrUEFMTVBoNml2R0dGWTdpeTBxbXl3?=
- =?utf-8?B?Umh6U3JzQi9IeERteDE5YkNTYUtsWGhTMG1yRUhwSUdMYVpNb0VMUCtyUk90?=
- =?utf-8?B?NlFLcnVwZWpIVktzOU8rNnBITnZBZmtWcmZnRTVKTHgvcENVVm5vNzJVMFFr?=
- =?utf-8?B?MlVLM2d1QWZsTzB0U1R0Nm1XeVZMcC90U1VEN1REbUh1RDV1ZmUvTGZBVjh2?=
- =?utf-8?B?RTFoaVFnK0tCVlVqckZ2bkE5bGtvUXZQeWJ5UW9scXZSU3BibUF3d3gySnJt?=
- =?utf-8?B?eEJ6MEJnMDN1eHltaEVFNU55d0Z0QzVXZG5zUmQ5ZlRhaENZUEp5YzhjNndn?=
- =?utf-8?B?c05nNFU2SGFBTFlXTmsrbXVHUEVZYXNuRFlMRzQ1UXJvMW1reUFNOUZTQXJY?=
- =?utf-8?B?akNyUGtCRFhYMU5VQ3BQOVBzWkFaZHhyM2FmUjhLcmdqSU1uaFZCQkZaVjY5?=
- =?utf-8?B?WlRLbjM3aXlldGQyNUZBYzUwRUFhbGVKc3RTck5mRmxQYThJengzT2dJMGxp?=
- =?utf-8?B?MFF2U1VHbjhCTC9hSUh2VUVuRGt2MEZIUDVzcVVKaU9kN2I2bnM2aHVSTU94?=
- =?utf-8?B?WHgyM2FuMldqck91cTMwdEN1TzBwWkpndU9vTXIzR2VIVTRGS2FVbUFtK0kv?=
- =?utf-8?B?UGVaTU5kMGp6emc3dlRDOVphZzlwRUNXZXhXVElRTUczbU1hZ3htWXB4TGUx?=
- =?utf-8?B?YTViV2FlY0h4aVBoejJlcnVZcEIxUkIvSVlDT2puUzRBU0dLaExBSi8vSmNC?=
- =?utf-8?B?M1NXb0JYYXRIY1o0Y3ZwOUdFUVcxbDI1N3hSRWRPQUZIZkhVTzlidGo5QjJa?=
- =?utf-8?Q?htBokl88hJ+PnoJAuWDIgjZH45LCaiy6ZyUACTByQziVoh?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?aitSVXdKRFJBTjlHbDV3RzBlK0FzSWtkTWZoVXBRTXRLNEI0ekNZQjVSem90?=
- =?utf-8?B?dHJWZzVQSXQxYXp1NU5ZUEhDZDkxQkNkTjJoc1E2S2l4VDNvMnExcEozdHJ5?=
- =?utf-8?B?YmMyWTNScjFNK20yWkZoQmRsUnZqb0FiSDBuM2pvYkZHWElPTjExbVJIZktW?=
- =?utf-8?B?YTYzK0l0M1l6Wk5sNzl6RExOYXpLWnJSY2sydzROWU5HNmNmek9pc1pyOStC?=
- =?utf-8?B?Z3BFeG42bFpIQThYdm5sRnpRNy9OeUxUaXJteFJndkVsOWtxUDB3OVJHdVpp?=
- =?utf-8?B?TlJnRlhRdDJ1eW5MVkxMNnZHRmJIOGdNT1dmdXZEbE43djBsL0xvUm1WN1I5?=
- =?utf-8?B?UG1CR3E5cWFUT25rRVRpcFN4cGJra3B3RXFLd0VOYjBTRVF1Vk1lYWRuNEhD?=
- =?utf-8?B?ZlhBb1VXT3JZRnBSL0tOY1FBWE1nZEt0cGd4dTNoVldIQ2REb1BrcFk2UzFI?=
- =?utf-8?B?TnVRbHZrZzZtS1dqSlh6bkxkMjFiL0c5WHIvYXdHL0FhZDIrUC96TnVxZzJ3?=
- =?utf-8?B?enFIb0JQNHZheFZEOHRrZDJ1T2F1YWNGVkpQUGY5NCtUUW9JQU81N3R3QTA5?=
- =?utf-8?B?Y0U4U0ZkbGRPWEI5T2tDa3JUdmdJV0NVdkg0WEk3ZnBGN3ZDaWlneUVyeGVQ?=
- =?utf-8?B?aDIvb1R3UHFHNWl0NmpTQjVacmg0SEkyZldUTi84Q3JlNkdXRHUwRE85bzdy?=
- =?utf-8?B?QnpRMEZ3UkdUZ1B6bGY0dFR3WFFmTVZqOU8zUlJna3NRYkNjSm8yemE3U1gz?=
- =?utf-8?B?MjlZV2JSMWg4TE1VWTNRd05BU2VqNnlCTjJQcHRmeURRQi9kbzkvZk1SdUNt?=
- =?utf-8?B?dUo3SjlZbUc5dEQrZ2FFRUhNamd2cnB5WjRxQ3ZidWQ3WFRIVGhzbDlya3Rq?=
- =?utf-8?B?WnVMUUNmSjBZYkN0cHVMbGUzSTdrdEpFM2VMeHJNM0FyTDFacGVqRUNLa0NM?=
- =?utf-8?B?c2x2UElYaHBJalYwd1owVUpKR0lDa3l4NTdIeU53SEhhaDJINDBVVGtRK1Jt?=
- =?utf-8?B?WkE3ZGxsdGRDcjlvcFhmOWlROW9IMzhDWWlnU1ZpOENvbEE4OHFLbHErc080?=
- =?utf-8?B?dGhPVzk4NDhyQ2dVaTRhZll4NWNQdnlCdjc3K0Y4YnY5OWNjaVpHNGNxV1R6?=
- =?utf-8?B?UmdVMlNvMkU3YW9SQ3hLMzJudTZ2QmsxSk1icUhnalg0eTZkSThlQmxUTXVP?=
- =?utf-8?B?VkVaUXJJcFl5WE52L01CWWkwWDNXYm1LVllydm1IL1NYUUhHdkIyZ2R5VWVn?=
- =?utf-8?B?TTZRa21CdEkxVDF5aWVGZXVBSjBsWmg1cENOWFhXTkpLTVA3REVvU2MvYWov?=
- =?utf-8?B?V1c5Z0ZJSE11VXRaR2VpU1A5aGhJbjJPY2drblNkaU1qTFZIcHh3M1prc3du?=
- =?utf-8?B?VkkzR1JXK0FFcXZXUUxZU0FiRlQ3MS9rcnhxdTdkcEVJVjUramNuRDFlUkk0?=
- =?utf-8?B?OUoxYkJVeE1DSHFJWW9td3JENGdINVJ1M25lZ3JSTTNHRHRVNkp0WTh2QU00?=
- =?utf-8?B?dUlIV1BJTWN3bUZBTTQyZGZObXVqenZYNnowZDFBUEZZTDdkZHZmOWZTRHJI?=
- =?utf-8?B?eGl6dUh4N2ZBMmY3WDZVa1FXSG9aRExNY0VzRlRON3NQZmhBdkxpOWt6cndm?=
- =?utf-8?B?Tmx2ci9MU2J2WGhNNHZyOVhOMzBmcUlSdDRFUkF5eEhhTzk3Z1lQVGxXanpo?=
- =?utf-8?B?REJreEgrYnFOY3VjckRxb05uRFlmTmFDajRkdXEzZTNHWW9EbkhMakxxemN3?=
- =?utf-8?B?ckVqdWNPNkV3Z2xjQ1lBTk8rOVovV0FWQ0lOR04rM08zNG5NUmpRZERJMFZj?=
- =?utf-8?B?MUwxSVJIQkRUVE53aHRUZ2FFU1VHYXhSeG8zd2s4MnhZZkxDY0laMTY4VlVz?=
- =?utf-8?Q?b8RJ5gqdVVfLo?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xqm5loDr"
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=2N9BQKz6AnVfddAOlxhaAFtPmyMyrlSN/sFqe0szwXI=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792234454; v=1; x=1792839254;
+ b=Xqm5loDrTqvvBVVVoUKDVyg8AWU7oFll7Z1LCNmxsDQFEhTESbTLuSowRt8V8AYu/LH0Lhyo
+ U8yOpNOjpa3a/Rtq64RQhZfcpKcMBqgCDC3EZkkTzgbp5TE1tw5VygWcqxKq3DjrfolSkxZ+UZ+
+ 3lmZD70weD3fff5dW7fEtYW0=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id bbef089e09e1860e;
+	Sat, 17 Oct 2026 10:54:14 +0000
+X-Mizu-Trace-ID: bbef089e09e1860e
+X-Migadu-Flow: FLOW_OUT
+From: Kaitao Cheng <kaitao.cheng@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kaitao Cheng <chengkaitao@kylinos.cn>
+Subject: [PATCH] blk-mq: add direct dispatch support for mq-deadline
+Date: Sat, 17 Oct 2026 18:54:00 +0800
+Message-ID: <20261017105400.95967-1-kaitao.cheng@linux.dev>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR05MB10385.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 489e120e-3ff5-4293-bc90-08df2c2b117b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2026 08:45:59.7862
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LVWPR05MB998850
+Content-Transfer-Encoding: 8bit
 
-RnJvbTogWWluZ2ppZSBXYW5nIDx4LXByb2Zlc3NvckBvdXRsb29rLmNvbT4KClNHX1NFVF9USU1F
-T1VUIHJlYWRzIGl0cyBhcmd1bWVudCBhcyBhIHNpZ25lZCBpbnQgaW4gVVNFUl9IWiB1bml0cy4g
-VGhlCnNnIGNoYXJhY3RlciBkZXZpY2UgcmVqZWN0cyBuZWdhdGl2ZSB2YWx1ZXMsIHdoaWxlIHRo
-ZSBibG9jayBTQ1NJIGlvY3RsCmFuZCBCU0cgcGF0aHMgcGFzcyB0aGVtIHRvIGNsb2NrX3RfdG9f
-amlmZmllcygpLCB3aGljaCB0YWtlcyBhbiB1bnNpZ25lZApsb25nLgoKT24gYSA2NC1iaXQgc3lz
-dGVtIHdpdGggSFo9MTAwMCwgcGFzc2luZyAtNSBmaXJzdCBjb252ZXJ0cyBpdCB0byBhIGxhcmdl
-CnVuc2lnbmVkIHZhbHVlLCBjYXVzaW5nIGNsb2NrX3RfdG9famlmZmllcygpIHRvIHJldHVybiBV
-TE9OR19NQVguClN0b3JpbmcgdGhhdCByZXN1bHQgaW4gc2Rldi0+c2dfdGltZW91dCBvciBiZC0+
-dGltZW91dCB0cnVuY2F0ZXMgaXQgdG8KVUlOVF9NQVguIFNHX0dFVF9USU1FT1VUIHRoZW4gcmVw
-b3J0cyA0Mjk0OTY3MjkgdGlja3MsIGFuZCBhbiBTR19JTwpyZXF1ZXN0IHdpdGggYSB6ZXJvIHBl
-ci1yZXF1ZXN0IHRpbWVvdXQgaW5oZXJpdHMgYSB0aW1lb3V0IG9mIGFib3V0CjQ5LjcgZGF5cy4K
-ClJlamVjdCBuZWdhdGl2ZSB2YWx1ZXMgaW4gYm90aCBwYXRocyB3aXRoIC1FSU8sIG1hdGNoaW5n
-IHRoZQpsb25nc3RhbmRpbmcgYmVoYXZpb3Igb2YgdGhlIHNnIGNoYXJhY3RlciBkZXZpY2UuCgpU
-aGUgYmxvY2sgU0NTSSBwYXRoIHByZWRhdGVzIEdpdCBoaXN0b3J5LiBUaGUgQlNHIHBhdGggaGFz
-IGV4cG9zZWQgdGhlCnNhbWUgYmVoYXZpb3Igc2luY2UgQlNHIHdhcyBpbnRyb2R1Y2VkLgoKRml4
-ZXM6IDNkNjM5MmNmYmQ3ZCAoImJzZzogc3VwcG9ydCBmb3IgZnVsbCBnZW5lcmljIGJsb2NrIGxh
-eWVyIFNHIHYzIikKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcKU2lnbmVkLW9mZi1ieTogWWlu
-Z2ppZSBXYW5nIDx4LXByb2Zlc3NvckBvdXRsb29rLmNvbT4KLS0tCiBibG9jay9ic2cuYyAgICAg
-ICAgICAgICAgIHwgMiArKwogZHJpdmVycy9zY3NpL3Njc2lfaW9jdGwuYyB8IDkgKysrKysrLS0t
-CiAyIGZpbGVzIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkKCmRpZmYg
-LS1naXQgYS9ibG9jay9ic2cuYyBiL2Jsb2NrL2JzZy5jCmluZGV4IDgyYWFmM2NlZTU4Mi4uNjgx
-ZGE3OWE1YmEyIDEwMDY0NAotLS0gYS9ibG9jay9ic2cuYworKysgYi9ibG9jay9ic2cuYwpAQCAt
-MTMyLDYgKzEzMiw4IEBAIHN0YXRpYyBsb25nIGJzZ19pb2N0bChzdHJ1Y3QgZmlsZSAqZmlsZSwg
-dW5zaWduZWQgaW50IGNtZCwgdW5zaWduZWQgbG9uZyBhcmcpCiAJY2FzZSBTR19TRVRfVElNRU9V
-VDoKIAkJaWYgKGdldF91c2VyKHZhbCwgaW50cCkpCiAJCQlyZXR1cm4gLUVGQVVMVDsKKwkJaWYg
-KHZhbCA8IDApCisJCQlyZXR1cm4gLUVJTzsKIAkJYmQtPnRpbWVvdXQgPSBjbG9ja190X3RvX2pp
-ZmZpZXModmFsKTsKIAkJcmV0dXJuIDA7CiAJY2FzZSBTR19HRVRfVElNRU9VVDoKZGlmZiAtLWdp
-dCBhL2RyaXZlcnMvc2NzaS9zY3NpX2lvY3RsLmMgYi9kcml2ZXJzL3Njc2kvc2NzaV9pb2N0bC5j
-CmluZGV4IGMxNGY4MTQwM2EwOS4uMTYyYTIxMTEyZDQ5IDEwMDY0NAotLS0gYS9kcml2ZXJzL3Nj
-c2kvc2NzaV9pb2N0bC5jCisrKyBiL2RyaXZlcnMvc2NzaS9zY3NpX2lvY3RsLmMKQEAgLTE5NSwx
-MCArMTk1LDEzIEBAIHN0YXRpYyBpbnQgc2dfc2V0X3RpbWVvdXQoc3RydWN0IHNjc2lfZGV2aWNl
-ICpzZGV2LCBpbnQgX191c2VyICpwKQogewogCWludCB0aW1lb3V0LCBlcnIgPSBnZXRfdXNlcih0
-aW1lb3V0LCBwKTsKIAotCWlmICghZXJyKQotCQlzZGV2LT5zZ190aW1lb3V0ID0gY2xvY2tfdF90
-b19qaWZmaWVzKHRpbWVvdXQpOworCWlmIChlcnIpCisJCXJldHVybiBlcnI7CisJaWYgKHRpbWVv
-dXQgPCAwKQorCQlyZXR1cm4gLUVJTzsKIAotCXJldHVybiBlcnI7CisJc2Rldi0+c2dfdGltZW91
-dCA9IGNsb2NrX3RfdG9famlmZmllcyh0aW1lb3V0KTsKKwlyZXR1cm4gMDsKIH0KIAogc3RhdGlj
-IGludCBzZ19nZXRfcmVzZXJ2ZWRfc2l6ZShzdHJ1Y3Qgc2NzaV9kZXZpY2UgKnNkZXYsIGludCBf
-X3VzZXIgKnApCgpiYXNlLWNvbW1pdDogNTgxNjFlYWQyOWU1MGQ3MGEzMTdlYTI2YjQ3MmUwYzc1
-MDhlNjlkYQotLSAKMi40My4wCgo=
+From: Kaitao Cheng <chengkaitao@kylinos.cn>
+
+On fast devices such as NVMe SSDs with spare capacity, scheduler insertion,
+sorting and merging may add CPU overhead with little benefit. Allowing new
+requests to reach the driver directly can reduce submission latency and
+improve bandwidth when this overhead limits performance.
+
+Add a skip_request elevator callback to support direct dispatch for
+unplugged submissions and plug flushes outside the scheduling path.
+Implement it in mq-deadline with request accounting preserved across
+reinsertion and retries.
+
+Expose a dispatch_direct tunable, enabled by default. Directly dispatched
+requests may bypass queued requests, including higher priority or expired
+requests. Setting dispatch_direct to 0 restores normal scheduler insertion.
+
+Test sequential writes on an NVMe SSD with fio, comparing none, unmodified
+mq-deadline, and mq-deadline with this patch and dispatch_direct enabled.
+
+test A:
+fio -name=jobs1-4k -direct=1 -iodepth=16 -numjobs=1 -filename=fiolog.txt
+    -ioengine=libaio -blocksize=4k -size=10GB -rw=write -runtime=120
+    -time_based -ramp_time=30
+test B:
+fio -name=jobs10-4k -direct=1 -iodepth=16 -numjobs=10 -filename=fiolog.txt
+    -ioengine=libaio -blocksize=4k -size=10GB -rw=write -runtime=120
+    -time_based -ramp_time=30
+test C:
+fio -name=jobs1-32k -direct=1 -iodepth=16 -numjobs=1 -filename=fiolog.txt
+    -ioengine=libaio -blocksize=32k -size=10GB -rw=write -runtime=120
+    -time_based -ramp_time=30
+
+Bandwidth in MiB/s:
+
+  Workload        none    mq-deadline    my-patch
+  jobs1-4k        1209           1047        1174
+  jobs10-4k       2458            946        2349
+  jobs1-32k       2568           2565        2562
+
+Direct dispatch improves bandwidth over unmodified mq-deadline by 12.1%
+with one job and 148.3% with multiple jobs for the 4 KiB workloads,
+reaching 97.1% and 95.6% of the bandwidth achieved with none, respectively.
+All three configurations achieve the same maximum bandwidth.
+
+Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+---
+ Documentation/block/deadline-iosched.rst | 14 +++++++
+ block/blk-mq.c                           | 40 ++++++++++++++-----
+ block/elevator.h                         |  1 +
+ block/mq-deadline.c                      | 50 +++++++++++++++++++++++-
+ 4 files changed, 94 insertions(+), 11 deletions(-)
+
+diff --git a/Documentation/block/deadline-iosched.rst b/Documentation/block/deadline-iosched.rst
+index 9f5c5a4c370e..3d0900b4546c 100644
+--- a/Documentation/block/deadline-iosched.rst
++++ b/Documentation/block/deadline-iosched.rst
+@@ -69,4 +69,18 @@ that comes at basically 0 cost we leave that on. We simply disable the
+ rbtree front sector lookup when the io scheduler merge function is called.
+ 
+ 
++dispatch_direct (bool)
++----------------------
++
++Enabled by default. Allows new requests to bypass the scheduler's sort tree,
++FIFO and merge hash when the hardware context is not congested, stopped or
++quiesced. On fast devices such as NVMe SSDs with spare capacity, sorting and
++merging may offer little benefit while adding CPU overhead and limiting
++bandwidth. Direct dispatch can reduce this overhead and submission latency.
++
++Direct dispatch reduces opportunities for merging and sorting, and may bypass
++queued requests, including higher priority or expired requests. Set
++dispatch_direct to 0 to restore normal scheduler insertion.
++
++
+ Nov 11 2002, Jens Axboe <jens.axboe@oracle.com>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1b7f8cbbda8b..615ecacba1ed 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2751,17 +2751,26 @@ static bool blk_mq_get_budget_and_tag(struct request *rq)
+ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq)
+ {
++	bool use_sched = rq->rq_flags & RQF_USE_SCHED;
++	bool run_queue_async = use_sched || (rq->cmd_flags & REQ_NOWAIT);
+ 	blk_status_t ret;
+ 
+ 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(rq->q)) {
+ 		blk_mq_insert_request(rq, 0);
+-		blk_mq_run_hw_queue(hctx, false);
++		blk_mq_run_hw_queue(hctx, use_sched);
+ 		return;
+ 	}
+ 
+-	if ((rq->rq_flags & RQF_USE_SCHED) || !blk_mq_get_budget_and_tag(rq)) {
++	if (use_sched) {
++		struct elevator_mq_ops *ops = &rq->q->elevator->type->ops;
++
++		if (ops->skip_request)
++			use_sched = !ops->skip_request(rq);
++	}
++
++	if (use_sched || !blk_mq_get_budget_and_tag(rq)) {
+ 		blk_mq_insert_request(rq, 0);
+-		blk_mq_run_hw_queue(hctx, rq->cmd_flags & REQ_NOWAIT);
++		blk_mq_run_hw_queue(hctx, run_queue_async);
+ 		return;
+ 	}
+ 
+@@ -2927,9 +2936,14 @@ static void blk_mq_dispatch_list(struct rq_list *rqs, bool from_sched)
+ 		spin_unlock(&this_hctx->lock);
+ 		blk_mq_run_hw_queue(this_hctx, from_sched);
+ 	} else if (this_hctx->queue->elevator) {
+-		this_hctx->queue->elevator->type->ops.insert_requests(this_hctx,
+-				&list, 0);
+-		blk_mq_run_hw_queue(this_hctx, from_sched);
++		if (!this_hctx->dispatch_busy && !from_sched)
++			blk_mq_run_dispatch_ops(this_hctx->queue,
++				blk_mq_try_issue_list_directly(this_hctx, &list));
++		if (!list_empty(&list)) {
++			this_hctx->queue->elevator->type->ops.insert_requests(
++					this_hctx, &list, 0);
++			blk_mq_run_hw_queue(this_hctx, from_sched);
++		}
+ 	} else {
+ 		blk_mq_insert_requests(this_hctx, this_ctx, &list, from_sched);
+ 	}
+@@ -2984,6 +2998,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct list_head *list)
+ {
++	struct elevator_queue *e = hctx->queue->elevator;
+ 	int queued = 0;
+ 	blk_status_t ret = BLK_STS_OK;
+ 
+@@ -2991,6 +3006,14 @@ static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq = list_first_entry(list, struct request,
+ 				queuelist);
+ 
++		/* Scheduler requests need approval and dispatch accounting. */
++		if (e && (READ_ONCE(hctx->dispatch_busy) ||
++			  blk_mq_hctx_stopped(hctx) ||
++			  blk_queue_quiesced(hctx->queue) ||
++			  !e->type->ops.skip_request ||
++			  !e->type->ops.skip_request(rq)))
++			break;
++
+ 		list_del_init(&rq->queuelist);
+ 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
+ 		switch (ret) {
+@@ -3010,7 +3033,7 @@ static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 	}
+ 
+ out:
+-	if (ret != BLK_STS_OK)
++	if (ret != BLK_STS_OK || !list_empty(list))
+ 		blk_mq_commit_rqs(hctx, queued, false);
+ }
+ 
+@@ -3218,8 +3241,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	}
+ 
+ 	hctx = rq->mq_hctx;
+-	if ((rq->rq_flags & RQF_USE_SCHED) ||
+-	    (hctx->dispatch_busy && (q->nr_hw_queues == 1 || !is_sync))) {
++	if (hctx->dispatch_busy && (q->nr_hw_queues == 1 || !is_sync)) {
+ 		blk_mq_insert_request(rq, 0);
+ 		blk_mq_run_hw_queue(hctx, true);
+ 	} else {
+diff --git a/block/elevator.h b/block/elevator.h
+index 3eb32516be0b..871d166eaf25 100644
+--- a/block/elevator.h
++++ b/block/elevator.h
+@@ -74,6 +74,7 @@ struct elevator_mq_ops {
+ 	void (*insert_requests)(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 			blk_insert_t flags);
+ 	struct request *(*dispatch_request)(struct blk_mq_hw_ctx *);
++	bool (*skip_request)(struct request *rq);
+ 	bool (*has_work)(struct blk_mq_hw_ctx *);
+ 	void (*completed_request)(struct request *, u64);
+ 	void (*requeue_request)(struct request *);
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index e5db1ee097c3..c4cc482000f0 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -99,6 +99,7 @@ struct deadline_data {
+ 	int writes_starved;
+ 	int front_merges;
+ 	int prio_aging_expire;
++	bool dispatch_direct;
+ 
+ 	spinlock_t lock;
+ };
+@@ -310,8 +311,11 @@ static struct request *dd_start_request(struct deadline_data *dd,
+ 	enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
+ 
+ 	dd->per_prio[prio].latest_pos[data_dir] = blk_rq_pos(rq);
+-	dd->per_prio[prio].stats.dispatched++;
+-	rq->rq_flags |= RQF_STARTED;
++	/* Count each request once, including direct dispatch followed by requeue. */
++	if (!(rq->rq_flags & RQF_STARTED)) {
++		dd->per_prio[prio].stats.dispatched++;
++		rq->rq_flags |= RQF_STARTED;
++	}
+ 	return rq;
+ }
+ 
+@@ -550,6 +554,7 @@ static int dd_init_sched(struct request_queue *q, struct elevator_queue *eq)
+ 	dd->last_dir = DD_WRITE;
+ 	dd->fifo_batch = fifo_batch;
+ 	dd->prio_aging_expire = prio_aging_expire;
++	dd->dispatch_direct = true;
+ 	spin_lock_init(&dd->lock);
+ 
+ 	/* We dispatch from request queue wide instead of hw queue */
+@@ -728,6 +733,29 @@ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
+ 
++/*
++ * When blk-mq finds the hctx uncongested, let new requests skip the sort tree,
++ * FIFO and merge hash
++ */
++static bool dd_skip_request(struct request *rq)
++{
++	struct deadline_data *dd = rq->q->elevator->elevator_data;
++	const enum dd_data_dir data_dir = rq_data_dir(rq);
++	const enum dd_prio prio = ioprio_class_to_prio[dd_rq_ioclass(rq)];
++	struct dd_per_prio *per_prio = &dd->per_prio[prio];
++
++	if (!READ_ONCE(dd->dispatch_direct) || rq->elv.priv[0] ||
++	    READ_ONCE(rq->mq_hctx->dispatch_busy))
++		return false;
++
++	spin_lock(&dd->lock);
++	per_prio->stats.inserted++;
++	rq->elv.priv[0] = per_prio;
++	dd_start_request(dd, data_dir, rq);
++	spin_unlock(&dd->lock);
++	return true;
++}
++
+ /*
+  * sysfs parts below
+  */
+@@ -745,6 +773,7 @@ SHOW_JIFFIES(deadline_prio_aging_expire_show, dd->prio_aging_expire);
+ SHOW_INT(deadline_writes_starved_show, dd->writes_starved);
+ SHOW_INT(deadline_front_merges_show, dd->front_merges);
+ SHOW_INT(deadline_fifo_batch_show, dd->fifo_batch);
++SHOW_INT(deadline_dispatch_direct_show, READ_ONCE(dd->dispatch_direct));
+ #undef SHOW_INT
+ #undef SHOW_JIFFIES
+ 
+@@ -778,6 +807,21 @@ STORE_INT(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX);
+ #undef STORE_INT
+ #undef STORE_JIFFIES
+ 
++static ssize_t deadline_dispatch_direct_store(struct elevator_queue *e,
++					     const char *page, size_t count)
++{
++	struct deadline_data *dd = e->elevator_data;
++	bool enabled;
++	int ret;
++
++	ret = kstrtobool(page, &enabled);
++	if (ret)
++		return ret;
++
++	WRITE_ONCE(dd->dispatch_direct, enabled);
++	return count;
++}
++
+ #define DD_ATTR(name) \
+ 	__ATTR(name, 0644, deadline_##name##_show, deadline_##name##_store)
+ 
+@@ -788,6 +832,7 @@ static const struct elv_fs_entry deadline_attrs[] = {
+ 	DD_ATTR(front_merges),
+ 	DD_ATTR(fifo_batch),
+ 	DD_ATTR(prio_aging_expire),
++	DD_ATTR(dispatch_direct),
+ 	__ATTR_NULL
+ };
+ 
+@@ -989,6 +1034,7 @@ static struct elevator_type mq_deadline = {
+ 		.limit_depth		= dd_limit_depth,
+ 		.insert_requests	= dd_insert_requests,
+ 		.dispatch_request	= dd_dispatch_request,
++		.skip_request		= dd_skip_request,
+ 		.prepare_request	= dd_prepare_request,
+ 		.finish_request		= dd_finish_request,
+ 		.next_request		= elv_rb_latter_request,
+-- 
+2.54.0 (Apple Git-157)
+
