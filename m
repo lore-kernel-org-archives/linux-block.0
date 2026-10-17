@@ -1,161 +1,519 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18AE390CB7
-	for <linux-block@vger.kernel.org>; Fri, 16 Oct 2026 23:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792192658; cv=fail; b=JW+h5JRu9DtGHjhlbiIcZSaH9NqdixojmM8FT5CZcIS9kynGkwShDZ7va2ggWQmyEjExo5kXgSNbAvputEVwrblihvqV0/sa2uFX2j/4T+8OdrRvJVYFt7kzGaqPwmZd2bleIbvaI/UP7s3ceH6PkBkL8OiHidsA/G9t4lQggm4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792192658; c=relaxed/simple;
-	bh=Tw5PSoFzypL893jTy806wKZpqNePTa5d4u3Zh6PvpYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=C9rErcB4mZ2ZjIEk+nkBxiu95Xt/CtEwT8oJO72Q+ZLE7Muqx6UH+h/9aJlIZEKUxakQi1nMSIQRJe8Eb/3d+YTV8uEv8fMGh+qXJBSk1aa6uUWXvxs3nIgrMzcWWUY2wTZ0s5o6rgJSBuR0le4sy8xfh9uJRVLgGYrcZQunFEg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=IGe+M+aU; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=fqp3XOEw; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88F93AF647;
+	Sat, 17 Oct 2026 03:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792207018; cv=none; b=Mo5dZocS39ERs0xoZGrCQlnsomJagjyC+lkv2gu9QB3Lo8sQsizQeKwPn8gnZGP/+NaaiDBqN35IGLsOgwigKLRy2S0q4Gi1MR2il4Wu8IyAyDKSXndC1Huu6MgR+5oPb7B05+raS02nGXpmIAeIE8rSWxTjwHCzb9tg1obtoz0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792207018; c=relaxed/simple;
+	bh=YFTZDZcr+d1+S6ruRoTARk9e56IUEOiVbU2z5oJGIx4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=szcS+DhAT6nQQIqMvad+h5c6u0J7EU3Npsz6WpXLcjOCvMUnEjBSV5+Ep5vQGYB15lcj4/GNYwtlG5FVzXdVPsfHAaSuy5qXW1/Pjysx1G72AcErXZnpGgd55uSWApMgkHbjbIBvynfQSv9nAVnFkTwY2ZsJn5/fAsr+F+OY9HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=xiaomi.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=SucYKug5; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=xiaomi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IGe+M+aU";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="fqp3XOEw"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1792192663; x=1823728663;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=Tw5PSoFzypL893jTy806wKZpqNePTa5d4u3Zh6PvpYY=;
-  b=IGe+M+aUNBVoHNZUe5bIyWASNl6LumU/6OP/SFoa2XoQpD8FxjVDD6E9
-   Byw8osjPEDfckFPxtHK0Xz7wMYyXdaUcjFQZeRJJLiTbR5ie4/dcJvXNi
-   oAudv3tIqu4c2h9+0GPSIRUsJcJ4vB0/Anwaz5N4FfKxwxIbLqIpTKyWu
-   yR+y+gpv35yofFr6ddnvGsCtlGeQTJcehkLZoe/MTXY96rV3CLpFLX124
-   5bNrGzbpYrdx7umcOg0U3QBrXQCk5617opk9D5WfN6QwBiMjhzcbEQI74
-   qwhtLq7APzj4Xcn4TxyxXLnM6DpuVYeV2ph8rnBYJ/ZGXWIGWIOnE0LGV
-   Q==;
-X-CSE-ConnectionGUID: DTA0CJ7zRsW6qdk9MOKcYw==
-X-CSE-MsgGUID: sH2h/UmOTJuy17MgNWE+4w==
-X-IronPort-AV: E=Sophos;i="6.27,162,1786982400"; 
-   d="scan'208";a="158308066"
-Received: from mail-westus3azon11010032.outbound.protection.outlook.com (HELO PH7PR06CU001.outbound.protection.outlook.com) ([52.101.201.32])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Oct 2026 07:17:42 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=W76bWySgVehR8SFSr1Lvy4EPIbUSnk9MKirQCB83J6t8SUTDSGcNIYcuP7354eXEaV2yyGEIr18XAuXZoAscJvc3WfwgajXYosZ7vU/1PgYR7/feWb4RovAzb/15y1GaVLFPY+TSBuUaxkTWDo7bCsdUqeh/AMp4ts6Vc7O/xgINbMv14gaZGm1HBE8EPaKLnnZwr1jGwXspmb0BLwiN5A1KXg9fj1MzbGOrjWSKEZGCY2tX8YvZpO4hRpTRTNmPAxr/lFdbMADxxcWjIFjcD4kSLWa6mqJPUqtxHhY1GrX+Vmyz6nrNHC3JyAa94rAFFFp9yL2M7oY7ejIUaWgr4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+xNWlaElUy5UonIUDbrayFlUiy3HxgJuZsSr51U+Eh4=;
- b=LVHBVdZoa8JqLM2BkZMYQSujW5xIH32GD7Wlh19jubXMGHg/o7MyqQGTnEXPDd3rqEQmG89hYy951dUmtdsTtJy5/7Kjtgms9LQcDdgUTYHH2dku+ZHks9RVosB3wqTgr155fFQV2d95kTbVJVtehB4MmSGoKroPeK/z94yxLqWkpET0XmLA8uK1KCuRBjtirsPmgqsRsy9qq3k8BahAGd8p6E/C+L+MKv07WsuWvNtuZ/hdcilLURqVmhMv0Zj2/y+UM9CQgoSgiaMIcvsBxx9eC6vIYr5Mj0/mcK5onzH/ak3LpdnG/kl37fqax/hrXQrM1LXHdkywQQgIaxAQLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+xNWlaElUy5UonIUDbrayFlUiy3HxgJuZsSr51U+Eh4=;
- b=fqp3XOEwKLdfJ71ccDGVYFA6gzo33u04j6XRCXuiB12CyuyR9+eQS5eIrG5vpmZJ24Tnvq14r4GWM2k78r7fjCbFV/1sdxqXTaVwgA8JwtKg4fLMwcM8n5wUbJHmkI7um7E6r/vaBylt5cOrH8n+soAi2QeOOyFBj5PENZmOLn4=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by BN8PR04MB6404.namprd04.prod.outlook.com
- (2603:10b6:408:7d::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.17; Fri, 16 Oct
- 2026 23:17:34 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%5]) with mapi id 15.21.0522.016; Fri, 16 Oct 2026
- 23:17:34 +0000
-Date: Sat, 17 Oct 2026 08:17:29 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: blktests-ci-bot@kernel.org
-Subject: Re: [PATCH v2] lib/sbitmap: add KUnit test suite
-Message-ID: <atKv-V5gYmiua2SG@shinmob>
-References: <20261016073253.520971-1-szwyb123@gmail.com>
- <52bd3c015dd078eb947ffea0c9a3e6b0fd8c20593b5796cf30bcb8a4fed51a44@mailrelay.wdc.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <52bd3c015dd078eb947ffea0c9a3e6b0fd8c20593b5796cf30bcb8a4fed51a44@mailrelay.wdc.com>
-X-ClientProxiedBy: TYCP286CA0258.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:455::6) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="SucYKug5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=rY
+	eujvCf6NprmQgfrv6xnLcyR5lzfeAJ0jKIJm9Zn+E=; b=SucYKug5Ko8/q75pd+
+	T59xqkR123hm/O5nMROdtZwAZjbtcE8QTcQx68lNLOz8vDBu3Uu6IadgHyfe5ECf
+	QKGicLv5/NOZD9e2RFNvRuhod064ig5leyUGuWAq7C64kj8yKOoxYXmYZK1q1QAV
+	h+6L2A4C/ln1vwdpM31FwhszM=
+Received: from hongfeng.mioffice.cn (unknown [])
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgD3YQl46NJq+Fg1AQ--.37596S2;
+	Sat, 17 Oct 2026 11:16:09 +0800 (CST)
+From: Hongfeng Chen <hongfengchen@xiaomi.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Barry Song <baohua@kernel.org>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Minchan Kim <minchan@kernel.org>,
+	Nhat Pham <nphamcs@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Yosry Ahmed <yosry@kernel.org>,
+	Wenchao Hao <haowenchao@xiaomi.com>,
+	Wenchao Hao <haowenchao22@gmail.com>
+Cc: linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Hongfeng Chen <hongfengchen@xiaomi.com>,
+	chenhongfeng0212@gmail.com
+Subject: [RFC PATCH v4 2/2] zram: keep the hot statistics per cpu
+Date: Sat, 17 Oct 2026 11:15:42 +0800
+Message-ID: <20261017031542.3504947-1-hongfengchen@xiaomi.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20261016120927.3191690-1-hongfengchen@xiaomi.com>
+References: <20261016120927.3191690-1-hongfengchen@xiaomi.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|BN8PR04MB6404:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1fdffd1-faaf-4273-36e3-08df2bdba8c1
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|366016|19092799006|23010399003|56012099006|4143699003|11063799006|261009223027099003|22082099003|10067099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	sNyUiyleLH+BQ1jEAXam2eXjOkviCrgQfntII9NHvahf44pI14mqTNuikITJ4EUf87NV3LIktE9JhGnhpN1n6N3H1m8woKY0lxBD5Ho388Ym+982ElDhWCfSyRIYRViv+7Q3PylRU5gQxIJ2vOWSFir325HQVrEYMvN7V8/1PfP61Tkd8OvO4F4k4x0Q3PBhsDCO7IEw6LDr5G2p4WUjgJ0Pf8Ec52BBl3kT4pzHJqLrlCPwdR6wGBgEycwG6JYTZYgf1k4TqIJ/FtA+keVYoOeSqoZ8wqAvwvWTed5H0D0K0Yw7D3pnxiOvg1eBqi0k2gyK/uiqoPBSD8vXS+eOWiWWCrA1bWIoeiLsJHST5rKtvAfg23+3m8NeviqAwi5CxsRGHpby5D2kd0gLNN4c0mIhYPVegS43YPfFJrNE/FFJpWR69B5CDyXq+9tIMLDaVzFCGS/0liyiTIR7G0nVRs2G0tYx8A/erPIBhsbBGDRFaMPgCWzzBSrJs5S065BVwlh2yMIhCUbnNwka09JvwP8HPbD1ceQV4Fp/V2LGP5KtBldmHhsUHz0COdZP+BL/jLAiksxWJiurlD+rhu+n/dzSovsasoUW8UZeB1I0sown424uBJldiE0FS9a0Kr5e
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(19092799006)(23010399003)(56012099006)(4143699003)(11063799006)(261009223027099003)(22082099003)(10067099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?PY0DhWtU+4iAzuAQjmOn7oiVC9/lC/dNxdquKvaGmmnZZpN9+hq1cCPu4EBC?=
- =?us-ascii?Q?FwefzQLjjFlAWHN8y6lj0lGeGW/oW3wYPu+D6gzac3pd1tG3NRIj9FTfdk87?=
- =?us-ascii?Q?5+JRO1dTbOCG0lYDxLuMb26Gnbd2upNpSYQNP80CxB3M0/fyZdYsl1JPPO8E?=
- =?us-ascii?Q?nOpegz40e314HoeS/mJbEYa4s/29xlS5Qx7ouEhByR8Pvm2oSLsLBBiwnbbO?=
- =?us-ascii?Q?Gjf1O3hdGk8NxWLXJkNwK2isrOuMPtG4K9qaQ9JsCpD1UOc6CcIwUCwBbiOu?=
- =?us-ascii?Q?/gbNyyST8kppT/ikEsAaokOBPcJN8AysEiIJ0hubTbxsV1+3qmW7GQqO+CJ2?=
- =?us-ascii?Q?8s+N8pjSBv6Ppx8GqKQrszlhYujEyIA2HPg8zM5ve7z+BTh4ES7D1qjnUUuB?=
- =?us-ascii?Q?OUBY3D4s60474aBWpTsn3SNEjW5H4gJaWlKAKBiLkKjcOFwyTxB7qvCd+mGN?=
- =?us-ascii?Q?u1uGpuBTentoMUDp2Bc2n3IkOFQ/GaBepV6eY9WyAMnjZMOW4Ry8DJe0qQnL?=
- =?us-ascii?Q?8j49b0MBEgu3B4Yx53b42MUZmWFovce/IYdpEWL5O2tsCCTFPkWd4iH20iun?=
- =?us-ascii?Q?L//076ngAj21QzUdNBW8JxeahQ9txuiykOTGwRvs9f7pjL9c+YY6MP7x5uza?=
- =?us-ascii?Q?l9z+ZdMZoPuQhRM/sDkXNdEXSZvq9SJGe6eVvf9J0whSYGxKedpn0RagcgEJ?=
- =?us-ascii?Q?5i/puHA+JdwBe+uH0GKJeHTanCEmuIOqRtvXacN871oLd27whcukO3LhXLHJ?=
- =?us-ascii?Q?UAIZ4a3e5LIBMqLoOBYHdNq9G6mRo2Z5QEIPhGM30ZQh/+LhOtP4jkK8vjAS?=
- =?us-ascii?Q?sTR6xcxs4sgEanlJV78jHJetRVDTpcmS9N3t9fE+F0BJYJOCsaAt2mXHIkbN?=
- =?us-ascii?Q?IchjHF6d9qoZyDEeRdFXECqfW1VeI6QdzJrBtbnt9aOHj9vw/xwu/YNznqvY?=
- =?us-ascii?Q?UU2276phO2aAO519xDxILHMJ7tLyycfzwgPYCb+hQsZpv1NKu4k1xkMCqw00?=
- =?us-ascii?Q?xpXBaS2W3Iwvn2rgaJvrGuWiGtFOnB5fcwf7SU5qVuudQFCbIBejwVpVA8qf?=
- =?us-ascii?Q?tzcuE5z47idat6rvy6cLbnbWdaO9ta85AHWwuxL65VWwhyvU0HYOIK5/ySu9?=
- =?us-ascii?Q?vffr6pLnchdXebz7bgMY0XuwhfZGno09zkwqYcwA1d9lcMuaJgFeCSE6Mnan?=
- =?us-ascii?Q?Kh2YDFP8KQDp3RE1RyBchCx8LOe2DqV1p106AZHYuYvdjGP3GqllTQ4zZYkk?=
- =?us-ascii?Q?z/379L8mSM7TV0+cyh+GQB50Xdu+dO5OBiyPEIch5JHLkKf5vQ4VVt0ErPQ4?=
- =?us-ascii?Q?T3q6TBO5oPxAp0YBQyF8Z5V0PI+fOKJDO7pnqegOEouCxJQEy/VNJjn0/Sxm?=
- =?us-ascii?Q?ZLRDxbDqGftDj3D0xPsAhU86CqWHEabhpyHaVbCGk6JX1rkenwceWdIKwp/q?=
- =?us-ascii?Q?P6U/2sNTFagVp+Zusec2ZGsbPhdgeZqGPiC1uPsKqwyHCG1fP6uomJvcZAWX?=
- =?us-ascii?Q?ldZLwcKIrqg3U8maKDE1e7jCyYnZcLA5Y3EXzEY+MgxT7LdHWwQkYB5SSdu8?=
- =?us-ascii?Q?+aMALzNxiLrtiDFH7hxeCR/tk/myPl3RG3REO73yeXoLdIGNTt2NOXwtRWqO?=
- =?us-ascii?Q?qMU1FGkGcf4syNBZrq4hR9aVkff9N/Az4dlHN3rsFLmJFuge2lGNeH8Bjhi1?=
- =?us-ascii?Q?pJUdV6zojwAiRKhrCrag7wyxqQc4g8cjhzX4U5AcCh4OVBt+ukRmKXt16Bdc?=
- =?us-ascii?Q?5yQiDeD1gLd28rRdg2hiGdGX6Eo2NtA=3D?=
-X-Exchange-RoutingPolicyChecked:
-	hNstLS7NEWJkf+XdUktX3MeNtR5BymT3F06d6UgakNZZYYu7NpnyCQ96fd6NFlV2o+FCJhe32XQ++6lXvD0bXkRDX+1Y+Mch2waIANb4ip2xrq/VX4Yh8JkBjyjNDtG/E/88jTMLKXPhRevXzSHKu0QP/yI4OBdLVoOYWNXmfGUlfp9PV62F3Zxfgqi0wH+7vmXk/l8oMHo4zZa4h+aDn3plNMbC/Iyt3l5dfcmPXtd7Gg5c+pL3p2lSWbE5phaO0Mry+4kwrP3JhyJrDj7JVF6beRWT/qBMOOQJBbeSUC3EvuN5q3OQvFTP+hRg7z9IjuM9cm++1U26YMOrZE7/yw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	lOM+bUGb4/0fPu9dpAuXbZp6ZyL0Rzq9tsiORrnyyXYsDPrn1S2OwLVbW7pfXX/nHLOmRMj+TzKYMytsr/8YQ3vetdvY+J/YMbdgzFCv7OJClx/2sr1s8ykABkSRjaPqiO5rAoGqFXaxuczKdyzjYnfernLQClmyQfLwNmblGlRC90t2UgHpXW4pcm1e3XH4T93bLensIUIiNVdOWaJRbVAMV7hl/7T90RqeSC88616i4tAtCdrTHC0hQ+kD0uHwI80jOmYHmxMgK5cxc1CAId21GdpeqdY+5ZeAnuErG6ppefIjrYFBzFsf8snWfgjaVkwAPr+Qr3pbOWKRmlK3OD2dpV6P/0s0uX0ZDjdv8L0m6LHI7RUa32UZ+ZiDEWy/GObGUPj31Ntm/N0JRfPZUy7A2SZpilFiRkefG7DTZcQPQNY9/08xyKA3+IG8LlxMuodvHFtm7NnoQBDsDZzcAsv0a0lrQagb0EoGwfIwuyEONYJCs5C0Upz2de34PZooXLyTiMGvcA1/+V3qIK7gT6/AwJoY+6oBcu7XRJXkBPvgGqW02TjMNfkrD1Isg6qdfeMQbh0iY0C8d2mLDULP+jgPZsgiYsHPXa6FqgOP+lMJPR5YXeZYWQ3wxgd+3n0N
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1fdffd1-faaf-4273-36e3-08df2bdba8c1
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2026 23:17:33.9953
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KA9mzRv1OwDf219UJLhat5etrm31ev9uy7N2JiIfql1MPOIrXsAtBsyw9n36INFX2HxS5l1nkAm0vF2Qyv7FeQIATNO83a9ZY5Ryy6/zDxs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR04MB6404
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PSgvCgD3YQl46NJq+Fg1AQ--.37596S2
+X-Coremail-Antispam: 1Uf129KBjvAXoW3Zr4UWw43KFW5XFWfCr4kWFg_yoW8Wr1UZo
+	WxJFsxW3WrG345Gryvk345t3WY93WDWrn3Ar4rWFs8X39xuw1Yq3W3Gr15X3W7JFWYqFWS
+	y3savr1Iqrs3tayrn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUSs2-DUUUU
+Sender: chenhongfeng0212@163.com
+X-CM-SenderInfo: hfkh0xxrqjwvtqjqjiqs6rljoofrz/xtbC7RmnwGrS6HkjsgAA3r
 
-On Oct 16, 2026 / 09:22, shinichiro.kawasaki@wdc.com wrote:
-> Dear patch submitter,
-> 
-> Blktests CI has tested the following submission:
-> Status:     FAILURE
-> Name:       [v2] lib/sbitmap: add KUnit test suite
-> Patchwork:  https://patchwork.kernel.org/series/1187055/&state=*
-> Run record: https://github.com/linux-blktests/linux-block/actions/runs/38868812396
-> 
-> 
-> Failed test cases: block/017
+From: Hongfeng Chen <hongfengchen@xiaomi.com>
 
-Please ignore this failure report. I took a look in the test case, but it has no
-relation with the patch. The test case measures null_blk I/O performance to
-judge pass/fail, and when an exceptional number is measured, the test case can
-report false-positive failure, probably. Sorry for the noise.
+pages_stored, compr_data_size, same_pages, huge_pages and notify_free are
+updated on every page that zram stores or releases. When several processes
+munmap() swapped out memory at the same time, all cpus update these
+counters, and the cacheline that holds them bounces between cpus.
+
+Move the five counters into a per cpu structure and update them through
+zram_pcpu_add(), which disables preemption and adds to the value of the
+current cpu. All writers run in process context, so disabling preemption is
+enough. The store is WRITE_ONCE() and the remote reads are READ_ONCE(),
+since a reader on another cpu can see the value at any time. A sysfs read
+sums the per cpu values without a snapshot across cpus, so a sum can be
+briefly negative and is clamped at zero.
+
+slot_free() and the write, recompression and writeback paths update all of
+their counters while preemption is disabled once. Disabling preemption and
+finding the per cpu data has a cost, and this way it is paid once per slot
+instead of once per counter.
+
+u64_stats_sync keeps 64-bit reads from tearing on 32-bit systems and is
+empty on 64-bit systems.
+
+Signed-off-by: Hongfeng Chen <hongfengchen@xiaomi.com>
+---
+ drivers/block/zram/zram_drv.c | 171 ++++++++++++++++++++++++++++------
+ drivers/block/zram/zram_drv.h |  16 +++-
+ 2 files changed, 155 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 024402438bd1..affe758a9543 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -488,6 +488,56 @@ static ssize_t idle_store(struct device *dev, struct device_attribute *attr,
+ 	return len;
+ }
+ 
++struct zram_stats_sum {
++	s64 pages_stored;
++	s64 compr_data_size;
++	s64 same_pages;
++	s64 huge_pages;
++	u64 notify_free;
++};
++
++#define zram_pcpu_add(zram_dev, field, val)					\
++do {									\
++	struct zram *__zram = (zram_dev);				\
++	struct zram_pcpu_stats *__stats;				\
++									\
++	__stats = get_cpu_ptr(__zram->pcpu_stats);			\
++	u64_stats_update_begin(&__stats->syncp);			\
++	WRITE_ONCE(__stats->field, __stats->field + (val));		\
++	u64_stats_update_end(&__stats->syncp);			\
++	put_cpu_ptr(__zram->pcpu_stats);				\
++} while (0)
++
++static void zram_pcpu_sum(struct zram *zram, struct zram_stats_sum *sum)
++{
++	int cpu;
++
++	memset(sum, 0, sizeof(*sum));
++
++	for_each_possible_cpu(cpu) {
++		struct zram_pcpu_stats *stats;
++		unsigned int start;
++		s64 pages, bytes, same, huge;
++		u64 notify;
++
++		stats = per_cpu_ptr(zram->pcpu_stats, cpu);
++		do {
++			start = u64_stats_fetch_begin(&stats->syncp);
++			pages = READ_ONCE(stats->pages_stored);
++			bytes = READ_ONCE(stats->compr_data_size);
++			same = READ_ONCE(stats->same_pages);
++			huge = READ_ONCE(stats->huge_pages);
++			notify = READ_ONCE(stats->notify_free);
++		} while (u64_stats_fetch_retry(&stats->syncp, start));
++
++		sum->pages_stored += pages;
++		sum->compr_data_size += bytes;
++		sum->same_pages += same;
++		sum->huge_pages += huge;
++		sum->notify_free += notify;
++	}
++}
++
+ #ifdef CONFIG_ZRAM_WRITEBACK
+ #define INVALID_BDEV_BLOCK		(~0UL)
+ 
+@@ -919,6 +969,8 @@ static void zram_account_writeback_submit(struct zram *zram)
+ static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
+ {
+ 	unsigned long index = req->pps->index;
++	struct zram_pcpu_stats *stats;
++	s64 huge, size;
+ 	int err;
+ 
+ 	err = blk_status_to_errno(req->bio.bi_status);
+@@ -947,9 +999,14 @@ static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
+ 	}
+ 
+ 	clear_slot_flag(zram, index, ZRAM_IDLE);
+-	if (test_slot_flag(zram, index, ZRAM_HUGE))
+-		atomic64_dec(&zram->stats.huge_pages);
+-	atomic64_sub(get_slot_size(zram, index), &zram->stats.compr_data_size);
++	huge = test_slot_flag(zram, index, ZRAM_HUGE) ? -1 : 0;
++	size = get_slot_size(zram, index);
++	stats = get_cpu_ptr(zram->pcpu_stats);
++	u64_stats_update_begin(&stats->syncp);
++	WRITE_ONCE(stats->huge_pages, stats->huge_pages + huge);
++	WRITE_ONCE(stats->compr_data_size, stats->compr_data_size - size);
++	u64_stats_update_end(&stats->syncp);
++	put_cpu_ptr(zram->pcpu_stats);
+ 	zs_free(zram->mem_pool, get_slot_handle(zram, index));
+ 	set_slot_handle(zram, index, req->blk_idx);
+ 	set_slot_flag(zram, index, ZRAM_WB);
+@@ -1919,14 +1976,16 @@ static ssize_t io_stat_show(struct device *dev, struct device_attribute *attr,
+ 			    char *buf)
+ {
+ 	struct zram *zram = dev_to_zram(dev);
++	struct zram_stats_sum sum;
+ 	ssize_t ret;
+ 
+ 	guard(rwsem_read)(&zram->dev_lock);
++	zram_pcpu_sum(zram, &sum);
+ 	ret = sysfs_emit(buf,
+ 			"%8llu %8llu 0 %8llu\n",
+ 			(u64)atomic64_read(&zram->stats.failed_reads),
+ 			(u64)atomic64_read(&zram->stats.failed_writes),
+-			(u64)atomic64_read(&zram->stats.notify_free));
++			sum.notify_free);
+ 
+ 	return ret;
+ }
+@@ -1936,6 +1995,7 @@ static ssize_t mm_stat_show(struct device *dev, struct device_attribute *attr,
+ {
+ 	struct zram *zram = dev_to_zram(dev);
+ 	struct zs_pool_stats pool_stats;
++	struct zram_stats_sum sum;
+ 	u64 orig_size, mem_used = 0;
+ 	long max_used;
+ 	ssize_t ret;
+@@ -1948,19 +2008,20 @@ static ssize_t mm_stat_show(struct device *dev, struct device_attribute *attr,
+ 		zs_pool_stats(zram->mem_pool, &pool_stats);
+ 	}
+ 
+-	orig_size = atomic64_read(&zram->stats.pages_stored);
++	zram_pcpu_sum(zram, &sum);
++	orig_size = max_t(s64, sum.pages_stored, 0);
+ 	max_used = atomic_long_read(&zram->stats.max_used_pages);
+ 
+ 	ret = sysfs_emit(buf,
+ 			"%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
+ 			orig_size << PAGE_SHIFT,
+-			(u64)atomic64_read(&zram->stats.compr_data_size),
++			(u64)max_t(s64, sum.compr_data_size, 0),
+ 			mem_used << PAGE_SHIFT,
+ 			zram->limit_pages << PAGE_SHIFT,
+ 			max_used << PAGE_SHIFT,
+-			(u64)atomic64_read(&zram->stats.same_pages),
++			(u64)max_t(s64, sum.same_pages, 0),
+ 			atomic_long_read(&pool_stats.pages_compacted),
+-			(u64)atomic64_read(&zram->stats.huge_pages),
++			(u64)max_t(s64, sum.huge_pages, 0),
+ 			(u64)atomic64_read(&zram->stats.huge_pages_since));
+ 
+ 	return ret;
+@@ -2027,6 +2088,8 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ 
+ static void slot_free(struct zram *zram, unsigned long index)
+ {
++	s64 pages = 0, bytes = 0, same = 0, huge = 0;
++	struct zram_pcpu_stats *stats;
+ 	unsigned long handle;
+ 
+ #ifdef CONFIG_ZRAM_TRACK_ENTRY_ACTIME
+@@ -2044,7 +2107,7 @@ static void slot_free(struct zram *zram, unsigned long index)
+ 		 * ZRAM_HUGE flag for deferred decompression path.
+ 		 */
+ 		if (!test_slot_flag(zram, index, ZRAM_WB))
+-			atomic64_dec(&zram->stats.huge_pages);
++			huge = -1;
+ 		clear_slot_flag(zram, index, ZRAM_HUGE);
+ 	}
+ 
+@@ -2060,22 +2123,32 @@ static void slot_free(struct zram *zram, unsigned long index)
+ 	 */
+ 	if (test_slot_flag(zram, index, ZRAM_SAME)) {
+ 		clear_slot_flag(zram, index, ZRAM_SAME);
+-		atomic64_dec(&zram->stats.same_pages);
++		same = -1;
+ 		goto out;
+ 	}
+ 
+ 	handle = get_slot_handle(zram, index);
+ 	if (!handle)
+-		return;
++		goto stats;
+ 
+ 	zs_free(zram->mem_pool, handle);
+ 
+-	atomic64_sub(get_slot_size(zram, index),
+-		     &zram->stats.compr_data_size);
++	bytes = -(s64)get_slot_size(zram, index);
+ out:
+-	atomic64_dec(&zram->stats.pages_stored);
++	pages = -1;
+ 	set_slot_handle(zram, index, 0);
+ 	set_slot_size(zram, index, 0);
++stats:
++	if (!(pages | bytes | same | huge))
++		return;
++	stats = get_cpu_ptr(zram->pcpu_stats);
++	u64_stats_update_begin(&stats->syncp);
++	WRITE_ONCE(stats->pages_stored, stats->pages_stored + pages);
++	WRITE_ONCE(stats->compr_data_size, stats->compr_data_size + bytes);
++	WRITE_ONCE(stats->same_pages, stats->same_pages + same);
++	WRITE_ONCE(stats->huge_pages, stats->huge_pages + huge);
++	u64_stats_update_end(&stats->syncp);
++	put_cpu_ptr(zram->pcpu_stats);
+ }
+ 
+ static int read_same_filled_page(struct zram *zram, struct page *page,
+@@ -2237,14 +2310,20 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+ static int write_same_filled_page(struct zram *zram, unsigned long fill,
+ 				  unsigned long index)
+ {
++	struct zram_pcpu_stats *stats;
++
+ 	slot_lock(zram, index);
+ 	slot_free(zram, index);
+ 	set_slot_flag(zram, index, ZRAM_SAME);
+ 	set_slot_handle(zram, index, fill);
+ 	slot_unlock(zram, index);
+ 
+-	atomic64_inc(&zram->stats.same_pages);
+-	atomic64_inc(&zram->stats.pages_stored);
++	stats = get_cpu_ptr(zram->pcpu_stats);
++	u64_stats_update_begin(&stats->syncp);
++	WRITE_ONCE(stats->same_pages, stats->same_pages + 1);
++	WRITE_ONCE(stats->pages_stored, stats->pages_stored + 1);
++	u64_stats_update_end(&stats->syncp);
++	put_cpu_ptr(zram->pcpu_stats);
+ 
+ 	return 0;
+ }
+@@ -2252,6 +2331,7 @@ static int write_same_filled_page(struct zram *zram, unsigned long fill,
+ static int write_incompressible_page(struct zram *zram, struct page *page,
+ 				     unsigned long index)
+ {
++	struct zram_pcpu_stats *stats;
+ 	unsigned long handle;
+ 	void *src;
+ 
+@@ -2282,10 +2362,14 @@ static int write_incompressible_page(struct zram *zram, struct page *page,
+ 	set_slot_size(zram, index, PAGE_SIZE);
+ 	slot_unlock(zram, index);
+ 
+-	atomic64_add(PAGE_SIZE, &zram->stats.compr_data_size);
+-	atomic64_inc(&zram->stats.huge_pages);
++	stats = get_cpu_ptr(zram->pcpu_stats);
++	u64_stats_update_begin(&stats->syncp);
++	WRITE_ONCE(stats->compr_data_size, stats->compr_data_size + PAGE_SIZE);
++	WRITE_ONCE(stats->huge_pages, stats->huge_pages + 1);
++	WRITE_ONCE(stats->pages_stored, stats->pages_stored + 1);
++	u64_stats_update_end(&stats->syncp);
++	put_cpu_ptr(zram->pcpu_stats);
+ 	atomic64_inc(&zram->stats.huge_pages_since);
+-	atomic64_inc(&zram->stats.pages_stored);
+ 
+ 	return 0;
+ }
+@@ -2293,6 +2377,7 @@ static int write_incompressible_page(struct zram *zram, struct page *page,
+ static int zram_write_page(struct zram *zram, struct page *page,
+ 			   unsigned long index)
+ {
++	struct zram_pcpu_stats *stats;
+ 	int ret = 0;
+ 	unsigned long handle;
+ 	unsigned int comp_len;
+@@ -2348,8 +2433,12 @@ static int zram_write_page(struct zram *zram, struct page *page,
+ 	slot_unlock(zram, index);
+ 
+ 	/* Update stats */
+-	atomic64_inc(&zram->stats.pages_stored);
+-	atomic64_add(comp_len, &zram->stats.compr_data_size);
++	stats = get_cpu_ptr(zram->pcpu_stats);
++	u64_stats_update_begin(&stats->syncp);
++	WRITE_ONCE(stats->pages_stored, stats->pages_stored + 1);
++	WRITE_ONCE(stats->compr_data_size, stats->compr_data_size + comp_len);
++	u64_stats_update_end(&stats->syncp);
++	put_cpu_ptr(zram->pcpu_stats);
+ 
+ 	return ret;
+ }
+@@ -2449,6 +2538,7 @@ static int recompress_slot(struct zram *zram, unsigned long index,
+ 			   u32 threshold, u32 prio)
+ {
+ 	struct zcomp_strm *zstrm = NULL;
++	struct zram_pcpu_stats *stats;
+ 	unsigned long handle_old;
+ 	unsigned long handle_new;
+ 	unsigned int comp_len_old;
+@@ -2545,8 +2635,12 @@ static int recompress_slot(struct zram *zram, unsigned long index,
+ 	set_slot_size(zram, index, comp_len_new);
+ 	set_slot_comp_priority(zram, index, prio);
+ 
+-	atomic64_add(comp_len_new, &zram->stats.compr_data_size);
+-	atomic64_inc(&zram->stats.pages_stored);
++	stats = get_cpu_ptr(zram->pcpu_stats);
++	u64_stats_update_begin(&stats->syncp);
++	WRITE_ONCE(stats->compr_data_size, stats->compr_data_size + comp_len_new);
++	WRITE_ONCE(stats->pages_stored, stats->pages_stored + 1);
++	u64_stats_update_end(&stats->syncp);
++	put_cpu_ptr(zram->pcpu_stats);
+ 
+ 	return 0;
+ }
+@@ -2724,7 +2818,7 @@ static void zram_bio_discard(struct zram *zram, struct bio *bio)
+ 		slot_lock(zram, index);
+ 		slot_free(zram, index);
+ 		slot_unlock(zram, index);
+-		atomic64_inc(&zram->stats.notify_free);
++		zram_pcpu_add(zram, notify_free, 1);
+ 		index++;
+ 		n -= PAGE_SIZE;
+ 	}
+@@ -2825,7 +2919,7 @@ static void zram_slot_free_notify(struct block_device *bdev,
+ 
+ 	zram = bdev->bd_disk->private_data;
+ 
+-	atomic64_inc(&zram->stats.notify_free);
++	zram_pcpu_add(zram, notify_free, 1);
+ 	if (!slot_trylock(zram, index)) {
+ 		atomic64_inc(&zram->stats.miss_free);
+ 		return;
+@@ -2866,6 +2960,8 @@ static void zram_destroy_comps(struct zram *zram)
+ 
+ static void zram_reset_device(struct zram *zram)
+ {
++	int cpu;
++
+ 	guard(rwsem_write)(&zram->dev_lock);
+ 
+ 	zram->limit_pages = 0;
+@@ -2877,6 +2973,16 @@ static void zram_reset_device(struct zram *zram)
+ 	zram_meta_free(zram, zram->disksize);
+ 	zram->disksize = 0;
+ 	zram_destroy_comps(zram);
++	for_each_possible_cpu(cpu) {
++		struct zram_pcpu_stats *stats;
++
++		stats = per_cpu_ptr(zram->pcpu_stats, cpu);
++		stats->pages_stored = 0;
++		stats->compr_data_size = 0;
++		stats->same_pages = 0;
++		stats->huge_pages = 0;
++		stats->notify_free = 0;
++	}
+ 	memset(&zram->stats, 0, sizeof(zram->stats));
+ 	reset_bdev(zram);
+ }
+@@ -3083,15 +3189,23 @@ static int zram_add(void)
+ 						  BLK_FEAT_SYNCHRONOUS,
+ 	};
+ 	struct zram *zram;
+-	int ret, device_id;
++	int cpu, ret, device_id;
+ 
+ 	zram = kzalloc_obj(struct zram);
+ 	if (!zram)
+ 		return -ENOMEM;
+ 
++	zram->pcpu_stats = alloc_percpu(struct zram_pcpu_stats);
++	if (!zram->pcpu_stats) {
++		ret = -ENOMEM;
++		goto out_free_dev;
++	}
++	for_each_possible_cpu(cpu)
++		u64_stats_init(&per_cpu_ptr(zram->pcpu_stats, cpu)->syncp);
++
+ 	ret = idr_alloc(&zram_index_idr, zram, 0, 0, GFP_KERNEL);
+ 	if (ret < 0)
+-		goto out_free_dev;
++		goto out_free_pcpu;
+ 	device_id = ret;
+ 
+ 	init_rwsem(&zram->dev_lock);
+@@ -3133,6 +3247,8 @@ static int zram_add(void)
+ 	put_disk(zram->disk);
+ out_free_idr:
+ 	idr_remove(&zram_index_idr, device_id);
++out_free_pcpu:
++	free_percpu(zram->pcpu_stats);
+ out_free_dev:
+ 	kfree(zram);
+ 	return ret;
+@@ -3182,6 +3298,7 @@ static int zram_remove(struct zram *zram)
+ 	zram_reset_device(zram);
+ 
+ 	put_disk(zram->disk);
++	free_percpu(zram->pcpu_stats);
+ 	kfree(zram);
+ 	return 0;
+ }
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index 7a55d751417e..482e1c28ca1c 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -17,6 +17,7 @@
+ 
+ #include <asm/byteorder.h>
+ #include <linux/rwsem.h>
++#include <linux/u64_stats_sync.h>
+ #include <linux/zsmalloc.h>
+ 
+ #include "zcomp.h"
+@@ -90,15 +91,19 @@ struct zram_table_entry {
+ 	};
+ };
+ 
++struct zram_pcpu_stats {
++	struct u64_stats_sync syncp;
++	s64 pages_stored;	/* no. of pages currently stored */
++	s64 compr_data_size;	/* compressed size of pages stored */
++	s64 same_pages;		/* no. of same element filled pages */
++	s64 huge_pages;		/* no. of huge pages */
++	u64 notify_free;	/* no. of swap slot free notifications */
++};
++
+ struct zram_stats {
+-	atomic64_t compr_data_size;	/* compressed size of pages stored */
+ 	atomic64_t failed_reads;	/* can happen when memory is too low */
+ 	atomic64_t failed_writes;	/* can happen when memory is too low */
+-	atomic64_t notify_free;	/* no. of swap slot free notifications */
+-	atomic64_t same_pages;		/* no. of same element filled pages */
+-	atomic64_t huge_pages;		/* no. of huge pages */
+ 	atomic64_t huge_pages_since;	/* no. of huge pages since zram set up */
+-	atomic64_t pages_stored;	/* no. of pages currently stored */
+ 	atomic_long_t max_used_pages;	/* no. of maximum pages stored */
+ 	atomic64_t miss_free;		/* no. of missed free */
+ #ifdef	CONFIG_ZRAM_WRITEBACK
+@@ -134,6 +139,7 @@ struct zram {
+ 	unsigned long limit_pages;
+ 
+ 	struct zram_stats stats;
++	struct zram_pcpu_stats __percpu *pcpu_stats;
+ 	/*
+ 	 * This is the limit on amount of *uncompressed* worth of data
+ 	 * we can store in a disk.
+-- 
+2.54.0
+
