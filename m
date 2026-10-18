@@ -1,78 +1,70 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476F63DDDBE
-	for <linux-block@vger.kernel.org>; Sun, 18 Oct 2026 03:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7A63B9D9F
+	for <linux-block@vger.kernel.org>; Sun, 18 Oct 2026 07:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792295549; cv=none; b=sfEMABnrvb0x+kEuy/bIwshQi7sUdqXQVJcJD+NRDPMVr4UhszJbqs3gxIaF3kCRuCP//+iAaxe5R+wzIidZ3aqVnlogZiva2YsRBhs0F83o70tWs9YMJ82MzBpwS9ysAH7xA71/W6WuTAWOBnWHOWbLB1gFoaScmYib9ldEWgc=
+	t=1792307803; cv=none; b=M+eRRbfUHYeS2uvZslXbePtDOndYfk4dQ0p11EOWLn5TS8GPU29voH/vtDeq6zeO/q0shVG4CoKOS7w0U1MUOWv/gVhVgLOEsCweM16fZbmhugecfK1RoJu8WtIviYzcoOLl8vv5Lq+IcDkiAp0OQ9ewHZXgtzOuriI+9tO9Pcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792295549; c=relaxed/simple;
-	bh=IMwXcOIFbaTba9duylEhRaH0+iChQsLlcede3lTgSF0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uX5EkXGHL9kFarNHtdQJ1NCa1fQilRRn8bAtucxwBTU29AUs/+R8+bR01krW/cXHqdEMsvwg9HQk8Ejcdv13V/1OGoeN5sL+0h7Y6bkuKqc3k37EE1rzLW33yW3FqjXiBhi9KaEOyBuvMMcIdDZ1fNtxhXWyLYH8pMc8Zu3jv9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=kep02YzY; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1792307803; c=relaxed/simple;
+	bh=nvVFUq/61qzab7zOKRtEl9kkbUwupZvr5gTkYS91nQs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iQ7EReND4aqiFHSrasBRD4mUPhKyIX/R5VcpRztQPu3poE/XIqPJJP9eSkg+ph4Ti56Bn2ERBlybjo59rqtsq+It4WGvF7Tgf+5hjVzLl4lye2jbnXDcaTNdhVWB72sS4SmTj7ZJB5y28ikSWFfIij3JM0X/nofOua2784BA43g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aj1iBFTd; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kep02YzY"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2e5fb79ce82so5001095ad.0
-        for <linux-block@vger.kernel.org>; Sat, 17 Oct 2026 20:52:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aj1iBFTd"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2e8fe8e343fso4752905ad.2
+        for <linux-block@vger.kernel.org>; Sun, 18 Oct 2026 00:16:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792295547; x=1792900347; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=M55JStFe4+ywWFb/Lnl0qjUNokQckie0nywOU4qhi9c=;
-        b=kep02YzYJO0Cd30vCzdL3FrJ048+oBE8NvG3qtNe+AuxVmxSNoSaE8iCHDqGg2rCvS
-         ciNiJyQ781cIYscihRYlgt1RHc0IxPjnJLgDrrhxMOLanQh6hDswIM565k2bDoHIgOeW
-         Q9/KPeSmvl9p+CI3c7DMf2CbieNqRi3WorPH4=
+        d=gmail.com; s=20251104; t=1792307801; x=1792912601; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=fm+8hE4os7LvlJdHIvQMczxhBtCibQ83SWWXxfbxmcs=;
+        b=aj1iBFTdSwsKANMPlPG0PyzmeE6Ym+3QmMHp6nleL2ctUTQRbK74jj5m10EtAbJ+zq
+         eoSnHTpaN6nVF/4VnLnAXBZGyZXA8pioglIEAf9F8oTJ1u1okkUlrQIFSMuchJVfZpRt
+         ifew6+ncepgYjCwaUwxh5n3EPpFr7KfC3LJn5APhmwoSBmkUQs3QtINEtpa4KsLp7Ph+
+         19mG1q22g4biYJliI1Hx3A76MVUB+UAJEyiajSHp8qWrDSDf9bDAIYMyPLZxib90sRKz
+         oQbszV5t/ydq43kYtJErGC8+RKUkDYmtDmLx+VuQ4mKnIHsWS/il/50mB90fsN0zoVjQ
+         817w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792295547; x=1792900347;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=M55JStFe4+ywWFb/Lnl0qjUNokQckie0nywOU4qhi9c=;
-        b=yiM6sefHr548hd/hDFM8yeSYDGNn1l9dC0Rb/oPvtwOf6pueAkM4ZIKj0PE5i/d0Xk
-         R/JFsaZvNVbB6k4oGC4lDQ5ARvMF5Fx0UNU2TII3UlddpIVpIl9GOqorn8707YMAlcJ1
-         ySW77C91osSPV6cHBvv4/TO3gx/8ZNO5VZulSOivzJYEsjNSCcbyHKOKvFQ7lcX6r9hh
-         8WNupoOj9wdm9ClTQVu5sy7j/ktU1y1GziMK5nxk0klyrC/qoUFo3pBpmvR5494dClig
-         iNu5WBp9VA3PoXDzjwRpI3PrwMN4RKghSSIKA6Y+FWoecL649uHwpLPSG54HkBgFAyk5
-         AG9w==
-X-Forwarded-Encrypted: i=1; AKwUvBxDHO3UKGS8GJy1AwF/Sl/rKeYw9RO+AwVZlnYKGYFOmssM477YrrYZdvQ9FBg/S+MRV9Cxzs0HmCZB6A==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ2uZau4IODhWYMRBmQ0iECtBdxzsa/02LSnXHceWZsbHiUjd8u
-	X58EmxuFBs+rWelUrxzmCCkRrfXFvS301y8h9k9IKw7KRSCZQaEhof67QsJRc9+X2Q==
-X-Gm-Gg: AYBFou3kxI5/CD1dpD0F7hnDU/BzSrszdqiTuUVC07C/JMMZmefmx4jCsXdohF3/BCz
-	jeJuvTCgSkAhJJJrgvi9+fzjKFQ1IrfoHQixx38IQbPSo8OUaHCtXaxtXUcNld4c2psXqQrDVDO
-	i9M1TpJPsVUckCtIwL2so6VYjxFmvcyOoS464+As+zZuVLN7KSAxL0T474XBiD8nP304SznkPYf
-	KoJ1xp6mQVcerz93QlKxjfhXUROP1WzxKyshXnMoYXdyESdmBuhqVYEV4YUeBjnhtIcM7sIx6/x
-	9VSSlptECY3Ir1xMsjJXzPTIs4cD2iXk3OeEp43fpk9tjPT1mhZA7Ouu2KLdyKbUxcOwYu+BlOw
-	YmRcDr6UFNnXQ0MA0Bi52+vXe6+duXT9UzJuiuCXmIi7GMYy9ui02ex58146VK0Lpjzeg5AHNNg
-	02gs8rzI1bZr5Amet6a31E+ssDcOUVF+wssWTDCDiAAjpJ7VLnBXt2/lb1OIGpj9fM0h2jYPdml
-	WTqXo29mAnNLV/BwS8Gjos6GyLLkX2j77kr1RgE8MU185ARWNHE2NeqbN0nQ4c=
-X-Received: by 2002:a17:90b:28ce:b0:3ac:d17c:2a70 with SMTP id 98e67ed59e1d1-3acef5dcc7dmr3685875a91.62.1792295546657;
-        Sat, 17 Oct 2026 20:52:26 -0700 (PDT)
-Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:4569:b311:f3ea:5f8d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ad25d5d1b4sm253024a91.16.2026.10.17.20.52.20
+        d=1e100.net; s=20260707; t=1792307801; x=1792912601;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=fm+8hE4os7LvlJdHIvQMczxhBtCibQ83SWWXxfbxmcs=;
+        b=waVOMPPKsiEtn3wkaDNrcnpsxZDR3kPvt/Ds1dC63Bn+oqS0g0k5zdQeU/Ys6njByl
+         rv+hFj6WakC3OrqsCRv9WkPCrWAtZHr2HXfjSrksZ5aD4/yF6DjPJHY2Tl+wPKu+XNtg
+         W6POnzOwSaN8+1bfN8UI4qrHJOhAHPJa9SXdIVH+2DlPra07LNfJSrWDTZoYEf3vmWP1
+         pto0HmOBflU/VSUOjhaInOZUUZ/l+MzHwodZ0h5wPEypAS2ax2Z5UUHpkPhKx8mUxwPq
+         kU1ATeYl4PTK6kiBNnLBkqmLjR7XDGGfwyLmxJqyHs+LO8fxTq2oZ/Rx/MTepj4/Vrvx
+         QYoA==
+X-Gm-Message-State: AFq9FYJv+zBp6XpZze2sDYKHCs2rf3yDDGlpbT5c5FF5KgzBKqXAG+qt
+	i44ZQfjJN7aNxYn81Wk+OlfNrUs5EDlg7xHqlPQoICPkEPY18JIvUGse
+X-Gm-Gg: AYBFou3UgKrfrrfgXBlaIumC8hUug9Zif1CKSNrCfHxNt7D4vaDSr8isM4a8zb5o7mf
+	DcgxhNHykaeWBDtFmwc34XNwz3yU5w1QagW4e4bz5fnSfWcAzVQ/xIMPE5c9Y0f6tM4YCxaGv3e
+	k4O+x0To5lcwPpXr1c7Do970yC3xpI9A5/L0GZNK3nsdk/XH63Eplx6xSTzXSlVnZKy832vd7JF
+	B6N0x5mNLGW+nFWXRs2RuS+1DiUuULsGaLuoYMkgMHK/KV99IwsmkYgQlZ/MNG5eJUkTeUH6GXx
+	qzrNrKqDxFwSqIiL2RK5YE7oziUUMjZQ1N4qhHg9stjl/LvipKQA/URkczdN1eLQ9/CYVZS8upg
+	sGu5c68nqUhD70iQjJy6ZNurhmxg7k8XyPHkR6pE7BAHIsVr1aZVXxinIQsGn8CKQ8PvUgdijR8
+	hUeYf+IW3BNR6Ru91RHDqCj8qLeGbj2d37Z7AgTcl0GyViXt0v0YIYoGc56Rzk8eTRXIGA0g==
+X-Received: by 2002:a17:902:ce11:b0:2e2:e24e:a88a with SMTP id d9443c01a7336-2e9a68d91bfmr36318835ad.22.1792307801324;
+        Sun, 18 Oct 2026 00:16:41 -0700 (PDT)
+Received: from thangnn-ASUS.. ([2a09:bac1:7ac0:50::3d0:3f])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e97e835063sm26509325ad.33.2026.10.18.00.16.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 17 Oct 2026 20:52:24 -0700 (PDT)
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Brian Geffon <bgeffon@google.com>,
-	Barry Song <baohua@kernel.org>,
-	Bo Zhang <zhangbo0325@gmail.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Richard Chang <richardycc@google.com>,
+        Sun, 18 Oct 2026 00:16:40 -0700 (PDT)
+From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH v5 13/13] zram: use a singleton compression context for recompression
-Date: Sun, 18 Oct 2026 12:51:15 +0900
-Message-ID: <20261018035125.3120704-14-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
-In-Reply-To: <20261018035125.3120704-1-senozhatsky@chromium.org>
-References: <20261018035125.3120704-1-senozhatsky@chromium.org>
+	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>,
+	syzbot+feeb9b5352b9ff89618a@syzkaller.appspotmail.com
+Subject: [PATCH] block: annotate lockless task ioprio accesses
+Date: Sun, 18 Oct 2026 14:16:36 +0700
+Message-ID: <20261018071636.79198-1-ngocthang2710.1999@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -81,248 +73,75 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Secondary compressors are only used by recompress_store(), which is
-serialized under zram->dev_lock, so we only ever use one secondary
-compressor at a time, yet we still allocate them on each CPU, which is
-just a plain memory wastage.  However, we do need per-CPU decompressors
-in order to support concurrent reads.
+__get_task_ioprio() reads task->io_context and ioc->ioprio without
+task_lock() when called on current, e.g. from init_sync_kiocb() on every
+write.  set_task_ioprio() can update both for another task at any time,
+including the first publication of a new io_context.  KCSAN reports it:
 
-Now that Read and Write contexts are split, we can allocate just a
-single compression stream (recomp_cstream) for secondary algorithms
-instead of per-CPU streams, avoiding unused per-CPU compression
-contexts and 2 * PAGE_SIZE buffers.
+  BUG: KCSAN: data-race in __kernel_write_iter / set_task_ioprio
+  value changed: 0x0000000000000000 -> 0xffff888109813730
 
-For example, on an 8-CPU x86_64 system (4K PAGE_SIZE), this saves:
-- zstd (level 3, default):        ~700 KB (~100 KB/CPU)
-- zstd (levels 12-22, no dict):   ~1.91 MB (~280 KB/CPU)
-- zstd (levels 14-22, 110K dict): ~5.33 MB (~780 KB/CPU, lazy)
-- deflate (winbits=-11, default): ~1.04 MB (~152 KB/CPU)
-- deflate (winbits=15):           ~1.86 MB (~272 KB/CPU)
-- lz4hc:                          ~1.84 MB (~269 KB/CPU)
+A stale or torn value is harmless, a task simply gets the old or new
+priority, but the compiler may tear or refetch the accesses and the
+io_context fields must be visible before the pointer is.
 
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Publish the pointer with smp_store_release(), read it with READ_ONCE()
+(address dependency orders the ioprio load), and mark the ioprio
+accesses.
+
+Reported-by: syzbot+feeb9b5352b9ff89618a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=feeb9b5352b9ff89618a
+Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
 ---
- drivers/block/zram/zcomp.c    | 75 ++++++++++++++++++++++++++---------
- drivers/block/zram/zcomp.h    |  9 +++--
- drivers/block/zram/zram_drv.c |  5 ++-
- 3 files changed, 65 insertions(+), 24 deletions(-)
+Tested with a KCSAN kernel in QEMU. syzbot's coredump repro is too slow to hit
+the window, so a thread loops pwrite() on a tmpfs file while the main thread
+does the first ioprio_set() on its tid (~35k iterations per run). Same pair,
+same "0 -> pointer" value change: 26 reports per run before, 0 in two runs
+after. No Fixes: tag, the history I have is grafted.
+ block/blk-ioc.c        | 5 +++--
+ include/linux/ioprio.h | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index c6d2fd23c6f6..ce94dd96cc98 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -151,6 +151,11 @@ ssize_t zcomp_available_show(const char *comp, char *buf, ssize_t at)
- 
- struct zcomp_cstrm *zcomp_cstrm_get(struct zcomp *comp)
- {
-+	if (comp->recomp_cstream) {
-+		mutex_lock(&comp->recomp_cstream->lock);
-+		return comp->recomp_cstream;
-+	}
-+
- 	for (;;) {
- 		struct zcomp_cstrm *zstrm = raw_cpu_ptr(comp->cstream);
- 
-@@ -326,22 +331,25 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_dstrm *zstrm,
- int zcomp_cpu_up_prepare(unsigned int cpu, struct hlist_node *node)
- {
- 	struct zcomp *comp = hlist_entry(node, struct zcomp, node);
--	struct zcomp_cstrm *cstrm;
-+	struct zcomp_cstrm *cstrm = NULL;
- 	struct zcomp_dstrm *dstrm;
- 	int ret;
- 
--	cstrm = per_cpu_ptr(comp->cstream, cpu);
--	ret = zcomp_cstrm_init(comp, cstrm);
--	if (ret) {
--		pr_err("Can't allocate a compression stream\n");
--		return ret;
-+	if (comp->cstream) {
-+		cstrm = per_cpu_ptr(comp->cstream, cpu);
-+		ret = zcomp_cstrm_init(comp, cstrm);
-+		if (ret) {
-+			pr_err("Can't allocate a compression stream\n");
-+			return ret;
-+		}
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index d15918d7fabb..12ddc672f41d 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -277,9 +277,10 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
+ 		if (task->io_context)
+ 			kmem_cache_free(iocontext_cachep, ioc);
+ 		else
+-			task->io_context = ioc;
++			/* Pairs with READ_ONCE() in __get_task_ioprio() */
++			smp_store_release(&task->io_context, ioc);
  	}
- 
- 	dstrm = per_cpu_ptr(comp->dstream, cpu);
- 	ret = zcomp_dstrm_init(comp, dstrm);
- 	if (ret) {
- 		pr_err("Can't allocate a decompression stream\n");
--		zcomp_cstrm_free(comp, cstrm);
-+		if (cstrm)
-+			zcomp_cstrm_free(comp, cstrm);
- 		return ret;
- 	}
- 
-@@ -354,10 +362,12 @@ int zcomp_cpu_dead(unsigned int cpu, struct hlist_node *node)
- 	struct zcomp_cstrm *cstrm;
- 	struct zcomp_dstrm *dstrm;
- 
--	cstrm = per_cpu_ptr(comp->cstream, cpu);
--	mutex_lock(&cstrm->lock);
--	zcomp_cstrm_free(comp, cstrm);
--	mutex_unlock(&cstrm->lock);
-+	if (comp->cstream) {
-+		cstrm = per_cpu_ptr(comp->cstream, cpu);
-+		mutex_lock(&cstrm->lock);
-+		zcomp_cstrm_free(comp, cstrm);
-+		mutex_unlock(&cstrm->lock);
-+	}
- 
- 	dstrm = per_cpu_ptr(comp->dstream, cpu);
- 	down_write(&dstrm->lock);
-@@ -367,7 +377,8 @@ int zcomp_cpu_dead(unsigned int cpu, struct hlist_node *node)
+-	task->io_context->ioprio = ioprio;
++	WRITE_ONCE(task->io_context->ioprio, ioprio);
+ out:
+ 	task_unlock(task);
  	return 0;
- }
- 
--static int zcomp_init(struct zcomp *comp, struct zcomp_params *params)
-+static int zcomp_init(struct zcomp *comp, struct zcomp_params *params,
-+		      bool recomp)
- {
- 	int ret, cpu;
- 
-@@ -376,10 +387,28 @@ static int zcomp_init(struct zcomp *comp, struct zcomp_params *params)
- 	if (ret)
- 		goto cleanup;
- 
--	comp->cstream = alloc_percpu(struct zcomp_cstrm);
--	if (!comp->cstream) {
--		ret = -ENOMEM;
--		goto cleanup;
-+	if (recomp) {
-+		comp->recomp_cstream = kzalloc_obj(*comp->recomp_cstream);
-+		if (!comp->recomp_cstream) {
-+			ret = -ENOMEM;
-+			goto cleanup;
-+		}
-+		mutex_init(&comp->recomp_cstream->lock);
-+		ret = zcomp_cstrm_init(comp, comp->recomp_cstream);
-+		if (ret) {
-+			/* zcomp_cstrm_init() cleans up after itself */
-+			kfree(comp->recomp_cstream);
-+			comp->recomp_cstream = NULL;
-+			goto cleanup;
-+		}
-+	} else {
-+		comp->cstream = alloc_percpu(struct zcomp_cstrm);
-+		if (!comp->cstream) {
-+			ret = -ENOMEM;
-+			goto cleanup;
-+		}
-+		for_each_possible_cpu(cpu)
-+			mutex_init(&per_cpu_ptr(comp->cstream, cpu)->lock);
- 	}
- 
- 	comp->dstream = alloc_percpu(struct zcomp_dstrm);
-@@ -393,7 +422,6 @@ static int zcomp_init(struct zcomp *comp, struct zcomp_params *params)
- 	for_each_possible_cpu(cpu) {
- 		struct zcomp_dstrm *zstrm = per_cpu_ptr(comp->dstream, cpu);
- 
--		mutex_init(&per_cpu_ptr(comp->cstream, cpu)->lock);
- 		init_rwsem(&zstrm->lock);
- 		mutex_init(&zstrm->excl_lock);
- 	}
-@@ -405,6 +433,10 @@ static int zcomp_init(struct zcomp *comp, struct zcomp_params *params)
- 	return 0;
- 
- cleanup:
-+	if (comp->recomp_cstream) {
-+		zcomp_cstrm_free(comp, comp->recomp_cstream);
-+		kfree(comp->recomp_cstream);
-+	}
- 	comp->ops->release_params(comp->params);
- 	free_percpu(comp->dstream);
- 	free_percpu(comp->cstream);
-@@ -414,13 +446,18 @@ static int zcomp_init(struct zcomp *comp, struct zcomp_params *params)
- void zcomp_destroy(struct zcomp *comp)
- {
- 	cpuhp_state_remove_instance(CPUHP_ZCOMP_PREPARE, &comp->node);
-+	if (comp->recomp_cstream) {
-+		zcomp_cstrm_free(comp, comp->recomp_cstream);
-+		kfree(comp->recomp_cstream);
-+	}
- 	comp->ops->release_params(comp->params);
- 	free_percpu(comp->dstream);
- 	free_percpu(comp->cstream);
- 	kfree(comp);
- }
- 
--struct zcomp *zcomp_create(const char *alg, struct zcomp_params *params)
-+struct zcomp *zcomp_create(const char *alg, struct zcomp_params *params,
-+			   bool recomp)
- {
- 	struct zcomp *comp;
- 	int error;
-@@ -443,7 +480,7 @@ struct zcomp *zcomp_create(const char *alg, struct zcomp_params *params)
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	error = zcomp_init(comp, params);
-+	error = zcomp_init(comp, params, recomp);
- 	if (error) {
- 		kfree(comp);
- 		return ERR_PTR(error);
-diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-index ca1ebc70ad0a..39efefc43a13 100644
---- a/drivers/block/zram/zcomp.h
-+++ b/drivers/block/zram/zcomp.h
-@@ -40,7 +40,8 @@ struct zcomp_params {
- /*
-  * Run-time driver context - scratch buffers, etc. It is modified during
-  * request execution (compression/decompression), cannot be shared, so
-- * it's in per-CPU area.
-+ * it's in per-CPU area (except for recompression, which uses a single
-+ * per-device compression stream).
+diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+index 5210e8371238..56371e9ea306 100644
+--- a/include/linux/ioprio.h
++++ b/include/linux/ioprio.h
+@@ -56,7 +56,8 @@ static inline int task_nice_ioclass(struct task_struct *task)
   */
- struct zcomp_ctx {
- 	void *context;
-@@ -95,9 +96,10 @@ struct zcomp_ops {
+ static inline int __get_task_ioprio(struct task_struct *p)
+ {
+-	struct io_context *ioc = p->io_context;
++	/* Paired with smp_store_release() in set_task_ioprio() */
++	struct io_context *ioc = READ_ONCE(p->io_context);
+ 	int prio;
  
- /* dynamic per-device compression frontend */
- struct zcomp {
--	struct zcomp_cstrm __percpu *cstream;
- 	struct zcomp_dstrm __percpu *dstream;
- 	wait_queue_head_t dstrm_waitq;
-+	struct zcomp_cstrm __percpu *cstream;
-+	struct zcomp_cstrm *recomp_cstream;
- 	const struct zcomp_ops *ops;
- 	struct zcomp_params *params;
- 	struct hlist_node node;
-@@ -108,7 +110,8 @@ int zcomp_cpu_dead(unsigned int cpu, struct hlist_node *node);
- ssize_t zcomp_available_show(const char *comp, char *buf, ssize_t at);
- const char *zcomp_lookup_backend_name(const char *comp);
+ 	if (!ioc)
+@@ -66,7 +67,7 @@ static inline int __get_task_ioprio(struct task_struct *p)
+ 	if (p != current)
+ 		lockdep_assert_held(&p->alloc_lock);
  
--struct zcomp *zcomp_create(const char *alg, struct zcomp_params *params);
-+struct zcomp *zcomp_create(const char *alg, struct zcomp_params *params,
-+			   bool recomp);
- void zcomp_destroy(struct zcomp *comp);
- 
- struct zcomp_cstrm *zcomp_cstrm_get(struct zcomp *comp);
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 52341f05da83..079f3723db31 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -2526,7 +2526,7 @@ static int recompress_slot(struct zram *zram, unsigned long index,
- 	}
- 
- 	/*
--	 * We are holding per-CPU stream mutex and entry lock so better
-+	 * We are holding compression stream mutex and entry lock so better
- 	 * avoid direct reclaim.  Allocation error is not fatal since
- 	 * we still have the old object in the mem_pool.
- 	 *
-@@ -2928,7 +2928,8 @@ static ssize_t disksize_store(struct device *dev, struct device_attribute *attr,
- 			continue;
- 
- 		comp = zcomp_create(zram->comp_algs[prio],
--				    &zram->params[prio]);
-+				    &zram->params[prio],
-+				    prio != ZRAM_PRIMARY_COMP);
- 		if (IS_ERR(comp)) {
- 			pr_err("Cannot initialise %s compressing backend\n",
- 			       zram->comp_algs[prio]);
+-	prio = ioc->ioprio;
++	prio = READ_ONCE(ioc->ioprio);
+ 	if (IOPRIO_PRIO_CLASS(prio) == IOPRIO_CLASS_NONE)
+ 		prio = IOPRIO_PRIO_VALUE(task_nice_ioclass(p),
+ 					 task_nice_ioprio(p));
 -- 
-2.56.0.176.g3575e65682-goog
+2.43.0
 
