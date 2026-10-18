@@ -1,161 +1,165 @@
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0ED4C33F9
-	for <linux-block@vger.kernel.org>; Sun, 18 Oct 2026 13:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792330343; cv=fail; b=pwl3nPj7KcIQLjf2ryQqVNWJfruyOHSDXB/fN81vweE5cZSTBSzpyeGVCPYjUF4ZM6sAg5WNy9+1KGjMm1FwR52Z2pZutzP0PMf+TCh5L+2fNFDjrcw5DTUPWayP29r6c+gunO+X8L0dbyxhspCi3Hsdv3qaaNrqEwyVPRu84sA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792330343; c=relaxed/simple;
-	bh=6hry03unZz8tgviOoRlygKU488qD11swBpKrLzu/5cI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=a+ZiYO50ybz5fBQOJljH/Orp9iYaTBHc4xDAct3zokN/TgPrD9BN/M5YHOGjaV6b6aCAfUIx4R87AH3ofz0PaZLeobcxhGmmeDfDZw/tCqb1Zg2Vm1jZwcYUv5han/IsD7Vrqq3Z3UhdnAB1Xeso6vinrowPG5Fze80OeQOwHtw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=U2NEK7Lf; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=jOCSZFOF; arc=fail smtp.client-ip=68.232.143.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="U2NEK7Lf";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="jOCSZFOF"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1792330342; x=1823866342;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=6hry03unZz8tgviOoRlygKU488qD11swBpKrLzu/5cI=;
-  b=U2NEK7LfqV6kxUW4/UT06kDa2GXmMxOkcgfHb2Uf1kE8G92/Bq84MZqK
-   wIxMSE4Dd/pvFR2lYWxdFFtHWgixm0A9VREbasIJA6/3ts8PFXQA7TYuq
-   QJ1gyvn7UeqNN2foOjqPRX/R3O+9+/5uDRclgRjZDkytGaMFhrQsJJNPP
-   J/CEIz2gX9FUxn4ClbqyRGCWptACEEDS/o7xoRFTZwaKF9K+QIpppVd/U
-   4igw5LukIAOQxVI2vtygAl2nZcupxqUHPAoDqX8jPOHI8UglEQf5F+tjD
-   B1N/kpEgjrY3zk+h4CGv9GT+GXZqRX0tkeEd9NpzUxPgZ3qePCD8VRsYq
-   g==;
-X-CSE-ConnectionGUID: BCQSWhWRSLi7TeQriJOheg==
-X-CSE-MsgGUID: n3bTRmHmQPyfONJGWO/y1A==
-X-IronPort-AV: E=Sophos;i="6.27,165,1786982400"; 
-   d="scan'208";a="159334623"
-Received: from mail-northcentralusazon11012060.outbound.protection.outlook.com (HELO CH5PR02CU005.outbound.protection.outlook.com) ([40.107.200.60])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Oct 2026 21:32:21 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=snnnxtdGtqx5S9w09k56SzhCOqim7OhjK01CtjP3aLBOzFnMiyZDDIGOlEpBCzHZOYHtMwAeS9kffKv3FBQvX3vV9eQ608XW3xtszyaM8/K79AwlESmiGqJshjpaautlMo3M9Xlk4IRvb9Bq14S7ygPWIrhmHUGzeBDhdIiycasX0mlR2Erl6ozW7q/qp+qkFJFZhCnKImJNwkD4II4P7EFpPpD8Nm2zB81u/+OGrHYmkMrGSooLO/y1uiuY5qx8U/bNpc2vM25bUFHTEGTH37X2/+5COmHy8Tc5+g3Cy3bAyZlTaU68Nnj5+IEW4BWXoVsBD+3Sf/b0OZpkAwNxxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Znky+z9Ta9nCj7DMMYjHpuVPuhshmOeHErT45HHTvqc=;
- b=K+6eq1GaS0YZ7Jv5JpMjkECEVbV/QvAI7jCjF91dABqqvkk6WlX8SZ7IWvKqw42aVsZX0rDb7CKYJzpIk+tb0/Nly4bCKKjWe0BdK0w9pYzjOsfwyMtLyzaJCIpjCRz/W+BNHNLFNdfJ1laFehCN4eBrZXw+LYB8RBNON7N9eJFsiWz6frUHYGobkqNtqwX34meX8KacUz7x9re1uNAqTWjv/y61/LBHvPGYqJFELhESFngwHjDFIwtCQ00PYJpSet51pynhLByFqILV6gGfmKYafvs4iw2BrTwPN/HYskn82VXEPJRzlmQjMFf4KL9xfoEAv42e9oOpjJXLBXVVkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Znky+z9Ta9nCj7DMMYjHpuVPuhshmOeHErT45HHTvqc=;
- b=jOCSZFOFWLMXgOv8eJ1j5NBree5tpUNwQ42LMh2vXOcJJ1aMpZil7vx5Y9xzuyKpCWYmZbPBAkWWYiqMoOZUMZx5QKaj7IaXpkCP2o6iG77evWn+WW5E9cEAp1r0OMrqxiQfirCX65Jy9NX1aKRJv+MggbGFJWYBxpyqZHQ1BSA=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by LV8PR04MB8982.namprd04.prod.outlook.com
- (2603:10b6:408:184::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.19; Sun, 18 Oct
- 2026 13:32:16 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%5]) with mapi id 15.21.0522.017; Sun, 18 Oct 2026
- 13:32:16 +0000
-Date: Sun, 18 Oct 2026 22:32:11 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: blktests-ci-bot@kernel.org
-Subject: Re: [RFC 0/4] fs: support dma-buf backed direct I/O
-Message-ID: <atTJy6MLgDXV80Bq@shinmob>
-References: <20261016091919.971295-1-anuj1072538@gmail.com>
- <25bc51e2bde7437dc692cd60dad9acb68a6522e6796b9e79d9b73c89eb1607b4@mailrelay.wdc.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <25bc51e2bde7437dc692cd60dad9acb68a6522e6796b9e79d9b73c89eb1607b4@mailrelay.wdc.com>
-X-ClientProxiedBy: TYCPR01CA0208.jpnprd01.prod.outlook.com
- (2603:1096:405:7a::16) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0704A2A46
+	for <linux-block@vger.kernel.org>; Sun, 18 Oct 2026 15:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792337227; cv=none; b=sVR8JwG0aepRlauy5PO0srSTOpgZG6EkVTx12pXt4uZmmh6nanyszu4wZADUM+SQ69GA8FNzsmE59G7XKcncJwkxJz3dXCxHIz016u/fKunUunxRHxKofPHOqmbdmN/R2uuzv7/rT34oXjJHHAhUzvFG5Xfkc3sA9WxqTp6H5vc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792337227; c=relaxed/simple;
+	bh=xWvyFR6mh0PiNrbJrqB+hChIX9FBKkd5vEI7A1DSN4k=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=iIhKGNPFVvROHFV6yrKhdrnBWcz7jdsPXcarwVnC1tVXaxTvGomWWu2wy1xk5ltCrwCk+XBqbX+KA3KFE9yeyU/KOXUuUD6dC5L/bHTfxxCnwq4JYNNy9RGGOJWt6MFKAycP1j+yCA09ngcGN4lLtL0/YMEUXxSRpMrsawgnrWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 69IFQSMv087039;
+	Mon, 19 Oct 2026 00:26:28 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 69IFQJG0087013
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 19 Oct 2026 00:26:28 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <e8d48691-9e29-41e0-9326-fff961b10cdf@I-love.SAKURA.ne.jp>
+Date: Mon, 19 Oct 2026 00:26:17 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|LV8PR04MB8982:EE_
-X-MS-Office365-Filtering-Correlation-Id: aa6a4ce2-1ba0-4f82-5841-08df2d1c39f8
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|19092799006|1800799024|23010399003|366016|22082099003|18002099003|10067099003|4143699003|261009223027099003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	Ccf8GBpNariRjbNuQcN/cknCAp4TsX6DRqrPn5yb7clz1b7L8mkoMsmVgzxKGro8QsktjOHU+K+amgpsXpd/WAqLq4fu3j0pOCkUQqI5jnCJYtK35H012891fyhFi5EsHi6x5G0CrooherwFsIDnNdNiqz9LXWoV046HHGSuMUPbAclJfUQPVvZb7nEDDDMMHmMBldMjKh9YVZumoCE0vGNXaly7CsTsNA94rmfsn4yzfxRE3gJpdJIqHKgCO/zCQp8e6QCZgo3BuFPPE2ALNhqeU+aSuffccw9nmDMB7LDWn0pt6t+xh+iS5b2jSH/azc3yHkNLeMWT2l+6YcLSQeXmOH+GD5c9TOovQi9xrqatQTksvib5RQwJPCL75LygM3DbWh9ZCZ2yHhPyWtZaaOCaLADmLxMsCvlLAaBqo9ZsZBTHMFd4RYdkkppZtGz7p4YkgBwTOZ60XMY+ryq0EU/LXzpHcqv/PqUIC3E8gpERtHFs8Koy4V9kqSVsYaCCG+tzdyYcAi8yLp35nH0SyLu+9ZHuYB0xUf+vuVTAZnBTSOwTp3+dKvNLRbVEfQa8aPYne0/vxJyXVS5Ma6VL8trlMSfzdGogrM4O1P+hJYrXmBy6o2uUG43/t9T8K1xN
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(1800799024)(23010399003)(366016)(22082099003)(18002099003)(10067099003)(4143699003)(261009223027099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?hpx3sb7rrgBZ3wGGXtdR/rf4CsaMPo3YUL9kuOSyV/413z0/eQ+mC0FTvbow?=
- =?us-ascii?Q?OA4waoVTFKvAgtPX11zvajkf1Lg9F4n6FC8CD2YTcZ5cjPqV4OyjJE2q5XOt?=
- =?us-ascii?Q?yyqwrCMqtepfQuJqNoxP2r5Kj4hWAInwRukFgx6kkHOIC9FW88HeJbMAne+f?=
- =?us-ascii?Q?bWzGlRxubY7xHSN6SgbG8BfkQ9CQDC9finFas1ihbngXCaiuW5mD5ELxYWpb?=
- =?us-ascii?Q?fQWS2AE9Yby2Xy0kzhxK6Qouv3xn0GEjaG4Hgzj/76EKgXY/x5sH1sxMG1J4?=
- =?us-ascii?Q?LVC2/XmsIMSZlGIGleKPHPUbrfwJ+G6SugRJO6xihbz/ezP+sCLJ9jBHj5FB?=
- =?us-ascii?Q?WQus9MSIAUZax21pAEIoJCSj/TFW7NL4sixE6TwExbLM7ySfVnwChp5TtSBR?=
- =?us-ascii?Q?Uliye9ir0Lq4QywZov3pKqhQlTbNDRomgkkeUQLatCOFldDQ6D2I3OJMrKIh?=
- =?us-ascii?Q?w2g37R8UL0wTwLHZ28opyGKPe+UABC71S/ni8sKKT+tly1/cK10Ml61E3kk9?=
- =?us-ascii?Q?qAFBaWB6Uwz7VE8enQlOIBGZcq2iS0pipmznoCouOLnIWIB/85DxvpxkegTg?=
- =?us-ascii?Q?WwesYGcatDBCcBGaAiYhrxV/bEWADMPDn+6uGFMxatSkG5iTBwV5ICb51jKf?=
- =?us-ascii?Q?D2y26nV6OrtiQ7YI8GTL2UEI+QDsJEdpcshDon0QJPnoH4flIVxQyL+xGeUX?=
- =?us-ascii?Q?e3ke+Z00KrUkE0sxQBc1i4J/bwBVQlU8ry1otUYRbriXy3G5xSiaR1pN147z?=
- =?us-ascii?Q?v+PzTDiwQ0SghuPUnxt1lowH+alVMMh8UoyfcoosV4J2fjxXF//ghhQ4257H?=
- =?us-ascii?Q?sA/BfjSYs+omq8LGlNCIJQbfnhQ28K3AtPYGVOqg6pX31ZxOe7zLbFeZPEy7?=
- =?us-ascii?Q?Yo4OzncpxNdmUggsjD3bF4KuKDckRtodO8rqEcWa3P6wMHRHBrwkYJloPkqU?=
- =?us-ascii?Q?z7Lx7WGqa5292pRSCvc4juczMeWEfo84uQBS/mZVNHTeUiQ/Db+JbKJtnLMy?=
- =?us-ascii?Q?Gg2HPojFI7FjzV1yV+z1ydY49sDoaIJIld5A4mwvPaVjhF6HwVT5IBV53H53?=
- =?us-ascii?Q?NXokn0QhGJX7BWXL3QaMfL5aeiz1/NXc17zwMdC/yrdFs3IJEoaqdluzEc/o?=
- =?us-ascii?Q?jHY2t6nYbnGmqGO2wjeaC2rVkbz7fP5AErLPJJbyE8lZfPsYauS/LMIN6uTD?=
- =?us-ascii?Q?WIxlURTtGIzMa+8NnDaaUVOlCh2lDl0yr2hB+MY+074pKOL/47XHYs6yPxwu?=
- =?us-ascii?Q?7hB9iLG/tKxccBr1Lva5XAtXmkvMkU7TNMo/6ktXrCYmlxcHpNHzvSshlqG1?=
- =?us-ascii?Q?tiecYcw5JoS0gJoqc6EZGqXHEjeImRbKih1hIfJRLY42W75jMe8+D2gD9vde?=
- =?us-ascii?Q?mUyVS45DFbYfgbTf16GD+Y4slVvzWWYuDc3XwTD5E/spt318SWJAEcIJMjPD?=
- =?us-ascii?Q?nTf4p4U58iz1+auyiSGHyhy2lO49WdjW1CvHNFvexj0A1LFjUiJaRxlYLloP?=
- =?us-ascii?Q?ZId+PA2Qln5FSJRqun7pTjkAV6vxIia2oPnxKmJbTNYPt1MlSwgIFMmWMloR?=
- =?us-ascii?Q?31frryGoizZQYFFt+N6LbkfEPYv1Gz7iJChQNqmM/+OUXA27aUy8ds0oHNNC?=
- =?us-ascii?Q?z2a2bgVnX/2Kjbr0gEahzpJXWWhkQgJVLNtUewb7mADwXcoEsSgCc83gNRaF?=
- =?us-ascii?Q?H2iJ7xu1wDEUMZZ9IV9TtJyErEcINrWGE7K/kqNXZlgO8PSSclCUy1fvAVwB?=
- =?us-ascii?Q?FqeUMYvXlWe4L8DLCmEvUr3eey+h4xI=3D?=
-X-Exchange-RoutingPolicyChecked:
-	ws7kC1wFAR4AhZfJscfjjmKSPsp67z0qzUiqGrZTYHRdzL/g8X9b00ohZMaenRCSEPxhCwxWDT3rs6YIY+an2dfddtFaDV6yGoSqGtALjFP/7i/yqtm1DLePhrKQM9Ooo5joWjiAnNtUvKFR1mB3B1pAQypd/lvSQXZdnkqV7DwXGzW9CsDNxls2ujKh0S38WruPbeua6aRDCaXIYNC43KlSQKaMmnagio0vqxS9eYX+pr9LppIXjkHHNmrZ7+Csheuvg9P+DRhW5KzmSWpWCUproHS5ROhz/X9stbdfCoDrpRFJB9Ty6DKI314ZGd0ICvC4C9tCs8wLHvo3E0Ou9w==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	U2+9Xzxxl0/NDkHfwp4oHETZPl/F6AYZBD4jCBmuDnYvvWhcNfp+UOqx86yJpnAy16lp8eanECUOmDH9Ho/f7cUM4/N0epjptdsQWgYVUIrRyDuWyOj6eVHKXtFphlNVYjCmzxeUxLh8f1slJR8iqxYaxsaw8tvhrz6iqcOIy1b+yt/FnAkEqcKHxj0vWKlzE7bdeQx7Tz6saGCsLSH6rTtVkKMAjUPH1opp+oOLb7/eic4eGQVBDlFNx/jN1JHLijP5aUSlVkvxs8UEkmznInAFpkJLpuAInkAbmP2bSvbNg+SdG5s/03POdoBwzt5bflxCE9EMRdGX8YawfaNPV0lqgRMUYPfTFvG2OqVgtkSPMtHH+iPMBN+Gb36QObbS2HTQGd4XQSMwPxazhXGV9NxyyFYRmJYK0jUmKxqz5kW1FRjSP16fuBVGsIYTBHUmcxjh0bB/MHyVJdW3jEhwpfxFbYT0rEwGJ0NuKDKDB/+k5rm0fYBxjyp2hAcdA1Fb2jrazNAOi2TrTkZq3k9MnqkAmAiqU4n6EUxuJk0dM/6pgBEQWICTF6wB9GS4c37FZURmX3J3y+xWIeL6/Ul1y3ycX+vQ2mFmP2CCDOXfyPBq6PDKgL1wHTQzAjWmNwo9
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa6a4ce2-1ba0-4f82-5841-08df2d1c39f8
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2026 13:32:16.5421
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BN4Pg+iiU+Wv67B89uRno6fcBKrE/VeC5R0NXQIX3b5hX9kz8qDagNm8yNY29CB9dZzfl0s79LGMm+hUSCpzsNGxDELpPcnzRLeotq5lVNw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR04MB8982
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH v8 1/2] block: avoid long sync_blockdev() under
+ disk->open_mutex during parallel close
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <fb1e0f16346994e32b479e4be596436b2a614b03.1791234123.git.bvanassche@acm.org>
+ <20261007130851.GA30117@lst.de>
+ <4d7c7365-259c-402e-9cf5-d55ad9333200@I-love.SAKURA.ne.jp>
+ <380f04ef-902d-4664-9ae3-228692d2efb9@I-love.SAKURA.ne.jp>
+ <696e5e7c-e3f1-4181-be2a-8915fd1753cf@I-love.SAKURA.ne.jp>
+ <cc2910d3-3113-44d4-94ef-0c8d365fac9c@I-love.SAKURA.ne.jp>
+ <53c3ccf7-1a5e-4861-afc0-7cbfd3284655@I-love.SAKURA.ne.jp>
+ <d05d7049-70a1-4216-b268-1c209834dc84@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <d05d7049-70a1-4216-b268-1c209834dc84@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav114.rs.sakura.ne.jp
 
-On Oct 17, 2026 / 15:54, shinichiro.kawasaki@wdc.com wrote:
-> Dear patch submitter,
-> 
-> Blktests CI has tested the following submission:
-> Status:     FAILURE
-> Name:       [RFC,0/4] fs: support dma-buf backed direct I/O
-> Patchwork:  https://patchwork.kernel.org/series/1187147/&state=*
-> Run record: https://github.com/linux-blktests/linux-block/actions/runs/38999893251
-> 
-> 
-> Failed test cases: md/001
+Commit b849dd84b6cc ("bdev: Reduce time holding bd_mutex in sync in
+blkdev_close()") introduced a sync_blockdev() call immediately before
+holding disk->open_mutex. But this check was racy and best-effort basis.
 
-Please ignore this failure report. I believe the failure cause of the md/001
-failure is in a different patch for nvme-tcp driver [*].
+If more than one thread concurrently called bdev_release() and saw
+atomic_read(&bdev->bd_openers) > 1, the thread which actually hit
+the atomic_dec_and_test(&bdev->bd_openers) condition will call
+sync_blockdev() from blkdev_flush_mapping() (which could take several
+minutes) with disk->open_mutex held.
 
-[*] https://lore.kernel.org/linux-nvme/atSzF3URmcpP2_i2@shinmob/
+Kill this race window and make sync_blockdev() always be called before
+holding disk->open_mutex, by using a counter that tracks how many threads
+are calling sync_blockdev() from bdev_release() without disk->open_mutex
+held.
+
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ block/bdev.c              | 54 +++++++++++++++++++++++++++++++--------
+ include/linux/blk_types.h |  1 +
+ 2 files changed, 45 insertions(+), 10 deletions(-)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index cd8323083740..a4065e16544d 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -1150,6 +1150,46 @@ static inline void bd_yield_claim(struct file *bdev_file)
+ 		bd_end_claim(bdev, holder);
+ }
+ 
++static inline void bd_early_sync(struct gendisk *disk, struct block_device *bdev)
++{
++	/*
++	 * Temporarily drop open_mutex and process writeback (which could take
++	 * several minutes to complete) for this "bdev", if current thread is
++	 * the last opener (or one of threads who might become the last opener)
++	 * when current thread re-acquires open_mutex.
++	 *
++	 * It is safe for this "bdev" to temporarily drop open_mutex here, for
++	 * this "bdev" owns one bd_openers count (avoiding possibility of UAF),
++	 * and bdev_release() has not yet modified any state for this "bdev".
++	 * In essence, bd_early_sync() is doing what we can do (or what we
++	 * should have done) before calling bdev_release().
++	 *
++	 * It is safe if another thread called blkdev_get_{whole,part}() from
++	 * bdev_open() while current thread temporarily dropped open_mutex, for
++	 * the bd_openers elevated by another thread prevents current thread
++	 * from calling blkdev_flush_mapping() when current thread re-acquired
++	 * open_mutex and calls blkdev_put_{whole,part}().
++	 *
++	 * It is also safe if another thread called blkdev_get_{whole,part}()
++	 * from bdev_open() and initiated bdev_release() while current thread
++	 * temporarily dropped open_mutex, for the bd_closers elevated by
++	 * current thread prevents another thread from skipping this step
++	 * (another thread is evaluated as one of threads who might become
++	 * the last opener) and sync_blockdev() is designed to be thread-safe.
++	 *
++	 * Therefore, this bdev->bd_openers == 1 + bdev->bd_closers condition
++	 * guarantees that any thread who might become the last opener performs
++	 * synchronization which should be done before holding open_mutex.
++	 */
++	if (atomic_read(&bdev->bd_openers) == 1 + bdev->bd_closers) {
++		bdev->bd_closers++;
++		mutex_unlock(&disk->open_mutex);
++		sync_blockdev(bdev);
++		mutex_lock(&disk->open_mutex);
++		bdev->bd_closers--;
++	}
++}
++
+ void bdev_release(struct file *bdev_file)
+ {
+ 	struct block_device *bdev = file_bdev(bdev_file);
+@@ -1160,17 +1200,11 @@ void bdev_release(struct file *bdev_file)
+ 	if (IS_ERR(holder))
+ 		goto put_no_open;
+ 
+-	/*
+-	 * Sync early if it looks like we're the last one.  If someone else
+-	 * opens the block device between now and the decrement of bd_openers
+-	 * then we did a sync that we didn't need to, but that's not the end
+-	 * of the world and we want to avoid long (could be several minute)
+-	 * syncs while holding the mutex.
+-	 */
+-	if (atomic_read(&bdev->bd_openers) == 1)
+-		sync_blockdev(bdev);
+-
+ 	mutex_lock(&disk->open_mutex);
++	bd_early_sync(disk, bdev);
++	if (bdev_is_partition(bdev))
++		bd_early_sync(disk, bdev_whole(bdev));
++
+ 	bdev_yield_write_access(bdev_file);
+ 
+ 	if (holder)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 98e21b4cbf32..04d378818c76 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -74,6 +74,7 @@ struct block_device {
+ #ifdef CONFIG_SECURITY
+ 	void			*bd_security;
+ #endif
++	int			bd_closers;
+ 	/*
+ 	 * keep this out-of-line as it's both big and not needed in the fast
+ 	 * path
+-- 
+2.56.0
+
