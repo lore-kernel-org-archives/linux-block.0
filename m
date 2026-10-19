@@ -1,36 +1,33 @@
-Received: from mta0.migadu.com (out-84.mta0.migadu.com [91.218.175.84])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEC649E5CF
-	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 09:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676804B3CBE
+	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 09:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792403064; cv=none; b=KvF3noLoA8aDizrEt3SP22lFFTN0vebkFCZ8zL9/igMJg30hhZ+9Z9fRZtOImCCgAQhwyJox5PImxdPJFpOJrGP94wizZeCRKCSQKKRik9YBMpXmbQPREMHEoaEn+XMYEMXsucYFlcdTPPWnffbtrUOxOi9cMwCoNuKm4McVYqI=
+	t=1792403072; cv=none; b=ViuajT1kCQ3lCng7h6hdZ7rfBx7ijgDRvgJ7kMTtSxShIzVldc3R1Q1N4cGOhRTF8FedzwdhqcTNv9NJjI7t7Nihq0wl6j7clPDzWs370rVJGLUsjiTbXzmv7v90lvAN2owkva4wrHjJ2vGM6m9EXpuPUrUh2pouTCT/ApUrysk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792403064; c=relaxed/simple;
-	bh=e0QRKXqseSbnwv/jNw0BZs0Ci0ks6UPUvoTzc0mkA6U=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=YC245YGm2tOpibmBdqmzS86FBUhC/o7bLM3wndLidLdtagBTz3MXRyBFgCVJkYfvSQQAR/p3nTitgiXstu4iqKkh8f4Q8qp8p1sKzt39uC2J6gDoXH+GltAcEHja6+Zy38apD9okH1bjMRsr29m51LDtf6GOKJTre/pxdDsjGbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BMaBccpM; arc=none smtp.client-ip=91.218.175.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1792403072; c=relaxed/simple;
+	bh=wMI+wvLL3Lfmf9QOAzMBWmfEf84Qwp6r7z02p/HhR48=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nfijAxygGgBY0x5Owkx8d+gRC6uxBC8GGA0qie3OBsnUOg/MUM5MbyzEB/wBNGACOXzGair1haGBQckep5KBvxy2wiiFjQJrONtLZI6oco3iXiygsqZze90LZosj0uJae3yCcDRhGZMVyyPUpjMJKEScCD1KiVa8SxJrKbo0mXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GJmJORKQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BMaBccpM"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=e0QRKXqseSbnwv/jNw0BZs0Ci0ks6UPUvoTzc0mkA6U=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792403060; v=1; x=1793007860;
- b=BMaBccpMv3NMSDT1Bd0lgqkLZ9Hcw/VNr3PvN7xr/D9ixiZf51Ma/Yu9HoJmC/dNLPaqTC0n
- hQDkxRFL1nMlfQuW0pXCk2oH2Mw7jP5U1GRu1G6aKNVcn9wtPl2clD1vIu6ESSEw8BkSg7ndplj
- fSgChnF961fWYeln4MxeG+Ec=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 51b1cea30dcf2afa;
-	Mon, 19 Oct 2026 09:44:20 +0000
-X-Mizu-Trace-ID: 51b1cea30dcf2afa
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <8f67b745-d63f-4d3f-9672-7bad7ce0e436@linux.dev>
-Date: Mon, 19 Oct 2026 17:44:10 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GJmJORKQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16CBE1F000C6;
+	Mon, 19 Oct 2026 09:44:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792403067;
+	bh=4unmMhDlj948qvIvWvnmCfD6s2zcYKI54XQJsLFKqfg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=GJmJORKQnSo3nGzeIpQFxz5w7SnMf9Ox6v4WuHjdD/0YS2FokERQ3cT8XAmdz63lT
+	 srM7rTBoW4QzuV7hhS8V0VXRg0m2AOAoVn9Q256B9+jtyiixmTrPk8PxIKWk8y8/7g
+	 wb2tV1etMzjNxl/HfqfQ/S04yaGa526/8epuuXDx//DWQpL4Ahi9BOsOXbXWhraPZc
+	 gONoFZGzsrBIlxYsnoVx5YwgTPTSwp51La/j2EqOjPN3A6oopvpqOsO7Ih9Ird9IL6
+	 6LqqyO/ELDS3p/hv2KNxR3rZev/0oe+RYSLJ3IHZUaP+3A1o+srMTXPjz+qD3a0+cM
+	 Yqu+51KaUUnWA==
+Message-ID: <be184b72-5d1b-4723-869b-a9fce2535bdc@kernel.org>
+Date: Mon, 19 Oct 2026 11:44:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,53 +35,32 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>,
- ameryhung@gmail.com, alexei.starovoitov@gmail.com
-Subject: Re: [RFC PATCH v10 3/4] blk-iocost: add iocost_ioc_tick tracepoint
- for per-period device summary
-To: Tejun Heo <tj@kernel.org>
-References: <20261003124045.1289305-1-cui.tao@linux.dev>
- <20261003124045.1289305-4-cui.tao@linux.dev>
- <b76b821edba101b68f085f03e8613d7c@kernel.org>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <b76b821edba101b68f085f03e8613d7c@kernel.org>
+Subject: Re: [PATCH] zloop: print device that had errors
+To: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20261016073043.1164325-1-johannes.thumshirn@wdc.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20261016073043.1164325-1-johannes.thumshirn@wdc.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hello Tejun,
+On 2026/10/16 9:30, Johannes Thumshirn wrote:
+> When testing zoned filesystems that span multiple zloop drives it can be
+> difficult to figure out which devices access caused an error.
+> 
+> Prefix the error messages where we have the disk available with the disk
+> name.
+> 
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-在 2026/10/17 01:49, Tejun Heo 写道:
-> Hello, Tao.
-> 
-> On Sat, 03 Oct 2026 20:40:44 +0800, Tao Cui wrote:
->> + * Periodic per-device summary, emitted once per period from the tail of
->> + * ioc_timer_fn().  Unlike the state-change events above, this fires every
-> 
-> The event is emitted before the vrate adjustment and the period
-> transition, not from the tail.
-> 
-Updated both the commit message and the comment to say that the event
-is emitted before the vrate adjustment and the period transition.
+Looks good.
 
->> +		/* whether the controller still has active iocgs */
->> +		__field(int, running)
-> 
-> nr_active counts every entry on ioc->active_iocgs, and ioc->lock is held
-> from the count to the emit point, so running always equals active != 0.
-> Maybe drop the field?
-> 
-Dropped, along with the printk column and the corresponding commit
-message paragraph. With the lock held across the count and the
-tracepoint emission, it always equals active != 0, so it carries no
-additional information.
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Thanks,
-Tao
 
-> Thanks.
-> 
-
+-- 
+Damien Le Moal
+Western Digital Research
