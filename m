@@ -1,192 +1,432 @@
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A442A4F7995
-	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 13:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BF156DCCC;
+	Mon, 19 Oct 2026 13:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792417249; cv=none; b=iQW5XDeUL20VvIwX2TXKiwlCrjbUSdkiSHxf3lt3nDVC6MmwfBQ34OARZIdydSxzpKbtr5R8Wq1wU5d3iuB5h6CySsNkmgWNAba9ur/KkOgZrW/VacdBUcnXEsjitGBP1mkOSvWYkIJDzg7GVo4NC0FxVLQymFU33HjaiUXvp8o=
+	t=1792418286; cv=none; b=bVVCi79WI0CNj3x2pMcm+Ivf3vT7xpPPML54DEmtiIMtZ30vUJ9QDudB1Bk0rS+IFjXsv/r2WSQevYzh8zPWZqWXRCXk2qt1TKUgbYeVtNNF7OoqZO3ygYWc7KaZHr2rlGGZ7QQmQC7nyxuJvg3RQ+2mJWpLAiSxpoMQcaQ0Jr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792417249; c=relaxed/simple;
-	bh=hUhBVpSTJR79fZOx3XriD8gVhMiXrasOdf5lG9lo7Vc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T5nUcXhdy9Z7d57JsnsOYLd0PiXEf4wrOgiKezyCr6bAFtzDFyH6FDZGSkSziQ9xoZpg9rF16M034pJag7skpIsEI6Uv4Ob/Vv0IDjwu8K3cmjRvDdXZ6pVXY7OqgA51ljxzdQo0xudtjuBTy78aq3iJz943t+nywuKSymUlUJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E4ZMtBvY; arc=none smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792418286; c=relaxed/simple;
+	bh=3QGg+1T51XI+6ErIgq7haAN3iJcqq4509MpqRcj74Es=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qIKSOvXSdJLL/6G3nWE5fVb03TCr2MFy7iiw0MtGbx1I4fbo2uqRGGijx/KrXUizy1os8JahicfCT0FlhkNjpj8Nknk80Bwe1w7jSAOCdseWAgoANLs3zwHqepqgw8i/evko4JO4gFAiK318TxWK9W1VFmNs9hyEUxu1DykiYbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l2lWsD3/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E4ZMtBvY"
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-157fe9d771bso706210c88.0
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 06:40:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792417247; x=1793022047; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=cCjmpspcPpS38WYBBQYovAwzUdEJHovl54RGs3q/tTo=;
-        b=E4ZMtBvYVsg3rqDO+GlC0suXYVEkRTuT2UOqcs0w8zJy9D3W3WxzQzrIIX5Fx6anJk
-         5aSgLqZ3M7PUnkiKvdhW4LttWGyS6Fmfz1WWdhjdS9RvysAlZorGIuD+cQU7FPUqpRgr
-         rSJewsqbOe92NDN5yI6qg534d4hvUyjXWO9QJvwCeD5PecbkOF00UXNXmxmyhlSKeqe6
-         Vi5b6KZWh4UwLqKzxeZRVsp28/0D1p3yEuOizepFM9es94hU3YxfH4nV/f/yl1TcKnNt
-         8TeTjds58zE7PtgGxnpMrPNLDxbEjAV80VpWpKMKooyHg+4m4NtvkBiWumq0ONHJQVrZ
-         KMCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792417247; x=1793022047;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cCjmpspcPpS38WYBBQYovAwzUdEJHovl54RGs3q/tTo=;
-        b=neo4Pzr98J/MIYpTinSffTwLDz1XvkyMxEPI2wTZHR8VgLC0H/ZHZqn8wvCTyjedmF
-         jQeHb8C+0DAheCYAhUMcp5H5rkqWICN6OFOoI3eJos6mC57I3ka8IUNt68NBGupBieOO
-         d2ayUxG+80knveJjHNeLhamIpRjgp3e3Q+62pG23wQIO5t/bZ/oWqbwBNLDswjq0qmT2
-         GByJntWz/jPuSTDNHa4KrAGxZr0NFc3j3RLReeoq+cZ+vVSI28xcLrUAGn1tqS10NSbM
-         y5MURA7Os5eAog+tZBRsJpJa8c0GUMPU8n85afbQMmN6rvYpNL/xQqDdqmQGeuQn4Sfm
-         N//Q==
-X-Forwarded-Encrypted: i=1; AKwUvBwqPs6bZd8C3VZvkUm8Sc1dsqxSKjy5G8+odhAE+FdiCQ5S4u0iPVV/3rK5SMOuLG419cIvhz/oxlO5pA==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLiZyg4VqdgnXn2uoAc0WA2IX6jXz6RYXYYC4XlkFfAnFEiDz0g
-	iHc6WfshJJAdDFl7uwuH/qtMN/jrQuXyXN6Z/7XFUtmTigPmKB46S4tpr0aycDM=
-X-Gm-Gg: AYBFou3dxTnghUIQ8Tsz3miIUdkGsWpdXpJW8riWDLNZm1KeVrQTcd9QejyIpM9IJrM
-	VJAyiX3GpIhZJ1U9gK+L8uRNK+PiOXeLGcSc/SsuQL7SygQt7PEcu150LXkCuKgMpSdqyPGVO0v
-	hELqK4LKpDDSROxBDA3IozUoZ0y9J3K9n4MODBuFmCy8Nf/vYpTZB5sqIBeXczPqj0nDwi9ejF8
-	FJW7dApH/NT8bTv003puw/CwBL1W1sxcij8JT6fgbxVMdy1fCIRFQJESLNKdF8wvXsi3xFxKPLy
-	lbUYo4+LcMefsk3VmMpfuQ51wtomqX5ELFeyV63eT2hISlSYYE6neSJ7EVS/NoqyB0xYvxUFGQI
-	0TLQjJzXrv648nOcxLPh51ZcYry/b5+q5juBNKIntwQVlFOmvpB+yluyb2FRibEXXDLZoJwkVmJ
-	VEB5bl76TC/wFYH2N1UucCoMgBclpw+wZc+fTkB+exjAXux5fVde2xLJLT3lqfDsJKG0B+JnZ6p
-	0f4bJMWqqkrquAfQttbMpf5yy8QVcPWoRAvXM15m0DWsU7c
-X-Received: by 2002:a05:7022:170d:b0:143:3617:c595 with SMTP id a92af1059eb24-1850c223bb9mr10480854c88.1.1792417231454;
-        Mon, 19 Oct 2026 06:40:31 -0700 (PDT)
-Received: from anuj-MacBookPro ([2406:7400:63:e55a:9f78:eb3b:17e1:f1b6])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1831ba424a6sm29078300c88.17.2026.10.19.06.40.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Oct 2026 06:40:30 -0700 (PDT)
-Date: Mon, 19 Oct 2026 19:10:22 +0530
-From: Anuj Gupta <anuj1072538@gmail.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, axboe@kernel.dk, 
-	joshi.k@samsung.com, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, 
-	io-uring@vger.kernel.org, Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH] nvme/io_uring: enable dma-buf backed passthrough I/O
-Message-ID: <vx4ugjq6wol6elipmwkuhtpk3qnanpwou6g73dxrjona3nepd4@pvetkgijfsx5>
-References: <20261016103453.1129150-1-anuj1072538@gmail.com>
- <79627452-98d3-4e8d-9c37-ceda0796d59c@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2lWsD3/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C433F1F000C6;
+	Mon, 19 Oct 2026 13:58:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792418283;
+	bh=Dv3twa7zYOB3knqGrwOntSkkwfPWGCbTt5dOVIhc7Fc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=l2lWsD3/9dHeUKkLyg+Z6WFUrxPIulOKlijIB69wU2fTw7mbnD0ceHmMy6CTOWqXv
+	 NxpOM9SDBm/HUsSBGDXGfmn4WvoM6lDD7How7yVRn12lcb+uDb7p7tZd4z2NRvtvZu
+	 IdQTJPqRcnHgPZZ7hzYOfphQGBgpkcwBwc6n9nyARAlswKmBmpC64+srtMQwJcXfsQ
+	 Ahd7IyUCF9+sJnuHyrM7o8Wfnxgm2//KAjhAsPYPLJcKdRBpCkTRwFW60CV6rU6zMc
+	 AUf1NEOc9VJ4SGbnBo695HH+pGwVBCHYH/vHxYr/f+7NTKXaMFpQbontv/0JZ0jN09
+	 TgbTaxKq7SKyw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Jenson Johnathon Reggentin <mail@jregg.de>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sasha Levin <sashal@kernel.org>,
+	axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.18-5.10] docs: block: fix dead http link in blk-mq.rst
+Date: Mon, 19 Oct 2026 09:47:09 -0400
+Message-ID: <20261019135441.1420968-138-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
+References: <20261019135441.1420968-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79627452-98d3-4e8d-9c37-ceda0796d59c@gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.18.57
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Oct 18, 2026 at 11:06:16PM +0100, Pavel Begunkov wrote:
-> On 10/16/26 11:34, Anuj Gupta wrote:
-> > From: Anuj Gupta <anuj20.g@samsung.com>
-> > diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-> > index 3aa5d2f2dfbb..6343da1f6c05 100644
-> > --- a/drivers/nvme/host/ioctl.c
-> > +++ b/drivers/nvme/host/ioctl.c
-> > @@ -458,6 +458,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
-> >   			status = blk_status_to_errno(err);
-> >   	}
-> >   	io_uring_cmd_set_res32(ioucmd, status, result);
-> > +	io_uring_cmd_detach_dmabuf(ioucmd);
-> 
-> It's not great spilling the responsibility for [de,a]ttaching
-> between nvme and uring_cmd code. Is there a way to stash it
-> all under io_uring?
+From: Jenson Johnathon Reggentin <mail@jregg.de>
 
-The natural place would be __io_uring_cmd_done(), but that runs from
-task_work, while the ref has to be dropped at hardware completion, like
-io_complete_rw() does.
+[ Upstream commit b40a680ea4efe4ef2addada63e304a94d19500d1 ]
 
-Hooking io_uring_cmd_do_in_task_lazy() would avoid changing the NVMe
-call site, but would add a non-obvious side effect to a generic
-task_work helper. How about a separate helper that drivers call from
-end_io instead? This keeps the dma-buf handling in io_uring while NVMe
-only reports that it has finished accessing the data.
+The current link http://kernel.dk/blk-mq.pdf leads to a 404 error page.
+https://www.kernel.dk/blk-mq.pdf leads to the correct document.
 
-Something like this on top of this patch:
+v2 to add the missing www. prefix in the actual file change.
 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index 6343da1f6c05..6a7d1cc7b716 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -458,7 +458,6 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
- 			status = blk_status_to_errno(err);
- 	}
- 	io_uring_cmd_set_res32(ioucmd, status, result);
--	io_uring_cmd_detach_dmabuf(ioucmd);
+Signed-off-by: Jenson Johnathon Reggentin <mail@jregg.de>
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Jonathan Corbet <corbet@lwn.net>
+Message-ID: <20260819192422.42189-1-mail@jregg.de>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+I have the tree identity, the dead URL in-tree, review history, and a
+clean apply. Next I’ll finish call-site and stable-rule checks, then
+give the backport verdict.
+
+---
+
+## PHASE 1: COMMIT MESSAGE FORENSICS
+
+Step 1.1: PARSE THE SUBJECT LINE
+Record: `[docs: block:]` `[fix]` `[dead HTTP link in blk-mq.rst]` —
+documentation URL correction in the block multi-queue overview.
+
+Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
+Record:
+- Signed-off-by: Jenson Johnathon Reggentin `<mail@jregg.de>` (author)
+- Acked-by: Randy Dunlap `<rdunlap@infradead.org>` (docs reviewer)
+- Signed-off-by: Jonathan Corbet `<corbet@lwn.net>` (docs maintainer,
+  applied it)
+- Message-ID: `<20260819192422.42189-1-mail@jregg.de>` (v2 submission)
+- No Fixes: tag (expected)
+- No Reported-by / Tested-by / Reviewed-by on the committed form (v1 had
+  Reviewed-by: Md Haris Iqbal; that tag was not carried to v2)
+- No Cc: stable (expected; not a negative)
+- Ignore any pipeline “Upstream commit” / “Signed-off-by: Sasha Levin”
+  markers if present
+
+Step 1.3: ANALYZE THE COMMIT BODY TEXT
+Record:
+- Bug: `http://kernel.dk/blk-mq.pdf` in the “Further reading” section
+  returns 404.
+- Symptom: readers of blk-mq documentation cannot open the canonical
+  blk-mq paper.
+- Fix: switch to `https://www.kernel.dk/blk-mq.pdf`.
+- v2 note: v1 used `https://kernel.dk/blk-mq.pdf` (missing `www.`),
+  which still 404’d / had a bad cert; v2 adds `www.`.
+- No kernel version range given; no crash/trace.
+
+Step 1.4: DETECT HIDDEN BUG FIXES
+Record: Not a hidden runtime fix. It is exactly what it says: a
+documentation hyperlink correction. Not a leak/race/UAF disguised as
+cleanup.
+
+---
+
+## PHASE 2: DIFF ANALYSIS
+
+Step 2.1: INVENTORY THE CHANGES
+Record:
+- File: `Documentation/block/blk-mq.rst` — 1 line changed (`-1/+1`)
+- Functions: none
+- Scope: single-file, surgical documentation edit
+
+Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
+Record:
+- Before: RST link target `http://kernel.dk/blk-mq.pdf`
+- After: RST link target `https://www.kernel.dk/blk-mq.pdf`
+- Path affected: documentation “Further reading” only; no execution path
+
+Step 2.3: IDENTIFY THE BUG MECHANISM
+Record: Not a memory-safety/locking/refcount bug. Category:
+documentation correctness (dead external URL). Mechanism: site now
+requires HTTPS + `www.` hostname.
+
+Step 2.4: ASSESS THE FIX QUALITY
+Record:
+- Obviously correct once v2 uses the working URL.
+- Minimal; no unrelated edits.
+- Regression risk: none at runtime. Residual risk is only that the
+  remote host could move again (same class of risk as any external
+  link).
+- v1 was wrong (Randy Dunlap reported continued 404 / bad SSL);
+  committed v2 addresses that.
+
+Verified live:
+- `http://kernel.dk/blk-mq.pdf` → 404
+- `https://www.kernel.dk/blk-mq.pdf` → PDF retrieved (51.5 KB)
+
+---
+
+## PHASE 3: GIT HISTORY INVESTIGATION
+
+Step 3.1: BLAME THE CHANGED LINES
+Record:
+- Introduced in `46e906144c3f4b` (“docs: block: Create blk-mq
+  documentation”, André Almeida, 2020-06-19)
+- First appeared: `v5.9-rc1` (`git describe --contains` →
+  `v5.9-rc1~150^2~141`)
+- Present in this tree for the entire 6.12 lifetime
+
+Step 3.2: FOLLOW THE FIXES: TAG
+Record: No Fixes: tag. The introducing commit is the original
+documentation add, not a later regression in C code.
+
+Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
+Record (this tree, `-- Documentation/block/blk-mq.rst`):
+- `41bd33df4e180` docs: correct places → place
+- `c19430eec84f7` Fix small typo
+- `2bc602cb0e0d9` correct drive → driver
+- `8ac867340bd8c` / `9303c9d5e9883` Sphinx `:c:type` cleanup
+- `46e906144c3f4b` create the file
+No later URL rewrite in this checkout. Standalone; not patch X/Y of a
+functional series.
+
+Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
+Record: `git log --author="Jenson Johnathon Reggentin"` /
+`mail@jregg.de` on this tree: no hits. One-off docs contributor, not the
+block maintainer. Applied by Jonathan Corbet; Acked-by Randy Dunlap.
+
+Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
+Record: No new helpers, structs, or APIs. The hunk matches the current
+file byte-for-byte. Can apply standalone.
+
+---
+
+## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+
+Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
+Record:
+- `b4 mbox 20260819192422.42189-1-mail@jregg.de` saved 12-message thread
+  (lore HTTP 403 from WebFetch; b4 succeeded).
+- v1: `https://kernel.dk/blk-mq.pdf` (no www)
+- v2 (applied): `https://www.kernel.dk/blk-mq.pdf`
+- Randy Dunlap: v1 still 404 + invalid SSL; confirmed `www.` works;
+  Acked-by on v2; asked changelog-after-`---` nit
+- Haris Iqbal: Reviewed-by on v1; spotted missing `www.`
+- Jonathan Corbet: asked for a version that actually works; applied v2
+  (“Applied, thanks.”)
+- No NAK. No reviewer asked for Cc: stable.
+- Included in Corbet’s `[GIT PULL] Documentation stragglers for 7.3`
+  (`docs-7.3-2`), described as late-arriving docs fixes, not a stable-
+  critical runtime fix.
+- Syzbot CI skipped both versions: “AI determined the patch has no
+  functional impact”
+
+Step 4.2: CHECK WHO REVIEWED THE PATCH
+Record (syzbot CI Cc + thread):
+- To/Cc: Jens Axboe, Jonathan Corbet, linux-block, linux-doc
+- Reviewers who spoke: Randy Dunlap (ack), Md Haris Iqbal (v1 r-b),
+  Jonathan Corbet (applied)
+- Block maintainer was copied; no Axboe reply in the 12-message thread
+
+Step 4.3: SEARCH FOR THE BUG REPORT
+Record: No bugzilla/syzbot crash. Author observed a 404. Confirmed
+independently in this analysis.
+
+Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
+Record: Standalone. v1→v2 only to correct the hostname. No sibling
+functional patches required.
+
+Step 4.5: CHECK STABLE MAILING LIST HISTORY
+Record: lore.kernel.org/stable WebFetch returned 403. UNVERIFIED that
+stable@ discussed this specific URL. No evidence in the docs thread of a
+stable nomination or of a reason to exclude it.
+
+---
+
+## PHASE 5: CODE SEMANTIC ANALYSIS
+
+Step 5.1: KEY FUNCTIONS
+Record: None. Only an RST hyperlink.
+
+Step 5.2: TRACE CALLERS
+Record: N/A — not callable kernel code. Consumers are humans (and Sphinx
+HTML on kernel.org / distro doc packages).
+
+Step 5.3: TRACE CALLEES
+Record: N/A.
+
+Step 5.4: FOLLOW THE CALL CHAIN
+Record: Not reachable from syscalls. User impact is documentation-only.
+kernel.org `v6.12` HTML is built from this tree, so the 404 is user-
+visible for people reading 6.12 docs.
+
+Step 5.5: SEARCH FOR SIMILAR PATTERNS
+Record: `kernel.dk/blk-mq` appears only in `Documentation/block/blk-
+mq.rst` in this tree. Other `kernel.dk` hits are emails/copyrights, not
+this PDF.
+
+---
+
+## PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
+
+Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?
+Record:
+- `git describe HEAD` → `p-6.12-3-gc504cf0baa3d8`
+- `make kernelversion` / Makefile → **6.12.111**, branch `pending-6.12`
+- Line 142 of `Documentation/block/blk-mq.rst` still has
+  `http://kernel.dk/blk-mq.pdf`
+- `git merge-base --is-ancestor 46e906144c3f4b HEAD` → yes
+- Bug introduced v5.9-rc1 (2020); present here
+
+Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
+Record: Surrounding hunk is identical to the patch context. Expected
+apply: **clean**. `git log v6.12..HEAD -- Documentation/block/blk-
+mq.rst` is empty (no conflicting stable edits).
+
+Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE
+Record: Replacement URL not present. No alternate rewrite of this link.
+Comparable docs-link backports **do** exist after v6.12 in this tree,
+e.g.:
+- `b23111ec50d86` `docs: hwmon: fix link to g762 devicetree binding`
+- `a7f28636da6f9` `docs: media: update location of the media patches`
+  (explicit Cc: stable)
+
+---
+
+## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+
+Step 7.1: SUBSYSTEM AND CRITICALITY
+Record:
+- Subsystem: Documentation for the block layer (`Documentation/block/`,
+  MAINTAINERS: BLOCK LAYER, Jens Axboe; docs tree via Corbet)
+- Criticality of **blk-mq itself**: IMPORTANT (common block I/O)
+- Criticality of **this change**: documentation-only, not the I/O path
+
+Step 7.2: SUBSYSTEM ACTIVITY
+Record: `Documentation/block/` is mature; this file’s last change in-
+tree is a 2023 typo fix. The URL has been wrong/stale for years; the
+site layout change is what made `http://kernel.dk/...` a hard 404.
+
+---
+
+## PHASE 8: IMPACT AND RISK ASSESSMENT
+
+Step 8.1: WHO IS AFFECTED
+Record: Anyone reading in-tree or generated blk-mq docs (developers,
+distro doc packages, kernel.org HTML for 6.12). Not a
+runtime/driver/config population.
+
+Step 8.2: TRIGGER CONDITIONS
+Record: Opening the “Further reading” PDF link. Common for people
+studying blk-mq; never triggered by unprivileged syscalls. Not a race.
+
+Step 8.3: FAILURE MODE SEVERITY
+Record:
+- Failure: HTTP 404 / cannot open the referenced paper
+- Severity: **LOW** (incorrect documentation, no crash/corruption/hang)
+- No kernel oops, leak, or security effect
+
+Step 8.4: RISK-BENEFIT RATIO
+Record:
+- Benefit: working further-reading link in 6.12 docs; small but real for
+  doc users
+- Risk: **very low** (one RST URL; no code, locks, APIs)
+- Ratio: favorable *if* documentation corrections are in scope; not a
+  stability win
+
+---
+
+## PHASE 9: FINAL SYNTHESIS
+
+Step 9.1: COMPILE THE EVIDENCE
+
+FOR backporting:
+- Dead link is real (404 verified); replacement URL works
+- One-line, obviously correct v2 after review
+- Docs maintainer applied it; Randy Dunlap Acked-by
+- Buggy line exists in this 6.12.111 tree since v5.9; applies cleanly
+- User-facing exception: documentation/comment fixes with zero runtime
+  regression
+- This same 6.12 tree already took other documentation link-location
+  fixes
+
+AGAINST backporting:
+- Not a crash, deadlock, corruption, UAF, or security bug
+- Official rule 3 (“important issue”) is not met in the runtime sense
+- No functional kernel impact (syzbot CI skipped it for that reason)
+- No Cc: stable; landed as docs-7.3 stragglers, not a hotfix
+- Stable rules also discourage purely trivial edits; this is adjacent to
+  that class
+- Benefit is only to documentation readers, not production uptime
+
+UNRESOLVED:
+- Could not fetch lore.kernel.org or lore stable search via WebFetch
+  (403); thread recovered via b4
+- Commit SHA is not in this checkout’s `master` (that tip is ~7.2; patch
+  went in docs-7.3-2)
+
+Step 9.2: STABLE RULES CHECKLIST
+1. Obviously correct and tested? **PASS** — v2 URL verified; Acked-by +
+   maintainer apply
+2. Fixes a real bug that affects users? **PASS** — 404 in
+   shipped/generated docs, not a runtime bug
+3. Important issue (crash, security, corruption, deadlock)? **FAIL** as
+   runtime severity; **LOW** doc defect only
+4. Small and contained? **PASS** — 1 line, one file
+5. No new features or APIs? **PASS**
+6. Can apply to the local tree? **PASS** — context identical, URL still
+   old
+
+Step 9.3: EXCEPTION CATEGORIES
+Record: **Documentation fix** (incorrect/obsolete external link). That
+exception is why a LOW-severity, zero-runtime patch can still be
+appropriate for this tree.
+
+Step 9.4: DECISION
+The change does not stabilize running 6.12 systems, but it is a
+contained, verified correction of documentation this tree still ships,
+with no regression surface and with precedent for similar doc-link
+backports here. That matches the documentation exception, not a “new
+feature” or refactor.
+
+What it solves for stable users: kernel.org / distro HTML for 6.12
+currently points “Further reading” at a 404; after backport it points at
+Jens Axboe’s actual blk-mq PDF.
+
+Risk vs benefit: negligible risk, modest doc benefit. No dependencies or
+backport rework.
+
+---
+
+## Verification
+- [Phase 1] Tags: author SOB, Randy Dunlap Acked-by, Jonathan Corbet
+  SOB, Message-ID v2; no Fixes/Reported-by/Cc-stable
+- [Phase 2] Diff: single RST URL `http://kernel.dk/blk-mq.pdf` →
+  `https://www.kernel.dk/blk-mq.pdf`
+- [Phase 2] WebFetch: old URL 404; new URL returns the PDF
+- [Phase 3] `git blame` line 142: `46e906144c3f4b` (2020); `git describe
+  --contains` → v5.9-rc1
+- [Phase 3] `git merge-base --is-ancestor 46e906144c3f4b HEAD` succeeded
+- [Phase 3] Author has no other commits in this tree; file history is
+  typo/Sphinx-only
+- [Phase 4] `b4 mbox`: 12-message v1/v2 thread; Randy caught v1 404/SSL;
+  Corbet applied v2
+- [Phase 4] LKML pull: included in Documentation stragglers for 7.3
+- [Phase 4] Syzbot CI: skipped, no functional impact
+- [Phase 4] UNVERIFIED: lore.kernel.org/stable search (HTTP 403)
+- [Phase 5] No functions/callers; only docs consumers
+- [Phase 6] `git describe HEAD` = p-6.12-3-gc504cf0baa3d8; kernelversion
+  6.12.111; dead URL still at blk-mq.rst:142
+- [Phase 6] Apply would be clean; no post-v6.12 edits to this file
+- [Phase 6] Precedent: `docs: hwmon: fix link to g762...` and `docs:
+  media: update location...` already in this 6.12 tree
+- [Phase 8] Failure mode: documentation 404, severity LOW; runtime risk
+  none
+
+**YES**
+
+ Documentation/block/blk-mq.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/block/blk-mq.rst b/Documentation/block/blk-mq.rst
+index fc06761b6ea90..2798761efe0d6 100644
+--- a/Documentation/block/blk-mq.rst
++++ b/Documentation/block/blk-mq.rst
+@@ -139,7 +139,7 @@ completed.
+ Further reading
+ ---------------
  
- 	/*
- 	 * For IOPOLL, check if this completion is happening in the context
-@@ -473,7 +472,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
- 			blk_rq_unmap_user(pdu->bio);
- 		__io_uring_cmd_done(ioucmd, 0);
- 	} else {
--		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
-+		io_uring_cmd_hw_done(ioucmd, nvme_uring_task_cb);
- 	}
- 	return RQ_END_IO_FREE;
- }
-diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
-index 33e0ebeea5a0..0a89f5faf88c 100644
---- a/include/linux/io_uring/cmd.h
-+++ b/include/linux/io_uring/cmd.h
-@@ -70,7 +70,8 @@ int io_uring_cmd_import_fixed_vec(struct io_uring_cmd *ioucmd,
- 				  size_t uvec_segs,
- 				  int ddir, struct iov_iter *iter,
- 				  unsigned issue_flags);
--void io_uring_cmd_detach_dmabuf(struct io_uring_cmd *ioucmd);
-+void io_uring_cmd_hw_done(struct io_uring_cmd *ioucmd,
-+			  io_req_tw_func_t task_work_cb);
+-- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <http://kernel.dk/blk-mq.pdf>`_
++- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <https://www.kernel.dk/blk-mq.pdf>`_
  
- /*
-  * Completes the request, i.e. posts an io_uring CQE and deallocates @ioucmd
-@@ -138,7 +139,8 @@ static inline int io_uring_cmd_import_fixed_vec(struct io_uring_cmd *ioucmd,
- 	return -EOPNOTSUPP;
- }
+ - `NOOP scheduler <https://en.wikipedia.org/wiki/Noop_scheduler>`_
  
--static inline void io_uring_cmd_detach_dmabuf(struct io_uring_cmd *ioucmd)
-+static inline void io_uring_cmd_hw_done(struct io_uring_cmd *ioucmd,
-+					io_req_tw_func_t task_work_cb)
- {
- }
- 
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index 0e0509edec6f..11a8ed1ba03a 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -50,12 +50,6 @@ void io_uring_cmd_cleanup(struct io_kiocb *req)
- 	io_req_uring_cleanup(req, 0);
- }
- 
--void io_uring_cmd_detach_dmabuf(struct io_uring_cmd *ioucmd)
--{
--	io_detach_dmabuf_map(cmd_to_io_kiocb(ioucmd));
--}
--EXPORT_SYMBOL_GPL(io_uring_cmd_detach_dmabuf);
--
- bool io_uring_try_cancel_uring_cmd(struct io_ring_ctx *ctx,
- 				   struct io_uring_task *tctx)
- {
-@@ -146,6 +140,18 @@ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
- }
- EXPORT_SYMBOL_GPL(__io_uring_cmd_do_in_task);
- 
-+/*
-+ * Queue completion in task context after dropping references that must be
-+ * released at hardware completion rather than from task_work.
-+ */
-+void io_uring_cmd_hw_done(struct io_uring_cmd *ioucmd,
-+			  io_req_tw_func_t task_work_cb)
-+{
-+	io_detach_dmabuf_map(cmd_to_io_kiocb(ioucmd));
-+	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, IOU_F_TWQ_LAZY_WAKE);
-+}
-+EXPORT_SYMBOL_GPL(io_uring_cmd_hw_done);
-+
- /*
-  * Called by consumers of io_uring_cmd, if they originally returned
-  * -EIOCBQUEUED upon receiving the command.
+-- 
+2.53.0
+
