@@ -1,251 +1,106 @@
-Received: from mta1.migadu.com (out-48.mta1.migadu.com [95.215.58.48])
+Received: from mta1.migadu.com (out-135.mta1.migadu.com [95.215.58.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A520C339395
-	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 08:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D265449BB72
+	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 08:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792399391; cv=none; b=b+gqIoLahC7HNrGWasJc3fZv4bOJ/csbc5vyhG59Fn+7POdsnez+e2SYKT2HALe+R5jffuO31AYMDOAjMeYyp7ajXb2hEJfN0QAskV9c5BEkiusftNXhyxDS70BSr2GhwaIGX61JLxzfQJYJhWdb7n0EJxYBi5luersatOn0t6g=
+	t=1792399657; cv=none; b=tqzkzCpPXMPWRPWV2YE/paBI/guUAcOpHPVvuvDKS7uwATq8aqY6ZjNsBv6aRJ8hn3jqK9ze7rtvAqwBO7LILloa9AqWx+8BGMqADCfdygDoC5sxwzSQ3j4QgA0dmIAgTCTxR0Qpxj0AAcdh5NTi0AapOADGXEIQvYpyw3BAlQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792399391; c=relaxed/simple;
-	bh=SkseMn7fPuRum4KiC10PAEDJWAlNIXhfvD1jIKxAIkQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Po0Q3Z9oSmvi49vk8MXDGZ8ycw6FH3O094p+2MrbyTx6uqxBb95VOTAkKKWdkxuRjKlajHpvFSZCaRfOnPjE0IBciAx3do7h7e9Wqr7ylEVQ4saYJz8GKICAyktWRNMz+MBJl7US+GgnMPhc3/MilP2IDGXetJXB5HeoICeQGuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hwcCABqA; arc=none smtp.client-ip=95.215.58.48
+	s=arc-20240116; t=1792399657; c=relaxed/simple;
+	bh=jFAkyj5yoPWtYLC+zOW72R2wyKdGUE2qk/tecO0yjmA=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=p87TCJqMvNhYAGi/nFxaBQv95nqoLbjIMXPIATNi4DJgNGt9cgI0DwSZ3PvdQa72A/RM+fYhFL+9EKb/R+tAj1vlwfGoOLMUl3KvjvKl24J1wwQ7nwVBlIN3/sIYWEMDNR4pdaJ9OlL15ff3flMiz3QUxFqPON3RZsDo3vQ3aUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JZ1ZcpQ6; arc=none smtp.client-ip=95.215.58.135
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hwcCABqA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JZ1ZcpQ6"
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=SkseMn7fPuRum4KiC10PAEDJWAlNIXhfvD1jIKxAIkQ=;
+DKIM-Signature: a=rsa-sha256; bh=jFAkyj5yoPWtYLC+zOW72R2wyKdGUE2qk/tecO0yjmA=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792399386; v=1; x=1793004186;
- b=hwcCABqAgltYQmaTSbczVNLVDTH5gpdSXcW6zD/q8hCJkow7DrzJxMAebc9Z0BDnbGEVDsn5
- XhzVuOkIlrByE9q0nTatoARYcr+BXjNiLa32nPfRpyDkQoAAWq22dexN66XRawAV2Rk7Lgj+zZG
- Jj3MljRgdTxIZrRNBYN1xxQA=
+ t=1792399653; v=1; x=1793004453;
+ b=JZ1ZcpQ6rs/nEXE0tIhJ2SEUgsoq0dF8fHk1c2XZC/ntxtHo0YRtOJW3N9MnO5OHSt69/45h
+ cFJMesqOXbslNCCjA7t3qGuv7hGFkdkt++X/8EHLPGzVWC05S1O2uL/N48ZTniAem+GJ/Kw3DVX
+ UvENTPelfBKUpx6sW5sqAEW8=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 65f89b9575891237;
-	Mon, 19 Oct 2026 08:43:06 +0000
-X-Mizu-Trace-ID: 65f89b9575891237
+Received: by smtp.migadu.com with ESMTPS id d39df06ac6c62a0f;
+	Mon, 19 Oct 2026 08:47:33 +0000
+X-Mizu-Trace-ID: d39df06ac6c62a0f
 X-Migadu-Flow: FLOW_OUT
-From: Jackie Liu <liu.yun@linux.dev>
-To: josef@toxicpanda.com
-Cc: axboe@kernel.dk,
-	shuah@kernel.org,
-	tom.leiming@gmail.com,
-	yukuai@fygo.io,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH 4/4] selftests: nbd: test multi-connection startup races
-Date: Mon, 19 Oct 2026 16:42:27 +0800
-Message-ID: <1e23512b7d6701f53fdec82e08ee480cd9b27712.1792399226.git.liuyun01@kylinos.cn>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <cover.1792399225.git.liuyun01@kylinos.cn>
-References: <cover.1792399225.git.liuyun01@kylinos.cn>
+Message-ID: <6f2cb853-5eb5-4f3b-9021-ab24735a61c3@linux.dev>
+Date: Mon, 19 Oct 2026 16:47:26 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>,
+ ameryhung@gmail.com, alexei.starovoitov@gmail.com
+Subject: Re: [RFC PATCH v10 0/4] blk-iocost: add BPF struct_ops cost model
+ support
+To: Tejun Heo <tj@kernel.org>
+References: <20261003124045.1289305-1-cui.tao@linux.dev>
+ <a3dfbc2d-8580-478c-8189-3794d49aee11@linux.dev>
+ <20e2b2a51fd97292add8d8e527b14a45@kernel.org>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20e2b2a51fd97292add8d8e527b14a45@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Jackie Liu <liuyun01@kylinos.cn>
+Hello Tejun,
 
-Extend the NBD startup selftests to race NBD_DO_IT against adding a
-second socket without NBD_FLAG_CAN_MULTI_CONN, and against clearing the
-flag on a device that already has two sockets. Prime the queue count
-before each attempt to exercise the unlocked hardware queue update.
+在 2026/10/17 01:49, Tejun Heo 写道:
+> Hello, Tao.
+> 
+> On Thu, 15 Oct 2026 20:00:20 +0800, Tao Cui wrote:
+>> When you have a chance, could you take a look at this series? I'd
+>> appreciate your thoughts on whether the implementation still matches
+>> what we discussed, or whether it has drifted somewhere along the way.
+> 
+> The behavior matches what was discussed, but the implementation needs a
+> lot of cleanup, and there are bugs in the detach path and the
+> iocg_init()/iocg_free() pairing. Details are in the replies to the
+> patches.
+> 
 
-Check for EINVAL or a valid single-connection start. Detect an invalid
-multi-connection start by checking whether a receive worker consumes a
-byte from the second socket. Keep the reply incomplete so that the check
-does not inject a malformed reply into request completion.
+Thank you for the careful review, and especially for confirming that
+the behavior is where we wanted it.
 
-Exclude flag changes observed after PID publication, since changing
-flags on an already running device is outside the startup race being
-tested. As with the concurrent-start test, this is scheduling stress and
-a passing run does not prove that every race window was exercised.
+The two bugs are mine to fix, and v11 reworks both. The detach path
+follows your map-reference suggestion, and the iocg_init()/iocg_free()
+pairing moves to ioc_pd_online() as you described, with iocg_free()
+keeping the delivered flag per your catch about bios still holding the
+blkg across offline. 
 
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- tools/testing/selftests/nbd/.gitignore       |   1 +
- tools/testing/selftests/nbd/Makefile         |   2 +-
- tools/testing/selftests/nbd/nbd_multi_conn.c | 147 +++++++++++++++++++
- 3 files changed, 149 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/nbd/nbd_multi_conn.c
+>> Sashiko flagged a possible ABBA between the BPF paths and
+>> ioc_cost_model_write(): attach/detach take the queue freeze before
+>> q->rq_qos_mutex, while the cost-model write holds rq_qos_mutex across
+>> its freeze. That is indeed the current ordering, but I don't think this
+>> can deadlock because the queue freeze is a depth counter
+> 
+> The attach and detach order matches ioc_qos_write(). The reverse order in
+> ioc_cost_model_write() predates this series and is better fixed
+> separately. An earlier attempt to convert it ran into blk_iocost_init()'s
+> percpu allocation under the freeze:
+> 
+>   https://lore.kernel.org/all/aV5OwAvw1sRF1IW1@fedora/
+> 
+Agreed. The write path ordering predates the series and
+I've left it alone there.
 
-diff --git a/tools/testing/selftests/nbd/.gitignore b/tools/testing/selftests/nbd/.gitignore
-index 5516e34b30f2..5920071f30ee 100644
---- a/tools/testing/selftests/nbd/.gitignore
-+++ b/tools/testing/selftests/nbd/.gitignore
-@@ -1 +1,2 @@
- /nbd_pid_race
-+/nbd_multi_conn
-diff --git a/tools/testing/selftests/nbd/Makefile b/tools/testing/selftests/nbd/Makefile
-index e49ee6cfc82e..7c3e5e6ea1b0 100644
---- a/tools/testing/selftests/nbd/Makefile
-+++ b/tools/testing/selftests/nbd/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- CFLAGS += -O2 -Wall -Wextra $(KHDR_INCLUDES)
--TEST_GEN_PROGS := nbd_pid_race
-+TEST_GEN_PROGS := nbd_pid_race nbd_multi_conn
- LOCAL_HDRS += nbd_common.h
- 
- include ../lib.mk
-diff --git a/tools/testing/selftests/nbd/nbd_multi_conn.c b/tools/testing/selftests/nbd/nbd_multi_conn.c
-new file mode 100644
-index 000000000000..a032b36bb89d
---- /dev/null
-+++ b/tools/testing/selftests/nbd/nbd_multi_conn.c
-@@ -0,0 +1,147 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2026 KylinSoft Co., Ltd. All rights reserved.
-+ *
-+ * Startup must revalidate CAN_MULTI_CONN after an unlocked queue update.
-+ */
-+#include <errno.h>
-+#include <linux/nbd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+#include <sys/socket.h>
-+#include <unistd.h>
-+
-+#include "../kselftest.h"
-+#include "nbd_common.h"
-+
-+struct stats {
-+	int rounds;
-+	int rejected;
-+	int missed;
-+	int hits;
-+	int errors;
-+};
-+
-+/*
-+ * A byte cannot disappear from this UNIX socket unless a receiver reads it.
-+ * Only recv_work() reads the client endpoint. Keep the reply incomplete so
-+ * observing a second receiver does not depend on hardware queue counts or
-+ * inject a malformed NBD reply into request completion.
-+ */
-+static int second_receiver(struct session *s)
-+{
-+	long long end = nbd_now_ms() + 50;
-+
-+	if (send(s->sockets[1][1], "x", 1, MSG_NOSIGNAL) != 1)
-+		return -errno;
-+	for (;;) {
-+		int pending;
-+
-+		if (ioctl(s->sockets[1][0], FIONREAD, &pending))
-+			return -errno;
-+		if (!pending)
-+			return 1;
-+		if (pending != 1)
-+			return -EIO;
-+		if (nbd_now_ms() >= end)
-+			return 0;
-+		usleep(1000);
-+	}
-+}
-+
-+static int multi_connection(int index, struct options *o, struct stats *st,
-+			    bool flags_only)
-+{
-+	struct session s;
-+	int ret, state = -1, cleanup;
-+	bool eligible = true;
-+
-+	ret = nbd_prime(index, flags_only ? 1 : 2, o);
-+	if (ret)
-+		return ret;
-+	ret = nbd_session_open(&s, index, flags_only ? 2 : 1,
-+			       flags_only ? NBD_FLAG_CAN_MULTI_CONN : 0);
-+	if (!ret)
-+		ret = nbd_launch(&s, 1, o);
-+	if (!ret) {
-+		if (o->spread_b)
-+			usleep(rand_r(&o->seed) % o->spread_b);
-+		if (flags_only) {
-+			if (ioctl(s.fd, NBD_SET_FLAGS, 0))
-+				ret = -errno;
-+			/* A flags change after startup is a separate, older behavior. */
-+			state = nbd_device_pid(index);
-+			if (state < 0)
-+				ret = state;
-+			eligible = state == 0;
-+		} else if (ioctl(s.fd, NBD_SET_SOCK, s.sockets[1][0])) {
-+			if (errno == EBUSY)
-+				eligible = false;
-+			else
-+				ret = -errno;
-+		}
-+	}
-+	if (!ret) {
-+		state = nbd_wait_state(&s);
-+		st->rounds++;
-+		if (!state && s.results[0].error == EINVAL) {
-+			st->rejected++;
-+		} else if (state == 1) {
-+			int receiving = eligible ? second_receiver(&s) : 0;
-+
-+			if (receiving < 0) {
-+				ret = receiving;
-+			} else if (receiving) {
-+				st->hits++;
-+				ksft_print_msg("nbd%d: invalid second receiver (%s)\n",
-+					       index,
-+					       flags_only ? "flags changed" : "socket added");
-+			} else {
-+				st->missed++;
-+			}
-+		} else {
-+			ret = state < 0 ? state : -EIO;
-+		}
-+	}
-+	cleanup = nbd_session_close(&s);
-+	if (!ret)
-+		ret = cleanup;
-+	if (!ret && state == 1 && (s.nr_results != 1 || s.results[0].error))
-+		ret = -EIO;
-+	return ret;
-+}
-+
-+static void run_test(struct options *o, bool flags_only, const char *name)
-+{
-+	struct stats st = { 0 };
-+	int i;
-+
-+	for (i = 0; i < o->rounds; i++) {
-+		int ret = multi_connection(nbd_pick_device(i), o, &st, flags_only);
-+
-+		if (ret) {
-+			ksft_print_msg("%s round %d: %s (%d)\n", name, i + 1,
-+				       strerror(-ret), ret);
-+			st.errors++;
-+		}
-+		if (st.errors || st.hits)
-+			break;
-+	}
-+	ksft_test_result(!st.errors && !st.hits && st.rounds == o->rounds,
-+			 "%s: rounds=%d rejected=%d missed=%d regressions=%d errors=%d\n",
-+			 name, st.rounds, st.rejected, st.missed, st.hits, st.errors);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct options o;
-+
-+	nbd_parse_options(argc, argv, &o);
-+	ksft_print_header();
-+	nbd_init_test(&o);
-+	ksft_set_plan(2);
-+	run_test(&o, false, "socket-count retry rechecks CAN_MULTI_CONN");
-+	run_test(&o, true, "flags-only change rechecks CAN_MULTI_CONN");
-+	ksft_finished();
-+}
+The implementation cleanup from the patch replies is in v11 as well.
+
+Thanks,
+Tao
+
+> Thanks.
+> 
+
