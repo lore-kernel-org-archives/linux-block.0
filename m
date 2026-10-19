@@ -1,85 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=52.35.192.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792437969;
-	b=3Ygxp0LiLRiOkwtQ89eh7eI8eVbfNOAG41bNYfWqbivi62/OoPQvK7OaEXGK5LF4LPzg
-	 W41yqKHy+mVZP+yK3/4xH8QqeFwrXdhCU4V7co/WeptujGbibI1xG3Q+cWYq7JTW8/bF8
-	 4fGcfFDcIgv2MUYY0YNDnBwP6W/ke3m/Da7WPbJvILMNoLnDECoNLaSchxzn8l4IIQYd2
-	 /DE5FM8HuZg7FUGpow/luUklH1B/4THkZKxDg0N06FBl/fks734O1esECZvJ5YcI/yeHT
-	 nsOm2MQIAGVmzsnEyxF52Ix2pSVbdTY6zh+D4Q1CazzDQVo9XeyOBRvSoHG8cECEI6g==
+	t=1792438144;
+	b=T/XNwGfI+Gy45KMEG3f2iGEv84Wa+w+PGhrk3pqNkF8MXu2vmpLo/rzhMtlY45u5/c4x
+	 qYSeuA4gSFjowxDjJLHUusL5CL93jkFRhojh0O5JD+M53jI1+/kVN56lZPrpcrGPDtpDq
+	 lXt86cX1N3LGLMJm3aJjX6XitiPi9AZY/Nj6q2JS50ZlvoSoGjzHhZkvkT6tIVOpdTD5M
+	 HpnROGgE1LS76XRtKNnMBotjAAEsJry7MCzQRNKLUJyJOAna2H0O0F4rCooe6XFqmexxa
+	 M0oYwjVjXqe6mq6rjj62gjpBw6pcHftdNvj479E4LfzmNAwEGNHnTNCXdpEQpRwrBYg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792437969;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=MKk8pS8Vf1bXwxj1SK95UJHCC43mO5YEaAXmf2ft/vc=;
-	b=t0eRUpZq7QL/nBUeAmhAQArsLVzreHafU9wyjxuOql7wHQ5OnG/4TUdMbbj2pGEyYSt1
-	 2M7WRJrSQfe7wWr8UcDyC3rVxq9YJn6CnLX0tIGLUW4f/mCB4Xy0mGU+l4himt/D15znO
-	 6bCn8fl+WH2RRbfsNEkUIsZjB1cS3vRnI8kxf/cPP8WyjKLNkpakZwUQbEtIk/BG5YEGn
-	 1hoEtSqovp17zTH7Xu4BLDS3GmFPKm8HLhmXbWFHYncwyEoOKHBIRILfldzW5QBT+Z2ea
-	 v4s6vIN3RVQ5W0mu/swkaWc224NhGf/4iRgEKiWww8Nqc22AcqRkdcxOhULkJVpf7ow==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792438144;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:Received:Received:X-Farcaster-Flow-ID:Received:Received:
+	 From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=U/bRINIDQzD431k78GQB7GRewLOTJlawRJ+e1x3vg3c=;
+	b=RnzS2t+JCXoS39EEVobQ6T9cPAljFN//HtnEwIidN/iOHtNi0lI0aB34iEomVLSUI+f6
+	 osGfVu75j+FF5/XjiGwrl+kENkvxcOj5XgCQznFBYXqp3hYNYm7VsX2Ac/NRRtGsqk/5d
+	 e5mG+6eFHHZeFWBA4GRYmZufleeIgbOR87b96P6nmZ4V6zrrck2NplU4iNLTsfTgOkpvi
+	 5oFFlMs5Y8v+DhCuorFiakjAsZVQtkvkZlrgCw9Ft+2TfMnl7qKXAtpndbC3ryceG4Yak
+	 7xaL6S8LVkT9WB0nAvbg6uYnZ3beCqJsulPQyHfmH7SoGKu0ZaPW/sofCvHiXB5LZTg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=E0BbqP+n;
-	arc=none smtp.remote-ip=209.85.161.46
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=amazon.com;
+	spf=pass smtp.mailfrom=amazon.com;
+	dkim=pass header.d=amazon.com header.i=@amazon.com header.a=rsa-sha256 header.s=amazoncorp2 header.b=fDIxBXzP;
+	arc=none smtp.remote-ip=52.35.192.45
+Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFBD606A31F
-	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 19:26:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5BFBD606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB24606A319;
+	Mon, 19 Oct 2026 19:29:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ACB24606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=E0BbqP+n
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-6de1ca1b05aso1838735eaf.0
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 12:26:08 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=amazon.com header.i=@amazon.com header.a=rsa-sha256 header.s=amazoncorp2 header.b=fDIxBXzP
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792437967; x=1793042767; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=MKk8pS8Vf1bXwxj1SK95UJHCC43mO5YEaAXmf2ft/vc=;
-        b=E0BbqP+nHzVnb9kxYgPijwdeHaehuef1gZ2ZmePQmRQAMgbcx+l370sQk7+k6vWeyZ
-         f7LIffJUq723oU1ZeRn2SOktMhZfC+sIctOVPtSDfmsFricH2yJ1qGVVvEZfokh7beAh
-         ksbs+6Olf6SEYpPiZVYOy+5AayGr/lMs3w8amKUpuz5MPouBwyy9ADfSRNMdppPs3RXO
-         iOxUnmbcTqbjxsnz+sNOKNh2PWCCwEJ+Lyxj/huZ10aZ8MU1oxVC17lZTsW2InRZhaAO
-         GHeIZT0AxPZ8Gq8t1+qM05C356hYgPp4Bo+dop+6skyQUhvUrts0eA9QI0r+3Cg0ZKy3
-         wSOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792437967; x=1793042767;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=MKk8pS8Vf1bXwxj1SK95UJHCC43mO5YEaAXmf2ft/vc=;
-        b=uA6eurc5QvJC148ipw1gga9aOFzFvpGuReVowQATCXqv7fps9TdZ24z9sDuFvLM3k9
-         nCfpKfO0gZQUoJblMLHVhtDcn3RnFkaonPJsrEjlSHS/gbxhVzSaz82VQat2CVa1pZ8H
-         fm0SEw0Ue3mjDSTq6g+UbNsPVHBPhHykf/e8H5iLuKcXOI/evJv9/54B0perQkMF9Sev
-         +dlUYj06cNUJhN8AGUmn+0LBPv7x4DTh8oo0KSuahkoDm0qJqS4Qv5dIlE7MT/qzVZxD
-         Wf7gOpRxCmn/LJXhzDKx3AgOSTpYu9mi8cZ3VnC4TkzPND4lg9jpcCRYIB30JmqkCeyT
-         /cTQ==
-X-Gm-Message-State: AFq9FYKZn7XgH+8zeEyNWefbcqQl1nJlPA9g+U6NkeJsm/eWSUQPz9V7
-	MQqW0cTk4bBIWe/315C0bAhrl8IbDQN2bH++0S4i7p5GXQ/JaX9I4vK9pbJnPlPn9hs=
-X-Gm-Gg: AYBFou1Jytsxfvd+ruMDFrrDFepiEuxw+h25o8Nu5ENGw1rxIvO3M0Rsr/oMFcjdyaZ
-	15mHftIFiSJZVVdoObjDNSf7wP1EOxhjBNvMG2WIpzKX31j0Y76JseDFErRCRbDXy+ID0hhPuTZ
-	Ej6tk+2EYCBMoeyNKMPdSUE8N7p5liPo5fox0kKbMmT2+DI2ppar3j5aT3d5NRKbJfwkhv/mYM2
-	ibDKUtD4n/7ziScW+cKElSeCIpsC7zN1jh1gstCAp4RGnRNmUspA4uVYXMNU7P65/6DZxSky8lp
-	mpyJKfB+qSLBh1Ah7xoXt46WqWz0yTa9/hazjM4rJYq+DvV3Vl3pcYUnV96KHQU3hHDs/CKEk3Z
-	voNY+K+qusoJaZX+hx5hetbF8xdNMHeszL25bYNOV730UeP2Zpid6kw+cZAWfP026xgeApzms58
-	OGbBhg+dI3Ib0RwaHsk5KuNWPo2dLOfHiGx3cQHo0ayAN2VpHE1rLQx6tTQA1VtbR3K9DSCTsmu
-	xDrZGneoz8BjWKHHzyyG/tS9v8rDuapyvIfsz63u3lsEpO3t0yHqhqNV2B87wbGug==
-X-Received: by 2002:a05:6820:1686:b0:6f7:75ab:f969 with SMTP id 006d021491bc7-7035749fca2mr5657283eaf.66.1792437967242;
-        Mon, 19 Oct 2026 12:26:07 -0700 (PDT)
-Received: from [192.168.2.38] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a782c94514sm3933455fac.17.2026.10.19.12.26.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Oct 2026 12:26:06 -0700 (PDT)
-Message-ID: <50082b9e-2adf-4292-8d7e-a1d3af4cb7f6@kernel.dk>
-Date: Mon, 19 Oct 2026 13:26:04 -0600
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1792438143; x=1823974143;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=U/bRINIDQzD431k78GQB7GRewLOTJlawRJ+e1x3vg3c=;
+  b=fDIxBXzPe+iOWcGhnPihh+wCaxAvZsKz7VYZzNCPq+KbvOcVOlsT3Y5A
+   oKVNw+ndij1Y7wFiCcdhVUhfOYEz+UqJSyz2rVeNGRaAtSomN8gZbJda4
+   R2wIxq+wmk2eQ9xh17VCgDzKYGS7mehE5vOESWPiD1iLVxxSoT1Nd1Z9k
+   5Ld/6kNbI1lvdEz1SJixDdpI89fp0aH4qlAGdQ7U0r7Qy3KEtibjM5IOn
+   mAHogBofHahzQJ7ZfmrotpiTYzZ6YrXt8juz/Zb4h45I5E9YudC3/Qrb7
+   jh9936j8fhnLI0V0/YLjFOgKLW2sedZ6yWoEvKfj3g1ah0ZQMxtfCL6CX
+   g==;
+X-CSE-ConnectionGUID: JcB4rCh/QG2fiukXgN41hQ==
+X-CSE-MsgGUID: u5bBUhXLT+aRMdNKeUKHsw==
+X-IronPort-AV: E=Sophos;i="6.27,167,1787011200"; 
+   d="scan'208";a="31447309"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 19:29:03 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.48:25501]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.38:2525] with esmtp (Farcaster)
+ id 308ec05d-3c5a-4c35-a3af-d9ffdda9890d; Mon, 19 Oct 2026 19:29:02 +0000 (UTC)
+X-Farcaster-Flow-ID: 308ec05d-3c5a-4c35-a3af-d9ffdda9890d
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Mon, 19 Oct 2026 19:29:02 +0000
+Received: from dev-dsk-mkbund-2b-9ea2efba.us-west-2.amazon.com (10.2.100.138)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.53;
+ Mon, 19 Oct 2026 19:29:02 +0000
+From: Mark Bundschuh <mkbund@amazon.com>
+To: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, Benjamin Marzinski
+	<bmarzins@redhat.com>
+CC: <dm-devel@lists.linux.dev>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Damien Le Moal <dlemoal@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Mark Bundschuh <mkbund@amazon.com>,
+	<stable@vger.kernel.org>
+Subject: [PATCH] dm: fix infinite loop in dm_blk_do_report_zones()
+Date: Mon, 19 Oct 2026 19:28:19 +0000
+Message-ID: <20261019192819.3962873-1-mkbund@amazon.com>
+X-Mailer: git-send-email 2.50.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -89,37 +86,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] loop: missing BLK_OPEN_WRITE check on LOOP_SET_STATUS in
- lo_compat_ioctl()
-To: Bart Van Assche <bvanassche@acm.org>, Dominik Maier <dmnk@google.com>
-Cc: linux-block@vger.kernel.org, dmnk+artist@google.com
-References: <CAE7N4Sq6_M610g6gOUJCkkoBH06Kqbndb7KhGGLk=WCHOqHbtw@mail.gmail.com>
- <51568a73-77a8-49cf-8a49-71f15cb6e5e7@acm.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <51568a73-77a8-49cf-8a49-71f15cb6e5e7@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA002.ant.amazon.com (10.13.139.96) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On 10/19/26 1:23 PM, Bart Van Assche wrote:
-> On 10/19/26 3:16 AM, Dominik Maier wrote:
->> Fixes: 604f275f9670 ("loop:Check for read-write open mode before
->> setting status")
->> Assisted-by: ARTIST LLM
-> 
-> I can't find commit ID 604f275f9670 anywhere. Additionally, I can't find
-> any commit with the subject "loop:Check for read-write open mode before
-> setting status". Did I perhaps overlook something?
-> 
-> Linux kernel patches must be signed. I don't see a Signed-off-by tag?
+If the device underlying a zoned target is removed, its capacity is set
+to 0 and blkdev_report_zones() returns 0 without reporting any zones.
+The mapped device keeps its old capacity, so args->zone_idx and
+args->next_sector never advance and dm_blk_do_report_zones() loops
+forever. On non-preemptible kernels this causes soft lockups and RCU
+stalls.
 
-Agree, all of these seem broken, sha as well as title, and no SOB.
-On top of that, [BUG] is also wrong, and the patch was mangled
-and I even had to hand apply it. Fix looks good though - Dominik,
-please check how to generate and email patches and resend it, I'll
-drop this one.
+The following sequence of commands triggers the hang:
 
+modprobe scsi_debug zbc=managed dev_size_mb=1024 zone_size_mb=64
+udevadm settle
+echo '0 2097152 linear /dev/sda 0' | dmsetup create lin
+echo 1 > /sys/block/sda/device/delete
+blkzone report -o 0 -c 1 /dev/mapper/lin
+
+Fix this by returning -EIO when a target reports no zones. The target
+always maps args->next_sector, so a zero return means the underlying
+device no longer covers that sector.
+
+Fixes: d41003513e61 ("block: rework zone reporting")
+Cc: stable@vger.kernel.org
+Signed-off-by: Mark Bundschuh <mkbund@amazon.com>
+---
+ drivers/md/dm-zone.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+index f29acf64429a..ce4f94685a78 100644
+--- a/drivers/md/dm-zone.c
++++ b/drivers/md/dm-zone.c
+@@ -33,6 +33,8 @@ static int dm_blk_do_report_zones(struct mapped_device *md, struct dm_table *t,
+ 					      nr_zones - args->zone_idx);
+ 		if (ret < 0)
+ 			return ret;
++		if (!ret)
++			return -EIO;
+ 	} while (args->zone_idx < nr_zones &&
+ 		 args->next_sector < get_capacity(md->disk));
+ 
 -- 
-Jens Axboe
+2.50.1
 
