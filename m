@@ -1,87 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792444962;
-	b=zvekBjrdXXLHf9pNU3R6HAzLFbjE0cw4f5K2zzrHHVpwoeKmxgZ0FuTvwTOIOY5TQh8Z
-	 biNDN1JAer/d7/cPQ/BT17LXuKTfbxzZO6fdce6CGhe5JROnspER4sTdsyaZzDeMPDlNE
-	 wI9LxhfUTJIJqH0uucduSIeNmIHnGkU317+G6O1aiwEs6He4YpUQLKe125deNaKqdxZV0
-	 WLKtUaq16OCR5uiAnOFdGhG4HXUA4FjEX9Ejsb4Y6HX8iKEx/AJYFhnOQp/GX631y3rt4
-	 zwfSSR1dTv+oE1w3i0dgVfbbiRZnV9Kq4uYlAxeYnZgk6PTToI8h+tLjOugR61RJahQ==
+	t=1792445647;
+	b=Lx/tstiOdrb9rt3xnTgaKg7Bl7tMxYZSA8jnvQjZEWYB+GPkYfwE/QCQnGi9jNFwThRd
+	 IL9SH2/2YItDfLmGgkZ0kHQQZXKr9ZfDApEPKx7cVvpu8A8RE9weG0RkYASOO14DGN9lI
+	 7rLt0mtqrwIAHetygOzT4JOvYfxpajGH5eH33GcQYmlTDJySzMMPoD2SPISxOcN5RKvnJ
+	 H5Bkfbg0gjfm5FIGaSzwtoQKdVsgli7OCz3YcKEbewkzFqgz2lamxHoh8SwMtWgKX0y87
+	 EJtmC4qnoCRMd4CmsBgt4PO8pQnMxR8rEsxEDNZey4+AqEeRjORpeWKOH6Pa2RCLXVw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792444962;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1792445647;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
+	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 References:Content-Language:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=CEb54PbMcZ4QC2hOQFDpn9YXBC5p2LNF1QebXmTTnaw=;
-	b=C8+KcCpYj9XTai4kIzsLLFx03tYNESWxU3DI3BN7qOqR1xKxXylY5hJBLVs+dmNkRkWX
-	 89JbU2X0locdzJj4XM56S5GJvBshJb+sivJcg19LqoXZhHQVGI/UPRKA/oU+KoWQ/J9zi
-	 xeYp7HPBPMqkD8l1Idvh8rSUpq6hKZCuI3gE3F+cT6zBdBmzZfkKVkGxrHeiGjk5lnpzf
-	 v8C0IKpYXH04JS9pXROKphCW+VQvqXMwmjLEU4UD3W4hVTJwsryUeU3I+PyvGw+qEcOQv
-	 Mj33LIAe8apz9IHpwYnTVswLqh2K+ECLVWuhFHjmIjLxGdfZ6Hfq1fk6V6I68bMF8BA==
+	bh=5E7RzlaDuAw9uKwHLzxHAh7RmcEba2LCM1IqL7WsLws=;
+	b=I7QY+TKOknwrLHR3QxCxEJ+fK1lHcgA+laD+mdnt2WotgXQIcBDKM7wrpOhbUFe7dzZm
+	 JHgrwuSYfva0IcOBEHQbMTAGDWN9pvYHqsZUA+eHlXxdCUKGD/h4L4JktuIIL/mRhAF3m
+	 oeCDCrTTL/+JdLpnX/sUZVMymtyver2iBowTyK0+z5KBAtfg1vKMAP67DlY76cT6rFYM7
+	 ciDFxOSp1YREIfbCK8Ix0qGLCMJTtG+Xcx5Wp1/fn2ZSatmOX6lT/ErV9att7dbpCKMur
+	 Z13T1/PfScEUwUFdIiSls+6ggibFsiHKn8U/ilH3vk8SBvvMU0lJcy3cESW9UEX1EjQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=crQKpPzk;
-	arc=none smtp.remote-ip=209.85.210.48
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=acm.org;
+	spf=pass smtp.mailfrom=acm.org;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=Tcg4MwfJ;
+	arc=none smtp.remote-ip=199.89.1.16
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F14F606A31B
-	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 21:22:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6F14F606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC33606A31B;
+	Mon, 19 Oct 2026 21:34:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6DC33606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=crQKpPzk
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-8470d7d430fso882584a34.3
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 14:22:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792444960; x=1793049760; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CEb54PbMcZ4QC2hOQFDpn9YXBC5p2LNF1QebXmTTnaw=;
-        b=crQKpPzk4HbGrVKiuAlEdOyeK7Z+qQz5C8fVvQQ/dJQ+687M5eYHFURY+QuLZMNrE9
-         74mVHPdEucO20wUp6sZifiVrFukZyp0kcbqxmTDABgkCJ7Yph56xWNUwA/JgfmqUSlN+
-         msWIhZ+DLsA9DtwsT4J2vo7Y3ZPKdRxgO/uoWOZ36ylEZQSpUCS/lPHtWbJ+Ub/v3y86
-         ebf/Zeie1KdqNQsVLyPPHiN07FP/PGZujHEJkEHXWhwjRDrVMcPIgMFSbU4lyAY/5Gpk
-         X6aP1Gu4m6bqpRcDqF1/QNTodn208biEzKdDvX9uNudWH0DbNW19O1aamsBIaYu9NUa/
-         wGrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792444960; x=1793049760;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=CEb54PbMcZ4QC2hOQFDpn9YXBC5p2LNF1QebXmTTnaw=;
-        b=pX2k+jhZg86KBHdNpjOPIDT/KFgP08xP9tgZ2CyPawOAxAFJJ6fShvsY/8ONmp19ov
-         AMh4xCy6ROT5XVQyzQVS8XpUUp7TwPBgkMq1F4g/5BGBy76QAYPjcEJD8kT2vP5PnVEu
-         ASMxmEuQe3djch0/Z2d6A6lMX8xSWImlxEpEAv5H5f0dY8gJNhwrPJxETnZeV//F40EO
-         yqcTF751RcQ6dARLEiu/CXJN+xn6PW3ohqPvMDBs5eIXYXKcwG7Vvlv9BR5AHLJiEQfG
-         4lvSIN8FBjevGAXoxeKJORLkVAfqsYk5WTrmzLob6wm83B2Aihmc9G8Sbcjs6lv37ikD
-         89zg==
-X-Forwarded-Encrypted: i=1; AKwUvBx00jnJSgfRq0vuyvFtZb3K/hEi6qktVWVkDX2OR7Vx47I271s9ibMbwPS4WxTY5FYYUB0VZqUXiV09Ew==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKGBzrv6ml3Ts8sJ5hLlgt3ZeHHbd5lUshfmItDELZAGXu9L4+G
-	hQcq4cuDbK/Kos1wZJgKGW5AUuYvlic2dlKBuAwJJ11HyoJCKJT5/jopLSI65G2Pa+s=
-X-Gm-Gg: AYBFou2xeCloAC1i15JOL6U7eb5rBCNgRxxfySg4aXX1hD61eT8Ev2rpW9VJrjRNzmG
-	MOPJi5T5WnoDdl2RHHo6jAaJBnqBcM1Ojcs8KY7G0mMqRDKwYgM5WZwa9V6f7Jozsq7K/0NxyE0
-	u3oV9Ak2mKjbR+y03qXFHijfT9tYGbOUESPRunCW8kPjLU9D1rBpJmx4VzR1k/kFWB8QRvsa1K0
-	zW9qOa4GdwjHzui5QTGQWlw5RW5b3TQHjdjFgiHKC8kR/iW6APhAkBaoSoERNvn/K/XXiSJmHgh
-	vrm4Nv6X/wZfeJ0VwUJWHAgCV96CRLaI1t9RzEsXVwskCD+VpJO3vVClhtnK8UdqMUqFCAf2Uoi
-	fS1g0MioIko8dPW7+COTaCGfVZVSRzmhXgrcLej8XjVIlYT4SECaEiwFvpCqERNThZ8TL9mA+AX
-	EnrXBDbZoGEqX8yE/RoshWC6EgzxCymxyOLqNT48/W/2cbuUWxpYx3PM1PjJqADqw1DjECyEx48
-	/xZT9BMp1YgjHu3jITysDV1gttsoKaKlI34F/bbAifRKG6Xt3evKjzn
-X-Received: by 2002:a05:6830:67e3:b0:821:a094:b26d with SMTP id 46e09a7af769-844ff9f4095mr9582081a34.13.1792444960202;
-        Mon, 19 Oct 2026 14:22:40 -0700 (PDT)
-Received: from [192.168.2.38] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-8438ce16e37sm10588561a34.13.2026.10.19.14.22.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Oct 2026 14:22:39 -0700 (PDT)
-Message-ID: <956e10db-bcc1-4e6d-a0ce-b5f5fe25354e@kernel.dk>
-Date: Mon, 19 Oct 2026 15:22:38 -0600
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=Tcg4MwfJ
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4j7phY5w9JzlfvpT;
+	Mon, 19 Oct 2026 21:34:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1792445642; x=1795037643; bh=5E7RzlaDuAw9uKwHLzxHAh7R
+	mcEba2LCM1IqL7WsLws=; b=Tcg4MwfJy/ak4sxLYRZ5vRAqHeAj9OBvWsFW9CKe
+	GhmAVJQ2XXY+4coq+xzTHvy2+2yZibSPxDQSxZ8/xILkiNcTk2jy1rfvWYMlXgT5
+	x7NfEXivich2yBQEamk6hgcAEiGlp1jmQm5y5s9Vwn/Wa25oBA2AtAD3ke+GOnQE
+	hLANc17PkU/Ikg9tMV6VPbw9Twut6WefASfjFw3qqoOGbGEfxHwIrGTtAiMUvxKU
+	ZsXFhy63xNL5ImYERAyySjmfcZabocyiXXTDCWXf4vNm9otw3yVS28cxt298QXvh
+	LTKrwQY52v+DrAzJN/q4xZ8jroPkXxBL9psf4SxwSeFZPQ==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id jc0h5tQdPjhN; Mon, 19 Oct 2026 21:34:02 +0000 (UTC)
+Received: from [100.80.231.125] (unknown [104.135.182.41])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4j7phT003mzlfvpH;
+	Mon, 19 Oct 2026 21:34:00 +0000 (UTC)
+Message-ID: <9321a59c-c560-4742-8b71-5b0ec1f30c2f@acm.org>
+Date: Mon, 19 Oct 2026 14:34:00 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -92,72 +71,71 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Question about asynchronous blk-mq tag waiting for io_uring
-To: Maks <mi9992828@gmail.com>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org
-References: <20261008214137.1267424-1-mi9992828@gmail.com>
+Subject: Re: [PATCH] scsi: reject negative SG_SET_TIMEOUT values
+To: Wang Yingjie <x-professor@outlook.com>, "mkp@kernel.org"
+ <mkp@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "fujita.tomonori@lab.ntt.co.jp" <fujita.tomonori@lab.ntt.co.jp>,
+ "James.Bottomley@HansenPartnership.com"
+ <James.Bottomley@HansenPartnership.com>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20261017084547.2880694-1-x-professor@outlook.com>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20261008214137.1267424-1-mi9992828@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20261017084547.2880694-1-x-professor@outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/8/26 3:41 PM, Maks wrote:
-> From: Maks Ivanov <mi9992828@gmail.com>
+On 10/17/26 1:45 AM, Wang Yingjie wrote:
+> The block SCSI path predates Git history. The BSG path has exposed the
+> same behavior since BSG was introduced.
 > 
-> Hi,
-> 
-> I read your comment in liburing issue #1492 about callback-based retry
-> when storage tags are exhausted:
-> 
-> https://github.com/axboe/liburing/issues/1492#issuecomment-4696489936
-> 
-> I'm considering this direction for my bachelor's thesis and would like
-> to clarify its scope and design.
-> 
-> The initial scope would be io_uring direct reads on raw block devices.
-> For requests without explicit RWF_NOWAIT, the mechanism would register
-> a continuation when tag allocation cannot complete immediately, then
-> retry submission when a tag becomes available.
-> Explicit RWF_NOWAIT requests would retain their existing
-> behaviour when tag allocation would require waiting.
-> 
-> Could you clarify a few points?
-> 
-> - Is this still an open direction worth investigating?
+> Fixes: 3d6392cfbd7d ("bsg: support for full generic block layer SG v3")
 
-I think so, yes, as it'd avoid needing to punt to io-wq. Which
-is ALWAYS a good thing.
+As mentioned above this issue is older than when Linus started using git
+so I think it would be appropriate to add the following:
 
-> - Is there related work or an existing approach I should look at first?
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 
-Not on the block/storage front. Basically the tag waiting is just
-a normal sleep operation for the current task. The alternative
-would be to add a private wait_queue_entry to the list instead,
-and then retry when you get the callback.
+> diff --git a/block/bsg.c b/block/bsg.c
+> index 82aaf3cee582..681da79a5ba2 100644
+> --- a/block/bsg.c
+> +++ b/block/bsg.c
+> @@ -132,6 +132,8 @@ static long bsg_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+>   	case SG_SET_TIMEOUT:
+>   		if (get_user(val, intp))
+>   			return -EFAULT;
+> +		if (val < 0)
+> +			return -EIO;
+>   		bd->timeout = clock_t_to_jiffies(val);
+>   		return 0;
+>   	case SG_GET_TIMEOUT:
+> diff --git a/drivers/scsi/scsi_ioctl.c b/drivers/scsi/scsi_ioctl.c
+> index c14f81403a09..162a21112d49 100644
+> --- a/drivers/scsi/scsi_ioctl.c
+> +++ b/drivers/scsi/scsi_ioctl.c
+> @@ -195,10 +195,13 @@ static int sg_set_timeout(struct scsi_device *sdev, int __user *p)
+>   {
+>   	int timeout, err = get_user(timeout, p);
+>   
+> -	if (!err)
+> -		sdev->sg_timeout = clock_t_to_jiffies(timeout);
+> +	if (err)
+> +		return err;
+> +	if (timeout < 0)
+> +		return -EIO;
+>   
+> -	return err;
+> +	sdev->sg_timeout = clock_t_to_jiffies(timeout);
+> +	return 0;
+>   }
 
-> - Which layer should own the continuation: io_uring, the block submission
->   path, or blk-mq?
+Rejecting negative values with -EIO matches drivers/scsi/sg.c, which
+looks good. However, large positive int values still overflow
+bd->timeout and sdev->sg_timeout: both fields are 32-bit unsigned int 
+while clock_t_to_jiffies() returns unsigned long (clamping only at
+ULONG_MAX).
 
-Just spit balling here, but it'd be an -EIOCBQUEUED operation on
-the io_uring side, even though the operation hasn't really started
-yet on the device side. On the block side you'd need to handle this
-at tag starvation time. Right now that'd put the current task to
-sleep, and then wake it when it can get a tag. With the callback
-approach, you'd need to be able to tell in the blk-mq sleep side,
-and get access to the wait_queue_entry to use. On the block side,
-this would be a 0 return, just like if the IO was queued.
-
-> - What lifetime and cancellation constraints would such a mechanism need
->   to satisfy?
-
-That requires a bit more in-depth analysis to answer. Presumably
-the wait_queue_head would have the same life time as the io_uring
-request, so if a device is ever torn down with IO queued, then
-these entries would need pruning too. I suspect the block side
-probably does all of that already, as it'd need to wake tasks
-sleeping too.
-
--- 
-Jens Axboe
+Bart.
 
