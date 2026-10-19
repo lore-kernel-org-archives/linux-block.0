@@ -1,154 +1,194 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EF239E164
-	for <linux-block@vger.kernel.org>; Sun, 18 Oct 2026 22:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6063E13D8BD;
+	Mon, 19 Oct 2026 01:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792362540; cv=none; b=KhBDouZs82ERghw+Q/lugTq8c9HjJEizJpBzlQK6+N6Xnwy5ZFgoVgy0EYkWopLyDeJMKxk8DilIQcl1EyoFKyueq8/yC/C56h/8jm225pSM8XaaZEdT+Jvt7EjPit/wP0SH50QH0/VgKFATcPngUNDMJb15IMvZTh/pToBbj08=
+	t=1792373829; cv=none; b=Hq4yRCj/QsbR1Hnk+W+/2ukHCSF3aA7X6rQjwWNlO7ZQ6kNteqBzB7jv3SbD4Hf+Y1gbCxjK/x9ys5AAAGrAxsCqWp6CO35wr2GVnC8ih7eeJQ5YNM/bPBSEUJU+Elwv0mZcxXIOp7iy0QrrFW/rt8M0JPRSVwCaW17nr/LLemo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792362540; c=relaxed/simple;
-	bh=DfupwPSZCin6aC6UoR/hMPVmIOg1Ka92Z2blxUP6B8c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hR6/w3uYg4iShjOAaNEoen5losRBoqTPzu36RSjFnW4J/tLD0wKa2FcsFlCWH+Y05SBki4KI3O+W1KLcsZRze6SVLLhaP4FOe16Y1UzTT7X9zPX2rqxAqXfL/i5ZUpbMaBQncgBdK1UnlO/GTBCuXKs1DQfK21F4R9JHBDffQkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j0cibDtL; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792373829; c=relaxed/simple;
+	bh=szHP56FjldtD2Uxu4ijUioje532o4OKEHWIlQnqjj0Y=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=JMEh2wwA83yEYme3s/nXdqtDoOengj/JJGI8/h4tUEowch2Jd4GwS9wB9cHHn9TCjYgxsvmrA+bQnJOJDefgI1hUSYNIxeYes24SfUMJ3J6MO+5wA4d/SdzEIYIMKtcHJ0Gc0N65cTEIVMMs6i42gTnEp5n8M9MzabPbFa8Wj7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=qpI4sZ58; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0cibDtL"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-48e011d370dso1235647f8f.0
-        for <linux-block@vger.kernel.org>; Sun, 18 Oct 2026 15:28:59 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="qpI4sZ58"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DC371F000C4;
+	Mon, 19 Oct 2026 01:37:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792362537; x=1792967337; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=YuPuYj2KyJGah9hmABQQctga1s9wEhiM9oVruD5npRo=;
-        b=j0cibDtLxh/izLswrWPSsQZxFjb5L4EMPQBgcSnjGDit42gu1Pm5oWUsCrfuFTx8nd
-         wYdyunGN9El/oKYgG2w3WAYm0sk7eApe6170A44Hd9mgeJuNdh1e/KU4iIOUMEAXzaU3
-         VNCxgmRqbBuQMK1tFC8Ss7wwT5CXv6gb+uHeepZrZvqLULJeGZbe416AFBo2XlQDlYK4
-         43A+vKFjj7e/2eSEWeetWdnbn+6n4rO33x0NXv3tPPTW37QdsurVr5v5j7d0s55IMXhA
-         W9bE69ocS128IIfUjS4jY1tNP2zNYItTsbpAaNtwkQR1T27hfeK4TocFTYZc22mWLe1T
-         cdgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792362537; x=1792967337;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YuPuYj2KyJGah9hmABQQctga1s9wEhiM9oVruD5npRo=;
-        b=zpMIQTiOz4h7DmaXLyHiUPBHFjK+CRFhYnBZudLpB6yZU1DbrmnvBSyYH6HsYEaYkx
-         H+hf4DN12vXBG6rfXEsNDxOfhY01Ho1k3Y6hX/1Q48Q6WVGz6B7YXU8mnQJrd7h8ijvG
-         dCb/6BqLB+rocPo7jBXSppSjGC+UfotWK/S8Qlt2Vnt/3Zbdr4gGM03a3kKwWLd79sEf
-         4r3mHQVEMFz8Km3pHKKppbeZN9rkogcWZ0kihBVkE+ZEtEh2hm7VLD5Ne1GBjAQrveVl
-         xLLPaXCa1uOcppDrcGbz5imMepBuS5JER0XglhmO8GrfLnesDl1jZQPf7qnL6nweE+F8
-         OgwQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwcCsp+5WYkrmzVTMUIU471wJH+wvDBJPHlPTpX2llcC/UrWt5s/TetBOg95ca7Mlz2vXe/SoipA7bDbw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIy1dIxn9jH2OWbWK1jLUW26QIdp9ZUJpKoXHy1Uc7WxDVI6wmW
-	ukr/PU3KLvgxcZLpUXMblEADEz2M+XmHKviuUoRzLjqq8aLqQBbZsjZjSGlXDw==
-X-Gm-Gg: AYBFou0ZYvRH+IGV0jj5VOdjkDrRkyyz71alwuBbcI8n/76Diu9zEVxcLC8F74G+5cN
-	AfbNrQLGO7i468GzB45P/1fLAL9GsKf7xBhqHEsn7ZEOhYwSLi6pfaApgTrSkFxwv4j1A7bofPU
-	jY1VgUYl3wNBrz4N8RpB4mztkvRhoCE7q5ot5YVtJgayZ7InDhDk9QU5PRgPy8lidZAKx0RLMT0
-	UowF1OZhrAo+tHUDLojEUw2/JZD4IhwEgHvLv/7y72H7tcst+nie1FLLcUBDMZbPspUAtWqIJiI
-	p7IOffM/Jn1GIH1bHXucvWJEHh3ufwCkTvcXZEbRoYm+/GLdkInhstJmckR1jGVlGiBwHG4VSVz
-	9/GdcgL8w+Jk5JBu9h1j+5WLbDVE32vvf1Qj9SwKoxyh2zRLOYd1I37llCVSc05PcHNY/pLbgqA
-	dqu8txxFJ/O9PXo56oqZivFeHH21zzcUFqY0h1uCz0T0DZp0KboNy+IAULpahL/KwL/N2r4Z55A
-	Iq7EQJ0FbOn+hN3YTj3vRhywc3j4bk3Vj+VZUTX9KAb7cViKTZV6UkxXa4//HJDFFoe+AuTIRtJ
-	Cbx4Mxn3HynVvlOqnuNnYJ1y4wvWh1a3VmJ7FS5jrcJDH+cH
-X-Received: by 2002:a05:6000:2f86:b0:48d:fd0e:a117 with SMTP id ffacd0b85a97d-48e079759c0mr14316716f8f.5.1792362537508;
-        Sun, 18 Oct 2026 15:28:57 -0700 (PDT)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd4f5b2dsm20677990f8f.31.2026.10.18.15.28.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Oct 2026 15:28:56 -0700 (PDT)
-Message-ID: <0fe67d0f-54cf-4076-9e4d-ad23d05e7099@gmail.com>
-Date: Sun, 18 Oct 2026 23:28:53 +0100
+	d=linux-foundation.org; s=korg; t=1792373827;
+	bh=Wuq5JSaJ2iBCmQVUdFVG10GyTUf/WKdjmQmYRhFmoAY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=qpI4sZ58Sc+uFSzMeZSX5IXOxgqylXHLPUe31Fd5t6Ti9pTu+V6hhhQ4pATq/UbF6
+	 scC3UloOpvxsLwZlZJilf5BGNw6MsKIgl095PR8Rw7z8Qlo/k7e0IbDwAzNSykEnWj
+	 9MAEvMJqehU18J6SR4KWT4A/469vJRMCsI3xk6Yo=
+Date: Sun, 18 Oct 2026 18:37:07 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: l1za0.sec@gmail.com
+Cc: viro@zeniv.linux.org.uk, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, Jens Axboe
+ <axboe@kernel.dk>, Tal Zussman <tz2294@columbia.edu>, Daehyeon Ko
+ <4ncienth@gmail.com>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig
+ <hch@lst.de>
+Subject: Re: [BUG] KASAN: slab-out-of-bounds Read in
+ copy_folio_from_iter_atomic
+Message-Id: <20261018183707.23dba84df0a235e36de1620d@linux-foundation.org>
+In-Reply-To: <20261018081203.2431035-1-l1za0.sec@gmail.com>
+References: <20261018081203.2431035-1-l1za0.sec@gmail.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 4/4] xfs: support dma-buf registered buffers for direct I/O
-To: Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj1072538@gmail.com>
-Cc: djwong@kernel.org, cem@kernel.org, brauner@kernel.org, axboe@kernel.dk,
- linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, joshi.k@samsung.com, anuj20.g@samsung.com,
- nj.shetty@samsung.com
-References: <20261016091919.971295-1-anuj1072538@gmail.com>
- <20261016091919.971295-5-anuj1072538@gmail.com>
- <20261016092855.GD23141@lst.de>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20261016092855.GD23141@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 10/16/26 10:28, Christoph Hellwig wrote:
-> On Fri, Oct 16, 2026 at 02:49:14PM +0530, Anuj Gupta wrote:
->> From: Nitesh Shetty <nj.shetty@samsung.com>
->>
->> Add the init_dma_buf_io_ctx fop for XFS files.
->> XFS picks the device and calls the iomap layer with
->> the relevant device.
->>
->> Refuse the iterator from every CPU-copy path: DAX, buffered
->> fallback from a -ENOTBLK direct write, and read/writes
->> without O_DIRECT.
->>
->> If a file is switched between the data and realtime devices
->> after registration, the block layer cross-device check refuses
->> the I/O.
->>
->> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
->> ---
->>   fs/xfs/xfs_file.c | 30 ++++++++++++++++++++++++++++++
->>   1 file changed, 30 insertions(+)
->>
->> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
->> index 426a67b813a7..f97d5acfaf68 100644
->> --- a/fs/xfs/xfs_file.c
->> +++ b/fs/xfs/xfs_file.c
->> @@ -340,6 +340,11 @@ xfs_file_read_iter(
->>   	if (xfs_is_shutdown(mp))
->>   		return -EIO;
->>   
->> +	/* a device mapping can only be read by a direct I/O bio */
->> +	if (iov_iter_is_dmabuf_map(to) &&
->> +	    (IS_DAX(inode) || !(iocb->ki_flags & IOCB_DIRECT)))
->> +		return -EOPNOTSUPP;
+On Sun, 18 Oct 2026 16:12:03 +0800 l1za0.sec@gmail.com wrote:
+
+> From: Haocheng Yu <l1za0.sec@gmail.com>
 > 
-> Maybe move this into the actual methods for dax/buffered instead
-> to avoid extra conditionals?  Same for the write side.
+> Hi,
 > 
->>   
->> @@ -1209,6 +1219,9 @@ xfs_file_write_iter(
->>   		ret = xfs_file_dio_write(iocb, from);
->>   		if (ret != -ENOTBLK)
->>   			return ret;
->> +		/* the page cache cannot copy from a device mapping */
->> +		if (iov_iter_is_dmabuf_map(from))
->> +			return -EOPNOTSUPP;
+> We found a KASAN slab-out-of-bounds read in copy_folio_from_iter_atomic() while 
+> fuzzing Linux with a modified version of syzkaller. We couldn't find a report 
+> of the same issue on syzbot. We are investigating the root cause and trying to 
+> develop a fix. Could you let us know whether this issue warrants a fix?
 > 
-> I suspect these random fallbacks are going to cause trouble, but
-> I'm not really sure what to do about it either.
+> The crash occurs on Linux v7.3.0-rc5. KASAN reports an 8-byte read 8 bytes past 
+> a 144-byte allocation in kmalloc-192.
+> 
+> Relevant stack trace:
+> 
+>   iterate_iovec (include/linux/iov_iter.h:49)
+>   __copy_from_iter (lib/iov_iter.c:261)
+>   copy_folio_from_iter_atomic (lib/iov_iter.c:491)
+>   generic_perform_write (mm/filemap.c:4392)
+>   ext4_buffered_write_iter (fs/ext4/file.c:354)
+>   ext4_file_write_iter (fs/ext4/file.c:794)
+>   vfs_writev (fs/read_write.c:1058)
+>   do_writev (fs/read_write.c:1104)
+> 
+> The reproducer mounts an ext4 image, opens a file, performs write operations, 
+> and triggers the crash through writev() with a crafted iovec array.
 
-Folks did mention it to me before. For a slow path we can try
-do something like amdxdna_cbuf_clear() does:
+tl;dr: bug in bio_iov_iter_get_pages().
 
-dma_buf_vmap(dbuf, &vmap);
-if (!vmap.vaddr)
-	return -EFAULT;
-memset(vmap.vaddr, 0, dbuf->size);
-dma_buf_vunmap(dbuf, &vmap);
 
-But I can already imagine it triggering some interesting
-behaviour like buffer migration, which will be too penalising
-for things like clear on a hole. And we'll need to be careful
-about deadlocking here.
+Thanks.  Boy I burned a lot of tokens on this.
 
--- 
-Pavel Begunkov
+I was able to reproduce this.  I found that Daehyeon's "iov_iter:
+validate extracted segment for bvec alignment" makes the KASAN warnings
+go away.  https://lore.kernel.org/20261015061907.2713943-1-4ncienth@gmail.com
+
+Daehyeon's patch is presently in mm.git's mm-unstable branch, with
+cc:stable, targeted for upstreaming during the second week of the merge
+window.
+
+Daehyeon's patch prevents this reproducer from triggering the bug by
+rejecting the misaligned direct-I/O request before extraction advances
+the iterator.  Without that check, extraction skips the initial empty
+iovec and the following 10-byte segment, then encounters an alignment
+error.  The bio is discarded, but the iterator remains advanced.  iomap
+subsequently restores its byte count without restoring its position,
+leaving 1025 bytes recorded when only 1015 remain.  Buffered-I/O
+fallback then walks beyond the imported iovec array.  So Daehyeon's
+patch avoids the bad path, but doesn't address the underlying failure
+to restore the iterator when rejecting a bio.
+
+Tal Zussman's atomic-write fixes also change the rejected-bio handling
+in bio_iov_iter_get_pages().  In particular, his partial-pin fix
+rejects an atomic bio rather than allowing a short atomic write to be
+submitted.  That introduces another cleanup path on which the iterator
+may already have advanced.  The rollback should therefore cover that
+path as well, preferably through the common cleanup label in Tal's
+version.  The two fixes address different problems and are
+complementary, but their error handling needs to be reconciled when
+both are merged.
+
+
+Proposed fix:
+
+
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: block: restore the iterator when rejecting a misaligned bio
+Date: Sun, 18 Oct 2026 17:30:00 -0700
+
+bio_iov_iter_get_pages() can extract some iovecs before encountering a
+misaligned one.  It releases the pages and rejects the entire bio, but
+leaves the supplied iterator advanced.
+
+An iomap direct-I/O caller may subsequently reexpand the iterator's
+byte count and fall back to buffered I/O.  The reexpanded count then
+includes bytes before the iterator's current segment, potentially
+causing iterate_iovec() to read beyond the imported iovec array.
+
+In a reproducer using an initial empty iovec followed by 10-byte and
+1015-byte segments, writev() returned 1015 instead of 1025 and KASAN
+reported an 8-byte read beyond the nine-element iovec allocation.
+Saving and restoring the iterator on the rejected-bio path makes
+writev() return 1025 and eliminates the KASAN report.
+
+Restore the entire iterator rather than reverting a byte count:
+advancing past an empty segment changes its position without consuming
+any bytes.
+
+Leave successful and partially accepted bio paths unchanged.
+
+Fixes: 14b007e17881 ("block: validate user space vectors during extraction")
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Reported-by: Haocheng Yu <l1za0.sec@gmail.com>
+Closes: https://lore.kernel.org/20261018081203.2431035-1-l1za0.sec@gmail.com
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Tal Zussman <tz2294@columbia.edu>
+Cc: Daehyeon Ko <4ncienth@gmail.com>
+Cc: <stable@vger.kernel.org>
+---
+Testing on x86-64 QEMU/KVM with generic KASAN:
+- Before: the ext4 writev() reproducer returned 1015 instead of 1025
+  and triggered an 8-byte slab out-of-bounds read.
+- After: 100 consecutive reproducer runs returned 1025 without KASAN;
+  60-second buffered and direct ext4 fio runs passed.
+- Daehyeon's alignment patch independently avoids the reproducer.
+
+Tal Zussman's pending atomic-write changes introduce another rejected-bio
+cleanup path. If both patches are combined, restore the iterator there too.
+
+
+---
+
+ block/bio.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/block/bio.c~bio-iov-iter-rollback
++++ a/block/bio.c
+@@ -1285,6 +1285,7 @@ int bio_iov_iter_get_pages(struct bio *b
+ 			   unsigned mem_align_mask, unsigned len_align_mask)
+ {
+ 	iov_iter_extraction_t flags = 0;
++	struct iov_iter saved_iter;
+ 
+ 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
+ 		return -EIO;
+@@ -1303,6 +1304,7 @@ int bio_iov_iter_get_pages(struct bio *b
+ 	if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
+ 		flags |= ITER_ALLOW_P2PDMA;
+ 
++	saved_iter = *iter;
+ 	do {
+ 		ssize_t ret;
+ 
+@@ -1320,6 +1322,7 @@ int bio_iov_iter_get_pages(struct bio *b
+ 				bio_release_pages(bio, false);
+ 				bio_clear_flag(bio, BIO_PAGE_PINNED);
+ 				bio->bi_vcnt = 0;
++				*iter = saved_iter;
+ 			}
+ 			if (!bio->bi_vcnt)
+ 				return ret;
+_
 
