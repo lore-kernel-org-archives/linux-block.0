@@ -1,518 +1,291 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=68.232.143.124
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792422650;
+	b=lSw7c65ItwYVQ0nkL+aXKgGwtzOGiMx43MDy3ihHptBy/bOolaiCTrvVXgucsLRiQ7IW
+	 pweFlKqHNE0lWLhZl+tPTHlrKICt3ZoZgiHmA8xGHacA5adqwRS8JXtN3hdIteWGI/hVU
+	 o2xVn8r/8uLc9iduO5zA/hzeGIzArZqXSIvuLgUnTrPCroelDrlvQOwuO15vS71EJ/PO8
+	 boghZNpxDNOY/TS24dzhWosM2iD5yP6J865BSTGHONIBUsMyWTG0I0uNT24PN4Uv7cL7W
+	 WL2Dj26eOhxl5he3Xt9ajt+OyF1dESbn/RjBOJ2OjGR/IMjIgcq7BvpJpBViEfyzb3Q==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792422650;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:Received:DKIM-Signature:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:Content-Transfer-Encoding:
+	 Content-Type:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 WDCIPOUTBOUND:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:
+	 X-MS-Exchange-AntiSpam-MessageData-1:X-Exchange-RoutingPolicyChecked:
+	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=zrOg1gTcUITjeTQoNee3UZ91XT7wEjY6wi7TCZn7Ai0=;
+	b=ZdSK8ucFHFb6iMT2+ooH0c4vzOdY/kjsAyIxCE2BLJ+hwI9yTwfokJxeq9h57bV2qjVo
+	 SZ3iiFf4gJ55FSYipx9S1rYNuj4s+YmTGWzLeqqN48Igc1+ulkyGK3xKBpxtj05Yiju6+
+	 0MHjwslwMJzvhgJazrcQvopTyLuVWUMYmTVN04ZuY6+DDjZZVeisjrneDg4JcttLaUtAE
+	 LUVdrL0eHAA/R+zLWXbcbUIK7W7mvplZi0Po02InU0Vt60QQDXqYC/xs3eye3Rrf4COSo
+	 zcePYrqdLUnE1HUKYMvZ4F5rdXpe0VCUn8e6mI6qCaNn24IhCgxbLcLo0ejYMfDnTtA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=wdc.com;
+	spf=pass smtp.mailfrom=wdc.com;
+	dkim=pass header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=dldRQYFP;
+	dkim=pass header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=EqZFBNl6;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=68.232.143.124
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB2E646982;
-	Mon, 19 Oct 2026 14:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418792; cv=none; b=s+/Nzo9pyMlxpp8PJZ8rM+9YrR+nwDPn1mnkV/y1g9yfP9bkS/QhVFPAYIt9E+fsLhDE8/t2Cyg6rInCAuzZVVhxJYLP9ZoIV6VE3LicQ/yydk3sVxf25I6yZzq/4KQIndS4k8p3nvQBhXNWQsJxDVkhYxcJLUIYFfyrUXQITtY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418792; c=relaxed/simple;
-	bh=b970QSfivtWhXrCHnwzJxaqW6ZddRWQZLiIE8vwH3Ik=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gUt1NaXtULie3h5q2IGpsJNMCwhueG2+c5bPxsBmnqyjlVdAPJMZ6/pD96p+o9XLHKfHXpPzLuYRwhji5vfzDywuzqx/ERg8M3r9ZbkAgZB6G+GdPPC+OvZENnAe+w7uMWfg0AUDIrKcMjy+SK2k4WZ/e2YQceEZVKopxcITKZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjOEgefw; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933F660892C8
+	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 15:10:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 933F660892C8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjOEgefw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 031161F000C5;
-	Mon, 19 Oct 2026 14:06:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418789;
-	bh=hOQDEz33xStZKw/+9YXAnJNUn5iUFyNgLBgNBn1kxMM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kjOEgefwtRTl8ILkOEMAOI8kWJzovXDpvC965hB1Kcn1+3RyfdSF8kc/b3hp3XthF
-	 yfbQCb2Vm9KGc/cJpHvrUvHNquQo4VMDRP0sjYiI8Jx7cWDa8cEAsO/aWaTcgaVc+y
-	 fhicJYKn5ozuGWPJv9TOCoA9P7PeVcetxqNfzFK2RdaQWSuBnkOj8FYDLI/90w8unM
-	 dcRcq8h2UBdID4Db+vcqDdwGxUjgZvxx66yoYgG5WMzIEkfBiYiXz9ewpCtaijTRyT
-	 A2Jfn/a9eOfOQwVGiZhOzPpn8R1j07nsaS2PQydsGK18GiOmS09e5j/WuMSDQRqF4l
-	 LonZXj1x47HCA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Yun Zhou <yun.zhou@windriver.com>,
-	syzbot+72fe3ea5814121fbc76e@syzkaller.appspotmail.com,
-	"Christian Brauner (Amutable)" <brauner@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] block: reject block device inodes with i_rdev == 0 in lookup_bdev()
-Date: Mon, 19 Oct 2026 09:53:09 -0400
-Message-ID: <20261019135441.1420968-498-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
-References: <20261019135441.1420968-1-sashal@kernel.org>
-Precedence: bulk
+	dkim=pass (2048-bit key, unprotected) header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=dldRQYFP;
+	dkim=pass (1024-bit key, unprotected) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=EqZFBNl6
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1792422649; x=1823958649;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=bfQVlnXKTMS1gaIvd0mR+U5cQCXAdgtrPUj2N6EIauI=;
+  b=dldRQYFPVn+K3orndk5TV5XZtnbH6BhVhgojdIaQyCjlvT1IiSXsuZnx
+   UcjqQvMMzSINScNixB+cpDhDAxUWToNJirsRkapYC4fgRPracH2zZPNP/
+   xbsPWOevh7rXmpdzXJwJWPZzBDAC0RzhbCGqMdVQShZrtFVZuslcrEQWg
+   L1Cqs+XvAEzVizQi5KUpEoB0pxotxB8Rugjl1dLdck4mFT6qm6HA6tx9H
+   i730MaqEuSzT7m45VSBncc/YfqOgK8oDzpvsZ0z1DGSv6xIPmH9Ug8Eng
+   vpT7NKLHJ78Eu0/29cS0aEwIdQTrgHanb23MVgt3wx8mNiyXSPAEeZ1Tt
+   g==;
+X-CSE-ConnectionGUID: uSyoJQqyR5iCumIJETWHrw==
+X-CSE-MsgGUID: biH3mtrwRg6dfz1ri9mQyg==
+X-IronPort-AV: E=Sophos;i="6.27,167,1786982400"; 
+   d="scan'208";a="159413216"
+Received: from mail-northcentralusazon11012066.outbound.protection.outlook.com (HELO CH5PR02CU005.outbound.protection.outlook.com) ([40.107.200.66])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Oct 2026 23:10:42 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vVxHEpCd6M4EMCyc6DS8/V2RZBuPbKSDh+z9RWXku7ZjQjdadTnS+Gj5A8lkMBc6IEJmE1Elg/ZjzkoiJxgobl97/FpHB2aO+DBf5DTJC1nFXbB9TUQRQ8HdzeDAxlgGymAA1VRe+HOslDxpEkdN6p6IRN7sAYn4RK5mpdI6G4bAgs+Nued8Fx0klKRQteX12LE4eED2mRq55QmqCNUeg9VLc2iRgDFFYhtJHZXoHKoIfSirVx0L+V5DLgfHNbR0UNh5oysdcwPzThPKx9p+3fbXuNQPtplYGqgRfR1AzHpoAie0a7JZ8fLnT+vrLFhR9FdXhhy42L6aJbh1ZBoBDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zrOg1gTcUITjeTQoNee3UZ91XT7wEjY6wi7TCZn7Ai0=;
+ b=XfOjx4nchkZjHRS80x25stOnUVzQU9BCuOP2uNco9rvOjU38A+IC3e1CMn3ol9fijeahVGXJreGDamDbbCN1787OFOG3a0Fv5DsmDza0zKIwmX1NWdQTIio+KOjFTa4HbLO20vZw1Lc++Y0XFv5W62gztxqf5X7+COq66C8GHhN4STtc9660ayAE0lkm4wED92f01fRgNNgUFKyfJ1nZNpCDZK4Op2umYprmTdD7j0zNGTGUCJ0wjgDwE3sSGT8AkfworsHRT2c6rz3jdYoNvWbtsPPLEdGHQBbwPQi4y8R0Y9gguq2yawUX5m/GDZGJ4HDpypCPd+0gSYtdY2W4Lw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zrOg1gTcUITjeTQoNee3UZ91XT7wEjY6wi7TCZn7Ai0=;
+ b=EqZFBNl6+P27RlC6H1hxW+BOdAh/a5NhI7+tqHUKrwfoPp70gABA16Vr1xO8Rs+DNGZO4XoqVoD1YqKvtwKzdZEVwnscV34uR9xevnxA460Hd1MslfOFZprwry2+lML1C9NGFEHsV3X8UQPd3+oZiGfPBNtbIQt92ygftQzOABs=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+Received: from SA6PR04MB9447.namprd04.prod.outlook.com (2603:10b6:806:436::21)
+ by BL0PR04MB6481.namprd04.prod.outlook.com (2603:10b6:208:1c5::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.19; Mon, 19 Oct
+ 2026 15:10:40 +0000
+Received: from SA6PR04MB9447.namprd04.prod.outlook.com
+ ([fe80::14c6:1c14:485f:1825]) by SA6PR04MB9447.namprd04.prod.outlook.com
+ ([fe80::14c6:1c14:485f:1825%4]) with mapi id 15.21.0522.017; Mon, 19 Oct 2026
+ 15:10:40 +0000
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v2] zloop: print device that had errors
+Date: Mon, 19 Oct 2026 17:09:36 +0200
+Message-ID: <20261019150936.1819956-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.56.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR3P281CA0179.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a0::16) To SA6PR04MB9447.namprd04.prod.outlook.com
+ (2603:10b6:806:436::21)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
+List-Post: <mailto:linux-block@vger.kernel.org>
+List-Help: <mailto:linux-block+help@vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+List-Owner: <mailto:linux-block+owner@vger.kernel.org>
+Precedence: list
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18.57
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA6PR04MB9447:EE_|BL0PR04MB6481:EE_
+X-MS-Office365-Filtering-Correlation-Id: 34e73ea6-27b8-4831-2487-08df2df32335
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|23010399003|366016|1800799024|376014|10070799003|18002099003|11063799006|10067099003|261009223027099003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	jIWumi4SqGpPtmxEBEgzRYvMLQ38phmIl4hwz7Jsft9hnPKhW7Pv7EskfP98gJx8IUDEWDAorWnK2IwVKJi/1xYDXoUzqnE7H2PhZMW75fE7Fe9eAN3YCXpC+kyB2hvbv9z5XjwZeSkVCTI0h3D2Yf/zQzq7qEeY01fJ7hDPEgotYadhxQ7eugJ1XqqpqGAiXbiOxPm7eYWi6l1WMezntZXT7odn60Rw+o6kOe6ZQxl++XO7u7Dn4H7oltfEpwNcWriG9dNtDU/iiHCE1Lyzl11PJNTDcKrjUTm0TUcNbD+cdpT45uWz9i1OH4qsTFiHjK/T/HwUinw+DrfGZDYg83ggsHInvWBGX+tYnP8Md0x3FmpGgdQNRSV8A4tb446j8N3hywK1jNSjIenB031dxlALitIAfFLrsUYoWfLEZq34QCm5KcAlRCyyt3XfRze0GAuzd5UD4lpH1IWmwTkXVmZNGffscZGXEozzVX5m6cxuCoWYoj0FNWb1FRTJYSuT2rhMU+2YTHMzttYtr80xOFbg7Ti06WOs0PJ0FAXk2TjXEGWjiS0zBTbz3Hfm+qMKturnEIwUyn/ckzJqSQbZzphUeSB9vOZ2opSmYXmAbBIwtO6x8vKL4jfPYSmAfcl5BdsL4b7OEYCAxqk06lLa6g/f1BWWEspQR4M/oj3s+Y0=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR04MB9447.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(23010399003)(366016)(1800799024)(376014)(10070799003)(18002099003)(11063799006)(10067099003)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?uA+rkPPGqoN+xkTpK6+SlMPmd76/ItDabc2dNttG7IUVNuiJ/2B7w/dQ9xsw?=
+ =?us-ascii?Q?nNxrjk9THyumVBXMie55clFSxIxn3Da9yd7jsZxcFOU06NQWlLuVWR6roC/6?=
+ =?us-ascii?Q?cR/GBBToV9ppvx4lnUhAelqTGw+9y5J5csD87GRcej9DLUaXSlD2SJmKD8SH?=
+ =?us-ascii?Q?/aS70Bly4U4rY7liHaf+qBZdUh9VP6PWMH0gQLQ9iQbPlki2o9pKeZz/O+aP?=
+ =?us-ascii?Q?tDT1Y+05/vSrtJgt2vMJ5xTlXD6EnCTSUFwc3/dBqfN4rEtT8bK2YPHPWa21?=
+ =?us-ascii?Q?HgcRYa8aDc1OjHok1qG17lFvtl3eZNRS0ZiCsEAN4jRXxaJwylzTWWvOwP1c?=
+ =?us-ascii?Q?rBv46mfVAzUQm6+DK2Ic+xxjy9BHr4fsYSuBCSzs+ZunaJYzqjkhSOMtruA/?=
+ =?us-ascii?Q?Ku+m6IcMLBjtkqqpMyelOhibymFjgV28yxLH3M5ad90XEfcFArd6MIiIdmIv?=
+ =?us-ascii?Q?DbEN/suWsC1KZebvdC+dfZ3/YepOy/WyL35UzcfNE1XynrmxxOBYt2Vo9O0I?=
+ =?us-ascii?Q?8+O0RnMFAisxC5vS2Lzi5Snc0dGrzlIj9g3P/4oUPkkqsnLSlrKE4gjnFD3J?=
+ =?us-ascii?Q?uxQXKqfO0GvxWj1wKpS73K8z5Ekpxa82XBay/Lu3yGXDa6Ljrhhunk9HSk9I?=
+ =?us-ascii?Q?BidAjLbKmYdgbTt0oVhqzBkwvMwdTQD/hmI/SXUl1bZOV+q7MWxs9cfzkwHK?=
+ =?us-ascii?Q?IqDPgElgJSNUeH3eYiU8aE4L6bLoa5qUgK/JBQ4q3rROEFTHjmlmEcIAFAPz?=
+ =?us-ascii?Q?6WtaU3hujUIU3hndgRkVvjDe4XdsMKbAyjVuN8YerQPiKwZS3rQDMRYb1RzJ?=
+ =?us-ascii?Q?lOyiziQYqJpSZhuH89x93+sIaSmuNvrjQgGLcCHVJnmsZ7LNbv0qe6pmDEa5?=
+ =?us-ascii?Q?mIeOQVVtmAkwCzt7SvoJgFOLlHtzV2IEKjkqC2xWi1/lDWoFAsBpDBqusCRU?=
+ =?us-ascii?Q?idyyQYWXG8uXcnahw/oiwAStYdoe8Ycv1JPES8oIX4hzdHpz9OoCunpVW3Ie?=
+ =?us-ascii?Q?be21XUIAidwDfwKFPUch3UjL8knudo57fu3HxYz/8AXAZzwq53HzYTJQwvt4?=
+ =?us-ascii?Q?kKE1MOsWhLqbcq335e8iJJ3Flp21tg2c/7MPpBgyRkUs2L7QQttX7OSt6LW5?=
+ =?us-ascii?Q?MHWZ8H38X/rxZQDgUTZD8EXkYN03zIKSWGKkHq7FRbp3XBZJQhEPtVt+7M4/?=
+ =?us-ascii?Q?6RkXQjTB1Cs9ur2uIwSnQMaQxLcm+3MZKaJsKcCeSQjPSmV+BAfwG0YONzX8?=
+ =?us-ascii?Q?015VqsvgLBGwyIUomSYgcMMnZUwqMJUEl6XdEAe1cbm5N1ZCjmR5ZEJ0nVWa?=
+ =?us-ascii?Q?tMw732X2QKPVBnW6LOPHW/b/KUlGUrgbzGitZR/VdQvU5E3tfn+jZsaHRq8S?=
+ =?us-ascii?Q?EPcsK/cvHMCxvffP1Sa2fmHfw9oixyiwQ3WqYcOxcf9njYxCLbtqm0wSi/Wt?=
+ =?us-ascii?Q?r93t6evhN33SmZdcGPwLH94rhmMhLtDy5vXTM0xwS1DPax1ABZswbPIDR3tN?=
+ =?us-ascii?Q?AZAeK69vuG/OkGJqKP0N+DloZ0KTE77LQ4VNWAVdW+RZOiuJU8LHFl50vLrq?=
+ =?us-ascii?Q?a8T7A14bs1pkMjFKZSaX3g3Pktdox6+p7QGEkugMencX8J3NbOe38U0QSTb2?=
+ =?us-ascii?Q?k9QZKwPWcIFy7SB4i68VbtQv+ccw9ZT8KZzq6nlnh//TghUynYFLPoDlTHcn?=
+ =?us-ascii?Q?FcloQjLSlq0Lku2IX220bwTmoMeXj7rkwweLN0knKHMETIjxtbNPaXr1OEXN?=
+ =?us-ascii?Q?7ijsgEUOABef/+7OUA4yKf9Zm+VQT8ck1eqCXlzWlQbJD+FVo+2/Y9IHcYJ1?=
+X-MS-Exchange-AntiSpam-MessageData-1: e8QzZ7s0Y5+qr1WvcZKqyJ4BFgHX4vISfIk=
+X-Exchange-RoutingPolicyChecked:
+	cswOrTgknnmel8J2HV0eGPKU9nb4i1Yg1SZPuK2PfPrSEE8PQvQyhNlMtOR1NHFAL8vtLYEEpbLUFvD+psMUMr6LKe5HZWyS8llaPS4P3sP+qr3jiRwTjWdSqHTrscRm2tiw9t47UZboPcC7EYPk/1Q4z/0QGrPku5adogzTV9BA+F2yRH1ATh/pnT8QtWT0+TIXYjLWXlQicdcCBm+WuewqfsNAgwB6CZLq9XwEZDfezfl00j2/R1JdXrhjDLZxsY46NU9ZQdSrRFpgW7wZ3WH7ZBR0zol2ZeHSH4Vnz/c2P3sR5Uuh5n8bbuSUwyUOB84rA3Gibpn6dp1Rq31oNA==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	MiqxYl1womoeMV6LaGPvel/StNQ7wCrOpn93RMvOyKDKqj4yfvhFCi26q4yUy0stVlrBPrLA+W0hYVoRPqqsb2MO+I7FEtxQb85Fj7ElPLLjydop19caVak7rRI1zaXCppXUjPbYq4fiz5X3MJA91vV+/U9RgJMrQKvOgNnvcrxXk/rIBvfeWMDpMDaCYlhDUi2uUbsormjWq2etiKn2AIrcLjO5wIHq/lqP/huS8n4FbsZbGeY7maRkhw2Lj5Zv8HavzmmJbTFjVCLHPpBvXGjwONCfEX9IDoeCCwReBqrkbvG2MSQ+zD0Dg/UYJKQVTw9/TT99uREQ7FBlWjD1hdiu3mQaQO/peSUmE2ec+l8SfyHvpCBPJ4ZrUdbmqJdsvgzvc4Y07UplxoBcdx3yVps6OC+NVcJ4nDN0/ziyFh62rx/aFW2YRy/DBeec6dfQK0/nR/foZ302k2fsiyHqZTzgQy5Bf7TTgcWNsQ932IkTAIM+Ikmnc/qz5oAml642ecOb95NFErbdo8Iy4uFSMnpH55ci4k03frOiy2T+YneSZ+M5RryF9e96hbDA4NDLBeuHchPLxzdBBPsxReuvTtsnzERW7D+JF5SygR71KB31lq4N696RjXyNWAz610ym
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34e73ea6-27b8-4831-2487-08df2df32335
+X-MS-Exchange-CrossTenant-AuthSource: SA6PR04MB9447.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2026 15:10:40.2464
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GSxSt5ARbO1JQlV+QcgASOEMrlwSnIRZALVqcifHO6m4zGGBjn42pjruflmHj8l7AFV81h6dvUc2EPPnLAXC+WJuOjVQoTJ5F1VHElKB5tk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR04MB6481
 
-From: Yun Zhou <yun.zhou@windriver.com>
+When testing zoned filesystems that span multiple zloop drives it can be
+difficult to figure out which devices access caused an error.
 
-[ Upstream commit 83887ad02f30c1814bed5da3ca999f7b0f3f337c ]
+Prefix the error messages where we have the disk available with the disk
+name.
 
-lookup_bdev() blindly returns inode->i_rdev without validating it.
-When a FUSE filesystem exposes a root inode with S_IFBLK mode but
-i_rdev == 0 (via rootmode=060000), any subsequent mount attempt using
-that path as a block device source propagates dev_t 0 into the
-superblock machinery.  After commit 9ee5f161a4db ("fs: maintain a
-global device-to-superblock table") this triggers a WARNING in
-super_dev_register().
-
-Reject i_rdev == 0 early with -ENODEV since no real block device
-driver registers major 0.
-
-Reported-by: syzbot+72fe3ea5814121fbc76e@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=72fe3ea5814121fbc76e
-Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
-Link: https://patch.msgid.link/20260703065548.1135125-1-yun.zhou@windriver.com
-Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
-
-LLM Generated explanations, may be completely bogus:
-
-# Stable backport analysis: `83887ad02f30c`
-
-Local tree: **v7.3-rc4** (`7.3.0-rc4`, HEAD `f0100363d8c37`). Both the
-device-to-superblock table (`9ee5f161a4db`) and this lookup check landed
-in the `vfs-7.3-rc1.super` pull. Verdict is for this checkout only.
-
----
-
-## PHASE 1: COMMIT MESSAGE FORENSICS
-
-**Step 1.1: PARSE THE SUBJECT LINE**
-
-Record: **[block] [reject] reject block device inodes with `i_rdev == 0`
-in `lookup_bdev()`**
-
-Subsystem `block:`. Verb `reject` is a defensive check, not a feature.
-Intent: stop `lookup_bdev()` from returning `dev_t` 0.
-
-**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
-
-Record:
-- **Reported-by:**
-  `syzbot+72fe3ea5814121fbc76e@syzkaller.appspotmail.com` (fuzzer, C
-  repro)
-- **Closes:**
-  https://syzkaller.appspot.com/bug?extid=72fe3ea5814121fbc76e
-- **Link:** https://patch.msgid.link/20260703065548.1135125-1-
-  yun.zhou@windriver.com
-- **Signed-off-by:** Yun Zhou (author); Christian Brauner (VFS
-  maintainer; applied)
-- **Fixes:** none (expected for this review)
-- **Cc: stable:** none (expected)
-- **Tested-by / Reviewed-by / Acked-by:** none on the commit
-
-Sasha Levin SOB is ignored per pipeline rules.
-
-**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
-
-Record:
-- **Bug:** `lookup_bdev()` copies `inode->i_rdev` with no check. FUSE
-  `rootmode=060000` (`S_IFBLK`) can present a block inode with `i_rdev
-  == 0`. A later mount that uses that path as a block-device source
-  feeds `dev_t` 0 into superblock setup.
-- **Symptom:** `WARNING in super_dev_register()` after `9ee5f161a4db`
-  (`VFS_WARN_ON_ONCE(!sb->s_dev)`).
-- **Root cause:** major 0 is not a real block major (`get_anon_bdev()`
-  allocates `MKDEV(0, n)` with `n >= 1`). Fake inodes can still expose
-  0.
-- **Version info:** warning is tied to `9ee5f161a4db` (2026-06-29). That
-  commit **is** an ancestor of this HEAD.
-
-**Step 1.4: DETECT HIDDEN BUG FIXES**
-
-Record: **Not disguised.** It is an explicit validation fix. Not cleanup
-or API work.
-
----
-
-## PHASE 2: DIFF ANALYSIS
-
-**Step 2.1: INVENTORY THE CHANGES**
-
-Record:
-- **File:** `block/bdev.c` only (`+12` comment + check, `−0`)
-- **Function:** `lookup_bdev()`
-- **Scope:** single-file surgical check on an existing error path (`goto
-  out_path_put`)
-
-**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
-
-Record: **Before:** after `S_ISBLK` and `may_open_dev()`, always `*dev =
-inode->i_rdev`. **After:** if `i_rdev == 0`, return `-ENODEV` and drop
-the path. Success path unchanged for real devices.
-
-**Step 2.3: IDENTIFY THE BUG MECHANISM**
-
-Record: **Logic / correctness** (invalid `dev_t`), plus **debug
-assertion** (`WARN_ON_ONCE` under `CONFIG_DEBUG_VFS`). Mechanism: stop
-`dev_t` 0 from reaching `sget_dev()` → `set_bdev_super()` →
-`super_dev_register()`.
-
-**Step 2.4: ASSESS THE FIX QUALITY**
-
-Record: **Obviously correct and minimal.** Real block drivers do not
-register major 0; `get_anon_bdev()` starts minors at 1 for that reason.
-Regression risk is **low**: only rejects `i_rdev == 0`. No new API, no
-lock changes. Possible behavior change: callers that used to get `dev_t`
-0 now get `-ENODEV` instead of failing later in `blkdev_get_no_open()`
-(`-ENXIO`). That is a better error for “no such device.”
-
----
-
-## PHASE 3: GIT HISTORY INVESTIGATION
-
-**Step 3.1: BLAME THE CHANGED LINES**
-
-Record: Unchecked `*dev = inode->i_rdev` comes from `4e7b5671c6a883`
-(“block: remove i_bdev”, 2020-12-01), on top of `lookup_bdev()` back to
-`1da177e4c3f41`. The **warning** is new with `9ee5f161a4db`
-(2026-06-29). The new check is `83887ad02f30c` itself.
-
-**Step 3.2: FOLLOW THE FIXES: TAG**
-
-Record: **No Fixes: tag.** The message names `9ee5f161a4db`. `git merge-
-base --is-ancestor 9ee5f161a4db HEAD` succeeded. That commit is in this
-tree. `git describe --contains`: both `9ee5f161a4db` and `83887ad02f30c`
-are in **v7.3-rc1**.
-
-**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
-
-Record: Recent `block/bdev.c` work is unrelated (`bdev_yield_claim`,
-unfreezable bdev, etc.). Standalone one-patch series, not `N/M`.
-
-**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
-
-Record: Yun Zhou also has filesystem fixes (ext4/xfs/jfs) in this
-history; not the block maintainer. Applied by **Christian Brauner**, VFS
-maintainer.
-
-**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
-
-Record: The check is self-contained in `lookup_bdev()`. The **warning**
-needs `super_dev_register()`, which this tree has. No extra helper or
-struct change required. **Can apply standalone** on this tree’s
-`lookup_bdev()`.
-
----
-
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-
-**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
-
-Record:
-- `b4 dig -c 83887ad02f30c` → https://patch.msgid.link/20260703065548.11
-  35125-1-yun.zhou@windriver.com
-- `b4 dig -a`: **v1 only**, 2026-07-03
-- Mbox is the patch only; **no review replies** in the saved thread
-- Openwall mirror matches; no NAK
-- Applied the same day (commit date 2026-07-03 15:12 +0200)
-- **No Cc: stable** in the submission
-
-**Step 4.2: CHECK WHO REVIEWED THE PATCH**
-
-Record (`b4 dig -w`): To Jens Axboe and Christian Brauner; Cc linux-
-block, linux-kernel. Brauner applied it. No extra Reviewed-by.
-
-**Step 4.3: SEARCH FOR THE BUG REPORT**
-
-Record (syzkaller):
-- Title: `WARNING in super_dev_register`
-- Label: **prio:normal**; subsystem fuse
-- C repro; first crash 2026-07-02 on linux-next
-- Stack: `mount` → `fuse_get_tree` → `get_tree_bdev_flags` → `sget_dev`
-  → `super_dev_register`
-- Warning text: `!sb->s_dev` at `super_dev_register`
-- Syzbot CI: **Unprivileged: ❌**; DenialOfService/Exploitable marked,
-  but not an unprivileged trigger
-- Status: fix listed as `83887ad02f30`
-
-**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
-
-Record: Single patch. Syzbot CI series passed KASAN build/boot/fuzz. No
-follow-up fix on `lookup_bdev()` `i_rdev` in this tree.
-
-**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
-
-Record: lore.kernel.org WebFetch returned **403**. Web search of
-`site:lore.kernel.org/stable` did not find a discussion of this patch.
-**UNVERIFIED:** no confirmed stable-list thread.
-
----
-
-## PHASE 5: CODE SEMANTIC ANALYSIS
-
-**Step 5.1: IDENTIFY KEY FUNCTIONS**
-
-Record: **`lookup_bdev()`** only.
-
-**Step 5.2: TRACE CALLERS**
-
-Record (this tree): `get_tree_bdev_flags()` in `fs/super.c` (mount path
-that warned); `bdev_file_open_by_path()`; hibernate; quota; nilfs2;
-btrfs; MTD; dm-table; bcache. **~26** call sites. Important path:
-**`get_tree_bdev_flags()`** from filesystem `get_tree` (including
-fuseblk).
-
-**Step 5.3: TRACE CALLEES**
-
-Record: `kern_path()`, `d_backing_inode()`, `S_ISBLK()`,
-`may_open_dev()`, `path_put()`. No alloc/lock added.
-
-**Step 5.4: FOLLOW THE CALL CHAIN**
-
-Record: Userspace `mount()` with a FUSE `rootmode=S_IFBLK` path as
-fuseblk/block source. **Reachable from the mount syscall**, typically
-with mount privilege. Confirmed by syzbot C repro. Not a hot I/O path.
-
-**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
-
-Record: No other `i_rdev == 0` reject in block core.
-`early_lookup_bdev()` is name/PARTUUID parsing at boot, not inode-based;
-different bug. `bdev_statx()` uses `i_rdev` via `blkdev_get_no_open()`,
-which already fails closed on missing devices.
-
----
-
-## PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
-
-**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
-
-Record: **Yes.**
-- `lookup_bdev()` is in `block/bdev.c`
-- `super_dev_register()` in `fs/super.c` has
-  `VFS_WARN_ON_ONCE(!sb->s_dev)`
-- `get_tree_bdev_flags()` still does `lookup_bdev(fc->source, &dev)`
-  then `sget_dev(fc, dev)`
-- Bug introduced for this warning: **`9ee5f161a4db`**, first in
-  **v7.3-rc1**, present here
-
-Current `lookup_bdev()` already contains this check because
-`83887ad02f30c` is an ancestor of HEAD (same 7.3-rc1 vfs pull). That is
-git history of this series, not a pipeline “already selected” marker.
-
-**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
-
-Record: **Clean apply** on this tree’s `lookup_bdev()`. Surrounding code
-matches the hunk. No backport rewrite needed.
-
-**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
-
-Record: This is the fix in this lineage. No alternate `i_rdev` check
-elsewhere.
-
----
-
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-
-**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
-
-Record: **block / VFS mount** (`block/bdev.c`, used by `fs/super.c`).
-**CORE** for block-backed mounts.
-
-**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
-
-Record: Active in 7.3 (device-to-superblock table is new this cycle).
-The check is a same-cycle guard for that table.
-
----
-
-## PHASE 8: IMPACT AND RISK ASSESSMENT
-
-**Step 8.1: DETERMINE WHO IS AFFECTED**
-
-Record: Anyone mounting a block-backed fs using a path that is a fake
-`S_IFBLK` inode with `i_rdev == 0` (FUSE `rootmode=S_IFBLK` is the known
-trigger). Not universal hardware. **Config-specific extra:**
-`CONFIG_DEBUG_VFS` (default **n**, `DEBUG_KERNEL`) is required for the
-**runtime WARNING**. Without it, `VFS_WARN_ON_ONCE` is
-`BUILD_BUG_ON_INVALID` (no runtime warn).
-
-**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
-
-Record: FUSE mount with `rootmode=060000`, then mount that path as a
-block device (fuseblk / `get_tree_bdev`). **Unprivileged: no** (syzbot).
-Not every boot; needs a crafted mount. Reproducible (C repro).
-
-**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
-
-Record:
-- **With `CONFIG_DEBUG_VFS`:** `WARN_ON_ONCE(!sb->s_dev)` — **MEDIUM**
-  (WARN; panic if `panic_on_warn`)
-- **Without it:** `s_dev = 0` is still registered in the global table,
-  then `setup_bdev_super()` → `bdev_file_open_by_dev(0)` →
-  `blkdev_get_no_open(0)` fails (`NULL` → `-ENXIO`). Mount fails.
-  **LOW–MEDIUM** correctness (invalid table key; mount still fails)
-
-Not UAF, not filesystem corruption, not an unprivileged crash.
-
-**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
-
-Record:
-- **Benefit:** Stops `dev_t` 0 from entering `sget_dev` /
-  `super_dev_register` on this 7.3 line, which has the new table.
-  Matches a syzbot C repro.
-- **Risk:** Very low (~12 lines, error-path only).
-- **Ratio:** Favorable **on this tree**, because `9ee5f161a4db` is
-  present.
-
----
-
-## PHASE 9: FINAL SYNTHESIS
-
-**Step 9.1: COMPILE THE EVIDENCE**
-
-**For backporting to this tree:**
-- Introducing commit `9ee5f161a4db` **is in this tree** (v7.3-rc1)
-- Syzbot C repro of `WARNING in super_dev_register`
-- Small, obviously correct `-ENODEV` check
-- Applied by VFS maintainer; syzbot CI passed
-- Call path is real: `get_tree_bdev_flags()`
-- Also avoids publishing `s_dev == 0` in the device-to-superblock table
-
-**Against:**
-- Runtime WARN is **`CONFIG_DEBUG_VFS` only** (default n)
-- Trigger is a privileged, crafted FUSE/fuseblk mount, not normal disks
-- syzbot **prio:normal**; not unprivileged
-- Production mount already fails later with `-ENXIO`
-- No Fixes/Cc-stable (not a negative by itself)
-
-**Unresolved:**
-- lore.kernel.org 403; no stable-list thread found (UNVERIFIED)
-
-**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
-
-1. Obviously correct and tested? **PASS** — syzbot repro + CI; logic is
-   sound
-2. Fixes a real bug that affects users? **PASS** — warning and invalid
-   `dev_t` 0 on this 7.3 VFS
-3. Important issue? **PASS** (borderline) — WARN_ON / table invariant;
-   not UAF/corruption; still a real VFS assertion this tree has
-4. Small and contained? **PASS** — one function, +12 lines
-5. No new features or APIs? **PASS**
-6. Can apply to the local tree? **PASS** — `lookup_bdev()` and
-   `super_dev_register()` match
-
-**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
-
-Record: **None** (not a device ID, quirk, DT, build, or docs patch).
-Qualifies as a small correctness fix, not an exception class.
-
-**Step 9.4: MAKE YOUR DECISION**
-
-On **this** v7.3-rc4 tree the warning path exists: `9ee5f161a4db` is
-here, `lookup_bdev()` can still feed 0 into `sget_dev()`, and syzbot has
-a C repro. The patch is a 12-line `-ENODEV` check with negligible
-regression risk. That meets stable rules for this checkout. It would not
-be appropriate on a tree that lacks `super_dev_register()`; that is not
-this tree.
-
----
-
-### What the commit solves, and why it matters here
-
-Without the check, a FUSE inode with `S_IFBLK` and `i_rdev == 0` makes
-`lookup_bdev()` return 0. `get_tree_bdev_flags()` then calls
-`sget_dev(fc, 0)`, and `super_dev_register()` hits
-`VFS_WARN_ON_ONCE(!sb->s_dev)` when `CONFIG_DEBUG_VFS=y`. This tree has
-that table and that warning. Rejecting `i_rdev == 0` with `-ENODEV`
-stops the bad `dev_t` at the lookup.
-
-### Risk vs benefit
-
-Benefit is silencing a reachable WARN and keeping `dev_t` 0 out of the
-superblock device table on 7.3. Risk is a slightly earlier `-ENODEV`
-instead of a later `-ENXIO` for a path that was never a real block
-device.
-
-### Concerns
-
-Depends on `9ee5f161a4db` for the warning; that dependency **is
-satisfied here**. No extra backport patches. lore.kernel.org could not
-be fetched (403); discussion was recovered via `b4 dig` and an openwall
-mirror.
-
----
-
-### Verification
-
-- **[Phase 1]** Parsed tags: syzbot Reported-by, Closes syzkaller URL,
-  msgid Link, Brauner SOB; no Fixes
-- **[Phase 2]** Diff: +12 in `lookup_bdev()` in `block/bdev.c`;
-  `-ENODEV` if `!inode->i_rdev`
-- **[Phase 3]** `git describe HEAD` → `v7.3-rc4-27-gf0100363d8c37`;
-  `make kernelversion` → `7.3.0-rc4`
-- **[Phase 3]** `git merge-base --is-ancestor 9ee5f161a4db HEAD` → yes
-- **[Phase 3]** `git merge-base --is-ancestor 83887ad02f30c HEAD` → yes
-  (in v7.3-rc1 vfs-super pull)
-- **[Phase 3]** `git blame -L 1259,1297 block/bdev.c`: unchecked assign
-  from `4e7b5671c6a883`; check from `83887ad02f30c`
-- **[Phase 3]** `git describe --contains 9ee5f161a4db` / `83887ad02f30c`
-  → both v7.3-rc1
-- **[Phase 4]** `b4 dig -c 83887ad02f30c` →
-  patch.msgid.link/20260703065548.1135125-1-yun.zhou@windriver.com
-- **[Phase 4]** `b4 dig -a`: v1 only; `-w`: axboe + brauner + linux-
-  block
-- **[Phase 4]** `b4 dig -m`: mbox is the patch only; no NAK
-- **[Phase 4]** WebFetch syzkaller bug: WARNING, prio:normal, C repro,
-  Unprivileged ❌
-- **[Phase 4]** lore.kernel.org WebFetch: **403**; stable-list hit:
-  **UNVERIFIED**
-- **[Phase 5]** Callers: `get_tree_bdev_flags`,
-  `bdev_file_open_by_path`, btrfs/nilfs2/dm/quota/hibernate/mtd/bcache
-- **[Phase 5]** `include/linux/vfsdebug.h`: `VFS_WARN_ON_ONCE` is
-  runtime only if `CONFIG_DEBUG_VFS`
-- **[Phase 5]** `lib/Kconfig.debug`: `DEBUG_VFS` default n, “If unsure,
-  say N”
-- **[Phase 6]** Read `lookup_bdev()` and `super_dev_register()` in this
-  tree; warning and mount path present
-- **[Phase 8]** Failure: WARN under DEBUG_VFS; otherwise failed open of
-  bdev 0 (`blkdev_get_no_open`)
-- **UNVERIFIED:** full lore review thread beyond the v1 patch mbox;
-  stable@ discussion
-
-The fix is small, matches a syzbot warning this 7.3 tree can hit, and
-applies cleanly.
-
-**YES**
-
- block/bdev.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/block/bdev.c b/block/bdev.c
-index 02d7503e7c2c4..00345746e34f8 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -1209,6 +1209,18 @@ int lookup_bdev(const char *pathname, dev_t *dev)
- 	if (!may_open_dev(&path))
- 		goto out_path_put;
+Changes to v1:
+- Based on for-7.4/block
+- Add reviews
+
+ drivers/block/zloop.c | 37 +++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 509d9727835d..73d9949d01e0 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -318,22 +318,23 @@ static int zloop_update_seq_zone(struct zloop_device *zlo, unsigned int zone_no)
  
-+	/*
-+	 * Reject a block device inode with i_rdev == 0.  A dev_t of 0 is
-+	 * never valid for a block device: no real block device driver
-+	 * registers major 0.  Fake block device inodes (e.g. fuse with
-+	 * rootmode=S_IFBLK) can expose i_rdev == 0, and letting that
-+	 * propagate would confuse superblock lookup and trigger warnings
-+	 * in the device-to-superblock table (super_dev_register).
-+	 */
-+	error = -ENODEV;
-+	if (!inode->i_rdev)
-+		goto out_path_put;
-+
- 	*dev = inode->i_rdev;
- 	error = 0;
- out_path_put:
+ 	ret = vfs_getattr(&zone->file->f_path, &stat, STATX_SIZE, 0);
+ 	if (ret < 0) {
+-		pr_err("Failed to get zone %u file stat (err=%d)\n",
+-		       zone_no, ret);
++		pr_err("%pg: Failed to get zone %u file stat (err=%d)\n",
++		       zlo->disk->part0, zone_no, ret);
+ 		set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
+ 		return ret;
+ 	}
+ 
+ 	file_sectors = stat.size >> SECTOR_SHIFT;
+ 	if (file_sectors > zlo->zone_capacity) {
+-		pr_err("Zone %u file too large (%llu sectors > %llu)\n",
+-		       zone_no, file_sectors, zlo->zone_capacity);
++		pr_err("%pg: Zone %u file too large (%llu sectors > %llu)\n",
++		       zlo->disk->part0, zone_no, file_sectors,
++		       zlo->zone_capacity);
+ 		return -EINVAL;
+ 	}
+ 
+ 	if (!IS_ALIGNED(stat.size, zlo->block_size)) {
+-		pr_err("Zone %u file size (%llu) not aligned to block size %u\n",
+-		       zone_no, stat.size, zlo->block_size);
++		pr_err("%pg: Zone %u file size (%llu) not aligned to block size %u\n",
++		       zlo->disk->part0, zone_no, stat.size, zlo->block_size);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -604,12 +605,14 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
+ 	} else {
+ 		if (cmd->sector != zone->wp) {
+ 			if (zone->wp == ULLONG_MAX)
+-				pr_err("Zone %u: write to %s zone: sect %llu\n",
+-				       zone_no, blk_zone_cond_str(zone->cond),
++				pr_err("%pg: Zone %u: write to %s zone: sect %llu\n",
++				       zlo->disk->part0, zone_no,
++				       blk_zone_cond_str(zone->cond),
+ 				       cmd->sector);
+ 			else
+-				pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
+-				       zone_no, cmd->sector, zone->wp);
++				pr_err("%pg: Zone %u: unaligned write: sect %llu, wp %llu\n",
++				       zlo->disk->part0, zone_no, cmd->sector,
++				       zone->wp);
+ 			ret = -EIO;
+ 			goto out_unlock;
+ 		}
+@@ -816,8 +819,9 @@ static void zloop_complete_rq(struct request *rq)
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_READ:
+ 		if (cmd->ret < 0)
+-			pr_err("Zone %u: failed read sector %llu, %llu sectors\n",
+-			       zone_no, cmd->sector, cmd->nr_sectors);
++			pr_err("%pg: Zone %u: failed read sector %llu, %llu sectors\n",
++			       zlo->disk->part0, zone_no, cmd->sector,
++			       cmd->nr_sectors);
+ 
+ 		if (cmd->ret >= 0 && cmd->ret != blk_rq_bytes(rq)) {
+ 			/* short read */
+@@ -830,14 +834,15 @@ static void zloop_complete_rq(struct request *rq)
+ 	case REQ_OP_WRITE:
+ 	case REQ_OP_ZONE_APPEND:
+ 		if (cmd->ret < 0)
+-			pr_err("Zone %u: failed %swrite sector %llu, %llu sectors\n",
+-			       zone_no,
++			pr_err("%pg: Zone %u: failed %swrite sector %llu, %llu sectors\n",
++			       zlo->disk->part0, zone_no,
+ 			       req_op(rq) == REQ_OP_WRITE ? "" : "append ",
+ 			       cmd->sector, cmd->nr_sectors);
+ 
+ 		if (cmd->ret >= 0 && cmd->ret != blk_rq_bytes(rq)) {
+-			pr_err("Zone %u: partial write %ld/%u B\n",
+-			       zone_no, cmd->ret, blk_rq_bytes(rq));
++			pr_err("%pg: Zone %u: partial write %ld/%u B\n",
++			       zlo->disk->part0, zone_no, cmd->ret,
++			       blk_rq_bytes(rq));
+ 			cmd->ret = -EIO;
+ 		}
+ 
+
+base-commit: afc9cde716b29ce814798d649a95f9128ba42b43
 -- 
-2.53.0
+2.56.0
 
