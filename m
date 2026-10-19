@@ -1,45 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BF156DCCC;
-	Mon, 19 Oct 2026 13:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB2E646982;
+	Mon, 19 Oct 2026 14:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418286; cv=none; b=bVVCi79WI0CNj3x2pMcm+Ivf3vT7xpPPML54DEmtiIMtZ30vUJ9QDudB1Bk0rS+IFjXsv/r2WSQevYzh8zPWZqWXRCXk2qt1TKUgbYeVtNNF7OoqZO3ygYWc7KaZHr2rlGGZ7QQmQC7nyxuJvg3RQ+2mJWpLAiSxpoMQcaQ0Jr4=
+	t=1792418792; cv=none; b=s+/Nzo9pyMlxpp8PJZ8rM+9YrR+nwDPn1mnkV/y1g9yfP9bkS/QhVFPAYIt9E+fsLhDE8/t2Cyg6rInCAuzZVVhxJYLP9ZoIV6VE3LicQ/yydk3sVxf25I6yZzq/4KQIndS4k8p3nvQBhXNWQsJxDVkhYxcJLUIYFfyrUXQITtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418286; c=relaxed/simple;
-	bh=3QGg+1T51XI+6ErIgq7haAN3iJcqq4509MpqRcj74Es=;
+	s=arc-20240116; t=1792418792; c=relaxed/simple;
+	bh=b970QSfivtWhXrCHnwzJxaqW6ZddRWQZLiIE8vwH3Ik=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qIKSOvXSdJLL/6G3nWE5fVb03TCr2MFy7iiw0MtGbx1I4fbo2uqRGGijx/KrXUizy1os8JahicfCT0FlhkNjpj8Nknk80Bwe1w7jSAOCdseWAgoANLs3zwHqepqgw8i/evko4JO4gFAiK318TxWK9W1VFmNs9hyEUxu1DykiYbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l2lWsD3/; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=gUt1NaXtULie3h5q2IGpsJNMCwhueG2+c5bPxsBmnqyjlVdAPJMZ6/pD96p+o9XLHKfHXpPzLuYRwhji5vfzDywuzqx/ERg8M3r9ZbkAgZB6G+GdPPC+OvZENnAe+w7uMWfg0AUDIrKcMjy+SK2k4WZ/e2YQceEZVKopxcITKZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjOEgefw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2lWsD3/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C433F1F000C6;
-	Mon, 19 Oct 2026 13:58:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjOEgefw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 031161F000C5;
+	Mon, 19 Oct 2026 14:06:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418283;
-	bh=Dv3twa7zYOB3knqGrwOntSkkwfPWGCbTt5dOVIhc7Fc=;
+	s=k20260515; t=1792418789;
+	bh=hOQDEz33xStZKw/+9YXAnJNUn5iUFyNgLBgNBn1kxMM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=l2lWsD3/9dHeUKkLyg+Z6WFUrxPIulOKlijIB69wU2fTw7mbnD0ceHmMy6CTOWqXv
-	 NxpOM9SDBm/HUsSBGDXGfmn4WvoM6lDD7How7yVRn12lcb+uDb7p7tZd4z2NRvtvZu
-	 IdQTJPqRcnHgPZZ7hzYOfphQGBgpkcwBwc6n9nyARAlswKmBmpC64+srtMQwJcXfsQ
-	 Ahd7IyUCF9+sJnuHyrM7o8Wfnxgm2//KAjhAsPYPLJcKdRBpCkTRwFW60CV6rU6zMc
-	 AUf1NEOc9VJ4SGbnBo695HH+pGwVBCHYH/vHxYr/f+7NTKXaMFpQbontv/0JZ0jN09
-	 TgbTaxKq7SKyw==
+	b=kjOEgefwtRTl8ILkOEMAOI8kWJzovXDpvC965hB1Kcn1+3RyfdSF8kc/b3hp3XthF
+	 yfbQCb2Vm9KGc/cJpHvrUvHNquQo4VMDRP0sjYiI8Jx7cWDa8cEAsO/aWaTcgaVc+y
+	 fhicJYKn5ozuGWPJv9TOCoA9P7PeVcetxqNfzFK2RdaQWSuBnkOj8FYDLI/90w8unM
+	 dcRcq8h2UBdID4Db+vcqDdwGxUjgZvxx66yoYgG5WMzIEkfBiYiXz9ewpCtaijTRyT
+	 A2Jfn/a9eOfOQwVGiZhOzPpn8R1j07nsaS2PQydsGK18GiOmS09e5j/WuMSDQRqF4l
+	 LonZXj1x47HCA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jenson Johnathon Reggentin <mail@jregg.de>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Jonathan Corbet <corbet@lwn.net>,
+Cc: Yun Zhou <yun.zhou@windriver.com>,
+	syzbot+72fe3ea5814121fbc76e@syzkaller.appspotmail.com,
+	"Christian Brauner (Amutable)" <brauner@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	axboe@kernel.dk,
 	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.10] docs: block: fix dead http link in blk-mq.rst
-Date: Mon, 19 Oct 2026 09:47:09 -0400
-Message-ID: <20261019135441.1420968-138-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.15] block: reject block device inodes with i_rdev == 0 in lookup_bdev()
+Date: Mon, 19 Oct 2026 09:53:09 -0400
+Message-ID: <20261019135441.1420968-498-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -55,378 +54,465 @@ X-stable-base: Linux 6.18.57
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Jenson Johnathon Reggentin <mail@jregg.de>
+From: Yun Zhou <yun.zhou@windriver.com>
 
-[ Upstream commit b40a680ea4efe4ef2addada63e304a94d19500d1 ]
+[ Upstream commit 83887ad02f30c1814bed5da3ca999f7b0f3f337c ]
 
-The current link http://kernel.dk/blk-mq.pdf leads to a 404 error page.
-https://www.kernel.dk/blk-mq.pdf leads to the correct document.
+lookup_bdev() blindly returns inode->i_rdev without validating it.
+When a FUSE filesystem exposes a root inode with S_IFBLK mode but
+i_rdev == 0 (via rootmode=060000), any subsequent mount attempt using
+that path as a block device source propagates dev_t 0 into the
+superblock machinery.  After commit 9ee5f161a4db ("fs: maintain a
+global device-to-superblock table") this triggers a WARNING in
+super_dev_register().
 
-v2 to add the missing www. prefix in the actual file change.
+Reject i_rdev == 0 early with -ENODEV since no real block device
+driver registers major 0.
 
-Signed-off-by: Jenson Johnathon Reggentin <mail@jregg.de>
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Signed-off-by: Jonathan Corbet <corbet@lwn.net>
-Message-ID: <20260819192422.42189-1-mail@jregg.de>
+Reported-by: syzbot+72fe3ea5814121fbc76e@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=72fe3ea5814121fbc76e
+Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
+Link: https://patch.msgid.link/20260703065548.1135125-1-yun.zhou@windriver.com
+Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-I have the tree identity, the dead URL in-tree, review history, and a
-clean apply. Next I’ll finish call-site and stable-rule checks, then
-give the backport verdict.
+# Stable backport analysis: `83887ad02f30c`
+
+Local tree: **v7.3-rc4** (`7.3.0-rc4`, HEAD `f0100363d8c37`). Both the
+device-to-superblock table (`9ee5f161a4db`) and this lookup check landed
+in the `vfs-7.3-rc1.super` pull. Verdict is for this checkout only.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
-Step 1.1: PARSE THE SUBJECT LINE
-Record: `[docs: block:]` `[fix]` `[dead HTTP link in blk-mq.rst]` —
-documentation URL correction in the block multi-queue overview.
+**Step 1.1: PARSE THE SUBJECT LINE**
 
-Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
+Record: **[block] [reject] reject block device inodes with `i_rdev == 0`
+in `lookup_bdev()`**
+
+Subsystem `block:`. Verb `reject` is a defensive check, not a feature.
+Intent: stop `lookup_bdev()` from returning `dev_t` 0.
+
+**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
+
 Record:
-- Signed-off-by: Jenson Johnathon Reggentin `<mail@jregg.de>` (author)
-- Acked-by: Randy Dunlap `<rdunlap@infradead.org>` (docs reviewer)
-- Signed-off-by: Jonathan Corbet `<corbet@lwn.net>` (docs maintainer,
-  applied it)
-- Message-ID: `<20260819192422.42189-1-mail@jregg.de>` (v2 submission)
-- No Fixes: tag (expected)
-- No Reported-by / Tested-by / Reviewed-by on the committed form (v1 had
-  Reviewed-by: Md Haris Iqbal; that tag was not carried to v2)
-- No Cc: stable (expected; not a negative)
-- Ignore any pipeline “Upstream commit” / “Signed-off-by: Sasha Levin”
-  markers if present
+- **Reported-by:**
+  `syzbot+72fe3ea5814121fbc76e@syzkaller.appspotmail.com` (fuzzer, C
+  repro)
+- **Closes:**
+  https://syzkaller.appspot.com/bug?extid=72fe3ea5814121fbc76e
+- **Link:** https://patch.msgid.link/20260703065548.1135125-1-
+  yun.zhou@windriver.com
+- **Signed-off-by:** Yun Zhou (author); Christian Brauner (VFS
+  maintainer; applied)
+- **Fixes:** none (expected for this review)
+- **Cc: stable:** none (expected)
+- **Tested-by / Reviewed-by / Acked-by:** none on the commit
 
-Step 1.3: ANALYZE THE COMMIT BODY TEXT
+Sasha Levin SOB is ignored per pipeline rules.
+
+**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
+
 Record:
-- Bug: `http://kernel.dk/blk-mq.pdf` in the “Further reading” section
-  returns 404.
-- Symptom: readers of blk-mq documentation cannot open the canonical
-  blk-mq paper.
-- Fix: switch to `https://www.kernel.dk/blk-mq.pdf`.
-- v2 note: v1 used `https://kernel.dk/blk-mq.pdf` (missing `www.`),
-  which still 404’d / had a bad cert; v2 adds `www.`.
-- No kernel version range given; no crash/trace.
+- **Bug:** `lookup_bdev()` copies `inode->i_rdev` with no check. FUSE
+  `rootmode=060000` (`S_IFBLK`) can present a block inode with `i_rdev
+  == 0`. A later mount that uses that path as a block-device source
+  feeds `dev_t` 0 into superblock setup.
+- **Symptom:** `WARNING in super_dev_register()` after `9ee5f161a4db`
+  (`VFS_WARN_ON_ONCE(!sb->s_dev)`).
+- **Root cause:** major 0 is not a real block major (`get_anon_bdev()`
+  allocates `MKDEV(0, n)` with `n >= 1`). Fake inodes can still expose
+  0.
+- **Version info:** warning is tied to `9ee5f161a4db` (2026-06-29). That
+  commit **is** an ancestor of this HEAD.
 
-Step 1.4: DETECT HIDDEN BUG FIXES
-Record: Not a hidden runtime fix. It is exactly what it says: a
-documentation hyperlink correction. Not a leak/race/UAF disguised as
-cleanup.
+**Step 1.4: DETECT HIDDEN BUG FIXES**
+
+Record: **Not disguised.** It is an explicit validation fix. Not cleanup
+or API work.
 
 ---
 
 ## PHASE 2: DIFF ANALYSIS
 
-Step 2.1: INVENTORY THE CHANGES
+**Step 2.1: INVENTORY THE CHANGES**
+
 Record:
-- File: `Documentation/block/blk-mq.rst` — 1 line changed (`-1/+1`)
-- Functions: none
-- Scope: single-file, surgical documentation edit
+- **File:** `block/bdev.c` only (`+12` comment + check, `−0`)
+- **Function:** `lookup_bdev()`
+- **Scope:** single-file surgical check on an existing error path (`goto
+  out_path_put`)
 
-Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
-Record:
-- Before: RST link target `http://kernel.dk/blk-mq.pdf`
-- After: RST link target `https://www.kernel.dk/blk-mq.pdf`
-- Path affected: documentation “Further reading” only; no execution path
+**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
 
-Step 2.3: IDENTIFY THE BUG MECHANISM
-Record: Not a memory-safety/locking/refcount bug. Category:
-documentation correctness (dead external URL). Mechanism: site now
-requires HTTPS + `www.` hostname.
+Record: **Before:** after `S_ISBLK` and `may_open_dev()`, always `*dev =
+inode->i_rdev`. **After:** if `i_rdev == 0`, return `-ENODEV` and drop
+the path. Success path unchanged for real devices.
 
-Step 2.4: ASSESS THE FIX QUALITY
-Record:
-- Obviously correct once v2 uses the working URL.
-- Minimal; no unrelated edits.
-- Regression risk: none at runtime. Residual risk is only that the
-  remote host could move again (same class of risk as any external
-  link).
-- v1 was wrong (Randy Dunlap reported continued 404 / bad SSL);
-  committed v2 addresses that.
+**Step 2.3: IDENTIFY THE BUG MECHANISM**
 
-Verified live:
-- `http://kernel.dk/blk-mq.pdf` → 404
-- `https://www.kernel.dk/blk-mq.pdf` → PDF retrieved (51.5 KB)
+Record: **Logic / correctness** (invalid `dev_t`), plus **debug
+assertion** (`WARN_ON_ONCE` under `CONFIG_DEBUG_VFS`). Mechanism: stop
+`dev_t` 0 from reaching `sget_dev()` → `set_bdev_super()` →
+`super_dev_register()`.
+
+**Step 2.4: ASSESS THE FIX QUALITY**
+
+Record: **Obviously correct and minimal.** Real block drivers do not
+register major 0; `get_anon_bdev()` starts minors at 1 for that reason.
+Regression risk is **low**: only rejects `i_rdev == 0`. No new API, no
+lock changes. Possible behavior change: callers that used to get `dev_t`
+0 now get `-ENODEV` instead of failing later in `blkdev_get_no_open()`
+(`-ENXIO`). That is a better error for “no such device.”
 
 ---
 
 ## PHASE 3: GIT HISTORY INVESTIGATION
 
-Step 3.1: BLAME THE CHANGED LINES
-Record:
-- Introduced in `46e906144c3f4b` (“docs: block: Create blk-mq
-  documentation”, André Almeida, 2020-06-19)
-- First appeared: `v5.9-rc1` (`git describe --contains` →
-  `v5.9-rc1~150^2~141`)
-- Present in this tree for the entire 6.12 lifetime
+**Step 3.1: BLAME THE CHANGED LINES**
 
-Step 3.2: FOLLOW THE FIXES: TAG
-Record: No Fixes: tag. The introducing commit is the original
-documentation add, not a later regression in C code.
+Record: Unchecked `*dev = inode->i_rdev` comes from `4e7b5671c6a883`
+(“block: remove i_bdev”, 2020-12-01), on top of `lookup_bdev()` back to
+`1da177e4c3f41`. The **warning** is new with `9ee5f161a4db`
+(2026-06-29). The new check is `83887ad02f30c` itself.
 
-Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
-Record (this tree, `-- Documentation/block/blk-mq.rst`):
-- `41bd33df4e180` docs: correct places → place
-- `c19430eec84f7` Fix small typo
-- `2bc602cb0e0d9` correct drive → driver
-- `8ac867340bd8c` / `9303c9d5e9883` Sphinx `:c:type` cleanup
-- `46e906144c3f4b` create the file
-No later URL rewrite in this checkout. Standalone; not patch X/Y of a
-functional series.
+**Step 3.2: FOLLOW THE FIXES: TAG**
 
-Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
-Record: `git log --author="Jenson Johnathon Reggentin"` /
-`mail@jregg.de` on this tree: no hits. One-off docs contributor, not the
-block maintainer. Applied by Jonathan Corbet; Acked-by Randy Dunlap.
+Record: **No Fixes: tag.** The message names `9ee5f161a4db`. `git merge-
+base --is-ancestor 9ee5f161a4db HEAD` succeeded. That commit is in this
+tree. `git describe --contains`: both `9ee5f161a4db` and `83887ad02f30c`
+are in **v7.3-rc1**.
 
-Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
-Record: No new helpers, structs, or APIs. The hunk matches the current
-file byte-for-byte. Can apply standalone.
+**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
+
+Record: Recent `block/bdev.c` work is unrelated (`bdev_yield_claim`,
+unfreezable bdev, etc.). Standalone one-patch series, not `N/M`.
+
+**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
+
+Record: Yun Zhou also has filesystem fixes (ext4/xfs/jfs) in this
+history; not the block maintainer. Applied by **Christian Brauner**, VFS
+maintainer.
+
+**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
+
+Record: The check is self-contained in `lookup_bdev()`. The **warning**
+needs `super_dev_register()`, which this tree has. No extra helper or
+struct change required. **Can apply standalone** on this tree’s
+`lookup_bdev()`.
 
 ---
 
 ## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 
-Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
+**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
+
 Record:
-- `b4 mbox 20260819192422.42189-1-mail@jregg.de` saved 12-message thread
-  (lore HTTP 403 from WebFetch; b4 succeeded).
-- v1: `https://kernel.dk/blk-mq.pdf` (no www)
-- v2 (applied): `https://www.kernel.dk/blk-mq.pdf`
-- Randy Dunlap: v1 still 404 + invalid SSL; confirmed `www.` works;
-  Acked-by on v2; asked changelog-after-`---` nit
-- Haris Iqbal: Reviewed-by on v1; spotted missing `www.`
-- Jonathan Corbet: asked for a version that actually works; applied v2
-  (“Applied, thanks.”)
-- No NAK. No reviewer asked for Cc: stable.
-- Included in Corbet’s `[GIT PULL] Documentation stragglers for 7.3`
-  (`docs-7.3-2`), described as late-arriving docs fixes, not a stable-
-  critical runtime fix.
-- Syzbot CI skipped both versions: “AI determined the patch has no
-  functional impact”
+- `b4 dig -c 83887ad02f30c` → https://patch.msgid.link/20260703065548.11
+  35125-1-yun.zhou@windriver.com
+- `b4 dig -a`: **v1 only**, 2026-07-03
+- Mbox is the patch only; **no review replies** in the saved thread
+- Openwall mirror matches; no NAK
+- Applied the same day (commit date 2026-07-03 15:12 +0200)
+- **No Cc: stable** in the submission
 
-Step 4.2: CHECK WHO REVIEWED THE PATCH
-Record (syzbot CI Cc + thread):
-- To/Cc: Jens Axboe, Jonathan Corbet, linux-block, linux-doc
-- Reviewers who spoke: Randy Dunlap (ack), Md Haris Iqbal (v1 r-b),
-  Jonathan Corbet (applied)
-- Block maintainer was copied; no Axboe reply in the 12-message thread
+**Step 4.2: CHECK WHO REVIEWED THE PATCH**
 
-Step 4.3: SEARCH FOR THE BUG REPORT
-Record: No bugzilla/syzbot crash. Author observed a 404. Confirmed
-independently in this analysis.
+Record (`b4 dig -w`): To Jens Axboe and Christian Brauner; Cc linux-
+block, linux-kernel. Brauner applied it. No extra Reviewed-by.
 
-Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
-Record: Standalone. v1→v2 only to correct the hostname. No sibling
-functional patches required.
+**Step 4.3: SEARCH FOR THE BUG REPORT**
 
-Step 4.5: CHECK STABLE MAILING LIST HISTORY
-Record: lore.kernel.org/stable WebFetch returned 403. UNVERIFIED that
-stable@ discussed this specific URL. No evidence in the docs thread of a
-stable nomination or of a reason to exclude it.
+Record (syzkaller):
+- Title: `WARNING in super_dev_register`
+- Label: **prio:normal**; subsystem fuse
+- C repro; first crash 2026-07-02 on linux-next
+- Stack: `mount` → `fuse_get_tree` → `get_tree_bdev_flags` → `sget_dev`
+  → `super_dev_register`
+- Warning text: `!sb->s_dev` at `super_dev_register`
+- Syzbot CI: **Unprivileged: ❌**; DenialOfService/Exploitable marked,
+  but not an unprivileged trigger
+- Status: fix listed as `83887ad02f30`
+
+**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
+
+Record: Single patch. Syzbot CI series passed KASAN build/boot/fuzz. No
+follow-up fix on `lookup_bdev()` `i_rdev` in this tree.
+
+**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
+
+Record: lore.kernel.org WebFetch returned **403**. Web search of
+`site:lore.kernel.org/stable` did not find a discussion of this patch.
+**UNVERIFIED:** no confirmed stable-list thread.
 
 ---
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
-Step 5.1: KEY FUNCTIONS
-Record: None. Only an RST hyperlink.
+**Step 5.1: IDENTIFY KEY FUNCTIONS**
 
-Step 5.2: TRACE CALLERS
-Record: N/A — not callable kernel code. Consumers are humans (and Sphinx
-HTML on kernel.org / distro doc packages).
+Record: **`lookup_bdev()`** only.
 
-Step 5.3: TRACE CALLEES
-Record: N/A.
+**Step 5.2: TRACE CALLERS**
 
-Step 5.4: FOLLOW THE CALL CHAIN
-Record: Not reachable from syscalls. User impact is documentation-only.
-kernel.org `v6.12` HTML is built from this tree, so the 404 is user-
-visible for people reading 6.12 docs.
+Record (this tree): `get_tree_bdev_flags()` in `fs/super.c` (mount path
+that warned); `bdev_file_open_by_path()`; hibernate; quota; nilfs2;
+btrfs; MTD; dm-table; bcache. **~26** call sites. Important path:
+**`get_tree_bdev_flags()`** from filesystem `get_tree` (including
+fuseblk).
 
-Step 5.5: SEARCH FOR SIMILAR PATTERNS
-Record: `kernel.dk/blk-mq` appears only in `Documentation/block/blk-
-mq.rst` in this tree. Other `kernel.dk` hits are emails/copyrights, not
-this PDF.
+**Step 5.3: TRACE CALLEES**
+
+Record: `kern_path()`, `d_backing_inode()`, `S_ISBLK()`,
+`may_open_dev()`, `path_put()`. No alloc/lock added.
+
+**Step 5.4: FOLLOW THE CALL CHAIN**
+
+Record: Userspace `mount()` with a FUSE `rootmode=S_IFBLK` path as
+fuseblk/block source. **Reachable from the mount syscall**, typically
+with mount privilege. Confirmed by syzbot C repro. Not a hot I/O path.
+
+**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
+
+Record: No other `i_rdev == 0` reject in block core.
+`early_lookup_bdev()` is name/PARTUUID parsing at boot, not inode-based;
+different bug. `bdev_statx()` uses `i_rdev` via `blkdev_get_no_open()`,
+which already fails closed on missing devices.
 
 ---
 
 ## PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
 
-Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?
-Record:
-- `git describe HEAD` → `p-6.12-3-gc504cf0baa3d8`
-- `make kernelversion` / Makefile → **6.12.111**, branch `pending-6.12`
-- Line 142 of `Documentation/block/blk-mq.rst` still has
-  `http://kernel.dk/blk-mq.pdf`
-- `git merge-base --is-ancestor 46e906144c3f4b HEAD` → yes
-- Bug introduced v5.9-rc1 (2020); present here
+**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
 
-Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
-Record: Surrounding hunk is identical to the patch context. Expected
-apply: **clean**. `git log v6.12..HEAD -- Documentation/block/blk-
-mq.rst` is empty (no conflicting stable edits).
+Record: **Yes.**
+- `lookup_bdev()` is in `block/bdev.c`
+- `super_dev_register()` in `fs/super.c` has
+  `VFS_WARN_ON_ONCE(!sb->s_dev)`
+- `get_tree_bdev_flags()` still does `lookup_bdev(fc->source, &dev)`
+  then `sget_dev(fc, dev)`
+- Bug introduced for this warning: **`9ee5f161a4db`**, first in
+  **v7.3-rc1**, present here
 
-Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE
-Record: Replacement URL not present. No alternate rewrite of this link.
-Comparable docs-link backports **do** exist after v6.12 in this tree,
-e.g.:
-- `b23111ec50d86` `docs: hwmon: fix link to g762 devicetree binding`
-- `a7f28636da6f9` `docs: media: update location of the media patches`
-  (explicit Cc: stable)
+Current `lookup_bdev()` already contains this check because
+`83887ad02f30c` is an ancestor of HEAD (same 7.3-rc1 vfs pull). That is
+git history of this series, not a pipeline “already selected” marker.
+
+**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
+
+Record: **Clean apply** on this tree’s `lookup_bdev()`. Surrounding code
+matches the hunk. No backport rewrite needed.
+
+**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
+
+Record: This is the fix in this lineage. No alternate `i_rdev` check
+elsewhere.
 
 ---
 
 ## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
 
-Step 7.1: SUBSYSTEM AND CRITICALITY
-Record:
-- Subsystem: Documentation for the block layer (`Documentation/block/`,
-  MAINTAINERS: BLOCK LAYER, Jens Axboe; docs tree via Corbet)
-- Criticality of **blk-mq itself**: IMPORTANT (common block I/O)
-- Criticality of **this change**: documentation-only, not the I/O path
+**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
 
-Step 7.2: SUBSYSTEM ACTIVITY
-Record: `Documentation/block/` is mature; this file’s last change in-
-tree is a 2023 typo fix. The URL has been wrong/stale for years; the
-site layout change is what made `http://kernel.dk/...` a hard 404.
+Record: **block / VFS mount** (`block/bdev.c`, used by `fs/super.c`).
+**CORE** for block-backed mounts.
+
+**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
+
+Record: Active in 7.3 (device-to-superblock table is new this cycle).
+The check is a same-cycle guard for that table.
 
 ---
 
 ## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-Step 8.1: WHO IS AFFECTED
-Record: Anyone reading in-tree or generated blk-mq docs (developers,
-distro doc packages, kernel.org HTML for 6.12). Not a
-runtime/driver/config population.
+**Step 8.1: DETERMINE WHO IS AFFECTED**
 
-Step 8.2: TRIGGER CONDITIONS
-Record: Opening the “Further reading” PDF link. Common for people
-studying blk-mq; never triggered by unprivileged syscalls. Not a race.
+Record: Anyone mounting a block-backed fs using a path that is a fake
+`S_IFBLK` inode with `i_rdev == 0` (FUSE `rootmode=S_IFBLK` is the known
+trigger). Not universal hardware. **Config-specific extra:**
+`CONFIG_DEBUG_VFS` (default **n**, `DEBUG_KERNEL`) is required for the
+**runtime WARNING**. Without it, `VFS_WARN_ON_ONCE` is
+`BUILD_BUG_ON_INVALID` (no runtime warn).
 
-Step 8.3: FAILURE MODE SEVERITY
+**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
+
+Record: FUSE mount with `rootmode=060000`, then mount that path as a
+block device (fuseblk / `get_tree_bdev`). **Unprivileged: no** (syzbot).
+Not every boot; needs a crafted mount. Reproducible (C repro).
+
+**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
+
 Record:
-- Failure: HTTP 404 / cannot open the referenced paper
-- Severity: **LOW** (incorrect documentation, no crash/corruption/hang)
-- No kernel oops, leak, or security effect
+- **With `CONFIG_DEBUG_VFS`:** `WARN_ON_ONCE(!sb->s_dev)` — **MEDIUM**
+  (WARN; panic if `panic_on_warn`)
+- **Without it:** `s_dev = 0` is still registered in the global table,
+  then `setup_bdev_super()` → `bdev_file_open_by_dev(0)` →
+  `blkdev_get_no_open(0)` fails (`NULL` → `-ENXIO`). Mount fails.
+  **LOW–MEDIUM** correctness (invalid table key; mount still fails)
 
-Step 8.4: RISK-BENEFIT RATIO
+Not UAF, not filesystem corruption, not an unprivileged crash.
+
+**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
+
 Record:
-- Benefit: working further-reading link in 6.12 docs; small but real for
-  doc users
-- Risk: **very low** (one RST URL; no code, locks, APIs)
-- Ratio: favorable *if* documentation corrections are in scope; not a
-  stability win
+- **Benefit:** Stops `dev_t` 0 from entering `sget_dev` /
+  `super_dev_register` on this 7.3 line, which has the new table.
+  Matches a syzbot C repro.
+- **Risk:** Very low (~12 lines, error-path only).
+- **Ratio:** Favorable **on this tree**, because `9ee5f161a4db` is
+  present.
 
 ---
 
 ## PHASE 9: FINAL SYNTHESIS
 
-Step 9.1: COMPILE THE EVIDENCE
+**Step 9.1: COMPILE THE EVIDENCE**
 
-FOR backporting:
-- Dead link is real (404 verified); replacement URL works
-- One-line, obviously correct v2 after review
-- Docs maintainer applied it; Randy Dunlap Acked-by
-- Buggy line exists in this 6.12.111 tree since v5.9; applies cleanly
-- User-facing exception: documentation/comment fixes with zero runtime
-  regression
-- This same 6.12 tree already took other documentation link-location
-  fixes
+**For backporting to this tree:**
+- Introducing commit `9ee5f161a4db` **is in this tree** (v7.3-rc1)
+- Syzbot C repro of `WARNING in super_dev_register`
+- Small, obviously correct `-ENODEV` check
+- Applied by VFS maintainer; syzbot CI passed
+- Call path is real: `get_tree_bdev_flags()`
+- Also avoids publishing `s_dev == 0` in the device-to-superblock table
 
-AGAINST backporting:
-- Not a crash, deadlock, corruption, UAF, or security bug
-- Official rule 3 (“important issue”) is not met in the runtime sense
-- No functional kernel impact (syzbot CI skipped it for that reason)
-- No Cc: stable; landed as docs-7.3 stragglers, not a hotfix
-- Stable rules also discourage purely trivial edits; this is adjacent to
-  that class
-- Benefit is only to documentation readers, not production uptime
+**Against:**
+- Runtime WARN is **`CONFIG_DEBUG_VFS` only** (default n)
+- Trigger is a privileged, crafted FUSE/fuseblk mount, not normal disks
+- syzbot **prio:normal**; not unprivileged
+- Production mount already fails later with `-ENXIO`
+- No Fixes/Cc-stable (not a negative by itself)
 
-UNRESOLVED:
-- Could not fetch lore.kernel.org or lore stable search via WebFetch
-  (403); thread recovered via b4
-- Commit SHA is not in this checkout’s `master` (that tip is ~7.2; patch
-  went in docs-7.3-2)
+**Unresolved:**
+- lore.kernel.org 403; no stable-list thread found (UNVERIFIED)
 
-Step 9.2: STABLE RULES CHECKLIST
-1. Obviously correct and tested? **PASS** — v2 URL verified; Acked-by +
-   maintainer apply
-2. Fixes a real bug that affects users? **PASS** — 404 in
-   shipped/generated docs, not a runtime bug
-3. Important issue (crash, security, corruption, deadlock)? **FAIL** as
-   runtime severity; **LOW** doc defect only
-4. Small and contained? **PASS** — 1 line, one file
+**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
+
+1. Obviously correct and tested? **PASS** — syzbot repro + CI; logic is
+   sound
+2. Fixes a real bug that affects users? **PASS** — warning and invalid
+   `dev_t` 0 on this 7.3 VFS
+3. Important issue? **PASS** (borderline) — WARN_ON / table invariant;
+   not UAF/corruption; still a real VFS assertion this tree has
+4. Small and contained? **PASS** — one function, +12 lines
 5. No new features or APIs? **PASS**
-6. Can apply to the local tree? **PASS** — context identical, URL still
-   old
+6. Can apply to the local tree? **PASS** — `lookup_bdev()` and
+   `super_dev_register()` match
 
-Step 9.3: EXCEPTION CATEGORIES
-Record: **Documentation fix** (incorrect/obsolete external link). That
-exception is why a LOW-severity, zero-runtime patch can still be
-appropriate for this tree.
+**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
 
-Step 9.4: DECISION
-The change does not stabilize running 6.12 systems, but it is a
-contained, verified correction of documentation this tree still ships,
-with no regression surface and with precedent for similar doc-link
-backports here. That matches the documentation exception, not a “new
-feature” or refactor.
+Record: **None** (not a device ID, quirk, DT, build, or docs patch).
+Qualifies as a small correctness fix, not an exception class.
 
-What it solves for stable users: kernel.org / distro HTML for 6.12
-currently points “Further reading” at a 404; after backport it points at
-Jens Axboe’s actual blk-mq PDF.
+**Step 9.4: MAKE YOUR DECISION**
 
-Risk vs benefit: negligible risk, modest doc benefit. No dependencies or
-backport rework.
+On **this** v7.3-rc4 tree the warning path exists: `9ee5f161a4db` is
+here, `lookup_bdev()` can still feed 0 into `sget_dev()`, and syzbot has
+a C repro. The patch is a 12-line `-ENODEV` check with negligible
+regression risk. That meets stable rules for this checkout. It would not
+be appropriate on a tree that lacks `super_dev_register()`; that is not
+this tree.
 
 ---
 
-## Verification
-- [Phase 1] Tags: author SOB, Randy Dunlap Acked-by, Jonathan Corbet
-  SOB, Message-ID v2; no Fixes/Reported-by/Cc-stable
-- [Phase 2] Diff: single RST URL `http://kernel.dk/blk-mq.pdf` →
-  `https://www.kernel.dk/blk-mq.pdf`
-- [Phase 2] WebFetch: old URL 404; new URL returns the PDF
-- [Phase 3] `git blame` line 142: `46e906144c3f4b` (2020); `git describe
-  --contains` → v5.9-rc1
-- [Phase 3] `git merge-base --is-ancestor 46e906144c3f4b HEAD` succeeded
-- [Phase 3] Author has no other commits in this tree; file history is
-  typo/Sphinx-only
-- [Phase 4] `b4 mbox`: 12-message v1/v2 thread; Randy caught v1 404/SSL;
-  Corbet applied v2
-- [Phase 4] LKML pull: included in Documentation stragglers for 7.3
-- [Phase 4] Syzbot CI: skipped, no functional impact
-- [Phase 4] UNVERIFIED: lore.kernel.org/stable search (HTTP 403)
-- [Phase 5] No functions/callers; only docs consumers
-- [Phase 6] `git describe HEAD` = p-6.12-3-gc504cf0baa3d8; kernelversion
-  6.12.111; dead URL still at blk-mq.rst:142
-- [Phase 6] Apply would be clean; no post-v6.12 edits to this file
-- [Phase 6] Precedent: `docs: hwmon: fix link to g762...` and `docs:
-  media: update location...` already in this 6.12 tree
-- [Phase 8] Failure mode: documentation 404, severity LOW; runtime risk
-  none
+### What the commit solves, and why it matters here
+
+Without the check, a FUSE inode with `S_IFBLK` and `i_rdev == 0` makes
+`lookup_bdev()` return 0. `get_tree_bdev_flags()` then calls
+`sget_dev(fc, 0)`, and `super_dev_register()` hits
+`VFS_WARN_ON_ONCE(!sb->s_dev)` when `CONFIG_DEBUG_VFS=y`. This tree has
+that table and that warning. Rejecting `i_rdev == 0` with `-ENODEV`
+stops the bad `dev_t` at the lookup.
+
+### Risk vs benefit
+
+Benefit is silencing a reachable WARN and keeping `dev_t` 0 out of the
+superblock device table on 7.3. Risk is a slightly earlier `-ENODEV`
+instead of a later `-ENXIO` for a path that was never a real block
+device.
+
+### Concerns
+
+Depends on `9ee5f161a4db` for the warning; that dependency **is
+satisfied here**. No extra backport patches. lore.kernel.org could not
+be fetched (403); discussion was recovered via `b4 dig` and an openwall
+mirror.
+
+---
+
+### Verification
+
+- **[Phase 1]** Parsed tags: syzbot Reported-by, Closes syzkaller URL,
+  msgid Link, Brauner SOB; no Fixes
+- **[Phase 2]** Diff: +12 in `lookup_bdev()` in `block/bdev.c`;
+  `-ENODEV` if `!inode->i_rdev`
+- **[Phase 3]** `git describe HEAD` → `v7.3-rc4-27-gf0100363d8c37`;
+  `make kernelversion` → `7.3.0-rc4`
+- **[Phase 3]** `git merge-base --is-ancestor 9ee5f161a4db HEAD` → yes
+- **[Phase 3]** `git merge-base --is-ancestor 83887ad02f30c HEAD` → yes
+  (in v7.3-rc1 vfs-super pull)
+- **[Phase 3]** `git blame -L 1259,1297 block/bdev.c`: unchecked assign
+  from `4e7b5671c6a883`; check from `83887ad02f30c`
+- **[Phase 3]** `git describe --contains 9ee5f161a4db` / `83887ad02f30c`
+  → both v7.3-rc1
+- **[Phase 4]** `b4 dig -c 83887ad02f30c` →
+  patch.msgid.link/20260703065548.1135125-1-yun.zhou@windriver.com
+- **[Phase 4]** `b4 dig -a`: v1 only; `-w`: axboe + brauner + linux-
+  block
+- **[Phase 4]** `b4 dig -m`: mbox is the patch only; no NAK
+- **[Phase 4]** WebFetch syzkaller bug: WARNING, prio:normal, C repro,
+  Unprivileged ❌
+- **[Phase 4]** lore.kernel.org WebFetch: **403**; stable-list hit:
+  **UNVERIFIED**
+- **[Phase 5]** Callers: `get_tree_bdev_flags`,
+  `bdev_file_open_by_path`, btrfs/nilfs2/dm/quota/hibernate/mtd/bcache
+- **[Phase 5]** `include/linux/vfsdebug.h`: `VFS_WARN_ON_ONCE` is
+  runtime only if `CONFIG_DEBUG_VFS`
+- **[Phase 5]** `lib/Kconfig.debug`: `DEBUG_VFS` default n, “If unsure,
+  say N”
+- **[Phase 6]** Read `lookup_bdev()` and `super_dev_register()` in this
+  tree; warning and mount path present
+- **[Phase 8]** Failure: WARN under DEBUG_VFS; otherwise failed open of
+  bdev 0 (`blkdev_get_no_open`)
+- **UNVERIFIED:** full lore review thread beyond the v1 patch mbox;
+  stable@ discussion
+
+The fix is small, matches a syzbot warning this 7.3 tree can hit, and
+applies cleanly.
 
 **YES**
 
- Documentation/block/blk-mq.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/bdev.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/Documentation/block/blk-mq.rst b/Documentation/block/blk-mq.rst
-index fc06761b6ea90..2798761efe0d6 100644
---- a/Documentation/block/blk-mq.rst
-+++ b/Documentation/block/blk-mq.rst
-@@ -139,7 +139,7 @@ completed.
- Further reading
- ---------------
+diff --git a/block/bdev.c b/block/bdev.c
+index 02d7503e7c2c4..00345746e34f8 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -1209,6 +1209,18 @@ int lookup_bdev(const char *pathname, dev_t *dev)
+ 	if (!may_open_dev(&path))
+ 		goto out_path_put;
  
--- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <http://kernel.dk/blk-mq.pdf>`_
-+- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <https://www.kernel.dk/blk-mq.pdf>`_
- 
- - `NOOP scheduler <https://en.wikipedia.org/wiki/Noop_scheduler>`_
- 
++	/*
++	 * Reject a block device inode with i_rdev == 0.  A dev_t of 0 is
++	 * never valid for a block device: no real block device driver
++	 * registers major 0.  Fake block device inodes (e.g. fuse with
++	 * rootmode=S_IFBLK) can expose i_rdev == 0, and letting that
++	 * propagate would confuse superblock lookup and trigger warnings
++	 * in the device-to-superblock table (super_dev_register).
++	 */
++	error = -ENODEV;
++	if (!inode->i_rdev)
++		goto out_path_put;
++
+ 	*dev = inode->i_rdev;
+ 	error = 0;
+ out_path_put:
 -- 
 2.53.0
 
