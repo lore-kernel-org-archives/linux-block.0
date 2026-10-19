@@ -1,100 +1,161 @@
-Received: from mta0.migadu.com (out-199.mta0.migadu.com [91.218.175.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44906499F31
-	for <linux-block@vger.kernel.org>; Mon, 19 Oct 2026 09:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D926B4A3F26;
+	Mon, 19 Oct 2026 09:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792403450; cv=none; b=KZFAEpbAhJP/SxRcMtK9psQAUIZ5WQs2XtcKECEOqECLeuUqGsPz6VLcGUQowvPfoW1PSk6BmixerWctGPnfMsMJ+CIcfm7Io8VeeXBDDx0C2y5gDQhhfxcIKVM8Fnof1ep5nMvDX6OZe8Pgokj6gjUZMeKtHotQooU5zqCaUxg=
+	t=1792403925; cv=none; b=eV39/RbRn1misYnksZfw3PT2Tgj6pwRpw3GJMnrK7nwGdXwJyF8HBtlQgrPZ6J2zwmaInQFZdqXJHAiqO7d/uQJGcv8nbXh31mPdSg/0b3GrZnMEUalvWRPrYA63E6fUZmwmRc1ZAJpytRlBYBLeiJ4uns497wdMVbQmltLLBQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792403450; c=relaxed/simple;
-	bh=5dg8NSvB9hFjoy54PLoUpMKB7gitIbpPU2h83kRMT2s=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=nWNTiqUTVV8eqLvwg71UpQRDfSeTgjEQjOgifzzh2DXaay/Si8cqlIfw8n5Zz/Va4umkIGyTZ3eGe6mO+Wc6CvgL8mW/JcKl02DnFvA8v8FIuCelNimYkCTuSJ4yQfEnAnimF0MofK3bcbuCt5aUayNJ7bdX9h9YBNbh3X9Jb7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Sovzfxe0; arc=none smtp.client-ip=91.218.175.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1792403925; c=relaxed/simple;
+	bh=GW8/0uoNT92TX4Jm2XL1p10F/geIT3Pftx8oGPFQ9k0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WG9uis6N0V0MTPzO0Z98RDTMWvl2JOFLLR1Rb/RsuXuY3CwKqpzyiiNA4WYlhI1Txwr3+akqAw3ruXSySG9yZ2b9NT1UQkxVQfjL2bIX/RUplSE2JuRZtYS7SbRbtI+nCSz6fJ1dko58H89fE9kPKGLhqVHJoCsJE22orUA9lws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Rzm9lCHz; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Sovzfxe0"
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=5dg8NSvB9hFjoy54PLoUpMKB7gitIbpPU2h83kRMT2s=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792403446; v=1; x=1793008246;
- b=Sovzfxe0zRfZXnJh2soMp8JNM+dkRvWsul3dh56BXn+bh1RMfHKiV7Lahy/mx9+lLjABlgMF
- drMjuPXJxB1EGsqMN3K+GdWu7k028eZRP46HppLCB/YeVzaFZnOiOlVc6Ajd3yWOuZDHg0uYtMv
- /M28WOWew/a2FNCW2e9z40/s=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 535a794b7b48e7a4;
-	Mon, 19 Oct 2026 09:50:46 +0000
-X-Mizu-Trace-ID: 535a794b7b48e7a4
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <2352b824-7e36-453e-b3e9-151761a352c3@linux.dev>
-Date: Mon, 19 Oct 2026 17:50:36 +0800
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Rzm9lCHz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=yo
+	aSTyIAZlCf7IrpG6xDvxi5QR2YUjffz80uNqfSkNw=; b=Rzm9lCHznLFy0tG85c
+	poBlbcT9hLNfj2VxP/ZUBuwA788L5ksZeIW1EcZMCCKbDrO8HgUhgSQ47n/mF+iC
+	qbu4RL0uxpwDoCdEcSKdejehGyQ541a7FghNpxTqCy/hvQXnpM3842P7gr92ugPW
+	S05gHfejdwqpkSWPe4aIM+Krw=
+Received: from pc.localdomain (unknown [])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgD3VECx6dVqUUgcAw--.30679S2;
+	Mon, 19 Oct 2026 17:58:10 +0800 (CST)
+From: Jiale Yao <yaojiale02@163.com>
+To: Andreas Hindborg <a.hindborg@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Jiale Yao <jiale.yao@example.com>,
+	Jiale Yao <yaojiale02@163.com>
+Subject: [PATCH] rnull: serialize configfs updates with power changes
+Date: Mon, 19 Oct 2026 17:58:07 +0800
+Message-Id: <20261019095807.1906316-1-yaojiale02@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- linux-kselftest@vger.kernel.org, Tao Cui <cuitao@kylinos.cn>,
- ameryhung@gmail.com, alexei.starovoitov@gmail.com
-Subject: Re: [RFC PATCH v10 4/4] docs: cgroup-v2: document the iocost BPF cost
- model attachment
-To: Tejun Heo <tj@kernel.org>
-References: <20261003124045.1289305-1-cui.tao@linux.dev>
- <20261003124045.1289305-5-cui.tao@linux.dev>
- <eae39daec12cf6f121cc5010574a6c03@kernel.org>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <eae39daec12cf6f121cc5010574a6c03@kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PigvCgD3VECx6dVqUUgcAw--.30679S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxGrW7Ar47AryfJF15GF15urg_yoW5WFW5pF
+	W5Kw1jyF45GFyfXr47t347uF13Xwn7CFW7GrZ7Wa1Sgr15Crya9rnYqryUWw1rur9aq3Wa
+	vr4FqFy7uay7Cw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piAwIDUUUUU=
+X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbC8BK28GrV6bJYkwAA3L
 
-Hello Tejun,
+From: Jiale Yao <jiale.yao@example.com>
 
-在 2026/10/17 01:49, Tejun Heo 写道:
-> Hello, Tao.
-> 
-> On Sat, 03 Oct 2026 20:40:45 +0800, Tao Cui wrote:
->>  	  model		The cost model in use - "linear"
->> +			or "bpf" while the BPF model
->> +			is in use
-> 
-> "linear" or "bpf" is enough here.
-> 
-Shortened to "linear" or "bpf".
+The configuration stores check whether the device is powered before
+parsing the new value, then take the mutex again to update the field.
+A concurrent power-on can complete between these lock acquisitions,
+allowing a live device configuration to be changed.
 
->> +	When CONFIG_BLK_CGROUP_IOCOST_BPF is enabled, a BPF cost model
->> +	can be bound to a device by attaching an "iocost_model_ops"
->> +	struct_ops carrying the whole disk's major:minor in its "dev"
->> +	member (a partition's major:minor is rejected).  Attaching
->> +	creates the controller if needed, like an io.cost.model write
->> +	does, and
->> +	switches the device's pricing to the model; enabling and
-> 
-> Attaching now also populates the device's line, so the existing sentence
-> saying the line is populated on the first write to "io.cost.qos" or
-> "io.cost.model" needs updating. The paragraph also runs 21 lines with a
-> leftover break after "does, and". Can it be split into three, attaching,
-> model= selection and detaching, and removal and ctrl?
-> 
-Updated and split. The documentation now says the device's line
-appears on the first io.cost.qos or io.cost.model write, or when a
-model is attached. The same wording change also went into the
-io.cost.qos section.
+Parse the input before taking the mutex, then check powered and update
+the configuration while holding the same lock.
 
-The paragraph is now split into three parts: attaching, model=
-selection, and detaching/removal with ctrl. The stray line break after
-"does, and" is gone too.
+Fixes: d969d504bc13 ("rnull: enable configuration via `configfs`")
+Signed-off-by: Jiale Yao <yaojiale02@163.com>
+---
+ drivers/block/rnull/configfs.rs | 42 ++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 17 deletions(-)
 
-Thanks,
-Tao
-
-> Thanks.
-> 
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 32c10c3f4d0f..1808fcacfd55 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -174,15 +174,17 @@ impl configfs::AttributeOperations<1> for DeviceConfig {
+     }
+ 
+     fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
+-            return Err(EBUSY);
+-        }
+-
+         let text = core::str::from_utf8(page)?.trim();
+         let value = text.parse::<u32>().map_err(|_| EINVAL)?;
+ 
+         GenDiskBuilder::validate_block_size(value)?;
+-        this.data.lock().block_size = value;
++        let mut guard = this.data.lock();
++
++        if guard.powered {
++            return Err(EBUSY);
++        }
++
++        guard.block_size = value;
+         Ok(())
+     }
+ }
+@@ -204,11 +206,14 @@ impl configfs::AttributeOperations<2> for DeviceConfig {
+     }
+ 
+     fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
++        let value = kstrtobool_bytes(page)?;
++        let mut guard = this.data.lock();
++
++        if guard.powered {
+             return Err(EBUSY);
+         }
+ 
+-        this.data.lock().rotational = kstrtobool_bytes(page)?;
++        guard.rotational = value;
+ 
+         Ok(())
+     }
+@@ -225,14 +230,15 @@ impl configfs::AttributeOperations<3> for DeviceConfig {
+     }
+ 
+     fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
+-            return Err(EBUSY);
+-        }
+-
+         let text = core::str::from_utf8(page)?.trim();
+         let value = text.parse::<u64>().map_err(|_| EINVAL)?;
++        let mut guard = this.data.lock();
+ 
+-        this.data.lock().capacity_mib = value;
++        if guard.powered {
++            return Err(EBUSY);
++        }
++
++        guard.capacity_mib = value;
+         Ok(())
+     }
+ }
+@@ -248,14 +254,16 @@ impl configfs::AttributeOperations<4> for DeviceConfig {
+     }
+ 
+     fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
+-            return Err(EBUSY);
+-        }
+-
+         let text = core::str::from_utf8(page)?.trim();
+         let value = text.parse::<u8>().map_err(|_| EINVAL)?;
++        let value = IRQMode::try_from(value)?;
++        let mut guard = this.data.lock();
++
++        if guard.powered {
++            return Err(EBUSY);
++        }
+ 
+-        this.data.lock().irq_mode = IRQMode::try_from(value)?;
++        guard.irq_mode = value;
+         Ok(())
+     }
+ }
+-- 
+2.34.1
 
