@@ -1,107 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792508975;
-	b=r1ZsB0vnsNbev0kpx3GqDDkXYR9cFtgD4x5k7wU9IQJ38dnmD5eIu88xbGain2XAasMJ
-	 HFcB/7Cfr1OZaSiknhWDT35oOxAq531bPxkPOppWXKGyUCtgA6lf1/mL6k56G7CzhEjbD
-	 58aJKDfyqNP0pqgkGZrLWcyXHE5UGVanMjZpgJ6AfKB+hqKlz+LEyvxXk6XKrhnBxUfzB
-	 JOk8X3a7oWqdD3Cg6Vb8dvLf9SORRFcERwFrFsuWPBGErMyCBCrRckiiDW5NRBTzGHSNw
-	 TH79mkA3z4e/e5n0B+CcUyVpvF+YM3GGw/1fy01YUwDznhpIuF0WsVbHXX25PzlCChg==
+	t=1792509460;
+	b=itsF6bvzjylNmrcppPClcbwsrMlmrNvAWwscjUNGlTJZS3aziiKpdX7vkiYLxpIk3mDI
+	 Wh8Vvt+gZfx614ndYloqx3fVGIT2+2M9k2q6uymoLvWjkgHNTH07XkeocQHx5gOSjwp1h
+	 IkXp1og/mGvVmEkMMaKkoL+EQ31xL5QN1Zz8NWJ/gXvaC/JsUKAQBUthc6rAEJavp+9FO
+	 1Yr36AzkJ4/qZSOC7pPdHFAtZgW+S+RFp7Fr2v6TTYPPltgO5HVf+hbCiNNf0g0Khk85w
+	 PDBJQgCOCIrPkK9Q7if3Jn6/ppYskofnd2i2AjQ1XV4yZey7og9svMDQ6UjsLTjd3YQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792508975;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-Rspamd-Action:X-Spam-Score:X-Spam-Flag:X-Spamd-Result:X-Spam-Level:
-	 X-Rspamd-Queue-Id:X-Rspamd-Server;
-	bh=Sls3bPmQCZyMAO5iplXNtOsVZo7FofwN1/WgYR7lQ8o=;
-	b=joTBE47J9zh5eHYikrVdPm51yleYXwcCAGuzBlltBD/wo5xF62cGRNP6eBYduKBdRB8n
-	 NBpgvef6gQR6wuUi5xPkve03rqzZF2IdYE93UBALNnJuoHBm2nrY3AzbrWPB2HflUF10U
-	 GwHGXX+jyZ4RrMlHY5TLnB6mJxek4taYXa2B2oH9XYQVa0dl5G+HK0u9DlE16KCac752H
-	 6f0+eXh5OD4rrYkubONd9ciD4BNB55ZMBt4xxDxhgRDZ/P3aP7dYJjEhyaK7Hd+oLBlLV
-	 aj1RNU5bWKrhxAuvV4iOyg2mXq6Nwwul65ByJ+UEkUtpwbBRHk+ZIDTIVBUxT4vfkrg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792509460;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=zTjUKTq2pDJiEG+CDmqesBFdpCYeamHw0/TGw/oMuDk=;
+	b=rOS53ZHtsbqZyb7MnDRfmlYqlR2HbOMQ6ulUBMoeuxTVv9eiujFUXwqyYkwuHKtJYQ41
+	 JBzoONmVA0TfwmNmMm3YYlL6sVkcx1zwwOtDs6HKkSpQmFkwemRIz5xtBfXgSABxNlxKA
+	 ihY2gqzcAcJ8oYuLCxFerHwKFMWLPllPOlUyaRWqGyseMq1Qi1IsBkxkGnhbxnEzc+OuA
+	 EiO2n4W2dP8gwf87bZFhW5DcQx6u6IQDjuPXruOUsgIpAalG6G16HrKBrMnX26s6Mr5Bg
+	 6bZmOf2E/xCOff3qrF/1+Ro3P8HM6MKM3FuyjQe3Pi/AXK1bEJe/dwXLNO/KHYAUl1g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=pb3uhxZT;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=Yk4FrAyW;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=pb3uhxZT;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=Yk4FrAyW;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=QaBolOjg;
+	arc=none smtp.remote-ip=209.85.128.49
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41577606A325;
-	Tue, 20 Oct 2026 15:09:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41577606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E27C606A31A
+	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 15:17:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1E27C606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=pb3uhxZT;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=Yk4FrAyW;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=pb3uhxZT;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=Yk4FrAyW
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 56E341F7CD;
-	Tue, 20 Oct 2026 15:09:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1792508966; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Sls3bPmQCZyMAO5iplXNtOsVZo7FofwN1/WgYR7lQ8o=;
-	b=pb3uhxZTVaeXbRHucS6qREAJHNTXDF47MRY8XnKdSS2JjzHiciBJyy3ZVLDY4hwTFZfNS0
-	pDb1pcjAmbLt+/TAoVDRVvK0KpMzHd2F3u4GOijl97WYoe5kH1VHdmpZzPOUfzmyxYmYzR
-	YDOr1V1TuYfip17W0zq3FUsiPr85oPo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1792508966;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Sls3bPmQCZyMAO5iplXNtOsVZo7FofwN1/WgYR7lQ8o=;
-	b=Yk4FrAyWhpjc8hCSSRcO2E/2FRWOsuQJmEA1JWoM83yRnOSiiWtSHtOO9Bn+GswR78zKK2
-	STg1nVkn6KMMZJCQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=pb3uhxZT;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Yk4FrAyW
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1792508966; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Sls3bPmQCZyMAO5iplXNtOsVZo7FofwN1/WgYR7lQ8o=;
-	b=pb3uhxZTVaeXbRHucS6qREAJHNTXDF47MRY8XnKdSS2JjzHiciBJyy3ZVLDY4hwTFZfNS0
-	pDb1pcjAmbLt+/TAoVDRVvK0KpMzHd2F3u4GOijl97WYoe5kH1VHdmpZzPOUfzmyxYmYzR
-	YDOr1V1TuYfip17W0zq3FUsiPr85oPo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1792508966;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Sls3bPmQCZyMAO5iplXNtOsVZo7FofwN1/WgYR7lQ8o=;
-	b=Yk4FrAyWhpjc8hCSSRcO2E/2FRWOsuQJmEA1JWoM83yRnOSiiWtSHtOO9Bn+GswR78zKK2
-	STg1nVkn6KMMZJCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2357B136CC;
-	Tue, 20 Oct 2026 15:09:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id jTk2AiaE12pEaQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Tue, 20 Oct 2026 15:09:26 +0000
-Date: Tue, 20 Oct 2026 17:09:25 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Aaron Tomlin <atomlin@atomlin.com>
-Cc: axboe@kernel.dk, tom.leiming@gmail.com, hare@suse.de, 
-	frederic@kernel.org, tj@kernel.org, sean@ashe.io, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3] blk-mq: dispatch kworker to housekeeping CPU when
- hctx cpumask is empty
-Message-ID: <a6b3d7c6-64fd-4b92-8428-964a863ea9e8@flourine.local>
-References: <20261016052203.489760-1-atomlin@atomlin.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=QaBolOjg
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a1e477fe16so17568085e9.1
+        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 08:17:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792509458; x=1793114258; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=zTjUKTq2pDJiEG+CDmqesBFdpCYeamHw0/TGw/oMuDk=;
+        b=QaBolOjgCb0Nw5wFb7wUnII/ni7kJBHw8cIBlsbYPEEYPGKOGGB8JywIckULc+x5ns
+         bOeAmRVLUXjFLtv9xCHVjz+QcHrVu3i9Wbw4KfQQ0ndLIbrIp8nakzFR5USNYueLmUO/
+         JLm8jWKBJMCb6qqAvk7ErUidj5Oq9BWiy2wtUS8Ra4/83plusB+7UTcvq9MSFA4Q+YJu
+         +Ocw1bbd7u3BdTm0zGEpqv8VG1P9IWiJPj6IJ07fBKRdVJulw7YRJuTD228ibo1Mfyhf
+         +li4GEjJcsi/ae3fjZ3sjYaWMyBCkUKl63dzQVMCW6YDqjoDRzSiHCP+s+6vUcxD+N3v
+         A+cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792509458; x=1793114258;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=zTjUKTq2pDJiEG+CDmqesBFdpCYeamHw0/TGw/oMuDk=;
+        b=G4k+nmGQ0xGph5kW6Ez3U7UlaQ5hNgm70VHkyyAh9+/+owtg9ONm+1rwInXabW7U9X
+         +alaOGKWbbsI9/VobHjuWnqSAB5e/yL4Kl4hyHrs31qb25saiIjBsFgi/4AV0nzyuqLT
+         SNI/pxNKaWcI+J/zmmk7Z1CncEy1RgkJVxQvvDK27unJobH8EdIJQK6oxCIjZXAoJXUx
+         ONsw49Dybq19cyl64FQMj26/XQmImOjpMZa7iTiigSb3glgB3piTEbe6gMnUHCcIsSxC
+         32gW981F35MwhwHCRuvllkSD7UoJp34Tg1CYqK/LfOH/4m46Npk4ESLcukZ4QyQTCXzm
+         1bbg==
+X-Forwarded-Encrypted: i=1; AKwUvBy8K8WFPjPDstWA4JxzLz17qXXBbNScdpBvWPIyZTXTPH48b0OpPgg8TWUbSzQ5Pha1M5N+rqs1ZZySaQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJvTsUZVrWp9YNc+y1uyMRbAD5vflZ/TJwDy7GKKp+5jG+eRGXi
+	0BDosRmoNz0wdTWKbinxlq1FF7Br6QnOhX+5y6lrY+Xh0c7WbPHeTefc
+X-Gm-Gg: AYBFou2t+c5XncQeR1rEbwZljQ1WIB09u/fLqlMTfTnrRCC/ptETBWI0x/5bYtPFal1
+	Y8Bw2plL4GgbKLVUkHqLm0JyKwkuhGr/j2skumtLMuruTxIp1KY9zLbGCmQKYTBNz2rprsLwdvH
+	2ii9Xg28hbUU3X2yi1J2a8KpFmOlsIP61Iz27UiMl85R8Emn4tY1DUAn2yZQDPI/vEWIBeHyGhh
+	2y8junUz8xPZbUJkrh9GWuacpoppivW3jV41yP3pA3lVRv+mVXVEfBoW3xi+VFK4Zg8BXzeGDXI
+	v57n2p8E57Qya9eAH4uyzillAotTtRBMpyvLq7JOCYxo8U6xgmZxBYY732DryykEQZV2g2ftTbx
+	MJwXf3yEQkDNwiLUYDhrrR4NO3/2aGzOf1e0VTUDC8gepotv1QCKZ/3+Lj0tif4hHs//mrNNPSl
+	DPotykUF8Ctqqj2c9Vc/1b7Vyyg3Jd61mTn9z6aWlfElz8LqvOs7YN/cAObP4+OoTs2HMQlUHNu
+	vuoS1kphsIGTAQelW7FI3U0S4vU8SOFn9XtWkiVK9I=
+X-Received: by 2002:a05:600c:870b:b0:4a1:d487:2dc8 with SMTP id 5b1f17b1804b1-4a1d760518amr238522665e9.18.1792509458121;
+        Tue, 20 Oct 2026 08:17:38 -0700 (PDT)
+Received: from andreayoga.wind3.hub ([151.76.51.95])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1fb83ff0dsm3555715e9.7.2026.10.20.08.17.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Oct 2026 08:17:37 -0700 (PDT)
+From: Andrea Parri <parri.andrea@gmail.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Andrea Parri <parri.andrea@gmail.com>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Daniel Wagner <dwagner@suse.de>,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH blktests 2/4] nvme/071: test that nvmet sends no data for a failed read
+Date: Tue, 20 Oct 2026 17:17:31 +0200
+Message-ID: <20261020151732.90412-1-parri.andrea@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <atdDDxISK3i_5uQX@shinmob>
+References: <20261014170046.2516-1-parri.andrea@gmail.com> <20261014170046.2516-3-parri.andrea@gmail.com> <atdDDxISK3i_5uQX@shinmob>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -111,131 +102,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261016052203.489760-1-atomlin@atomlin.com>
-X-Rspamd-Action: no action
-X-Spam-Score: -3.01
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.dk,gmail.com,suse.de,kernel.org,ashe.io,vger.kernel.org];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,kernel.dk:email]
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 56E341F7CD
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 16, 2026 at 01:22:03AM -0400, Aaron Tomlin wrote:
-> Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated
-> CPUs") excluded isolated CPUs from hctx->cpumask to prevent worker
-> threads from executing block work on isolated CPUs. When all CPUs mapped
-> to a hardware queue are isolated (i.e. blk_mq_hctx_empty_cpumask(hctx)
-> evaluates to true), blk_mq_hctx_next_cpu() returns WORK_CPU_UNBOUND with
-> the intention of offloading execution.
-> 
-> However, kblockd_workqueue is allocated as a per-CPU workqueue
-> (WQ_PERCPU). When WORK_CPU_UNBOUND is queued on a per-CPU workqueue, the
-> workqueue core resolves the target CPU via raw_smp_processor_id().
-> Consequently, if a task executing on an isolated CPU submits I/O and
-> triggers an asynchronous queue dispatch with zero delay (e.g. upon
-> hardware queue congestion, tag/resource exhaustion returning
-> BLK_STS_RESOURCE, or plugging), &hctx->run_work is queued directly onto
-> the local isolated CPU's worker pool. This causes the local per-CPU
-> high-priority kworker (e.g. "kworker/6:1H-kblockd") to be scheduled on
-> the isolated CPU. In real-time environments, an active SCHED_FIFO workload
-> will starve this SCHED_NORMAL worker, causing hardware dispatch to stall,
-> in addition to introducing unwanted latency jitter on nohz_full cores,
-> thereby defeating the original objective of commit a46c27026da1.
-> 
-> Introduce blk_mq_hctx_unbound_cpu() to select an online housekeeping CPU
-> from housekeeping_cpumask(HK_TYPE_DOMAIN) via
-> cpumask_any_and_distribute() when executing on an isolated CPU, and
-> otherwise fall back to WORK_CPU_UNBOUND. Use this helper across the
-> unbound fallback paths in blk_mq_hctx_next_cpu()
-> 
-> This ensures that:
->     1.  When executing on an isolated CPU, deferred queue work is
->         cleanly offloaded to an online housekeeping CPU across single-queue
->         devices, hardware queues with empty cpumasks, and offline CPU
->         fallback paths.
-> 
->     2.  The per-CPU high-priority kworker on the isolated CPU is not
->         scheduled, avoiding priority inversion and latency jitter.
-> 
->     3.  When executing on a non-isolated CPU, WORK_CPU_UNBOUND is
->         preserved, maintaining optimal local execution with zero CPU
->         bouncing.
-> 
-> Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
-> ---
-> Changes since v2:
-> 
->  - Query housekeeping_cpumask(HK_TYPE_DOMAIN) instead of HK_TYPE_TIMER
->    to align with cpu_is_isolated(), workqueue affinity rules, and cpuset
->    isolated partitions
-> 
->  - Query the housekeeping cpumask under guard(rcu)() to safely handle
->    dynamic cpuset updates without lockdep warnings
-> 
->  - Validate that cpumask_any_and_distribute() returns a valid cpu ID
->    before returning, falling back cleanly to WORK_CPU_UNBOUND
-> 
->  - Link to v2: https://lore.kernel.org/all/20261015020225.422107-1-atomlin@atomlin.com/
-> 
-> Changes since v1:
-> 
->  - Introduce the blk_mq_hctx_unbound_cpu() helper to steer deferred work
->    to an online housekeeping CPU only when executing on an isolated
->    core, preserving WORK_CPU_UNBOUND and local cache locality for
->    housekeeping cores
-> 
->  - Apply blk_mq_hctx_unbound_cpu() across all unbound fallback paths in
->    blk_mq_hctx_next_cpu(), comprehensively covering single-queue devices
->    (nr_hw_queues == 1), empty hardware queue cpumasks, and the offline
->    CPU fallback path.
-> 
->  - Elaborate in the commit log on the triggers for asynchronous queue
->    dispatch (e.g. tag exhaustion, BLK_STS_RESOURCE backpressure, and
->    plugging) and the SCHED_FIFO worker starvation hazard on isolated
->    cores
-> 
->  - Link to v1: https://lore.kernel.org/lkml/20261012012905.267920-1-atomlin@atomlin.com/
+On Tue, Oct 20, 2026 at 07:35:53PM +0900, Shin'ichiro Kawasaki wrote:
+> > +# Issue an Identify with CNS $2 to controller $1 and print the NVMe status
+> > +# and the number of changed bytes in the 4096-byte data buffer.
+> > +_identify() {
+>
+> In most cases, the function names that start with underscore are used for
+> helper functions in common scripts. This function is used only in this script
+> file, I suggest a function name that does not start with underscore. How about
+> issue_identify() ?
 
-Looks reasonable and related to my patch as well
+Sure, issue_identify() it is.
 
-  https://lore.kernel.org/all/20261014-nvme-fabrics-isolcpu-v1-4-355156be27b2@kernel.org
+> Do we really need this dd part below? As far as I understand, the core part of
+> this test case is Identify command part above.
 
-and I was able to create a blktests for it:
+No, we don't.  It was meant as a control that the fc fix still sends
+data for successful reads, but the successful Identify above already
+checks that: it must overwrite the whole 4096-byte buffer.  I'll drop
+the read, and with it the file backing, which was there only because
+the read failed over the loop transport with the default backing.
 
-  https://lore.kernel.org/all/20261014-nvme-isolcpu-v1-0-2fd175a8ef00@kernel.org
-
-Would it possible to extend those tests or add a new one so we get this
-also tested? And these two patches then should/could merge.
+Thanks,
+Andrea
