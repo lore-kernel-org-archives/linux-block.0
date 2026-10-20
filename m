@@ -1,89 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792509797;
-	b=zoq7Igj88Ul3MEmNW/f9XzEjxOlQnWGIQDTe2Z1sCTfymfeaXLgNP1/MBIQh1Gb0+DMm
-	 Cg0ZxoKHdl+iQIIY7ZCD290H6x6BUvJHs32m8S2O/MggTf6Fm0FfNbEIi4s1hWSEWxZWZ
-	 f6i/LTJ6QjfWZDgNsL3msHWkJA2N1N5tYIVePnEtF45UX5le8naGWTH/lignA5iYnZIb2
-	 RcKPVG57CpQn57/yglog7p4w4mFnIlgZBh3rnK9QqZspdZCIkG9liNbid21C6x0SbVUG2
-	 lidJKcJF0nanMbKRfFpm7herfvFNZErsDKMqfq3OrymRgDkBNJjBhP4WMz5b/9DRwkQ==
+	t=1792510330;
+	b=GkBH4VHTCF3yKrck3JWOU7V3i3lDZX92KW1Usa48ChoabS3Pgs4L2cI2GptnatOgaNA2
+	 azkq9nK1DzVo2i8vKVIrgubMCH9pJugqHZhEhH9W8U1gp1M9YJlViEhPnA8AoDL4J5oaN
+	 hDUDVPjwBRUlkm0rzSIkQS1ar7ygpX9UjF6tf26xz+6hIidad2m0gkrcP5cRFOq+SuFBb
+	 y+qTQ4ZTjHrG6uLEFp79ckpC7+YAk2nFjrv+lgaxmZVg0kb1B8cdLFMtywAPk+cEERmZd
+	 MJjPR6iIcJ8fzRtuAvxmHbM0JWSMtrL/UOKBMld1bpXZkgptbHOoTBwMJ59rzZlNrJw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792509797;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=gRK1N06gC7y4lklCZOXSgRG5jNtEwJRUHirNfgb2kAs=;
-	b=dgqkCS8FYV6u2wDakpkBdUXSv3G9yE6sYUe3x1h/r+nQ+rNXKTBFmivSHn8JVV2RbDcg
-	 XrQmA8Lxz7tUZlUTMfOzPkZWFiqM2dKJiOur025ZCxwZYR0pbtSnUP0RiIw/WCfv/kwtb
-	 P1PRImzpilHCGrahzP/BOMgJHQz+buBJDlONiMIEbwrCOdwJ23vzK0mIVJtQZNBiG65uc
-	 PfJtqTOhstU9uBgaTeLyRCeFDj9/gWZCS6Y/IkJmtxAAcbJXYFuaSFSn1kHoTrFrqHUCz
-	 22t+ioSTapEvRNogvzJMLdblxEj1bCfrvF2ZI6bpO7T2gEMFg07UZsFqbVIruTKaeWg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792510330;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Content-Type;
+	bh=RpUsNHBHUXRzS2zghI2ldKlR03lTMuoNlBhWk95vYTI=;
+	b=BIIsisc0KjjtAUjiTlEkiTdc2aVoAqK+jJGXpHHnMFAhwcMqH20Hi0KDKdfs5m8toApH
+	 NUa73qMk7DjHumCBZOs9Q5zrbzcKYFwLF5XuDUpVO0rgBGcwNwEcG9yUHMWfXJ1eylSqq
+	 ND7iEOBuyVN8/o97mzmkwzvKSYbXNVHpNr6uSqa56YpExqK+tm7Tap1rZD1nUoeka+nYg
+	 K+2i227TGzmxDJk8QUHOLB+2ZbWALmavbCgTn7ngLiySF31AJPV3d8JDVTe7MqEZ6KABG
+	 0mW28ENowXOSkJ6KgLSqJ/G+L9wfHiyYian2UQIxtPqknwsSyqh6qXLes474YQK3Ysw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=dkPslbGk;
-	arc=none smtp.remote-ip=74.125.82.175
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.200
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B8B606A31B
-	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 15:23:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 70B8B606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=dkPslbGk
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-35f036b17easo1302649eec.1
-        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 08:23:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792509795; x=1793114595; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gRK1N06gC7y4lklCZOXSgRG5jNtEwJRUHirNfgb2kAs=;
-        b=dkPslbGkC1nueqKNXl755MPhADryHbix1NVdewPX8G0v9UdD7ZfloAWtp9AAN7zC5/
-         vaYuCEQu3zOAobsJcIgqUtf2wYzeZwthITqkeWWuj15jPJASH2wlHWmNoxpvWu6LHzWX
-         pL4Cz7cFTpzkQ6kEDymUiK2vJpxXPX62Ob7r7tJb5oqf5bHEiNDpj+vDwbTRL6iD5CnZ
-         +/vTZ6N4iowAvPU+hwW3vGLftpHfs7Z8U8fOkmCqAtbeN7lyo1IY8O4KrI1pJ4k4x21k
-         tPgoO+JyoZSiG5fgtaAFynGDBmqqeXrNIOYbilx19pq1K07EMW5CyFNpGsVuNdmFuf8Y
-         tGRQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC561606A321
+	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 15:32:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC561606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4b26d8d2498so4932412b6e.2
+        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 08:32:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792509795; x=1793114595;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=gRK1N06gC7y4lklCZOXSgRG5jNtEwJRUHirNfgb2kAs=;
-        b=QKrp0xXoVydn1v0wubbncbBXjBCCwIrxTjsi68nI3J0gvMqnDWOD+Wj6tvhbmouQ8J
-         UT37fZLysPNhk78/tj+peyb3fNFA3l15ly3AcKwDAWVzLkEjACCMUpO2LPsgPYtSgsUE
-         AoBnFxG9n41h0Rs/8jPIcR3bdtpEWRImtf7WH2nOmnuPPCF++DCdAp3bhjpK2+aucFlA
-         Y9bjFZCC7w+86nxBZXc4QL18OzQPe2yqr47wlM2/bY/VJi3ZfDjEV41upayizcULYLfq
-         DVV6OYWTm9HfWTXre7+UtqurWCp/l8e2yHD5CO/RhX9bFYURtsX45ApZ8SLS6ONNFFkt
-         rAeQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzgnQhMTiaFquojzYSSKKBpPDmtwZg/vUceU3gT2skNv7rCMC6JVuzIfcdxjRQ5FxQFHBdLRXGYjX7Xkg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKDOpnd5n9V3pxaWqe1dP2830Z6fsv2vMOtiVimpeIRnAEqvA4c
-	P8TxBVIkhSmMfEJKhAbFKeg33ciwdy3clYRlXcJSM7Adphtr03R+mgexC265JFROWWM=
-X-Gm-Gg: AYBFou2H7TflFjkdePnmDuzl3hZWYXChdcN7rMbPGu6fT2g8tory4h81omYukUrKg+U
-	JX1b180K4BV4IDQsSrXEamB782xnLfhsgbhwX8cxlukD70iULJL4dJHfO8zXUdYGouAfSRF41Se
-	D1azUnJMD5SzHAkuGMz4Wl4X8qR/+v5m8amvGUnFtqVxHg5LKU9plvfR/ULnz+d4Gf2q3gpFex8
-	7CDC+ueK8dKwQPy3mDLPV8gfRIW/ZSwuAb9mYMiY5798fUyuk8Oak1gw5CMO12ha4l39UMyTUYX
-	d5bzDsh+zO3puOMfPQifDScqKSGmxZOhW9lsba+oSgJiInbRkJwwHSzPPWD837KZWukiPJNqKIO
-	2sybWDpGcYvMli3FNOmpRv0jUgnn266PBT7mZFIdoHG+k0J1bwLgesH26C9jJL0x6EIdmGzC3ab
-	PEAGNUayhQBIwtFP9wlzsuudvUDsoISNuhoWVf7mjZlMx9zwIYp2x/UktW22AojE7t6ZQvz2yHx
-	OnbuD10tuqVNigOa024bMbIMH7WXStSa1rJbd24YQME4zh8jpT3pTTlA5leuaDbBqeOT7GWT3ed
-	h9zYCQVHZdw7A0RXw6RCykimEd9jIXSCOldJVZ1x2IdohsjvnUEHBtRxsthabnObbK0lYxfertz
-	mOtIK
-X-Received: by 2002:a05:693c:62c2:b0:35f:f0:8ed1 with SMTP id 5a478bee46e88-361a2a3f147mr13596612eec.36.1792509795251;
-        Tue, 20 Oct 2026 08:23:15 -0700 (PDT)
-Received: from [10.61.8.29] ([155.98.132.5])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-360813b6ca5sm39540410eec.9.2026.10.20.08.23.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Oct 2026 08:23:12 -0700 (PDT)
-Message-ID: <694b548c-5f34-48f2-8ccc-5aa020c76939@kernel.dk>
-Date: Tue, 20 Oct 2026 09:23:10 -0600
+        d=1e100.net; s=20260707; t=1792510329; x=1793115129;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=RpUsNHBHUXRzS2zghI2ldKlR03lTMuoNlBhWk95vYTI=;
+        b=gne9oTq7tgIVRyzsOzizgIZo90IfO/o5/58DnnKyRMBaBLPgiVGcTPrInQ0WPJsAwo
+         u88DwNyeBRUEH3RjEhUus6DaI9d3FCAJWRRVFJ88ElJx9SQHVmCaXc1uCYAPI9210m72
+         AUCKVS0l2yQNdwh4eJP0kFoy0bcM9m2lot4al97oXvhQcPa7f7faFIAz3RzKopGw6wcA
+         NmS2dqRQnPSnR22pAg0JLiAGXogfHMAPxF7hh8XFOLr9KsxC8kF0yPsFqrt1w6e/5lDF
+         zKpd0HsotA56P0jP4JjKLNx34ldU3UPj7REBV/cGMOOTQZx0186sObVG3w3AuqfLe10X
+         7hEw==
+X-Forwarded-Encrypted: i=1; AKwUvBwHFUddz1/i8Y/rq2OOrrmxEd8pfbd732yP6+C55i6kpFmKMb4iBfsOXnf6tqDEmhD2NfbU7n+cFfas2g==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLSUifTRSCTxh/Y1Ln5nDkaYYoTjwuOvLqnLXTGMUl6F0hkoz6x
+	2pc3TwEJ+ZFEsUjunP1/ooZ8DiuW3QhQdrAYyAbubrepsgIrQbBcewGokC7XV9oTHg7IVix+/YW
+	Haq22jwHwuwP+W34rymepNbVkGMdubY3VgspjtNz1R1CFIfk1eRNInBcgFcs=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -93,49 +58,124 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] blk-mq: dispatch kworker to housekeeping CPU when hctx
- cpumask is empty
-To: Aaron Tomlin <atomlin@atomlin.com>
-Cc: tom.leiming@gmail.com, hare@suse.de, dwagner@suse.de,
- frederic@kernel.org, tj@kernel.org, sean@ashe.io,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20261016052203.489760-1-atomlin@atomlin.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20261016052203.489760-1-atomlin@atomlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6808:13c6:b0:4f4:d7:b15b with SMTP id
+ 5614622812f47-53cc6b003a6mr9914911b6e.4.1792510329007; Tue, 20 Oct 2026
+ 08:32:09 -0700 (PDT)
+Date: Tue, 20 Oct 2026 08:32:08 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6ad78978.b5bd089a.6b57.008d.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in blkdev_buffered_write
+From: syzbot <syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/15/26 11:22 PM, Aaron Tomlin wrote:
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 025a799f35b9..1a113679f15b 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2241,6 +2241,21 @@ static bool blk_mq_hctx_empty_cpumask(struct blk_mq_hw_ctx *hctx)
->          return hctx->next_cpu >= nr_cpu_ids;
->  }
->  
-> +static inline int blk_mq_hctx_unbound_cpu(void)
-> +{
-> +	if (cpu_is_isolated(raw_smp_processor_id())) {
-> +		int cpu;
-> +
-> +		guard(rcu)();
-> +
-> +		cpu = cpumask_any_and_distribute(housekeeping_cpumask(HK_TYPE_DOMAIN),
-> +						 cpu_online_mask);
-> +		if (cpu < nr_cpu_ids)
-> +			return cpu;
-> +	}
-> +	return WORK_CPU_UNBOUND;
-> +}
+Hello,
 
-Not opposed to this, but let's please think about making the
-common case the fast path. CPU isolation is not the common
-path. That might mean annotating the hctx itself.
+syzbot found the following issue on:
 
--- 
-Jens Axboe
+HEAD commit:    2efb7a11f1aa Add linux-next specific files for 20261016
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15344895580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=129fca4e65ab9877
+dashboard link: https://syzkaller.appspot.com/bug?extid=bd975ef54294bec73f0e
+compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=110b0f01580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17b99031580000
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cd996cff1b76/disk-2efb7a11.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/59577d58bd5a/vmlinux-2efb7a11.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a3dfa3b04143/bzImage-2efb7a11.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/2b9971624b86/mount_0.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com
+
+============================================
+WARNING: possible recursive locking detected
+syzkaller #0 Not tainted
+--------------------------------------------
+syz.0.40/6005 is trying to acquire lock:
+ffff888024956f68 (&sb->s_type->i_mutex_key#10){++++}-{4:4}, at: inode_lock_shared include/linux/fs.h:1039 [inline]
+ffff888024956f68 (&sb->s_type->i_mutex_key#10){++++}-{4:4}, at: blkdev_buffered_write+0xd7/0x160 block/fops.c:738
+
+but task is already holding lock:
+ffff888024956f68 (&sb->s_type->i_mutex_key#10){++++}-{4:4}, at: inode_lock_shared include/linux/fs.h:1039 [inline]
+ffff888024956f68 (&sb->s_type->i_mutex_key#10){++++}-{4:4}, at: blkdev_write_iter+0x6c5/0x810 block/fops.c:815
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&sb->s_type->i_mutex_key#10);
+  lock(&sb->s_type->i_mutex_key#10);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+locks held by syz.0.40/6005: 1, last CPU#1:
+ #0: ffff888024956f68 (&sb->s_type->i_mutex_key#10){++++}-{4:4}, at: inode_lock_shared include/linux/fs.h:1039 [inline]
+ #0: ffff888024956f68 (&sb->s_type->i_mutex_key#10){++++}-{4:4}, at: blkdev_write_iter+0x6c5/0x810 block/fops.c:815
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 6005 Comm: syz.0.40 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/16/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_deadlock_bug+0x27a/0x290 kernel/locking/lockdep.c:3085
+ check_deadlock kernel/locking/lockdep.c:3137 [inline]
+ validate_chain kernel/locking/lockdep.c:3939 [inline]
+ __lock_acquire+0x25db/0x2de0 kernel/locking/lockdep.c:5288
+ lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+ down_read+0x45/0x320 kernel/locking/rwsem.c:1574
+ inode_lock_shared include/linux/fs.h:1039 [inline]
+ blkdev_buffered_write+0xd7/0x160 block/fops.c:738
+ blkdev_write_iter+0x6d5/0x810 block/fops.c:816
+ do_iter_readv_writev+0x612/0x8c0 fs/read_write.c:-1
+ vfs_writev+0x343/0x990 fs/read_write.c:1768
+ do_pwritev fs/read_write.c:1864 [inline]
+ __do_sys_pwritev2 fs/read_write.c:1922 [inline]
+ __se_sys_pwritev2+0x177/0x2a0 fs/read_write.c:1913
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff2f2b9e559
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff19d23ca8 EFLAGS: 00000246 ORIG_RAX: 0000000000000148
+RAX: ffffffffffffffda RBX: 00007ff2f2e25fa0 RCX: 00007ff2f2b9e559
+RDX: 0000000000000001 RSI: 0000200000000240 RDI: 0000000000000004
+RBP: 00007ff2f2c35ab8 R08: 0000000000000000 R09: 0000000000000003
+R10: 0000000000007a00 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ff2f2e25fac R14: 00007ff2f2e25fa0 R15: 00007ff2f2e25fa0
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
