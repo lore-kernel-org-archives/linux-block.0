@@ -1,13 +1,13 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.95.125
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.196.75
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792527891;
-	b=QYJw9hBK2LJpCVZkNHAm/DsnO+J0vgUZzRczlq0bB25mjpsiG0Ks2sbkpHhZtJliNCKJ
-	 BZqLNHcCdBbP2S90IH7XiT9SxMMIHgDCVnrMEkWW3k+d/GuTlMfxNZxDKpaxgsvMk9bYT
-	 3LDAk2KAo0toZYy6R08DX62d9iNkcE8pB/oWyoy+81OaA/xIO83yfr4x5DgzDk1FrS5W4
-	 xCGQX2wg0qznTGBcEfcDplAYiLel/PicjoFRPDyVLKVE9J91W8L6aqYo0lY9zFTyJK+oL
-	 Sa5F1ciq2xcVLvhY0ZgKHIPzXYe0oBzxP1VCUOS2vUtS9/ghkLilkIyPexvg6fWmFrA==
+	t=1792529805;
+	b=LotI7TsIoqaxlg6OUlMxhMCqo0fLjrOBPiGErcBXZNU52mZ5kKpKmKIsZzkGEqdT495o
+	 DfJRYcPNqR4MyTVhbiMGYXX2q9elRW/XntNKyCxzj+qgq80M3LKC38vRI6kFRAsEsjkeM
+	 C14m4RRMLGsOrqqb7801vEhGsbV57JxixHg9pc61ZnAUnlZuPqQ3O6+svbaEAFmR/R3us
+	 wVgUxi/dr8FrXHoNEyxHYNZYiIpXAChe/XtEHWHq8gJytQXtPxWKIT+TVobtmESE4FmHS
+	 wabzEuL0B+8iB4EDimQIqH3tRljZ//1MD8OJebw4WE7lhFFFWbTJHAq9y0Wqs+cannQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792527891;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792529805;
 	h=DMARC-Filter:Received:Received:Date:From:To:Cc:Subject:Message-ID:
 	 References:Content-Type:Content-Disposition:In-Reply-To:
 	 X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
@@ -24,61 +24,61 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=i7vBvvBpv9B4s85z0F3FjJeAYHO+GGdRk7ovJyeBDvU=;
-	b=V1wfaG73tjL98y6WCo9qFd/AngNP2tH/S99zrjX1wxfffGsR2rVm7RTwbZzgUMffC+Dv
-	 mo/16QKuN7hDAUHfaki1ORKZW9FoP9q0fKEiOqlEGV765Eg85sOfrkjUOig/vA0obZddp
-	 DsXrFpZuadqD6X3JzQtqCrNPqyg9zGD63bzGz01SVJYUW0PDP40Jph1KK71u1SNvrbfg4
-	 vZe/Tg2BcAT1MlH3axgjqo7/2Ht2W49RDnFk71pckJ9sYygZPt28cPJ5kNxo2d2HgQ2fz
-	 WiTnZc1ufVP0Xngzk3LzJuqD6kUulwCL7JCE2h/7vfMlA7F1Z963v3Wet9BOdSgZxKw==
+	bh=AMUfAPzgGAp7Fu3sI4UGBnmzd20C4otVTH9XKEtgVwM=;
+	b=TELtggduMdQeHC6mDValPmERV0lgs3tnKe0tuFoKEhdodi2rt4/z+crowep8HwQ3ogKU
+	 AhB17KnxsOrP1h2PEsu1SOE3aR1W2a83lNT3MkxAuZiKZozcw4x7OEqbBZrJ0ebpVVOAQ
+	 A9YGcCpCzu3D1RsHxhnCe7+nEw6WtxvKvPhaUVLQyx1N689AdXOARthjkyUfyI+A25t/b
+	 vV+qVDsz1j4ose/I1/f4vWH+P3zDjEj0ftMF+6gj50KKo/H/4ynSTHkT8eGAQNqx1M36Y
+	 0910vZyQ0jMSPuTLwMGy5rx3DijbAaVFAdr+dlQ2SGWQ1GNiG5ZoBHBIq+5ho1dQFcQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=none header.from=atomlin.com;
 	spf=pass smtp.mailfrom=atomlin.com;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.95.125
-Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021125.outbound.protection.outlook.com [52.101.95.125])
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.196.75
+Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020075.outbound.protection.outlook.com [52.101.196.75])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80ED3606A31C;
-	Tue, 20 Oct 2026 20:24:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 80ED3606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F397606A31A;
+	Tue, 20 Oct 2026 20:56:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2F397606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=osezBUMhI3CVQwa5WUYhVB+zolJ9OSQf3oLzhg3Uo0YQV3+cwF7udlweEaKzRLMrndWQcXjx50XaFyfPZR+tEzzGLRhNwjWKE2JPNhuKMG+JNTQTHfHt1fFrxDdQAQJpBhLJB+puAa99uSTdDX/emyCCr1eYLhYm5VH2zZXUlUnofBaznSeh/I4hx3QJ3v0UiZ+GVeH3oFpI6O73Yr5upZFKv4jb860HVWOd2pxCj5/Ll5WgdE4GPqI3j1Qo1tZEK2iTUroQjnT44W763+jibtMFTz3sO3/TTsuyqj9jsdOW0lf2f67EkKWUZ/+9BEVLiynSOkzQdjv4K+KqtS3WFg==
+ b=RS1fMzolahZz3bGdQKK5b8ixAoEGYV0kCZBoOskxF9lxMZNb15VMHzd/Z/VP2JpTLmwkWI3p2/g2X2ONtAO0zZEeqW+dUZc/GVtnAaWS6LJDGUwv9vqbsCucs+8kJy0bOcnMav9xT9yWeHJ9L76fMLscx/zjnA59CxC+Z9k3n9cH8zYBeWrhWzE+fLwA8qq8dgACy4bbw8VHxyW5zuXk+Bcly90mz/JGdIMniT49JNsglFcdWFBb4eYuUZzTa8c6zwadepksLC56cyk60iVHnn8aXpxZ1b+ucah4Zi2EQPKYUo7R4G/Zu8xJPJicRf57TZYL1LDo+Jk7hv04JstFwQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
- bh=i7vBvvBpv9B4s85z0F3FjJeAYHO+GGdRk7ovJyeBDvU=;
- b=yorVbLGNDS27NPIPsuz8QeHl4Y1sIu73WaKGNVknlQPGXl9xdBdXJ29XBTqbMLGA55pqoXmBgliN/IBvTYGHLd0tTGs4Xh923KV0FpniqBnHGluoUlLeukQUvOnSogWYMOOOswGwyI+d6XwzHXPXBuN6YGiF2k/Ruimh8AQ5XXN7dG8d70rNcrec3ype3awOnKOvGYYxmga3erhLGaaoym+afo6a7eysgvc9N2ysvCir1e2ewiqaM/LkdlKHJ5c6KNmvTYvle4a7j6vsuifNcvrd8UZVpI1+4fAe7lmAb193+Ge6QmgFhPz7C4msdxD1gFBB2WM9jn6r36RxAkKCwA==
+ bh=AMUfAPzgGAp7Fu3sI4UGBnmzd20C4otVTH9XKEtgVwM=;
+ b=s/G8eTYbRxi5Blr/syA9otNhLADPAHgpDkm2kHbn6bJmm/C41kOttoI+jOauV3SV64KrhN4Cz1O6x8bT/ZsQvKmXLP//YD1kCmTF75WWql1OCMDB/6ErqCpNxjuDE/BumqR/zMVI2Jyan9KuQAyR3VrDA1qeoQ159O36rWt49VOBu56aTSxcgWPzgwzFxLyP2dgxsj6wj9tHgaj7QmmZNgp5A+ucp5xk1qwtMEnrPCTbm5pBrP/rui1XK79Wmvj9LHkHD06YDkJ89dKFIjGlpVSS/fmA59Dt/LI3E4kAm318aJizK2OsTQjMZtGvPoKb9kHnCQVtqtsZaYwPAp56IQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
  dkim=pass header.d=atomlin.com; arc=none
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=atomlin.com;
 Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
- by LO0P123MB4041.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:181::5) with
+ by LOYP123MB3279.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:e6::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.17; Tue, 20 Oct
- 2026 20:24:46 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.15; Tue, 20 Oct
+ 2026 20:56:41 +0000
 Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
  ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
  ([fe80::cec4:77ab:262e:d230%5]) with mapi id 15.21.0546.012; Tue, 20 Oct 2026
- 20:24:45 +0000
-Date: Tue, 20 Oct 2026 16:24:40 -0400
+ 20:56:41 +0000
+Date: Tue, 20 Oct 2026 16:56:37 -0400
 From: Aaron Tomlin <atomlin@atomlin.com>
-To: Daniel Wagner <dwagner@suse.de>
-Cc: axboe@kernel.dk, tom.leiming@gmail.com, hare@suse.de, 
+To: Jens Axboe <axboe@kernel.dk>
+Cc: tom.leiming@gmail.com, hare@suse.de, dwagner@suse.de, 
 	frederic@kernel.org, tj@kernel.org, sean@ashe.io, linux-block@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Subject: Re: [PATCH v3] blk-mq: dispatch kworker to housekeeping CPU when
  hctx cpumask is empty
-Message-ID: <zpheefzacmmkz362qm342gfxhluovh4d35numrweqn2ajnxhog@ucus4k2prn6o>
+Message-ID: <u5pjpjnywmbvjyzmlc65ezf4gwsfvmlobevzd5j7ynwflwac43@qrtyxz2ihsdd>
 References: <20261016052203.489760-1-atomlin@atomlin.com>
- <a6b3d7c6-64fd-4b92-8428-964a863ea9e8@flourine.local>
+ <694b548c-5f34-48f2-8ccc-5aa020c76939@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a6b3d7c6-64fd-4b92-8428-964a863ea9e8@flourine.local>
-X-ClientProxiedBy: BN9PR03CA0856.namprd03.prod.outlook.com
- (2603:10b6:408:13d::21) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+In-Reply-To: <694b548c-5f34-48f2-8ccc-5aa020c76939@kernel.dk>
+X-ClientProxiedBy: BN9PR03CA0037.namprd03.prod.outlook.com
+ (2603:10b6:408:fb::12) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
  (2603:10a6:400:183::5)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -90,185 +90,114 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LO0P123MB4041:EE_
-X-MS-Office365-Filtering-Correlation-Id: 63a2d480-75d5-4519-58b2-08df2ee82e55
+X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LOYP123MB3279:EE_
+X-MS-Office365-Filtering-Correlation-Id: bb590873-5165-4749-8756-08df2eeca441
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|366016|376014|23010399003|56012099006|4143699003|261009223027099003|10067099003|18002099003|22082099003|6133799003;
+	BCL:0;ARA:13230040|366016|1800799024|23010399003|376014|7416014|4143699003|56012099006|261009223027099003|10067099003|22082099003|18002099003|3023799007;
 X-Microsoft-Antispam-Message-Info:
-	Xi4ArUJp9a+qcA/34d3ZODIF0N9RpxhEkaS4MOYik7ecxZxs2yI81ZrIeXn1HJ3ixFBf8LlkMOtBaIs9Z2zPyb/6CzwCM5szoAIzcyIQ9yp2gabXt/JltExbD8tUVKIV1zmUGz/a62Gl5oZieCrBL8ThmjAv4xd6abb7FtaPyTkP9luvHvV6cL4+Nek8ieJFDKjr62De9BxLxO7rWYrnQE7lz7e6otLEtJKJlUo4x9HIwk5iT9HeaUXRLTh+p+bwZxsnu0ByVtr2j1euJqDhpIVLr3PYrHtobTvdY/A3HojPMxUIgBa53Wi4sPh8Pa1t3lNS6ZUcEvMvTigMaFoRTnzIVRcj2hv5YftxwVPOMgOjDlojaijGYV/uZbky0BkAUk0OvadG1+f1vZ9RtQbADbIBvFj6nq6C10rlBGgHlJmf4NS1msvKmO933wC4kTN6ztrO553tLaK7LZ2sLm1fRLJJAxs0RbyksdvS3ogY8K2me1vtwoA4QzGS1vfaKqMb0k6ZgbTyilIycII/ZI60ENBC3KgjGO+tfxqX0e+hoAhfXSsxQDei8bsYszoD0B0NC08uBhuvKra0iPsTFR9KWp07Ar3vSOzyjr0Y8VjTXQ3O39Xtijen5kv6X1djXo9N
+	lCh+1/y93xoUcUw5leKON74nbhgg7DhSbkNGpVpJChLrebQAGKQRJYHe3/++mqvyFz12YR38uvlCcfbd2SaCKcuHDVxMF0h9Aw5qXz6C/HtabNV3GdkLtVZIflhcDDGUZm6nwe5l5X22d5RK9h49Vqz/UKk6shHHdSdmELKYAreYHTTF8o23UxH7VX87XtPwkUPie+IPoQ2QIRZyM1rWx/iKWNhsndAlbtspVVtozaoRdJ6vAMjBHDzWMEgT4SKIG36i7PlKLDDbZPQW0mJvMiz9pzO1IQpX7Mcei1MZTcFcGAMP5PZGNyFnL8IWz8DFU/bxjdJEHiNKFa5vt94Fg3UfHqZUl9hawDudfSLoQLefcmsytM7IJjr+WgBhrN9F/IqsQ+h88VB/qZN403Ufuwb4P0aKqQ0FZX3zf93NevaQeeou9m6XebCoP/OrWik0GnJLLhWFWg0jFkgKEmjmqaAlLwlWpf+4/QaLXtyRbIT0goNxMKLV9OOVq2czcc13wqSClLQF4sqC5BBHdp0xZdUWN14nCYub2cRHCWHXeUpoahipFZrtcd5n3YC82nQo8iJnTqkIYb/5Ily8iy1AQhh/GGVGHRtn9dw1zF+kqSAuQTtAuxsUxMYs055Cdu5ezdoJVYgFKK13pY8ZBPmUPF2X9it2lyc1wtAWwKHP+ME=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014)(23010399003)(56012099006)(4143699003)(261009223027099003)(10067099003)(18002099003)(22082099003)(6133799003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(376014)(7416014)(4143699003)(56012099006)(261009223027099003)(10067099003)(22082099003)(18002099003)(3023799007);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SU5YeFRqdjZoRkw4b0tmMUxWWEFWRTgzVzZ4a3EzSm5LWGcyZERZZi9lbC9D?=
- =?utf-8?B?YVlvL0FjM1BxdlFUZGNuTnBCOGRYT2JEakJpank4K1o5ZGQ3RlVVWlpvLy9h?=
- =?utf-8?B?eFBWb1Bhcmc1SDdmWUxjczd4YmNuZzFQS2Y4UllyUkozWnpwM3BiaDBuTEJE?=
- =?utf-8?B?RVBjUTg0SnR1NXlEMnY4ZlBDaWNEOWxiL3Y3RVhiM00wdEtMV0MwMVJBeG5I?=
- =?utf-8?B?YUFUenVOT3g4bmh1cTJXSC9Wb2U0YTJvVXBRQ0l4bVJ3aFNpQmd5Z0d3dTlZ?=
- =?utf-8?B?RnRsWnVxdUdYSmV5NTIxTzZURW5jQ25YZm9DQWpHKzBEMlhNQ0N3enVFM2Y5?=
- =?utf-8?B?cjhLT1gvR2xzSnlhdFhYb052SXFSRTh3QUtYU1FhbkN1b0J6SnYzdEo0ZkNa?=
- =?utf-8?B?VDVTNVRXUTNTejJRY2RwLzdNVXlTT2ZoRXhSVVkrWWdVTHlDalRrWGhqMHhH?=
- =?utf-8?B?Q3dRSEo1bCsrMVNRbU1sMGJybldybDBiZ3hMVEpodzhUanlCWVpXdlJMMG9X?=
- =?utf-8?B?ZnFzbUdZcUJZWSt1VEpYM1loOXJLbHJyYTc5TFh0S3NudnNxMm1vbHdnZ2gw?=
- =?utf-8?B?VzFFdFNEa1d5d3NrYW4wVEJEUzlybUdVSzVzaFJmSkhYTlJpS1hlN1R3bkJi?=
- =?utf-8?B?MHpJQUpwdy9Jb29OWURKajJLVlBwK2pUYlplWEU2ZXdCa2NrajlLUXFaVG91?=
- =?utf-8?B?TDh5VmVRSWFxUmF4YWppUzU1OXRmZ0RnQ0N3UUk0Q05jeFc3dTdHWTZOaURN?=
- =?utf-8?B?STdoMWpIbDhqY1MzQTFLZDN1YlloSnV6QUZuZW5XTHY0cTRLVjBKSzNiVXQ5?=
- =?utf-8?B?SUtWVDBBNys4QWxCaWxSVit0aE5SSjBqMnRxaUZKVVJoWVdqRldBQXRWOFJw?=
- =?utf-8?B?RTJzYWFWMFQvYnFwODNJemNvVTlyczRpRjBMRGxLM0pHaWZUUlZyT0YrZTU1?=
- =?utf-8?B?VzFWblZOd1NhalhyUjRFWEQyMHU2aXVIaGVOdEpqNTcvY0ZCTFgzalIwekh6?=
- =?utf-8?B?VlVqejA4RWhhcVhjazkyck0vZmZkOTJBckZvSUtIK1hPdUpuYVdveVVGVmZi?=
- =?utf-8?B?TkNoeEM2bGZCQytxcWhYZ3AzMmsySU5JMjRsQVNBOHdFTkV5bnM3MDdpMkYw?=
- =?utf-8?B?bzlMR2lKQVlqOWNKQ0d0MVhlb2xkWkdtbmFJaEZKa2YrUnMxQk5LVXhnTzBK?=
- =?utf-8?B?OHk4T09lWDF5My9vSEpySTRyaVZQTkYvR3Rma1JRU2U3b2pBWjNxenlyZzE2?=
- =?utf-8?B?MmJad2NEMFdScmdGODdOM0w5bnptVWxnSEdxQS9tRGpqMkxjNFpxTElNcEU4?=
- =?utf-8?B?ejh2SVFub1NDeGlBcG5MOXVWRC9lb3ZqelVoTlhJajNtcnBMblA3WVh4SVd2?=
- =?utf-8?B?OU0reUZ0UCtkdTRYNDBxb0ZJOFRUM1ZkQk9DeVJiTG9zNk9Pa3hudlg0TXVY?=
- =?utf-8?B?cHJkQ2NNOFJTYVVmSEIybHl2bTExMktPWk95eDJkcEdnbEF1VmhPZ3I2SmtY?=
- =?utf-8?B?NnJwd0owSSt3eExuODNBaFMyZXlxRjRvRHR0SVFLeDNxWlkyS0lRVEJoenhp?=
- =?utf-8?B?ZytYbUozZks2U3VVdThUTFdHZnQwQkdFb1VoeDVPMTd6UlNkTnRHd0NjQ0Vz?=
- =?utf-8?B?MWpML202cWRxQXJEUjNyTmhZYUM3d01jOFhyMUFqdU1BWGxvdEJUSzdrWU5J?=
- =?utf-8?B?czVHTUhSY1BSUjZveXlWOFFoMVhLeVluaEphYkREa096T1VkSG9mTWp4dlp6?=
- =?utf-8?B?SHJ0QWZTWDR6K1RNbnBOd0RzN0luQmMzNU80OTArWGtYTmppSjFqaGVveGFE?=
- =?utf-8?B?UTBVQi8vUDYrbXRJS1FYOWgvU3JtTm5udWg0d3kwdks0Z2FHNitmRWZaenBh?=
- =?utf-8?B?bWpQYjlSOW9aNytkQjc5R3FnRU9RRzV0djNHajQ1dHBnclF3bzVvcUFtSExh?=
- =?utf-8?B?cE1iSXVvOHA1OFlaT2FQODdWN1Y0SUlmWkhZUFpxT2wyU0tqL2ptQnJoRXhF?=
- =?utf-8?B?WFhtSVdZb253emxmemZxTG1VMEVjRE9FRW5RM2E4SS96bmdRRWtsamRLVHRN?=
- =?utf-8?B?UEJnejlkMUJ1WmwrS0RzTmFrMnZqYWVrQ3NTMkhDK2xuZnFHTDRFdElDVW9U?=
- =?utf-8?B?aFJRK0NhYnZOYVpSaVM0d1J1SG1EN2h2M2FqRUdvS1g4SlpSUU5oNzZKNzcz?=
- =?utf-8?B?T01QbGMySHZXOG1vVUdWZVNVVWJnQityWVAxbTdodC92Rmk5YVQvcU5YTjBZ?=
- =?utf-8?B?R0NURUhHRmY0YXJwL3ovcXpmK0VUMUhJNHJ2WE8ydXE4SWQyckl0TjhNQXZr?=
- =?utf-8?B?OVpYVklQNFp3cHd0M3RrMXdscjJjV09oWUgyVjRXdERiSThYa3NwZz09?=
+	=?utf-8?B?WkJaeWV2RjhIbjYwRU11V3lpS1ZnWFR3RU5vYkxRdGxiNms1c2pJS05vLytQ?=
+ =?utf-8?B?dlM2djE5Umg1akV2UTdFZDZsR2JHcjU3cERvNkw0blg0UDZCVk1ndEVVWVRr?=
+ =?utf-8?B?ZHAwOXVIQTJPT0NwRFBhK0xmL0Ewd3d2b3dqNWFvQkRTTWp3TFVoQVI3Q3k2?=
+ =?utf-8?B?TEZFWDVkeHgvRWtoVU93K2ZRaDlTdXJod3pTM0ZtTDR2ZE9CWG4xSUNWWGRC?=
+ =?utf-8?B?a2tZc1l2bTNlRWZHRWUrQlgzQ1RsNHpvYldWQTkrMnhlL3AyZEVSc2xtc05B?=
+ =?utf-8?B?YlpMNHR1VHpwZStHMnhGZkNxekh5Qk9wSmRvd1lkY3FDQ1RzbFdnNm0yQ1VD?=
+ =?utf-8?B?RUFIMGZtaU5ueWlkWVVKeElJL1RiYUZTSjltU3BJVmdTbGU1VXp1RW5kaGQ3?=
+ =?utf-8?B?amhPcTROSkZrSzRPaEtlVjdZTlpFS09hYTYydFNOQndnQVlPOVkyQW5DMGVT?=
+ =?utf-8?B?SzU3TTFkK1lIMnVObFFEMlcvQkhZdUJQRnVGK0N3VzVydWpxc2RIbHhKSDd3?=
+ =?utf-8?B?aFFEM3EvS2NMM0NlNWhOeGpRSXlCZXllVFRiWm1Fem1sb0tab2o1ZDIvSVNY?=
+ =?utf-8?B?cFdXc2I1NjNXM3ZMZHFJRTgvSEliOEpPYkZCQ1NSZDRNM0Zsck91UEg2OFpt?=
+ =?utf-8?B?UXJYV1NCaFlLVmhtRTFXZWxsdlU0RHJxNmFXU2ZUZnZ0TmUxS1h5bTdHTTY5?=
+ =?utf-8?B?MEtzM2lUR2pQaUlQbk9SS1BuLzJ4NzFmUGVlYWd4eWdMUXY4aFJTanN1cUwx?=
+ =?utf-8?B?bGNZbFN5L1pRR2VENVJYRGFhQkcwSU9hNElzRU8wYm54S3pYOUp3N20rK0lQ?=
+ =?utf-8?B?VWl2eWpndDhYTkk4KzVvb2VKWVEwd0ZWWm9QeWVjNjhEeXFZY3N4aUM5RjVu?=
+ =?utf-8?B?dWI3NWdyUkgveDVHSHNvZlhhWG1VVUIrM0x2dDVkRDRCUFdCMEU3K1NVNE9z?=
+ =?utf-8?B?SzNMVjc3UW1mL3FVS1NqczJBdkx3bWtOMUtqczlaakNwd2Q4NWJieitwWnZI?=
+ =?utf-8?B?T2liZHVpVFFTWFB0WkJYSlBYeWMwZmthV3pDNHBTQzMzYzgyc1FxcVpHbFRz?=
+ =?utf-8?B?SC8yRDdMT0lMK292aXhZRDhnclE4L2ZiYU1yb2E0QmpvcXQvaFdwcnpLWVFt?=
+ =?utf-8?B?bW9pUmtCY1JhUEdzQmtVZ3dybU5YKzhGZUJDb2g4ZWZabzM2SHg1VHlESUZx?=
+ =?utf-8?B?YlE0TERvOEVHRGhpR3RHTGhuY3lvNE9vb0VaQklaSVFDcEZXQ1RCczdMbkIx?=
+ =?utf-8?B?TlV4eWdwZHVza0MrVUxlb1pRNUVBNDY1c01WRHhwMytmbmlobzB0c2llNzFU?=
+ =?utf-8?B?bmJ2dWdsUjVnU1hLT1hZd3pXM3pyblBxTE5OdEdSc2drb25JazRrajlxKzZj?=
+ =?utf-8?B?cVpzRDNmbDB6aVY4WFNwRFhIUmRyTWJKS25PaU1ER214bmllNk9IZ1lWY1Q1?=
+ =?utf-8?B?Mnk4S3dCWGRCTmRyY2RJazlodlZJNDF0RHZJT1QxOXp2TW9LWWYwRTNyQitq?=
+ =?utf-8?B?NkFIZDgwOGppeDlnOWJBVlhDcjdhN3M5bVphMGNUbHIrbUhBTk1tNHhZQi9M?=
+ =?utf-8?B?anQ3TTRyYllldittcWdFekZtY3ZPMVI5NGVrUkhUend3OFlBd2JaeXJXd3VF?=
+ =?utf-8?B?NHVUQXVBL1hESFlsc3E0TDdHWm1mUEVHTXQ5NWFIMzVhTGZmdjJ1M3FFVkNX?=
+ =?utf-8?B?blV3clZWOUlwcjhZNUlyUGNUVjZHSStZc21zWkMveloxVThGbjZYNTlwS0tr?=
+ =?utf-8?B?L2c0NE9RNG1xNmE4Z1NNa0RyWEduMlRyN3dyUEVBbTM2bWdHaWFqUG5nM2dU?=
+ =?utf-8?B?d2tYMHJWUGIrZ1BPbHB4a1BBVWpibXl4aWR1WFRnbUN4MGpGS2t4OGdzdHIx?=
+ =?utf-8?B?T29DT3dhR3NFVXptTmdyeWFKVVFZUTQwcnp1TXh0TE5yd0ZFQk1zOWwwQjAr?=
+ =?utf-8?B?M3ZsSzMwdHJCVkFxK0hLZHBmVVA1NUFlMmswNnRBVWhYc2x0MVM2OW5JNUlQ?=
+ =?utf-8?B?LzdjWm90TmhRL2t0ZWFTTXFsQTBHMFE4UGJJSEJVQld5cmcwdm0ybGJvSWIv?=
+ =?utf-8?B?VGFlQ0lsUktWWGozMTlmRWFUSytHRFFOMGNVRnBTcHNTOEhld0tDMlJ2T2Jm?=
+ =?utf-8?B?bWdxdS9UNDN0MURTcm1pT25Hb1EzalNuMjh5anpNdXUzVEFLTWs2ZkVVWG9s?=
+ =?utf-8?B?aWFGUFBWOWF2VlozcmlXcmpoaHExSlBGRUIzV1dmaEk5Z0hDWm8xaWx6VDVO?=
+ =?utf-8?B?djlFSm52dDBLYUQvbmwxTDUwWmp2djg0Yk5LWkJVZk1YSVo1bW9JTlBqU1Zk?=
+ =?utf-8?B?blU1ckRVTjR0SnhsVk5aSlhzUUYxWkNHU0xiSWkvWXJTYXIyeGhsZz09?=
 X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63a2d480-75d5-4519-58b2-08df2ee82e55
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb590873-5165-4749-8756-08df2eeca441
 X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2026 20:24:45.6485
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2026 20:56:41.4384
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: w9qAFinwshUfHqilquAY3ISGnCS/jRgPRRAXHNlBZYPXAYsSgKpSQVz5BmEibHD+QGrwDtpIxrmfwZgj4f3UqQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO0P123MB4041
+X-MS-Exchange-CrossTenant-UserPrincipalName: W2qjSPC7pRysqPDVTvJyUyh3aTmnQMU0l83haFQ2obC+tMD70w6u9sQpOjUjWysa0A67ScFoYOIKmmljAF69dA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LOYP123MB3279
 
-On Tue, Oct 20, 2026 at 05:09:25PM +0200, Daniel Wagner wrote:
-> On Fri, Oct 16, 2026 at 01:22:03AM -0400, Aaron Tomlin wrote:
-> > Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated
-> > CPUs") excluded isolated CPUs from hctx->cpumask to prevent worker
-> > threads from executing block work on isolated CPUs. When all CPUs mapped
-> > to a hardware queue are isolated (i.e. blk_mq_hctx_empty_cpumask(hctx)
-> > evaluates to true), blk_mq_hctx_next_cpu() returns WORK_CPU_UNBOUND with
-> > the intention of offloading execution.
-> > 
-> > However, kblockd_workqueue is allocated as a per-CPU workqueue
-> > (WQ_PERCPU). When WORK_CPU_UNBOUND is queued on a per-CPU workqueue, the
-> > workqueue core resolves the target CPU via raw_smp_processor_id().
-> > Consequently, if a task executing on an isolated CPU submits I/O and
-> > triggers an asynchronous queue dispatch with zero delay (e.g. upon
-> > hardware queue congestion, tag/resource exhaustion returning
-> > BLK_STS_RESOURCE, or plugging), &hctx->run_work is queued directly onto
-> > the local isolated CPU's worker pool. This causes the local per-CPU
-> > high-priority kworker (e.g. "kworker/6:1H-kblockd") to be scheduled on
-> > the isolated CPU. In real-time environments, an active SCHED_FIFO workload
-> > will starve this SCHED_NORMAL worker, causing hardware dispatch to stall,
-> > in addition to introducing unwanted latency jitter on nohz_full cores,
-> > thereby defeating the original objective of commit a46c27026da1.
-> > 
-> > Introduce blk_mq_hctx_unbound_cpu() to select an online housekeeping CPU
-> > from housekeeping_cpumask(HK_TYPE_DOMAIN) via
-> > cpumask_any_and_distribute() when executing on an isolated CPU, and
-> > otherwise fall back to WORK_CPU_UNBOUND. Use this helper across the
-> > unbound fallback paths in blk_mq_hctx_next_cpu()
-> > 
-> > This ensures that:
-> >     1.  When executing on an isolated CPU, deferred queue work is
-> >         cleanly offloaded to an online housekeeping CPU across single-queue
-> >         devices, hardware queues with empty cpumasks, and offline CPU
-> >         fallback paths.
-> > 
-> >     2.  The per-CPU high-priority kworker on the isolated CPU is not
-> >         scheduled, avoiding priority inversion and latency jitter.
-> > 
-> >     3.  When executing on a non-isolated CPU, WORK_CPU_UNBOUND is
-> >         preserved, maintaining optimal local execution with zero CPU
-> >         bouncing.
-> > 
-> > Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
-> > Cc: Ming Lei <ming.lei@redhat.com>
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
-> > ---
-> > Changes since v2:
-> > 
-> >  - Query housekeeping_cpumask(HK_TYPE_DOMAIN) instead of HK_TYPE_TIMER
-> >    to align with cpu_is_isolated(), workqueue affinity rules, and cpuset
-> >    isolated partitions
-> > 
-> >  - Query the housekeeping cpumask under guard(rcu)() to safely handle
-> >    dynamic cpuset updates without lockdep warnings
-> > 
-> >  - Validate that cpumask_any_and_distribute() returns a valid cpu ID
-> >    before returning, falling back cleanly to WORK_CPU_UNBOUND
-> > 
-> >  - Link to v2: https://lore.kernel.org/all/20261015020225.422107-1-atomlin@atomlin.com/
-> > 
-> > Changes since v1:
-> > 
-> >  - Introduce the blk_mq_hctx_unbound_cpu() helper to steer deferred work
-> >    to an online housekeeping CPU only when executing on an isolated
-> >    core, preserving WORK_CPU_UNBOUND and local cache locality for
-> >    housekeeping cores
-> > 
-> >  - Apply blk_mq_hctx_unbound_cpu() across all unbound fallback paths in
-> >    blk_mq_hctx_next_cpu(), comprehensively covering single-queue devices
-> >    (nr_hw_queues == 1), empty hardware queue cpumasks, and the offline
-> >    CPU fallback path.
-> > 
-> >  - Elaborate in the commit log on the triggers for asynchronous queue
-> >    dispatch (e.g. tag exhaustion, BLK_STS_RESOURCE backpressure, and
-> >    plugging) and the SCHED_FIFO worker starvation hazard on isolated
-> >    cores
-> > 
-> >  - Link to v1: https://lore.kernel.org/lkml/20261012012905.267920-1-atomlin@atomlin.com/
+On Tue, Oct 20, 2026 at 09:23:10AM -0600, Jens Axboe wrote:
+> On 10/15/26 11:22 PM, Aaron Tomlin wrote:
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 025a799f35b9..1a113679f15b 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -2241,6 +2241,21 @@ static bool blk_mq_hctx_empty_cpumask(struct blk_mq_hw_ctx *hctx)
+> >          return hctx->next_cpu >= nr_cpu_ids;
+> >  }
+> >  
+> > +static inline int blk_mq_hctx_unbound_cpu(void)
+> > +{
+> > +	if (cpu_is_isolated(raw_smp_processor_id())) {
+> > +		int cpu;
+> > +
+> > +		guard(rcu)();
+> > +
+> > +		cpu = cpumask_any_and_distribute(housekeeping_cpumask(HK_TYPE_DOMAIN),
+> > +						 cpu_online_mask);
+> > +		if (cpu < nr_cpu_ids)
+> > +			return cpu;
+> > +	}
+> > +	return WORK_CPU_UNBOUND;
+> > +}
 > 
-> Looks reasonable and related to my patch as well
+> Not opposed to this, but let's please think about making the
+> common case the fast path. CPU isolation is not the common
+> path. That might mean annotating the hctx itself.
 > 
->   https://lore.kernel.org/all/20261014-nvme-fabrics-isolcpu-v1-4-355156be27b2@kernel.org
-> 
-> and I was able to create a blktests for it:
-> 
->   https://lore.kernel.org/all/20261014-nvme-isolcpu-v1-0-2fd175a8ef00@kernel.org
-> 
-> Would it possible to extend those tests or add a new one so we get this
-> also tested? And these two patches then should/could merge.
 
-Hi Daniel,
+Hi Jens,
 
-Thank you for the feedback.
+Agreed on keeping the fast path penalty-free.
 
-Having test coverage in blktests makes complete sense.
-Between extending your NVMe test and adding a new one, I think creating a
-new, generic test under tests/block/ is the cleaner path.
+For multi-queue devices, blk_mq_hctx_empty_cpumask(hctx) already serves as
+that annotation (via hctx->next_cpu >= nr_cpu_ids) since isolated CPUs are
+stripped during mapping, so normal multi-queue devices never hit that path.
 
-While your nvme/070 test targets NVMe fabrics connect and passthrough
-request allocation, this fix is in core blk-mq (blk_mq_hctx_next_cpu) and
-affects deferred workqueue execution across all block devices. Using a new
-test based on null_blk would allow us to:
+The main concern is single-queue devices (nr_hw_queues == 1), where the
+hctx is shared between housekeeping and isolated cores. To avoid calling
+cpu_is_isolated() on every deferred dispatch in the common case, we can
+split the check and gate it behind a static key:
+static_branch_unlikely(&housekeeping_overridden)
 
-    1.  Target infrastructure for generic blk-mq workqueue placement testing
-
-    2.  Easily configure a shallow queue depth or inject tag
-        exhaustion/busy conditions to reliably trigger asynchronous queue
-        dispatch (&hctx->run_work)
-
-    3.  Trace workqueue:workqueue_execute_start to assert that no kblockd
-        worker executes on the isolated core
-
-I'll put together a test case for tests/block/.
-
+I will prepare a v4.
 
 Kind regards,
 -- 
