@@ -1,115 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=68.232.143.124
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792478463;
-	b=HBzHouTadL8xpN4uhF4xb5iPzct/1EsKuUxQ19h7zxTe4MCUZi6UMFsyY4/jeYK9TkgR
-	 NP7VkKswfefRPM0aKMDESALtcPvAkWx89eH93j5a1reZNxgbytcjBwT2VBp9wFgCskHKf
-	 3o1v52OPeLMd2ekzslZNp6TCNS6BldlEwE2T+Z4tepx8QZ+NHp5lGyLahmmF20u5tmqCr
-	 r1N2OJLZNApqU5MDw7hyhffuaLLqOkpMYiWBkJ3xQcd/pxrE75V0UVPJDaWIqzO5H/UC2
-	 1nQeeXJl+67kBw0zqKKgagPDmuzIa5TJCKRy+MQZZY3ZOcN3EDoPB1jStox3r3X/S1A==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792478463;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:Received:DKIM-Signature:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:Content-Type:Content-Disposition:
-	 In-Reply-To:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 WDCIPOUTBOUND:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-Exchange-RoutingPolicyChecked:
-	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=vCSA50yyPcM1QetSbUbPJWsrBzOkoYHHfX4ND9QaliE=;
-	b=Gxw9GPyn8BW/E8bs9Dg5quvS3zwzgstGZusjGyjtTd/1OrQ4gX6cxbWbS3B1hFMjELGC
-	 qPFB0uaBpQo7DK6WY5MSbRJWHf8AgTQysCLr+DWY8Vsj8vbmJZX7miJpr/58zahV7yibP
-	 dvwQ7dKunHJT/MBQReks9hvnwn7bJvrealLar/6m2qgCL7tJyfoQLa8UEEeOmUSkR2ASJ
-	 I+7M2pfRFFgeXNtiL20MCxtHvKFFxC1XwsnZfyJ8BdoY8k0ElyukzPyAJthfQ9E1omBS6
-	 wgONlkATTXtppFZvRqFmOY0H96pludURoHc2IGsK2qZr15/cSvLDc/W+xURoV2igzfA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=wdc.com;
-	spf=pass smtp.mailfrom=wdc.com;
-	dkim=pass header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=lRE0P24N;
-	dkim=pass header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=qF4p5nPb;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=68.232.143.124
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.127.231.47
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792479444;
+	b=hnHlsgFlfwTlQy3icvuByUfmODyJrIoIZHQK8sysGmmb3lix4kzGajyaibn3W9/8vkY/
+	 0/BsMzm1n2BoVG6WqIyUzejcdPClLRmL9TYQY42Q+zCXqjgbXU6H4yw/zEv+EBJ84hW2L
+	 +5S5UqZtBuwOHUg4/46uuF2KyE3BKl4nCqppx0Ps9c4hZo16YEVSwcHrJvHv6VUDSCEWT
+	 G/ETCEZO1/+eWL/426Z57vyrWt5C4C6FhsDTT75VF2liEEJ6Q6hzwO3lxpE7EKTsiU4vF
+	 JBLrWAuipB7vgrMeL5Sl0eZ38kb3CL8gsEHyDxXXn1wuHnpFu5I6tb3TeyLv0CZQtTw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792479444;
+	h=DMARC-Filter:DKIM-Signature:Cc:Message-Id:To:Received:
+	 Content-Transfer-Encoding:Reply-To:Subject:Date:User-Agent:
+	 X-Lms-Return-Path:Content-Type:From:References:X-Original-From:
+	 In-Reply-To:Mime-Version;
+	bh=YmzrkAr1UCdFF1b7GSnZNeQasDWPbv25bVPLQoA0QTE=;
+	b=gKGEvrCgkOmzBg4WCvNy86s4bb4+GnK36DjcjTdBHB7x6na4EHUcL8zXTS9zeopvFEdW
+	 7zseSdT5CZIr9IWFlVxnWps8oU/jOT9ViCPLysIwm2eaf0tC99e0CEoS+Cs/WjKUcSUK4
+	 RBKHD13w+AfwCQvsDNXaHi5rBG8Hl2ZG6cJvXvZ6qqaVdc6IYKoguCLzekdH5W7E613JO
+	 AnXhCN8G05eQXqj0rvPBLh13N0ZwC8fIhZ6g6GnutTi89/7vsrRRvwpNCQzdZbQN+/VyS
+	 ecoaU90pJ+uSQqeO3hz7elvJhOoUXRTARZbaJvAUvcEYCPsbAkT4u1ebyq6uaVq68bg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=fygo.io;
+	spf=pass smtp.mailfrom=fygo.io;
+	dkim=pass header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=OMdnNeHn;
+	arc=none smtp.remote-ip=209.127.231.47
+Received: from va-2-47.ptr.blmpb.com (va-2-47.ptr.blmpb.com [209.127.231.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2FA606A319
-	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 06:41:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED2FA606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1773B60A3834
+	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 06:57:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1773B60A3834
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=lRE0P24N;
-	dkim=pass (1024-bit key, unprotected) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=qF4p5nPb
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1792478462; x=1824014462;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=xUMYzfVxh23Th3UWPJni2wSGosPycEIPvD7v1CG9Ivc=;
-  b=lRE0P24NyYScGVLowLM0rQTUvXJ+2qPGG6GoA8RzB4s/4cD0DP/OI9QM
-   67lSejk3TgGdvEEpS5l90Xp285mxIeYHPAtyekXtHy5EpWv49rcuegOJw
-   yAzV3ve7hP+ZR7o/Z6tXzUOE/6M+xhKzaOaKFnySyUvYPy9R6m9D86tW5
-   /e8sgjMYD/2wN0sNfLgwgSGRsIba3QDBqfUkEy2cUM0yKLdCZPyBLf9hP
-   KWz8uJlCqx8ISns4gSLAvLZU/kXJCYxWi5C8DjZ1+u2+v7gN1bUARsQ68
-   BbB1RKmsugSwoh98Lrflz43E+I3hhbmezqPFa/Ms0hrAlsdot+w4n/tYU
-   g==;
-X-CSE-ConnectionGUID: /+PEtLBmRYCsQFWwXhN/vw==
-X-CSE-MsgGUID: ShKWkuoJSsmmouWI55nDzA==
-X-IronPort-AV: E=Sophos;i="6.27,168,1786982400"; 
-   d="scan'208";a="159474338"
-Received: from mail-eastusazon11012029.outbound.protection.outlook.com (HELO BL0PR03CU003.outbound.protection.outlook.com) ([52.101.53.29])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Oct 2026 14:41:01 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vULJK6VFxJYbUnyOrZUjaVI3knY3WyQNrkY8/q/Rm1U51NMma2unKQ0iXP3yrIUIvUaCuMuPiPsaPHLxKmuuC2VLt0X3DkCzqduNQuRxg9LGuWAz6xyQs7fqZKqor+xSqOzx+luPgCZ4a9YiZPRlH7tt0s7tM1XcXLJRTbfQx9IJMSY7XjRU6iQ1B2MKQcwDVXZoDERUoOr14Eri/QDbT6g4wm82WaySydKmZqvGj10nNVZd/OGYO4BYltg4s3zvpxp6mPGNq5tDoWteVgT9j+UJdjUYn6URTw2DqtUVHkiculuJiJbFZSoppgYvUcb0OfgkTaF1OgOMBZmTfp/LKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vCSA50yyPcM1QetSbUbPJWsrBzOkoYHHfX4ND9QaliE=;
- b=MxEdRobhMppBTWNWs1UU6e8JpPkyzb56hi1nMOtzFpcuJjnXLcyXWp5W89MpLS9xpG8TorWKd3Yx0h8KtvmDjuNHv7dOfLv0bt6OHlRm6Ph8sbKIp0+jX8vN7XkChZdu7XZUplWIL4PRFM2Nn6Hua04dv1I5sqVTEqEJVBxpRO3ACAI+gjs8gqFCns1myK7XUa2vcNB2yUyxBA7IvJS6uabL7QP3ZBjryd24AjGboz9T4GD2Ornvz5Po44/4JqrbWIwqH6+PCCpR8UYPkWIOkYjcP2u3yKi4Bk6ewtqWqVrKQXczEID11DlX9ddiixtLEP6BmJkJy2SpAto0+xVqFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vCSA50yyPcM1QetSbUbPJWsrBzOkoYHHfX4ND9QaliE=;
- b=qF4p5nPbeitdrlrrx5Mr9FH9dTX3+Hpy6NrvEtiLg5amAQZ5SAXyHEl1Ea0gHzD8qZU7xLXJpNlM/8LoP1PqExjbMFgtJj/h4AGezweEcMoIHne1H1S7brBfjRGu5bpJi0PtBjMDrJzcEHJV6Q+sL8IExI8+GKk0DwY7ueTeaQ4=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by BN0PR04MB7966.namprd04.prod.outlook.com
- (2603:10b6:408:155::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.15; Tue, 20 Oct
- 2026 06:40:59 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%5]) with mapi id 15.21.0522.017; Tue, 20 Oct 2026
- 06:40:58 +0000
-Date: Tue, 20 Oct 2026 15:40:53 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Daniel Wagner <dwagner@suse.de>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	Daniel Wagner <wagi@kernel.org>
-Subject: Re: [PATCH blktests 0/5] nvme: tests for isolated CPUs and fabrics
- queue mapping
-Message-ID: <atcLN4XXfNF1YSZa@shinmob>
-References: <20261014-nvme-isolcpu-v1-0-2fd175a8ef00@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261014-nvme-isolcpu-v1-0-2fd175a8ef00@kernel.org>
-X-ClientProxiedBy: TY6P301CA0022.JPNP301.PROD.OUTLOOK.COM
- (2603:1096:405:3bf::8) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+	dkim=pass (2048-bit key, unprotected) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=OMdnNeHn
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1792479433;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=YmzrkAr1UCdFF1b7GSnZNeQasDWPbv25bVPLQoA0QTE=;
+ b=OMdnNeHnsa/x0j5hsYN3yNbcS2qb8SQ9eZpoRASiKSgY2V82t8+wNZ6lTor20AbDKTzRtS
+ pf5W4k2tx/cIl+kLCJJ9cXRwY/CPQ1dLUe67JlDi+SCr/Dvfq6/+PPK0Qy1r56MsPSrsOG
+ asiSe4KnszoJmlVNhxXun2cXLPRDHXvkL7Alxr8yEEX/knK0dpjHuTebAk5hkYnHjFxitY
+ 1E4M4APSta6jqKk2Yqc1m1cB5WGUdnoKgItjZtuCKry+8CZeUO4dl3fkVWzx+jzHmOCejT
+ JDh5xsDJoNRpqjoFVXqkAl1yXDhoreUE17YVJbIT1ysN+SCBSpXmwalD5S88Sw==
+Cc: <linux-block@vger.kernel.org>, "Jens Axboe" <axboe@kernel.dk>, 
+	"Christoph Hellwig" <hch@lst.de>, "Damien Le Moal" <dlemoal@kernel.org>, 
+	"Ming Lei" <tom.leiming@gmail.com>, "Xiao Ni" <xiao@kernel.org>, 
+	"Li Nan" <magiclinan@didiglobal.com>, 
+	"Mike Snitzer" <snitzer@kernel.org>, 
+	"Mikulas Patocka" <mpatocka@redhat.com>, <dm-devel@lists.linux.dev>, 
+	<linux-kernel@vger.kernel.org>, "Jack Wang" <jinpu.wang@cloud.ionos.com>
+Message-Id: <e2c36f31-d198-40a7-a18d-156e1fd6fbb2@fygo.io>
+To: "Jack Wang" <jinpu.wang@ionos.com>, "Song Liu" <song@kernel.org>, 
+	<linux-raid@vger.kernel.org>, "Nilay Shroff" <nilay@linux.ibm.com>, 
+	<abd.masalkhi@gmail.com>, "yu kuai" <yukuai@fygo.io>
+Received: from [192.168.1.104] ([39.182.0.21]) by smtp.larksuite.com with ESMTPS; Tue, 20 Oct 2026 06:57:11 +0000
+Content-Transfer-Encoding: quoted-printable
+Reply-To: yukuai@fygo.io
+Subject: Re: [PATCH v2 0/8] md: don't wait for q->limits_lock while md holds back I/O
+Date: Tue, 20 Oct 2026 14:57:07 +0800
+User-Agent: Mozilla Thunderbird
+X-Lms-Return-Path: <lba+26ad710c8+d38c61+vger.kernel.org+yukuai@fygo.io>
+Content-Type: text/plain; charset=UTF-8
+From: "yu kuai" <yukuai@fygo.io>
+References: <20260910081114.1605746-1-jinpu.wang@ionos.com>
+X-Original-From: yu kuai <yukuai@fygo.io>
+In-Reply-To: <20260910081114.1605746-1-jinpu.wang@ionos.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -118,98 +75,172 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|BN0PR04MB7966:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c17c301-3ba8-4a5f-044d-08df2e7519bb
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|23010399003|19092799006|56012099006|11063799006|261009223027099003|10067099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	XCxl6tVoo+4gggKTLhVTZdyjoOIDR7jbO8ig6VXADAM4hctM+8Hj+z0/5yp/aw+7uKpoNcbWp6tbfVcyq71yX1mQcpRC7xTqxtPVkJ8jLD2u/e8H5h4u6EDfuJsbOo2E9M57gDkGSF36vUGIfREDeWYSxp/oUSovPpsCyCDz8GzYuSDOh3begKSeWrtz9vB3Zrtryo/c154qt7CD6bDvzljkmzdqGaAri1HNAQBTF+iQvkoT4Rqb+2AAoJmD9SEads0+YqOMxCBz2jaxyhcY9vCM5P3EzrSCFtXJxwlAsKAJAW2SYmptlT9uKfHr8rBkQkhKlWMSjx//o4IxLKzNfN9FkbDj269xGGbsdutDxpI2a14zsSJQn8/5Asi+ZWQ5M7h6SuwKYCxXlLedQqzxOG4siEAd2oi8PuzUouxBzU49l54u96Q3r9lz2c/xdQeh/Er/lS9O+55FG1mMDdWvmqfR/fu072b142qF4ZJHL/tmVpgGpT0P9qYzSGt9LPoQfhaGHClj01Fq3sDFo8Then1plLS9RInnZeuZWZbrBxFPonWCpiqyThJiIFblM2O1Vqmqsb1aWR0RkgAytC4pxgz1NYpEkM30z//8yv7FKqKYmoyddLex6GenMmIfTPAR
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(23010399003)(19092799006)(56012099006)(11063799006)(261009223027099003)(10067099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WEzkvzKkcqNsF+DICmMPEydzUvnJ/gVc+dbePywnmVnNm0KCGqhDYiDK7fmI?=
- =?us-ascii?Q?4hRIQuD8+7MkTFnP7WJc0cFyfk7FwJkyLOSQgI1kJv9XgRvktM3xEXb1vBFd?=
- =?us-ascii?Q?733S5BCYI2ZzcoTe8+gcXfgms6/B0mdktTT4MdkTPQcK3m95UL2HSf57uL5c?=
- =?us-ascii?Q?hgiSWBvos/eqSyi4p+uGE4RwVgrGzNs5zp9Rp/fuj61HohaU14gSgqsGvaa+?=
- =?us-ascii?Q?96h5A4GQO2AlUqwEDO96lbT+U+OCcd2cEhnQ1k+M6b9mommIguccmhibxtEB?=
- =?us-ascii?Q?OpTGpnKOy6N/jMkWiXlztEqdfY10j3Iwvtwtj23hxJqw3z/iObnILF8QOH9Y?=
- =?us-ascii?Q?e5Y8S9oGeZI259KBwLIyh3IVd5muxrpHiODIHAKilTpLWoQshmdyrGAjw2Vk?=
- =?us-ascii?Q?4C9Y6HFMPW+O7ramgAdt/aTeGSldg+jyqqLqXHZQ/NGAHO2coyePqXOWqEUj?=
- =?us-ascii?Q?J4xXc3WEOPPpRpAQSkovjJHyGNW0Rtq9ad8Cch8QTJX4e/JPOHrXoyTHDJRn?=
- =?us-ascii?Q?xr2BJmONyHmgSpTuk660W+dAe5bzuTtS03Ppnj9ouBJvXidDE/O7BDV9VH3f?=
- =?us-ascii?Q?s1esI0k/tUQfJxNC2biX7op0emQII9PlgHxXaUkBl5KcMUSKF28HUIJrt8Ma?=
- =?us-ascii?Q?sdxRLDH9FnYEjAnYSyq0q7w9C1TQ5HHty4CdZEuxTYX3ErlD7v3wUMnJj4tP?=
- =?us-ascii?Q?N96o8p5iDzuQ2SA5wgndNyHwZN9tR1JK0x8jU/Z8txB8EftBdKjl67oUCr2o?=
- =?us-ascii?Q?Le+o2C4lJPrQ0sdzcxh/twM7QLWVTyF+x2XJiWrtKJJcHobxB0bcF0h05MIP?=
- =?us-ascii?Q?bNiBD6GvmSKQIfC5h91mDHVfdIZvQ97OtMHyqFBgGT2KGD+DmUbXQWQeAinw?=
- =?us-ascii?Q?XJioryKfAJCEuGriCtB5EFmHYG3hs0IO06Kjzt3F6/bKxaYogPtUC+7uxzLZ?=
- =?us-ascii?Q?7bDnjAv/sMGgRDU3RRt1hdUFjIDjzPKgx4ET56wh+yPEaDtKGlf4wUV2xCH2?=
- =?us-ascii?Q?iwxDkASN+5Zvb6rdtzlKgIB1T28IrAzpZTXOEfnvcTIlmU6NGTu6OHuyT1YE?=
- =?us-ascii?Q?Sf3xeElsONNVMtofND2/LOS4PsCzYfN5E7jkhh8tLsMpJ4aLGYAvq6YA003G?=
- =?us-ascii?Q?0sorWoTgeJV+EWwzYyq6Q3kGwEVC6FT2xhaScT3memCxgwZZIndLeaBooDVT?=
- =?us-ascii?Q?2ECagzF3n5XDc0o0rgtHPeVJ76g2rlsM10NfEjDSTvunlhW5UR80r9U2G4Qh?=
- =?us-ascii?Q?cU0D7svEqaC8aZtyQm4Zkna/pmvZa2waMjW+ZQRmfxHnlDf6+3ov6HAO8C70?=
- =?us-ascii?Q?R+oNIeUzxwEJxaDVHCDEJft2AGDDf1hAV3RGKzW3WA2W9i4UZw0iqNptxvJr?=
- =?us-ascii?Q?zICpk1qMv/8DbIsSnzNb333OYuzQSFjFnmcZObSxQJRu3PwBlgugxMmMOyLE?=
- =?us-ascii?Q?t5QIrC8JFd3v7ROaPeBAFbRd8yI9yutI89GHhz8Da61j9eNzCursroIrzCrq?=
- =?us-ascii?Q?LOJN33TfZA7pv3UZgLbKzZW7M/PG/yoQmjDjSLWv6QuU/q0EpIpOvLHoKNz7?=
- =?us-ascii?Q?NuUPK56FAoqYU5dmywi3HMB5qhIn2eI6UklLfQpohKNz/UWaCLtBPnW+/ejN?=
- =?us-ascii?Q?KDWjw47lzrbbXYbnB/wRo66VYogJ+Wh/zQyzw+QfQZzIfctJ5u2WVpcwr1OZ?=
- =?us-ascii?Q?ISlXMpQwSLEVDMCArmIbdjKwnQO/XSLr3BtTaq8mVhSkG0oWk3yWup7OuwWF?=
- =?us-ascii?Q?wnWQre6wiLKMDbhjz0UjN6Cuea30Yb4=3D?=
-X-Exchange-RoutingPolicyChecked:
-	4nslIqcM81FpCMedtNdLXumDmVz7vhxe9DfzQCS6KSmFfgb0jwCrKJK7EQMXRpzQo2f3YATWJDNP4bzdhyvT8FPKOLvkqtqu4zyla7qTi8X8uxbxvBkiLwXZ63RHalR/KuOseC0hVIii0HrXpf4dUArCHBlmSpHp61fPPaNNwfR8vjZaVFLQ5gi6yOu+4z36W9ynVn/xzOAAAHxp276xQPFN+wY/Iq/6iSNz6T4xewFK4SVVrHGQKmok+rJv9xdFhmOHu2xdiRoaRq2Jyys6AIBKkT7HHPa4dlAjOKUct9yV0PpPevH4dN22c1TADUT7oJzocfRxNBqotXJiFRIziw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	GOqmL4ruU1PnVuF+emmmK6QqbxdYXdHQGN7l9rR1CdwDk494iqq4e+GRVvUAwCdav54VzhZ7W4GjkT9RIDl/iJEmjhhE9hfC2UQJLfWEtX7kmLoucDjx/Elr5c48gMjBCtgI8h2nwU8jVZ2aMeg68/96C3OdrUYl4wdqTglOpdZgAbssxE/Qb8gxaJSV05izEQabDnxuYfFlrpo7FXeXjJ34SejPSJh+dEVt3g+4AVgEWvn+GNxp9hViPVFJJqI6pYnkrCDvNwau3aHb2oc1rgN63xrud8Io29Wi4ckC8DZQzGGwnBcwn46lJrWAz9en6U+f2HPjwkmzXYvkF7ZDdcFMA/WCQdRTZIt/qGGGBestnumNDSeNQeklI7c4S+RMme79pCiXgJpd8MgsGksTES0k6xYVibjMMBK3NWB1ktt+UpmSGgHgqfT4h00bBIK6U11iPJrAZzyekFVR7pxoK9HfyNO2mJ8GsZ+QTfRktaglYnyazpNrgtWwnBAYQTZ6WF5wppaulPYQTPIYc3ny0hZnfVsOWPKbs1l/lOeh0nEwXSEp5aIsz4RmrlSvadCgqUBVwJS1LJmM9zjC6g0d/GEzkQ7DD23C3A3mytpwAc/760RcW44SJoaOOGipvY3d
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c17c301-3ba8-4a5f-044d-08df2e7519bb
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2026 06:40:58.8562
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D33WFGFONIz2EvI7ykgee1jNY8UZc6r3+yXAMCq5beK1CwwzKhSrBexZolgQV6n6cMjMYgvWVebpM4QbEAmH3E8btjwmKUW3gO79eClzCQ8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR04MB7966
+Mime-Version: 1.0
 
-On Oct 14, 2026 / 09:51, Daniel Wagner wrote:
-> New tests for the bugs fixed by the kernel series "nvme-fabrics: fix
-> connects with isolated CPUs and queue mapping bugs":
-> 
-> https://lore.kernel.org/linux-nvme/20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org/
-> 
->   nvme/070  connect with an isolated CPU (cpuset partition), verified
->             I/O from a housekeeping and from the isolated CPU, traced on
->             the queue of the isolated CPU
->   nvme/071  more write and poll queues than online CPUs
->   nvme/072  no queues left for polling
->   nvme/073  reconnect with fewer I/O queues
-> 
-> nvme/071-073 need write and poll queues and only run for tcp and rdma.
-> Without the kernel series all four fail and nvme/073 crashes the kernel,
-> with the series they pass. Tested with loop and tcp.
-> 
-> Patch 1 stops _nvme_disconnect_ctrl() and _nvme_disconnect_subsys() from
-> truncating $FULL, which dropped everything logged before the disconnect,
-> e.g. the fio command lines.
+Hi,
 
-Daniel, thank you for the series. I ran the added test cases, and they work as
-expected. With 7.3-rc7 kernel, they failed or hanged. With the kernel fix
-series, they all passed.
+=E5=9C=A8 2026/9/10 16:11, Jack Wang =E5=86=99=E9=81=93:
+> From: Jack Wang <jinpu.wang@cloud.ionos.com>
+>
+> Writing to a queue limits attribute of an md array while a spare is
+> being re-added deadlocks the array.  I reported this earlier here:
+>
+>    https://lore.kernel.org/linux-raid/CAMGffE=3DheGA3y8FjQ0Sm1jj-kd-=3DH9=
+Y54WozKASSEZhc9UNKjA@mail.gmail.com/
+>
+> Four tasks, one array:
+>
+>    udev-worker    queue_attr_store() holds q->limits_lock, waits in
+>                   blk_mq_freeze_queue() for q_usage_counter to drain
 
-The first patch in this series is not required because the blktests commit
-64cce9a87099 already fixed the problem. Other than that, the patches overall
-look good to me. I think left works for this series are as follows:
+Sorry for the delay, usually blk_mq_freeze_queue() is useless for bio-based
+disks, because it can't guarantee inflight BIOs to drain. So this looks lik=
+e
+a long term problem since queue_attr_store() can still update limits while
+there can still be bios inflight.
 
- 1) wait for the kernel side fixes applied,
- 2) modify blktests side commit messages and test script comments to reflect
-    the kernel side git hashes, and,
- 3) renumber the test cases
+>    fio            holds a q_usage_counter reference, parked in
+>                   md_handle_request()'s is_suspended() loop
+>    mdadm          suspended the array, waits for reconfig_mutex
+>    md_start_sync  holds reconfig_mutex, waits for q->limits_lock
+
+And this deadlock looks related to blk_mq_freeze_queue() concurrent with
+mddev_suspend(), hence there can be bio blocked between. So I think there
+can be a simpler solution for this deadlock.
+
+1) either remove the blk_mq_freeze_queue() from limits update for mdraid, o=
+r
+2) also add blk_mq_freeze_queue() to mddev_suspend().
+
+If this is a mdraid specific problem, I'll suggest 2). If there are other
+bio-based drivers have the same problem, we might what to replace
+blk_mq_freeze_queue() with driver's bio suspend to fix that limits can
+update with inflight bios as well.
+
+>
+> The last leg is mddev_stack_new_rdev() from ->hot_add_disk().  Since
+> commit c99f66e4084a ("block: fix queue freeze vs limits lock order in
+> sysfs store methods") the sysfs store holds q->limits_lock across the
+> freeze, so md must not block on that lock while it is holding back the
+> I/O the freeze waits for.  That is the same hazard mddev_suspend()
+> already documents for reconfig_mutex.
+>
+> v1 kept q->limits_lock outermost where it could and used a trylock
+> everywhere else.  Christoph asked for the lock ordering to be fixed
+> instead, so v2 drops the trylock and the block patch that added it.
+>
+> The rule v2 applies is that q->limits_lock nests outside reconfig_mutex
+> and the suspend everywhere, with no exceptions to paper over.  The two
+> callers that cannot own an update do not need one: check_sb_changes()
+> and md_check_recovery() only ever re-add a device that is already a
+> member, so its limits are stacked and the update is a refresh, and they
+> now take the no-stack path unconditionally.  mddev_update_io_opt() is
+> not an add and does need the update, so patch 4 defers it to a work
+> item that takes the lock with nothing held.
+>
+> Making the hoists unconditional exposed a second cycle that the trylock
+> had been hiding, which Nilay hit with lockdep on v1:
+>
+>    q->limits_lock -> reconfig_mutex        added by this series
+>    reconfig_mutex -> disk->open_mutex      pre-existing, md opens legs
+>                                            under reconfig_mutex
+>    disk->open_mutex -> q->limits_lock      pre-existing, sd_open() ->
+>                                            sd_revalidate_disk()
+>
+> Only the middle edge can go, so legs are now opened before any md lock
+> is taken.  Patch 7 does the opens and patch 8 the holder links, which
+> take disk->open_mutex too and were easy to miss because the release
+> side only takes blk_holder_mutex.  Opening without reconfig_mutex means
+> the superblock format fields have to be snapshotted and rechecked once
+> the array is locked.
+>
+> Patches 1, 3 and 6 are plumbing with no functional change.
+>
+> Two callers still take q->limits_lock inside reconfig_mutex, both with
+> the array suspended, and patch 5 says why: ->start_reshape() from
+> action_store(), which suspends before flushing sync_work, and
+> raid*_run() -> queue_limits_set() from level_store(), which already
+> hangs on its own because it freezes the queue while suspended.  Both
+> need more restructuring than belongs here.
+>
+> The patches are based on v7.3-rc2.
+>
+> v1: https://lore.kernel.org/linux-raid/20260909063029.GC29874@lst.de/T/#t
+>
+> Changes since v1:
+>   - Drop the trylock and the block patch adding
+>     queue_limits_start_update_trylock(), per Christoph.
+>   - check_sb_changes() and md_check_recovery() take the no-stack path
+>     unconditionally instead of trying the lock first.
+>   - Defer the io_opt update to a work item rather than skipping it on a
+>     contended pass (patch 4, was "md: don't wait for q->limits_lock in
+>     mddev_update_io_opt()").
+>   - New patches 6-8 to close the reconfig_mutex -> disk->open_mutex
+>     edge that lockdep reported on v1: pass a queue_limits through
+>     ->run(), open new legs before locking the array, and link their
+>     holders there too.
+>   - Rebased on v7.3-rc2.
+>
+> Testing, on v7.3-rc2 with lockdep (PROVE_LOCKING, DEBUG_LOCK_ALLOC):
+>
+>   - the reproducer below, 20 fail/remove/add cycles with fio in flight
+>     and a loop writing queue/max_sectors_kb, where the same test wedges
+>     the array before the series
+>   - array start at raid0, raid1, raid5, raid10 and linear, spare add,
+>     fail and remove, the rdev sysfs stores, ADD_NEW_DISK, array_state
+>     transitions, a level change and a raid5 3 -> 4 reshape to
+>     completion, which is what exercises patch 4's work item: io_opt
+>     goes from 1048576 to 1572864 once end_reshape() runs
+>   - HOT_ADD_DISK of an undersized leg, so bind_rdev_to_array() fails
+>     and patch 8's release path runs
+>
+> No lockdep reports, and debug_locks stayed 1 throughout.  Every patch
+> builds on its own.
+>
+> A blktests case covering this deadlock will be sent separately.
+>
+> The reproducer, for anyone who wants it:
+>
+>    mdadm -C /dev/md111 --force -e 1.2 --assume-clean -l 1 \
+>          --bitmap=3Dinternal -n 2 /dev/ram0 /dev/ram1
+>
+>    fio --direct=3D1 --rw=3Drandrw --ioengine=3Dlibaio --iodepth=3D32 --nu=
+mjobs=3D4 \
+>        --time_based=3D1 --runtime=3D180 --filename=3D/dev/md111 --name=3D=
+repro &
+>
+>    while :; do
+>        echo 128 > /sys/block/md111/queue/max_sectors_kb 2>/dev/null
+>    done &
+>
+>    for i in $(seq 20); do
+>        mdadm /dev/md111 --fail /dev/ram0
+>        mdadm /dev/md111 --remove /dev/ram0
+>        mdadm /dev/md111 --add /dev/ram0
+>        mdadm --wait /dev/md111
+>    done
+>
+> Jack Wang (8):
+>    md: pass a queue_limits down to ->hot_add_disk()
+>    md: don't wait for q->limits_lock in check_sb_changes()
+>    md: pass a queue_limits through the rdev sysfs stores
+>    md: defer the io_opt update out of the sync thread
+>    md: take q->limits_lock before locking and suspending the array
+>    md: pass a queue_limits through ->run()
+>    md: open new legs before locking the array
+>    md: link a new leg's holder before locking the array
+>
+>   drivers/md/dm-raid.c       |   4 +-
+>   drivers/md/md-autodetect.c |  38 ++-
+>   drivers/md/md-linear.c     |  30 +-
+>   drivers/md/md.c            | 661 +++++++++++++++++++++++++++++--------
+>   drivers/md/md.h            |  56 +++-
+>   drivers/md/raid0.c         |  16 +-
+>   drivers/md/raid1.c         |  26 +-
+>   drivers/md/raid10.c        |  37 ++-
+>   drivers/md/raid5.c         |  54 ++-
+>   9 files changed, 741 insertions(+), 181 deletions(-)
+>
+--=20
+Thanks,
+Kuai
