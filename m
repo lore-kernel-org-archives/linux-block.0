@@ -1,54 +1,106 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.152
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792500552;
-	b=vi2kgBmlE8nGj0RMP0YZH3Mb6hxOSdavobJW7JywXcfo2ZCHGQAA4wq9qGGVSJ/unIJg
-	 Zz0UJE6Xos4ZoGkXiUKoDeG16SQ/iqAR+aKnhyywEEtnAar5rcIofJkKjRtF/b7beTEc1
-	 cn+mNP/fjT09ZRNC1IFJoxzxw8PCRxRDXkNi+si3mPGB/etE8YK3XVvdMSjiXI4h30Z7r
-	 e7nJqTF4J2x2UzZ7mZYJApFFHI5zSDw+WqZ4rp/9hYz6Py41NqnJnMdy6oqxWOzJ5PcVv
-	 sptxSUN+Zh6ZtHrPH1giUqHT/7Ooa48Plx7gRHGUdV7iCO9IaHpZeqAicu1gsFvlaTA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792500552;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=FAeVOIir4HMk1KRsfGRYBGjRZCtdGNjoG1cMCUcwWcQ=;
-	b=qU/FxzLlFrXjAtS/s4xxKdQ0u4baNKoMoB6DrV3VHmd63YU8I3ExiO05WT8MEb+Xxkek
-	 vT+wvdPMvhR7A+fwDoCzbL8oikHIaP9su8npZed/9dRlbWj7PG4e8cAF3l2dCbdlYaQW8
-	 2Ht55pOtBptF0/tBuRFtR1hfXvuBPtrJt468iwahnTgdqKNQwxYwPVAuRwMbRkqBMr+6n
-	 hi9gBzotBeB6SAxctDbY0GdPznhVx5uv0RSfS3hapmoSL2sJV0yQO7yQfaD1s6JUcHum6
-	 oMqAQxG5lHt93Pe7O9XEU9RhmUVEp7uB9y0YTc9pnYFeqEMHzMyb1Vgnbm7bjBZPvFw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=oEUtcdpc;
-	arc=none smtp.remote-ip=91.218.175.152
-Received: from mta0.migadu.com (out-152.mta0.migadu.com [91.218.175.152])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.52.9
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792500749;
+	b=ZArUZ7xZ3TYn+FDuihbiMLLIIL2TT7wnH+dsF810CTHk8sdRBMChhlIVlBe3pQJEzkD2
+	 wJT73oXPkRzz2jaGEAIDIoBo1JcRdswEjiFQ21E6IXmfMVzDoAB5Huk30SYqVWm6t+8Qr
+	 iyQQvBzkU/1kObndSaQO4nktYdeG8VG7x6vSAdYNM+2JkosAsKUrdyt65mUg3sN7ueM4E
+	 lgNVNiFF7prz2jF9XmsIJ9BbeKWfrdwWtY4D3o23XuSLonTNjQes14lMt3LG0RCrpp5G5
+	 mx1WBN67hw/eiN0cFdkUBHQ6VDSdGgVe2fw0vNhta6ezeBpD19aBtFQXH4dZL3TDkig==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792500749;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:
+	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
+	 Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy:X-EOPAttributedMessage:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=Z9syTPfiC6hEWHcnLPr8tzi+ECDO4j0WuanQxl4vpJE=;
+	b=cK9tPHw3f3d4v/Ai2PIPtZIoSoyFz8q7kV6DsCdxE8hq40CK91hLDq7nz16gwnDzL5Ec
+	 sn9VdTt1e7mRvMLJ+RVqCBmlT02DXWVoN59RzPpbX9L4vbXZlwyPYr44CoStpHXrUbMUv
+	 3lhMhRr4G4sfgg7k1zvts975pgXHRl9mD0FTQ6gQId5Rr3Jx1Xh5TR0rnVi1dQDdTy80v
+	 IYsCfjXkQ8qplIs0aYDirvYm3T0xDFXtU2GNfcMHhUTiFR4G7KbNEZH1SY0+YQmE4ImAv
+	 e6JxJGi5YPirglZhStPNqHuQ4xE8MyR5Ul2Z/kds+S7g3/aPONCE31xZPwKiIJomYdw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=nvidia.com;
+	spf=fail smtp.mailfrom=nvidia.com;
+	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=Q4+CzYPh;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.52.9
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011009.outbound.protection.outlook.com [52.101.52.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EC8606A319
-	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 12:49:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D2EC8606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B06606A31D;
+	Tue, 20 Oct 2026 12:52:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 47B06606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=oEUtcdpc
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=O0ZvGw0ZoKFzAZ1EP4MQE4G7MB6j6Lu1fMegrKdHYqw=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792500548; v=1; x=1793105348;
- b=oEUtcdpcdk9esWoFxS2HUgXoj2xbr27DC60xMLZGGZFmXPL8YiZwHM+B/yNmyAzarE3ARB4O
- LzSToGH7VZtEp6FaCsEQ9+fbs+RBfgxqSrWKj1812CrIfpBFHXk+yT0+jHlHyyhVzsXqrUedkbV
- 2tLqIadHyowX1RgLxDTzByCM=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta10.migadu.com with ESMTPS id 765e9563e2983e52;
-	Tue, 20 Oct 2026 12:49:08 +0000
-X-Mizu-Trace-ID: 765e9563e2983e52
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <95c88c33-0184-4258-ac02-8eb42f346b36@linux.dev>
-Date: Tue, 20 Oct 2026 20:49:03 +0800
+	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=Q4+CzYPh
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eGRfWjcLtl1P0+ymn3zTuQVaoo/ENkhMDmhoO2Lrd+oP86EYRpl0oqw5mlDbb2OPakPxorxtCw6Nb/FPxz5vz6K5FIkrQFJqQS1xmveAa3RdiWLIsBcD9h6HLgy83qw6v8zeWMIH/7VmCdWDkbZifjZQfWmZaLm1xdAlbpoEChfI2wz0tiO8+zo0+W2AK8+kTKOapbsb0dIK3wn5ZgE1Q2q+seYB/VNhbhyGznT52gPbXBovp9Hf7lSgLpVUXI/mxbWC55lxNRmIWFm3aLuIMbit0YhVa5DuUm0qmISpOzCMNvAAi4s6qc4UbeDQSFjcE/a3C1Yi7zVNVZ/VqO+FBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z9syTPfiC6hEWHcnLPr8tzi+ECDO4j0WuanQxl4vpJE=;
+ b=cdu1wYiEjqMipCA+qY0kzPb8mno1NK9zkzp54O9LwFbkDZevzBKXY6EckrtN3B7tSfhb4Ms6EATj5PYhu9Jl1dJ6d/KxZVHjOFz7O7BhSrIaW0cKwVn/dOL7pZjXTg1jbuJYiB2aNNIipBcDCLQ9cs13AsCet3lcvFZTsArVyPWdXt7G/eMoGnDTvdwM6xySpbx1K3+/Y1ox6sv9ZQSCCEqn0Ysl/WgFt7tHqMWRO59HHQ5qXmyc7xzTlI7C8nGoDhr+75HRX3wY9ghCeLbEO66/uqwdzbEKcsS5QUar2hoTMrb6T72Wp1GDQotYa3cx3B5TcBKLO6dYAK+JIPn4Rw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.dk smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z9syTPfiC6hEWHcnLPr8tzi+ECDO4j0WuanQxl4vpJE=;
+ b=Q4+CzYPh0hvdHddtsBxeMZvlz1Aw3sEOiDeCwDXZKUHpy257EFXAQJj4CpljV3OULB3kwAwGKth5f6IlCnNydS6mgf8OjyohqT+nSg22bXWkAhH3/S9jU7b9ZJ9coPM8mUv9py+7LQtohLOF+BxoUq/dx4nK1YEBHgTZ7mP6BHJ4TYPiSoYLU2OD96OnVp4BvG59qjkCckJt7NRE2SpBB3CAzJ/E+eIQZAt6CksSQC1QnFh7wK+yYg9EBdjRpx/tRXj+X3wTLaFLIb6zOV6zF64GABGd4HczjjwoKf4nA3LZoAzosViPGWeqgzpl3ljmJaZi3eX3KCLJaX6vnExrtg==
+Received: from DS1PR03CA0014.namprd03.prod.outlook.com (2603:10b6:8:450::11)
+ by IA1PR12MB8310.namprd12.prod.outlook.com (2603:10b6:208:3ff::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.19; Tue, 20 Oct
+ 2026 12:52:26 +0000
+Received: from DS2PEPF00006E1F.namprd05.prod.outlook.com
+ (2603:10b6:8:450:cafe::65) by DS1PR03CA0014.outlook.office365.com
+ (2603:10b6:8:450::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.522.20 via Frontend Transport; Tue,
+ 20 Oct 2026 12:52:25 +0000
+X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
+ is 216.228.117.161) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF00006E1F.mail.protection.outlook.com (10.167.23.212) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.522.6 via Frontend Transport; Tue, 20 Oct 2026 12:52:25 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Tue, 20 Oct
+ 2026 05:52:06 -0700
+Received: from 82875d6-lcedt.nvidia.com (10.126.230.37) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.49; Tue, 20 Oct 2026 05:52:05 -0700
+From: Nirmoy Das <nirmoyd@nvidia.com>
+To: <axboe@kernel.dk>
+CC: <ming.lei@redhat.com>, <hare@suse.de>, <dwagner@suse.de>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Nirmoy Das
+	<nirmoyd@nvidia.com>, <stable@vger.kernel.org>
+Subject: [PATCH] blk-mq: clear stale inactive flag on hctx reuse
+Date: Tue, 20 Oct 2026 05:51:29 -0700
+Message-ID: <20261020125129.430600-1-nirmoyd@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,63 +110,104 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: add direct dispatch support for mq-deadline
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-block@vger.kernel.org, Kaitao Cheng <chengkaitao@kylinos.cn>
-References: <20261017105400.95967-1-kaitao.cheng@linux.dev>
- <307b05d7-16dd-493a-a10a-d5ac50ec219b@acm.org>
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <307b05d7-16dd-493a-a10a-d5ac50ec219b@acm.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00006E1F:EE_|IA1PR12MB8310:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1ad27586-d7cd-4105-40ca-08df2ea8fdda
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|23010399003|36860700016|1800799024|18002099003|10067099003|261009223027099003|11063799006|5023799004|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	j3n3uQCoTZP8WTe18BtS1r8JgK4dZqZ08tUpdpsFwCm7fnq+685dFGc4+DDJmI2GMoAvM9rUX3JwSOiisLKg70dxIs33kvtKEMw1pxNvgifRDjS1kwkKuNihmcH2d6ihhhgLHx2u5IJfYrnKi9iANg4LF1pL96o/M5SD6LsJImW8RSSpwGNTIU35xRdnMwom5mQb8Q2yiDOM80uD2sBzTt9EpPDqQQc+bWxu8mUESHP5xWIbBi6a7RqFOqywr6zesvaXaWXbFYLPQYYMCjwFNW4FjipOKYHB2a9K18IIOtZ7oh6Tj/QaAuiEHBlMIpNhn0mE7I/umnwHfvaCIuVmCH4Y7RhjKCiGsgpDB/bt0P2eR5mVBggsmRjrvvUxXBwHlsUlHdNHcsmBL5lihoeMIYQx13mNYwAStjExq9Bb7xsFWlIBfWDnPdQuRWEbyTNg8su6CORlHn2EN2EeCBIvuBNQ4sk4gMqUP9CoaOrF9+gTfhX//dhIXt3dxYW8j4/G/11sTUZrPJwlCcC6VWNRTUJqaB9e96DYp30tIZpUa9fwyoUE8wuABedUhi1OSwQDVu+uYbzb2X+ADiI/aOgHAVk4EuJG89ZuoTHFgbQH1ZhDFXu6gftFplqU/8LSOH+32VkGKTRUD28KkLIKdq92Ilk04H7jSnRBWqI39sENXfy70ePvk/IYkDHXepdua1l3W6co1PJ94PLI85NClDwEUg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(23010399003)(36860700016)(1800799024)(18002099003)(10067099003)(261009223027099003)(11063799006)(5023799004)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	oUa3YA7N3vU9y1sImCrsq4gYKgTwhX6KARUlXHcBFBFGRBZrmCxlfs9Sx8J2qaYUCCTOzHvYSMXtA5LV+hCJm2Sokpo9mniFwBRRCpd195A7qp7hzlqi+R14WVmoAE3renHJW+lUpl2Jtx7WqZFcX5md1Q3tfaCwcKuAwThf/gvX+SWtP7Iv2z2A2UwBbtZN/nDE4TbO7yVPspOHa4rJkOn/Q+vwZP3tICkWpZuZDKg5flyycHZNhpIBa9YHn+9LQN+FEQ3R5JLZOxlKayqGU5apFpPb7jjqVxQfYKtjx1NSK+DZ28OfiJ/uaNA9BK1k270eTvGMhqA908/B2J1/aLIf0Ws8NqR6qon0R8eaqDi65VlSSKoaNEz/KEbOuK4rZSfiBj1wHlZxUTi2vy2MBme3/WbSwFViAMVgt0jRBfUBm/SDJSevFCkGrvLXxv5n
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2026 12:52:25.5957
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ad27586-d7cd-4105-40ca-08df2ea8fdda
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00006E1F.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8310
 
+When the last CPU mapped to an hctx goes offline,
+blk_mq_hctx_notify_offline() sets BLK_MQ_S_INACTIVE. Updating the
+number of hardware queues exits every hctx and parks it on
+q->unused_hctx_list. A later update can reuse a parked hctx through
+blk_mq_alloc_and_init_hctx(), at any queue index, and nothing clears
+the flag.
 
+If the reused hctx is mapped to an online CPU, blk_mq_get_tag() keeps
+returning BLK_MQ_NO_TAG for it. __blk_mq_alloc_requests() sleeps and
+retries, expecting CPU hotplug to move the task to another CPU, so a
+task that stays on that CPU never gets a tag. Onlining the original CPU
+doesn't recover it either, because blk_mq_hctx_notify_online() only
+clears the flag on the hctx that CPU now maps to.
 
-在 2026/10/17 22:19, Bart Van Assche 写道:
-> On 10/17/26 3:54 AM, Kaitao Cheng wrote:
->> Bandwidth in MiB/s:
->>
->>    Workload        none    mq-deadline    my-patch
->>    jobs1-4k        1209           1047        1174
->>    jobs10-4k       2458            946        2349
->>    jobs1-32k       2568           2565        2562
-> 
-> Can I conclude from the above numbers that "none" performs
-> better than "mq-deadline" and hence that it's better not to use
-> and I/O scheduler rather than to complicate the mq-deadline source
-> code?
-> 
-> I have removed the linux-doc and linux-kernel mailing lists from the
-> Cc-list. Block layer patches should be posted on the linux-block mailing
-> list only.
-> 
+Clear BLK_MQ_S_INACTIVE in blk_mq_init_hctx() so a reused hctx starts
+like a freshly allocated one. A reused hctx has no cpuhp instances at
+that point, so the offline callback can't set the flag again before
+blk_mq_add_hw_queues_cpuhp() registers it. Clearing the flag in
+blk_mq_exit_hctx() is not enough, because a parked hctx keeps its cpuhp
+instances until blk_mq_remove_hw_queues_cpuhp(). Preserve the other
+hctx state flags.
 
-I ran additional tests on both a SATA SSD and a SAS HDD. The results are
-as follows:
+Reproduced with null_blk on v7.3 in a four-vCPU arm64 QEMU/KVM guest:
 
-    SATA SSD       none    mq-deadline    my-patch
-    jobs1-4k        294            295         295
-    jobs10-4k       133            400         401
-    jobs1-32k       470            470         470
+  modprobe null_blk nr_devices=0
+  mkdir /sys/kernel/config/nullb/nullb0
+  cd /sys/kernel/config/nullb/nullb0
+  echo 4 > submit_queues; echo 1 > memory_backed; echo 16 > size
+  echo 1 > power
+  echo 0 > /sys/devices/system/cpu/cpu3/online
+  echo 2 > submit_queues
+  echo 4 > submit_queues
 
-    SAS HDD        none    mq-deadline    my-patch
-    jobs1-4k        218            218         218
-    jobs10-4k      26.6           26.9        27.2
-    jobs1-32k       225            224         224
+Offlining CPU3 marks hctx3 inactive. After the two updates it comes back
+as hctx1 and is mapped to CPU0:
 
-The SAS HDD results show no clear performance differences. On the SATA SSD,
-however, mq-deadline outperforms none, and my patch preserves mq-deadline's
-performance. Together with the earlier NVMe SSD results, these results
-suggest that the patch combines the benefits of both none and mq-deadline.
+  # cat /sys/block/nullb0/mq/1/cpu_list
+  0
+  # cat /sys/kernel/debug/block/nullb0/hctx1/state
+  INACTIVE
 
-I also found in the NVMe SSD tests that disabling the direct dispatch paths
-used with the none scheduler causes its performance to drop to the same
-level as mq-deadline.
+A 4K O_DIRECT read pinned to CPU0 hangs in D state, while the same read
+on CPU1 and CPU2 completes. Onlining CPU3 again leaves hctx1 inactive
+and the CPU0 read still hangs. With this change hctx1 state is empty and
+the reads on CPU0, CPU1 and CPU2 complete, before and after onlining
+CPU3.
 
+Fixes: bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Nirmoy Das <nirmoyd@nvidia.com>
+---
+ block/blk-mq.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 025a799f35b924d..00b75eb95dd943a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4002,6 +4002,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 		goto fail;
+ 
+ 	hctx->queue_num = hctx_idx;
++	clear_bit(BLK_MQ_S_INACTIVE, &hctx->state);
+ 
+ 	hctx->tags = set->tags[hctx_idx];
+ 
 -- 
-Thanks
-Kaitao Cheng
+2.43.0
 
