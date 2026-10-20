@@ -1,99 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792519369;
-	b=PTKnqzSlMBfjMF150CcvKH4zxMNrt0gkXRK3ciPMEHJh1YRfN8KlIcr1yF24yIlDOAv3
-	 BEnr0xo4aLium1qvimlzn+pZcPzLV/J7bFsVpijOsSMiOs4u9iwy725/sB38Nx2IZuGbG
-	 qRR0e1NY/CqM3vIZG59+evhpbhVPpVVFuntYVd+I0pX+sZBygVIl+mGK/Azubmec0kpJG
-	 VHkFj+M9kmUBlFPsEuq1Ytpr0+LCjDawTlWki+KmUZPZGileX92tZpTPEc3FMKCW23ZJm
-	 MoAscXH0YlueMlSfnHgheVhDWIb2uSrs4dI+729RH1ilHIRMN18OBDBAeOgTX7A6RoA==
+	t=1792520564;
+	b=FvUgLG1o/ljK/AX7WtGUAEzCOplRjSFF6dBDrbcixFHcoCo2kxb7Itr+bcxa2vV0Pa47
+	 n5Elz4y1dcV1QsDXITqyA2SCDFRnW39dOoVIJAC+YxgQRhWgvb9mc0sOLbNsOM63FSwSe
+	 LTfSlU+XJa9CEhs6wexuaFg3fZrcoC5Qt6I3xvvptoER+64dXOvtDoh1OhfBckJdf6JtT
+	 lRp1DQQuXmazNkXxG8xkNA30iuH0pqYscE7kVGgQPynxjCAnzRgGEqbZp/sXsJABz7dau
+	 pUDdwBfYo0eH/RhHHMqF2WxJSl6ITZVSUjX11VxkukcmZAUNE1R4+JNezYtITR9stxg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792519369;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792520564;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=avcM7OeAOA9Xi/3SI/gsoJLps37fRmICI7MaAi6WXEY=;
-	b=mievqyqVEylobDNc5dqBgEpPBxlhdtZ/F4LpBh2ZYmUm1q4NC71iG1OOlW0iHhp8HVqK
-	 do4jxzc52I8+47t7zGgV0f7kKIOh/U3n7Pm3bmPy1fMVaqHcYa6R7cQ2sIZPJX5jqmNUN
-	 7SMxcnuZYz/o6yf0mXH+f3K0CM2Qh2H6gwCcV/ScyP9/dyN9Q7TFTJzTO+HC4m5sIPP8s
-	 Guzi/c1I/bRX2lt90k9NZgfWOSlAmL2K14YqF/vgas+4eYiA99vtP9YUe4tfBaQzNeEef
-	 UuAGko+j2LZdnmurmbVwUAobqrlNf0pKr9gmVk4a3N8opAAlNwtyrk6vR6J/LIHp+VQ==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=QBkELidHnujeG3xBjThPr+adF0FJwgUwsd5WBy30Lkc=;
+	b=p8ggt3ZoBsxSo5Yj4AhjbR+Ojx0FH3QZhSZrw/xg1AsJtashAyOG8ewK2BtI8RM14UHA
+	 JUdhDA/aB2dAM5zVHea9MM78D5RGpbt5GI2BXdY3ANZ9P/2OGLLl9bYjeubIJ5zThNqvg
+	 LiPOXk6e1ZrKe2s/w5kb6GEd14kx0OJJTBTK7ieykOywQl+Cun6rkLORZT0pCLGumvfow
+	 owsoZUyhZvwUBJbpU9f6rtFLpSO2F+7j8jcTr3rmQk0P1as8I5z1RyVy0thkAFFlix05o
+	 YPNJL1hikwYCDguxaqPRyXzhuaxd2Bj5qz7hiUx39l3VJS0iuyphCibuH68y1iAgiMA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=purestorage.com;
-	spf=pass smtp.mailfrom=purestorage.com;
-	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=e8wVzwOn;
-	arc=none smtp.remote-ip=74.125.82.44
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=UCiKwgE1;
+	arc=none smtp.remote-ip=74.125.82.174
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D9E606A31C
-	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 18:02:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C0D9E606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33B0606A329
+	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 18:22:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C33B0606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=e8wVzwOn
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-188406bb948so770141c88.1
-        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 11:02:48 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=UCiKwgE1
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-3514b90bb89so9736888eec.1
+        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 11:22:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1792519368; x=1793124168; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=avcM7OeAOA9Xi/3SI/gsoJLps37fRmICI7MaAi6WXEY=;
-        b=e8wVzwOnQPZkrfd74qmtUaU9b3PdCwX924N20xM8zCciinWuPoxxWJKjzYZvdkJY0l
-         OUJsgik+1L0nSFMIBY4Bb3tyzjIvr4kPeRgUSQob2MvmTyz14WXva/UUUd+zmi3FXssV
-         rlJGW5vaZpInwLHJ4HzTdb1S8hnMr4k+TrKNHRr/UfinA+DqdLntBhLH18h5f2dfIap2
-         PjXuSbAOr/QYowX4vmqs9XEGRvMwe7gnJ/VsiiKwH9foDEit9j7gzcV/HxPJbs5uMnCk
-         XrzwUTehR+0UpE6Q7HrcXUSiafT2L8356E9UKvcstkeJ3aPz1VJnQesVCrV2844VAk6p
-         b4ZA==
+        d=gmail.com; s=20251104; t=1792520563; x=1793125363; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=QBkELidHnujeG3xBjThPr+adF0FJwgUwsd5WBy30Lkc=;
+        b=UCiKwgE1munICdPucccsS61rgAr8sNDaXJOSU/TLALuS9a1Dr23yGosoCSNij4gb5N
+         aMItYkFB9I8uAu5e5l+qi7ilgNrv+u4c8WgoXeTS2GplpXRa/KlRUxzGg2cl+GEGAuEe
+         pfHXIe5HE5dtKMBixNO6bpP/CdhGjFqSW0Wg29BHp8X704DryyV1PnCKszt4YDmpZyLS
+         IbIz4GjiQxwRTdUwFuZbSaEv5et6adr71xuAb+NOjTVvvCgAgMwK5hFVWtP/4DHYs+xd
+         Ydjy65sfKvXYuJcbyZ+TmlK+G44mejeyiWB5i58vYOXiJSAyxZ6YImS5hyFm8+g5Mew/
+         DPTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792519368; x=1793124168;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=avcM7OeAOA9Xi/3SI/gsoJLps37fRmICI7MaAi6WXEY=;
-        b=F2Q5ZAIE9ieqKoEupAOpO58x7FVMEZXzr2NApQX9Ez2eRqnFFcjlB2LvMQArVrHijs
-         fbatEaCbbwkevB4z3O+e+wtM+EvjAKAIm0Kgo0l7mW3FoIE0tvJxiqbWbICzPyyem6k/
-         tIkbDaJtsd9yfi/rBgvPBxu2rcK81zs34z8OD1F3orOdMIX16xTJOk3cW+SzGqu9Sqqu
-         QU6wiDuZRQYDA1UeL0bKbMs7Vp7A1HHpooqOs0CcjbtL7955xHfegRygm7h2xbI1CSNp
-         BLmZWqdvT6X7/ruoZAXwN/xCpYzgrHrDV1cz9kqWBJkS74gyxKHFUxfbPnQu1DyHGkhU
-         Izfg==
-X-Gm-Message-State: AFq9FYIk2BflhfPDaFuzpHDC4bkN2gq4+eC4a8jJ3xLUhCgQWDcf9R9B
-	C4Jv176V+QWriewK2AkS3RdufBMYuzE0P3vdciTZpXzhI8+rBJfG04kjvyCLRiVPgVk=
-X-Gm-Gg: AYBFou31uvM5vh0p3coL/DSLYY7BLc+Pi85I4AeTWt++ixgYjbcVeAhZ7bR2mbOs74M
-	YoL1J+itPLIUyiUKkb/hxrT4nQ82Xo93eAQTJ/uqC6wWxHtQ4GiYkwFQSYf3u5w89vuWuWAaScO
-	uXkt5ZzdCsHayE0Ht0pNmuKdMZHxaE7PLwHhUWzXygzvmhLiEtPRtoBOFnvtENq8rFEAW8sh/NV
-	g+4or4CmUH3JD7sIeanCtv1e08Ok0elZRfn3/SmTsR7V1DMb6cEGG5tuLwS8Qc9CnND5AH6f1ED
-	a+Yn0g8bWTVZiOz77XLSJvStlQ5EmJeG90oKCpzpij21unlzzdC0b9jqFLS9fclzxhm08dmqP5Z
-	bhUG5TYXZwRpkeNbP6flcf6WISs/xLjh1tnRbZhaSNgDUKs5/z09xHZ7YpUx2WBV9QnNVA3fjku
-	qjHT5F9rl1PeF7BNtsjrm2YHHIDPm/D8NYg5YpSmvGm4ogVYnAmZneac+BRYSafKur68PpKlnpP
-	l9EduD/2Wlo7EKprzBk
-X-Received: by 2002:a05:701b:261b:b0:14d:3c0c:79e8 with SMTP id a92af1059eb24-1851160d02dmr17991943c88.10.1792519367321;
-        Tue, 20 Oct 2026 11:02:47 -0700 (PDT)
-Received: from medusa.lab.kspace.sh ([208.88.152.253])
-        by smtp.googlemail.com with ESMTPSA id a92af1059eb24-1903cce5accsm278639c88.18.2026.10.20.11.02.46
+        d=1e100.net; s=20260707; t=1792520563; x=1793125363;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=QBkELidHnujeG3xBjThPr+adF0FJwgUwsd5WBy30Lkc=;
+        b=tPN0hMi6ByPVZutyPwOJR8Ib6+d+LlIFLSxfQdLaKdFHGgI5LdqX+aqbkVOfnW+M1P
+         j7hN5Wy9LjFUI+c73lFfAO/RXlTunqLreYXd7nh7jfRkk3+XDDyGzLLKnVcKbBFgqEqA
+         qkhqbN+iulV9O+CDFstOBhmUuZE/422KSaKF6UPvYQnRflwcl9C1iS8n5+JjWTb/ybUS
+         u0VVknOn3H/z1CetCkZ6Gh2qoA8MVmwDcBfUww9hCK7ez8x68Uc96hiiXzwso3e7Y/yA
+         aXzm5hIJiXAgkKRPSPinwsxfzB1RR6lWv8Wz3U+ELZVTTsVvkmeAh9SDQZhoV5s3lRPr
+         wZiA==
+X-Forwarded-Encrypted: i=1; AKwUvByHq+qgiTN9crgP8BC/8I6iPnOrZwi9QiheGpnJTaHreETfj8rk9rp/k/In7Ks0286R/QpYBaTFYt1PBw==@vger.kernel.org
+X-Gm-Message-State: AFq9FYI6mHAsEfbdYMTO6yiog7u/6cFlr+3uCarXnKOWCQpnkwupBN6P
+	dDCUOoB7r/a18CL1TmdzbflC1kEvE5El8t9UxVmBNDsIMTwQUKKiclFW
+X-Gm-Gg: AYBFou2RzfkuQLLJx599Yt7WZOV7cGQrrSU50R02+0hxbs/gev25GWR/F8OLJu6TjJ3
+	Qu49GMPfi+2Nxfss5gxOGqo2KixjmCtJNL8EifmS+Wy7ZZ5kbNea4hfrn7hjwuOZ396S44xwEzj
+	unrWxP4BZWSWVbJccLMvUtWXUkfOrNterjWmbM1TFt1UEyIS+3WR0orkyI/VajZPNtH8NQcHFWV
+	8i8mij8Dd1VF7fxUn9XpQoK903a3g7HI0yP28M+pcP9RF6wliGCxPcJwEc/RIODytgGB4O5osr6
+	D91P0lLBg42JwdzF81ODstlETDL7P2qDNLVRKdFFwMdjhm0sGtvbecDzc+/OB1eonYLHVmEYSll
+	h0F94BEPqaqf/t1OrBvE+tt5twogxPl3lEW997UvUnjT9ns5OjHH54mlYgu09p0LdGQ5hkLLkpG
+	g+r6eyyQMSVObjHXUbHHrBC0/e6kIvEK6RVNNKKSyGNEMnZy3o95E9qj4OAN9QNkHRW3WXeOsuU
+	lPzjoMXVoQ1xNj2SNC9n/UyP013g5AbN6K09LWr4T/E1jTWomQvNYs=
+X-Received: by 2002:a05:693c:65cc:b0:367:23b6:94e1 with SMTP id 5a478bee46e88-3674e25bf5cmr71459eec.41.1792520562401;
+        Tue, 20 Oct 2026 11:22:42 -0700 (PDT)
+Received: from localhost.localdomain ([206.206.192.161])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36740cc8439sm402866eec.11.2026.10.20.11.22.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Oct 2026 11:02:46 -0700 (PDT)
-Date: Tue, 20 Oct 2026 11:02:45 -0700
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
-	John Meneghini <jmeneghi@redhat.com>,
-	Jesse Taube <jtaubepe@redhat.com>,
-	Randy Jennings <randyj@purestorage.com>,
-	Dhaval Giani <dgiani@purestorage.com>
-Subject: Re: [PATCH blktests 0/5] nvme: detect ABA ghost writes on multipath
- fabrics
-Message-ID: <20261020180245.GP2931-mkhalfella@purestorage.com>
-References: <20260917020752.1672578-1-mkhalfella@purestorage.com>
- <arOFG9-sM_GrrbQf@shinmob>
- <20260923170238.GH2931-mkhalfella@purestorage.com>
- <ar8eGV4jsEchjk-R@shinmob>
+        Tue, 20 Oct 2026 11:22:41 -0700 (PDT)
+From: Yibo Liu <yiboliume@gmail.com>
+To: Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	co+0845f49852fd568f@bugs.sh,
+	Yibo Liu <yiboliume@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] drbd: validate digest size in checksum resync and verify requests
+Date: Tue, 20 Oct 2026 18:22:00 +0000
+Message-Id: <20261020182200.236875-1-yiboliume@gmail.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -103,54 +100,90 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ar8eGV4jsEchjk-R@shinmob>
+Content-Transfer-Encoding: 8bit
 
-On Fri 2026-10-02 05:03:20 +0200, Shin'ichiro Kawasaki wrote:
-> On Sep 23, 2026 / 10:02, Mohamed Khalfella wrote:
-> > On Wed 2026-09-23 17:18:21 +0900, Shin'ichiro Kawasaki wrote:
-> > > On Sep 16, 2026 / 20:06, Mohamed Khalfella wrote:
-> > > 
-> > > Mohamad, thanks for the series. Before I look in the details of the patches,
-> > > I would like make a comment below.
-> > > 
-> > > > Reproducing the race needs an IO that can be held at the target for
-> > > > longer than the host's io_timeout without being failed. The first three
-> > > > patches give miniublk that ability, since there was previously no way to
-> > > > talk to a running ublk server at all:
-> > > > 
-> > > >   1/5  adds a loopback UDP control channel to the daemon, served by a
-> > > >        detached thread, one reply datagram per request
-> > > >   2/5  adds an INJECT_DELAY command which delays a given number of reads
-> > > >        or writes as an io_uring timeout on the queue's own ring
-> > > >   3/5  exposes it as "miniublk inject", which returns only once the
-> > > >        daemon has armed the delay, so a test can start IO immediately
-> > > >        without racing it
-> > > 
-> > > It is interesting to implement the delay feature to miniublk, and use it as the
-> > > testing tool. But I'm not sure if this is the best approach because of two
-> > > points. First, scsi_debug has jdelay and ndelay options. I wonder if this
-> > > existing feature can fulfill the requirements of the new test case. Second, when
-> > > rublk [*] is available in the PATH of the test system, blktests detect it and
-> > > use it instead of miniublk. I guess the added delay feature is not available in
-> > > rublk, and the test case won't work well. What do you think of these points?
-> > > 
-> > 
-> > The two points make sense to me. Let me look at scsi_debug delay
-> > injection mechanism first and see if it can be used here. I will also
-> > look at rublk. Thanks for the pointers.
-> 
-> I've learned that now delay injection is being added to the block layer [*].
-> This looks more generic and could be the best way for this use case.
-> 
-> [*] https://lore.kernel.org/linux-block/20260928221634.43239-1-haris.iqbal@linux.dev/
+receive_DataRequest() sizes the digest buffer of P_CSUM_RS_REQUEST and
+P_OV_REPLY packets from the length the peer puts in the packet header,
+without checking it against the digest size of the negotiated csums-alg
+or verify-alg. w_e_end_csum_rs_req() and w_e_end_ov_reply() later
+memcmp() crypto_shash_digestsize() bytes of that buffer; the D_ASSERT()
+on the size only logs a message.
 
-Thank you for pointing me to this patchset. The change as in v3 in the
-link above is not sufficient for this case. Block layer "error_inject"
-does not support an option to set the maximum number of times a rule
-should be executed. I want only the first write to be delayed for the
-test to be deterministic.
+A peer that sends a shorter digest thus causes a slab-out-of-bounds read
+in the worker, and a peer that declares a huge length makes the receiver
+attempt an oversized kmalloc() that triggers a page allocator warning.
 
-That is said, it should not be difficult to close this gap. I will give
-it a shot.
+  BUG: KASAN: slab-out-of-bounds in memcmp (lib/string.c:676)
+  Read of size 8 at addr ff11000007b9d630 by task drbd_w_r0/601
+  Call Trace:
+   memcmp (lib/string.c:676)
+   w_e_end_csum_rs_req (drivers/block/drbd/drbd_worker.c:1182)
+   drbd_worker (drivers/block/drbd/drbd_worker.c:2189)
+   drbd_thread_setup (drivers/block/drbd/drbd_main.c:314)
+   kthread (kernel/kthread.c:436)
+   ret_from_fork (arch/x86/kernel/process.c:158)
+   ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
+
+  Allocated by task 605:
+   __kmalloc_noprof (mm/slub.c:5439)
+   receive_DataRequest (drivers/block/drbd/drbd_receiver.c:2715)
+   drbd_receiver (drivers/block/drbd/drbd_receiver.c:5371)
+   drbd_thread_setup (drivers/block/drbd/drbd_main.c:314)
+   kthread (kernel/kthread.c:436)
+
+Reject the packet and drop the connection unless the declared digest
+length matches the digest size of the corresponding transform, or if
+no such transform is configured.
+
+Fixes: b411b3637fa7 ("The DRBD driver")
+Cc: stable@vger.kernel.org
+Reported-by: co+0845f49852fd568f@bugs.sh
+Signed-off-by: Yibo Liu <yiboliume@gmail.com>
+---
+Changes in v2:
+- Drop patch 1/2 (P_DATA_REPLY size check); this is now a single patch.
+- Check the digest length only in receive_DataRequest(), before the
+  buffer is allocated, and leave drbd_worker.c unchanged: with the exact
+  size enforced on receive, the sizes compared in the worker always match.
+
+v1: https://lore.kernel.org/all/20261015222800.85928-1-yiboliume@gmail.com/
+
+ drivers/block/drbd/drbd_receiver.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 2135c14354a8..d45c4e68f83b 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -2711,7 +2711,17 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
+ 		break;
+ 
+ 	case P_OV_REPLY:
+-	case P_CSUM_RS_REQUEST:
++	case P_CSUM_RS_REQUEST: {
++		struct crypto_shash *tfm = pi->cmd == P_CSUM_RS_REQUEST ?
++			peer_device->connection->csums_tfm :
++			peer_device->connection->verify_tfm;
++
++		if (!tfm || pi->size != crypto_shash_digestsize(tfm)) {
++			drbd_err(device, "%s: unexpected digest size %u\n",
++				 cmdname(pi->cmd), pi->size);
++			goto out_free_e;
++		}
++
+ 		di = kmalloc(sizeof(*di) + pi->size, GFP_NOIO);
+ 		if (!di)
+ 			goto out_free_e;
+@@ -2742,6 +2752,7 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
+ 			goto submit_for_resync;
+ 		}
+ 		break;
++	}
+ 
+ 	case P_OV_REQUEST:
+ 		if (device->ov_start_sector == ~(sector_t)0 &&
+
+base-commit: c03c1a14507dfaf8b856c2608f9ac216021fc222
+-- 
+2.34.1
+
