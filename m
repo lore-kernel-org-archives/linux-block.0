@@ -1,35 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792515771;
-	b=Id268nuGysiPgT56UBJ0tAMQTk8THp5BuNOoAc7uC1nS9KcXBXmfkLjAruw49aJFth56
-	 ENFs6107HSSN1Nl438EfT3ePGCMies+7vzSkFZ4g4yIWTl4g32ZFAPuXrN9FKM/sVPRb0
-	 G9OyH9Sf7jtatVC2yuaugJVfNs8DcK/q6MLb2HlSMcHpMh3MgSzUPc8feNHN/uMbXSpjB
-	 vEUykCOs0KlmA+HJ8nOdqST0XL5VFcNVMZypELO0rJ5mQDzAz+ao1IE3KR5nkjg5ohe1L
-	 u4BcSLpr7OM8K3gp0afPar3kZOHM24+0JBH3gLLQzQfATBlzejX159zj6D5lTsQJo0A==
+	t=1792515804;
+	b=qxdBpLBqvMOtNMblODEi+DVHOaMhP6ew/Un2dEStiIQ6RM+DQJbljpR79+i80MbeEcha
+	 1XYPaQv6ZZE5vj9/fsCVE6TnsDIFrbrEHAgIOWO6YFwufciNcSJL9nNymb7+cWdv+4Txn
+	 zqznXaaWBkI6Uw5DrZpNPVlYQg11SFn9OwCTl2kvuqqK2iv5Fv4WpG+itbsSg4LDhNrfZ
+	 aSTiurMhJYKYS7W/MK87CAdNBl+n8EMzrnmTBBY3TwAGf2R0+Rona/o3ssJA2uLpizjyX
+	 ht1VlVKZmxzlIFobgeiWwfqW/d3EID9MIxA5wg/yvNgDPx3L/3HgBwgcjQzSd44HUCA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792515771;
-	h=Received:Date:To:From:Subject:Message-Id;
-	bh=4xfhOuk4fAlufgZQ81Jax6/icLSHwd6Prm1rRP2LfnI=;
-	b=pnZHdoFUH4qX+1x5uWgAlk3tLTmMAGw30JPBoGwEY+PKiLqW5A6Py21SCmIP13T9h6YM
-	 3sEA3mTrhe8yMXwYEHrReutS6kJS5LeM5cFbToc8PyEmLLTswB9gXeJ/Yx2N0fDRd74Ll
-	 iYL+kWR0/hPwx40C3yFMlm+DXew8pxJHOboCFzxXt6oOEPKsNOfZCxLtyfYy4vZkGa00o
-	 vudx+yg6VYZuBlDs+z1eEMzH76zovyQApq8o77HozuRYeWhA5DWz/5DzjTmNSf+KSjppk
-	 GWRLqlfT1XmeO1vOpPnYgmjjCAXVlZm01gGBTArvKR5Kr95M/hOMQliGTOXZcTeZFZQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792515804;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=oESoAQCuZrNGKORfGFDQ3eqpeMZSdJxrF4wmGNCHWgE=;
+	b=l/GnUfTUvIpLyucUyVHFTRF5dsAl2oj302wWQvOq684Dnv6WueniULtm/asWbl1vjoVv
+	 aM0p8d1zBZgMdk80iHUc7M/kzDT0YzrbBJSy+psYKiCEVVFnlfnN5shTdHVN6SXy3pwEo
+	 p4eVrlrOfcNe4RkN7b6LOsWs4rxZphVux8ji4VuC8jV3OfL5mvpnv/9pCFBig05YvGvVu
+	 gApRrZlGauAC5vcF8RLudm4DFAEC0tGZsKHYqbq69gkHevfGWKdxNdopWnF4A4TiYZouZ
+	 DLUornzgI0ghwZYihUn93l/dBbXlE+n+ZrBdi1+lluPhskPT0PUX18eqX+HduhMFx4A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=infradead.org;
+	spf=pass smtp.mailfrom=infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=oZ8yZ0zi;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F48606A336;
-	Tue, 20 Oct 2026 17:02:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 014BD1F000C9;
-	Tue, 20 Oct 2026 17:02:49 +0000 (UTC)
-Date: Tue, 20 Oct 2026 10:02:19 -0700
-To: viro@zeniv.linux.org.uk,tz2294@columbia.edu,stable@vger.kernel.org,l1za0.sec@gmail.com,kbusch@kernel.org,hch@lst.de,hare@kernel.org,4ncienth@gmail.com,akpm@linux-foundation.org,linux-block@vger.kernel.org,axboe@kernel.dk
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: [patch 1/1] block: restore the iterator when rejecting a misaligned bio
-Message-Id: <20261020170250.014BD1F000C9@smtp.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A973D606A333
+	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 17:03:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A973D606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=oZ8yZ0zi
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=oESoAQCuZrNGKORfGFDQ3eqpeMZSdJxrF4wmGNCHWgE=; b=oZ8yZ0ziv4/4+5loOTwkNJ5tJ+
+	SOV1UhheQNrl+fXhTxDcKK8+zSOktH4f7qXY1lnDyzGDLihaMb8G0DITJZhk0rF00/8IwSAQvdLFt
+	nOM0arIqTk6WLjt4IMbk35CBu10owJ3myoa5djeD4Hahf8dtfkG3lFDh7U6Uve1cd+4cMUuhsGc1K
+	aEa0Eu4UlVa1u60R0qtcT6ZfnRbD8Z4E64HTW85qnNJjd3rmrbbM96isIgY9nV7+p/dtwjhFszQfC
+	1yhyf7HODc4Zr8y74owifzydYTDcQyYt3SEJFBJcIQtFEljfY1msBzJxuzfhxC9p4uQD8C8jX0kDk
+	T4XPE6bQ==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1xJDFD-0000000AImT-0PUV;
+	Tue, 20 Oct 2026 17:03:23 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-block@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Phillip Potter <phil@philpotter.co.uk>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] cdrom: drop linux/fs.h from cdrom.h
+Date: Tue, 20 Oct 2026 10:03:22 -0700
+Message-ID: <20261020170322.3687068-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -38,81 +63,31 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: block: restore the iterator when rejecting a misaligned bio
-Date: Sun, 18 Oct 2026 17:30:00 -0700
+The comment "not really needed" has been there since the inception
+of git history. I have done build testing of all files that use
+<linux/cdrom.h> with no problems found.
 
-bio_iov_iter_get_pages() can extract some iovecs before encountering a
-misaligned one.  It releases the pages and rejects the entire bio, but
-leaves the supplied iterator advanced.
+<linux/libata.h> includes <linux/cdrom.h>. I have also build tested
+99% of the files that use <linux/libata.h> with no build issues found.
 
-An iomap direct-I/O caller may subsequently reexpand the iterator's
-byte count and fall back to buffered I/O.  The reexpanded count then
-includes bytes before the iterator's current segment, potentially
-causing iterate_iovec() to read beyond the imported iovec array.
-
-In a reproducer using an initial empty iovec followed by 10-byte and
-1015-byte segments, writev() returned 1015 instead of 1025 and KASAN
-reported an 8-byte read beyond the nine-element iovec allocation.
-Saving and restoring the iterator on the rejected-bio path makes
-writev() return 1025 and eliminates the KASAN report.
-
-Restore the entire iterator rather than reverting a byte count:
-advancing past an empty segment changes its position without consuming
-any bytes.
-
-Leave successful and partially accepted bio paths unchanged.
-
-Fixes: 14b007e17881 ("block: validate user space vectors during extraction")
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-Reported-by: Haocheng Yu <l1za0.sec@gmail.com>
-Closes: https://lore.kernel.org/20261018081203.2431035-1-l1za0.sec@gmail.com
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Tal Zussman <tz2294@columbia.edu>
-Cc: Daehyeon Ko <4ncienth@gmail.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Hannes Reinecke <hare@kernel.org>
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 ---
-Testing on x86-64 QEMU/KVM with generic KASAN:
-- Before: the ext4 writev() reproducer returned 1015 instead of 1025
-  and triggered an 8-byte slab out-of-bounds read.
-- After: 100 consecutive reproducer runs returned 1025 without KASAN;
-  60-second buffered and direct ext4 fio runs passed.
-- Daehyeon's alignment patch independently avoids the reproducer.
+Cc: Phillip Potter <phil@philpotter.co.uk>
+Cc: Jens Axboe <axboe@kernel.dk>
 
-Tal Zussman's pending atomic-write changes introduce another rejected-bio
-cleanup path. If both patches are combined, restore the iterator there too.
- block/bio.c |    3 +++
- 1 file changed, 3 insertions(+)
+ include/linux/cdrom.h |    1 -
+ 1 file changed, 1 deletion(-)
 
---- a/block/bio.c~block-restore-the-iterator-when-rejecting-a-misaligned-bio
-+++ a/block/bio.c
-@@ -1285,6 +1285,7 @@ int bio_iov_iter_get_pages(struct bio *b
- 			   unsigned mem_align_mask, unsigned len_align_mask)
- {
- 	iov_iter_extraction_t flags = 0;
-+	struct iov_iter saved_iter;
+--- linux-next-20261019.orig/include/linux/cdrom.h
++++ linux-next-20261019/include/linux/cdrom.h
+@@ -11,7 +11,6 @@
+ #ifndef	_LINUX_CDROM_H
+ #define	_LINUX_CDROM_H
  
- 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
- 		return -EIO;
-@@ -1303,6 +1304,7 @@ int bio_iov_iter_get_pages(struct bio *b
- 	if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
- 		flags |= ITER_ALLOW_P2PDMA;
- 
-+	saved_iter = *iter;
- 	do {
- 		ssize_t ret;
- 
-@@ -1320,6 +1322,7 @@ int bio_iov_iter_get_pages(struct bio *b
- 				bio_release_pages(bio, false);
- 				bio_clear_flag(bio, BIO_PAGE_PINNED);
- 				bio->bi_vcnt = 0;
-+				*iter = saved_iter;
- 			}
- 			if (!bio->bi_vcnt)
- 				return ret;
-_
+-#include <linux/fs.h>		/* not really needed, later.. */
+ #include <linux/list.h>
+ #include <linux/blkdev.h>
+ #include <scsi/scsi_common.h>
