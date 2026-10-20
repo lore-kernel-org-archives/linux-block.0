@@ -1,72 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.127.231.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.66
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792479444;
-	b=hnHlsgFlfwTlQy3icvuByUfmODyJrIoIZHQK8sysGmmb3lix4kzGajyaibn3W9/8vkY/
-	 0/BsMzm1n2BoVG6WqIyUzejcdPClLRmL9TYQY42Q+zCXqjgbXU6H4yw/zEv+EBJ84hW2L
-	 +5S5UqZtBuwOHUg4/46uuF2KyE3BKl4nCqppx0Ps9c4hZo16YEVSwcHrJvHv6VUDSCEWT
-	 G/ETCEZO1/+eWL/426Z57vyrWt5C4C6FhsDTT75VF2liEEJ6Q6hzwO3lxpE7EKTsiU4vF
-	 JBLrWAuipB7vgrMeL5Sl0eZ38kb3CL8gsEHyDxXXn1wuHnpFu5I6tb3TeyLv0CZQtTw==
+	t=1792487795;
+	b=02+ixKrbrsFLdmdnHQOsbR9wjJ0ZYdTgkM7R/WFlok+if8SXCmzS51fEtYzLXXFIDU7+
+	 0RkGPtOjWVOTvaPEJ92SyJwTxOyGlbRFDWGuq/j6M5uThRKP8wiL4YZa3vOlQqeucn+/D
+	 tPdWlDbZdemqXyzFPxl1Zw6QG76vLJo+58FY8S+UuYwKhxHLKx6J9GmuJXveurLGnUGbN
+	 n/Z1Oy9j1/gi7hlbt6otBr2tZfns2XqAqhyDjDtL+gqGt2ypYd0SIMaYKVFcUwpmFTDjb
+	 Td70nN6LTvD098IL9cfJtnwJYHUUfLapdKTCEA0w77sw3DHGxvwn00POSnqxoW3HuFg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792479444;
-	h=DMARC-Filter:DKIM-Signature:Cc:Message-Id:To:Received:
-	 Content-Transfer-Encoding:Reply-To:Subject:Date:User-Agent:
-	 X-Lms-Return-Path:Content-Type:From:References:X-Original-From:
-	 In-Reply-To:Mime-Version;
-	bh=YmzrkAr1UCdFF1b7GSnZNeQasDWPbv25bVPLQoA0QTE=;
-	b=gKGEvrCgkOmzBg4WCvNy86s4bb4+GnK36DjcjTdBHB7x6na4EHUcL8zXTS9zeopvFEdW
-	 7zseSdT5CZIr9IWFlVxnWps8oU/jOT9ViCPLysIwm2eaf0tC99e0CEoS+Cs/WjKUcSUK4
-	 RBKHD13w+AfwCQvsDNXaHi5rBG8Hl2ZG6cJvXvZ6qqaVdc6IYKoguCLzekdH5W7E613JO
-	 AnXhCN8G05eQXqj0rvPBLh13N0ZwC8fIhZ6g6GnutTi89/7vsrRRvwpNCQzdZbQN+/VyS
-	 ecoaU90pJ+uSQqeO3hz7elvJhOoUXRTARZbaJvAUvcEYCPsbAkT4u1ebyq6uaVq68bg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792487795;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=fgVCjXg66MfmXK1DhMhAdx0UFOlMxpw0/DgjoCbhR4g=;
+	b=fvVUC8B6QOjD+Ty/JFXYM+kZ/7mM7HKo2ZorG+/7/7N79NVTLBYMXEnOoNEoQ/fczsJ3
+	 jCnSFswcegqWLy7c91YOUwmagT9x7WjqQ1f+t/VNxVHehCmgkcvHqkm85Eq7Y41iNhGr5
+	 faJesW+6YMgqmr1jTYYw72J9fe0j6iWdeM9oiEFqO0mjmmPzRXV5hHqs+WwRddMD8u0gW
+	 b44jZyibZEEiGStCf+d42m8NUGWnxMhQYuTpjXjYfJiwsBSufjW9Ah1JKf3HhJnZF1/ym
+	 pE18+LBwaGzl8frgsHznd7PF8A1HxgopRKwiX5CW2LkC2eaGzPt98KS8K3QMCHlfmzg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fygo.io;
-	spf=pass smtp.mailfrom=fygo.io;
-	dkim=pass header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=OMdnNeHn;
-	arc=none smtp.remote-ip=209.127.231.47
-Received: from va-2-47.ptr.blmpb.com (va-2-47.ptr.blmpb.com [209.127.231.47])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VXWXviUg;
+	arc=none smtp.remote-ip=91.218.175.66
+Received: from mta0.migadu.com (out-66.mta0.migadu.com [91.218.175.66])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1773B60A3834
-	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 06:57:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1773B60A3834
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79324606A326
+	for <linux-block@vger.kernel.org>; Tue, 20 Oct 2026 09:16:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 79324606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=OMdnNeHn
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1792479433;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=YmzrkAr1UCdFF1b7GSnZNeQasDWPbv25bVPLQoA0QTE=;
- b=OMdnNeHnsa/x0j5hsYN3yNbcS2qb8SQ9eZpoRASiKSgY2V82t8+wNZ6lTor20AbDKTzRtS
- pf5W4k2tx/cIl+kLCJJ9cXRwY/CPQ1dLUe67JlDi+SCr/Dvfq6/+PPK0Qy1r56MsPSrsOG
- asiSe4KnszoJmlVNhxXun2cXLPRDHXvkL7Alxr8yEEX/knK0dpjHuTebAk5hkYnHjFxitY
- 1E4M4APSta6jqKk2Yqc1m1cB5WGUdnoKgItjZtuCKry+8CZeUO4dl3fkVWzx+jzHmOCejT
- JDh5xsDJoNRpqjoFVXqkAl1yXDhoreUE17YVJbIT1ysN+SCBSpXmwalD5S88Sw==
-Cc: <linux-block@vger.kernel.org>, "Jens Axboe" <axboe@kernel.dk>, 
-	"Christoph Hellwig" <hch@lst.de>, "Damien Le Moal" <dlemoal@kernel.org>, 
-	"Ming Lei" <tom.leiming@gmail.com>, "Xiao Ni" <xiao@kernel.org>, 
-	"Li Nan" <magiclinan@didiglobal.com>, 
-	"Mike Snitzer" <snitzer@kernel.org>, 
-	"Mikulas Patocka" <mpatocka@redhat.com>, <dm-devel@lists.linux.dev>, 
-	<linux-kernel@vger.kernel.org>, "Jack Wang" <jinpu.wang@cloud.ionos.com>
-Message-Id: <e2c36f31-d198-40a7-a18d-156e1fd6fbb2@fygo.io>
-To: "Jack Wang" <jinpu.wang@ionos.com>, "Song Liu" <song@kernel.org>, 
-	<linux-raid@vger.kernel.org>, "Nilay Shroff" <nilay@linux.ibm.com>, 
-	<abd.masalkhi@gmail.com>, "yu kuai" <yukuai@fygo.io>
-Received: from [192.168.1.104] ([39.182.0.21]) by smtp.larksuite.com with ESMTPS; Tue, 20 Oct 2026 06:57:11 +0000
-Content-Transfer-Encoding: quoted-printable
-Reply-To: yukuai@fygo.io
-Subject: Re: [PATCH v2 0/8] md: don't wait for q->limits_lock while md holds back I/O
-Date: Tue, 20 Oct 2026 14:57:07 +0800
-User-Agent: Mozilla Thunderbird
-X-Lms-Return-Path: <lba+26ad710c8+d38c61+vger.kernel.org+yukuai@fygo.io>
-Content-Type: text/plain; charset=UTF-8
-From: "yu kuai" <yukuai@fygo.io>
-References: <20260910081114.1605746-1-jinpu.wang@ionos.com>
-X-Original-From: yu kuai <yukuai@fygo.io>
-In-Reply-To: <20260910081114.1605746-1-jinpu.wang@ionos.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VXWXviUg
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=9eP3qjgVUbFfqUcF5YGr57onnQc45ct6s0INEa2Ebw8=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792487786; v=1; x=1793092586;
+ b=VXWXviUgLFBknZK+dXQMJD2opDdEMVE/cZ/3qSzssNRpsItYDpeGBg7DYwuILh0VryDri6KL
+ oG1btPXLvLKGSJNsy4M1Hh1+41q+UVyMjWpK1vApTOqPMdpAMLmlKwQ4+RqbNC4cyZApJtfS7Nd
+ 7ExI8i53YCSA+BxNDFWxvjQs=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 8edb85ba72c7628e;
+	Tue, 20 Oct 2026 09:16:26 +0000
+X-Mizu-Trace-ID: 8edb85ba72c7628e
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <6e7d6232-d422-47f3-bc85-a52508cb172f@linux.dev>
+Date: Tue, 20 Oct 2026 17:16:20 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -75,172 +57,44 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, axboe@kernel.dk, josef@toxicpanda.com, yukuai@fygo.io,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] blk-iocost: fix hweight cache publication and
+ donation fail-safe
+To: Kunhai Dai <daikunhai@didiglobal.com>, tj@kernel.org
+References: <20261019125412.3123895-1-daikunhai@didiglobal.com>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20261019125412.3123895-1-daikunhai@didiglobal.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Hi Kunhai,
 
-=E5=9C=A8 2026/9/10 16:11, Jack Wang =E5=86=99=E9=81=93:
-> From: Jack Wang <jinpu.wang@cloud.ionos.com>
->
-> Writing to a queue limits attribute of an md array while a spare is
-> being re-added deadlocks the array.  I reported this earlier here:
->
->    https://lore.kernel.org/linux-raid/CAMGffE=3DheGA3y8FjQ0Sm1jj-kd-=3DH9=
-Y54WozKASSEZhc9UNKjA@mail.gmail.com/
->
-> Four tasks, one array:
->
->    udev-worker    queue_attr_store() holds q->limits_lock, waits in
->                   blk_mq_freeze_queue() for q_usage_counter to drain
+在 2026/10/19 20:54, Kunhai Dai 写道:
+> This series fixes the blk-iocost hweight cache publication race and adds a
+> fail-safe for invalid donation weights.
+> 
+> Previous version:
+>   https://lists.openwall.net/linux-kernel/2026/10/15/1954
+> Replies:
+>   https://lists.openwall.net/linux-kernel/2026/10/16/1431
+>   https://lists.openwall.net/linux-kernel/2026/10/16/2798
 
-Sorry for the delay, usually blk_mq_freeze_queue() is useless for bio-based
-disks, because it can't guarantee inflight BIOs to drain. So this looks lik=
-e
-a long term problem since queue_attr_store() can still update limits while
-there can still be bios inflight.
+I re-ran the injection tests on my side (linux-next 20261019):
+two runs with a 30ms kprobe
+hold on every refresh of current_hweight() and one with the hold on every
+50th refresh, same rt/s1..C topology and 1 <-> 10000 weight alternation
+load as before. No WARN or oops, and the tracepoint hweight fields decoded
+within [1, 65536] in every run.
 
->    fio            holds a q_usage_counter reference, parked in
->                   md_handle_request()'s is_suspended() loop
->    mdadm          suspended the array, waits for reconfig_mutex
->    md_start_sync  holds reconfig_mutex, waits for q->limits_lock
+For the series:
 
-And this deadlock looks related to blk_mq_freeze_queue() concurrent with
-mddev_suspend(), hence there can be bio blocked between. So I think there
-can be a simpler solution for this deadlock.
+Tested-by: Tao Cui <cuitao@kylinos.cn>
+Reviewed-by: Tao Cui <cuitao@kylinos.cn>
 
-1) either remove the blk_mq_freeze_queue() from limits update for mdraid, o=
-r
-2) also add blk_mq_freeze_queue() to mddev_suspend().
-
-If this is a mdraid specific problem, I'll suggest 2). If there are other
-bio-based drivers have the same problem, we might what to replace
-blk_mq_freeze_queue() with driver's bio suspend to fix that limits can
-update with inflight bios as well.
-
->
-> The last leg is mddev_stack_new_rdev() from ->hot_add_disk().  Since
-> commit c99f66e4084a ("block: fix queue freeze vs limits lock order in
-> sysfs store methods") the sysfs store holds q->limits_lock across the
-> freeze, so md must not block on that lock while it is holding back the
-> I/O the freeze waits for.  That is the same hazard mddev_suspend()
-> already documents for reconfig_mutex.
->
-> v1 kept q->limits_lock outermost where it could and used a trylock
-> everywhere else.  Christoph asked for the lock ordering to be fixed
-> instead, so v2 drops the trylock and the block patch that added it.
->
-> The rule v2 applies is that q->limits_lock nests outside reconfig_mutex
-> and the suspend everywhere, with no exceptions to paper over.  The two
-> callers that cannot own an update do not need one: check_sb_changes()
-> and md_check_recovery() only ever re-add a device that is already a
-> member, so its limits are stacked and the update is a refresh, and they
-> now take the no-stack path unconditionally.  mddev_update_io_opt() is
-> not an add and does need the update, so patch 4 defers it to a work
-> item that takes the lock with nothing held.
->
-> Making the hoists unconditional exposed a second cycle that the trylock
-> had been hiding, which Nilay hit with lockdep on v1:
->
->    q->limits_lock -> reconfig_mutex        added by this series
->    reconfig_mutex -> disk->open_mutex      pre-existing, md opens legs
->                                            under reconfig_mutex
->    disk->open_mutex -> q->limits_lock      pre-existing, sd_open() ->
->                                            sd_revalidate_disk()
->
-> Only the middle edge can go, so legs are now opened before any md lock
-> is taken.  Patch 7 does the opens and patch 8 the holder links, which
-> take disk->open_mutex too and were easy to miss because the release
-> side only takes blk_holder_mutex.  Opening without reconfig_mutex means
-> the superblock format fields have to be snapshotted and rechecked once
-> the array is locked.
->
-> Patches 1, 3 and 6 are plumbing with no functional change.
->
-> Two callers still take q->limits_lock inside reconfig_mutex, both with
-> the array suspended, and patch 5 says why: ->start_reshape() from
-> action_store(), which suspends before flushing sync_work, and
-> raid*_run() -> queue_limits_set() from level_store(), which already
-> hangs on its own because it freezes the queue while suspended.  Both
-> need more restructuring than belongs here.
->
-> The patches are based on v7.3-rc2.
->
-> v1: https://lore.kernel.org/linux-raid/20260909063029.GC29874@lst.de/T/#t
->
-> Changes since v1:
->   - Drop the trylock and the block patch adding
->     queue_limits_start_update_trylock(), per Christoph.
->   - check_sb_changes() and md_check_recovery() take the no-stack path
->     unconditionally instead of trying the lock first.
->   - Defer the io_opt update to a work item rather than skipping it on a
->     contended pass (patch 4, was "md: don't wait for q->limits_lock in
->     mddev_update_io_opt()").
->   - New patches 6-8 to close the reconfig_mutex -> disk->open_mutex
->     edge that lockdep reported on v1: pass a queue_limits through
->     ->run(), open new legs before locking the array, and link their
->     holders there too.
->   - Rebased on v7.3-rc2.
->
-> Testing, on v7.3-rc2 with lockdep (PROVE_LOCKING, DEBUG_LOCK_ALLOC):
->
->   - the reproducer below, 20 fail/remove/add cycles with fio in flight
->     and a loop writing queue/max_sectors_kb, where the same test wedges
->     the array before the series
->   - array start at raid0, raid1, raid5, raid10 and linear, spare add,
->     fail and remove, the rdev sysfs stores, ADD_NEW_DISK, array_state
->     transitions, a level change and a raid5 3 -> 4 reshape to
->     completion, which is what exercises patch 4's work item: io_opt
->     goes from 1048576 to 1572864 once end_reshape() runs
->   - HOT_ADD_DISK of an undersized leg, so bind_rdev_to_array() fails
->     and patch 8's release path runs
->
-> No lockdep reports, and debug_locks stayed 1 throughout.  Every patch
-> builds on its own.
->
-> A blktests case covering this deadlock will be sent separately.
->
-> The reproducer, for anyone who wants it:
->
->    mdadm -C /dev/md111 --force -e 1.2 --assume-clean -l 1 \
->          --bitmap=3Dinternal -n 2 /dev/ram0 /dev/ram1
->
->    fio --direct=3D1 --rw=3Drandrw --ioengine=3Dlibaio --iodepth=3D32 --nu=
-mjobs=3D4 \
->        --time_based=3D1 --runtime=3D180 --filename=3D/dev/md111 --name=3D=
-repro &
->
->    while :; do
->        echo 128 > /sys/block/md111/queue/max_sectors_kb 2>/dev/null
->    done &
->
->    for i in $(seq 20); do
->        mdadm /dev/md111 --fail /dev/ram0
->        mdadm /dev/md111 --remove /dev/ram0
->        mdadm /dev/md111 --add /dev/ram0
->        mdadm --wait /dev/md111
->    done
->
-> Jack Wang (8):
->    md: pass a queue_limits down to ->hot_add_disk()
->    md: don't wait for q->limits_lock in check_sb_changes()
->    md: pass a queue_limits through the rdev sysfs stores
->    md: defer the io_opt update out of the sync thread
->    md: take q->limits_lock before locking and suspending the array
->    md: pass a queue_limits through ->run()
->    md: open new legs before locking the array
->    md: link a new leg's holder before locking the array
->
->   drivers/md/dm-raid.c       |   4 +-
->   drivers/md/md-autodetect.c |  38 ++-
->   drivers/md/md-linear.c     |  30 +-
->   drivers/md/md.c            | 661 +++++++++++++++++++++++++++++--------
->   drivers/md/md.h            |  56 +++-
->   drivers/md/raid0.c         |  16 +-
->   drivers/md/raid1.c         |  26 +-
->   drivers/md/raid10.c        |  37 ++-
->   drivers/md/raid5.c         |  54 ++-
->   9 files changed, 741 insertions(+), 181 deletions(-)
->
---=20
 Thanks,
-Kuai
+Tao
