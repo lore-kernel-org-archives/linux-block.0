@@ -1,89 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792592593;
-	b=XeR7OnflJIbZbIn/Svzv3mXZoCLLmnJvRIreh3hRnZ0ZHtjk+rtuefUp29T+QWo1RZ/3
-	 9Jo4+kdAJtb2pMyJGcFyBijQIvAXUTraTT8rLfEu8femv6mXTxssem4JsN6PL8Kr8CIAv
-	 gWwlpBHF1MUMKw+l6ws/o1rrc0WC7RTu2l/Rc/am81UQmtFAd8RuyoyiRHSsEd1tyfvz3
-	 xhnVYjbSKL2pNn0d+VD1o5eOtkSJGs8OxusRHV5BdZjCeBjXTvbfUohHxU3+wvisgRc9p
-	 SKwHqUJ2cB/bA0Z2dkrN0h4WdaKh38J+kDAmg0tmVq5o3/odIIs7AoL6MCC2Skh2TaA==
+	t=1792593817;
+	b=halwSBiSJFXykOVsqc4qrT3l0uf09mR7WX+puNEp2oJ4Epnl7mfHKUuPN9MnIDC1lW3M
+	 i+QaVX02ULwzMv9vR4Oh3PEg2IbTYkrZuFgL9A7dF3DiQRozr48LE1g8MACEQZJ+QVpLd
+	 UmAEZYJa3LBMV3+9SKXpjIZraAkXn1aND19Oh6fkKvZ+vc66fhliEBh4AIYJVNzVnysRJ
+	 X8kZcCpFPjMJAT2F221Nnf55RLXIW+nOecp2Qc0JQ5G8Kk4I5WuDa0LCoVjlSymWUc5/+
+	 PCehm0lWnWw7RAzpsvexFpxDTrn3u4nZDeLrrkc0mIY+dS6xNwnq0qB48DMhVdXUFrA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792592593;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792593817;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=Ry0ejq2iOovIh50a5iLZlHQmAJp0KdXz+qWiCMyE90s=;
-	b=xb8bw7Gcgq0B8XS//UhqkEnrAQNzPvl9DyhymFAG098G6ssU1e6GaleJ3cXzbcIsycQ5
-	 bU+ULwY7kxVvRZhlXl16cwUHLFuDyo65JBAnZSHzlhWzOxqX4jR4oa6CK8y+gbff1CBYv
-	 neJDO0tzv0dWTxVwW9c68sHYbvePn8bvqjAx2cmLm0/eyisBSyPqLx1+ZMdGAllJ0iJ5z
-	 +LKyQFbvIcmESEsSjzPdm6xd116KIQmLOvyNWyH3W1IYiQjTkwVIJOB2tV/2QIoaSfHLS
-	 hEarXWS6SEVy7t8oiD9rkchV3hcFjG7i1cHz2Jq1aY5yCyrHi509SYVyR++gnxRjfyw==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Content-Language:To:Cc:From:Subject:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=0JvTuEAfs3JoL1ehjJC7DQMIer6297rj3Wekcqe3CrI=;
+	b=eJtc9iLEkV9QVu1EuehexQRZ45jAE5FMzKvmSXe1UCexevCs5aDvdNJKQTg9L1cYdhE1
+	 S+6Sn+a0hv6T6U0QWVDnpJY+jvJS+or4BpjH6l+FpT/dXu/Ul0L5DWGIMWsoOpcA5RPCp
+	 VtIe+EAsBQfFsqGBjlo8mltIccngdbVrCtwsm6vNzVYrllPlVZihKmB91Lo0vyN+glB1l
+	 KmBSqZKK+HO0xm7fCHcVGVeWe21Au77EoEihbJpAuZs2i4n3WaHoHWElu+qQLI/5uR0hs
+	 oN3AslLQHdaW83J+UMc+3S7vPzHs4TfZcf9H2bihprLipQj2fwATWHJqO7Wp5saHCcw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=UmrN72zC;
-	arc=none smtp.remote-ip=209.85.128.46
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=peVDPa3j;
+	arc=none smtp.remote-ip=74.125.82.45
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C27606A330
-	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 14:23:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B8C27606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5FA0606A31D
+	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 14:43:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C5FA0606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=UmrN72zC
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4a1ddc7c9beso4428135e9.1
-        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 07:23:12 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=peVDPa3j
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-14394530ec6so995096c88.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 07:43:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792592591; x=1793197391; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Ry0ejq2iOovIh50a5iLZlHQmAJp0KdXz+qWiCMyE90s=;
-        b=UmrN72zCxsSETrtXgFu1j3IULAxtC3xJczMlP7lP2PcHwldVuoMlyDYQqycuGBWZA1
-         y6UNV0K35EQgUtcF+BbxS5YF6SLD/pH96aKKzbMUmTuJKhHoU9HfAS2dodFs1gHILpoh
-         f8W1T2XIkQH0ojDxb/mjKnDxHKEPnJE4xfd1+wnet4R0hmM75lrK0LADdQBs6RuhltzS
-         /10fFDKI8nnhI3p8iUg++UjM603kachz10zn2bNWObtPgrRiGauJmGKlfsv3d88O51Dz
-         1w36jFtVIb4Lr6Cen6OILMPUgkZMyOhWKWwiuTyhntW8olf6CGUULgy4KQZuNVJT5D8O
-         F0EQ==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792593815; x=1793198615; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=0JvTuEAfs3JoL1ehjJC7DQMIer6297rj3Wekcqe3CrI=;
+        b=peVDPa3jmH9fRc2iS8wKZnm1N20t/l/9JVKaapTVpM0w/3gQKNoSbzdpSXLlzNBi70
+         +C+/+QwNfcHmRCsaYmGT5YerOQM8nbUj+zPG0lXnYYxxOYjE1Ruxfwty0W5SXYrjNjrm
+         FScoCS5dAN2aEX4b/ny8HH0hb+36NjB0eFVZNGvyrPDUeWrQTX8uorsssa0GtUCeAy3G
+         LgRoBO52EnMnlglFvIt32L+Zz94z3vyYzDRJWx3kXNLYZD5qGn1uXa9LWgeWzrAmHjy7
+         X3suVotzxaD0cnEaMWmHQtaaxNxBM7qRoSpyQspTlOqbj3bBND4CW0ybIqlDyKPMYhVa
+         8ZGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792592591; x=1793197391;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Ry0ejq2iOovIh50a5iLZlHQmAJp0KdXz+qWiCMyE90s=;
-        b=hf9LvNQqGFBfwJM8M/eAXErgqnQcaaiQWaIPX0ThSdQ5WeeV8+28Y5rmidglMfOhwS
-         Fbwxc8kSsqXSKs653f8S08gOUW1YQpWPl9RE69B9ZrAfmJfOVNhMTctkBLEeR2UomoCb
-         O+uutu5l/WpBaSudkISjrg9CE0rViYQ6wxD3bP57JNprxyRoZ5dUAPAjeZ/k3K9Dz0yR
-         Rxj9eIe+Wbq7vLpLeRR2mzPci2+LvIt4WHvKpIlNOJTw1htIVTRz49oYiJV36TT8GA5v
-         ldmozgyeAUtrl776VTPqkPGvg31bXNXyCmTsdpyrgcwU/xqv180MXjIAMRo7rBhXVc9s
-         5PXg==
-X-Forwarded-Encrypted: i=1; AKwUvBxCC2hvnPGIF45dzBdZlpzwnT12NNeTdnSl0n0HgUcZbPaGfg2/J2H7GsrjK+4DZTZnd2EaqmFWX0CnvA==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIdM4JcSj1W0Kpn/Bx6/zKs0GI7OuBA0rvT6fbpfuhYDe/350Q/
-	NpnoykS76l1yZMCzzbS0emHpBf2nXTC9xO1BykOYJ7ktBri5uarxyT2Lne8Aaw==
-X-Gm-Gg: AYBFou2Ftkl4L2UKI6OptTbFVg9vLLGbNMxjzMkklhUBUbR+hpowZ478IcjCtFqUmSL
-	84ypPwjT25AvZA1JK92oE7nY2V/R7JXv5tYU/hGVY7ajf45+upuQ0yPdpF40LXCH7HC/9Mvmue1
-	7ClozX8jhcZJ4MNQxdKK1Sv7wG5m09qIfco7R2S36ssQPKIZoC9mECXtcPlUSWFnV5gBovFgE2R
-	W8ucW0ypm7qrXWuEujcZKMR82tBQF9qCmwQgCxElVL0IPtSHuo9uHpsij9kaasMUcxIz2jn2CX7
-	DIBfsP3mcAQESWvy37lwnUpImHOPwMY+Yc11vkuXuIzQ9MRF/vPv6EwEiIYwuz2Q49eWIP+Aa2X
-	wikN0ICz1FfYosjvY2ydUsK7Dr4t4WiHkEcU6LVCg20zM2xqL/q+akoyXeOlnuVbZ45e/OU9yUW
-	dpHIhGjHRnXVl5qkcIvzAi+wUPQqhb2vHhMeTWfCBS3IuuMAXy7IZznW9wWKMk/OvEsWRgkkbmQ
-	l5P97vL7nHIH6i/hTpqOd+AlccZaqfmNmns1ziFd3pGNlBvrYDZfkHvLdMjskWP1ELS4hdwy3ej
-	/XH0H5CkaupYbz+UvSh/DxuHD+g2STKx7PWZamYUxOiyVMXSyUxxx3Im/V3BMAIcse0Jl/sgHNj
-	o2jqYkvs=
-X-Received: by 2002:a05:600d:864d:10b0:49f:e941:d6e with SMTP id 5b1f17b1804b1-4a1fdd399dbmr32967835e9.21.1792592589343;
-        Wed, 21 Oct 2026 07:23:09 -0700 (PDT)
-Received: from [10.54.182.141] (82-132-213-19.dab.02.net. [82.132.213.19])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1fb80ef02sm83229375e9.5.2026.10.21.07.23.06
+        d=1e100.net; s=20260707; t=1792593815; x=1793198615;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=0JvTuEAfs3JoL1ehjJC7DQMIer6297rj3Wekcqe3CrI=;
+        b=so/tZVKdngWwGwThUzoYBAvmkWwNd9Wq8SSpifGd+OGtxQ6owWZWIqZVZBljEb7r/Q
+         agPVxCFPzrAHbqf0Zzxr6kEseVGO1oFBGHn+pUi24VMPsKtjb5ceTZh9urcZtEBbVh1S
+         9d8frx4qAzA2qu59vzScJ3XWCOw5JqoMt8hF8JnGm7xjDWd6OiTNp+4vM8rYYVXOCcOP
+         j8GWCyhqsQkACgJWYnp5se8hmCiP5itZT+LrobfuVHrfAiEL1AZdylTtNTHJhqlCHT8a
+         0odsFCkZZ41L6W90BfPBeMxrdH1yEjRsArQLsfxY8T06TqYW4tY0Yspd0fGLNP4OLEvW
+         v2qA==
+X-Gm-Message-State: AFq9FYKUygIMq5mawa/imusUdAV0/6o11oAMNxg3kDlhZFZkYEiTdXLX
+	WL75cYoXUiEGOoUrVLvVGLSv+eBkQXafa5DM+O6YIV40/+qccpZZ5dGyKcnHn8Zlj7eC4nx/I8l
+	XGpcFhJ8=
+X-Gm-Gg: AYBFou12oOX1LOZxbbF00OIp+n+LzRFaMKHu4WUKtR/wKDTED5LKAxB3bCtkCo1YQqN
+	m7+Qo9Ykih5m0WHblDEdmt3//ujZsBmkCGM6/vGEEgQ8wBaZoF68nui/WEr/V2I90BCdDfho6SJ
+	jecXnAU04Qx04WjkUG11eOR4ONQq+lLM7ke5dL/HdL5EzlRkaRXfAXMknSc2Jbk2ASZ762x+d+j
+	evnO0vPwVXJpc/GQmw9lhNRymNZHgAdAXn+2LybysjnsPGjnSiA6hrvyPWcUp+ALd6xzBfSoz8e
+	InvMtgrgD9oB4HaSAR7ppqpq3b/zCiDRBpA0KNYrEmJg4gJyLEqkeLVYRMi8Ug6cQ4sf9yoHSJ4
+	y7L9fYOgo4HcOMCGMfws/9UiLonalVGBoIW8PlVvtEdkrD/UqJSHqZD5klqbz2RlVKP9z8lzboC
+	bCsKuJB8YMNn7gZJcXxE6oZDYTRiMPqiHqaAmWVNVwI6CcNG/AnSAQj3ncmlXcAkHtJ8x1bevoV
+	hmPZIM+nuzrU00I1WbxgTFy33oHsHwRPGKPcJYrlpQxVrotLqywNwf4FOvmO3Vo1WNTrX7jk8tk
+	4RPWDip7VuwsrmU8nnQnWTWrZZHmgIkwxdueFgQ=
+X-Received: by 2002:a05:7022:ebcb:b0:190:596:4071 with SMTP id a92af1059eb24-190a437bcdfmr3891605c88.11.1792593814501;
+        Wed, 21 Oct 2026 07:43:34 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1903b3d0530sm7168083c88.11.2026.10.21.07.43.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Oct 2026 07:23:07 -0700 (PDT)
-Message-ID: <d0c8cc97-6a21-4c64-b55d-16af783fdb59@gmail.com>
-Date: Wed, 21 Oct 2026 15:23:09 +0100
+        Wed, 21 Oct 2026 07:43:33 -0700 (PDT)
+Message-ID: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk>
+Date: Wed, 21 Oct 2026 08:43:33 -0600
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -94,59 +91,403 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nvme/io_uring: enable dma-buf backed passthrough I/O
-To: Anuj Gupta <anuj1072538@gmail.com>
-Cc: kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, axboe@kernel.dk,
- joshi.k@samsung.com, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org,
- Anuj Gupta <anuj20.g@samsung.com>
-References: <20261016103453.1129150-1-anuj1072538@gmail.com>
- <79627452-98d3-4e8d-9c37-ceda0796d59c@gmail.com>
- <vx4ugjq6wol6elipmwkuhtpk3qnanpwou6g73dxrjona3nepd4@pvetkgijfsx5>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <vx4ugjq6wol6elipmwkuhtpk3qnanpwou6g73dxrjona3nepd4@pvetkgijfsx5>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block updates for 7.4-rc
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Anuj,
+Hi Linus,
 
-On 10/19/26 14:40, Anuj Gupta wrote:
-> On Sun, Oct 18, 2026 at 11:06:16PM +0100, Pavel Begunkov wrote:
->> On 10/16/26 11:34, Anuj Gupta wrote:
->>> From: Anuj Gupta <anuj20.g@samsung.com>
->>> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
->>> index 3aa5d2f2dfbb..6343da1f6c05 100644
->>> --- a/drivers/nvme/host/ioctl.c
->>> +++ b/drivers/nvme/host/ioctl.c
->>> @@ -458,6 +458,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
->>>    			status = blk_status_to_errno(err);
->>>    	}
->>>    	io_uring_cmd_set_res32(ioucmd, status, result);
->>> +	io_uring_cmd_detach_dmabuf(ioucmd);
->>
->> It's not great spilling the responsibility for [de,a]ttaching
->> between nvme and uring_cmd code. Is there a way to stash it
->> all under io_uring?
-> 
-> The natural place would be __io_uring_cmd_done(), but that runs from
-> task_work, while the ref has to be dropped at hardware completion, like
-> io_complete_rw() does.
+Here are the block updates and fixes queued up for the 7.4 merge
+window. This pull request contains:
 
-It may queue a task work but is called from whenever. It would work
-if we drop there and in __io_uring_cmd_do_in_task(), but I agree
-with you that it might be confusing to the user.
+- NVMe updates via Keith:
+  - Apple M4 (t8132) ANS2 NVMe support
+  - nvme-multipath sysfs attributes for path_state, iopolicies, and
+    fail_on_ctrl_loss, plus path state evaluation fixes
+  - nvme-tcp parallelized I/O queue allocation and startup, and using
+    the caller's network namespace
+  - nvmet passthru UAF fix and rework, PR preempt use-after-free fixes,
+    auth hardening, and traffic based keep alive support
+  - DH-HMAC-CHAP secret attributes readable by root only
+  - Various other fixes and cleanups
 
-> Hooking io_uring_cmd_do_in_task_lazy() would avoid changing the NVMe
-> call site, but would add a non-obvious side effect to a generic
-> task_work helper. How about a separate helper that drivers call from
-> end_io instead? This keeps the dma-buf handling in io_uring while NVMe
-> only reports that it has finished accessing the data.
+- swim driver overhaul and fixes, plus floppy fixes, via a pull from
+  Denis
 
-Sounds the same, but I don't have a better answer, so either is
-fine with me. At least with your versions we can add a warning
-for misbehaving users.
+- Block device buffered and direct I/O rework from Tal: use
+  iomap_dirty_folio, take i_rwsem for the write fallback and splice
+  read, honor IOCB_NOWAIT in the buffered read path, and reject atomic
+  write fallback to buffered I/O
+
+- Large zone revalidation rework: serialize revalidation, handle
+  capacity changes by dropping and retrying zone write plugs, propagate
+  read-only and offline conditions, and treat offline and read-only
+  zones as dead
+
+- ublk robustness work around canceled FETCH rounds and going live over
+  canceled io commands, dropping the default I/O scheduler, and a batch
+  of selftest additions
+
+- blk-iocost flush cost support and zone append accounting
+
+- rust block fixes for Send/Sync bounds on GenDisk and TagSet, and
+  import style cleanups
+
+- Atomic write fixes capping size by the PI buffer constraints and
+  failing short atomic pins
+
+- Skip the redundant flush for O_DSYNC direct writes, and only use
+  REQ_FUA when the device supports it
+
+- Store GPT attributes as a raw value
+
+- Remove support for swapping loop fds
+
+- Various other fixes and cleanups all over
+
+Please pull!
+
+
+The following changes since commit df2908090cda368b01ff43709f51890076c56157:
+
+  Linux 7.3-rc2 (2026-09-06 15:07:20 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.4/block-20261021
+
+for you to fetch changes up to 40d070cbb1906896d6fd65c39722d2411830ed9f:
+
+  block: restore the iterator when rejecting a misaligned bio (2026-10-20 11:11:45 -0600)
+
+----------------------------------------------------------------
+for-7.4/block-20261021
+
+----------------------------------------------------------------
+Alvin Sun (4):
+      rust: block: mq: use vertical import style
+      rust: block: mq: remove redundant imports and format
+      rust: block: rnull: use vertical import style
+      rust: block: gen_disk: set fops.owner from driver module pointer
+
+Andrea Parri (1):
+      nvmet: zns: don't leak stale memory in zone management receive
+
+Andreas Hindborg (3):
+      rust: block: fix `Send` bound for `GenDisk`
+      rust: block: require `Sync` for `Operations::QueueData`
+      rust: block: implement `Send` and `Sync` for `TagSet`
+
+Andrew Morton (1):
+      block: restore the iterator when rejecting a misaligned bio
+
+Cen Zhang (1):
+      floppy: annotate data-races around command_status and floppy_work_fn
+
+Christian Brauner (1):
+      loop: remove support for swapping loop fds
+
+Christoph Hellwig (5):
+      block: avoid integer overflows in max_integrity_io_size
+      block: cap atomic write size by PI buffer size constraints
+      block: improve aligning down bios in bio_iov_iter_bounce_write
+      zloop: explicitly mention zone condition when a write fails to it
+      Revert "nvme-pci: clamp max_hw_sectors based on DMA optimized limitation"
+
+Daejun Park (2):
+      nvmet: fix use-after-free of the old registrant in nvmet_pr_preempt()
+      nvmet: fix preempt of another registrant by the reservation holder
+
+Damien Le Moal (16):
+      block: remove disk_free_zone_resources()
+      block: improve capacity handling during zone revalidation
+      block: refactor disk_revalidate_zone_resources()
+      block: refactor disk_update_zone_resources()
+      block: remember a zone type regardless of its condition
+      block: refactor bdev_zone_is_seq()
+      block: improve blkdev_get_zone_info()
+      block: introduce disk_for_all_zone_wplugs()
+      block: serialize zone revalidation
+      block: drop all zone write plugs on capacity changes
+      block: retry zone revalidation on capacity change
+      block: propagate readonly and offline conditions to zone write plugs
+      block: always treat offline and read-only zones as dead
+      block: fail zone management operations to read-only and offline zones
+      block: allow read-only and offline conventional zones
+      block: simplify disk_zone_set_cond()
+
+Denis Efremov (Oracle) (2):
+      floppy: don't store a stack buffer in timeout_message
+      floppy: return the drive state flags from the 32-bit FDGETDRVSTAT
+
+Finn Thain (36):
+      swim: Assert strobe with stable outputs
+      swim: Select appropriate drive once only
+      swim: Enable the drive when probing
+      swim: Don't disable drive after every sector
+      swim: Perform ISM/IWM mode switching according to specs
+      swim: Configure parameter memory
+      swim: Refactor SWIM setup
+      swim: Enable clock divider only where appropriate
+      swim: Don't start motor until medium is present
+      swim: Recalibrate when drive is probed
+      swim: Add track zero recalibration delay
+      swim: Handle FIFO timeout error
+      swim: Simplify return value initialization
+      swim: Check for CRC errors
+      swim: Check error register during sector read
+      swim: Don't use the mark register to read data
+      swim: Fix buffer overflow
+      swim: Convert to blocking queue
+      swim: Remove redundant RELAX actions
+      swim: Deduplicate polling loops
+      swim: Check drive ready bit
+      swim: Revisit delays
+      swim: Remove pointless mode0 register write
+      swim: Don't needlessly re-read sectors
+      swim: Don't search beyond the first data mark
+      swim: Remove pointless specifiers
+      swim: Move swd initialization
+      swim: Add some helpful references
+      swim: Remove unused macro definitions
+      swim: Clean up whitespace
+      swim: Define macros for constants
+      swim: Define symbols for constants
+      swim: Unexport global symbols
+      swim: Return -EROFS when opened with BLK_OPEN_WRITE flag
+      swim: Fix FDEJECT ioctl for exclusive open
+      swim3: Fix FDEJECT ioctl for exclusive open
+
+Guangshuo Li (1):
+      floppy: unregister platform device on add_disk failure
+
+Guixin Liu (1):
+      nvme-multipath: expose path_state via sysfs
+
+Jens Axboe (2):
+      Merge tag 'floppy-for-7.4' of https://github.com/evdenis/linux-floppy into for-7.4/block
+      Merge tag 'nvme-7.4-2026-10-15' of git://git.infradead.org/nvme into for-7.4/block
+
+Jesse Taube (1):
+      nvmet: Add traffic based keep alive support to configfs
+
+Johannes Thumshirn (1):
+      zloop: print device that had errors
+
+John Garry (1):
+      block: cap atomic write size by PI buffer size constraints
+
+Josef Bacik (2):
+      aoe: pull in the headers each received packet type reads
+      ublk: refuse to go live after an io command was canceled
+
+Julian Sun (2):
+      block: reject NOWAIT buffered write fallback
+      block: take the inode lock for buffered write fallback
+
+Jérémy Jean (2):
+      nvmet-auth: serialize access to DH-HMAC-CHAP state to fix UAF
+      nvmet: free the bvec on file namespace range errors
+
+Karl Mehltretter (2):
+      block: Fix the thaw_bdev reference in bdev_freeze() kernel-doc
+      floppy: flush pending work before releasing resources on init failure
+
+Krishna Iyer (2):
+      nvme-multipath: fix path state evaluation for failfast and ANA
+      nvme-multipath: add fail_on_ctrl_loss sysfs attribute
+
+Laurence Oberman (1):
+      nvme-multipath: add iopolicies sysfs attribute
+
+Li RongQing (2):
+      ublk: use global index for reported zones
+      block, bfq: initialize active lists for all actuators
+
+Malte Wechter (1):
+      rnull: configfs: add power to configfs features
+
+Martin Belanger (1):
+      nvme: make the DH-HMAC-CHAP secret attributes readable by root only
+
+Martin George (1):
+      nvme-multipath: report "none" iopolicy for discovery subsystems
+
+Ming Lei (10):
+      ublk: keep a canceled FETCH round canceling until the server is gone
+      ublk: mark the io command cancelable before publishing it
+      ublk: mark the batch fetch command cancelable before linking it
+      ublk: reset the FETCH round in release also without a disk
+      ublk: reset the FETCH round under ub->mutex
+      ublk: allow a NULL io->cmd in the cancel callback
+      ublk: let STOP_DEV cancel the server's commands before its release
+      selftests: ublk: move the control command helpers into ctrl.c
+      selftests: ublk: stop a batch thread when PREP_IO_CMDS fails
+      selftests: ublk: add test for going live over canceled io commands
+
+Nilay Shroff (2):
+      nvmet: introduce struct nvmet_passthru
+      nvmet: fix use-after-free in passthru I/O hotpath
+
+Nirmoy Das (1):
+      blk-mq: clear stale inactive flag on hctx reuse
+
+Palla Raghunath (1):
+      nvmet-fc: don't drop the last assoc reference in nvmet_fc_delete_ctrl()
+
+Paolo Bertinetti (1):
+      ublk: hold RCU read lock in ublk_try_buf_match()
+
+Peng Fan (1):
+      nvme: use assign_bit() where applicable
+
+Qiliang Yuan (6):
+      ublk: don't use an I/O scheduler by default
+      ublk: drop the device reference outside ublk_ctl_mutex in DEL_DEV
+      selftests: ublk: don't keep the fault_inject timespec on the stack
+      selftests: ublk: make the fault_inject delay a pure timeout
+      blk-mq: share one tags_srcu instance across all tag sets
+      blk-mq: drop the tag_set argument from blk_mq_free_rq_map/tags
+
+Qingxiao Xu (1):
+      rnull: fix geometry store check-then-act across lock scopes
+
+Runyu Xiao (1):
+      block: amiflop: synchronize flush timer before track flush
+
+Sophon Z (1):
+      rust: block: Fix GenDiskBuilder block size documentation
+
+Sung Byeongchan (2):
+      nvmet: require authentication before property set
+      nvmet-auth: reject undersized AUTH_SEND payloads
+
+Surabhi Gogte (3):
+      nvme-tcp: store and use the caller's network namespace
+      nvme-tcp: refactor I/O queue setup path
+      nvme-tcp: parallelize I/O queue allocation and startup
+
+Tal Zussman (9):
+      block: use iomap_dirty_folio for block devices
+      block: take i_rwsem for the direct I/O write fallback
+      block: take i_rwsem for the splice read path
+      block: honor IOCB_NOWAIT in the block device buffered read path
+      block: fail a short atomic pin in bio_iov_iter_get_pages()
+      block: don't fall back to buffered I/O for atomic writes
+      iomap: reject atomic writes in iomap_file_buffered_write()
+      block: unpin all pages of a bvec in bio_iov_iter_align_down()
+      block: remove dead metadata handling from the async direct I/O path
+
+Tao Cui (4):
+      blk-iocost: add flush cost support with the flushiops model parameter
+      blk-iocost: charge zone appends as writes
+      blk-iocost: account zone append completions in latency stats
+      blk-iocost: fix stale comment in ioc_rqos_throttle()
+
+Vasileios Almpanis (1):
+      block: drop the cached plug time when blk_add_rq_to_plug() flushes
+
+Vincent Mailhol (1):
+      block: store GPT attributes as a raw value
+
+Yang Xiuwei (1):
+      floppy: avoid NULL deref in reset_interrupt when cont is cleared
+
+Yao Sang (1):
+      nvme: pass partition flags to passthrough checks
+
+Yehyeong Lee (3):
+      nvme-rdma: don't complete a request after a bogus remote invalidation
+      nvme-auth: fail when the controller does not authenticate itself
+      nvme: bound FDP config log reads to the received buffer
+
+Yureka Lilian (2):
+      dt-bindings: nvme: Add apple,t8132-nvme-ans2 compatible
+      nvme: apple: add t8132 (M4) ANS2 NVMe support
+
+Zhenxian Ma (2):
+      block: skip redundant flush for O_DSYNC direct writes
+      block: only use REQ_FUA for direct writes if the device supports it
+
+sonotri (1):
+      ublk: pin module while release work is pending
+
+ Documentation/ABI/stable/sysfs-nvme                |  52 ++
+ Documentation/admin-guide/cgroup-v2.rst            |   7 +
+ Documentation/block/ublk.rst                       |  17 +-
+ .../devicetree/bindings/nvme/apple,nvme-ans.yaml   |   1 +
+ arch/m68k/mac/config.c                             |  31 +-
+ block/bdev.c                                       |   2 +-
+ block/bfq-iosched.c                                |   4 +-
+ block/bio.c                                        |  99 ++-
+ block/blk-core.c                                   |   7 +-
+ block/blk-iocost.c                                 |  39 +-
+ block/blk-mq-tag.c                                 |  19 +-
+ block/blk-mq.c                                     |  27 +-
+ block/blk-mq.h                                     |   6 +-
+ block/blk-settings.c                               |  12 +-
+ block/blk-zoned.c                                  | 856 +++++++++++-------
+ block/blk.h                                        |   6 +
+ block/fops.c                                       | 141 ++-
+ block/partitions/efi.h                             |   8 +-
+ drivers/block/amiflop.c                            |  71 +-
+ drivers/block/aoe/aoenet.c                         |  14 +-
+ drivers/block/floppy.c                             |  56 +-
+ drivers/block/loop.c                               | 112 +--
+ drivers/block/rnull/configfs.rs                    |  44 +-
+ drivers/block/rnull/rnull.rs                       |  15 +-
+ drivers/block/swim.c                               | 457 +++++-----
+ drivers/block/swim3.c                              |   8 +-
+ drivers/block/swim_asm.S                           | 340 ++++----
+ drivers/block/ublk_drv.c                           | 261 ++++--
+ drivers/block/zloop.c                              |  38 +-
+ drivers/nvme/host/apple.c                          |  39 +-
+ drivers/nvme/host/auth.c                           |  15 +-
+ drivers/nvme/host/core.c                           |  15 +-
+ drivers/nvme/host/ioctl.c                          |   2 +-
+ drivers/nvme/host/multipath.c                      | 155 +++-
+ drivers/nvme/host/nvme.h                           |   4 +
+ drivers/nvme/host/pci.c                            |   2 +-
+ drivers/nvme/host/rdma.c                           |   1 +
+ drivers/nvme/host/sysfs.c                          |  23 +-
+ drivers/nvme/host/tcp.c                            | 139 ++-
+ drivers/nvme/target/admin-cmd.c                    |   4 +-
+ drivers/nvme/target/auth.c                         |   1 +
+ drivers/nvme/target/configfs.c                     | 119 ++-
+ drivers/nvme/target/core.c                         |  19 +-
+ drivers/nvme/target/fabrics-cmd-auth.c             |  38 +-
+ drivers/nvme/target/fabrics-cmd.c                  |   4 +
+ drivers/nvme/target/fc.c                           |  15 +-
+ drivers/nvme/target/io-cmd-file.c                  |   4 +-
+ drivers/nvme/target/nvmet.h                        |  70 +-
+ drivers/nvme/target/passthru.c                     | 103 ++-
+ drivers/nvme/target/pr.c                           |   4 +-
+ drivers/nvme/target/zns.c                          |  10 +
+ fs/iomap/buffered-io.c                             |   4 +
+ include/linux/blk-mq.h                             |   3 -
+ include/linux/blkdev.h                             |  19 +-
+ rust/kernel/block/mq/gen_disk.rs                   |  72 +-
+ rust/kernel/block/mq/operations.rs                 |  16 +-
+ rust/kernel/block/mq/request.rs                    |  16 +-
+ rust/kernel/block/mq/tag_set.rs                    |  35 +-
+ tools/testing/selftests/ublk/.gitignore            |   1 +
+ tools/testing/selftests/ublk/Makefile              |   6 +-
+ tools/testing/selftests/ublk/batch.c               |  13 +-
+ tools/testing/selftests/ublk/ctrl.c                | 268 ++++++
+ tools/testing/selftests/ublk/fault_inject.c        |  14 +-
+ tools/testing/selftests/ublk/kublk.c               | 271 ------
+ tools/testing/selftests/ublk/kublk.h               |  32 +
+ tools/testing/selftests/ublk/test_generic_18.sh    |  69 ++
+ tools/testing/selftests/ublk/ublk_cancel_ready.c   | 957 +++++++++++++++++++++
+ 67 files changed, 3789 insertions(+), 1543 deletions(-)
+ create mode 100644 tools/testing/selftests/ublk/ctrl.c
+ create mode 100755 tools/testing/selftests/ublk/test_generic_18.sh
+ create mode 100644 tools/testing/selftests/ublk/ublk_cancel_ready.c
 
 -- 
-Pavel Begunkov
+Jens Axboe
 
