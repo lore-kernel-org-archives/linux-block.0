@@ -1,67 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.108.3.19
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792569224;
-	b=W8rQWGOUqekS6Qqc1YYhxYpFhS2rPmP321k1YGVcLYQsa1oja3F2CfvhxhdHAccRCh32
-	 ZAsWqPJR6XpqpTZRo4BYO7hmDswJGtb0z0+6b5WnsCBUwbm/C598+tq3YgEyo4HqQvZsg
-	 suTYrl47xy9eHOOF9NM7Z6vB66e9PvN8+eq84gGBzMl3tZr79tTrIQaTETSDFbn2coROG
-	 PODTo1/GoMO+6if/zL0nXTWmGyWmwLRSSY9x1L/e3/shGcVIVfO2vYti92ew1vbyq6tE8
-	 hVvsTlfLJMZkRrE16gAXYfXVvImcL1UnmXIesRT4ofd6UIk7vfZcG0YhK3LB0dw3PhA==
+	t=1792573183;
+	b=TyHFWaTMWTy0CmTXBIkpUHsmI1/e8NBUpYyEAu/sjXDT5TL2JbmowMJqxVkW49LD3vJg
+	 bfXyHyVpqiwu98P6Jv7cVAARhj8yaCKbUCa3DL+ya4eNs5x0aFMrzUI+OmjzKNu/h/D+c
+	 DWsepZ7JHGQFdWRflw0GUEqJyr/RyaqRgp5EMOstl4zz+nsoRKR/oKdVXOx0FKpxyN+HC
+	 0lqoam/bNUO4aPL1I0YfbbKNc4ypzvRtz2A1MkWEqS+zHQMy0ZsETxaQFz6Vv6pMp6a2p
+	 OSt3JYqJ7AjsI/PSMkhzT45/l2jMbPepiWgTj9XJ4uCnFXC7SA9eTIk/5mBi74Bta+A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792569224;
-	h=DMARC-Filter:DKIM-Signature:X-SMAIL-HELO:Received:X-Sender:X-Auth-ID:
-	 X-SMAIL-MID:X-SMAIL-UIID:From:To:Cc:Subject:Date:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=bhy0oyRetX168I3CYw/iHInrZZxLMV6KJR6cfcucIJA=;
-	b=3WuckiKFt+jbhKNX6FIyeXeslynbQjdBMQtmkFOkvVolZzxL2zUXM/tsYjOAWNwZ1fSn
-	 hZbgs82FNqXxL/7fofkFqz45eIzJS2n4GRUcyV8RuPzaiOWebxH8PisQW9/B75KqEUSmK
-	 Gg99Fb2n69wu89mkSEUfJxPp5tM90vjNQMFnDOtnxE3LTdn9+w/hNTCNe9jbg/kWUyQ78
-	 qGbVI2bDWRDrp1c2Q9PUvG0D1X+eS5vp2nEh295Wf70MXVlgzzykpsCVQ8UuuZ7jbJTbG
-	 zaT7dyeh9P7zhwLyAqxyztTDDBZ63L+eW+aHHmRA4+h2U5U5mBS/fABJyQaeYJjHWWA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792573183;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+	 X-Rspamd-Action:X-Spam-Score:X-Spam-Flag:X-Spamd-Result:X-Spam-Level:
+	 X-Rspamd-Queue-Id:X-Rspamd-Server;
+	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
+	b=xcWqWh4tlKybSt2It1VndsN6NO/CJ/piKvu5fvrg30x5gYJ2CQbNMYnYprqWl2PUY/lh
+	 pc2hIEhvHMnkOZ0QUPzEi/nr0T5J2w2pyxY/qpxVjS3rZWLuOQQmBpsqw4qNG0zRsh1M0
+	 pWOGHuHGCsIgIdBdeYib6xmuDaKOHZ1PNwXF8wnKaa+NwbZSGcV91PpHYD+WMgs73shk3
+	 sUWkn9Elsv1rQ6vl2HIPaj5JLvFBp83gabs3ufRxppiAAaHGLqV2SuObulZDXzZeJHtfE
+	 qJ/GS9CEquBy/wGevuCjda3YaYz4YOYEFdVJN4it7vmeTkBiHrlKvqmR5Qst4WAQkKw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=sina.com;
-	spf=pass smtp.mailfrom=sina.com;
-	dkim=pass header.d=sina.com header.i=@sina.com header.a=rsa-sha256 header.s=201208 header.b=AaMspNBc;
-	arc=none smtp.remote-ip=202.108.3.19
-Received: from r3-19.sinamail.sina.com.cn (r3-19.sinamail.sina.com.cn [202.108.3.19])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=pnavB1YQ;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=FvXr7lmg;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=UoEaZvBI;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=727llxKI;
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4223D606A31A
-	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 07:53:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4223D606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC760606A31B;
+	Wed, 21 Oct 2026 08:59:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC760606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=sina.com header.i=@sina.com header.a=rsa-sha256 header.s=201208 header.b=AaMspNBc
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1792569222;
-	bh=bhy0oyRetX168I3CYw/iHInrZZxLMV6KJR6cfcucIJA=;
-	h=From:Subject:Date:Message-ID;
-	b=AaMspNBcAlZYeSyktyDx6+smnysTeA8pUlNL4bDy+pkZ3Tj/sv6bU5pIykUobAdPs
-	 UZiEVlhHHx0qoEG9325QJ6kO0YY2e1Yd8X2sVcLx8U/SLJwf34Ye1ZP9r0i8RszLUQ
-	 5kZPssj5SjdKxQzyR/WFfun6XD4+kwgiQKk/g9tE=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.254.3.56])
-	by sina.com (10.54.253.32) with ESMTP
-	id 6AD86F7A00002678; Wed, 21 Oct 2026 15:53:33 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 5760734456874
-X-SMAIL-UIID: A986B4A8D67249C0A2750D2D5F8A8120-20261021-155333-1
-From: Hillf Danton <hdanton@sina.com>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Brian Geffon <bgeffon@google.com>,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [PATCH v6 09/13] zram: split zcomp into separate R/W streams
-Date: Wed, 21 Oct 2026 15:53:21 +0800
-Message-ID: <20261021075322.923-1-hdanton@sina.com>
-In-Reply-To: <athFf0kXopUKh2-V@google.com>
-References: 
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=pnavB1YQ;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=FvXr7lmg;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=UoEaZvBI;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=727llxKI
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id C1FC51F7C4;
+	Wed, 21 Oct 2026 08:59:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1792573181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
+	b=pnavB1YQO92YCXlsmfLgPQlFLOchvVuqwTo2ajJLqepdfRUOBFx5ITgy9XePlpZzpJde5x
+	fVBWqLzNiiY3q5gLrkzDwoMHlXZ/vzvqU06/hGlf0jIeX9vy2Z+KOe7lOiG91DXcqOnRG2
+	UGt17PnI5H0NliV7W5mrIazW8CsU0Kc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1792573181;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
+	b=FvXr7lmgduEM4f1zUlczE8sZehIlX7cFxP9SH6s6t/M9J/jAU2y9ZFoArxQ4niIJZdmaUk
+	g4Kfe2q0lh7qGgCg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=UoEaZvBI;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=727llxKI
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1792573180; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
+	b=UoEaZvBIYvNjeyOVnoDwBMxQOPbsHfhnGvhB00+vUP8fKbq3HAsu0hAelcUrCH8SmuXUXm
+	1LPS+5Q95gPwvLqZXm0bWGfjKJbMoFGAy4uw/Ih94bydbmBPMtc7QOF1r1kSeQ6CTn7X3v
+	ufhEyuYqHIs27JM4g+IUSjHYc2m59v8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1792573180;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
+	b=727llxKInczBYWntWyAIXyZoudCLsm0TQzPi38ueWwpbBENZvC51lILZrrqXE3cv6Or2Cl
+	CfxIgoVnxNjHlgCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 87022134A5;
+	Wed, 21 Oct 2026 08:59:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id U8xSGPx+2GoXdAAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 21 Oct 2026 08:59:40 +0000
+Date: Wed, 21 Oct 2026 10:59:39 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, tom.leiming@gmail.com, hare@suse.de, 
+	frederic@kernel.org, tj@kernel.org, sean@ashe.io, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v3] blk-mq: dispatch kworker to housekeeping CPU when
+ hctx cpumask is empty
+Message-ID: <63c7810b-b893-43be-b108-4fcc05773492@flourine.local>
+References: <20261016052203.489760-1-atomlin@atomlin.com>
+ <a6b3d7c6-64fd-4b92-8428-964a863ea9e8@flourine.local>
+ <zpheefzacmmkz362qm342gfxhluovh4d35numrweqn2ajnxhog@ucus4k2prn6o>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -71,29 +113,57 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <zpheefzacmmkz362qm342gfxhluovh4d35numrweqn2ajnxhog@ucus4k2prn6o>
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.dk,gmail.com,suse.de,kernel.org,ashe.io,vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Spam-Level: 
+X-Rspamd-Queue-Id: C1FC51F7C4
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
 
-On Wed, 21 Oct 2026 13:56:17 +0900 Sergey Senozhatsky wrote:
->On (26/10/21 12:23), Hillf Danton wrote:
->> On Wed, 21 Oct 2026 11:42:19 +0900 Sergey Senozhatsky wrote:
->> > Split struct zcomp_strm into separate compression (Write zcomp_cstrm)
->> > and decompression (Read zcomp_dstrm) streams, and split zcomp_ops
->> > context creation/destruction into create_cctx/destroy_cctx and
->> > optional create_dctx/destroy_dctx callbacks.
->> > 
->> > This decouples Read (decompression) and Write (compression) paths so
->> > they no longer contend on the same per-CPU stream mutex (Writer vs
->> > Reader priority inversion).  Currently, a (low priority) Writer that
->> > holds the stream mutex can be preempted by a (higher priority) Reader
->> > on the same CPU, which then blocks on that mutex until the Writer gets
->> > to run again and releases it, which can take a long time when there
->> > are other runnable tasks on that CPU.
->> >
->> Given lock like mutex, priority inversion happens from Monday to Friday,
->> but I wonder if you are inventing some wheels in 2026 if proxy excution
->> works for you.
->
-> Reader-Writer split is a foundation for further improvements (like
-> singleton recompression stream and so on).
->
-But that split is not needed at all if PE works, yes?
+> While your nvme/070 test targets NVMe fabrics connect and passthrough
+> request allocation, this fix is in core blk-mq (blk_mq_hctx_next_cpu) and
+> affects deferred workqueue execution across all block devices. Using a new
+> test based on null_blk would allow us to:
+> 
+>     1.  Target infrastructure for generic blk-mq workqueue placement testing
+> 
+>     2.  Easily configure a shallow queue depth or inject tag
+>         exhaustion/busy conditions to reliably trigger asynchronous queue
+>         dispatch (&hctx->run_work)
+> 
+>     3.  Trace workqueue:workqueue_execute_start to assert that no kblockd
+>         worker executes on the isolated core
+> 
+> I'll put together a test case for tests/block/.
+
+Sounds good to me! Thanks.
