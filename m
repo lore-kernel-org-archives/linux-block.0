@@ -1,94 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792589927;
-	b=CBQ3Q4kKCRG9KGwrnDhOF5T43XtP++bIaZpelRoheb5kcUpwc8FvQg5dCaPDPOeqFyxY
-	 szVF2KIK+ZKADoDWo5vDwBynfeHLiB2N8wUMN5ss7GkIuTBGUSGl2qK2v9hbqg3CnhZZB
-	 EF0ZZiol1fM0MVZS7i8o0tETi2+zmdWpIwQZqx/l9Yryilq/IWub5cqwAYMsBDz+Qrsup
-	 wyTjnrXRfoVxq6HmKNsyHj4VOYQ1koSBpaU4GmsfT63fV5V+6Bdgp+GyYFU0jbMx1rL6s
-	 0N93g4pZIFuQ+oVE//ZPAE0AVxVqLXQaNI0MVmy8qk4s+2QqR44gWtAhGEUuRgz2uOQ==
+	t=1792592593;
+	b=XeR7OnflJIbZbIn/Svzv3mXZoCLLmnJvRIreh3hRnZ0ZHtjk+rtuefUp29T+QWo1RZ/3
+	 9Jo4+kdAJtb2pMyJGcFyBijQIvAXUTraTT8rLfEu8femv6mXTxssem4JsN6PL8Kr8CIAv
+	 gWwlpBHF1MUMKw+l6ws/o1rrc0WC7RTu2l/Rc/am81UQmtFAd8RuyoyiRHSsEd1tyfvz3
+	 xhnVYjbSKL2pNn0d+VD1o5eOtkSJGs8OxusRHV5BdZjCeBjXTvbfUohHxU3+wvisgRc9p
+	 SKwHqUJ2cB/bA0Z2dkrN0h4WdaKh38J+kDAmg0tmVq5o3/odIIs7AoL6MCC2Skh2TaA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792589927;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792592593;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=5c03wHQY/A8JbxeL/7g0tRvKNDHudBeP+rG9bb169uk=;
-	b=mYxDEHiBrCtMRHqr8aDxTomDmM98/vU1Tult4nh71bbFD3qq0uq3fmDtLtsfotaBgz0e
-	 Tz/DcbH9fV8SoS4/KINcorjU1RKMDv2wFXS+ULcJXKvQYUovjXMbdAuSNUBsbJQAS+6Hc
-	 Cci05H8/zwrm4G5X5RAnCN1Tjw1fr/wzrIBPmXUfBD8Qn3Y8Yq8et+uRP+9y7wljBJctL
-	 C0GkHa3LrWeYAX5+r67ostGMkKpu2MCZrATZz/LxNUSGFp6VAtfyBWHYi5SELDBcvxWsg
-	 /B/+9ok2aDTJHBHLBe7CG1Hv9qU6gHpHXOfxyCfjngQPTR/5iFOkG1dPTHGxMGYe80w==
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=Ry0ejq2iOovIh50a5iLZlHQmAJp0KdXz+qWiCMyE90s=;
+	b=xb8bw7Gcgq0B8XS//UhqkEnrAQNzPvl9DyhymFAG098G6ssU1e6GaleJ3cXzbcIsycQ5
+	 bU+ULwY7kxVvRZhlXl16cwUHLFuDyo65JBAnZSHzlhWzOxqX4jR4oa6CK8y+gbff1CBYv
+	 neJDO0tzv0dWTxVwW9c68sHYbvePn8bvqjAx2cmLm0/eyisBSyPqLx1+ZMdGAllJ0iJ5z
+	 +LKyQFbvIcmESEsSjzPdm6xd116KIQmLOvyNWyH3W1IYiQjTkwVIJOB2tV/2QIoaSfHLS
+	 hEarXWS6SEVy7t8oiD9rkchV3hcFjG7i1cHz2Jq1aY5yCyrHi509SYVyR++gnxRjfyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=jXCMSsEE;
-	arc=none smtp.remote-ip=74.125.224.54
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=UmrN72zC;
+	arc=none smtp.remote-ip=209.85.128.46
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075B1606A31A
-	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 13:38:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 075B1606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C27606A330
+	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 14:23:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B8C27606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=jXCMSsEE
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-6798d4ab549so696712d50.0
-        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 06:38:46 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=UmrN72zC
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4a1ddc7c9beso4428135e9.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 07:23:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792589926; x=1793194726; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=5c03wHQY/A8JbxeL/7g0tRvKNDHudBeP+rG9bb169uk=;
-        b=jXCMSsEESFZVjdjzfNi/bSWJKOk17XHYGmVTOCwIqZR8IXFZ6JaIxgj94S01mE6lUN
-         kq3GZopQP4XE3Aac2PnfcyXRLRPRbsLLJlSf0T32r8vh0qDFMoYAopIX+TKjG29ZXM4Y
-         zSN3qBw5x1XAQ0jrz5EGFddq+djTNyr7mu+NuNf3Ur43I54hi5uxGp5PO8CHc3EHyN2D
-         0y82te8fXM447P4Sc40m4ZsRGzrgXJrH0EneZrcrRHAfmJdkkg5hVh0O0HidBJREB09b
-         ctxtwOFsO1hWk+J6+BL8H+WgneHn54rwRdrGbnWvyYGAgknwA5yY1RVuSI55SmggxVAX
-         8U+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792589926; x=1793194726;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1792592591; x=1793197391; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=5c03wHQY/A8JbxeL/7g0tRvKNDHudBeP+rG9bb169uk=;
-        b=f370NQu0yLnjIm4/9mKnG4PFF9WIaQ0wDutifnP/eg1+/Xi9g0jnA1+gblUzJNjnsQ
-         nWIWKgGcvspR2MU2HLDGNk/VjSoYzrlH9VcXoBk8UP9LvDrug1QsQE9wGp1CEQQjwdm6
-         axc3EUoOPhvq+D2nZLpt4b14ElhHj0uxY4P4KJzbHQlQPlv12vAG+RVH3V4kB+CQpcto
-         RtsmoSgc8wBiPK72GYKfj60ZPI9+iMDoW5KDAKWh4OWN2RMlNoCv5lypbkUbowExyDCR
-         BqqZEyc0KnhD0387VZNtmiOPdf/tD9OkWWm4JOl6hlfNJ1nr1nXnIvIUUpsr7MQplvba
-         pNRg==
-X-Forwarded-Encrypted: i=1; AKwUvBzgP6UGi0pmWcKygDLYzwUhjXw7P6FRq2FI2WBzrSA7U1vP2u6h9czFES7+1vWYt6PeVYRHMkbJnomgZw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKKN35ULA8NZGH8z38JcfFYeIixZyViTmFyENYcSZGhulLvkZ58
-	m+LjlBpexNgJKwzEfDtguXt53N/KnHpYq+Zul9463/ON4MGIg/zpXoen
-X-Gm-Gg: AYBFou3Q9qvN32K5SfPkeC/jRD5WUxzHyKU9OBP+QaY9b83Rc0aGvkVhAsdd7uBlwMJ
-	srVgGrXLzuHYhXeBYym1xMabIVE+47WCVDdDSrIjHOtF96MzfJe/RyUmQ+tg0gJkM1M0opQxVqZ
-	Cj7Lj4xh2fSR3TsSbBBYqCIsnu6lMxitc+k95Cmpk1qxKTKFf+ieNl0g/JhqwFGPxcFA+9fGcrL
-	h36tvtogwoeMS7o9PoEclTJRyDSP11zlkXyVh34275uBS3i3qTzx0P7KMgi6onIYEUOMFtYcc/x
-	VIiGsxN2vahxb2jlWwpsdfnA1/86ef2x6d94Ll+5BskdybZhc/oFdVeoR7sqXuHpjI0TzxZ/eOF
-	0AZGuZOqMvOYgfavap0xqDeMotJ0cdPP9IjpQ2CP1ZIfTe7fbML1VcGvyVlNP6u6iGqG42momrg
-	yZc47hobuIhVRx1eQJTHmYZvrGOQhKjXkcXSxJXRlHfeHjJqcY4gsOhxtBKbPpeswFxmMyK3aR6
-	K9jxBQWaNgKYxakh2RyQBTqO2q63bm+lAxOfDCZLPJJDxutO93hOr6kapIQUAxPe20C/bU25imF
-	KZhWuanBI8akjEwXpHsT4CKA2y4pwe7XOFLr2mofEdVhqi9Qd04Gso+vDhfQMg==
-X-Received: by 2002:a05:690e:d8b:b0:679:bf13:c01a with SMTP id 956f58d0204a3-67a0ddf103fmr945125d50.0.1792589925959;
-        Wed, 21 Oct 2026 06:38:45 -0700 (PDT)
-Received: from fedora-laptop ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-67a0e501c01sm1052477d50.15.2026.10.21.06.38.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2026 06:38:45 -0700 (PDT)
-Date: Wed, 21 Oct 2026 08:38:37 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Aaron Tomlin <atomlin@atomlin.com>
-Cc: axboe@kernel.dk, hare@suse.de, dwagner@suse.de, frederic@kernel.org,
-	tj@kernel.org, sean@ashe.io, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3] blk-mq: dispatch kworker to housekeeping CPU when
- hctx cpumask is empty
-Message-ID: <atjAXSTH2aRligiA@fedora-laptop>
-References: <20261016052203.489760-1-atomlin@atomlin.com>
+        bh=Ry0ejq2iOovIh50a5iLZlHQmAJp0KdXz+qWiCMyE90s=;
+        b=UmrN72zCxsSETrtXgFu1j3IULAxtC3xJczMlP7lP2PcHwldVuoMlyDYQqycuGBWZA1
+         y6UNV0K35EQgUtcF+BbxS5YF6SLD/pH96aKKzbMUmTuJKhHoU9HfAS2dodFs1gHILpoh
+         f8W1T2XIkQH0ojDxb/mjKnDxHKEPnJE4xfd1+wnet4R0hmM75lrK0LADdQBs6RuhltzS
+         /10fFDKI8nnhI3p8iUg++UjM603kachz10zn2bNWObtPgrRiGauJmGKlfsv3d88O51Dz
+         1w36jFtVIb4Lr6Cen6OILMPUgkZMyOhWKWwiuTyhntW8olf6CGUULgy4KQZuNVJT5D8O
+         F0EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792592591; x=1793197391;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Ry0ejq2iOovIh50a5iLZlHQmAJp0KdXz+qWiCMyE90s=;
+        b=hf9LvNQqGFBfwJM8M/eAXErgqnQcaaiQWaIPX0ThSdQ5WeeV8+28Y5rmidglMfOhwS
+         Fbwxc8kSsqXSKs653f8S08gOUW1YQpWPl9RE69B9ZrAfmJfOVNhMTctkBLEeR2UomoCb
+         O+uutu5l/WpBaSudkISjrg9CE0rViYQ6wxD3bP57JNprxyRoZ5dUAPAjeZ/k3K9Dz0yR
+         Rxj9eIe+Wbq7vLpLeRR2mzPci2+LvIt4WHvKpIlNOJTw1htIVTRz49oYiJV36TT8GA5v
+         ldmozgyeAUtrl776VTPqkPGvg31bXNXyCmTsdpyrgcwU/xqv180MXjIAMRo7rBhXVc9s
+         5PXg==
+X-Forwarded-Encrypted: i=1; AKwUvBxCC2hvnPGIF45dzBdZlpzwnT12NNeTdnSl0n0HgUcZbPaGfg2/J2H7GsrjK+4DZTZnd2EaqmFWX0CnvA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIdM4JcSj1W0Kpn/Bx6/zKs0GI7OuBA0rvT6fbpfuhYDe/350Q/
+	NpnoykS76l1yZMCzzbS0emHpBf2nXTC9xO1BykOYJ7ktBri5uarxyT2Lne8Aaw==
+X-Gm-Gg: AYBFou2Ftkl4L2UKI6OptTbFVg9vLLGbNMxjzMkklhUBUbR+hpowZ478IcjCtFqUmSL
+	84ypPwjT25AvZA1JK92oE7nY2V/R7JXv5tYU/hGVY7ajf45+upuQ0yPdpF40LXCH7HC/9Mvmue1
+	7ClozX8jhcZJ4MNQxdKK1Sv7wG5m09qIfco7R2S36ssQPKIZoC9mECXtcPlUSWFnV5gBovFgE2R
+	W8ucW0ypm7qrXWuEujcZKMR82tBQF9qCmwQgCxElVL0IPtSHuo9uHpsij9kaasMUcxIz2jn2CX7
+	DIBfsP3mcAQESWvy37lwnUpImHOPwMY+Yc11vkuXuIzQ9MRF/vPv6EwEiIYwuz2Q49eWIP+Aa2X
+	wikN0ICz1FfYosjvY2ydUsK7Dr4t4WiHkEcU6LVCg20zM2xqL/q+akoyXeOlnuVbZ45e/OU9yUW
+	dpHIhGjHRnXVl5qkcIvzAi+wUPQqhb2vHhMeTWfCBS3IuuMAXy7IZznW9wWKMk/OvEsWRgkkbmQ
+	l5P97vL7nHIH6i/hTpqOd+AlccZaqfmNmns1ziFd3pGNlBvrYDZfkHvLdMjskWP1ELS4hdwy3ej
+	/XH0H5CkaupYbz+UvSh/DxuHD+g2STKx7PWZamYUxOiyVMXSyUxxx3Im/V3BMAIcse0Jl/sgHNj
+	o2jqYkvs=
+X-Received: by 2002:a05:600d:864d:10b0:49f:e941:d6e with SMTP id 5b1f17b1804b1-4a1fdd399dbmr32967835e9.21.1792592589343;
+        Wed, 21 Oct 2026 07:23:09 -0700 (PDT)
+Received: from [10.54.182.141] (82-132-213-19.dab.02.net. [82.132.213.19])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1fb80ef02sm83229375e9.5.2026.10.21.07.23.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Oct 2026 07:23:07 -0700 (PDT)
+Message-ID: <d0c8cc97-6a21-4c64-b55d-16af783fdb59@gmail.com>
+Date: Wed, 21 Oct 2026 15:23:09 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -98,57 +93,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261016052203.489760-1-atomlin@atomlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nvme/io_uring: enable dma-buf backed passthrough I/O
+To: Anuj Gupta <anuj1072538@gmail.com>
+Cc: kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, axboe@kernel.dk,
+ joshi.k@samsung.com, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+ Anuj Gupta <anuj20.g@samsung.com>
+References: <20261016103453.1129150-1-anuj1072538@gmail.com>
+ <79627452-98d3-4e8d-9c37-ceda0796d59c@gmail.com>
+ <vx4ugjq6wol6elipmwkuhtpk3qnanpwou6g73dxrjona3nepd4@pvetkgijfsx5>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <vx4ugjq6wol6elipmwkuhtpk3qnanpwou6g73dxrjona3nepd4@pvetkgijfsx5>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 16, 2026 at 01:22:03AM -0400, Aaron Tomlin wrote:
-> Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated
-> CPUs") excluded isolated CPUs from hctx->cpumask to prevent worker
-> threads from executing block work on isolated CPUs. When all CPUs mapped
-> to a hardware queue are isolated (i.e. blk_mq_hctx_empty_cpumask(hctx)
-> evaluates to true), blk_mq_hctx_next_cpu() returns WORK_CPU_UNBOUND with
-> the intention of offloading execution.
-> 
-> However, kblockd_workqueue is allocated as a per-CPU workqueue
-> (WQ_PERCPU). When WORK_CPU_UNBOUND is queued on a per-CPU workqueue, the
-> workqueue core resolves the target CPU via raw_smp_processor_id().
-> Consequently, if a task executing on an isolated CPU submits I/O and
-> triggers an asynchronous queue dispatch with zero delay (e.g. upon
-> hardware queue congestion, tag/resource exhaustion returning
-> BLK_STS_RESOURCE, or plugging), &hctx->run_work is queued directly onto
-> the local isolated CPU's worker pool. This causes the local per-CPU
-> high-priority kworker (e.g. "kworker/6:1H-kblockd") to be scheduled on
-> the isolated CPU. In real-time environments, an active SCHED_FIFO workload
-> will starve this SCHED_NORMAL worker, causing hardware dispatch to stall,
-> in addition to introducing unwanted latency jitter on nohz_full cores,
-> thereby defeating the original objective of commit a46c27026da1.
-> 
-> Introduce blk_mq_hctx_unbound_cpu() to select an online housekeeping CPU
-> from housekeeping_cpumask(HK_TYPE_DOMAIN) via
-> cpumask_any_and_distribute() when executing on an isolated CPU, and
-> otherwise fall back to WORK_CPU_UNBOUND. Use this helper across the
-> unbound fallback paths in blk_mq_hctx_next_cpu()
-> 
-> This ensures that:
->     1.  When executing on an isolated CPU, deferred queue work is
->         cleanly offloaded to an online housekeeping CPU across single-queue
->         devices, hardware queues with empty cpumasks, and offline CPU
->         fallback paths.
-> 
->     2.  The per-CPU high-priority kworker on the isolated CPU is not
->         scheduled, avoiding priority inversion and latency jitter.
-> 
->     3.  When executing on a non-isolated CPU, WORK_CPU_UNBOUND is
->         preserved, maintaining optimal local execution with zero CPU
->         bouncing.
-> 
-> Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
+Hi Anuj,
 
-The current code follows behavior of schedule_work() and other related
-wq APIs. If you think it is wrong, care to fix schedule_work() too,
-otherwise it confuses people, IMHO.
+On 10/19/26 14:40, Anuj Gupta wrote:
+> On Sun, Oct 18, 2026 at 11:06:16PM +0100, Pavel Begunkov wrote:
+>> On 10/16/26 11:34, Anuj Gupta wrote:
+>>> From: Anuj Gupta <anuj20.g@samsung.com>
+>>> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+>>> index 3aa5d2f2dfbb..6343da1f6c05 100644
+>>> --- a/drivers/nvme/host/ioctl.c
+>>> +++ b/drivers/nvme/host/ioctl.c
+>>> @@ -458,6 +458,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+>>>    			status = blk_status_to_errno(err);
+>>>    	}
+>>>    	io_uring_cmd_set_res32(ioucmd, status, result);
+>>> +	io_uring_cmd_detach_dmabuf(ioucmd);
+>>
+>> It's not great spilling the responsibility for [de,a]ttaching
+>> between nvme and uring_cmd code. Is there a way to stash it
+>> all under io_uring?
+> 
+> The natural place would be __io_uring_cmd_done(), but that runs from
+> task_work, while the ref has to be dropped at hardware completion, like
+> io_complete_rw() does.
 
+It may queue a task work but is called from whenever. It would work
+if we drop there and in __io_uring_cmd_do_in_task(), but I agree
+with you that it might be confusing to the user.
 
-Thanks,
-Ming
+> Hooking io_uring_cmd_do_in_task_lazy() would avoid changing the NVMe
+> call site, but would add a non-obvious side effect to a generic
+> task_work helper. How about a separate helper that drivers call from
+> end_io instead? This keeps the dma-buf handling in io_uring while NVMe
+> only reports that it has finished accessing the data.
+
+Sounds the same, but I don't have a better answer, so either is
+fine with me. At least with your versions we can add a warning
+for misbehaving users.
+
+-- 
+Pavel Begunkov
+
