@@ -1,88 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792600362;
-	b=tXz5qkPP5xQ9Dq5HLKbZL9C6jqkaMU/+8ajEpb9QDAeDDmM6zmV/xk8NhFuNypBkOsma
-	 dtkZkiYiulpmOl49jKX4RAsZfoaFCRz0OSNq/yinPJjmOB0efr7HPs9pOANFGBVCd+kt+
-	 9lxlb1Sxe9yNKVKRbHBhL3rlkQpXu5+SrbUPfD499gbdHF1BWn8ODUj1c7wXPk0VCBAte
-	 SOsUfEVYrGviWhUQsV5Xzcu7UnCQ+L60G51IwjsB0f7/bzjP60CMx3Pi3iX8v8OKJLFUE
-	 UjJwTJoX+WjESdliviy3XoaR87ROZ3KhVEcJl0jazNRg0VOJ5f4lSAL/OFMm/U9jcTg==
+	t=1792601378;
+	b=EatdvcShOWRKBgQZulwKV8ag3qVJg28kbz3EIoffVNvIOvvp9piIBGyIgyLkpfguEda0
+	 BTqc4trsoqwBH8hv8ZzUt30VkzMKz48J2WxSOUjNIAxbiRheamPwKmzyMROraoJSvZy2v
+	 NlZc38najixeRZOuihmkOVH/l2PpJumzZCd8zCFhIHx+nW3MWe04XlBAWyUbpxj+yijCT
+	 +ddLAwe8p5EKMTZ40t56I7bdqNUHk5vasCaTiMTlbUZu0G22ZsDjiCthAaOCTMOKXiMWF
+	 FDkJqERrUt9YQiHdQDd5v4jViMcRxAxmlHQmR20Aq8A7YTLj60ZEM8JW2p0Kn02mTnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792600362;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1792601378;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
+	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 References:Content-Language:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=dC+5Lunx5dUQ5dWu37CHLZRWRMYn1XOzLPwBfQqIc2s=;
-	b=iGXvgSsCrJJ7yXazBdAioMBqwa3cb4ZhLKUMGUfQzCLUREg/kdrOYip+26kmLbvIi1rp
-	 3fDlKJ5CcyCYTS2IeHY6+5By+s82GotLEPUcqxu7S+KxbWPv5p4wkdtFzj41V5LbEL9eq
-	 wLkq/LhvW1LrwWGjgmtAfowUZq+XRqxVsggw+zawBFXjEe/6pvLB4jdYK2HIe4O1vGq5g
-	 WY15SbLxH/BlYVv/XHXM3LxmxwYtuJRADj6fH31T/lTqzmFEvUSlgjOv92QdYt/vu7R5Q
-	 DCrf2P4v4wsNbvvThieAx1JEGC5iKaevVdqb3mBRNiiBfuxmnKW5EjItYUqM3mq+4XA==
+	bh=1vJnDpwVYLgb2SfwiOBBeFH79sMSFeqjlwGNgb0hChk=;
+	b=kdm7N2c/3vxqBpP7czMI6EjPHofwoOZFOCGP7FgKGDRioqWbkhdKW+e5m5QnQI3TrM9t
+	 SpNwO/D3Mc29Yh4mc8GOcefHdiuJor/iYe8GBuFqBj4hj8u+myi6x1qmCMy6+Kl0DWMMs
+	 eFk4QYeNBZa3V1s4fstAN+M+eLKaEwdwUTtn/TiobKVOhV8qpRlhsMe0PTK91o7UmhPbl
+	 tXiaNOcAvUdT+VJ4TOFfqdEADfzjc+/phUE2ozF6lx3GxVz8Nu2O55FqCoOkEKKQxm7Zh
+	 czfpqlAmrSjD5zdUNbo/tdIGPmYK4PGQvC5dPKMLMYqY5F3id1QZcdRtBQvVF4hmCvA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=ok0zsLYF;
-	arc=none smtp.remote-ip=209.85.210.170
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=acm.org;
+	spf=pass smtp.mailfrom=acm.org;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=wuv+gXee;
+	arc=none smtp.remote-ip=199.89.1.16
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19F6606A319
-	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 16:32:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F19F6606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CC5606A31D
+	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 16:49:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 77CC5606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=ok0zsLYF
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8a0673d9bd2so523137b3a.3
-        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 09:32:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792600360; x=1793205160; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=dC+5Lunx5dUQ5dWu37CHLZRWRMYn1XOzLPwBfQqIc2s=;
-        b=ok0zsLYF6Jt/8Qjs3Kouo2Hzmuakm+SQxEo0XQvD95+U0UY1ZRvyAH9axs1/PubNR+
-         ySRUGtxOsFYH7B6eJCgGD35Q43GfFsIAm0ds7WDg5uKXytYT+K2bu/MiXsK96XEahIrr
-         LmV5/vV18/k2UtrB48TVICp3aKT/FrH3PED1mJRwpfur3y4hfNR/I+rq4BGtX8PYXBYe
-         xuvq3hZy4pyuzD7ozUn7eG6lO50PP1Rd+k0qvZMyaSA0Kew7qmSo4GZC2IkXbxrMQEmo
-         kshvDGnk6gF7pa6O5v63sFlndH/DRnUPOP605Q/EmggJO2qII0sYznH5JUZoXWPa6TTR
-         /hwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792600360; x=1793205160;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=dC+5Lunx5dUQ5dWu37CHLZRWRMYn1XOzLPwBfQqIc2s=;
-        b=BKAtOcT4NnJJQrCt+bXy+gVa3mEabuy0SWOki1qhCZ3DA2cp/JQeEpmQ274JThEOeM
-         DlsttKSaf18mtNQyeriQIZobHOAIyeGLa2ZEf302kfJfNj+sCOP05EEpUpnFLev+KORt
-         u8fuOMJlLM/02zBvtHjLzTGZvz1VX0sd6oKAxGHF4NDvUl5yHuWxHS5yDo6nqbhEU8uG
-         UWVjEv6c1Lki/DFuRSUyL325gsNzmR6/nK9zjYPpW9q8CeNF2cffyyRDwsjwgRQlFBPa
-         6K7X1LFq5kGkRtqoyMPeibBQY5pZk5KJIA+O5wGPnh89OlMxnxG/hJhaqmPU1cEIH0AD
-         vDPQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzm047JgfsMLGjtZno0mA11mo695rVAYwx7+DdciiXwDI/zT2J70AkVjXfXwykrar+UGWBIlsh8Duv8Xw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJd6arxDmcNiJaCSMzn8tJlvcON/Eua7zD+Hgqv1hdKUlLBxt1Y
-	BfNlaBiL2YqKh6hvE7cFKE/zIYcVUmmJVPADR5SSbev7bhtfHULY7jLHoEIgDEjAZec=
-X-Gm-Gg: AYBFou16Ky8H1Z9ge70da+0UJufDsG2jUoG0FOEX3qfk8i5jBJ1r6iers0vNplLv8tw
-	hzKAXkWtBMVttHZMgG2Mr6oRl+OCqCPNL77pd4PTdPKcUB1tPT9uGCDRlL619CCI++TPqdU5XQL
-	JKFN5zqzuWQBkfvUsgyyVWHdMWeIoAj6K/pCj/QfwE07Jdb0bgRzSiAj3rRjiEjfp9ldmrc6COF
-	U4pJdd4w7u33+jlgH9zMPOcuV/1SXRLxiT9lJgPIJXL5WNks8JCT981os4kxIYyRfyplaUJLrQI
-	FMNoJWwc2HGTw3sFdS3erW+i36P+vbXZxFHCm+uJz24XtJyHGRLjc1tV+16eMhaIuAsaRIWGYfs
-	+AmFqiY9lMp9ArLRVYVqVh9Y4sdPm9FhlKU17TLVmtEou8NG1+/E0Q3lRMdfjZ4fHdpa+UcQbyx
-	+dURBkFwkG6/dKKPcMTM0O2i3hiXK0mFwbGsPWBxxp79vLge0jMR6bGjjG7ApkX7Hgc3gsH+7m+
-	NpRO/CEWX8rT5HMk4gF2EpYmP0iKPob++Y1q7CLzWEuh29Sre2yOPZgAEiy534FDE7RlvZ4rPoB
-	e722nUcA09pbSfNnNF1lNGCgWq+z+hdNdHTQj9EA+LwbwyOWf+N14ch6XOgo
-X-Received: by 2002:a05:6a20:9154:b0:3e0:b445:5612 with SMTP id adf61e73a8af0-3e287dd624emr2111224637.14.1792600359159;
-        Wed, 21 Oct 2026 09:32:39 -0700 (PDT)
-Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cd6b8482048sm247328a12.7.2026.10.21.09.32.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Oct 2026 09:32:36 -0700 (PDT)
-Message-ID: <db225771-106e-4014-bc43-3cd8f0e459cb@kernel.dk>
-Date: Wed, 21 Oct 2026 10:32:35 -0600
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=wuv+gXee
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4j8wHN5ljzzlfvpr;
+	Wed, 21 Oct 2026 16:49:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1792601372; x=1795193373; bh=1vJnDpwVYLgb2SfwiOBBeFH7
+	9sMSFeqjlwGNgb0hChk=; b=wuv+gXee1aH2CRmadClvvk4c3HwQUpVpCrBNowhi
+	oSZCQhIPa1Cup180y838sxyQF3Y0LVJVAv/Yd1J30/Uc6sVoDE9DDQXg3FXVrrpH
+	6WCLXMBSSi2dxNNeDkzpVZgeJpc0vaF6Mr0PkrX/d62xlga3+a+sB3xJrACF36SE
+	++E1se6eITGJkWPRc9ciYlX8/gcrioHbcDP0F8+P0IchIQf5dotU6i/8jEf45n5N
+	n2IWuTdr7yf+EDFzBikT3kaTtg6ToWC71dTDwShadlHuSel9/bMoxXsi6wp3i1qG
+	b3wOO2YQ/F9G50Kq8wBeWPutAm+GlD/GwxA7ENDYWCyycQ==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id U64hflKrJ1Sm; Wed, 21 Oct 2026 16:49:32 +0000 (UTC)
+Received: from [100.80.231.125] (unknown [104.135.182.41])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4j8wHH6SPCzlfvpd;
+	Wed, 21 Oct 2026 16:49:31 +0000 (UTC)
+Message-ID: <97c82167-7760-4baa-add5-64abb1e909dc@acm.org>
+Date: Wed, 21 Oct 2026 09:49:31 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -93,54 +71,69 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: clear stale inactive flag on hctx reuse
-To: Bart Van Assche <bvanassche@acm.org>, Nirmoy Das <nirmoyd@nvidia.com>
-Cc: ming.lei@redhat.com, hare@suse.de, dwagner@suse.de,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20261020125129.430600-1-nirmoyd@nvidia.com>
- <ff516ed8-d4b0-463d-952b-14cf110ec8da@acm.org>
- <29692751-e80e-4f29-a07a-ea0221f1116e@kernel.dk>
- <a39c904d-4d84-49ef-84b2-16db1b28b706@acm.org>
+Subject: Re: [PATCH] block: don't take i_rwsem twice in the direct write
+ fallback
+To: Zhenxian Ma <mzx199711@gmail.com>, axboe@kernel.dk,
+ linux-block@vger.kernel.org
+Cc: hch@lst.de, syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com,
+ Tal Zussman <tz2294@columbia.edu>, Julian Sun <sunjunchao@bytedance.com>
+References: <20261021093332.17334-1-mzx199711@gmail.com>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <a39c904d-4d84-49ef-84b2-16db1b28b706@acm.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20261021093332.17334-1-mzx199711@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/21/26 9:18 AM, Bart Van Assche wrote:
-> On 10/20/26 7:39 AM, Jens Axboe wrote:
->> On 10/20/26 8:13 AM, Bart Van Assche wrote:
->>> On 10/20/26 5:51 AM, Nirmoy Das wrote:
->>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>> index 025a799f35b924d..00b75eb95dd943a 100644
->>>> --- a/block/blk-mq.c
->>>> +++ b/block/blk-mq.c
->>>> @@ -4002,6 +4002,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
->>>>            goto fail;
->>>>          hctx->queue_num = hctx_idx;
->>>> +    clear_bit(BLK_MQ_S_INACTIVE, &hctx->state);
->>>>          hctx->tags = set->tags[hctx_idx];
->>>
->>> Why clear_bit() instead of __clear_bit()?
->>
->> Since this isn't a hot path at all, going into details like
->> that does more harm than good. clear_bit() is totally fine
->> and honestly preferred.
+On 10/21/26 2:33 AM, Zhenxian Ma wrote:
+> commit 2fec4fd97cc3 ("block: take i_rwsem for the direct I/O write
+> fallback") takes i_rwsem around blkdev_buffered_write() in the direct
+> write fallback.  commit 1b1be9ea4e34 ("block: take the inode lock for
+> buffered write fallback") fixes the same race by taking i_rwsem inside
+> blkdev_buffered_write().  With both applied, the fallback takes i_rwsem
+> shared twice.
 > 
-> Although I'm fine with the patch as-is, I want to clarify that
-> the concern behind my reply is code readability rather than a
-> micro-optimization. No other context should be accessing a hctx while
-> blk_mq_init_hctx() is in progress. Using clear_bit() instead of
-> __clear_bit() might make readers of this code wonder whether any other
-> context might be accessing the hctx concurrently with the
-> blk_mq_init_hctx() call.
+> Drop the outer locking in the fallback.
+> 
+> Fixes: 1b1be9ea4e34 ("block: take the inode lock for buffered write fallback")
+> Reported-by: syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=bd975ef54294bec73f0e
+> Cc: Tal Zussman <tz2294@columbia.edu>
+> Cc: Julian Sun <sunjunchao@bytedance.com>
+> Assisted-by: LLM
+> Signed-off-by: Zhenxian Ma <mzx199711@gmail.com>
+> ---
+>   block/fops.c | 7 +------
+>   1 file changed, 1 insertion(+), 6 deletions(-)
+> 
+> diff --git a/block/fops.c b/block/fops.c
+> index 0e4c42c8b74f..ddab4940d76b 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -809,13 +809,8 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>   				else if (!blkdev_dio_fua(iocb, bdev))
+>   					need_sync = true;
+>   			} else {
+> -				ssize_t ret2;
+> -
+> -				inode_lock_shared(bd_inode);
+> -				ret2 = blkdev_buffered_write(iocb, from);
+> -				inode_unlock_shared(bd_inode);
+>   				ret = direct_write_fallback(iocb, from, ret,
+> -							    ret2);
+> +						blkdev_buffered_write(iocb, from));
+>   				need_sync = true;
+>   			}
+>   		} else if (ret > 0 && !blkdev_dio_fua(iocb, bdev)) {
 
-I know that was your intent, but it just reads the opposite to
-me. Whenever someone uses the __ variants it should only be
-for optimization purposes, and preferably with a comment
-explaining why it's safe. Unless there's a reason to do so,
-using the normal variants is just preferable to me.
+Please keep the ret2 variable and its assignment. I prefer to see
+function calls appear in the code in the same order as they are called.
 
--- 
-Jens Axboe
+Additionally, please improve the patch description:
+* "takes i_rwsem shared twice" doesn't say why that's a problem. Please
+   explain that rw_semaphore read locks aren't recursive.
+* Including a short excerpt of the syzbot report about the deadlock
+   would help.
+
+Thanks,
+
+Bart.
