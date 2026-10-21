@@ -1,102 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792581085;
-	b=xkRUFWniEg38qwpI0e1DEsIXtOlSsc9m8bUISzJCbxhfjj020cOHlDmGPtp/+vqbzKT3
-	 d12qGfIAkEJHdhcwL5uYavlMBn6yjxRpKLk0KonUQHca3mNoVRTg54ZHnO79fBbN+nPza
-	 dSC8dxQrVKKKx/H/zZ6i7FwVBbwBpP58DkQDu63Vj8ex5fZs5B1M1bI0x7bC+p21rNNJG
-	 JaAZh+Z9NyVacVxPTvT2aDiIpugXCR9nIX7X2JO1o5jMqKr9jEN7rNuk6+napsoNf11P1
-	 hHv6TcqmYdYUcKw498dCM8IYqYr2NxViCCJxzks8fJTbXnhCa54Ht/pJaJoQuP6vPzQ==
+	t=1792581142;
+	b=mltNxwPT7kn6xAiAPEgBdPq+kOCYFtDwoB20q0tCl8Ux7qRDcV6XeR0gyF4a328rLT+t
+	 Uj3Guyvhl38038py6gdPIFPn8obe7lJJrYsPbT01McOJMFE7Ws8W+XeQ4OSJCxGiEIJ1N
+	 2klaSRrk3Stp/KdtrgqukbVNaJhtUZBIuYO14yQS8QOzLL3ug5JRm2jvBNlPyz8e+8S6g
+	 /dgJrTIHi7557sQiE7oTAsRQHRnDez49ikYZnrS2ogKNUXrpt05XuCgKmE9wyJbn5dNS9
+	 bb5h1lE0KeMSUx3nL8fJdOZrSSZrPMf8K/FttC+xbD565YRIowtizh8U97Yn+lVD02Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792581085;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792581142;
 	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
 	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
 	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Spam-Score:
-	 X-Spam-Level:X-Spam-Flag;
-	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
-	b=1FPKXOD5f9bpgRZPFVhTDahcNVOLlSCiXQK/JxOWwdKorx9jIdirpr7RS8o9mLKycoSV
-	 Naom8KzJY9NK7Myyijty29zSOUWG1ht73OXl+CgOJ4yYPiAlla/JPP0lV3t/J+dxTt23C
-	 sNAAIAvAnRdJzWRy0wmukmYJMFowuMACnSP3tGU2ELWe14pTCD/Ub3WjpJLEwcl2Ec+NU
-	 6I4AcGhygmGMx5ojs3BLCyuSp2H3dJe8vT+luhAJ21YAqontk5qRpLLZGohPZLKO8QCD8
-	 P8wbOqSd4lbpuBfTCbXwT5K9ve7x6dHb1B9zc+aPkAWgpvXejFJp3WFyaEHHUPKiHOg==
+	 Content-Type:Content-Transfer-Encoding:X-Spam-Flag:X-Spam-Level:
+	 X-Spamd-Result:X-Spam-Score;
+	bh=EJBM3qHz6wO0vIjwr4ywSAoAmm7XwJUzCn8kiOebQoo=;
+	b=wlFxLQpAvLOYTbxxN8ZkXQyP0DBU93y77GZ6MGoD44FY6/FVy7bkzxNEkJq+2KVCUsoV
+	 xymFvrWjoKnCrDWKISTZGonwOPw1qJV0JrhyVs9dJxklMK4c4M0dWefhudFIe/KqdzQIj
+	 UbU6SOqna8QbVc62gNlYV0Qn0gPjG1GLYS0rdVL5hNoDxcXCY9jZvtvlFjbUAewWWhbVe
+	 MleiFZhEX4Q1bfdYlcSHsUrkTzPPDywpdlp9qdWqpQnF81LGzQFEd0Wp9XfCyI6JHUfG9
+	 T+doyN8swqSV+l3K/bycL0tA18vIu9VKBVFO0iZoQw1C/4u9xBPLe+liaKjErHbdmLg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=suse.de;
 	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=2DKp838h;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+YSkjRbj;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=2DKp838h;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+YSkjRbj;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=EKjY5bkG;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=1HtUq+x6;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=EKjY5bkG;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=1HtUq+x6;
+	arc=none smtp.remote-ip=195.135.223.130
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E3D606A319;
-	Wed, 21 Oct 2026 11:11:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 33E3D606A319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC499606A319;
+	Wed, 21 Oct 2026 11:12:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC499606A319
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=2DKp838h;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+YSkjRbj;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=2DKp838h;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+YSkjRbj
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=EKjY5bkG;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=1HtUq+x6;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=EKjY5bkG;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=1HtUq+x6
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 75BF81F799;
-	Wed, 21 Oct 2026 11:11:23 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 42A8D21DF0;
+	Wed, 21 Oct 2026 11:12:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1792581083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1792581140; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
-	b=2DKp838h55iWZtAoeCI3WZP/tbtdH69Fwhhl5snOhoo/SOvL3TPxNEB7kElvokkgG+kFMH
-	dRdZN201sNExTcipJQflaHmiV6GJKQ55UmD7+lzYVcd0icuunWJunUswUzPBuKizecMJZx
-	oImFJ5JvtScmceKTbnbyHQw3a7PtGS4=
+	bh=EJBM3qHz6wO0vIjwr4ywSAoAmm7XwJUzCn8kiOebQoo=;
+	b=EKjY5bkGpoRBx4VVHesxzwNxbXTQh6XPdRp0olwx9cU8cEFsZ9PI2VIDMgBaKOP1XFwwI5
+	IglO1jRW0akEjEob42xZ030rkBscXSCj3wBcmKqZWr3lqvwO5I1jHGPlA7GYZ0o7hDG81B
+	NrC9To4Cq2DicOVvV5wanyKMKQGLFQc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1792581083;
+	s=susede2_ed25519; t=1792581140;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
-	b=+YSkjRbjIc3ICzHlctLiruKD0Aw4WtCCt1FOeWs6Wcaam8cuUt2KI0ECIFZ8cLajG6TuAU
-	7XEJbLme4433DjAQ==
-Authentication-Results: smtp-out2.suse.de;
+	bh=EJBM3qHz6wO0vIjwr4ywSAoAmm7XwJUzCn8kiOebQoo=;
+	b=1HtUq+x6/hZp5RVPDBFwKe9bIP41E/4etr41n7TRg7GwWEAu8pmXpvmMDuMybLZyz8fTW/
+	ZhKetV9bbnVrMEDQ==
+Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1792581083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1792581140; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
-	b=2DKp838h55iWZtAoeCI3WZP/tbtdH69Fwhhl5snOhoo/SOvL3TPxNEB7kElvokkgG+kFMH
-	dRdZN201sNExTcipJQflaHmiV6GJKQ55UmD7+lzYVcd0icuunWJunUswUzPBuKizecMJZx
-	oImFJ5JvtScmceKTbnbyHQw3a7PtGS4=
+	bh=EJBM3qHz6wO0vIjwr4ywSAoAmm7XwJUzCn8kiOebQoo=;
+	b=EKjY5bkGpoRBx4VVHesxzwNxbXTQh6XPdRp0olwx9cU8cEFsZ9PI2VIDMgBaKOP1XFwwI5
+	IglO1jRW0akEjEob42xZ030rkBscXSCj3wBcmKqZWr3lqvwO5I1jHGPlA7GYZ0o7hDG81B
+	NrC9To4Cq2DicOVvV5wanyKMKQGLFQc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1792581083;
+	s=susede2_ed25519; t=1792581140;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
-	b=+YSkjRbjIc3ICzHlctLiruKD0Aw4WtCCt1FOeWs6Wcaam8cuUt2KI0ECIFZ8cLajG6TuAU
-	7XEJbLme4433DjAQ==
+	bh=EJBM3qHz6wO0vIjwr4ywSAoAmm7XwJUzCn8kiOebQoo=;
+	b=1HtUq+x6/hZp5RVPDBFwKe9bIP41E/4etr41n7TRg7GwWEAu8pmXpvmMDuMybLZyz8fTW/
+	ZhKetV9bbnVrMEDQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2D84613518;
-	Wed, 21 Oct 2026 11:11:23 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F3932134A5;
+	Wed, 21 Oct 2026 11:12:19 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id TnWRBNud2GqWAQAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 21 Oct 2026 11:11:23 +0000
-Message-ID: <e818bd40-2333-412c-800f-9bad6d6d7f6b@suse.de>
-Date: Wed, 21 Oct 2026 13:11:22 +0200
+	id aqCuMhOe2GpuAgAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 21 Oct 2026 11:12:19 +0000
+Message-ID: <451bea60-3c75-4edd-88c1-415ff7657595@suse.de>
+Date: Wed, 21 Oct 2026 13:12:19 +0200
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -107,8 +107,8 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/5] nvme-fabrics: reset io_queues before computing the
- queue mapping
+Subject: Re: [PATCH 4/5] nvme-fabrics: limit each queue type to the number of
+ online CPUs
 To: Daniel Wagner <dwagner@suse.de>, Keith Busch <kbusch@kernel.org>,
  Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
  Sagi Grimberg <sagi@grimberg.me>
@@ -120,12 +120,14 @@ Cc: Ming Lei <ming.lei@redhat.com>, Surabhi Gogte <sgogte@purestorage.com>,
  linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
  linux-kernel@vger.kernel.org, Daniel Wagner <wagi@kernel.org>
 References: <20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org>
- <20261014-nvme-fabrics-isolcpu-v1-3-355156be27b2@kernel.org>
+ <20261014-nvme-fabrics-isolcpu-v1-4-355156be27b2@kernel.org>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261014-nvme-fabrics-isolcpu-v1-3-355156be27b2@kernel.org>
+In-Reply-To: <20261014-nvme-fabrics-isolcpu-v1-4-355156be27b2@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Level: 
 X-Spamd-Result: default: False [-13.29 / 50.00];
 	SUSE_INTERNAL_BYPASS(-9.00)[];
 	BAYES_HAM(-3.00)[100.00%];
@@ -145,48 +147,36 @@ X-Spamd-Result: default: False [-13.29 / 50.00];
 	FROM_EQ_ENVFROM(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
 X-Spam-Score: -13.29
-X-Spam-Level: 
-X-Spam-Flag: NO
 
 On 10/14/26 9:46 AM, Daniel Wagner wrote:
 > From: Daniel Wagner <wagi@kernel.org>
 > 
-> nvmf_set_io_queues only sets the io_queues entries of the queue types it
-> hands out, but the array is reused on every reconnect.  When the
-> controller grants fewer queues on a reconnect, stale entries survive and
-> nvmf_map_queues maps CPUs to hardware contexts that don't exist anymore,
-> which crashes blk_mq_map_swqueue with a NULL pointer dereference.  E.g.
-> with nr_io_queues=8, nr_write_queues=8 and nr_poll_queues=8, 24 queues
-> are mapped 8/8/8 (default/read/poll).  If the controller grants only 16
-> queues on the reconnect, the poll map still starts at hardware context
-> 16.
+> nvmf_nr_io_queues limits each queue type to the number of online CPUs
+> when asking for I/O queues, but nvmf_set_io_queues hands out the
+> granted queues without these limits, and only nr_io_queues is clamped
+> when parsing the options.
 > 
-> Clear the array before computing the new mapping.
+> E.g. with 2 CPUs, nr_io_queues=2, nr_write_queues=10 and
+> nr_poll_queues=10, 2 + 2 + 2 = 6 queues are requested, but handed out
+> as 4 default, 2 read and 0 poll queues.  blk_mq_map_queues can't create
+> more CPU masks than there are CPUs, so default queues 2 and 3 take over
+> the CPUs of default queues 0 and 1, and connecting the I/O queue of
+> default queue 1 fails with -EXDEV.
+> 
+> Apply the same limits in nvmf_set_io_queues.  A queue type with more
+> queues than online CPUs always has a hardware context without an online
+> CPU, so no working setup changes.  The options are not modified, so the
+> limits follow CPU hotplug on reconnect.
 > 
 > Fixes: 6486199378a5 ("nvme-tcp: fix queue mapping when queue count is limited")
-> Fixes: 5651cd3c4336 ("nvme-rdma: fix queue mapping when queue count is limited")
+> Fixes: a249d3066de6 ("nvme-fabrics: add queue setup helpers")
 > Signed-off-by: Daniel Wagner <wagi@kernel.org>
 > ---
->   drivers/nvme/host/fabrics.c | 2 ++
->   1 file changed, 2 insertions(+)
+>   drivers/nvme/host/fabrics.c | 21 +++++++++++++++------
+>   1 file changed, 15 insertions(+), 6 deletions(-)
 > 
-> diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
-> index 59f823dfbbcc..571de549fbaf 100644
-> --- a/drivers/nvme/host/fabrics.c
-> +++ b/drivers/nvme/host/fabrics.c
-> @@ -1125,6 +1125,8 @@ static int nvmf_parse_options(struct nvmf_ctrl_options *opts,
->   void nvmf_set_io_queues(struct nvmf_ctrl_options *opts, u32 nr_io_queues,
->   			u32 io_queues[HCTX_MAX_TYPES])
->   {
-> +	memset(io_queues, 0, sizeof(*io_queues) * HCTX_MAX_TYPES);
-> +
->   	if (opts->nr_write_queues && opts->nr_io_queues < nr_io_queues) {
->   		/*
->   		 * separate read/write queues
-> 
-
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
 Cheers,
