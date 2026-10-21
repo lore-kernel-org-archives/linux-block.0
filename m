@@ -1,71 +1,71 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=67.231.153.30
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792608440;
-	b=RYUkL/TeCxFzVhAf12sD6RgadbCzbIUzI9V8SVeEbUm9yr0f3RC/wqw4gpjdfqMv4f4l
-	 e52cBhdTZ0RD7CUYwEGSDfg250rDRb1fDYtNa8du9kLc9V533hSF5RyNtbmco2kWbS8XN
-	 I+gM8gBC5geUWdsygq4eSe45cl8RS7M1U/CZytGtFyvDwjnqhUu1YKcwQ3HICasH8lSyU
-	 5zWjkHnwqyBat3DZ4BSgPcD9xWrNRHuBR2TLvStrAQ/wJUZPpAX0rgSyF6UkUaqh2ELeT
-	 9D0CWUGWgYwqhe0W+iguc+BFuX6qrxOZSZHeCNPc9LqDqQtumCLKKE/LT9uFraSJInQ==
+	t=1792608442;
+	b=UBU67t6N40LIXC/Ql/KZFL38QEjTB8gV340kz3P34H/zod46BPzvXV2j7INWmmi6T5O/
+	 J6gzjK3Qo4u72DyzEdelQHq0Vhjfqog+9lxxur2HOC6xnxSBxsQBAud7qhmqT+wX+/jXP
+	 qmEBEummbGE9EVBTWwCqx5jTDNZvuqbFV1bRMCasWosV25XyRVbEgwKddVmcJb4pWlHEO
+	 vXbQy+fPLQ39Gc9GsnV7gdZWAqQfpClS/lqUkV/gRtcUoPrxzZXcq94LAXxDqSPcy7XPk
+	 KY4VbWKgUiPSHUBAvnLG/Ix6jJlOs/3LF2urPt3BjYokH90/bbvs8f6fful5blECUpw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792608440;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792608442;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:From:
 	 To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:X-FB-Internal:Content-Type:
 	 X-Authority-Analysis:X-Proofpoint-ORIG-GUID:
 	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
 	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version;
-	bh=3xBrDcZFd80Ul5kXzUkyKrsSjyIhpaV6/CILIoL496g=;
-	b=P18WtxXuTUvywh9QX4s5ORNOrEoPBJiPsDMkB1/udqT18gh6aBNKfDW+kwO8vy4F/PcV
-	 94tEY+M7SLXGIPcVVdGoRZDhx99hM40mnN0tbbQ6Rshc06tla/xiNXkEK3zgvT46KcJYm
-	 fYNfvvzsyhL/p1HxtpJtaDaZeLVUUdT+l14B7DoxjjbZpKzr06sc0lmDfxhvYYRhEIFUS
-	 jduYrejXVXqubINYJxSbqTtno8+OGHhZjPjRsHA/Ee9pbaUb/r27oCiQGnH525is68Qwf
-	 YWCse+5aGq2yEOVJtViAMfCxfPy2Z6iI850vch7YQ2OpNzv2Tu5RuJdrIKDy8AVd0Cg==
+	bh=vIH9Q4srWAzZV4ros0rpTOQQCBVci/zaS1xLRE132NA=;
+	b=fLKPvn+/l1ZazcJXu9S4cjkw623vWjRm6v2LTAYiGyvproXsCRTZ9ODNWvjfT8WQI+/R
+	 UD3egrsXlqjK3raG7KXZlUnB1/Nb+ZY2l239C7f2IjTRX5bfBqOQOMq+uR+coHqQmbcVD
+	 ZQ8i4oTacKEoEfePwfgwFBFH8+8iRvc/5WNdGPCVwroA+wS1k7DdOPTO/0y3PUUeM3ELl
+	 wx7vZmCX8ImWQTHp2Sd2heDHI3oARdQx86kR2obOEYYaZyMni3T0DNcPtJlBRtuOEa5TV
+	 dzJ/rdS4hRIWv75+XYMU8sCtFsLFvFTg8233bJWNoXLt9it2Xd6K2/BZV70nWFLIuXw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=meta.com;
 	spf=pass smtp.mailfrom=meta.com;
-	dkim=pass header.d=meta.com header.i=@meta.com header.a=rsa-sha256 header.s=pps82601-s2048-2026-q3 header.b=gqrcj7cL;
+	dkim=pass header.d=meta.com header.i=@meta.com header.a=rsa-sha256 header.s=pps82601-s2048-2026-q3 header.b=edhhW5LG;
 	arc=none smtp.remote-ip=67.231.153.30
 Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E9A606A320
-	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 18:47:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 31E9A606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6884B606A319
+	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 18:47:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6884B606A319
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=meta.com header.i=@meta.com header.a=rsa-sha256 header.s=pps82601-s2048-2026-q3 header.b=gqrcj7cL
+	dkim=pass (2048-bit key, unprotected) header.d=meta.com header.i=@meta.com header.a=rsa-sha256 header.s=pps82601-s2048-2026-q3 header.b=edhhW5LG
 Received: from pps.filterd (m0528005.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69LHrvQr2288347
-	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 11:47:18 -0700
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69LHrvQv2288347
+	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 11:47:20 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	pps82601-s2048-2026-q3; bh=3xBrDcZFd80Ul5kXzUkyKrsSjyIhpaV6/CILI
-	oL496g=; b=gqrcj7cL3fIFUR5L5PuBYwrN2ZXXVOcA/3XAjPIatsD7GboMTeonR
-	ZxAgI2VrRgymi0o7NA4d19ceaklLrfFcxkOpQVGeOaA+Aw/uEU2G/oyJBkQSXGqg
-	w/P9/n5f4bHNs4969EkzPrODrmBvzJo9TtEd5NPG6vNLxGwwQ1YVL6vABU/ZfcjA
-	XccTX2Vu/tv5i2QirR36vmxPDmk6shYZc7Wa6lofo/q+yU+Kcj4foLgKZB5hn48X
-	QFT1dOJGRaFp+qSYkAQ0HqrbmPvAub7gynCpXeOXXT/p0auoCY7TSwT8Ray47heB
-	obVhrnbgDhfJhf36P68DrMjYSAJ8reTcA==
+	pps82601-s2048-2026-q3; bh=vIH9Q4srWAzZV4ros0rpTOQQCBVci/zaS1xLR
+	E132NA=; b=edhhW5LGlSgI6dAuDw2hblOVCAgXCNATv+qbb+7D2YuWRd2TpWxkh
+	IjM45kIxn+hCmMhJWzrNsH2p3m8jhlNtzhvzn0wU8ZRDHsMSH0CiKtRZJ6J/n4j+
+	mtVS2uVuKQ7GyQguCYffRGq2eTHub/iXvsG48S/Z2UbCzHTxW/OGY4I+JbBhOgTy
+	doaIXoqGXNQj9a2wpp8VPpYmiiiCy1wFF11fOp9q87jLDt5j6uIRMxttUmS+tSVE
+	1MkzHLbML8MWPfIG4XSXEhQtWiqusjeoH/TEJPkjLvoXOjccdF0NSr2nbeMYVEpD
+	RiCbE98V7JYNbIRVS9N72Smn2Wq86XkHA==
 Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4hdw50euc1-6
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4hdw50euc1-10
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 11:47:17 -0700 (PDT)
-Received: from twshared31846.02.snb1.facebook.com (2620:10d:c0a8:1b::2d) by
+	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 11:47:19 -0700 (PDT)
+Received: from twshared17659.01.snb2.facebook.com (2620:10d:c0a8:1b::2d) by
  mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.56; Wed, 21 Oct 2026 18:47:14 +0000
+ 15.2.2562.56; Wed, 21 Oct 2026 18:47:16 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 9B4FF2DBB477D; Wed, 21 Oct 2026 11:46:59 -0700 (PDT)
+	id A0CE42DBB477E; Wed, 21 Oct 2026 11:46:59 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <axboe@kernel.dk>, <asml.silence@gmail.com>
 CC: <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 1/2] block: reject dma-bufs larger than 4GiB
-Date: Wed, 21 Oct 2026 11:46:57 -0700
-Message-ID: <20261021184658.644645-2-kbusch@meta.com>
+Subject: [PATCH 2/2] nvme-pci: detach dma-bufs only on removal
+Date: Wed, 21 Oct 2026 11:46:58 -0700
+Message-ID: <20261021184658.644645-3-kbusch@meta.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20261021184658.644645-1-kbusch@meta.com>
 References: <20261021184658.644645-1-kbusch@meta.com>
@@ -81,60 +81,63 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=DMgacCNb c=1 sm=1 tr=0 ts=6ad908b5 cx=c_pps
+X-Authority-Analysis: v=2.4 cv=DMgacCNb c=1 sm=1 tr=0 ts=6ad908b7 cx=c_pps
  a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
  a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=jCddH8ec0KUNCymVuxII:22 a=VwQbUJbxAAAA:8 a=kMFwTpXalVGouGIobfMA:9
-X-Proofpoint-ORIG-GUID: 5-7ZOSyUZdi4QzTWZ4-uC4DSxlw_TGEg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDIxMDA3NCBTYWx0ZWRfX3nQm4bknivOF
- yB88w3mlSUkdvRcgzjXUKEQXmXwq02qfK6ij95S1vncea4lScHWC5oZJlxLznvIOGoXvxfW17HQ
- jyD5EOshDYRAbrxuzf3pUKVau9lMtQaDcqeM03bI1AZEZU+5Lr0ccmY9wOoi9DzjoxelLGvjHTi
- u71YAbPOhIDp3QQKicsR2IAqGShQe4358zRdaXuygWHhAeLkkvtvGjA6JGQ2oG5Xpnceu2bBV5i
- 1h4BMe73PXGanWrRzDsIjRDJWhObLh5ZuhSLsRDazQ3aYSBOg2T7ENcRvnR4nFj05BSvWPIeDpT
- UhmpZdeYSouqV5ldeD712PhrtfZ7woHdNM/5SsXL2LZaWuWsrCJFA8T/JzNBlqzjcXNjfe8Rg/q
- mhNh2WhijlDnLxCKrfQ3VAxIp/L2lcWh8Cx0OQhcvHewJXOHT2p3Enm5A0G+RxIPTHpfKxTGr5v
- vu7Os17QJT5VZgzt6jw==
-X-Proofpoint-GUID: 5-7ZOSyUZdi4QzTWZ4-uC4DSxlw_TGEg
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDIxMDA3NCBTYWx0ZWRfXxphHqSUMMVSw
- aFMdi7p4t1rmIjnIeQ7StCTIBQNJOBtqr1Kz6rVdlVF2VeCr9iMj22KLCADs5HkPFb1UU6Bl1nG
- phT3NfCY67q1EA9Ws3tfl6I/HvBXdSc=
+ a=jCddH8ec0KUNCymVuxII:22 a=VwQbUJbxAAAA:8 a=VX5OWN6_KMkPTkhSNNQA:9
+X-Proofpoint-ORIG-GUID: CoCupOvbuWiKWln5oAYILnAqMORX9LW5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDIxMDA3NCBTYWx0ZWRfX4mwuxjvlhff+
+ lutVXojQIjdPmqcsBCky6dwXzyywY67/5rUT4Necrc6xCOaYn/dV2sAH1k7PSz0eE9VJr/fXClq
+ /mPsUC8npyDX/bBUBNtXZIFbOtZFZDO03p2e8H2wA2A5dVTnxT7JepREls92oDJHuP78I996kSJ
+ EBg6aiTIuLP1lt1I/lxLFj78SeqoJr9GPxzM8OcpDVHZUsBfXyYLfH5C361cuu7SOoureWTsuO6
+ TFYjkAlcnqg03FH1r8wbo34p9wQlTb6AkQz+CDW1rms5Oi+MydyfTMOeZnOkN9VJk3k8QpO37Ln
+ FseMGuR/0R9YDlyB7X480mi5OHmLzcLDpzVzpbbpPR9mEQZT/iN7i65T9rMBZbL5IkdmbsmZJlT
+ MME7za48eDg7r338q/0bZfyJZU8RrHXOCH54zp3CGvzQWdefRIx/lsMsDrrCkv1apwn/e4/ckoa
+ CZOuuwKWa+6YXG3IErw==
+X-Proofpoint-GUID: CoCupOvbuWiKWln5oAYILnAqMORX9LW5
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDIxMDA3NCBTYWx0ZWRfX0FZc9aSLUxTA
+ APGKRtTCsdBWNP1NIdg+iTLXO1HPcX9AMoL63o7fnGagZ8b/yV2zPwFyPtYYYOGZnsosr0pqHpl
+ Jl4tHn1b6J1Sjyj3zjLcbKAtvDpR3Ug=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-10-21_05,2026-10-21_02,2025-10-01_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-The dma-buf offset is set in the 32-bit bvec_iter bi_offset. Reject
-buffers that can carry an offset that would wrap.
+Detaching the dma-bufs on every shutdown permanently prevents dma-buf
+I/O after resuming from a suspend. The mappings remain valid across
+suspend, so detach these only when the device is being removed.
 
-Fixes: 839231d19393 ("block: add dma-buf support for raw bdev")
+Fixes: ce5e386c1108 ("nvme-pci: implement dma-buf backed requests")
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/fops.c | 3 ++++
- 1 file changed, 3 insertions(+)
+ drivers/nvme/host/pci.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/fops.c b/block/fops.c
-index 46cb86dd36d23..a974b423869eb 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -19,6 +19,7 @@
- #include <linux/iomap.h>
- #include <linux/module.h>
- #include <linux/io_uring/cmd.h>
-+#include <linux/dma-buf-io.h>
- #include "blk.h"
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 9610e1ff98a2d..a29de6e520b29 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -3578,9 +3578,6 @@ static void nvme_dev_disable(struct nvme_dev *dev, =
+bool shutdown)
+ 			nvme_unquiesce_admin_queue(&dev->ctrl);
+ 	}
+ 	mutex_unlock(&dev->shutdown_lock);
+-
+-	if (shutdown)
+-		nvme_pci_remove_dmabuf(&dev->dmabufs);
+ }
 =20
- static inline struct inode *bdev_file_inode(struct file *file)
-@@ -1009,6 +1010,9 @@ static int blkdev_init_dma_buf_io_ctx(struct file *=
-file,
-=20
- 	if (!(file->f_flags & O_DIRECT))
- 		return -EINVAL;
-+	if (ctx->dmabuf->size > UINT_MAX)
-+		return -EINVAL;
- 	if (!disk->fops->init_dma_buf_io_ctx)
- 		return -EOPNOTSUPP;
- 	if (bdev_has_integrity_csum(bdev))
+ static int nvme_disable_prepare_reset(struct nvme_dev *dev, bool shutdow=
+n)
+@@ -4150,6 +4147,7 @@ static void nvme_remove(struct pci_dev *pdev)
+ 	nvme_stop_ctrl(&dev->ctrl);
+ 	nvme_remove_namespaces(&dev->ctrl);
+ 	nvme_dev_disable(dev, true);
++	nvme_pci_remove_dmabuf(&dev->dmabufs);
+ 	nvme_free_host_mem(dev);
+ 	nvme_dev_remove_admin(dev);
+ 	nvme_dbbuf_dma_free(dev);
 --=20
 2.52.0
 
