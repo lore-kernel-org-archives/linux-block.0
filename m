@@ -1,102 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792581043;
-	b=0wkRd7IucaMOQGxKi/wPKC5nEaENHWz2KbaPqIdl/HC5k2uWXI4BxxVKq8SslxMYPxRs
-	 6Wx+RkLocBJWTPcypjyZzGuQU5Be9tFfQCVDwfU6jTlvPo6u42e3oHwRACvsdCpd4TyUt
-	 rCafvqZUcK3DKUI+GX9uHoxrG4yxA6PGR8SZh7QEXQ/Nr/Lq79ZcYIvEhpnsgNiTgmyZG
-	 0wQhPONXG/zgzAT6mqItec0Jv/xOUmGLvPAC21fN7HJaR8X+my1IfxwXEYUxTBdbxWtXS
-	 Aynubq1+/pYmMNYoR+yb4voeYBEgGSedeIDoxqVJQhfHni71t4wYTA8/h0iwBAO3AAg==
+	t=1792581085;
+	b=xkRUFWniEg38qwpI0e1DEsIXtOlSsc9m8bUISzJCbxhfjj020cOHlDmGPtp/+vqbzKT3
+	 d12qGfIAkEJHdhcwL5uYavlMBn6yjxRpKLk0KonUQHca3mNoVRTg54ZHnO79fBbN+nPza
+	 dSC8dxQrVKKKx/H/zZ6i7FwVBbwBpP58DkQDu63Vj8ex5fZs5B1M1bI0x7bC+p21rNNJG
+	 JaAZh+Z9NyVacVxPTvT2aDiIpugXCR9nIX7X2JO1o5jMqKr9jEN7rNuk6+napsoNf11P1
+	 hHv6TcqmYdYUcKw498dCM8IYqYr2NxViCCJxzks8fJTbXnhCa54Ht/pJaJoQuP6vPzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792581043;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792581085;
 	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
 	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
 	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Spam-Score:
 	 X-Spam-Level:X-Spam-Flag;
-	bh=UCkfmHOiQxhQajlRY6RXrRx6cpO82id1YJHUSOoswrs=;
-	b=ZsS09WWJYIm5QBJRJTxIOYzH6dZG1rfWmIZh5WApMr67CeOgeBEgmpkQSSOKi5yC32G8
-	 ykUtPmUNk23PHRSR+yUuQWXAVRydRBPiE1dePO3VTopVFkIkYR/5RAcgQUpDfgW63hGp5
-	 Q5eEu3bGMJrLMFSL+BTXge5LSTIffvj5byGyRowS0oGQO/n/bLkMxEYDN+9PKD1fwWnvR
-	 9G/LsBHbXGBAdMHFRrXj3sItiRTwy0OCuN1xeOBRNG0gbNhFDTh7kG21dtodwiqgEvUiH
-	 ZUt5DWK63dL1ikgZNWlc8vrbCt5gcRkiy2IS3qaBAVnl3mxW/heM0bUA1C6HMCz0w9g==
+	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
+	b=1FPKXOD5f9bpgRZPFVhTDahcNVOLlSCiXQK/JxOWwdKorx9jIdirpr7RS8o9mLKycoSV
+	 Naom8KzJY9NK7Myyijty29zSOUWG1ht73OXl+CgOJ4yYPiAlla/JPP0lV3t/J+dxTt23C
+	 sNAAIAvAnRdJzWRy0wmukmYJMFowuMACnSP3tGU2ELWe14pTCD/Ub3WjpJLEwcl2Ec+NU
+	 6I4AcGhygmGMx5ojs3BLCyuSp2H3dJe8vT+luhAJ21YAqontk5qRpLLZGohPZLKO8QCD8
+	 P8wbOqSd4lbpuBfTCbXwT5K9ve7x6dHb1B9zc+aPkAWgpvXejFJp3WFyaEHHUPKiHOg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=suse.de;
 	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=rD6+WzcF;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=6ekZ5gws;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=rD6+WzcF;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=6ekZ5gws;
-	arc=none smtp.remote-ip=195.135.223.130
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=2DKp838h;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+YSkjRbj;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=2DKp838h;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+YSkjRbj;
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4317F606A31B;
-	Wed, 21 Oct 2026 11:10:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4317F606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E3D606A319;
+	Wed, 21 Oct 2026 11:11:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 33E3D606A319
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=rD6+WzcF;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=6ekZ5gws;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=rD6+WzcF;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=6ekZ5gws
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=2DKp838h;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+YSkjRbj;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=2DKp838h;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+YSkjRbj
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 7951D21DE1;
-	Wed, 21 Oct 2026 11:10:41 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 75BF81F799;
+	Wed, 21 Oct 2026 11:11:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1792581041; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1792581083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UCkfmHOiQxhQajlRY6RXrRx6cpO82id1YJHUSOoswrs=;
-	b=rD6+WzcF+YZIhOklmrjuoOOhngj24XwaPJIobh9u+JBhhhbeB/7UlGOB19C2VZNh+8unzh
-	gU9wLuLmuSE8uvDc/jKTYNsPwnmAyS0A1qyH5Zln4FuQUYB9clHFdPcft6GrBWz5k+Y1yM
-	arA2Fd8TQWiyT0dmYQdI3kABnSXqspo=
+	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
+	b=2DKp838h55iWZtAoeCI3WZP/tbtdH69Fwhhl5snOhoo/SOvL3TPxNEB7kElvokkgG+kFMH
+	dRdZN201sNExTcipJQflaHmiV6GJKQ55UmD7+lzYVcd0icuunWJunUswUzPBuKizecMJZx
+	oImFJ5JvtScmceKTbnbyHQw3a7PtGS4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1792581041;
+	s=susede2_ed25519; t=1792581083;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UCkfmHOiQxhQajlRY6RXrRx6cpO82id1YJHUSOoswrs=;
-	b=6ekZ5gwsivf9G+TIG9GapkV6C+0hjmwaZx1H/6wajgwDvu77eR8eQYkaKhLvl1E1iAAxqk
-	LkRDSBn3jew6gkDQ==
-Authentication-Results: smtp-out1.suse.de;
+	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
+	b=+YSkjRbjIc3ICzHlctLiruKD0Aw4WtCCt1FOeWs6Wcaam8cuUt2KI0ECIFZ8cLajG6TuAU
+	7XEJbLme4433DjAQ==
+Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1792581041; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1792581083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UCkfmHOiQxhQajlRY6RXrRx6cpO82id1YJHUSOoswrs=;
-	b=rD6+WzcF+YZIhOklmrjuoOOhngj24XwaPJIobh9u+JBhhhbeB/7UlGOB19C2VZNh+8unzh
-	gU9wLuLmuSE8uvDc/jKTYNsPwnmAyS0A1qyH5Zln4FuQUYB9clHFdPcft6GrBWz5k+Y1yM
-	arA2Fd8TQWiyT0dmYQdI3kABnSXqspo=
+	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
+	b=2DKp838h55iWZtAoeCI3WZP/tbtdH69Fwhhl5snOhoo/SOvL3TPxNEB7kElvokkgG+kFMH
+	dRdZN201sNExTcipJQflaHmiV6GJKQ55UmD7+lzYVcd0icuunWJunUswUzPBuKizecMJZx
+	oImFJ5JvtScmceKTbnbyHQw3a7PtGS4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1792581041;
+	s=susede2_ed25519; t=1792581083;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UCkfmHOiQxhQajlRY6RXrRx6cpO82id1YJHUSOoswrs=;
-	b=6ekZ5gwsivf9G+TIG9GapkV6C+0hjmwaZx1H/6wajgwDvu77eR8eQYkaKhLvl1E1iAAxqk
-	LkRDSBn3jew6gkDQ==
+	bh=n0j1drhlnlCtpxxLEzYakiDDyaGlUXaZ4daHm/zAbPc=;
+	b=+YSkjRbjIc3ICzHlctLiruKD0Aw4WtCCt1FOeWs6Wcaam8cuUt2KI0ECIFZ8cLajG6TuAU
+	7XEJbLme4433DjAQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2C3CE134A5;
-	Wed, 21 Oct 2026 11:10:41 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2D84613518;
+	Wed, 21 Oct 2026 11:11:23 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 7JaSOrCd2GqvfwAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 21 Oct 2026 11:10:41 +0000
-Message-ID: <62c3831f-f4e5-484e-b32a-f83ed1316d68@suse.de>
-Date: Wed, 21 Oct 2026 13:10:40 +0200
+	id TnWRBNud2GqWAQAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 21 Oct 2026 11:11:23 +0000
+Message-ID: <e818bd40-2333-412c-800f-9bad6d6d7f6b@suse.de>
+Date: Wed, 21 Oct 2026 13:11:22 +0200
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -107,8 +107,8 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] blk-mq: use a housekeeping CPU for passthrough
- requests on isolated hctxs
+Subject: Re: [PATCH 3/5] nvme-fabrics: reset io_queues before computing the
+ queue mapping
 To: Daniel Wagner <dwagner@suse.de>, Keith Busch <kbusch@kernel.org>,
  Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
  Sagi Grimberg <sagi@grimberg.me>
@@ -120,10 +120,10 @@ Cc: Ming Lei <ming.lei@redhat.com>, Surabhi Gogte <sgogte@purestorage.com>,
  linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
  linux-kernel@vger.kernel.org, Daniel Wagner <wagi@kernel.org>
 References: <20261014-nvme-fabrics-isolcpu-v1-0-355156be27b2@kernel.org>
- <20261014-nvme-fabrics-isolcpu-v1-2-355156be27b2@kernel.org>
+ <20261014-nvme-fabrics-isolcpu-v1-3-355156be27b2@kernel.org>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261014-nvme-fabrics-isolcpu-v1-2-355156be27b2@kernel.org>
+In-Reply-To: <20261014-nvme-fabrics-isolcpu-v1-3-355156be27b2@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-13.29 / 50.00];
@@ -153,94 +153,41 @@ X-Spam-Flag: NO
 On 10/14/26 9:46 AM, Daniel Wagner wrote:
 > From: Daniel Wagner <wagi@kernel.org>
 > 
-> Since commit a46c27026da1 ("blk-mq: don't schedule block kworker on
-> isolated CPUs") isolated CPUs are removed from hctx->cpumask.  That
-> commit assumed the mask is only used for kworker placement and CPU
-> offline handling, but blk_mq_alloc_request_hctx uses it to pick the
-> software context of the request.  If only isolated CPUs are mapped to a
-> hardware context, the mask is empty and blk_mq_alloc_request_hctx fails
-> with -EXDEV, although the isolated CPUs still submit I/O to it.
+> nvmf_set_io_queues only sets the io_queues entries of the queue types it
+> hands out, but the array is reused on every reconnect.  When the
+> controller grants fewer queues on a reconnect, stale entries survive and
+> nvmf_map_queues maps CPUs to hardware contexts that don't exist anymore,
+> which crashes blk_mq_map_swqueue with a NULL pointer dereference.  E.g.
+> with nr_io_queues=8, nr_write_queues=8 and nr_poll_queues=8, 24 queues
+> are mapped 8/8/8 (default/read/poll).  If the controller grants only 16
+> queues on the reconnect, the poll map still starts at hardware context
+> 16.
 > 
-> The nvme fabrics transports allocate the Connect command for every I/O
-> queue this way, so connecting a controller fails with isolcpus=domain
-> or an isolated cpuset partition as soon as a hardware context only has
-> isolated CPUs.
+> Clear the array before computing the new mapping.
 > 
-> Passthrough requests are inserted directly into hctx->dispatch, so
-> their software context only selects the CPU the completion runs on and
-> the hint for freeing the tag.  Use the software context of an online CPU
-> which is neither isolated from the scheduler domains nor from managed
-> interrupts for them.  Other requests and inactive hardware contexts
-> still fail.
-> 
-> Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
+> Fixes: 6486199378a5 ("nvme-tcp: fix queue mapping when queue count is limited")
+> Fixes: 5651cd3c4336 ("nvme-rdma: fix queue mapping when queue count is limited")
 > Signed-off-by: Daniel Wagner <wagi@kernel.org>
 > ---
->   block/blk-mq.c | 37 +++++++++++++++++++++++++++++++++++--
->   1 file changed, 35 insertions(+), 2 deletions(-)
+>   drivers/nvme/host/fabrics.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index a26a11c73ee3..79fb08400c48 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -697,6 +697,25 @@ struct request *blk_mq_alloc_request(struct request_queue *q, blk_opf_t opf,
->   }
->   EXPORT_SYMBOL(blk_mq_alloc_request);
->   
-> +/*
-> + * Return an online CPU which is neither isolated from the scheduler domains
-> + * nor from managed interrupts, or nr_cpu_ids if there is none.
-> + */
-> +static unsigned int blk_mq_housekeeping_cpu(void)
-> +{
-> +	unsigned int cpu;
-> +
-> +	rcu_read_lock();
-> +	for_each_online_cpu(cpu) {
-> +		if (!cpu_is_isolated(cpu) &&
-> +		    housekeeping_test_cpu(cpu, HK_TYPE_MANAGED_IRQ))
-> +			break;
-> +	}
-> +	rcu_read_unlock();
-> +
-> +	return cpu;
-> +}
-> +
->   struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->   	blk_opf_t opf, blk_mq_req_flags_t flags, unsigned int hctx_idx)
+> diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+> index 59f823dfbbcc..571de549fbaf 100644
+> --- a/drivers/nvme/host/fabrics.c
+> +++ b/drivers/nvme/host/fabrics.c
+> @@ -1125,6 +1125,8 @@ static int nvmf_parse_options(struct nvmf_ctrl_options *opts,
+>   void nvmf_set_io_queues(struct nvmf_ctrl_options *opts, u32 nr_io_queues,
+>   			u32 io_queues[HCTX_MAX_TYPES])
 >   {
-> @@ -747,8 +766,22 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->   	if (!blk_mq_hw_queue_mapped(data.hctx))
->   		goto out_queue_exit;
->   	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
-> -	if (cpu >= nr_cpu_ids)
-> -		goto out_queue_exit;
-> +	if (cpu >= nr_cpu_ids) {
-> +		/*
-> +		 * Isolated CPUs are not part of hctx->cpumask, so it can be
-> +		 * empty although online CPUs are mapped to this hardware
-> +		 * context.  Passthrough requests are inserted directly into
-> +		 * hctx->dispatch, so use the software context of a
-> +		 * housekeeping CPU for them.  Inactive hardware contexts have
-> +		 * no online CPU left.
-> +		 */
-> +		if (!blk_op_is_passthrough(opf) ||
-> +		    test_bit(BLK_MQ_S_INACTIVE, &data.hctx->state))
-> +			goto out_queue_exit;
-> +		cpu = blk_mq_housekeeping_cpu();
-> +		if (cpu >= nr_cpu_ids)
-> +			goto out_queue_exit;
-> +	}
->   	data.ctx = __blk_mq_get_ctx(q, cpu);
->   
->   	if (q->elevator)
+> +	memset(io_queues, 0, sizeof(*io_queues) * HCTX_MAX_TYPES);
+> +
+>   	if (opts->nr_write_queues && opts->nr_io_queues < nr_io_queues) {
+>   		/*
+>   		 * separate read/write queues
 > 
-Hmm. I wonder.
-While the patch looks correct, the reasoning for this patch is slightly 
-confusing: 'nvme connect' surely tries to send a 'connect' command on
-every queue, and every queue maps to a cpu (-set).
-But why do we execute a 'connect' sqe on an isolated CPU? I thought
-we would exclude them when connecting the queues?
+
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
 Cheers,
 
