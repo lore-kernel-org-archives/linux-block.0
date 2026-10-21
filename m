@@ -1,109 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.227.134
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792573183;
-	b=TyHFWaTMWTy0CmTXBIkpUHsmI1/e8NBUpYyEAu/sjXDT5TL2JbmowMJqxVkW49LD3vJg
-	 bfXyHyVpqiwu98P6Jv7cVAARhj8yaCKbUCa3DL+ya4eNs5x0aFMrzUI+OmjzKNu/h/D+c
-	 DWsepZ7JHGQFdWRflw0GUEqJyr/RyaqRgp5EMOstl4zz+nsoRKR/oKdVXOx0FKpxyN+HC
-	 0lqoam/bNUO4aPL1I0YfbbKNc4ypzvRtz2A1MkWEqS+zHQMy0ZsETxaQFz6Vv6pMp6a2p
-	 OSt3JYqJ7AjsI/PSMkhzT45/l2jMbPepiWgTj9XJ4uCnFXC7SA9eTIk/5mBi74Bta+A==
+	t=1792575253;
+	b=RRL2WDbN2c0Ls6Y+Sz7Qx8l1fA0c95bhbRXs2wO8KTvJjsbzNoVNE3nUCSmXni6M3DdD
+	 nScsalzHlipmsDHw1g24muNJwbg7PAdXYdSyzzQH1ex1w8lQwqm415+H1TvySmigp4MMB
+	 xxGbrDNTJ05Xfnf8reWIoefCpZTPsmH4SU4prx++/o8UF71E/tCdvfHAS/pK/vs1oe79o
+	 W3nXzxKrClqtrmIS65u+HesOsvnq17/2CX4gJEYsab2KGZu43gISQdyexTDic9sW1pQct
+	 9w32Pe/IUBhM8YK6Be5Z6y8DLbmc1sbEqvxLeFtgNxmXlC1j4cmg5mYQbdkC80Jhb+Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792573183;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-Rspamd-Action:X-Spam-Score:X-Spam-Flag:X-Spamd-Result:X-Spam-Level:
-	 X-Rspamd-Queue-Id:X-Rspamd-Server;
-	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
-	b=xcWqWh4tlKybSt2It1VndsN6NO/CJ/piKvu5fvrg30x5gYJ2CQbNMYnYprqWl2PUY/lh
-	 pc2hIEhvHMnkOZ0QUPzEi/nr0T5J2w2pyxY/qpxVjS3rZWLuOQQmBpsqw4qNG0zRsh1M0
-	 pWOGHuHGCsIgIdBdeYib6xmuDaKOHZ1PNwXF8wnKaa+NwbZSGcV91PpHYD+WMgs73shk3
-	 sUWkn9Elsv1rQ6vl2HIPaj5JLvFBp83gabs3ufRxppiAAaHGLqV2SuObulZDXzZeJHtfE
-	 qJ/GS9CEquBy/wGevuCjda3YaYz4YOYEFdVJN4it7vmeTkBiHrlKvqmR5Qst4WAQkKw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792575253;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=/icW9de2yPi45VA3VGlvd36JSdYTaM+DvBNccOsQTwY=;
+	b=F0vLLUTZchERVQlaUen0vikbZOXqOIDyk41DOFzW5TtHydgCli7zevd274zM4QSHeTO7
+	 m50J56TDYtgPgMN1XAcisGBgJzIsuz8+OQsyrV4feXyMXya3nNyJsfAtAZlfNRk0Wn9Wi
+	 J6dxKMG8fGTeH4i9Dtppn2mnf+YnyNryjOhPL/VA5XeOTYYLaI3fK+xckJu3eeDisdTZl
+	 u2IHq9p8j23o4AaZn00mPUA+C10lYcp7yVofHj3Wq0aXkJWesFAtwPdMcGhxhky9DS5F1
+	 Vz6ktRpkeRBt2V0hV9puG9Nf/pnXvqXGQ9lEzj2HOELPj9XtSfJEtsS3j9ZNuokbx2A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=pnavB1YQ;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=FvXr7lmg;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=UoEaZvBI;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=727llxKI;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=gV78xjk8;
+	arc=none smtp.remote-ip=74.125.227.134
+Received: from mail-pj2-f6.google.com (mail-pj2-f6.google.com [74.125.227.134])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC760606A31B;
-	Wed, 21 Oct 2026 08:59:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC760606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32FB606A31E
+	for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 09:34:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D32FB606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=pnavB1YQ;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=FvXr7lmg;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=UoEaZvBI;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=727llxKI
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C1FC51F7C4;
-	Wed, 21 Oct 2026 08:59:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1792573181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
-	b=pnavB1YQO92YCXlsmfLgPQlFLOchvVuqwTo2ajJLqepdfRUOBFx5ITgy9XePlpZzpJde5x
-	fVBWqLzNiiY3q5gLrkzDwoMHlXZ/vzvqU06/hGlf0jIeX9vy2Z+KOe7lOiG91DXcqOnRG2
-	UGt17PnI5H0NliV7W5mrIazW8CsU0Kc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1792573181;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
-	b=FvXr7lmgduEM4f1zUlczE8sZehIlX7cFxP9SH6s6t/M9J/jAU2y9ZFoArxQ4niIJZdmaUk
-	g4Kfe2q0lh7qGgCg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=UoEaZvBI;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=727llxKI
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1792573180; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
-	b=UoEaZvBIYvNjeyOVnoDwBMxQOPbsHfhnGvhB00+vUP8fKbq3HAsu0hAelcUrCH8SmuXUXm
-	1LPS+5Q95gPwvLqZXm0bWGfjKJbMoFGAy4uw/Ih94bydbmBPMtc7QOF1r1kSeQ6CTn7X3v
-	ufhEyuYqHIs27JM4g+IUSjHYc2m59v8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1792573180;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyNTbNEiAoIwsJLTz99M7oLLSoGo+m07kKcOdYkr6Ls=;
-	b=727llxKInczBYWntWyAIXyZoudCLsm0TQzPi38ueWwpbBENZvC51lILZrrqXE3cv6Or2Cl
-	CfxIgoVnxNjHlgCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 87022134A5;
-	Wed, 21 Oct 2026 08:59:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id U8xSGPx+2GoXdAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 21 Oct 2026 08:59:40 +0000
-Date: Wed, 21 Oct 2026 10:59:39 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Aaron Tomlin <atomlin@atomlin.com>
-Cc: axboe@kernel.dk, tom.leiming@gmail.com, hare@suse.de, 
-	frederic@kernel.org, tj@kernel.org, sean@ashe.io, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3] blk-mq: dispatch kworker to housekeeping CPU when
- hctx cpumask is empty
-Message-ID: <63c7810b-b893-43be-b108-4fcc05773492@flourine.local>
-References: <20261016052203.489760-1-atomlin@atomlin.com>
- <a6b3d7c6-64fd-4b92-8428-964a863ea9e8@flourine.local>
- <zpheefzacmmkz362qm342gfxhluovh4d35numrweqn2ajnxhog@ucus4k2prn6o>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=gV78xjk8
+Received: by mail-pj2-f6.google.com with SMTP id d9443c01a7336-2e987949882so2853015ad.0
+        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 02:34:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792575252; x=1793180052; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/icW9de2yPi45VA3VGlvd36JSdYTaM+DvBNccOsQTwY=;
+        b=gV78xjk8/82DGacL2DayycVIorrceekLo5SltnqN48dOsqJlMiSefW2t/j2EnbXx7B
+         hloTii7NO/EdN8mMnY7KyuMm13T1MDixIyyxkZLdg4/I70KntgADmkG8U65ol2r7rFzL
+         wJQiYaKiRIf6EVhDVkZpW9b2kGm5MBmPcNHqOqtHLRu3eEFgZtaiIqVslu+LWuhbhE+Z
+         6Vw97IDR9Ms+HbHv60lBqrIVQRN12C/oeLFOrDvelkJ2Z++TiidSwabvbIzx3OCNj+um
+         3KQuCVcKYoaemtj9XnzOhe7SFD70Z2DlFIY5o5eLs1XtCq72Zvc+3V4nN8/lvOx7sfT+
+         FE3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792575252; x=1793180052;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/icW9de2yPi45VA3VGlvd36JSdYTaM+DvBNccOsQTwY=;
+        b=b0U6ULOsMoeCIjJ2owiPdZP4bEYi09xySO1V0jUsG2vFcBEsRuip0z3aG5Ub3DbGx9
+         8up9VBTnODC/krL3FIXn8MxtUkofEYTEjFtnM0NudvoihXZLoVpR1D2W7CjFiliVjmrN
+         jfJkoz2QXKWhPk1rVuWNqktCbZoJSIInJuyhMj6xfoRm1ErSqfMVtYQ6GPlZw8fZqDL6
+         LenieEJB0rmiHh3FNFadv6CQkutMMIDN+gOIyYAA+r5pZ4Y+BDC640PGfRcDje8Amium
+         hIkFC8OrGrP4Ugc+v1BX33x40EZ8ornaP+SNp9PWs8cOY4W9K4YBMUCmEET7BWafOgPI
+         oC6Q==
+X-Forwarded-Encrypted: i=1; AKwUvBxkPAPwduQKvEqM49qBLoNBXf2SKKpIHK9OmkeV82cLmt0B9GWTqkuFSnaqr0wjn7dlxJiC/ohELAcp2w==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKUOjtbqMsLyBRfI3+pv1WH68loEmWzCLB2Qn+CI9XLFSCmFc4E
+	65zzo4Tj5H8L2IDpp3yxzPXF24RV0Rk3Vg0hfG6CcIuZtMez90gP55thXQkG2zmqBsk=
+X-Gm-Gg: AYBFou3xpDZgnDRF3iaERDVcYUv9Lbjwm9Za+uds81SVAeb+7VYAWjHUX4EApgEc3mA
+	prw2VAkZrudkLma59EQr/n+5B7t0J0m/3dQonvk3SZ+E31wH0fQwRpwM3dY1IJh7ThNiKbbPNbF
+	hIghHBpHfC4qvY75O4qPRaASd68j6r0b1Zr7h6/jh+liuZ7VmTXMXfnUIELuBSTNVZocDnTWTyq
+	EJ9to3dAe/S5/kPIgKoO0FTDnTi059yJtv583b2JkgFbooitW7KhOHlp2FsqeDYAStkFB8EC485
+	QAjbWnUWn7vXth9OvX5kDAZ+mZRTZuEJICPSyP80ehLXLjDeKV+Pauiwp1ucQepAjerAcTPjDgc
+	QmL0Ngjp56V1MraSA3BTX/u3tBimKoU5Pwujp1hbq9buyHm0FxAguBGZ+MSGOLQHigKduoLxKnY
+	Vz4n9KlxOXOELnWDQYV3mUPvWOMbsMaqXT+pxNaEQwXFCl13XfKyX7BHgm43ATrgZwxk3PvmecG
+	oNWIycIU2Ry07QyBBxuWvnC0MnCaC8Ym2gr73iUio6wKBBIllO6fdL72dTiZUbQfCCxsJkMiQKv
+	lDoKyrKxJP3Q1fSeKe82lHOnNRpeScy1SFITb8gxs7B/+8p6
+X-Received: by 2002:a17:90b:3bce:b0:3ab:2c2b:1026 with SMTP id 98e67ed59e1d1-3ad86f794c7mr1272615a91.34.1792575252058;
+        Wed, 21 Oct 2026 02:34:12 -0700 (PDT)
+Received: from HXYG4FPMGD.xiaohongshu.sh ([61.8.202.163])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ad802917c3sm3699898a91.7.2026.10.21.02.34.08
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 21 Oct 2026 02:34:11 -0700 (PDT)
+From: Zhenxian Ma <mzx199711@gmail.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Cc: hch@lst.de,
+	Zhenxian Ma <mzx199711@gmail.com>,
+	syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com,
+	Tal Zussman <tz2294@columbia.edu>,
+	Julian Sun <sunjunchao@bytedance.com>
+Subject: [PATCH] block: don't take i_rwsem twice in the direct write fallback
+Date: Wed, 21 Oct 2026 17:33:32 +0800
+Message-ID: <20261021093332.17334-1-mzx199711@gmail.com>
+X-Mailer: git-send-email 2.55.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -113,57 +98,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <zpheefzacmmkz362qm342gfxhluovh4d35numrweqn2ajnxhog@ucus4k2prn6o>
-X-Rspamd-Action: no action
-X-Spam-Score: -3.01
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.dk,gmail.com,suse.de,kernel.org,ashe.io,vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.de:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Spam-Level: 
-X-Rspamd-Queue-Id: C1FC51F7C4
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+Content-Transfer-Encoding: 8bit
 
-> While your nvme/070 test targets NVMe fabrics connect and passthrough
-> request allocation, this fix is in core blk-mq (blk_mq_hctx_next_cpu) and
-> affects deferred workqueue execution across all block devices. Using a new
-> test based on null_blk would allow us to:
-> 
->     1.  Target infrastructure for generic blk-mq workqueue placement testing
-> 
->     2.  Easily configure a shallow queue depth or inject tag
->         exhaustion/busy conditions to reliably trigger asynchronous queue
->         dispatch (&hctx->run_work)
-> 
->     3.  Trace workqueue:workqueue_execute_start to assert that no kblockd
->         worker executes on the isolated core
-> 
-> I'll put together a test case for tests/block/.
+commit 2fec4fd97cc3 ("block: take i_rwsem for the direct I/O write
+fallback") takes i_rwsem around blkdev_buffered_write() in the direct
+write fallback.  commit 1b1be9ea4e34 ("block: take the inode lock for
+buffered write fallback") fixes the same race by taking i_rwsem inside
+blkdev_buffered_write().  With both applied, the fallback takes i_rwsem
+shared twice.
 
-Sounds good to me! Thanks.
+Drop the outer locking in the fallback.
+
+Fixes: 1b1be9ea4e34 ("block: take the inode lock for buffered write fallback")
+Reported-by: syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=bd975ef54294bec73f0e
+Cc: Tal Zussman <tz2294@columbia.edu>
+Cc: Julian Sun <sunjunchao@bytedance.com>
+Assisted-by: LLM
+Signed-off-by: Zhenxian Ma <mzx199711@gmail.com>
+---
+ block/fops.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/block/fops.c b/block/fops.c
+index 0e4c42c8b74f..ddab4940d76b 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -809,13 +809,8 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 				else if (!blkdev_dio_fua(iocb, bdev))
+ 					need_sync = true;
+ 			} else {
+-				ssize_t ret2;
+-
+-				inode_lock_shared(bd_inode);
+-				ret2 = blkdev_buffered_write(iocb, from);
+-				inode_unlock_shared(bd_inode);
+ 				ret = direct_write_fallback(iocb, from, ret,
+-							    ret2);
++						blkdev_buffered_write(iocb, from));
+ 				need_sync = true;
+ 			}
+ 		} else if (ret > 0 && !blkdev_dio_fua(iocb, bdev)) {
+-- 
+2.39.3
+
