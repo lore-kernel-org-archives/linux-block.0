@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792653335;
-	b=HgWliRmxS/EDxzYbHVSGMhiysnGTgs5UTSUQDfxI3a/6KfOD2oXjB/wy3NZgyLFhF+/d
-	 g+gB+hy2EyRBOk4niqGe8knOJ1/UELJkZr8uFRKAQTXAiYHY48IZFzdtpHlTFpl3f/rY9
-	 r1yjOzY/W6epcFiwhgXLFK9/a0Ok4LRw/ErAqwqvSG5i8n45zisDpgBg7QdWrBqYMjZfa
-	 Vp/yRzTeKpb/frvYXV7p8u2lZ1PYRQ39oyUD+gVNi8zZleU6c5OlsYMGk+ciHf3uk1WN6
-	 vQ6dgsjoh+kgOCuh4rg5LVHAQTa9/2Qnr/FhcXDj6yiUZvwRndllX25hS8PykW4ORHA==
+	t=1792654444;
+	b=pgIAd6vnP8PvV1hXc3a2yUoMLdkMKO3wjjFqp8G3tb2LhOZ8HclwOd7+2E91vjScVp2W
+	 3ngRbXvI480FZhNTnt1Aa+pM/APfK8j+F/TV4spWl2zqU6BM69r8Vih8mckICPOriNDaN
+	 q4ypmOIM9Tf+6oCOvo/HsE4+QdCAAbfFm95NxXKQ9B1DjL2S76AuYIc3s8mvf2NW7iUpY
+	 OnjclzDQ0qr7PgN0QIYpOw6O/ayfptc4L197UYQrAw2m3pOm5xBY87vnXNnx6m7JtsluG
+	 ILYvZuX3z98XByvfXRk76K5JM3+l4vLurUkH+zRW82gssJfzW+UQ4GMXrF0Whff3NJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792653335;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792654444;
 	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
 	 Subject:To:Cc:References:From:Content-Language:Organization:
 	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=8Z3XZ7WxkIfTXlT8A+LoryYW+Dn9h1GWmFu9g/diiWc=;
-	b=QxASKQWNwUJ68jz1y1u7vxHcLIZ3qRx54Mr60oxg+R37h9aMEP18OXbsYE/HEmqNQ1M+
-	 qgOF+prFwZRNfYR0KgdjDdC84901DwYXallvH/BC1gg5DijtiFnA8DxCk2iVERYlR8c2D
-	 nnSZqjXfeRpTpdAzS55pJ0j0qRBzVEh6J7lyV9Yo4dBRwxU/+++3taPH3olMAnuizW5V7
-	 Ph7pg6b4L7QzTiw0ilaBTkIZ/0uebX5F8kXir/gL2rJr6ljVhJPX8E8GSbjomlJvpv2Ma
-	 DFHKEn7e3DkezYr4jXD3fvux6qK4q6EfLT7kn1qxEddbQ5pFzRLpDrLocaqKUpFK1bQ==
+	bh=EXmo14MNykGN07bA6sS/UaZhsjisvLhN9+lktwXS9t4=;
+	b=dh6rkh5woRWXkUYHSJFtlvN36YA3dId9KLk6L/N7qi/VwdhZOmqv9S5zopldFjY621UG
+	 G9zsKPvgeAuz1Y4S/JqF0Sxu5eThOPjoew/tXw5J/j+nwLpiG7YMDes5l1l6jto1j9N4o
+	 I++pmKTC/ml1N6n0zvbg/Mp1Y8hNl82KN6ZPFb8trgydDxYkjUWVO/UJ5BO+HJAe7XRWc
+	 i1mSEO7Q0Aj3uOHvYEHhFiKki6p5wHZxccZpaF5iFCrm154EMvH0lKDxOSt4SdEvwDh90
+	 j/ApIbzqn4p+PPtSKMNGQ0mdLaIFl6lZ4QMuhUEsJUF36f0Cmk1cs4LZ8e9f2FHU8ng==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="htb/0AKU";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ih+gmNB1;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24A9606A323
-	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 07:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9F8606A31D;
+	Thu, 22 Oct 2026 07:34:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=htb/0AKU
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B7F21F000C1;
-	Thu, 22 Oct 2026 07:15:34 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ih+gmNB1
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3B171F000C1;
+	Thu, 22 Oct 2026 07:34:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792653335;
-	bh=8Z3XZ7WxkIfTXlT8A+LoryYW+Dn9h1GWmFu9g/diiWc=;
+	s=k20260515; t=1792654443;
+	bh=EXmo14MNykGN07bA6sS/UaZhsjisvLhN9+lktwXS9t4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=htb/0AKUJKrRkdROUV4BUX61a39EP+94AbDYnizpS/IpacL+KvO8LmqqKviOF38nY
-	 ZSV39E2+r1/amTj1NJtBXFqrFANhfGu3Ro6uVH1SOrct1GFcPOHJeS5wDdZvt37snH
-	 3MwapJOFTq94FqOqOP+dJRyqqCLwUXrlyCiBhKPWN7s4bqIhnTepatCfPYFy/FTcaZ
-	 vU+4dMaXo5UCqcPEv8tl/gfxc34p89XqueaaCwZJA6OnaI+DhalnaJwR+tylIaA0fw
-	 TbAEBcCnsClebnknfZH3dLmydxUPJh7kp+XB/3idd1B6VEpJjOL3knRZ2r+Q4tQVvS
-	 AjPKmfP3cJ6/A==
-Message-ID: <3222f1e8-07a8-4948-bd95-3d816fd1d71e@kernel.org>
-Date: Thu, 22 Oct 2026 09:15:32 +0200
+	b=Ih+gmNB1PknqfRTD3S0H7jnj02GqqPSb69Y9zURlWSixrqKzMkiELJfykibd9LZHS
+	 66TeG6jXBNUeU1y3tIKZ8GzCKn8Cq5MATLdQ8wFEnSd0GuFViFkqYUqOuzwnmksFWD
+	 4zASIIWYe4te1IEHNIail4FKp3nHlY7iUCw3FPq+zJXBZ4xdGKyGiDOzMQu6wVowhQ
+	 i/TeZltDSqo2zCjUUhPf5KGhUO5iuRfC19l3cLIVuoeY4Ba+SwD+cMGCw0X0tplY4v
+	 AmVkSgiFvKZ2EHn0oxxGTIyHZHnHB57cjMga27o6xmFFcaz0db+a7TSGOZqVi+r8qc
+	 fs4sr0cNIKI/Q==
+Message-ID: <10bb721f-43bb-4a22-a9c5-6ebacda9b6b4@kernel.org>
+Date: Thu, 22 Oct 2026 09:34:01 +0200
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -52,111 +52,73 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] null_blk: don't finish zones to set them read-only or
- offline
-To: Niklas Cassel <cassel@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>, linux-block@vger.kernel.org
-References: <20261021202100.2017938-4-cassel@kernel.org>
- <20261021202100.2017938-6-cassel@kernel.org>
+Subject: Re: [PATCH v3] block: annotate lockless task ioprio accesses
+To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+feeb9b5352b9ff89618a@syzkaller.appspotmail.com
+References: <20261019125811.21666-1-ngocthang2710.1999@gmail.com>
+ <20261020125233.9820-1-ngocthang2710.1999@gmail.com>
 From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <20261021202100.2017938-6-cassel@kernel.org>
+In-Reply-To: <20261020125233.9820-1-ngocthang2710.1999@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2026/10/21 22:21, Niklas Cassel wrote:
-> null_set_zone_cond() calls null_finish_zone() to release the zone
-> resources held by a zone before setting it read-only or offline.
+On 2026/10/20 14:52, Nguyen Ngoc Thang wrote:
+> __get_task_ioprio() reads task->io_context and ioc->ioprio without
+> task_lock() when called on current, e.g. from init_sync_kiocb() on every
+> write.  set_task_ioprio() can update both for another task at any time,
+> including the first publication of a new io_context.  KCSAN reports it:
 > 
-> For an empty or closed zone, null_finish_zone() first runs the zone
-> resource checks, which can close an unrelated implicitly open zone, or
-> fail. As the error is ignored, a failure for a closed zone leaks
-> nr_zones_closed, permanently lowering the effective active zone limit.
+>   BUG: KCSAN: data-race in __kernel_write_iter / set_task_ioprio
+>   value changed: 0x0000000000000000 -> 0xffff888109813730
 > 
-> Setting a zone read-only or offline requires no zone resources, so
-> release the zone resources held by the zone directly instead, using a
-> new helper, null_release_zone_resources().
+> A stale or torn value is harmless, a task simply gets the old or new
+> priority, but the compiler may tear or refetch the accesses and the
+> io_context fields must be visible before the pointer is.
 > 
-> Fixes: d3a5738849e0 ("null_blk: support read-only and offline zone conditions")
-> Signed-off-by: Niklas Cassel <cassel@kernel.org>
+> The io_context itself needs no extra protection: only the owning task
+> drops it, in exit_io_context(), so it cannot be freed under a lockless
+> reader running as current.
+> 
+> Publish the pointer with smp_store_release(), read it with READ_ONCE()
+> (address dependency orders the ioprio load), and mark the ioprio
+> accesses.
+> 
+> Reported-by: syzbot+feeb9b5352b9ff89618a@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=feeb9b5352b9ff89618a
+> Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
 
-Looks good, modulo one nit below.
+The patch title still mentions "annotate", which is really vague. Please change
+the title to be more descriptive. E.g. "use READ_ONCE() to access a task ioprio
+context".
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+> index d15918d7fabb..12ddc672f41d 100644
+> --- a/block/blk-ioc.c
+> +++ b/block/blk-ioc.c
+> @@ -277,9 +277,10 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
+>  		if (task->io_context)
+>  			kmem_cache_free(iocontext_cachep, ioc);
+>  		else
+> -			task->io_context = ioc;
+> +			/* Pairs with READ_ONCE() in __get_task_ioprio() */
+> +			smp_store_release(&task->io_context, ioc);
 
-> ---
->  drivers/block/null_blk/zoned.c | 35 +++++++++++++++++++++++++++++-----
->  1 file changed, 30 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-> index ecdc8d68ca2a..015f5d304c7c 100644
-> --- a/drivers/block/null_blk/zoned.c
-> +++ b/drivers/block/null_blk/zoned.c
-> @@ -743,6 +743,33 @@ blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_op op,
+This is normally paired with smp_load_acquire(). The generic implementation of
+that is simply a READ_ONCE() followed by an __smp_mb(), but some architectures
+may have their own implementation. So why is it always correct to pair with
+READ_ONCE()? Why not use WRITE_ONCE() here?
+
 >  	}
->  }
->  
-> +/*
-> + * Release the zone resources held by a zone, before changing the condition of
-> + * the zone to a condition that does not hold any zone resources.
-> + */
-> +static void null_release_zone_resources(struct nullb_device *dev,
-> +					struct nullb_zone *zone)
-> +{
-> +	if (!dev->need_zone_res_mgmt)
-> +		return;
-> +
-> +	spin_lock(&dev->zone_res_lock);
-> +	switch (zone->cond) {
-> +	case BLK_ZONE_COND_IMP_OPEN:
-> +		dev->nr_zones_imp_open--;
-> +		break;
-> +	case BLK_ZONE_COND_EXP_OPEN:
-> +		dev->nr_zones_exp_open--;
-> +		break;
-> +	case BLK_ZONE_COND_CLOSED:
-> +		dev->nr_zones_closed--;
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +	spin_unlock(&dev->zone_res_lock);
-> +}
-> +
->  /*
->   * Set a zone in the read-only or offline condition.
->   */
-> @@ -759,8 +786,8 @@ static void null_set_zone_cond(struct nullb_device *dev,
->  	 * If the read-only condition is requested again to zones already in
->  	 * read-only condition, restore back normal empty condition. Do the same
->  	 * if the offline condition is requested for offline zones. Otherwise,
-> -	 * set the specified zone condition to the zones. Finish the zones
-> -	 * beforehand to free up zone resources.
-> +	 * set the specified zone condition to the zones. Release the zone
-> +	 * resources held by the zones beforehand.
->  	 */
->  	if (zone->cond == cond) {
->  		zone->cond = BLK_ZONE_COND_EMPTY;
-> @@ -768,9 +795,7 @@ static void null_set_zone_cond(struct nullb_device *dev,
-
-This function is called only from zone_cond_store() with cond either
-BLK_ZONE_COND_READONLY or BLK_ZONE_COND_OFFLINE. Since your change is valid only
-for these 2 conditions, we really should check that cond is either of the
-already used values and add a comment, to avoid invalid use of
-null_set_zone_cond() in the future (without tweaking it).
-
->  		if (dev->memory_backed)
->  			null_handle_discard(dev, zone->start, zone->len);
->  	} else {
-> -		if (zone->cond != BLK_ZONE_COND_READONLY &&
-> -		    zone->cond != BLK_ZONE_COND_OFFLINE)
-> -			null_finish_zone(dev, zone);
-> +		null_release_zone_resources(dev, zone);
->  		zone->cond = cond;
->  		zone->wp = NULL_ZONE_INVALID_WP;
->  	}
+> -	task->io_context->ioprio = ioprio;
+> +	WRITE_ONCE(task->io_context->ioprio, ioprio);
+>  out:
+>  	task_unlock(task);
+>  	return 0;
+> diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
 
 
 -- 
