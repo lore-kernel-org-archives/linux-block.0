@@ -1,61 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792653064;
-	b=ejRJqkJYoNoOnqOeUbj9EsIyRgmqskdaKj65tvCOysbbVjjg0oH513vcshgmMYLJHzBA
-	 ULoOyChDZ+IJRCJ4t8LSJ0fLHmvn/PhVjsB8F3XWvQNZy0uXs7olGHckiEMooG6+nUc6m
-	 vcVMZzw3xntXV2SQcGI/5Htm1tC4LyQOZhOHS6/nGYpAg/cxqSWKTUvZaMTOqQwAeinWT
-	 M5ix6kJ4D69nAo5JxDkNzrWtDzCFSuv8uSFXahfvRAR21pSr3zdAy7LJXKN7pQIrjxZuc
-	 ApQas1FVzkBjj5gz3k/TJicaj6hY5yXI45co39YOQC855W9qyPq3pJj7jWMSoC7kEMg==
+	t=1792653335;
+	b=HgWliRmxS/EDxzYbHVSGMhiysnGTgs5UTSUQDfxI3a/6KfOD2oXjB/wy3NZgyLFhF+/d
+	 g+gB+hy2EyRBOk4niqGe8knOJ1/UELJkZr8uFRKAQTXAiYHY48IZFzdtpHlTFpl3f/rY9
+	 r1yjOzY/W6epcFiwhgXLFK9/a0Ok4LRw/ErAqwqvSG5i8n45zisDpgBg7QdWrBqYMjZfa
+	 Vp/yRzTeKpb/frvYXV7p8u2lZ1PYRQ39oyUD+gVNi8zZleU6c5OlsYMGk+ciHf3uk1WN6
+	 vQ6dgsjoh+kgOCuh4rg5LVHAQTa9/2Qnr/FhcXDj6yiUZvwRndllX25hS8PykW4ORHA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792653064;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=RO4O3xrSDxHNDaVbz+rNfXkoLE+vdkQ3B9aB8C7xQMI=;
-	b=0ysj8KLv06122NPZbsllhbnR7MzJuupRTlrWuAGYNfUIqOd3tNd/seP9G8hPSfYyHB5d
-	 1ZJCyJcEmfoSZXFKcDkhUNoeCYrQ4ML8dJfA2/AzY1jTXyoV304sUKtQDZbOHPPjEtG4K
-	 ar8ZUMjetg6KHj9oSWBbgjNxan4YpVmdJ3cxWTfHZKkY0Mzw9b1PIT5o/72xKhvsiDJaa
-	 yF69t5B8d/OOGIF7Dd6FwyguAtNFLAdJ7QXEH+KKs8FYYp0qfwtHn+hsGjtSDwxLyZPuF
-	 xYjIA4AX1r4RQdHGDxbBTHilBbeMIFXmYbuHOIORkPa99Rrwf2jiCDqNF7Epkci4ZRg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792653335;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:Content-Language:Organization:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=8Z3XZ7WxkIfTXlT8A+LoryYW+Dn9h1GWmFu9g/diiWc=;
+	b=QxASKQWNwUJ68jz1y1u7vxHcLIZ3qRx54Mr60oxg+R37h9aMEP18OXbsYE/HEmqNQ1M+
+	 qgOF+prFwZRNfYR0KgdjDdC84901DwYXallvH/BC1gg5DijtiFnA8DxCk2iVERYlR8c2D
+	 nnSZqjXfeRpTpdAzS55pJ0j0qRBzVEh6J7lyV9Yo4dBRwxU/+++3taPH3olMAnuizW5V7
+	 Ph7pg6b4L7QzTiw0ilaBTkIZ/0uebX5F8kXir/gL2rJr6ljVhJPX8E8GSbjomlJvpv2Ma
+	 DFHKEn7e3DkezYr4jXD3fvux6qK4q6EfLT7kn1qxEddbQ5pFzRLpDrLocaqKUpFK1bQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WcYU7OXe;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="htb/0AKU";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1C2606A319;
-	Thu, 22 Oct 2026 07:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24A9606A323
+	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 07:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WcYU7OXe
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C97A1F000C1;
-	Thu, 22 Oct 2026 07:11:03 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=htb/0AKU
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B7F21F000C1;
+	Thu, 22 Oct 2026 07:15:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792653063;
-	bh=RO4O3xrSDxHNDaVbz+rNfXkoLE+vdkQ3B9aB8C7xQMI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=WcYU7OXenb4CSmaPFPn9f7Mf9fn8IWaqKmYQve0aOXepRWHCMOfKzscUjVc9jDPFB
-	 UXnJeVTByoHd1N32CLSLLtLsknHlEY3fqtEcwwGiE0jgfdBaZIvHqCglDQoNwSbch7
-	 1R6YoXnsTR7eA275KlQ8h/IY5SRFlhk0qmhNUAzalEpu2scbCxVwSJf8J1MAf/nDB7
-	 KqQl7dsaB38oj6Nz3ASmVU/oDuKdDk5FWszGTCOIjbUA6Ii6tDULTp/F9jhrULAqR4
-	 8cZyjZqlThlgDIP2e+Ot/Jkwa5W/LWIg+lSTPJCI6qSdsKVrroLIwSpQY0eLVFdinu
-	 zGoUxeXJ7kMHQ==
-Date: Thu, 22 Oct 2026 00:11:01 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Baokun Li <libaokun@linux.alibaba.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, hch@lst.de, dm-devel@lists.linux.dev,
-	mpatocka@redhat.com, sweettea-kernel@dorminy.me, satyat@google.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] blk-crypto: fix missing smp_load_acquire() for
- tfms_inited[]
-Message-ID: <20261022071101.GA1857@sol>
-References: <20261014071846.3666398-1-libaokun@linux.alibaba.com>
- <20261014071846.3666398-2-libaokun@linux.alibaba.com>
- <20261014161153.GC322435@quark>
- <006e3804-7e5e-4b8d-a299-3a47b8b643b3@linux.alibaba.com>
- <20261015183200.GC2170687@google.com>
- <f113d4bc-2db5-4ed4-b34f-fe972099ad12@linux.alibaba.com>
+	s=k20260515; t=1792653335;
+	bh=8Z3XZ7WxkIfTXlT8A+LoryYW+Dn9h1GWmFu9g/diiWc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=htb/0AKUJKrRkdROUV4BUX61a39EP+94AbDYnizpS/IpacL+KvO8LmqqKviOF38nY
+	 ZSV39E2+r1/amTj1NJtBXFqrFANhfGu3Ro6uVH1SOrct1GFcPOHJeS5wDdZvt37snH
+	 3MwapJOFTq94FqOqOP+dJRyqqCLwUXrlyCiBhKPWN7s4bqIhnTepatCfPYFy/FTcaZ
+	 vU+4dMaXo5UCqcPEv8tl/gfxc34p89XqueaaCwZJA6OnaI+DhalnaJwR+tylIaA0fw
+	 TbAEBcCnsClebnknfZH3dLmydxUPJh7kp+XB/3idd1B6VEpJjOL3knRZ2r+Q4tQVvS
+	 AjPKmfP3cJ6/A==
+Message-ID: <3222f1e8-07a8-4948-bd95-3d816fd1d71e@kernel.org>
+Date: Thu, 22 Oct 2026 09:15:32 +0200
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -65,159 +51,114 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f113d4bc-2db5-4ed4-b34f-fe972099ad12@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] null_blk: don't finish zones to set them read-only or
+ offline
+To: Niklas Cassel <cassel@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>, linux-block@vger.kernel.org
+References: <20261021202100.2017938-4-cassel@kernel.org>
+ <20261021202100.2017938-6-cassel@kernel.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20261021202100.2017938-6-cassel@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 22, 2026 at 11:50:59AM +0800, Baokun Li wrote:
-> Hi Eric,
+On 2026/10/21 22:21, Niklas Cassel wrote:
+> null_set_zone_cond() calls null_finish_zone() to release the zone
+> resources held by a zone before setting it read-only or offline.
 > 
-> Sorry for the late reply.
+> For an empty or closed zone, null_finish_zone() first runs the zone
+> resource checks, which can close an unrelated implicitly open zone, or
+> fail. As the error is ignored, a failure for a closed zone leaks
+> nr_zones_closed, permanently lowering the effective active zone limit.
 > 
-> On 2026/10/16 02:32, Eric Biggers wrote:
-> > On Fri, Oct 16, 2026 at 01:36:17AM +0800, Baokun Li wrote:
-> >> That's what I was about to do for v3, but while looking for other
-> >> callers that inherit a key without calling start_using_key()
-> >> themselves, I found that dm-inlinecrypt has the same shape, so fixing
-> >> fscrypt alone wouldn't cover it -- only the constructor calls
-> >> start_using_key(), and the task submitting I/O reaches the key through
-> >> md->map:
-> >>
-> >>   dmsetup (ctr)                      I/O task
-> >>   ---------------------------------- -------------------------------
-> >>   blk_crypto_start_using_key()
-> >>    fallback_start_using_mode()
-> >>     init profile, keyslots, tfms[]
-> >>     smp_store_release(tfms_inited[m])
-> >>   rcu_assign_pointer(md->map, t)
-> >>                                      srcu_dereference(md->map)
-> >>                                       -> ti->private -> &ctx->key
-> >>                                      inlinecrypt_map() -> bio_prep()
-> >>                                        tfms_inited[m]  addr-dep, ok
-> >>                                        profile/keyslots/tfms[]  not
-> >>
-> >> dm's own grace periods would cover this, but all three are conditional:
-> >>
-> >>   drivers/md/dm.c:2533       if (old_map) dm_sync_table(md);
-> >>   drivers/md/dm.c:3015,3039  if (map) synchronize_srcu(&md->io_barrier);
-> >>   drivers/md/dm-ioctl.c:1651 add_disk() only when type == DM_TYPE_NONE
-> >>
-> >> so e.g. this sequence has no happens-before:
-> >>
-> >>   DM_DEV_CREATE
-> >>   DM_TABLE_LOAD (linear)       add_disk(), md->type set, not resumed
-> >>                                  -> a task opens the device here
-> >>   DM_TABLE_CLEAR
-> >>   DM_TABLE_LOAD (inlinecrypt)  ctr sets tfms_inited[]; no add_disk()
-> >>   DM_DEV_SUSPEND (resume)      old_map == NULL, all three skipped
-> >>                                  -> the already-open task does I/O
-> >>
-> >> This needs a weakly ordered machine and a deliberate ioctl order, so
-> >> it's not urgent.  Which would you prefer?
-> >>
-> >>   1. Leave it for now and fix only fscrypt_find_mode_key().
-> >>
-> >>   2. A separate smp_rmb() in inlinecrypt_map(), paired with the
-> >>      rcu_assign_pointer(md->map) in __bind().  Keeps the cost on
-> >>      dm-inlinecrypt only, but means a second site to get right.
-> >>
-> >>   3. Keep the barrier in blk_crypto_fallback_bio_prep() after all,
-> >>      documented as ordering the loads after the check rather than the
-> >>      flag itself.  One site covers both callers and any future one,
-> >>      at the cost of blk-crypto no longer relying on the caller for
-> >>      this part.
-> > So the device-mapper core doesn't order target_type::ctr before
-> > target_type::map?  Nearly every dm target's map function relies on the
-> > constructor having run first.  If this is an issue, it isn't specific to
-> > dm-inlinecrypt and it will need to be fixed in the device-mapper core.
+> Setting a zone read-only or offline requires no zone resources, so
+> release the zone resources held by the zone directly instead, using a
+> new helper, null_release_zone_resources().
 > 
-> It does, for everything map() reaches through the table:
-> 
->   ctr                               map
->   ------------------------------    -------------------------------
->   ctx->foo = ...                    map = srcu_dereference(md->map)
->   ti->private = ctx                 ti  = map->targets[i]
->   rcu_assign_pointer(md->map, t)    ctx = ti->private
->           ^ release                   ctx->foo     ordered (addr-dep)
->                                       some_global  not ordered
-> 
-> The address dependency covers the whole object graph hanging off
-> ti->private, so no barrier needed there.
-> 
-> But dm-inlinecrypt initializes globals from the ctr:
-> 
->   inlinecrypt_ctr()
->     blk_crypto_start_using_key()
->       blk_crypto_fallback_start_using_mode()
->         blk_crypto_fallback_init()
->           blk_crypto_fallback_profile = ...      global
->           blk_crypto_keyslots = ...              global
->         slotp->tfms[mode] = ...                  global
->         smp_store_release(tfms_inited[mode])
-> 
->   inlinecrypt_map()
->     __blk_crypto_submit_bio()
->       blk_crypto_fallback_bio_prep()
->         tfms_inited[bc->bc_key->...]   addr-dep on the key, ordered
->         blk_crypto_fallback_profile    no dependency
->         blk_crypto_keyslots            no dependency
->         slotp->tfms[mode]              no dependency
-> 
-> Those three don't depend on md->map, so nothing stops the CPU from
-> reading them before it.
-> 
-> No other target does this, and neither of the usual patterns helps
-> here.
-> 
-> Some targets create their globals at module_init (journal_io_cache,
-> dm_bufio_wq).  That isn't available to us:
-> 
->   * the state belongs to blk-crypto, not to dm;
->   * nothing in blk-crypto-fallback.c is exported;
->   * blk_crypto_start_using_key() needs the bdev and the key from the
->     table line, neither of which exists at module_init.
-> 
-> The others keep state per-target under ti->private (dm-crypt's cc->bs,
-> dm-verity's v->verify_wq, dm-integrity's ic->*).  The equivalent here
-> would be hanging the fallback state off struct blk_crypto_key, which
-> already lives in ti->private -- then the whole chain is
-> address-dependent and needs no barrier at all.  But that means:
-> 
->   * a profile pointer in an exported struct;
->   * moving blk_crypto_keyslots into the profile as well, since
->     blk_crypto_fallback_tfm() reads it as a bare global.
-> 
-> That is far more than this bug is worth.
-> 
-> A core fix can't go on the publish side either.  An unconditional
-> dm_sync_table() in __bind() still lets a reader that overlaps the grace
-> period see the new md->map with the stale globals.  That leaves an
-> acquire in dm_get_live_table(), i.e. a barrier per bio on every dm
-> device, for one target.
-> 
-> So I still think the smallest fix is the single barrier from the
-> original patch.  That line carries two meanings:
-> 
->   if (WARN_ON_ONCE(!smp_load_acquire(&tfms_inited[cfg->crypto_mode])))
-> 
->   * False means start_using_key() was never called and we bail out.
->     You're right that this half needs no barrier: the index is
->     address-dependent on bc->bc_key, so the flag is read accurately
->     either way.
-> 
->   * True means the mode was initialized and the globals behind the
->     flag are safe to use.  That is the half that needs it -- without
->     the barrier, nothing orders blk_crypto_fallback_profile,
->     blk_crypto_keyslots and slotp->tfms[] against the initialization
->     that smp_store_release() published.
-> 
-> Any thoughts?
+> Fixes: d3a5738849e0 ("null_blk: support read-only and offline zone conditions")
+> Signed-off-by: Niklas Cassel <cassel@kernel.org>
 
-Well, it isn't great to be adding another barrier to every bio submitted
-to work around insufficient ordering during one-time setup.  The fscrypt
-case is easily fixable by the change I mentioned.  The dm case I'm not
-sure is a real problem.  For one, dm_get_live_table() actually already
-has an smp_mb() in it; it's inside srcu_read_lock().
+Looks good, modulo one nit below.
 
-- Eric
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+> ---
+>  drivers/block/null_blk/zoned.c | 35 +++++++++++++++++++++++++++++-----
+>  1 file changed, 30 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
+> index ecdc8d68ca2a..015f5d304c7c 100644
+> --- a/drivers/block/null_blk/zoned.c
+> +++ b/drivers/block/null_blk/zoned.c
+> @@ -743,6 +743,33 @@ blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_op op,
+>  	}
+>  }
+>  
+> +/*
+> + * Release the zone resources held by a zone, before changing the condition of
+> + * the zone to a condition that does not hold any zone resources.
+> + */
+> +static void null_release_zone_resources(struct nullb_device *dev,
+> +					struct nullb_zone *zone)
+> +{
+> +	if (!dev->need_zone_res_mgmt)
+> +		return;
+> +
+> +	spin_lock(&dev->zone_res_lock);
+> +	switch (zone->cond) {
+> +	case BLK_ZONE_COND_IMP_OPEN:
+> +		dev->nr_zones_imp_open--;
+> +		break;
+> +	case BLK_ZONE_COND_EXP_OPEN:
+> +		dev->nr_zones_exp_open--;
+> +		break;
+> +	case BLK_ZONE_COND_CLOSED:
+> +		dev->nr_zones_closed--;
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +	spin_unlock(&dev->zone_res_lock);
+> +}
+> +
+>  /*
+>   * Set a zone in the read-only or offline condition.
+>   */
+> @@ -759,8 +786,8 @@ static void null_set_zone_cond(struct nullb_device *dev,
+>  	 * If the read-only condition is requested again to zones already in
+>  	 * read-only condition, restore back normal empty condition. Do the same
+>  	 * if the offline condition is requested for offline zones. Otherwise,
+> -	 * set the specified zone condition to the zones. Finish the zones
+> -	 * beforehand to free up zone resources.
+> +	 * set the specified zone condition to the zones. Release the zone
+> +	 * resources held by the zones beforehand.
+>  	 */
+>  	if (zone->cond == cond) {
+>  		zone->cond = BLK_ZONE_COND_EMPTY;
+> @@ -768,9 +795,7 @@ static void null_set_zone_cond(struct nullb_device *dev,
+
+This function is called only from zone_cond_store() with cond either
+BLK_ZONE_COND_READONLY or BLK_ZONE_COND_OFFLINE. Since your change is valid only
+for these 2 conditions, we really should check that cond is either of the
+already used values and add a comment, to avoid invalid use of
+null_set_zone_cond() in the future (without tweaking it).
+
+>  		if (dev->memory_backed)
+>  			null_handle_discard(dev, zone->start, zone->len);
+>  	} else {
+> -		if (zone->cond != BLK_ZONE_COND_READONLY &&
+> -		    zone->cond != BLK_ZONE_COND_OFFLINE)
+> -			null_finish_zone(dev, zone);
+> +		null_release_zone_resources(dev, zone);
+>  		zone->cond = cond;
+>  		zone->wp = NULL_ZONE_INVALID_WP;
+>  	}
+
+
+-- 
+Damien Le Moal
+Western Digital Research
