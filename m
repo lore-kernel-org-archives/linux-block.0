@@ -1,47 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792655882;
-	b=1YuR72IhQCJN8y6qeReMxZCcZCJcTuEy70t/ZWYeVeONqodjlfKqXlqXcW0Av4he/HRT
-	 4KxUYtQBKRVq2uwGmtvxCwfeRnM0XYZRpltgrAVR8qahWLi/vAacLlmdxMdD6/haUsgNp
-	 CejYOk3UwbPRpSUnJeQhMZhjLvUI89aR3naJ+yQiY6BalBKIRKbgBl82qg7DtG8PjpTa1
-	 7tyiI/1C7mElcneVdqW77brH0K+RhB+U9XKZK6wgh7WxGG3RQaqhfCfmwRvC3z+mVoi9s
-	 hfLJkPXFKyg5j5vvWMhBy9C1btqFa9mCe5wpHGSC3qyhaVxrv2VCyIK2DFVzwnDE7oA==
+	t=1792660927;
+	b=0ljPpffeux7cGWgBW/ryR4ws8S+BFTmwWEQSEPJGX1dSeQwcauH7l4VcugdZ4wMDxlEz
+	 f09+r4kpztPERQQtCFEInJPC42ZoqTZavN35PlBos2epvFaPCVPTo6cz7rXDdREEng3rB
+	 nzUE/cZe0CwtMG/Oh4lH5TsXaUmDrxF6lhQPzMhyn2VXNW/B9Noara6VTmRA0VldsakM7
+	 T+WD4SJhJwjRwbFIYCwjEniaOOHECsIVPWB26D5Pi0Rdt5bCkh/kzlBi+r8im86bluJ1e
+	 KbB0L8hSMKAh6W9n8Bxjsvl7DszMGK7i/xwO8zVLpgV4qAYEw7JM8nE1ZYNzGgL7Bmg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792655882;
-	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:From:Content-Language:Organization:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=al8LwFXKhQMtvebVFFNkSePOwM1a+nny9q2UkN6c8qQ=;
-	b=PmUQp14TQgvPbXEY6otMDRh79jRtnOa4B7YjWXtc8u6zk8Y4kmF6J0wRJD1VoEE4DsOw
-	 Q76hj/fjwuAjBwQjwgrcd3ZnFvpSMK9l5CVlV09ciQE9HMZcVRuz6O5lROFBW0arxB3sw
-	 Stj//vFURMd8CxI7nMb7/DOGeLY+az3A8WBitvYy2kMpZKhUWg6elfc1Hrr7Q+g8KXd7F
-	 SjzddwNQTC6vGLd1zWwtNPY8CrGoM4Tq42vwH/euif048G9hwEnRDvPTVYViiFPWDjVyG
-	 6QoCkRnC8KyPBZyzB1+t+6+P0Ubb0pVCC+2vQRtbDi/vhDSjUpGT3anwBrtDTJmdqQw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792660927;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:X-Developer-Signature:X-Developer-Key:
+	 Content-Transfer-Encoding;
+	bh=nDLJ6F/aTerROkEt/IPbwhL2ADDBMxFFo7vEwcyHkWg=;
+	b=gejU/ueStN2Hl+5BiGAw1Y1O4Gs/OmBjW6SvZuokODv82jdvlUbcOn5ZXdM0PbdDP62Q
+	 oevYjcsKopc0cZL26dCX8ZB0pNX3Mp65af7hjA4SIzq84jU+lScTy+qyAqkW82ZwpG3Xv
+	 oQte/aintkKow/cpFlz36H9BUp/LyDLCbSO9dlSacsA0jNSvh1r1SjVB00+Wu+iI5cYJw
+	 HT2Be7szQCWav2Z//DWpZa5C12GauZOAvEalkAuW8ycJub5eUPm+b0xuwFc84fZDr8qHG
+	 XgE6iqG6/MSyLUSb6lzVINOg8QU1ZXvNVhAIj2cP7WwS+062lAI5IXCV8ODQeKuUFTQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MN+AbLU1;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=n6RWotc+;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C80F606A31B;
-	Thu, 22 Oct 2026 07:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808C0606A31B
+	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 09:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MN+AbLU1
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B7D31F000C3;
-	Thu, 22 Oct 2026 07:58:00 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=n6RWotc+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1463F1F000C1;
+	Thu, 22 Oct 2026 09:22:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792655881;
-	bh=al8LwFXKhQMtvebVFFNkSePOwM1a+nny9q2UkN6c8qQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=MN+AbLU1PaXtQMdHTbIw9lN2dZHitBsiJyxN9RFxBjlIR/IyvxbIQWOMxrfU797R5
-	 2S06k9AsMgZk3UAEHtD67h8rt1G8O3bEL6ZmbFlETGW+MxQjf7egNoogt1aI5Yvb4a
-	 omIqB66NL8P7tg8jN28ej/LAO00kTQJlnY94wvsY0qIuwI2O/xZQyDI6d1qKNfc7dY
-	 3FSoXyakPbW6lzVzjoYN97QIH5zOi2Ejw/zp8wIyh5Vx2Aph6CD7H6NCPwUJ/rsIri
-	 sDmE7hjoqKSLKA4ZA++CcFfmBiuR26UwTZNIrVJcqgsdW01BOCxzsqFqyfPWT2mHfR
-	 bNn4nQGbrhWZg==
-Message-ID: <ff60b44b-e85d-433e-9c08-450474c7af09@kernel.org>
-Date: Thu, 22 Oct 2026 09:57:58 +0200
+	s=k20260515; t=1792660927;
+	bh=nDLJ6F/aTerROkEt/IPbwhL2ADDBMxFFo7vEwcyHkWg=;
+	h=From:To:Cc:Subject:Date;
+	b=n6RWotc+/tEyVQXliDt6fxLorVEhUxRFQtPL1q4xv1p1c57WGAr6QQF+sZ4FLk+Om
+	 wwmk1fp0S6yZhZcCsq9mlrgkh4cQ2a/Hy2QEWw0t3VOM81WD+meFu4AGUnj7e8G/sU
+	 N6U/wSYu7426KdVp+Z6aaQW/NdacWKb0XmIznJczCRKDvTXmjAYU1iRXstZ/vBfFML
+	 rT3XcRrQpaAvSBfSGHAY/dANRhw48EtgxlI46d+7Uu4kZCSKKyt91QIGvDafe9VGwS
+	 8nRPpL5ODFG0YS42CmJ7Kklubt7/fuSEPMRoknzfkxgUHARGrk3YpB6SfmDMRL4aJw
+	 HD7PDLC5NtaLA==
+From: Niklas Cassel <cassel@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	linux-block@vger.kernel.org,
+	Niklas Cassel <cassel@kernel.org>
+Subject: [PATCH v2 0/3] null_blk: zone resource management fixes
+Date: Thu, 22 Oct 2026 11:21:59 +0200
+Message-ID: <20261022092158.2248831-5-cassel@kernel.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -51,50 +60,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dm: fix infinite loop in dm_blk_do_report_zones()
-To: Mark Bundschuh <mkbund@amazon.com>, Alasdair Kergon <agk@redhat.com>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Benjamin Marzinski <bmarzins@redhat.com>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- stable@vger.kernel.org
-References: <20261019192819.3962873-1-mkbund@amazon.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20261019192819.3962873-1-mkbund@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1187; i=cassel@kernel.org; h=from:subject; bh=lXZbjGK1wH+bTXtUUg+OYcSgXBbDEx6iOEpNWIjXLN4=; b=owGbwMvMwCV2MsVw8cxjvkWMp9WSGLJuXt0WzNASpM8XecQuwDj5w9XvWf4sKw88O6618UtKx O29Z7RtOkpZGMS4GGTFFFl8f7jsL+52n3Jc8Y4NzBxWJpAhDFycAjCRwsuMDN+Sf/A2Hfk7nTXS sVBxrt35D+ohdxvmpInKG2086bnqzUtGhtsOR3nao/O3xU+vj/IubeJj43z+ekNtkeqWWb/Xbp3 gzwUA
+X-Developer-Key: i=cassel@kernel.org; a=openpgp; fpr=5ADE635C0E631CBBD5BE065A352FE6582ED9B5DA
+Content-Transfer-Encoding: 8bit
 
-On 2026/10/19 21:28, Mark Bundschuh wrote:
-> If the device underlying a zoned target is removed, its capacity is set
-> to 0 and blkdev_report_zones() returns 0 without reporting any zones.
-> The mapped device keeps its old capacity, so args->zone_idx and
-> args->next_sector never advance and dm_blk_do_report_zones() loops
-> forever. On non-preemptible kernels this causes soft lockups and RCU
-> stalls.
-> 
-> The following sequence of commands triggers the hang:
-> 
-> modprobe scsi_debug zbc=managed dev_size_mb=1024 zone_size_mb=64
-> udevadm settle
-> echo '0 2097152 linear /dev/sda 0' | dmsetup create lin
-> echo 1 > /sys/block/sda/device/delete
-> blkzone report -o 0 -c 1 /dev/mapper/lin
-> 
-> Fix this by returning -EIO when a target reports no zones. The target
-> always maps args->next_sector, so a zero return means the underlying
-> device no longer covers that sector.
-> 
-> Fixes: d41003513e61 ("block: rework zone reporting")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Mark Bundschuh <mkbund@amazon.com>
+Patch 1 fixes writing, opening and finishing a closed zone when both the
+open and the active zone limits are reached: null_blk fails the request
+instead of closing an implicitly open zone, as ZBC-3 and NVMe ZNS
+require.
 
-Looks good.
+Patch 2 fixes zone_readonly and zone_offline, which can close an
+unrelated zone, or leak the closed zone count.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Patch 3 cleans up the code that sets zones read-only or offline, with
+no functional change.
 
+Both issues were reproduced, and the fixes tested, in QEMU, with
+null_blk devices created through configfs (memory_backed=0 and 1,
+CONFIG_PROVE_LOCKING=y).
+
+Developed with the help of an AI coding assistant.
+
+Changes since v1:
+- Picked up Reviewed-by tags from Damien on patches 1 and 2.
+- New patch 3, a cleanup suggested by Damien.
+
+Niklas Cassel (3):
+  null_blk: fix opening closed zones at the active zone limit
+  null_blk: don't finish zones to set them read-only or offline
+  null_blk: clean up setting zones read-only or offline
+
+ drivers/block/null_blk/zoned.c | 63 +++++++++++++++++++++++++---------
+ 1 file changed, 46 insertions(+), 17 deletions(-)
+
+
+base-commit: f47d223627f80cb7a1eb14c585fe6cb35de5e984
 -- 
-Damien Le Moal
-Western Digital Research
+2.56.0
+
