@@ -1,56 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792672618;
-	b=iNH36PfoaUqCN05LkHYJ/g7YCnOVwIZEXmvDsCfQe8mWHU6fc0cUqKZmxVlIuH6jO3g7
-	 uJQNlx40hXsnCHdHexBmGQBTHcgN3RRr0345d0UnYq9WgbErdc01yLVgwyi8Sw8LZ8WCB
-	 cZWfHpRqarTSX5VGtKkx7JwJyMEG6kajePc4kuLXceNsj7bAPMtpdMq/6cbMM/HPYtaoc
-	 ev8iBdaC97fJdJmY0dqVPdKVs59wA64svXGSjk1po4p7/Df0N2NVaeGQQE67y2ugl2stF
-	 DmUSg1xQTKSBA91g3mgeyyBmSuzUoDS6eW85gWwEozI++ebL4oRJ1O4X+QYgL/GuXGQ==
+	t=1792672865;
+	b=d6g4eAueqm0qEPOc3x9OcbZFZZ3++VcMt1sBHsjo1MnLy+0VYzZS/zgFaDsaMduyGupT
+	 WUImRXJvWKluK7+pvzlfk2khRiAsG4CqQgFiirWRQOjYNcrsWvLeVpgNVeZwioduIfVH5
+	 aSsNJggJ0l3H9szHvGbqcNe5InzW5f907kVgyqJRZYED8pMVIix+tERnls8lvc7Af5OsG
+	 fVwLMZWV6VeqRi2MTtgCX2rPRoItBNBNEHjGwdvqwXtDxUtP2prcGeyCMli/BIToaWQ+Y
+	 gVXPpEV5Z7LLHGAQ25g+59ZKKclOPriQNEP1cafmcca5sK5/y/RKfXpW8946l+M0A7A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792672618;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=2AVYDVIfgqfkP0XMmMllKTp+e7zNLw0N1Ot5Z6OeEQ0=;
-	b=dAcI6PrsghQniEG7T/gqVLkogShBUiMIK8fAurE3KLdiQYnz8DfhgWJz2aQScC0qstsP
-	 xnNOjHFXB94ciUjWUPdFLG5l0lBiTmwbFucsLfyjeBI8muQoQnSgGcwp/DIsEqYGPF8ik
-	 1EfC5bADTzUZ6js+dGQf4yJQDM1bYS3RBQMpOKvXlVWuK5ixeelQnBfhCAIkLmy1D5ei8
-	 1LZpIiKmkb9TXiUWWWfiW1r5bW1EuAaU3btfSc0zUwDCqZPrNBMt+xischcHV+GdtSAXd
-	 mDnOth/JPMdCLJNZooxonWVziOFipqjJQ+sF5jdKCO25wepRkmv3Xfsxs2ORV/rcRFQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792672865;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
+	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-Mailer;
+	bh=CcN6V0kVf6Aq31J0RAqWWkvpV1VAcbfbB6YKV5xFzr4=;
+	b=i4/q2dKH6ySITzDi6SINLN6DeuFH+Gp151+28WePaqCbaneWWd8n7l1Rc5X8GvUt5cTV
+	 OOrDTqPZeUxORqamQV19Lv3XAGtQp8tWXs1Bsoy02EQ/IoNzFXrdra4MQd+lvhv+ra/r1
+	 LngN06Jms2Jt0PO+e6m1oLvPz2pI1akZhXl1bHq+LWlm6y43+faFXZzKWdyvzcxMh4EmT
+	 MyRO7p1xSk3Xl3P4PPV8pYRjP9/ebLq7cL1zUvAKydsQ4tX9vfrqiqurtpJ7io0nKnLVS
+	 E9CZa5odq3za5OhbdV/XWrX/4LmcpwMyAwCk6Kp+f5ko8atdhX3pMBBDkRkBkBVwp6A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZiAmWkn6;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=BMc2Aktj;
+	arc=none smtp.remote-ip=209.85.215.180
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD35606A319;
-	Thu, 22 Oct 2026 12:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A698B606A319
+	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 12:41:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A698B606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZiAmWkn6
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 595711F000C1;
-	Thu, 22 Oct 2026 12:36:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792672617;
-	bh=2AVYDVIfgqfkP0XMmMllKTp+e7zNLw0N1Ot5Z6OeEQ0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ZiAmWkn6gV977xjzSfELCTexHhfd7cQ28a8A2y7P5QiuAz3cfvAhBt2nR2Ik8CTIM
-	 yPoXr4vp/MSxBZmBnVsfaZAupj9yDUTA4k+C3OgHodJ7oEwkb3PqFUwBapWTlNDQIk
-	 RFldXGSu2oL1jaT1Vre3tCgKVNNGz2dN8QGw2o8XEMUB5ak3MNVuPdsdMI56OA317h
-	 MilcAXPLRuNoIxq7dCn4G3V1zp9pFObS3J1ejFUiIXguny83OzUlPGqA9Cy9OtDhor
-	 K7z7TDaitCqsjAcSQxg7aTn+ryqVRLBQftOvtXNDTr4/lUhpYm+FD7A1O1OdHHUpgO
-	 tSBtqbmBIVCqQ==
-Date: Thu, 22 Oct 2026 14:36:55 +0200
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Aaron Tomlin <atomlin@atomlin.com>
-Cc: axboe@kernel.dk, tom.leiming@gmail.com, hare@suse.de, dwagner@suse.de,
-	tj@kernel.org, sean@ashe.io, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	marco.crivellari@suse.com
-Subject: Re: [PATCH v4] blk-mq: dispatch kworker to housekeeping CPU when
- hctx cpumask is empty
-Message-ID: <atoDZ85GTNGyaNPL@localhost.localdomain>
-References: <20261022034737.47820-1-atomlin@atomlin.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=BMc2Aktj
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-cd5cd8d89a7so642218a12.1
+        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 05:41:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792672863; x=1793277663; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=CcN6V0kVf6Aq31J0RAqWWkvpV1VAcbfbB6YKV5xFzr4=;
+        b=BMc2AktjYWq1T+ctah0PDRPeLKdSyz2QpTK4BLiZwDjyiOTiRj6Subul6qGteYqjE2
+         krvq3xL0S6kHVMrTx5UTdPJh0gWLtotytoIRbFlvVnIUExFdTWI8EnHXncPGljEfWG/o
+         /56xmRqZDlHVP7RP0vx/AF5SflSIyk4vD/b5fiVXhahTeZRtY9dNXlBJz/RoPWC5qhP3
+         a+KTPO/CjfI8rVmIBVQRgPghoujQlNKJ/6zyweo+HfpXgbtDrTnwEtHrLcWdXgn5jqCT
+         0uIGZSJRvmifzxU7z65O+5tZOEWY3NfebsO7pXBcZi/IpcDyJkY9+oB0CNibzS9v2sp8
+         MG0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792672863; x=1793277663;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=CcN6V0kVf6Aq31J0RAqWWkvpV1VAcbfbB6YKV5xFzr4=;
+        b=nFYcxfC0KXSJfTqSV9PCP3YfeCQFAiJRdJRQdYb8DJduen9JNYU7tqW7dJ0Q8i4IWx
+         del+bQj1uK5BoPiM0C1+v5r06OiDozAWRZpdxvYTWtkt1vUyRWWZdzAK0+dpI9hQK+D7
+         zrCL6iAvhOinAQiUXlNu8tytl6OlSrSE68dkIAErFYglS7FRVA4RTXczDDWwTeSnZTlK
+         4tho/PCb9cM9qXATOXMvocE4HhOCI/A+bnGvxf8JRQK7sLSMSQ+OiG6hQmnrhFpOSNIQ
+         4XTiQQNN8ucgCxIPexjCHdbqchuiPxJPS3douR3czC1+RnmXywkSomHGeFGfI5fuuTiS
+         GCZQ==
+X-Gm-Message-State: AFq9FYJVjcFOchr2RXhBcroOZJ7B8OFa8SuFKhR48Z9oWuiyYZYZPklU
+	gQ3l5VDIdWeFukHXxRUwGeFpJUbTvJ0VVjRDCNmu1oGVTSqsHSp5q69OLLOBX3/g+8M=
+X-Gm-Gg: AYBFou1rOK7XMrG2neylz+fSMdmGGh+fAXZGFpnLeZMbPlMOplhghCTuPENZR9QbVu4
+	EEaM8kdQFImwXwqj4LdHKdDSxgO9/RkE1NwD7ZGtTjI8QeEG/S13wlSRdQGlmays/SYcfD53oAQ
+	iIHPXT5LzbbQgZ+8VzqR2eeT21uPH8RW57jgMQEsbVDz5jW65LAHcnnr6ljrCOCyK/RmKFdumZI
+	wzr7MMMK3jZuY96cLiDeC+i652zsjv5l9IgCTGcuwjitp2S/v0Ze0HeTZAvCtmVumacmUWDlcaQ
+	+nzICohbCLYy7CKOPDH5es5vySp2aSuJtCpwiX95d/Wg28F+IA46UB+3d7ECElmhg6g/V3r5Gpi
+	VAf62+elKPtaqre3GSWetQcCLaOQOZ4SjnDlyHIBBGZazZY3nPaaD+5v5QQVNQ1WvfHSwGhLJFf
+	oU5/tlDoP5Btl/7FYbKbGAe+4lUr1JqG7dhkHhII9Qg3v7mxHAfJJh50cnTKQeKVDLKuf9cj7vH
+	aBKjhZprEkYnitI21Sr9ZmDOn1mrQ3BNMIjZ89o0Q75ILQXKtbUR1PRHVXZva8U9NoZITLgQMy2
+	5WuUjBV88Q31GlK3uTdVkMStf2Eakt4yO5be94M=
+X-Received: by 2002:a17:90b:3c12:b0:3ac:b7b9:6484 with SMTP id 98e67ed59e1d1-3ad86d57f66mr3763863a91.45.1792672862598;
+        Thu, 22 Oct 2026 05:41:02 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ad85f4b103sm4484148a91.3.2026.10.22.05.41.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Oct 2026 05:41:02 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ asml.silence@gmail.com, Keith Busch <kbusch@meta.com>
+Cc: hch@lst.de, Keith Busch <kbusch@kernel.org>
+In-Reply-To: <20261021184658.644645-1-kbusch@meta.com>
+References: <20261021184658.644645-1-kbusch@meta.com>
+Subject: Re: [PATCH 0/2] block, nvme: minor fixes to dma-buf support
+Message-Id: <179267286175.3853015.14808759833206340958.b4-ty@b4>
+Date: Thu, 22 Oct 2026 06:41:01 -0600
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -60,157 +96,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261022034737.47820-1-atomlin@atomlin.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-(Adding Marco)
 
-Le Wed, Oct 21, 2026 at 11:47:37PM -0400, Aaron Tomlin a écrit :
-> Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated
-> CPUs") excluded isolated CPUs from hctx->cpumask to prevent worker
-> threads from executing block work on isolated CPUs. When all CPUs mapped
-> to a hardware queue are isolated (i.e. blk_mq_hctx_empty_cpumask(hctx)
-> evaluates to true), blk_mq_hctx_next_cpu() returns WORK_CPU_UNBOUND with
-> the intention of offloading execution.
+On Wed, 21 Oct 2026 11:46:56 -0700, Keith Busch wrote:
+> Just a couple minor fixes. I wish I could say I caught the first one
+> myself, but no, I prompted an LLM to look at it.
 > 
-> However, kblockd_workqueue is allocated as a per-CPU workqueue
-> (WQ_PERCPU). When WORK_CPU_UNBOUND is queued on a per-CPU workqueue, the
-> workqueue core resolves the target CPU via raw_smp_processor_id().
-> Consequently, if a task executing on an isolated CPU submits I/O and
-> triggers an asynchronous queue dispatch with zero delay (e.g. upon
-> hardware queue congestion, tag/resource exhaustion returning
-> BLK_STS_RESOURCE, or plugging), &hctx->run_work is queued directly onto
-> the local isolated CPU's worker pool. This causes the local per-CPU
-> high-priority kworker (e.g. "kworker/6:1H-kblockd") to be scheduled on
-> the isolated CPU. In real-time environments, an active SCHED_FIFO workload
-> will starve this SCHED_NORMAL worker, causing hardware dispatch to stall,
-> in addition to introducing unwanted latency jitter on nohz_full cores,
-> thereby defeating the original objective of commit a46c27026da1.
+> I am assuming changing the bi_offset type to accomodate large offsets
+> isn't acceptable as the bvec_iter's size appears to be packed to be
+> small. I think there's a path to accepting larger offsets through
+> bi_idx, but the patch proposed here is a safer quick fix.
 > 
-> Introduce blk_mq_hctx_unbound_cpu() to select an online housekeeping CPU
-> from housekeeping_cpumask(HK_TYPE_DOMAIN) via
-> cpumask_any_and_distribute() when executing on an isolated CPU, and
-> otherwise fall back to WORK_CPU_UNBOUND. Use this helper across the
-> unbound fallback paths in blk_mq_hctx_next_cpu().
-> 
-> Additionally, for single-queue devices, gate the check behind the static
-> key housekeeping_overridden under CONFIG_CPU_ISOLATION to ensure that
-> common configurations without CPU isolation incur zero overhead on the
-> fast path.
-> 
-> This ensures that:
->     1.  When executing on an isolated CPU, deferred queue work is
->         cleanly offloaded to an online housekeeping CPU across single-queue
->         devices, hardware queues with empty cpumasks, and offline CPU
->         fallback paths.
-> 
->     2.  The per-CPU high-priority kworker on the isolated CPU is not
->         scheduled, avoiding priority inversion and latency jitter.
-> 
->     3.  When executing on a non-isolated CPU, WORK_CPU_UNBOUND is
->         preserved, maintaining optimal local execution with zero CPU
->         bouncing while avoiding timer pinning hazards.
-> 
->     4.  On systems without CPU isolation, single-queue devices maintain
->         the zero-overhead fast path via a static key.
-> 
-> Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
-> ---
-> Changes since v3:
-> 
->  - Create companion blktests test case (block/050) to reproduce this issue
->    and verify the fix (Daniel Wagner)
-> 
->  - Gate the single-queue (nr_hw_queues == 1) check behind the static key
->    housekeeping_overridden under CONFIG_CPU_ISOLATION to ensure the
->    common case without CPU isolation incurs zero overhead on the fast
->    path (Jens Axboe)
-> 
->  - Wrap the evaluation of cpu_is_isolated() inside guard(rcu)() in
->    blk_mq_hctx_unbound_cpu() to prevent an RCU lockdep warning and ensure
->    safe dereferencing of the housekeeping cpumask while concurrent cpuset
->    updates occur
-> 
->  - Disable preemption via guard(preempt)() around cpumask_any_and_distribute()
->    to prevent a preemption warning under CONFIG_PREEMPT_RCU and avoid
->    data races when accessing per-CPU distribution state
-> 
->  - Link to v3: https://lore.kernel.org/all/20261016052203.489760-1-atomlin@atomlin.com/
-> 
-> Changes since v2:
-> 
->  - Query housekeeping_cpumask(HK_TYPE_DOMAIN) instead of HK_TYPE_TIMER
->    to align with cpu_is_isolated(), workqueue affinity rules, and cpuset
->    isolated partitions
-> 
->  - Query the housekeeping cpumask under guard(rcu)() to safely handle
->    dynamic cpuset updates without lockdep warnings
-> 
->  - Validate that cpumask_any_and_distribute() returns a valid cpu ID
->    before returning, falling back cleanly to WORK_CPU_UNBOUND
-> 
->  - Link to v2: https://lore.kernel.org/lkml/20261015020225.422107-1-atomlin@atomlin.com/
-> 
-> Changes since v1:
-> 
->  - Introduce the blk_mq_hctx_unbound_cpu() helper to steer deferred work
->    to an online housekeeping CPU only when executing on an isolated
->    core, preserving WORK_CPU_UNBOUND and local cache locality for
->    housekeeping cores
-> 
->  - Apply blk_mq_hctx_unbound_cpu() across all unbound fallback paths in
->    blk_mq_hctx_next_cpu(), comprehensively covering single-queue devices
->    (nr_hw_queues == 1), empty hardware queue cpumasks, and the offline
->    CPU fallback path.
-> 
->  - Elaborate in the commit log on the triggers for asynchronous queue
->    dispatch (e.g. tag exhaustion, BLK_STS_RESOURCE backpressure, and
->    plugging) and the SCHED_FIFO worker starvation hazard on isolated
->    cores
-> 
->  - Link to v1: https://lore.kernel.org/lkml/20261012012905.267920-1-atomlin@atomlin.com/
-> ---
->  block/blk-mq.c | 31 ++++++++++++++++++++++++++++---
->  1 file changed, 28 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 025a799f35b9..f8f862a0e525 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2241,6 +2241,23 @@ static bool blk_mq_hctx_empty_cpumask(struct blk_mq_hw_ctx *hctx)
->          return hctx->next_cpu >= nr_cpu_ids;
->  }
->  
-> +static inline int blk_mq_hctx_unbound_cpu(void)
-> +{
-> +	guard(rcu)();
-> +
-> +	if (cpu_is_isolated(raw_smp_processor_id())) {
-> +		int cpu;
-> +
-> +		guard(preempt)();
-> +		cpu = cpumask_any_and_distribute(housekeeping_cpumask(HK_TYPE_DOMAIN),
-> +						 cpu_online_mask);
-> +		if (cpu < nr_cpu_ids)
-> +			return cpu;
-> +	}
-> +
-> +	return WORK_CPU_UNBOUND;
-> +}
+> [...]
 
-Just for future record, we are working on a WQ_PREFER_PERCPU workqueue flag that
-should automatically handle this sort of things. It's not ready for now so these
-hacks are still necessary but keep in mind this is a good candidare for future
-simplication.
+Applied, thanks!
 
-Thanks.
+[1/2] block: reject dma-bufs larger than 4GiB
+      commit: bcbd808652e127a704c21fa44d908eb56cbcda03
+[2/2] nvme-pci: detach dma-bufs only on removal
+      commit: fd13f31ac62abac4df2166bb0a6fbff53b288e0c
 
+Best regards,
 -- 
-Frederic Weisbecker
-SUSE Labs
+Jens Axboe
+
+
+
