@@ -1,66 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.97
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792685980;
-	b=k9jCKv3sDK0aqCnAwzsq1MXn50UodIRjxQzB3uiYA3t0cPQX2uf3DoGruMOwjW2AfZ9k
-	 Jg6cNLUofKZ5qGi/xYrqhL5d9mtzpYduCYFpyAEW65fxA93RmNo0kQADdmJ3pwNGCdDm3
-	 5+zzfz4GiX3Gm4H95ffaO/8tFZTiG5Pu4iwClQJfkM/O6Ij5yWIa9llYU80NylhUklMVS
-	 z9tx2AbYiUVbYMd/wrkeypMxB9hY0MdCy3ad7VBNhzwz4tZjl49Dh0Aitvhhu6o9sL8Dw
-	 SGa5r+IZlwmUe+Mj8r52d91vs2T3xvCh2YPqoZxy75Osa9gUR9U0v+Oxhq+wfB87aQg==
+	t=1792686655;
+	b=muWpyt5EVA28Ioh1VpT2XWKaehyDRsvzeozzdsvh1juDR1m0X1nGobTqBA+HKqNzIAlA
+	 esNYzG4hYUd9dDAzqIoL5srloCb6BB0VK7CjpCXIQxkGengQVg9ar0heblJhyCapRIC1q
+	 pLQFGSpDfZkBnrjsO6qTRtvP9yeCUFL5YtGFINbwEvEWH8S1b3GqbKSlCB8O24J4eJsU3
+	 qu1YZJFLC+HRvu+7siF8wMu3+9qyYa2mqMdNg5jeLNrY7/KAETMvwdzLPvj8ysw3PB0kT
+	 kUOBMxhAq5vIkFfokJdWP26HkF4iguWLzSBqlXqDNj+i/UMqVbbcUdG4CNpHtXhTCoQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792685980;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1792686655;
+	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=rUe/fDB85DFfM7fh+QFYZ6VWMP/4KqUiMHPEMUaN3YU=;
-	b=NAPeR0YELWevGImK2+UmKlMT3kW9Qc8ysjT1RXo4qX1M+aqbICDjgQqdbljh1TIHjgd6
-	 nLRXaOdpa+LMGeMNuHy1B3StKypTJxLiubmR6zonSCl+bRv0yWXe8fLq6yTY93RwyDF3W
-	 ZYJ6NiaJQNu+Dv/iW7+PCKYHCkwXg4ssNl1x42vvCQjvvo0Uxqeb9S3mKNfOUftlBOBqE
-	 UNj4vV4wwGpeU1Qod1yxpZRMjjXG5ZGj2K0JCdLZcgjr9AST4g32l1mLVgJUUegAZgI61
-	 EEm9OCOEZExYpLa91In0I7v3zQTzKyWKLOqNX9J5nEC0uIbMOLT2fEUKENsfaY8AJ9Q==
+	bh=tc4RtQ+McDeq8l1s8m84usBk75s9ZYG6jo3YuZ+d7zc=;
+	b=QTW7cUeHnSTTZQDRAtGSdqaP4ncAId1WMVuExFpwe5ifd0+WGhRFuivzTmygOMwkKQmZ
+	 DfGzsK9pix5QCl883pYsXg3VSEYAi/NE6hVJp7GlcKBCW4Bs05bNSfOdnL4/ncNIEeJN5
+	 a+LMOrJgJUj1PakxreJGJp74n4IJl2UwRZnwEQOC+ONO+0KSVlnykVB41mbmRiJFkPfUE
+	 FGb6RWeZmUE94HEwF/MsJPtz6phX11cBzJkTggRXH7jmESIGp+nToTo8ovczPD3tPZW3w
+	 xNGEn55sV40RBE73eMAll042rirARV/j2DiGH5MABRGWEITUta9QrFdAFjzogmu8HZA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=acm.org;
-	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=EihQGIJ9;
-	arc=none smtp.remote-ip=199.89.1.14
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	dmarc=pass header.from=linux.alibaba.com;
+	spf=pass smtp.mailfrom=linux.alibaba.com;
+	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=cjeqLWZM;
+	arc=none smtp.remote-ip=115.124.30.97
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9EE606A31E
-	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 16:19:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5E9EE606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB43E606A31B;
+	Thu, 22 Oct 2026 16:30:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AB43E606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=EihQGIJ9
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4j9WZM5r97z1XM4Tn;
-	Thu, 22 Oct 2026 16:19:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1792685976; x=1795277977; bh=rUe/fDB85DFfM7fh+QFYZ6VW
-	MP/4KqUiMHPEMUaN3YU=; b=EihQGIJ9SayYyWEWp12HMne+sMheeeIg9euLwqRJ
-	OPQX51UuR6/f9ctXpF2+7ThKXiYyVXORahvNojTwaJYlM6tpmBWGY2J8EkWwdeZS
-	yj7MtcdLIEHZ4eJ94Gd6dFyM6Fe4Q1t60TmfgoKIAhEqdn6ZIK7fHyQJ/ukmFllK
-	CU65TGlAZx2y1P7/iKFgbwMHhhOQNLZdRf7AIQMUblyzT9+VYzL8BklYHZd8EBIr
-	Sbf7etIW7UPTeCif6kAQygBm88QofOhLE6DNYj6wf+z84+Wi3BwkIjWQHtreE/aj
-	uHJp1es73dvnRG8xUSEvwUMbawaS6AlJbbIzalehJxWohw==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id diFMy1hHes1x; Thu, 22 Oct 2026 16:19:36 +0000 (UTC)
-Received: from [100.80.231.125] (unknown [104.135.182.41])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4j9WZJ2Kvhz1XM4Tl;
-	Thu, 22 Oct 2026 16:19:35 +0000 (UTC)
-Message-ID: <5c7b9f30-893e-4127-8ffa-3d5b7224674f@acm.org>
-Date: Thu, 22 Oct 2026 09:19:35 -0700
+	dkim=pass (1024-bit key, unprotected) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=cjeqLWZM
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1792686643; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=tc4RtQ+McDeq8l1s8m84usBk75s9ZYG6jo3YuZ+d7zc=;
+	b=cjeqLWZMtA9n3tPAe9DC01AJAWrdB/em+IUMc+LyPICucgcT9moGv+RkfJIAun0Ejqt3xrNb44Zk8BLiXyK4NZS0rL3BezLsgz3yqxx1TYfVh5SzCwjzikS4P+et78CTp88iMwBS1b0JpxUUtvAofrpqZ/YB7BZFuZdX+EuVtN8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0XDJckJa_1792686640;
+Received: from 30.170.203.187(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XDJckJa_1792686640 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 23 Oct 2026 00:30:41 +0800
+Message-ID: <625e5190-d43e-4a2b-9296-da15c52d1a9a@linux.alibaba.com>
+Date: Fri, 23 Oct 2026 00:30:39 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -71,21 +55,106 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: fix recursive i_rwsem locking in
- blkdev_write_iter()
-To: Zhenxian Ma <mzx199711@gmail.com>, axboe@kernel.dk,
- linux-block@vger.kernel.org
-Cc: hch@lst.de, syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com,
- Tal Zussman <tz2294@columbia.edu>, Julian Sun <sunjunchao@bytedance.com>
-References: <20261021093332.17334-1-mzx199711@gmail.com>
- <20261022062513.77372-1-mzx199711@gmail.com>
+Subject: Re: [PATCH 00/13] block, ext4: allow encryption with a block size
+ larger than the page size
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-xfs@vger.kernel.org, jaegeuk@kernel.org, axboe@kernel.dk, hch@lst.de,
+ djwong@kernel.org, brauner@kernel.org, tytso@mit.edu, berto@igalia.com,
+ adilger.kernel@dilger.ca, jack@suse.cz, yi.zhang@huawei.com,
+ ojaswin@linux.ibm.com, ritesh.list@gmail.com
+References: <20261011170958.1759230-1-libaokun@linux.alibaba.com>
+ <20261015185325.GG2170687@google.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20261022062513.77372-1-mzx199711@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Baokun Li <libaokun@linux.alibaba.com>
+In-Reply-To: <20261015185325.GG2170687@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 10/21/26 11:25 PM, Zhenxian Ma wrote:
-> Drop the outer locking in the fallback.
+Hi Eric, Thank you for your feedback!
+On 2026/10/16 02:53, Eric Biggers wrote:
+> On Mon, Oct 12, 2026 at 01:09:45AM +0800, Baokun Li wrote:
+>> Motivation
+>> ==========
+>>
+>> ext4 supports a block size larger than the page size (LBS), e.g. a 32k
+>> block size on a machine with 4k pages [1].  Encryption, however, is
+>> still refused on such a filesystem: file contents used to be encrypted
+>> page by page in the fs-layer path, which cannot handle a folio that
+>> covers several data units, so the checks that refuse encryption with
+>> such a block size stayed in place.
+>>
+>> Since commit 5acc6f649a68 ("fscrypt: Always use blk-crypto for
+>> contents on block-based filesystems") file contents are always
+>> encrypted through blk-crypto.  Inline encryption hardware can already
+>> en/decrypt a data unit that spans several pages, but the fallback and
+>> the block layer cannot carry such a data unit:
+>>
+>>   1. blk-crypto-fallback en/decrypts a data unit with the bio_vecs of
+>>      a single page-clamped segment, so a larger data unit fails with
+>>      BLK_STS_INVAL;
+>>   2. the block layer requires every bio_vec of an encrypted bio to be
+>>      data unit aligned, and splits such a bio without rounding the
+>>      split size down to the data unit size;
+>>   3. iomap cuts the direct I/O bios of an encrypted file only at the
+>>      logical block size of the device, so a bio can end in the middle
+>>      of a data unit.
+>>
+>> This series adds the missing pieces on all three layers, removes the
+>> refusals, and enables large folios for encrypted files on the way.
+>>
+>> [1]: https://lore.kernel.org/all/20251121090654.631996-1-libaokun@huaweicloud.com
+> A high-level question: most of the complexity in this series is to
+> support crypto_data_unit_size > PAGE_SIZE, despite the actual goal being
+> to support fs_block_size > PAGE_SIZE.  It's left unstated that the
+> default of crypto_data_unit_size == fs_block_size is used.  However,
+> ext4 and f2fs already support crypto_data_unit_size < fs_block_size.
+>
+> Would leaving the crypto_data_unit_size at e.g. 4 KiB while increasing
+> fs_block_size be a simpler way to achieve the goal of this series?
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+I initially followed the LBS approach of lifting the page-size
+restriction, keeping the existing default crypto_data_unit_size
+equal to fs_block_size. I had not considered using sub-block DUs.
+
+After your reply, I implemented a variant using min(bs, PS) for
+new default v2 policies, recording a smaller DU explicitly on disk.
+This avoids patches 3-6 and the per-bvec alignment relaxation in
+patch 10, and is indeed much simpler.
+
+Both variants retain large-folio support and showed similar gains,
+about twice their respective 4K-block controls. Although 32K DUs reduced
+decryption calls eightfold, I did not observe a consistent additional
+throughput benefit, or CPU savings at matched bandwidth, in the tested
+workloads.
+
+> Or do you feel that would be incomplete, and you'd indeed like to
+> support crypto_data_unit_size = fs_block_size > PAGE_SIZE?
+
+However, keeping DU = bs has a compatibility advantage for existing
+encrypted filesystems.
+
+For example, a 64K-block filesystem created with a default v2 policy
+on a 64K-page machine uses 64K DUs. Supporting DU > PAGE_SIZE would
+allow a 4K-page machine to use that format without re-encryption,
+assuming the other policy and backend requirements are met.
+
+This also covers otherwise-supported legacy v1 policies, which cannot
+encode smaller DUs.
+
+Explicit 4K v2 DUs can also be portable across page sizes, but
+choosing a smaller DU for new files does not make existing large-DU
+ciphertext readable on a smaller-page machine. I have not yet tested
+the cross-page-size migration.
+
+If you think supporting DU = bs > PS makes this series too broad,
+I can use the simpler sub-block version in the next revision and
+develop larger-DU support separately.
+
+Looking forward to hearing your thoughts.
+
+
+Thanks,
+Baokun
+
