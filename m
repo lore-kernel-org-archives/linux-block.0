@@ -1,78 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792675900;
-	b=nlOYyEKKqXEcB2SKtHZYf3YcMAa5OIcxzeTN5/KSHghJoGmjNVZ2Uk5mxA+7+B9eg6G+
-	 2jYVWnNLc1+4gVZEeIToJUWMUTnhfe1EPNXmZFMXpZO97+TItYJ8GaQv3LnnN5mw2pHGT
-	 aAPE3GMrqI6gSggnONvPiI7UpCbelEqdSwpQ+2DHClmpdS1+S9qXk8mBeZbG2jSx13CAW
-	 o6C995f0fciPvv9JvD/3sBWXKPLXvQU7D0FRqyQSaCElpFP3dv2pUM/9F3tIECGbbzglC
-	 1ut+tJNrYryQJbKME57jb7hHyv08p6nm+LFapdiP76PtqJ3U8Zcfhi2UnetHOMlbkGA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792675900;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=9yH6lCZJs4jQqhq5RKT/kA7z15frEt+8pQmmPZcgKoI=;
-	b=Tiy0OBMSpxCwwpq0UOO9Wdb93uPBZdkCT9YMR09QwNsOh4zPS5msi98zwzD2bvvB6DKp
-	 88eTY8gz8GRysEfVkO/Cp7ItAPebqHzgZS5h80ffZmDFLsVShCRh7Q40pFgB35ZwpxaPq
-	 X424fRJXx7USzoTz14TJZOj+AaMdZJC5BwlsfH/z/xqV4Y1zla8vKd5Et+390i2VWNMUU
-	 cz5rdNH0qfAqr7hdqt9V5f4hvMSTItyk8IM0AJblFeWVSV0XvBlKr7bT1Pth86LPKj0yN
-	 WQnh0JtUngO2Xfb1PY9M7edXvnHOlQr1Fl5r8/t4xqvOCZBAVd+2paZ8GWaMABPLYJQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hfBqS0r6;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32246606A31A;
-	Thu, 22 Oct 2026 13:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hfBqS0r6
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1792675899;
-	b=Bb5zvK6dWrBjfIgtuX6mI8uctf9QyxE9a0xyx4/la/t32xqOihZOWZ65n9PRjG2bD3es
-	 606Chzyr5slcdF6SDQ144C+nylKHbzQ9pFLaJAR8kF+WBFOXguwQKRSCocNmIityMTJYT
-	 XbB8UdIT8hrzD0jON0WXMGlpOz0wa+cWJCQR7+ogRtPUlwLRq1Yi6rUnxPemB63IadH5f
-	 eHqMT2+FQQaOA7KnXh0WoD9pIdL2khhsRLyvrVN/xnoXNDg2YwYEdd0c8AkjBw1aoG5tM
-	 0/Ogy1QgLvbEgNlbxvXO2LL/utXCuIBJA3yrIll2GhEhlftgr/Q6wYj4wgnsVm1SGlA==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1792675899;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=9yH6lCZJs4jQqhq5RKT/kA7z15frEt+8pQmmPZcgKoI=;
-	b=oNo4iHBLMs/hizjbXhNtCLpZgd/P8q3ifoI3CxnjK+SlNkWdPF83e9IADWzWD8vHfL+D
-	 C7Nywl4soD4aKf0NAVhm4k3dic4P+BItN12HQtroIfNnMCH7WHzDn8xKC2A+UxzgSujSp
-	 xgbMy8hp4PtALsXDedU5GxCiGn0xTAKa+QNq8Muf5r6X15lcVO8+hBQH6DFUikYxEMtL0
-	 iVcmCJDi0nDjR+vvlPCPCsQIn0wFvqlRG9jTfnZ7MwgPdJDk9qbSpWFCYM+gGP0o8/NR8
-	 QpPXVKX+GWP9wtvQXHHioqkaiLpt3OIqiYjIfRIFfaSvBU9zR1O8iXGpI0j+F0H2qYQ==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.52
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792676182;
+	b=LrXF0XofDl4VgCKBvLx4wYGG2oh5CIxf5/SxdErVReP7yTNyBnErp9G+cx3Fkm+LozEp
+	 6QVSbmMb8+SPDil+P/608yRjJBR5GJbrdrJxnqlEB8gNVyZDyWx/hEyo2zX4mkOR/dqGx
+	 tfy0nTcDIjUNTU7Q7kmUglBMBiYiYYVD9+jQvnYCYIpoDdlDFReI9fkT8ILTPkzd2m0bf
+	 bkD13c7LGbk13Qx9WKQ/QgIQM+22YbKoGk1+AJD6vRMA+IxPpZytV0VcL5/rkuoYDqe5D
+	 +JK5baTbjsCMtxoF3wYk7T/xOwv5gwnG0v4M6ekfD6x0fV0Zh1b6Lq/uC8TbHhmXOug==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792676182;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=IbtxibXdI9zyqjziQv0IxMo79fhmOdo8yS+ycPfz4Yk=;
+	b=gJWot/8mN8mX4CN90sk3QmCZ9ySz4vj4xYuI8ydLqAnNJ8z04n66D3JAhTf09fN7I6Ib
+	 G2ba45k7rZkvLY3Diwf272qU1ivL4CjQhXL9q0Wmsd+YyirY05+bRuaiV/AP9WZ4SdDM8
+	 d8/MpenjRobE27TZzDXN9u3Ld+RJNhuT54nxS1D7kX+vZxjcCBxWc63lrL3Fa9vTYrjo5
+	 FtYMkyTNFB7LtjN9agDep+/Tx+QCgYf4FZ5cl7MnqNugAowAD6Lt4vlottWXVN4Ng5oDt
+	 03ShbwTsURjr6Rz8ViuoRfRctxCw9oyRarBVuVv2ayGeBFcgCTSmagptKNQxkd6KEyQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=pSRz+sdz;
+	arc=none smtp.remote-ip=209.85.221.52
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 4D7A41F000C2;
-	Thu, 22 Oct 2026 13:31:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792675899;
-	bh=9yH6lCZJs4jQqhq5RKT/kA7z15frEt+8pQmmPZcgKoI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=hfBqS0r6yLyPm/TpGe8+2J407uBxMRyMpqim1bvrQP3ClrXWhudHspbovMuKk7pDa
-	 qESHLg51UIFJgJA5xpdwkh13CQCUHSsc0VW0NAE/x6K/jzuNo8ID8c9I0ug3yuV2zO
-	 lQu37pWHPpdq+G9rjVnBH6vBLk+xs0SQPUu2kdt65UREPPIqPyDkfLGwEyybuMY3aQ
-	 v11p6Mc2Pv8UoIhKU6gXNFfpNaEAbllsNVmjiATmsEIx38FcUr/r2ga3q1q3FonNbv
-	 ym6GUqcFKzV9nQPh7rYTEdoq1daRO8E7Z89NJu58TRbGLqFNmOLgakGrxmyOG1GsGX
-	 HQCH5SKn87CKw==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id D303F4358E;
-	Thu, 22 Oct 2026 13:31:38 +0000 (UTC)
-From: Daan De Meyer via B4 Relay <devnull+daan.amutable.com@kernel.org>
-Date: Thu, 22 Oct 2026 15:31:11 +0200
-Subject: [PATCH v3 1/2] loop: drop stale partitions on LOOP_CHANGE_FD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0900606A319
+	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 13:36:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0900606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=pSRz+sdz
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-487049569b6so1287762f8f.1
+        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 06:36:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792676180; x=1793280980; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=IbtxibXdI9zyqjziQv0IxMo79fhmOdo8yS+ycPfz4Yk=;
+        b=pSRz+sdzwCM+wosNEQmUKUDNrg6La94MAOtYET6ansQaw4Jit8sWNTBdiELduFOb5c
+         rD8REU/8N7Pf8nU8NqkVPhhXiPd5D8X7BRGL2CCKPKZGCNOfj8K5zg+6HMGYsgVJj7R0
+         WyttVKbC7nj3EaT0P1LzpzCEBKK/4NYSTt5ryedZIqWgc8Wg3Ji9jJLzBkT8fyhU5dWv
+         7KyxAGrHO/4gMd0elIMU5yRwgl42/StitCdJQd+XW7sEs6NP4Tdvm9fM4RuTURV+DjJE
+         uqW+AWlfEO3YHYYMzmbWTgZjQfNsl70l/RCHF3/t5tnc1SvI2dtDcSCN/uBt8hr9UJFX
+         WP6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792676180; x=1793280980;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=IbtxibXdI9zyqjziQv0IxMo79fhmOdo8yS+ycPfz4Yk=;
+        b=ztzJ2QphXkGd/SwjGzrIqZx82IFG7sycInpGa46UF+5hoO0t2yXmU2v6CmQKM++YrO
+         g8IEr/8QpUnoiQIxOX1tp/1flHO48ZuDzWGJUWFTsmGAlEP5DN4XNBLe3NRw+i9GcM+k
+         0N+yVfybrLN9okh4x0Pe1cy/CKEdcKDCaKJEcibtMW80U22kduPkcIwpMcycBf+IK71C
+         iQrJyN25J0JM8WtbtO5aMbIqCHrZmfaRHwHjxfPwee+JDuyk7qESI3gecEG0u/5P0acd
+         avGvHE9kJQXe4EBDkcYyyNILqcuc48MOXZuv7EExDM3XsnFCiIs8AyM6BoJOgyo8PEnu
+         vYAw==
+X-Forwarded-Encrypted: i=1; AKwUvBy/DswiQVHp6SeAWxr6I3kvqvsKr4azTv/8CSPAeEeXs190zOh8VsOPzeVq/sglnpw8Ex+8azdUHocubg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJ14PF4AwKgPUWTvxsCinZmIBRTVeej0VR2RKyrDg9pcgvMQ2/C
+	5JN8xqe/jsRADG2V+8xXEcmnCsjYM+30ZsF6kmABIEzpVXHabJUyAVj3
+X-Gm-Gg: AYBFou0F/keU7C5TKyUHVSHF+2gZ9oG86IcqV9fXkVxTi1kglZR1JX1MLlDSo/+tQjX
+	zY7EaKfrSSXteB+u0OwNl7eqOROZs+vpypJiIXlu3SP0YzalkOseU9AO8WrbS1pGr5XrOtl4ZSi
+	edIOxHiZ8T5XzLbX+08fVGCAQd7d/qnd/McHzC5Gnzrh48d3oUDuo1iQeWvOxNYFH/Ln08ubWxC
+	eV6icBtymeTwBGJ8x/xr4PHIqaEDOGF3W8/lzic9Ic1gd0aTL15sDKIeG9c4qWDUjL/aCPCzXHD
+	Xa5ydMI2oZDTom1GrxtHkyn/ru6E1p0xqNCVAQLUosu1M3BOyijnnBUIFeRfHd7l8fNaCzFxrs3
+	JfzaERS7fFKif8I7Rmxv8aNKyqyYspCeqqf74Ypv+0foGV49G08WzvVnE1nnV/TVcxqWCu0D0E6
+	Wf2OKtiJnOwdvrIo7guAPmtkEcgO7z3lNj19yCiV4oUYi4A+btJh1uvs0C7LlGhMfgcW5eNkA7p
+	acMYfkGWEco8f5hl/jWsf/+RBlEQpeyJ9GWdZqr8z02AiYkg7RTfP5NxY+T9sjuqnyRwevjOWa+
+	kbCENCCPY3StHriWKATw8hVj
+X-Received: by 2002:a5d:4573:0:b0:48e:e2a:4093 with SMTP id ffacd0b85a97d-48e264ab3a3mr8726545f8f.19.1792676180147;
+        Thu, 22 Oct 2026 06:36:20 -0700 (PDT)
+Received: from andreayoga.wind3.hub ([151.76.51.95])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e2581f0d4sm12645777f8f.13.2026.10.22.06.36.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Oct 2026 06:36:19 -0700 (PDT)
+From: Andrea Parri <parri.andrea@gmail.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	linux-block@vger.kernel.org
+Cc: Andrea Parri <parri.andrea@gmail.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Daniel Wagner <dwagner@suse.de>,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH blktests v2 0/4] nvme: add nvmet zone report and FC regression tests
+Date: Thu, 22 Oct 2026 15:36:04 +0200
+Message-ID: <20261022133605.3593484-1-parri.andrea@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261022130927.3583166-1-parri.andrea@gmail.com>
+References: <20261022130927.3583166-1-parri.andrea@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -82,104 +103,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261022-b4-loop-nbd-stale-partitions-v3-1-7c58ecab69c8@amutable.com>
-References: <20261022-b4-loop-nbd-stale-partitions-v3-0-7c58ecab69c8@amutable.com>
-In-Reply-To: <20261022-b4-loop-nbd-stale-partitions-v3-0-7c58ecab69c8@amutable.com>
-To: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
- Josef Bacik <josef@toxicpanda.com>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- nbd@other.debian.org, Christoph Hellwig <hch@infradead.org>, 
- Bart Van Assche <bvanassche@acm.org>, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
- Daan De Meyer <daan@amutable.com>, stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1792675886; l=2855;
- i=daan@amutable.com; s=20260712; h=from:subject:message-id;
- bh=puuj6cW8tTVT3rlBQ4+twjIwX6td3ITnz1udGWzqXoE=;
- b=bm9JYcaLmrTZGd65sbO3DwpOUBlC4Vat94LKUpfk8mBWpc0fo0plUO/65DilomxGB2AsSbCoO
- QR5WuNuKixMCDnwJCExAo7glZyI0ZuD+GJp8S4VhDFRzt/SWbaNIDW9
-X-Developer-Key: i=daan@amutable.com; a=ed25519;
- pk=I1l+WwrtmzRgofA5SQ1wTuJi18fjh91w+f5uRkFeZEA=
-X-Endpoint-Received: by B4 Relay for daan@amutable.com/20260712 with
- auth_id=868
-X-Original-From: Daan De Meyer <daan@amutable.com>
-Reply-To: daan@amutable.com
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-From: Daan De Meyer <daan@amutable.com>
+The kernel fixes that nvme/072 and nvme/074 test are now at v2:
 
-Commit 267ec4d7223a ("loop: fix partition scan race between udev and
-loop_reread_partitions()") stopped disk_force_media_change() from
-setting GD_NEED_PART_SCAN. That bit did more than request a rescan:
-bdev_disk_changed() drops every partition before it consults
-disk_has_partscan(), so the lazy scan on the next open was also what
-removed partitions from a loop device without LO_FLAGS_PARTSCAN.
+  https://lore.kernel.org/r/20261022132934.3592924-1-parri.andrea@gmail.com
 
-Such devices are not unusual. bdev_add_partition() only rejects
-GENHD_FL_NO_PART disks, so BLKPG_ADD_PARTITION works while
-GD_SUPPRESS_PART_SCAN is set, and parted, libfdisk and systemd all fall
-back to BLKPG when BLKRRPART fails with -EINVAL, which is what a loop
-device without LO_FLAGS_PARTSCAN returns.
+nvme/073 tests commit 31b8a6af19b7 ("nvmet: zns: don't leak stale
+memory in zone management receive"), already in nvme-7.4.
 
-loop_change_fd() only rescans when LO_FLAGS_PARTSCAN is set, so those
-partitions now survive the backing file swap and keep describing the old
-file. The new backing file must have the same size, but its partition
-table can be completely different, leaving the partition devices mapping
-the wrong ranges.
-
-Call loop_reread_partitions() unconditionally. Without LO_FLAGS_PARTSCAN,
-blk_add_partitions() returns early, so this drops the stale partitions
-without scanning the new backing file.
-
-Fixes: 267ec4d7223a ("loop: fix partition scan race between udev and loop_reread_partitions()")
-Cc: stable@vger.kernel.org
-Reviewed-by: Christian Brauner (Amutable) <brauner@kernel.org>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Signed-off-by: Daan De Meyer <daan@amutable.com>
----
- drivers/block/loop.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 758c20678bf6..378163fdf957 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -552,7 +552,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	struct file *old_file;
- 	unsigned int memflags;
- 	int error;
--	bool partscan;
- 	bool is_loop;
- 
- 	if (!file)
-@@ -606,7 +605,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	loop_assign_backing_file(lo, file);
- 	loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
--	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
- 	loop_global_unlock(lo, is_loop);
- 
- 	/*
-@@ -624,8 +622,12 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	 */
- 	fput(old_file);
- 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
--	if (partscan)
--		loop_reread_partitions(lo);
-+	/*
-+	 * Rescan or, without LO_FLAGS_PARTSCAN, just drop the partitions of
-+	 * the old backing file. They can exist without LO_FLAGS_PARTSCAN as
-+	 * they may have been added manually with BLKPG.
-+	 */
-+	loop_reread_partitions(lo);
- 
- 	error = 0;
- done:
-
--- 
-2.54.0
-
-
+Andrea
