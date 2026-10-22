@@ -1,60 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792706697;
-	b=lqOaisgXJM/ozZvcOFkqlo+6tf/HpgfGYW+S1UhSMuhtEKSG710zfMRHsSwq7sc9e31y
-	 pRXcO2U9QAJYpIwpwHTrdANsyO/w4+sNNVQ76JJl7p18yzMgrSWDbeTHCUUWTxjYSKQOk
-	 NByN8EDshiLJTWJOfYADisqphPSaCNDz6mF5LBV+IsKyjbhJj5uw9ABfv7eu8fgXy7nsE
-	 RqICgZiNdi2LFgP0OAIhODlUqj/uk1K0e5849tXCvVm4HtHXt388KmqCBWrAheVXjQsGG
-	 R3Q9YUYokk07wsl1b0Y0d7LP0D0WSvSj1/MHdnuASeDMbeobtPhcbh5nuDYL22lMHXg==
+	t=1792711278;
+	b=LZX6s5JUJLGgbwNrpOhvjdpg37eZ3C7dwTO6YhjimVOeMCcstI7WYYx6EA0/lsadGFsg
+	 pnAS6F7PDJd1LEhTWVMBapdtHOE48wrhkmZjvLdD3U7p+68h4wnKzTM9VFIWL20dOb3LO
+	 wPWicSyw2KESiXD+ksvlV6ntIf++MtBIxtnWZ7Mp463Klw2e9cR7CA293Qwek3vQPFs4N
+	 KuZnAXb4TyK9ZB/AxOAT7cX7u43COKuid5+iPf/2q/GgYqgshEkrfEVeAydGfxrgbDIpw
+	 g37Yt9ipDWkoxLSOi9htDI0n7M043yGUOeFt40p0yUQ86DaSMHaLFl5LQO7KQK0LA/g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792706697;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=zWkFFrCjzJ7Rb09dks5kAI7WSjnHbFizCZlsjSWaW68=;
-	b=a/pvRtB6MNZKpbk7Y6uYTuKWApQUChQplZIqWVrkZru1P1kp9gnrovPgrvnpI01JLCJ1
-	 55VmYxJZiarm2cgb+cS69DhCX8L8rj0lJXLQYnEvuKdm2ET4GRL6PquHpNhY7Hkdf41uT
-	 7/YJDRAecWyva6+6WVHKHKlYz6vsjC8kk8iILIYykL0HVDouRShJyKxp74hR6G51pTEcs
-	 a/y5Uwp30MeSYMZCYdYVvnZZHhr1o29thxXcBzoHC5oGjL1rTuqbOncq8G8f6JsvOFpq9
-	 Pj8x5zWCeMOUkMOVVALoDslRkqQiYznf08+6EKs9GdCpPW+5BOm84LdYDbtSYNucM1g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792711278;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Received:Date:Mime-Version:X-Mailer:Message-ID:
+	 Subject:From:To:Cc:Content-Type;
+	bh=rtnM1iSGxbLqH9+CwwNDUl2JT44AtoAZO7zKVDfXHNU=;
+	b=vPrn1IErU6WA+aulaz20H+5eb3pL2kilc40sIXk7kgU8/b0bQHF0UDm8GwmGppe4OM8s
+	 KwcxlKUwm52HvW553VpSI7oMroSTkMf7ucICeCj7LkQbUEjGlf+/bcJI8lSrGMxIQPm3v
+	 6q287vdAlOcEY+n4PeOLcGTmuvzWAi37gA4hA6SKmQw5vveIaj9kWmkVEODi8bGg78bdp
+	 jAkWPKyzNi8f0UeHH9q/xLyzlNLn3qsXaNDWDWkhyNGdVVPjkyOamjydoG2rqU4mKVzHZ
+	 o3yxs6B+fR36XuiRBp+kOtPoqSLKDF7MaJ2uQJJgXo7rk+EC3Gv7nzsIqDZrvC6w4BA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Rqj0HHoS;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--dmnk.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b="H0Eb24/g";
+	arc=none smtp.remote-ip=209.85.128.70
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1B6606A319;
-	Thu, 22 Oct 2026 22:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4922F606A31A
+	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 23:21:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4922F606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmnk.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Rqj0HHoS
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BA6B1F01828;
-	Thu, 22 Oct 2026 22:04:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792706696;
-	bh=zWkFFrCjzJ7Rb09dks5kAI7WSjnHbFizCZlsjSWaW68=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Rqj0HHoSEP/g7GIhndcGRvVFz5o/sVqSQu6ndjYgZtxC7DdxRLAsff7z4mliNGYo8
-	 lxxktvxYqQbjzXcmMePZy0FR/RnvPzQP+AEgq845EUXq/NDHL7Hx08J7vU5xlV1DZn
-	 fTZGKPor23cE7I1I8UsxuHBn0TQMd6belOg203h+APRtvAsOnZWy3hnC0A9or29si4
-	 eVbZhYMjJ9nBM4Tmkg1mZilMSXDZ4hWubCMb2jjU0a0FNiaB25gBZCpZBqXNtXKYND
-	 M72+GUkvcm5ePJvMEz5/LzEfE4CJ3RW2VN0LgkFR/9JqaGIinAYgR1L+8ChAJ6ucyi
-	 z7OXIJYHp7VIA==
-Date: Thu, 22 Oct 2026 22:04:54 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Baokun Li <libaokun@linux.alibaba.com>
-Cc: linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, jaegeuk@kernel.org, axboe@kernel.dk,
-	hch@lst.de, djwong@kernel.org, brauner@kernel.org, tytso@mit.edu,
-	berto@igalia.com, adilger.kernel@dilger.ca, jack@suse.cz,
-	yi.zhang@huawei.com, ojaswin@linux.ibm.com, ritesh.list@gmail.com
-Subject: Re: [PATCH 00/13] block, ext4: allow encryption with a block size
- larger than the page size
-Message-ID: <20261022220454.GC1383716@google.com>
-References: <20261011170958.1759230-1-libaokun@linux.alibaba.com>
- <20261015185325.GG2170687@google.com>
- <625e5190-d43e-4a2b-9296-da15c52d1a9a@linux.alibaba.com>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=H0Eb24/g
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a21053899aso1685725e9.3
+        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 16:21:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792711277; x=1793316077; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=rtnM1iSGxbLqH9+CwwNDUl2JT44AtoAZO7zKVDfXHNU=;
+        b=H0Eb24/gm6K93J+ew8VUudC7sy7EMXENiMXElOaUvy1J0YJsW9PQJL3f28WscjwlZZ
+         4AW3GrSoD743iTzIGWLzQUc4hGTs2EI8mjASk1QzV0+zNnXciju2140a4aBunrP7jnko
+         ajNfQmsjhev5FMYCH8TILvQPxkAXvnlMnIXQEmnDInSvROdBmpeVWpiDPjN7TTXwgPVq
+         JwRAGYDTCqPIlIHNk3h2s+t3JcoIRkv9I+RqzpQ4+Nd0zjUdMp9/I0obgcYhxreBs/UB
+         d6Sxi9LyRNm1jZsvmMuhWJ4KNUE4Po0PIS6zZODSoIJ4vjwjw0/49N06Of8xWNy75Y5e
+         Rsqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792711277; x=1793316077;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=rtnM1iSGxbLqH9+CwwNDUl2JT44AtoAZO7zKVDfXHNU=;
+        b=ZY1s0kZE47dczN7v37mSexzVmPAX8gjXC7RrLKhz0a6sdToPefotob4iDh+Vp3WNwT
+         7QxTkJlE8kW34O+1JTIWHTDSwNgeSmxlT3WiH1+Byd2IJevxN25S7e02HGwXjBvXOYq5
+         tjg0/OiJG7iFCQq/PWW5aC3z1FnrojZXXa/zw2UxePJTWXybgu4MXww/tJGoq06q41OM
+         X8NDsi1h8lufj/PDeTLeGEAHL2PdhDUGCSCCwUft5yxBkcOKo9coJHQdNgb6CWTXlhGm
+         3oZ/QLPlKHmTAMZzkyml83myajGUoxDyJi/rX1hCEEPQ03vSWPUsLNIRyTn+ClUd3YZK
+         Wi6Q==
+X-Gm-Message-State: AFq9FYL3I+o3CQmgDGsgFkU/O1RXHkzK265bsSVk4jryGvOpuqGnEVVJ
+	IRf2SF8hd3bIRLjshDAULL+fXUjpRzvRySaxiWo3K8OGXCQledEcNf9K0XeUyemgI1dTEFLixg=
+	=
+X-Received: from wmcq10.prod.google.com ([2002:a05:600c:c10a:b0:4a2:14b1:1f8a])
+ (user=dmnk job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:e555:10b0:4a1:f377:5c6c
+ with SMTP id 5b1f17b1804b1-4a211edfc66mr4801815e9.10.1792711276477; Thu, 22
+ Oct 2026 16:21:16 -0700 (PDT)
+Date: Fri, 23 Oct 2026 01:21:14 +0200
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -63,111 +74,55 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <625e5190-d43e-4a2b-9296-da15c52d1a9a@linux.alibaba.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.257.gf7497c7d27-goog
+Message-ID: <20261022232114.2535802-1-dmnk@google.com>
+Subject: [PATCH] loop: check for read-write open mode on LOOP_SET_STATUS in lo_compat_ioctl()
+From: Dominik Maier <dmnk@google.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, dmnk+artist@google.com, 
+	Dominik Maier <dmnk@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 23, 2026 at 12:30:39AM +0800, Baokun Li wrote:
-> Hi Eric, Thank you for your feedback!
-> On 2026/10/16 02:53, Eric Biggers wrote:
-> > On Mon, Oct 12, 2026 at 01:09:45AM +0800, Baokun Li wrote:
-> >> Motivation
-> >> ==========
-> >>
-> >> ext4 supports a block size larger than the page size (LBS), e.g. a 32k
-> >> block size on a machine with 4k pages [1].  Encryption, however, is
-> >> still refused on such a filesystem: file contents used to be encrypted
-> >> page by page in the fs-layer path, which cannot handle a folio that
-> >> covers several data units, so the checks that refuse encryption with
-> >> such a block size stayed in place.
-> >>
-> >> Since commit 5acc6f649a68 ("fscrypt: Always use blk-crypto for
-> >> contents on block-based filesystems") file contents are always
-> >> encrypted through blk-crypto.  Inline encryption hardware can already
-> >> en/decrypt a data unit that spans several pages, but the fallback and
-> >> the block layer cannot carry such a data unit:
-> >>
-> >>   1. blk-crypto-fallback en/decrypts a data unit with the bio_vecs of
-> >>      a single page-clamped segment, so a larger data unit fails with
-> >>      BLK_STS_INVAL;
-> >>   2. the block layer requires every bio_vec of an encrypted bio to be
-> >>      data unit aligned, and splits such a bio without rounding the
-> >>      split size down to the data unit size;
-> >>   3. iomap cuts the direct I/O bios of an encrypted file only at the
-> >>      logical block size of the device, so a bio can end in the middle
-> >>      of a data unit.
-> >>
-> >> This series adds the missing pieces on all three layers, removes the
-> >> refusals, and enables large folios for encrypted files on the way.
-> >>
-> >> [1]: https://lore.kernel.org/all/20251121090654.631996-1-libaokun@huaweicloud.com
-> > A high-level question: most of the complexity in this series is to
-> > support crypto_data_unit_size > PAGE_SIZE, despite the actual goal being
-> > to support fs_block_size > PAGE_SIZE.  It's left unstated that the
-> > default of crypto_data_unit_size == fs_block_size is used.  However,
-> > ext4 and f2fs already support crypto_data_unit_size < fs_block_size.
-> >
-> > Would leaving the crypto_data_unit_size at e.g. 4 KiB while increasing
-> > fs_block_size be a simpler way to achieve the goal of this series?
-> 
-> I initially followed the LBS approach of lifting the page-size
-> restriction, keeping the existing default crypto_data_unit_size
-> equal to fs_block_size. I had not considered using sub-block DUs.
-> 
-> After your reply, I implemented a variant using min(bs, PS) for
-> new default v2 policies, recording a smaller DU explicitly on disk.
-> This avoids patches 3-6 and the per-bvec alignment relaxation in
-> patch 10, and is indeed much simpler.
-> 
-> Both variants retain large-folio support and showed similar gains,
-> about twice their respective 4K-block controls. Although 32K DUs reduced
-> decryption calls eightfold, I did not observe a consistent additional
-> throughput benefit, or CPU savings at matched bandwidth, in the tested
-> workloads.
-> 
-> > Or do you feel that would be incomplete, and you'd indeed like to
-> > support crypto_data_unit_size = fs_block_size > PAGE_SIZE?
-> 
-> However, keeping DU = bs has a compatibility advantage for existing
-> encrypted filesystems.
-> 
-> For example, a 64K-block filesystem created with a default v2 policy
-> on a 64K-page machine uses 64K DUs. Supporting DU > PAGE_SIZE would
-> allow a 4K-page machine to use that format without re-encryption,
-> assuming the other policy and backend requirements are met.
-> 
-> This also covers otherwise-supported legacy v1 policies, which cannot
-> encode smaller DUs.
-> 
-> Explicit 4K v2 DUs can also be portable across page sizes, but
-> choosing a smaller DU for new files does not make existing large-DU
-> ciphertext readable on a smaller-page machine. I have not yet tested
-> the cross-page-size migration.
-> 
-> If you think supporting DU = bs > PS makes this series too broad,
-> I can use the simpler sub-block version in the next revision and
-> develop larger-DU support separately.
-> 
-> Looking forward to hearing your thoughts.
+In 64-bit lo_ioctl(), commit 7035b5df3c07 ("loop: cleanup set_status
+interface") added a check requiring (mode & FMODE_WRITE) ||
+capable(CAP_SYS_ADMIN) (now BLK_OPEN_WRITE) before allowing
+LOOP_SET_STATUS or LOOP_SET_STATUS64, but the corresponding check was
+omitted from 32-bit lo_compat_ioctl().
 
-I think I prefer the simpler version for now.  If someone wants to
-create encrypted files on a 64K block size filesystem on a 64K PAGE_SIZE
-system that are also readable on a 4K PAGE_SIZE system, for now they can
-just set crypto_data_unit_size = 4K.  v1 policies were deprecated 7
-years ago, so they shouldn't really factor into considerations here.
+As a result, on kernels with CONFIG_COMPAT=y, an unprivileged process
+holding a read-only (O_RDONLY) file descriptor to an active /dev/loopN
+device can issue a 32-bit compat LOOP_SET_STATUS ioctl to modify
+lo_offset, clear lo_sizelimit to 0 (exposing backing-file data past the
+configured limit), or alter lo_flags.
 
-Note also that setting crypto_data_unit_size too high can break write
-atomicity as well as compatibility with inline encryption hardware.
+Enforce the same (mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN) check
+on LOOP_SET_STATUS in lo_compat_ioctl().
 
-(Also, the more common use case these days is that someone is
-*increasing* their page size, not decreasing it.)
+Fixes: 7035b5df3c07 ("loop: cleanup set_status interface")
+Assisted-by: ARTIST LLM
+Signed-off-by: Dominik Maier <dmnk@google.com>
+---
+ drivers/block/loop.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-I understand there's been a trend to lift limitations like these and
-make every size work on every system.  But the large crypto data unit
-sizes are difficult to implement correctly, and the proposed
-implementation slows down common cases that matter.  Let's focus on
-fs_block_size > PAGE_SIZE by itself first.
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 758c20678bf6..f15a5cae5c63 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1708,8 +1708,10 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 
+ 	switch(cmd) {
+ 	case LOOP_SET_STATUS:
+-		err = loop_set_status_compat(lo,
+-			     (const struct compat_loop_info __user *)arg);
++		err = -EPERM;
++		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
++			err = loop_set_status_compat(lo,
++				(const struct compat_loop_info __user *)arg);
+ 		break;
+ 	case LOOP_GET_STATUS:
+ 		err = loop_get_status_compat(lo,
+-- 
+2.56.0.218.g1ec904b173-goog
 
-- Eric
