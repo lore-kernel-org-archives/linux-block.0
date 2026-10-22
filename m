@@ -1,50 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792686655;
-	b=muWpyt5EVA28Ioh1VpT2XWKaehyDRsvzeozzdsvh1juDR1m0X1nGobTqBA+HKqNzIAlA
-	 esNYzG4hYUd9dDAzqIoL5srloCb6BB0VK7CjpCXIQxkGengQVg9ar0heblJhyCapRIC1q
-	 pLQFGSpDfZkBnrjsO6qTRtvP9yeCUFL5YtGFINbwEvEWH8S1b3GqbKSlCB8O24J4eJsU3
-	 qu1YZJFLC+HRvu+7siF8wMu3+9qyYa2mqMdNg5jeLNrY7/KAETMvwdzLPvj8ysw3PB0kT
-	 kUOBMxhAq5vIkFfokJdWP26HkF4iguWLzSBqlXqDNj+i/UMqVbbcUdG4CNpHtXhTCoQ==
+	t=1792688472;
+	b=XD/dXsBYgK9Yv9eMd8SqKlSrCStXimmDZz/nyT+sptAFIWjRKBZSSr2z3bSTQOMUU0uE
+	 rwunS7PwA02fGA81IuSx1pSUQENIrzgv3h93FvjMKdlIhlspu7wKgJzYMIeak5I2yo2Cf
+	 DuzHu4moFmyRBZjnBJp9Mst7LZI30C1V7XmAgplcqTFQuY9E3h/jVLKld3uMeFzLjo8lD
+	 6aqaJUOznYRlss/ziQKvBnVQVwAyhX7CFZ8c1mY1aKH0MDTZzBhpITf2X7ohOTGc+bQHR
+	 SUk9EQHQ48CzcZ6BwvnXF5ySeXrucvjfL4y9Xhhl/Qh1SCyLOABuk3LFwR38YaVxD0Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792686655;
-	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=tc4RtQ+McDeq8l1s8m84usBk75s9ZYG6jo3YuZ+d7zc=;
-	b=QTW7cUeHnSTTZQDRAtGSdqaP4ncAId1WMVuExFpwe5ifd0+WGhRFuivzTmygOMwkKQmZ
-	 DfGzsK9pix5QCl883pYsXg3VSEYAi/NE6hVJp7GlcKBCW4Bs05bNSfOdnL4/ncNIEeJN5
-	 a+LMOrJgJUj1PakxreJGJp74n4IJl2UwRZnwEQOC+ONO+0KSVlnykVB41mbmRiJFkPfUE
-	 FGb6RWeZmUE94HEwF/MsJPtz6phX11cBzJkTggRXH7jmESIGp+nToTo8ovczPD3tPZW3w
-	 xNGEn55sV40RBE73eMAll042rirARV/j2DiGH5MABRGWEITUta9QrFdAFjzogmu8HZA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792688472;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=NBJ0aniVhrR8tDLjJgaeln00bRmLYZmDqTLDwkgAqcw=;
+	b=sCt+6eFbBnXK6duh3doNRXgNDo0SUQVPOhRaa5cXh9AV9nS6Tn8q+q314nZjc8YjhSDB
+	 AjedMnG2krQ6bErqOyAw2OJUUn6Q9sRj/2gLRRuMQn7kmrNwr1mRJbXqIU6PMgj20t/qM
+	 ZFuj/myh1H1iEgT2AerJKOf/cBdz3t8SExt1xl9HsNv5mvAp9UJ/n+ffborMFxSQZ8ycK
+	 Rdd73E989JkqBGeb5VwXHyW0okh34Yrl7mzS5VRwWHO17h/qjyfY9w7z4T57msIkuP/5p
+	 khzdip0LsLn3I0o04Ohknd8TEVDnexo5lKUZ9wp0qlS69SNXrulPzhYE362Ay+ivoRA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.alibaba.com;
-	spf=pass smtp.mailfrom=linux.alibaba.com;
-	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=cjeqLWZM;
-	arc=none smtp.remote-ip=115.124.30.97
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RxDYY2yA;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB43E606A31B;
-	Thu, 22 Oct 2026 16:30:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AB43E606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63583606A31A;
+	Thu, 22 Oct 2026 17:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=cjeqLWZM
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1792686643; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=tc4RtQ+McDeq8l1s8m84usBk75s9ZYG6jo3YuZ+d7zc=;
-	b=cjeqLWZMtA9n3tPAe9DC01AJAWrdB/em+IUMc+LyPICucgcT9moGv+RkfJIAun0Ejqt3xrNb44Zk8BLiXyK4NZS0rL3BezLsgz3yqxx1TYfVh5SzCwjzikS4P+et78CTp88iMwBS1b0JpxUUtvAofrpqZ/YB7BZFuZdX+EuVtN8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0XDJckJa_1792686640;
-Received: from 30.170.203.187(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XDJckJa_1792686640 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 23 Oct 2026 00:30:41 +0800
-Message-ID: <625e5190-d43e-4a2b-9296-da15c52d1a9a@linux.alibaba.com>
-Date: Fri, 23 Oct 2026 00:30:39 +0800
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RxDYY2yA
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBD0D1F01825;
+	Thu, 22 Oct 2026 17:01:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792688472;
+	bh=NBJ0aniVhrR8tDLjJgaeln00bRmLYZmDqTLDwkgAqcw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RxDYY2yAUdF5Bt5QLyX1/+fgxZAxLU5FaB7WM9TFao6wib8ozVuARDtudys37tfSI
+	 0nqPD5AfnMYwBxLstJzfLYy8Qw0Z4wQ3vqZ5WtCHwrMwJweP1/OFoqTn+Egz1hS6gx
+	 9LBjigDiUibkTZCNTD1xzIt1YVoJVrtDC2+jysIj4d0YII3ZTUi5ERNP2nKUSQ9okS
+	 GY7MuEUBe5Zn4Ar8jI+CBfL208i2RJC4+l8213ygVTis8kT42onsJjJJDh4vBmn3tB
+	 f9IxaSl8POmhfSl6n5mHBbcEwi+ZO/OW8PDEhJiVfvRDmYb5Qlw3psNE79KplfZejE
+	 gF/oeGIzKpbWQ==
+Date: Thu, 22 Oct 2026 13:01:10 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Keith Busch <kbusch@meta.com>, axboe@kernel.dk
+Cc: dm-devel@lists.linux.dev, mpatocka@redhat.com, bmarzins@redhat.com,
+	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH] block: let a stacking device inherit its members' DMA
+ alignment
+Message-ID: <atpBVtPqGDWZ2AFo@kernel.org>
+References: <20260709161519.1559723-1-kbusch@meta.com>
+ <20260709161519.1559723-2-kbusch@meta.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -54,107 +58,103 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/13] block, ext4: allow encryption with a block size
- larger than the page size
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-xfs@vger.kernel.org, jaegeuk@kernel.org, axboe@kernel.dk, hch@lst.de,
- djwong@kernel.org, brauner@kernel.org, tytso@mit.edu, berto@igalia.com,
- adilger.kernel@dilger.ca, jack@suse.cz, yi.zhang@huawei.com,
- ojaswin@linux.ibm.com, ritesh.list@gmail.com
-References: <20261011170958.1759230-1-libaokun@linux.alibaba.com>
- <20261015185325.GG2170687@google.com>
-Content-Language: en-US
-From: Baokun Li <libaokun@linux.alibaba.com>
-In-Reply-To: <20261015185325.GG2170687@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260709161519.1559723-2-kbusch@meta.com>
 
-Hi Eric, Thank you for your feedback!
-On 2026/10/16 02:53, Eric Biggers wrote:
-> On Mon, Oct 12, 2026 at 01:09:45AM +0800, Baokun Li wrote:
->> Motivation
->> ==========
->>
->> ext4 supports a block size larger than the page size (LBS), e.g. a 32k
->> block size on a machine with 4k pages [1].  Encryption, however, is
->> still refused on such a filesystem: file contents used to be encrypted
->> page by page in the fs-layer path, which cannot handle a folio that
->> covers several data units, so the checks that refuse encryption with
->> such a block size stayed in place.
->>
->> Since commit 5acc6f649a68 ("fscrypt: Always use blk-crypto for
->> contents on block-based filesystems") file contents are always
->> encrypted through blk-crypto.  Inline encryption hardware can already
->> en/decrypt a data unit that spans several pages, but the fallback and
->> the block layer cannot carry such a data unit:
->>
->>   1. blk-crypto-fallback en/decrypts a data unit with the bio_vecs of
->>      a single page-clamped segment, so a larger data unit fails with
->>      BLK_STS_INVAL;
->>   2. the block layer requires every bio_vec of an encrypted bio to be
->>      data unit aligned, and splits such a bio without rounding the
->>      split size down to the data unit size;
->>   3. iomap cuts the direct I/O bios of an encrypted file only at the
->>      logical block size of the device, so a bio can end in the middle
->>      of a data unit.
->>
->> This series adds the missing pieces on all three layers, removes the
->> refusals, and enables large folios for encrypted files on the way.
->>
->> [1]: https://lore.kernel.org/all/20251121090654.631996-1-libaokun@huaweicloud.com
-> A high-level question: most of the complexity in this series is to
-> support crypto_data_unit_size > PAGE_SIZE, despite the actual goal being
-> to support fs_block_size > PAGE_SIZE.  It's left unstated that the
-> default of crypto_data_unit_size == fs_block_size is used.  However,
-> ext4 and f2fs already support crypto_data_unit_size < fs_block_size.
->
-> Would leaving the crypto_data_unit_size at e.g. 4 KiB while increasing
-> fs_block_size be a simpler way to achieve the goal of this series?
+On Thu, Jul 09, 2026 at 09:15:17AM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> All device mappers that want to override the dma_alignment do so.
+> However, because the default stacking limit is set to 511, a device
+> mapper couldn't make it smaller even if it is capable of handling
+> finer grained alignment.
+> 
+> Set the default dm stacking dma_alignment limit to 0 so that it can be
+> stacked with any value a device mapper wants. If a mapper doesn't
+> override the value, the initial 0 value will get changed to the original
+> default 511 value when the limits are validated after the device
+> stacking is complete.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  drivers/md/dm-table.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> index dc2eff6b739df..80326f8096cb7 100644
+> --- a/drivers/md/dm-table.c
+> +++ b/drivers/md/dm-table.c
+> @@ -591,6 +591,7 @@ static void dm_set_stacking_limits(struct queue_limits *limits)
+>  {
+>  	blk_set_stacking_limits(limits);
+>  	limits->features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT | BLK_FEAT_POLL;
+> +	limits->dma_alignment = 0;
+>  }
+>  
+>  /*
+> -- 
+> 2.52.0
+> 
 
-I initially followed the LBS approach of lifting the page-size
-restriction, keeping the existing default crypto_data_unit_size
-equal to fs_block_size. I had not considered using sub-block DUs.
+This isn't a DM-specific concern (just happens to be that you're
+focused on dm-crypt in this patchset).  dm-crypt is still imposing a
+too strict dma_alignment, and so that'll need fixing too (along with
+other DM targets that aren't properly considering the underlying
+devices' queue_limits provided dma_alignment).
 
-After your reply, I implemented a variant using min(bs, PS) for
-new default v2 policies, recording a smaller DU explicitly on disk.
-This avoids patches 3-6 and the per-bvec alignment relaxation in
-patch 10, and is indeed much simpler.
+But this is a proper fix that I needed to allow MD RAID0 to allow
+O_DIRECT to NVMe devices beneath the MD device:
 
-Both variants retain large-folio support and showed similar gains,
-about twice their respective 4K-block controls. Although 32K DUs reduced
-decryption calls eightfold, I did not observe a consistent additional
-throughput benefit, or CPU savings at matched bandwidth, in the tested
-workloads.
+From: Mike Snitzer <snitzer@kernel.org>
+Date: Fri, 9 Oct 2026 06:26:29 -0600
+Subject: [PATCH] block: let a stacking device inherit its members' DMA alignment
 
-> Or do you feel that would be incomplete, and you'd indeed like to
-> support crypto_data_unit_size = fs_block_size > PAGE_SIZE?
+blk_set_stacking_limits() initializes dma_alignment to SECTOR_SIZE - 1,
+and blk_stack_limits() then takes the maximum of that and each member's
+value.  As a result every MD array and device-mapper table requires
+512-byte aligned memory regardless of what its members need: a raid0
+of NVMe namespaces reports a dma_alignment of 511 while each member
+reports 3.
 
-However, keeping DU = bs has a compatibility advantage for existing
-encrypted filesystems.
+Direct I/O from memory every member accepts is therefore rejected at
+the stacking device, and callers that check the advertised alignment
+(for instance through STATX_DIOALIGN) fall back to buffered I/O.
 
-For example, a 64K-block filesystem created with a default v2 policy
-on a 64K-page machine uses 64K DUs. Supporting DU > PAGE_SIZE would
-allow a 4K-page machine to use that format without re-encryption,
-assuming the other policy and backend requirements are met.
+Leave dma_alignment at zero in blk_set_stacking_limits() so that the
+stacked value is the strictest of the members'.  blk_validate_limits()
+still applies the SECTOR_SIZE - 1 default when nothing was stacked,
+such as for a table with no devices.  Targets that process the data
+themselves and need logical-block-aligned memory already set
+dma_alignment in their io_hints (dm-crypt, dm-integrity, dm-verity,
+dm-log-writes), and NVMe multipath sets its own.
 
-This also covers otherwise-supported legacy v1 policies, which cannot
-encode smaller DUs.
+Assisted-by: LLM
+Signed-off-by: Mike Snitzer <snitzer@kernel.org>
+---
+ block/blk-settings.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Explicit 4K v2 DUs can also be portable across page sizes, but
-choosing a smaller DU for new files does not make existing large-DU
-ciphertext readable on a smaller-page machine. I have not yet tested
-the cross-page-size migration.
-
-If you think supporting DU = bs > PS makes this series too broad,
-I can use the simpler sub-block version in the next revision and
-develop larger-DU support separately.
-
-Looking forward to hearing your thoughts.
-
-
-Thanks,
-Baokun
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 8274631290db..c4b0fba01c4b 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -41,7 +41,14 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+ 	lim->physical_block_size = SECTOR_SIZE;
+ 	lim->io_min = SECTOR_SIZE;
+ 	lim->discard_granularity = SECTOR_SIZE;
+-	lim->dma_alignment = SECTOR_SIZE - 1;
++	/*
++	 * No dma_alignment of its own: blk_stack_limits() keeps the strictest
++	 * of the devices stacked under it, and blk_validate_limits() gives the
++	 * sector-size default to a device left with none.  A driver that looks
++	 * at the data and needs it laid out by logical block says so in its
++	 * own limits, as dm-crypt, dm-integrity, dm-verity and dm-log-writes
++	 * do.
++	 */
+ 	lim->seg_boundary_mask = BLK_SEG_BOUNDARY_MASK;
+ 
+ 	/* Inherit limits from component devices */
+-- 
+2.52.0
 
