@@ -1,50 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792673519;
-	b=kwOmbNgF8w4EvmEpQqGdmheRltgYvK/gHLDCYRGJJ/cT9FHjFCbLJ/vMLQAyBLKWtObj
-	 w4WVMUaQKP0YgAnJePtYQiaN64clZ7HipWgDQGOVHT2pkDDNku6SMUWUgFjwxM4+BdrIG
-	 hcTUCVdH95IOT2H7INIt04L2AA9VL6YNqBfCp/lVfYT+lFTiucM8Zksn3r8LtcvMEtLZx
-	 w+vsWyCrutvTL0Qlcmr13tLBD2IQ6KMVTMWp76jZ6XFPZ78NFAB0Y4LHIzErQHBTZ3h4W
-	 te87dij3WQaqBB389bz1O+WFr22h/PIzzt91fWdwXpgNA6MzN/NOfQFcfdhOOHy7daQ==
+	t=1792674578;
+	b=TbaJRC7C7iVL6hvtlAA8Dxi2r+0xK2CoSHPQ8NKiUPeff8ltqdW4IVx3kKbJZc+3M6Zv
+	 jOsbBsZIYUZxoQ4auo7pIBSUs4aeqLc4Sy3CtmkRxa+0e1f+gs79pDcy0iVcYwD3AA6Qf
+	 5XD0rZqz9ZvbxCF1JCwKYmkByJS9yFCmD+3WpXionUd+fSh8i8ED4xTAb0x+q18Y2stPF
+	 6dUqh4NlzWI+9XTMohw2B1j6rH3oP1uvVkwvCEaMxGPyy0XmLIE2QQ246cFswwOHkfL4d
+	 EGrOUXOyDc2JRbzqqDo8GBF9uKA7l/KFvvO73rJdjc9y3kVPTX0guaM07EBgKEvXNbA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792673519;
-	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1792674578;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=JJ+yvx8h9h7oxNTqk5GOk42TZ5zXpsHUleVZXM9ghI0=;
-	b=Jen0aIHdgpIyo1vNIcb2EENITgPAIv3Az/gCXjlgHTPUdooAvx58vjn/J4h8OKX62vmY
-	 kbhpL+INcRzvAsRdWNXWyL89ATLEdxtZ5V5PwubvdFCvJyeiSGtyClY3V9BXr6uUFrgW0
-	 yrUBhmmFyuo4xsqNa9Zt3+ccLElEhbQO4xzmRhdllLprZuUPqme7oja+i/cV6WGCY01as
-	 AoIxrHi+a4LwGnieNk5sBU2qwpAHFlVFIO71LR8XZ8MrjFT2u0pitt6MGdD1TVd/06GSj
-	 CTWrRo+yLhpdoT/rBObVm208xEe33CAn3EQbSQeRvCuBbQw7lCqHvhf9whfbloJuOPg==
+	bh=2aB4n5jrJ+eDnutbPVSuTN4FJGF30ZBUQ83WroDaOXk=;
+	b=4LjhOjouN4fYFrPK8/cJ5fFCIgZBdFvWJAS4UOlVwKQCc5qWRT4flLliDFrpSq/HSxgg
+	 mIXcz6qI5Z+OM7WPTnPIlZhAGUMizBF2zjk9NlJNfguVu5RjnPoyEgeOfcyR9SOY5fPlM
+	 Vf8aK9+cmeQGlT+vPYbcP0E3iguQsdrCDnYelh38nroJ50eeQ0FE4dUsf1lH7cFFfn7pQ
+	 m4r9pNjms1ks4us9aukRmU0yY7tPbuOtrhLmst9yOj+EQygesLU5PU2JHW6+QkyGzRDRl
+	 VpukW0uv7uvCFTY4jMtAoO54RfVsDzfTQn1YzWLOzWAYYwlgX4pnclnWr50YctuOHlA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.alibaba.com;
-	spf=pass smtp.mailfrom=linux.alibaba.com;
-	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=LlABwMC1;
-	arc=none smtp.remote-ip=115.124.30.110
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=eX0UnUP4;
+	arc=none smtp.remote-ip=209.85.128.41
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE326606A31A;
-	Thu, 22 Oct 2026 12:51:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AE326606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B40A606A31A
+	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 13:09:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4B40A606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=LlABwMC1
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1792673512; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=JJ+yvx8h9h7oxNTqk5GOk42TZ5zXpsHUleVZXM9ghI0=;
-	b=LlABwMC1mRDKvdEUTDmmL4G48o+OAckR8J8cTgwUli6m10D3tlAuSzhu5v9O0kQLBXNrIZpbhhsksi4EzWtSph7pvmDgnn9z+Cvb8Wx3y+rAwH6nixSN/R+0GrNNB+fAdocv8F1svWi+pLZnKSHVzhAJ/4jLX9QPUcG6m28+2LQ=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0XDJERAJ_1792673509;
-Received: from 30.221.132.50(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XDJERAJ_1792673509 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 22 Oct 2026 20:51:50 +0800
-Message-ID: <58c0fc65-8275-4d38-9d64-0f4638dbda34@linux.alibaba.com>
-Date: Thu, 22 Oct 2026 20:51:49 +0800
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=eX0UnUP4
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4a208d93758so6770905e9.3
+        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 06:09:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792674577; x=1793279377; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=2aB4n5jrJ+eDnutbPVSuTN4FJGF30ZBUQ83WroDaOXk=;
+        b=eX0UnUP4RzYdCYWZ5YStmugmN6r5vIcGyiU+0s+mx/gl8C9lqFi4e4fM3T6Bi9ZfKi
+         JyqkkMvR61kbeRXaaAlo5hyUf2tyf7rYe++EjQ0fan8HF8xcLl5MA41t+LWaSnnr9tSA
+         lkAG/gDl6EviheiiTP//aah+hc+xcHlZYAu5KlL3wY2+kidZJ0DlF+Lng4FxxtVFKynt
+         NSsdAek5i43z1F3Uct3IDWpnSqp+5Br3DhB0jLYlVByW9EYsQ14rA5wS5ZzM286bnchH
+         TYRJfg5k1awF6jmXsPXWNYKbKcVhAUOFp0RSAG3Z4CHqvj8l6/3yt4XEungcFiahXql0
+         DP4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792674577; x=1793279377;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=2aB4n5jrJ+eDnutbPVSuTN4FJGF30ZBUQ83WroDaOXk=;
+        b=TOtbJ95osy/4RFcTmhFCZAfWsOlKXOIEe4AMdAKnv+V9sjCP3jKxzTCX4I70Vcd/0r
+         Bzqc0KuQZzktKSsjyqcykcqtHMKaux6Cz9GhSip0fRfS8XHAx7ghS1NqhwAPUmeAo2ly
+         sBJNHK52HPuOt8M+r462tfPB9zbUDD52ev5B3/Lo0cM9wSLItq0At8Ni2WZ0VcCSHb/k
+         RJVU61rFjhV2lU9LQy83tvFQysqwPMR0p6Ec15n/6N/liQQi8exTx2vhoZ86g5USVAK2
+         9c+/dtFVEHdBuvIHc5/NNGvj8BRfC3eL65wIZj+QT/T/V74qzv0PyYm8Ndno53t/sjG4
+         vrpg==
+X-Forwarded-Encrypted: i=1; AKwUvBw1euX2AtWBpANI/S4rAT9K8WB3Wt+PDnKxegUEbuQ7MCXZOlso2Ot2qFmyHdeGg7iEdkc4FkSwLuVUAA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJSQqeTEcAkSHJbux763M1esvVBKgI0C9OApLn/NaSd1N3ttKc0
+	wUAwvMNGSNC9abN9m66/VoEfGkO8hdFuXRb0XLdVGyxtOmFpF3+M9ouH
+X-Gm-Gg: AYBFou3bLx7YYNV6Mvyg+/S6tlQe8xCqSVyLHnw4EXADKtof8OztC7R8GxCrl2jE/BM
+	bXvQiBuIKGUMYep/+oAV7UijOn56HbZlrw3FsqY+vOLYbVNirBzX3e3AjUJT4+3BfjWWIepei9n
+	3+wDP25mNMRLZI6V97/2WEnbGHnzQ2FHviDFaKz+waEuTjaoI5IoLF6oIxfiPoWG6NCbxhwQYY5
+	43QdsLigOucSVqs/C/fssdyI+1Yy6asbgLdi8mFA6dGxuTjFVa/aYzL95PLQiMGYuY1h7JXsMuO
+	Joibe6SRu5WOHUqdMARKGVJc54EtDZHYqxvh10HFF2ov/0TA/eUtjiOBuZVE63KpDuh8rZ4UHsH
+	m62kPHfYTM7k5JU1LXSVF7VOs9IuPN9ri2t2be2PbLe2/7fpSbgYyEB3CYRUDBP5S5bqt6907pk
+	Nlw6XJRSU4UJFuEH2/HS6SZRy1dle/84YuxaiLgBxxzalgb/aZ38tCUj4qIAnBCTWsesvhQDHpP
+	xwLcIZdEqlMcZfP8OhYXLlc6att6zkZOKWq05VUohkcI52H4BKOy1QmOK8CxJ2aeHSLf35gKIcF
+	Qg5lI5YAIvOpD+97DnWowbBs
+X-Received: by 2002:a05:600c:3e14:b0:4a0:174:579e with SMTP id 5b1f17b1804b1-4a1fdd517f2mr102306365e9.28.1792674576373;
+        Thu, 22 Oct 2026 06:09:36 -0700 (PDT)
+Received: from andreayoga.wind3.hub ([151.76.51.95])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1fcd2eff9sm119664695e9.4.2026.10.22.06.09.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Oct 2026 06:09:35 -0700 (PDT)
+From: Andrea Parri <parri.andrea@gmail.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	linux-block@vger.kernel.org
+Cc: Andrea Parri <parri.andrea@gmail.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Daniel Wagner <dwagner@suse.de>,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH blktests v2 0/4] nvme: add nvmet zone report and FC regression tests
+Date: Thu, 22 Oct 2026 15:09:20 +0200
+Message-ID: <20261022130927.3583166-1-parri.andrea@gmail.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -54,65 +100,85 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/13] blk-crypto: reject fallback data unit sizes it
- can't handle
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-xfs@vger.kernel.org, jaegeuk@kernel.org, axboe@kernel.dk, hch@lst.de,
- djwong@kernel.org, brauner@kernel.org, tytso@mit.edu, berto@igalia.com,
- adilger.kernel@dilger.ca, jack@suse.cz, yi.zhang@huawei.com,
- ojaswin@linux.ibm.com, ritesh.list@gmail.com, stable@vger.kernel.org
-References: <20261011170958.1759230-1-libaokun@linux.alibaba.com>
- <20261011170958.1759230-4-libaokun@linux.alibaba.com>
- <20261015184519.GF2170687@google.com>
-Content-Language: en-US
-From: Baokun Li <libaokun@linux.alibaba.com>
-In-Reply-To: <20261015184519.GF2170687@google.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 2026/10/16 02:45, Eric Biggers wrote:
-> On Mon, Oct 12, 2026 at 01:09:48AM +0800, Baokun Li wrote:
->> Such keys exist on filesystems whose
->> block size is larger than the page size, because fscrypt uses the block
->> size as its data unit size by default.
->>
->> Fix this by advertising only the data unit sizes that the fallback
->> really supports, and by rejecting keys that the fallback can't handle in
->> blk_crypto_fallback_start_using_key(), so that the failure happens when
->> the key is set up instead of during I/O, and before any data is written.
->>
->> Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Baokun Li <libaokun@linux.alibaba.com>
-> Several patches in this series are marked as fixes, but they seem to
-> only be needed for encryption with data_unit_size > PAGE_SIZE which is a
-> new feature in this series.  I don't think these should be marked as
-> fixes, as they will cause unnecessary backports, CVEs, etc.
+Add regression tests for three nvmet bugs fixed by the kernel series [1]:
 
-In this patch set, the five patches carrying the “Fixes” tag are
-1, 2, 3, 8, and 12.
+  nvme/072  "nvmet-fc: only send read data for successful commands"
+  nvme/073  "nvmet: zns: don't leak stale memory in zone management receive"
+  nvme/074  "nvmet: zns: reject a NUMD whose byte count wraps"
 
-Patches 1, 2, and 12 were included because my commit 709f0f1f1bf5
-(“ext4: add checks for large folio incompatibilities when BS > PS”)
-did not account for the fact that encryption can be enabled at mount
-time, making these issues accessible. Sorry about that.
+The nvme/073 fix is already applied to nvme-7.4; the other two are still
+under review.
 
-Patch 3 was added because the blk-crypto-fallback implementation did not
-limit the supported data unit size, setting it directly to 0xFFFFFFFF.
-This could cause silent data corruption, so I added an upper limit in
-the patch set and applied the “Fixes” tag. However, since this issue was
-unreachable prior to my patch mentioned above, I'm fine with removing
-the “Fixes” tag 
+Patch 1 adds the zoned null_blk target setup, cleanup and zone report
+status check that nvme/073 and nvme/074 share.  Patches 2-4 add one test
+each, with a small C helper for nvme/072 and nvme/073 where nvme-cli
+cannot express the check.
 
-Patch 8 can also be triggered when the sector size is 512 but the
-filesystem block size is 4k, so a `Fixes` tag was added to it as well.
+All three tests run on every configured transport.  On a kernel without
+the fixes, nvme/073 and nvme/074 fail over loop, tcp, rdma and fc, and
+nvme/072 fails over fc, the only affected transport.  All three pass
+with the fixes applied.
 
-If you think any of these are unnecessary, I can remove them in the next
-iteration.
+Tested in virtme-ng VMs over loop, tcp, rdma (rdma_rxe) and fc (fcloop),
+on v7.3-rc4-108-g551c722f4080 without the fixes and on nvme-7.4 with the
+v2 kernel series applied:
+
+                   loop  tcp   rdma  fc
+  unpatched  072   pass  pass  pass  FAIL  failed Identify transferred
+                                           4096 bytes
+             073   FAIL  FAIL  FAIL  FAIL  stale report bytes, and an
+                                           8192-byte transfer for NUMD
+                                           1023 not rejected
+             074   FAIL  FAIL  FAIL  FAIL  NUMD 0x4000000f not rejected
+  patched    all   pass  pass  pass  pass
+
+Changes since v1:
+- Renumbered nvme/071-073 to nvme/072-074, since nvme/071 is now taken.
+- Patch 1: configure nullb1 instead of nullb0, and drop the
+  _init_null_blk() call, so that the helpers also work with a built-in
+  null_blk (Shin'ichiro).
+- Patch 2: rename _identify() to issue_identify(), and drop the
+  namespace read, which only served as a control, together with the
+  file backing it needed (Shin'ichiro).
+- Patches 3 and 4: use _have_null_blk instead of _have_module null_blk,
+  and read the nullb1 attributes in patch 3 (Shin'ichiro).
+- Rebased on current master.
+
+v1: https://lore.kernel.org/r/20261014170046.2516-1-parri.andrea@gmail.com
+
+[1] https://lore.kernel.org/r/20261012141239.156408-1-parri.andrea@gmail.com
+
+Andrea Parri (4):
+  nvme/rc: add zoned null_blk target helpers
+  nvme/072: test that nvmet sends no data for a failed read
+  nvme/073: test nvmet zone report initialization and length
+  nvme/074: test that nvmet rejects a zone report NUMD that wraps
+
+ src/.gitignore           |   2 +
+ src/Makefile             |   2 +
+ src/nvme-sentinel-read.c |  89 +++++++++++++++++++++
+ src/nvme-zone-report.c   | 165 +++++++++++++++++++++++++++++++++++++++
+ tests/nvme/072           |  72 +++++++++++++++++
+ tests/nvme/072.out       |   2 +
+ tests/nvme/073           |  68 ++++++++++++++++
+ tests/nvme/073.out       |   2 +
+ tests/nvme/074           |  46 +++++++++++
+ tests/nvme/074.out       |   2 +
+ tests/nvme/rc            |  58 ++++++++++++++
+ 11 files changed, 508 insertions(+)
+ create mode 100644 src/nvme-sentinel-read.c
+ create mode 100644 src/nvme-zone-report.c
+ create mode 100755 tests/nvme/072
+ create mode 100644 tests/nvme/072.out
+ create mode 100755 tests/nvme/073
+ create mode 100644 tests/nvme/073.out
+ create mode 100755 tests/nvme/074
+ create mode 100644 tests/nvme/074.out
 
 
-Cheers,
-Baokun
+base-commit: 9ad5a10fa8ed56f74c23fea2c35f4594a110b8b9
+-- 
+2.53.0
+
