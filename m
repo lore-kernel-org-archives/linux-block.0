@@ -1,92 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.110
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792672865;
-	b=d6g4eAueqm0qEPOc3x9OcbZFZZ3++VcMt1sBHsjo1MnLy+0VYzZS/zgFaDsaMduyGupT
-	 WUImRXJvWKluK7+pvzlfk2khRiAsG4CqQgFiirWRQOjYNcrsWvLeVpgNVeZwioduIfVH5
-	 aSsNJggJ0l3H9szHvGbqcNe5InzW5f907kVgyqJRZYED8pMVIix+tERnls8lvc7Af5OsG
-	 fVwLMZWV6VeqRi2MTtgCX2rPRoItBNBNEHjGwdvqwXtDxUtP2prcGeyCMli/BIToaWQ+Y
-	 gVXPpEV5Z7LLHGAQ25g+59ZKKclOPriQNEP1cafmcca5sK5/y/RKfXpW8946l+M0A7A==
+	t=1792673519;
+	b=kwOmbNgF8w4EvmEpQqGdmheRltgYvK/gHLDCYRGJJ/cT9FHjFCbLJ/vMLQAyBLKWtObj
+	 w4WVMUaQKP0YgAnJePtYQiaN64clZ7HipWgDQGOVHT2pkDDNku6SMUWUgFjwxM4+BdrIG
+	 hcTUCVdH95IOT2H7INIt04L2AA9VL6YNqBfCp/lVfYT+lFTiucM8Zksn3r8LtcvMEtLZx
+	 w+vsWyCrutvTL0Qlcmr13tLBD2IQ6KMVTMWp76jZ6XFPZ78NFAB0Y4LHIzErQHBTZ3h4W
+	 te87dij3WQaqBB389bz1O+WFr22h/PIzzt91fWdwXpgNA6MzN/NOfQFcfdhOOHy7daQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792672865;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
-	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:X-Mailer;
-	bh=CcN6V0kVf6Aq31J0RAqWWkvpV1VAcbfbB6YKV5xFzr4=;
-	b=i4/q2dKH6ySITzDi6SINLN6DeuFH+Gp151+28WePaqCbaneWWd8n7l1Rc5X8GvUt5cTV
-	 OOrDTqPZeUxORqamQV19Lv3XAGtQp8tWXs1Bsoy02EQ/IoNzFXrdra4MQd+lvhv+ra/r1
-	 LngN06Jms2Jt0PO+e6m1oLvPz2pI1akZhXl1bHq+LWlm6y43+faFXZzKWdyvzcxMh4EmT
-	 MyRO7p1xSk3Xl3P4PPV8pYRjP9/ebLq7cL1zUvAKydsQ4tX9vfrqiqurtpJ7io0nKnLVS
-	 E9CZa5odq3za5OhbdV/XWrX/4LmcpwMyAwCk6Kp+f5ko8atdhX3pMBBDkRkBkBVwp6A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792673519;
+	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=JJ+yvx8h9h7oxNTqk5GOk42TZ5zXpsHUleVZXM9ghI0=;
+	b=Jen0aIHdgpIyo1vNIcb2EENITgPAIv3Az/gCXjlgHTPUdooAvx58vjn/J4h8OKX62vmY
+	 kbhpL+INcRzvAsRdWNXWyL89ATLEdxtZ5V5PwubvdFCvJyeiSGtyClY3V9BXr6uUFrgW0
+	 yrUBhmmFyuo4xsqNa9Zt3+ccLElEhbQO4xzmRhdllLprZuUPqme7oja+i/cV6WGCY01as
+	 AoIxrHi+a4LwGnieNk5sBU2qwpAHFlVFIO71LR8XZ8MrjFT2u0pitt6MGdD1TVd/06GSj
+	 CTWrRo+yLhpdoT/rBObVm208xEe33CAn3EQbSQeRvCuBbQw7lCqHvhf9whfbloJuOPg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=BMc2Aktj;
-	arc=none smtp.remote-ip=209.85.215.180
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=linux.alibaba.com;
+	spf=pass smtp.mailfrom=linux.alibaba.com;
+	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=LlABwMC1;
+	arc=none smtp.remote-ip=115.124.30.110
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A698B606A319
-	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 12:41:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A698B606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE326606A31A;
+	Thu, 22 Oct 2026 12:51:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AE326606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=BMc2Aktj
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-cd5cd8d89a7so642218a12.1
-        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 05:41:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792672863; x=1793277663; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=CcN6V0kVf6Aq31J0RAqWWkvpV1VAcbfbB6YKV5xFzr4=;
-        b=BMc2AktjYWq1T+ctah0PDRPeLKdSyz2QpTK4BLiZwDjyiOTiRj6Subul6qGteYqjE2
-         krvq3xL0S6kHVMrTx5UTdPJh0gWLtotytoIRbFlvVnIUExFdTWI8EnHXncPGljEfWG/o
-         /56xmRqZDlHVP7RP0vx/AF5SflSIyk4vD/b5fiVXhahTeZRtY9dNXlBJz/RoPWC5qhP3
-         a+KTPO/CjfI8rVmIBVQRgPghoujQlNKJ/6zyweo+HfpXgbtDrTnwEtHrLcWdXgn5jqCT
-         0uIGZSJRvmifzxU7z65O+5tZOEWY3NfebsO7pXBcZi/IpcDyJkY9+oB0CNibzS9v2sp8
-         MG0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792672863; x=1793277663;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CcN6V0kVf6Aq31J0RAqWWkvpV1VAcbfbB6YKV5xFzr4=;
-        b=nFYcxfC0KXSJfTqSV9PCP3YfeCQFAiJRdJRQdYb8DJduen9JNYU7tqW7dJ0Q8i4IWx
-         del+bQj1uK5BoPiM0C1+v5r06OiDozAWRZpdxvYTWtkt1vUyRWWZdzAK0+dpI9hQK+D7
-         zrCL6iAvhOinAQiUXlNu8tytl6OlSrSE68dkIAErFYglS7FRVA4RTXczDDWwTeSnZTlK
-         4tho/PCb9cM9qXATOXMvocE4HhOCI/A+bnGvxf8JRQK7sLSMSQ+OiG6hQmnrhFpOSNIQ
-         4XTiQQNN8ucgCxIPexjCHdbqchuiPxJPS3douR3czC1+RnmXywkSomHGeFGfI5fuuTiS
-         GCZQ==
-X-Gm-Message-State: AFq9FYJVjcFOchr2RXhBcroOZJ7B8OFa8SuFKhR48Z9oWuiyYZYZPklU
-	gQ3l5VDIdWeFukHXxRUwGeFpJUbTvJ0VVjRDCNmu1oGVTSqsHSp5q69OLLOBX3/g+8M=
-X-Gm-Gg: AYBFou1rOK7XMrG2neylz+fSMdmGGh+fAXZGFpnLeZMbPlMOplhghCTuPENZR9QbVu4
-	EEaM8kdQFImwXwqj4LdHKdDSxgO9/RkE1NwD7ZGtTjI8QeEG/S13wlSRdQGlmays/SYcfD53oAQ
-	iIHPXT5LzbbQgZ+8VzqR2eeT21uPH8RW57jgMQEsbVDz5jW65LAHcnnr6ljrCOCyK/RmKFdumZI
-	wzr7MMMK3jZuY96cLiDeC+i652zsjv5l9IgCTGcuwjitp2S/v0Ze0HeTZAvCtmVumacmUWDlcaQ
-	+nzICohbCLYy7CKOPDH5es5vySp2aSuJtCpwiX95d/Wg28F+IA46UB+3d7ECElmhg6g/V3r5Gpi
-	VAf62+elKPtaqre3GSWetQcCLaOQOZ4SjnDlyHIBBGZazZY3nPaaD+5v5QQVNQ1WvfHSwGhLJFf
-	oU5/tlDoP5Btl/7FYbKbGAe+4lUr1JqG7dhkHhII9Qg3v7mxHAfJJh50cnTKQeKVDLKuf9cj7vH
-	aBKjhZprEkYnitI21Sr9ZmDOn1mrQ3BNMIjZ89o0Q75ILQXKtbUR1PRHVXZva8U9NoZITLgQMy2
-	5WuUjBV88Q31GlK3uTdVkMStf2Eakt4yO5be94M=
-X-Received: by 2002:a17:90b:3c12:b0:3ac:b7b9:6484 with SMTP id 98e67ed59e1d1-3ad86d57f66mr3763863a91.45.1792672862598;
-        Thu, 22 Oct 2026 05:41:02 -0700 (PDT)
-Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ad85f4b103sm4484148a91.3.2026.10.22.05.41.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Oct 2026 05:41:02 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- asml.silence@gmail.com, Keith Busch <kbusch@meta.com>
-Cc: hch@lst.de, Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20261021184658.644645-1-kbusch@meta.com>
-References: <20261021184658.644645-1-kbusch@meta.com>
-Subject: Re: [PATCH 0/2] block, nvme: minor fixes to dma-buf support
-Message-Id: <179267286175.3853015.14808759833206340958.b4-ty@b4>
-Date: Thu, 22 Oct 2026 06:41:01 -0600
+	dkim=pass (1024-bit key, unprotected) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=LlABwMC1
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1792673512; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=JJ+yvx8h9h7oxNTqk5GOk42TZ5zXpsHUleVZXM9ghI0=;
+	b=LlABwMC1mRDKvdEUTDmmL4G48o+OAckR8J8cTgwUli6m10D3tlAuSzhu5v9O0kQLBXNrIZpbhhsksi4EzWtSph7pvmDgnn9z+Cvb8Wx3y+rAwH6nixSN/R+0GrNNB+fAdocv8F1svWi+pLZnKSHVzhAJ/4jLX9QPUcG6m28+2LQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0XDJERAJ_1792673509;
+Received: from 30.221.132.50(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XDJERAJ_1792673509 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 22 Oct 2026 20:51:50 +0800
+Message-ID: <58c0fc65-8275-4d38-9d64-0f4638dbda34@linux.alibaba.com>
+Date: Thu, 22 Oct 2026 20:51:49 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -96,32 +54,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/13] blk-crypto: reject fallback data unit sizes it
+ can't handle
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-xfs@vger.kernel.org, jaegeuk@kernel.org, axboe@kernel.dk, hch@lst.de,
+ djwong@kernel.org, brauner@kernel.org, tytso@mit.edu, berto@igalia.com,
+ adilger.kernel@dilger.ca, jack@suse.cz, yi.zhang@huawei.com,
+ ojaswin@linux.ibm.com, ritesh.list@gmail.com, stable@vger.kernel.org
+References: <20261011170958.1759230-1-libaokun@linux.alibaba.com>
+ <20261011170958.1759230-4-libaokun@linux.alibaba.com>
+ <20261015184519.GF2170687@google.com>
+Content-Language: en-US
+From: Baokun Li <libaokun@linux.alibaba.com>
+In-Reply-To: <20261015184519.GF2170687@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On 2026/10/16 02:45, Eric Biggers wrote:
+> On Mon, Oct 12, 2026 at 01:09:48AM +0800, Baokun Li wrote:
+>> Such keys exist on filesystems whose
+>> block size is larger than the page size, because fscrypt uses the block
+>> size as its data unit size by default.
+>>
+>> Fix this by advertising only the data unit sizes that the fallback
+>> really supports, and by rejecting keys that the fallback can't handle in
+>> blk_crypto_fallback_start_using_key(), so that the failure happens when
+>> the key is set up instead of during I/O, and before any data is written.
+>>
+>> Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Baokun Li <libaokun@linux.alibaba.com>
+> Several patches in this series are marked as fixes, but they seem to
+> only be needed for encryption with data_unit_size > PAGE_SIZE which is a
+> new feature in this series.  I don't think these should be marked as
+> fixes, as they will cause unnecessary backports, CVEs, etc.
+
+In this patch set, the five patches carrying the “Fixes” tag are
+1, 2, 3, 8, and 12.
+
+Patches 1, 2, and 12 were included because my commit 709f0f1f1bf5
+(“ext4: add checks for large folio incompatibilities when BS > PS”)
+did not account for the fact that encryption can be enabled at mount
+time, making these issues accessible. Sorry about that.
+
+Patch 3 was added because the blk-crypto-fallback implementation did not
+limit the supported data unit size, setting it directly to 0xFFFFFFFF.
+This could cause silent data corruption, so I added an upper limit in
+the patch set and applied the “Fixes” tag. However, since this issue was
+unreachable prior to my patch mentioned above, I'm fine with removing
+the “Fixes” tag 
+
+Patch 8 can also be triggered when the sector size is 512 but the
+filesystem block size is 4k, so a `Fixes` tag was added to it as well.
+
+If you think any of these are unnecessary, I can remove them in the next
+iteration.
 
 
-On Wed, 21 Oct 2026 11:46:56 -0700, Keith Busch wrote:
-> Just a couple minor fixes. I wish I could say I caught the first one
-> myself, but no, I prompted an LLM to look at it.
-> 
-> I am assuming changing the bi_offset type to accomodate large offsets
-> isn't acceptable as the bvec_iter's size appears to be packed to be
-> small. I think there's a path to accepting larger offsets through
-> bi_idx, but the patch proposed here is a safer quick fix.
-> 
-> [...]
-
-Applied, thanks!
-
-[1/2] block: reject dma-bufs larger than 4GiB
-      commit: bcbd808652e127a704c21fa44d908eb56cbcda03
-[2/2] nvme-pci: detach dma-bufs only on removal
-      commit: fd13f31ac62abac4df2166bb0a6fbff53b288e0c
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Cheers,
+Baokun
