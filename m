@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792660931;
-	b=HTUMHTxdXFDgQl5Gkk8ZwKVg1II8xilxIi8j4FEg/xvRLzk1uaVpdN0lRR/SMQj2XOrB
-	 nqkOitgCtpwXYrwdQQXoTBEGUkM+HfOOq9y6ntKr9X4FM1ydS5A6UdsUMLx9x+hXiqtih
-	 ++n9e2UzUo19UwbyJWyDD1mqYnvh7VM1xS8REALCZo7Lg1Z6G7M3T89RPDmL9vRskgTp/
-	 yUkY+6xcecLOxrpU8HgmoNHRZ7Ek2J3qC+LxfJ74epsLV9TAXwmUtUcYAHEhsfP08pEY/
-	 kBfmOctqAqBz5IV64GH0Os2VWIedsOMLhIrH2lsSuwSgJegGNsh2I6dVVm+Lr2A8gfg==
+	t=1792660933;
+	b=33OSgd6nVCJ/usvrAX5AjODXLBff+oZZD6BSHBqU4keVQeO/QwOwfF9Os545XndA+d5X
+	 esmGClb48ygx+wQ7gNZQ8RcbeCWSv985r+OLarD9tKoAS/t+R64Wbd+xsmhGQTz4/aBya
+	 KqJ+fO9eHAfq1wPh9oDLocor67o2trbFDuMN+mTq7DtmBv0GBPOYWC429nktxMhBQr0vj
+	 qw+Vtx1E59F3nkbCDsp+VViDZbyOQacGvk91DZuKZ0l1SR+2vNgunYcGfxJeFNLiIaB4d
+	 jDHnH8Pe6GnqS2fUqxGckL7ZE+YdOxeYkMsXPK673BrzCwxYiaGxkPcWcpUmfNfGZNA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792660931;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792660933;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:X-Developer-Signature:
 	 X-Developer-Key:Content-Transfer-Encoding;
-	bh=+zDiCMC35MoELVTN7pdJ+bb1itpLkJeBSsfjWRivmpc=;
-	b=fyRbWp92yuEUyrZFSSrWcU2N876NUrVljl/jDRkw+NHJhgl8+egPZUTDLQumeMAHs2KV
-	 O6GOKtUAPOnx2azUr1QPZ3qfW0+G4+9ewKf7E8mlpP6XOcugOJw8RMQSTk9aIWW/nOUNi
-	 AQSGeBR7Uwy5rr7J/jbX8Zc018NC+LWCSTDgGarA7ynYwl7TIK7U9OGQilCJFxR2o3O98
-	 a5rJlyY0yZAYOXCM5Ashe2kxwKg+rLRPctFH7lI8Mb3pRtsWd0RIArOadgUl/SXc4SdfW
-	 exPKYhyLj2mn9cg62VDcpZOiKRJvzeY5k3S8l4PULBr6AYI3d/8FOacTKtXF3h8pOlw==
+	bh=8RLJXyRQsP19IFvWgRQc9A+9ybc7lC6z+9QDlEO3+Zg=;
+	b=3Cp+nojVD3nxx354Q+4tK+nD5F092GuyjcvHi8yp/f4213LNhQjl3P9r4Vy7cMQnrTA1
+	 zpdfOH5xiwZo5NEyyMNP1mbp6Z24Io/W9E/nuO8XbTGxOLAaWi8wy9wwbfiCdK7qQjPXo
+	 MqOMPkiYUgiQJ2iB27CZb0SwkSY3WkT615WZxqzt8oRV+FWNjKtAlFGUk2NcDZBSeQHJ+
+	 AEhSrh4VoNlpo6Okxvi8aWN1Xvp5Wagy0420d0l4g7gvLJfMfKkgezFXQhBJhrcSNoh6H
+	 0Xz5a1/X//FzBAmXau2MD4AvxnJZqEeKipC+qK67i85p1dtrwuNbZbruHFCDT5/ilEQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BOXQbdYm;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=N9IYLdnC;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA22606A31A
-	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 09:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB63F606A31A
+	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 09:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BOXQbdYm
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 813921F000C1;
-	Thu, 22 Oct 2026 09:22:09 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=N9IYLdnC
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D1091F000C2;
+	Thu, 22 Oct 2026 09:22:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792660930;
-	bh=+zDiCMC35MoELVTN7pdJ+bb1itpLkJeBSsfjWRivmpc=;
+	s=k20260515; t=1792660932;
+	bh=8RLJXyRQsP19IFvWgRQc9A+9ybc7lC6z+9QDlEO3+Zg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=BOXQbdYmf6l5ENTtxm7b/2TsWH6ixgPfI7PVDMI+sO2AoYSOJWhz0Ro04XoL2k3LD
-	 fR9vPH8pUIHFC8J2+S4vJic8Nzsrtyqp/kkaxejdyote2ERg/Z6UXwB5qc3iaH/6pF
-	 XIHsflVSq87GWT9xjMsQ2QcWJTjhbB+anymYQYLLWSk9tvdjr38But3OI2HscrK7nr
-	 yKYOQnI73CRpB6gudvVUNCozkaqguhwRTjzgM2DCtuETh9SnPOrxknoVTWkIkX6zyB
-	 4o6HD1s4T8Ti68qbQuAlRkK6be5lPNB/oNil95Z773N71c1mZbIcKz5kQp3F1QKrOw
-	 mQPDZJdmKHIWw==
+	b=N9IYLdnCEwzfv6ESvrv5Tvm1S64HOQ4rlK67lT8TbXj3SbK8APD4IoWNqb5yXDLbj
+	 QBIxcfxJ//saQ/HR+A9lBYXBShJoBJmuu9b1Ph3LdS72Cwfw4sULr2RL8FitrY8aW8
+	 g8V/ClSZfYqZImob1eDsqbtVQhcLESKA2SmFE8PH7f3RYa2OmGkgnLLu7ag2T0MOyE
+	 IA+szThTQOc63yU99xoHWB/vr6mzxy3N1Fk+jvHpfrD99xryGyW+Va8l1R1DjwN6cH
+	 1Doqsg57Xq0ByvyCUH05t3RBpjsol0S517FkLvJUFkpBHB3llu2cjzKoBYED6tQJIH
+	 JJRzth7okmfFg==
 From: Niklas Cassel <cassel@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
@@ -47,9 +47,9 @@ Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
 	Damien Le Moal <dlemoal@kernel.org>,
 	linux-block@vger.kernel.org,
 	Niklas Cassel <cassel@kernel.org>
-Subject: [PATCH v2 2/3] null_blk: don't finish zones to set them read-only or offline
-Date: Thu, 22 Oct 2026 11:22:01 +0200
-Message-ID: <20261022092158.2248831-7-cassel@kernel.org>
+Subject: [PATCH v2 3/3] null_blk: clean up setting zones read-only or offline
+Date: Thu, 22 Oct 2026 11:22:02 +0200
+Message-ID: <20261022092158.2248831-8-cassel@kernel.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261022092158.2248831-5-cassel@kernel.org>
 References: <20261022092158.2248831-5-cassel@kernel.org>
@@ -62,89 +62,80 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2970; i=cassel@kernel.org; h=from:subject; bh=K6QvQfo++jWVkT02HRJ/nIO+BPHObPxOa1zZAze0dLQ=; b=owGbwMvMwCV2MsVw8cxjvkWMp9WSGLJuXt3NU3ag7MHM5PXSKR7ipyuu/1kz4VG0TmB8xT+5d c1dLNerO0pZGMS4GGTFFFl8f7jsL+52n3Jc8Y4NzBxWJpAhDFycAjARu5sM/6t0/IVc3EsOLQlc N5Xvpmzhf7G0pHieJS/2qZ9Vv/+yQJqR4Zqia/rSYwb2BxVd+irvLP6SFKi4Ys0vu1Cdo/ML2M8 KsgAA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2713; i=cassel@kernel.org; h=from:subject; bh=NGL/o8XOiUFeqTd3T+LBuIAKOmwolAEvQWybG/cK3/w=; b=owGbwMvMwCV2MsVw8cxjvkWMp9WSGLJuXt1tnX72ks5Zhx0FxTvEg2feL9v1+oci87nPqor6H zZ2sizb31HKwiDGxSArpsji+8Nlf3G3+5TjindsYOawMoEMYeDiFICJ1N5iZJiX1iNz5WpDPW/8 7OKbk9JCl2zZYp8kq9ruzyLi775USoThr1CTWMKfrZZ5dS3BT+oiA4PYp4m/WzVLdqrnnCiL0IP 2XAA=
 X-Developer-Key: i=cassel@kernel.org; a=openpgp; fpr=5ADE635C0E631CBBD5BE065A352FE6582ED9B5DA
 Content-Transfer-Encoding: 8bit
 
-null_set_zone_cond() calls null_finish_zone() to release the zone
-resources held by a zone before setting it read-only or offline.
+null_set_zone_cond() takes a zone condition, even though read-only and
+offline are the only zone conditions that it can set. Because of this,
+it needs a WARN_ON_ONCE() to reject any other zone condition, and its
+name suggests a generic helper that can set any zone condition.
 
-For an empty or closed zone, null_finish_zone() first runs the zone
-resource checks, which can close an unrelated implicitly open zone, or
-fail. As the error is ignored, a failure for a closed zone leaks
-nr_zones_closed, permanently lowering the effective active zone limit.
+Rename null_set_zone_cond() to null_set_zone_readonly_or_offline(), and
+replace its zone condition argument with a bool, set_offline, which
+selects between the read-only and offline conditions. Also remove the
+comment above the function, as it only repeats the new function name.
 
-Setting a zone read-only or offline requires no zone resources, so
-release the zone resources held by the zone directly instead, using a
-new helper, null_release_zone_resources().
+zone_cond_store() keeps taking a zone condition, as it, unlike
+null_set_zone_readonly_or_offline(), contains generic code, and might
+be extended to support additional zone conditions in the future.
 
-Fixes: d3a5738849e0 ("null_blk: support read-only and offline zone conditions")
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+No functional change, as zone_cond_store() is only called with the
+read-only or offline condition.
+
+Suggested-by: Damien Le Moal <dlemoal@kernel.org>
 Signed-off-by: Niklas Cassel <cassel@kernel.org>
 ---
- drivers/block/null_blk/zoned.c | 35 +++++++++++++++++++++++++++++-----
- 1 file changed, 30 insertions(+), 5 deletions(-)
+ drivers/block/null_blk/zoned.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index ecdc8d68ca2a9..015f5d304c7ce 100644
+index 015f5d304c7ce..b271d0a88ff21 100644
 --- a/drivers/block/null_blk/zoned.c
 +++ b/drivers/block/null_blk/zoned.c
-@@ -743,6 +743,33 @@ blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_op op,
- 	}
+@@ -770,15 +770,12 @@ static void null_release_zone_resources(struct nullb_device *dev,
+ 	spin_unlock(&dev->zone_res_lock);
  }
  
-+/*
-+ * Release the zone resources held by a zone, before changing the condition of
-+ * the zone to a condition that does not hold any zone resources.
-+ */
-+static void null_release_zone_resources(struct nullb_device *dev,
-+					struct nullb_zone *zone)
-+{
-+	if (!dev->need_zone_res_mgmt)
-+		return;
+-/*
+- * Set a zone in the read-only or offline condition.
+- */
+-static void null_set_zone_cond(struct nullb_device *dev,
+-			       struct nullb_zone *zone, enum blk_zone_cond cond)
++static void null_set_zone_readonly_or_offline(struct nullb_device *dev,
++					      struct nullb_zone *zone,
++					      bool set_offline)
+ {
+-	if (WARN_ON_ONCE(cond != BLK_ZONE_COND_READONLY &&
+-			 cond != BLK_ZONE_COND_OFFLINE))
+-		return;
++	enum blk_zone_cond cond =
++		set_offline ? BLK_ZONE_COND_OFFLINE : BLK_ZONE_COND_READONLY;
+ 
+ 	null_lock_zone(dev, zone);
+ 
+@@ -814,6 +811,11 @@ ssize_t zone_cond_store(struct nullb_device *dev, const char *page,
+ 	unsigned int zone_no;
+ 	int ret;
+ 
++	/* Read-only and offline are the only conditions supported for now */
++	if (WARN_ON_ONCE(cond != BLK_ZONE_COND_READONLY &&
++			 cond != BLK_ZONE_COND_OFFLINE))
++		return -EINVAL;
 +
-+	spin_lock(&dev->zone_res_lock);
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		dev->nr_zones_exp_open--;
-+		break;
-+	case BLK_ZONE_COND_CLOSED:
-+		dev->nr_zones_closed--;
-+		break;
-+	default:
-+		break;
-+	}
-+	spin_unlock(&dev->zone_res_lock);
-+}
-+
- /*
-  * Set a zone in the read-only or offline condition.
-  */
-@@ -759,8 +786,8 @@ static void null_set_zone_cond(struct nullb_device *dev,
- 	 * If the read-only condition is requested again to zones already in
- 	 * read-only condition, restore back normal empty condition. Do the same
- 	 * if the offline condition is requested for offline zones. Otherwise,
--	 * set the specified zone condition to the zones. Finish the zones
--	 * beforehand to free up zone resources.
-+	 * set the specified zone condition to the zones. Release the zone
-+	 * resources held by the zones beforehand.
- 	 */
- 	if (zone->cond == cond) {
- 		zone->cond = BLK_ZONE_COND_EMPTY;
-@@ -768,9 +795,7 @@ static void null_set_zone_cond(struct nullb_device *dev,
- 		if (dev->memory_backed)
- 			null_handle_discard(dev, zone->start, zone->len);
- 	} else {
--		if (zone->cond != BLK_ZONE_COND_READONLY &&
--		    zone->cond != BLK_ZONE_COND_OFFLINE)
--			null_finish_zone(dev, zone);
-+		null_release_zone_resources(dev, zone);
- 		zone->cond = cond;
- 		zone->wp = NULL_ZONE_INVALID_WP;
+ 	if (!dev->zoned) {
+ 		pr_err("null_blk device is not zoned\n");
+ 		return -EINVAL;
+@@ -839,7 +841,8 @@ ssize_t zone_cond_store(struct nullb_device *dev, const char *page,
+ 		return -EINVAL;
  	}
+ 
+-	null_set_zone_cond(dev, &dev->zones[zone_no], cond);
++	null_set_zone_readonly_or_offline(dev, &dev->zones[zone_no],
++					  cond == BLK_ZONE_COND_OFFLINE);
+ 
+ 	return count;
+ }
 -- 
 2.56.0
 
