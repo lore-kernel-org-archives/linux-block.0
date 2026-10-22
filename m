@@ -1,98 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.227.138
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792650329;
-	b=CNqZDksi1FpylhAPjn+PIibQJAkxjdlDr59b/XtZNk2sSFb+2z33RJ3ufqpwghcgZZPs
-	 kpuOAKdji4DCBS1VZXN36HBFDxJtAB60X2m/Tf9PEIFHI/wxBYC4NToEAWT6jjJeRAJA3
-	 INxIZZDsaN7NjQO7AaRx6pLb6h/8UiTOmkE21WrTzmqPlI5EDESgVTr2tfNv0PzzaOTD0
-	 vdWG0QZVkWwNTbF4dNt/6DhPClJHR+jFKhROJbWXFkHDgXBSyzwkJkm4mKWqNMrPwG4v4
-	 kP2CiCq9hVxeIeegA95MBQZMboCfbsoqJcNscCP6tIfblFooIwpTd8NvkW0/iB4kiIA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792650329;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.176
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792652144;
+	b=xcB9VlJ5u/ceVNBdeKAM9rZ32PAgcaEc/k0Dm1pnIWAgTqGlD3y0RqLYw4fGA/QrUJx1
+	 wZqf5jDun6aJmMpa5hpw9rzhKExJ62ETqclkAOhJXyosBpQmcdlF0U1B5BEg0AAt9PYuc
+	 BtUge/V10aeLMPgqlYfmmM7za1OEb16QZHOuGncv7SwYTZeOujYTkS6qh1095vUnDCVEI
+	 q7Xs9AgDejJr+sMkexHHx4boMcNdIR7AuFZ0ramHN2TQuDMPynVB0nivz9ppU7d2bN/Ye
+	 OeC5mB2D1j9OCbPciR9EHvlBFCy0htkgElrIlAsspymtINyalZgcg8SmFgflttt0EXg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792652144;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=Poj95iKUo4QyH3/5kwdW6qIr2kOr+yFV97wGvMkSdkQ=;
-	b=k26ZhrruuBqcsTppeGf4LhUHF4S1sLHPTvb6RLMUgfQaM3VVk5be85cLIw5x+lsXfVV2
-	 50r7Gn6TLiKv/Hz5MGIfaOBSH++eWnkZhbZMmaIXt3F1fTunZ1xJH8eGo1qXBLLWrfr1b
-	 F9IXMWi11JmLKuFScpoE+Uoh2Q3CmiJz7JCtBEHwJL22/tC/8MJ15cmNWstyHlCZeHQEO
-	 zrAE8QAQo+k6HywBdojNdIC8NypYxu2OTBytBOuVe17XQmoH197xUpzpr/Y3Bj+24uRPp
-	 KUePVcQ31IXCn9x+YSxoLEl6Ian5+6TDFrqEL+cwfM6g0Cc3mZ//Kf4C/00WgFEWmyA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=+qOAfSouOX0t5YZwWU2eSWaqspMZR2wrvfeU+oUpg14=;
+	b=AA7soq5h5J65bAPGqJv1YRdAYYSGzFtmfzTawbrOf1b7Zosu4aXUv/ZitEIxIAndNeAA
+	 qT9kk+EP+LEuOgbJ7rjstkv9hLZWiip9UoDQh81cLaH4w+knMrJSILjSwmgZcE7OaQbAi
+	 BPlVyP7tI9BvAThLyuxJYp2jzgmsMHpHm4zj+gffkSZ71vSKsVYb3BfxFdwhQmod64d+q
+	 ODlBrpv+VwL8AUC/+TFYtLp2UtWn1hKF0VFPjgQEuhZnEzCZD+y1nE893bvmaVPmPQizO
+	 UASjzqxnpcPRWXRMy43d88yXpAaW0OvezT/U04s36EJ/eFI/tKvZ0jnpRJfwJ+6n2cQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=lJCd4Zvv;
-	arc=none smtp.remote-ip=74.125.227.138
-Received: from mail-pj2-f10.google.com (mail-pj2-f10.google.com [74.125.227.138])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=R0Kg3uFH;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.176
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BDC606A319
-	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 06:25:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32BDC606A319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6118606A31F
+	for <linux-block@vger.kernel.org>; Thu, 22 Oct 2026 06:55:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6118606A31F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=lJCd4Zvv
-Received: by mail-pj2-f10.google.com with SMTP id 98e67ed59e1d1-3abe4fb64d2so712554a91.1
-        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 23:25:29 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=R0Kg3uFH
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-4d198f1a591so788146b6e.2
+        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2026 23:55:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792652143; cv=none;
+        d=google.com; s=arc-20260327;
+        b=NGnUdwrzWTLG5xaYWGOo4v447JbVIfrn4iYMxlJyQY0JwdC6kADyrya2U2FCogrIUc
+         kNiGFncaRJjTt6QkkhzbrVB70tAlr+okGjTdK8xzjdIY1EKH77O54p77XXQ1sWavYzkL
+         6jSfyTE6SDedbZyZuN0LgllZpzR5ivLApTZgTNwRxWvG8hg7WvH0NXoKEN1UiWAa0gEZ
+         qyAImEXgVeVWPy8ZNtB3Au1vWXZYvxHjjVM7e0rT35cWi/apKqMlzGI7p54yFz/zqO+9
+         mwqH6rA64zqbhEzk5fFCuWsOEflmy1dYGGLrvFPwFqejyRNJuFyRAmwbINeAIswRWrXz
+         3ltA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+qOAfSouOX0t5YZwWU2eSWaqspMZR2wrvfeU+oUpg14=;
+        fh=KIc0SlPJECrqTrcdHnQRuYUhPgCzttE4u2laMH39rBw=;
+        b=bSdtsdMqug2dndeSKkH0nevPKGBcRLtaBA5TvAFJaryHKlfppChERal8PVR/PffVwL
+         Q+LjR7PkQTuNppkaWVs8lgvP9iEZIPF1sPzKYyhMRpOEVDaQK3OBVMXs9/d9hvcVW70V
+         c2rei+DkRA8OmpVcfl8IKxurQd7+u/z/eC1YlwoJnfLasYZf6EIjQ60FrpwckMXV0r3Y
+         hXlZPwiaJBJfpIzw2N+PiX3UFDYSyOiVtCYEzZey5RMphl5WnfoxchFSXaPGXlpjLDYL
+         oRvclnZRh5e6oW8k6zYIesxhLLLslzfKP6A35/U69TS6PgagjC+F965ZMPxhnJIBjIuZ
+         tpfw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792650328; x=1793255128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Poj95iKUo4QyH3/5kwdW6qIr2kOr+yFV97wGvMkSdkQ=;
-        b=lJCd4Zvv3zzg2VsvpemySDQFCSU1TyrrnhaJ5VQDsk2ZSjmlLn5sXJcIe+XmiD57xy
-         LlzrilIsG1z8kv5Ti+OY/Xvd9/DFrIAcum+Ss+6sSNtZEOFFgtO+mmbWpqIAMarlmXmZ
-         HOWWvbnRA7pTaa6Xttauig/ad0sknE0ggVvG9HHBberUEoxOPO0HcVg7AT+3lJVD4Nie
-         NK1XFtgVHkeWOzC7k8cNmIQqsqMr7ytDB/g43hcZRGdIZVm3iE56MO+zMvGe1lZyqjXj
-         WKw8rfFfY+VovxZkwyFXuQEPsty07vjadt+YGwl0G+6xekYv6HmoVDZ19KwRF8KtnKGk
-         GRUA==
+        d=gmail.com; s=20251104; t=1792652143; x=1793256943; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+qOAfSouOX0t5YZwWU2eSWaqspMZR2wrvfeU+oUpg14=;
+        b=R0Kg3uFHbTkdHKNM5sIOn1KZNzNYzlXfSvO3YRZQOMJ4JZAsfCJJKhA1RUp74ivT0s
+         qZUV1TEi3nFuRs00KqWUo36FyoC5C+HwbottBSlUOjXjODGafSkrANkHxuEsG7aS/1uk
+         WkIRteItJy2W6dfvysFvVlTBayq8PqtWevnJXgZijReXMHeyUC26T5dzylMSErfKB1LS
+         T9ZdteSijLwTqyCDEHA2sCpi3jnyQAtU8XkA65kdYqh3YQ6g2f74m7tVdwwFBZHPYi4c
+         Odg8dEG3+ImnFbx0w3TwvL3k/Z9yVYHR43uWEZkzIhZf9yOtq5dWpsbpHFJeNLG1n8fu
+         sIOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792650328; x=1793255128;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Poj95iKUo4QyH3/5kwdW6qIr2kOr+yFV97wGvMkSdkQ=;
-        b=nkRioa2gp66gikwrI1QE04c0pcJMCMHZ0YqhbfUkxu2wVkteQC4jyWXphDkfZe6X5q
-         5wofnKJXl2+O5KuQ6ck8egu6Ecu7BDWRk4cseVP/SU38Pdv3EXMUi8VCBB+Eb4vAytfQ
-         Dw1Sv8gcUuB1LFb+FJExGy21RjHdGimldE4GW7VxEcddk54qAaXm0hOJBtnilwIpyEv+
-         B3dEzI82fLtDGi+evEabYza1aYP4bMl9rtMlUKPei+tw7PqxWr5WfL8zIHAUIe3/QCFK
-         XhbbiguoOskPNKOMvhj3ksjZ4++cDX2OWst+uSSZZM1XEjjEU3sOaNPr1+DbmUp/3cgx
-         GNnQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwT9EfVYV+71PzxcSgRKTxc3c4ZegO0Gc3hrTMPnn1/PG9LiUuJpSEpeafYM8Hika0LIrnWV1qWhNzCZg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJuwRK32Gdx4HBL29qmjhMzXKGUZTPN4aOj4HXPUZ2x+qCKO7rx
-	qGeaWaBjlLp1KFKc1sxgOmZol0pcq/jGabuMSbMRx8hQdu7MS8koUPc40petcGfR4bY=
-X-Gm-Gg: AYBFou2R7Dw2du+rc0j9yUCpadJPuEzBRsssUdVJFIOj1Q3NWAtWlixR+Y0PRD00hU2
-	0Vt/GU3hoAQTjumOrWCX/qUKdh8WHFsk1q/sTk6zaV6E5J8Z5iT/pIyDIJrw6sBdwwcAAnY9NrB
-	JbTYI2aCy9kuhZyFwTe1/GxUYGME7aW28L8WHfZCUgs0Ve4n1mJmpKPXAYm0smArHEg1GjI0KxS
-	HYt59avF1A9LFfNPue7JNGmabvtBIeRrDAv6LVyOAL77C90owvsx7bhabrFzAb6pWB1/I3m2Uxv
-	383yrmxyESpNJYneNBL6P+540syIl/5n4iMvOdHCQDHAdy+Mizmi1TyiC96rwHw6kXyuLGnRyV6
-	+BsxAPom2csnvgxSCgxixXVmiGJpiOmPuSOZstt0Y0TNZUqwGKWmi/YdEh9/CvU8rM+9rP/uS/K
-	CjI6/niH4kHNNqhtzjPF+Pw9Kb04g5S3bC7tdx/+n2fftWUHBoM77/rFlScrKBjzarI+ckRZWoj
-	Igl1U9Jg+AtsDUjPIk3eEwSNM65LknaUZ/rf8ivFWPPHO/P3bEir+k+b4m0W8VyHlH917ZYdWSd
-	2zbYwbF+lg7RIC0NBbQTsvhihUM=
-X-Received: by 2002:a17:90b:4410:b0:3a8:1a1a:7895 with SMTP id 98e67ed59e1d1-3ad86e97863mr3315519a91.18.1792650328451;
-        Wed, 21 Oct 2026 23:25:28 -0700 (PDT)
-Received: from HXYG4FPMGD.xiaohongshu.sh ([61.8.202.163])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cd6b85e8c9asm804909a12.20.2026.10.21.23.25.24
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 21 Oct 2026 23:25:28 -0700 (PDT)
-From: Zhenxian Ma <mzx199711@gmail.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Cc: hch@lst.de,
-	bvanassche@acm.org,
-	Zhenxian Ma <mzx199711@gmail.com>,
-	syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com,
-	Tal Zussman <tz2294@columbia.edu>,
-	Julian Sun <sunjunchao@bytedance.com>
-Subject: [PATCH v2] block: fix recursive i_rwsem locking in blkdev_write_iter()
-Date: Thu, 22 Oct 2026 14:25:13 +0800
-Message-ID: <20261022062513.77372-1-mzx199711@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20261021093332.17334-1-mzx199711@gmail.com>
-References: <20261021093332.17334-1-mzx199711@gmail.com>
+        d=1e100.net; s=20260707; t=1792652143; x=1793256943;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+qOAfSouOX0t5YZwWU2eSWaqspMZR2wrvfeU+oUpg14=;
+        b=vZHicdTutCvxCMRTISYn8ohpnkGeiC25KzE96B1ASnPRdkv7c+x6Ta/6KM1Pvg+U0B
+         OOk15TydsC+jSyOkEJXpWPCMNUSVRbvAKWWHePidaXJl3gNctP0DvarvvUsS21cO9Z6i
+         6YI/KBD+e1j6MLM+zcRGHx1mxm1oqe/SlW6CxAKGkU0GBZoQvOtUwzZXe1xrnddcVqJv
+         NT1d8mPlYFmlSqVspbaAG4H3ZHDZlhqEE8oB8mK5crPXu+gUvS4bOHPM4n3aXMBkZbYi
+         wK9omzWljzPt2SRU1qcsjiHiusnfSUcUObvF7EQYKTFqF7pF9TyGn642mdSqBLkklVaq
+         p1lw==
+X-Forwarded-Encrypted: i=1; AKwUvByN+U/Yo4cglUtujo1/uCehvslnKE7DBk7X7FWpaD5lny6V74H1gridzHjt6mjIr6mBLJ4P5uA94CLI/Q==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKiEnDwcC7VkOpYgHff5CN73yq98R8c1++GLkI0MBs4FYzV/9dB
+	Jq3hTA/RWM0Bg6PsVKEXpEosRa/kde5DwLCjYODp8huTG9HxgrgZ+pdnJciPj6vemMB+X/Y4xbb
+	Bx9aXX2qyAkPj+ddHDaPfPgldHKbQJRI=
+X-Gm-Gg: AYBFou3BxLJHicKEL1WKtDEYvNPvwSOiflKX9DRZDqA1cA18eyF3NpX3R4QzTP6x2u0
+	HmoyP/AEZ0ZHFf9jfsmbWmUGA/fuRaIF+YzZzpm/CZzGec5ljaZVhkWklyaDW0z88LT2ij/PA8v
+	aMTTc7clbVrhD16TcjbYfGKROdqlSdaN0/MzXClt5VRrH+J/ST+dYKFpDt73lm9oLVzE/a53Swa
+	qrKHX96mlf2hc0fJ0HLw7mdLFvMfcCof7dDrntaDHPyJ+vwdbQbBSD+zbAcKzhjy1AobQ4mwAEU
+	o206fQ9cEQZhnaFx2gL7R6dq7sSRbHT3TIrrKrnnqzDaRjtio24xYyEebdSBfns53Rpcb/DYjBZ
+	PnaK8Ec8oJYTTgk2D5TlQrG3cYCvI6BbhmQZE4/Vg4uA15IoiLnUFmejViSEDsu/Vq9HKByXE8E
+	eAiVH0RU+OebgHSQ==
+X-Received: by 2002:a05:6808:d4c:b0:4f5:e13:95e2 with SMTP id
+ 5614622812f47-5534f511f07mr3092508b6e.9.1792652142362; Wed, 21 Oct 2026
+ 23:55:42 -0700 (PDT)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -102,69 +105,45 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261002152821.410591-1-yupeng0921@gmail.com> <CAG3TDc1Ydhjx1GD7-ZCqmzYbZv5+DM0O7wPnzKLWJ1ycK9C2sQ@mail.gmail.com>
+ <66f87058e7e811af340d920e654117eb@kernel.org>
+In-Reply-To: <66f87058e7e811af340d920e654117eb@kernel.org>
+From: peng yu <yupeng0921@gmail.com>
+Date: Wed, 21 Oct 2026 23:55:30 -0700
+X-Gm-Features: AclHuK8Sypv-7xRYs_lPJ7h3Nm6lMdPqTsjMnjk1hM_VRIlE-PXSuRDM8lifbow
+Message-ID: <CAG3TDc1BgQNuCD75NTCcpmP_d4aLummSP6AN6JuxoAgeEBfmFw@mail.gmail.com>
+Subject: Re: [PATCH v8] nvmet: add cgroup_id to charge namespace I/O to a cgroup
+To: Tejun Heo <tj@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	Keith Busch <kbusch@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
+	Maurizio Lombardi <mlombard@arkamax.eu>, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit 2fec4fd97cc3 ("block: take i_rwsem for the direct I/O write
-fallback") takes i_rwsem around blkdev_buffered_write() in the direct
-write fallback to close a race with set_blocksize().  Commit
-1b1be9ea4e34 ("block: take the inode lock for buffered write fallback")
-fixes the same race by taking i_rwsem inside blkdev_buffered_write()
-instead.  With both commits applied, the fallback path takes i_rwsem
-recursively:
+On Wed, Oct 21, 2026 at 2:57=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote:
+>
+> Hello, Peng.
+>
+> On Tue, Oct 20, 2026 at 06:01:12PM -0700, peng yu wrote:
+> > Hi Tejun, does this patch look good from the cgroup perspective?
+>
+> From the cgroup core side, this looks okay to me. However, the current
+> implementation will block the shared submitter when throttled, and it
+> would probably need more work to behave well.
 
-  blkdev_write_iter()
-    inode_lock_shared(bd_inode)
-    blkdev_buffered_write()
-      inode_lock_shared(inode)
+Currently the io.max won't block the shared submitters but io.cost and
+io.latency will. If a nvmet subsystem has two namespaces, one namespace is
+blocked by the io.cost or io.latency, the IOs of another namesapce will be
+blocked too. I plan to create a v9 patch, if a namespace has a cgroup, it
+will submit the IOs via the nvmet_wq, then this namespaces won't impact eac=
+h
+other. If it is not the correct way, please let me know.
 
-syzbot reports this as:
 
-  WARNING: possible recursive locking detected
-  syz.0.40/6005 is trying to acquire lock:
-  ffff888024956f68 (&sb->s_type->i_mutex_key#10){++++}-{4:4}, at: blkdev_buffered_write+0xd7/0x160 block/fops.c:738
-  but task is already holding lock:
-  ffff888024956f68 (&sb->s_type->i_mutex_key#10){++++}-{4:4}, at: blkdev_write_iter+0x6c5/0x810 block/fops.c:815
-
-rw_semaphore read locks are not recursive: once a writer is queued,
-new readers block behind it.  If set_blocksize() calls inode_lock()
-between the two acquisitions, it waits for the first read lock to be
-released, while the second inode_lock_shared() waits behind
-set_blocksize(), and the task deadlocks.
-
-Drop the outer locking in the fallback.
-
-Fixes: 1b1be9ea4e34 ("block: take the inode lock for buffered write fallback")
-Reported-by: syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=bd975ef54294bec73f0e
-Cc: Tal Zussman <tz2294@columbia.edu>
-Cc: Julian Sun <sunjunchao@bytedance.com>
-Assisted-by: LLM
-Signed-off-by: Zhenxian Ma <mzx199711@gmail.com>
----
-Changes in v2:
-- Keep ret2 so calls appear in the order they are executed (Bart).
-- Explain why taking i_rwsem shared twice can deadlock, since
-  rw_semaphore read locks are not recursive, and include an excerpt
-  of the syzbot report (Bart).
-- Link to v1: https://lore.kernel.org/linux-block/20261021093332.17334-1-mzx199711@gmail.com/
-
- block/fops.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/block/fops.c b/block/fops.c
-index 0e4c42c8b74f..373667c6b65c 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -811,9 +811,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 			} else {
- 				ssize_t ret2;
- 
--				inode_lock_shared(bd_inode);
- 				ret2 = blkdev_buffered_write(iocb, from);
--				inode_unlock_shared(bd_inode);
- 				ret = direct_write_fallback(iocb, from, ret,
- 							    ret2);
- 				need_sync = true;
--- 
-2.39.3
-
+> Thanks.
+>
+> --
+> tejun
