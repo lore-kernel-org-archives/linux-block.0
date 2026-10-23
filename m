@@ -1,95 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=117.135.210.3
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792756581;
-	b=iIuGzmNvO7vKN2qJ1rNtg7dfq3Es3n3v+5TUz2CTjobQdvZyeCk3SbNGzf+1F2EmXkah
-	 oF82/pTZ9YTD40WcaH4ema9BySQuhexMBsf0INQrUN4vWdC76OylITYcH95FmmvCejKaP
-	 iaWY+EODLYxyWbSSJLaU8B/0VvgZPADKGKmn8z4+9DJ/Tqu/ElkLEi1xCN7V6YQP50D/k
-	 4qjV+BdSnqaQgICJ16G34pgGI7yzIICWUIo+qLoYrdQdEVQYGTWOFrVPKMICCupkP03BT
-	 4LmeIkG5YUbRdKD6WMtlKexuI9a6LTDKpNJDj3V/+J8boZMKqvJoCIv6sRpC2W4l3Qg==
+	t=1792759140;
+	b=mQvvMzYTcuik3TDfIsUfF+zbAOJJBZqKvmj0+3iDUViZSgj8clHDhcvoMetPedX8uPJE
+	 XgDA29+G+qamNWYfTHkoC3uUX2y+DsI08fu6hsuVlSvwA6/TA+MYaSw9sP/6R24YioLSj
+	 zl0OCaBJIDLIrxnB8XTBEAYai6Xqqp1x7VC+MVeegk/0hRYQj6lugelAY1bU6ua1cKReL
+	 eN+mzKzg9+lnx4dbkcM1mhxpNMzHLv7z42xdkcL380HFvSHdoJTjP+GZdHTMN/UkXjj8k
+	 8ksEORQpjF3prhlluWFDaD9cG/XPdukOMJq6liLnL5K0ErzOhR0zXIWmCmfOWKE21TA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792756581;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=5dCvo6bsmgCaQ8DMa8VWGE76Rg99fDHT/+IeuLzD3dU=;
-	b=S8W5znlzUlCiPLty8Zmu32zfBpixD4vxBQAq08K62O7RsfSHhFfSqyyqXjNqtJywT+Wx
-	 J5zj6t+jA7qe9WyCdNZEaqubZGaLBY8P2SB8WMZs2rnqtaeFsfI/qQBPQuq8WYXoh+Ali
-	 1cGgkH69OJ8Eo/bh5Ee1NXSR/xxAoIBTeMMUGvgOhCuZVPS7OYMLAs6MES+ARm/0nVElH
-	 ZHNbv+6VoEdLKa71IzjxVZQ/OLkgljcDEahvvybzUHkMNImW0OivQ2IgMpv/Yw5xBNMWV
-	 Tb+ZNlcgMdZrdBvL1GIB3vQGPKQhAfGZKPWQanQBnL6OB8+TfWTYQyCnCmd8VXE/9Nw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792759140;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:
+	 X-CM-SenderInfo;
+	bh=cp05jW7hJV+9rE5FQ+Ld7f2LCLjbgtBVL5t7Y46XhuA=;
+	b=oVeP8fqBvqxhESCW4SnFkEuvzrXXMAjpnmXbC5YmrQTnir9qMO2R4SJqasE1TDK5/TVC
+	 Zrzej6KG5M6QZUpGyCkX0GLILFVldaTvSO+bO+EEl8iWb5LuEWqsUQ9Ei/bK6r6ZiaGj7
+	 F43WxV0hgZAh/jbDM5JmQUppM/XrOgDah5cMLGVZt9K9QVqNFaIsdXqfv3retDicIuffZ
+	 6/THnko5yQSPwsUgLFyCOwbX4E8/0mT1y/O6cWCJBbuqtqxDzZ1RXDlLpibsmYW8jmmXf
+	 neiFlN1bagkTD4dCjPnQGfmMK38BvMzWO9xTFW6yHqEL8nszQ/Xglb5HkQNHXroCCfQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=s+adkAZn;
-	arc=none smtp.remote-ip=209.85.210.175
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=163.com;
+	spf=pass smtp.mailfrom=163.com;
+	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b="NwL/idF7";
+	arc=none smtp.remote-ip=117.135.210.3
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44A3606A31A
-	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 11:56:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B44A3606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C48E606A322;
+	Fri, 23 Oct 2026 12:38:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8C48E606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=s+adkAZn
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8a064dcfcfdso295171b3a.2
-        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 04:56:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792756580; x=1793361380; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=5dCvo6bsmgCaQ8DMa8VWGE76Rg99fDHT/+IeuLzD3dU=;
-        b=s+adkAZnr3Kn/RfzSY3qYmRNyUA+d6aAnEkHDvskSdcJXybOUl2qWdYoWfXIe/mRqw
-         a2I3e04I28t18EGam2ykHEQ77LPPqltfwIrbBPbL+S22/YWcW2FvsOLK9O6robRcDIhU
-         KqfB1+RThj2NzvK3U5/zZJJ4m4dFYwNmIM+YY5nGAy5wDPyQr7TgfFo3vPZ+nL/B5bvQ
-         4D+yM3u2B0Baiv67oUg8R1eZcV7Qv659c0Bb75v0F6TT3yJ8Ywzwp928vOcENIpOZD/O
-         4vVMO6vosD7KIzYUHnMA2vvfCDDHXAM1pZaaiC4UHsxPihzj7tV3OCHGY3lQkfJ/TCpG
-         DOmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792756580; x=1793361380;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5dCvo6bsmgCaQ8DMa8VWGE76Rg99fDHT/+IeuLzD3dU=;
-        b=phnaytmHF7Qpw6iiEWv+t1Aits53e9oEP4BxIDOtEn4mBGlyvzycvb8Vh5juDvy/rV
-         mx78X+wrqAeveMhzUR8+2W/0cx3d5zIr36g87bn8kXgxkdPGHBKUgpk86kLxeUALbPrb
-         ZobWC0QF+iS7vnStzTE5QBNfQw7F+U4RRZ6AGGBAAagdfCajQZRjYIW6YvSLCx5R67P+
-         ixhzDh4t+v71zOKowGZ0uT9zNYCvVYsCbRb0rjSxL2dvHKWuyq3OzILDMRCmIG489+md
-         EYtmv9pDUusIoyGWg+/2wddyTAAc8oGEZuTJMZGCpKHNsggXRmOACoviPLfH21ODyv0I
-         UmHg==
-X-Forwarded-Encrypted: i=1; AKwUvBz8YLa9Ll/A0Ntp1zfISTDvlDrOqxU2EadzK/FtcQgt3APcnlshAiqaxOYQxhJxAHmYOLamWNs52rSxvA==@vger.kernel.org
-X-Gm-Message-State: AFq9FYI9u81C7XF0MRzKxEIbVFgt9RAiG1782h9dk5zf77UqgxjBlGMx
-	GrYKlGxsY0YDkTTJFONjLbRG6agisXxT5/HcuFatFRjpD6G4mY8r/07qB8FWUoec
-X-Gm-Gg: AYBFou1ZQKQKC8A8CwdtSrRr35pBDV65AMwYFmmwkhZMnE1VeIHmyYMJ75BRxL+27NQ
-	USf3r4L1KDedPqBz0yoksKUTmNQSjf3ciLBPgLBb2KXlV3iHFN707/fnEoHemQ68gDG0F3k1pwZ
-	ShLsjTA5UYHojkSm9iHIWo016Vki9FH14NovHhEyIdgUGWIMgk0aUwSkopwqfAW54+b8zqd92qU
-	6so019DZsjyRK9jQE4YjG1kpw1yPQlR7ekX88mnqyIaQYbF+Ipr0gHZf3f5lwIar2AHWDyxyunk
-	dXzJ5p7xT8teqKltGwuE/E4jsyauGVS+3PtMl8lCMXw8IzBOfI0zUvxAz1CfcWVW6CFrXAHJJnL
-	jDKmuT2nWnfbgQZ72lvXut3Pj5dU0OI1ONBTRKxYrMapSTGmjKg/cvVM0xfXHyWcDS84ET9GMch
-	ZPzsGrrzcw4gm6GDJbrpTDqaQNgTrJTkw6thMpSpgHiK7r/6MDBVxEPD1KAkU8W3Jtoj+zxJ33I
-	+GodCDNnkMvSZnnyhFa9mH115kPcQ4KeNS2b/mY76y93fJ1he8gKA4=
-X-Received: by 2002:a05:6a00:3496:b0:89f:d254:7c74 with SMTP id d2e1a72fcca58-8a2c626f0e5mr1846740b3a.9.1792756579962;
-        Fri, 23 Oct 2026 04:56:19 -0700 (PDT)
-Received: from thangnn-ASUS.. ([2a09:bac1:7ae0:50::498:6a])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8a2d2948e11sm604419b3a.31.2026.10.23.04.56.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Oct 2026 04:56:19 -0700 (PDT)
-From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	linux-block@vger.kernel.org,
+	dkim=pass (1024-bit key, unprotected) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=NwL/idF7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=cp
+	05jW7hJV+9rE5FQ+Ld7f2LCLjbgtBVL5t7Y46XhuA=; b=NwL/idF7yLcNVy1Sqh
+	wCBArmlZDfE3CETd4QWsLQicQ1DnbCevfOyjT9Nf5WHJ4Txi+50Aq408HisBlz5P
+	ukvpaIcil4sCLfPuJ3cgvXk2hEO+rw0CCAVYffw0vh0PIdp9f7+ICJqC9UfRbcWC
+	BsU40s1CE8mXgqDsdc2XwQRus=
+Received: from hongfeng.mioffice.cn (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wD31_UTVdtq41kmCA--.56769S2;
+	Fri, 23 Oct 2026 20:37:41 +0800 (CST)
+From: Hongfeng Chen <chenhongfeng0212@163.com>
+To: Nhat Pham <nphamcs@gmail.com>
+Cc: Hongfeng Chen <chenhongfeng0212@163.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Barry Song <baohua@kernel.org>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Yosry Ahmed <yosry@kernel.org>,
+	Wenchao Hao <haowenchao@xiaomi.com>,
+	Wenchao Hao <haowenchao22@gmail.com>,
+	linux-mm@kvack.org,
 	linux-kernel@vger.kernel.org,
-	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>,
-	syzbot+feeb9b5352b9ff89618a@syzkaller.appspotmail.com
-Subject: [PATCH v4] block: use READ_ONCE() to access the task io_context ioprio
-Date: Fri, 23 Oct 2026 18:56:15 +0700
-Message-ID: <20261023115615.12260-1-ngocthang2710.1999@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261020125233.9820-1-ngocthang2710.1999@gmail.com>
-References: <20261020125233.9820-1-ngocthang2710.1999@gmail.com>
+	linux-block@vger.kernel.org,
+	Hongfeng Chen <hongfengchen@xiaomi.com>,
+	Hongfeng Chen <chenhongfeng0212@gmail.com>
+Subject: Re: [RFC PATCH v4 0/2] mm/zsmalloc: defer object free to per-cpu batches
+Date: Fri, 23 Oct 2026 20:37:36 +0800
+Message-ID: <20261023123736.1542117-1-chenhongfeng0212@163.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <CAKEwX=ONniSwdiZAe_8NT5XwVj=Mmc-WJs_rWE4Y5snjFg2=Eg@mail.gmail.com>
+References: <20261016120927.3191690-1-hongfengchen@xiaomi.com> <CAKEwX=ONniSwdiZAe_8NT5XwVj=Mmc-WJs_rWE4Y5snjFg2=Eg@mail.gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -100,100 +77,62 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD31_UTVdtq41kmCA--.56769S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7WF4UGw15Xw4kAr4kJr4rGrg_yoW8XFyUpF
+	Z3GayxWws5Jr1xKr97Aw48ur18Aw1rGF48JrWSy347ZFn0yFnFkw1kJay8Zw1fAr4Fk3WF
+	yFWktw15trsrZa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U2XdbUUUUU=
+X-CM-SenderInfo: hfkh0xxrqjwvtqjqjiqs6rljoofrz/xtbC7hXrBWrbVRW5MAAA3t
 
-__get_task_ioprio() reads task->io_context and ioc->ioprio without
-task_lock() when called on current, e.g. from init_sync_kiocb() on every
-write.  set_task_ioprio() can update both for another task at any time,
-including the first publication of a new io_context.  KCSAN reports it:
+Hi Nhat,
 
-  BUG: KCSAN: data-race in __kernel_write_iter / set_task_ioprio
-  value changed: 0x0000000000000000 -> 0xffff888109813730
+On Fri, Oct 16, 2026 at 9:09 AM Nhat Pham <nphamcs@gmail.com> wrote:
+> 1. Would memory freeing be slowed down?
 
-A stale or torn value is harmless, a task simply gets the old or new
-priority, but the compiler may tear or refetch the accesses.
+I sampled pool->pages_allocated every 1 ms, and measured the time from
+the start of munmap() until the zspages are freed. Three cases are
+tested: 1 process x 256MB, 1 process x 1024MB, and 4 processes x
+256MB. The results are as follows:
 
-The io_context itself needs no extra protection: only the owning task
-drops it, in exit_io_context(), so it cannot be freed under a lockless
-reader running as current.
+  workload                  base      with-patch
+  1 process, 256 MB         14 ms     9 ms
+  1 process, 1024 MB        51 ms     31 ms
+  4 processes, 256 MB       45 ms     24 ms
 
-Read the pointer and ->ioprio with READ_ONCE() and write ->ioprio with
-WRITE_ONCE().  Publish a new io_context with smp_store_release() so that
-its initialization is visible before the pointer.  The reader only
-dereferences the pointer it loaded, so the address dependency of
-READ_ONCE() is enough to pair with the release, as with
-rcu_assign_pointer() and rcu_dereference(); an acquire is not needed.
+Memory freeing didn't get slower and it actually got faster.
 
-Reported-by: syzbot+feeb9b5352b9ff89618a@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=feeb9b5352b9ff89618a
-Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
----
-v4:
-- Retitle: "annotate" was too vague (Damien).
-- Explain in the commit message and in a comment why smp_store_release()
-  pairs with READ_ONCE() and not smp_load_acquire(): the reader only uses
-  the loaded pointer, so the address dependency orders the access, as in
-  rcu_assign_pointer()/rcu_dereference().  No code change.
+> 2. Would this introduce isolation issues, especially when this work is
+> not properly accounted?
 
-v3: https://lore.kernel.org/r/20261020125233.9820-1-ngocthang2710.1999@gmail.com
+Yes. The drain runs in an unbound kworker in the root cgroup, so its
+cost is not charged to the killed tenant, and it may take CPU time
+from other tenants. I'd appreciate any suggestions on a clean way to
+handle this.
 
-Tested with a KCSAN kernel in QEMU: 26 data-race reports per run before, 0
-in two runs after (v1 code, later versions differ only in comments).
- block/blk-ioc.c        |  9 +++++++--
- include/linux/ioprio.h | 11 +++++++++--
- 2 files changed, 16 insertions(+), 4 deletions(-)
+> Another thing I wonder is, how much of this slowed down is because of
+> zsmalloc's own inefficiency, and how much is because we just have a
+> larger logical footprint
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index d15918d7fabb..fac62f2858ec 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -277,9 +277,14 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
- 		if (task->io_context)
- 			kmem_cache_free(iocontext_cachep, ioc);
- 		else
--			task->io_context = ioc;
-+			/*
-+			 * Make the ioc initialization visible before the
-+			 * pointer.  Readers use READ_ONCE(), whose address
-+			 * dependency is enough, like rcu_dereference().
-+			 */
-+			smp_store_release(&task->io_context, ioc);
- 	}
--	task->io_context->ioprio = ioprio;
-+	WRITE_ONCE(task->io_context->ioprio, ioprio);
- out:
- 	task_unlock(task);
- 	return 0;
-diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
-index 5210e8371238..be999cbe7c91 100644
---- a/include/linux/ioprio.h
-+++ b/include/linux/ioprio.h
-@@ -56,9 +56,16 @@ static inline int task_nice_ioclass(struct task_struct *task)
-  */
- static inline int __get_task_ioprio(struct task_struct *p)
- {
--	struct io_context *ioc = p->io_context;
-+	struct io_context *ioc;
- 	int prio;
+Mostly zsmalloc. I kept the footprint the same (1 GB paged out to zram,
+then munmap()) and only made zs_free() do nothing:
+
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -1455,6 +1455,8 @@ void zs_free(struct zs_pool *pool, unsigned long handle)
+ 	int fullness;
+ 	struct zspage *zspage_to_free = NULL;
  
-+	/*
-+	 * Only the current task itself drops its io_context, in
-+	 * exit_io_context(), so a non-NULL ioc is always valid.  However,
-+	 * another task may change ->io_context or ioc->ioprio, so make sure
-+	 * to get the latest value with READ_ONCE().
-+	 */
-+	ioc = READ_ONCE(p->io_context);
- 	if (!ioc)
- 		return IOPRIO_PRIO_VALUE(task_nice_ioclass(p),
- 					 task_nice_ioprio(p));
-@@ -66,7 +73,7 @@ static inline int __get_task_ioprio(struct task_struct *p)
- 	if (p != current)
- 		lockdep_assert_held(&p->alloc_lock);
- 
--	prio = ioc->ioprio;
-+	prio = READ_ONCE(ioc->ioprio);
- 	if (IOPRIO_PRIO_CLASS(prio) == IOPRIO_CLASS_NONE)
- 		prio = IOPRIO_PRIO_VALUE(task_nice_ioclass(p),
- 					 task_nice_ioprio(p));
--- 
-2.43.0
++	return;
++
+ 	if (IS_ERR_OR_NULL((void *)handle))
+ 		return;
+
+The speedup is as follows:
+
+  machine                   base      with-diff-above   speedup
+  x86, 1024 MB              50.2 ms   20.6 ms           2.44x
+  RK3588 A76, 1024 MB       89.4 ms   23.3 ms           3.84x
+
+Thanks,
+Hongfeng
 
