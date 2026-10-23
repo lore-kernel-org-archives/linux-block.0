@@ -1,55 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.147
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792772409;
-	b=mY7sFUATlYFlvCQeJVOcryeDPuAyh8BLllPRK311OLGaSq+R0AO3+9/FN9hBuUxIRlIQ
-	 vW3BVAh1jy7nxMh412vkX1yArHpDEb4i5ZLHP5v3sfMWsI7TWrhjCAMg0RxFsg9m/fHWZ
-	 jXmsqo2Y2J36D4SM1INg6K0sgjJ6pFF6NQYVlX198M3Axv886Cs2GHPaP2IdAiFtBqdmz
-	 oKAyp3FFMoziV/F9J8hFMxA38SAI97wBPgN5Qyde1kxBo2KmdXu7GHMrkVxOvAEdvSJei
-	 RbJ4iDXSSScTqoFCqTWSqESA1tB5EK14nSSrzSTgN+a2juBVOdS3I67Ztoso+cZE4hQ==
+	t=1792772861;
+	b=LHmEZmwi/OpqMTF9gxqBU9PLnJVZUJKAQrTxmzOaDTdlEK5jwtrllqluHB5bpZGt8gJl
+	 TtHCKrpIr3SPV1vphH9O+MiLGs9dF7Spl4/eAwcTNKC3otjAFEQQDzZcTcP/5sT5onF6L
+	 brhsMt5ZXFmm0H2u9lZIyEJrhf7pjLLNM2tou7PEqEMDg398FPVG2qjVTi83yM7b6nOVe
+	 yW0hQBFvCjTDPyFJQwJuMyxIlLPUDhiVqNBOWsr91IdW6w/wDH5iDgwLx2dURrDKkjvjQ
+	 ifabrz0nczlXn7NpY+Uq4xmhD7vYo9wKyKKq8SJRAdVZUQOCOMmX+WSotZuEXXKMe+Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792772409;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=lFKXhdz7b29163w5ty1D2Chrsll2Yyt/yyzKi1Ft4hU=;
-	b=1wMb+qxWrNcrRUeY9krrkz8vI2rKqJO3V9s6d0gAqJnnqL2iXwQQSZvnNbNoyDasELif
-	 b0u+5EKjA3cI22luAYBKfgHHfCeWysq6j12XWKJI4h4GlpOTsP079IATKfNrto93s8keO
-	 49n8lRLY/iTFsWxiRWShgbmNcl3uUEB6ldon9g7qwpK3KMbM2ZOHlWYGEf7StVwrze9kd
-	 29OMaVNFe+dU0IRuKS/e7H5zEs2vUQsTnDANB1dgcXmU3mT1Ph7n093ibchaYHoB4gboN
-	 WoLpDIKwac5HX+2oL1W+TCEki0yhFQqt2ZBCbeeZakW21UWeFjljM64RZz89XOSEx9A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792772861;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
+	 References:Subject:Content-Type:Content-Transfer-Encoding;
+	bh=tAaVmzUGd7yfz+Y53F9/4k9F52nXT6HbnGx9q7bJDc8=;
+	b=RbCNGJCfuloSEDixjTPDPxgcx9HRltxCZyytXb2SUS5zhgH37e9QgW9Oigqt6FJG40zp
+	 bY05fGem+rbDEVHL9SfuBbRrAdOBN/sGdyHbezEaYZNmIqgcrbppbJb+SOUqhR8p0qQDR
+	 PVR+PbZ++F8f+U2KH4hZ3HDVf7U7cMJWKEK6kBTAscUiKDk0A6pp5Ap6OBSDCl76prOKK
+	 EBzufJ+t4/EHPe2OAp4+oQvK+TsujviQHHoVfJ56kaqg5LrKc4nEOjgEKv5v4dbcbtnQ7
+	 NOVxBJ1Zqdst0tsQ+o6FDsyfukNVelO1/W/C7rddgutgQWPb1bQKXy7TRG4XfDo6aBQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NYX6apH4;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=arndb.de;
+	spf=pass smtp.mailfrom=arndb.de;
+	dkim=pass header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm1 header.b=k1+FTmoa;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=dnQsin22;
+	arc=none smtp.remote-ip=202.12.124.147
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3C1606A323;
-	Fri, 23 Oct 2026 16:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3793A606A31D
+	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 16:27:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3793A606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NYX6apH4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D85E31F01825;
-	Fri, 23 Oct 2026 16:20:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792772409;
-	bh=lFKXhdz7b29163w5ty1D2Chrsll2Yyt/yyzKi1Ft4hU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=NYX6apH4XjsuZbhZ2nkea+lMVyIY944cl0LUHsen297ujJ8tYK0Bbm8WYyHbavD1V
-	 HBlPPC7XJpUoofs/uOB6pSPlWMa8saidr1rTg8SgSH/Q1k9tGrngoixXjljR6B6PAq
-	 rzI90tjtjcS8jL38d09abhDYkW8EpDURsDwyv0FOUS5umplK24ggOyDQda12SLmuTg
-	 3NMURHfzk/s+xOrQHzLP9T/lezpnJj98PKqY9MIRcb3pKE9uDDYPmPMi1+7MNbPbVk
-	 Mcmy1jtKYbWmqjaYoDaLumIKZpfq/YG060V8fziI+xTT3xCvpffOsDzc8UTVV67VCn
-	 mtFaW+fA77OzA==
-Date: Fri, 23 Oct 2026 16:20:07 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Baokun Li <libaokun@linux.alibaba.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk,
-	linux-fscrypt@vger.kernel.org, hch@lst.de, dm-devel@lists.linux.dev,
-	mpatocka@redhat.com, sweettea-kernel@dorminy.me,
-	stable@vger.kernel.org, Sashiko <sashiko-bot@kernel.org>
-Subject: Re: [PATCH v3] blk-crypto: fix NULL deref and UAF in
- __blk_crypto_evict_key()
-Message-ID: <20261023162007.GA2810556@google.com>
-References: <20261023081908.3505413-1-libaokun@linux.alibaba.com>
+	dkim=pass (2048-bit key, unprotected) header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm1 header.b=k1+FTmoa;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=dnQsin22
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfout.stl.internal (Postfix) with ESMTP id 40FCF1D00105
+	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 12:27:34 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Fri, 23 Oct 2026 12:27:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1792772851;
+	 x=1792859251; bh=tAaVmzUGd7yfz+Y53F9/4k9F52nXT6HbnGx9q7bJDc8=; b=
+	k1+FTmoaMyc6c0UxlJQv5ItJzjmcBf8p9uravKf7CWcqYPIY6VYuVcRQi1zfaS3p
+	JTV7xNHXyuPBIg4M1Y3LIUo2PT4SW+1TS/sJlwKPNJv0YLOfJdujyMYDhKnLqigj
+	a4WEgF9hT7/9VDGpH25Zbg6K2nXBdR2Lf6KrtKptc05TXoJU4NnDYT/FUM4KkKuk
+	UAyTzCpIPLxRMFY0DwKMz+Xd/+LdWka84DhJR3Z5hEHVytvKYQGoRM4VE9H5af5d
+	piFJLdQHqlrfvL14KRNrabuOuKsrXYvwb62NidZPfva2+5Gsr+3vMgaEY60Xnywu
+	adgFr1W+nIsIORRMw2aktA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1792772851; x=
+	1792859251; bh=tAaVmzUGd7yfz+Y53F9/4k9F52nXT6HbnGx9q7bJDc8=; b=d
+	nQsin22uZBwliP1AXOU3UkaJFKSP+MVYwuqk7E7KqIjid2XZeiDIT8VG5paoAGtg
+	ZNet4zCrwgRwT2x4QVnmNPXMzgYr0PObNTG8O1ZUWp2AmnrIv3grjPdiz1Jy4juL
+	fPU3iH9IOe0TivW+g3rKK93UlrVaXBpC7kyG2hdDY0Zhvp2yJaQpOxvhgLa8jCbu
+	A/qQa3kKPB6mQxdhvd7w+XncnK2Hlgdm00fR3sMOcEY/MT3tJq58yTPcjQkjHvQo
+	Ak8Fu0Zj+IgAZhSxPWT+R7uNGh/g2xta8311KFpIdMc7jC9/TcJCQO7+YD8jXJoI
+	tM3XqatVt1NXOGST29jLQ==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=sign d=arndb.de a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1792772851; d=arndb.de;
+	mf=PGFybmRAYXJuZGIuZGU+;
+	rt=PGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZz4=;
+	s=fm1:rsa-sha256:GPxn5MCe311WZBh/QmqOR3EHuyGDE4TbPAZSsQrO3pLAOP8
+	4p4xv1F9Trz+vozE9yFAsHKeUyDBJ0W6ziL7Z++uwhfzr6y0//qj0xASFYhznVRS
+	+ENiL9Ilv8VGpui/w4wgj+QHAu19D5R1M9xJXk92IrX3nqyX6+vi+Nh/o3PzG9xV
+	TLsNNKs2urbl0u8+bvQ+hS29KD5jjldSTwZl4PDoPptpYWeTXl9alMYTLuEt1a7B
+	FWMym9x4AY36QKL5tibIXcWeGZplZB9SkA5Z3sIyJeu6rCtboUFY9F7sDKKeOO3g
+	M+0l94azUp14JioT6nfSC34/sA6m6oDXRA9g6OA==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=mi-m=1; hc=12;
+	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
+	from,in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:+e/Wk9rybGMCI5Gv34ketxCyX8V4ZGXFTpnw18SVErI=:tAaVmzUGd7yfz+Y53F9/4k9F52nXT6HbnGx9q7bJDc8=;
+X-ME-Sender: <xms:8IrbarnhdCh0sEd31LJb3TjdtxrwVseMVJEc3dOhj7OSJ4JYqz6uUQ>
+    <xme:8Irbapolq5wRAu9zEz0MAJsHFQrPBf4UWEBN8cbl-QvsXN_QaP6e4xUd4glmt_74f
+    GoK48xd2D5gmlTGJUdD4JIPu3m72S9BpEk29JSSydp3b_rFxZj8CiL_sg>
+X-ME-Proxy-Cause: dmFkZTF5nL+/XgICGqkob1XXU5PMKkrkGakQIyKKr7sF16M69IBIjyFoFlQKe+kGgPogiG
+    yDAUyj2mlimIn92XnNIp50Ko9dajCgfEKcnn2yNvERVAODPqYoO56oa+aK0xgQ5eukbl6e
+    M/NNMPIKEfXqv7Kj+mtrjZ1AIfj7ld2ptH17oz3tNF4JiSM05SBDS8fB6J49SOArm9tjKK
+    1VDgF4rbmGlg7YrP4SrbqI73wDge2Ktz0j85iJLDf/mcra8fcEkmDJLV45kb5b69fYQA/K
+    WdSFwdhUDJXiYz1AXW1+P3fn3j3B7XHCR90vnex6mc/KNGzlXF/4U/Ty18wt8+CsTlzRuD
+    RWvPQT6hZOCJaQOB0vTz8Ux2hSjMUcKo/Y8KuPF0wZlLcfEE8r3QFMX2omI8d9DvkroTXg
+    MI8wHEdhPXV6RtPPd53qYyc28mg9QxhWWS/PktaRcUuHwea49RZH9dP+/Mr7PTL+UUg6Ow
+    1R8ytafKjjzL6v5MzvdwNTHxsiL+1HCdSs6v/fbNSx/KRPdBDi1nDIqixaCpPSE1R+kQYc
+    lbQRjEeVDVfZOUQU3aCBsvhBMeF/Q/YnImc0bNX6Iru7tovjNBlfX4jBrGOYa/Fw3lUARG
+    +782Sra5wfe8XixzhOpnfKEr9UkE8WgzK1H0mktmkuNdPj5ULLzRZlhEZ6pQ
+X-ME-Proxy: <xmx:8Yrbah8gQ9MOkY9-FFK4aw-oMNvCWzlMQ9WqXbMgDvluFbyT65RQfw>
+    <xmx:8Yrbamb1s0_g7z2ajAixn54wBIosYFz0LcQ3m3zo3NDSd9PtODl8Mw>
+    <xmx:8YrbatP01ZMsq5BHWoWW5Od5SBuYIUu0o57f8F8vnPNSbAeuHEN9Fw>
+    <xmx:8YrbaqAv4Cq6xH25m4AEXs3xSszcQbWdMQ5m79EkK3WLSf9j-2-vmg>
+    <xmx:84rbaqCSCvbooSOxPkvS-MljeNmcpodl7MmvsLht1zHEB8yzfdxikeua>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 29C3F32A0097; Fri, 23 Oct 2026 12:27:28 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,29 +115,36 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261023081908.3505413-1-libaokun@linux.alibaba.com>
+X-ThreadId: AG7ML5kObmmw
+Date: Fri, 23 Oct 2026 18:27:07 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Hungyu Lin" <dennylin0707@gmail.com>, "Jens Axboe" <axboe@kernel.dk>
+Cc: ben.hutchings@codethink.co.uk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Message-Id: <0241d3be-82d3-4ad0-a055-3897e7dfc475@app.fastmail.com>
+In-Reply-To: <20261023153645.37546-1-dennylin0707@gmail.com>
+References: <20261023153645.37546-1-dennylin0707@gmail.com>
+Subject: Re: [PATCH] block: Return the soft block size for compat BLKBSZGET
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 23, 2026 at 04:19:08PM +0800, Baokun Li wrote:
-> Fix this by returning early from blk_crypto_fallback_evict_key() when
-> tfms_inited[] is not set for the key's mode.  tfms_inited[] is only set
-> after blk_crypto_fallback_init() has successfully initialized the
-> profile, so the crash above is no longer reachable.
-> 
-> The bug has been latent since commit c984ff1423ae ("blk-crypto:
-> dynamically allocate fallback profile") was merged in v6.5, and only
-> became actually triggerable when commit e7f57d2c47e2 ("dm-inlinecrypt:
-> add target for inline block device encryption") was merged in v7.2.
-> 
-> Fixes: c984ff1423ae ("blk-crypto: dynamically allocate fallback profile")
+On Fri, Oct 23, 2026, at 17:36, Hungyu Lin wrote:
+> BLKBSZGET returns the block device's soft block size, while BLKSSZGET
+> returns its logical sector size. The compat BLKBSZGET_32 handler uses
+> bdev_logical_block_size(), so it returns the wrong value when these
+> sizes differ.
+>
+> For example, on an x86_64 kernel a native query of a RAM or loop device
+> with 512-byte logical sectors returns the initial soft block size of
+> 4096 bytes, but an i386 process gets 512 bytes. This makes 32-bit
+> blockdev --getbsz and the BSZ column of --report disagree with native
+> queries, even without a preceding BLKBSZSET.
+>
+> Use block_size() as the native handler and the pre-regression compat
+> handler do, and correct the case comment to describe the soft size.
+>
+> Fixes: 9b81648cb5e3 ("compat_ioctl: simplify up block/ioctl.c")
 > Cc: stable@vger.kernel.org
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Closes: https://patch.msgid.link/sashiko-outbox-167341@kernel.org
-> Suggested-by: Eric Biggers <ebiggers@kernel.org>
-> Link: https://patch.msgid.link/20261014155131.GB322435@quark
-> Signed-off-by: Baokun Li <libaokun@linux.alibaba.com>
+> Signed-off-by: Hungyu Lin <dennylin0707@gmail.com>
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
-
-- Eric
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
