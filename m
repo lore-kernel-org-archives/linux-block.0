@@ -1,78 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792741656;
-	b=1XD63uHGEXu6ZyU76osp04pe+eEFHXy5Jykb6p/CiyDeFtT0fLoQ4CzdtMCuY0rEuygk
-	 hTm7KgALbgfB6Y9Tm80kz0rpGGmlGSWJUcA4kY/gLT8Gvf/R+U2lHie7QMVDljCjbJ7UW
-	 rRC0gUDRkUl5ex6t4H4HcqVG//f7R+oxoVNDhQTgZI3GytWXBQeS61STPZQrLzplRVo9j
-	 jJK/x3MbNFlV/CEZFCWh66RhSTXb2jE0aHse0hFiLVd+NF+38Q+20LY0NSGWDvbMTM6MX
-	 s6+ESXt+Vj8gjPe+m8/4hddi9hilz9eG+zMvzzzykz7QXum4GsklyLbcUMskY15+E7w==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792741656;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=V65awey7PH+EaVz0Z/qFwHRAyR1mJpUy4VAJ3/5UO5Y=;
-	b=zToqf1SH/a8xMROKcVYYwT0QPs4kSwxXwML6KKdvGz35ywbeARTuXq5tBqV2/mbjSjKp
-	 VbV1R58r6DPuUAk6KqPFxBq6+yARYm0Xap6JT69jUPdLuC/myFZuRIYG+CLe20H3srOuE
-	 8VxgL0y/XixRngyprn15rXV2e5ZDjfnOtPaJ/oD0L6IMIBCTUl6hnw3gFTUBGYHiQu2eP
-	 MhflXTLer5q2q9MkrqMrGwQhiy48vszHVx+Bd45VbHnwj34hzSVj/DeM117KESCzmT6Ni
-	 jamooJ6Kb2jAf+3HQBwnbfIiV+apQ31kVvjXnjGG1zZuO44fJ5s1VTcHVzi9yzwqFmw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e92g5dyt;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBFD606A320;
-	Fri, 23 Oct 2026 07:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e92g5dyt
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1792741655;
-	b=1nNas0DairAlD7QaQuVf2HQp1m9hB5eOe+MeHTTLuSXT8U0MtrGObV33453lRA8UO9yS
-	 68V7N6GoKw0JxwXjo8VpiIJAozgGGcjcvoNu52TCcRSLnRlQNeSio0Wkl68uZ6s5Epaqq
-	 6O9eh8/yK8XffLDW1vJzbQiri0vXepH/+/1evnHQlYsKrQ4PXj1ICb7+yTT/CrICvqgG1
-	 REA0Qhd6r4U2GmmCaHsY70NsApg+l/U4MCbdInS+E/usM//B/k7viux5cooUF8PVrJUxm
-	 6CsT4Wj4qoOiQUhE0aUe1I3C5NKCpDPXS5infA9ApvlwxGjXaLTeo/XA8mU8jTxk1+w==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1792741655;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=V65awey7PH+EaVz0Z/qFwHRAyR1mJpUy4VAJ3/5UO5Y=;
-	b=qFXrPEJaq9JzjGfSrTb0C2XIot18Vi/+OZP3tPP1FWjalfOZFxLq5Lps8M0bKjoS8+D+
-	 198Z3UKQd8AN48JBT7+ShajUJQx1CoDNhPEkU+tGLgF9ojsCwT1hMbHVPNid/vx186RiO
-	 FFDMDdyHUn7I53ufk1iLk84KzmMLJHhgOKuknTJDqp8PRZFoUJpEqur9Mvjc3cG0F+oNT
-	 dF7GZ+tIVMe1+TLVn3tQOKhmwZAZdPNyU3LcCj1ewNBKMOZ9ZkbOZrZK9ayNsIh8edOlj
-	 kJeuS5AF45D59q9MdI+akBbcKDg6EdC57HWBgOQJ5Weww8oPNbnPZNHmb8V6b/0l8Wg==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.132
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792743585;
+	b=0X7J16vcJkDqYR4iKMkhBMIlOdqWky8bF+2Tj+CeoeL8hWOCDBl/iOAftaO3wVZzIaAQ
+	 0iPUCsb0dglnzp4LTojFLuztJCEejcstc628v2R3t/XjFQ7KSBeSCdfXnFmw16v0bgoqN
+	 BjbUBbCP9mxlpibe7MWP5f1VdNUVUn0iihTCEDj+jt+ZDdWcH8EFDUdGGDT1CfYNt8vYs
+	 8DinEKj6n0Knczxzz/T/p2a9Uq7BlTbtB8e4Ws9thkRH1e1F32c5Sh5vtM6fxIFfn4HBg
+	 r5NuQpeKFBUZRHuGOhVrBlSrJzUNnAVzZZy8RVWMvM88Sq4WdTg1xj88keVqXR9qyoA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792743585;
+	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=aBrMWknICibqOEH4OG2gicLYXH4Dvkn7sWSAjLgDFB4=;
+	b=PPoJacv0le6VdHdoyU/48zOyK2ZFwRoaq6zofuSKEfN1R0kUE4EzPUphciqS7JtagTq4
+	 ktPxbT6VyiSFbibUS4H0kUkC6LJNTXV/hwyGmZRpd5kT6QLIXHW6bMAhrc05wYhor+M9J
+	 vJ3kJ2heWRMYE5bLRa2EarM6FqntdPh7wecYMQBbpevp9QMDE8fFFU/1+wJ6gtDr+rLdf
+	 zDGS6jznt+GSs4Uvdy4GXCjNYHIC0/TzrWKAUQJVJSMisFpDTIhRaXpN7xOGkksA60mhP
+	 uIFGrv9z1eGGUzc4FCrmCiyaVOeTvO7CPh0PeQsk0O7Mq7REe84FWDpTh3jDRdGeKjQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=linux.alibaba.com;
+	spf=pass smtp.mailfrom=linux.alibaba.com;
+	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=c5QtSXy3;
+	arc=none smtp.remote-ip=115.124.30.132
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id AF5E11F01825;
-	Fri, 23 Oct 2026 07:47:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792741655;
-	bh=V65awey7PH+EaVz0Z/qFwHRAyR1mJpUy4VAJ3/5UO5Y=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=e92g5dytaHr+WzCny7lr4KtmtpWdBcMb7dXQe9DNNfeO8Vb0rXvweQ9EBPZqtBaOR
-	 o4FQSujBsNgQkH/vUAdwn1VYH4YvhC6wW7Lg0sB2BGzyzgYX0dEP4tBo0v+mBoGaqQ
-	 VVz59ZXGWvZm+qtQ9ylKzuRuAtQzWhr98RRkxUdGgMR6EiwsLXCAWUz0rBxqJWEW/c
-	 7YJTJ70IrQUDIAOu8FX7ZKONULoT+GAm0VJXK+GpWBnJRRvGGSbcg5JdS1Z84uNJMx
-	 vE1pg5UCySpzE7YiP15MpUJmEOfob/OPRQDU3YsyX2PQ2easy9s1u7axivJmizxiYs
-	 /Ki+us5Trxefw==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 22ABD44400;
-	Fri, 23 Oct 2026 07:47:34 +0000 (UTC)
-From: Daan De Meyer via B4 Relay <devnull+daan.amutable.com@kernel.org>
-Date: Fri, 23 Oct 2026 09:47:21 +0200
-Subject: [PATCH v4 2/2] nbd: drop stale partitions on NBD_CLEAR_SOCK
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FB4606A31A;
+	Fri, 23 Oct 2026 08:19:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88FB4606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=c5QtSXy3
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1792743579; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	bh=aBrMWknICibqOEH4OG2gicLYXH4Dvkn7sWSAjLgDFB4=;
+	b=c5QtSXy3vJO7zEvTD/DzdporMf14fm2Oj6G48nEKqzK6RpANaVxMB4UeKwYhHc53Y2fzax1AM1if258I6u+JW2EfHqrB97BDe8StOdXsqS2P0NiEwipQOPni9Lkg2jwyLFgl0KfTxwyepbG5XKt7rmvhf+iK8rocZL+MJzi9f/8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0XDLbawC_1792743549;
+Received: from x31h02109.sqa.na131.tbsite.net(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0XDLbawC_1792743549 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 23 Oct 2026 16:19:38 +0800
+From: Baokun Li <libaokun@linux.alibaba.com>
+To: linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Cc: ebiggers@kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	hch@lst.de,
+	dm-devel@lists.linux.dev,
+	mpatocka@redhat.com,
+	sweettea-kernel@dorminy.me,
+	stable@vger.kernel.org,
+	Sashiko <sashiko-bot@kernel.org>
+Subject: [PATCH v3] blk-crypto: fix NULL deref and UAF in __blk_crypto_evict_key()
+Date: Fri, 23 Oct 2026 16:19:08 +0800
+Message-ID: <20261023081908.3505413-1-libaokun@linux.alibaba.com>
+X-Mailer: git-send-email 2.43.7
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -82,85 +66,112 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261023-b4-loop-nbd-stale-partitions-v4-2-2baf05e4b2cb@amutable.com>
-References: <20261023-b4-loop-nbd-stale-partitions-v4-0-2baf05e4b2cb@amutable.com>
-In-Reply-To: <20261023-b4-loop-nbd-stale-partitions-v4-0-2baf05e4b2cb@amutable.com>
-To: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
- Josef Bacik <josef@toxicpanda.com>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- nbd@other.debian.org, Christoph Hellwig <hch@infradead.org>, 
- Bart Van Assche <bvanassche@acm.org>, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
- Daan De Meyer <daan@amutable.com>, stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1792741645; l=2448;
- i=daan@amutable.com; s=20260712; h=from:subject:message-id;
- bh=Xsf7lw9CzriaYcZ7LSWs2dUmnLL/EkAep1GawGfe3ic=;
- b=Gk00yNSAxP0BGLLgZfO+zaDaxRJD3UmvXzA2USAiHH8ymQf38em9AeTOaEeJgTv7csveCg6OV
- S+Ui/WVp2pFB7LgAZP1DCBYHO4ZjfizxVy2yFlSfoOzrfWpY9IWgabW
-X-Developer-Key: i=daan@amutable.com; a=ed25519;
- pk=I1l+WwrtmzRgofA5SQ1wTuJi18fjh91w+f5uRkFeZEA=
-X-Endpoint-Received: by B4 Relay for daan@amutable.com/20260712 with
- auth_id=868
-X-Original-From: Daan De Meyer <daan@amutable.com>
-Reply-To: daan@amutable.com
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: Daan De Meyer <daan@amutable.com>
+Sashiko reported a possible NULL pointer dereference, triggered by the
+following flow:
 
-Commit 267ec4d7223a ("loop: fix partition scan race between udev and
-loop_reread_partitions()") stopped disk_force_media_change() from
-setting GD_NEED_PART_SCAN. Besides requesting a rescan, that bit was what
-removed stale partitions on the next open, as bdev_disk_changed() drops
-all partitions before it consults disk_has_partscan().
+  dm-inlinecrypt ctor            # first use of the fallback
+   ├─ blk_crypto_init_key()      # succeeds, ctx->key.size != 0
+   ├─ blk_crypto_start_using_key()
+   │   ├─ hw-wrapped key: -EOPNOTSUPP
+   │   │    # profile never allocated (NULL)
+   │   └─ raw key: fallback_start_using_mode()
+   │      └─ blk_crypto_fallback_init() fails
+   │         └─ kfree(profile)   # not NULLed
+   ├─ goto bad
+   └─ inlinecrypt_dtr()          # evicts whenever key.size is set
+      └─ blk_crypto_evict_key()
+         └─ blk_crypto_config_supported_natively() = false
+            └─ blk_crypto_fallback_evict_key()
+               └─ __blk_crypto_evict_key(blk_crypto_fallback_profile)
+                  └─ profile->num_slots # BOOM!!!
 
-nbd_clear_sock_ioctl() relied on that. It zeroes the capacity through
-nbd_bdev_reset(), but nothing removes the partitions of the disconnected
-device anymore. With the default max_part=16 they linger until the next
-connect sets GD_NEED_PART_SCAN again. With max_part=0 nothing ever sets
-it, so they are never removed at all, even though nbd does not set
-GENHD_FL_NO_PART and partitions can therefore still be added with BLKPG.
+This issue can be reproduced using the following commands:
 
-Set GD_NEED_PART_SCAN in nbd_clear_sock_ioctl() so the partitions are
-dropped on the next open. Calling bdev_disk_changed() directly is not an
-option as it needs open_mutex. nbd_open() acquires config_lock under
-open_mutex, and nbd_clear_sock_ioctl() runs with config_lock held.
-Taking open_mutex in nbd_clear_sock_ioctl() would invert that lock order.
+  dd if=/dev/zero of=/tmp/backing bs=1M count=64
+  LOOP=$(losetup -f --show /tmp/backing)
+  SZ=$(blockdev --getsz $LOOP)
+  KEY=$(head -c 64 /dev/urandom | od -An -tx1 | tr -d ' \n')
+  dmsetup create ic --table "0 $SZ inlinecrypt aes-xts-plain64 \
+    $KEY 0 $LOOP 0 1 keytype:hw-wrapped"
 
-Fixes: 267ec4d7223a ("loop: fix partition scan race between udev and loop_reread_partitions()")
+And the following oops is triggered:
+
+  ==================================================================
+  blk-crypto: loop0: no support for wrapped keys
+  Oops: general protection fault, probably for non-canonical address
+        0xdffffc000000000b: 0000 [#1] SMP KASAN PTI
+  KASAN: null-ptr-deref in range [0x0000000000000058-0x000000000000005f]
+  CPU: 5 UID: 0 PID: 901 Comm: dmsetup 7.3.0-rc3 #1 PREEMPT(lazy)
+  RIP: 0010:__blk_crypto_evict_key+0x2e/0x3b0
+  Call Trace:
+   blk_crypto_evict_key+0x24c/0x320
+   inlinecrypt_dtr+0xf6/0x160
+   inlinecrypt_ctr+0x2d3/0xbd0
+   dm_table_add_target+0x661/0xf40
+   table_load+0x1c4/0x490
+   ctl_ioctl+0x32f/0x5f0
+   dm_ctl_ioctl+0xe/0x20
+  ==================================================================
+
+dm-inlinecrypt is the only caller that can evict a key that was never
+started, as fscrypt frees such a key without evicting it.
+
+Fix this by returning early from blk_crypto_fallback_evict_key() when
+tfms_inited[] is not set for the key's mode.  tfms_inited[] is only set
+after blk_crypto_fallback_init() has successfully initialized the
+profile, so the crash above is no longer reachable.
+
+The bug has been latent since commit c984ff1423ae ("blk-crypto:
+dynamically allocate fallback profile") was merged in v6.5, and only
+became actually triggerable when commit e7f57d2c47e2 ("dm-inlinecrypt:
+add target for inline block device encryption") was merged in v7.2.
+
+Fixes: c984ff1423ae ("blk-crypto: dynamically allocate fallback profile")
 Cc: stable@vger.kernel.org
-Reviewed-by: Christian Brauner (Amutable) <brauner@kernel.org>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Signed-off-by: Daan De Meyer <daan@amutable.com>
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Closes: https://patch.msgid.link/sashiko-outbox-167341@kernel.org
+Suggested-by: Eric Biggers <ebiggers@kernel.org>
+Link: https://patch.msgid.link/20261014155131.GB322435@quark
+Signed-off-by: Baokun Li <libaokun@linux.alibaba.com>
 ---
- drivers/block/nbd.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Changes since v2:
+ * Skip fallback eviction if tfms_inited[] is unset
+   (Suggested by Eric Biggers).
+ * Drop v2 2/2; fix the weak ordering in fscrypt instead
+   (Suggested by Eric Biggers).
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index ffce519bf008..322dbd16dc93 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1616,6 +1616,15 @@ static void nbd_clear_sock_ioctl(struct nbd_device *nbd)
- 	nbd_clear_sock(nbd);
- 	disk_force_media_change(nbd->disk);
- 	nbd_bdev_reset(nbd);
+Changes since v1:
+ * Publish the profile only after successful init to avoid concurrent
+   UAF (Reported by Sashiko).
+
+v2: https://patch.msgid.link/20261014071846.3666398-1-libaokun@linux.alibaba.com
+v1: https://patch.msgid.link/20261013095106.881914-1-libaokun@linux.alibaba.com
+
+ block/blk-crypto-fallback.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index 2a8f40a65158..12e0b487e23a 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -524,6 +524,12 @@ bool blk_crypto_fallback_bio_prep(struct bio *bio)
+ 
+ int blk_crypto_fallback_evict_key(const struct blk_crypto_key *key)
+ {
 +	/*
-+	 * Drop the partitions of the disconnected device on the next open.
-+	 * They can exist even with max_part zero as they may have been added
-+	 * manually with BLKPG. Dropping them here would need open_mutex.
-+	 * nbd_open() acquires config_lock under open_mutex, and we hold
-+	 * config_lock here. Taking open_mutex here can deadlock against
-+	 * nbd_open().
++	 * Pairs with smp_store_release() in
++	 * blk_crypto_fallback_start_using_mode()
 +	 */
-+	set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
- 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
- 		nbd_config_put(nbd);
++	if (!smp_load_acquire(&tfms_inited[key->crypto_cfg.crypto_mode]))
++		return 0;
+ 	return __blk_crypto_evict_key(blk_crypto_fallback_profile, key);
+ }
+ 
 
+base-commit: 734bef548a96e8774d6eef5dfa2026c6edc4e80b
 -- 
-2.54.0
-
+2.43.7
 
