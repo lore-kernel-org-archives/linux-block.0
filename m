@@ -1,72 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.229.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792759140;
-	b=mQvvMzYTcuik3TDfIsUfF+zbAOJJBZqKvmj0+3iDUViZSgj8clHDhcvoMetPedX8uPJE
-	 XgDA29+G+qamNWYfTHkoC3uUX2y+DsI08fu6hsuVlSvwA6/TA+MYaSw9sP/6R24YioLSj
-	 zl0OCaBJIDLIrxnB8XTBEAYai6Xqqp1x7VC+MVeegk/0hRYQj6lugelAY1bU6ua1cKReL
-	 eN+mzKzg9+lnx4dbkcM1mhxpNMzHLv7z42xdkcL380HFvSHdoJTjP+GZdHTMN/UkXjj8k
-	 8ksEORQpjF3prhlluWFDaD9cG/XPdukOMJq6liLnL5K0ErzOhR0zXIWmCmfOWKE21TA==
+	t=1792769819;
+	b=YBUhiLSw59ZMaX/3lL9XFfluC366y3qw8cx2B3y84DMUFwRbSXgLt1034b9ALcRsYslv
+	 YvQ4sa4Qzou599bQNgtDJZrfqQdlLrK5U4ZkS7InGRHmzvje5Dv1NN5/kmw3SF+4QovKZ
+	 UFVc/qQuh7OgFwToC2t2gJ+HwftAVSlUlIidLjLehCWl3baEvGU0uu5kO1gTLTKZCa8rV
+	 httc3hSY0bZOOM74EUdgkoQkfj1hi8EQ1LH7DblBuA2qSVjIEfebpTEcw30tnzBuUj4Mv
+	 cKyDjwJ03WmyUWK9s6DkRNQ75EusnZSbRqOtQcr2LyDtl/wvXkPkOK0FNZz+iFmTclw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792759140;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:
-	 X-CM-SenderInfo;
-	bh=cp05jW7hJV+9rE5FQ+Ld7f2LCLjbgtBVL5t7Y46XhuA=;
-	b=oVeP8fqBvqxhESCW4SnFkEuvzrXXMAjpnmXbC5YmrQTnir9qMO2R4SJqasE1TDK5/TVC
-	 Zrzej6KG5M6QZUpGyCkX0GLILFVldaTvSO+bO+EEl8iWb5LuEWqsUQ9Ei/bK6r6ZiaGj7
-	 F43WxV0hgZAh/jbDM5JmQUppM/XrOgDah5cMLGVZt9K9QVqNFaIsdXqfv3retDicIuffZ
-	 6/THnko5yQSPwsUgLFyCOwbX4E8/0mT1y/O6cWCJBbuqtqxDzZ1RXDlLpibsmYW8jmmXf
-	 neiFlN1bagkTD4dCjPnQGfmMK38BvMzWO9xTFW6yHqEL8nszQ/Xglb5HkQNHXroCCfQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792769819;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=4A2LFgNU3Vz3Cd1QkL+GF0Kwq7uWsh+K0kLA3UVTqQQ=;
+	b=j+grpfLfQJrhzBmneegZSP8oUUWlP4AdRtb3jzW28FD2hBD+mZ2A4xbGfEjPd+dQjzra
+	 MwtUHHCposcmhwgYtnYf7fdRFfvOgNYlN36DgFsBxJdtCwdXqn3WDk43Zfr+fQScIheGP
+	 nhpcCRnBvQkqJFDjIDBsSLD61/m1owDHZZJ72feIvBHx3++MZKwIJZDxH1gNjLLteP2FD
+	 WtZ11CQMDqTnjDQRt73ZZAgKc/Ql3kEE3DucejVfTQkYJLT8AFneMHiFEesKTXnrAYKsd
+	 Ux1wY4ww8HFezBB1UWbPfMYvNMD/kgMlaPEH5mpNQWoQcGW+pq7VMyQsSHXy/0huesg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=163.com;
-	spf=pass smtp.mailfrom=163.com;
-	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b="NwL/idF7";
-	arc=none smtp.remote-ip=117.135.210.3
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=dKlS8bo9;
+	arc=none smtp.remote-ip=74.125.229.5
+Received: from mail-dy2-f5.google.com (mail-dy2-f5.google.com [74.125.229.5])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C48E606A322;
-	Fri, 23 Oct 2026 12:38:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8C48E606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD84F606A31B
+	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 15:36:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD84F606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=NwL/idF7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=cp
-	05jW7hJV+9rE5FQ+Ld7f2LCLjbgtBVL5t7Y46XhuA=; b=NwL/idF7yLcNVy1Sqh
-	wCBArmlZDfE3CETd4QWsLQicQ1DnbCevfOyjT9Nf5WHJ4Txi+50Aq408HisBlz5P
-	ukvpaIcil4sCLfPuJ3cgvXk2hEO+rw0CCAVYffw0vh0PIdp9f7+ICJqC9UfRbcWC
-	BsU40s1CE8mXgqDsdc2XwQRus=
-Received: from hongfeng.mioffice.cn (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wD31_UTVdtq41kmCA--.56769S2;
-	Fri, 23 Oct 2026 20:37:41 +0800 (CST)
-From: Hongfeng Chen <chenhongfeng0212@163.com>
-To: Nhat Pham <nphamcs@gmail.com>
-Cc: Hongfeng Chen <chenhongfeng0212@163.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Barry Song <baohua@kernel.org>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Yosry Ahmed <yosry@kernel.org>,
-	Wenchao Hao <haowenchao@xiaomi.com>,
-	Wenchao Hao <haowenchao22@gmail.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=dKlS8bo9
+Received: by mail-dy2-f5.google.com with SMTP id 5a478bee46e88-35cd538de29so420883eec.1
+        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 08:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792769818; x=1793374618; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=4A2LFgNU3Vz3Cd1QkL+GF0Kwq7uWsh+K0kLA3UVTqQQ=;
+        b=dKlS8bo9/2SQaE++bG0l1jBEF+5W6CiLhS8Ya0X6QcdG0+OSjkFSQ7ZTnJQXuOmJmF
+         tjcgfjLM6gLXRBj5n4OprkwBA0JBeUCVf+bC4rd4mtVKRE5nIYBd8QvASikib7ifIimc
+         ptp9ilY8xK2i0VUg/lkTIj4KD6iQT/NQsNfz9Bpf68eNgrc3VjOeTjrTQAMf1Uu358XP
+         dhWArzP4dcdOJHKBixaxNr6NMhO2px9+IaGxtdZhQdZIbAoYmTz46hzbwGczviTk1pNI
+         RDn0g206v4cwxuEKfEVs/HGTWXgA+vn2/7reiKIiV7ZffEB0bLda/7QcmfXRcAcNZXYQ
+         x/xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792769818; x=1793374618;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=4A2LFgNU3Vz3Cd1QkL+GF0Kwq7uWsh+K0kLA3UVTqQQ=;
+        b=2lacnShNrSPZZFZ5zkeVB8KcR8JYCR541cE5MXH/r2dXkHvTRXrwMDExM09Kjc3mX0
+         ZzchH7DjXXwSCOk7Kb4bAaQQxo0Ub22CrIp+gp+WHQFenNGeSS7/Mdl3Y8CzKXNgPjOB
+         2dzseyjv/4BkevcOgrwbqS9gmeNf74h+xhCUPAA9466uGHpYFfvAoFnva5W8Om/aV4FK
+         ZiqKjjchChj2TdY8o3JRU2JsWgOVWSmTgkNv8kR9bUpF1IWVQuKTWK+MIlj3JNs0mG/v
+         LuWlJ+Jr3JpKTUekbin5LyTNX8rPLgNnrLVb41JUWPfb+X19rkv4+TuiPzVvPRmgfe7h
+         kIsg==
+X-Forwarded-Encrypted: i=1; AKwUvByRIxFc6h+1MrxjOSqGeDmfJU6BLvdRFAN8cVayoJJPERpHxIKuvnyr7ff4e3BUJ4PkwsyNA7mVpqMLGg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJeBsiU9GkAUXBNpRj9biXRl1FPTvENWShX56VZSka3fXy07zu+
+	hqWnDg772VDWVPU3Xpy/jr1W+05HvvmgdDzhFGpzTtoos6wLUkSjZ7oq
+X-Gm-Gg: AYBFou3f9sYNwAjk2q0FsTyCyNm9adFe634tohm/jsF2h0IY3SpYPgSAzeX8rkb0tGT
+	3zsT0f0DcHTHPuYBRfAmkWF3wvAyqOsVKTi3ufVGdcZlLzvixlA3LRLevgpfGT/+rSi8zegtjsF
+	d8Qh8LQovhfE7kPzGc6ZF9+pTzljksqdqNXP3/lfWD00qmYOkj8hKC5RJHq6AtdVfrIJ2c3wufH
+	0n1dicXvBORE1uBMcccK8s/KiChrocff7rK9ykAuQmZ+rUxqkzHRv8waWRHXPV+lu5rSEdTLyxN
+	KELZ1X7dveodqBtwx2FBVSeyj26o1YtgoRwUIR8x9w9dbumgut3cd8CsezkHm2Hh9yRdjdr/KZk
+	8OuqtaRj7yqx4t1ktKXUEMWBkcrFVZ6gkxA84gnfLFUvt47fSgKrQZDujrhmTqnTQXHT4AEdX7p
+	D0Z5d6efuzo4z8pOLYGeCWKyGJXb0sFWTT75j54sQ0OE9sW2Iw+vrz/5wR2vvqskIXtSdAbrx1C
+	+9tFRNVgBTFHcy1idMMq+c/h9sfSKIL30hZP13+1PJf073ifbaalq7B1WriPPT9gHARcInaNhol
+	6nngqydTWmzNup1IXZj7JBdEY6oI
+X-Received: by 2002:a05:693c:88cd:20b0:35c:cd26:3066 with SMTP id 5a478bee46e88-369d985fbc3mr3119669eec.41.1792769817438;
+        Fri, 23 Oct 2026 08:36:57 -0700 (PDT)
+Received: from localhost.localdomain ([98.148.34.5])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-369e6e4e81asm432485eec.17.2026.10.23.08.36.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Oct 2026 08:36:56 -0700 (PDT)
+From: Hungyu Lin <dennylin0707@gmail.com>
+To: axboe@kernel.dk
+Cc: arnd@arndb.de,
+	ben.hutchings@codethink.co.uk,
 	linux-block@vger.kernel.org,
-	Hongfeng Chen <hongfengchen@xiaomi.com>,
-	Hongfeng Chen <chenhongfeng0212@gmail.com>
-Subject: Re: [RFC PATCH v4 0/2] mm/zsmalloc: defer object free to per-cpu batches
-Date: Fri, 23 Oct 2026 20:37:36 +0800
-Message-ID: <20261023123736.1542117-1-chenhongfeng0212@163.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <CAKEwX=ONniSwdiZAe_8NT5XwVj=Mmc-WJs_rWE4Y5snjFg2=Eg@mail.gmail.com>
-References: <20261016120927.3191690-1-hongfengchen@xiaomi.com> <CAKEwX=ONniSwdiZAe_8NT5XwVj=Mmc-WJs_rWE4Y5snjFg2=Eg@mail.gmail.com>
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Hungyu Lin <dennylin0707@gmail.com>
+Subject: [PATCH] block: Return the soft block size for compat BLKBSZGET
+Date: Fri, 23 Oct 2026 15:36:45 +0000
+Message-ID: <20261023153645.37546-1-dennylin0707@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -77,62 +99,45 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD31_UTVdtq41kmCA--.56769S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7WF4UGw15Xw4kAr4kJr4rGrg_yoW8XFyUpF
-	Z3GayxWws5Jr1xKr97Aw48ur18Aw1rGF48JrWSy347ZFn0yFnFkw1kJay8Zw1fAr4Fk3WF
-	yFWktw15trsrZa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U2XdbUUUUU=
-X-CM-SenderInfo: hfkh0xxrqjwvtqjqjiqs6rljoofrz/xtbC7hXrBWrbVRW5MAAA3t
 
-Hi Nhat,
+BLKBSZGET returns the block device's soft block size, while BLKSSZGET
+returns its logical sector size. The compat BLKBSZGET_32 handler uses
+bdev_logical_block_size(), so it returns the wrong value when these
+sizes differ.
 
-On Fri, Oct 16, 2026 at 9:09 AM Nhat Pham <nphamcs@gmail.com> wrote:
-> 1. Would memory freeing be slowed down?
+For example, on an x86_64 kernel a native query of a RAM or loop device
+with 512-byte logical sectors returns the initial soft block size of
+4096 bytes, but an i386 process gets 512 bytes. This makes 32-bit
+blockdev --getbsz and the BSZ column of --report disagree with native
+queries, even without a preceding BLKBSZSET.
 
-I sampled pool->pages_allocated every 1 ms, and measured the time from
-the start of munmap() until the zspages are freed. Three cases are
-tested: 1 process x 256MB, 1 process x 1024MB, and 4 processes x
-256MB. The results are as follows:
+Use block_size() as the native handler and the pre-regression compat
+handler do, and correct the case comment to describe the soft size.
 
-  workload                  base      with-patch
-  1 process, 256 MB         14 ms     9 ms
-  1 process, 1024 MB        51 ms     31 ms
-  4 processes, 256 MB       45 ms     24 ms
+Fixes: 9b81648cb5e3 ("compat_ioctl: simplify up block/ioctl.c")
+Cc: stable@vger.kernel.org
+Signed-off-by: Hungyu Lin <dennylin0707@gmail.com>
+---
+ block/ioctl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Memory freeing didn't get slower and it actually got faster.
-
-> 2. Would this introduce isolation issues, especially when this work is
-> not properly accounted?
-
-Yes. The drain runs in an unbound kworker in the root cgroup, so its
-cost is not charged to the killed tenant, and it may take CPU time
-from other tenants. I'd appreciate any suggestions on a clean way to
-handle this.
-
-> Another thing I wonder is, how much of this slowed down is because of
-> zsmalloc's own inefficiency, and how much is because we just have a
-> larger logical footprint
-
-Mostly zsmalloc. I kept the footprint the same (1 GB paged out to zram,
-then munmap()) and only made zs_free() do nothing:
-
---- a/mm/zsmalloc.c
-+++ b/mm/zsmalloc.c
-@@ -1455,6 +1455,8 @@ void zs_free(struct zs_pool *pool, unsigned long handle)
- 	int fullness;
- 	struct zspage *zspage_to_free = NULL;
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 64b4e6c0f696..fb2f4b4d2505 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -835,8 +835,8 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ 		return compat_put_ulong(argp, bdev_nr_sectors(bdev));
  
-+	return;
-+
- 	if (IS_ERR_OR_NULL((void *)handle))
- 		return;
+ 	/* The data is compatible, but the command number is different */
+-	case BLKBSZGET_32: /* get the logical block size (cf. BLKSSZGET) */
+-		return put_int(argp, bdev_logical_block_size(bdev));
++	case BLKBSZGET_32: /* get the soft block size (cf. BLKSSZGET) */
++		return put_int(argp, block_size(bdev));
+ 	case BLKBSZSET_32:
+ 		return blkdev_bszset(file, mode, argp);
+ 	case BLKGETSIZE64_32:
 
-The speedup is as follows:
-
-  machine                   base      with-diff-above   speedup
-  x86, 1024 MB              50.2 ms   20.6 ms           2.44x
-  RK3588 A76, 1024 MB       89.4 ms   23.3 ms           3.84x
-
-Thanks,
-Hongfeng
+base-commit: 734bef548a96e8774d6eef5dfa2026c6edc4e80b
+-- 
+2.43.0
 
