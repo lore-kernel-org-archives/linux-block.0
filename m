@@ -1,100 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792779676;
-	b=b1xCl+8MQUWcrnO1DLjzv/iB1NOFznENZQL36nup1Cq34j4Xaih/s3FDw1dfXORg+EEx
-	 QKk5vQ6NtuNkloEZtAB9u8r604uQUREaN02trEPL3IWfEks7+ZHA8kZ3i7mTKwkU6gQDv
-	 5+DKLcJyRB6y4wHTjCFgmssSUl34D9LVoKapI/piRrush2xytc4wmAc8kSfJe2ZpR/J5M
-	 U6Aoq6kY21QwFRbY7Yi85VGU6cQztj5+KbOyQk0kI/Mp0jInFV6qxc9iZEliEYif67dgk
-	 GqXFifAakXWwrxNBGroowCMvqY8Euq23QBbEB7dfUsqyiTA0263G+jxRLdwsfBpe6QA==
+	t=1792786683;
+	b=Ilx8S2S+k2IL5PYE81OzUUUz81NN8uIbxWUfMvBjvrtkjImln2yQtUBLHHiy8NpL/9Eb
+	 3khligD8OFR21tD9DgTfKk9vIoRD89YFuFUaYUX+lQiJ6l6Sxt61XPyNS0a2ul4GePQ6y
+	 IYhUvoq/S5epQU9LUonOS9tA9L7Z+myIuNQWl1Z2vC3o6Pv93QCuBKTe/czSpD5XmtlGf
+	 BofSIz5QGvVCxcYQukCwlWneUe66kvF38SFgih3HplJFN9y1G5D28d8rwWjJnA+YVMfOQ
+	 w1DUasy5Yb2FWIQP+00lFXSJkHCmDZJ0xQN+NeNYjvRZhXsS7N6enbtDGtGCIXqfUBQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792779676;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=JPXYTcb2GVIpXeWLwsxVi5QbrL0t2UUrrpmBeD3Y8TQ=;
-	b=mQVS3RiYIw25pBlz9bc8t6cKzws+kx0o0qF2HcSUK2EyPULwJHLGgN1dVtRNlaPrC5ns
-	 G7xHbDB21UzM3ck10dO9OZ4/smlgiGnzeEiWAiX7wMijrzNaZhaPfMH1A/CzolVLVKYdS
-	 MgKFJ6JOD2foei8dLupUxUql+IVjPKaxHk4FfUCCkNGAPPVdbjTWfLVccKY7WVRrqPo8o
-	 PHmHp9FzsfmT6/wvLIWmZ+ygNhnPyRwV934Sv0RdseAZU8yqW3CwxsOiCSNKbBs9HD70F
-	 TYUJ8DRFu8L6LdEWe9mNLZEJOWa8heyyVUFDyTnLgYi1S/Tbi3XuGEkzyOqedtPJwzw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792786683;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-ZohoMailClient;
+	bh=uRYww9vPDB7eBeDr4GhK1+jQ+LPs4+QyokdqRCG88Z0=;
+	b=WYAA4xK8/98zk1hle8eHOzTEZQbbN76trc6z3MQpxhzovZhamsSGNhFhqs6Uba3+Ksaq
+	 5Isi6iRL8SUwEIN/+JXJIU1CQJV3pTJODw+uudk5ALtVNRb97bGZguKe7AlL+TMAR4y0l
+	 im4XP877qf6Yk1C5y4APQ8wsqbzQSKVcVKEQnBxTE2hzMEV4gwK15us31y2o3fVIl8u5c
+	 l1rMuHc5RP4zxCzM9GucIsdyazQmQk0r+KTznrebIdGvwIse9fPYfmYKKtXdg45iDwCRR
+	 S/K4WG9/g71hdJuqg1ckARBZh8Qmrx2Sq7mYWV2EkmE/jiYBFU5VjrFkx/+AHgtdKuA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cloud.ionos.com;
-	spf=pass smtp.mailfrom=ionos.com;
-	dkim=pass header.d=cloud.ionos.com header.i=@cloud.ionos.com header.a=rsa-sha256 header.s=google header.b=jPVbTySp;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.44
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=none header.from=laveeshbansal.com;
+	spf=pass smtp.mailfrom=laveeshbansal.com;
+	dkim=pass header.d=laveeshbansal.com header.i=laveeshb@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=jiskkh0d;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
+Received: from sender5-op-o15.zoho.com (sender5-op-o15.zoho.com [165.173.182.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B004D606A325
-	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 18:21:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B004D606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA0A606A31A;
+	Fri, 23 Oct 2026 20:18:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EA0A606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.a=rsa-sha256 header.s=google header.b=jPVbTySp
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c3fae9338f0so15457866b.2
-        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 11:21:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792779674; cv=none;
-        d=google.com; s=arc-20260327;
-        b=pt8NCk28XWMtqaFo/LNEXwnF8Xgilqpgdhx54KxvawQQJghGHtS1qTjB6WHOG+XGoN
-         DgnUVXGx0+XE5OVlUIz64PjhTOnzlxPXUBb/fujCF5jTu4H7MKuyQw4WRo9CCQ6CnuzY
-         v3CIo079Y/+SMeMaMnWUW4hk7+UhbuhQ8qGyn5GikRHp12wy+ds4nOKXRBftud7Wil/t
-         gLlZoWZp3nPV03azFYJ9h8l7NarNsWtw1LbD2N/CBXrttPzdA021LYtQk83W9M64CkmY
-         swBbRu5WBu+fJ9TOF5PACxiSa0Jr0CbhmM55nxAAzawFJBCMk52Vei4wFM+S82ecnvEa
-         Jbmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=JPXYTcb2GVIpXeWLwsxVi5QbrL0t2UUrrpmBeD3Y8TQ=;
-        fh=I/IJ9mf4bIEWB174LeitmmPe/CGIhkeOr3W21wM4/pQ=;
-        b=AJ0YXfktZsQkYkeHxlNGsfZV2C9M0zqvENKOyWP757XGYQp+l627vWJoBbmCpKCP6t
-         SQNBh9/pTxVNwHV5bWYnSVsVQFSPvatKmJ5A/hTTOXOyrRvBhvFlnaz3lxyoywXcJQcX
-         FD1iV27VXz6JWEGjfuUGO3Rwzkgv64qANRXUUuYpIpVI+hvalYzdqV1vo/Yo6CRdw1Pt
-         hAS5tMJJs7oMTuvOkf0eeAHBw2nki/WHzyZIts9bymQaNDQchKW66V2heh9BJCvdhSDO
-         g+p6TgZOwywKHeUc6xJRT28U4fcyOye3oXcfOGGDfuCFHSFhFhVs/oDPhSLlTxuRDCaq
-         Y3Eg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google; t=1792779674; x=1793384474; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=JPXYTcb2GVIpXeWLwsxVi5QbrL0t2UUrrpmBeD3Y8TQ=;
-        b=jPVbTySpKu9bZwpJjjiHg6fWlvq4ipOGD42e9huBV/TtiWterg17v+cdPrZn3MRa7T
-         GwwYEbO4nFeltQ9kAj0QDov6NtWoR1H4CmtvcGP7qz5XwCGvsBLsEUo0vI+80p6AOWJY
-         xojMxYAmpVyO6EPl59ZMkh6oteNu4blWQTCqH32R+JykOQSJwJHb9AlZMt49GKljBcgy
-         5kgQc9pj7uTGSqN60A3M2VpP7CJsUH4N5r1TuHN0R2KDy5mC23gAWIzkHg+2C7HpPGbl
-         Ei2eqaznzgYMGG5B9fXLf5srIPoENLvio3e7y8rILDgzMvMRoKgRn5Wmf+Mu9OsMgCgL
-         HoHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792779674; x=1793384474;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=JPXYTcb2GVIpXeWLwsxVi5QbrL0t2UUrrpmBeD3Y8TQ=;
-        b=Vvvi3gLvwNukCx+OXfwvT3+2caTs7lb5UbdeGWIQVVYZi0LI8mRvM5hie8NI+eeeO4
-         d9gXFIxn7LCsodSfRZy8y9GRB1sQLXGlNpsTRWn0bvwnbL1IqC3TWCQqkcm1+wuimw8p
-         rwZhuFHQMzCHH+EDSNpWLI+AQ6iORAE7uB7Hy6KJ5ox9MT+80iAstCksVW6HkjMEhi6h
-         rTZxtEPkbyEqbaPJKmwNU0JPFp+oDVnihu3o/0842aLEwQ+auxre6h+G0djWKvv//J7G
-         pR3IZyOdOEW8sFlaaxqVtSBP6NJcb5gKVqiV7IAj7ThpC2KupQKo7QGpKmyYlHAhR+Tv
-         KTAQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzGOfpX75jX0+xPRUbx3huhkxe2z4HTtp6fg+WgaA4rTo59VE3+m1D9MttxJGYL3lyHaJO/WCEv8pXkQg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIcasv/fWBqY2ir04bA7Gwq/50BLiGXzeMV05ztxkh5wRiOLqKN
-	nHA/7wkNppAdymcXpiny26PEgxf+XZklT3rcfBia+A7TJ8N8PHLhfy1Dsc332PTVl065t40zIa3
-	ZC/BuwlMqIdHWMOU6dvU2Lkab5wlXuvKuRdD4CR/bVw==
-X-Gm-Gg: AYBFou2ZUIf2OdCWk61INLBLfH8MaX9/kJbux7yqwLeE8Grmwj241PVWtj3HzKYK9bj
-	v+w2FuyqGdjMJNP7A7UUyowok4OQT72lrdEFJei5m0+pohL49isr0oE9VJwN7PiyF9Qbub52SP1
-	FapUi0GLKmoStRp+SzwM9aFtPjQaBtxq/D0ra/n7uaWSn1K1dXe1OTK2lkl+ro/TLwGZVaMyvuf
-	a6gnnS2h+sr4LYfhVTE0zi0o1VhkT5Nkea+2MbFK2VLPVvdIeh41eZ4xx+FA368LAx2wKf+gAMw
-	kNG/+3uZOz+vYEe7ca1ZwmnXCBkYj0EqmSbzAlF1GxbSW8OTuFkJQV5QNRnNVf8ROCRVq3fkBd0
-	XvqpaN10SIJvZPUQyzhfOuB4m5ntkjylCEsQ1MJhi52XIkn5lPzKS7wfks7u+dq1MxDa4Wg==
-X-Received: by 2002:a17:906:560d:b0:c25:2ded:ad36 with SMTP id
- a640c23a62f3a-c46a8e5e8famr381988966b.0.1792779674049; Fri, 23 Oct 2026
- 11:21:14 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=laveeshbansal.com header.i=laveeshb@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=jiskkh0d
+ARC-Seal: i=1; a=rsa-sha256; t=1792786645; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=k7aSQBvgJ8ZVAYOnICPIJAg/N96u5IlLhXREFlAcmVbx69nuA+EzqNkUrDrbL92I2ySNN8YgiH9Dk4CEXfRx7X1HWC4JQbAbTdc5Oi9gmrRPXF1QR/9TPjFgd4ZuB02OJZmHcFEfYrC1WhklNJIMvnuUprnHDZHJynu/szr+CTI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1792786645; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=uRYww9vPDB7eBeDr4GhK1+jQ+LPs4+QyokdqRCG88Z0=; 
+	b=fz3K8/ZaPx9jHM+x++cFSxYOy0IVEF5BWDHJwY92/jYLLb1FGcVw4Pxle7hqYG0rgWXZ4ouM0e3sRR0HziOdTshaIpYM3r49BcDF60suJnxkxFKbCGwmSrJ8eN+2aPU2IC54I+yBo4wEDrcnwJradtAmu++8r2HbnjokiNtJLMg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=laveeshbansal.com;
+	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
+	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1792786645;
+	s=zoho; d=laveeshbansal.com; i=laveeshb@laveeshbansal.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=uRYww9vPDB7eBeDr4GhK1+jQ+LPs4+QyokdqRCG88Z0=;
+	b=jiskkh0dp5GCXVCsEtfSUqr4JR5MimceZfeP8H7bLLKPRYh0A8kDNusardOxdlfq
+	ZunZ7b+78+YUqF69FdgPcRTLFwWaD3TyMzDcGZ6chW1Ifq3tVtlN5WX+o3tf7ptKr7e
+	EbmK/xUbi1oA+sHJM2jJVRGSNZPVu1CSi7BSTgBQ=
+Received: by smtp.zohomail.com with SMTPS id 1792786642053928.007163592512;
+	Fri, 23 Oct 2026 13:17:22 -0700 (PDT)
+From: Laveesh Bansal <laveeshb@laveeshbansal.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Yu Kuai <yukuai@fygo.io>,
+	Reindl Harald <h.reindl@thelounge.net>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: only serialize elevator switches of the same queue
+Date: Fri, 23 Oct 2026 13:17:04 -0700
+Message-ID: <20261023201704.20577-1-laveeshb@laveeshbansal.com>
+X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,199 +76,144 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20260910081114.1605746-1-jinpu.wang@ionos.com> <e2c36f31-d198-40a7-a18d-156e1fd6fbb2@fygo.io>
-In-Reply-To: <e2c36f31-d198-40a7-a18d-156e1fd6fbb2@fygo.io>
-From: Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date: Fri, 23 Oct 2026 20:21:00 +0200
-X-Gm-Features: AclHuK95vt0fwIpK5hKjjmZvyy0BYIwu-sPwB35kyz_hWeMoZZCxGN2pFtQZ1y8
-Message-ID: <CAMGffE=LF4o0to7teb_k1i7H1FhhvfEs5ntDG8JfumS0fWPQRw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] md: don't wait for q->limits_lock while md holds
- back I/O
-To: yukuai@fygo.io
-Cc: Song Liu <song@kernel.org>, linux-raid@vger.kernel.org, 
-	Nilay Shroff <nilay@linux.ibm.com>, abd.masalkhi@gmail.com, linux-block@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>, 
-	Ming Lei <tom.leiming@gmail.com>, Xiao Ni <xiao@kernel.org>, 
-	Li Nan <magiclinan@didiglobal.com>, Mike Snitzer <snitzer@kernel.org>, 
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-Hi Kuai,
+Since commit 4ff58d6bc9dd ("block: serialize elevator changes for the
+same queue using a writer lock"), a write to queue/scheduler fails with
+-EBUSY whenever something else holds set->update_nr_hwq_lock. That
+commit takes the lock for write, and it has to be a trylock because of
+commit ce8ee8583ed8 ("block: use trylock to avoid lockdep circular
+dependency in sysfs").
 
-On Tue, Oct 20, 2026 at 8:57=E2=80=AFAM yu kuai <yukuai@fygo.io> wrote:
->
-> Hi,
->
-> =E5=9C=A8 2026/9/10 16:11, Jack Wang =E5=86=99=E9=81=93:
-> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
-> >
-> > Writing to a queue limits attribute of an md array while a spare is
-> > being re-added deadlocks the array.  I reported this earlier here:
-> >
-> >    https://lore.kernel.org/linux-raid/CAMGffE=3DheGA3y8FjQ0Sm1jj-kd-=3D=
-H9Y54WozKASSEZhc9UNKjA@mail.gmail.com/
-> >
-> > Four tasks, one array:
-> >
-> >    udev-worker    queue_attr_store() holds q->limits_lock, waits in
-> >                   blk_mq_freeze_queue() for q_usage_counter to drain
->
-> Sorry for the delay, usually blk_mq_freeze_queue() is useless for bio-bas=
-ed
-> disks, because it can't guarantee inflight BIOs to drain. So this looks l=
-ike
-> a long term problem since queue_attr_store() can still update limits whil=
-e
-> there can still be bios inflight.
->
-> >    fio            holds a q_usage_counter reference, parked in
-> >                   md_handle_request()'s is_suspended() loop
-> >    mdadm          suspended the array, waits for reconfig_mutex
-> >    md_start_sync  holds reconfig_mutex, waits for q->limits_lock
->
-> And this deadlock looks related to blk_mq_freeze_queue() concurrent with
-> mddev_suspend(), hence there can be bio blocked between. So I think there
-> can be a simpler solution for this deadlock.
->
-> 1) either remove the blk_mq_freeze_queue() from limits update for mdraid,=
- or
-> 2) also add blk_mq_freeze_queue() to mddev_suspend().
->
-> If this is a mdraid specific problem, I'll suggest 2). If there are other
-> bio-based drivers have the same problem, we might what to replace
-> blk_mq_freeze_queue() with driver's bio suspend to fix that limits can
-> update with inflight bios as well.
-Thanks for the suggestion, will look into it back from vacation. Yes,
-it's a MDraid specific problem.
->
-> >
-> > The last leg is mddev_stack_new_rdev() from ->hot_add_disk().  Since
-> > commit c99f66e4084a ("block: fix queue freeze vs limits lock order in
-> > sysfs store methods") the sysfs store holds q->limits_lock across the
-> > freeze, so md must not block on that lock while it is holding back the
-> > I/O the freeze waits for.  That is the same hazard mddev_suspend()
-> > already documents for reconfig_mutex.
-> >
-> > v1 kept q->limits_lock outermost where it could and used a trylock
-> > everywhere else.  Christoph asked for the lock ordering to be fixed
-> > instead, so v2 drops the trylock and the block patch that added it.
-> >
-> > The rule v2 applies is that q->limits_lock nests outside reconfig_mutex
-> > and the suspend everywhere, with no exceptions to paper over.  The two
-> > callers that cannot own an update do not need one: check_sb_changes()
-> > and md_check_recovery() only ever re-add a device that is already a
-> > member, so its limits are stacked and the update is a refresh, and they
-> > now take the no-stack path unconditionally.  mddev_update_io_opt() is
-> > not an add and does need the update, so patch 4 defers it to a work
-> > item that takes the lock with nothing held.
-> >
-> > Making the hoists unconditional exposed a second cycle that the trylock
-> > had been hiding, which Nilay hit with lockdep on v1:
-> >
-> >    q->limits_lock -> reconfig_mutex        added by this series
-> >    reconfig_mutex -> disk->open_mutex      pre-existing, md opens legs
-> >                                            under reconfig_mutex
-> >    disk->open_mutex -> q->limits_lock      pre-existing, sd_open() ->
-> >                                            sd_revalidate_disk()
-> >
-> > Only the middle edge can go, so legs are now opened before any md lock
-> > is taken.  Patch 7 does the opens and patch 8 the holder links, which
-> > take disk->open_mutex too and were easy to miss because the release
-> > side only takes blk_holder_mutex.  Opening without reconfig_mutex means
-> > the superblock format fields have to be snapshotted and rechecked once
-> > the array is locked.
-> >
-> > Patches 1, 3 and 6 are plumbing with no functional change.
-> >
-> > Two callers still take q->limits_lock inside reconfig_mutex, both with
-> > the array suspended, and patch 5 says why: ->start_reshape() from
-> > action_store(), which suspends before flushing sync_work, and
-> > raid*_run() -> queue_limits_set() from level_store(), which already
-> > hangs on its own because it freezes the queue while suspended.  Both
-> > need more restructuring than belongs here.
-> >
-> > The patches are based on v7.3-rc2.
-> >
-> > v1: https://lore.kernel.org/linux-raid/20260909063029.GC29874@lst.de/T/=
-#t
-> >
-> > Changes since v1:
-> >   - Drop the trylock and the block patch adding
-> >     queue_limits_start_update_trylock(), per Christoph.
-> >   - check_sb_changes() and md_check_recovery() take the no-stack path
-> >     unconditionally instead of trying the lock first.
-> >   - Defer the io_opt update to a work item rather than skipping it on a
-> >     contended pass (patch 4, was "md: don't wait for q->limits_lock in
-> >     mddev_update_io_opt()").
-> >   - New patches 6-8 to close the reconfig_mutex -> disk->open_mutex
-> >     edge that lockdep reported on v1: pass a queue_limits through
-> >     ->run(), open new legs before locking the array, and link their
-> >     holders there too.
-> >   - Rebased on v7.3-rc2.
-> >
-> > Testing, on v7.3-rc2 with lockdep (PROVE_LOCKING, DEBUG_LOCK_ALLOC):
-> >
-> >   - the reproducer below, 20 fail/remove/add cycles with fio in flight
-> >     and a loop writing queue/max_sectors_kb, where the same test wedges
-> >     the array before the series
-> >   - array start at raid0, raid1, raid5, raid10 and linear, spare add,
-> >     fail and remove, the rdev sysfs stores, ADD_NEW_DISK, array_state
-> >     transitions, a level change and a raid5 3 -> 4 reshape to
-> >     completion, which is what exercises patch 4's work item: io_opt
-> >     goes from 1048576 to 1572864 once end_reshape() runs
-> >   - HOT_ADD_DISK of an undersized leg, so bind_rdev_to_array() fails
-> >     and patch 8's release path runs
-> >
-> > No lockdep reports, and debug_locks stayed 1 throughout.  Every patch
-> > builds on its own.
-> >
-> > A blktests case covering this deadlock will be sent separately.
-> >
-> > The reproducer, for anyone who wants it:
-> >
-> >    mdadm -C /dev/md111 --force -e 1.2 --assume-clean -l 1 \
-> >          --bitmap=3Dinternal -n 2 /dev/ram0 /dev/ram1
-> >
-> >    fio --direct=3D1 --rw=3Drandrw --ioengine=3Dlibaio --iodepth=3D32 --=
-numjobs=3D4 \
-> >        --time_based=3D1 --runtime=3D180 --filename=3D/dev/md111 --name=
-=3Drepro &
-> >
-> >    while :; do
-> >        echo 128 > /sys/block/md111/queue/max_sectors_kb 2>/dev/null
-> >    done &
-> >
-> >    for i in $(seq 20); do
-> >        mdadm /dev/md111 --fail /dev/ram0
-> >        mdadm /dev/md111 --remove /dev/ram0
-> >        mdadm /dev/md111 --add /dev/ram0
-> >        mdadm --wait /dev/md111
-> >    done
-> >
-> > Jack Wang (8):
-> >    md: pass a queue_limits down to ->hot_add_disk()
-> >    md: don't wait for q->limits_lock in check_sb_changes()
-> >    md: pass a queue_limits through the rdev sysfs stores
-> >    md: defer the io_opt update out of the sync thread
-> >    md: take q->limits_lock before locking and suspending the array
-> >    md: pass a queue_limits through ->run()
-> >    md: open new legs before locking the array
-> >    md: link a new leg's holder before locking the array
-> >
-> >   drivers/md/dm-raid.c       |   4 +-
-> >   drivers/md/md-autodetect.c |  38 ++-
-> >   drivers/md/md-linear.c     |  30 +-
-> >   drivers/md/md.c            | 661 +++++++++++++++++++++++++++++-------=
--
-> >   drivers/md/md.h            |  56 +++-
-> >   drivers/md/raid0.c         |  16 +-
-> >   drivers/md/raid1.c         |  26 +-
-> >   drivers/md/raid10.c        |  37 ++-
-> >   drivers/md/raid5.c         |  54 ++-
-> >   9 files changed, 741 insertions(+), 181 deletions(-)
-> >
-> --
-> Thanks,
-> Kuai
+The lock covers the whole tag set, so it is easy to hit. A scheduler
+write fails while another queue of the set is switching, or while a
+sibling disk of the same SCSI host or NVMe controller is added or
+removed. That is what breaks the udev rules that set the scheduler on
+7.2.
+
+Go back to taking the lock for read. The write lock was there to keep
+two switches of one queue from overlapping in elevator_change_done(),
+which touches the elevator sysfs and debugfs entries outside of
+q->elevator_lock, so use a new mutex for that instead. It is held across
+elevator_change(), and only the sysfs store takes it. The other callers
+of elevator_change() run before the queue is registered, after its sysfs
+files are gone, or with the lock held for write, so they cannot race
+with the store.
+
+nr_hw_queues updates, nr_requests writes and disk removal still take the
+lock for write, so a scheduler write can still get -EBUSY while one of
+those holds or waits for it, as before 4ff58d6bc9dd.
+
+Fixes: 4ff58d6bc9dd ("block: serialize elevator changes for the same queue using a writer lock")
+Cc: stable@vger.kernel.org # v7.2+
+Reported-by: Reindl Harald <h.reindl@thelounge.net>
+Closes: https://lore.kernel.org/r/077dd42e-cbc9-4c23-a5ef-3d20e4fc7757@thelounge.net
+Assisted-by: LLM
+Signed-off-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
+---
+
+Tested on arm64 and x86_64 in QEMU, with KASAN, lockdep and debug lists.
+
+Writes failing with -EBUSY, one number per run (writers x writes):
+
+                                       x86_64        arm64
+  one queue
+    v7.3, 4 x 400                      795, 756      807, 926
+    patched, 6 x 600                   0             0
+  one writer per namespace
+    v7.3, 4 x 400                      649, 597      704, 662
+    patched, 4 x 600                   0             0
+  one writer, sibling namespaces added and removed
+    v7.3, 1 x 400                      23, 32, 34    42, 43
+    patched, 1 x 400                   0, 2, 0       0
+
+With 4ff58d6bc9dd reverted from v7.3, six writers on one queue hit
+KASAN in elevator_change_done() on all three runs (arm64): a
+null-ptr-deref in blk_mq_debugfs_register_sched() and use-after-frees
+in kobject_add() and kobject_uevent_env(). With the patch the same test
+is clean. 20 disk removals under writers, block/005 and block/047 pass
+as well.
+
+A write to queue/scheduler now sleeps on the mutex with the read lock
+held, so a queued nr_hw_queues update or disk removal waits for the
+writes ahead of it.
+I did not reuse q->sysfs_lock because blk_unregister_queue() holds it
+while draining the sysfs files, and elevator_change_done() runs after
+q->elevator_lock is dropped, so that lock does not cover it.
+
+ block/blk-core.c       |  1 +
+ block/elevator.c       | 16 +++++++++-------
+ include/linux/blkdev.h |  6 ++++++
+ 3 files changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 196bccf27f58..655c18237967 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -473,6 +473,7 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
+ 	refcount_set(&q->refs, 1);
+ 	mutex_init(&q->debugfs_mutex);
+ 	mutex_init(&q->elevator_lock);
++	mutex_init(&q->elevator_store_lock);
+ 	mutex_init(&q->sysfs_lock);
+ 	mutex_init(&q->limits_lock);
+ 	mutex_init(&q->rq_qos_mutex);
+diff --git a/block/elevator.c b/block/elevator.c
+index 2161b6eea680..0a8fcb4bad06 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -812,16 +812,16 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+ 	 * reference during concurrent disk deletion:
+ 	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
+ 	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
+-	 *
+-	 * Use the writer lock instead of the reader lock of update_nr_hwq_lock
+-	 * to serialize the two-stage elevator switch steps in
+-	 * elevator_change(): the core switch step under the elevator lock and
+-	 * the elevator_change_done() step outside the elevator lock.
+ 	 */
+-	if (!down_write_trylock(&set->update_nr_hwq_lock)) {
++	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
+ 		ret = -EBUSY;
+ 		goto out;
+ 	}
++
++	/* The reader lock is shared: serialize both stages of a switch here. */
++	ret = mutex_lock_killable(&q->elevator_store_lock);
++	if (ret)
++		goto out_unlock;
+ 	if (!blk_queue_no_elv_switch(q)) {
+ 		ret = elevator_change(q, &ctx);
+ 		if (!ret)
+@@ -829,7 +829,9 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+ 	} else {
+ 		ret = -ENOENT;
+ 	}
+-	up_write(&set->update_nr_hwq_lock);
++	mutex_unlock(&q->elevator_store_lock);
++out_unlock:
++	up_read(&set->update_nr_hwq_lock);
+ 
+ out:
+ 	if (ctx.type)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 4f7905c3412b..87fcf2921253 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -610,6 +610,12 @@ struct request_queue {
+ 	 */
+ 	struct mutex		elevator_lock;
+ 
++	/*
++	 * Serializes queue/scheduler writes. Lock order: update_nr_hwq_lock
++	 * (read), this lock, then the queue freeze.
++	 */
++	struct mutex		elevator_store_lock;
++
+ 	struct mutex		sysfs_lock;
+ 	/*
+ 	 * Protects queue limits and also sysfs attribute read_ahead_kb.
+-- 
+2.43.0
+
