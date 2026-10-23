@@ -1,91 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792756575;
-	b=I0uRcD2E4RBL5OyDSge5o0JFW9VK9V+JKq1g+30zPi5UvdBu42eJHTy7Be1N0T3LZ9Ku
-	 8ZfsH1H52TiAlTtzcJwtRsM2EEXlNUOZj+3eOlTLLkGeo01g191o0kTDOj5NNknSa8pUV
-	 lkRYMJg4jY6IYOnCEdi0sej2z1ATII4RNPgA4Uyiv/HzIpR1OZn3H9JE+oxqFslD7mYfT
-	 CrWFzhfz6timoKEZ58QxWgqjCZhM+luNLzNCwbRcDQUP7PeuoudgZdi/tet7ptfFVnOai
-	 RiVJ/E+/+5081NWFrSFUfbnm5MEpMWkcva+i0flEg2c7CLKSO6R0aAeU7o3+OfjOqmQ==
+	t=1792756581;
+	b=iIuGzmNvO7vKN2qJ1rNtg7dfq3Es3n3v+5TUz2CTjobQdvZyeCk3SbNGzf+1F2EmXkah
+	 oF82/pTZ9YTD40WcaH4ema9BySQuhexMBsf0INQrUN4vWdC76OylITYcH95FmmvCejKaP
+	 iaWY+EODLYxyWbSSJLaU8B/0VvgZPADKGKmn8z4+9DJ/Tqu/ElkLEi1xCN7V6YQP50D/k
+	 4qjV+BdSnqaQgICJ16G34pgGI7yzIICWUIo+qLoYrdQdEVQYGTWOFrVPKMICCupkP03BT
+	 4LmeIkG5YUbRdKD6WMtlKexuI9a6LTDKpNJDj3V/+J8boZMKqvJoCIv6sRpC2W4l3Qg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792756575;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792756581;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=PGbGz4TbxsRm4CnuNTXPVX7exvrpALjGesuQgwBDcN8=;
-	b=WSgG3nWn1hceuh8c011LRvBpN8+Sck6Ogmq9JccXg+H2+VJdNdfV9M4hGbOpPY8ITR3o
-	 qdL2SXYBCZgh2ySMr8fmLZlkv0fXGxP7RW4OreSuHRwvGdACBvXZpgPASGX6jHPGAuBqY
-	 wjCfoQTfXxl3B41qbk2ciYNsQ0gyvI8L2e4Wyz68ja7UXQEZrSkpxurs7uIdgzWWu86Rn
-	 JAMOEFg06G/Mr64fAIRUik1iAjwzSfAcD49wi18Qv4VjexSpiKbYtNGIjUOD5uifUl4oJ
-	 yKO2vY1U0jfUX3MbkyXFKoiROrKNGkEwTNVwAedfkx9Tc/i0yL7hQ5swgtt73fodF6Q==
+	bh=5dCvo6bsmgCaQ8DMa8VWGE76Rg99fDHT/+IeuLzD3dU=;
+	b=S8W5znlzUlCiPLty8Zmu32zfBpixD4vxBQAq08K62O7RsfSHhFfSqyyqXjNqtJywT+Wx
+	 J5zj6t+jA7qe9WyCdNZEaqubZGaLBY8P2SB8WMZs2rnqtaeFsfI/qQBPQuq8WYXoh+Ali
+	 1cGgkH69OJ8Eo/bh5Ee1NXSR/xxAoIBTeMMUGvgOhCuZVPS7OYMLAs6MES+ARm/0nVElH
+	 ZHNbv+6VoEdLKa71IzjxVZQ/OLkgljcDEahvvybzUHkMNImW0OivQ2IgMpv/Yw5xBNMWV
+	 Tb+ZNlcgMdZrdBvL1GIB3vQGPKQhAfGZKPWQanQBnL6OB8+TfWTYQyCnCmd8VXE/9Nw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=E1XrwkZe;
-	arc=none smtp.remote-ip=209.85.216.48
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=s+adkAZn;
+	arc=none smtp.remote-ip=209.85.210.175
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B33606A31B
-	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 11:56:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 67B33606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44A3606A31A
+	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 11:56:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B44A3606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=E1XrwkZe
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3ab752f6244so665903a91.2
-        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 04:56:15 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=s+adkAZn
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8a064dcfcfdso295171b3a.2
+        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 04:56:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792756575; x=1793361375; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792756580; x=1793361380; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=PGbGz4TbxsRm4CnuNTXPVX7exvrpALjGesuQgwBDcN8=;
-        b=E1XrwkZeEo2dGC3AqBV58myzoL3Owtm4ZJ406k5WI59hOjxLeRup5JVLQeYT4UVExo
-         h39YAWR49oAuDPKApIqQPhqV2wOIWwAU7nCguS+9e4OSUnYa+iLZbi+3Un/xdif0scsD
-         7SJCqA198dK0Pi030yh8b+VlFR573YKqGgsu4t7lBy5jb9clgu6N5CG0GAKycx14+ZPj
-         nMuHP0wKrfKyB6logd2crGETf3/gVRe8tMAo+Df6O7GD42+xpvFzgBlOWMZr4J3PwgDU
-         GKN3AfMClxtSRjna1JWBeIjBl86ig1ynWohKqQnG761wS9FdjjmbRqUco+KytL/bMJJl
-         zILg==
+        bh=5dCvo6bsmgCaQ8DMa8VWGE76Rg99fDHT/+IeuLzD3dU=;
+        b=s+adkAZnr3Kn/RfzSY3qYmRNyUA+d6aAnEkHDvskSdcJXybOUl2qWdYoWfXIe/mRqw
+         a2I3e04I28t18EGam2ykHEQ77LPPqltfwIrbBPbL+S22/YWcW2FvsOLK9O6robRcDIhU
+         KqfB1+RThj2NzvK3U5/zZJJ4m4dFYwNmIM+YY5nGAy5wDPyQr7TgfFo3vPZ+nL/B5bvQ
+         4D+yM3u2B0Baiv67oUg8R1eZcV7Qv659c0Bb75v0F6TT3yJ8Ywzwp928vOcENIpOZD/O
+         4vVMO6vosD7KIzYUHnMA2vvfCDDHXAM1pZaaiC4UHsxPihzj7tV3OCHGY3lQkfJ/TCpG
+         DOmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792756575; x=1793361375;
+        d=1e100.net; s=20260707; t=1792756580; x=1793361380;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=PGbGz4TbxsRm4CnuNTXPVX7exvrpALjGesuQgwBDcN8=;
-        b=jk7CXvCXaZhWmPGZcJMPGzOCYpGme3m9qs9vCTgExjfVyEbW77DhFunU/6DQDVa9Jv
-         KaEVjL3Pa8cjylC6M56Hds6jSKXatZIQCcYb+JmvBf4VAE3DrW/UWxJgTVG5kUaEm7tW
-         LVKefWo8Oc+HGPNJyiW5AWBlaxU+jtLaOxEGpJDhgBOLIZGZJGwW85r3S7wJ9XsgT6lt
-         R5YlwlW92WzfDi7ynq/Rj6zO6HQNhJNb/FMRPyy4IjxuYAEswh/YjH09Gb2YRb3OaVRg
-         lZXsbsguaKdSXuTMvwFPOfa0EZSZFxyDRyGEuwRDbxy0PuMGF8xY1mOTBDjH9eGd3OG3
-         YnEA==
-X-Forwarded-Encrypted: i=1; AKwUvBya/Bur4m21LenZYrOSRc169YQU9yERsxfnIWLmJ1G8dpSATy//n1IJS2j+pbfkRDtyNDq3sr7IuFQAOQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIBQ/5N5j5xxf2ui3Xs9PVakKvE8k9r0J5eB9ZAJ6UyRZQH4kOu
-	vcjcNz4B9g6SJuPwAsTVhpGsfI7ztO8+oPczXMbMtvgwYPe/ETTVmK12
-X-Gm-Gg: AYBFou0oxEqW2v13cGGKFsPEGve/PqHAvnwK5GFe+1mqe2GSD6gSXFGlVxuKHA3evuj
-	8KilqBZ0DYvbeTzpGzkPuRZCg6D/5A2xsXdZED6EUEC85WJ2nT6UtBNXps6OoqaHbpmxQjuLsP5
-	00PQPPih39U1v7n/OIxmMMgtAMILJwfhCuO+L928QLLaj4JTJotKvbPnFMAZdmI7fIGU1EOD2Sd
-	NqQVnCPg7pkigWn8r/jP9Y6eQu4U4rI5VEeipHaW+ea1bY0uMQSADmIp9+velNBK7OTcZhxCoXH
-	1wyi6xzLkTaG6nI+D896cSHMn+SOmpUyyOKAurpGgubQn4yYPk5hfTeGWyUVDjr6eWuQguItoTD
-	vnT4iOnWlL8ZmjJijkNtU6/jBFjcBXai3Dv2pfrO9UuDoS23p5ON6WHO+YQP77ftlAYHDLL7AHM
-	kiobd6rbBtufEsMrENPv3sxbSlktgViCFxLsp/EOmR32NEX+Gl5eblOdluaX4Q7EkM7IwCiWL3e
-	3/hUUNA2cQW4d0Y9nS0uvXYSwtiPuD7orC2eNa9gpJGY6EiFZOFYRD7
-X-Received: by 2002:a17:90b:518d:b0:3ac:a139:1b14 with SMTP id 98e67ed59e1d1-3adce150aa0mr1524440a91.57.1792756574675;
-        Fri, 23 Oct 2026 04:56:14 -0700 (PDT)
+        bh=5dCvo6bsmgCaQ8DMa8VWGE76Rg99fDHT/+IeuLzD3dU=;
+        b=phnaytmHF7Qpw6iiEWv+t1Aits53e9oEP4BxIDOtEn4mBGlyvzycvb8Vh5juDvy/rV
+         mx78X+wrqAeveMhzUR8+2W/0cx3d5zIr36g87bn8kXgxkdPGHBKUgpk86kLxeUALbPrb
+         ZobWC0QF+iS7vnStzTE5QBNfQw7F+U4RRZ6AGGBAAagdfCajQZRjYIW6YvSLCx5R67P+
+         ixhzDh4t+v71zOKowGZ0uT9zNYCvVYsCbRb0rjSxL2dvHKWuyq3OzILDMRCmIG489+md
+         EYtmv9pDUusIoyGWg+/2wddyTAAc8oGEZuTJMZGCpKHNsggXRmOACoviPLfH21ODyv0I
+         UmHg==
+X-Forwarded-Encrypted: i=1; AKwUvBz8YLa9Ll/A0Ntp1zfISTDvlDrOqxU2EadzK/FtcQgt3APcnlshAiqaxOYQxhJxAHmYOLamWNs52rSxvA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYI9u81C7XF0MRzKxEIbVFgt9RAiG1782h9dk5zf77UqgxjBlGMx
+	GrYKlGxsY0YDkTTJFONjLbRG6agisXxT5/HcuFatFRjpD6G4mY8r/07qB8FWUoec
+X-Gm-Gg: AYBFou1ZQKQKC8A8CwdtSrRr35pBDV65AMwYFmmwkhZMnE1VeIHmyYMJ75BRxL+27NQ
+	USf3r4L1KDedPqBz0yoksKUTmNQSjf3ciLBPgLBb2KXlV3iHFN707/fnEoHemQ68gDG0F3k1pwZ
+	ShLsjTA5UYHojkSm9iHIWo016Vki9FH14NovHhEyIdgUGWIMgk0aUwSkopwqfAW54+b8zqd92qU
+	6so019DZsjyRK9jQE4YjG1kpw1yPQlR7ekX88mnqyIaQYbF+Ipr0gHZf3f5lwIar2AHWDyxyunk
+	dXzJ5p7xT8teqKltGwuE/E4jsyauGVS+3PtMl8lCMXw8IzBOfI0zUvxAz1CfcWVW6CFrXAHJJnL
+	jDKmuT2nWnfbgQZ72lvXut3Pj5dU0OI1ONBTRKxYrMapSTGmjKg/cvVM0xfXHyWcDS84ET9GMch
+	ZPzsGrrzcw4gm6GDJbrpTDqaQNgTrJTkw6thMpSpgHiK7r/6MDBVxEPD1KAkU8W3Jtoj+zxJ33I
+	+GodCDNnkMvSZnnyhFa9mH115kPcQ4KeNS2b/mY76y93fJ1he8gKA4=
+X-Received: by 2002:a05:6a00:3496:b0:89f:d254:7c74 with SMTP id d2e1a72fcca58-8a2c626f0e5mr1846740b3a.9.1792756579962;
+        Fri, 23 Oct 2026 04:56:19 -0700 (PDT)
 Received: from thangnn-ASUS.. ([2a09:bac1:7ae0:50::498:6a])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3addd73c20csm11163a91.17.2026.10.23.04.56.12
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8a2d2948e11sm604419b3a.31.2026.10.23.04.56.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Oct 2026 04:56:14 -0700 (PDT)
+        Fri, 23 Oct 2026 04:56:19 -0700 (PDT)
 From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-Subject: Re: [PATCH v3] block: annotate lockless task ioprio accesses
-Date: Fri, 23 Oct 2026 18:56:09 +0700
-Message-ID: <20261023115609.12244-1-ngocthang2710.1999@gmail.com>
+	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>,
+	syzbot+feeb9b5352b9ff89618a@syzkaller.appspotmail.com
+Subject: [PATCH v4] block: use READ_ONCE() to access the task io_context ioprio
+Date: Fri, 23 Oct 2026 18:56:15 +0700
+Message-ID: <20261023115615.12260-1-ngocthang2710.1999@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261020125233.9820-1-ngocthang2710.1999@gmail.com>
 References: <20261020125233.9820-1-ngocthang2710.1999@gmail.com>
@@ -100,34 +101,99 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Damien,
+__get_task_ioprio() reads task->io_context and ioc->ioprio without
+task_lock() when called on current, e.g. from init_sync_kiocb() on every
+write.  set_task_ioprio() can update both for another task at any time,
+including the first publication of a new io_context.  KCSAN reports it:
 
-Title: agreed, I'll change it (v4 below).
+  BUG: KCSAN: data-race in __kernel_write_iter / set_task_ioprio
+  value changed: 0x0000000000000000 -> 0xffff888109813730
 
-On the pairing: a release store pairs with any load that is ordered after
-the pointer load, and here the ordering comes from the address dependency,
-not from an acquire.  The only thing the reader does with the loaded
-pointer is dereference it (ioc->ioprio), and the kernel memory model orders
-a dependent load after the READ_ONCE() that produced its address.  This is
-the same pairing as rcu_assign_pointer()/rcu_dereference() (see "ADDRESS
-DEPENDENCY" in Documentation/memory-barriers.txt); READ_ONCE() also carries
-the extra barrier Alpha needs (arch/alpha/include/asm/rwonce.h).
-smp_load_acquire() would only be needed if the reader looked at data not
-dependent on the pointer, and would add a barrier on arm64/powerpc for
-nothing.
+A stale or torn value is harmless, a task simply gets the old or new
+priority, but the compiler may tear or refetch the accesses.
 
-Why not plain WRITE_ONCE(): it would silence KCSAN, but it does not order
-the initialization of the new io_context (alloc_io_context() runs before
-task_lock(), and spin_lock() is only an acquire, so those stores may be
-reordered after the pointer store on weakly ordered CPUs). A reader could
-then see the pointer without seeing the initialized ioc. The release is
-what makes the publication safe.
+The io_context itself needs no extra protection: only the owning task
+drops it, in exit_io_context(), so it cannot be freed under a lockless
+reader running as current.
 
-If you'd rather keep this minimal, I can drop the release and use
-WRITE_ONCE(), but I think the release is the correct thing to have.
+Read the pointer and ->ioprio with READ_ONCE() and write ->ioprio with
+WRITE_ONCE().  Publish a new io_context with smp_store_release() so that
+its initialization is visible before the pointer.  The reader only
+dereferences the pointer it loaded, so the address dependency of
+READ_ONCE() is enough to pair with the release, as with
+rcu_assign_pointer() and rcu_dereference(); an acquire is not needed.
 
-v4 follows with the new title and a comment/commit-message paragraph
-explaining the above.
+Reported-by: syzbot+feeb9b5352b9ff89618a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=feeb9b5352b9ff89618a
+Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+---
+v4:
+- Retitle: "annotate" was too vague (Damien).
+- Explain in the commit message and in a comment why smp_store_release()
+  pairs with READ_ONCE() and not smp_load_acquire(): the reader only uses
+  the loaded pointer, so the address dependency orders the access, as in
+  rcu_assign_pointer()/rcu_dereference().  No code change.
 
-Thanks,
-Nguyen Ngoc Thang
+v3: https://lore.kernel.org/r/20261020125233.9820-1-ngocthang2710.1999@gmail.com
+
+Tested with a KCSAN kernel in QEMU: 26 data-race reports per run before, 0
+in two runs after (v1 code, later versions differ only in comments).
+ block/blk-ioc.c        |  9 +++++++--
+ include/linux/ioprio.h | 11 +++++++++--
+ 2 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index d15918d7fabb..fac62f2858ec 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -277,9 +277,14 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
+ 		if (task->io_context)
+ 			kmem_cache_free(iocontext_cachep, ioc);
+ 		else
+-			task->io_context = ioc;
++			/*
++			 * Make the ioc initialization visible before the
++			 * pointer.  Readers use READ_ONCE(), whose address
++			 * dependency is enough, like rcu_dereference().
++			 */
++			smp_store_release(&task->io_context, ioc);
+ 	}
+-	task->io_context->ioprio = ioprio;
++	WRITE_ONCE(task->io_context->ioprio, ioprio);
+ out:
+ 	task_unlock(task);
+ 	return 0;
+diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+index 5210e8371238..be999cbe7c91 100644
+--- a/include/linux/ioprio.h
++++ b/include/linux/ioprio.h
+@@ -56,9 +56,16 @@ static inline int task_nice_ioclass(struct task_struct *task)
+  */
+ static inline int __get_task_ioprio(struct task_struct *p)
+ {
+-	struct io_context *ioc = p->io_context;
++	struct io_context *ioc;
+ 	int prio;
+ 
++	/*
++	 * Only the current task itself drops its io_context, in
++	 * exit_io_context(), so a non-NULL ioc is always valid.  However,
++	 * another task may change ->io_context or ioc->ioprio, so make sure
++	 * to get the latest value with READ_ONCE().
++	 */
++	ioc = READ_ONCE(p->io_context);
+ 	if (!ioc)
+ 		return IOPRIO_PRIO_VALUE(task_nice_ioclass(p),
+ 					 task_nice_ioprio(p));
+@@ -66,7 +73,7 @@ static inline int __get_task_ioprio(struct task_struct *p)
+ 	if (p != current)
+ 		lockdep_assert_held(&p->alloc_lock);
+ 
+-	prio = ioc->ioprio;
++	prio = READ_ONCE(ioc->ioprio);
+ 	if (IOPRIO_PRIO_CLASS(prio) == IOPRIO_CLASS_NONE)
+ 		prio = IOPRIO_PRIO_VALUE(task_nice_ioclass(p),
+ 					 task_nice_ioprio(p));
+-- 
+2.43.0
+
