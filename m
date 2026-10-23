@@ -1,75 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792746868;
-	b=WLNvc3HUClKvqxKxkQ4NuQUIt9U3+Y+INncoriRD01uvpDEWHupDgO7ooS+Y53Gp6DmZ
-	 A1Jzoy8ccLEMy7sqVqG9eQneZoj1Jl/ee774NQaSKSJNR8+N7sblTdYLSydzUC0I5ufmE
-	 vjq53OMpblqaBmmtSrzCaz9PM3HLaXr/SU+50dHcwjIM4mhA8u1iCl+0Zg6zvnajQ6If3
-	 0PxC5A0Z2nSFCTsg/KRZvoU/MK0zZGmxdrbSpBC36caYKKEQZNc8jgIGzl9tIuOi1AQln
-	 Kr/qXqYr3qZ7BMn77UF8blrHJ8aNfCdhvtCr+0oGhxaOf1kScAIUkRJcRhefeJCp4MQ==
+	t=1792747580;
+	b=38KhmhBwOmnAefmfLj0pfS6Jt3sWHQIKs2hLKpKX5Xaq5JU43nGrig82v4mogCdv63J4
+	 u0tlYBU97Ah7wVBv5pXMMRcOXYvoAwmxqLTGYDNNQm+oDwesAF5S6HaKGthcWhncAnxxF
+	 dr0iWbZARALjDpU1/4UoTHyrOnJaows1Z2aZFP0b4P+rKMOao5xugoPlejJyGHzEWcly8
+	 9MInSXk1afEBosM7M2J+YGZyl0Fk+nDNq8vaUOGL1ZNsA+9TrtZTandg5I7OpOcf/neGk
+	 j2fQmb6oV6xj2t8BKUoUAuVH3CEtev+tT0ODJGpxb3iI+L7X366CYdDFmJeRZL2P4Yw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792746868;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
-	 Received:Received:Date:From:To:Cc:Subject:Message-ID:MIME-Version:
-	 In-Reply-To:X-CMS-MailID:X-Msg-Generator:Content-Type:
-	 X-Sendblock-Type:CMS-TYPE:cpgsPolicy:X-CFilter-Loop:X-CMS-RootMailID:
-	 References;
-	bh=KxRBaCl6SIR11QatilRX983Sq8/llllRV78Ep6I15c8=;
-	b=sBBYrCHjRx3uQq10fdIkrBF1GYo8dwj5Wsi5Avd5FvGuV5gp9xDso80dzUHY/Qp8Xo8d
-	 EYinvWWe0uM6byvNy5HZ3OH2pcboHB6ChppwtHhOyYG6RLVkPHcFYnSpKQrXVL+/g7wt7
-	 85R+NzDE+I3yNwH5FSUu/MPLJ+Gw2hTe/hO+sRUT/A/ws+0zzInywCSut71dOe9zBYMdM
-	 ID+Cqg+L7gxFBq+8Bol2E1E0CxKTZaYWwJ/+CeIFul18jSeTdBfJLy+AJM4yup25LX8Y5
-	 WD90V9ZBvVu77zVHAgsjf21aMgJiv1kZHMrk1NYvI3op+pkA+rcfYzzRNiOCsjbI6wQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792747580;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=kS1Z5LCsa+qRBaBJIS5asNgQIOLlArqrMwVB7Pu9irg=;
+	b=R0OYUQ1Te/iYv1JZPkg+hJ0ZvMvoOYPQO9wZKB6rjA2f6puhvcm5jTpLK451AntsbaYy
+	 Mimhl8K3iKpbzO2xvBvSTkE4TVYmSSJuBvycbRtUrte38fvbkNPKArmReqA/hymd5+ExZ
+	 DyACJVVSoZhjn0w7PrvJIH9VToZcDj95ZFpMtWzaWmhJK3nTKqQi72l1O9q1gQX4q3N2l
+	 9tKi9CzaBRN/CA68hSmK4kXJ+tLglSFeAPBElJCU5XkvG8AECu4cdfw04KpkN+bC5bFsv
+	 vqeGe9UiFhLEJanAS+GOwnI3G7eYSzFTd7AD1iUtJpSuspJp7D/mvrvwfXeGTzJdvbg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=samsung.com;
-	spf=pass smtp.mailfrom=samsung.com;
-	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=NTww7lbG;
-	arc=none smtp.remote-ip=203.254.224.34
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=aye1zcez;
+	arc=none smtp.remote-ip=209.85.216.44
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D932606A31E
-	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 09:14:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9D932606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A95606A31D
+	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 09:26:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C5A95606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=NTww7lbG
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20261023091419epoutp04427a3eee31c925121dcf4eacdd8256b7~hHcU5vIL62064520645epoutp04N
-	for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 09:14:19 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20261023091419epoutp04427a3eee31c925121dcf4eacdd8256b7~hHcU5vIL62064520645epoutp04N
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1792746859;
-	bh=KxRBaCl6SIR11QatilRX983Sq8/llllRV78Ep6I15c8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NTww7lbG6DNGSbYdJpQKW/4oLc1S4ixnafP49IKas3mC9sCYy0mZ/RYQwM35xquxi
-	 3LlVeX720+DIt31tVagsJuQG/9lDc4C5+1vj2esuEppM3IMFRsLKmttZaLZL4iCkU/
-	 6CTfROQdjsSJVFnU33yGdRRmi+eM0haOrPov7MxI=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20261023091419epcas5p471c3db4981fae6ad5fd9f843c319a218~hHcUhYtpu2146721467epcas5p4l;
-	Fri, 23 Oct 2026 09:14:19 +0000 (GMT)
-Received: from epcas5p2.samsung.com (unknown [182.195.38.93]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4j9y561PQ1z2SSKX; Fri, 23 Oct
-	2026 09:14:18 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20261022130134epcas5p23704ea4f10cd9d90762b89c3c9fdf254~g25c8K_br1950919509epcas5p2j;
-	Thu, 22 Oct 2026 13:01:34 +0000 (GMT)
-Received: from green245.gost (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20261022130132epsmtip19a5b77749906115956858b506dddc7c3~g25bZmdxB1541915419epsmtip1I;
-	Thu, 22 Oct 2026 13:01:32 +0000 (GMT)
-Date: Thu, 22 Oct 2026 18:30:53 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Anuj Gupta <anuj1072538@gmail.com>, hch@lst.de, djwong@kernel.org,
-	cem@kernel.org, brauner@kernel.org, axboe@kernel.dk,
-	linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com, anuj20.g@samsung.com
-Subject: Re: [RFC 2/4] block: refuse a dma-buf bio for a disk the buffer was
- not registered on
-Message-ID: <20261022130053.vhphcch4swb5xxih@green245.gost>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=aye1zcez
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3ab41538192so514437a91.0
+        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2026 02:26:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792747579; x=1793352379; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=kS1Z5LCsa+qRBaBJIS5asNgQIOLlArqrMwVB7Pu9irg=;
+        b=aye1zceze7CiaTprYqf7PTybamY+omzp0KHLB4UaPBglrTNLqCqxTJ+nqcr1i2cFU+
+         xu7T6P7coPrPJFfOaHLTHQ8dii2XHZXhhDN3MhNpxmnvvB/wgUgbasZxAOH7P85ZOKlZ
+         zdYNxXW4v1vhvFPZxR1XNWeZIfddtjV4QRX8jn1QLHJWVc2TRwI9QWNxe2CLPfG+mDen
+         twpF2AiPqd069e2f5B+L/OwEaGrH3PilfWW7mKtBsAkRRRBbrV6Ph5nFMd6i2wDb2P9Q
+         aKOpdtqDsfjFvLQsccZrQfLT9VY5/1KrcNMyMEf1l1LlcI3zxcxyBXafm9B2WgMZzNXG
+         bJOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792747579; x=1793352379;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=kS1Z5LCsa+qRBaBJIS5asNgQIOLlArqrMwVB7Pu9irg=;
+        b=a2gA5wK6q1PLRVEPla0TIA4shMB+lJ8p4Jo9JfIyZz9qeBhdZr4s134Oj4q/QM/sTq
+         xrkFBfaQqzNQeORInT0v5kM/RPR3bhpXmeYJ4O4J+d8WLmvJd0JJQe3vi0qv8l6QB79I
+         dSLxNfMqpgYrfGv39vj0Syg2RuDRn7Ts3/x9x4sZz+dtOcy3n3v4jHilddGQyLXxi/5K
+         cXj5TIdbdPtC6/RqAhCxLC/En1ozwKyLNMdQ/c8WhWhn0CKnM7h/jFKEJn/auIgczFPZ
+         8Beoy2TULt8swFBS1Dw+HAlsznQNCSZth7X2h/HO/J8GepDKTq7rZQo7bANdUTY0R3en
+         3rlA==
+X-Gm-Message-State: AFq9FYJRkJliGHsH2FKGYMZfwkTqAe0eQjNmpYe1BdSxfe0vcLXUzmKL
+	NlK6PzKviil++2xvgvkXJ4g65zw8UdRhG1wzXvrnDYvATIDzCEy64xJ6aoernuA1p2c=
+X-Gm-Gg: AYBFou3UCAPNayVus4yAfK8dQin7XUkyefkL8zPGFCHtNjnat7KIQzVO71uAL1fyQnY
+	QSdSmhmVSGrlwot4FTb23p2jEnfOBopnWI4PwdaJVq8ljhzjBBm5JYH2XMud3kIpl4RNmULybaH
+	B6sUyjDSt66uPBhOj7Wtg3AfGav2UngvGTSeJ2cJPX143twTzZ0/UW4gDId6y2PCDQMiPTswMI+
+	xvGnIMexKO9UwUWfpmhRun0azI+xD1HV2Ytl+TxbJy73bsJW9SG2KlUC2L+QRd0QJ+lqdoyLrzo
+	/Jan+TyuWefKXoiGcB+tUvcTwlrQSl30jdMUp3/VIfJJT2zvK024t+6CjhUKJZCUFUfpnOzzL/j
+	tySqRKFLUHLC5B5p6RjPlo5J9oWYIAJ7bFHDblNVpsDrWHWB8byDrPjxjYEQ5XyPYmS12fgatfB
+	VCWCM7rPp3arbgbpqJ3G28l2oEM1aD+gqA88d3rCXfTbBMBegiVjELHRecwoKsQqsfJgvMhBEPQ
+	QGWCIIhfLN58Kb6ceeFKQFA8+xjon/2yXUiBTCQOC10Zp29ykPn9cne0Y8ihYss+jzf9Qw252vi
+	hQ+Gg7Jl+kmpdsW8C2Y=
+X-Received: by 2002:a17:90b:1844:b0:3a0:9c9d:eb18 with SMTP id 98e67ed59e1d1-3adce0a49d3mr1376081a91.54.1792747579117;
+        Fri, 23 Oct 2026 02:26:19 -0700 (PDT)
+Received: from 4ce604c9y2.bytedance.net ([61.213.176.58])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ada49366fdsm7975741a91.14.2026.10.23.02.26.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Oct 2026 02:26:18 -0700 (PDT)
+From: Jianan Huang <jnhuang95@gmail.com>
+To: linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Cc: linux-kernel@vger.kernel.org,
+	ming.lei@redhat.com,
+	Jianan Huang <jnhuang95@gmail.com>
+Subject: [PATCH] blk-mq: reset queue state on scheduler teardown
+Date: Fri, 23 Oct 2026 17:26:11 +0800
+Message-ID: <20261023092611.116795-1-jnhuang95@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -79,100 +94,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-In-Reply-To: <5f542a8d-c6c1-4c5d-b0c6-f761af2e126a@gmail.com>
-X-CMS-MailID: 20261022130134epcas5p23704ea4f10cd9d90762b89c3c9fdf254
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----VZDtnczHWjdXYXkjw.jkIJrU2UH2.1dU.Tnm2W3-fiUacbuL=_9f5cc_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20261022130134epcas5p23704ea4f10cd9d90762b89c3c9fdf254
-References: <20261016091919.971295-1-anuj1072538@gmail.com>
-	<20261016091919.971295-3-anuj1072538@gmail.com>
-	<5f542a8d-c6c1-4c5d-b0c6-f761af2e126a@gmail.com>
-	<CGME20261022130134epcas5p23704ea4f10cd9d90762b89c3c9fdf254@epcas5p2.samsung.com>
+Content-Transfer-Encoding: 8bit
 
-------VZDtnczHWjdXYXkjw.jkIJrU2UH2.1dU.Tnm2W3-fiUacbuL=_9f5cc_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+We observed I/O timeouts with requests stalled in per-CPU software
+queues.
 
-On 21/10/26 04:12PM, Pavel Begunkov wrote:
->On 10/16/26 10:19, Anuj Gupta wrote:
->>From: Nitesh Shetty <nj.shetty@samsung.com>
->...> +static bool bio_dmabuf_map_valid(const struct bio *bio,
->>+				 const struct iov_iter *iter)
->>+{
->>+	return iter->dmabuf_map->ctx->registered_devt ==
->>+		disk_devt(bio->bi_bdev->bd_disk);
->>+}
->>+
->>  /**
->>   * bio_iov_iter_get_pages - add user or kernel pages to a bio
->>   * @bio: bio to add pages to
->>@@ -1300,6 +1312,9 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter,
->>  	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
->>  		return -EIO;
->>+	if (iov_iter_is_dmabuf_map(iter) && !bio_dmabuf_map_valid(bio, iter))
->>+		return -EXDEV;
->>+
->>  	if (bio_iov_iter_set(bio, iter)) {
->>  		if (iov_iter_is_bvec(iter) &&
->>  		    !bio_iov_bvec_aligned(bio, mem_align_mask))
->>diff --git a/block/fops.c b/block/fops.c
->>index 18a755f6e0b0..b36dde10a4ac 100644
->>--- a/block/fops.c
->>+++ b/block/fops.c
->>@@ -19,6 +19,7 @@
->>  #include <linux/iomap.h>
->>  #include <linux/module.h>
->>  #include <linux/io_uring/cmd.h>
->>+#include <linux/dma-buf-io.h>
->>  #include "blk.h"
->>  static inline struct inode *bdev_file_inode(struct file *file)
->>@@ -938,6 +939,7 @@ int bdev_init_dma_buf_io_ctx(struct file *file, struct block_device *bdev,
->>  			     struct dma_buf_io_ctx *ctx)
->>  {
->>  	struct gendisk *disk = bdev->bd_disk;
->>+	int ret;
->>  	if (!(file->f_flags & O_DIRECT))
->>  		return -EINVAL;
->>@@ -945,7 +947,10 @@ int bdev_init_dma_buf_io_ctx(struct file *file, struct block_device *bdev,
->>  		return -EOPNOTSUPP;
->>  	if (bdev_has_integrity_csum(bdev))
->>  		return -EOPNOTSUPP;
->>-	return disk->fops->init_dma_buf_io_ctx(bdev, ctx);
->>+	ret = disk->fops->init_dma_buf_io_ctx(bdev, ctx);
->>+	if (!ret)
->>+		ctx->registered_devt = disk_devt(disk);
->>+	return ret;
->>  }
->>  EXPORT_SYMBOL_GPL(bdev_init_dma_buf_io_ctx);
->>diff --git a/include/linux/dma-buf-io.h b/include/linux/dma-buf-io.h
->>index b9bbeca1744f..d42a79f2ac9b 100644
->>--- a/include/linux/dma-buf-io.h
->>+++ b/include/linux/dma-buf-io.h
->>@@ -50,6 +50,8 @@ struct dma_buf_io_ctx {
->>  	void					*dev_priv;
->>  	const struct dma_buf_io_ops		*dev_ops;
->>+
->>+	dev_t					registered_devt;
->
->That wouldn't work well with multiple devices. Maybe reject it in
->xfs / iomap for now?
->
->FWIW, a generic solution is for xfs to own the ctx passed on
->registration instead of forwarding it to block, allocate an array
->of new ctxs for each device and register them separately. This
->should even be able to support dynamic device registration.
->
-Agree, that works, keeps block layer clean, will update in next version.
+The affected queue had no elevator, but QUEUE_FLAG_SQ_SCHED remained
+set. A failed elevator switch can leave this state when falling back to
+none without clearing the flag. With empty hctx dispatch lists, a
+queue-wide restart on CPU4 would skip requests pending in ctx5/ctx7:
 
---Nitesh
+CPU4: blk_mq_run_hw_queues(q)
+  sq_hctx = hctx4
+  hctx4: no pending requests   -> selected
+  hctx5: 9 reads in ctx5       -> skipped
+  hctx7: 3 writes in ctx7      -> skipped
 
-------VZDtnczHWjdXYXkjw.jkIJrU2UH2.1dU.Tnm2W3-fiUacbuL=_9f5cc_
-Content-Type: text/plain; charset="utf-8"
+The pending requests may remain undispatched until another event runs
+their hardware queues.
 
+Clear the flag and restore nr_requests and async_depth to the driver
+queue depth in the common scheduler teardown path, covering both
+scheduler exit and failed initialization.
 
-------VZDtnczHWjdXYXkjw.jkIJrU2UH2.1dU.Tnm2W3-fiUacbuL=_9f5cc_--
+Fixes: 4d337cebcb1c ("blk-mq: avoid to touch q->elevator without any protection")
+Assisted-by: LLM
+Signed-off-by: Jianan Huang <jnhuang95@gmail.com>
+---
+ block/blk-mq-sched.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 0a00f5a76f5a..d7b45778732b 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -374,7 +374,7 @@ bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq,
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_sched_try_insert_merge);
+ 
+-/* called in queue's release handler, tagset has gone away */
++/* Clear scheduler tags and reset queue state. */
+ static void blk_mq_sched_tags_teardown(struct request_queue *q, unsigned int flags)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+@@ -385,6 +385,10 @@ static void blk_mq_sched_tags_teardown(struct request_queue *q, unsigned int fla
+ 
+ 	if (blk_mq_is_shared_tags(flags))
+ 		q->sched_shared_tags = NULL;
++
++	blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
++	q->nr_requests = q->tag_set->queue_depth;
++	q->async_depth = q->tag_set->queue_depth;
+ }
+ 
+ void blk_mq_sched_reg_debugfs(struct request_queue *q)
+-- 
+2.43.0
+
