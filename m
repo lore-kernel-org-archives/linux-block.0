@@ -1,53 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.127.231.57
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792897307;
-	b=ks3y84BksJFyMIv9xlGtUp5fHo/cdc74HMHSW2lYbqx+T8RfhDbiAZ7cXjxN+0A4t641
-	 SL6Q9GhTMmzRyHAV4+PrzRnm1NZlGeCewlEgFAbjhzda3LQCw4j/ykFbUiEGid8oAtIzR
-	 SYd26YVEDoAGrRwbnH/8TJnyh6ahYHyCDxgftgZnv/6i1+ncIaCOEfkw/x1qY4BWZSRCf
-	 ztFE1rOdL4InncymtwloPU7sEjP2sfCGSGtJOazhGlkqIDMYrAHMVxHHsDFIYC142016p
-	 TLWAsdd0Y8G8JcDtckoiw/8INJtr3pCZ+cE49KAIlrL9rFPp9Q8WDNEBD5hM3vhyrVg==
+	t=1792897662;
+	b=gGm3nEHPcEgk937zhkflheLV0VneA2GmbLL/g2BwIEy3CdzX4YvosIz2yLfbl4iHJC/Y
+	 At5xu1YHYwVaYYugTmIHN61aUrU4ny7klPS/LvKJSx0pdXwJiGwidesOh9KdGD6mbliUR
+	 rdeLMM4c4zz/Pt/pPoiAM5ZxvVhLvz/7nevt4ugd784JYl22LyUjydOEvGDOZpFr+s5M9
+	 1R89v+m8I8GH9JCHSYj61BSi8eIMwY/GbCWG4jyEAARuaH7pOQm5wAXK/p69pOSx97Gqs
+	 cejWRKnTp802QJNcAmyV9afiV60wUsZMBowOVK8fSGHieUWEbA7IaY4DE3OMJpN2XQw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792897307;
-	h=DMARC-Filter:DKIM-Signature:To:Received:Content-Transfer-Encoding:
-	 Reply-To:Mime-Version:Cc:Date:References:X-Original-From:Content-Type:
-	 User-Agent:From:Message-Id:X-Lms-Return-Path:In-Reply-To:Subject;
-	bh=f6PX6afc5p7U4VK9oQ6kAEfAgV5x1//StyaUivK4W0A=;
-	b=bga+45bUwM3a5mJyUqc8E1CP4fKTSHe+lQfixDi7h95D2eNdcVQ3Tr9kHktry/1t5fbt
-	 hQHOsNRsaqDuzx4qHi7K4kMTLlNC36g1r2tplPt/KQjaamrt8lBW8c0JYAFkdoy0nNO0+
-	 Nmr1Rz5emtJ+FRYsXeQAVo0LZgIEIrv8RllE9j2/PScVW+zvwV0tahPaTVz0SyHeWM+RD
-	 duGfVAssMcbr6phoYbB6VKhljM92zQS/YttT52QsqiGJ3dZdlup6E9Ib0uUxoxstnNVGE
-	 9/QIGpsvdbYxtNDUYhwXBXT4JZy7vJzZHP1sCHrQCXAEj7paoGJRKQtE4N3C+Jg3Xqw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792897662;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=sU46yUAf9fpl1+G8OJsmObxc7Moi9Q2vShnNQxEzeYk=;
+	b=S0Hd5bI7MemhW9BD11nx+CBKKisLosdNyXEUiif5ApiDNl8ivSVjutmrodwUYIwilYSw
+	 GySeU+6zX9wP3RHEpVZeTAKQViDScTWGBdO4d/WPDEwn97kvVCFtbxIw7Z21MAZr35Pmr
+	 B++PXIvBjB5xAbW0syKUiPNdRZkh372YjUoxJPubsI/G+J1JcTPKvuNBLPpDzwRbkLRqi
+	 6nfd85e/dALmQBRrM2bBIGws8M9uBstfyzCYWZrWwcXiOtqFK6IwTf3+mKCi73oh4rejx
+	 PRRzggBSSfojQYUJdYC+TV9BUcFyxAeWcBe5m9wgduXT0omql+83L/swhwBbYnFoe7A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fygo.io;
-	spf=pass smtp.mailfrom=fygo.io;
-	dkim=pass header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=VPXcQ9Kf;
-	arc=none smtp.remote-ip=209.127.231.57
-Received: from va-2-57.ptr.blmpb.com (va-2-57.ptr.blmpb.com [209.127.231.57])
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=MuMSfX8I;
+	arc=none smtp.remote-ip=74.125.82.43
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FEF5606A31B
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 03:01:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3FEF5606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFD3606A328
+	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 03:07:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3AFD3606A328
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=VPXcQ9Kf
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1792897301;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=f6PX6afc5p7U4VK9oQ6kAEfAgV5x1//StyaUivK4W0A=;
- b=VPXcQ9Kf0jItOUjNhf2FOomN0jffE/3PadvWlfa0c6Vw1l/HAjV/ThXKyLB/SPHvQQ8rPQ
- ECjEOEjG5Vzjka2+3NXjoo7R1UohcOz+iFbf291wYaHU+ekAvPof5gtvIVCNVRdLZLYjcD
- Pkc9jE0IJKOyl8zybiYx/2kF2hqqz3JbpVf5CzVyH1SRMp4mQF7cOSRng0CGvfsi7U9lzk
- tubCppRW2uT8xJVkuiOEym8Ii8F8C9LZJol85Hn/DF9N+2AlfcpCc6wACV5/XFZvU5qi2e
- QO+aOByCPOtnaRXhKnTHHCTqg/chgiTwJ+0REUKnkdorPBvGd4/lEWlIdFQIdg==
-To: "Yu Kuai" <yukuai@kernel.org>, "Jens Axboe" <axboe@kernel.dk>, 
-	"yu kuai" <yukuai@fygo.io>
-Received: from [192.168.1.104] ([39.182.0.25]) by smtp.larksuite.com with ESMTPS; Sun, 25 Oct 2026 03:01:39 +0000
-Content-Transfer-Encoding: quoted-printable
-Reply-To: yukuai@fygo.io
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=MuMSfX8I
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-15ea896ddc8so3403326c88.0
+        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 20:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792897660; x=1793502460; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=sU46yUAf9fpl1+G8OJsmObxc7Moi9Q2vShnNQxEzeYk=;
+        b=MuMSfX8I91h5yDHghR0un5ZmkgrgW6gXpPePZvjdFb0KZKvzOgsncReAQ7R4Q6gctg
+         eBvHpKbpF9ElNGR7lScAldiz09zNUX9HrBQdjwok1xWYtUCuYtqvdF4PyYA0aKP837FU
+         Lz9HlNJP65M7YQJyDuQ7oVJ+Vu983zwumqHY6fMmGJEofPnVxeL5UfDNwgKj+VEcLm0N
+         WrY6n2pHDvPKk0CoQsES1rECZWNuo41Xms83ZQ1iHbCDq9mhah1NqgXMQB2C7sos5DX2
+         Mm/7NOkmZtOAXvA/uXU1ISJuLjvb7KydFW2m5bZlVW8MOzb8G9IDLFsV8daSoSd2lgxD
+         pZ/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792897660; x=1793502460;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sU46yUAf9fpl1+G8OJsmObxc7Moi9Q2vShnNQxEzeYk=;
+        b=uMbFCn6sRVXednFJX5hbMiM0hvAceE6wnjn3Yt1+gNR1gSVkBMU1MiRiXOw81npDva
+         kzBcFoE0rkPQ7jta5qCyGVdS3MC0kHJ9RjQozCVXPG5XInjNd8ofHMWq3GaTrhesWdQS
+         FXXay3j16RbXKJfjUrt6GEsm0UdLSeKIthq5pr0JyJhPZD+AZiQgkfC+CZX4/XFcguJI
+         kJAGipWqeXpUuS8X1480Xe0zYMEJ1U26s7QdQIRWZXTLf7TmIkxwS5zMUtPTQyLEIADQ
+         mAKbgzyoe2aoVNnHCzTfjhmtZMNsXuMllgIfOPA4Ef5QudzBZoE/PFA7JPK3tk7Vl7ob
+         TAyw==
+X-Forwarded-Encrypted: i=1; AKwUvBxyzaJGX+eBasH9FDY5EpTu47C0/mT7gK9/cjwpAdFK5XOjXUc1a2L0l/lfIz/rLKRpz3azE5JPl+53LA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJrakNafNENe7yrW83nyyUjqsQ4lqqgLrYLL7sLnYlouHWgP6KC
+	2+eLlXqhWAjLPJLhdjQFJgBDHzr9gbWeh6TfG2P/9NgWCq0yEINEazUX+efArlXoLGo=
+X-Gm-Gg: AYBFou3dtB8d+2BliOBbCC7DOBcMuhaWWgw4ZtCWrGPJ7IFenzpRWVnQwkjZWSpFcIH
+	WzefX52O3WedR/NDA09XzfryT2/jHY1rhjWqfRCT2loeEb7sQsQEUscCp5gXL3momLp3u/Kq8Cf
+	b+Z3ZHUxngElinErXDfW9U51zlTlaBZlOyc9IfGGdizX3dnCtwhiBA8fNia0z8DsFG8LINuJgKj
+	wbFLkvncyeOw49crA3xsPPMWWuna8mzxyh7+qySZoON0Kgk3aKNGow60XrT3nJGqj1fEc6CfvCU
+	i8K8kOocAfz035QpdzNDnRj2BY2C7IsDLdIJBnPYjav1DsYf46bOgNA6vj/eMFh7tJZedzU9L0W
+	YZOcoM9z26jJL6DFKyeCPenPFKrk9ecRn+7tB580RPx6lIhqjdeFL7iG8mFh+CBtbTdf/3agK+a
+	6hsDr5UdF92EWvdH+T/hT5/N+VOaLlF3anqBwvQzbGIZyVBKq1WO7M+Iqq8zI587TRNohkLADKh
+	D7dlF9NUjb7huRC3rEhwzmih+FWWESL8vrvJEkVl0yF1rhgLJRd8pMDqsSZLOa/q3CzKWFgmLmh
+	QAdrDLPsFspCyRrQWRJ+YWO3VoDXSFusNZu2GEu99XC2zpcDa3/ADzg05RYJ
+X-Received: by 2002:a05:701b:465c:b0:19a:9a93:c9b2 with SMTP id a92af1059eb24-19a9a93cdbbmr3541213c88.13.1792897659938;
+        Sat, 24 Oct 2026 20:07:39 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-198a249c331sm26612823c88.17.2026.10.24.20.07.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Oct 2026 20:07:39 -0700 (PDT)
+Message-ID: <31b5a611-2f6c-4ebc-801d-e1c5677633e1@kernel.dk>
+Date: Sat, 24 Oct 2026 21:07:38 -0600
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -56,179 +91,41 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Cc: <linux-raid@vger.kernel.org>, <linux-block@vger.kernel.org>, 
-	"Cao Guanghui" <caoguanghui@kylinos.cn>, 
-	"Chandradhar Kumar" <chandradhar.2003@gmail.com>, 
-	"Chen Cheng" <chencheng@fnnas.com>, 
-	"Jack Wang" <jinpu.wang@cloud.ionos.com>, 
-	=?utf-8?q?J=C3=A9r=C3=A9my_Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>, 
-	"Li Youhong" <liyouhong@kylinos.cn>, 
-	"Martin Wilck" <martin.wilck@suse.com>, 
-	"Nguyen Ngoc Thang" <ngocthang2710.1999@gmail.com>, 
-	"Peng Fan" <peng.fan@nxp.com>, "Sang-Hoon Choi" <csh0052@gmail.com>, 
-	"Yogesh Gaur" <yogeshgaur.83@gmail.com>, 
-	"Yuchao Zhang" <ndaugoing@gmail.com>, 
-	"Zhihao Cheng" <chengzhihao1@huawei.com>, 
-	"Zizhi Wo" <wozizhi@huawei.com>
-Date: Sun, 25 Oct 2026 11:01:34 +0800
-References: <20261013141241.2257621-1-yukuai@kernel.org>
-X-Original-From: yu kuai <yukuai@fygo.io>
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: "yu kuai" <yukuai@fygo.io>
-Message-Id: <c5690a5d-9553-463e-b9f0-617b4d29b011@fygo.io>
-X-Lms-Return-Path: <lba+26add7114+9a8226+vger.kernel.org+yukuai@fygo.io>
-In-Reply-To: <20261013141241.2257621-1-yukuai@kernel.org>
 Subject: Re: [GIT PULL] md-7.4-20261013
+To: yukuai@fygo.io, Yu Kuai <yukuai@kernel.org>
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+ Cao Guanghui <caoguanghui@kylinos.cn>,
+ Chandradhar Kumar <chandradhar.2003@gmail.com>,
+ Chen Cheng <chencheng@fnnas.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
+ =?UTF-8?B?SsOpcsOpbXkgSmVhbg==?= <Jeremy.Jean@oss.cyber.gouv.fr>,
+ Li Youhong <liyouhong@kylinos.cn>, Martin Wilck <martin.wilck@suse.com>,
+ Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>, Peng Fan
+ <peng.fan@nxp.com>, Sang-Hoon Choi <csh0052@gmail.com>,
+ Yogesh Gaur <yogeshgaur.83@gmail.com>, Yuchao Zhang <ndaugoing@gmail.com>,
+ Zhihao Cheng <chengzhihao1@huawei.com>, Zizhi Wo <wozizhi@huawei.com>
+References: <20261013141241.2257621-1-yukuai@kernel.org>
+ <c5690a5d-9553-463e-b9f0-617b4d29b011@fygo.io>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <c5690a5d-9553-463e-b9f0-617b4d29b011@fygo.io>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Jens
+On 10/24/26 9:01 PM, yu kuai wrote:
+> Hi Jens
+> 
+> ? 2026/10/13 22:12, Yu Kuai ??:
+>> Hi Jens,
+>>
+>> Please consider pulling the following changes into your for-7.4/block
+>> branch.
+> 
+> Looks like this pr is missing for 7.4, should I regenerate it for block-7.4
+> later?
 
-=E5=9C=A8 2026/10/13 22:12, Yu Kuai =E5=86=99=E9=81=93:
-> Hi Jens,
->
-> Please consider pulling the following changes into your for-7.4/block
-> branch.
+Oops, pulled now, it'll make 7.4, don't worry.
 
-Looks like this pr is missing for 7.4, should I regenerate it for block-7.4
-later?
-
->
-> This pull request contains:
->
-> Bug Fixes:
-> - Wake RAID10 barrier waiters when a pending-count rollback satisfies
->    an active array freeze. (Zizhi Wo)
-> - Reject v0.90 superblocks whose device count cannot fit the metadata
->    format, preventing out-of-bounds access. (J=C3=A9r=C3=A9my Jean)
-> - Track RAID5 disk-array allocation size and avoid removing an
->    unregistered CPU hotplug instance on setup or resize failure.
->    (Cao Guanghui)
-> - Validate the RAID0 device count before allocating its device list.
->    (Chandradhar Kumar)
-> - Validate RAID5 journal payload header, size, and checksum bounds
->    before accessing them. (Martin Wilck)
-> - Reject inconsistent RAID5 reshape metadata instead of triggering a
->    kernel BUG. (Yogesh Gaur)
-> - Reject invalid RAID4/5 disk counts before setup and invalid reshape
->    disk counts in raid5_run. (Chen Cheng)
-> - Fix a NULL-pointer dereference in RAID5 setup error handling.
->    (Zhihao Cheng)
-> - Reject RAID5 per-device sizes smaller than one chunk. (Zizhi Wo)
-> - Fix mddev_unlock() on an unacquired mutex in lbs_store().
->    (Jack Wang)
-> - Give RAID5 io_unit slab caches per-array names to avoid duplicate
->    cache names. (Yogesh Gaur)
-> - Validate v1.x bad-block log size when loading superblocks.
->    (Yuchao Zhang)
-> - Take reconfig_mutex while enabling PPL on an inactive array to
->    prevent a NULL PPL configuration. (Nguyen Ngoc Thang)
-> - Drain released RAID5 stripes before destroying the stripe cache on
->    takeover setup failure. (Li Youhong)
-> - Protect RAID5 big_stripe_tree lookup with RCU. (Sang-Hoon Choi)
-> - Prevent a NULL mddev->private dereference when stopping an array
->    while I/O is being submitted. (Zhihao Cheng)
-> - Don't publish an md array before md_alloc() finishes initializing
->    mddev->kobj. (Yogesh Gaur)
->
-> Cleanups:
-> - Annotate intentional lockless RAID10 freeze-state accesses.
->    (Zizhi Wo)
-> - Add shared RAID write-error and bad-block-sector helpers, and share
->    flush_bio_list between RAID1 and RAID10. (Li Youhong)
-> - Extract RAID5 min_raid_disks() helper. (Chen Cheng)
-> - Use assign_bit() where applicable in MD/RAID. (Peng Fan)
->
-> Thanks,
-> Kuai
->
-> ---
->
-> The following changes since commit 85bffad4d2fea373a72d68bed8012e8cbccb8e=
-e7:
->
->    block: simplify disk_zone_set_cond() (2026-09-15 06:53:06 -0600)
->
-> are available in the Git repository at:
->
->    https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux.git tags/=
-md-7.4-20261013
->
-> for you to fetch changes up to d1472ca2ca5de8ecd2b358411eb14c031404ecf0:
->
->    md: don't hand out the array before md_alloc() has added mddev->kobj (=
-2026-10-09 11:52:58 +0800)
->
-> ----------------------------------------------------------------
-> Cao Guanghui (2):
->        md/raid5: track disks array size to fix extra_page leak on error p=
-aths
->        md/raid5: fix NULL pointer dereference in raid5_free_percpu
->
-> Chandradhar Kumar (1):
->        md/raid0: validate device count before allocating devlist
->
-> Chen Cheng (3):
->        md/raid5: reject raid4/5 arrays with too few disks
->        md/raid5: extract min_raid_disks()
->        md/raid5: reject invalid reshape disks in raid5_run()
->
-> Jack Wang (1):
->        md: fix mddev_unlock() called without holding lock in lbs_store()
->
-> J=C3=A9r=C3=A9my Jean (1):
->        md: reject v0.90 arrays with too many devices
->
-> Li Youhong (4):
->        md: add rdev_record_write_error() helper
->        md/raid1-10: add rdev_bb_block_sectors() helper
->        md/raid1-10: share flush_bio_list between raid1 and raid10
->        md/raid5: drain released_stripes before destroying the cache
->
-> Martin Wilck (1):
->        md/raid5: validate payload size before calculating payload_len
->
-> Nguyen Ngoc Thang (1):
->        md: take reconfig_mutex when enabling PPL on an inactive array
->
-> Peng Fan (1):
->        md/raid: use assign_bit() where applicable
->
-> Sang-Hoon Choi (1):
->        md/raid5: protect big_stripe_tree lookup with RCU
->
-> Yogesh Gaur (3):
->        md/raid5: don't BUG() on an inconsistent reshape state from the su=
-perblock
->        md/raid5: give the io_unit slab caches per-array names
->        md: don't hand out the array before md_alloc() has added mddev->ko=
-bj
->
-> Yuchao Zhang (1):
->        md: validate bblog_size when loading v1.x badblocks metadata
->
-> Zhihao Cheng (2):
->        md/raid5: setup_conf: Fix null-ptr-def in error handling path
->        md: Fix the null-ptr-deref of 'mddev->private' while submitting IO
->
-> Zizhi Wo (3):
->        md/raid10: annotate lockless access to array_freeze_pending
->        md/raid10: fix missing wakeup in wait_barrier_nolock
->        md/raid5: reject a per-device size smaller than one chunk
->
->   drivers/md/md.c          |  72 ++++++++++++++++++++++----------
->   drivers/md/md.h          |   7 ++++
->   drivers/md/raid0.c       |  16 ++++---
->   drivers/md/raid1-10.c    |  27 ++++++++++++
->   drivers/md/raid1.c       |  42 +++----------------
->   drivers/md/raid10.c      |  59 ++++++--------------------
->   drivers/md/raid5-cache.c |  54 ++++++++++++++++++------
->   drivers/md/raid5-ppl.c   |  12 +++++-
->   drivers/md/raid5.c       | 106 +++++++++++++++++++++++++++++++++++-----=
--------
->   drivers/md/raid5.h       |   1 +
->   10 files changed, 244 insertions(+), 152 deletions(-)
-
---=20
-Thanks,
-Kuai
+-- 
+Jens Axboe
