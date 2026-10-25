@@ -1,55 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792960953;
-	b=Y3/yG/w51BP85VkT5RBhoGujwmxLvhAUhSIAKkrb9k03nmVl4av24D8x2YvlR+Qd/64n
-	 DPcAMf+rleTn/vi9wREnhp9fY2EWNsSJvtZXfSAt0atbY6AJCNiDSsSzPTVNcK5CxWAf8
-	 FY2vaA5jHzQ/wskt3GI97CSQzEBcbWHzOfHWzJb+ynhd1HN/H5CM+lyqhoRvJqm43fv3F
-	 8CUdA9T1Wq2M1Boh5XU1EROTxOABgpcV5NzVHINfAhTQf1kAyXOb0Q9tWnFvoGKnHSReC
-	 Mn532WiMy/4Tidf2OlcCQnCY9BKntEZgjZati8n9XKNuuG/CAB1ISVebteI2nPPqiww==
+	t=1792971009;
+	b=YP98syzEssTNyKAOThZWFEtKcslQ9cTBftCDE2ghq2pVMzAzDdS63XTFTbQb5OavzejB
+	 oviRn6M+R7iI9p3b196egGr1QcJ7I6tjRf0bxI494Vmy8Mw/gcU66TQpN2w5+TqWjxR/Q
+	 m70zFIaa9ZkVsa5CY27LTnPBShuDNzd1rUsPA47U4CURp5/CxGDq5qhGgLnKUIUNX2mBO
+	 ZjJQcE9KAEMW6m/EKy//PCem1L0fCLG4ZWnOA+Yq6r4sTvSKFCXEoNTobB4xl7aoVYZ/P
+	 nqxrakoPFUNhoT/rXZGLMCodKUF1NBmW3KhTLVs2fpA4ZcoG1h7aQUhcN2BpwzVB89g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792960953;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=1ZVwpDuEOvVP+5WMptjvGUaD4UnS5xmh0v3my59uo80=;
-	b=v+YgQ6FHGH2WrPDpYGfUJo4D2WFKfNAkjP+3WhNHAw41hFzT3ZOyuYUd/6A7Ip5coUBD
-	 WP7OSXrukiPZ/PYc+aQS/vYtjK7+M0wg2NviSMmLE5GCNf7Z2K4qFogbuuwBmxszMKHNE
-	 MTwGgobzZ6//Z9HLL87iGvutEpYQL5Cs8CPUD/ysKyHIKha6MLVs0dTUr0jSRYrmg8sWX
-	 0Afo+WO2ZCSsmWI2ygt1u8G7pB1T5hH8SpXBt1Hg7TY6Q8jWXgrF9zMncJ9TZVB4Pfs5i
-	 vX4fOdkx7LRyhIlfSPPbgUM3kwj6Ib/jYNZ4zRAD3FLeEVP+QRwYXg+RUJtKgjINJOg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792971009;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=MlkHn+7oV+3VYLRMpytUTNKZCJLQLbbjowoYmzC9jBw=;
+	b=MXYN8UayNyNZ/3mAa6BlcuC4JzGkMBaFkwqxQIEbQd0pZQzhYDgRzRTlICoXowAYaN7I
+	 VBGBG8Psnh/rZ4S+RTOCs/kb9E8H6SImbB1kKaHefi4iUqfpggUvLxK+JZz2zX3+V75ZH
+	 rdpwZX4CypTlLqwKx4EeHPowNFv5wUUzP2YO/G7gampNNDc86CAtUIPJhv1TB4XFb2gtA
+	 T5cv4TshgVoUwnJ6vtwB6tprBxPw15OcpuT7WstQ3vnOe55nm1+DkyuU+I/SdG1umPvWE
+	 WwK4RRf4C6TOwajMoRR4l/OLHTGzmwzxO6NqOVEQM5RtGXpPLRG/rYRZfl/6wkPWIjw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cw6wxqO8;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=h7wNU7QN;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3111D606A31B
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 20:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52ACC606A325;
+	Sun, 25 Oct 2026 23:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cw6wxqO8
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C75611F01828
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 20:42:32 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=h7wNU7QN
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9216A1F031E1;
+	Sun, 25 Oct 2026 23:30:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792960952;
-	bh=1ZVwpDuEOvVP+5WMptjvGUaD4UnS5xmh0v3my59uo80=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=cw6wxqO869ZZJ8vwwoDzLpFL7knGGLPUHbSAAQ1kpxEmlLRSoAcIyI+7nCNkPXtXC
-	 /sQV6Nvfef8NOsj/Vee6+JjdQSwsL8eGsx0BMC/21zb7xTzpc9lozSJ7N6zZWF79VG
-	 mhefi2f4xhIQUZOWJNQJMiZp57XOxhMYe7hXPq/QPwTT/ClZNZV7lCq/+2OFBWsxrw
-	 7Bbsquk/ryxVB+AxDl4L4wPHsfXS7lFVdaIMIGn6/3nH7z15C+TgtIieL9xFC7NZ5v
-	 Nf14VG1zxAGC+aQJ4EokIMh5+0zoWQO5PXt/cCcE/eP1BVl+c1l6nRpKjLzjRsrTav
-	 8ePHU+mvvPfrg==
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-93f36c18b75so119665885a.1
-        for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 13:42:32 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwoq4cNfdJHPd1jnlcMEuEOrkoAdZS9AES9EnMzIA5Tvm0rmldhBdyUcnzgIj0Ankg0AQEiEFF/eAdNdA==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIHgHtOCkF0e5h2NQavy01yB6ZHvnOwnz5cxxbEZNY1UhNsF+1U
-	nP5RdgDnON5QDh/bj/zavYysEtEHtNJXx8X2k1Qr8k41w3EiYxs8VcMXfO4eEXvFAN2kkzjjHMn
-	2TW9MOgAdHuk2xVqGveuYzdnGrZGcbkY=
-X-Received: by 2002:a05:620a:400a:b0:93e:48fc:aa88 with SMTP id
- af79cd13be357-940ef95513emr790870385a.44.1792960952180; Sun, 25 Oct 2026
- 13:42:32 -0700 (PDT)
+	s=k20260515; t=1792971009;
+	bh=MlkHn+7oV+3VYLRMpytUTNKZCJLQLbbjowoYmzC9jBw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=h7wNU7QN5rT9qQhVrZP5A5Klx5WSjTw4cxFU8rzC38BwuiKx4MXTpfra4fliebFVh
+	 XJ/SsDeSsy1n54igV1ZnKggsW3hE8x0ghIivI3SmZnr/VVUyNTaxaFyDvChxjis07H
+	 t5Oy2JS+WRfCfNTo7OH2HFWHstT00EObaJj1RITtynEaQxfuWI71ym5wovBUeOViLM
+	 S4k9rKoBHOLwQl2LFCwtoGg6cefmZG5fa9bggHXNBXPhCTXowBmsAogpuPyxgKMr5n
+	 1CTfNcLkdrf2XhpSPhrWkYNC8JHVzLGSEpPhMwdJ/CzN3Ixg1h6SiDXLGLZ1FK/KL0
+	 pVq9V+sElm+qg==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: Sasha Levin <sashal@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	linux-block@vger.kernel.org,
+	Stanley Jhu <stanleyjhu@google.com>
+Subject: Re: [PATCH 6.18.y] block: avoid potential deadlock on zone revalidation failure
+Date: Sun, 25 Oct 2026 19:29:55 -0400
+Message-ID: <2026-10-25-1-daily-reply-0009-block-zone-revalidate-6-18@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261025060914.1652636-1-stanleyjhu@google.com>
+References: <20261025060914.1652636-1-stanleyjhu@google.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,37 +60,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261025021839.1542805-1-senozhatsky@chromium.org> <20261025021839.1542805-4-senozhatsky@chromium.org>
-In-Reply-To: <20261025021839.1542805-4-senozhatsky@chromium.org>
-From: Barry Song <baohua@kernel.org>
-Date: Mon, 26 Oct 2026 04:42:21 +0800
-X-Gmail-Original-Message-ID: <CAGsJ_4wF2YfHwyDSt=B_+duiHCXke8JJgqGJcaw31JunUbxxQw@mail.gmail.com>
-X-Gm-Features: AclHuK_u4ku4HYNTJ8RqUHQB0jHfvIpB2fBEVv08j0BZX4fWzV5XB72RUiMN54w
-Message-ID: <CAGsJ_4wF2YfHwyDSt=B_+duiHCXke8JJgqGJcaw31JunUbxxQw@mail.gmail.com>
-Subject: Re: [PATCH v7 03/15] zram: reset writeback state in zram_reset_device()
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Brian Geffon <bgeffon@google.com>, 
-	Bo Zhang <zhangbo0325@gmail.com>, Minchan Kim <minchan@kernel.org>, 
-	Richard Chang <richardycc@google.com>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sun, Oct 25, 2026 at 10:18=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
+> commit 3dd63dba8f9cb6990a40af7ed66ee0159f475819 upstream.
 >
-> Reset all writeback state to its initial defaults on device reset.
-> We used to keep writeback related data in zram->stats, which
-> zram_reset_device() clears, but commit 1d69a3f8ae77 ("zram: idle
-> writeback fixes and cleanup") moved it (along with the newly added
-> wb_limit_enable) to struct zram, after which neither of them was
-> reset anymore.  wb_batch_size and compressed_wb, which were added
-> later, are not reset either.
->
-> The patch is more about just being pedantic.
->
-> Acked-by: Brian Geffon <bgeffon@google.com>
-> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-> ---
+> If revalidating the zones of a zoned block device with
+> blk_revalidate_disk_zones() fails during a SCSI disk rescan, the following
+> lockdep splat is thrown:
 
-Reviewed-by: Barry Song <baohua@kernel.org>
+Queued for 6.18, thanks.
+
+-- 
+Thanks,
+Sasha
