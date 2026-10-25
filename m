@@ -1,87 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792887536;
-	b=NjlMqWmJkuNqbIlxdNyzsenqmEluBahaxXJspsu+I6CnnMwIUzImLtASTuEznHKEMqcA
-	 Q+U47WS30xvw+ZdLxcOElSE58mCOoY+ibJavNFIpssuL2buqP0HRqrFDvkDcmQnH1dntX
-	 op1n3rlULWHypJMklKXCtnlfwQZwy3SOC4WSHh/vRSwbBZhTMmRhbdUB7l2Flmsc7NQgF
-	 ZAEtlwL3QHOKzLLpy+COVBHOxT6hsZtTwl/rTjVX/N3ARiWpwBL1eNDEa1C0PE3qx5Cb0
-	 QgeZ0DIC3eBV3FtKQaYnmH6OV8WmwO7MNa9qodwrcXKV8sxT8S8Fz1kIFJRMv5WpD6g==
+	t=1792887611;
+	b=cEnFs1OSQMaH5rWihWfRduMhouAN+Zvbq14KgFuGC0re9kE7L77daIJjJxPYQl9f7Vql
+	 R5HyMTAzhPwxcS6MxMDS5WcLwuZHsgx3oX+bQPfqFyipundrYh/NwTNvyOMoR4MLijcTd
+	 z5F2/PUBQzu3bIJX4kPiLCHqFD/xZCiLsFmzGKrc9XFgjkA1OEwH+63IoLN9wcC98WfCi
+	 qcCIynLDyFTa6R3YVNoBm8qR4E8IeDAF//oG5PeoWCZJOmJTpoX1q0UHU5EwEhnvq6ZOS
+	 QLH36FifmhutMVbyxqm22bUs7YytD8vAL78KedMLDFXVTR2r549psfktu25qNuBLONQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792887536;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Received:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type;
-	bh=NDtHB6+96zNrJiqoESkTVM99RvAu/va7B08qrVOb2CE=;
-	b=U9qbDQWJXN23f28BsGvWZlvKE2mVV0iNkV1l3U2PdkCag9WDwhp4t7SAvlSrY2Fg5A0p
-	 QTcdUbfwd3L0Z+CWuEcuQe8V5B/Vbii1o9nHEZ9hEXZvWvzTCRDSEYBUgL1Kw8TDE1Cht
-	 9krZmaz3HGZfoJz5FHX+BLjfWcrgEIU79FWR+MDQzTHRP4XPZg0zWgKyueL1ClK3VgRUL
-	 jdEVPfAJsSwqTxszGz4/NOAJ5662YWfBlPt1OjlB9VGJwMpVDH+7dYGdsrbI8E/kKYKya
-	 sed9cVwUJnX/7RqFlHTP9X3QE4olNwz9Q22B97xR9VVMGcFo4FunOU5YftYtaKTBP6g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792887611;
+	h=Received:DKIM-Signature:Received:Subject:From:In-Reply-To:References:
+	 X-PR-Tracked-List-Id:X-PR-Tracked-Message-Id:X-PR-Tracked-Remote:
+	 X-PR-Tracked-Commit-Id:X-PR-Merge-Tree:X-PR-Merge-Refname:
+	 X-PR-Merge-Commit-Id:Message-Id:Date:To:Cc;
+	bh=t1YQFn0x8nP9hc6SNzB8o8M4BvjBUjche5ZWklFu+uM=;
+	b=nLTvBfnlPfMWXn/4mI155Vk6BtBV3SmnFrjRuf28bkl0FZdlUC0ZhBndshehCIRv+jE5
+	 rmkvGByqGlH7UylvV8cYW+cJG2t+68TJmCdD2x+AXeL3MkYHPe0f2AtO5JEWqFWVVetyU
+	 wP5Z8eE8LGZUPXfOxXabRo0CdOWtS52VJUHbHNhE++1ddWNeJts2YmXlI7U5ul3tugsi7
+	 mxAO2fNVZtcwn1v9RWXT7Q3YHHVakkjPUjFUnxgh5Bl5mh/vONxumix1MgIuGmu3ycie/
+	 erwbqc9cVKyFFy8DrPdLsGUSgXMFnpFhLuAlb7K++pZ9GxwGvtfApYvTXLykwhg4ilw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=linux-foundation.org;
-	spf=pass smtp.mailfrom=linuxfoundation.org;
-	dkim=pass header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=google header.b=emjo1Tbg;
-	arc=none smtp.remote-ip=209.85.208.41
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VmjKMMEr;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44430606A31E
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 00:18:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44430606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379A6606A31A
+	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 00:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=google header.b=emjo1Tbg
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6ae305e3bd9so3367069a12.0
-        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 17:18:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1792887533; x=1793492333; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=NDtHB6+96zNrJiqoESkTVM99RvAu/va7B08qrVOb2CE=;
-        b=emjo1TbgduKlQ4wcFFJ6Ln5OcyzL1K6csEayf3f0Zih2UkYsSxLXCbXCyhPgfXmToQ
-         rsuIAHM2eQQmbUA0gU6ItX9qYEEzHTNsnt3tw+uN9CMqxDLo2bPW8jpDZPLo+comFVwi
-         KJ9ROXDP0vKr/idLGnJ8wnwfj5AotvSKczl+8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792887533; x=1793492333;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=NDtHB6+96zNrJiqoESkTVM99RvAu/va7B08qrVOb2CE=;
-        b=I4mfRuxymlzYAPk17p0PK/mAQn3uxFhYybx/zfJOu/9UyXlKPCgAzyhyaxyimxEUSG
-         h1nScbBGnt4IF9XRO+/8J9D2RF5YupF4J9veBWYroRfRKPqGUCMD586zMa49yW5/eOCi
-         QgDDrC1Lx7f/SaLv4Vx7uVMvS3tW+EcUvZINB8klNem5ostGHzAD/X7dKRa25e55vwb3
-         TcwEsOl/I/B02jySP5MyZrz0qKPSADejicm/CsbmFrK8ly+egGlnhf0M+kM8UO6Qg7hn
-         ertzbqXYAeApnhXyTkZC2yg8d80vzWyhDakToDwSQwZfToewdqRXDgDTqrh/B3XHcLgf
-         xbwA==
-X-Gm-Message-State: AFq9FYK43FkNGUxxP1NrQwi1j4yUkKOIyM4tU9KXuamcu4mR+y82vDNS
-	Gooic3PGlhgRcQMKCmoM9CDK3Rh0GG0CxKPo61EVyT9Wgxpf07RraoGRDPWzoFY+T0kvabM/Mvq
-	krq128dY=
-X-Gm-Gg: AYBFou0i3ue1pOPPOzdf4dnqE49cxv0pNxRxfUJ6ibROtYXkRI7wWkkRVPzOfOKeVdK
-	r0T5SNgISmYwQQHGEJvGx9memi5TG8CIn2kYrvLISk7pW04sOjLkS48+e0Cyue+Kddpe84ndxYW
-	CSd/9sLocFXoHCPU/mH/FFzOPFEkDg+x8ibt2PxyNDAmqmauh4XqLGXeGG/4ITH+zm1zfl2Unxk
-	QWjXBEAju+h2jowz8gA+YvX8J+1YTu2mfm4t7pNxxFTM6MPC0vrOToHrLi7AOkdWXIupAYig75Q
-	Vb6+lWytMfPOjzbTRdBwc+ejJllNca9sapZu8IjTl6X4dZOJFzmTjPQmUrlBEIIsJw3MjPw/eeQ
-	9cAXVfINsgEZAVOaO2ELzDmTkxAwTsWC+3II8cxT04hR44pDj/lbBGovkW19v5+APP28L1qlU3Q
-	ievuGrF7dXjhPkbwoenXA8+ZsXwXQEDsznex0M7QjITh8QYlUgcKggh2oRRDRbYO8jIszo185DI
-	WIHrzX51e0B6ys8fvmXAtx9yJANBPl0BbjxRc7chTQAJYuGbJqLdrTBfP0eMa/mSYsNzbsA99ky
-	AYrkztTJdoEOKx6Xi0PssFOp3mVGhUVa6BF4+m3ujmtOrn+q06WE
-X-Received: by 2002:a17:906:9f85:b0:c41:5a0e:3356 with SMTP id a640c23a62f3a-c46bded5befmr334851066b.41.1792887533581;
-        Sat, 24 Oct 2026 17:18:53 -0700 (PDT)
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com. [209.85.218.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c46bd7984e9sm141329666b.74.2026.10.24.17.18.52
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Oct 2026 17:18:53 -0700 (PDT)
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c3f8d72d7ceso291969566b.3
-        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 17:18:52 -0700 (PDT)
-X-Received: by 2002:a17:907:94c9:b0:c43:ae92:9a9 with SMTP id
- a640c23a62f3a-c46bde9d0a2mr336833266b.33.1792887532752; Sat, 24 Oct 2026
- 17:18:52 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VmjKMMEr
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 126D31F01825;
+	Sun, 25 Oct 2026 00:20:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792887611;
+	bh=t1YQFn0x8nP9hc6SNzB8o8M4BvjBUjche5ZWklFu+uM=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=VmjKMMErGecErxxFlq1sZPlOZsq1JmXuyv+I3ZLRTFu9NMFad3OZ3i28YSEp/rtDz
+	 yKj4U/fvO41LlHg+U859iREE8w1l/cudrd2ashOYBgp7UxgmJCrLyNvGP6/JfWjQXJ
+	 fHqZHcozO+AL0D5pdpD6l9GiY1+2B/o9YXodcDnz4H3WyxM2K2ZvhIKv+cvTM2b9ZC
+	 UBWbDmP6Tw588e31YmMbuHCf8XtgtKSc5ZBx5xMmGAhndS9vI+PlbpT3yPHQZRc4uu
+	 j45VFXHbhztcsIyIFRVrZF5ebMhtA2IamGMB6A5CMNgLgriNA7toRH7uXBgzD0qvBX
+	 hpoIzvP0HoyeQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0792C391B1B3;
+	Sun, 25 Oct 2026 00:20:11 +0000 (UTC)
+Subject: Re: [GIT PULL] Block updates for 7.4-rc
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk>
+References: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.4/block-20261021
+X-PR-Tracked-Commit-Id: 40d070cbb1906896d6fd65c39722d2411830ed9f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b23545529c21737dd7939e86b6f649f06480796d
+Message-Id: <179288760967.1837883.10019790159910042896.pr-tracker-bot@kernel.org>
+Date: Sun, 25 Oct 2026 00:20:09 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -90,33 +67,16 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk> <efe0abd7-edf4-4d2e-a8e8-be4203d7ac3b@kernel.dk>
-In-Reply-To: <efe0abd7-edf4-4d2e-a8e8-be4203d7ac3b@kernel.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 24 Oct 2026 14:18:36 -1000
-X-Gmail-Original-Message-ID: <CAHk-=whdThHmhxSuh2dWw8-+v5caYBdb3AwLyx4YY67_P0qufQ@mail.gmail.com>
-X-Gm-Features: AclHuK9aT3lPpMFvhVDJBQzuJ7BjcGMMoUCr8FaVWfE9dfDGm4wWvgVeOHHS2HE
-Message-ID: <CAHk-=whdThHmhxSuh2dWw8-+v5caYBdb3AwLyx4YY67_P0qufQ@mail.gmail.com>
-Subject: Re: [GIT PULL] Block updates for 7.4-rc
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 21 Oct 2026 at 05:11, Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 10/21/26 8:43 AM, Jens Axboe wrote:
-> > Hi Linus,
-> >
-> > Here are the block updates and fixes queued up for the 7.4 merge
-> > window. This pull request contains:
->
-> Completely forgot to mention that this merge will throw conflicts. Both
-> block/bio.c and block/blk-zoned.c will need resolving. Details:
+The pull request you sent on Wed, 21 Oct 2026 08:43:33 -0600:
 
-Bah. My resolution ended up being different. But I think mine isn't
-actively wrong, and keeps some of the warnings.
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.4/block-20261021
 
-Holler if you hate it. Or if I just plain screwed up.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b23545529c21737dd7939e86b6f649f06480796d
 
-             Linus
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
