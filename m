@@ -1,80 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792894738;
-	b=JiGfseLI3Z5WmAZIm0aNKhtHQFRmOrgsxykZIIqiL+524XYw53bJwtpHVgUfBVGsJLFT
-	 LWJ/EwKt5tBlLSKQbvTmmfvubJplnkuBHBp2vb+8XQ5J2hNngzx5534hPAsFU+2u3nF5n
-	 K3UhvBn05ZkR5IhRnI7rzzmgEjlYXGyaYZInqghjew2viMlriSfk8EMp0ZqgsTW/t5r6e
-	 BoZh8X2brt4e3cn9S6eKVEcfdxOIgOr2dmp6K/1nURNgPBj9E7NKtSjgcRNeQpQsLHXhl
-	 prlSR78fsXHa/MusPHEVIsuCCqVUuzaDYWiHNcdhelJ/fejQJFfPzg5VGM6g4cO07wg==
+	t=1792894740;
+	b=GaeVKBk6vmv8RwDsmuQBuslbj34xdYPDuv3OtJ/ii04m6zVy8gr+/QG/nqKupVLOe7Cr
+	 eRwY1opULy7G7fTFjppozFXFEhPBsXOF3XFeb4+tuytM/oTqiJcuMEcF9/qtyi5XjxTks
+	 UB8i5rehxNCFeP+v775gH+3QnMxmDB8fXlXBX21Zb9JsDU0ifzTpBPuAG3Gg8pW7sPklQ
+	 CBNOWlmVwsa5ObnKYcYxHPKGM9vy+DX1nrQdTNRE4PmWIfGiuhkx361gcTXvuoW9nc7Eq
+	 rq3ONhGclqutg5Fmu7U4C7a3zJ+xEbbUU8M18ehteg4rHl81lf2VCDOiWhXoZ/8eprQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792894738;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792894740;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=l+1W8fCH2YVVqsp80PGoTHVKE1lHVqXbpp8Ot3nWXz4=;
-	b=Al83qPsjA7DNPjnId04RZgH4LzY0D3OdRY/4B9fokb+pgZHdBsy3bzTUvIR3xaMQt/SM
-	 Kr472H3f5nQWZimk72NNw1BQKVHhBVXbhlMfSAnSE4lBeY+QviVAauzCJheDYWLbupC3T
-	 uUXfH7BKkpKNPJ6MfeYNO0YGS1sim3om/OAng16SUT/kFPFMT9T3ZRg0Q1up18d37siFv
-	 SYgU1yNDb6iDpf3yeE0FXSqsRDfIwR/LtuxPCcVciSZEu8sUXG35i7vsyzEiBRkdDH5Vx
-	 +My8bKoAYfhQpNL8y8OEff0rrnuapYFj7NR1AYFXf8VbZvCz2qcQhevmaVbY2k6PJwA==
+	bh=m/5b7j8QNKagV6FrH9MtDrAVHWRcPhsXwfAR70xb0Ug=;
+	b=MxPaWtT2+XObF/k6JQ6Xit0mURJ/hw6YV+O0Fn78PTasZk6DCEj0vX2tiZXftc7Uyqf9
+	 XvCwQiSCzai+aAzVd2soYEVVVt2jO8LxtRm5jvHc0s7fZT+OIMElUXLUEV6utpV0S9Jj0
+	 dhEEgO7tZNq5/5T2nLfDxLZiDN4Jf58oXtItJBboH5VPFHnnfD0kKj9h0b8S5exIjjWz6
+	 z6De3O5bqnVYYnNx1esOgqlAtFc5EAd9lkEpngGgbxMGgAzjVXuNaCI5jHAmlSdxLGQ+B
+	 nrZZurayuhiomK6LqbFz+GShdzwN1KnF20mi0ApFPCyOSMAVw3Ovwf4etQ2Zm4q25eQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=chromium.org;
 	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=dKuzwXoM;
-	arc=none smtp.remote-ip=74.125.82.43
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=mEaEtWj1;
+	arc=none smtp.remote-ip=74.125.82.174
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE83606A31A
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 02:18:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBE83606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00D5606A323
+	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 02:18:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E00D5606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=dKuzwXoM
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-188406bb948so1552212c88.1
-        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 19:18:57 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=mEaEtWj1
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-35c76e9614aso3169504eec.0
+        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 19:18:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792894737; x=1793499537; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1792894739; x=1793499539; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=l+1W8fCH2YVVqsp80PGoTHVKE1lHVqXbpp8Ot3nWXz4=;
-        b=dKuzwXoMRhNTEPPA+DYqc/ej4+W59qzyYx6sCUclzvqZgeB66RYor4i/D94aeKEqzH
-         4IoO0wWaPdG/H4Mf4fyWOQlFaVVdtbPFYrB3V4vj9VPbZ37MZu4X3HaBELqaT08oMbkY
-         drddQU9yy++6qH+dp5MZXklSkL+kdlD8YdeN0=
+        bh=m/5b7j8QNKagV6FrH9MtDrAVHWRcPhsXwfAR70xb0Ug=;
+        b=mEaEtWj1OFaHbLGuSLDOWsJZilE11kSLTXklpDVe9Nq/k5sRlT+ra3XSCqIX3jSnRt
+         V1BaNi/mcsF+VaKi2bRK0Oyy8Sger5f5DR3cORrxrTmOi7srOxQZCy8KxfD3oiwPMBF1
+         iqgcnbvVx2TtfrPMtc10d2NtZMnvRrW3ebggk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792894737; x=1793499537;
+        d=1e100.net; s=20260707; t=1792894739; x=1793499539;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=l+1W8fCH2YVVqsp80PGoTHVKE1lHVqXbpp8Ot3nWXz4=;
-        b=1aGlQT2Do/4hza4coldoGUqtdUes4Qp6wRtHrDdSSKcOhtaA1iVpGV9VN96LZB04rC
-         AqdOI7wiHOjywwWyxy9zm2qIYqMRqPZ5rkt/IFmyAX82/VzuQFok+340Hgz6B7U+YTE/
-         pJ9m+0K3IerzV1tD67lq5YgvTzHW0iRyptVzhfbG57hKpabGLumeVsP3pBxdv9K4GgT4
-         A4AKMiwD1Qp22C3nSpAKXClMXqxsAyei2AHG4nysnjwZqnvP4NKNCd2zYrmhk+GVNCmR
-         nEpLGW59NPZcWK8qo5rFPKE+4GIGrY3Gr4yN8RVHGg8eGQXLisDxgxp8uHD0J9iwOv/W
-         G65w==
-X-Forwarded-Encrypted: i=1; AKwUvBxuj7a/sehfMUmRwGl25RzMB1iRgHVkmlkIx9J7THd0p3RSI+7h6BwnWN6j43UmeQ9QJ49xoYhxMMvGSg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJrZuEt/l+AFFgojyKvDnbMvIEUSQAByZJ+OXqXghVKpLn89Hrj
-	VbI2I7na726wLDdH7+822Qs2yA80G7lKF3aFd/st57vrcpFEGN1vTJBSiTk8v6hJVw==
-X-Gm-Gg: AYBFou0JdnEP3MMXIIPvRJRKw3t+Ns0AqW9GiBCuuTC1c9EIv0/GIvtRU8OB15nH1Qo
-	+aBeB58bQm3t/18hyFVX/7QNTDX31QPtco9uPAweqagEo5q5GP3HkNrOPt+YKFZLwYhFKEh2ZES
-	iS4tzaosfeWahCujw306FZIVzh2a05fBjKLi0zhjM4l6OJkNTX8rFHrS+s7hpFmafWNLbJofI3D
-	+IKs7DAx8h2Pe8S+hWBKL9ah+tB7FIoyLuRbv8fvWqt2KcC7NfBI7ZAXHuvcmDmivfOMN6MSvBp
-	moO7afSlfLHEF/A7HevE7mXUCtEEiT7+XyK0mtg8R1Ie58a2QCRfB6O+CPUo+1QfiX+3K1b4c8B
-	GRGt6GsP7MziWr9xS6a8HkUmADL4pvA3Y7YP3Lo2tzWrdurdLfxCuCM2k0tJewnt2mW7T4+neXn
-	FC11ZpS8L806r2xV+/66B2S3w5WJoXBudiPx2o3Lfg5TbiLOABTKAvw0Rlj+5ekEhlkn42e3kU6
-	jLX9ZPTsDr4WAusyK6dgXaK0wu9wLpZK62412p9o4H1PuMXerk+ZK6/cz8mE1N4TcZgF5p/Hbz1
-	4pqTvw83H8SPF+mq7MtUAGJ6gbeXzYpE0Flmyd8IpfTvrQ==
-X-Received: by 2002:a05:701b:204a:20b0:14d:c7ae:85df with SMTP id a92af1059eb24-1993505df63mr4347970c88.12.1792894736742;
-        Sat, 24 Oct 2026 19:18:56 -0700 (PDT)
+        bh=m/5b7j8QNKagV6FrH9MtDrAVHWRcPhsXwfAR70xb0Ug=;
+        b=x0YgkEWheVJQMRFmcFPy6nfs2suwMcbv5HTSdPZKPyZXpGKlX5Os16Iuif4PiT0Yd+
+         69ztwHD+mK6ixTtbQ7ZfifG25MTrcnY6kX1byXBv1bS4fp64npm46Mdc90OtHfzaQ2fk
+         qhfPKatxClV1WnjJELj8EOnZ90eig/BnOTbQbMd3PCOZOcapbJpaFJVJQ7OhnhC/zAhC
+         z95i1195eysSayNYsNpB3Xj0WPhY72+DGcDOwVwg6Di7hhc+LjsVsIzbOm63S/INek5d
+         APHNnwtRuoQZoB85K2TAgbPPE6HOM/SRkqnm8xs+hmX9mc4guVST3Nu6K4SCIKuwrBsN
+         kEaA==
+X-Forwarded-Encrypted: i=1; AKwUvBxMaSn1i8+nemYz9b6v6X00/woxnDnye1TjgcdEOxDQu+lSkpN68q2byN/vYJdnRSQXOfpKeQSVDH3orA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJczIzq6pxqSRK4YNBjijWKFhSlVSafdmj19guoRciuK41vB57W
+	u7tMR2biRVb3zgYil7F8f12jVVoft4MKdNnQNX5Th5eUvbqWaxbZ2nDbXp4BJL4unA==
+X-Gm-Gg: AYBFou3vLVPcO4T20M9uNZ1GvTzpOS/myYAtv5FIIYMDcYBhQOKEemlICgY9WnK81i4
+	tCTFQLzBLQYudbQH5RI/QEiJ2PqukK1u6eCbKj6irqYB8MWaKvyQtIXLashXPXPKYXNV/AKmp5a
+	HhYOeui2Sn1OVu1Luw2bB5OaKhYOD18uZUkDciZsvUkVV7M6SGc68URaXhivnmqf8cPYGUsHh90
+	JGO26GWCpoxtxJzLPu5A08xgHAEzE6Pihy3OKEgUmKeUJkG0OJ5Xj54AZP+ujnHQsgvrTeDSBmg
+	Sjzb4iGAM592KsYezKeqBiSoZIiyUChjLP5Eb77D7ZeEkyBRJgzCR4Cy36XpLT4W4zxP2wqZ5bE
+	8SJh3HsiYh2aTA3AuC2Aa6hj7EwwBB/QsFjsoGBGabXp1wxHGZy0vhIfep4hIMaAX1uVPssULMG
+	sAsDVsxxZ2oRSYdH/3LaDK9bxwkqCTYX7TLgLhyU3znWVfi0XW/gqMJ9u9n2BV1M0Ba0K+lbkeQ
+	C6Wg1t7e6yHjwqsqSw4oOK5v0ydBUPbIhWxw5PCWFzqt3w+znU/WKD1dNH4+YPPQ0IlWsjELgUK
+	s0F8VOGPDryKn+iLAHhdABCC0xMn/BK4f62XBjXEFEAO
+X-Received: by 2002:a05:7022:fa02:b0:166:37d2:3b72 with SMTP id a92af1059eb24-1993686f496mr5842218c88.27.1792894738959;
+        Sat, 24 Oct 2026 19:18:58 -0700 (PDT)
 Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:9f87:66fc:8c85:11bb])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1989ff2ee5asm10387242c88.8.2026.10.24.19.18.54
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1989ff2ee5asm10387242c88.8.2026.10.24.19.18.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Oct 2026 19:18:56 -0700 (PDT)
+        Sat, 24 Oct 2026 19:18:58 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Brian Geffon <bgeffon@google.com>,
@@ -86,9 +86,9 @@ Cc: Brian Geffon <bgeffon@google.com>,
 	linux-block@vger.kernel.org,
 	linux-mm@kvack.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH v7 05/15] zram: remove stale WARN_ON() from zram_read_page()
-Date: Sun, 25 Oct 2026 11:18:21 +0900
-Message-ID: <20261025021839.1542805-6-senozhatsky@chromium.org>
+Subject: [PATCH v7 06/15] zram: zstd: do not allocate empty C/D-dictionaries
+Date: Sun, 25 Oct 2026 11:18:22 +0900
+Message-ID: <20261025021839.1542805-7-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.56.0.257.gf7497c7d27-goog
 In-Reply-To: <20261025021839.1542805-1-senozhatsky@chromium.org>
 References: <20261025021839.1542805-1-senozhatsky@chromium.org>
@@ -103,30 +103,30 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The zram_read_page() WARN_ON() is not accurate anymore, because, in
-theory, async read from bdev can return -EIO or -ENOMEM.  We report
-errors to upper layers via bi_status, so upper layers printk errors.
+Do not zstd_create_cdict_byreference() / zstd_create_ddict_byreference()
+C/D dictionaries when no dictionary was provided in the first place,
+because zstd still allocates internal memory for such calls (~96 KB at
+default level 3, and ~160 KB at levels 9+ on x86_64).
 
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/zram_drv.c | 4 ----
- 1 file changed, 4 deletions(-)
+ drivers/block/zram/backend_zstd.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 2affac25db5d..beae16f22777 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -2204,10 +2204,6 @@ static int zram_read_page(struct zram *zram, struct page *page,
- 		ret = read_from_bdev(zram, page, index, blk_idx, parent);
- 	}
+diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+index 127976b5455b..b367049f131d 100644
+--- a/drivers/block/zram/backend_zstd.c
++++ b/drivers/block/zram/backend_zstd.c
+@@ -76,6 +76,9 @@ static int zstd_setup_params(struct zcomp_params *params)
+ 	prm = zstd_get_cparams(params->level, PAGE_SIZE,
+ 			       params->dict_sz);
  
--	/* Should NEVER happen. Return bio error if it does. */
--	if (WARN_ON(ret < 0))
--		pr_err("Decompression failed! err=%d, page=%lu\n", ret, index);
--
- 	return ret;
- }
- 
++	if (!params->dict || !params->dict_sz)
++		return 0;
++
+ 	zp->cdict = zstd_create_cdict_byreference(params->dict,
+ 						  params->dict_sz,
+ 						  prm,
 -- 
 2.56.0.257.gf7497c7d27-goog
 
