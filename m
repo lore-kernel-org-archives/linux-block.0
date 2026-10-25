@@ -1,92 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792892333;
-	b=An1Q6nfZuLOx2RK9hP4sotCPHJjph+duXtSJntyK1unyU/pZgQPtxNmbsDih+p1QhtaO
-	 qFhS4KXlHdGXS1/ByRTYg4zsTd26eKS7p1KlFxkQYXAOLCapxqfl3hk4oqAnJc2FWj71v
-	 gOhZJUIIpf16ZS3QSx4bNwkUI3cASrVlRS/Xcc71edrZq02bPFpBLxqrvH/EKvwvo6jB2
-	 0jusrSrO4KjEA2h6N65JxPXPEToHh2CKocYAgG/3KxSW9FsuTWLWuaCib+0aIZlUmJdnu
-	 kuPUtqE4ha/yktoC7OP/KFhKOoCDMSmwEonXm4Ipjz7sGo0/VDk580OWSYV8S7ASYCA==
+	t=1792894727;
+	b=sE5zPL+U4H/ssg4U+3CyXRScmdf7uT1LM8VGgP3TNwXq4qsP64IUymG0dXBoRpi/DtzP
+	 tEpRQOdCuaxzGVWW2iS74jyLBXxOayZ67PVVWhyooP7kCvwZSzXGeyoHJp3T4+G7tckHo
+	 0kkGp+Tbrl/jEqMgQmabW63RYL75RCdI4NZCUBkNdctvHm2z5urM75O811wFCYhKPjLYr
+	 WbrBJ52r0/kiyyCZiWoNZaRAoHZlkGeFCINWKD6tW19coZ/P0ypHduHyu16GtDXH00MVa
+	 htO+yOy8pCmwFpmBON7ODc+PrmYJ//No9VQAIJ3oSHacYt4JVvaxOrJ4/VoklMffv1Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792892333;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792894727;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=vX4jDwUVQE1PbT5Y2KzG++B9u8Cu7vIzDB5HJALt09k=;
-	b=YYRvZu0RnrC1rae8YA7UIXo0+hx0qHIyPlNZNbD86Dw067UO3xTVJ1/LAQcuW47Gb/tn
-	 dap30Et73kupqWYRAFPiS9dvhvE4nB0M28ypCZfvwfobeVg5SbfVIblrFgiOjc0w86y6w
-	 S+FwpEydmG9Rg0VEQhmU6VvjUYDwSvW/jGbDiIZ/+zel6D1yPeuK8SPSej0Xidma2RndN
-	 oXKP6L4X5u/8OIfiI+WCrW3J2t9gAD6vKd9oueAT8EUYPGUEeAznZQoOJFxfSieghjPmH
-	 AnSWl4Pnm/Bp2DPFpIovO0jGSTlfrVoftp9yOjVt18RfqtR55CO49PEigm6VbLHo+Rg==
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=1r9lv2JLQ4NzTK9KfK4WRWnT+ABvHOtQg4UlHpt8dgI=;
+	b=JIxZkkeIpAPBALXxv5z5SdGMwvhxfPIZX4/nKnA78rE31qzCuMpm4KpmMfKxz+2D13LN
+	 DWa9GS2LRKFOFt8tWJSSEi/1MzOLtcw8sFmnqXBkKQNMMBJMsk5VFnhe/wxxkNiCkO0nA
+	 zDcZ4EKREq7B0N8VK9Fd7SKZMF31itJsc0tgVcRukmFMP9RbkCt3p8tSD5NNGsPLnMRx7
+	 Atzp0hOCoEA9HOn7Zx+Q6+BzMYseYK8viwMia7NaDYRA8RyOi7APVj1WmHJ39MlFwXW44
+	 Jv1zBnblOaXeLaHNXuDAK4rswanKnOUgkFAapQip++u5zhv1gnbkwujaLdySy+7is6A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=chromium.org;
 	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ZVm54Zwi;
-	arc=none smtp.remote-ip=74.125.82.44
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=X68vQEuE;
+	arc=none smtp.remote-ip=74.125.82.50
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F51606A31B
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 01:38:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D9F51606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA2E606A31D
+	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 02:18:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AFA2E606A31D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ZVm54Zwi
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-14fc585291cso698338c88.1
-        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 18:38:52 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=X68vQEuE
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-156cbe59524so1122957c88.1
+        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 19:18:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1792892332; x=1793497132; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=vX4jDwUVQE1PbT5Y2KzG++B9u8Cu7vIzDB5HJALt09k=;
-        b=ZVm54Zwip8sDjzS/8wmfoEi8r8OnRmIlduD8ZC4CKClZtZ6figRlmlr/RJ1hFp5z+4
-         nSK6yktdy/RotnXBQehKuzIPhQDFFvBeuuK8Tf4upO3AVTqwcSJDIFSSFNEYg01rVSHl
-         vpxr95+It5cY1S7NjzdjBo0swaIkQsv+PEsGA=
+        d=chromium.org; s=google; t=1792894726; x=1793499526; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=1r9lv2JLQ4NzTK9KfK4WRWnT+ABvHOtQg4UlHpt8dgI=;
+        b=X68vQEuERJj8MplXxgmix7A26xkVyeyRe+luYyOsjoF9SblunY8QDumbxEKhAwEJI5
+         T84HSnNy7rpF4Tm+kSi9Ua4MQFAy3z08JVtvb4fCNYfqE6lw2T88HvCaxnZGqp8lbfT9
+         NiaH7llp+1AM32Ofj4QrPTLl3o/gfLj2YzQvc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792892332; x=1793497132;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vX4jDwUVQE1PbT5Y2KzG++B9u8Cu7vIzDB5HJALt09k=;
-        b=XXZIm1Vs76amW427HG5l2+8v4pD+EBdx0XHEBgXFlv0y43/AdohhEr5DAUMLt43qCR
-         o4RV33sslwUPziiZbHIz/hhliIHubbBxs2XWwZPxfl4lEM1QR/1EyXGq9skHi4ngejYK
-         wXoN6hlnrj3oCeVWz/7yNgICUm4GxSOuuayYCP9a4p99LpHuFTjbo/HBLKtTPqJTjIsz
-         PtElQpMzp0L4aDsrcMRTQw29vFCxDZPuAQ8DQZGUu/BQbwlL2D590Qt3jM/fXtXl/ldv
-         74u+ptbTrF3VL+fSG8zj9/eoEQVAosRSjSuTByQhdY2UFnMkT9MkkcRY6DIQOuXVFam3
-         iDeg==
-X-Forwarded-Encrypted: i=1; AKwUvBwRKQfVZFkhy2LKs0T5+3Gu6kVi/Qg7Ujur/2TuVJ4EjmZkTg2/L9fGu8Q96FhF9HMaQ/Do+ifVyg7fiQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLZQ6ztwM+mPQYuSJTDVi1trXpkwm3tZEdu5KMixYrFMBSkLpNJ
-	MBjjDntSD3ZbvmSP1CHnojsFC/UkGyX1zNuX9RRg2A++M8ZmhTfpYAJjF6uNKwEx1Q==
-X-Gm-Gg: AYBFou18pIr+8tldi/nG1DIALsoiYlMR5Rs50MyX9PTBNk3RVzqzGqr98O8Tj/Sci/p
-	Qy4x8qELbFKJaCCyhd+42p+OTw28Zu4wsYtI8E0VWw1JfjzgubkC/PDFJRnqyspH89EKdf3LYZN
-	gcxvxoaQvaaWtUckCon83aEoIeDL8/ZXImVmZtpbdoln2VpZKqPmQTjt1I6JHYBomOqlSUoo6ZG
-	30MzI6Xp/0dIjqo9ENVA+d7hgn/mfhdocuCNT44Pzd/dWa7s8ap+IrQlZlG8en5WOSIQQrGcp/y
-	RFJOz9Kbhwcq/TxHA6j4Sf2cr0CpGoqz5l+NBPcGj+T+ok4Jf0j0W2pCRC46Xs217lOI4t2D4wG
-	sc/o6QDHnN4Yd+PlqH+jhzgNZVDoCefi3cTEny3nvEpSd/BQPHmqblWeLnn5/4E709o21CkM+1d
-	vv31+eTNs4FQIrxTho4zVwIfW20iwWcAFNK2s059QerXds1LrtgnEMwJxRks+m6PEwUBMBfS83W
-	7Dtje36XEgBz0GniAao7StRogZUODz3Vqa23G3tqNEJYMOYaKheM9c6Nbh/4M9p5Q2AShR7jVku
-	imhqCtk1gdRiB0t2cbO23Ct5oz14PxImXW1j9cazcw==
-X-Received: by 2002:a05:7022:7f12:b0:176:2095:1ac4 with SMTP id a92af1059eb24-19935be809dmr4891737c88.18.1792892331865;
-        Sat, 24 Oct 2026 18:38:51 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:9f87:66fc:8c85:11bb])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-198a21bc6cbsm11000132c88.16.2026.10.24.18.38.49
+        d=1e100.net; s=20260707; t=1792894726; x=1793499526;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=1r9lv2JLQ4NzTK9KfK4WRWnT+ABvHOtQg4UlHpt8dgI=;
+        b=G6lghC1CQpfWgd1ylmm5hElT8iuHJhvVVZFEYQGKm5k1q5yQfIaNIE6vU8UzGMmT+M
+         veGMDh5l6I/XGb7dc2xGhXCDqIP+DlL5XUcu+8rXX/fpiV5A6NwuNv2ZF5/81GwligZO
+         5HzvsotzYcqaTHecVXnhayboSE+7bzfPE/TTsShzLuZ5l1KVmViLFY8uUm4SLrM5Gx3u
+         880IOJICXKBm4C9dwn8hkDk7Cxo0CUd2idW2vl379fA3oQklc07WJFmFI2f6Gv3twIav
+         5UifG16v3kxfb15tSmykfgHIGt/QH8pF8T1F1bppIrE8DOjguzLo+I9YH1C4tZIJbxFS
+         YGSQ==
+X-Forwarded-Encrypted: i=1; AKwUvBweLX+XKKu0zoZTsq9EqqBGHnZ8ymtTmIpIQti9uWEN4wUy5SSG6n0En9NH5OQpdHoOsUVCm7uCZpukfg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIp2Ejj3xHJpTlgRhaY4rq1lg5kST9sFTVdwoaFO4LTY2swBlzG
+	lRXzvbeL/k8cKyrwvyPNp8x+FWpGoAox7j393qsNuTTNE7q/icyPErF+wUqq+Lu8uA==
+X-Gm-Gg: AYBFou2tb2ZuoCDduTkZ9Rj9BMIaTQy2EXOM7mq1+HHThFwHln0C+h1QC9PLPKXMTTV
+	GSkAfI9h64Z232fHNGcpJ5auu6XMm7KmGJOKgkUlqLmp+S/6nyC9YNt6T89MBMq/0A8Y+Y81HAy
+	f1gIqjdpeSJGXyCbUdLpcjGiE3pt9ScaXX5vZxPEjsOWdo41015v3dOrqAGA/UH4ZuY2QiBQaR7
+	zpA+opLNmyOyqmCHLiqutTKKJOfYJfYbvkXrR2KEzzSrqkpxcjad28Jb9zmQgCN3pYQ1T4qzACJ
+	jZ9kyXKTwqE4HBXqswB99mbh1Ulmti+h3turqWY2KFiYYuMjzsj/FextiOt8sAGhx/0Cf8dfQXf
+	nqM/kvbmB4dUeT/l6ERAhJQrudWqyTbC/fheqMCwBcX6y+1HyeYaw+eFcnj9nBoX8BfGgyEhXUL
+	jZ5FJ0C6GTdYM399XXBv0fSYywiNJqp2as2ctrZfxoCj+cQFR7hX/92wCD7/XLxVFRr2qDQsvpz
+	bHNLM5ln+3HIOOZX3h67KJxPbikDXqeRcXZekhLsmogtUFMdAsKfqhznA/baKaqsA7tTeDAPKH7
+	OzN1+3NQfN1DqYboi9DXbebypP4ZObZzl5gCny4EfDePBId9PZM98q3CaQj08Mj6ZALWRAmaZPf
+	7F5JxcdCTOcsubbwGgg==
+X-Received: by 2002:a05:7022:eac3:b0:192:bb26:19fe with SMTP id a92af1059eb24-199376e0828mr5839865c88.34.1792894725429;
+        Sat, 24 Oct 2026 19:18:45 -0700 (PDT)
+Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:9f87:66fc:8c85:11bb])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1989ff2ee5asm10387242c88.8.2026.10.24.19.18.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Oct 2026 18:38:51 -0700 (PDT)
-Date: Sun, 25 Oct 2026 10:38:47 +0900
+        Sat, 24 Oct 2026 19:18:44 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Hillf Danton <hdanton@sina.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Barry Song <21cnbao@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Brian Geffon <bgeffon@google.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-mm@kvack.org
-Subject: Re: [PATCH v6 09/13] zram: split zcomp into separate R/W streams
-Message-ID: <at1cSbfBXdYIAIyT@google.com>
-References: <atxFgutP-N3UZex2@google.com>
- <20261024101401.1035-1-hdanton@sina.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Brian Geffon <bgeffon@google.com>,
+	Barry Song <baohua@kernel.org>,
+	Bo Zhang <zhangbo0325@gmail.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Richard Chang <richardycc@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH v7 00/15] zram: redesign zcomp and rework backends
+Date: Sun, 25 Oct 2026 11:18:16 +0900
+Message-ID: <20261025021839.1542805-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.56.0.257.gf7497c7d27-goog
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -96,168 +99,121 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261024101401.1035-1-hdanton@sina.com>
+Content-Transfer-Encoding: 8bit
 
-On (26/10/24 18:14), Hillf Danton wrote:
-> > (PE enabled for all tests)
-> > 
-> > ######## zstd compression level 3 W-vs-R
-> >     BASE     IOPS 1,154k  avg 7.84us  sd   444us  max   697,634us
-> >              IOPS 881k  avg 14.16us  sd 2,242us  max 1,387,000us
-> >              IOPS 704k  avg 20.43us  sd 3,499us  max 2,058,300us
-> >              IOPS 563k  avg 29.02us  sd 3,910us  max 1,649,800us
-> >              IOPS 626k  avg 24.79us  sd 4,013us  max 2,085,800us
-> >              IOPS 976k  avg 11.54us  sd 1,518us  max 1,165,800us
-> >              IOPS 1,178k  avg 7.44us  sd    22us  max     3,103us
-> >              IOPS 1,120k  avg 7.39us  sd    21us  max     7,222us
-> >              IOPS 522k  avg 32.51us  sd 4,311us  max 1,598,300us
-> >              IOPS 581k  avg 27.54us  sd 3,626us  max 1,448,600us
-> >              IOPS 1,160k  avg 7.69us  sd   352us  max   702,099us
-> >              IOPS 1,169k  avg 7.52us  sd   129us  max   281,428us
-> >              IOPS 954k  avg 12.06us  sd 1,705us  max 1,545,600us
-> >              IOPS 1,029k  avg 10.24us  sd 1,156us  max   976,065us
-> >              IOPS 1,169k  avg 7.48us  sd    24us  max     4,305us
-> >              IOPS 1,177k  avg 7.45us  sd    53us  max   118,777us
-> >              IOPS 579k  avg 27.43us  sd 3,661us  max 1,615,800us
-> >              IOPS 1,169k  avg 7.52us  sd   115us  max   228,074us
-> >              IOPS 1,110k  avg 8.59us  sd   985us  max 1,288,000us
-> >              IOPS 1,177k  avg 7.45us  sd    29us  max    72,245us
-> >              IOPS 580k  avg 27.74us  sd 3,755us  max 1,507,000us
-> >     PATCHED  IOPS 1,179k  avg 7.40us  sd    23us  max     7,404us
-> >              IOPS 1,179k  avg 7.41us  sd    22us  max     2,857us
-> >              IOPS 1,176k  avg 7.40us  sd    22us  max     6,615us
-> >              IOPS 1,175k  avg 7.44us  sd    23us  max     5,623us
-> >              IOPS 1,176k  avg 7.42us  sd    24us  max     5,625us
-> >              IOPS 1,173k  avg 7.42us  sd    24us  max     5,632us
-> >              IOPS 1,172k  avg 7.41us  sd    23us  max     6,223us
-> >              IOPS 1,173k  avg 7.40us  sd    25us  max     5,848us
-> >              IOPS 1,173k  avg 7.40us  sd    24us  max     7,563us
-> >              IOPS 1,172k  avg 7.42us  sd    24us  max     5,625us
-> >              IOPS 1,175k  avg 7.42us  sd    23us  max     5,626us
-> >              IOPS 1,177k  avg 7.42us  sd    23us  max     4,243us
-> >              IOPS 1,170k  avg 7.46us  sd    25us  max     5,622us
-> >              IOPS 1,178k  avg 7.40us  sd    22us  max     3,213us
-> >              IOPS 1,167k  avg 7.43us  sd    25us  max     7,593us
-> >              IOPS 1,174k  avg 7.44us  sd    23us  max     6,971us
-> >              IOPS 1,179k  avg 7.38us  sd    23us  max     3,477us
-> >              IOPS 1,180k  avg 7.39us  sd    23us  max     2,894us
-> >              IOPS 1,145k  avg 7.37us  sd    21us  max     4,048us
-> >              IOPS 1,177k  avg 7.38us  sd    22us  max     5,620us
-> >              IOPS 1,177k  avg 7.40us  sd    23us  max     5,623us
-> > 
-> >     IOPS: BASE 932k (+-260k), PATCHED 1,174k (+-7k), 21 runs each.
-> >           significant difference at 95% confidence: PATCHED is 241k (25.9%) higher; 95% CI [+136k, +353k], Welch's t-test p = 0.000
-> >     max latency: BASE 3.1..2,085.8 ms, PATCHED 2.9..7.6 ms
-> >           runs with max over 100 ms: BASE 17 of 21, PATCHED 0 of 21; over 1 s: BASE 11 of 21, PATCHED 0 of 21
-> > 
-> > ######## zstd compression level 12 W-vs-R
-> >     BASE     IOPS 690k  avg 21.53us  sd 3,088us  max 1,635,500us
-> >              IOPS 478k  avg 36.51us  sd 4,385us  max 1,941,300us
-> >              IOPS 822k  avg 16.13us  sd 2,865us  max 2,263,800us
-> >              IOPS 1,161k  avg 7.73us  sd   114us  max   190,307us
-> >              IOPS 780k  avg 17.56us  sd 2,717us  max 1,550,500us
-> >              IOPS 1,166k  avg 7.66us  sd    40us  max    94,522us
-> >              IOPS 585k  avg 27.51us  sd 3,847us  max 1,550,600us
-> >              IOPS 1,147k  avg 7.97us  sd   344us  max   496,483us
-> >              IOPS 1,166k  avg 7.64us  sd    49us  max   115,243us
-> >              IOPS 1,163k  avg 7.66us  sd    23us  max     7,006us
-> >              IOPS 1,071k  avg 9.42us  sd 1,489us  max 1,915,500us
-> >              IOPS 962k  avg 11.88us  sd 2,168us  max 1,904,500us
-> >              IOPS 607k  avg 26.05us  sd 3,538us  max 1,591,100us
-> >              IOPS 1,167k  avg 7.63us  sd    23us  max     2,903us
-> >              IOPS 1,157k  avg 7.78us  sd   198us  max   418,930us
-> >              IOPS 1,163k  avg 7.66us  sd    40us  max   100,346us
-> >              IOPS 1,162k  avg 7.70us  sd    32us  max    82,602us
-> >              IOPS 488k  avg 35.43us  sd 4,340us  max 1,786,400us
-> >              IOPS 563k  avg 28.85us  sd 3,989us  max 2,209,500us
-> >              IOPS 843k  avg 15.43us  sd 2,490us  max 1,572,100us
-> >              IOPS 604k  avg 26.30us  sd 3,560us  max 1,555,700us
-> >     PATCHED  IOPS 1,166k  avg 7.60us  sd    23us  max     5,623us
-> >              IOPS 1,169k  avg 7.58us  sd    23us  max     5,629us
-> >              IOPS 1,157k  avg 7.67us  sd    27us  max     5,639us
-> >              IOPS 1,166k  avg 7.61us  sd    24us  max     5,644us
-> >              IOPS 1,160k  avg 7.64us  sd    26us  max     7,543us
-> >              IOPS 1,167k  avg 7.60us  sd    24us  max     7,514us
-> >              IOPS 1,160k  avg 7.61us  sd    25us  max     6,643us
-> >              IOPS 1,162k  avg 7.65us  sd    25us  max     7,315us
-> >              IOPS 1,161k  avg 7.66us  sd    24us  max     6,237us
-> >              IOPS 1,158k  avg 7.62us  sd    27us  max     7,688us
-> >              IOPS 1,167k  avg 7.58us  sd    24us  max     5,637us
-> >              IOPS 1,165k  avg 7.59us  sd    24us  max     7,098us
-> >              IOPS 948k  avg 7.58us  sd    23us  max     7,808us
-> >              IOPS 1,166k  avg 7.60us  sd    24us  max     5,621us
-> >              IOPS 1,166k  avg 7.58us  sd    24us  max     5,672us
-> >              IOPS 1,162k  avg 7.65us  sd    25us  max     6,824us
-> >              IOPS 1,165k  avg 7.59us  sd    24us  max     7,078us
-> >              IOPS 1,168k  avg 7.58us  sd    23us  max     6,191us
-> >              IOPS 1,170k  avg 7.56us  sd    22us  max     2,851us
-> >              IOPS 1,171k  avg 7.55us  sd    22us  max     2,834us
-> >              IOPS 1,166k  avg 7.59us  sd    24us  max     5,627us
-> > 
-> >     IOPS: BASE 902k (+-269k), PATCHED 1,154k (+-47k), 21 runs each.
-> >           significant difference at 95% confidence: PATCHED is 252k (27.9%) higher; 95% CI [+142k, +367k], Welch's t-test p = 0.000
-> >     max latency: BASE 2.9..2,263.8 ms, PATCHED 2.8..7.8 ms
-> >           runs with max over 100 ms: BASE 17 of 21, PATCHED 0 of 21; over 1 s: BASE 12 of 21, PATCHED 0 of 21
-> > 
-> > ######## lz4 W-vs-R
-> >     BASE     IOPS 1,422k  avg 3.84us  sd   418us  max   619,495us
-> >              IOPS 1,450k  avg 3.57us  sd   326us  max   609,723us
-> >              IOPS 1,414k  avg 3.92us  sd   543us  max   879,815us
-> >              IOPS 1,451k  avg 3.56us  sd   253us  max   503,428us
-> >              IOPS 1,460k  avg 3.40us  sd    68us  max   135,825us
-> >              IOPS 1,413k  avg 3.31us  sd    44us  max   188,450us
-> >              IOPS 1,432k  avg 3.73us  sd   503us  max   844,228us
-> >              IOPS 1,387k  avg 4.20us  sd   719us  max   961,827us
-> >              IOPS 1,464k  avg 3.38us  sd    44us  max   133,675us
-> >              IOPS 1,469k  avg 3.38us  sd    22us  max    65,812us
-> >              IOPS 1,465k  avg 3.40us  sd    49us  max   111,788us
-> >              IOPS 1,465k  avg 3.39us  sd    64us  max   174,040us
-> >              IOPS 1,467k  avg 3.38us  sd    36us  max    97,821us
-> >              IOPS 1,445k  avg 3.63us  sd   343us  max   671,026us
-> >              IOPS 1,472k  avg 3.35us  sd    27us  max    86,795us
-> >              IOPS 1,473k  avg 3.33us  sd    44us  max   138,096us
-> >              IOPS 1,439k  avg 3.71us  sd   353us  max   619,815us
-> >              IOPS 1,398k  avg 3.36us  sd    54us  max   206,815us
-> >              IOPS 1,471k  avg 3.36us  sd    15us  max     2,832us
-> >              IOPS 1,407k  avg 4.02us  sd   629us  max 1,074,800us
-> >              IOPS 1,465k  avg 3.40us  sd    63us  max   158,779us
-> >     PATCHED  IOPS 1,471k  avg 3.30us  sd    15us  max     6,946us
-> >              IOPS 1,473k  avg 3.29us  sd    16us  max     5,618us
-> >              IOPS 1,474k  avg 3.29us  sd    15us  max     5,615us
-> >              IOPS 1,473k  avg 3.29us  sd    15us  max     5,625us
-> >              IOPS 1,440k  avg 3.26us  sd    13us  max     2,829us
-> >              IOPS 1,456k  avg 3.30us  sd    15us  max     5,623us
-> >              IOPS 1,476k  avg 3.29us  sd    15us  max     2,835us
-> >              IOPS 1,464k  avg 3.28us  sd    16us  max     6,063us
-> >              IOPS 1,468k  avg 3.32us  sd    19us  max     6,692us
-> >              IOPS 1,465k  avg 3.30us  sd    17us  max     6,834us
-> >              IOPS 1,468k  avg 3.28us  sd    16us  max     7,268us
-> >              IOPS 1,463k  avg 3.31us  sd    17us  max     6,480us
-> >              IOPS 1,454k  avg 3.33us  sd    20us  max     8,418us
-> >              IOPS 1,452k  avg 3.32us  sd    19us  max     5,621us
-> >              IOPS 1,477k  avg 3.27us  sd    14us  max     2,834us
-> >              IOPS 1,468k  avg 3.30us  sd    16us  max     5,617us
-> >              IOPS 1,475k  avg 3.30us  sd    16us  max     3,884us
-> >              IOPS 1,475k  avg 3.30us  sd    16us  max     5,692us
-> >              IOPS 1,471k  avg 3.30us  sd    15us  max     5,616us
-> >              IOPS 1,473k  avg 3.28us  sd    16us  max     7,014us
-> >              IOPS 1,475k  avg 3.28us  sd    15us  max     5,616us
-> > 
-> >     IOPS: BASE 1,444k (+-27k), PATCHED 1,467k (+-10k), 21 runs each.
-> >           significant difference at 95% confidence: PATCHED is 23k (1.6%) higher; 95% CI [+11k, +35k], Welch's t-test p = 0.001
-> >     max latency: BASE 2.8..1,074.8 ms, PATCHED 2.8..8.4 ms
-> >           runs with max over 100 ms: BASE 17 of 21, PATCHED 0 of 21; over 1 s: BASE 1 of 21, PATCHED 0 of 21
-> 
-> 
-> Lets see the data from another pov (feel free to disagree) -- in the android
-> phone/car cockpit environment, the render frequence is required above 60HZ,
-> IOW a frame rendered within 16ms, so what share of the 16ms does the IOPS
-> account for after this patchset, for example when an app in background is
-> brought foreground?
+The series has a number of memory usage optimisations and fixes
+that result in savings from double digits KB to triple digits
+KB per-context/per-CPU, depending on backend and its configuration.
+More details are in the corresponding commit messages.
 
-A single 500 ms read stall is 30 dropped frames.  Across 126 runs that
-I ran, base+PE had read stalls over 100 ms in 108 runs and over 1 s in 47.
-The worst read with the series+PE, in all 126 runs, was 8.4 ms, i.e. within
-one frame.
+The zcomp redesign and backend rework happen in the final five
+patches.  zcomp part, basically, attempts to address the priority
+inversion problem, that is seen on some setups.  In zcomp, we have
+always kept Read and Write contexts together in per-CPU streams.
+With preemptible zram this becomes a bit of a problem, as a higher
+priority Reader can preempt a Writer, which may hold a stream
+lock, but since the compression stream is locked by the preempted
+Writer, the Reader gets blocked on the very same stream lock.
+However, we don't have any reasons to have Read and Write contexts
+share and compete for the stream, because Read (decompression) and
+Write (compression) paths are completely independent, they never
+touch each other's buffers.  Thus, we can split compression streams
+into per-CPU Read streams and per-CPU Write streams (Barry Song),
+so that Readers and Writers don't block each other anymore.
+Decoupling Reads and Writes results in noticeable performance
+improvements on synthetic tests.  The Reader vs Reader priority
+inversion is still possible.  To attack this problem we introduce
+shared decompression stream (Brian Geffon) which can be used when
+decompression is stateless.  There, however, stateful backends (zstd,
+deflate) that cannot have shared decompression contexts.  For those
+backends, we introduce a remote CPU borrowing of idle exclusive
+decompression contexts, if an exclusive Reader get preempted on
+current CPU.  We also now allocate a per-request (Read) bounce
+buffer for linearisation of spanning zsmalloc objects, so stateless
+decompression contexts do not block each other.
+
+Reader vs Reader priority inversion tests (fg reader, average of
+3 runs):
+
+  exclusive zstd
+  Metric           Base               Patched
+  ----------------------------------------------------------
+  Read IOPS        391k               1,064k        (+2.7x)
+  Read clat max    3,208,867 us       5,881 us      (-546x)
+
+  shared lz4
+  Metric           Base               Patched
+  ----------------------------------------------------------
+  Read IOPS        972k               1,466k        (+50.9%)
+  Read clat max    2,204,467 us       6,442 us      (-342x)
+
+Writer vs Reader priority inversion tests (fg reader, average of
+3 runs):
+
+  lz4
+  Metric           Base               Patched
+  ----------------------------------------------------------
+  Read IOPS        642k               1,472k        (+2.3x)
+  Read clat max    2,393,767 us       5,711 us      (-419x)
+
+Proxy execution was brought up during v6 review, so I re-ran the
+tests with CONFIG_SCHED_PROXY_EXEC=y in both kernels, 21 runs per
+configuration (lz4, zstd level 3, zstd level 12).  Per-patch commit
+messages have the full tables.  In short: with proxy execution base
+catches up with patched on IOPS in Reader vs Reader tests, and is
+still 26-28% behind in zstd Writer vs Reader tests.  What proxy
+execution does not fix is the worst case: out of 126 base runs (R-vs-R
+and W-vs-R combined), 108 had a read stalled for over 100 ms and 47
+for over 1 s.  Patched never exceeded 8.4 ms in 126 runs.  One thing
+to notice, Proxy execution is EXPERT-only option; this series doesn't
+depend on it.
+
+The final patch builds atop of decoupled Read and Write streams and
+reworks the way secondary streams are handled.  Secondary compression
+streams are only used from recompression, which is serialized by
+device lock, IOW it's single-threaded.  However, we still allocated
+secondary streams per-CPU (we needed to permit concurrent Reads
+of recompressed objects).  Because we now have dedicated R/W
+streams, we can allocate a singleton compression context (for
+recompression) yet still have per-CPU decompression contexts.
+This saves a notable amount of memory with some backends and
+configurations (e.g. zstd, deflate).
+
+v6 -> v7:
+- tested against Proxy Execution, added the numbers to commit messages
+- added "move mark_slot_accessed() under existing slot lock sections"
+  and "remove stale WARN_ON() from zram_read_page()" patches
+- updated commit messages
+
+Sergey Senozhatsky (15):
+  zram: prefix backends printk-s
+  zram: remove debugfs entry on init failure
+  zram: reset writeback state in zram_reset_device()
+  zram: move mark_slot_accessed() under existing slot lock sections
+  zram: remove stale WARN_ON() from zram_read_page()
+  zram: zstd: do not allocate empty C/D-dictionaries
+  zram: lz4hc: pre-initialize dictionary stream in setup_params
+  zram: lz4: use LZ4_decompress_safe_usingDict()
+  zram: lz4hc: use LZ4_decompress_safe_usingDict()
+  zram: zstd: do not use kvzalloc() for zstd allocations
+  zram: split zcomp into separate R/W streams
+  zram: introduce shared decompression streams
+  zram: allocate bounce buffer for spanning objects
+  zram: borrow idle decompression streams in exclusive mode
+  zram: use a singleton compression context for recompression
+
+ drivers/block/zram/backend_842.c     |   6 +-
+ drivers/block/zram/backend_deflate.c |  98 +++++----
+ drivers/block/zram/backend_lz4.c     |  85 ++------
+ drivers/block/zram/backend_lz4hc.c   | 105 ++++------
+ drivers/block/zram/backend_lzo.c     |   6 +-
+ drivers/block/zram/backend_lzorle.c  |   6 +-
+ drivers/block/zram/backend_zstd.c    | 133 +++++++-----
+ drivers/block/zram/zcomp.c           | 298 +++++++++++++++++++++++----
+ drivers/block/zram/zcomp.h           |  53 ++++-
+ drivers/block/zram/zram_drv.c        |  71 ++++---
+ 10 files changed, 546 insertions(+), 315 deletions(-)
+
+-- 
+2.56.0.257.gf7497c7d27-goog
+
