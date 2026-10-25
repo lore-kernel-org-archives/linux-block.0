@@ -1,68 +1,115 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.108.3.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792925705;
-	b=3nKnOYQZ7jZDnKTTrKncvsbZyyHVM9X107D/gjXSN0RnUd8CrV5R9MRgemoxuKws36Wm
-	 jtoLPiB4pg9M6N0z+wMMKtJiqt7/clV/4Fddm7+1DGc5cjMj3hu0iOcffG+SjqpJluJSB
-	 FSswRG0+zMYl0TboMCN4nVOzoI4iXGi1TM4cgbH/pESWqUXLVzAPQjZjemIUbegBTjxZG
-	 XwgNZz7OUcqP39iFmUtZN/ktmKjTyagYHadUanfIQYVq9ceMfPEU1IAMfNyBHuCAVVVaR
-	 grVJsXAqNVUVn+/3n+LRVwhpFgPamLDb75YWFFYBmwMV33Y9YHd/gPXYD5I9BDJXu5w==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792925705;
-	h=DMARC-Filter:DKIM-Signature:X-SMAIL-HELO:Received:X-Sender:X-Auth-ID:
-	 X-SMAIL-MID:X-SMAIL-UIID:From:To:Cc:Subject:Date:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=4ddGAYAtB79F7wRhnGkW+ljKWe8FQH+MNDzT857Yhzs=;
-	b=3ac/M51yUdYKHeM0qFbVLypO3Y35+eYMu//xvMPx+kywBIZtLAAV0+UziiW3fO4AvDK7
-	 mSTULDyjKfUKzi+rdtBL3X1o8ZEY4fINH/1F3/sz6bww24SpNfPDJ5vK5Bxrc45YAlIFN
-	 l3MlWOePcEBPpOS2l8WEwysg9oh2YwTJ9f3aEYbjrZ8R3sKUgWzsCvvINMxXAUblGYNAm
-	 zRJ20OS4Mrzm+biF2bAVt8NtNW55zTWxeHdM0QDkc3QEJO5onORTYRFC58W7pLIJPOrxI
-	 8PlsgQK79QR5loCvtKAlfzWvWIpt0iGtzvRMI/82QILpTADiEmIdO1PeOuaOg4z5hIA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=sina.com;
-	spf=pass smtp.mailfrom=sina.com;
-	dkim=pass header.d=sina.com header.i=@sina.com header.a=rsa-sha256 header.s=201208 header.b=vmireff4;
-	arc=none smtp.remote-ip=202.108.3.18
-Received: from r3-18.sinamail.sina.com.cn (r3-18.sinamail.sina.com.cn [202.108.3.18])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=216.71.154.45
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792931031;
+	b=cMOccQ+GCyLLN9GncRHGJgr9zn3Cg7HkNGDp8F38BkGdyzDAT3iXwOaqQJdSg45lp9bZ
+	 gL9Ride0H3XVlwZLZ83guuRn4D9Y1FF/RtJT9aZlbNQr+0/6KZyW/bVQ9pJcPdQWdjOtD
+	 0aiXNilQm5vjl2Smzhq5f5lG9TzsWPs8UKVtnrj6kfvmEja/TBNbRZ/IXnC1WgcTF8YCZ
+	 2C8a0gPrmpDjD/wnJaJatBN4AZhQ444SdR2ijRlyZoQjR5lPo4fVw2/DXvJRtn2xcXLqa
+	 kiLqwktG5ziKibdJFhyXPFerz1ynLphanMSSGyGWM6abFLHofg/N5X4aH8fxHqcre9g==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792931031;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:Received:DKIM-Signature:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:Content-Type:Content-Disposition:
+	 In-Reply-To:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 WDCIPOUTBOUND:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-Exchange-RoutingPolicyChecked:
+	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=+uU8vtJQ5rq6A8R6gzcSLjCPn5AfGS7UwCHYZ5t7l34=;
+	b=iRiUy8hvJQ2VIDilFyXOJzt80Lzux5zNvrHgroN50rlmXyhTp6OyNNb4Ug/Yt5Mi0lgg
+	 ozj8HffAFhxVX1C3SaQIoMQd6UmD32Oij9kdJjpMpajORsGxewOynCipCl4eOtyUBJFOM
+	 IJ97U7TUKQuCbu5ms5l7p6ej9+jn3QVqzAYyj73whobzLD0J0Qo2kjMffdn7SaouIM2eY
+	 nEIZFCcnneeIFRSEBFFhhnvG6VoiP8Z+zz2Lw84IQyhf0eQHhPyaSR2GWdOM/ZnIVlyKg
+	 f0CL2j1/0jeW4Q5RXtElVoZWEm1vho1QsOVfZinDh4+1h8c6Gdvs1RP7/M4sIG5OSeg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=wdc.com;
+	spf=pass smtp.mailfrom=wdc.com;
+	dkim=pass header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=Z1yGRZ0W;
+	dkim=pass header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b="Z8wgz/gG";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=216.71.154.45
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A2C606A322
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 10:55:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 85A2C606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F29606A31F;
+	Sun, 25 Oct 2026 12:23:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88F29606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=sina.com header.i=@sina.com header.a=rsa-sha256 header.s=201208 header.b=vmireff4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1792925703;
-	bh=4ddGAYAtB79F7wRhnGkW+ljKWe8FQH+MNDzT857Yhzs=;
-	h=From:Subject:Date:Message-ID;
-	b=vmireff4J+MbDoGe5Q55pfbqnu9egReFVl55MYum52Vjk66qca++UAyFW6ZCQr4ea
-	 LNetT/b/v27znRSbpn+Gfv56sn807d9pAGeSlLLfJ/NDYCRScrz8HCvQPNqYH3zSEu
-	 BdwzTyZ6m2YGji3Cuor2cZYdClhyI4poYR8PVMUQ=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.246.238.232])
-	by sina.com (10.54.253.32) with ESMTP
-	id 6ADDDFFB00000221; Sun, 25 Oct 2026 18:54:54 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 6351494456771
-X-SMAIL-UIID: 9557747A4C984AC9AE3E1418D8FD2278-20261025-185454-1
-From: Hillf Danton <hdanton@sina.com>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Barry Song <21cnbao@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brian Geffon <bgeffon@google.com>,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [PATCH v6 09/13] zram: split zcomp into separate R/W streams
-Date: Sun, 25 Oct 2026 18:54:40 +0800
-Message-ID: <20261025105441.1148-1-hdanton@sina.com>
-In-Reply-To: <at1cSbfBXdYIAIyT@google.com>
-References: 
+	dkim=pass (2048-bit key, unprotected) header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=Z1yGRZ0W;
+	dkim=pass (1024-bit key, unprotected) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=Z8wgz/gG
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1792931030; x=1824467030;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=v0JQQ7ldpnWjTf++UGKCcVScSaR2N+K+6KsVUiEln/8=;
+  b=Z1yGRZ0WOUYJvNsIrrxHD9UEcQI1t3Jlzqvyb0BP7c7s4NJ+ge+geVsm
+   fJcO4ZLvdZw7vhhWXINVXVP7oR6Ntxrq96k3EGzNOXyP5kaPQKBBH+OMP
+   +H6DgTEVotBNNGCjfb9qTv1iAOo7TmMC+iWyfFPTrY4B9Hbnm4xRCeDtB
+   jhdfIZ1oIn6+KtIMPEgCQrhzBksRBnRmKKJtBUgd2sBBq40x2rWRH6JMd
+   NY6vgLG8kbnoeFuZpJZ/JkSp01ykNjNehMd577ht4WK0ldifCuU/QUYzI
+   b69cF8RBLzsQftlIrRBh5iTDYd0eFRqUVIlkO8pVmYiSrdGtpkylrliLm
+   w==;
+X-CSE-ConnectionGUID: aIl6+Bq1Sd2pxAWpmAkLbw==
+X-CSE-MsgGUID: OeNAAvgtS/26o4fCWyXOiA==
+X-IronPort-AV: E=Sophos;i="6.27,177,1786982400"; 
+   d="scan'208";a="157338542"
+Received: from mail-westus2azon11010021.outbound.protection.outlook.com (HELO CO1PR03CU002.outbound.protection.outlook.com) ([52.101.46.21])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Oct 2026 20:23:43 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vA88RMv/POGrFxmmxr/YpRWUggIvqUwOwoql/4EzxvfeCR9bvuNTVE9JHY4h4vqzagG4spz35nE7kOGpvBWsu31Lffr6pNtAZOwfnuC2Ze6DX2e++ECXY7V80tKdr4LIAbSY3gv2s8k4ojeOjlbb5FS16ffRLfGSCtRwptevMo89HjqviSujzBluFFn3F9NBRKtoo+fd+ewA6NrILQpZqJsRnNiYhzDx2F8LaTQkMdOH1qYjoMaBEGjA1fLjezn10/Y27+vrAaawPMEbK2WSJ4Q1Tx0lI+Q5Tmo2psjgZwuDP3E/7Dbcnm6xX2ga8OSOfijzQIWBio+bHSeug0zMfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+uU8vtJQ5rq6A8R6gzcSLjCPn5AfGS7UwCHYZ5t7l34=;
+ b=BkgZy+GQVBNiHvGtVbmdoiZ+gs7Z5Bi42ETmNh/oYpqopVPp11qHW4DQSP3y+iEgvcTU4g/efBAMHjhZzh4LSH1Nfkx7onDTXiUHWTCS1U+zm6/fG4xP/uAu3ANBng/8UpLo7ZY14xywfebE6tRdyhXKj501xAhratzn65tUsH1MLputXdyzvV8/6c5lY9vpeQRnLEMDajZpLg56wXK9a8MGfFZ3XsgsLVEfqQX1J8IGwR9CRvyCIMFpK0X8dTzBczw32NMmJp7+TtSlRQUT55Jxfdgl7hAR0qsVz8qPMqRy6kkt4eKVElqb32QN+4AiTJWayiKTT7LY8bJRIRyP4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+uU8vtJQ5rq6A8R6gzcSLjCPn5AfGS7UwCHYZ5t7l34=;
+ b=Z8wgz/gGyOF0baszCbFfRlf4YJh1M+RI9TD6iyRBuAi+YDCPBOOcIy30/XIon4THYQm33zrPRj/1VAHyki8nC2gftfhtcu/+PldGQ9u3KJf0mDRxAdOnnUFkxWN2JmSt6J6g9o/J/wVnmk9mGgxw7e41dgDC0WA7Dpb2xsFcE4E=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14) by SA1PR04MB8256.namprd04.prod.outlook.com
+ (2603:10b6:806:1f0::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.12; Sun, 25 Oct
+ 2026 12:23:41 +0000
+Received: from SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
+ ([fe80::9b98:bf8a:b0b1:ef85%5]) with mapi id 15.21.0546.021; Sun, 25 Oct 2026
+ 12:23:41 +0000
+Date: Sun, 25 Oct 2026 21:23:23 +0900
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Laveesh Bansal <laveeshb@laveeshbansal.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Nilay Shroff <nilay@linux.ibm.com>, 
+	Ming Lei <tom.leiming@gmail.com>, Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai@fygo.io>, 
+	Reindl Harald <h.reindl@thelounge.net>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: only serialize elevator switches of the same queue
+Message-ID: <at3xNpJLZ1PeGKUA@shinmob>
+References: <20261023201704.20577-1-laveeshb@laveeshbansal.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261023201704.20577-1-laveeshb@laveeshbansal.com>
+X-ClientProxiedBy: TYCP286CA0066.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:31a::10) To SA1PR04MB10065.namprd04.prod.outlook.com
+ (2603:10b6:806:4dd::14)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -72,171 +119,108 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|SA1PR04MB8256:EE_
+X-MS-Office365-Filtering-Correlation-Id: cce48d01-3862-4756-71ed-08df3292cdc9
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|23010399003|366016|19092799006|376014|22082099003|261021135927099003|56012099006|261009223027099003|11063799006|10067099003|18002099003|261022105027099003|261022075727099003;
+X-Microsoft-Antispam-Message-Info:
+	MNUQ3BhfBFsXytPn7sGo0BOII0ENd0DZm059UBmbJcAY8X+MUHiSYftw2bJiJnforNNu64swAWozM4UhI5G0jM0G56qcxho6ukw0B6/xUP16gpVOq+9ZvS2smcLLNeDSS5bLqofAw3KbGCLnJDisWuNXg8w2/gANY+L8T6tL3s4VJwae7QbTnt8MZyo/OT+W8NVP8f6qzaulOHQZb4zYF/cp2b+zPC9z0GZDEZadcDwl3t3/MiWDOWDahf7ppHg1MpYhnEn/tFaKnZJrUwWqiHmpFIR1CTO9a9acaUokNa2cGsvV9Uv+CuP8TzIz3dtePt+ui0QYY1OnsmRCHlWFQ5MTA3/6vJZNLskF+p9KzG8bw8qJbcUb0tFUg0AxchaLE8auOtZUcQP0DQlPqgJGVTn9cEcgFMzZhCZJnzxjGutR1tp67l6dfdTPgwTsbONlaA8rfBQhUXSKkVy8DE1fp7PURYPV76rjJeO7M8e0JPY2z9z+Id7efK5oQjZ/c0KmkkqTwwa22JT0sYIGEVUUlsTK6UT+Nr8CF0SNZ0guy2iamE5Lx3iWA7WxMc6g11VADAUUxgor9SPURcRWLtvJObK09a5f9CfayALJwA4a82J4y5yH6diyhdC7biva18m0
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(19092799006)(376014)(22082099003)(261021135927099003)(56012099006)(261009223027099003)(11063799006)(10067099003)(18002099003)(261022105027099003)(261022075727099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QCSyYejADu2Cg8CPCg7ng6kNqpPG1+VVDuLw5ESD+BPuZhT+PU0+TxheV8Pt?=
+ =?us-ascii?Q?epHJY9bHZ7e6By+2VlkIE6UYJsIgUEF08GAhWdqPQYD27O/ZcI2FJBq6m4PF?=
+ =?us-ascii?Q?eMz50A1yqoXfZyJn0OLCBlvSSBqL6wpEpAa/YZQguXcqtUBJRlllMMYLo1FH?=
+ =?us-ascii?Q?Vo/9mrFKbOMABcR/KHMQsFMbbx6946eiJ+LPYVpqCQ1uMA8RQxoMnaD82uj9?=
+ =?us-ascii?Q?OVpLb4GGSXqAEVWoCBrH236suUe/gajZokanSMm2FYVmoXWvTs69OyLuLwg/?=
+ =?us-ascii?Q?yhpH9g5s1S4M5j+G+o1+14STmnyzA2VTzYPiyj4fMQrgZlhAlVQleC5Voulg?=
+ =?us-ascii?Q?h4CuwMFOQZbaPk3hOwKg/r3zpGXwqF59kEHBE+1Innm4H92q1DE8QHavp9/k?=
+ =?us-ascii?Q?N81nyZi55/6hC/00t2HOLLZ1EEaxaDZGyLrwdPIBH8LO0ypGWXl8zhw3V3gT?=
+ =?us-ascii?Q?ncBXR0+0px8vci/hx030QO8dtKwey6pcsTQtFiptQ2MM8Vm3SKIsFRBtjIDK?=
+ =?us-ascii?Q?7+1lovtYG0WicKL42Nc4zxK+QfCgwS9SY/N6x3ApuLOnCwwOdhfYS+AuU6w9?=
+ =?us-ascii?Q?KEN3ybxkiLCpHneGDLBUEkDZ+7AB3CnEpOSJEsynZsiFqo2CM09AyesHWxiG?=
+ =?us-ascii?Q?OF+htPHCYy0otobVRUKJ4tJboTUQnMant/P6zdmigjuPQHRsEX9cPzEU0rTp?=
+ =?us-ascii?Q?BgsFMNRcSzhpjQEFFwOnQ37p4ItDkN4LZDbRva6QcHtQEDNptkTFYfWNLcTk?=
+ =?us-ascii?Q?3VNudTEggA7OxXOUjj1fzlUib6FDJRoCOhXww+py/V9PrUDmDT9+XJDSpBL2?=
+ =?us-ascii?Q?68QYYjeHa+MwMzngvfFKfnkDTXgKQZ3HTn7Klr9j014ZPQ3uESI0GZIlKbJa?=
+ =?us-ascii?Q?XZbADAGWcLZmJ+Bf2Kv+5pC/pjz9y5i+3jPex3gpMaXuExH7pTPPOpMifnZw?=
+ =?us-ascii?Q?aaJ+hMlhjjNmQTt7j6PtpUeQL2YrEmo+2Mjt23SI7Ko9aEPRzh7fvdrf2WBE?=
+ =?us-ascii?Q?/fVcldnQbKZtf3moZTm6JpAq489okNZJKRs1f3WbUOqZrjV3rAdLIsN8lg/B?=
+ =?us-ascii?Q?baDRJDDSugE8I8ZiNlLVnP7EGk58/80L7HeeMltVMRMot8jWgWID0DTYWuMG?=
+ =?us-ascii?Q?Z2kBxytbKC2FQ5fRGyny4wZaIOoR64sA4AjAVoW6najhWJsSviUmE0oun/P6?=
+ =?us-ascii?Q?qH7bH4oXrvtTpnQg5POElPKGeQdDomGihQxGSjPwX5Yc8awGIgkPn0gTokgk?=
+ =?us-ascii?Q?JRakMFIEODRA5b+nVGorZjWTX0Mep60DonXHXnaG3ZmeIr99Yib3AJxIk9YT?=
+ =?us-ascii?Q?BMbZlBzhXCzmW0KHRSN1PHCZlxVRkt5FnrOKH5Mb+IOym9B2bOEKWXROqEzZ?=
+ =?us-ascii?Q?0F/b8hkW/ntEQTVN8hA4Vscb2yUl2jtJcyFB35JETRaE7vbcVsMUX2PFA6xj?=
+ =?us-ascii?Q?PntBTO8ZllFw3Xtce/KuO/+wixkpzyjblOde2wXXjugKRQV/7tiPpiS2Fyir?=
+ =?us-ascii?Q?AUl2L/D4xSlmXmR7wxvEn6ledeISf3t3HqZmkzr3NMOwiMtsDuO5CTmrlZy5?=
+ =?us-ascii?Q?fC+NDZKZq8RkYUidkni5V2ZfbFq9hNRGWfrJR6E2tQ/za/lhb2pEfBvMSwVf?=
+ =?us-ascii?Q?4WqvtwWXUfxP5rLWr9PC8ag1uttYH6uxR67sqMlcM1hhCJckcfWunEIy8uaA?=
+ =?us-ascii?Q?Cde7RiB+Awyw8/QDFnQ6+IwQ9mJ+++r9yRY5TBDHN9LHb7pQnBTFJdXusByx?=
+ =?us-ascii?Q?bvrndNqmuJxWxFrEPkV6cYp9i7Nzq2c=3D?=
+X-Exchange-RoutingPolicyChecked:
+	EfKB/UuUHmvzLQ/rl013vwK5n9gvqCB218rD7DBQ1f9VL/qyEW2Dt0SQSpsq73M935lEv8WwWxY7B0I2xVrGe30j9QbDHnyg1akKwSxpProvn1piBB4aUNbw5MJ4gDZ9L2oT7vqjsYmZt9DK7uXwMowJm2pbhkRKGGI4tLkUKe+m/pJxIMeZnkBVhW72TrLpFjuJU6zx4KpKNXt0b6r1cD88DUarUrk2ysDXNF7CvMC7V5BPIbe0rB3Am+CDwikq5LscVqHD3QhSS+0H604nc34Y5J/oAGPFCuREKGGrl6CapLcv3bMopcIXgBQ8CZQVpc6H46tK5z8OaCaF+2aLuw==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	wYBDqJThIuAG4SZKPeBQgIaJLdi6dxglTUIFu+pDatoEmcEuc8tgYDDSeCEbyVUd+JpgO6e3npyzWclVUDfjeyeW7JuLJdfZ0VemLy9RD64pBqBfMgUKtgAkJioE+Yr09bfUhpMutzUA9ccQz4LoITK5vObgIXutoRJvXuNo7SolOVApAjA5mx59S/B5FK9eigVEjRcFOM/JSNZrd0QxgbuuG9EVQiPbqrclv1lB6isUtto+KnDSj0sHcXnQZUqkofRdCA4ihnORpRjpiS4Ak1p5Im/BqwNZOdU6UvwMJOfcVdmGxg9y52MgqwowLpaXK0JtqonYbgsFhAIw1291F2LTGOb8ips2R7C6Onr2hhwGMY7OSgsmuTcybmMJLy+2QV3ghrCrcW6btU7EWJC5AOC8fQ6Dksqjam6O3sZv8vP67vISt213x0/fZEmv2p25WmgrJ9edfk9cbFOP8qLUAFuSDbx4Rlrk+q4ZGO4mTdmH0ZtW2AIpu61+tN5AoPEXdM0TUZjoXO9n29d/U5CMNdPrk9zVZJfVdEr2mlzTV3vOgZEVmt3QIYYny0BDDxH0NqiHN1XEYeDZAw+u1Qc1mag8cvbm7L8rIepZxsDatIZLhXlyB5L2tf0enpUTwhzk
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cce48d01-3862-4756-71ed-08df3292cdc9
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2026 12:23:41.0033
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4kytO7JoeEh9Qtc0pIDiH/j9JpfCTW/HP08ResuW8DEeLSPGpCI6EmvM9hl9VKM+D7AeNOQs01ncaH/WTggBG/PJjtivai6Ub2P17cinj2Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR04MB8256
 
-On Sun, 25 Oct 2026 10:38:47 +0900 Sergey Senozhatsky wrote:
->On (26/10/24 18:14), Hillf Danton wrote:
->> > (PE enabled for all tests)
->> > 
->> > ######## zstd compression level 3 W-vs-R
->> >     BASE     IOPS 1,154k  avg 7.84us  sd   444us  max   697,634us
->> >              IOPS 881k  avg 14.16us  sd 2,242us  max 1,387,000us
->> >              IOPS 704k  avg 20.43us  sd 3,499us  max 2,058,300us
->> >              IOPS 563k  avg 29.02us  sd 3,910us  max 1,649,800us
->> >              IOPS 626k  avg 24.79us  sd 4,013us  max 2,085,800us
->> >              IOPS 976k  avg 11.54us  sd 1,518us  max 1,165,800us
->> >              IOPS 1,178k  avg 7.44us  sd    22us  max     3,103us
->> >              IOPS 1,120k  avg 7.39us  sd    21us  max     7,222us
->> >              IOPS 522k  avg 32.51us  sd 4,311us  max 1,598,300us
->> >              IOPS 581k  avg 27.54us  sd 3,626us  max 1,448,600us
->> >              IOPS 1,160k  avg 7.69us  sd   352us  max   702,099us
->> >              IOPS 1,169k  avg 7.52us  sd   129us  max   281,428us
->> >              IOPS 954k  avg 12.06us  sd 1,705us  max 1,545,600us
->> >              IOPS 1,029k  avg 10.24us  sd 1,156us  max   976,065us
->> >              IOPS 1,169k  avg 7.48us  sd    24us  max     4,305us
->> >              IOPS 1,177k  avg 7.45us  sd    53us  max   118,777us
->> >              IOPS 579k  avg 27.43us  sd 3,661us  max 1,615,800us
->> >              IOPS 1,169k  avg 7.52us  sd   115us  max   228,074us
->> >              IOPS 1,110k  avg 8.59us  sd   985us  max 1,288,000us
->> >              IOPS 1,177k  avg 7.45us  sd    29us  max    72,245us
->> >              IOPS 580k  avg 27.74us  sd 3,755us  max 1,507,000us
->> >     PATCHED  IOPS 1,179k  avg 7.40us  sd    23us  max     7,404us
->> >              IOPS 1,179k  avg 7.41us  sd    22us  max     2,857us
->> >              IOPS 1,176k  avg 7.40us  sd    22us  max     6,615us
->> >              IOPS 1,175k  avg 7.44us  sd    23us  max     5,623us
->> >              IOPS 1,176k  avg 7.42us  sd    24us  max     5,625us
->> >              IOPS 1,173k  avg 7.42us  sd    24us  max     5,632us
->> >              IOPS 1,172k  avg 7.41us  sd    23us  max     6,223us
->> >              IOPS 1,173k  avg 7.40us  sd    25us  max     5,848us
->> >              IOPS 1,173k  avg 7.40us  sd    24us  max     7,563us
->> >              IOPS 1,172k  avg 7.42us  sd    24us  max     5,625us
->> >              IOPS 1,175k  avg 7.42us  sd    23us  max     5,626us
->> >              IOPS 1,177k  avg 7.42us  sd    23us  max     4,243us
->> >              IOPS 1,170k  avg 7.46us  sd    25us  max     5,622us
->> >              IOPS 1,178k  avg 7.40us  sd    22us  max     3,213us
->> >              IOPS 1,167k  avg 7.43us  sd    25us  max     7,593us
->> >              IOPS 1,174k  avg 7.44us  sd    23us  max     6,971us
->> >              IOPS 1,179k  avg 7.38us  sd    23us  max     3,477us
->> >              IOPS 1,180k  avg 7.39us  sd    23us  max     2,894us
->> >              IOPS 1,145k  avg 7.37us  sd    21us  max     4,048us
->> >              IOPS 1,177k  avg 7.38us  sd    22us  max     5,620us
->> >              IOPS 1,177k  avg 7.40us  sd    23us  max     5,623us
->> > 
->> >     IOPS: BASE 932k (+-260k), PATCHED 1,174k (+-7k), 21 runs each.
->> >           significant difference at 95% confidence: PATCHED is 241k (25.9%) higher; 95% CI [+136k, +353k], Welch's t-test p = 0.000
->> >     max latency: BASE 3.1..2,085.8 ms, PATCHED 2.9..7.6 ms
->> >           runs with max over 100 ms: BASE 17 of 21, PATCHED 0 of 21; over 1 s: BASE 11 of 21, PATCHED 0 of 21
->> > 
->> > ######## zstd compression level 12 W-vs-R
->> >     BASE     IOPS 690k  avg 21.53us  sd 3,088us  max 1,635,500us
->> >              IOPS 478k  avg 36.51us  sd 4,385us  max 1,941,300us
->> >              IOPS 822k  avg 16.13us  sd 2,865us  max 2,263,800us
->> >              IOPS 1,161k  avg 7.73us  sd   114us  max   190,307us
->> >              IOPS 780k  avg 17.56us  sd 2,717us  max 1,550,500us
->> >              IOPS 1,166k  avg 7.66us  sd    40us  max    94,522us
->> >              IOPS 585k  avg 27.51us  sd 3,847us  max 1,550,600us
->> >              IOPS 1,147k  avg 7.97us  sd   344us  max   496,483us
->> >              IOPS 1,166k  avg 7.64us  sd    49us  max   115,243us
->> >              IOPS 1,163k  avg 7.66us  sd    23us  max     7,006us
->> >              IOPS 1,071k  avg 9.42us  sd 1,489us  max 1,915,500us
->> >              IOPS 962k  avg 11.88us  sd 2,168us  max 1,904,500us
->> >              IOPS 607k  avg 26.05us  sd 3,538us  max 1,591,100us
->> >              IOPS 1,167k  avg 7.63us  sd    23us  max     2,903us
->> >              IOPS 1,157k  avg 7.78us  sd   198us  max   418,930us
->> >              IOPS 1,163k  avg 7.66us  sd    40us  max   100,346us
->> >              IOPS 1,162k  avg 7.70us  sd    32us  max    82,602us
->> >              IOPS 488k  avg 35.43us  sd 4,340us  max 1,786,400us
->> >              IOPS 563k  avg 28.85us  sd 3,989us  max 2,209,500us
->> >              IOPS 843k  avg 15.43us  sd 2,490us  max 1,572,100us
->> >              IOPS 604k  avg 26.30us  sd 3,560us  max 1,555,700us
->> >     PATCHED  IOPS 1,166k  avg 7.60us  sd    23us  max     5,623us
->> >              IOPS 1,169k  avg 7.58us  sd    23us  max     5,629us
->> >              IOPS 1,157k  avg 7.67us  sd    27us  max     5,639us
->> >              IOPS 1,166k  avg 7.61us  sd    24us  max     5,644us
->> >              IOPS 1,160k  avg 7.64us  sd    26us  max     7,543us
->> >              IOPS 1,167k  avg 7.60us  sd    24us  max     7,514us
->> >              IOPS 1,160k  avg 7.61us  sd    25us  max     6,643us
->> >              IOPS 1,162k  avg 7.65us  sd    25us  max     7,315us
->> >              IOPS 1,161k  avg 7.66us  sd    24us  max     6,237us
->> >              IOPS 1,158k  avg 7.62us  sd    27us  max     7,688us
->> >              IOPS 1,167k  avg 7.58us  sd    24us  max     5,637us
->> >              IOPS 1,165k  avg 7.59us  sd    24us  max     7,098us
->> >              IOPS 948k  avg 7.58us  sd    23us  max     7,808us
->> >              IOPS 1,166k  avg 7.60us  sd    24us  max     5,621us
->> >              IOPS 1,166k  avg 7.58us  sd    24us  max     5,672us
->> >              IOPS 1,162k  avg 7.65us  sd    25us  max     6,824us
->> >              IOPS 1,165k  avg 7.59us  sd    24us  max     7,078us
->> >              IOPS 1,168k  avg 7.58us  sd    23us  max     6,191us
->> >              IOPS 1,170k  avg 7.56us  sd    22us  max     2,851us
->> >              IOPS 1,171k  avg 7.55us  sd    22us  max     2,834us
->> >              IOPS 1,166k  avg 7.59us  sd    24us  max     5,627us
->> > 
->> >     IOPS: BASE 902k (+-269k), PATCHED 1,154k (+-47k), 21 runs each.
->> >           significant difference at 95% confidence: PATCHED is 252k (27.9%) higher; 95% CI [+142k, +367k], Welch's t-test p = 0.000
->> >     max latency: BASE 2.9..2,263.8 ms, PATCHED 2.8..7.8 ms
->> >           runs with max over 100 ms: BASE 17 of 21, PATCHED 0 of 21; over 1 s: BASE 12 of 21, PATCHED 0 of 21
->> > 
->> > ######## lz4 W-vs-R
->> >     BASE     IOPS 1,422k  avg 3.84us  sd   418us  max   619,495us
->> >              IOPS 1,450k  avg 3.57us  sd   326us  max   609,723us
->> >              IOPS 1,414k  avg 3.92us  sd   543us  max   879,815us
->> >              IOPS 1,451k  avg 3.56us  sd   253us  max   503,428us
->> >              IOPS 1,460k  avg 3.40us  sd    68us  max   135,825us
->> >              IOPS 1,413k  avg 3.31us  sd    44us  max   188,450us
->> >              IOPS 1,432k  avg 3.73us  sd   503us  max   844,228us
->> >              IOPS 1,387k  avg 4.20us  sd   719us  max   961,827us
->> >              IOPS 1,464k  avg 3.38us  sd    44us  max   133,675us
->> >              IOPS 1,469k  avg 3.38us  sd    22us  max    65,812us
->> >              IOPS 1,465k  avg 3.40us  sd    49us  max   111,788us
->> >              IOPS 1,465k  avg 3.39us  sd    64us  max   174,040us
->> >              IOPS 1,467k  avg 3.38us  sd    36us  max    97,821us
->> >              IOPS 1,445k  avg 3.63us  sd   343us  max   671,026us
->> >              IOPS 1,472k  avg 3.35us  sd    27us  max    86,795us
->> >              IOPS 1,473k  avg 3.33us  sd    44us  max   138,096us
->> >              IOPS 1,439k  avg 3.71us  sd   353us  max   619,815us
->> >              IOPS 1,398k  avg 3.36us  sd    54us  max   206,815us
->> >              IOPS 1,471k  avg 3.36us  sd    15us  max     2,832us
->> >              IOPS 1,407k  avg 4.02us  sd   629us  max 1,074,800us
->> >              IOPS 1,465k  avg 3.40us  sd    63us  max   158,779us
->> >     PATCHED  IOPS 1,471k  avg 3.30us  sd    15us  max     6,946us
->> >              IOPS 1,473k  avg 3.29us  sd    16us  max     5,618us
->> >              IOPS 1,474k  avg 3.29us  sd    15us  max     5,615us
->> >              IOPS 1,473k  avg 3.29us  sd    15us  max     5,625us
->> >              IOPS 1,440k  avg 3.26us  sd    13us  max     2,829us
->> >              IOPS 1,456k  avg 3.30us  sd    15us  max     5,623us
->> >              IOPS 1,476k  avg 3.29us  sd    15us  max     2,835us
->> >              IOPS 1,464k  avg 3.28us  sd    16us  max     6,063us
->> >              IOPS 1,468k  avg 3.32us  sd    19us  max     6,692us
->> >              IOPS 1,465k  avg 3.30us  sd    17us  max     6,834us
->> >              IOPS 1,468k  avg 3.28us  sd    16us  max     7,268us
->> >              IOPS 1,463k  avg 3.31us  sd    17us  max     6,480us
->> >              IOPS 1,454k  avg 3.33us  sd    20us  max     8,418us
->> >              IOPS 1,452k  avg 3.32us  sd    19us  max     5,621us
->> >              IOPS 1,477k  avg 3.27us  sd    14us  max     2,834us
->> >              IOPS 1,468k  avg 3.30us  sd    16us  max     5,617us
->> >              IOPS 1,475k  avg 3.30us  sd    16us  max     3,884us
->> >              IOPS 1,475k  avg 3.30us  sd    16us  max     5,692us
->> >              IOPS 1,471k  avg 3.30us  sd    15us  max     5,616us
->> >              IOPS 1,473k  avg 3.28us  sd    16us  max     7,014us
->> >              IOPS 1,475k  avg 3.28us  sd    15us  max     5,616us
->> > 
->> >     IOPS: BASE 1,444k (+-27k), PATCHED 1,467k (+-10k), 21 runs each.
->> >           significant difference at 95% confidence: PATCHED is 23k (1.6%) higher; 95% CI [+11k, +35k], Welch's t-test p = 0.001
->> >     max latency: BASE 2.8..1,074.8 ms, PATCHED 2.8..8.4 ms
->> >           runs with max over 100 ms: BASE 17 of 21, PATCHED 0 of 21; over 1 s: BASE 1 of 21, PATCHED 0 of 21
->> 
->> 
->> Lets see the data from another pov (feel free to disagree) -- in the android
->> phone/car cockpit environment, the render frequence is required above 60HZ,
->> IOW a frame rendered within 16ms, so what share of the 16ms does the IOPS
->> account for after this patchset, for example when an app in background is
->> brought foreground?
->
-> A single 500 ms read stall is 30 dropped frames.  Across 126 runs that
-> I ran, base+PE had read stalls over 100 ms in 108 runs and over 1 s in 47.
-> The worst read with the series+PE, in all 126 runs, was 8.4 ms, i.e. within
-> one frame.
->
-Good work from the 2026 most valuable baker, MVB.
+On Oct 23, 2026 / 13:17, Laveesh Bansal wrote:
+> Since commit 4ff58d6bc9dd ("block: serialize elevator changes for the
+> same queue using a writer lock"), a write to queue/scheduler fails with
+> -EBUSY whenever something else holds set->update_nr_hwq_lock. That
+> commit takes the lock for write, and it has to be a trylock because of
+> commit ce8ee8583ed8 ("block: use trylock to avoid lockdep circular
+> dependency in sysfs").
+> 
+> The lock covers the whole tag set, so it is easy to hit. A scheduler
+> write fails while another queue of the set is switching, or while a
+> sibling disk of the same SCSI host or NVMe controller is added or
+> removed. That is what breaks the udev rules that set the scheduler on
+> 7.2.
+> 
+> Go back to taking the lock for read. The write lock was there to keep
+> two switches of one queue from overlapping in elevator_change_done(),
+> which touches the elevator sysfs and debugfs entries outside of
+> q->elevator_lock, so use a new mutex for that instead. It is held across
+> elevator_change(), and only the sysfs store takes it. The other callers
+> of elevator_change() run before the queue is registered, after its sysfs
+> files are gone, or with the lock held for write, so they cannot race
+> with the store.
+> 
+> nr_hw_queues updates, nr_requests writes and disk removal still take the
+> lock for write, so a scheduler write can still get -EBUSY while one of
+> those holds or waits for it, as before 4ff58d6bc9dd.
+> 
+> Fixes: 4ff58d6bc9dd ("block: serialize elevator changes for the same queue using a writer lock")
+> Cc: stable@vger.kernel.org # v7.2+
+> Reported-by: Reindl Harald <h.reindl@thelounge.net>
+> Closes: https://lore.kernel.org/r/077dd42e-cbc9-4c23-a5ef-3d20e4fc7757@thelounge.net
+> Assisted-by: LLM
+> Signed-off-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
 
-Hillf
+FYI, this patch looks similar as the RFC patch that I created before [*]. It
+adds another mutex in similar manner as this patch.
+
+[*] https://lore.kernel.org/linux-block/aiqaXfTqCLMu2DwF@fedora/
+
+I ran whole blktests applying this patch on top of the kernel v7.3. I observed
+no regression, then looks good from testing point of view. In case this patch
+gets applied,
+
+Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
