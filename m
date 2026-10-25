@@ -1,86 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.199
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792897764;
-	b=bhYv61XXZWk8F0BLV1rm5GJEEK3YOWmO3A6+dWx2/uAE0f0Dx91ryB3rol8LAlf18HNg
-	 uSaOvH1N7gzw5Zg3p/kTa27XAFp9BjLBWDi9Yq71Y4qDZ6D9VsRbgd6NA9Fmra8WUuUet
-	 SAuLVqT/jBN6iHWM9iRkCoivOTNs0P2d+dWe8vZfJOYM+O/SmyjE1aRn3Xh3PnJ8ElA+t
-	 J2PIFaND+YBzVRh+7GMaTDcf44uhkelBrv1JS1RBbTG0EYGgiSWzO2fx4k9xh7Nd24dCJ
-	 xBnkWxsVMwMZ6UFoZeynVSpT8LIFMMeCDwYlkS9uMGrFeaIaZyoC/DRFz9N1yvu532Q==
+	t=1792908558;
+	b=pyz2iPsyOL0WHetD/6NjSQaLgI1bhhfP2F8az+0bWYnmUR0pXYFmL0PJ7IUeV7OnfSqo
+	 8LaT/yuI4P0rSUQz54qxsoVRPbwzBx/H31Ui2LLLDBJEANNXtt92SPIZj3ePOB3xmqTQn
+	 U4uCnBgGW6l3iYl7XZ3w5sFIsQ1yKs5uGQsX9ZhsetC3rnZGNo5SkTsJCAJIGVyjKrm+c
+	 D6S6RvORqgZoMXsf/oliRty9IQFqbsPXeH5TIiBntn5k7luueNLJ1uRABHvGhKGI09g8g
+	 p9WIM7IVx/6dxRpaBwBk9YmGyOXjMXa9TWMNjSh67R/QSoihaIVcjmRKjVtbaAWvsPA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792897764;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792908558;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=zxAI2/bzDmWUdnexxhVM6ch/dJvnGADbn1oa+AeS06k=;
-	b=w9IqO3k6RjCe5u7H0w4jrxpDw3P/30/DhfF8zwEYMGk6nqDg68NiEYmsCxgnVlvgu5dn
-	 uR4Pf+f1JSeeb87v2nRcDAVBpCY71gggBYgsxdqQ8pDrLLQ3/n9tx1cEn+PIteojYZh2w
-	 KwkLCNTA+BNZ+HsjjsN0L/7YHJsxNcwdMVNFJx0FCZSj1izVuf0GweNOZ5IcXDeIrVUYn
-	 7kOhkLESWmZyLMPfcXlsBpK1inEBfMo2L1/Rbxmba9P32qqoMyxIpIwZ0qX112YMpKeE+
-	 iczqOHddSDzUb30TeAz0KDzsZHUh/9M0h9NFVU2WDozJ6qGRG0Y/iAZpsjyCdIcvgpQ==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=Sfzi/7/w3SaIV07IDVIi4Dx7aYnputtbbmUJJqGHnco=;
+	b=ZpiaLYY/86+m+dTuAQvCP/A+aOHLZC7g7NBovT/2kz8sNxO4udNyJRNPxtPpVLCqR8TU
+	 1UCVj05vKW8/YdCWMOBN0T4vLHgwKNW/Mk892wQZa82R1p7qrw3UeW0z4ag5fyezN8Xbf
+	 2PZA0Q9jVxXEEu1gxboRq9RWnUigqVlOiAOzMeNnIpOKwL7UMGFzhGLJssmwD0YG9Zxx5
+	 S8upDW/W6t8j8vdP/2rrFVxKjKnkeAkHm6tNA9ePLFPHUN2bTHSIub3nIgkLCP4ZhaiaD
+	 A2z0vNRTmThnsZazdqppnWESHB0RXMR2/j2yaioEUzgLtCoW4e4eaAJogtXhXlmuX3Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=y984Mhl5;
-	arc=none smtp.remote-ip=74.125.82.175
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=QrixxMzW;
+	arc=none smtp.remote-ip=209.85.214.199
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB538606A31A
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 03:09:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AB538606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED28606A31A
+	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 06:09:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8ED28606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=y984Mhl5
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-35b2c599f43so1238330eec.0
-        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 20:09:23 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=QrixxMzW
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2e954d87b48so31102225ad.2
+        for <linux-block@vger.kernel.org>; Sat, 24 Oct 2026 23:09:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1792897763; x=1793502563; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=zxAI2/bzDmWUdnexxhVM6ch/dJvnGADbn1oa+AeS06k=;
-        b=y984Mhl5Cnsjkt1cz2u+gmA9f4kBd/oHpiQkChveqoyxlZHxmghE/XkHNhDJFvTaDR
-         BQpSFokV2ba3M5j3JX8EhZngw100VChEEL5phVln7PTt0Lw87yWC4QsqKtPnK/4b0HsB
-         QnLJCxfv6uMz8vZflrJS+DgQxjXKPeVu8B3anUA5Frk3e4bELtmUQnmPLDEU/cYKYRB1
-         VZ8jA4RDpW8qIzZsJ6xp6mB7yfUdQfzb+l0dvkZuFhy5Rvy0Zr4r5kWF0MMbHqXXYzDs
-         yciPeVta4rtZm3A2c96za9diPORm5wey5BjsLXoWcr/BNEyuX14tT1RpAlaW4Ui31Bhc
-         8ZqA==
+        d=google.com; s=20251104; t=1792908557; x=1793513357; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Sfzi/7/w3SaIV07IDVIi4Dx7aYnputtbbmUJJqGHnco=;
+        b=QrixxMzWiF1a1hD6Qmd2sQp4ufgavYBOYMWNIcXVTbpJS6uZFRsfRBUZWbongdMTvM
+         4PkuqKXjp4bZdIJh4o+dIQSJ5RiYuLIwz/Pg5xhHvlNzjsC1thjlYgb3uVzyUvQUk3qQ
+         +CjJ0nhr/auvCqbXIiDLjOXU+H/yq3kbNSaBMA00NW0TvqCGBGJ7FJ5q2jPz81w8fIL4
+         acb32Acpi5HwM+TfYEfuoTlbHTl06O85izEC47HpQxiZ4SDvRUzZdz8kI8Z4GfUlKH/p
+         ZgPw9kq8dGbYemm8H5p6FjZrrsdChFQNa+XlEw/wqZzfH3cBVH8ZqSYOOGhzLfbFZgPn
+         6XpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792897763; x=1793502563;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=zxAI2/bzDmWUdnexxhVM6ch/dJvnGADbn1oa+AeS06k=;
-        b=rvKVbbHI6eFgN5fYwLSCZuzEo7JZiXQGkh1/XkbmYbsWVXW4X7OjSLj1dl+nncvSgF
-         AtJIa4Eb9pBins2K8SJlFeFz7iyV+bYO/QogPwC8Y6XxB2FKk3SUplDMVk48/qMG3hw8
-         x9u0neIBdU2+z0tWceQkRnU61VwVkKYTYwYcKoUHv18myPkydoVNGdsA2zUuqOJOzBg8
-         EtqMLCvS2Z5023ks0swrPfTPyB0WgTO6CkhWGDgzUjiT8rZULCbaO2SZMa4HRiTZhpv/
-         E7XfcSsVX2Xab0Wk8hK2DriUz44Aldd9AltX4jKVExzR5Ekf1v4w7AkDfUen3qhRblHs
-         AsEg==
-X-Gm-Message-State: AFq9FYJUkdDYPrLIBAU32IhXJh5tIShVHM/5ceqmIxATzNPPWpDm17lN
-	hiN3JTQMMx7i4Aj2gqVcT4JNq3fZaxlcR2iAYSKl1wJBWNp/EW1Fo3QmSrp4ZFg3mpc=
-X-Gm-Gg: AYBFou0a/7o8ia0OHDFfw2u90P732tz87Ioc3rWM6/UzjtkBL+bNGzDyDLnxDCL4uS6
-	aFWABI5V/mpiIiNzQFVRV3anOMjlWm+adiqnh50FNrM7oxYyniWSjwEoCeIg21J+/+QNToa/grW
-	M1WlO3+REUwWxObVjJKvPZP/COo95IhzuT9oBFjfExyYUlYL6nydBtv1WO/GP9Lczuw2Sd3g+JI
-	FMF/binro1Qn3KKGLmj1v4hwAL5y+op5cOeFzVjJP4D9Q1q2SC09dgDri+UG8AsjC0mTqb3tn5T
-	sYl4RMVPMOzPfsmGSMHJ3xHhPYYUT/SU/kuRWV8BVYwGyHo/lVpmlFhmGIfYNy55RqPDNrXmuuK
-	l0g1fWUL6NkZekql82yr4fX7AbKa9l87J3kt6MMl29vNgxIRr/nB2zXAnXSL5o/LWoXDalvdq08
-	aRkBxIoChJnMwr0+h7x0Lx3Oqw0mpAjNf6YJS26hLz4LMlrSAOBxg9cwNM4E52yJxDVfK3YBdnW
-	jKsRnbunXOmjTPcLjMe+If4jDIw597q5OpSScGYgmBFAqY4El7lUoAAJbifNunvC0+MWlq895A3
-	gqORCI7ywudmTKwEjT63yy8QBCkfonzyFqAbslWx3LSJBpO0L6DVqNmBYlTL
-X-Received: by 2002:a05:7301:c083:b0:369:eee6:ee2c with SMTP id 5a478bee46e88-369eee6f2bamr3597909eec.5.1792897762640;
-        Sat, 24 Oct 2026 20:09:22 -0700 (PDT)
-Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-369e8d9307bsm14570292eec.14.2026.10.24.20.09.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Oct 2026 20:09:22 -0700 (PDT)
-Message-ID: <9e552c09-f0df-4123-9fee-60541177a986@kernel.dk>
-Date: Sat, 24 Oct 2026 21:09:21 -0600
+        d=1e100.net; s=20260707; t=1792908557; x=1793513357;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Sfzi/7/w3SaIV07IDVIi4Dx7aYnputtbbmUJJqGHnco=;
+        b=vmYWsnbsnrGSD+hekTnIeP43uJq7Swusr6lgFCOt6dhmWvcA4XCFQJMAemn//HvM2z
+         iOG+iGDPODtGRAozD8l45hyecj4VDw0jp/SLmLjx/zVu5A8pDV8Vo/ZVX2LZkT3Lctwy
+         yzSDeJE34fnC+kFAE5HEgFEx2D5ysw0oLmcI8h6Yn3t8fdhHu/TRtlxj4iGRRhlpttkt
+         CE20Yk46gRNS6G2WB28P1Ke/FZMwMmChnHSk3iwR3UzhvLbR15f5YP4VZyJHnbuHxGCO
+         wUBfnG0ZTBr8xnthMCVUd/HJmTLZc6e7gvtGCKbvPQpfE88P5j7hBPZUVfGZlkQYXxqu
+         0+1A==
+X-Forwarded-Encrypted: i=1; AKwUvBylFHBNoKUbQNcJd1/+sCZdk7iczKGg+mecDBOCf/dZkHyj5T6rdQca/S3PUOSjSTN3bPcri5UnYtB7ew==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJFDzJFN3UDEWVc5IqkRgIfr+CTwOcyKb5ECs/brKOjnmEnL92Z
+	bXVvokyaBoJBCAaDL4C7yTPW4cJ31TBOB/pIMPfiSoZ+BCXeP6K7jt/IsosMFPABmaanvVoN8dJ
+	ErkJJPcfecUdPD0vuYFD9og==
+X-Received: from plblv3.prod.google.com ([2002:a17:903:2a83:b0:2e9:314a:fcc8])
+ (user=stanleyjhu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:2cb:b0:2e9:4bf3:37a5 with SMTP id d9443c01a7336-2ea9c864accmr31076525ad.58.1792908556694;
+ Sat, 24 Oct 2026 23:09:16 -0700 (PDT)
+Date: Sun, 25 Oct 2026 14:09:14 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -89,40 +75,237 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] Block updates for 7.4-rc
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk>
- <efe0abd7-edf4-4d2e-a8e8-be4203d7ac3b@kernel.dk>
- <CAHk-=whdThHmhxSuh2dWw8-+v5caYBdb3AwLyx4YY67_P0qufQ@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAHk-=whdThHmhxSuh2dWw8-+v5caYBdb3AwLyx4YY67_P0qufQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.307.g5fe7bd680c-goog
+Message-ID: <20261025060914.1652636-1-stanleyjhu@google.com>
+Subject: [PATCH 6.18.y] block: avoid potential deadlock on zone revalidation failure
+From: Stanley Jhu <stanleyjhu@google.com>
+To: stable@vger.kernel.org
+Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/24/26 6:18 PM, Linus Torvalds wrote:
-> On Wed, 21 Oct 2026 at 05:11, Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 10/21/26 8:43 AM, Jens Axboe wrote:
->>> Hi Linus,
->>>
->>> Here are the block updates and fixes queued up for the 7.4 merge
->>> window. This pull request contains:
->>
->> Completely forgot to mention that this merge will throw conflicts. Both
->> block/bio.c and block/blk-zoned.c will need resolving. Details:
-> 
-> Bah. My resolution ended up being different. But I think mine isn't
-> actively wrong, and keeps some of the warnings.
-> 
-> Holler if you hate it. Or if I just plain screwed up.
+From: Damien Le Moal <dlemoal@kernel.org>
 
-Looks fine to me - bio one is the same, and the blk-zoned.c looks OK to
-me - you kept the pr_warn() and a check that blk_zstate_set() covers,
-but that's fine. Thanks!
+commit 3dd63dba8f9cb6990a40af7ed66ee0159f475819 upstream.
 
+If revalidating the zones of a zoned block device with
+blk_revalidate_disk_zones() fails during a SCSI disk rescan, the following
+lockdep splat is thrown:
+
+[  347.251859] [  T11230] sda: failed to revalidate zones
+
+[  347.261380] [  T11230] ======================================================
+[  347.263882] [  T11230] WARNING: possible circular locking dependency detected
+[  347.266353] [  T11230] 7.1.0+ #1194 Not tainted
+[  347.268052] [  T11230] ------------------------------------------------------
+[  347.270537] [  T11230] tcsh/11230 is trying to acquire lock:
+[  347.272555] [  T11230] ffffffff8f91d400 (wq_pool_mutex){+.+.}-{4:4}, at: destroy_workqueue+0x15d/0x8d0
+[  347.275914] [  T11230]
+                          but task is already holding lock:
+[  347.278646] [  T11230] ffff88812fa1bcc0 (&q->q_usage_counter(io)#5){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x16/0x30
+[  347.282503] [  T11230]
+                          which lock already depends on the new lock.
+
+[  347.286239] [  T11230]
+                          the existing dependency chain (in reverse order) is:
+[  347.289408] [  T11230]
+                          -> #2 (&q->q_usage_counter(io)#5){++++}-{0:0}:
+[  347.292437] [  T11230]        blk_alloc_queue+0x5ca/0x750
+[  347.294379] [  T11230]        blk_mq_alloc_queue+0x14c/0x240
+[  347.296375] [  T11230]        scsi_alloc_sdev+0x871/0xd10 [scsi_mod]
+[  347.298619] [  T11230]        scsi_probe_and_add_lun+0x600/0xc50 [scsi_mod]
+[  347.301056] [  T11230]        __scsi_scan_target+0x187/0x3b0 [scsi_mod]
+[  347.303385] [  T11230]        scsi_scan_channel+0xf2/0x180 [scsi_mod]
+[  347.305651] [  T11230]        scsi_scan_host_selected+0x20b/0x2d0 [scsi_mod]
+[  347.308119] [  T11230]        do_scan_async+0x42/0x420 [scsi_mod]
+[  347.310276] [  T11230]        async_run_entry_fn+0x94/0x5a0
+[  347.312284] [  T11230]        process_one_work+0x8da/0x1690
+[  347.314287] [  T11230]        worker_thread+0x5fe/0x1010
+[  347.316216] [  T11230]        kthread+0x358/0x450
+[  347.317675] [  T11230]        ret_from_fork+0x5b9/0x8e0
+[  347.319181] [  T11230]        ret_from_fork_asm+0x11/0x20
+[  347.320778] [  T11230]
+                          -> #1 (fs_reclaim){+.+.}-{0:0}:
+[  347.322890] [  T11230]        fs_reclaim_acquire+0xd5/0x120
+[  347.324464] [  T11230]        __kmalloc_cache_node_noprof+0x39/0x620
+[  347.326223] [  T11230]        init_rescuer+0x19b/0x560
+[  347.327697] [  T11230]        workqueue_init+0x33b/0x6a0
+[  347.329224] [  T11230]        kernel_init_freeable+0x2eb/0x600
+[  347.330881] [  T11230]        kernel_init+0x1c/0x140
+[  347.332334] [  T11230]        ret_from_fork+0x5b9/0x8e0
+[  347.333847] [  T11230]        ret_from_fork_asm+0x11/0x20
+[  347.335360] [  T11230]
+                          -> #0 (wq_pool_mutex){+.+.}-{4:4}:
+[  347.337510] [  T11230]        __lock_acquire+0xdea/0x2260
+[  347.339030] [  T11230]        lock_acquire+0x187/0x2f0
+[  347.340495] [  T11230]        __mutex_lock+0x1ab/0x2600
+[  347.341464] [  T11230]        destroy_workqueue+0x15d/0x8d0
+[  347.342485] [  T11230]        disk_free_zone_resources+0xd5/0x560
+[  347.343577] [  T11230]        blk_revalidate_disk_zones+0x620/0xac7
+[  347.344723] [  T11230]        sd_zbc_revalidate_zones+0x1dd/0x790 [sd_mod]
+[  347.345938] [  T11230]        sd_revalidate_disk+0xc66/0x8e60 [sd_mod]
+[  347.347112] [  T11230]        scsi_rescan_device+0x1f9/0x310 [scsi_mod]
+[  347.348318] [  T11230]        store_rescan_field+0x19/0x20 [scsi_mod]
+[  347.349507] [  T11230]        kernfs_fop_write_iter+0x3d2/0x5e0
+[  347.350565] [  T11230]        vfs_write+0x469/0x1000
+[  347.351484] [  T11230]        ksys_write+0x116/0x250
+[  347.352403] [  T11230]        do_syscall_64+0xf0/0x6e0
+[  347.353361] [  T11230]        entry_SYSCALL_64_after_hwframe+0x4b/0x53
+[  347.354533] [  T11230]
+                          other info that might help us debug this:
+
+[  347.356432] [  T11230] Chain exists of:
+                            wq_pool_mutex --> fs_reclaim --> &q->q_usage_counter(io)#5
+
+[  347.358919] [  T11230]  Possible unsafe locking scenario:
+
+[  347.360307] [  T11230]        CPU0                    CPU1
+[  347.361327] [  T11230]        ----                    ----
+[  347.362340] [  T11230]   lock(&q->q_usage_counter(io)#5);
+[  347.363344] [  T11230]                                lock(fs_reclaim);
+[  347.364526] [  T11230]                                lock(&q->q_usage_counter(io)#5);
+[  347.365968] [  T11230]   lock(wq_pool_mutex);
+[  347.366811] [  T11230]
+                           *** DEADLOCK ***
+
+This happens because SCSI disk rescan is executed from a work context
+and a failure of blk_revalidate_disk_zones() causes a call to
+disk_free_zone_resources() which will free the disk zone write plug
+workqueue.
+
+Avoid this by delaying the destruction of the disk zone write plug
+workqueue to disk_release(). Do this by introducing the function
+disk_release_zone_resources() and using this new function from
+disk_release(). This new function destroys the zone write plugs workqueue
+and calls disk_free_zone_resources(), thus allowing to remove the call to
+destroy_workqueue() from disk_free_zone_resources().
+disk_alloc_zone_resources() is modified to not create the disk zone
+write plug work queue if it already exists.
+
+Fixes: a8f59e5a5dea ("block: use a per disk workqueue for zone write plugging")
+Cc: stable@vger.kernek.org
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
+Link: https://patch.msgid.link/20260701082155.1369996-1-dlemoal@kernel.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+[ stanleyjhu: 6.18.y has no zone write plug kthread worker and does not
+  use WQ_PERCPU, so only the workqueue part applies:
+  disk_alloc_zone_resources() reuses an existing workqueue,
+  disk_free_zone_resources() drains it instead of destroying it, and
+  the new disk_release_zone_resources() destroys it from
+  disk_release(). ]
+Signed-off-by: Stanley Jhu <stanleyjhu@google.com>
+---
+The upstream commit has a misspelled Cc: stable address
+(stable@vger.kernek.org), so it was not picked up automatically.
+
+ block/blk-zoned.c | 37 +++++++++++++++++++++++++++----------
+ block/blk.h       |  4 ++--
+ block/genhd.c     |  2 +-
+ 3 files changed, 30 insertions(+), 13 deletions(-)
+
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 5c16cf96b97c..a7d3d2e002da 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -1413,11 +1413,20 @@ static int disk_alloc_zone_resources(struct gendisk *disk,
+ 	if (!disk->zone_wplugs_pool)
+ 		goto free_hash;
+ 
+-	disk->zone_wplugs_wq =
+-		alloc_workqueue("%s_zwplugs", WQ_MEM_RECLAIM | WQ_HIGHPRI,
+-				pool_size, disk->disk_name);
+-	if (!disk->zone_wplugs_wq)
+-		goto destroy_pool;
++	/*
++	 * We may already have a zone write plug workqueue as this function may
++	 * be called after disk_free_zone_resources(), which does not destroy
++	 * the workqueue (the zone write plugs workqueue is destroyed at
++	 * disk_release() time).
++	 */
++	if (!disk->zone_wplugs_wq) {
++		disk->zone_wplugs_wq =
++			alloc_workqueue("%s_zwplugs",
++					WQ_MEM_RECLAIM | WQ_HIGHPRI,
++					pool_size, disk->disk_name);
++		if (!disk->zone_wplugs_wq)
++			goto destroy_pool;
++	}
+ 
+ 	return 0;
+ 
+@@ -1474,15 +1483,13 @@ static unsigned int disk_set_conv_zones_bitmap(struct gendisk *disk,
+ 	return nr_conv_zones;
+ }
+ 
+-void disk_free_zone_resources(struct gendisk *disk)
++static void disk_free_zone_resources(struct gendisk *disk)
+ {
+ 	if (!disk->zone_wplugs_pool)
+ 		return;
+ 
+-	if (disk->zone_wplugs_wq) {
+-		destroy_workqueue(disk->zone_wplugs_wq);
+-		disk->zone_wplugs_wq = NULL;
+-	}
++	if (disk->zone_wplugs_wq)
++		drain_workqueue(disk->zone_wplugs_wq);
+ 
+ 	disk_destroy_zone_wplugs_hash_table(disk);
+ 
+@@ -1501,6 +1508,16 @@ void disk_free_zone_resources(struct gendisk *disk)
+ 	disk->nr_zones = 0;
+ }
+ 
++void disk_release_zone_resources(struct gendisk *disk)
++{
++	if (disk->zone_wplugs_wq) {
++		destroy_workqueue(disk->zone_wplugs_wq);
++		disk->zone_wplugs_wq = NULL;
++	}
++
++	disk_free_zone_resources(disk);
++}
++
+ static inline bool disk_need_zone_resources(struct gendisk *disk)
+ {
+ 	/*
+diff --git a/block/blk.h b/block/blk.h
+index 2810b4d086e6..179662b86899 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -499,7 +499,7 @@ static inline void ioc_clear_queue(struct request_queue *q)
+ 
+ #ifdef CONFIG_BLK_DEV_ZONED
+ void disk_init_zone_resources(struct gendisk *disk);
+-void disk_free_zone_resources(struct gendisk *disk);
++void disk_release_zone_resources(struct gendisk *disk);
+ static inline bool bio_zone_write_plugging(struct bio *bio)
+ {
+ 	return bio_flagged(bio, BIO_ZONE_WRITE_PLUGGING);
+@@ -552,7 +552,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+ static inline void disk_init_zone_resources(struct gendisk *disk)
+ {
+ }
+-static inline void disk_free_zone_resources(struct gendisk *disk)
++static inline void disk_release_zone_resources(struct gendisk *disk)
+ {
+ }
+ static inline bool bio_zone_write_plugging(struct bio *bio)
+diff --git a/block/genhd.c b/block/genhd.c
+index bbcfbd1a363c..6ba0e22ce9df 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1308,7 +1308,7 @@ static void disk_release(struct device *dev)
+ 
+ 	disk_release_events(disk);
+ 	kfree(disk->random);
+-	disk_free_zone_resources(disk);
++	disk_release_zone_resources(disk);
+ 	xa_destroy(&disk->part_tbl);
+ 
+ 	kobject_put(&disk->queue_kobj);
 -- 
-Jens Axboe
+2.56.0.307.g5fe7bd680c-goog
+
