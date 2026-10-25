@@ -1,64 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.108.3.162
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792887611;
-	b=cEnFs1OSQMaH5rWihWfRduMhouAN+Zvbq14KgFuGC0re9kE7L77daIJjJxPYQl9f7Vql
-	 R5HyMTAzhPwxcS6MxMDS5WcLwuZHsgx3oX+bQPfqFyipundrYh/NwTNvyOMoR4MLijcTd
-	 z5F2/PUBQzu3bIJX4kPiLCHqFD/xZCiLsFmzGKrc9XFgjkA1OEwH+63IoLN9wcC98WfCi
-	 qcCIynLDyFTa6R3YVNoBm8qR4E8IeDAF//oG5PeoWCZJOmJTpoX1q0UHU5EwEhnvq6ZOS
-	 QLH36FifmhutMVbyxqm22bUs7YytD8vAL78KedMLDFXVTR2r549psfktu25qNuBLONQ==
+	t=1792890712;
+	b=lriq5j5NsALn6rSWuojitYYRywnarp7CSk2A4Z9TksywjQDh6OlpnmLcHzeNtuSmLWFm
+	 opWZOaf2gG3t7eiQTSOl9c5BFF/pZKaOnM+0EkGTfKqFmeiS832EI/hFch/dmN4yh8Wwh
+	 IZPylPet2EmEdSG1u43kHuYZ5W4hpdWd7sJOPFfaKlwKKwQEnwuIPRa/w2lcCHCOB3wV/
+	 ZMAYHEIomJIkk9tB56DkPq/MP+ZptxZsskRhbOsEOZbDKcI52hoTDbB1RRjaLkxBEEBgG
+	 8ry1bhixMUs471MfN8+2nFK4u7XsNmQvJ5OSCmi5fbWBVDdhXz6LcIxp4RoFhPejXZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792887611;
-	h=Received:DKIM-Signature:Received:Subject:From:In-Reply-To:References:
-	 X-PR-Tracked-List-Id:X-PR-Tracked-Message-Id:X-PR-Tracked-Remote:
-	 X-PR-Tracked-Commit-Id:X-PR-Merge-Tree:X-PR-Merge-Refname:
-	 X-PR-Merge-Commit-Id:Message-Id:Date:To:Cc;
-	bh=t1YQFn0x8nP9hc6SNzB8o8M4BvjBUjche5ZWklFu+uM=;
-	b=nLTvBfnlPfMWXn/4mI155Vk6BtBV3SmnFrjRuf28bkl0FZdlUC0ZhBndshehCIRv+jE5
-	 rmkvGByqGlH7UylvV8cYW+cJG2t+68TJmCdD2x+AXeL3MkYHPe0f2AtO5JEWqFWVVetyU
-	 wP5Z8eE8LGZUPXfOxXabRo0CdOWtS52VJUHbHNhE++1ddWNeJts2YmXlI7U5ul3tugsi7
-	 mxAO2fNVZtcwn1v9RWXT7Q3YHHVakkjPUjFUnxgh5Bl5mh/vONxumix1MgIuGmu3ycie/
-	 erwbqc9cVKyFFy8DrPdLsGUSgXMFnpFhLuAlb7K++pZ9GxwGvtfApYvTXLykwhg4ilw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792890712;
+	h=DMARC-Filter:DKIM-Signature:X-SMAIL-HELO:Received:X-Sender:X-Auth-ID:
+	 X-SMAIL-MID:X-SMAIL-UIID:From:To:Cc:Subject:Date:Message-ID:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=Q8QjgI+cguG7bWbedFj22oT8cvaLq++BS/0yoHckLkk=;
+	b=bxEZYlNbFbWyekfv6ZpK0MEmBSDqSBIW08AG1xrvjkNj8bbzCNy8inM8sbo/Xbtdkeh7
+	 sQ6rES11Z20y/SS5VlMCL0Z5F+h/kDfBX8NriYylQj56baQxuCe3UqBnzfvlUj5nh99Et
+	 Yz6Im+Q85c98zhG7+YarIok81UCQZuUUAfmeB3H6iYusuNKzuroGK7ij0W3SxLlJhIBym
+	 Nb664PSk8TpNn+pU+tfGFM5bxxZjNGfyvDtOlxRSS0XBORhe0DuqpZQtXOz1ptOP0h1yD
+	 k4zHgoMX8u0phCnpGxVCa4TB8tmXFnPJff6mEvZM0t2aEO0YPJzDivS9U498cSjPVug==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VmjKMMEr;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=sina.com;
+	spf=pass smtp.mailfrom=sina.com;
+	dkim=pass header.d=sina.com header.i=@sina.com header.a=rsa-sha256 header.s=201208 header.b=Dt9pEpyA;
+	arc=none smtp.remote-ip=202.108.3.162
+Received: from mail3-162.sinamail.sina.com.cn (mail3-162.sinamail.sina.com.cn [202.108.3.162])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379A6606A31A
-	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 00:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509DD606A31A
+	for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 01:11:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 509DD606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VmjKMMEr
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 126D31F01825;
-	Sun, 25 Oct 2026 00:20:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792887611;
-	bh=t1YQFn0x8nP9hc6SNzB8o8M4BvjBUjche5ZWklFu+uM=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=VmjKMMErGecErxxFlq1sZPlOZsq1JmXuyv+I3ZLRTFu9NMFad3OZ3i28YSEp/rtDz
-	 yKj4U/fvO41LlHg+U859iREE8w1l/cudrd2ashOYBgp7UxgmJCrLyNvGP6/JfWjQXJ
-	 fHqZHcozO+AL0D5pdpD6l9GiY1+2B/o9YXodcDnz4H3WyxM2K2ZvhIKv+cvTM2b9ZC
-	 UBWbDmP6Tw588e31YmMbuHCf8XtgtKSc5ZBx5xMmGAhndS9vI+PlbpT3yPHQZRc4uu
-	 j45VFXHbhztcsIyIFRVrZF5ebMhtA2IamGMB6A5CMNgLgriNA7toRH7uXBgzD0qvBX
-	 hpoIzvP0HoyeQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0792C391B1B3;
-	Sun, 25 Oct 2026 00:20:11 +0000 (UTC)
-Subject: Re: [GIT PULL] Block updates for 7.4-rc
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk>
-References: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <3b7e92f1-77a7-4bf7-a942-83de345bfd1a@kernel.dk>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.4/block-20261021
-X-PR-Tracked-Commit-Id: 40d070cbb1906896d6fd65c39722d2411830ed9f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b23545529c21737dd7939e86b6f649f06480796d
-Message-Id: <179288760967.1837883.10019790159910042896.pr-tracker-bot@kernel.org>
-Date: Sun, 25 Oct 2026 00:20:09 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (1024-bit key, unprotected) header.d=sina.com header.i=@sina.com header.a=rsa-sha256 header.s=201208 header.b=Dt9pEpyA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1792890709;
+	bh=Q8QjgI+cguG7bWbedFj22oT8cvaLq++BS/0yoHckLkk=;
+	h=From:Subject:Date:Message-ID;
+	b=Dt9pEpyAAM/AH81vRp0/3ZKnWVUn99TIr/m2pJm41Yk7nJ4oNx7GjKJGBKTEMPntl
+	 q0L3UBYZ5WAULybxmpYuNBEEMcwyUe5xepUUkac73j0SxhX/u6c55VyMXtPolJlEGL
+	 xCS3gta6qCav1KnJ9r1vHlMYA6n5AJuJLrCDC+mo=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.254.1.249])
+	by sina.com (10.54.253.34) with ESMTP
+	id 6ADD574800005F4F; Sun, 25 Oct 2026 09:11:39 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 4931906291679
+X-SMAIL-UIID: 5492C95F558C4561AB8994FC81A21430-20261025-091139-1
+From: Hillf Danton <hdanton@sina.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Barry Song <21cnbao@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brian Geffon <bgeffon@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [PATCH v6 09/13] zram: split zcomp into separate R/W streams
+Date: Sun, 25 Oct 2026 09:11:25 +0800
+Message-ID: <20261025011126.1100-1-hdanton@sina.com>
+In-Reply-To: <20261024101401.1035-1-hdanton@sina.com>
+References: 
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -67,16 +71,31 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Wed, 21 Oct 2026 08:43:33 -0600:
-
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.4/block-20261021
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b23545529c21737dd7939e86b6f649f06480796d
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+On Sat, 24 Oct 2026 18:14:00 +0800 Hillf Danton wrote:
+>On Sat, 24 Oct 2026 14:48:32 +0900 Sergey Senozhatsky wrote:
+>> On (26/10/23 19:40), Hillf Danton wrote:
+>> [..]
+>> > > writers vs readers 3 runs
+>> > > 
+>> > >     BASE+PE     IOPS 1,271k  avg 5.57us  sd 1,393us  p99.99 27.5us  max 1,581,800us
+>> > >                 IOPS 1,461k  avg 3.43us  sd    78us  p99.99 23.9us  max   227,015us
+>> > >                 IOPS 1,444k  avg 3.48us  sd   222us  p99.99 23.9us  max   592,628us
+>> > >     PATCHED+PE  IOPS 1,457k  avg 3.32us  sd    18us  p99.99 27.5us  max     5,620us
+>> > >                 IOPS 1,464k  avg 3.31us  sd    17us  p99.99 24.2us  max     5,621us
+>> > >                 IOPS 1,475k  avg 3.29us  sd    16us  p99.99 26.5us  max     5,620us
+>> 
+>> BASE+PE looked noisy, so I sat down and tested properly (also tested
+>> zstd and various compression levels).
+> 
+> Lets see the data from another pov (feel free to disagree) -- in the android
+> phone/car cockpit environment, the render frequence is required above 60HZ,
+> IOW a frame rendered within 16ms, so what share of the 16ms does the IOPS
+> account for after this patchset, for example when an app in background is
+> brought foreground?
+>
+I mean cpu cycles are burned to reclaim pages, given zram and swapout/in, OTOH
+given whatever a GPU, slow or fast, if it would take more than 16ms to render
+a frame, then there is no cure for the dilemma.
