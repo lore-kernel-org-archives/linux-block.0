@@ -1,94 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.229.4
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793038403;
-	b=guZtibWOKLfkUns304LoulzDPQ3kwdn0dT7NyMv0OWgGh4e471VbYW9BkM7xX0WEUlPy
-	 qGM8cHULba77gZIQKvsMndhVcVLS0xc1x4gAAqh15EZw5iYa76zsERLh6eng0WIK2xBUF
-	 qWH4LTDqbTFCjemFcWKWK7/rMRsMrDtEwIOWogGPaTxhn6/wwSZITTw6IMUawcXetdBYN
-	 duyESzzK3ZWzVpkRbRf5E9nZVcPlugT9eVi8rVyx+WmQ9D8OfgEoEX7181W2sAnx8DF+t
-	 HbmkC3aNaHCEIik0ezJTFcXqXjqDErW8J+yKnbcbT3Gez1zx94hpVijg67Or+ND/Wjg==
+	t=1793044308;
+	b=W+DOfeVeYJZeOzEw9Rw/jpZ0UtqfS+HW9d0rDBmdTVLpecQFQBe0fsnD2Qeg5WXtcWvq
+	 0Z5OtuThzACFJUr7DorzMpadWed3z7sAHbCbNxIh9YDrWfZMdQuBfntLsjB7ZpOjDSHrh
+	 cWJ/QR32hlTlpqYtSmhlky/a/+8wcVXwyy6GTXmzDonpIRqu5UxVnhcxDo1xL7IGIHjFS
+	 YxecnJsQhwF/HuIvPEDuDIeZIzpOICMCUj5lEwd968kN+U1urpaPVa0znjHBLqz2No3AR
+	 SCYuxOZe/aiSgHXBaHPtNVYleGGyvQ2Sdft1fGXcSD3lHhwbFb71MsOkDWBhmtIb0bA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793038403;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793044308;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=j/PGXyV6/Wt6qi/8E7+ZLUzJWYcL7XXDLU8lYYkrrcM=;
-	b=qU6Biy++VgQExo+MQur4egigbflrwTfFKsGO/VscrZhmnqOoCrGR/brMiAG/eQZFiq3g
-	 /lFYxQa/ORsKIXtyCCijNTW1tchetnLFP+jG9k1jRDU4+HFJSGLF/ThO36QrvKpn6Ne7G
-	 C0F1LELzXAo/I9npozkPxRHkUETq9SekNYaBUVFRNBimDb1sEQwY52Sn3xlHzD0Ktm74k
-	 0vVCL7HkpZ9sLJPcRghWfOZW9mTb3OiKTA2c5zQwyielC8lXlUra+mLVq/+3uQqvrhK6I
-	 RfZNNo1TVxf9R3O+ytKUKMF3EpMQInUViBzOvNXGezvVlCgnHdqFG8lrDqQguR4JysA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=lt5+IIOEQntNwj4k8ixyv60ZFra3k7uwj0Sn4JHHT+4=;
+	b=zCl9MhnLr3eMi3WewYadpU9JFSkN+41ZYPBsOVUVEKzN523kpB+MSpJSvBoyx4WrVloa
+	 be1aSz980403vqYsXd1AQ8Jn8b/tj9iCeslPHP9KohP499fiOQ1BXj5cbTuVAwu5vGQG/
+	 Ae7L8hfZp7d21nnXTRJVp2NlZ3QwYpgL7vD4ixXKDZwhACTb9IrFEuduY5dAM4rjxF6hr
+	 omH7j60J1RmQTw2FauH41wA842CndrTpKTIrKqgTNYGwkOLzKU7shAi0u1q/s5RAw/ZS8
+	 Cpz65grPjptM1Vn56HtNPay6r44akJrFtBFB9K3jh4HGilpzHlbQOuiWwEaNqRW4hAQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=OXZAXbFm;
-	arc=none smtp.remote-ip=74.125.82.49
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=D2YtkdlV;
+	arc=none smtp.remote-ip=74.125.229.4
+Received: from mail-dy2-f4.google.com (mail-dy2-f4.google.com [74.125.229.4])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B400606A326
-	for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 18:13:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6B400606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E842606A31A
+	for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 19:51:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E842606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=OXZAXbFm
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-185fd3a4ca3so2716196c88.0
-        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 11:13:23 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=D2YtkdlV
+Received: by mail-dy2-f4.google.com with SMTP id 5a478bee46e88-35af9712d88so279669eec.1
+        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 12:51:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1793038402; x=1793643202; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=j/PGXyV6/Wt6qi/8E7+ZLUzJWYcL7XXDLU8lYYkrrcM=;
-        b=OXZAXbFmxu5N5tro2yRXp1EQltbtiVnGSO8vBdyCYgKSdgLXFmmaXw9j7eahoJEJYA
-         dMwqGL80wIUv7bsjDO6wLee9Yvn7ZiqrFZROKvKeIRzd6ymmHBsRcPVsP/PhcrFcjknJ
-         UWdfIv2ri1QY7PgLz7f9h5EmdMIZY4jHYRX7LJ/owzSYJvKGk7Su5hSq+eUs4k2vmZeL
-         jVm3HuQuEodE5LCh6pqEInivyw9t6apxMVTiWWd7W9L1q5LaMqBtQjcJ6yDRkl4+BAMp
-         OtC10QTQlyP1zdGZeT9M+4tphQhERT0Onu8ZpzfM+Jq4T82429meKUuFbUeAMZu+TEfg
-         1Vgg==
+        d=gmail.com; s=20251104; t=1793044307; x=1793649107; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lt5+IIOEQntNwj4k8ixyv60ZFra3k7uwj0Sn4JHHT+4=;
+        b=D2YtkdlVCDGqT/iZgKm4itlNOYiW4o6uFWvyGLGYTXjPAelbMQS2Pv18QOHavGVg+2
+         ioK8NOehpDooXHPIbX8jkrkGbJckCdeOh60CmsswXjMvrcNBdMXOB/AZ8LG6ezgMfK/N
+         7lUc8oS7m8KmfPNBxPTy6xjMOKDvHfDKSeRGVj19Uv+8grTzMLgweXy5xJFTNKGognr7
+         zDOfA7MWebe+XHAlNEyCLcM1RNqx6EijjI/FNx+4qDAkWlWoST0H6Kk6FUtBSgvwVXFy
+         /9ehPtbmsP3d61x9DZzzg50mAPfv9GtSsgNFGd6jOa+p5d+J3fc1HraVLcJEHSfT/5Ji
+         b9TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793038402; x=1793643202;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=j/PGXyV6/Wt6qi/8E7+ZLUzJWYcL7XXDLU8lYYkrrcM=;
-        b=QNCEA0ffAxR6kNVUhQL0IngriYjrGMnF04I/qHVY9pZSxKcULRAubrC/UfH2M3U0wB
-         YPenQBV0OBi/DyDG8ke20EmsLEolTDCiGdVqP0cuRw2re/zaxcmoLbk1VsiBSEXs8d5O
-         mpiqPJtI7Vj9/uIgfzJu3BrVziCITR4QEJW3/dkq2IoVr8idtK5Vuz9LqYyB6UzkKc37
-         BSDSlCydfCWCn5mTlS3UqRV1UdXW8NXfZwxhNqGibfT5I8HNQyocT+eDK281QRZe7HHh
-         hr0aVnG2CkgrR/tr/R2RPzksU2mWvMhkSqO1i7U1ryXrr8axlF03sileoMQVXTv70vFA
-         qNww==
-X-Forwarded-Encrypted: i=1; AKwUvBxdwSrA979GtgWmWfdMbsBA9SkBj9nFAh/xFs14tlmtbRcby/YIdePlv3ivtSZy90ayFXiBaop8YT9mSw==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ1jzRW3GdHrvc65/jxY5TgYkLq/mk1yRGUZv/JU8oOl6GGO/Ie
-	LshjMT4sqAtwJSa4yBrzLkqN91j7unaObL23+r7JTz4SDG1dpGa2MGE7L8xMMEUUBno=
-X-Gm-Gg: AYBFou1jMbLU/tnhhq/kEI/ZCZ5G0sK9/s6Qu9j/+pi1RVv4V4pnLjog6ymlXcDVS/1
-	fNz2aIPlS7JDagymsUmo5hSwCPPTxZSugfmwM/cC7rGitxxAYpcED3bA4nNHuu1ZC2GzSBenawf
-	rxYrhhZRgl0CBzvN+7Bzip0z41V09zC5Uhn/2Y+VAnmtl92hILyJkQQE3xT7ma1L8wREEhZpHu8
-	fssAV+btpIxE6iDKoOOpNDG5UNQL9DI5Y2/+3Uy1/PNIl4TKrd1nz3AimHxJzZHWYoW7KL8W8Ts
-	Rf8AsrLSTYgM2FKa0LYHToRVs8uLSQOS6/DfRZH7ZiuZb2K0gsLvsaAy3rr8it2RYx8rdE8hVlM
-	shXvzbZ++aR+4ts56SuPFk0xxO26COOpj36h+nUNsUmjH3XBXcATw0bnsK755qIKxpR0FU91G9P
-	fg4b34Gz0tW/BNxLOitABZaB+NXz4xIj3pa57OkBH+yZdh/bsZMmANwBivu+BplcKYKoGuHhGY1
-	twgajhvaKeam1HRqRhgjyGtBuk2Li0dl82NKjxU+h1/or7m5/FER/A5EBZ+WsIkDjXL2t4857Xn
-	RgKTnqPXW+pyXYZonXK5OrtUM86+F3i5JM0DzEw=
-X-Received: by 2002:a05:701a:ca07:b0:176:a225:e364 with SMTP id a92af1059eb24-199374f3d28mr11671343c88.35.1793038402460;
-        Mon, 26 Oct 2026 11:13:22 -0700 (PDT)
-Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1989ff2ee5asm23576455c88.8.2026.10.26.11.13.21
+        d=1e100.net; s=20260707; t=1793044307; x=1793649107;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=lt5+IIOEQntNwj4k8ixyv60ZFra3k7uwj0Sn4JHHT+4=;
+        b=tslCAi9ag0GfY+RyeodW1qgXjZ47tNj+hWQS7UBZOefdvQOotyhbMY+Kr5lSfB6gzb
+         mB4bg2S4Ptqw23W6m2d+JcOxHqKtJNqzSz99BPJiuVLIOvrEmv1duoPGXiYsAZ2wXZbY
+         0NK5c3/aEahIHWVXyU0sCC3do4CnuYJAKnp+/yC8E2o0khyxT0WpmFPjD6YxRCQPXE3H
+         Jnp816H49LAzqZveWt9kXCgQxnPk/fK5lBfbuGf6cUXziIsKr1/yTmwoqZA9Qm9gxqDz
+         P6Kf5hAp2OiT9dvAg8AKC1JQdSYxzz6vPVpQddw+Vk5FddAzQlb19Bjfu8Fp2Ir88GSC
+         pc7g==
+X-Gm-Message-State: AFq9FYLUJI30dAIesWvSDWCMyptu7liSuRx2WjizHfcHpUUMZyb8S3S8
+	a58kVIBxyZttoAQwye8levGRl9jNYDaklSUD14f/X5991EzR9+9wxmxH
+X-Gm-Gg: AYBFou1ri82/GymEKaQ2JPxJYdzePEaUMVhqMG6LWwtXlVfRbAjnwLJ8rA9welYe8vY
+	CTMRV318hS0AIt6X5nROMZ1fAEzkMPb6Fhs3dFmndgpzOWLdU6LyccN39IeqObzgW8Go92tlFur
+	vwxw2vO+y9DZjCzvGGwvSQbh+MInB7pUIPgPAijQZiRDU5MK35e1q1d5LxYMfQgHRUmN//fCz0t
+	PL//9Bl7cALPnxEbZEX7K8qh1z8HVVeJ+kBI/EpGCD6Fro3WKYUXp7TZGQLFao8Tzy7NV2da87T
+	IgBPwJh0K7LuHsSGP22t5ktVB5LN2mpThFPDjYrJDiH5vMg5PEszLKv5RVUW2XyN4EcBZo09lpi
+	eUVpjuTQFyqPrwH1EbVB9sEazsaT6hm/gY7Ubh1dBL4LAVPVhwlTTMo8ULYGE3jxQeXr8fm6PqQ
+	eKhj9cZA/MUtK8ljwI9Pf/9Zk/4Hes17Hbg/u2p5s1UrkYJGwkVQ7iyuV84a7ccoc5U0jHk4CGy
+	gsaKRWp/3ISBdPlX1VSBB8dbD20AVtby8mmeRETUZn40tyYyDuFIOylmBJdE6tu5yDq2VC2E+Y0
+	irH7QHU=
+X-Received: by 2002:a05:7022:102:b0:196:7590:8bed with SMTP id a92af1059eb24-1a3c3240338mr1258384c88.2.1793044307251;
+        Mon, 26 Oct 2026 12:51:47 -0700 (PDT)
+Received: from localhost.localdomain ([98.148.34.5])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1989ff2ee69sm36573707c88.4.2026.10.26.12.51.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2026 11:13:21 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: TJ Adams <tadamsjr@google.com>
-Cc: "Christian A . Ehrhardt" <lk@c--e.de>, Christoph Hellwig <hch@lst.de>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260929160813.1599129-1-tadamsjr@google.com>
-References: <20260929160813.1599129-1-tadamsjr@google.com>
-Subject: Re: [PATCH] block: advance iterator after copy-in for
- SG_DXFER_TO_FROM_DEV
-Message-Id: <179303840146.792754.17618533917461283198.b4-ty@b4>
-Date: Mon, 26 Oct 2026 12:13:21 -0600
+        Mon, 26 Oct 2026 12:51:46 -0700 (PDT)
+From: Hungyu Lin <dennylin0707@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	mtsai@redhat.com,
+	sashiko-bot@kernel.org,
+	stable@vger.kernel.org,
+	dennylin0707@gmail.com
+Subject: [PATCH v2] block: fix discard alignment for non-power-of-two granularities
+Date: Mon, 26 Oct 2026 19:51:31 +0000
+Message-ID: <20261026195131.46699-1-dennylin0707@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -98,31 +97,76 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
 
+bio_discard_limit() uses round_up() and round_down(), which require a
+power-of-two alignment. However, discard_granularity need not be a power
+of two. For example, dm-thin supports data block sizes that are arbitrary
+multiples of 64 KiB and advertises the block size as its granularity.
 
-On Tue, 29 Sep 2026 09:08:13 -0700, TJ Adams wrote:
-> When a passthrough request uses transfer direction SG_DXFER_TO_FROM_DEV,
-> bio_copy_user_iov() sets up a temporary iterator iter2 with
-> data_source = ITER_SOURCE to copy user data into the bio pages before
-> execution.
-> 
-> bio_copy_from_iter(bio, &iter2) copies the data and advances iter2, but
-> the original iter is never advanced. Consequently, iov_iter_count(&i)
-> remains non-zero in the caller loop in blk_rq_map_user_iov():
-> 
-> [...]
+With a 192 KiB granularity, discarding one complete block at offset
+384 KiB is split into 128 KiB and 64 KiB bios. Neither covers a complete
+thin block, so dm-thin ignores both and the mapping remains allocated.
 
-Applied, thanks!
+Use sector_div() to find the distance to the next granularity boundary,
+and rounddown() to align the maximum bio size. This handles non-power-of-
+two granularities while preserving the alignment for power-of-two ones.
 
-[1/1] block: advance iterator after copy-in for SG_DXFER_TO_FROM_DEV
-      commit: 82e72ea18d0af724914c31a1f274c1aef452aad0
+When discard is unsupported or disabled, discard_granularity can be zero.
+Return BIO_MAX_SECTORS in that case so the existing bio submission checks
+can handle unsupported discard requests without dividing by zero.
 
-Best regards,
+Fixes: 9b15d109a6b2 ("block: improve discard bio alignment in __blkdev_issue_discard()")
+Reported-by: Ming-Hung Tsai <mtsai@redhat.com>
+Link: https://lore.kernel.org/r/CALjSBEvjbiGDVewuapWKhGDtaxZwcn4=22raUiBEOyj22rY7-g@mail.gmail.com
+Cc: stable@vger.kernel.org
+Signed-off-by: Hungyu Lin <dennylin0707@gmail.com>
+---
+Changes in v2:
+- Handle zero discard_granularity before dividing, as pointed out by
+  Sashiko. Leave unsupported discard handling to the bio submission path.
+ block/blk-lib.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 688bc67cbf73..5649e4d3b5bf 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -13,26 +13,28 @@
+ static sector_t bio_discard_limit(struct block_device *bdev, sector_t sector)
+ {
+ 	unsigned int discard_granularity = bdev_discard_granularity(bdev);
+-	sector_t granularity_aligned_sector;
++	unsigned int remainder;
++
++	if (!discard_granularity)
++		return BIO_MAX_SECTORS;
+ 
+ 	if (bdev_is_partition(bdev))
+ 		sector += bdev->bd_start_sect;
+ 
+-	granularity_aligned_sector =
+-		round_up(sector, discard_granularity >> SECTOR_SHIFT);
++	remainder = sector_div(sector, discard_granularity >> SECTOR_SHIFT);
+ 
+ 	/*
+ 	 * Make sure subsequent bios start aligned to the discard granularity if
+ 	 * it needs to be split.
+ 	 */
+-	if (granularity_aligned_sector != sector)
+-		return granularity_aligned_sector - sector;
++	if (remainder)
++		return (discard_granularity >> SECTOR_SHIFT) - remainder;
+ 
+ 	/*
+ 	 * Align the bio size to the discard granularity to make splitting the bio
+ 	 * at discard granularity boundaries easier in the driver if needed.
+ 	 */
+-	return round_down(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT;
++	return rounddown(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT;
+ }
+ 
+ struct bio *blk_alloc_discard_bio(struct block_device *bdev,
 -- 
-Jens Axboe
-
-
+2.43.0
 
