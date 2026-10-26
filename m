@@ -1,93 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.229.4
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793044308;
-	b=W+DOfeVeYJZeOzEw9Rw/jpZ0UtqfS+HW9d0rDBmdTVLpecQFQBe0fsnD2Qeg5WXtcWvq
-	 0Z5OtuThzACFJUr7DorzMpadWed3z7sAHbCbNxIh9YDrWfZMdQuBfntLsjB7ZpOjDSHrh
-	 cWJ/QR32hlTlpqYtSmhlky/a/+8wcVXwyy6GTXmzDonpIRqu5UxVnhcxDo1xL7IGIHjFS
-	 YxecnJsQhwF/HuIvPEDuDIeZIzpOICMCUj5lEwd968kN+U1urpaPVa0znjHBLqz2No3AR
-	 SCYuxOZe/aiSgHXBaHPtNVYleGGyvQ2Sdft1fGXcSD3lHhwbFb71MsOkDWBhmtIb0bA==
+	t=1793051357;
+	b=2swC9UdoO0kfJ47d30nNp6oOvVt76yRnO+toTYoUDqHlAuPfwjK2OLQaaLP8MBRiIorN
+	 CYTZfNZ/0dGT3GsxnXpmfNHNBsGEz0G1ZVJFMn7ZzQkZCgtna/qS+JQHYWNLXiX5sKAvu
+	 ybwJpfE/TX7tK8rlLJKwZjt1tRIsTuppRanfblHOl/OF19ZInfMpQrXRExNpJdyVtEYI0
+	 UayhoN+NQMxMtVX4cM32WAgDNGYFgHgOWUS1Hlog4FVQB6YdBpmBS+edxgM0WtyAWu8L3
+	 705CvUuY2FerLjueUT9zyVknNdutonVe8qVTZf3on0tXi2CHHpebJQjMwRJ/Yxu+zAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793044308;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=lt5+IIOEQntNwj4k8ixyv60ZFra3k7uwj0Sn4JHHT+4=;
-	b=zCl9MhnLr3eMi3WewYadpU9JFSkN+41ZYPBsOVUVEKzN523kpB+MSpJSvBoyx4WrVloa
-	 be1aSz980403vqYsXd1AQ8Jn8b/tj9iCeslPHP9KohP499fiOQ1BXj5cbTuVAwu5vGQG/
-	 Ae7L8hfZp7d21nnXTRJVp2NlZ3QwYpgL7vD4ixXKDZwhACTb9IrFEuduY5dAM4rjxF6hr
-	 omH7j60J1RmQTw2FauH41wA842CndrTpKTIrKqgTNYGwkOLzKU7shAi0u1q/s5RAw/ZS8
-	 Cpz65grPjptM1Vn56HtNPay6r44akJrFtBFB9K3jh4HGilpzHlbQOuiWwEaNqRW4hAQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793051357;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-Rspamd-Queue-Id:X-Spam-Level:X-Rspamd-Server:
+	 X-Rspamd-Action:X-Spam-Flag:X-Spamd-Result:X-Spam-Score;
+	bh=bVpJ81jbb6s/k9oeKUE3zACKDLs87mB6qiXsiIpROrw=;
+	b=ejaUx9ezICE4zwtUSLPkFEV+FbOgKZT930InXJudjmz4bQ1cNKwFTs5oyyRGkL1kF/FV
+	 2mSUybL4qi+ivV2iDKe2QDCpD7tRshz3u7PBwLWOsFT4bBLrJrXfLFiI1GsIx8nPgQAq/
+	 /CmQ3hEPguhCOPWtsCAhaLOqrlvOtGE0KCawwKwfdS4vOyqLpUORy5CFXlB1HNVr8vKDI
+	 pjWFDRO+V87piF2aBdA2M1Vlk6nZEOsQNQVplUaKJndvPavzVsMuCt0nNQSZ9U0ccGVoY
+	 YqLAQ/iphfxnbonc6j9Q3tWmVa9fj9s3ryT0QFBZR34pfhisANhcRczcCG6+eKdmydQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=D2YtkdlV;
-	arc=none smtp.remote-ip=74.125.229.4
-Received: from mail-dy2-f4.google.com (mail-dy2-f4.google.com [74.125.229.4])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=none header.from=suse.cz;
+	spf=pass smtp.mailfrom=suse.cz;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=eCinZKry;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=c7Cedkm8;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=eCinZKry;
+	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=c7Cedkm8;
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E842606A31A
-	for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 19:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E842606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A39A606A31A;
+	Mon, 26 Oct 2026 21:49:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9A39A606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=D2YtkdlV
-Received: by mail-dy2-f4.google.com with SMTP id 5a478bee46e88-35af9712d88so279669eec.1
-        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 12:51:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1793044307; x=1793649107; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=lt5+IIOEQntNwj4k8ixyv60ZFra3k7uwj0Sn4JHHT+4=;
-        b=D2YtkdlVCDGqT/iZgKm4itlNOYiW4o6uFWvyGLGYTXjPAelbMQS2Pv18QOHavGVg+2
-         ioK8NOehpDooXHPIbX8jkrkGbJckCdeOh60CmsswXjMvrcNBdMXOB/AZ8LG6ezgMfK/N
-         7lUc8oS7m8KmfPNBxPTy6xjMOKDvHfDKSeRGVj19Uv+8grTzMLgweXy5xJFTNKGognr7
-         zDOfA7MWebe+XHAlNEyCLcM1RNqx6EijjI/FNx+4qDAkWlWoST0H6Kk6FUtBSgvwVXFy
-         /9ehPtbmsP3d61x9DZzzg50mAPfv9GtSsgNFGd6jOa+p5d+J3fc1HraVLcJEHSfT/5Ji
-         b9TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793044307; x=1793649107;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=lt5+IIOEQntNwj4k8ixyv60ZFra3k7uwj0Sn4JHHT+4=;
-        b=tslCAi9ag0GfY+RyeodW1qgXjZ47tNj+hWQS7UBZOefdvQOotyhbMY+Kr5lSfB6gzb
-         mB4bg2S4Ptqw23W6m2d+JcOxHqKtJNqzSz99BPJiuVLIOvrEmv1duoPGXiYsAZ2wXZbY
-         0NK5c3/aEahIHWVXyU0sCC3do4CnuYJAKnp+/yC8E2o0khyxT0WpmFPjD6YxRCQPXE3H
-         Jnp816H49LAzqZveWt9kXCgQxnPk/fK5lBfbuGf6cUXziIsKr1/yTmwoqZA9Qm9gxqDz
-         P6Kf5hAp2OiT9dvAg8AKC1JQdSYxzz6vPVpQddw+Vk5FddAzQlb19Bjfu8Fp2Ir88GSC
-         pc7g==
-X-Gm-Message-State: AFq9FYLUJI30dAIesWvSDWCMyptu7liSuRx2WjizHfcHpUUMZyb8S3S8
-	a58kVIBxyZttoAQwye8levGRl9jNYDaklSUD14f/X5991EzR9+9wxmxH
-X-Gm-Gg: AYBFou1ri82/GymEKaQ2JPxJYdzePEaUMVhqMG6LWwtXlVfRbAjnwLJ8rA9welYe8vY
-	CTMRV318hS0AIt6X5nROMZ1fAEzkMPb6Fhs3dFmndgpzOWLdU6LyccN39IeqObzgW8Go92tlFur
-	vwxw2vO+y9DZjCzvGGwvSQbh+MInB7pUIPgPAijQZiRDU5MK35e1q1d5LxYMfQgHRUmN//fCz0t
-	PL//9Bl7cALPnxEbZEX7K8qh1z8HVVeJ+kBI/EpGCD6Fro3WKYUXp7TZGQLFao8Tzy7NV2da87T
-	IgBPwJh0K7LuHsSGP22t5ktVB5LN2mpThFPDjYrJDiH5vMg5PEszLKv5RVUW2XyN4EcBZo09lpi
-	eUVpjuTQFyqPrwH1EbVB9sEazsaT6hm/gY7Ubh1dBL4LAVPVhwlTTMo8ULYGE3jxQeXr8fm6PqQ
-	eKhj9cZA/MUtK8ljwI9Pf/9Zk/4Hes17Hbg/u2p5s1UrkYJGwkVQ7iyuV84a7ccoc5U0jHk4CGy
-	gsaKRWp/3ISBdPlX1VSBB8dbD20AVtby8mmeRETUZn40tyYyDuFIOylmBJdE6tu5yDq2VC2E+Y0
-	irH7QHU=
-X-Received: by 2002:a05:7022:102:b0:196:7590:8bed with SMTP id a92af1059eb24-1a3c3240338mr1258384c88.2.1793044307251;
-        Mon, 26 Oct 2026 12:51:47 -0700 (PDT)
-Received: from localhost.localdomain ([98.148.34.5])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1989ff2ee69sm36573707c88.4.2026.10.26.12.51.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2026 12:51:46 -0700 (PDT)
-From: Hungyu Lin <dennylin0707@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	mtsai@redhat.com,
-	sashiko-bot@kernel.org,
-	stable@vger.kernel.org,
-	dennylin0707@gmail.com
-Subject: [PATCH v2] block: fix discard alignment for non-power-of-two granularities
-Date: Mon, 26 Oct 2026 19:51:31 +0000
-Message-ID: <20261026195131.46699-1-dennylin0707@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key, unprotected) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=eCinZKry;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=c7Cedkm8;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=eCinZKry;
+	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=c7Cedkm8
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 9F2381F395;
+	Mon, 26 Oct 2026 21:49:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1793051354; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bVpJ81jbb6s/k9oeKUE3zACKDLs87mB6qiXsiIpROrw=;
+	b=eCinZKry9BdBG2Tuub+XI9hK94YcOOBUoAy5NiqDtrxCIfhiDCpKBYosrzHbGoQPdqVcVF
+	/qUyW0flh+XLgtYLcWFiEdoa2BT99gfRo3PcAl738bcEs9klDFkXP6z2X4Nbo/EaPFu13F
+	/G1VPtqe+OHGGNMTOwe+xOIuqM2+o+Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1793051354;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bVpJ81jbb6s/k9oeKUE3zACKDLs87mB6qiXsiIpROrw=;
+	b=c7Cedkm86DrLmBhaRecl63q8E2NQXs91lGx1midza1J1rGGNKflLD0QKxcMpGk83nRyC0X
+	IUBu035ZLkrDe3DA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=eCinZKry;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=c7Cedkm8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1793051354; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bVpJ81jbb6s/k9oeKUE3zACKDLs87mB6qiXsiIpROrw=;
+	b=eCinZKry9BdBG2Tuub+XI9hK94YcOOBUoAy5NiqDtrxCIfhiDCpKBYosrzHbGoQPdqVcVF
+	/qUyW0flh+XLgtYLcWFiEdoa2BT99gfRo3PcAl738bcEs9klDFkXP6z2X4Nbo/EaPFu13F
+	/G1VPtqe+OHGGNMTOwe+xOIuqM2+o+Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1793051354;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bVpJ81jbb6s/k9oeKUE3zACKDLs87mB6qiXsiIpROrw=;
+	b=c7Cedkm86DrLmBhaRecl63q8E2NQXs91lGx1midza1J1rGGNKflLD0QKxcMpGk83nRyC0X
+	IUBu035ZLkrDe3DA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4D9BA13408;
+	Mon, 26 Oct 2026 21:49:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id eRk0CtrK32pSBAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 26 Oct 2026 21:49:14 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id CCA06A1419; Mon, 26 Oct 2026 22:49:09 +0100 (CET)
+Date: Mon, 26 Oct 2026 22:49:09 +0100
+From: Jan Kara <jack@suse.cz>
+To: Andrea Parri <parri.andrea@gmail.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-mm@kvack.org, linux-api@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] iov_iter: take an unsigned long segment count in
+ import_iovec()
+Message-ID: <yb2p27fkrqamzmzfwqbqjwsxhw7cdlpgjzc26eqtimw2puhxrz@mhrjegarlm5a>
+References: <20261026180619.4147910-1-parri.andrea@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -97,76 +115,181 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261026180619.4147910-1-parri.andrea@gmail.com>
+X-Rspamd-Queue-Id: 9F2381F395
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-11.51 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:dkim,suse.cz:email,suse.com:email]
+X-Spam-Score: -11.51
 
-bio_discard_limit() uses round_up() and round_down(), which require a
-power-of-two alignment. However, discard_granularity need not be a power
-of two. For example, dm-thin supports data block sizes that are arbitrary
-multiples of 64 KiB and advertises the block size as its granularity.
+On Mon 26-10-26 19:06:18, Andrea Parri wrote:
+> readv(), writev() and their positional variants, process_vm_readv(),
+> process_vm_writev(), vmsplice(), process_madvise(), vectored aio and
+> the btrfs encoded I/O ioctls all take a full-width segment count, and
+> all of them hand it to import_iovec() or __import_iovec().  Those take
+> an unsigned int count, so on 64-bit kernels the upper 32 bits are
+> dropped before iovec_from_user() checks the count against UIO_MAXIOV.
+> 
+> A count of 0x100000001 is therefore imported as one segment: writev()
+> on a pipe writes a byte and readv() reads it back, instead of both
+> failing with EINVAL.  A count of 0x100000000 returns 0 as an empty
+> vector.
+> 
+> import_iovec() was added with an unsigned int count, but the helper it
+> wrapped, rw_copy_check_uvector(), took an unsigned long, as does
+> iovec_from_user() today.  Until v4.1, readv(), writev(), preadv(),
+> pwritev(), process_vm_readv(), process_vm_writev() and vectored aio
+> therefore failed these counts with EINVAL, as did vmsplice() until
+> v4.18.
+> 
+> Widen nr_segs in both import helpers so the UIO_MAXIOV check sees the
+> count the caller passed.  Callers with 32-bit counts are unaffected.
+> 
+> AI assistance was used to find the bug, develop the fix, and run the
+> reproducers.
+> 
+> Fixes: bc917be81059 ("saner iov_iter initialization primitives")
+> Signed-off-by: Andrea Parri <parri.andrea@gmail.com>
 
-With a 192 KiB granularity, discarding one complete block at offset
-384 KiB is split into 128 KiB and 64 KiB bios. Neither covers a complete
-thin block, so dm-thin ignores both and the mapping remains allocated.
+Looks good. Feel free to add:
 
-Use sector_div() to find the distance to the next granularity boundary,
-and rounddown() to align the maximum bio size. This handles non-power-of-
-two granularities while preserving the alignment for power-of-two ones.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-When discard is unsupported or disabled, discard_granularity can be zero.
-Return BIO_MAX_SECTORS in that case so the existing bio submission checks
-can handle unsupported discard requests without dividing by zero.
+								Honza
 
-Fixes: 9b15d109a6b2 ("block: improve discard bio alignment in __blkdev_issue_discard()")
-Reported-by: Ming-Hung Tsai <mtsai@redhat.com>
-Link: https://lore.kernel.org/r/CALjSBEvjbiGDVewuapWKhGDtaxZwcn4=22raUiBEOyj22rY7-g@mail.gmail.com
-Cc: stable@vger.kernel.org
-Signed-off-by: Hungyu Lin <dennylin0707@gmail.com>
----
-Changes in v2:
-- Handle zero discard_granularity before dividing, as pointed out by
-  Sashiko. Leave unsupported discard handling to the bio submission path.
- block/blk-lib.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 688bc67cbf73..5649e4d3b5bf 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -13,26 +13,28 @@
- static sector_t bio_discard_limit(struct block_device *bdev, sector_t sector)
- {
- 	unsigned int discard_granularity = bdev_discard_granularity(bdev);
--	sector_t granularity_aligned_sector;
-+	unsigned int remainder;
-+
-+	if (!discard_granularity)
-+		return BIO_MAX_SECTORS;
- 
- 	if (bdev_is_partition(bdev))
- 		sector += bdev->bd_start_sect;
- 
--	granularity_aligned_sector =
--		round_up(sector, discard_granularity >> SECTOR_SHIFT);
-+	remainder = sector_div(sector, discard_granularity >> SECTOR_SHIFT);
- 
- 	/*
- 	 * Make sure subsequent bios start aligned to the discard granularity if
- 	 * it needs to be split.
- 	 */
--	if (granularity_aligned_sector != sector)
--		return granularity_aligned_sector - sector;
-+	if (remainder)
-+		return (discard_granularity >> SECTOR_SHIFT) - remainder;
- 
- 	/*
- 	 * Align the bio size to the discard granularity to make splitting the bio
- 	 * at discard granularity boundaries easier in the driver if needed.
- 	 */
--	return round_down(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT;
-+	return rounddown(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT;
- }
- 
- struct bio *blk_alloc_discard_bio(struct block_device *bdev,
+> ---
+> Tested on x86_64 with virtme-ng, base 734bef548a96e vs patched:
+> readv, writev, preadv, pwritev, preadv2, pwritev2, vectored aio,
+> process_madvise, process_vm_readv, process_vm_writev and vmsplice with
+> counts 0, 1, 1024, 1025, UINT_MAX, 2^32, 2^32+1, 2^32+1024, 2^32+1025
+> and ULONG_MAX (LONG_MAX for aio).  The base kernel accepts 2^32,
+> 2^32+1 and 2^32+1024 on every path; the patched kernel rejects every
+> count above 1024 with EINVAL.  Also built every caller with
+> allmodconfig W=1, and lib/iov_iter.o and the readv, vmsplice and
+> process_vm callers with i386 defconfig W=1.
+> 
+> Reproducer (64-bit userspace):
+>   cc -Wall -Wextra -O2 repro.c -o repro
+>   ./repro
+> 
+> // SPDX-License-Identifier: GPL-2.0-only
+> #define _GNU_SOURCE
+> #include <errno.h>
+> #include <stdio.h>
+> #include <stdlib.h>
+> #include <string.h>
+> #include <sys/syscall.h>
+> #include <sys/uio.h>
+> #include <unistd.h>
+> 
+> int main(void)
+> {
+> 	char source = 'x', received = '-';
+> 	struct iovec wiov = { .iov_base = &source, .iov_len = 1 };
+> 	struct iovec riov = { .iov_base = &received, .iov_len = 1 };
+> 	const unsigned long count = (1UL << 32) + 1;
+> 	long wret, rret;
+> 	int pipefd[2], werr;
+> 
+> 	if (pipe(pipefd)) {
+> 		perror("pipe");
+> 		return EXIT_FAILURE;
+> 	}
+> 	errno = 0;
+> 	wret = syscall(SYS_writev, pipefd[1], &wiov, count);
+> 	werr = errno;
+> 	close(pipefd[1]);
+> 	errno = 0;
+> 	rret = syscall(SYS_readv, pipefd[0], &riov, count);
+> 	printf("writev=%ld (%s) readv=%ld (%s) byte=%c\n",
+> 	       wret, strerror(werr), rret, strerror(errno), received);
+> 	close(pipefd[0]);
+> 	return EXIT_SUCCESS;
+> }
+> 
+>  include/linux/uio.h | 8 ++++----
+>  lib/iov_iter.c      | 6 +++---
+>  2 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/linux/uio.h b/include/linux/uio.h
+> index fe2e985d74d24..529c6cd53df7a 100644
+> --- a/include/linux/uio.h
+> +++ b/include/linux/uio.h
+> @@ -362,11 +362,11 @@ struct iovec *iovec_from_user(const struct iovec __user *uvector,
+>  		unsigned long nr_segs, unsigned long fast_segs,
+>  		struct iovec *fast_iov, bool compat);
+>  ssize_t import_iovec(int type, const struct iovec __user *uvec,
+> -		 unsigned nr_segs, unsigned fast_segs, struct iovec **iovp,
+> -		 struct iov_iter *i);
+> +		 unsigned long nr_segs, unsigned int fast_segs,
+> +		 struct iovec **iovp, struct iov_iter *i);
+>  ssize_t __import_iovec(int type, const struct iovec __user *uvec,
+> -		 unsigned nr_segs, unsigned fast_segs, struct iovec **iovp,
+> -		 struct iov_iter *i, bool compat);
+> +		 unsigned long nr_segs, unsigned int fast_segs,
+> +		 struct iovec **iovp, struct iov_iter *i, bool compat);
+>  int import_ubuf(int type, void __user *buf, size_t len, struct iov_iter *i);
+>  
+>  static inline void iov_iter_ubuf(struct iov_iter *i, unsigned int direction,
+> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+> index 2072c04e99d05..55cf2ff5bfdad 100644
+> --- a/lib/iov_iter.c
+> +++ b/lib/iov_iter.c
+> @@ -1362,8 +1362,8 @@ static ssize_t __import_iovec_ubuf(int type, const struct iovec __user *uvec,
+>  }
+>  
+>  ssize_t __import_iovec(int type, const struct iovec __user *uvec,
+> -		 unsigned nr_segs, unsigned fast_segs, struct iovec **iovp,
+> -		 struct iov_iter *i, bool compat)
+> +		 unsigned long nr_segs, unsigned int fast_segs,
+> +		 struct iovec **iovp, struct iov_iter *i, bool compat)
+>  {
+>  	ssize_t total_len = 0;
+>  	unsigned long seg;
+> @@ -1434,7 +1434,7 @@ ssize_t __import_iovec(int type, const struct iovec __user *uvec,
+>   * Return: Negative error code on error, bytes imported on success
+>   */
+>  ssize_t import_iovec(int type, const struct iovec __user *uvec,
+> -		 unsigned nr_segs, unsigned fast_segs,
+> +		 unsigned long nr_segs, unsigned int fast_segs,
+>  		 struct iovec **iovp, struct iov_iter *i)
+>  {
+>  	return __import_iovec(type, uvec, nr_segs, fast_segs, iovp, i,
+> 
+> base-commit: 734bef548a96e8774d6eef5dfa2026c6edc4e80b
+> -- 
+> 2.53.0
+> 
 -- 
-2.43.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
