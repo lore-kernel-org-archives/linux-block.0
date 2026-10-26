@@ -1,93 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.229.9
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792973129;
-	b=gGX2EEIbux7KO0RhLuqgpHA4mxcEzJwOXpV3EPMjkR4eYkfyuzo09a+yUUGYXKxLFFKq
-	 1DXPxmA/eu3riWFXcefPnDmzNdkMUOtfkIoFw4cZ75VhQChE5W7SWIdkDB2ccb2LAJsGy
-	 MJtQ4F8u2HcIv5Z7peVdVBaWxcjeJn7kdSN3tP8rbFehY1Zc1jLbMMcMO2t7sL60gH/ph
-	 FMwiS+JYThBSoj1CWAtNlLYPq5xj3o1JLXSyNbvCamFme9UEc8YU9LxcYozK3S0MnZzTB
-	 DSCT+5OousZLdyd2Y3MTfhV31zK1/3rxYWoqIny23Cxs43/bIpc73w4/GBZtgRjNQoQ==
+	t=1792984182;
+	b=Uibw0CedVrfF3B5+6eazqIStrXKSkEZNS4EEZWZ7i9kJwJ3uU6fNujMp4D/Hyv2hYrzj
+	 uGtwgKpbh+XxVKBDEDmeIXxBYLfL/v8MR7PhyjeIxif0Z2hmN0aN9kTPOSgp2EPFbthyu
+	 x3wOGPfW7VOvHoAMDdG03qkEGqwezM+yTGzIDebNDwMUFghO0xLchntP22TjygGLnTcAW
+	 3j3PVgv7mcUNOqTasFI69UwSBuCTROiad+TDZ+0pAcsifGfH0BGMlELNSpPADmawxZ8OC
+	 uIwbV4B786y6FF5rafifO9g+soSoTyJlqt3jrH098kTGYT6rpo8wr2+U743kbeQFIrA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792973129;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792984182;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=T1XZ1WfHH7XnOv0sWlDb4paoPJtD91jpUpFHrBDh51s=;
-	b=U9bChXAJExxRrVafMw3KY5XKwHhJjKKftWPAQ/7/FhqJHJvTryqFYt2Xln4uTYvg36WM
-	 2MTCbHB/qrmxfy27N5DLuyzH7OQsgdFkIdnGpqv49yY+iOW+0IGaPQYJHjqXsl3KkWkTs
-	 NFIwl0n8GDKd+P4q4kPtlg/8TB/JNFSDOonXBxOAICXZjGAbJGmylqMGyfYnpg10LAY6h
-	 TA+v+BsIfdd/7CoZspIQ+qQvIdaDBGxLEJMF8q7htnwkgGm+VPVY/CbtZvku7qPzsRCEk
-	 pDLgOAMfHLBTsCTRfbdsILVXwggqNLn7y/DPwEBo0E8e/6He0/yV8YTygfahaoLcceQ==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
+	 In-Reply-To;
+	bh=z+4adjsji42YunpnXzr153PsIW3465KG5I6YOnRXsyQ=;
+	b=qhRqDUxwVgziZJOa59sObDS98V9zrhxjjOLbqh5gBwIINCvvINQ/v9pqHu7FiLZT82+L
+	 TVyWaYx8jR+pVSfDG/ZTHTheYx2dKGNShH6ZQ1behKWPWT2jMgqNMKoN93utCEbpe5c4x
+	 dBWGFS8HDtlGj1LrDv9xuoBGHqmVX3NAeaZFUkIiw7oCYj/sbuluBQ61Hh0/8iCMLsg+7
+	 jGBq5biKY0IJafH9QTkno+T/LHh6UEebmPLkP3qjm12gHwBkrNznIzHE+9ZrButnPYGEO
+	 E9FPYaOkvjf4Cdoir714ksNFg6rctVlsIA6bW07d1niyhfRlQ8Q34DOQx9cTE5wCpmQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=NHCbz66H;
-	arc=none smtp.remote-ip=74.125.229.9
-Received: from mail-dy2-f9.google.com (mail-dy2-f9.google.com [74.125.229.9])
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=fFETq0jP;
+	arc=none smtp.remote-ip=74.125.82.173
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD94E606A31B
-	for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 00:05:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CD94E606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B477606A322
+	for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 03:09:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5B477606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=NHCbz66H
-Received: by mail-dy2-f9.google.com with SMTP id 5a478bee46e88-34cbc588a31so1730539eec.1
-        for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 17:05:28 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=fFETq0jP
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-3282db206d3so4950442eec.0
+        for <linux-block@vger.kernel.org>; Sun, 25 Oct 2026 20:09:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792973128; x=1793577928; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=T1XZ1WfHH7XnOv0sWlDb4paoPJtD91jpUpFHrBDh51s=;
-        b=NHCbz66H380hLDe36iJ3YyizU2wTxHQ+sK8vl+yKeiJN8/DjTGde+YR9MLqjB6kIgZ
-         I+IfDdfzG1iQZ+SkJu/jOBCgxll2hH9RyTjZsYh4JoBPpLcrT4h9UyWv79O/fLk5zM65
-         GGJ3rhPKPzsJKKhaaYyNBPTyrjBIUZaw2EGP6AgLFK0ocdHs630f99fSl9Pj88ezI2Zv
-         6LN70Evdyt+8e81Pgsp2kBKxF4jE7muUAW2FglveSpbHpPzoGNWmDghUGb97R3kyPjZn
-         4ppQeuWyLQ4zykkxUCLRKrG2VNuCwo/UqNDL1daLK3CLOO46nOdzLEN0BMPgGVZvGZpD
-         7TyA==
+        d=chromium.org; s=google; t=1792984181; x=1793588981; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=z+4adjsji42YunpnXzr153PsIW3465KG5I6YOnRXsyQ=;
+        b=fFETq0jPG6sQ9wiL42ku236U241G4j1Kd8IqsCybUJpzUdGray+Dl/X4p4SlX1WzID
+         tzatSkKdSr6jG4SqhFB9YvxZ53PReNOYl84lku+DAcBWcuo9wPZQrxqeWa1G8aiU46BQ
+         CVdLpCPJhKcsJFTXheLehfg1WqxtkgNKUHPlY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792973128; x=1793577928;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=T1XZ1WfHH7XnOv0sWlDb4paoPJtD91jpUpFHrBDh51s=;
-        b=V4Q44elouZzVrNTlFxhOjIFnVYnfVWrnPZ7t30uwjZA8KFKrX3DzMHRRb+eCzXW7Ew
-         OlyJ/mo6NJxM3zcq/YqRuZHUpN9/D2S0rCuDqwuCp3VnfBgjqzEALegM04KOYuSY4WxF
-         WY1/n9RRnPWc6fn+dhAMH1dqMGlIcNonYrk/UfNArJJZG+tnEpPWbD2lzL6tzq5KbYhH
-         xUezjcnkroKuafTbH1Nqb70CGzvCVyZFLLOKscwi9tPEe9hPmOWvu598YH5nuR8RUQkk
-         831yi4lwqpwzUZXlSqlByOjs+L+atvF4KyRfHGrLPLeeQ/kzFbD8eHL7fKpDPxm0fuK9
-         Di+w==
-X-Gm-Message-State: AFq9FYLXTybzHJcD0Iboqov4eksnWFHTbUpae13DTocz61e6kj0z3g+t
-	pCK3B+xfQQdxCoG420W08yUiLS1f+SfDSTFOTevBOVDrELX8JZfw/nbl
-X-Gm-Gg: AYBFou1SkAtq0zr3uijnSuaQHFaNrXH72Mo6pHcz91dgGDFWQeXnbwsa1wO7z9pC99a
-	pr21ublYtj1O2bcv/E6FC+UeXKXWcVemYGVygvkCHDXzSMGr6pzWSFGP3GH9Q1RRUqxXAdq8/p0
-	YqY/9cG9bLk1m7cjCcGOaUz5w7BQVaHj1aAaSjMUDElDSynWuv/xY1EzniIAgDZh6GTtfDLA2e/
-	y3hkewEwsM8AI6xKNg+9nDqfkLFqaRj5y1QJS4mEomHfSr90urSyLqdF6icufReem04fVv/6INF
-	l2HKVyxviGK+f5Q0vvFU74l0q/20g+dgtxA/GZhzHldWViVFiM8iagaZjRXAeMuVZn6b+B2fV9g
-	zoadSMnmZ/fnKoTAgFtuIXOmYC/nWrCMryI6FKeVLoPEKyoaHeVIKjmbF9/HEkhlrJlJaw3TlUd
-	rb8QyBaRI7ETvIKSVaBpp4kHHK2VdimbShhDr6pm4omM/JZoWnfIN75xzUzTqGmkeK5x4GudD+I
-	P4nh4cvWfYlyn97YHt3hAjbR6n+J6k099zX/M2lMPh3fjUoJ/fuPL7FAGtv4yhehRYUyX4WRbd0
-	Y5WrLHI=
-X-Received: by 2002:a05:7022:3f07:b0:144:fa57:c617 with SMTP id a92af1059eb24-19935dd7f53mr9109408c88.34.1792973127715;
-        Sun, 25 Oct 2026 17:05:27 -0700 (PDT)
-Received: from localhost.localdomain ([98.148.34.5])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1989ff2ee69sm26698531c88.4.2026.10.25.17.05.27
+        d=1e100.net; s=20260707; t=1792984181; x=1793588981;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=z+4adjsji42YunpnXzr153PsIW3465KG5I6YOnRXsyQ=;
+        b=k5hmgUN45rVNlIqm0hRQ357dKoOv+tZvsqNJOzE5AVCo++5rQUyaxrL4ubYAQu+sJ7
+         /eMco7rQd9tySsRJLoeD/TK5xkrt+rnD+sVbyuUjqNnYv4kSai0rOiON8lTFYn4BTeMA
+         FP9ZmKg3cApZdOG6bPNbiU4nm3lJOyZw0jKkudSXwcEzUA3L4WEEjBgOG9bF/yF9MVtW
+         nQCIQJwCc6UqtVnGhpUge3YJq5txA27S1a9QRayNqrh4VDqBX4zbsBki7BtqnUvcQU2w
+         wZgOTo4X0shGoS/sPZ4VriMbQkg8zCqKnkFRv/ccQo/MMis5BHeqZdSYq9/ZUbBikA0u
+         48Jg==
+X-Forwarded-Encrypted: i=1; AKwUvBzNDJwkZSTuijYmY5biBGrMCWqP5e88R4710z1TIQZA5jc69p7ebK0MtSAghekVn7oaLJ/Z+WTxaXBZMA==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIO3ril0SZ3Bkl49+Ur6rywprFEe2WCqFizvAN7jDxkxkVh/SR9
+	XUZVSU68cN8GeZs4P7nuE6z/dgWI479FsPefE0VzZd4E/u8143xwPhQnAoPx3NvLpQ==
+X-Gm-Gg: AYBFou3GhDg8DEvoSbX+zmxvZmiu3a6XdcitSYfn+cfZr0tfTbGBS+RoaEsEnvqJeco
+	aUn5wYzPeuvtL2stIDAcGxrYR16LVEgSYsQdM5NadfYPWdzM74O7inqbwyU7IQuhFu69Af7z30h
+	FgYvkTWcOwUjyUjQ1XrxLj6135l50BjpnzqudGBQpF2xnlJ1hQhzlT/0f3L78BbVHq/cysx7JFK
+	n3QZ61DPkLimnODJAUz6qMoc92RFI9sXd5MrC6OzemEVlgssucLeeB9UUJ7O6iv4ZAlYy4khNfl
+	7gWjhtnA4l/4avnxk0aQrx4OTrkNqwd2YyFXt6SisNzy9TLhNORaoOUHnYRRlvOZz2C4Ltm5brr
+	zQqaW9COIA0ss620gNMHqebMx2SBYzJMoMiINCklhDaHpJzlZptShMnAQGJe1vHRCVDZA00JXzf
+	JO3TXCLY+Vb+ETbf8+bv/0VX4Ud2xOJfJew1sbxtlGTaUKlrZfS4d68THIIcVMAvGUEfYQd1dVo
+	XorVyWILk6cPXyNUl+kjxubaqTBBAxF+BVEr+jbneYCSq27xa4kea56vW4szh8maNQWfBmw+Ush
+	tSv43uvgYwfCLhBpFw==
+X-Received: by 2002:a05:7300:3d13:b0:361:39c0:c393 with SMTP id 5a478bee46e88-369e848a6dcmr9746177eec.13.1792984181239;
+        Sun, 25 Oct 2026 20:09:41 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:4346:aa6:8d90:326])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-369f4164886sm13681062eec.7.2026.10.25.20.09.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Oct 2026 17:05:27 -0700 (PDT)
-From: Hungyu Lin <dennylin0707@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	mtsai@redhat.com,
-	colyli@suse.de,
-	stable@vger.kernel.org,
-	dennylin0707@gmail.com
-Subject: [PATCH] block: fix discard alignment for non-power-of-two granularities
-Date: Mon, 26 Oct 2026 00:05:11 +0000
-Message-ID: <20261026000511.73371-1-dennylin0707@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Sun, 25 Oct 2026 20:09:40 -0700 (PDT)
+Date: Mon, 26 Oct 2026 12:09:32 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Brian Geffon <bgeffon@google.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Barry Song <baohua@kernel.org>, Bo Zhang <zhangbo0325@gmail.com>, 
+	Minchan Kim <minchan@kernel.org>, Richard Chang <richardycc@google.com>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v6 09/13] zram: split zcomp into separate R/W streams
+Message-ID: <at7ECnijIur1XOAG@google.com>
+References: <20261021024236.1787884-1-senozhatsky@chromium.org>
+ <20261021024236.1787884-10-senozhatsky@chromium.org>
+ <CADyq12xeONu-+YRP79KaH4XCsSrNK5DdoKw6T5YSEyW7Acxh7w@mail.gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -97,66 +98,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADyq12xeONu-+YRP79KaH4XCsSrNK5DdoKw6T5YSEyW7Acxh7w@mail.gmail.com>
 
-bio_discard_limit() uses round_up() and round_down(), which require a
-power-of-two alignment. However, discard_granularity need not be a power
-of two. For example, dm-thin supports data block sizes that are arbitrary
-multiples of 64 KiB and advertises the block size as its granularity.
+On (26/10/23 13:05), Brian Geffon wrote:
+> On Tue, Oct 20, 2026 at 10:43 PM Sergey Senozhatsky
+> <senozhatsky@chromium.org> wrote:
+> >
+> > Split struct zcomp_strm into separate compression (Write zcomp_cstrm)
+> > and decompression (Read zcomp_dstrm) streams, and split zcomp_ops
+> > context creation/destruction into create_cctx/destroy_cctx and
+> > optional create_dctx/destroy_dctx callbacks.
+> >
+> > This decouples Read (decompression) and Write (compression) paths so
+> > they no longer contend on the same per-CPU stream mutex (Writer vs
+> > Reader priority inversion).  Currently, a (low priority) Writer that
+> > holds the stream mutex can be preempted by a (higher priority) Reader
+> > on the same CPU, which then blocks on that mutex until the Writer gets
+> > to run again and releases it, which can take a long time when there
+> > are other runnable tasks on that CPU.  The good news is that Read and
+> > Write contexts are completely independent - compression uses its own
+> > scratch buffer that decompression never touches, and decompression
+> > uses its own local buffer (for spanning zsmalloc objects) that
+> > compression never touches, so the Read/Write context split doesn't
+> > noticeably increase memory usage.  In addition many S/W backends have
+> > stateless decompression contexts.
+> >
+> > A quick synthetic fio test for Writer vs Reader inversion on 24 CPUs
+> > (preempt=full, zstd, 48 low priority (nice 19) writers, 24 normal
+> > priority (nice 0) CPU hogs and 24 high priority (nice -19) readers):
+> >
+> >   Metric           Base               Patched
+> >   ----------------------------------------------------------
+> >   Read IOPS        207k               1,150k        (+5.6x)
+> >   Read clat avg    101.50 us          7.76 us       (-13.1x)
+> >   Read clat stdev  5,615.90 us        30.78 us      (-182x)
+> >   Read clat p99.99 258,998 us         111.10 us     (-2331x)
+> >   Read clat max    1,342,600 us       11,217 us     (-120x)
+> 
+> These results are awesome and thanks for exploring other options. I
+> agree this sounds like a great path forward.
+> 
+> >
+> > Suggested-by: Barry Song <baohua@kernel.org>
+> > Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> 
+> Acked-by: Brian Geffon <bgeffon@google.com>
 
-With a 192 KiB granularity, discarding one complete block at offset
-384 KiB is split into 128 KiB and 64 KiB bios. Neither covers a complete
-thin block, so dm-thin ignores both and the mapping remains allocated.
-
-Use sector_div() to find the distance to the next granularity boundary,
-and rounddown() to align the maximum bio size. This handles non-power-of-
-two granularities while preserving the alignment for power-of-two ones.
-
-Fixes: 9b15d109a6b2 ("block: improve discard bio alignment in __blkdev_issue_discard()")
-Reported-by: Ming-Hung Tsai <mtsai@redhat.com>
-Link: https://lore.kernel.org/r/CALjSBEvjbiGDVewuapWKhGDtaxZwcn4=22raUiBEOyj22rY7-g@mail.gmail.com
-Cc: stable@vger.kernel.org
-Signed-off-by: Hungyu Lin <dennylin0707@gmail.com>
----
- block/blk-lib.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 688bc67cbf73..e0de5bb4d969 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -13,26 +13,25 @@
- static sector_t bio_discard_limit(struct block_device *bdev, sector_t sector)
- {
- 	unsigned int discard_granularity = bdev_discard_granularity(bdev);
--	sector_t granularity_aligned_sector;
-+	unsigned int remainder;
- 
- 	if (bdev_is_partition(bdev))
- 		sector += bdev->bd_start_sect;
- 
--	granularity_aligned_sector =
--		round_up(sector, discard_granularity >> SECTOR_SHIFT);
-+	remainder = sector_div(sector, discard_granularity >> SECTOR_SHIFT);
- 
- 	/*
- 	 * Make sure subsequent bios start aligned to the discard granularity if
- 	 * it needs to be split.
- 	 */
--	if (granularity_aligned_sector != sector)
--		return granularity_aligned_sector - sector;
-+	if (remainder)
-+		return (discard_granularity >> SECTOR_SHIFT) - remainder;
- 
- 	/*
- 	 * Align the bio size to the discard granularity to make splitting the bio
- 	 * at discard granularity boundaries easier in the driver if needed.
- 	 */
--	return round_down(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT;
-+	return rounddown(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT;
- }
- 
- struct bio *blk_alloc_discard_bio(struct block_device *bdev,
--- 
-2.43.0
-
+Thank you, sir!
