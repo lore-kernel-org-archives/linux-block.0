@@ -1,61 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.139
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793009635;
-	b=ibvyjFAWWsBOCf9fXi4o700qZIRsUlHnqjdsu8Z6HLULQRYVjnUH+jp0xM+5paltC9+E
-	 qp1hPxkCEiOmR8Qgd+4EmV6Ffs67wOg78mT230726K+mFHZdKiicff0NaM9B9e90uuMKY
-	 vFPkJPe+2x2jpzdEKpVtxosPfWQNWxA4MVvTpLx32vnA36E/DuTm2/wqj+kXZB/6hNekk
-	 aSMFFk9EhcgI8poYl6LGbuas1uqLcLe43MVHsvw87y3ls5Ag5C4VMdYhb5e+CL2qLORAE
-	 I+qzBz+GKsNeOw9k289JwihulZDf3FVp/o8C1P8Dy5+HSVkA+XLEim4N/ftw7L1ryLQ==
+	t=1793015728;
+	b=ME6Rk/Aekw97j7LM4gpOLNTftMgH9Z40nQ7BVKTTNkHspqWes9BJtJgOBkqYv9KoP0ww
+	 1xm2vESecoAko8VGf5rOgjRdtuFZEguSMDIhjm0z2C7tcDVAWqkuKrX/vQrF7BQR1fCVz
+	 rh3oMoDgDWPj7RWWZOzyH0fBvhdARTNFyFKybvRws6bjE95KtPJQYm8AS4gVo88+evysL
+	 5bGv9N7pfZeMUo2v8NlxO3syqRGtmtjY+/PTP+1mhFENJEea1Xjssa65NRKxwBcwmUWuK
+	 vs+Ws+y9a9jjS2Fzw5Qy29fcB+iJTPclVKP7QxIeiLN5/F5LHdgzNdy4rM9LjjZSjKA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793009635;
-	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
-	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
-	 To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=gUvhPvbaKNcm4IjsCyO+EpYXhBhQnGVfangkZ0Iy/gk=;
-	b=H8JEWLx3UM1VVWsA3z+XhFDp/5x2ClwkToRPa1PZHWxgOaFA3pUzCQCvPPHOWJZy2TMf
-	 AZ0E6FBAZiVPsC0MVHc9ChigXmoPpyFlOZTbX3XLgYpuv0bkc46cvfPURD/IjS9oE3YlW
-	 E17jI4k7fEL+gKuL8GZ6G72XrruMBnzZKFIot1m2gSCx7joqlX/3vLzd5//f1qDRac8/R
-	 fpptC3JcG2eQF85t1NQZQmvkhUmw8MUj3MaETf8rp1quOLlQPd0S1GsqnecLXCabMocmq
-	 L5M8Es33gW4pz87ho2h3ChtQjPi+e3zr8a0oiGwsNu03aST6j0gfDvCiPPDWm0/5wnQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793015728;
+	h=DMARC-Filter:Received:Received:Received:X-Zmail-TransId:X-Mailer:
+	 Message-ID:Date:Mime-Version:From:To:Cc:Subject:Content-Type:X-MAIL:
+	 X-TLS:X-ENVELOPE-SENDER:X-SOURCE-IP:X-CLEAN:
+	 X-Fangmail-Anti-Spam-Filtered:X-Fangmail-MID-QID;
+	bh=znfRRGXnuU67jSNnNEjHXyFS0kfdf0VT6Pe2OYJ+5HE=;
+	b=XiRKG7XtpLazEiSiliSujbULNRAmp71D0YSwkzy/hAVff56t22r0uEQ7dYst6NE7nKQK
+	 7YjjD374is3EgoA8BItpRWefidSftTLWt+xUpk6gvqGqcp7A1XV4vt60mhybrT00n7v5w
+	 6BoXwu7U+3NjCPk+LeU+SyPjl7fL53lZI6djxCL++bGQSd4gZZtNe0ZMzKlJvhzLMIeJr
+	 KlMLyx6RfoJylsh6SencJvDQF0hI/OyOozxui8k4vwOKt/oI26HVnL4CJiXEoBbuduwv6
+	 nrdojZv2j9lAI391qvEfGViy2Z98rT9ktW6xv9A14U62P7HDddZyUb6hE+02LxEFIEw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cmss.chinamobile.com;
-	spf=pass smtp.mailfrom=cmss.chinamobile.com;
-	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=YhVjGRx2;
-	arc=none smtp.remote-ip=111.22.67.139
-Received: from cmccmta6.chinamobile.com (cmccmta6.chinamobile.com [111.22.67.139])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B28D606A31E;
-	Mon, 26 Oct 2026 10:13:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6B28D606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=YhVjGRx2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=cmss.chinamobile.com; s=default; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=YhVjGRx2bPgQrg+vpxNIR+1EqorTf6K1/A2R2m8iS9gExFmzk7sD8tInPeHph+gv079Nqr6ZEYrST
-	 H6JXGwq58XyeLQNKvOulXiTkKopP9q4uBzbG3EWB2ZI/w9a2aiRzAbeMt+k/pNbOYtaGdCsH6vIklU
-	 tZbt26dxOLWqNqas=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
-	by rmmx-syy-dmz-app01-12001 (RichMail) with SMTP id 2ee16adf27d9234-29bf5;
-	Mon, 26 Oct 2026 18:13:45 +0800 (CST)
-X-RM-TRANSID:2ee16adf27d9234-29bf5
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from localhost.localdomain (unknown[124.156.110.139])
-	by rmsmtp-syy-appsvr05-12005 (RichMail) with SMTP id 2ee56adf27d8ade-aec31;
-	Mon, 26 Oct 2026 18:13:45 +0800 (CST)
-X-RM-TRANSID:2ee56adf27d8ade-aec31
-From: wuyuehong <wuyuehong@cmss.chinamobile.com>
-To: dm-devel@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatoka@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, Jens Axboe <axboe@kernel.dk>, stable@vger.kernel.org, syzbot+1288484b13bf6af3620d@syzkaller.appspotmail.com
-Subject: [PATCH] dm snapshot: fix discard_granularity unit in snapshot_io_hints
-Date: Mon, 26 Oct 2026 17:35:00 +0800
-Message-ID: <20261026-dm-snap-discard-granularity@cmss.chinamobile.com>
+	dmarc=pass header.from=zte.com.cn;
+	spf=pass smtp.mailfrom=zte.com.cn;
+	arc=none smtp.remote-ip=160.30.148.34
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBD2606A31D;
+	Mon, 26 Oct 2026 11:55:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3BBD2606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jCsWc6fTwz5BNRf;
+	Mon, 26 Oct 2026 19:55:24 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.99.176])
+	by mse-fl1.zte.com.cn with SMTP id 69QBtGls092273;
+	Mon, 26 Oct 2026 19:55:16 +0800 (+08)
+	(envelope-from shao.mingyin@zte.com.cn)
+Received: from mapi (xaxapp04[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Mon, 26 Oct 2026 19:55:19 +0800 (CST)
+X-Zmail-TransId: 2afb6adf3fa72e5-beab5
+X-Mailer: Zmail v1.0
+Message-ID: <202610261955196384aSLGuy3_0MiTvlYXVdiC@zte.com.cn>
+Date: Mon, 26 Oct 2026 19:55:19 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -64,66 +56,86 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+From: <shao.mingyin@zte.com.cn>
+To: <mst@redhat.com>, <jasowangio@gmail.com>, <virtualization@lists.linux.dev>
+Cc: <pbonzini@redhat.com>, <stefanha@redhat.com>, <eperezma@redhat.com>,
+        <hch@lst.de>, <dlemoal@kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIXSB2aXJ0aW8tYmxrOiBGaXggem9uZSBhcHBlbmQgc2VjdG9yIHJlcG9ydGluZyBpbiBiYXRjaGVkIGNvbXBsZXRpb24=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 69QBtGls092273
+X-TLS: YES
+X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
+X-SOURCE-IP: 10.5.228.132 unknown Mon, 26 Oct 2026 19:55:24 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6ADF3FAC.000/4jCsWc6fTwz5BNRf
 
-snapshot_io_hints() copies the snapshot store's chunk_size, which is
-in 512-byte sectors, into queue_limits.discard_granularity, which, like
-all other members of struct queue_limits, is in bytes.
+From: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-For snapshots with a chunk size smaller than 512 sectors, e.g. the
-16 KiB (32-sector) chunks created by the syzkaller reproducer, the
-resulting granularity is smaller than a single sector.  When
-dm_calculate_queue_limits() then stacks the target limits into the
-table limits:
+For zone append, the block layer copies req->__sector back into the
+bio in blk_zone_append_update_request_bio(), so the driver must update
+req->__sector with the sector reported by the device.
+virtblk_request_done() does that, but the batched completion path used
+by virtblk_poll() only unmaps and cleans up the requests before calling
+blk_mq_end_request_batch().
 
-	blk_stack_limits(limits, &ti_limits, 0)
+A zone append completed through polling therefore keeps the sector that
+was assigned at submission time, and the file system or application sees
+the wrong LBA for the written data.
 
-queue_limit_discard_alignment() truncates that granularity to zero
-sectors and sector_div() divides by zero:
+Move the sector update into a helper and call it from both completion
+paths.
 
-  Oops: divide error: 0000 [#1] SMP KASAN NOPTI
-  RIP: 0010:queue_limit_discard_alignment block/blk-settings.c:645 [inline]
-  RIP: 0010:blk_stack_limits+0x1105/0x2d00 block/blk-settings.c:916
-  Call Trace:
-   dm_calculate_queue_limits+0x70c/0x1510 drivers/md/dm-table.c:1823
-   dm_setup_md_queue+0x199/0x4f0 drivers/md/dm.c:2618
-   table_load+0x4fd/0x8a0 drivers/md/dm-ioctl.c:1661
-
-The divide fault itself only became reachable when commit e924da7d6622
-("block: Drop granularity check in queue_limit_discard_alignment()")
-removed the check for a sub-sector granularity in v6.13.  Kernels
-before that returned a zero discard alignment instead of faulting, but
-they still advertised a granularity 512 times too small.
-
-Use the same chunk_size << SECTOR_SHIFT conversion that
-io_overlaps_chunk() already applies to turn chunk_size into bytes.
-
-Fixes: 2e6023850e17 ("dm snapshot: add optional discard support features")
-Reported-by: syzbot+1288484b13bf6af3620d@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1288484b13bf6af3620d
-Cc: stable@vger.kernel.org
-Signed-off-by: wuyuehong <wuyuehong@cmss.chinamobile.com>
+Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
+Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
 ---
- drivers/md/dm-snap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index c8bfbf8435ac..cc29b8238a4d 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -331,18 +331,25 @@ static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
+ 	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
+ }
 
-diff --git a/drivers/md/dm-snap.c b/drivers/md/dm-snap.c
-index 797c432594d8..31676ee05514 100644
---- a/drivers/md/dm-snap.c
-+++ b/drivers/md/dm-snap.c
-@@ -2414,7 +2414,7 @@ static void snapshot_io_hints(struct dm_target *ti, struct queue_limits *limits)
- 			snap = snap_src;
- 
- 		/* All discards are split on chunk_size boundary */
--		limits->discard_granularity = snap->store->chunk_size;
-+		limits->discard_granularity = snap->store->chunk_size << SECTOR_SHIFT;
- 		limits->max_hw_discard_sectors = snap->store->chunk_size;
- 
- 		up_read(&_origins_lock);
--- 
-2.43.0
++static inline void virtblk_update_zone_append_sector(struct request *req,
++						     struct virtblk_req *vbr)
++{
++	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
++
++	if (req_op(req) == REQ_OP_ZONE_APPEND)
++		req->__sector = virtio64_to_cpu(vblk->vdev,
++						vbr->in_hdr.zone_append.sector);
++}
++
+ static inline void virtblk_request_done(struct request *req)
+ {
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+ 	blk_status_t status = virtblk_result(virtblk_vbr_status(vbr));
+-	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
 
+ 	virtblk_unmap_data(req, vbr);
+ 	virtblk_cleanup_cmd(req);
 
+-	if (req_op(req) == REQ_OP_ZONE_APPEND)
+-		req->__sector = virtio64_to_cpu(vblk->vdev,
+-						vbr->in_hdr.zone_append.sector);
++	virtblk_update_zone_append_sector(req, vbr);
 
+ 	blk_mq_end_request(req, status);
+ }
+@@ -1196,8 +1203,11 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
+ 	struct request *req;
+
+ 	rq_list_for_each(&iob->req_list, req) {
+-		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
++		struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
++
++		virtblk_unmap_data(req, vbr);
+ 		virtblk_cleanup_cmd(req);
++		virtblk_update_zone_append_sector(req, vbr);
+ 	}
+ 	blk_mq_end_request_batch(iob);
+ }
