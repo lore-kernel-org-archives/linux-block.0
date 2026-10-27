@@ -1,89 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793123121;
-	b=2D9xgwb0QeN2QJfLC2gSdLnP2DsfSUZfbVzkTq0E1Cmnp2+LfB2agihQqt86GKcDQJ4H
-	 0BQLaYqvtohus3n/fg096MlDT0sjXo6PKDVnp9hHl4xWwxh21Zf0ZAzwjLtp6HTFJzLkw
-	 NuW6VFlamc0e0hYUmNGwzXyBZXtzjH4RMxQsetaS+RgGOfNFLukUjTRAzoLt/rAIvfNUq
-	 5pAQwBE2AOWYL276zhuoPH0XnmD3R5UqBa1iQ1edv0KXZtd+GVbXV/JghcA4luoJHh5r/
-	 cEWXc92z7f0zQ7nwmEmM6LUCC5XV8gOhCOQaa1Cy/aX6LFCGDsj5N0TkI1ET9t5eWFw==
+	t=1793123394;
+	b=rQ8C/eAb+T2od3uLkw66xwKcLgg3UrL8t2rzjq79OnR5k0zZPJ8p7kU2AWMmrzLqiRfJ
+	 OtVEKvezDxy37Wk0jdOhqpjF3B8BFfVBBiXe+lO9ofa6+3NBJi/anuxXkJYeJExGc5G0M
+	 +dYb9NrWUHY+oHERR+Yp55U1X6rS5bTRExtzW9S/9WceGasTpdp0A3xtJrwuZ70rRVOHO
+	 EGALGCH9rgt0e+meOJO9Bk7lYRj0XT/8R4llh4S0vZBKoou6S7ocYbgb6+F/F4KKyvsjg
+	 fvbyvqNlrFixoEUzkp+WdG7RzX1cdyjTr7kCc1P3kmJ1MLFNdC4H23VDsGwKXf4B9ig==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793123121;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793123394;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:X-Forwarded-Encrypted:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=IX+G9SOnBii3qZVcpbPFnOSsikTG2tcrehuOi4LapMY=;
-	b=GFPObvOPWenTSdUdyYiXHcYY8qnfBHrB3zVxrJhLroV3Sn7y8wPoXNvLWP5J5qLFvaTG
-	 t012W/Jo8509deSFHjLxeRQ7dwt348+eCHsRCr19NSmCu5iDCQNiNrEz0s24Q+h6MRjet
-	 Xatx18FErger8UqTdlR2ZmJEAs6PEkfuVByU3Cva5LhV9DqJNEqfb8KdzlTP83UsUn6UT
-	 UOc2zVs2fDOanlC60pK69uJJMzjxsl6izTrXjTMFK48Nl3EeP0gLeg053Xm8f42d1Z9Qe
-	 DWBdXkTQIZBjg16czMB2D/zLG8qXfoHhWJzaBORu+Xp7CJMxVRuFz7OdM1RcJBHw5ZQ==
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=pmxuATz6Q0v8YZq9eZB17JiD7ofsK6hYGMgJE7NMLyA=;
+	b=vQbe+Ei7Zr4ChmFEr6kR9zG9/96izaXRfwZyOL7cIsc9aHnpj+tUQ3lV3GvRXvYzM1US
+	 vW3ZQAJhlBLuWA0Llw4YS/3SzU/rxn2dKDa74w3PBUSs7qX6KNp7JcKXrWc7kjgKe1j9v
+	 ysRtETlVctO2q3y2KWD3MSeJbzKiDTMIyjoXlW5iWijfxL2ZIxY7IlEsYpyP0WMkUayBH
+	 z+ZoO22vSH8+k1zjiomZpokLm0MdScfzc9LOkk8FQF6qotDpB6+8DZL22f/yakEQuGk2N
+	 AOVxb7YYlP1T+r0rk+xGdDEKnpuKUps27dgvvrXzz0kBAoQ+5aTHJ5arwIlfUD/EhYw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=linux-foundation.org;
-	spf=pass smtp.mailfrom=linuxfoundation.org;
-	dkim=pass header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=google header.b=WphOdIGY;
-	arc=none smtp.remote-ip=209.85.214.170
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=lJFDpZaU;
+	arc=none smtp.remote-ip=209.85.210.50
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D67606A31A
-	for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 17:45:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71D67606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54D8606A31E
+	for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 17:49:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D54D8606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=google header.b=WphOdIGY
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2e9995ce866so603725ad.0
-        for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 10:45:20 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=lJFDpZaU
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-8253bc5a613so86749a34.0
+        for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 10:49:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1793123120; x=1793727920; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793123392; x=1793728192; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=IX+G9SOnBii3qZVcpbPFnOSsikTG2tcrehuOi4LapMY=;
-        b=WphOdIGYX/UvFVCsOGsOEjKfuXa3eOMnjlE/oH98dDJE5AQjaP4vNkgndW6hGi8Qni
-         QZdRvdRUJLLZxdWp+Zl5qKI6/61I00l5XO0r5L6IQHA+KIM/sH0yAGXaGnzJZWkBHyDV
-         Ex06G3DXIJK4/zKiaDdSjjPRmN2knZrMQtV28=
+        bh=pmxuATz6Q0v8YZq9eZB17JiD7ofsK6hYGMgJE7NMLyA=;
+        b=lJFDpZaUNnVFoxOeOhYAlbKxKkRmNwhX+/qrpc3NMkWeVGlys9iyAqdiaYS3VIroyz
+         zrpV1Mb+cHjD8GY2AA7gOAcrckqldtzEMppf+0/BjEvBMHYfAv7RYEj516GWVuelkydN
+         D4Y4RH0K325tgAL8opvxSn7ACfdSAyYsHInbzzm0f3skwOecG1YdmUrTRNSpFk+ZNCtF
+         KxAyTNMaqLlyZe3QtMXli18t7lh0iOAzTLvhB+g/38vry3XWlZOsZ9jcHZ+UtqKAgXmI
+         aZwcHwEJepNxxTa+i8VqO/+UVIHDlqDTRrihoCZaU6dlq0GVIeCM3JepforsoHe+cT0f
+         SDKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793123120; x=1793727920;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=IX+G9SOnBii3qZVcpbPFnOSsikTG2tcrehuOi4LapMY=;
-        b=B7yQbJhaLJVv6/0YP39Mwz/jPj6FYjf9Di90S6zTtnBpdaCxzMs54YrO71jOnMpSa0
-         GIFhy0vJLkbYU5pj8/YYE9RX7idnn6ymwTHUH4O2LKiS3tq8vRF/wI9aWyORFuWKYZUf
-         /yf/iMj3DLatKxIZ/SsDKqWHCgMRmbNj6faa+s5v1pNpOsAfXDdgyt1tHzvVvp46+k7J
-         83dnqnhxS9LJK1Aellr1CbhFOAsLWxP3cHzFhKj/aaXzu4lj1DIItRapGik07KiyHCRW
-         rKrR0GeOryoiZD7VxCHCvBFrmatWtGLNlJRkwVDLmuyzA8irTmF57qgVEMBVDqtS5udf
-         OtBQ==
-X-Forwarded-Encrypted: i=1; AKwUvBz2mfz5TGOBJYuPFDQYQo0Q5cjl9un6JVxsU5RR1yTFWsi4RMNrzW+l7AUnrtcXnVNnDdPjTH5+g/TPoQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJOFl9fPfdNhhxoApsVju2WtKxu1XgBeXwFAww6QBmRakLedNBH
-	K/iujjXvDEvTVMtfx+KuxlWdCExQFofXcwBAM64BtQ0S6mmEu2iywe25BRocOQ8p4R24BKJk6RV
-	IDr5dNNqmmQ==
-X-Gm-Gg: AYBFou2e3LIPymmuKNgH1u5eH+XviZFW3OJ9460jCQanakBF8uxwYqjG91yg9pFzHsa
-	tHV/7IFicg2+NmpvyoINyFCFDsE3m0avtFSybGcpi3R7JMom245sB9Y+3ID46aYJm0rkBeJZzg4
-	bhQloSiOXcoPeF+kS2oyjYUQbWGajCZ3a6QxvomQc3731Hua1++lkp8NIYKZqHVxjevpeApUbRL
-	qU+A12uggMBc7ZaAyizeBRxBEqOXln+fxLjCsrJk/3wzyd3PF/y+rKRY4mMHDm0WEXWL7/+pDhe
-	REWsmndOvDf2JS4k3mS11NJkBZlKMn849KicYKwW0rKu8RV8PoOO/KRTYKHCf+mW8H2E/Pmnpeu
-	B6jv9at2+i0fLQVN2mAU5lCcrmdqDdS4RKrhSB+qR3YCkMD+nc44lVagXx0NkgFC+loQPjGa530
-	TJ5EXBNh5QMvZtEwTtTShiuScz3YA7gkjt/r7h6MzIjvJQ155EcX8/xhRBPSEO0D07/3ZAbhpNe
-	txrtLn1DClsi8q5fM88icRf9O3jKsa95xoFudxTu5lMUoL9+IHNKawlkU07q2psJ2LyGkH9Sp1c
-	umknRoC/M8OK9zdsmnioEOgEkGioQlesaQ==
-X-Received: by 2002:a17:90b:5644:b0:3ab:d45c:59da with SMTP id 98e67ed59e1d1-3adeafd21a8mr8806615a91.40.1793123119759;
-        Tue, 27 Oct 2026 10:45:19 -0700 (PDT)
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com. [209.85.214.178])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ae40456f65sm4803759a91.13.2026.10.27.10.45.18
-        for <linux-block@vger.kernel.org>
+        d=1e100.net; s=20260707; t=1793123392; x=1793728192;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=pmxuATz6Q0v8YZq9eZB17JiD7ofsK6hYGMgJE7NMLyA=;
+        b=QXs9uhOlNqm8aNLkf8S6Eq+j5fwa/gkJbZ/Syu8A6l4Zwp36/55MuUDnr8ahjwhloX
+         iVg/lGhHNeHhfVHy+MOmJr1l59PI6VPjovUBk7zRgXZ3wOxVpm4U7H8OHkMrVPso2w7t
+         ZDKDjUKPywbedLyXDftdz58TguFV8/dja4NgAXdEb3tVai3OMOcKuDhXggCBaFz1Swmz
+         6Aj0/IJbTC9BjUzPYRy44/iwf2XzGRsPibvNss8K+qzLHU8mWBTUD0z8J5jmxp8n7SDr
+         LiJt3C4PuLLj0s1xktzLTkY1hsbYnnOKm1tQh1ashHS56C77tKIAwmzoWsMGmLDIkQAl
+         zjWA==
+X-Forwarded-Encrypted: i=1; AKwUvBzSCz8WWedCceMp7Sd+s0Hl3wBp6y9dpIc+0hq++3ZYNMHfUJZTV2/1QlIGFfN3n2MaMa2ogDavEylMog==@vger.kernel.org
+X-Gm-Message-State: AFq9FYK4wCYPH8EYnVpOhqYWagRkLGii+nngo/HmPaVcPqGWpX4fZyB/
+	bdjwBRWu4MuFuZCLU5dVNk6xYxffypvcQ9rlG1Y8zOPsUihenqZRC3N34PbcQZWcgP0=
+X-Gm-Gg: AYBFou0oNWYLOnEQBHpEifCLlxBHGQgH/esRSeQuLPCpIRXdX7tqLeQ2pRL8aDwxfYT
+	ChFk6VQoz++MWmhRk01ImF2LEl9x5Vl+kKp12chquf9FwRFJQq5eqQrFOBT7Io9EtoKxD1P/I62
+	ssg+HIvQpIJOJ1YGPflShUwKcx7glo61MGQTZ87z0tGxsq6/B4RKaL8NEKbUYszLmJWX/Z6svqK
+	qbMNBhSSY9XGjGmtPey3T/miWmT/kWntwrEcsUb90txVV3Qm7yqbqBqWggKY5gGZwAcSSKQtxef
+	Tasdt3Ee+oNFJu6EzK4gbBBxP95N4UE6qs6zPj3GX6Oct7afbQeyFEpX+dI5aPIjNCl3hGXwjSk
+	f5+25OIoDYoH7zcj2wc6kMmLcBSO50JPBbI57uTrTnReVdElJkaftZy3N29Z7N81kg0CyYBLtqt
+	6oCm6w8BWjdQIf4/5OHmicxcL3b/L3PDG6aNCS+C9dFn3ZteKS5MRNdMJjwSNTvQyuJTo9R68ez
+	bS4f4c7vJAUEQmHvaniJocosWzXpw7Vnr6Vp25CKgQ7/xqLnvq+TUHZjgsmhtB14zF+225eVNzs
+	O62gRPKwuFGP8sF5Xoxy/Oo3WjLtfK0rSMFYjWM23IYd7+gsE5X5zYdqHg==
+X-Received: by 2002:a05:6830:4110:b0:843:98dd:84e4 with SMTP id 46e09a7af769-85ab4e21711mr351411a34.3.1793123391741;
+        Tue, 27 Oct 2026 10:49:51 -0700 (PDT)
+Received: from [192.168.2.38] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-850f8458a4asm11484186a34.3.2026.10.27.10.49.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Oct 2026 10:45:19 -0700 (PDT)
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2e9995ce866so603355ad.0
-        for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 10:45:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzj701Cmp5ZrHUWIyLZmHYOvR++Lh8NQLtNEdyc3J3t+MEwnsYLA2sltzy1/5LcfdOdIcK0GVWKxzcbFQ==@vger.kernel.org
-X-Received: by 2002:a17:90b:58e8:b0:3ac:9706:7739 with SMTP id
- 98e67ed59e1d1-3adead57cf0mr9005664a91.17.1793123118449; Tue, 27 Oct 2026
- 10:45:18 -0700 (PDT)
+        Tue, 27 Oct 2026 10:49:50 -0700 (PDT)
+Message-ID: <fceefe1d-c513-4cc2-97be-ee2919601f88@kernel.dk>
+Date: Tue, 27 Oct 2026 11:49:49 -0600
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -93,41 +92,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <b97140d2-df87-4cdf-9f0b-d5ca404d50da@kernel.dk>
-In-Reply-To: <b97140d2-df87-4cdf-9f0b-d5ca404d50da@kernel.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 27 Oct 2026 07:45:00 -1000
-X-Gmail-Original-Message-ID: <CAHk-=whLg-od86aV4HU6yC8EKh6zsVWyyvWVOcrVshvxoQ9dAw@mail.gmail.com>
-X-Gm-Features: AclHuK8pwUjVyitH5NtHnOssDqiuKTG-rCghbVipSDMu8Vd4XNbNK-Rtknr7Zew
-Message-ID: <CAHk-=whLg-od86aV4HU6yC8EKh6zsVWyyvWVOcrVshvxoQ9dAw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [GIT PULL] io_uring dma-buf support for 7.4
-To: Jens Axboe <axboe@kernel.dk>
-Cc: io-uring <io-uring@vger.kernel.org>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: io-uring <io-uring@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <b97140d2-df87-4cdf-9f0b-d5ca404d50da@kernel.dk>
+ <CAHk-=whLg-od86aV4HU6yC8EKh6zsVWyyvWVOcrVshvxoQ9dAw@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHk-=whLg-od86aV4HU6yC8EKh6zsVWyyvWVOcrVshvxoQ9dAw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, 25 Oct 2026 at 03:30, Jens Axboe <axboe@kernel.dk> wrote:
->
-> This adds native dma-buf support to the I/O path
+On 10/27/26 11:45 AM, Linus Torvalds wrote:
+> On Sun, 25 Oct 2026 at 03:30, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> This adds native dma-buf support to the I/O path
+> 
+> So while doing the trivial resolution, and looking at the code, I note
+> that blkdev_buffered_write() grew a
+> 
+>     inode_lock_shared
+>     ..
+>     inode_unlock_shared
+> 
+> in it. But looking at the two call sites (in blkdev_write_iter()),
+> _one_ of them already has that inode_lock_shared() on what seems to be
+> the exact same inode (bdev_file_inode(iocb->ki_filp))
+> 
+> These all went through you in the original block pull:
+> 
+>   1b1be9ea4e34 block: take the inode lock for buffered write fallback
+>   2fec4fd97cc3 block: take i_rwsem for the direct I/O write fallback
+> 
+> am I missing something? That nested locking looks not just
+> unnecessary, it looks like deadlock city. I'm surprised lockdep hasn't
+> complained, but I'm assuming hardly anybody actually uses this path.
 
-So while doing the trivial resolution, and looking at the code, I note
-that blkdev_buffered_write() grew a
+Someone did actually report it recently, after it had been in
+for-next for a long time. There is a fix queued up for it:
 
-    inode_lock_shared
-    ..
-    inode_unlock_shared
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/commit/?h=block-7.4&id=21b88cc8bafceee6c6c82503e3b2cc6f1d0c78bf
 
-in it. But looking at the two call sites (in blkdev_write_iter()),
-_one_ of them already has that inode_lock_shared() on what seems to be
-the exact same inode (bdev_file_inode(iocb->ki_filp))
+since this morning! It'll go out later this week, pre -rc1.
 
-These all went through you in the original block pull:
+-- 
+Jens Axboe
 
-  1b1be9ea4e34 block: take the inode lock for buffered write fallback
-  2fec4fd97cc3 block: take i_rwsem for the direct I/O write fallback
-
-am I missing something? That nested locking looks not just
-unnecessary, it looks like deadlock city. I'm surprised lockdep hasn't
-complained, but I'm assuming hardly anybody actually uses this path.
-
-                 Linus
