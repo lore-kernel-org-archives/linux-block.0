@@ -1,85 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.44
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793081604;
-	b=gUgdFS0RXZZb9v4/gc4zYiw1P8V1BO4dZ6w+EXs0zI+vokdiuZLNzijqWjRQbAivRD4X
-	 qAm0W7GbeFV3QQG56/O5aQgkLO4XKIOZrzEDJxYcFtHFo2tpjShn1Rhan2P7Etql5fRBv
-	 W3Ui61Yrab2lzUNCsqG3MB6xIB8P+X1j1n91xBlvWD5o0aZfdkKpAc6AgB2b29eKCNUte
-	 z/EKYiiQFmjWBC+E+KyHbt74Otnjn7M0zwHZdOveK2oCs2zrrRACKe21y+v/u0JupqrSR
-	 xkkQpwMrakgJJ/H+Z0kmzycjRihsIAg8Yc5NMvXoVpMn8aX5BXHbebCvR8tKYxSbhlA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793081604;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.229.9
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793081698;
+	b=ZdPrZT2jL7KrKPtIvVMg944wUQqt16kQOeuxZZe6byi01Ah0M3b+5hddj14nwGA82j61
+	 OOM6m09FQv4AtVPADDpxjBW2RBUrfoztxR5gOyku2pWU5PI8kIVJmYpmlyb2OW1T+zVi0
+	 Trl+FRCtBE+QS/ERZ0DsKul0nSXJsNtgJhuKa5QYu4wwNP3fl99GEFkzBLF2m26plnbRn
+	 +mML93Q3ZhRpykcGciLiwEjzWiiWCrnXCPDv4cI3D7HqUxt5BcQNnYBc0VE9aqPT0QvO1
+	 DesbVHxjrQMzO9JkdrnstHa3E2qnBp6t2/QwzXBexssSBTa33CyfQ5v/7zLkQR979xw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793081698;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=mffSw+MxdEAje0XtGPg2+DovEJNnFqJUem/6VRtADtE=;
-	b=ZpHK2N1HwPiWhm3fLPNwOq1A/yuZt3Iam4GOQ4bE9Wr9CAInYBu4AnxlsPQGtnsM20hP
-	 YgjFwE+gk5vMJh+PRUHdjUKHCwoKTdkQozasnX1C6FbtGNtsNd8Msz6ooMnB1Nqfh3UKa
-	 QzYmqc0atEClND8u2+hY0ALFx72jIwhspGcyXdp/XzJpHRffUiDbPQPcoYkW8eGNe2c2a
-	 Nru6RJcxTFl1hHPb8mZWV4+I9p14N2tNFX0MKQmtRKXTs7VJSKx1Egsb1xXHD9C73BtHI
-	 uHaS47Iudp8cdDBqEyIo+jWFpNhn226dYwdfAFCcoc+Lam+s1xdOVjpQvMujbpX2/SA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=bytedance.com;
-	spf=pass smtp.mailfrom=bytedance.com;
-	dkim=pass header.d=bytedance.com header.i=@bytedance.com header.a=rsa-sha256 header.s=google header.b=fWlOahps;
-	arc=none smtp.remote-ip=209.85.216.44
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=rvHLijNBU08aEIcYebs583tqrtn0BZ2i7XUXNkAlzGI=;
+	b=NJCLlYE1/hlYoaZ59r3ZlCXo8W3GYzwXfVrBjzRKAGEg0nS3O5WRH3P5LPSJDOLAy79n
+	 1W9VY0H/Mwhqc7ajX6eE/+5Ifcl3I9mr5E5OXOTFqOgdCctCo9AYuzfNeYiTB9Edhl1t/
+	 kXcLYMco3gdFUt8v+LsP2/NMSUZes1TVrSw+6g/uyKrI+q8cW1hCJYwa4flIckzwCEPiJ
+	 C8ROC1chs4M0vd0RCfmlPlYp48LtPbFgClPZMS3s+rHbYY50Yg38vnWXfnc9o0WqKrAVs
+	 p2QsDmRcjHrAFMrWIDqP1hscgii2tITzgYS5NhYFyt6d+JhC4fyYb5OhbjMf3hRVfog==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=jItwf6wq;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.229.9
+Received: from mail-dy2-f9.google.com (mail-dy2-f9.google.com [74.125.229.9])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F202606A31E
-	for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 06:13:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F202606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1095D606A31D
+	for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 06:14:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1095D606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=bytedance.com header.i=@bytedance.com header.a=rsa-sha256 header.s=google header.b=fWlOahps
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3acd21ba21aso2933942a91.1
-        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 23:13:23 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=jItwf6wq
+Received: by mail-dy2-f9.google.com with SMTP id 5a478bee46e88-35fad13ca97so432386eec.1
+        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 23:14:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1793081697; cv=none;
+        d=google.com; s=arc-20260327;
+        b=kLFiiQZYKxb6HKxoCd5tjsiW6s8d5Uoo3LtCUoH7fsgLehQmNE10HxnoRBGlSWLDJ4
+         cAxVFIRGysD3Q/FFLeQ04/xkjjyCkg1W0JzzIjkKyZViXYqM0WEI+ai08+iqmMcUyDvs
+         hz8kAR5dJKq2S8FRu4p3AJ2IFIaWeO3Mp0MkGj4hRXvsRkFfX55EkYZW4A2UzbZPzpOK
+         R4FGhWqEldWqGL5hFJaXCjX8UTaWnJWxSJpyOMRoIsZQKTXr6IMd0tfpQZB3sroGaTgt
+         DF03hwc7cL9r7dDdiqAUNgr77lKYigKoEOE7nZshZb1F5+XYse4R2NcZR8n35Sn0svme
+         GJoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rvHLijNBU08aEIcYebs583tqrtn0BZ2i7XUXNkAlzGI=;
+        fh=rwx0oKtqmXNZmf40GpIcXBk3EWE6GVhJHiPkGf/jzBE=;
+        b=B1SKZJm5KQFqYCPK14TKfstE1hnLms0xQQv5euhlpLdpxKCvWy/68VWx9H/2GDPcMd
+         dejDiv3R8tWymyn5dQWWMETV27OQ+tVIXFWlTA2Pv5sQYUW+5tM/FLbQyW70vBHyHYcJ
+         vjl6pwzZqSi8Dq/6Om44EWxDXJhip3f3g10LaN+4JCqVidqc8sHw9H7BSMd0Wd28N6oI
+         DxDIQLxiQjyOFKYdiFud9ru2pLvd5hIxKCzt7U5dV2ALC6kn+S+kkr/uqGYee+J8hVOy
+         ISIUJJksYQNRALUweiwHp8Lw4Cd+J7vNf4yUtPeeCxZdaED66/OeXdqAVXf0NpLXTH7o
+         G2rg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1793081602; x=1793686402; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=mffSw+MxdEAje0XtGPg2+DovEJNnFqJUem/6VRtADtE=;
-        b=fWlOahpsTdQn5NB1uVUlK7ahruh61jBYOCD8+LRoUvlLU8Z8IruBEwe9TlPVsA9nnl
-         Kgn8usObPOJmXt0KaqX0rIQ9ho3FTNey5AoEs31Wqx4kzlm1F7De3szm++30Wn6p8KsU
-         mv31rQNeS9suscMS8BilN1OS6BC11oa4SaCmDdAmHbPqyAyGV+l1gbKMsZRKNHcKKTO4
-         aVGdaIDah2Jz6MjDekjHyJhyGJNpgxXfM//MpilLKWdgZVvql0ha2kP7P5nd0TWnb/AC
-         1wu4ZymidzOFAG7OT/I+2/PvJ0yKIC8AvqxBVAyN9pxelRomCIFKD6VzyF79ZIhxuerG
-         nZzQ==
+        d=gmail.com; s=20251104; t=1793081697; x=1793686497; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=rvHLijNBU08aEIcYebs583tqrtn0BZ2i7XUXNkAlzGI=;
+        b=jItwf6wqDUSf94XwxDxeQl+DqCP2yUlSmpnBFAewrBuQ9WoSKZ3LUH3J7OY4FmdDA3
+         grsrS1uU9Vr0fPcMCoM8UsrKlCu0jD3oaV0DArXfgjA90WOyuVGtWcGfVp0OIk/qV1wu
+         NufDk3Fk9VOJA9ZtMqpfndWcEIEx7LN9rWgTDIV2CoBIHHPd413KPpPfN2O4jX/u9bKc
+         YhOFtOI4cFEqtPu4kXDrjSCO+3VGtD7OmsVdLj8mm9y7iKm38eRUitF0EOcVe2cr7pdd
+         /iTqj9YQrH4lX/Z2Jh/uVdCc05fPDuPnba/8au/PI2fUW/Ax2C24+wGnW1JZbWY13xOD
+         t0yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793081602; x=1793686402;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
+        d=1e100.net; s=20260707; t=1793081697; x=1793686497;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=mffSw+MxdEAje0XtGPg2+DovEJNnFqJUem/6VRtADtE=;
-        b=1JjBEmRrv5eMEuq7lgIvrO5byXuDFw0EWFusITrReHB5atyniy68A/HIRaTHns7VfU
-         JlsN3GUVoDcrMlAcmApgh78wyTP+hUJZ2BE8CXU3ph0T6E5tISfGR5YP5pXO6bIG547F
-         DcpoAH7zbORLdPe/EK5rcnZzrKUy2fZ/xZRRtQ38JaVYoGEMutVXXSgl/Er8M+ZHgnQ0
-         YH+Xm547p1YCUj03p7xDeSldDI7iM95rfvNBaisQC1IA5/0dz+WVuZ8FA9ai6zwKsONA
-         5r9E759PmA5J+ATI37pb629D59fqdFEHgUscKLtqAXeunFQmCAIfi4dzw+Aa8WYhgf/0
-         z7wg==
-X-Gm-Message-State: AFq9FYIHoJh4CTyGwYHrnJfi2m2Lq/38JQzWDamG9F51JWYE7d6hQc6b
-	Lghw5aOuo+vOsBtZD1FFLpYw87T2A2R/ZUuEp3MKlpgF4fWyPz3TQfUkGb6A6z09bKQ=
-X-Gm-Gg: AYBFou3yUuXZOcG8y5QthuZ4nkG0uifMNoW70p7tKEE0NzbpgRkvDCHPtkhJ3loHK+V
-	lcOKx5xmpsKW+cclxdkhLlHQb1BOiA9a3r7cQ8R+O7oUOzqTHbdiJC2l8ognJxrbpBRyKCIwooi
-	K6IQXdMdxO8eUMY9jNVluhQCO4CnAQ1YjdE7CbKNAtS5g1Q4GheamdPMMJkX4Ph2CCg7/MI5vsn
-	2pQU2dbX6PBNIfKgfKYNGwIFthfdWgo0aoE3VJGk8wxjDifkKYLq7iR7FrCAl9qF2cH9BIdFSc1
-	5gjWvc9uAuG3QpvbnOnNVzg6ykKjoyOG6zzUYFzOabTAVpJm97PHCkGY9VzRBRDunTih0lcl4nN
-	1PsOo3IiAJArLIM8I6GkSx7kLOZeRzLDftM4GI9b5icQMUoIIuq8dgISsS/CeHPTWCMoQEZJLNs
-	8vHG/KKT6eLrWEYr39EFdSY9nNqArvzyHEzF/VJNSsKC7V76LikTEmnZspRjnlfocXezHX7AMhb
-	M8PSrdrFQPO8fiMWHGxEZmUHwu54Kycxehcf0KRX5vR0KQ35fx1XssjrNy3qVpo/6zfDxpVtQHb
-	pb8sK/6IVNVaWgVEwbpcpv7V
-X-Received: by 2002:a17:90a:d605:b0:3ab:2236:6b3d with SMTP id 98e67ed59e1d1-3adead57d9cmr7228994a91.27.1793081602508;
-        Mon, 26 Oct 2026 23:13:22 -0700 (PDT)
-Received: from [100.81.10.186] ([61.213.176.59])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ae402a0587sm2163867a91.1.2026.10.26.23.13.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Oct 2026 23:13:22 -0700 (PDT)
-Message-ID: <b8e77932-d22d-4c08-b163-f60ffec25553@bytedance.com>
-Date: Tue, 27 Oct 2026 14:13:17 +0800
+        bh=rvHLijNBU08aEIcYebs583tqrtn0BZ2i7XUXNkAlzGI=;
+        b=m5x5rg+p5lM9IuQW1heWGH7y1FwdDCVtIldn//cAH2ZyC5KgwIit3UxOpqnR6ExotJ
+         E4wstXVW0y1kYaX1rPekneD6tCHe9lgnY9MObXQWIuDqX4OV5LWxcwG8tF+VbiJDBlDU
+         nqCGMlFo1/M0UNr/UQa0gzFesihH/Yy9lkxszu6vwDx6pDtQMNDeaC1KlSnB6IiKb0kz
+         OfNSpK/Iv++RPTDerOBrOq78K7kJRy65zKaV4SMh/owXa7N/nsu59RR0PBsAbfaZS6OQ
+         84LoWtNCJRdpVJa9e9b2qNxrZIwmSKQqvLIDOJLv6F/J7qqNVL+CyVhbFHeFJgS93Kbr
+         yBQw==
+X-Forwarded-Encrypted: i=1; AKwUvBzhBTmVq8vqP703eRA61JrE+hQindlynj0dxMggIxdw3PXv5gHj9lw/qrn190+xA7FADSH+K+a3+FlwGQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLRB7ZzaXxjfbJ4f7saQyM24ewp+hZQUBt0w1AkNBhcu15wDktV
+	E6dgTKGBc0b6hESWauqzHF510rL3Ii338JwM+UVGhRcxt6SQ9t7G1zS/G+OkwN3jg7xqXXPWEuu
+	1m7cf4sOZ0uDGdzaMir2EzcOHkOH3a4UK6L77iSJ80A==
+X-Gm-Gg: AYBFou33wSVwj/8m3+8/L1SxqN0grAKmYaBtERB72h0T7YBS9MyNP7SP0dYODtpvY35
+	Xg2G7y/opoLY0MNgjTuQ765dD2spWgVEYPsxVX919usdxAamELrqTYP+5KH27Mezq0XwkzSNM++
+	8j+UG+0e+8gsWXY212HLrIJ875/zi2kr8ghCdOiDiGUAB2p3/U/lKAVYtH2efEFFtdi+EQ1o6ee
+	X6IViFYe2yEB1Y3HgC+5W3nVMFkaxZywOBWzFcyL2JRjNRqabdpv2lZtNq9CJeJAXtsVyIgX/Xs
+	01g7dV2THy5DJdmND6aSF7DQlAyEJdv1dGTQzKQCuypHmHjR8ILt9kiM46yVQ5PyZRWogZ6tE+V
+	EshKBg60SWdGY/jnmcYnhGS1+CfYGnl8fqn/cllulU7PcLfGbLx9SGUoZTOfQanRw7Vi/fgHA76
+	r1uF/C
+X-Received: by 2002:a05:7301:6408:b0:36a:a10:ab95 with SMTP id
+ 5a478bee46e88-36a0a10b95dmr3472715eec.29.1793081696914; Mon, 26 Oct 2026
+ 23:14:56 -0700 (PDT)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -89,54 +105,35 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: take the inode lock for buffered write
- fallback
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, jack@suse.cz, axboe@kernel.dk,
- viro@zeniv.linux.org.uk, mcgrof@kernel.org, djwong@kernel.org,
- tz2294@columbia.edu
-References: <20261015091105.1315605-1-sunjunchao@bytedance.com>
- <20261015091105.1315605-3-sunjunchao@bytedance.com>
- <auAmMShKl4S2lc1u@shinmob>
-From: Julian Sun <sunjunchao@bytedance.com>
-In-Reply-To: <auAmMShKl4S2lc1u@shinmob>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20261021093332.17334-1-mzx199711@gmail.com> <20261022062513.77372-1-mzx199711@gmail.com>
+ <5c7b9f30-893e-4127-8ffa-3d5b7224674f@acm.org>
+In-Reply-To: <5c7b9f30-893e-4127-8ffa-3d5b7224674f@acm.org>
+From: Zhenxian Ma <mzx199711@gmail.com>
+Date: Tue, 27 Oct 2026 14:14:44 +0800
+X-Gm-Features: AclHuK-OG29MugfEcwXyYV0jzPDDYGKVBguIF0ql4PUVRJM1kKeNGt1FKOzmfZM
+Message-ID: <CAAth02B6UyRLaU+eKmLNueeh1N5Ecu_+Tsz-GaXj=AWZ2bQkbA@mail.gmail.com>
+Subject: Re: [PATCH v2] block: fix recursive i_rwsem locking in blkdev_write_iter()
+To: shinichiro.kawasaki@wdc.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, hch@lst.de, 
+	syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com, 
+	Tal Zussman <tz2294@columbia.edu>, Julian Sun <sunjunchao@bytedance.com>, bvanassche@acm.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/27/26 12:24 PM, Shin'ichiro Kawasaki wrote:
-> CC+: Tal Zassman,
-> 
-> On Oct 15, 2026 / 17:11, Julian Sun wrote:
->> Commit c0e473a0d226 ("block: fix race between set_blocksize and read
->> paths") added shared inode locking around ordinary buffered writes,
->> but missed the direct-I/O fallback path.
->>
->> Move the lock into blkdev_buffered_write() so both paths serialize
->> with set_blocksize().
->>
->> Also correct the comment claiming that this path takes invalidate_lock;
->> it only takes i_rwsem.
->>
->> Fixes: c0e473a0d226 ("block: fix race between set_blocksize and read paths")
->> Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
-> 
-> When I checking the new blktests test case block/050 by Tal Zussman [1], I found
-> the test case hangs [2]. I bisected and this kernel change triggers the hang.
-> 
-> Julian, may I ask you to take a look in the hang?
+  Hi Shin'ichiro,
 
-Hi Shin'ichiro,
+  As you mentioned in another series, this is a known issue with this
+  patch and has already been fixed by:
+   https://lore.kernel.org/linux-block/20261022062513.77372-1-mzx199711@gma=
+il.com/
 
-Thanks for the report. This issue should be fixed by:
-https://lore.kernel.org/all/20261022062513.77372-1-mzx199711@gmail.com/
+  Thanks,
+  Ma
 
-Could you please apply that patch and rerun block/050?
-
-> 
-> [1] https://lore.kernel.org/linux-block/20261015-blkdev-fixes-tests-v3-1-b6ffa6410514@columbia.edu/
-> 
-
-Thanks,
--- 
-Julian Sun <sunjunchao@bytedance.com>
+On Fri, Oct 23, 2026 at 12:19=E2=80=AFAM Bart Van Assche <bvanassche@acm.or=
+g> wrote:
+>
+> On 10/21/26 11:25 PM, Zhenxian Ma wrote:
+> > Drop the outer locking in the fallback.
+>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
