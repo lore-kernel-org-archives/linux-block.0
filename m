@@ -1,54 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.198
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793060225;
-	b=fNwdV/jZfPk5r9v0KucqAhkTXzRxbwce+Zk6jyIOA6i8BNO4qN7g3xxH67zh/SFAuri0
-	 SSMqYszCyuadFurqeCeQciEbIKwEpCu1I3Ycb0mBGU/MhCHp8LBoXUXlgwvOKrZ5xxtyS
-	 GxN5o9mlUSG99oWD2/ZXuuJrrEqXpoUCbjjWprIIUChzDB8Xl/PEBBRbSSJKXaORZ/B7T
-	 JHN028+I20WQtjbKz6j7G3fHjpkr687625vsNMA1V/SJnZe+Ow+clbSk1XBGJ0el6TX3O
-	 RWBh4SW9TX/iGN4A4gAT1QneByb9GIaJ2AUH1YjgnyAYOjAxMrIYesjw0Z3snWCsnmw==
+	t=1793068422;
+	b=pgm6P/UO5/NJBzIawZElnyxNMfiRyXgv2cvqyaBw4aunomffzGyVHnR+0Xc8Dhi3cE2c
+	 SGvuaxhbomck/pX1y0ADrb4PCTgwOnb4izEcmAqLdu5uy7OAk0nr7dAxLeAiqZ3lEhSPH
+	 w+XbaJYHLMoxaj6Y/YCPZMYuvtgh1iz9pL1H4JjiKbZaTLmb2XT70biIodDerwUF9yREY
+	 Zukszj0R0gPccv6/Dbn180g9dWkWc2/IARWbM17I1eZzyNpFvnyYf5iHD569Di4E0hGxa
+	 0vcAcSnSq+WfT8vJKFENRmhHAs5Wif2v77rv1zfghHJuoBQvIk5yEGrmn1hRnlSNkkA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793060225;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:MIME-Version:X-Received:Date:In-Reply-To:
-	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
-	 Subject:From:To:Content-Type;
-	bh=6x9+N/COr+6pNBpUPwwvKfGBRH2EOtY9PmyW7dZS2UA=;
-	b=Roba3XFtQz/1t8Kw/AgaNUi0ypmN95pL2aS1Alq3MGbeBfz09dfC5lvdqQ1U82Tbfl8l
-	 yxqA/oe0aN7VIXsD3QvY3AGLhC2E08eRYMjU8u0yM1SYjQpRc5+zuJjxvlPhNr3Lj+7R1
-	 CQ6tFMuBO0hZrCpvr7qTtfOojEJl5f+tcN9JotJl3v2tngZNm87+X7pgyMhwR9blUw8zz
-	 DzJvo5GQQrnD7mfAAWQKa2NE4tcAQE0qi4LMVhn0gqgJ9b1957iGmHgh4GfKd+qXD9N2Y
-	 1ZAC+wSCABdEqVJzLuYKK4Sl43a6EldVT6gZ1yu61xGb3TQetIuFVHhhUWZN3HybbiA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793068422;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
+	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-Mailer;
+	bh=puCn0Ks69HMbweTqrcsUBv/ereDfbXa2GkbsTiQ4tug=;
+	b=2Y445SSySUqHLh/tATGrTkOxGqMzresKq4KhiXCXV/WRPzi1xIBCuPcLJswVe9zeZVuh
+	 Dx7dKUqupVsvSOF42Rbcu03c6KPw8GjKnMRVlswPj0uwVQQ1YdWo/N63kcDMlZcLSGPM+
+	 wDNID6Is+lP3bUwVR5xF6Y/G+lqUR0sgP4//r+1jgcDWbeoSpesb6A5q1xW/hAWWrS0Ag
+	 MeFQbEZgqHILjDiBG1qC4Iey2Yh0STU1JBCOeCqJTitfyuGRXizqVu/Iv2wqOgQV+Cp6Z
+	 ETYsCeMnDFp+/AU1/1gLMVGO9RQm9xSrSU/XHRnXNgZ4RqZVoke6Ud1dZZqZIy+/M2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.167.198
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=tStonwDr;
+	arc=none smtp.remote-ip=74.125.82.49
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242B9606A32D
-	for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 00:17:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 242B9606A32D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-4cc89e86e4dso5801356b6e.2
-        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 17:17:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466B7606A31A
+	for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 02:33:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 466B7606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=tStonwDr
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-185fd3a4ca3so3121244c88.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 19:33:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1793068420; x=1793673220; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=puCn0Ks69HMbweTqrcsUBv/ereDfbXa2GkbsTiQ4tug=;
+        b=tStonwDrNoxNucFAywLg9XAMC47eCUhohE+AnYCAxsniVQe1EYRF1rep1BcrpKA7xQ
+         PMXPXGJRRBZPZdt8KHTlMdJm4/2cyUbnu23naSIjr5kMmbclaNnQpNmt6cPfOYOSjaIC
+         bTTS0bwMbtlyLQofRMagFPl3lQDIlDw+qZrd0/r38tDlmQMh1u417t3CviOYkwti21VO
+         TMa+foE+OedPT8vL2bInZhVl1M1IBeW1UK3O/R2Fo2q6jBdSlppz4LXsiIQwfq6cjPXi
+         mlOKbd+V0pMkyD/pJP8mmciBUrSGWNfBS8guRBk1cx6a600noa1OjtWcxr0TGFWFlp7Z
+         FKLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793060224; x=1793665024;
-        h=content-type:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=6x9+N/COr+6pNBpUPwwvKfGBRH2EOtY9PmyW7dZS2UA=;
-        b=YqeRYPBXEkvCbTr+lbMyiEQ0Qp56DChDdQkxU473Bqd+8G3FbdULgts6nry5PPSWZ1
-         qgSjwXA2xMhtLbzW3rxM2OHwQi1G1QVZyA4JU93SA+232vBJh2dbQJRakVSyV8LkH7jP
-         LQW9JOl/n15hHiSpQ9DWSwIeQi4FhbGk5yQgj2Lf4EgGnuIwRdjYmVsSsardD+S9RCHF
-         WFYeRMyu3bgwQ8qXOz9LCizJu0vXyaorA1icSphkUw62C0QrHws1siN6XrLW3cJ7pHnG
-         +0DxdNJlHzInoLbUjv8+6Cy/CoIf4LDv14bF6dFLmGxAOgFqqfSeVBR75mFDhwk75W49
-         g7FQ==
-X-Forwarded-Encrypted: i=1; AKwUvByymGR38U9fY7N40Ty9iGRExlNyR4YhgP5kaSNdirHO9lmK/n/OWZjnt6EC2lPOv4BjnMTbdlGY+VLqWQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLFxyWxlqPg5jV1exg3bbasjyJOXD0C0HkEUSGJZkT4UaH13lk5
-	kKkIbAKcrXxroASljcpnqR30NFDojCGFdSW0L4rkgic5uHepIUAIu7H+2X2UaFMcnec9NTJEfFQ
-	UFNTql8LZ76Aje5msASAS4M2R6AeDFWs7YWil9OK9Zt8xp6/eLcBu9ex/fGg=
+        d=1e100.net; s=20260707; t=1793068420; x=1793673220;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=puCn0Ks69HMbweTqrcsUBv/ereDfbXa2GkbsTiQ4tug=;
+        b=RzSUG28juCZxnCRz8KGjD1Gks+uw68gXBSiiHS5eVAFVWLSqoYWFCwBb9SZyVkCboe
+         WEoFwT+2L6Y+bPDZJ/vkoB6swQH4KAKz8DJg04Ko2zAb40bkohGe2MOKcPlsY41ULdf9
+         a9fT225yLJr/oV+Mm1vOyQSVQ6IYj1ftKOwM/gqCEWqrk/9dT943qOtDZTbB3sLtBbFP
+         RB6lk9c6QxMBecrule3PfAfwwCNjUw0kZ+VvzO/j1FjT5SGysQBbkNhP59lcxh51iqOO
+         ZyKRk/F03uanH2tIg+EIRTyZtiqjrpUJ7J2hzfaC/9XmB56yZ0jPT/ErqVvY2etncBV0
+         8VlA==
+X-Gm-Message-State: AFq9FYLvsJHMday6HoQto6xFk3SfUcvKe1EhJmAFrZrEpuJyf+Mpkl2R
+	pswB/sGvlyQfh9za9sLrHc9J67vH5KUTpEFau+/EojkvIPKLvEk9TyGwA9FCqxSzdDvXXij/Yb5
+	T74KHfYY=
+X-Gm-Gg: AYBFou1JKMNYIKBDHko3iRnFiEKDcyO9kwIrgF1BFSFobolW74NABhJDfW59jdHOo+p
+	cmFAPSX9TwcURikXp81zJX0x7UpQ5piEAESLIj63YrBAsjuPJu705yFvAdY4ffRHdx/AcdBiYKB
+	/ML7LHoSaYpRiSheQoTc8aE3bM3Wgj1rDQXhzcd829VIngaprbxg0x+KtO1BsNadU/ABFEqOA/6
+	odkkN6BJkSCXTO4+xo6J5SqEs1XhPLanOO+3Rav0u1n5lmUMhWqdM/HEbrvnfg5V8sitzwqCFB6
+	/ORRe81ZRV0VWw8C2x6/o13l9KLDsnnlTIg0TvF3wF/mhpzgAKDeT/oMQcb1A22AxETYqhzb+XE
+	hoICC2efsqzZ4cTjZC6IolKoVbhP/cwgu7oO6T3a7lrlT1yRcHTR36WxKgPu2WIyYsAh3SmK+4i
+	z+nqka8/mJHbTzxwLm46tiPyTufnxbtIGn82/utpj9a7UgWsKPJieWbjEox+LPa7EhYSWkjjAwy
+	zjDUFN15TnkOyowcpISBegc+4SghdmBPBOVvFmAHibJucfIKOlOQzZuXmVSjMhRNzdJe3U8C0uQ
+	lE+LI9qbeLNVhHuLI7vcxUhAZShL2nQS6U6NsmI=
+X-Received: by 2002:a05:7022:ea45:b0:19b:7b7a:a61e with SMTP id a92af1059eb24-19b7b7aa68emr10771199c88.26.1793068420246;
+        Mon, 26 Oct 2026 19:33:40 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-198a2e32479sm26186181c88.21.2026.10.26.19.33.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Oct 2026 19:33:39 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Phillip Potter <phil@philpotter.co.uk>
+Cc: linux-block@vger.kernel.org, rdunlap@infradead.org
+In-Reply-To: <20261026220823.1162-2-phil@philpotter.co.uk>
+References: <20261026220823.1162-2-phil@philpotter.co.uk>
+Subject: Re: [PATCH 1/1] cdrom: drop linux/fs.h from cdrom.h
+Message-Id: <179306841930.867242.15678945354004186026.b4-ty@b4>
+Date: Mon, 26 Oct 2026 20:33:39 -0600
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,41 +96,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:10ce:b0:4e6:db9c:9a7c with SMTP id
- 5614622812f47-55c002ec88bmr4875116b6e.63.1793060224091; Mon, 26 Oct 2026
- 17:17:04 -0700 (PDT)
-Date: Mon, 26 Oct 2026 17:17:04 -0700
-In-Reply-To: <6ad78978.b5bd089a.6b57.008d.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6adfed80.6200f071.51519.0efd.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in blkdev_buffered_write
-From: syzbot <syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, bvanassche@acm.org, hch@lst.de, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mzx199711@gmail.com, sunjunchao@bytedance.com, 
-	syzkaller-bugs@googlegroups.com, tz2294@columbia.edu
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-syzbot has bisected this issue to:
 
-commit 1b1be9ea4e34ccede1e7cf9ff2b6317328a5b6ad
-Author: Julian Sun <sunjunchao@bytedance.com>
-Date:   Thu Oct 15 09:11:05 2026 +0000
+On Mon, 26 Oct 2026 22:08:23 +0000, Phillip Potter wrote:
+> The comment "not really needed" has been there since the inception
+> of git history. I have done build testing of all files that use
+> <linux/cdrom.h> with no problems found.
+> 
+> <linux/libata.h> includes <linux/cdrom.h>. I have also build tested
+> 99% of the files that use <linux/libata.h> with no build issues found.
+> 
+> [...]
 
-    block: take the inode lock for buffered write fallback
+Applied, thanks!
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=165121e1580000
-start commit:   21a7f44fd076 Merge tag 'devicetree-for-7.4' of git://git.k..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=155121e1580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=115121e1580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cb217ea80b9f9fe
-dashboard link: https://syzkaller.appspot.com/bug?extid=bd975ef54294bec73f0e
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1634b469580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=108dd695580000
+[1/1] cdrom: drop linux/fs.h from cdrom.h
+      commit: 3d97e7c377f1a8fac1c5bf8fd6008c9a67c87847
 
-Reported-by: syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com
-Fixes: 1b1be9ea4e34 ("block: take the inode lock for buffered write fallback")
+Best regards,
+-- 
+Jens Axboe
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+
