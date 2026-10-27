@@ -1,88 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793123394;
-	b=rQ8C/eAb+T2od3uLkw66xwKcLgg3UrL8t2rzjq79OnR5k0zZPJ8p7kU2AWMmrzLqiRfJ
-	 OtVEKvezDxy37Wk0jdOhqpjF3B8BFfVBBiXe+lO9ofa6+3NBJi/anuxXkJYeJExGc5G0M
-	 +dYb9NrWUHY+oHERR+Yp55U1X6rS5bTRExtzW9S/9WceGasTpdp0A3xtJrwuZ70rRVOHO
-	 EGALGCH9rgt0e+meOJO9Bk7lYRj0XT/8R4llh4S0vZBKoou6S7ocYbgb6+F/F4KKyvsjg
-	 fvbyvqNlrFixoEUzkp+WdG7RzX1cdyjTr7kCc1P3kmJ1MLFNdC4H23VDsGwKXf4B9ig==
+	t=1793124677;
+	b=FL6T3TDflLOuZCzK7rbGIxIuY/eX3ycjW5s3Vd0zu3cr01+kivpyR62oYXKW/CKyyRbp
+	 fADnJMgW0QCyuXHKzwnAM8VLBLIGIZ//W2sHjPWTrmNb0WCqavNJZpC0BA+KJHFx3DL4J
+	 uD/zHV9CPG2MaSitFLZwDm8HU5hJV6gsLDHuRfR4ald3XX0YL9ihybLPXzsVbzj7um6m0
+	 3LCjv/HCP2IVSpCN7hhyWwvHfVBWMKhNY+/rL6xQzSX8oqBPl1uRfn/eiR4YSOIisO50U
+	 XJ5JV4B1VHniZo7d+Y1zL4A+bNnhJwVKB7tipUoCDW7mIsjpMjB5Qz912nzYVhSEzQg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793123394;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=pmxuATz6Q0v8YZq9eZB17JiD7ofsK6hYGMgJE7NMLyA=;
-	b=vQbe+Ei7Zr4ChmFEr6kR9zG9/96izaXRfwZyOL7cIsc9aHnpj+tUQ3lV3GvRXvYzM1US
-	 vW3ZQAJhlBLuWA0Llw4YS/3SzU/rxn2dKDa74w3PBUSs7qX6KNp7JcKXrWc7kjgKe1j9v
-	 ysRtETlVctO2q3y2KWD3MSeJbzKiDTMIyjoXlW5iWijfxL2ZIxY7IlEsYpyP0WMkUayBH
-	 z+ZoO22vSH8+k1zjiomZpokLm0MdScfzc9LOkk8FQF6qotDpB6+8DZL22f/yakEQuGk2N
-	 AOVxb7YYlP1T+r0rk+xGdDEKnpuKUps27dgvvrXzz0kBAoQ+5aTHJ5arwIlfUD/EhYw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793124677;
+	h=Received:DKIM-Signature:Received:Subject:From:In-Reply-To:References:
+	 X-PR-Tracked-List-Id:X-PR-Tracked-Message-Id:X-PR-Tracked-Remote:
+	 X-PR-Tracked-Commit-Id:X-PR-Merge-Tree:X-PR-Merge-Refname:
+	 X-PR-Merge-Commit-Id:Message-Id:Date:To:Cc;
+	bh=qpD3mjT41t9GE44t0T5p/kvuiG8IUHEz8mrIA+Dwlnc=;
+	b=i9aGLlHJb+dOvGMmyhWnkbJ6AiQDvHxLMtDGObW85T3zSJ5fupgIhygqv5h3IetMdvsK
+	 ZmfZ9upP/WDt0YV1Zv8d1/7X/g7vq3h3lAWVmZS+U3MRzZGO9A2ddZxsq8Sba+8nXx3sk
+	 dD9+x59WytOndYXIEetDV+fW1bVh3CS/8bldOqQnTbyNxqWF+WCHjFu424BMxb+AKnGQW
+	 OOmkM3WdpCXGWP07aolM2+MsMxwNM7wSDsYTXbvqquyiGvqI97NxnGs4ORZCco/DetXO3
+	 JqrXjaM2qW+poy+sKHmyovpC/1XPd9hFSKCru6IXLER6auTtWY+fGizs/4Kmq0Jr+mA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=lJFDpZaU;
-	arc=none smtp.remote-ip=209.85.210.50
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=T8BhAG68;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54D8606A31E
-	for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 17:49:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D54D8606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D174606A31D;
+	Tue, 27 Oct 2026 18:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=lJFDpZaU
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-8253bc5a613so86749a34.0
-        for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 10:49:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793123392; x=1793728192; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=pmxuATz6Q0v8YZq9eZB17JiD7ofsK6hYGMgJE7NMLyA=;
-        b=lJFDpZaUNnVFoxOeOhYAlbKxKkRmNwhX+/qrpc3NMkWeVGlys9iyAqdiaYS3VIroyz
-         zrpV1Mb+cHjD8GY2AA7gOAcrckqldtzEMppf+0/BjEvBMHYfAv7RYEj516GWVuelkydN
-         D4Y4RH0K325tgAL8opvxSn7ACfdSAyYsHInbzzm0f3skwOecG1YdmUrTRNSpFk+ZNCtF
-         KxAyTNMaqLlyZe3QtMXli18t7lh0iOAzTLvhB+g/38vry3XWlZOsZ9jcHZ+UtqKAgXmI
-         aZwcHwEJepNxxTa+i8VqO/+UVIHDlqDTRrihoCZaU6dlq0GVIeCM3JepforsoHe+cT0f
-         SDKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793123392; x=1793728192;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=pmxuATz6Q0v8YZq9eZB17JiD7ofsK6hYGMgJE7NMLyA=;
-        b=QXs9uhOlNqm8aNLkf8S6Eq+j5fwa/gkJbZ/Syu8A6l4Zwp36/55MuUDnr8ahjwhloX
-         iVg/lGhHNeHhfVHy+MOmJr1l59PI6VPjovUBk7zRgXZ3wOxVpm4U7H8OHkMrVPso2w7t
-         ZDKDjUKPywbedLyXDftdz58TguFV8/dja4NgAXdEb3tVai3OMOcKuDhXggCBaFz1Swmz
-         6Aj0/IJbTC9BjUzPYRy44/iwf2XzGRsPibvNss8K+qzLHU8mWBTUD0z8J5jmxp8n7SDr
-         LiJt3C4PuLLj0s1xktzLTkY1hsbYnnOKm1tQh1ashHS56C77tKIAwmzoWsMGmLDIkQAl
-         zjWA==
-X-Forwarded-Encrypted: i=1; AKwUvBzSCz8WWedCceMp7Sd+s0Hl3wBp6y9dpIc+0hq++3ZYNMHfUJZTV2/1QlIGFfN3n2MaMa2ogDavEylMog==@vger.kernel.org
-X-Gm-Message-State: AFq9FYK4wCYPH8EYnVpOhqYWagRkLGii+nngo/HmPaVcPqGWpX4fZyB/
-	bdjwBRWu4MuFuZCLU5dVNk6xYxffypvcQ9rlG1Y8zOPsUihenqZRC3N34PbcQZWcgP0=
-X-Gm-Gg: AYBFou0oNWYLOnEQBHpEifCLlxBHGQgH/esRSeQuLPCpIRXdX7tqLeQ2pRL8aDwxfYT
-	ChFk6VQoz++MWmhRk01ImF2LEl9x5Vl+kKp12chquf9FwRFJQq5eqQrFOBT7Io9EtoKxD1P/I62
-	ssg+HIvQpIJOJ1YGPflShUwKcx7glo61MGQTZ87z0tGxsq6/B4RKaL8NEKbUYszLmJWX/Z6svqK
-	qbMNBhSSY9XGjGmtPey3T/miWmT/kWntwrEcsUb90txVV3Qm7yqbqBqWggKY5gGZwAcSSKQtxef
-	Tasdt3Ee+oNFJu6EzK4gbBBxP95N4UE6qs6zPj3GX6Oct7afbQeyFEpX+dI5aPIjNCl3hGXwjSk
-	f5+25OIoDYoH7zcj2wc6kMmLcBSO50JPBbI57uTrTnReVdElJkaftZy3N29Z7N81kg0CyYBLtqt
-	6oCm6w8BWjdQIf4/5OHmicxcL3b/L3PDG6aNCS+C9dFn3ZteKS5MRNdMJjwSNTvQyuJTo9R68ez
-	bS4f4c7vJAUEQmHvaniJocosWzXpw7Vnr6Vp25CKgQ7/xqLnvq+TUHZjgsmhtB14zF+225eVNzs
-	O62gRPKwuFGP8sF5Xoxy/Oo3WjLtfK0rSMFYjWM23IYd7+gsE5X5zYdqHg==
-X-Received: by 2002:a05:6830:4110:b0:843:98dd:84e4 with SMTP id 46e09a7af769-85ab4e21711mr351411a34.3.1793123391741;
-        Tue, 27 Oct 2026 10:49:51 -0700 (PDT)
-Received: from [192.168.2.38] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-850f8458a4asm11484186a34.3.2026.10.27.10.49.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Oct 2026 10:49:50 -0700 (PDT)
-Message-ID: <fceefe1d-c513-4cc2-97be-ee2919601f88@kernel.dk>
-Date: Tue, 27 Oct 2026 11:49:49 -0600
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=T8BhAG68
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DCD11F01825;
+	Tue, 27 Oct 2026 18:11:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793124677;
+	bh=qpD3mjT41t9GE44t0T5p/kvuiG8IUHEz8mrIA+Dwlnc=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=T8BhAG68aWrEhAKg6nsMOO1rCeqY6w3mfXUBKbBiLnm55suNyaytEfn1uke0bg2XV
+	 vfhfXFILJwXpOexIpyXhq7dtcqYzDitNLSsyo0Xf6fPgTBZC2g3tRVPxVNZHIVFI/S
+	 c04Go9fHaZlNeMpGYLOZtJcznaDpmgv9tRzofu+n1EGEVJ/bXS7LzBxGN5lhx9V3rc
+	 Azi2Xh69ZFiNWnLzqVKGb2Q9Kg8TCAFU0FW3Xepinxx6z80lUo+0OyA9XiwgHTtecU
+	 UwCu8RBIJqNDSUJKSWVEk2f0pv15A4QLXuBIXDJi/dMrBkHetOOXx9PyFLVybXo+go
+	 FAHe4RZYYN1hQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 077183AA9AA0;
+	Tue, 27 Oct 2026 18:11:17 +0000 (UTC)
+Subject: Re: [GIT PULL] io_uring dma-buf support for 7.4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <d38042c3-75f6-41fd-8998-da38f9420354@kernel.dk>
+References: <d38042c3-75f6-41fd-8998-da38f9420354@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <d38042c3-75f6-41fd-8998-da38f9420354@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.4/io_uring-dmabuf-20261023
+X-PR-Tracked-Commit-Id: 45b716456dd99488a0cef58482120dc0474aa696
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ed02f4f7ad9b5dabae2118e642cbbafe7dc9bb62
+Message-Id: <179312467571.245349.11132213751620462463.pr-tracker-bot@kernel.org>
+Date: Tue, 27 Oct 2026 18:11:15 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, io-uring <io-uring@vger.kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -91,52 +67,16 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] io_uring dma-buf support for 7.4
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: io-uring <io-uring@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <b97140d2-df87-4cdf-9f0b-d5ca404d50da@kernel.dk>
- <CAHk-=whLg-od86aV4HU6yC8EKh6zsVWyyvWVOcrVshvxoQ9dAw@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAHk-=whLg-od86aV4HU6yC8EKh6zsVWyyvWVOcrVshvxoQ9dAw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 10/27/26 11:45 AM, Linus Torvalds wrote:
-> On Sun, 25 Oct 2026 at 03:30, Jens Axboe <axboe@kernel.dk> wrote:
->>
->> This adds native dma-buf support to the I/O path
-> 
-> So while doing the trivial resolution, and looking at the code, I note
-> that blkdev_buffered_write() grew a
-> 
->     inode_lock_shared
->     ..
->     inode_unlock_shared
-> 
-> in it. But looking at the two call sites (in blkdev_write_iter()),
-> _one_ of them already has that inode_lock_shared() on what seems to be
-> the exact same inode (bdev_file_inode(iocb->ki_filp))
-> 
-> These all went through you in the original block pull:
-> 
->   1b1be9ea4e34 block: take the inode lock for buffered write fallback
->   2fec4fd97cc3 block: take i_rwsem for the direct I/O write fallback
-> 
-> am I missing something? That nested locking looks not just
-> unnecessary, it looks like deadlock city. I'm surprised lockdep hasn't
-> complained, but I'm assuming hardly anybody actually uses this path.
+The pull request you sent on Sun, 25 Oct 2026 07:29:55 -0600:
 
-Someone did actually report it recently, after it had been in
-for-next for a long time. There is a fix queued up for it:
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/for-7.4/io_uring-dmabuf-20261023
 
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/commit/?h=block-7.4&id=21b88cc8bafceee6c6c82503e3b2cc6f1d0c78bf
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ed02f4f7ad9b5dabae2118e642cbbafe7dc9bb62
 
-since this morning! It'll go out later this week, pre -rc1.
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
