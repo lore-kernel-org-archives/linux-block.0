@@ -1,87 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793052507;
-	b=NjvH4zCwR/9eJsjS7q5wEqDSMnhFyVKg13AEdABBH9hXGk3TmHle5i1dEtCJ8PaZRTsm
-	 TY4CIi299+8LKdMHvsJG6qrmtUhzW0ah3QLb0lnQFVhwIlH+ouMEcJK6wJeFbDq32VNzQ
-	 0dB2a36zrpuBbqfZ16RuDV0ACVPK0u0NISM74sA+TP2r3Cs2qzk9DHxrxSLtldhH713dE
-	 k25NviPjw7ciqBwgvb6zKhOih4IgpsucXaf5JGnfH7jCbG+fsq4FpPCbXThztiH3nON2c
-	 qCqjgkJo4Gp1Gt6rNCbVh3MqdWju4jHM6/eWmpV2VTUyDQzM0MLKBlHXw6CKma11hNA==
+	t=1793060225;
+	b=fNwdV/jZfPk5r9v0KucqAhkTXzRxbwce+Zk6jyIOA6i8BNO4qN7g3xxH67zh/SFAuri0
+	 SSMqYszCyuadFurqeCeQciEbIKwEpCu1I3Ycb0mBGU/MhCHp8LBoXUXlgwvOKrZ5xxtyS
+	 GxN5o9mlUSG99oWD2/ZXuuJrrEqXpoUCbjjWprIIUChzDB8Xl/PEBBRbSSJKXaORZ/B7T
+	 JHN028+I20WQtjbKz6j7G3fHjpkr687625vsNMA1V/SJnZe+Ow+clbSk1XBGJ0el6TX3O
+	 RWBh4SW9TX/iGN4A4gAT1QneByb9GIaJ2AUH1YjgnyAYOjAxMrIYesjw0Z3snWCsnmw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793052507;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=jMc91yRqwLdM6D0hK7JmiPccEPADpL623k5VEJKckkU=;
-	b=THCqOuaJKS2Xx2J36aflaWlFwb+68FwbJE2fPJgj1C4S1/S7alLa2n6Oo1y3GNayhCip
-	 ELFjCc7PfP7jpVqMc9akCpGaLTTCVq/Hdz1R18RJsqxonwZVsfeaQXvs5gLuz8C+/hypb
-	 UMP29Dc1osk2nM6zBdQcP4CrpIixSIlYGnnpeSrjnEwz+nEFj6baey2PB2MonQ9LClhg8
-	 VbLNLRbv/mhHPnSdUI5zVKK+mEU2SxNdJKO8drPmGayMwEh/XLjiDchpNEPxd3yURN93C
-	 Ig6p6wiuG0tFfcGnU+6HxLhd/C6kwtmLlO3hINvR9cHP/lzHzZgyhLXqBHV9oHjM/sw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793060225;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:In-Reply-To:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Content-Type;
+	bh=6x9+N/COr+6pNBpUPwwvKfGBRH2EOtY9PmyW7dZS2UA=;
+	b=Roba3XFtQz/1t8Kw/AgaNUi0ypmN95pL2aS1Alq3MGbeBfz09dfC5lvdqQ1U82Tbfl8l
+	 yxqA/oe0aN7VIXsD3QvY3AGLhC2E08eRYMjU8u0yM1SYjQpRc5+zuJjxvlPhNr3Lj+7R1
+	 CQ6tFMuBO0hZrCpvr7qTtfOojEJl5f+tcN9JotJl3v2tngZNm87+X7pgyMhwR9blUw8zz
+	 DzJvo5GQQrnD7mfAAWQKa2NE4tcAQE0qi4LMVhn0gqgJ9b1957iGmHgh4GfKd+qXD9N2Y
+	 1ZAC+wSCABdEqVJzLuYKK4Sl43a6EldVT6gZ1yu61xGb3TQetIuFVHhhUWZN3HybbiA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=philpotter.co.uk;
-	spf=pass smtp.mailfrom=philpotter.co.uk;
-	dkim=pass header.d=philpotter-co-uk.20251104.gappssmtp.com header.i=@philpotter-co-uk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=ag1B7Q49;
-	arc=none smtp.remote-ip=209.85.128.42
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.198
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF26D606A31A
-	for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 22:08:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DF26D606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=philpotter.co.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=philpotter-co-uk.20251104.gappssmtp.com header.i=@philpotter-co-uk.20251104.gappssmtp.com header.a=rsa-sha256 header.s=20251104 header.b=ag1B7Q49
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a5b2be99a8so14420545e9.2
-        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 15:08:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20251104.gappssmtp.com; s=20251104; t=1793052505; x=1793657305; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jMc91yRqwLdM6D0hK7JmiPccEPADpL623k5VEJKckkU=;
-        b=ag1B7Q49e3X8yMRZ4b8XjNgAz6LQ8SqzfAF1Er/ahM8I7U26iEQv/wlCymTXGnFoxU
-         iqt66Ds2F2+lDpTm1TqrpJqCG6hIBO+suHCsbImQN7f5wENQOIijmu5eHMtQeXac9rhX
-         8e7am3kvsapA90SSapkzedgHzU6L5kYCZZysXFY+mgr2j1y/7+kg4TEciMp4rVAJo8tZ
-         IYHYfOnqnvMW5siwcnrPCoCVHRnRXJSCaKaNta2AMY4w+DnPpmJDhaYSFyOnUZMWwE8l
-         +ZzAX4gP05+lc5m+MJnpCcsbcWSVz8Bl2b/uzh48TD8MV28DRkOwgyAJLzpasvEXyjKB
-         /zRw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242B9606A32D
+	for <linux-block@vger.kernel.org>; Tue, 27 Oct 2026 00:17:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 242B9606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-4cc89e86e4dso5801356b6e.2
+        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2026 17:17:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793052505; x=1793657305;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=jMc91yRqwLdM6D0hK7JmiPccEPADpL623k5VEJKckkU=;
-        b=t0CHmsh9w0I/VPNvBYXUlFq83e3ptC5br1YD9mjoobYV9bbLL+NZgA9iL3Q9vEDcbh
-         VSDSANpXoYPp/j3UpQ9fIhBKClJ+cAThVqOXlMCnj47FCTNiPDK1Cr9KkQ03r3D71A2B
-         sqTZYurOfOVJYLHPFhfm3dpEQJzCx0eFssLYFAOrOTbOyqadF04fIl3L4w3j9Gg6MB1m
-         Ok2xGD7knHb/iLHUrlyXBwsYIc0oXAmwlFfYYZtpfAF9yVhLOPdA1YbNn/bt0Btl/Njc
-         4TkK98TUjPZnBMAoimA7hkuNcNC7rEeJORy9kNr8CAicTM2SxnUs9mdPwcRGd/d02Y4F
-         yXhw==
-X-Gm-Message-State: AFq9FYLfwLytHuYE6MoA3MpnBRKHDjIzckrb4Kmz3yq9Y/CDOBNSA9bV
-	cVDCy/RXOffJhGl4Ovd0BPkIX/ntE3lsW+66uPsOpmMma6VE5vlCb2wntdEivPU10PA=
-X-Gm-Gg: AYBFou0XH6gokLHPHjPIRJY7x4v2soYcPQSGr/+VvmJHXN/wSkDLfWOGSpkqRph1+RH
-	dSQADWOKZUZcHQQQ35psWANmupkZkOw3ylmdSHyRvGZRPPtb1uJjUnvup/JQB4vvJQBKCJzLD6h
-	ay34JNku+xgrszx8TZqH2HZprqHxkBcnL6poNOujxSxeWTNyUjYQNgS3mo5DFuWKVodgiKukmyi
-	fwjVQITQrw0F3o+8yFbSYapEPydPW3s0bd/KEu7VOgDUcc1zLP3vm12bAL1T6VTxocz29tfuW7v
-	d0i4wdErLWfP6Ke789YrgNYASMIDWtQTTJrC3mCII7AdUmQiuimJc29P4VHqinJ7fBn6vudkqCR
-	EzWEfnZjZzeMWOrgOKVoY6uGpspLJ4FLioCmWzFKHBrrtgmAPuPHifp+qPeaO7r2dxYOW/kWLaF
-	Qws5KjDAiXYO7vQa4Q3Fwd0LXinP/usqqnPFbIVH9uYlOhzQuQr6XzWyh0nLQfmSStvwhEwnUx9
-	55wtH9kLud9py0+cYKan8Vm51k=
-X-Received: by 2002:a05:600c:3f14:b0:4a2:1612:6367 with SMTP id 5b1f17b1804b1-4a35ac8ec61mr148967535e9.15.1793052505149;
-        Mon, 26 Oct 2026 15:08:25 -0700 (PDT)
-Received: from KernelVM ([2001:8b0:df16::2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e3ebd48e0sm19365996f8f.38.2026.10.26.15.08.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2026 15:08:24 -0700 (PDT)
-From: Phillip Potter <phil@philpotter.co.uk>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	rdunlap@infradead.org
-Subject: [PATCH 0/1] cdrom: new patch for inclusion
-Date: Mon, 26 Oct 2026 22:08:22 +0000
-Message-ID: <20261026220823.1162-1-phil@philpotter.co.uk>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1793060224; x=1793665024;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=6x9+N/COr+6pNBpUPwwvKfGBRH2EOtY9PmyW7dZS2UA=;
+        b=YqeRYPBXEkvCbTr+lbMyiEQ0Qp56DChDdQkxU473Bqd+8G3FbdULgts6nry5PPSWZ1
+         qgSjwXA2xMhtLbzW3rxM2OHwQi1G1QVZyA4JU93SA+232vBJh2dbQJRakVSyV8LkH7jP
+         LQW9JOl/n15hHiSpQ9DWSwIeQi4FhbGk5yQgj2Lf4EgGnuIwRdjYmVsSsardD+S9RCHF
+         WFYeRMyu3bgwQ8qXOz9LCizJu0vXyaorA1icSphkUw62C0QrHws1siN6XrLW3cJ7pHnG
+         +0DxdNJlHzInoLbUjv8+6Cy/CoIf4LDv14bF6dFLmGxAOgFqqfSeVBR75mFDhwk75W49
+         g7FQ==
+X-Forwarded-Encrypted: i=1; AKwUvByymGR38U9fY7N40Ty9iGRExlNyR4YhgP5kaSNdirHO9lmK/n/OWZjnt6EC2lPOv4BjnMTbdlGY+VLqWQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYLFxyWxlqPg5jV1exg3bbasjyJOXD0C0HkEUSGJZkT4UaH13lk5
+	kKkIbAKcrXxroASljcpnqR30NFDojCGFdSW0L4rkgic5uHepIUAIu7H+2X2UaFMcnec9NTJEfFQ
+	UFNTql8LZ76Aje5msASAS4M2R6AeDFWs7YWil9OK9Zt8xp6/eLcBu9ex/fGg=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -91,25 +58,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:10ce:b0:4e6:db9c:9a7c with SMTP id
+ 5614622812f47-55c002ec88bmr4875116b6e.63.1793060224091; Mon, 26 Oct 2026
+ 17:17:04 -0700 (PDT)
+Date: Mon, 26 Oct 2026 17:17:04 -0700
+In-Reply-To: <6ad78978.b5bd089a.6b57.008d.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6adfed80.6200f071.51519.0efd.GAE@google.com>
+Subject: Re: [syzbot] [block?] possible deadlock in blkdev_buffered_write
+From: syzbot <syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, bvanassche@acm.org, hch@lst.de, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mzx199711@gmail.com, sunjunchao@bytedance.com, 
+	syzkaller-bugs@googlegroups.com, tz2294@columbia.edu
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jens,
+syzbot has bisected this issue to:
 
-Please apply the following patch from Randy Dunlap, which removes an
-unnecessary header inclusion from include/linux/cdrom.h - I've build
-and runtime tested this too.
+commit 1b1be9ea4e34ccede1e7cf9ff2b6317328a5b6ad
+Author: Julian Sun <sunjunchao@bytedance.com>
+Date:   Thu Oct 15 09:11:05 2026 +0000
 
-Many thanks in advance.
+    block: take the inode lock for buffered write fallback
 
-Regards,
-Phil
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=165121e1580000
+start commit:   21a7f44fd076 Merge tag 'devicetree-for-7.4' of git://git.k..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=155121e1580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=115121e1580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cb217ea80b9f9fe
+dashboard link: https://syzkaller.appspot.com/bug?extid=bd975ef54294bec73f0e
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1634b469580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=108dd695580000
 
-Randy Dunlap (1):
-  cdrom: drop linux/fs.h from cdrom.h
+Reported-by: syzbot+bd975ef54294bec73f0e@syzkaller.appspotmail.com
+Fixes: 1b1be9ea4e34 ("block: take the inode lock for buffered write fallback")
 
- include/linux/cdrom.h | 1 -
- 1 file changed, 1 deletion(-)
-
--- 
-2.56.0
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
