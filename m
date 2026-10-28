@@ -1,21 +1,21 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793204945;
-	b=FE50RHY5WOUn16ApKOUmSJ6gKsvtGjnh4VgL6Lsd35j2ZmGWllAh0iDbqp+2wC7e/Nf3
-	 +G93BfEJfi1de8nQobwPwHHUfDFQcTenhXd48ICjgFNSF12ofc1ySjm/xXYPTIhK8RI7/
-	 /tAd0dyAagRqNzQvWpqKYy38vvMjw3BT7E/Lx+2tSz1ayEPBPGKDaelYb4CoBEuVw4AiX
-	 cVezWhumYwDvAhHWIj6Wqy0khvu9ueCS1PBSr7yo16YQgIwJreeDWNjSpkC2aumqV2MTy
-	 +shpf3Y50LkqFssxZ/6wwxHXyQNPNNytWCIFSyDuvQqrbKggPuMBl3nvbx27pZjsSXQ==
+	t=1793205062;
+	b=F2IClynd29VKH70NJRONnTNMDQ4BKEwLpasW67qLnKiLsAQOVOhA6/HrgyAaKUBc7Lrs
+	 HkIwlzCFyNcsfEGIyZ9Oz1mP3ofRsHL5YsddG08jBRdgMVADhIZBp7rvrg3b/Eumv64zz
+	 Y9KYw67d6tlj1jvtLVlTjLeiunMGB+VoOIEfH67dLsU7GGmey0ND/rEC5Zy3VY0Us6eBc
+	 hrxFhJ+InyfpbI1ei+2Xs8DnWsbEKyRIzMNXpL4idSyBXMG+Rbxzcw3vp/aXjE/Nw5Xi+
+	 KQ5hwIA/0LDUrcbS0CpkhfiP3+DmVSy7TAQA3xl0A2TmtzK34janu2vGSQ37FKLQVdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793204945;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205062;
 	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
 	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
-	bh=m3Qi8jh6bvyv+rU748JUDXbOoG8wQ0F9dt+Hesa3sxk=;
-	b=U3m874+bspi81pwtCK/E+Lk3YWqNHe7gZCE+k2TTr0JqhkBfjE7i39mA46xvEKvTIMhM
-	 qe/VPpxydZUEWa1ZGK+OYxSvlQZwGVoR1OjwQfuFIVXWYXwAfSbCd2P9nh93VbiKr3JeB
-	 0xwG28xeUD62vsj5EnfSYobXH9HzN4RyxSFM0SRt3Ygv7rwFz+JMuC3KcVkZH41uCfk0R
-	 vxrQw433KProb90KcN6QT9796a3Nm9y8hKRggvIo1ZrfCtmSKA9+Igxdiwj2WjPwQS8Jr
-	 cYfKmt7fbMNyYDr88mUNL4QljaQOUfQLsaStBXdtd3xdLVU9MyFoZW9Ue/cO4apnCww==
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	b=0VX6PQVoi1TebUVdoHcBEnmdLn+31WkH+ZgTAhxT67kCg349GuyP6ej1CE0GeioSu6ao
+	 pfub50+fsKk8a/Ffq9WFJ3QgpQN5Idlt2a4RMw3BfgypSVzAYglKPJaOTzMr4Zokn2SRX
+	 VLT5PyWC59G9RVsdP7ttfhf/JbgIJCMG9Q4OXyM8rk1IIB6biy4lKY1LFTcCcwJLYX3iW
+	 Jyelc3yJfUiZi9b1mTtkgfRGw2WAYCwDsTC6RMUOayMWKj/th2CSikZLBIK/G2///lEi8
+	 wTfdje3aYnY1xlLwuhjgy7DvJ60bxTX5TGHRZCf357bZBqU+ZZTEOQPk7coJP2Ti9Fw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=lst.de;
 	spf=pass smtp.mailfrom=lst.de;
@@ -23,24 +23,27 @@ ARC-Authentication-Results: i=1; smtp.subspace.kernel.org;
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E8F606A31C;
-	Wed, 28 Oct 2026 16:29:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 61E8F606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0F9606A325;
+	Wed, 28 Oct 2026 16:31:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EF0F9606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id C0BC768AFE; Wed, 28 Oct 2026 17:29:00 +0100 (CET)
-Date: Wed, 28 Oct 2026 17:29:00 +0100
+	id DFE5968AFE; Wed, 28 Oct 2026 17:30:54 +0100 (CET)
+Date: Wed, 28 Oct 2026 17:30:54 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Anuj Gupta <anuj1072538@gmail.com>, hch@lst.de, djwong@kernel.org,
-	cem@kernel.org, brauner@kernel.org, axboe@kernel.dk,
-	linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
-	anuj20.g@samsung.com, nj.shetty@samsung.com
-Subject: Re: [RFC 0/4] fs: support dma-buf backed direct I/O
-Message-ID: <20261028162900.GA22640@lst.de>
-References: <20261016091919.971295-1-anuj1072538@gmail.com> <4649a20f-aba9-418e-987f-66f21ab24410@gmail.com>
+To: Anuj Gupta <anuj1072538@gmail.com>
+Cc: axboe@kernel.dk, asml.silence@gmail.com, kbusch@kernel.org, hch@lst.de,
+	sagi@grimberg.me, James.Bottomley@HansenPartnership.com,
+	mkp@kernel.org, bernd@bsbernd.com, joannelkoong@gmail.com,
+	miklos@szeredi.hu, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, fuse-devel@lists.linux.dev,
+	joshi.k@samsung.com, anuj20.g@samsung.com
+Subject: Re: [PATCH v2 4/5] block: map dma-buf iterators in
+ blk_rq_map_user_iov()
+Message-ID: <20261028163054.GA22862@lst.de>
+References: <20261022144501.2478417-1-anuj1072538@gmail.com> <20261022144501.2478417-5-anuj1072538@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -52,22 +55,10 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4649a20f-aba9-418e-987f-66f21ab24410@gmail.com>
+In-Reply-To: <20261022144501.2478417-5-anuj1072538@gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sun, Oct 18, 2026 at 11:18:27PM +0100, Pavel Begunkov wrote:
->  	file_ref_t			f_ref;
->  	/* --- cacheline 3 boundary (192 bytes) --- */
-> +
-> +	/*
-> +	 * A tag representing the underlying subsystem for dma-buf I/O.
-> +	 * See struct dma_buf_io_ctx::importer_tag.
-> +	 */
-> +	unsigned long			f_dma_io_tag;
->  } __randomize_layout
+Looks good:
 
-Growing strut file into a new cacheline just for dmabufs is a no-go..
-
-Also note that a file can be placed on multiple block devices when
-using RAID or just btrfs placements (not sure about f2fs).
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
