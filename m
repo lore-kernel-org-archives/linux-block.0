@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205985;
-	b=3hmdS50Ixh4H7XzetW3OooYEab5CS115USBq6CtKLhIz7PttFsgkQRyG9L/bkTnu0DZc
-	 61GU9Du/hJtNhO79L/Q+GLXfMQDfTCx5+6nS87GxlAkcOH6H1Pkhb30i5DEue6N6vKC0e
-	 VKmnoseLuPfH7HZhfwzUy0zY/1Y2N4Ke/kSBS3B5e7cVCDqMGxizexHyNOT4UEQjPaTM1
-	 J6bb4E4KtIuzVfhu4b2ybiGhAsVnaMZZGwHIiOmOSEVGvAsOBFzHqOkIySCiOfR/cxzIm
-	 WChluO43vzTcs1xULow9tHhKRPf/cRCfInI5BhxscP2dVBMTtzKmECeNlDwYE5cn22g==
+	t=1793205986;
+	b=htM5BGKey73phj58/33HpnZ9oykZVG5hHIfQ0KL6NUpSjrYor8YmlXdLzw7tOPOJKAz5
+	 C/2cogn0iChiXFNdMCn9Hon0lJhnvWY9mnZPzlVlLtULNEyD5wS+5MU975+klhXDGYcxP
+	 Pds0vzQutK60mpsgwX6fNOUq97KsAWF3+kD8D/QS117VfcrYUjWlVQz4pEchBrmdRIj4m
+	 C2GzHn9T4HM4isEsPLMMsqzGCiUoB/I37w6hC+kTWTWJq/K99+Zt/NYA4BSiEXKNmCffH
+	 5E1aZDre3wmKZSO56Rlq1oQ76KMfXDbGZ2GbbXj2gC5d/RiCiFtLT5/EZd9a2dfDC2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205985;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205986;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=weYgcu8mKXNQr92B1C0Qaaoo7PE0FKjrVVwXEWqleNE=;
-	b=QNo31iZoyJiEUKwRl77OWBaytXt+7l5MlreYNKweEn7qDHzrunfhmGikxB2F5ei5upKm
-	 gLnkbJXydIGYSKYjdaxtVr1CSvKBcwM1Bu5GWKwF8bT0yLVHCv+5P6qL8s70U13bRVbqL
-	 uRwS385K1JQa0BPhxyF61z5LZvQsQEyMoMx4xLjqdLWONWl3JUIcC50oSQPjEuHsGyAUf
-	 p7LwPmfHjQTX8wx24ut9SsYimRXQsh0HGDqAa8vcE3kgQ0t6p7m/HDyFi7QTUpKZuwfRf
-	 CTzNi1v/z+NywvEs5MC9uC2Gfv7w43jCesiNHZ63cgwM8c/CCAEXk6sGEwT09Q8CNOw==
+	bh=VR2GONG4WVNQ3EFbUrt+wzYPw7dWLYE3NUVtoPlCoRw=;
+	b=vCNzB6aa+DdmO3pQpxR2y+K6KPNxYU189xWnwGPOUkbdIU0pLDT2/aKv0UIN/kuQLw2E
+	 h6gevFpvyNVwAqRULLPAboJll08TcikbzYUZ8TCe6aQWEI+thXb+mGQXFu8jCykZ+YmZc
+	 Ng5u1PY+soU2z/F52fXCkaUSQtGU4666e70qt8BmtV0hJYdsBr0/3S+bIO2TMwkZ0e3or
+	 d7Cx6U3qEogKFBMA1GP0O+hzx98quSKvpRVfDqbKDRqDHpiW4+rbJt9CLMeMJo0r3QnNi
+	 Zy/nUKcgi+dM/33lOVcaeSg55PAs8M8rQrpk7djVwDg9dED+wg5zOW0WRFYGhTmeJWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=nRoq2n8L;
-	arc=none smtp.remote-ip=209.85.161.46
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=QsjChizU;
+	arc=none smtp.remote-ip=209.85.210.51
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00BD60A3826
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:46:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B00BD60A3826
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613D060A2600
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:46:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 613D060A2600
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=nRoq2n8L
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-6de1fd5f572so605494eaf.3
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:46:24 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=QsjChizU
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-82109f51565so597042a34.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:46:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205983; x=1793810783; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205985; x=1793810785; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=weYgcu8mKXNQr92B1C0Qaaoo7PE0FKjrVVwXEWqleNE=;
-        b=nRoq2n8LgsNIIZun7aNhN5ZM/Ln/Vlsx/S6EcF7Kg6iTxf/b/E1cTKgWEH+crsqvsn
-         fAtxIOWsOYOa8LAp2pm7DfzLsj6npIqt/fsiAFk2WnYoVk8aTPLaq21BUrdAatwJBXgz
-         veWrLDTwj8TjAMXpACdjEkOKW6TIARye7uzhpgrvVXP4r6F4cXTTK/2Td/EcKMeIGBcl
-         +eBWq8cm35iYbihSaGy7/zjeK2xDvHayyWlDetB8QOivJmLRqDWYsM9IHHnuImn96BL4
-         iPKsHYZ+JJDYgHV61YaZIdiBSJawna5dn/BNl5QwyKYRpMfCSUQJtqMSxcIaYCyBT7Da
-         Y+5w==
+        bh=VR2GONG4WVNQ3EFbUrt+wzYPw7dWLYE3NUVtoPlCoRw=;
+        b=QsjChizUZvRLJ6DDvOjACbJZpZp60zAD5kze8m0qrVrkgly4LYI++/OISFFjp/T96D
+         WQQWM2cz8FDFqHNwSjwoJO35043E6Ay8xjBWe7Da/Mtp+b+5Ah/MiSEzjPpqfuUZPLdb
+         fc1vTroAI3/TOnDlnx1eLweaFoR7SlYbM7prprJCyD/wye0k4R04TomCUfLhaO+RBfyR
+         zh+Bt/bpvyLsxJGyY+Tc+i6g8GCAOFYzR1Nto0SukGAOZkFwRK2tGHBnEKUrsXOalkV9
+         1MRgjcOIP/+uasm42Q/f7Q7GZ5MlExhtNguYwhAzAJbOWF7miewwtc5sZKZX16vDKYLN
+         qoqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205983; x=1793810783;
+        d=1e100.net; s=20260707; t=1793205985; x=1793810785;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=weYgcu8mKXNQr92B1C0Qaaoo7PE0FKjrVVwXEWqleNE=;
-        b=vLdtuHeXrA+bWurEE54SWgZaC8kY/vOxVNWDHIGySdli8d8TGXkCmTfhOBnQlJJX3W
-         FIwWz6E6+ycWP9IWSE1sIa8QPLxWxWX7a1YVrCQIk6evGwukroVxPLiveCOm3nPbi//9
-         RTXu1EX2VCQRktr+Ur7XAihtCgSGVUKU+9b5VF/kkTKqHp2GB7hNCNR8Q5V0C9xnbKdE
-         jirTepZ/XBRfOTIla0AtHLmaXIKHnBeP3ZWmzpT3xODTVf+iiXNGmkEzpdKEyXUZUQHC
-         OiveAgg/gXJkGLRnDTFGuRtY07lt/5u7rch18LCrtTlCjTmtCtODpTPvKW+5OLXT+DUF
-         BHBQ==
-X-Gm-Message-State: AFq9FYLrWSxlkvs2njPy8Wd2dfBEuZNqEuzsgGAOOLD3afrq8X6JZzHa
-	T5HuDgUQ7qjHuLODsyB990Vwp0ACm0K2d13aVoOY1d3xp/sFy85YjngttOiT/x04ekcIp7WX8OH
-	s9SUtpDE=
-X-Gm-Gg: AYBFou2tmEvzXTGOJzGtFay+T7I7SPDgpR22m2C+4rNIYFyy5b1bmVa4ewRoEzyX0Ua
-	MG3l36Om9DPI+Sgizvo8+C3Hr3ePphu8LjpNK6le1UYEvZzKDMYsxbGf5pYLjrjn8C7D1x+zeFt
-	yQHFv1S8bTI60w8uqJW2ktyNoh7Z2p28yr4EtijlJaJ1bPFA8TimLBuqDrlV2cF9d51CCC+OkDq
-	8JduvJOxxgbdNG9RXs+G5d1i/EL9C1tZsn9AlR0zhic8z0fSJiZvGkJfb2fya6or4Z4+sHeACC+
-	BWygOTnbvA8Fip3bhYcApbEIlH3OnvbZWC0cpiRq9g9zJkoHXGth3uUAjOp+AFL7Ik7QXVCl5QC
-	Rh2uxsfYBrtcGS/iZu2P3LE0r4Do+8QUj7L7PqZD8GSvY4JsgmWY0wqXPBB41ezgmF8BJOc8Tnr
-	oteih73HG7ikYNakaCb2lJijVxBWHM8VXh0fejBX5P0qcyo2iEB007d5HeSWqdlRZmBl4QtnlHK
-	BfD9eWEUy0I/mp7QYFpNW9Zcu3P4vl04MyBi3WvUzQJOR9uc5Tvmh+Yc1r4/7giim66980j9GUT
-	MhFZRvJWNHArlGJEb+OvjWOuw0wAP0I4B96ieUGT3Stxsz7ixdfxpP9n+VXG/IQFpEsPvrW6dQ=
+        bh=VR2GONG4WVNQ3EFbUrt+wzYPw7dWLYE3NUVtoPlCoRw=;
+        b=heQD0XE9c1c32Y7NL9n2R1JKYpsQ15L6CYAGj0zyB24bjwc7BoBrq/zzMD4xAcrrY6
+         VFTsjFjxNmJBee+s7Gn5OeJR1Kn5rKnYIwk9ES6lFRQ+MKGbVvDf3FAxKpA+1KWyWYKb
+         Skqv8r003wEJaux80jv625TZI7op5hAqKreIJXGah20j+IbdG9/B6S4BwB3UBUhGBJhV
+         fHe6vRjo5+XFVyexHXuAKaclFOdVzQp/M4dA9i5qZmyWwj3BCkjWxxKA1/yl8eE6mvhk
+         tfN8vj3l2jr+r/mhIAEz447rz56rsymrWixF5I0sKguGesfxgN4lkwT5PIu/2m1Fvsih
+         sRvw==
+X-Gm-Message-State: AFq9FYKZRuxTHS+au4pQb5F+VGUKr65QlgPx3xgWiJlxBebhfnyGD2u3
+	fXIVbN6MCzdZ72v8Blkx5nRDgl3VPf55Mycsp/ALEQmNR0BDlXyZpU8OBWEcbbO+zbJodLq51FY
+	OQSYhxz4=
+X-Gm-Gg: AYBFou3sRwxi0zMK2jB2s9q+LGY9sEwCnD/ZEFr2CO9mj73twIyd2Qwq0MM1lUcEdKy
+	41+bS8xKHdHE64uTghbjCEqeX3/KEZYnpVbtRu82sgBUuc5ONpiyMoAdzGS3YQCULVHmPTSQbR0
+	eBgKUMtu3ntpD/OShXj9Jt/wrlF2HFhitMV/wqTyx92WQTY3B9nFYQosu1SaVotkNu3h+TvYyEB
+	mPLscAmcxvRm2xO+YxpV+k3PPCkQnclmUR9WI8men9NeLcx1EaKWC6lzzp26H6LTiYW6sAbwH4z
+	lO5QbY9p1zwYxezX+mud6nnlStMUm8W9HPUx5EFZiQJ69oAIRLzWbuFhs3kpGJAWi8IuLBIL8+l
+	t0kuSzmXuM4htSeH96vIykdgsbuxC9HboMOZbeEhQH98P0mwYKNsJvUNbHmlHJ1soJqIJIgVh8M
+	8esDgyTPgOksvtV3xdi28y3euTFG/1Uar//89sJf1zxXCtseFP5/o5RJI7SbZbvTf2OIciOt+YF
+	F/hwzTN9kzbVqjkidhrHer/5LyTrCekocwrsfratCVobTzuvjH3UOopB6NJYVcmPEHO2PNof7wW
+	RDCW34HnCtntSHWqwpJRZ8n+3/ZAOfY0plygiUu1FcZN/xA6Y2C297GxNRLY4Xa/IMZMuB+lxg=
 	=
-X-Received: by 2002:a05:6820:3519:20b0:70a:d839:2b35 with SMTP id 006d021491bc7-713effff5e7mr1146154eaf.86.1793205983473;
-        Wed, 28 Oct 2026 09:46:23 -0700 (PDT)
+X-Received: by 2002:a05:6830:4aca:b0:7dc:c7aa:22c7 with SMTP id 46e09a7af769-85ab3f72a06mr3165810a34.0.1793205985356;
+        Wed, 28 Oct 2026 09:46:25 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.46.22
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.46.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:46:22 -0700 (PDT)
+        Wed, 28 Oct 2026 09:46:24 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Chris Mason <mason@kernel.org>,
@@ -86,9 +86,9 @@ Cc: Chris Mason <mason@kernel.org>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 97/98] nvmet-rdma: hold sq->ref to post a T10-PI Read's SEND
-Date: Wed, 28 Oct 2026 10:42:40 -0600
-Message-ID: <20261028164415.1262013-98-axboe@kernel.dk>
+Subject: [PATCH 98/98] nvmet: don't clear sq->ctrl for a Connect with sqsize 0
+Date: Wed, 28 Oct 2026 10:42:41 -0600
+Message-ID: <20261028164415.1262013-99-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,57 +105,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Chris Mason <mason@kernel.org>
 
-For a read with T10-PI, nvmet_rdma_write_data_done() posts the SEND
-after the WRITE completes, and by then the request has put sq->ref. So
-nvmet_sq_destroy() doesn't wait for it, and the release work can reach
-ib_drain_qp() before the SEND is posted. The SEND then goes in behind
-the drain's own work request, nothing waits for it, and
-nvmet_rdma_send_done() runs against a destroyed QP and freed responses.
-Seen once as a use-after-free in sgl_free() with an SRQ over rxe.
+nvmet_install_queue() checks sqsize first and jumps to err on zero,
+where sq->ctrl is set to NULL. Since commit b71df12605ca the cmpxchg()
+that sets sq->ctrl comes after the checks, so err now undoes a bind
+that this call never made. Over RDMA a host can send two Connects
+together and the second is parsed before the first executes, so a
+second Connect with sqsize 0 clears the sq->ctrl the first one set.
+The reference it held is never dropped and the controller leaks, with
+its cntlid, until reboot. The discovery subsystem lets any host do
+that, 20 connections leak around 10 controllers. A pending AER on such
+a queue hangs nvmet_sq_destroy() forever, and a queue can keep its
+"authenticated" mark across a rebind.
 
-Take sq->ref with percpu_ref_tryget_live() while posting the SEND, so
-nvmet_sq_destroy() waits for it like for any other response. If the ref
-is dead, release the response and post nothing, nobody is left to read
-it.
+Return the status directly, as the two checks after it do, so err is
+only reached after this call's cmpxchg() succeeded.
 
-Fixes: b09160c3996c ("nvmet-rdma: add metadata/T10-PI support")
+Fixes: b71df12605ca ("nvmet: avoid duplicate qid in connect cmd")
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Chris Mason <mason@kernel.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/rdma.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/nvme/target/fabrics-cmd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index 994a668f45d6..fe426a0f7e57 100644
---- a/drivers/nvme/target/rdma.c
-+++ b/drivers/nvme/target/rdma.c
-@@ -862,10 +862,23 @@ static void nvmet_rdma_write_data_done(struct ib_cq *cq, struct ib_wc *wc)
- 		rsp->req.cqe->status = cpu_to_le16(status << 1);
- 	nvmet_rdma_rw_ctx_destroy(rsp);
- 
-+	/*
-+	 * The request has been completed and its reference is put, so nothing
-+	 * keeps the release work from draining the queue pair. While we hold
-+	 * sq->ref it waits in nvmet_sq_destroy(), and the SEND is posted ahead
-+	 * of the drain. If the ref is dead, nobody is left to read a response.
-+	 */
-+	if (unlikely(!percpu_ref_tryget_live(&queue->nvme_sq.ref))) {
-+		nvmet_rdma_release_rsp(rsp);
-+		return;
-+	}
-+
- 	if (unlikely(ib_post_send(cm_id->qp, &rsp->send_wr, NULL))) {
- 		pr_err("sending cmd response failed\n");
- 		nvmet_rdma_release_rsp(rsp);
+diff --git a/drivers/nvme/target/fabrics-cmd.c b/drivers/nvme/target/fabrics-cmd.c
+index 089e3082c388..5614849edece 100644
+--- a/drivers/nvme/target/fabrics-cmd.c
++++ b/drivers/nvme/target/fabrics-cmd.c
+@@ -186,8 +186,7 @@ static u16 nvmet_install_queue(struct nvmet_ctrl *ctrl, struct nvmet_req *req)
+ 		pr_warn("queue size zero!\n");
+ 		req->error_loc = offsetof(struct nvmf_connect_command, sqsize);
+ 		req->cqe->result.u32 = IPO_IATTR_CONNECT_SQE(sqsize);
+-		ret = NVME_SC_CONNECT_INVALID_PARAM | NVME_STATUS_DNR;
+-		goto err;
++		return NVME_SC_CONNECT_INVALID_PARAM | NVME_STATUS_DNR;
  	}
-+
-+	percpu_ref_put(&queue->nvme_sq.ref);
- }
  
- static void nvmet_rdma_use_inline_sg(struct nvmet_rdma_rsp *rsp, u32 len,
+ 	if (ctrl->sqs[qid] != NULL) {
 -- 
 2.56.0
 
