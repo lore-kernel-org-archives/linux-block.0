@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205956;
-	b=KqGAiFGPSUbN9+F6I7K4cH8JQEh6/irLZX3ZZ8TR36IbTg93Whf6GFdcZOm1JTqkzGtV
-	 i9pYwXwen4v/pPQt2u7b3ZDJPwko3OY4TZzk68S6bECw7qhTFdlPW5tqXQeugn9oGu3at
-	 JI+3Mf6H6tDW5UJjuaFDhFpXCcuUEvx7Ox9v4DIEILCNN3d8FeoitWBnJhNuidLbgUg4W
-	 ltcMzgs63Qw8h6DXdtlm2NuO9v3EfZMeYyoJH6gMJG8nD4nQyuCjcyMgViyTC4ujwYebD
-	 VM+R+ohMFOR6q+3KsCVu0UKGFlU0Ujlha2FDH8hWyqJ01uZaqQrYS+fE3209lrVGWOg==
+	t=1793205957;
+	b=CyckKirZZYr1F5dr7sRs1yAvJLtF3wyRqImm01qRLpxoqbNwJ9IjlxOtHquCu68AVzQb
+	 1WNb2Vzt0vC8xMECu7bsgen9qh8wV7i4S9MLxNvvWaFfE07jhVZq/JYzGCMO6/XI496wt
+	 5yDoloVPV5NUJEUQKQPhNlQmbKTIuCmdN2ytQeAhVw6tE9t1nGU0xMuPfXIUQwpchgPck
+	 /3pwufPWcu4xgHXAd0V8erNgegevx+yqAzgy6ip5LeQ0NM+yxvBPO1wBBU7uogL6HHoED
+	 vep666emnh8+uQAqB7yD9iwts5V0d59KuzbVj5FH4Ze3rlXyYlWHoCMIZKaIGy3GFlw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205956;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205957;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=GaOTmO/bbLtGMmtnPn+tjbW+1YjHOYPXeDO/srKr8RE=;
-	b=gj9mnT3CJjnOtOdFfKlAEaqI4pzezqTW9FAdn3vcurvX9ryLl3df69XlvPhUPJam6mA+
-	 MNJQIxe+6QfWCo5fBdFMjs8rOC6ntxdxEpIxckrE2VKoW+BkabsP0DHdbfAt74704u9RR
-	 3t+Vg4Q0fe27kEyWlOjMVjIVtD5L3PIH0DLyQ7JtE5fdqOVRskqdKouTth/+LtZMYGONA
-	 hNA74T5JqnDfv7nCElMXdOI/GAGjVjV27imgJYJmkvOtvA3LsQZbthte4awNnUeZesLnL
-	 Z7JSmMWVw7KBrCt6ysAGyWNamy4W/ADVx9AiWQ/ut2GiYkqdZg8ISspG1sWMfA34sJg==
+	bh=0yyVHnQAONT+EmgcmIfmXULaneSpLwENXFzePU/qa7M=;
+	b=Pttvt1rEbZ9YKThfGwLJQlXh04jz22zb1PqWpXtzcucg22urE8M2LqmbgS/YpBx12tWP
+	 O/0gqBxurcaIh0GVu+C6Bj0u91nhEagUY0rgmT/eLIImxZjoF5M3P7Msx+NVmac2r/piV
+	 oTss76EWO/5kFh7oowSLvsiLDt/l1uL2C8hMc2aEtuGteqg/99Hv1us5Cc5P+lSiTgP1b
+	 A+pMaW23hDcpkwcNLnIA0upCkYF8tS8W61JP/FKbhqsrsnp6g8y2BfHL+om2aRG1Q//RD
+	 TQIOECUGbTdqU6W6qTDjAlJrx7AKEDu+EcQ5UQ1yRf1kOXIeEe9H+60x6lAnDPO+oeA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=JPVETtOP;
-	arc=none smtp.remote-ip=209.85.210.43
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=PAiTDzpA;
+	arc=none smtp.remote-ip=209.85.210.49
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD0C606A321
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBD0C606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9F7606A31F
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1A9F7606A31F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=JPVETtOP
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-85a5455bd3cso734323a34.3
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:55 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=PAiTDzpA
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7f84a55e31aso754501a34.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205955; x=1793810755; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205956; x=1793810756; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GaOTmO/bbLtGMmtnPn+tjbW+1YjHOYPXeDO/srKr8RE=;
-        b=JPVETtOP6xrq1FZ+UyB5hL6D7QtC2mhbCA/s66TQGb0ewuaoeN4zdujlaJdlk4xbAv
-         YTZGG1I3wOPE7bx9cNQaT9S92FMMBKd/uELYXP7dHpl4GxS/cMyP6Mm/BuLhdcRgj5ln
-         MgyDBKGtc7hIxCQVLvXMKFEllBfyNBEPuy8EbZEfIpp+uY2erS4BmoPpme4CoTNHD45M
-         zFFIIAtBrfAzRtXU9ugRW5V5x/rX9Yqad0IDXUNySiEcqVlBHBcnwdn+OgfxYrIFKa4v
-         Gj1cXGZF3spg1siS12lUi58LkdhQB/XuWkezd8fWUInPJf0CGIwfxOH2ourJEYIqEeAR
-         sbuQ==
+        bh=0yyVHnQAONT+EmgcmIfmXULaneSpLwENXFzePU/qa7M=;
+        b=PAiTDzpAb8e0jnHIxmNIpb28jDNaKpojO1b2NiTQcfn2z4NqgO6CC9YKpfZGsy+Tzr
+         ygspvnpq/HBvJtS4uCdZxssknKQE8V2iynHFyArPMJO6kZILCrzXoJL38wexi3s7y5Bb
+         x8ua6cUu3CTueltRTKZi/HCPtaZmEzU3ikw3S+aSU5nQYiHrejxTvDuKsL9uqBMG7tSW
+         xMU2nmaUKF5fA7hMEF8mH0B6koSyTpKfU3s/TeKfeBJwq5fXHOL8nHriroW9EZs0yz2u
+         N7lev89OwA2ZEtDKPWjqmR4neG6rPhgBlKiESz4g0NQSlvLOf3/LQEVVHAp2SDAzS2rn
+         iV2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205955; x=1793810755;
+        d=1e100.net; s=20260707; t=1793205956; x=1793810756;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=GaOTmO/bbLtGMmtnPn+tjbW+1YjHOYPXeDO/srKr8RE=;
-        b=HtgoABSrensMnuFX7Y+6oyS5rB5j3ztN+beUULgwpUAJ9PM4MZQjLoPes5wgXkiWad
-         K/zHlSSUmpWv7VbuWnFSV6QfBDdOH5ULWNUzb54X/rjcDs3+6DmHHZRMevwJkqRj4ib3
-         muYPH4zdfZ3tuCGDocR0UzRR2RwEDqY57pcfe0uyR6A0iO960wavJxQFG9fNQtNsUA4v
-         Hc96H3t5xJ03RSwqTKdEswG9SbIqRqN/19qZn3nl/Hs1uF3qKvf67hn5HnppnwgwXwX9
-         RZf1+f++ppUPL3rh9JyU7YKdkA10WFNUqiHAEiNzrVoPppI4bzBQx728xkLgtyFm1QIu
-         OAow==
-X-Gm-Message-State: AFq9FYJPZus32e/tVdI09DB6oLYSIaLj12V5anhFyFotLWw/HJ9GhJYD
-	scPAHNtbB3KUxwbwT+h1D3d9DOJS0oIjtLAztlM2lxiz6pPpDVLEKCvVGAUVLO6IIyZMfnoDjtN
-	DVVa7Uu8=
-X-Gm-Gg: AYBFou3yocIRkRfWJzImmP69+lfXTUxzwJFRaauS89fvn8KBn0j6vizjE2RJo5Tdu98
-	YuD3MDD1WwgWSmdDgh9ZLo+tpPDNAUug/yWuY2DesBC+3B1uT4cZqhLsG+xs/UY4ukiuH0ucmXp
-	Opjh9duewlP9BkpMjXP3ei/GoMDI0A5iOpiCefSw0f+yioE1w+yhbt3y3Eu9BaZf1kNpLD75Qre
-	ZS79ALgQk7ZC9zCncfkmhdVHE+y4fPVHWvHnsuI3Pdx4+sG1ClAHCNk7UCOayejQkr08E4RwMec
-	3/biYpXkloooPN1TdGN2tBGYtsYV44WzDJOIwvXXq+E45TZ61rsgi5ODexY9tldynUqUNwfkS/2
-	mTYI8d9zWBSjHMJuKLiDgT15z8VxizezpA8sK/8EQtXUyn9J/1MYpleCbkskmjzRDS+nDiaPqY0
-	GQjjXpaupn2IKoq01fc/hBHbcVw+IlT4CvPzEdKZdT3BvCTIYK3sTUXbi/u3P6EUBI+tC55/gRl
-	L4806+0ronBL07uJbNyu3E2SI/rM6jggZIt40aIAcef9brcvufjuqgC1MdWkZZhiC/wDwHQ4VNN
-	ceA39YSFj1ANoWngkFqSRvWvKouXd/68oynlElXsESXlGkq4AEuqD5EfLM7YmrmXFDZYzHvPcg=
+        bh=0yyVHnQAONT+EmgcmIfmXULaneSpLwENXFzePU/qa7M=;
+        b=TTa0SZkvfIU9Xxy76H4Dh6AoGszV8wbzNC4WMoMgkvPepm9AkZJhfHvJqW8lUwI6zD
+         YLkj72ckjcSmoJhouAWozxeZo06F2hGsWUqifmryMsHiKXdRYX6jHNe5wZyJDCNANOjP
+         u3ojVGcX7XSUPcAndC8rJp2mDK8vBAyxsGPF2HERuf1X1fnqcrEW0+L+l/5mPXdMw7g5
+         5eqf9KalBM9wP1tslnbdrKMYLBY18Q4sQjXs2LVUqTLFI9bw2SkcNZOFKhZNMg5mEl2H
+         qWMj7B/6NNaSTidkTFbK90jh+nFZTd1WcAUyBJ3KtNRrBmOprjZIV+7v4GyDMrLvCnM7
+         bX+w==
+X-Gm-Message-State: AFq9FYLf5qpEt/5N8emjhdpqh9dKwdaooNHfn1fdKMiBXce+P+jznJeU
+	5rpkiISEOamPOxPDrn+kWpqK+QxdSuWnEEIfrtalnAKNPuLxlJqR4OUUUV/fRr/47ISikl+MsX/
+	ljksaaec=
+X-Gm-Gg: AYBFou1kTkeIPm4/RNbdi4WMIsggzVMOgjHp4xny2hgFYSQV+5DbkMM1X5pmb8Nr9ak
+	cWEZvTzsZmPgV6PfvkLG6VoPGVzH71JcUND6Ui8UBti9M/M7FPvlySgluQWxhOTzFTgN9hb4kfQ
+	SVv5TQcXmCk72jm6PxpuPxcXIgjEfw2sVU03nJUN8VPrNtxtB+XKbCNPXBfRqNWFzrTfESvfXbl
+	XGLrcAxZK1oniDtixXzl2TK5lAYtZaLoE2PnMd5KwALJeP8FBaLR2AjD9oAmfqop2+0n8byJeTv
+	GPaSkHbvMKwS440k1ORnPQgON5/Arl5smdN/5zOVJ6Q6SUHl9qig45L1rq3ZAgzxziZUMGMpSgc
+	kwyeDIVMD2zI9+gLI3rQt03aoWPMp9oTK3IU3jgn3GRejAwlgj/Kf0vx5nvucRGTSZzbGu0Z2ZB
+	z7ODIIM0TgLikNocJlHv7sHDnAw9tuaN7P7cDCKzI+PLKZ1SD5GBKObZ5xbjqO2+6DCnvpp1zq8
+	PrFNedZyc+bIXH7jC1JYjCUmXzMI8GVOkirmVbiHj80UXorAQFAfeSyPfjs5jUE3iKizgAmYK82
+	qlW04pLsdh/ndyrHmERZpND8y7EZOgFJrMuQtjNW5zYKhiecLmdu/1aW5vEOrAHPX7+C1hKNqw=
 	=
-X-Received: by 2002:a05:6830:2e05:b0:81f:b957:abba with SMTP id 46e09a7af769-85ab9876299mr3277432a34.23.1793205954735;
-        Wed, 28 Oct 2026 09:45:54 -0700 (PDT)
+X-Received: by 2002:a05:6830:211a:b0:85b:895:a01b with SMTP id 46e09a7af769-85b0895b5c2mr2043041a34.31.1793205956029;
+        Wed, 28 Oct 2026 09:45:56 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.53
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:45:54 -0700 (PDT)
+        Wed, 28 Oct 2026 09:45:55 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
@@ -86,9 +86,9 @@ Cc: Josef Bacik <josef@toxicpanda.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 77/98] nvmet-tcp: let the accept work come to an end
-Date: Wed, 28 Oct 2026 10:42:20 -0600
-Message-ID: <20261028164415.1262013-78-axboe@kernel.dk>
+Subject: [PATCH 78/98] nvmet-tcp: don't read a removed port at Connect time
+Date: Wed, 28 Oct 2026 10:42:21 -0600
+Message-ID: <20261028164415.1262013-79-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,15 +105,16 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-nvmet_tcp_accept_work() loops until there's nothing left to accept, and
-anyone opening and closing connections fast enough keeps it running
-indefinitely, since tearing down a dead connection takes long enough for
-more to arrive. Whoever flushes nvmet_wq waits for it: removing any
-other port of the target does in nvmet_port_release(), and so does
-unloading the rdma and fc modules.
+nvmet_tcp_alloc_cmd() takes the nvmet port of a command from
+queue->port, and the commands of a queue are allocated from the io work
+when the Connect arrives. nvmet_tcp_remove_port() shuts down the queues
+that have no controller yet and frees the port without waiting for
+them, they're released later from a work. An io work handling a Connect
+at that moment reads the freed port for every command of the queue and
+hands the result to the core.
 
-Accept a bounded number of connections per run and requeue the work. A
-flush doesn't wait for work queued behind it.
+Note the nvmet port in the queue at allocation. It outlives the
+transport port.
 
 Fixes: 872d26a391da ("nvmet-tcp: add NVMe over TCP target driver")
 Cc: Christoph Hellwig <hch@lst.de>
@@ -122,43 +123,39 @@ Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/tcp.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/nvme/target/tcp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 908614fa82b0..a0adcc7f0740 100644
+index a0adcc7f0740..4cc65decb02e 100644
 --- a/drivers/nvme/target/tcp.c
 +++ b/drivers/nvme/target/tcp.c
-@@ -85,6 +85,7 @@ MODULE_PARM_DESC(tls_handshake_timeout,
- #define NVMET_TCP_RECV_BUDGET		8
- #define NVMET_TCP_SEND_BUDGET		8
- #define NVMET_TCP_IO_WORK_BUDGET	64
-+#define NVMET_TCP_ACCEPT_BUDGET		16
+@@ -151,6 +151,7 @@ enum nvmet_tcp_queue_state {
+ struct nvmet_tcp_queue {
+ 	struct socket		*sock;
+ 	struct nvmet_tcp_port	*port;
++	struct nvmet_port	*nport;
+ 	struct work_struct	io_work;
+ 	struct nvmet_cq		nvme_cq;
+ 	struct nvmet_sq		nvme_sq;
+@@ -1544,7 +1545,7 @@ static int nvmet_tcp_alloc_cmd(struct nvmet_tcp_queue *queue,
+ 	u8 hdgst = nvmet_tcp_hdgst_len(queue);
  
- enum nvmet_tcp_send_state {
- 	NVMET_TCP_SEND_DATA_PDU,
-@@ -2145,9 +2146,9 @@ static void nvmet_tcp_accept_work(struct work_struct *w)
- 	struct nvmet_tcp_port *port =
- 		container_of(w, struct nvmet_tcp_port, accept_work);
- 	struct socket *newsock;
--	int ret;
-+	int ret, i;
+ 	c->queue = queue;
+-	c->req.port = queue->port->nport;
++	c->req.port = queue->nport;
  
--	while (true) {
-+	for (i = 0; i < NVMET_TCP_ACCEPT_BUDGET; i++) {
- 		ret = kernel_accept(port->sock, &newsock, O_NONBLOCK);
- 		if (ret < 0) {
- 			if (ret != -EAGAIN)
-@@ -2156,6 +2157,9 @@ static void nvmet_tcp_accept_work(struct work_struct *w)
- 		}
- 		nvmet_tcp_alloc_queue(port, newsock);
- 	}
-+
-+	/* There may be more. Come to an end for those who flush nvmet_wq. */
-+	queue_work(nvmet_wq, &port->accept_work);
- }
- 
- static void nvmet_tcp_listen_data_ready(struct sock *sk)
+ 	c->cmd_pdu = page_frag_alloc(&queue->pf_cache,
+ 			sizeof(*c->cmd_pdu) + hdgst, GFP_KERNEL | __GFP_ZERO);
+@@ -2048,6 +2049,8 @@ static void nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
+ 	kref_init(&queue->kref);
+ 	queue->sock = newsock;
+ 	queue->port = port;
++	/* The port may be gone when the commands are allocated */
++	queue->nport = port->nport;
+ 	queue->nr_cmds = 0;
+ 	spin_lock_init(&queue->state_lock);
+ 	if (queue->port->nport->disc_addr.tsas.tcp.sectype ==
 -- 
 2.56.0
 
