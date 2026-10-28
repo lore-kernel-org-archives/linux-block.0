@@ -1,91 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205893;
-	b=mZfejCo5DG1nX8yGUZ6Byi0V1BWBfslMu5UjZx9/Yt8SJ1Zxyj5XbiE6DBUmvF39203I
-	 jyTy2QoVvvg57ICEx6i6f4KaRcYmnDcWqT/zS7yZvwY2ImyXk/CFaeX31wlEsyU2CuiH2
-	 8JqsTs6tQViUzI3bWx+1S8hDRRi3zMTSsnwGnm7jx92IGCAnSIN2G95o7yP3yXMWTiD8h
-	 db5+2DjWg/Tp02GYgaoZBCYlZBFsUoHSZ/De8a89Xgm0Stqm7ih1cilllN+zBKYhtVT3A
-	 JGR/ZM82x+n2ugI2nrsFFGNq1pUT6UiINCljR3Z8qDWO3/+Kh19YWug9cMCj6eB7jpw==
+	t=1793205894;
+	b=1SOyO6BvfH5U5KU7GnHqV5u0Dr9Dxjp5CDLfR723ESATrQ2n/vTwzkM0+KdXUNAG5cSH
+	 mlOj4jS6i/PUTY10ASi1z4T1uMV3c1+De6+UZmgiAXPzEUyHfjyCfQcOwfiTWuRwQH1Ql
+	 0vqV9IvetkKiUQVjeFfeWbWK0hjeIDvt4vcp78CdWMJKcQdCWMfny0woPCgkqVbV08YJW
+	 PXBYZNNw/1Vma/ss81WySDSkEanJ1kHP9RtFarVj9n4mh5KSf5GF5D98DxbbckTdRPvDi
+	 9FOJD53MYvPeV4VTtrw0FIWl5zPqkwO2GD7SyOmkFiwtPEtf+6b9AVMh0RfQI7XAgwA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205893;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205894;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=NopKNI1TscCvs8AXqOgByddNyfZiOAXivM+rgWj+cp0=;
-	b=2s1EJxrnU5gLrgA/n5s1/P58fH3ItudRDynkA7UO8L9u0YmJKqDoe55ZLofsmvSgfa+J
-	 vc2gm96Q1kt7y2DO0NSCp1ssac1xWL2M5QJ0YpYZetddiBBHf1NvpOuT5ThjoTJA2uxQY
-	 tt7dNAIuqdzqjnSBbuw6/FaZ9jOMUtK+3kPpBVR4GoKZktBOi7hP4K89Lg3Him5blkSB1
-	 JH/cQ4ZXF21hLRoMptdArpmAdBKwDmHQDBxgHrOw2/aJfNoIWlRVbNLZ6AV0nlMuhpFoZ
-	 uk3QugZ6IehwEzGcvIwG2wS3PanTY4iRJLWURgOegx/xddJ2GfoQVJVVztBevzB59Xg==
+	bh=7DcT95DMliIQqoDKKifvP+oEA9nhkiqbXl+EjjWGsR8=;
+	b=ycDJcJlssXP+Ucw5VXZ0vufPHK/ToqzbOAjHc0xQDZVRA2YHSSNXKBa8wDk3BeQEgtYL
+	 CBoa/ZdywUPMSmm68zzYCc0N3r2I7cu+f/ig2QXylg2CSHGWyNFIVs7IPG6xQ53VcEF02
+	 1cz+h6TqLklcyt8rkyqY+Cn+p5KYkp+H7e24oViT9Urr1C4f0qQ5AZ9gdVBTpugDfFHgd
+	 hzttfGc73xmHQjXSFcIurNeMa9S+UZDVkMqDD74mp69GFGGd9xPj9mUr0NHfcnhJ0Nh/j
+	 vLI82d662LhGE9OU0AfXWD1ZjQwJ5ZlbmIENrcgun9+H33QCm6Wv2PbDfQH2Jz3dDHQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=lDJWSqw1;
-	arc=none smtp.remote-ip=209.85.161.43
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=jvCm0NRm;
+	arc=none smtp.remote-ip=209.85.161.51
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BEA606A321
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 02BEA606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C76606A324
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 27C76606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=lDJWSqw1
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-6fe4372c5f3so836948eaf.3
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:52 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=jvCm0NRm
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-6b8e2d8df4fso963435eaf.1
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205892; x=1793810692; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205893; x=1793810693; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=NopKNI1TscCvs8AXqOgByddNyfZiOAXivM+rgWj+cp0=;
-        b=lDJWSqw1Ns1vKTcCsiZ6i4ZOKj42HYhi+Rtyh25khn9/wOvd+a7wiWc3qjtDOjx/uX
-         uIfyO4DH3OFiWkkMNJJw4xlozB33CAcK4onXBQokq00MMM14nn0Jh5DbY0/AAYIWHeOu
-         gVuvzczCDGqY2tj5ddZl0/DDjHt+HwWA/sndgkqB3Rfu+nfgmdhIMqurDe0H2FmsD8q3
-         Hd27efGl7AMjxfXCBfYTTtkDoY/pXhNVIWRuaHUEvTMjmwenrwDuyfKy+EYc0wMNGErn
-         8yrVfuJpzhhOkh3dia3hqtEOKPFT7wz3TJqg4DaT0DKQs7hMM91et/8I5rGkUFzLx8t1
-         aeaA==
+        bh=7DcT95DMliIQqoDKKifvP+oEA9nhkiqbXl+EjjWGsR8=;
+        b=jvCm0NRmHA4OMJOFehmagpCaGrOsPkwlNM6iBIQV8SjBxQhMDojsuaqsxX++b4l0jG
+         pzxMBqWvj6W/SmAo5EazBdnkEeZnmhpaJHnaNhCSutCbKfLpmGFv9WRvdUu09EAWCpdH
+         BU4vIB2xK2C048pQBd/UGTiK40buv93uqwAPkogMbwGxUJP4PKdIxCbf9xNWoHR2K05V
+         cBR54HcWIP7uLNsbR+0zWY7Frqilt94x6GQu6aQsrCDlwohKW+yj7VaOf4Uq1+nCuEUa
+         6S/zy8ABocITAQfksFJNrFM458vWMmDtctFJftXxsz10IfLz0oDGYQJ7GhZpLKJdNnlB
+         6O1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205892; x=1793810692;
+        d=1e100.net; s=20260707; t=1793205893; x=1793810693;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=NopKNI1TscCvs8AXqOgByddNyfZiOAXivM+rgWj+cp0=;
-        b=SuND4Jr52XC6jXFL60J8LQY2fSClcIks+Qm1frpIUgeh8s8n703B2Sjyu4LW/54wJR
-         TgP7kN40L7ZMfH4AFLoLmpjqeCd8+nQGFLgwZlsouS+lQsAFFltZJ9JOzfLCukHilsQU
-         /YtN24LbnkVTowiHZbjGdPyy6elWlNefsxja+493mDizRdZoAa7FINZmqT/yM9/TRz0V
-         k824XZBMYhrevIeJWP6+W0v60crVIDRf/8kJOe9fPSkQ31hm5mJwBi6EeendGKmFyVh3
-         7c6OWIp5XSbgY+6Q3Gu9QOrhF83DGDFsafYnLJqlcy+Fk+RCcA5uaw3ndMMdpn7mv+y7
-         OyYA==
-X-Gm-Message-State: AFq9FYI4IslWKmryUTXGTvm1CBnWobVc0fRxMH7erqmvqCkIguEf/NOV
-	j+wx+0DqaCu4eR/R7igoxFjBOU46w0WgbjtzFqDBdfeU+yDxtuk34lFp9kjL4wumIWCQbGJoFt5
-	V1Vu6xNc=
-X-Gm-Gg: AYBFou2wsH3fuJCrJAXPTWTSjWYsUfcPt1EBtvj+Wx4Ix73ipeZ1CuHbTUogf7rgSQ7
-	6pAs/R3ZSON1eChqrB2h3KjFMFDN/1wAzVK2KmreJOdygqHqnbjgmYt69E0uCu2Gs/NNiFHfCnx
-	yXlxloL8R60M1olLSludhQUr87g85+oJh+42huGkaZzhUYbth4wIaTOeuymJUnf8jf2jggC0P3+
-	AkAtS4M3BzFUGg7LEzRR1pTT71hXLpiBwqyoGFpLPaJhYqkAjq/r2w/tUqk/hcCuR3wvAQ6xa5q
-	bViw81tCOfYRaexRDEkyw1+PEL7W5wvugUogoSpxuKn+d/Tjwv2uEa8krPg7plND1vptDp/2uli
-	CQe44zzvOiP4cEebmbphrbAaj2bqzV0DvsEcxOKOtWWNzM2ahLULQcTS7RRe10UWaEL/UVCtykO
-	lzyR6SEazVntrr0pim9Y1uA9oklmBa7SIhEX1lDDspZTaYQR2giygLV6mjlXpBeWtYspX1qA2Wi
-	ou8qw8a8CwUp6vdpVjHpi7F8TBuHXGYdBSfg3p6c5QRL4gcSq6Mtwujim9LjmNdlWtsk6AWHsWE
-	TPD5TOf2YA2EPSQ69Bo6VA4zw2o96uHrylABz3jJC72DbjHvUE/ZhTxG6QhTLK6Ay8l2OFw2561
-	dqIkJcnBv+hMmaoqphPA=
-X-Received: by 2002:a05:6820:55c2:10b0:703:3ff5:ddc1 with SMTP id 006d021491bc7-713eaf5b41emr1336637eaf.8.1793205891943;
-        Wed, 28 Oct 2026 09:44:51 -0700 (PDT)
+        bh=7DcT95DMliIQqoDKKifvP+oEA9nhkiqbXl+EjjWGsR8=;
+        b=xk9Gvyz2nQZQhuiCrfk/URYZP/XJr+CqrPOKUAVrDH5mKG9M7zyPB3OBDyuBwNS6An
+         7uspVu68lxhe9ywHyLvQdqrt8RfAX2ZF8fxmrniBEWf2xYyMbpAn5CqSX+TWK7rh5ANd
+         N0On3E3m85gCG44PjaFeyZIGy5lSNZa7VnOL+e+vfoAyhLKI6/btCs659NpVw4rbtBgF
+         G0kK0G7EewrSV6fQWSQICY/ElQiSycVuqUP+0H2puAkTWxV03rLuPtQ1m2KlTYlg6tPp
+         5XAAUQtrcGlbeFhXUJEqT/OsxJE9JtIODJvafOqCBata55nlsY8RPqWZVk9M7q2jscr+
+         Uy3A==
+X-Gm-Message-State: AFq9FYL34ila/hzH4zhYRwB0nKw1nw/R4Bjs4Zgrg3sDKOPhtAUszKX1
+	g0yCqSUPdIL5nzqX9OlKTU/KKBvjFprbvXu24BIQZwFCxjlWH3mr6J8np+K0YlC0SgQ/6WQKuGk
+	1bSwFYHA=
+X-Gm-Gg: AYBFou2Hg48m5Ap0JKsKPz2VRTmAvDgQjNsj+e2S7ZWTRoEwO+6aHOj+QDt9d6RJg9A
+	r/RJHNwk7QjERTV6qq/FfuiahBLBroZQuTEEI/5SLBiOUC+MV0Nx3st8QG51V48IG5Aua1Cd8ZJ
+	dN48yBoxCA9hXCqMwa6ZW3Is2Sn6MSDRxoLZpp4riEsPpSdR582UqsRgXztRGqpd8F9Jj/L884W
+	dSsth8S7sWEvekbNGbUHPZikath6R7c6vFBBtcxXsx7goYD3GA8rCAzMkzJATAMQT0IIBWkQSPo
+	hQ83XibPi4MfgDDJI32hKhrsGp1/41jOvSxWWRWz9cxEDmtZvnnW09XLzUybMxal5bNnt2xUKzb
+	Kc14F/4E4Kv8RGJLwgiywC/nUoBKYekAd3GRo8KxmpHFA8ZQBtRtcQMWcT8lXRNNjJqFRE+K6pU
+	QFGnXs/AxKJgE1uyP3HtVIfGv+3UAJlYjRZicsaOy2uQ9APNRX/R43yNLXTBMXiUbw9x3WpDGQl
+	8p3/b4/vMeJ4MhvJoPKj/kiP9KjRj+4gDe+vhGJHMI7/Nk9n2gPvci17doMXk3GB6kwg9Y4Md0k
+	qn2WW4iqe0OR0EBgq4RPC7/9OsA5kGl7CZEsGmC5tvzKGZfi7V9w/yHndhOilWZxcukMDRaUlA=
+	=
+X-Received: by 2002:a05:6820:350e:20b0:6da:3a3b:527e with SMTP id 006d021491bc7-713ef438b7cmr1219843eaf.81.1793205893139;
+        Wed, 28 Oct 2026 09:44:53 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.50
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:44:51 -0700 (PDT)
+        Wed, 28 Oct 2026 09:44:52 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 27/98] blk-mq: don't trust the cookie in blk_mq_poll()
-Date: Wed, 28 Oct 2026 10:41:30 -0600
-Message-ID: <20261028164415.1262013-28-axboe@kernel.dk>
+Subject: [PATCH 28/98] blk-iocost: check again that the disk is alive
+Date: Wed, 28 Oct 2026 10:41:31 -0600
+Message-ID: <20261028164415.1262013-29-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -102,52 +103,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-blk_mq_poll() indexes queue_hw_ctx[] with bio->bi_cookie unchecked. Zone
-write plugging keeps the segment count of a plugged write in
-__bi_nr_segments, which shares a union with the cookie, and clears
-REQ_POLLED, but bio_poll() only looks at the cookie. A plugged polled
-write with more segments than there are hardware queues reads past the
-array. The bio is also SLAB_TYPESAFE_BY_RCU, so a cookie from a bio
-reused for another device can meet the wrong array as well.
+blkg_conf_open_bdev() checks that the disk is alive under rq_qos_mutex,
+but ioc_qos_write() drops the mutex to freeze the queue first. If
+del_gendisk() runs in between, the tag set may be gone by the time
+blk_mq_quiesce_queue() looks at it. Check disk_live() again after
+retaking the mutex.
 
-Ignore a cookie that is out of range or doesn't name a poll queue.
-
-Fixes: 3e08773c3841 ("block: switch polling to be bio based")
-Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+Fixes: 9730763f4756 ("block: correct locking order for protecting blk-wbt parameters")
+Cc: Tejun Heo <tj@kernel.org>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ block/blk-iocost.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c91306f8156f..5ebe2e23df5c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -5245,9 +5245,22 @@ static int blk_hctx_poll(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- int blk_mq_poll(struct request_queue *q, blk_qc_t cookie,
- 		struct io_comp_batch *iob, unsigned int flags)
- {
-+	struct blk_mq_hw_ctx *hctx;
-+
- 	if (!blk_mq_can_poll(q))
- 		return 0;
--	return blk_hctx_poll(q, q->queue_hw_ctx[cookie], iob, flags);
-+
-+	/*
-+	 * The cookie is no more than a hint. iocb_bio_iopoll() may have read it
-+	 * from a bio that was reused for another queue right afterwards, and
-+	 * zone write plugging keeps the number of segments in the same field.
-+	 */
-+	if (cookie >= q->nr_hw_queues)
-+		return 0;
-+	hctx = q->queue_hw_ctx[cookie];
-+	if (hctx->type != HCTX_TYPE_POLL)
-+		return 0;
-+	return blk_hctx_poll(q, hctx, iob, flags);
- }
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 7b5d865d8c14..bfb0dd320c4a 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3322,6 +3322,11 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
  
- int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
+ 	body = ctx.body;
+ 	disk = ctx.bdev->bd_disk;
++	/* It may have gone while the mutex was not held */
++	if (!disk_live(disk)) {
++		ret = -ENODEV;
++		goto close_bdev;
++	}
+ 	if (!queue_is_mq(disk->queue)) {
+ 		ret = -EOPNOTSUPP;
+ 		goto close_bdev;
 -- 
 2.56.0
 
