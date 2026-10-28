@@ -1,60 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=220.197.31.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793162929;
-	b=a3EmI6Hb+8XEe4VVTO0IA8UXezRfuCygXTn8LXo+ei+xH+XNbfv2JZ6Q6WttP3A9oKlO
-	 nymalvKRzq0jnZFA6yUGESTVrAo2zNcvKEW+qj3Qtaeh4+OrOLYzVNhfGRiKAxv5I7V8W
-	 yPvlazR+pSIfUAhVP8hsTdTtvQbF/miD7rQCaomqkKh4PyaDq4Xr/jOKGWEOAcAgZf4mc
-	 jj2h6Yp2/VFQX3V0vhH+n/ZmTlUd+5DaRIi7t+R4TLRPNt2kAQpjZQrPfY6XL1UdCxoLo
-	 WgH+rUbYTf56mEWS462McYTx/ed7aRe9yIbKVue+sctz5xZJXfnZS7dyg/BcmKoiEpg==
+	t=1793163020;
+	b=IDcQ/k9EkAAgmd2TCMyPQyoHuGkdwluihWBoDbDwxX32hO20CKy4WeQoJFeFQSBQ5koB
+	 1yKhGjH/KkIIapwGGINTrUCbAVG0TqhDEtNoNpzg8XMOtCwGP3KPM2ml+ozLY5d5RKJ+g
+	 Z3DWrB+H+PKYvmd4zSmA95cbAIAi56svDO14XI/7WGqxzSCOr5tBGGMaMNF3gUSdk5k9d
+	 m+rzMiEw4OLobSjkbvV8e0X2RCT4cxb54Vnt3hrIFGTO/7lqWd51V1sFt1oKIQRsPhjlI
+	 wM8Lri45yIezpBQj/iO7ztuvjo0A+An74Xx9miExKhAbZAmarPyDWZm1g5+89VH+/Jg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793162929;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:
-	 X-CM-SenderInfo;
-	bh=BIyqk4EIFBEh6YzqQd/sxPsjm17XNt9nVVGA3XBXOBo=;
-	b=3/+aTozybZ0sEIX1zCjXResIumhxKA0NXzYS5ME2AXTxXD+24lbYPxtB1bpMU+/mtNe6
-	 1IVBZidE4k8D5ngO1b9MI7y0QQ6JSgqA+nsDnw/gXTgGl55DmEYVewkNVnF40djbn4QcS
-	 SsybXXUFrPqzRXoFZNY8MyUenD4qjfds5dlelZOeNOXR0WYOKCfGdTGbUqBURpl6coyhd
-	 2HKIu+mJPFhuBEv+f6bkc2p+KpS9SSkN40Lo7vkQ3z8o12yReoRWy2d1hFPGvxYAv9bn/
-	 GxnT7jGO04MMjWd3aeRNTvhlnG+0fddRvdC5o5ro1hkLCLHcanlGezcnzxUJnXhauEA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793163020;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-Id:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding:X-CM-TRANSID:
+	 X-Coremail-Antispam:X-CM-SenderInfo;
+	bh=5eX6ZERtxMma6IIiwk4zjHSJGCnTW5TdkQ89tZL/8dM=;
+	b=GmxtOGfyUj5pCCr4aqR0JioNiimFurOzK9YRtRlglGWJpfIKgJ987Fj/+EPj6frdd9VP
+	 OZi/sW3bgP5+u7xP42PaGohspt/uhERJLLeUnmU1uCOl/iF/OncY2YOXrpolVUiLlUQNX
+	 sdCCAsSxP59wd1Oijbf1kLiQCoaWfiXQG4qBJSJLiXFuQeDbYIPebH8EEJCDaOnQddyK0
+	 BNkZWC2k1pO4PBlyfYn8Ehs4n6td59E9NlJznKUNJzsd4kuZxhZ2ZKXVnVbw8+NhiaAKc
+	 /pfL8u6VwErNkSObK6xg+cXK4YUkG0C/5WC6ErYXtsjiNjocnfvZDc8ozUKTQQr4oYg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=163.com;
 	spf=pass smtp.mailfrom=163.com;
-	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=SjI9VgGN;
-	arc=none smtp.remote-ip=220.197.31.3
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b="Pmoe/AMv";
+	arc=none smtp.remote-ip=220.197.31.5
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35160606A31A;
-	Wed, 28 Oct 2026 04:48:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 35160606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD134606A31A;
+	Wed, 28 Oct 2026 04:50:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD134606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=SjI9VgGN
+	dkim=pass (1024-bit key, unprotected) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=Pmoe/AMv
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=BI
-	yqk4EIFBEh6YzqQd/sxPsjm17XNt9nVVGA3XBXOBo=; b=SjI9VgGNA+EpcYadfe
-	xIg0LOp0537EKAHcaGFXKmtL3oMSUrYzgG2Rqln5aJE2ZxUIdBD99gUpp6KmYOdm
-	QA4fGffDg+56+hBnATWndm8yMVZARV6z/xHvRYpQP7SpFbLYycSpC8+ktYYJHCyo
-	J8htokG0k1o7dKYGUl6/cmX4M=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=5e
+	X6ZERtxMma6IIiwk4zjHSJGCnTW5TdkQ89tZL/8dM=; b=Pmoe/AMv61DOoUS7hw
+	fJtrZ1OMVnBesqPe6v4a8+oGDtdeJ3Kmtf4tf4a4NHv6eHPXLarg1WgKZ5yBzh2D
+	sCKfYqy6c0tdGZ0XZrY36teHjocwbfTitnmOp/cu5Kq9/4MNwk/sKJvQ7YHsj4rp
+	O2kCYpKzGX/5HwlY9DZzq6lCs=
 Received: from pc.localdomain (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgDXXyGcfuFqI22BCQ--.35298S3;
-	Wed, 28 Oct 2026 12:48:32 +0800 (CST)
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgDXXyGcfuFqI22BCQ--.35298S2;
+	Wed, 28 Oct 2026 12:48:30 +0800 (CST)
 From: Jiale Yao <yaojiale02@163.com>
 To: Justin Sanders <justin@coraid.com>,
 	Jens Axboe <axboe@kernel.dk>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Brad Warrum <bwarrum@linux.ibm.com>,
+	Ritu Agarwal <rituagar@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+	Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+	Mukesh Rathor <mrathor@linux.microsoft.com>,
+	Muminul Islam <muislam@microsoft.com>,
+	Nuno Das Neves <nunodasneves@linux.microsoft.com>,
+	Steven Royer <seroyer@linux.vnet.ibm.com>,
+	Adam Reznechek <adreznec@linux.vnet.ibm.com>,
+	"Bryant G. Ly" <bryantly@linux.vnet.ibm.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Florian Fainelli <florian.fainelli@telecomint.eu>,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-Subject: [PATCH 1/6] aoe: initialize error message synchronization before registration
-Date: Wed, 28 Oct 2026 12:48:21 +0800
-Message-Id: <20261028044828.96177-2-yaojiale02@163.com>
+	linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-hyperv@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-watchdog@vger.kernel.org
+Subject: [PATCH 0/6] Initialize device state before userspace registration
+Date: Wed, 28 Oct 2026 12:48:20 +0800
+Message-Id: <20261028044828.96177-1-yaojiale02@163.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261028044828.96177-1-yaojiale02@163.com>
-References: <20261028044828.96177-1-yaojiale02@163.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -65,54 +92,38 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgDXXyGcfuFqI22BCQ--.35298S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZFWxZF4UJr17JFWxXFW7XFb_yoW8JFyfpr
-	4fWa4rKr409r45Gw4qqwn2yFy8Was2k3yUua40kw1xZw1rZa4q9r4Utry7ZF4UJrsrCFW2
-	gF1UJ3yrC34jkrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jzrWrUUUUU=
-X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbC7wDaFWrhfqCIewAA3G
+X-CM-TRANSID:PSgvCgDXXyGcfuFqI22BCQ--.35298S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7XFWfGw4fZr1kWFy5Xry5Jwb_yoW8Jry3pa
+	1Sg3sYy392krW7Xr43Zay7Ga4Fga48uayUCF90kw1FgFs5CFyvqFW0qay8tFWDJFWxA3W0
+	qF10vrWxGFWUCrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UpE_NUUUUU=
+X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbC7x7ZFGrhfp6IQwAA3c
 
-register_chrdev() makes the AoE character device available before the
-error message completion and lock are initialized. A userspace access
-racing module initialization can therefore use either object before it
-is ready.
+Several drivers register character devices or sysfs attributes before
+initializing synchronization objects and related state used by their
+userspace entry points. Registration makes those entry points immediately
+available, so a concurrent access can reach partially initialized state.
 
-Initialize both synchronization objects before registering the character
-device.
+Move each initialization ahead of the corresponding registration. The
+patches are independent and cover AoE, fsl-mc, MSHV, IBM VMC, DCSSBLK,
+and the RDC321x watchdog.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jiale Yao <yaojiale02@163.com>
----
- drivers/block/aoe/aoechr.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Jiale Yao (6):
+  aoe: initialize error message synchronization before registration
+  bus: fsl-mc: initialize UAPI state before device registration
+  Drivers: hv: initialize partition table before device registration
+  misc: ibmvmc: initialize HMC state before device registration
+  s390/dcssblk: initialize device semaphore before sysfs registration
+  watchdog: rdc321x: initialize device state before registration
 
-diff --git a/drivers/block/aoe/aoechr.c b/drivers/block/aoe/aoechr.c
-index a42c4bcc85ba..efc09c97ff23 100644
---- a/drivers/block/aoe/aoechr.c
-+++ b/drivers/block/aoe/aoechr.c
-@@ -288,13 +288,14 @@ aoechr_init(void)
- {
- 	int n, i;
- 
-+	init_completion(&emsgs_comp);
-+	spin_lock_init(&emsgs_lock);
-+
- 	n = register_chrdev(AOE_MAJOR, "aoechr", &aoe_fops);
- 	if (n < 0) {
- 		printk(KERN_ERR "aoe: can't register char device\n");
- 		return n;
- 	}
--	init_completion(&emsgs_comp);
--	spin_lock_init(&emsgs_lock);
- 	n = class_register(&aoe_class);
- 	if (n) {
- 		unregister_chrdev(AOE_MAJOR, "aoechr");
-@@ -319,4 +320,3 @@ aoechr_exit(void)
- 	class_unregister(&aoe_class);
- 	unregister_chrdev(AOE_MAJOR, "aoechr");
- }
--
+ drivers/block/aoe/aoechr.c       |  6 +++---
+ drivers/bus/fsl-mc/fsl-mc-uapi.c |  6 ++----
+ drivers/hv/mshv_root_main.c      |  6 +++---
+ drivers/misc/ibmvmc.c            | 16 ++++++++--------
+ drivers/s390/block/dcssblk.c     |  3 ++-
+ drivers/watchdog/rdc321x_wdt.c   | 12 ++++++------
+ 6 files changed, 24 insertions(+), 25 deletions(-)
+
 -- 
 2.34.1
 
