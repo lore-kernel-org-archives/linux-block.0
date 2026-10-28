@@ -1,108 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.208.15
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793193563;
-	b=Khi3aE6OWzwAn/oMAaq/auTnnZ9q6jzJ2QWjOAmvnUPJ0IpBAFNr6NUGiDIq8nFDcIIF
-	 MmsObYBu6/l33u41GrQY+Fz54xIQgCww5rUgLYL5Lw/suF9c1f4EwMutcHyvM0/63HvXc
-	 OBS8wnZVACQ1uHP0vG9RszRJaQuGX672PJs6a+bHbf13GKNLMSjTHxjB2zJelyw1nBGh6
-	 P+2O0BmgQUnqPXeFCQDqyhiDdRdZjq8sJ9Tu720XvPBRzLRyYkXngi2T+IMjfyvdwZO7i
-	 +JALC/yF+LxHrg/jwoOmvEtoVrR8EgsUI0SnREfnBJO8MdAYtHP20jq6Pe2kmKkpBZQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793193563;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:Content-Type:
-	 X-Originating-IP:X-ClientProxiedBy:X-EOPAttributedMessage:
-	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
-	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=/oW9+Tz8iO9CqNcwyhjOMLBavW6Y0ynlmcriUvTcE8M=;
-	b=RxFv5PDVjlxXjUsLkpETUqI9jXxzRWkx9SYdUrFT/IWZ9lERt0jePYmT/DsiovxsiyVr
-	 l/+SpXOWvw7yQFp8PvFp/r4sh8VKbP5xfPqgiD/gkeOF63CBVTG7DYJtfjyABxIW3Ui5z
-	 aaijvhH9D4AlRwFC9oi7CKiUUplCeUVP64ZTqSZ4WnNma+1x3DM32fhYTwuOLldJ034oY
-	 o1aLy9LffQOj4Gh1LS4YT3QGD+PkuqYbPNi1F2SB1nlf0IGHVi+GW1RI8PMqYVJ76v4hJ
-	 GzzrtpTspc3nbX541Z6ZaPz98zTmYDB5+rfIeLGB7FS9nHN9n11VWjvV6dJKptp1ciQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b="j/p7nO+b";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.208.15
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011015.outbound.protection.outlook.com [40.107.208.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.41
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793197356;
+	b=sflgI9K7NCxZildj5VELObI4pHpRZNoZwMpjM/dUWde6TDb02a/o8dZ2Y4oThKoahYmu
+	 ISCsMlj18GzT9hrUQD1hzJICgL6qPgWlfAUPL2QkcS+XrrID6R1VJgw84Zed2J5bMMKsW
+	 kd3nvLxLBt4a/LIRCTqoYt9ESvfgnGKOAiBHyOorX/6R1TloBZkAqB/AIIoaXlbC8VRRj
+	 t2P+kEBPSfBQkSNBUzlnSmvaey48jc9sB+vyRhhn3HYjKceXGfYc5QLD37qw+XyaOElhx
+	 gNZh3nqCZMgvyLX3S2SpGaoHFughAMixFQLHWlTIZOnHZyuZ5cuMJx159OCDBY3RFQA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793197356;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=XkCOJZX/WWMB9kGzP5MkxZIBGrbHKVoP2EMu7c4H2Kk=;
+	b=YhBeMDhX2YWhShonxOx6jb8iD7aIfcqzxrEr0BNHu3lRiWwp5MPNSnI8piUJRKCDpa65
+	 lhzkq5oCGth0DbMG9CvyvPFgB8UjkJcVDW9vhXtZOBSCc087w0UnK+llQrVqyWuA/Yuap
+	 MvuL3rEIf5Yo2gK+BVEmvQ0Nem3E4AQkj9qZLLPfltD/MiaclGvI8qom5tTX+2IFrEwf1
+	 mUJ9Kh6Rc3vnGe4cFumqJ9eaSxpprbmWuXR5djOg4tvl3BzhfNa1262sQT6ciYgiBKoGN
+	 pNkA/Dvji0PJ5If5c9EhfIQ77wvBOIqlAYczhMnMlPExZ+zE5PMumOxRNqu+4aS/fNg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p1iUDFqo;
+	arc=none smtp.remote-ip=209.85.216.41
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD565606A31D
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 13:19:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD565606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A59606A31A
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 14:22:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A6A59606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=j/p7nO+b
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LmW3ecUN+cf6fCr+10mFMurJ8Hkcw5OY5RBf5jILlZacGYP+qNRG/Ur80ZFJ7hbyZ5Ytre3bGXOyMh+PXGWHU8JD5PQC5oAfWtUzEuKaFCzKjEtMFLdMO+6dIGW+zj/M98GgZVKgoum4lvUD4EnrNbABO9yluIQ6394b3I2QSz7HN6pwyHDZMaAHBl+Kb/PyBEPh3gP1LRBSbnRqu3opcI5brNY7fz/GwH8PPbxHy1/VLSVQSS5ZoZnlQCikuVTove5cNX+m2GssYlXLv3RMAeoMlv34p8FfCMYFBjC/t58hzBY5vNkLcjmWZlF6MlU/Po3N0v62fQe2DeV1WApcfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/oW9+Tz8iO9CqNcwyhjOMLBavW6Y0ynlmcriUvTcE8M=;
- b=DBXs8qle7QQ2cqshksC5pEg31gRYb4thTRKQ/k2CqkaxN5ec3tMkxVtvxdAW6yuGZd9ekTjYK5rS9+y75qXHvlFLbkfv8tx4qZCeV0qCUKcYi9ydAr9iISyTBPGkh+8RrRg8pTHMcJ0ZmZsObY8iafQtON9w7A4bHOs2m9aUh23+tWEg9RdAQUllVZ8mk9ghnvBQ4U3/revsXRZTbsITc/MI+4Bx85DxBnuAtaoPlwIOiKBXpYFHOcSaLVVAKP7H8k07UhVFOHGwLJjvA8UOsMmT/NhvPd4BZ4wCa1fEVVQgZOMqRY3wVzZz8J/J/IbsNk5y1IRC7lCIhAhHNt0nDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/oW9+Tz8iO9CqNcwyhjOMLBavW6Y0ynlmcriUvTcE8M=;
- b=j/p7nO+bk9e+pBGe/bdMy3ISIYPtvB27MRBKa0t07LknRj/PgAJkCwUpCO3z4iYC5hMK3kWjEuXQbwRCa1rz/Jo+Fca8NBrgYDQYsSUvP9HJQv6rxaWgldFt7e56D/aKTB+yoiRYzNoOkzsKfPzD2ucPdoDaMOsT9scpcDQ1F2CdNq/5T9vkoT7x1I2E3wiloJbTi9elwQ0DVzxZbi9OiaGnuxhJoHiTqs11vVh4pRo2gdgRx2ZFckDTHc3mDQtWmSqZoTTBf9GcB+8wioc5BQ4jwZJxT2iOfcszBuqBSQEGMxSFC4NaQl4YmytlVKUSykOo1oeaSnVEO/KnhiN0Gg==
-Received: from SJ0PR05CA0045.namprd05.prod.outlook.com (2603:10b6:a03:33f::20)
- by PH0PR12MB8051.namprd12.prod.outlook.com (2603:10b6:510:26d::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.22; Wed, 28 Oct
- 2026 13:19:17 +0000
-Received: from PH5PEPF00000031.namprd04.prod.outlook.com
- (2603:10b6:a03:33f:cafe::a2) by SJ0PR05CA0045.outlook.office365.com
- (2603:10b6:a03:33f::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.592.3 via Frontend Transport; Wed, 28
- Oct 2026 13:19:17 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.117.161) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- PH5PEPF00000031.mail.protection.outlook.com (10.167.243.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.569.4 via Frontend Transport; Wed, 28 Oct 2026 13:19:17 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Wed, 28 Oct
- 2026 06:18:55 -0700
-Received: from yoav-mlt.nvidia.com (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Wed, 28 Oct
- 2026 06:18:52 -0700
-From: Yoav Cohen <yoav@nvidia.com>
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	<linux-block@vger.kernel.org>, <csander@purestorage.com>
-CC: <jholzman@nvidia.com>, <omril@nvidia.com>, <ofer@nvidia.com>, Yoav Cohen
-	<yoav@nvidia.com>
-Subject: [PATCH v4 2/2] selftests: ublk: add rq_affinity test
-Date: Wed, 28 Oct 2026 15:18:29 +0200
-Message-ID: <20261028131829.45803-3-yoav@nvidia.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20261028131829.45803-1-yoav@nvidia.com>
-References: <20261028131829.45803-1-yoav@nvidia.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p1iUDFqo
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3ac77270fbfso595308a91.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 07:22:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793197355; x=1793802155; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=XkCOJZX/WWMB9kGzP5MkxZIBGrbHKVoP2EMu7c4H2Kk=;
+        b=p1iUDFqocQVreW8roT9uwBqm6fySMDwgzjOCMGfn8x5G2WANMhf8m8BF++eyz91ef5
+         CFEgtqlNdqdmN2iKi3k+DBoajDIu+GKDYyVfMsetvRIHtSebreXYpWDd7ilJdfk2qfDc
+         CPd04F9Zc1qkzDu+tl2TajmsKIdBnPFxWK0GiGu/wbEDLhf5IA6WOoQYj6tp3RKJ8LuA
+         on/2ID1TXSKk8oWNqdM6upYk9J3DCwLJI/JYfistRGToKZiakbUql0ccLPKoLo9Shiyl
+         2XderNpWJ4JK0sIxJtN0+pKrQACGD57RXW1wzl/ihBqFtb4Jkw3MkxXLcpyaGL8a5tKX
+         MEfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793197355; x=1793802155;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=XkCOJZX/WWMB9kGzP5MkxZIBGrbHKVoP2EMu7c4H2Kk=;
+        b=iL/Vt0CIyYRGWllxF9ndX1XIVgATN2J+ZPlPS5p6vCMbDoVMNdnMTMhy6ZPIVTCDpJ
+         rbJzCs2Q6dszcrYmQdTCd0KMdYkVHU+FxVkxpRT0LhSOD5IwMx0i9ExxSC993OOUPbID
+         kSCfdVHAgRcQ/be/Pl4o4uwihJ9Ghm7cG9i21DcSuSvrnQGDHp1WV2zbmDM5+Z2Hm4Rv
+         Og1o61ixbH4jWINbdm9QaHnXGgPyMW1WcoPsyoRFYFldMQsyXyBUwbjaD7l94mIQBv0V
+         rOkfQNxohF/C3Z3qyy90BARxoYuMlcUZA1IowUGAy+z55gbhc/whJPAVbKqCp2uR3+1a
+         ySQQ==
+X-Gm-Message-State: AFq9FYL9BfiOZ+/Bgi0iVWGGZy00DdfeqfAQC8c4a+jZrmOcDiYq+oOl
+	oGa7yi8o7rcnf4XGwnNSVpVFmiALH8Z8DV+6Ct5yrpzZcZfX13LvmrHf
+X-Gm-Gg: AYBFou0UgUekHIgVtF1n5N7niVemNOLz5Ym4JR2uusmMGLdVDI6hfs0zePctVKG8+cH
+	+nMP8HHxNOBxm0i63L+m7WbWoCpsi8DoP7meaGP1/zkzatjarBCQUA6vnEiNMWAz/vCei6HUznx
+	7XLbzVBALS2deVsqxz6HrU1Ne60mK5qbZtU3r0NrK8cKWUZIgmaR4kp5A0d0LQf6m+SN9+m3uvl
+	DktlC6QsRk2g4gVmp/uXtgxZ3kGoceRfVwdwaY/pilkIn41syuoipj9Jb6AtmXImHjg/BIPdKn+
+	rDvlCkPL8WyJJrP4yE6G3d76xfXxu7yM16KI/LzL8tD1zrzrhGaii0YQW9N/XDIZImTtykBtlJv
+	+SKHi2gSffoMGX4gaFiwtt1kCB+57WlRaSeSAz3bNG5997GeM785oi9KxomhQi36dJKAgNeU1i2
+	ybRyNV8Ki+Lp/PadgvLMsAw377pEhBCdk0Vdfz27TyoXsJ+Z8qAbgcsmGIIB5ucnevMSozGi1qH
+	DXOjGP+h8wmVNvlQq+WvX4NaJe9+aFsQhps+LW7tJvzgFwUEC0um/qNhpr3aSnpNnIfSjNplOiB
+	u9Ir5NTyvI+Dudl1Ecpu1NKruuYk
+X-Received: by 2002:a17:90b:1644:b0:3ad:6090:a17b with SMTP id 98e67ed59e1d1-3ae580ae5f8mr1548061a91.17.1793197354899;
+        Wed, 28 Oct 2026 07:22:34 -0700 (PDT)
+Received: from thangnn-ASUS.. ([2a09:bac1:7ac0:50::246:47])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ae5a900c22sm3309411a91.4.2026.10.28.07.22.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Oct 2026 07:22:34 -0700 (PDT)
+From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+To: Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+a246ab421a728c78b4ad@syzkaller.appspotmail.com,
+	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Subject: [PATCH] nbd: don't take cpu_hotplug_lock under tx_lock on reconnect
+Date: Wed, 28 Oct 2026 21:22:29 +0700
+Message-ID: <20261028142229.24660-1-ngocthang2710.1999@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -113,157 +97,83 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH5PEPF00000031:EE_|PH0PR12MB8051:EE_
-X-MS-Office365-Filtering-Correlation-Id: 76bfc475-1287-4568-5993-08df34f611eb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|23010399003|36860700016|261026140227099003|5023799004|11063799006|10067099003|261026121527099003|261021123027099003|261021121427099003|261022075727099003|261009223027099003|56012099006|261022105027099003|22082099003|18002099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	MAXLnqOxBotfUgOs2UJgPcdJ92v9k4j+rlN72IZvdYN4DjWl1l+1qsjMHvKZsOyV3Tvk+EyTTGm6y4Qh7fmPUuzzA9jPz5QP8OvgMUWMmKn+ksZiLDgyQSKQrAFnI7u1dn5hg2+iE5ALIp+fBGwzrjQsQb4t25KVN/HXoKID1ZwTCoN9NBbsEazTZ6RijMA4PLCg9x3LyBbuOMTpIvw64V0rZlGdY+dkE5+AJYVdN+bilvBvXIv0nT8EoN8ntbIZaj7slUtPoNCz641h3jHUDDxXjZd0cCZOX8sXqd8Y25qvIntnz0WUKADCnz5cLao5iarqzsrhzqetVKCIXV0crQTj5aSRgSZGZc0s700AISA2aSzdiDlcD6GX7ts4l34vm7K16/9D0TgW7zki5bgnce+HMcVQ9j3MZS8wgNVQmBIjPiIAUbABjUJTo+KF0cQmKWrYTMBM8oueBQ/ZlxoMTUj8TjMo7tH5rPnIVilw+vX26s8j39UDZvW8W/Fy9IFgxXrchGNTPs0y8q8kIESbNeKRUEOHSwzVERPtehvWrnbWRZfHpSkUiwV2I1npNNQ2oYWQkRidtvLqWc5RPJ97zxOtb9feBsp1tZi8p76asr+STsYJqkhmKYO4UzMwla4Ydir7PvbduL8bE4k9zskpH541W8n6JUo6RJNztowGjTUwklVkdqhB4zA/TJqf/JDtpypPkNddW5gz39T2Jj+kRw==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(23010399003)(36860700016)(261026140227099003)(5023799004)(11063799006)(10067099003)(261026121527099003)(261021123027099003)(261021121427099003)(261022075727099003)(261009223027099003)(56012099006)(261022105027099003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	SN8kJ6ChqOwHnyXW9VYTiYDIsCSXyRAFCsECKOE2qPABQFDTJfTnjoZyGuRJHxmdAN9ThaY54y/sGJDqloQP3OpbmvErBQHI0w2Mt2VsGnkKsfzG39c/Y9areyQQaYbJOIFjCMRUiAxQFFN346li9PdITdSXeUBBtW5chWNCNcp8Ugg4g7F6OS9pHNIeHwKjkmkvKIl8iMlJYArC/ry+X3AbgP0H4aVUleb54mhGqcyPN77YJ5olIPLYSanFVvsxxWm2/5NH/qaR1T34p9iyerGw3gRhYmcmLr0FfIc14YEva4ZaHGr+ZbZ9YZE3vFVVdNKOZXGOvBRqMSN0hWFq3TdOrO/e62jjQBtzTcb24tbdaKz5J/KjsUHf5bR/XSySiSZ9WamQ3J1HC48FT9uerqtdfYiD5eQBt+/PjUusxvwfCAt5UWCXYCJzS6oxBffM
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2026 13:19:17.6263
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76bfc475-1287-4568-5993-08df34f611eb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	PH5PEPF00000031.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8051
 
-Add UBLK_F_SUPPORT_RQ_AFFINITY to kublk's feature table, a
---rq_affinity option, and a test that writes and verifies data on a
-single-queue loop device with rq_affinity set to 0, 1 and 2.
+nbd_genl_reconnect_sock_cb() calls sk_set_memalloc() on the new socket
+while holding nsock->tx_lock. sk_set_memalloc() bumps the
+memalloc_socks_key static key, which takes cpu_hotplug_lock.
 
-kublk pins the queue thread to the first CPU of the hctx, so submit
-from the last CPU in cpu_list. That way rq_affinity=2 always takes the
-remote completion path.
+tx_lock is taken in the I/O path under cmd->lock and set->srcu, which
+lockdep already orders after fs_reclaim through the queue freeze and
+elevator locks. Once cpu_hotplug_lock hangs off tx_lock, any path that
+allocates memory while holding a lock taken under cpu_hotplug_lock
+closes a cycle:
 
-Signed-off-by: Yoav Cohen <yoav@nvidia.com>
+  WARNING: possible circular locking dependency detected
+  Chain exists of:
+    fs_reclaim --> cpu_hotplug_lock --> uevent_sock_mutex
+
+  -> #6 (cpu_hotplug_lock){++++}-{0:0}:
+         cpus_read_lock+0x54/0x1c8 kernel/cpu.c:490
+         static_key_slow_inc+0x1c/0x40 kernel/jump_label.c:190
+         sk_set_memalloc+0x6c/0xa0 net/core/sock.c:307
+         nbd_genl_reconnect_sock_cb+0x32c/0x72c drivers/block/nbd.c:1377
+  -> #5 (&nsock->tx_lock){+.+.}-{4:4}:
+         nbd_handle_cmd drivers/block/nbd.c:1143 [inline]
+         nbd_queue_rq+0x1f4/0xbac drivers/block/nbd.c:1207
+
+The new socket isn't visible to anyone until it is installed in nsock,
+so it doesn't need tx_lock. Mark it memalloc before looking for a dead
+connection, as nbd_start_device() does, and undo it if there is no
+dead connection to replace.
+
+Reported-by: syzbot+a246ab421a728c78b4ad@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=a246ab421a728c78b4ad
+Fixes: b7aa3d39385d ("nbd: add a reconfigure netlink command")
+Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
 ---
- tools/testing/selftests/ublk/Makefile         |  1 +
- tools/testing/selftests/ublk/kublk.c          |  6 ++-
- .../testing/selftests/ublk/test_generic_19.sh | 49 +++++++++++++++++++
- 3 files changed, 55 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/ublk/test_generic_19.sh
+Tested in x86_64 QEMU (KASAN + PROVE_LOCKING) with the syzbot C
+reproducer. Before: the circular dependency with
+&nsock->tx_lock -> cpu_hotplug_lock is reported on every run. After:
+that chain is gone. Also exercised the no-dead-connection path
+(sk_clear_memalloc()) with a second NBD_CMD_RECONFIGURE.
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index fc64b8f02833..21941071a35a 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -20,6 +20,7 @@ TEST_PROGS += test_generic_13.sh
- TEST_PROGS += test_generic_16.sh
- TEST_PROGS += test_generic_17.sh
- TEST_PROGS += test_generic_18.sh
-+TEST_PROGS += test_generic_19.sh
+With this applied, the reproducer then hits an unrelated lockdep false
+positive (reconnected sockets are not reclassified); I'm sending a
+separate fix for that.
+
+ drivers/block/nbd.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 218b99f9e1ef..a567c0bce90e 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1364,6 +1364,9 @@ static int nbd_genl_reconnect_sock_cb(struct nbd_device *nbd, unsigned long arg)
+ 		return -ENOMEM;
+ 	}
  
- TEST_PROGS += test_batch_01.sh
- TEST_PROGS += test_batch_02.sh
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 5a4ff689c1f7..ad42bb099d5b 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -1812,6 +1812,7 @@ static int cmd_dev_get_features(void)
- 		FEAT_NAME(UBLK_F_NO_AUTO_PART_SCAN),
- 		FEAT_NAME(UBLK_F_SHMEM_ZC),
- 		FEAT_NAME(UBLK_F_IO_DESC_SIZE),
-+		FEAT_NAME(UBLK_F_SUPPORT_RQ_AFFINITY),
- 	};
- 	struct ublk_dev *dev;
- 	__u64 features = 0;
-@@ -1909,7 +1910,7 @@ static void __cmd_create_help(char *exe, bool recovery)
- 	printf("\t[--nthreads threads] [--per_io_tasks]\n");
- 	printf("\t[--integrity_capable] [--integrity_reftag] [--metadata_size SIZE] "
- 		 "[--pi_offset OFFSET] [--csum_type ip|t10dif|nvme] [--tag_size SIZE]\n");
--	printf("\t[--batch|-b] [--rotate_auto_buf] [--no_auto_part_scan]\n");
-+	printf("\t[--batch|-b] [--rotate_auto_buf] [--no_auto_part_scan] [--rq_affinity]\n");
- 	printf("\t[--io_desc_size SIZE]\n");
- 	printf("\t[target options] [backfile1] [backfile2] ...\n");
- 	printf("\tdefault: nr_queues=2(max 32), depth=128(max 1024), dev_id=-1(auto allocation)\n");
-@@ -1989,6 +1990,7 @@ int main(int argc, char *argv[])
- 		{ "batch",              0,      NULL, 'b'},
- 		{ "rotate_auto_buf",	0,	NULL,  0 },
- 		{ "no_auto_part_scan",	0,	NULL,  0 },
-+		{ "rq_affinity",	0,	NULL,  0 },
- 		{ "shmem_zc",		0,	NULL,  0  },
- 		{ "htlb",		1,	NULL,  0  },
- 		{ "rdonly_shmem_buf",	0,	NULL,  0  },
-@@ -2136,6 +2138,8 @@ int main(int argc, char *argv[])
- 				ctx.safe_stop = 1;
- 			if (!strcmp(longopts[option_idx].name, "no_auto_part_scan"))
- 				ctx.flags |= UBLK_F_NO_AUTO_PART_SCAN;
-+			if (!strcmp(longopts[option_idx].name, "rq_affinity"))
-+				ctx.flags |= UBLK_F_SUPPORT_RQ_AFFINITY;
- 			if (!strcmp(longopts[option_idx].name, "shmem_zc"))
- 				ctx.flags |= UBLK_F_SHMEM_ZC;
- 			if (!strcmp(longopts[option_idx].name, "htlb"))
-diff --git a/tools/testing/selftests/ublk/test_generic_19.sh b/tools/testing/selftests/ublk/test_generic_19.sh
-new file mode 100755
-index 000000000000..1d412b4b3318
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_generic_19.sh
-@@ -0,0 +1,49 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
++	/* Takes cpu_hotplug_lock, so it must not nest inside tx_lock. */
++	sk_set_memalloc(sock->sk);
 +
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+ERR_CODE=0
-+
-+if ! _have_program fio; then
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+if ! _have_feature "SUPPORT_RQ_AFFINITY"; then
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+_prep_test "loop" "write and verify I/O across rq_affinity settings"
-+
-+_create_backfile 0 256M
-+
-+dev_id=$(_add_ublk_dev -q 1 -t loop --rq_affinity "${UBLK_BACKFILES[0]}")
-+_check_add_dev $TID $?
-+
-+rq_affinity_path=/sys/block/ublkb"${dev_id}"/queue/rq_affinity
-+cpu_list=$(tr -d ' ' < /sys/block/ublkb"${dev_id}"/mq/0/cpu_list)
-+first_cpu=${cpu_list%%,*}
-+last_cpu=${cpu_list##*,}
-+
-+if [ "${first_cpu}" = "${last_cpu}" ]; then
-+	_cleanup_test
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+for affinity in 0 1 2; do
-+	echo "${affinity}" > "${rq_affinity_path}"
-+
-+	# The queue thread runs on the first CPU, so submit from the last.
-+	taskset -c "${last_cpu}" fio --name=verify --rw=randwrite --direct=1 \
-+		--ioengine=libaio --bs=8k --iodepth=32 --verify=crc32c \
-+		--do_verify=1 --verify_state_save=0 \
-+		--filename=/dev/ublkb"${dev_id}" --size=256M > /dev/null
-+	if [ $? -ne 0 ]; then
-+		echo "fio verify failed with rq_affinity=${affinity}"
-+		ERR_CODE=255
-+		break
-+	fi
-+done
-+
-+_cleanup_test
-+_show_result $TID $ERR_CODE
+ 	for (i = 0; i < config->num_connections; i++) {
+ 		struct nbd_sock *nsock = config->socks[i];
+ 
+@@ -1375,7 +1378,6 @@ static int nbd_genl_reconnect_sock_cb(struct nbd_device *nbd, unsigned long arg)
+ 			mutex_unlock(&nsock->tx_lock);
+ 			continue;
+ 		}
+-		sk_set_memalloc(sock->sk);
+ 		if (nbd->tag_set.timeout)
+ 			sock->sk->sk_sndtimeo = nbd->tag_set.timeout;
+ 		atomic_inc(&config->recv_threads);
+@@ -1404,6 +1406,7 @@ static int nbd_genl_reconnect_sock_cb(struct nbd_device *nbd, unsigned long arg)
+ 		dev_info(nbd_to_dev(nbd), "reconnected socket\n");
+ 		return 0;
+ 	}
++	sk_clear_memalloc(sock->sk);
+ 	sockfd_put(sock);
+ 	kfree(args);
+ 	return 1;
 -- 
-2.50.1 (Apple Git-155)
+2.43.0
 
