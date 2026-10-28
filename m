@@ -1,92 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205862;
-	b=3JfoheCjaiaHmUw0hxQavJoq6s9csTUvSjVMYxOk4Xf6E7xgb7s+7OIFqxXa8eDhbqmP
-	 SwBl0+jEIj/J/GAQ3U22+fQuA+H/9wcIxbomFYJJDzIunugXry+ZA5Cy6hNtTYMA4k3QR
-	 hUJFWrQS0S9l3eS8TF5MVZeGlLJtB1aI+TTaseFDhFbaZRafTtoLkCtM4NGYrDXGFcNVL
-	 ZGYMp2frADnpRAd5vyfFM7lePPEbeTtj3esalU3HDxAXGeaeoKjD3Iz1oDCHnkLMWjttP
-	 JGPwgxH1bgtkaq7lV/uU1+GaKlobtgTdYwMdp8NM0qhwa0ofP8sUVucyuA8TCtEy/rw==
+	t=1793205863;
+	b=CRr4bg5I54t4OcX68/+jqcQxFtbKeg69/08+E4X//pSxZ+d257Mm2Mg5fL9HbZFHMp4o
+	 idnZFrcIwBovbhO6XjiEGo4dvCjCCWqydq1VbkndNiosvVUA1NkU2XdS+/vyp/lyrKAmv
+	 oVFFqKffdJwtfk7n66eD8MP+3RL2I83b2ln6gC/M5O5RoK2JEfRea8+BOFUmCcExiAaAQ
+	 RkszFe/L/mZ2HqBYcaWZvONH1uFL9QbUsEwbIXP2rsGixgADdBSpPz7/3UXruIlEOz1Er
+	 8udAneYObQDDAN3V5IwnEQq9lfqPl6oi++mvQoh0PC1Yg9I1abADRnlXxQ1HOS8HyKw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205862;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205863;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=2x6ZMRwjwD1MoaqG4WqOnxE5UXawezAVCYWm3ixWoRY=;
-	b=qbOsVU+/tOUWa+ptUUcJZ08C1iWW3VTsQO7l4vyC40S9vLxqivr246rKjZ6vwC2U1Z1x
-	 VqTUBy7lkdx+JrTcIA3fNCZvJNAq1H3WlH4SY6QWJznr8e87bapUtpvTAIVw8mRI6Rksj
-	 FB3K4JpY8EjDQNHzCSNIWPa3wY2C7LyQJc9qM0fw9rdUvzX17CcX8r5JrsYXZs/vcbLU0
-	 t6ZBk973B3CCrrz4UI+y5qnVmwcEmHBbk49LGv7dP7O8PI6fzu3egorHqEZoV1cAAvU+1
-	 xL2Eg2AD4XXbmcxAMR/FgIWa3PbXZA8hj1vpxKW43fzDCtqlzw3/ZqkO6TKYYGVcmxg==
+	bh=MtoAFkUARZ6sctfHtcZ/2HGK6Ul7c57ilohnFA/OsG4=;
+	b=k6BJnyCdl66TMN23CGdMXlUYT09nuoJAwcGyPd8d+C3wD2hgF54+xFeEXDbmFsvxFOvD
+	 ze8PoaXtco4OBH12manjCmz3vD+sJEv7hRYhfXGqnHtR+kfY0JK3oEwr1O48itggenLNF
+	 JnOWodGCUJeEBqA0lifE76KClTXVlEqQA8W7GnyaUr3K4n8K8R7813BlFHJcxvpxz9Sr9
+	 lp0vhm9KIS0PevTgz3Mhmmys93JLMFu9gJ5gMfahEqfv0FSiUmtT0pmwjMRpioyIb+Wyg
+	 Px5AGDxQWpsDBe3jxizTgHTNq34zsxNZGY07RmcV1R8tQlAmDOOav7nOsEzCgor22uA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=inLxbOhT;
-	arc=none smtp.remote-ip=209.85.210.43
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=eTAMOHeu;
+	arc=none smtp.remote-ip=209.85.210.51
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F229D606A31E
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F229D606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5000B606A329
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5000B606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=inLxbOhT
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-847ac7ccd85so792279a34.3
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:21 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=eTAMOHeu
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-823b938464fso825080a34.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205861; x=1793810661; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205862; x=1793810662; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=2x6ZMRwjwD1MoaqG4WqOnxE5UXawezAVCYWm3ixWoRY=;
-        b=inLxbOhTp5B8slXntRkuEZvaXq/9gpgrDTyM9kOtAXUBKOUIXAw0iOtu+qiDWKUzQL
-         fdS9hcSuJzGn7Df+0UeSeOW8ET9Ayd56Iwe8PZ5TjGYYokN1+d9cejC63j8zKKC8rAy8
-         O2LscvkJPqv2fOWWO3DhIsgi0m0eK/DNjwCJd3twhq6sMtl0trvCcmioEhLlFU7IhxIs
-         G6GtWlOu7a7wrUjZYqOghn1QwQuPUXr39yGItNBznDtrkT6/3bbeUrdxmWaFLV6ov1pA
-         LiXx+7bj/cieJPx3ui/YYF1xFNmBvQVn1+WYdp/CzpDs+EXq82SSvYOqxojV0xg2YeJn
-         Siaw==
+        bh=MtoAFkUARZ6sctfHtcZ/2HGK6Ul7c57ilohnFA/OsG4=;
+        b=eTAMOHeuYaK4WuHcbJbBBlpY0c474K2TAIw3kCs3OrVwSkl/IvLpOdTzr8LlnTQMOt
+         sEskkXYdTSx/d+eBWv/ZtpsQFnVHQQdtRPKr0eelLaxaOWy9KLwjCH5mr6pksnuWStbZ
+         iJiIWvb/AlJ56SfQrDmeWnpKViiMY511QYCRKLg9XKEZITnwyrzFT7SSKkD3kmMOBhYp
+         qBnNa6MNF+qAAwj7BzgGgrm4g7sPNfV12QpRIHtB+aKpkVlt5zmXt0+eBJS9Z3A488/w
+         CpG9BKT6P0U5eEKN+7QUJ7uTdLYJzx2wdMUV5OSV80IcPb+E+hFfAQ3nuEjHYPVIU59Q
+         e4tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205861; x=1793810661;
+        d=1e100.net; s=20260707; t=1793205862; x=1793810662;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2x6ZMRwjwD1MoaqG4WqOnxE5UXawezAVCYWm3ixWoRY=;
-        b=ZWV2UjAKN7hfql2C36B27Xo6cKR2F1lwgcSRp02mzFhj/W0H5VG1u/7TyrjlzUIHNs
-         OLla0LYH679ZxawpSp0QIFtOh5LvcZ4qgbX55INgp0K1pe4am7HirjcP+/4XE2LsZcBk
-         y3JZx3/soqJfPMIN+ndc5J/VRFDGQp7XjkkXZnsweetbBEfpAP2cqCjz8+5wnlzkLhrR
-         ZkrA1f43dAAG5naV7UJI2hINLLBaQPbrE0OLVixYvEYHhqRZCL97WfXPcE4MWgkRXELY
-         2/Blt1qclIIOlvBtAeMtBSu5IZBDHsF5xZn8qxRbI19aDhk2DWXKNozkC989Iw4P7bjA
-         ljCw==
-X-Gm-Message-State: AFq9FYKT+yTrM2Xa1X7kwYqcJkB6uQZbnwFXpxrnCEEU1PRkfvML6mcn
-	4xNwofKq5P7xWgFIDD0FXbplpZGgF2tFOPI1sJEnbHWKn0sQ9FQE73m713rPjQ2LG/IcWl4wl9m
-	BHxwVNRU=
-X-Gm-Gg: AYBFou1ouRSPEbGNmhkZbSV7cadtA0h+bZMW/ziqG7KvZoRdlTeNRkksGL0JD9S+T3H
-	YWRZnr7Hmm7z9WC03RrS9gK0iWcZ0HbRqYrup96l/6XsQ05dPEWlNo+ZlgXLSz9LzCI8dZGpAFu
-	YG7KskVPgfJ1H5rk89MzluZgIeflOHfkAg0+Ej5Fx26WCV6Tfag33xQC+f4TPa7U+xami6AKEJx
-	J7OTtK4FmoqulkCK7KBTCcWyUulxxaFMTxrndclxhVVu6KAonKAHMoRljALEjaMDX55+s/vRl50
-	JKmvvHOe+bBIHzvCZjBqi1yQPb9g3xWAT4hUxXh9e/IBdUwL51oF8b+kmhE8Ltxp7frd8Ukj+9i
-	54IyEL+zxTN6FajQyZ3TcmVyDWpsrMjNOPR6ZJCB4JMRkJpSY8K4n/gId8X7B8Sekq1xYfxfT++
-	KpAXKkXn4FZu/4Og5HYvV9l85mf50CO3MUqcpFeQuIoHVM1lLNOBNV9o3fLcWfJR7q2Pa8iovK6
-	gmK4cNrXS/MPCK7GFzTDWrkocUheAAJFBCPGq41JGDQQo02bSJnaTrrfjY+xr65GVEjrSaY+7Nl
-	4ll5ng8UmIVHxRe4OA7TKb/WiuiLPwlvGQuasdNG3eOQZ+qmuO6bgMj/VzRrwRPPBVll23hUyQ=
+        bh=MtoAFkUARZ6sctfHtcZ/2HGK6Ul7c57ilohnFA/OsG4=;
+        b=L2LsMbMN1KoTCGbXTYlBj0UFJ6Y5JKeTrvvakqMw6Dzp+7v/OFxVEwIXEKsDosoo0g
+         lbC91yjySQ2jV4yUMdNulsLUriXFUEN9kvnHxw71Prg9Ij1JexcBlSa72x5v8j88vEXZ
+         eECrLmOFSHIYDKY32bd4pIUZr7PFsRu5XGeC2QnxDyMTr+m8IeltJWF7Ey1uLrojc15N
+         uTAwRX7obt/zL6Ma1IIrwt1ZPdXuBHsEcvWRt4o8O1mKU5WS3hOXof8hvuWMNSP/9JSw
+         fAui1/nVIuVF0iPY+ANlhOfIjeL/po8oARS3oxDBeHw1eftgSTsr77XaBF/ID5U1l/6H
+         xRpA==
+X-Gm-Message-State: AFq9FYLO4vavNNarqi41eW/snE0mu8EvgDmmqQDUuXFEt1QFY1Zro90k
+	L2+0S8MM1YdWlfJdyjAboXkl1VBtEcAYxDwU5NK2bKIxBVhQwNfX4GMZIyxHkzenqhKkdSo5JSr
+	oNbR7zxA=
+X-Gm-Gg: AYBFou2zBS6vZ0HpdJWet6gehQHEd7dqFQwqtRx0JXGgM8uHrfpm4gkcfQk0MODmfW2
+	ugnYxI7WAF2ncB2V+mfw6FroFeVhty/LgXjAp37uf0nIMDYeM4R8Utmi3I8yQsUnskRYJ5i//b0
+	xxUaqZseGlvW0GdFGlR6dp8KgBqZhiemYvP0cu12rvVe/jT3RAeQjg4vxCEVCIemlaqses+GebP
+	s2e99InPBarUVELI8giczwWkpezmkr8WseO5N1xaHEogyVe0k8gXmlFH7VOnPfcpbfXHxiIiksO
+	MELujgno56S+L1soI3U/wtUuT1gZwUnIVsZMwqDEoTqjY2bCLPSppHhtirBo3+29+k+xGrJSebR
+	xcTDBgSnU+O1juIxFe4nk6j6YWqEYEs5fQtoEkK6RsZY6C1cvJwz+3/cI7aionKva7mUmCjXrW4
+	AUb+AC4u0TinmhDrPOtMR0Tf+J0Ou06CK+0Z/289tmfTCEeYTkIv/2LS/ir5IdTNLFk00/mV0br
+	eqv6IMC530NNg5lWGJGzkMgTZDlw81sL79eQzSKeE0LFCgs/NfdHAyouh/T06IsbHfnjbxEPP+w
+	ISaD43Lo08DHIw6yJROfrXDRNh3yKAAT0hwYRckj9s19N8wa4Ebx+XtjplLGoQhybPKs9Ql8bw=
 	=
-X-Received: by 2002:a05:6830:2316:b0:821:c01c:2ec3 with SMTP id 46e09a7af769-85ab7a13a8emr2711852a34.0.1793205860926;
-        Wed, 28 Oct 2026 09:44:20 -0700 (PDT)
+X-Received: by 2002:a05:6830:4116:b0:823:e626:27c1 with SMTP id 46e09a7af769-85ab87cc78fmr2647712a34.10.1793205862314;
+        Wed, 28 Oct 2026 09:44:22 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.20
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:44:20 -0700 (PDT)
+        Wed, 28 Oct 2026 09:44:21 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
 	Tejun Heo <tj@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 02/98] blk-iocost: free struct ioc after a grace period
-Date: Wed, 28 Oct 2026 10:41:05 -0600
-Message-ID: <20261028164415.1262013-3-axboe@kernel.dk>
+Subject: [PATCH 03/98] blk-throttle: don't truncate the cgroup v1 iops limits
+Date: Wed, 28 Oct 2026 10:41:06 -0600
+Message-ID: <20261028164415.1262013-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -103,36 +103,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-ioc_qos_prfill() and ioc_cost_model_prfill() take ioc->lock from
-blkcg_print_blkgs(), which since commit 56cc24f59c14 runs under RCU only.
-That covers the policy data, which is freed after a grace period, but
-not the ioc it points to: ioc_rqos_exit() frees that right away, and a
-concurrent read of io.cost.qos locks freed memory.
+tg_set_conf() parses the limit into a u64 and stores the iops ones
+through an unsigned int, so anything above UINT_MAX is truncated and a
+multiple of 2^32 becomes a limit of 0. The next IO of the group then
+divides by it in tg_within_iops_limit().
 
-Free the ioc with kfree_rcu_mightsleep().
+Clamp to UINT_MAX, which means no limit, like tg_set_limit() does on the
+default hierarchy.
 
-Fixes: 56cc24f59c14 ("blk-cgroup: don't nest queue_lock under rcu in blkcg_print_blkgs()")
+Fixes: af133ceb2610 ("blkcg: move blkio_group_conf->iops and ->bps to blk-throttle")
 Cc: Tejun Heo <tj@kernel.org>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-iocost.c | 3 ++-
+ block/blk-throttle.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index a81488c755ca..7b5d865d8c14 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2920,7 +2920,8 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index ffc3b70065d4..4f10fe05744b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1386,7 +1386,8 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ 	if (is_u64)
+ 		*(u64 *)((void *)tg + of_cft(of)->private) = v;
+ 	else
+-		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
++		*(unsigned int *)((void *)tg + of_cft(of)->private) =
++			min_t(u64, v, UINT_MAX);
  
- 	timer_shutdown_sync(&ioc->timer);
- 	free_percpu(ioc->pcpu_stat);
--	kfree(ioc);
-+	/* blkcg_print_blkgs() gets here from a pd with only RCU held */
-+	kfree_rcu_mightsleep(ioc);
- }
- 
- static const struct rq_qos_ops ioc_rqos_ops = {
+ 	tg_conf_updated(tg, false);
+ 	ret = 0;
 -- 
 2.56.0
 
