@@ -1,98 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205979;
-	b=ZRquAk6CHVvvZ+JF3nCrBdJd75Imu5OOOZQ/oVa0IL2dfMtbvB+4tcmVaQ+Xtk37YoYO
-	 r0Z3atNY9fRXVMfg/9vzzLDc1mOmMVoMw9eHTYHjYnO7NRpxZ+lG+xXWOM2aC5K0seBpW
-	 T5cm0eNJhWUXj4yp6O7oE6AfNyczwB3J12ZDJRj8CH1xUmGnrBwLVUR9rB+P7AUlV7SN5
-	 AIt9MS4u+18HoNkCz3W8zUsIxsQbX2knBmtAJzvtFLoR7kjDsNUYqd+XS6EAydm/Iv69Z
-	 64Sr7AN0FkkItmjWTJhYt1KA3nRT4bor06D1vCJI+8GzJkRQSpIAHeyytBTQ3DTnnsQ==
+	t=1793205981;
+	b=0t0+PI9FH1AgO6DUsjsDprSpUNl/vQEbZTC0mMBkxQCbik3eJoXibk4SSAGRqx0hZdAE
+	 X1R7u1c4fL2qpB20SGRMbJ2JHe+K4RmIxsYvQ8Wxya53FPeuEDdSKdHggBctaxg0yL5DX
+	 3XwurnI7Tu13sN3xx8Rr3faNyxStmtw6lvrP1/h6GDG1qFnv0AK/YHMCGBGrE42l6rGqq
+	 hcV8FMmVtG0iM6qP4sJb7kzk4BtZlpVEtYoMFz/apq71IwZPLC+VzEV46Y70UEqGjdQZk
+	 dQ0ybe2hrRultbrywXBMAAFUiw3qF3CvmHXVumnvuTipO+OqLdx2ZZZvkh9LPRuRWzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205979;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205981;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=y1bk3hauGmSlVbbzTKUs6ZWOzx+ReD4F+CcFEDKQX6A=;
-	b=2WPggBZ/TIUYQU9pohFaChvU9v0T49NeK9lg8rQ/wPrwLb4ab4xHU6e9RSHBtIDcnAoY
-	 Sp/jwQM/A8xy8jqlQTdGrJKGT7qIp2lC5JWI1g1Mdv0XRVtVv2diKWqEu93cMyiq6E/4E
-	 EknHW2NJBLpv5jNhZ6UEPwIJ+lwQKmW6bmLrM8Ubdaea7iYMR4XOxTqtSUxGFRX08aMNj
-	 xxWv04tDNssiEwO8lk074fwjBAE3NS6ZhBEdelUktx/paMOfr7DhesniwXSWneLacm8eD
-	 3AxvzEmuswVZWlfJrHGlMvzat0SGJ84qr5soC+9AfBXkOh3/cZzpeTjCh8jRKFtNsiw==
+	bh=Ondc5tsv3qogDM/jxYbmSwDoPGsdyv7HYZbmzdedVxQ=;
+	b=fMtLnNvaZ5qECrHW0NJDqKTjyKt+mHCvTcZZyRU8R2sZy0K118wI5e4DShHc+WBAaNFD
+	 Xx8PQbiwJy5XfPnP+wA00W+H8narI+lRwzcXme8H2Y8W2cymZGdorgAV50rTBryjzmEUR
+	 vgHUEkjCutCghUWkfQBd/4YiiTJxxS5Tz1U+rnyX+t67PTF+3W+N0LRxEHRb+OgYX4ICx
+	 NvK75o0hHCwV1iDW72U+DM+rvRZrOmNyXqQTlRaTmRSKTE4FYK4vTBhLzhPpJkiABJDiW
+	 IAJYIqDlKytGC6gHrkn+uB83ieX+y/znLB0vnlwelKHlgSfNIUcES2tEu1N8DbOSDyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=kXJQWLIF;
-	arc=none smtp.remote-ip=209.85.210.50
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=dEBNQszm;
+	arc=none smtp.remote-ip=209.85.161.43
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE46360A261D
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:46:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE46360A261D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0AD60A260F
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:46:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9B0AD60A260F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=kXJQWLIF
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-83bbcfba0ffso911133a34.0
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:46:18 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=dEBNQszm
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-6de1ca1b05aso861705eaf.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:46:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205978; x=1793810778; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205979; x=1793810779; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=y1bk3hauGmSlVbbzTKUs6ZWOzx+ReD4F+CcFEDKQX6A=;
-        b=kXJQWLIFpD5Nsx6x4rXVEufZJ7Bgw4knS+PMYq9J/5rvTETexWthvhedXPaDLDOEED
-         kv/TKmPmcDme9DbpHUJzPRfzqFFutX9hFF1t9dUyuFoOpYKf+wFj+K4BCAs8tcymXOP8
-         sOORwoP0Qes551mtwxH5cr0VLbhXRkw7/KsjEBAN9PSarhVh90xbLUwzzv0siAAzzXwK
-         zh/inoy3DsRnoHryAEtj93QYEraJ9AmZu29dUh4Md2MIbA1lI7E0ij1lmwpSD2RISDgP
-         Oe2y9w2hGK+9RWBLeKtIH0GNQsT3xzS6zVT3tU6UgEupL0kGqafv2F1p/bgVZOXqSecn
-         Zgow==
+        bh=Ondc5tsv3qogDM/jxYbmSwDoPGsdyv7HYZbmzdedVxQ=;
+        b=dEBNQszm3p1p5uqjuTwL+L0kpKN1ebcF2Hlvis0P2rFl3ppyt2VyUS0CzXhynmoSfu
+         4IeR3FrscROYDKKcQbfGkJ+d2mo368LDuN8SoRBWKNqQlOfK4x5RYxNL1j1lJYEGfKuJ
+         BflhfQBscX1avAHK5gNL7Eqt1XOz58omFAkKrhnygtICbhJzWLKeHLxEu2g4JJi8+M0n
+         yBBD+hEqWuAMFyJtyPd4IYigp6JVDb/zumGdZCx0cbKho2L4FoGNLGZFZZCPgZr4+LDa
+         MiyKNaoQQcPVuY7J4ViLsn6cLvcc9J0n+is4y81scMibXD8DeAY9wn0qw42aMeM8VoBU
+         cGSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205978; x=1793810778;
+        d=1e100.net; s=20260707; t=1793205979; x=1793810779;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=y1bk3hauGmSlVbbzTKUs6ZWOzx+ReD4F+CcFEDKQX6A=;
-        b=Cdq43P36z1tbnzyUom1iKJBy0KBtZDTXoVdoa0k+6GMsJSAJvBn2gaY0vaFbBIkqr7
-         i8cesblK+VTff+G/DqPTyQk5Mo5/+pd4YAPsKeRRGyqxoUbB4p8/w98IflyKbmDDHoNp
-         I+DxB00NM568vLH6Kj2x2iSFWpkni2nVGmYvmOsvmZ7XzYYOW2CCgqVtm7pkGMBoCznn
-         8y8wH0agjBapQpRqNlqP7EIfk5jSyw6Xn32HuMpMkePk6yOANjWOD9g0OfvDnMCt2Nic
-         FaQUt5IgMvGQJhDLxKcDieppW9yvUa+wVHsMCbQmzEvwMBZPGUy8z0817ZBDPjlVDMsP
-         ihnQ==
-X-Gm-Message-State: AFq9FYIFUhDqANqAty77PZc5YuEz6NbXMC7rq7JX4SOsCm52d4rMI2bK
-	wIw3Xj71+x5E4QuWE2LarwMksWUd1VXVRuVPgEL9VHAvEEXCWBrPfqPsGUDFKG1Ev0Zo0PsaJNq
-	jeuB68nE=
-X-Gm-Gg: AYBFou0D7wt46CKV1375+Kjptza7k8+fkUroF5KmUc6keSt5u3gwgOyxaOHx+GXnjq3
-	DQxmpJolPcTx8Bnh83sf9Vga80YFFlC+4SqMc5JJt86cdv3u55cADQOO/hnkp9S9t6KMvOET4pQ
-	Mc/6l/KQW0CHHBG6TeP8iAByI+7FV8i/i73jwpkalRsrsjKZ4pmsZY0p/9pHfQS1p/PATAp0lYD
-	hQrfH4ceY2ZvbPKt/JhbJOZQr8oQLdfmYCRAc4gsWJ7hitcfmjtXm1+X3AEvf/ZlaQjOxA7Tv2K
-	7b8URPY1GcXelUlssPxz4J17nm+OWhAJ+7Wb0cusDaja3duDB4TRnzhVDIC1O7ioGGQ+aquGiBE
-	3yikJNfzVxc4+fi25fT4Fp36MoSXzsTnsrq33dFFHhltNufsmLj9C0pbwAaXZQ8dEVijVInUjwn
-	i87ngQdtHqP1VDJjDj8FcqVIDi5iL+M1UpzEb6+w2t9iKkom1ej7m1Ua1Tti23VxIWFYM7G5p+f
-	VQFGZ7aYK1Lzi4zS2fO7BopKVRgnl6lAWUaDR3woo0c7gusKYZwPRPRh/jvp5QbXrBTbnlCO4n7
-	lHUf473ktdNUAJOw8sgJHqrz3F1Yi1rBrWjLHZkZ6w7t98Z0GnasBwaxQCM0n8rnIdoH4kKbbA=
+        bh=Ondc5tsv3qogDM/jxYbmSwDoPGsdyv7HYZbmzdedVxQ=;
+        b=LsXFa+jlfHsBlfBl0jslq4NlUmLJJMV3BdgomXid6U5X62mbWnHDAVcYubY4BANwYk
+         1jdHFNdxegfGZqfvTNVA1eoAb/llISttKuV6HU4aXjkZvD8U+4XfeW5xRW2734LpmUk2
+         vNvYkNLM7Z6JSN7bbD0j34YbcGp0GkwMTgpyN3gdHJYY8GMfj97c0r1f/tV+yQPV2iDB
+         COSfa4YhesjALks2jzAvmbzG1JQbNZ6S8e/lIWOkWuPcd4J7P4+BFsYkaJSDjz7YsdHH
+         VAsviOfupI69oqY6uBw0SnxQgmgmIr6YKj2Wq9iclI2ZhQDH2IQvYrC4yNPym/+kcjlQ
+         4boA==
+X-Gm-Message-State: AFq9FYIbbE0kez3JlPJtHGmlnC/VDb84l7nQ354LXfyiJ6BEiQAVvtAo
+	193J5E9kh5eWkKlNbpIwHlqidPFNTB2d6pSaHq/lx6nwTv/XpP4XGY7byW2310/mG1+S70qlAEj
+	1NQzAclc=
+X-Gm-Gg: AYBFou0CzQ0r91CD2ThxfPjLJj28M/aUjrkHUYB3aGZ9gsuW/tKLpR4czx0gQQt+dMH
+	/KuAESdfrYesauPHXAEnz+SrmkJRhk3xRmTqHSIoH3qLoysyw2AZzHUyve9ELEj7tXI4M0BtJQM
+	cYTo5/hm+x/QOVLmhYRJFPPcm3sJ/ipXrKSQmjG5YJJp7UEK7h6oo7aWhAzY7Y5CkcA4QTwyAui
+	Q2+dxYgVQ5v3/WySU9r3WHkjZJZkfxDufFJZXmMPRtKQp4opfXoqTA4jkSUmwrTojCkfgOQ9uTJ
+	YT6TQuLgaRuzuNnI/T8lKVmMQIs8LnOhMGODZuvK7rkPWo7eUKvSkM8KfVPciCpUmL/ru+N0ket
+	5RBTLPX/UDAC+V5oU7E01IXA5xoOCTJuswc0rDLsDTYl0KVBFQGarpjHdclLw8fc6zZ6VKhfYk2
+	0NqN+4kVyyK7G0ToJzYGsgM/oACS6Ra6DwZ7I6wtikRVZuVQHd+3FMXO2LLeRfRgPJJQoJZlphw
+	OP0YYR2U++Hjx639xI45bx+ZvLcsfo4teExM3YEp85zwna3jUcjQnhEyjz52+LFqPDVTkeAhyyf
+	MmslSLUyCD4Ar0ilvaqLw50BUAKT5gmCK1pYcYo5WHtR3JVyRDWH9c/XL6Web7YprUos/YHktg=
 	=
-X-Received: by 2002:a05:6830:2304:b0:80c:d30f:97a with SMTP id 46e09a7af769-85abe8bb687mr2574281a34.27.1793205977633;
-        Wed, 28 Oct 2026 09:46:17 -0700 (PDT)
+X-Received: by 2002:a05:6820:f014:b0:6c9:80d8:a201 with SMTP id 006d021491bc7-713eeb53676mr1623334eaf.62.1793205979437;
+        Wed, 28 Oct 2026 09:46:19 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.46.16
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.46.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:46:17 -0700 (PDT)
+        Wed, 28 Oct 2026 09:46:18 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
-Cc: Andrea Parri <parri.andrea@gmail.com>,
-	stable@vger.kernel.org,
-	Justin Tee <justin.tee@broadcom.com>,
-	Naresh Gottumukkala <nareshgottumukkala83@gmail.com>,
-	Paul Ely <paul.ely@broadcom.com>,
+Cc: Chris Mason <mason@kernel.org>,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 93/98] nvmet-fc: only send read data for successful commands
-Date: Wed, 28 Oct 2026 10:42:36 -0600
-Message-ID: <20261028164415.1262013-94-axboe@kernel.dk>
+Subject: [PATCH 94/98] nvmet: wait only for executing I/O in preempt and abort
+Date: Wed, 28 Oct 2026 10:42:37 -0600
+Message-ID: <20261028164415.1262013-95-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -107,53 +103,138 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Andrea Parri <parri.andrea@gmail.com>
+From: Chris Mason <mason@kernel.org>
 
-__nvmet_fc_fcp_nvme_cmd_done() pushes the whole data buffer of a read
-to the host even when the command failed. The buffer comes from
-sgl_alloc() without __GFP_ZERO, and a command rejected by
-nvmet_check_transfer_len() never touches it, so the host receives stale
-target memory, as much as it asked for.
+nvmet_parse_io_cmd() takes the pc_ref for an I/O command as soon as it's
+parsed, and "preempt and abort" waits for all pc_refs of the preempted
+controllers before it releases pr_sem. But a write that still needs its
+data can't complete without the host sending it and without the
+transport context receiving it, and that same context is where Register,
+Acquire and Release sleep on pr_sem. So a host that sends a write and
+holds the data back, then preempt and abort with its own key, then
+Register on the same queue, deadlocks io_work, the abort work and the
+write with each other. Two well-behaved hosts get there by accident
+when one fences the other while it re-registers under I/O. The
+connection can't be torn down, the namespace can't be disabled, and
+with nvmet_config_sem held across that, nobody can connect.
 
-The tcp and rdma targets only send data when cqe->status is zero. Do
-the same for fc. The ERSP then reports fod->offset, which is 0, as the
-transferred length, matching what the host checks.
+Take the pc_ref when the transport calls ->execute(), once all the data
+is there: nvmet_parse_io_cmd() stashes the real execute method and
+installs nvmet_pr_execute_io(), which gets the reference, rechecks the
+reservation access since the host may have lost it since parse time,
+and calls through. Preempt and abort then only waits for commands that
+have started executing, which need neither the host nor the transport
+to finish. A write whose data arrives after the abort now fails with
+Reservation Conflict where it was previously executed, that's the
+input the hang needs.
 
-Fixes: c53432030d86 ("nvme-fabrics: Add target support for FC transport")
-Cc: stable@vger.kernel.org
-Cc: Justin Tee <justin.tee@broadcom.com>
-Cc: Naresh Gottumukkala <nareshgottumukkala83@gmail.com>
-Cc: Paul Ely <paul.ely@broadcom.com>
+Fixes: 5a47c2080a73 ("nvmet: support reservation feature")
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Andrea Parri <parri.andrea@gmail.com>
 Signed-off-by: Chris Mason <mason@kernel.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/fc.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/nvme/target/core.c  |  2 +-
+ drivers/nvme/target/nvmet.h |  4 +++-
+ drivers/nvme/target/pr.c    | 42 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 45 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/target/fc.c b/drivers/nvme/target/fc.c
-index eecdffefa24f..b95893adae36 100644
---- a/drivers/nvme/target/fc.c
-+++ b/drivers/nvme/target/fc.c
-@@ -2487,11 +2487,11 @@ __nvmet_fc_fcp_nvme_cmd_done(struct nvmet_fc_tgtport *tgtport,
- 	} else {
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index f96b21257169..b78a4d4eb838 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -1171,7 +1171,7 @@ static u16 nvmet_parse_io_cmd(struct nvmet_req *req)
+ 		if (ret)
+ 			return ret;
  
- 		/*
--		 * try to push the data even if the SQE status is non-zero.
--		 * There may be a status where data still was intended to
--		 * be moved
-+		 * A failed command may not have filled its read buffer, so
-+		 * only push data for success, as the tcp and rdma targets do.
- 		 */
--		if ((fod->io_dir == NVMET_FCP_READ) && (fod->data_sg_cnt)) {
-+		if (fod->io_dir == NVMET_FCP_READ && fod->data_sg_cnt &&
-+		    !cqe->status) {
- 			/* push the data over before sending rsp */
- 			nvmet_fc_transfer_fcp_data(tgtport, fod,
- 						NVMET_FCOP_READDATA);
+-		ret = nvmet_pr_get_ns_pc_ref(req);
++		nvmet_pr_set_execute(req);
+ 	}
+ 	return ret;
+ }
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index 9e8fbb2d1fc1..29105e2a7022 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -517,6 +517,8 @@ struct nvmet_req {
+ 	struct nvmet_port	*port;
+ 
+ 	void (*execute)(struct nvmet_req *req);
++	/* what nvmet_pr_execute_io() calls once it has the pc_ref */
++	void (*pr_execute)(struct nvmet_req *req);
+ 	const struct nvmet_fabrics_ops *ops;
+ 
+ 	struct pci_dev		*p2p_dev;
+@@ -1051,7 +1053,7 @@ void nvmet_pr_exit_ns(struct nvmet_ns *ns);
+ void nvmet_execute_get_log_page_resv(struct nvmet_req *req);
+ u16 nvmet_set_feat_resv_notif_mask(struct nvmet_req *req, u32 mask);
+ u16 nvmet_get_feat_resv_notif_mask(struct nvmet_req *req);
+-u16 nvmet_pr_get_ns_pc_ref(struct nvmet_req *req);
++void nvmet_pr_set_execute(struct nvmet_req *req);
+ static inline void nvmet_pr_put_ns_pc_ref(struct nvmet_pr_per_ctrl_ref *pc_ref)
+ {
+ 	percpu_ref_put(&pc_ref->ref);
+diff --git a/drivers/nvme/target/pr.c b/drivers/nvme/target/pr.c
+index 1a03f74c2e14..798f5ce9011f 100644
+--- a/drivers/nvme/target/pr.c
++++ b/drivers/nvme/target/pr.c
+@@ -1060,7 +1060,7 @@ u16 nvmet_pr_check_cmd_access(struct nvmet_req *req)
+ 	return status;
+ }
+ 
+-u16 nvmet_pr_get_ns_pc_ref(struct nvmet_req *req)
++static u16 nvmet_pr_get_ns_pc_ref(struct nvmet_req *req)
+ {
+ 	struct nvmet_pr_per_ctrl_ref *pc_ref;
+ 
+@@ -1072,6 +1072,46 @@ u16 nvmet_pr_get_ns_pc_ref(struct nvmet_req *req)
+ 	return NVME_SC_SUCCESS;
+ }
+ 
++static void nvmet_pr_execute_io(struct nvmet_req *req)
++{
++	u16 status;
++
++	status = nvmet_pr_get_ns_pc_ref(req);
++	if (!status) {
++		/*
++		 * The host can have lost its registration since the command was
++		 * parsed. A get that succeeds after "preempt and abort" has
++		 * resurrected the pc_ref has to see that. In percpu mode the
++		 * get orders no later load, so this pairs with the
++		 * smp_store_release() in __percpu_ref_switch_to_percpu(). While
++		 * the resurrect is under way the get is a fully ordered
++		 * atomic_long_inc_not_zero(). queue_work() in
++		 * nvmet_execute_pr_acquire() orders the unregistration before
++		 * the resurrect.
++		 */
++		smp_rmb();
++		status = nvmet_pr_check_cmd_access(req);
++	}
++	if (status) {
++		nvmet_req_complete(req, status);
++		return;
++	}
++
++	req->pr_execute(req);
++}
++
++/*
++ * "Preempt and abort" waits for the commands that hold a pc_ref. Until the
++ * transport calls ->execute(), the end of a command can depend on the host,
++ * which may still have to send the data, and on the context and the resources
++ * of the transport. So a command gets its pc_ref only then.
++ */
++void nvmet_pr_set_execute(struct nvmet_req *req)
++{
++	req->pr_execute = req->execute;
++	req->execute = nvmet_pr_execute_io;
++}
++
+ static void nvmet_pr_ctrl_ns_all_cmds_done(struct percpu_ref *ref)
+ {
+ 	struct nvmet_pr_per_ctrl_ref *pc_ref =
 -- 
 2.56.0
 
