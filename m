@@ -1,91 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793223668;
-	b=MVXeUtLkrx02K+2G9Zq15l54yo+o2dJnXR4MJlr8EiEt01AAmLtSDASpzSejoZGZQ9kW
-	 h5OWtZBvJMa7EpmnhMqE/zHhGHOGTYXFLknDt0BtUvgf4s17KSJ8xWemiql+g+0XF+8EW
-	 8ZDWRzN/diD/QxnLvcRs59ofRY3zFrgigPSVAE+7FRisTe729rbAxKJ237F5jtaQeuHFC
-	 uAdnlctksV4l11JWXoRiFYSre1myZ91vmWm4iXs8AU5YsK8aOwe5j5H7/K0i/kgGqU/VU
-	 tHXqg5E1nT15HlGCKT5V7byZkSQ0LEKyUD7TvXpwGqG8a0MoR6WG92gW8vIlpFJdfXA==
+	t=1793231374;
+	b=HkHcadg5faF3/aeMAA2fXlECaEdNes69n/k2BdN8QdFpIxs+HD3WqWjuf3sWp1Z3JSSj
+	 GNtlKjCK7d6+Dkp5FdCvWB74rRwMyFRsCUSvdR3djZ/UiPMvl89kaCb8gER2A3qbPFJvZ
+	 0E55Y67SIQ+o6K2iRIjE1duLjizQwd2ZbjgDg5n35NrnNFuafrNzUg7vv6uFAILpK5RIG
+	 0Qo8bS4g+Wp33tbXHPVPGCq77yeZIKCwtgGR/9lsdgldaEFsft+RPk5rEUz9WWn4bkpmX
+	 brzA6wapEGZA6VEUVEaDQiFFs+guUn+btzgDeyUTrE8utt30m+W97NqBR8hdrzxiCBQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793223668;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:In-Reply-To:
-	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:X-Mailer;
-	bh=cc49exvy41iKBAY2Mjfi2XX66SV5CDWWS6KdVbEg5mU=;
-	b=ywfTXnacPww31rHmqBEzKwLwKNm517ArZv1mTQjFcK3DVpV1IgcntMbJXBq3J1gzROGI
-	 L6ljRmIGkDZ5vgP9KUKmueU9VjyWkOwxxaG1TiQYSZeNO7YGqYtRVTgG0qVyBGGZqVENX
-	 OHJuqi9ifZaRvx9zt2C1Q8H4y09eYnANa6YxdBzTx9ILYx2bT+XL5ACugx+kC9kbkhIN5
-	 QTYVe6udqG3PnQGttVB0MRNWkrCiUkup5cBs3LpdXL8gket4Tr25Ybbw7fM77dFdwdpUx
-	 EaAoQuVaon21uB6NJdPr/jvVgb4D5Fe8MREwdimb49WX3PRreaaY7DOxxrqj0D2i7/g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793231374;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding;
+	bh=q288pBJwVmPXpB+FW0MORM9hqcsIXPImg4gXaxIst44=;
+	b=umbXVTW7h+e6hnPMEd2lqZj88+usE/OnPJ4nAqNOElNzdD5Ku3KDeDqSNifCwMCOT4Mm
+	 gPGKYiBk7B1ELt1+9Juacscl1rRGbwbnZihtciOL1LaClGyb5vYsMpTLq3COQ0gh6/uDV
+	 to96lKq1HT3ZjXgNIMt0prxzpRV2U8XNEni1gDMeRPetNS9t6WMSDSi8dHPkxu4pFceRk
+	 4FvK/70HZQSiFOTf7krlEtO4R+COeWpmkLf7+pYX8YVRCV5XmIUpASbB7cb/sToeFgxVc
+	 M9yxLuwnJpHftp4sV6xILRQ1xaReyFYidv1t7QHIywPWgUmedUvzerwck4JeQv1eJqw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=ICEMhesL;
-	arc=none smtp.remote-ip=74.125.82.180
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=acm.org;
+	spf=pass smtp.mailfrom=acm.org;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=BDY5RWfq;
+	arc=none smtp.remote-ip=199.89.1.16
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C749606A31D
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 21:41:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5C749606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC822606A31A
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 23:49:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC822606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=ICEMhesL
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-353804b591eso2346422eec.0
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 14:41:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793223665; x=1793828465; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=cc49exvy41iKBAY2Mjfi2XX66SV5CDWWS6KdVbEg5mU=;
-        b=ICEMhesLKtT1lB/wsy2iZCKMOtsQvvT55wXAiEK/AU5RTSgpJu2OSb6HC9UnKTK7UU
-         KlolMRA1yxECoXVsv1PA3OV4qNNCv5vFiizy6puIIIiOM75wiFuXBbS5dwSMngludo/1
-         O/5WBjRoddtxWi/+0SnqEICZcnKugiXYk2s362nizZEK8OmzYlUD7njUeGJ3qcNUQDzj
-         Mqe4BEZ81EqZiwNw3av0D75aUCsc77hOb1g4o0hgM8DZ59sXwbsz1GEgYuMKQdPcmNLX
-         8MiMHg//blhVjYMxyYEM0goERvwj50Hv3sB8S18Rj78YZNtE2P5SPbg0f398xGUQKhaM
-         mDjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793223665; x=1793828465;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:to:from:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=cc49exvy41iKBAY2Mjfi2XX66SV5CDWWS6KdVbEg5mU=;
-        b=2zQprxWvF/OWNS5PF0trQ3JKOmYzU+q0dCGKkCYFE2mOpMlgD2o+y4D20ef85Fg2nr
-         UCyiKlS1LvTJZPdXI7A8KiE6a0AOkNfhJSIfyvDevzAYL851HMFU8dIwTdHktJpUtJoC
-         69QRobcGrq5nykRFBfocBKYRsOmJmWGUIjLDMoIL2PmhlybpMXDnNyAaXa3QLgkG+WQv
-         CjGRc89wOvwm438EVUf782apGbB3c0c1RVX7KA/Jx/51LyvVegGtgxSp04sTBWwC0ABH
-         59SoLw6dYbmdcnPsvRRD3B8gCyg7D2lNPwaxoYm0wH6uub4HE+M/8Dr8ef6eKEff9gCt
-         RNjA==
-X-Gm-Message-State: AFq9FYIRkNBAiSK+H8PIvwpbo/59FR8mpLLpYOyxbtPuQEpWcSu3bd7U
-	AvXW7CsMGRGILXAUPeZckWzVzz1OQ444FYH/uLT6NVFvUD6wp59zHXGJdT6OwX1Z8YwwYtdQ9sv
-	3t7GwOBo=
-X-Gm-Gg: AYBFou0zVUMfmsSEATxxedeXqfq4U4FjOkhSDag1SQcpK7NnyQpxJl64yA3nlqbZwA7
-	AZA0OhFXAHIts1Agl5cPjjt+uWA1yq7xC83QnzGqkwjlto/o7nttxABk5yC6iF9O5m65whCTx4Z
-	SUPHJogsYTWNFWlorpQ1QIb34cIL3rVuUuz37sGoMcXGZ2/U+ZgvUVtO7vtzDbEeRO/Ps4Qmg+G
-	B59a1TjbLRFAZNneuM/fCKtXkectC5G4iEqle7REgtxMV4jZdo3OHnnMpzrgG9DVwlyrY3LGYW2
-	ZM8ESqrlSIDUc4rcIZYlZc0CVm3jOKU1SALjKol0a8CIY1hM5Okylw51CIJ42330QPQ6tqMVU9J
-	sxdUnxCoGVTOKlZCRAGAHXWYir+VfM8lptvDUhN/mvrDGPwBkR5bRQlNRsnKRqOrKuzGWde0C5x
-	Fa29GoZuJJs0i9eyG0zlbu9EUlks2dUP6+31L0GS0cCC78UPD/40sAgFhfqAATTDZeWVb/mkHBp
-	iZ51+tGMv4HEXVdVGLBKD4Kfzd1qrOrYuCjZPSI0Ddk5xu1RJqNN9tJ0QNl2/BjlpEbtW0jXA0y
-	mIh6H9EvOwhAHkBLhUb9ikVogyqdJHG2vhS5mt5A1QeHiBE77nenMmRONBniz4wyp/N8HRXy3iF
-	vkbsoZV2wQlzp
-X-Received: by 2002:a05:7300:b196:b0:36a:30b:5dc0 with SMTP id 5a478bee46e88-36a203bb12amr4981287eec.24.1793223665307;
-        Wed, 28 Oct 2026 14:41:05 -0700 (PDT)
-Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a238da3e1sm13103508eec.8.2026.10.28.14.41.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 14:41:04 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
-References: <20261028164415.1262013-1-axboe@kernel.dk>
-Subject: Re: (subset) [PATCHSET 0/98] Various block related fixes
-Message-Id: <179322366442.1350780.18258243570598262428.b4-ty@b4>
-Date: Wed, 28 Oct 2026 15:41:04 -0600
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=BDY5RWfq
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jFPGj2Mcxzlfvq2;
+	Wed, 28 Oct 2026 23:49:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1793231369; x=1795823370; bh=q288p
+	BJwVmPXpB+FW0MORM9hqcsIXPImg4gXaxIst44=; b=BDY5RWfqnRR08OC+TqMyz
+	vCj6kt03CXMs8e8qx9GBUQ3ZzEEZB2w8lOTNRu4wotl9YNUxNNMrtk53NRgTQsnB
+	reKS5n44G9mg9kwdNuVttR08uHwLUGlN6VVELkwpNgLdouV69aZxhCwUIpWRRUg5
+	nBk6Jpwi8JU5yECJHOyBe37FOP8W7bntcc+7ofe+8OI2RIH2fr0FM20xnaKGz6mo
+	4JqzJ9yiejn11MPvU5JGyfmxHBwbHjdxdtj/1yoEQjDnX5iDJSFOypA1COC/ciQb
+	jfmW1ujRlru5S5my7NabvzuEaImUkf+aT/yBCQmCrNORd9KeUBnGOIEJw02YFpIN
+	g==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id kg9SJkjlsdVc; Wed, 28 Oct 2026 23:49:29 +0000 (UTC)
+Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jFPGc39v3zlfvpT;
+	Wed, 28 Oct 2026 23:49:28 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: Justin Sanders <justin@coraid.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 18/98] aoe: don't free a device with its work queued
+Date: Wed, 28 Oct 2026 16:49:06 -0700
+Message-ID: <20261028234917.3067347-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
+In-Reply-To: <20261028164415.1262013-19-axboe@kernel.dk>
+References: <20261028164415.1262013-1-axboe@kernel.dk> <20261028164415.1262013-19-axboe@kernel.dk>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -95,46 +78,172 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: quoted-printable
 
+On 10/28/26 09:41, Jens Axboe wrote:
+> @@ -356,7 +358,9 @@ flush(const char __user *str, size_t cnt, int exiti=
+ng)
+>  		spin_unlock(&d->lock);
+>  		spin_unlock_irqrestore(&devlist_lock, flags);
+>  		aoedev_downdev(d);
+> +		spin_lock_irqsave(&d->lock, flags);
+>  		d->flags |=3D DEVFL_TKILL;
+> +		spin_unlock_irqrestore(&d->lock, flags);
+>  		goto restart1;
 
-On Wed, 28 Oct 2026 10:41:03 -0600, Jens Axboe wrote:
-> Got a giant pile of stuff dumped on me, and went through and did some
-> vetting and, particularly, commit message rewriting to get it to a
-> somewhat comprehensible shape. If you're CC'ed on a patch, please
-> review it. Feel free to queue it up, or reply back why the particular
-> patch is garbage, if it is garbage.
-> 
-> Thanks!
-> 
-> [...]
+Setting DEVFL_TKILL only after aoedev_downdev(d) returns leaves a race
+window open while aoedev_downdev(d) drops d->lock and sleeps in
+blk_mq_freeze_queue(d->blkq):
 
-Applied, thanks!
+1. ataid_complete(), rexmit_timer(), or aoeblk_gdalloc()'s error path
+   can still see !(d->flags & DEVFL_TKILL) and queue d->work during that
+   window.
+2. aoecmd_sleepwork() does not check DEVFL_TKILL either. If it runs
+   before freedev() reaches cancel_work_sync(&d->work), it can call
+   aoeblk_gdalloc() (hitting WARN_ON(d->flags & DEVFL_TKILL) if
+   DEVFL_TKILL was set in the meantime) or set d->flags |=3D DEVFL_UP
+   again after aoedev_downdev() cleared DEVFL_UP, letting new I/O enter
+   and hanging del_gendisk() in freedev().
 
-[01/98] blk-cgroup: keep the old blkg while reassociating a bio
-        commit: 0e1daaf9b20df2125452846f768a68d8ea280adf
-[02/98] blk-iocost: free struct ioc after a grace period
-        commit: 05ce1df3756773862c056ca8698f8ec4cdd7fe98
-[03/98] blk-throttle: don't truncate the cgroup v1 iops limits
-        commit: 7d96874ba80ba7a2ab578ea9139c2af79c353b88
-[13/98] blk-cgroup: fix root io.stat byte counts on 32-bit
-        commit: e335b853d919f2c6246ca0993115285742a2acc1
-[19/98] blk-cgroup: don't free a blkg with its punt work queued
-        commit: 4def096314cf29fb6940b74c087a0b923185580e
-[23/98] blk-iolatency: flush enable_work after going offline
-        commit: 020f61242d6ebeba5f8f2ef6e429aeffdd63f1c1
-[25/98] blk-throttle: pass the I/O counts of a dead group on
-        commit: 587edb931fdda032bcd63fdfb0db4ded75159ee9
-[26/98] blk-throttle: make blkio.reset_stats reset I/O counts
-        commit: ac81a07a0bd5e75e8edc0eb5be563be1b2d56554
-[34/98] block: don't enter reclaim under rq_qos_mutex
-        commit: 045cbfc369f5929ed473f7c200dc2e8146569ce5
+Instead of setting DEVFL_TKILL after aoedev_downdev(d), how about:
 
-Best regards,
--- 
-Jens Axboe
+- Serializing flush() with a static flush_mutex so a second
+  aoedev_flush() caller cannot enter pass 2 (freedev()) and pass 3
+  (kfree()) on a device while the first caller is still in pass 1.
+- Setting d->flags |=3D DEVFL_TKILL under d->lock before unlocking, then
+  running cancel_work_sync(&d->work) before aoedev_downdev(d) (and
+  keeping cancel_work_sync(&d->work) after timer_delete_sync(&d->timer)
+  in freedev()).
+- Checking DEVFL_TKILL at all three queue_work(aoe_wq, &d->work) sites
+  (ataid_complete(), rexmit_timer(), and aoeblk_gdalloc()), as well as
+  in aoecmd_sleepwork() and aoeblk_gdalloc().
 
+Here is a replacement patch against the same baseline (checked with
+checkpatch.pl and syntax-checked with Clang; not runtime-tested):
 
-
+---
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 34ead75e7e02..69586dc6d379 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -385,7 +385,10 @@ aoeblk_gdalloc(void *vp)
+ 	spin_lock_irqsave(&d->lock, flags);
+ 	WARN_ON(!(d->flags & DEVFL_GD_NOW));
+ 	WARN_ON(!(d->flags & DEVFL_GDALLOC));
+-	WARN_ON(d->flags & DEVFL_TKILL);
++	if (d->flags & DEVFL_TKILL) {
++		spin_unlock_irqrestore(&d->lock, flags);
++		goto out_disk_cleanup;
++	}
+ 	WARN_ON(d->gd);
+ 	WARN_ON(d->flags & DEVFL_UP);
+ 	d->bufpool =3D mp;
+@@ -427,7 +430,8 @@ err_mempool:
+ err:
+ 	spin_lock_irqsave(&d->lock, flags);
+ 	d->flags &=3D ~DEVFL_GD_NOW;
+-	queue_work(aoe_wq, &d->work);
++	if (!(d->flags & DEVFL_TKILL))
++		queue_work(aoe_wq, &d->work);
+ 	spin_unlock_irqrestore(&d->lock, flags);
+ }
+=20
+diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+index a4744a30a8af..c7f762180b9b 100644
+--- a/drivers/block/aoe/aoecmd.c
++++ b/drivers/block/aoe/aoecmd.c
+@@ -787,7 +787,8 @@ rexmit_timer(struct timer_list *timer)
+ 			 */
+ 			list_splice(&flist, &d->factive[0]);
+ 			d->flags |=3D DEVFL_DEAD;
+-			queue_work(aoe_wq, &d->work);
++			if (!(d->flags & DEVFL_TKILL))
++				queue_work(aoe_wq, &d->work);
+ 			goto out;
+ 		}
+=20
+@@ -899,6 +900,13 @@ aoecmd_sleepwork(struct work_struct *work)
+ {
+ 	struct aoedev *d =3D container_of(work, struct aoedev, work);
+=20
++	spin_lock_irq(&d->lock);
++	if (d->flags & DEVFL_TKILL) {
++		spin_unlock_irq(&d->lock);
++		return;
++	}
++	spin_unlock_irq(&d->lock);
++
+ 	if (d->flags & DEVFL_DEAD)
+ 		aoedev_downdev(d);
+=20
+@@ -909,7 +917,8 @@ aoecmd_sleepwork(struct work_struct *work)
+ 		set_capacity_and_notify(d->gd, d->ssize);
+=20
+ 		spin_lock_irq(&d->lock);
+-		d->flags |=3D DEVFL_UP;
++		if (!(d->flags & DEVFL_TKILL))
++			d->flags |=3D DEVFL_UP;
+ 		d->flags &=3D ~DEVFL_NEWSIZE;
+ 		spin_unlock_irq(&d->lock);
+ 	}
+@@ -974,7 +983,7 @@ ataid_complete(struct aoedev *d, struct aoetgt *t, un=
+signed char *id)
+ 			d->fw_ver, (long long)ssize);
+ 	d->ssize =3D ssize;
+ 	d->geo.start =3D 0;
+-	if (d->flags & (DEVFL_GDALLOC|DEVFL_NEWSIZE))
++	if (d->flags & (DEVFL_GDALLOC | DEVFL_NEWSIZE | DEVFL_TKILL))
+ 		return;
+ 	if (d->gd !=3D NULL)
+ 		d->flags |=3D DEVFL_NEWSIZE;
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index 6e8b3807c1c8..4eb2e68439db 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -286,6 +286,7 @@ freedev(struct aoedev *d)
+ 		return;
+=20
+ 	timer_delete_sync(&d->timer);
++	cancel_work_sync(&d->work);
+ 	if (d->gd) {
+ 		aoedisk_rm_debugfs(d);
+ 		del_gendisk(d->gd);
+@@ -311,6 +312,8 @@ enum flush_parms {
+ 	EXITING =3D 1,
+ };
+=20
++static DEFINE_MUTEX(flush_mutex);
++
+ static int
+ flush(const char __user *str, size_t cnt, int exiting)
+ {
+@@ -333,6 +336,7 @@ flush(const char __user *str, size_t cnt, int exiting=
+)
+ 			specified =3D 1;
+ 	}
+=20
++	mutex_lock(&flush_mutex);
+ 	flush_workqueue(aoe_wq);
+ 	/* pass one: do aoedev_downdev, which might sleep */
+ restart1:
+@@ -353,10 +357,11 @@ restart1:
+ 		|| d->ref)
+ 			goto cont;
+=20
++		d->flags |=3D DEVFL_TKILL;
+ 		spin_unlock(&d->lock);
+ 		spin_unlock_irqrestore(&devlist_lock, flags);
++		cancel_work_sync(&d->work);
+ 		aoedev_downdev(d);
+-		d->flags |=3D DEVFL_TKILL;
+ 		goto restart1;
+ cont:
+ 		spin_unlock(&d->lock);
+@@ -397,6 +402,7 @@ restart2:
+ 		kfree(doomed);
+ 	}
+ 	spin_unlock_irqrestore(&devlist_lock, flags);
++	mutex_unlock(&flush_mutex);
+=20
+ 	return 0;
+ }
