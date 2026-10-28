@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205962;
-	b=5LhPzFsqi+GSQWOhl0USOoZSMmJugVfWaftu8ozmVDtnCcx/HAPVH+hAImSwNOepUmoH
-	 Lhn5a/7DkooBjy+4zTAu6RiJjVfD/tkgNHfz4TXKd0aegRWQoUP0IGEfwZNfUmDJwCpF9
-	 lN2n1YmIfN7/2/Rylbe181pG0v1kreVYqGhVqB36Srrnlgis35qw2F96I+eNAGsvLngqc
-	 7uy5idS8rcKY2E0Kuue26vSXPZ6QZ0ZHpM3AMyIFsMkWpprqVxCwKjhk6oneGhdbQ0OyX
-	 20SqKXdcNoAvzapUYoqJxnZg5xrP6mcJhP0Zj1feebCp2u0EdRsL9LRC+p+00EEhHLw==
+	t=1793205963;
+	b=m7XDPIxmiBOxUPuqi1+heQFlS8GgToTxZMx6d7GuhpfSJAocKzZJVf6sQjGosPICy0cV
+	 wNaZLgrLYmwmxF9Z8BNrQzawptMOXfpLrPlnRS3x7V4BY9ushqpYwUU5+3xGfMYwXleMl
+	 Q7cnvL1K0aeh0MIUZHNGKkr5yLjLkdbSwlRsEI/Wm5trubPuh5czrD1wDKU+J3ntYH1+j
+	 DXB3AHtxn/9w6PLzZ5eeCPr9oCeyMm+99aYgkCfmTGu6hwRjjw5YRnaYdkl9L1PCfjqN6
+	 nLJLclS8mKEz19ttx4l4fzqvopJnf8qBCGJEbC3MvHl6G7HNt6V8CSp5a672NfOwxQw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205962;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205963;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=DzGEEs0ay7pyB2sE4++FiYEu7fZzYJC7NMBTgrhLXwY=;
-	b=2G1entBPsewKsiSa5Ghp2Lm2/4PwzCRVlv3B25fLnbdUTB7NkdnqJQMAJcrKeRla/aEN
-	 A65r+P7l+HahXeG1GNOEdfsX8lHhgLNC34UGYbWhYdz5yfg8CK1UQLuQ3Xyl7dywj/wO7
-	 KRhhCKGcTe/fYAPnEyeEyGasyQBTzmLXrzBOv02GxWkGjKn4PX+K77fZiifK0HTX4NvfY
-	 0cwVUSeGWeZRmO/wrUlwzrG/vNWxBXS85IP9+gzhpQ8jAdhO2dPtDs2vW7Pnso6UlG2y4
-	 EkUEeE9oKThI5vLG30BeZuae/YIQIyw/gSYZKXl3IO177TyBOPtiuF5wEMo8JCDhoxw==
+	bh=1NNaeja9CPQdNWDiA6GhYzCVGaHovmQ4cPZ+vjHlOj0=;
+	b=ovFfWnvD1BEZfhDrfHK+4FmABlkrUxtDdZ9dUXIVesY78KGr2DgYhgp8HOT6qFFzFucs
+	 PTsM4abkKu+GAi1dYS/vHPKESntYl2VBohbieqUbjheA9YIo46NapKeDD31NapOH3Byxi
+	 kePexLWc2c6A+UmsnYZ7lLEF6iphpzSOKKJ9JkbU8l/OfTWzYanbT9Bwh3sooPIwc9Cqs
+	 gAvA3WyVyXFfIL0yqtk0rbo/UA7d/y4UX/ETq8Tt6Sb/rWJuxMGBboZoj6ClZGJAVszlq
+	 kfbUA40IrAV6ej8YU5CRxyVF1yXaTlTozs/bKVkh3ld5zeuntrqQkq+rn0DCs9hKiZw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=KQthycbF;
-	arc=none smtp.remote-ip=209.85.161.42
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=mE3ZShLZ;
+	arc=none smtp.remote-ip=209.85.210.45
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A2E606A327
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:46:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 57A2E606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758DB606A31C
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:46:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 758DB606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=KQthycbF
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-6b8e2d8df4fso964691eaf.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:46:02 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=mE3ZShLZ
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-84e513877a3so1112827a34.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:46:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205961; x=1793810761; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205962; x=1793810762; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=DzGEEs0ay7pyB2sE4++FiYEu7fZzYJC7NMBTgrhLXwY=;
-        b=KQthycbFiKI/CnxnwU5nzq+QHCeJeeSswIASHTJH+3vRluVMLp0WnMvIaJupYTq19G
-         9JTxW65Dyv2Y+9v3Vrg1XTwh2Do/2JiyukZ0RKpASaL0JdNuALmzXFu0uDvbWZJHiscz
-         c4thB9u5oiT/7dEf7WE1mqVzPYREhb9wn4hOrrOOoyaKt433gx/OkDAlr0CBzInhxsZz
-         siqZ0pSUJQrZh+CAP73hX4xlj6vKHCRAwrnwr1N4aaogwOi0YFn/8HnUbF2ySHrgFEwz
-         TKbha6SOYVcAz/NWob3WTBBa9fH890HPpxVFT6uRbtB4NroVSg2RajZkiXYUCijHn40j
-         sPAw==
+        bh=1NNaeja9CPQdNWDiA6GhYzCVGaHovmQ4cPZ+vjHlOj0=;
+        b=mE3ZShLZUnRmv/oWQ1heoUxcUdeg9cIXjqTB3IPCGYT5NW74wZ1sDhLFZ3/flNeSX+
+         2F9w3e5Tr/G7VPLCIOFUHKvz4eV2TBESXvmIZWog2Lu+oaSA7GFTc8Jz/m7A7QEl0ULi
+         AZVvw6488OOtXRtrxn6D8coxYAspQ4MIoxzEtKwamzFCoXpisf8gFxVqRca3nvspKCXF
+         rRz6f9RUfDU3OjhxlddlDsgGwgHum/4r8irhKMAwtLmNR5rXtGTRGZozNDd2vUKTyOLE
+         BF0hAA3fOWRoPG8r0m2RUtVdCS0G6rWRjqHUxp2OqV66Soo3NV5J2uuFLX0Pmr1BOYXH
+         m57g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205961; x=1793810761;
+        d=1e100.net; s=20260707; t=1793205962; x=1793810762;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DzGEEs0ay7pyB2sE4++FiYEu7fZzYJC7NMBTgrhLXwY=;
-        b=QlSnqsKTn8PuJOC0q+B4m7ReCqOwnQs+SYjFLvc4DBdUZEjsHgGztlpIqx4tc2qneK
-         mWARBA2b+XUp/c9Xr8nGeyyx8GAtH5uXp+lf3rl+SM+wKwJgaxb9laRpwa1NPMAy4RGy
-         tKfCW/H4l+WNrFnbateHlNLf77fQerUUxysG9K2kF+FsxNjJBefMfDCPNzegKJuBtDiz
-         lft4k3TH1vYzxkKt8DwyoZYAekk01GT9GnQRzCd+/7mmdbxQ7C7P3yDcL5hjO7teNPg9
-         ZNDdvLx3Bt+c9p5jW1HYKAbcBpjA9CjNz3Jw2UcJDuhObUZIjud2wgW/tXHn+aPAVrce
-         kGIQ==
-X-Gm-Message-State: AFq9FYI1qlXAcR4raPZDEecrdmPsGUkgONmlopNuRpA6512ZoiC3Yhnm
-	ygULhbOaxfpAju63M5zncLIX1GBh0rfwUvPpeEunkOl4mDHVMaSatNhoonUJFdNCRmJC1eFFEMf
-	ZV87u/gA=
-X-Gm-Gg: AYBFou1pEtKXqq8SfV067/AlAhwLoWo8zFqNoK4rvfA0Q3q/3BIPfzhFKzBqnfOLfna
-	+IIZPwjiM49UTqf3gwjo4K/mA3M183b/YbKJP1ovSXD+wzd2tfEGydtB9FjF0ANxTKRGACAdPLX
-	qUTh7j4IgOApTLc0/Gwx1HLoI5UAohurj5DPGrKZlycjqwQGtQESbXVqF+IQ5Z3k+DWqDeOk9Yf
-	zZ+hCQ9m4Pls1Xo2xzZ1pAKTb5xO3DRbPNcTDFLOSaOHEiA7LqYx1IYaMU7UiTGCcaeQ2ZMUzW3
-	Cxsfz9s/Tj15cZ5gfBL0mJmvPCxdiajaq/D9JYhNslqzJXqR/Ker5SzJkeCjZtcn2izLOOy8IFa
-	p4OYw5UZlYBe4xDnvlDOR1r0XEy0F1CAro43ZHcXuTI/2thW2MeAjMOTnBNnPs11oqD8MOcZQFl
-	cNKzwXPU93qm2g5p5ktesrH4QnvUwUuztsYXav5r2OB+r7u2SFatOBmk1M0hceyNxcHoR0Cp4RO
-	hYvJfVYNVHV4VAOmevCBk1VnqCLtZSLL2SKMDtXHPNbgNK+lLur+TRHS8c3XPoipxLyAh/YYSwF
-	DzCCWFYrrZib26VH7slgI46deL13p3lvU4JQqt8JZZspu7AWJfQKdLIEE3j5UL1HTn7W+0BqDw=
-	=
-X-Received: by 2002:a05:6820:169e:b0:713:da3b:938f with SMTP id 006d021491bc7-713ee7665bcmr1778741eaf.50.1793205961207;
-        Wed, 28 Oct 2026 09:46:01 -0700 (PDT)
+        bh=1NNaeja9CPQdNWDiA6GhYzCVGaHovmQ4cPZ+vjHlOj0=;
+        b=UcNkaIQEfnSsEoJf0lIXeDcTV/Jm1X8WvPbNphZx7maSbMwlx4jIGkVm5PywnY4z+a
+         9WI4dJrsIDltUTNPZbV1jaCUdcEMRVsTKPPM89aKtd/HOOhgwTIWdEr/P4FhfQUNpnUh
+         yPyOOgpH7JtnX3cafFbHowlymy0CK5O2V+pmEtCywD9jl53hHWwdXhvurB1fMvTF9ff9
+         8iX1H9ZV09O04dL3HmZyk56arfSYPkzH5rLtsOpFshtNCF7Gjs+5BASZxFhHJm/oFdeS
+         Fqop1XyLMz1wqLBJtC6jzfVRmNfvu9Mm9wXxmTMDgKf0AEyEkFS6MpkFW9TkP+Ugwo5r
+         wx5g==
+X-Gm-Message-State: AFq9FYJkK4RtmbkhrrOAVLv1hDppYhv89Kmp5hjPAozkEGF4pCW+H1Tj
+	L9lNtap5N//KelxbQSrreHtOVkvgN7Nl8pETQezKf4NiDW6qM9cI1ONUxG7so9MrHo/V6Qy8JTc
+	145iMP6Q=
+X-Gm-Gg: AYBFou2X6xWziAvp1dk0HnFBC2Itt+ege6VXywgYJ1Zbmm6moeLWzjWzb9/Bj6ENQHg
+	6hJiHIHV3irARDtKJXa0PLOdFrJw70u+HH9xG7JtrmmhqLKjj8jugmn0tezUyE79X4dC9hGdFaD
+	ALA0H3JhNHcXMOOdGcqVHLMN0v0Bii/DrQBQnJaGPlugI/qTYJ+BKavacc5R5vQ9beJp36DsGjr
+	/fQe/xuIVpnj4IaB7IdSsModMWF6rDvp0r0bcfnBGcp59+0I5ZhrgdNTlr6HEFFVLdduluzOwGX
+	LZ7UO9ztptPZJR1XfOHnQBE4jhmNj0baP+58hbTEiyNEZlDksiPSE+8WuOHIwcKtGDm5VhiBf85
+	R+9DrIiOiCaIqcST6F7o3HdsHe5UqQZj4/m7hJHVs2mnFqlt/iFc2iJzAxgrpuXk+/v0XIde8RF
+	bgmF0FSb7sFoawJ4b3wrfzvK/Qeop+BR0nJ7FzVMk409oe7BkBdDM9+Bhnl83poY1LmDGpNBeOC
+	OKmbrl5CP+4hLsCiNrkeDnH6/ZaQkAf3sSBrz00/fhIZopbldCBPAIFn18c0fJh+c3xClMESdNv
+	0y1JGYuDIKvxNYcgYLfCuaeZZxpdgGXZwKPWUPIREGtWHp/jsOr8D42kQglpOh3zCLT+LtbMHvX
+	CKMUIWn1EoEt5T29lAIM=
+X-Received: by 2002:a05:6830:920:b0:81e:a314:7f70 with SMTP id 46e09a7af769-85c1e2b73f8mr91662a34.1.1793205962426;
+        Wed, 28 Oct 2026 09:46:02 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.46.00
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.46.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:46:00 -0700 (PDT)
+        Wed, 28 Oct 2026 09:46:01 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Chris Mason <mason@kernel.org>,
@@ -86,9 +86,9 @@ Cc: Chris Mason <mason@kernel.org>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 82/98] nvmet: move preempt and abort work off nvmet-wq
-Date: Wed, 28 Oct 2026 10:42:25 -0600
-Message-ID: <20261028164415.1262013-83-axboe@kernel.dk>
+Subject: [PATCH 83/98] nvmet-rdma: treat a failed connect as a disconnect
+Date: Wed, 28 Oct 2026 10:42:26 -0600
+Message-ID: <20261028164415.1262013-84-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,109 +105,60 @@ Content-Transfer-Encoding: 8bit
 
 From: Chris Mason <mason@kernel.org>
 
-nvmet_pr_do_abort() runs on nvmet-wq, holds pr_sem while it waits for
-the preempted controllers' I/O, and releases it at the end. nvmet-wq
-also runs nvmet_tcp_release_queue_work(), which cancel_work_sync()s the
-io_work of a closed connection, and that io_work may be sleeping on
-pr_sem in a reservation command. So a host that keeps a write in flight
-on a preempted controller, sends a second preempt and abort, and then
-closes enough connections with a reservation command in flight fills
-nvmet-wq with release works that wait for pr_sem. When the first abort
-finishes, the second one is queued on a full workqueue behind them and
-never starts, pr_sem is never released, and the accept work doesn't run
-either, so nobody can connect.
+Once a connect request has been accepted, a queue is only freed by its
+release_work, so that must be queued once. The disconnect paths take
+the queue off nvmet_rdma_queue_list first and queue the work only if it
+was still on it. nvmet_rdma_queue_connect_fail(), for REJECTED,
+UNREACHABLE and CONNECT_ERROR, queues it unconditionally and only warns
+if the queue isn't connecting. But the IB CM delivers a REJ from the
+peer while the connection is established and even after we've sent a
+DREQ, so a peer that causes a disconnect with a short capsule and then
+sends a REJ while the release work is running queues it a second time
+and the work runs on a freed queue. No credentials needed, just RoCE or
+IB reachability, reproduced over rxe with a UDP socket.
 
-Queue the abort work on its own workqueue so it starts regardless. The
-release works can still fill nvmet-wq while pr_sem is held, and a
-file-backed namespace's flush, DSM and write zeroes need nvmet-wq
-themselves, so this is a mitigation.
+Route connect failures through nvmet_rdma_queue_disconnect(), so only
+the path that takes the queue off the list queues the work. A REJ on an
+established connection still frees the queue, the RDMA CM reports no
+disconnect after one.
 
-Fixes: 5a47c2080a73 ("nvmet: support reservation feature")
+Fixes: 8f000cac6e7a ("nvmet-rdma: add a NVMe over Fabrics RDMA target driver")
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Chris Mason <mason@kernel.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/core.c  | 11 ++++++++++-
- drivers/nvme/target/nvmet.h |  1 +
- drivers/nvme/target/pr.c    |  6 +++++-
- 3 files changed, 16 insertions(+), 2 deletions(-)
+ drivers/nvme/target/rdma.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index 142df0db5208..f96b21257169 100644
---- a/drivers/nvme/target/core.c
-+++ b/drivers/nvme/target/core.c
-@@ -29,6 +29,7 @@ struct workqueue_struct *nvmet_wq;
- EXPORT_SYMBOL_GPL(nvmet_wq);
- struct workqueue_struct *nvmet_aen_wq;
- EXPORT_SYMBOL_GPL(nvmet_aen_wq);
-+struct workqueue_struct *nvmet_pr_wq;
- 
- /*
-  * This read/write semaphore is used to synchronize access to configuration
-@@ -2034,9 +2035,14 @@ static int __init nvmet_init(void)
- 	if (!nvmet_aen_wq)
- 		goto out_free_nvmet_work_queue;
- 
-+	nvmet_pr_wq = alloc_workqueue("nvmet-pr-wq",
-+				      WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
-+	if (!nvmet_pr_wq)
-+		goto out_free_nvmet_aen_work_queue;
-+
- 	error = nvmet_init_debugfs();
- 	if (error)
--		goto out_free_nvmet_aen_work_queue;
-+		goto out_free_nvmet_pr_work_queue;
- 
- 	error = nvmet_init_discovery();
- 	if (error)
-@@ -2052,6 +2058,8 @@ static int __init nvmet_init(void)
- 	nvmet_exit_discovery();
- out_exit_debugfs:
- 	nvmet_exit_debugfs();
-+out_free_nvmet_pr_work_queue:
-+	destroy_workqueue(nvmet_pr_wq);
- out_free_nvmet_aen_work_queue:
- 	destroy_workqueue(nvmet_aen_wq);
- out_free_nvmet_work_queue:
-@@ -2071,6 +2079,7 @@ static void __exit nvmet_exit(void)
- 	nvmet_exit_discovery();
- 	nvmet_exit_debugfs();
- 	ida_destroy(&cntlid_ida);
-+	destroy_workqueue(nvmet_pr_wq);
- 	destroy_workqueue(nvmet_aen_wq);
- 	destroy_workqueue(nvmet_wq);
- 	destroy_workqueue(buffered_io_wq);
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 563b966b8f75..9e8fbb2d1fc1 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -532,6 +532,7 @@ extern struct workqueue_struct *buffered_io_wq;
- extern struct workqueue_struct *zbd_wq;
- extern struct workqueue_struct *nvmet_wq;
- extern struct workqueue_struct *nvmet_aen_wq;
-+extern struct workqueue_struct *nvmet_pr_wq;
- 
- static inline void nvmet_set_result(struct nvmet_req *req, u32 result)
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index c4b848f84465..13243e3edca5 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -1738,15 +1738,14 @@ static void nvmet_rdma_queue_disconnect(struct nvmet_rdma_queue *queue)
+ static void nvmet_rdma_queue_connect_fail(struct rdma_cm_id *cm_id,
+ 		struct nvmet_rdma_queue *queue)
  {
-diff --git a/drivers/nvme/target/pr.c b/drivers/nvme/target/pr.c
-index 1c0d6cac1a6b..1a03f74c2e14 100644
---- a/drivers/nvme/target/pr.c
-+++ b/drivers/nvme/target/pr.c
-@@ -756,7 +756,11 @@ static void nvmet_execute_pr_acquire(struct nvmet_req *req)
- 	if (!status && acquire_act == NVME_PR_ACQUIRE_ACT_PREEMPT_AND_ABORT) {
- 		kfree(d);
- 		INIT_WORK(&req->r.abort_work, nvmet_pr_do_abort);
--		queue_work(nvmet_wq, &req->r.abort_work);
-+		/*
-+		 * Not nvmet_wq: works on it can wait for pr_sem, which this
-+		 * work releases.
-+		 */
-+		queue_work(nvmet_pr_wq, &req->r.abort_work);
- 		return;
- 	}
+-	WARN_ON_ONCE(queue->state != NVMET_RDMA_Q_CONNECTING);
+-
+-	mutex_lock(&nvmet_rdma_queue_mutex);
+-	if (!list_empty(&queue->queue_list))
+-		list_del_init(&queue->queue_list);
+-	mutex_unlock(&nvmet_rdma_queue_mutex);
+-
+ 	pr_err("failed to connect queue %d\n", queue->idx);
+-	queue_work(nvmet_wq, &queue->release_work);
++
++	/*
++	 * The peer decides when these events arrive: a REJ is also delivered
++	 * for a connection that is established, or that we are disconnecting.
++	 * Whoever takes the queue off the list queues release_work, once.
++	 */
++	nvmet_rdma_queue_disconnect(queue);
+ }
  
+ /**
 -- 
 2.56.0
 
