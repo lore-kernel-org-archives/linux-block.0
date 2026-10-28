@@ -1,92 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205884;
-	b=oFP6NVN6XqdV0p6Ybiwrw6WLSyjyX/YXzO/IoPU2quy2zzH/1+nXh4P7L5/8JDsrBbKe
-	 yA4c3xBgt8SFo6lOuatQ0D+uKQNVmSnUxgF/oGpnXWxNcUJAcvizNMfCLnVIePXkuTxM/
-	 9RbCRQe+CThG5cDHWIc2qVjyq/WuJoVv5LzLcbigPWHuWgKx23voyMjHibkwYzfj8+nkU
-	 7hnl+jwUHrZkJGeeZkes51uB0YNmUdtVdMyUfFwIqWE1DcnEcRIb8ztW7BmMCtM1MkNuD
-	 zdqP2iDf/8YJ/XxbXTP8sK054OJndmIc3POk68m8I5ZLpJZMBdd8jmfuFsNifmSXVbw==
+	t=1793205885;
+	b=elMV+IfxjxLRG5Jil1+QO8scsp270TCXcsZBCo8hjQ1KhqxOXl8uzAbIBIdrMEs5mJjS
+	 CVls4HMqpl5YlXLkBaF/hjhKQa2bhsm0sWBoBzNKg618hPZDvXm6n9OImMg2aEPuEyRid
+	 /w8SE4BzApz1x4PZP+RkM5geRxEF+Buho/7AqJ9gn6zvTJT08XdzCU368oZQA0yGXKMQJ
+	 dvN0DETzVIUAIzpbbFt055i2fFFeZJ7yxZ8ujTLT/Xt+PgeKp/OaKLYhCWRykNqHWmEaK
+	 IViR0FLaahPzYnfMA8AS2hrTfB7J4P3tyfEMSt12oUqfQR94TM7WLQrgZC+5pSW8ceA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205884;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205885;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=uCt+bqnV1TErfBOb4wpLK89zEMYn1nEYdeCgPwVJWPw=;
-	b=rDYUxBixJwRMEJZS3dhSUn8eLMpc3mikucpaN2/D4PhrSeAYyHbORyJDRpXz8zDSUWxO
-	 FKHgBqE+bcABHJvyGsuk5SzXK0XXsfz//vFLvjZW0+3LxOWJngY5IBCDhg0BCX0gjZxMG
-	 5KxOO0IS5DqJqxih61rxmYN0spa9XtCqYQ7RX5SHPLTniO676dY6exjelSMdFo9b/tLw+
-	 Y1iTt9NMDDT5B8AkuH/NPiF84X+JMqoD2lCu0Zyo9TvNJ39Yl80QjEtKCHM9393DMZe9O
-	 okyXxurxIwYY+wDNnuvOFgVpM2vIqGaEZOU5l0P6ZdCgbk0X92pobSIa2KXk4SwAEHw==
+	bh=qVvhVTQ9IoiGdTrk+SIM2l0I61oYlow/ZwYyrMI5KTY=;
+	b=bD9TPFjpPalIXrMFqPtXZpdDRipLcMjpJDeKSjc05KGc4cIL6fSHSz54y6FNS8dy9Lby
+	 QxK6j003Vwb2FBRF+Y7gpk0Ju+DH37b7UknviDjPF62uFCv6J1B1bAZxPhOIRPianPD4K
+	 jz0PmVndRloHgkLD2oKYmwAnGswl+qGZLlFgKilJ/OWn5Ch71lZciZkPo9sfTOAMPeK9d
+	 tOiErcEeOrj9pcVHFpu2W0rOHpML1Nc9HZmoPewKrqkG8qUQWAagDa5yW+IkWfw9JqAqr
+	 EcMRvQeE5pBTyFfehabJYaasqPtckIR+hxsG+Jb6m3C0GYvcD8Q2qvfu5f5H60QsJ5Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=jpMdPlLN;
-	arc=none smtp.remote-ip=209.85.161.53
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=acrvwQXT;
+	arc=none smtp.remote-ip=209.85.210.50
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0B4606A31E
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC0B4606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B532D606A324
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B532D606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=jpMdPlLN
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-6dde81a6820so999493eaf.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:43 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=acrvwQXT
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-843ea301d60so849225a34.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205883; x=1793810683; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205884; x=1793810684; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=uCt+bqnV1TErfBOb4wpLK89zEMYn1nEYdeCgPwVJWPw=;
-        b=jpMdPlLNcsGjrkyrjW0t/qKulS9VpL5LW5YTWef2aSropPu9rNxn2KUHljiLnYEpoM
-         O6WS52uaVq5Kzrz1D81gAlJHf5aqjAG8gBamujX+Xovjgb4BqlJmOk7P2MJWhlz8uuHk
-         pKcWLD0NV6KwWbWaHJGmwU+6Qu3IaTxt9jdnh9xy8FRvtsNzgVOi4MXYRS+UZ7sDvWw7
-         nU2SeMfhILG0UdamDg3koG8aDqOO32LaDD5B+opyFjSG27T2sjGt+JUaA+1BHvDWi1g+
-         C3BEHrZxcAdNBrNA+UZ6+Ra2Z48JSDAlO7BeW2l/IhYOv1qL4vfzINXSbJJgscmEsDsV
-         eszA==
+        bh=qVvhVTQ9IoiGdTrk+SIM2l0I61oYlow/ZwYyrMI5KTY=;
+        b=acrvwQXT1kJ/JHgNwOFi7qOuDZ7voJV9lwT8CO7v87v3bNiweE1EIwRG8ctveEARvP
+         YzxFxtssAXS6JeTmPomjOwitIF5BOSY1MwNZhn8RQTEbWCZps51ko8Ns+EGe9J1mDWR+
+         e8EFI5DrUGbyQtALMi1qMUgHsQQrI3gpF+RnupMWEM0QonkcIkuAHtOQQA9+5DpQIkbB
+         JxUSF/2n9MIzbRzhhJEapDt99why+S8cIz2uQoWu0aCmch+ezuC+uCRmOnw6rYc3cNYO
+         cYWrPUTEflMANAG43H0PrpVGUayJTsM2ad6WOI8jPKAu+9vOwMpbfOMbPbIG7Az3wQL2
+         m/mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205883; x=1793810683;
+        d=1e100.net; s=20260707; t=1793205884; x=1793810684;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=uCt+bqnV1TErfBOb4wpLK89zEMYn1nEYdeCgPwVJWPw=;
-        b=LCxipu7nY4yWCjythPJ+uOHQ/49x61M/0B7yAGKq9RxagraRjQ3+o/RZzkAX0zuatF
-         f86nDCbIwJiuAX/sjX3/4fIORDrWe1lgNgJH0MIlhYC65+tZT/KZ290ptlujfzTbBTJn
-         INJtvRCUE8LLhSDeAyuvqi8hdKF3v612V9lIy31Rs9Srw/AKLv+2Eg0w160ocHCHQhnQ
-         642QWif/2fCCyNF+XpHws402OYXJPQ9Ef84wmzD1Un0vtXARdpB96d64V/Z/qeHjcCbt
-         Mo+HqmjIDdzpyRoX9fyb4S5SJxnxWNQE27+w99TiXtbOvoVg+QUDLaneqiuk4Sz4uw7L
-         Pf3Q==
-X-Gm-Message-State: AFq9FYJSnIFcUMRN0IWFRqTn3ghGt1cElOU51egLAAMSVxAG/BVVqcyX
-	2MLshykoD9dzWBdap8PJaXyPAhT2INZpobP4IwiG6czJllyMbsF9NHObbnDPsIAYbJfXk7iaLRe
-	6dvmeOWw=
-X-Gm-Gg: AYBFou1+kSsT7ku6P+qtbC8SBslceOgABpxezU47JRlxRQTmr5Ljw/707S+4whooErj
-	wLEkxSSv8iWBgyLe0cTGhuRM/RjSupdPqNfAwNpUtuEb1WtCUVyRGIsYP0Jnt7XqL33KwClaOzc
-	Eal4RKzfK5MPDeDrHXcrjr5gPMp3eVfZIrIO2/XZQlveBTSP01BBTKXt+M0AWvVEvsuH8Y7wAuA
-	ZzJsloUO1b+QQTvzngg6KppZqdnLrfcmcx/pQL1RZOetlti1QBHw+cgtPto2dLhQo0l41bNbeQT
-	7pkbVVX1FwhKc2cCTtDT+nlcGwA+8UuQg463DiutN2fz+AbWtqK+HTn/sXnyqGPQdEwCQ//Uq8w
-	1sDYBC5nzmhlzc3Lmluz7dJf/Cf0xFyPnh3ITmlUPjFEyxuUgfxTOFjM/3CgVX52mtJhdYa7l0I
-	I35yWgMUmgYTqXxWFhKjnfSh9tp1w8kcfSzzV13nd/SAVKB9mZm5V0QQp7yTlu0WJKsW9hOM2sx
-	1KTQ+ZCvFPeakPB/w81O5HrQPm/1WB+zhxfHQUdLZNznACftlgxhq/f5Os/L+UXNk8Ze+cr2c3g
-	t2zU7XAtKfjRNrirXe6f3WStO/MpYVHLfBU1x/lZbZ9CAvGnL/htm5YCmAYN6yzLIo3YyK7EZg=
+        bh=qVvhVTQ9IoiGdTrk+SIM2l0I61oYlow/ZwYyrMI5KTY=;
+        b=2SyVruH4zGuyiOlgaaWjJ8h9zJil0zfMnm2VTKNA5QEQBqJuD5rv2VdQQoMmJw2IHn
+         u6t0OWsFwRg5fwQfi1bA4JVQYJcEqsueEXpK3Y3HBf/yAydOBjIqbgKCogL0w/J3IDhL
+         mOmdYwJNBK6/EykxzFhy4tQ3PisLliwkCBnmdRSBpbaIvq6VLXGUkFzAaOFU3swtc+eN
+         6ljlCEXG51ZmoMABEXndHPOmhxxi/lRYkVZDGVDeBFBS/v1sZmxBgkD3QA1k7XI2OlyH
+         RbOJmbzFEy3HJsTbMiqBGvayL+UIOlR8yLIV6v4MtCEc5D0PBgZmKXmzdFU+YV5/ZVAG
+         HKcQ==
+X-Gm-Message-State: AFq9FYKVrCsCj4n9/Un6GUAg/mN5tv8bCFx5ry88BA8z/9GhX1MpjokZ
+	rurg77CnW4u3GBh65rF/AWMiqHyrWhKWsuhxV/wVLqbMIzIIqUgGc5QjJe0Jw15SA70FgKF7J96
+	rVOy0/i4=
+X-Gm-Gg: AYBFou3cScokivu5IejDolnricTz58aHy4a8XvW7yb5OVZu9CFKQb73t9vP/9y/u2+u
+	YXOisgunqVNkanNJcMV0GxPmgEAtgB1W3QDwjk/TlZ8nzVD7s2vgqcm1x8VlGsRDsJYpGMc46HB
+	g81xJZUi4N//nHlqjRJX6JUFGsch8pftwPlmv7zMiLD06Udnt8f6N1ok0VGiOrTf4ntkxutjbpV
+	zbJpsI9nMOnDogVOBAKunS6epz2BEQib7nc/p5o3gN9N4TV+8vO1HCALHexI/EFozWadHYDzAWe
+	4RJcJYfRt0fzRfFd6lT7cqqqTDfPqZOmOefnaFBxn80PtyKMBCtiyFXK/B7VfTqIP8BJsC2gTYm
+	5KyR1F6gBpzx8Jo38EMdrkg0wqiGX8KGf3h4YDgVYD9VVlKJERse6cIpLhRUXbKP1lbiImVdKCY
+	UrSOC7rtW8i1NaeZacCBG4mIhKhUQTLeLpRW+Deuwc/aunTckKPbEBKFtZns2ygFpQPPjO9HwFK
+	yNrfgUaZXGb3CY1kVerOhgy9qtxr14gApb8OlwIYa+6uZmpT2+WudPAlas4k6yXsq30l7FZ/CXn
+	fUAXmfEMosUlK+HCoXUH3mBRH7ccZYsRbtUPbTZP889JDDjUxogLGvmZ06iTEC7hkztfJ9OvmQ=
 	=
-X-Received: by 2002:a05:6820:1c9d:b0:702:f7c2:1928 with SMTP id 006d021491bc7-713efffe531mr1734415eaf.74.1793205882768;
-        Wed, 28 Oct 2026 09:44:42 -0700 (PDT)
+X-Received: by 2002:a05:6830:411a:b0:843:d5ee:5785 with SMTP id 46e09a7af769-85ac0038ca3mr2929373a34.12.1793205883832;
+        Wed, 28 Oct 2026 09:44:43 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.41
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:44:41 -0700 (PDT)
+        Wed, 28 Oct 2026 09:44:43 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 19/98] blk-cgroup: don't free a blkg with its punt work queued
-Date: Wed, 28 Oct 2026 10:41:22 -0600
-Message-ID: <20261028164415.1262013-20-axboe@kernel.dk>
+Subject: [PATCH 20/98] mtip32xx: don't mark the disk dead in the irq handler
+Date: Wed, 28 Oct 2026 10:41:23 -0600
+Message-ID: <20261028164415.1262013-21-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -103,84 +102,132 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-blkg_async_bio_workfn() relies on the bios on the list pinning the blkg.
-But blkcg_punt_bio_submit() can call queue_work() after a running
-instance already took and completed the bio, and queue_work() succeeds
-on an empty list for the same reason. Nothing holds the blkg then, and
-free_work shares its memory with async_bio_work on top of that.
+mtip_check_surprise_removal() calls blk_mark_disk_dead() from the
+interrupt handler, and that takes bd_holder_lock and calls into the
+holder. Only note the removal there and let the service thread tell the
+block layer.
 
-Hold a reference across blkcg_punt_bio_submit(), give the two works
-memory of their own, and cancel async_bio_work in blkg_free_workfn().
-
-Fixes: d3f77dfdc718 ("blkcg: implement REQ_CGROUP_PUNT")
-Cc: Tejun Heo <tj@kernel.org>
+Fixes: f55e017c6420 ("block: add a mark_dead holder operation")
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-cgroup.c | 13 ++++++++++++-
- block/blk-cgroup.h |  6 ++----
- 2 files changed, 14 insertions(+), 5 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.c | 35 +++++++++++++++++++++++++------
+ drivers/block/mtip32xx/mtip32xx.h |  3 +++
+ 2 files changed, 32 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index c9187d95a54b..00da55c6ec43 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -121,6 +121,11 @@ static void blkg_free_workfn(struct work_struct *work)
- 	struct request_queue *q = blkg->q;
- 	int i;
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 113bdb868c46..58dc0d63df32 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -130,7 +130,7 @@ struct mtip_compat_ide_task_request_s {
+  * return value
+  *	 true if device removed, else false
+  */
+-static bool mtip_check_surprise_removal(struct driver_data *dd)
++static bool mtip_device_removed(struct driver_data *dd)
+ {
+ 	u16 vendor_id = 0;
  
-+#ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-+	/* It may have been queued for bios which an earlier run has taken */
-+	cancel_work_sync(&blkg->async_bio_work);
-+#endif
+@@ -141,14 +141,34 @@ static bool mtip_check_surprise_removal(struct driver_data *dd)
+ 	pci_read_config_word(dd->pdev, 0x00, &vendor_id);
+ 	if (vendor_id == 0xFFFF) {
+ 		dd->sr = true;
+-		if (dd->disk)
+-			blk_mark_disk_dead(dd->disk);
+ 		return true; /* device removed */
+ 	}
+ 
+ 	return false; /* device present */
+ }
+ 
++/* As above, and tell the block layer. May sleep. */
++static bool mtip_check_surprise_removal(struct driver_data *dd)
++{
++	if (!mtip_device_removed(dd))
++		return false;
 +
- 	/*
- 	 * pd_free_fn() can also be called from blkcg_deactivate_policy(),
- 	 * in order to make sure pd_free_fn() is called in order, the deletion
-@@ -218,7 +223,7 @@ static void blkg_async_bio_workfn(struct work_struct *work)
- 	struct blk_plug plug;
- 	bool need_plug = false;
++	if (dd->disk && !test_and_set_bit(MTIP_DDF_DISK_DEAD_BIT, &dd->dd_flag))
++		blk_mark_disk_dead(dd->disk);
++	return true;
++}
++
++/* For the interrupt handler: the service thread tells the block layer. */
++static bool mtip_check_surprise_removal_irq(struct driver_data *dd)
++{
++	if (!mtip_device_removed(dd))
++		return false;
++
++	set_bit(MTIP_PF_SR_BIT, &dd->port->flags);
++	wake_up_interruptible(&dd->port->svc_wait);
++	return true;
++}
++
+ static struct mtip_cmd *mtip_cmd_from_tag(struct driver_data *dd,
+ 					  unsigned int tag)
+ {
+@@ -715,7 +735,7 @@ static inline void mtip_process_errors(struct driver_data *dd, u32 port_stat)
+ 		dev_warn(&dd->pdev->dev,
+ 			"Port stat errors %x unhandled\n",
+ 			(port_stat & ~PORT_IRQ_HANDLED));
+-		if (mtip_check_surprise_removal(dd))
++		if (mtip_check_surprise_removal_irq(dd))
+ 			return;
+ 	}
+ 	if (likely(port_stat & (PORT_IRQ_TF_ERR | PORT_IRQ_IF_ERR))) {
+@@ -740,7 +760,7 @@ static inline irqreturn_t mtip_handle_irq(struct driver_data *data)
+ 		/* Acknowledge the interrupt status on the port.*/
+ 		port_stat = readl(port->mmio + PORT_IRQ_STAT);
+ 		if (unlikely(port_stat == 0xFFFFFFFF)) {
+-			mtip_check_surprise_removal(dd);
++			mtip_check_surprise_removal_irq(dd);
+ 			return IRQ_HANDLED;
+ 		}
+ 		writel(port_stat, port->mmio + PORT_IRQ_STAT);
+@@ -784,7 +804,7 @@ static inline irqreturn_t mtip_handle_irq(struct driver_data *data)
+ 		}
  
--	/* as long as there are pending bios, @blkg can't go away */
-+	/* blkg_free_workfn() waits for us */
- 	spin_lock(&blkg->async_bio_lock);
- 	bio_list_merge_init(&bios, &blkg->async_bios);
- 	spin_unlock(&blkg->async_bio_lock);
-@@ -245,10 +250,16 @@ void blkcg_punt_bio_submit(struct bio *bio)
- 	struct blkcg_gq *blkg = bio->bi_blkg;
+ 		if (unlikely(port_stat & PORT_IRQ_ERR)) {
+-			if (unlikely(mtip_check_surprise_removal(dd))) {
++			if (unlikely(mtip_check_surprise_removal_irq(dd))) {
+ 				/* don't proceed further */
+ 				return IRQ_HANDLED;
+ 			}
+@@ -2492,6 +2512,9 @@ static int mtip_service_thread(void *data)
  
- 	if (blkg->parent) {
-+		/*
-+		 * Once it is on the list, a run which is under way can submit
-+		 * @bio, and its reference goes when it completes.
-+		 */
-+		blkg_get(blkg);
- 		spin_lock(&blkg->async_bio_lock);
- 		bio_list_add(&blkg->async_bios, bio);
- 		spin_unlock(&blkg->async_bio_lock);
- 		queue_work(blkcg_punt_bio_wq, &blkg->async_bio_work);
-+		blkg_put(blkg);
- 	} else {
- 		/* never bounce for the root cgroup */
- 		submit_bio(bio);
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index e67c69839129..1fd60cb4157c 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -76,11 +76,9 @@ struct blkcg_gq {
- #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
- 	spinlock_t			async_bio_lock;
- 	struct bio_list			async_bios;
-+	struct work_struct		async_bio_work;
- #endif
--	union {
--		struct work_struct	async_bio_work;
--		struct work_struct	free_work;
--	};
-+	struct work_struct		free_work;
+ 		set_bit(MTIP_PF_SVC_THD_ACTIVE_BIT, &port->flags);
  
- 	atomic_t			use_delay;
- 	atomic64_t			delay_nsec;
++		if (test_and_clear_bit(MTIP_PF_SR_BIT, &port->flags))
++			mtip_check_surprise_removal(dd);
++
+ restart_eh:
+ 		/* Demux bits: start with error handling */
+ 		if (test_bit(MTIP_PF_EH_ACTIVE_BIT, &port->flags)) {
+diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
+index 0963c07b5845..1af2c75414a5 100644
+--- a/drivers/block/mtip32xx/mtip32xx.h
++++ b/drivers/block/mtip32xx/mtip32xx.h
+@@ -134,11 +134,13 @@ enum {
+ 	MTIP_PF_ISSUE_CMDS_BIT      = 5,
+ 	MTIP_PF_REBUILD_BIT         = 6,
+ 	MTIP_PF_SVC_THD_STOP_BIT    = 8,
++	MTIP_PF_SR_BIT              = 11, /* surprise removal seen in irq */
+ 
+ 	MTIP_PF_SVC_THD_WORK	= ((1 << MTIP_PF_EH_ACTIVE_BIT) |
+ 				  (1 << MTIP_PF_ISSUE_CMDS_BIT) |
+ 				  (1 << MTIP_PF_REBUILD_BIT) |
+ 				  (1 << MTIP_PF_SVC_THD_STOP_BIT) |
++				  (1 << MTIP_PF_SR_BIT) |
+ 				  (1 << MTIP_PF_TO_ACTIVE_BIT)),
+ 
+ 	/* below are bit numbers in 'dd_flag' defined in driver_data */
+@@ -150,6 +152,7 @@ enum {
+ 	MTIP_DDF_RESUME_BIT         = 6,
+ 	MTIP_DDF_INIT_DONE_BIT      = 7,
+ 	MTIP_DDF_REBUILD_FAILED_BIT = 8,
++	MTIP_DDF_DISK_DEAD_BIT      = 9,
+ 
+ 	MTIP_DDF_STOP_IO      = ((1 << MTIP_DDF_REMOVE_PENDING_BIT) |
+ 				(1 << MTIP_DDF_SEC_LOCK_BIT) |
 -- 
 2.56.0
 
