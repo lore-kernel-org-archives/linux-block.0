@@ -1,95 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205934;
-	b=WYr0UDyuY/e+ofU3zOSv2mBleRY9Oj6DDNUJVyJI+oeI9dNVRneGDaESwNIrGSbKV+/O
-	 8CUwwLWl4rYMvPwLRTpqwF457lNi9IJwgMgP8gy3x2B5wdQ7UlznkWK7u8mzzngC91q4n
-	 B3kDnBxzQt4+Fs/xU1FadvBbNQowWwdN9e+n/1E9NWgdfHtzCqild2KNia9YDeM/zrzWb
-	 EuCFrRDX7uvb70135P/8fAlYcKTt5MO79nd2SnZ4EzrrmnrTdh1AyFo8/zz8m9ysUb7vP
-	 mEndxZHI7C2tdKGQnJ+zI7NefSaDXkf98FOsnxsnZ2FMDoUiVHkYJPJi6sx5Oo49fRg==
+	t=1793205936;
+	b=xkbnFm3gI9YDOEbF+Cwfrg7U1hRj4opj5+GWxvdkC4jx/3MAj+xe9r13bBOd2Zi/lEf/
+	 zIA7hCtIfqXBoErhfIk65qnqonSa4noL1QopnzG3AUucQ0ucopw1dsu/Ddpn/yrbM/v2b
+	 f2ZXe2OdHKkwE1g1flJM8tWn5ikNRSEOd+6dNPOG0Qib/y/TpFVW00fq3PiRHbtBS5BZu
+	 Igc+tziINRIZ3jNpzQtA1YR6gy6xAHZWIb6yPqkO1mBvmc+lKQBhUHiM+JsrgTA7fxH9v
+	 Sg3VSLTfe+I2JpeFfJPLMRlL1Q5/sEjIRdE5ogy65pHs2+54aDojf9QnH+Yr+kHjahA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205934;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205936;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=IU9MOmP/DNYIBy+a0Esa3M3MWyw1kMu7zxXOFPkbXXM=;
-	b=oFQn5aYonPcDxoZuEQ8Xl/EHMZO91QXg7fpqZwPHRQjB+EffzdRH1Sa3oN/DiyPgLaN7
-	 Ax1g3aSImU9u+vkSN8v/kx7CU3JSexLluJdOgrf2u0rpjRFNiIbO5CiCwsHNITdOdUtBX
-	 j1Z5xAZGuLHO/p2xzfmwMcWcB79VDcyZEoQ7GeRgnq0TgKO7ITAkHdwYhokAERShao93+
-	 4E4GXBswjZhJQG9sAAdgphQROlidF6/AeAPjpjJW/iJZQWRg/s+ypUSwwBRHHnnlk17Sv
-	 ax3rssT/M7P9W9zIREVnpelxHmMYxK6jVMy1J2H6xFMUtn5kWg9q8SsjEcqoaC8Zs1Q==
+	bh=wCUY0em9ODZPFMSyvaOv2IqIbeYwuWkix2Dn3VoYk3w=;
+	b=dGX+Nj83C7Wql1zivS9Nm/SsB31FNbTJNA+v1ZkDZa5CtdC0ecTUIyJvSHrDQcm+fGds
+	 6H/WJGgw6+62Rga31IegutFzt7nP69UCnzRMAb8MiuQrhINQC8gA/SMYlsJrtQIaGiVTQ
+	 BNQpc5N28twwTzUl1SK4r3jpw2z3QsyL5vJGhU7/QN36uRTR1sBf2UVZHYyvG6kEOKkSZ
+	 cfdTj+tt4rpL5Is5fqlZ6ASkdJURRYiT8rmAgZA4NPSm7kUg//wxts8++jTApcPKkgt2t
+	 RM18JwAYEePhm+Hg91df/kr+swAWnJuN+U2YrJrt0K5dk9K5JS+cCzmjhjDVgX/QDJg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=MwPqTwG4;
-	arc=none smtp.remote-ip=209.85.210.45
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=dQumBcxl;
+	arc=none smtp.remote-ip=209.85.210.54
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93439606A326
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 93439606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0909A606A326
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0909A606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=MwPqTwG4
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-846566246e8so1081040a34.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:34 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=dQumBcxl
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-85c1135c286so72354a34.1
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205934; x=1793810734; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205935; x=1793810735; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=IU9MOmP/DNYIBy+a0Esa3M3MWyw1kMu7zxXOFPkbXXM=;
-        b=MwPqTwG4aN0CbZ1pPEzQpGoX0SGLhkk4E0oVT6ngkpj1HvCK2xGgQY2LnWbOdjzh4G
-         QFpFHd0NGJI+iXWlkApin8lXx9QhT9yMZDfnA8C7LgQ4moPshoIny/dx5ZWfuTvMu6Aw
-         k9i8z5duqK7CZh8wPnT/bSgDKRfM0lJvqERd66zFQORUbx7uXq3VFA4wQ4ybie+N5uCi
-         47rjDptN4/4guW8EM30PhYUqHRAUvB/YwNlvqpx4L7a86xsgb7Alp8t+QH7q+wyoOxlD
-         zIyXTeRAnNmCEm+Ooy9L6PQYflxBMrZNnsh7IpVVTRwaYTIt24tKcoO4jGgv6I0Re/L1
-         xXWg==
+        bh=wCUY0em9ODZPFMSyvaOv2IqIbeYwuWkix2Dn3VoYk3w=;
+        b=dQumBcxlEcltR5UOMnschNrSuxBEgOUcUpU7fcIqy/IKK0gNov2EU27m0AkMc7Rri2
+         RS0x1O+SaW9ZuBBgFmZOa6qq54L8m8DEFi4hvxYfVntyFj2mHjMOz7QU+c2XoRO3+Zwq
+         b0qvocWDdHCmLD8Jtpzp5jxOQzf7fTFFu5o9xZhYZwop5//be/ar8T8Uph7/t0NaQglg
+         ltATdTn1Sj4pfoE3APZhPjoIAscK8MAbX+XAQqK7uaWhWpPQ1bKV9Un8QhLycJ1sO8fb
+         m9X8s6KAJS2JxTwR0q2eBwElIxjvfRCN9zoYEdp+BdsbjLk5RjDATdjq3vlJG4az0JdQ
+         dCEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205934; x=1793810734;
+        d=1e100.net; s=20260707; t=1793205935; x=1793810735;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=IU9MOmP/DNYIBy+a0Esa3M3MWyw1kMu7zxXOFPkbXXM=;
-        b=050BFYp0B1K1SGU554K/uDMM1J0urXy0tqiwdVToLRO4LHfSBbAgIanWdwSbTAuTRD
-         Rnmd73/VCLamjMuM7Mb/Eu4lbj/XBz/Mr3cYGfHiwTy2wTJARSMpCVIBWX6bueLw5I+y
-         D9nMNc3KEsKx+uh/q0YE701gXBOYsYc55pBeujrX0IbAQ1ZDeSjVhvj7BMANBbevv1E8
-         tcp2GdMjA8Mbve6YoVQaHrRA+/VCNXjFMZI6UK69ZnWbdPZsQTeba0FCG4qA5lBr+Zh/
-         EMGG9BWdHWcO6IzyOSPSEpwm10SUqXE8S/rFe0CaMyekEs3rkw2xAO8L0eGgC2AQu+9o
-         XP+Q==
-X-Gm-Message-State: AFq9FYK/KgSnajklssc8GmAMH0EyKirdSnHecXRjRe3Fj0rNfOOZqRvO
-	rQij42hEWPecdQsd6hnHT71ykMShO94Ro96vG0gXEwzrcQMZCWEW5c7RDFR0NhI2twjX0gKNbpe
-	99CFNoFw=
-X-Gm-Gg: AYBFou1uEx1PS7saqJ0Ob/xdoFahntFNEZ94hkwpanLdYkIDvD3dClljBjasINgvI42
-	b+/BKiMRR4wdNvgOjlKalWvplHLhaUZWdghDxZg7L54p1t+Q8f8D6518G21PhssMTFSy87jmeOj
-	0d9h5V2+GN4mIzIYehopO0iu5qZy1cYbKNyPtHmeX+/6WXU0hjnldhvN0BaSw1vP6RGJcSz4Y34
-	xe3EMHrLQgkEOxWnZABFp6AI6AEdlwRl9KwWoYQBKE9WQOgIEEgO8ETJbRJnL9WmbGfBNkh5BO8
-	0WcuudzysGHCP7vsBb9wLmL0Ytk5OIRCcc1B6X4Syd1/Pzks/4cmREEZZBVTqgkHkc/piOsIBMY
-	fFe4H2tjcMrsYdglTEXqfPQ76pugU0KGUD+SNcJ87vE5OoVDdSDdYW4BVDMrZbSX71xDHe1lbd/
-	w0WgnPJNRQrh1mUJFT42l8WIuuCAOtDCQ5vlSmoY5YYivPl6FH7+bEszsiqZKQrfKQO4kn1UwGq
-	pmsEUgD9D5ifMUkdQPhz3ExR+c3X6kjjQzgAwoMZtCnS/E7Mvpu1NMlBsmecSzPC2u9bhbILSjh
-	5py0j+s5hgVpnPHU+Mowd0tHAcE2lb6JyXyHNV5IRdgmIaAzjgwS+LLGm4h+7f681wjju/o9Cg=
+        bh=wCUY0em9ODZPFMSyvaOv2IqIbeYwuWkix2Dn3VoYk3w=;
+        b=KRpRquIkd8lxth+zD6IZY0qRNQ54o6XoQXMFuYe7NH0sQ3bvu4eJv4+WRh0SXxSmN4
+         L+9ij4WQb569SCSnKyldQfOvEN+m3dBD0oMUj0KiKxE1OmUrCjdla5lpKTQ+9K+30RFR
+         42/ZtrD6FJnCyTV7f1tycxlQGySo9RkT+LJSrRUYsKfiezj04CCva/GJprp/1HEqf4us
+         6A3meTg4+WIoomjW4r3FyOgCMFxCwKY/cTyOadoi/N9RpSGuf4KsWkukB2xL5CzskSq9
+         PDImeHm4bIEr+202QVOd1JhK0itAhbytvlswl0radyKbJVAoSCG5gcbY2mYEz490nOgu
+         UIyw==
+X-Gm-Message-State: AFq9FYIZzna2f7Twe2KvYOu9WDO7VhIKCVyqgaDMRRWzBNsvuPXfnFmX
+	W/zi0gj3eCyBUJuTtOy4lCV22iuD9LbW52NwC0IXheOLGlTfzF6pUVhpcOQVQ75fy/XbdHsMjTx
+	NTdn88rs=
+X-Gm-Gg: AYBFou2C9T2LLkVBvmx3+4BMHnGsgb6XDtcKAOptniS/aA+QInPH2xHWTGsiQ3/6HZs
+	twL5YWyQ0TIPX8vVS9AKxoi3JqW/8yJTFSF8BCSwIQai7juNzdme/wNSUcrmyKU6kokm/DEA6kK
+	lolHMEULArn4FZEdf+em71Rspw95c/C9xprIu85q3OIaaLpsFcWMUsXyW0YVW6CUceFoVAYn0AW
+	jR8zbsvZXrWc2BK9jJsO8HkwBM8zxReg3FQEymaK38lFGgn1cvgV811WF8x4PtAVYjjFUCd+kps
+	PjW8y342wP3DAUKsPVy8imXfEAvqDLKpcvF7aBabI0y0SDhLodtlDjKT8dYC4zpy/JnFWXNhe/l
+	b3z/FVFjWNza3ucWt9gFQC0eVe6OX0wjgzASQROsphqj7j9UNQZJSgOK9Yom5Ckkc0aGtXGM07M
+	ALTA4/tLLpVhJDFrJ2d2QEfbFOgPNJNprjnPeYxcoj1ZAdXJgi6B7c1NozgT/SjNfZBzdSff6aS
+	hp97rm0OSjnqfhTRW7O/2lSadWxBhMBxsKnjxKEJUhxKQlmqebWt/tk5RmAyFlPkrcmXnm3TAdB
+	KuUay7gAWwd1UsNW2JmTLBOTU6VVLwfMaKzL61WKz8NVPZVZX/svW0du1uPNLZgou9/qxLUb3w=
 	=
-X-Received: by 2002:a05:6830:4492:b0:844:53b7:9890 with SMTP id 46e09a7af769-85c20a9e8a5mr62052a34.8.1793205933723;
-        Wed, 28 Oct 2026 09:45:33 -0700 (PDT)
+X-Received: by 2002:a05:6830:4393:b0:806:dbd8:9929 with SMTP id 46e09a7af769-85abd90dd7fmr2640240a34.15.1793205935110;
+        Wed, 28 Oct 2026 09:45:35 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.32
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:45:33 -0700 (PDT)
+        Wed, 28 Oct 2026 09:45:34 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
-	Hannes Reinecke <hare@suse.de>,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 61/98] nvmet-auth: authenticate the I/O queues again
-Date: Wed, 28 Oct 2026 10:42:04 -0600
-Message-ID: <20261028164415.1262013-62-axboe@kernel.dk>
+Subject: [PATCH 62/98] nvmet: don't mix queues with and without TLS
+Date: Wed, 28 Oct 2026 10:42:05 -0600
+Message-ID: <20261028164415.1262013-63-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -106,75 +105,74 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-Since commit c91a20129185 the target neither asks a host to authenticate
-an I/O queue nor checks that it did: nvmet_check_auth_status() is true
-for everything but the admin queue. Nothing else ties an I/O queue to
-the admin queue's authentication. The Connect of an I/O queue names its
-controller by subsystem NQN, host NQN and cntlid, so anyone who can
-reach the port and knows the NQNs can attach a queue to an authenticated
-controller and do I/O. Property Set isn't subject to authentication
-either, so an unauthenticated host can enable its own controller and
-connect an I/O queue to that.
+Since commit fa2e0f8bbc68 a controller whose admin queue uses TLS gets
+no host key, the PSK stands in for DH-HMAC-CHAP. But a port with TREQ
+"not required" takes plain connections too, as does any other port the
+subsystem is linked to, and the Connect of an I/O queue names its
+controller by NQNs and cntlid only. So anyone who reaches such a port
+can add a plain queue to a TLS controller, and with no host key nothing
+is asked of it. The other way round, a TLS queue skips DH-HMAC-CHAP on
+a controller whose other queues had to pass it.
 
-Ask for authentication in the Connect response of an I/O queue and
-refuse its commands until it has passed, as before that commit. The
-Linux host authenticates every queue that is asked to. A queue with a
-TLS session is exempt, its peer held a PSK the port accepts, and since
-commit ecf4d2d88351 such a controller does get a host key when the admin
-queue re-authenticates.
+A host uses TLS for all queues or none. Refuse an I/O queue Connect that
+differs from the admin queue in that.
 
-Fixes: c91a20129185 ("nvmet-auth: authenticate on admin queue only")
-Cc: Hannes Reinecke <hare@suse.de>
+Fixes: fa2e0f8bbc68 ("nvmet-tcp: support secure channel concatenation")
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/auth.c        | 14 +++++++-------
- drivers/nvme/target/fabrics-cmd.c |  4 ----
- 2 files changed, 7 insertions(+), 11 deletions(-)
+ drivers/nvme/target/core.c        | 1 +
+ drivers/nvme/target/fabrics-cmd.c | 9 +++++++++
+ drivers/nvme/target/nvmet.h       | 1 +
+ 3 files changed, 11 insertions(+)
 
-diff --git a/drivers/nvme/target/auth.c b/drivers/nvme/target/auth.c
-index 0f64fd4ade59..9ae8293cc734 100644
---- a/drivers/nvme/target/auth.c
-+++ b/drivers/nvme/target/auth.c
-@@ -275,13 +275,13 @@ void nvmet_destroy_auth(struct nvmet_ctrl *ctrl)
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index 5bd78bb83cf9..333739f14c2b 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -1646,6 +1646,7 @@ struct nvmet_ctrl *nvmet_alloc_ctrl(struct nvmet_alloc_ctrl_args *args)
  
- bool nvmet_check_auth_status(struct nvmet_req *req)
- {
--	if (req->sq->ctrl->host_key) {
--		if (req->sq->qid > 0)
--			return true;
--		if (!req->sq->authenticated)
--			return false;
--	}
--	return true;
-+	struct nvmet_sq *sq = req->sq;
-+
-+	if (!sq->ctrl->host_key || sq->authenticated)
-+		return true;
-+
-+	/* Whoever set up the TLS session of an I/O queue knew the PSK. */
-+	return sq->qid && nvmet_queue_tls_keyid(sq);
- }
+ 	ctrl->port = args->port;
+ 	ctrl->ops = args->ops;
++	ctrl->tls = args->sq && nvmet_queue_tls_keyid(args->sq);
  
- int nvmet_auth_host_hash(struct nvmet_req *req, u8 *response,
+ #ifdef CONFIG_NVME_TARGET_PASSTHRU
+ 	/* By default, set loop targets to clear IDS by default */
 diff --git a/drivers/nvme/target/fabrics-cmd.c b/drivers/nvme/target/fabrics-cmd.c
-index b451029ab8f4..38311187d27a 100644
+index 38311187d27a..ddb732f62981 100644
 --- a/drivers/nvme/target/fabrics-cmd.c
 +++ b/drivers/nvme/target/fabrics-cmd.c
-@@ -251,10 +251,6 @@ static u32 nvmet_connect_result(struct nvmet_ctrl *ctrl, struct nvmet_sq *sq)
- 	bool needs_auth = nvmet_has_auth(ctrl, sq);
- 	key_serial_t keyid = nvmet_queue_tls_keyid(sq);
+@@ -377,6 +377,15 @@ static void nvmet_execute_io_connect(struct nvmet_req *req)
+ 		goto out_ctrl_put;
+ 	}
  
--	/* Do not authenticate I/O queues */
--	if (sq->qid)
--		needs_auth = false;
--
- 	if (keyid)
- 		pr_debug("%s: ctrl %d qid %d should %sauthenticate, tls psk %08x\n",
- 			 __func__, ctrl->cntlid, sq->qid,
++	/* All queues of a controller use TLS, or none of them does. */
++	if (ctrl->tls != !!nvmet_queue_tls_keyid(req->sq)) {
++		pr_warn("ctrl %d: queue %d with%s TLS\n", ctrl->cntlid, qid,
++			ctrl->tls ? "out" : "");
++		status = NVME_SC_CONNECT_INVALID_PARAM | NVME_STATUS_DNR;
++		req->cqe->result.u32 = IPO_IATTR_CONNECT_DATA(cntlid);
++		goto out_ctrl_put;
++	}
++
+ 	status = nvmet_install_queue(ctrl, req);
+ 	if (status)
+ 		goto out_ctrl_put;
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index 46501d0757c0..cc7fface77de 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -308,6 +308,7 @@ struct nvmet_ctrl {
+ 	struct nvme_error_slot	slots[NVMET_ERROR_LOG_SLOTS];
+ 	bool			pi_support;
+ 	bool			concat;
++	bool			tls;
+ 	struct mutex		auth_lock; /* one AUTH command at a time */
+ #ifdef CONFIG_NVME_TARGET_AUTH
+ 	struct nvme_dhchap_key	*host_key;
 -- 
 2.56.0
 
