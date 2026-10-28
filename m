@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205947;
-	b=Xz4ANmfvzOkKsBwdmuWzupnGWGIpU3VqiRUg3Iv0i3asdvvWsTIy2rROYZtf5ApfG9mv
-	 uIz0Nyb8+rwqpABwsuDxWKhHx4yDB1Y1AxowR/R7pjdSEvPqjgN+nWu7eKraPLAoaKTWQ
-	 DEZpA4J2icjRxrGqrXlRi291HTaGNG6jjBUKnhRJqQq8AKvypJkMYiTlqSncYBbWcP2VB
-	 H5Q2f+D01ZvUn59Iz3/98n9/6565qr4g1bt7HEHNchXBwpywR+EqzvA5TTyyTS6TIa8q8
-	 A3HM+uQxhOguwd3OrX6CvgbKpFWQ4cSA+eIKGVzvPOsXuE1lhUjaXKyeSVHdUu/QC3g==
+	t=1793205948;
+	b=ADrYVj18pxXqOtM+hQvFhkwHf82O1OzRBQmzBN5d5eqjQ5w4/DK/tJ6EhLiRtmjib+5p
+	 OhY0LXP2oydgUIqooIY6eCWLK7DSo7XtZ/qoxkAXjAsQwxhFhoMRkNGpoSvc5+rMOqMrK
+	 Ke3e9HqxPoiaqjWuzEQlLYpc1Ln5xnlw8PkgQIxCyVNoDAZi8TfBw44v53O24QbCddsLE
+	 vyG9cKKZCXdqESW77dUtVMWn4oRD0zqnPZd2/kmZNDBOygW9rDkI0pla4H3YaGlFDSFgG
+	 vtNWHJUtFZeVGHh7w1yQ2cXaOCdRisVjzdMbFeQwuoPiRgvomaPXeEmylr9H2n+Sdxw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205947;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205948;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=WEQ3r4S0DQr0eyjHgxzXcVRIcL0VSwg1ay6nH0jSO18=;
-	b=rVU03lNmwIv9lofuSZf4ufj/hUtW3iWUMdjEOPLgxUUv7gWCXwKcVWEfKUOKo4wNY+L2
-	 5hQBsj473cUYGLgtNu45qz8P+4y+bCxGwcGVw0NSvldfCbX9SuqR/VKeKyRa+BIUhEzdS
-	 SptJJWIPh4vI2EjClRKvjEW+sGg7D5vsAyGzsYS5AfNP50RR/jOBZTy7Y3JOJ+xuoikeD
-	 /l8gwvDfWgrBm2t72hHMzekTJuQ+9c9ZQ3ICEFQbd+HJ28x4MPtBo8sPOGrI+8PjW5C8f
-	 R5r/swxVWZ3MlVnzlge9wXBAj2RVK0D1a9XCDBrD7xnejPSOC89pvlqzFTGJwuGhOvA==
+	bh=8GlTZg5Nmi1xEFEoDbZjjkwa1ikE9ENyXWgEb2Andtc=;
+	b=HMPE3q1mV75tMiA/1nibfRRv0sM1B9KyKpzVt1a8ymgtg1pE6YQmoK2x1UBNvXkBKrVJ
+	 qpu3bakU8m1bywnyTHMffc0RoAO/3Ihp5NPeOm2YhAKEMncuZag2haKiIVz2oYcF0Fxdk
+	 erUbBNW4vrLu+1lv+9FSB6fwNxwKTR4wuLic7NeT4QN0GLe4voGsRu7FnEGvXcROXY8IR
+	 xGXc2xveF7P1aXDbRFfufDTQF8frFR4OIWRTJmJ0RkPIii3a1U3ycOPttThJtSpdLWLQF
+	 mG5/cOIQpWZDRNACsgfWwa0JY0iF4cIvLG93dIJEIRMj7YFNcj1V2QFV4ALWXdqtlGA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=lcUUg6kT;
-	arc=none smtp.remote-ip=209.85.210.41
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=Cxe1o17m;
+	arc=none smtp.remote-ip=209.85.161.50
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E81606A31F
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44E81606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6BC606A31F
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7C6BC606A31F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=lcUUg6kT
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-846566246e8so1081312a34.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:47 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=Cxe1o17m
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-6dd059478dcso925964eaf.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205946; x=1793810746; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205947; x=1793810747; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=WEQ3r4S0DQr0eyjHgxzXcVRIcL0VSwg1ay6nH0jSO18=;
-        b=lcUUg6kTXhKfcuWlj6Kh4XcdxQKfqMssXEYeBY8rrnnjGXagNOJq6O95W69K7S8fcK
-         ecxJCgm4FzADA0NqyFZSw5vxQldblBUhsNy1DQOhyz6jUL3Z9p7Fqj1lkWCUlo8w7+Pf
-         uu/1AfrVzTCroczwcwTfygtw28lNoTg2FSW0pNxA+9D78ZqlXgKYDvf7UuutJ0ft1CpL
-         5B9KukpfN+PxiwZM7Ix9M1Cwbh5IW5kHKPADukzSLz7czF16VWC6AiVOtI3Cwf8Ofo2i
-         IRNTP8evV0dI15xMGDRn8Ukc3sDJubtu65HHr04U6HCLyhIWXt7Kq0MzWveIP7a67l7Y
-         PM7A==
+        bh=8GlTZg5Nmi1xEFEoDbZjjkwa1ikE9ENyXWgEb2Andtc=;
+        b=Cxe1o17m2vX5nphkSRSqz5OxxRux40Q873/NoUPC0kmSYgkpCTUWiNOj9KZTk/wCla
+         4VSoCV8c01WZuTX0t8TDp0Pbwld4KHqvPv5QWn+ar4pUfq/TFMIWA7wGYC8T8DYoXxcu
+         d1/1DDrlbo5W6a5DDKQH9uytV6NrQ8A5jqjnoxnajNzbasVv34yoPczOyOYWLFXnjU3M
+         sECkN56tE4aoWWIj8/a1h5KOFc/FcIiiv1zWdoqzQ2VpueOJPHWh/XBibcNkvBvvUIWk
+         vrPLTzECwWKDMjUP1RnY+8OeD0rLIYH08qsAnYRHFfWb3PZcDwVHf9nggntQy/QMuxmW
+         53ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205946; x=1793810746;
+        d=1e100.net; s=20260707; t=1793205947; x=1793810747;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WEQ3r4S0DQr0eyjHgxzXcVRIcL0VSwg1ay6nH0jSO18=;
-        b=qSzzGpkjDw/Gib/aDCIBwTK8Up4Mr11jHFsFNpL019eW8P0ws2kBOsSYRO12usnnVm
-         VjePwbokuiIkYc63B6ZSO7OpnWJNohazMJh64TCe2nZkIrxU7bSG6nksj8OfsQhvM2i6
-         3MvU/eAoVqI0LLdNJLpwChLShXCS9iDkcX1//WrZh2jgwLDgEPUozl/Swg5GHcphukUF
-         eT1vWtBBNp48IUMkpssdCzWM9I54kmEaree/WiOSp8ovbeSWpuckQdrSybo3Nh2JWTaq
-         sU13k/wb78MfnPir3n3WbK+09KPDAugQwyTADhvnuhRjRJSeHMZV4jiZxdsyhrxqT1vx
-         6hUg==
-X-Gm-Message-State: AFq9FYIfctKAFB5L+ioybxEW3PBNmPd8aLT/t2sqQlh397wS4dQC4R8l
-	j7688Yc5OCqqo+jtol8TexLrHb2vbMug8zNNM9l2kbP5vsQ1EW2JUE5o4BPx775awR9LeRilT12
-	Zp6Zezqo=
-X-Gm-Gg: AYBFou3PB8iynwl5fn3Ps53gVT7MiAGNZSr5jX2RtFJep5kv+D8Z2pMpcNofPDG+hF4
-	VXdj5+SuBfWRXExaASrYm/kQA8jwCnEslZq8Xakj4ZhwsBTmPdnm5VkWfmgxHgQPkPR7MK0FoL7
-	z4rs/Yc/pxFAZ5xDFOKaWViB1rUVOtR7Q3wdTMpiVWHywxM4+8b33JTWYcQ+QmiPBuLvTq9Q6d8
-	w+vkIaUI8xrnHITBQvtp3/jW/KiVJ7poe13ltJ/iCyb2KZWzkavYnKloL9M9dwx7Y5YuRXeBM24
-	BYWCY3+ZtlJDv7rGiy7jjp7qNq5frV+BIzjvIjA7IL9CtjycjQAVtSR69m9x5gbnXcdoU7ll+Gw
-	rAQQ6Xjerngv6eyU7Plj6kB63qcxmRXLc5C8PmbZbE6EsMLKRLrDZHEGMkgVXcjp96gz1UMquUI
-	LQNkpQfY8P9SxJAdCdJsAJLtZ4+i7H2TYgUnW4i6lPZxH0DH7YjruTaF4TSjJ7ZytgRNyIlfz2f
-	z7LhHT51YGhC7baPR8uaNF05V+5VjhtrkgT293swzHncYjmmo1FIa4DwEQrTu9Z0Jk7cIynTKrn
-	ohK9snHD7lDxlUlLgjNn/RiRSPR4KAVtpMm6kmmeBMIBE/Y9ta5wo8LFasnCZgFsw8/iJErKonE
-	DLXTAu2D/Jp2EfX1jGHc=
-X-Received: by 2002:a05:6830:268b:b0:83f:2c3e:e157 with SMTP id 46e09a7af769-85c1f2aa01dmr88953a34.9.1793205946269;
-        Wed, 28 Oct 2026 09:45:46 -0700 (PDT)
+        bh=8GlTZg5Nmi1xEFEoDbZjjkwa1ikE9ENyXWgEb2Andtc=;
+        b=WpvHNYHNFRX/+HJwU8aEJB5k9uHNCvQQC1L6S0nyKe0bRg96MOzFqjniWa4LCATMPB
+         bzJmUa9WIShMnB6/EWG9pXWers6HjB96J2HihjUiDWYIqV2Lpl+PT6Svwm5AiS8Pl/M2
+         sdU8GyeRgjO4iUxighRjCttPg7LiNPRJrI720mKnOMJsOShZTCk4rVRaRUg0Tz8/KiJd
+         YaN+TxjCBXq/LQTWYvPTCwhI4e1GE66+NAwai6UVHiOBHOJ6xfGqCXZ9y37TmvAaw3GN
+         QeE7hf/p6s94qQ+JBvy8myF4H1+DmJBFieLlwtAjS4gRefds3vv3mvcr0IekibcTKPUM
+         qpCQ==
+X-Gm-Message-State: AFq9FYIj0BNgV3rvwTYwOEgpoHgt3wcqe4LQxaYhEuGROOe0ZZo+QTGj
+	ChUkgIZAbl2aCKQKN4qNN0ayk07+oCNlsXK0MFYwPse6uZISFmx3NCdYskH8tMPbImDo09GeHyU
+	obKDqiQU=
+X-Gm-Gg: AYBFou1fncaL9fGoLG7HY3v7MXLkm12MoOquitcEBzzsU4341zGXgs+zCYv8ZA/jMe6
+	ih3oSr49XnGPOsew1QQylTyJbacFH7RXfqKJD8kmKmuweWJ7ghAKdEqcJaFmb5HAtqvWS2qRePP
+	R3nX37JpEwFPZ3PZHxo7XmbnIEmQJb5opBAOlSPhizza+pulwqmIZc8jtdxtK+KNUWt8OpavU6l
+	SD251SDGEGA3i640ggWchFsqIoCbZd8bNYMj2Bajqo3vn7qjDY54FQZsu0dkkERv8lHSqNB4cJJ
+	VaFQXEVb0xxx+vJNP6VAhFJ28tvbN3EXNxXCt4kFfrYh5g3Un8pGbiCcE0raRAcPLm9gB73fV7H
+	hg/CZ8VY0cpW+WtRvUCnIWxgcnPZI8m+imCr0yjgpQyWu9iXVutCJ5gP+B2bg1R2dhanwP+o+sM
+	KydrJb0w9bRTcz0JmTL8SM3pmL6ii/zeykMI9c+pU30unRzkYZJ2hh9JJJL8mDEJZhE6diXs7ID
+	e9HyqayOVbekwajYm7GxWwVJpm+4bOGUe/3IEGDcEaNHvxkO71u2CQmvVBR8/mzHBjC+ihKH5HP
+	nkofup+D9aS3hK8qgG1VTSrKZCVNXE8spslzh4jKaT2h8MFrqGpZHsO0XMLcn1yAJyO/fEniMg=
+	=
+X-Received: by 2002:a05:6820:151b:b0:6f6:e7e5:9044 with SMTP id 006d021491bc7-713ede98f82mr2038901eaf.34.1793205947476;
+        Wed, 28 Oct 2026 09:45:47 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.45
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:45:45 -0700 (PDT)
+        Wed, 28 Oct 2026 09:45:46 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
@@ -86,9 +86,9 @@ Cc: Josef Bacik <josef@toxicpanda.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 70/98] nvmet-tcp: don't wait for the host in the accept work
-Date: Wed, 28 Oct 2026 10:42:13 -0600
-Message-ID: <20261028164415.1262013-71-axboe@kernel.dk>
+Subject: [PATCH 71/98] nvmet: check the host NQN against the TLS PSK identity
+Date: Wed, 28 Oct 2026 10:42:14 -0600
+Message-ID: <20261028164415.1262013-72-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,175 +105,86 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-On a port that offers TLS but doesn't require it,
-nvmet_tcp_alloc_queue() peeks at the first bytes of a new connection to
-tell an ICReq from a TLS handshake. That receive blocks until the host
-sends something or closes, and it runs in the accept work, of which
-there is one per port. A connection that stays silent blocks every
-other connect on that port for as long as it's held open, no secret
-needed. And nvmet_tcp_remove_port() waits for the accept work with
-nvmet_config_sem held for writing, so an admin taking the port down
-hangs there and no port of the target answers a Connect anymore.
+The identity of a TLS PSK names the host and subsystem the key was
+generated for. The target remembers which key a handshake ended with,
+but never compares it with the host NQN in the Connect that follows. So
+a host holding any PSK in the port's keyring can connect as another
+host, sees what that host may see, and isn't asked for DH-HMAC-CHAP
+since TLS queues skip it. It can add an I/O queue to that host's TLS
+controller the same way.
 
-Install the socket callbacks first and peek without blocking from the
-io work, which data_ready() reruns. If it's a handshake, restore the
-default callbacks for the upcall as before, and make the upcall from
-one more run of the io work so no run is left that could steal data
-from the handshake. The state change happens under state_lock and only
-if the queue isn't already going away. The io work doesn't hold the
-port like the accept work did, so note the keyring serial, which is all
-the upcall needs from the port, at allocation.
+Refuse a Connect whose host NQN isn't the one in the PSK identity of the
+queue. The subsystem NQN isn't compared, a discovery subsystem goes by
+two names.
 
-A partially arrived header used to be taken for "no TLS", now the rest
-is waited for. A silent connection still holds its queue, as on a port
-without TLS.
-
-Fixes: 70525e5d82f6 ("nvmet-tcp: peek icreq before starting TLS")
+Fixes: 675b453e0241 ("nvmet-tcp: enable TLS handshake upcall")
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/tcp.c | 67 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 59 insertions(+), 8 deletions(-)
+ drivers/nvme/target/fabrics-cmd.c | 33 +++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index c8f0c52a1b95..3d24efe3b7c3 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -140,6 +140,7 @@ struct nvmet_tcp_cmd {
- 
- enum nvmet_tcp_queue_state {
- 	NVMET_TCP_Q_CONNECTING,
-+	NVMET_TCP_Q_TLS_PEEK,
- 	NVMET_TCP_Q_TLS_HANDSHAKE,
- 	NVMET_TCP_Q_LIVE,
- 	NVMET_TCP_Q_DISCONNECTING,
-@@ -176,6 +177,7 @@ struct nvmet_tcp_queue {
- 
- 	/* TLS state */
- 	key_serial_t		tls_pskid;
-+	key_serial_t		tls_keyring;
- 	struct delayed_work	tls_handshake_tmo_work;
- 
- 	unsigned long           poll_end;
-@@ -1496,6 +1498,8 @@ static bool nvmet_tcp_check_queue_deadline(struct nvmet_tcp_queue *queue,
- 	return !time_after(jiffies, queue->poll_end);
+diff --git a/drivers/nvme/target/fabrics-cmd.c b/drivers/nvme/target/fabrics-cmd.c
+index ddb732f62981..089e3082c388 100644
+--- a/drivers/nvme/target/fabrics-cmd.c
++++ b/drivers/nvme/target/fabrics-cmd.c
+@@ -264,6 +264,30 @@ static u32 nvmet_connect_result(struct nvmet_ctrl *ctrl, struct nvmet_sq *sq)
+ 		(needs_auth ? NVME_CONNECT_AUTHREQ_ATR : 0);
  }
  
-+static bool nvmet_tcp_tls_peek(struct nvmet_tcp_queue *queue);
-+
- static void nvmet_tcp_io_work(struct work_struct *w)
- {
- 	struct nvmet_tcp_queue *queue =
-@@ -1503,6 +1507,11 @@ static void nvmet_tcp_io_work(struct work_struct *w)
- 	bool pending;
- 	int ret, ops = 0;
- 
-+	if ((queue->state == NVMET_TCP_Q_TLS_PEEK ||
-+	     queue->state == NVMET_TCP_Q_TLS_HANDSHAKE) &&
-+	    !nvmet_tcp_tls_peek(queue))
-+		return;
-+
- 	do {
- 		pending = false;
- 
-@@ -1828,12 +1837,9 @@ static int nvmet_tcp_try_peek_pdu(struct nvmet_tcp_queue *queue)
- 	struct msghdr msg = {
- 		.msg_control = cbuf,
- 		.msg_controllen = sizeof(cbuf),
--		.msg_flags = MSG_PEEK,
-+		.msg_flags = MSG_PEEK | MSG_DONTWAIT,
- 	};
- 
--	if (nvmet_port_secure_channel_required(queue->port->nport))
--		return 0;
--
- 	len = kernel_recvmsg(queue->sock, &msg, &iov, 1,
- 			iov.iov_len, msg.msg_flags);
- 	if (unlikely(len < 0)) {
-@@ -1955,7 +1961,7 @@ static int nvmet_tcp_tls_handshake(struct nvmet_tcp_queue *queue)
- 	args.ta_sock = queue->sock;
- 	args.ta_done = nvmet_tcp_tls_handshake_done;
- 	args.ta_data = queue;
--	args.ta_keyring = key_serial(queue->port->nport->keyring);
-+	args.ta_keyring = queue->tls_keyring;
- 	args.ta_timeout_ms = tls_handshake_timeout * 1000;
- 
- 	ret = tls_server_hello_psk(&args, GFP_KERNEL);
-@@ -1968,8 +1974,51 @@ static int nvmet_tcp_tls_handshake(struct nvmet_tcp_queue *queue)
- 	}
- 	return ret;
- }
-+
 +/*
-+ * TLS is offered, but not required: the first bytes tell what the host wants.
-+ * Returns true if the queue goes on without TLS.
++ * The identity of a TLS PSK names the host that the key was made for:
++ * "NVMe<version><type><hash> <host NQN> <subsystem NQN> ...".
++ * Whoever has proven to hold the key is that host, and no other one.
 + */
-+static bool nvmet_tcp_tls_peek(struct nvmet_tcp_queue *queue)
++static u16 nvmet_check_tls_host(struct nvmet_sq *sq, const char *hostnqn)
 +{
-+	int ret;
++#ifdef CONFIG_NVME_TARGET_TCP_TLS
++	size_t len = strlen(hostnqn);
++	const char *id;
 +
-+	if (queue->state == NVMET_TCP_Q_TLS_HANDSHAKE) {
-+		if (nvmet_tcp_tls_handshake(queue))
-+			nvmet_tcp_schedule_release_queue(queue);
-+		return false;
++	if (!sq->tls_key)
++		return 0;
++
++	id = strchr(sq->tls_key->description, ' ');
++	if (!id || strncmp(id + 1, hostnqn, len) || id[len + 1] != ' ') {
++		pr_warn("TLS PSK %08x does not belong to host %s\n",
++			key_serial(sq->tls_key), hostnqn);
++		return NVME_SC_CONNECT_INVALID_HOST | NVME_STATUS_DNR;
 +	}
-+
-+	/* ->data_ready() brings us back */
-+	ret = nvmet_tcp_try_peek_pdu(queue);
-+	if (ret == -EAGAIN)
-+		return false;
-+
-+	/* The upcall wants the default callbacks */
-+	if (!ret)
-+		nvmet_tcp_restore_socket_callbacks(queue);
-+
-+	spin_lock_bh(&queue->state_lock);
-+	if (queue->state != NVMET_TCP_Q_TLS_PEEK) {
-+		spin_unlock_bh(&queue->state_lock);
-+		return false;
-+	}
-+	queue->state = ret ? NVMET_TCP_Q_CONNECTING : NVMET_TCP_Q_TLS_HANDSHAKE;
-+	spin_unlock_bh(&queue->state_lock);
-+	if (ret)
-+		return true;
-+
-+	/*
-+	 * ->data_ready() may have queued the io work meanwhile, nothing does
-+	 * from now on. The handshake must not start before that run is over,
-+	 * so leave it to that run.
-+	 */
-+	queue_work_on(queue_cpu(queue), nvmet_tcp_wq, &queue->io_work);
-+	return false;
++#endif
++	return 0;
 +}
- #else
- static void nvmet_tcp_tls_handshake_timeout(struct work_struct *w) {}
-+static bool nvmet_tcp_tls_peek(struct nvmet_tcp_queue *queue) { return true; }
- #endif
++
+ static void nvmet_execute_admin_connect(struct nvmet_req *req)
+ {
+ 	struct nvmf_connect_command *c = &req->cmd->connect;
+@@ -309,6 +333,10 @@ static void nvmet_execute_admin_connect(struct nvmet_req *req)
+ 	d->subsysnqn[NVMF_NQN_FIELD_LEN - 1] = '\0';
+ 	d->hostnqn[NVMF_NQN_FIELD_LEN - 1] = '\0';
  
- static void nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
-@@ -2039,14 +2088,16 @@ static void nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
- 		sk->sk_user_data = NULL;
- 		sk->sk_data_ready = port->data_ready;
- 		write_unlock_bh(&sk->sk_callback_lock);
--		if (!nvmet_tcp_try_peek_pdu(queue)) {
-+		/* The port may be gone when the upcall is made */
-+		queue->tls_keyring = key_serial(port->nport->keyring);
-+		if (nvmet_port_secure_channel_required(port->nport)) {
- 			if (!nvmet_tcp_tls_handshake(queue))
- 				return;
- 			/* TLS handshake failed, terminate the connection */
- 			goto out_destroy_sq;
- 		}
--		/* Not a TLS connection, continue with normal processing */
--		queue->state = NVMET_TCP_Q_CONNECTING;
-+		/* Don't wait for the host here: others want to connect, too */
-+		queue->state = NVMET_TCP_Q_TLS_PEEK;
- 	}
- #endif
++	args.status = nvmet_check_tls_host(req->sq, d->hostnqn);
++	if (args.status)
++		goto out;
++
+ 	args.subsysnqn = d->subsysnqn;
+ 	args.hostnqn = d->hostnqn;
+ 	args.hostid = &d->hostid;
+@@ -363,6 +391,11 @@ static void nvmet_execute_io_connect(struct nvmet_req *req)
  
+ 	d->subsysnqn[NVMF_NQN_FIELD_LEN - 1] = '\0';
+ 	d->hostnqn[NVMF_NQN_FIELD_LEN - 1] = '\0';
++
++	status = nvmet_check_tls_host(req->sq, d->hostnqn);
++	if (status)
++		goto out;
++
+ 	ctrl = nvmet_ctrl_find_get(d->subsysnqn, d->hostnqn,
+ 				   le16_to_cpu(d->cntlid), req);
+ 	if (!ctrl) {
 -- 
 2.56.0
 
