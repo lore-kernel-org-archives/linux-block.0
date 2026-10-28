@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205949;
-	b=F9uDhKBcF9eXdPCUjgiWWVEo0vAEhTVcL0QStSmIIujofEzU/hrH686Q8p1/8kOjE26O
-	 wDbOqOE4zCPCp5bs5Psb02JchcMgrJBQVKxdWTSUSoUBRfDYosg9+UitCfZMN55txYtBt
-	 eEF4UDVSX22kzeyOrkoEN+TxSXr/9OH7deh7aYnJg79EsT9sTT/qoI8L9OYi7pEGQpIW5
-	 Db11f/6eF1xCEAYs6rxV3yCtZh2HOMedxa0E/k6GSaOKSoFJo8OqIyrYOvtMP14+ip9ip
-	 /a+IdCuHGbbaPOIwV99d+b8CHNm5Y1sodDeTAcWz0ONAXacygHJW9s400CrHlJuDtRQ==
+	t=1793205951;
+	b=JOrx6OIgGpmi8qgGZa6ht1MYjqpJ39sBeMnWNMd0hFR+06Mw6UbhnEDwSz8663Swc4Hu
+	 xCEdckcSDR82nZ25XhbEJGadr7KeSO8tX2UIcXgkHFXYIgFY9/pY8F2bfP303WL8GOKcG
+	 eiF3UX8smD7ZrNaVgVF+rxIsQU0qAUumd6Cs6OSlFbek0dVIy48CmVxHP4nT/BtHfNRU7
+	 +oWU9eOjUcDaQOJ8tlYWVOJUsAdm7MtBm5mBUljjkOCN3datjy2I1n1vv7QWEecPg7lvI
+	 qZCtZuCP+uoETc7y/sDPiK+vn24FZxS8EQaaFVesN9XfcOUrA6YwQv7KVYl0LCre9vQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205949;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205951;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=RVYtNnJT0mZ9d3d89Cr4tuAShGn0eqLJS/Cuzaqnc/E=;
-	b=NJQcWhKONE4sFPKStASgCKIyJ7LOKrF9TV0LQQ7nrKSsxgIpVm+W1YKEb6yEwoUyDNUA
-	 XagBjn3xl1wH2Jayq4a1Frjz8M6PihL95z3Vrt4BkSzbtvXZ1QCyf3cqFa1hqUgBy5ysp
-	 vvdhhn7sW9ql+7ReFYUBDrWAwS+o+ISZ5D5uCZU2jxi2RnDpihKX/U8Ng4Ph53ujYHY9c
-	 1ZDBSmynRrQiOGY5kkTEtHwiAsj4lJD/9BbYOCRuZeK97QseoHNnNpKIkzB6RXHYoUISr
-	 1ERaQsnirZfyoE3tZr5Rvu77fIcMl24kE78TmUCEsTL66YW0cW/yNoQ4zNbdzOLA7Pw==
+	bh=YXxe+7kIYAtCbjpADluWoq2mIe6ZpS5Y1HhIQgut8NE=;
+	b=pNc5OTpNCxzcshhp+P1MyLeWEBQCHUYPdzlsaMBHF6gbYlsKd2a+t0ZxZ1f8dAP37ucM
+	 vXhcS1+5GIeeJQzXB0wiHZl8QWwjAnOU0X80FCNVj9ElzmwASXxDdnrz1ogrc9jBRUbW2
+	 +vcpzMlfH0RzEcmJrfLpnez9k3EF9PQF6OGp158raonptCZAGklGYAVmTVzkcWGnPVY3m
+	 +czZfMaZui4AUux+5uVkqcE/PDDN4IYU0crUGN2raYDKfBUnpg2quXKgXY+PNoF42Jeex
+	 5ip9gHKgz+v+fdiDX5MOAuLBqKFch9k9aboxTrG+MgFKB4iXJWXcBwCIHBkRYjk6VYQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=EYvHSxh3;
-	arc=none smtp.remote-ip=209.85.210.42
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="m4b8YP/e";
+	arc=none smtp.remote-ip=209.85.210.46
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A44606A325
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 95A44606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB542606A322
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB542606A322
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=EYvHSxh3
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-847ac7ccd85so793443a34.3
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:49 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=m4b8YP/e
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-85a5455bd3cso734270a34.3
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205948; x=1793810748; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205950; x=1793810750; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=RVYtNnJT0mZ9d3d89Cr4tuAShGn0eqLJS/Cuzaqnc/E=;
-        b=EYvHSxh3zeAkP5JgUdYGNqgRzaXEzcvtiQVFv/rf/OxB5l9EupXsIsTwgJSmb5sk1C
-         lXMhskGnEUfmHe/hcxA/oxKaWr33a2q+BhySS6B9rdXG6Iog9620mdNt6Zo+jEyCI/JP
-         0N/obrphgeh5la6Z44xRchKpsSgWb/8S6uG/SleTZ274NVWteXdThZdBjwohmco2gGFR
-         6Nx0CAryi6cydiP3O9PFQDPo+OepjMG+Ale/0hqzS8OWsxlr7clkfVHgl/dXPr7F49eK
-         XIESu5g2b7fEZ0O08cgl7tGd2c6OicK1HGp3C4Qp0vqW+1hWANrPdg6q2llwvZj7NUWK
-         Sj7A==
+        bh=YXxe+7kIYAtCbjpADluWoq2mIe6ZpS5Y1HhIQgut8NE=;
+        b=m4b8YP/eUXkeNU4vSdGZddcznXiJMNwrBehAUWVgsPp2/DLw3ohtQS198t9VrW+BRZ
+         FMYTW1jusImCA4xKPsG7v31sA5Iqp5WOi0yFehig5ohk/UMNo66V1q40CN8c3eSDYJas
+         58TLo3JOsivhDVdrdjBgg/3H89P44XbFaW6WanmHw7lIBOSv3P5ttoWerGMcEUatrP9Y
+         HoIK5e/P/JTnHJ+9UwlbdA/TzkJ/G9JAH0jGVxObzGE1ANd8RvQ0S8qBM4y6+QkpheH/
+         vbA3+/e0qgr8XfsCVLYVyLR49eN+iadw+m6D7Ovjc0rouvG8cc6SNiZXKBFm72w1s6qG
+         0JhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205948; x=1793810748;
+        d=1e100.net; s=20260707; t=1793205950; x=1793810750;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=RVYtNnJT0mZ9d3d89Cr4tuAShGn0eqLJS/Cuzaqnc/E=;
-        b=X+XZUrJutJ+GvAYrCIFW9QSzVflnJNbTyu2NZq1yiJsE/qM+Ylig7xyufaB6OBwIhu
-         GyZEGiXzFY9ZH/5Mo/fC8J2opvZvxMqPLrXVQdaMasG3wAZdMFjqVWW8bxqUD45+yN5x
-         yiEr8GW3JtP9ryOimtBfmfFNCSo1WheAeLvbF3tl5LLHQWUhZF9J6CJT3F12+z/j7qco
-         y+7r2vWiGMvAIJHrwaDKvfD1A4H4408cH36yb1B9vjtRK8QHDUDSdz3g+HhTIMg1Il1O
-         bPfWuudcuAzmHvGpqrDKiIichuA77HF9Vp/L2181VB82E0ElDshjEKTukn3ulf4beJ9l
-         Cgvw==
-X-Gm-Message-State: AFq9FYKlQBIS3jBKC0T+HUmE0Wmmgr4RcbHgylo7EiOuKUYY0bXWpRFG
-	Dw2cCseT4KK87IpZSEn5WucL+nkIqLvPaa0C8L2Mnz1RpmamgczCzc53k7Lf486ZtEgM1TyPew4
-	K3G911iw=
-X-Gm-Gg: AYBFou3B3ghwcSzYCHppOr4PovWsgZr4FdWWSPOT3ZZPcoVcfuol5rO8NIiHQph5LXt
-	wdJJQ/PXC33DTtvlYtsXwG/JWN6wrjaLmnnRqHhLRzaEdlfEo0mk1M1SuxOwACREX5i4WCpF5Pl
-	5o0VYmacnmDZBKHzqHbX/EUVujM9AMpdaTmblLul8pkSk+pQ9zq4einACwJhUw1hG4oyN26lU7P
-	150K2OP/ju9uPKEKzrCA4ncQzxG9NHHnrhrbWJ/83DADSTksZU/S8HnYofvYVUwXGBBfzskLqTn
-	tUgJSu2Fut6llhNrs8bVsBsAIGuJ9O+LZkMBqcUw5LOrHPReyOBYjLivJW2NZz3LKSSRKqhuNBV
-	LwtrZLOv0IuNnz/RsMfjxwRLMGlEt13PrE3088oeslXMP3Va6O+lFS2v5d1/2W1o7MpdTHOEj3b
-	tKSQg2zC2QyvyKg+X916TNWw76kNfskxtDksmRErwPJAb5VTYIN67ibiWOYj8Y2r+3l3LhwlBzu
-	dl2ALhO4aeiiYeuezoEzRlOW5nAw3r9gVdb1qextoN6JovtkcrolofnkAMoXFqZUWkrHH2bHYGu
-	fWK+knUzvL6MM5uqCQhhTlVcDMlZr52qDzyPMK3tRPPdaJvz1oQWKXUvESp06OC2eDTlUGnXOxQ
-	luLF8aG52Y36XgIwoVJw=
-X-Received: by 2002:a05:6830:90f:b0:7dc:dbe4:3f21 with SMTP id 46e09a7af769-85aba80af99mr2356978a34.1.1793205948629;
-        Wed, 28 Oct 2026 09:45:48 -0700 (PDT)
+        bh=YXxe+7kIYAtCbjpADluWoq2mIe6ZpS5Y1HhIQgut8NE=;
+        b=dDbxpNqN1YcoubXaoeE+yOaeSMMf4nWRjLQIpQogbuCRW6t7byBjskDGDYwNJ31sJO
+         sbzoMdH/Z90Meo4VAdsEK91mGoCmGyZ7HcgEV2tE3jVmvtTlsub2CMdIVYrYMbPiX/AL
+         xFwR7D+P+FkptPVFHiAjsk9XDfNwc8jQpRXwGfdr4TH5kgCYBPAw2IxGvkXy10hkEjFo
+         OVkuZ4SWQWGihucQ9dAtSdCIIk+rlDuMz+qiR/XVKFLBEq6W7ZuJynrUBtFo9ZqLYeXG
+         rQ5IuB9turinhyyvtbWR8V6bCQm5xaeSy6SDPtgWSoTsEUBESNocMHT4AIU6vlWza0Z9
+         ZoJA==
+X-Gm-Message-State: AFq9FYK9LHxyEB5gzfI4AOrkM4p1Rb4BxMJJASS8drTjHUmDm0rE9wTU
+	nH7n+4g6+XPHHlkVWOZF92kpNKLH8e1Uu7jGtPYFAKfuFsnAoAYwR7uHVckRoXldMV2pGgC0DOP
+	G1NHD8vM=
+X-Gm-Gg: AYBFou3032uP4ofbTFXkAnWseUEndXzIm77ywXDBoqvv5UgBHYd7cfp44jdZXgSRG1s
+	mT0FuUbjuMrRXJZgmRfxLA4Fg/BntrQz6OqHP/D5O3u+EvjIgMw10z7xqOnv20EqmKHUqhVM3Oy
+	oLymcsO8FcxiCKu8CCzTWtt/0b1cPstwLpYsiqtbh6pPQmkMIHmO3JuWz/1/EwHlwbVFrrB1OLO
+	ZwhSbtZw0GX5NzB2Po+NOQblHzCazZAxzMoaVE8/X/BpXhtkQQU2+8wwGdNP3FmuUz0Ek+NFgNk
+	1HHS0kjYu7NxDlhVaQiFGWfiZ/y7LSqWow3x27Jm8wi4TtksoGVSS06zNxvBV5Tt96s2BX/LKEe
+	Qpo+b+aPr5uEZNv9kBPGOLRZWPd1fI9PniSjSdfRDQ93bLB6XicG1/RiaxwK+xsweqgyCHvrJAS
+	vyClchL7QjepeH/Fk9zh8eTKmzmP9ZqS05Upe0mveN+vBFZC4Tuc3ppaU7UhxOixG7CZ2fdF7jN
+	6zwHEvUZgdjOEtAZPi70/vHoHunMTkWlz3TRlAUp5/gXYHjDDRAr6jvm7QN84tBYSlWjyB/lnkS
+	0h94lFwDfxTpeupDg+a518SlsB4DFv3p6oJwiCyF2EobLGo0DBrC47saLACNA3XLH5mEhlLATw=
+	=
+X-Received: by 2002:a05:6830:44a2:b0:81b:a5aa:e82b with SMTP id 46e09a7af769-85ab996d1b9mr2375296a34.24.1793205949810;
+        Wed, 28 Oct 2026 09:45:49 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.47
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:45:48 -0700 (PDT)
+        Wed, 28 Oct 2026 09:45:49 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
@@ -86,9 +86,9 @@ Cc: Josef Bacik <josef@toxicpanda.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 72/98] nvmet: fix NULL dereference of PCI endpoint targets
-Date: Wed, 28 Oct 2026 10:42:15 -0600
-Message-ID: <20261028164415.1262013-73-axboe@kernel.dk>
+Subject: [PATCH 73/98] nvmet-tcp: stop listening when a port is removed
+Date: Wed, 28 Oct 2026 10:42:16 -0600
+Message-ID: <20261028164415.1262013-74-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,41 +105,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-nvmet_pci_epf_create_ctrl() calls nvmet_alloc_ctrl() without a queue,
-the admin queue comes later from the host. nvmet_alloc_ctrl() passes
-args->sq to nvmet_queue_tls_keyid(), which with
-CONFIG_NVME_TARGET_TCP_TLS dereferences it, so every PCI endpoint
-controller creation crashes on such a kernel. The debugfs tls_key file
-passes ctrl->sqs[0] to the same function, which is NULL until the admin
-queue exists and again once a fabrics host has closed it while keeping
-an I/O queue.
+nvmet_tcp_accept_work() accepts until there's nothing left. A
+connection that is already dead when accepted is torn down right there,
+which takes a few ms, and more can arrive meanwhile.
+nvmet_tcp_remove_port() waits for the work with cancel_work_sync(), so
+someone opening and closing connections in a loop keeps the removal from
+finishing. It holds nvmet_config_sem for writing, so nothing can be
+configured and no port answers a Connect until the flood stops. No
+secret needed, just an admin removing the port at the wrong time.
 
-A queue that isn't there has no TLS key.
+Shut the listening socket down first. Pending connections are dropped,
+as they were on release, and the next kernel_accept() fails and ends the
+work.
 
-Fixes: fa2e0f8bbc68 ("nvmet-tcp: support secure channel concatenation")
+Fixes: 872d26a391da ("nvmet-tcp: add NVMe over TCP target driver")
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/nvmet.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/nvme/target/tcp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index e354a71514ae..5c2021b89ec4 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -964,7 +964,8 @@ static inline void nvmet_req_bio_put(struct nvmet_req *req, struct bio *bio)
- #ifdef CONFIG_NVME_TARGET_TCP_TLS
- static inline key_serial_t nvmet_queue_tls_keyid(struct nvmet_sq *sq)
- {
--	return sq->tls_key ? key_serial(sq->tls_key) : 0;
-+	/* A PCI endpoint controller is created without a queue */
-+	return sq && sq->tls_key ? key_serial(sq->tls_key) : 0;
- }
- static inline void nvmet_sq_put_tls_key(struct nvmet_sq *sq)
- {
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index 3d24efe3b7c3..0b70d3647e28 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -2263,6 +2263,8 @@ static void nvmet_tcp_remove_port(struct nvmet_port *nport)
+ 	port->sock->sk->sk_data_ready = port->data_ready;
+ 	port->sock->sk->sk_user_data = NULL;
+ 	write_unlock_bh(&port->sock->sk->sk_callback_lock);
++	/* The accept work goes on for as long as there is something to accept */
++	kernel_sock_shutdown(port->sock, SHUT_RDWR);
+ 	cancel_work_sync(&port->accept_work);
+ 	/*
+ 	 * Destroy the remaining queues, which are not belong to any
 -- 
 2.56.0
 
