@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793217142;
-	b=Hvfs3VMHtTWKKPb6+RpUTIKPmk8GW8kJo4/cOvTGrYbVP/WnZVdh0YkXQfX16WotaG5D
-	 xsoGTGT37/uXbqYGvNzpsyThvjvVfW94up6WCAZRm90UYsSghgKEZyPimAwKCnWQLsyrX
-	 wwQv1E8mQHKRyfVSyDBdHmeCc3mF/ODHcVdYkfJP0vk/bsmQuiQ0iNFZLuGWegl91dCXp
-	 qlUIDwCiGiT7p3S0+xH05WLZ0vuVPPM7WnRLB3wu2LJvKeTlXEZiTL9Alaycsj71BLnKV
-	 GRl3K2j+9eZ56etp83SM/ljl1e5nso9mxDCJM+URIOflBzx1zlzyfQIld9RinGGDjdg==
+	t=1793217143;
+	b=iPCQYpLsdOU9QoXFRkiGZSSbzMUrGLETaTJtdc7flC5UAUFnZRA4wExU12Lx/msN5waY
+	 GYyajx9njnLWB+aDXMsmk+QwMNdYymAiCM+eHqOg1eXebcu20U/cyJyOJhhZVxQp4BoCo
+	 BTxWpXkCNQYqSCSWgXc8NY5ypkuMVncVMgo4B4+Kppe7NOPQ3FyGdm1NoqdKS1gX7Swoa
+	 foTBHKSLXsKL+3HJfQnmV4RwMvPh46XG4VuZi7sxuLtCjPfljLkErdw4sz4VqKe/+IqUN
+	 zUppqvYPN3/+NZn6QMBPY3V6cXlHEIas3i+uQv5csmTXxf9HG21XUygRIiXrmeETPfw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793217142;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793217143;
 	h=Received:DKIM-Signature:Date:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=AtF8gwqEDOtZI6obv958lG6gGxSzDFJL4G5waOARj2s=;
-	b=DnjZYjsCOeF794tdkgxtztIYADJSqk3PrdlBpG7R4oU4XyYKZkvGhTpKCS+UYHJydrRr
-	 WGi30Tdfao4QSJgD0aSUtdMhRSICzTGXisMKGzZ2WPMOcdGvInz2lJLt9Q+5Lv0PDbcqt
-	 7Ypd0ueFgXMv6lGdvfibspHcDGO0Ljm7BMPuAUkpkLWX+eD/dNSI+3r60l/kcNgUgqAVP
-	 bnGsUZENlyySvL7kN1CDFmSyugZcPRzZ9t0VXxCcwIIKu5ZxuAs5hRbRqp4gAJp0vS7Q+
-	 b2iwxd+VwZdwTLChU41jdG9fWtM9eDNL4e6aHqrV0YtGeNBy4+nY5gtJIjOvkUpR/dA==
+	bh=WrLQVvIBF16QctV3AgEdD6+deB0dsd9V1mcd9heBiWs=;
+	b=057qH0vKj7MX5z96A16IdEijiF6EXMgGU8rKWjisU+uR4821Ngo2YE6g/8zoP0Q9eMlM
+	 eSYnQ416dtIOINKyj0E+mXpVivplb3+lxabhSDZOoKlCnhSDBCezZxDzIY2lgY3m1QK0g
+	 42D9VQVNxtf/Ry2PeP5uIM9C3Gaoul5iwCGerwvThWw700sGvEgN1L3yx0nLo2D/6j9/s
+	 beLEZyqoqQARI4ISQHTtCll+SmmQYPbOxZHoHScpzbV7wUf4MAWKrW4FiSYTeZ1tDgGpm
+	 /oM9iVuPy+oACXKxc2Y4Cz1NKOqEsJo2J3ZjaafugXak6XO+UjxQptGxX9ToiOorSrA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bqyEJLK6;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hPktCOlw;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CE1606A329
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 19:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142BC606A324
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 19:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bqyEJLK6
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 939701F01825;
-	Wed, 28 Oct 2026 19:52:21 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hPktCOlw
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2D5A1F01825;
+	Wed, 28 Oct 2026 19:52:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793217141;
-	bh=AtF8gwqEDOtZI6obv958lG6gGxSzDFJL4G5waOARj2s=;
+	s=k20260515; t=1793217142;
+	bh=WrLQVvIBF16QctV3AgEdD6+deB0dsd9V1mcd9heBiWs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=bqyEJLK6pbj2o9OFvu7Y0o5T6jHQ2Gbt6IhKqNgkGNiOEtfv3DBxsQ2uQaB+46NSj
-	 EMXXoK7yXlVxBIZND/qgobFoMWQoRS64iFj0tNCKLpdQgU+VzsJvDB/81Rbu0sVD3R
-	 BD6nLLJsnvIZW1a99TnK8p/bXIVd06/DM8uoKxn95nXJJuBJFKmE0aE3B8JbiEtgp8
-	 vo/mxdyTm9sagR27lNT6ZJkPtKOwscLf+KgOKQodbemb1cLOAOLvAqrxZNkejH2f3T
-	 2oinxig1QAFf+rXVnYxZUK+1pfJZxwc7mfAFQVwCA4qJtrnEUgPaIrI6lmUbHxYdfB
-	 65n79qrSNSjFA==
-Date: Wed, 28 Oct 2026 09:52:20 -1000
-Message-ID: <83384c0b3d8483de8c179acb727da0ae@kernel.org>
+	b=hPktCOlweDSwoh8zCMDCP3/4+NQ6CnRw6b7FM6tTuZzdlRc3u6FJstzJi6xJi+Lji
+	 Z8ZNxsQoRkToQYBZ1NSMUyYtNYrK0uvvle0j1b7STwpHyKbtrn8sZyq1aHZ4RIM6E1
+	 1C1l2I3Kzt0V25Ntfhi+irgGMq+nf8lIlwJd3/44dfDGVwq7qXzSZ/gDW3R1DxaLIJ
+	 ttTKismEdMFwlaWQnIWoP5qF4EfpVGs5fUftUIkvmbrI+j1IHjBbdLx+lBqbBVK6/B
+	 RK6+a024IOWEqi1oTslp5i5jwjpihJ9X4cxaY9JOMYuv4CREUwfRCcfxd31eTqoUka
+	 XVRKCH3C9iNnQ==
+Date: Wed, 28 Oct 2026 09:52:22 -1000
+Message-ID: <50a198d5c9b51f32aa052f4603c3cf93@kernel.org>
 From: Tejun Heo <tj@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 19/98] blk-cgroup: don't free a blkg with its punt work queued
-In-Reply-To: <20261028164415.1262013-20-axboe@kernel.dk>
-References: <20261028164415.1262013-1-axboe@kernel.dk> <20261028164415.1262013-20-axboe@kernel.dk>
+Subject: Re: [PATCH 23/98] blk-iolatency: flush enable_work after going offline
+In-Reply-To: <20261028164415.1262013-24-axboe@kernel.dk>
+References: <20261028164415.1262013-1-axboe@kernel.dk> <20261028164415.1262013-24-axboe@kernel.dk>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -60,17 +60,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 28, 2026 at 10:41:22AM -0600, Jens Axboe wrote:
-> blkg_async_bio_workfn() relies on the bios on the list pinning the blkg.
-> But blkcg_punt_bio_submit() can call queue_work() after a running
-> instance already took and completed the bio, and queue_work() succeeds
-> on an empty list for the same reason. Nothing holds the blkg then, and
-> free_work shares its memory with async_bio_work on top of that.
+On Wed, Oct 28, 2026 at 10:41:26AM -0600, Jens Axboe wrote:
+> blkcg_iolatency_exit() flushes enable_work before it deactivates the
+> policy, but iolatency_pd_offline() schedules it again for the last group
+> with a target, so the blk_iolatency is freed with the work queued. Flush
+> it after the deactivation.
 >
-> Hold a reference across blkcg_punt_bio_submit(), give the two works
-> memory of their own, and cancel async_bio_work in blkg_free_workfn().
->
-> Fixes: d3f77dfdc718 ("blkcg: implement REQ_CGROUP_PUNT")
+> Fixes: 8a177a36da6c ("blk-iolatency: Fix inflight count imbalances and IO hangs on offline")
 > Cc: Tejun Heo <tj@kernel.org>
 > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
