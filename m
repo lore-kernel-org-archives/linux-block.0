@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205933;
-	b=xHHHg4ugNLnEXm+7wQLS274lA1MV1G8vnduNQCLA2BYYkcwUBPuq+CabQYo/j551mKkm
-	 +uMhI5Tjot1i8TP3hJ9lrHXSSPs9Tddd5dBNqGReg+lWesYKMwfbAWcA5fr2JTeN6yqAO
-	 U2EXO9mkT9SVbADsSf0wntk5LB80KvEQNWz38amGTvFJq/jw4R+jtmSV5lG0GTh7cClJ3
-	 cOD+Ge4IpmhsRYX0N5nP2F2tE0KNYjp+akxPM2agQuwljsgDpfsEphcDqZ+FDSfbyzr18
-	 UV5gjKhkiBmv34ETAkp9VPJflmCOfJHAItH0nOi3pYdyy3nYp2jE/97gjk5ePLahkbA==
+	t=1793205934;
+	b=WYr0UDyuY/e+ofU3zOSv2mBleRY9Oj6DDNUJVyJI+oeI9dNVRneGDaESwNIrGSbKV+/O
+	 8CUwwLWl4rYMvPwLRTpqwF457lNi9IJwgMgP8gy3x2B5wdQ7UlznkWK7u8mzzngC91q4n
+	 B3kDnBxzQt4+Fs/xU1FadvBbNQowWwdN9e+n/1E9NWgdfHtzCqild2KNia9YDeM/zrzWb
+	 EuCFrRDX7uvb70135P/8fAlYcKTt5MO79nd2SnZ4EzrrmnrTdh1AyFo8/zz8m9ysUb7vP
+	 mEndxZHI7C2tdKGQnJ+zI7NefSaDXkf98FOsnxsnZ2FMDoUiVHkYJPJi6sx5Oo49fRg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205933;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205934;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=nG+DHn1LzFCaeXWX0dwZORZZuaohaWDMfP3DcwooPQ4=;
-	b=I6gF0TcbKcppKV36sM7BRiu5nnwvVo4OLbu/C1E1AmTqaMOpSYHrKQDM+lu+YBeEDeSd
-	 EnfWSGSc7hEnUmbFP1DUSmOqsqi28+X8d//3JYVpyU6/eq6Q39ilPP9xXW2kDUL9ldA/C
-	 3RPJPbfEJ3QxcwwgfLMJrrRfDa0cCx/wlk6exQ+1A1X1s3LxIRg8WWZwOhVEM7CzgxXq9
-	 MwEJboV84VWzQGp976buT/oxnnAv9ptkyHFyEcfSXnneKzznsm9VkN7yZm45nv2fTl05W
-	 Z18+hKrZ5u5VhI4HMteG48JvHfC1f1ECiknpSxaaSbHZaBeyt3+zN2+p0ixfXafMlrQ==
+	bh=IU9MOmP/DNYIBy+a0Esa3M3MWyw1kMu7zxXOFPkbXXM=;
+	b=oFQn5aYonPcDxoZuEQ8Xl/EHMZO91QXg7fpqZwPHRQjB+EffzdRH1Sa3oN/DiyPgLaN7
+	 Ax1g3aSImU9u+vkSN8v/kx7CU3JSexLluJdOgrf2u0rpjRFNiIbO5CiCwsHNITdOdUtBX
+	 j1Z5xAZGuLHO/p2xzfmwMcWcB79VDcyZEoQ7GeRgnq0TgKO7ITAkHdwYhokAERShao93+
+	 4E4GXBswjZhJQG9sAAdgphQROlidF6/AeAPjpjJW/iJZQWRg/s+ypUSwwBRHHnnlk17Sv
+	 ax3rssT/M7P9W9zIREVnpelxHmMYxK6jVMy1J2H6xFMUtn5kWg9q8SsjEcqoaC8Zs1Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="HY2/kCuj";
-	arc=none smtp.remote-ip=209.85.210.54
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=MwPqTwG4;
+	arc=none smtp.remote-ip=209.85.210.45
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB3D606A32A
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7CB3D606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93439606A326
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 93439606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=HY2/kCuj
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-82380b0f55dso617901a34.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:33 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=MwPqTwG4
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-846566246e8so1081040a34.1
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205932; x=1793810732; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205934; x=1793810734; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=nG+DHn1LzFCaeXWX0dwZORZZuaohaWDMfP3DcwooPQ4=;
-        b=HY2/kCujC2UK0EpIhtXXej0n0xGUbShMO7yXnM8irMWhpb10TnQzTakyhyIVoo37sY
-         XGUVN6JOsQbCLOjt+KeSfSvOr5TrL6MtHHh9tecBJx+Axj+PoQGFucxUkz5UfB1JndIT
-         lITvL5jUtv9OcJSTMkgei1lFjC7kU6LlT7WXnol6sQzTvLmqcQIEm9zr3+goO/D2Z46s
-         IxoXcMTLOEhH8msNwGdCw8lLBOvmdFd5WHaUVeR0W3BlrmVzoaA2/54FntoleYQ2jhxH
-         Q8pNnOwhLuNzHU5cF8itiZ7yQHFiFBoQzRV3yVTW1Pi3kcnS2GP7Na3/A6dHE7kFbBxw
-         zxJw==
+        bh=IU9MOmP/DNYIBy+a0Esa3M3MWyw1kMu7zxXOFPkbXXM=;
+        b=MwPqTwG4aN0CbZ1pPEzQpGoX0SGLhkk4E0oVT6ngkpj1HvCK2xGgQY2LnWbOdjzh4G
+         QFpFHd0NGJI+iXWlkApin8lXx9QhT9yMZDfnA8C7LgQ4moPshoIny/dx5ZWfuTvMu6Aw
+         k9i8z5duqK7CZh8wPnT/bSgDKRfM0lJvqERd66zFQORUbx7uXq3VFA4wQ4ybie+N5uCi
+         47rjDptN4/4guW8EM30PhYUqHRAUvB/YwNlvqpx4L7a86xsgb7Alp8t+QH7q+wyoOxlD
+         zIyXTeRAnNmCEm+Ooy9L6PQYflxBMrZNnsh7IpVVTRwaYTIt24tKcoO4jGgv6I0Re/L1
+         xXWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205932; x=1793810732;
+        d=1e100.net; s=20260707; t=1793205934; x=1793810734;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=nG+DHn1LzFCaeXWX0dwZORZZuaohaWDMfP3DcwooPQ4=;
-        b=pbcauT5YfzD4A7G8UJpt7lnUIzMqonvJx3ERQswFLxwJJIDqSdSw7wZi8/OqsMord7
-         dzE+JWN1FHh6eSBjRJy2a7C5Lhm72esndOBl5GsWyaDJYOQzlA1A33SshONz/dPpN+Wu
-         0GnyrbhOw+is0Rw3YIyJuicspKTo4wFALM2SsKlWOHBALd6E8MRPrGSiYGXe+kLEpv9T
-         U1qUavVB1ZLibLRzLoPLg6WY6j9n2a9nN0wnAVNV6QZ8jWPz0Xfe1QosZb6KceW7I0Ib
-         xN8J2LDrfgYnw9UZK9NB0kAT69YKZ6bkGHBoywQ17L1MfHIxnuNsAxnZ5YUsyhAA4WSX
-         ia8g==
-X-Gm-Message-State: AFq9FYIPESEZd3crcu2KNEEpusUIi3ihTIAcHVpuJ5XcPMqnsNNyi7h8
-	oVyfibNs/hHVOHQSvA5YJ8Qbv+2aiAfyGCKJOA3DGKGoQS6j98GVGh5M3Tu/iEYgWfHJ/hoQvpY
-	JJBxedc4=
-X-Gm-Gg: AYBFou1omQ0XqsFCcfYlc+AB8q11drphT9CU4PvTQSxhp5Xs+CixdJ7uZHAYT/E+BEN
-	UcdHRAAxSu6JI7G7EgRYUM8f/SiwOhlYghZtD2EumJRST0JExQCKcF/ciKmZh/YSy8ZpW4SZApy
-	7EPWSUiKPSo7ezVxGxREaQnVPGdlN5nlciGnFK8Swv9kUk8/XZltYw3s8YkQbzkOakRMr8/Lyof
-	22cyxe3QmYw1/BzOgpA82/zLUkAJm64DSaApN3t4SameJ/ZdG9KmlaM+29NHVL2kuyeYVhCK+ha
-	C4EwjXdT7lwxioNoEMXVnblLEwsQ46P2uVE2SYCzeiSmki3wuDU/KBckzKTANLzky0HPOuh1UNk
-	nnRuWrnE2M7KxJwcZ16wxnlplAet8YlBeQWMOPdopu86wQcUPbpEc7PFrVjeZViUsCJS9eEELW0
-	5qyq6lc8EgbrAqCmLmkyETr8velJb/Vq/B/oeWvSV69OZFcP6nvjhs6nIIZIu03JL0ALF4WIpbM
-	9oizYMbKM1wzVvku9efeJ4gF3o7e+1oBsB8l5CJGlkcY7fZi+DL8SS5WtP+gPXuicxoS1SPEpeB
-	ecvqBkw4g1uuJMzp8K4pKrksWMFPhoHpbQla2LeN/Jk7J9IHvgae5Q1CHCzairBADWpvm8Uoog=
+        bh=IU9MOmP/DNYIBy+a0Esa3M3MWyw1kMu7zxXOFPkbXXM=;
+        b=050BFYp0B1K1SGU554K/uDMM1J0urXy0tqiwdVToLRO4LHfSBbAgIanWdwSbTAuTRD
+         Rnmd73/VCLamjMuM7Mb/Eu4lbj/XBz/Mr3cYGfHiwTy2wTJARSMpCVIBWX6bueLw5I+y
+         D9nMNc3KEsKx+uh/q0YE701gXBOYsYc55pBeujrX0IbAQ1ZDeSjVhvj7BMANBbevv1E8
+         tcp2GdMjA8Mbve6YoVQaHrRA+/VCNXjFMZI6UK69ZnWbdPZsQTeba0FCG4qA5lBr+Zh/
+         EMGG9BWdHWcO6IzyOSPSEpwm10SUqXE8S/rFe0CaMyekEs3rkw2xAO8L0eGgC2AQu+9o
+         XP+Q==
+X-Gm-Message-State: AFq9FYK/KgSnajklssc8GmAMH0EyKirdSnHecXRjRe3Fj0rNfOOZqRvO
+	rQij42hEWPecdQsd6hnHT71ykMShO94Ro96vG0gXEwzrcQMZCWEW5c7RDFR0NhI2twjX0gKNbpe
+	99CFNoFw=
+X-Gm-Gg: AYBFou1uEx1PS7saqJ0Ob/xdoFahntFNEZ94hkwpanLdYkIDvD3dClljBjasINgvI42
+	b+/BKiMRR4wdNvgOjlKalWvplHLhaUZWdghDxZg7L54p1t+Q8f8D6518G21PhssMTFSy87jmeOj
+	0d9h5V2+GN4mIzIYehopO0iu5qZy1cYbKNyPtHmeX+/6WXU0hjnldhvN0BaSw1vP6RGJcSz4Y34
+	xe3EMHrLQgkEOxWnZABFp6AI6AEdlwRl9KwWoYQBKE9WQOgIEEgO8ETJbRJnL9WmbGfBNkh5BO8
+	0WcuudzysGHCP7vsBb9wLmL0Ytk5OIRCcc1B6X4Syd1/Pzks/4cmREEZZBVTqgkHkc/piOsIBMY
+	fFe4H2tjcMrsYdglTEXqfPQ76pugU0KGUD+SNcJ87vE5OoVDdSDdYW4BVDMrZbSX71xDHe1lbd/
+	w0WgnPJNRQrh1mUJFT42l8WIuuCAOtDCQ5vlSmoY5YYivPl6FH7+bEszsiqZKQrfKQO4kn1UwGq
+	pmsEUgD9D5ifMUkdQPhz3ExR+c3X6kjjQzgAwoMZtCnS/E7Mvpu1NMlBsmecSzPC2u9bhbILSjh
+	5py0j+s5hgVpnPHU+Mowd0tHAcE2lb6JyXyHNV5IRdgmIaAzjgwS+LLGm4h+7f681wjju/o9Cg=
 	=
-X-Received: by 2002:a05:6830:2e05:b0:805:620e:4d40 with SMTP id 46e09a7af769-85ab6f46631mr3432506a34.2.1793205932417;
-        Wed, 28 Oct 2026 09:45:32 -0700 (PDT)
+X-Received: by 2002:a05:6830:4492:b0:844:53b7:9890 with SMTP id 46e09a7af769-85c20a9e8a5mr62052a34.8.1793205933723;
+        Wed, 28 Oct 2026 09:45:33 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.31
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:45:31 -0700 (PDT)
+        Wed, 28 Oct 2026 09:45:33 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
@@ -87,9 +87,9 @@ Cc: Josef Bacik <josef@toxicpanda.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 60/98] nvmet-auth: keep the negotiated hash per queue
-Date: Wed, 28 Oct 2026 10:42:03 -0600
-Message-ID: <20261028164415.1262013-61-axboe@kernel.dk>
+Subject: [PATCH 61/98] nvmet-auth: authenticate the I/O queues again
+Date: Wed, 28 Oct 2026 10:42:04 -0600
+Message-ID: <20261028164415.1262013-62-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -106,24 +106,24 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-Every queue runs its own DH-HMAC-CHAP transaction, but the hash that
-AUTH_Negotiate settles on is stored in the controller. A host that
-doesn't offer the configured hash gets a fallback, and that changes
-ctrl->shash_id under the transactions of the other queues, whose
-challenges have the length of the old hash:
+Since commit c91a20129185 the target neither asks a host to authenticate
+an I/O queue nor checks that it did: nvmet_check_auth_status() is true
+for everything but the admin queue. Nothing else ties an I/O queue to
+the admin queue's authentication. The Connect of an I/O queue names its
+controller by subsystem NQN, host NQN and cntlid, so anyone who can
+reach the port and knows the NQNs can attach a queue to an authenticated
+controller and do I/O. Property Set isn't subject to authentication
+either, so an unauthenticated host can enable its own controller and
+connect an I/O queue to that.
 
-  qid 1: AUTH_Negotiate (SHA-256), 32 byte challenge
-  qid 0: AUTH_Negotiate (SHA-512 only)
-  qid 1: DH-HMAC-CHAP_Reply with a hash length of 64
+Ask for authentication in the Connect response of an I/O queue and
+refuse its commands until it has passed, as before that commit. The
+Linux host authenticates every queue that is asked to. A queue with a
+TLS session is exempt, its peer held a PSK the port accepts, and since
+commit ecf4d2d88351 such a controller does get a host key when the admin
+queue re-authenticates.
 
-  BUG: KASAN: slab-out-of-bounds in nvmet_auth_host_hash+0x2c9/0x530
-
-No secret is needed for that.
-
-Store the negotiated hash in the queue and use it for the rest of the
-transaction. ctrl->shash_id stays the configured preference.
-
-Fixes: db1312dd9548 ("nvmet: implement basic In-Band Authentication")
+Fixes: c91a20129185 ("nvmet-auth: authenticate on admin queue only")
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
@@ -131,206 +131,50 @@ Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/auth.c             | 35 +++++++++++++-------------
- drivers/nvme/target/fabrics-cmd-auth.c | 12 ++++-----
- drivers/nvme/target/nvmet.h            |  1 +
- 3 files changed, 25 insertions(+), 23 deletions(-)
+ drivers/nvme/target/auth.c        | 14 +++++++-------
+ drivers/nvme/target/fabrics-cmd.c |  4 ----
+ 2 files changed, 7 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/nvme/target/auth.c b/drivers/nvme/target/auth.c
-index 1680e5e6839c..0f64fd4ade59 100644
+index 0f64fd4ade59..9ae8293cc734 100644
 --- a/drivers/nvme/target/auth.c
 +++ b/drivers/nvme/target/auth.c
-@@ -299,14 +299,14 @@ int nvmet_auth_host_hash(struct nvmet_req *req, u8 *response,
- 	if (IS_ERR(transformed_key))
- 		return PTR_ERR(transformed_key);
+@@ -275,13 +275,13 @@ void nvmet_destroy_auth(struct nvmet_ctrl *ctrl)
  
--	ret = nvme_auth_hmac_init(&hmac, ctrl->shash_id, transformed_key->key,
--				  transformed_key->len);
-+	ret = nvme_auth_hmac_init(&hmac, req->sq->shash_id,
-+				  transformed_key->key, transformed_key->len);
- 	if (ret)
- 		goto out_free_response;
- 
--	if (shash_len != nvme_auth_hmac_hash_len(ctrl->shash_id)) {
-+	if (shash_len != nvme_auth_hmac_hash_len(req->sq->shash_id)) {
- 		pr_err("%s: hash len mismatch (len %u digest %zu)\n", __func__,
--		       shash_len, nvme_auth_hmac_hash_len(ctrl->shash_id));
-+		       shash_len, nvme_auth_hmac_hash_len(req->sq->shash_id));
- 		ret = -EINVAL;
- 		goto out_free_response;
- 	}
-@@ -317,7 +317,7 @@ int nvmet_auth_host_hash(struct nvmet_req *req, u8 *response,
- 			ret = -ENOMEM;
- 			goto out_free_response;
- 		}
--		ret = nvme_auth_augmented_challenge(ctrl->shash_id,
-+		ret = nvme_auth_augmented_challenge(req->sq->shash_id,
- 						    req->sq->dhchap_skey,
- 						    req->sq->dhchap_skey_len,
- 						    req->sq->dhchap_c1,
-@@ -371,14 +371,14 @@ int nvmet_auth_ctrl_hash(struct nvmet_req *req, u8 *response,
- 	if (IS_ERR(transformed_key))
- 		return PTR_ERR(transformed_key);
- 
--	ret = nvme_auth_hmac_init(&hmac, ctrl->shash_id, transformed_key->key,
--				  transformed_key->len);
-+	ret = nvme_auth_hmac_init(&hmac, req->sq->shash_id,
-+				  transformed_key->key, transformed_key->len);
- 	if (ret)
- 		goto out_free_response;
- 
--	if (shash_len != nvme_auth_hmac_hash_len(ctrl->shash_id)) {
-+	if (shash_len != nvme_auth_hmac_hash_len(req->sq->shash_id)) {
- 		pr_err("%s: hash len mismatch (len %u digest %zu)\n", __func__,
--		       shash_len, nvme_auth_hmac_hash_len(ctrl->shash_id));
-+		       shash_len, nvme_auth_hmac_hash_len(req->sq->shash_id));
- 		ret = -EINVAL;
- 		goto out_free_response;
- 	}
-@@ -389,7 +389,7 @@ int nvmet_auth_ctrl_hash(struct nvmet_req *req, u8 *response,
- 			ret = -ENOMEM;
- 			goto out_free_response;
- 		}
--		ret = nvme_auth_augmented_challenge(ctrl->shash_id,
-+		ret = nvme_auth_augmented_challenge(req->sq->shash_id,
- 						    req->sq->dhchap_skey,
- 						    req->sq->dhchap_skey_len,
- 						    req->sq->dhchap_c2,
-@@ -456,7 +456,8 @@ int nvmet_auth_ctrl_sesskey(struct nvmet_req *req,
- 	struct nvmet_ctrl *ctrl = req->sq->ctrl;
- 	int ret;
- 
--	req->sq->dhchap_skey_len = nvme_auth_hmac_hash_len(ctrl->shash_id);
-+	req->sq->dhchap_skey_len =
-+		nvme_auth_hmac_hash_len(req->sq->shash_id);
- 	req->sq->dhchap_skey = kzalloc(req->sq->dhchap_skey_len, GFP_KERNEL);
- 	if (!req->sq->dhchap_skey)
- 		return -ENOMEM;
-@@ -464,7 +465,7 @@ int nvmet_auth_ctrl_sesskey(struct nvmet_req *req,
- 					pkey, pkey_size,
- 					req->sq->dhchap_skey,
- 					req->sq->dhchap_skey_len,
--					ctrl->shash_id);
-+					req->sq->shash_id);
- 	if (ret)
- 		pr_debug("failed to compute session key, err %d\n", ret);
- #ifdef CONFIG_NVME_TARGET_AUTH_DEBUG
-@@ -478,7 +479,7 @@ int nvmet_auth_ctrl_sesskey(struct nvmet_req *req,
- 
- void nvmet_auth_insert_psk(struct nvmet_sq *sq)
+ bool nvmet_check_auth_status(struct nvmet_req *req)
  {
--	int hash_len = nvme_auth_hmac_hash_len(sq->ctrl->shash_id);
-+	int hash_len = nvme_auth_hmac_hash_len(sq->shash_id);
- 	u8 *psk, *tls_psk;
- 	char *digest;
- 	size_t psk_len;
-@@ -487,7 +488,7 @@ void nvmet_auth_insert_psk(struct nvmet_sq *sq)
- 	struct key *tls_key = NULL;
- #endif
+-	if (req->sq->ctrl->host_key) {
+-		if (req->sq->qid > 0)
+-			return true;
+-		if (!req->sq->authenticated)
+-			return false;
+-	}
+-	return true;
++	struct nvmet_sq *sq = req->sq;
++
++	if (!sq->ctrl->host_key || sq->authenticated)
++		return true;
++
++	/* Whoever set up the TLS session of an I/O queue knew the PSK. */
++	return sq->qid && nvmet_queue_tls_keyid(sq);
+ }
  
--	ret = nvme_auth_generate_psk(sq->ctrl->shash_id,
-+	ret = nvme_auth_generate_psk(sq->shash_id,
- 				     sq->dhchap_skey,
- 				     sq->dhchap_skey_len,
- 				     sq->dhchap_c1, sq->dhchap_c2,
-@@ -497,7 +498,7 @@ void nvmet_auth_insert_psk(struct nvmet_sq *sq)
- 			__func__, sq->ctrl->cntlid, sq->qid, ret);
- 		return;
- 	}
--	ret = nvme_auth_generate_digest(sq->ctrl->shash_id, psk, psk_len,
-+	ret = nvme_auth_generate_digest(sq->shash_id, psk, psk_len,
- 					sq->ctrl->subsys->subsysnqn,
- 					sq->ctrl->hostnqn, &digest);
- 	if (ret) {
-@@ -505,7 +506,7 @@ void nvmet_auth_insert_psk(struct nvmet_sq *sq)
- 			__func__, sq->ctrl->cntlid, sq->qid, ret);
- 		goto out_free_psk;
- 	}
--	ret = nvme_auth_derive_tls_psk(sq->ctrl->shash_id, psk, psk_len,
-+	ret = nvme_auth_derive_tls_psk(sq->shash_id, psk, psk_len,
- 				       digest, &tls_psk);
- 	if (ret) {
- 		pr_warn("%s: ctrl %d qid %d failed to derive TLS PSK, error %d\n",
-@@ -515,7 +516,7 @@ void nvmet_auth_insert_psk(struct nvmet_sq *sq)
- #ifdef CONFIG_NVME_TARGET_TCP_TLS
- 	tls_key = nvme_tls_psk_refresh(NULL, sq->ctrl->hostnqn,
- 				       sq->ctrl->subsys->subsysnqn,
--				       sq->ctrl->shash_id, tls_psk, psk_len,
-+				       sq->shash_id, tls_psk, psk_len,
- 				       digest);
- 	if (IS_ERR(tls_key)) {
- 		pr_warn("%s: ctrl %d qid %d failed to refresh key, error %ld\n",
-diff --git a/drivers/nvme/target/fabrics-cmd-auth.c b/drivers/nvme/target/fabrics-cmd-auth.c
-index 9779e664b65f..841fd2683702 100644
---- a/drivers/nvme/target/fabrics-cmd-auth.c
-+++ b/drivers/nvme/target/fabrics-cmd-auth.c
-@@ -111,8 +111,9 @@ static u8 nvmet_auth_negotiate(struct nvmet_req *req, void *d, u32 tl)
- 		pr_debug("%s: ctrl %d qid %d: no usable hash found, falling back to %s\n",
- 			 __func__, ctrl->cntlid, req->sq->qid,
- 			 nvme_auth_hmac_name(fallback_hash_id));
--		ctrl->shash_id = fallback_hash_id;
-+		hash_id = fallback_hash_id;
- 	}
-+	req->sq->shash_id = hash_id;
+ int nvmet_auth_host_hash(struct nvmet_req *req, u8 *response,
+diff --git a/drivers/nvme/target/fabrics-cmd.c b/drivers/nvme/target/fabrics-cmd.c
+index b451029ab8f4..38311187d27a 100644
+--- a/drivers/nvme/target/fabrics-cmd.c
++++ b/drivers/nvme/target/fabrics-cmd.c
+@@ -251,10 +251,6 @@ static u32 nvmet_connect_result(struct nvmet_ctrl *ctrl, struct nvmet_sq *sq)
+ 	bool needs_auth = nvmet_has_auth(ctrl, sq);
+ 	key_serial_t keyid = nvmet_queue_tls_keyid(sq);
  
- 	dhgid = -1;
- 	fallback_dhgid = -1;
-@@ -454,7 +455,7 @@ static int nvmet_auth_challenge(struct nvmet_req *req, void *d, int al)
- 	struct nvmf_auth_dhchap_challenge_data *data = d;
- 	struct nvmet_ctrl *ctrl = req->sq->ctrl;
- 	int ret = 0;
--	int hash_len = nvme_auth_hmac_hash_len(ctrl->shash_id);
-+	int hash_len = nvme_auth_hmac_hash_len(req->sq->shash_id);
- 	int data_size = sizeof(*data) + hash_len;
- 
- 	if (ctrl->dh_tfm)
-@@ -469,7 +470,7 @@ static int nvmet_auth_challenge(struct nvmet_req *req, void *d, int al)
- 	data->auth_type = NVME_AUTH_DHCHAP_MESSAGES;
- 	data->auth_id = NVME_AUTH_DHCHAP_MESSAGE_CHALLENGE;
- 	data->t_id = cpu_to_le16(req->sq->dhchap_tid);
--	data->hashid = ctrl->shash_id;
-+	data->hashid = req->sq->shash_id;
- 	data->hl = hash_len;
- 	data->seqnum = cpu_to_le32(req->sq->dhchap_s1);
- 	req->sq->dhchap_c1 = kmalloc(data->hl, GFP_KERNEL);
-@@ -493,7 +494,7 @@ static int nvmet_auth_success1(struct nvmet_req *req, void *d, int al)
- {
- 	struct nvmf_auth_dhchap_success1_data *data = d;
- 	struct nvmet_ctrl *ctrl = req->sq->ctrl;
--	int hash_len = nvme_auth_hmac_hash_len(ctrl->shash_id);
-+	int hash_len = nvme_auth_hmac_hash_len(req->sq->shash_id);
- 
- 	WARN_ON(al < sizeof(*data));
- 	memset(data, 0, sizeof(*data));
-@@ -530,7 +531,6 @@ static void nvmet_auth_failure1(struct nvmet_req *req, void *d, int al)
- 
- u32 nvmet_auth_receive_data_len(struct nvmet_req *req)
- {
--	struct nvmet_ctrl *ctrl = req->sq->ctrl;
- 	u32 al = le32_to_cpu(req->cmd->auth_receive.al);
- 	u32 min_len;
- 
-@@ -544,7 +544,7 @@ u32 nvmet_auth_receive_data_len(struct nvmet_req *req)
- 	case NVME_AUTH_DHCHAP_MESSAGE_SUCCESS1:
- 		min_len = sizeof(struct nvmf_auth_dhchap_success1_data);
- 		if (req->sq->dhchap_c2)
--			min_len += nvme_auth_hmac_hash_len(ctrl->shash_id);
-+			min_len += nvme_auth_hmac_hash_len(req->sq->shash_id);
- 		break;
- 	default:
- 		min_len = sizeof(struct nvmf_auth_dhchap_failure_data);
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index f6a9f2e1c0ed..46501d0757c0 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -167,6 +167,7 @@ struct nvmet_sq {
- 	bool			auth_expiry_active;
- 	u16			dhchap_tid;
- 	u8			sc_c;
-+	u8			shash_id;
- 	u8			dhchap_status;
- 	u8			dhchap_step;
- 	u8			*dhchap_c1;
+-	/* Do not authenticate I/O queues */
+-	if (sq->qid)
+-		needs_auth = false;
+-
+ 	if (keyid)
+ 		pr_debug("%s: ctrl %d qid %d should %sauthenticate, tls psk %08x\n",
+ 			 __func__, ctrl->cntlid, sq->qid,
 -- 
 2.56.0
 
