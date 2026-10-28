@@ -1,75 +1,77 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.14
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793217467;
-	b=vCneMuCNNkrxV3fhPwAhU/g1wZ3zG8XFPJyEuaCHhj8PpDN7gbBhsPjyZVqvEA/M9dvF
-	 CZKTciypjNVwcfGLAxKXxmzkMuQZhuBNSuM31ByqrMLCCfMJAsvHQh+CmC/WBEgmfDvUf
-	 hmI0ev4ptUmcFeTxXEqRD3LAA1m/IhWZh6VbK1mKNMQD4PuNZQXBe73aYHqEHpjPIQ6Za
-	 7HNPxB4c7o21sYgvNlDYZMZ6pWFNJT5xsrolK2MOjO+rRuszYflfH6nZw8dRXi74GNkQQ
-	 woSMdAxXIonp7zS+gf6xAyxBd5IhClIQ31QiZWJ+GooLf72j4EWTBOMKz8nOgUlLqaQ==
+	t=1793217468;
+	b=O1nsysnTmjH6H+UTbulqFeGE5REzEQxXaLJTVgeADI2/RbudmJKqikyzTARJZNZ0k+UP
+	 F+rG4j60+Ge6JQE3pNa3qBErXNKkhpiDRCilIn9lWif0F61MO+c5AaKPUDou76K2JDSIN
+	 aRNDL9bCqoIaZJYzefig8MwaCvijCQQ5KU8GuJocuT3DogcY/I+dDYCD9jio8xNL30hUe
+	 1ZLr1ZYBeS2vyLdtReVQMyGjGEOXQiVLXh5YCJ+Lqx6JbNm50Wd1CBZBLR1NDEcVKYxcS
+	 jQVz55cd+LBuqrekUwOsOMSD7QtBURjtRWzEY+Psvq1lZz5gCzv4VHzBoFAj2OyW/MA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793217467;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793217468;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=offDEXI5REUzf6x9U5Vcrz23TrhcK45+EwJ7w+MOIBU=;
-	b=xYaDtbBfog/lE+Dr6Oibj6EFcnRi75N9xnyFQxt+196nCwjOoLrhAuSxSq3M2mEd5Eib
-	 TwKf2m4XIewpAs8OzVyM65+oeLFfUiVSvYt/bPhVBuEFNqv5yb3jt88dXvD0/1jA/D+vC
-	 36sF4YD35Qr3gnVUC5d+WwcfiyzuufL/TyC+K1Q+XAwK/bxqsNyZoPSvs+EcXjjNyBT1J
-	 ZZ2YrEgsqWbCYX21oQf1VgFp1WrFi//6AJ2hq5qtfyFnXMCO/vTN1b9FLfz7AR7rTePWv
-	 wR0UXcRjEpy2bftIqTckxF3q3wmqfP9VfRoHuxYx35jZEbNCJFi39aUriFhnqI4gjOA==
+	bh=jSKBNBV9XJtnDZlpb8sFmkGj4ydQ7QQvommJYpzcW3w=;
+	b=XaaQgveMhKRFj8oCEk2v3FSIPrZGvAKXy59nWP0MO3/dbqfFO4kjrQUv8j7FgMRvcmHu
+	 cMIwBXAzkKCSPuh+H2eHGei358ltzLxLCoBOO3YqjonTXULeSUwCYOnYqZ51ZZrWRq6cZ
+	 FHtCiYCLki1VSRRIE49fearMKVJ1US3TFmaclp/VTUO4xfzE4pscXo5drJaZMcYZbh7Qi
+	 +iCM2Zq5VrsYspaCfuSfxJflaF9LEZypoXWxfk+4hgVmPvHIus/AKbXzRjztNm8lholYx
+	 J5YUELXCaTj+uvZMkoXQeByMPkuK6atk71utzFVdJfDTnPgZmFwI8py247NJpATjQzg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=acm.org;
 	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=MMB1XIpo;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=L0xxlOCh;
 	arc=none smtp.remote-ip=199.89.1.14
 Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF6A606A321
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 19:57:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9AF6A606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE62606A31A
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 19:57:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1EE62606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=MMB1XIpo
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=L0xxlOCh
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jFJ7G2r7Wz1XM30w;
-	Wed, 28 Oct 2026 19:57:46 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jFJ7H530lz1XM30h;
+	Wed, 28 Oct 2026 19:57:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1793217463; x=1795809464; bh=offDE
-	XI5REUzf6x9U5Vcrz23TrhcK45+EwJ7w+MOIBU=; b=MMB1XIpoUyxY+JhHPPdDU
-	uyjG+IwAHv3vxzaqyLhvppWtHVD0xNlIosyXHjE+EfN4fSkY6vgd2aATeVYkNfKF
-	ZbUyytppWp8f7n6oqjX94WoWZEww+Waz9Fta5jf2WTbzUwm3xkzOIQuhRxqxTrf+
-	7Zk/ceuOEtAsG60o5CKEanrCy19/ON62mX9aCVsHgYtlaYYIL1HeZNnr85JWs65F
-	ceBMkW9Od1Y7K/kHm7n7vyZLbgfR2vR4VB/x6InnoD944dFlshiQW947CbS1D4Ty
-	Qu+nxfA+MY+V8Aj2OFfGuuS1IGhVC/x/sNNkieQ7eNt80Bv+AGd4PWehNXx6sC/T
-	g==
+	:received:received; s=mr01; t=1793217463; x=1795809464; bh=jSKBN
+	BV9XJtnDZlpb8sFmkGj4ydQ7QQvommJYpzcW3w=; b=L0xxlOChV80biMYmrJkm/
+	mU1pTNCDuKrPuR2awRJSyCEsjqCKEFy7Az3nBkE+0FK8WZo88u2xrS7lMr7Pa1gr
+	9+GXPUwdN2IxG7kxwdORV2GX/2eruAKxyu/p8KBpPUWWei6LA0fQ0Hk4OKjWQg9f
+	rAv6uty3CUs1wiCDHdnpzlXmU9WYQ9nhZASk9JGEnrMrSAD7q+jgya4Ou0w9fy3O
+	aV1uXiiRq/pvKoktPNUvHOI7wdMgxrnYjLSQpOPghLr0cPsYJb1SaTqO/Bmdg67v
+	0ZVDZMPL0hyQOtA5GRB5oyzkHH3RHDTj/Hs4W8VWiuDsCYucI2CqpLHk007J+/ah
+	A==
 X-Virus-Scanned: by MailRoute
 Received: from 011.lax.mailroute.net ([127.0.0.1])
  by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id eYyRYFNk8riy; Wed, 28 Oct 2026 19:57:43 +0000 (UTC)
+ id qeS8-vGjBoYs; Wed, 28 Oct 2026 19:57:43 +0000 (UTC)
 Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jFJ7B2NCtz1XM30h;
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jFJ7B6L4Dz1XM30j;
 	Wed, 28 Oct 2026 19:57:42 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>
+	Josef Bacik <josef@toxicpanda.com>,
+	Chris Mason <mason@kernel.org>
 Cc: Justin Sanders <justin@coraid.com>,
 	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH 28/98] blk-iocost: check again that the disk is alive
-Date: Wed, 28 Oct 2026 12:57:16 -0700
-Message-ID: <20261028195731.1591331-4-bvanassche@acm.org>
+	Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH 41/98] zram: check a bio's range against the device size
+Date: Wed, 28 Oct 2026 12:57:17 -0700
+Message-ID: <20261028195731.1591331-5-bvanassche@acm.org>
 X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
-In-Reply-To: <20261028164415.1262013-29-axboe@kernel.dk>
-References: <20261028164415.1262013-1-axboe@kernel.dk> <20261028164415.1262013-29-axboe@kernel.dk>
+In-Reply-To: <20261028164415.1262013-42-axboe@kernel.dk>
+References: <20261028164415.1262013-1-axboe@kernel.dk> <20261028164415.1262013-42-axboe@kernel.dk>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -82,32 +84,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 On 10/28/26 09:41, Jens Axboe wrote:
-> @@ -3322,6 +3322,11 @@ static ssize_t ioc_qos_write(struct kernfs_open_=
-file *of, char *input,
-> =20
->  	body =3D ctx.body;
->  	disk =3D ctx.bdev->bd_disk;
-> +	/* It may have gone while the mutex was not held */
-> +	if (!disk_live(disk)) {
-> +		ret =3D -ENODEV;
-> +		goto close_bdev;
-> +	}
+> +/*
+> + * bio_check_eod() counts whole sectors: it does not look at a bio tha=
+t is
+> + * shorter than a sector, nor at a tail that is shorter than one. zram=
+ takes
+> + * such a piece to the slot of its sector, so round the size up. An em=
+pty bio
+> + * has to start inside the device as well: the loops for reads and wri=
+tes run
+> + * once before their test.
+> + */
+> +static bool zram_bio_in_range(struct zram *zram, struct bio *bio)
+> +{
+> +	sector_t nr_sectors =3D get_capacity(zram->disk);
+> +	sector_t start =3D bio->bi_iter.bi_sector;
+> +	sector_t len =3D ((sector_t)bio->bi_iter.bi_size + SECTOR_SIZE - 1) >=
+>
+> +			SECTOR_SHIFT;
+> +
+> +	return start < nr_sectors && len <=3D nr_sectors - start;
+> +}
 
-Look at the close_bdev unwind path in ioc_qos_write():
+There are two problems with zram_bio_in_range():
 
-close_bdev:
-	q =3D ctx.bdev->bd_queue;
-	blkg_conf_close_bdev(&ctx);
-	blk_mq_unfreeze_queue(q, memflags);
+1. It explicitly allows an empty REQ_OP_READ or REQ_OP_WRITE bio
+   (bi_size =3D=3D 0) as long as start < nr_sectors. Both zram_bio_read()
+   and zram_bio_write() use a do { ... } while (iter.bi_size) loop whose
+   first statement is bio_iter_iovec(bio, iter), which immediately
+   dereferences NULL bio->bi_io_vec on an empty bio.
 
-blkg_conf_close_bdev(&ctx) unlocks q->rq_qos_mutex and calls
-blkdev_put_no_open(ctx.bdev). When !disk_live(disk) is true because
-del_gendisk() (and potentially put_disk()) ran while rq_qos_mutex was
-dropped, ctx.bdev may hold the final reference to the bdev/gendisk.
-blkdev_put_no_open(ctx.bdev) will then run disk_release() ->
-blk_put_queue(q) and free q while it is still frozen, before the next
-line calls blk_mq_unfreeze_queue(q, memflags) on the freed queue.
+2. It allows sub-4K / unaligned bios as long as they fall within
+   nr_sectors. However, ZRAM_LOGICAL_BLOCK_SIZE is 4096, and on
+   PAGE_SIZE =3D=3D 4096 kernels is_partial_io() is hardcoded to return
+   false:
+   - zram_bvec_read() calls zram_read_page(zram, bvec->bv_page, index,
+     bio), ignoring bv_offset and bv_len and overwriting all 4096 bytes
+     of bv_page.
+   - zram_bvec_write() calls zram_write_page(zram, bvec->bv_page,
+     index), clobbering the rest of the 4 KiB zram slot and compressing
+     up to 4095 bytes of adjacent kernel page memory into the slot where
+     a subsequent read will return it.
 
-q->rq_qos_mutex needs to be unlocked and blk_mq_unfreeze_queue(q,
-memflags) called before blkdev_put_no_open(ctx.bdev) drops the bdev
-reference.
+Shouldn't this reinstate valid_io_request()'s ZRAM_LOGICAL_BLOCK_SIZE
+alignment checks on bi_sector and bi_size (as well as rejecting
+bi_size =3D=3D 0)?
