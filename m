@@ -1,115 +1,106 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.201.40
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793190154;
-	b=skY55CUPUlMQi90o5Q9i5LF3RuudB+NGaOhD1mRXZ3Vps3mnKwBM1b9LzNiiUq2lSdvT
-	 cXpQ8rcTkyNmKaO4yVoo9Aolr00rc7k+UGPXzHpjnbs9UYD2gkgM6yypHz1gGyRDxWVRU
-	 P+AyckrwrNfPZ2tWQiUR21W3uDN/nQXLVycYT4j/q6Y4svuQgndjAWQQDZf4NVEBWcrB9
-	 82RPQ4W/zDYkpKNPrfv4oOu8tSz8DcAwhpUerC3XuKONWefim7/L09yt227q0ESD65/fv
-	 e8lB9zF19AtoD43GF03iXpUjR07VRFJYMmFmih/c6hEqxT1VxYQpxVtQUus4E3zJcWg==
+	t=1793193552;
+	b=hnw1j0zKN9WPHX3dmcUUFLv2pN87grFmTXrh5DrqSBU10VPWipWDJZ7/w5+EVu9cU52z
+	 eqF0SevfLS4iNREOA5cP0PRyj0nTXAhqtgiw1l0ygqacfFpcQE6Hyq4D7M7okDqfPIY4z
+	 nCHqK09KXAB72/WvRWCDyR3zN1J0B/Rsyk+9VLozzf1OKZEK5NBjV95Yre9B+8vr5DhCf
+	 P3+f60sn6HSVzFyWpWKKQiqTMCYAGgupfEfm0Z4J+5PDpzv5QMpebczIBzvGesfoMl3rH
+	 kIDVXeaHY1iNYMlYEsVX+N0uePpPlurfFXBU8tDCWMRWKGWxwVjqChXHaYtSXWbSjng==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793190154;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:Received:DKIM-Signature:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:Content-Type:Content-Disposition:
-	 In-Reply-To:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793193552;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:
+	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
+	 Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy:X-EOPAttributedMessage:X-MS-PublicTrafficType:
 	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 WDCIPOUTBOUND:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
 	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-Exchange-RoutingPolicyChecked:
-	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
 	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
 	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=2WfzwRULsed08KY3wrUpInddlwmm73ku+Wd6snMr6v0=;
-	b=QETbHHfE7+OZtKRyAb3617gEl/2WZgtPkuxq/25oTcmuPHxHwgqFQ+Bf/hQcVzjHftIp
-	 96ztqtSe4m9YForOa2AWVpU4OqqqwfiQk3psuJ3wz+PmRiAZ3IQ7zTDBTwZdW36eCS0UC
-	 M398KbjH9bAH1WdpOtxNfau4G/Ctz4vxtAXAwVGw7UO66/A4bCXYxlddW9BceMkzpJCW7
-	 azgpdl+aTL9DVNpZJwkF9I0hrM1n8fYx3Wtlv5xSQPwZLhpEtxbDd5tjCSGXGQzac+4dh
-	 NiyB0Unw1uPMHh1U/fcuqTL3vEEk5T4+ZjjxYaBZRTUUaEY6PcttS8h6K5fKCG1SYHA==
+	bh=nrM426IK/FawFkO23M3f+nYz4tUFW78sEIhZFDyCJIE=;
+	b=stKiPNK1yE35l7l3OzXXg2nifXRDkgCRH7ZTZiK9DbPuR/Uh+yT5mSjhqA2UwqoVbLk4
+	 UMkGjyT7z1yCzNSqKsgnMfDdItdIiZEFUhtouNTDO1ltITL5qhWRdypw3sOXtASVyqPLw
+	 /ClM9yjdGvaGZWvdhMsDuOKoaj1xGtE2FD0LPqhNtuMWstlu5h+3any/JovS4ZuDX1bTV
+	 8dncGfKOAY0qCjC6pawelBehE6mG9HBWUApTsYdeZW0TQVJYC+Gz6SEFe1uY2Fyk+GSlp
+	 djy4k0CfI29tQUa/855pgobMrrjarPiqF90r2vZOcetoIZpqgrQgxm9Mu4YAYyTWmaw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=wdc.com;
-	spf=pass smtp.mailfrom=wdc.com;
-	dkim=pass header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=T3JR+1Gz;
-	dkim=pass header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=gqb3ISbb;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=216.71.154.45
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=nvidia.com;
+	spf=fail smtp.mailfrom=nvidia.com;
+	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=f1uRYHPX;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.201.40
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013040.outbound.protection.outlook.com [40.107.201.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79028606A31F
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 12:22:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 79028606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D5F606A31C
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 13:19:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91D5F606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=T3JR+1Gz;
-	dkim=pass (1024-bit key, unprotected) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=gqb3ISbb
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1793190153; x=1824726153;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=H4bmN1N+kekDkhzGYdrsvlrAqVbRg9r4brExEDy/Ynw=;
-  b=T3JR+1Gz8Fmj6vwzrueAx/W6pJPq0WJNzu0FTBIEEhxJKe94n+aYoBHH
-   nQjM8cJ39p87eiLonuTz0UqJ6gYYtoGL/pXkBFgvPRkkTsTjkJzUvnhoX
-   J/yOvRxTtMNp1MgEz6M7UQ6PiinYm7V/TpsQ34pRlPSxl5hGMgn0E0xs+
-   UfZZ2WkRm4ob8+Y0SOJc1hCWjHO6ZmoVhn8XPKbqAnvocO7HPHYWCZJkR
-   XPe6okJlBnSLPPIeOHpY7Dy7KySiP7yR/dW5kUr+Gzv+PixsUn41qj0qr
-   fHIWKMq6t23kDbCSlrwi0Y0optCD/W2x1RP9t5zklukGmkybJrfl/vNtv
-   A==;
-X-CSE-ConnectionGUID: /F/m3kZMRxCzLtQ6/MKb5w==
-X-CSE-MsgGUID: kwUzc4B+TOGTxicO+COTgQ==
-X-IronPort-AV: E=Sophos;i="6.27,182,1786982400"; 
-   d="scan'208";a="157596937"
-Received: from mail-westcentralusazon11013011.outbound.protection.outlook.com (HELO CY3PR05CU001.outbound.protection.outlook.com) ([40.93.201.11])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Oct 2026 20:22:27 +0800
+	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=f1uRYHPX
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=s/vh0o+WLx7csKJWdoUNAkyxniy5l+Jik5+GuTGqNm0P9CTKcSRF/8lgtca1PCDGoRn+3rKSRJnDQvcDFWFp4dJnB+jzMJmpt7hJiuFTkEEhRWuMDDtrmSC5WDuWJKVKqmvepx6WVI+a9hALg7bOcDHQyEGOGrZ26CoCj4wadr7SE/qP3R3qHFlpCYWDddsCkm8IV75LpXN9SzUW5c4YPihuXMxq4UNYkw/kz4mepXaOljCqNBeRy7+pJHH9AF8lHaSJ7PauvJYwt1hHG6rRue5QOeuC5AzRX/5mCEAMBYGYIkwre0w+R0WF/iKng7wxv/jQZJO6WAppccIsSdFKuQ==
+ b=BLvEb/Pl1bNIyTsL7PN0hygCzx5cmAqCIXL4YhWKJmBDfquqAvexVJaK7WORvpl5gZvVBuxjoMBNkdv3Tfch2Op3f65kKlUP+wVFLFX10km5rH66obH39ViS8AJDmkI03ATbq4ULvbfhCkd7ezlurUhFVr31E542vd/8Qmbn3jRiM1XzLtxjm1BHbsnFJcEOLAKDFi//ZKeVSKOVjp7kJPi4u1sx6F//c7oJm/JB+8+6AuaLMiPeXqOSEs4oHAP0x+eNuJBlwhpofzL+94WPA4hoAr/hPd0t977byBdDobf2D8PChISG9IdqYZUDzvy3xh8gEwTyvJXw5WsEV+oOLw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2WfzwRULsed08KY3wrUpInddlwmm73ku+Wd6snMr6v0=;
- b=pPrPFfFSTUX+XPTI00+Pn8bgKAtDG41C1D4SU4LWmBEjbdhvliv9XW60HtRHIE/2IVnvlDqYLUeOIznoOIBkvieJyGJQADrGMMdrF9gXu4K3GzWqbfq3CSyzUn8t8JfmQw1lx1XHi3nv1itO4ulAmx5bPyGk7yTT5dPtA4yHoOdZHHQGgQTncOh+4CWdhORuO7YACv7I/KYR5ev9THqFDf1anwHTke888MijPmzixdb4iN7UG5udbOrn+23wAJFBBwtn0ADJC+8U4tqRRdfuGCaAyPmL8pqAnUzuznsvbxuIdXnt4llE6y3wY6p8YW0EuKE0bQraCoUOivUOWhWMdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ bh=nrM426IK/FawFkO23M3f+nYz4tUFW78sEIhZFDyCJIE=;
+ b=ISvZ9tJJP9C31Z39l2KH5qos5nKXJtM5Ge+T8rVMO/JgCBamY6d++y5EB60WOtVpfUFiuNHi4KrlcGVKQ5AZhx2WTwVaPD9JgJeORCfJKqj9LMHXxLU442SRPrm0ATEPNCH0XmBuvuoIPz2mtQR82HBEr1Z9D4GzNnlLf+diwQwJ9y3Q21cceAUegGMOp313vuZli8Pd7EFdlaTC1x+QoJq7SPl0ZuX7k/5Q74pT5h8dPtTCnN4CgHKE7VvteRMypfhBAG7bKskKzxzUr8RkGm8kwtOCcaSVCDVXXdBmzAuUVs+f7JfJNpDHwqijXz3vZGdPUWLHv5+Z08QchlPVoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2WfzwRULsed08KY3wrUpInddlwmm73ku+Wd6snMr6v0=;
- b=gqb3ISbbHyadZZiOIEYENPLVecyO5Nn9lYyu7pDVRkZjcCZri/duQvxDxcEvfwNK1Me38rdRsOaZmcHXOMDmNCMAexylQmGO4p6AEescPsIeh5xAqJ9NT80RDQMQY7HQuwhm92elaNVhQWmvGQHqOroDMebpfHPe1sb1g77knM4=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14) by BY5PR04MB6437.namprd04.prod.outlook.com
- (2603:10b6:a03:1e4::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.22; Wed, 28 Oct
- 2026 12:22:23 +0000
-Received: from SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85]) by SA1PR04MB10065.namprd04.prod.outlook.com
- ([fe80::9b98:bf8a:b0b1:ef85%5]) with mapi id 15.21.0546.021; Wed, 28 Oct 2026
- 12:22:23 +0000
-Date: Wed, 28 Oct 2026 21:22:17 +0900
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@opensource.wdc.com>
-Cc: linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>, 
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH blktests] loop: remove loop/006 which tests swapping loop
- fds
-Message-ID: <auHo555CJqqjbFlH@shinmob>
-References: <20261020054135.2766271-1-shinichiro.kawasaki@opensource.wdc.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261020054135.2766271-1-shinichiro.kawasaki@opensource.wdc.com>
-X-ClientProxiedBy: TY6P286CA0033.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:405:3b7::17) To SA1PR04MB10065.namprd04.prod.outlook.com
- (2603:10b6:806:4dd::14)
+ bh=nrM426IK/FawFkO23M3f+nYz4tUFW78sEIhZFDyCJIE=;
+ b=f1uRYHPXQTMkZXQbhspMnfIl4lS14eABHD1jvYPmG1IfjPUAnWDZG0//Cj0lXiPKZP/gU+MI5oHWTf7pRC9kIkWeyfIRdyavTRaA4G9kj2h123+far9dQMBQTG1BArIEUJKrm9gRLUiW7n2+1MdUaMD3AXkO942BAesZPzwmAFJeWSObbUGI5tQ+CLnmB36uVwLfCwCCUcrsaCgLRH9RF/ikvpPJ4RDI5uT/QVQ/iWd7Bh636N/WEkuVqWywfcZwUlsXc1Uakn2TrjaH2SYvJZGkfSAHsYmsMaXoahIFtaqjmJ14CClBdPWOGcfYsLX4E7SLp91vfOTx8z2U1PTDTA==
+Received: from MW4PR04CA0277.namprd04.prod.outlook.com (2603:10b6:303:89::12)
+ by SN7PR12MB7856.namprd12.prod.outlook.com (2603:10b6:806:340::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.16; Wed, 28 Oct
+ 2026 13:19:06 +0000
+Received: from PH5PEPF0000002B.namprd04.prod.outlook.com
+ (2603:10b6:303:89:cafe::48) by MW4PR04CA0277.outlook.office365.com
+ (2603:10b6:303:89::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.546.22 via Frontend Transport; Wed,
+ 28 Oct 2026 13:19:05 +0000
+X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
+ is 216.228.117.161) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ PH5PEPF0000002B.mail.protection.outlook.com (10.167.243.5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.569.4 via Frontend Transport; Wed, 28 Oct 2026 13:19:05 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Wed, 28 Oct
+ 2026 06:18:41 -0700
+Received: from yoav-mlt.nvidia.com (10.126.230.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Wed, 28 Oct
+ 2026 06:18:39 -0700
+From: Yoav Cohen <yoav@nvidia.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	<linux-block@vger.kernel.org>, <csander@purestorage.com>
+CC: <jholzman@nvidia.com>, <omril@nvidia.com>, <ofer@nvidia.com>, Yoav Cohen
+	<yoav@nvidia.com>
+Subject: [PATCH v4 0/2] ublk: honor rq_affinity on request completion
+Date: Wed, 28 Oct 2026 15:18:27 +0200
+Message-ID: <20261028131829.45803-1-yoav@nvidia.com>
+X-Mailer: git-send-email 2.50.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -119,80 +110,89 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR04MB10065:EE_|BY5PR04MB6437:EE_
-X-MS-Office365-Filtering-Correlation-Id: c8728841-66e4-42e8-2065-08df34ee1e94
-WDCIPOUTBOUND: EOP-TRUE
+X-MS-TrafficTypeDiagnostic: PH5PEPF0000002B:EE_|SN7PR12MB7856:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3bf54240-6d28-4389-619d-08df34f60a78
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|19092799006|261009223027099003|261022105027099003|261021135927099003|10067099003|56012099006|261026140227099003|18002099003|22082099003|11063799006;
+	BCL:0;ARA:13230040|82310400026|376014|23010399003|1800799024|36860700016|261026140227099003|56012099006|11063799006|5023799004|261009223027099003|261021121427099003|10067099003|261021123027099003|18002099003|261026121527099003|6133799003|261022105027099003;
 X-Microsoft-Antispam-Message-Info:
-	U899nZm8v786cyw2kfNp1aRv9ovEsea8DBZaLbOoJu1sh3sh3Ws/LVY7lB2jTHivRrAMZccWidDWZRgG9dVp5CXFgSWRObW4L2KqG1Tg/+EVTsRpvWSScbMgttSOQzBw5Q+jbiYbTB3ZMUYBTWTgWeFQc1Qp8y9qEndQUDyULm9FR8QJ1GkI1Gf9eacRdMMT0UDeyz5gVwGl+5SgiD4nQIJZB27x2N+LsZbKpfU8/ppiTLfRxvygqFMnoesollvNOkOHC78dBy0V3/WWUOCI3oxctczcw4qDQcXSN+x7XP8+6KcB0zyVEkxIXE8Fx5PkfLIEEBWB/+8d596kpCH8NrVluA3GHV521owNigWrE/eNd2oj79LpNHPzNRN8LO75Cuc5nACHU5PDGnXF+TnIy0JYpS9GuBxGEc75RQ++1TTNKpce1BdyH4uum1TRa/3dYnsmopkRWzo8j0UalFu2wDCLrjczwP9oyDzZAYKC5yr6haKIAbUOp1OL1PKEFqByc3D6r+MHAMxW6gHp53ZIV71ALWdJCAHj0lEup2Oj5yG0Yp3MwNxtg5x7feqxnNZbDub7Kg8hAgKsZpi0Pl79Udkk7Wv9h34S2tyTOJ7BBbk=
+	+8YtimCuDYRSa0OVFaEg1TMl0C88gpK4o6it3yZBgZ0X5ybaxQJGQRafAKRqmdASuwuglJa/pYAzRUAY9hF0ImzDWMiSSV7vrWhCGSwgchUJVE8cH1SPIu4FczPIEFn2HHB3PTmLl4kG+7/jK7JeDYJPEd4/JnXMQF1eU8wxmeX2fEKKQi7S+oMaRp5wSkCMAhGkyouZYY3ecGvdg9CMgn28Utr8grjl8m+jLXcMdMOX0Au16izQg5sP6UkwLJ1VzT4+1b+ZrNP6Zp+yYI+rpvp2fe87wq4jLNISvFrtpOpnFn9QERbD8vqx67khNE50ORRGbHCRUXker1M0pn4/SXSJNRrDgupR5PmuKazKZVJSVEGvRfpRgXoJUlgx3Ly3RZePY/Bw7sW1hhJNzig6NMlFHEUPWwmOpn4IBtXEi7Py27azmT05OZ/LArRuftL/I58emlbn22q5B8HF4mAnqQp5AWNOqOqx2Cd7gjsi+Sd68T3BLXRIlQApu9fsCL/TpUlpM76HVcld1PnzwizhuiDrQMe2+N+Es3Fg7RTWsEcHft2ljqRPyfBqsg4gfd5OAXoxeeh/C4Rx6+KL45uDgXXNo4WYtm9VvEXFDr88bFy9UEl80CWA7WRLWDe1yeCi+pJkUtLF2v8gSSfkg1jDZOghAczB5g9saZUTgHwRIK08R+qyasblOWD6h96ZenPqdZRdgLZUIsvEvkCiSdTasA==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR04MB10065.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(19092799006)(261009223027099003)(261022105027099003)(261021135927099003)(10067099003)(56012099006)(261026140227099003)(18002099003)(22082099003)(11063799006);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(23010399003)(1800799024)(36860700016)(261026140227099003)(56012099006)(11063799006)(5023799004)(261009223027099003)(261021121427099003)(10067099003)(261021123027099003)(18002099003)(261026121527099003)(6133799003)(261022105027099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+NJqyl8GeBznYWTsfey7Nm5DB3VWMaRM3zKarbaIHq3hopZbjamcXpULOMiO?=
- =?us-ascii?Q?p2XZWuA2r3SOcLJPMQ9XkXyEoi1bzimK5qTXv3hJIPsoU4SZ3yWiMcBo5JQS?=
- =?us-ascii?Q?s741atwcwAKFg7+qEZkTZy3jD+DCF5shurF6dLw/q6mIOE8p8LuhCQsZmErY?=
- =?us-ascii?Q?W4u85JJ4Cn8NVe1ROIh54e6e4zlXEwI5KVqm5jf3k0qsu+iBOKsv7kQM9/3J?=
- =?us-ascii?Q?swqbd7NMIgUP3h7PznCHaYsTOvVXbX/3n48+SMzKQD13SGx1lqaIpcIELgHc?=
- =?us-ascii?Q?n5mJXr4XQmNhgcpCXbPMmwg0gOTiWHfyZZiW6E0vj+ptWE1oKnxvhlXu4ogO?=
- =?us-ascii?Q?DCFjSUGRlwfzpsrT5gPUBnWOqBPfbfvuwa7U9W+cikVeHsuQb53xRO5uPVdE?=
- =?us-ascii?Q?9Lx9XhWB/SKsdmHR4mDAPBOmUJcf8XKUwR2dC7OpNlLKgn+97K0JafJYLL9z?=
- =?us-ascii?Q?z77MVlS0wlrEdTaoMGj7wA3efuiCRo3bA+EWDbTmcUud3aLEPhr3WWHvlZay?=
- =?us-ascii?Q?hBe6EvRWQcC0CeyLZELHIS5jAgVozEiG0mzf5z0tcTcPr7v2LxTudEXht6Fg?=
- =?us-ascii?Q?OgR/oPtbJyDisuCwEkD0c96iAZkBrE5rdzFE8HjstBfzz563n9M2ydtAtQUL?=
- =?us-ascii?Q?w8mfsCLe6taiBcjb4Ys3rH9j+2mAlS0Jn/BlCM5UQZEPAw8MnZ3nrUft7W4R?=
- =?us-ascii?Q?DeSbfJ7pj2JbOiJITjd51qAKCtWxRYHAG0UsyZhYH8VdMti44nBIHK+asWNF?=
- =?us-ascii?Q?o8ZQwxi0WoNd2C4A++W2b85RSXSm0Nk+CBHco38i/ND3isYbwhZaYusykvhi?=
- =?us-ascii?Q?5h8gmrm0saHWGZ/Vx1XG24O3LVzwTiqNoMLT+LlWkaNfYuJhT7HTtqlT/59z?=
- =?us-ascii?Q?jAWH/VjLMvMMQwveQ6AeQg+ZoIBQLuZEqH9i1mhVqqgr96n652wL0oeO6YEL?=
- =?us-ascii?Q?y68HrUoAdHNZtQLBXLWV/qhs2vpXd96mK2Do2awmjy70PG+yUCj1UAo5fDUz?=
- =?us-ascii?Q?kIwRZDVXs864uF6dAw6Z7Je/ZO38+B04OW5R/AhyWgIuM7iEvTQ/DF9vmg4J?=
- =?us-ascii?Q?9BoaL3LbLzXCUpZD9AHfNLK/b/849vc0M4Ki0lQkNVotJNBzOvtxh0kV3b6G?=
- =?us-ascii?Q?JqWxX3yw44JWzEIG7sqaHyulFM5Vv8REcoUFl1KfgGVrzt86riSODcIL/kwF?=
- =?us-ascii?Q?7PP5vUOSnX2NEd20z7Scs7nyTLsmGu+jWhK1bs5LOKNHHaiMCatG4LWkAx39?=
- =?us-ascii?Q?24NaVCNryf8HXQJsDXhemHaZkHOH1KGZAy7Q/J84fZiVFyG0sS3mv8ue5hvg?=
- =?us-ascii?Q?tUCPIrgHpWO3DBktm/EQpRaQx35E9GYkv4ZBVrcxFm3tZnNgZf2TNeIrfJx3?=
- =?us-ascii?Q?aYzzq8IdM9aQBavC8VDyhlDzc3PFVIuF0lwu/y2cptdBUoo0jamlewPNfRbT?=
- =?us-ascii?Q?fWrNbmww2mAvwqvgGi0YiBE0KKLPQ3T/Ng68OdjF8kn5OwOsk1A8uIpJXtUK?=
- =?us-ascii?Q?cg90ZlAmlmje5c5UBQ/Q44xRgARelpPElh/qswl1fESid7ObR9Wy7y9Np/Mi?=
- =?us-ascii?Q?MR10wRFNd9WTuVqLNw3r3lylGUkAW4GdUijqIaKvhGSZMpcXBQyYpBuln/Kq?=
- =?us-ascii?Q?jSLk1zACn1t9bSuSFhUQePiIxTVvL19s9MV4bNr0BJ6oNvFgjVILK0KS76OD?=
- =?us-ascii?Q?ffwTbQWlBY35gGP09Nrz0//JO1F+JplzTbS5IXKtFSI0Z1BpBw2BoECVvANk?=
- =?us-ascii?Q?F+duAZ1xdAA7+xFsRulsvoIRNM5qRgM=3D?=
-X-Exchange-RoutingPolicyChecked:
-	DBIzSfWUfBciDg/UK+nh5R8rWrojSjVRrX636LUhYSDs7DdwGEyxx0TNampj3vBdjLU4RdhgF3+UYcm0DTAjZSEDpNAiVzdU54HO18HIpryhstonIUsH3i5WoE4wDXyok1t7f8zaqGSLphan/f1q0az9TgVk5OYOHqnWcbgf/uPRPgZUpZRFwUuGYNNvNcRXLlgoKph+yKWAWR8h/VK324CPAnorTq/TyfTjDHR25AFX7h7KMdUsWwyXqUTIR2qvJaiCf67IXZeobK/gvy9vRy7PFb1Icm9fOIGhL9sV00U+2BbDUjuLbzdckvPauiySgKiODXSBSmLrjvqguCgSsw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	IQxcmpG3/gfG2M/6aXVQhifqHyhQ2oHKotLdeeOVqwbn2ucp8UGfezIE9zSmPJXiS6kjl3VP4IqBCfMqBQmhX50+HlG8Pwc+JSk2cS0TxXKIq+2Xn/CheBAa7kTyUjmEZRGitWzj3Q2XTZjjIes9DEBRe1yj7geb+DDwoFN4oa5cNYGt5PdN+O1s3j0R6zzx43lBPXj8qUJF1XZ7rvtSq9tVrTPTLkRn+xuQIzmXEoHRja8QY42l0Uctm/r/V0+z0W77j/bRCr6kAXaAuPWm5TwZ69nXfZo38HiNX/Y02ARStIbVb7N8fSoazkwWp0xzgX7XZGo91xNmLwvx4+KGtrfo7ZIp6HWQJCJ6mrIkiJktiu0ovbysNLyiH5/30ghNEamCX4YK3/uEOAwN7saT+QpGb5l5LMBfl7xafDVP105zGQejo6slxGCbfRKgRnCrhJmfP3FvWSU3yBnvPBP1rwwEYT4hm/01lulZzHGwEYkFbjsIiSGJjywVVxbk0/HhHn9DOd8p1B6OA+EBnNZ5oTlKCr1FkEtx7UbX9WNR5p44foRmTAxlZIYCP9DWIMyc9/alxtX1QU8O8V61eiFt8eicJy8PLl1EJqQ/sYzwAdyf0E2rxJPWnKbDDX9A3ubY
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8728841-66e4-42e8-2065-08df34ee1e94
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR04MB10065.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2026 12:22:23.0605
+	sunzKoahlVL1XRMIs79+co4mHmur+J611bjKB8cKTO7cvfOSiXiRsQMR/Gt1xfIeHi+S+e7H/6V1dTlEEcltpek3L1TdZqesBv96T29pdVLpqQUW62JvScCOOc3o/C8Y2C98e7tXccELclSpJfcB1lwHs24oJ3aJuG42gfGRgOoMaXNuL3gj/LNayrtJ/vJXyGz53BIH3l+PzoblRo8EMKRAL9AciflW/OrFIiny75Ils3y266c6gOeOm1KXr8+0uhTlSi+KfTXw5duBatxhhc9AxDGtP8VN0QuhMRnlX8NlBJcawiAPNdHtfxU1Kkd6vzwr+qzFwPOgJiCpimkPF4eA8nLSt0irpEH7iTdm6wHPda0oTesGtEvpTD7z+HlmxVhRdpSi3OOQBF1agADV7O2mFM1JbNSnTIxL8OabiZm3zUAtzzHdcEkuPldtQ+qe
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2026 13:19:05.1242
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qFHxmEz4Uh/03EHnYuefqafjZ3kkDim0GDyj6oCy9e1Kz48LRsXZ7MxefWJTaC/iQftYJPVaxp9MSF+WhQ4RwkzVhWPnuXjQ6sQqnUTefvE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6437
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bf54240-6d28-4389-619d-08df34f60a78
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	PH5PEPF0000002B.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7856
 
-On Oct 20, 2026 / 14:41, Shin'ichiro Kawasaki wrote:
-> From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> 
-> The loop driver is going to drop the support of swapping loop fds. The
-> commit titled "loop: remove support for swapping loop fds" is going to
-> be applied to kernel version v7.4-rc1, and LOOP_CHANGE_FD ioctl is going
-> to be removed.
-> 
-> The test case loop/006 checks the behavior of the swapping loop fds.
-> Failure of the test case is expected after the kernel commit. The test
-> case no longer has value. Hence remove it.
-> 
-> Link: https://lore.kernel.org/linux-block/as8-8rDJmUb1FxbP@shinmob/
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+ublk ends successfully completed requests inline on the server thread,
+so rq_affinity never redirects completion work back to the submitting
+CPU the way it does for NVMe, SCSI, virtio-blk, loop, nbd and rnbd.
+Patch 1 fixes that and adds a feature flag so servers can detect
+support. Patch 2 adds a selftest for it.
 
-FYI, I applied the patch.
+With an SPDK-style polling user-space block server at queue depth 96,
+rq_affinity=2 gives 7-8% higher IOPS than today's always-inline
+completion by offloading a saturated server CPU; rq_affinity=0 keeps
+the old behavior for anyone who wants to opt out.
+
+v4, addressing Ming Lei's review of v3:
+- The selftest didn't reach the remote completion path, as kublk pins the
+  queue 0 thread to the first CPU of its hctx mask, which is where I/O was
+  submitted. Use a single queue and submit from the last CPU in the
+  hctx's cpu_list, so rq_affinity=2 always takes the remote path.
+- No change to the driver patch.
+
+v3, addressing Caleb Sander Mateos's and Ming Lei's review of v2:
+- Pass whether the device opted in to __ublk_complete_rq() from the
+  ublk_device its callers already have, instead of reading it through
+  req->mq_hctx->driver_data and ubq->flags, which are likely cache
+  misses on a server thread servicing many queues.
+- ublk_end_rq() may run on a remote CPU, so it no longer touches ublk_io
+  or ublk_queue; it only ends the request. Only a request that completed
+  in full (io->res == blk_rq_bytes()) is redirected. Short completion,
+  errors and copy-back failures stay in __ublk_complete_rq() as before.
+- Drop the re-derivation of the completion path in ublk_end_rq(), and
+  with it ublk_rq_need_unmap() and ublk_update_and_requeue().
+
+v2, addressing Ming Lei's review of v1:
+- v1 only redirected the classic-copy-mode successful-read completion;
+  every write, flush/discard, error, and zero-copy/user-copy/
+  auto-buf-reg/shmem-zc I/O still completed inline as before, so
+  rq_affinity had no effect for most traffic. v2 redirects every
+  completion outcome.
+- v1 ran the new completion path unconditionally on any patched
+  kernel. v2 adds UBLK_F_SUPPORT_RQ_AFFINITY, which a server must
+  request at ADD_DEV time; without it, behavior is unchanged.
+
+Yoav Cohen (2):
+  ublk: honor rq_affinity on request completion
+  selftests: ublk: add rq_affinity test
+
+ drivers/block/ublk_drv.c                      | 68 +++++++++++++++----
+ include/uapi/linux/ublk_cmd.h                 |  8 +++
+ tools/testing/selftests/ublk/Makefile         |  1 +
+ tools/testing/selftests/ublk/kublk.c          |  6 +-
+ .../testing/selftests/ublk/test_generic_19.sh | 51 ++++++++++++++
+ 5 files changed, 121 insertions(+), 13 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_19.sh
+
+-- 
+2.50.1 (Apple Git-155)
+
