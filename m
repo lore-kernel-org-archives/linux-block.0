@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205963;
-	b=m7XDPIxmiBOxUPuqi1+heQFlS8GgToTxZMx6d7GuhpfSJAocKzZJVf6sQjGosPICy0cV
-	 wNaZLgrLYmwmxF9Z8BNrQzawptMOXfpLrPlnRS3x7V4BY9ushqpYwUU5+3xGfMYwXleMl
-	 Q7cnvL1K0aeh0MIUZHNGKkr5yLjLkdbSwlRsEI/Wm5trubPuh5czrD1wDKU+J3ntYH1+j
-	 DXB3AHtxn/9w6PLzZ5eeCPr9oCeyMm+99aYgkCfmTGu6hwRjjw5YRnaYdkl9L1PCfjqN6
-	 nLJLclS8mKEz19ttx4l4fzqvopJnf8qBCGJEbC3MvHl6G7HNt6V8CSp5a672NfOwxQw==
+	t=1793205965;
+	b=i6SDy0nb7IXRzMSLhVEu7zW3X+ZAvAHrUVmj9dE7dE/ruM6ZwNlaqu4pzWZzBCmzybt/
+	 zYlJkabz0mQHDOdlufPVT2+hCJ3pqALVzvWria3TqmLkcCv5EuJtNLic6OTqsdHcsNlb5
+	 Sx8pA44P1scW/+rd5XWYQnULDLpsBohVhZ85LT3B+fuqqKN8br3MdkoVIMUqPZ1Zjj72b
+	 R2MYhNsOHn54W/NNma3yMt7jhazENFPxBtQfmmTGMK8qH4E5/kATUFd1I/AISwzyoYZ5m
+	 LUfjK8VRsRZPCziu1tyYUC+yn1eDRIjlWaQt81pNlQ7N8fwZVOdvoSJyY34ecqxn6Gw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205963;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205965;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=1NNaeja9CPQdNWDiA6GhYzCVGaHovmQ4cPZ+vjHlOj0=;
-	b=ovFfWnvD1BEZfhDrfHK+4FmABlkrUxtDdZ9dUXIVesY78KGr2DgYhgp8HOT6qFFzFucs
-	 PTsM4abkKu+GAi1dYS/vHPKESntYl2VBohbieqUbjheA9YIo46NapKeDD31NapOH3Byxi
-	 kePexLWc2c6A+UmsnYZ7lLEF6iphpzSOKKJ9JkbU8l/OfTWzYanbT9Bwh3sooPIwc9Cqs
-	 gAvA3WyVyXFfIL0yqtk0rbo/UA7d/y4UX/ETq8Tt6Sb/rWJuxMGBboZoj6ClZGJAVszlq
-	 kfbUA40IrAV6ej8YU5CRxyVF1yXaTlTozs/bKVkh3ld5zeuntrqQkq+rn0DCs9hKiZw==
+	bh=CDESht0AN8bxmZcMh60WJz8yZHponAR0XGJGMwaFhL8=;
+	b=p76chrb4gX7RjksOeCmqT9n1DsV3Ig5whRX0bNUqdKqzFTLfobIveJbix6rPStWGuLXU
+	 dAFEbTaefQdc+OaSdZL2AsUyHFlDH1hgMt4S+kO55gxfIH6XdR5nZRmqqwHh0hNywnays
+	 bxvusvy2EjZYWaCJGs6eWzWLdYfZ4bcZWubd4vBTM6F5sc1GVyLrW7TYkjX48Or6HKmUq
+	 pK7kcQWxiKM2bUaVTjQBr94qgoWrt7w05DA0ZvYjMx/0vsGtP8nubhItS/GymWVTUZkm0
+	 mFzn795d53n1u6DqxuJ/RBk6pMGKm6CH3C74k6r1vZZN8AK/czwDq4nM+DjwkM7mUXg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=mE3ZShLZ;
-	arc=none smtp.remote-ip=209.85.210.45
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=RlJcBQie;
+	arc=none smtp.remote-ip=209.85.161.51
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758DB606A31C
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:46:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 758DB606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2D2606A31C
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:46:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0F2D2606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=mE3ZShLZ
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-84e513877a3so1112827a34.0
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:46:03 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=RlJcBQie
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-6d68de53053so669780eaf.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:46:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205962; x=1793810762; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205964; x=1793810764; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=1NNaeja9CPQdNWDiA6GhYzCVGaHovmQ4cPZ+vjHlOj0=;
-        b=mE3ZShLZUnRmv/oWQ1heoUxcUdeg9cIXjqTB3IPCGYT5NW74wZ1sDhLFZ3/flNeSX+
-         2F9w3e5Tr/G7VPLCIOFUHKvz4eV2TBESXvmIZWog2Lu+oaSA7GFTc8Jz/m7A7QEl0ULi
-         AZVvw6488OOtXRtrxn6D8coxYAspQ4MIoxzEtKwamzFCoXpisf8gFxVqRca3nvspKCXF
-         rRz6f9RUfDU3OjhxlddlDsgGwgHum/4r8irhKMAwtLmNR5rXtGTRGZozNDd2vUKTyOLE
-         BF0hAA3fOWRoPG8r0m2RUtVdCS0G6rWRjqHUxp2OqV66Soo3NV5J2uuFLX0Pmr1BOYXH
-         m57g==
+        bh=CDESht0AN8bxmZcMh60WJz8yZHponAR0XGJGMwaFhL8=;
+        b=RlJcBQieCKFVF6WIzLoz8RCK5kwG37mSODwVpLC1YyOlE8iNwaaFqbSMXavpqQssb1
+         fv6Fp7XX7/jMHutEcQK4G5w12SPbdKb15g8Ad1ok7JbS80ZH7qJiIZHkX/6p0JuC3Gok
+         9mpnru70NmI046Wo+WGpmeh/dQxk9q7+dq0wy+5BF/36iXm7EmiH4BFlHIyrVQtcybF8
+         7sCJVmNwCn1jpwZC6JygxKxG4yxJrxm5WFt3uawaNYD/Y3dQUkFv+2vGl+IQikcPGtGq
+         LCDRi0rUhBnUzT8b+tflM0D09qB7QLIurc9i/ntUPbZWxkHVr+zDLleyDzwNwPoNJs1e
+         qH5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205962; x=1793810762;
+        d=1e100.net; s=20260707; t=1793205964; x=1793810764;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=1NNaeja9CPQdNWDiA6GhYzCVGaHovmQ4cPZ+vjHlOj0=;
-        b=UcNkaIQEfnSsEoJf0lIXeDcTV/Jm1X8WvPbNphZx7maSbMwlx4jIGkVm5PywnY4z+a
-         9WI4dJrsIDltUTNPZbV1jaCUdcEMRVsTKPPM89aKtd/HOOhgwTIWdEr/P4FhfQUNpnUh
-         yPyOOgpH7JtnX3cafFbHowlymy0CK5O2V+pmEtCywD9jl53hHWwdXhvurB1fMvTF9ff9
-         8iX1H9ZV09O04dL3HmZyk56arfSYPkzH5rLtsOpFshtNCF7Gjs+5BASZxFhHJm/oFdeS
-         Fqop1XyLMz1wqLBJtC6jzfVRmNfvu9Mm9wXxmTMDgKf0AEyEkFS6MpkFW9TkP+Ugwo5r
-         wx5g==
-X-Gm-Message-State: AFq9FYJkK4RtmbkhrrOAVLv1hDppYhv89Kmp5hjPAozkEGF4pCW+H1Tj
-	L9lNtap5N//KelxbQSrreHtOVkvgN7Nl8pETQezKf4NiDW6qM9cI1ONUxG7so9MrHo/V6Qy8JTc
-	145iMP6Q=
-X-Gm-Gg: AYBFou2X6xWziAvp1dk0HnFBC2Itt+ege6VXywgYJ1Zbmm6moeLWzjWzb9/Bj6ENQHg
-	6hJiHIHV3irARDtKJXa0PLOdFrJw70u+HH9xG7JtrmmhqLKjj8jugmn0tezUyE79X4dC9hGdFaD
-	ALA0H3JhNHcXMOOdGcqVHLMN0v0Bii/DrQBQnJaGPlugI/qTYJ+BKavacc5R5vQ9beJp36DsGjr
-	/fQe/xuIVpnj4IaB7IdSsModMWF6rDvp0r0bcfnBGcp59+0I5ZhrgdNTlr6HEFFVLdduluzOwGX
-	LZ7UO9ztptPZJR1XfOHnQBE4jhmNj0baP+58hbTEiyNEZlDksiPSE+8WuOHIwcKtGDm5VhiBf85
-	R+9DrIiOiCaIqcST6F7o3HdsHe5UqQZj4/m7hJHVs2mnFqlt/iFc2iJzAxgrpuXk+/v0XIde8RF
-	bgmF0FSb7sFoawJ4b3wrfzvK/Qeop+BR0nJ7FzVMk409oe7BkBdDM9+Bhnl83poY1LmDGpNBeOC
-	OKmbrl5CP+4hLsCiNrkeDnH6/ZaQkAf3sSBrz00/fhIZopbldCBPAIFn18c0fJh+c3xClMESdNv
-	0y1JGYuDIKvxNYcgYLfCuaeZZxpdgGXZwKPWUPIREGtWHp/jsOr8D42kQglpOh3zCLT+LtbMHvX
-	CKMUIWn1EoEt5T29lAIM=
-X-Received: by 2002:a05:6830:920:b0:81e:a314:7f70 with SMTP id 46e09a7af769-85c1e2b73f8mr91662a34.1.1793205962426;
-        Wed, 28 Oct 2026 09:46:02 -0700 (PDT)
+        bh=CDESht0AN8bxmZcMh60WJz8yZHponAR0XGJGMwaFhL8=;
+        b=pVGK8wQXe+1ogULTVvVilkhoeiv0SASQ/H4rF/H6Xgsi2S3GsgrgTAEozHSDh0cDDt
+         aVlcWZ4z/y2xdBPoFLB+S2jBvDm3wgBZaIxZj0aJNWdE0bZs22StzngkBhz7f4w/5YoY
+         CdsFSP2ShI5nI15XYjh2SWiZln5hyKMxf1r6IQP9yuqdnGTE6d3q/Oci9BfSH6lzAsMr
+         iWMdqEiLiIZJE2V5CimhKL8sbo6cQFxlKIpurIa+t7ZfmWAub7jyDhNUuTBjZpvdDN14
+         7CnlhRqAXNywe8pRE9XxLu1i48VJXZCsYHX4Sp6FNtSZ7JaNlVnt5LINPXJSGq1bOl0L
+         iwYA==
+X-Gm-Message-State: AFq9FYLlI2ZQPT+BcYbcg0x+dlB/IonTr7eBfBXV/0HXvBi6QVEaozb/
+	3NNn8DQKRHlaU2dkae76nU1kGSy0WzItQKOgKmPxltg4tXuZiDWfrbmcqUflfQrXDtoobw3beEl
+	FnOBYYL4=
+X-Gm-Gg: AYBFou3uyJu+olL36UCH059Jdtl0gtnwxNaABzH0DeiO3VNLL0uPgPM38Bq5csX3/99
+	DGbmAwFu/Uc37AxlpFZPbyEhbU6ACzWSMsz+uUcDm3s7LJ/TS5hlvJNTYArbQ6MN5oJe3kDW1zv
+	VG8MkE6VvBD7sv+N3UjZujc1dses36PPxjq1M5xiN4os+fICCmSjBZ+7K1/wTnilvlYAAX592Y5
+	SjmY6f37wkcvlTulNfiafCQqb9N0fHA2mm7Ewva4VbXxVDU0eydqEiiU74hfrhs2+7ffZxASVoI
+	FC9NsCiAGRIaoc3+6z3GM/nzhFeZM84pbZPq08ONPvCdURA7GTkfbBbzqy3yprY00SQcc63VkOZ
+	dn9gayd7JS9+mmN3Jryh2E6ALQgrDqYhVINgyBliXdmRgCd0hpBXjjVQpCb+B4j8Ni/FU23U+9k
+	tF/3ImOOeafG86mrcIu5kwNh+ADOYaQW/CfRELv6viGTGHAreKcB2nqaW2Rwqd1U+pZjPWfaXFe
+	MyAehu6qLbm1wOcRpS0I3zrdhgo+L9Zru3V8dX5r0fT7DKoqwaIXuKlZ2PYqlEUd/3Eb3mSLW6Y
+	cqt2WAgd3VFHLXqUbYdi8Ke9l4JanqYbZK8+x+dPp4QfUU33jx3cQYjnthdXnrUOIEp10D2qaA=
+	=
+X-Received: by 2002:a05:6820:8597:10b0:70b:8379:c170 with SMTP id 006d021491bc7-713ee85c744mr1085204eaf.27.1793205963840;
+        Wed, 28 Oct 2026 09:46:03 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.46.01
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.46.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:46:01 -0700 (PDT)
+        Wed, 28 Oct 2026 09:46:03 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Chris Mason <mason@kernel.org>,
@@ -86,9 +86,9 @@ Cc: Chris Mason <mason@kernel.org>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 83/98] nvmet-rdma: treat a failed connect as a disconnect
-Date: Wed, 28 Oct 2026 10:42:26 -0600
-Message-ID: <20261028164415.1262013-84-axboe@kernel.dk>
+Subject: [PATCH 84/98] nvmet-rdma: disconnect only established queues
+Date: Wed, 28 Oct 2026 10:42:27 -0600
+Message-ID: <20261028164415.1262013-85-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,60 +105,76 @@ Content-Transfer-Encoding: 8bit
 
 From: Chris Mason <mason@kernel.org>
 
-Once a connect request has been accepted, a queue is only freed by its
-release_work, so that must be queued once. The disconnect paths take
-the queue off nvmet_rdma_queue_list first and queue the work only if it
-was still on it. nvmet_rdma_queue_connect_fail(), for REJECTED,
-UNREACHABLE and CONNECT_ERROR, queues it unconditionally and only warns
-if the queue isn't connecting. But the IB CM delivers a REJ from the
-peer while the connection is established and even after we've sent a
-DREQ, so a peer that causes a disconnect with a short capsule and then
-sends a REJ while the release work is running queues it a second time
-and the work runs on a freed queue. No credentials needed, just RoCE or
-IB reachability, reproduced over rxe with a UDP socket.
+Over iWARP, rdma_disconnect() sleeps in iw_cm_disconnect() until the
+ESTABLISHED event of the connection has been handled, and iw_cm handles
+all events of all connections one at a time on iw_cm_wq.
+nvmet_rdma_destroy_port_queues(), nvmet_rdma_remove_one() and
+nvmet_rdma_delete_ctrl() walk the queue list with
+nvmet_rdma_queue_mutex held and call rdma_disconnect() for each, while
+nvmet_rdma_cm_handler() takes the same mutex. If the walk sleeps on a
+queue whose ESTABLISHED is queued behind another queue's event, both
+are stuck and iWARP connection handling is dead until reboot. A peer
+sets that up by connecting in a loop, or over siw by asking for MPA
+peer-to-peer mode and then staying silent, which delays ESTABLISHED
+indefinitely.
 
-Route connect failures through nvmet_rdma_queue_disconnect(), so only
-the path that takes the queue off the list queues the work. A REJ on an
-established connection still frees the queue, the RDMA CM reports no
-disconnect after one.
+Only call rdma_disconnect() for a queue in NVMET_RDMA_Q_LIVE, which the
+handler sets when it gets ESTABLISHED. A queue that never got there is
+left to the release work: ib_drain_qp() moves the QP to the error
+state, which ends the connection, and rdma_destroy_id() tells the peer.
+Over IB and RoCE the skipped call did nothing more than that.
 
-Fixes: 8f000cac6e7a ("nvmet-rdma: add a NVMe over Fabrics RDMA target driver")
+Fixes: f1d4ef7d8883 ("nvmet-rdma: register ib_client to not deadlock in device removal")
+Fixes: fcf73a804c7d ("nvmet-rdma: fix use-after-free when a port is removed")
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Chris Mason <mason@kernel.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/rdma.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ drivers/nvme/target/rdma.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index c4b848f84465..13243e3edca5 100644
+index 13243e3edca5..c5970bd2dc29 100644
 --- a/drivers/nvme/target/rdma.c
 +++ b/drivers/nvme/target/rdma.c
-@@ -1738,15 +1738,14 @@ static void nvmet_rdma_queue_disconnect(struct nvmet_rdma_queue *queue)
- static void nvmet_rdma_queue_connect_fail(struct rdma_cm_id *cm_id,
- 		struct nvmet_rdma_queue *queue)
- {
--	WARN_ON_ONCE(queue->state != NVMET_RDMA_Q_CONNECTING);
--
--	mutex_lock(&nvmet_rdma_queue_mutex);
--	if (!list_empty(&queue->queue_list))
--		list_del_init(&queue->queue_list);
--	mutex_unlock(&nvmet_rdma_queue_mutex);
--
- 	pr_err("failed to connect queue %d\n", queue->idx);
--	queue_work(nvmet_wq, &queue->release_work);
-+
-+	/*
-+	 * The peer decides when these events arrive: a REJ is also delivered
-+	 * for a connection that is established, or that we are disconnecting.
-+	 * Whoever takes the queue off the list queues release_work, once.
-+	 */
-+	nvmet_rdma_queue_disconnect(queue);
- }
+@@ -1687,7 +1687,7 @@ static void nvmet_rdma_queue_established(struct nvmet_rdma_queue *queue)
  
- /**
+ static void __nvmet_rdma_queue_disconnect(struct nvmet_rdma_queue *queue)
+ {
+-	bool disconnect = false;
++	bool disconnect = false, live = false;
+ 	unsigned long flags;
+ 
+ 	pr_debug("cm_id= %p queue->state= %d\n", queue->cm_id, queue->state);
+@@ -1706,6 +1706,7 @@ static void __nvmet_rdma_queue_disconnect(struct nvmet_rdma_queue *queue)
+ 		}
+ 		fallthrough;
+ 	case NVMET_RDMA_Q_LIVE:
++		live = queue->state == NVMET_RDMA_Q_LIVE;
+ 		queue->state = NVMET_RDMA_Q_DISCONNECTING;
+ 		disconnect = true;
+ 		break;
+@@ -1715,7 +1716,17 @@ static void __nvmet_rdma_queue_disconnect(struct nvmet_rdma_queue *queue)
+ 	spin_unlock_irqrestore(&queue->state_lock, flags);
+ 
+ 	if (disconnect) {
+-		rdma_disconnect(queue->cm_id);
++		/*
++		 * Over iWARP rdma_disconnect() sleeps until the CM has handled
++		 * the ESTABLISHED event of this connection. The CM handles the
++		 * events of all connections one at a time, and our handler
++		 * takes nvmet_rdma_queue_mutex, which callers of this function
++		 * hold. So a queue that has not seen the event is left to the
++		 * release work: ib_drain_qp() moves the queue pair to the error
++		 * state, which ends the connection.
++		 */
++		if (live)
++			rdma_disconnect(queue->cm_id);
+ 		queue_work(nvmet_wq, &queue->release_work);
+ 	}
+ }
 -- 
 2.56.0
 
