@@ -1,91 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205899;
-	b=SxIraWfhQUq5ApjmEfcGqDH7znS2GATjixcQeapjtEWiNSFVRiYWrhJ7U9LIUgcoy+3P
-	 HQtlVbzBKesxjx5XSDNLjwjWOqBXdZzHtPlSDGxQvMcG3e9FXMavTucSsvNZ9txI+VUds
-	 ItriIcrynrZj9HBF/rqnp2CmMOagPyDxRj9cGNu6+UMTEt8QPtM1cxWdpYhSTF3/Z8lUh
-	 CFZZ0u2pTpbcjJli8l1WO4vvMbVG+7/siaEJBtY71zpz39c+FNLKg2bY833f+Yuykjidh
-	 xWcZ4ad3sBiydUB+azPpHXKK7NuIyDmKSbni0h8wisfNY/QWwx9EBoX9t4iO6TYMJNA==
+	t=1793205900;
+	b=2zCU6fkM4XzYbTtwrlcHbNmOoBWMAXKcLY1ZYT2tPJfKUZSRtpvfUL+0optJ4757kh/M
+	 AOCc4rGaqmAjCyoKvidcXKvMZz9FjzJ7EjxdCC5fZJm7cBGk27w6bTOdVh6jzwl7iLMsI
+	 98KdlAsnQBOAzHPbYDE+1yRncKZKwxv0XZb0gIG50vI9CQdXE4SSQTPeS/XApTb8okfpv
+	 4aIovAwGwSdu8SNHq1JsWzSnfXYKvYR3tm7y2kd4cmv1Duuq3jNton37Llh9da0l/2Njp
+	 Rtp+scd9zceKV++8OXdkC82WueTwNZTAgzFrk6ZrZGt8MW1S2kLcvzv0rtdXxkvyb8g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205899;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205900;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=43fNiymvfrbcShBUvXeBFpEWnvLGZyv5ExKLMUTpuaY=;
-	b=Fu5ht1Dm0eqSXXfSytt2nu0VzSGCIIzC+XVO5x5hdQi3ogYsb5eiUmhFxTdbrlhtY48D
-	 A7wmmzxjbHTUNQlo6mVERfwTfMYuJoKI1ttaFMh+HCaY4upHYK51+UmFEoYxArBRst3dO
-	 bZ4WXL7xFhyOIJJW02UaJyLKJveWAtAwco4vJrbs6uCXiR9+TbBVvouk9ksXhSOF/QyKR
-	 fsGZfNW9alhX0dSq0OnczycwPPD0bfXuQGO0cAC46GxejM/aIDy9AtTOLUzgKLL196qZe
-	 u6MLc5xbDLebvwaHM6Wl6CBGWNsvksunpqdf5Ll5lL0ZYFDsQ2MEx9yDwxvsvkSIrqg==
+	bh=3XwYtFfajwQV83c7HEcG4lBPXk2p8oqhRXS8V69BIOY=;
+	b=BX9EZ7GtyRdXFgoZ8zVCVOc1PlrvdTpsXvsxzd4MiL85Dn51M7SYl/JU7O3nSAvnLc+F
+	 pvJ4ZRl/u904rHH0ilb1r6m+lrt1qZfVuUJLUJNJkI7G52Bc30de2fZVMexwFMF11avdH
+	 sEm0ldfEDxkf+6HqUZGeG3hlq7mcJDqt9ODb7PQG0bOgOAesAJErtq1Q/t5f7Z7pjd4nG
+	 VPmHWZ4DNarUTOVKwCP13+C6pOrGFP6NfvEL7aukQKbIj/7nKp3cycMMhVabFzBXAnFLJ
+	 N1afsWSueeEzzno8z5ci+AJBrJN8S7eYQ1gnZqyWAtvUFR4s5oZyvw0NoRo2aDx+sJw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=DJJ6I8Bf;
-	arc=none smtp.remote-ip=209.85.210.41
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=hphDgB+9;
+	arc=none smtp.remote-ip=209.85.210.49
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97EB606A31F
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B97EB606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5301606A31A
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B5301606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=DJJ6I8Bf
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-843a4ca671eso638455a34.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:58 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=hphDgB+9
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-82380b0f55dso617643a34.1
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205898; x=1793810698; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205899; x=1793810699; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=43fNiymvfrbcShBUvXeBFpEWnvLGZyv5ExKLMUTpuaY=;
-        b=DJJ6I8BfpyMiESxS6kEEqQTB+Vcs1ksrOGcNxKfU+8ugk1eCSAMiMlpYKnBaqE2WZB
-         lIr84zgP+v1UqaM9zNvI26/7V5y3Dy/IUAfiQHzbi3Im+gJNMVJFgwNEhLCytG7EEFZY
-         gTBOuy3s7swLhaylURGXAaXOH4C4wTeGQKWZblLxrMorEs8QKv4duMnx97/DAW5SSsUH
-         DyKhvuRPiZVPxamH1fEfVQxVdQlNn55KFgpsV/q8ijOB5c7cnqjnsJgsuMVEIaBHXKf3
-         z68nriXw0ufIVEKoEVR+k/qA45QVthlghWWgs9JueW4zrsm5jUHquvRro03zvlWT5k9w
-         siBA==
+        bh=3XwYtFfajwQV83c7HEcG4lBPXk2p8oqhRXS8V69BIOY=;
+        b=hphDgB+9sAcgRrW3GuQA9LYueU++2C3xR2Ye2YcOU6+SeyMbnX/FtqkDQ+uRCXMqCy
+         0prBhemIp3MJ+laLAXLnPxVFzy3kjEsM/p8FTfUiTskrv2SsCZgSWxUonsCP6TsEYlyl
+         jsWiLeqe297XgFpiLPTZ7j4bjXtU91+xjAS9ITybHCh5Apr9Ygs/zHIiK9iOkH3SMHxG
+         wHZclpIVCMe3MM8xwNEZTc+BwuJRVTR/9RbBeBvNDllscApFMBGi8pTX9ea9AeYljEI5
+         hx2mUWzE1ykuAitB4lRnDg1whBipI075g5PINmNNcoPxWRJdsnPMLxlCh758lRtArWgH
+         hIyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205898; x=1793810698;
+        d=1e100.net; s=20260707; t=1793205899; x=1793810699;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=43fNiymvfrbcShBUvXeBFpEWnvLGZyv5ExKLMUTpuaY=;
-        b=qGy5PW81GNcTbJ9kRlBApr6cQN0r1T+InBV+qW5KuM/Ib1sRP1ZMHnhjoEgl4P3B2E
-         oZwy0P8cJiH8LkJ7vUxJTU98gmuBPqHdVmDoEqfBbUXFcPHtn7ujOq5jFxfoRrsE8VFh
-         HnIDJFT7kARFtkVTngRYmjjbRmxyE0PRXVkaHDTa8qQY61fX7YHyXehbXDylzDkrh0c5
-         bN5aiISgsSX9vT5smNcfdP/nU7IcdEMBlD13z2H4sHl37CHEJnQTea3SvHbnbuuocM7p
-         PYsp0N9rIhaBwc/Avuq3GcKXE7glhAeoH8SLfE2bAB99yEs1VrxV1RehSwRKEIsu+X6O
-         PZzw==
-X-Gm-Message-State: AFq9FYIowA+ruRJzXBpJZjpLxxvUPDDz9TxN2VcZmSwEEcFVNel3qewv
-	UeEqZmh9zawg4WyTbUdyfuZImGk+eDYOCFe0AEVgJbdBuYJM61B6DKHqH1tVmXASS3j0SuIoZ96
-	5FnRNDFk=
-X-Gm-Gg: AYBFou2PDKXLLOM3doksJ1ysUs1t4ZvycKGZdYKgH2RcCZ8+PqS0wx/QoXurMxrZcfp
-	HA638C7pU1F5M2gMlzL00c1BjmEYKk7f2F3iK5A0ra2NNHp5Im8SBYoAcsnCTlo4wVvWR9/qVe3
-	/0Pbm1T2MdJh/HaSLWZ/R72yxV1QxxOTpdzdkeLxsry61sF2bW97EgoIUtDFrR/CrfwNQFoC/zY
-	czdlTjeHE1ADZH60h44/biwDj+0O43ci9y5HqjRvNafm0Xt2/LqEduNBBqp63gjtC0GB8QuGEhr
-	JbR+jOsK+C8BHdBT9FM85h5+RWCfQ7lQ9TYEvk9zw9D8ioDGRp+nyXCjnfpl9SIMbmq9/M0riYJ
-	tOmuULLlEVtpQLLSAefSlRqbGRZu9g1UM/zzHgXy5w1jusSPSA7Whrni2O4mUPxcoHXTnBTEXHY
-	yl+h6t7OwyXjI4G2pf5Dql9xUt97/zS5RAL1URxQleOAcwjxF1XYx3943ApL/Wf0HmE0CJhHT2C
-	C5+Inhkz3yNyN6q8ByyxarjC5Fe2YCIwXcC2XAdQfTs9MwUYxtuwQfl3F66sfWyinPDOW5jneAc
-	s9qyBvRRddCBH0a5KHfMPe9YT71I4chboFNv9yNgEaG6HP8o306mH6Dm4htfJCV9eSvjhtiCaGK
-	3gvN5pdaEpNY+gWlt3G8=
-X-Received: by 2002:a05:6830:6415:b0:821:a94d:3b51 with SMTP id 46e09a7af769-85ac0ed56c7mr2267982a34.25.1793205897736;
-        Wed, 28 Oct 2026 09:44:57 -0700 (PDT)
+        bh=3XwYtFfajwQV83c7HEcG4lBPXk2p8oqhRXS8V69BIOY=;
+        b=EgQV2iFHF5xMrxSJMf4pZkda1VvHOGNvwJ2Xw8RpFj52W3F9PLktyEZoTm3iPxvfrT
+         dJDLMJV6WMnus/Mv5dsvF+8BJ3iryG4ySlS6265Wbs9fWa7Y2eQqHhmwKaZEgC3lkGan
+         R4HYa5exy2a/SFSF57O9q5QWF1Q7i33bkigijbnf66LL4A2rwz4uIWGKvGu0g+JhnSKt
+         uNoCrFEIEc10PNZMP/9e3Xm/p7WsVbNNorhlO2AUxN2UFnu+PqzRYeOIaCgH5HdxcdkZ
+         JSHfB3hjxqCB6yTvuK636T6JwENDXhALjgMa71dutzFwLkCL7mqegiAUwW4yu1iM+cj4
+         052w==
+X-Gm-Message-State: AFq9FYKI+urHWfeo0wj9S6v+gaiMtuMeOa+0SNpScQN8QShFV2b9lJT6
+	lUPZjdE/16j7doADsIyEC8dwF6F8fbi6zBJSqyOhxhd1ewOnL2XtYGxVr3g6YKEMq1zD6gyqAgy
+	EymWo1Hw=
+X-Gm-Gg: AYBFou1zOWFKt+DBNALGHI4WIlQ7M438Xl+Po+9N9hhLyi/WzxD1YpgNITNdjV4h0EO
+	y6UwXttjuzn9r22x2UQ0qKJBcsPjIcpCl8Wvc72iIyvDI8HqJwbmMrv49/lgPh7b5zj2Ca4RF1q
+	luzC11Wwr0IOGCNqbKwTV+CCjYEwUVrq7OfiNtLD2w6UMFNgap3oMrKAZFwubpsaLkFW52voWhF
+	u55eiLUQZefqwWSafkzAVIGtuLYaiQt3ZDGo5srTEJ+RHtxrIlQWha4FfEuOh6LUS+hMqeaOeJe
+	dHsWHZx3YnrcOnHAui1nJ2xDaBPEO3biXYw0GvemIzO9bNPgveUZ6rwv7vCUIaFHHaeXpNV8DcD
+	HT8QpmWHC+NqDhWo+BVSP4XNPC8IqqBOZVMjmEVoRhzR0jUzhc0PostMdFNIdXQZ27Tkrs9hQBW
+	Am+jnX93Uy2l9yzc90n8XxNHFDgH/7s6ctyYtsN5olNFjJfec4lrY/vZ7gVz/yvuhPuMCZJ0ZUz
+	PIfNjgXCW/SKNShEtLOllYoQEtcnp9kpml00jmuJMF9Myodrfc0rG6wWgVqqsnFWubUq0ac/CdW
+	1spTHUQUbBagyuDxJmKcAezjP0JBuzEd5mt9JSM4muKIML53JNVjTDqU5lY9vdxkzwEIhuh441t
+	3AtwjQwnew9rANouZBr8=
+X-Received: by 2002:a05:6830:a1d2:20b0:7fa:ab72:9e01 with SMTP id 46e09a7af769-85ababed424mr1852580a34.25.1793205898765;
+        Wed, 28 Oct 2026 09:44:58 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.56
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:44:57 -0700 (PDT)
+        Wed, 28 Oct 2026 09:44:58 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 32/98] blk-mq-dma: initialize the dma state for P2P, too
-Date: Wed, 28 Oct 2026 10:41:35 -0600
-Message-ID: <20261028164415.1262013-33-axboe@kernel.dk>
+Subject: [PATCH 33/98] blk-mq-dma: map the metadata a passthrough request has
+Date: Wed, 28 Oct 2026 10:41:36 -0600
+Message-ID: <20261028164415.1262013-34-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -102,32 +102,48 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-blk_rq_dma_map_iter_start() promises that the caller need not initialize
-the dma_iova_state, but the P2P bus address path returns before it does
-so. The state then holds what the last request with that tag left, and
-blk_rq_dma_map_coalesce() describes a transfer as one IOVA range that it
-isn't. Clear it on that path too.
+blk_rq_integrity_dma_map_iter_start() sizes the metadata from the sector
+count and the device format. A passthrough request has whatever
+userspace gave it, so too much is mapped past the allocated IOVA range
+and too little hands the device an unmapped length. If the data needs a
+second bio, the iterator moves on to it and dereferences a NULL
+integrity payload.
 
-Fixes: 858299dc6160 ("block: add scatterlist-less DMA mapping helpers")
+Take the size from the payload and stop at a bio without one.
+
+Fixes: fec9b16dc555 ("blk-mq-dma: add scatter-less integrity data DMA mapping")
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq-dma.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-mq-dma.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index 88fd9cbc951f..e0e7a18790b5 100644
+index e0e7a18790b5..5df704bbd98a 100644
 --- a/block/blk-mq-dma.c
 +++ b/block/blk-mq-dma.c
-@@ -181,6 +181,8 @@ static bool blk_dma_map_iter_start(struct request *req, struct device *dma_dev,
- 	switch (pci_p2pdma_state(&iter->p2pdma, dma_dev,
- 				 phys_to_page(vec.paddr))) {
- 	case PCI_P2PDMA_MAP_BUS_ADDR:
-+		/* don't leave the state of an earlier mapping to the caller */
-+		memset(state, 0, sizeof(*state));
- 		return blk_dma_map_bus(iter, &vec);
- 	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
- 		/*
+@@ -13,6 +13,10 @@ static bool __blk_map_iter_next(struct blk_map_iter *iter)
+ 	if (!iter->bio || !iter->bio->bi_next)
+ 		return false;
+ 
++	/* All the metadata of a passthrough request is in its first bio */
++	if (iter->is_integrity && !bio_integrity(iter->bio->bi_next))
++		return false;
++
+ 	iter->bio = iter->bio->bi_next;
+ 	if (iter->is_integrity) {
+ 		iter->iter = bio_integrity(iter->bio)->bip_iter;
+@@ -348,6 +352,10 @@ bool blk_rq_integrity_dma_map_iter_start(struct request *req,
+ 					   blk_rq_sectors(req));
+ 	struct bio *bio = req->bio;
+ 
++	/* User space decides how much metadata a passthrough request has */
++	if (blk_rq_is_passthrough(req))
++		len = bio_integrity(bio)->bip_iter.bi_size;
++
+ 	iter->iter = (struct blk_map_iter) {
+ 		.bio = bio,
+ 		.iter = bio_integrity(bio)->bip_iter,
 -- 
 2.56.0
 
