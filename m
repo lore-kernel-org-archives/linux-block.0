@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205928;
-	b=nek1ve66acrUfgUfSThONc3MtmkcaW9merv8EjOjPfTwoD2wEzftq5XMBA5SBAMfiCxJ
-	 w8UPXXzcPCsWMGtSrX/Wwbw9HTEuLYGCCWwtdIXx7lp+S2dClsbcXd6BuJh3KlCuo6QdN
-	 L5WS6vn+tEX5RGReHPvVMkMboHv+WgnHn4RTh4/Xu/SsNFElTCYPJt0UYHGvR4ahKBNK4
-	 Ohsn9at6wtIYox23DwCcEt+W4U50VHd1TajuOWh9sHeAZ3hWqAUtZBMv6KiFX6vChe5IK
-	 5CxBW/6wbpRWy7i3Yi1OKTgTlHUWc8MOjarHcg0wDOeMZmQiawRsOkFSMxSXJspDdhg==
+	t=1793205930;
+	b=U7UA7CzWA87s73/NZyOG80u1ng8lQslfUKLJOQKUMutLCvSxDP5iXLK7ZhUtcg7pLo56
+	 /5aWfNkPqgFcmtDVyg5bwONq9KJpYJjL39RZ+tWCSA9IywReuWCcoLeHcEqCCoQ6UPMoi
+	 cT7XV2yD/nFhG6AjuXo90//UPBnFHIbeWqGFi8ObnEndKMmh3hDCHTbD2dTBkFiUtvF5O
+	 64+i/Ap8+Fnh/Pf8rQAa5ZVN0Xlvfu2fybHUrFaHkrQ0XRxcanJ/aKFan1cht2yHOpjmz
+	 KlvqwVzm1FACa5G6xitZSxeUrlwpSaL8ZlMnQ9VqKCp9phY3HBOzVnmpeK+raVD6duQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205928;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205930;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=9SVZHFdxkVZAvDR8KtyQ9mon7rHQzeyoCf14TxWDZB0=;
-	b=LWF1DMKD7oS/z+KI8a9RR1xx4dhLUuyLIV+7bUz18nH6FDdj6LrU+m5RbcCyPBw2UOv2
-	 CefCcVyPb636jJc2vnSqUtND+XRkVOtj2W3drVfSLECmlw99sChlLa2VDZAv36YOlOZy5
-	 2Dv4eqtAe3doSi/RRu3cJ86LNdWLsEcY/qInk9eTQcgmUyEChcdNq48BHseZKBzVKfqzM
-	 jSACpkyNpypxPotv5jbuRYiqOk0WmFr/88u9vd1oCFAr8S/nEXtQlITbk8O+kQGHSk+yR
-	 H4EdX8yNmOI6nYlSs758PWr4mljP7UFJRywnzeiIfP85GU+EvTvOjfLGwxvtU0FAgiw==
+	bh=Kw6hlJlUz1H1awk4MapK55p+HFEzrVNfUFOayv/6HwQ=;
+	b=AG0CyS8pFv1jvrBXVf+v9Rt9gt26N3KlFTFOlq08peZNBPX8gJC4GxWNCvW+BbGK992x
+	 eHdum2mbeg2iAnZ0MTrcmVIrbuSppYECzh5/zlkeheMv09EjVZlGAsCNsSswhBURP+QVB
+	 o9pUPStuCAfQIPFrLCcIs2D3Cqi1TfuluUWTJrVnwXc4MYFr0ZorTtofU5nDlvsZNFUjl
+	 nr27JBfbL5Y1BgfDLWWh5AxKicDTYUY3PgKU56OAz6bNWA3eInbU8nIXQT4inXHJv0KV1
+	 MGUlonVQ2syd3Pk7ZvuX9r6GnsbdR/BO6KYBJoI6CxDSqklzgnJh6Yju6sTVw4tC3CQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=ubYWIFal;
-	arc=none smtp.remote-ip=209.85.210.42
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=ayZmbKpa;
+	arc=none smtp.remote-ip=209.85.210.48
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76306606A327
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76306606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AE4606A327
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A6AE4606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=ubYWIFal
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-8256106635eso661890a34.0
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:28 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=ayZmbKpa
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-84e513877a3so1112039a34.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205927; x=1793810727; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205929; x=1793810729; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=9SVZHFdxkVZAvDR8KtyQ9mon7rHQzeyoCf14TxWDZB0=;
-        b=ubYWIFal8OEVh8vvymVvflYlCycZxK6MhOmGJWM2GwRtOX2a8l1IsGSMzl06p5CV63
-         kZ1GYD5gcEnlTBhYu+NfizxW0WIGy0uLuHqvfZJNW8EmvmCRaUUcWcoEJx3wY/OlJHfl
-         z7HGVXMFot+SUJiVfh0pIEf1lybcblGgAMlHTOzdi2Qzln9zU7BBAq/U/VQXmRLEqou3
-         63btQJe8qzRcSBtGNkIYn2pPd7C5Oh96It34zfGryMklR7SzJUl1PUDX0fOOUOw694QI
-         RPJCHuAS6oeRZG9NWOETiz97fFKp1HENj9dhU7geK/rrt1Pfk4M5r00tcMDwyPoDLloM
-         qtvg==
+        bh=Kw6hlJlUz1H1awk4MapK55p+HFEzrVNfUFOayv/6HwQ=;
+        b=ayZmbKpaUA1JpAtYjQ6XN29KcxsLlkdhdRCrjWpL97u6H0meFV9N3bLsbw8rvUkX4p
+         eI6dyRZbR9F+QW5MbxYquGcckhbXod41SgMYfdnfWOS4hs4SPctlIcLS1JS3gZyVm3w5
+         OmzPa9onfhPATfoIeboaLrTHx5SAo0iDD7Ku+MpuhB1wYNrfiUCV5j3YpODciNJ83pbi
+         Yam9Ke+pDNSckRwFIbC/zT072OZD0OHH05YKZiBKpkC9d3kYExXh1AdwNaVyuV8LYhDf
+         Le48ZnfKNZO2v9GSwi3Hv3cjSRJUEPHvkovKrZ/dQKvVnAGYaNEYNepHzNkmqKJquzXA
+         zegQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205927; x=1793810727;
+        d=1e100.net; s=20260707; t=1793205929; x=1793810729;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9SVZHFdxkVZAvDR8KtyQ9mon7rHQzeyoCf14TxWDZB0=;
-        b=YxPQqx2YYcXtPnFqgzUPWEDWl/Mv5G8seqBTng/hoYWjKY0xCXIPNa4Y9U4EUpANQq
-         TxAQQtzVmBcMd+PjLrxnJjsyk8BfgPH5ufBm8c27r9t/AkqRyJsQesXJCkSKMOsaS3Nz
-         dV9g6oUfjXeu/UnnT7Bd+8GEAL5RblD8WDvMxMYyRDs8skd3NU9JBOs4rEEG1h59aI6u
-         DtNvexrmQS5og+4OJWDVdR8d1HnaIf4HYzrQh0VG5GDlvZoIADtb1GMcZ2YqJc7GOvNV
-         B0MH5NSuBdU7gAp+eJOwTe8rnIRJZZRbyCgamMcw909ojo598DVqZ/o+hHSGDj6HYbux
-         lCzw==
-X-Gm-Message-State: AFq9FYL0l7/BZ0iXgVXPbZ5tUzo0LQJPIu3uE8q6MKw5KzQs9aJPBZXr
-	O1bPu3PMh/PUNQYLoH9+IIbzHkfaEDEAlkQymVVfwTKQyOVCy04qZEY7lf64OekGok0prpux6/4
-	0CwqLuzg=
-X-Gm-Gg: AYBFou0F4dY2cDxKdWJJvnmPxrJ6zbnyRvB3jsPRLxRT30GOpW1uy9XR9foQMEDv+W4
-	tFXSUSsLR/KT90h1bacGJvHHkwNoMcOuVMc7rbdkwSGvYaJmADydMmpGvYDDzyTo9VTIoCjbHkN
-	9H2Hk5n3QMYFMkIuM8HqoqC5UB6h3c8mOGXjnj8pYVhbj83m78hr7FUbjzyKvyErboddl8zK1Z6
-	LBlYWDsPNLs7SCJ2Gn2l0u5nBavntKqbgvL+SsHyJu6n0CVdW4txkHMStyZvWYl+9Lo+8D0DR5x
-	dGa2NeHqpIbblCeUNj0AV912tS6lJLwZ3bBsrf5vM/9Pij15/SYQHfoilX9T3IgDmcQEOcOBplQ
-	CzD/eIREXOZpw0T2QYs1OhxXgH/XkwkreHTGZMy3NlE0ueG4JT4s21mJS1qkijN8WEz7vpDPzAr
-	L63vxcaN8du/4pclh70d/1kIMIIgJM5+zQqoXKb+010DgkUtFDnRn1Yb7N05zSHUNHAZGqshuoD
-	k/sxTI9G2ObPUBRbrW3z8UhehUaxUA+tFR5GQSaZq7chu95/1/FWX16xMxI5xY9/Ayr9L9UyQ/b
-	RbjmWfRgFVML0RXxpphnVxV2L1s01irXrah0jMwBVAlQrgMv2rQTHd8Jd5tkqU13/mJpIN12zSY
-	=
-X-Received: by 2002:a05:6830:630b:b0:81e:abb6:749f with SMTP id 46e09a7af769-85abf770ce1mr3019644a34.8.1793205927464;
-        Wed, 28 Oct 2026 09:45:27 -0700 (PDT)
+        bh=Kw6hlJlUz1H1awk4MapK55p+HFEzrVNfUFOayv/6HwQ=;
+        b=wrxjdK1OFqxawd886gN3C/Qy/OM952A6yMpq4Nh71qu+C9fQHPIP+UjfLi6ZVZH2U0
+         GTc4GWGMb4qHgYjyYntNp/C6Nd34/hRuC7BhJSguwO65Ja2/4fb8O5OgKcg0xzOztTLG
+         jC0AugBSUrX1NxNljfSLbnS4KMXxH9ZC5wS/kB7G1tgEciKGtd5Gma7e3S/ZHYKZrrfI
+         cQBIaFCsLPA3AaSTtV9q+GVJ8Qnc7c0SoPsfnm3ubitsN7NnIsmh/xEoklg6PHwnQ1hQ
+         6DSDNtI9NZhYwr8o0Z2A2Oc0Ca1LSW7z2N1+PLpM1Wk7BB1oR/A8aVP34q76TdVhJu/W
+         HgXQ==
+X-Gm-Message-State: AFq9FYIyOvmVtykwJ60rOSrWJey0iWmzQpIAba4ulwSBPaSBmsTnBK+M
+	mWU2Ho1irw/VHhn5ZgyiC1rymJJ7AztPPkDOREcTg9AzIIBulojhjqNNaZJ4GXBqpn9z0nP+wCA
+	zYQX2NAQ=
+X-Gm-Gg: AYBFou1niVtYjxJRk1mX0DCqWbRgeIhRrrXx/eYYsIgSargI0bKxa+hA/oT6G7o+gsp
+	pA2+Mqz2DyqROZhAbMDvicnJ8NpRvn/Y4af+iF0NOpTH2b4M+7J4yDYs0dIVwomjJZOOVPfQ4WP
+	uZZeATpnfbvFYx5kQkQnP+r2lnCHOzzlbohnUZ50ltoSrSgRV0g5/wfej7UVzvxMNfOjZQ/oG/z
+	Ul+nL7Xdwrc27c9T24QWzXMYOmvSBvTowLm9+t2+4dGOj2peC1zcVMxc06ofnyELZE1MuOlly5O
+	XghqDdDpegMO44Y43h5EoHWffM2+5P13qEDTIxX1I1MLq+wWqrsaM+62UR163Nz40lQ5yIhYP1J
+	47xb0CFfvoORehdQgneCCiVaeFUcctN9F8Y34emEAk1MWAIu0gNNZC/U9aj4L9vcvz6pMDaz3LO
+	45E5ZfEGQ0PgdLUz72CL16AHczf5GhtbvO9W3DL6KAnRIyQW8MSeGUFyBo8kqzaTV6Ojv0LG8Ak
+	SG/fQKzN9ny8DmVRtcE94tMJSFKcWpC0A7jp6BBLfd8+xoxPHo4CpFIHX+qxzejT+riD0r8GFJX
+	yZHAJ9aHEFbzu3jAGBkU4UjQkSvR+RM4pB/I+0HXUiQWmALIle4qX0prwwzpHK4uNY8o0wME/8B
+	a8X9sWXoMeNG2jnTHXFc=
+X-Received: by 2002:a05:6830:4492:b0:845:8d86:9f81 with SMTP id 46e09a7af769-85c1eabf036mr87190a34.6.1793205928677;
+        Wed, 28 Oct 2026 09:45:28 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.26
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:45:26 -0700 (PDT)
+        Wed, 28 Oct 2026 09:45:28 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
@@ -86,9 +86,9 @@ Cc: Josef Bacik <josef@toxicpanda.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 56/98] nvme-tcp: don't queue the AER while it is being sent
-Date: Wed, 28 Oct 2026 10:41:59 -0600
-Message-ID: <20261028164415.1262013-57-axboe@kernel.dk>
+Subject: [PATCH 57/98] nvme-tcp: don't send SIGPIPE to whoever submits I/O
+Date: Wed, 28 Oct 2026 10:42:00 -0600
+Message-ID: <20261028164415.1262013-58-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,79 +105,81 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-Every AER completion runs nvme_async_event_work(), which has
-nvme_tcp_submit_async_event() set up and queue ctrl->async_req again. A
-controller that completes the AER twice can do that while the request is
-still on req_list or send_list, or being sent. Added to req_list twice
-the list becomes a ring and nvme_tcp_process_req_list() never ends:
+nvme_tcp_queue_request() tries to send inline, so the first PDU of a
+command goes out in the context of the submitting task, and none of the
+sends pass MSG_NOSIGNAL. Once a connection is down and error recovery
+hasn't stopped the queue yet, tcp_sendmsg() returns -EPIPE and
+sk_stream_error() sends SIGPIPE to current. A lost connection that the
+driver would recover from transparently instead kills whatever is doing
+I/O on the namespace: with 16 dd processes and a connection cut every
+other second, a few die within a minute.
 
-  WARNING: lib/list_debug.c:35 at __list_add_valid_or_report+0xd8/0xf0
-   nvme_tcp_try_send+0x51b/0x600
+Pass MSG_NOSIGNAL, like nbd, drbd, ceph, cifs and sunrpc do.
 
-Leave the AER alone while the send path holds it, there's one on its way
-already. Initialize the list nodes at allocation so the check is valid
-from the start; nvme_tcp_fetch_request() leaves them that way.
-
-Fixes: 3f2304f8c6d6 ("nvme-tcp: add NVMe over TCP host driver")
+Fixes: db5ad6b7f8cd ("nvme-tcp: try to send request in queue_rq context")
 Cc: Keith Busch <kbusch@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/host/tcp.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ drivers/nvme/host/tcp.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 06c205703cf5..be3938c3cb6f 100644
+index be3938c3cb6f..c9531e653a2c 100644
 --- a/drivers/nvme/host/tcp.c
 +++ b/drivers/nvme/host/tcp.c
-@@ -766,11 +766,14 @@ static int nvme_tcp_handle_comp(struct nvme_tcp_queue *queue,
- 	 * for them but rather special case them here.
- 	 */
- 	if (unlikely(nvme_is_aen_req(nvme_tcp_queue_id(queue),
--				     cqe->command_id)))
-+				     cqe->command_id))) {
-+		if (nvme_tcp_req_busy(queue, &queue->ctrl->async_req))
-+			return -EBUSY;
- 		nvme_complete_async_event(&queue->ctrl->ctrl, cqe->status,
- 				&cqe->result);
--	else
-+	} else {
- 		ret = nvme_tcp_process_nvme_cqe(queue, cqe);
-+	}
- 
- 	return ret;
- }
-@@ -1646,6 +1649,8 @@ static int nvme_tcp_alloc_async_req(struct nvme_tcp_ctrl *ctrl)
- 		return -ENOMEM;
- 
- 	async->queue = &ctrl->queues[0];
-+	init_llist_node(&async->lentry);
-+	INIT_LIST_HEAD(&async->entry);
- 	return 0;
- }
- 
-@@ -2884,6 +2889,10 @@ static void nvme_tcp_submit_async_event(struct nvme_ctrl *arg)
- 	struct nvme_command *cmd = &pdu->cmd;
+@@ -1249,7 +1249,8 @@ static int nvme_tcp_try_send_data(struct nvme_tcp_request *req)
+ 	while (true) {
+ 		struct bio_vec bvec;
+ 		struct msghdr msg = {
+-			.msg_flags = MSG_DONTWAIT | MSG_SPLICE_PAGES,
++			.msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL |
++				     MSG_SPLICE_PAGES,
+ 		};
+ 		struct page *page = nvme_tcp_req_cur_page(req);
+ 		size_t offset = nvme_tcp_req_cur_offset(req);
+@@ -1308,7 +1309,9 @@ static int nvme_tcp_try_send_cmd_pdu(struct nvme_tcp_request *req)
+ 	struct nvme_tcp_queue *queue = req->queue;
+ 	struct nvme_tcp_cmd_pdu *pdu = nvme_tcp_req_cmd_pdu(req);
+ 	struct bio_vec bvec;
+-	struct msghdr msg = { .msg_flags = MSG_DONTWAIT | MSG_SPLICE_PAGES, };
++	struct msghdr msg = {
++		.msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL | MSG_SPLICE_PAGES,
++	};
+ 	bool inline_data = nvme_tcp_has_inline_data(req);
  	u8 hdgst = nvme_tcp_hdgst_len(queue);
- 
-+	/* A controller which completes it twice makes us come here twice */
-+	if (nvme_tcp_req_busy(queue, &ctrl->async_req))
-+		return;
-+
- 	memset(pdu, 0, sizeof(*pdu));
- 	pdu->hdr.type = nvme_tcp_cmd;
- 	if (queue->hdr_digest)
-@@ -2900,8 +2909,6 @@ static void nvme_tcp_submit_async_event(struct nvme_ctrl *arg)
- 	ctrl->async_req.offset = 0;
- 	ctrl->async_req.curr_bio = NULL;
- 	ctrl->async_req.data_len = 0;
--	init_llist_node(&ctrl->async_req.lentry);
--	INIT_LIST_HEAD(&ctrl->async_req.entry);
- 
- 	nvme_tcp_queue_request(&ctrl->async_req, true);
- }
+ 	int len = sizeof(*pdu) + hdgst - req->offset;
+@@ -1349,7 +1352,9 @@ static int nvme_tcp_try_send_data_pdu(struct nvme_tcp_request *req)
+ 	struct nvme_tcp_queue *queue = req->queue;
+ 	struct nvme_tcp_data_pdu *pdu = nvme_tcp_req_data_pdu(req);
+ 	struct bio_vec bvec;
+-	struct msghdr msg = { .msg_flags = MSG_DONTWAIT | MSG_MORE, };
++	struct msghdr msg = {
++		.msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL | MSG_MORE,
++	};
+ 	u8 hdgst = nvme_tcp_hdgst_len(queue);
+ 	int len = sizeof(*pdu) - req->offset + hdgst;
+ 	int ret;
+@@ -1384,7 +1389,7 @@ static int nvme_tcp_try_send_ddgst(struct nvme_tcp_request *req)
+ 	size_t offset = req->offset;
+ 	u32 h2cdata_left = req->h2cdata_left;
+ 	int ret;
+-	struct msghdr msg = { .msg_flags = MSG_DONTWAIT };
++	struct msghdr msg = { .msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL };
+ 	struct kvec iov = {
+ 		.iov_base = (u8 *)&req->ddgst + req->offset,
+ 		.iov_len = NVME_TCP_DIGEST_LENGTH - req->offset
+@@ -1696,7 +1701,7 @@ static int nvme_tcp_init_connection(struct nvme_tcp_queue *queue)
+ 	struct nvme_tcp_icresp_pdu *icresp;
+ 	char cbuf[CMSG_LEN(sizeof(char))] = {};
+ 	u8 ctype;
+-	struct msghdr msg = {};
++	struct msghdr msg = { .msg_flags = MSG_NOSIGNAL };
+ 	struct kvec iov;
+ 	bool ctrl_hdgst, ctrl_ddgst;
+ 	u32 maxh2cdata;
 -- 
 2.56.0
 
