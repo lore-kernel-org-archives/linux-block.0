@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793218172;
-	b=hRudOfgTkMbRbAezHyTwlW3eXNl6o9d7mMXh/Mp6fbqNykeGv4sjd4G7BsbDov2Ra7S+
-	 fsHiFtw3YvyXtiTSl1ZgzxZmuoXDnlHJBrG3nH1x0s5NSITr9Gq2BnN5PXBjCwGfeGiP3
-	 qbUQQea9F9UZiZRDaWOz49AWW/qlmCy/UkaOy+bAGyFjtL+fsIyW6Mjq8I/C4KbudH3Mr
-	 RtFe2LikNXtm6OQRvzB5ZkdaHGLsKXojE7/IIympyjgX1qWcZlYgpu10dSHtKYqM/douP
-	 hR02cQ/w7Gz6w+vjAnof8/wq51flh4MHVZQ/4wgdj20vh0E/wqzpPAyKWh9dqmm2k/g==
+	t=1793218169;
+	b=jnIwFKwYKrBHGgI6tlUiH9WSr+MgmtbO0Q5T13w6xESJDgYzkBFMTuBU7rUkFmm2u7Qd
+	 SQbPzmBd8Bi5qaCImtV17KFJGZs6yRfKpatZFql9Okl0v1M/3F7+vhSJvVZm62elRAUBz
+	 d5qegE9KTuEE5WmihQO73DGiySWaxXAfQKZXjZ9DaG5OwhR1WD9hHMMSdE2pP4uoCINNg
+	 XicEfaFvRYkjfWv2DJLLNOJ4cZWS1n5/3nh/FdGmyrtfhgxjhH0/Tlh9iYz6nGoMRLiJw
+	 0x70L+4zzm2rFB2gEwtqwQcysppZH1DeMcRAniCwjvoFz7g+hn6/fnu53U3nCe3bN9Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793218172;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793218169;
 	h=Received:DKIM-Signature:Date:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=Y9prV6WuIi15Ykaoy1sEEO6x+8TCFI9Z8BWNg0g0Ywk=;
-	b=2wNocvp8hrFdtADf8lYBgppPZGx21wOmgOfGEfgVue8It1wbNCL2zI9JSDkWzuFyUQcB
-	 sXyDhaaM3G+lutP19LjKK2c8shLX75TQ1EUIAOH620Cwf7VxhuhimLY4PPVCUivSRK22u
-	 DQROE4qX9/8cVuOTLIt1lju3JzpapxAG4ISmuvPsLlg8jMeyDSxPGEhD1H9zoAtnU46uY
-	 L3J6+SWeDjCumsQJmMr3Kp7TAIyE4K0EGsCtnhL3EXcWaMhz4dkn6hh3tZsUfoEEbryWJ
-	 SCa9swOMQgopdZShYSYEe22DYqP7vRCQJXl5vnZWAZtFwhQsV+JgiORLaYv97hs+Ocg==
+	bh=Wp+0Yj0Lz4BPqvrq9eW7Lj8ytJ+Vwq7ZAYHHcFtuB+4=;
+	b=WO+4QJEWn6cHJOgeBX1wW8348gCqtjw7Tj43r/w3WhPUchpKhlBqPtGiVG3o/yAkW+6y
+	 fkNvgMj6B0nvY6iGFdLQ+lGjY4Mb2EQxOvxnaedVTUaZPcyPOM6OMmJ9FarYlMVnWmQMS
+	 7ftz5PCjP4KymKl4J0S8VCDyko3MWVCbCM8GRVSRZOjNqy9cfUSVoaq7spJ2PtsSLuXBv
+	 EGs1HVnOz2KMz/oFb03nhfoDwpP1H/G435TW/Uqu2pzT7hgugWIn3gs3aig7r5G10WnzN
+	 FnzD11t+ceRg9dQARrYXVxTiyOcKw1SrCrKFuYlqExTjHItlsYJxOm/DgmCKeGxys4g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="WND6t1/j";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iTbtDjsx;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D1260A3820;
-	Wed, 28 Oct 2026 20:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632A460A261E;
+	Wed, 28 Oct 2026 20:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WND6t1/j
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4ECD1F01829;
-	Wed, 28 Oct 2026 20:09:31 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iTbtDjsx
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0C0E1F031E6;
+	Wed, 28 Oct 2026 20:09:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793218172;
-	bh=Y9prV6WuIi15Ykaoy1sEEO6x+8TCFI9Z8BWNg0g0Ywk=;
+	s=k20260515; t=1793218168;
+	bh=Wp+0Yj0Lz4BPqvrq9eW7Lj8ytJ+Vwq7ZAYHHcFtuB+4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=WND6t1/jTFscSVNiNiVqFI+25ygKV43rBTw/IGzypSYvTe95dJR8SahVRynocJz6s
-	 IJme8Tw+bnsZrayFVEW9e/VCfLhvsXlE3jsnYpM7xzoAgfiinqstsy/fdVL7hEidlX
-	 ey4HcPH5A4Q6oRiAihCsRSxcGo27G7yJXQg6Sj9M/kHUGjYDznI9fyLcAWy2AGc7er
-	 8K2JehtT03S1rIasywLfEZEeS9QQYmmczaXqBM53X4HEH5MGRXpJR5k4YNVaYs0VI9
-	 NfGWP8hL2r3gR+K/tPfXUC5H86uJLwLcTChcka8RBIZfc44QgUktahYa5jvvglMI1v
-	 YSLmq2+fp7B5A==
-Date: Wed, 28 Oct 2026 10:09:31 -1000
-Message-ID: <72deb196d0dfc413a48f0739013bc610@kernel.org>
+	b=iTbtDjsx8xqclN4kfgdZjY1XlF0KJH7Pf3J9Fwf4+BT+f8ztEniqCbg7VMRZixZJ+
+	 ZfWEyso0onDCn77mMrpLV7e6ndxvet/04YcytET/gC9XjS0b4PfIj7KcGMbVbJrPLN
+	 IMYiqB6XrykokxWhKqmqBjk3FGIndep9I6OKXljXHC4ucd2NIXBymfn2TVkI63gHM2
+	 eDL4V/W2QNw/l3tUmmTSG14ncwEGlQ/xf3fMkEF3zVV55D2eIIdtw4fBcZeI9kCDZ2
+	 Ebo9yBzwnVrZt+AdCYsVAqBj+/Y9Btl+CEO49oqvTIivpDAzGsp3tbyIdWdjnXAcpp
+	 JWDEuKzpiuRsw==
+Date: Wed, 28 Oct 2026 10:09:28 -1000
+Message-ID: <0753eaa990c954aa56a0c5fa8ba302e2@kernel.org>
 From: Tejun Heo <tj@kernel.org>
 To: Tao Cui <cui.tao@linux.dev>
 Cc: josef@toxicopanda.com, axboe@kernel.dk, cgroups@vger.kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net, linux-kselftest@vger.kernel.org, cuitao@kylinos.cn, ameryhung@gmail.com, alexei.starovoitov@gmail.com
-Subject: Re: [PATCH 5/5] docs: cgroup-v2: document the iocost BPF cost model attachment
-In-Reply-To: <20261028143534.135968-6-cui.tao@linux.dev>
-References: <20261028143534.135968-1-cui.tao@linux.dev> <20261028143534.135968-6-cui.tao@linux.dev>
+Subject: Re: [PATCH 2/5] blk-iocost: add BPF struct_ops cost model support
+In-Reply-To: <20261028143534.135968-3-cui.tao@linux.dev>
+References: <20261028143534.135968-1-cui.tao@linux.dev> <20261028143534.135968-3-cui.tao@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,34 +62,75 @@ Content-Transfer-Encoding: 7bit
 
 Hello, Tao.
 
-On Wed, Oct 28, 2026 at 10:35:34PM +0800, Tao Cui wrote:
-> +	When CONFIG_BLK_CGROUP_IOCOST_BPF is enabled, a BPF cost
-> +	model can be bound to a device by attaching an
+On Wed, Oct 28, 2026 at 10:35:31PM +0800, Tao Cui wrote:
+> +/*
+> +/*
+> + * Deliver iocg_init()/iocg_free() to the cgroups already online on the
 
-Users can't select CONFIG_BLK_CGROUP_IOCOST_BPF.
+The comment opens with "/*" twice. clang warns "'/*' within block comment
+[-Wcomment]" and CONFIG_WERROR builds break.
 
-> +	Only detaching removes the model, after which "model=bpf"
-> +	fails and the device prices with the builtin model again.
-> +	Device removal ejects the attached model as well, while the
-> +	struct_ops link remains until userspace destroys it.  "ctrl"
+> +			/*
+> +			 * A blkg which never went online never reached the
+> +			 * radix tree, so it must not receive an init either;
+> ...
+> +			if (!iocg || !iocg->pd.online)
+> +				continue;
 
-"Only detaching removes the model" is followed by "Device removal ejects
-the attached model as well".
+blkg_create() adds a blkg to q->blkg_list only after radix_tree_insert()
+succeeds, so the blkgs skipped here are the ones blkg_destroy() already
+took offline, not ones that never reached the radix tree.
 
-> +	accepts only "auto" and "user" and never selects a model.  It
-> +	keeps describing the builtin coefficients, which take effect
-> +	again when switched back.  The automatic profile stepping does
-> +	not switch profiles while the BPF model is in use; as with
-> +	user-set parameters, the profile selected from the device
-> +	class still applies.
+> +	if (!disk_live(disk)) {
+> +		mutex_unlock(&q->rq_qos_mutex);
+> +		blk_mq_unfreeze_queue(q, memflags);
+> +		blkdev_put_no_open(bdev);
+> +		return -ENODEV;
+> +	}
 
-cgroup-v2.rst doesn't describe automatic profile stepping anywhere else.
+The guard() suggestion from v10 was only partly applied. This unlock,
+unfreeze and put sequence is repeated on three error paths.
 
-> +	defined.  They remain readable and writable while "model" is
-> +	"bpf" but take effect only after switching back to "linear".
+> +	/*
+> +	 * Scope the mutex so the tail bdev put runs with blkcg_mutex
+> +	 * already released: dropping the last device reference can
+> +	 * reach disk_release() -> blkcg_exit_disk() ->
+> +	 * blkg_destroy_all(), which takes q->blkcg_mutex.
+> +	 */
+> +	{
+> +		guard(mutex)(&q->blkcg_mutex);
 
-The builtin coefficients taking effect again after switching back is
-already said above.
+The bare { } block isn't necessary, and ioc_bpf_detach() has the same
+block with the same comment. Can you drop them?
+
+> +	/*
+> +	 * The attachment is checked under rq_qos_mutex first, so an unmatched
+> +	 * detach exits without freezing.
+> +	 */
+> +	mutex_lock(&q->rq_qos_mutex);
+> +	spin_lock_irq(&q->queue_lock);
+> +	ioc = q_to_ioc(q);
+> +	if (ioc) {
+> +		spin_lock(&ioc->lock);
+> +		matched = ioc_attached_model_locked(ioc) == ops &&
+> +			  ioc->bpf_link == link;
+> ...
+
+The same 11 lines check the attachment again after the freeze. The check
+under rq_qos_mutex after the freeze is the one that matters.
+
+> +/*
+> + * Pluggable cost model interface for blk-iocost.
+> + *
+> + * A BPF struct_ops implementation can take over the cost model of one device.
+> ...
+> + * offline and its free. Both callbacks are called with ioc->lock held and must
+> + * not sleep; the delivery points nest inside queue_lock except for iocg_free()
+> + * from ioc_pd_free() in blkg_free_workfn().
+> + */
+
+This restates the attach mechanics and lists the call sites. The comments
+and descriptions in general are still long and narrate mechanics.
 
 Thanks.
 
