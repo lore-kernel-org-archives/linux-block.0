@@ -1,50 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793218170;
-	b=Dn/vkiQtRqk1NwG1B+EEq8YZRJylmodEg6zVtPceww5Mb2UKZEkxQylnL5cf/jIqD2Ep
-	 4+N2syeFELGJQSqHqOs3+Xriw1//N7r7+TKQrGCR8rj361sOgufBXKLn6Cb+lEe+OjBUR
-	 U6X8YIbxXPCJkCw8f2Kek5aBTG/AmEKPLQCtKnrVcsbnc/06+bo/JKzG/jKI30Bv9N/ka
-	 dwSaTKsLrrXizsslbHftY3kTsGw87tXg/vF3pT+yEBwPgqL2ldI+gGzGb7ulBWXWUXd9O
-	 qO1etKMrnAOGB+c6S1Fa/HaYn0Qcb/bA/aBrfZ4mA6hRUh1THRQrn6LKKHZe4Tvw4mw==
+	t=1793218171;
+	b=R5e/rx9I7EM4YpRNqe5tuDkFnf3Iy1DP3Q7p3LxBrmIALw7tl9ZR1ScUD2tviXrVXnHq
+	 Ax2zryUGn4w+UBLi+jxufU4KkQ/rY6x4tTuhEQMeQ/Rb5VP5jekcmR8ZaaTs4a6aX2fR1
+	 1LwQEUKUXVUKfuh26eVytgOMFH9Oedm8uw6ps6Rl9Sz0xQdpNxKul2n9JfXljBN8stXnM
+	 59LhdLYznwzsQIZSr2AdjamscLW/OUnL1O8huKr/1FZQsJHIZA9mIs/zGB/cVqFqye51a
+	 D7EMxyHwANA0nTQyCwjg2m5FSMq9wklkk5hK4h4BM3H1ztBGLdz5cfuuGe+DU5rv4jQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793218170;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793218171;
 	h=Received:DKIM-Signature:Date:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=A0SoP+W2Ylzai32YncZqgehMd2spWJOL4Ra8zJeBLMc=;
-	b=O8k1Cad0vc9VyfZrnsADeq2Oi+YxRmr15eyPSXYb89yeyHrsdWCzFX/Ttd+bc/MSt44d
-	 PaNpA4ySY+TCIAE1nOm9xhgfNrqm0SsxCe/gQ2CngDZUJc9FZA1XGyRnedAMZ6j+3oZgc
-	 0T/7yKxygNDQPrqQO5Lb0ienHikaqWL4vanRLS0H9aE+iIRAJgjK+rqoj+wg8xuXR8Yqr
-	 ncnX1OQxzS1xYWjzqORydDZ+4ebi3FNR+cWDqUMQqRNK8f3icZt5eQvndEHkp2dmznuPC
-	 evlzAX6VKxCSYykw3nuXDKl7QGi9neVyhitWJnj4wfVjRbDsSFnMUva2rzw+XiZotLg==
+	bh=mnMiENV9iiGt5Ln0FNczg1dR/kUQWH9k/F5fEuPMClk=;
+	b=zuvrGEHhw8B02Rjh5vYzlFzCk0XveTv9E4Bn8HExKmG6gpOxkdK43HlrpdEH9BQC/FE0
+	 TK3oALwS+LjXOMMBAGiV/n9y47vL7kFGgMW9ewXwYGgbmo18TKoXr5c0i1d/2SdeVAsIU
+	 X9JCyiRfHIvKybQUzRshI6OBpd/l7pcaMXeitfSj2OUZ349vjudtLt5Zy3L6PA4pgnf8Q
+	 1yeYA1zN0yllhfFOI+oYYx2mHunwdj84vaZ7qnWK3NfLCgomjbJXYVcjbNxnWQ+GYC06d
+	 MenmOEAZuIR4Drc1nL2B79TzrpY6O7C7yuPsZQR0G2aMmxvTZY7Yk90GA/GBf80N6CA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oTSD4Zo2;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F06060A2631;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE0760A380C;
+	Wed, 28 Oct 2026 20:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oTSD4Zo2
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F051F031E3;
 	Wed, 28 Oct 2026 20:09:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3CAC1F031E2;
-	Wed, 28 Oct 2026 20:09:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793218170;
-	bh=A0SoP+W2Ylzai32YncZqgehMd2spWJOL4Ra8zJeBLMc=;
+	s=k20260515; t=1793218171;
+	bh=mnMiENV9iiGt5Ln0FNczg1dR/kUQWH9k/F5fEuPMClk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=VGy58csZN31r8aoABGjrMS2S8VmwRqqyzOjc+yh6KtZj6Qb5kvGENOJfz5MKyZac0
-	 +96HIAVZJAFeZJ6zoZU3i7udNRXHp9sPOPWd5mK/M7XTWKpC+Ov/TW51gu6uX0u0IQ
-	 gQBxNRU9IeP3Phe59HrsUBj+npbiuTycUJfFW20GyKRX0Tb0kA5CPekQhaFIb+HyMG
-	 9HVfO+hC9fwiOQOjBUwa1Dx4vQ8qFfvyNYKtXKhPy95ScSfQliyU1ihruvcsCNbm3g
-	 A4KrSsQBbSYXVmop1yhEEaDOue97Hz3deALG4jRfiyVOkczASwgmF22h4u5DbtRXsV
-	 kOGE0Mk3Fi6yw==
-Date: Wed, 28 Oct 2026 10:09:29 -1000
-Message-ID: <b69d96a507aec382c279d62cfb038fa9@kernel.org>
+	b=oTSD4Zo2w9t8c3fEkQn+OjxBiMTcap9YffNtM9g68PkMRPpqe3StRXHBW/HCV8Sp3
+	 bCGJv5xTjZ9rwEbCfGa0OLYOyTiqYBpTf8dkRm1Fhfa6OiCvM7WWv+N8tcriAV3FTa
+	 vekLoxcxqxeqApO82N/gWA1+KgMdnQAq1INkupPZP1WksJjUKbt8JBQSlgGvH4Zl0V
+	 6owXpV3jVX9MKCZo7fs1vlaMl4Tcug+FcDphL0CPagufhTjj3JLAMUP6cYmIKUasvg
+	 EIk5ZUCGN540Ic5IdysaJnlzaMFOYgZXNjfzDR9+4KWcTg6z1YpQHQkgpzJxdMaxRJ
+	 nhvURshNGgeSw==
+Date: Wed, 28 Oct 2026 10:09:30 -1000
+Message-ID: <75384a99148fbd477e003453718b1717@kernel.org>
 From: Tejun Heo <tj@kernel.org>
 To: Tao Cui <cui.tao@linux.dev>
 Cc: josef@toxicopanda.com, axboe@kernel.dk, cgroups@vger.kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net, linux-kselftest@vger.kernel.org, cuitao@kylinos.cn, ameryhung@gmail.com, alexei.starovoitov@gmail.com
-Subject: Re: [PATCH 3/5] selftests/bpf: add iocost cost model test
-In-Reply-To: <20261028143534.135968-4-cui.tao@linux.dev>
-References: <20261028143534.135968-1-cui.tao@linux.dev> <20261028143534.135968-4-cui.tao@linux.dev>
+Subject: Re: [PATCH 4/5] blk-iocost: add iocost_ioc_tick tracepoint for per-period device summary
+In-Reply-To: <20261028143534.135968-5-cui.tao@linux.dev>
+References: <20261028143534.135968-1-cui.tao@linux.dev> <20261028143534.135968-5-cui.tao@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,75 +62,22 @@ Content-Transfer-Encoding: 7bit
 
 Hello, Tao.
 
-On Wed, Oct 28, 2026 at 10:35:32PM +0800, Tao Cui wrote:
-> +static bool iocost_bpf_supported(void)
-> +{
-> +	FILE *f;
-> +	char line[128];
-> +	bool any = false, on = false;
-> ...
-> +		if (strstr(line, "CONFIG_"))
-> +			any = true;
-> ...
-> +	return on;
+On Wed, Oct 28, 2026 at 10:35:33PM +0800, Tao Cui wrote:
+>  		u64 vdone, vtime, usage_us;
+>  		u32 hw_active, hw_inuse;
+>
+> +		nr_active++;
 
-any is set but never read, so every test skips without /proc/config.gz.
+nr_active is counted even when the tracepoint is disabled.
 
-> +	/* isolate the configfs and cgroup mounts from the host */
-> +	if (unshare(CLONE_NEWNS)) {
+> +	/*
+> +	 * Everything the tick reports is final here: busy_level was just
+> +	 * computed, cur_period hasn't changed, nr_active and usage_us_sum are
+> +	 * complete, and vrate and period_us still hold the values this period
+> +	 * ran in. usage is wall time over wall time, summed over iocgs, and is
 
-unshare(CLONE_NEWNS) alone doesn't make the mounts private, so the
-configfs mount propagates to the host, one more per test.
-
-> +	ASSERT_OK(configfs_write("/sys/fs/cgroup/cgroup.subtree_control",
-> +				 "+io"), "subtree_io");
-> +	if (!ASSERT_OK(cgroup_mkdir("/sys/fs/cgroup/iocost_pairing"),
-
-The "+io" write to the root cgroup's cgroup.subtree_control is never
-reverted, the cgroups are created directly under /sys/fs/cgroup and
-test_progs stays in the root cgroup. cgroup_helpers handles all of this.
-
-> +	err = iocost_model__attach(skel);
-> +	if (err == -EOPNOTSUPP || err == -ENODEV) {
-> ...
-> +		test__skip();
-
--ENODEV and -EOPNOTSUPP from attaching to the test's own null_blk device
-are failures, not skips. The same goes for
-serial_test_iocost_model_streams().
-
-> +		ASSERT_GT(skel->bss->iocg_inits, 0, "pair_init");
-
-This passes on the root blkg alone, so it doesn't show that the test
-cgroup got iocg_init(). The same goes for eject_had_inits and
-pair_init_again.
-
-> +		/*
-> +		 * detach implicitly by closing the link fd instead of
-> +		 * calling bpf_link__destroy() explicitly: the release
-> +		 * path must detach the model just like the explicit
-> +		 * call does
-> +		 */
-> +		lfd = bpf_link__fd(skel->links.iocost_2x);
-> +		bpf_link__disconnect(skel->links.iocost_2x);
-> +		close(lfd);
-> +		skel->links.iocost_2x = NULL;
-
-This leaks libbpf's link struct. The reason in the comment doesn't hold
-either. bpf_link__destroy() on a struct_ops link does the same close().
-
-> +void serial_test_iocost_model_streams(void)
-> ...
-> +	if (ASSERT_OK(err, "attach")) {
-> +		err = readback_model(dev, model, sizeof(model));
-> +		if (ASSERT_OK(err, "readback"))
-> +			ASSERT_STREQ(model, "bpf", "model_bpf");
-> +
-> +		bpf_link__destroy(skel->links.iocost_ms);
-
-The test never enables the controller, so iocost_ms's calc_cost() never
-runs. The multi-stream results in the cover letter aren't exercised by
-the test.
+An io.cost.qos write in the middle of a period changes both period_us
+and vrate.
 
 Thanks.
 
