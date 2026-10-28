@@ -1,88 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793207600;
-	b=QhyHwjJYonBMceqxzWjo1hcPXZvAiuaYYi94WnM502OpBRpDm2SpVghqb9BUsDUoFz0K
-	 xKPsOZBkNVtf6aenvf7ggvU/sMgbdOg+ROS0ir0UpoTkoP5NY3iI5rs3+E9juWsR96kKZ
-	 JB3SjUdbI5R9of4WqWx9WLYFRrT6heMZWKWSYFzPSpbSBKq4+/lDoQC3hd1NnrumKTDB0
-	 quRFrYuru6H/uBJV723cUFBciLDX8nHtmKzBsjpRkAGVewxkQwOEfWrJGUnBrMcpiut6k
-	 b+Dkuf1dk+If579etUWRWaT/jGijDqLV08+ja+KMBm1ots2RWJ0fTTk1XSGcZk5DEzA==
+	t=1793207981;
+	b=qacyIxw3KhnwjMCO9/MCu3D5yIRDmeZKRliWuXDxCTbuu4FZsTiPas2HZyLhnrMGqC7F
+	 ZgQHzgGSj5NlMPbzZVqjM7m/evJoHUxDnPkSyWXFmDOwbAYUIDZjwzSGPpvgOM6k7eegH
+	 bdgz5kpVakh9ByqxrKfq3x4sQoQM6ZYHga3su8Ln0V3BshikpDKo8WgB9p+Be89i1xXNc
+	 hpwJIbXNUaFOfg3pV1uYzeCO6efWTdT4DXsg30heCoQkOVodpiIRd1MRHROsYZawzAyRW
+	 E7aUsD7ws9PoqAUy+s+IvpyC7sEpjobiK+YnRw0RR5gsALVDgpOEA2/ZN/rwMvkmj/g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793207600;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793207981;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=KdJb1+otHKbAY66S5TWXTv0isFFDzUNZ4HEtijKmReM=;
-	b=PWBby852+SO+89tYWCHbh71U8sq2WL/5uAS1WjyB5HJBcsLehQUX1IQobABtippgVDf/
-	 7fHH/FUQMJE7fZQc3dJeiNhXYPZ/FajjnI0yM0MYQ/xQ+Z/ztkqoI34qPZKd9/rM9Pl6E
-	 RDPyGg2h+Su+plbXUyY0qTMW9bM4xWaYAKqt29oOvZz1IWW5KK01FvLeJ5c6V3uXdVtlf
-	 vM3wwhhxB9aDvJrGrveYatZwOYfr8cRAgfZuwqm/3x0jMMGrcwhVSmC4M1lXZanSrR7H1
-	 LRiONTtAxpw3aVlHMmti1P+2sjtrFWw6Vn/9orsoGtPacPSW3epzT349sx8yARNkEHQ==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=lAWulrjtYt7mxpMPX+OHNKu4/oFhSzNqEFCQHqnzkJI=;
+	b=e2QPUmdjishdsh881zaeAaO+sqd5daupvNPJZM+JGBTvp2h4svuaJneYjBpGrESzyTeC
+	 xZAgy3uLktKT/P9x1sTGOO4acyoZPdstCOxZajaRxoIbiFdTey47GQM9wq2EX+vdIJZ2S
+	 OzL24icQVtv86r2WjJD517ao44CJNAIFK5u86X4WbbumgYtnVkIuMzI/a7wSGjMY1GhJV
+	 vC/uoBlont97jK4GBl+fgZ5kJunizJSRFgIAxK6MFNAzECPgFnYGtA4pZu9i0bNLOSLqO
+	 112eUVE5WSaaW/NHRVBUS0dJggnSQwzICKx7HD/UHyFriXT/qOANFgc00gqTVVCKXWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=K6oM50Ys;
-	arc=none smtp.remote-ip=209.85.160.49
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+	dmarc=pass header.from=purestorage.com;
+	spf=pass smtp.mailfrom=purestorage.com;
+	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=QiJeCnIE;
+	arc=none smtp.remote-ip=209.85.215.172
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114F0606A31D
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 17:13:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 114F0606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C728A606A31C
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 17:19:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C728A606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=K6oM50Ys
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-4a76f63b243so1767959fac.0
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 10:13:18 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=QiJeCnIE
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-cc7e79c1eaaso613072a12.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 10:19:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793207598; x=1793812398; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=KdJb1+otHKbAY66S5TWXTv0isFFDzUNZ4HEtijKmReM=;
-        b=K6oM50YsyfDRlcFGLUcDwC0eiTCTtyJqsRGyIajd/jrTsqwR9x7uLIHyBlpA3ORxFJ
-         Jr1d9DSJDwGsULGS0ow97GNNj8Lc50YG3uTMf7D+NMKCSLzbXX9wEpia9oFA73jwhr/b
-         wMD12FEsZ6vtDFxvYK5v0fRXT0AVYX3mNjKAIdWDBKBwC1wkyac2CmJKBpSgBpf1ANoq
-         Oh7MlwzL7F+39jEcSSnrSZeE59O3HhjEUSUgCVTzJE9NUzYFRyF2P/tF7tJrCYZuYgc3
-         G9/MTEfc6T9njwzCpcr699pBThutnYVyLW/CBqS+ANdjWBpi8NERkF8W3LlCoXr24PG5
-         pMHw==
+        d=purestorage.com; s=google2022; t=1793207979; x=1793812779; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=lAWulrjtYt7mxpMPX+OHNKu4/oFhSzNqEFCQHqnzkJI=;
+        b=QiJeCnIEkvTsz1dMLNll2jCBX1FloSjtzFMmwoNze9PuLefK0/khYJQiKGATDK5GpH
+         +xf/JzDZWB9Ohk8VNkWWd/qxlACDRGpWM7Ln/oG/41lrjtbBTvpDqNAwB5S5YPKFKq0o
+         +0iCEHlPlwhfj3J8tHOijpVV0fhl+VnhU1D0a3cVe6qOgnan55CwkqRt+zSJWaF++3ju
+         bXoIbzzpBfZ3dA9bSuQ6mnAAKEwZWVZvHKBqn9bonmQ1m/A6k6rA9wgnxLdc2BIWCK9l
+         auELyD2R1ND2X+Nphu/6cSQTvPgUW+B2U7CxLoKZxyjEURs8l7/Flshwmpy9EhTx1QtE
+         0AlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793207598; x=1793812398;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=KdJb1+otHKbAY66S5TWXTv0isFFDzUNZ4HEtijKmReM=;
-        b=vdB1nE+Xh5sSxromj62AWWMnqu0Ox3o7KuKPtIQx5JUgT6TqJ4cqxmzj8T56+8H5ui
-         Q/21VNxFd4ISiXBRYQHeqUQjqwFmGtn9YjSnq52ETrpCZ2ly1kKOOnxO336aQv70oRtJ
-         gNiMmz/w1jbykHVvVnV61iuGZsPy6XRmGvGKD3yOj21l+HzdwPgZLFkJT5lYWOHzk8yE
-         NcD24XJkijtnhEPAgy1RoXlDc5nbr75nIscnILFDxdjh8jMD12SlOp2N58yqmhCx4qPK
-         imw3K6lhNweKQ0jr8QKh9c5JNX2guA7lgHBJ7b4Y7B0TG7TVzyyVCRxZCClzgvV11ujl
-         k3Sg==
-X-Gm-Message-State: AFq9FYJuL+mH1eXDzOne22raa6r0yfkyiaNuctk+klbgMVU9MxZU4D5p
-	6O1kWrVGmWGrlqMlw5Pn1EOvrJLEAGhsPb3VM7psnCx+43qkrVpLEi4Ov8A3KiagpWzQofxuEwg
-	fWaRa/1Q=
-X-Gm-Gg: AYBFou02kmO9UheVemqA7KLh5/UjonDpDRyu1DFTn6xv7fdna1lNfK6wSeElMuu4YRq
-	oGkf1T0IJH3GD1Fk72xAADhWjEC3hJ/lQI8DPgIYDwRQBQe66bksSLc1Ev64c0HH1Wq+G5bCZ0A
-	f9I60qFdZ3ByN2J76aYLpS0yMKVIoltsq6iA4tz/UO876IYOhMr+0k07peiXD8RS7hxjmjICW/m
-	/Tvtae88UOfxugl8+WAi9mp0zCKeRMxRZC17bacSAxuv8RnoEQF4GKg5CBRHea8AxEU0/l4OSDd
-	mcrmW+LM0ItnWXbnhRQTzapJ5jNH+OW7W4X3MNyncQbaoVUg/5y/WVkX4fk5ddu1cglNJldLD3m
-	A5nAbBCNoxlVw19x9S4IpUudE2ZYfwFyaFWUekn+QXo2nqPPqvCUKPpK4u83v2agoq4Cu/hBcRw
-	atbnJp0X+MooTm11mRMeDziA9HF/reSy29YgBZgaIssgLPvbY99Ab698SMVlcs5QJw191zwQ9oB
-	aleIz0a3F/h6RD7oPPa6dSkoKh9at5skQL9gGosENwqUgKhE7OSyoYfzims1ovf77b7PGVput7c
-	1upCQ0HOa8D3uxfGRif/gBoPcaKygPbTX3hHd+9darhma/4UsJRs0VOHHyWIjXxXytmNUsWqgwr
-	OsDpiM64xstDWIfBvTNhPCAa2nh1yXuM=
-X-Received: by 2002:a05:6870:2194:b0:48f:e0f6:bd52 with SMTP id 586e51a60fabf-4a8e0ac1574mr89101fac.39.1793207597767;
-        Wed, 28 Oct 2026 10:13:17 -0700 (PDT)
-Received: from [192.168.2.38] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a8b74c0a38sm2825474fac.1.2026.10.28.10.13.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Oct 2026 10:13:17 -0700 (PDT)
-Message-ID: <b7d643bb-77f7-497d-8a08-06643876721b@kernel.dk>
-Date: Wed, 28 Oct 2026 11:13:16 -0600
+        d=1e100.net; s=20260707; t=1793207979; x=1793812779;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=lAWulrjtYt7mxpMPX+OHNKu4/oFhSzNqEFCQHqnzkJI=;
+        b=nzfNS67aD4gz0oYPSUPGPNW6Z5iphOiw4eYOgyGbkBBUFVQ6F0SeTsxLyWy6xNZ8t5
+         3Y5u6FBTcEuojL0psfB6HC/vHLrDPK5ugysCtmkBy0JmgfQU5KUXZ9R01F1Q+RSe4l7O
+         +s4iL6l5p0Dn637Y+DmeImN0PyYSD0Km1Ii6wCaZwLo7fiyrH0WViPOnwQx0Rc7VSDDv
+         cMoUPd6zMDGrzx5wir0cN1rgpBrD8K8Jaiw51FaP297hFRg91gQDTFkq8urnWG4gtNO9
+         tHNuIzDZQ0a+vo0HZf3lHnxsodfCtERP4dllXOu4sl4//STwUuKqQWTNvHsXuVPoXaes
+         SYWw==
+X-Forwarded-Encrypted: i=1; AKwUvBzsmAH5CvdnxA7Y/UDg4jOjBQdUPcifL7HLpua8vXdW9ezBla2sFa2FPYIOdoE+EXaNzQKU6vKSzu2fig==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJXp3Tr942QI3A1DP1HQ9s4TfmxTbqx3HtLtl0ZJzLe+cJ940i7
+	a7yFTHJHQ4JDohscnR/8o2mq3UWGox2dg2GepqpsoXivLzXr6mq0g8ae3FbAp+BLkus=
+X-Gm-Gg: AYBFou21xUM3Z7+wzOJG4mbL2TD7LTXIWzAvlUsOD3GZXlinZpAQvOvejcdGVfWgzw/
+	97IS3ACpbf5SnbgUeklOjeeOb/I7R8eyMnXgSj+7AYIsaMlqQUP/JpZRnPF+N++/bWBODPeKK9i
+	g/31/PL5YxB3ivGj9YOk00niBuXJZWYCVEE9bUnlcM48gka+e9UEFAGi4Qiti+K4Kyp4r+mnNko
+	Sq9bZ0+NtUrnYx20jTnODLt+zuw4BBTbdFalquRkYwqTmYug8CCfzSKmI+vcAWFWAtPmNsP/7FU
+	YI9vgNLZMPTgq1/WRfSBgW4bcXi5gLQqgGH4ZjvN3WiVuv6TSPeRO28Et8nXBAgvC974mNsIGqd
+	fOP0at4mAEN2yu+kc8c+S1Mf/mg6WjamNUkPN7/vT0MDo8CAi9ctPtn34dnal1v0s0YGb21XR0p
+	drCgWIVrGKbkA4NNtcSAiIQqRh42VhMCEhK7LgLGkPYTQ+ecT9uY684MZJ3150cfFF1Sokv8LUp
+	hpCHVoKwFccpFPeUaNFYf0hVhhg6NjUzJLP7/wWBto8rSMuIcC5RYmdbPNRR73lcj2Nd/8/Atdz
+	QWoGpudKC+e0bcBiMwB2s2z6Gib0hqXM/ZhzhY0+kkqH9k3F/bJcxzGpLsUIW8d/7vCChp0=
+X-Received: by 2002:a05:7022:7f0e:b0:144:c127:dd1b with SMTP id a92af1059eb24-1a6cef7a4d4mr4060949c88.39.1793207978208;
+        Wed, 28 Oct 2026 10:19:38 -0700 (PDT)
+Received: from medusa.lab.kspace.sh ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id a92af1059eb24-1a75e5c6d4fsm12731604c88.14.2026.10.28.10.19.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Oct 2026 10:19:37 -0700 (PDT)
+Date: Wed, 28 Oct 2026 10:19:36 -0700
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Haris Iqbal <haris.iqbal@linux.dev>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [v3 for-next 0/3] block: delay support for error injection
+Message-ID: <20261028171936.GA122209-mkhalfella@purestorage.com>
+References: <20260928221634.43239-1-haris.iqbal@linux.dev>
+ <20261022202326.GB2931-mkhalfella@purestorage.com>
+ <7efb1e79-f4a3-48a1-a08c-20eeb6369bbd@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -92,48 +101,92 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHSET 0/98] Various block related fixes
-To: Keith Busch <kbusch@kernel.org>
-Cc: linux-block@vger.kernel.org
-References: <20261028164415.1262013-1-axboe@kernel.dk>
- <auIsvfMs114ndVjT@kbusch-mbp>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <auIsvfMs114ndVjT@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7efb1e79-f4a3-48a1-a08c-20eeb6369bbd@linux.dev>
 
-On 10/28/26 11:11 AM, Keith Busch wrote:
-> On Wed, Oct 28, 2026 at 10:41:03AM -0600, Jens Axboe wrote:
->> Got a giant pile of stuff dumped on me, and went through and did some
->> vetting and, particularly, commit message rewriting to get it to a
->> somewhat comprehensible shape. If you're CC'ed on a patch, please
->> review it. Feel free to queue it up, or reply back why the particular
->> patch is garbage, if it is garbage.
->>
->> Thanks!
+On Wed 2026-10-28 15:51:38 +0100, Haris Iqbal wrote:
 > 
-> Neat! This looks like it is tackling my top complaint about sashiko: it
-> flags pre-existing issues only when a patch is submitted touching code
-> in the general area instead of proactively identifying and proposing
-> fixes to those pre-existing bugs.
 > 
-> Patches 66 and 93 have identical commits from other contributors that I
-> have already staged in the nvme tree, and patch 54 is fixed differently
-> than proposed here. Pull request coming this afternoon.
+> On 10/22/26 22:23, Mohamed Khalfella wrote:
+> > Hello,
+> > 
+> > I wanted to use the delay injection for a test case that I am currently
+> > working on [1]. Are you still working on these changes?
+> 
+> Hello,
+> 
+> Yes. But currently I am moving houses and hence did not get a chance to 
+> look at the comments. I plan to send a v4 with changes based on the 
+> comments next week.
 
-Ah excellent - I have no issues dropping whatever patches, just wanted
-to flush out this queue.
+Great, thank you. 
 
-> For the rest, lacking any block layer dependencies, I'd prefer splitting
-> the nvme subsystem specific patches into their own series and they go
-> through our nvme tree.
-
-No dependencies between eg nvme patches and block patches. For nvme,
-ideally you just grab all of them, and I can drop them locally. They
-only exist locally because they had to go somewhere first.
-
--- 
-Jens Axboe
-
+> 
+> > 
+> > 1- https://lore.kernel.org/all/20261022185920.GA2931-mkhalfella@purestorage.com/
+> > 
+> > 
+> > On Tue 2026-09-29 00:16:31 +0200, Md Haris Iqbal wrote:
+> >> Error injection can only fail a bio today.  This adds a delay_us option so
+> >> that a rule can hold a bio back first, to model a slow device.  The delay
+> >> happens above the driver, so it tests the code waiting above the block
+> >> layer, not the blk-mq timeout handler.
+> >>
+> >> A delayed bio is marked with a new BIO_ERROR_INJECTED flag so the rules
+> >> are not applied to it again, even after a split.  Christoph asked on v2
+> >> to avoid the flag by allowing a delay only together with an error.  I kept
+> >> delay-only rules, as a slow device that succeeds is the more useful case,
+> >> so the flag question is still open.
+> >>
+> >> Holding a bio back reorders it against bios submitted later, which breaks
+> >> sequential write ordering on zoned devices.
+> >>
+> >> Patch 1 is a prep cleanup.  It moves the rejection of an unknown status
+> >> tag into the parser, because patch 2 makes a rule without a status valid.
+> >>
+> >> Tested in a VM.
+> >>
+> >> v1: https://lore.kernel.org/linux-block/20260827000115.128093-1-haris.iqbal@linux.dev/
+> >> v2: https://lore.kernel.org/linux-block/20260830012002.80275-1-haris.iqbal@linux.dev/
+> >>
+> >> Changes since v2:
+> >>
+> >>   - Patch 1: return bool, rewrite the commit message.
+> >>
+> >>   - Patch 2: drop __submit_bio_noacct_nocheck(); the flag alone stops the
+> >>     rules being applied again.  Log the error when a delayed bio is failed.
+> >>
+> >>   - Patch 3: trim the documentation.
+> >>
+> >> Changes since v1:
+> >>
+> >>   - Add the BIO_ERROR_INJECTED bio flag.  v1 only resubmitted a delayed bio
+> >>     below the injection hook, which left the remainder of a split going
+> >>     through the hook and matching the same rule again, so a bio was held
+> >>     once per split instead of once.
+> >>
+> >>   - Patch 1: tag_to_blk_status() returns an error and passes the status back
+> >>     through a pointer, instead of returning BLK_STS_OK for both the "OK" tag
+> >>     and an unknown one.  A delay-only rule has no status, so the two have to
+> >>     be told apart.
+> >>
+> >>   - Documentation: a delayed bio is held once rather than once per split.
+> >>
+> >> Md Haris Iqbal (3):
+> >>    block: Reject unknown status tags in error injection rules
+> >>    block: allow error injection rules to delay bios
+> >>    Documentation: block: document error injection delay feature
+> >>
+> >>   Documentation/block/error-injection.rst |  39 +++++-
+> >>   block/blk-core.c                        |  14 +-
+> >>   block/blk.h                             |   2 +-
+> >>   block/error-injection.c                 | 167 +++++++++++++++++++++---
+> >>   block/error-injection.h                 |   1 +
+> >>   include/linux/blk_types.h               |   1 +
+> >>   6 files changed, 192 insertions(+), 32 deletions(-)
+> >>
+> >> -- 
+> >> 2.53.0
+> >>
+> 
