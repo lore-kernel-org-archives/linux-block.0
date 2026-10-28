@@ -1,77 +1,78 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793231383;
-	b=lULSrjdixXwnuN7nodRgmU8uj7xXxKEgZrSvnBYtnqzEWM22U0tJHtFw1iOJzUruHne4
-	 OrxwqA7M3dEnTBc0AVnwn3jNs0rgdhuU22iBzV6qelz6zqWfeozw4ddABSvKZBcg6yq+5
-	 tbLB9JILvcKCUHdIJM1HyX9nBCv+DMYzNBM/yKGNf7m/DgqszBA7i7LC1/4aqJEgI3JPr
-	 yqXzOmYMf+6s4VBfoTdUpH+hy3Z48CSEc6yrmelzI3EjXAGJO84JmFoLL6IRACqKQrhdC
-	 8MqanFcvjVEVN9to9r/TCRtxQtN3XHbR/REL8tmEbh9pQs+Ejy8fmZtAS/Qw0rHSyqA==
+	b=3r4RM7uco0lW0qS7ZRzpZDIo85SzYw+fJ1q9s+nVylUjJDPL1M1jZtvvA7chT6n9BBK/
+	 KS+4X4cLy97glK0d3AI4egIRQccaqeOYJdP+EYt2BBG0CV1CnPL4xVhfl/vwArUPSrs9g
+	 MtqTstfu4dn6tOp37AGWLehaxqO0BnPapWcHR9FB1tZT90jg/etQrHTaKrnnrwLzeP9gc
+	 VCcjS1kJVazrhJ2ZKHi+64lLouhHkMjr0aGbxuNMiYzHsQzXYVQpoyuZ5ZOG5lbpI/rVi
+	 98ORiKPeKoIZSV4+xgwab/Zun9dwCRFph7Yu4MWMtkMSndnjkiVtdgRl2m1EQaktU9g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793231383;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=SKBEhM3MQg/PUw6p2XarbvNBrNHPZ+Tud/GCW+2PvGc=;
-	b=j6F5qSWHu5YUnJgaxXaDNIYLeHl+JUHd1rAHsqAImff/yjX1eYEdXMO7+nW4Xar6d6Sr
-	 o0NMxG3oKV6YSVS2PBogsW2i+kTblLZJMY8bz4oIGT19DkcdRTq7Ah/KmAs8Ez7TDhNNT
-	 pZZvKt2Mfn3GzNwnZL4SCK1ey27vxS/npN8/NAdO+6Ma/R5iIMEAjmU0o2m63B8PENhz0
-	 mk9vLwG+JVmcTTasSUvQ2+mK6tbGZfAie3eZU9zNm9+hULc/V5AmZUZK37rOQk54RfoHD
-	 cdBuHd8mDs9DhQeqGnqnKi4hEH/jBDrq0BUrsXzi2yE0bmOUsjktethJ+UkHSbHh5YA==
+	bh=ex6YOu7e9L89CbVLpgJNSRno9vfswRWpN3f8iIESdN8=;
+	b=TpVLZ/46zH/RPdUMoeC1aT/mImT8f+Bo8sZ9g5/6SBlPWBaEiGRg1TV/7ZJ2oYaB8cmu
+	 gDRoAz3PxHQFyI/E7eq2mp9gDSaggwusDLziRjaWxL43Yu9m1pVxvyOEuIw/P/PPTnS5F
+	 rYvC1/ODDhKxMt22FPQ++UrTRHNk3+9BT/pDPtoYbgjxOmD2w+XmXZLP3tGgHilIDreq/
+	 YdWRwr2Um4QtIJGPCNPMJAzHBXJSQ2UphCGpz11prHwFAdkyoZ2iEq5tdbQnm6XGJE9BN
+	 s5UVym/f9OJV2PpBjClwS0JDzY4FZp631N68RXoCElcPUQd7d1DTcwVDm2Tq4CCTKKA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=acm.org;
 	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=Uyti+sBq;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=X+GHvJVE;
 	arc=none smtp.remote-ip=199.89.1.16
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C5E606A31C
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 23:49:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D4C5E606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405F0606A320
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 23:49:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 405F0606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=Uyti+sBq
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=X+GHvJVE
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jFPGt40Rczlfvpr;
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jFPGt5mJyzlfvpy;
 	Wed, 28 Oct 2026 23:49:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1793231376; x=1795823377; bh=SKBEh
-	M3MQg/PUw6p2XarbvNBrNHPZ+Tud/GCW+2PvGc=; b=Uyti+sBq4oGV8HXWNCj5F
-	yUYFLJ4S8fLsDW9HelDpjz1KSj53LZcZlk55sJ9ngbRJxUvCydfW8Ba6ODNF+2m2
-	BkCCNW5fhVAbmG1eoKpRI8jG3PcVYvYeCuZdWsg95KbXViqwlEgSEgWspdz0j1Um
-	FSAupcMGMsllA5ZfcsXSg81aOEVzGMyGvMQn8jf11gPIc+xdtE6QLOVSr8WW4EDQ
-	Y6PF415Cax7t0bria8pLoAOcMDmNmGwvJ6gcovbAtGNZB4V6dmfTHfPZEgMC8ybt
-	1KRaS2f6Itdk6f5VCl265lZn2ni2N7ioDYBdbW/hl5hUrUSRA21hGEfkB7eqnoW+
+	:received:received; s=mr01; t=1793231376; x=1795823377; bh=ex6YO
+	u7e9L89CbVLpgJNSRno9vfswRWpN3f8iIESdN8=; b=X+GHvJVElavJqDhkI68/P
+	gApjpBPludKUjEiQezKRCZ4WctSPOI18Tl5M0FB/8FTa7L2Lu8GxOfY5r1rI+82r
+	0dDtJ+bQsj340CWONfuJKKFoXiu0Lrj/tE55DL/pchlMlqWeOArtwzQjF7nR9jkt
+	I2kDSn7WjCzwJW0scRIQ2fo/SC3pqEt7k226wTl7xHb238fDIlvn80S/zSS4PzZt
+	1aBdlzgBfg7iWM45mwdilKZzVJntzuCJUrJO3vYCCLk2k+iGYaDrDpZnUL0hMqeX
+	4j1nFv3ZIi0sQIRP4hB/U/POTUXK7KCBjGNVmq3XeYhJl7orcUCkcFOHj47xQ7Fi
 	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 7s3smx2bCS_j; Wed, 28 Oct 2026 23:49:36 +0000 (UTC)
+ id EPtD3IlFFG9x; Wed, 28 Oct 2026 23:49:36 +0000 (UTC)
 Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jFPGj2GrDzlfvq1;
-	Wed, 28 Oct 2026 23:49:33 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jFPGk6YrJzlfvpc;
+	Wed, 28 Oct 2026 23:49:34 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>
+	Josef Bacik <josef@toxicpanda.com>,
+	Chris Mason <mason@kernel.org>
 Cc: Justin Sanders <justin@coraid.com>,
 	linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH 76/98] nvmet: fix NULL dereference in debugfs host_traddr
-Date: Wed, 28 Oct 2026 16:49:12 -0700
-Message-ID: <20261028234917.3067347-7-bvanassche@acm.org>
+Subject: Re: [PATCH 97/98] nvmet-rdma: hold sq->ref to post a T10-PI Read's SEND
+Date: Wed, 28 Oct 2026 16:49:14 -0700
+Message-ID: <20261028234917.3067347-9-bvanassche@acm.org>
 X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
-In-Reply-To: <20261028164415.1262013-77-axboe@kernel.dk>
-References: <20261028164415.1262013-1-axboe@kernel.dk> <20261028164415.1262013-77-axboe@kernel.dk>
+In-Reply-To: <20261028164415.1262013-98-axboe@kernel.dk>
+References: <20261028164415.1262013-1-axboe@kernel.dk> <20261028164415.1262013-98-axboe@kernel.dk>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -84,134 +85,111 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 On 10/28/26 09:42, Jens Axboe wrote:
-> @@ -1849,6 +1849,9 @@ ssize_t nvmet_ctrl_host_traddr(struct nvmet_ctrl =
-*ctrl,
->  {
->  	if (!ctrl->ops->host_traddr)
->  		return -EOPNOTSUPP;
-> +	/* They all take the address from the admin queue */
-> +	if (!ctrl->sqs[0])
-> +		return -ENOTCONN;
->  	return ctrl->ops->host_traddr(ctrl, traddr, traddr_len);
->  }
+> +	if (unlikely(!percpu_ref_tryget_live(&queue->nvme_sq.ref))) {
+> +		nvmet_rdma_release_rsp(rsp);
+> +		return;
+> +	}
+> +
+>  	if (unlikely(ib_post_send(cm_id->qp, &rsp->send_wr, NULL))) {
+>  		pr_err("sending cmd response failed\n");
+>  		nvmet_rdma_release_rsp(rsp);
+>  	}
+> +
+> +	percpu_ref_put(&queue->nvme_sq.ref);
 
-As the commit message notes, nothing synchronizes this check with
-nvmet_sq_destroy() clearing ctrl->sqs[0] and the transport freeing the
-admin queue: nvmet_tcp_host_port_addr(), nvmet_rdma_host_port_addr(),
-and nvmet_fc_host_traddr() all re-read ctrl->sqs[0] unlocked and
-dereference the container transport queue, leaving a TOCTOU NULL
-dereference and use-after-free.
+In nvmet_rdma_free_queue(), nvmet_sq_destroy(&queue->nvme_sq) calls
+percpu_ref_exit(&sq->ref) before nvmet_rdma_destroy_queue_ib() calls
+ib_drain_qp(queue->qp). Because nvmet_req_complete() still drops sq->ref
+immediately after posting &rsp->write_cqe, nvmet_sq_destroy() can reach
+percpu_ref_exit(&queue->nvme_sq.ref) while the T10-PI RDMA WRITE is in
+flight, and nvmet_rdma_write_data_done() will then call
+percpu_ref_tryget_live() concurrently with or after percpu_ref_exit().
 
-Since args->sq is already passed to nvmet_alloc_ctrl() when the admin
-queue creates the controller, we can pass struct nvmet_sq * directly to
-ops->host_traddr, format the address once into ctrl->host_traddr before
-nvmet_debugfs_ctrl_setup(ctrl), and have nvmet_ctrl_host_traddr() copy
-out ctrl->host_traddr. That avoids touching ctrl->sqs[0] or the admin
-transport queue after controller allocation altogether, and also keeps
-debugfs host_traddr working even if the admin connection has closed.
+percpu_ref_tryget_live() is only valid between percpu_ref_init() and
+percpu_ref_exit(): __percpu_ref_exit() and percpu_ref_exit() perform
+unmarked writes to ref->percpu_count_ptr that race under KCSAN with
+percpu_ref_tryget_live_rcu()'s unmarked read. (As a side note, patch
+96/98 has the same tryget_live-vs-exit issue in nvmet_rdma_error_comp()
+and should also be folded into patch 69/98.)
+
+Here we do not need percpu_ref_tryget_live() at all:
+nvmet_rdma_queue_response() runs while the request's own sq->ref is
+still held, so it can take an extra percpu_ref_get() on
+queue->nvme_sq.ref when preparing a T10-PI RDMA WRITE and drop it either
+on synchronous ib_post_send() failure or at the end of
+nvmet_rdma_write_data_done(). Because __nvmet_rdma_queue_disconnect()
+calls rdma_disconnect() (transitioning the QP to IB_QPS_ERR and flushing
+outstanding WRs) before scheduling release_work -> nvmet_sq_destroy(),
+holding sq->ref across the RDMA WRITE cannot block disconnect and keeps
+sq->ref live until the SEND has been posted.
 
 Here is a replacement patch (checked with checkpatch.pl and
 syntax-checked with Clang; not runtime-tested):
 
 ---
-diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index eea67fba6f92..b837c591af36 100644
---- a/drivers/nvme/target/core.c
-+++ b/drivers/nvme/target/core.c
-@@ -1729,6 +1729,10 @@ struct nvmet_ctrl *nvmet_alloc_ctrl(struct nvmet_a=
-lloc_ctrl_args *args)
- 		goto init_pr_fail;
- 	list_add_tail(&ctrl->subsys_entry, &subsys->ctrls);
- 	nvmet_setup_p2p_ns_map(ctrl, args->p2p_client);
-+	if (ctrl->ops->host_traddr && args->sq &&
-+	    ctrl->ops->host_traddr(args->sq, ctrl->host_traddr,
-+				   sizeof(ctrl->host_traddr)) < 0)
-+		ctrl->host_traddr[0] =3D '\0';
- 	nvmet_debugfs_ctrl_setup(ctrl);
- 	mutex_unlock(&subsys->lock);
- 	up_read(&nvmet_config_sem);
-@@ -1849,7 +1853,9 @@ ssize_t nvmet_ctrl_host_traddr(struct nvmet_ctrl *c=
-trl,
- {
- 	if (!ctrl->ops->host_traddr)
- 		return -EOPNOTSUPP;
--	return ctrl->ops->host_traddr(ctrl, traddr, traddr_len);
-+	if (!ctrl->host_traddr[0])
-+		return -EINVAL;
-+	return strscpy(traddr, ctrl->host_traddr, traddr_len);
- }
-=20
- static struct nvmet_subsys *nvmet_find_get_subsys(struct nvmet_port *por=
-t,
-diff --git a/drivers/nvme/target/fc.c b/drivers/nvme/target/fc.c
-index eecdffefa24f..1e1583c8b7e7 100644
---- a/drivers/nvme/target/fc.c
-+++ b/drivers/nvme/target/fc.c
-@@ -2960,10 +2960,9 @@ nvmet_fc_discovery_chg(struct nvmet_port *port)
- }
-=20
- static ssize_t
--nvmet_fc_host_traddr(struct nvmet_ctrl *ctrl,
-+nvmet_fc_host_traddr(struct nvmet_sq *sq,
- 		char *traddr, size_t traddr_size)
- {
--	struct nvmet_sq *sq =3D ctrl->sqs[0];
- 	struct nvmet_fc_tgt_queue *queue =3D
- 		container_of(sq, struct nvmet_fc_tgt_queue, nvme_sq);
- 	struct nvmet_fc_tgtport *tgtport =3D queue->assoc ? queue->assoc->tgtpo=
-rt : NULL;
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 5c2021b89ec4..e05cbf463751 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -297,6 +297,7 @@ struct nvmet_ctrl {
- 	u32			nr_changed_ns;
-=20
- 	char			hostnqn[NVMF_NQN_FIELD_LEN];
-+	char			host_traddr[NVMF_TRADDR_SIZE];
-=20
- 	struct device		*p2p_client;
- 	struct radix_tree_root	p2p_ns_map;
-@@ -444,7 +445,7 @@ struct nvmet_fabrics_ops {
- 	void (*disconnect_queue)(struct nvmet_sq *sq);
- 	void (*disc_traddr)(struct nvmet_req *req,
- 			struct nvmet_port *port, char *traddr);
--	ssize_t (*host_traddr)(struct nvmet_ctrl *ctrl,
-+	ssize_t (*host_traddr)(struct nvmet_sq *sq,
- 			char *traddr, size_t traddr_len);
- 	u16 (*install_queue)(struct nvmet_sq *nvme_sq);
- 	void (*discovery_chg)(struct nvmet_port *port);
 diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index c4b848f84465..5e24cdb3a71f 100644
+index 994a668f45d6..ec54e3706e6c 100644
 --- a/drivers/nvme/target/rdma.c
 +++ b/drivers/nvme/target/rdma.c
-@@ -2050,10 +2050,9 @@ static void nvmet_rdma_disc_port_addr(struct nvmet=
-_req *req,
+@@ -758,6 +758,7 @@ static void nvmet_rdma_queue_response(struct nvmet_re=
+q *req)
+ 		container_of(req, struct nvmet_rdma_rsp, req);
+ 	struct rdma_cm_id *cm_id =3D rsp->queue->cm_id;
+ 	struct ib_send_wr *first_wr;
++	bool hold_sq =3D false;
+=20
+ 	if (rsp->invalidate_rkey) {
+ 		rsp->send_wr.opcode =3D IB_WR_SEND_WITH_INV;
+@@ -767,12 +768,20 @@ static void nvmet_rdma_queue_response(struct nvmet_=
+req *req)
+ 	}
+=20
+ 	if (nvmet_rdma_need_data_out(rsp)) {
+-		if (rsp->req.metadata_len)
++		if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
++		    rsp->req.metadata_len) {
++			/*
++			 * Hold sq->ref until nvmet_rdma_write_data_done()
++			 * posts the SEND ahead of ib_drain_qp().
++			 */
++			percpu_ref_get(&rsp->queue->nvme_sq.ref);
++			hold_sq =3D true;
+ 			first_wr =3D rdma_rw_ctx_wrs(&rsp->rw, cm_id->qp,
+ 					cm_id->port_num, &rsp->write_cqe, NULL);
+-		else
++		} else {
+ 			first_wr =3D rdma_rw_ctx_wrs(&rsp->rw, cm_id->qp,
+ 					cm_id->port_num, NULL, &rsp->send_wr);
++		}
+ 	} else {
+ 		first_wr =3D &rsp->send_wr;
+ 	}
+@@ -786,6 +795,8 @@ static void nvmet_rdma_queue_response(struct nvmet_re=
+q *req)
+ 	if (unlikely(ib_post_send(cm_id->qp, first_wr, NULL))) {
+ 		pr_err("sending cmd response failed\n");
+ 		nvmet_rdma_release_rsp(rsp);
++		if (hold_sq)
++			percpu_ref_put(&rsp->queue->nvme_sq.ref);
  	}
  }
 =20
--static ssize_t nvmet_rdma_host_port_addr(struct nvmet_ctrl *ctrl,
-+static ssize_t nvmet_rdma_host_port_addr(struct nvmet_sq *nvme_sq,
- 		char *traddr, size_t traddr_len)
- {
--	struct nvmet_sq *nvme_sq =3D ctrl->sqs[0];
- 	struct nvmet_rdma_queue *queue =3D
- 		container_of(nvme_sq, struct nvmet_rdma_queue, nvme_sq);
-=20
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 908614fa82b0..57b00f3ae988 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -2348,10 +2348,9 @@ static void nvmet_tcp_disc_port_addr(struct nvmet_=
-req *req,
+@@ -849,6 +860,7 @@ static void nvmet_rdma_write_data_done(struct ib_cq *=
+cq, struct ib_wc *wc)
+ 				ib_wc_status_msg(wc->status), wc->status);
+ 			nvmet_rdma_error_comp(queue);
+ 		}
++		percpu_ref_put(&queue->nvme_sq.ref);
+ 		return;
  	}
+=20
+@@ -866,6 +878,7 @@ static void nvmet_rdma_write_data_done(struct ib_cq *=
+cq, struct ib_wc *wc)
+ 		pr_err("sending cmd response failed\n");
+ 		nvmet_rdma_release_rsp(rsp);
+ 	}
++	percpu_ref_put(&queue->nvme_sq.ref);
  }
 =20
--static ssize_t nvmet_tcp_host_port_addr(struct nvmet_ctrl *ctrl,
-+static ssize_t nvmet_tcp_host_port_addr(struct nvmet_sq *sq,
- 			char *traddr, size_t traddr_len)
- {
--	struct nvmet_sq *sq =3D ctrl->sqs[0];
- 	struct nvmet_tcp_queue *queue =3D
- 		container_of(sq, struct nvmet_tcp_queue, nvme_sq);
-=20
+ static void nvmet_rdma_use_inline_sg(struct nvmet_rdma_rsp *rsp, u32 len=
+,
