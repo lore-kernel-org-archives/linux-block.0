@@ -1,94 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205951;
-	b=JOrx6OIgGpmi8qgGZa6ht1MYjqpJ39sBeMnWNMd0hFR+06Mw6UbhnEDwSz8663Swc4Hu
-	 xCEdckcSDR82nZ25XhbEJGadr7KeSO8tX2UIcXgkHFXYIgFY9/pY8F2bfP303WL8GOKcG
-	 eiF3UX8smD7ZrNaVgVF+rxIsQU0qAUumd6Cs6OSlFbek0dVIy48CmVxHP4nT/BtHfNRU7
-	 +oWU9eOjUcDaQOJ8tlYWVOJUsAdm7MtBm5mBUljjkOCN3datjy2I1n1vv7QWEecPg7lvI
-	 qZCtZuCP+uoETc7y/sDPiK+vn24FZxS8EQaaFVesN9XfcOUrA6YwQv7KVYl0LCre9vQ==
+	t=1793205952;
+	b=EzVi4Fm/W8RtsKujmySpiH+Lyw8KzC8RSYVD9IhXgEbxBL3ahbyh1GCr2VY4/m71orp4
+	 6eoCUzE6vzuKx7d3KTAmdmuzKemH6dy6c03gt5g/Q0kqw5O31yFBLW9thKJ+blvy3Ahzd
+	 916mevU5ZyZv/HEkcjhSnTf2ycBjHfl63EAY3dqZaFcI3Sl2w+Cgdp6YDPloahsgZpVze
+	 4qN+mIRMNPHgBtJ+AtcMvWUbVM/GcpfBhwY63pkF6PnVjzkpkVI647I/TOfUOZ5muw7/O
+	 LCLp4oEbXAV4q5bVcoB+nUfNniTYvNj0sI6TrkJn1YKLiRxMz+4z7QWBzTDIgpLWHww==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205951;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205952;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=YXxe+7kIYAtCbjpADluWoq2mIe6ZpS5Y1HhIQgut8NE=;
-	b=pNc5OTpNCxzcshhp+P1MyLeWEBQCHUYPdzlsaMBHF6gbYlsKd2a+t0ZxZ1f8dAP37ucM
-	 vXhcS1+5GIeeJQzXB0wiHZl8QWwjAnOU0X80FCNVj9ElzmwASXxDdnrz1ogrc9jBRUbW2
-	 +vcpzMlfH0RzEcmJrfLpnez9k3EF9PQF6OGp158raonptCZAGklGYAVmTVzkcWGnPVY3m
-	 +czZfMaZui4AUux+5uVkqcE/PDDN4IYU0crUGN2raYDKfBUnpg2quXKgXY+PNoF42Jeex
-	 5ip9gHKgz+v+fdiDX5MOAuLBqKFch9k9aboxTrG+MgFKB4iXJWXcBwCIHBkRYjk6VYQ==
+	bh=jlhI/uzOfwVf3BoL3UiUzwTILCcRcijMCYaiODSmN4s=;
+	b=abIiKiXuAOfF4TXVUU9Snx1jTXqMNV4xfROZU6+udq568vNMPJPxMiFwknGiSxZnc8BX
+	 ViRnIFOej0nzobCDmLt/sQG4Hkw3Ju4cjDr4p3QHwqMZbFPYCfbmzsE70dfpfrd2Rpe5r
+	 ebztANHAuFYRFvXdMssAnDtB1XfhTb1sy75vN1xZPQdqVju3WQm/FAohPdxAdPh8JYMWl
+	 TLwcnjppdiYqVb5OYRbDaudIbarrPYbZ5+Ht71k8LblTd5UQUbfLcELWYUY/Finf5MdCP
+	 amuXE7zUD2SVWZCHliXVzZUPxtKIVcE3dZ+lOUjpRNqtMOYw3Lh6hheZiM7yWe4rZXw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="m4b8YP/e";
-	arc=none smtp.remote-ip=209.85.210.46
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=DNfVvUuW;
+	arc=none smtp.remote-ip=209.85.210.49
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB542606A322
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB542606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0934A606A326
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0934A606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=m4b8YP/e
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-85a5455bd3cso734270a34.3
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:50 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=DNfVvUuW
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-84621d8c7aaso590100a34.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205950; x=1793810750; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205951; x=1793810751; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=YXxe+7kIYAtCbjpADluWoq2mIe6ZpS5Y1HhIQgut8NE=;
-        b=m4b8YP/eUXkeNU4vSdGZddcznXiJMNwrBehAUWVgsPp2/DLw3ohtQS198t9VrW+BRZ
-         FMYTW1jusImCA4xKPsG7v31sA5Iqp5WOi0yFehig5ohk/UMNo66V1q40CN8c3eSDYJas
-         58TLo3JOsivhDVdrdjBgg/3H89P44XbFaW6WanmHw7lIBOSv3P5ttoWerGMcEUatrP9Y
-         HoIK5e/P/JTnHJ+9UwlbdA/TzkJ/G9JAH0jGVxObzGE1ANd8RvQ0S8qBM4y6+QkpheH/
-         vbA3+/e0qgr8XfsCVLYVyLR49eN+iadw+m6D7Ovjc0rouvG8cc6SNiZXKBFm72w1s6qG
-         0JhA==
+        bh=jlhI/uzOfwVf3BoL3UiUzwTILCcRcijMCYaiODSmN4s=;
+        b=DNfVvUuWJ5n/LPGvvcMylkKFP1nz8ANos97XK4IRa7SaVcdR4BCtVg2chJrVlpiXRB
+         b+2SqymSQZjKZKVfU7qwtIbhvJlV3N2u5rtLONtIrT9bTIK/DIAmNNtcuPLCTVZ0E3oQ
+         6t29241EB6VbjtyedtQevEL+Ic+KSYfyo7KYyxqO8ul3nFi2KAgiIrubnwTi8+55xhr1
+         sCfrTbRMiZsyOetSraK3gRMod2hLQqI6CCwlntKmMEKkUpDEc/nhG8Kj42NhVC0icaMh
+         SZF7l4Js8FSLdWNI66wPHqzJf4zx+Z+/uzx2SLkl8k3SeZBc0XTYklL90fEpwsdObD7e
+         Tikg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205950; x=1793810750;
+        d=1e100.net; s=20260707; t=1793205951; x=1793810751;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YXxe+7kIYAtCbjpADluWoq2mIe6ZpS5Y1HhIQgut8NE=;
-        b=dDbxpNqN1YcoubXaoeE+yOaeSMMf4nWRjLQIpQogbuCRW6t7byBjskDGDYwNJ31sJO
-         sbzoMdH/Z90Meo4VAdsEK91mGoCmGyZ7HcgEV2tE3jVmvtTlsub2CMdIVYrYMbPiX/AL
-         xFwR7D+P+FkptPVFHiAjsk9XDfNwc8jQpRXwGfdr4TH5kgCYBPAw2IxGvkXy10hkEjFo
-         OVkuZ4SWQWGihucQ9dAtSdCIIk+rlDuMz+qiR/XVKFLBEq6W7ZuJynrUBtFo9ZqLYeXG
-         rQ5IuB9turinhyyvtbWR8V6bCQm5xaeSy6SDPtgWSoTsEUBESNocMHT4AIU6vlWza0Z9
-         ZoJA==
-X-Gm-Message-State: AFq9FYK9LHxyEB5gzfI4AOrkM4p1Rb4BxMJJASS8drTjHUmDm0rE9wTU
-	nH7n+4g6+XPHHlkVWOZF92kpNKLH8e1Uu7jGtPYFAKfuFsnAoAYwR7uHVckRoXldMV2pGgC0DOP
-	G1NHD8vM=
-X-Gm-Gg: AYBFou3032uP4ofbTFXkAnWseUEndXzIm77ywXDBoqvv5UgBHYd7cfp44jdZXgSRG1s
-	mT0FuUbjuMrRXJZgmRfxLA4Fg/BntrQz6OqHP/D5O3u+EvjIgMw10z7xqOnv20EqmKHUqhVM3Oy
-	oLymcsO8FcxiCKu8CCzTWtt/0b1cPstwLpYsiqtbh6pPQmkMIHmO3JuWz/1/EwHlwbVFrrB1OLO
-	ZwhSbtZw0GX5NzB2Po+NOQblHzCazZAxzMoaVE8/X/BpXhtkQQU2+8wwGdNP3FmuUz0Ek+NFgNk
-	1HHS0kjYu7NxDlhVaQiFGWfiZ/y7LSqWow3x27Jm8wi4TtksoGVSS06zNxvBV5Tt96s2BX/LKEe
-	Qpo+b+aPr5uEZNv9kBPGOLRZWPd1fI9PniSjSdfRDQ93bLB6XicG1/RiaxwK+xsweqgyCHvrJAS
-	vyClchL7QjepeH/Fk9zh8eTKmzmP9ZqS05Upe0mveN+vBFZC4Tuc3ppaU7UhxOixG7CZ2fdF7jN
-	6zwHEvUZgdjOEtAZPi70/vHoHunMTkWlz3TRlAUp5/gXYHjDDRAr6jvm7QN84tBYSlWjyB/lnkS
-	0h94lFwDfxTpeupDg+a518SlsB4DFv3p6oJwiCyF2EobLGo0DBrC47saLACNA3XLH5mEhlLATw=
+        bh=jlhI/uzOfwVf3BoL3UiUzwTILCcRcijMCYaiODSmN4s=;
+        b=KQ4GJivzWUKsmAPXM35lew0EWAqpEjd+tPs0suN9ms8dZrmY1ANNRdykUMWage7Aa0
+         9+3fQxUMPpuKUrCsNWxO+EYDP3ymb3W3N37hnJbaPokbTIUuPxvvFrxfiEuCnXl3n/jY
+         yiiu7n5bHCKWxxU0F6Tnf+mgNwGbldlnlQyEUpmcDFftLtMr4pxopCKWfDPIXJESvC7/
+         lmq4QDkQdb5Y6HaAe7+3hGo3qZiBd130dbO8WL3WreF5i9XXj4Z6Frdw/qWqDB2UiK7M
+         C+bfVGDHbUw1mnxFGbJzphufO0LnjTfmM6/6IiVzHFyJHkTS5LK7K+Omdc/Cwi/wF69Z
+         s1bA==
+X-Gm-Message-State: AFq9FYIAG5xbSW6RTGOhDAaUbNXHRR3ht5vL4SGeHwOU+6jZl3pikSRP
+	cxtQL4nvcFWFWZoiaH0dGX4NhI2lgMZP0Xj8uabyP8Esncz+lv/bkY5EOYsPhUVh3T1Dsq5eslW
+	OIHL+r3o=
+X-Gm-Gg: AYBFou2vbtJHHAZM1uG4W5vRB16tCy7XzHZWz5/FQFu2Yv6NzIpNsZ8aUNQLWcLH1Iu
+	NENGyK/MrdeyB4H+4hyDP0b6pJVwnJQuei38XGxfWRglZHKrQ6Y9FwjfjyXfVe82rhQptdGc18t
+	7I7NBpgeFOvaqY3QKig2l/3HdV+mPT9P+Ed1Pi8gOE2kwvrLfefknX6w4TJ80HFD/ICnd7QeKMy
+	wvrZkS6QlZ66kWd9t8dEFmlnDN32yPHwTRdwgoV6HyEnB89uRuL4+Is62SH+5jhFbUjw5So+hXU
+	0JTNuyNctbPMIXDlrblKNaawRWH+KEV7vIgmle0TWRc4DO5FDJOsg/kq5nk7FCu83v0+y+dN3Yy
+	KrHbIEPAohtQ+YIdtOxhAF7kEoiE4cebsEM31xUx3qflSgjCfdr7Z+JZZEbQU2dyO2OUly32fRC
+	KmYIo1Jv5hIlxg9SlG1YFwMNMyrPV5QpaIGRwQw/iVdiwCEox+CMJ3LQYsbJOCs30Pl1HgyFbbp
+	4hUvUOHTctQVkOlXh8fm1ijz1UjCq6EAAhB7vgRkKA/5fsguwjCBOB4k0AkhJtnDjhEEZUTCaj/
+	oHTBFjJwDlzqM0iQvXqBapUZwc5qUs5Fq/qi83VQtyGOOQ0HGv6lAdtM1H5StR2WtLp4q8C6kg=
 	=
-X-Received: by 2002:a05:6830:44a2:b0:81b:a5aa:e82b with SMTP id 46e09a7af769-85ab996d1b9mr2375296a34.24.1793205949810;
-        Wed, 28 Oct 2026 09:45:49 -0700 (PDT)
+X-Received: by 2002:a05:6830:2690:b0:846:5d82:8bc8 with SMTP id 46e09a7af769-85ababeb330mr2721965a34.0.1793205951053;
+        Wed, 28 Oct 2026 09:45:51 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.48
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:45:49 -0700 (PDT)
+        Wed, 28 Oct 2026 09:45:50 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
+	Keith Busch <kbusch@kernel.org>,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 73/98] nvmet-tcp: stop listening when a port is removed
-Date: Wed, 28 Oct 2026 10:42:16 -0600
-Message-ID: <20261028164415.1262013-74-axboe@kernel.dk>
+Subject: [PATCH 74/98] nvme-tcp: keep the page frag cache with the controller
+Date: Wed, 28 Oct 2026 10:42:17 -0600
+Message-ID: <20261028164415.1262013-75-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,42 +105,111 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-nvmet_tcp_accept_work() accepts until there's nothing left. A
-connection that is already dead when accepted is torn down right there,
-which takes a few ms, and more can arrive meanwhile.
-nvmet_tcp_remove_port() waits for the work with cancel_work_sync(), so
-someone opening and closing connections in a loop keeps the removal from
-finishing. It holds nvmet_config_sem for writing, so nothing can be
-configured and no port answers a Connect until the flood stops. No
-secret needed, just an admin removing the port at the wrong time.
+nvme_tcp_init_request() allocates the PDU from the queue's page frag
+cache under pf_cache_lock, and it's called not just for the tag set but
+for the flush request of every hctx of a new namespace. The cache and
+the lock are torn down and reinitialized with the connection though,
+and a namespace scan isn't stopped by error recovery, so it allocates
+from a cache that's being drained or set up:
 
-Shut the listening socket down first. Pending connections are dropped,
-as they were on release, and the next kernel_accept() fails and ends the
-work.
+  WARNING: kernel/locking/mutex.c:625 at __mutex_lock+0xa25/0x1a30
+   nvme_tcp_init_request+0x8c/0x1a0
+   blk_mq_alloc_and_init_hctx+0x28e/0x6c0
 
-Fixes: 872d26a391da ("nvmet-tcp: add NVMe over TCP target driver")
+Without lock debugging a waiter can spin forever on a mutex that's
+being reinitialized, an allocation beside the drain can return a
+fragment of a freed page, and what's allocated after the drain leaks if
+the controller goes away. The target, or anyone who can break the
+connection, picks the moment.
+
+The PDUs outlive the connection anyway. Initialize the lock with the
+controller and drain the caches when it's freed.
+
+Fixes: a5053c92b3db ("nvme-tcp: fix memory leak when freeing a queue")
+Fixes: 36ac05f7cfd5 ("nvme-tcp: fix usage of page_frag_cache")
+Cc: Keith Busch <kbusch@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/target/tcp.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/nvme/host/tcp.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 3d24efe3b7c3..0b70d3647e28 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -2263,6 +2263,8 @@ static void nvmet_tcp_remove_port(struct nvmet_port *nport)
- 	port->sock->sk->sk_data_ready = port->data_ready;
- 	port->sock->sk->sk_user_data = NULL;
- 	write_unlock_bh(&port->sock->sk->sk_callback_lock);
-+	/* The accept work goes on for as long as there is something to accept */
-+	kernel_sock_shutdown(port->sock, SHUT_RDWR);
- 	cancel_work_sync(&port->accept_work);
- 	/*
- 	 * Destroy the remaining queues, which are not belong to any
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index c9531e653a2c..4aa666dd0266 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -162,6 +162,7 @@ struct nvme_tcp_queue_setup_ctx {
+ struct nvme_tcp_ctrl {
+ 	/* read only in the hot path */
+ 	struct nvme_tcp_queue	*queues;
++	int			nr_queues;	/* allocated, see queue_count */
+ 	struct blk_mq_tag_set	tag_set;
+ 
+ 	/* other member variables */
+@@ -1668,8 +1669,6 @@ static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
+ 	if (!test_and_clear_bit(NVME_TCP_Q_ALLOCATED, &queue->flags))
+ 		return;
+ 
+-	page_frag_cache_drain(&queue->pf_cache);
+-
+ 	/**
+ 	 * Prevent memory reclaim from triggering block I/O during socket
+ 	 * teardown. The socket release path fput -> tcp_close ->
+@@ -1692,7 +1691,6 @@ static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
+ 
+ 	kfree(queue->pdu);
+ 	mutex_destroy(&queue->send_mutex);
+-	mutex_destroy(&queue->pf_cache_lock);
+ }
+ 
+ static int nvme_tcp_init_connection(struct nvme_tcp_queue *queue)
+@@ -2021,7 +2019,6 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid,
+ 	INIT_LIST_HEAD(&queue->send_list);
+ 	mutex_init(&queue->send_mutex);
+ 	INIT_WORK(&queue->io_work, nvme_tcp_io_work);
+-	mutex_init(&queue->pf_cache_lock);
+ 
+ 	if (qid > 0)
+ 		queue->cmnd_capsule_len = nctrl->ioccsz * 16;
+@@ -2153,7 +2150,6 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid,
+ 	queue->sock = NULL;
+ err_destroy_mutex:
+ 	mutex_destroy(&queue->send_mutex);
+-	mutex_destroy(&queue->pf_cache_lock);
+ 	return ret;
+ }
+ 
+@@ -2840,6 +2836,10 @@ static void nvme_tcp_stop_ctrl(struct nvme_ctrl *ctrl)
+ static void nvme_tcp_free_ctrl(struct nvme_ctrl *nctrl)
+ {
+ 	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
++	int i;
++
++	for (i = 0; i < ctrl->nr_queues; i++)
++		page_frag_cache_drain(&ctrl->queues[i].pf_cache);
+ 
+ 	if (list_empty_careful(&ctrl->list))
+ 		goto free_ctrl;
+@@ -3265,9 +3265,15 @@ static struct nvme_tcp_ctrl *nvme_tcp_alloc_ctrl(struct device *dev,
+ 		ret = -ENOMEM;
+ 		goto out_free_ctrl;
+ 	}
+-	/* A poller may try the lock of a queue that has been freed */
+-	for (i = 0; i < ctrl->ctrl.queue_count; i++)
++	ctrl->nr_queues = ctrl->ctrl.queue_count;
++	/*
++	 * A poller may try the lock of a queue that has been freed, and a
++	 * request of a new namespace may be set up for one.
++	 */
++	for (i = 0; i < ctrl->nr_queues; i++) {
+ 		mutex_init(&ctrl->queues[i].queue_lock);
++		mutex_init(&ctrl->queues[i].pf_cache_lock);
++	}
+ 
+ 	ctrl->net = get_net(current->nsproxy->net_ns);
+ 
 -- 
 2.56.0
 
