@@ -1,95 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205877;
-	b=2YpL+eDqgX6436ZnyAk+SRY7e1/tqYovSzvQ/2eyrV7oi5AJnJx40AWZsWye7Zkfcvl1
-	 IS8vrP7PXHeyPGh3cHn7iiJSLTX7Se0e4JSt3j3ehq8yU7DvgB9iSauL4aoq3OV5fSZWC
-	 x0jVPWJ0KD0/gC35AU3C52+Ymlkw8GfMA2VF66FjXmUFSzk1ybQDfv4IxTN0n6qDY2uYZ
-	 /l4adBkceY8ItjWAY63s6BLKegzdGMqawzB/FZi6JQQXynoS8i/hXhYt+x3SywAz2tAOu
-	 C3rbCzbnZkzWRhUPIdYARJJ9VGh55/oxQ5dHrmMY/P1hRvyYvP9vlV4bujV4FN04VMw==
+	t=1793205879;
+	b=w0pUHIkZtvHuR/SIjL+42PaDc04MunbVbDPzntxVICR6IMJ55BSBICYD/p05Bg3fkPxy
+	 BLoA7bGeXf0iz+g8bApcjV33cxs9N+vRanDAYi7EN8xj/prZiDaXylD9V04eFDWm0kRxf
+	 xJlaLS1UkOd6/vuxvp3lEilLZZIA2fGUZxl8UkofzS5khqf8qmyvZ8ZhVsjxDJ8SSqMTc
+	 14LKYItRIrZJcGwz5RAZPsplL7bWsG3hEVl/fmDauxlRvdz9fXpvT+6P1N1dhCS9LXUSb
+	 4CEQs1zFJ9j2ya5nsUlcG6LGzjFzLIyEdsqlHOcXQtoyLDwpk7+Mm7QNJHOz33DfDSg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205877;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205879;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=MsjJONEl2ufMEQeFENm54QCqTNG6W3CtoJ/9MOxw5NE=;
-	b=HQr13KfdcgIIHX1JPLIyDYWUIADRVD3LyGZgGSyXv9LqiDv6o8iZ1WKrxLrSz6DOSbRF
-	 Z9WOd6vK5hcC180v/Y1vRCJ9TJjsKgGPsEiBB8nJb30YiKH57pXhc/C7Hiyswboz3Mjt5
-	 xTUvC8RPXhl6iwJnBKSCQz6+PPd7FpWgTkZChacxMcLtpjoxG5eP7764AzDkxtfaaIwEj
-	 3t7EVQNg+Uydyi9Di4Y8JYzP0Un0A4wLIUKiObR20DvwoNX5OYiZLu+b6gizkpPZMXI16
-	 LzeJGeYj0ozHfxCTvoY9EeVsMDNUG/JMg6A4UySNwq/3GHxsLU2G5Q+k0ibisq5YwZg==
+	 Content-Transfer-Encoding;
+	bh=J0xUkTNFr6seTcki+ti3k5OnyqCFLX6M/RKIcdbvF3g=;
+	b=zgqaDMteD6fWIqk02MgfQuzkfHNgau3wfLxBFA9oIvqm+B4hSHlF9KePr7iTKxNkj3es
+	 39v0g8cxKIbGJqAagCMcZB5UgIDxUkmGElu3X6UTnyBuYOqrzuhsovtj+oMkj8qbNPUqu
+	 fS6DE3T6VlgePuikKiv9ljJZliNz9ijYaqYQOHl+9cDt+eU0Q4gmB9jWcg0/IRFl7XR8x
+	 ctO+WgrlX8vW4yt9Vpd5gUxY8gFa2AFjMZqZGB9L58Hzx5xM+SBW/Al1d4421ITZCAc+t
+	 mblX+9vtjyLMCfS46D5e5tb5c6mqiEpIS4oL9R3j39OFaOBiM6WQBH0VtNoCv1hH73A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="f/QOfbXr";
-	arc=none smtp.remote-ip=209.85.161.45
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=k9Uxbyzq;
+	arc=none smtp.remote-ip=209.85.210.46
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F9C606A322
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 67F9C606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B46D606A31E
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:44:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7B46D606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=f/QOfbXr
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-6dde81a6820so999426eaf.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:37 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=k9Uxbyzq
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-84a2bea315dso833016a34.1
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:44:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205876; x=1793810676; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=MsjJONEl2ufMEQeFENm54QCqTNG6W3CtoJ/9MOxw5NE=;
-        b=f/QOfbXrAO5cWKk6o5DSRNnrHY4WFsmRnp2sp3POHKk0CLS/x7Fhi1wuOPgjzjv0fw
-         XGClOeAeqP9q1YwA8KGKTAQ/motmWykqcrb9WkHNgkWax5lBUEh8+bLZHOT7EUDCD419
-         jHGSEeG6yxFumnFbOMzGZVQ/xGa0PmRS3QZ883yzoxV+ETCKHVRu/YU4d8YEcwBt87Wr
-         WuwukYXO7MUttn1CwW6k/nBu5IP+EZGVc6Smi0ZBh309wIJyO/RudSqeIXVohAkg9xF+
-         pKVupIGoEieOqfDwX+BAVSkEEBNvFUvmhw79w9PelUTYcVZZIAp1be7WTrJYVJfYrTEK
-         ag1g==
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205877; x=1793810677; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=J0xUkTNFr6seTcki+ti3k5OnyqCFLX6M/RKIcdbvF3g=;
+        b=k9UxbyzqDxDW/Hm8vxkoO3I6bAOaHBVok2OOU0KXw+PyCLyCZMQq7Eh3vbO0FENtsp
+         7/pXh9/ee5EauQffQV/WKfZ1QFMeMrYR5p9cWAT32QFelOs7ro9Y+JSsriOZm29+Rx3v
+         BuvyEsW12V4jb6hr5hAJ0D+UiwqcRKMInWH4r241qMny/7d9jFYpYTlQIgPzITWbhvpk
+         3yxB8iRT1ApVRJZXYVIWW4aVNZR/lDpJeF9C077qPNmO+NSrRF6N/pZLCIghufsIE1ay
+         nuKnymVBbGp2xhgU/AeNsq5Nzx4FIB+GQvzT27wA7SEFkgT/SdeXUzlHXD5JnE5q9zvw
+         Pkng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205876; x=1793810676;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=MsjJONEl2ufMEQeFENm54QCqTNG6W3CtoJ/9MOxw5NE=;
-        b=DlEsXj7gd9EaFjKviqbgaWMJg3tOvk/hPilSkY002mKQ+AdvcSD5t6H/4ryRVsLt6H
-         kzdXohbsMT8cO+9L1M7eQ7+OEsz0nmkBCthphLY1Sy39jZ16k81Oyr3RCx7t3hDtBx42
-         WvuXD46qVOoAq7TlgPdKj+b8SifPLqC/IzPWZYYC6uCMF6xZVPOZvBO+JM08QL3dn612
-         kpHXS24St0zcjuJ/RvAbsWUxGqhZ8yfGVTLsB033EQB7grPihzmH0PiUIal19AED9iQk
-         daG16jtb35bUkUlM9RsPoIwjcNgJ28Zfn/OA/IJY0uFvTVgP32Mct9V79zOml1DmX7OD
-         a6dA==
-X-Gm-Message-State: AFq9FYJKgmLj2J+VvEUbhVD3oWRmhdZswkcVVD+5Qq02IEtXCt70sC4K
-	qn7Dc0qYpT2Th/6EiqJ18doz/nQqUPx758NVV+GOVU98ZDOWICMPSq1uM421IIY/eVrK+AMc9r3
-	u9gROjWs=
-X-Gm-Gg: AYBFou3pc/BgqampOtKOr3wmnYY+Fu45AEZsc4n96kRSH2cBVBy4kC5qS4Fbqs2HWBv
-	f+hBRJwTPqsCDSs7yKPeFp0hbLx3ifZmh+4NEgP42c8klhMkQR7n8mqvk/lcatQHHsrPbKDqt+i
-	yRqGeZhVwWPuvcRKZgS9muc+jpEd8ToUhSVekbrR7oUvZG7/1300x/7nDmHGo1U0cqdN5DRt9FB
-	krdHG3fKfw70x/dDhL7ZpgMaHo+rDn+sz8QLc1JLB12y1Wcd3ouNqDwr9JyJrzvdUnPUEzcjJri
-	ZfTGG88w5T5x5HcKsllx/deKUoVwcO74hkgKJ0J7q1rrgjZEAR+VH5H+3I6Uxg5MlCNDgPK9V1f
-	9Vjx1UstpPq5QMecNUaMUs2OwTCQRl2vEVRMvqkIcBuR8xAkErxPKgyGH8IyHkpsh6wMr4ug6TL
-	AfBzO5IIvOnvavTBHtODvXPdTTeI12W72l42HPKaaT7xlAnuerrOtjbbSQTeNiVolSg1tGaodm9
-	BOIl+FI1NzbeROlZ3BjVx1a3dKhFm1spw1qhwsbzzmWgaJbs1y2l07XKVZmrcloYo35yqIPVgkr
-	uZeUn0ZnSZN9QdrI93epd9mbCGKtuz1ba8ccqgU+XQlURYy1MyJ+Rd966T2Va4VLwGW/NZP66Q=
+        d=1e100.net; s=20260707; t=1793205877; x=1793810677;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=J0xUkTNFr6seTcki+ti3k5OnyqCFLX6M/RKIcdbvF3g=;
+        b=hp2CGgBt21ysebkv35tCMlY6DDpft7WVQ947XMI4nB5Szga6VCggXML90nSZT/HlKS
+         n4hYl1dx7aEUemRuBfcXWMGCPt9HkNkGcXBnjN54OFMXTJhiy578xHAy8m+V9y8YPwz0
+         porujRBAFJI/1N/WnsNvmf4Hg22Ezu663LFOePX/6aSaowe1sd+RCFDLZvuQbYkJwt4b
+         aOY6vVjTmuPQpjugOtYHqLl//W8VE/6l+yv0qdQdQeuDg+ZtxalTi/+5+IQOOVhTKmXW
+         OVoippldODbHiZ0GehpUb1UvF9dkwmdbB0CSpTMPS+eRACSKZgnG/kJXUCDVkB3a7nOO
+         TuRQ==
+X-Gm-Message-State: AFq9FYLi2WCsb7WLs1SabKbRZxV9nYGYfRjlAjx2/w9NkauHIRwDeKax
+	d+vEn/hOVitqkQlfIc6jl1YdnZxlBqiajcseK8KMKFlssiW+R6a/XO4xx4zQkEFWF2nnfYOB8GW
+	CYGJJ7+w=
+X-Gm-Gg: AYBFou1E28dgxJljOcgg/QfPDDayISqRoJcaz6lXU16EqCNWM7WvuCgfWWEc5xveeep
+	ue5KhbzLHegdyrxYVFlVcTkaF628wbpBWyj7Hu3wlddwOx2KZlTk9NLJiI4ivZp3LUR9i3xUz/i
+	94e02Rway27qX4YtTgMpjrhbrmJcOsbEfz8V1QyOS6kqxLh2SUAwItb9/8zVAeHR5BgX4ZPYW5w
+	0t+CI7Q8mCA/RL+4opfC7VODEh/5SqIMQiR/FbYl7pQHd5fTyDd28HXSInf0rDxuzixo36Bskhs
+	qp5urc/c7hc3RabH0Ecrxu9JJoPvQSrspA020qHZNZqiyM40q+ey5Boi1lD+AZTcQ3TN+0VYoN2
+	lV6XQfKru+Ze6dZrABYpqD3/8RObLc7uj0KrLgmro7uocw8dt5/PqY0HNiNMbPaUhOUogKudGks
+	mEGKhZ199JBPbm1o1uu6bd5ol7pIXLa6kinULBdy54yIDeFpT4lbfyRI0ysP21e8JoM3LiJp11U
+	xtxP0iNiJR7ACjcL4XznHi+XG9K4iipp/Z260ojSDakrNC5ZxIK5el4VflD7EykfVd9qi/ANzO5
+	xPtZES+wTnIR+Iccu9inzvjfcu80u9HbU5KnctcxcLr6mrlmshLYaPvT7sSLAgcK+YrEV2zeJQ=
 	=
-X-Received: by 2002:a05:6820:a009:b0:6d2:a9c5:ec7a with SMTP id 006d021491bc7-713ef3396c6mr1246563eaf.34.1793205876320;
-        Wed, 28 Oct 2026 09:44:36 -0700 (PDT)
+X-Received: by 2002:a05:6830:640f:b0:806:e047:cd6e with SMTP id 46e09a7af769-85abf9642d0mr2393434a34.8.1793205877660;
+        Wed, 28 Oct 2026 09:44:37 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.35
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.44.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:44:35 -0700 (PDT)
+        Wed, 28 Oct 2026 09:44:36 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 14/98] drbd: take req_lock to skip the initial sync as peer
-Date: Wed, 28 Oct 2026 10:41:17 -0600
-Message-ID: <20261028164415.1262013-15-axboe@kernel.dk>
+Subject: [PATCH 15/98] zloop: refuse zone files without read/write_iter
+Date: Wed, 28 Oct 2026 10:41:18 -0600
+Message-ID: <20261028164415.1262013-16-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -102,41 +100,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-_drbd_set_state() must be called with req_lock held. drbd_adm_new_c_uuid()
-does, receive_uuids() on the peer doesn't, so a concurrent state change
-gets lost: the device is Secondary again, or its failed disk UpToDate,
-while the work for the lost change is already queued.
+zloop_do_rw() calls ->read_iter() and ->write_iter() on the zone files
+without checking that they exist. A base_dir on hugetlbfs, or zone files
+that are links into procfs, create a device just fine and the first IO
+jumps to NULL. Check for both when a zone file is opened, like loop does
+for its backing file.
 
-Fixes: b411b3637fa7 ("The DRBD driver")
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-Cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
+Fixes: eb0570c7df23 ("block: new zoned loop block device driver")
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/block/drbd/drbd_receiver.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/block/zloop.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 2135c14354a8..a405ccdf919e 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -4096,8 +4096,10 @@ static int receive_uuids(struct drbd_connection *connection, struct packet_info
- 					BM_LOCKED_TEST_ALLOWED, NULL);
- 			_drbd_uuid_set(device, UI_CURRENT, p_uuid[UI_CURRENT]);
- 			_drbd_uuid_set(device, UI_BITMAP, 0);
-+			spin_lock_irq(&device->resource->req_lock);
- 			_drbd_set_state(_NS2(device, disk, D_UP_TO_DATE, pdsk, D_UP_TO_DATE),
- 					CS_VERBOSE, NULL);
-+			spin_unlock_irq(&device->resource->req_lock);
- 			drbd_md_sync(device);
- 			updated_uuids = 1;
- 		}
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 9145e0f98d56..b4076940ae7f 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -1056,6 +1056,16 @@ static struct file *zloop_filp_open_fmt(int oflags, umode_t mode,
+ 		return ERR_PTR(-ENOMEM);
+ 	file = filp_open(p, oflags, mode);
+ 	kfree(p);
++	if (IS_ERR(file))
++		return file;
++
++	/* Zone files are accessed with ->read_iter() and ->write_iter(). */
++	if ((oflags & O_ACCMODE) == O_RDWR &&
++	    (!file->f_op->read_iter || !file->f_op->write_iter)) {
++		fput(file);
++		return ERR_PTR(-EINVAL);
++	}
++
+ 	return file;
+ }
+ 
 -- 
 2.56.0
 
