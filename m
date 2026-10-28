@@ -1,87 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=220.197.31.5
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793163020;
-	b=IDcQ/k9EkAAgmd2TCMyPQyoHuGkdwluihWBoDbDwxX32hO20CKy4WeQoJFeFQSBQ5koB
-	 1yKhGjH/KkIIapwGGINTrUCbAVG0TqhDEtNoNpzg8XMOtCwGP3KPM2ml+ozLY5d5RKJ+g
-	 Z3DWrB+H+PKYvmd4zSmA95cbAIAi56svDO14XI/7WGqxzSCOr5tBGGMaMNF3gUSdk5k9d
-	 m+rzMiEw4OLobSjkbvV8e0X2RCT4cxb54Vnt3hrIFGTO/7lqWd51V1sFt1oKIQRsPhjlI
-	 wM8Lri45yIezpBQj/iO7ztuvjo0A+An74Xx9miExKhAbZAmarPyDWZm1g5+89VH+/Jg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793163020;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-Id:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding:X-CM-TRANSID:
-	 X-Coremail-Antispam:X-CM-SenderInfo;
-	bh=5eX6ZERtxMma6IIiwk4zjHSJGCnTW5TdkQ89tZL/8dM=;
-	b=GmxtOGfyUj5pCCr4aqR0JioNiimFurOzK9YRtRlglGWJpfIKgJ987Fj/+EPj6frdd9VP
-	 OZi/sW3bgP5+u7xP42PaGohspt/uhERJLLeUnmU1uCOl/iF/OncY2YOXrpolVUiLlUQNX
-	 sdCCAsSxP59wd1Oijbf1kLiQCoaWfiXQG4qBJSJLiXFuQeDbYIPebH8EEJCDaOnQddyK0
-	 BNkZWC2k1pO4PBlyfYn8Ehs4n6td59E9NlJznKUNJzsd4kuZxhZ2ZKXVnVbw8+NhiaAKc
-	 /pfL8u6VwErNkSObK6xg+cXK4YUkG0C/5WC6ErYXtsjiNjocnfvZDc8ozUKTQQr4oYg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=163.com;
-	spf=pass smtp.mailfrom=163.com;
-	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b="Pmoe/AMv";
-	arc=none smtp.remote-ip=220.197.31.5
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.139
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793178282;
+	b=WXOSC9hY3ps1iZvUxQ4YWKIvTZT/vREJq8lOrkUvW9ufc5IY2l+3EhzqoeBxZ/bM/dKx
+	 SDQ0wH7qSrAwlVzTxVHTcIMZ5kz95D0yqVwR9nNhqk6iUNJ+W76os1nVQ7VCgfny6A3Cy
+	 2KGQ2IGwn9JvtKGTYBuCkjjgQ+FLfVHaRlldLGT2xaI06yIMs75qoeQymVVStleIKZbVk
+	 /gntiY2U8k84VG/6BbW890DHDHz/LMJWHTC0EehIml5zlcolAVcNkbNLBTC3fVg1Gv1ZP
+	 ZzdNpRVw1zQ8v5NYTl+mmrWpXhFyS9lJR6TsBtyFTlYbWSAzpk/oyqnvGAlW4G0cy1A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793178282;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=7baAZch0AV2ZQpsltJrgKMT5HFebbDsF2TyQttQo+4Q=;
+	b=0cW7PbrD2XfEIcddQggQE6n3f7UoYb8f6TBCUb5QpnXI/5VA9jENDWuiRxp+sL+1Zr6P
+	 Futd4tMpVlFmauJFP7f+WI6uqm1h34YT4wRzvgbYFBNlAWHMIuoUGzM6fKWiYVAZQjtRx
+	 Ai8T6nR8k+ApXLk3ZW/1bwYsqSU33TeuX79cePykupWOPthSLZeTZ+OhB5FLxOUSXgmrE
+	 SDuzvFoEipeJ7WpsrVghOI3kFP+jW4vmugnbEFHzKaVf89Vilg0zZ682bGjsfAkvFyE3W
+	 Ub449ShBcaJxDwuOST3Wlrp9EwDeOT2z+tZUh4FO1L6RKpkCwYGIa+sfXneF9/pNLaQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PeHJH9Hz;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.139
+Received: from mail-yx2-f11.google.com (mail-yx2-f11.google.com [74.125.224.139])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD134606A31A;
-	Wed, 28 Oct 2026 04:50:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD134606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB30606A320
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:04:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DAB30606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=Pmoe/AMv
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=5e
-	X6ZERtxMma6IIiwk4zjHSJGCnTW5TdkQ89tZL/8dM=; b=Pmoe/AMv61DOoUS7hw
-	fJtrZ1OMVnBesqPe6v4a8+oGDtdeJ3Kmtf4tf4a4NHv6eHPXLarg1WgKZ5yBzh2D
-	sCKfYqy6c0tdGZ0XZrY36teHjocwbfTitnmOp/cu5Kq9/4MNwk/sKJvQ7YHsj4rp
-	O2kCYpKzGX/5HwlY9DZzq6lCs=
-Received: from pc.localdomain (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgDXXyGcfuFqI22BCQ--.35298S2;
-	Wed, 28 Oct 2026 12:48:30 +0800 (CST)
-From: Jiale Yao <yaojiale02@163.com>
-To: Justin Sanders <justin@coraid.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Brad Warrum <bwarrum@linux.ibm.com>,
-	Ritu Agarwal <rituagar@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-	Mukesh Rathor <mrathor@linux.microsoft.com>,
-	Muminul Islam <muislam@microsoft.com>,
-	Nuno Das Neves <nunodasneves@linux.microsoft.com>,
-	Steven Royer <seroyer@linux.vnet.ibm.com>,
-	Adam Reznechek <adreznec@linux.vnet.ibm.com>,
-	"Bryant G. Ly" <bryantly@linux.vnet.ibm.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Florian Fainelli <florian.fainelli@telecomint.eu>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-hyperv@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-watchdog@vger.kernel.org
-Subject: [PATCH 0/6] Initialize device state before userspace registration
-Date: Wed, 28 Oct 2026 12:48:20 +0800
-Message-Id: <20261028044828.96177-1-yaojiale02@163.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PeHJH9Hz
+Received: by mail-yx2-f11.google.com with SMTP id 956f58d0204a3-66c70d59eb7so95408d50.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 02:04:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1793178281; cv=none;
+        d=google.com; s=arc-20260327;
+        b=oGZHLzw92+wzzRzDAFhC3jLZMwMgahg4u657wchzVz8M3Zpctcg53iLX3fumAApzHe
+         mQXGL7GqPJpX1ZviLykFIHFvIPNCAlisP0ce9GkAY8NJ7qe2kLTvwafdmJbYkbfKPkLI
+         L/1kELA6ww4Vnl84n3KH+J94h0N1r6KyY32FPTv+W+LmbOeqAdDNmg14b15ImobMkDgM
+         IlULPbB3V6hxRPVobZosb5BpGFaCd7n9B9jiUaC/Z3u8V4xNLlw8PBRKpZj4ADT6piKG
+         IjHLVIYklphCam9PLki7SevsjGx3m9tMoVcO/jAJCbV+vInw2YN4OeQT5ZF45S7GzOtz
+         PfxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7baAZch0AV2ZQpsltJrgKMT5HFebbDsF2TyQttQo+4Q=;
+        fh=gne8D9lh9gDHj4yNw5sBtHDKfQL5Y1/nbawFNkBjdGI=;
+        b=ovEUXKuYg933lKjJ+fQmjkVXI3VrDvSighEnomzNSg4xcpkVwNyd5fG7aWcMOjySbe
+         BwqLIDGL0aDl2DSEEOZX2/zOx2ywmtE9W/Fqpusll6K4atn17b3kDazF+nRlNRI/D6sX
+         0sLXPO/XIw3KQNfDEzCEWbXZELX6Djuf1dRdIkPrnKYeXHGgIFWGY2LUClpM5ms6Fb7s
+         U3u5cKFZ5RDcSr3iYEAo0V+mx9gMLnWW1/cFHslrDYs1nRpBouUxmA+d0OykHugqav/0
+         UeeeY2OeRJ8Yc3tW8GQl1DRveN+tgb9FUJg2PzCkzaPCog3GPJiA7kz1+yMb5rpscxLa
+         Q22A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793178281; x=1793783081; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=7baAZch0AV2ZQpsltJrgKMT5HFebbDsF2TyQttQo+4Q=;
+        b=PeHJH9HzitfqkHwUIHziH4oDgPV1ijSyhYS2wKuypkLLe+lOu9OQCg4T2KXrMxSJZj
+         ykW+O7RylgBeVYNscJ5iqZJ48jlNNNhh5Rbuz9fAsvvS0TIV0EW0QjcgjuNyhmWVvJw4
+         FjPxtpF0pBkjnucpcDHDuSPGnO+Hy27FrzDtYFdzJWI28spm2h6kWo9IHKSe3LsuX/uz
+         tuRLgGxD1DQX32ulW41HqIyNhcxn4mGnXUXwccr2adZ0vUr5t1zF1mVyAX4A3Ak5NcZ8
+         h8K8FiQqeJ7ujG2qQANX6pRLM2r8U8qFiPxlpeHb7eK0xlk0lqtC+O7j/RAjDQWTKkar
+         qfcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793178281; x=1793783081;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=7baAZch0AV2ZQpsltJrgKMT5HFebbDsF2TyQttQo+4Q=;
+        b=BSbKybs9LELjup2CxPrzbLh56BhKx6SpihXIJZVz0MYRTKsPY6OD/tY4ID6sIV2L/f
+         Vx1dDBGeK0pq0OyNOdEQJt3gLaEMQubTl0oHblTb+7evngo1aN14BjMA2dNEXMmgx9Oe
+         jCthX7mnNILUevZk/Fr1QEbGtPwdZpFvF7Y7dONWTTFdrH5mQjxkYHaJzOc/WqffKgFt
+         3hwvTE8eNA3yfmkaBd8QBM36VZHsivDQzdIYmwyAdYg3P49lhOMgnfpymXVCWo3toqZZ
+         02Y9IdzBq8dizBgy4pNEeJd7Rb7ZQJdLI2cq8AhKyBu8Ow1Y1mDMP+JC25ArIa7nHjoL
+         swnQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzjAiB3DvoBBi3nilTYjWtvHsISTGPECXkb/zJ703E6zLi9WzEzwkIYbSXFLWOiZoyg9SvOc1wR4xYBiQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKghCLJsqNMJXcnlVR9j+w0M1bM6evcUCgNQjEHJ9XoqnngfgVj
+	63ehiAR/FVYg3ychgvS0Welhvv9bRXEoipFa7/9YaBJ1Z+0Yx5jA/dNDYXNkP9I/vgbJtwhURsx
+	9qSB9q1POWI7AujmcwsNIwAZwvxL2TqA=
+X-Gm-Gg: AYBFou1XVEY0ye9JETvwD96gzlKesotUEzx3+YqMx9retyowGT4OPkEpB8vjWt4PAfh
+	o9Udh2Wo9qUeTaOI7zC5SRTWTcu+qEc5JiC82HlS1sFClJApPFE5PDTlaj3r3xo9Od6D9aik1bG
+	s5sdk2nVKpWUWD6THiMtEIMZ4oNwYBC3zcgmdZeeosTI3kXCpO1YTFtKRIiGnSUVZVPxaBKboNh
+	JTQ4CkKxC9IPFCj/5Gjlu3+by2ENDu80FZj6uRvAyvaDQEbMciQD4jhyeIpZhNQ2u9JQfxJnEHe
+	LSb4EDxs+7OHditX9tegOsQDFwtmuoBeT7fssnPoGTT3I7DbqQ2c5lPuf4B3X7PIuFunS5j6fAS
+	TbbVRgEqAhQNqCKhaE5wfYFz6vqqcsygAW7UVBAIhdFrEsXRqYGFPhiak7A==
+X-Received: by 2002:a05:690e:1699:b0:679:bd09:f46 with SMTP id
+ 956f58d0204a3-67a813f79cbmr815916d50.6.1793178280698; Wed, 28 Oct 2026
+ 02:04:40 -0700 (PDT)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -91,39 +104,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgDXXyGcfuFqI22BCQ--.35298S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7XFWfGw4fZr1kWFy5Xry5Jwb_yoW8Jry3pa
-	1Sg3sYy392krW7Xr43Zay7Ga4Fga48uayUCF90kw1FgFs5CFyvqFW0qay8tFWDJFWxA3W0
-	qF10vrWxGFWUCrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UpE_NUUUUU=
-X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbC7x7ZFGrhfp6IQwAA3c
+References: <20261018081203.2431035-1-l1za0.sec@gmail.com> <20261018183707.23dba84df0a235e36de1620d@linux-foundation.org>
+In-Reply-To: <20261018183707.23dba84df0a235e36de1620d@linux-foundation.org>
+From: Li Zao <l1za0.sec@gmail.com>
+Date: Wed, 28 Oct 2026 17:04:23 +0800
+X-Gm-Features: AclHuK92W6eCjxLVFBVIgwy3cZtZtdZpLsiCnKY2XBI3u7Tc-5IEfkiWO_P6Glk
+Message-ID: <CAAwbnpdgKj5hEky8ZRcPOzJurj6W_rf4X4nEkMsfCU2CfXJj0g@mail.gmail.com>
+Subject: Re: [BUG] KASAN: slab-out-of-bounds Read in copy_folio_from_iter_atomic
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: viro@zeniv.linux.org.uk, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Tal Zussman <tz2294@columbia.edu>, Daehyeon Ko <4ncienth@gmail.com>, 
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Several drivers register character devices or sysfs attributes before
-initializing synchronization objects and related state used by their
-userspace entry points. Registration makes those entry points immediately
-available, so a concurrent access can reach partially initialized state.
+On Mon, Oct 19, 2026 at 9:37=E2=80=AFAM Andrew Morton <akpm@linux-foundatio=
+n.org> wrote:
 
-Move each initialization ahead of the corresponding registration. The
-patches are independent and cover AoE, fsl-mc, MSHV, IBM VMC, DCSSBLK,
-and the RDC321x watchdog.
+> Thanks.  Boy I burned a lot of tokens on this.
+>
+> I was able to reproduce this.  I found that Daehyeon's "iov_iter:
+> validate extracted segment for bvec alignment" makes the KASAN warnings
+> go away.  https://lore.kernel.org/20261015061907.2713943-1-4ncienth@gmail=
+.com
+>
+> Daehyeon's patch is presently in mm.git's mm-unstable branch, with
+> cc:stable, targeted for upstreaming during the second week of the merge
+> window.
+>
+> Daehyeon's patch prevents this reproducer from triggering the bug by
+> rejecting the misaligned direct-I/O request before extraction advances
+> the iterator.  Without that check, extraction skips the initial empty
+> iovec and the following 10-byte segment, then encounters an alignment
+> error.  The bio is discarded, but the iterator remains advanced.  iomap
+> subsequently restores its byte count without restoring its position,
+> leaving 1025 bytes recorded when only 1015 remain.  Buffered-I/O
+> fallback then walks beyond the imported iovec array.  So Daehyeon's
+> patch avoids the bad path, but doesn't address the underlying failure
+> to restore the iterator when rejecting a bio.
 
-Jiale Yao (6):
-  aoe: initialize error message synchronization before registration
-  bus: fsl-mc: initialize UAPI state before device registration
-  Drivers: hv: initialize partition table before device registration
-  misc: ibmvmc: initialize HMC state before device registration
-  s390/dcssblk: initialize device semaphore before sysfs registration
-  watchdog: rdc321x: initialize device state before registration
 
- drivers/block/aoe/aoechr.c       |  6 +++---
- drivers/bus/fsl-mc/fsl-mc-uapi.c |  6 ++----
- drivers/hv/mshv_root_main.c      |  6 +++---
- drivers/misc/ibmvmc.c            | 16 ++++++++--------
- drivers/s390/block/dcssblk.c     |  3 ++-
- drivers/watchdog/rdc321x_wdt.c   | 12 ++++++------
- 6 files changed, 24 insertions(+), 25 deletions(-)
+Hi,
 
--- 
-2.34.1
+Thanks for investigating the issue and preparing a patch.
 
+I was wondering whether a CVE ID would be assigned to this vulnerability.
+The CVE ID is important for our research, and we'd appreciate any update.
+
+Best regards,
+Haocheng Yu
