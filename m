@@ -1,94 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793205952;
-	b=EzVi4Fm/W8RtsKujmySpiH+Lyw8KzC8RSYVD9IhXgEbxBL3ahbyh1GCr2VY4/m71orp4
-	 6eoCUzE6vzuKx7d3KTAmdmuzKemH6dy6c03gt5g/Q0kqw5O31yFBLW9thKJ+blvy3Ahzd
-	 916mevU5ZyZv/HEkcjhSnTf2ycBjHfl63EAY3dqZaFcI3Sl2w+Cgdp6YDPloahsgZpVze
-	 4qN+mIRMNPHgBtJ+AtcMvWUbVM/GcpfBhwY63pkF6PnVjzkpkVI647I/TOfUOZ5muw7/O
-	 LCLp4oEbXAV4q5bVcoB+nUfNniTYvNj0sI6TrkJn1YKLiRxMz+4z7QWBzTDIgpLWHww==
+	t=1793205953;
+	b=fsINK2pHVX8fdSDjGwOqJATHNCaoFxCf+0EiaI+77XcjODiGx2H0O9DYzux5F/N09Ihe
+	 97BmVJjBsRKmaFuIzCKBbpbguwjGwS3mH2p02A24cWOkptpAuFVxXLDg/lbAViExjLNPH
+	 UVVfHxVit+GD/31eDE+aue3g8iw521oVcq/pg4B1d+f1gyT/f8cCJDF2V1Z5JU5+5VePP
+	 2NTmNVUUzRfv0fPRPmLiTl5eaqliFkI6V+xTMbfOgdjUBFUIVdJUjyrSzRP/Jgmo4SbJA
+	 dv1DqdRsdkwGQBaIMNIIQa8I0hZj0mCmp9JEAGJbSzT/PSetN+U9XUFdZ74qChEyWfQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793205952;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793205953;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=jlhI/uzOfwVf3BoL3UiUzwTILCcRcijMCYaiODSmN4s=;
-	b=abIiKiXuAOfF4TXVUU9Snx1jTXqMNV4xfROZU6+udq568vNMPJPxMiFwknGiSxZnc8BX
-	 ViRnIFOej0nzobCDmLt/sQG4Hkw3Ju4cjDr4p3QHwqMZbFPYCfbmzsE70dfpfrd2Rpe5r
-	 ebztANHAuFYRFvXdMssAnDtB1XfhTb1sy75vN1xZPQdqVju3WQm/FAohPdxAdPh8JYMWl
-	 TLwcnjppdiYqVb5OYRbDaudIbarrPYbZ5+Ht71k8LblTd5UQUbfLcELWYUY/Finf5MdCP
-	 amuXE7zUD2SVWZCHliXVzZUPxtKIVcE3dZ+lOUjpRNqtMOYw3Lh6hheZiM7yWe4rZXw==
+	bh=wLrW1fe0BLlmqySJPVK+vEPqFevObDHYLzu83wDZCVw=;
+	b=yq6eGgtISy6K7i95N1QDrktlebiQ80r+MkcmGW9UALSY/dPx6ZyZJVMc2Sl62+f6ZR8a
+	 9L4k9pZ9GrBQRCHc2TqaaQoTo+fg2cdrdb1K2RqCRJWLjTywP3b5zYGhl61uZq19Py18Z
+	 5An5cDlGZ7sdF34qI/7zqMZYvOvuajeJ75AhXMjkdQ4B7ftWk9hXKdryBPKKXmSOLgHwj
+	 kyQi1wg/T+ym0uGRJx1yEpwode1T2tZN//2ivdGwJB2k7WE/Cm0DYBPINmQD6CIuy9B1v
+	 syAEhff0SoPiSCe9Lje056ZDwhozgE/R/Rzb1v7QWPCTzqAkk0s9URns9YKsepPH7Uw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=DNfVvUuW;
-	arc=none smtp.remote-ip=209.85.210.49
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=MMpxA6rz;
+	arc=none smtp.remote-ip=209.85.210.44
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0934A606A326
-	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0934A606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C908606A326
+	for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 16:45:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8C908606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=DNfVvUuW
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-84621d8c7aaso590100a34.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:51 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=MMpxA6rz
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-823b938464fso825975a34.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 09:45:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205951; x=1793810751; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793205952; x=1793810752; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=jlhI/uzOfwVf3BoL3UiUzwTILCcRcijMCYaiODSmN4s=;
-        b=DNfVvUuWJ5n/LPGvvcMylkKFP1nz8ANos97XK4IRa7SaVcdR4BCtVg2chJrVlpiXRB
-         b+2SqymSQZjKZKVfU7qwtIbhvJlV3N2u5rtLONtIrT9bTIK/DIAmNNtcuPLCTVZ0E3oQ
-         6t29241EB6VbjtyedtQevEL+Ic+KSYfyo7KYyxqO8ul3nFi2KAgiIrubnwTi8+55xhr1
-         sCfrTbRMiZsyOetSraK3gRMod2hLQqI6CCwlntKmMEKkUpDEc/nhG8Kj42NhVC0icaMh
-         SZF7l4Js8FSLdWNI66wPHqzJf4zx+Z+/uzx2SLkl8k3SeZBc0XTYklL90fEpwsdObD7e
-         Tikg==
+        bh=wLrW1fe0BLlmqySJPVK+vEPqFevObDHYLzu83wDZCVw=;
+        b=MMpxA6rz4Pozy6+RKyOxaKAi5X2N9oJ2ovVhRhLrGbnaZTc4RJVwaCLYgfFmcAYGwc
+         ZNQd1Pg5cPB0noAofba85i4piNrF9nl69PXXyXOaFMuc+MEhM7ouH/AsMajBMDLltbsw
+         cneyW53QDz8tBDMMP2xj0NajiBOkkAcCGAuNJk16yMxt0LdQRRHCwFPEvpox0hI7ueJL
+         CeqzSFzGOqXjvtimSNLyDs1H8254I/cYQhdAFs53j4Frm4jkiRMZvK4YxryIqqiT1tAS
+         6MRRhgSVZv4AjkojWQNTUmOFzTFYsmKqvxJQBz8y9ZJduUI8RXex6Z4Sy5BRknExp/60
+         UodA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793205951; x=1793810751;
+        d=1e100.net; s=20260707; t=1793205952; x=1793810752;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jlhI/uzOfwVf3BoL3UiUzwTILCcRcijMCYaiODSmN4s=;
-        b=KQ4GJivzWUKsmAPXM35lew0EWAqpEjd+tPs0suN9ms8dZrmY1ANNRdykUMWage7Aa0
-         9+3fQxUMPpuKUrCsNWxO+EYDP3ymb3W3N37hnJbaPokbTIUuPxvvFrxfiEuCnXl3n/jY
-         yiiu7n5bHCKWxxU0F6Tnf+mgNwGbldlnlQyEUpmcDFftLtMr4pxopCKWfDPIXJESvC7/
-         lmq4QDkQdb5Y6HaAe7+3hGo3qZiBd130dbO8WL3WreF5i9XXj4Z6Frdw/qWqDB2UiK7M
-         C+bfVGDHbUw1mnxFGbJzphufO0LnjTfmM6/6IiVzHFyJHkTS5LK7K+Omdc/Cwi/wF69Z
-         s1bA==
-X-Gm-Message-State: AFq9FYIAG5xbSW6RTGOhDAaUbNXHRR3ht5vL4SGeHwOU+6jZl3pikSRP
-	cxtQL4nvcFWFWZoiaH0dGX4NhI2lgMZP0Xj8uabyP8Esncz+lv/bkY5EOYsPhUVh3T1Dsq5eslW
-	OIHL+r3o=
-X-Gm-Gg: AYBFou2vbtJHHAZM1uG4W5vRB16tCy7XzHZWz5/FQFu2Yv6NzIpNsZ8aUNQLWcLH1Iu
-	NENGyK/MrdeyB4H+4hyDP0b6pJVwnJQuei38XGxfWRglZHKrQ6Y9FwjfjyXfVe82rhQptdGc18t
-	7I7NBpgeFOvaqY3QKig2l/3HdV+mPT9P+Ed1Pi8gOE2kwvrLfefknX6w4TJ80HFD/ICnd7QeKMy
-	wvrZkS6QlZ66kWd9t8dEFmlnDN32yPHwTRdwgoV6HyEnB89uRuL4+Is62SH+5jhFbUjw5So+hXU
-	0JTNuyNctbPMIXDlrblKNaawRWH+KEV7vIgmle0TWRc4DO5FDJOsg/kq5nk7FCu83v0+y+dN3Yy
-	KrHbIEPAohtQ+YIdtOxhAF7kEoiE4cebsEM31xUx3qflSgjCfdr7Z+JZZEbQU2dyO2OUly32fRC
-	KmYIo1Jv5hIlxg9SlG1YFwMNMyrPV5QpaIGRwQw/iVdiwCEox+CMJ3LQYsbJOCs30Pl1HgyFbbp
-	4hUvUOHTctQVkOlXh8fm1ijz1UjCq6EAAhB7vgRkKA/5fsguwjCBOB4k0AkhJtnDjhEEZUTCaj/
-	oHTBFjJwDlzqM0iQvXqBapUZwc5qUs5Fq/qi83VQtyGOOQ0HGv6lAdtM1H5StR2WtLp4q8C6kg=
-	=
-X-Received: by 2002:a05:6830:2690:b0:846:5d82:8bc8 with SMTP id 46e09a7af769-85ababeb330mr2721965a34.0.1793205951053;
-        Wed, 28 Oct 2026 09:45:51 -0700 (PDT)
+        bh=wLrW1fe0BLlmqySJPVK+vEPqFevObDHYLzu83wDZCVw=;
+        b=nmFy+ewLpvBpsBYpumEaXdKNDDRxu1W6CCmk/UuQla340/eYTiqiafbN4BZdK0WdtG
+         rIL0ecwgeMIBaRy2jmLdEPKWxZE4aLjUz/s4ZXND/+t081e5lTeAAKDz+J0MHEFMdFIW
+         MELLs/TahPOdpyG+iddpWs9RTPFdsXwq++QdkvP8YgQBqT7GZdTRr4IVu2sR6QoyAUfu
+         LluFN+q7boW97vy//z0JWY6rrxLfvjWSvHtgIcL3JYLvTg5+xHjNKI4G/4d24vXh5Nfn
+         47wJkxcTM+sSgkuUWl8B5nfS7gAv80aYUGaqK22HvN+F+Cqvumy2leyxdl6qIKLFLl8C
+         JSRw==
+X-Gm-Message-State: AFq9FYJ8ZfW6oe+06mHgH3iTjZ+ijgbKEmyfLPmHu9cWxlFnCJX6Z9IH
+	K/i2VaMGwcb4Fej1fkQMP5ykpWtjuRqQXXP9ictnKROnD6JR5Z9UqGKBGGdOEs7C9urlbaEBr74
+	yen2drBk=
+X-Gm-Gg: AYBFou0BYNW45MtqU7DrSHRdgxJxLlr8BwOeSWJpU0W6xsimqOf+0N3FJI7+4yK21RE
+	eYdPqzjWZoUQblX+7nh2sq/7Csi5peeXwW4s+NLNcLD7EDpJnv95ThvqGcm3wt+GJX1/fnZ4Z/u
+	cYbpX6MfrR5FQstCRHye3m9japRBUlQl8qONVj/FhlRoyAZ1cZmFblv0yG+HlI388SwOxo3GgCW
+	Cw4PRGZpDpeTXt7hGCgqTAWaRhM6KNRBn0ZpGhpMBAsD22PcWrgf69XIuAOQ+catB+CrvTmQHi6
+	BiezV4z4mcbDCXeFslu8h8M6j7TNnhJnyTg2lPQbTi0rLRuijx9KG75bzYSy8L9JXJ1kbPwLMTw
+	qdKV08u7LZXOrYWf1kbd3zfbv4tmtIZlRebjhSd6bDEE4iV+6jw2HHhi2AwZ8nVR3Ln51tXWolw
+	ene6W69IM1lR+i+LDsOMaokq+hutZ1A8FWs5qx5hTZ27fx1+9iOEI6SJAml+bAd82i0LSBNL1Bb
+	BGaH2TL7ptl2lVA/OL2kutgX8bFN+Ba+6S93xhThpw5z5ZTdVdJuqcTE93OAI+9UY2KF6jCgRay
+	wbXomXSuTt3cM3sFEBK4ix4JNA3VUkj+ZUOODXnNRvxnDM4vTm1Qa6xLnqP+QLrOZlXzGQHeJWh
+	fIC/YoTNTixTh0jPKyKM=
+X-Received: by 2002:a05:6830:3490:b0:822:ce5a:4ab with SMTP id 46e09a7af769-85ab9d504femr2871661a34.26.1793205952463;
+        Wed, 28 Oct 2026 09:45:52 -0700 (PDT)
 Received: from xps16 ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.49
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b20216828sm2416941a34.19.2026.10.28.09.45.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 09:45:50 -0700 (PDT)
+        Wed, 28 Oct 2026 09:45:51 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>,
-	Keith Busch <kbusch@kernel.org>,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 74/98] nvme-tcp: keep the page frag cache with the controller
-Date: Wed, 28 Oct 2026 10:42:17 -0600
-Message-ID: <20261028164415.1262013-75-axboe@kernel.dk>
+Subject: [PATCH 75/98] nvmet-tcp: hold the queue while the TLS timer is armed
+Date: Wed, 28 Oct 2026 10:42:18 -0600
+Message-ID: <20261028164415.1262013-76-axboe@kernel.dk>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261028164415.1262013-1-axboe@kernel.dk>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
@@ -105,110 +105,59 @@ Content-Transfer-Encoding: 8bit
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-nvme_tcp_init_request() allocates the PDU from the queue's page frag
-cache under pf_cache_lock, and it's called not just for the tag set but
-for the flush request of every hctx of a new namespace. The cache and
-the lock are torn down and reinitialized with the connection though,
-and a namespace scan isn't stopped by error recovery, so it allocates
-from a cache that's being drained or set up:
+nvmet_tcp_tls_handshake() hands the queue to tls_server_hello_psk() and
+arms the timeout work afterwards. The reference it takes belongs to the
+handshake and is dropped by nvmet_tcp_tls_handshake_done(). If the
+handshake already ended by then, the callback found no timer to cancel,
+and if it failed because the host closed the connection, the queue may
+be gone as well. The timer is then armed in freed memory and fires
+there. Anyone who can reach a TLS port can start a handshake and close
+the connection, it just takes a quick tlshd.
 
-  WARNING: kernel/locking/mutex.c:625 at __mutex_lock+0xa25/0x1a30
-   nvme_tcp_init_request+0x8c/0x1a0
-   blk_mq_alloc_and_init_hctx+0x28e/0x6c0
+Hold a second reference until the timer is armed, and arm it under
+state_lock only if the handshake is still in progress. The callback
+changes the state under that lock before it cancels the timer.
 
-Without lock debugging a waiter can spin forever on a mutex that's
-being reinitialized, an allocation beside the drain can return a
-fragment of a freed page, and what's allocated after the drain leaks if
-the controller goes away. The target, or anyone who can break the
-connection, picks the moment.
-
-The PDUs outlive the connection anyway. Initialize the lock with the
-controller and drain the caches when it's freed.
-
-Fixes: a5053c92b3db ("nvme-tcp: fix memory leak when freeing a queue")
-Fixes: 36ac05f7cfd5 ("nvme-tcp: fix usage of page_frag_cache")
-Cc: Keith Busch <kbusch@kernel.org>
+Fixes: 675b453e0241 ("nvmet-tcp: enable TLS handshake upcall")
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/host/tcp.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ drivers/nvme/target/tcp.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index c9531e653a2c..4aa666dd0266 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -162,6 +162,7 @@ struct nvme_tcp_queue_setup_ctx {
- struct nvme_tcp_ctrl {
- 	/* read only in the hot path */
- 	struct nvme_tcp_queue	*queues;
-+	int			nr_queues;	/* allocated, see queue_count */
- 	struct blk_mq_tag_set	tag_set;
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index 0b70d3647e28..908614fa82b0 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -1955,6 +1955,8 @@ static int nvmet_tcp_tls_handshake(struct nvmet_tcp_queue *queue)
+ 		return -EINVAL;
+ 	}
  
- 	/* other member variables */
-@@ -1668,8 +1669,6 @@ static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
- 	if (!test_and_clear_bit(NVME_TCP_Q_ALLOCATED, &queue->flags))
- 		return;
- 
--	page_frag_cache_drain(&queue->pf_cache);
--
- 	/**
- 	 * Prevent memory reclaim from triggering block I/O during socket
- 	 * teardown. The socket release path fput -> tcp_close ->
-@@ -1692,7 +1691,6 @@ static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
- 
- 	kfree(queue->pdu);
- 	mutex_destroy(&queue->send_mutex);
--	mutex_destroy(&queue->pf_cache_lock);
- }
- 
- static int nvme_tcp_init_connection(struct nvme_tcp_queue *queue)
-@@ -2021,7 +2019,6 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid,
- 	INIT_LIST_HEAD(&queue->send_list);
- 	mutex_init(&queue->send_mutex);
- 	INIT_WORK(&queue->io_work, nvme_tcp_io_work);
--	mutex_init(&queue->pf_cache_lock);
- 
- 	if (qid > 0)
- 		queue->cmnd_capsule_len = nctrl->ioccsz * 16;
-@@ -2153,7 +2150,6 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid,
- 	queue->sock = NULL;
- err_destroy_mutex:
- 	mutex_destroy(&queue->send_mutex);
--	mutex_destroy(&queue->pf_cache_lock);
++	/* One for the handshake, one to keep the queue until we are through */
++	kref_get(&queue->kref);
+ 	kref_get(&queue->kref);
+ 	pr_debug("queue %d: TLS ServerHello\n", queue->idx);
+ 	memset(&args, 0, sizeof(args));
+@@ -1969,9 +1971,15 @@ static int nvmet_tcp_tls_handshake(struct nvmet_tcp_queue *queue)
+ 		kref_put(&queue->kref, nvmet_tcp_release_queue);
+ 		pr_err("failed to start TLS, err=%d\n", ret);
+ 	} else {
+-		queue_delayed_work(nvmet_wq, &queue->tls_handshake_tmo_work,
+-				   tls_handshake_timeout * HZ);
++		/* The handshake may be over, then nobody cancels the timer */
++		spin_lock_bh(&queue->state_lock);
++		if (queue->state == NVMET_TCP_Q_TLS_HANDSHAKE)
++			queue_delayed_work(nvmet_wq,
++					   &queue->tls_handshake_tmo_work,
++					   tls_handshake_timeout * HZ);
++		spin_unlock_bh(&queue->state_lock);
+ 	}
++	kref_put(&queue->kref, nvmet_tcp_release_queue);
  	return ret;
  }
- 
-@@ -2840,6 +2836,10 @@ static void nvme_tcp_stop_ctrl(struct nvme_ctrl *ctrl)
- static void nvme_tcp_free_ctrl(struct nvme_ctrl *nctrl)
- {
- 	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
-+	int i;
-+
-+	for (i = 0; i < ctrl->nr_queues; i++)
-+		page_frag_cache_drain(&ctrl->queues[i].pf_cache);
- 
- 	if (list_empty_careful(&ctrl->list))
- 		goto free_ctrl;
-@@ -3265,9 +3265,15 @@ static struct nvme_tcp_ctrl *nvme_tcp_alloc_ctrl(struct device *dev,
- 		ret = -ENOMEM;
- 		goto out_free_ctrl;
- 	}
--	/* A poller may try the lock of a queue that has been freed */
--	for (i = 0; i < ctrl->ctrl.queue_count; i++)
-+	ctrl->nr_queues = ctrl->ctrl.queue_count;
-+	/*
-+	 * A poller may try the lock of a queue that has been freed, and a
-+	 * request of a new namespace may be set up for one.
-+	 */
-+	for (i = 0; i < ctrl->nr_queues; i++) {
- 		mutex_init(&ctrl->queues[i].queue_lock);
-+		mutex_init(&ctrl->queues[i].pf_cache_lock);
-+	}
- 
- 	ctrl->net = get_net(current->nsproxy->net_ns);
  
 -- 
 2.56.0
