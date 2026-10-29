@@ -1,59 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793279472;
-	b=HYozIFDpRKXUlv4svvBxDl/diq9Bvoq1/qhKTcj4RJkclxVmB0Y402cGamopExbrpbW5
-	 QFuUgrEVviRutQleHF/2v6eEmjxof1sS7trpis+mwyW7fIvX4Jo/mKw9vvgCOwV0saG0h
-	 E5ukz9cS8jLOPh088p6QRhpD7mhEllsJmTX9Lm4Oy7OZeOhWtHrWRc9LzZXkQp+sqPRMF
-	 BMZJhnuxOrmAXob55d9B3488gcKuJkRBLnuYFeFAWxf/6e0zO1/iv700cbn5Xn1Hvl3bp
-	 ogEFAPREj9vnwea89aumusHpbvsFKjNM6YHi/6a84I2G3ItuqfrKBql2KSUaXXaCm4w==
+	t=1793279512;
+	b=f9yplGyKIf531qXZBMLxm2QIZAoAUgkMvCwMhB/2szBOkB5bnLff7y3/NhlH3G2iYnH4
+	 aTrgrByC/Kg3n2A/zDwBKUFvzb+rCeY3PZUSK3LuBBO+XaFSv/qxfMIP246aZvXE2bMhj
+	 B/JIifT0QiTnVnEJhF3dw9dnYe4+D2etJXywQSJxRyY+HBOa+Eg58Ru+biGQk7DZhP2pG
+	 nUpf16V1e4bFUJbPYPhEj9Utx3YMrW5I1Q8sm/RspR7uUPsqpicesgZvmUyYght5e5u6P
+	 1T2FrRZ+stenlEvj/a4L+k2ZKe+YzZDxrmehiz4xjQr6YM+Nw+hgdRjnxMXKg76TOLQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793279472;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:X-SRS-Rewrite;
-	bh=v6ZXBTo/ISjfzE9wS/OAY12IKSvuSsxdMen/7ggLK5U=;
-	b=hKpWtBFp+bJ2mRp5XJdQPRvaf9kzpigO9xQQIIpkCm6hxPcWSeOj77NUkMja5G00aNNl
-	 r8UJenQ+/toSZSlYSsBv8c799mKZcl5Pvu1X5ctTLFo4XwaQa74f1+iDhm4XYVQG8bZr1
-	 MUxQ97lGpJ3ZG5ENzjLJtzK5J/Q1+QGXRnIosoeUmqq7k8xMXlpiRH1WaplyDdLLHrR9U
-	 J2KFvaipBvWWSFL1czeTL8uSQQ6cvVqwenY6uervtj1TAhyQudas9NJMEUkXpFSANUH/T
-	 ub5OCxI8i1u3YwVsLHN2d+XM38wBP2rcgpo5V94sG0RiQsDun48n6wdAMv5WlNAbVqw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793279512;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=s3Yt0HrKdBITV3RppTf2tI5kY66FXgjfj6dvBAbyZ6o=;
+	b=da589TOtdsd0sIXLAhl/N5qVatroo7OiWUO9jzOWF1cf7DkFNoe7aceHIVRPYo1+D76Y
+	 43C2GxF8f9EnI4kfieMWmuJJJHSS4UJEU9RVXXBt/gZjmELPk32p0banz4nteu6FJSGmV
+	 5/k6x2AEcz1kJl3s1OAOIqlG/SqUsGcTbkW351nF7Zafp0BCxahNKwZtiD9zaYl6kIbMj
+	 jDz0XCqVgxGKhRoqDwLpfwz13gLeieLl9zhY0DPRkEn/82YXmSk48rCoEWSD2pqM10jd7
+	 D5t+odh+aAO/VzpuZC2LclxhUFUvIWv8AAxaIyCyjzuvdTeWMiGSIHNAL5T1xnwmamA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b="VL/DQieV";
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=N8MOekKn;
+	arc=none smtp.remote-ip=74.125.82.178
+Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDB6606A31D
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 13:11:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BCDB6606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A1C606A31F
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 13:11:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B6A1C606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=VL/DQieV
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=v6ZXBTo/ISjfzE9wS/OAY12IKSvuSsxdMen/7ggLK5U=; b=VL/DQieV7yjWWNqvfKUdFBLOdO
-	1Pog1QbXNtc8sjGB4vBxlKFcNrinVlwIElFmBAgQ4ezeUSLQOyYvZnjAh7Rm2HRXZgn5SRPeMyfQz
-	GToaGmC5qrMOpkM88+DMYVCDRWNOHmxrD22+d9TFGk+NjSba8bR61fyMT5/Sp57DbEzotNeFwAyhC
-	dtz9b7DPxSJXdzPQRcskw3yG6J9kuzWH2g/m+9Lrt16yKaxJUgJhmgFylslELbO7DWlflXUMbTGtQ
-	GVlAdarHR8KFcHwQ9LUpgiNFPfJJzUVrRrFwvae2JnxKQe6hFTAx5xiSxTcZ55rQsTXf4NfQd/UN6
-	p2swlN5g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xMPuR-00000009I3Q-0pHm;
-	Thu, 29 Oct 2026 13:11:11 +0000
-Date: Thu, 29 Oct 2026 06:11:11 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>
-Subject: Re: [PATCH 38/98] blk-mq: set up a queue under tag_list_lock
-Message-ID: <auNF73ueU40KTazf@infradead.org>
-References: <20261028164415.1262013-1-axboe@kernel.dk>
- <20261028164415.1262013-39-axboe@kernel.dk>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=N8MOekKn
+Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-3282db206d3so1139081eec.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 06:11:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793279511; x=1793884311; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=s3Yt0HrKdBITV3RppTf2tI5kY66FXgjfj6dvBAbyZ6o=;
+        b=N8MOekKnePbThvOr5XtwsABA5d8aGIdRk9qSUu3fV1KapdkPX+H6ZunwxfM2x4YRte
+         m1Vs0SHlcSwhlbpFX4PVgfOLLct4G0F7RMYK/pAphbhT/Zgqpq4+KFbZkqiCqnZWvavs
+         kLtFIxX6SrOuddoo4rgn4byAFgYU+4DNrrcKW8Ygp+oOgqasl6orlQ245sEEYtUfOXPg
+         riGsXxjvxuvpqcvc8UptvwTEg4swCMhlnM/FWRJb4YAYmES6Ql7bDsBTx111XRNTwE6e
+         1PHbic2jNOt9IxYFy67QcGr+P5SH7P+s3ZPaAfzF356U7Ev2DLoGuLWeON7Sc9J/cqx2
+         Rpqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793279511; x=1793884311;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=s3Yt0HrKdBITV3RppTf2tI5kY66FXgjfj6dvBAbyZ6o=;
+        b=1yxUBF5VRRdZ9vJPqvWe0xmYgTjQZcminSenWHGwOs/PhtoCeQeJkZYGbbUr6j0lY6
+         8mD88Aj4DmWYvuXk+vQCH8Z3+acvuZa7w5YHgXFGKskThyWtPFoh7BWo/b3WhC9fdwjV
+         2jr7/EbaD6kcfmAmlLpnq+ktl4w6qgRtqQ9fVemGBtfhKp4o0d5WyqPZHpNlmkx373hL
+         Remb2nr5CZOGxd9qUbp1LAQYzAVhZwvTCQygdNNoPWzRev7KFDMP/QkKd24C8ZouoPb+
+         kX1LhevW2udyPthXlRwEO9Q7k+/02kofUY1GgidLgNjtYAj6PyV6KfhYT6A7EMWtr5bk
+         tIFg==
+X-Gm-Message-State: AFq9FYI8ACRxiYNm163WcFAE48WpNLndWIU7WyL5UkPA2//b555SEQhz
+	JWUh1KkJUTVhU6cCeWIPf3qmNtfmE0J4BFhnIpMbUwEpMrDQfvAPP1ymSTTg/SRuMwo=
+X-Gm-Gg: AYBFou1FOpJtT0bfxWZxvPJdOz4scSkkonTeza6MyEFrEervPdooIPmtpHXNdSVc9cj
+	W6xUfa1ZBD98FSS42/lMjPv2A5SpydeSw3+I3H0zd+4loe2Qg1nJYePWvvTA4HLz5V7zpg8KrPG
+	8Y8vvnDa4R1uU/n9Z+s0KzISVHE2NqHwdZ72PnjDZsO9fcji+W6C7/4kMUpiBvPIKPQqzfyq7pL
+	ewyx4jZfjvz7EkzQo+j/HI7xieG64pNaN4eySP1g6s5Fje+rKNNxIqyknkxTlfd5wxmA3JbLP8E
+	zQyj5rUGB2N4BYzYzXeYi0doFwDUYXanYq2EPKOGVGtHK/mjs0xgNjhvcK6Neqz+oS606FOFFj8
+	swzelolR/liOm56wviLAO6fWFvrYrWcQbmCM0rMC+s70Wx2t8AziOMQmzdEQ+atay9+5X0NAjDC
+	FhIQotuI+NjcPPQ3W+C2iRMieaMR5TzQ3nIkaI0kE6A3LMaH/SzjujyAytcKeO52A6dQ2S9BjWQ
+	EQwlbWyF6VFFI7HHa1exzlNfJGS75ij4styFavzGKqsllzBVhZ93WdRXzmzh1ZoXsgYAIliyJ6V
+	Av69Eq6R7ViisfUm/iWYBRjjss756fZQb62uB2jg8tk1hWlVbHXARCDDm58mxE/hi0JfuuAh8lN
+	zLWLNKuVRIM5mRWxw/choc2NczVkY74WuNg==
+X-Received: by 2002:a05:693c:8946:10b0:369:f7d2:d7a0 with SMTP id 5a478bee46e88-36a20407ad2mr8606217eec.25.1793279510655;
+        Thu, 29 Oct 2026 06:11:50 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a238d9a21sm18506359eec.4.2026.10.29.06.11.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Oct 2026 06:11:50 -0700 (PDT)
+Message-ID: <3297224f-c2da-42eb-83ae-68ae275c06f9@kernel.dk>
+Date: Thu, 29 Oct 2026 07:11:50 -0600
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -63,75 +91,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261028164415.1262013-39-axboe@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 15/98] zloop: refuse zone files without read/write_iter
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+ Damien Le Moal <dlemoal@kernel.org>
+References: <20261028164415.1262013-1-axboe@kernel.dk>
+ <20261028164415.1262013-16-axboe@kernel.dk> <auNCPdXOjqneFNsd@infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <auNCPdXOjqneFNsd@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 28, 2026 at 10:41:41AM -0600, Jens Axboe wrote:
-> From: Josef Bacik <josef@toxicpanda.com>
+On 10/29/26 6:55 AM, Christoph Hellwig wrote:
+> On Wed, Oct 28, 2026 at 10:41:18AM -0600, Jens Axboe wrote:
+>> +		return file;
+>> +
+>> +	/* Zone files are accessed with ->read_iter() and ->write_iter(). */
+>> +	if ((oflags & O_ACCMODE) == O_RDWR &&
 > 
-> blk_mq_init_allocated_queue() only takes tag_list_lock at the end, when
-> it adds the queue to the set. Before that it sizes the queue by
-> set->nr_hw_queues, hands out set->tags[], maps by set->map[], and
-> blk_mq_map_swqueue() frees tags of the set. An update clearing the maps
-> at that time makes the new queue free tags that all the other queues
-> share. An NVMe controller reset during a namespace scan does exactly
-> that.
+> I don't think this checks makes any sense.
 > 
-> Take the lock before the first look at the set. An update can be part of
-> error handling, so the allocations under the lock must not wait for IO:
-> memalloc_noio_save(), as in add_disk_fwnode().
-> 
-> Fixes: 868f2f0b7206 ("blk-mq: dynamic h/w context count")
-> Signed-off-by: Josef Bacik <josef@toxicpanda.com>
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->  block/blk-mq.c | 21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 37c8f68e23c4..458ef0970527 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4355,7 +4355,7 @@ static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
->  {
->  	unsigned int i;
->  
-> -	mutex_lock(&set->tag_list_lock);
-> +	lockdep_assert_held(&set->tag_list_lock);
->  
->  	/*
->  	 * Check to see if we're transitioning to shared (from 1 to 2 queues).
-> @@ -4380,8 +4380,6 @@ static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
->  			blk_mq_quiesce_queue_nowait(q);
->  	}
->  	spin_unlock(&set->quiesce_lock);
-> -
-> -	mutex_unlock(&set->tag_list_lock);
->  }
->  
->  /* All allocations will be freed in release handler of q->mq_kobj */
-> @@ -4658,6 +4656,8 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->  int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
->  		struct request_queue *q)
->  {
-> +	unsigned int memflags;
-> +
->  	/* mark the queue as mq asap */
->  	q->mq_ops = set->ops;
->  
-> @@ -4676,6 +4676,16 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
->  	INIT_LIST_HEAD(&q->unused_hctx_list);
->  	spin_lock_init(&q->unused_hctx_lock);
->  
-> +	/*
-> +	 * Keep blk_mq_update_nr_hw_queues() away until the queue is on
-> +	 * set->tag_list: it changes the number of hardware queues, the tags and
-> +	 * the maps, and blk_mq_map_swqueue() allocates and frees tags of the set.
+> The proper fix here is to copy and paste loop_check_backing_file from
+> loop.  I an prepare a patch for that.
 
-Overly long line inside an otherwise nicely formatted block comment :(
+Perfect, I'll drop this one.
 
-Otherwise similarly a slight worry about lock chains, otherwise this
-looks fine.
+-- 
+Jens Axboe
 
