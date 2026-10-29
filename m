@@ -1,104 +1,104 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793259517;
-	b=Oh5AEEQFQFTiOfLs9HKyHa9vH2AscqQ9KsJMZGKvc/ZV/YEo3GI2p1SWkdDYXoM89Pap
-	 L9FcL/iWnKCXiLg7eu9jpZiUIzhARSmTxDKjpgFDLT5lP7///TKzjm7SYb6wYabUTjXAb
-	 lhjwAe0CpIJtrMf/gg7KFxPZC24VPrTr1b6hrlVbyy+oHUxiUXhIyGuY11HE2x7lcdqmk
-	 V+jccdOMp1urSyGI4pVHaCIVPB5X98+mP8gmTu4a310BaA3n/AcvRvLRB4AB8kDtV5B74
-	 z+aaYf0I43ppDZyoH6qmUomKSSKW+54W2GDpNtnTK3pxvDAzN4PUsdYj4aze9QUte6A==
+	t=1793259658;
+	b=2b7IHTuRk/zjOZc48A+2BNFZEFHWkbPQW9ulkdFiEJFNFN4QJbxF1cXMAASUWo20W8FH
+	 Tb+N1YttnrwnbLDveZmTlOzA3FiZ59Zg3iJO5AUwOmX4YaG90mUHYQMGE1KmqJVaoPLgx
+	 f/cOofKjE1H3bHIVmY3IXgP+XZnvv5M4HoMu347hRW8n9pE5d2l4T+zBca+U6AsyEoDEW
+	 KEz4mn+0GACXfJ/9oWc3umHvEN3RiRDeIa8v6aGiN/FHz+02mnVzaxagTD62TU1rpoWp3
+	 bjhxMRanlmDdS/iyROGN3cFrNK6vOaT+MHR62hUrYb243qejl1kyUyV4ZL4HDl/ac3Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793259517;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793259658;
 	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
 	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
 	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Rspamd-Server:
 	 X-Rspamd-Action:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
 	 X-Rspamd-Queue-Id;
-	bh=e3frSo3K/Jd1hv8KRpaPeuDUFMDu6v7jRO6OAQZ6Aec=;
-	b=zCiIavHdIzUgIejXZEF7wnYI2/pWYA+RMH7Jnt2sAH+dEKJfC4mwu410kQHVR87LwXOn
-	 BKh/r9xPiblyEvNg+bN+xJmKZQ5qXJGs5iFI0yKe1vEx0SUNcdlKObyT4GDFg1CATY02l
-	 EYstDnvJPn2Vc7WY8/kBGNY7qFYPvmsg9dk8+90uSBZhnnYXktPIZ8f100KgkrPLJTJOf
-	 nuIHacpznuhPXIgz1pFS2Mr8Y5FX5dW6dNeJZ+c1Kr/Jxg2jGAkQNyQnpTs4JWop/6kMD
-	 9cKbewGZFHIS/Bdi3GI/5VA632+3dgwBJa4RNS0oLTpw6fck1BF8cYD1eAfWxmHwHjg==
+	bh=hUlacaKhExYHRf4258QqR1PayElB/Gd/eJyJhLSWnEo=;
+	b=v1qQleCcqzPoUEMTXK4AV2Hzq1Mr1w+LN0ZuONxY0KO/DOf57LqX/OdcSV+Ubk6eObMI
+	 ZfLNN8KKAIgIWR/SFr4q2CV2jDOoKHSsB1UCzHTzekTLFyLcsVWnn6iPSRvAWvf8EbdTw
+	 3kHtM6NKBvfTz9UEpK8+/yXbe2sj+VwnXoEuTqi4Sf/NxAorGPJ5ToOMOSCTejOlRqA7i
+	 sDna95raX0I6n+XlxymxmbGnJkg1iSMl/UpIbd5jvxayKiD1QJ2D1W9qqjl94SobMl0de
+	 LSqUif+Le6H8xmNh5xwcH60Tvg7Ey9vluwHT2q3jhpyVNoVY353ldUNyMjU/ZUu2dmw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=suse.de;
 	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=xYHEPqr3;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=d4KbX1F6;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=y2KUup2e;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=foeQCOgU;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=sRWTMFlU;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=ffHRCq6h;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=sRWTMFlU;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=ffHRCq6h;
 	arc=none smtp.remote-ip=195.135.223.131
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F9E606A323
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 07:38:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 68F9E606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3336A606A31A
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 07:40:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3336A606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=xYHEPqr3;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=d4KbX1F6;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=y2KUup2e;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=foeQCOgU
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=sRWTMFlU;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=ffHRCq6h;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=sRWTMFlU;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=ffHRCq6h
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 9EC3C1F800;
-	Thu, 29 Oct 2026 07:38:27 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4F3071F800;
+	Thu, 29 Oct 2026 07:40:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793259509; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1793259656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=e3frSo3K/Jd1hv8KRpaPeuDUFMDu6v7jRO6OAQZ6Aec=;
-	b=xYHEPqr3WNy/01A4spavlAdPKn4WCPGHo35JE7mARDbggLLfjyH+Wc3czSUJ0Z1Rb5c679
-	DUt0uDqv3Ui+Nj+YanafJ8vVMXoLijYXT2m3pb173HUs5VBOTF0knaeHyDS6U9q1kb+xC+
-	H3W+HhtkCBUN06k/3yiytH2Sj2UOhf4=
+	bh=hUlacaKhExYHRf4258QqR1PayElB/Gd/eJyJhLSWnEo=;
+	b=sRWTMFlUtEnw7gD0mNZno5CQ3dvwqF/OJukQ01b8uEvKF2z2Y9MU52Wgtjw4aV55Cqe0Co
+	TXdGboDyApVHkROokw6Os4j0k77pzJ9S5jRtj1nNJ5hzyIKR7SNYkuzEeI1xI22vFLzis1
+	n8l5C5RwQL5yhNrmhPQQFToIOzc/k0A=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793259509;
+	s=susede2_ed25519; t=1793259656;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=e3frSo3K/Jd1hv8KRpaPeuDUFMDu6v7jRO6OAQZ6Aec=;
-	b=d4KbX1F6364favyZPHiJC4/MqTwyXMl0kElka86nQWeVmfmNLRIv97fGHIjxnf1Ukckaan
-	QuF6u5h35A6XRXAw==
+	bh=hUlacaKhExYHRf4258QqR1PayElB/Gd/eJyJhLSWnEo=;
+	b=ffHRCq6h5u4KqiEb1dvKjSNWBU12vu4mglyDEgi1OmcPVUus5mexCrPz5UHA1WOyLB+5BV
+	DyrGdkoHZSwUyaBQ==
 Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=y2KUup2e;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=foeQCOgU
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=sRWTMFlU;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ffHRCq6h
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793259507; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1793259656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=e3frSo3K/Jd1hv8KRpaPeuDUFMDu6v7jRO6OAQZ6Aec=;
-	b=y2KUup2eGvSKcw/C/s2vfKtDXolUP6khRDGrgwDWjfhlq2Lk4PI1JPXs7pVaT1jZ8ssWKe
-	j06mpnoAVkmrMGGmpEmPp31CG19Znmk/GOlj01xXWNEpK1vyo5sdNSdBiC00q1Q2GIY+Jy
-	x1RL2F4Bd1pI1eDMy/8yHMLmCo9Fe94=
+	bh=hUlacaKhExYHRf4258QqR1PayElB/Gd/eJyJhLSWnEo=;
+	b=sRWTMFlUtEnw7gD0mNZno5CQ3dvwqF/OJukQ01b8uEvKF2z2Y9MU52Wgtjw4aV55Cqe0Co
+	TXdGboDyApVHkROokw6Os4j0k77pzJ9S5jRtj1nNJ5hzyIKR7SNYkuzEeI1xI22vFLzis1
+	n8l5C5RwQL5yhNrmhPQQFToIOzc/k0A=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793259507;
+	s=susede2_ed25519; t=1793259656;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=e3frSo3K/Jd1hv8KRpaPeuDUFMDu6v7jRO6OAQZ6Aec=;
-	b=foeQCOgUMfyJ3lDT6AOUhCma1xuIZ5m3L48RKHJM19PY/KfJx1IK/UWA9DHNTRT2/hu3lc
-	Bm1mv8YWk1iN42CA==
+	bh=hUlacaKhExYHRf4258QqR1PayElB/Gd/eJyJhLSWnEo=;
+	b=ffHRCq6h5u4KqiEb1dvKjSNWBU12vu4mglyDEgi1OmcPVUus5mexCrPz5UHA1WOyLB+5BV
+	DyrGdkoHZSwUyaBQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5632113419;
-	Thu, 29 Oct 2026 07:38:27 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E1E2213419;
+	Thu, 29 Oct 2026 07:40:55 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ES4+C/P34mo/EAAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 29 Oct 2026 07:38:27 +0000
-Message-ID: <54b9aa09-43a5-459a-b99b-1212c7fe94f8@suse.de>
-Date: Thu, 29 Oct 2026 08:38:18 +0100
+	id SpJ/Kof44mpeEwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 29 Oct 2026 07:40:55 +0000
+Message-ID: <9d50dd8f-ec5f-4d0f-806f-52c03b610b42@suse.de>
+Date: Thu, 29 Oct 2026 08:40:55 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -109,16 +109,16 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 49/98] nvmet-tcp: ask for the TLS record type on every
- receive
+Subject: Re: [PATCH 50/98] nvme-tcp: wait for an in-flight TLS handshake
+ callback
 To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
- <20261028164415.1262013-50-axboe@kernel.dk>
+ <20261028164415.1262013-51-axboe@kernel.dk>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261028164415.1262013-50-axboe@kernel.dk>
+In-Reply-To: <20261028164415.1262013-51-axboe@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-13.50 / 50.00];
@@ -142,7 +142,7 @@ X-Spamd-Result: default: False [-13.50 / 50.00];
 	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,kernel.dk:email,suse.de:email,suse.de:dkim,toxicpanda.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,grimberg.me:email,nvidia.com:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[grimberg.me:email,toxicpanda.com:email,kernel.dk:email,suse.de:email,suse.de:dkim,lst.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
 	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
@@ -152,50 +152,53 @@ X-Rspamd-Action: no action
 X-Spam-Flag: NO
 X-Spam-Score: -13.50
 X-Spam-Level: 
-X-Rspamd-Queue-Id: 9EC3C1F800
+X-Rspamd-Queue-Id: 4F3071F800
 
 On 10/28/26 5:41 PM, Jens Axboe wrote:
 > From: Josef Bacik <josef@toxicpanda.com>
 > 
-> nvmet_tcp_alloc_cmd() points recv_msg.msg_control at recv_cbuf once.
-> The first receive that stores a record type there advances msg_control
-> and leaves msg_controllen at 0 for the lifetime of the command. From
-> then on nvmet_tcp_try_recv_data() sees the record type of that first
-> receive: if it was an alert, all later data is dropped as alerts and the
-> queue stalls, if it was data, a later alert can't be reported and
-> tls_sw_recvmsg() fails with -EIO.
+> If the wait for the TLS handshake times out or is interrupted,
+> nvme_tcp_start_tls() cancels the request and returns.
+> tls_handshake_cancel() returns false if the handshake already completed,
+> in which case nvme_tcp_tls_done() may still be running while
+> nvme_tcp_alloc_queue() tears the queue down. On the first connect that
+> frees the controller, including the queue array the callback writes to.
 > 
-> Set up the control buffer before each receive, like the other receive
-> paths do.
+> If the cancel lost, wait for the callback to signal completion before
+> returning, like the SUNRPC callers do.
 > 
-> Fixes: a1c5dd8355b1 ("nvmet-tcp: control messages for recvmsg()")
+> Fixes: be8e82caa685 ("nvme-tcp: enable TLS handshake upcall")
+> Cc: Keith Busch <kbusch@kernel.org>
 > Cc: Christoph Hellwig <hch@lst.de>
 > Cc: Sagi Grimberg <sagi@grimberg.me>
-> Cc: Chaitanya Kulkarni <kch@nvidia.com>
 > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > ---
->   drivers/nvme/target/tcp.c | 5 +++++
->   1 file changed, 5 insertions(+)
+>   drivers/nvme/host/tcp.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-> index a0d942c34d3a..261672ab5c1f 100644
-> --- a/drivers/nvme/target/tcp.c
-> +++ b/drivers/nvme/target/tcp.c
-> @@ -1286,6 +1286,11 @@ static int nvmet_tcp_try_recv_data(struct nvmet_tcp_queue *queue)
->   	int len, ret;
->   
->   	while (msg_data_left(&cmd->recv_msg)) {
-> +		if (queue->tls_pskid) {
-> +			/* The last receive has used it up */
-> +			cmd->recv_msg.msg_control = cmd->recv_cbuf;
-> +			cmd->recv_msg.msg_controllen = sizeof(cmd->recv_cbuf);
-> +		}
->   		len = sock_recvmsg(cmd->queue->sock, &cmd->recv_msg,
->   			cmd->recv_msg.msg_flags);
->   		if (len <= 0)
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index 7190eb10c248..d735994ee517 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -1827,7 +1827,12 @@ static int nvme_tcp_start_tls(struct nvme_ctrl *nctrl,
+>   		dev_err(nctrl->device,
+>   			"queue %d: TLS handshake failed, error %d\n",
+>   			qid, ret);
+> -		tls_handshake_cancel(queue->sock->sk);
+> +		/*
+> +		 * If the cancellation lost to handshake_complete(),
+> +		 * nvme_tcp_tls_done() is in flight and still uses the queue.
+> +		 */
+> +		if (!tls_handshake_cancel(queue->sock->sk))
+> +			wait_for_completion(&queue->tls_complete);
+>   	} else {
+>   		if (queue->tls_err) {
+>   			dev_err(nctrl->device,
 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
+This has already been reported to the linux-nvme list
+(https://lore.kernel.org/linux-nvme/20261022071934.3818224-1-thnkslprpt@gmail.com/)
+Please drop.
 
 Cheers,
 
