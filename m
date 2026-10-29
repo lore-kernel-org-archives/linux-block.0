@@ -1,21 +1,21 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793276464;
-	b=tsWlLrpgeP6yEwtuzFR8AfktJaZXwovNpLkFV+K4ajjXD5rAk5Lv4uPq17TUGbUzY9c+
-	 0LCEOG07VCjBlChEYM7B3vTvvLuORWuVlAm/vGR+7PfZKTXJNe+kSuiu799MKIraRADXw
-	 OHh5ec5dlJlJ/jTYZeNDG/jBiPyftBZqxGuOPX4JnCXf8LDES8TWrPR2oRm9VrCgp8puQ
-	 0kO3HPYgCb+pgWldR6QGCK6/z1uSC4es1FrWqnsR1kfixrWh6tO2wTWv1nIrfGW+l49TS
-	 idZPuDPd+jj2GuBRTW/ZU8j5r/7pNu3/6z6wjgbjSptyznobdmUdSf5FI3aclGzjUKw==
+	t=1793276867;
+	b=H7ZX0Aiq70QRPnXVII+A1yfaU9I5gy0qZQOQcq9/PvTT3+5ZZf77kccS9DLohstk9AKm
+	 imLT/w6XBMXeh2vmrHNSi4hKxnU/h8E0CB+Y8kbRXXjLAdRrrB+5Z8wKo2iQCCSq3ZNPp
+	 G1xUOFAaaDm3/2g93+hJneuEEtLz+/o5cp+0ovvdtXCgEABZZk1fzaWvD49zt7w+0Re6J
+	 Ob1X8XnYxrxoJNNstTHx3rJA4fSdM+lzXsgMzr/UE5LrTZD5ChtE55hH6vBBhlDsdQupC
+	 zl/q/CKiCj1z707oKCyCcTbkBoq6YLHe+7MkyWKo47NtXzHPKEaol/bdOVGZloG3ong==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793276464;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793276867;
 	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
 	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
-	bh=i3fiR/sAc3MoSh1uvdBFwJ3whZ8RDFm7WQNOOBsAd4U=;
-	b=4kXsglW94BNjhWtuITNUNLIZfblJLtH8v1+9y7Xlcdzx5Oz8kbwqW80qW05C1GZNUHXO
-	 Q7n/88B+3ukuceC9f++m1uleJRgHEVwQRZFiimYJa9+frfZJascs8v9L9UyzOSfVTmLeN
-	 n0/pIGRNDh2ejB2rGKldh+OXynX1BWmUXVgOP0q1lXWFcowauLgU1ftqx+tHVwyAzaDxH
-	 exRM36Q29TZUsfwrsZXCuzLBq66/lV/kmx6aVqiBhNkUzFbc2Q43egfGUYy0VMnw68X9B
-	 CDW3infJUqRwgYl8rNYHvtl3qpu9MEpcC4QiUKHd7KfmHZKRN77eZQscivDlbch+iGg==
+	bh=kE/aup/iAkKSyqA1EGcSzojt0yBgl10lJYtlTnXTIYM=;
+	b=Q1+33I6H4cESwI7dEccVKLhLJCSAJyJ4q6iIRAuCf+BCTbo0+L86IjFPdWSKS/11fcBC
+	 TmIk14Sj0x1zpFScSbOvwzHOnubBzJie1b1TGNcm0ERM6B60q60nOhAWDLW8Wy3RfPD92
+	 WDJgBh3SJrxlKCv4g02sNfI+05ZZpg2fxCbwAMYKkRCa4hf2gVilpia81om7ZRb2T98gL
+	 6I8pNNRGay9uhxzBV1NoPADzY4gqWifptFW1D3RkMBv2m/f876Vjz8W9Fk731/vVq9yef
+	 jAE1sP8QK5io1C15FeIKLhisD50+idGiUtcla+F7MJYhMDJ1ecr0PVHHFhzIy+dXGNQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=lst.de;
 	spf=pass smtp.mailfrom=lst.de;
@@ -23,17 +23,17 @@ ARC-Authentication-Results: i=1; smtp.subspace.kernel.org;
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C73F606A31A;
-	Thu, 29 Oct 2026 12:21:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C73F606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2528E606A31E;
+	Thu, 29 Oct 2026 12:27:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2528E606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 6EF7468BEB; Thu, 29 Oct 2026 13:20:58 +0100 (CET)
-Date: Thu, 29 Oct 2026 13:20:58 +0100
+	id 00C3E68D07; Thu, 29 Oct 2026 13:27:41 +0100 (CET)
+Date: Thu, 29 Oct 2026 13:27:41 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Kyle Bader <kbader@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Kyle Bader <kbader@redhat.com>, Jens Axboe <axboe@kernel.dk>,
 	Kyle Bader <kbader@ibm.com>, Anuj Gupta <anuj20.g@samsung.com>,
 	Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>,
 	Keith Busch <kbusch@kernel.org>,
@@ -42,8 +42,8 @@ Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
 	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] block: only fail dma-buf bios that need block layer PI
-Message-ID: <20261029122058.GA24811@lst.de>
-References: <20261028181412.1919506-1-kbader@redhat.com>
+Message-ID: <20261029122741.GB25162@lst.de>
+References: <20261028181412.1919506-1-kbader@redhat.com> <134aa376-7441-46e1-8d04-be327747b4a9@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -55,19 +55,17 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261028181412.1919506-1-kbader@redhat.com>
+In-Reply-To: <134aa376-7441-46e1-8d04-be327747b4a9@gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Oct 28, 2026 at 06:14:12PM +0000, Kyle Bader wrote:
-> From: Kyle Bader <kbader@ibm.com>
-> 
-> Any dma-buf I/O to a device with a PI checksum fails today.
-> blkdev_init_dma_buf_io_ctx() returns -EOPNOTSUPP at registration, and
-> blk_mq_submit_bio() fails each dma-buf bio with BLK_STS_NOTSUPP. The
-> checks prevent a crash: bi_dmabuf_map shares a union with bi_io_vec,
-> and bio_integrity_generate() and bio_integrity_verify() walk bi_io_vec
-> to compute the guards over the data.
+On Thu, Oct 29, 2026 at 11:51:31AM +0000, Pavel Begunkov wrote:
+> Thanks, looks good from a quick glance, I'll take another look in
+> a bit. It might be nice to somehow support kernel generated PI
+> as well later, looks like there will be a good bunch of cases that
+> might want to have CPU access.
 
-Please cut down the commit log to the essentials.  It's basicallyr
-currently all P2P I/O to devices advertizing integrity data is rejected,
-but it should only reject those walking the bio_vecs.
+I don't think the kernel auto-PI makes sense for P2P.  The data lives
+on a remote device, so generating PI for it would have to transfer
+the data to the host.  Instead we probably should just force PRACT
+for that case.  It would make sense to support PI generation for
+dmabufs using local memory, though.
