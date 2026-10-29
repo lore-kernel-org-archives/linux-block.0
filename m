@@ -1,54 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.198
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793250750;
-	b=GDAK4m70uO1X8VH/xYPKB8Gw+hTIlvyg/SW0ouLloDs7hi0o0qL5khvu8Xec+qgG3VfD
-	 3JgoUFKsaMcQ9UnvfZ+vzNmTI0qKSSuqIorFsq8gVqSOJp3KaVPyhDsDMkFNrgpEQtzzM
-	 NemiJHQ5JwgcN9jy5H9Fwm4xaWh3oB278doDMqXAXvTd7aL7vuslM+R+JkHoGL7uVNTz5
-	 wNQFlmxQiQJdE8gPehfGCfGY9O/F04WviKvLeEzm1koPM96lsQfuK51qTV/TFxSa3MYAg
-	 VcnMJFi8TOQ8T/f1aDTeMChGQaCue3xpFSq/yqmd4JgtKW80GzBxdZ8HJiyDEiHhK7A==
+	t=1793257702;
+	b=nvkLxcQZOtRtpR+fFJMXqg3QFjR/g2ATk+noJxSmJsQv5aOXrC28DqnzhhDKGzCK9WO8
+	 I7iZLuSbL6QnDUQ4mz7RctnVsVqPF++VU84mOZho39AjrjRN4bxRDaka5BmawPLG7CwTq
+	 +vHrcey/ER08REWZynIYxwCHUMkqeg5Gzt90cUcwHWM4V8ZETsFvl4GbnvddxbJYk9FI2
+	 IBkA7IcIwK1y5PAov9qiMQfOBt2s4zh+fiBLWaWLPp3Nf64KA8LfW3Qbunbd1dY38tUcH
+	 Zy1lJgV3C1a9/fxo/VbkI1Nti7xnl0kvfECbiVVJPD76ObhFrdU0EZmZxUZl+RQ4XMg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793250750;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:MIME-Version:X-Received:Date:
-	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
-	 Subject:From:To:Content-Type;
-	bh=tJ9LIiDZgiKxLOj84Ud11lzQkNpj0FXQvc670E6Q+Ho=;
-	b=muNa6ZUNuVdS2ieievNWik/sulRWJHd0G4dSMDs0QckFAYvo1gPJxb7h+gw/npaHvAFv
-	 /nrSusQqbaB0SMyu/olR8B5LJK2hon9JE61JAay1d1t3cgUpXT9zjjfbK6XVlAAYtcmj9
-	 TqSXz4lfEMivgYvg+xAnYdYcTaUTxgMis6TfVmSTAX4RJg+hzyADzsblzML4HnhzDydKa
-	 3kl4wNfhcA8kKCdzoxURVtlJRcFoQhJLYhKOnfDob5LQ2ZXlAs35DBm0WZyh5/WFzIIx2
-	 IYjYhG1TLP0qivNrWvhndNAHYOCCtCmAxHCMhhX2qNn4BRN/qo2N6u7sApza1oCpTCw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793257702;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=ke87La0xWSgmTiEL3IFuQIhdbuC7AYi2feZJeeO6Kt4=;
+	b=JZt+FPaSr19arajf3nZoA4735x4OvZxSiFPS00Jq2BFapl/GvOw4qGKsMlZv6Fv3siov
+	 JeKoZCrVVcO8llBIVsRsgfKyMI0RwwUb9oMvvjGjbwOxiV83+810zuNODZ6/nFHo6nq2E
+	 euyUlezz/AWoTzci0QvPywZPXd/V4X/8HqKdtEkw4n0OGPfHZv/Zf9FP5ApjhFlC0/MbR
+	 2iKkZWrzo6Hq24zenzLU0IR87jGiw0x9wFfWKN/32344WdFmE98Ll+jc07XCS1tHKyrqX
+	 cjk1mSIcWtJyUM37vONfEky6mrjCeHrsvgz3uuW3h8HYwpDI50HRToPboOerBHDzluQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.167.198
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=M20GFEY0;
+	arc=none smtp.remote-ip=209.85.210.200
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DACC606A31A
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 05:12:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4DACC606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-4b28deb7ee3so2667453b6e.0
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2026 22:12:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838AE606A31F
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 07:08:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 838AE606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=M20GFEY0
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-8a065e2933fso2276053b3a.3
+        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 00:08:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793257701; x=1793862501; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ke87La0xWSgmTiEL3IFuQIhdbuC7AYi2feZJeeO6Kt4=;
+        b=M20GFEY02HFSlOhygrjlm7JH+ts5qe+9RbS8DxnrFLxry8ev9Lw11ID2dfeTYsjyBY
+         qVSyuWqH7hAygkevW54cuMwSIRjF7pe1C0jZKZDcPKzyfLYnXKZAJtiL4vg1+VFey012
+         j9Hpe/FqeqKAnoq7Grxue+mDvoCWyUns7Fg3gJAHodzyVDay3ahfl63+/h4mUoZuYo7b
+         QeKf3mv7FFNFn8ZpTi3F+19xC7Fe+q5wn773h7jQb5HE9PI2Im8fJNHd5QmtR5STJbxT
+         iSex4RNsKfYxh1RZf05woqvVdj+XfC3Xo7F5DJyMHONeX+Jk2DkfGvqp6B7DHe/EeC2h
+         gbyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793250749; x=1793855549;
-        h=content-type:to:from:subject:message-id:date:mime-version
+        d=1e100.net; s=20260707; t=1793257701; x=1793862501;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=tJ9LIiDZgiKxLOj84Ud11lzQkNpj0FXQvc670E6Q+Ho=;
-        b=GSZbngKJZv6//6BGUv24/NsiRptjBcxHL1+slbREarf5bNwMutj/wUQTBroQg0bQ7n
-         xWU6CJGZb73n5O5F/8Du+t2LAL7voZ6InLFiX54nWFTbFm0mbYLp0bcR0mG6Le9f8X+s
-         JljunOJg35aKS9lULhacYv9l73dWERdGrVgGxDOqNfdxDqLQlYNxzqc4GKqvlAjj59VL
-         b5uAGYktCcSPdpaCB5MXvOhBTaTeujGlbgsrFuTPArJz+qRUKqAEIL7Bm8Eo42IB3vtd
-         shVJYw8mLyX1CkqqiPnpiqOUf1/wwlg2Y2owIVx8+kq0+SG/OgmhAjqFbE6gIcJ7qW1c
-         s3WA==
-X-Forwarded-Encrypted: i=1; AKwUvByVEPnm/mbOAYutktTZXv6ejYjKVKw1FWsg7kllrOf/l+Xmm95TvLoBFPSeilO/1DBsbp56q2LgnlUeyQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYIMf56RwrJ2C7kQcmldGS1EUbkw1mGEhnlTP64Q0MypyC2mF0gG
-	Kar5y38JHA1RfCXgejP52LZuVMHnVDyWAkYPXi3ZBxoZJJbA4dnmPoDARKyodOuecBk8b8QE+oG
-	LZR9gAVABdt8nR69FTfm5wqDjTEa5VJ1OcwxuF58z29GLPisF4OATJxxUiEA=
+        bh=ke87La0xWSgmTiEL3IFuQIhdbuC7AYi2feZJeeO6Kt4=;
+        b=QuqYauA+BLkWEZoVwOV9ZEVLh8CD8h5Mflx3Oh676dUrqQq8NLN7JW8ocNDfxykspT
+         klD1MnRoOYTFkXUEsvxj8R+Rtq1Z6W9u5tfTNjqP2cejxLlRdmjcjwcjJBytIUZOftOn
+         NAJz9CGaS84KkPx/GeIrglMCNsrLVXb9+USQqikuzyJrDr+KQ8lHQcxQz1/It9DKatoJ
+         PDLIMRHamO0oFUDwDs2h4IY0eSMRuqluPVJ/jpj1YnHFTSyB+0xWgF1iBhLIC38b/JlY
+         lp6NBYm1F5p3jXJIlsKNwWlsljN1bB+PlmFCzA1qab+gicb9TleTOuDDoDFE6PzOSW1B
+         Yrtw==
+X-Forwarded-Encrypted: i=1; AKwUvBxUAEGHzESzVrjWOhqWtRwucrVpPqdySkec6v/HMqglLO8FyWccKPPqnAb3QcBrZuXI7Np+XnhARxOmig==@vger.kernel.org
+X-Gm-Message-State: AFq9FYKqWES1ncx1S63LN0HV2TIunQPPt+a4NjH0VSSb9wALghis0Ah8
+	AELvB1545+NC4/jMUHKZaPR78YhojlCcYJyuVcwzWgxBY+gZUOZPgQUxK2cyeolA/RpJIG9kqO+
+	2k91PcD0nWbPxw3ah72nijg==
+X-Received: from pfblo10.prod.google.com ([2002:a05:6a00:3d0a:b0:88a:f8c3:9c75])
+ (user=stanleyjhu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1c84:b0:8a0:1435:fda0 with SMTP id d2e1a72fcca58-8a6e7dc9390mr4068412b3a.51.1793257700500;
+ Thu, 29 Oct 2026 00:08:20 -0700 (PDT)
+Date: Thu, 29 Oct 2026 15:08:18 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -57,125 +75,82 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1b26:b0:533:be44:82e with SMTP id
- 5614622812f47-56384499512mr2928883b6e.40.1793250749323; Wed, 28 Oct 2026
- 22:12:29 -0700 (PDT)
-Date: Wed, 28 Oct 2026 22:12:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6ae2d5bd.84012103.26b497.074c.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in blkdev_write_iter
-From: syzbot <syzbot+39e465d3f7a1555b0f96@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
+Message-ID: <20261029040001.2100001-1-stanleyjhu@google.com>
+Subject: [PATCH] block: Keep RPM_ACTIVE in blk_pre_runtime_resume() when
+ already active
+From: Stanley Jhu <stanleyjhu@google.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Rafael J . Wysocki" <rafael@kernel.org>, Praveen Talari <praveen.talari@oss.qualcomm.com>, 
+	Alan Stern <stern@rowland.harvard.edu>, Bart Van Assche <bvanassche@acm.org>, 
+	linux-block@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Stanley Jhu <stanleyjhu@google.com>, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Since commit eef1d74bf88f ("PM: runtime: Only set runtime_error on
+suspend callback failures"), a failed runtime resume leaves
+dev->power.runtime_error at 0 with runtime_status set to RPM_SUSPENDED,
+so later runtime resume requests run sdev_runtime_resume() again:
 
-syzbot found the following issue on:
+1. A runtime suspend increments q->pm_only from 0 to 1 and sets
+   q->rpm_status to RPM_SUSPENDED.
+2. The first runtime resume fails in the driver callback, and
+   blk_post_runtime_resume() sets q->rpm_status to RPM_ACTIVE and calls
+   blk_clear_pm_only(), decrementing q->pm_only from 1 to 0 so recovery
+   commands can enter the queue (intended since
+   commit 6e1fcab00a23 ("scsi: block: pm: Always set request queue
+   runtime active in blk_post_runtime_resume()")).
+3. A retried runtime resume calls blk_pre_runtime_resume(), which
+   overwrites q->rpm_status from RPM_ACTIVE to RPM_RESUMING, so
+   blk_post_runtime_resume() sees old_status != RPM_ACTIVE and calls
+   blk_clear_pm_only() a second time without a matching
+   blk_set_pm_only().
+4. q->pm_only underflows from 0 to -1 (triggering WARN_ON_ONCE in
+   blk_clear_pm_only()), blocking non-PM requests in blk_queue_enter()
+   and __bio_queue_enter() while the device is RPM_ACTIVE, and the next
+   runtime suspend increments q->pm_only from -1 to 0, letting non-PM
+   requests dispatch while RPM_SUSPENDED. This hits the UFS device
+   well-known LUN by default and SCSI disks with
+   manage_runtime_start_stop enabled (ATA and FireWire sbp2 defaults).
 
-HEAD commit:    330517c63aa9 Merge tag 'char-misc-7.4-rc1' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11962aa5580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b03c85f3988bfcd5
-dashboard link: https://syzkaller.appspot.com/bug?extid=39e465d3f7a1555b0f96
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16949aa5580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=105c53cd580000
+Set q->rpm_status to RPM_RESUMING in blk_pre_runtime_resume() only when
+q->rpm_status is not already RPM_ACTIVE, so blk_post_runtime_resume()
+skips blk_clear_pm_only() on retries.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-330517c6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ecb230491807/vmlinux-330517c6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ace3132a7acc/bzImage-330517c6.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+39e465d3f7a1555b0f96@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-syzkaller #0 Not tainted
---------------------------------------------
-syz.2.64/6167 is trying to acquire lock:
-ffff88802a5f1ee8 (&sb->s_type->i_mutex_key#9){++++}-{4:4}, at: inode_lock_shared include/linux/fs.h:1039 [inline]
-ffff88802a5f1ee8 (&sb->s_type->i_mutex_key#9){++++}-{4:4}, at: blkdev_buffered_write block/fops.c:734 [inline]
-ffff88802a5f1ee8 (&sb->s_type->i_mutex_key#9){++++}-{4:4}, at: blkdev_write_iter+0xd12/0x11d0 block/fops.c:812
-
-but task is already holding lock:
-ffff88802a5f1ee8 (&sb->s_type->i_mutex_key#9){++++}-{4:4}, at: inode_lock_shared include/linux/fs.h:1039 [inline]
-ffff88802a5f1ee8 (&sb->s_type->i_mutex_key#9){++++}-{4:4}, at: blkdev_write_iter+0xc5e/0x11d0 block/fops.c:811
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&sb->s_type->i_mutex_key#9);
-  lock(&sb->s_type->i_mutex_key#9);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-locks held by syz.2.64/6167: 1, last CPU#2:
- #0: ffff88802a5f1ee8 (&sb->s_type->i_mutex_key#9){++++}-{4:4}, at: inode_lock_shared include/linux/fs.h:1039 [inline]
- #0: ffff88802a5f1ee8 (&sb->s_type->i_mutex_key#9){++++}-{4:4}, at: blkdev_write_iter+0xc5e/0x11d0 block/fops.c:811
-
-stack backtrace:
-CPU: 2 UID: 0 PID: 6167 Comm: syz.2.64 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_deadlock_bug.cold+0xbd/0xca kernel/locking/lockdep.c:3085
- check_deadlock kernel/locking/lockdep.c:3137 [inline]
- validate_chain kernel/locking/lockdep.c:3939 [inline]
- __lock_acquire+0x13f4/0x1f40 kernel/locking/lockdep.c:5288
- lock_acquire kernel/locking/lockdep.c:5942 [inline]
- lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
- down_read+0x94/0x4c0 kernel/locking/rwsem.c:1574
- inode_lock_shared include/linux/fs.h:1039 [inline]
- blkdev_buffered_write block/fops.c:734 [inline]
- blkdev_write_iter+0xd12/0x11d0 block/fops.c:812
- new_sync_write fs/read_write.c:595 [inline]
- vfs_write+0x6af/0x1050 fs/read_write.c:687
- ksys_write+0x12a/0x250 fs/read_write.c:739
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f835bf9f559
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd15ca3258 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f835c225fa0 RCX: 00007f835bf9f559
-RDX: 00000000fffffe38 RSI: 0000200000001140 RDI: 0000000000000004
-RBP: 00007f835c036b20 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f835c225fac R14: 00007f835c225fa0 R15: 00007f835c225fa0
- </TASK>
-
-
+Fixes: eef1d74bf88f ("PM: runtime: Only set runtime_error on suspend callback failures")
+Cc: stable@vger.kernel.org # v7.3+
+Signed-off-by: Stanley Jhu <stanleyjhu@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ block/blk-pm.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index 8d3e052f91da..31598dd03a3f 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -142,7 +142,8 @@ EXPORT_SYMBOL(blk_post_runtime_suspend);
+  *
+  * Description:
+  *    Update the queue's runtime status to RESUMING in preparation for the
+- *    runtime resume of the device.
++ *    runtime resume of the device, or keep RPM_ACTIVE if a previous failed
++ *    runtime resume already reactivated the queue.
+  *
+  *    This function should be called near the start of the device's
+  *    runtime_resume callback.
+@@ -153,7 +154,9 @@ void blk_pre_runtime_resume(struct request_queue *q)
+ 		return;
+ 
+ 	spin_lock_irq(&q->queue_lock);
+-	q->rpm_status = RPM_RESUMING;
++	/* Keep RPM_ACTIVE if a prior failed resume reactivated the queue. */
++	if (q->rpm_status != RPM_ACTIVE)
++		q->rpm_status = RPM_RESUMING;
+ 	spin_unlock_irq(&q->queue_lock);
+ }
+ EXPORT_SYMBOL(blk_pre_runtime_resume);
+-- 
+2.56.0.313.g2479322e68-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
