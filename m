@@ -1,54 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.28
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793269909;
-	b=v5OyirGeWGqtM8pREFvQfJ0DYHmYfaDCO7YUW8EPYf48wvHo0BsU16ayQbFRF4Z6r+5F
-	 QgRdBT+YuCutDwgsUg3FrDfwf2KBku/bUsRg1ONNBMUQq4X+WY491FtKkJDy933rSpWLD
-	 OYdTh/epsSmdtwhJCLAwqCBh1rTzGcS5B+vq/pZlRMU3JVsbXA9Z86Wr95qAQODl02yol
-	 uZv3x0WSMn0IDmeo6UCM/ApLuRJSUSH1DAZHZ/NEZ9Y8GC1BKhQau1D0seirSK/+YnU4C
-	 T4emQlrjgzB0zvSgJn+yFhU1xX06+kXR64roUPF+meCPFvhmnFmXIP9wM070H788dNg==
+	t=1793270000;
+	b=k0rHw6dAf9aCT94ocgq67iqHU4Rtf8Sfuwxd3jScCir04M2y36bJJDrD/KyjmhtLUfMk
+	 ZQOPQOn4BEDcHIWPTgYQMwkDYVUbju+g1cEwtFV3XxeYPvc7qDYDhJQ/ylpDZkSic22dm
+	 5b+ds+eXVJXS1FwIY8l5M2LO0LoPPDoMcVpwMxMf3zF2j1zfPMm2cD3CZwQxfj+fv1hpG
+	 rLVgPI5yGPbEIL1lcNFc/F4CE2DAOAN9CrbEnCi7qr/fCM1+2cA4CRFwTUIS+PMex3D79
+	 KENWvelMZTkR1i+7zmF341qX+5eOplZj0BsYb6S87/4ylzpgleCfI3TaQndUSZRH1tw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793269909;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793270000;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
 	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=mLFZ+u8l7Eri5WPSJSqe9fz8wKmk1PQzwwX61Xl/bQo=;
-	b=Dm6iFInTxuVEbigHGXdGPVE1/2xAdNqx76vib0iLaLKQihOgp+2wpr+HmR84KKrhQt/h
-	 OGfXPqVvAJ5LKR/73ciyFhJ1/dRjW2OXSu0ab5cdDPUJigS4IKE13z6hdRge8v8ZCoBqo
-	 8qQdme3P6pszGKjXAMsmRsjzHiCj+p4/rXldf8GdjlyGM+4CPegy2f67OK5RWUSZvCnce
-	 g6WQOChAlSe0WkZZnEySMQv/0dX7QjxxeW+NynuGDSnlVecftR9EEvYOB2tZXENFao+CV
-	 oo1slXEX7dZPcaOp5eatjEZ9ZypLue34se1DXXL8OiJI+csDwaeu0K4OkYH2nfdEMpw==
+	bh=AQbbcg15G9Rdgl9nUgK2PYtfP3hcLsC+WTRWlyTICwA=;
+	b=Oeaq61dKqy6G+rMB6+bdJU7RP44a3Y5zS9Nu0t3vc5283lo7Jj9VfqTm/3GYaJJRpBhu
+	 aM5rZwg3d8kz2Vbj3cbct1Um4/k/o86ttj/fEnG8JeYZSx1/zVf+mse/bzu9Kbnj9PgAo
+	 zEBU9iyPjWMIm+el909VMtNaDC5KtkCGdCDrd+MkT0myRLpTyHLu1ggkpPQaNhdGrZ4O7
+	 5PSkTMlSPDB9q8RNuIqxggdahuXJyfb7YAXmInqQam6so9IwG2KQK9K71VO6vmiM3pi2r
+	 sKkdeDnIpByedAlhdR/BoMNrlviQGFWn5ujlgTNwpNyujJz3sHtnoF1yBHpNVVNV19g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=RdwL51U8;
-	arc=none smtp.remote-ip=95.215.58.181
-Received: from mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VcAcw2Oh;
+	arc=none smtp.remote-ip=95.215.58.28
+Received: from mta1.migadu.com (out-28.mta1.migadu.com [95.215.58.28])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1D5606A31D
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 10:31:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A1D5606A31D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B6C606A31D
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 10:33:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B7B6C606A31D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=RdwL51U8
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VcAcw2Oh
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=Om9Am+J4+0DDvLnms/qpKuDS8xUS8M7eIZtxz9T8uWw=;
+DKIM-Signature: a=rsa-sha256; bh=J85rkoN1XnhCBt+ZBRQtQySMprDThVLpEudrWZLX1rQ=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793269906; v=1; x=1793874706;
- b=RdwL51U8e46cWyYi24EFJGB8T6DhuT1LTml+FR4gi9BJMjlJY24SkGZdaF21sbmcyviZ+YLf
- MHy91lCZWYmFMP/q8M8cbY7UKdl4oYXPtR3GPqU4KL7QjsXfdwrC4xaAEXx94eu7Crha4HdMvKW
- djJEBWQygmhV4NA00wmYmiFA=
+ t=1793269997; v=1; x=1793874797;
+ b=VcAcw2OhNb8Ngx6ElwFkLwLvwMVCY+eOq9jXaMCps/cuSKMXma2q+6gtBUpqiyDHqHWChBTN
+ sng+jaxnGEVj+2NcVZtDgDphJmHuw8dIxMXkNJP2G5KqGsnI7dLXHHnjDFexuTJqJK/Ig+VXs6y
+ Rf1EiBQI5fsrasMWufpxL95M=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 4ba3fd5e8dd1c890;
-	Thu, 29 Oct 2026 10:31:46 +0000
-X-Mizu-Trace-ID: 4ba3fd5e8dd1c890
+Received: by smtp.migadu.com with ESMTPS id 14e5668ba4a579be;
+	Thu, 29 Oct 2026 10:33:17 +0000
+X-Mizu-Trace-ID: 14e5668ba4a579be
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <7004a360-ac39-4a2b-8727-972414e006c6@linux.dev>
-Date: Thu, 29 Oct 2026 18:31:36 +0800
+Message-ID: <ce3ede81-f70b-4324-9fa4-21cf716e1e33@linux.dev>
+Date: Thu, 29 Oct 2026 18:33:09 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -65,14 +65,14 @@ Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
  eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
  linux-kselftest@vger.kernel.org, cuitao@kylinos.cn, ameryhung@gmail.com,
  alexei.starovoitov@gmail.com
-Subject: Re: [PATCH 4/5] blk-iocost: add iocost_ioc_tick tracepoint for
- per-period device summary
+Subject: Re: [PATCH 5/5] docs: cgroup-v2: document the iocost BPF cost model
+ attachment
 To: Tejun Heo <tj@kernel.org>
 References: <20261028143534.135968-1-cui.tao@linux.dev>
- <20261028143534.135968-5-cui.tao@linux.dev>
- <75384a99148fbd477e003453718b1717@kernel.org>
+ <20261028143534.135968-6-cui.tao@linux.dev>
+ <72deb196d0dfc413a48f0739013bc610@kernel.org>
 From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <75384a99148fbd477e003453718b1717@kernel.org>
+In-Reply-To: <72deb196d0dfc413a48f0739013bc610@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
@@ -81,30 +81,41 @@ Hello Tejun,
 在 2026/10/29 04:09, Tejun Heo 写道:
 > Hello, Tao.
 > 
-> On Wed, Oct 28, 2026 at 10:35:33PM +0800, Tao Cui wrote:
->>  		u64 vdone, vtime, usage_us;
->>  		u32 hw_active, hw_inuse;
->>
->> +		nr_active++;
+> On Wed, Oct 28, 2026 at 10:35:34PM +0800, Tao Cui wrote:
+>> +	When CONFIG_BLK_CGROUP_IOCOST_BPF is enabled, a BPF cost
+>> +	model can be bound to a device by attaching an
 > 
-> nr_active is counted even when the tracepoint is disabled.
+> Users can't select CONFIG_BLK_CGROUP_IOCOST_BPF.
 > 
-Right. I'll only count nr_active when trace_iocost_ioc_tick_enabled()
-is true.
+The sentence now reads "When BPF cost model support is available".
 
->> +	/*
->> +	 * Everything the tick reports is final here: busy_level was just
->> +	 * computed, cur_period hasn't changed, nr_active and usage_us_sum are
->> +	 * complete, and vrate and period_us still hold the values this period
->> +	 * ran in. usage is wall time over wall time, summed over iocgs, and is
+>> +	Only detaching removes the model, after which "model=bpf"
+>> +	fails and the device prices with the builtin model again.
+>> +	Device removal ejects the attached model as well, while the
+>> +	struct_ops link remains until userspace destroys it.  "ctrl"
 > 
-> An io.cost.qos write in the middle of a period changes both period_us
-> and vrate.
+> "Only detaching removes the model" is followed by "Device removal ejects
+> the attached model as well".
 > 
-Right. I'll update the comment and the commit message to say that the
-emission point has busy_level, cur_period, nr_active and
-usage_us_sum complete, while vrate and period_us may already reflect a
-later io.cost.qos update.
+Dropped "Only".
+
+>> +	accepts only "auto" and "user" and never selects a model.  It
+>> +	keeps describing the builtin coefficients, which take effect
+>> +	again when switched back.  The automatic profile stepping does
+>> +	not switch profiles while the BPF model is in use; as with
+>> +	user-set parameters, the profile selected from the device
+>> +	class still applies.
+> 
+> cgroup-v2.rst doesn't describe automatic profile stepping anywhere else.
+> 
+Those sentences are removed.
+>> +	defined.  They remain readable and writable while "model" is
+>> +	"bpf" but take effect only after switching back to "linear".
+> 
+> The builtin coefficients taking effect again after switching back is
+> already said above.
+> 
+Removed.
 
 Thanks,
 Tao
