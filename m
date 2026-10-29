@@ -1,104 +1,104 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793268488;
-	b=MgI+fiuRDlrTCuDazP8dIHq7j32RdWtJvHKO96uFuIsmvyTZgo3hQHuYZI+60RgkxPS/
-	 m0bvGVHlrIK8POE4TCd+ZdQJUM3Hmyr5j+sL4jgFAzgv6julGDJTDuzH7nwZFiuVgW+cW
-	 OZ8KITn+L8wiBu/p6I2NltxnO2Otxli8E+CZkcx2OtrWGDZQlp/Za0Jtgyq3jslP0oDNr
-	 Sa5XK0J2IaZibYB6xZQ3NmeTgjrTRV3KDxSJVIrPSYk/B8ZcC3tNHNJGILbbbbIR7VTiz
-	 9kCAsqfIi4X3IdciMETkve1vb2QHKOftxqPfdfGUqQ5JrST+j27tKrtL3dvbfiVy11g==
+	t=1793268530;
+	b=ACeEP0HBLHNOh+JxjMCZA9Q/ywB3GWBs4hvYgKQoMH8Gtk73hbidmM/7vFwloKebYL4b
+	 u0+qc7s4ztCtIWoGho6PFu0OgLFJRCP70lqHeiYP2H7TqIgmcsuLHuuhgPRFJN0JuUbnH
+	 zRACmCa0yx9mL5sG6ur8YUVl53RRDXFzU07ldQRGw6qjRoGjY+kley2/SQ+mXa2Zgia7J
+	 asXU+sZd0VlxvGN1EMU9JcTdCw/2jporb2eSVJ9uUT4l0sgZjih8FYgQE+A2wU8szT8IR
+	 k+WLidEP72GY/y3ER4bDMPM+5szthUAvNeJDbhRqSxuO4IAKUO6twiFRZ4Vu/hdkfBg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793268488;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793268530;
 	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
 	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
 	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Rspamd-Server:
 	 X-Rspamd-Action:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
 	 X-Rspamd-Queue-Id;
-	bh=YfsKotmiF6S30Blh5dPFkz9BiZrO3ruD48DAYR24JgI=;
-	b=hwc1FHikGYyuT7++Abp3m/qG5POnj7kee+11GI/BqDLsHc2SjaMIh/GahvyrWN57qc1L
-	 nG++tLpmwltMyhtWPvTjNjhQWy0GgT9VVu57D+nlZYBm4VFQrDAH2uXamxwNhVdDeGC9F
-	 tLz/kf0LrueO9aeAxWXP5Asc6Ry5s6dpBtlsAyPJDZbFYl0MRH0+iZs9mHKWUsdLXARIL
-	 IG7eWa83iJdMbKdkbZwMdJxE2hmuX3WjWLQeh5+zmscbIwchrw1kuUK3mgSXbr/rdp4QL
-	 h64isSMPzPsuDZ5N4/cJvI2Jcputm5vymaLwsN/S1mc6Ap6xW3nmbglPC1vvicBvbSw==
+	bh=rw9P2IoBa6eZIdEYjDusioClo20Nhdo0iuTV6mBDZHQ=;
+	b=BrIjyJgr8XokVmmXTD//UNmiXA4EGMkgJCtOxWBRq5+Gd+YcpHxlMrVJbo/CQcKkP0iE
+	 lSi9QpOIp4MbFrc88ZqoPCo5aKssfTjeaEe53VAwxHF3MwVXwpBS7Z3q7V/YFXUKE58Wl
+	 KDqyt4/GILgl/nFwaqIYHKYDsrGiureh9Vr+jlkJKuElsF0u3wgg/Gp58Uf4WKETOy3Jd
+	 h4JVMWhl5i6Ta3NTZx9pHIT1SvhlLaQ/AidnKjDhcQRU570cPSOuWCU9Dp40RMhK87RoY
+	 iTIXDgCG4ib4CkXamleu56XHQXD6Ugg9QVddXfjWXXKqQEI+j36yOLhbcU252OQOL6A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=suse.de;
 	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=GrvYcjw7;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=gVoVWWZR;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=uHJVTP1E;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=eMFyLVkr;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nqphY28o;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=DY0705Fn;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nqphY28o;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=DY0705Fn;
 	arc=none smtp.remote-ip=195.135.223.131
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0998606A321
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 10:08:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C0998606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E86606A326
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 10:08:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 61E86606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=GrvYcjw7;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=gVoVWWZR;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=uHJVTP1E;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=eMFyLVkr
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nqphY28o;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=DY0705Fn;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nqphY28o;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=DY0705Fn
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A36C61F803;
-	Thu, 29 Oct 2026 10:08:04 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 870031FB5F;
+	Thu, 29 Oct 2026 10:08:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793268486; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1793268527; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YfsKotmiF6S30Blh5dPFkz9BiZrO3ruD48DAYR24JgI=;
-	b=GrvYcjw7fve5eeP0T3aX3YtNM+4mYzHZZUmzi1hGVuzFcZmtoGW+AIe9z09K8L9oXtk6HL
-	869rKF98Mn2D60HJdsLPvSn+i0dQxEldhSVsEu0PTa+bvi6kQbl7bZSzmAVim5L3aayNdO
-	xLYpyhiDaAyKLXk4w8EfSuVz16fqGw0=
+	bh=rw9P2IoBa6eZIdEYjDusioClo20Nhdo0iuTV6mBDZHQ=;
+	b=nqphY28o0XFshSoLm7GnxZGsGfU3AvCeYafbA0dT+blTHIiw+ItQFURKEvlJP7xtAwrWld
+	b6NdFzgugatTFT/TKHOi6qKtfWGD87H9QFSq2uAUR7WnhoQtH0rLBtxzb+VvInZ7XTBCRL
+	abGaUuky/ShThuTmXlUYF2chabYyS/U=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793268486;
+	s=susede2_ed25519; t=1793268527;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YfsKotmiF6S30Blh5dPFkz9BiZrO3ruD48DAYR24JgI=;
-	b=gVoVWWZR+TJdmTQ7zfy09LNwyGNwEe0q2sEC9vzZXeUCxh1O3dzOewnRqEbnIcNL4D+v4J
-	nX22bu/juf5W/YBg==
+	bh=rw9P2IoBa6eZIdEYjDusioClo20Nhdo0iuTV6mBDZHQ=;
+	b=DY0705Fn3v2IVpa4oXszqpMhPJCmgGeFYd11Kz78J9URhYmtM5HI6u/8BAxoXVeqawPIu6
+	2QiTjwOGNnYeKXBQ==
 Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=uHJVTP1E;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=eMFyLVkr
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=nqphY28o;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=DY0705Fn
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793268484; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1793268527; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YfsKotmiF6S30Blh5dPFkz9BiZrO3ruD48DAYR24JgI=;
-	b=uHJVTP1Eq1yCdVPcqBrps53SX2nNHiQCrT9Vi4KtoKm539brcdDY8LZs4MjQXEmrPiI3ht
-	UrsbmbPgRzH0gcmQt5HMpBq18Eykc2dqgzUcv+5+8jsizoq1ln41rUDX0UvZEkI8QKNOkD
-	A0uA75QXfgP1itEGAmNcSGoOFuIEmvQ=
+	bh=rw9P2IoBa6eZIdEYjDusioClo20Nhdo0iuTV6mBDZHQ=;
+	b=nqphY28o0XFshSoLm7GnxZGsGfU3AvCeYafbA0dT+blTHIiw+ItQFURKEvlJP7xtAwrWld
+	b6NdFzgugatTFT/TKHOi6qKtfWGD87H9QFSq2uAUR7WnhoQtH0rLBtxzb+VvInZ7XTBCRL
+	abGaUuky/ShThuTmXlUYF2chabYyS/U=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793268484;
+	s=susede2_ed25519; t=1793268527;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YfsKotmiF6S30Blh5dPFkz9BiZrO3ruD48DAYR24JgI=;
-	b=eMFyLVkrwrAeOJLORdWxfzT7wT/3b1/91p1YoVWPhazUINTbIUmNYwSBqaTGdius5M1+aJ
-	9mdmoB0DJ6tlmqBQ==
+	bh=rw9P2IoBa6eZIdEYjDusioClo20Nhdo0iuTV6mBDZHQ=;
+	b=DY0705Fn3v2IVpa4oXszqpMhPJCmgGeFYd11Kz78J9URhYmtM5HI6u/8BAxoXVeqawPIu6
+	2QiTjwOGNnYeKXBQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7028B13419;
-	Thu, 29 Oct 2026 10:08:04 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5371A13419;
+	Thu, 29 Oct 2026 10:08:47 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id fqXlEgQb42q+LQAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 29 Oct 2026 10:08:04 +0000
-Message-ID: <c15eecc9-8086-4ce1-9a05-a395c3268a83@suse.de>
-Date: Thu, 29 Oct 2026 11:08:04 +0100
+	id AxoTDC8b42qCLgAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 29 Oct 2026 10:08:47 +0000
+Message-ID: <bb279413-aca9-419b-ad57-4aeabce10934@suse.de>
+Date: Thu, 29 Oct 2026 11:08:46 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -109,15 +109,16 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 79/98] nvme-tcp: start error recovery when a send fails
+Subject: Re: [PATCH 80/98] nvme-loop: don't BUG() if a scan runs beside a
+ reset
 To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Josef Bacik <josef@toxicpanda.com>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+Cc: Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
- <20261028164415.1262013-80-axboe@kernel.dk>
+ <20261028164415.1262013-81-axboe@kernel.dk>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261028164415.1262013-80-axboe@kernel.dk>
+In-Reply-To: <20261028164415.1262013-81-axboe@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-13.50 / 50.00];
@@ -142,7 +143,7 @@ X-Spamd-Result: default: False [-13.50 / 50.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,toxicpanda.com:email,grimberg.me:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,kernel.dk:email,suse.de:email,suse.de:dkim];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:dkim,lst.de:email,toxicpanda.com:email];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	DKIM_TRACE(0.00)[suse.de:+]
 X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
@@ -150,49 +151,51 @@ X-Rspamd-Action: no action
 X-Spam-Flag: NO
 X-Spam-Score: -13.50
 X-Spam-Level: 
-X-Rspamd-Queue-Id: A36C61F803
+X-Rspamd-Queue-Id: 870031FB5F
 
 On 10/28/26 5:42 PM, Jens Axboe wrote:
 > From: Josef Bacik <josef@toxicpanda.com>
 > 
-> When the target closes a connection, nvme_tcp_state_change() calls
-> nvme_tcp_error_recovery(), which does nothing unless the controller is
-> live. While connecting that's fine for the queue being set up, its
-> Connect fails and the attempt with it. But if an already connected queue
-> is closed at the end of the attempt, nothing fails, the notification is
-> lost and the controller goes live on a dead socket. Every request on
-> that queue then fails with "failed to send request -32" and is retried,
-> forever with native multipathing, and if it's the admin queue the first
-> keep-alive fails too. Nothing but a manual reset recovers it. The Linux
-> target closes its connections at exactly that moment after a fatal
-> error.
+> A reset sets queue_count to 1 while it destroys the I/O queues and
+> counts it back up when the new ones are made, and it doesn't stop the
+> scan work. A new namespace found in that window trips the check in
+> nvme_loop_init_hctx() for every hctx but the first:
 > 
-> Start error recovery when a request can't be sent, as nvme-rdma does.
+>    kernel BUG at drivers/nvme/target/loop.c:224!
+>     nvme_loop_init_hctx+0x7d/0x80
+>     __blk_mq_realloc_hw_ctxs+0x3af/0xa80
+>     nvme_alloc_ns+0x1a2/0x22f0
 > 
-> Fixes: 3f2304f8c6d6 ("nvme-tcp: add NVMe over TCP host driver")
-> Cc: Keith Busch <kbusch@kernel.org>
+> The check protects nothing. ctrl->queues has nr_io_queues + 1 entries
+> for the life of the controller, the tag set never has more hardware
+> queues than that, and nvme_loop_queue_rq() rejects requests until the
+> controller is live again.
+> 
+> Remove it.
+> 
+> Fixes: 3a85a5de29ea ("nvme-loop: add a NVMe loopback host driver")
 > Cc: Christoph Hellwig <hch@lst.de>
 > Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: Chaitanya Kulkarni <kch@nvidia.com>
 > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > ---
->   drivers/nvme/host/tcp.c | 2 ++
->   1 file changed, 2 insertions(+)
+>   drivers/nvme/target/loop.c | 2 --
+>   1 file changed, 2 deletions(-)
 > 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 4aa666dd0266..52c7f6dd34d0 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -1461,6 +1461,8 @@ static int nvme_tcp_try_send(struct nvme_tcp_queue *queue)
->   			"failed to send request %d\n", ret);
->   		nvme_tcp_fail_request(queue->request);
->   		nvme_tcp_done_send_req(queue);
-> +		/* The close may have come when nobody could act on it */
-> +		nvme_tcp_error_recovery(&queue->ctrl->ctrl);
->   	}
->   out:
->   	memalloc_noreclaim_restore(noreclaim_flag);
-
+> diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
+> index 93ba6357a850..80b67608eb15 100644
+> --- a/drivers/nvme/target/loop.c
+> +++ b/drivers/nvme/target/loop.c
+> @@ -221,8 +221,6 @@ static int nvme_loop_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
+>   	struct nvme_loop_ctrl *ctrl = to_loop_ctrl(data);
+>   	struct nvme_loop_queue *queue = &ctrl->queues[hctx_idx + 1];
+>   
+> -	BUG_ON(hctx_idx >= ctrl->ctrl.queue_count);
+> -
+>   	/*
+>   	 * flush_end_io() can be called recursively for us, so use our own
+>   	 * lock class key for avoiding lockdep possible recursive locking,
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
 Cheers,
