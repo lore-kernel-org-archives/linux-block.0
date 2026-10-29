@@ -1,78 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793297525;
-	b=gVHDam6GA/97Rkd3g0QrBENirjHkpuf2prYx3vIkfqeFFBpasvga7U0+fx37FuJnYP9p
-	 7I7mqbfN/dDsW7nkba9JoOidcLL/E538ocAcQD6jG4iQEeWTDp9SrSFRYL/+w7PASH+5g
-	 61VypRJ4e/WIzMY1v2iyivzTT+82LnJ1Hb7jIzaXUcN1f/oCpq0+c9Ysw2XzoAfSq8egD
-	 O0E94eaxbQEM8w8KRpC8mPLFzFq5+RgidfN4KNXZzPMohPGq86uxEbUlIDPJp3m1EzkOh
-	 QP26nDBg/j9eRPGwbOYKa03lBhXXXd9pamVKdsiXzf9vE4fFFUfYskjfsj3ve1G/nRw==
+	t=1793298640;
+	b=MhSuOTCo+6f108QBigTM9PSG6oj8c0hCQdmkPw2rJ7oLtCcPEVwF0+IMvtmzBZMycVHT
+	 uv64Q5sj1iNIASgFMlLaDlOoc4DsdMhRx+xACLJq2EQyC2q68su2X9H9+B2Mueetiedqq
+	 +VLULVe57ucgy2BlDNhcSV1gB077C8zAdZ61UWaHBiRCtCD9JPPYJRlnONNDsEY7dF7cJ
+	 yBgMmdu4bhf/DQUAJ0lPrpZsc2NweZt99f9vyURbUDPuwZXbwUfvHArUOv4AWsgw5nhA5
+	 BMPbEk0+k8H1wtS+VdvB1gE505zEByJNtDlpFrPnNzc/fdv9r8AevziCJ/NcSF9T8QA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793297525;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:X-Scanned-By;
-	bh=52GGOIPcBybueFQ3XkV7m5rJYQJjkP+ldIdwErNttcM=;
-	b=dqydaY0p6JHdcJTgz3Hvcc2M2SdJQ+HAUZr0FKw951+n16kZe9ItJK5lW3M2ZXQTkeUY
-	 y3Qz48Ze0/f1XiIh//B4X/3T9iL3dAzwbFxj7YtHNRvZPET83LEh9ydI0J1t1DTsuccE/
-	 dR4SE+UMRkWUyu7H1n6/S9k5H6o1AgyS7GMx97RPPUc75504Uz1ZWpNOxpd3QAxHCn+WN
-	 UGUg7pOsbm+0UsMwVpR1L0BlOjRmNBjPVf2uDCTIwC8sC48olPtDpj31Y7uIL2k0o+xp3
-	 4T41aO2tv0HBmEU/gtZiBj+AnXc1x9G0hp/q0KcsPSSB63DQhAT/CoScTqkPiUSfxuQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793298640;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=7cXZTVE1hFKWPBgqy/0wFbFMZQKQUKo9lOQBzSZYXhw=;
+	b=xGMoac1QlxnhUHlTzcY8nAoMqYQ1vYzEfnXAJjfFYdKN8C5CKAIw2ZjPnUL+YcXN5V7h
+	 VgrCjcC4qhStFP65lWG6IY2gx8shpgCjlIKF2s7ZCO2UHwLAszK8n2dPpI2wRjF/bQnMU
+	 aiY8XE8GnbzjW44CarmXWT/0KX7x/J6fy88n4iViMOr6JjLh+tiU8eZI5heLijggmAypx
+	 g4Me4cTxhV5Bdr8Cl7fLbNAIqGfmf5MCt7cAWR7IdnNmEBfjGgBWkPnc40+U08Eh2Co5R
+	 +dNT77t87OKTXnouhFm9WPZlHrWID0GqigfxgqI1A3ry8tFgUXx1yWEYDXuOmQ4GGrg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=Yoa15vTs;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kk7u19sg;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8DF606A31D
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 18:12:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0A8DF606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90222606A31E
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 18:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=Yoa15vTs
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1793297523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=52GGOIPcBybueFQ3XkV7m5rJYQJjkP+ldIdwErNttcM=;
-	b=Yoa15vTsN4byKkw4dwewM/RwuXNpLSSW7tmMNoKStDA4kbWBpHogJKNPTnTehP/Gqbrc+p
-	+KlufrUn2cD96/WFIovjdXStyOUTSmNIEneS4t4+vMUunNkjC+DxUZD3IYy1olGZb7Csmu
-	rMc9aJkMWWcZCt9pYEPLdIL0Z1c987E=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-257-rgpI6PabN3e2MuKlyAY0EQ-1; Thu,
- 29 Oct 2026 14:12:01 -0400
-X-MC-Unique: rgpI6PabN3e2MuKlyAY0EQ-1
-X-Mimecast-MFC-AGG-ID: rgpI6PabN3e2MuKlyAY0EQ_1793297520
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D3451956055;
-	Thu, 29 Oct 2026 18:11:59 +0000 (UTC)
-Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 39D601803A40;
-	Thu, 29 Oct 2026 18:11:58 +0000 (UTC)
-Date: Thu, 29 Oct 2026 14:11:57 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alberto Faria <afaria@redhat.com>
-Cc: linux-block@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowangio@gmail.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kwolf@redhat.com
-Subject: Re: [PATCH 0/2] virtio_blk: add FUA write support
-Message-ID: <20261029181157.GA1571175@shajnocz.csb>
-References: <20261021055235.648957-1-afaria@redhat.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kk7u19sg
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A6871F01816;
+	Thu, 29 Oct 2026 18:30:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793298638;
+	bh=7cXZTVE1hFKWPBgqy/0wFbFMZQKQUKo9lOQBzSZYXhw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kk7u19sg9WHsEozZF/49jqPp6dOAxM8veCVAf/Q9rBZ/58TF3XIhHvzyGT0A9dJiY
+	 ns97/5TDz9HyVq1VOfuQXab8TwxTEutPi/yi29SjpHmkC6kviDu+WUIMamFduYmUK4
+	 SpsGj9oLonhIH51SBguUW7eOzMMUzoK4FLUqlySunba03XERlofONT19iyJO3cIdVA
+	 dZREmhay54P382oXDVnGbWjYRvAwGbX4sfySYTZgajQjOPrXCMpQIuQwymHablNC2E
+	 qv+75QgjNUS3isk07gUO+SMm/f1VGLa57Ugvr7ElaNTtxbzukAAfhJbi4jmsrb9sjF
+	 Ew2WVr75bWaDw==
+Date: Thu, 29 Oct 2026 11:30:33 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Josef Bacik <josef@toxicpanda.com>
+Subject: Re: [PATCH 09/98] blk-mq: end the request if getting a keyslot fails
+Message-ID: <20261029183033.GF1862@quark>
+References: <20261028164415.1262013-1-axboe@kernel.dk>
+ <20261028164415.1262013-10-axboe@kernel.dk>
+ <auNBSoa3vscdnr9_@infradead.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -84,32 +60,63 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261021055235.648957-1-afaria@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <auNBSoa3vscdnr9_@infradead.org>
 
-On Wed, Oct 21, 2026 at 06:52:32AM +0100, Alberto Faria wrote:
-> virtio-blk FUA write support has been added to the virtio spec [1]. This series
-> implements that by adding the new request flag uapi definitions and
-> corresponding virtio-blk support. It also enables vdpa_sim_blk to handle fua
-> writes.
+On Thu, Oct 29, 2026 at 05:51:22AM -0700, Christoph Hellwig wrote:
+> Adding Eric for the blk-crypto code.
 > 
-> [1] https://lore.kernel.org/virtio-comment/20251112055113.62207-1-afaria@redhat.com/
+> On Wed, Oct 28, 2026 at 10:41:12AM -0600, Jens Axboe wrote:
+> > From: Josef Bacik <josef@toxicpanda.com>
+> > 
+> > When blk_crypto_rq_get_keyslot() fails, blk_mq_submit_bio() ends the bio
+> > by hand and frees the request. By then blk_mq_bio_to_request() has done
+> > the IO accounting, which blk_mq_free_request() doesn't undo, so the
+> > in_flight counter never drops and iostat shows a device that is 100%
+> > busy. If the bio went through zone write plugging the zone stays plugged
+> > as well, and every later write to it waits forever.
+> > 
+> > Use blk_mq_end_request() like the dispatch path does for a request the
+> > driver rejected, after marking it for zone write plugging.
+> > 
+> > Fixes: a892c8d52c02 ("block: Inline encryption support for blk-mq")
+> > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+> > Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > ---
+> >  block/blk-mq.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 7400f678258e..c91306f8156f 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -3195,8 +3195,9 @@ void blk_mq_submit_bio(struct bio *bio)
+> >  
+> >  	ret = blk_crypto_rq_get_keyslot(rq);
+> >  	if (ret != BLK_STS_OK) {
+> > -		bio_endio_status(bio, ret);
+> > -		blk_mq_free_request(rq);
+> > +		if (bio_zone_write_plugging(bio))
+> > +			blk_zone_write_plug_init_request(rq);
+> > +		blk_mq_end_request(rq, ret);
 > 
-> Alberto Faria (2):
->   virtio_blk: add fua write support
->   vdpa_sim_blk: add support for FUA writes
-> 
->  drivers/block/virtio_blk.c           | 15 +++++++++++++--
->  drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  4 +++-
->  include/uapi/linux/virtio_blk.h      | 13 +++++++++++--
->  3 files changed, 27 insertions(+), 5 deletions(-)
-> 
-> -- 
-> 2.56.0
+> If blk_mq_end_request does the right thing (it looks like that to
+> me, but I'd rather rely on Eric and Jens for that), we should
+> reorder the blk_crypto_rq_get_keyslot and
+> blk_zone_write_plug_init_request calls so that the extra copy
+> of the blk_zone_write_plug_init_request call is not needed.
 
-CCing maintainers according to `scripts/get_maintainers.pl -f drivers/block/virtio_blk.c` and Kevin Wolf (QEMU).
+I don't know the blk-mq code super well.  But yes,
+blk_zone_write_plug_init_request() has no dependency on the keyslot; in
+particular the back-merging relies on crypt_ctx, not crypt_keyslot.  So
+calling it before blk_crypto_rq_get_keyslot() would be simpler than
+duplicating it in the success and failure cases.
 
-If this patch series is just now coming to your attention and you want
-to take a quick look:
-https://lore.kernel.org/linux-block/20261021055235.648957-1-afaria@redhat.com/
+And yes, blk_mq_end_request() doesn't assume blk_crypto_rq_get_keyslot()
+has succeeded.  On failure crypt_keyslot just remains NULL.
 
+Josef and Jens, what are your expectations about this patch?  Sending it
+as part of a 98-patch series (that didn't get picked up by Sashiko) is
+kind of awkward.  If you need help I'd be glad to send a revised version
+as a standalone patch.  Or you can handle it: up to you.
+
+- Eric
