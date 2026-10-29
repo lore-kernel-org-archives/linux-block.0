@@ -1,102 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793259884;
-	b=xj+IPqG79Bse7QBwT/+3Qv+P7B3lJ3YZYKXTll0rxtccxCBSR1E9WuRA0Rm/MwtZCn7a
-	 9age6m2FBu/kIL5oVFxCSX2ytpVdfKoX2YJ7TKtJJ+Q6C+OXn+RKbwFxbJeyAdClDVAHK
-	 YCVTqrCfOPQL9poTaOv8bbHXJ3GhGRAkqn/PVGR8QVDf6XEYVtnm7qFPAtzabE7Ggdbgk
-	 CVgfpXN4610Eu/LL6U07f+jgsi3SmS/Z62GoW71SCO3R4ObJKDiKQhCtuUxkCETqjgqEe
-	 mUr+h2W/dzltxODXspF8Cy1aGHs7ZDlTfc6RAIRA6fccVJwQ4DZoI7U/OJXDPwPOx3g==
+	t=1793260187;
+	b=MU63jUOtXMeInBXqEnGUewrjavwd5Oj5OaSArdbzRLMf92pUgVz1NYegYL0MwBzmlLh7
+	 aEOpAjYiu5vNQg1wgh+5zydGMHp03mhgn95VDVG8LfZ+QW02SBLp4D0iX+TFweHcs9hVd
+	 kP+/JoN00AQwk8I/WE2JDpuejTSfkn0HK1zyo9z1mSbnF8McvShQKmTSHZ531MptXjS7Y
+	 az7GprObRT1FLtOMDjnbfFH0DoRqxlFyYhzVzFeELXyV9i9108mkxfj0cLL9v+RPzw3p2
+	 y+RCvBXoFQbIm4D6J8Ii/u2bKj2QPjuxK9waTIVdZjL0y+XhkX1zglpkf1kdIgyrLjA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793259884;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793260187;
 	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
 	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
 	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Spam-Flag:X-Spam-Level:
-	 X-Spamd-Result:X-Spam-Score;
-	bh=iYzgyRy9e7KrMk2VFwevWg5HygN+ByzYcib+AT+Cf+E=;
-	b=YX3X64zWKp9Wk7seLuyg9+zUULkVwUkbb9NDgh96ypPxOwDYSgDdT46gzF0+uoN+gl/v
-	 BD9/lYxIio7AJ2zhFxfQl2GpZH7tBuIM8pBBmdaZ27r17Tx8SKjcinDFydei2H9f1THZ+
-	 gPOw6Ad5xGw4TmkBoonN5/MWRkcjYsH+o9UHVftebAzG14CeQCdvaRWhBtyDYFIX1mJ9w
-	 iU1a5W+Kbm7pHpeIv9yKEwSsTgkZ2/0aMnae/8pYRJ5g+i0F649GurtNgi1xLX1nVYFlj
-	 gfrEzY1NVF0IcODU6/DOR4AwhhAnEsu02ZVxPw8oawmv6gzU/gEK+mATj/apnmS/ANA==
+	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Spam-Score:
+	 X-Spam-Level:X-Spam-Flag;
+	bh=2Sklk1qiYFNNSBSDGtd0ZucPc6bm4vsA1VKYM668LVw=;
+	b=DmoA23K17pxmVNqD9yTFc/RQklymYQU2onel0Qxzm1fbfsKXQ8Pc+ZnInNnfFgd7YY0h
+	 U2TbEQBqnKh2c4KRJ5Yggx9b1y4YZ4fRWuSivmq9QPmnsWSYyrQB12g6PZ0TbD6+UzG0/
+	 3JwdjH7/HZyHGPB9DyeW3CxhPVv0kKauBSE6GBTTwYHEPCjwktfwj6h6QSveJxCLV6He3
+	 T7F9naWTVjbG3gEBOmRIuuNOMkhslyi9N0eJhn1HS2S+rpTwCJaA/+DkhR4FE6bXUDGni
+	 UL3bdHOUuWHZKiRcxdLA8b+Y7fuKeYLq3vrNnoDRlrjPIEipW9zHnduE3F9Su+MPTVg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=suse.de;
 	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=lQMOfMor;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=b3DW9fSm;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=lQMOfMor;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=b3DW9fSm;
-	arc=none smtp.remote-ip=195.135.223.130
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=bB+HsgHL;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dtpwajp0;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=bB+HsgHL;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dtpwajp0;
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C23606A31A
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 07:44:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 43C23606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979DF606A31C
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 07:49:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 979DF606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=lQMOfMor;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=b3DW9fSm;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=lQMOfMor;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=b3DW9fSm
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=bB+HsgHL;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dtpwajp0;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=bB+HsgHL;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dtpwajp0
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 76A0A220A8;
-	Thu, 29 Oct 2026 07:44:42 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id C863D1FAAB;
+	Thu, 29 Oct 2026 07:49:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793259882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1793260184; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iYzgyRy9e7KrMk2VFwevWg5HygN+ByzYcib+AT+Cf+E=;
-	b=lQMOfMorQhx3EMNG1yP0fEn46+vXDHvtlfoEyYqraT6Pc5sj+K7DmV4kL/XNtzwG3kb9Kn
-	5NEbhVZtYtpmTtNYZQXTfFOkbDp4td/DDXO+xC2NqJlCBJhKvCza/yqObD+wyxxjzNEj9N
-	Sc8q+ElKSlpaqq+ymERIkdwq2WA7OPI=
+	bh=2Sklk1qiYFNNSBSDGtd0ZucPc6bm4vsA1VKYM668LVw=;
+	b=bB+HsgHLfbNGQKSvBDaN0yw8D6Mw30OrgelMqJyfFVVLgPCcs3K00lXUOEUyWAZPd2j6fw
+	vU/6RCN13P8keK+u4AC1KOWPkxCdhhiWi588A3inqgVBjRYgiH4fQS0SCMxpo8uMaDsLid
+	YTQit58rUArpFjA5OGzfaleRFDvuCiE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793259882;
+	s=susede2_ed25519; t=1793260184;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iYzgyRy9e7KrMk2VFwevWg5HygN+ByzYcib+AT+Cf+E=;
-	b=b3DW9fSmdXCzKhDfTLB+aNFo01tQ2QRQo2QXjh+8209mNhlQ2OZh/PPRQEAParkdtUlyi+
-	gki7gJLqQniQXmCg==
-Authentication-Results: smtp-out1.suse.de;
+	bh=2Sklk1qiYFNNSBSDGtd0ZucPc6bm4vsA1VKYM668LVw=;
+	b=dtpwajp032jhgVElq/rXkSJeJFQHG1XL2Gw32bbw41r5I3C0ZQcsZrtgf9gzhgOHzESL1j
+	ObeXtcLdtPqQHODQ==
+Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793259882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1793260184; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iYzgyRy9e7KrMk2VFwevWg5HygN+ByzYcib+AT+Cf+E=;
-	b=lQMOfMorQhx3EMNG1yP0fEn46+vXDHvtlfoEyYqraT6Pc5sj+K7DmV4kL/XNtzwG3kb9Kn
-	5NEbhVZtYtpmTtNYZQXTfFOkbDp4td/DDXO+xC2NqJlCBJhKvCza/yqObD+wyxxjzNEj9N
-	Sc8q+ElKSlpaqq+ymERIkdwq2WA7OPI=
+	bh=2Sklk1qiYFNNSBSDGtd0ZucPc6bm4vsA1VKYM668LVw=;
+	b=bB+HsgHLfbNGQKSvBDaN0yw8D6Mw30OrgelMqJyfFVVLgPCcs3K00lXUOEUyWAZPd2j6fw
+	vU/6RCN13P8keK+u4AC1KOWPkxCdhhiWi588A3inqgVBjRYgiH4fQS0SCMxpo8uMaDsLid
+	YTQit58rUArpFjA5OGzfaleRFDvuCiE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793259882;
+	s=susede2_ed25519; t=1793260184;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iYzgyRy9e7KrMk2VFwevWg5HygN+ByzYcib+AT+Cf+E=;
-	b=b3DW9fSmdXCzKhDfTLB+aNFo01tQ2QRQo2QXjh+8209mNhlQ2OZh/PPRQEAParkdtUlyi+
-	gki7gJLqQniQXmCg==
+	bh=2Sklk1qiYFNNSBSDGtd0ZucPc6bm4vsA1VKYM668LVw=;
+	b=dtpwajp032jhgVElq/rXkSJeJFQHG1XL2Gw32bbw41r5I3C0ZQcsZrtgf9gzhgOHzESL1j
+	ObeXtcLdtPqQHODQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2D16F13419;
-	Thu, 29 Oct 2026 07:44:42 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8325C13419;
+	Thu, 29 Oct 2026 07:49:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id o2sSAmr54modGAAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 29 Oct 2026 07:44:42 +0000
-Message-ID: <074f2280-973b-4ef8-af98-46d6e6f5c5bd@suse.de>
-Date: Thu, 29 Oct 2026 08:44:41 +0100
+	id l99pFpj64mrhHQAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 29 Oct 2026 07:49:44 +0000
+Message-ID: <6f651be7-8f3d-43cb-8457-0bbde67607fa@suse.de>
+Date: Thu, 29 Oct 2026 08:49:40 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -107,23 +107,22 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 53/98] nvme-tcp: don't get stuck on a TLS control record
+Subject: Re: [PATCH 54/98] nvme-tcp: start error recovery after a TLS
+ KeyUpdate
 To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 Cc: Josef Bacik <josef@toxicpanda.com>, Keith Busch <kbusch@kernel.org>,
  Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
- <20261028164415.1262013-54-axboe@kernel.dk>
+ <20261028164415.1262013-55-axboe@kernel.dk>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261028164415.1262013-54-axboe@kernel.dk>
+In-Reply-To: <20261028164415.1262013-55-axboe@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Level: 
 X-Spamd-Result: default: False [-13.29 / 50.00];
 	SUSE_INTERNAL_BYPASS(-9.00)[];
 	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-0.997];
+	NEURAL_HAM_LONG(-1.00)[-0.998];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
 	XM_UA_NO_VERSION(0.01)[];
@@ -139,36 +138,55 @@ X-Spamd-Result: default: False [-13.29 / 50.00];
 	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_TWO(0.00)[2];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,grimberg.me:email,suse.de:email,kernel.dk:email,toxicpanda.com:email,lst.de:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo,grimberg.me:email]
 X-Spam-Score: -13.29
+X-Spam-Level: 
+X-Spam-Flag: NO
 
 On 10/28/26 5:41 PM, Jens Axboe wrote:
 > From: Josef Bacik <josef@toxicpanda.com>
 > 
-> The host receives with read_sock(), and tls_sw_read_sock() won't hand
-> out a non-data record: it puts it back and returns -EINVAL.
-> nvme_tcp_io_work() bails on the error and finds the same record again
-> next time, so nothing behind it is ever read. One warning alert or
-> NewSessionTicket after the ICResp kills the queue: commands time out and
-> the controller resets. The Linux target sends none, but others may.
+> Once the controller sends a KeyUpdate, kTLS fails every receive with
+> -EKEYEXPIRED until a new key is installed, and nobody on the host side
+> does that. nvme_tcp_io_work() returns on the error and the queue is dead
+> until a command or the keep-alive times out.
 > 
-> Fetch such a record with recvmsg() instead. A fatal alert starts error
-> recovery, anything else is dropped whole, with a log line, and the queue
-> carries on. io_work and a poller may both see the record, so a bit makes
-> sure only one of them deals with it, and that one retries read_sock()
-> afterwards.
+> The connection is unusable at that point, say so and start error
+> recovery right away.
 > 
-> Fixes: be8e82caa685 ("nvme-tcp: enable TLS handshake upcall")
+> Fixes: 0471b1093e3a ("tls: block decryption when a rekey is pending")
 > Cc: Keith Busch <kbusch@kernel.org>
 > Cc: Christoph Hellwig <hch@lst.de>
 > Cc: Sagi Grimberg <sagi@grimberg.me>
 > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > ---
->   drivers/nvme/host/tcp.c | 87 ++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 86 insertions(+), 1 deletion(-)
+>   drivers/nvme/host/tcp.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
 > 
-TLS record handling is currently being reworked, so please drop.
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index 87ecee0665c7..64f563686938 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -1516,6 +1516,14 @@ static int nvme_tcp_try_recv(struct nvme_tcp_queue *queue)
+>   	if (consumed == -EINVAL && nvme_tcp_queue_tls(queue) &&
+>   	    queue->rd_enabled)
+>   		consumed = nvme_tcp_recv_tls_ctrl(queue);
+> +	if (consumed == -EKEYEXPIRED && queue->rd_enabled) {
+> +		/* Nobody is going to install the new key */
+> +		dev_err(queue->ctrl->ctrl.device,
+> +			"queue %d: TLS KeyUpdate is not supported\n",
+> +			nvme_tcp_queue_id(queue));
+> +		queue->rd_enabled = false;
+> +		nvme_tcp_error_recovery(&queue->ctrl->ctrl);
+> +	}
+>   	return consumed == -EAGAIN ? 0 : consumed;
+>   }
+>   
+
+Already been reported 
+(https://lore.kernel.org/linux-nvme/20261027-nvme-tcp-ctrlrec-fixes-v2-0-9656395ebcf2@gmail.com/).
+Please drop.
 
 Cheers,
 
