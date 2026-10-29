@@ -1,54 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.91
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793279375;
-	b=NjIR6KyTxgFKaSAKR0t4+abGUn28jKmGSZVE3jnzI8ib+Cf/cP3Rpwj+s1QvkKZuSkEo
-	 EEApmDDflg9Upikp9FGmNKF22n1qDllhq0SiQaj/JXHN1zSTZZQS2WGoLOxKxb3RW9YTc
-	 qi574lLFn9irm/OPuPmPxRTEe6I7nrCJuudIa7sjqCcNbWA/hPu9WMvbryzJ2Vmo09axC
-	 G9SqFaVW+GDHd9Zw1Cp4ZsuaaZOhvSGC/ErY9f9Y7HHZwIbac9sMYaE3sasl8kKtjxjP2
-	 RCe7VU41rkNomi9xSl0O5dlc5jK4frRfyMiFplxr1s45pOG8qXDX0+uvSrAVYvs3Otg==
+	t=1793279404;
+	b=omPV7CrnpvM+zpQwIhWXuptaVkEi4bABXKI8nsUXgW1ERGAIujFZExRZ6N6piMFbE8ZW
+	 gbkKkai/ZHJ2bDtwA08PKM2t+pBWD5C/2f7/WNDcv8svgeFzRHJZQKXUYIS/+51k6dz4V
+	 MhFKq+NqBFKv7MZayA+lF7SnjhojRAXmk7aNTCSKm/MPpK4PKNOj2Gtjl5faQHvFt50TM
+	 g/GmfKV2dRLPdwjgHXQn9csXBJEeit5Ko2oFWqgnsfUIPo2bMWyrhZqfS9Ac1PB61hELi
+	 a2fXqg9roCDsD6KE+/lkGtyxEZgJkhrlbNT8uCzMPjgg1YiPJmOCtZmsq7PIijTD8bg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793279375;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=UMz+d1PJLg5h+Wtxm65zwHt8O1ssfbNLYkm9paEGB2k=;
-	b=US/SRn6LId6KQsS27cOof6noCiqDALvvEciH1E4ggpEaUHXHqRFxFdH4GbmnmQwCq2YO
-	 1P/ypuFPn1OaoihMMR/At87XjASoZz8z69Hx2rEy5V5lBmmgqbL/jKV+qvTi3aS43xbxZ
-	 vRoWHH7LjkLD7wIDTUKjbPHHIKQfB4ewyMWHQB5AMSj0/AFgI6doNU2k+UdvOUMCtowvg
-	 4o2Y4+qDjP2GLGo/sCzjiM9N1nhLLJ4b84sHH5G14QmgpWZ13wWbY2E3+JJtkmcX4N8m+
-	 Y/kogQIFn03NHeTjr9OGQYkXV+x4lAZyvfTel6URmd4WBC+H1SkvIk0sH+RCYQ+zt9w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793279404;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-SRS-Rewrite;
+	bh=KOdgnK8xZFM5IsOKZUAH8B+/467biiMEbMPJwGwT4Uw=;
+	b=Zhh2eqo2UHTYZ4ot9vFac4sPMm5m6WtAzXFMNWx9cqdfN9dVaSKsADtg0E1vm04W5dbf
+	 Tsn2fxMTAg7zQjnG0SdMF7R5p2No2X2x5G9eNG6QYzBG/TJYTL08Bg1MEXY7DqdUOYQht
+	 QfvlCrXfpORuB+CO6/fgw0RzLP9nehARoBuxmzL9RzOpyqn/tSXVnYyHIy4x3PSKCn/nS
+	 FEbmSv4GZQmH4P73M4OkdFywAOvciH7WJuM7AcCH4OiDK4LJOzr8/1eoWkRHlxucOTPBI
+	 VycJAGf18Wp1oBcuXOLRraxFvdkMRkIH+gwPkqutw5oL4J4aSER7zEt/UlU60iTx9Xg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=hO4SP2x2;
-	arc=none smtp.remote-ip=91.218.175.91
-Received: from mta0.migadu.com (out-91.mta0.migadu.com [91.218.175.91])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=vOPBHM1c;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE9D606A32C
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 13:09:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8FE9D606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E90E606A31A
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 13:10:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2E90E606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=hO4SP2x2
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=F7yOuWqfxHFz/mG7VplEXKs0bWF5sLdGW/cWLYDLPpQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793279371; v=1; x=1793884171;
- b=hO4SP2x2jRGPbqcOlM33ldS40kvt7NMghS/gYpk4Q18xhOWJ4TEprj8idzflFsVC97SieC01
- OEe+gafuBJsNtv4xxmt9qd+kDbzkjMhSr9gMtz4VVIS1B5KaHdCrUFcW06lsEuc4vXRSq9T+seL
- XDO3SpRVFwYjsOhuJ3eAF85Y=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta12.migadu.com with ESMTPS id dff8b26f4d6af5c4;
-	Thu, 29 Oct 2026 13:09:31 +0000
-X-Mizu-Trace-ID: dff8b26f4d6af5c4
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <dfa3f8d1-fa82-4c4b-91bc-e2529fbb5ddc@linux.dev>
-Date: Thu, 29 Oct 2026 21:09:19 +0800
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=vOPBHM1c
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=KOdgnK8xZFM5IsOKZUAH8B+/467biiMEbMPJwGwT4Uw=; b=vOPBHM1cHGVCdywoz7A61M+HYN
+	dVVkDFqE0YjOR66oMgUo0TFqqUOKOdylvOl9HYFgnbeHeM1QjxUM7I0lX7+05ZJr7S3o35V38h/0H
+	XhIVlaRA6ayLR0sQoAezWRNuLc/j7WHGWYxw6Nwr0/0eZhF8bjNA2dpk+pJO3Q4m7HlRomRdKEVBk
+	wY/vGP3B0j0vrFx++5WgtIk87i8++v4MYkeBu3Y9KFXpbWgotQ4UqkZp2fp5Nj9/iIQJl5NbkguDv
+	Qn9EebfLLrktQCoYis/4IQlk2CFEQma5fM/SHGTUv0Ohh0Im9EqjzTaI4AziNnfZNbq4solx5ULlo
+	8q+J4+0Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xMPtL-00000009HdM-1mrk;
+	Thu, 29 Oct 2026 13:10:03 +0000
+Date: Thu, 29 Oct 2026 06:10:03 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Nilay Shroff <nilay@linux.ibm.com>
+Subject: Re: [PATCH 37/98] blk-mq: exit the hctxs of a queue under
+ tag_list_lock
+Message-ID: <auNFqyGofX79OZVx@infradead.org>
+References: <20261028164415.1262013-1-axboe@kernel.dk>
+ <20261028164415.1262013-38-axboe@kernel.dk>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,133 +66,78 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: run the hw queue synchronously for unplugged
- scheduler inserts
-To: Qiliang Yuan <odys.yuan@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Ming Lei <tom.leiming@gmail.com>, Wen Xiong <wenxiong@linux.ibm.com>,
- yukuai3@huawei.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20260930-bug-blk-mq-noplug-sched-dispatch-v1-1-ff1e49e52b00@gmail.com>
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <20260930-bug-blk-mq-noplug-sched-dispatch-v1-1-ff1e49e52b00@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261028164415.1262013-38-axboe@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-
-
-在 2026/9/30 15:38, Qiliang Yuan 写道:
-> When the submitter holds no plug, blk_mq_submit_bio() inserts a request
-> into the I/O scheduler and runs the hardware queue asynchronously. Now
-> that __submit_bio() no longer opens a plug around every bio, this path
-> is taken by all unplugged I/O to devices with an elevator, such as
-> io_uring submitting at most two SQEs per io_uring_enter() or synchronous
-> O_DIRECT reads and writes.
+On Wed, Oct 28, 2026 at 10:41:40AM -0600, Jens Axboe wrote:
+> From: Josef Bacik <josef@toxicpanda.com>
 > 
-> Each of these requests queues hctx->run_work on kblockd. kblockd is a
-> per-CPU WQ_HIGHPRI workqueue and blk_mq_hctx_next_cpu() returns
-> WORK_CPU_UNBOUND for single-queue devices, so the work runs on the
-> submitting CPU and the kworker preempts the submitter once per I/O.
-> With fio (io_uring, 4k randread, iodepth=16, one job) the submitter
-> context switches about once per I/O. A single-queue null_blk device
-> with mq-deadline drops from 289K to 193K IOPS, and a single-queue ublk
-> device, which defaults to mq-deadline, drops from 265K to 113K IOPS.
+> blk_mq_update_nr_hw_queues() exits and replaces the hctxs of every queue
+> on set->tag_list under tag_list_lock. blk_mq_exit_queue() exits its
+> hctxs without the lock and only then takes the queue off the list, so an
+> update running at the same time exits them again and sets up new ones
+> that nobody exits. del_gendisk() is kept away by update_nr_hwq_lock,
+> disk_release() of a never added disk and blk_mq_destroy_queue() are not,
+> and nvme_alloc_ns() drops such a disk when it finds the queues frozen by
+> a reset.
 > 
-> Run the hardware queue from the submitting context for scheduler
-> inserts, as flushing the per-bio plug did. Keep the asynchronous run for
-> the hctx->dispatch_busy case.
+> Hold tag_list_lock for both steps.
+
+I'm a bit worried about cpu hotplug lock interaction as that always
+lead to the craziest imaginable lock chains, but otherwise this looks
+ok.
+
 > 
-> fio, io_uring, 4k randread, 16 vCPU KVM guest:
-> 
->                                                   before     after
->   null_blk, 1 queue, mq-deadline, qd16              193K      289K
->   null_blk, 1 queue, none, qd16                     354K      356K
->   null_blk, 4 queues, none, qd1                     356K      358K
->   ublk (ublksrv null), 1 queue, mq-deadline, qd16   113K      265K
->   ublk (ublksrv null), 4 x 1-queue devices, qd16    290K      852K
-> 
-> Fixes: 9cbbac29d752 ("block: Remove redundant plug in __submit_bio()")
-
-Commit 9cbbac29d752 does need to be reevaluated.
-
-Our customer ran fio tests with --bs=4K --rw=randwrite --iodepth=1 --numjobs=1
-and confirmed that adding bio plugging to __submit_bio() improves performance.
-
-Without bio plugging in __submit_bio():
-fio:
-__submit_bio                              (17.16%)
-  → blk_mq_submit_bio                     (16.80%)
-    → blk_mq_run_hw_queue                 (9.97%)
-      → blk_mq_delay_run_hw_queue         (9.41%)
-        → kblockd_mod_delayed_work_on     (9.13%)
-          → mod_delayed_work_on           (9.11%)
-
-kworker:
-process_one_work                          (12.48%)
-  → blk_mq_run_work_fn                    (11.70%)
-    → blk_mq_sched_dispatch_requests      (11.00%)
-      → __blk_mq_sched_dispatch_requests  (10.91%)
-        → __blk_mq_do_dispatch_sched      (10.26%)
-          → blk_mq_dispatch_rq_list       (7.84%)
-            → nvme_queue_rq               (5.85%)
-
-With bio plugging in __submit_bio():
-__submit_bio                                (26.94%)
-  → __blk_flush_plug                        (21.36%)
-    → blk_mq_flush_plug_list                (21.24%)
-      → blk_mq_flush_plug_list.part.0       (18.38%)
-        → blk_mq_run_hw_queue               (15.34%)
-          → blk_mq_sched_dispatch_requests  (14.55%)
-            → __blk_mq_sched_dispatch_requests (11.27%)
-              → blk_mq_dispatch_rq_list      (7.41%)
-                → nvme_queue_rq              (5.72%)
-
-Adding bio plugging increased IOPS from 60,000 to 74,000 and reduced latency
-from 12.4 µs to 9.5 µs.
-
-Commit 9cbbac29d752 states that bio plugging increases CPU usage. I suspect
-that plugging may allow I/O to be dispatched faster, concentrating CPU
-activity into a shorter period. This could increase instantaneous CPU
-utilization while reducing the total test duration.
-
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
+> Fixes: 630ef623ed26 ("blk-mq: Swap two calls in blk_mq_exit_queue()")
+> Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > ---
->  block/blk-mq.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+>  block/blk-mq.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 > 
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index a26a11c73ee3e..54eff3cf45fae 100644
+> index 0e8449424c9a..37c8f68e23c4 100644
 > --- a/block/blk-mq.c
 > +++ b/block/blk-mq.c
-> @@ -3200,8 +3200,16 @@ void blk_mq_submit_bio(struct bio *bio)
->  	}
+> @@ -4339,7 +4339,8 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
+>  {
+>  	struct blk_mq_tag_set *set = q->tag_set;
 >  
->  	hctx = rq->mq_hctx;
-> -	if ((rq->rq_flags & RQF_USE_SCHED) ||
-> -	    (hctx->dispatch_busy && (q->nr_hw_queues == 1 || !is_sync))) {
-> +	if (rq->rq_flags & RQF_USE_SCHED) {
-> +		/*
-> +		 * Run the queue from the submitting context, as flushing a plug
-> +		 * does. Punting every unplugged request to kblockd lets the
-> +		 * kworker preempt the submitter once per I/O.
-> +		 */
-> +		blk_mq_insert_request(rq, 0);
-> +		blk_mq_run_hw_queue(hctx, false);
-> +	} else if (hctx->dispatch_busy &&
-> +		   (q->nr_hw_queues == 1 || !is_sync)) {
->  		blk_mq_insert_request(rq, 0);
->  		blk_mq_run_hw_queue(hctx, true);
->  	} else {
+> -	mutex_lock(&set->tag_list_lock);
+> +	lockdep_assert_held(&set->tag_list_lock);
+> +
+>  	list_del_rcu(&q->tag_set_list);
+>  	if (list_is_singular(&set->tag_list)) {
+>  		/* just transitioned to unshared */
+> @@ -4347,7 +4348,6 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
+>  		/* update existing queue */
+>  		blk_mq_update_tag_set_shared(set, false);
+>  	}
+> -	mutex_unlock(&set->tag_list_lock);
+>  }
+>  
+>  static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
+> @@ -4711,10 +4711,16 @@ void blk_mq_exit_queue(struct request_queue *q)
+>  {
+>  	struct blk_mq_tag_set *set = q->tag_set;
+>  
+> +	/*
+> +	 * As long as the queue is on set->tag_list, its hctxs belong to
+> +	 * blk_mq_update_nr_hw_queues() as well, which exits and replaces them.
+> +	 */
+> +	mutex_lock(&set->tag_list_lock);
+>  	/* Checks hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED. */
+>  	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
+>  	/* May clear BLK_MQ_F_TAG_QUEUE_SHARED in hctx->flags. */
+>  	blk_mq_del_queue_tag_set(q);
+> +	mutex_unlock(&set->tag_list_lock);
+>  }
+>  
+>  static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+> -- 
+> 2.56.0
 > 
-> ---
-> base-commit: 551c722f40809618230001baccf219193e22fc5a
-> change-id: 20260930-bug-blk-mq-noplug-sched-dispatch-4f19360b0bf7
 > 
-> Best regards,
-
--- 
-Thanks
-Kaitao Cheng
-
+---end quoted text---
