@@ -1,94 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793271218;
-	b=llDr8x6+6hdKoq3LiuCA7Ki061nZ3W2M6/SgRd2vdBDAK0tNj3Y8kXpG4Ew5kQqU+XgV
-	 VbC65JEMjy9kZphMkCYZQesczf7DABPqJsOooC6lh5M/LoKS2Gzzc/Pxdc0fQlFGPKLGg
-	 S2go2bYrFjw+xsDUiK5K1GuPVhO/APFnIQV1EvwDdcV2O3XGzxyhTyaAQinqNRgacbhfQ
-	 MWYeNr+ViUpeslqbeYx3YKlcEzGrhgCWHPamMkTQhB8C7owhAqSNV22x3fkgMWeOsfg0w
-	 Ft35oFt/iISIDwlqyJI5lpCoQSxPP6NwAPg0YBblZx/5wrl9WMVTMZ/nM0BPyvc9CVA==
+	t=1793271567;
+	b=IazHwSULWCUaKhiFJb4lTdB9FWee9AUZEL/JeixPdQyx0TVASjUovnfOAv7h/MPg8G6Q
+	 8zMAgxWnp9tB34aRRhkESfOy1bKtdKO0qx4AE2r0fqZ1drnivHnc+dJWo+8SgZ9JMg3fw
+	 jj7EiOHMc3A1ST7SjYDK295imJ7+t4TRiDObz61n3KPiw/X1NDfavG+c56kkaUh8oVgek
+	 utm51hL40/w3HDwnHQWmbhVT+iIV22/tqGvyQTFDEA72UIhwrRcGheP2afKKwVXyTYpjP
+	 bZsaynNk9ZXzonpgA/MbJMhRjtByo1B/hZM9B2XdX/NiCzlR34+EJDEbSqYepbL8Eiw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793271218;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793271567;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=G37MhI+O3tqGZVGitzVY1owvDCFJb+kDWkzQZJJlvL0=;
-	b=TRB8hCSAIu7JTxIZE2uGeYyIcAygIgYc2WoNE7oHdZyxgsSMrQwJ2Y01XIPo36/kYXfi
-	 fZ/r8x1Do2uJVpy/hr12a10IUcezZgX7QB1CxF8L0PM4op3Yccs0daHdPmFdJaZ4AuCPa
-	 XIUOXI3hngMXt1kdMFWLlRiSIDZCRQhlHLbXRpNtoGoET3EobGC05koaMTKRAQZem95Q7
-	 Q90gLsCdqChyrh3wson3+xdd8Ik0J4ykH4zHOPIQQ0YHSav7Q65Bo19yhOtPlXReHYSzH
-	 PQM6ZFzPnzzmWF7I+WTIvb+8PS50ZftV/EXSRpOq5x0CZjqD7kIRo2TC2BFJtglF4jg==
+	bh=BjLzw1kM6LZTzUaUxJhqUTMufk3/F/G637drKyKaiJE=;
+	b=Sl/fsJiHFKHxJIn998QB9vyAub5daSx0oYh39stqMe/pbWUlOdKOv6uLhlheBdBH3snf
+	 7TfzZg+plg9KfcYzq3uKijqJisRm+wTTg5Noeaw7qT2cfRqjnpqDVDVwWlxRySxtU9LpV
+	 TR0Ipj3OzCeO5Z+QgY37mW7z4r57NmcXB1BzVwp3DKQxYZHriM1h/uTj4pGsCIp6WMt+U
+	 44VjmEtvO9hDqMAwFlVlWG+fm5LowFNePnZmERAZD8VirmqN+5YhHmlDqiv+CQElsquG6
+	 mWwn5fyja2bVLWZ6CxzOqr1KhvoFMZ5/h9X5m2xFNCMmtxdcDqHVXXe8AmGP33I9ZOw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Sn4Aekgg;
-	arc=none smtp.remote-ip=74.125.82.44
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="p/QONaBU";
+	arc=none smtp.remote-ip=209.85.128.54
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690F4606A31A
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 10:53:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 690F4606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50107606A31D
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 10:59:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 50107606A31D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Sn4Aekgg
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-170135e43c7so1213741c88.0
-        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 03:53:38 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p/QONaBU
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4a4dc547987so9810075e9.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 03:59:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793271217; x=1793876017; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=G37MhI+O3tqGZVGitzVY1owvDCFJb+kDWkzQZJJlvL0=;
-        b=Sn4AekggiRiYWv+bhOGRf3jQL/YlHcseSe/uZChmuKKVlmFgi3vQ6JB9N/W9Sd/YCH
-         SxDOlZ4rWMIlgXhshdaxyaNY4GcnInKqn82wucSv9zbH6SUEi4ZtdE2jw7w3aAsvQIi+
-         Uj/Qwwq7o6fHzgj021wMFFXgjgFpdQYc3ikqhkBSapCq4BzU/S8B20YU0KL3J4icAZFh
-         NMrtnTMT4FyoN1c+MsXuGlG82bImGzLHee1RHd52PvGvteKwMK1sn8rfmKnHl59gGtnz
-         +9Gs40hxJ6rw/iLrRW2EKIBO2RpcS0mN0k/JmHL3LQgZWu1ilZimbSOHQUJWIsg/8IyL
-         4MYA==
+        d=gmail.com; s=20260707; t=1793271566; x=1793876366; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=BjLzw1kM6LZTzUaUxJhqUTMufk3/F/G637drKyKaiJE=;
+        b=p/QONaBUeuWz8ele7CgjVKq2RtfloFiauiV98PyQcOH/LZQH6jHOetr6yagJOYtMUl
+         U1YtJGLhpSHmKRtFecnJbcTk54YPpHMUaqCMMFdyrVxBNn6EosuSX2WN/D5tNqtutHgk
+         W9OsYWZQSpV/NKOSfCBOurFMr6wNFE+4CgRjaWrhI66qcpSQfxiVga0/CkWzGPI0cwx/
+         yCucYOlC47cPL9VNX7PosOHYPolW8v5+1x9wkBF+bXv+pDpzZAChsjjB9MrcK9I6UEVD
+         GXz+Ns6XSlqwvlwjqn3oaBCKeTht+Vk11lmzuYCghqfw8nILm3+AI86vOVzmK6p93dhA
+         hYww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793271217; x=1793876017;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20260707; t=1793271566; x=1793876366;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=G37MhI+O3tqGZVGitzVY1owvDCFJb+kDWkzQZJJlvL0=;
-        b=H1jLDcijXqcrBiV2HjISDTa9i5Xhalpmusse1BP2LBbAmouhKMCSqSVs6cSeQDCAnP
-         Kzfsho37IwA8cVOFrgpUjcEEC22G7/RJTXeOBDCvEPzhM0WhHOVdufX0mmXLZjPcBsxZ
-         kmxU75WujfmE2xTYjoVgT54MbH/NDkinT28VHBJ0QVULLQzp/lcxshF6N9T0hlpf8Yrf
-         Kee1x8Z8AzJlNX+r3ysWwe8tTYZNlLe6Hu+xCcBDsib8Xq3kwtsHUNsmFs5wFnmmQ7iN
-         AuYuuOab744pByk9/MT99LPbHNy8Aci2HP3YdyGRwgvnmLgambMqaZjscTXwLZEA4j5Z
-         crww==
-X-Forwarded-Encrypted: i=1; AKwUvByZxCoLG1gF/6ChieDhziDHqfm/mkSvQZi6IiwDaUsqIBmhhQYiYhtxQkT9xsSFYVKSVRhm3iJpeO8vPQ==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKGCIqHK2LGRC/ZpROBxKyOmjYcOtvV1wm9t5xUmzekPekiaZr8
-	gWJqCyOiZSY1+v8DFZKr/+tPsKVg/GF4CKPgF/qxWiifHQll/0xWqmI=
-X-Gm-Gg: AYBFou2e6y5sSxLFFwWHWZr6moenmcEr7uPr4VymmfqX373rp9YUqz6sQv6wWwApr1Q
-	Cbh2oQ2Fzo0zUlwoAnQ22IMhQUYY0/GiyxWV2JNuSXLDqV/P785Xe+eK3C1ScW35OgkQmkXV8Gy
-	YX15PWUrsfJ2VQXj1d99rsVJ+C5O/tu7TVg239+Yvy89ja5uyPbpxwaw1sqN3GxrEAQdE8fX/Lx
-	qeEcIIsrGzDzY5d9yR5H8I/is/iHiaV+E1PZVkhCLvHKhBjwm4zDCEzaFvfmy9kIPtC7qGTouBB
-	a+YRUVDd6WYzJxEKzsZmpE0mf6kF66XmLdt3dWtt9DDuPDmI+y73bXusnx0aDSEnIW/+9uJaIAi
-	2z7FObpJ4GfF+uks4yNNf0q3GYBBCryoo+0l2fQBdczf+3cH+5sn7TjpCR9+bm53suCuTYLNX4n
-	CBy8VthoSqHR8OR4LTZlYMD2jjmsiiMwnT1iLlh1+D14bRtGvaZvvSrvI1mWltn31MQnYP4QYvI
-	5e5Rz1aE4xtNFGVQSh0JAy7H8h2/h6w4bGRWi8fVTvAxQulsXtJ/h1WdK45e0MDxjMgKGlswKMh
-	351FAM6hfduxGxK6ANjW4roOmrTSN3UtgVGY65OZ1wn2iB0RNUU6jd/bEm45V2t459m2HrqSdFX
-	Zx+yYCE8xO+PoXMq3
-X-Received: by 2002:a05:7022:fd04:b0:1a3:bfb6:44ad with SMTP id a92af1059eb24-1a6ce2ff120mr8561631c88.32.1793271217022;
-        Thu, 29 Oct 2026 03:53:37 -0700 (PDT)
-Received: from anuj-MacBookPro.. ([2406:7400:63:e55a:9f78:eb3b:17e1:f1b6])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1a75e5c6d4fsm24266063c88.14.2026.10.29.03.53.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Oct 2026 03:53:36 -0700 (PDT)
-From: Anuj Gupta <anuj1072538@gmail.com>
-To: axboe@kernel.dk,
-	asml.silence@gmail.com,
-	hch@lst.de
-Cc: kbusch@kernel.org,
-	linux-block@vger.kernel.org,
-	anuj20.g@samsung.com
-Subject: [PATCH] block: don't use the bvec fast path for dma-buf bios
-Date: Thu, 29 Oct 2026 16:23:30 +0530
-Message-ID: <20261029105330.1427462-1-anuj1072538@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=BjLzw1kM6LZTzUaUxJhqUTMufk3/F/G637drKyKaiJE=;
+        b=caX/5LA4tzRkh9V2vsIexdpEXJXKartT1HpbSWxTCxFZ5pjw/l/YcjRh6Vv11KX0MR
+         FT4KK1bpyNOuzS4u9LKKAWKUiMg7v4BVRgbwKPYQranlH060jqUEqRrCiTP3AhvJtNQ9
+         lOcLJc4DnGw+9YeXn/WiiA8KdMKUtQE/aNB91IZLfhukYfxb/mO3pLrtu+pzHwnbOH8m
+         L8A3hPdfF6lgH2jLZ5YQaTBlaJiSe8qMMLQPX7kSELOCa0SQkdSGIx1t2aijyQZOp00h
+         Za1Bm0QdKmd6ddM9AjDSi1/U9q+/fK3HIGNSdZ+gKKXPXtZrxbfkUCAU8OPXmZUK5daN
+         +L3Q==
+X-Forwarded-Encrypted: i=1; AKwUvBxlOxr9Vw+hem+MRcgK/LGWSz6dOTivnYdpa+gfrWVe6ZZkCY6V/A7acLKL07ZZgdb05z9suS9PcI5lZQ==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJeZyQN5tIb3KE+dOoUUzlAGPCnPD8okxTMrw/UJouNkmyIo4bT
+	RAhschaHMQZA+hDM5ipo2OI44V/eW+uG5YDJsZFQA2q5XjcBk1LElEoS
+X-Gm-Gg: AYBFou1MFnkm/XWllqmEGjdD4PBnObTStrILV297KYoa4flhG9ULTnbMSCGDbC4nP6/
+	PAZtkqJ1SSDjBhzSHRG0IuBVC6xDd2Gp7H+XavSjyRrHvxMlFG9betBNHnmZ0vs9JNHpXmMmlKW
+	rRADaGweqRULIa6affseAGeWVILTQv3R65no4qkxTZScJUwotufe8HFJC3WaCKz77qMAol4yT+s
+	X5KJPBjVOzTpCIRcqSEIXEkcSMulYLOCHiK+ZlMuwMLAo9vjOdiB2VIzaNx4MdxewvWxcabF/QL
+	oc4D1cYR6fuUP43SWtlGlLGCYkf/oeaaAd2SvN/NHPOvyHi8z3hbtN16r0i1MK0hlrRsxlB1E1b
+	7tbaRmJg8DkJ8+V99afAdFcTGc2Wvq717uZ6KVpK390xrlhHHkS8b0BvbIy5NYxE6tPo+lIHfzK
+	Jyg2oyuvYzk5hd3aIj3wynDN2wZinhSm7omxo1y1a/hQ7DqkYWOVIAayYq8nkFphOs35zWHb/gg
+	OOSX09YOxaRoBr779Gd57fgjxMAscJa+uMUaa1tzBXEDmnA5mVI0m5sNgvGzFXSsGlnmv34D4wB
+	WYIICagtfEsS1Do5N13v8I7NQpZ82VYVa5UNDdR2Vh5qRf3WuaeswTJdJMlqgniHCQJv3Tjermp
+	FZ0FNJXY8GJMFqU0qv3pfaXyORbXmJlEPXdCfhDR9HZFnWXF7BUjKH2SPJ3NbVd2QkCS0uruPJI
+	N0dA==
+X-Received: by 2002:a05:600c:4f89:b0:4a1:c6fd:4db0 with SMTP id 5b1f17b1804b1-4a966c41836mr125002085e9.19.1793271565710;
+        Thu, 29 Oct 2026 03:59:25 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4aa7ee575e2sm58301065e9.1.2026.10.29.03.59.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Oct 2026 03:59:25 -0700 (PDT)
+Message-ID: <c4acc3b3-be8c-49c6-b1ec-b25431d28d8d@gmail.com>
+Date: Thu, 29 Oct 2026 10:59:26 +0000
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -98,33 +94,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/5] io_uring/uring_cmd: support dma-buf registered
+ buffers
+To: Anuj Gupta <anuj1072538@gmail.com>, axboe@kernel.dk, kbusch@kernel.org,
+ hch@lst.de, sagi@grimberg.me, James.Bottomley@HansenPartnership.com,
+ mkp@kernel.org, bernd@bsbernd.com, joannelkoong@gmail.com, miklos@szeredi.hu
+Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ fuse-devel@lists.linux.dev, joshi.k@samsung.com, anuj20.g@samsung.com
+References: <20261022144501.2478417-1-anuj1072538@gmail.com>
+ <20261022144501.2478417-4-anuj1072538@gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20261022144501.2478417-4-anuj1072538@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Anuj Gupta <anuj20.g@samsung.com>
+On 10/22/26 15:44, Anuj Gupta wrote:
+> From: Anuj Gupta <anuj20.g@samsung.com>
+> 
+> Let callers of io_uring_cmd_import_fixed() opt in to dma-buf registered
+> buffers with IO_URING_CMD_IMPORT_DMABUF, and attach the current map on
+> import.
+> 
+> The map has to be dropped at hardware completion rather than from
+> task_work. Add io_uring_cmd_hw_done() for drivers to call from end_io,
+> which drops the map and queues task_work, and warn if task_work is
+> queued with a map still attached.
 
-bio_may_need_split() reads bi_io_vec, which for dma-buf bios aliases
-bi_dmabuf_map, and interprets the map as a bvec. Always run the full
-split check for dma-buf bios.
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 
-Fixes: d88e44f43e93 ("block: introduce dma map backed bio type")
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
----
- block/blk.h | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/blk.h b/block/blk.h
-index 50abfd932886..27b568cedc43 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -404,6 +404,8 @@ static inline bool bio_may_need_split(struct bio *bio,
- 
- 	if (!bio->bi_io_vec)
- 		return true;
-+	if (op_is_dmabuf(bio->bi_opf))
-+		return true;
- 
- 	bv = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
- 	if (bio->bi_iter.bi_size > bv->bv_len - bio->bi_iter.bi_offset)
 -- 
-2.43.0
+Pavel Begunkov
 
