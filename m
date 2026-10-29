@@ -1,63 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.137
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.126.103.232
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793265054;
-	b=eEhzNBD8VeCbiHkqPCb7dv8AivAaVcgtUOm3Fnt26p8x68zKrVmD/cATljIsmhSBM7nA
-	 VjvG9sM+iEk7zgZ2wKEt1zWes/kr2eRtAySqOFT+V9DfAkTI0xAp+Oppw2IXMXwXnT8x0
-	 XYyaMOkwIdgI+RJfgHlpnWBAHNnrPql59vDBv6pP8j8ZMC45qbO5m8nKAOYbQ4yuTIzMn
-	 +BrkTwi5e+jzQhIBUcwA7zrPuLPoqZcbzzVaWCmVsjdEO/0mCOp//mP/Yk0SKYXB6Kamn
-	 zQHrPWTe7pLiaVImIlQ7i0Xf3IdE7n3Vieupx71IEic5FstyAeCycxGkb3ivmcLc7fQ==
+	t=1793265887;
+	b=ajRnZdIRM/ksI1aNlO0cg7fmBFruHGHg/wa9f19Amu0xcUTN0nI+ysbnFgCnCst/JhTC
+	 4MKP25FjzBFRqkFjpUa3y+OLTxA2+2G2KkohQRnoQW1y5NCFps+wuAZ3txgJNCVVlhtzz
+	 lu7UyUr2rj3M/MqteGbx8JnPgYuLZ5kwfcq2Ef4x/8zbwNoIXujZ9KFp4H9aZluWB63ee
+	 kL48c/txS7u/Oui58fQ8a4O7dPGJPOn1WLh0vASrAFOqaeU/I3LGE0gSTESdG2as4ynYu
+	 ytyv68AHN1zoRQ0rNlKxHc5ML0lYOgEJUvEDetIv/u4nsz9FxjwFwwtLUHRqCgqGCZQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793265054;
-	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
-	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
-	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793265887;
+	h=DMARC-Filter:X-UUID:X-CTIC-Tags:X-CID-P-RULE:X-CID-O-INFO:X-CID-INFO:
+	 X-CID-META:X-CID-BVR:X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:X-User:
+	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=A0CT1CLM4FHtwJoACcLaBHTfFpgwkIVkpL+ZZSHF4jA=;
-	b=V4UMn2Ql4mOs94WSdSC86qIZ+hJLn4lHhtFtEqfypUzXJuZW0bTczWUlqxD80WEnqP0w
-	 rCPSOCKQk3I/82PHwfBGyB2x01lTaDEqINOs9IFl1eGwRRhQNTCSu7ABX/IS7Q9OfrrR/
-	 qf8dU7WpfMX75oPKo68xbC+y645peAsPSDCz/lRj32Df+sf264q6xlMtC//P5ndNtWPdD
-	 TO0+rzopUks4gbiq4PyR9avIheAUzZIl0WRtZEKF/c2NHxQz9V/iJlJs1XAvEWLwzESZr
-	 WK0+NkoEdliG/HQLCQhGzTRZtqxU/FIbA54RIzntgu1BCYr0XmofObUqnmjbjgtPjZQ==
+	bh=luEVM4Eim8Yp29bwXPo7UtdKs1nlH+Pzyq5a2hp44q0=;
+	b=fbmViP2uykCQgAG9IgmqFmRS5L0DR6PJWwEnHOgdZMOHeLIYVnKGK2zbPmjkhkKwAMp3
+	 QofeZYJHBnK0qOucCQklqxdFlBqJN38HGXhtweypwDxj7LE1lDfqe64Gw59WZJljPbGMB
+	 w8GdyG4wfOtLzc1NbEfW3DQdmcXmmDRLwTmnDCCSoor9sd25zvnzyso5byH15HCd4IVkJ
+	 WB/Y0ZZFX0aA1LQ0jZlJRL+2TPLhF9NCjJyT6EOL8qiGaZAOPKimy4nWx2MX5+6xFZggw
+	 SmSa7LE6j1coUZrmAqc9AtNUqjJk8Bul/WPVKi1+NrvCpDDFagDh9GqfFVmzLmbM95g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cmss.chinamobile.com;
-	spf=pass smtp.mailfrom=cmss.chinamobile.com;
-	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b="pQSN/qAc";
-	arc=none smtp.remote-ip=111.22.67.137
-Received: from cmccmta4.chinamobile.com (cmccmta4.chinamobile.com [111.22.67.137])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07348606A31D;
-	Thu, 29 Oct 2026 09:10:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 07348606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=pQSN/qAc
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=cmss.chinamobile.com; s=default; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=pQSN/qAcDUwHZ+L5/sRulkwNFjisW6ibm/NMyBwvfR/4mlIoCa+UZly4f8qgscKzuSo+WqDiOlsO+
-	 n6GAFCR2MVmySrGt/i560oYO6hszeFUnyM3V6gLzURsE2G55SID69Lwsr50gdAaMQLQaYGQoexgZHu
-	 oOSn3fJQ8BO1vPog=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
-	by rmmx-syy-dmz-app08-12008 (RichMail) with SMTP id 2ee86ae30d98a35-0929d;
-	Thu, 29 Oct 2026 17:10:48 +0800 (CST)
-X-RM-TRANSID:2ee86ae30d98a35-0929d
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from VM-32-23-ubuntu.. (unknown[124.156.110.139])
-	by rmsmtp-syy-appsvr04-12004 (RichMail) with SMTP id 2ee46ae30d97793-62905;
-	Thu, 29 Oct 2026 17:10:48 +0800 (CST)
-X-RM-TRANSID:2ee46ae30d97793-62905
-From: Yuehong Wu <wuyuehong@cmss.chinamobile.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: fix kernel-doc warnings in blk-map.c and blk-mq-dma.c
-Date: Thu, 29 Oct 2026 17:10:47 +0800
-Message-ID: <20261029091047.3085558-1-wuyuehong@cmss.chinamobile.com>
-X-Mailer: git-send-email 2.43.0
+	dmarc=none header.from=kylinos.cn;
+	spf=pass smtp.mailfrom=kylinos.cn;
+	arc=none smtp.remote-ip=124.126.103.232
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F880606A31A;
+	Thu, 29 Oct 2026 09:24:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6F880606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 8f413766d37a11f19a56ed5b684f684d-20261029
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_DIGIT_LEN
+	HR_FROM_NAME, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
+	SA_EXISTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
+	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
+	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:553eb04b-26dd-4815-ba07-98c98a4735e9,IP:10,
+	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-15
+X-CID-INFO: VERSION:1.3.19,REQID:553eb04b-26dd-4815-ba07-98c98a4735e9,IP:10,UR
+	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-15
+X-CID-META: VersionHash:7db8b62,CLOUDID:a07bb596bbfb029ec605fef6e093316c,BulkI
+	D:26102917243992FITHXI,BulkQuantity:0,SF:17|19|38|66|78|102|127|136|850|86
+	5|898,TC:nil,Content:0|15|50|99,EDM:-3|-100,IP:-2,URL:0,File:nil,RT:nil,Bu
+	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
+	0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 8f413766d37a11f19a56ed5b684f684d-20261029
+X-User: liuzhe1@kylinos.cn
+Received: from localhost.localdomain [(114.244.3.119)] by mailgw.kylinos.cn
+	(envelope-from <liuzhe1@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 2010831275; Thu, 29 Oct 2026 17:24:36 +0800
+From: Zhe Liu <liuzhe1@kylinos.cn>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zhe Liu <liuzhe1@kylinos.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] blk-iocost: account flush sequence latency only once
+Date: Thu, 29 Oct 2026 17:24:24 +0800
+Message-Id: <20261029092424.764545-1-liuzhe1@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -69,70 +87,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-make W=1 reports excess kernel-doc parameters for bio_copy_kern()
-and blk_rq_integrity_dma_map_iter_next():
+A flush sequence with a DATA phase can complete its original request
+twice. Both completions invoke ioc_rqos_done(), causing the request to
+contribute two latency samples and adding the same queue wait time
+twice. This gives such requests disproportionate weight compared to
+ordinary writes, distorting the device-wide latency and queue wait
+feedback used to adjust iocost's virtual time rate.
 
-  block/blk-map.c:366: warning: Excess function parameter 'op' description in 'bio_copy_kern'
-  block/blk-mq-dma.c:379: warning: Excess function parameter 'state' description in 'blk_rq_integrity_dma_map_iter_next'
+Skip requests marked RQF_FLUSH_SEQ in ioc_rqos_done(). The flag is set
+when the request enters the flush machinery and is still set when the
+data phase completes; blk_flush_restore_request() clears it before the
+final completion, so accounting happens only once, after the whole
+sequence finishes. The remaining sample covers the request's lifetime
+through any postflush, and its queue wait time is accumulated only
+once.
 
-bio_copy_kern() derives the operation from @rq and has no @op argument,
-and blk_rq_integrity_dma_map_iter_next() lost its @state argument in
-commit 91e1c1bcf0f2 ("block, nvme: remove unused dma_iova_state function
-parameter").  Drop the stale parameter descriptions.
-
-While at it, fix the "ft" typo in the return value description of
-blk_rq_dma_map_iter_start() and blk_rq_dma_map_iter_next().
-
-Signed-off-by: Yuehong Wu <wuyuehong@cmss.chinamobile.com>
+Fixes: 7caa47151ab2e ("blkcg: implement blk-iocost")
+Cc: stable@vger.kernel.org
+Signed-off-by: Zhe Liu <liuzhe1@kylinos.cn>
 ---
- block/blk-map.c    | 1 -
- block/blk-mq-dma.c | 5 ++---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ block/blk-iocost.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 81cba3af4e9c..e0c2b8236513 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -356,7 +356,6 @@ static void bio_copy_kern_endio_read(struct bio *bio)
-  *	@rq: request to fill
-  *	@data: pointer to buffer to copy
-  *	@len: length in bytes
-- *	@op: bio/request operation
-  *	@gfp_mask: allocation flags for bio and page allocation
-  *
-  *	copy the kernel address into a bio suitable for io to a block
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index 88fd9cbc951f..efe16943de15 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -213,7 +213,7 @@ static bool blk_dma_map_iter_start(struct request *req, struct device *dma_dev,
-  * at unmap time, @iter is only needed at map time.
-  *
-  * Returns %false if there is no segment to map, including due to an error, or
-- * %true ft it did map a segment.
-+ * %true if it did map a segment.
-  *
-  * If a segment was mapped, the DMA address for it is returned in @iter.addr and
-  * the length in @iter.len.  If no segment was mapped the status code is
-@@ -243,7 +243,7 @@ EXPORT_SYMBOL_GPL(blk_rq_dma_map_iter_start);
-  * arguments.
-  *
-  * Returns %false if there is no segment to map, including due to an error, or
-- * %true ft it did map a segment.
-+ * %true if it did map a segment.
-  *
-  * If a segment was mapped, the DMA address for it is returned in @iter.addr and
-  * the length in @iter.len.  If no segment was mapped the status code is
-@@ -361,7 +361,6 @@ EXPORT_SYMBOL_GPL(blk_rq_integrity_dma_map_iter_start);
-  * 					 a request
-  * @req:	request to map
-  * @dma_dev:	device to map to
-- * @state:	DMA IOVA state
-  * @iter:	block layer DMA iterator
-  *
-  * Iterate to the next integrity mapping after a previous call to
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 2ae40138e041..601029221e6f 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2868,6 +2868,9 @@ static void ioc_rqos_done(struct rq_qos *rqos, struct request *rq)
+ 	if (!ioc->enabled || !rq->alloc_time_ns || !rq->start_time_ns)
+ 		return;
+ 
++	if (rq->rq_flags & RQF_FLUSH_SEQ)
++		return;
++
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_READ:
+ 		pidx = QOS_RLAT;
 -- 
-2.43.0
-
-
+2.25.1
 
