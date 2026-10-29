@@ -1,66 +1,104 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=51.250.124.100
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793266096;
-	b=Q3qbcSTSIW0EGTbFLdjsKmHR8BZzWpP7Q4klXgBjAfCIs4bbraSTQtsuwVNOMzol9hB3
-	 Yf9Vqhs03DuHhHW+QVFN2tUnCw+wL4czbxtjo0byRY/aPubtFFEvK0fZrpQ+++A8/hUW4
-	 PwPelsiLN/2aFkRPeA10RNH/EQSarE5zYPsyqxcrfYRSgLx5zpmphaJdYnzEt2O1USnxS
-	 lkIrGvdQJvgF068HHt08hF/LOWE/cVueDx+glCE2EGviUypIoESlYZhet8uqXa355fYTR
-	 7kfaf7n02rjGWHCmzAFT2pJGGNF4B9PPHWSskV9guD6xHAEGSxQJXMW3XStakJKn82g==
+	t=1793266403;
+	b=YaNqadJ6eK+/W6LkIQ+a/sWQ5jLdpsRdF0Uvv84D7MYmZB84Lye+36Bu9134AmfGhsF+
+	 38yoTASJi4bBBoTuPkntnEgnum0LOPDowsA1l8NRL48LskoRsF6NSK7jwOUotCp2YStyv
+	 Z5GNVonMKZ7uThYNS74ofz+9pHEJ8Si1KNH/Fminvmc/yVAGKOBplMV/WRi94UmAbV2ea
+	 voL+R/Ir4ty390lgdQ3DYCb8/N9Y9ID6oJ39Y1b7gzbGc75Xp91NQ7kFIar+iZsoutJJx
+	 OeRs5GZhDvz5qHDRAttoGCQinuF25lHa40hcZJ9BLG4+SH+lemMhYdMZ4ZHFaOXJOkg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793266096;
-	h=DMARC-Filter:Received:Received:X-Yandex-Fwd:DKIM-Signature:From:To:
-	 Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=ucJClS3C52+tN9fgpmASAGYwr5TrUblvC/hnqIUBTG0=;
-	b=p99AHLn7xHYo0Bgx5cASFlsM8RhSC5dWFHzVkVQlKhzPzZy3C5r//NGLvg6wYiuXnLyg
-	 yVjFI9SXQ3FSddSDbcMqprbxPMcZw5qQYURV0tfKeKk/vVYS7Q42MPy/qSuf9rZfHcFkQ
-	 qcdTiJhk9MVG1UDrpRc1OPD39mAHELaqHLthZJVg13+w6doZbVS2hURc25E9givoG/x2r
-	 tbvJtm00ArwT4kLruzmD9OY6lEoIRuwQwgGpqMRoM9JymtKaWi/Osux/S8NoZfqLI9IiD
-	 InYMoPvjxxNaBwqzgAdvIQ5vDluaGGwqr1HCeX0JSrzr4M9K50amtA9W/N+Ni+U5vTw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793266403;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Rspamd-Queue-Id:X-Spam-Level:
+	 X-Rspamd-Server:X-Rspamd-Action:X-Spam-Flag:X-Spamd-Result:
+	 X-Spam-Score;
+	bh=A3eaDltp9ro00kzLkKym+ifXR0l5ELVdXbWq3uIp3Ak=;
+	b=GPjjyztbTNsV9NBEB3uB7EdNzKwidtHnKXe0a9MSJ+iGXgltHLSA4UzntppurfS+Qykj
+	 hziUP5oD+IBLLRDus0ghq2vt5r1Iu8l96lRrJ7dIFjO+4uMQN1e9RLmKwsRqfBTCHtzni
+	 I4JLeeV9tX+H4jhAGskk0Cj8eRigVP7pRpc1MepIbmaBrxh1uK/HOaWwPEu/dXRjD0Grf
+	 HgluOj6NVZtLTd67TWCMl/Y+JqBf03D1QhCc/LWxH3jw6fHVUC5g1GBgMvWsPbZ7tDRFZ
+	 FbSW/8cZnQdVTH+NkCdBxfYCLefrVXK9+h7Rlg42ZObQQ2Nwa5iH10Hb1NFKMzrPxyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=yandex.ru;
-	spf=pass smtp.mailfrom=yandex.ru;
-	dkim=pass header.d=yandex.ru header.i=@yandex.ru header.a=rsa-sha256 header.s=mail header.b=tEWvMa08;
-	arc=none smtp.remote-ip=51.250.124.100
-Received: from forward104a.mail.yandex.net (forward104a.mail.yandex.net [51.250.124.100])
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=Ywprm8+n;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=npjtqavM;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nmgiNLzX;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b="1aGXArv/";
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0FA606A31C;
-	Thu, 29 Oct 2026 09:28:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AB0FA606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5D9606A320
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 09:33:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC5D9606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=yandex.ru header.i=@yandex.ru header.a=rsa-sha256 header.s=mail header.b=tEWvMa08
-Received: from mail-nwsmtp-smtp-production-main-62 (mail-nwsmtp-smtp-production-main-62.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:5724:0:640:b7ee:0])
-	by forward104a.mail.yandex.net (postfix) with ESMTPS id 3407010003A;
-	Thu, 29 Oct 2026 12:28:07 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-62 with ESMTPSA id 1SfdjsOiIiE0-pzJcvn9f;
-	Thu, 29 Oct 2026 12:28:06 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1793266086; bh=ucJClS3C52+tN9fgpmASAGYwr5TrUblvC/hnqIUBTG0=;
-	h=Message-ID:Date:In-Reply-To:Cc:Subject:References:To:From;
-	b=tEWvMa08wWHLuX1dHNmCdAZLKGbZXIGgg8nxJ0Fljluo/r8jUAq51uzrLhfnKXdrF
-	 OgCT1XAnG5Pdpyt3v4PsuCioXjUEGegs+ROO3AFv5ElCUIimCck/ejJEB4ylqNUq7T
-	 xsgQwxuY3YC+8eVtzb12s1EgZ73BOtlAIjR9hhhw=
-Authentication-Results: mail-nwsmtp-smtp-production-main-62; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Jens Axboe <axboe@kernel.dk>,
-	Fujita Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	Martin Petersen <mkp@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH 2/2] scsi: add basic CDB check to bsg_sg_io()
-Date: Thu, 29 Oct 2026 12:26:24 +0300
-Message-ID: <20261029092624.579887-2-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261029092624.579887-1-dmantipov@yandex.ru>
-References: <20261029092624.579887-1-dmantipov@yandex.ru>
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=Ywprm8+n;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=npjtqavM;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nmgiNLzX;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=1aGXArv/
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A0BEE1FB41;
+	Thu, 29 Oct 2026 09:33:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1793266395; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A3eaDltp9ro00kzLkKym+ifXR0l5ELVdXbWq3uIp3Ak=;
+	b=Ywprm8+nLTivOjCkaYZhH4jUZj7sp3bWaPZDdn4i+dCb6/sbv/MebJY7044hiHLx0wcPmL
+	bkox9MbmdbC45dSgnbl/1pCwtCexUJLzI92PTrKkUURun1KLrbsJvScavpNJYTlgDr1uYp
+	moDXTazJpKyRqKjploJw2lG7LjH6bn8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1793266395;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A3eaDltp9ro00kzLkKym+ifXR0l5ELVdXbWq3uIp3Ak=;
+	b=npjtqavMk9VEUHOWSx4RWeBQxmesyhWvueXGlZDiGmRlSzVx/S9GUeZSN9Aj+IpA8Fcsku
+	dV+muBAPbjkNcSCg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=nmgiNLzX;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="1aGXArv/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1793266394; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A3eaDltp9ro00kzLkKym+ifXR0l5ELVdXbWq3uIp3Ak=;
+	b=nmgiNLzXWagb8qsEkFYMgs3AeBXmU1AjYuioUak7StWTQX/zsxkcV4/4FRx4wTXQPxkmqR
+	jOXsetOVHYD6C6OXQ7Sl1cPD3SvMmztF8xmVvez2vfI+zPxAAsKkelb5EF3O6WTP2nQ0QT
+	sWe1usi8a9Ple0ByQu1uTDbDXpO4k3Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1793266394;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A3eaDltp9ro00kzLkKym+ifXR0l5ELVdXbWq3uIp3Ak=;
+	b=1aGXArv/2ahbJcD7epIQwMzYDNltBV7sMYDs5dA09kQUhDWPy0wTi0RsVBVw93qHlADSwH
+	sSr0f/YVTgY5tLDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 68DA813419;
+	Thu, 29 Oct 2026 09:33:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id mRaHENoS42pACQAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 29 Oct 2026 09:33:14 +0000
+Message-ID: <0b4fc5e1-9b5d-4f7f-bd5d-95566762d243@suse.de>
+Date: Thu, 29 Oct 2026 10:33:14 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,118 +108,196 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 59/98] nvmet-auth: serialize the commands of a controller
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>
+References: <20261028164415.1262013-1-axboe@kernel.dk>
+ <20261028164415.1262013-60-axboe@kernel.dk>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20261028164415.1262013-60-axboe@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A0BEE1FB41
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-13.50 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[grimberg.me:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,lst.de:email,nvidia.com:email,suse.de:dkim,suse.de:email,kernel.dk:email,toxicpanda.com:email]
+X-Spam-Score: -13.50
 
-Local fuzzing of 6.12.113 has reported the following crash:
+On 10/28/26 5:42 PM, Jens Axboe wrote:
+> From: Josef Bacik <josef@toxicpanda.com>
+> 
+> The host and controller keys, the DH context and the hash of DH-HMAC-CHAP
+> live in the controller, and the authentication commands of all its
+> queues use them without a lock. A host can send AUTH_Negotiate on the
+> admin queue at any time, and nvmet_setup_auth() then frees and reloads
+> the keys while another queue computes a response from them:
+> 
+>    BUG: KASAN: slab-use-after-free in nvme_auth_transform_key+0xa3/0x250
+>     nvmet_auth_host_hash+0x10e/0x530
+>     nvmet_execute_auth_send+0xa4c/0x1a00
+>    Freed by task 194:
+>     nvmet_setup_auth+0x166/0x3a0
+>     nvmet_execute_auth_send+0x3e7/0x1a00
+> 
+> Neither queue needs to have authenticated for that.
+> 
+> Add a controller-wide mutex and hold it for the duration of an
+> authentication command, dropping it before the request is completed.
+> nvmet_alloc_ctrl() takes it around nvmet_setup_auth() too, as the
+> controller is already on the subsystem list by then and an I/O queue
+> can connect.
+> 
+> [axboe: upstream already has the per-queue auth_lock and expiry handling
+>   from 53f6efe00cea, so only the controller lock is added here. It nests
+>   inside sq->auth_lock.]
+> 
+> Fixes: db1312dd9548 ("nvmet: implement basic In-Band Authentication")
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: Chaitanya Kulkarni <kch@nvidia.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   drivers/nvme/target/core.c             | 4 ++++
+>   drivers/nvme/target/fabrics-cmd-auth.c | 6 ++++++
+>   drivers/nvme/target/nvmet.h            | 1 +
+>   3 files changed, 11 insertions(+)
+> 
+> diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+> index 8353950f346f..5bd78bb83cf9 100644
+> --- a/drivers/nvme/target/core.c
+> +++ b/drivers/nvme/target/core.c
+> @@ -1642,6 +1642,7 @@ struct nvmet_ctrl *nvmet_alloc_ctrl(struct nvmet_alloc_ctrl_args *args)
+>   	if (!ctrl)
+>   		goto out_put_subsystem;
+>   	mutex_init(&ctrl->lock);
+> +	mutex_init(&ctrl->auth_lock);
+>   
+>   	ctrl->port = args->port;
+>   	ctrl->ops = args->ops;
+> @@ -1728,7 +1729,10 @@ struct nvmet_ctrl *nvmet_alloc_ctrl(struct nvmet_alloc_ctrl_args *args)
+>   
+>   	nvmet_start_keep_alive_timer(ctrl);
+>   
+> +	/* An I/O queue may connect as soon as the controller is on the list. */
+> +	mutex_lock(&ctrl->auth_lock);
+>   	dhchap_status = nvmet_setup_auth(ctrl, args->sq, false);
+> +	mutex_unlock(&ctrl->auth_lock);
+>   	if (dhchap_status) {
+>   		pr_err("Failed to setup authentication, dhchap status %u\n",
+>   		       dhchap_status);
+> diff --git a/drivers/nvme/target/fabrics-cmd-auth.c b/drivers/nvme/target/fabrics-cmd-auth.c
+> index 1fe21f2672f1..9779e664b65f 100644
+> --- a/drivers/nvme/target/fabrics-cmd-auth.c
+> +++ b/drivers/nvme/target/fabrics-cmd-auth.c
+> @@ -269,6 +269,7 @@ void nvmet_execute_auth_send(struct nvmet_req *req)
+>   	u8 dhchap_status;
+>   
+>   	mutex_lock(&req->sq->auth_lock);
+> +	mutex_lock(&ctrl->auth_lock);
+>   
+>   	if (req->cmd->auth_send.secp != NVME_AUTH_DHCHAP_PROTOCOL_IDENTIFIER) {
+>   		status = NVME_SC_INVALID_FIELD | NVME_STATUS_DNR;
+> @@ -297,6 +298,7 @@ void nvmet_execute_auth_send(struct nvmet_req *req)
+>   	}
+>   	if (unlikely(tl != req->transfer_len)) {
+>   		pr_debug("%s: transfer length mismatch (%u)\n", __func__, tl);
+> +		mutex_unlock(&ctrl->auth_lock);
+>   		mutex_unlock(&req->sq->auth_lock);
+>   		nvmet_check_transfer_len(req, tl);
+>   		return;
+> @@ -442,6 +444,7 @@ void nvmet_execute_auth_send(struct nvmet_req *req)
+>   		nvmet_ctrl_fatal_error(ctrl);
+>   
+>   complete:
+> +	mutex_unlock(&ctrl->auth_lock);
+>   	mutex_unlock(&req->sq->auth_lock);
+>   	nvmet_req_complete(req, status);
+>   }
+> @@ -562,6 +565,7 @@ void nvmet_execute_auth_receive(struct nvmet_req *req)
+>   	u16 status = 0;
+>   
+>   	mutex_lock(&req->sq->auth_lock);
+> +	mutex_lock(&ctrl->auth_lock);
+>   
+>   	if (req->cmd->auth_receive.secp != NVME_AUTH_DHCHAP_PROTOCOL_IDENTIFIER) {
+>   		status = NVME_SC_INVALID_FIELD | NVME_STATUS_DNR;
+> @@ -590,6 +594,7 @@ void nvmet_execute_auth_receive(struct nvmet_req *req)
+>   	}
+>   	if (unlikely(al != req->transfer_len)) {
+>   		pr_debug("%s: transfer length mismatch (%u)\n", __func__, al);
+> +		mutex_unlock(&ctrl->auth_lock);
+>   		mutex_unlock(&req->sq->auth_lock);
+>   		nvmet_check_transfer_len(req, al);
+>   		return;
+> @@ -650,6 +655,7 @@ void nvmet_execute_auth_receive(struct nvmet_req *req)
+>   		nvmet_auth_sq_free(req->sq);
+>   		nvmet_ctrl_fatal_error(ctrl);
+>   	}
+> +	mutex_unlock(&ctrl->auth_lock);
+>   	mutex_unlock(&req->sq->auth_lock);
+>   	nvmet_req_complete(req, status);
+>   }
+> diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+> index 9cec19e6f485..f6a9f2e1c0ed 100644
+> --- a/drivers/nvme/target/nvmet.h
+> +++ b/drivers/nvme/target/nvmet.h
+> @@ -307,6 +307,7 @@ struct nvmet_ctrl {
+>   	struct nvme_error_slot	slots[NVMET_ERROR_LOG_SLOTS];
+>   	bool			pi_support;
+>   	bool			concat;
+> +	struct mutex		auth_lock; /* one AUTH command at a time */
+>   #ifdef CONFIG_NVME_TARGET_AUTH
+>   	struct nvme_dhchap_key	*host_key;
+>   	struct nvme_dhchap_key	*ctrl_key;
 
-[ T6325] KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-[ T6325] CPU: 1 UID: 0 PID: 6325 Comm: syz.0.17 Tainted: G W 6.12.113 #2
-...
-[  123.544088][ T6325] RIP: 0010:ufs_bsg_request+0x244/0x11f0
-...
-[  123.550658][ T6325] Call Trace:
-[  123.550918][ T6325]  <TASK>
-[  123.551154][ T6325]  ? __pfx_ufs_bsg_request+0x10/0x10
-[  123.551599][ T6325]  bsg_queue_rq+0x4e2/0x780
-[  123.551991][ T6325]  ? __pfx_bsg_queue_rq+0x10/0x10
-[  123.552526][ T6325]  ? lockdep_unlock+0x5c/0xd0
-[  123.553098][ T6325]  blk_mq_dispatch_rq_list+0x499/0x1990
-[  123.553819][ T6325]  ? do_raw_spin_lock+0x12b/0x2f0
-[  123.554458][ T6325]  ? __pfx_blk_mq_dispatch_rq_list+0x10/0x10
-[  123.555332][ T6325]  ? do_raw_spin_unlock+0xf5/0x200
-[  123.556247][ T6325]  __blk_mq_sched_dispatch_requests+0x355/0x1580
-[  123.557644][ T6325]  ? __lock_acquire+0x761/0x2e30
-[  123.559226][ T6325]  ? do_raw_spin_lock+0x12b/0x2f0
-[  123.562128][ T6325]  ? __pfx___blk_mq_sched_dispatch_requests+0x10/0x10
-[  123.565938][ T6325]  ? lock_acquire+0x115/0x350
-[  123.568870][ T6325]  ? lock_acquire+0x115/0x350
-[  123.571884][ T6325]  blk_mq_sched_dispatch_requests+0xd7/0x180
-[  123.574304][ T6325]  ? blk_mq_run_hw_queue+0x317/0x4e0
-[  123.575617][ T6325]  blk_mq_run_hw_queue+0x340/0x4e0
-[  123.576586][ T6325]  blk_execute_rq+0x1e0/0x4c0
-[  123.577254][ T6325]  ? import_ubuf+0xfb/0x1d0
-[  123.577847][ T6325]  ? blk_rq_map_user+0x11b/0x1a0
-[  123.578440][ T6325]  ? __pfx_blk_execute_rq+0x10/0x10
-[  123.579013][ T6325]  ? _copy_from_user+0x94/0xb0
-[  123.579509][ T6325]  bsg_transport_sg_io_fn+0x5ff/0xef0
-[  123.580093][ T6325]  bsg_ioctl+0x7ec/0xa10
-[  123.580603][ T6325]  ? __pfx_bsg_transport_sg_io_fn+0x10/0x10
-[  123.581248][ T6325]  ? __pfx_bsg_ioctl+0x10/0x10
-[  123.581695][ T6325]  ? __fget_files+0x2a/0x420
-[  123.582057][ T6325]  ? bpf_lsm_file_ioctl+0x9/0x20
-[  123.582437][ T6325]  ? __pfx_bsg_ioctl+0x10/0x10
-[  123.582789][ T6325]  __se_sys_ioctl+0xfc/0x170
-[  123.583123][ T6325]  do_syscall_64+0x166/0x520
-[  123.583470][ T6325]  ? trace_irq_disable+0x3b/0x140
-[  123.583904][ T6325]  ? entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[  123.584412][ T6325]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Hmm. Not particularly happy with this.
+In the end, it renders sq->auth_lock pretty much pointless (the only
+place where it remains on its own is in nvmet_auth_expiry_work() ).
+And it would trigger if a authentication reset while another 
+authentication (eg on the I/O queues) is still ongoing.
+With this patch we would switch the authentication variables
+in the middle of the authentication protocol run for the I/O
+queue, most likely causing that authentication to fail.
 
-This is caused by ioctl(..., SG_IO, {struct sg_io_v4 hdr = {
-.subprotocol = BSG_SUB_PROTOCOL_SCSI_TRANSPORT, .request = NULL,
-.request_len = 0 }}). So if 'hdr' is not a task management
-function, perform basic 'request' and 'request_len' check
-assuming that there should be a valid fixed length CDB at least.
+We should rather fail ongoing authentications whenever we
+call nvmet_auth_setup().
 
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- block/bsg-lib.c         | 2 --
- block/bsg.c             | 9 +++++++++
- include/linux/bsg-lib.h | 2 ++
- 3 files changed, 11 insertions(+), 2 deletions(-)
+Cheers,
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 536cee4430a7..e7ae60f73870 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -16,8 +16,6 @@
- #include <scsi/scsi_cmnd.h>
- #include <scsi/sg.h>
- 
--#define uptr64(val) ((void __user *)(uintptr_t)(val))
--
- struct bsg_set {
- 	struct blk_mq_tag_set	tag_set;
- 	struct bsg_device	*bd;
-diff --git a/block/bsg.c b/block/bsg.c
-index 82aaf3cee582..80f367ae7d24 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -11,6 +11,7 @@
- #include <linux/percpu.h>
- #include <linux/idr.h>
- #include <linux/bsg.h>
-+#include <linux/bsg-lib.h>
- #include <linux/slab.h>
- #include <linux/io_uring/cmd.h>
- 
-@@ -66,6 +67,14 @@ static int bsg_sg_io(struct bsg_device *bd, bool open_for_write,
- 		return -EFAULT;
- 	if (hdr.guard != 'Q')
- 		return -EINVAL;
-+
-+	if (hdr.subprotocol != BSG_SUB_PROTOCOL_SCSI_TMF) {
-+		if (hdr.request_len < SCSI_MIN_CDB_SIZE)
-+			return -EINVAL;
-+		if (!access_ok(uptr64(hdr.request), hdr.request_len))
-+			return -EFAULT;
-+	}
-+
- 	ret = bd->sg_io_fn(bd->queue, &hdr, open_for_write,
- 			   bsg_timeout(bd, &hdr));
- 	if (!ret && copy_to_user(uarg, &hdr, sizeof(hdr)))
-diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index a697246feeac..fac7c89516ca 100644
---- a/include/linux/bsg-lib.h
-+++ b/include/linux/bsg-lib.h
-@@ -17,6 +17,8 @@ struct device;
- struct scatterlist;
- struct request_queue;
- 
-+#define uptr64(val) ((void __user *)(uintptr_t)(val))
-+
- typedef int (bsg_job_fn) (struct bsg_job *);
- typedef enum blk_eh_timer_return (bsg_timeout_fn)(struct request *);
- 
+Hannes
 -- 
-2.56.0
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
