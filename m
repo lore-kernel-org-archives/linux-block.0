@@ -1,54 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793268697;
-	b=Wg1Rn0nwL6B5cn+DVod/eYmh0Kp/mu4wpzsBJa3Fl6jQbJGYzSuoDWx8A/RdsTVQQzf4
-	 69IpJz7iOt8ccfWoulMtZRJqieS+nJPlnzZHAaK9Zb1qXNQiA4fk3yiuR0lkF3OsXOuyU
-	 ijRCw0jbxB24wSrvAjic5JcjeHEa1fLtLjb6TZnRo+jIfjKID2fikODyE9Fu8OKveg0+u
-	 wTshKc6oZczdIdYbvgzvHbyE3N4FdZkq5cNP2fhmksq8WkrG8s9uefX1PR3uFVI5L72n6
-	 iZI+VrFRhdSuSXJxO3nsA81FHULTK4JJuAWNbAJfJ8VwtiKPRxxgp6g3aZXQPgb/pXg==
+	t=1793268722;
+	b=gKtANIS1jgCdrPw6uhWu0JMNWF6TXe8mgj5BjQJXbEjdCFfQZhrMPuyxftDELaGgyUAy
+	 E6o668/52MygwN8eSY69CO2hlv+EPmR5hEelRsgBRMGe7mCDtFR7fSTJBiphvD26INiSr
+	 Kb7RYzWLSvMfeVxdtpyyjV3OF4Q0XFbkaO8MoAsPrU3pm2Qd95IrklAIgKD+jKHs5ke0X
+	 k5nC7Ud0V/0UFqpfyBuIo3kcYmMZ8Ajv4E0PhYIklUxFUMIKJBkp9Un0E1Bls5GPaa1ej
+	 ESarfN3uYCjQBYE50M/wL1emDouMDT4Uw1NaY4ee8HbBRDtUIweG8sxN50nhw0WSVTw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793268697;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=FAoeFjOhHMIomvSZEyPcUceFOZEousEjiVEkUk7cB2Y=;
-	b=e3ojIf0iH1Vg1Og0Xs57OnCxEvao0NtBWEabB39ZJSFdmjguQ0g+07px1FU4+dOTTJzj
-	 OW7MRleieGAxpirE3Y1W3+lIeRKwOToj8TqB6Wt3TpF3YXshbVTPx6k6G0HiCThUNAPpT
-	 nyQbtSGIZ/GdG+YffNLkOwR6J9/6NgOHu0IZEwFcORIvFak73FrZLOQwucC7XP2BJoQL2
-	 bMm0xT1PX0rLABqITop8irvEqthWzmyLesKGN8ZvAkau2FU3nS9u5Ga8Ml7JBeLfRLfXc
-	 nHM1OJ6/cW7FjzBj978Pe7b1Pfz+qxutT0zSumZqmrqwnni6u1ioloLqxW4wSmZ2g4Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793268722;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Spam-Flag:X-Spam-Level:
+	 X-Spamd-Result:X-Spam-Score;
+	bh=YYr7rp0MKE6X3AdaQW2iOo55WBPYNGuuiI3up0Qg35s=;
+	b=J+5bGg/xlFysPgkqj0tfBDOxf4DITGA7HP4hhul8lJ6tKPV4d5P0G4A8JzZtyCQTRqtl
+	 kpuFqDua/4/8Ohy0J3nE2/n65SevQsvYBod5RWQaC346JEQ3rF2uR1wMKl+M99h+2ZJf7
+	 YsUDr5XdpdXFBNCtxyWKcl4DDKhRFp1s9XLqWeq+Clt2W3H8ohX9In8wEe7DDf+Lt23SW
+	 rhPNNtdiTvQqLlFfG7XAIIlakYBUAgQdQNTz9Lpy4M8ImZv0SIaQ/pM6YBMQFSuwFl3RV
+	 IXcsiKJv9KfkQwRngTvyBi9km+sO2sKlYro73ALXs8YQeWeT1qzaL9gOCReyEXjGQUg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ZeoDW+IX;
-	arc=none smtp.remote-ip=95.215.58.189
-Received: from mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=gl7WuCph;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+KElWXgF;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=gl7WuCph;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+KElWXgF;
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BF3606A324
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 10:11:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0BF3606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4B5606A32E
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 10:12:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2F4B5606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ZeoDW+IX
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=O6pECeJaIkk7IfSov1GVY8i4R6cQbSZNmIkkj1P7D6Q=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793268694; v=1; x=1793873494;
- b=ZeoDW+IX8pJ0xoQ4rjQaOdRjv3XntVFyg1mljQ462gjJ8QtHberIy8I3vN25HJSYU3X+jRU5
- riZGSX3aklA63YpJ1ez6SWmybO1uIcDLwx48LUChThpcH1hdcBGof0khT+0ucFuokpWFGrkkr9F
- pCQRBFS7YYyAih+hEKv4I2LQ=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 73988b42a70c48c5;
-	Thu, 29 Oct 2026 10:11:34 +0000
-X-Mizu-Trace-ID: 73988b42a70c48c5
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <895cb52c-1542-4ff7-abaf-844a73126fa8@linux.dev>
-Date: Thu, 29 Oct 2026 18:11:25 +0800
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=gl7WuCph;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+KElWXgF;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=gl7WuCph;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=+KElWXgF
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 7596A1FCE4;
+	Thu, 29 Oct 2026 10:12:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1793268720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YYr7rp0MKE6X3AdaQW2iOo55WBPYNGuuiI3up0Qg35s=;
+	b=gl7WuCphGlwTdlQczFJImSlWPJwfL3jfS7+/js8pfLbBQCdmOiZBkruVz7B2szGENNGn3l
+	MSC/aoo8tCAwT40PPitS1N4n3I7iUP9qs9GyOstDUVnP/QtpvPRBRktfKWbZAV6o5Ts3Ie
+	nGFvxrgf6DVoaaxsCCghFW+x2DH9JFk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1793268720;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YYr7rp0MKE6X3AdaQW2iOo55WBPYNGuuiI3up0Qg35s=;
+	b=+KElWXgFwK+Ofq+r+ogZeafjNhzpgpvnC1DahWwMAonj7ppL6Kmn+uGWjjPilVfUCfMhWY
+	8pSbtXfHpi3TgqCg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1793268720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YYr7rp0MKE6X3AdaQW2iOo55WBPYNGuuiI3up0Qg35s=;
+	b=gl7WuCphGlwTdlQczFJImSlWPJwfL3jfS7+/js8pfLbBQCdmOiZBkruVz7B2szGENNGn3l
+	MSC/aoo8tCAwT40PPitS1N4n3I7iUP9qs9GyOstDUVnP/QtpvPRBRktfKWbZAV6o5Ts3Ie
+	nGFvxrgf6DVoaaxsCCghFW+x2DH9JFk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1793268720;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YYr7rp0MKE6X3AdaQW2iOo55WBPYNGuuiI3up0Qg35s=;
+	b=+KElWXgFwK+Ofq+r+ogZeafjNhzpgpvnC1DahWwMAonj7ppL6Kmn+uGWjjPilVfUCfMhWY
+	8pSbtXfHpi3TgqCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4090413419;
+	Thu, 29 Oct 2026 10:12:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +bXABvAb42qxMQAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 29 Oct 2026 10:12:00 +0000
+Message-ID: <5f81a3f9-88fd-4128-9642-b08d240ddd44@suse.de>
+Date: Thu, 29 Oct 2026 11:11:59 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,115 +107,156 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, josef@toxicopanda.com, axboe@kernel.dk,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- linux-kselftest@vger.kernel.org, cuitao@kylinos.cn, ameryhung@gmail.com,
- alexei.starovoitov@gmail.com
-Subject: Re: [PATCH 2/5] blk-iocost: add BPF struct_ops cost model support
-To: Tejun Heo <tj@kernel.org>
-References: <20261028143534.135968-1-cui.tao@linux.dev>
- <20261028143534.135968-3-cui.tao@linux.dev>
- <0753eaa990c954aa56a0c5fa8ba302e2@kernel.org>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <0753eaa990c954aa56a0c5fa8ba302e2@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 96/98] nvmet: take sq->ref in nvmet_sq_fatal_error()
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Chris Mason <mason@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>
+References: <20261028164415.1262013-1-axboe@kernel.dk>
+ <20261028164415.1262013-97-axboe@kernel.dk>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20261028164415.1262013-97-axboe@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spamd-Result: default: False [-13.29 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-0.998];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,lst.de:email,grimberg.me:email,suse.de:email,kernel.dk:email]
+X-Spam-Score: -13.29
 
-Hello Tejun,
+On 10/28/26 5:42 PM, Jens Axboe wrote:
+> From: Chris Mason <mason@kernel.org>
+> 
+> nvmet_sq_destroy() kills sq->ref, waits for the commands to drop it,
+> then puts the controller and clears sq->ctrl. So sq->ctrl may only be
+> used while holding sq->ref. nvmet_sq_fatal_error() reads it without,
+> and its transport callers hold nothing either: in nvmet-rdma the
+> completion handlers run until the QP is drained, which
+> nvmet_rdma_release_queue_work() does only after nvmet_sq_destroy(), and
+> in nvmet-tcp io_work can run between the two cancels of the release
+> work. A short capsule or a failed completion that races the disconnect
+> then dereferences a NULL sq->ctrl, or locks ctrl->lock and queues
+> fatal_err_work in a freed controller. The host needs nothing but a
+> Connect, reproduced over rxe with a sleep added to widen the window.
+> 
+> Take sq->ref with percpu_ref_tryget_live() around the body. If the ref
+> is already dead the queue is going away and the error is dropped, which
+> is the mitigation: nothing can tell a call that would have finished in
+> time from one that wouldn't. tryget_live after percpu_ref_exit() is
+> fine, it sees __PERCPU_REF_DEAD and touches nothing freed, and
+> nvmet_req_init() already relies on that. nvmet_auth_fatal_error() runs
+> in a command that holds the ref, so it calls the body directly.
+> 
+> Fixes: 14c862dbb0a0 ("nvmet-rdma: drain the queue-pair just before freeing it")
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: Chaitanya Kulkarni <kch@nvidia.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Chris Mason <mason@kernel.org>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   drivers/nvme/target/core.c             | 21 ++++++++++++++++++++-
+>   drivers/nvme/target/fabrics-cmd-auth.c |  3 ++-
+>   drivers/nvme/target/nvmet.h            |  1 +
+>   3 files changed, 23 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+> index b78a4d4eb838..19f96f1b7e74 100644
+> --- a/drivers/nvme/target/core.c
+> +++ b/drivers/nvme/target/core.c
+> @@ -1833,8 +1833,11 @@ EXPORT_SYMBOL_GPL(nvmet_ctrl_fatal_error);
+>    * A fatal error on one queue.  The Connect command of an I/O queue needs no
+>    * secret, so until the queue has authenticated it may be anybody's: do not
+>    * let it take down the controller of the host whose NQN it has named.
+> + *
+> + * The caller holds sq->ref, as a command that is being executed does: until it
+> + * is put, nvmet_sq_destroy() waits, and does not clear sq->ctrl.
+>    */
+> -void nvmet_sq_fatal_error(struct nvmet_sq *sq)
+> +void __nvmet_sq_fatal_error(struct nvmet_sq *sq)
+>   {
+>   	struct nvmet_ctrl *ctrl = sq->ctrl;
+>   
+> @@ -1843,6 +1846,22 @@ void nvmet_sq_fatal_error(struct nvmet_sq *sq)
+>   	else
+>   		nvmet_ctrl_fatal_error(ctrl);
+>   }
+> +
+> +/*
+> + * A transport calls this with no reference of its own, concurrently with
+> + * nvmet_sq_destroy(), which puts the controller and clears sq->ctrl.  As in
+> + * nvmet_req_init(), the call can come after percpu_ref_exit():
+> + * percpu_ref_tryget_live() then sees that the ref is dead and touches nothing
+> + * that is freed.
+> + */
+> +void nvmet_sq_fatal_error(struct nvmet_sq *sq)
+> +{
+> +	if (!percpu_ref_tryget_live(&sq->ref))
+> +		return;
+> +
+> +	__nvmet_sq_fatal_error(sq);
+> +	percpu_ref_put(&sq->ref);
+> +}
+>   EXPORT_SYMBOL_GPL(nvmet_sq_fatal_error);
+>   
+>   ssize_t nvmet_ctrl_host_traddr(struct nvmet_ctrl *ctrl,
+> diff --git a/drivers/nvme/target/fabrics-cmd-auth.c b/drivers/nvme/target/fabrics-cmd-auth.c
+> index cb6be285b3c4..020a989fe263 100644
+> --- a/drivers/nvme/target/fabrics-cmd-auth.c
+> +++ b/drivers/nvme/target/fabrics-cmd-auth.c
+> @@ -33,12 +33,13 @@ static void nvmet_auth_expired_work(struct work_struct *work)
+>   	mutex_unlock(&sq->auth_lock);
+>   }
+>   
+> +/* Called from a command that is being executed, which holds sq->ref. */
+>   static void nvmet_auth_fatal_error(struct nvmet_sq *sq, bool passed)
+>   {
+>   	if (passed)
+>   		nvmet_ctrl_fatal_error(sq->ctrl);
+>   	else
+> -		nvmet_sq_fatal_error(sq);
+> +		__nvmet_sq_fatal_error(sq);
+>   }
+>   
+>   void nvmet_auth_sq_init(struct nvmet_sq *sq)
+> diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+> index 29105e2a7022..3519537705f8 100644
+> --- a/drivers/nvme/target/nvmet.h
+> +++ b/drivers/nvme/target/nvmet.h
+> @@ -631,6 +631,7 @@ void nvmet_sq_destroy(struct nvmet_sq *sq);
+>   int nvmet_sq_init(struct nvmet_sq *sq, struct nvmet_cq *cq);
+>   
+>   void nvmet_ctrl_fatal_error(struct nvmet_ctrl *ctrl);
+> +void __nvmet_sq_fatal_error(struct nvmet_sq *sq);
+>   void nvmet_sq_fatal_error(struct nvmet_sq *sq);
+>   
+>   void nvmet_update_cc(struct nvmet_ctrl *ctrl, u32 new);
 
-在 2026/10/29 04:09, Tejun Heo 写道:
-> Hello, Tao.
-> 
-> On Wed, Oct 28, 2026 at 10:35:31PM +0800, Tao Cui wrote:
->> +/*
->> +/*
->> + * Deliver iocg_init()/iocg_free() to the cgroups already online on the
-> 
-> The comment opens with "/*" twice. clang warns "'/*' within block comment
-> [-Wcomment]" and CONFIG_WERROR builds break.
-> 
-A stray line was left over from an earlier edit. Sorry about that.
->> +			/*
->> +			 * A blkg which never went online never reached the
->> +			 * radix tree, so it must not receive an init either;
->> ...
->> +			if (!iocg || !iocg->pd.online)
->> +				continue;
-> 
-> blkg_create() adds a blkg to q->blkg_list only after radix_tree_insert()
-> succeeds, so the blkgs skipped here are the ones blkg_destroy() already
-> took offline, not ones that never reached the radix tree.
-> 
-You're right, the comment described the wrong blkgs. It goes away with
-the walk, which I'll drop in v12 together with the callbacks.
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
->> +	if (!disk_live(disk)) {
->> +		mutex_unlock(&q->rq_qos_mutex);
->> +		blk_mq_unfreeze_queue(q, memflags);
->> +		blkdev_put_no_open(bdev);
->> +		return -ENODEV;
->> +	}
-> 
-> The guard() suggestion from v10 was only partly applied. This unlock,
-> unfreeze and put sequence is repeated on three error paths.
-> 
-I'll fold the reg error path into a single out label. Detach no longer
-needs the freeze after the v12 rework.
+Cheers,
 
->> +	/*
->> +	 * Scope the mutex so the tail bdev put runs with blkcg_mutex
->> +	 * already released: dropping the last device reference can
->> +	 * reach disk_release() -> blkcg_exit_disk() ->
->> +	 * blkg_destroy_all(), which takes q->blkcg_mutex.
->> +	 */
->> +	{
->> +		guard(mutex)(&q->blkcg_mutex);
-> 
-> The bare { } block isn't necessary, and ioc_bpf_detach() has the same
-> block with the same comment. Can you drop them?
-> 
-I'll drop both.
->> +	/*
->> +	 * The attachment is checked under rq_qos_mutex first, so an unmatched
->> +	 * detach exits without freezing.
->> +	 */
->> +	mutex_lock(&q->rq_qos_mutex);
->> +	spin_lock_irq(&q->queue_lock);
->> +	ioc = q_to_ioc(q);
->> +	if (ioc) {
->> +		spin_lock(&ioc->lock);
->> +		matched = ioc_attached_model_locked(ioc) == ops &&
->> +			  ioc->bpf_link == link;
->> ...
-> 
-> The same 11 lines check the attachment again after the freeze. The check
-> under rq_qos_mutex after the freeze is the one that matters.
-> 
-This goes away with the freeze removal: detach becomes a single
-mutex-critical section.
->> +/*
->> + * Pluggable cost model interface for blk-iocost.
->> + *
->> + * A BPF struct_ops implementation can take over the cost model of one device.
->> ...
->> + * offline and its free. Both callbacks are called with ioc->lock held and must
->> + * not sleep; the delivery points nest inside queue_lock except for iocg_free()
->> + * from ioc_pd_free() in blkg_free_workfn().
->> + */
-> 
-> This restates the attach mechanics and lists the call sites. The comments
-> and descriptions in general are still long and narrate mechanics.
-> 
-v12 folds everything back into blk-iocost.c, so the private header and
-the long interface comment both go away.
-
-Thanks,
-Tao
-
-> Thanks.
-> 
-> --
-> tejun
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
