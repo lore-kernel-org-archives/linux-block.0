@@ -1,60 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793279513;
-	b=AvtBY00wSUSvoqhsW5jXBEVblBT3RGvZovapnsk6nyf5Y/+b/QSj0Eotho4IKodUdxDM
-	 Ruypne7IWfPS0jyScEyDXYHnMGiUcoGgbbRMU+mEayyEraTII3ZFWwv1xIQV04VlrEoGE
-	 L8SSx7EAExs3hLoar+7WAsC7EsuQMVqi5vyiVF4n3PvmAmOEMHBcLRWRontnHXxBwaeCS
-	 8kxtc+UojO/uajMeiJBYt1aqE9m0OstEZOudDoKBhG/1fJyKbdG3TV/N9KU4sVW4McPrX
-	 hkyncEQgKCFcHrNtJ03vrXjqugFm3ow93M+vkuFRY5fpH72YbJB9EkR3fK/rkYcGZCQ==
+	t=1793279557;
+	b=qxza1/1qqZ4d6xlngj/FECphp4dQVkw9P7Dm+7ahhwK6F+0buyACftcXkTup1VLQxMf1
+	 j/jL8bHve2IJwEHCtl4CLgD4+3a3gmMmiZjfysUdQuq9fA05MWJzprQPn3fhoHIDBeOka
+	 GcQ0xL7axAQLl0rzPN/gMZkeeLQ3jYFP3GeVvpCbTqI+6b5fcu6PiPI5f7CVetWvmbNX0
+	 d062X0wMfydpgd9y5G49yxMehnpeul9S7/4YA63o+HqZbUK6sxllV3KPGKlobLLOle+jP
+	 qQoCQUsoHiXMmYrdn6szg54QykT39Vd8v8Rvzrygdj4bBniRpcT5dPqwOon50sQNrow==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793279513;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793279557;
 	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
 	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
 	 In-Reply-To:X-SRS-Rewrite;
-	bh=C83gEU3kLZnbS7pwP/IcqLN17d/qu+B4Lm37Mby/L8U=;
-	b=L6f4FCVN4l1xQQAIQX3z8QCzLZAbRLQfcVlF/SD112BWKsWc1MTflIpehdPpWBE4Tc6A
-	 CA6Nt1fR25GCI3uu9ajK4RPkqURsJgiRpx54GcHQj7R3/YEcVPTwgcgVwzGb4xJMEuoYG
-	 CaFZDv0p8lZVIuEpbYPaIpe2c+9ZWN5Dv3o38l4gPiQIEDojYFtfDU27XGkUeiHYlwT2+
-	 +Gh2wDQJ68PUztHkaVSDNQWwri+l2FD/Efw1e3wyZ6CGWr9m0K3B81JVsRL1qSBMQb5/a
-	 zR5/O14atcGOSjk6+0Fn9z1K88RvNR28dIRMFsm+SaqRY1UKhE/pa25+Tu1tdSxwwWg==
+	bh=aV4fV5SczxX3UzyR2sqTjiQqwR8G58Svwkty68Bn5sA=;
+	b=1cmSBlHUp2FMHDEyN/46YlQozq9a52abBfrWw56CRNjoQdDihCHTZMLlZvdXXRhQVC0K
+	 6HxHeL/Z4SelEYuPS0hJ1pTug/uXHBDL1lx/+zlVPq6ABLeyeT8H66SSahUgj2iH03/Ap
+	 mA7wWchZDBXUN2+oSEgGxrXNm7nJEnO62BbCr6PtjiJWLfQvamCJOo8UHRaLQ+XXpkxLF
+	 w0YEZi+2P9p4aEw3grOoS90Deaogc6Qv9FH1KSZ8v6nQho9tnX+GR0Kk8UXejpcWzwIU4
+	 Bf36owZd/0Ybw5VdAvXpCBSAn7YvFKDXb2Hvm7KPw6BaGFo2nyq7tleGQRJPydM41Sg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=nTPp5swU;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b="X1F/vYwJ";
 	arc=none smtp.remote-ip=198.137.202.133
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AACB606A332
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 13:11:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1AACB606A332
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C12E606A329
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 13:12:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C12E606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=nTPp5swU
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=X1F/vYwJ
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=C83gEU3kLZnbS7pwP/IcqLN17d/qu+B4Lm37Mby/L8U=; b=nTPp5swUSsvoz9Yd4HAURTtRJ9
-	VOo3pU7uEKr0gmUIGw209DSk4IWdcwoU/kd4bLA92rPzT8HbM2PWcYzGPs0gFfek0He86g5fY1oqF
-	oCTj8t9rcq6HGz4BlqLgCx/jv5XtolP6/II0GCd+d6kMXM3RjRQzufyMxuUatpsWPXy7qXDDAiuRu
-	qQU7/yhgiQFxRXKVfivH7yKniEunxl1oGaNuuT9v59yy+GPOv7BMoswD/CxhEe86cm2QRIuaO5Tho
-	SpjkskMmGYY1JDVVGEzzc5FBs4ccplNCH27ZR3AEy48Gb1ULa3P0gAthZQIYdm0Paojd/n/7eg4tJ
-	zfH5owxQ==;
+	bh=aV4fV5SczxX3UzyR2sqTjiQqwR8G58Svwkty68Bn5sA=; b=X1F/vYwJ8933zrAjpfIkV3aItd
+	br12MFBHLqvejXG6X9t0KnIJY02Ysu2kx1ZkBIKOptz5D+g6uw8653rIoHNZiDjngcMSSpR1dizkl
+	c/1bnN/8gqOJkM+/X86KqZcLKHMP6IcAtTfv2q8qcWHvysyoVjOx7GTAO3MRP/AtKkqHgKHSB+qEa
+	ci3Fgs5+SyqazYYPsj7MG9gavyprtcNL8LCMMnQwRGIZgPigOIv258XEJbQ5w9hl9/bfH/BTzwmVN
+	PkPxht+9WwiejdPG/AlgtdDd/+XzdTPWMhYsrgEsFcw0Cft0lf1rrdUgm5VpIgNDCnCtO9fFf87IE
+	bpehnIkA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xMPv6-00000009IWO-2tRm;
-	Thu, 29 Oct 2026 13:11:52 +0000
-Date: Thu, 29 Oct 2026 06:11:52 -0700
+	id 1xMPvo-00000009JAq-429y;
+	Thu, 29 Oct 2026 13:12:36 +0000
+Date: Thu, 29 Oct 2026 06:12:36 -0700
 From: Christoph Hellwig <hch@infradead.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>
-Subject: Re: [PATCH 42/98] block: partitions/mac: compute the sectors in 64
- bits
-Message-ID: <auNGGO5_gBUZD95Q@infradead.org>
+Subject: Re: [PATCH 43/98] blk-mq: free the bitmaps of tags in the SRCU
+ callback
+Message-ID: <auNGRHU0yxEVN0hu@infradead.org>
 References: <20261028164415.1262013-1-axboe@kernel.dk>
- <20261028164415.1262013-43-axboe@kernel.dk>
+ <20261028164415.1262013-44-axboe@kernel.dk>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -66,36 +66,38 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261028164415.1262013-43-axboe@kernel.dk>
+In-Reply-To: <20261028164415.1262013-44-axboe@kernel.dk>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Oct 28, 2026 at 10:41:45AM -0600, Jens Axboe wrote:
+On Wed, Oct 28, 2026 at 10:41:46AM -0600, Jens Axboe wrote:
 > From: Josef Bacik <josef@toxicpanda.com>
 > 
-> start_block and block_count are converted to 512 byte sectors in 32-bit
-> arithmetic, although put_partition() takes a sector_t. With a block size
-> above 512 bytes anything beyond 2TiB wraps and the partition lands on
-> top of another one.
+> Commit ad0d05dbddc1 keeps struct blk_mq_tags and the requests until the
+> iterators under tags_srcu are gone, but the two bitmaps they walk are
+> still freed right away. When the number of hardware queues shrinks,
+> blk_mq_tagset_busy_iter() may be about to walk tags that
+> __blk_mq_update_nr_hw_queues() frees. sbitmap_free() clears the map
+> pointer, so that's a NULL dereference or a use-after-free, depending on
+> the timing.
 > 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Free the bitmaps with the rest in the callback.
+> 
+> Fixes: ad0d05dbddc1 ("blk-mq: Defer freeing of tags page_list to SRCU callback")
 > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > ---
->  block/partitions/mac.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  block/blk-mq-tag.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
-> diff --git a/block/partitions/mac.c b/block/partitions/mac.c
-> index df03ca428e15..f372392af95b 100644
-> --- a/block/partitions/mac.c
-> +++ b/block/partitions/mac.c
-> @@ -97,8 +97,8 @@ int mac_partition(struct parsed_partitions *state)
->  		if (be16_to_cpu(part->signature) != MAC_PARTITION_MAGIC)
->  			break;
->  		put_partition(state, slot,
-> -			be32_to_cpu(part->start_block) * (secsize/512),
-> -			be32_to_cpu(part->block_count) * (secsize/512));
-> +			(sector_t)be32_to_cpu(part->start_block) * (secsize/512),
-> +			(sector_t)be32_to_cpu(part->block_count) * (secsize/512));
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index aaea2e2c2f23..e3edf18697af 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -623,17 +623,17 @@ static void blk_mq_free_tags_callback(struct rcu_head *head)
+>  		kmemleak_free(page_address(page));
+>  		__free_pages(page, page->private);
+>  	}
+> +	/* An iterator may walk the bitmaps for as long as it may see the tags */
 
-PLease just put this into a helper..
+Missing sentence ending and overly long line. Otherwise looks good.
 
