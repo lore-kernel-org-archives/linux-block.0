@@ -1,60 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793286245;
-	b=Juee/xdNui+PQrsufkyx7O4YJW73MapFbzDmAgkllwJTSOgbDAKldYUg/ztMMluQRGsX
-	 lyyXKRFPDoXCShe+C91JfjlfYJgAuzd7Utprr1S6iAH26ng/mkWusfQEAIHNbUIyQ3nMx
-	 7IqIEvMlSx9VqtF5ZIrq2pwJ0TdSKES10tvdqcLTUt+9nnnvD6/hUDA9u/3qCh3mlJZ7i
-	 1ZNRoc1ieMGCpdWs5OUv3eVlqCL9PAQimeeHiOW7dh31C6wbB/J5OXuSa5UCTsuLaFzUM
-	 6s4jw9Eqz4DUS6hUZEj92eQRXtDs9YVq6KKUmg7HDNC3h0k+ScHaLzgpeKrnnKurFOg==
+	t=1793286248;
+	b=T/ixlopY8Bk3wZt4ygl4+5tR95xbCca90HG2qKJZ9J8baoOwS8txMFtSQa2FeSEzWRwX
+	 aN11d1wKKKActqTKcd9xExkOoDYV5Zut/3msaQH2g1eShG2oX7R457AmvjamFdNRs9hhw
+	 Iz7umj92S+vbf8KRmbkZk2MX5Gbs7CCr6LKRLqBNQuAszfWspgU3sXAlsR304Gb++ahHB
+	 iIJLUAe8kbYY57KVXxTtTOgRZbUMeKY5BNQK1DsciiScbZgWpcIraYCK6Xio4p+NqXB6x
+	 +ZTGgy1lOlL8Pk+mxLK7jOitzmxqyVv7K6NEp3opCLI+9zS9wxs86dTewJL5x8Gv27Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793286245;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793286248;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-SRS-Rewrite;
-	bh=L0ExvTHj8RwxPRVI2BFjfgzCjPfxvme8GhGL5cOlHig=;
-	b=yKbjahEALjUTgV6GssYT99A1Il/ITG5geqEJMrCNNFx1VAGOdMW8vAi7Nn9UW0No4SwR
-	 +cu7TzZssvOnpSXxU9jXpqUqnOgpcEWHeNv05mqmpbqhucN+Gxo6mTG0FTmhWoBWsIMlq
-	 EOawAuqkMWrJ9mDKs4PL8AtSPYV7EQDCyMgJLkvHuhecdXy7gZqLb2oC5GRDJ/u70aQcf
-	 zMHqhvTslCyk9iDd+vQNqar32gD02tMTpGEGkkqeiatRfNbKDHnpVRBCj6pwCzJvjTx20
-	 rTegbWnXaiFUAdrc4OcItRv7IWFSGby5iKDskdLoEqeg+cnjV3Jms1WMaDWjKSfnQCQ==
+	bh=IUTqnO460UMVA71IfKZIhLRgDeyaa2GPyL7wFz45XTg=;
+	b=tvYG5ak7/HQ0otxFg7zJU+g84lPnaRbWpb5UuHXBxKRhGY3dPU0fOwGjDeeX0MRO/Zes
+	 QOBKubIVlKT3sVppJAh17+ZDL/pzYxifvtMqYIZfJooazN33VAnUrNqndVUQ1eicteWIR
+	 +dZB7LWB810I4q8qf1mahTxZo9QWlJ3Rm6XZk2eXj2Oer4MIMVsSH2H02/rkCXVpYRA3u
+	 LlQLtgZLt7NBqpaTbgqaPLYFaCREs6ErlCt049bO7nFnxyFdiHGaq1sBcB7rxEGuObl9L
+	 hg+JnQM/jYe6bU8lUDJ5ItAZhpL3sfuJhnGdZBPP2V/yNzGIEo9pudI4egkQOCUQfMA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=fail header.from=lst.de;
 	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=mddKEAXU;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=1+tX0nHC;
 	arc=none smtp.remote-ip=198.137.202.133
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A985606A323
-	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 15:04:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7A985606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DF1606A31D
+	for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 15:04:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 93DF1606A31D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=mddKEAXU
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=1+tX0nHC
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=L0ExvTHj8RwxPRVI2BFjfgzCjPfxvme8GhGL5cOlHig=; b=mddKEAXUukQm5WUalWKKTHDU8Y
-	1DJykeIPG5r9nQLv8hILTrMwjeH+XdcFQWiDk9CTMapEE0bqw6vDiD/dJ7ncgt0sJa7jJ0KHEYM9L
-	w5426qiccfL1TTvg2RiEfUCiMMvTvqnXtc+c7Y4xdzVMgVthUEmR67Hs4OZ9qbVab+Ca51Lfk7SI5
-	G9gxr5oIKDLjQChm77ux2f/L+pltJsXi80HFvtgifBTRYuZozt6eX19Y3u2qvj31U1dKe/SwxXiDn
-	MUApUeWbG5CIsXcmwSPDDgv/T9ZH+fEV7nCfUfelW0b/WFhymzPzOUTfZlhPn4WemdooZO/p+q+wV
-	MygPUEFQ==;
+	bh=IUTqnO460UMVA71IfKZIhLRgDeyaa2GPyL7wFz45XTg=; b=1+tX0nHCKUso4ViwwepExjt+NU
+	g2kLtX3anXh4/Y6wAfxZcgcoIQVn9WyoGegs6RHEv0MnqBbRlQ8L9buT1MzVRneV2DS5IsGiNwj9+
+	RNVOusnds9GRqGHHPDyFxHldqUo60z6S6W8PXl+0FlwcWkrVO1ODwzxW1Oq0wrgDlTFGUcwPJp4qL
+	BsLEKz3P8Mmgaq5yGJrM/efOsPgEPXarzqBpCvcQ2IUDYJicLi7dXubnYRLOCsuJpLSPXNRIy44X3
+	v1pCuCFn+ub1AX450Jzdq7uDijOhtgyrYmzf6tLtPpX3KzEFanjgq10HMqswVKessbdMgx8JbS0ev
+	nVSe+BhA==;
 Received: from 2a02-8389-2301-9f00-31e8-efb6-e973-61ca.cable.dynamic.v6.surfer.at ([2a02:8389:2301:9f00:31e8:efb6:e973:61ca] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xMRff-00000009btC-3m4a;
-	Thu, 29 Oct 2026 15:04:04 +0000
+	id 1xMRfi-00000009btT-3EX1;
+	Thu, 29 Oct 2026 15:04:07 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Damien Le Moal <dlemoal@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: Josef Bacik <josef@toxicpanda.com>,
 	linux-block@vger.kernel.org
-Subject: [PATCH 2/4] zloop: share more code for opening a zone backing file
-Date: Thu, 29 Oct 2026 16:03:33 +0100
-Message-ID: <20261029150353.2503201-3-hch@lst.de>
+Subject: [PATCH 3/4] zloop: fput file after failed zone init
+Date: Thu, 29 Oct 2026 16:03:34 +0100
+Message-ID: <20261029150353.2503201-4-hch@lst.de>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261029150353.2503201-1-hch@lst.de>
 References: <20261029150353.2503201-1-hch@lst.de>
@@ -70,108 +70,65 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Use a common path for opening and querying the block size.
+Clean up after failure in zloop_init_zone, as the caller only cleans up
+the zones before the current one.
 
+Fixes: eb0570c7df23 ("block: new zoned loop block device driver")
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/zloop.c | 65 +++++++++++++++++--------------------------
- 1 file changed, 26 insertions(+), 39 deletions(-)
+ drivers/block/zloop.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index 71f7685efb13..3dc484e3c700 100644
+index 3dc484e3c700..f0aca9d43851 100644
 --- a/drivers/block/zloop.c
 +++ b/drivers/block/zloop.c
-@@ -1107,8 +1107,6 @@ static int zloop_init_zone(struct zloop_device *zlo, struct zloop_options *opts,
- {
- 	struct zloop_zone *zone = &zlo->zones[zone_no];
- 	int oflags = O_RDWR;
--	struct kstat stat;
--	sector_t file_sectors;
- 	int ret;
+@@ -1135,7 +1135,7 @@ static int zloop_init_zone(struct zloop_device *zlo, struct zloop_options *opts,
+ 	if (zlo->block_size) {
+ 		ret = zloop_get_block_size(zlo, zone);
+ 		if (ret)
+-			return ret;
++			goto out_fput;
+ 	}
  
- 	mutex_init(&zone->lock);
-@@ -1122,27 +1120,33 @@ static int zloop_init_zone(struct zloop_device *zlo, struct zloop_options *opts,
- 	if (!opts->buffered_io)
- 		oflags |= O_DIRECT;
- 
-+	zone->file = zloop_filp_open_fmt(oflags, 0600, "%s/%u/%s-%06u",
-+				zlo->base_dir, zlo->id,
-+				zone_no < zlo->nr_conv_zones ? "cnv" : "seq",
-+				zone_no);
-+	if (IS_ERR(zone->file)) {
-+		pr_err("Failed to open zone %u file %s/%u/%s-%06u (err=%ld)",
-+		       zone_no, zlo->base_dir, zlo->id,
-+		       zone_no < zlo->nr_conv_zones ? "cnv" : "seq",
-+		       zone_no, PTR_ERR(zone->file));
-+		return PTR_ERR(zone->file);
-+	}
-+
-+	if (zlo->block_size) {
-+		ret = zloop_get_block_size(zlo, zone);
-+		if (ret)
-+			return ret;
-+	}
-+
  	if (zone_no < zlo->nr_conv_zones) {
-+		sector_t file_sectors;
-+		struct kstat stat;
-+
- 		/* Conventional zone file. */
- 		set_bit(ZLOOP_ZONE_CONV, &zone->flags);
- 		zone->cond = BLK_ZONE_COND_NOT_WP;
- 		zone->wp = U64_MAX;
- 
--		zone->file = zloop_filp_open_fmt(oflags, 0600, "%s/%u/cnv-%06u",
--					zlo->base_dir, zlo->id, zone_no);
--		if (IS_ERR(zone->file)) {
--			pr_err("Failed to open zone %u file %s/%u/cnv-%06u (err=%ld)",
--			       zone_no, zlo->base_dir, zlo->id, zone_no,
--			       PTR_ERR(zone->file));
--			return PTR_ERR(zone->file);
--		}
--
--		if (!zlo->block_size) {
--			ret = zloop_get_block_size(zlo, zone);
--			if (ret)
--				return ret;
--		}
--
+@@ -1150,14 +1150,14 @@ static int zloop_init_zone(struct zloop_device *zlo, struct zloop_options *opts,
  		ret = vfs_getattr(&zone->file->f_path, &stat, STATX_SIZE, 0);
  		if (ret < 0) {
  			pr_err("Failed to get zone %u file stat\n", zone_no);
-@@ -1163,30 +1167,13 @@ static int zloop_init_zone(struct zloop_device *zlo, struct zloop_options *opts,
- 			       zone_no, ret);
- 			return ret;
- 		}
--
--		return 0;
--	}
--
--	/* Sequential zone file. */
--	zone->file = zloop_filp_open_fmt(oflags, 0600, "%s/%u/seq-%06u",
--					 zlo->base_dir, zlo->id, zone_no);
--	if (IS_ERR(zone->file)) {
--		pr_err("Failed to open zone %u file %s/%u/seq-%06u (err=%ld)",
--		       zone_no, zlo->base_dir, zlo->id, zone_no,
--		       PTR_ERR(zone->file));
--		return PTR_ERR(zone->file);
--	}
--
--	if (!zlo->block_size) {
--		ret = zloop_get_block_size(zlo, zone);
--		if (ret)
 -			return ret;
-+	} else {
-+		/* Sequential zone file. */
-+		mutex_lock(&zone->lock);
-+		ret = zloop_update_seq_zone(zlo, zone_no);
-+		mutex_unlock(&zone->lock);
++			goto out_fput;
+ 		}
+ 		file_sectors = stat.size >> SECTOR_SHIFT;
+ 
+ 		if (restore && file_sectors != zlo->zone_size) {
+ 			pr_err("Invalid conventional zone %u file size (%llu sectors != %llu)\n",
+ 			       zone_no, file_sectors, zlo->zone_capacity);
+-			return ret;
++			goto out_fput;
+ 		}
+ 
+ 		ret = vfs_truncate(&zone->file->f_path,
+@@ -1165,15 +1165,21 @@ static int zloop_init_zone(struct zloop_device *zlo, struct zloop_options *opts,
+ 		if (ret < 0) {
+ 			pr_err("Failed to truncate zone %u file (err=%d)\n",
+ 			       zone_no, ret);
+-			return ret;
++			goto out_fput;
+ 		}
+ 	} else {
+ 		/* Sequential zone file. */
+ 		mutex_lock(&zone->lock);
+ 		ret = zloop_update_seq_zone(zlo, zone_no);
+ 		mutex_unlock(&zone->lock);
++		if (ret)
++			goto out_fput;
  	}
  
--	mutex_lock(&zone->lock);
--	ret = zloop_update_seq_zone(zlo, zone_no);
--	mutex_unlock(&zone->lock);
--
++	return 0;
++
++out_fput:
++	fput(zone->file);
  	return ret;
  }
  
