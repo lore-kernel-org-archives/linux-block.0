@@ -1,90 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793355971;
-	b=P47kslxgnphrNhs6cRjEhsToIQedLGsjx2hLsSDqQ6E7DX20zgMvx9paO7JEdN4GaxUP
-	 Xg0hsSq6PhxD1mhg8sgyxFEARnwBfmSLYhSFpwfxsVDyKeRT48GVsrAaonx53eT0Lr5zT
-	 QIQGP4B5Cu1SsqUoSDNC9m0kJFrUaHhidaHl47da7EvTkpdyFnBExF35tHlxzv2oa3fg9
-	 I+Svfx1l1C19C18oyvrulEFHQQD6fV6CTcsb7vjtJYl1aWTyfNUVXBFz1Jlc6RaW5wcr9
-	 GHqn0CB4qSCPAKLYxllWJtUqoyv/p0cR238eNQySePTQgImuGXw0pSTtIj2qNFFzWYg==
+	t=1793368214;
+	b=Qyi0Dt4OTdPcJ182fLRoI/7tZVVTqBax1uAkgbjnFL2i6oZOzoajPYqD04MlIm73Trnr
+	 +LlSrVxiMlWdCBsvMYFCaauS/jDHe6BTQrcPEeo6+j1BG/48LFl40Inx5kZt68aER35F9
+	 KPTIgAVF/Ydni3FhKR9xKkZ6vlrEqI1/g8Gf01QOcAdd2aVs+CFcT0XSgwBSHrY+Uc6nC
+	 qhAKBd9Flo1Nm1jw1+6CKzZy8jYoJ+6Q2LqvWSZNRf4Me2RA8dxfUgjHxqxYC69KElhjB
+	 4eE8qUKkA7GB3z1Fpprkkx+UiLxRFR6IezOPmNdPPmQPkr8E56J0dN3RwYNIiz3fgqQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793355971;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793368214;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=qUelzvzI0I1/N8qXjV1BcthIIh2qTCSRp7SQgDbPekE=;
-	b=Toc5Ix70jXEzkeyUpEuiAMW+OYxsslAaSCZxFPeuXfu9u0DqvCXOWTUB8TeGv7Dy2oYM
-	 qtlMyZjGNfq5NveHPiWi6tEEFh/hbW8btgZVAYC9KEbCfIHIFR642PY+Tiruz8XCtbK6t
-	 jzch4dGihnWMwJD0x43nD+WaB+wLp8WJRHCnLEo9OKT62WAP24+Am9vtoz4XRy6IyxM/i
-	 6/5X/g5/HJAfpe3f4FoNPHGqGDxLiWsNx1rTdFgEjV5NhKyHPlBKi2a6N2B8nPMJcEhlJ
-	 J/69bvgebhHbQtx+9HdUTrmc2eDabmreDSs3e9NBuA5gehjca2GpOhodm13YGMjSWUA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Content-Language:To:Cc:From:Subject:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=4+kZEoyi5rvv0STlWa1XknWaXqfHb7i0F9azHDXu1DU=;
+	b=Z/ZVieVPtnsdSG3NuIDHizCGPwJ1wDMwmQzGWrUz7wT9EnnGRHyR/VCmVNaTQfXIAI9u
+	 6sBuXJBEXfhJFT019rEUiroGIPa0dFSex9ico3k9q/Iynv/tFpo2TGGKn+22NgXTosaH0
+	 CthP1la8VxQsnGdZrYwF9Lmonj+qjCL+qVFJNzBDLVAyKN0vco7DZ6UtigLm3HHChiMgH
+	 OIMr+TdpxUoUEeAW82MyGXGY+Ove4xb8pNukgkXS3zwDZnZctgvHZj4M1gO7DGgZKgirV
+	 ymSI+IFA2QvHgk9cQfoL2XKy8B95msU6B1uOs4IgmT/5G2WqKIrRQ4spgdQu6GkpWpg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PhLMcOaL;
-	arc=none smtp.remote-ip=209.85.221.54
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=ii5VW7CP;
+	arc=none smtp.remote-ip=74.125.82.175
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D513606A31A
-	for <linux-block@vger.kernel.org>; Fri, 30 Oct 2026 10:26:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3D513606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901A1606A31A
+	for <linux-block@vger.kernel.org>; Fri, 30 Oct 2026 13:50:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 901A1606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PhLMcOaL
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-48e0d1da913so398178f8f.1
-        for <linux-block@vger.kernel.org>; Fri, 30 Oct 2026 03:26:11 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=ii5VW7CP
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-36a18fc7a38so1857819eec.1
+        for <linux-block@vger.kernel.org>; Fri, 30 Oct 2026 06:50:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793355970; x=1793960770; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qUelzvzI0I1/N8qXjV1BcthIIh2qTCSRp7SQgDbPekE=;
-        b=PhLMcOaL7tR16t9O6qwnKaq504i2yptLi47qNgV2oTRgaJFinkcAjXKqL5IyImiZtT
-         SP97MVdHIjdTbyfAFuD7U2d6bVxWfhydX0ZOhHdPc0l5OeQ+E9c+PSj6Rf4MLvAV9dRa
-         cLD8CqB18+b5RCnqDP/SbF9KotPj17RkpymGVZef9iNn8w/r+UfrIuj6Nep9ElZ28bjf
-         qKWVOaDHUGTmSZuLNgsKzw0EgGZFipgVCdG0lzH8bCGTiciYoyATJl9h748ncbkk0418
-         WE/xegpkV4LyN4mWZ3GeIFEnBBrL9gjhvziGkyy0ia56EMIZDyW6cn4RHfAnJFwhE41Z
-         cFhA==
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793368213; x=1793973013; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=4+kZEoyi5rvv0STlWa1XknWaXqfHb7i0F9azHDXu1DU=;
+        b=ii5VW7CPrYCTrCla9P+GsMln+cMKm5b7hA0yRPtWIic4NSAW7JOCVzakYt0+x0qATc
+         3Qp6neDFlFenUk1VdjiPeLtGRi+eqZDcgJl08+2FyzB+7FOhz/p8wCzxIsEsrtHNk6lS
+         8UQmQoGa4FB+pMIJmbdFCk82xITdbQtf8ZKHgbXaP+Yow01cs1/anHieMIi6OYfkcJyf
+         nMUWj37ULBRsPIw2lbzYUinf3FwSmglZ8eixVhfxk01YKBArbTi16sAd82tPZOLX1/D6
+         V9SG6hG1TzQ7u5NWooZKYoU9NoZEjY/4vIIap8nOf+p9ftDSP568248czjhVMrGU2h8k
+         kkhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793355970; x=1793960770;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=qUelzvzI0I1/N8qXjV1BcthIIh2qTCSRp7SQgDbPekE=;
-        b=U1yi7t3h2Poqkvm7tAlddVYg89mF3HnBRj5JXFee1mg15defbJbov7a81gHXYYKUTV
-         ix2MOT10HFlmaZOhfVLsrZN5FZgLKxsq4A2NL+2pbO0mn9ti9MU5uwpnu0FiLQPjlFz0
-         zf5Jtd7WVq+7MKTADxH+s50z9mmNU2JgHpsPJ9Ux6IUwg3C655DUPNer+gXEvRUqpd95
-         pNmOKBq1B26AHnPfWhPanGcmfnkrnG146rPjzMpOd0hKO82Ty7ovva8D2G9CJlTxdI1Q
-         fT1FpPgH4IwPlZZ4VjGgNG3QuqB+GbO4JDliDiQa7aUFBYpoXueMC13z9z5N0711zype
-         N0kQ==
-X-Forwarded-Encrypted: i=1; AKwUvBydrT5icB5s3srqbedlr/9wPhs2smF/HlJjOGZgrJszWVFhfw6aU0cCNtkcQ1n3e53SKBnC/ufwkVILKA==@vger.kernel.org
-X-Gm-Message-State: AFq9FYKdRATLEPvrAoW4k+KDfzM7/uXkZrQbVn7brbPDV3I+r0BMWoR1
-	GVNYj7Kwo+zsOOeKh04OvqmZhFLbL5YsqWOafr2WWLAyPHiyHQiCCt+4
-X-Gm-Gg: AYBFou26HrPvBv9rYsj5EYYi+X62sUzu+qWbnUm9mqHxSpyUJSzmPH+Pe7YiILlh+He
-	1EHEhubE/vr1lXB8zo7VVpOBTJFuEcbOzSbtqviv5wBr1obQucXBBYAz6vpt/f5lBPxxGmeIFi6
-	lUQ+qhen9ZMGGLzMdnlWbvyQ2ntEURim+7htTK4YbqM4Vl5PixhQBpsr6ghuCk6djXTnjAcKvIA
-	okR/Qwiy//OFyDg3CDH+J9fS8/qnY6F65wFa7vWK8IiS7oy/TQ6bOUEG6H6pVhyM0fHgLXZLpHO
-	YuDsK4Hulumb0q461NZ16GKfbgaLLq/rBrtFjxZEbdkGY/eNBiqkETPTmQ1eYFnM4LDViT3I4L2
-	YxwAX+oRz82LvUSMRbQOOGzYtRYSfz/REhih8eD3+2lPCy8m1cYsKDSKh+HO8V4+aPWjPvCJGe0
-	/5Rdz5Z/scVuGVGcz3pJs4257fAmqlIkfr36Z++JYs3QkFbZthTF6fumkLsl5AqA1NWQ5c4Lg+K
-	2G2V30uz11/AfdcIjIIli+tFHuG0JoQgs1fqLKnbw571dWusf2de8Draq6aA6d0KVVs8yEtXuuI
-	FA+oC9lEZqkkfqpT5/iKt5yFyphzdTPdcLPSQmCwk9BtTDZ43B95oCg4r2Aj25Ob5GkhisRU48s
-	AaMAdT9qFDg4pBkbtVF5pUNDPDzMBBPqyRwWPG/5efczU1t6vh8ngdZgdZQNbWO1bNxsPTSD3GU
-	ZcrA==
-X-Received: by 2002:adf:e011:0:10b0:48e:6c3f:f7b2 with SMTP id ffacd0b85a97d-48e6c3ff7d7mr5879996f8f.23.1793355969523;
-        Fri, 30 Oct 2026 03:26:09 -0700 (PDT)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e71b80ecbsm2527884f8f.35.2026.10.30.03.26.08
+        d=1e100.net; s=20260707; t=1793368213; x=1793973013;
+        h=content-transfer-encoding:content-type:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=4+kZEoyi5rvv0STlWa1XknWaXqfHb7i0F9azHDXu1DU=;
+        b=euIPbiCa6d2piwy0BBzS+SD6FVQ1s8iUvTXkGI3KOXkDFg6C+IZPTXdnSRWGHC1Tut
+         fDn/xtWNcb4dqkEmtdo9l1x11iB803laTAXpoTyySBvdQvmU/A3uR7ydQitxy1M+WwRM
+         Qsv3bWLA2r2cNJpAHzHSHpypZuXcNqt6dZ0GGA0w9e2+J7eS5sLRmCF2wvZJF2bGYFgM
+         rXQFfp4xYZAtfsRlaiBVahQN7ylYqFqemmDlaGO5gE0AAKIET5n4FQN8Rwip7PLjLU4S
+         IpkDr8+lyWHDcKPVUghZ6PfcJrpErC3CaaGYBrk8NHMLiAeTuo7pqVkaWQluFYSqExen
+         9uGQ==
+X-Gm-Message-State: AFq9FYKsl/nh007yqOmwQQQtGrhL1qQVEuatKE8OivltERL00F+LFc+b
+	6wdJWGpO4JWkM4cpyTo4wMuFjC28VsoBvEEadQWSYMWehzsY1CKKnc1WUaVrdED6oF4/MQ345hO
+	uEvxpM/8=
+X-Gm-Gg: AYBFou1S03rjCSocbktB/T75ilgR3sms8NivJiAWvRiW/twgEtt3Adw6i7cdEYKZrRt
+	DdXSO6wCCEeUSSQf8tYQcjNHs4d3muL5JH3DUQT1zIpREd3uPGSMNDcfwabGtVeTWZLhpCuaxzf
+	0CDlfDhLuTubkFLYx9ojoP8DCoxYWd9rXNejlue0qL7aklkdCT2CwNqmrC9wYgybMKuRcREnGZT
+	v/kY64I0zENoOQ2/ke+Gl/gYKL8Viw7/XqOecnI5YJAQy7xDHDZNvqvZgd0DayU/ojVq4/L/VHW
+	KPd5vVg10U6Sze1maC0XVEnH2IY74FMS8obJEtDjmhEjwnbKXxWFhdKAUdzvHqQp5hMA7nje9pu
+	kV2brzy2atghrUWgq0Kad1mUwMjp0yh4oTZ/gTWcBR3vvm+2A9s59vaG1gGYkuz1aPzSMYibQ1x
+	/T1fCC+2jl9iGm81t6TGWaL3KSdbIfC191LyoQsJ5OzjoO29vfmVP+fOwWHTBwqHVzDh21XHEmw
+	xmSEFHYjE6imEQp4+hcb38J+g3wRFPhpcdCIsCIbWVdX1keBBUiKF7V36aREUI/cb+9jJW2TVOy
+	rHe5SThQdRbc/0tOTdFcrKY8+NqOX0hZaRkcjAVxwOYhLC3Z5XRluPsx5/KApXACmi/9LZnp32O
+	TWV2FqOMPqp+W
+X-Received: by 2002:a05:693c:638e:20b0:369:f18f:34ab with SMTP id 5a478bee46e88-36a4235f6bamr3782374eec.11.1793368212508;
+        Fri, 30 Oct 2026 06:50:12 -0700 (PDT)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a42669128sm8541458eec.3.2026.10.30.06.50.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Oct 2026 03:26:08 -0700 (PDT)
-Message-ID: <bcafcbcf-9503-4fe5-82e4-ab9f8a3cb687@gmail.com>
-Date: Fri, 30 Oct 2026 10:26:09 +0000
+        Fri, 30 Oct 2026 06:50:10 -0700 (PDT)
+Message-ID: <27b58e47-723b-4d67-a1f0-ccb8b0ae66a9@kernel.dk>
+Date: Fri, 30 Oct 2026 07:50:09 -0600
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -95,93 +92,378 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: only fail dma-buf bios that need block layer PI
-To: Kyle Bader <kbader@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Kyle Bader <kbader@ibm.com>, Anuj Gupta <anuj20.g@samsung.com>,
- Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>,
- Keith Busch <kbusch@kernel.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Tushar Gohad <tushar.gohad@intel.com>, linux-block@vger.kernel.org,
- io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20261029155821.2983229-1-kbader@redhat.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20261029155821.2983229-1-kbader@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] block fixes for 7.4-rc1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/29/26 15:58, Kyle Bader wrote:
-> From: Kyle Bader <kbader@ibm.com>
-> 
-> All dma-buf (P2P) I/O to a device with integrity data is rejected
-> today, at registration and in blk_mq_submit_bio(). Only a bio for which
-> the block layer generates or verifies PI needs that. The block layer
-> then walks the bio_vecs, and a dma-buf bio has none.
-> 
-> Reject only those bios, and remove the check at registration. Then a
-> submitter that attaches its own PI, for example with
-> IORING_RW_ATTR_FLAG_PI, can do dma-buf I/O to such a device.
+Hi Linus,
 
-Looks good,
+Bigger than usual for an end-of-merge-window pull request, main reason
+being that the MD side I had missed a pull on, and both NVMe and block
+got a good pile of LLM driven fixes where some of them may as well just
+go in now rather than wait a full cycle. This pull request contains:
 
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+- NVMe fixes via Keith:
+  - nvme-tcp fallout from the parallel queue allocation: initialize
+    pf_cache_lock and the header digest before requests are set up,
+    and don't dereference a NULL queue->ctrl on reconnect
+  - nvme-fabrics queue mapping fixes: reset io_queues on reconnect,
+    limit each queue type to the online CPUs, and clear a poll map
+    with no poll queues
+  - nvme-tcp io_work priority inversion with send_mutex held (Seiji),
+    error recovery on read_sock failure and skipping TLS control
+    records while waiting for the ICResp (Martin B), TLS handshake
+    timeout validation, and an address attribute race
+  - nvme-rdma NULL metadata_sgl dereference with T10-PI
+  - nvme-pci early boot hang with the quirks parameter
+  - nvme-multipath ANA log bounds underflow, and an nvme-fc discovery
+    reference leak
+  - nvmet hardening: rdma inline SGL out-of-bounds write and short
+    connect requests, fc use-after-free in LS create connection and
+    teardown on admin queue failure, pci-epf transport error reporting
+    and SGL length checks, zns NUMD wrap, fc stale read data, auth
+    state and status fixes, ports list and qid_max locking, rdma
+    double puts and irq-safe locking, and a double free on metadata
+    SGL allocation failure
+  - nvmet fixes from Josef: big discard length truncation, NULL derefs
+    for PCI endpoint targets and debugfs host_traddr, stop listening
+    when a tcp port is removed, and don't BUG() in nvme-loop when a
+    scan runs beside a reset
 
-It's also enticing to shove it under the existing
-bio_integrity_action() check, but it can be done later.
+- MD fixes via Yu Kuai:
+  - raid5 validation: reject too few disks, invalid reshape disks, a
+    per-device size below one chunk, and an inconsistent reshape state
+    from the superblock instead of BUG(), plus journal payload size
+    checks
+  - raid5 error path and lifetime fixes: extra_page leak and NULL
+    derefs in free_conf/setup_conf, draining released_stripes before
+    destroying the cache, RCU for the big_stripe_tree lookup, and
+    per-array io_unit slab names
+  - md core: reject v0.90 arrays with too many devices, validate
+    bblog_size, take reconfig_mutex when enabling PPL, fix the
+    mddev->private NULL deref when stopping an array under IO, and
+    don't hand out the array before mddev->kobj is added
+  - raid10 missing barrier wakeup, raid0 device count validation, a
+    bogus mddev_unlock() in lbs_store(), and shared helpers
+
+- blk-mq fixes from Josef: don't trust the bio cookie in blk_mq_poll(),
+  keep tag sharing fair after a queue update, don't bring back flags of
+  a completed request from the timeout handler, honor a restarted
+  timer, initialize the dma state for P2P, quiesce a queue joining a
+  quiesced tag set, set up and exit hctxs under tag_list_lock, and free
+  the tag bitmaps in the SRCU callback
+
+- blk-cgroup and friends from Josef: keep the old blkg while
+  reassociating a bio, free struct ioc after a grace period, don't
+  truncate v1 iops limits, fix root io.stat on 32-bit, don't free a
+  blkg with its punt work queued, flush iolatency enable_work after
+  going offline, pass dead group I/O counts on and make reset_stats
+  reset them, and don't enter reclaim under rq_qos_mutex
+
+- Other core fixes from Josef: a disk use-after-free in sync_bdevs(),
+  not losing the status of a failed flush request, 64-bit sector math
+  for mac partitions, and applying the segment size to the integrity
+  buffer
+
+- blk-iocost: abort a weight transfer on invalid donation weights, and
+  publish hweights as one atomic value
+
+- Fix a NULL deref and use-after-free in __blk_crypto_evict_key(),
+  reachable via dm-inlinecrypt
+
+- Fix recursive i_rwsem locking in blkdev_write_iter(), from two fixes
+  for the same race landing in the window
+
+- Advance the iterator after copy-in for SG_DXFER_TO_FROM_DEV, fixing
+  an infinite loop in blk_rq_map_user_iov()
+
+- Check the open mode for LOOP_SET_STATUS in the compat ioctl
+
+- rnbd-srv use-after-free and kobject fixes
+
+- drbd timer and req_lock fixes
+
+- zloop cleanups and error path fixes
+
+- cdrom header and kernel-doc cleanups
+
+Please pull!
 
 
-> Link: https://lore.kernel.org/all/bbb87d6b-b7a3-487a-8be4-27f3f9ce4a1b@samsung.com/
-> Assisted-by: LLM
-> Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
-> Signed-off-by: Kyle Bader <kbader@ibm.com>
-> ---
-> v2: a shorter commit message (Christoph), and Anuj's Reviewed-by. The
-> code is the same as in v1, so the tests of v1 still apply.
-> 
-> v1: https://lore.kernel.org/all/20261028181412.1919506-1-kbader@redhat.com/
-> 
->   block/blk-mq.c | 9 ++++++++-
->   block/fops.c   | 2 --
->   2 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 7fff1305b..3fc9fdeb3 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3138,8 +3138,15 @@ void blk_mq_submit_bio(struct bio *bio)
->   		goto queue_exit;
->   	}
->   
-> +	/*
-> +	 * The block layer cannot generate or verify PI for a dma-buf bio, as
-> +	 * that walks the data pages.  Only fail the bio if it needs that, not
-> +	 * if the submitter attached its own integrity payload or if PI
-> +	 * generation or verification is turned off for the device.
-> +	 */
->   	if (unlikely(op_is_dmabuf(bio->bi_opf) &&
-> -		     bdev_has_integrity_csum(bio->bi_bdev))) {
-> +		     bdev_has_integrity_csum(bio->bi_bdev) &&
-> +		     (bio_integrity_action(bio) & BI_ACT_CHECK))) {
->   		bio_endio_status(bio, BLK_STS_NOTSUPP);
->   		goto queue_exit;
->   	}
-> diff --git a/block/fops.c b/block/fops.c
-> index 01bc8afe3..5c8024011 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -947,8 +947,6 @@ static int blkdev_init_dma_buf_io_ctx(struct file *file,
->   		return -EINVAL;
->   	if (!disk->fops->init_dma_buf_io_ctx)
->   		return -EOPNOTSUPP;
-> -	if (bdev_has_integrity_csum(bdev))
-> -		return -EOPNOTSUPP;
->   	return disk->fops->init_dma_buf_io_ctx(bdev, ctx);
->   }
->   
-> 
-> base-commit: 45b716456dd99488a0cef58482120dc0474aa696
+The following changes since commit 330517c63aa9b48227b6ab45f01003effac77ae4:
+
+  Merge tag 'char-misc-7.4-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc (2026-10-24 15:44:26 -1000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux tags/block-7.4-20261029
+
+for you to fetch changes up to c8c53d669d4e45b3a804013251a34387d7e11bfb:
+
+  blk-crypto: fix NULL deref and UAF in __blk_crypto_evict_key() (2026-10-29 11:10:05 -0600)
+
+----------------------------------------------------------------
+block-7.4-20261029
+
+----------------------------------------------------------------
+Andrea Parri (4):
+      nvmet-fc: only send read data for successful commands
+      nvmet: zns: reject a NUMD whose byte count wraps
+      nvmet: pci-epf: report transport errors in command completions
+      nvmet: pci-epf: require SGLs to match the command data length
+
+Andrew Stellman (1):
+      nvmet-rdma: fix out-of-bounds write in nvmet_rdma_map_sgl_inline()
+
+Avi Weiss (1):
+      nvmet: prevent double-free after metadata SGL allocation failure
+
+Baokun Li (1):
+      blk-crypto: fix NULL deref and UAF in __blk_crypto_evict_key()
+
+Cao Guanghui (2):
+      md/raid5: track disks array size to fix extra_page leak on error paths
+      md/raid5: fix NULL pointer dereference in raid5_free_percpu
+
+Chandradhar Kumar (1):
+      md/raid0: validate device count before allocating devlist
+
+Chen Cheng (3):
+      md/raid5: reject raid4/5 arrays with too few disks
+      md/raid5: extract min_raid_disks()
+      md/raid5: reject invalid reshape disks in raid5_run()
+
+Chris Mason (6):
+      nvmet-rdma: flush nvmet-wq on module exit
+      nvmet-rdma: disable interrupts under rsp_wr_wait_lock
+      nvmet-rdma: fix double puts after a failed RDMA WRITE
+      nvmet: don't clear sq->ctrl for a Connect with sqsize 0
+      rnbd-srv: fix use-after-free on two CLOSE messages
+      rnbd-srv: publish the sess_dev at the end of OPEN
+
+Christian Aurich Zanettini Martins (3):
+      nvme-rdma: fix NULL metadata_sgl dereference with T10-PI
+      nvme-tcp: fix request PDU size when header digest is enabled
+      nvme-tcp: fix NULL queue->ctrl dereference on reconnect
+
+Christoph Hellwig (4):
+      zloop: remove a duplicate call to zloop_get_block_size
+      zloop: share more code for opening a zone backing file
+      zloop: fput file after failed zone init
+      zloop: check that the zone backing file support ->{read,write}_iter
+
+Daniel Wagner (4):
+      nvme-tcp: initialize pf_cache_lock when allocating the controller
+      nvme-fabrics: reset io_queues before computing the queue mapping
+      nvme-fabrics: limit each queue type to the number of online CPUs
+      nvme-fabrics: clear the poll map if no poll queues are mapped
+
+Dominik Maier (1):
+      loop: check for read-write open mode on LOOP_SET_STATUS in lo_compat_ioctl()
+
+Guixin Liu (4):
+      nvmet-fc: Tear down the association when the admin queue allocation fails
+      nvme-tcp: Validate the queue state under the queue lock in the address attribute
+      nvmet: Finish the blk plug when integrity allocation fails
+      nvmet: Free the old negotiation state when restarting authentication
+
+Jack Wang (1):
+      md: fix mddev_unlock() called without holding lock in lbs_store()
+
+Jens Axboe (2):
+      Merge tag 'md-7.4-20261013' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-7.4
+      Merge tag 'nvme-7.4-2026-10-28' of git://git.infradead.org/nvme into block-7.4
+
+Josef Bacik (33):
+      nvmet: don't truncate the length of big discards
+      nvmet-auth: take only AUTH_Negotiate for a negotiation
+      nvmet: fix NULL dereference of PCI endpoint targets
+      nvmet-tcp: stop listening when a port is removed
+      nvmet: fix NULL dereference in debugfs host_traddr
+      nvmet-tcp: don't read a removed port at Connect time
+      nvme-loop: don't BUG() if a scan runs beside a reset
+      blk-cgroup: keep the old blkg while reassociating a bio
+      blk-iocost: free struct ioc after a grace period
+      blk-throttle: don't truncate the cgroup v1 iops limits
+      blk-cgroup: fix root io.stat byte counts on 32-bit
+      blk-cgroup: don't free a blkg with its punt work queued
+      blk-iolatency: flush enable_work after going offline
+      blk-throttle: pass the I/O counts of a dead group on
+      blk-throttle: make blkio.reset_stats reset I/O counts
+      block: don't enter reclaim under rq_qos_mutex
+      block: fix use-after-free of the disk in sync_bdevs()
+      block: don't lose the status of a failed flush request
+      blk-mq: don't trust the cookie in blk_mq_poll()
+      blk-mq: keep sharing tags fairly after a queue update
+      blk-mq: don't bring back flags of a completed request
+      blk-mq: don't forget a timer the driver has restarted
+      blk-mq-dma: initialize the dma state for P2P, too
+      blk-mq: quiesce a queue that joins a quiesced tag set
+      blk-mq: exit the hctxs of a queue under tag_list_lock
+      blk-mq: set up a queue under tag_list_lock
+      block: partitions/mac: compute the sectors in 64 bits
+      blk-mq: free the bitmaps of tags in the SRCU callback
+      block: apply the segment size to the integrity buffer
+      drbd: stop the start_resync timer of a dying device
+      drbd: take req_lock to skip the initial sync as peer
+      block/rnbd-srv: don't free the device on a sysfs error
+      block/rnbd-srv: drop the sess_dev kobject unlocked
+
+J?r?my Jean (1):
+      md: reject v0.90 arrays with too many devices
+
+Kunhai Dai (2):
+      blk-iocost: abort weight transfer on invalid donation weights
+      blk-iocost: publish hweights as one atomic value
+
+Li Youhong (4):
+      md: add rdev_record_write_error() helper
+      md/raid1-10: add rdev_bb_block_sectors() helper
+      md/raid1-10: share flush_bio_list between raid1 and raid10
+      md/raid5: drain released_stripes before destroying the cache
+
+Martin Belanger (2):
+      nvme-tcp: start error recovery when read_sock fails
+      nvme-tcp: skip TLS control records while waiting for the ICResp
+
+Martin George (3):
+      nvme-auth: update error log in nvme_auth_submit()
+      nvme-multipath: avoid size_t underflow in ANA log bounds checks
+      nvme-fc: fix reference leak in nvme_fc_nvme_discovery_store()
+
+Martin Wilck (1):
+      md/raid5: validate payload size before calculating payload_len
+
+Maurizio Lombardi (2):
+      nvme-pci: fix early boot hang with nvme.quirks parameter
+      nvme-pci: increase quirks_param buffer size to 256 bytes
+
+Nguyen Ngoc Thang (1):
+      md: take reconfig_mutex when enabling PPL on an inactive array
+
+Peng Fan (1):
+      md/raid: use assign_bit() where applicable
+
+Qing Zhang (1):
+      nvmet: protect nvmet_ports_list with nvmet_config_sem
+
+Randy Dunlap (1):
+      cdrom: drop linux/fs.h from cdrom.h
+
+Rongzheng Wang (1):
+      nvmet: use the enabled transport when disabling a port
+
+Sang-Hoon Choi (1):
+      md/raid5: protect big_stripe_tree lookup with RCU
+
+Seiji Nishikawa (1):
+      nvme-tcp: fix io_work priority inversion when send_mutex is held
+
+Shao Mingyin (1):
+      nvmet-auth: fix error handling on CHALLENGE failure
+
+TJ Adams (1):
+      block: advance iterator after copy-in for SG_DXFER_TO_FROM_DEV
+
+Weiming Shi (1):
+      nvmet-rdma: reject short connection requests
+
+Yehyeong Lee (1):
+      nvmet-fc: fix use-after-free in nvmet_fc_ls_create_connection()
+
+Yingjie Wang (2):
+      nvmet-tcp: validate the TLS handshake timeout
+      nvme-tcp: validate the TLS handshake timeout
+
+Yogesh Gaur (3):
+      md/raid5: don't BUG() on an inconsistent reshape state from the superblock
+      md/raid5: give the io_unit slab caches per-array names
+      md: don't hand out the array before md_alloc() has added mddev->kobj
+
+Yu Zhang (1):
+      nvmet: take subsys->lock while force-reconnecting in nvmet_subsys_attr_qid_max_store()
+
+Yuchao Zhang (1):
+      md: validate bblog_size when loading v1.x badblocks metadata
+
+Yuehong Wu (1):
+      block: fix kernel-doc warnings in blk-map.c and blk-mq-dma.c
+
+Zhenxian Ma (1):
+      block: fix recursive i_rwsem locking in blkdev_write_iter()
+
+Zhihao Cheng (2):
+      md/raid5: setup_conf: Fix null-ptr-def in error handling path
+      md: Fix the null-ptr-deref of 'mddev->private' while submitting IO
+
+Zizhi Wo (3):
+      md/raid10: annotate lockless access to array_freeze_pending
+      md/raid10: fix missing wakeup in wait_barrier_nolock
+      md/raid5: reject a per-device size smaller than one chunk
+
+ .../admin-guide/kernel-parameters.txt         |  10 +
+ block/bdev.c                                  |  10 +
+ block/blk-cgroup.c                            |  39 ++-
+ block/blk-cgroup.h                            |   6 +-
+ block/blk-crypto-fallback.c                   |   6 +
+ block/blk-flush.c                             |   8 +-
+ block/blk-iocost.c                            | 119 +++++--
+ block/blk-iolatency.c                         |   6 +-
+ block/blk-map.c                               |   2 +-
+ block/blk-mq-dma.c                            |   7 +-
+ block/blk-mq-tag.c                            |   8 +-
+ block/blk-mq.c                                |  78 ++++-
+ block/blk-throttle.c                          |  28 +-
+ block/blk-timeout.c                           |   3 +-
+ block/blk.h                                   |  14 +
+ block/fops.c                                  |   2 -
+ block/partitions/mac.c                        |   4 +-
+ drivers/block/drbd/drbd_main.c                |   1 +
+ drivers/block/drbd/drbd_receiver.c            |   2 +
+ drivers/block/loop.c                          |   6 +-
+ drivers/block/rnbd/rnbd-srv-sysfs.c           |  28 +-
+ drivers/block/rnbd/rnbd-srv.c                 |  36 +-
+ drivers/block/zloop.c                         |  80 +++--
+ drivers/md/md.c                               |  72 ++--
+ drivers/md/md.h                               |   7 +
+ drivers/md/raid0.c                            |  16 +-
+ drivers/md/raid1-10.c                         |  27 ++
+ drivers/md/raid1.c                            |  42 +--
+ drivers/md/raid10.c                           |  59 +---
+ drivers/md/raid5-cache.c                      |  54 ++-
+ drivers/md/raid5-ppl.c                        |  12 +-
+ drivers/md/raid5.c                            | 106 ++++--
+ drivers/md/raid5.h                            |   1 +
+ drivers/nvme/host/auth.c                      |   6 +-
+ drivers/nvme/host/fabrics.c                   |  30 +-
+ drivers/nvme/host/fc.c                        |   7 +-
+ drivers/nvme/host/pci.c                       |   4 +-
+ drivers/nvme/host/rdma.c                      |   2 +-
+ drivers/nvme/host/tcp.c                       | 309 ++++++++++++++----
+ drivers/nvme/target/auth.c                    |   1 +
+ drivers/nvme/target/configfs.c                |  26 +-
+ drivers/nvme/target/core.c                    |  16 +-
+ drivers/nvme/target/fabrics-cmd-auth.c        |  11 +-
+ drivers/nvme/target/fabrics-cmd.c             |   3 +-
+ drivers/nvme/target/fc.c                      |  18 +-
+ drivers/nvme/target/io-cmd-bdev.c             |   8 +-
+ drivers/nvme/target/loop.c                    |   2 -
+ drivers/nvme/target/nvmet.h                   |   3 +-
+ drivers/nvme/target/pci-epf.c                 |  30 +-
+ drivers/nvme/target/rdma.c                    |  31 +-
+ drivers/nvme/target/tcp.c                     |  33 +-
+ drivers/nvme/target/zns.c                     |  12 +-
+ include/linux/blk-mq.h                        |   6 +
+ include/linux/blkdev.h                        |   9 +-
+ include/linux/cdrom.h                         |   1 -
+ include/trace/events/iocost.h                 |   7 +-
+ tools/cgroup/iocost_monitor.py                |   7 +-
+ 57 files changed, 1062 insertions(+), 419 deletions(-)
 
 -- 
-Pavel Begunkov
+Jens Axboe
 
