@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.176
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793324778;
-	b=0RwOBUrYmdlyCLeoCMBwtttjNBEBbckwEZEmDkxlSkeFpHB8cPhprHicRkZRxB4tyWU6
-	 D2FI24Ys3uQnngHYqLXGKDIx0ycKX+W5E1VhufjJb81dTf1BxgSfOm+51YNxx5k1htWnH
-	 fRDL9f+Aa1VCPjKlszig70LbMiB7zLbnotOYJtsU1fxVHjMfMH/xTguiliw2N10Epn/Sr
-	 ncsv4q98qiz6593GTQqIZm4TI3iKsIf1ug8bG/o6aDcg8+cmSqLiitfRsUyTemobC2l03
-	 HraOY8Zg2HjDDFjXlxw0vNg2uyBJ60d/1OC3J/Fs9oyCfOAWeuYgjQprNG/CO61OfpQ==
+	t=1793324784;
+	b=J7xlCjmWD+bpZ22YaexkZrzvbv6iDHHEh7PQCR20NJg0UbKzHCi801g6pC65sZZBy2iX
+	 wMUGHAdZrtapiVJ4RZunGd2XaJddG5GEqKHVSFRXlJuwKB/SiWJy7+xDqUJ2pl/dHaj7k
+	 AiRrSftiKS+AZLx9ofElT4vTlYIqxMWW1OSqhdKRhJ+yZYzmgTUVes0oBIgxEkkSr87Bs
+	 CXb2a9R2Nc3NNlzQpS7DwpCGsX8mUmQNk4z1AZqW5oxsepAzEZLzqLQd4iP+UmpBEVhjT
+	 4oMW0ZJP9fYLkoXx3Xrk8uQv5Azu8L09wlJXeQJTpq+nnOEbIyMkHm+Iseq24E8VJbQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793324778;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793324784;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=KBjoHjefEpt6gXeu0uBAO7mx6fOzElk1Inu+2ky7I1c=;
-	b=JcuwuHhqYBJ1LIkMS5oPMWbFvca4LSXt7sKTTJtHR4kpSsgoadcrtgAGid5wTAyBtcc1
-	 a2LlafFLAEFCxD8UMfpc6m7/kp7g8v3gNXHTWlECS6dNF8TXKsLITf0wuJY04ZIVX9WCI
-	 tnaDziNbQ3YoaVopz4jusWYBJUfFFMPvy0BogM3WX7SzuPsvatumRdCzmarda/slkjmNz
-	 OzWHHYoOCx39LwSzwHQuDKnbzpGNvI4ssN3gYyqO80B1x1sg715IxL4/BN3ppj1f5IGfI
-	 buwAbC0GTy8Po8gEaO0TfEm+YtQVnPMPKa/HULaGvBcq1CKAboCB45wViXLI6/+sZ3Q==
+	bh=SF9HmYpsqJyt4I9c/G5LCdmVYCdb7Ms79eOZlmLUUW8=;
+	b=jYREj7213BQIs6PbG8eTHbUHuKffoYWVlfKzubVEslGc77jTct2HYC4STTGMStqmALt7
+	 HhdOYvCHqq0Mvxk5YACH3RwzqmP/tNz9kTuxa1nvL2H+W8KJEJijc1FlKN4TpcN/8WJHI
+	 EeydLScqDyk3lKHbtoiCIXnpqdvLUQljSduYayFbI/Q05kjbz1FsOw1AQGR8M5ghAv6o9
+	 2vQpXRpV1j6xWqJe5BSCXfm2YvAC0xUmq8BwnExXfwF6kZuvNITJfVcezq/Mg5jasfF2s
+	 +3HuGB5cHY8ITDaReVxMqvIgRZJ69XRob5uhTlZ3PkPERJ1Mb90wgYgwl8wLoWzW18w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QMZuKhWs;
-	arc=none smtp.remote-ip=74.125.82.172
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PpJtXuLt;
+	arc=none smtp.remote-ip=74.125.82.176
+Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6E8606A31D
-	for <linux-block@vger.kernel.org>; Fri, 30 Oct 2026 01:46:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE6E8606A31D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B7E606A31A
+	for <linux-block@vger.kernel.org>; Fri, 30 Oct 2026 01:46:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 35B7E606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QMZuKhWs
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-36a17a332ecso455682eec.1
-        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 18:46:17 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PpJtXuLt
+Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-36661f953e4so393915eec.1
+        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 18:46:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793324777; x=1793929577; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793324783; x=1793929583; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=KBjoHjefEpt6gXeu0uBAO7mx6fOzElk1Inu+2ky7I1c=;
-        b=QMZuKhWsa2erUSLf/IY0zFqF2nVXuVqGGow6hvJMlomv9revsAHZYtIipxTsntNl4t
-         FQ7slvlyN4kPaRu/yminnBrxoZrysIIsJ6hGIY30J2/8Xbb44S3Ama35r1FCk/14kvLT
-         JgtZgKfYW9MheOcj7q9UT5HlPOOWkaLnE5LvDN1lqddtxp74P9bzIk6XnRWxw/RRotau
-         CjIsHFxy0GmMzeiHLRePiEBnnNa+IWyO3lPMGziXTaOWZ009vGpGbxKpLu2GRqT7ZMMd
-         RhfBQ26czyEpfpIphKYWgg9cDNdHTpQoZLHZ+LFl88pj1WD4gZksSTTyojdHYii1csQQ
-         20OA==
+        bh=SF9HmYpsqJyt4I9c/G5LCdmVYCdb7Ms79eOZlmLUUW8=;
+        b=PpJtXuLtrGLkKx/N+0tCyrbbBKOE3Ru4G2tPkL4Fy/TPNm4MMuVamdfqFeVKhzvHWO
+         5zfkyPcNvjkQtGRsngYTN6tj3jKX81nYAB+L+v9JxG8WAiT7ZuuwCIbLK0DE/NzVTNxH
+         V8ykoYQuKsXyu+oItMTU/fELmq1xlU4XJ/zFaX3n4njziJO2qNyw3ajd65YpBpJm89Vf
+         ZaoFn+57s5tllrgiqGn6h12jGywcjhnlBubvgxi01+Bq3Diqbl9yqhJZ9hY7jGFKVv/c
+         PWPgkNT9CA6OIkaB/dygJNRqdJ0VTetO2JbWNcMad2XdBtFait71EyzgVQzvNqAZib2Y
+         YqCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793324777; x=1793929577;
+        d=1e100.net; s=20260707; t=1793324783; x=1793929583;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=KBjoHjefEpt6gXeu0uBAO7mx6fOzElk1Inu+2ky7I1c=;
-        b=0bWcxYriHQhfB7opB6DqeLVGQSiCygtMoXFbLHtay32LeyF6p8Tal7kON3f3OWySTb
-         hNjim5+0TQ+zyIo32S78bmitX0UCV6BpF0L7XGTXAtCkM/0IDF6Q5fM5ZuwDaKA1+UwD
-         JehbmCNhPr/Hy6e8UKLhEPBR+XvmT/eiMKTW0L7WF0dMohbMO680D/6pfVzhnzedFeZd
-         0Lpb9Cy/0+Rih6e+My8Nv2pZGu8riIYA7tr3jHOZtjqaJUPP7Sh3xrOFZSh8FPRZdQJe
-         ehJVlD5udwI3AWPQmIC1R9YMSPbr6La4o8O/zRR+D2IJEDSNM9OgiSA4MPjGQhZ+KYAg
-         x75w==
-X-Forwarded-Encrypted: i=1; AKwUvByp/ROAJ03qKR9ghNYILYbLI1CNXKpgEOGxl6msxO5NEJJFu2JAO1iTDqmPR+5ZitHRCpyWacVroGYgtg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYLbKmoKWRvn376Ew09sb0qofOnAS2qu3UdTPLVOitIbwdudCpOx
-	9fDVlPPABWBDrfV0e9EFos7TT1Bng6K/OepzeFeKz/pPEZT52jPcILg=
-X-Gm-Gg: AYBFou26Jlnv8cm+vml0bzSW6v6M54cDmMyTsuFCiuSpfy2nWpvdGMRWMMKvqFWqcTV
-	5NVlZMv6lkNATv2DMROFbwWmSH+4y88fX3NrIBWf1q0qv2jAR8YFKH4mQ4s8ru/6jLm75fI/u4U
-	V6UtFtOblt2pHZlUaPkxGLOJLH7xEMHr6CTB3EaWOACm7YipQoKeJC0Mfvj0VXLM9zC+etS3ihO
-	KY2JZznavdWXNbQzCwc3/ZJdRRgFyxK5F3fuhfC51DbYA+JtVKlaPwBszyDocoInTmJApEIfrG0
-	iAKkSo+gsg9/FrwwaYNyP2ZCo15zhSEWl4/v/BIOHntxuR3EmL7JCsiKuEcq23tQcAsJggfghPo
-	OyT/JRIRlZQaHR0Y9saJaa6KQZl/WfATzBSEysylPRzT0BUFgcUoFng4nx+l0Cp9j/lUKpOCGfl
-	wqlwFDB3cwWWxuEYV4cWnv2vUwIAUjOzjwEcoqN/D3xoPYhe9oTwBdo9YRjzL+pidzyJismvwkd
-	HIEubw4QeaCIXZ7RJo4dCWvBh9Cce2HzA8F0c1FgUpsqL+CrslreTEREN2ILo3EHJltDkRb/oLa
-	lMAyWqx5k6FfFV7pKjAqlOXiV+Q+Os6gO1P1xhM8CPY9OhGsUYV0SNjyxtfzJYu7dAPCCnXlT7W
-	2dekYeIERsmAj1JpH
-X-Received: by 2002:a05:693c:20d3:10b0:369:fa21:ba0b with SMTP id 5a478bee46e88-36a42451227mr1548074eec.33.1793324776753;
-        Thu, 29 Oct 2026 18:46:16 -0700 (PDT)
+        bh=SF9HmYpsqJyt4I9c/G5LCdmVYCdb7Ms79eOZlmLUUW8=;
+        b=glq4IYsR6dK1U/m2y3vtyRursa4gQm5NqhCaCWfyI8Z3drxZ3Im43qlW5IQE86HBgP
+         lJtL+Ev2p4T44+OOZBobrV3B6vnaay6c0S7Z2ZulDk9WBbDQkrDn+n5stTNVln3tn0M6
+         wgerD7j4Oi+rWD9E6LUjY1XiQkAItUZ43S3TwhxAaHfVcOaeI+VO9/bbV6I3/dr9fZty
+         CD99iNDWggm2oWFhjAhLnMmiGO4Aq/7mEhSjd3R+KCgkvnFIZnI+/EFh5X7H7+8ig7Rw
+         nIPwQ0u0Kqp6Ae/lzyDfop/TUxtHZeR7IoWl+DbFfI8vfySo6pEKA0NkTgNIx+VKnbt4
+         g8Aw==
+X-Forwarded-Encrypted: i=1; AKwUvBxN3mhtnIpZCgilYaCWu896EUHUIdVrYjZsiX8hrfH1AryegwuJrcLmiFMP0qGR7xmSf/LTKCuq4FhLSg==@vger.kernel.org
+X-Gm-Message-State: AFq9FYJ8nIsxMlLpHypLaXnFwkm5We1LW4Do5ncKttXI67vGRiP6Jrbw
+	uOwrI8OVU4U2ZGqM5T4Tt4jom2wBukHUHQtqjaWnxLHmBWLS5uNe8bU=
+X-Gm-Gg: AYBFou3330k1174lDMD2/z0NKvlmN34CO80/PmEh7nrcOsA/cy1Cx41+ADP7WIQ1cLo
+	9XpYZ8xCIzFL24U/e1ZbsIIOCEAsDkQdOHNHXI7u2tbXcjxbTZAHINIZ6VTdin1+Hg+7rrKNKLp
+	z3W4wdBZFJvSXKfKMSwiPsrXy33mPsrPJU2OfHbiPt1M3F/3XHx4MkrqoY51nFzzq8vRI8KComW
+	2ijvKktfBKFwJIlNGSTiYEiJi/UnVElJRVQn21omvxOkV/zccHgHPYs0KJa0soNEX/rVE7AVXRk
+	dgEUL9dUO22AtPsUUV2DlqcZuf2Sekhcb8vH3xVU0795CFpfMbSopPdim171GMUg2nPmhCwY2EV
+	htvnC13DgP2KJ2QP/DW4nQVY99bYOYvIgFdvaAGX6bgEOvNIEkm7FULCjGTl2pKhToXCl0PCxy9
+	gdnItipIqhM0nGhbzFH1+W2ghjywnOqgQO/4KMJbyYBq9HPNQ1ecHMOn6A7lNnQmn0T4EkJ6dhf
+	LN3ronNepxg3+xy/lx4nPujLBRPzgWACD9j4rsH34syYOXkSazLyXmalt7pRfSLdzGxa0EU01qu
+	qxsV74LQRqi19xMtxtRJilQ41MfnKPhMXEQnoFGRGzUsJP0zzbxOFW0d9vSZA7T0H0B+bd+mIdl
+	7b6wyokVFwPvznkwG
+X-Received: by 2002:a05:693c:69d2:b0:368:9553:f2da with SMTP id 5a478bee46e88-36a423f5c39mr1635691eec.31.1793324783143;
+        Thu, 29 Oct 2026 18:46:23 -0700 (PDT)
 Received: from anuj-MacBookPro.. ([2406:7400:63:75fd:f9a4:4062:7980:1324])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428fa380sm2209020eec.12.2026.10.29.18.46.10
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428fa380sm2209020eec.12.2026.10.29.18.46.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Oct 2026 18:46:16 -0700 (PDT)
+        Thu, 29 Oct 2026 18:46:22 -0700 (PDT)
 From: Anuj Gupta <anuj1072538@gmail.com>
 To: axboe@kernel.dk,
 	asml.silence@gmail.com,
@@ -97,9 +97,9 @@ Cc: io-uring@vger.kernel.org,
 	fuse-devel@lists.linux.dev,
 	joshi.k@samsung.com,
 	anuj20.g@samsung.com
-Subject: [PATCH v3 4/5] block: map dma-buf iterators in blk_rq_map_user_iov()
-Date: Fri, 30 Oct 2026 07:15:39 +0530
-Message-ID: <20261030014540.3065403-5-anuj1072538@gmail.com>
+Subject: [PATCH v3 5/5] nvme: support dma-buf registered buffers for passthrough
+Date: Fri, 30 Oct 2026 07:15:40 +0530
+Message-ID: <20261030014540.3065403-6-anuj1072538@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261030014540.3065403-1-anuj1072538@gmail.com>
 References: <20261030014540.3065403-1-anuj1072538@gmail.com>
@@ -116,50 +116,83 @@ Content-Transfer-Encoding: 8bit
 
 From: Anuj Gupta <anuj20.g@samsung.com>
 
-A dma-buf iterator can't fall back to a bounce copy, so map it directly
-with blk_rq_map_user_bvec(), which already handles it through
-bio_iov_iter_set(). Fail with -EINVAL where a copy would otherwise be
-needed, and update the blk_rq_map_user_bvec() comment to match.
+Allow registering a dma-buf against an NVMe namespace character device
+and using it as the data buffer of fixed uring_cmd passthrough I/O.
+Complete through io_uring_cmd_hw_done(), so the dma-buf map is released
+at hardware completion.
 
 Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- block/blk-map.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ drivers/nvme/host/core.c  | 16 ++++++++++++++++
+ drivers/nvme/host/ioctl.c |  5 +++--
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 7369aba74771..a65b255b229c 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -459,7 +459,7 @@ int blk_rq_append_bio(struct request *rq, struct bio *bio)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index a7a4d09644c1..33dbaa319bb9 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -8,6 +8,7 @@
+ #include <linux/blkdev.h>
+ #include <linux/blk-mq.h>
+ #include <linux/blk-integrity.h>
++#include <linux/dma-buf-io.h>
+ #include <linux/compat.h>
+ #include <linux/delay.h>
+ #include <linux/errno.h>
+@@ -4008,6 +4009,20 @@ static int nvme_ns_chr_release(struct inode *inode, struct file *file)
+ 	return 0;
  }
- EXPORT_SYMBOL(blk_rq_append_bio);
  
--/* Prepare bio for passthrough IO given ITER_BVEC iter */
-+/* Prepare a bio for passthrough I/O from a directly mapped iterator. */
- static int blk_rq_map_user_bvec(struct request *rq, const struct iov_iter *iter)
- {
- 	unsigned int max_bytes = rq->q->limits.max_hw_sectors << SECTOR_SHIFT;
-@@ -506,6 +506,19 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
- 	struct iov_iter i;
- 	int ret = -EINVAL;
- 
-+	if (iov_iter_is_dmabuf_map(iter)) {
-+		if (map_data || (iov_iter_alignment(iter) & align))
-+			return -EINVAL;
-+		ret = blk_rq_map_user_bvec(rq, iter);
-+		/*
-+		 * -EREMOTEIO asks the caller to fall back to a bounce copy,
-+		 * which a dma-buf can't do.
-+		 */
-+		if (ret == -EREMOTEIO)
-+			ret = -EINVAL;
-+		return ret;
-+	}
++static int nvme_ns_chr_init_dma_buf_io_ctx(struct file *file,
++					   struct dma_buf_io_ctx *ctx)
++{
++	struct nvme_ns *ns =
++		container_of(file_inode(file)->i_cdev, struct nvme_ns, cdev);
++	struct nvme_ctrl *ctrl = ns->ctrl;
 +
- 	if (map_data)
- 		copy = true;
- 	else if (iov_iter_alignment(iter) & align)
++	if (ctx->dmabuf->size > UINT_MAX)
++		return -EINVAL;
++	if (!ctrl->ops->init_dma_buf_io_ctx)
++		return -EOPNOTSUPP;
++	return ctrl->ops->init_dma_buf_io_ctx(ctrl, ctx);
++}
++
+ static const struct file_operations nvme_ns_chr_fops = {
+ 	.owner		= THIS_MODULE,
+ 	.open		= nvme_ns_chr_open,
+@@ -4016,6 +4031,7 @@ static const struct file_operations nvme_ns_chr_fops = {
+ 	.compat_ioctl	= compat_ptr_ioctl,
+ 	.uring_cmd	= nvme_ns_chr_uring_cmd,
+ 	.uring_cmd_iopoll = nvme_ns_chr_uring_cmd_iopoll,
++	.init_dma_buf_io_ctx = nvme_ns_chr_init_dma_buf_io_ctx,
+ };
+ 
+ static void nvme_add_ns_cdev(struct nvme_ns *ns)
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index d342ccad067a..3f240c9a537f 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -472,7 +472,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+ 			blk_rq_unmap_user(pdu->bio);
+ 		__io_uring_cmd_done(ioucmd, 0);
+ 	} else {
+-		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
++		io_uring_cmd_hw_done(ioucmd, nvme_uring_task_cb);
+ 	}
+ 	return RQ_END_IO_FREE;
+ }
+@@ -533,7 +533,8 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 					ddir, &iter, issue_flags);
+ 		else
+ 			ret = io_uring_cmd_import_fixed(d.addr, d.data_len,
+-					ddir, &iter, ioucmd, issue_flags, 0);
++					ddir, &iter, ioucmd, issue_flags,
++					IO_URING_CMD_IMPORT_DMABUF);
+ 		if (ret < 0)
+ 			return ret;
+ 
 -- 
 2.43.0
 
