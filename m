@@ -1,84 +1,84 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793324759;
-	b=byR4p4XcGax2yu4GMmzzuKlTE8Rqwzl7j79DF4Nf6+o9YdN1Z46HmxuoJZKkVWrFCPGN
-	 0oTKs/Am4zqJp802qRixX8qusHkGX33LAS/ntvOZh5YsR9KOnnLLkWfECcQFy8v0myB8Z
-	 SUEjZjTXm1v9HgS4m/5g4jaNavrlk98KtBzxMXOHrJDZFuDAV+tVTi9aCzBDEI9Lu8mte
-	 htfEb6ZI6Po1st/czEEeP4gzvhJlkxXEiCpiSYKIs3S6doDcwz+fWUF6OAaAMOhcwdWRg
-	 XBHv/YtnhkI8bqXpyv3lGiv650fZuo4p9tR835A/vzd1YfUXE36MGsW5x89s0fPg6Ow==
+	t=1793324772;
+	b=heVU98G5WcRqgKmfqPht+bVNJnN4GaKCwXyaoHDST0zVbkQRg2gBfKCv7VNeYCsgPsAf
+	 1yalXex6UiaIDWc62aIoK+Y5YKXCojjat2X1HSKo03PUijPZTe77sq/m0pxFvUFRTjlqa
+	 vclKuu0nizIN/tZG/xHIlCXi+I2PBzE5QljqwdP0832mRBbeltR0a5q6XcVyiD2jaLOtp
+	 AXrK+Y0ui8paANXys6237MeEZGfF7ptka95KzYNEjHDjnDPmXG4AbLSvCZelkkcotM2FU
+	 HHZYjDECrpBFy084KD/6XfNhpTXfWm6K2lbmA8udaIku9mUm6eMyOZ7n4F/KcnJ7qBw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793324759;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793324772;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=ODvSAgyV/h/yeJCArNYdVO3F0icLZBSUlmTqdaSk0qI=;
-	b=sxMljWub//uF6qHXQIh2VM1wH7yZfPx4Fvuimag/NAl6OxIyORbUtxiIzZNuK/fbp8Cv
-	 tKmmWdguOt/BAl5mu9NzLJpEb0VhfHCLHfBTlhONJfXuMYIKQiPY0JKiqJ5rxvbQMMCjt
-	 G+UdsuDLgeI9zIX5xiaPUhm80t/IYVe35sGx952ORC9Wi382o2jQhjp2rxsV4c/lg8s6G
-	 tLdG4J9D+xPebx3980OcKRZIDYWAzg5EIkU4wyvElIpuUVgfHmGv+l/EDPUzUx7puSo+W
-	 YaPWlyFRxdJGcPQPTXjTRQY6FBU8c/PkRAuvhIcKMxGF8KOvIr11uiWOIRBGNmCIFnA==
+	bh=lCyrcMpBQiz0VtWC05/bFg8KKUJTwPO8EsDhKRgsAck=;
+	b=5qPf8eepWfhrVqQNf7AMO43ZRKmf99XyUtXlNEtpwZPjAlJdJelkgC3sE2dJsNJ/AbXR
+	 WwIqyrerDxD2sUtkQ+EJoqzVntmaWuHPANP9+VkuBo6xV8jCsS0/k+Gicw7VrNd+WZrGS
+	 vujTq0AFGj+XJFEpqy5fBkaS+zmukvtL+hcd3VKL0QW0i0bjVdyKJ6TEfIm5CUoXA7rXW
+	 uyf9qtHsdrFXs7e8b6MTOIzfrW14JEHda20FkIwpiYDt0GIDQ+ZuNc7pkx6JK4zdvut9R
+	 t7VVgtd+sUcMRoYsoiAjZ60QvYl7MRfLOb2MXAxysapyyM+gJP+Z6e/LN44XSO7LAGw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="ERqyOc/a";
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="mP1cJL/M";
 	arc=none smtp.remote-ip=74.125.82.169
 Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29396606A31C
-	for <linux-block@vger.kernel.org>; Fri, 30 Oct 2026 01:45:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 29396606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766D7606A323
+	for <linux-block@vger.kernel.org>; Fri, 30 Oct 2026 01:46:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 766D7606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ERqyOc/a
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-35c76e9614aso409576eec.0
-        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 18:45:58 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=mP1cJL/M
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-35cd4e8bdbdso352742eec.1
+        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2026 18:46:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793324758; x=1793929558; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793324771; x=1793929571; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ODvSAgyV/h/yeJCArNYdVO3F0icLZBSUlmTqdaSk0qI=;
-        b=ERqyOc/arjTQd+ob0SEMV+H7q4Sy3FNhJRpQZPrMFbzh/E7RaYSsx85yXrbbSpeTG8
-         G8nhEDEu/PHW9IE3C06owdQOgNh23BEWdm8ZkeVeKfMj7eAtN2cC1+ws5FKJX/cSVmH3
-         xGaFOU8syrrCQgUzYsRapYSJB0Jr8cpHtywlildS/bewHJ/c5VmiarVfQYw4azvQyHgO
-         k0v3/8cg7XM8yqd2KEieXWELvfTW3h7yWSPvJj3hrSX7jfRXJdb9cgCFmDiTTfrMBTD7
-         4TYzVAxMBqpPXfu7FF8I2Y74oDsbHfQ+860jLEIesNsKe6qiDsAAE2IfU8VwziBF005P
-         U4gw==
+        bh=lCyrcMpBQiz0VtWC05/bFg8KKUJTwPO8EsDhKRgsAck=;
+        b=mP1cJL/MpFzT6P3oH6WSjjB1MEHetUrgSXupQ7NyBzECGts+xtuiX3NQv+D7joCawY
+         44Dmki5CtdoN29CZkIe9KQKJGnN2B4xWMlxBhENhWOeDoKNpuUOyVDT9lMIml3DcG9RS
+         Jn6miet0U2fXe16f3NBzAw3dHSo8SMKHrNSqxSNMNea11SXGuik+yVhPxHN0Gyd+nHaC
+         vqvLDU0LyGz9xjIrW7SU3hFy5ntKvRzbkpX/O8FHF6j0z362uQrwQzghqUgfhhX3eeaw
+         v5z9c92JOVCTREB4HJBKiGpctKDYzFT4llI0JTN6HpIA2ECzBlU4lhEusNzAc9N9SEQc
+         zduw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793324758; x=1793929558;
+        d=1e100.net; s=20260707; t=1793324771; x=1793929571;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ODvSAgyV/h/yeJCArNYdVO3F0icLZBSUlmTqdaSk0qI=;
-        b=mQk18GR7AMZcJjhOoWm60reFtgYNeyISVwi3z+FxJw/NNaDGTCnTh2w3XchUrSXU5J
-         eWxk8hfVn5J5yRobzuL59qcNXsyfdmIa//ENe+eql2luDhGCUUVMu0q4zMFgViS7yD8L
-         vD/jnF9yXEzdod7cMqa9KkG6mXI9V+zNO4mzkIRjtrJNmO9ZX2/VS+S/NgjZTt+Y0pcH
-         5NTywO3raQzjdwfY6qkLDEDPkZWLto8IPCAYJE0aVMljUNgKyi1LPA52T8VdHo9eE9Qm
-         C5Wat7eTvyvauQ7YiBcO868o6HEUEls5zNd5lQcjdJrTl+GAOCCCGUgOJbUabILxHmLh
-         Ho1Q==
-X-Forwarded-Encrypted: i=1; AKwUvBzJPXAlYdMGg+ay+WAZ9SQWhz4K/lP+7lrgH8b1pXAv9yzIRYdRZQuOXKkH2pkvNS7pJKs4OuA6Xl41lg==@vger.kernel.org
-X-Gm-Message-State: AFq9FYJt5rN35URUw8XZfUu15acfVcOQTjhCaFgUgox8wmxdlDw8kDed
-	M++Jd/EwMDizLxkOpfUoGQlrUeUHzI9N3mn/LBYsGRqKk1J5BkBmaBw=
-X-Gm-Gg: AYBFou3F8xFW33VT+CHSCIftq42K8n3EH0xoNVhCuME7bUy7WWS5r7JyF1teo439Oh/
-	PxtGiy/7mBB1fmMcaZyB461AQkAEmbu5H0wYeCycCfUWz5vcOR7YqhQByTlue7tOm62xOCz6T5b
-	NpLDU6Wm+JO6XlmZ/dSr4r2sYbcCS9C5XgysWqD7ibJf0FpTBRIoUYgYOIl8933w+odYa3l+NSB
-	eIeSEeZZrWevfOVoxowQuDuJtmpJjk/+sEMRt2mnNUPSynrzLzk3un3Su6Mg0ap/9yU4lnxL4tS
-	tSYOlXjLyublH32yLM2R//gYhDqW+gDAKesMz7KJvZDfF2sUjy5u7+qVHhU6R63GC5FsxYggv1D
-	Eap8BnMISovqO69ekyi4R6Qg7o3F0l7P5w98qQ/e+hfgas1X7RuKUrr/fKJhSJd67lrpU6rvtlA
-	MwVlhfJSK9Tz20NdDkE1/8wLVxqnddJysNgNw3AQTcaWzMQ8ehPyYJ6BhcE4On40KajsmXbx+Ai
-	IpmeD4gDFNQsmXH9sFoD8z1IrDmwRpSkchuqA6kVsJDkvK+V3n69TJmV68ihVsJshGQF2B0FvlU
-	VX+MonS6MRNwWM8krItD7gCaHq4NmwJhPJ5+lapKW5Bo39Ff0pcGvqWeZsSNRNkdjfh5xkHP5lI
-	ZGpurT3N577Q6ZE6t
-X-Received: by 2002:a05:693c:639c:10b0:36a:1f8:a56e with SMTP id 5a478bee46e88-36a423bb931mr1471206eec.23.1793324757946;
-        Thu, 29 Oct 2026 18:45:57 -0700 (PDT)
+        bh=lCyrcMpBQiz0VtWC05/bFg8KKUJTwPO8EsDhKRgsAck=;
+        b=qGouZX6fZXlQJJa2J0XoO+oXsutWXio4TdMVmIYSnLTOAWQM8IA7weltkCzNblUKM1
+         xdRk3S/jS3uzpWZtBaDTviw0O4gzHAli2WPC0qKtBMjJzpT0WQ46mgTYZVUwfx0koA7f
+         /awrzyE4eJ8VDGoPCwKDSe1UEKMfHL5ruspVuT329SnbUh2t+B1dzDO4YiJAHcInn1Cn
+         94qHRRQ9NRzYfSZSCtTZRCjxi35GfYoK1XPbXeWvD/BI57MfB7ATjAIwV0TpnDALc5IH
+         My5IuRpEcSVcAfqVfxpTi9UbmIsTHwT06q0Q1O6jYIjgnHdKLPoaoLWU1Vh6ZEOlwo+G
+         eQEw==
+X-Forwarded-Encrypted: i=1; AKwUvBxK02vVTTdSVLmvOzhuqsMu7NT5i3zP9Cb96PmQDDL3C9oLj01SBNSAJsZ29pzdav1+MeaadAPduAfUFw==@vger.kernel.org
+X-Gm-Message-State: AFq9FYI8+oFoq+8ZqMb716AVVkFk1mz16roDXxRplPzVLmbOthUROdlu
+	2CckMvvcIdMzpY37VXo0wbpxpahb82JK1u3VJGA7j8uoff4bqi4TINg=
+X-Gm-Gg: AYBFou3Jj/52sXdJTPc+5HeDOQmGS1qYLLaQkpmx0bR8Iy0wq0V+ApSlH3nVgtVQKiD
+	VBQhVhumiGMKowSOH2Ct6gZtZEesYbKX486tLZs+xTYzHmstg35Wl5D2ZAY9+YQeOYVbp8DiYBo
+	gPB0gXgvzQ3S3QUrAiXttQgM7orE2xD5Bocusla4N4ag6bu6TS/rlx0+E+gCMJheFYDKn2ZXbGa
+	5wk1ZZdTltbp8Z2CbvrmJfDHAPS1h3/0xtKeWeMRCHTG9vlZlouWzbvMfTgaXPG2pbWQ1eMgiVy
+	LNf98CkgPUDxNjqO9yMAVgivvxzp6wqzHadxlqF6myJMJA2Hhc+AC1lFDkH3B7B65zbdA0kBmuY
+	HkDuc1NNLwXv/alQIirasag2r65bzD5Mr17OfzECsTvL0Zu1ahR5wmACdfyKMikA8YFxlnNW2fy
+	GIOBjTLirwIX7pI+nUY3rTECHSptcY1/KVA/iBpu1mZCjuUmuD2qpfH0QmMdJ0pL6uDMnU0wqtr
+	B2b5s72aolzZcZZZNLpTzTU2wK7t3kCKf1pvUueY6/pVSpJQ7CCBPhBQQ+3gtsUNSx6ot6slPxV
+	9XMUc2JZAhZuKGBJVMR/Vbcbkg1MM3dqdFhqAsBkmOwNekCIcFuM4WcqBOC7cXbYd8kBJEb9hfY
+	wBKBRx34RwdnX2cDRvQ==
+X-Received: by 2002:a05:701b:4189:20b0:182:6c6c:d876 with SMTP id a92af1059eb24-1ac5cb1a331mr1177745c88.8.1793324770340;
+        Thu, 29 Oct 2026 18:46:10 -0700 (PDT)
 Received: from anuj-MacBookPro.. ([2406:7400:63:75fd:f9a4:4062:7980:1324])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428fa380sm2209020eec.12.2026.10.29.18.45.52
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428fa380sm2209020eec.12.2026.10.29.18.46.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Oct 2026 18:45:57 -0700 (PDT)
+        Thu, 29 Oct 2026 18:46:09 -0700 (PDT)
 From: Anuj Gupta <anuj1072538@gmail.com>
 To: axboe@kernel.dk,
 	asml.silence@gmail.com,
@@ -97,9 +97,9 @@ Cc: io-uring@vger.kernel.org,
 	fuse-devel@lists.linux.dev,
 	joshi.k@samsung.com,
 	anuj20.g@samsung.com
-Subject: [PATCH v3 1/5] io_uring/rsrc: pass import flags to io_import_reg_buf()
-Date: Fri, 30 Oct 2026 07:15:36 +0530
-Message-ID: <20261030014540.3065403-2-anuj1072538@gmail.com>
+Subject: [PATCH v3 3/5] io_uring/uring_cmd: support dma-buf registered buffers
+Date: Fri, 30 Oct 2026 07:15:38 +0530
+Message-ID: <20261030014540.3065403-4-anuj1072538@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261030014540.3065403-1-anuj1072538@gmail.com>
 References: <20261030014540.3065403-1-anuj1072538@gmail.com>
@@ -116,125 +116,131 @@ Content-Transfer-Encoding: 8bit
 
 From: Anuj Gupta <anuj20.g@samsung.com>
 
-Give io_import_reg_buf() the import flags argument and drop the
-__io_import_reg_buf() variant, which only existed to pass them.
+Let callers of io_uring_cmd_import_fixed() opt in to dma-buf registered
+buffers with IO_URING_CMD_IMPORT_DMABUF, and attach the current map on
+import.
 
-No functional change.
+The map has to be dropped at hardware completion rather than from
+task_work. Add io_uring_cmd_hw_done() for drivers to call from end_io,
+which drops the map and queues task_work, and warn if task_work is
+queued with a map still attached.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
 Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- io_uring/net.c       |  6 +++---
- io_uring/rsrc.c      |  6 +++---
- io_uring/rsrc.h      | 13 +++----------
- io_uring/rw.c        |  5 +++--
- io_uring/uring_cmd.c |  2 +-
- 5 files changed, 13 insertions(+), 19 deletions(-)
+ include/linux/io_uring/cmd.h |  9 +++++++++
+ io_uring/uring_cmd.c         | 28 ++++++++++++++++++++++++++--
+ 2 files changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 533afd335627..5d0f7c0a1825 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -663,7 +663,7 @@ int io_send(struct io_kiocb *req, unsigned int issue_flags)
- 	if (req->flags & REQ_F_IMPORT_BUFFER) {
- 		ret = io_import_reg_buf(req, &kmsg->msg.msg_iter,
- 					(u64)(uintptr_t)sr->buf, sr->len,
--					ITER_SOURCE, issue_flags);
-+					ITER_SOURCE, issue_flags, 0);
- 		if (unlikely(ret))
- 			return ret;
- 		req->flags &= ~REQ_F_IMPORT_BUFFER;
-@@ -1242,7 +1242,7 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
- 	if (req->flags & REQ_F_IMPORT_BUFFER) {
- 		ret = io_import_reg_buf(req, &kmsg->msg.msg_iter,
- 					(u64)(uintptr_t)sr->buf, sr->len,
--					ITER_DEST, issue_flags);
-+					ITER_DEST, issue_flags, 0);
- 		if (unlikely(ret)) {
- 			kmsg->msg.msg_inq = -1;
- 			sel.buf_list = NULL;
-@@ -1536,7 +1536,7 @@ static int io_send_zc_import(struct io_kiocb *req,
- 	if (!(sr->flags & IORING_SEND_VECTORIZED)) {
- 		ret = io_import_reg_buf(notif, &kmsg->msg.msg_iter,
- 					(u64)(uintptr_t)sr->buf, sr->len,
--					ITER_SOURCE, issue_flags);
-+					ITER_SOURCE, issue_flags, 0);
- 	} else {
- 		unsigned uvec_segs = kmsg->msg.msg_iter.nr_segs;
+diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
+index 23fb66a1e2c1..d4e17c2f59fd 100644
+--- a/include/linux/io_uring/cmd.h
++++ b/include/linux/io_uring/cmd.h
+@@ -12,6 +12,9 @@
+ /* io_uring_cmd is being issued again */
+ #define IORING_URING_CMD_REISSUE	(1U << 31)
  
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index e0345c3e764e..e9e4221ef86f 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -1366,9 +1366,9 @@ inline struct io_rsrc_node *io_find_buf_node(struct io_kiocb *req,
- 	return NULL;
- }
++/* io_uring_cmd_import_fixed() flags */
++#define IO_URING_CMD_IMPORT_DMABUF	(1U << 0)
++
+ struct io_uring_cmd {
+ 	struct file	*file;
+ 	const struct io_uring_sqe *sqe;
+@@ -86,6 +89,8 @@ void __io_uring_cmd_done(struct io_uring_cmd *, unsigned issue_flags);
+ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+ 			    io_req_tw_func_t task_work_cb,
+ 			    unsigned flags);
++void io_uring_cmd_hw_done(struct io_uring_cmd *ioucmd,
++			  io_req_tw_func_t task_work_cb);
  
--int __io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
--			u64 buf_addr, size_t len, int ddir,
--			unsigned issue_flags, unsigned import_flags)
-+int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
-+		      u64 buf_addr, size_t len, int ddir,
-+		      unsigned issue_flags, unsigned import_flags)
+ /*
+  * Note: the caller should never hard code @issue_flags and only use the
+@@ -145,6 +150,10 @@ static inline void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+ 			    io_req_tw_func_t task_work_cb, unsigned flags)
  {
- 	struct io_rsrc_node *node;
- 
-diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index 418d236152ff..6226c7862d4e 100644
---- a/io_uring/rsrc.h
-+++ b/io_uring/rsrc.h
-@@ -66,21 +66,14 @@ int io_rsrc_data_alloc(struct io_rsrc_data *data, unsigned nr);
- 
- struct io_rsrc_node *io_find_buf_node(struct io_kiocb *req,
- 				      unsigned issue_flags);
--int __io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
--			u64 buf_addr, size_t len, int ddir,
--			unsigned issue_flags, unsigned import_flags);
-+int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
-+		      u64 buf_addr, size_t len, int ddir,
-+		      unsigned issue_flags, unsigned import_flags);
- int __io_import_reg_vec(int ddir, struct iov_iter *iter,
- 			struct io_kiocb *req, struct iou_vec *vec,
- 			unsigned nr_iovs, unsigned issue_flags,
- 			unsigned import_flags);
- 
--static inline int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
--				    u64 buf_addr, size_t len, int ddir,
--				    unsigned issue_flags)
--{
--	return __io_import_reg_buf(req, iter, buf_addr, len, ddir, issue_flags, 0);
--}
--
- static inline int io_import_reg_vec(int ddir, struct iov_iter *iter,
- 				    struct io_kiocb *req, struct iou_vec *vec,
- 				    unsigned nr_iovs, unsigned issue_flags)
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index 3a8559ff4dc6..327215e0f8b2 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -360,8 +360,9 @@ static int io_init_rw_fixed(struct io_kiocb *req, unsigned int issue_flags,
- 	int ret;
- 
- 	if (!io->bytes_done) {
--		ret = __io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir,
--					  issue_flags, IO_REGBUF_IMPORT_ALLOW_DMABUF);
-+		ret = io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir,
-+					issue_flags,
-+					IO_REGBUF_IMPORT_ALLOW_DMABUF);
- 		if (ret)
- 			return ret;
- 		iov_iter_save_state(&io->iter, &io->iter_state);
+ }
++static inline void io_uring_cmd_hw_done(struct io_uring_cmd *ioucmd,
++					io_req_tw_func_t task_work_cb)
++{
++}
+ static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+ 		unsigned int issue_flags)
+ {
 diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index b5486b56ee0c..4dac3ba162ae 100644
+index d77a94d19cb5..446bc8a363e6 100644
 --- a/io_uring/uring_cmd.c
 +++ b/io_uring/uring_cmd.c
-@@ -279,7 +279,7 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+@@ -10,6 +10,7 @@
+ 
+ #include "io_uring.h"
+ #include "alloc_cache.h"
++#include "dma-buf.h"
+ #include "rsrc.h"
+ #include "kbuf.h"
+ #include "uring_cmd.h"
+@@ -28,6 +29,7 @@ static void io_req_uring_cleanup(struct io_kiocb *req, unsigned int issue_flags)
+ 	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
+ 	struct io_async_cmd *ac = req->async_data;
+ 
++	io_detach_dmabuf_map(req);
+ 	if (issue_flags & IO_URING_F_UNLOCKED)
+ 		return;
+ 
+@@ -132,12 +134,26 @@ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+ 
+ 	if (WARN_ON_ONCE(req->flags & REQ_F_APOLL_MULTISHOT))
+ 		return;
++	/* the dma-buf map must be dropped first, see io_uring_cmd_hw_done() */
++	WARN_ON_ONCE(req->dmabuf_map);
+ 
+ 	req->io_task_work.func = task_work_cb;
+ 	__io_req_task_work_add(req, flags);
+ }
+ EXPORT_SYMBOL_GPL(__io_uring_cmd_do_in_task);
+ 
++/*
++ * Queue completion in task context after dropping references that must be
++ * released at hardware completion rather than from task_work.
++ */
++void io_uring_cmd_hw_done(struct io_uring_cmd *ioucmd,
++			  io_req_tw_func_t task_work_cb)
++{
++	io_detach_dmabuf_map(cmd_to_io_kiocb(ioucmd));
++	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, IOU_F_TWQ_LAZY_WAKE);
++}
++EXPORT_SYMBOL_GPL(io_uring_cmd_hw_done);
++
+ /*
+  * Called by consumers of io_uring_cmd, if they originally returned
+  * -EIOCBQUEUED upon receiving the command.
+@@ -257,6 +273,7 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
+ 
+ 	ret = file->f_op->uring_cmd(ioucmd, issue_flags);
+ 	if (ret == -EAGAIN) {
++		io_detach_dmabuf_map(req);
+ 		ioucmd->flags |= IORING_URING_CMD_REISSUE;
+ 		return ret;
+ 	}
+@@ -276,13 +293,20 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+ 			      unsigned int import_flags)
+ {
+ 	struct io_kiocb *req = cmd_to_io_kiocb(ioucmd);
++	unsigned int flags = 0;
++	int ret;
+ 
  	if (WARN_ON_ONCE(!(ioucmd->flags & IORING_URING_CMD_FIXED)))
  		return -EINVAL;
+-	if (WARN_ON_ONCE(import_flags))
++	if (WARN_ON_ONCE(import_flags & ~IO_URING_CMD_IMPORT_DMABUF))
+ 		return -EINVAL;
++	if (import_flags & IO_URING_CMD_IMPORT_DMABUF)
++		flags |= IO_REGBUF_IMPORT_ALLOW_DMABUF;
  
--	return io_import_reg_buf(req, iter, ubuf, len, rw, issue_flags);
-+	return io_import_reg_buf(req, iter, ubuf, len, rw, issue_flags, 0);
+-	return io_import_reg_buf(req, iter, ubuf, len, rw, issue_flags, 0);
++	ret = io_import_reg_buf(req, iter, ubuf, len, rw, issue_flags, flags);
++	if (ret)
++		return ret;
++	return io_attach_dmabuf_map(req, iter, issue_flags);
  }
  EXPORT_SYMBOL_GPL(io_uring_cmd_import_fixed);
  
