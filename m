@@ -1,67 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793421763;
-	b=nJhuVk7VSpnqOD3LLzBEV2cmivIPQbhnAu05xshlBmsH38/i8q7Jk3pbUXXNHeNdi3st
-	 3DSwfr4gKMwiSZJ4t7mUmizaPS1iiXghPlmrBv6nl5zXSZN2enAo+Fu5Y7lI05VIHoQNc
-	 RJ9WG0I4SFvLxS6rlpshUHmJmMMWHFx7wIyrDif+sZc1+iVwkudw+/mg6hWM3U5rav1Lq
-	 Ty/FeXkYB1TtWyXhnekp+wl7zz3u6bwpKPclRquhMPZUo+7pTPgYtGFeH6GR3p70TpOBi
-	 Z6V4n+IPeHa9I3RlYZYLGwVs6BaW9yA61rS0kIrN1WArbjVdY3ac4NiTXqGfZsVpcOA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793421763;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-ZohoMailClient;
-	bh=sJ8c5IFCspf4DEBszgGmF7j4hNNQUDcLYzLMI5yLgEQ=;
-	b=Evj40RKtyHSG3jei7AEy57eAPYni6r8W/gtBaeWVLsSYpdAiO3f87F3HRDHI5xKiyiNn
-	 SXl7Juo7+m4VO+xollAMOtp2Tu6P3fzzlMsULY7BWLK5UJLUXLX1VmTFVROfY9p/lJHc0
-	 wutIE0fw6hbMB3W8KmIZKD7d/fKnBdWLkx+NVu8lw0RB0FSWcrw419pyu+0eEXY5mB3wM
-	 vuKIAYXffh3eKu1Pd7KT2JaH5kOC1RfQHFza9pAFtqm2vcKXnTDAQhl5fC+G/AxnWp3Ry
-	 RsVsI5M5grqAzWTLh4Z7JK9DNxBznD3bgEvSavP8Wo50NvhjBk8lNUIXEJlHKhas42A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=laveeshbansal.com;
-	spf=pass smtp.mailfrom=laveeshbansal.com;
-	dkim=pass header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=Z4KXrakm;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
-Received: from sender5-op-o15.zoho.com (sender5-op-o15.zoho.com [165.173.182.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.69
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793438804;
+	b=CFlx+ZSrxz4CvIKgGquHbBN7P37Y9IG1eRbOVoj9IuBeGwr3Qaqp+acordMbWE+3i8Vp
+	 RewYD/8QV8GfqWTyxVooNfGTYFYhrzkvRgOxXi/p3KayvuF1S/c/o5qu1yphy/3h/p/ee
+	 PAx76f6/sJ7P8ediin1ln7iwKDI5nuYzps2YSr+ANCDmTITZLT2NeaTq/BlW5T3ikN78e
+	 1+u59spwQiMQKN3uO2FdP2oCB00thVpiw0wvhnMSOHNNqYkvJUjk/iXdKtc+FD2wqbUO0
+	 00BQpGgm5h0mmqXWhnNPCgPL3HLBAVXEcK9IUBTL+CHGuq5qK9g5GepKM7JKwGnOF0g==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793438804;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 MIME-Version:X-Received:Date:X-Google-Appengine-App-Id:
+	 X-Google-Appengine-App-Id-Alias:Message-ID:Subject:From:To:
+	 Content-Type;
+	bh=lYUXLDsuH0kOjSZHyOASfKtU+4hD7I+9skjy+tMb1e0=;
+	b=wBCIZfQlc/Sby8hkFaNbj7h3zev/fWHqZXaUcJgJxVUIcgr1lDUrVL7pDuKTxe/yEKEt
+	 C4qYzp5FS2s1E5SxXsynieQz0zokXxKoK4Kil/5jvey+M1/waOhibEeDH0J21cSPz3hUm
+	 evsYYkN7kwlsUu8a1u7UkF37BPRJkeDawSkqXhVRWdr+PMYf29dADruj/SYp48rwqPf7F
+	 iSk4rs794e3MQV4/aXf/UaAuFuf8/2l41ZpcnKaDAbF/niznH670sjHyIjqQ8iwB7/D0d
+	 fKGwMipLBxFGC0McvMBRDlY6g/LiHTXIRgV2peIc+9PHghN5GngxN5NpAePQAkxjNrA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.210.69
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4C4606A31A;
-	Sat, 31 Oct 2026 04:42:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DA4C4606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=Z4KXrakm
-ARC-Seal: i=1; a=rsa-sha256; t=1793421727; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Qrnh/0l1BjZe0hRSg+hJR51f8ivnnA4Scj3HvyOLaP+46Jl01lVSUfEQ73WcOfrd/ajVb/2Nluy2EiCjf+FfKoLs0B99QCSwMwDfpM+mDOLWcL0na3HUtT7ar5KFhae3o27DT/ccV/gWZBeD8GPC71xf5kMMKLWnJeGmKdyEwzY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1793421727; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=sJ8c5IFCspf4DEBszgGmF7j4hNNQUDcLYzLMI5yLgEQ=; 
-	b=gwJsenMSVQqygQaSljcsBT8OcK8Nyr2GMB5SYRTuqoxvYMjPzRpIL2oL3Iy+N+ptrIKfYH1N1Ceit99mQ5cCumZ6OuTZ8IA9T6UxV4C58GS9r1R4jtOuUnTMAFllq16JO5uZjx8FIh864rIqwmAB7XMUUpmIKnL8JnL/98DyvAk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=laveeshbansal.com;
-	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
-	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
-DKIM-Signature: a=rsa-sha256; b=Z4KXrakm1cIB6eVUJu2+dqdKAoSGXt+QvS3LF0cnw+mMHWrWSK8o3rzoPGIrp0THR8FURK+rPLY2PCM9cazdyN872Qv9tscQ9q4eiSuiklNmXd/aw7nXui6a2Xs7ljSRdcpNuMXuzrOxN/igx6cUCr26DN2CgQCFMq+gEMRPQEc=; c=relaxed/relaxed; s=zoho; d=laveeshbansal.com; v=1; bh=sJ8c5IFCspf4DEBszgGmF7j4hNNQUDcLYzLMI5yLgEQ=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
-Received: by smtp.zohomail.com with SMTPS id 1793421724606653.8085461912727;
-	Fri, 30 Oct 2026 21:42:04 -0700 (PDT)
-From: Laveesh Bansal <laveeshb@laveeshbansal.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Yu Kuai <yukuai@fygo.io>,
-	Reindl Harald <h.reindl@thelounge.net>,
-	regressions@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] block: only serialize elevator switches of the same queue
-Date: Fri, 30 Oct 2026 21:41:41 -0700
-Message-ID: <20261031044141.5569-1-laveeshb@laveeshbansal.com>
-X-Mailer: git-send-email 2.54.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0809606A31D
+	for <linux-block@vger.kernel.org>; Sat, 31 Oct 2026 09:26:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F0809606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-85c6a056128so1527717a34.3
+        for <linux-block@vger.kernel.org>; Sat, 31 Oct 2026 02:26:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793438803; x=1794043603;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=lYUXLDsuH0kOjSZHyOASfKtU+4hD7I+9skjy+tMb1e0=;
+        b=JzuGKL0cECvFPwwWo3+UYQc2LGP3WGnu34N/S1A2U8llPt8FhCOUZuCyj2t+709MLc
+         xpAL9cX++ZFZ6VTSuHDxWnVYBI1J3QlJNF6DFxoQFhPnkd7dwFr5+J+dAKeHXPQWXQXf
+         FfdS70cRAkHsrVJbiJ+nIQQr0Q2iPw9Mg8YfWVQIbUXeNWssHlpTg8YapQtr6ojqAYik
+         02l45Aa3CUJWwMYT1wPQCjAnG3VcigqqgkToOsNged0w92/pjYS4c/BeHF0K88Jv1vTF
+         KfobdAtAaWco0CIfPRQlVvaPMZjS/crzUYzw9tWp39az+3P35XDv0Rw6f6xqY7GuhPIG
+         Xo9w==
+X-Gm-Message-State: AFq9FYK8CMrTdMVcmhr/uA8ZiocBh0eX2hg11IEyntjD7VCICqAFVDPG
+	tfKmGEYSFwDWBEcqFUvENIaUuK5VJfOskSRgjS8XNOIo0+L7Qesh19zUrNZcw1eX6wklxHzKUql
+	L3P3odVtLmxacHbcAxIKI5K7s+l9qwHz/n4V1Z+7c6AAT1NqeW8DkuYJCkJk=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -71,150 +57,219 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-Received: by 2002:a05:6808:6718:b0:557:308a:9e9a with SMTP id
+ 5614622812f47-5640dcfd646mr3138139b6e.21.1793438802958; Sat, 31 Oct 2026
+ 02:26:42 -0700 (PDT)
+Date: Sat, 31 Oct 2026 02:26:42 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6ae5b452.88e51036.1515fd.0004.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in md_alloc
+From: syzbot <syzbot+cd254889291ef8666036@syzkaller.appspotmail.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Since commit 4ff58d6bc9dd ("block: serialize elevator changes for the
-same queue using a writer lock"), a write to queue/scheduler fails with
--EBUSY whenever something else holds set->update_nr_hwq_lock. That
-commit takes the lock for write, and it has to be a trylock because of
-commit ce8ee8583ed8 ("block: use trylock to avoid lockdep circular
-dependency in sysfs").
+Hello,
 
-The lock covers the whole tag set, so it is easy to hit. A scheduler
-write fails while another queue of the set is switching, or while a
-sibling disk of the same SCSI host or NVMe controller is added or
-removed. This matches the udev failures reported on 7.2.
+syzbot found the following issue on:
 
-Go back to taking the lock for read. The write lock was there to keep
-two switches of one queue from overlapping in elevator_change_done(),
-which touches the elevator sysfs and debugfs entries outside of
-q->elevator_lock. Use QUEUE_FLAG_NO_ELV_SWITCH for that instead: a
-write sets it before elevator_change() and clears it afterwards, and a
-write that finds it set returns -EBUSY. Disk removal already sets the
-flag under the write lock, so no switch can start once it has run.
+HEAD commit:    a39c95080621 Add linux-next specific files for 20261029
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=1406117f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=82467d52d846ff27
+dashboard link: https://syzkaller.appspot.com/bug?extid=cd254889291ef8666036
+compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16477d31580000
 
-Writes to the same queue, and writes that race with an nr_hw_queues
-update, an nr_requests write or disk removal, can still get -EBUSY, as
-with 4ff58d6bc9dd. A write to a disk that is being removed now gets
--EBUSY instead of -ENOENT.
+AI-generated root cause summary:
+A circular locking dependency exists between major_names_lock, md's internal
+disks_mutex, and mddev->reconfig_mutex. In blk_probe_dev(), major_names_lock is
+held while invoking the driver's autoload probe callback md_probe(), which calls
+md_alloc() and acquires disks_mutex followed by mddev->reconfig_mutex.
+Concurrently, md ioctls (such as ADD_NEW_DISK) hold mddev->reconfig_mutex while
+calling bdev_file_open_by_dev(), which triggers block device autoloading and
+attempts to acquire major_names_lock via blk_request_module() / blk_probe_dev(),
+resulting in a potential ABBA deadlock.
 
-Fixes: 4ff58d6bc9dd ("block: serialize elevator changes for the same queue using a writer lock")
-Cc: stable@vger.kernel.org # v7.2+
-Reported-by: Reindl Harald <h.reindl@thelounge.net>
-Closes: https://lore.kernel.org/r/077dd42e-cbc9-4c23-a5ef-3d20e4fc7757@thelounge.net
-Suggested-by: Nilay Shroff <nilay@linux.ibm.com>
-Assisted-by: LLM
-Signed-off-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
+full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=cd254889291ef8666036
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com
+
+md: could not open device unknown-block(8,200).
+md: error, md_import_device() returned -6
+md: could not open device unknown-block(8,250).
+md: error, md_import_device() returned -6
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz-executor140/6002 is trying to acquire lock:
+ffffffff91329200 (disks_mutex){+.+.}-{4:4}, at: md_alloc+0x40/0xf40 drivers/md/md.c:6355
+
+but task is already holding lock:
+ffffffff9096c060 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev block/genhd.c:885 [inline]
+ffffffff9096c060 (major_names_lock){+.+.}-{4:4}, at: blk_request_module+0x35/0x2a0 block/genhd.c:901
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (major_names_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+       blk_probe_dev block/genhd.c:885 [inline]
+       blk_request_module+0x35/0x2a0 block/genhd.c:901
+       blkdev_get_no_open+0x3f/0xe0 block/bdev.c:870
+       bdev_file_open_by_dev+0xa0/0x240 block/bdev.c:1091
+       md_import_device+0x2e9/0x650 drivers/md/md.c:3861
+       md_add_new_disk+0x522/0x1850 drivers/md/md.c:7681
+       md_ioctl+0x2027/0x2630 drivers/md/md.c:8525
+       blkdev_ioctl+0x5e3/0x740 block/ioctl.c:798
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (&mddev->reconfig_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+       mddev_lock_nointr drivers/md/md.h:734 [inline]
+       md_alloc+0x81e/0xf40 drivers/md/md.c:6413
+       md_alloc_and_put+0x1a/0x1f0 drivers/md/md.c:6452
+       add_named_array+0x240/0x350 drivers/md/md.c:-1
+       param_attr_store+0x214/0x310 kernel/params.c:591
+       module_attr_store+0x65/0x90 kernel/params.c:906
+       kernfs_fop_write_iter+0x3a4/0x540 fs/kernfs/file.c:345
+       new_sync_write fs/read_write.c:595 [inline]
+       vfs_write+0x612/0xba0 fs/read_write.c:687
+       ksys_write+0x150/0x270 fs/read_write.c:1036
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (disks_mutex){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3209 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+       validate_chain kernel/locking/lockdep.c:3952 [inline]
+       __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
+       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+       md_alloc+0x40/0xf40 drivers/md/md.c:6355
+       md_alloc_and_put+0x1a/0x1f0 drivers/md/md.c:6452
+       blk_probe_dev block/genhd.c:888 [inline]
+       blk_request_module+0x27d/0x2a0 block/genhd.c:-1
+       blkdev_get_no_open+0x3f/0xe0 block/bdev.c:870
+       blkdev_open+0x1d7/0x600 block/fops.c:678
+       do_dentry_open+0x80e/0x1360 fs/open.c:1000
+       vfs_open_consume+0x4a/0x350 fs/open.c:1131
+       do_open fs/namei.c:4845 [inline]
+       path_openat+0x16fc/0x20f0 fs/namei.c:5010
+       do_file_open+0x23e/0x4a0 fs/namei.c:5039
+       do_sys_openat2+0x115/0x200 fs/open.c:1442
+       do_sys_open fs/open.c:1448 [inline]
+       __do_sys_openat fs/open.c:1788 [inline]
+       __se_sys_openat fs/open.c:1783 [inline]
+       __x64_sys_openat+0x138/0x170 fs/open.c:1783
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  disks_mutex --> &mddev->reconfig_mutex --> major_names_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(major_names_lock);
+                               lock(&mddev->reconfig_mutex);
+                               lock(major_names_lock);
+  lock(disks_mutex);
+
+ *** DEADLOCK ***
+
+locks held by syz-executor140/6002: 1, last CPU#1:
+ #0: ffffffff9096c060 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev block/genhd.c:885 [inline]
+ #0: ffffffff9096c060 (major_names_lock){+.+.}-{4:4}, at: blk_request_module+0x35/0x2a0 block/genhd.c:901
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 6002 Comm: syz-executor140 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/07/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2087
+ check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2219
+ check_prev_add kernel/locking/lockdep.c:3209 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+ validate_chain kernel/locking/lockdep.c:3952 [inline]
+ __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
+ lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+ md_alloc+0x40/0xf40 drivers/md/md.c:6355
+ md_alloc_and_put+0x1a/0x1f0 drivers/md/md.c:6452
+ blk_probe_dev block/genhd.c:888 [inline]
+ blk_request_module+0x27d/0x2a0 block/genhd.c:-1
+ blkdev_get_no_open+0x3f/0xe0 block/bdev.c:870
+ blkdev_open+0x1d7/0x600 block/fops.c:678
+ do_dentry_open+0x80e/0x1360 fs/open.c:1000
+ vfs_open_consume+0x4a/0x350 fs/open.c:1131
+ do_open fs/namei.c:4845 [inline]
+ path_openat+0x16fc/0x20f0 fs/namei.c:5010
+ do_file_open+0x23e/0x4a0 fs/namei.c:5039
+ do_sys_openat2+0x115/0x200 fs/open.c:1442
+ do_sys_open fs/open.c:1448 [inline]
+ __do_sys_openat fs/open.c:1788 [inline]
+ __se_sys_openat fs/open.c:1783 [inline]
+ __x64_sys_openat+0x138/0x170 fs/open.c:1783
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9cb93efb37
+Code: 48 89 fa 4c 89 df e8 98 1d 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+RSP: 002b:00007ffd0a7a14d0 EFLAGS: 00000202 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 000055558698d400 RCX: 00007f9cb93efb37
+RDX: 0000000000000002 RSI: 00007ffd0a7a15f0 RDI: ffffffffffffff9c
+RBP: 00007ffd0a7a15b0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000202 R12: 00007ffd0a7a15f0
+R13: 00000000ffffffff R14: 00007f9cb942909a R15: 0000000000000002
+ </TASK>
+md: async del_gendisk mode will be removed in future, please upgrade to mdadm-4.5+
+block device autoloading is deprecated and will be removed.
+md: async del_gendisk mode will be removed in future, please upgrade to mdadm-4.5+
+block device autoloading is deprecated and will be removed.
+
+
 ---
-Changes since v1 (https://lore.kernel.org/r/20261023201704.20577-1-laveeshb@laveeshbansal.com):
-- Replaced the new mutex with QUEUE_FLAG_NO_ELV_SWITCH as a busy bit
-  under the read lock, as Nilay suggested
-  (https://lore.kernel.org/r/7f697f9d-6e8c-4544-bca7-137d3f3d2dbf@linux.ibm.com).
-- Shin'ichiro's Tested-by on v1 does not carry over, since the code changed.
-- I also tried taking q->sysfs_lock around the switch instead. It fixes
-  the report too, but same-queue writers wait on it, and 1bf70d08cc3b
-  ("block: introduce a dedicated lock for protecting queue elevator
-  updates") moved elevator switching off that lock, so I kept the flag.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Tested on arm64 and x86_64 in QEMU, with KASAN, lockdep and debug lists.
-Writes to queue/scheduler failing with -EBUSY, one number per run
-(writers x writes):
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-                                       x86_64        arm64
-  one writer per namespace (NVMe, one controller)
-    v7.3, 4 x 400                      572, 649, 597 704, 662
-    this patch, 4 x 400                0, 0          0, 0
-  one writer, sibling namespaces added and removed
-    v7.3, 1 x 400                      23, 32, 34    42, 43
-    this patch, 1 x 400                0, 0, 1       0, 4, 1
-  four writers on the same queue (null_blk)
-    v7.3, 4 x 400                      849, 795, 756 807, 926
-    this patch, 4 x 400                779, 790      910, 816
-  one writer per SCSI disk (scsi_debug, 4 LUNs on one host)
-    v7.3, 4 x 400                      828, 818      -
-    this patch, 4 x 400                0, 0          -
-  one writer on a SCSI disk, siblings deleted and rescanned
-    v7.3, 1 x 400                      43, 46        -
-    this patch, 1 x 400                0, 0          -
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-20 disk removals under writers complete on both architectures, with no
-KASAN, lockdep or hung-task reports. blktests on x86_64 (all groups
-except bcache, blktrace, rnbd and srp) gives the same results as v7.3.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
- block/elevator.c       | 30 +++++++++++++++++-------------
- include/linux/blkdev.h |  4 +---
- 2 files changed, 18 insertions(+), 16 deletions(-)
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 2161b6eea680..66edf1a5768a 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -812,25 +812,29 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
- 	 * reference during concurrent disk deletion:
- 	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
- 	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
--	 *
--	 * Use the writer lock instead of the reader lock of update_nr_hwq_lock
--	 * to serialize the two-stage elevator switch steps in
--	 * elevator_change(): the core switch step under the elevator lock and
--	 * the elevator_change_done() step outside the elevator lock.
- 	 */
--	if (!down_write_trylock(&set->update_nr_hwq_lock)) {
-+	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
- 		ret = -EBUSY;
- 		goto out;
- 	}
--	if (!blk_queue_no_elv_switch(q)) {
--		ret = elevator_change(q, &ctx);
--		if (!ret)
--			ret = count;
--	} else {
--		ret = -ENOENT;
-+
-+	/*
-+	 * The reader lock is shared, so use QUEUE_FLAG_NO_ELV_SWITCH to allow
-+	 * only one switch of this queue at a time, and none once the disk is
-+	 * going away.
-+	 */
-+	if (test_and_set_bit(QUEUE_FLAG_NO_ELV_SWITCH, &q->queue_flags)) {
-+		ret = -EBUSY;
-+		goto out_unlock;
- 	}
--	up_write(&set->update_nr_hwq_lock);
- 
-+	ret = elevator_change(q, &ctx);
-+	if (!ret)
-+		ret = count;
-+
-+	blk_queue_flag_clear(QUEUE_FLAG_NO_ELV_SWITCH, q);
-+out_unlock:
-+	up_read(&set->update_nr_hwq_lock);
- out:
- 	if (ctx.type)
- 		elevator_put(ctx.type);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4f7905c3412b..3989bb0dd43b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -675,7 +675,7 @@ enum {
- 	QUEUE_FLAG_HCTX_ACTIVE,		/* at least one blk-mq hctx is active */
- 	QUEUE_FLAG_SQ_SCHED,		/* single queue style io dispatch */
- 	QUEUE_FLAG_DISABLE_WBT_DEF,	/* for sched to disable/enable wbt */
--	QUEUE_FLAG_NO_ELV_SWITCH,	/* can't switch elevator any more */
-+	QUEUE_FLAG_NO_ELV_SWITCH,	/* a switch is running or disk is going away */
- 	QUEUE_FLAG_QOS_ENABLED,		/* qos is enabled */
- 	QUEUE_FLAG_BIO_ISSUE_TIME,	/* record bio->issue_time_ns */
- 	QUEUE_FLAG_ZONED_QD1_WRITES,	/* Limit zoned devices writes to QD=1 */
-@@ -716,8 +716,6 @@ void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
- 	((q)->limits.features & BLK_FEAT_SKIP_TAGSET_QUIESCE)
- #define blk_queue_disable_wbt(q)	\
- 	test_bit(QUEUE_FLAG_DISABLE_WBT_DEF, &(q)->queue_flags)
--#define blk_queue_no_elv_switch(q)	\
--	test_bit(QUEUE_FLAG_NO_ELV_SWITCH, &(q)->queue_flags)
- #define blk_queue_zoned_qd1_writes(q)	\
- 	test_bit(QUEUE_FLAG_ZONED_QD1_WRITES, &(q)->queue_flags)
- 
--- 
-2.43.0
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
+If you want to undo deduplication, reply with:
+#syz undup
