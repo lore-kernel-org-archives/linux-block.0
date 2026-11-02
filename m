@@ -1,102 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793604421;
-	b=ZxavdFSB9CyLCVAkE41PzTuGpef4R32wADIiDZOUeEiQEPpm9WLsrHQ72H48FRL7Z/Rn
-	 w2ml174xQ7F5vBxpcAzCaNvUe6t/YZZXZOWSlsHabMp4x3U0cpC+aZUFZiH/pu9/quEV1
-	 g/QUkLV6U+PU51j/oNyS5EzJuZROoZ9pACbNWjw12HEXaIyZhWYYUtWtAeLSj4O3G4rOB
-	 waokUnxe+FLe2ej0GrnvotuCIR+R8VcWIvyze2/AJjVYoB30t3AsSI3DprTw6A4uJwv5j
-	 XVvZbAD65gOiqtix0F0QnWExzXudKWcZIgCnsCDaTNhXvgmR1IqeZWJ+yrgbBp/sEtw==
+	t=1793606449;
+	b=G1a5zpqKyUg6LlP++Wfjh3mxMK/1H/ebv7r9nFn5von5sMER8mNOsK94+aVSJDd7UOaE
+	 lVivZ8sgpbyrBqZYW1kcq/r74tE7dqd+dvrvIKi0tMUAsbO4BBXuZ/RE0U1wtSN9ygRZN
+	 L0tzH38mVVtx0CntE32AgdTZvkkz3qjgmX5tyEmCz5z2WM1xfVjBWF8x1iubhYU72Mngg
+	 Dl4MgM90WElgGtID77hNEhU0eNjK0lF4OEgToYj0kNyS7+dcOzPwga33cXDIlp8qycJOD
+	 L3Tic3+yhbVA/HrCfOzzQLMqrfSmpLbGrP2S5u1m1Ie2pJPv8S/twm1U47dVpf7VW+Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793604421;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Spam-Score:
-	 X-Spam-Level:X-Spam-Flag;
-	bh=TH0IBD57jKAGJCpKPw6WuC+ywmk1dUAZkICAD3tTpTk=;
-	b=niVKfKGMJajn1QCLUQ+zCFe/OI3DBmDpsp7OHxA2kaBJtsuVHyBUFPwBBJG0rEPXa7x0
-	 qUCyBpmGssyNM8F/cRM16E9hS7tW7Que1FVTp9am9zcrcRuj/icE8NFW+ng18U3DgaX9O
-	 RHkFHq5mRVduL5Dsf+B+sjEJhpxHHjkEc3gG71DQveVgSPv/W4Mj/RyUNWoCcfQQLAXdM
-	 4bhWNxNnUjrZXDQY8JRq5YzKsuTw+fZvjhhvN9ltXs7epOEmJ67vT6y3qqUJReTH2oWW6
-	 nq8oTByWjsyyMqunZDKaXmT2sLibGZSvvwiFiEk9dwD5rVZ9vAbljQsYmhts2zQBzcA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793606449;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=8kqF3ntzYW3hP6K+8Zi1mBskB8D2QgCHbNZ8Jdf9/+4=;
+	b=CYTqYTtiI3zd6+mBIbZ5Nhm68bkgsPGm+E+sWl2vGJWhIaRkH8zaRam301fGL+hk1onS
+	 vX3mW+rrAj5/Mu7x07CdiULCgocFPokFf5NffQ73wFvdVa92FWnNzqgSWa4NYAFII6f85
+	 2r8nCW10Lr50NwgMuN9QZSCZ8f2RC7IclnJuzKF8i3bJKjFC5aKE+H+PSMvJtVfaeg+DT
+	 ylGA1UdmKIGdKKrjCBJxHOQjUj2jHe9Im4CvCO8Due5wnEbG7BFco9M/AYfWXlUri6JHf
+	 bDbI9JCOf8N2M7yFg+V2YKoTxBHCI72X7rr1UEmifyt9I8iViZddpw8NMpmgfKsmOrg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nMt8BHjk;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b="tg47q/4A";
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nMt8BHjk;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b="tg47q/4A";
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WlSZwWCi;
+	arc=none smtp.remote-ip=74.125.82.175
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8876F606A324;
-	Mon,  2 Nov 2026 07:27:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8876F606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AE7606A327
+	for <linux-block@vger.kernel.org>; Mon,  2 Nov 2026 08:00:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A5AE7606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nMt8BHjk;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=tg47q/4A;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=nMt8BHjk;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=tg47q/4A
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B0D541F788;
-	Mon,  2 Nov 2026 07:26:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793604418; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TH0IBD57jKAGJCpKPw6WuC+ywmk1dUAZkICAD3tTpTk=;
-	b=nMt8BHjky/1S3YlOjl184PVLOw65SCzlu4n73GFxSTVyupFfIGsS3VqtuQJWBGZ6gyI0NT
-	XVEHCJKEzsW0pz4z1z3NuWBLYtg+8+UQETgXeqwb7OEiJEWe/hPuK9S/zj9F7bYG08G77O
-	Q+ysKX66LokrFu0L6P09u4g8D3/wsUA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793604418;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TH0IBD57jKAGJCpKPw6WuC+ywmk1dUAZkICAD3tTpTk=;
-	b=tg47q/4AJwq592NmqX2E0MwXUjLzXsl+/I0fHmMcZNh0cuTBsSi0NUXMPOEbfufoYhKzRh
-	vNp4CMc0n7chf0Ag==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793604418; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TH0IBD57jKAGJCpKPw6WuC+ywmk1dUAZkICAD3tTpTk=;
-	b=nMt8BHjky/1S3YlOjl184PVLOw65SCzlu4n73GFxSTVyupFfIGsS3VqtuQJWBGZ6gyI0NT
-	XVEHCJKEzsW0pz4z1z3NuWBLYtg+8+UQETgXeqwb7OEiJEWe/hPuK9S/zj9F7bYG08G77O
-	Q+ysKX66LokrFu0L6P09u4g8D3/wsUA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793604418;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TH0IBD57jKAGJCpKPw6WuC+ywmk1dUAZkICAD3tTpTk=;
-	b=tg47q/4AJwq592NmqX2E0MwXUjLzXsl+/I0fHmMcZNh0cuTBsSi0NUXMPOEbfufoYhKzRh
-	vNp4CMc0n7chf0Ag==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4371E134B3;
-	Mon,  2 Nov 2026 07:26:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id UBfCAEI76GpfbQAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 02 Nov 2026 07:26:58 +0000
-Message-ID: <6e9e6f78-4bd7-46f0-bf57-5c227a65a69e@suse.de>
-Date: Mon, 2 Nov 2026 08:26:57 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WlSZwWCi
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-3514b90bb89so5550351eec.1
+        for <linux-block@vger.kernel.org>; Mon, 02 Nov 2026 00:00:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793606448; x=1794211248; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=8kqF3ntzYW3hP6K+8Zi1mBskB8D2QgCHbNZ8Jdf9/+4=;
+        b=WlSZwWCiq2PAF+H6oZ4EkhdoOGWWeYu7f56c319sIi8m2ToY7CTu8Y1DrLbRw5nAMi
+         L/5UoU6Ivu2LXjt4JX5Ig+TwCrsCPKYiDYhYqCEA0pmOubyaR5IDeoSVVqZWWkXXErSE
+         SdCJnanp2UU9nHttCa77WOscrVnwFOW2Dep+EqPNgDolIWhnjfHb5vj7ad/Sz0T6wMjH
+         Zwhr6BJQBoovDKodO/hmXJfFwliqpS3zeEdgRItceAgDjcb8mjTIwza1U6Spp1L3UvEg
+         o2RTw7QhM0mx0SWZPyJhv0SRjAGB4x/QqicIe62ASgt9nFNEnYTSFHRxjq6v525KWzBn
+         CPDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793606448; x=1794211248;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8kqF3ntzYW3hP6K+8Zi1mBskB8D2QgCHbNZ8Jdf9/+4=;
+        b=NG+Nl67Dp75PURUM7WTwBHET0KRDUQByKP9FqzcDXPyF0K8vKpw0N9vaHHGGl2CG3H
+         h9hqtj9yIyMPRnsUHnojrq/kqhhqFIfYMqcxZWi/vq4rfPB9v9CkQieBNQiPJYTFPwAj
+         /qeDzTjDOulP7GbuAtZSYL6fatGKGqAgUmsGPK9k++Y+LNOAEXT7vw4/PpulUxzxSq87
+         mgj/vdDpVPgxbctGZMQ18lYJRAB6fQGksgBjSOmFPu5n5iJbtjHWzgwLRR+qBTPSiCMA
+         uc+dczjxns4QI/MOxLp3WHuQkQT11FJ6AUuzNq3pth5TMRKFcW9wt/fW95a7awy8exO3
+         rKAA==
+X-Forwarded-Encrypted: i=1; AKwUvByQdbvc3cCp0Faa9UDIsA9kpJ5jYc7kp++cfk5AUJzQWcBD4u8sJmUmi9cZrVy8x1utdiJA57parv6A/Q==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9Id0hdAULfC8sh+rTtKVJ2lu1T20B2j5vVkjdbpNuILeOxCCwR
+	NdWcbYpCqxK5fXDI9tp7iwUOo21/T2R1Zx0PaFw2wQUdHgxaJcUV+X2ivGGVGl0+tR8=
+X-Gm-Gg: AYBFou3rbJZZc9HiUB6T9m+S0yKKUMtIPBbxlXi58E6Z9wwMiXbK3+TlA9d+xbhyHPf
+	y/13Uco6twXT8+VCizqZqvx26OPNdisxFJbc1o+7kfgmrP+5ZgKv6ieFreRADk0KfRRwCZCQEee
+	zyf4WfOLRo1SZ+xltSBiutmWhJ8Z3VrisuUaK7OP7exVNooFH7WEh4ao3euC+0ifn16uyXRBEf2
+	NGVYs910L3C1LyuqK8F2Kf+/3VxXDPmSv1h7+l4XSQZIRXiAe7KPDo1vd/WwVVk6oDm36DsKNOv
+	m+g54ERdQ62bMwY/dNPh9zcsUr5IeJDwe9HavmpNRkpsDtaxZ+6nOnLs8W8YCd0IYjZSN0/ElhJ
+	hWZou0zt1BT7QW47ZgtRIze9N7aIKSXKrO2IrVAIX8Aaey29ZDWgYKCaHtrXXFMORE66kLCj1w9
+	huT7s94SdgAr9lDqAzirA2Rj773rVZ3cv6++kd104VYJKWzpVvPBvNi9F/q6ShLlJ1Yf/nCcr3v
+	3C47eaqboA0GVBB4D9yurlISJTOut+yK510/hTlk/7wAak4eBNSyNl8qdc31LW+UJjPIXCfeekS
+	EMpbVjLbYURlwyu5Bmaq
+X-Received: by 2002:a05:693c:4152:20b0:36a:1807:75a4 with SMTP id 5a478bee46e88-36a423cacb4mr16532556eec.20.1793606447377;
+        Mon, 02 Nov 2026 00:00:47 -0800 (PST)
+Received: from ubuntu.. ([23.254.208.9])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428aed76sm36371585eec.9.2026.11.02.00.00.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Nov 2026 00:00:46 -0800 (PST)
+From: Qiliang Yuan <odys.yuan@gmail.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Ming Lei <tom.leiming@gmail.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Stuart Hayes <stuart.w.hayes@gmail.com>
+Subject: Re: [PATCH 1/2] nvme: remove namespaces in parallel
+Date: Mon,  2 Nov 2026 03:00:41 -0500
+Message-ID: <20261102080041.1269654-1-odys.yuan@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <6e9e6f78-4bd7-46f0-bf57-5c227a65a69e@suse.de>
+References: <20261102-bug-nvme-remove-ns-async-v1-0-61780fee111c@gmail.com> <20261102-bug-nvme-remove-ns-async-v1-1-61780fee111c@gmail.com> <6e9e6f78-4bd7-46f0-bf57-5c227a65a69e@suse.de>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -106,131 +106,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] nvme: remove namespaces in parallel
-To: Qiliang Yuan <odys.yuan@gmail.com>, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- Nilay Shroff <nilay@linux.ibm.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Stuart Hayes <stuart.w.hayes@gmail.com>
-References: <20261102-bug-nvme-remove-ns-async-v1-0-61780fee111c@gmail.com>
- <20261102-bug-nvme-remove-ns-async-v1-1-61780fee111c@gmail.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261102-bug-nvme-remove-ns-async-v1-1-61780fee111c@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-11.79 / 50.00];
-	SUSE_INTERNAL_BYPASS(-9.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,kernel.dk,lst.de,grimberg.me];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,gmail.com,linux.ibm.com,wdc.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	TAGGED_RCPT(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
-X-Spam-Score: -11.79
-X-Spam-Level: 
-X-Spam-Flag: NO
 
-On 11/2/26 7:14 AM, Qiliang Yuan wrote:
-> nvme_remove_namespaces() removes the namespaces of a controller one
-> after another. Each removal waits for RCU grace periods in
-> del_gendisk() for the namespace and for its multipath head, about
-> 20 ms in all.
-> 
-But that isn't changed by calling async_schedule_domain, isn't it?
+On Mon, 2 Nov 2026 08:26:57 +0100, Hannes Reinecke wrote:
+> On 11/2/26 7:14 AM, Qiliang Yuan wrote:
+>> nvme_remove_namespaces() removes the namespaces of a controller one
+>> after another. Each removal waits for RCU grace periods in
+>> del_gendisk() for the namespace and for its multipath head, about
+>> 20 ms in all.
+>>
+> But that isn't changed by calling async_schedule_domain, isn't it?
 
-> Deleting a controller, such as disconnecting from a fabrics target,
-> thus takes time proportional to its namespace count, over a second for
-> 64 namespaces. Scanning had the same problem until commit 4e893ca81170
-> ("nvme_core: scan namespaces asynchronously") made it add namespaces
-> in parallel.
-> 
-> Remove the namespaces through an async domain the same way, and wait
-> for all of them before returning.
-> 
-> Disconnect time from a target on the same host, over tcp to 127.0.0.1
-> and over nvme-loop, with 4 I/O queues, median of 3 runs on each of two
-> boots per kernel:
-> 
->    namespaces  transport  before              after
->             8  tcp         170 /  171 ms        85 /   91 ms
->            32  tcp         628 /  628 ms       294 /  293 ms
->            64  tcp        1201 / 1308 ms       533 /  550 ms
->            64  loop       1988 / 1913 ms      1283 / 1200 ms
-> 
-> Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
-> ---
->   drivers/nvme/host/core.c | 13 ++++++++++++-
->   1 file changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index a7a4d09644c13..18948c2ba218d 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -4716,6 +4716,11 @@ static void nvme_scan_work(struct work_struct *work)
->   #endif
->   }
->   
-> +static void nvme_ns_remove_async(void *data, async_cookie_t cookie)
-> +{
-> +	nvme_ns_remove(data);
-> +}
-> +
->   /*
->    * This function iterates the namespace list unlocked to allow recovery from
->    * controller failure. It is up to the caller to ensure the namespace list is
-> @@ -4725,6 +4730,7 @@ void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
->   {
->   	struct nvme_ns *ns, *next;
->   	LIST_HEAD(ns_list);
-> +	ASYNC_DOMAIN(domain);
->   
->   	/*
->   	 * make sure to requeue I/O to all namespaces as these
-> @@ -4759,8 +4765,13 @@ void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
->   	mutex_unlock(&ctrl->namespaces_lock);
->   	synchronize_srcu(&ctrl->srcu);
->   
-> +	/*
-> +	 * Remove the namespaces in parallel, as each removal waits for several
-> +	 * RCU grace periods.
-> +	 */
->   	list_for_each_entry_safe(ns, next, &ns_list, list)
-> -		nvme_ns_remove(ns);
-> +		async_schedule_domain(nvme_ns_remove_async, ns, &domain);
-> +	async_synchronize_full_domain(&domain);
->   }
->   EXPORT_SYMBOL_GPL(nvme_remove_namespaces);
->   
-> 
-Other than that it looks fine.
+Right, each removal still waits about 20 ms. What changes is that the
+waits overlap. A grace period is system-wide, so removals that wait at
+the same time are released by the same grace periods instead of each
+needing its own. Disconnect time over tcp, from the table in the
+patch:
 
-Cheers,
+  namespaces  before              after
+           8   170 /  171 ms       85 /  91 ms
+          32   628 /  628 ms      294 / 293 ms
+          64  1201 / 1308 ms      533 / 550 ms
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+> Other than that it looks fine.
+
+Thanks for the review.
+
+Qiliang
