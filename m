@@ -1,65 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793602035;
-	b=JG2LWwL/jBTJ24F4XQ2l+5ol4upSW/rrlVX6j4PgVcymZOS0fcmxFAV79E2Yw1+JUjCo
-	 lXeJ5V6mqxVx9KKhO4U/TlNgMxxCeNWm+xZ6CY8DouYi5gHoZBkBsaQ3V73LyxFtGVm2S
-	 icgLczr72C/wyK+vg60Hc2DEi5/dqsDd43Gx+9YmkzcTYs5/NrUGwrqRK7jPaD1KFhTWK
-	 1gAtNd2wT6PgDBkDnVjg///rDAa6zyiVKGFCabs4EreHciUF0MZGN5oWaNxwobYT7w6iH
-	 5iBqxLhH4ffsoR/m0N+jPKlgfnzJh3T7Sgw03ZgFnplopaktrYOaajciRv4UXGAxOEw==
+	t=1793604163;
+	b=HzuJCamVjVYlMKFCzTQSuezDhoTscflWAYhsin3t3X0MplYwf6zN2HFvbnbABRRj4gnK
+	 ulohS3TmVVp/4GHUUD4B3lZwMtopKaDUXToTBw8vyMUkishKdaDVLlFnNrYTDBeLI3X7I
+	 KP+RrGGD+wF6UoLcYxE2mPnTylzr0dQcUlsvPWkavhTLxzgPAXCXIgzzLTE3XlGH8MYj5
+	 r8qJIFQLLWNzbh9ssoVduaz7Ega/icTXC5LtpUevxm8Q3SWNVGxtTzUiSHH0mKMhO8yWU
+	 vWm2xxSvA3id1y4TRjST5Qg7XcrfQcrD30D7ibaWZ1CPGVbgPqXlcAR1FQsINCS1Xng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793602035;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
-	 Subject:Date:Message-ID:X-Mailer:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=TnrMdknEv6+01oL0Xur2PpAkSyjvMCEFKEns63Q5Zd8=;
-	b=UunMFj0L7OJ9zPgtM7UlcwuEGhD//WW9nvHz7363dm5uBcSQ1mb7ZTXfmIkEnqcr278x
-	 9uJGV1H+l4ul+xcQUtLZOv99GDrUG4eg8MCG0Q4Jj0FDgGA7e8mF01vNlO4A2rlkGGUj3
-	 oFWq8FIBYgLLAG/KdQ6703vSKc28c084cX6fX6oC4qvyfsAZtVPTWcU2+8iDuua6/fRBa
-	 BjO/xe1exToGPkfF9qyHdMBdY0MOHkpOkNh1ekLDYTE45dW5hiJcQoZkN4Npz61I9LPXF
-	 CIB5lvMhlUTMNsTpg4fYd3EM1IMQK+5KiV4oMHtRS1SVZJyie/EAOWPF8svnTWRm4Hw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793604163;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Spam-Flag:X-Spam-Level:
+	 X-Spamd-Result:X-Spam-Score;
+	bh=lxjewwj2nxYhKCWZW7nt6HgiTVdnylcH/diTEvdKaKQ=;
+	b=E0ZFqDmnWmGx0QEv08YqhL50RX7CelWjV//nhw9vuwKB8NswBijaxPmgR1aiibRZSwn0
+	 gsJQMu0juvSGm9qDoTl6JU8fXXp+IpsLV6mJQUSWP26QsV7KbnnCuMTAQhm87/37BxhJM
+	 x4p7u1XQQlyAjoTd+YwSmCjEH/Otz4GWzPIV6KO/i4kzz//B96T3Q7N6ca+PlG7pVtwTR
+	 FGuOyq0196RsZmK+AlpeMy73ZrbJKSyncDOwfUDTK3wCVkDZhkZBYbWlVUaXwnYD+m0Tc
+	 ptwTYZ+s1uDmyecHKo4B65Qy3tKP+XhF9OTGSyL2hAD8KKdNnFRwLxYXUraqR5p2Tpg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	arc=none smtp.remote-ip=113.46.200.217
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b="R0m/Aesq";
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=DcICn4YV;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=QbVhc5Jj;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=BIxYawek;
+	arc=none smtp.remote-ip=195.135.223.130
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1281E60A5BE6;
-	Mon,  2 Nov 2026 06:47:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1281E60A5BE6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=TnrMdknEv6+01oL0Xur2PpAkSyjvMCEFKEns63Q5Zd8=;
-	b=nA8/c4knN0gt8OeFroEFYi6VYCKm+HRJnef6DLxi2pyKv8NoGqn8kSLeJeGB8TpwTC69QSWlh
-	xZ/SautLTAPhPSKzGvRbq27Hs1kSi0uu1lTH9mw1X1mKJju+cTh4w9VXqfi8mMOGWTqLahYoyno
-	+B4MyshgB5/XnC2oyboSh10=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4jJ2L43mp7zcb0L;
-	Mon,  2 Nov 2026 14:46:36 +0800 (CST)
-Received: from kwepemr200011.china.huawei.com (unknown [7.202.195.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5915940575;
-	Mon,  2 Nov 2026 14:46:59 +0800 (CST)
-Received: from localhost (10.50.159.234) by kwepemr200011.china.huawei.com
- (7.202.195.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Mon, 2 Nov
- 2026 14:46:58 +0800
-From: <zhangqiuhao@huawei.com>
-To: "Richard Russon (FlatCap)" <ldm@flatcap.org>, Jens Axboe <axboe@kernel.dk>
-CC: <hewenliang4@huawei.com>, <yangyun50@huawei.com>,
-	<chenrenhui1@huawei.com>, <wuguanghao3@h-partners.com>, <wozizhi@huawei.com>,
-	<linux-ntfs-dev@lists.sourceforge.net>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH] block: partitions: ldm: avoid overflow in VMDB size check
-Date: Mon, 2 Nov 2026 14:38:17 +0800
-Message-ID: <179360149774.20265.17257530536010482220@huawei.com>
-X-Mailer: git-send-email-like-python-script
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685BD606A326;
+	Mon,  2 Nov 2026 07:22:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 685BD606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=R0m/Aesq;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=DcICn4YV;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=QbVhc5Jj;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=BIxYawek
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7021222012;
+	Mon,  2 Nov 2026 07:22:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1793604154; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lxjewwj2nxYhKCWZW7nt6HgiTVdnylcH/diTEvdKaKQ=;
+	b=R0m/AesqnG9DKR345fWFJNOFYRbzM24Wt+rBwgSKk7OfA5OnXuYerfzjtdCVS4/DmpbGMQ
+	EnAQTeSGz3zYLn+PLPcytQb2YhzgI3A5mYB7/lbiCYb+rFSFV61dKJkbvF8m1Qa0BZkmRv
+	w41mtdu8FnUE07EWaRtHns2Rtud3ZCY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1793604154;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lxjewwj2nxYhKCWZW7nt6HgiTVdnylcH/diTEvdKaKQ=;
+	b=DcICn4YVTRmeB1aVwFJT5w6yd1In8QGRbM/UaJk7mfxXc1Kvd7wmJeck4dYji7PfhrZ/yi
+	cKHpg23zP+CZluAw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1793604153; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lxjewwj2nxYhKCWZW7nt6HgiTVdnylcH/diTEvdKaKQ=;
+	b=QbVhc5JjDTjzg2e/Eawtw9TnAdGbuPDj7kef936rNWbPwhFQS40ZOJIpfCZBf7tKVYnXSD
+	XLoW/jusD5zUAndsZ3Qz96PM82exDwOJ+aklFhghg9z8uGnMTPY7Wa5lAOI5aZmRqk07Z0
+	R6iVt0RD+hF1V7XtuuHQ9ye1ylmA2iQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1793604153;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lxjewwj2nxYhKCWZW7nt6HgiTVdnylcH/diTEvdKaKQ=;
+	b=BIxYawekxBqW7x7jBjPAayK6AObsZJuYw9YDvYCDB7rI7syejyW/cLZCvlPByQ5F87jSQa
+	qIC6m6lCbqEGpdBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0C1DE134B3;
+	Mon,  2 Nov 2026 07:22:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id EnDILjg66GriaAAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 02 Nov 2026 07:22:32 +0000
+Message-ID: <a8fe2167-1fbc-4618-ba2f-170457d9c10f@suse.de>
+Date: Mon, 2 Nov 2026 08:22:32 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -69,58 +106,132 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemr200011.china.huawei.com (7.202.195.32)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] block: set QUEUE_FLAG_NO_ELV_SWITCH under the read
+ lock in del_gendisk()
+To: Qiliang Yuan <odys.yuan@gmail.com>, Keith Busch <kbusch@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
+ Nilay Shroff <nilay@linux.ibm.com>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Stuart Hayes <stuart.w.hayes@gmail.com>
+References: <20261102-bug-nvme-remove-ns-async-v1-0-61780fee111c@gmail.com>
+ <20261102-bug-nvme-remove-ns-async-v1-2-61780fee111c@gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20261102-bug-nvme-remove-ns-async-v1-2-61780fee111c@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spamd-Result: default: False [-11.79 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,kernel.dk,lst.de,grimberg.me];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,gmail.com,linux.ibm.com,wdc.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	TAGGED_RCPT(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
+X-Spam-Score: -11.79
 
-ldm_validate_vmdb() can accept a VMDB whose declared VBLK extent
-exceeds the TOCBLOCK configuration bitmap.
+On 11/2/26 7:14 AM, Qiliang Yuan wrote:
+> del_gendisk() takes the tag set's update_nr_hwq_lock for write to set
+> QUEUE_FLAG_NO_ELV_SWITCH, then for read around __del_gendisk(). The
+> write lock was there to wait for elevator switches from sysfs, which
+> held the lock for read when the flag was added.
+> 
+> When several disks of one tag set are deleted at once, as nvme does for
+> the namespaces of a controller, each write lock waits for the other
+> disks to get through __del_gendisk() under the read lock, and the
+> deletions run one after another.
+> 
+> Elevator switches from sysfs have taken update_nr_hwq_lock for write
+> since commit 4ff58d6bc9dd4 ("block: serialize elevator changes for the
+> same queue using a writer lock"), as updates of nr_hw_queues do. Set the
+> flag under the read lock instead, which still waits for both and keeps
+> them out.
+> 
+> Disconnect time of an nvme controller that removes its namespaces in
+> parallel, from a target on the same host, over tcp to 127.0.0.1 and
+> over nvme-loop, with 4 I/O queues, median of 3 runs on each of two
+> boots per kernel:
+> 
+>    namespaces  transport  before              after
+>             8  tcp          85 /   91 ms        51 /   47 ms
+>            32  tcp         294 /  293 ms        75 /   70 ms
+>            64  tcp         533 /  550 ms       115 /  124 ms
+>            64  loop       1283 / 1200 ms       185 /  204 ms
+> 
+> Signed-off-by: Qiliang Yuan <odys.yuan@gmail.com>
+> ---
+>   block/genhd.c | 17 +++++------------
+>   1 file changed, 5 insertions(+), 12 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 10ca8b4d6eea7..5afc60bf139e6 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -781,16 +781,6 @@ static void __del_gendisk(struct gendisk *disk)
+>   		blk_unfreeze_release_lock(q);
+>   }
+>   
+> -static void disable_elv_switch(struct request_queue *q)
+> -{
+> -	struct blk_mq_tag_set *set = q->tag_set;
+> -	WARN_ON_ONCE(!queue_is_mq(q));
+> -
+> -	down_write(&set->update_nr_hwq_lock);
+> -	blk_queue_flag_set(QUEUE_FLAG_NO_ELV_SWITCH, q);
+> -	up_write(&set->update_nr_hwq_lock);
+> -}
+> -
+>   /**
+>    * del_gendisk - remove the gendisk
+>    * @disk: the struct gendisk to remove
+> @@ -820,10 +810,13 @@ void del_gendisk(struct gendisk *disk)
+>   	} else {
+>   		set = disk->queue->tag_set;
+>   
+> -		disable_elv_switch(disk->queue);
+> -
+>   		memflags = memalloc_noio_save();
+>   		down_read(&set->update_nr_hwq_lock);
+> +		/*
+> +		 * Set the flag under the read lock, as elevator switches take
+> +		 * update_nr_hwq_lock for write.
+> +		 */
+> +		blk_queue_flag_set(QUEUE_FLAG_NO_ELV_SWITCH, disk->queue);
+>   		__del_gendisk(disk);
+>   		up_read(&set->update_nr_hwq_lock);
+>   		memalloc_noio_restore(memflags);
+> 
 
-For example, these fields on a 4 MiB image pass the preceding PRIVHEAD
-and TOCBLOCK bounds checks:
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-    disk capacity =3D 8192 sectors
-    config_start  =3D 6144 sectors
-    config_size   =3D 2048 sectors
-    bitmap1_start =3D   17 sectors
-    bitmap1_size  =3D 1024 sectors (524288 bytes)
-    vblk_size     =3D  128 bytes
-    last_vblk_seq =3D 0x02000008 (33554440)
+Cheers,
 
-The configuration area fits on the disk, and the bitmap ends at sector
-1041 within the 2048-sector area. The VBLK extent is 128 * 33554440 =3D
-4294968320 bytes (4 GiB + 1024 bytes), so the VMDB should be rejected.
-Both multiplicands are u32, however, so the product wraps to 1024 before
-it is promoted to u64 for the comparison. The check evaluates
-1024 > 524288 as false and incorrectly accepts the VMDB.
-
-Cast vblk_size to u64 before multiplying. The check then evaluates
-4294968320 > 524288 as true and rejects the out-of-range extent.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: zhangqiuhao <zhangqiuhao@huawei.com>
----
-
-Based on Jens Axboe's for-next at
-70866cfa169d5ee149364267289e71d50f9a7ae9.
-
- block/partitions/ldm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
-index c0bdcae58..d5c133a33 100644
---- a/block/partitions/ldm.c
-+++ b/block/partitions/ldm.c
-@@ -458,7 +458,8 @@ static bool ldm_validate_vmdb(struct parsed_partitions *s=
-tate,
- 	 * The last_vblkd_seq can be before the end of the vmdb, just make sure
- 	 * it is not out of bounds.
- 	 */
--	if ((vm->vblk_size * vm->last_vblk_seq) > (toc->bitmap1_size << 9)) {
-+	if (((u64)vm->vblk_size * vm->last_vblk_seq) >
-+	    (toc->bitmap1_size << 9)) {
- 		ldm_crit ("VMDB exceeds allowed size specified by TOCBLOCK.  "
- 				"Database is corrupt.  Aborting.");
- 		goto out;
---=20
-2.33.0
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
