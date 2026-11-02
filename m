@@ -1,102 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.181
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793585366;
-	b=KA1EsC6YS84ta8bnEuxZHf/yi6VaOPgoc3mFfZF0KxDt/PY2VsxDFyoc2l81tsSO949U
-	 u/d3Ax/ueIGoL59QlaRx4rwdE28klofc6pCWNE6SH/cxPCinzVktwiZwCYldPHWtQ7QZX
-	 BMz8yfhHWFAhvW85PGO96veXrrtUREUfq7YrtCcyKVqgG4DJbMe/Hqmxj0d/mqqlRJa3a
-	 nDubo5l0TG9LWZo9mbjlHolPK/lP6yXmqSjszr7QgZpODr9xvSwPts6HbiNb6RM64Lo87
-	 MxqPN+MpftDz4fUSi8bWioGnYR1vve4TCiEzqKBeRANOIyCWtSrEC8u4CKYH6BPMCwg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793585366;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=JM+w6aBnc/6mcug/U+Sf72nhtCKL0cl1TGwbfpZXBto=;
-	b=RdnM699cByj36SCGDGXOHmAVVh7K5Kl9qvHvvqAlrTpclP4mJf48lG7tHryDvuTIzXf5
-	 o5KB7uhwNBhmSwrijnHsjiF2sTjfC0a3Cya+l1hhHTSZsz6QN6SwXoheZRabZdJs0vhLb
-	 8t01ShDgOrD6etDwlYCyyby1FHM5+PI4tvDpWK4v9ONYq3YiPOVqQKPZVijBfJSftiezl
-	 gGIuT/sHkKldRzBi8+ib06O1PbdkcO3QQcoLwINkLaCW5gSLBv7rXdAWJHzswxN1/B6YN
-	 vQswABQiHo2HW1vIFPj1Hdhe6CkR4VJFYAWSSAllaPWmURf07FvXK/GJ4Tx75PbnSOg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xLli9ooL;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.181
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.69
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793591260;
+	b=QPQBxQIl1pcGwywZwBSIjE3lRyEZAJfGXgCjybhR43JtKGLyjdV2VejJMHYAhc/vST4E
+	 paCHsWTTomXQg4lkL0vjmwkKS1r3Y+yejhbHC36paTJXOgU749SgyZiE2MVSGXIpIA7SU
+	 Y43EKMCeyrgKanfJhnvwmjmhzoXva/wfGBYQj8hldwXDRmfaS4Ak/blEBpsmv2lVbns/B
+	 RceBWXLt1cSB9Z5ou4neL6MnNRSaTCYWVq35u0/6w9HOKYN+N6f/ffx98JxWQETWB8N2t
+	 VxZ5wiLK83/460+YTtO56D+ka0gnNQZHZd5cTWdv/lZFx9UGHRSw77zhsaaV1pYiRYw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793591260;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Content-Type;
+	bh=w3YWNQ9e9fM+0YHmB+mpWJhWC4zaBYJmDguwktfIzxs=;
+	b=KgZdPsWh3Yk2tyTydSbjky5p2kFxmQoim3yRwmCcgYR+XKR6Xves5v+flxjmRIVTWrKk
+	 0uJ8n9ephQ9Skv9eAft2BTlTSLi6YOoBAYqTb2OlCphasxn2WwW0WWBAf5NMqIfUAXUr6
+	 i6bdbRBHo7Cc6bQp4PE9uHbZ30Fjf1o3U+5UHDHQ3eJjcjpyEhUU/Kgs2JjLsBJldWtto
+	 ajytJ8Ly3/nOTv79gd3WXamcRYk5SwvD8OyOc96JOuaqVv5hgkfjkJL/kWJfzhuwmewc6
+	 XwOWlcdfLrOJLh4vhE99j0hmji/rfhWcwx6D89ZrrWEmsg0YcgZT047Wf6Q5nWOsGuw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.161.69
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF054606A327
-	for <linux-block@vger.kernel.org>; Mon,  2 Nov 2026 02:09:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DF054606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xLli9ooL
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-36a6b774d12so61524eec.3
-        for <linux-block@vger.kernel.org>; Sun, 01 Nov 2026 18:09:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1793585365; cv=none;
-        d=google.com; s=arc-20260327;
-        b=lBswrf8CO30g6WGs1/v6ILOS3El4Us8DO+tJ8pKSMVqlfZvJmZRVT5GKmolPvICjeH
-         c1A6w6cCfBgqgMxeA+wSw2fqaMoPLhxM6gZGVPL0xs7/yMTz9kcdp7LbTafNJTn3L48G
-         rWayaEyAv5FS2DTsH1RbdYYUWnwE0EVDULaMBZUA0TG+eRHEV4C17MHcIpxXmcu/D6cC
-         BbcJnWApOYMGTZHmEdnkq7ijIhx+5FC2iWHqi44d3AYn5fYt+JEgRJwnR3/PgocVMIP5
-         CT5RC60BUysC5eU8e5GFmWEc0W+ALW7TsDcQZYfCyHWSxu2iTBer7UPlgqit/vt1t0b+
-         +lPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=JM+w6aBnc/6mcug/U+Sf72nhtCKL0cl1TGwbfpZXBto=;
-        fh=pUUbLGwdGgedkyQnJM6JtaijKxh4jfMyz7SNifNywac=;
-        b=UgjceoMeiafTpAmOdTUV302MtNI3Im6WL1G0Y1S80k64I74/JRtua2sndBG5MxndDQ
-         JxndKTQQa4D9dxbfWZwhoR655mFnrcmgQlxHuiV+YIS+20xK0WG4CGQwzKtBWvJZzwa7
-         UK5c2HTqWofMxxHkUU4QYYG4yBbMGc0or1gmzzjkf7H019oLKDj55U85go33QZgBM6EU
-         7Dp36rVVhBSRR7O0s8+Qx22kWveJMAFeeltwGN+uA63blXaH1hiJRy563SPbQ3a8Uu1q
-         9KLSCC5XvqNrm0bBZBHCfDyEqBADVt2gcGpJ0fl4wG3i26Vl6uyY/EXMpt6TnAB7lBLJ
-         rlXQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793585365; x=1794190165; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=JM+w6aBnc/6mcug/U+Sf72nhtCKL0cl1TGwbfpZXBto=;
-        b=xLli9ooLhzieBA7ShWegrKHg7wsQlkXwGdZxFt4Ehnp8tKPxxEJShw6Vd5tIKTsbaV
-         1YnzdlwFEmRnrgn0AhMdBFet7R6GVJ9ZDs6oJIyCzVkVyaC0GFZKzdh6VvbCaZTRjPzF
-         TLI2zjZBfGs25VnHv8pszD23F7dFRTR2OCZ8ezOnSK9AC/Lvo4Cq05MxTICnxPp1K1Wq
-         8nQnrJ66XVyiZ9ikzfKA+7KWcZeD9mlPz52kfEqAAjvGi1tLG4sjNRCGfHKZZl8dOgJz
-         i4ar3liEMt8MTMo0h4mptYCaLpR5HBLxabA+UsOzEjpCLJ7MizXTqNZbMx7vKTeDBswR
-         kLxQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B870C606A32C
+	for <linux-block@vger.kernel.org>; Mon,  2 Nov 2026 03:47:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B870C606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-702f2edafaaso3537326eaf.1
+        for <linux-block@vger.kernel.org>; Sun, 01 Nov 2026 19:47:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793585365; x=1794190165;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20260707; t=1793591259; x=1794196059;
+        h=content-type:to:from:subject:message-id:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=JM+w6aBnc/6mcug/U+Sf72nhtCKL0cl1TGwbfpZXBto=;
-        b=q4Is59vIo2yiHOhg43tjoh2ThfK/GqG/apGYOgHXWn5ors2odaHybnua+ZP+pz3yuK
-         0sG/1x1lYM3mPaG2N/F3sxqM0MvJ96WKE6bPcHC1MUKsIYLxEhxwODPRGKD1d9vFhKit
-         mOLwYTQM8k5zv3wcbqAttQMl6x7TV4pAOPpoAueJ5E2cod6sKBrKALZswz+TcS7HO/Al
-         WGeNiJ/LOrdopIOb40TULCo/DlIvZsRjIBLUWch32ulnMDLhg4PcrmJikLDZgBWWPLcW
-         pbqY9FYQYInBL8YZ85liNjtR1H+8bxz9bbWPzQHRRg0ZEpOzN/CUEOir9fITN0gwUgJI
-         73Ag==
-X-Forwarded-Encrypted: i=1; AKwUvByGu/xyTv3sgXOQMQGbYDKScW6U2bvlMX+8gvnaPDYinZM5NVs1od2PplalLWdFuKMcgu4L/OlVYpjDEQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+N7qldTlZ3XPfWMkbu6W3X0ngpaTv60M2BXI8383NEn6HteZOj
-	yUD5DUr20cjSz/DG4wLRja1CSbV/R/udz9MWOmvYMp6LJL7PsgolkUHnnQ2f57+Jh8mdDdpOtVF
-	jnFvtNreA2VCCSEaHCZq6o2USHNv0x4Q=
-X-Gm-Gg: AYBFou2NZfX2AoCQIu/eEaSZoxlKvz1HlwohWM/QKkCn3rUSPqICyxHpkqHxPnNdJxP
-	98SV6z4dqkY9ekBw7UShl2jivhhClb48s5dEXq0aGEgWJL26nwpWwiu8KYdIGE9hcJ2qp9uRH8v
-	x5KP8c2jP1C6D+t3T+iGotKK181QhPNMbm2NSQj+U1/3SY80mfti/TW4FYL0vAzpfjh0uv3SeCm
-	m7N9CdSLifB0tmiI9+oLQNFVWq/fSttO4EhQ+68nNlt/2Gws06LCw/pYVygcc0XrDqr4O+u+hdu
-	e34Gg3mnc5LNRkeO8PggxsVsBhpNw5lurXYiHg7DIZCGX4rW7ufhiQNKLs5Up5aWldI3Q4ywg3l
-	aV9uWg+eNQwtwXXCYSj7ixyZYHHa85Y/YknRlM00StpCU8FZ4JOlF1LR3dnRWpf8CLZlWZVHfuZ
-	yrbb19iwqCJ1Ub4urVoRGJ5/x8TX7gHIVZHOW26n4bajEGxjjSsd5OmYlk6LaYbQWqIcqSqQrW3
-	x6oGXsBmgQM0HPGIFjci9lHrkpuJCqlsrgA
-X-Received: by 2002:a05:7300:d090:b0:36a:e7a:e89 with SMTP id
- 5a478bee46e88-36a4239cc86mr20960721eec.2.1793585364848; Sun, 01 Nov 2026
- 18:09:24 -0800 (PST)
+        bh=w3YWNQ9e9fM+0YHmB+mpWJhWC4zaBYJmDguwktfIzxs=;
+        b=tIyFmM29Wh/nCb0n5hqlnLAhQSQcQ9gCt6vQfnOZw66KQDD6JJXeuhciDRIuF/1ELB
+         rYnxvmFBd4ueZiEZS4RYwX7EBDLvJzcSZ6JT4SbsZcIeb6qiDmClWWDDn2fL80ZAehmp
+         y//twcx6YaYoHO5Oe7mt3lpGJmT/XV2ffiBcqYExQyShuYpErpk+x7rBA7VEfzQI85Ow
+         Ctzz90fah3XzNtFEKwxyElog2PsK511RxlaRo73pPH1Fccvy4XhBS4hc75tJD/bVsIG+
+         zsiV/qYilWSrIrYAXLdN4A8Tfd4DDpNwvsDytA6R9GSSOJ029trkRskETCYiKqzlD7Du
+         b1+g==
+X-Forwarded-Encrypted: i=1; AKwUvBxL6nZRXxguuqdZ4AoTVQ32YFO6fCS8v9bHaiOC0wYmS7U1ZwbI+Iw9uQOgoqBVd8XyM5U9yqYZDuKGXw==@vger.kernel.org
+X-Gm-Message-State: AFq9FYIUaOXqWQ2givePlcGyl+BNZ/qyfx59NfOeyPfEM4Xc1OPQMBVY
+	0Wn0IxOghWD7/KtYgFfRhYt3dZvrvvxMoF89AAr00kj8ULAhqcRca+NrL6pcCyDRzg9sultWXQm
+	jO0FikQDj0iX1PqcHzUWLB+dDDl02lKtAw4ng+Rq06ybdDjkobhB5/z7wpz8=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -106,69 +58,147 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <27b58e47-723b-4d67-a1f0-ccb8b0ae66a9@kernel.dk> <20261031152846.746656-1-sashal@kernel.org>
-In-Reply-To: <20261031152846.746656-1-sashal@kernel.org>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 2 Nov 2026 03:09:10 +0100
-X-Gm-Features: AclHuK9ySQ6mOkAgL_UJrSzXhdUVu9i8QnIVYFXWb_u0s7kLFxls3StjHm71adg
-Message-ID: <CANiq72=jdQdNeTNoSxnMGvQ9URQ7yJjLWceYiB1ZcbpoYxj7wA@mail.gmail.com>
-Subject: Re: [PATCH] rust: bindings: derive Zeroable for bindgen's opaque
- array wrappers
-To: Sasha Levin <sashal@kernel.org>, =?UTF-8?Q?Emilio_Cobos_=C3=81lvarez?= <emilio@crisal.io>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Josef Bacik <josef@toxicpanda.com>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Nathan Chancellor <nathan@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6820:c2d0:10b0:70a:4053:52e7 with SMTP id
+ 006d021491bc7-714f1f8157amr3592158eaf.8.1793591258811; Sun, 01 Nov 2026
+ 19:47:38 -0800 (PST)
+Date: Sun, 01 Nov 2026 19:47:38 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6ae807da.c8ffc79a.e3697.002c.GAE@google.com>
+Subject: [syzbot] [block?] [ext4?] BUG: unable to handle kernel paging request
+ in blk_mq_exit_hctx
+From: syzbot <syzbot+5307e3bcacec2ce4c2f0@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 31, 2026 at 4:28=E2=80=AFPM Sasha Levin <sashal@kernel.org> wro=
-te:
->
-> bindgen 0.73 emits the blob of some opaque types, such as ones aligned
-> to more than 4 bytes, as a `__BindgenOpaqueArray` or
-> `__BindgenOpaqueArray<align>` newtype instead of a plain array. The
-> newtype only derives `PartialEq`, `Eq`, `Copy`, `Clone`, `Debug` and
-> `Hash`, and the `MaybeZeroable` custom derive does not reach it, so a
-> struct that embeds such an opaque type is no longer `Zeroable`.
->
-> `spinlock` is opaque (see rust/bindgen_parameters), and with lockdep its
-> blob becomes a `__BindgenOpaqueArray8<[u8; 72]>`. Commit 71ec3c7d6db8
-> ("blk-mq: quiesce a queue that joins a quiesced tag set") added a
-> `spinlock_t` to `struct blk_mq_tag_set`, so an allmodconfig build with
-> bindgen 0.73 now fails:
->
->   error[E0277]: the trait bound `bindings::__BindgenOpaqueArray8<[u8; 72]=
->: pin_init::Zeroable` is not satisfied
->     --> rust/kernel/block/mq/tag_set.rs:41:49
->
-> Which wrappers exist depends on the bindgen version and on the opaque
-> types of the configuration, so they cannot be covered by unconditional
-> impls in rust/bindings/lib.rs like `__BindgenBitfieldUnit` is. Derive
-> `Zeroable` for each wrapper in the generated bindings instead. The
-> pattern allows for the spacing of bindgen's output when rustfmt is not
-> available.
->
-> Fixes: 71ec3c7d6db8 ("blk-mq: quiesce a queue that joins a quiesced tag s=
-et")
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
+Hello,
 
-Applied to `rust-fixes` -- thanks everyone!
+syzbot found the following issue on:
 
-I can send this to Linus in a couple days, unless Andreas shouts or
-Jens prefer to take it through his tree for some reason (now that
-v7.4-rc1 is out, it shouldn't matter).
+HEAD commit:    7a19f0cc94ad Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=17bddc8d580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6602d83d2f34eb80
+dashboard link: https://syzkaller.appspot.com/bug?extid=5307e3bcacec2ce4c2f0
+compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=169be5a5580000
 
-Cc'ing Emilio as well so that he is aware that this means we are using
-a regex to match the source code that `bindgen` emits, which isn't
-great (fragile etc.) -- you can see the context at:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/26f2e4202da9/disk-7a19f0cc.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1e23a9081d19/vmlinux-7a19f0cc.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b51f551829ee/Image-7a19f0cc.gz.xz
+mounted in repro #1: https://storage.googleapis.com/syzbot-assets/f7427d1d35bc/mount_4.gz
+  fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=15bddc8d580000)
+mounted in repro #2: https://storage.googleapis.com/syzbot-assets/22e8d60714f9/mount_5.gz
+  fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=11dc1d29580000)
+mounted in repro #3: https://storage.googleapis.com/syzbot-assets/f50f15fd78d0/mount_20.gz
+  fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=13ab1795580000)
+mounted in repro #4: https://storage.googleapis.com/syzbot-assets/3cdc94810dc2/mount_21.gz
+  fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=13bddc8d580000)
 
-  https://lore.kernel.org/rust-for-linux/20261031152846.746656-1-sashal@ker=
-nel.org/T/
+AI-generated root cause summary:
+When dm_setup_md_queue() fails after add_disk() (for instance during
+bd_link_disk_holder() or dm_sysfs_init()), the error path invokes del_gendisk(),
+which calls blk_mq_exit_queue() -> blk_mq_exit_hctx(), freeing each hardware
+context flush queue and setting hctx->fq = NULL. However, md->type remains
+DM_TYPE_NONE and the mapped device is not torn down. When userspace retries
+table_load on the device, dm_setup_md_queue() and dm_mq_init_request_queue() run
+again, invoking blk_mq_init_allocated_queue() on the existing queue. During
+__blk_mq_realloc_hw_ctxs(), blk_mq_exit_hctx() is called on the existing
+hardware contexts, unconditionally dereferencing hctx->fq->flush_rq (offset
+0x78) when hctx->fq is NULL, causing a kernel null-pointer dereference crash.
 
-Cheers,
-Miguel
+full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=5307e3bcacec2ce4c2f0
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5307e3bcacec2ce4c2f0@syzkaller.appspotmail.com
+
+Unable to handle kernel paging request at virtual address dfff80000000000f
+KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
+Mem abort info:
+  ESR = 0x0000000096000005
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x05: level 1 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0
+[dfff80000000000f] address between user and kernel address ranges
+Internal error: Oops: 0000000096000005 [#1]  SMP
+Modules linked in:
+CPU: 0 UID: 0 PID: 9108 Comm: syz.5.600 Not tainted syzkaller #0 PREEMPT 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/14/2026
+pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : blk_mq_exit_hctx+0x64/0x494 block/blk-mq.c:3957
+lr : blk_mq_exit_hctx+0x40/0x494 block/blk-mq.c:3956
+sp : ffff8000984475d0
+x29: ffff8000984475e0 x28: 0000000000000000 x27: 1fffe0001b03332a
+x26: dfff800000000000 x25: ffff0000d8199950 x24: ffff0000c3aeffc0
+x23: 0000000000000078 x22: 0000000000000000 x21: ffff0000d3857000
+x20: ffff0000d8199800 x19: ffff0000eabc5388 x18: ffff8001237ae000
+x17: ffff0001acf6ce07 x16: ffff0000dad68014 x15: 0000000000000001
+x14: 0000000000000000 x13: 0000000000000001 x12: 0000000000000000
+x11: 0000000000000000 x10: ffff0000eabc53bc x9 : 0000000000000000
+x8 : 000000000000000f x7 : 0000000000000000 x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000003 x3 : 0000000000000000
+x2 : ffff0000d8199800 x1 : ffff0000dad68000 x0 : 0000000000000000
+Call trace:
+ blk_mq_exit_hctx+0x64/0x494 block/blk-mq.c:3957 (P)
+ __blk_mq_realloc_hw_ctxs+0x1f0/0x548 block/blk-mq.c:4583
+ blk_mq_realloc_hw_ctxs block/blk-mq.c:4623 [inline]
+ blk_mq_init_allocated_queue+0x2a8/0xc44 block/blk-mq.c:4653
+ dm_mq_init_request_queue+0x2d8/0x474 drivers/md/dm-rq.c:573
+ dm_setup_md_queue+0x134/0x434 drivers/md/dm.c:2611
+ table_load+0x3d4/0x764 drivers/md/dm-ioctl.c:1661
+ ctl_ioctl drivers/md/dm-ioctl.c:2221 [inline]
+ dm_ctl_ioctl+0x884/0xbbc drivers/md/dm-ioctl.c:2243
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
+ do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
+ el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:796
+ el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:815
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
+Code: 97cfdb27 f9400328 9101e117 d343fee8 (387a6908) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	97cfdb27 	bl	0xffffffffff3f6c9c
+   4:	f9400328 	ldr	x8, [x25]
+   8:	9101e117 	add	x23, x8, #0x78
+   c:	d343fee8 	lsr	x8, x23, #3
+* 10:	387a6908 	ldrb	w8, [x8, x26] <-- trapping instruction
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
