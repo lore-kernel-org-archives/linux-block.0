@@ -1,58 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.71.93.112
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.71
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793607169;
-	b=BJiTr9ycMj4wlH9eABOXkPOtYJ5TVOU+F260Eolj6zcyi6tY21Uo9Mq1DuilGggLC9wc
-	 zP5L+D8DGNz0MxHU1KDeE+N+2d1QfYrMJqRFNIq3qkuwu9zpME6EnByOG+dQheVWboCQW
-	 OnfK7LHdNJCU0P8kk4WEd/ff+z7TNcnkD6NmCZic4DWfjQyhLeZfVVVUr72lN09pZp7jB
-	 6e1klv+JI2fnG1d7y/RwCU6z8BCALoaULJp/y2O9xOOI6h3iE4QglguLwGjvn1JPqVyOA
-	 ZpxPTM7StaqlSgPyR07Cxf/albATKlAGp8JmVjCMiJbLcnqzEZi3Dd5YUWkTm+akX3g==
+	t=1793610143;
+	b=P85+tilgu9AzlM/mjSJ0xqwedjNV/cVXleJr1vpThZ6Y8PEJ6bDhKwOsXUW5TUVpVYcs
+	 qhlmjFUf5HyjXVa+YWlsHDdf/xpzFGyezk/RDRMMFZXPfQrshTK2jCRFnkIyYB0HJNMPn
+	 QszEC9jkX8FCREh+1F4h+DOrifgfp7SN3AEoF7ioihnNDilxtYtrUnB7S1MFxu58apr7F
+	 GsSZtUWj0y7ROzh/hVkr3jk+1BJP14nss3PAXZ41yjHQ5tF+Ph4knXRlx1PxTPmLSVahf
+	 d11Xn9olKov/M7JxntDprwSp+CnkHiUr3/nvvCWHHwbl3BnJq7BfrbzgQ2idBBVjdig==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793607169;
-	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
-	bh=StNRhS3uLF68vr/22gxVM7chGhzsilgJi6E3RMdsv9c=;
-	b=cs2do7pgwxX/KHGGa0VYvCGQQJ1PhE9KmNlWAMov5rq4t//+jfao7HlTY7rTfoyZhODU
-	 nrs2p1ePrYtFI58G3D39ZM1Vdl+sL1+tHLV9UYuJEvgjfgJ7baxRb1+0UbVyViDwbv/9m
-	 gEyKpov8V2kaMFphjf1kA+F+IOJ/hF0dnJy/o7q0xuwLoSd+c40cxdZ8989Bx8/SvpRHX
-	 JtxoFBxj+DX3516eEGDEfTk+ogV1WmR1ncznNdKsJ1kF6M7QsHjef8NwiOHiiJqBezs1+
-	 b7rwpqVUnazm6k0Qn6VrSDrSYrPpva3ruvACjOpPzWJb5gKqfaW6AnQ4m7TsajRXZGQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793610143;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type;
+	bh=yJCWLcVlTtiQVfwuNd4Ug+QWJeJEHbdAzaMQBdZ49Qc=;
+	b=JhH3z1B69L9KIUvme8ceNe/XJ/DsSqUmdTj8EnnDXRfCr9p2De32bevJmjzaOtNPnayb
+	 DqFc+eZ8k4OZdQ/VgNGwA3VoV/ANckepUKnCAHn0ga6pcYGiUpyZGymvawIKPT5h0RqgB
+	 wLeMpcRYPcIUxOLL3q5kSrA2+DC4kXcseFqitR7WMFTsD9oJXQ5+gKVyrgQkJxUh4FnVy
+	 3SEdTdJC/+fM2HuFWlEmnbWbqt/WByOUYZsR9rRqo4bGf03dpTSBXAHmO0DdiaD+nfeNU
+	 N2KnrR6hEsCnI31cKPaMAGEMbJhdWc0sBx5MGbWfzECJ6ShZROFMiMRWC8bzZPX3AOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=huaweicloud.com;
-	spf=pass smtp.mailfrom=huaweicloud.com;
-	arc=none smtp.remote-ip=124.71.93.112
-Received: from dggmsgout12.his.huawei.com (dggmsgout12.his.huawei.com [124.71.93.112])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--sergiiushakov.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=HKdXNGRd;
+	arc=none smtp.remote-ip=209.85.221.71
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BDC606A32C;
-	Mon,  2 Nov 2026 08:12:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B9BDC606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggmsgout12.his.huawei.com (SkyGuard) with ESMTP id 4jJ4F03llnz206N;
-	Mon,  2 Nov 2026 16:12:20 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id B839140561;
-	Mon,  2 Nov 2026 16:12:42 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP4 (Coremail) with UTF8SMTPSA id gCh0CgB3tfT6RehqnrYcCw--.16409S4;
-	Mon, 02 Nov 2026 16:12:42 +0800 (CST)
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-To: axboe@kernel.dk,
-	bvanassche@acm.org,
-	hch@lst.de,
-	yukuai@fygo.io,
-	linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	yangerkun@huawei.com,
-	chengzhihao1@huawei.com,
-	wozizhi@huawei.com
-Subject: [PATCH] block: partitions: reject GPT entries with starting_lba > ending_lba
-Date: Mon,  2 Nov 2026 16:04:42 +0800
-Message-ID: <20261102080442.3775061-1-wozizhi@huaweicloud.com>
-X-Mailer: git-send-email 2.52.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D852E606A324
+	for <linux-block@vger.kernel.org>; Mon,  2 Nov 2026 09:02:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D852E606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sergiiushakov.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=HKdXNGRd
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-48e6d6e780fso1271882f8f.2
+        for <linux-block@vger.kernel.org>; Mon, 02 Nov 2026 01:02:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793610141; x=1794214941; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=yJCWLcVlTtiQVfwuNd4Ug+QWJeJEHbdAzaMQBdZ49Qc=;
+        b=HKdXNGRdXq7vMXqBG1gfBNIajHsmS++L02ycTN7DQLBoyMmSLPIda2fem0StuK97G6
+         Ztw9wCzmv8IAn0bBvIKcutXR6Qgomor0OlkbooPphQlgheALka3rM3WWsG9slsNNVf8i
+         RH2p76chU+R7fe2Tu396Q2ykpss24VunWqvtSke4b3YiXcqlAFio4f62IIjoUmcakC2w
+         I6DQJ/zThJJeOk8dzIGaPHfUklnlk+qFyjx81g3mOzeb4lLXkqunNlOPkqw9pjiln7iL
+         qw6SSydMRZ1w5E+kQkR8AFj9aW3Q7BXnjlOjc/h4dC/HVXQymS0hzZyi7Na6WgeQq8ul
+         wufg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793610141; x=1794214941;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=yJCWLcVlTtiQVfwuNd4Ug+QWJeJEHbdAzaMQBdZ49Qc=;
+        b=rQtgCt32cqTy87yLGtbJwL6s2M0/lkhSK2cSKBlk+Tm+t+zCIFb6BDKiC2MKvCp4MK
+         13rx+fPddw+xIuZs/YgVEQHBrCfSV939GPnYPQxON3h3vbqO2/AqqjC7k3RkCxvUpsrX
+         UfagisAq6l2qVwhvGzAgNpBfW0wyP2YlC/1Q6r22x4Wkbqx8fy69jI8fpcP3BST/hhOp
+         xMqgTjlqUoNKVfxTcH5F3H+TWBFO+mZioZacI6fZnV7oQ4fbTtHNKV5F99H0uxtVeduq
+         BbzlJ5p17pAwiw3XoHeYZtQYECspwi+0lMvBQNSKC4aQ9VES36dUHgK0i6Z74W0+cj7G
+         zWjQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwVTdqsP2nYBZ7cyWoW11J6dH7bMRix9bgreeU8WWcN8HYDD/Z4Bg16+pB0/xvJOvMJbWhbU691qaigAQ==@vger.kernel.org
+X-Gm-Message-State: APuU4Z85c9yVZUjhQjdpT6u2pPwFySYzul7bW91ia3XvGLkHmoB19hS1
+	joOCjTu6GoXqmrmqWR0u8mPTeoP4PYQA0FRP4zjLkoLhoS2akzZd0Fk91AbbSP3VRo5VJTtrxh/
+	9qTfzaG/fEPCOflyG1wlRjL5t2p7HEbReAw==
+X-Received: from wrox17.prod.google.com ([2002:adf:f0d1:0:b0:48d:f214:2440])
+ (user=sergiiushakov job=prod-delivery.src-stubby-dispatcher) by
+ 2002:adf:e001:0:10b0:48d:f470:6b3e with SMTP id ffacd0b85a97d-48e6e30722amr15896125f8f.13.1793610140239;
+ Mon, 02 Nov 2026 01:02:20 -0800 (PST)
+Date: Mon,  2 Nov 2026 10:02:17 +0100
+In-Reply-To: <20260918135120.1261150-1-sergiiushakov@google.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -61,67 +78,26 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3tfT6RehqnrYcCw--.16409S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7AF15KF47GFWUAFWxXF43Wrg_yoW8AF15pr
-	s3Gry3Cw18uF1fZa97tan7X34rurnrWw45tFW3W3yfKr43ZasrtF9I9ayjkryjqrZxt3sr
-	ZF1Ygr1kua13AF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7
-	CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8C
-	rVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4
-	IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY
-	0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I
-	0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
-	cVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcV
-	CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UQ6p9UUUUU=
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Mime-Version: 1.0
+References: <20260814105954.4060627-1-sergiiushakov@google.com>
+ <20260918083557-mutt-send-email-mst@kernel.org> <20260918135120.1261150-1-sergiiushakov@google.com>
+X-Mailer: git-send-email 2.56.0.317.g454f8302e1-goog
+Message-ID: <20261102090217.3324999-1-sergiiushakov@google.com>
+Subject: Re: [PATCH v4] virtio-blk: clamp max_segments to virtqueue ring size
+From: Sergii Ushakov <sergiiushakov@google.com>
+To: mst@redhat.com, axboe@kernel.dk, stefanha@redhat.com, hch@lst.de
+Cc: virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, pbonzini@redhat.com, sergiiushakov@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Zizhi Wo <wozizhi@huawei.com>
+Hi Michael, Jens,
 
-A GPT entry whose starting_lba is greater than its ending_lba is accepted,
-and the kernel creates a partition with a bogus size. The bogus sector
-count defeats the end-of-device check, so I/O through that partition is not
-confined to it and can access sectors outside the partition on the same
-disk.
+Gentle ping on v4 of this patch:
+https://lore.kernel.org/virtualization/20260918135120.1261150-1-sergiiushakov@google.com/
 
-is_pte_valid() only rejects an entry when its type is NULL or when
-starting_lba or ending_lba is greater than lastlba; it never checks that
-starting_lba <= ending_lba. For a reversed entry both field checks still
-pass, but efi_partition() computes size = ending_lba - starting_lba + 1 in
-u64, which underflows to a huge value. That value also wraps in the
-end-of-device check in blk_add_partition() (from + size) and does not fit
-the signed i_size, which turns negative.
+All review comments from v3 have been addressed. Please let me know if
+anything else is needed.
 
-Reject entries with starting_lba > ending_lba in is_pte_valid(), matching
-the head-level check against last_usable_lba < first_usable_lba.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
----
- block/partitions/efi.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index 9865d59093fa..b31227a13db0 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -458,10 +458,11 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
-  */
- static inline int
- is_pte_valid(const gpt_entry *pte, const u64 lastlba)
- {
- 	if ((!efi_guidcmp(pte->partition_type_guid, NULL_GUID)) ||
-+	    le64_to_cpu(pte->starting_lba) > le64_to_cpu(pte->ending_lba) ||
- 	    le64_to_cpu(pte->starting_lba) > lastlba         ||
- 	    le64_to_cpu(pte->ending_lba)   > lastlba)
- 		return 0;
- 	return 1;
- }
--- 
-2.52.0
-
+Thanks,
+Sergii
