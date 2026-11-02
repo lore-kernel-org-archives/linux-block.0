@@ -1,104 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.167.242.64
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793611680;
-	b=zMdJdkppIHwPMEw5Zrn4qxnbs1hS+Cylh1WxVMkH6tnH8xAKWdNPYA3Hcw5t0ZiczPV4
-	 b5BKE5/ASmWr8fvzpIV4EzyzovUNVgLzvPjhRs+DqM0RZMQUDSTTfqMf3TycPlgxLXIBJ
-	 /ZTT3Svi3eV0xgEpFaVlUrGMApi7Yi3Rwk8jQCD3j6N7EUCcpTuszhyQjVuLF++XnFGp/
-	 1IrW30ejP2YeUE3u+Ht/2X3XSCNoz8fgghMOmWPPErYoScIXnpJAE3rcWVopr80o9koII
-	 lexke7ImXl8flRpAcy6z3/05MCmROPP0qpIddkL2d05qMR8VYL0HtfQyk6aIyIYt4fQ==
+	t=1793614377;
+	b=p/a9tyjKAeU2ULq9GJ1gmCOCZzkPmtz338jrBHbErUWf0WrmQf5pHOzw+Hto0wlqFzYt
+	 3KWbwOVxCvbHKkMRS+gaVBSqLnq+GVBMtq6cUGyR7/RNdLnFOd9zd38170D+PZW3LsShU
+	 G1fn2J2etJEaIu6pnA7v9wTxtT4XXeysEFt359aHzf7u1Y8zXUwVfYxuXqzmPR1HeFefU
+	 oZeanZw9W8qmnZ8YL3FXQI3sjrCMgqxFSZ21APdj8aItD8+8yw2qTLgCYAHbfHsl2EmTX
+	 LfpROyT2IWuDNCnUmpBrGtawRmki74d3uab/6nQnNlJszHEV8UkZOXUTCVdYtWtcxdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793611680;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Rspamd-Queue-Id:X-Spam-Level:
-	 X-Rspamd-Server:X-Rspamd-Action:X-Spam-Flag:X-Spamd-Result:
-	 X-Spam-Score;
-	bh=0PQKLGQmo+qOMofVV7qp7DPCSriBILDh+6LNhfqBAIw=;
-	b=pD8EhQdcWi9Aec1bbKbh+XbMBEHMLbjeHW3CxvA7PmLYWTwSHz13FdjqYuumMWlxB+fs
-	 NMZwu8i9vsAuCnmiVkjDmtkDvBlGgpzJjiTxozHDLxznm/EzBt+nZRjdtvE8bDtDs0pYg
-	 z2CelRDlIw8QfevFKvQUamPz7xs5eIWH0d+yFmKh2fkf4mwl+TW1Bf2cayavLdotTEHxJ
-	 aq0eHwOoSJM+uAIx2VPyCUuFOqlyclmbFWyNfeyNSPZ4vTwJfOGHGi9hQLt9mfjFeVab2
-	 Wh+wMZ4OpBNBai7sS+M8KhVPfdzHgxO9SPLGCfBqwEgioAlGTr15KF4G9ZxbPc7NieA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793614377;
+	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:Autocrypt:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=AIUHPAAXt1s3tQmTRgQTWCI8t2dy2mHDfBJvoW1CIRU=;
+	b=NKnUrNJ+ZrU8c9k1+trR9xSRJUKJ4/8UIjV7joqCWm6y7CVBaWQpgX5iphCGsnR08AUy
+	 m1dYrtDi/WAIzN2X16PZP/unBXTA3Z4khfHilwgb3/v0SwuzJcvDG9xaq22F4eZXG7Ewk
+	 26XF2vhRHo6RfTR/H0AIPGcms7+AAE6Xzbs0xnvoX+BDN+XJeZOCm6EENdL/Dmh3ICu+c
+	 E+MKfdldhQSklaCV/kRKWaqfUV5g7Xjm0r0jBKv19AG4jUH5FW33oCiDEFQpDaKlDNSDQ
+	 GEPRS1quYsS/vJTTKWSA/fLuNZV0A9o0YYGZWGk4wIkP/Uzm2ONiswkOCTFVJj0Vyug==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=TOHyMzn8;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=Nc+ShyS8;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=TOHyMzn8;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=Nc+ShyS8;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	dmarc=pass header.from=ideasonboard.com;
+	spf=pass smtp.mailfrom=ideasonboard.com;
+	dkim=pass header.d=ideasonboard.com header.i=@ideasonboard.com header.a=rsa-sha256 header.s=mail header.b=gNFkVet7;
+	arc=none smtp.remote-ip=213.167.242.64
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C8D606A324;
-	Mon,  2 Nov 2026 09:27:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B8C8D606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C9C606A324;
+	Mon,  2 Nov 2026 10:12:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D9C9C606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=TOHyMzn8;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=Nc+ShyS8;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=TOHyMzn8;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=Nc+ShyS8
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B1B0F1FC04;
-	Mon,  2 Nov 2026 09:27:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793611677; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0PQKLGQmo+qOMofVV7qp7DPCSriBILDh+6LNhfqBAIw=;
-	b=TOHyMzn8TmnrQU5tgAov+GA/1VvxIofBLUysJDzXJLZ7dDBBtRU4p+fBwnzOBL+89et0TT
-	0gDTVta89xkNBBXjq7RuWef6ckFQaorza4wGuCUMQpAZDbCdkNhNqWmOJTCROumzr0R5Gq
-	ErOrT3bNXu295v7i/Hdubidx0V+nh80=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793611677;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0PQKLGQmo+qOMofVV7qp7DPCSriBILDh+6LNhfqBAIw=;
-	b=Nc+ShyS8OT/gboDsTJBpxd4fKggLIczzAgvz1QPnqBHV5PcsY3V2R2AEeWHHPvfa3XShGa
-	jxha6ck8FwPWl6Bg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=TOHyMzn8;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Nc+ShyS8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1793611677; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0PQKLGQmo+qOMofVV7qp7DPCSriBILDh+6LNhfqBAIw=;
-	b=TOHyMzn8TmnrQU5tgAov+GA/1VvxIofBLUysJDzXJLZ7dDBBtRU4p+fBwnzOBL+89et0TT
-	0gDTVta89xkNBBXjq7RuWef6ckFQaorza4wGuCUMQpAZDbCdkNhNqWmOJTCROumzr0R5Gq
-	ErOrT3bNXu295v7i/Hdubidx0V+nh80=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1793611677;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0PQKLGQmo+qOMofVV7qp7DPCSriBILDh+6LNhfqBAIw=;
-	b=Nc+ShyS8OT/gboDsTJBpxd4fKggLIczzAgvz1QPnqBHV5PcsY3V2R2AEeWHHPvfa3XShGa
-	jxha6ck8FwPWl6Bg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 60936134B3;
-	Mon,  2 Nov 2026 09:27:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id CpyODp1X6Gp8cQAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 02 Nov 2026 09:27:57 +0000
-Message-ID: <1c55b616-d1c5-4929-a4ac-43695ca4f87b@suse.de>
-Date: Mon, 2 Nov 2026 10:27:56 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=ideasonboard.com header.i=@ideasonboard.com header.a=rsa-sha256 header.s=mail header.b=gNFkVet7
+Received: from [192.168.1.71] (cpc89244-aztw30-2-0-cust6594.18-1.cable.virginm.net [86.31.185.195])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 6D7E04DC;
+	Mon,  2 Nov 2026 11:10:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1793614231;
+	bh=Pbr7FqwHE7e4DKrbewizP5BIUnE5HZeSzQe6zlBuXgc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gNFkVet7a8YNgqKKfUattiD324ptZXZOwCs2ElXrPuQU7AEkmyGg5A9iUdpWCq4Zw
+	 n3Ag9IzEx8qDyTSIvwUgNi6XIZEQ9M9OPU17+kQcdYSQC8OD5QURTc/RfUc8aM907v
+	 EzbRU+ChlB6Zx8WxwMUhohSq1WiSg+C9Ivq9Tk/I=
+Message-ID: <4898b6a7-1824-412a-aef0-ae6bde021e38@ideasonboard.com>
+Date: Mon, 2 Nov 2026 10:12:42 +0000
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -109,86 +55,121 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] nvme: remove namespaces in parallel
-To: Qiliang Yuan <odys.yuan@gmail.com>
-Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- Nilay Shroff <nilay@linux.ibm.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Stuart Hayes <stuart.w.hayes@gmail.com>
-References: <20261102-bug-nvme-remove-ns-async-v1-0-61780fee111c@gmail.com>
- <20261102-bug-nvme-remove-ns-async-v1-1-61780fee111c@gmail.com>
- <6e9e6f78-4bd7-46f0-bf57-5c227a65a69e@suse.de>
- <20261102080041.1269654-1-odys.yuan@gmail.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261102080041.1269654-1-odys.yuan@gmail.com>
+Subject: Re: [PATCH v2 17/26] mm/fbatch: no lru_cache_disable() in
+ __alloc_contig_migrate_range()
+To: Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Ackerley Tng <ackerleytng@google.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Alexandre Ghiti <alex@ghiti.fr>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Barry Song <baohua@kernel.org>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Christian Brauner
+ <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Christoph Lameter <cl@gentwo.org>, Claudio Imbrenda
+ <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>,
+ JP Kobryn <jp.kobryn@linux.dev>, Jan Kara <jack@suse.cz>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Kairui Song <ryncsn@gmail.com>, Kiryl Shutsemau <kas@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>, Leonardo Bras <leobras.c@gmail.com>,
+ Lorenzo Stoakes <ljs@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Matthew Wilcox <willy@infradead.org>,
+ Mel Gorman <mgorman@techsingularity.net>, Miaohe Lin <linmiaohe@huawei.com>,
+ Michal Hocko <mhocko@suse.com>, Minchan Kim <minchan@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
+ Peter Zijlstra <peterz@infradead.org>, Qi Zheng <qi.zheng@linux.dev>,
+ Rik van Riel <riel@surriel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Suren Baghdasaryan
+ <surenb@google.com>, Vlastimil Babka <vbabka@kernel.org>,
+ Yang Shi <yang@os.amperecomputing.com>, Yu Zhao <yuzhao@google.com>,
+ Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org
+References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
+ <84ed3bf8-da32-3447-0577-052c5d1a56b2@google.com>
+Content-Language: en-GB
+From: Alen Karnil <alen.karnil@ideasonboard.com>
+Autocrypt: addr=alen.karnil@ideasonboard.com; keydata=
+ xjMEafxhCxYJKwYBBAHaRw8BAQdAXswEEnvxYiHXb8Q8GsSAuaLuXqJFs3kmsMI7EWF9EuDN
+ NUFsZW4gS2FybmlsIChXb3JrIElvQikgPGFsZW4ua2FybmlsQGlkZWFzb25ib2FyZC5jb20+
+ wpkEExYKAEEWIQT0whyXpTyoVtApVAlRzoJ78NRPngUCagGrrgIbAwUJBaOagAULCQgHAgIi
+ AgYVCgkICwIEFgIDAQIeBwIXgAAKCRBRzoJ78NRPnkpDAP4kmtHsMfTtV6BC1z7GTb86BL2g
+ 9FC1EarGJDDzcafMGQEA6clsoXvRYjHPJexVebjmkI4bq1QM0X/L9Ffe0PfpdQbOOARp/GEL
+ EgorBgEEAZdVAQUBAQdAsVoGZ4IK0EgJ8HU05PQKzK15jaCi/IEA/7Cw9ZzcBmwDAQgHwn4E
+ GBYKACYWIQT0whyXpTyoVtApVAlRzoJ78NRPngUCafxhCwIbDAUJBaOagAAKCRBRzoJ78NRP
+ nqYcAP0eh3LahCDsfNa8zsiK+8QzeujWPKhc5zDcIqrDI6xufwD+Mu9e202It54rNZb8UWEy
+ V5OzTEy0JlsQfO6DYWIORwI=
+In-Reply-To: <84ed3bf8-da32-3447-0577-052c5d1a56b2@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B1B0F1FC04
-X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-12.00 / 50.00];
-	SUSE_INTERNAL_BYPASS(-9.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,kernel.dk,lst.de,grimberg.me,lists.infradead.org,vger.kernel.org,gmail.com,linux.ibm.com,wdc.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email]
-X-Spam-Score: -12.00
+Content-Transfer-Encoding: 7bit
 
-On 11/2/26 9:00 AM, Qiliang Yuan wrote:
-> On Mon, 2 Nov 2026 08:26:57 +0100, Hannes Reinecke wrote:
->> On 11/2/26 7:14 AM, Qiliang Yuan wrote:
->>> nvme_remove_namespaces() removes the namespaces of a controller one
->>> after another. Each removal waits for RCU grace periods in
->>> del_gendisk() for the namespace and for its multipath head, about
->>> 20 ms in all.
->>>
->> But that isn't changed by calling async_schedule_domain, isn't it?
+Hi Hugh,
+
+I've come across your series because of a usecase I have, namely this patch.
+
+Not to bore you with details, I got an IMX8MPlus with some cameras.
+Due to the cameras (and other associated HW), it ends up allocating 
+multiple framebuffers using CMA (currently 16 per camera)
+which is quite slow (~200ms for a single camera).
+
+I've spent some time profiling and found that the biggest
+stall is when lru_cache_disable() is called. Just applying the patch on 
+its own, I saw greatly improved performance (cutting the delay almost 5x).
+
+This is on a 7.2 kernel.
+
+On 09/09/2026 11:16, Hugh Dickins wrote:
+> Remove lru_cache_disable() from __alloc_contig_migrate_range(). It does
+> not now benefit from lru_add_drain_all() first; and gains little benefit
+> from invalidating buffer head LRUs first, since 5.0 commit 80409c65e2c6
+> ("mm: migrate: make buffer_migrate_page_norefs() actually succeed").
 > 
-> Right, each removal still waits about 20 ms. What changes is that the
-> waits overlap. A grace period is system-wide, so removals that wait at
-> the same time are released by the same grace periods instead of each
-> needing its own. Disconnect time over tcp, from the table in the
-> patch:
+> This will be more controversial. lru_cache_disable()+lru_cache_enable()
+> were brought in for CMA page migration, see 5.13 commit d479960e44f2
+> ("mm: disable LRU pagevec during the migration temporarily") through
+> 8cc621d2f45d ("mm: fs: invalidate BH LRU during page migration") - I
+> guess the testing there must have been on a 4.19-based Android kernel,
+> without 5.0's buffer_migrate_page_norefs().
 > 
-So state that in the patch description.
-That'll make it easier for people to understand.
+> It's possible that invalidating BH LRUs perhaps 0 times, perhaps N
+> times, will average out worse than invalidating 1 time and stopping
+> everyone else; or that folio_test_clear_lru() failures manifest more
+> than before (note how folio migration has retries on raised refcount,
+> but isolate_migratepages_block() no retry on failed test_clear_lru).
+> But let's give this a try and look out for regressions.
+> 
+> Don't delete lru_cache_disable() yet: leaving stale folio pointers in
+> the per-cpu fbatches, with folio_try_get() yet to come on them, would be
+> bad for memory hotremoval: the lru_cache_disable() in offline_pages()
+> protects from that.
+>
+Can the patch stand on its own?> Signed-off-by: Hugh Dickins 
+<hughd@google.com>
+> ---
+>   mm/page_alloc.c | 3 ---
+>   1 file changed, 3 deletions(-)
+> 
+> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> index 12fac9084c48..3e085a25a776 100644
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -7147,8 +7147,6 @@ static int __alloc_contig_migrate_range(struct compact_control *cc,
+>   		.reason = MR_CONTIG_RANGE,
+>   	};
+>   
+> -	lru_cache_disable();
+> -
+>   	while (pfn < end || !list_empty(&cc->migratepages)) {
+>   		if (fatal_signal_pending(current)) {
+>   			ret = -EINTR;
+> @@ -7182,7 +7180,6 @@ static int __alloc_contig_migrate_range(struct compact_control *cc,
+>   			break;
+>   	}
+>   
+> -	lru_cache_enable();
+>   	if (ret < 0) {
+>   		if (!(cc->gfp_mask & __GFP_NOWARN) && ret == -EBUSY)
+>   			alloc_contig_dump_pages(&cc->migratepages);
 
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Thanks,
+Alen Karnil
+
