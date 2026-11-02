@@ -1,102 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.71.93.99
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793606449;
-	b=G1a5zpqKyUg6LlP++Wfjh3mxMK/1H/ebv7r9nFn5von5sMER8mNOsK94+aVSJDd7UOaE
-	 lVivZ8sgpbyrBqZYW1kcq/r74tE7dqd+dvrvIKi0tMUAsbO4BBXuZ/RE0U1wtSN9ygRZN
-	 L0tzH38mVVtx0CntE32AgdTZvkkz3qjgmX5tyEmCz5z2WM1xfVjBWF8x1iubhYU72Mngg
-	 Dl4MgM90WElgGtID77hNEhU0eNjK0lF4OEgToYj0kNyS7+dcOzPwga33cXDIlp8qycJOD
-	 L3Tic3+yhbVA/HrCfOzzQLMqrfSmpLbGrP2S5u1m1Ie2pJPv8S/twm1U47dVpf7VW+Q==
+	t=1793607148;
+	b=ptubI4QMsl+AGIMwGEQU6SWO/mkWfLwUwUn459PbsMnVdNMH7OLKAZpBQLR4RJuuXRFR
+	 rP9a551kqDBplX8Zaqb1Geil9nXnRlZZN1IJez2nvF9iSt9ysYODbdCSp6z+8c5x2zjS6
+	 zg3M3k8uyRTbelslCt3M2uytnQOP/nFGXq0hOI0YtPCnwPn1JM61btTYQv06rAYRadgY7
+	 HPQEtpNcln6KMxYQYqDTq2foX8o1qBUBqula/4D+vB1dG5GO1ygQyWv9Ml56Hil8H26Ir
+	 1+LSx+xQTGITNwLZapwFqs2FTf53y+wB7iARLWpDW2awwBZYfzI7bQzsR2vc7Bd0Jpg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793606449;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=8kqF3ntzYW3hP6K+8Zi1mBskB8D2QgCHbNZ8Jdf9/+4=;
-	b=CYTqYTtiI3zd6+mBIbZ5Nhm68bkgsPGm+E+sWl2vGJWhIaRkH8zaRam301fGL+hk1onS
-	 vX3mW+rrAj5/Mu7x07CdiULCgocFPokFf5NffQ73wFvdVa92FWnNzqgSWa4NYAFII6f85
-	 2r8nCW10Lr50NwgMuN9QZSCZ8f2RC7IclnJuzKF8i3bJKjFC5aKE+H+PSMvJtVfaeg+DT
-	 ylGA1UdmKIGdKKrjCBJxHOQjUj2jHe9Im4CvCO8Due5wnEbG7BFco9M/AYfWXlUri6JHf
-	 bDbI9JCOf8N2M7yFg+V2YKoTxBHCI72X7rr1UEmifyt9I8iViZddpw8NMpmgfKsmOrg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793607148;
+	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
+	bh=IMhoSo95gjCjerFnh8p/muOlEhctt3FoP0/R1vEJRHo=;
+	b=taw5Ll7BCdV0y4jsg8PH1+HG82HVzhRKWnBchmZYDJlv2gmnXHHrlupS2N4HE3AojTsM
+	 NYflcxanKhKkuE6V/On08kqSAgokcKOjVL1k2tqCPvmKXKXlAvSoQTOCWCpeVZzl9dc2Z
+	 RQbxKEWQHxUp6SGn6hJRzr6gzZgMHWc9/LuQaY+DZCRlPociAUyJswXslN15Zz5X8rbSv
+	 A4otpSABuVFISW4yDmIQORJxqS1BkMIH63r27APUj1+oxppodLbaLqk+EpzFyvqWBTFcM
+	 OXQ9xKiss08GJcuAvThd3O14gF4sVrgOm5WjX14sMaEXhMb4090WeEE/x9axZwGa2hQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WlSZwWCi;
-	arc=none smtp.remote-ip=74.125.82.175
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=none header.from=huaweicloud.com;
+	spf=pass smtp.mailfrom=huaweicloud.com;
+	arc=none smtp.remote-ip=124.71.93.99
+Received: from dggmsgout11.his.huawei.com (dggmsgout11.his.huawei.com [124.71.93.99])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AE7606A327
-	for <linux-block@vger.kernel.org>; Mon,  2 Nov 2026 08:00:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A5AE7606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WlSZwWCi
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-3514b90bb89so5550351eec.1
-        for <linux-block@vger.kernel.org>; Mon, 02 Nov 2026 00:00:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793606448; x=1794211248; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=8kqF3ntzYW3hP6K+8Zi1mBskB8D2QgCHbNZ8Jdf9/+4=;
-        b=WlSZwWCiq2PAF+H6oZ4EkhdoOGWWeYu7f56c319sIi8m2ToY7CTu8Y1DrLbRw5nAMi
-         L/5UoU6Ivu2LXjt4JX5Ig+TwCrsCPKYiDYhYqCEA0pmOubyaR5IDeoSVVqZWWkXXErSE
-         SdCJnanp2UU9nHttCa77WOscrVnwFOW2Dep+EqPNgDolIWhnjfHb5vj7ad/Sz0T6wMjH
-         Zwhr6BJQBoovDKodO/hmXJfFwliqpS3zeEdgRItceAgDjcb8mjTIwza1U6Spp1L3UvEg
-         o2RTw7QhM0mx0SWZPyJhv0SRjAGB4x/QqicIe62ASgt9nFNEnYTSFHRxjq6v525KWzBn
-         CPDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793606448; x=1794211248;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8kqF3ntzYW3hP6K+8Zi1mBskB8D2QgCHbNZ8Jdf9/+4=;
-        b=NG+Nl67Dp75PURUM7WTwBHET0KRDUQByKP9FqzcDXPyF0K8vKpw0N9vaHHGGl2CG3H
-         h9hqtj9yIyMPRnsUHnojrq/kqhhqFIfYMqcxZWi/vq4rfPB9v9CkQieBNQiPJYTFPwAj
-         /qeDzTjDOulP7GbuAtZSYL6fatGKGqAgUmsGPK9k++Y+LNOAEXT7vw4/PpulUxzxSq87
-         mgj/vdDpVPgxbctGZMQ18lYJRAB6fQGksgBjSOmFPu5n5iJbtjHWzgwLRR+qBTPSiCMA
-         uc+dczjxns4QI/MOxLp3WHuQkQT11FJ6AUuzNq3pth5TMRKFcW9wt/fW95a7awy8exO3
-         rKAA==
-X-Forwarded-Encrypted: i=1; AKwUvByQdbvc3cCp0Faa9UDIsA9kpJ5jYc7kp++cfk5AUJzQWcBD4u8sJmUmi9cZrVy8x1utdiJA57parv6A/Q==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9Id0hdAULfC8sh+rTtKVJ2lu1T20B2j5vVkjdbpNuILeOxCCwR
-	NdWcbYpCqxK5fXDI9tp7iwUOo21/T2R1Zx0PaFw2wQUdHgxaJcUV+X2ivGGVGl0+tR8=
-X-Gm-Gg: AYBFou3rbJZZc9HiUB6T9m+S0yKKUMtIPBbxlXi58E6Z9wwMiXbK3+TlA9d+xbhyHPf
-	y/13Uco6twXT8+VCizqZqvx26OPNdisxFJbc1o+7kfgmrP+5ZgKv6ieFreRADk0KfRRwCZCQEee
-	zyf4WfOLRo1SZ+xltSBiutmWhJ8Z3VrisuUaK7OP7exVNooFH7WEh4ao3euC+0ifn16uyXRBEf2
-	NGVYs910L3C1LyuqK8F2Kf+/3VxXDPmSv1h7+l4XSQZIRXiAe7KPDo1vd/WwVVk6oDm36DsKNOv
-	m+g54ERdQ62bMwY/dNPh9zcsUr5IeJDwe9HavmpNRkpsDtaxZ+6nOnLs8W8YCd0IYjZSN0/ElhJ
-	hWZou0zt1BT7QW47ZgtRIze9N7aIKSXKrO2IrVAIX8Aaey29ZDWgYKCaHtrXXFMORE66kLCj1w9
-	huT7s94SdgAr9lDqAzirA2Rj773rVZ3cv6++kd104VYJKWzpVvPBvNi9F/q6ShLlJ1Yf/nCcr3v
-	3C47eaqboA0GVBB4D9yurlISJTOut+yK510/hTlk/7wAak4eBNSyNl8qdc31LW+UJjPIXCfeekS
-	EMpbVjLbYURlwyu5Bmaq
-X-Received: by 2002:a05:693c:4152:20b0:36a:1807:75a4 with SMTP id 5a478bee46e88-36a423cacb4mr16532556eec.20.1793606447377;
-        Mon, 02 Nov 2026 00:00:47 -0800 (PST)
-Received: from ubuntu.. ([23.254.208.9])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428aed76sm36371585eec.9.2026.11.02.00.00.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 00:00:46 -0800 (PST)
-From: Qiliang Yuan <odys.yuan@gmail.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Ming Lei <tom.leiming@gmail.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Stuart Hayes <stuart.w.hayes@gmail.com>
-Subject: Re: [PATCH 1/2] nvme: remove namespaces in parallel
-Date: Mon,  2 Nov 2026 03:00:41 -0500
-Message-ID: <20261102080041.1269654-1-odys.yuan@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <6e9e6f78-4bd7-46f0-bf57-5c227a65a69e@suse.de>
-References: <20261102-bug-nvme-remove-ns-async-v1-0-61780fee111c@gmail.com> <20261102-bug-nvme-remove-ns-async-v1-1-61780fee111c@gmail.com> <6e9e6f78-4bd7-46f0-bf57-5c227a65a69e@suse.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F702606A327;
+	Mon,  2 Nov 2026 08:12:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F702606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggmsgout11.his.huawei.com (SkyGuard) with ESMTP id 4jJ4DZ22Zvz1c0TF;
+	Mon,  2 Nov 2026 16:11:58 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id EB97C40574;
+	Mon,  2 Nov 2026 16:12:21 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP4 (Coremail) with UTF8SMTPSA id gCh0CgAXTu3kRehqCK4cCw--.15917S4;
+	Mon, 02 Nov 2026 16:12:21 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	bvanassche@acm.org,
+	hch@lst.de,
+	yukuai@fygo.io,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	wozizhi@huawei.com
+Subject: [PATCH RESEND V2] block: fix BLKSECDISCARD zero-length range causing page cache invalidation
+Date: Mon,  2 Nov 2026 16:04:20 +0800
+Message-ID: <20261102080420.3774409-1-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.52.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -107,29 +63,95 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAXTu3kRehqCK4cCw--.15917S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxWrWUCry3AF4xXr17Xw4xZwb_yoW5GrWfpr
+	y3KFy5Jr4UWr9rWF40k3ZruFWUK3W7Ka1xA345twn3ZrWqvrnFgFyfCrySgFWvqr97Jaya
+	vF4Yva4xKFy7ua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7
+	CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8C
+	rVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4
+	IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY
+	0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I
+	0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
+	cVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcV
+	CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+	c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU17KsUUUUUU==
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-On Mon, 2 Nov 2026 08:26:57 +0100, Hannes Reinecke wrote:
-> On 11/2/26 7:14 AM, Qiliang Yuan wrote:
->> nvme_remove_namespaces() removes the namespaces of a controller one
->> after another. Each removal waits for RCU grace periods in
->> del_gendisk() for the namespace and for its multipath head, about
->> 20 ms in all.
->>
-> But that isn't changed by calling async_schedule_domain, isn't it?
+From: Zizhi Wo <wozizhi@huawei.com>
 
-Right, each removal still waits about 20 ms. What changes is that the
-waits overlap. A grace period is system-wide, so removals that wait at
-the same time are released by the same grace periods instead of each
-needing its own. Disconnect time over tcp, from the table in the
-patch:
+Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") fixed
+the start+len overflow via check_add_overflow() but did not handle the
+start=0, len=0 case. There, start + len = 0, so end = 0 passes all checks,
+and truncate_bdev_range()->truncate_inode_pages_range() is then called with
+lend=UINT64_MAX, whitch is the "truncate to the end of file" sentinel, so
+the entire page cache is invalidated.
 
-  namespaces  before              after
-           8   170 /  171 ms       85 /  91 ms
-          32   628 /  628 ms      294 / 293 ms
-          64  1201 / 1308 ms      533 / 550 ms
+Fix this by replacing the validation with blk_validate_byte_range(), which
+already rejects a zero-length range and is what BLKDISCARD uses. This also
+switches the alignment check from a hardcoded 512 to
+bdev_logical_block_size().
 
-> Other than that it looks fine.
+Fixes: 0bd1ed4860d0 ("block: pass inclusive 'lend' parameter to truncate_inode_pages_range")
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+Reviewed-by: Yu Kuai <yukuai@fygo.io>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+---
+v2:
+Add the fixtag.
 
-Thanks for the review.
+v1:
+https://lore.kernel.org/all/20260704073942.3760597-1-wozizhi@huaweicloud.com/
+---
+ block/ioctl.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-Qiliang
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 64b4e6c0f696..53558963d9d7 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -175,12 +175,11 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ }
+ 
+ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 		void __user *argp)
+ {
+-	uint64_t start, len, end;
+-	uint64_t range[2];
++	uint64_t range[2], start, len;
+ 	int err;
+ 
+ 	if (!(mode & BLK_OPEN_WRITE))
+ 		return -EBADF;
+ 	if (!bdev_max_secure_erase_sectors(bdev))
+@@ -188,19 +187,17 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 	if (copy_from_user(range, argp, sizeof(range)))
+ 		return -EFAULT;
+ 
+ 	start = range[0];
+ 	len = range[1];
+-	if ((start & 511) || (len & 511))
+-		return -EINVAL;
+-	if (check_add_overflow(start, len, &end) ||
+-	    end > bdev_nr_bytes(bdev))
+-		return -EINVAL;
++	err = blk_validate_byte_range(bdev, start, len);
++	if (err)
++		return err;
+ 
+ 	inode_lock(bdev->bd_mapping->host);
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+-	err = truncate_bdev_range(bdev, mode, start, end - 1);
++	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+ 	if (!err)
+ 		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
+ 						GFP_KERNEL);
+ 	filemap_invalidate_unlock(bdev->bd_mapping);
+ 	inode_unlock(bdev->bd_mapping->host);
+-- 
+2.52.0
+
