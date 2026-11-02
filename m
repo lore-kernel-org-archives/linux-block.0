@@ -1,80 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793644640;
-	b=qttIpnu9WmXd5V5R+NQuAWsHFtjqt2FICzaPEYdTFYIFIXpMzTKMXxCcmCe/fvmZTiMq
-	 /qhG4vuMrhD85XYyP0NMVVfovH3F39SdAPrjIhB4Cmz9fm5hfx03jj4l9xZGvP15yBwwn
-	 iBzJLiZmIypbH3cs1QHfvsVUkDDdws7rVEWriJ19+YynaWYQ7T6GOp7T+6CAxWd2c5EWC
-	 VoGQ0pLRVKlRuknR6BJHfwdvIAuzpBaKFVqj/jQ++sD2fZH3vvaDLi0EhUzfP50rLf22q
-	 Zl2GjbZW38OiRTlW4TymZWvIl2GKT0wfVKFLXVxkYCQtc7HQyicijBQVY5Jwl4w2LXw==
+	t=1793646962;
+	b=QgmYMsTdG7SyGSOcCtI4z2gotUS6FcjolS4MiNwPSJPY5O8uCyoBomm8KuHc4/JDejZR
+	 OlgkirVp+QUVCRt3xhkOsuByQsmftUz3fH3Tc1X5hAAYL++TFZbOQF7lcT8H81WbNRNpn
+	 u7HXoKE/lCHFa270DL4wWp2Ryk0UhVbA5OapxHobeZhT+gE4pV3WJnTXKN2JFQqNVeyeX
+	 VWICYmtinRMPUCbdaGLmd8ZehXfNWaiO06+4yX56eSpTlusQqIE6UJyaA93/Wpv9MmMb0
+	 CfxhsZJ01WCs2KCw8CUod7LYSthY8SpSoGBvBFI0J3b3x7mRSZwitmwA3MQMxWOgCJA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793644640;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=abqkswgtFQmiFmU7+ExKU8DN2+g3xHYN90rasaD8iGY=;
-	b=pL8FaLW8G03xYui0ncDRDza63jan2DPwuAptGo9n6uVcB2XcbkB7RR8x1vKJpIzoyunS
-	 QkRghUFoQaoUETINOdmUbG/KkCMGeSs/WOomnq4yf0A0dJrRCYiq3hXBnpWYxPz+BXmU0
-	 7W4IXkWjHUqOrJxgrdAaC146CwSK5myAqwZvN3KPc+sD7OVMOjE3JeP2ZUj2ohq4jJIhr
-	 M7J22vq0Wn48/e5upYzfkPVZu3KH1GIPqWVwfvVx1Vtm5cwKJLJfdwcq2qpKI7f1KAFL/
-	 9YmmVLXYRibTah417voGltJebTAiXvYrs5jFBzuZ0IXBN4a5RSWRsddiIFyYUQnYgRA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793646962;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-Scanned-By;
+	bh=LlL1FYBFvzdxPX61Wt1FdQFWAKbXd+F54L2vvyVEA2k=;
+	b=HLjM/XpBo1LiLE0YvUeFYZM9naI755YsbNsa99EvhSfHYVX/5iYatGAXv61bVgZzXJXD
+	 5RSL4k6pebVKgdPzsFSqN6atgOY4GIUXTdtnUCLPeRxuivzVNa6g8rQEFfZOwbC9Qq86r
+	 nso7dep18AtretOs9q2Dwjx8qeH7enT5BaMbiFpLFkk0IfhcXeTPk0nCsmm0GxXH+t8to
+	 bYTlC7WzFOKSORzXYxkjP7nA0iHeF3oy1Es16jLHLI2oQ7axZUrx9ENQTZ3mlJpMRYBtO
+	 3JwjRkIpQf5P5RO6HGxtYctrHWxx444V6vfl8U9y46meiISGWvLzBTWH/03VrBgOqdQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=b5vfuRa1;
-	arc=none smtp.remote-ip=192.198.163.12
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b="KX/vtHMK";
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70532606A326;
-	Mon,  2 Nov 2026 18:37:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 70532606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77DE606D81A
+	for <linux-block@vger.kernel.org>; Mon,  2 Nov 2026 19:16:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E77DE606D81A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=b5vfuRa1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793644639; x=1825180639;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XBBSxBJM4dbAmhw9qJHLVU5PGpaTLbyMmJayE5/gdWA=;
-  b=b5vfuRa1YCBnl5GCe7xI9NJo265n/Y2WNPDyBu2GdKE2GRKo9IzWiloJ
-   YQU7eNuV9wQpsKQIBurLJ9gDYIcu5gCC5DF5ni6ReJ7DDMY3GydoT0aeP
-   t9UYx7Bph8STqeMfjrV99vvnpaJLI1DpfJH2nrgQSZ+3aSiOZqzBquwAu
-   8Gu2hiDsXomd2nGevVB7iNKTQ7m8A/qJjf/K34KOXUEHKidMrPCdHz++k
-   bl4Rnin7MRx7gq+Tb6jiJv6Eq5U0GMFfzpwgWpdpmu/0EGG3Wpc5gR/Hk
-   t0Yd76r/52hwbawasen172aV7d9eo2URh/W2cQ/iQ+th9vwTEtuNf275L
-   A==;
-X-CSE-ConnectionGUID: VKSE0XA8Sl+lt+vBLOs8Kw==
-X-CSE-MsgGUID: F0GYaJBNRficM0fJF4lBqw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11954"; a="2241902"
-X-IronPort-AV: E=Sophos;i="6.27,191,1787036400"; 
-   d="scan'208";a="2241902"
-Received: from fmviesa013.fm.intel.com ([10.60.135.153])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2026 10:37:18 -0800
-X-CSE-ConnectionGUID: PwC639boRYutcH2UfyYAcQ==
-X-CSE-MsgGUID: tzPbWeIfSDu1ced30xPCeg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,191,1787036400"; 
-   d="scan'208";a="8035743"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by fmviesa013.fm.intel.com with ESMTP; 02 Nov 2026 10:37:16 -0800
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xNwu9-00000000heW-2SzP;
-	Mon, 02 Nov 2026 18:37:13 +0000
-Date: Tue, 3 Nov 2026 02:36:56 +0800
-From: kernel test robot <lkp@intel.com>
-To: Edward Adam Davis <eadavis@sina.com>,
-	syzbot+a31cda410a4ccd419712@syzkaller.appspotmail.com
-Cc: oe-kbuild-all@lists.linux.dev, axboe@kernel.dk,
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=KX/vtHMK
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1793646961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LlL1FYBFvzdxPX61Wt1FdQFWAKbXd+F54L2vvyVEA2k=;
+	b=KX/vtHMKDK1rDbqxq0JtXAmwNg5eYzBAjXBXomUjlN3BuAYQE3je6MAnxrAs1TsXsxnkIZ
+	5eEGWaLIw765gw008f1u2o5pg/kpd4jbAAjqxx0aigpyTCH4XbHIzQf2R1t9J5aqKt5Ss9
+	FBEp2/lElKZWg0lmlTyFPW3WoZCCPZs=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-460-q1TuddBQOOWXfHNbUUV5dA-1; Mon,
+ 02 Nov 2026 14:15:56 -0500
+X-MC-Unique: q1TuddBQOOWXfHNbUUV5dA-1
+X-Mimecast-MFC-AGG-ID: q1TuddBQOOWXfHNbUUV5dA_1793646954
+Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D58FA18052F9;
+	Mon,  2 Nov 2026 19:15:53 +0000 (UTC)
+Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 35ACB7E1;
+	Mon,  2 Nov 2026 19:15:51 +0000 (UTC)
+Date: Mon, 2 Nov 2026 14:15:51 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Yunye Zhao <yunye.zhao@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowangio@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Max Gurtovoy <mgurtovoy@nvidia.com>, virtualization@lists.linux.dev,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] loop: prohibit the use of sysfs as a backing file
-Message-ID: <202611030239.QMvbuUI3-lkp@intel.com>
-References: <20261102103354.427722-1-eadavis@sina.com>
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Ferry Meng <mengferry@linux.alibaba.com>
+Subject: Re: [PATCH] virtio_blk: freeze the virtqueue layout at probe time
+Message-ID: <20261102191551.GB1738758@shajnocz.csb>
+References: <20261102133740.88919-1-yunye.zhao@linux.alibaba.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -86,58 +85,50 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261102103354.427722-1-eadavis@sina.com>
+In-Reply-To: <20261102133740.88919-1-yunye.zhao@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
-Hi Edward,
+On Mon, Nov 02, 2026 at 09:37:40PM +0800, Yunye Zhao wrote:
+> init_vq() reads the writable num_request_queues and poll_queues module
+> parameters both at probe and when recreating virtqueues after suspend
+> or reset. However, virtio-blk does not update the blk-mq hardware queue
+> count or queue maps on restore.
+> 
+> Increasing poll_queues can therefore remove the completion callback
+> from a virtqueue still used for interrupt-driven I/O, leaving requests
+> uncompleted. Reducing the effective request queue count through
+> num_request_queues can instead leave existing hardware contexts
+> indexing beyond the reallocated vblk->vqs array.
+> 
+> Determine the virtqueue count and the split between interrupt-driven
+> and polling queues once at probe, and reuse this layout when
+> recreating the virtqueues. Changes to these module parameters then
+> affect only subsequently probed devices.
+> 
+> Fixes: 0989c41bed96 ("virtio-blk: add num_request_queues module parameter")
+> Signed-off-by: Yunye Zhao <yunye.zhao@linux.alibaba.com>
+> ---
+> The functional fix was previously tested with QEMU 8.2.2 on
+> 7be4bc52fd9e (v7.3-2415), covering:
+> 
+> - PCI FLR after changing poll_queues from 0 to 1 or num_request_queues
+>   from 0 to 1 on a device with four request queues.
+> - Normal and polled I/O across FLR with poll_queues=1 at probe,
+>   including a subsequent change of poll_queues to 0.
+> - Device suspend/resume with pm_test=devices and state=freeze (not a
+>   full s2idle cycle), plus full S3 and S4 suspend/resume cycles.
 
-kernel test robot noticed the following build errors:
+I noticed that drivers/nvme/host/ allows the queues to change:
+1. The hardware queue count can be different and the tagset is updated
+   with blk_mq_update_nr_hw_queues().
+2. The module parameters are refreshed in nvme_setup_io_queues() and are
+   allowed to change across power management operations.
 
-[auto build test ERROR on axboe/for-next]
-[also build test ERROR on linus/master v7.3 next-20261030]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Please consider implementing more flexibile restore behavior in
+virtio_blk that can toleration hardware queue count changes and module
+parameter changes instead though.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Edward-Adam-Davis/loop-prohibit-the-use-of-sysfs-as-a-backing-file/20261102-183354
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
-patch link:    https://lore.kernel.org/r/20261102103354.427722-1-eadavis%40sina.com
-patch subject: [PATCH] loop: prohibit the use of sysfs as a backing file
-config: nios2-defconfig (https://download.01.org/0day-ci/archive/20261103/202611030239.QMvbuUI3-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 11.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261103/202611030239.QMvbuUI3-lkp@intel.com/reproduce)
+However, this patch looks correct to me and can be merged IMO.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202611030239.QMvbuUI3-lkp@intel.com/
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-All errors (new ones prefixed by >>):
-
-   drivers/block/loop.c: In function 'loop_check_backing_file':
->> drivers/block/loop.c:537:48: error: 'SYSFS_MAGIC' undeclared (first use in this function)
-     537 |         if (file_inode(file)->i_sb->s_magic == SYSFS_MAGIC)
-         |                                                ^~~~~~~~~~~
-   drivers/block/loop.c:537:48: note: each undeclared identifier is reported only once for each function it appears in
-
-
-vim +/SYSFS_MAGIC +537 drivers/block/loop.c
-
-   528	
-   529	static int loop_check_backing_file(struct file *file)
-   530	{
-   531		if (!file->f_op->read_iter)
-   532			return -EINVAL;
-   533	
-   534		if ((file->f_mode & FMODE_WRITE) && !file->f_op->write_iter)
-   535			return -EINVAL;
-   536	
- > 537		if (file_inode(file)->i_sb->s_magic == SYSFS_MAGIC)
-   538			return -EINVAL;
-   539	
-   540		return 0;
-   541	}
-   542	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
