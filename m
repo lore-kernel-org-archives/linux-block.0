@@ -1,93 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793716288;
-	b=A4ltVUecORgoE0BpY1c0owXPjyWvoD/BhcGjBzJcyMxiK0rHOmh9suz2neBkkm8eGpzJ
-	 YcV74uUdauLWCwwK9oCNdYHgLGRscZFc/dRLri5wtzwjWsJXupWgtcCeVj0VaQlSY4N1T
-	 6S04Sryjvu210fQESj4XsWWbl6SuIvHoVp5gaXAbqi5hTTWENWQrEJyxUOT5rYJ6xnB36
-	 2KPQTMcblurMtq9BX2YLibBelT/EACuQn5jbAr2RpsmpbSqfSizVRkm0Ixy6Pn7f5Fzfy
-	 pKnXqM0IwSPi9kR5JLOa+uU1aUsQZunDHZ9exEls5fmPq9lmejupgJ2TuwjxJ+LDKUQ==
+	t=1793716290;
+	b=RiwauLY1cVsDgYvL6tzALKQamSdQH+K+tGHlDxitzcB4POntEUMN8Jo93fWFPdrRNjGk
+	 wbV5s/QxOFbrDEppyRNIn0CbLnZfTdHvKnpAIQIVHNWlBaXgih86SWEf7UAWOj3RMszYA
+	 grvqCFXgvVyuKbY77yTZW08nGPD++wjXWdeJ1zOX/GSzcHS7272NodxxApMI3WDG5HHGv
+	 tTuCllJBh/f04WN93LKE4OoK90WGx/ffbwQbyaWfe9JibIgf8dNVa3u3xfk12i1I8WsUh
+	 +74x/m3tkaBDJjHb5N8qXCkDH03NlgFfWl8OUVLg0+ajBho9Iu/5tMx8KMdFvo3XN8Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793716288;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793716290;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
 	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:X-Mailer;
-	bh=w+6rqmat8dLUzlB6PAGhcslRU/QsBUAoeXuoPxKZzAA=;
-	b=XA6EI++yGrFt+ip0uAJt5ioujApCMLeFK+1gbair4cgR4n8zRwqDs6azw/9y7qolepEG
-	 n46c3y1mhT/jOb+DGyHK+DQ49W6CEeLRWKJp+ju0g/N8QrUGqbGE561YMPKfAFuiVh7M1
-	 0Mj5rOOtKVfOUTgexPV+wp2+wlJuQGwIwq0YLSePd3nNu96QX1JKd9TPgKEkRiKs78RjU
-	 4RVYA0dnI1m4Zu+rhKQIFjCB+w1Unu4odBwmzKKILzBUmFq1Ht64G+ZH2KsVyaD5sZtSL
-	 +3Sbhra7liHZukJDSTV0cw16NfqSUaNCW/cG31RE+H4lGy13HfeQaeztJs5nGhcYevg==
+	bh=lQP5UfoJGZ61K5R3SQuKiGS3++XV/5Fqa+MZBDFEMdI=;
+	b=B2VyjOJaJwNMbITCoQa0qhdtJPELblsTWHWQLd8qc68FEoukQz0Y3eWUiH5vWl3UoMv9
+	 jAO14Dar8MohOpDY+PUNsu0qUIRCVYvL1UAa2cWhfWIq6f/zRLp05lUl+hRTh+lkDYeTW
+	 z5i3/5ompcjOqTFRTku9srNOL57bDRKUTtSsh3IQCwaaUqaXmLu503gr5gmivFNVVJhLI
+	 uKTxOAaKAN4+7MToY3njv4A7e7nQAuylDcbzzS/s5Y2t1P96zfc+vSw6vNislPvKPPgyN
+	 xvn/pOUR6hyrcgYSiFiAgPbZOyyGO+L8qIs+0AkggShh+tQ5IpmnzZ8FfvqS61iJ29g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="p/dfsP33";
-	arc=none smtp.remote-ip=74.125.82.47
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="gKjJ/6Sv";
+	arc=none smtp.remote-ip=74.125.82.50
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8502608360D
-	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D8502608360D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674E56083638
+	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 674E56083638
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=p/dfsP33
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1ae58d17cd9so1141366c88.1
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:27 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=gKjJ/6Sv
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-1ae58d17cd9so1141414c88.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716287; x=1794321087; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716289; x=1794321089; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=w+6rqmat8dLUzlB6PAGhcslRU/QsBUAoeXuoPxKZzAA=;
-        b=p/dfsP33lVS7hQydRyF5+IF8ZwSyflCKVigobbFPeVkZb4GC8VxXqrDDnzezzKrArj
-         2VEjpHCaGFAlUdOwrJDBywjmGutiF346GeJS3ktoLv4jI/sQV6KjRJ9CVtrMNWEYTypZ
-         aRdJVerK/L/KBsJRVSgMPCFEOPZw7li1CHWEXtFLq/20SFFvdGCQkbAGJfalry2l34DC
-         rQYpFnMpxroTzdAHgjP27ufiInji2oerWSuHhw4qzO1+tfFa9nVbuqGnmFlJ7V0N5BdP
-         xCM9gF31h5sLieQUZTQEx7B4gZAcUfMqHygeNu8QzGgnO4hmIQqzZdXoa8yoa4VD18hJ
-         nllA==
+        bh=lQP5UfoJGZ61K5R3SQuKiGS3++XV/5Fqa+MZBDFEMdI=;
+        b=gKjJ/6SvSISn5g6EFsgPui5YEYC/MbDN05MclZGEWTEgK+qxGLT2Pqzke2uXQS6c9U
+         YfaHxiTLnY7Mm2g2eXYxsq+GmguraXytboIiKKpG2bDndyvwy/TGithPIDvxJSJG+G/g
+         qGR9nIuGQxyGmxV6pT5DM0z8EndE4zDPoxsPKNQHUevSm/NmDC5FAzBIxehXWW1MICJP
+         VkPwz9qSMV5dbjL6cWPjntuBAi8pRY0umW8vztqtlmNm6yxxkzOEyA05bn6l58XWzSmF
+         ZHEi49EDPDY2thdsvCrCtfCf+SQshoj90f+9nAGDyx1BidsELgEhui/ume8n37Ga9duU
+         H+vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793716287; x=1794321087;
+        d=1e100.net; s=20260707; t=1793716289; x=1794321089;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=w+6rqmat8dLUzlB6PAGhcslRU/QsBUAoeXuoPxKZzAA=;
-        b=zwS5XdS83rlojrZXxuUlc+elbRQmxlPP7tm29jDSK4PRbRw9j7ohkKUrYdYsRM85ST
-         8shlDUEWEKAMKpH4kSTxPrrGjaIcI+twH1ZcmpAlroEgQEkjDbJaWp48iLcUDzjnLmgc
-         x4/Ik0pClB4n0C3m+gIQm614K0Dwg+RHTTy2EDlDp33ClomEmihDf5xBeDWO9HjW2/nP
-         BvqcdXXhI+NvEKDkB0hAY77LtF9a4/d07l8PGh5MrO1jtxiFQNhr9cBpHiPdT8Nr291Y
-         kmqVa5vcsLx1d5pClTkckpFWMqmDHWklbTbkNig8/d+d9dgqy4mb4iXIfzRduZ/v6F2U
-         EpmQ==
-X-Gm-Message-State: APuU4Z8ZYAEVzMqJ17qRBrntwLRPrZUkbnNzG4EPIiUNApgTiCcmJcye
-	Fps7ZGX+ukyXYN2L+6hOALa2STBEMR1UAwldQis8jtnGe+8xxRJA/V13nWcV/lSC5+uFj3YXLFp
-	TIAim+QU=
-X-Gm-Gg: AYBFou0vKGUKIyR/OtRMR/DxNjs3Gqg6n5jN3K6ia4aWeUYash/FAPpcadj9IwxbAz5
-	N1I8PdqtkE22CfP+kL6GXqAu1qbi6rbs3VklleViMWSFTLWpSfc8yCcTtqEp9g5A21PNmSn43WA
-	NG3117pkjm17oI5Iw6BG7AAo3zse+3hF7AznLBU9+zTr/f4PmcQmm8FzJtGVVjqGHvoWODYtV0J
-	O/hfw1URBqZ5ZBfQ0TjB6846UBhU9y9umsXMYFfTPeW8MMHSZq1Of1BPdrnT+E+/7RjDrqxpTV4
-	NyNKEuIm9On99hVhZDu3CAhWfTLphDg7WPyOfyPjk0kDqgOrjGM686eCVaAWyy3pvcbUpqGKy5+
-	pyta1YyfyM0PtWUN8/6wIUM9M4lsARp3U1uM794m/wDnKMuIOoOz81PqJhAE853CneS2QWtiArM
-	rLU5oQuUDZa74ixts0hEwaYfLOGarlW/XNcNio/Zz7HlQArpvjGn9mdjPtK7PTcaXj53ze04Eam
-	oftGED8crtFNS4scv4853hsHnTZNFYbVO85j6JX6aXFOsvY55nNvHsYGXyK5KPHEykmV19Z3ANK
-	ihwr4bcKFaLckDWj5L4vH2ubg9AtjpjTEXcFu3hNrPGvMBQIWevbtrpJjAInl6kZAfK6WNIPeF6
-	mJSOU6cT6sPqW
-X-Received: by 2002:a05:701b:420e:10b0:14c:1f57:3e86 with SMTP id a92af1059eb24-1ac5e6f5fbemr20269426c88.47.1793716286823;
-        Tue, 03 Nov 2026 06:31:26 -0800 (PST)
+        bh=lQP5UfoJGZ61K5R3SQuKiGS3++XV/5Fqa+MZBDFEMdI=;
+        b=utklKCxKsU4KKXbVRrLW4vAvCWflLlrAbzSaHt5cL/3bgBBNDN3t2xNcdqq/NKOAcT
+         FIRQJxm6S4KQy8OuafdV0+DvD6YxMbsCdL2yX61TSqDHVDR1yQ873R4E9PJdK8nJ/Vgc
+         sxZHWW6pmSBgSa1Kl53Ubuibol1eEg5FSxWHgQDSzVcOExoRRUALivC5ZLPaqEuFinsa
+         75bqLSUz3D4hNyF5rpNyQMTEkqbucD54syzU0cpm59ui8NDV1/6MrBbrUwOPIRkVSefJ
+         fIQnPEIMQtDJKAiXdne9kHl2i1AIPAk3NShfnZLoa+R014ROINxXuC0ouyjfG2AjQrlt
+         AGyQ==
+X-Gm-Message-State: APuU4Z9JcoN3Md++eF7aXvOMlsDbWHpe24GpimHMZzmb2tVpB2fk+IgJ
+	QeL8fn/7Jwa3tU9cypNfQ9eHpVJf+3EiCV6WDOofd3XgQm51gIIXTvyweDgtKqFGUjw=
+X-Gm-Gg: AYBFou2sGPOdyLVgPbxZaMrA19AcJfB8kiC3rsn45ggdNkiYUmZgH03AzXUO0cf9wd5
+	Mh0xh+1xtFnDj9O7kx72poJQY2DkbdP4feUtrThSMFSuFcmXLYjQ56VOIxdMmmihSPYGOQVmjdI
+	J1Vdk8sD+tipBz7dcC7OdGEHUPrenglV+S3p+Lq2RkchlYHWG8DBTbaw/Tpa2jdhqNsfc4FPdUR
+	zF0bLacOCyRS1wI8DKEl8zwAebLtZvN42IYRu1Lp7tVfB1ByAkdjFCbmI9EWhJmpj4g2N40GpAu
+	+mUY+201E1aCDMJxOnCx5XbKSXMscZwfkG7lcbWRh1fr3URLcHsM2IL1/mKeS1ck4Ql8+CVU8RN
+	+8+0yxV+wEgPOIEsrT5hLOS03pzkFQtEg//Jin/TWC7dXzbzHbzYrimJb9/WlkS1IaCyjgmtSKa
+	HxuIiciMNR1dxnwZaToif6aMl1dDPHvMhGwG+pgNzcAH0hbVDKdjuizfpI1OSDwYHsEO+winI6j
+	/JM8J5Y1XAiIhZZI0b4HHGCml0git78ERGmXlK+/0+jn4ZfRGRH+GA+3V/jUAZ83GEZrhly99ze
+	5T9gViLDoeSJFwg6EDEdmZoJeyGyfLB1ypl9Pjqg4x7LrwS3q4WdkwZN+DWPx0n/oV08xHdKomI
+	I/wuTDlinpfel
+X-Received: by 2002:a05:7023:d0b:b0:144:e535:3ef6 with SMTP id a92af1059eb24-1ac5de53bbdmr21036321c88.41.1793716289438;
+        Tue, 03 Nov 2026 06:31:29 -0800 (PST)
 Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.26
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 06:31:26 -0800 (PST)
+        Tue, 03 Nov 2026 06:31:28 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: dlemoal@kernel.org, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20261102055558.3212814-1-hch@lst.de>
-References: <20261102055558.3212814-1-hch@lst.de>
-Subject: Re: [PATCH] zloop: fix block size query
-Message-Id: <179371628604.3691261.8426896731163496682.b4-ty@b4>
-Date: Tue, 03 Nov 2026 07:31:26 -0700
+To: linux-block@vger.kernel.org, 
+ Krystian Kaniewski <krystianmkaniewski@gmail.com>
+Cc: Nilay Shroff <nilay@linux.ibm.com>, Hannes Reinecke <hare@suse.de>, 
+ Ming Lei <ming.lei@redhat.com>, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
+ syzbot@lists.linux.dev, 
+ syzbot+e90526cab23b9efcd03c@syzkaller.appspotmail.com
+In-Reply-To: <20261014170538.1089448-1-krystianmkaniewski@gmail.com>
+References: <20261014170538.1089448-1-krystianmkaniewski@gmail.com>
+Subject: Re: [PATCH v2] blk-mq: fix out-of-bounds read in blk_mq_free_rqs
+Message-Id: <179371628848.3691261.276757911523604089.b4-ty@b4>
+Date: Tue, 03 Nov 2026 07:31:28 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -102,14 +106,24 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Mon, 02 Nov 2026 06:55:58 +0100, Christoph Hellwig wrote:
-> The block size obviously needs to be queried when it is not set, not when
-> it already is set.
+On Wed, 14 Oct 2026 19:05:36 +0200, Krystian Kaniewski wrote:
+> A KASAN slab-out-of-bounds read can occur in blk_mq_free_rqs() when there
+> is a mismatch between the number of hardware queues allocated for the IO
+> scheduler (et->nr_hw_queues) and the number of hardware queues in the block
+> tag set (set->nr_hw_queues).
+> 
+> This mismatch can happen if blk_mq_update_nr_hw_queues() fails halfway
+> through (e.g., due to memory pressure during
+> blk_mq_prealloc_tag_set_tags()). In this error path, the elevator is
+> restored with a larger number of hardware queues than the block tag set
+> actually has.
+> 
+> [...]
 
 Applied, thanks!
 
-[1/1] zloop: fix block size query
-      commit: 8fbee85a90789d367c347b1cfd5a5ef37f3a934a
+[1/1] blk-mq: fix out-of-bounds read in blk_mq_free_rqs
+      commit: 894e4e6084924cfd590968d45fad20908e02ddae
 
 Best regards,
 -- 
