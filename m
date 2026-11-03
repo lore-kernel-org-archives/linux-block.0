@@ -1,60 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.28.115
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793702534;
-	b=qz8E+gyFzCpUleTmZFSsB4xeRqlkegKjp5xnGsrYb5JtobOZYEoDJ3LmkIAh+t2uEHaL
-	 De6rkrxAgY/vt5Eyfylns9Mq6ssf/6/ZSwLn/4WuC4/yce6rIB4LWMg1BgILx785Ibjt9
-	 A4OMT0lE4MYs/Agv99VJiGpMMkYYvrtIrtW8R/CjFt7QxooDcD/z4VDclCwIbV7gfxr6J
-	 isyaUiiHAwMhWY7kvdJCNZualjuHOlFRJuYqRhtAAa/6yDOUW4CdG+dq+nMhmPTaSGki5
-	 6HVptaH04LWP5csOL1OgOdYjwcrjdwrbIjs2vAViUeeJ/0e+dfK+M/vg0pkLOErBYlQ==
+	t=1793706947;
+	b=Ruk/YojQDiqXc1JeDMEwDTby/UeOEdmAVIRx5Hp3Y/6yfXwoTgVZmWKL4x7+cpgAukJm
+	 ygavh7SsbvayAppTxvRq+NhXZIwrS4REOcCYzBStx09I2ThYkHJ+LHy1JLTbK/UnOSfRk
+	 98tjTNRjwpnF/2ybO9BqlQA2Lae2aTQqseND2mkSfTZ+EUg634ZRxL2csCzrF/Q8sh7DI
+	 j3vLrGjTNl7MoipGiEmoj4MGC7vul5IfFiDwk5rd7tMrjz0d+ism+xFl36/4JbJR8nMAd
+	 /UsHiXilNRrtjIMgv/ja5JyyUv8FCB9EVDstfb7fkA3CrmJQDHaNhnSq9N1fjmhusTw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793702534;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:X-SRS-Rewrite;
-	bh=ReTrihaaRabtR47CqLaW3Lxkmv9zbkz3G+ix5184sfA=;
-	b=sVNYKP5ZEzk3mL/QpQITMTxWuTPf5z8L9aEUUyAEsSscJdUooxkV1PN2vCKEUZFxs0kM
-	 ifvqsIIuhASdmR6twhZ+2VClgIiU8luyr1kS2VzWaRL4iqAZ4jyiK/jlQMft2EwZfSTob
-	 mN2RUZRJ0bmQR5ehS6mjMia00aLlQRSfXKpUhpIXm0S+UGxD+dPkYPPpMz4tBkmCXWnMU
-	 ssFzyZQbLzH5Kxm2e/EfvOJ3ilDD8+DfuyB8oEa+Z/hO54GBf9JoUw6jySHiieBRRDSSb
-	 L0OaK9W8bwHNTxQLh9GUf5m3iZEbYMHoKIdzOwQG19sfQMVI6+xCRrA2hpuxDBxLljg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793706947;
+	h=DMARC-Filter:X-Alimail-AntiSpam:Received:From:To:Cc:Subject:Date:
+	 Message-Id:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=eGUTN5stq2GNQ65GIycmnbGlk5AjIXl4S++YM+uakBs=;
+	b=nQLlqkhQgY6riEUzlbr8VSDInbo/ZRl86pTohGAg/quwduoQNcDagaBi40McqidLtTsa
+	 erxZ8Ax8Ym49hmeOLcC51JTG8SUnTTGl/FKbCKqUY5nOwnI30N1peXJA3UtWL4dYDJDPk
+	 cOWim9NspAx/nwbYO+DaULrbKGAl+e7TDzGXrjOkEsOXZhzB9K/PNxSTbbbKCm2n679JA
+	 O/Yulhx2IbvlgX14nvWzPUXqXOHjIZqb7X/RKe/XZvnNgRHWonD4qAroS6lYCBvzzYRaF
+	 qRFF7MEX+8zLdqgjJ/lZWQdMfQJS7iUsPCLDmCAPRc77n9HEjJLxyuY5P+BIaQs8U1Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=TZLSp0Za;
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	dmarc=none header.from=kaihong.com;
+	spf=pass smtp.mailfrom=kaihong.com;
+	arc=none smtp.remote-ip=115.124.28.115
+Received: from out28-115.mail.aliyun.com (out28-115.mail.aliyun.com [115.124.28.115])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED00606C577;
-	Tue,  3 Nov 2026 10:42:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4ED00606C577
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=TZLSp0Za
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ReTrihaaRabtR47CqLaW3Lxkmv9zbkz3G+ix5184sfA=; b=TZLSp0ZalJDXUcqFPq5D7mMOE7
-	2lD0b63/ZKViVjMExVT9AN18WWjfKTonTOm5bm+iQTOpYJX5BofbxIhCeN6iobyFonVexqkwPltZq
-	n0Q17a2JsTKc/zIv+lS8QYuy7j4EhB3jCjVaDdmHhhnO4k0OBeetxVKNWGveKv3DtNXDMkpzHinVO
-	Y2xq0q0ZEGhvQHYe9KWIrQ2ENVFvp3z1x61bCh8BuF2b1W/UC+fnv6JnJWl66wQGNCWvyWrvp32lX
-	+HUSZnoBjnuH1kMBo5CjwgBhskCHHF93DtzxJXiuwfRnYEqcezBS9UbPu9g9pKhg4BNKRc99LFBkD
-	31e54evg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xOBy1-0000000238E-33rQ;
-	Tue, 03 Nov 2026 10:42:13 +0000
-Date: Tue, 3 Nov 2026 02:42:13 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Avi Weiss <thnkslprpt@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>,
-	Christian Brauner <brauner@kernel.org>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: avoid repeated notifications for dead disks
-Message-ID: <aum6hZ6u9G4bNyCU@infradead.org>
-References: <20261031171325.4073830-2-thnkslprpt@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A88606A333;
+	Tue,  3 Nov 2026 11:55:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 04A88606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaihong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaihong.com
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07436259|-1;BR=01201311R111S59rulernew998_84748_2000303;CH=blue;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.0107514-0.00587939-0.983369;FP=14128837808419836670|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033037033194;MF=wangjichen@kaihong.com;NM=1;PH=DS;RN=10;RT=10;SR=0;TI=SMTPD_---.jvip0Fh_1793706932;
+Received: from ubuntu.example.org(mailfrom:wangjichen@kaihong.com fp:SMTPD_---.jvip0Fh_1793706932 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Tue, 03 Nov 2026 19:55:33 +0800
+From: Wang Jichen <wangjichen@kaihong.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai@fygo.io>,
+	Li Nan <magiclinan@didiglobal.com>,
+	Xiao Ni <xiao@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org
+Cc: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com,
+	wangjichen <wangjichen@kaihong.com>
+Subject: [PATCH] md: avoid block autoload while importing rdev under reconfig_mutex
+Date: Tue,  3 Nov 2026 11:55:29 +0000
+Message-Id: <20261103115530.2913093-1-wangjichen@kaihong.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -64,75 +58,102 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261031171325.4073830-2-thnkslprpt@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 31, 2026 at 07:13:26PM +0200, Avi Weiss wrote:
-> blk_mark_disk_dead() reports disk death even when GD_DEAD is already
-> set. For example, NVMe reset failure and subsequent namespace removal
-> can call it twice, repeating holder mark_dead callbacks.
-> 
-> Only report disk death when __blk_mark_disk_dead() first sets GD_DEAD.
-> Keep its existing return value for queue drain handling in
-> __del_gendisk().
+From: wangjichen <wangjichen@kaihong.com>
 
-This would be much simpler if we move the test_and_set_bit of GD_DEAD
-into the callers:
+md_import_device() runs with mddev->reconfig_mutex held from md_ioctl().
+Opening a member disk via bdev_file_open_by_dev() triggers legacy block
+autoload (blk_probe_dev), which takes major_names_lock. md_probe() can
+run under that lock and call md_alloc(), which takes disks_mutex and
+reconfig_mutex — a lockdep ABBA with the ioctl path.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 10ca8b4d6eea..7e4570f9cea7 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -659,12 +659,6 @@ static void blk_report_disk_dead(struct gendisk *disk, bool surprise)
- 
- static bool __blk_mark_disk_dead(struct gendisk *disk)
- {
--	/*
--	 * Fail any new I/O.
--	 */
--	if (test_and_set_bit(GD_DEAD, &disk->state))
--		return false;
--
- 	if (test_bit(GD_OWNS_QUEUE, &disk->state))
- 		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
- 
-@@ -689,17 +683,19 @@ static bool __blk_mark_disk_dead(struct gendisk *disk)
- void blk_mark_disk_dead(struct gendisk *disk)
- {
- 	blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
--	__blk_mark_disk_dead(disk);
--	blk_report_disk_dead(disk, true);
-+	if (!test_and_set_bit(GD_DEAD, &disk->state)) {
-+		__blk_mark_disk_dead(disk);
-+		blk_report_disk_dead(disk, true);
-+	}
+Add bdev_file_open_by_dev_autoload() and use autoload=false from
+md_import_device(); member devices must already be present in the
+block layer (normal mdadmin usage).
+
+Link: https://syzbot.org/bug?extid=cd254889291ef8666036
+Reported-by: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com
+Tested-by: Wang Jichen <wangjichen@kaihong.com>
+Signed-off-by: Wang Jichen <wangjichen@kaihong.com>
+---
+ block/bdev.c           | 13 ++++++++++---
+ drivers/md/md.c        |  8 ++++++--
+ include/linux/blkdev.h |  2 ++
+ 3 files changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index f20f91b31..e78936556 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -1076,8 +1076,8 @@ static unsigned blk_to_file_flags(blk_mode_t mode)
+ 	return flags;
  }
- EXPORT_SYMBOL_GPL(blk_mark_disk_dead);
  
- static void __del_gendisk(struct gendisk *disk)
+-struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+-				   const struct blk_holder_ops *hops)
++struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode,
++		void *holder, const struct blk_holder_ops *hops, bool autoload)
  {
- 	struct request_queue *q = disk->queue;
-+	bool start_drain = false;
- 	struct block_device *part;
- 	unsigned long idx;
--	bool start_drain;
+ 	struct file *bdev_file;
+ 	struct block_device *bdev;
+@@ -1088,7 +1088,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 	if (ret)
+ 		return ERR_PTR(ret);
  
- 	might_sleep();
+-	bdev = blkdev_get_no_open(dev, true);
++	bdev = blkdev_get_no_open(dev, autoload);
+ 	if (!bdev)
+ 		return ERR_PTR(-ENXIO);
  
-@@ -727,9 +723,11 @@ static void __del_gendisk(struct gendisk *disk)
- 	 * Drop all partitions now that the disk is marked dead.
- 	 */
- 	mutex_lock(&disk->open_mutex);
--	start_drain = __blk_mark_disk_dead(disk);
--	if (start_drain)
--		blk_freeze_acquire_lock(q);
-+	if (!test_and_set_bit(GD_DEAD, &disk->state)) {
-+		start_drain = __blk_mark_disk_dead(disk);
-+		if (start_drain)
-+			blk_freeze_acquire_lock(q);
-+	}
- 	xa_for_each_start(&disk->part_tbl, idx, part, 1)
- 		drop_partition(part);
- 	mutex_unlock(&disk->open_mutex);
+@@ -1110,6 +1110,13 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 	}
+ 	return bdev_file;
+ }
++EXPORT_SYMBOL(bdev_file_open_by_dev_autoload);
++
++struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
++				   const struct blk_holder_ops *hops)
++{
++	return bdev_file_open_by_dev_autoload(dev, mode, holder, hops, true);
++}
+ EXPORT_SYMBOL(bdev_file_open_by_dev);
+ 
+ struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 03e35386a..d3717e2e8 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -3858,9 +3858,13 @@ static struct md_rdev *md_import_device(dev_t newdev, int super_format, int supe
+ 	if (err)
+ 		goto out_clear_rdev;
+ 
+-	rdev->bdev_file = bdev_file_open_by_dev(newdev,
++	/*
++	 * md_ioctl() holds reconfig_mutex; legacy autoload in bdev open takes
++	 * major_names_lock via blk_probe_dev() and can deadlock with md_probe().
++	 */
++	rdev->bdev_file = bdev_file_open_by_dev_autoload(newdev,
+ 			BLK_OPEN_READ | BLK_OPEN_WRITE,
+-			super_format == -2 ? &claim_rdev : rdev, NULL);
++			super_format == -2 ? &claim_rdev : rdev, NULL, false);
+ 	if (IS_ERR(rdev->bdev_file)) {
+ 		pr_warn("md: could not open device unknown-block(%u,%u).\n",
+ 			MAJOR(newdev), MINOR(newdev));
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 0c2010230..e5121101a 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1699,6 +1699,8 @@ struct blk_holder_ops {
+ 
+ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 		const struct blk_holder_ops *hops);
++struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode,
++		void *holder, const struct blk_holder_ops *hops, bool autoload);
+ struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
+ 		void *holder, const struct blk_holder_ops *hops);
+ int bd_prepare_to_claim(struct block_device *bdev, void *holder,
+-- 
+2.34.1
+
