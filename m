@@ -1,86 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=216.71.152.95
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793698749;
-	b=2U8md8BlneUQO6Z2rVPPWTr9RFibGS4HOO1G8UwA9aimflvs/N1kEC/DnEMNADqlVD/a
-	 ckAYU5SrGQu0VdIfwRz5wY8TBXLQOJGXKYyi6PQjIFtxe3lfZRl1Ha+0HYeYGnIgdOGXc
-	 Ig2mOt9VFHk11R/qoelMvRM7Yx1i9TkdEOGw+dBm/88PaOpski0B1SQRfngoqwdlBjLwL
-	 naMkmoPKG2D9yYytxihLalyjkEoSstxUT6mJOmX+oujyMlqNJP4Mq1IxjIYdWSrxkQywX
-	 BVyKzE6RyIBXQ98r+bQEguXYDz+oRTV91hf4YkPb9vKGWPH3IWO1SHYUHuPjmvPgQmw==
+	t=1793699780;
+	b=ITn+23vo0J7Z0UHjIWUz+NU8L939U8Mpe8FQGTTg81Lwj6bTCHRdObX0W1qVmBtBa5Ic
+	 qjkg3mEuaJhwXWtl+1XWIHLuJGsvLHMn+MWoau2X4JPhRNhQJX52e2g3D5MwQ+lP5OPLO
+	 Gz1dliyDH4Rt/hb6Y/dW5y3aDyNQv6v4h/3kjM6bVl02+RHZKWUpoihMKAkpLZF1mHRcH
+	 ZZ2vi3Bfa++OKIpNVznoh7j2/Nh1C00hL3ycPNgmvlo/xGSfBD9EJaUAXm/TS9Fo6v7bb
+	 k7h7y4mN08/qcqcCzM5B70mVa7PVqsAccfKZPWeTQY1ZDNcgWr7bieQCFLp32IGbyxg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793698749;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 Received:X-CSE-ConnectionGUID:X-CSE-MsgGUID:IronPort-SDR:Received:
-	 X-CSE-ConnectionGUID:X-CSE-MsgGUID:SanDiskIronportException:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=mSIOrvwCljTuyfqFX+dIixZrw7yR8HkFNXQP1Zue3go=;
-	b=r+f5jnantbuPY7FVBy/2p1wPbug0kyhq2aNJXXyvvujIpxOybuJ+/CqK2OpGgNtz3qLw
-	 d9dhBr06fK69C7KPIwyZ+7FuVSHiSMPbY9ZgkqmFtc1R722GjqNTos5F/XhKyq8Yr8A/v
-	 jaMoAdk1IgvjqzwB0OSfmAk3HHuGe7iMwYK0zJmXjHsiN1PdXvIOH1EAINEq/I0Kstzmi
-	 fhvTjrXQURyLTsaWhjBhEycjSO7jf/hm4U3oAC9ksWbLVjMDYNTm2XZUsA3tYHnr6UwN/
-	 +6xqLsyuxU+mzbqDV2t4PffuKBwF2cI4FmIJLZqHG1moZMp4/vXMTf9nYutF0YyLaPA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793699780;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-SRS-Rewrite;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	b=hLTiI1kP/AbllMQDMrdD3GMXjYT58HAHPodk/BwxYu7On02P4bHffsKdo8NqayV/gry6
+	 5NiobhL6q+FY2WUja2Iza1t1LZ/AvgbeHfF/eC2QYRyiVlpYYKz6olIaXWxm5p2RsoKRw
+	 KNjU7PqmfHS9l3Tb5Kq+Q/ydQb65FvPdyZI+tM/gwGWyqj6AafstjekDCtH9bM9GEjubj
+	 BsXvXRBQmfsz/ddhcvJSxbdBHMCRQSHkKs24BUJnPgWYkgheRx5RQqhDA7VLt/IpMq6z3
+	 4L+QBDO+8z2ekOx1duEqJbHnHGdZydjm+eUUOxEGCrPj0nXPi/TWP03uzmyopOZWTvA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=sandisk.com;
-	spf=pass smtp.mailfrom=sandisk.com;
-	dkim=pass header.d=sandisk.com header.i=@sandisk.com header.a=rsa-sha256 header.s=dkimnew.sandisk.com header.b=YgDbDKy3;
-	arc=none smtp.remote-ip=216.71.152.95
-Received: from esa.hc6817-7.iphmx.com (esa.hc6817-7.iphmx.com [216.71.152.95])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611FD606A330;
-	Tue,  3 Nov 2026 09:39:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 611FD606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sandisk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandisk.com
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=dlR0BLvh;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C64606B374;
+	Tue,  3 Nov 2026 09:56:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D4C64606B374
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=sandisk.com header.i=@sandisk.com header.a=rsa-sha256 header.s=dkimnew.sandisk.com header.b=YgDbDKy3
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=sandisk.com; i=@sandisk.com; q=dns/txt;
-  s=dkimnew.sandisk.com; t=1793698749; x=1825234749;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zBreZxYH0dOG14vJK5tWIMeKPJMWwqSlb7VxpR6aVnQ=;
-  b=YgDbDKy3wYGXBdHtm7QSiuIwxTs+wBu/5EU5YXC5Eo9TB3eiVVRxCgrv
-   JAvDZYevEN75euSjAhnxuRcGSRJyFn68PnCKzb64yh+v3mM5vmCP2xSXe
-   +VDJfYn2QwVfK87S/LBOloWjlX7rcobnsleOcysBud3v/mc+8HxEpluOL
-   3Udf6cEztLXzrSNG3GG4pemvxpmREEk1qUvL3rQEU2Rdc47bW2UU4DH4w
-   IBrK+4CFhcFoW8t//UYADF2J3x3GacUr7xBkLl5Qcwf+gUfBiI6ferlvT
-   C7C0PrjZhJDzLgVaqBy3fQC8jBdn9jKNTui5bzopOtGnfJR0ISN4/zo2m
-   w==;
-X-CSE-ConnectionGUID: JOTIdg5wRS+JYvBeLIQ1vA==
-X-CSE-MsgGUID: RB63MrBGRFqoNqZOdzKHZw==
-Received: from unknown (HELO uls-op-esaep03.corp.sandisk.com) ([129.253.192.43])
-  by ob1.hc6817-7.iphmx.com with ESMTP; 03 Nov 2026 01:39:03 -0800
-X-CSE-ConnectionGUID: dopcpq0vT8aqefEVGkNurg==
-X-CSE-MsgGUID: b5fzc2cUSaSlKjYGn1CNcA==
-IronPort-SDR: 6ae9abb7_ZW4mTK2QQVt+dQKKigbrWDDfWEttSrWVSkITlPKqTN+IfhE
- 4sEWKa4G/VTON3qrGQjLVON5JpBxiSoYZugIHEg==
-Received: from unknown (HELO uls-op-esaip04.corp.sandisk.com) ([10.15.0.10])
-  by uls-op-esaep03.corp.sandisk.com with ESMTP; 03 Nov 2026 01:39:03 -0800
-X-CSE-ConnectionGUID: YyJbVwm8T5OsfVdkoZ50MA==
-X-CSE-MsgGUID: I9QSv+peTUeEftWkqLk7pg==
-SanDiskIronportException: Internal
-Received: from ulssdxvpxsnip.corp.sandisk.com (HELO WDAP-ez2C89klLd.corp.sandisk.com) ([10.9.34.160])
-  by uls-op-esaip04.corp.sandisk.com with ESMTP; 03 Nov 2026 01:38:59 -0800
-From: Arthur Simchaev <arthur.simchaev@sandisk.com>
-To: Daniel Gomez <da.gomez@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Andres Freund <andres@anarazel.de>,
-	Pankaj Raghav <pankaj.raghav@linux.dev>,
-	GOST <gost.dev@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Avi.Shchislowski@sandisk.com,
-	Alex.Lemberg@sandisk.com
-Subject: Re: [PATCH RFC 2/2] nvme: enable multiple atomicity mode
-Date: Tue,  3 Nov 2026 11:38:56 +0200
-Message-ID: <20261103093856.203861-1-arthur.simchaev@sandisk.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260929-nvme-mam-v1-2-48dcbe79cece@samsung.com>
-References: <20260929-nvme-mam-v1-2-48dcbe79cece@samsung.com>
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=dlR0BLvh
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=dlR0BLvhBt/X5Kvkd76yjGaG+H
+	UKtgSW0ZhfO5lKc1nXji+L/Wk3egM54eZJSYTTyKnR75GFat/q/56L9d/GS36hoLmni6St/BM+ua+
+	zXg6MTpa9lbi+tiC7AOX2Mr9lrDkTVc4mMe7eWR45rkFV9aKXf2NLM8z3O31SGSy+wuLZ0fUdek6K
+	d0MHFp2jOQaXsxX8p+LYP/sa9pLzg5zFuAxK4jihpbmqcNdo9fpbSv8uMmFdXXmg8tcmY9SbPzo2R
+	Cm3TS7FSS3ecJlJ5XI1E9pZGP2ZGh+wADsvugxv9e67sCCFRe9MPaFoYbblwLXf4IKTWG+ZZrr6MO
+	4j2n3/9A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xOBFX-00000001qzv-41Uy;
+	Tue, 03 Nov 2026 09:56:15 +0000
+Date: Tue, 3 Nov 2026 01:56:15 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Eric Dumazet <edumazet@kernel.org>, Abel Vesa <abelvesa@kernel.org>,
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, daniel@makrotopia.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v12 2/2] block: implement NVMEM provider
+Message-ID: <aumvv31Xm0K6ypgP@infradead.org>
+References: <20261102-block-as-nvmem-v12-0-f4a2a681087d@oss.qualcomm.com>
+ <20261102-block-as-nvmem-v12-2-f4a2a681087d@oss.qualcomm.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -90,57 +91,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261102-block-as-nvmem-v12-2-f4a2a681087d@oss.qualcomm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Sep 29, 2026 at 01:17:12PM +0200, Daniel Gomez wrote:
-[...]
-> @@ -993,6 +993,9 @@ static bool nvme_valid_atomic_write(struct request *req)
->  	struct request_queue *q = req->q;
->  	u32 boundary_bytes = queue_atomic_write_boundary_bytes(q);
->  
-> +	if (q->limits.features & BLK_FEAT_ATOMIC_WRITE_MULTI)
-> +		return true;
-> +
+Looks good:
 
-With the flag set this skips all checks. Since each REQ_ATOMIC bio carries
-exactly one RWF_ATOMIC write (blkdev and iomap reject atomic writes that need
-more than one bio), could it instead check every bio of the merged request with
-__rq_for_each_bio(), using the existing size and boundary checks? That would
-keep the safety net described in the comment above the function, at the cost of
-a few comparisons per bio.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-[...]
-> +static bool nvme_mam_compliant(struct nvme_id_ns *id)
-> +{
-> +	if (id->nabspf != id->nawupf)
-> +		return false;
-> +	if (id->nabsn && id->nabsn != id->nabspf)
-> +		return false;
-> +	if (id->nawun && id->nawun != id->nawupf)
-> +		return false;
-> +	return true;
-> +}
-
-This deliberately accepts NABSN == 0 and NAWUN == 0. I assume this is because
-Linux only uses the power-fail values (NAWUPF/NABSPF) for atomic writes? If so,
-a comment would help. Still, NVM Command Set 1.1 Figure 9 requires NABSN to
-equal NAWUN (or AWUN when NAWUN is not reported) and NABSPF in MAM. NABSN == 0
-means no boundary for normal operation while the device claims MAM, and NAWUN ==
-0 would need NABSN == AWUN, which the driver does not track today. Would it be
-safer to treat both as inconsistent, as your QEMU series does?
-
-[...]
-> +		if (id->nsfeat & NVME_NS_FEAT_MAM) {
-> +			if (nvme_mam_compliant(id))
-> +				lim->features |= BLK_FEAT_ATOMIC_WRITE_MULTI;
-> +			else
-> +				dev_warn_once(ns->ctrl->device,
-> +					"Inconsistent MAM parameters, ignoring\n");
-> +		}
-
-Minor: dev_warn_once() uses one static flag per call site, so only the first
-affected controller is reported. Maybe dev_warn() (this runs on namespace scan,
-not in the I/O path), and print the four values to make the report actionable?
-
-Regards,
-Arthur
