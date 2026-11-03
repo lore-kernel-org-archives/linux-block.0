@@ -1,45 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793714860;
-	b=cE/767WmUyhUaL7eSVVthFfNTr6RMU4Va2cAiIjj8Q7qoofJKOI/wiaq2DFqLLrGNsyj
-	 +7WfQjhwFi/vlfrm9T672ocSevk15kUMmiLk2e1hYGGz8vftzpg7XEba/yhWEePdQ4Ocq
-	 4rmAoVRjg1YxOnwmraVx44xTa2dL+bXaDZXzPc6RW4/i45Lrrks8J9imgecEJibM2Ucjn
-	 exF/ZlasgoLwz4lfVGx26vGoqwr4ueOlhA2HU5FRuVlePen9qnHG5oOezRoPWniv5QVKW
-	 mCBLvrClE4xML+2vH0gCZsPBnS9p7nlX8ERSqrXqrk4Bpy5MKSCq6uKt7uBHmQViovg==
+	t=1793716266;
+	b=vwH2UeWZ68++ee2+FGGbfZ2ixOnJV+E+wRgunZ6cODfWzJT5SUucOihIWqmTK8u54i/J
+	 zqJ1bSzL3wVs4q/fLoC+45xR931Jv7A48JISEwJwTWdWGUykZClwXo8D69PfuCUR4NnZ8
+	 G4nkcCd+aF7htav1T00AS93pt7umEr0dY2admTSeKsUvUE1pE1YaQM8CPKKsexaeJw4o0
+	 IoAt5Lxf48Wwpj1AFeCKyR4e9a7YOqrYKKPdUo+DdmebubF6ZqezbJsVGsXvxYMPFXUNa
+	 NOPJuxCECrujJkrOHZKrXZo5apEi9tFa9cFrULRXdseZjV6vSiiuZvbPrpr5M4cBAoA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793714860;
-	h=Received:DKIM-Signature:Content-Type:MIME-Version:Message-Id:
-	 In-Reply-To:References:Subject:From:To:Cc:Date;
-	bh=qxI6uxKuEBsKWE5dZToQWARpMTqM0sfykaf/tV2OkQE=;
-	b=iblv5MxGkDRCnV2kr6Q3r+uy4uLsxzxfij5bfQ8b5Zn/D52dePolAtRc0Tn1OKDxpETn
-	 6jqTy5CYBwfJOrqlEpbKU4O0ZCfX3zZDQvq4W2VQkvOskg2jA+Q8SeuRz7ajTyhiHAY2u
-	 nelnUUik+Don87yLonfeH/Af48joA8baAby1O0n70gDJtB58eJwyIO7oBj+6eHmmjvZJy
-	 rDOsMyNGjX//EeHmQEozcWxEguqgGXCaplsJmLutf+mBghhcZ68X8a+d8HjpXSStThSOX
-	 PIf8C5u7g2DFRSXM6NT7vVs81pM9bICmXYxeXJMtqDOIqtrAlg7fc61D5r1ZlqfdH9w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793716266;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
+	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-Mailer;
+	bh=SYduxspSDTHUtiOUros2j7XWp+mQ+wFfNDgsc26Ob+s=;
+	b=nYDeOon29yA0r7SkUeUbudBNLpvuYTKlYzvjihgdes3OMSa5bc9JunzTBEJbCYsKxLzE
+	 uVAY7ZiBepmaVHOmSVCX1wuV9NKrWzsqWfOREXMWjVs0cJJy+BvFl3N3fu8CwjQVZ9/C1
+	 CsFAoh9FRYBO2mCl25YrsuB05/4wx/li4I18GFVZKX8QGDF+dd41et/y2XEPhbyyGEpvi
+	 A1/9nVkayjwSMeCltt7ideZ5JaV6Op2sw5uQLtNt/c7BQX2Z7+g0Niu5oRaTfR1p3XH//
+	 IdoHK2ZQUqFNtRdp83wgzv/QvVR6pWYuxfe8Cl+gIZonnwE2ghP4WjQrgskp0E0K5rA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kvAhsPMv;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=R3DlMsAS;
+	arc=none smtp.remote-ip=74.125.82.49
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D020A606A336;
-	Tue,  3 Nov 2026 14:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C92606D804
+	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A7C92606D804
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kvAhsPMv
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18EF31F0093A;
-	Tue,  3 Nov 2026 14:07:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793714859;
-	bh=qxI6uxKuEBsKWE5dZToQWARpMTqM0sfykaf/tV2OkQE=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=kvAhsPMvD47M67OaIC8UcigKRO5xXurkov7sP13ENoG9Bu8aSgSd4XGyHHp+MHDbS
-	 rjhyieqt2+LLMMTKTa2+Il1z6oGL8rZ60njQIpEmAmSgFE1U9O94psfATXjDm1SiO6
-	 n0vptLQLV1S0wy7d/e0Psm4iNIMRXTyXVT43KLThvIyp6jFhniBDBdo2A4bsdIoGHJ
-	 i+6OWJsxSz4S37woEi7UMx51fGMHxnh7Fo0o77QSy3WSfFk/yth/jEO6h5hh8aLa+8
-	 EMadLU71WZDBZWr/ZemQM7hENGXMQ7RTvMbxpwUbfORwZSTzJlkD2YHzVISli31o5Z
-	 8wvLAtpgk6ehw==
-Content-Type: multipart/mixed; boundary="===============0895216361124977455=="
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=R3DlMsAS
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-1a2af4c8d00so6270309c88.0
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716265; x=1794321065; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=SYduxspSDTHUtiOUros2j7XWp+mQ+wFfNDgsc26Ob+s=;
+        b=R3DlMsASMzn4n6kieUFPygn7aJzjGIYKUpPFx6AKyb9gYPJ1fL/75rH3zUJXir9lQc
+         ksD0u4d7+9i8torBcbqGgzwTfMNiNJw41Io25DYGqkJIbbIpcHXpWQnjW3JVshGL3Nhl
+         vomuTJpqL+dCtrTlphtyEI1/OLBjySgSb3sM3VzDFGeECi6lvfhloLw3w0YgLQ3k9kIm
+         r3LjCNFr4N84xBhiT1HE9NnsRO3/8I/ltD1IoY26UOII8JAOtR00xWuGj9ob3bR76Vmd
+         IwXK4MCdlARs0YwY3y0mjF9CXnJaMkNVqvvxQuTdAvMlrhtKXKS4NhbVsE0Mch7zxP6a
+         xW7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793716265; x=1794321065;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=SYduxspSDTHUtiOUros2j7XWp+mQ+wFfNDgsc26Ob+s=;
+        b=JA0loAHczQsp4zAmLwT+W8sqHfVBau2q8U/DhOKcRPurprssWkh29frkdtJyofu1U5
+         xBeRnsZLWj5ZKX08dpk32tYBJ4ccUyjIRRzVJrgzHDU6l1vY0e/ZWf1sA+h0b0rdlUxe
+         KAjzz2ZFMlL2Dq8D/O7j5CoyIletIfGj538VuXxxWyZ+c6gi9X0FfZXORUH8YEQRk7cm
+         YXBluZYgLionIpt1PVwq1CNUvvMN0VJICn/I+LUVhjg2JGAowEw9MvrL+qtCsteFVzqh
+         uHVgqxdyxykmnCYhCGa/eqfqy006ILptJ56VTK26HhBvVat/LuU18dJOJlZPqpOKjLES
+         DC0g==
+X-Gm-Message-State: APuU4Z9wln8KGsZfylL2ZsYk8lO9TCUdJKZXoGBZM3z7fg878pwZ4+QV
+	VEJg7RGb5yaF+NcZLFdDtMlyiLe/rGRUG9VcFfPtZ+iilCcCLDCqXJtHGXJzuVzByos=
+X-Gm-Gg: AYBFou1x1k0Qg5pAqaPm82eUV1D8QcEsReEbiJ/GvFAxn+YuCkKyyxe9cpe+yKcglD1
+	uOelovAdcdoZvVj9GcRJrzLFwYaS9a9GtEGN4ss2QWlcAOYA7wWoLpPmsoCgbJtaKwic1tqePky
+	hg7P8bJ/WhM7RFlbpvipnvAt2o4SEZEpCZZyw9yWrhzT+ziHxid9pnTURbzS9fNVXka7npCNz3J
+	aR6jeZDf/IVvSS80JU8vAN6zC1/uazqy8x87jW+6DvEvtnnyXWdgrmDiKcbIsSOSd9VB9FY9Lir
+	pTAJ5SrjfD+eRBvOSLRGv9/rKMir1QcQ/S4Pf1JNSaWlkF5NBC1wzRkuYBuNTicmjoxGJVbU2EA
+	2bpMoQloH/Jwe/7mygOgTKv+qta6uIkLsa9sLDuXYjxLOOINqWhL5iZ9diNGo2pQfP+fjBAISq7
+	opAmzMxcEf1HKcWJMJq8QEIDfiktj8DWiUQc4R2TWMHrb6ZmZkKCUppyFg5onNPyMEdX+r7S8Uq
+	z8YQdTZFGo6p6AvyJchWZogQo0LJGdYwGRoV3Bsssj57ch6nzPOaiMbxhk+rC7Vx+43qNgsjpPm
+	AjpqaNmnKXQ2sIcIhUagosWGKJA82B54PPYkU6gdFK/Lk4oNzmgncSobhEUYeU/6ZkLQWW1OkRm
+	D8YNMNz2nXATn
+X-Received: by 2002:a05:701b:42d2:20b0:1aa:6c3f:2f7b with SMTP id a92af1059eb24-1ac5b3fdef6mr21331910c88.24.1793716264489;
+        Tue, 03 Nov 2026 06:31:04 -0800 (PST)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Nov 2026 06:31:03 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: "Baek Kyu, Kim" <pocj8ur4in@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20261025161133.59344-1-pocj8ur4in@gmail.com>
+References: <20261025161133.59344-1-pocj8ur4in@gmail.com>
+Subject: Re: [PATCH] null_blk: reset cache state before device setup
+Message-Id: <179371626229.3691261.9776195588952863415.b4-ty@b4>
+Date: Tue, 03 Nov 2026 07:31:02 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -49,83 +96,31 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Message-Id: <cdb4a70a69306fb920d52c3e5511bb1cbac094d4f47b1b89ae56b674853c287d@mail.kernel.org>
-In-Reply-To: <20261103132613.1952975-4-cui.tao@linux.dev>
-References: <20261103132613.1952975-4-cui.tao@linux.dev>
-Subject: Re: [RFC PATCH v12 3/4] selftests/bpf: add iocost cost model test
-From: bot+bpf-ci@kernel.org
-To: cui.tao@linux.dev,tj@kernel.org,josef@toxicopanda.com,axboe@kernel.dk,alexei.starovoitov@gmail.com
-Cc: cgroups@vger.kernel.org,linux-block@vger.kernel.org,linux-kernel@vger.kernel.org,bpf@vger.kernel.org,andrii@kernel.org,eddyz87@gmail.com,ast@kernel.org,daniel@iogearbox.net,linux-kselftest@vger.kernel.org,cui.tao@linux.dev,cuitao@kylinos.cn,ameryhung@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
-Date: Tue,  3 Nov 2026 14:07:39 +0000 (UTC)
-
---===============0895216361124977455==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-
-> selftests/bpf: add iocost cost model test
-
-TL;DR: Selftest cgroup names "iocost_pairing" and "iocost_ms" lack a leading
-'/', so the cgroups are likely created outside the work directory and not
-removed by cleanup_cgroup_environment(), leaving empty cgroups on the host.
-
-> diff --git a/tools/testing/selftests/bpf/prog_tests/iocost_model.c b/tools/testing/selftests/bpf/prog_tests/iocost_model.c
-> new file mode 100644
-
-[ ... ]
-
-> +	/*
-> +	 * cgroup_setup_and_join() creates the priced-IO cgroup with the
-> +	 * available controllers enabled, so the cgroup has
-> +	 * io.weight/io.stat and the iocg activates.
-> +	 * cleanup_cgroup_environment() removes it from every exit path
-> +	 * below. io.cost.qos and io.cost.model are root-only cgroupfs
-> +	 * files: they are written at the hierarchy root and reverted on
-> +	 * exit.
-> +	 */
-> +	cg = cgroup_setup_and_join("iocost_pairing");
-
-[ ... ]
-
-> +		cg = cgroup_setup_and_join("iocost_ms");
-
-Will these cgroups actually be removed by cleanup_cgroup_environment()?
-
-The name has no leading '/', and format_cgroup_path() in cgroup_helpers.c
-joins the pieces with no separator:
-
-    #define format_cgroup_path_pid(buf, path, pid) \
-        snprintf(buf, sizeof(buf), "%s%s%d%s", CGROUP_MOUNT_PATH, \
-        CGROUP_WORK_DIR, pid, path)
-
-So cgroup_setup_and_join("iocost_pairing") ends up doing mkdir on
-"/mnt/cgroup-test-work-dir<pid>iocost_pairing".  That is a sibling of the
-work directory directly under the cgroup2 root, not a child of it.
-join_cgroup(), write_cgroup_file() and read_cgroup_file() build the same
-path, so the test itself works.
-
-But __cleanup_cgroup_environment() only walks the work directory:
-
-    format_cgroup_path(cgroup_workdir, "");
-    join_cgroup_from_top(CGROUP_MOUNT_PATH);
-    nftw(cgroup_workdir, nftwfunc, WALK_FD_LIMIT, FTW_DEPTH | FTW_MOUNT);
-
-so the sibling directory is never visited.  The empty cgroup remains on the
-host as /sys/fs/cgroup/cgroup-test-work-dir<pid>iocost_pairing, which also
-contradicts the comment above ("cleanup_cgroup_environment() removes it from
-every exit path below").  serial_test_iocost_model_streams() has the same
-problem with "iocost_ms", including the matching write_cgroup_file() and
-read_cost_usage() calls.
-
-Other callers that use a fixed name pass a leading slash, for example
-"/skb_cgroup_test" and "/cgroup_iter_memcg_test".  Would "/iocost_pairing"
-and "/iocost_ms" at every place they are passed put the cgroups under the
-work directory where the existing cleanup removes them?
+X-Mailer: b4 0.15.2
 
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+On Mon, 26 Oct 2026 01:11:33 +0900, Baek Kyu, Kim wrote:
+> The CACHE flag belongs to nullb_device, which outlives each powered-on
+> nullb instance. Power-off discards the runtime cache but leaves the flag
+> set. If cache_size changes from 1 to 0 before the next power-on, the
+> queue advertises write-through while new page writes still go into the
+> cache tree. A completed write can then disappear at the next power-off.
+> 
+> Clear CACHE before creating the new instance. The existing cache_size
+> setup sets it again when the new instance needs a cache.
+> 
+> [...]
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/41646836440
---===============0895216361124977455==--
+Applied, thanks!
+
+[1/1] null_blk: reset cache state before device setup
+      commit: 5a4236bf22622c291a96c139bfe54117f4cf1af6
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
