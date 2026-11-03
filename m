@@ -1,92 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793716266;
-	b=vwH2UeWZ68++ee2+FGGbfZ2ixOnJV+E+wRgunZ6cODfWzJT5SUucOihIWqmTK8u54i/J
-	 zqJ1bSzL3wVs4q/fLoC+45xR931Jv7A48JISEwJwTWdWGUykZClwXo8D69PfuCUR4NnZ8
-	 G4nkcCd+aF7htav1T00AS93pt7umEr0dY2admTSeKsUvUE1pE1YaQM8CPKKsexaeJw4o0
-	 IoAt5Lxf48Wwpj1AFeCKyR4e9a7YOqrYKKPdUo+DdmebubF6ZqezbJsVGsXvxYMPFXUNa
-	 NOPJuxCECrujJkrOHZKrXZo5apEi9tFa9cFrULRXdseZjV6vSiiuZvbPrpr5M4cBAoA==
+	t=1793716267;
+	b=TEQDVqahoI+cxxPABmWJWjJbtMBxrdigQXtv1TTeOskCoQxv93x8ghxBefZcQ4jyh2vV
+	 tGBexMqTHkdEhDQNH+pObIo4fRc/fFElAeDLkY0eU0EdsTjQFJrZuhfpGDrAnUCKRB6dc
+	 QuiGwZI5Nes20IHkyJFGETBF9jFLfBY/Sk+50zCIT5S7//sLw8OsBpo1MPZSKMaAc837i
+	 nM7qAdhD8KO6rs+zo7gcRjkMM96lD7ubbR+rxVv9B80tnjQti7x4fIbyRmLvSZFsjSFgN
+	 QTYAOBixjQHlUTYwXALT3crMXHMPd98igx1AJt3BR+RZ84sqWBTGiYJ4GQhwxT3uQ1Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793716266;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793716267;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
-	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:X-Mailer;
-	bh=SYduxspSDTHUtiOUros2j7XWp+mQ+wFfNDgsc26Ob+s=;
-	b=nYDeOon29yA0r7SkUeUbudBNLpvuYTKlYzvjihgdes3OMSa5bc9JunzTBEJbCYsKxLzE
-	 uVAY7ZiBepmaVHOmSVCX1wuV9NKrWzsqWfOREXMWjVs0cJJy+BvFl3N3fu8CwjQVZ9/C1
-	 CsFAoh9FRYBO2mCl25YrsuB05/4wx/li4I18GFVZKX8QGDF+dd41et/y2XEPhbyyGEpvi
-	 A1/9nVkayjwSMeCltt7ideZ5JaV6Op2sw5uQLtNt/c7BQX2Z7+g0Niu5oRaTfR1p3XH//
-	 IdoHK2ZQUqFNtRdp83wgzv/QvVR6pWYuxfe8Cl+gIZonnwE2ghP4WjQrgskp0E0K5rA==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
+	bh=+GXjmDSpdPKSM3dvXbu3WCZAHTmv+G6w0ssCMfJAnCM=;
+	b=lyyIsy7sDT7CvyQxbFz1D8fwkyrFeJG9ejyXniLyCSfOx1bq7EHVPz+y2tGsTunRJV07
+	 DJjr8hqjE+jZ7Y5Jo1R1/BzXy61pCs0QBqjB+KmbFnAPjtYHCITJ6BwwUO8wn6L/AfIHO
+	 I0DPMtgZ7ybtA6KzBw/grUey1F+n9xtEO+rJbecNCEarC0vhf0lTwW4FALyfdSQKR57bC
+	 XdFiuMAl04mIez9COZDbTNWJFy1UMbP2Jc3UciHuud8zZH2IcLwY+g4YueGCu8tu+xW8g
+	 cBZflkUONJaj7E1EWVe2Q/gaWfsNxTYD1/xW90pEjqpyNQ/j9/iw1gBQKl/ZB/e/NVg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=R3DlMsAS;
-	arc=none smtp.remote-ip=74.125.82.49
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=JAL5xEbx;
+	arc=none smtp.remote-ip=74.125.82.43
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C92606D804
-	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A7C92606D804
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC08C606A324
+	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC08C606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=R3DlMsAS
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-1a2af4c8d00so6270309c88.0
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:05 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=JAL5xEbx
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1931ff67a29so8730432c88.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716265; x=1794321065; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716266; x=1794321066; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=SYduxspSDTHUtiOUros2j7XWp+mQ+wFfNDgsc26Ob+s=;
-        b=R3DlMsASMzn4n6kieUFPygn7aJzjGIYKUpPFx6AKyb9gYPJ1fL/75rH3zUJXir9lQc
-         ksD0u4d7+9i8torBcbqGgzwTfMNiNJw41Io25DYGqkJIbbIpcHXpWQnjW3JVshGL3Nhl
-         vomuTJpqL+dCtrTlphtyEI1/OLBjySgSb3sM3VzDFGeECi6lvfhloLw3w0YgLQ3k9kIm
-         r3LjCNFr4N84xBhiT1HE9NnsRO3/8I/ltD1IoY26UOII8JAOtR00xWuGj9ob3bR76Vmd
-         IwXK4MCdlARs0YwY3y0mjF9CXnJaMkNVqvvxQuTdAvMlrhtKXKS4NhbVsE0Mch7zxP6a
-         xW7w==
+        bh=+GXjmDSpdPKSM3dvXbu3WCZAHTmv+G6w0ssCMfJAnCM=;
+        b=JAL5xEbxeRyI5iZfq2c75QvgWSvM8A+hwAkPoB5Ef0uYyHxKF51D+EkIcYAiVT42GW
+         O8+rFQnzDXYUm2OXJlerdC3iicYR4aSaSaHH3Ep/VgS3dutNQteQPI38N9cTs923fA4D
+         BIryhyqdfWTScigh6MyLKL1CJS2d6DQawQgkmWOyqgp69tkPhN8FiEZNW53On/G87OWp
+         kqGTqlIrju9gHXn+A4kicd+uohnWUkqFnZgHPqVrRm/AudeUaSqo5Vxq/cHqmboyto3O
+         deySONUwD/jokWH+7+DxV4OSMbR/tJKnNpueSZ3h16f9pmnrEaRKiRgNtstEGOao5RnI
+         wqBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793716265; x=1794321065;
+        d=1e100.net; s=20260707; t=1793716266; x=1794321066;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=SYduxspSDTHUtiOUros2j7XWp+mQ+wFfNDgsc26Ob+s=;
-        b=JA0loAHczQsp4zAmLwT+W8sqHfVBau2q8U/DhOKcRPurprssWkh29frkdtJyofu1U5
-         xBeRnsZLWj5ZKX08dpk32tYBJ4ccUyjIRRzVJrgzHDU6l1vY0e/ZWf1sA+h0b0rdlUxe
-         KAjzz2ZFMlL2Dq8D/O7j5CoyIletIfGj538VuXxxWyZ+c6gi9X0FfZXORUH8YEQRk7cm
-         YXBluZYgLionIpt1PVwq1CNUvvMN0VJICn/I+LUVhjg2JGAowEw9MvrL+qtCsteFVzqh
-         uHVgqxdyxykmnCYhCGa/eqfqy006ILptJ56VTK26HhBvVat/LuU18dJOJlZPqpOKjLES
-         DC0g==
-X-Gm-Message-State: APuU4Z9wln8KGsZfylL2ZsYk8lO9TCUdJKZXoGBZM3z7fg878pwZ4+QV
-	VEJg7RGb5yaF+NcZLFdDtMlyiLe/rGRUG9VcFfPtZ+iilCcCLDCqXJtHGXJzuVzByos=
-X-Gm-Gg: AYBFou1x1k0Qg5pAqaPm82eUV1D8QcEsReEbiJ/GvFAxn+YuCkKyyxe9cpe+yKcglD1
-	uOelovAdcdoZvVj9GcRJrzLFwYaS9a9GtEGN4ss2QWlcAOYA7wWoLpPmsoCgbJtaKwic1tqePky
-	hg7P8bJ/WhM7RFlbpvipnvAt2o4SEZEpCZZyw9yWrhzT+ziHxid9pnTURbzS9fNVXka7npCNz3J
-	aR6jeZDf/IVvSS80JU8vAN6zC1/uazqy8x87jW+6DvEvtnnyXWdgrmDiKcbIsSOSd9VB9FY9Lir
-	pTAJ5SrjfD+eRBvOSLRGv9/rKMir1QcQ/S4Pf1JNSaWlkF5NBC1wzRkuYBuNTicmjoxGJVbU2EA
-	2bpMoQloH/Jwe/7mygOgTKv+qta6uIkLsa9sLDuXYjxLOOINqWhL5iZ9diNGo2pQfP+fjBAISq7
-	opAmzMxcEf1HKcWJMJq8QEIDfiktj8DWiUQc4R2TWMHrb6ZmZkKCUppyFg5onNPyMEdX+r7S8Uq
-	z8YQdTZFGo6p6AvyJchWZogQo0LJGdYwGRoV3Bsssj57ch6nzPOaiMbxhk+rC7Vx+43qNgsjpPm
-	AjpqaNmnKXQ2sIcIhUagosWGKJA82B54PPYkU6gdFK/Lk4oNzmgncSobhEUYeU/6ZkLQWW1OkRm
-	D8YNMNz2nXATn
-X-Received: by 2002:a05:701b:42d2:20b0:1aa:6c3f:2f7b with SMTP id a92af1059eb24-1ac5b3fdef6mr21331910c88.24.1793716264489;
-        Tue, 03 Nov 2026 06:31:04 -0800 (PST)
+        bh=+GXjmDSpdPKSM3dvXbu3WCZAHTmv+G6w0ssCMfJAnCM=;
+        b=gU0U6+iJ11x2GncXa5thtHyRMaCv3e3POd5CDU/zVf+bfVeh03DOuSGNhI2KqrIiWG
+         KlTHnmWyy2umHcDfo3MaQBJaPQaHtlM3yKCM9k+tf5TmFGG0Ob0s4ArdhgAUT+kmtnW9
+         qGySdDYE0rehiBsWQgv22ppa2fL4tZdNDO9uvf9uDqPMfgXnkO8K1pN0i10k6hThafsQ
+         HqVF1YWPBY7LWPBCSn+RxQThS0BBSo0Pmc2LE7h5xjqYYIa+hTZpaRZLrhQbKwrgqEGm
+         3rVeOT+pr2Ew1SR3LPLculKcXYTEp5SgCU9Xzj79V1l7dRgXyAN8vt8/JLbOBnwIH5eV
+         UPOg==
+X-Forwarded-Encrypted: i=1; AKwUvBy5lCcdT5XZ4brWg1bB6Q8Fu6MKCW9iZ5ReE+MbEF2WAD60+LsBNhPEwjM55Vf71huzKXrNBOEyw8btGQ==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/A7+rCn3L2syoteKQ3XktLEvz42vfuXoJTps2rVip0LBsI/f+B
+	cwWPPUl5aMAjZIfL12vOQ7PWS4sIbhlUEVnQ6VuCs/YycuzKRU74rDi1aaxsD8QNQo8=
+X-Gm-Gg: AYBFou2gSJW1v8Rz1hFhJN/cdH5ewdVgOWJxJegTjJ3p/Fnxq47h4Gauf29WsVifrIy
+	Zj/u2jXjLJYVmtC5FDa4ZG25htwKq9VSppjU4zzYIIs3PjuVB8knRZL654j0DYTZQ4Q0kER46r5
+	dmi1K/xTG2HDemNCfNgCui25RI5LL9o9qlAVr1SDNq59g7MfJXnPwnJgUeSE6GBAZd5VetLu30W
+	V4CKW2FH3Zab1eA6Xicov9/ZiApFXTEmG3lM/Y6z869EJ7ce+T5P3ooZrwpu/54eTvnxpgHtr2V
+	bnfClUqp5SbifOlo/oRxNh8a6GIQYwosZw9uRbilW+JEWUTfiai4LEE60+2KDCInm7S+YRhIqxk
+	mDqB0zJzWLJKC2f4eEiMO1pmp673/BorF5kPS1TeNoGeUXU18rvdxHr9eCRq9sVjENP18beuMOA
+	GljgESqFIV4+oE7op/KS+tLnWJI4ecz9sU+2gBTWL/hGiqubmLvbpaWLnj+gy+D3el7W8L968Ew
+	V52nMXYzYl9yq4ceoDcFNYTHPUW2YFwRS80JuA7mHLShD6RQ2m/EYD4O8WgtoHYmlcUDJ1B7/8i
+	xIJmWD2A+ZnPx6YVVJ2pH9BEggFnObCbZpmg846FIqI3CzbseRq7PcrgWQ+wzBSmcoceyFhF5oW
+	gWrI24s0/yiTu
+X-Received: by 2002:a05:7022:c88:b0:194:3a84:e67a with SMTP id a92af1059eb24-1ac5d0da7e6mr18645854c88.41.1793716265860;
+        Tue, 03 Nov 2026 06:31:05 -0800 (PST)
 Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.02
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 06:31:03 -0800 (PST)
+        Tue, 03 Nov 2026 06:31:05 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: "Baek Kyu, Kim" <pocj8ur4in@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20261025161133.59344-1-pocj8ur4in@gmail.com>
-References: <20261025161133.59344-1-pocj8ur4in@gmail.com>
-Subject: Re: [PATCH] null_blk: reset cache state before device setup
-Message-Id: <179371626229.3691261.9776195588952863415.b4-ty@b4>
-Date: Tue, 03 Nov 2026 07:31:02 -0700
+To: "Michael S. Tsirkin" <mst@redhat.com>, 
+ Jason Wang <jasowangio@gmail.com>, Eugenio Perez <eperezma@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>, Ming Lei <ming.lei@redhat.com>, 
+ Cong Zhang <cong.zhang@oss.qualcomm.com>
+Cc: linux-arm-msm@vger.kernel.org, virtualization@lists.linux.dev, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+In-Reply-To: <20261103-virtblk_sync_quiesce-v3-1-f40233f9bdd9@oss.qualcomm.com>
+References: <20261103-virtblk_sync_quiesce-v3-1-f40233f9bdd9@oss.qualcomm.com>
+Subject: Re: [PATCH RESEND v3] virtio_blk: use synchronous quiesce in
+ virtblk_freeze_priv()
+Message-Id: <179371626469.3691261.7199603294029974156.b4-ty@b4>
+Date: Tue, 03 Nov 2026 07:31:04 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -101,22 +109,27 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Mon, 26 Oct 2026 01:11:33 +0900, Baek Kyu, Kim wrote:
-> The CACHE flag belongs to nullb_device, which outlives each powered-on
-> nullb instance. Power-off discards the runtime cache but leaves the flag
-> set. If cache_size changes from 1 to 0 before the next power-on, the
-> queue advertises write-through while new page writes still go into the
-> cache tree. A completed write can then disappear at the next power-off.
+On Tue, 03 Nov 2026 18:32:21 +0800, Cong Zhang wrote:
+> blk_mq_run_work_fn() can call blk_mq_sched_dispatch_requests() through
+> blk_mq_run_dispatch_ops(). The dispatcher checks QUEUE_FLAG_QUIESCED
+> while the flag is clear. It can then be preempted before it gets a
+> request. At that time, it has no queue usage reference, so
+> blk_mq_freeze_queue() does not wait for it.
 > 
-> Clear CACHE before creating the new instance. The existing cache_size
-> setup sets it again when the new instance needs a cache.
+> virtblk_freeze_priv() then calls blk_mq_quiesce_queue_nowait() and
+> blk_mq_unfreeze_queue(). A new request can enter the queue. The old
+> dispatcher can run again, use its old flag check, get the new request,
+> and call virtio_queue_rq(). At the same time, virtblk_freeze_priv() can
+> reset the device, delete the virtqueues, and free vblk->vqs. The old
+> dispatcher can then use a deleted virtqueue or a NULL vblk->vqs, and the
+> kernel can crash.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] null_blk: reset cache state before device setup
-      commit: 5a4236bf22622c291a96c139bfe54117f4cf1af6
+[1/1] virtio_blk: use synchronous quiesce in virtblk_freeze_priv()
+      commit: 6c6dec7883f8eb10b326bc9d109a4990c885d949
 
 Best regards,
 -- 
