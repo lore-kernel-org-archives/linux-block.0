@@ -1,79 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793732652;
-	b=SFd1sIiLgrO3mdvOe7XxXrK8OV0a5TBAHHmENavcNcVJwnEbheOuBzJ1HU7VawfgIfuW
-	 30N+1UVNESqbbkr/jiyJyY9tdDFtC0zw8hhiEIL8G5QCxMUqA8qrW6nKk2Tb+VyO07sFt
-	 hDq8x3sdD9Fvm9UvElTJhhnarVYSzWuaoMqrwOVkxz/LAphv6sEjDzNv7wNhkX3E1Vlnh
-	 GCFESr9QVRUuaiTUIjYqWDJfbZBaFhkETzSi0oSuCJdQhyZvgd4slTC3W/Fhiq03S7grO
-	 JrHDNS9tOaAfKfEXFUioOtLX9NPHU/kgbirE8HNPx03ilYDX6HH4QqJSQlmhBwujTmw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793732652;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=nPJWsS0873Oy+02TJGKyZpW86wslqZHLsLqHfzEf5Zw=;
-	b=UiAOEnJNzPgN2Ib1v4+TJDO7pdH8bf+ibZTLQuLYifuLe6so0fvS7RVAQ1MdDYGKUTbQ
-	 LONCCSneuS4/+qte69tlGHPmjbKmU9kl19lpdby4lhM/GbGlPqyZKmjpd2AZVrk/HErsj
-	 OZcXrcKcyySZ2KmPCQS3mnTd3IwfJroLlL/8sGH3cW4rzyTY8I2JIjkuLBQMfxhSasKmf
-	 bEoRayuH2nuGYE7m/gPi9AvBn6hEJ9ciYtiHViELWLxJhUQIg1Mhw657hzFsaao/ZrzzX
-	 iSs7qihbITJktrI00qwhOQdu4IDSNaVSK1NgqhB2+ReQo5cfONJaDKdjpEfh7JwGPZg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lbE2m5+z;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF704606A31B;
-	Tue,  3 Nov 2026 19:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lbE2m5+z
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793732651;
-	b=jGQoX8rQBJVJWcU1sEmvDKgG8Bcxy0s4Rl5JD2MfXlXeF+pJ9XPOmEFkxIGeVOrvZ5aT
-	 +bGjP+2gk/edCz9uiSRuyIUZs0btnOHkr05d1T7a7XD0ERcZTKq8SRdKUE56djh5vWx7l
-	 ca2p/TX8JQD48vItYv9Sq/DdgeSkQU9gEMy1lnVfeJDC7l8D2C234PAVnfVfOaL83O6Hz
-	 6AK6PhWPXaeG6Bv4si6QH6bVdwi0PxFybenGaFPuSKLaW/xkQdxL0uLF1O8oFvpGoc3Qe
-	 JT/Heyf27yy7/z8rNhsyxsNsoThwczyFJcEKMbhKbykLFRFjNJtDbMNbJbnCcMjISkg==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793732651;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=nPJWsS0873Oy+02TJGKyZpW86wslqZHLsLqHfzEf5Zw=;
-	b=bDqHiGbQH3pRrnulzgzHpxmXeszmzDrbv79cFGAtw94obWHTCnpHJZnaZiTGuWq3zkDg
-	 ZnhO/DWel1sBREDVr0l4/IbZc5vOAZ1SdjB1MheykvczgJsQX8P52juGkzNEkdBaQemeH
-	 MMaanRegRAlJlkjK11KP/915VXfSAv2eC1WaoDbGtIkeNg/ISmL+mgO3TduwO8vAyTO1d
-	 MJsvMUUTQXH+8bgGg5G1jKPEt/s+SDhykmc/xyJrbLsKuYIn9bebTEfMsgNrK9vi3k4Me
-	 ze5f4RGHxNDyPqEBFN/i6o8/ywOXNrkRjetDcpF1q7SzDfZH09u1yOnC59M6/y0mKAQ==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.54
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793735282;
+	b=XTy7/N0zYtgQhxzQ2gtJHu8oLJxkGSHcMb/iElchaRelFXFMB6m2d1egEt1fjAiJSCZz
+	 D0fDZv8l24y1mO0TjXl1pjRzoBM4nS5RemPMDeLxAFg7EAeu/xY6+y4NCGWd2HzKiWBi3
+	 vr/C5+g6wd5Ug8qjw9johyiHI2mDJ6FFhFHH/GXls1h1U56/4Hy6kalDDdGkZEmOlKmBJ
+	 5bTqB7hRTVVK1vYh/QMSbbB1CpBC3H09DrwvazojKQLTEuzq6BYTK8oK63WSV2xWgUQeX
+	 XGlmHm5h7fX3uS5126o2g8PzYYTtzOzL7qyuo/MAXhykr66mIk+JIuin02xiz1ammeg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793735282;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=VXvJfI/dWhdkcdG1zI34QvgiZR0Honn8mj5uvJip0QM=;
+	b=42lxJXSNaeKIE8KMDPu3X+rtQ1z1nq5Dp+scDzzFTzLKeC/hK3IxYDNjMztDXrU26FRL
+	 dCIeNKxvZWQ3cKQmyzBpu4uJeRfBjNZH7jJ51dfUL1yKvtIi068be5SmVuyH02qeT128s
+	 eEbEJG0ZW/0qniVCKDSvgWGzNA8p3Cu8ir+ANzyndgomBVzEvA9M0LEkpy5onEWauFZbl
+	 3MvBQuhcH0nHAB779+091fSW1jyTdaD6KsqcCxVsfJu8gWOE5YGzEH+LfjpGuYjCm5BB8
+	 FTmRMUrFg6bZS8Bo73av6HFQH1TwYCOv5ns6J4oFzlNgAXzeHgPRqv98VbpiQCBcTIA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=H6WQJUUF;
+	arc=none smtp.remote-ip=74.125.82.54
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id BA4031F000C1;
-	Tue,  3 Nov 2026 19:04:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793732651;
-	bh=nPJWsS0873Oy+02TJGKyZpW86wslqZHLsLqHfzEf5Zw=;
-	h=From:Date:Subject:To:Cc:Reply-To;
-	b=lbE2m5+zi2UWh6nw1VuunUHlA74sdhXdsyG5GdxlInbhrNUysFWjMU0DwkyiGK4LQ
-	 rov4QWd2Yf9jU3CmeeMljcpOQiaNE/PHtPLcRqDVJolcTVqU8kzDf0IZeHCJ85GvkY
-	 dyVaaCaX6LyjoZuk3+vn6i1J4J3KrHvXP0gcIvsjxys8V1/axQhiJUtnFVmNnh71Bh
-	 lyEuzGabiAssM1zTfDJugIGrhBEiht7LPw+hhW5AzBCF6GJP5Zf+Zw/7dOuwL+js8Z
-	 XEwofdMnXT3VQHNcYDYh/k131zmyUu2jRxy+rOUKYgmXphdZz62bLa2LjnQnf3LVdn
-	 QLYLHUbDPToQA==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 1C0A746AB0;
-	Tue,  3 Nov 2026 19:04:10 +0000 (UTC)
-From: Mani Tofigh via B4 Relay <devnull+mt4022.columbia.edu@kernel.org>
-Date: Tue, 03 Nov 2026 14:04:10 -0500
-Subject: [PATCH] blk-mq: take quiesce_lock when removing a queue from the
- tag set
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D66606A324
+	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 19:48:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3D66606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=H6WQJUUF
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-170135e43c7so9380c88.0
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 11:48:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1793735281; x=1794340081; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=VXvJfI/dWhdkcdG1zI34QvgiZR0Honn8mj5uvJip0QM=;
+        b=H6WQJUUFlKKaWZ84UY9W3Yr2WFBYEWYpyd+D7n0FN+LVdGD+bRROnCOjYNVqMwCTQG
+         KYs1wqIsKvXcB68tNuJZc9gxs3kXtfzgzdac9QURPRloGkktHfOgMZQB3m1puNKVTS2e
+         A6GPY1DVBItpBXuSCL1joUHZR+cwVNP+Vg/CM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793735281; x=1794340081;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VXvJfI/dWhdkcdG1zI34QvgiZR0Honn8mj5uvJip0QM=;
+        b=B3mex6WIld4J32G/C70vgYojaSVZNcmBfatvFyzxZqcpRRg5T2cic3UYs5bdJDa3sq
+         yiGJOyXl+OiT7BW8NwIzRoLPjKk2gGy74eCxUeBU+yGX5tOaTWedOsYOO34Hi4jTxIxj
+         CRTj4YtvaY3E8fh3maqMlayfdeLeQacnTxf0/Set4s7ZfcEAstcF0OF4JMMikVVKPOVS
+         V4P78g6nPwiDCp9daCgBqKsKe0gJxYT5EiIeiylo9eniGzqm6XjRHsegWLB78h1o5fqb
+         HHjpktQN9WSGH1muHSWRykkpqvkG5rdBvbFu0LF/ddauWSy66giBROqlOcwVpSg6W3A+
+         6ixw==
+X-Forwarded-Encrypted: i=1; AKwUvBwpTn9/JbTr0LCL4izuTD1diY9LcXnzmm+Mi5hEcVExyJq+7VOS8su/baUTpA7qMcKtSiQ6z84p0GhvuA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8WWap0z+FNIPFtEp/HMrDIC7wEyUaOCd+E4IAyBiZbJ8CwIatO
+	WAVlINknbpPGdx2UIiW7T5MohjNFOfGvHMPZFMGocTBY4A9pw2hTbK+l9LgpIhEaXA==
+X-Gm-Gg: AYBFou13QMiroIVvrCCEShaMLuE9Kr0C2BU2jq/iJk/jtHiC+JW1LjJRKg2E9SHs19V
+	7Ki993AfVqqSkPumBzzTVmzLylyiBHnIEfGPm/X9pav2Dti7TSjdMWWLiPY3x7sRKAKKbJQEniA
+	3TEhC6ouOnJdgIM3L51h6gGenf2wybnG96V1fHpkvycmughaD/V1E/qV5WrxGKL04L5PeK9Tqy5
+	qoT3Jv6Ugoy7BN7d7B/z1R5JlZEd67y2upExXKHOyOdVV0ftxBs1OJ8aeHRdMnKFj+DZvNWMLXw
+	5CYnfhG4Qcvbf+kcUvGJa8+Ae/P5I8ufEHMNzLDI0JZFSF3kl+ue0Ms+nRcjrNfcKoyvI7tsrra
+	v1h9bEqHEL80ZOTCdHtMltttbeFXqtci0KQtzmeGesuF4KmtatnCMjswTKPId6NKjV6dD3O1/NN
+	swiust84UkHvlYlLbudKpiN11YPR/VQyInH1HCZb3Mj/sirsu8cJA+7i4ST+takv53R875DDN0D
+	+EQmVyMl5vfzRM5Aj3AbKu0wWMkTM8Opc6DGFeDn/PF9F7kidlNrwhpN2JHq20MN23ubo8l3A8c
+	ftyBNO7VOxFH5GOuBhxCcC5J2ZqO1yntw+YsKNcZQ4JgLHb05W/I8OzoNBIfl8lty+Y=
+X-Received: by 2002:a05:7022:e807:b0:1b2:4188:840b with SMTP id a92af1059eb24-1b2418884a4mr3582177c88.25.1793735280597;
+        Tue, 03 Nov 2026 11:48:00 -0800 (PST)
+Received: from localhost ([2a00:79e0:2e7c:8:ab71:b3df:693a:fbf2])
+        by smtp.gmail.com with UTF8SMTPSA id a92af1059eb24-1b245c463e9sm1010564c88.14.2026.11.03.11.47.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Nov 2026 11:47:59 -0800 (PST)
+Date: Tue, 3 Nov 2026 11:47:58 -0800
+From: Brian Norris <briannorris@chromium.org>
+To: Stanley Jhu <stanleyjhu@google.com>
+Cc: "Rafael J . Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
+	Pavel Machek <pavel@kernel.org>,
+	Praveen Talari <praveen.talari@oss.qualcomm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Mark Brown <broonie@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+	linux-pm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] PM: runtime: Update runtime_pm.rst for non-fatal resume
+ errors
+Message-ID: <auo6bvjDtwAMKOid@google.com>
+References: <20261029040005.2100005-1-stanleyjhu@google.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -83,129 +101,129 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261103-blk-mq-del-quiesce-lock-v1-1-04aa29a481f6@columbia.edu>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMSw6CMBRG4a2QO+YmLRp5bIU4sOVHLpRXK8aEs
- HeLDr/BOTsFeEGgKtnJ4y1B5ilCpwnZ7jE9wdJEU6aym9bqwsYNPK7cwPG6xdKC3WwHNiVUW+j
- ympuCYr14tPL5nev732EzPezr3NFxfAEh1NGHewAAAA==
-X-Change-ID: 20261103-blk-mq-del-quiesce-lock-b9e0f81947b8
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Mohamed Khalfella <mkhalfella@purestorage.com>, 
- Keith Busch <kbusch@kernel.org>, Ming Lei <tom.leiming@gmail.com>, 
- Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>, 
- Nilay Shroff <nilay@linux.ibm.com>, Josef Bacik <josef@toxicpanda.com>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- tz2294@columbia.edu, stable@vger.kernel.org, 
- Mani Tofigh <mt4022@columbia.edu>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793732649; l=4068;
- i=mt4022@columbia.edu; s=20261026; h=from:subject:message-id;
- bh=N19XFK6Pp+jL6yjmYqq3sqsEIVvyVqas9SpWxi3HCEA=;
- b=KLSAIAInJMbfO/21dGqhMqi18T4b90sFGUsLqNtLBOtEtudKJecw/Bt+m+iV7SNh2BtKReW2Z
- alM2Gh4DK7TBrSEQ2KSyc1pzeTIemYgMvXVPO71MFIFGn6ZxglREXk3
-X-Developer-Key: i=mt4022@columbia.edu; a=ed25519;
- pk=gljCMQDuxyKPmd5y37CRpEJGSPXDV1MyAnHBhCgXl0I=
-X-Endpoint-Received: by B4 Relay for mt4022@columbia.edu/20261026 with
- auth_id=1322
-X-Original-From: Mani Tofigh <mt4022@columbia.edu>
-Reply-To: mt4022@columbia.edu
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261029040005.2100005-1-stanleyjhu@google.com>
 
-From: Mani Tofigh <mt4022@columbia.edu>
+Hi Stanley,
 
-Unquiescing a tag set can run the hw queues of a queue whose hctxs were
-already freed.  blk_mq_unquiesce_tagset() walks the tag set's queues
-under quiesce_lock and rcu_read_lock().  Commit 71ec3c7d6db8 ("blk-mq:
-quiesce a queue that joins a quiesced tag set") added quiesce_lock to
-the walks and to adding a queue, but blk_mq_del_queue_tag_set() still
-removes a queue without it.  The hctxs are then freed right away since
-RCU only keeps the request_queue itself alive:
+On Thu, Oct 29, 2026 at 03:11:45PM +0800, Stanley Jhu wrote:
+> Since commit eef1d74bf88f ("PM: runtime: Only set runtime_error on
+> suspend callback failures"), rpm_callback() no longer sets
+> dev->power.runtime_error when ->runtime_resume() returns an error.
+> However, Documentation/power/runtime_pm.rst still states that the PM
+> core treats any ->runtime_resume() error as a fatal device error and
+> refuses to run runtime PM helper functions until the device status is
+> manually reset.
+> 
+> Update the resume callback semantics bullet to state that on error the
+> PM core resets the runtime PM status to 'suspended', returns the error
+> code from synchronous resume helpers, and leaves power.runtime_error
+> unset so a subsequent resume request can invoke ->runtime_resume()
+> again. Also drop ->runtime_resume() from the ->runtime_idle()
+> comparison of callbacks whose negative return codes are treated as fatal
+> device errors.
+> 
+> Fixes: eef1d74bf88f ("PM: runtime: Only set runtime_error on suspend callback failures")
+> Signed-off-by: Stanley Jhu <stanleyjhu@google.com>
+> ---
+> This updates Documentation/power/runtime_pm.rst as discussed in the v3
+> thread for commit eef1d74bf88f:
+> https://lore.kernel.org/r/CAJZ5v0ga8qqYg79+hQVtO8T=FOCj8XLmTz3HpEKoOykV_K-HSQ@mail.gmail.com
+> 
+> Two .runtime_resume() paths assumed the old latching behavior:
+> - blk_pre_runtime_resume() (q->pm_only underflow):
+> https://lore.kernel.org/r/20261029040001.2100001-1-stanleyjhu@google.com
+> - __ufshcd_wl_resume() in UFS, where after a failed resume the retried
+>   resume releases the clock-gating hold a second time:
+> https://lore.kernel.org/r/20261029040002.2100002-1-stanleyjhu@google.com
 
-  Task A (controller reset)            Task B (namespace removal)
-  blk_mq_unquiesce_tagset()
-    /* finds q */
-                                       blk_mq_del_queue_tag_set(q)
-                                       blk_mq_release(q)
-                                         /* frees the hctxs */
-    blk_mq_run_hw_queues(q)
-      /* reads freed hctxs */
+Those need a close eye, as the code involved is a bit subtle. I tried to
+review, but I'm not really an expert in those subsystems. (I'm also not
+quite sure the second one was 100% a regression, vs further exposing an
+existing underlying problem.)
 
-The window is short.  On PREEMPT_RT quiesce_lock is a sleeping lock and
-the walk can be preempted inside it, which is how it's hit here:
+> Should other .runtime_resume() callbacks that undo suspend-time state
+> on failure, assuming no retry, be audited?
 
-  [  399.851277] BUG: KASAN: slab-use-after-free in blk_mq_run_hw_queues+0x4bd/0x550
-  [  399.851328] Read of size 8 at addr ff11000003014148 by task kworker/u9:2/116
-  [  399.851352] CPU: 1 UID: 0 PID: 116 Comm: kworker/u9:2 Not tainted 7.3.0-16299-g81cb9aa43246 #1 PREEMPT_RT
-  [  399.851425] Workqueue: nvme-reset-wq nvme_loop_reset_ctrl_work
-  [  399.851441] Call Trace:
-  [  399.851457]  <TASK>
-  [  399.851551]  blk_mq_run_hw_queues+0x4bd/0x550
-  [  399.851564]  blk_mq_unquiesce_tagset+0x128/0x210
-  [  399.851576]  nvme_loop_reset_ctrl_work+0x78/0x4c0
-  [  399.851600]  process_one_work+0x92b/0x16d0
-  [  399.851660]  worker_thread+0x4e6/0xd60
-  [  399.851707]  kthread+0x300/0x3e0
-  [  399.851727]  ret_from_fork+0x4f0/0x6f0
-  [  399.851776]  ret_from_fork_asm+0x1a/0x30
-  [  399.851793]  </TASK>
-  ...
-  [  399.851988] Freed by task 111:
-  [  399.852040]  kfree+0x1b3/0x4b0
-  [  399.852050]  blk_mq_release+0x400/0x550
-  [  399.852060]  blk_put_queue+0x94/0x120
-  [  399.852068]  disk_release+0x1bd/0x3f0
-  [  399.852102]  nvme_free_ns+0x39/0x270
-  [  399.852113]  nvme_remove_nsid_range+0x2d1/0x4a0
-  [  399.852123]  nvme_scan_ns_list+0x2cc/0x390
-  [  399.852134]  nvme_scan_work+0x421/0x9f0
-  ...
+Sure, that seems reasonable (although difficult), especially considering
+you seem to have identified real problems here already. I don't know
+that you'll get a formal sign-up from anyone here for that work, but
+you're free to do it yourself :)
 
-With BLK_CGROUP the disk's root blkg holds the queue until a grace
-period later, which hides this for NVMe namespaces.  It's still open
-without BLK_CGROUP, and from reading the code also for queues freed
-without a disk (e.g., SCSI device queues on a UFS host).
+>  Documentation/power/runtime_pm.rst | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
+> 
+> diff --git a/Documentation/power/runtime_pm.rst b/Documentation/power/runtime_pm.rst
+> index 40a5c23d5259..04dc2a538352 100644
+> --- a/Documentation/power/runtime_pm.rst
+> +++ b/Documentation/power/runtime_pm.rst
+> @@ -222,11 +222,12 @@ what to do to handle the device).
+>      I/O operations as needed.  The runtime PM status of the device is then
+>      'active'.
+>  
+> -  * If the resume callback returns an error code, the PM core regards this as a
+> -    fatal error and will refuse to run the helper functions described in
+> -    `Section 4`_ for the device, until its status is directly set to either
+> -    'active', or 'suspended' (by means of special helper functions provided by
+> -    the PM core for this purpose).
+> +  * If the resume callback returns an error code, the PM core sets the
+> +    device's runtime PM status back to 'suspended' and returns the error
+> +    code from synchronous resume helpers.
 
-Take quiesce_lock around the list_del_rcu() as well so that the walk
-either finishes with a queue before it leaves the list or never sees
-it.  With the fix, KASAN doesn't report the use-after-free anymore.
+This part seems good.
 
-This bug was identified and confirmed with the help of a deterministic
-hypervisor currently under development.  The C reproducer below however
-hits it about once every 20 minutes on a PREEMPT_RT kernel.
+> As with a suspend callback
+> +    returning -EBUSY or -EAGAIN, this does not set power.runtime_error,
 
-Fixes: 59e25ef2b413 ("block: Use RCU in blk_mq_[un]quiesce_tagset() instead of set->tag_list_lock")
-Cc: stable@vger.kernel.org
-Signed-off-by: Mani Tofigh <mt4022@columbia.edu>
----
-Stable trees need 71ec3c7d6db8 first since it adds quiesce_lock.
+I think this is a weird comparison to make, for two reasons:
 
-Reproducer: https://github.com/manitofigh/files/blob/main/linux-repros/blkquiesce.c
----
- block/blk-mq.c | 3 +++
- 1 file changed, 3 insertions(+)
+1) we don't talk about power.runtime_error anywhere else in this doc.
+   That's probably a good thing, since it's not really something any
+   consumers should need to inspect in most cases. Instead, the
+   runtime_suspend() section you're referring to mentions "remains
+   'active'" (i.e., can be retried later) or "fatal error" and "will
+   refuse to run [...] until [...]" (i.e., not retriable).
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5ae22d556540..54ccfc43c27c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4354,7 +4354,10 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
- 
- 	lockdep_assert_held(&set->tag_list_lock);
- 
-+	/* blk_mq_unquiesce_tagset() runs the hctxs, which are not RCU freed */
-+	spin_lock(&set->quiesce_lock);
- 	list_del_rcu(&q->tag_set_list);
-+	spin_unlock(&set->quiesce_lock);
- 	if (list_is_singular(&set->tag_list)) {
- 		/* just transitioned to unshared */
- 		set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
+2) -EBUSY and -EAGAIN aren't relevant here at all. All error codes are
+   now treated the same for runtime_resume(). (I know you aren't
+   claiming they matter in runtime_resume(); but the wording seems a bit
+   cloudy to me.)
 
----
-base-commit: 801bddbf1e4147a69b811c548c35a06a157941b4
-change-id: 20261103-blk-mq-del-quiesce-lock-b9e0f81947b8
+I think it would be better to flip the comparison to the other
+direction, and deemphasize power.runtime_error. For example:
 
-Best regards,
---  
-Mani Tofigh <mt4022@columbia.edu>
+  "Unlike with the suspend callback, failures in the resume callback are
+  never considered fatal, [...]"
 
+> so
+> +    the helper functions described in `Section 4`_ are not blocked and a
+> +    subsequent resume request can run the resume callback again.
 
+Looks good to me.
+
+>  The idle callback (a subsystem-level one, if present, or the driver one) is
+>  executed by the PM core whenever the device appears to be idle, which is
+> @@ -250,9 +251,9 @@ call to pm_runtime_autosuspend().
+>  To prevent this suspension (for example, if the callback routine has scheduled
+>  a delayed suspend or determined the device cannot be idle), the routine must
+>  return a non-zero value (typically -EBUSY or -EAGAIN).  Unlike
+> -->runtime_suspend() and ->runtime_resume(), the PM core does not treat negative
+> -return codes from ->runtime_idle() as a fatal device error; any non-zero value
+> -simply stops the PM core from suspending the device.
+> +->runtime_suspend(), the PM core does not treat negative return codes from
+> +->runtime_idle() as a fatal device error, and any non-zero value simply stops
+> +the PM core from suspending the device.
+
+Looks good. Sorry, I think I missed this part when updating this
+language recently in commit aedc51762a0d ("PM: runtime: Clarify
+->runtime_idle() callback return value handling").
+
+Brian
+
+>  
+>  Core Guarantees and Synchronization Rules
+>  -----------------------------------------
+> -- 
+> 2.56.0.313.g2479322e68-goog
+> 
