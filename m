@@ -1,100 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793716267;
-	b=TEQDVqahoI+cxxPABmWJWjJbtMBxrdigQXtv1TTeOskCoQxv93x8ghxBefZcQ4jyh2vV
-	 tGBexMqTHkdEhDQNH+pObIo4fRc/fFElAeDLkY0eU0EdsTjQFJrZuhfpGDrAnUCKRB6dc
-	 QuiGwZI5Nes20IHkyJFGETBF9jFLfBY/Sk+50zCIT5S7//sLw8OsBpo1MPZSKMaAc837i
-	 nM7qAdhD8KO6rs+zo7gcRjkMM96lD7ubbR+rxVv9B80tnjQti7x4fIbyRmLvSZFsjSFgN
-	 QTYAOBixjQHlUTYwXALT3crMXHMPd98igx1AJt3BR+RZ84sqWBTGiYJ4GQhwxT3uQ1Q==
+	t=1793716268;
+	b=T+gO3b5s5N2xDmg9sadMJngis2b96eU3X7Vqs6SL1z5v/gb9MRftCsNtlVGmr9pT88tT
+	 dsnI+t7rehulQPu6N5Y5vAMeaNLqXArGwf/rP21XiO6pkp1ip6HXGmqd1SgscD9lUG/kx
+	 vdCzkgmuue8cVqmNH1CCHwp9JFtjzQ6N72NJU9H2lXeN+6YMqLgq98KCTO8bUFvBF7woA
+	 8o8XOklwgRoZv2wjm/fDMyzfCB96NhzPg76N0ddCRv01gqUdi2aAlfpwD0RKrqAZgO+Ot
+	 9yTVc24mpsap15sQWsak1wTURx/jaD2rEzAp8bj6swxpK6MHLaQ2xvmyAO1YvfsWcMA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793716267;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793716268;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=+GXjmDSpdPKSM3dvXbu3WCZAHTmv+G6w0ssCMfJAnCM=;
-	b=lyyIsy7sDT7CvyQxbFz1D8fwkyrFeJG9ejyXniLyCSfOx1bq7EHVPz+y2tGsTunRJV07
-	 DJjr8hqjE+jZ7Y5Jo1R1/BzXy61pCs0QBqjB+KmbFnAPjtYHCITJ6BwwUO8wn6L/AfIHO
-	 I0DPMtgZ7ybtA6KzBw/grUey1F+n9xtEO+rJbecNCEarC0vhf0lTwW4FALyfdSQKR57bC
-	 XdFiuMAl04mIez9COZDbTNWJFy1UMbP2Jc3UciHuud8zZH2IcLwY+g4YueGCu8tu+xW8g
-	 cBZflkUONJaj7E1EWVe2Q/gaWfsNxTYD1/xW90pEjqpyNQ/j9/iw1gBQKl/ZB/e/NVg==
+	bh=TDYXubwg/R2YZMIkfVjvc0zCht1CRa4fwx87fBOfgn0=;
+	b=OHVz5z7AkngYyrtBdJ7cX4iKmod2umfEx7EJO7MVzS3I32Hh2JilB8NhmQHM+tkWmZho
+	 G82OQ9l38YZXpR/ftGdlPuITGDrn2zk2Xz+ViE4vVzGH9G8elciDDPjV66lcMGnEGcfjS
+	 CqoL5NQVOFEcFXiWdo76QbqzpmIemQgOHZGoaJ72ODiLswcZBk9Xnu3F3VocuIVHkoP1W
+	 S+3/elMWLidiObswduyf8RQFaN0iv/iufkTUPt0OQ96nvD1Unsfy1hwkN8O//rVpohpAQ
+	 elQfmOH073piGINdsN22t5H3JmUqBcYPcMFJMSpU3tfId6b6Xhr28yDaY4Jv2oLHuNw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=JAL5xEbx;
-	arc=none smtp.remote-ip=74.125.82.43
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=uZnFdR+L;
+	arc=none smtp.remote-ip=74.125.82.44
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC08C606A324
-	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC08C606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114DD606D824
+	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 114DD606D824
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=JAL5xEbx
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1931ff67a29so8730432c88.1
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:06 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=uZnFdR+L
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-14394530ec6so5584968c88.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716266; x=1794321066; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716267; x=1794321067; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=+GXjmDSpdPKSM3dvXbu3WCZAHTmv+G6w0ssCMfJAnCM=;
-        b=JAL5xEbxeRyI5iZfq2c75QvgWSvM8A+hwAkPoB5Ef0uYyHxKF51D+EkIcYAiVT42GW
-         O8+rFQnzDXYUm2OXJlerdC3iicYR4aSaSaHH3Ep/VgS3dutNQteQPI38N9cTs923fA4D
-         BIryhyqdfWTScigh6MyLKL1CJS2d6DQawQgkmWOyqgp69tkPhN8FiEZNW53On/G87OWp
-         kqGTqlIrju9gHXn+A4kicd+uohnWUkqFnZgHPqVrRm/AudeUaSqo5Vxq/cHqmboyto3O
-         deySONUwD/jokWH+7+DxV4OSMbR/tJKnNpueSZ3h16f9pmnrEaRKiRgNtstEGOao5RnI
-         wqBQ==
+        bh=TDYXubwg/R2YZMIkfVjvc0zCht1CRa4fwx87fBOfgn0=;
+        b=uZnFdR+L3OPiUEGDCpAZ63X/Q7vx/nNunWYSlDlH2EK35tSe3/smu88ZJx1AAwhuo5
+         Q3CY1EAeDaqHnBoDcUJf+EULvzzko0oZXnKZzrnGGQwHTPuAh+o3bw8khaiYMnrkIv8t
+         eMstjo6slcdCOXlnXjN1s6rYEEDvcCJWXrVkoSD/QJYsKUgURH1wYAKmqhkZ/hTIMQQl
+         teAmWmffecIYuTso12x4VaZ4o678Rc+KMOm906DK4yLeZdXtJrz+xd6Js1hkpyR/cqFM
+         lLT4B9F2fL5tjKpWgo0RSY72MlPKzPHeTh+czDsAr8I05RofyJ13fG9FTr4P1goSvM2i
+         ryNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793716266; x=1794321066;
+        d=1e100.net; s=20260707; t=1793716267; x=1794321067;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=+GXjmDSpdPKSM3dvXbu3WCZAHTmv+G6w0ssCMfJAnCM=;
-        b=gU0U6+iJ11x2GncXa5thtHyRMaCv3e3POd5CDU/zVf+bfVeh03DOuSGNhI2KqrIiWG
-         KlTHnmWyy2umHcDfo3MaQBJaPQaHtlM3yKCM9k+tf5TmFGG0Ob0s4ArdhgAUT+kmtnW9
-         qGySdDYE0rehiBsWQgv22ppa2fL4tZdNDO9uvf9uDqPMfgXnkO8K1pN0i10k6hThafsQ
-         HqVF1YWPBY7LWPBCSn+RxQThS0BBSo0Pmc2LE7h5xjqYYIa+hTZpaRZLrhQbKwrgqEGm
-         3rVeOT+pr2Ew1SR3LPLculKcXYTEp5SgCU9Xzj79V1l7dRgXyAN8vt8/JLbOBnwIH5eV
-         UPOg==
-X-Forwarded-Encrypted: i=1; AKwUvBy5lCcdT5XZ4brWg1bB6Q8Fu6MKCW9iZ5ReE+MbEF2WAD60+LsBNhPEwjM55Vf71huzKXrNBOEyw8btGQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/A7+rCn3L2syoteKQ3XktLEvz42vfuXoJTps2rVip0LBsI/f+B
-	cwWPPUl5aMAjZIfL12vOQ7PWS4sIbhlUEVnQ6VuCs/YycuzKRU74rDi1aaxsD8QNQo8=
-X-Gm-Gg: AYBFou2gSJW1v8Rz1hFhJN/cdH5ewdVgOWJxJegTjJ3p/Fnxq47h4Gauf29WsVifrIy
-	Zj/u2jXjLJYVmtC5FDa4ZG25htwKq9VSppjU4zzYIIs3PjuVB8knRZL654j0DYTZQ4Q0kER46r5
-	dmi1K/xTG2HDemNCfNgCui25RI5LL9o9qlAVr1SDNq59g7MfJXnPwnJgUeSE6GBAZd5VetLu30W
-	V4CKW2FH3Zab1eA6Xicov9/ZiApFXTEmG3lM/Y6z869EJ7ce+T5P3ooZrwpu/54eTvnxpgHtr2V
-	bnfClUqp5SbifOlo/oRxNh8a6GIQYwosZw9uRbilW+JEWUTfiai4LEE60+2KDCInm7S+YRhIqxk
-	mDqB0zJzWLJKC2f4eEiMO1pmp673/BorF5kPS1TeNoGeUXU18rvdxHr9eCRq9sVjENP18beuMOA
-	GljgESqFIV4+oE7op/KS+tLnWJI4ecz9sU+2gBTWL/hGiqubmLvbpaWLnj+gy+D3el7W8L968Ew
-	V52nMXYzYl9yq4ceoDcFNYTHPUW2YFwRS80JuA7mHLShD6RQ2m/EYD4O8WgtoHYmlcUDJ1B7/8i
-	xIJmWD2A+ZnPx6YVVJ2pH9BEggFnObCbZpmg846FIqI3CzbseRq7PcrgWQ+wzBSmcoceyFhF5oW
-	gWrI24s0/yiTu
-X-Received: by 2002:a05:7022:c88:b0:194:3a84:e67a with SMTP id a92af1059eb24-1ac5d0da7e6mr18645854c88.41.1793716265860;
-        Tue, 03 Nov 2026 06:31:05 -0800 (PST)
+        bh=TDYXubwg/R2YZMIkfVjvc0zCht1CRa4fwx87fBOfgn0=;
+        b=O7Nr2/Nm9Vr9hvHipwZLeFKN8b/J8dGJxndoGzpGJzKjtWWBMb2cSE4xWwBVKtu6Rz
+         49xY0P+0i6/4x7Z25fkg5nQNw1OnZnsHC6rbRvI8tYqKcd3G6SG7YWveWuBTz5kFHUwG
+         AaefdD3+dPR2bQ9BvPx5NuEZS61AtELzgDD+k4bdztnkNKKNVTCWSfF4rsj5jW22naBa
+         iK9S0EhzMg8jcccgnM5ADKd1T8ohwAWyorfxKlaf0aWHfEWZeTPE76k86bVXYUL+I8Ox
+         q9K0np6x5ww+9BFfxGAaNzm8JIgubMEtxPRGm6HNyiOwjo751ECkBKRQsF21BYiPxIdV
+         cd2A==
+X-Forwarded-Encrypted: i=1; AKwUvBxYMo1ZyDynT9vmPvcN3ZPXzdT/D18QebFAhKaXBc6ZDel1JubC4ir+Z7UYmDy8cGOk6R/bjbFxVEQtEQ==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+o5Ypm4l9J4zD3mjeIK48bqtbim3uOl+78UFBbNQKDci/vNb1P
+	WfDDIY2CDXXbuYEDcapmx7VVcPgmSOoNX5cT3dSmfBKZdto8MCwji7oOY8HX2KoT0rWrrf/4yP5
+	8Ivna5uo=
+X-Gm-Gg: AYBFou15G3xcXIt2NMTGxhWFb4Dbo8+HAlzMvd/oLGTK773OTZAL4HnjvuUe6xL+BCA
+	HhFQFh21FG+hQDvLIdc22bOoWzsYYH7VA69z/rWfKhJZhwEwcVJqUKa0xcg6OX7vIBWkmfH9Exs
+	/Sjv2XuuqZzubjaishqMQulC/IShyfgTdMybmFhE/8Ylv+MMNSzGa7B/AuUkkHRP4TnxQ0BMN2t
+	5WV7KA468zepli2H2XTMP8IiDsseITs/CDVEabPfGCrrG7CMOz6+7Mf2z4xugtPHRN8RsUrzcfx
+	2FDXPZwPCeyYVVo35xyIp6Qu452MEmfPMJbnV8IQ6c8j2dEelRYEfMYUo1Axq2gxhWmbFyDaXro
+	FZzQBI0aM38eLxLN2LmFFeXt7j0zRw7VcWa0yVUa22Tqzxr0hyW5bSaz3zEidJtQxsm+/+ogkdr
+	ou0eHGdzuSuJHFNn2PaqmsJ8b15qFvfgQAxgRsirsyQtsTLAwfxLVeC1iCpf5BIr+1o7Q8BSSlm
+	Ip6anY3jAYeUyfO+eFNvNTM/1raN0XZTVNGDfvI45wJA+Wph24pzAxGk0CpAdcZ6hZwUiGknXI7
+	MAfSDIHmAb49E5Foyk2YytJQYqB8I9PRo2pNYT2CubN7QW/k/ZFLkK6x/DN+nEsms+WgvkHhXlZ
+	he4qzTXi3NnvqX+cd/V9GkO81Ubx6tzOxvQ==
+X-Received: by 2002:a05:7022:f908:b0:14c:d84c:7182 with SMTP id a92af1059eb24-1ac5da75597mr17665992c88.22.1793716266905;
+        Tue, 03 Nov 2026 06:31:06 -0800 (PST)
 Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.04
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 06:31:05 -0800 (PST)
+        Tue, 03 Nov 2026 06:31:06 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: "Michael S. Tsirkin" <mst@redhat.com>, 
- Jason Wang <jasowangio@gmail.com>, Eugenio Perez <eperezma@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Paolo Bonzini <pbonzini@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, Ming Lei <ming.lei@redhat.com>, 
- Cong Zhang <cong.zhang@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, virtualization@lists.linux.dev, 
+To: Hungyu Lin <dennylin0707@gmail.com>
+Cc: arnd@arndb.de, ben.hutchings@codethink.co.uk, 
  linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
  stable@vger.kernel.org
-In-Reply-To: <20261103-virtblk_sync_quiesce-v3-1-f40233f9bdd9@oss.qualcomm.com>
-References: <20261103-virtblk_sync_quiesce-v3-1-f40233f9bdd9@oss.qualcomm.com>
-Subject: Re: [PATCH RESEND v3] virtio_blk: use synchronous quiesce in
- virtblk_freeze_priv()
-Message-Id: <179371626469.3691261.7199603294029974156.b4-ty@b4>
-Date: Tue, 03 Nov 2026 07:31:04 -0700
+In-Reply-To: <20261023153645.37546-1-dennylin0707@gmail.com>
+References: <20261023153645.37546-1-dennylin0707@gmail.com>
+Subject: Re: [PATCH] block: Return the soft block size for compat BLKBSZGET
+Message-Id: <179371626606.3691261.1284483179085449929.b4-ty@b4>
+Date: Tue, 03 Nov 2026 07:31:06 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -109,27 +105,24 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Tue, 03 Nov 2026 18:32:21 +0800, Cong Zhang wrote:
-> blk_mq_run_work_fn() can call blk_mq_sched_dispatch_requests() through
-> blk_mq_run_dispatch_ops(). The dispatcher checks QUEUE_FLAG_QUIESCED
-> while the flag is clear. It can then be preempted before it gets a
-> request. At that time, it has no queue usage reference, so
-> blk_mq_freeze_queue() does not wait for it.
+On Fri, 23 Oct 2026 15:36:45 +0000, Hungyu Lin wrote:
+> BLKBSZGET returns the block device's soft block size, while BLKSSZGET
+> returns its logical sector size. The compat BLKBSZGET_32 handler uses
+> bdev_logical_block_size(), so it returns the wrong value when these
+> sizes differ.
 > 
-> virtblk_freeze_priv() then calls blk_mq_quiesce_queue_nowait() and
-> blk_mq_unfreeze_queue(). A new request can enter the queue. The old
-> dispatcher can run again, use its old flag check, get the new request,
-> and call virtio_queue_rq(). At the same time, virtblk_freeze_priv() can
-> reset the device, delete the virtqueues, and free vblk->vqs. The old
-> dispatcher can then use a deleted virtqueue or a NULL vblk->vqs, and the
-> kernel can crash.
+> For example, on an x86_64 kernel a native query of a RAM or loop device
+> with 512-byte logical sectors returns the initial soft block size of
+> 4096 bytes, but an i386 process gets 512 bytes. This makes 32-bit
+> blockdev --getbsz and the BSZ column of --report disagree with native
+> queries, even without a preceding BLKBSZSET.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] virtio_blk: use synchronous quiesce in virtblk_freeze_priv()
-      commit: 6c6dec7883f8eb10b326bc9d109a4990c885d949
+[1/1] block: Return the soft block size for compat BLKBSZGET
+      commit: 57cd1a08717690e5ea01d7ac7a96bb33a2dca117
 
 Best regards,
 -- 
