@@ -1,100 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.176
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793696691;
-	b=2GSpK20luecuHqztADpY3HIK2vi9aI9eImg3RoCLX7sOHNQGVNw6pxP/6kytLKsTReOJ
-	 dhiQqYej6Rfb+JZhtM2VsoslsLPlKYQy7gscfE3sPy5lvdKHBE/YQIs9cmTamY66wAQlv
-	 SORgEitUueTnYyRyyc7MaTGqoPjb/7PrHehQfRplPpdJ2PWVf2VGBCbinfWtnHVtkP1tn
-	 H7/TZ5BKbJopgVo3IwkDJKZrBXs97ucFZAAV8iaktX2n4qcqvF2jY57SumEF92zwI02W+
-	 FcLx1Jf66rkmFvkbUb7ZGfRsWS0mMvficakgdMDLo2l3gKZ9AtQCvefydSO1YM+wM8w==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793696691;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=QibTS3hRHWBtrderPfFItxtuJrimy/UpjW7x7VnYyXc=;
-	b=b5j+KSdpYaHYuNANIUDOr2EWvjDAFBRK5Vdrfqa7xPTawcTcojo5vZjEqVzS5yoVve2s
-	 EzKRwxfidpazvtQ9J0B/lVTPmjisANk1VBSD7SYD6lJQEzLYS9mJ2vMdfu+ZpTSmUHj67
-	 MWUrtNAu3Vt4hWVf8IIWiFf8OXNikRqZUhDGFt+gPKVkJJTt+fg/m7KW9i7uxhQO7759P
-	 XOlHHxeQyZUnPiTQaB8DShpZMeOsSBU9ySniGRmPtuQfRHXYKR5kKiHE7r6xeH5C0w0KT
-	 K59qqDECCzwalUWdATFep0DjiILcTgmyyDgX9qbIz1ZpxVR4p4W8r5Rh2rtHvuzAqcg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=smartx.com;
-	spf=pass smtp.mailfrom=smartx.com;
-	dkim=pass header.d=smartx-com.20260707.gappssmtp.com header.i=@smartx-com.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=NoUTn0BX;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.176
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6C7606A334
-	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 09:04:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E6C7606A334
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=216.71.154.88
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793698735;
+	b=tCRHxbfuxZxGcifrIFTjEYiNrM86MpkBcDuVzGcWvkRPYlVUKTu347ZyXwnAlERQXp+r
+	 8nFFFH/cQl2fuZuWmGZWfqyrfcLJYsm95qgps5TJlR2XFnm/lpbJjhZAwY+TQ8FYt+k/f
+	 3BLPZhGtmInXQrWhRJ88n29+gpdyyF0QNoPhTxNFRgQRzx2MU2LVB4hWv5CrIt3tN1rHb
+	 bKLTbrLmbSPJfZ5DpEVqwKrNDa5DIrpdj+nY1i38cu92bTRoh1ZiZCkHrZDi4H6FXDWdK
+	 e7nsIIi40ea7Gwq0qIaSZknGaAXO5zaGv3/Gsuj9SnfKdQkuqewGf9ry0BaM4vm2pzw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793698735;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 Received:X-CSE-ConnectionGUID:X-CSE-MsgGUID:IronPort-SDR:Received:
+	 X-CSE-ConnectionGUID:X-CSE-MsgGUID:SanDiskIronportException:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=Es+iUNXb2N93UImwfSO2oOUm0ra/6NQPCq5iI5VuFgY=;
+	b=D6PuayNA5mb7sDrSJ3At7MFmQ8VzR6oCe9QITd9QBqlSFLBIb9Oe+++X3MkB85g2RKDL
+	 n6KDLzadboVJaUwv11OjkU1IsjtKtHkKMwTMSbtKQTDoTIcC5O+unDccBWs6ClhgUuU2S
+	 fiGM13bii+CbgUvQmDGuOMWR+nWcKyRr554Ugn+pmGHmj0T5tfKX1cHYRy5NpCga027wH
+	 s7mqE80F90UaKCo12MVx2VFcoM+Z10kG7PYaM7dJcy0SaaXI7sEfDklOFVMDnhs+2p/IV
+	 UrolCFJ29VGXQTV4pvdHCSJOU3G8XFJOXyU08wvnWwRqvjz5jb4Cy4L0D7Tfk9JY6/g==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=sandisk.com;
+	spf=pass smtp.mailfrom=sandisk.com;
+	dkim=pass header.d=sandisk.com header.i=@sandisk.com header.a=rsa-sha256 header.s=dkimnew.sandisk.com header.b=DFmjdy2Q;
+	arc=none smtp.remote-ip=216.71.154.88
+Received: from esa.hc6817-7.iphmx.com (esa.hc6817-7.iphmx.com [216.71.154.88])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53C1606A324;
+	Tue,  3 Nov 2026 09:38:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A53C1606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sandisk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandisk.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=smartx-com.20260707.gappssmtp.com header.i=@smartx-com.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=NoUTn0BX
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-3ab3dd9681fso35113691fa.1
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 01:04:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1793696684; cv=none;
-        d=google.com; s=arc-20260327;
-        b=PEacM5+sjf+FvZeLopGGVnNCZ8ILOfReMz3PhvKrQlkZlFWst4iVEvlN2//3p5eDFW
-         nx5Yda9+yvMRdysD9IrgiSpi+Ahy5dp4HQlBSBisREYjOwbNDqBzOU51LBy2bBTefX4p
-         ogCB3AYWeFLhq4H9mMJfGMAU56eWxITGBk/cnCEoIniITeyUWTNUmN+7rgDVs2L7Cj9T
-         ZzHYZb3Wu/tWUxglVCcIRhjxomHfNjgDeQEitjnktziERNlCzsNjC7JPWKAYuGKnF0mB
-         Xl0QOB3Yfn2Wu4S1Mxa9NKURCkty79vY7+tAnXvJ6UJwaZtNjVquPWDaNReCofYQtlEM
-         d4vA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QibTS3hRHWBtrderPfFItxtuJrimy/UpjW7x7VnYyXc=;
-        fh=LzlZIwhvdY89t0woKD+Oj+0Rak9FYPo2BUyTECiwXYI=;
-        b=enN7NcMn94Kynqhrqf7nnHrwUgdtvrOGkiMaXmOhlaCsn81C17Qsh9GgLPVZ0y9px1
-         Sqel1uDvIbi+lXaw5fj2YmK2pXuJfszNMZKBHPe4zXyMCxTEPQBI4szobhfuEAUhbjwj
-         UTkrmZM6zUKiE6hexCOWMCLUcYBf7EvUgtuzwK0iFUuJhjFJxhK0eB6lKF926n9gmIjt
-         +ZWOtULOPIGlUC456IxrmVwm9ypDi673v2Vz4JVvWYHOK7nUN8WscAMrimGSMeZZNuUZ
-         3XyhKba3tvQ87Q0qANOWIEEROl1cmvDPGMhCwVb2pGAktfnWyyNr3IYsIK8cAPuDJPi4
-         NmJA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20260707.gappssmtp.com; s=20260707; t=1793696684; x=1794301484; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=QibTS3hRHWBtrderPfFItxtuJrimy/UpjW7x7VnYyXc=;
-        b=NoUTn0BXtDsnFq1HpMu0aGhl74vF6CKggAagce7kXJrkwzVVNgCdmEOWGPBVK+PZUa
-         Etp/6wMflgBrUvrlEbhJpj0KHK68dO1qsnej/4oCGRTNlUyllk2VSFvBpJ/oijFF3u3x
-         9J7sfZNzCPkN+6LxdDMXV4hIOZkEBaf3HaU4+2CBLg0mihokJbbiFUqVJzbJaTNByS4+
-         4bwRXeFn4TXwNvbD4p0mIan+1sD8jxz8AOSqBvN1PF1sLCAYyvm9keSfuvDve6ExsbVy
-         OWUJdr2MoaeK7kTi52hhSzF5qPFiLX2qRwDITel32YzXCyD09x8KdVs+QeOv8U+ffg3J
-         qngg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793696684; x=1794301484;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=QibTS3hRHWBtrderPfFItxtuJrimy/UpjW7x7VnYyXc=;
-        b=2GWYbvZFiETmRXLWRzQhcuDrfswvo/5u/3eiY/mPoasJ1TfXq3MCIwE143LwyQz8RX
-         k3EWP3wnbYVl7GuvWdxOItDair6YYJYqC5lef9v8eEx2s56wwQEeN3Mdu9Orp9p5/Pve
-         zFYkaPNG9nLtXErohhfrVt6RdSFXWermD7f/LpHltKb6na9+jt6/LRFK9F1VgsTiaumU
-         CxVmDDa0fRHS6W2xic7OhQretqteEPsxmNrUjPOOALuFqROha3QjS6uezjRGHw18TKBE
-         U0G1/rjBXwLuGrFvoOkHLkIQS7p+kYhObRMy+YrtFhLaKku7q+NyjRg7dmx5y4V/SIPC
-         vALw==
-X-Gm-Message-State: APuU4Z/rxQ7olOMJRZQsJSMDRh8/rlrESzz7tDAmOf9a0sjn5Da8Qo7l
-	fEJyHcicacuNJAyxYUlFoUJUUEMswHc2wmJMDgSER8Ji5V63ggxjFs0sz7nhYCBDSeC6mbbvmGt
-	p0Ry1XeSepJBDLaNMuPa6a/xqxdC+o9ucIJUIv2KYZrDXLUpzeExXu9fng7lk1xtc5L06nqq8Lc
-	DPq1OmROipaWj1vGvMcaN/eX312xOtVIz38WBSSNl12xGwgWHZ
-X-Gm-Gg: AYBFou3Ts/Qjt4aFNAiIg4YSPFCImMjfasQxMdPXBH5tTehNGSTtZCMTETSp7Sn0rb/
-	zItIl29bjmUfk/0k0aZXLhpHUUEKbOWu63RGc6ywDrFPOD0h4MPxWrSuEa4S9aaGN14UX0+cHgW
-	CC52HOV2MTXR3N5bQCyfHeegq8lwUxI4H1z3Sk1d7ORzu+ndtF166xBIOj6ATpulyEU2XD0GKL0
-	xOUogvdBa03gDwyGSbCUpr2hmjFH2ukDOc70Lb4mgalSKcCLv4/qPMaWCT088otjO0+owFLvDJl
-	eaNZeiKhi0cXCjiZ29ZRBI7ReIxgnWUzldswWkDq6ZI06d60DC/vzr3/CvJAdCVs5iMNRkzhLSV
-	TSEV822H8UMD2hyuYk8sANH+R8h1rR/kBqiprJWAvvgXKw0JIss++WL+/ah5RXtR3wLdgG5w=
-X-Received: by 2002:a2e:bc11:0:b0:3ab:34b7:2535 with SMTP id
- 38308e7fff4ca-3acb7a29983mr29493411fa.9.1793696683509; Tue, 03 Nov 2026
- 01:04:43 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=sandisk.com header.i=@sandisk.com header.a=rsa-sha256 header.s=dkimnew.sandisk.com header.b=DFmjdy2Q
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=sandisk.com; i=@sandisk.com; q=dns/txt;
+  s=dkimnew.sandisk.com; t=1793698734; x=1825234734;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6gILW4913DJmhe6Xf2zy1YvOrI0lTdtkeeHEK4vy7j4=;
+  b=DFmjdy2Qbk72YHzWZLB8sYNaSqw+RAp2XMQE9VBPRK6BYkTEqYLfeUQf
+   cNyFKUn9apeVpmAW7k34PbD4rG4YhsaaBcQZ5jU6nx0afkm1jDa/n5iB9
+   ZZgn6gD8+TBVi6oRl2ErQ3nqjOKzaZmwNLO3zdfhDAxQXih2WTB94n3PG
+   voqIzvsZaEJBXQ9yaiEIoEOD6N0c5zj9uvNQQ1nrNLMYAYUHs+cAwocVB
+   Iq0TUI4yUxRMIeebht0U8fUmgU9TmF45KWHsqxmiyI+LTCZeR3eLW04Bq
+   gqtnzqceN9U7O1Frxm4vyLS+S2bQnw0uRWu8EMMSqe0ue1SsFYKEudl9p
+   g==;
+X-CSE-ConnectionGUID: N1bTh70GRK+punBLalyGAw==
+X-CSE-MsgGUID: TeQFgXW1Q62O82kX2t+5TQ==
+Received: from unknown (HELO uls-op-esaep03.corp.sandisk.com) ([129.253.192.43])
+  by ob1.hc6817-7.iphmx.com with ESMTP; 03 Nov 2026 01:38:48 -0800
+X-CSE-ConnectionGUID: 6XPYSXlnQ3GkBPsp5aRAJw==
+X-CSE-MsgGUID: CNK+0/lGTjG+j9BqRxRwFw==
+IronPort-SDR: 6ae9aba8_J3mApw+WszOCRAdBjOR5BVqsNJeAwf9wjdY4ATMp+lQjHJe
+ AZNDDLNqcb2J4CKrD2PQy9FOFSgBWx+J317EUow==
+Received: from unknown (HELO uls-op-esaip04.corp.sandisk.com) ([10.15.0.10])
+  by uls-op-esaep03.corp.sandisk.com with ESMTP; 03 Nov 2026 01:38:48 -0800
+X-CSE-ConnectionGUID: AqC0UPcGQtuzuCT5q0QjBw==
+X-CSE-MsgGUID: f0yvLvy8TYWlKwC8Ag5LTQ==
+SanDiskIronportException: Internal
+Received: from ulssdxvpxsnip.corp.sandisk.com (HELO WDAP-ez2C89klLd.corp.sandisk.com) ([10.9.34.160])
+  by uls-op-esaip04.corp.sandisk.com with ESMTP; 03 Nov 2026 01:38:44 -0800
+From: Arthur Simchaev <arthur.simchaev@sandisk.com>
+To: Daniel Gomez <da.gomez@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Andres Freund <andres@anarazel.de>,
+	Pankaj Raghav <pankaj.raghav@linux.dev>,
+	GOST <gost.dev@samsung.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Avi.Shchislowski@sandisk.com,
+	Alex.Lemberg@sandisk.com
+Subject: Re: [PATCH RFC 0/2] Support for Multiple Atomicity Mode
+Date: Tue,  3 Nov 2026 11:38:39 +0200
+Message-ID: <20261103093839.203841-1-arthur.simchaev@sandisk.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260929-nvme-mam-v1-0-48dcbe79cece@samsung.com>
+References: <20260929-nvme-mam-v1-0-48dcbe79cece@samsung.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,92 +90,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261009030111.57784-1-lei.chen@smartx.com>
-In-Reply-To: <20261009030111.57784-1-lei.chen@smartx.com>
-From: Lei Chen <lei.chen@smartx.com>
-Date: Tue, 3 Nov 2026 17:04:38 +0800
-X-Gm-Features: AclHuK_pmOLLTESyZi7anXUIO5GW4TaRMlcQcRNW9nXAneDiHkZvFfsScA0IpS8
-Message-ID: <CAKcXpBxKzWgez34rmpqEmV9hw2JiKBtjJsJqVnKk=ySytxkU2Q@mail.gmail.com>
-Subject: Re: [PATCH v1 0/4] Expose blk-mq tag sets through debugfs
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Jens,
+On Tue, Sep 29, 2026 at 01:17:10PM +0200, Daniel Gomez wrote:
+> While I think this small feature is worth having (hence this RFC)
+> for users sending atomic write commands that are contiguous, the
+> question I'd also like to discuss really is how to also expose clear
+> MAM semantics to userspace for users who can send larger commands,
+> so they avoid syscall overhead [2] and splitting, and still get the
+> atomic guarantees in the LBA subranges. RWF_ATOMIC currently exposes
+> SAM semantics, but I think MAM may be confusing for users, as it's not
+> simply a larger atomic write but an atomic carrier. Thoughts? What can
+> work best to leverage MAM from userspace without conflicting with SAM?
 
-A gentle ping on this series.
+Hi Daniel,
 
-It adds a tag-set-level debugfs view to inspect CPU mappings and
-driver tags, with links from request queues to their shared tag set.
+I agree that RWF_ATOMIC should keep its current meaning: the whole write is
+untorn. Letting it accept larger writes on MAM devices would silently weaken
+that guarantee for existing users.
 
-I'd appreciate feedback on the overall approach, particularly the
-driver tag lifetime changes in patch 2 that support the debugfs view.
+If we want userspace to send one large write with per-piece guarantees, I would
+keep RWF_ATOMIC unchanged and add a separate opt-in flag that describes the
+guarantee rather than the device mode, for example (names are placeholders):
 
-Thanks,
-Lei
+  pwritev2(fd, iov, 1, pos, RWF_ATOMIC_CHUNKED);
 
-On Fri, Oct 9, 2026 at 11:01=E2=80=AFAM Lei Chen <lei.chen@smartx.com> wrot=
-e:
->
-> Block debugfs provides views of request queues and hardware contexts, but
-> not the tag set they share. This series adds a tag set view for inspectin=
-g
-> configuration, CPU mappings and driver tags, with links from request queu=
-e
-> directories to identify queues using the same tag set.
->
-> The series first removes a stale CPU mapping comment and moves driver tag
-> allocation and reclamation from individual request queue initialization t=
-o
-> the tag set level. This gives the debugfs tag files a lifetime that can b=
-e
-> coordinated with tag allocation and release. It then adds tagset/<id>
-> directories under the debugfs root and links each request queue to its ta=
-g
-> set directory.
->
-> Tag reads hold a debugfs active reference only while copying tag fields t=
-o
-> local variables. Releasing it before copying to userspace lets tag file
-> removal complete even if a reader faults on its user buffer and needs I/O
-> to a frozen queue.
->
-> Based on Linux v7.3-rc2.
->
-> Testing on a 192-CPU x86_64 host with KASAN and lockdep enabled included:
->
->   - null_blk queue growth and shrink under concurrent direct I/O and
->     debugfs reads, including 100 cycles between 1 and 192 queues.
->   - Shared tag sets, shared tag bitmaps, three-map configurations, and
->     repeated device teardown and recreation with old file descriptors.
->   - Unmapped tag reclamation with 256 poll queues: tracing confirmed
->     allocation, reclamation, reallocation and reclamation again for
->     indices that became unmapped as the queue count changed.
->   - Task-local allocation fault injection, including hctx allocation
->     failures that rolled the hardware queue count back.
->   - NVMe loop with two namespaces, 50 controller resets and data-checked
->     direct I/O. These resets retained the same hardware queue count.
->   - userfaultfd-controlled stalls in tag reads: null_blk queue resizing
->     and NVMe loop controller deletion completed while copying to the
->     user buffer was blocked.
->
-> No KASAN or lockdep reports were observed in these tests. A hardware queu=
-e
-> count change with NVMe queues already frozen has not been tested.
->
-> Lei Chen (4):
->   blk-mq: remove stale comment about non-present CPU mapping
->   blk-mq: manage driver tags at the tag set level
->   block: expose blk-mq tag sets through debugfs
->   block: link request queue debugfs directories to tag sets
->
->  block/blk-mq-debugfs.c | 298 +++++++++++++++++++++++++++++++++++++++++
->  block/blk-mq-debugfs.h |  22 +++
->  block/blk-mq.c         | 143 +++++++++++++++-----
->  include/linux/blk-mq.h |  13 ++
->  4 files changed, 445 insertions(+), 31 deletions(-)
->
-> --
-> 2.43.0
->
+  - statx reports a granule G (e.g. stx_atomic_write_chunk)
+  - the range is split at file offsets that are multiples of G
+  - each piece is untorn; nothing is guaranteed across pieces
+
+If G is tied to atomic_write_unit_max, a G-aligned piece never crosses an atomic
+boundary, because the block layer already requires the boundary to be a power of
+two no smaller than unit_max. A SAM device could then implement the flag with
+one atomic bio per piece, and MAM would only be an optimisation underneath. Open
+questions would be the semantics of partial completion and errors, and how
+filesystems keep each piece mapped to one contiguous extent.
+
+Before adding a new flag, though: with this series your fio example (io_uring,
+iodepth_batch_submit=4) already sends four 16k RWF_ATOMIC writes as one 64k
+command, so a single large write would only save per-I/O work in the kernel, not
+device commands. I understand real MAM hardware may not be available, but that
+cost can be estimated without it, e.g. by comparing host CPU usage of a batch of
+small O_DIRECT writes against one large write of the same total size on any NVMe
+device. Even a relative number (e.g. % CPU per GB written) would show whether
+the remaining overhead justifies new uAPI.
+
+Regards,
+Arthur
