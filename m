@@ -1,96 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793716273;
-	b=XYQ8DJFDljtuNw0LaJ6KKGB11CSliK8L6/R7FKSUZ3tb5kP9RrZtkm96qf+/KbEEbIQ6
-	 fWACsUcSYjrZHHlwwZnARoI4PNXrFACJ2rvoo8317dpm3Q/SPDIPUAogu/9FAZe/EO9Gz
-	 6esiKuVODzDqv/tjVV3w2L5759KVuQUEVRefs7IN2aNjkeqOUYf25HZTtXxoumOA8dJen
-	 zqTDFo5uCyZJkITxjF/NmQuM4lEgcgdZra5c3CstjbT0nXpFoRq4PNnvqS4F8fRmHbXL3
-	 AzhKLYu1j8lNTD/iVFj0c8IH7fOP7ZKheAd7dH6b6LhIsPpcr1c21qh8k+O0tkgjMHg==
+	t=1793716275;
+	b=Yj0zphWjJkoB12WK/xrWCcv2tFmiWS7CiDXtXwVA/713p1XNTiYM57oNY5e/W4Cwx4IQ
+	 A9Gzdf5+Ujelb9L9PHDDAZKWiD+wvTp72qfUyyagcJUMcXxVIovPtmkrrUULq2DO3A9Q2
+	 t4j8oDkukszCDYeyE3GchzTrWy3gkvOBONM3r6fZlDK8pZfszrSeY3uJunqJFZaW0jSL7
+	 qeEJIODdrsdFCTOG581VY9BexL1Lf15AYt6XpFO1ae+XxDmtGItfCSGCeNC1rteVlxGAV
+	 bQjNrLMTVq070sn6/XRUb6AR371eTinErgFMs6oTxoaIgT+Axhlr/oQwYDtrYDUURjA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793716273;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793716275;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=DDx8Ehj1ckHKpx5GFjUEQj8Z/cmjaQtpmHixmoQXBEg=;
-	b=W/v3dMGUcwkn5G4blnagqrogZBfAgjAL5yVmbEM24lpo6Q7doIol61sO28kyc5al1GpR
-	 jXDDzRmQmnuGL7lERVrTTSvVZmtiXbeIdjR/j3lsCHlDv8KU/gyiMRt2l9IVb7AFyAsI2
-	 m7UGNLrzIj5k6+E2DyDHIkrfNVgxBOnEb6JA1atk7DsC1GjgE07wIVPl2F3pVPO17bnCe
-	 dAS0UGyyasg4EIcOQoIamnzq3LvwuK/7DvXW1UZj9pykCVjRX02PEtSWxdnbRaY5Bz4Pp
-	 ss0Zau+TtcfMN6OQms7E/lBJF//edahgyAmDx6P1cYXFpMZ8VnfuynBZn/tyKtqnGLQ==
+	bh=mQHIItj+qvoGznmNDSAc+oLyoddjsgyl65N2G457jxQ=;
+	b=bY4CqAgqgnOox89dYB3/vlO1jKeS3wOE2Z3EAlp7mn2xG5ATB732n2pQCiN+SG954jbk
+	 lYI6/5WectjG9Jn81zj5pU7Yinp5zPAf46JeFPdHAYbboHfxE35DdTzBa2xNe4t7SgdD8
+	 vzknaIUO6ctollvaRJeDPXCzaq53AuaBtc1Yl4pT0eSepwpDsKMr1yavmbCfozYmOt+1K
+	 gXUcq00lNM6A2A9igMX0V6j+car6ehF6ZLwEmuWVxVFZoDoTtAdH/36DH+TFYg+ssqE/P
+	 NfKU+0ilJOTj2QhpjH4SnxED78zr9Ljnvdpky5JUn9n7xUWigLGJ359ivwKwb95HaOQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=O2ZZYQ7g;
-	arc=none smtp.remote-ip=74.125.82.48
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="jVnxhA/E";
+	arc=none smtp.remote-ip=74.125.82.45
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E070606EE8F
-	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6E070606EE8F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B03606EEA1
+	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 14:31:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4B03606EEA1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=O2ZZYQ7g
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-170135e43c7so2531005c88.0
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:13 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=jVnxhA/E
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-14394530ec6so5585187c88.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 06:31:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716272; x=1794321072; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793716274; x=1794321074; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=DDx8Ehj1ckHKpx5GFjUEQj8Z/cmjaQtpmHixmoQXBEg=;
-        b=O2ZZYQ7g5x9WzmRrWKlJBZKCGUL4m3NcbK1BgXeH6hQ4g034AAF+ozXP6Vq7VFQCpo
-         rD7zK58l+OmrJQdSBlzoJVtmIx37T/qwy/d8zjA5GH5Cyi3e3QZ0KCLEu//X934ut2d0
-         fkGf9eQ6F8h23rwbn/xAsrrmJlYiKkw++1TKJUTEjO87ZQitjK3soLmrsyriCgiFohdm
-         ZcmolbGECjOU8pIXL4qGQGUX3Yno5zuW0caZHCKFBuS85zIB7/T9KxMrVg9xg3MMc7Fk
-         HYZuU9/1TVwZ6LF6H2iExDrrbn7HXug/oKjVtS7EMNTguAiBueMNaEcrIP85LkGpeiu9
-         1FhQ==
+        bh=mQHIItj+qvoGznmNDSAc+oLyoddjsgyl65N2G457jxQ=;
+        b=jVnxhA/EG8/jwWHgyUd/YGEYAOWsVLRlwNPRXwYEGVwswK2+uIGauWBraLJnUWUA/t
+         h4t6pngRbbrUOVUbmqrlWAVUK3/ta+8Zown4zVadfvmTepZik3oUQ0nWhWqTcs98Qb66
+         02BsiQK1wpIb/OOt8q3I/7EIuN3e8R/LQhAdXYpgMIzEI1JUwWmQnBlbKGfgtP5z2r98
+         5fZlpur1KqKKd59doL9dDbmgKB2ljBPZBLjqhSkoWF9OFIM/aX5CyXWKG+MrJbtp8m50
+         4lzdrVw6eECucGAexedcU/afcUfRw5ncCH4jSpuo9V/mwzGNqPLBXWXtcd0RvEigPHVN
+         /0Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793716272; x=1794321072;
+        d=1e100.net; s=20260707; t=1793716274; x=1794321074;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=DDx8Ehj1ckHKpx5GFjUEQj8Z/cmjaQtpmHixmoQXBEg=;
-        b=X3YnN9lC3KH4NWc04FevgvqCJubqBnn4Hys8yIcQSG4MNDqB6hvJKS/UO0dl39n7qc
-         rC2rUPikSd6F6bLa6g53EymOioGOTTYkWpphi/qyGqZg1fWDQkzg4mbp7CAYI2aoVBJH
-         Vz0mSAnpS02BnoxniVCYMkWTTy7eMFhjeJJweJ130wN0UsTqjtZ8D/OOi/acY2rELO5q
-         P5xY8o4++KaQEXvOMEq1C3F+E4lORU6ZwZSBoUONoVx4BDtys+HBJCOLQMan3izZm0nf
-         JLOWDsdUmczEUHB8tyIVnuhMU5Y8ctdwCvLMpoxacsNcCB1LSlJN5K09RQjPIO37pzBf
-         f2Ig==
-X-Forwarded-Encrypted: i=1; AKwUvByazOBiIq0vwBni3TAjueqWX5A62Pm6tzafNgiEXxBDTYQ70/0shQwjAa+ZNIrjiAttA1LM+nJXJCVnsQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8VU79cXAFn7AzfuV1z4MDm7DYRDvTTn5XM7x+Xt+iCyg8MZ35l
-	yeMeO5nRg4dt8FbVUPHeSSG6TMlgb5S2ZIC3hwAhdNDWxw8SYRnjAjDQyxv0oHhy6PU=
-X-Gm-Gg: AYBFou0lwdljF2PEF12nNgUNNw/9c10jbF4nySnUc6adzQG6v3r9BGfTclHfuVBJuew
-	eM59dlei3J9lDlhWeA2myFt5HXlJ1sQuaG2ja59DDjpZickYVR2qsjysb0MYGPT+EzxAY7wLFDz
-	dYhixOr2L+hwcngO+iuThCb68Sy9ig10XYk155F3qJ1FyHu6W2jwE2t+wQzxpcYaiuep8RpVjDk
-	OQXZwBoYexEhs22wksnYikQSyC39OyoR5bxXFkx/w3gsJ0qxfsYfHd1bdx0xMVzEeZdrrUwgSij
-	fMvIYSug0dpGOQPiFZHItHcSjbBLp0y2QsRxXW9J3b24EoniQmQsZLfoNjZ7XdT7siJWYlLCTpv
-	bNVT1sksTBPXLuBPN3zUQc+PQrvPMkqO1Q/zdLaV/08FWnx73HRzLq969YhVYi3L9OF9AvUc4qi
-	uTTxccM96L5mwbw+msl1kyYez4lX9dS9YrlK+ZsZmnuJFgRoBVPQxSUBoiMxD3ksVg1yugg0scI
-	WsbF5htLoTt7MikVSnKBwvMgxoy7+t8BqaIEs+Ttrbka1zsT5wBEdkBgGDIpVRsxmFWUc2AlDBR
-	xzGB5OLndLpFIkWm4qK81td+hVEq3BJXbNZ1AURb4atoSZknZ39KFOIJxsMFfAyWpNZDM911YMT
-	7TQt+FcVKNqc6
-X-Received: by 2002:a05:7022:e27:b0:14d:cb67:afc4 with SMTP id a92af1059eb24-1ac5e8e1e4bmr27128472c88.41.1793716272247;
-        Tue, 03 Nov 2026 06:31:12 -0800 (PST)
+        bh=mQHIItj+qvoGznmNDSAc+oLyoddjsgyl65N2G457jxQ=;
+        b=oicuNiyRNAnJEVn4VoJPSC3GV6ILWt+V/tM2Ddjc+BKzvTF27Vd9ZXVl457OJByy5M
+         JVSRQ5kXky5D48/ZUdLdYjRU3mULYeina8F+t+1XGgQZfPlCILC6xBfOVu7SYkLhu53n
+         5rvF0NvpC3wq8bmoofLrdvIZvYZrr9oYQ7D6j2h7SqNzx+0ZjPdiaRYXN5sRZqA73EQT
+         Oh/IjdjL7Cwn5MLE+wKFu1mVB16LSPL4uLTOhf2phWMe9RFTDexQMTxxzRvhepx5lV5A
+         MVSKopqNEdh4Kipkyxo9Yzc1FxIL5E9iE9JhILzjefk556UUZugeg0g5qkti+D6jHp6T
+         yjZA==
+X-Forwarded-Encrypted: i=1; AKwUvBxNDwcuBbNcU5eHML2HtNdpVMNSA80wM+FLlh2xIyljGJUPvG2Lk7D74YdXdiF+RYylHeDK2zHsyTICCA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z976RdthEIhBIDxUbQWsGuo3Jwz5VBTVPZycR76eGR+H0/4UhGF
+	NWeivm8O3bd2frfMESc17IZAJChv29hAvsUV6/EXu4swaLswNqkwNQq066xb6L5X1GE=
+X-Gm-Gg: AYBFou3pah5fJikbOoRrKGJqSbOEaA74UVLEtN+kb/RIssR0KHj3karnmAYrT5Ima8S
+	v9rSzyHbZDGj/myE7eSCFoPDmDyM9h0cr48f3RE8g8nPQkNCJQ1WYH+vi9hvqDYBv3az7MSC+fB
+	i/MBxFSNwp6tzuP4GILxtupvM1XMHhKOlXwDpae3x7t6tgRufmSqhl5iBd0+BsBu2f8uCZ8ptx+
+	ynj8GPKpsmpX5SB8uR5HU7Rwd6EIgrJdiD0nubF7a5hSSGwFU/QkgvOzk6zcZ+ojQhv1zZWTsOn
+	mFsOzJQn9dByzvJ9v0GmUo8wLrQF/3mQ3WokViQr294MuC+DKNsSXeG89ykk/JUYRSm0wqDWVt5
+	tZnXYZ8qmSx+wNQUdzIyZVoEL8AqrV1O282yMJO8h1m9I4BM/m1XS0nW/aefMeyRqmBkoeNTF6q
+	MAjayqsLeBOeybLXtJcVRVZaQRZl6LG8FA43WxaYuzLZdR6Z2MdepG8OjfJLQeCydDe1S8aLBd6
+	XTZfG7BnPYEGs5V+GgqXz6aANF6j24Fdwkwls+dY/TwP1/bo1Hd+n73tIZPYJpsLK4Ht8g8sgKQ
+	97wPYovGAoidAnfWshoXVB7seXNoRirCcdpgjVqTDNxT1vH4f2CiQ+CrePkQzKr0FkJh1WuJtw0
+	l3dpFp8jvRJSI
+X-Received: by 2002:a05:7022:3a03:b0:152:9e88:daaa with SMTP id a92af1059eb24-1ac5f181628mr22731309c88.36.1793716273870;
+        Tue, 03 Nov 2026 06:31:13 -0800 (PST)
 Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.10
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b23b847348sm9534779c88.4.2026.11.03.06.31.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 06:31:11 -0800 (PST)
+        Tue, 03 Nov 2026 06:31:13 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: bvanassche@acm.org, hch@lst.de, yukuai@fygo.io, 
- linux-block@vger.kernel.org, Zizhi Wo <wozizhi@huaweicloud.com>
-Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com, 
- chengzhihao1@huawei.com, wozizhi@huawei.com
-In-Reply-To: <20261102080442.3775061-1-wozizhi@huaweicloud.com>
-References: <20261102080442.3775061-1-wozizhi@huaweicloud.com>
-Subject: Re: [PATCH] block: partitions: reject GPT entries with
- starting_lba > ending_lba
-Message-Id: <179371627073.3691261.1371314560299241508.b4-ty@b4>
-Date: Tue, 03 Nov 2026 07:31:10 -0700
+To: Pavel Begunkov <asml.silence@gmail.com>, Kyle Bader <kbader@redhat.com>
+Cc: Kyle Bader <kbader@ibm.com>, Anuj Gupta <anuj20.g@samsung.com>, 
+ Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>, 
+ Keith Busch <kbusch@kernel.org>, Tushar Gohad <tushar.gohad@intel.com>, 
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org, 
+ linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ "Martin K. Petersen" <mkp@kernel.org>
+In-Reply-To: <20261029155821.2983229-1-kbader@redhat.com>
+References: <20261029155821.2983229-1-kbader@redhat.com>
+Subject: Re: [PATCH v2] block: only fail dma-buf bios that need block layer
+ PI
+Message-Id: <179371627250.3691261.14418388073265426531.b4-ty@b4>
+Date: Tue, 03 Nov 2026 07:31:12 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -105,27 +108,22 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Mon, 02 Nov 2026 16:04:42 +0800, Zizhi Wo wrote:
-> A GPT entry whose starting_lba is greater than its ending_lba is accepted,
-> and the kernel creates a partition with a bogus size. The bogus sector
-> count defeats the end-of-device check, so I/O through that partition is not
-> confined to it and can access sectors outside the partition on the same
-> disk.
+On Thu, 29 Oct 2026 15:58:21 +0000, Kyle Bader wrote:
+> All dma-buf (P2P) I/O to a device with integrity data is rejected
+> today, at registration and in blk_mq_submit_bio(). Only a bio for which
+> the block layer generates or verifies PI needs that. The block layer
+> then walks the bio_vecs, and a dma-buf bio has none.
 > 
-> is_pte_valid() only rejects an entry when its type is NULL or when
-> starting_lba or ending_lba is greater than lastlba; it never checks that
-> starting_lba <= ending_lba. For a reversed entry both field checks still
-> pass, but efi_partition() computes size = ending_lba - starting_lba + 1 in
-> u64, which underflows to a huge value. That value also wraps in the
-> end-of-device check in blk_add_partition() (from + size) and does not fit
-> the signed i_size, which turns negative.
+> Reject only those bios, and remove the check at registration. Then a
+> submitter that attaches its own PI, for example with
+> IORING_RW_ATTR_FLAG_PI, can do dma-buf I/O to such a device.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: partitions: reject GPT entries with starting_lba > ending_lba
-      commit: 7e3801d12ebabaa3db6e2685ccc80b6e6f6d1ff7
+[1/1] block: only fail dma-buf bios that need block layer PI
+      commit: d734b6433b2fd248bc25a2ea1fa60c34b40ba15c
 
 Best regards,
 -- 
