@@ -1,96 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.229.6
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793732364;
-	b=I2ljNw/PtvWMmNSdOuogbXL6x2XG6Yw421GNObFwizRMAVJPrwrO1Mbaoo70Y5GBRsDh
-	 r+Qp+SqqzxpAvo5FyLI+0sDIJnxNURPGM1cl7tyjOmBuYm3EmLqrZWA0e0bQ6bjMYvViT
-	 BuOF71KY/RF1joiAQI+Wc6TaQLnsFr5dcPz9jTlwA60MTblKb4Je4kVfMZ5RunTnRvFx4
-	 aZg5gcuVgNlDG0PFguOc3oCgY20vgfUfy07vEtPvwn8gUoRPxXSsjT4IIr89wcghs/mks
-	 Z/Xl/Jg7fg/wQH+vgLN3dSu/HUCnBi4CXT4n11aKsHIIxm/V+xzCPE6cO/m2vlT1pvw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793732364;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=31+P6AMFeIVlhmQscpLB4qy/vx9LUkvE2yKWF6dd1So=;
-	b=DOKwd1hFCIVg/03dU6lBlUX2RP7HbyasAJedWICnocoRqakgoUEG3I0oV2JDfx/rYkds
-	 Pj7KrPu3m0hAkM9An9BjnoXm9T5tKtvV0L0z3vIUtkI+vsuqxcKK4C8JLm3CDApAgp4sV
-	 aBz8SOmt3XJkfL2L07ZiJrBY5HY0pud9+PRag9RuSs/TphFXSjvimdoIt5W1zZtWnqnn/
-	 oyX9H/po0yer8RglFIlgBTgyR6BtvJJ/9Bk7RdPFczeT/FnXyyF+DZgKHuBMcDSNbBzev
-	 62iqAt7oLsfM76+AYb6BR6np912Og/jllFTfbYz6B4y96X9lQoo9Bzl3MBE4T1wxzEg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wQHtwz1p;
-	arc=none smtp.remote-ip=74.125.229.6
-Received: from mail-dy2-f6.google.com (mail-dy2-f6.google.com [74.125.229.6])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793732652;
+	b=SFd1sIiLgrO3mdvOe7XxXrK8OV0a5TBAHHmENavcNcVJwnEbheOuBzJ1HU7VawfgIfuW
+	 30N+1UVNESqbbkr/jiyJyY9tdDFtC0zw8hhiEIL8G5QCxMUqA8qrW6nKk2Tb+VyO07sFt
+	 hDq8x3sdD9Fvm9UvElTJhhnarVYSzWuaoMqrwOVkxz/LAphv6sEjDzNv7wNhkX3E1Vlnh
+	 GCFESr9QVRUuaiTUIjYqWDJfbZBaFhkETzSi0oSuCJdQhyZvgd4slTC3W/Fhiq03S7grO
+	 JrHDNS9tOaAfKfEXFUioOtLX9NPHU/kgbirE8HNPx03ilYDX6HH4QqJSQlmhBwujTmw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793732652;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=nPJWsS0873Oy+02TJGKyZpW86wslqZHLsLqHfzEf5Zw=;
+	b=UiAOEnJNzPgN2Ib1v4+TJDO7pdH8bf+ibZTLQuLYifuLe6so0fvS7RVAQ1MdDYGKUTbQ
+	 LONCCSneuS4/+qte69tlGHPmjbKmU9kl19lpdby4lhM/GbGlPqyZKmjpd2AZVrk/HErsj
+	 OZcXrcKcyySZ2KmPCQS3mnTd3IwfJroLlL/8sGH3cW4rzyTY8I2JIjkuLBQMfxhSasKmf
+	 bEoRayuH2nuGYE7m/gPi9AvBn6hEJ9ciYtiHViELWLxJhUQIg1Mhw657hzFsaao/ZrzzX
+	 iSs7qihbITJktrI00qwhOQdu4IDSNaVSK1NgqhB2+ReQo5cfONJaDKdjpEfh7JwGPZg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lbE2m5+z;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF704606A31B;
+	Tue,  3 Nov 2026 19:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lbE2m5+z
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1793732651;
+	b=jGQoX8rQBJVJWcU1sEmvDKgG8Bcxy0s4Rl5JD2MfXlXeF+pJ9XPOmEFkxIGeVOrvZ5aT
+	 +bGjP+2gk/edCz9uiSRuyIUZs0btnOHkr05d1T7a7XD0ERcZTKq8SRdKUE56djh5vWx7l
+	 ca2p/TX8JQD48vItYv9Sq/DdgeSkQU9gEMy1lnVfeJDC7l8D2C234PAVnfVfOaL83O6Hz
+	 6AK6PhWPXaeG6Bv4si6QH6bVdwi0PxFybenGaFPuSKLaW/xkQdxL0uLF1O8oFvpGoc3Qe
+	 JT/Heyf27yy7/z8rNhsyxsNsoThwczyFJcEKMbhKbykLFRFjNJtDbMNbJbnCcMjISkg==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1793732651;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=nPJWsS0873Oy+02TJGKyZpW86wslqZHLsLqHfzEf5Zw=;
+	b=bDqHiGbQH3pRrnulzgzHpxmXeszmzDrbv79cFGAtw94obWHTCnpHJZnaZiTGuWq3zkDg
+	 ZnhO/DWel1sBREDVr0l4/IbZc5vOAZ1SdjB1MheykvczgJsQX8P52juGkzNEkdBaQemeH
+	 MMaanRegRAlJlkjK11KP/915VXfSAv2eC1WaoDbGtIkeNg/ISmL+mgO3TduwO8vAyTO1d
+	 MJsvMUUTQXH+8bgGg5G1jKPEt/s+SDhykmc/xyJrbLsKuYIn9bebTEfMsgNrK9vi3k4Me
+	 ze5f4RGHxNDyPqEBFN/i6o8/ywOXNrkRjetDcpF1q7SzDfZH09u1yOnC59M6/y0mKAQ==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24966606A31B
-	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 18:59:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 24966606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wQHtwz1p
-Received: by mail-dy2-f6.google.com with SMTP id 5a478bee46e88-35adc681e1aso479349eec.0
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 10:59:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793732362; x=1794337162; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=31+P6AMFeIVlhmQscpLB4qy/vx9LUkvE2yKWF6dd1So=;
-        b=wQHtwz1p7ctJP+IopmWMaKe+YCjn74fJHc4vqJ82D+qPHg2Jle3Vjj2p5l525YJIX8
-         XAtHT1MpzXlCaPNmbMF+5hJvrl+edDN7I324Ac8/pIaeetciJ+Gjnl+/pDbMrcV/b30h
-         hZClwTnK6HbY7a5DjWg/doIYJdcKHf508roQulOMj+fqNj43d89FeYnybFTZhr5kTkPc
-         714Y2QDP/TWGF5gYwtMxcHSDzPb7ZSBsprFACcDEw/Dr1vkHWv6VNcxH5j9BnzkrGX+U
-         B2NIlvaxq755/fC0sKk5DLcx1oXFcb8wue46nisaBYaPZcPr5Ic9ZKL7Xj+7DOy1HsOp
-         3r5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793732362; x=1794337162;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=31+P6AMFeIVlhmQscpLB4qy/vx9LUkvE2yKWF6dd1So=;
-        b=rRuc9bg5CuxVQUqGmsTJOZb1tU8C9SlEl50YefAV8RR6BBgjfMTkjYYbo3y3Ohtcd0
-         UCu6gxbO/GLt5MuCc/VdEBr+fEdO4FERjAR5v+POOV9s+1YYA+GPZVeyAq4MLS/sQ08R
-         vweqadvk2ZnE86CbojNnTYx+MZhi8I5TFugMxmX/saYFJaw9XHhDyg2+a58b/vJr7s6s
-         2Et3Val/bFJ7JXetuqrPYuEMO1MQnwWctKRHA4Ce4Ht7uXWOqI5jeuaNGs1oW6OGU+yS
-         21BfJkU4UIWxpzOtvtE76SLPnrGixIfBrHCOvW8PRhM/PSO6R/W8KiXbZ3muVC8FAIFJ
-         XqWw==
-X-Forwarded-Encrypted: i=1; AKwUvBz0U23AwypPkPk193lmz81xqymZu3g/JnF3PQYt+5oxOHM2wcisgBLxKSnR5qBVAfxjWAyyRHXWeLdSew==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+EBnvnqUZifEQssM09eE1vUso5p0ZxZTZmGUfnnd1vsqv2UR8P
-	Y0OiPuB9vxOdJqku/Yu3WWF3Ufd4H3auCU8EsO9i6sqfrB+qJUbuktIb
-X-Gm-Gg: AYBFou2WO5PYlXsKeHkU0RxMhuhV14oIAlraIDx3iHFrdx+ICrmJFOce973Mp20l+lD
-	fwvB+pDHLP+Z5VbddJZMG0uIZdt8UkjVaSebhEkWW9X2NwSG+DcuNTzd4mO5bOWZEOy/oi8gjuu
-	wkEuOHqQ6x5eHoCJ8XwdZo42yurGT7RxMxRZsPDGQ/MQ1zHMJIpV8WqHC+N1xq4nzlE8DsLgYGK
-	v/Dm45RR9Y6xRXTPZiTd8P/vxnbK6EieUB6PtpWIctpFjT4FDQDHfmcb1cB9LHPuJR6DG1u5lPg
-	++Pj6lVV0pTU1m2zQ+P6/ljDEi0fdMVAqp53YugdeiFFoXkT9QhdP/Chd3o0OGDCWEKpa2Qx4Fc
-	jko1YCLCBhRv9Yf3hplLKRD2DKdHrkxKBTqzGsxc9oC8N1jabpws0W8HWCrb5F4Siz8cjhAPZgF
-	aV955gIOsarkwzT9Gm6dG1bZBIJj0MQURnDkI2y8w8eAXmLL6MlVhbThqVa+UW7TW8NsCljQ5gf
-	t+cYJk6W/WOtvfm8x8rBbrKoFZnhfGfP8izNnQt98uFwQS69u2/tile0N/rDPVqSxy0/wHeEJ2t
-	D0cC1c2Tf+5bCf8+97d/2yBdewrTdCdws3kY8Lw57Zy68mGOo/qBOIsD
-X-Received: by 2002:a05:7022:f50a:b0:149:50cb:2175 with SMTP id a92af1059eb24-1ac5cb1881bmr18974882c88.33.1793732362218;
-        Tue, 03 Nov 2026 10:59:22 -0800 (PST)
-Received: from localhost.localdomain ([98.148.34.5])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b245c1c290sm747339c88.5.2026.11.03.10.59.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 10:59:21 -0800 (PST)
-From: Hungyu Lin <dennylin0707@gmail.com>
-To: axboe@kernel.dk
-Cc: hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	mtsai@redhat.com,
-	sashiko-bot@kernel.org,
-	stable@vger.kernel.org,
-	dennylin0707@gmail.com
-Subject: [PATCH v3] block: fix discard alignment for non-power-of-two granularities
-Date: Tue,  3 Nov 2026 18:59:09 +0000
-Message-ID: <20261103185909.71843-1-dennylin0707@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.kernel.org (Postfix) with ESMTPS id BA4031F000C1;
+	Tue,  3 Nov 2026 19:04:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793732651;
+	bh=nPJWsS0873Oy+02TJGKyZpW86wslqZHLsLqHfzEf5Zw=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=lbE2m5+zi2UWh6nw1VuunUHlA74sdhXdsyG5GdxlInbhrNUysFWjMU0DwkyiGK4LQ
+	 rov4QWd2Yf9jU3CmeeMljcpOQiaNE/PHtPLcRqDVJolcTVqU8kzDf0IZeHCJ85GvkY
+	 dyVaaCaX6LyjoZuk3+vn6i1J4J3KrHvXP0gcIvsjxys8V1/axQhiJUtnFVmNnh71Bh
+	 lyEuzGabiAssM1zTfDJugIGrhBEiht7LPw+hhW5AzBCF6GJP5Zf+Zw/7dOuwL+js8Z
+	 XEwofdMnXT3VQHNcYDYh/k131zmyUu2jRxy+rOUKYgmXphdZz62bLa2LjnQnf3LVdn
+	 QLYLHUbDPToQA==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 1C0A746AB0;
+	Tue,  3 Nov 2026 19:04:10 +0000 (UTC)
+From: Mani Tofigh via B4 Relay <devnull+mt4022.columbia.edu@kernel.org>
+Date: Tue, 03 Nov 2026 14:04:10 -0500
+Subject: [PATCH] blk-mq: take quiesce_lock when removing a queue from the
+ tag set
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -100,104 +83,129 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261103-blk-mq-del-quiesce-lock-v1-1-04aa29a481f6@columbia.edu>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMSw6CMBRG4a2QO+YmLRp5bIU4sOVHLpRXK8aEs
+ HeLDr/BOTsFeEGgKtnJ4y1B5ilCpwnZ7jE9wdJEU6aym9bqwsYNPK7cwPG6xdKC3WwHNiVUW+j
+ ympuCYr14tPL5nev732EzPezr3NFxfAEh1NGHewAAAA==
+X-Change-ID: 20261103-blk-mq-del-quiesce-lock-b9e0f81947b8
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Mohamed Khalfella <mkhalfella@purestorage.com>, 
+ Keith Busch <kbusch@kernel.org>, Ming Lei <tom.leiming@gmail.com>, 
+ Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>, 
+ Nilay Shroff <nilay@linux.ibm.com>, Josef Bacik <josef@toxicpanda.com>, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ tz2294@columbia.edu, stable@vger.kernel.org, 
+ Mani Tofigh <mt4022@columbia.edu>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793732649; l=4068;
+ i=mt4022@columbia.edu; s=20261026; h=from:subject:message-id;
+ bh=N19XFK6Pp+jL6yjmYqq3sqsEIVvyVqas9SpWxi3HCEA=;
+ b=KLSAIAInJMbfO/21dGqhMqi18T4b90sFGUsLqNtLBOtEtudKJecw/Bt+m+iV7SNh2BtKReW2Z
+ alM2Gh4DK7TBrSEQ2KSyc1pzeTIemYgMvXVPO71MFIFGn6ZxglREXk3
+X-Developer-Key: i=mt4022@columbia.edu; a=ed25519;
+ pk=gljCMQDuxyKPmd5y37CRpEJGSPXDV1MyAnHBhCgXl0I=
+X-Endpoint-Received: by B4 Relay for mt4022@columbia.edu/20261026 with
+ auth_id=1322
+X-Original-From: Mani Tofigh <mt4022@columbia.edu>
+Reply-To: mt4022@columbia.edu
+Content-Transfer-Encoding: 7bit
 
-bio_discard_limit() uses round_up() and round_down(), which require a
-power-of-two alignment. However, discard_granularity need not be a power
-of two. For example, dm-thin supports data block sizes that are arbitrary
-multiples of 64 KiB and advertises the block size as its granularity.
+From: Mani Tofigh <mt4022@columbia.edu>
 
-With a 192 KiB granularity, discarding one complete block at offset
-384 KiB is split into 128 KiB and 64 KiB bios. Neither covers a complete
-thin block, so dm-thin ignores both and the mapping remains allocated.
+Unquiescing a tag set can run the hw queues of a queue whose hctxs were
+already freed.  blk_mq_unquiesce_tagset() walks the tag set's queues
+under quiesce_lock and rcu_read_lock().  Commit 71ec3c7d6db8 ("blk-mq:
+quiesce a queue that joins a quiesced tag set") added quiesce_lock to
+the walks and to adding a queue, but blk_mq_del_queue_tag_set() still
+removes a queue without it.  The hctxs are then freed right away since
+RCU only keeps the request_queue itself alive:
 
-Use div_u64_rem() to find the starting sector's remainder without
-modifying the sector. Round the maximum bio size down with rounddown()
-and subtract the remainder so that the next bio starts on a granularity
-boundary. This handles non-power-of-two granularities and avoids a small
-initial bio when a large discard starts at an unaligned sector.
+  Task A (controller reset)            Task B (namespace removal)
+  blk_mq_unquiesce_tagset()
+    /* finds q */
+                                       blk_mq_del_queue_tag_set(q)
+                                       blk_mq_release(q)
+                                         /* frees the hctxs */
+    blk_mq_run_hw_queues(q)
+      /* reads freed hctxs */
 
-When discard is unsupported or disabled, discard_granularity can be zero.
-Return BIO_MAX_SECTORS in that case so the existing bio submission checks
-can handle unsupported discard requests without dividing by zero.
+The window is short.  On PREEMPT_RT quiesce_lock is a sleeping lock and
+the walk can be preempted inside it, which is how it's hit here:
 
-Fixes: 9b15d109a6b2 ("block: improve discard bio alignment in __blkdev_issue_discard()")
-Reported-by: Ming-Hung Tsai <mtsai@redhat.com>
-Link: https://lore.kernel.org/r/CALjSBEvjbiGDVewuapWKhGDtaxZwcn4=22raUiBEOyj22rY7-g@mail.gmail.com
-Suggested-by: Christoph Hellwig <hch@infradead.org>
+  [  399.851277] BUG: KASAN: slab-use-after-free in blk_mq_run_hw_queues+0x4bd/0x550
+  [  399.851328] Read of size 8 at addr ff11000003014148 by task kworker/u9:2/116
+  [  399.851352] CPU: 1 UID: 0 PID: 116 Comm: kworker/u9:2 Not tainted 7.3.0-16299-g81cb9aa43246 #1 PREEMPT_RT
+  [  399.851425] Workqueue: nvme-reset-wq nvme_loop_reset_ctrl_work
+  [  399.851441] Call Trace:
+  [  399.851457]  <TASK>
+  [  399.851551]  blk_mq_run_hw_queues+0x4bd/0x550
+  [  399.851564]  blk_mq_unquiesce_tagset+0x128/0x210
+  [  399.851576]  nvme_loop_reset_ctrl_work+0x78/0x4c0
+  [  399.851600]  process_one_work+0x92b/0x16d0
+  [  399.851660]  worker_thread+0x4e6/0xd60
+  [  399.851707]  kthread+0x300/0x3e0
+  [  399.851727]  ret_from_fork+0x4f0/0x6f0
+  [  399.851776]  ret_from_fork_asm+0x1a/0x30
+  [  399.851793]  </TASK>
+  ...
+  [  399.851988] Freed by task 111:
+  [  399.852040]  kfree+0x1b3/0x4b0
+  [  399.852050]  blk_mq_release+0x400/0x550
+  [  399.852060]  blk_put_queue+0x94/0x120
+  [  399.852068]  disk_release+0x1bd/0x3f0
+  [  399.852102]  nvme_free_ns+0x39/0x270
+  [  399.852113]  nvme_remove_nsid_range+0x2d1/0x4a0
+  [  399.852123]  nvme_scan_ns_list+0x2cc/0x390
+  [  399.852134]  nvme_scan_work+0x421/0x9f0
+  ...
+
+With BLK_CGROUP the disk's root blkg holds the queue until a grace
+period later, which hides this for NVMe namespaces.  It's still open
+without BLK_CGROUP, and from reading the code also for queues freed
+without a disk (e.g., SCSI device queues on a UFS host).
+
+Take quiesce_lock around the list_del_rcu() as well so that the walk
+either finishes with a queue before it leaves the list or never sees
+it.  With the fix, KASAN doesn't report the use-after-free anymore.
+
+This bug was identified and confirmed with the help of a deterministic
+hypervisor currently under development.  The C reproducer below however
+hits it about once every 20 minutes on a PREEMPT_RT kernel.
+
+Fixes: 59e25ef2b413 ("block: Use RCU in blk_mq_[un]quiesce_tagset() instead of set->tag_list_lock")
 Cc: stable@vger.kernel.org
-Signed-off-by: Hungyu Lin <dennylin0707@gmail.com>
+Signed-off-by: Mani Tofigh <mt4022@columbia.edu>
 ---
-Changes in v3:
-- Use div_u64_rem() instead of sector_div(), as suggested by Christoph
-  Hellwig, so the input sector is not modified.
-- Subtract the starting-sector remainder from the rounded maximum size
-  instead of emitting a short initial bio, following Christoph's proposal.
-- Include <linux/math64.h> explicitly and retain v2's zero-granularity guard.
+Stable trees need 71ec3c7d6db8 first since it adds quiesce_lock.
 
-Changes in v2:
-- Handle zero discard_granularity before dividing, as pointed out by
-  Sashiko. Leave unsupported discard handling to the bio submission path.
+Reproducer: https://github.com/manitofigh/files/blob/main/linux-repros/blkquiesce.c
+---
+ block/blk-mq.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-v2: https://lore.kernel.org/r/20261026195131.46699-1-dennylin0707@gmail.com
-
- block/blk-lib.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 688bc67cbf7..e98aa483707 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -3,6 +3,7 @@
-  * Functions related to generic helpers functions
-  */
- #include <linux/kernel.h>
-+#include <linux/math64.h>
- #include <linux/module.h>
- #include <linux/bio.h>
- #include <linux/blkdev.h>
-@@ -13,26 +14,25 @@
- static sector_t bio_discard_limit(struct block_device *bdev, sector_t sector)
- {
- 	unsigned int discard_granularity = bdev_discard_granularity(bdev);
--	sector_t granularity_aligned_sector;
-+	u32 unaligned_sectors;
-+
-+	if (!discard_granularity)
-+		return BIO_MAX_SECTORS;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5ae22d556540..54ccfc43c27c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4354,7 +4354,10 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
  
- 	if (bdev_is_partition(bdev))
- 		sector += bdev->bd_start_sect;
+ 	lockdep_assert_held(&set->tag_list_lock);
  
--	granularity_aligned_sector =
--		round_up(sector, discard_granularity >> SECTOR_SHIFT);
--
--	/*
--	 * Make sure subsequent bios start aligned to the discard granularity if
--	 * it needs to be split.
--	 */
--	if (granularity_aligned_sector != sector)
--		return granularity_aligned_sector - sector;
--
- 	/*
--	 * Align the bio size to the discard granularity to make splitting the bio
--	 * at discard granularity boundaries easier in the driver if needed.
-+	 * Align the bio size to the discard granularity to make splitting the
-+	 * bio at discard granularity boundaries easier in the driver if needed.
-+	 *
-+	 * If the current sector is not aligned, shorten the range so that the
-+	 * next one is aligned.
- 	 */
--	return round_down(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT;
-+	div_u64_rem(sector, discard_granularity >> SECTOR_SHIFT,
-+		    &unaligned_sectors);
-+	return (rounddown(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT) -
-+		unaligned_sectors;
- }
- 
- struct bio *blk_alloc_discard_bio(struct block_device *bdev,
++	/* blk_mq_unquiesce_tagset() runs the hctxs, which are not RCU freed */
++	spin_lock(&set->quiesce_lock);
+ 	list_del_rcu(&q->tag_set_list);
++	spin_unlock(&set->quiesce_lock);
+ 	if (list_is_singular(&set->tag_list)) {
+ 		/* just transitioned to unshared */
+ 		set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
 
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
--- 
-2.50.1 (Apple Git-155)
+---
+base-commit: 801bddbf1e4147a69b811c548c35a06a157941b4
+change-id: 20261103-blk-mq-del-quiesce-lock-b9e0f81947b8
+
+Best regards,
+--  
+Mani Tofigh <mt4022@columbia.edu>
+
 
