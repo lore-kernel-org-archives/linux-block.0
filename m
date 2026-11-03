@@ -1,54 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.28.115
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793706947;
-	b=Ruk/YojQDiqXc1JeDMEwDTby/UeOEdmAVIRx5Hp3Y/6yfXwoTgVZmWKL4x7+cpgAukJm
-	 ygavh7SsbvayAppTxvRq+NhXZIwrS4REOcCYzBStx09I2ThYkHJ+LHy1JLTbK/UnOSfRk
-	 98tjTNRjwpnF/2ybO9BqlQA2Lae2aTQqseND2mkSfTZ+EUg634ZRxL2csCzrF/Q8sh7DI
-	 j3vLrGjTNl7MoipGiEmoj4MGC7vul5IfFiDwk5rd7tMrjz0d+ism+xFl36/4JbJR8nMAd
-	 /UsHiXilNRrtjIMgv/ja5JyyUv8FCB9EVDstfb7fkA3CrmJQDHaNhnSq9N1fjmhusTw==
+	t=1793710905;
+	b=VvI9nT3r2ChyIW90571bYVlfrY6NY/zVlG8+aRWaqdDpu1FuzS+NCdEAtaPs+eWUpJCt
+	 kvB1JS9y4DxkD09M1z+HmHkZYIwgxoaszFTLBLT/q7NDEXfIfJklPNypkD1UPJkzvtohU
+	 enuO+OJtE0W1GAe0UFwWVjWEzXatm4XkL+gVZWEDLsbDff1dqK/vwLI1hI09vi4DqSr+W
+	 od+PIqx7/9Xk1rQvJbRyGgl36fx72YkKX8Tm0anLrzbUILaFa7+LEtAue1QfwSlN1rydT
+	 aGtX7vvj29bb61XO8bB8tIh/SSj/jNy46hmihnxVTFagOuUeLtw2UxQJI5PyzZ+wgEw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793706947;
-	h=DMARC-Filter:X-Alimail-AntiSpam:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=eGUTN5stq2GNQ65GIycmnbGlk5AjIXl4S++YM+uakBs=;
-	b=nQLlqkhQgY6riEUzlbr8VSDInbo/ZRl86pTohGAg/quwduoQNcDagaBi40McqidLtTsa
-	 erxZ8Ax8Ym49hmeOLcC51JTG8SUnTTGl/FKbCKqUY5nOwnI30N1peXJA3UtWL4dYDJDPk
-	 cOWim9NspAx/nwbYO+DaULrbKGAl+e7TDzGXrjOkEsOXZhzB9K/PNxSTbbbKCm2n679JA
-	 O/Yulhx2IbvlgX14nvWzPUXqXOHjIZqb7X/RKe/XZvnNgRHWonD4qAroS6lYCBvzzYRaF
-	 qRFF7MEX+8zLdqgjJ/lZWQdMfQJS7iUsPCLDmCAPRc77n9HEjJLxyuY5P+BIaQs8U1Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793710905;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=im19ijJnqDS7x6irU+zvomnzbUODwTEv8kALLgm4rWo=;
+	b=0YGSB7dHOA1wyFTnILrEqg6pE044Um4fXjr9vIBp27jOq6SL1JFue2O4VGB8P4Fh5jOQ
+	 uB15TIZ5XYP0cnSiJczrhkvAwO4jiud6t3fGqTrbMZk3WTamU7DDgmJDVGEOS3s/Qy5nz
+	 /s+Cq57rfVdY7HcAXYvIOKyOuiB1Hgy5RrtZdUahBY3E7sHJps2fArik7iVgUHV9FzDz2
+	 kbtvCnEL2nixaFv+aYg8YwaNUk/WkKoZtZclXgDVls41sAbA/ZaOT92j1T3wxPAhE1cvl
+	 b+gfcLOoxn7LFzMzIHuXq4Zjap9zLykzhBZ8ZJmkAV0WpgsKncOfe4BuB8LRhPpZWvQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kaihong.com;
-	spf=pass smtp.mailfrom=kaihong.com;
-	arc=none smtp.remote-ip=115.124.28.115
-Received: from out28-115.mail.aliyun.com (out28-115.mail.aliyun.com [115.124.28.115])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m3kNXWwU;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A88606A333;
-	Tue,  3 Nov 2026 11:55:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 04A88606A333
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaihong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaihong.com
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07436259|-1;BR=01201311R111S59rulernew998_84748_2000303;CH=blue;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.0107514-0.00587939-0.983369;FP=14128837808419836670|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033037033194;MF=wangjichen@kaihong.com;NM=1;PH=DS;RN=10;RT=10;SR=0;TI=SMTPD_---.jvip0Fh_1793706932;
-Received: from ubuntu.example.org(mailfrom:wangjichen@kaihong.com fp:SMTPD_---.jvip0Fh_1793706932 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Tue, 03 Nov 2026 19:55:33 +0800
-From: Wang Jichen <wangjichen@kaihong.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai@fygo.io>,
-	Li Nan <magiclinan@didiglobal.com>,
-	Xiao Ni <xiao@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6804F606D82F;
+	Tue,  3 Nov 2026 13:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m3kNXWwU
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 750EA1F00A1A;
+	Tue,  3 Nov 2026 13:01:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793710905;
+	bh=im19ijJnqDS7x6irU+zvomnzbUODwTEv8kALLgm4rWo=;
+	h=From:To:Cc:Subject:Date;
+	b=m3kNXWwUsGj9Id/GhC5oAm42Jgn6JDBPAXWzFn+Xh/egjza1rpxwCB3KIoXxuA0mC
+	 RtotCkl77ZZmY+AH5665R40l4GHG4IkYZAFDLwqaQdOt2yQeUIDDwwhT+CrxyiwCgJ
+	 uw60/CF/fsHbOP6J3k2x1dD0FN8Dy4/eLu6MoFplasio930jVAe19oFTjdXkg7wUAZ
+	 HREMCOkWc4Iv3MIXVePASEjifoOQmVk3CPXa7eG24UuWtAnq+5WvEpyir9LgxJ8J1O
+	 2XlA/Mc9cibirG9T8FXbbMld5/K/qvQqYFmn1Zi8wGKEy9Kbvvv/b68oY7dNskB5sd
+	 ITw0ybcLnTEcA==
+From: Sasha Levin <sashal@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Sasha Levin <sashal@kernel.org>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Shuah Khan <shuah@kernel.org>,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Cc: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com,
-	wangjichen <wangjichen@kaihong.com>
-Subject: [PATCH] md: avoid block autoload while importing rdev under reconfig_mutex
-Date: Tue,  3 Nov 2026 11:55:29 +0000
-Message-Id: <20261103115530.2913093-1-wangjichen@kaihong.com>
-X-Mailer: git-send-email 2.34.1
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] selftests/ublk: use the configured kernel UAPI headers
+Date: Tue,  3 Nov 2026 08:01:30 -0500
+Message-ID: <20261103130131.4069212-7-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,102 +61,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: wangjichen <wangjichen@kaihong.com>
+With generated headers in an output directory, the hardcoded source-tree
+include path falls through to distribution headers. New ublk flags and
+structure members, including UBLK_F_IO_DESC_SIZE, are then missing.
 
-md_import_device() runs with mddev->reconfig_mutex held from md_ioctl().
-Opening a member disk via bdev_file_open_by_dev() triggers legacy block
-autoload (blk_probe_dev), which takes major_names_lock. md_probe() can
-run under that lock and call md_alloc(), which takes disks_mutex and
-reconfig_mutex — a lockdep ABBA with the ioctl path.
+Use KHDR_INCLUDES to consume the headers from the kernel under test, and
+add the headers target as an order-only prerequisite of the ublk
+programs, as nolibc-test does, so that a standalone build installs them
+first. Baseline builds fail on the missing definitions; GCC 14 and Clang
+21 builds succeed with the output-directory headers and target liburing
+development files available.
 
-Add bdev_file_open_by_dev_autoload() and use autoload=false from
-md_import_device(); member devices must already be present in the
-block layer (normal mdadmin usage).
-
-Link: https://syzbot.org/bug?extid=cd254889291ef8666036
-Reported-by: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com
-Tested-by: Wang Jichen <wangjichen@kaihong.com>
-Signed-off-by: Wang Jichen <wangjichen@kaihong.com>
+Fixes: e371b9d3368c ("selftests: ublk: kublk: fix include path")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/bdev.c           | 13 ++++++++++---
- drivers/md/md.c        |  8 ++++++--
- include/linux/blkdev.h |  2 ++
- 3 files changed, 18 insertions(+), 5 deletions(-)
+Changes since v1:
+- Rebased on v7.4-rc1. ublk_cancel_ready got its own rule next to
+  kublk in the meantime, no other changes.
 
-diff --git a/block/bdev.c b/block/bdev.c
-index f20f91b31..e78936556 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -1076,8 +1076,8 @@ static unsigned blk_to_file_flags(blk_mode_t mode)
- 	return flags;
- }
+v1: https://lore.kernel.org/all/20261014200144.1364828-1-sashal@kernel.org/
+
+ tools/testing/selftests/ublk/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index fc64b8f028332..b8142bad63a1b 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
  
--struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
--				   const struct blk_holder_ops *hops)
-+struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode,
-+		void *holder, const struct blk_holder_ops *hops, bool autoload)
- {
- 	struct file *bdev_file;
- 	struct block_device *bdev;
-@@ -1088,7 +1088,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
- 	if (ret)
- 		return ERR_PTR(ret);
+-CFLAGS += -O3 -Wl,-no-as-needed -Wall -I $(top_srcdir)/usr/include
++CFLAGS += -O3 -Wl,-no-as-needed -Wall $(KHDR_INCLUDES)
+ ifneq ($(WERROR),0)
+ 	CFLAGS += -Werror
+ endif
+@@ -85,6 +85,7 @@ include ../lib.mk
  
--	bdev = blkdev_get_no_open(dev, true);
-+	bdev = blkdev_get_no_open(dev, autoload);
- 	if (!bdev)
- 		return ERR_PTR(-ENXIO);
+ $(OUTPUT)/kublk: $(filter-out $(STANDALONE_UTILS),$(wildcard *.c))
+ $(OUTPUT)/ublk_cancel_ready: ublk_cancel_ready.c ctrl.c
++$(TEST_GEN_PROGS_EXTENDED): | headers
  
-@@ -1110,6 +1110,13 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
- 	}
- 	return bdev_file;
- }
-+EXPORT_SYMBOL(bdev_file_open_by_dev_autoload);
-+
-+struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
-+				   const struct blk_holder_ops *hops)
-+{
-+	return bdev_file_open_by_dev_autoload(dev, mode, holder, hops, true);
-+}
- EXPORT_SYMBOL(bdev_file_open_by_dev);
- 
- struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 03e35386a..d3717e2e8 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -3858,9 +3858,13 @@ static struct md_rdev *md_import_device(dev_t newdev, int super_format, int supe
- 	if (err)
- 		goto out_clear_rdev;
- 
--	rdev->bdev_file = bdev_file_open_by_dev(newdev,
-+	/*
-+	 * md_ioctl() holds reconfig_mutex; legacy autoload in bdev open takes
-+	 * major_names_lock via blk_probe_dev() and can deadlock with md_probe().
-+	 */
-+	rdev->bdev_file = bdev_file_open_by_dev_autoload(newdev,
- 			BLK_OPEN_READ | BLK_OPEN_WRITE,
--			super_format == -2 ? &claim_rdev : rdev, NULL);
-+			super_format == -2 ? &claim_rdev : rdev, NULL, false);
- 	if (IS_ERR(rdev->bdev_file)) {
- 		pr_warn("md: could not open device unknown-block(%u,%u).\n",
- 			MAJOR(newdev), MINOR(newdev));
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 0c2010230..e5121101a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1699,6 +1699,8 @@ struct blk_holder_ops {
- 
- struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
- 		const struct blk_holder_ops *hops);
-+struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode,
-+		void *holder, const struct blk_holder_ops *hops, bool autoload);
- struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
- 		void *holder, const struct blk_holder_ops *hops);
- int bd_prepare_to_claim(struct block_device *bdev, void *holder,
+ check:
+ 	shellcheck -x -f gcc *.sh
 -- 
-2.34.1
+2.53.0
 
