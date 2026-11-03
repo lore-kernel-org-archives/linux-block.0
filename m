@@ -1,75 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=80.241.56.151
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793712434;
-	b=AWpYKuNsDZ0c6BC4qC9/peYG341+eq6uQTb1nU2er+yJhT3U43l90BunlloP6H8EBw9a
-	 wq7pWB5jgL16GFENGVeq3raiiLuLhLTAMwImUer9fPy15uyziWV3Gd0wKVTyBi8Pj6+An
-	 OkRz45FwHEv/4fbjUPiQO7cwuofOhEIHpUwZIOCCHThLBGrKI2hJFi+CCkL/0usjZeNSj
-	 x5jXz1yji8Z5X7jddbJ9pERt1jVaTp0+U5Tw29xV7oyiDgH4Iz7g2f65xmrp9XKnl4w4Y
-	 e3IVdbVxS0TfKqldI7//H6jRrcDSl2y0WRZl3sN5Tp1q7gTB/BJdg0Q0T0aL4Ar14eg==
+	t=1793713263;
+	b=iefVM/aNl8Rzwz5ODnX/fiB+lY+qK1otS5G/FvsyQgtNGnvnuBO6mUmTLa/yXLioIAAQ
+	 xbOLpHEkRCvqwrIabqth01IArMxlInx8DEt7qXsYPNmaUb/Fg3akVgJgrwBPkmjvpZz3C
+	 xuwlA6v1+9lkTrkmemC/XDrYYv3QkP61y/3W7ll79WFyrNZX0DWoAmCcD6QNvuo2iSGz0
+	 pVwB5HDqQo9RyB6eDJKm+wGyK+z0b6ufL5FhPICW+If9oXCuBKsLypRQLzGv0TgIEebzk
+	 ihmEawBirDvVXz+nhbVUhAKjE5iEy10uZJlzWSJKjr1of3z1puNqRaSYOzVv3X3W0oQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793712434;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=9VAhO8KBM9mOdifI8nmOoX/2TqgeYxG3nBGm5R3+hSk=;
-	b=r229ZU2RfYE9LP8o98HZOpeM0ND1git+37Gy3E3WACtFjbenIHuZRY7RiIHqgyA1+fwY
-	 moKj3pWMjSyEVJjJGMMSHGVHeo24ktY8y4wKez2eMdJtMHYKG+sgx9NYM0Rzm/VpuVl/m
-	 o1UCuhNAnBSsvcGzXMYk+0XqPBoqUdYeAR9Ca2sdSepSTPJb+M7en00Mcbklt6UPVSLUz
-	 6xWDFFsw/vI+3a89IX6cMMx9MnEaonJSdQY5BAigYdtIBIM1ddzcaj7IGtoTb9X1merjO
-	 tfB9MYXzmInp3uUaQBxYYB11offJ5sYQGwRpSwjpOQMSmg1q77kNyV9MlMiDClHdTKw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793713263;
+	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Subject:From:To:Cc:
+	 Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:
+	 User-Agent:MIME-Version:X-MBO-RS-ID:X-MBO-RS-META;
+	bh=DJlGLqyr7qaLFG04KI8kVedddj4Vea+yaqBKGFZW6fY=;
+	b=khZGtgTKa0R7jK3EsKemI8bk5QmCAWC1p3rb/PZ/PmRu5/IDeIYZLWguJ7Vm5T0vXCD/
+	 duOwtXZbD/XVg8YYulky+fKJlZ+wJlG3MIMo7UmhG916vOhbyB6yuf6ers4P16Fih/Gue
+	 qDFCM9HQeD+JdNojVe+mOK6BlNR0TTcyaEqweJFGvKiaHgLHYvug3PdboWrp1oz6tFYU2
+	 LliIxKu/SET38L5qlid5tBLv/3K7StuCYsyluitXf/JwVVm9OEDDB2QdtSleynGbS8W9t
+	 Mv4arLM4y4FOnre4OhxBCK1HT/ft5X7v2dZ34+bJQBVAan974GZt8ZE/a3a7EAuxXFQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=jQggFAhP;
-	arc=none smtp.remote-ip=91.218.175.41
-Received: from mta0.migadu.com (out-41.mta0.migadu.com [91.218.175.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=mailbox.org;
+	spf=pass smtp.mailfrom=mailbox.org;
+	dkim=pass header.d=mailbox.org header.i=@mailbox.org header.a=rsa-sha256 header.s=mail20150812 header.b=TJ21vDI+;
+	arc=none smtp.remote-ip=80.241.56.151
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0466085082
-	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 13:27:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC0466085082
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A00606A326
+	for <linux-block@vger.kernel.org>; Tue,  3 Nov 2026 13:41:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 00A00606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=jQggFAhP
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=dZMvqS4c+48JMUQ62nOXGEohEi1C+eqSvF1H1cvPGHA=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793712431; v=1; x=1794317231;
- b=jQggFAhPNDGDne8cOo7hGsMcyDuPltvGyPW3td6U8W4asuBjI8QYBcouRdgc7uM4lIrNOcaX
- ZPX6OfGvIxwiff3hNLL9/H2vWvuCdhUDoYAZcI80mA8/Nc5Y2Ch3hNTLp48UhucYNoUklNoFRSJ
- WB/oR4IoP74z2XP3lsgcvEHk=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id fb2cfe47defad250;
-	Tue, 03 Nov 2026 13:27:11 +0000
-X-Mizu-Trace-ID: fb2cfe47defad250
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: tj@kernel.org,
-	josef@toxicopanda.com,
-	axboe@kernel.dk,
-	alexei.starovoitov@gmail.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	andrii@kernel.org,
-	eddyz87@gmail.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	linux-kselftest@vger.kernel.org,
-	cui.tao@linux.dev,
-	cuitao@kylinos.cn,
-	ameryhung@gmail.com
-Subject: [RFC PATCH v12 4/4] docs: cgroup-v2: document the iocost BPF cost model attachment
-Date: Tue,  3 Nov 2026 21:26:13 +0800
-Message-ID: <20261103132613.1952975-5-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261103132613.1952975-1-cui.tao@linux.dev>
-References: <20261103132613.1952975-1-cui.tao@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=mailbox.org header.i=@mailbox.org header.a=rsa-sha256 header.s=mail20150812 header.b=TJ21vDI+
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4jJqTk2KTlz8v2F;
+	Tue, 03 Nov 2026 14:40:58 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1793713258;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DJlGLqyr7qaLFG04KI8kVedddj4Vea+yaqBKGFZW6fY=;
+	b=TJ21vDI+pdiZ5y6bPAKJ/4XhwsMbo3Nvr4GqdCGuijuOfX9334roia4iNFD2y7pejfkH3w
+	kTDr3OikDnYfQ8ZoopI41IubaEOsxvBzLlGZJ4gLSmrOcmPd1DH11cfTPAKk1VuC3wJ8Ji
+	lZEhUYmcop/kYiD0iEY/3CZU7V/5O71ymNB1q9TTZjXsk7aEyKLprHnHwgfv+RAarPLpvH
+	IbV8jxlwAJwYcjoWtK8d4mLTvRkuUtJQQ9wZ0ZXPIN1+zxd1BK8FCDtYEbEkIlPHQa+TTi
+	MAiWG/KrDU4ECtGcb3yJyS8V0q8zqB1XZdTAMqxRC23z00GxhVjMJXxi8kNkUA==
+Message-ID: <d57ee45e25cd429372298b1481a58c232d052569.camel@mailbox.org>
+Subject: Re: [PATCH 1/1] cdrom: fix brackets
+From: Manuel Ebner <manuelebner@mailbox.org>
+To: Phillip Potter <phil@philpotter.co.uk>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Date: Tue, 03 Nov 2026 14:40:56 +0100
+In-Reply-To: <20260902183723.1584-2-phil@philpotter.co.uk>
+References: <20260902183723.1584-1-phil@philpotter.co.uk>
+	 <20260902183723.1584-2-phil@philpotter.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -79,94 +72,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MBO-RS-ID: f7b59ce7afe9ae0eb40
+X-MBO-RS-META: qjdbmp4qaj3prpj7ej5w971n8g8qbhhb
 
-From: Tao Cui <cuitao@kylinos.cn>
+On Wed, 2026-09-02 at 19:37 +0100, Phillip Potter wrote:
+> From: Manuel Ebner <manuelebner@mailbox.org>
+>=20
+> Fix missing ')' and add '()' to function.
+>=20
+> Fixes: e327cfcb2542 ("docs: cdrom-standard.tex: convert from LaTeX to ReS=
+T")
+> Signed-off-by: Manuel Ebner <manuelebner@mailbox.org>
+> Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+> Tested-by: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
 
-Document the BPF cost model attachment in the io.cost.model section
-of the cgroup v2 documentation: attaching an iocost_model_ops
-struct_ops to a device by its major:minor, the model=bpf readback
-while attached (ctrl keeps describing the coefficients), the builtin
-model coming back on detach, and ctrl writes never selecting a model.
+Can I do something to get this applied?
 
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
----
- Documentation/admin-guide/cgroup-v2.rst | 45 ++++++++++++++++++++-----
- 1 file changed, 37 insertions(+), 8 deletions(-)
+Thanks
+ Manuel
 
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 9e3c67b02ae2..0965645b1286 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -2056,8 +2056,9 @@ IO Interface Files
- 	currently implements "io.weight" proportional control.  Lines
- 	are keyed by $MAJ:$MIN device numbers and not ordered.  The
- 	line for a given device is populated on the first write for
--	the device on "io.cost.qos" or "io.cost.model".  The following
--	nested keys are defined.
-+	the device on "io.cost.qos" or "io.cost.model", or when a BPF
-+	cost model is attached to it.  The following nested keys are
-+	defined.
- 
- 	  ======	=====================================
- 	  enable	Weight-based control enable
-@@ -2111,13 +2112,40 @@ IO Interface Files
- 	implements "io.weight" proportional control.  Lines are keyed
- 	by $MAJ:$MIN device numbers and not ordered.  The line for a
- 	given device is populated on the first write for the device on
--	"io.cost.qos" or "io.cost.model".  The following nested keys
--	are defined.
-+	"io.cost.qos" or "io.cost.model", or when a BPF cost model is
-+	attached to it.  The following nested keys are defined.
- 
--	  =====		================================
-+	  =====		==========================================
- 	  ctrl		"auto" or "user"
--	  model		The cost model in use - "linear"
--	  =====		================================
-+	  model		The cost model in use - "linear" or "bpf"
-+	  =====		==========================================
-+
-+	When BPF cost model support is available, a BPF cost model
-+	can be bound to a device by attaching an
-+	"iocost_model_ops" struct_ops carrying the whole disk's
-+	major:minor as encoded by makedev(3) in its "dev" member (a
-+	partition's major:minor is rejected).  Attaching creates the
-+	controller if needed, like
-+	an io.cost.model write does, switches the device's pricing to
-+	the model and populates the device's line in this file and in
-+	"io.cost.qos" if it did not exist yet.  Attaching fails with
-+	-EBUSY if the device already has a model attached.  The
-+	attached model prices IOs only while the controller is
-+	enabled through "io.cost.qos"; attaching does not enable it.
-+	IOs issued directly by the root cgroup bypass the model.
-+
-+	While a model is attached, "model" selects between it and the
-+	builtin model: "model=bpf" switches to the attached model and
-+	"model=linear" switches back to the builtin model, and neither
-+	detaches the struct_ops.
-+
-+	Detaching removes the model, after which "model=bpf"
-+	fails and the device prices with the builtin model again.
-+	Device removal ejects the attached model as well, while the
-+	struct_ops link remains until userspace destroys it.  "ctrl"
-+	accepts only "auto" and "user" and never selects a model.  It
-+	keeps describing the builtin coefficients, which take effect
-+	again when switched back.
- 
- 	When "ctrl" is "auto", the kernel may change all parameters
- 	dynamically.  When "ctrl" is set to "user" or any other
-@@ -2125,7 +2153,8 @@ IO Interface Files
- 	automatic changes are disabled.
- 
- 	When "model" is "linear", the following model parameters are
--	defined.
-+	defined.  They remain readable and writable while "model" is
-+	"bpf".
- 
- 	  =============	========================================
- 	  [r|w]bps	The maximum sequential IO throughput
--- 
-2.53.0
-
+> ---
+> =C2=A0Documentation/cdrom/cdrom-standard.rst | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/Documentation/cdrom/cdrom-standard.rst b/Documentation/cdrom=
+/cdrom-standard.rst
+> index b97a4e9b9bd3..b6dde1d1eaaa 100644
+> --- a/Documentation/cdrom/cdrom-standard.rst
+> +++ b/Documentation/cdrom/cdrom-standard.rst
+> @@ -1014,7 +1014,7 @@ How to update your driver
+> =C2=A0=C2=A0 just calls to the routines you adapted in the previous step.
+> =C2=A0- You may remove all remaining memory checking code in the
+> =C2=A0=C2=A0 *audio_ioctl()* function that deals with audio commands (the=
+se are
+> -=C2=A0 listed in the second part of cdrom_ioctl_. There is no
+> +=C2=A0 listed in the second part of cdrom_ioctl()). There is no
+> =C2=A0=C2=A0 need for memory allocation either, so most *case*s in the *s=
+witch*
+> =C2=A0=C2=A0 statement look similar to::
+> =C2=A0
