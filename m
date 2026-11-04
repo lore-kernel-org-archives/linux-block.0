@@ -1,66 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793817292;
-	b=AlfNIby6VGqCUE3AobOXEhKFSU2eNSB0g6gOLaarR82HuZSL43W01kY6l5djsRR3RJv1
-	 m0sU4SgAm2sQuMRvRpSjUAnPQOSLOfK3i+L19r7hPk+cjTpsIosaWgsa50sBp1qlIG4um
-	 iWLKHG9SZuk47PjE/sNrx83chBn4Hys1+Id7rkCY9UEs+lKSIVs1IsIXynqk/YSaoLmTb
-	 Z6YLao0k/uSYyMIf7GZymNq3hSf4bXSZBYLDYO54q1kbwXYjft0sT5B5oVCeJX8YQG8/H
-	 Z8F/lN/vnDIELYHvckKc8qw5h+cu8h9VwdibFuzih8L70lXMJ7s4pdvN9i5NvCyzhBA==
+	t=1793819528;
+	b=eG1/KiCXqs8iubY+Vu6Ik1xBiUmsfzPIqpnazYmyIdecKQER26II1upBVLkHcjNw4Qpn
+	 IUIIe91xPlxeBmmiCx4GcMsb85hffqsxPySa+Zc2sFMDR9JE6RewXQ6XMNfb+zNoz5kFP
+	 EY2mhGFvOTxUaOUW1UX0e+Tkb7FAkQuCPBEIjQCgiu0gKa9n4NP9ox2JSUnh7tNmG3L/F
+	 7x1cyl8SwIQpvs/qqUf1/FvBn55L6EkKR0Itv8BdDQu0rUHlScv7ZiNsJyTI65/8PGHYf
+	 SDqDuqOPp9taa5wNulqbMT0MqyddUoDdbck/VbDxvDMXfP6ybtrsrTOeFSeZ4Difp6g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793817292;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=NfxT0sqcleYaY8Ga2KzCjtCATlcCj9RfsbOGm3hC7pc=;
-	b=kmRn8GIrf3EZPYyl4NzwoEXyPgbCXGxi52l1a10zzS+EEseplLJfWK1wHcp17/5R0KxJ
-	 ODV3oqTKhufj+cVnCas/taTtCrbckQAh7D7K2hKbqfESwD/uckKW7PCCCWxVot4UTi/Hp
-	 rcF8cR0uhkll1KJU4A9HSwlTf+NyvJrghUxyS5iZbBmPbEje7kqT81MlqCdL1pYv/6MhA
-	 ny7SaOEd/BYkFQQHWTfl2x1WVw+08D9k95QvWB82k+5nt+90WJywdgET3moh35o2Txm4B
-	 O22L9lvozYU4/EoZGN3BZ8k/S4ToutJ78kRe9sJH2Aoyf4AI3k2/hMWv3uFBXxCXvYg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793819528;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=3DKxUDhIGrS0XKk3YGxhQanUk4e1Hk17J0HKDnLrC4w=;
+	b=JxqW9z1OJORGt843ETUcwfAd7rItLP9c4iOLL5gp+ACk0wXKWaoCJhhzIJ6eyJe7Artr
+	 WuAxiKJvd9FvobTUE1vKRO/jcZQu0S6PhS5kzFK2jMBDvOB+QFfyVMz3M5Uc/cZHErLrB
+	 yDeO7VWgVEENGzpgp2ThRx2FrDVbwitWjdYuYeD3gOWpwnzlL/xPtPT7vn/aR7r9/IHm5
+	 NeuBTed7MJ2ciiiZ97PcTk1iVynh5jIkaWvziakWuarQIg4lANnpB4ao9FLrt8MQl8YUd
+	 JqZdwyfhCWbUYn/fMZnfVj/qo2GhC2gc0+4hINQ1pfvrzsLavwQp0xnsKlUKcvSXJMQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=acm.org;
-	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=3I7Vj4tZ;
-	arc=none smtp.remote-ip=199.89.1.16
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E6BWhVAu;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF34606A33D;
-	Wed,  4 Nov 2026 18:34:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1CF34606A33D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46C1606A31B
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 19:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=3I7Vj4tZ
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jKYyM2nMFzlffvH;
-	Wed,  4 Nov 2026 18:34:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1793817289; x=1796409290; bh=NfxT0sqcleYaY8Ga2KzCjtCA
-	TlcCj9RfsbOGm3hC7pc=; b=3I7Vj4tZjRD5dWk+LQypRBd2dlG7y/f9/d/G3ndI
-	zzjbC7CmzfOsQhCpF9Wffqi91nVMzNDnIX+i4WeRYnGGOhdP3FCnAe3xE88qxqOA
-	+hJbfNbtDlovEiw0uGffeop7+Qo7f+lQCKu8jhymWj9VwfMc6OUF6M7LalcsgQGu
-	qdF3ogZHWTAhr6jqIMRGTHN7VtBW/q/J5CiiKgPRcVBBzmQAd0VMV1i+ZGtgwCzG
-	4rTZOY3cS2Vtxcr8w+PA3GauXfEiXkeYv8sD2HYHm+THrylQOrFLJBqY/naTily8
-	PI1sJEoJx5qGVtnoxtnYBPwso3tk8c/h9PlJEfER++rwGw==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id miuA7hPYHUMx; Wed,  4 Nov 2026 18:34:49 +0000 (UTC)
-Received: from [IPV6:2a00:79e0:2ed2:d:cf61:6f8e:9bfc:37ad] (unknown [104.135.182.41])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jKYyJ6Jd6zlfl5v;
-	Wed,  4 Nov 2026 18:34:48 +0000 (UTC)
-Message-ID: <5f523a2c-c2ef-4285-9501-44d373569f7f@acm.org>
-Date: Wed, 4 Nov 2026 10:34:47 -0800
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E6BWhVAu
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2C311F00919
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 19:12:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793819527;
+	bh=3DKxUDhIGrS0XKk3YGxhQanUk4e1Hk17J0HKDnLrC4w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=E6BWhVAujpHKz0HBPWfMuhI0XXUt+yp9/6ZuVZ1TU6mTuV1ZzSVOS4IdADWTV8hCr
+	 LQ0ZrqnUh8V6ahlcAptxCCUaE6Gsii+LRJ95oD1ujXoR3XbM/+ofsUOdw+flCmWzAR
+	 tttyyhsFOuA6Z0TxoapeB1vau8qI2/5E4/UzlYEuphhqT2EeBJbfzA8hT9tPzK8ywM
+	 jCTFhnfQtIW+Fb095szIl4Z4sdfi55VrPT7ZKY/bHSNwiUYMBnmIUdR5yjUYyJQBGP
+	 Cn0ZOAWu/WkWXoVsVW3JIW8PBN3Jb5C0XImVmkt64vm16BgdsraokB2p6S8dsAC5JH
+	 5EEok3qIQ/DlQ==
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-3acd523a802so8565521fa.2
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 11:12:07 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBxFRkiHmKETebBw4n1ATA1F0Q3IMA4VG9tzXwditEXvk4b/Z1EGy9Edg+wq4S+f4onKcEYJy1hkebQuzg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9IukjOC2ApSL+L2UU4BK8XSFX6FSact9iBOQXhhClPR9NKxOot
+	MwJbuDN6ku3tXy9JISlLcLn31r9LDRwbsIau3sGuwplvwWYChUWE7eCBWUtPaYo+1hC4yEGVZcb
+	9sRZIV+GX5lRDhmoiyrt3NA4nNGzbjv8=
+X-Received: by 2002:a05:6512:1247:b0:5bf:b144:fcbd with SMTP id
+ 2adb3069b0e04-5bfd95871afmr6554848e87.42.1793819526207; Wed, 04 Nov 2026
+ 11:12:06 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,39 +59,49 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: Keep RPM_ACTIVE in blk_pre_runtime_resume()
- when already active
-To: Stanley Jhu <stanleyjhu@google.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Brian Norris <briannorris@chromium.org>,
- "Rafael J . Wysocki" <rafael@kernel.org>,
- Praveen Talari <praveen.talari@oss.qualcomm.com>,
- Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20261104112744.1630864-1-stanleyjhu@google.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20261104112744.1630864-1-stanleyjhu@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20261104151651.3035537-1-stanleyjhu@google.com> <8adcbd80-f684-4e00-81b3-a2661fac895b@acm.org>
+In-Reply-To: <8adcbd80-f684-4e00-81b3-a2661fac895b@acm.org>
+From: "Rafael J. Wysocki (Intel)" <rafael@kernel.org>
+Date: Wed, 4 Nov 2026 20:11:54 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0guHKxUKXqB2MO037X_hn9B4Qr6mfqgKShP7xLaXt0xtg@mail.gmail.com>
+X-Gm-Features: AclHuK82fCXfTCCutppNy8n6kl31mTAu99xE8kGJzMIP4eRpp98LhfMeiJfG6w0
+Message-ID: <CAJZ5v0guHKxUKXqB2MO037X_hn9B4Qr6mfqgKShP7xLaXt0xtg@mail.gmail.com>
+Subject: Re: [PATCH v2] PM: runtime: Update runtime_pm.rst for non-fatal
+ resume errors
+To: Bart Van Assche <bvanassche@acm.org>, Stanley Jhu <stanleyjhu@google.com>
+Cc: Brian Norris <briannorris@chromium.org>, Pavel Machek <pavel@kernel.org>, 
+	Praveen Talari <praveen.talari@oss.qualcomm.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Mark Brown <broonie@kernel.org>, Alan Stern <stern@rowland.harvard.edu>, 
+	Jens Axboe <axboe@kernel.dk>, linux-pm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/4/26 3:27 AM, Stanley Jhu wrote:
-> Differences from v1:
-> - Move SUSPENDED -> RESUMING explicitly in blk_pre_runtime_resume() and
->    clear pm_only only for RPM_RESUMING in blk_post_runtime_resume()
+On Wed, Nov 4, 2026 at 6:11=E2=80=AFPM Bart Van Assche <bvanassche@acm.org>=
+ wrote:
+>
+> On 11/4/26 7:16 AM, Stanley Jhu wrote:
+>  > +  * If the resume callback returns an error code, the PM core sets th=
+e
+>  > +    device's runtime PM status back to 'suspended' and returns the er=
+ror
+>  > +    code from synchronous resume helpers.  Unlike with the suspend
+>  > +    callback, failures in the resume callback are never considered
+> fatal,
+>  > +    so the helper functions described in `Section 4`_ are not
+> blocked and
+>  > +    a subsequent resume request can run the resume callback again.
+>
+> Hi Stanley,
+>
+> This matches what rpm_resume() does since commit eef1d74bf88f. A nit:
+> suspend callback failures with -EBUSY / -EAGAIN are not fatal either,
+> so "Unlike most suspend callback errors" may be slightly more accurate.
+> Either way:
 
-Hi Stanley,
+Adjusted accordingly while applying.
 
-Thank you for having addressed my concerns. There is an existing
-issues that you may want to address with a future patch: Queue ACTIVE,
-device suspended: after a failed resume, the queue is ACTIVE with
-pm_only == 0 while the device is still RPM_SUSPENDED. So
-blk_pm_resume_queue() never asks for a resume, and normal I/O goes to
-a device the PM core thinks is suspended. A retry only happens if
-something else calls pm_runtime_get*(). Commit 6e1fcab00a23 introduced
-this behavior on purpose.
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-Thanks,
-
-Bart.
+Applied as 7.4-rc material, thanks!
