@@ -1,78 +1,80 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793820316;
-	b=islX4t1NWir+KPEBozvBuMl5vTj0364Knb6j+wvhsEPPsZA9w4NC9LhJoxEQAqC2b73a
-	 Pbi0kCalCwAskekRCxLTJZ0LO9rNRGETN+TbTpn9tS7/APim4/XjE7wDXy2LzpN+hc1iO
-	 1iGeRRfU9m2e/h5YJPvsqELuUCCrvHJOjTSZIdEeAEpmF3lE5HaR9IbhAzcT058BfipKR
-	 PTAClXessPpQxjkMcRtp2/iF3+fW7VGwCqZ92Npf+9ZtlzcKSowCIxK6hwkhmY8WT4If1
-	 tf86XjUHOY7rD8C+sKmR6qubEGdjDerETz0CEws4zrqQAGLL8dKa5lDbzMVRpfmtZYg==
+	t=1793820315;
+	b=Sen6Wezikl1jR3taGw1rYx4/R44M7CLfW8MN5mko1TawENQRuncMYxPjQa/j/niajMow
+	 gKws8zB1XM3TYX+3EN5TBOFKb9OqMG9gOM79wwHs0ocmcjqDMW9SkrP3SuZlZETe8lDRl
+	 UvZZDoXbSsF6Vr4D60OVXdU5ZMbL0skRXWq3d6BmzQ6T4kMSodF3lmvX4yTjBc1esGaN0
+	 InSCub8Hg0+ePwEQSipaW3X+/17EAnzjpJt6eIfvTPm9axoYL9VfOT1/VEzSyinqE3l0s
+	 VnKrRIFGtzEgU8pT3QatTE1PEb70xczIMyb/ZZOmCw+cRRA5z5JFZd6mqdBViAGLYFg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793820316;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=+5bZu1eNDxT+h/X926N8ObB9yoVZbilGy5OTDJHDUEo=;
-	b=BZ6KEgrJrL24xi8SjvcdWhZmnfvcV9/QMxSLv/IN9N27PWhgPQbyr52OyqtIv5wNTcel
-	 0gHIynjBeucsTClyd6n+agdFFIe2DfdwZPSGbOZMM3oVzF42vGw4H7ngL/jr5rDfJp0jr
-	 hpd/iQsXlcwLF5JEZi83hPrRTURio98EqMIDEYuaA/svsbdc0iQsuc9RHFvVGducvV4yR
-	 z7zpJwMjoN3OdZO8Pel52uKwIbualjgZJRBZJKz6UbNGa/Ow6D6zjCYPk3SuZDZ6TKfSv
-	 Pup0RVhgBcdsaq0LQIKBIncYLfePuJPQHjN2NqrYe/+0Fu1EdmTDz1zRQUrrRj3Gyjw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793820315;
+	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=CxaIAJs6w/X8Iq5pOusNCO7dYPXXz9Eag9FYVsxJWoY=;
+	b=qsUwPtmaRX38o3sJ5Mq2ubP92FQcDER3n+k1NYjltEc4a1TkYkkqMA03/7NHYls6VBDB
+	 czNBqpzxF4cLUwXDzT0E1xH9J0Vo4LXc83Sxd2J3UXxXFHeM0RSsL0B0dn0VucjtaoLO1
+	 0kxL4uE819AbZK1tBYQKlLcBGiKjptEU5brAAVt3WsFD/lP7+f2BIb0BOgJ59q7GImZmf
+	 lCdQw6MoVtoFBV5L/vyZo0nu2kbsYWE4P0Uu1HbO0e28k9dw4sY7XroI10E2HOZ95aIH4
+	 a9S6jgciX0ihswpYQpTZ07HM6gurCLEjuFGwOrlC8oXQDTKIPRbHgZ9ENBXRDSCi2rQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EhQJjALP;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AbbZJMeF;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4083060807B4;
-	Wed,  4 Nov 2026 19:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F6C60807AE;
+	Wed,  4 Nov 2026 19:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EhQJjALP
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AbbZJMeF
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793820315;
-	b=vgsOFo7NvJhwqw1G172B68bCLyck66taBVvoOi34qPJbD+KUJ56jTS91/TBV+19emxJH
-	 2XyjW2HjlqZov1d8HFlA9ddAmtRNMW4H0HE5bfFxWGHnzKWtUReYcmITmcTmMaWyhqZW/
-	 DbGj8ckdYT1hw69mROt4lrLbewPEMTQArayyWB0CAT/m5ZR9II7NChSRUjH9swzMttJpr
-	 ORd5PLmfba5o3cAUl3pIfUXRuqD+xE3i/U1SrcjHnf6LNrWBcDFR2RutkzRhL+DREz0Ch
-	 6wB+pSVV0wG7YRer9MgcMtFL2uvn8LMQuk1SOCNrGBXDeE887EVTOHBPAImo2aXUWuw==
+	t=1793820314;
+	b=ehNBLN1w/3L/hGNmcMbT6C8OkOlvr0ZaVmGzwtShaziPjphoOEs1v2YM/Bt6xMIT8fNS
+	 I+HpYtU86+wFawj6cBBjIr4oWV9f5sOSo0aLNiFWWTKXPnTlpTeSs+cms1KHx0nG7Y0hV
+	 HNRKLzhJw8CYBtm5bnyRuqxfqIv5u+sF90EBx1blzyB0WQA2dlkRUx//jrxtXL7UOEcZ+
+	 BKsVfCsCa/s4NTBegWNjRffywxbof8o5cS30ezcD072h5uTVKb6aqWPCTaAluwV7bRKSv
+	 8LTYN5c+JtLISGnNk4ZIpfjy5n3jsDMM3Lppp3HI2DUKajWeV7T85d72zl6/2vhrAcA==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793820315;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=+5bZu1eNDxT+h/X926N8ObB9yoVZbilGy5OTDJHDUEo=;
-	b=E2N23nm2wv0mamDfEdZ6iG0SCu3aoageUOt3PLwzJcXlJMF1Iz5xTjveR/UypfUDtadg
-	 SlVqUEneWz1yY1NOpwRJv3Qimi9SF9xw8jiDLTkMh5v4q8UZT52j7mK2cF7/4OTFBtQ5h
-	 1lsTdayfScCV1IH/wET49jNngFU9A9IWmTYaMneNp30zf29up4tebXd6c+EryhcHMolH4
-	 ryOfVLp9c13TrppUWHJzTJrSe5SIS5OeaoCa/9K/Ci95FT7qyTM3+g4qukLZWDQcvjswf
-	 P+hyXiOA6Hk/pyySgJK0rX/8EHx36H2Ijh3VrUEUYYnW52fMHN0RJ5Cp2x8cTsTweMQ==
+	c=relaxed/relaxed; t=1793820314;
+	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=CxaIAJs6w/X8Iq5pOusNCO7dYPXXz9Eag9FYVsxJWoY=;
+	b=xfSgj17ES72g6TPezoKWowioEeu6jz8G2LxMqBzci5cSktW/baQbD4mkDigvrYOUcJwB
+	 0Mek55z+U6TD9Y3HCXxG6Stmt3wYEBu9Hplecw/2jKX0c2SrwzMwNQe3b9/oMJLgfeUs2
+	 wVzsiutv54KoSbIVpy1pZw8F3x6q2XrDjQdfXTt1tPvmhPM1WmOqCNk8GNtyfKgH2sHLu
+	 urNuBFaixxBPwY0JN1hhU7BGqJ0WcHL7lYLRKVKHR2tAcbWDZ8KdtAUTy2h465colRYV3
+	 SRU4cP8BTiN2/YXN3eiCcXGMV1lSPhFIVza4TC5Se7ewJFvk55IybTYxleZp+3xSXLA==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id DA2041F00A27;
+	by smtp.kernel.org (Postfix) with ESMTPS id E23781F00A2A;
 	Wed,  4 Nov 2026 19:25:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793820315;
-	bh=+5bZu1eNDxT+h/X926N8ObB9yoVZbilGy5OTDJHDUEo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=EhQJjALPww3wrqrPE44qPmw3vfWaIJYQ7/hD56OvMP1efjZrezKYJ2OvfeWtE1XRh
-	 DeqcouhjklqMUn/SvaAZiwoppvWjrwNsjIFRmp9RqOIkULAC3CKKaQAII1VhgT53Zo
-	 IDa/kewQjc8euFuVG945yGu/KW1Wb3TdcCu8/XmX5FdLN7oYCGUQu2IbR8V9dhJsqS
-	 FrvwYaYA9OSDPTefYO9FtSShwnKdYem4vM++PbiX7Bh487BKUzDyeTeLJ20jVxwun1
-	 klLRq39cTL5VTeYNnUWMB/3wGWUySLA/unaKQXA7eLl/itIDO3BW4m317z11YJcdOV
-	 88zb+1is98Alg==
+	s=k20260515; t=1793820314;
+	bh=CxaIAJs6w/X8Iq5pOusNCO7dYPXXz9Eag9FYVsxJWoY=;
+	h=From:Subject:Date:To:Cc:Reply-To;
+	b=AbbZJMeFc4PHrh47U/yNvbWaigx7U6OP/k1jXwX7BlzS+ZZdxDrylVufmFtoeGbvz
+	 XQ/QgQU2sMWWudrkw0KAh8qaaGlbm3KO8Nxw9spaZYhxEFw+mYUW58d4fqqpZZVftc
+	 M7/xSEDew1wmVwkNXD7NcNQcIXGQHcWNLoCMRJPm8Jj1YPU5jZkIu+JmTxn0rkOD6B
+	 cEwUr7AoUB7iwZDoI75qQAHDz/XF7agTHTf0rdLPp/3DzPCCb6ZA0ZQaUu3piHA+kb
+	 cdnj+/7i47glpMDyZKpgHe8Le36hnNJRVUPwLcgt7dL15tSIjA5J0aOl6Unm5cMneF
+	 zO8dPIg2TZikw==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 4EEC446F62;
+	by lkml.kernel.org (Postfix) with ESMTP id 3446B46F5E;
 	Wed,  4 Nov 2026 19:25:06 +0000 (UTC)
 From: Mark Korenberg via B4 Relay <devnull+socketpair.gmail.com@kernel.org>
-Date: Thu, 05 Nov 2026 00:25:06 +0500
-Subject: [PATCH 2/2] ublk: don't take ublk_ctl_mutex in DEL_DEV
+Subject: [PATCH 0/2] ublk: don't let one stuck device block control of all
+ ublk devices
+Date: Thu, 05 Nov 2026 00:25:04 +0500
+Message-Id: <20261105-ublk-del-gendisk-hang-v1-0-913a91a4314d@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -83,153 +85,97 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261105-ublk-del-gendisk-hang-v1-2-913a91a4314d@gmail.com>
-References: <20261105-ublk-del-gendisk-hang-v1-0-913a91a4314d@gmail.com>
-In-Reply-To: <20261105-ublk-del-gendisk-hang-v1-0-913a91a4314d@gmail.com>
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MQQqAIBAAvxJ7bkEtPfSV6JC51mJYKEUQ/T3rO
+ DAzN2RKTBm66oZEJ2feYgFZVzAtY5wJ2RUGJZSRUrR42DWgoxVnio5zwM9Ca5vGa2OU9hpKuyf
+ yfP3ffnieFzecOzVnAAAA
+X-Change-ID: 20261104-ublk-del-gendisk-hang-bb33f56625f5
 To: Ming Lei <tom.leiming@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>, 
  Mark Korenberg <socketpair@gmail.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793820305; l=4989;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793820305; l=3412;
  i=socketpair@gmail.com; s=20260603; h=from:subject:message-id;
- bh=rq+V0p9ah2pKCehbSs97gh/beSumuzgTTTAyhHi8BZM=;
- b=O9eOIbxuERP1hL8Q7gLQa3qXQHEASMBS+huKkFqP9unpltD6yK5P6uuGh6wt0Vx1Z+zTig/n3
- VveVbkTf+HcATVEwiBv50BN0YagUNt3baVkzWMAIgTv44bxrzT0VYxT
+ bh=ed+++DV3HtIipUSehjA+fspJo3hIwQmkBnnMsoaxA5M=;
+ b=IRpKMhVeG5cfku6a00obCR56pJkuAzujaK89yVgM4ezrw36H1p/L9VE5WEKVSQ7iEkUZVW/kf
+ Ls89C11kNhtASBn32zNZiGKz3OIhRn7PTHGBmfXdZ8XEZPQNBsywi/o
 X-Developer-Key: i=socketpair@gmail.com; a=ed25519;
  pk=2iAMjWhs7kA9X8ccetT2YVX8dvniXua2okQogw3Don8=
 X-Endpoint-Received: by B4 Relay for socketpair@gmail.com/20260603 with
  auth_id=806
 X-Original-From: Mark Korenberg <socketpair@gmail.com>
 Reply-To: socketpair@gmail.com
-Content-Transfer-Encoding: 7bit
 
-From: Mark Korenberg <socketpair@gmail.com>
+If the filesystem on a ublk device is stuck, removing that device
+blocks in del_gendisk(), which syncs the filesystem. DEL_DEV holds the
+global ublk_ctl_mutex across the removal, so ADD_DEV and DEL_DEV of
+every other ublk device hang too, until reboot. It doesn't matter
+whether the server is alive: when it dies, the release work does the
+same syncing del_gendisk() under ub->mutex, and DEL_DEV waits for
+ub->mutex holding ublk_ctl_mutex.
 
-ublk_ctrl_del_dev() holds the global ublk_ctl_mutex across
-ublk_remove(). Stopping the device calls del_gendisk(), which syncs the
-filesystem on the disk. If that filesystem is stuck, DEL_DEV never
-returns, and ADD_DEV and DEL_DEV of every other ublk device wait for
-ublk_ctl_mutex behind it, until reboot. This happens with the server
-alive, and also when it dies: the release work then hangs in the same
-del_gendisk() with ub->mutex held, and DEL_DEV sleeps on ub->mutex
-uninterruptibly, holding ublk_ctl_mutex.
+I hit it with btrfs on a ublk zoned device whose writeback deadlocked
+on its own (a btrfs bug, handled separately): killing the server as a
+last resort didn't help, and no new ublk device could be created on the
+machine afterwards.
 
-DEL_DEV doesn't need the mutex. ADD_DEV is done with the device when
-DEL_DEV finds it: the device is found by its id only once it is set up,
-since the previous patch. Claiming UB_STATE_DELETED with
-test_and_set_bit() lets only one DEL_DEV remove the device, and the
-device number is freed under ublk_idr_lock on release. The mutex also
-protected unprivileged_ublks_added: make it atomic. ADD_DEV still
-checks and increments it under the mutex, so a decrement without it
-can only lower the count, and the limit holds.
+Patch 2 removes the global part: DEL_DEV doesn't take ublk_ctl_mutex.
+It relies on patch 1, which fixes an older race the mutex partly hid:
+ADD_DEV makes a new device findable by its id before its char device is
+added, and if adding it fails, a DEL_DEV that found the device removes
+a char device that was never added. With a failure injected into
+ublk_add_chdev() this oopses on master in kill_device() from
+cdev_device_del(); with patch 1, DEL_DEV gets -ENODEV.
 
-A second DEL_DEV of the same device used to wait for the first one on
-ublk_ctl_mutex. Now it sees UB_STATE_DELETED and, unless it is
-DEL_DEV_ASYNC, waits interruptibly for the device number to be freed.
-The counter is decremented once the device is removed, so at the limit
-ADD_DEV of an unprivileged device fails with -EACCES instead of waiting
-for the removal, and the limit is never exceeded, even if the removal
-never completes.
+Reproducer, without btrfs or zoned: XFS (or ext4) on a ublk loop
+device, its external log (journal) on dm-linear over null_blk:
 
-Reproducer: XFS on a ublk loop device with an external log on
-dm-linear; "dmsetup suspend --nolockfs --noflush" the log device, write
-a file and syncfs, SIGKILL the ublk server or not, DEL_DEV the device,
-ADD_DEV another one. Before, ADD_DEV hangs on ublk_ctl_mutex until the
-log device is resumed. After, it completes; only the DEL_DEV of the
-device with the stuck filesystem waits.
+  dmsetup suspend --nolockfs --noflush <log>
+  write a file; syncfs                  # blocks, as expected
+  kill -9 <ublk server>                 # optional
+  DEL_DEV 0                             # directly, as libublk does
+  ADD_DEV 1                             # null target
+  dmsetup resume <log>                  # everything unwinds
 
-Signed-off-by: Mark Korenberg <socketpair@gmail.com>
+           DEL_DEV 0                         ADD_DEV 1
+  master   D, survives SIGKILL               hangs on ublk_ctl_mutex
+  series   D, survives SIGKILL (see below)   ok
+
+The stuck device itself still can't be stopped or deleted until its
+filesystem moves: its STOP_DEV and DEL_DEV sleep uninterruptibly, in
+del_gendisk() or on ub->mutex. When the server is gone, nothing can be
+written anyway, so that removal should be a surprise one done without
+ub->mutex, but marking the disk dead isn't enough (the filesystem's
+->shutdown() and the writeback flush in bdi_unregister() can block the
+same way), and doing the removal without ub->mutex races with the
+release work, recovery and a new server attaching. I'll send that part
+separately as an RFC.
+
+Tested in a VM with lockdep on top of master c339f4010dea, XFS and ext4,
+with and without the server killed; block for-next has no ublk_drv.c
+changes on top of it. The ublk selftests give the same results with and
+without the series (integrity_01/03 fail on both, no
+CONFIG_BLK_DEV_INTEGRITY here); a stress of DEL_DEV racing ADD_DEV of
+the same id shows no warnings, also with KASAN and KCSAN.
+
+This series was developed with the help of an AI coding assistant
+(Claude); I reviewed and tested the changes and take responsibility
+for them.
+
 ---
- drivers/block/ublk_drv.c | 37 ++++++++++++++++---------------------
- 1 file changed, 16 insertions(+), 21 deletions(-)
+Mark Korenberg (2):
+      ublk: publish a new device by its id only once it is set up
+      ublk: don't take ublk_ctl_mutex in DEL_DEV
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 14d2823a92e5..40f521077bc9 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -881,7 +881,8 @@ static ssize_t ublk_batch_copy_io_tags(struct ublk_batch_fetch_cmd *fcmd,
-  * by cgroup.
-  */
- static unsigned int unprivileged_ublks_max = 64;
--static unsigned int unprivileged_ublks_added; /* protected by ublk_ctl_mutex */
-+/* checked and incremented under ublk_ctl_mutex, decremented without it */
-+static atomic_t unprivileged_ublks_added = ATOMIC_INIT(0);
- 
- static struct miscdevice ublk_misc;
- 
-@@ -4486,7 +4487,7 @@ static int ublk_add_chdev(struct ublk_device *ub)
- 		goto fail;
- 
- 	if (ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV)
--		unprivileged_ublks_added++;
-+		atomic_inc(&unprivileged_ublks_added);
- 	return 0;
-  fail:
- 	put_device(dev);
-@@ -4518,15 +4519,9 @@ static int ublk_add_tag_set(struct ublk_device *ub)
- 
- static void ublk_remove(struct ublk_device *ub)
- {
--	bool unprivileged;
--
- 	ublk_stop_dev(ub);
- 	cdev_device_del(&ub->cdev, &ub->cdev_dev);
--	unprivileged = ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV;
- 	ublk_put_device(ub);
--
--	if (unprivileged)
--		unprivileged_ublks_added--;
- }
- 
- static struct ublk_device *ublk_get_device_from_id(int idx)
-@@ -4916,7 +4911,7 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
- 
- 	ret = -EACCES;
- 	if ((info.flags & UBLK_F_UNPRIVILEGED_DEV) &&
--	    unprivileged_ublks_added >= unprivileged_ublks_max)
-+	    atomic_read(&unprivileged_ublks_added) >= unprivileged_ublks_max)
- 		goto out_unlock;
- 
- 	ret = -ENOMEM;
-@@ -5042,23 +5037,23 @@ static int ublk_ctrl_del_dev(struct ublk_device **p_ub, bool wait)
- {
- 	struct ublk_device *ub = *p_ub;
- 	int idx = ub->ub_number;
--	int ret;
--
--	ret = mutex_lock_killable(&ublk_ctl_mutex);
--	if (ret)
--		return ret;
-+	bool unprivileged = ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV;
- 
--	if (!test_bit(UB_STATE_DELETED, &ub->state)) {
-+	/*
-+	 * Don't take ublk_ctl_mutex: stopping the device may wait for the
-+	 * filesystem on its disk indefinitely, and ADD_DEV and DEL_DEV of all
-+	 * other ublk devices would wait for that too. ADD_DEV is done with the
-+	 * device, it is found by its id only then.
-+	 */
-+	if (!test_and_set_bit(UB_STATE_DELETED, &ub->state)) {
- 		ublk_remove(ub);
--		set_bit(UB_STATE_DELETED, &ub->state);
-+		if (unprivileged)
-+			atomic_dec(&unprivileged_ublks_added);
- 	}
- 
--	mutex_unlock(&ublk_ctl_mutex);
--
- 	/*
--	 * Drop the reference outside ublk_ctl_mutex: if it is the last one,
--	 * the release frees the tag set, which waits for an SRCU grace period,
--	 * and holding the mutex would serialize concurrent deletions on it.
-+	 * If this is the last reference, the release frees the tag set, which
-+	 * waits for an SRCU grace period.
- 	 */
- 	*p_ub = NULL;
- 	ublk_put_device(ub);
+ drivers/block/ublk_drv.c | 60 +++++++++++++++++++++++++++++-------------------
+ 1 file changed, 37 insertions(+), 23 deletions(-)
+---
+base-commit: c339f4010dea8b0d754f84ace70cd1b089878ef8
+change-id: 20261104-ublk-del-gendisk-hang-bb33f56625f5
 
+Best regards,
 -- 
-2.56.0
+Mark Korenberg <socketpair@gmail.com>
 
 
