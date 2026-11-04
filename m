@@ -1,58 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793802349;
-	b=xUfsqb3vW/w0hPkjgS9sIrsrs39p0WJofDumoCJ4737LqNkv3ybM2X2+CJ6DNZEMB490
-	 u6qzVUuKUMQdcKk+HQlBg+ZTF8D52L/tXzj+Z+XEhtj6ZT9JVAzvYzUMvuaiDa8BWsCaF
-	 R0I+i1vo/YbAYMBbWkFw9VlijUyEHruBOFwRRRD+o65q04snuG+j5qbik0wgWwEHrtuHl
-	 07q+fZeHTFt+b/uCmWVH6CTUumF5DOosJhwQ6Iv7aHew4U+X8TbDyA2y6+o6MHdMH+Be1
-	 fpt7kZ0Jqn/pc/CpKycnlcK1OWJmbsA0v11JJJdovE8EIicxFNw79WTJWR4pCVw3Ong==
+	t=1793802883;
+	b=xwjzbjQFUco2dYNjoxs+Y2XL6DiCaAy9ck+Rc4sisQzQt/C+ytdOoqdJN/OeJz6qznka
+	 DL/u0f3hXZR2XgH5KKqidcZNS7dpw4EIKFRW5b0DZCGk+l1EJdSpW4N+9IXRsJKy2Nfx+
+	 4yFLLv5Rg/n0aBWOz7cAw8huzZmbHL20EG30XOYCfjyCynrJCD26pbpm3sw04bJENv7nL
+	 xbxI4FL72gkJCQmVt1cELoOPH5OCUSrJju/z+KXpKzXtHYeNAn+8ekVEU26wtYSjWKf2w
+	 QxYr9fTug4fQGxCkC/NkP1z8RFEFKiR69NNCrPfmFWwhv6OGG7pG9ELnND9WVnkRNdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793802349;
-	h=DMARC-Filter:Received:Received:Received:From:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 References:In-Reply-To:To:Cc:X-Mailer:X-Rspamd-Pre-Result:
-	 X-Rspamd-Queue-Id:X-Rspamd-Pre-Result:X-Rspamd-Action:X-Rspamd-Server:
-	 X-Spam-Level:X-Spamd-Result:X-Spam-Flag:X-Spam-Score;
-	bh=ZOCTblioe0fUHPa1/ULzpKOMeU10MA+OZAFCTdg1ypA=;
-	b=Y0FaC39PPTXmGvkhUi858gv+CQoGvB5h3yiQMvXbeUFNsS9mUuNwa3Qv0RlsXEZEY8S6
-	 ul0369v0P6m+OR3JlyCezlY+5KDcMbncHnKXxnk7zYAsFTj1N6+PFimNepSxbWz+9sMVb
-	 3FDfgvovipb3LLndRmclCasrMbpNwopSKy8EUsGlnpI6t77MbGh1wANqGnyts/45lupnO
-	 z4aeBhsIE76RPwdQ9vm3apUpVQG1aKAqPdvlnNzr9heI8OxzEFMKBnev9sddcFBheIQr/
-	 TtBuyPJnjtqUnjXNjfa2UgVYxWq2wsj6pux8waSRZQVeMRHE6VwvwrlX1u96+TijCfA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793802883;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=miceYdDB+7PLPC/J0qgYQmDdAc3qF6Ff3jq4UUQkwZY=;
+	b=pVnuBngd6x+TZUb5J6Ar7xoXlmdm1Q57O/FDu4fXsuX4wpMPbSpYw3Rskf3uiWK04u1h
+	 QhAAThs5GUKW0wy3sMFWSYRIxq2LdVd/fPN4xtzqocyWQEaQOectA+KiNNSJUKxiWOcbD
+	 kgN1+mKRbEw5DaXT5x6jONOM51aHPes+IJPoFZgCLZ/YIzNAJ3IRMkyBj8W9twhk6JjS+
+	 hu+JPLdGQPB+XqEB/SzyIiN8Yjf31QL9R3euZya9csFUOQ8MBoLJ/xzlmffZe7RqwfagG
+	 lmD72AeApeIe1gbr7zJ2QNfcEEKknfOxJvxPkCmEXoCjA8a5h6ClcUCz7cZp9KqdwOg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZCQew7J4;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235B0606A31B
-	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 14:25:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 235B0606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6B20D1F790;
-	Wed,  4 Nov 2026 14:25:47 +0000 (UTC)
-Authentication-Results: smtp-out2.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1C520134F0;
-	Wed,  4 Nov 2026 14:25:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Y5lAOGpA62olawAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 04 Nov 2026 14:25:47 +0000
-From: Daniel Wagner <dwagner@suse.de>
-Date: Wed, 04 Nov 2026 15:25:18 +0100
-Subject: [PATCH blktests v2 6/6] nvme/080: test connect with offline CPUs
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33C2606A326
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 14:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZCQew7J4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91E2B1F00A1B
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 14:34:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793802882;
+	bh=miceYdDB+7PLPC/J0qgYQmDdAc3qF6Ff3jq4UUQkwZY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=ZCQew7J4C0cPbpFciKAO29xWInbT/Z9mDi4MngzVubYoiE/NbzT2woeIcapJeMO1d
+	 rOxhLT3GseRScwA22F7gUErzJFnWneWR8ELJ4/+aPneT3avjJDYLsymfA0og2a61Aw
+	 Td+crMWeYN2V0NTkV/ksXQvBalTAv6ZQDIpc32Z7ZlILQ7DaeMklE5gyS51OD4Ffqv
+	 y9ubd4J1tRS6KMYaJyiqAp1Nqd9tnk5Ly2DkSshSP5pAirdKjminDIUmG61Qar+l0w
+	 olOrzA9NoVYOWDFEIRj32Zj7BhbgBwa6xveznllTlS8//zKtVwUNIXIkBjzvW439Hr
+	 8pm9c2skhrRpg==
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ba328513b9so628053e87.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 06:34:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBzFMts0YJ8Ce4CS/msoMf2GoxAkAV818Nr5lzO6aCyq+g7XW4TZ50DULDj/v84FVDLD8dz8toe+tbLJlA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8EYWK8MwZv9UjBx+yGuf3SbLKohqvr/Zb7hyePRJU8VsEPELu5
+	YGH6AUbKGG7hBar2MYGpzB930kTe90TsthzdE39wk+lT3/z4jYK1yCD0ZF07WVudYebu7tF9Ua7
+	KgkAU38YAivukJWRGZr9bQWSSdkfPtdc=
+X-Received: by 2002:ac2:4c4e:0:b0:5be:605c:fca2 with SMTP id
+ 2adb3069b0e04-5bfd954bf17mr5907232e87.4.1793802880980; Wed, 04 Nov 2026
+ 06:34:40 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,210 +59,134 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261104-nvme-isolcpu-v2-6-2d59f622a2c8@suse.de>
-References: <20261104-nvme-isolcpu-v2-0-2d59f622a2c8@suse.de>
-In-Reply-To: <20261104-nvme-isolcpu-v2-0-2d59f622a2c8@suse.de>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- Daniel Wagner <dwagner@suse.de>
-X-Mailer: b4 0.16.0
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Queue-Id: 6B20D1F790
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -4.00
+References: <20261104112744.1630864-1-stanleyjhu@google.com>
+In-Reply-To: <20261104112744.1630864-1-stanleyjhu@google.com>
+From: "Rafael J. Wysocki (Intel)" <rafael@kernel.org>
+Date: Wed, 4 Nov 2026 15:34:28 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0gWGVXeN9nq=cUe=ufeX5jC3oWpdms-2Eus13dFNxqxAw@mail.gmail.com>
+X-Gm-Features: AclHuK8_mlawzHb7grWA4pMsKYYbWB0rPIQSUSQOlRdZy4jfzqgdM01VFchXEqs
+Message-ID: <CAJZ5v0gWGVXeN9nq=cUe=ufeX5jC3oWpdms-2Eus13dFNxqxAw@mail.gmail.com>
+Subject: Re: [PATCH v2] block: Keep RPM_ACTIVE in blk_pre_runtime_resume()
+ when already active
+To: Stanley Jhu <stanleyjhu@google.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>, 
+	Brian Norris <briannorris@chromium.org>, "Rafael J . Wysocki" <rafael@kernel.org>, 
+	Praveen Talari <praveen.talari@oss.qualcomm.com>, Alan Stern <stern@rowland.harvard.edu>, 
+	linux-block@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-blk-mq maps all possible CPUs to the hardware contexts, offline CPUs
-included. If a hardware context is mapped only to offline CPUs,
-blk_mq_alloc_request_hctx has no online CPU to select the software
-context from and fails with -EXDEV. The fabrics transports allocate the
-Connect command for each I/O queue this way, so connecting fails while
-CPUs are offline.
+On Wed, Nov 4, 2026 at 12:27=E2=80=AFPM Stanley Jhu <stanleyjhu@google.com>=
+ wrote:
+>
+> Since commit eef1d74bf88f ("PM: runtime: Only set runtime_error on
+> suspend callback failures"), a failed runtime resume leaves
+> dev->power.runtime_error at 0 with runtime_status set to RPM_SUSPENDED,
+> so later runtime resume requests run sdev_runtime_resume() again:
+>
+> 1. A runtime suspend increments q->pm_only from 0 to 1 and sets
+>    q->rpm_status to RPM_SUSPENDED.
+> 2. The first runtime resume fails in the driver callback, and
+>    blk_post_runtime_resume() sets q->rpm_status to RPM_ACTIVE and calls
+>    blk_clear_pm_only(), decrementing q->pm_only from 1 to 0 so recovery
+>    commands can enter the queue (intended since
+>    commit 6e1fcab00a23 ("scsi: block: pm: Always set request queue
+>    runtime active in blk_post_runtime_resume()")).
+> 3. A retried runtime resume calls blk_pre_runtime_resume(), which
+>    overwrites q->rpm_status from RPM_ACTIVE to RPM_RESUMING, so
+>    blk_post_runtime_resume() sees old_status !=3D RPM_ACTIVE and calls
+>    blk_clear_pm_only() a second time without a matching
+>    blk_set_pm_only().
+> 4. q->pm_only underflows from 0 to -1 (triggering WARN_ON_ONCE in
+>    blk_clear_pm_only()), blocking non-PM requests in blk_queue_enter()
+>    and __bio_queue_enter() while the device is RPM_ACTIVE, and the next
+>    runtime suspend increments q->pm_only from -1 to 0, letting non-PM
+>    requests dispatch while RPM_SUSPENDED. This hits the UFS device
+>    well-known LUN by default and SCSI disks with
+>    manage_runtime_start_stop enabled (ATA and FireWire sbp2 defaults).
+>
+> Transition q->rpm_status to RPM_RESUMING in blk_pre_runtime_resume()
+> only when it is RPM_SUSPENDED, and call blk_clear_pm_only() in
+> blk_post_runtime_resume() only when old_status is RPM_RESUMING, pairing
+> each clear with a completed runtime suspend.
+>
+> Tested on QEMU ARM64 UFS in SDB and MCQ modes by injecting
+> runtime-resume START STOP UNIT failures on the UFS device well-known
+> LUN, confirming zero pm_only underflows and balanced runtime PM cycles.
+>
+> Fixes: eef1d74bf88f ("PM: runtime: Only set runtime_error on suspend call=
+back failures")
+> Cc: stable@vger.kernel.org # v7.3+
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Stanley Jhu <stanleyjhu@google.com>
 
-Offline the upper half of the CPUs and connect. Check that a hardware
-context is mapped only to offline CPUs, bring them online, run I/O from
-one of them and trace that its commands are sent on the queue of that
-hardware context.
+LGTM
 
-The bug was introduced by kernel commit 20e4d8139319 ("blk-mq: simplify
-queue mapping & schedule with each possisble CPU") and is fixed by
-kernel commit XXX ("blk-mq: allow passthrough requests on hctxs without
-online CPUs").
+Acked-by: Rafael J. Wysocki (Intel) <rafael@kernel.org>
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- tests/nvme/080     | 142 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/080.out |   2 +
- 2 files changed, 144 insertions(+)
-
-diff --git a/tests/nvme/080 b/tests/nvme/080
-new file mode 100755
-index 000000000000..eea4ed237218
---- /dev/null
-+++ b/tests/nvme/080
-@@ -0,0 +1,142 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (c) 2026 SUSE LLC and contributors
-+#
-+# Test connecting with offline CPUs. blk-mq maps all possible CPUs to the
-+# hardware contexts, the offline ones too. If only offline CPUs are mapped to
-+# a hardware context, blk_mq_alloc_request_hctx has no online CPU to take the
-+# software context from and fails with -EXDEV. The fabrics transports allocate
-+# the Connect command for each I/O queue this way, so the connect fails.
-+#
-+# Offline the upper half of the CPUs and connect. Check that a hardware context
-+# has only offline CPUs mapped, bring them online, run I/O from one of them and
-+# trace the queue IDs of the commands to verify that the hardware context is
-+# used and works.
-+#
-+# The bug was introduced by commit 20e4d8139319 ("blk-mq: simplify queue
-+# mapping & schedule with each possisble CPU").
-+#
-+# Regression test for commit XXX ("blk-mq: allow passthrough requests on hctxs
-+# without online CPUs").
-+
-+. tests/nvme/rc
-+. common/cpuhotplug
-+
-+DESCRIPTION="Test connect with offline CPUs"
-+QUICK=1
-+
-+requires() {
-+	_nvme_requires
-+	_have_fio
-+	_have_loop
-+	_require_nvme_trtype_is_fabrics
-+	_require_min_cpus 4
-+	_have_cpu_hotplug
-+	_have_tracefs
-+}
-+
-+set_conditions() {
-+	_set_nvme_trtype "$@"
-+}
-+
-+offline_upper_cpus() {
-+	local -a cpus
-+	local cpu
-+
-+	mapfile -t cpus < <(printf '%s\n' "${HOTPLUGGABLE_CPUS[@]}" | sort -n)
-+	for cpu in "${cpus[@]:$((${#cpus[@]} / 2))}"; do
-+		_offline_cpu "${cpu}"
-+	done
-+}
-+
-+# Print the hctx directory and the CPUs of the first hardware context which
-+# only has offline CPUs mapped.
-+find_offline_hctx() {
-+	local disk="$1"
-+	local hctx
-+	local cpu
-+	local cpus
-+
-+	for hctx in /sys/block/"${disk}"/mq/*; do
-+		cpus=$(tr -d ' ' < "${hctx}/cpu_list" | tr ',' ' ')
-+		for cpu in ${cpus}; do
-+			if [[ $(cat "/sys/devices/system/cpu/cpu${cpu}/online" \
-+					2>/dev/null || echo 1) == 1 ]]; then
-+				continue 2
-+			fi
-+		done
-+		echo "$(basename "${hctx}") ${cpus}"
-+		return 0
-+	done
-+	return 1
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	local nvmedev
-+	local disk
-+	local ns
-+	local hctx
-+	local cpu_list
-+	local -a cpus
-+	local cpu
-+	local nr_cmds
-+	local trace_dir="/sys/kernel/debug/tracing/instances/blktests-nvme-080"
-+	local skipped=false
-+
-+	_setup_nvmet
-+
-+	offline_upper_cpus
-+
-+	_nvmet_target_setup
-+
-+	if _nvme_connect_subsys; then
-+		_nvmf_wait_for_state "${def_subsysnqn}" "live" || echo FAIL
-+		nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
-+		disk=$(basename /sys/class/nvme/"${nvmedev}"/nvme*n*)
-+		ns=$(_find_nvme_ns "${def_subsys_uuid}")
-+
-+		# The CPUs are spread over the hardware contexts in topology
-+		# order, so usually the upper ones end up without online CPU.
-+		if read -r hctx cpu_list < <(find_offline_hctx "${disk}"); then
-+			read -r -a cpus <<< "${cpu_list}"
-+			for cpu in "${HOTPLUGGABLE_CPUS[@]}"; do
-+				_online_cpu "${cpu}"
-+			done
-+
-+			cpu=${cpus[0]}
-+			mkdir "${trace_dir}"
-+			if _nvme_have_setup_cmd_event "${trace_dir}"; then
-+				_nvme_trace_qid_start "${trace_dir}" \
-+					"${nvmedev#nvme}" $((hctx + 1))
-+				_run_fio_verify_io --size=32m \
-+					--filename="/dev/${ns}" \
-+					--cpus_allowed="${cpu}" ||
-+					echo "FAIL: fio verify on CPU ${cpu}"
-+				nr_cmds=$(_nvme_trace_qid_stop "${trace_dir}")
-+				if [[ "${nr_cmds}" -eq 0 ]]; then
-+					echo "FAIL: no commands from CPU ${cpu} on hctx ${hctx}"
-+				fi
-+			else
-+				skipped=true
-+			fi
-+			rmdir "${trace_dir}"
-+		else
-+			SKIP_REASONS+=("no hardware context with only offline CPUs")
-+			skipped=true
-+		fi
-+
-+		_nvme_disconnect_subsys
-+	else
-+		echo "FAIL: controller not ready"
-+	fi
-+
-+	_nvmet_target_cleanup
-+
-+	if [[ "${skipped}" = true ]]; then
-+		return 1
-+	fi
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/080.out b/tests/nvme/080.out
-new file mode 100644
-index 000000000000..15119b8d7a83
---- /dev/null
-+++ b/tests/nvme/080.out
-@@ -0,0 +1,2 @@
-+Running nvme/080
-+Test complete
-
--- 
-2.56.0
-
+> ---
+> Differences from v1:
+> - Move SUSPENDED -> RESUMING explicitly in blk_pre_runtime_resume() and
+>   clear pm_only only for RPM_RESUMING in blk_post_runtime_resume()
+> - Describe the QEMU UFS test coverage in the commit message
+> - Link to v1: https://lore.kernel.org/r/20261029040001.2100001-1-stanleyj=
+hu@google.com
+>
+>  block/blk-pm.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+>
+> diff --git a/block/blk-pm.c b/block/blk-pm.c
+> index 8d3e052f91da..34cc7c5ca04e 100644
+> --- a/block/blk-pm.c
+> +++ b/block/blk-pm.c
+> @@ -142,7 +142,8 @@ EXPORT_SYMBOL(blk_post_runtime_suspend);
+>   *
+>   * Description:
+>   *    Update the queue's runtime status to RESUMING in preparation for t=
+he
+> - *    runtime resume of the device.
+> + *    runtime resume of the device if the queue is runtime suspended, or=
+ keep
+> + *    RPM_ACTIVE if a previous failed runtime resume already reactivated=
+ it.
+>   *
+>   *    This function should be called near the start of the device's
+>   *    runtime_resume callback.
+> @@ -153,7 +154,9 @@ void blk_pre_runtime_resume(struct request_queue *q)
+>                 return;
+>
+>         spin_lock_irq(&q->queue_lock);
+> -       q->rpm_status =3D RPM_RESUMING;
+> +       /* Keep RPM_ACTIVE if a prior failed resume reactivated the queue=
+. */
+> +       if (q->rpm_status =3D=3D RPM_SUSPENDED)
+> +               q->rpm_status =3D RPM_RESUMING;
+>         spin_unlock_irq(&q->queue_lock);
+>  }
+>  EXPORT_SYMBOL(blk_pre_runtime_resume);
+> @@ -168,8 +171,8 @@ EXPORT_SYMBOL(blk_pre_runtime_resume);
+>   *    driver or error handler will need to communicate with the device.
+>   *
+>   *    This function should be called near the end of the device's
+> - *    runtime_resume callback to correct queue runtime PM status and re-=
+enable
+> - *    peeking requests from the queue.
+> + *    runtime_resume callback to mark the queue runtime active and clear
+> + *    pm_only if the queue was resuming.
+>   */
+>  void blk_post_runtime_resume(struct request_queue *q)
+>  {
+> @@ -185,7 +188,7 @@ void blk_post_runtime_resume(struct request_queue *q)
+>         pm_request_autosuspend(q->dev);
+>         spin_unlock_irq(&q->queue_lock);
+>
+> -       if (old_status !=3D RPM_ACTIVE)
+> +       if (old_status =3D=3D RPM_RESUMING)
+>                 blk_clear_pm_only(q);
+>  }
+>  EXPORT_SYMBOL(blk_post_runtime_resume);
+> --
+> 2.56.0.385.gac671c819a-goog
+>
