@@ -1,73 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.199
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793789360;
-	b=E6HOHGUXEE3k780i+1l48TodGQBqVqt9Aq0SbxLAhYe/fgWV0xMszuHugUW27r5gBnUy
-	 ZDQesSAVjYDrR+M3/aaJ1hzH2hteBUoAYXdLKXKc4uMDpY6NjpelH1YvSKyZuGlLTIZ98
-	 Lvgps78bU+5O+EmkwnF7F9D8yaM4JtdEkVkY21fMNc6eXCAWERjHT3FSCwAYewsiCsRfr
-	 30cth4T7IGz85Y0yslDJnsFUYyTYZUahU2bem5aFxzVdF3K68/lpssgjqmHFMkwqNCKw2
-	 YvU55jZpxVHSooEL2HjS2MOofVpOOtkVyCnxk3N0BDTxTqsC2VlqkKfXEoAryrtwRsg==
+	t=1793791668;
+	b=AzTJBUyAM+0wFZQEQwihMiCicu0GinQjMn/zYvTQ3bw2djFDKtAQB3y/XP6hf/YcmXmR
+	 T5GPkXC74EeHPVGCARrRrY2GHONUkeXF5UvpqtwPO6z952TcYtWAw4L7sCgMVKW0VY1ps
+	 MEIuvxGxLfnOHOwJ3yZiaYbtImIQ4S2XZjiyrmxg5SPdqSxUIc33EW+SPC+qP7IoJ7KIB
+	 pi0eJLOkF5VvqSdrMxHE5h2I44iJJElisCFuovKoc6uXXoKAYsZWTALqQCXOX9pDVXnYB
+	 bDWyc3DP+rnnzkbRW6RV23EXkNu1z2CkP/flONZh9eUG+KucxWGaejG0C4JqiUK6J4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793789360;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Scanned-By;
-	bh=MFA7WkGo+hIbERumFRG59VaVyf5F/3/i6Y52p+XAYVU=;
-	b=ieAzHfU6EvYIISXSC+DMhMhA92GHV6jJhxzLo4qL3bE2lZxYF3sDBlLg6c/g0+0q/1Fw
-	 qkdPpY/75hQLDBFVPCkFcxwLo0XHZan0iDQFtNPgfPZJ8enycImUsfafhtMIzIE821GEe
-	 aGvN04Jw9BNS7xvkLj1+uvBs8eWTM8vERiG7iCuwbCsTQ3SdO3DMCLRDwWV0XWAp74mBb
-	 1RGxc3AqVZ+OhtVdJensl0bMlF4+BYIC5myRgTqQX0CvtQgDy1o2glvEo0C1xcIIYkAF0
-	 Uc3WLS5YgRls9DHeeUhcP3TSLFjI0NSw4Sect2CkwqYJ83nYKZTxTRlw7d0yg0IKM5Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793791668;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=pyY2wj3cJVqfa/dTdmvd0ISos1ijTzTPDWm7P9keHwc=;
+	b=KyQ5VjeVg7DHVGGjO+e712MY3qqfnS6mCNQPc/5o6JE0HOxmvz95TTBuw1+xS7v7dXFL
+	 M7LERXzs0gSaGKIZIi3h7G/y8Mj6rBOKZbNrNsjk0wSPgQQd4AhAC3WMCws0a/PdL8dV6
+	 enaY5XXAS9VPNLDJwAl1n9D7WMuEUIsuf6zYepFTse5IgN/B6lhIYXK63gIQuLGrNTzUt
+	 Fz+f7to+V/A0f0ZjjRvEXmS549XH65u7fQAjwb7GsqWfacxfTnNkMaQFkx/RktaDMIdor
+	 e7EQLJPQwD6lZ//SKDMyTlAYYrsGPV5KZWVp8OVUr+F/69b+X6PxmKBxP3QKn9yt0Qw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=VfL+yq+8;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=fXk1BHcc;
+	arc=none smtp.remote-ip=74.125.82.199
+Received: from mail-dy1-f199.google.com (mail-dy1-f199.google.com [74.125.82.199])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F60606A326
-	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 10:49:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D1F60606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD69F606A32E
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 11:27:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DD69F606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=VfL+yq+8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1793789357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MFA7WkGo+hIbERumFRG59VaVyf5F/3/i6Y52p+XAYVU=;
-	b=VfL+yq+8IlWM6hbtB4tgppnfCwEDNvMMrVfbfCPYZxQ62g/IwB8MCOYSkTBvoAwO+m5aXi
-	RJQ6n6lMyJNai0EUaF3fa/ityeIeO6zYXwX3n+r3bLtgUyIp+qsoybwR/qU6SosduKzOQH
-	XRMOpKjAyDRUpTNCA6zj/aXXQem3A1g=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-279-7_rpUqBSPeWq-YWFmJo4VQ-1; Wed,
- 04 Nov 2026 05:49:14 -0500
-X-MC-Unique: 7_rpUqBSPeWq-YWFmJo4VQ-1
-X-Mimecast-MFC-AGG-ID: 7_rpUqBSPeWq-YWFmJo4VQ_1793789353
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CD851800361;
-	Wed,  4 Nov 2026 10:49:13 +0000 (UTC)
-Received: from thuth-p1g4.redhat.com (unknown [10.44.48.42])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2F3ED195608C;
-	Wed,  4 Nov 2026 10:49:10 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Ming Lei <tom.leiming@gmail.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] selftests: ublk: Fix include path for out-of-tree builds
-Date: Wed,  4 Nov 2026 11:49:08 +0100
-Message-ID: <20261104104909.129656-1-thuth@redhat.com>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=fXk1BHcc
+Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-36d69ab3c2bso173581eec.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 03:27:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793791667; x=1794396467; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=pyY2wj3cJVqfa/dTdmvd0ISos1ijTzTPDWm7P9keHwc=;
+        b=fXk1BHccVFgFL2XcIFK6TH7HehutMBNeWYP7scpQtF10DBbnkfjU9vEeP2Lyeb3JVf
+         aWgvXyVKWpfgm8PcYjhDbp/pWFpgUqmg0N64KdFw3ujsvWyKJgkd1aVc97gU/36coh6F
+         dO04GJ1Am/hsPTFUGv3yxntdeN/g+pASqWYCBkuclbq/rLyll8ckuhZuIIgsNWmFXTx7
+         30VPsrGWE95BTqmWa/vsSvEG+yhcpiQZOPzL0nWx6dK67jQ0aXbWZ4StHt0jIV87/RIN
+         45M7NgACwqrJfKeN2Eez6hvyh7s4zBqAW1jGlEfkLh69N9WTJEsrA+og0e5iGPAr2Au/
+         yxNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793791667; x=1794396467;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=pyY2wj3cJVqfa/dTdmvd0ISos1ijTzTPDWm7P9keHwc=;
+        b=B/H95x5NgTiFYD/qVkV4s8qHcYaKGD2Z1Q3J0i8ckfNr35JBRGA+3QxQkJh1+hkw33
+         nggl4o2ZdsQkV13Wlv6x3sf8i3ZtqIu4Nt9oRV5mDSP5sA4KDb94FGA2gIgCptGOFY5C
+         StC+aVU9bYxMmTB9O+nLs+Ixg8YtJ935TxuOCi61Qznh6peUV4263hcHcmt0EaObzzi+
+         G2dBLCkYS97DaSBXKW9YpHZnvZ6d7lqBmcICoLs7S6iWQ3wiiKIIMMvfaWaXafWZ/zR0
+         h11ZUIbLbwqjx1nIZNRBAXHZ9oYuBbLbamT/trC7GyD24eXufI5pJP3iQZXwme/EYAvh
+         D2dg==
+X-Forwarded-Encrypted: i=1; AKwUvBwYOi8BGUgK9VV9ZUfSCXBZFe0Ehjs3GBwpb8jbbhq90sKjd4yYoFj9QtgVq3ZRvjMY72JqvH21T0u0mw==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+mMGlB6IMeMtkqy25WWGRRhszrvvE+HeFEy6R5/UzMSDsllUX/
+	aqHFYYlPVoNPWQIYpzTC0jgrDGxtKMVUQk5y1aM0l3dPmAgAtzQBWLTwKY3swym0hnsOTUiXHtC
+	KQaUHlOrb8FIThF8FSdFF2Q==
+X-Received: from dybpl4.prod.google.com ([2002:a05:7301:4304:b0:369:dd6b:ac5c])
+ (user=stanleyjhu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:693c:65d2:b0:369:1401:c5c2 with SMTP id 5a478bee46e88-36a423bf43fmr21671592eec.26.1793791666553;
+ Wed, 04 Nov 2026 03:27:46 -0800 (PST)
+Date: Wed,  4 Nov 2026 19:27:44 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -76,50 +75,115 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.385.gac671c819a-goog
+Message-ID: <20261104112744.1630864-1-stanleyjhu@google.com>
+Subject: [PATCH v2] block: Keep RPM_ACTIVE in blk_pre_runtime_resume() when
+ already active
+From: Stanley Jhu <stanleyjhu@google.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <bvanassche@acm.org>, Brian Norris <briannorris@chromium.org>, 
+	"Rafael J . Wysocki" <rafael@kernel.org>, Praveen Talari <praveen.talari@oss.qualcomm.com>, 
+	Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Stanley Jhu <stanleyjhu@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-When building the seltests out of tree with "make kselftest-all",
-the compilation of the ublk tests can currently fail since they
-are using the headers from the distro instead the headers from the
-kernel source. For example, I'm getting:
+Since commit eef1d74bf88f ("PM: runtime: Only set runtime_error on
+suspend callback failures"), a failed runtime resume leaves
+dev->power.runtime_error at 0 with runtime_status set to RPM_SUSPENDED,
+so later runtime resume requests run sdev_runtime_resume() again:
 
- kublk.c: In function ‘ublk_ctrl_dump’:
- kublk.c:190:27: error: ‘UBLK_F_IO_DESC_SIZE’ undeclared (first use in
-  this function); did you mean ‘UBLK_F_UPDATE_SIZE’?
-   190 |         if (info->flags & UBLK_F_IO_DESC_SIZE)
-       |                           ^~~~~~~~~~~~~~~~~~~
-       |                           UBLK_F_UPDATE_SIZE
- kublk.c:190:27: note: each undeclared identifier is reported only once
-  for each function it appears in
- kublk.c:191:53: error: ‘struct ublksrv_ctrl_dev_info’ has no member
-  named ‘io_desc_size’
-   191 |             ublk_log("\tio_desc_size %u\n", info->io_desc_size);
-       |                                                 ^~
- ... etc ...
+1. A runtime suspend increments q->pm_only from 0 to 1 and sets
+   q->rpm_status to RPM_SUSPENDED.
+2. The first runtime resume fails in the driver callback, and
+   blk_post_runtime_resume() sets q->rpm_status to RPM_ACTIVE and calls
+   blk_clear_pm_only(), decrementing q->pm_only from 1 to 0 so recovery
+   commands can enter the queue (intended since
+   commit 6e1fcab00a23 ("scsi: block: pm: Always set request queue
+   runtime active in blk_post_runtime_resume()")).
+3. A retried runtime resume calls blk_pre_runtime_resume(), which
+   overwrites q->rpm_status from RPM_ACTIVE to RPM_RESUMING, so
+   blk_post_runtime_resume() sees old_status != RPM_ACTIVE and calls
+   blk_clear_pm_only() a second time without a matching
+   blk_set_pm_only().
+4. q->pm_only underflows from 0 to -1 (triggering WARN_ON_ONCE in
+   blk_clear_pm_only()), blocking non-PM requests in blk_queue_enter()
+   and __bio_queue_enter() while the device is RPM_ACTIVE, and the next
+   runtime suspend increments q->pm_only from -1 to 0, letting non-PM
+   requests dispatch while RPM_SUSPENDED. This hits the UFS device
+   well-known LUN by default and SCSI disks with
+   manage_runtime_start_stop enabled (ATA and FireWire sbp2 defaults).
 
-Fix it by using the KHDR_INCLUDES from the main selftest Makefile that
-should contain the right include path in either case.
+Transition q->rpm_status to RPM_RESUMING in blk_pre_runtime_resume()
+only when it is RPM_SUSPENDED, and call blk_clear_pm_only() in
+blk_post_runtime_resume() only when old_status is RPM_RESUMING, pairing
+each clear with a completed runtime suspend.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Tested on QEMU ARM64 UFS in SDB and MCQ modes by injecting
+runtime-resume START STOP UNIT failures on the UFS device well-known
+LUN, confirming zero pm_only underflows and balanced runtime PM cycles.
+
+Fixes: eef1d74bf88f ("PM: runtime: Only set runtime_error on suspend callback failures")
+Cc: stable@vger.kernel.org # v7.3+
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Stanley Jhu <stanleyjhu@google.com>
 ---
- tools/testing/selftests/ublk/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Differences from v1:
+- Move SUSPENDED -> RESUMING explicitly in blk_pre_runtime_resume() and
+  clear pm_only only for RPM_RESUMING in blk_post_runtime_resume()
+- Describe the QEMU UFS test coverage in the commit message
+- Link to v1: https://lore.kernel.org/r/20261029040001.2100001-1-stanleyjhu@google.com
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index fc64b8f028332..ba6df7c0b530b 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
+ block/blk-pm.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index 8d3e052f91da..34cc7c5ca04e 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -142,7 +142,8 @@ EXPORT_SYMBOL(blk_post_runtime_suspend);
+  *
+  * Description:
+  *    Update the queue's runtime status to RESUMING in preparation for the
+- *    runtime resume of the device.
++ *    runtime resume of the device if the queue is runtime suspended, or keep
++ *    RPM_ACTIVE if a previous failed runtime resume already reactivated it.
+  *
+  *    This function should be called near the start of the device's
+  *    runtime_resume callback.
+@@ -153,7 +154,9 @@ void blk_pre_runtime_resume(struct request_queue *q)
+ 		return;
  
--CFLAGS += -O3 -Wl,-no-as-needed -Wall -I $(top_srcdir)/usr/include
-+CFLAGS += -O3 -Wl,-no-as-needed -Wall $(KHDR_INCLUDES)
- ifneq ($(WERROR),0)
- 	CFLAGS += -Werror
- endif
+ 	spin_lock_irq(&q->queue_lock);
+-	q->rpm_status = RPM_RESUMING;
++	/* Keep RPM_ACTIVE if a prior failed resume reactivated the queue. */
++	if (q->rpm_status == RPM_SUSPENDED)
++		q->rpm_status = RPM_RESUMING;
+ 	spin_unlock_irq(&q->queue_lock);
+ }
+ EXPORT_SYMBOL(blk_pre_runtime_resume);
+@@ -168,8 +171,8 @@ EXPORT_SYMBOL(blk_pre_runtime_resume);
+  *    driver or error handler will need to communicate with the device.
+  *
+  *    This function should be called near the end of the device's
+- *    runtime_resume callback to correct queue runtime PM status and re-enable
+- *    peeking requests from the queue.
++ *    runtime_resume callback to mark the queue runtime active and clear
++ *    pm_only if the queue was resuming.
+  */
+ void blk_post_runtime_resume(struct request_queue *q)
+ {
+@@ -185,7 +188,7 @@ void blk_post_runtime_resume(struct request_queue *q)
+ 	pm_request_autosuspend(q->dev);
+ 	spin_unlock_irq(&q->queue_lock);
+ 
+-	if (old_status != RPM_ACTIVE)
++	if (old_status == RPM_RESUMING)
+ 		blk_clear_pm_only(q);
+ }
+ EXPORT_SYMBOL(blk_post_runtime_resume);
 -- 
-2.56.0
+2.56.0.385.gac671c819a-goog
 
