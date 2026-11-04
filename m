@@ -1,82 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793803184;
-	b=1G5j4haawjQRn3q154QcNXpocgBeGEgu4cyz/ANUdap0BUbB5PfNpSBYsol+S/poFQuv
-	 AOTOZTFzHABCET/oqk0LnCN1cr7Gu28gek0/hOLkPowUiSEMW7cZCS8kha66FPlTNs/lg
-	 vzByk+1M5Njb09W3dLCb841v9g/++pXFaFlty0gFMlFebEaNqOLl3nz6NQPQBCUtfjyAK
-	 wMXPx4UNEn9gxRvntZrsvvpqYyq/4aYwfwoZQwwjU83mJoF463zD/i0tVS2gBds9mj7F0
-	 jNUm2Ogy3poXKb2Ou020VGBxmnpFhD7A7cuzAi6FAUBw7FxgII45ulijlz+GXxqFeJw==
+	t=1793804852;
+	b=u3Radugrgk2JnS8v96zGWIChf0lMpIgA+lSgXZYbuQiGv5AJhB2873yzUUU21F4pdgE8
+	 0Sr9r1r7M+DHtOi4IOfLy4gNIt1XYvEQfDmY8TEEU/9jCCyM+jGlIqFtMjd2en6fCa1oX
+	 mj7CpN+noafibq4BxpYsTPvn8yssX7PisYXTmY08H+N/sBxA2c3Ph4CQC1Ehwqb5LJQYp
+	 1TZaMxm8mKutm9/wimXqLHCBCyoCw/vr7bbchwHwWATw5f5RB/X3cbPhBnRcyXfepf2zy
+	 tx5jxD+k8wxmlZSIC8PAsdDULgd7gxrIrsEkHwHGoKPpIm4io4PQN3eN1n0l/GGPvJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793803184;
-	h=DMARC-Filter:DKIM-Signature:Received:X-QQ-mid:Message-ID:
-	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Cc:Subject:Date:X-OQ-MSGID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=vWAUioNlml08tns8OmIh5lWoP6sA2CHZkVMFWUAY6dE=;
-	b=O7p6pFifLwfTpWBaeCVOqU6bDp9ERBfYwSJ5HI45A5NGIP5O68rDHU2H12oxyOkPj0YY
-	 4J2ivd5642eADWOGULahcpuYOVWYfKHLh74BP9DX1AiTr/MFgHAuq4TPMF07t/8QAVQQL
-	 KhSCqDO7n5ZoMCr0KpsxmRrieEeYVDaDFOKgzSW5Emq9b2CLlofGpc6RNHZ69+BgBSHwV
-	 3FjTDFkp2jw8hJ/DCtFpOUboPxZD8uIntv52hVFStu1nldmIHkLdNwJtOqrnKftLLRldJ
-	 hNRe9hWVlNcF2uGIYrjo8xPFV/h3m0TTpSXhU/4qNY/i9f2eAQBSwkICr0QvWjhENyA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793804852;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
+	bh=SRwwF7d6JKQ+7rZ7FwUD8U4JtRdsbauXUbAizZTDQkg=;
+	b=d3eDnsmbwKJ8wG9r4R8HLpnaXJVEwvpKPyiWlSRr+9kQ2iLFui7v8MdBruZH3x9Y95k7
+	 WIiMzPKaFiFsvVrG5A8Ex3w9QsnOsPRhusJgZCaJqr//bN/nyGe7l3o59J3+cdU0p75Ln
+	 jzozi4aBiFWCS6Pgo2BQm6DpHFVcSnh4MH6SfDK70M+s5GWfeGAYT6ppQejTesiK5gRO3
+	 6nKfmYCzO+XnzZaxqUjjeZyDuE7PZbNwEISFIzWbuC0faVgfHGqd5c08VjcQn0wrxm0IX
+	 P/zEuNTVkfRsMjP2LF844LQIwqfm0ywWmcTtpJUyFkP4NZZnWWdeAcQgalruwlJiR6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=qq.com;
-	spf=pass smtp.mailfrom=qq.com;
-	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=VFNYiTk3;
-	arc=none smtp.remote-ip=162.62.57.49
-Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	arc=none smtp.remote-ip=209.85.161.43
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207D1606A31B;
-	Wed,  4 Nov 2026 14:39:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 207D1606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=VFNYiTk3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1793803172; bh=vWAUioNlml08tns8OmIh5lWoP6sA2CHZkVMFWUAY6dE=;
-	h=From:To:Cc:Subject:Date;
-	b=VFNYiTk3HZHAtlSYP144+5LfvHpr7bIMVAv68aiCEXE1z8f0O+dUq01Fv850igIzf
-	 rfBWhkahIjaGahp0H7Nf0OSWiz+0p9iK73yH8Os+fMTCAgjTPVRw/x9RzE2Tdxwc/i
-	 uLSaxG5hjiYTWhxpuYqKD/ElpQoyDGBVkGdXJ9MQ=
-Received: from shuai-VMware-Virtual-Platform.localdomain ([223.88.55.29])
-	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
-	id 9DC90C39; Wed, 04 Nov 2026 22:39:28 +0800
-X-QQ-mid: xmsmtpt1793803168tsgi7cg9a
-Message-ID: <tencent_2BD24B2CAFF21D4D0EB86262EC13D8EE6408@qq.com>
-X-QQ-XMAILINFO: OPbu+gyh5MQo/22CT/fkGfhx+YFn8vJTeKrQ7IxBsLolg0jRCoQ+Gl4DexhrCf
-	 xzGfxlmKU/J/UdFYp2+3XtqC7Hu8nhVsxQODlQNroL5fIjafDXGczSjy5je219PCoYrXKOE/kxsR
-	 +8C2RlPXSqRGdJAEblO5LOCDD76ugQgOrRntR2Jm6RlKss6C/9Mt5DyQPC6DAOgQKVS35vZIB8xa
-	 MKsUfNL1E/Ifth0MikVBpFxuAH2lDRD3AKX6/McbXehw4GcISSijeO6Zh3sVTrG4oJBh1ALSOuLx
-	 bLW+r2KIxQIbrIfS+Ac7a5BF+ZvBMWMnlk1L52NAFVfix79DNXxcXyd6V3VovG/kUK/YCiUTld4X
-	 YFHX46/MayAzBMzAR2ghp4QP7YokgOoi2uIzXBIfigv8VQLBBAgWaWQ1UdtM14NEBqzPvRsucgvn
-	 /O1EMt8SMGSaLo4vZrC415lFrCePbJz/vGjmIh0tVGFvgfyusORmUY2Mc9x3SeungIv2ppwtK6y0
-	 pcm+P8YYGZw14w3T5OfDADypvFlcCIq8FUQ9Up9viTlLpije6slL/RAa3s2cw+ZjNinRKTUPoExB
-	 uzHdVT4+esv9B9oyeXxS9g9UNcRNoM8MykMsRsMxTfV0dgFdCH+AbdEGURjAfLuNlGaPGv1sHIiw
-	 U3dPPTFWT0aGQVLkgwuafrYUEJ/x64M2fi4OzXbCHCNNfsy5eb1TTJqMAsi2ATWqMtegRJDpoyl5
-	 x3LaV2KmKqCmtPPm4hT8ZDQOxZZhIxWF5nbJwfxbcxt+2yoVry1r5pmTlQn4fDZrgzM9NQR3Kjrz
-	 bC95uzvJ3orX8QVocVADwXTv0Zaz3bFzrSrM4HJQlot+fs2l2afet/3c813CYx4pcAg4tRYdoJw6
-	 vKEmo/KXbNBfc92auye9lqhCjDe9TQXD9XbBrr4ht+k3cJ/uiRQTNAw7OKy2/Tm6mUYOLPMW64Dl
-	 QS/lFwygBVpp1K+Rj4J7NHaILMMVwFBwN4MlzMbtmz50iwb+ecoQ/BZfeL693jyR/Mw0cPSpLHn/
-	 HkBO6LsOthl/wlK+Fpk1+suKZzTeFMbUVjMYXPlybg8So+trciPlxHPzVuh2Hu+6uI/wnLdFsd0Y
-	 VVShE76neGbstJWq4lBkhVOTzNw8jS2l/rj/hM
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-From: Shuai Liu <847807867@qq.com>
-To: axboe@kernel.dk,
-	rostedt@goodmis.org
-Cc: mhiramat@kernel.org,
-	dlemoal@kernel.org,
-	johannes.thumshirn@wdc.com,
-	mkp@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	linux-block@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+2fca70610179be6c24a4@syzkaller.appspotmail.com,
-	Shuai Liu <847807867@qq.com>
-Subject: [PATCH] blktrace: always record v2 format for the ftrace tracer
-Date: Wed,  4 Nov 2026 22:39:22 +0800
-X-OQ-MSGID: <20261104143922.317295-1-847807867@qq.com>
-X-Mailer: git-send-email 2.53.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6FB606D803
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 15:07:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DA6FB606D803
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-70b875f6f13so743575eaf.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 07:07:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1793804850; x=1794409650; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=SRwwF7d6JKQ+7rZ7FwUD8U4JtRdsbauXUbAizZTDQkg=;
+        b=iaPSO7ylhtk6kcT1szhbnRBx/7YenRZ2KsqsxdHayRL5Vz46gvSXYRaeg7gflqS6pu
+         l11ScjSb8DAMDgP/ohO2M4OIGNXebt0EZL8kwwCzzvNFJbOkFBcA8SXIpF0WxV1s/way
+         I5YO3i1tPWzqyR4Oy/2YxxEdtcn+o5sek0iIrFbhGuC+9qtiSM2A6a892R+N4dUE4MIr
+         eMTLWEza1A/aNqm+XpJBr6XdL2MaALHkp9Avi4ptspwk20uHIgo7JCQRKZTHO9a1QKii
+         MtYUcL2RtxZi3Zo2tedy2Gl9HULVFyt9nyW5u2/Qwovq+xhJC209skaa4pwwfA1F1V1e
+         dWnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793804850; x=1794409650;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=SRwwF7d6JKQ+7rZ7FwUD8U4JtRdsbauXUbAizZTDQkg=;
+        b=i6n9VnRg+iQO37atMNX3q5dxiJLsapSnGrcOHg6p9SBYL1+9UIlMamCCQ0We9+/pf/
+         vDSZOZh1NsP5oZkvSmjcyTqIea/sB9CuqAmAtiAQh9fYCx7f7f0H5dF3GggWBxs9zJ1O
+         s+kOqrWWIoAPaaPiLTkNrASt4yKaYr5un4gW5OXEs0imWx04Rdo3Ay/FjT0aec01kNN5
+         kkygYCsknCbLd35QQ/zCC0PqxufdH/PdF6zx4pdefkZEVZ6g39nFun3O/d6VVkjKo6Pc
+         4CP9RvcSMLILTrXtp/BnGxMgcXmgFc84//lBiZ+HhbXT1HK1YRE65dFnsNufNqEo5/VG
+         JOjQ==
+X-Forwarded-Encrypted: i=1; AKwUvByuQlDGMWoJqoFx81bxl74RtlVMN2zsd1+FHxX05ZQCEOago8rQdFHRB+RRPf1r4wYlPDjg/oxqYEhX2A==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/kVaaTMDh7zB/lGVD98p1B/tIPk4IOx+kWCZlGTF8s7Uzi4n7p
+	LC7YT60u6q7aXX8rl6iOhnEpjP6qQc6Afz1oeoJauU5+wo2ZoZDs/0BWUude6xoWreIImRrJ1L4
+	E7OgliW0=
+X-Gm-Gg: AYBFou2K5nD7WNNipHtnk6WnbFPoSftdO9H0KUL7YOQxiPMkCI3JlG1tO6NjOcKFs/5
+	Cvy1/lIia/IkukH4eNYo8h2DpEKzPK7L5VGUFNclwEGifwOGdTF8RV8Ihk5GkAyvM87cplRmt9y
+	UYDyHsOi8hm83WrQP6pR3rBVMgaqaMvYFaUYTB0L1hW3dWsCCI5oNhZBTT7gePXzfIBZivmkA7D
+	ux6xet3ypuIujW/ZhdMmi06sElEaBqpOHbStOyhOmFAg2rbXN+vygp7R2IXplheR+W7yPWHfiN1
+	5pn/gRt9sCICaA0WwfLeLEbx0tRNxsZcQaQaZtK+ivL0M2SqRoLoIB+mVbYewS+q52jAgilQvtv
+	+/DuBSS2nHIsncUU9OZoxog8wA163tuElDBmUZgB1tkfyH/nN7WL1Z+07BMLqwqJNK2YKV/QRtZ
+	jF+VZG5d1Dmds6GW4JBQOs+/8myu8iiutnhVOJjDJC9CYQDL8mpH98d9M+ni8AGmjg7HXhTHRZD
+	CtXGiPvaz0qa7q75jthpuJnpbMjCJV18vyt6o+VT+CiWMC0/smBKG1/kSk7kxmrpZ6uF7o4iPnS
+	pQwZdYQSlcm2Eb1TggfpVtL4wpNrOYTmifZCcS1tSltnlkefGXI1uQCF2kFcW3bIlYgG4Mc=
+X-Received: by 2002:a05:6820:169f:b0:6dd:4f30:258f with SMTP id 006d021491bc7-714f253a484mr9672440eaf.56.1793804849653;
+        Wed, 04 Nov 2026 07:07:29 -0800 (PST)
+Received: from [192.168.2.38] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-716c0cdb22dsm1886033eaf.0.2026.11.04.07.07.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Nov 2026 07:07:29 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <tom.leiming@gmail.com>, Sasha Levin <sashal@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20261103163928.641519-1-sashal@kernel.org>
+References: <20261103163928.641519-1-sashal@kernel.org>
+Subject: Re: [PATCH] selftests: ublk: fix the build and file offsets on
+ 32-bit
+Message-Id: <179380484851.4021488.1650834850006214841.b4-ty@b4>
+Date: Wed, 04 Nov 2026 08:07:28 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -86,125 +96,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-The legacy BLKTRACESETUP ioctl creates a blk_trace with version 1, and
-__blk_add_trace() wrote v1 (struct blk_io_trace) records into the ftrace
-buffer. The ftrace read path, however, unconditionally parses entries as
-v2 (struct blk_io_trace2): the 32-bit pid at offset 28 of a v1 record is
-interpreted as the v2 action field. If the pid happens to equal
-__BLK_TA_BOUNCE (14), print_one_line() hits the uninitialized hole in
-what2act[] and calls a NULL .print handler, crashing with RIP 0x0.
 
-The relay path is the only consumer of v1 records (blkparse); ftrace
-always wants v2. Drop the version switch in the ftrace branch and always
-record v2, keeping the existing 0 -> 2 normalization for the sysfs path.
+On Tue, 03 Nov 2026 11:39:28 -0500, Sasha Levin wrote:
+> kublk puts pointers into 64-bit UAPI and SQE fields with a plain (__u64)
+> cast. ublk builds with -Werror, so it fails to build on 32-bit
+> architectures:
+> 
+>   batch.c:379:42: error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
+> 
+> Cast through uintptr_t. kublk also passes 64-bit user copy offsets,
+> which start at UBLKSRV_IO_BUF_OFFSET (2 GB), to pread() and pwrite(),
+> and with glibc those are truncated to a 32-bit off_t there. Build with
+> -D_FILE_OFFSET_BITS=64 as well.
+> 
+> [...]
 
-Reported-by: syzbot+2fca70610179be6c24a4@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=2fca70610179be6c24a4
-Fixes: 4d8bc7bd4f73 ("blktrace: move ftrace blk_io_tracer to blk_io_trace2")
-Signed-off-by: Shuai Liu <847807867@qq.com>
+Applied, thanks!
 
----
-Tested with the syzbot C reproducer on x86-64 QEMU: without this patch the
-kernel panics in print_one_line() with RIP 0x0; with it, reading
-/sys/kernel/tracing/trace returns 2958 bytes of correctly parsed events.
+[1/1] selftests: ublk: fix the build and file offsets on 32-bit
+      commit: 3197517875fdcfae1e9b5a4dcaf35cbbd66c413c
 
-Developed with AI assistance (code analysis and patch drafting); all changes
-reviewed and runtime-verified by me.
----
- kernel/trace/blktrace.c | 72 +++++++++++------------------------------
- 1 file changed, 18 insertions(+), 54 deletions(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 8cd2520b4c99..a9e9fc30e5ef 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -385,66 +385,30 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
- 	if (blk_tracer) {
- 		buffer = blk_tr->array_buffer.buffer;
- 		trace_ctx = tracing_gen_ctx_flags(0);
--		switch (bt->version) {
--		case 1:
--			trace_len = sizeof(struct blk_io_trace);
--			break;
--		case 2:
--		default:
--			/*
--			 * ftrace always uses v2 (blk_io_trace2) format.
--			 *
--			 * For sysfs-enabled tracing path (enabled via
--			 * /sys/block/DEV/trace/enable), blk_trace_setup_queue()
--			 * never initializes bt->version, leaving it 0 from
--			 * kzalloc(). We must handle version==0 safely here.
--			 *
--			 * Fall through to default to ensure we never hit the
--			 * old bug where default set trace_len=0, causing
--			 * buffer underflow and memory corruption.
--			 *
--			 * Always use v2 format for ftrace and normalize
--			 * bt->version to 2 when uninitialized.
--			 */
--			trace_len = sizeof(struct blk_io_trace2);
--			if (bt->version == 0)
--				bt->version = 2;
--			break;
--		}
--		trace_len += pdu_len + cgid_len;
-+		/*
-+		 * ftrace always consumes v2 (blk_io_trace2) records, no matter
-+		 * which format was requested through BLKTRACESETUP. The v1
-+		 * layout is only meaningful for the relay buffer read by
-+		 * blkparse. Recording v1 here made print_one_line() read the
-+		 * 32-bit pid as the action field, which could call a NULL
-+		 * handler.
-+		 *
-+		 * The sysfs-enabled path never initializes bt->version, so
-+		 * normalize an uninitialized version to v2 as well.
-+		 */
-+		if (bt->version == 0)
-+			bt->version = 2;
-+		trace_len = sizeof(struct blk_io_trace2) + pdu_len + cgid_len;
- 		event = trace_buffer_lock_reserve(buffer, TRACE_BLK,
- 						  trace_len, trace_ctx);
- 		if (!event)
- 			return;
- 
- 		tracing_record_cmdline(current);
--		switch (bt->version) {
--		case 1:
--			record_blktrace_event(ring_buffer_event_data(event),
--					      pid, cpu, sector, bytes,
--					      what, bt->dev, error, cgid, cgid_len,
--					      pdu_data, pdu_len);
--			break;
--		case 2:
--		default:
--			/*
--			 * Use v2 recording function (record_blktrace_event2)
--			 * which writes blk_io_trace2 structure with correct
--			 * field layout:
--			 *   - 32-bit pid at offset 28
--			 *   - 64-bit action at offset 32
--			 *
--			 * Fall through to default handles version==0 case
--			 * (from sysfs path), ensuring we always use correct
--			 * v2 recording function to match the v2 buffer
--			 * allocated above.
--			 */
--			record_blktrace_event2(ring_buffer_event_data(event),
--					       pid, cpu, sector, bytes,
--					       what, bt->dev, error, cgid, cgid_len,
--					       pdu_data, pdu_len);
--			break;
--		}
-+		record_blktrace_event2(ring_buffer_event_data(event),
-+				       pid, cpu, sector, bytes,
-+				       what, bt->dev, error, cgid, cgid_len,
-+				       pdu_data, pdu_len);
- 
- 		trace_buffer_unlock_commit(blk_tr, buffer, event, trace_ctx);
- 		return;
+Best regards,
 -- 
-2.53.0
+Jens Axboe
+
+
 
