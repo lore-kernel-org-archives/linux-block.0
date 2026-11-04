@@ -1,52 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.28.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793786366;
-	b=JkqwTdnzdBfSDtaNQjuAVs1mYke+rqK0ixpM/hTBdVyKT6wLcgWfD/GKKBe+OPAt99N+
-	 F3VdUk+sB/232FieoK5LFAe1jG8S3BZnMnlp3UwWqqSLGoPbEsWYizqCAolHpxUL94YpV
-	 5740v+roCoSEQJSKtes7VmPjuLKc0l6KmyeyI8GpI5PbVQds9xv3Lv22P3jK9mQEUxhD9
-	 tYzywsSomT6WSYi+cMxTtCilep7DyUJIwpK3/lw8jhedVi08osihbBoIx2ho6nuY2Jo3p
-	 pXXVT8jdH+Wcv9WNbGmQD2qOpHb4aWi5iOpvfRgX6qyZ/H1qiNDoNGaBEEA2VzoyHsQ==
+	t=1793789360;
+	b=E6HOHGUXEE3k780i+1l48TodGQBqVqt9Aq0SbxLAhYe/fgWV0xMszuHugUW27r5gBnUy
+	 ZDQesSAVjYDrR+M3/aaJ1hzH2hteBUoAYXdLKXKc4uMDpY6NjpelH1YvSKyZuGlLTIZ98
+	 Lvgps78bU+5O+EmkwnF7F9D8yaM4JtdEkVkY21fMNc6eXCAWERjHT3FSCwAYewsiCsRfr
+	 30cth4T7IGz85Y0yslDJnsFUYyTYZUahU2bem5aFxzVdF3K68/lpssgjqmHFMkwqNCKw2
+	 YvU55jZpxVHSooEL2HjS2MOofVpOOtkVyCnxk3N0BDTxTqsC2VlqkKfXEoAryrtwRsg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793786366;
-	h=DMARC-Filter:X-Alimail-AntiSpam:Received:Subject:To:Cc:References:
-	 From:Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=odiS2BD1Oni7cgdjx86LxslpSgo1Mv9bXgCCqdS0J5o=;
-	b=NiV446QoMW3FhOyGjVtSvIylpnOuhyeVLLk/B/IQJ5old6JCIve49D61Smo/nNPz+y5L
-	 svgSJAHoKaNCKe/GhQQm18KNVkv/qNuJRPtOD6cdtyRWkiTN84AfGWvOc2cacb32j4xjV
-	 TBVbfYA10nKn4/m42IqR2dlDBgrH8fzOBPrUQmr491EAL9utU1WCQk8brNMizKcUPZHXJ
-	 AgYA7gvFecJrkRfeAyxT5HoFGiHLASNePN9rGnEC2k6+laTUrK+A/mxTlYaUKyUmNR+h2
-	 +CrjuqelltZvYHNB80VfOHLlvmFMJSXtKnttDQ5XUhK285u1HPD0/sJbD898WYhWsGg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793789360;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Scanned-By;
+	bh=MFA7WkGo+hIbERumFRG59VaVyf5F/3/i6Y52p+XAYVU=;
+	b=ieAzHfU6EvYIISXSC+DMhMhA92GHV6jJhxzLo4qL3bE2lZxYF3sDBlLg6c/g0+0q/1Fw
+	 qkdPpY/75hQLDBFVPCkFcxwLo0XHZan0iDQFtNPgfPZJ8enycImUsfafhtMIzIE821GEe
+	 aGvN04Jw9BNS7xvkLj1+uvBs8eWTM8vERiG7iCuwbCsTQ3SdO3DMCLRDwWV0XWAp74mBb
+	 1RGxc3AqVZ+OhtVdJensl0bMlF4+BYIC5myRgTqQX0CvtQgDy1o2glvEo0C1xcIIYkAF0
+	 Uc3WLS5YgRls9DHeeUhcP3TSLFjI0NSw4Sect2CkwqYJ83nYKZTxTRlw7d0yg0IKM5Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=open-hieco.net;
-	spf=pass smtp.mailfrom=open-hieco.net;
-	arc=none smtp.remote-ip=115.124.28.172
-Received: from out28-172.mail.aliyun.com (out28-172.mail.aliyun.com [115.124.28.172])
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=VfL+yq+8;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8861C606A32E;
-	Wed,  4 Nov 2026 09:59:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8861C606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=open-hieco.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=open-hieco.net
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.08323395|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_regular_dialog|0.0105379-0.000473118-0.988989;FP=16549416186597666154|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033025068124;MF=likunyu@open-hieco.net;NM=1;PH=DS;RN=7;RT=7;SR=0;TI=SMTPD_---.jwaRWX3_1793786352;
-Received: from 172.18.25.145(mailfrom:likunyu@open-hieco.net fp:SMTPD_---.jwaRWX3_1793786352 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Wed, 04 Nov 2026 17:59:13 +0800
-Subject: Re: [PATCH 0/2] block: Add done_split_bio() for chained bio
- post-processing
-To: Christoph Hellwig <hch@infradead.org>
-Cc: axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20261030065945.88742-1-likunyu@open-hieco.net>
- <aum31_1jjv7OROxl@infradead.org>
-From: Li kunyu <likunyu@open-hieco.net>
-Message-ID: <d4cdf3de-4fca-fce3-2f16-03746a95ae71@open-hieco.net>
-Date: Wed, 4 Nov 2026 17:59:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F60606A326
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 10:49:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D1F60606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=VfL+yq+8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1793789357;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MFA7WkGo+hIbERumFRG59VaVyf5F/3/i6Y52p+XAYVU=;
+	b=VfL+yq+8IlWM6hbtB4tgppnfCwEDNvMMrVfbfCPYZxQ62g/IwB8MCOYSkTBvoAwO+m5aXi
+	RJQ6n6lMyJNai0EUaF3fa/ityeIeO6zYXwX3n+r3bLtgUyIp+qsoybwR/qU6SosduKzOQH
+	XRMOpKjAyDRUpTNCA6zj/aXXQem3A1g=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-279-7_rpUqBSPeWq-YWFmJo4VQ-1; Wed,
+ 04 Nov 2026 05:49:14 -0500
+X-MC-Unique: 7_rpUqBSPeWq-YWFmJo4VQ-1
+X-Mimecast-MFC-AGG-ID: 7_rpUqBSPeWq-YWFmJo4VQ_1793789353
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CD851800361;
+	Wed,  4 Nov 2026 10:49:13 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.44.48.42])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2F3ED195608C;
+	Wed,  4 Nov 2026 10:49:10 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Ming Lei <tom.leiming@gmail.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] selftests: ublk: Fix include path for out-of-tree builds
+Date: Wed,  4 Nov 2026 11:49:08 +0100
+Message-ID: <20261104104909.129656-1-thuth@redhat.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -56,50 +77,49 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-In-Reply-To: <aum31_1jjv7OROxl@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
+When building the seltests out of tree with "make kselftest-all",
+the compilation of the ublk tests can currently fail since they
+are using the headers from the distro instead the headers from the
+kernel source. For example, I'm getting:
 
+ kublk.c: In function ‘ublk_ctrl_dump’:
+ kublk.c:190:27: error: ‘UBLK_F_IO_DESC_SIZE’ undeclared (first use in
+  this function); did you mean ‘UBLK_F_UPDATE_SIZE’?
+   190 |         if (info->flags & UBLK_F_IO_DESC_SIZE)
+       |                           ^~~~~~~~~~~~~~~~~~~
+       |                           UBLK_F_UPDATE_SIZE
+ kublk.c:190:27: note: each undeclared identifier is reported only once
+  for each function it appears in
+ kublk.c:191:53: error: ‘struct ublksrv_ctrl_dev_info’ has no member
+  named ‘io_desc_size’
+   191 |             ublk_log("\tio_desc_size %u\n", info->io_desc_size);
+       |                                                 ^~
+ ... etc ...
 
-On 2026/11/3 18:30, Christoph Hellwig wrote:
-> On Fri, Oct 30, 2026 at 02:59:43PM +0800, Li kunyu wrote:
->> patch 1:  Introduce a new abstract function 'done_split_bio' and call it
->> from bio_remaining_done to resolve this issue.
->>
->> patch 2: Implement the blkcg_iolatency_done_split_bio callback in
->> blk-iolatency to correctly decrement the inflight count when the other
->> bio headers, which have not called rq_qos_done_bio(bio), complete.
-> Why are you not simplify calling rq_qos_done_bio before
-> bio_remaining_done?  __bi_remaining is only incremented for clones of
-> various types, and the qos processing should probably happen before
-> calling back into the submitter anyway.
-> 
-> As far as I can tell all the code here is duplicating the existing
-> done code without much of an explanation of why we need another copy.
-> 
-> While we're at, the existing code in rq_qos_done_bio added in commit
-> aa1b46dcdc7b ("block: fix rq-qos breakage from skipping rq_qos_done_bio()")
-> is extremly wrong and dangerous.  Once a bio completes, bi_bdev
-> is invalid, the driver could have even used it for something that is not
-> a block device like md raid5 does, but it certainly does not have any
-> use for the qos/iocost code.  So it really needs to derive anything
-> it needs to I/O processing from the bio itself.
+Fix it by using the KHDR_INCLUDES from the main selftest Makefile that
+should contain the right include path in either case.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tools/testing/selftests/ublk/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I identified this issue in the blk-iolatency framework under the QoS model: the
-inflight accounting for split bios is incorrect. Specifically, inflight I/Os are
-accumulated in the throttle function across the entire bio chain, whereas the
-done_bio function subtracts only a portion of the head bio and child bios.
-
-This patch may still have some issues; no anomalies were observed during testing
-or in the scenarios exercised so far. For example, this submission adds the line
-bio_clear_flag(bio, BIO_QOS_CHAIN_CHILD);.
-
-I will continue to analyze whether a more appropriate fix can be found.
-
-Thanks for the suggestion.
-
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index fc64b8f028332..ba6df7c0b530b 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-CFLAGS += -O3 -Wl,-no-as-needed -Wall -I $(top_srcdir)/usr/include
++CFLAGS += -O3 -Wl,-no-as-needed -Wall $(KHDR_INCLUDES)
+ ifneq ($(WERROR),0)
+ 	CFLAGS += -Werror
+ endif
 -- 
-thanks,
-kunyu
+2.56.0
+
