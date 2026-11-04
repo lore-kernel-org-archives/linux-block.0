@@ -1,54 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.197
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793778953;
-	b=IgtovjxxyIBvVGQwo1hAiU9h6sptIbDlSd/r/UofCsqRAPqD2nHk8EIvTa9nFGgyaFAA
-	 19tqMSzYbbpU+dELBlgCKVKZRR1MVZl8C75VxVKGkxAR0xHDWyN/CFjPd7JpbbN51V9e/
-	 1lyhJfqWNARAOQoZEElSi3AXvCpQPK21YUuZ8yucdgwzfORfX1f+wDsV8K4oZMgrR2VOn
-	 wf1AFLnJ+PRhOBcX1R9TMbQs9RtT1Rh1y57XfGRSPOKxv+rIhp5f39YDXknp3H8sB80AI
-	 rbATc8/GprukTU0MQLCMESkLInXn0eLqx/4nEC6yqcspNMNcjBEnsSjg9bPGavKAGAQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793778953;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:MIME-Version:X-Received:Date:In-Reply-To:
-	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
-	 Subject:From:To:Content-Type;
-	bh=jOF9VC+FyuoiOL7uBzh8l/7un8l/rjldOsAOW9RYlzg=;
-	b=ZJ4Ndn1JCSHAyNniMYJ9LokDgLmZj274MkSkeS1Cug8tR3Eu3u75HRcn+uubVnMdGZvP
-	 WKOPISGW5GyCyjGrM2pbgWSK17Dm3E81m8I6AtFHNUFb2xAAsf0klAdXXE5zDGt/dVQ96
-	 bXXEj8no7W1vpCjJ+zqJklbv0QqzxLvEaRPlLhwwU+dmMo0nLN+dWcPw1ru45kdym30IS
-	 PKxXg5AKH6jlUEXmlUe58k7nfPMwZ9NwQiq61shogdGCFoSvIurckPLp3P6jX0mwE56Dc
-	 Cbp02BzeIufMLCASEnVX5Dtbwh+z6pijuHzwzDMXZqutDtf43YGJUfZgPH7oRHACG1g==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.167.197
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.53
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793785141;
+	b=JnpUYhpxI5LbZu8x2B4lAUGr5D0nsORGxb/L7xsVh2UQKurjIp2ECfoLdeCMSyn7SlhT
+	 /ywkMH35QMTn30/1LU7kS+xqJqkJSjgXLwn1KtpWjLlXM07KmtwYy2u66DiwC2ckyvMRP
+	 icOKKqefO8fY0mMOpJyZbza46uRlEwJtJl6QyP088BqQVUetFMn2NcGbHyQo10FyIq3AN
+	 7X8TbciSdJFogsV+h3IMtfPgYWmgYQOijAWMOgBAHnrkGnH1oW0xt4KKb6ppK8yOP8G6/
+	 3esxpj1j/ETo+7o7XTAjduTa1bbY2uqDzwDkUZNGY7iZdMDnz29ofAQa8JEJzkDU3CA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793785141;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=wyMFhiKAtvEArgIfEIeRhVp7bZV2wi7+c/PirP/xKIQ=;
+	b=czT0hII2/dz44VJnIoodMEkveh4rCDPoS+7/2D9JYRAr5iqZKwW3wgR2W3SNmNOnlgg8
+	 3veI10BKENvjCIteM2GDos0zzYz1EwegD9YpRucdT/FHZ9/ethPN4oWsuEQU5/KNk8wDX
+	 xSg2+LZdyDcH7ZEpn0vDXXOyuIzHIdBDUPryN/wQlXzitZwdekWUbwPIb+dnd8VcysH/l
+	 f3wlociE8ocS9UVq2kAgtSfWoLm06zLBPS4DW7ua82XTWdmCLdlCZA0qeQzLAK2EpX8ic
+	 DR987b5UKhfnoGYrPX7VhOaTWA1dJ7LwfJOPav78aAPVd7GEKuXdYU1MWWmFLYA12LQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MWcuwFVU;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.53
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4AB606A326
-	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 07:55:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1E4AB606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-567ac848d83so359933b6e.3
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 23:55:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E3A606A31B
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 09:39:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F1E3A606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MWcuwFVU
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-82109f51565so210153a34.2
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 01:39:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1793785140; cv=none;
+        d=google.com; s=arc-20260327;
+        b=HKgYS4x34NnFIJLgUm9BlFk4Yv8DVszV77egOehluOWUlnxcjKSZVEV/j9ZpyYdTlF
+         Tg8jK5NnunyZjwlLf5E8oKHbW4gWDL07gywJxpa0E+vvUCqBv8epDn/Vv4UNwZ0Bycty
+         aXqE4YN0d8rqIIR8ApvjM2ttlkXWELB32TsJ/MlsYsjxBx5YuG+ImzK1glbClm2OlFSF
+         /ahuFlMPDr7F21Ksf3ApHdLPxtGOf3JCdHwTaDxyW1X2PQ7tlVHby/SIh/2AKd/i7N5t
+         pwnxz7+XZ6V25LaAWlVZv+vTnjohRQ8nVQjpR91DeRi3tPm8YoBCaGQeDtu0OSr8KE5F
+         D48Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=wyMFhiKAtvEArgIfEIeRhVp7bZV2wi7+c/PirP/xKIQ=;
+        fh=U9Z1nDmqhQ9Mf2e/Ryez/3D0U4WrXLUJE1KEQfF6j0c=;
+        b=kDUDLIXjHcmpduk2eqYYmn66UkXGMFezo6bZuh5WGRNq9bNJPyqBCj5jlL8exq+U2q
+         Nhyk/ObwR+SUTrFSt0cIUjxsQqaMK9JiZO893Y+2N3HfVdx7HCr+JggHE0m/RtF+tRmV
+         14dxf+rLJ2mdE9aDyCAvOMwUQZJaO/6wXODfJYDLaoTGkH0sdPP/+abRNXlZk823BnZR
+         w0H8Euw2nr0XNQ1GXINI70x8sJal04Ult567MC6SGssOgizrRCk+e8u/hlDzjYLyN+Ry
+         xD4V3zg+b247kV+XoCr4aDbDEPlugchwMdhH0DSw20M+wAlgH4ziaYzD7irxJQEYrAjz
+         WpmQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793785140; x=1794389940; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=wyMFhiKAtvEArgIfEIeRhVp7bZV2wi7+c/PirP/xKIQ=;
+        b=MWcuwFVU34g06UlUcqUa5sYEJmikRLRjgphlE29xhKOD4TvHCz42xKRoY64u6NKHes
+         xjt2Kmn/+YdToNLJkWPcGxIGbaaJ0wY1ZJbTTTZQD3IF/wRS+fSSROUlI3wyd+yxnKYc
+         GQPSHj1gm3g/8wCHIXZ3oe5us6mBgP1dC2jQP5aBVk8OhZCVs1sZkIcMVJMecAjJXasI
+         Og2OaHXi7Q0Zb2oFPTlydcj73h3lDupKulNOH88sy8HBskjJam3fsiYqJeYOxJqCxyVJ
+         TnTTf5Y7SydEjaXW/BvIYuv/FteX8czVREzaVxsDiMkx0vrx0ASemIuFyUYLSKPjT3Bg
+         Bkow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793778952; x=1794383752;
-        h=content-type:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=jOF9VC+FyuoiOL7uBzh8l/7un8l/rjldOsAOW9RYlzg=;
-        b=RBK/eqJaA54ZAREQ/LMN1DFc6DxslXnvDHWROOd2cXHZfKFILSjuZjfvGrFCr+2cLq
-         L5a5nSXfsnE5xdr03PDDK65UC70fBS08PZv4QAtXGQ3C+CLffA8xWBYXILax6wOhXzhG
-         s+g1tPIbRe/UVqWo5eyLnlobAD6G7yKlbTnT9mUAFQ1jW4rRz51QVhQRG8upTbisYEws
-         nAUC3FRagUI7Q8uGcl9JwTHwndcmfCffEf3C+vTxR2PwGnZnfHzohGVE0SIWK2kLUfdH
-         NKa8R3gfQ7+JcNbS8S8LV2hOsRRPlcupcoMtoNCDXCag78LrLhhYQ2Jdsu80lq9+qrZ7
-         34ew==
-X-Forwarded-Encrypted: i=1; AKwUvBxhQgFo10WVmyLEa023x0VapQL0cqja4OpRZfPUUsl4X+uOkmz/mx1JdVqYvwUDL4BgcKKCdtc+Ij7QlA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z87N4YpZbZNZ19tiCa6ja0T+lDc6Ni6pKcmOChOi6C1rgVz1+Gl
-	9TOWaXJxcP5hwkGTbmsq7eYzQWtvwLtV73SkYDS+BhvnIbqiy5iaVVKROKyOKk3WWQIsJUwLYR8
-	O3WshGYxm9SS9+tknNAsMFHNvN2D7LMQ6toUg2r2WgEgoqTSAuRR7xjl6OEU=
+        d=1e100.net; s=20260707; t=1793785140; x=1794389940;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=wyMFhiKAtvEArgIfEIeRhVp7bZV2wi7+c/PirP/xKIQ=;
+        b=pqGeygzFYINp3UHZuZjoBZfqMuqKgcrsKM8LR+/Kr/rYIAHbnmhXA3uZBfpGguNbqX
+         r5EDEg+dYT4Y6QXKkAhVnNQ8T+SlzNpumgJ3KILLZRivD/RwGlrWP8hJWnIGRjrlrIJj
+         uk1kCgV7FBRL/zYRroKiKYmlFZ3o0bEjRWqK50X1qz2uBlFh+xlVVGYpZJDuUNMal2aD
+         2V9dg8kFF1VMBQ+jEBIeKzErwr6b42039lZIirwEcPhIfHVv8ZVo/YdecK3DXWwWf1as
+         XpgJePaIC2K7AEf+wfNPIZPeimaIHPmb1SXV3Eje2WMw5RWWSISf3BILH0BORCtIl7WH
+         vr7w==
+X-Forwarded-Encrypted: i=1; AKwUvBye5sIX2lEb7qLnuD08GT70Zt2y+F/zs8/zTQYwnMOysksvsQSBuolUB4NGLBoufa1+g5b4il6cV3BU6g==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+Ld+evl0wtMgvNA1FXAR5GBXF6q7652/ErCygQwxRYF44qXwwP
+	6EIKGfT4Iq/EgsKp6NSVxQ7YbVAnQDB4AQy1aLQTOLud5oSWguXbu2uF7aXyqJI7trFuMD+wJlk
+	dKBV/OorZt5aKhrkw5y612UOBOZB61xw0ZrT1mGQ=
+X-Gm-Gg: AYBFou25WCDU4ZXd93BlBEPBOGgvS2J5iCAM/Fno1LvSxec6PPbazIjSFIVrCdvXENf
+	g3aozudC4N6+8VMcIvli3oJp2N26CVLeS7XK63FMEkmVEJLnL76S2tLEuULaulABrJodM023Xxv
+	Si8SQzIe3v95eBr81BPQAnKvXceGIUwdRZ+kofrnuKZ1nwQbARII91i66K4vwyDlr5wwGbvIF0G
+	c5NZ2CzjOJtUf64BSkLUkqRfyruGyq627iiV9BeV78HbzuoBsbztClAKQIheDG9x1XJaUsad/Zb
+	s1zrRt20ZR8Sv+S6UEs9MmZklN2jr//iDmbILBzSwsIKba5X7kb378ozu8a6jzxoXU4Y6LGN3kF
+	isDjRlQaDZ1S3mleKAFwiYxxelufdPOKL2gEcpsqO3392jiGeIS6BzTiGu77P/hQTcfi6rcdqZI
+	nXN7Vdk9WOOX21fjGiiBnZVtNpNA/NV+n2heYy
+X-Received: by 2002:a05:6808:16a7:b0:4d6:92b3:5c85 with SMTP id
+ 5614622812f47-5640de991f8mr9890887b6e.66.1793785139973; Wed, 04 Nov 2026
+ 01:38:59 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,115 +105,42 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:6410:b0:541:139a:881a with SMTP id
- 5614622812f47-5640de70b3dmr10704597b6e.59.1793778952194; Tue, 03 Nov 2026
- 23:55:52 -0800 (PST)
-Date: Tue, 03 Nov 2026 23:55:52 -0800
-In-Reply-To: <6ae807da.c8ffc79a.e3697.002c.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6aeae508.be891901.2a0dec.0004.GAE@google.com>
-Subject: Re: [syzbot] [block?] [ext4?] BUG: unable to handle kernel paging
- request in blk_mq_exit_hctx
-From: syzbot <syzbot+5307e3bcacec2ce4c2f0@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20261103163928.641519-1-sashal@kernel.org>
+In-Reply-To: <20261103163928.641519-1-sashal@kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Wed, 4 Nov 2026 03:38:47 -0600
+X-Gm-Features: AclHuK-ajlXUEOlDoBUIXIcZPeq0dPA_3c3hkn84_pIOTF1sCe9cDuF4iuz_gxU
+Message-ID: <CACVXFVNJp-aWqLDR+Vy=VyNzHzPjGiTppYBYYGb=bGs5CvNRZQ@mail.gmail.com>
+Subject: Re: [PATCH] selftests: ublk: fix the build and file offsets on 32-bit
+To: Sasha Levin <sashal@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has found a reproducer for the following issue on:
+On Tue, Nov 3, 2026 at 10:39=E2=80=AFAM Sasha Levin <sashal@kernel.org> wro=
+te:
+>
+> kublk puts pointers into 64-bit UAPI and SQE fields with a plain (__u64)
+> cast. ublk builds with -Werror, so it fails to build on 32-bit
+> architectures:
+>
+>   batch.c:379:42: error: cast from pointer to integer of different size [=
+-Werror=3Dpointer-to-int-cast]
+>
+> Cast through uintptr_t. kublk also passes 64-bit user copy offsets,
+> which start at UBLKSRV_IO_BUF_OFFSET (2 GB), to pread() and pwrite(),
+> and with glibc those are truncated to a 32-bit off_t there. Build with
+> -D_FILE_OFFSET_BITS=3D64 as well.
+>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+> Found with 32-bit builds of the selftests (gcc 16 and clang 21 with
+> -m32, with and without -D_TIME_BITS=3D64 -D_FILE_OFFSET_BITS=3D64);
+> KernelCI's 32-bit arm builds show the same warnings. The changed files
+> build without them now, and the x86_64 builds don't change.
+>
 
-HEAD commit:    6628e7d4c6b2 Linux 7.4-rc1
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=148f6add580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a58b6b4d667e7a61
-dashboard link: https://syzkaller.appspot.com/bug?extid=5307e3bcacec2ce4c2f0
-compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
-userspace arch: arm64
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1436344e580000
+ Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-AI-generated root cause summary:
-When dm_setup_md_queue() fails after add_disk() (for instance during
-bd_link_disk_holder() or dm_sysfs_init()), the error path invokes del_gendisk(),
-which calls blk_mq_exit_queue() -> blk_mq_exit_hctx(), freeing each hardware
-context flush queue and setting hctx->fq = NULL. However, md->type remains
-DM_TYPE_NONE and the mapped device is not torn down. When userspace retries
-table_load on the device, dm_setup_md_queue() and dm_mq_init_request_queue() run
-again, invoking blk_mq_init_allocated_queue() on the existing queue. During
-__blk_mq_realloc_hw_ctxs(), blk_mq_exit_hctx() is called on the existing
-hardware contexts, unconditionally dereferencing hctx->fq->flush_rq (offset
-0x78) when hctx->fq is NULL, causing a kernel null-pointer dereference crash.
-
-full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=5307e3bcacec2ce4c2f0
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5307e3bcacec2ce4c2f0@syzkaller.appspotmail.com
-
-kobject: kobject_add_internal failed for dm (error: -12 parent: dm-9)
-device-mapper: ioctl: unable to set up device queue for new table.
-Unable to handle kernel paging request at virtual address dfff80000000000f
-KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
-Mem abort info:
-  ESR = 0x0000000096000005
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x05: level 1 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0
-[dfff80000000000f] address between user and kernel address ranges
-Internal error: Oops: 0000000096000005 [#1]  SMP
-Modules linked in:
-CPU: 0 UID: 0 PID: 2579 Comm: syz.5.600 Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/23/2026
-pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-pc : blk_mq_exit_hctx+0x64/0x498 block/blk-mq.c:3974
-lr : blk_mq_exit_hctx+0x40/0x498 block/blk-mq.c:3973
-sp : ffff800097b275c0
-x29: ffff800097b275d0 x28: 0000000000000000 x27: 1fffe0001ae5652a
-x26: dfff800000000000 x25: ffff0000d72b2950 x24: ffff0000e0621480
-x23: 0000000000000078 x22: ffff0000d22e9400 x21: 0000000000000001
-x20: ffff0000d72b2800 x19: ffff0000ca1f5388 x18: ffff800123625000
-x17: ffff0001ace95387 x16: ffff0000d7a11d94 x15: 0000000000000001
-x14: 00000000004bc250 x13: 0000000000000001 x12: 0000000000000003
-x11: 0000000000000000 x10: ffff0000ca1f53bc x9 : 0000000000000000
-x8 : 000000000000000f x7 : ffff800081826454 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : 0000000000000000
-x2 : ffff0000d72b2800 x1 : ffff0000d7a11d80 x0 : 0000000000000000
-Call trace:
- blk_mq_exit_hctx+0x64/0x498 block/blk-mq.c:3974 (P)
- __blk_mq_realloc_hw_ctxs+0x1f0/0x548 block/blk-mq.c:4612
- blk_mq_realloc_hw_ctxs block/blk-mq.c:4652 [inline]
- blk_mq_init_allocated_queue+0x2dc/0xe9c block/blk-mq.c:4694
- dm_mq_init_request_queue+0x2d8/0x474 drivers/md/dm-rq.c:573
- dm_setup_md_queue+0x134/0x434 drivers/md/dm.c:2611
- table_load+0x3d4/0x764 drivers/md/dm-ioctl.c:1661
- ctl_ioctl drivers/md/dm-ioctl.c:2221 [inline]
- dm_ctl_ioctl+0x884/0xbbc drivers/md/dm-ioctl.c:2243
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:796
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:815
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
-Code: 97cf39bd f9400328 9101e117 d343fee8 (387a6908) 
----[ end trace 0000000000000000 ]---
-----------------
-Code disassembly (best guess):
-   0:	97cf39bd 	bl	0xffffffffff3ce6f4
-   4:	f9400328 	ldr	x8, [x25]
-   8:	9101e117 	add	x23, x8, #0x78
-   c:	d343fee8 	lsr	x8, x23, #3
-* 10:	387a6908 	ldrb	w8, [x8, x26] <-- trapping instruction
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Thanks,
