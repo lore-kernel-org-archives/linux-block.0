@@ -1,87 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793820680;
-	b=zRs9EUGV8gn195qznOJc+KGCuQQBIMsAZIVeyVJ2ZLSVmh31XFX4/0PmumRt/YO8YtSJ
-	 eXiDCv8BiAwcjPFhVeIP+OCVl99sncF2QOQQl03wJtYpwel2eZULyRghnNFPbUhrYAKwO
-	 tBBBQXjEySlPQ8d3DNilgkKdVBzyL3S/qfMvbyk4vCkOnHLdJdlXG1Ep2taPTJIAJ6Biq
-	 6sMYmBXy4d6Z1mkVKlkFX2SgZ/SlnjIRdz4xUQwj6O7krp6P0FOF9iq2lPBVns31JZQSz
-	 salxoc/jUaZaSdkDHbommryvopBo5hAifclNJtcs2kgQqmyto0PKbMj4Y7zsZTWAmkQ==
+	t=1793832865;
+	b=jGx8VfdzvJiAe5+2rl4RwjgTDB7BN+HUALdalZKvHn+pI+Qj2pktzDIfpDcMpEKT7l0d
+	 I1XhNMCXdLTNUCAMfRs3UEAiUBMFlnqxQ7hy87UgQ51C9n0TJh62WVAr6XNcbm8BRuGM0
+	 FnWp/kUZqcyYDuVVcIWhh6VG7XKHkUGuurcsKfdZNxtYysRs1VqYx4yO9znLJxH8W9v43
+	 smLk6CGFuNSyVbKAIeLkIA3TOlgYB/mERE3GRM7BH9eWz2+jpqf9XiDd4pqM85otPBsdV
+	 MWt8qfbAZRr51ZF5Gz+HjUddCvFuG5OVUnRLbei/S804xgK5WMGZTdUlyU+4Jcbqq8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793820680;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793832865;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:Message-ID:From:To:Cc:Subject;
-	bh=87Z8zwJarjKAZcG7q37D5+mnW6z05/4D2Aky4jDPXkY=;
-	b=3ibYd3vKGp4rYa8TaNRZQUaHV3F81sYNRuavJbEH+bB7fIU22VBc6bEZ7E5j4TlWsGFZ
-	 UZEH51UQjSnQd+v55h5wFQubWfGD1Y+HLV9R+oXNWBb6iLDyH5Y2aabqJp8waWEItfwIi
-	 d+sfNUUXthf2vG7Agm1dT0Y45m/DS/7O4HI5NV/XU24mektJG9ciISPtvrSoda0f+8I1c
-	 hNs2O+AQJRZ15q/sAZo0W3MEozxZVlXWWdXLz/CFAPhfpQEdqfXtFyOVUYvBf6i4uSep0
-	 mk9nqwgYkY5iAXZqVmvn1kyYULwa5VkCDeEzdoL8n1wgWNtZ5odbvP4U3Pzbhx6vU1A==
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
+	 In-Reply-To;
+	bh=ORn+lsJjXoHLPpvJz/SuX8WFL5k3oX7zpiKn62p+lV8=;
+	b=q0VElr7CoOstA51NnKJX2W+zuGFXON3rDRdbT06FlMxQX5JdgJiyJQAPJAeTiY6c7dVt
+	 KmV6BNT/h0hHh0/ymOHwK24xsF4lRjMpRkLwHVMfXmlOsHVxxEIlvrdmEklLUw3p2Wzcm
+	 P02IrvJB6tgrzE0PaJikd6EIqjYIPX7CpeeR75eU8ZU3oIYKI/kgjntLJhVNTupi1lRRr
+	 Vw7nTswPCWpKK9rrsUW8NDcclgvLrrjXpMS8TEvj2wmNUBW6fCwIJEl7y48KR2jj00Twx
+	 jNWlEVGY6lNv+3Nd+JaXg1MOZAUY+3XDVaUWfA+ppEp6QlZVQ5hjYSvA3MKo4H+aVhw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F8oj7753;
-	arc=none smtp.remote-ip=209.85.218.50
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	dmarc=none header.from=philpotter.co.uk;
+	spf=pass smtp.mailfrom=philpotter.co.uk;
+	dkim=pass header.d=philpotter-co-uk.20260707.gappssmtp.com header.i=@philpotter-co-uk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=Xf2JeQau;
+	arc=none smtp.remote-ip=209.85.221.42
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D1C606C59F
-	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 19:31:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C3D1C606C59F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B22606A329
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 22:54:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E7B22606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=philpotter.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F8oj7753
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c434376dbebso222559166b.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 11:31:19 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=philpotter-co-uk.20260707.gappssmtp.com header.i=@philpotter-co-uk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=Xf2JeQau
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-48b060ec084so802275f8f.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 14:54:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793820678; x=1794425478; darn=vger.kernel.org;
-        h=subject:cc:to:from:message-id:date:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=87Z8zwJarjKAZcG7q37D5+mnW6z05/4D2Aky4jDPXkY=;
-        b=F8oj7753/Vser52ngZRVswZ1IJBhvPgzWQF1Y6lD12L/hF2sJWymrX+Em2/w5nn7ZT
-         SYwhVU+kzbn/M6RsKafESjbH/ZX9slPJ0rpYSwM3t/HdaySIrgOSYPesjCqUUHGR6Gyl
-         BZrWyWaTXK87SM5DGs+eKZzXiMmDYOzU42+EFj1Ew+Wo56661buP7hw0X+FbPkJRTSPD
-         SpzR4GHIz1hEfGGpAi9QeisDgZCoFHibeyo4j5U7lZcmAMY4n91BRPM6S5sXZQQXtqLf
-         7r+wgBQxx1+7yQYBsC6gQNVia8vhXhgR+2megAW3lWNjJgGbAN6QgyW3R37aLeLVVOs4
-         OdIA==
+        d=philpotter-co-uk.20260707.gappssmtp.com; s=20260707; t=1793832863; x=1794437663; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ORn+lsJjXoHLPpvJz/SuX8WFL5k3oX7zpiKn62p+lV8=;
+        b=Xf2JeQauMqnsTgK8FoGw0SFXw3g8HbgpDcw0zP/bb7QPesVQRX7pzBr+pHAkHFVnTa
+         CkxWEcG5FkWKU0IHwR5SfoKHMg1ciYKdxJ+O9/FbpDxZVuZzGebt+HrRe7JD9ObL1Pnu
+         8tysy+NIIJI6oa2ryTg5v38dh6ferArLcmqcST9Tk0NZhxgYWwW3fLiR4YQ+PIQnRqGk
+         4bgjlYoHwWdg2GKjJF+PUPhiTSR6EWnPSM0/2vlRANNcNSzUW3NeHLM9qrIFxv5EJRPk
+         YpZSG6yLGPIX8YEHjTWr/YxPrFiqhodrNq34+vnKdLsHg3zdsR/thYUaN31pS0gm9gAj
+         aAsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793820678; x=1794425478;
-        h=subject:cc:to:from:message-id:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=87Z8zwJarjKAZcG7q37D5+mnW6z05/4D2Aky4jDPXkY=;
-        b=nMRG+iD37Cs+06oqXq8Fex0VhSQkdyLtT81hbMUpUMwVC8wdeb79vodLlTqWNEMJIX
-         ySykYdnryYbHD7d39RA3nRSc2NpEwSE7A07w+ZUkL4J9D3pjRd5uNKa2VpkOHiNiACNq
-         uH9LntWVdrCRSXkmXfroA+j/R1prr7pivmy5X6iDNU4LO9VpORHyNa7PHF8Ah1K1BEps
-         hW/k5/b3hYxBaEiefE+92W4WP6SfCH5OweW+DjlF5eJ+LUmt4GhYyPfV013M2QZ+PIbC
-         /cIw8CpHezXtUP2ATuC1TGljOxlPPpJoEYAoKSOBLELfcdBgqLHex3OC2ZrXSSAGPxvY
-         h5sQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzYkzzPfjBbzfG69jBOAzGRlf+AFG3RGVikOzqBaW+XLS0mWEgd5sbttivhlQqCf0Y5L5OBxMzRpJdwvg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/bVqHitPWQEZ+baPloHHBNW07QEWKX6fEA/ltWrq+1pyPESRiC
-	I5bKp/+nDyjSfjbyUiTGx3lkBVb52u4ignPDXLicDGwIo1aqbg4+wvGV
-X-Gm-Gg: AYBFou0IG8X71wztSCwkyMLb/XDNv9vh/UZK3dsJncjY1mRo/KN9OJo03AEF5xD+0y6
-	t/5EOpUptIPu/7m/ZTL3yFhOE7iYeyDYP2JiRPOgmCBhatF4vbeaABdJfhgQU7ZjK8Njr/Vromw
-	mzrNd0PTPrix7M6qxus53V1AXWE2O5hbDAf195/sU8kqsNerIfamAL6X76buGowoyGBZXX9/l8k
-	zbNpT2Er0mVqyV/inIzdxk6EmyGwYZPtqs1MKMVPnFQ5uVsc8f69NO4ixF3iFp0yLUPuO2ehdfY
-	gWEJlIJSTZalju9j4PFvypnRXwXIv3FgP5hOM62lXaYGXU6qWVA+lUjAK8mYWJ811BdFIMJaCLJ
-	SFcQomQSwHuhw5MR8I3pqIrMLdQIi2W6IXVftJ4KkGs6XAnoARMQIAEgES8lwgccGHBQs/FNMBP
-	e2woDu68VDjB73zXa/uAcfriH3rVwc1AX11Wa4mu7WPINuC2vwDkiqf+Xb7mP7U1jn1YU/PB1lI
-	m7BukIhG0MwaHy0Lj8uEWZgKvLpY6OCGB9c4nsNYH8YJU0tDBUt2rI9U6QbMdsTeJIxSZ+ReMM0
-	QuGUQJD9fyeDLc4+cgxm2YlW8HkEQ2bUrXFmrsR4tXcg4rZ0Wf1eTFh1+ugA6fJYBsNeY5L0+MN
-	BLgaZ0bHlns2FMi9g7BxIEGgNvOlCsmgtEzUNCA==
-X-Received: by 2002:a17:906:dc8c:b0:c46:7fa4:9212 with SMTP id a640c23a62f3a-c4d2070243fmr44806466b.23.1793820678031;
-        Wed, 04 Nov 2026 11:31:18 -0800 (PST)
-Received: from localhost ([85.9.211.111])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4d0e48d0dcsm100093566b.70.2026.11.04.11.31.16
+        d=1e100.net; s=20260707; t=1793832863; x=1794437663;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ORn+lsJjXoHLPpvJz/SuX8WFL5k3oX7zpiKn62p+lV8=;
+        b=wI+bBeIgQ8SvQRYbASBQy9adoo6j5j4HMbVIgRmP7x4zXfm2SiLfcNOeo3zYJYmDLV
+         Hhy9i0ZW9M4llujDcOA2r1OFZX9Wp4yz/b1LOKCATYReisW8QwqMjVEudc9CHLkCSkZv
+         o402hi5piuR0bc5xb/F3iw5BG2SwEGihCouu4Ley54+0Wubpm4vmz8RG2GbWIgu2xQ5j
+         HGpwtSQvCr9rDFDpDudSp8kJDLwSL2KktsRaB3Q6sPMZgKwb7aqkvKJw/g93MJDWEDDg
+         xATPmL/eiDEW4skY3EWcNY9tpH7oHCa5G538Ih99hxSW/juqGtSPVfjhXkL6eaAXBjz1
+         yZuA==
+X-Forwarded-Encrypted: i=1; AKwUvBxfFOpmZfn5g+YAG83K9ft8d9AbqE1Jd+Cuad09lIYGmJpzXAplSUj24cfs6Ma63lb3h9flNh+gz0TtYg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8sdMXBvsaDQihoZWHfIaCbDhKU29I5CkzTH3FqQLhZoeHwWYOO
+	4AaAIgnbwFRTOhusUmWS2XkBYN/XKSoo+5R61ceh0gCfGnoCi7Cdv+3kXBc/b3+YSMU=
+X-Gm-Gg: AYBFou1OEyZ1HzxZOXPafDH+hzjV416daP4ij1s6JAH+gT+glDKiMeRtFP8cLJgV7tV
+	rM5XSXrgIvx1xE0V6Zz3zK21ad9kDvvsHnAeqCIEGpf10Z4/W8tJrvpJn7JVw5CJrbMpmZ42bCH
+	WCAC0hGIEt3x6ysSsQeyzpQavfdMKWvnU72MkCo9i2TQsY8VtRuULxayU1bEhVYLAZJzTO09qy7
+	/wEaYvFSIx/4wffDTX9SrqO9pHlR4spw18tM8tabqjSW1OQNiVpjof47RYdYVILjlsnAq90i9JE
+	KdKZKKtHTZtq13oEdlyGvC7s3q5zF2EzH9wup1Ry3DnsYQWzTpt0MGN8oYQ6Zfr4acQFGtVDUkT
+	C/FPTGXXXGDmBMR++KjenaKsi2vmL5pjrZhinaXl0NfmExQzn0fKPDxQI1nhandsGI8ZRhrTswh
+	xIDfUoIFsz9ApOuTgXMTNT52UGuG0VSpcKa0MAQ7J5538H4cueQRudW+tdWN0CPs15EiZ9Ldalt
+	/Lw/SEhAqOT8QPmgWu1dkGGLoX8e41Lvk1fGkVaulKfOLMjLq9tzgSHbIucKUm0Z3iDOtFmTg==
+X-Received: by 2002:a05:6000:4804:b0:48e:390:80cf with SMTP id ffacd0b85a97d-48e6e2fe070mr39241809f8f.32.1793832863228;
+        Wed, 04 Nov 2026 14:54:23 -0800 (PST)
+Received: from equinox ([2001:8b0:df16::2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48fecac1caesm5848494f8f.17.2026.11.04.14.54.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2026 11:31:17 -0800 (PST)
-Date: Thu, 05 Nov 2026 00:31:14 +0500
-Message-ID: <99d859b83b39f4941dd214d30ea796c0@gmail.com>
-From: Mark Korenberg <socketpair@gmail.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>, linux-block@vger.kernel.org
-Subject: [RFC] ublk: removing the disk of a dead server hangs on a stuck filesystem
+        Wed, 04 Nov 2026 14:54:22 -0800 (PST)
+Date: Wed, 4 Nov 2026 22:54:21 +0000
+From: Phillip Potter <phil@philpotter.co.uk>
+To: Manuel Ebner <manuelebner@mailbox.org>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/1] cdrom: fix brackets
+Message-ID: <auu3nehR6aepSHLU@equinox>
+References: <20260902183723.1584-1-phil@philpotter.co.uk>
+ <20260902183723.1584-2-phil@philpotter.co.uk>
+ <d57ee45e25cd429372298b1481a58c232d052569.camel@mailbox.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -90,85 +96,53 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d57ee45e25cd429372298b1481a58c232d052569.camel@mailbox.org>
 
-Hi Ming,
+On Tue, Nov 03, 2026 at 02:40:56PM +0100, Manuel Ebner wrote:
+> On Wed, 2026-09-02 at 19:37 +0100, Phillip Potter wrote:
+> > From: Manuel Ebner <manuelebner@mailbox.org>
+> > 
+> > Fix missing ')' and add '()' to function.
+> > 
+> > Fixes: e327cfcb2542 ("docs: cdrom-standard.tex: convert from LaTeX to ReST")
+> > Signed-off-by: Manuel Ebner <manuelebner@mailbox.org>
+> > Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+> > Tested-by: Randy Dunlap <rdunlap@infradead.org>
+> > Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
+> 
+> Can I do something to get this applied?
+> 
+> Thanks
+>  Manuel
+> 
+> > ---
+> >  Documentation/cdrom/cdrom-standard.rst | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/Documentation/cdrom/cdrom-standard.rst b/Documentation/cdrom/cdrom-standard.rst
+> > index b97a4e9b9bd3..b6dde1d1eaaa 100644
+> > --- a/Documentation/cdrom/cdrom-standard.rst
+> > +++ b/Documentation/cdrom/cdrom-standard.rst
+> > @@ -1014,7 +1014,7 @@ How to update your driver
+> >    just calls to the routines you adapted in the previous step.
+> >  - You may remove all remaining memory checking code in the
+> >    *audio_ioctl()* function that deals with audio commands (these are
+> > -  listed in the second part of cdrom_ioctl_. There is no
+> > +  listed in the second part of cdrom_ioctl()). There is no
+> >    need for memory allocation either, so most *case*s in the *switch*
+> >    statement look similar to::
+> >
 
-When a ublk server dies and the device is not recoverable,
-ublk_ch_release_work_fn() stops it with del_gendisk() under ub->mutex.
-The disk isn't marked dead, so del_gendisk() reports a normal removal
-and fs_bdev_mark_dead() syncs the filesystem on it. All I/O to the disk
-fails by then, but if the filesystem is stuck for another reason, the
-sync never returns, and STOP_DEV and DEL_DEV of the device sleep on
-ub->mutex uninterruptibly until reboot.
+Hi Manuel,
 
-I hit it with btrfs on a ublk zoned device whose writeback deadlocked
-on its own (a btrfs bug, handled separately); killing the server was
-the last resort. It reproduces without btrfs: XFS on a ublk loop
-device, its external log on dm-linear over null_blk;
-"dmsetup suspend --nolockfs --noflush" the log, write a file and syncfs,
-kill -9 the server. The release work then sits in
+Perhaps this has just dropped off the radar for Jens for whatever
+reason, or was filtered or such like when I originally forwarded it on.
 
-  xlog_wait_on_iclog <- xfs_fs_sync_fs <- sync_filesystem
-  <- fs_bdev_mark_dead <- bdev_mark_dead <- blk_report_disk_dead
-  <- __del_gendisk <- del_gendisk <- ublk_stop_dev_unlocked
-  <- ublk_ch_release_work_fn
+Jens, please can this be merged? Many thanks.
 
-and DEL_DEV in ublk_stop_dev(). Same with ext4 and an external journal.
-The series "ublk: don't let one stuck device block control of all ublk
-devices" keeps this from blocking ADD_DEV/DEL_DEV of the other devices,
-but the device itself stays stuck.
-
-Since the server is gone, the removal should be a surprise one. What I
-found trying to fix it:
-
-1. blk_mark_disk_dead() before del_gendisk() under ub->mutex isn't
-   enough: fs_bdev_mark_dead() then calls ->shutdown(), which blocks the
-   same way (xlog_force_shutdown() waits for the log I/O,
-   jbd2_journal_abort() writes the journal superblock), and
-   del_gendisk() itself can wait in bdi_unregister() -> wb_shutdown()
-   for a flusher stuck in the filesystem. So it has to run without
-   ub->mutex.
-
-2. Dropping ub->mutex around the removal opens windows that the
-   current code doesn't expect:
-   - a STOP_DEV/DEL_DEV waiting on ub->mutex runs a normal, syncing
-     del_gendisk() before GD_DEAD is set;
-   - a STOP_DEV/DEL_DEV issued right after the server exited, before
-     the release work runs, does the syncing removal itself;
-   - with UBLK_F_USER_RECOVERY, the release work can set QUIESCED or
-     FAIL_IO on a disk that is being removed, and recovery can bring
-     it back;
-   - once the release work has cleared UB_STATE_OPEN, a new server can
-     open /dev/ublkcN and FETCH, which resets the queues' canceling,
-     fail_io and force_abort while the old disk still drains;
-   - UPDATE_SIZE and REG_BUF/UNREG_BUF can touch the disk meanwhile.
-
-A version that sets UBLK_S_DEV_DEAD under ub->mutex, then does
-blk_mark_disk_dead() + del_gendisk() without it and detaches the disk
-after, fixes the hang in my tests, but has the recovery and new-server
-problems above, and whoever gets there first (the release work, or a
-STOP_DEV/DEL_DEV from userspace) can still block unkillably in the
-filesystem.
-
-Which direction would you prefer?
-
-(a) An explicit "removing" state, set under ub->mutex, that the release
-    work, FETCH, recovery, UPDATE_SIZE and the buffer registration
-    check; the removal itself runs from a work item without ub->mutex,
-    and STOP_DEV/DEL_DEV wait for it killably.
-
-(b) Leave the removal of a server-less device entirely to the release
-    work, run it there without ub->mutex, and make STOP_DEV/DEL_DEV of
-    such a device only wait for it, killably.
-
-(c) Something else, e.g. never syncing on the release path and
-    accepting that the release work may block, as long as it doesn't
-    hold ub->mutex.
-
-I can send the draft of the version above if it helps.
-
-This analysis was done with the help of an AI coding assistant
-(Claude); I reviewed and tested it.
-
-Thanks,
-Mark
+Regards,
+Phil
