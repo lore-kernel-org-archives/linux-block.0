@@ -1,82 +1,105 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.179
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793798798;
-	b=WddtrIDp1Sv07G1u/2zAtJz+lP6tzONXcJPClTllD2/STQqzl4TitNZnLJAmu1QMsfU+
-	 +Oz0rFsJLvJxlNHdpx5DoJ/O0STpqr/7CrRZX8UUi1IqYEoBOilqyCAPxSzm6GLVX2Xep
-	 pr5WMUTFoqAvNqYCNvxNen6UPzd8GRZr9HqiTSYOFvkG3uZiplDNAEDxsliHgY2ehalL5
-	 Cb0kzoesMQtQYT/Gubzf2KOlGj4dz5wEQBybxlkVnyAom9P2pcGRf9menvSwvZsdpXJjp
-	 xKm7l2FfZAECp97r4cK5jlE4aJNUVPq0ljwHSOQPdwzYtnajxhd0USqXnIrG8jqU7kQ==
+	t=1793801300;
+	b=BQCGUpSDIZdTCeqbLA9CvRmBbfjrX/5WrKkEohIEUe2SFvTz6f7ioqcTo4672x6Btpd3
+	 9Cej1bYc/kcP3RXJGxRUiIRdH/aGFw+xRN1pBAk2jwh/sSU3j1c8o0vhyenRLlC7gRRr+
+	 5S7pzEWqpYmEmQt+0pvINJqKsYt3Qw0b2PkhZzeymM4khZZthm3C3MPx3uXDKF1va8ptE
+	 e6u2cq6zLIhVwy2bIlhBBBtl0i/2b1IUSZJNOLUfucBL7PU3iKfdZPNBT4PZ8KebAZn0S
+	 b9FFKqpCqsNvOdImzgWRuZc0IeoXN+ZsvX7tbThZgoImboFzOSB3zjCfPPRrb3fCbFg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793798798;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-TM-AS-GCONF:
-	 X-Proofpoint-Reinject:X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Spam-Info:
-	 X-Authority-Analysis:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=yjmwql2Q0/WWj7I5rUoCbaZQ81/0rY7QHc3z6oUDgjE=;
-	b=cEPetTQvzuan5vv/yVjm5W8yARj79YeGLOx3aPJZkScARqvR+qqglUDxC5ne8AJmsjPt
-	 Yt4f5gCzCL1QjpYJLNYmDb+8nbbuDnSuiMv4er1FllJmCej7EqBSpdMdThctvqjFd/mnW
-	 61TU1aYKygjNJpu3KXhWgr6j+iXpOpfv6K6gqhyO72oIyZQVirG07woUrJccVSSSqMSvP
-	 rzOE5prXQR0YnNEL0g1Bp5l1vxzGJmBnGOsx9jw38AtKC6ZeCOEh0rFR5WI3XTtwBCL0f
-	 hkBJ4Ox/HefSrknKGgjuMFdvYzutIHYwwyES99bEcusQvRzudnSANQNQlbfH2p37Lyw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793801300;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=ACKUMZkzA/F8ICajPkGBPHU4lMF7NqYKjdefPpK+Nmg=;
+	b=XSgPUO5ewviaXLevbs5AawtmYiSW6BX9pjv6u0Zg8N/nR8JhYDLUAme/9xk3kN+Y1kdM
+	 Cj4eHKpiXoCjk9XAOeU1sEJDmg/HqAz/epmd/IzMnsaQbp+Bhumyuj34XU/14FkI630nI
+	 xkbOMZnkYQub0XguXMnDWvyBeCgj9JQTraecTbFQrZ9dp35vMC5dkNMg3z2nbcuiyyLeM
+	 LCpAzAGieg/Vze66l8svLB+xSg91DIFnNmpyInMX0QtfeJmoqTvEQiJ3cOElibZeV89WZ
+	 nCIrEWvZ2/S3R3io3F1Xb11cPATjsCXtv+Tq4XObAj7iAKYNldnCJpTwnoYRNUYJsMA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.ibm.com;
-	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=JHY6z7vu;
-	arc=none smtp.remote-ip=148.163.156.1
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=crusoe.ai;
+	spf=pass smtp.mailfrom=crusoe.ai;
+	dkim=pass header.d=crusoe.ai header.i=@crusoe.ai header.a=rsa-sha256 header.s=google header.b=adAI+41u;
+	arc=none smtp.remote-ip=74.125.82.179
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902C3606A33A;
-	Wed,  4 Nov 2026 13:26:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 902C3606A33A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB76606A32C
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 14:08:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9BB76606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=crusoe.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crusoe.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=JHY6z7vu
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A4BiAgQ3026253;
-	Wed, 4 Nov 2026 13:26:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=yjmwql
-	2Q0/WWj7I5rUoCbaZQ81/0rY7QHc3z6oUDgjE=; b=JHY6z7vuCDPfVgknKa7b8y
-	Bx9eZ7LN23WYxB/7Hd+1hi+4+s1R61V2JYJE8WCqJ1pmN7+SZ/fRvWFUrt0sXzNb
-	BR4bVKUXTeFUCrD8JrHS1tnwAWSASYdECHSSR2EhLIVod4+Dh1WKHo5EiRBVG7Rj
-	edEE7CTcsIIo13GgtrAJ0yahYTQgE3yAwCD/jQODWHn6aJZE4ub4tOf0GOCiqNRw
-	slQ3zbcextdUzlyyjoTKlN/CjDvcRjJVP27xfikiA+Fww0l12E+LSyMh9xMETuff
-	sZTHcmtss8XB/xmeh6LrN259nSJ4KQils7ioMlBs15o1VcWE3YAUBtUccW0pF6nw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hn80sv0m8-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 04 Nov 2026 13:26:14 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A4Baj9w3997539;
-	Wed, 4 Nov 2026 13:26:13 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4hqcrce8v1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Nov 2026 13:26:13 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A4DQD0Q14942870
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 4 Nov 2026 13:26:13 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E42C558061;
-	Wed,  4 Nov 2026 13:26:12 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 12C1158057;
-	Wed,  4 Nov 2026 13:26:09 +0000 (GMT)
-Received: from [9.123.7.57] (unknown [9.123.7.57])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  4 Nov 2026 13:26:08 +0000 (GMT)
-Message-ID: <c172b7a8-bea1-4004-83be-af6dfe921df0@linux.ibm.com>
-Date: Wed, 4 Nov 2026 18:56:07 +0530
+	dkim=pass (2048-bit key, unprotected) header.d=crusoe.ai header.i=@crusoe.ai header.a=rsa-sha256 header.s=google header.b=adAI+41u
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-35829219da8so2026896eec.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 06:08:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=crusoe.ai; s=google; t=1793801299; x=1794406099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ACKUMZkzA/F8ICajPkGBPHU4lMF7NqYKjdefPpK+Nmg=;
+        b=adAI+41uTs96C4CQMqUBQPobl1N3rjbuBdnlkto8gvqNm6b787yAz6tjaoaOdiFmaF
+         Im5eRsNa8C9DZ/bg8D++E3g/++mOr9ubkUWmB+ug5awidFhZ3mTxaySWBZtZVWC2gICs
+         4X0CaXvnM6WN70ZdzDLaN0f0oJR52ofRCj3ytVIofGlGnzqkpxbmFSUg4iQN8y+/AH3O
+         aL7QtMmyZDT9Mjag6s5b3jaJLTYWUJzJPdHwAxwij5Fm03XDuGcqKCkihzLYq9VBIujO
+         0zclJJPQAy5d6p9Ij9SAp5V6A6VkX45U7Lh2XPVkslMO0j1AtzpoJI7ez/TvkaBG2cH8
+         rAtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793801299; x=1794406099;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ACKUMZkzA/F8ICajPkGBPHU4lMF7NqYKjdefPpK+Nmg=;
+        b=gi2E6TmY54V3LgZF4drMSj5p30rqYgioUfnwPGmYzgpWXrOeXXSvLEKLnD4sahJRWx
+         NFNbEeuMuMpWC9J3CJYTnn/RHVvuJ/4eLYN7xK4sHQNdFx+q3kG/GiRA2OXJX/4J8m+1
+         zhAC4TfQ+UNa54BtTwlXnYSRJazUNWhKQ4Rtw4y2hLficmb97irojxIjpM3F9y+PWJG8
+         vImdyew2XscAqrJr9mqTmfPehn+vgh6Fcdm0eLXShyigRJcT0SSjcP4zFhj6m9n7mMih
+         Rv/6kHc7TxY4stDWB0OitI+NMAzdq0tVvqEVo7JSijN3lC/vQ8o4Y9liI1wxMC9/cU4a
+         bcQg==
+X-Gm-Message-State: APuU4Z+tWK51PsyXGXDRepVzXg6XcYlWW09j7eabj/Y+E5V8M8wEBoXy
+	FOD0hu0gLk8ywydi+3dufLs67cJBJLAxv+S5BHT6Ii34UVfPaYkd8/yqCy7KSH7y5eDj9OMJZIv
+	rtOmrRas=
+X-Gm-Gg: AYBFou2IWI6N+Ypak8/vMlX2Llkc9Zisr9HIZbGZBG8JK2Zy8/PXGcrYYU62F4T4Lrr
+	jij/bJoyRxvh75AWaFrOFhBnrr8jntBBgquC3yo8X2Of4nqeZu/fSu13bnWykVuwTD0RJh9J2kb
+	YanmKBShRkNNmwE0MqYXMUvPUIpMay0BPhpM13EgFmLktHp+CImZ7GK3OP4mb1AHlGu5jkqH+0q
+	6vzC0qY4j0d6uj2TfvpUQU89MWvCC5Z6cyjBCmzT6JkKpoqx1H64g+BFzYmhJ/xtEYXK9XNLkV6
+	mpgVb+WgZGwUqGjGNdfPhM8noJX/dB5VdIeVcAdABhH4o6XL/krurQA9ILKbLBRuAz8HE8nFDyK
+	AOwFP90ASev+dxhxzlHXjRzWAosrppdoOZpQs3AvxrMVUpEtHDvy/VI7/ybzHuGM+02Spdquw+c
+	1HrcjpqujzhK61psn8yaFbzShbYcay4xiMytQuhZQK7KaDw6yhd2WJQ+Xrb0AuyzRnrnSGbbJFS
+	mNFDAbxUt0o2I0aaHp3YYvtRT2ApwjBfYLNgP5tS6gf0u3eraXCjcx22Cg+NVInCcSZuInxnvuz
+	tB2kcC/PrTgYFuGzQEZK6bnUIveSz9p9I69n2CN9w3EiJBrEdW8pEUEmYRLdOETIz5eo4uA9uA=
+	=
+X-Received: by 2002:a05:7301:152d:b0:36a:79cd:12df with SMTP id 5a478bee46e88-36a79cd1c3bmr8481928eec.9.1793801298473;
+        Wed, 04 Nov 2026 06:08:18 -0800 (PST)
+Received: from MBP-Saravanan-D.civet-hops.ts.net ([71.202.170.54])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36ca3785430sm11812491eec.3.2026.11.04.06.08.17
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 04 Nov 2026 06:08:18 -0800 (PST)
+From: Saravanan D <saravanand@crusoe.ai>
+To: linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com,
+	linux-nvme@lists.infradead.org,
+	dwagner@suse.de,
+	hare@suse.de,
+	nilay@linux.ibm.com,
+	sagi@grimberg.me,
+	kbusch@kernel.org,
+	iyamahata@crusoe.ai,
+	kiyer@crusoe.ai,
+	ganbalagane@crusoe.ai,
+	sjpark@crusoe.ai,
+	bchen@crusoe.ai,
+	Saravanan D <saravanand@crusoe.ai>
+Subject: [PATCH blktests] nvme/077: test the per-queue io_cpu sysfs attribute
+Date: Wed,  4 Nov 2026 06:07:21 -0800
+Message-ID: <20261104140721.4489-1-saravanand@crusoe.ai>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <cover.1793800758.git.saravanand@crusoe.ai>
+References: <cover.1793800758.git.saravanand@crusoe.ai>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -86,78 +109,231 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: take quiesce_lock when removing a queue from the
- tag set
-To: Christoph Hellwig <hch@lst.de>, mt4022@columbia.edu
-Cc: Jens Axboe <axboe@kernel.dk>,
-        Mohamed Khalfella <mkhalfella@purestorage.com>,
-        Keith Busch <kbusch@kernel.org>, Ming Lei <tom.leiming@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, tz2294@columbia.edu,
-        stable@vger.kernel.org
-References: <20261103-blk-mq-del-quiesce-lock-v1-1-04aa29a481f6@columbia.edu>
- <20261104071926.GA29136@lst.de>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20261104071926.GA29136@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: OL6bJ6XdGfIfN-IE_2nKDKeceYmhD930
-X-Proofpoint-ORIG-GUID: kjX0ct8-6NHIu3_iWyRCWMcwoDsr-7ZW
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA0MDA1MiBTYWx0ZWRfXwKFBVFCEePT5
- rNCc8CexrDkmhuZK7SJRXcM5SUHKI8IS/QLv/GNZWkGrkpgK6GjzwFLeSu+eGaOiMAz0RDQOAXz
- lydGC02v0dE+dpONYcrH51O8K/N7zMYszUcWGfnUa3wFJKv7jRt2FpgyTJvnblXrj3mDj6sQHmB
- 4IMG02DYwsP5v8gXlEf5UpOM4oGqYT5EpAw7PH9qMDN1oZRkSytUlojNbWzQUnftz697NyiTcQN
- e+Mev6zQ1u87scFqLGKfkNz5NZuJNn9PSEgVlDZc6HGW/tsRypf0H2vgXcxkrciqteRAr+4/DGw
- M/nSyuTyeqSdMFmDPh2i19ZEboF5vDIOdFb2pAwsf17iTgEg0uszuqyO3N1pzuWUCGDXXe+rTaO
- 6ckxnRMjo2YWwKGLC88Q9WyyrqvLuT8S5xCzemyFqbyF50bcpmb9kDilTp53vh9c0lqqIDLVJqn
- GH5uLipbFU/Jhi++T/A==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA0MDA1MiBTYWx0ZWRfX/ccD5SVabaSY
- kTLhYnJYNUHqla6dpbi/r8suZKJaxfLjJ1MjA1bUijRJQD7fsPWs/A/81jG8CzSFEx0hgIQwgZq
- 3awMjGIASlt6K01/6QjjkqNTOrMspfI=
-X-Authority-Analysis: v=2.4 cv=FIqOVOos c=1 sm=1 tr=0 ts=6aeb3276 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=DfyN0UfllRvmPPNdMxQA:9
- a=QEXdDO2ut3YA:10 a=zgiPjhLxNE0A:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-04_04,2026-11-03_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 malwarescore=0 impostorscore=0 spamscore=0 lowpriorityscore=0
- bulkscore=0 suspectscore=0 clxscore=1015 priorityscore=1501 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611040052
+Content-Transfer-Encoding: 8bit
 
-On 11/4/26 12:49 PM, Christoph Hellwig wrote:
-> Looks good, but the note from Mohamed should be taken into account.
-> 
-> Or even better add a guarded_by so that clang catches this (requires
-> actualy compile testing with clang, though).
-> 
-Yeah agreed! I also recommend adding __guarded_by() annotation around
-set->tag_list and set->quiesce_depth.
+nvme-tcp exposes /sys/class/nvme/nvmeX/queues/<qid>/io_cpu and managed,
+so a control plane can choose the CPU that runs each I/O queue's socket
+work [1]. Test that
 
-With this change, I have sorted following locking pattern:
+  - io_cpu reads back a written CPU and rejects invalid values
+  - managed is read only and turns 0 once io_cpu is written
+  - an assignment survives a controller reset
+  - the queue directories follow the queue count as attr_qid_max
+    shrinks and grows it
+  - removing the controller while io_cpu is written completes
 
-1. Every set->tag_list mutation holds both set->tag_list_lock and set->quiesce_lock.
-2. Every set->tag_list traversal holds at least one of set->tag_list_lock or set->quiesce_lock.
-3. The set->tag_list_lock and set->quiesce_lock order is preserved.
+The test skips when the kernel does not have the attribute.
 
-So the above scheme fits really well in the context annotations.
+[1] https://lore.kernel.org/linux-nvme/cover.1793800758.git.saravanand@crusoe.ai/
 
-We can define context annotation as follows:
+Assisted-by: Claude:claude-opus-5-5 [Claude Code]
+Signed-off-by: Saravanan D <saravanand@crusoe.ai>
+---
+ tests/nvme/077     | 185 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/077.out |   2 +
+ 2 files changed, 187 insertions(+)
+ create mode 100755 tests/nvme/077
+ create mode 100644 tests/nvme/077.out
 
-struct blk_mq_tag_set {
-     ...
-     struct list_head    tag_list __guarded_by(&tag_list_lock, &quiesce_lock);
-     unsigned int        quiesce_depth __guarded_by(&quiesce_lock);
-     ...
-}
+diff --git a/tests/nvme/077 b/tests/nvme/077
+new file mode 100755
+index 0000000..0b4bce5
+--- /dev/null
++++ b/tests/nvme/077
+@@ -0,0 +1,185 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Saravanan D <saravanand@crusoe.ai>
++#
++# Test the per-queue io_cpu sysfs attribute of nvme-tcp
++
++. tests/nvme/rc
++
++DESCRIPTION="test the per-queue io_cpu sysfs attribute"
++
++requires() {
++	_nvme_requires
++	_have_loop
++	_require_nvme_trtype tcp
++	_require_min_cpus 2
++}
++
++set_conditions() {
++	_set_nvme_trtype "$@"
++}
++
++# last CPU in the online list, and the first CPU id past the possible ones
++last_online_cpu() {
++	awk -F'[-,]' '{ print $NF }' /sys/devices/system/cpu/online
++}
++
++first_impossible_cpu() {
++	echo $(( $(awk -F'[-,]' '{ print $NF }' /sys/devices/system/cpu/possible) + 1 ))
++}
++
++nr_queue_dirs() {
++	local nvmedev="$1"
++
++	find "/sys/class/nvme/${nvmedev}/queues" -mindepth 1 -maxdepth 1 \
++		-type d 2>/dev/null | wc -l
++}
++
++expect_attr() {
++	local file="$1"
++	local expected="$2"
++	local value
++
++	value=$(cat "${file}")
++	if [[ "${value}" != "${expected}" ]]; then
++		echo "${file}: read ${value}, expected ${expected}"
++		return 1
++	fi
++	return 0
++}
++
++test_read_write() {
++	local qdir="$1"
++	local cpu="$2"
++	local bad
++
++	expect_attr "${qdir}/1/managed" 1
++
++	echo "${cpu}" > "${qdir}/1/io_cpu"
++	expect_attr "${qdir}/1/io_cpu" "${cpu}"
++	expect_attr "${qdir}/1/managed" 0
++
++	for bad in "$(first_impossible_cpu)" -2 abc 0x1; do
++		if { echo "${bad}" > "${qdir}/1/io_cpu"; } 2>/dev/null; then
++			echo "io_cpu accepted ${bad}"
++		fi
++	done
++	expect_attr "${qdir}/1/io_cpu" "${cpu}"
++
++	if { echo 1 > "${qdir}/1/managed"; } 2>/dev/null; then
++		echo "managed is writable"
++	fi
++
++	echo unbound > "${qdir}/2/io_cpu"
++	expect_attr "${qdir}/2/io_cpu" -1
++	echo -1 > "${qdir}/2/io_cpu"
++	expect_attr "${qdir}/2/io_cpu" -1
++	expect_attr "${qdir}/2/managed" 0
++}
++
++test_reset() {
++	local nvmedev="$1"
++	local qdir="$2"
++	local cpu="$3"
++
++	echo 1 > "/sys/class/nvme/${nvmedev}/reset_controller"
++	_nvmf_wait_for_state "${def_subsysnqn}" "live" || return 1
++
++	expect_attr "${qdir}/1/io_cpu" "${cpu}"
++	expect_attr "${qdir}/1/managed" 0
++	expect_attr "${qdir}/2/io_cpu" -1
++	expect_attr "${qdir}/2/managed" 0
++}
++
++set_qid_max() {
++	local nvmedev="$1"
++	local qid_max="$2"
++	local queue_count_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/queue_count"
++	local retries=10
++
++	echo "${qid_max}" > \
++		"${NVMET_CFS}/subsystems/${def_subsysnqn}/attr_qid_max"
++	while [[ "$(cat "${queue_count_file}")" -ne $((qid_max + 1)) ]]; do
++		if (( retries-- == 0 )); then
++			echo "queue count did not change to $((qid_max + 1))"
++			return 1
++		fi
++		sleep 1
++	done
++	_nvmf_wait_for_state "${def_subsysnqn}" "live" || return 1
++
++	if [[ "$(nr_queue_dirs "${nvmedev}")" -ne "${qid_max}" ]]; then
++		echo "$(nr_queue_dirs "${nvmedev}") queue directories," \
++			"expected ${qid_max}"
++		return 1
++	fi
++	return 0
++}
++
++io_cpu_writer() {
++	local qdir="$1"
++	local cpu="$2"
++	local file
++
++	while true; do
++		for file in "${qdir}"/*/io_cpu; do
++			{ echo "${cpu}" > "${file}"; } 2>/dev/null
++			{ echo unbound > "${file}"; } 2>/dev/null
++		done
++	done
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	_setup_nvmet
++
++	local cfs_path="${NVMET_CFS}/subsystems/${def_subsysnqn}"
++	local skipped=false
++	local nvmedev qdir cpu writer
++
++	_nvmet_target_setup --blkdev file
++
++	_nvme_connect_subsys --keep-alive-tmo 1 --reconnect-delay 2
++	_nvmf_wait_for_state "${def_subsysnqn}" "live"
++	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
++	qdir="/sys/class/nvme/${nvmedev}/queues"
++	cpu=$(last_online_cpu)
++
++	if [[ ! -f "${qdir}/1/io_cpu" ]]; then
++		SKIP_REASONS+=("missing per-queue io_cpu attribute")
++		skipped=true
++	elif [[ "$(nr_queue_dirs "${nvmedev}")" -lt 2 ]]; then
++		SKIP_REASONS+=("controller has fewer than 2 I/O queues")
++		skipped=true
++	else
++		test_read_write "${qdir}" "${cpu}"
++		test_reset "${nvmedev}" "${qdir}" "${cpu}"
++
++		if [[ -f "${cfs_path}/attr_qid_max" ]]; then
++			set_qid_max "${nvmedev}" 1
++			expect_attr "${qdir}/1/io_cpu" "${cpu}"
++			set_qid_max "${nvmedev}" 2
++		fi
++
++		# remove the controller while its queue directories are written
++		io_cpu_writer "${qdir}" "${cpu}" &
++		writer=$!
++		sleep 1
++	fi
++
++	_nvme_disconnect_subsys
++
++	if [[ -n "${writer}" ]]; then
++		kill "${writer}"
++		wait "${writer}" 2>/dev/null
++	fi
++
++	_nvmet_target_cleanup
++
++	if [[ "${skipped}" = true ]] ; then
++		return 1
++	fi
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/077.out b/tests/nvme/077.out
+new file mode 100644
+index 0000000..c7f6ac3
+--- /dev/null
++++ b/tests/nvme/077.out
+@@ -0,0 +1,2 @@
++Running nvme/077
++Test complete
+-- 
+2.56.0
 
-Thanks,
---Nilay
