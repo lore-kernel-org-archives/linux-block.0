@@ -1,61 +1,104 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793776305;
-	b=yETnhNpfzg7aX0bR306Xj8Zdg966Wvr6lawCFcrk2eG8OT+BrE1Hwdj3yFVAOFRG49Yd
-	 VMsfO2WS9TSnO5hJBN1DfoM80+ad+4tzINFF580BOH6/fbfZB9TWTQ+avu8RrWJREmL3U
-	 SUwOKl7Ue5OuNKXRmNOnTBe1HOIlu05oqo7iWvZAsLVbji0DRdXfif8rjT/nezZorUGnM
-	 bLPX81iQGRZrl0JDEWGAzNiWQ+s7O/5r7bMfu/alAE8L8aTVS9GTMCy7tErswacrUh/sz
-	 xiJrww824AjnuKDZX6taxC8COrAy9MO/9w0J//TVtu3Vn/IYbtR+AgYdcr/gOSRumDQ==
+	t=1793776565;
+	b=ExFayDKi7fAs1AwpHZQvLwrBFiK0Ano07yzzzbO+CGh4FhfIy9BFNuiYy1ipUjLzReB/
+	 TG+dTw5TQKPVvmJlsSj8G8ALgRxIfW3BHVPzyWUS67gYE18Ct8wwkgYnAK8+NYM0UkhHE
+	 03Swjy0THYULjARZ+P1FiAckZbqRlX9UOtbra4kAkxXWyvDzAkBCrB7Kc3SOW7aWhNNt3
+	 IYL3KBDYbLjwQUJOz67dQj7EA3QElTgi01qRrDwo+dw0y6P0S3NloBSOttkyI/jC9KJN9
+	 e7yz2VErIaItB3z66r7XCWAR7F+v2FgfaQJ74xclbQZFp7SMIbubVhTzwiek8xigFLw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793776305;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:X-SRS-Rewrite;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	b=U6e1StiwuLXl1ElZ7KjtJ0ynOkK+aUdGjyiu7hHBZW+hSnR4OLPftM62ISsA70PEehMt
-	 9DIDmM0LBikdMOvrBjKEB0JX0lN4P0Svi5ZMU6uZE3GYXXa7xUApqBzaYPeHGFJQNC3nO
-	 5lx4XO/Rrdq9JXXSbd/WqLz/aV5qtaXz1qaNzrvYnqwrEd7qJGBhPRERD0FnA6gKy/CwB
-	 3h7o4gsNDKbYIS3qRYrot4WrkPEBndhP9jKymN+MHSMUW0EfryosDqns79Z7khgf+vBi5
-	 8ia3YiLO0RljFnvHTVoQduAbutkscqUzqfUYQg61DIfOCr9fIXmA6rOYP5+1tBXLV5Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793776565;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=yDA6l1mYLflGy0BGVuiZ1Kit3BaPSEgJ8GlY0lKqIiw=;
+	b=4rXb3EkrHtCWsOAUO2JJmJHQ1EdRagxPxPrQ7VsBBhFA6siYsQhCb014GzT66pFI0AYI
+	 F6qfEPzi8GdblTITmr0G+WVpWuDYO6CjbeDQ1TR2LEkJ4AOVuu1f+Of7VIeAhOyWf+W7w
+	 2b5xNQgo3ORSlfgfSYpyygLitdKoptu13+nZmJpoKfM7LORd6siJzbB3JA5+R/xVnX9gx
+	 k7qBGK2MB6CqJmBpevLW3U17xUeZg8JFAPV6+W++UtHBlr7+cWxcG6WxlGudzwDfgA8eQ
+	 NOj+FrzlzuJz/sCla77Ri117SAdVEkXEEbTlJ+V4Wfz4YBNd075S8XOu/Mxi2GymDPQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=1reA5Rc5;
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SCr6PGxa;
+	arc=none smtp.remote-ip=209.85.216.51
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA1F606A326;
-	Wed,  4 Nov 2026 07:11:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5FA1F606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93528606A32E
+	for <linux-block@vger.kernel.org>; Wed,  4 Nov 2026 07:16:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 93528606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=1reA5Rc5
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=1reA5Rc5kEU1THZUFLOfosbTv2
-	9VB5BAjHnxOh9M/LQDOLkXUWGTPzJhvAZ87WoRYhiFnXYk4Q5858Tn4W4GNdQXgRy6785XBLhVplF
-	HiZtcDU0eSa2R9+VgIzdTRyOO1mgBRderNwPNSZItsXzfHvKkBav9WTflRD+5c498Cn0Hyx+w0ddV
-	8DrEQB+8KDkj/1UhQabeQtGHHQo7eshzoHbhGYV2x+I+2OwREnOlxIpYcNucuYrUSpoEGiguLsT9I
-	ZtPmMtHb4bsm2zY0iv/5v8Hlk9I4oUMTMHoDT1PU7Ic2pUGyLiPFX4PMC1kHwiHPykLvBH1RjMrxP
-	oq7V6OBA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xOV9m-00000004TXi-2TiN;
-	Wed, 04 Nov 2026 07:11:38 +0000
-Date: Tue, 3 Nov 2026 23:11:38 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Hungyu Lin <dennylin0707@gmail.com>
-Cc: axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	mtsai@redhat.com, sashiko-bot@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3] block: fix discard alignment for non-power-of-two
- granularities
-Message-ID: <auraqpkUiHmTgoli@infradead.org>
-References: <20261103185909.71843-1-dennylin0707@gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SCr6PGxa
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3b0960fdde9so222471a91.0
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2026 23:16:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793776564; x=1794381364; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=yDA6l1mYLflGy0BGVuiZ1Kit3BaPSEgJ8GlY0lKqIiw=;
+        b=SCr6PGxaxxdOGwOMWjAV8/YoNtzj0aril/7uhLsJIkptH0AsWbQ8R5kr7lGx5gXa8k
+         DSqLDhfcP8wUF93EsV2wlgLNM83rgS0ONKb2TXRCgH3lMla0+4KyRe1r5S/nCZbKdyt3
+         7Vs1JzQ4YqCqjOzLJb4QtIPuYCq0l9i+0Pws7zzzmXLsDFuWp6o5+G2MCor0kbjlop8p
+         nKTMx1HKT2rQaEHjc2f7bYmMX5ey1kB+3Tr884aN8oNj48johc8Guygpip205l/TSdww
+         WH6d/lJETKxV6yjcama4pwLKreCnLU1NST2Mot/l3cwsIjmQhxmDvQzHnU4kExBLTbdn
+         BUTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793776564; x=1794381364;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=yDA6l1mYLflGy0BGVuiZ1Kit3BaPSEgJ8GlY0lKqIiw=;
+        b=HF+KrOa/0zRv+s1oqOoC7ah03VrXmfcAIH78ScTbCP88hZEqLpbwiI1FYh6NV9tBxD
+         XPs4pkhysJSJVpSzuoYqBylL/r6HBU2yBZfAGqpsRoFEbuIZa27ME4y0TCISyg2v1l6H
+         LeDgl+8+8kipNNZjNqgzb+qgyBGtEitBOWiN2npogNJjK05p7mmSLV5fuW7K3k+RXgxd
+         JGa9knjza6gJYhP/b6k+viNOHg0U3sWVs0ncKhhpLsSgzUH44MrJCCj7B2LK9cUS97nV
+         wOam/uCXIadlAoJWAlDeASkKhSpxjTPUIppKh9qWbM49NNp7MQQH4ZexWLYYWR9bgtpI
+         tmNw==
+X-Forwarded-Encrypted: i=1; AKwUvByO2Krbok2Oog7iKM4wX3OJ+whCxlaOzYOCe83SsZeuClJGQgIGz/CcuOv1vAD+ByXMxIBDNP8zQSPifA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9vTyHg90T9eKqrotYlx+rBdc81d4+Wvv6y8WSgPizaGCAQciNI
+	eCRURa3vmYBNJeECf/ytt07SA5NRedozzz6KX9C2tnAicWKgkiAfANIL
+X-Gm-Gg: AYBFou31pzoQ2fCXQq9zMlUNCW4HEG1i3MGHm80nShGD08u+P9gH1bWvQYAjRxGrRTc
+	M4JUejeQ6wXbnAieFXF8118hU86NCb9DG5AqEVhTgjgrxnbo5JPCOab4foGV3e8+nw45sV/HbUe
+	/fwKYwuOOUXIFlRo1iWR4OJky0b+pQUB6yqqHklexwCSdCtjW5KLcAHc3g62JvFDQy7OtlPYfaa
+	X9M6k9bj64nwBinsGPAdo3We4TvCiBnTg4Gv9s+0qZp04d+6JPfF/DMM/BLzHChjSmluZ4V/fuA
+	DTzBU1BkOa2D5/O1QctHerzKl+zV/oLdKt39Da38dsg84rMinqi0v8RJatuyvPOZNMW3+W8SBdw
+	qWkxOS5BuquWf3N4xP141k1SsPMBV21Atl0TfdluoMG2VV7hoYRuDZhEslWaWni8bZqXb+VKCmk
+	mYJo9v45LYd1kSKkIBSHhx5isISD8rcUaGAoAtH8DiIueDCBLWnBGVoZ5QGFgNNy4F/mlOhIRj7
+	TjC4NH4KDhZU6a9oCtRnn9yaFwA71SnGR2FlLzL38GpnOjw/xpIkUK/y/t1zbkaEg1FlXg2aGSi
+	SjkcLYtBUwYGSPctR1rwMJmPjsV1bIm/sHce9W+HJrd7hNBs9EProLV/QWgdHrTvnetr2bseRNq
+	BpKehdtwVHJn7UQKTAyqyCcDS3YBH3S3XgAmVQ/lExP9wPlrTIyNEfpFwCNG4KgEI+Fn11g==
+X-Received: by 2002:a17:90b:1f8f:b0:3a4:ba6b:cc24 with SMTP id 98e67ed59e1d1-3ae89820cc1mr11401444a91.58.1793776563726;
+        Tue, 03 Nov 2026 23:16:03 -0800 (PST)
+Received: from yupeng-XPS-15-9520.. (c-73-169-192-12.hsd1.wa.comcast.net. [73.169.192.12])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b093c499a5sm2947389a91.2.2026.11.03.23.16.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Nov 2026 23:16:03 -0800 (PST)
+From: Peng Yu <yupeng0921@gmail.com>
+To: Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Maurizio Lombardi <mlombard@arkamax.eu>,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Peng Yu <yupeng0921@gmail.com>
+Subject: [PATCH v12] nvmet: add cgroup_id to charge namespace I/O to a cgroup
+Date: Tue,  3 Nov 2026 23:16:00 -0800
+Message-ID: <20261104071600.470430-1-yupeng0921@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -65,12 +108,519 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261103185909.71843-1-dennylin0707@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Looks good:
+The nvmet issues namespace IOs from kernel threads. So the io.max and
+other cgroup controllers can't apply limits to the namespaces.
+Consider this scenario: LVM creates multiple logical volumes on the
+same physical disk, and the logical volumes are assigned to different
+nvmet subsystems/namespaces. We want to stop a remote noisy user from
+using all the disk iops via nvmet. So add a per namespace cgroup_id to
+associate the namespace with a cgroup. Each namespace can then be
+throttled separately.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+The per namespace cgroup is good enough for the io.max, but is not good
+enough for the io.cost and io.latency. The io.cost and io.latency may
+put a thread to sleep. If the thread is shared by different namespaces,
+all of them will be impacted together. Submit the IOs via a workqueue to
+avoid this impact.
+
+With cgroup_id set, every I/O command except Reservation commands runs
+from its own work item on a per namespace WQ_HIGHPRI workqueue. Zone
+management and the file backend's Flush, DSM and Write Zeroes run
+directly in that work item. Each work item runs under memalloc_noio and
+looks up the cgroup's effective io css. A command whose queue is being
+deleted is aborted. buffered_io is not supported.
+
+Performance test:
+On a 4 core VM and 4G ramdisk, export tcp-nvmeof targets to 127.0.0.1,
+run fio with below parameters:
+fio --bs=4k --rw=randwrite --iodepth=32 --numjobs=4 --ioengine=libaio --direct=1
+
+file backend result:
+|                            | IOPS   | Mean Latency | p99 latency |
+|without this patch          | 204.4k | 625.8 µs     | 668 µs      |
+|this patch, cgroup_id unset | 204.4k | 625.7 µs     | 668 µs      |
+|this patch, cgroup_id set   | 155.9k | 820.6 µs     | 1139 µs     |
+
+block device backend result:
+|                            | IOPS   | Mean Latency | p99 latency |
+|without this patch          | 216.0k | 592.2 µs     | 627 µs      |
+|this patch, cgroup_id unset | 216.0k | 592.1 µs     | 627 µs      |
+|this patch, cgroup_id set   | 160.0k | 799.6 µs     | 1090 µs     |
+
+With this patch and no cgroup_id set, the performance is almost the same.
+When we set the cgroup_id, with no io controller limit, we can see a
+performance decrease but it is still very fast.
+
+Signed-off-by: Peng Yu <yupeng0921@gmail.com>
+Assisted-by: Claude:claude-fable-5 [Claude Code]
+Assisted-by: Claude:claude-opus-5-5 [Claude Code]
+---
+Changes since v11 (Tejun's review of v11):
+* Applied most of the v11 feedback suggestions.
+* Rebased on nvme-7.4 ca7e6a9a6932.
+
+Tejun's v11 review points without a code change:
+
+> The name uses only the nsid, which is unique only within a subsystem, so
+> namespaces in different subsystems get identically named workqueues and
+> rescuer threads.
+
+No unique name is needed, because the workqueue is not in sysfs (no
+WQ_SYSFS). A subsystem NQN is also too long for a workqueue name (32
+bytes).
+
+> The file backend's Flush, DSM and Write Zeroes and zone management now
+> count against blkcg_wq's max_active for their whole duration
+> (vfs_fsync(), vfs_fallocate(), submit_bio_wait() over the zones). With
+> max_active at the number of CPUs, a few slow flushes can fill it and
+> hold up the namespace's reads and writes. Without cgroup_id these ran on
+> nvmet_wq and zbd_wq. Probably fine, but worth noting.
+
+Yes. They can only hold up commands of the same namespace, which are
+charged to the same cgroup. A command that io.cost puts to sleep holds
+its slot the same way.
+
+Tejun, if v12 looks fine from the cgroup side, could you add your
+Acked-by?
+
+Tejun's v11 review: https://lore.kernel.org/all/17d94c41da65e31e1579a7211ebb7aa1@kernel.org/
+v11: https://lore.kernel.org/all/20261029153103.13689-1-yupeng0921@gmail.com/
+Sashiko's v10 review: https://lore.kernel.org/all/sashiko-outbox-185466@kernel.org/
+v10: https://lore.kernel.org/all/20261026153020.47791-1-yupeng0921@gmail.com/
+Tejun's v9 comment: https://lore.kernel.org/all/aee729fd53ef9c7c084a443216cfeb39@kernel.org/
+v9: https://lore.kernel.org/all/20261023043423.176002-1-yupeng0921@gmail.com/
+v8: https://lore.kernel.org/all/20261002152821.410591-1-yupeng0921@gmail.com/
+v7 (with test steps): https://lore.kernel.org/all/20260929232411.101087-1-yupeng0921@gmail.com/
+
+ Documentation/ABI/stable/configfs-nvmet |  21 ++++
+ drivers/nvme/target/configfs.c          |  47 ++++++++
+ drivers/nvme/target/core.c              | 153 ++++++++++++++++++++++++
+ drivers/nvme/target/io-cmd-file.c       |  10 +-
+ drivers/nvme/target/nvmet.h             |  40 +++++++
+ drivers/nvme/target/zns.c               |   8 +-
+ 6 files changed, 269 insertions(+), 10 deletions(-)
+
+diff --git a/Documentation/ABI/stable/configfs-nvmet b/Documentation/ABI/stable/configfs-nvmet
+index 36b587404ee7..c0b0b7ff100e 100644
+--- a/Documentation/ABI/stable/configfs-nvmet
++++ b/Documentation/ABI/stable/configfs-nvmet
+@@ -314,6 +314,27 @@ Description:
+ 		attr_subsys_vendor_id: Shows or sets the PCI subsystem
+ 		vendor ID. Displayed in "0x%x" format.
+ 
++What:		/config/nvmet/subsystems/NAME/namespaces/NSID/cgroup_id
++Date:		November 2026
++KernelVersion:	7.5
++Contact:	Peng Yu <yupeng0921@gmail.com>
++Description:
++		Shows or sets the cgroup2 ID of the cgroup to charge this
++		namespace's I/O to. Writing 0 clears it. The I/O is
++		charged to the cgroup's effective io css: the cgroup
++		itself or its nearest ancestor with the io controller
++		enabled. The namespace must be disabled before
++		modification. Enabling the namespace fails if the cgroup
++		can't be found in the cgroup namespace of the enabling
++		task, or if buffered_io is set. If the cgroup is removed
++		while the namespace is enabled, the I/O goes to the
++		effective io css of its nearest remaining ancestor; a
++		cgroup that is removed and created again gets a new ID.
++		Reservation commands and the flush of a Set Features
++		Write Protect are not charged.
++
++		Only available when CONFIG_BLK_CGROUP is enabled.
++
+ What:		/config/nvmet/hosts/HOSTNQN/dhchap_key
+ What:		/config/nvmet/hosts/HOSTNQN/dhchap_ctrl_key
+ What:		/config/nvmet/hosts/HOSTNQN/dhchap_hash
+diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
+index b3a5242d06f9..622559022f07 100644
+--- a/drivers/nvme/target/configfs.c
++++ b/drivers/nvme/target/configfs.c
+@@ -572,6 +572,50 @@ static ssize_t nvmet_ns_device_path_store(struct config_item *item,
+ 
+ CONFIGFS_ATTR(nvmet_ns_, device_path);
+ 
++#ifdef CONFIG_BLK_CGROUP
++static ssize_t nvmet_ns_cgroup_id_show(struct config_item *item, char *page)
++{
++	struct nvmet_ns *ns = to_nvmet_ns(item);
++	struct nvmet_subsys *subsys = ns->subsys;
++	ssize_t ret;
++
++	mutex_lock(&subsys->lock);
++	ret = snprintf(page, PAGE_SIZE, "%llu\n", ns->cgroup_id);
++	mutex_unlock(&subsys->lock);
++	return ret;
++}
++
++static ssize_t nvmet_ns_cgroup_id_store(struct config_item *item,
++		const char *page, size_t count)
++{
++	struct nvmet_ns *ns = to_nvmet_ns(item);
++	struct nvmet_subsys *subsys = ns->subsys;
++	u64 cgroup_id;
++	int ret;
++
++	ret = kstrtou64(page, 0, &cgroup_id);
++	if (ret)
++		return ret;
++
++	mutex_lock(&subsys->lock);
++
++	if (ns->enabled) {
++		ret = -EBUSY;
++		goto out_unlock;
++	}
++
++	/* Writing 0 clears the association. */
++	ns->cgroup_id = cgroup_id;
++	ret = count;
++
++out_unlock:
++	mutex_unlock(&subsys->lock);
++	return ret;
++}
++
++CONFIGFS_ATTR(nvmet_ns_, cgroup_id);
++#endif /* CONFIG_BLK_CGROUP */
++
+ #ifdef CONFIG_PCI_P2PDMA
+ static ssize_t nvmet_ns_p2pmem_show(struct config_item *item, char *page)
+ {
+@@ -844,6 +888,9 @@ static struct configfs_attribute *nvmet_ns_attrs[] = {
+ 	&nvmet_ns_attr_buffered_io,
+ 	&nvmet_ns_attr_revalidate_size,
+ 	&nvmet_ns_attr_resv_enable,
++#ifdef CONFIG_BLK_CGROUP
++	&nvmet_ns_attr_cgroup_id,
++#endif
+ #ifdef CONFIG_PCI_P2PDMA
+ 	&nvmet_ns_attr_p2pmem,
+ #endif
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index 1dede04c204a..67aeb704b015 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -4,12 +4,15 @@
+  * Copyright (c) 2015-2016 HGST, a Western Digital Company.
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++#include <linux/cgroup.h>
+ #include <linux/hex.h>
++#include <linux/kthread.h>
+ #include <linux/module.h>
+ #include <linux/random.h>
+ #include <linux/rculist.h>
+ #include <linux/pci-p2pdma.h>
+ #include <linux/scatterlist.h>
++#include <linux/sched/mm.h>
+ 
+ #include <generated/utsrelease.h>
+ 
+@@ -483,8 +486,152 @@ void nvmet_put_namespace(struct nvmet_ns *ns)
+ 	percpu_ref_put(&ns->ref);
+ }
+ 
++#ifdef CONFIG_BLK_CGROUP
++static int nvmet_blkcg_ns_enable(struct nvmet_ns *ns)
++{
++	struct cgroup *cgrp;
++
++	if (!ns->cgroup_id)
++		return 0;
++
++	/*
++	 * Writeback of buffered writes is charged through the page cache's
++	 * memcg, not to this cgroup, so we don't support buffered io.
++	 */
++	if (ns->buffered_io) {
++		pr_err("cgroup_id is not supported with buffered_io: %s\n",
++		       ns->device_path);
++		return -EINVAL;
++	}
++
++	cgrp = cgroup_get_from_id(ns->cgroup_id);
++	if (IS_ERR(cgrp)) {
++		pr_err("failed to resolve cgroup id %llu: %ld\n",
++		       ns->cgroup_id, PTR_ERR(cgrp));
++		return PTR_ERR(cgrp);
++	}
++
++	/*
++	 * WQ_HIGHPRI: the tcp and rdma transports execute the commands from
++	 * WQ_HIGHPRI workqueues; keep that priority on this one.
++	 */
++	ns->blkcg_wq = alloc_workqueue("nvmet-blkcg-%u",
++			WQ_MEM_RECLAIM | WQ_UNBOUND | WQ_HIGHPRI,
++			min_t(int, num_online_cpus(), WQ_MAX_ACTIVE),
++			ns->nsid);
++	if (!ns->blkcg_wq) {
++		cgroup_put(cgrp);
++		return -ENOMEM;
++	}
++
++	ns->cgrp = cgrp;
++	return 0;
++}
++
++static void nvmet_blkcg_ns_disable(struct nvmet_ns *ns)
++{
++	if (ns->cgrp) {
++		/*
++		 * No command is left, but the work item of a command that
++		 * completed from inside ->blkcg_execute() may still be
++		 * returning: destroy_workqueue() waits for it.
++		 */
++		destroy_workqueue(ns->blkcg_wq);
++		ns->blkcg_wq = NULL;
++		cgroup_put(ns->cgrp);
++		ns->cgrp = NULL;
++	}
++}
++
++/*
++ * Charge the I/O that the current work item submits for @req to the
++ * effective io css of the namespace's cgroup, looked up for each command.
++ */
++static bool nvmet_blkcg_begin(struct nvmet_req *req)
++{
++	struct nvmet_ns *ns = req->ns;
++	struct cgroup_subsys_state *css;
++
++	/*
++	 * A disable waits for the command: don't throttle it any more. This
++	 * catches only commands that haven't started; io.max holds the bios
++	 * already submitted and releases them at its rate.
++	 */
++	if (!test_bit(NVMET_NS_IO_LIVE, &ns->flags))
++		return false;
++
++	css = cgroup_get_e_css(ns->cgrp, &io_cgrp_subsys);
++	kthread_associate_blkcg(css);
++	css_put(css);
++	return true;
++}
++
++static void nvmet_blkcg_end(bool associated)
++{
++	if (associated)
++		kthread_associate_blkcg(NULL);
++}
++
++/*
++ * The io.cost and io.latency enforce their limits by putting the thread to
++ * sleep. A transport thread may be shared by multiple namespaces. In the
++ * tcp-nvmeof case, all namespaces in the same subsystem may share a
++ * thread. So we submit the IOs via the workqueue, thus the current thread
++ * won't be blocked.
++ */
++static void nvmet_blkcg_work(struct work_struct *work)
++{
++	struct nvmet_req *req =
++		container_of(work, struct nvmet_req, blkcg_work);
++	unsigned int noio_flag;
++	bool associated;
++
++	/* its queue is being deleted: abort it rather than throttle it */
++	if (unlikely(percpu_ref_is_dying(&req->sq->ref))) {
++		nvmet_req_complete(req, NVME_SC_ABORT_QUEUE);
++		return;
++	}
++
++	/* reclaim must not wait for I/O queued on this workqueue */
++	noio_flag = memalloc_noio_save();
++	associated = nvmet_blkcg_begin(req);
++	req->blkcg_execute(req);
++	nvmet_blkcg_end(associated);
++	memalloc_noio_restore(noio_flag);
++}
++
++static void nvmet_blkcg_queue_req(struct nvmet_req *req)
++{
++	INIT_WORK(&req->blkcg_work, nvmet_blkcg_work);
++	queue_work(req->ns->blkcg_wq, &req->blkcg_work);
++}
++
++static void nvmet_blkcg_init_req(struct nvmet_req *req)
++{
++	if (!req->ns->blkcg_wq)
++		return;
++
++	req->blkcg_execute = req->execute;
++	req->execute = nvmet_blkcg_queue_req;
++}
++#else
++static inline int nvmet_blkcg_ns_enable(struct nvmet_ns *ns)
++{
++	return 0;
++}
++
++static inline void nvmet_blkcg_ns_disable(struct nvmet_ns *ns)
++{
++}
++
++static inline void nvmet_blkcg_init_req(struct nvmet_req *req)
++{
++}
++#endif /* CONFIG_BLK_CGROUP */
++
+ static void nvmet_ns_dev_disable(struct nvmet_ns *ns)
+ {
++	nvmet_blkcg_ns_disable(ns);
+ 	nvmet_bdev_ns_disable(ns);
+ 	nvmet_file_ns_disable(ns);
+ }
+@@ -611,6 +758,10 @@ int nvmet_ns_enable(struct nvmet_ns *ns)
+ 	if (ret)
+ 		goto out_unlock;
+ 
++	ret = nvmet_blkcg_ns_enable(ns);
++	if (ret)
++		goto out_dev_disable;
++
+ 	ret = nvmet_p2pmem_ns_enable(ns);
+ 	if (ret)
+ 		goto out_dev_disable;
+@@ -1170,6 +1321,8 @@ static u16 nvmet_parse_io_cmd(struct nvmet_req *req)
+ 	if (ret)
+ 		return ret;
+ 
++	nvmet_blkcg_init_req(req);
++
+ 	if (req->ns->pr.enable) {
+ 		ret = nvmet_pr_check_cmd_access(req);
+ 		if (ret)
+diff --git a/drivers/nvme/target/io-cmd-file.c b/drivers/nvme/target/io-cmd-file.c
+index 695963dd932e..b9d221eeef57 100644
+--- a/drivers/nvme/target/io-cmd-file.c
++++ b/drivers/nvme/target/io-cmd-file.c
+@@ -265,8 +265,7 @@ static void nvmet_file_execute_flush(struct nvmet_req *req)
+ {
+ 	if (!nvmet_check_transfer_len(req, 0))
+ 		return;
+-	INIT_WORK(&req->f.work, nvmet_file_flush_work);
+-	queue_work(nvmet_wq, &req->f.work);
++	nvmet_req_run_work(req, nvmet_wq, &req->f.work, nvmet_file_flush_work);
+ }
+ 
+ static void nvmet_file_execute_discard(struct nvmet_req *req)
+@@ -325,8 +324,7 @@ static void nvmet_file_execute_dsm(struct nvmet_req *req)
+ {
+ 	if (!nvmet_check_data_len_lte(req, nvmet_dsm_len(req)))
+ 		return;
+-	INIT_WORK(&req->f.work, nvmet_file_dsm_work);
+-	queue_work(nvmet_wq, &req->f.work);
++	nvmet_req_run_work(req, nvmet_wq, &req->f.work, nvmet_file_dsm_work);
+ }
+ 
+ static void nvmet_file_write_zeroes_work(struct work_struct *w)
+@@ -355,8 +353,8 @@ static void nvmet_file_execute_write_zeroes(struct nvmet_req *req)
+ {
+ 	if (!nvmet_check_transfer_len(req, 0))
+ 		return;
+-	INIT_WORK(&req->f.work, nvmet_file_write_zeroes_work);
+-	queue_work(nvmet_wq, &req->f.work);
++	nvmet_req_run_work(req, nvmet_wq, &req->f.work,
++			nvmet_file_write_zeroes_work);
+ }
+ 
+ u16 nvmet_file_parse_io_cmd(struct nvmet_req *req)
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index 3cd58e813aa7..17694fc7d634 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -118,6 +118,22 @@ struct nvmet_ns {
+ 	struct nvmet_subsys	*subsys;
+ 	const char		*device_path;
+ 
++#ifdef CONFIG_BLK_CGROUP
++	u64			cgroup_id;
++	/*
++	 * Resolved from ->cgroup_id when the namespace is enabled and
++	 * released when it is disabled, so it has the same lifetime and
++	 * visibility rules as ->bdev and ->file.
++	 */
++	struct cgroup		*cgrp;
++	/*
++	 * The I/O commands of a namespace with a cgroup, except Reservation
++	 * commands, are executed from their own work items on ->blkcg_wq, so
++	 * the cgroup's throttling doesn't put a transport context to sleep.
++	 */
++	struct workqueue_struct	*blkcg_wq;
++#endif
++
+ 	struct config_group	device_group;
+ 	struct config_group	group;
+ 
+@@ -510,6 +526,11 @@ struct nvmet_req {
+ 
+ 	void (*execute)(struct nvmet_req *req);
+ 	const struct nvmet_fabrics_ops *ops;
++#ifdef CONFIG_BLK_CGROUP
++	/* the backend's ->execute, called from ->blkcg_work */
++	void (*blkcg_execute)(struct nvmet_req *req);
++	struct work_struct	blkcg_work;
++#endif
+ 
+ 	struct pci_dev		*p2p_dev;
+ 	struct device		*p2p_client;
+@@ -756,6 +777,25 @@ void nvmet_bdev_execute_zone_mgmt_recv(struct nvmet_req *req);
+ void nvmet_bdev_execute_zone_mgmt_send(struct nvmet_req *req);
+ void nvmet_bdev_execute_zone_append(struct nvmet_req *req);
+ 
++/*
++ * A command of a namespace with a cgroup already runs from its own work
++ * item on the namespace's workqueue (see nvmet_blkcg_work()), so run the
++ * backend's work function right there; otherwise queue it on @wq.
++ */
++static inline void nvmet_req_run_work(struct nvmet_req *req,
++		struct workqueue_struct *wq, struct work_struct *work,
++		work_func_t func)
++{
++#ifdef CONFIG_BLK_CGROUP
++	if (req->ns->blkcg_wq) {
++		func(work);
++		return;
++	}
++#endif
++	INIT_WORK(work, func);
++	queue_work(wq, work);
++}
++
+ static inline u32 nvmet_rw_data_len(struct nvmet_req *req)
+ {
+ 	return ((u32)le16_to_cpu(req->cmd->rw.length) + 1) <<
+diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
+index 92f5c1435582..38455481da24 100644
+--- a/drivers/nvme/target/zns.c
++++ b/drivers/nvme/target/zns.c
+@@ -335,8 +335,8 @@ void nvmet_bdev_execute_zone_mgmt_recv(struct nvmet_req *req)
+ 	if (!nvmet_check_transfer_len(req, (numd + 1) << 2))
+ 		return;
+ 
+-	INIT_WORK(&req->z.zmgmt_work, nvmet_bdev_zone_zmgmt_recv_work);
+-	queue_work(zbd_wq, &req->z.zmgmt_work);
++	nvmet_req_run_work(req, zbd_wq, &req->z.zmgmt_work,
++			   nvmet_bdev_zone_zmgmt_recv_work);
+ }
+ 
+ static inline enum req_op zsa_req_op(u8 zsa)
+@@ -534,8 +534,8 @@ static void nvmet_bdev_zmgmt_send_work(struct work_struct *w)
+ 
+ void nvmet_bdev_execute_zone_mgmt_send(struct nvmet_req *req)
+ {
+-	INIT_WORK(&req->z.zmgmt_work, nvmet_bdev_zmgmt_send_work);
+-	queue_work(zbd_wq, &req->z.zmgmt_work);
++	nvmet_req_run_work(req, zbd_wq, &req->z.zmgmt_work,
++			   nvmet_bdev_zmgmt_send_work);
+ }
+ 
+ static void nvmet_bdev_zone_append_bio_done(struct bio *bio)
+
+base-commit: ca7e6a9a693240f059a0b47726f64a3f0573011a
+-- 
+2.53.0
 
