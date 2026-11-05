@@ -1,99 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.201
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793854101;
-	b=0BKq7r/moko4w0YYF5DAsFAchxzTBIVttl1b5WyE54QpglFtQFBfXj/WQ/R2lfqw4tdk
-	 5P9Vmrjks8/0eXnxY+kv8poxIJREbQCzcyQ0c+4usBU/0S/njzfMwlDVXy5hCn8RSltoj
-	 sBUM2zIgEGcXcBXGK34Q8gaVRHLw/YhZlwRQXwX7AXMPqexHZ3+L/t2D6aAda2+5LbR+J
-	 RzdHitgxRjvjuh8sC8JbXaEmcRU/2n730stsXeXlfSToOoeRprFTF9lDjixa/pZ7vNiea
-	 QTRK8GNI0Z7wZVUtig0kRG3Bt/Cj7Lj2m2hQ6HQcz+6fvio8sb4JdewEEF1O7OxjlGQ==
+	t=1793861968;
+	b=XezXFBdDfATM/K8O/cAdmZwrSiNrIB61GVwFcgeh7mCXXG7r4nQ1c8pAwBt+ZsdYyPUf
+	 2ukne+zRSzc6sdjtctxv86dBEa0vdXr0GmsqLSY8kEjjCXLV/SABIcnN9dhjmEZoK/8tS
+	 1eHFJPexgwMgK7GKa82TKXMcipXCnfjr+steof9uYIC/6K4c5B4cRi4kEOREvpxrtrZoQ
+	 LgzIGpsFLwg0xDRIxaMki1VsN0o3lv9Ea0wwNGAjNaPY9Wm8WEMDitrD15VIrnJiLJIsc
+	 OnF5w3evibWfoYASWkp76sf6J+DkCY8t2NXDLDgUssJLlAw/3Y9TWX7SkjAIAayUhjw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793854101;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=Z4CptPZ1xxIkHaBqUwJgyo6uh3NXVfD6E10G6VWgJe8=;
-	b=cFX95sDdKg32PXRDGnNu1WSyHYyJHdqqvhXJsNXY7tAapgIFihUcsqAXf3ot+FB7XmE6
-	 wM4yr3ThZsLM7ZdW5UtHhc8MfoUYouEgTlNRzK54O+MMSUsgVd4ra+MnR1AyRa1ODXfhj
-	 351eehWLQHYCDRjw8gxCr7F/N30tit+zM9v2/X2N46L87/+NtVV29wCgBuKd3E5aMx8Rz
-	 xxOnL8qTsLmBe/oT4xgCZVf6F4YWEv8lndk/ZLwL2/0rlA3sAQ31FMjoZH854PP8ObJ0d
-	 JSyp8eb8MXghAmpFpLI0KjbJdPMN/kc3YnRsROdYeuzuLbxKxzDGBk+Lpy9AOVxMh5Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793861968;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=nIzPxp67nycIcgpn1aR+9cX2c2A9Fk/9SrE7eGQSDVI=;
+	b=dTGVgxs1O3+P0B8Sx8xmzCxDkT3zNx4D0o50OGAoKcFZns0clbub3hTlJFRlwAolmIdS
+	 Td4ZBcSK5UYIhD4uQPukZF7J3BU0WUnc2pkyBP1t5Z7vtuH/KWOvggO4KU/JLEwHRVeKs
+	 /YkHx29dD8P/m+YtK0sc6xeL+G7Y9xG9WnakuXzfc/SQL/mkwcrBe2OPVEy0QCDbVpbzW
+	 +hfw73z7YwXk/3k2QFuaTn38XE6zth66r+IQVIqd3yX/MClnQP2CeYeLKi9vrSI971REI
+	 3rw0IvexhlUkj02thej/EqHCsVV1XqqJB4KqEDjv57X5l3J/vftct98izcbV0CWGXsQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=U+aQgEZx;
-	arc=none smtp.remote-ip=74.125.82.54
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=URJ69ifo;
+	arc=none smtp.remote-ip=95.215.58.201
+Received: from mta1.migadu.com (out-201.mta1.migadu.com [95.215.58.201])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D8D606A335
-	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 04:48:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32D8D606A335
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F94606A33F
+	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 06:59:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 63F94606A33F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=U+aQgEZx
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-15ea896ddc8so2523280c88.0
-        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 20:48:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1793854100; x=1794458900; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Z4CptPZ1xxIkHaBqUwJgyo6uh3NXVfD6E10G6VWgJe8=;
-        b=U+aQgEZxeS5Pre7SDZg848BQdqMpLL7Cd5tR4LeM0Qd358dg8QaB+rw3k/7OcykJnh
-         VIidf2eRyWud4n6W1l7WdXDRcxxw8rJeoMdABWWD0TFNc4DeYOlOndfx5+ZowprbJsjM
-         9PqRK0VDzKr2FVQh9FMNwF2M8h8rIVf5VAQUI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793854100; x=1794458900;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Z4CptPZ1xxIkHaBqUwJgyo6uh3NXVfD6E10G6VWgJe8=;
-        b=nlqVYeSzbjTCiXbpfJqLazbfvBIfRYok24NqFeyH6JvUT62xzGYDlf074LBVv8bmkI
-         dmNt/GjYKlvrdh7sp3TzhSpkp457L2jrhmYOobjCyMKhC/9lsRlBT7za48N5mDDTzhnv
-         9uVuszF7W6ilcODMRbJSUBEgbsb/5i/BKBvd3hks6IC+WCHeoXsKOvrXs8tPLQAwn2Al
-         kA9VbMwgK5pRRWsWGekdegOGyO3D5L0i8dNZKJPO4y7zTAsgnolS+J8232Mq0QzZ2o5L
-         6vM3SyX7v4vGRdpP0/5GlOIgvdYgyDlg42ib2ft79HlT8270aYj1Usw0Cueh0ReJaBmo
-         RT3A==
-X-Forwarded-Encrypted: i=1; AKwUvBxWHEREPGcslawbpOGMGRXKuFvbGOhReqjpU6Wwp9D6g6sb02fnZeMB8X03Rgno9CVuOzFfR38XMRYbog==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+Sr2W9LllJ2EdKwiokce5wvEyQqZVF9vpHVVqUpQgwSNbdIFQg
-	e5lI+JHzX8xk7Vy5XVo5mm+boVTLUjUbXAbxHNu6bSGyj+31zjwjsAS8sw2X2m+JkQ==
-X-Gm-Gg: AYBFou3pgE2t5huRWffq0C7gChxl+wr/casymwbonOfB2yQ9ufXrTrkv72j8mP3K0Ai
-	TJiFB6yLuJ5xFmAt5/LPE711ps+5MpcYA31QTeM+YJhIJlFc+qrhGsUNBXv/qI9XuAOwCs7YpfG
-	zM34YyWDRCrd+dubQE1j3BiuVcOR8zXfPz0bxCMSgi9ZU/LEnGnJMkslFPZCIYc6cXIsWmDvsf2
-	Hu4//SwganiY/clZPG/bFFynGrtqrq1/7pimL0WKVkFqkixW98suxjs+icBOzxyqD9jQ4npZZdn
-	sXCoQ6HJ5nfbSytt6FyM5VpiJrA2fNiN7FZBpm2nkO09TeTb3jGZEOt3q44nVAJ8N1t/TEVJCL2
-	SEtushlbDH0IB5+XBOMCirhyZa8kAfPTJ4A/+r3xI+WMRNfCpw7az/NgzB5s/BrorUAIicGGQO9
-	QIzuAG2bcN5lQRkYQWjqozeV41i5MENfTpbB6YAT9eBkqWtxC6vWcM3fQ8+xzCWTZUR4FfvHp9B
-	U6Vj7Gekl8WudxTJHjhA2wpCGHXxt+XG80rR9lFirNXFWQcdBka/FLCVhl0ZrBTwzVX7dwYxNeo
-	l7BKsZaAeWbb6jM/DMZWmwmpjVaAVsbY4RmKFvmH05qyEOU1JCr4uvOCVbeIuolKxauIPQ6FK/o
-	pgp6KkCNkpQxoqJUvnzdCR2DHd3Y7lh4Cm6jzE6Y=
-X-Received: by 2002:a05:7022:7e0c:b0:14c:d8d9:9502 with SMTP id a92af1059eb24-1ac5a0b8a9amr26997590c88.14.1793854100117;
-        Wed, 04 Nov 2026 20:48:20 -0800 (PST)
-Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:37bc:b763:7ec7:65b4])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b245c6f0dcsm17142927c88.21.2026.11.04.20.48.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2026 20:48:19 -0800 (PST)
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Nhat Pham <nphamcs@gmail.com>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Brian Geffon <bgeffon@google.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Richard Chang <richardycc@google.com>,
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=URJ69ifo
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=xVc3emtqQK3gdjiaDH2/ozjRn5r+zA/0E88efrFuawg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793861965; v=1; x=1794466765;
+ b=URJ69ifo97ROruZ6pmwjXf0aKmSur7mh2uvlDandRG7mz4fCmrISF3oG8QPrDgE6EtbpnoLX
+ DDOkrLFAjlHrjyterio5ErE9cY4DTjD2rrmzaqCHaS/HCXbs+pcE5kLsyhLVR0lxf7DWy2zDiJH
+ ybQo4+FLjg9nVwpWWXkCsyjQ=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 7015cdc676c618de;
+	Thu, 05 Nov 2026 06:59:25 +0000
+X-Mizu-Trace-ID: 7015cdc676c618de
+X-Migadu-Flow: FLOW_OUT
+From: Mengmeng Zhao <mengmeng.zhao@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>,
+	Dan Williams <djbw@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	tytso@mit.edu,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Baokun Li <libaokun@linux.alibaba.com>,
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
+	Zhang Yi <yi.zhang@huawei.com>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	asml.silence@gmail.com,
+	hch@lst.de,
+	Anuj Gupta <anuj1072538@gmail.com>
+Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
 	linux-mm@kvack.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH 7/7] zsmalloc: constify struct zs_handle pointer in read-only functions
-Date: Thu,  5 Nov 2026 13:47:37 +0900
-Message-ID: <20261105044752.1997895-8-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.56.0.398.g882cbad275-goog
-In-Reply-To: <20261105044752.1997895-1-senozhatsky@chromium.org>
-References: <20261105044752.1997895-1-senozhatsky@chromium.org>
+	Li Wang <liwang@kylinos.cn>
+Subject: [RFC 1/6] block: refuse a dma-buf bio that carries a crypto context
+Date: Thu,  5 Nov 2026 14:58:42 +0800
+Message-ID: <20261105065847.196540-2-mengmeng.zhao@linux.dev>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261105065847.196540-1-mengmeng.zhao@linux.dev>
+References: <20261105065847.196540-1-mengmeng.zhao@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -105,79 +90,34 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Constify struct zs_handle * in functions that don't modify the handle.
+From: Mengmeng Zhao <zhaomengmeng@kylinos.cn>
 
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+A dma-buf bio has no pages for the crypto layer to walk: the
+software fallback would read the map as bio_vecs.  Refuse it in
+blk_mq_submit_bio() before it can reach that path.
+
+Signed-off-by: Mengmeng Zhao <zhaomengmeng@kylinos.cn>
+Signed-off-by: Li Wang <liwang@kylinos.cn>
 ---
- include/linux/zsmalloc.h |  4 ++--
- mm/zsmalloc.c            | 10 +++++-----
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ block/blk-mq.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/zsmalloc.h b/include/linux/zsmalloc.h
-index 674358f39191..793fc887015c 100644
---- a/include/linux/zsmalloc.h
-+++ b/include/linux/zsmalloc.h
-@@ -65,9 +65,9 @@ unsigned int zs_lookup_class_index(struct zs_pool *pool, unsigned int size);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index be5671966787..f0d978b1724f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3138,8 +3138,10 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		goto queue_exit;
+ 	}
  
- void zs_pool_stats(struct zs_pool *pool, struct zs_pool_stats *stats);
- 
--void zs_obj_read_sg_begin(struct zs_pool *pool, struct zs_handle *handle,
-+void zs_obj_read_sg_begin(struct zs_pool *pool, const struct zs_handle *handle,
- 			  struct scatterlist *sg, size_t mem_len);
--void zs_obj_read_sg_end(struct zs_pool *pool, struct zs_handle *handle);
-+void zs_obj_read_sg_end(struct zs_pool *pool, const struct zs_handle *handle);
- 
- extern const struct movable_operations zsmalloc_mops;
- 
-diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
-index ff1cde4c5dc2..e0f89a3b77f1 100644
---- a/mm/zsmalloc.c
-+++ b/mm/zsmalloc.c
-@@ -805,7 +805,7 @@ static unsigned long location_to_obj(struct zpdesc *zpdesc, unsigned int obj_idx
- 	return obj;
- }
- 
--static unsigned long handle_to_obj(struct zs_handle *handle)
-+static unsigned long handle_to_obj(const struct zs_handle *handle)
- {
- 	return READ_ONCE(ACCESS_PRIVATE(handle, obj));
- }
-@@ -1110,7 +1110,7 @@ unsigned long zs_get_total_pages(struct zs_pool *pool)
- }
- EXPORT_SYMBOL_GPL(zs_get_total_pages);
- 
--void zs_obj_read_sg_begin(struct zs_pool *pool, struct zs_handle *handle,
-+void zs_obj_read_sg_begin(struct zs_pool *pool, const struct zs_handle *handle,
- 			  struct scatterlist *sg, size_t mem_len)
- {
- 	struct zspage *zspage;
-@@ -1157,7 +1157,7 @@ void zs_obj_read_sg_begin(struct zs_pool *pool, struct zs_handle *handle,
- }
- EXPORT_SYMBOL_GPL(zs_obj_read_sg_begin);
- 
--void zs_obj_read_sg_end(struct zs_pool *pool, struct zs_handle *handle)
-+void zs_obj_read_sg_end(struct zs_pool *pool, const struct zs_handle *handle)
- {
- 	struct zspage *zspage;
- 	struct zpdesc *zpdesc;
-@@ -1395,7 +1395,7 @@ static unsigned int obj_to_class_idx(unsigned long obj)
-  */
- #if ZS_OBJ_CLASS_BITS > 0
- static inline void obj_class_get_and_lock(struct zs_pool *pool,
--					  struct zs_handle *handle,
-+					  const struct zs_handle *handle,
- 					  unsigned long *objp,
- 					  struct zspage **zspagep,
- 					  struct size_class **classp)
-@@ -1415,7 +1415,7 @@ static inline void obj_class_get_and_lock(struct zs_pool *pool,
- }
- #else
- static inline void obj_class_get_and_lock(struct zs_pool *pool,
--					  struct zs_handle *handle,
-+					  const struct zs_handle *handle,
- 					  unsigned long *objp,
- 					  struct zspage **zspagep,
- 					  struct size_class **classp)
++	/* a dma-buf bio has no pages for integrity work or contents crypto */
+ 	if (unlikely(op_is_dmabuf(bio->bi_opf) &&
+-		bdev_has_integrity_csum(bio->bi_bdev))) {
++	    (bdev_has_integrity_csum(bio->bi_bdev) ||
++	     bio_has_crypt_ctx(bio)))) {
+ 		bio_endio_status(bio, BLK_STS_NOTSUPP);
+ 		goto queue_exit;
+ 	}
 -- 
-2.56.0.398.g882cbad275-goog
+2.43.0
 
