@@ -1,96 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.176
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793910592;
-	b=OkqK8CVNT70Gn5Bt0uHrH5qOZTGyt/XpIcTrZS5B398zOfB47S67x/5hIFlqT7m1M3G5
-	 WwvfcxEwRvTVPFwrBFJpnVk6d7/d/ZNHndj/+l15RfvhwfpxLyftplQlnQYMsk80kzfDk
-	 BfM6Tl3YsL5EAhMmfeRaLVXccoY/mmDQdp8mruniYqf0mjpuhWE9K657A7SoTOc4Rq+QH
-	 axElIfsfGqm8xiNmtBm9xF0zn4ngSQGzdxASwdJKJ37JyMqiORw5xuo/zMnFDHoqJasXG
-	 QClPyMXAsAydSkchpGY2sqs9GnlpHXIHVfPA7NzgtVhMxExAEzsAMRZ5EpKU4u9by5Q==
+	t=1793914005;
+	b=U8aZ9+kxEkqsqBX4MSTbBsnXXTZ6OmLyoazTxI+AHPvMANVzdN0lvUAbRIVE+UPD9yyO
+	 PWE7Jaw+xEfUGMWvufER27LXoAjeWfJY9xy/xsAUtWK2h4jIOvHw7paGSdSfFTLritHmI
+	 ztZYfm6uzLCA3H5nyXclxqDq0SJ74qtFaw81ZSccLeYgZU950TcjN5WCcsvvl/AzmMYU7
+	 K2I7didYugGLIcPhoKGtWm2bGRBSgi8/++HxpRzSkAVOzU3OlNwY8KEfVR9VGX6dl7TIL
+	 AHnhT2DW2nkGg+TdeprPBaiHg96XvQ9qUlzwgFBr1Qz+JvU4tJRgrmQz1VFOKyAL1Cg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793910592;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=/nZzov8N+zyyuqAcE43h/bSIm3E1Cc1jzIpE1+g+dck=;
-	b=rKVtHXa8YDilQWKDjWN2a3+8W581TduwcAROoytugsIPxW6eNvjQ1+J2xy4rJl+FhwV9
-	 3d5tDVi2SVg8dPYOTxzL+lobsGQTb244Zyw1xVpzfMaw01XF4nj+NI5KnOaS9n1hIDO8Y
-	 pPbEtCjTuteZgLscxndebTX1Zg/SGUS5SGPnYxB8BtUq4rNCUZL3/72EJBxJqPYppGtto
-	 ujN6TYmPw1xcF4du079kTNLMFcPUWMUjEX72u+q9s7v3FLVoMrn8pc5WZemN/C+a8R9Bn
-	 TPtkJ6BXrBUxvaVHLUMnR3qoRvPuIaYqNMV+OAcYKGVW0dKkZ9cic4/KBV0w0qvcMnw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793914005;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=j6nLzJpF4CfBD1Utx6iKhdNHDK2kO6FZNPxEtGMJpzs=;
+	b=UORvZhBQ6RHdD5l9iOoENcrmrRrAu8/cUmiCgG9+nFBT59yD9aaZO/TECQhuMw0GifWJ
+	 NgP5YowhEbRCHl5JYnPHaRfk2PzzVmlQaw/WZmJ67038a90nfmWOZxXLFk11RIjf6l9w7
+	 FOQ7wGSktyLCT0FttuNnHeWXFsUMwp5JwDt5nB7ObAhrS4g0yqG0R/VXb9aM3NK3aMfZX
+	 U+dgM/xfvmt5uR7kDySY8mb3lbNuukTS4DFKAprYst7WUYIz4zXi93wVl3Xnye1GcQMa4
+	 42W6AYUy6AXrv9ob8rlNlE0O4aHsVwj3kuIoYbTkwuj9rd+68jhVSlMEgl96Y6mFL3g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F4nAnTX+;
-	arc=none smtp.remote-ip=209.85.160.181
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Am3xs4yM;
+	arc=none smtp.remote-ip=95.215.58.176
+Received: from mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A17606A32F
-	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 20:29:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 01A17606A32F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55589606A326
+	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 21:26:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55589606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F4nAnTX+
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-5366ae57896so25174731cf.3
-        for <linux-block@vger.kernel.org>; Thu, 05 Nov 2026 12:29:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793910591; x=1794515391; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/nZzov8N+zyyuqAcE43h/bSIm3E1Cc1jzIpE1+g+dck=;
-        b=F4nAnTX+kii+PCwyyE0+1CUq6xJegQw9Tm8KNoyuKGVdIP/Ko9Ng/U+c58ziik5Se9
-         UUtqGZLNGD8+LVfbRtp/Nn6er98UzOlv0qPoeWxv9Nh3I8THKjTFfKaGjrpsCtTh+Qjv
-         CqXTFPgAldeBlYd5Mxeh18m2WjlHgzjpBApFxVcnIDFh8CYhePDyr6YHwW4IaDbezSpg
-         t2oJyRQHZliPfEgufGXaXggD561cfP6iBPdqU1zssg+TF8PA8b7TjDHVEMUvYtao4waB
-         GmvCcEivjyLLWU7WVoX2mNB6pbbzQG+NpdAhScovptkBDsEEZmt5ct4uu6kSHh5hYg2w
-         a8ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793910591; x=1794515391;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/nZzov8N+zyyuqAcE43h/bSIm3E1Cc1jzIpE1+g+dck=;
-        b=2d1j52Y3DsfhlpbvuVyGS842HAgTQvDTZG/UvzZBsPbOeQEQRKYeO947/cn6uDE3AW
-         L+31B9tkEOcSZ5SSrFeb3rJIxKdEENfjBdP93UxX1V/mygDZubR0S0oXLEdyZZukKRoh
-         FXYldcexeaQcwFa0fCPFE2Va//pLyqdG0jb5IDaTilWY90Dri/akEo8Yp3z/1O7FRIK+
-         6/wvjn4W0gmB5vjJyj0SmDAxGLJmApJ/b5hRNfYNu/cjDE2JaR306W3FXtxBbj7iI/GD
-         M1lo3MTV33qIB5GKtZHtZSpcYQxfcEf74rUs6pM/dGyYbmn9chQNNvWlV2t0MKEXUS7D
-         kMgQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxkpQKMzaqV/6y/W3U0IUgWbt9UjLxP3WX7wb/Gq1JMoDgDWYFguOCQqYFv22t2T4Enz+k9Vv8ffzVQ7g==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+hnbVGaoiyIAKDLQsK/EiG94Fq0tPv0iQOD5c7OuNeSrqQGYRj
-	6oNW5LS8AhRxRzTvccjgK1YbsCCOzMBmhLp4YFvKV5ox1vPuXu5xqZOhQHEsAyED
-X-Gm-Gg: AYBFou3OhhH48VJQEjCeaN8KkCQ8b4kGfYWbd2o4IG+XcR6DJvorIIH6++Z7Q9EamR2
-	0eJVFjNKVA7t8ePMjcZZe/aPYuGyEGpaRlIF5osv0wqNqRzMoiwMGRhbapKwU9GAGfhoPcYIgo7
-	rjW/5Ase0eCyniG7vTbMkpwc4qzEsjFuTe7t6KTvq363JiQa6UOhbxSoSd5jqBZKva1Xrd90fBx
-	PErhGVeUpTDkGLYUE11x3mVQil+oe/F7nBSrmmD8hHGZqr8bUz1NQsLOLNrrMDe4WOtMijSsel5
-	EoICiMt7EOLysycB8js4HNfaBhxtFA2z3710t4QifTK6LQKMKFaDqwT8IhSgkR0mh8LHm6OnAay
-	2L/GD50BVgBeEpPQ9WbcC16vpwOrwQH3byyDahyLIz8hMXpgmtT3JQMG+v16IZZGMJTb+qLl1ZV
-	UQH9JMKuh+C6T0JBbzshh7oHnZjW4f/GYSTKTso+Rlr/GB5zLiTdLHjlmmt9lFcO7AzT357EUUp
-	khnGETVvo2ON1LAgmek3A2nuOu4HNIYps4btR6o/PlVBOUvSDAqSn2OAkfq9sqIcpqlwNTDQK8z
-	VMFU4FWIZ+3ul+xaJx7ltEjY76c0WjYELbehFZuq9KiY1XGpdyY0zivLf0A=
-X-Received: by 2002:ac8:5ad6:0:b0:536:6488:e7e4 with SMTP id d75a77b69052e-54e12fa003emr7137181cf.13.1793910590737;
-        Thu, 05 Nov 2026 12:29:50 -0800 (PST)
-Received: from i4-l-hqh5357-03.ad.psu.edu ([130.203.139.71])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-54e27502132sm1987361cf.28.2026.11.05.12.29.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Nov 2026 12:29:50 -0800 (PST)
-From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
-To: "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-	Jack Wang <jinpu.wang@ionos.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Shuangpeng Bai <shuangpeng.kernel@gmail.com>,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [BUG] RDMA/rtrs-clt: KASAN use-after-free in rtrs_clt_query
-Date: Thu,  5 Nov 2026 15:28:43 -0500
-Message-ID: <20261105202939.3104321-1-shuangpeng.kernel@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Am3xs4yM
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=50QvR5Rz1ijGbYHRRdoYsuy3eEKLOBbyuMDTHm2jZh0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793914001; v=1; x=1794518801;
+ b=Am3xs4yM6/tjgZMQlaNS6DAHZ1cTQ7pKDOqHRyT9OFD+dfNifribuzZxlRop6kVPZWOmK7gK
+ ulKfFwQrn14tRMSNR/7+wAAEuiVr3iWU+zAr5uqVFzq5dMWNlNawycn+A6JVNm34fQXIMWxQ1Fg
+ zMSAKacEyE/Vp2zfzjzVUXu4=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 63581dc183f9fce4;
+	Thu, 05 Nov 2026 21:26:41 +0000
+X-Mizu-Trace-ID: 63581dc183f9fce4
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <a2667ffd-3bbe-40b2-afc2-56fb54fb546b@linux.dev>
+Date: Thu, 5 Nov 2026 22:26:36 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -100,103 +58,262 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [v3 for-next 2/3] block: allow error injection rules to delay
+ bios
+To: Mohamed Khalfella <mkhalfella@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org
+References: <20260928221634.43239-1-haris.iqbal@linux.dev>
+ <20260928221634.43239-3-haris.iqbal@linux.dev>
+ <20261020233441.GB1582237-mkhalfella@purestorage.com>
+Content-Language: en-US
+From: Haris Iqbal <haris.iqbal@linux.dev>
+In-Reply-To: <20261020233441.GB1582237-mkhalfella@purestorage.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Kernel Maintainers,
 
-I hit the following report while testing current upstream kernel:
 
-KASAN: slab-use-after-free in rtrs_clt_query
+On 10/21/26 01:34, Mohamed Khalfella wrote:
+> On Tue 2026-09-29 00:16:33 +0200, Md Haris Iqbal wrote:
+>> Error injection can only fail a bio today. Add a delay_us option so that
+>> a rule can hold a bio back first, to model a slow device.
+>>
+>> If a matching rule has delay_us set, the bio is held for that long. It is
+>> then failed if the rule also has a status, or resubmitted otherwise.
+>>
+>> The resubmission is done through submit_bio_noacct_nocheck(), which is
+>> where the injection hook sits. To avoid the same delay rule being applied
+>> to it again, mark the bio with the BIO_ERROR_INJECTED flag before queueing
+>> the work in blk_error_inject_delay(). This also prevents bios that are
+>> split later and resubmitted from being evaluated for delay (or error
+>> injection) again. __bio_clone() does not propagate the flag, so a clone a
+>> stacking driver aims at a lower device is still evaluated.
+>>
+>> The bio is submitted from a workqueue rather than from the timer, because
+>> submitting a bio can sleep. Bios with REQ_NOWAIT are never delayed, and
+>> values above 600 seconds are rejected.
+>>
+>> Cc: Christoph Hellwig <hch@lst.de>
+>> Assisted-by: Claude:claude-opus-5
+>> Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
+>> ---
+>>   block/error-injection.c   | 160 ++++++++++++++++++++++++++++++++++----
+>>   block/error-injection.h   |   1 +
+>>   include/linux/blk_types.h |   1 +
+>>   3 files changed, 147 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/block/error-injection.c b/block/error-injection.c
+>> index db543fe27630..a35fe41a43e4 100644
+>> --- a/block/error-injection.c
+>> +++ b/block/error-injection.c
+>> @@ -6,9 +6,17 @@
+>>   #include <linux/blkdev.h>
+>>   #include <linux/parser.h>
+>>   #include <linux/seq_file.h>
+>> +#include <linux/workqueue.h>
+>>   #include "blk.h"
+>>   #include "error-injection.h"
+>>   
+>> +/*
+>> + * Cap the delay so that a typo can't wedge a device for good.  This is still
+>> + * well beyond the default hung task timeout, which is one of the things a
+>> + * delay is useful for triggering.
+>> + */
+>> +#define BLK_ERROR_INJECT_MAX_DELAY_US	(600 * USEC_PER_SEC)
+> 
+> DEFAULT_HUNG_TASK_TIMEOUT is 120 seconds (set in lib/Kconfig.debug)
+> 
+>> +
+>>   struct blk_error_inject {
+>>   	struct list_head		entry;
+>>   	sector_t			start;
+>> @@ -18,14 +26,104 @@ struct blk_error_inject {
+>>   
+>>   	/* only inject every 1 / chance times */
+>>   	unsigned int			chance;
+>> +
+>> +	/* hold the bio for this long before submitting or failing it */
+>> +	unsigned int			delay_us;
+>> +};
+>> +
+>> +/*
+>> + * A bio held by a delay rule.  It does not point back at the rule, so rules
+>> + * can be removed while delayed bios are outstanding.  The submitter holds the
+>> + * bdev open until the bio completes, so the disk and queue stay allocated.
+>> + * A delayed bio holds no queue usage counter reference, so it does not hold
+>> + * up a queue freeze either.
+>> + */
+>> +struct blk_error_inject_delay {
+>> +	struct delayed_work		dwork;
+>> +	struct bio			*bio;
+>> +	blk_status_t			status;
+>>   };
+>>   
+>> +static struct workqueue_struct *blk_error_inject_wq;
+>> +
+>>   DEFINE_STATIC_KEY_FALSE(blk_error_injection_enabled);
+>>   
+>> +static void blk_error_inject_delay_work(struct work_struct *work)
+>> +{
+>> +	struct blk_error_inject_delay *d = container_of(to_delayed_work(work),
+>> +			struct blk_error_inject_delay, dwork);
+>> +	struct bio *bio = d->bio;
+>> +	struct gendisk *disk = bio->bi_bdev->bd_disk;
+>> +	blk_status_t status = d->status;
+>> +
+>> +	kfree(d);
+>> +
+>> +	if (status != BLK_STS_OK) {
+>> +		pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
+>> +				disk->part0, blk_status_to_str(status),
+>> +				blk_op_str(bio_op(bio)), bio->bi_iter.bi_sector,
+>> +				bio_sectors(bio));
+>> +		bio->bi_status = status;
+>> +		bio_endio(bio);
+>> +	} else {
+>> +		/*
+>> +		 * Resubmit.  The BIO_ERROR_INJECTED flag ensures that a bio
+>> +		 * that was delayed once skips error injection entirely from
+>> +		 * here on, including any other rule that covers it.
+>> +		 */
+>> +		submit_bio_noacct_nocheck(bio, false);
+>> +	}
+>> +}
+>> +
+>> +/*
+>> + * Hand the bio to a workqueue that submits or fails it once the delay has
+>> + * expired.  Both blk_mq_submit_bio() and ->submit_bio can sleep, so this can't
+>> + * be completed from the timer itself.
+>> + *
+>> + * Returns false if the bio can't be delayed, in which case the caller handles
+>> + * it immediately instead.
+>> + */
+>> +static bool blk_error_inject_delay(struct gendisk *disk, struct bio *bio,
+>> +		blk_status_t status, unsigned int delay_us)
+>> +{
+>> +	struct blk_error_inject_delay *d;
+>> +
+>> +	/* never block a bio that asked not to be blocked */
+>> +	if (bio->bi_opf & REQ_NOWAIT)
+>> +		return false;
+>> +
+>> +	d = kmalloc_obj(*d, GFP_NOIO);
+>> +	if (!d)
+>> +		return false;
+>> +
+>> +	pr_info_ratelimited("%pg: delaying %s at sector %llu:%u by %uus\n",
+>> +			disk->part0, blk_op_str(bio_op(bio)),
+>> +			bio->bi_iter.bi_sector, bio_sectors(bio), delay_us);
+>> +
+>> +	d->bio = bio;
+>> +	d->status = status;
+>> +	INIT_DELAYED_WORK(&d->dwork, blk_error_inject_delay_work);
+>> +
+>> +	/*
+>> +	 * Mark the bio before queueing the work, which can complete it as soon
+>> +	 * as it is queued.  Splitting happens below the injection hook, but
+>> +	 * bio_submit_split_bioset() resubmits the remainder through the hook
+>> +	 * again, and as bio_split() only advances the original bio that
+>> +	 * remainder still matches the same rule.  Without this a bio would be
+>> +	 * delayed once per split.
+>> +	 */
+>> +	bio_set_flag(bio, BIO_ERROR_INJECTED);
+>> +	queue_delayed_work(blk_error_inject_wq, &d->dwork,
+>> +			usecs_to_jiffies(delay_us));
+> 
+> How about comparing the delay against sysctl_hung_task_timeout_secs in
+> order not to trigger hung task detector?
 
-on commit: 05441d697f7f9a927264f4058cbbc6a03dfcac9d (2026-11-03)
+Hitting the hung task detector is intentional; it's one of the things I 
+imagine would be useful to test, which is why the cap is well above the 
+default timeout.
 
-The reproducer triggers this report. It uses the supported RTRS path disconnect
-and RNBD force unmap_device sysfs interfaces.
 
-To help trigger the bug more reliably, we applied a minimal diagnostic patch
-that only adds delays and print statements.
+The block layer's own waiters (blk_wait_io, blk_io_schedule) already 
+avoid the detector, so it only fires for upper layers that wait 
+uninterruptibly, which is what such a test is after.
 
-The reproducer and .config files are here.
-https://gist.github.com/shuangpengbai/5409f0d93ab7414fcb6d97ac799fe28f
+> 
+>> +	return true;
+>> +}
+>> +
+>>   bool __blk_error_inject(struct bio *bio)
+>>   {
+>>   	struct gendisk *disk = bio->bi_bdev->bd_disk;
+>>   	struct blk_error_inject *inj;
+>> +	blk_status_t status = BLK_STS_OK;
+>> +	unsigned int delay_us = 0;
+>>   
+>>   	rcu_read_lock();
+>>   	list_for_each_entry_rcu(inj, &disk->error_injection_list, entry) {
+>> @@ -45,29 +143,38 @@ bool __blk_error_inject(struct bio *bio)
+>>   		if (inj->chance > 1 && (get_random_u32() % inj->chance) != 0)
+>>   			continue;
+>>   
+>> -		pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
+>> -				disk->part0, blk_status_to_str(inj->status),
+>> -				blk_op_str(inj->op), bio->bi_iter.bi_sector,
+>> -				bio_sectors(bio));
+>> -		bio->bi_status = inj->status;
+>> -		rcu_read_unlock();
+>> -		bio_endio(bio);
+>> -		return true;
+>> +		status = inj->status;
+>> +		delay_us = inj->delay_us;
+>> +		break;
+>>   	}
+>>   	rcu_read_unlock();
+>> -	return false;
+>> +
+>> +	if (delay_us && blk_error_inject_delay(disk, bio, status, delay_us))
+>> +		return true;
+>> +	if (status == BLK_STS_OK)
+>> +		return false;
+> 
+> status == BLK_STS_OK is permitted only if delay_us != 0. It means we are
+> here because blk_error_inject_delay() failed to inject a delay?
 
-For context, I previously reported a related but distinct RTRS client
-use-after-free in the same subsystem:
-Link: https://lore.kernel.org/linux-rdma/20260921033339.1320291-1-shuangpeng.kernel@gmail.com/
+Yes, correct.
 
-I'm happy to test debug patches or provide additional information.
+> 
+> Also, in case delay injection fails, do we want to continue with error
+> injection? Or inject nothing and return false instead?
 
-Reported-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+I think there is no reason not to continue with error injection. The 
+user wanted to delay and then fail the bio. There isn't a strict rule to 
+execute both or none.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in rtrs_clt_query (drivers/infiniband/ulp/rtrs/rtrs-clt.c:59 drivers/infiniband/ulp/rtrs/rtrs-clt.c:3140)
-Read of size 4 at addr ffff88810228d2f8 by task kworker/1:0/24
+> 
+>> +
+>> +	pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
+>> +			disk->part0, blk_status_to_str(status),
+>> +			blk_op_str(bio_op(bio)), bio->bi_iter.bi_sector,
+>> +			bio_sectors(bio));
+>> +	bio->bi_status = status;
+>> +	bio_endio(bio);
+>> +	return true;
+>>   }
+>>   
+>>   static int error_inject_add(struct gendisk *disk, enum req_op op,
+>>   		sector_t start, u64 nr_sectors, blk_status_t status,
+>> -		unsigned int chance)
+>> +		unsigned int chance, unsigned int delay_us)
+>>   {
+>>   	struct blk_error_inject *inj;
+>>   	int error = -EINVAL;
+>>   
+>>   	if (op == REQ_OP_LAST)
+>>   		return -EINVAL;
+>> -	if (status == BLK_STS_OK)
+>> +	if (status == BLK_STS_OK && !delay_us)
+>> +		return -EINVAL;
+>> +	if (delay_us > BLK_ERROR_INJECT_MAX_DELAY_US)
+>>   		return -EINVAL;
+> 
+> This could also compare against sysctl_hung_task_timeout_secs and maybe
+> drop BLK_ERROR_INJECT_MAX_DELAY_US?
 
-Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Workqueue: rtrs_client_wq rtrs_clt_reconnect_work
-Call Trace:
-<TASK>
-dump_stack_lvl (lib/dump_stack.c:94 lib/dump_stack.c:120)
-print_report (mm/kasan/report.c:378 mm/kasan/report.c:482)
-kasan_report (mm/kasan/report.c:595)
-rtrs_clt_query (drivers/infiniband/ulp/rtrs/rtrs-clt.c:59 drivers/infiniband/ulp/rtrs/rtrs-clt.c:3140)
-rnbd_clt_link_ev (drivers/block/rnbd/rnbd-clt.c:691 drivers/block/rnbd/rnbd-clt.c:731)
-init_path (drivers/infiniband/ulp/rtrs/rtrs-clt.c:2161 drivers/infiniband/ulp/rtrs/rtrs-clt.c:2677)
-rtrs_clt_reconnect_work (drivers/infiniband/ulp/rtrs/rtrs-clt.c:2709)
-process_scheduled_works (kernel/workqueue.c:3495 kernel/workqueue.c:3578)
-worker_thread (kernel/workqueue.c:3659)
-kthread (kernel/kthread.c:436)
-ret_from_fork (arch/x86/kernel/process.c:158)
-ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
-</TASK>
-
-Allocated by task 306 on cpu 1 at 11.590323s:
-kasan_save_track (mm/kasan/common.c:57 mm/kasan/common.c:78)
-__kasan_kmalloc (mm/kasan/common.c:409 mm/kasan/common.c:426)
-alloc_path (include/linux/slab.h:991 include/linux/slab.h:1312 drivers/infiniband/ulp/rtrs/rtrs-clt.c:1540)
-rtrs_clt_open (drivers/infiniband/ulp/rtrs/rtrs-clt.c:2871)
-rnbd_clt_map_device (drivers/block/rnbd/rnbd-clt.c:1288 drivers/block/rnbd/rnbd-clt.c:1571)
-rnbd_clt_map_device_store (drivers/block/rnbd/rnbd-clt-sysfs.c:612)
-kernfs_fop_write_iter (fs/kernfs/file.c:345)
-vfs_write (fs/read_write.c:595 fs/read_write.c:687)
-ksys_write (fs/read_write.c:739)
-do_syscall_64 (arch/x86/entry/syscall_64.c:61 arch/x86/entry/syscall_64.c:84)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-
-Freed by task 306 on cpu 1 at 47.089348s:
-kasan_save_track (mm/kasan/common.c:57 mm/kasan/common.c:78)
-kasan_save_free_info (mm/kasan/generic.c:584)
-__kasan_slab_free (mm/kasan/common.c:264 mm/kasan/common.c:296)
-kfree (include/linux/kasan.h:235 mm/slub.c:2780 mm/slub.c:6630 mm/slub.c:6923)
-kobject_put (lib/kobject.c:689 lib/kobject.c:720 include/linux/kref.h:65 lib/kobject.c:737)
-rtrs_clt_close (drivers/infiniband/ulp/rtrs/rtrs-clt.c:2940)
-free_sess (drivers/block/rnbd/rnbd-clt.c:770 drivers/block/rnbd/rnbd-clt.c:786)
-rnbd_clt_put_dev (drivers/block/rnbd/rnbd-clt.c:49 drivers/block/rnbd/rnbd-clt.c:62)
-rnbd_clt_unmap_device (drivers/block/rnbd/rnbd-clt.c:1723)
-rnbd_clt_unmap_dev_store (drivers/block/rnbd/rnbd-clt-sysfs.c:334)
-kernfs_fop_write_iter (fs/kernfs/file.c:345)
-vfs_write (fs/read_write.c:595 fs/read_write.c:687)
-ksys_write (fs/read_write.c:739)
-do_syscall_64 (arch/x86/entry/syscall_64.c:61 arch/x86/entry/syscall_64.c:84)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-
-Last potentially related work creation:
-kasan_save_stack (mm/kasan/common.c:57)
-kasan_record_aux_stack (mm/kasan/generic.c:556)
-insert_work (kernel/workqueue.c:2356)
-__queue_work (kernel/workqueue.c:2546)
-queue_work_on (kernel/workqueue.c:2599)
-rtrs_clt_close_conns (include/linux/workqueue.h:700 drivers/infiniband/ulp/rtrs/rtrs-clt.c:1963)
-rtrs_clt_disconnect_store (drivers/infiniband/ulp/rtrs/rtrs-clt-sysfs.c:259)
-kernfs_fop_write_iter (fs/kernfs/file.c:345)
-vfs_write (fs/read_write.c:595 fs/read_write.c:687)
-ksys_write (fs/read_write.c:739)
-do_syscall_64 (arch/x86/entry/syscall_64.c:61 arch/x86/entry/syscall_64.c:84)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-
-The buggy address belongs to the object at ffff88810228d000
-which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 760 bytes inside of
-freed 2048-byte region [ffff88810228d000, ffff88810228d800)
-
-Best,
-Shuangpeng
