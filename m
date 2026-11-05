@@ -1,99 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793909914;
-	b=FELCP41AUSpLoVGLvbY6U76ifA3CIVeYm8r6lNiLIqKZxDPKMV+zgCO2M9zuI5Z0yK7x
-	 FwLExAPYgkkYIJjzwJSEKSw4XYJYWIrQ2vmim8g0j6h+xMJLwVWlsPmXnvoIpEMyfhetb
-	 eNLQ/HTYs1J/UyJubZoKEdkL3WXiNUAps1Tpbv6ta+t4ROxZld/OfXOhIXiLaQyBKR9o3
-	 2rfDmS4yKvu7eVdiskaaHQarXHC93oVYss8jDZQg2qYzrt6rQ41esXBOL6+PxOgRm8meK
-	 BxZercz5UHz0f1sfjsS5ccyNuseUrDHzJe46BMUA7uBpkOggUfa1Hz931np3IbFqV6w==
+	t=1793910592;
+	b=OkqK8CVNT70Gn5Bt0uHrH5qOZTGyt/XpIcTrZS5B398zOfB47S67x/5hIFlqT7m1M3G5
+	 WwvfcxEwRvTVPFwrBFJpnVk6d7/d/ZNHndj/+l15RfvhwfpxLyftplQlnQYMsk80kzfDk
+	 BfM6Tl3YsL5EAhMmfeRaLVXccoY/mmDQdp8mruniYqf0mjpuhWE9K657A7SoTOc4Rq+QH
+	 axElIfsfGqm8xiNmtBm9xF0zn4ngSQGzdxASwdJKJ37JyMqiORw5xuo/zMnFDHoqJasXG
+	 QClPyMXAsAydSkchpGY2sqs9GnlpHXIHVfPA7NzgtVhMxExAEzsAMRZ5EpKU4u9by5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793909914;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793910592;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=ou4/lAhEpFwwKVnn/O173URP+OPA9Dr5LXSyF2aM0Kk=;
-	b=kv2dFbrJaYpqK4PrX11hDPwnKqZCQaZUA5VmQEO0Fph4K9QLXULNow/4qKEHZSac6fPm
-	 Aghun2QF0+txZf6RAbZSe+qHI1h0tbDwSYKqj6iaxGE9dHH5NP812r0KbfqMXCwFaU4ql
-	 YbmOpqaWwe3yJq1Csfc74WNyb+wW8lOHamkLzYjERKlj05ckbU5WLlBHQY1J1A0bS1Rhn
-	 UonGVzLlLf0fQsgpYTHa3Z3AmCmBa5NXNyV2eZ3Hh0uC8ALw8NfzEMaxYv7dVBRvnSS9N
-	 pdcwi+ggxyEz+dXmJz41NstGwdazfjKO4Ae+otkXMgoJ3I4ggEipYoMS1rxFMbMufDw==
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=/nZzov8N+zyyuqAcE43h/bSIm3E1Cc1jzIpE1+g+dck=;
+	b=rKVtHXa8YDilQWKDjWN2a3+8W581TduwcAROoytugsIPxW6eNvjQ1+J2xy4rJl+FhwV9
+	 3d5tDVi2SVg8dPYOTxzL+lobsGQTb244Zyw1xVpzfMaw01XF4nj+NI5KnOaS9n1hIDO8Y
+	 pPbEtCjTuteZgLscxndebTX1Zg/SGUS5SGPnYxB8BtUq4rNCUZL3/72EJBxJqPYppGtto
+	 ujN6TYmPw1xcF4du079kTNLMFcPUWMUjEX72u+q9s7v3FLVoMrn8pc5WZemN/C+a8R9Bn
+	 TPtkJ6BXrBUxvaVHLUMnR3qoRvPuIaYqNMV+OAcYKGVW0dKkZ9cic4/KBV0w0qvcMnw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=purestorage.com;
-	spf=pass smtp.mailfrom=purestorage.com;
-	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=fY92HljY;
-	arc=none smtp.remote-ip=209.85.221.51
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F4nAnTX+;
+	arc=none smtp.remote-ip=209.85.160.181
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090AF606A331
-	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 20:18:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 090AF606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A17606A32F
+	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 20:29:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 01A17606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=fY92HljY
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-491f34b4e0fso473246f8f.2
-        for <linux-block@vger.kernel.org>; Thu, 05 Nov 2026 12:18:32 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F4nAnTX+
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-5366ae57896so25174731cf.3
+        for <linux-block@vger.kernel.org>; Thu, 05 Nov 2026 12:29:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1793909911; x=1794514711; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ou4/lAhEpFwwKVnn/O173URP+OPA9Dr5LXSyF2aM0Kk=;
-        b=fY92HljYm7SUL/irbYBIukak8YUb3C47lQ24TCLgGG5fynimxwPMQM+lYLIvhRAsPn
-         qeUUtYqIRjEY35BnZd3pdA7+2EWRL0YEmPLA5UQch4Pmsy+TjNMBcr3MTzWON96WdVQW
-         oL4VhqsBcv52vQnJuepnrDyVRTGTF3q+i9khUTk18gQQlez/vXzTpXcx+azvPnzpGGEt
-         Pu6zHj0bebmvcJ6HDvrCNcnCbekezGsG0wMHx9JJ2rRXOwP5gRcGtCiKlDVRkmpycaAD
-         uSyxZVf1n0IK3GC0YVK8+h9Ma5JBOF0GGkZPL5elj6Rn5CwQSU1cy/+Q5oCHg3VB1E0a
-         fh8g==
+        d=gmail.com; s=20260707; t=1793910591; x=1794515391; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/nZzov8N+zyyuqAcE43h/bSIm3E1Cc1jzIpE1+g+dck=;
+        b=F4nAnTX+kii+PCwyyE0+1CUq6xJegQw9Tm8KNoyuKGVdIP/Ko9Ng/U+c58ziik5Se9
+         UUtqGZLNGD8+LVfbRtp/Nn6er98UzOlv0qPoeWxv9Nh3I8THKjTFfKaGjrpsCtTh+Qjv
+         CqXTFPgAldeBlYd5Mxeh18m2WjlHgzjpBApFxVcnIDFh8CYhePDyr6YHwW4IaDbezSpg
+         t2oJyRQHZliPfEgufGXaXggD561cfP6iBPdqU1zssg+TF8PA8b7TjDHVEMUvYtao4waB
+         GmvCcEivjyLLWU7WVoX2mNB6pbbzQG+NpdAhScovptkBDsEEZmt5ct4uu6kSHh5hYg2w
+         a8ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793909911; x=1794514711;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ou4/lAhEpFwwKVnn/O173URP+OPA9Dr5LXSyF2aM0Kk=;
-        b=oBBJYq7CFFThb4iExIOn+wnIMH1tlXtKI+ThTylK+bh6WxX15Cdk30OtTuPnOJL4/U
-         7ihycr2Jl4mlKE9hrTAEcm5El2oEWlVq2RrqOAJpqeCqpoAgVzk7xrEZ9bWK/HDtrExP
-         Jr9+GsDEbp8gppwHFnXAI8CzDtkzwrVCn8JprHppET2357ylTNJzbVDayDEka9HIapMO
-         ZTV9z+7xBYlsMc5fOKr5ybkCtLiY8lJhADjNrdIvGrQ6HZCFncWquQMBppmanYkCwHMx
-         uMupmdwF+gbN0yzXhHGpEcLcgztkDZFXENujKZheA7YviZXqLGQIPsR/lWkl3iN90i3f
-         CizA==
-X-Forwarded-Encrypted: i=1; AKwUvBwzRikS2X7pmGnNXeCtkufVRSBp5VlPbBoGlOxq/Rap3d442+i1XOce6UcGo9PTFWNBSpSH6QnyOX6TUg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9JyjaWOu4oNCJbSNA0yw+m1/ZvseYXtSMOK1PlhfO7MEKym1cH
-	erJ6sNBQHTFriOH4dQjrxO5hBIrBeHUX/YCG8lTEAONCaUZ2jAyO2N8MUwHYacB8e0Y=
-X-Gm-Gg: AYBFou055XjFeUJueFO90bb2rKqgTXfd8ktCJgmh7Evt+AXeVYUCKXZ8OY6PYdg0kL1
-	ipc/CI4c39n6eTKbJjYfwm0EPybL1gsxYFXnBp+YkTbZsbDZrdGehSED+EwHmGpEYp/SLFORUEU
-	ZIiZkFClXUDuE11LuVOVRjWlas+tntGyLVpZRUF6Ju1SAYNz7q4UpFzQzfnStArA9tIs3iJwh22
-	/CIfr0NbNpPaVq0e1S+HGqB4KwcCwMU04tGxOm8wOMRICkDu5z6MpQ7Hhfr0z3cvCU6/GXdhtzG
-	8hJjFDNY3LTtXfo12cf7nPfbS3eMOEDfkd4BSX6SfdrEFAlC3V2h8HueSP4aChNvHFOXGX2/49v
-	MOWIFZe9MzYCrlW2ghEIkUBK7/7/N8KQR6wEBLIpArjm0Zfa7XhgM5kPI1+nDqFP+k90pCuoSB4
-	QIFK+3SwGjI/nch2V5je33HPwDHlYIZkV9m2zfzKNC26SVFRfQ5YoW9G95zfC1+TCWt2r45sPki
-	Bl4vgT8JbTmgmckTMIhkvG7UGYYVt6ETmH2mtYgI1O+Z2UUom1KargeY4oly6qglbHL5n/CbApp
-	aLhLGloChfkB6BgbS5N+15NnmRz/8mm4GAgA/IohycfmtzBS
-X-Received: by 2002:a05:6000:1788:b0:491:ed89:a38f with SMTP id ffacd0b85a97d-49276977d36mr1397300f8f.23.1793909911128;
-        Thu, 05 Nov 2026 12:18:31 -0800 (PST)
-Received: from medusa.lab.kspace.sh ([208.88.152.253])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-48fece99a5dsm11653632f8f.21.2026.11.05.12.18.29
+        d=1e100.net; s=20260707; t=1793910591; x=1794515391;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/nZzov8N+zyyuqAcE43h/bSIm3E1Cc1jzIpE1+g+dck=;
+        b=2d1j52Y3DsfhlpbvuVyGS842HAgTQvDTZG/UvzZBsPbOeQEQRKYeO947/cn6uDE3AW
+         L+31B9tkEOcSZ5SSrFeb3rJIxKdEENfjBdP93UxX1V/mygDZubR0S0oXLEdyZZukKRoh
+         FXYldcexeaQcwFa0fCPFE2Va//pLyqdG0jb5IDaTilWY90Dri/akEo8Yp3z/1O7FRIK+
+         6/wvjn4W0gmB5vjJyj0SmDAxGLJmApJ/b5hRNfYNu/cjDE2JaR306W3FXtxBbj7iI/GD
+         M1lo3MTV33qIB5GKtZHtZSpcYQxfcEf74rUs6pM/dGyYbmn9chQNNvWlV2t0MKEXUS7D
+         kMgQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxkpQKMzaqV/6y/W3U0IUgWbt9UjLxP3WX7wb/Gq1JMoDgDWYFguOCQqYFv22t2T4Enz+k9Vv8ffzVQ7g==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+hnbVGaoiyIAKDLQsK/EiG94Fq0tPv0iQOD5c7OuNeSrqQGYRj
+	6oNW5LS8AhRxRzTvccjgK1YbsCCOzMBmhLp4YFvKV5ox1vPuXu5xqZOhQHEsAyED
+X-Gm-Gg: AYBFou3OhhH48VJQEjCeaN8KkCQ8b4kGfYWbd2o4IG+XcR6DJvorIIH6++Z7Q9EamR2
+	0eJVFjNKVA7t8ePMjcZZe/aPYuGyEGpaRlIF5osv0wqNqRzMoiwMGRhbapKwU9GAGfhoPcYIgo7
+	rjW/5Ase0eCyniG7vTbMkpwc4qzEsjFuTe7t6KTvq363JiQa6UOhbxSoSd5jqBZKva1Xrd90fBx
+	PErhGVeUpTDkGLYUE11x3mVQil+oe/F7nBSrmmD8hHGZqr8bUz1NQsLOLNrrMDe4WOtMijSsel5
+	EoICiMt7EOLysycB8js4HNfaBhxtFA2z3710t4QifTK6LQKMKFaDqwT8IhSgkR0mh8LHm6OnAay
+	2L/GD50BVgBeEpPQ9WbcC16vpwOrwQH3byyDahyLIz8hMXpgmtT3JQMG+v16IZZGMJTb+qLl1ZV
+	UQH9JMKuh+C6T0JBbzshh7oHnZjW4f/GYSTKTso+Rlr/GB5zLiTdLHjlmmt9lFcO7AzT357EUUp
+	khnGETVvo2ON1LAgmek3A2nuOu4HNIYps4btR6o/PlVBOUvSDAqSn2OAkfq9sqIcpqlwNTDQK8z
+	VMFU4FWIZ+3ul+xaJx7ltEjY76c0WjYELbehFZuq9KiY1XGpdyY0zivLf0A=
+X-Received: by 2002:ac8:5ad6:0:b0:536:6488:e7e4 with SMTP id d75a77b69052e-54e12fa003emr7137181cf.13.1793910590737;
+        Thu, 05 Nov 2026 12:29:50 -0800 (PST)
+Received: from i4-l-hqh5357-03.ad.psu.edu ([130.203.139.71])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-54e27502132sm1987361cf.28.2026.11.05.12.29.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Nov 2026 12:18:30 -0800 (PST)
-Date: Thu, 5 Nov 2026 12:18:27 -0800
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: Haris Iqbal <haris.iqbal@linux.dev>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org
-Subject: Re: [v3 for-next 1/3] block: Reject unknown status tags in error
- injection rules
-Message-ID: <20261105201827.GB2439-mkhalfella@purestorage.com>
-References: <20260928221634.43239-1-haris.iqbal@linux.dev>
- <20260928221634.43239-2-haris.iqbal@linux.dev>
- <20261005084917.GA9160@lst.de>
- <20261020223402.GA1582237-mkhalfella@purestorage.com>
- <58a98f7d-b2c5-47b5-a372-0ab5afa6a8ed@linux.dev>
+        Thu, 05 Nov 2026 12:29:50 -0800 (PST)
+From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+To: "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Shuangpeng Bai <shuangpeng.kernel@gmail.com>,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [BUG] RDMA/rtrs-clt: KASAN use-after-free in rtrs_clt_query
+Date: Thu,  5 Nov 2026 15:28:43 -0500
+Message-ID: <20261105202939.3104321-1-shuangpeng.kernel@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -103,138 +100,103 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58a98f7d-b2c5-47b5-a372-0ab5afa6a8ed@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On Thu 2026-11-05 21:00:27 +0100, Haris Iqbal wrote:
-> 
-> 
-> On 10/21/26 00:34, Mohamed Khalfella wrote:
-> > On Mon 2026-10-05 10:49:17 +0200, Christoph Hellwig wrote:
-> >> On Tue, Sep 29, 2026 at 12:16:32AM +0200, Md Haris Iqbal wrote:
-> >>> tag_to_blk_status() returns BLK_STS_OK both for the "OK" tag and for a
-> >>> tag it does not recognize, so a caller cannot tell the two apart. The
-> >>> block error injection code (which is the sole user of this function
-> >>> currently) relies on error_inject_add() later to reject adding a rule with
-> >>> status=BLK_STS_OK. This is okay for the current state of error injection.
-> >>>
-> >>> The delay option added in the next commit makes the rule with status=OK
-> >>> valid, meaning the function tag_to_blk_status() now needs to explicitly
-> >>> match BLK_STS_OK for it, and fail for a tag it does not recognize. Hence
-> >>> make tag_to_blk_status() take a second param to update the matched status,
-> >>> and return true in case of a successful match. If a match is not found,
-> >>> the function tag_to_blk_status() returns false and *status remains
-> >>> unchanged.
-> >>>
-> >>> A repeated status= where an invalid tag comes first is now rejected
-> >>> instead of being overridden by the later one.
-> >>>
-> >>> Cc: Christoph Hellwig <hch@lst.de>
-> >>> Assisted-by: Claude:claude-opus-5
-> >>> Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
-> >>> ---
-> >>>   block/blk-core.c        | 14 ++++++--------
-> >>>   block/blk.h             |  2 +-
-> >>>   block/error-injection.c |  7 ++++---
-> >>>   3 files changed, 11 insertions(+), 12 deletions(-)
-> >>>
-> >>> diff --git a/block/blk-core.c b/block/blk-core.c
-> >>> index 13dc70e8f55d..c45846b9c50d 100644
-> >>> --- a/block/blk-core.c
-> >>> +++ b/block/blk-core.c
-> >>> @@ -225,21 +225,19 @@ const char *blk_status_to_tag(blk_status_t status)
-> >>>   	return blk_errors[idx].tag;
-> >>>   }
-> >>>   
-> >>> -blk_status_t tag_to_blk_status(const char *tag)
-> >>> +bool tag_to_blk_status(const char *tag, blk_status_t *status)
-> >>>   {
-> >>>   	int i;
-> >>>   
-> >>>   	for (i = 0; i < ARRAY_SIZE(blk_errors); i++) {
-> >>>   		if (blk_errors[i].tag &&
-> >>> -		    !strcmp(blk_errors[i].tag, tag))
-> >>> -			return (__force blk_status_t)i;
-> >>> +		    !strcmp(blk_errors[i].tag, tag)) {
-> >>> +			*status = (__force blk_status_t)i;
-> >>> +			return true;
-> >>> +		}
-> >>>   	}
-> >>>   
-> >>> -	/*
-> >>> -	 * Return BLK_STS_OK for mismatches as this function is intended to
-> >>> -	 * parse error status values.
-> >>> -	 */
-> >>> -	return BLK_STS_OK;
-> >>> +	return false;
-> >>>   }
-> >>>   
-> >>>   /**
-> >>> diff --git a/block/blk.h b/block/blk.h
-> >>> index 2cc03aa54c53..5fa54162c686 100644
-> >>> --- a/block/blk.h
-> >>> +++ b/block/blk.h
-> >>> @@ -52,7 +52,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
-> >>>   
-> >>>   const char *blk_status_to_str(blk_status_t status);
-> >>>   const char *blk_status_to_tag(blk_status_t status);
-> >>> -blk_status_t tag_to_blk_status(const char *tag);
-> >>> +bool tag_to_blk_status(const char *tag, blk_status_t *status);
-> >>>   enum req_op str_to_blk_op(const char *op);
-> >>>   
-> >>>   bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
-> >>> diff --git a/block/error-injection.c b/block/error-injection.c
-> >>> index e14bc4b723ef..db543fe27630 100644
-> >>> --- a/block/error-injection.c
-> >>> +++ b/block/error-injection.c
-> >>> @@ -171,15 +171,16 @@ static int match_op(substring_t *args, enum req_op *op)
-> >>>   static int match_status(substring_t *args, blk_status_t *status)
-> >>>   {
-> >>>   	const char *tag;
-> >>> +	bool found;
-> >>>   
-> >>>   	tag = match_strdup(args);
-> >>>   	if (!tag)
-> >>>   		return -ENOMEM;
-> >>> -	*status = tag_to_blk_status(tag);
-> >>> -	if (!*status)
-> >>> +	found = tag_to_blk_status(tag, status);
-> >>> +	if (!found)
-> >>>   		pr_warn("invalid status '%s'\n", tag);
-> >>>   	kfree(tag);
-> >>> -	return 0;
-> >>> +	return found ? 0 : -EINVAL;
-> >>
-> >> 	if (!found) {
-> >>    		pr_warn("invalid status '%s'\n", tag);
-> >> 		return -EINVAL;
-> >> 	}
-> >> 	return 0;
-> 
-> As Mohamed mentioned below, "tag" would leak then.
-> 
-> > 
-> > Doing it this way will result in use-after-free. "tag" has already been
-> > freed above.
-> > 
-> > Maybe change tag_to_blk_status() to return an int (0 on success and
-> > -EINVAL on failure) and use its return value without mapping it?
-> 
-> I am not sure I get your suggestion completely. Even if we change the 
-> return type of tag_to_blk_status(), we would have to free the "tag" 
-> before returning.
+Hi Kernel Maintainers,
 
-Changing tag_to_blk_status() to return an int will not have an effect or
-"tag" like you mentioned. But you will not need to map the return from
-that function.
+I hit the following report while testing current upstream kernel:
 
-return found ? 0 : -EINVAL;
+KASAN: slab-use-after-free in rtrs_clt_query
 
-The line above just returns what tag_to_blk_status() returned.
+on commit: 05441d697f7f9a927264f4058cbbc6a03dfcac9d (2026-11-03)
 
-> 
-> What can make it simpler is allocating "tag" on stack, and then use 
-> match_strlcpy() instead of match_strdup().
+The reproducer triggers this report. It uses the supported RTRS path disconnect
+and RNBD force unmap_device sysfs interfaces.
 
-That can work too. Just make sure we limit the string size somehow.
+To help trigger the bug more reliably, we applied a minimal diagnostic patch
+that only adds delays and print statements.
+
+The reproducer and .config files are here.
+https://gist.github.com/shuangpengbai/5409f0d93ab7414fcb6d97ac799fe28f
+
+For context, I previously reported a related but distinct RTRS client
+use-after-free in the same subsystem:
+Link: https://lore.kernel.org/linux-rdma/20260921033339.1320291-1-shuangpeng.kernel@gmail.com/
+
+I'm happy to test debug patches or provide additional information.
+
+Reported-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+
+==================================================================
+BUG: KASAN: slab-use-after-free in rtrs_clt_query (drivers/infiniband/ulp/rtrs/rtrs-clt.c:59 drivers/infiniband/ulp/rtrs/rtrs-clt.c:3140)
+Read of size 4 at addr ffff88810228d2f8 by task kworker/1:0/24
+
+Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Workqueue: rtrs_client_wq rtrs_clt_reconnect_work
+Call Trace:
+<TASK>
+dump_stack_lvl (lib/dump_stack.c:94 lib/dump_stack.c:120)
+print_report (mm/kasan/report.c:378 mm/kasan/report.c:482)
+kasan_report (mm/kasan/report.c:595)
+rtrs_clt_query (drivers/infiniband/ulp/rtrs/rtrs-clt.c:59 drivers/infiniband/ulp/rtrs/rtrs-clt.c:3140)
+rnbd_clt_link_ev (drivers/block/rnbd/rnbd-clt.c:691 drivers/block/rnbd/rnbd-clt.c:731)
+init_path (drivers/infiniband/ulp/rtrs/rtrs-clt.c:2161 drivers/infiniband/ulp/rtrs/rtrs-clt.c:2677)
+rtrs_clt_reconnect_work (drivers/infiniband/ulp/rtrs/rtrs-clt.c:2709)
+process_scheduled_works (kernel/workqueue.c:3495 kernel/workqueue.c:3578)
+worker_thread (kernel/workqueue.c:3659)
+kthread (kernel/kthread.c:436)
+ret_from_fork (arch/x86/kernel/process.c:158)
+ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
+</TASK>
+
+Allocated by task 306 on cpu 1 at 11.590323s:
+kasan_save_track (mm/kasan/common.c:57 mm/kasan/common.c:78)
+__kasan_kmalloc (mm/kasan/common.c:409 mm/kasan/common.c:426)
+alloc_path (include/linux/slab.h:991 include/linux/slab.h:1312 drivers/infiniband/ulp/rtrs/rtrs-clt.c:1540)
+rtrs_clt_open (drivers/infiniband/ulp/rtrs/rtrs-clt.c:2871)
+rnbd_clt_map_device (drivers/block/rnbd/rnbd-clt.c:1288 drivers/block/rnbd/rnbd-clt.c:1571)
+rnbd_clt_map_device_store (drivers/block/rnbd/rnbd-clt-sysfs.c:612)
+kernfs_fop_write_iter (fs/kernfs/file.c:345)
+vfs_write (fs/read_write.c:595 fs/read_write.c:687)
+ksys_write (fs/read_write.c:739)
+do_syscall_64 (arch/x86/entry/syscall_64.c:61 arch/x86/entry/syscall_64.c:84)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+
+Freed by task 306 on cpu 1 at 47.089348s:
+kasan_save_track (mm/kasan/common.c:57 mm/kasan/common.c:78)
+kasan_save_free_info (mm/kasan/generic.c:584)
+__kasan_slab_free (mm/kasan/common.c:264 mm/kasan/common.c:296)
+kfree (include/linux/kasan.h:235 mm/slub.c:2780 mm/slub.c:6630 mm/slub.c:6923)
+kobject_put (lib/kobject.c:689 lib/kobject.c:720 include/linux/kref.h:65 lib/kobject.c:737)
+rtrs_clt_close (drivers/infiniband/ulp/rtrs/rtrs-clt.c:2940)
+free_sess (drivers/block/rnbd/rnbd-clt.c:770 drivers/block/rnbd/rnbd-clt.c:786)
+rnbd_clt_put_dev (drivers/block/rnbd/rnbd-clt.c:49 drivers/block/rnbd/rnbd-clt.c:62)
+rnbd_clt_unmap_device (drivers/block/rnbd/rnbd-clt.c:1723)
+rnbd_clt_unmap_dev_store (drivers/block/rnbd/rnbd-clt-sysfs.c:334)
+kernfs_fop_write_iter (fs/kernfs/file.c:345)
+vfs_write (fs/read_write.c:595 fs/read_write.c:687)
+ksys_write (fs/read_write.c:739)
+do_syscall_64 (arch/x86/entry/syscall_64.c:61 arch/x86/entry/syscall_64.c:84)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+
+Last potentially related work creation:
+kasan_save_stack (mm/kasan/common.c:57)
+kasan_record_aux_stack (mm/kasan/generic.c:556)
+insert_work (kernel/workqueue.c:2356)
+__queue_work (kernel/workqueue.c:2546)
+queue_work_on (kernel/workqueue.c:2599)
+rtrs_clt_close_conns (include/linux/workqueue.h:700 drivers/infiniband/ulp/rtrs/rtrs-clt.c:1963)
+rtrs_clt_disconnect_store (drivers/infiniband/ulp/rtrs/rtrs-clt-sysfs.c:259)
+kernfs_fop_write_iter (fs/kernfs/file.c:345)
+vfs_write (fs/read_write.c:595 fs/read_write.c:687)
+ksys_write (fs/read_write.c:739)
+do_syscall_64 (arch/x86/entry/syscall_64.c:61 arch/x86/entry/syscall_64.c:84)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+
+The buggy address belongs to the object at ffff88810228d000
+which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 760 bytes inside of
+freed 2048-byte region [ffff88810228d000, ffff88810228d800)
+
+Best,
+Shuangpeng
