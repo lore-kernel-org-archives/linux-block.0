@@ -1,96 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.226
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793844835;
-	b=qiDQi78RD9z/AfT/JMg6Q9rTnEpQIz6AE78csHD+08AJ3i5SP0FVLtnXZETukDygy3r7
-	 j/+54zKsJOtiNKp5amqGp3D0CHYWzAeGLUsknjpvpWy6xv160DYZeIGIDSVCR8ipEc3LN
-	 9Oj60ULVmAoz5tN3koiHPRVHCyDp9JUfT1lJ75gFzZQy3jUee5n0H4OV0rkAC1fQu49Wn
-	 /C/aRdfAellVTofujqh8ac3CY2zLQVcWbZnXDHgUHYZbHWdDEz7s0ObGvj828PupkJLCw
-	 d9C1hIQIYa3sSwCLWblzXLmvpgqjLDy31KWUsmORyEooHsrL+kXYiIkMEz81uTocMRg==
+	t=1793854081;
+	b=3Dj5X9Q4cdaEHLmyDqlqJIhjZvcul3yZKSEPZD+jpiBByb41nzkea/KkudxN+e5oeSvJ
+	 1lcLtYMUGeUu+x5NkAblqJtgcLXRRFOo8G+/wnIkl2gFr3ug6i5mryiQQCvct5KRR8OI3
+	 ynL1Ay8C8z3CWe9FLC4CkMvSc9wd+S8IGLBaGOqLEVNs++LRHPNMg6T00F32HLEpkxdom
+	 hYRebvDGzbWeykxQx3v54tsk7c78TwETNRZrFNSCLnHBLwqb094HRZJyUS7Saxc0DKUhv
+	 1OvZJ6pXHz+BhpTGRsOlR/hBwuV6YSjJy8Ok1n1Y+P9idIO0bjZoJqRQG0Q6w3GyWFw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793844835;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793854081;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 X-Relaying-Domain:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=jbk/ihbbo8xIG/OluC/zPXeNuyP21AAyIO9Pon6dIe4=;
-	b=bVQT9SUhA8gBbNLlfycwL683kZzS7xo2Hz7rjnRh+YzYl1MJ+hhjZvisxKiZuGaFowOn
-	 9xrYpbNvhmTjzkKjHk06f971TRFq35pzlWbfvqavSFrf+ThE0glPozrA9uVuf4RmlszCB
-	 PvNnEu2JYOpOnt57uY7igBP8okT3F0HQlG41Iqi9J9zOFln+RcAtjs+L3oEdUa53Qh6hY
-	 Z093jY+nu138s8HzDPFdRgG+MS2QN6/kupk0A0fVT7DQC9TCC0kk3pwTd25IKmUU9Hmm7
-	 tq6fqrMHNUUZXDuCR21SZ9jIQ/+qmuiXfNyY0zbZIMpaF3YZohTKCb47Av7xw6faIRg==
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=lZ/laB7EjjzlJibu0SL3xlybjiUy40ADVZ8qce7qfBM=;
+	b=fLmLYIA+1mTjb7kQ48IHU1aya9B+rbw3cjElJYMw3d3InsfyWdz6tRj11DwUUdZqcDLW
+	 MgdimG5BikEzjSPvkSTIjlWIn86D5+rcPsY/QuXRkUAyyYDFd/wF+8nvt/0qBYTljK3Ms
+	 eC9Q2APOoNKjzejptjl/9j+AKNaMRYojT7LUte1XTum3lItosXEDhUJzALprxhUHbeuGa
+	 8PMCcfQxRmL4ou9WRNroZW25SMkaCe4vCK+0CNYfBxLjnJhuYRZ9SFIBej6/H6imvrv1Q
+	 lV+Mmx8xTJURvyUjEIwJR24sjoQuAkWt3D0cxS2K9q6kFbUeUNuN5mT9x/xE4IfC22A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=purestorage.com;
-	spf=pass smtp.mailfrom=purestorage.com;
-	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b="MBoxWp/V";
-	arc=none smtp.remote-ip=209.85.215.226
-Received: from mail-pg1-f226.google.com (mail-pg1-f226.google.com [209.85.215.226])
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=RENQGIw2;
+	arc=none smtp.remote-ip=74.125.82.49
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC538606A31B
-	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 02:13:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC538606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE74E606A328
+	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 04:48:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DE74E606A328
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=MBoxWp/V
-Received: by mail-pg1-f226.google.com with SMTP id 41be03b00d2f7-cd15c885bdaso52767a12.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 18:13:54 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=RENQGIw2
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-1adbf62dd31so2042983c88.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 20:48:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1793844834; x=1794449634; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1793854080; x=1794458880; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jbk/ihbbo8xIG/OluC/zPXeNuyP21AAyIO9Pon6dIe4=;
-        b=MBoxWp/VMp/jHihnId3EgiwONu5hVMB9flYotVj8jbkpwsPWHst2MDLmXCtuLa7IFL
-         X1JFGYe6k9FuOJgk3nEOmlQauGkmZ2siyEH27d33Q8aityv0sL0AwVLBAOluwqbOOQbT
-         ikYV4SkwafMXj3pYYKwlQO/yq2AhRIrMBjv//F5wdHRNDrDbloJ7wB5KSfqo8PNPp0Gp
-         7quKUFAGAlDhhBezsDodHQMZcpuuZPHNB8yvx2Qi7PBM0kvNeCJ5Wsxyu4GzMjoLnOBU
-         5fk70VKuXXN6cEnU3gkFlvNTB8rZbLf222TV4ol1xYweWgRe5vMoNCs0l5soZEH0aiMw
-         LGAg==
+        bh=lZ/laB7EjjzlJibu0SL3xlybjiUy40ADVZ8qce7qfBM=;
+        b=RENQGIw2fXdz6cwkqBmrWSEx1sJ+69oy4zRqKse3yHtWwoIvjbpFfUkE/9rfqe8J2C
+         Ez5XEsLPw1/JNyZBNDhMstsxWTsKdyFk5iEAMqB7NSQzZ6lK5AKWOLOxS5+1krdU2VYj
+         ++OEvP2me0A64Gi8r4CB8KTwyTd0RdueKyPZ4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793844834; x=1794449634;
+        d=1e100.net; s=20260707; t=1793854080; x=1794458880;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=jbk/ihbbo8xIG/OluC/zPXeNuyP21AAyIO9Pon6dIe4=;
-        b=iSXbya780+IJvuHwwjSanCMGQKcGRIWS2p6N6UVOJyAm9Uz3rCDTaCWl022aCe1Ig1
-         QnxlVKZ5kVSUQXHF2r+vCa1iFdrKVzCJPXvwhyK++zznwxHwM57YfGXkv0RPb0+wNqnE
-         posaCkhL67k6y+KKk2iAxwzSXKshbqJuptGvE53sUpl3tyZbvR9hSwy3lY2HjpJp13EJ
-         /hZ5WsoCmEIaXCenTbyBsQ3ezk7Kl0hC7Povvtoir6aeE/HXdsjaZJ6Xe5XDh8QEvxaA
-         szqSFetyOzOPbvcOHGGNuQI4NH9iZaDdS49414yCR6uU6YGmnpqjURoxexBJUBfk4CAw
-         dnIw==
-X-Forwarded-Encrypted: i=1; AKwUvBxw9T6N7dLUSh1tcKxV7dcqMOgQOcpWgnOboVDHv5Pw3oCczJ5CjWjsPk8vx09N4b9cgfFJ6gfqRAUTsA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/Gm9Nr5mXhE08Bd+ifn4f/E+UEru9SuHuEqVs85Qs8h5zl+mas
-	gVEREgx69h1nDsvrgpol01UA7el+O4jDlrSHaJbBY7sbqcWDsiyuynllECKREbXrFjNSPnzFpHN
-	ENI3IWcSGOCmNtntG55Ae8yEexPQAob1IbVzE
-X-Gm-Gg: AYBFou0wQuLNIBrlmGllcCah4/WiK/hHtcm0Vw8LAzj4ZTGbO5+Q1Oyse6+tZIoReJT
-	bKkSuOxhcyvuGdcNIWqPs11burc0k9elUiUJ80CCgAzJweCt0n+pgfAWg1CxBD8CXQxXDppavwK
-	WqDebv+mmBZh+sz8Aw35IVxU4DOmnH/F2BDzZZxp0xYgBGWypNsLkrpokilhXVdKcIks6MvNU0F
-	oS22l4nhVxy6Hfq7mNvkGDDkHTMdLTj11QwAAZttSUv/SbQ+etGlHtJZeOIAXWAhyrj8xRGcwl9
-	x8WmSnpUYypFWqcxcJHXvW5sjgzghLpLFBaiLVnKTPPfxT7+VA1Ci05D8uRl/8fmunEzT1kmkmM
-	BDwPqK2VQQl9VniO5/W3FloALpcMXt1en
-X-Received: by 2002:a17:90b:3ec6:b0:3ac:a11a:7c88 with SMTP id 98e67ed59e1d1-3ae89767d8dmr25056607a91.3.1793844834135;
-        Wed, 04 Nov 2026 18:13:54 -0800 (PST)
-Received: from c7-smtp-2026.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3b0b2e09962sm836221a91.0.2026.11.04.18.13.53
+        bh=lZ/laB7EjjzlJibu0SL3xlybjiUy40ADVZ8qce7qfBM=;
+        b=et/ivgRo13KYAwI4gq+GKdc0JDf1g8IgGG5yv6ezraLzHQNH1bxzmeXZKjwjEELDRs
+         MhvG3Ksk5DCKIZgfu2N7VHmy2rP3rZP6F9eh0ZVgIkkc6EQ0+Kzdw7zMh8fW2o6dLP/U
+         lmqVkg+DUqIGkZs4aMMy7oyuEbl487N9VnNL0vUW3QlfLQYivuKhvhYMSWCVrrC/dj3a
+         Ia0PQVmpGE0rYAMDpPp9zrCsI5yAF5ECW1BGfogrzUfPAk8Ts5RA2JjJhja8WLQola+N
+         BBu4k5CIwiogYK+euEeXcYhq+F/FbmOor8NPrjLufFCQYHkZFeRIWoYM+wO7Q5BgTgwp
+         zaWg==
+X-Forwarded-Encrypted: i=1; AKwUvBweQDtl6e3Huq5dtS0XvchZaqZ+RmaVtek/YuCqiFWKQQV0gguOA6csvUxxNheP62c+KD9NFi794aWzLA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9EK5Jgy29sIhjwIfvu77mLrzPGbBonj3iCVpDnwLtv9wVeZuTa
+	fVDJBYzl9ZTeqhPGSYpti8kWrmK/zfW45tSzS12qB76wlwK/GmaLFndGLSUpREqXHQ==
+X-Gm-Gg: AYBFou1zgmKgIeYe0QHj2jmd3F/dLWbVUJUA4SDkCGRkI23isCrxX4+fv1quMAjgNXF
+	/tmgCQ4K+VycB8l2W4FwzKLiEPTN1amTowm5SMKbHqPK8p1HYFJ5/DaTSSf4vSevIYuDWhysTb0
+	prA84tjzyiPWHfYiznCnitS5PvffzajKuTxLF5y3xPL46UQDdPOlzOzw4zbjX24uF7/71JStolJ
+	GWki8HYfQrHTA7lWOfm7ub/An75IENp8weg+/oXAUiIXxpfVtRsqudU/N8MKRCLpmhGcDFnZedC
+	zN0x0ulq5stwPgBXmX7x1paly1B01bIFBsWBDyAEL+9pEr8GOJiuFcVWPQYJE8tpaxtqa94Uo10
+	yLv+FvNIq7ZyEfi2Wic0LqpFmIqaw3RISkLbPDbQkYP5uQQakbOzQJqkYfH/fBy+8MVblHnd3fW
+	5s6iB8LdCTC9q+W1X88Dlog/+nJzVW6h2FHYzNjgV4idX7Ozoa6n1oUvL776Vtbdyr9w7+jB6xq
+	Ekur+V/kVO1gxNrU45wAR6cDBv9e47RV+p7dso3DZH1q0Vh4K/oFF+5j6G5gVRzbyMs3rEETyq1
+	qaD9QTl6DYaVMeFLOhvcNAFcBJSeEIb9+hVdb90lScs6QhnpYFhx9t+ctX7k5GZDJC9rnDTfOkk
+	+P/36nrSvTJXUsYG/VA==
+X-Received: by 2002:a05:701b:4192:10b0:1a3:8d5f:6f93 with SMTP id a92af1059eb24-1ac5c8369cbmr26358050c88.17.1793854079724;
+        Wed, 04 Nov 2026 20:47:59 -0800 (PST)
+Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:37bc:b763:7ec7:65b4])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b245c6f0dcsm17142927c88.21.2026.11.04.20.47.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2026 18:13:54 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.17.2.4])
-	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id 6CBA940278;
-	Wed,  4 Nov 2026 19:13:53 -0700 (MST)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 609FCE4054E; Wed,  4 Nov 2026 19:13:53 -0700 (MST)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
+        Wed, 04 Nov 2026 20:47:59 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Nhat Pham <nphamcs@gmail.com>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Brian Geffon <bgeffon@google.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Richard Chang <richardycc@google.com>,
+	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ublk: optimize ublk_queue_cmd_list() for length-1 lists
-Date: Wed,  4 Nov 2026 19:13:49 -0700
-Message-ID: <20261105021351.2295547-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.56.0
+	linux-mm@kvack.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH 0/7] zsmalloc: redesign object alloc API
+Date: Thu,  5 Nov 2026 13:47:30 +0900
+Message-ID: <20261105044752.1997895-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.56.0.398.g882cbad275-goog
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -102,88 +102,43 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For a request list of length 1, ublk_cmd_list_tw_cb() is more expensive
-than ublk_cmd_tw_cb(). It loads rq_next, which is in a separate cache
-line from the other struct request fields accessed in the dispatch path.
-And it dereferences mq_hctx->driver_data to get the struct ublk_queue *,
-whereas ublk_cmd_tw_cb() gets it from struct ublk_uring_cmd_pdu
-alongside the request pointer. On the submission, ublk_queue_cmd_list()
-can cheaply check whether the request list just assembled has length 1.
-So pass ublk_cmd_tw_cb as the io_uring task work callback if the list
-has a single request and ublk_cmd_list_tw_cb if it contains multiple.
+Both zram and zswap already have per-entry structures that store zsmalloc
+handles, so allocating a separate handle_cachep object per stored page is
+redundant.  This series embeds struct zs_handle directly into zram and
+zswap entries and drops handle_cachep, saving 8 bytes and a slab
+alloc/free per stored object (2MB per 1GB of swapped out 4K pages).
 
-Collapse the req/req_list union in ublk_uring_cmd_pdu into a single
-field so ublk_queue_cmd_list() can store the head request to it in
-either case.
+It also folds zs_malloc() and zs_obj_write() into zs_store() so we don't
+take pool->lock and look up object location again right after allocation.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+A simple zram test on a 24-vCPU VM
+==================================
+165 fewer kernel instructions and 0.7-1.8% fewer kernel cycles per write;
+lz4 single writer +2.3% IOPS / -2.6% average latency;
+24 writers +0.9-+1.0% IOPS; no regressions.
+Memory: 8 bytes less per stored page.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3d322fa1bc83..c397e354a7d6 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -117,21 +117,18 @@ struct ublk_batch_fetch_cmd {
- 	unsigned short buf_group;
- };
- 
- struct ublk_uring_cmd_pdu {
- 	/*
--	 * Store requests in same batch temporarily for queuing them to
--	 * daemon context.
-+	 * For ublk_cmd_list_tw_cb(), a list of batched requests queued to
-+	 * daemon context. For ublk_cmd_tw_cb(), a single request.
- 	 *
- 	 * It should have been stored to request payload, but we do want
- 	 * to avoid extra pre-allocation, and uring_cmd payload is always
- 	 * free for us
- 	 */
--	union {
--		struct request *req;
--		struct request *req_list;
--	};
-+	struct request *req;
- 
- 	/*
- 	 * The following two are valid in this cmd whole lifetime, and
- 	 * setup in ublk uring_cmd handler
- 	 */
-@@ -2104,11 +2101,11 @@ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
- 
- static void ublk_cmd_list_tw_cb(struct io_tw_req tw_req, io_tw_token_t tw)
- {
- 	struct io_uring_cmd *cmd = io_uring_cmd_from_tw(tw_req);
- 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
--	struct request *rq = pdu->req_list;
-+	struct request *rq = pdu->req;
- 	struct request *next;
- 
- 	do {
- 		next = rq->rq_next;
- 		rq->rq_next = NULL;
-@@ -2119,14 +2116,16 @@ static void ublk_cmd_list_tw_cb(struct io_tw_req tw_req, io_tw_token_t tw)
- 
- static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
- {
- 	struct io_uring_cmd *cmd = io->cmd;
- 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-+	io_req_tw_func_t tw_cb;
- 
--	pdu->req_list = rq_list_peek(l);
-+	tw_cb = l->head == l->tail ? ublk_cmd_tw_cb : ublk_cmd_list_tw_cb;
-+	pdu->req = rq_list_peek(l);
- 	rq_list_init(l);
--	io_uring_cmd_complete_in_task(cmd, ublk_cmd_list_tw_cb);
-+	io_uring_cmd_complete_in_task(cmd, tw_cb);
- }
- 
- static enum blk_eh_timer_return ublk_timeout(struct request *rq)
- {
- 	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
+Sergey Senozhatsky (7):
+  zram: drop stale comment in write_incompressible_page()
+  zram: drop get_slot_handle() and set_slot_handle()
+  zsmalloc: switch handle type to struct zs_handle
+  zram: allocate zsmalloc object under slot lock
+  zsmalloc: embed struct zs_handle into zram and zswap entries
+  zsmalloc: fold zs_obj_write() into zs_store()
+  zsmalloc: constify struct zs_handle pointer in read-only functions
 
-base-commit: e6ac1da6a53c5f670bf09e60a2500d15be68d2fc
+ Documentation/admin-guide/mm/slab.rst        |   2 +-
+ Documentation/core-api/memory-allocation.rst |   2 +-
+ Documentation/mm/zsmalloc.rst                |   8 +-
+ drivers/block/zram/Kconfig                   |   1 +
+ drivers/block/zram/zram_drv.c                | 130 +++++-------
+ drivers/block/zram/zram_drv.h                |  10 +-
+ include/linux/zsmalloc.h                     |  37 +++-
+ mm/Kconfig                                   |   3 +
+ mm/zsmalloc.c                                | 204 +++++++++++--------
+ mm/zswap.c                                   |  21 +-
+ 10 files changed, 229 insertions(+), 189 deletions(-)
+
 -- 
-2.56.0
+2.56.0.398.g882cbad275-goog
 
