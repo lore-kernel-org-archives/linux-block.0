@@ -1,58 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.112
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.226
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793843085;
-	b=Vu2cbrXWqr7VyatnjKpKFKYa2bYcBnBdgxHZVRGpmSWlq3XZN18dBwSXDTpWasVtMqJa
-	 Ru4WwBcK1JlzCTWgXGceiowufhycfsaDQDydYRYjq6QwXvCj5XN80BX5CwE62XaXrFaYz
-	 UMx1EGZUApw4SzQE62XR+etkJnphFFj+kFwoyrmJNu5P+sTihJrfwOB7BthCRbcp1wnuG
-	 mEx6NFuefE9dEAPg/HJaQGhmPbAqfEYS34rfsaV8DAaS2l4WJ+wafL9hMnUOlMH8qBUgF
-	 SCdya5PqsHmTEO7tbafYPyvDBEGLnuPcI1MahbcM0kParwRfkfBZ9XB6UZ8cJK0ReVw==
+	t=1793844835;
+	b=qiDQi78RD9z/AfT/JMg6Q9rTnEpQIz6AE78csHD+08AJ3i5SP0FVLtnXZETukDygy3r7
+	 j/+54zKsJOtiNKp5amqGp3D0CHYWzAeGLUsknjpvpWy6xv160DYZeIGIDSVCR8ipEc3LN
+	 9Oj60ULVmAoz5tN3koiHPRVHCyDp9JUfT1lJ75gFzZQy3jUee5n0H4OV0rkAC1fQu49Wn
+	 /C/aRdfAellVTofujqh8ac3CY2zLQVcWbZnXDHgUHYZbHWdDEz7s0ObGvj828PupkJLCw
+	 d9C1hIQIYa3sSwCLWblzXLmvpgqjLDy31KWUsmORyEooHsrL+kXYiIkMEz81uTocMRg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793843085;
-	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=KCPP0dcD8EhOUqbX6pSZ0CLuO8QQgf4ncI0Xmf3yuyY=;
-	b=cP2LeABb04fOdMZeP4DhFKzG/xs78yTSTX9WzESZ5UYfXzV+FXDGgHPsUE5AhuuwR3zk
-	 RO+vDbU3bkOBZrrL/kRjz2vbHNvDKaOd0nLueQ4W6bzYN9LSdQQFXD12EX153J2ItxTDE
-	 FdBM5ihN3fOrCHxNSYFDWNJTclrYBhS9GBsqC7TTRRs7CFAKhOX4oGxpyEnPer54Hf2OT
-	 VQVqxTwe5RBuW3x152USgPY008hu+/+1OS5g61a/+3jTOM5N0YeOVd4HVWp+LPkIU/+kc
-	 g1Gf2AWLPnlWRoyu5DwoJ0ChKvIw752Mn1+prq1uInFFT3L3vIBhsijGQ2maxOBZ4Zw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793844835;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 X-Relaying-Domain:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=jbk/ihbbo8xIG/OluC/zPXeNuyP21AAyIO9Pon6dIe4=;
+	b=bVQT9SUhA8gBbNLlfycwL683kZzS7xo2Hz7rjnRh+YzYl1MJ+hhjZvisxKiZuGaFowOn
+	 9xrYpbNvhmTjzkKjHk06f971TRFq35pzlWbfvqavSFrf+ThE0glPozrA9uVuf4RmlszCB
+	 PvNnEu2JYOpOnt57uY7igBP8okT3F0HQlG41Iqi9J9zOFln+RcAtjs+L3oEdUa53Qh6hY
+	 Z093jY+nu138s8HzDPFdRgG+MS2QN6/kupk0A0fVT7DQC9TCC0kk3pwTd25IKmUU9Hmm7
+	 tq6fqrMHNUUZXDuCR21SZ9jIQ/+qmuiXfNyY0zbZIMpaF3YZohTKCb47Av7xw6faIRg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=raidlab.org;
-	spf=pass smtp.mailfrom=raidlab.org;
-	dkim=pass header.d=raidlab.org header.i=@raidlab.org header.a=rsa-sha256 header.s=protonmail header.b=O+Wjvewa;
-	arc=none smtp.remote-ip=79.135.106.112
-Received: from mail-106112.protonmail.ch (mail-106112.protonmail.ch [79.135.106.112])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=purestorage.com;
+	spf=pass smtp.mailfrom=purestorage.com;
+	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b="MBoxWp/V";
+	arc=none smtp.remote-ip=209.85.215.226
+Received: from mail-pg1-f226.google.com (mail-pg1-f226.google.com [209.85.215.226])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1995606A326
-	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 01:44:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E1995606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raidlab.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raidlab.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC538606A31B
+	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 02:13:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC538606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=raidlab.org header.i=@raidlab.org header.a=rsa-sha256 header.s=protonmail header.b=O+Wjvewa
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=raidlab.org;
-	s=protonmail; t=1793843081; x=1794102281;
-	bh=KCPP0dcD8EhOUqbX6pSZ0CLuO8QQgf4ncI0Xmf3yuyY=;
-	h=From:To:Cc:Subject:Date:Message-ID:From:To:Cc:Date:Subject:
-	 Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=O+WjvewahS1O7uDT8Yim7m+7q/1JG9unKziCUB3Ti6maqnoJeIL6y30bPDdqs6v6G
-	 YCPJGBZuz0QjvW7DsY7io32qvLwQD1SUs8quAvycFed7kDEXcJH+qbb2Eqy5faP3UK
-	 ky6HDmKW2xS+Bsp9aPw/MCa1nsErvvUHpQO7mA3z2v4mjAhiT6AXkWjW+qlqor8K8Y
-	 /rBShc8/vbkH+UkgqFGED2zlrmQy4F9CM3PmGZeIItV8zpAvDsiqHCl/HaiDgqjkiB
-	 6V1E7P9W6OxLA7uSUk1RdZQ4CmzGKdtBgnAeH9QfWh1r68EBQm7ZZSctHFUpR6qXIh
-	 gCdt+X3PN9nrw==
-X-Pm-Submission-Id: 4jKlVJ1dv4z2ScX3
-From: Miroslav Cimerman <mc@raidlab.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Miroslav Cimerman <mc@raidlab.org>
-Subject: [PATCH] null_blk: reset throttled state before device setup
-Date: Thu,  5 Nov 2026 01:42:45 +0000
-Message-ID: <20261105014245.436826-1-mc@raidlab.org>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key, unprotected) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=MBoxWp/V
+Received: by mail-pg1-f226.google.com with SMTP id 41be03b00d2f7-cd15c885bdaso52767a12.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2026 18:13:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1793844834; x=1794449634; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=jbk/ihbbo8xIG/OluC/zPXeNuyP21AAyIO9Pon6dIe4=;
+        b=MBoxWp/VMp/jHihnId3EgiwONu5hVMB9flYotVj8jbkpwsPWHst2MDLmXCtuLa7IFL
+         X1JFGYe6k9FuOJgk3nEOmlQauGkmZ2siyEH27d33Q8aityv0sL0AwVLBAOluwqbOOQbT
+         ikYV4SkwafMXj3pYYKwlQO/yq2AhRIrMBjv//F5wdHRNDrDbloJ7wB5KSfqo8PNPp0Gp
+         7quKUFAGAlDhhBezsDodHQMZcpuuZPHNB8yvx2Qi7PBM0kvNeCJ5Wsxyu4GzMjoLnOBU
+         5fk70VKuXXN6cEnU3gkFlvNTB8rZbLf222TV4ol1xYweWgRe5vMoNCs0l5soZEH0aiMw
+         LGAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793844834; x=1794449634;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=jbk/ihbbo8xIG/OluC/zPXeNuyP21AAyIO9Pon6dIe4=;
+        b=iSXbya780+IJvuHwwjSanCMGQKcGRIWS2p6N6UVOJyAm9Uz3rCDTaCWl022aCe1Ig1
+         QnxlVKZ5kVSUQXHF2r+vCa1iFdrKVzCJPXvwhyK++zznwxHwM57YfGXkv0RPb0+wNqnE
+         posaCkhL67k6y+KKk2iAxwzSXKshbqJuptGvE53sUpl3tyZbvR9hSwy3lY2HjpJp13EJ
+         /hZ5WsoCmEIaXCenTbyBsQ3ezk7Kl0hC7Povvtoir6aeE/HXdsjaZJ6Xe5XDh8QEvxaA
+         szqSFetyOzOPbvcOHGGNuQI4NH9iZaDdS49414yCR6uU6YGmnpqjURoxexBJUBfk4CAw
+         dnIw==
+X-Forwarded-Encrypted: i=1; AKwUvBxw9T6N7dLUSh1tcKxV7dcqMOgQOcpWgnOboVDHv5Pw3oCczJ5CjWjsPk8vx09N4b9cgfFJ6gfqRAUTsA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/Gm9Nr5mXhE08Bd+ifn4f/E+UEru9SuHuEqVs85Qs8h5zl+mas
+	gVEREgx69h1nDsvrgpol01UA7el+O4jDlrSHaJbBY7sbqcWDsiyuynllECKREbXrFjNSPnzFpHN
+	ENI3IWcSGOCmNtntG55Ae8yEexPQAob1IbVzE
+X-Gm-Gg: AYBFou0wQuLNIBrlmGllcCah4/WiK/hHtcm0Vw8LAzj4ZTGbO5+Q1Oyse6+tZIoReJT
+	bKkSuOxhcyvuGdcNIWqPs11burc0k9elUiUJ80CCgAzJweCt0n+pgfAWg1CxBD8CXQxXDppavwK
+	WqDebv+mmBZh+sz8Aw35IVxU4DOmnH/F2BDzZZxp0xYgBGWypNsLkrpokilhXVdKcIks6MvNU0F
+	oS22l4nhVxy6Hfq7mNvkGDDkHTMdLTj11QwAAZttSUv/SbQ+etGlHtJZeOIAXWAhyrj8xRGcwl9
+	x8WmSnpUYypFWqcxcJHXvW5sjgzghLpLFBaiLVnKTPPfxT7+VA1Ci05D8uRl/8fmunEzT1kmkmM
+	BDwPqK2VQQl9VniO5/W3FloALpcMXt1en
+X-Received: by 2002:a17:90b:3ec6:b0:3ac:a11a:7c88 with SMTP id 98e67ed59e1d1-3ae89767d8dmr25056607a91.3.1793844834135;
+        Wed, 04 Nov 2026 18:13:54 -0800 (PST)
+Received: from c7-smtp-2026.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3b0b2e09962sm836221a91.0.2026.11.04.18.13.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Nov 2026 18:13:54 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.17.2.4])
+	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id 6CBA940278;
+	Wed,  4 Nov 2026 19:13:53 -0700 (MST)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 609FCE4054E; Wed,  4 Nov 2026 19:13:53 -0700 (MST)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ublk: optimize ublk_queue_cmd_list() for length-1 lists
+Date: Wed,  4 Nov 2026 19:13:49 -0700
+Message-ID: <20261105021351.2295547-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -64,42 +102,88 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The NULLB_DEV_FL_THROTTLED flag is set at power on when mbps is set, and
-is never cleared. Since commit 00a8cdb84fcb ("null_blk: remove
-NULLB_DEV_FL_CONFIGURED on turning off nullb device") mbps can change
-when the device is off. After a change to 0, the stale THROTTLED flag
-sends I/O into the throttled I/O handler, whose hrtimer_active() runs on
-an uninitialized timer, dereferencing a NULL pointer. A crash happens at
-power on, as the first I/O that triggers the NULL dereference is
-partition scanning I/O. This sequence triggers the crash:
+For a request list of length 1, ublk_cmd_list_tw_cb() is more expensive
+than ublk_cmd_tw_cb(). It loads rq_next, which is in a separate cache
+line from the other struct request fields accessed in the dispatch path.
+And it dereferences mq_hctx->driver_data to get the struct ublk_queue *,
+whereas ublk_cmd_tw_cb() gets it from struct ublk_uring_cmd_pdu
+alongside the request pointer. On the submission, ublk_queue_cmd_list()
+can cheaply check whether the request list just assembled has length 1.
+So pass ublk_cmd_tw_cb as the io_uring task work callback if the list
+has a single request and ublk_cmd_list_tw_cb if it contains multiple.
 
-  echo 100 > mbps; echo 1 > power; echo 0 > power; echo 0 > mbps;
-  echo 1 > power
+Collapse the req/req_list union in ublk_uring_cmd_pdu into a single
+field so ublk_queue_cmd_list() can store the head request to it in
+either case.
 
-Clear the flag at the start of null_add_dev(), as is done in commit
-5a4236bf2262 ("null_blk: reset cache state before device setup") for
-NULLB_DEV_FL_CACHE. It is set again when mbps is set.
-
-Fixes: 00a8cdb84fcb ("null_blk: remove NULLB_DEV_FL_CONFIGURED on turning off nullb device")
-Signed-off-by: Miroslav Cimerman <mc@raidlab.org>
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 ---
- drivers/block/null_blk/main.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/block/ublk_drv.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index ec0d7ba4d938..924ec6cfdcaa 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1977,6 +1977,7 @@ static int null_add_dev(struct nullb_device *dev)
- 	if (rv)
- 		return rv;
- 	clear_bit(NULLB_DEV_FL_CACHE, &dev->flags);
-+	clear_bit(NULLB_DEV_FL_THROTTLED, &dev->flags);
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 3d322fa1bc83..c397e354a7d6 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -117,21 +117,18 @@ struct ublk_batch_fetch_cmd {
+ 	unsigned short buf_group;
+ };
  
- 	nullb = kzalloc_node(sizeof(*nullb), GFP_KERNEL, dev->home_node);
- 	if (!nullb) {
+ struct ublk_uring_cmd_pdu {
+ 	/*
+-	 * Store requests in same batch temporarily for queuing them to
+-	 * daemon context.
++	 * For ublk_cmd_list_tw_cb(), a list of batched requests queued to
++	 * daemon context. For ublk_cmd_tw_cb(), a single request.
+ 	 *
+ 	 * It should have been stored to request payload, but we do want
+ 	 * to avoid extra pre-allocation, and uring_cmd payload is always
+ 	 * free for us
+ 	 */
+-	union {
+-		struct request *req;
+-		struct request *req_list;
+-	};
++	struct request *req;
+ 
+ 	/*
+ 	 * The following two are valid in this cmd whole lifetime, and
+ 	 * setup in ublk uring_cmd handler
+ 	 */
+@@ -2104,11 +2101,11 @@ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
+ 
+ static void ublk_cmd_list_tw_cb(struct io_tw_req tw_req, io_tw_token_t tw)
+ {
+ 	struct io_uring_cmd *cmd = io_uring_cmd_from_tw(tw_req);
+ 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+-	struct request *rq = pdu->req_list;
++	struct request *rq = pdu->req;
+ 	struct request *next;
+ 
+ 	do {
+ 		next = rq->rq_next;
+ 		rq->rq_next = NULL;
+@@ -2119,14 +2116,16 @@ static void ublk_cmd_list_tw_cb(struct io_tw_req tw_req, io_tw_token_t tw)
+ 
+ static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
+ {
+ 	struct io_uring_cmd *cmd = io->cmd;
+ 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
++	io_req_tw_func_t tw_cb;
+ 
+-	pdu->req_list = rq_list_peek(l);
++	tw_cb = l->head == l->tail ? ublk_cmd_tw_cb : ublk_cmd_list_tw_cb;
++	pdu->req = rq_list_peek(l);
+ 	rq_list_init(l);
+-	io_uring_cmd_complete_in_task(cmd, ublk_cmd_list_tw_cb);
++	io_uring_cmd_complete_in_task(cmd, tw_cb);
+ }
+ 
+ static enum blk_eh_timer_return ublk_timeout(struct request *rq)
+ {
+ 	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
 
 base-commit: e6ac1da6a53c5f670bf09e60a2500d15be68d2fc
 -- 
-2.53.0
+2.56.0
 
