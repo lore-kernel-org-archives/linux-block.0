@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793898186;
-	b=bGLbHiE+fhkytbcMboioVVICpFbcheRplmN93wVUxk6c4fHPeTNFQ6Tw+jhC9p7ziCfk
-	 7qobfdK339K87t0RmXlL061fDfJgiyWgPOrWeHuKmGJvGL53t3bQzcfBaWWzUvLGZqGFC
-	 x0PMIVPhnwwJR04omt6Ky5EILyrAAhFTKx6FVKZHVK8m0XZnxAJ4maiu9VIhxHsIsrzyE
-	 uLqZCbP4S65eGGs2hLQI6nic+2kGcZNgxYsbJ+IjyFao8CkIW3XHHNsM8KhwDLWjnIAfW
-	 1+B+zoWfm5vqgpwc0dr9hi7RpDuOSZM/pQXXJqwbRbonzQwbquVRlISZ6/W7vSj6Q2Q==
+	t=1793899158;
+	b=W7Me9hRlJhHdvzsRlseFrBRsURb8+hHaxdurvG2FgYfquzCWgdb2nlBfwEjggh86a5bN
+	 MexBW/hQv0xXMDuTQlE3UZ4SdSfXE3dNGVvfshHRbhy/DgG710j6tF5ndSJt5gNuSTo84
+	 iLmtKQ2SSdygPAXMwa6/agICPRR2LQgvWp64uEkZYIBZskUSTXVn7FAoEm/g/OYTAh8hY
+	 bKd5TZhZVCTeEfoxrAnifEq6Dn11TX057J8c6+pj32HiSp21cyrCjLe4FZyXXPyBiVkT2
+	 mq5rj7prXFkw/01CWpjX42zMh0h4nkDn4QzMvCUQTtLDpWELa8q11R+KDrJ/6jxiZtQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793898186;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793899158;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=+GDK5SHSY6SA93NwCdlZTl+b20QDETC0OdxKh5BTja4=;
-	b=4At+Amqkb6CTUDF6wkXu9opH7x06FCTnbzI6wLDQm4BQ67yk0+CR+PulLw88M4NDh9RF
-	 JDfCPJ/wC0Uu70F4YpO+YH65Ox4tVxvw5h9QTDKMIUQjGI4ecdL/xrFerKwCkIEfUvqPO
-	 PUYllOTQYwiaGgPaIcOUAC4g2eTVqKrdxYEHsg8oJz4f//7efgngmtKoBpfMrBEdrsT/O
-	 m73vSx2h2dilLQV9hOAQQ4iWm7SrCbdhglMkBp2fOMX2705zNJkKHCVCxmBeJz68ACXK+
-	 w9QbfB+ntEkYkbqEFE8ILXnLM80mywF733F1Eyg6hY8Mv0k5EG9Q65XaoJ81fokOEZQ==
+	bh=xjdYfBlTXjkgnPLcfHWBun2lYgDctvXz+QMZ9GMRG4s=;
+	b=2f96OlrgCstb7bD4CsyJ84hyfxFMI9QX8B7eAQ/++rTK9A73BopBBhp/2qDwRU0nmNae
+	 QdpzxoWbzv+GQh/oVwRFxetVrvZQtNHgOcCeIcrWWEkcUh0p2cdWWYUcWF7YLZ6uxojjk
+	 uLCK5MjCfPngSI01zbGo4v7gWc98i3b6eg99gEqELd0+IhZdV9QamYVPxQPchYfJrpFjn
+	 ViDev8URcRJbWHNvDAJsro9aA9xReH6LDdmNYKSAj33xc9N4Wujn0zywOAY/AlCmQabUs
+	 uQQQWOzuy9nugICW8hoxi+97p7/fjwzzo4gVUvb+eCsy1VNHXHzgUQKyaEzdttjxqlw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="U/zzQhn9";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kgLnkLkD;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0762D606A33E;
-	Thu,  5 Nov 2026 17:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4422E606A32E;
+	Thu,  5 Nov 2026 17:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=U/zzQhn9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4329B1F00A15;
-	Thu,  5 Nov 2026 17:03:05 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kgLnkLkD
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE771F000C1;
+	Thu,  5 Nov 2026 17:19:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793898185;
-	bh=+GDK5SHSY6SA93NwCdlZTl+b20QDETC0OdxKh5BTja4=;
+	s=k20260515; t=1793899157;
+	bh=xjdYfBlTXjkgnPLcfHWBun2lYgDctvXz+QMZ9GMRG4s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=U/zzQhn9F9RkCJilk4OZI/QAAx01gxRgJL5gzdN1eBbPe+uIGkyUIY/eHuti0URuV
-	 PC7SUDFqmuz2hgDMK1d01qt6xjAyjtPUFHYy28KJ/ecJVH9fN82lpkhN/4yVV1XlRO
-	 J+g/tpgZlN6y1WvV3NayHklvEYOpvWYENJlITQYLg5XptBrIk+g6mtTGVFojNMYH0f
-	 k08K2sSlJ0/J3aq6my/f7r4uDwhlW8g15clSQ4VvKR/0ZgfPRWwuC2F48xkjZIw6dX
-	 57HFiVyxHavVE/PKepqny3sH4DJ91vEiRpr6mCqisqmj08Gc+2CBOd1Z/MKUn0p7F3
-	 5Eai81R5zHBiQ==
-Date: Thu, 5 Nov 2026 17:03:03 +0000
+	b=kgLnkLkDmRSHA3cbbJA+NIFwe4aQxML3/H8S77tTIeQVlFhCRp9lH9IGUi734kAiF
+	 rXJJxog1sXaAe03e37SNledfxKYHALb52HkKpN2S3qQsajRR8z668Er0SUgN+g32tj
+	 1rmYC/Waw/HSAnEIpO/QaJPhGn+ai8cm7fT3EO7SV4pTzIcmWherRXY5TKfARjdJmy
+	 kF+rTPelWKyfD0ZBLEeYFZfT2GKe2FdUGlTT8Z3D1ad37+d2a9rbSyjj8SGMDzy655
+	 O6NA2e+913hZuGhyu8SUqhcfKO3k2172u5z4m4t6ABJTo7UhqBwMGNq/ubQjK0MX6D
+	 J1//kdAYd7YuQ==
+Date: Thu, 5 Nov 2026 17:19:16 +0000
 From: Yosry Ahmed <yosry@kernel.org>
 To: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>, 
@@ -47,10 +47,11 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Johannes Weiner <hannes@cmpxchg.org>, Brian Geffon <bgeffon@google.com>, 
 	Minchan Kim <minchan@kernel.org>, Richard Chang <richardycc@google.com>, 
 	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 3/7] zsmalloc: switch handle type to struct zs_handle
-Message-ID: <auy19VvYgb25vnFc@google.com>
+Subject: Re: [PATCH 5/7] zsmalloc: embed struct zs_handle into zram and zswap
+ entries
+Message-ID: <auy22TkX0ADxP9WR@google.com>
 References: <20261105044752.1997895-1-senozhatsky@chromium.org>
- <20261105044752.1997895-4-senozhatsky@chromium.org>
+ <20261105044752.1997895-6-senozhatsky@chromium.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,123 +63,201 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261105044752.1997895-4-senozhatsky@chromium.org>
+In-Reply-To: <20261105044752.1997895-6-senozhatsky@chromium.org>
 
-[..]
+On Thu, Nov 05, 2026 at 01:47:35PM +0900, Sergey Senozhatsky wrote:
+> zsmalloc allocates an object from handle_cachep for every stored
+> object, just to have a stable address which compaction and page
+> migration can update when the object moves.  Both zram and zswap
+> already have per-entry structures that hold the handle, so we basically
+> keep a pointer to a pointer, which costs 8 bytes per stored object,
+> slab alloc/free on every store and free, and one more memory load on
+> every access.
+> 
+> Make struct zs_handle public and embed it into zram_table_entry and
+> zswap_entry (their sizes don't change), so that zsmalloc writes object
+> location directly there, and remove handle_cachep.  zs_malloc() now
+> takes a handle pointer and returns an error code, zs_free() resets the
+> handle.
+> 
+> Since compaction and migration update the handle in place, it must not
+> be on the stack (zs_malloc() warns about that) and must not be copied.
+> zram recompression allocates a new object before it frees the old one,
+> so it uses zram->recomp_handle, protected by ->dev_lock, and
+> zs_rebind_handle() moves the new object to the slot handle. zram
+> recompression is the only user of zs_rebind_handle().
+> 
+> This saves 8 bytes per stored page, e.g. 2MB per 1GB of swapped out
+> 4K pages.  Since handle is per-entry the memory savings scale.
+> 
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> ---
+>  Documentation/admin-guide/mm/slab.rst |   2 +-
+>  Documentation/mm/zsmalloc.rst         |   4 +-
+>  drivers/block/zram/Kconfig            |   1 +
+>  drivers/block/zram/zram_drv.c         |  74 ++++++++---------
+>  drivers/block/zram/zram_drv.h         |   6 +-
+>  include/linux/zsmalloc.h              |  30 ++++++-
+>  mm/Kconfig                            |   3 +
+>  mm/zsmalloc.c                         | 110 ++++++++++++++++----------
+>  mm/zswap.c                            |  22 +++---
+>  9 files changed, 154 insertions(+), 98 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/mm/slab.rst b/Documentation/admin-guide/mm/slab.rst
+> index 14429ab90611..57e4a118a391 100644
+> --- a/Documentation/admin-guide/mm/slab.rst
+> +++ b/Documentation/admin-guide/mm/slab.rst
+> @@ -96,7 +96,7 @@ except some that are deemed too performance critical and don't need to be
+>  debugged by specifying global debug options followed by a list of slab names
+>  with "-" as options::
+>  
+> -	slab_debug=FZ;-,zs_handle,zspage
+> +	slab_debug=FZ;-,zspage
+>  
+>  The state of each debug option for a slab can be found in the respective files
+>  under::
+> diff --git a/Documentation/mm/zsmalloc.rst b/Documentation/mm/zsmalloc.rst
+> index d2bbecd78e14..dbb5c1a8dcc3 100644
+> --- a/Documentation/mm/zsmalloc.rst
+> +++ b/Documentation/mm/zsmalloc.rst
+> @@ -23,8 +23,8 @@ uncompressed form). For allocation requests larger than this size, failure
+>  is returned (see zs_malloc).
+>  
+>  Additionally, zs_malloc() does not return a dereferenceable pointer.
+> -Instead, it returns an opaque handle (unsigned long) which encodes actual
+> -location of the allocated object. The reason for this indirection is that
+> +Instead, it stores the encoded location of the allocated object in the
+> +provided ``struct zs_handle``. The reason for this indirection is that
+
+Should we explicitly call out that zsmalloc will keep a back pointer to
+the handle and update it asynchronously, so the owner shouldn't modify
+it, and should keep it allocated until zs_free() (or rebind)?
+
+Probably somewhere in the code comments too?
+
+>  zsmalloc does not keep zspages permanently mapped since that would cause
+>  issues on 32-bit systems where the VA region for kernel space mappings
+>  is very small. So, using the allocated memory should be done through the
 > diff --git a/include/linux/zsmalloc.h b/include/linux/zsmalloc.h
-> index 5b7298a5026b..693c9484b638 100644
+> index 693c9484b638..6c76fd10344e 100644
 > --- a/include/linux/zsmalloc.h
 > +++ b/include/linux/zsmalloc.h
-> @@ -22,14 +22,15 @@ struct zs_pool_stats {
+> @@ -14,6 +14,7 @@
+>  #ifndef _ZS_MALLOC_H_
+>  #define _ZS_MALLOC_H_
+>  
+> +#include <linux/compiler.h>
+>  #include <linux/types.h>
+>  
+>  struct zs_pool_stats {
+> @@ -21,16 +22,39 @@ struct zs_pool_stats {
+>  	atomic_long_t pages_compacted;
 >  };
 >  
+> +/*
+> + * zsmalloc writes object location into the handle and updates it when
+> + * the object moves (compaction, page migration), so the handle must not
+> + * be on the stack and must not be copied.  Use zs_rebind_handle() to
+> + * move an object to another handle.
+> + */
+> +struct zs_handle {
+> +	unsigned long __private obj;
+> +} __aligned(sizeof(unsigned long));
+
+Is alignment guaranteed even if this is embedded in a packed struct? I
+wonder if we should have an explicit alignment check in
+zs_malloc()/zs_store(), and probably rebind too?
+
+> +
+> +static inline void zs_handle_init(struct zs_handle *handle)
+> +{
+> +	ACCESS_PRIVATE(handle, obj) = 0;
+> +}
+> +
+> +static inline bool zs_handle_is_allocated(const struct zs_handle *handle)
+> +{
+> +	return READ_ONCE(ACCESS_PRIVATE(handle, obj)) != 0;
+> +}
+
+Can this ever give a false negative? I believe that's only possible with
+pfn=0, I don't know if this can be the case on any architecture. Should
+we use something like OBJ_ALLOCATED_TAG?
+
+> +
 >  struct zs_pool;
-> +struct zs_handle;
+> -struct zs_handle;
 >  struct scatterlist;
 >  
 >  struct zs_pool *zs_create_pool(const char *name);
 >  void zs_destroy_pool(struct zs_pool *pool);
 >  
-> -unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t flags,
-> -			const int nid);
-> -void zs_free(struct zs_pool *pool, unsigned long obj);
-> +struct zs_handle *zs_malloc(struct zs_pool *pool, size_t size, gfp_t flags,
-> +			    const int nid);
-> +void zs_free(struct zs_pool *pool, struct zs_handle *handle);
+> -struct zs_handle *zs_malloc(struct zs_pool *pool, size_t size, gfp_t flags,
+> -			    const int nid);
+> +int zs_malloc(struct zs_pool *pool, struct zs_handle *handle, size_t size,
+> +	      gfp_t flags, const int nid);
+>  void zs_free(struct zs_pool *pool, struct zs_handle *handle);
+> +#ifdef CONFIG_ZSMALLOC_REBIND_HANDLE
+
+FWIW, I don't think this is buying as much. It's one function that is
+only called by zram anyway.
+
+> +void zs_rebind_handle(struct zs_pool *pool, struct zs_handle *dst,
+> +		      struct zs_handle *src);
+
+A few comments in zsmalloc.c mention zs_free() reading the handle
+locklessly, do these apply to rebinding as well?
+
+> +#endif
 >  
 >  size_t zs_huge_class_size(struct zs_pool *pool);
->  
-> @@ -40,10 +41,10 @@ unsigned int zs_lookup_class_index(struct zs_pool *pool, unsigned int size);
->  
->  void zs_pool_stats(struct zs_pool *pool, struct zs_pool_stats *stats);
->  
-> -void zs_obj_read_sg_begin(struct zs_pool *pool, unsigned long handle,
-> +void zs_obj_read_sg_begin(struct zs_pool *pool, struct zs_handle *handle,
->  			  struct scatterlist *sg, size_t mem_len);
-> -void zs_obj_read_sg_end(struct zs_pool *pool, unsigned long handle);
-> -void zs_obj_write(struct zs_pool *pool, unsigned long handle,
-> +void zs_obj_read_sg_end(struct zs_pool *pool, struct zs_handle *handle);
-> +void zs_obj_write(struct zs_pool *pool, struct zs_handle *handle,
->  		  void *handle_mem, size_t mem_len);
 
-I would squash patch 7's constification here.
-
->  
->  extern const struct movable_operations zsmalloc_mops;
-> diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
-> index 7ef80e0da626..7d8aab56f5cd 100644
-> --- a/mm/zsmalloc.c
-> +++ b/mm/zsmalloc.c
-> @@ -264,6 +264,10 @@ struct link_free {
->  	};
+[..]
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index 397b06c9f33b..f28a46cae1e1 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+> @@ -215,7 +215,7 @@ struct zswap_entry {
+>  	unsigned int length;
+>  	bool referenced;
+>  	u8 pool_idx;
+> -	struct zs_handle *handle;
+> +	struct zs_handle handle;
+>  	struct obj_cgroup *objcg;
+>  	struct list_head lru;
 >  };
->  
-> +struct zs_handle {
-> +	unsigned long __private obj;
-> +};
-> +
->  static struct kmem_cache *handle_cachep;
->  static struct kmem_cache *zspage_cachep;
->  
-> @@ -438,16 +442,16 @@ static void init_deferred_free(struct zs_pool *pool) {}
->  static void SetZsPageMovable(struct zs_pool *pool, struct zspage *zspage) {}
->  #endif
->  
-> -static unsigned long cache_alloc_handle(gfp_t gfp)
-> +static struct zs_handle *cache_alloc_handle(gfp_t gfp)
->  {
->  	gfp = gfp & ~(__GFP_HIGHMEM | __GFP_MOVABLE);
->  
-> -	return (unsigned long)kmem_cache_alloc(handle_cachep, gfp);
-> +	return kmem_cache_alloc(handle_cachep, gfp);
+> @@ -769,6 +769,7 @@ static struct zswap_entry *zswap_entry_cache_alloc(gfp_t gfp, int nid)
+>  	entry = kmem_cache_alloc_node(zswap_entry_cache, gfp, nid);
+>  	if (!entry)
+>  		return NULL;
+> +	zs_handle_init(&entry->handle);
+>  	return entry;
 >  }
 >  
-> -static void cache_free_handle(unsigned long handle)
-> +static void cache_free_handle(struct zs_handle *handle)
->  {
-> -	kmem_cache_free(handle_cachep, (void *)handle);
-> +	kmem_cache_free(handle_cachep, handle);
->  }
+> @@ -787,7 +788,7 @@ static void zswap_entry_free(struct zswap_entry *entry)
 >  
->  static struct zspage *cache_alloc_zspage(gfp_t gfp)
-> @@ -466,9 +470,9 @@ static void cache_free_zspage(struct zspage *zspage)
->   * Pairs with READ_ONCE() in handle_to_obj(): zs_free() may read the
->   * handle locklessly, so prevent store tearing here.
->   */
-> -static void record_obj(unsigned long handle, unsigned long obj)
-> +static void record_obj(struct zs_handle *handle, unsigned long obj)
->  {
-> -	WRITE_ONCE(*(unsigned long *)handle, obj);
-> +	WRITE_ONCE(ACCESS_PRIVATE(handle, obj), obj);
->  }
->  
->  /* Protected by class->lock */
-> @@ -817,13 +821,13 @@ static unsigned long location_to_obj(struct zpdesc *zpdesc, unsigned int obj_idx
->  	return obj;
->  }
->  
-> -static unsigned long handle_to_obj(unsigned long handle)
-> +static unsigned long handle_to_obj(struct zs_handle *handle)
->  {
-> -	return READ_ONCE(*(unsigned long *)handle);
-> +	return READ_ONCE(ACCESS_PRIVATE(handle, obj));
->  }
->  
->  static inline bool obj_allocated(struct zpdesc *zpdesc, void *obj,
-> -				 unsigned long *phandle)
-> +				 struct zs_handle **phandle)
->  {
->  	unsigned long handle;
->  	struct zspage *zspage = get_zspage(zpdesc);
-> @@ -839,7 +843,7 @@ static inline bool obj_allocated(struct zpdesc *zpdesc, void *obj,
->  		return false;
->  
->  	/* Clear all tags before returning the handle */
-> -	*phandle = handle & ~OBJ_TAG_MASK;
-> +	*phandle = (struct zs_handle *)(handle & ~OBJ_TAG_MASK);
->  	return true;
->  }
+>  	zswap_lru_del(entry);
+>  	if (!WARN_ON_ONCE(!pool)) {
 
-Would it be cleaerer if obj_allocated() just returned the handle here? I
-believe this can be done separately in a prep patch.
+This check is mostly defensive, and if the pool was ever NULL it
+prevented a NULL deref, and potentially leaked the underlying zsmalloc
+object, which is mostly fine as the pool being NULL points to a larger
+problem (e.g. corruption).
 
+However, if that happens now, the handle pointer in zsmalloc would point
+at the zswap entry after it's freed by zswap_entry_cache_free() below,
+potentially causing a UAF. It's arguably fine as it's just a cascade of
+corruptions, but I wonder if we should just bail early and skip all
+cleanups below if the pool is NULL.
+
+We'll leak the cgroup charge, stats, and the zswap entry itself -- but
+that's arguably the safer option if we already have a corruption
+problem.
+
+We can also just delete the NULL check, but it's cheap to keep and I'd
+rather have it tbh.
+
+> -		zs_free(pool->zs_pool, entry->handle);
+> +		zs_free(pool->zs_pool, &entry->handle);
+>  		zswap_pool_put(pool);
+>  	}
+>  	if (entry->objcg) {
