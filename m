@@ -1,54 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.208
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793914005;
-	b=U8aZ9+kxEkqsqBX4MSTbBsnXXTZ6OmLyoazTxI+AHPvMANVzdN0lvUAbRIVE+UPD9yyO
-	 PWE7Jaw+xEfUGMWvufER27LXoAjeWfJY9xy/xsAUtWK2h4jIOvHw7paGSdSfFTLritHmI
-	 ztZYfm6uzLCA3H5nyXclxqDq0SJ74qtFaw81ZSccLeYgZU950TcjN5WCcsvvl/AzmMYU7
-	 K2I7didYugGLIcPhoKGtWm2bGRBSgi8/++HxpRzSkAVOzU3OlNwY8KEfVR9VGX6dl7TIL
-	 AHnhT2DW2nkGg+TdeprPBaiHg96XvQ9qUlzwgFBr1Qz+JvU4tJRgrmQz1VFOKyAL1Cg==
+	t=1793916494;
+	b=LY0ER0Izncb91gIj4jkRFuTpT2LKEiEdOMGEc8u9CUDZJj/N7U/kJ4Aozd9PxlMJ2zBh
+	 z2O5p4TI1nESd2R5Pagkr7K2DfVGD7awez2jBb5hvUrLmN5NQNKg1KuazSor78UAMzuLq
+	 5msJsG+YuHy7lzOg5DR5J7o5msFhKpVw8JQb3fupqQnMF6FoppU323qslizwxpDE9tCzS
+	 Q0VUD2K6RU+JTTX0XB9f6Cu8VQZFmZ0kWDlFUu5wxbHtfZttUVEptHbH3QwdtqGk3hbap
+	 xVDdzv6EE2v94O/s922DVdS7Ym0YJxZTr/irFbkZdU/KDo1opUEznFP8fadf5xuf73w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793914005;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793916494;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
 	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=j6nLzJpF4CfBD1Utx6iKhdNHDK2kO6FZNPxEtGMJpzs=;
-	b=UORvZhBQ6RHdD5l9iOoENcrmrRrAu8/cUmiCgG9+nFBT59yD9aaZO/TECQhuMw0GifWJ
-	 NgP5YowhEbRCHl5JYnPHaRfk2PzzVmlQaw/WZmJ67038a90nfmWOZxXLFk11RIjf6l9w7
-	 FOQ7wGSktyLCT0FttuNnHeWXFsUMwp5JwDt5nB7ObAhrS4g0yqG0R/VXb9aM3NK3aMfZX
-	 U+dgM/xfvmt5uR7kDySY8mb3lbNuukTS4DFKAprYst7WUYIz4zXi93wVl3Xnye1GcQMa4
-	 42W6AYUy6AXrv9ob8rlNlE0O4aHsVwj3kuIoYbTkwuj9rd+68jhVSlMEgl96Y6mFL3g==
+	bh=XYA3g2+HtqFAIS8I2EWomiFCDvHSGWyaU3MTisxAOLE=;
+	b=DO0kO/x45TK99iq0v2ZUQMvfrAHA3ibDmO0h+6NOfBSgxU4ag7HYn+fhlaP4C6F4ydy5
+	 pb2TWe00uK7Fvo/n4JBfVBgM6ienna92Q6gbFjHw7kAvriurH5COmqXQRomX2gkarNWcb
+	 gn0fieukw7mo/msCsmahdSV/MAF4sbMjuoZdni+LfoT05oeOJcj+DEY2eowuo8u/XzOFl
+	 IO273r7rVVcK8LEJR3GDJ4ABb1++3+aJQ560KfWv/l1duYxi+HkV/x1BwX18xbkjs1UEL
+	 qQXgiHqDuFvvD8Y6YGb7FjNqjlMfq+QeK4oZUkgA3k3G2wMQ+CrCt5EnCdkO48akyig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Am3xs4yM;
-	arc=none smtp.remote-ip=95.215.58.176
-Received: from mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="QH/HVW0h";
+	arc=none smtp.remote-ip=91.218.175.208
+Received: from mta0.migadu.com (out-208.mta0.migadu.com [91.218.175.208])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55589606A326
-	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 21:26:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55589606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A590606A326
+	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 22:08:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A590606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Am3xs4yM
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QH/HVW0h
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=50QvR5Rz1ijGbYHRRdoYsuy3eEKLOBbyuMDTHm2jZh0=;
+DKIM-Signature: a=rsa-sha256; bh=PnYyaVx64MD1jaWFrbHNWMnyMKuFQYL/DiizwVaVslY=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793914001; v=1; x=1794518801;
- b=Am3xs4yM6/tjgZMQlaNS6DAHZ1cTQ7pKDOqHRyT9OFD+dfNifribuzZxlRop6kVPZWOmK7gK
- ulKfFwQrn14tRMSNR/7+wAAEuiVr3iWU+zAr5uqVFzq5dMWNlNawycn+A6JVNm34fQXIMWxQ1Fg
- zMSAKacEyE/Vp2zfzjzVUXu4=
+ t=1793916491; v=1; x=1794521291;
+ b=QH/HVW0hpgJm35wNbRGzmwvZ10g2LybOwDKUHZ4P8dJuTSEKQcDDwh6PVWgxSY68jXhqxkcP
+ M8WOED8XfgbQpgQqWrPt9BItzVObZ+TNhsEUU/L5wJimcNDwhBDdF3leBgbl95nIA+hR41Y7wko
+ NmIsiCHV1EwF6neowfmol7n0=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 63581dc183f9fce4;
-	Thu, 05 Nov 2026 21:26:41 +0000
-X-Mizu-Trace-ID: 63581dc183f9fce4
+Received: by smtp.migadu.com with ESMTPS id faa4b71d0d8cf75d;
+	Thu, 05 Nov 2026 22:08:11 +0000
+X-Mizu-Trace-ID: faa4b71d0d8cf75d
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <a2667ffd-3bbe-40b2-afc2-56fb54fb546b@linux.dev>
-Date: Thu, 5 Nov 2026 22:26:36 +0100
+Message-ID: <c043f698-176d-43c5-9086-2973d4ca0833@linux.dev>
+Date: Thu, 5 Nov 2026 23:08:06 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,261 +59,163 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [v3 for-next 2/3] block: allow error injection rules to delay
- bios
+Subject: Re: [v3 for-next 1/3] block: Reject unknown status tags in error
+ injection rules
 To: Mohamed Khalfella <mkhalfella@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
  linux-doc@vger.kernel.org
 References: <20260928221634.43239-1-haris.iqbal@linux.dev>
- <20260928221634.43239-3-haris.iqbal@linux.dev>
- <20261020233441.GB1582237-mkhalfella@purestorage.com>
+ <20260928221634.43239-2-haris.iqbal@linux.dev> <20261005084917.GA9160@lst.de>
+ <20261020223402.GA1582237-mkhalfella@purestorage.com>
+ <58a98f7d-b2c5-47b5-a372-0ab5afa6a8ed@linux.dev>
+ <20261105201827.GB2439-mkhalfella@purestorage.com>
 Content-Language: en-US
 From: Haris Iqbal <haris.iqbal@linux.dev>
-In-Reply-To: <20261020233441.GB1582237-mkhalfella@purestorage.com>
+In-Reply-To: <20261105201827.GB2439-mkhalfella@purestorage.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 10/21/26 01:34, Mohamed Khalfella wrote:
-> On Tue 2026-09-29 00:16:33 +0200, Md Haris Iqbal wrote:
->> Error injection can only fail a bio today. Add a delay_us option so that
->> a rule can hold a bio back first, to model a slow device.
+On 11/5/26 21:18, Mohamed Khalfella wrote:
+> On Thu 2026-11-05 21:00:27 +0100, Haris Iqbal wrote:
 >>
->> If a matching rule has delay_us set, the bio is held for that long. It is
->> then failed if the rule also has a status, or resubmitted otherwise.
 >>
->> The resubmission is done through submit_bio_noacct_nocheck(), which is
->> where the injection hook sits. To avoid the same delay rule being applied
->> to it again, mark the bio with the BIO_ERROR_INJECTED flag before queueing
->> the work in blk_error_inject_delay(). This also prevents bios that are
->> split later and resubmitted from being evaluated for delay (or error
->> injection) again. __bio_clone() does not propagate the flag, so a clone a
->> stacking driver aims at a lower device is still evaluated.
+>> On 10/21/26 00:34, Mohamed Khalfella wrote:
+>>> On Mon 2026-10-05 10:49:17 +0200, Christoph Hellwig wrote:
+>>>> On Tue, Sep 29, 2026 at 12:16:32AM +0200, Md Haris Iqbal wrote:
+>>>>> tag_to_blk_status() returns BLK_STS_OK both for the "OK" tag and for a
+>>>>> tag it does not recognize, so a caller cannot tell the two apart. The
+>>>>> block error injection code (which is the sole user of this function
+>>>>> currently) relies on error_inject_add() later to reject adding a rule with
+>>>>> status=BLK_STS_OK. This is okay for the current state of error injection.
+>>>>>
+>>>>> The delay option added in the next commit makes the rule with status=OK
+>>>>> valid, meaning the function tag_to_blk_status() now needs to explicitly
+>>>>> match BLK_STS_OK for it, and fail for a tag it does not recognize. Hence
+>>>>> make tag_to_blk_status() take a second param to update the matched status,
+>>>>> and return true in case of a successful match. If a match is not found,
+>>>>> the function tag_to_blk_status() returns false and *status remains
+>>>>> unchanged.
+>>>>>
+>>>>> A repeated status= where an invalid tag comes first is now rejected
+>>>>> instead of being overridden by the later one.
+>>>>>
+>>>>> Cc: Christoph Hellwig <hch@lst.de>
+>>>>> Assisted-by: Claude:claude-opus-5
+>>>>> Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
+>>>>> ---
+>>>>>    block/blk-core.c        | 14 ++++++--------
+>>>>>    block/blk.h             |  2 +-
+>>>>>    block/error-injection.c |  7 ++++---
+>>>>>    3 files changed, 11 insertions(+), 12 deletions(-)
+>>>>>
+>>>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>>>> index 13dc70e8f55d..c45846b9c50d 100644
+>>>>> --- a/block/blk-core.c
+>>>>> +++ b/block/blk-core.c
+>>>>> @@ -225,21 +225,19 @@ const char *blk_status_to_tag(blk_status_t status)
+>>>>>    	return blk_errors[idx].tag;
+>>>>>    }
+>>>>>    
+>>>>> -blk_status_t tag_to_blk_status(const char *tag)
+>>>>> +bool tag_to_blk_status(const char *tag, blk_status_t *status)
+>>>>>    {
+>>>>>    	int i;
+>>>>>    
+>>>>>    	for (i = 0; i < ARRAY_SIZE(blk_errors); i++) {
+>>>>>    		if (blk_errors[i].tag &&
+>>>>> -		    !strcmp(blk_errors[i].tag, tag))
+>>>>> -			return (__force blk_status_t)i;
+>>>>> +		    !strcmp(blk_errors[i].tag, tag)) {
+>>>>> +			*status = (__force blk_status_t)i;
+>>>>> +			return true;
+>>>>> +		}
+>>>>>    	}
+>>>>>    
+>>>>> -	/*
+>>>>> -	 * Return BLK_STS_OK for mismatches as this function is intended to
+>>>>> -	 * parse error status values.
+>>>>> -	 */
+>>>>> -	return BLK_STS_OK;
+>>>>> +	return false;
+>>>>>    }
+>>>>>    
+>>>>>    /**
+>>>>> diff --git a/block/blk.h b/block/blk.h
+>>>>> index 2cc03aa54c53..5fa54162c686 100644
+>>>>> --- a/block/blk.h
+>>>>> +++ b/block/blk.h
+>>>>> @@ -52,7 +52,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
+>>>>>    
+>>>>>    const char *blk_status_to_str(blk_status_t status);
+>>>>>    const char *blk_status_to_tag(blk_status_t status);
+>>>>> -blk_status_t tag_to_blk_status(const char *tag);
+>>>>> +bool tag_to_blk_status(const char *tag, blk_status_t *status);
+>>>>>    enum req_op str_to_blk_op(const char *op);
+>>>>>    
+>>>>>    bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
+>>>>> diff --git a/block/error-injection.c b/block/error-injection.c
+>>>>> index e14bc4b723ef..db543fe27630 100644
+>>>>> --- a/block/error-injection.c
+>>>>> +++ b/block/error-injection.c
+>>>>> @@ -171,15 +171,16 @@ static int match_op(substring_t *args, enum req_op *op)
+>>>>>    static int match_status(substring_t *args, blk_status_t *status)
+>>>>>    {
+>>>>>    	const char *tag;
+>>>>> +	bool found;
+>>>>>    
+>>>>>    	tag = match_strdup(args);
+>>>>>    	if (!tag)
+>>>>>    		return -ENOMEM;
+>>>>> -	*status = tag_to_blk_status(tag);
+>>>>> -	if (!*status)
+>>>>> +	found = tag_to_blk_status(tag, status);
+>>>>> +	if (!found)
+>>>>>    		pr_warn("invalid status '%s'\n", tag);
+>>>>>    	kfree(tag);
+>>>>> -	return 0;
+>>>>> +	return found ? 0 : -EINVAL;
+>>>>
+>>>> 	if (!found) {
+>>>>     		pr_warn("invalid status '%s'\n", tag);
+>>>> 		return -EINVAL;
+>>>> 	}
+>>>> 	return 0;
 >>
->> The bio is submitted from a workqueue rather than from the timer, because
->> submitting a bio can sleep. Bios with REQ_NOWAIT are never delayed, and
->> values above 600 seconds are rejected.
+>> As Mohamed mentioned below, "tag" would leak then.
 >>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Assisted-by: Claude:claude-opus-5
->> Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
->> ---
->>   block/error-injection.c   | 160 ++++++++++++++++++++++++++++++++++----
->>   block/error-injection.h   |   1 +
->>   include/linux/blk_types.h |   1 +
->>   3 files changed, 147 insertions(+), 15 deletions(-)
+>>>
+>>> Doing it this way will result in use-after-free. "tag" has already been
+>>> freed above.
+>>>
+>>> Maybe change tag_to_blk_status() to return an int (0 on success and
+>>> -EINVAL on failure) and use its return value without mapping it?
 >>
->> diff --git a/block/error-injection.c b/block/error-injection.c
->> index db543fe27630..a35fe41a43e4 100644
->> --- a/block/error-injection.c
->> +++ b/block/error-injection.c
->> @@ -6,9 +6,17 @@
->>   #include <linux/blkdev.h>
->>   #include <linux/parser.h>
->>   #include <linux/seq_file.h>
->> +#include <linux/workqueue.h>
->>   #include "blk.h"
->>   #include "error-injection.h"
->>   
->> +/*
->> + * Cap the delay so that a typo can't wedge a device for good.  This is still
->> + * well beyond the default hung task timeout, which is one of the things a
->> + * delay is useful for triggering.
->> + */
->> +#define BLK_ERROR_INJECT_MAX_DELAY_US	(600 * USEC_PER_SEC)
+>> I am not sure I get your suggestion completely. Even if we change the
+>> return type of tag_to_blk_status(), we would have to free the "tag"
+>> before returning.
 > 
-> DEFAULT_HUNG_TASK_TIMEOUT is 120 seconds (set in lib/Kconfig.debug)
+> Changing tag_to_blk_status() to return an int will not have an effect or
+> "tag" like you mentioned. But you will not need to map the return from
+> that function.
 > 
->> +
->>   struct blk_error_inject {
->>   	struct list_head		entry;
->>   	sector_t			start;
->> @@ -18,14 +26,104 @@ struct blk_error_inject {
->>   
->>   	/* only inject every 1 / chance times */
->>   	unsigned int			chance;
->> +
->> +	/* hold the bio for this long before submitting or failing it */
->> +	unsigned int			delay_us;
->> +};
->> +
->> +/*
->> + * A bio held by a delay rule.  It does not point back at the rule, so rules
->> + * can be removed while delayed bios are outstanding.  The submitter holds the
->> + * bdev open until the bio completes, so the disk and queue stay allocated.
->> + * A delayed bio holds no queue usage counter reference, so it does not hold
->> + * up a queue freeze either.
->> + */
->> +struct blk_error_inject_delay {
->> +	struct delayed_work		dwork;
->> +	struct bio			*bio;
->> +	blk_status_t			status;
->>   };
->>   
->> +static struct workqueue_struct *blk_error_inject_wq;
->> +
->>   DEFINE_STATIC_KEY_FALSE(blk_error_injection_enabled);
->>   
->> +static void blk_error_inject_delay_work(struct work_struct *work)
->> +{
->> +	struct blk_error_inject_delay *d = container_of(to_delayed_work(work),
->> +			struct blk_error_inject_delay, dwork);
->> +	struct bio *bio = d->bio;
->> +	struct gendisk *disk = bio->bi_bdev->bd_disk;
->> +	blk_status_t status = d->status;
->> +
->> +	kfree(d);
->> +
->> +	if (status != BLK_STS_OK) {
->> +		pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
->> +				disk->part0, blk_status_to_str(status),
->> +				blk_op_str(bio_op(bio)), bio->bi_iter.bi_sector,
->> +				bio_sectors(bio));
->> +		bio->bi_status = status;
->> +		bio_endio(bio);
->> +	} else {
->> +		/*
->> +		 * Resubmit.  The BIO_ERROR_INJECTED flag ensures that a bio
->> +		 * that was delayed once skips error injection entirely from
->> +		 * here on, including any other rule that covers it.
->> +		 */
->> +		submit_bio_noacct_nocheck(bio, false);
->> +	}
->> +}
->> +
->> +/*
->> + * Hand the bio to a workqueue that submits or fails it once the delay has
->> + * expired.  Both blk_mq_submit_bio() and ->submit_bio can sleep, so this can't
->> + * be completed from the timer itself.
->> + *
->> + * Returns false if the bio can't be delayed, in which case the caller handles
->> + * it immediately instead.
->> + */
->> +static bool blk_error_inject_delay(struct gendisk *disk, struct bio *bio,
->> +		blk_status_t status, unsigned int delay_us)
->> +{
->> +	struct blk_error_inject_delay *d;
->> +
->> +	/* never block a bio that asked not to be blocked */
->> +	if (bio->bi_opf & REQ_NOWAIT)
->> +		return false;
->> +
->> +	d = kmalloc_obj(*d, GFP_NOIO);
->> +	if (!d)
->> +		return false;
->> +
->> +	pr_info_ratelimited("%pg: delaying %s at sector %llu:%u by %uus\n",
->> +			disk->part0, blk_op_str(bio_op(bio)),
->> +			bio->bi_iter.bi_sector, bio_sectors(bio), delay_us);
->> +
->> +	d->bio = bio;
->> +	d->status = status;
->> +	INIT_DELAYED_WORK(&d->dwork, blk_error_inject_delay_work);
->> +
->> +	/*
->> +	 * Mark the bio before queueing the work, which can complete it as soon
->> +	 * as it is queued.  Splitting happens below the injection hook, but
->> +	 * bio_submit_split_bioset() resubmits the remainder through the hook
->> +	 * again, and as bio_split() only advances the original bio that
->> +	 * remainder still matches the same rule.  Without this a bio would be
->> +	 * delayed once per split.
->> +	 */
->> +	bio_set_flag(bio, BIO_ERROR_INJECTED);
->> +	queue_delayed_work(blk_error_inject_wq, &d->dwork,
->> +			usecs_to_jiffies(delay_us));
+> return found ? 0 : -EINVAL;
 > 
-> How about comparing the delay against sysctl_hung_task_timeout_secs in
-> order not to trigger hung task detector?
+> The line above just returns what tag_to_blk_status() returned.
 
-Hitting the hung task detector is intentional; it's one of the things I 
-imagine would be useful to test, which is why the cap is well above the 
-default timeout.
-
-
-The block layer's own waiters (blk_wait_io, blk_io_schedule) already 
-avoid the detector, so it only fires for upper layers that wait 
-uninterruptibly, which is what such a test is after.
+I would prefer to keep tag_to_blk_status() as a bool lookup. It's the 
+reverse of blk_status_to_tag(), and which errno to return is 
+match_status()'s call.
 
 > 
->> +	return true;
->> +}
->> +
->>   bool __blk_error_inject(struct bio *bio)
->>   {
->>   	struct gendisk *disk = bio->bi_bdev->bd_disk;
->>   	struct blk_error_inject *inj;
->> +	blk_status_t status = BLK_STS_OK;
->> +	unsigned int delay_us = 0;
->>   
->>   	rcu_read_lock();
->>   	list_for_each_entry_rcu(inj, &disk->error_injection_list, entry) {
->> @@ -45,29 +143,38 @@ bool __blk_error_inject(struct bio *bio)
->>   		if (inj->chance > 1 && (get_random_u32() % inj->chance) != 0)
->>   			continue;
->>   
->> -		pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
->> -				disk->part0, blk_status_to_str(inj->status),
->> -				blk_op_str(inj->op), bio->bi_iter.bi_sector,
->> -				bio_sectors(bio));
->> -		bio->bi_status = inj->status;
->> -		rcu_read_unlock();
->> -		bio_endio(bio);
->> -		return true;
->> +		status = inj->status;
->> +		delay_us = inj->delay_us;
->> +		break;
->>   	}
->>   	rcu_read_unlock();
->> -	return false;
->> +
->> +	if (delay_us && blk_error_inject_delay(disk, bio, status, delay_us))
->> +		return true;
->> +	if (status == BLK_STS_OK)
->> +		return false;
+>>
+>> What can make it simpler is allocating "tag" on stack, and then use
+>> match_strlcpy() instead of match_strdup().
 > 
-> status == BLK_STS_OK is permitted only if delay_us != 0. It means we are
-> here because blk_error_inject_delay() failed to inject a delay?
+> That can work too. Just make sure we limit the string size somehow.
 
-Yes, correct.
-
-> 
-> Also, in case delay injection fails, do we want to continue with error
-> injection? Or inject nothing and return false instead?
-
-I think there is no reason not to continue with error injection. The 
-user wanted to delay and then fail the bio. There isn't a strict rule to 
-execute both or none.
-
-> 
->> +
->> +	pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
->> +			disk->part0, blk_status_to_str(status),
->> +			blk_op_str(bio_op(bio)), bio->bi_iter.bi_sector,
->> +			bio_sectors(bio));
->> +	bio->bi_status = status;
->> +	bio_endio(bio);
->> +	return true;
->>   }
->>   
->>   static int error_inject_add(struct gendisk *disk, enum req_op op,
->>   		sector_t start, u64 nr_sectors, blk_status_t status,
->> -		unsigned int chance)
->> +		unsigned int chance, unsigned int delay_us)
->>   {
->>   	struct blk_error_inject *inj;
->>   	int error = -EINVAL;
->>   
->>   	if (op == REQ_OP_LAST)
->>   		return -EINVAL;
->> -	if (status == BLK_STS_OK)
->> +	if (status == BLK_STS_OK && !delay_us)
->> +		return -EINVAL;
->> +	if (delay_us > BLK_ERROR_INJECT_MAX_DELAY_US)
->>   		return -EINVAL;
-> 
-> This could also compare against sysctl_hung_task_timeout_secs and maybe
-> drop BLK_ERROR_INJECT_MAX_DELAY_US?
+This I can do in v4. It should effectively remove the ternary operator too.
 
