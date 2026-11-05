@@ -1,51 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.201
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.148
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793861968;
-	b=XezXFBdDfATM/K8O/cAdmZwrSiNrIB61GVwFcgeh7mCXXG7r4nQ1c8pAwBt+ZsdYyPUf
-	 2ukne+zRSzc6sdjtctxv86dBEa0vdXr0GmsqLSY8kEjjCXLV/SABIcnN9dhjmEZoK/8tS
-	 1eHFJPexgwMgK7GKa82TKXMcipXCnfjr+steof9uYIC/6K4c5B4cRi4kEOREvpxrtrZoQ
-	 LgzIGpsFLwg0xDRIxaMki1VsN0o3lv9Ea0wwNGAjNaPY9Wm8WEMDitrD15VIrnJiLJIsc
-	 OnF5w3evibWfoYASWkp76sf6J+DkCY8t2NXDLDgUssJLlAw/3Y9TWX7SkjAIAayUhjw==
+	t=1793861956;
+	b=X9XFjb+zA8bVC6NDzRBZbiAdy25r36XOk3JCEMShXKLBmBqhvXhXvo1GITpaOcA5kfWg
+	 8mQr+8SasfhuQiOBRb3yF/QWNBlECPlMk+f89PqHGX2/iZh7Wqz2K2WmFvXOC7oHKaH4u
+	 rzHl2BvL4iKyPxuzEtdxIFa9R2thqOcn1qEiusBHVvtx/U2PPlDe1iRCelIxCdu/iqoqH
+	 YNK0iXk5s9uHYDJczzz2pl1Ks9EkGtC2puU6bFFoKRHZu8sNdZikl6tudWlzMTu1w+fnX
+	 wd1TkFP/UFWdpb7rJWQ0p4Na1/2ArUWWMgnpcilEzCqKZcG/Ujpo7uWmKdmvEeX6a5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793861968;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793861956;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=nIzPxp67nycIcgpn1aR+9cX2c2A9Fk/9SrE7eGQSDVI=;
-	b=dTGVgxs1O3+P0B8Sx8xmzCxDkT3zNx4D0o50OGAoKcFZns0clbub3hTlJFRlwAolmIdS
-	 Td4ZBcSK5UYIhD4uQPukZF7J3BU0WUnc2pkyBP1t5Z7vtuH/KWOvggO4KU/JLEwHRVeKs
-	 /YkHx29dD8P/m+YtK0sc6xeL+G7Y9xG9WnakuXzfc/SQL/mkwcrBe2OPVEy0QCDbVpbzW
-	 +hfw73z7YwXk/3k2QFuaTn38XE6zth66r+IQVIqd3yX/MClnQP2CeYeLKi9vrSI971REI
-	 3rw0IvexhlUkj02thej/EqHCsVV1XqqJB4KqEDjv57X5l3J/vftct98izcbV0CWGXsQ==
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=8CTBv2FsWWNYoIFrDUziKjer08OPepQNcF8zDvYRVUM=;
+	b=2STtOwIWxrUWzCAXMpY7EdKcepkHPWtC6/Jro79KhT/9UoF8SH4WMFYUAQruEMb8b7lt
+	 UZ4dr9Qq83aXCZkCe0F5vl+IXhlR28fUCSpd64gajLFotIGNiAFeMVbygqmP/8nU14ieG
+	 4zwnwLhK7FdVY+lkYk5+yNJbfbo7d+gIZSkXrGBb+tqPUOsD88jCre847J28RDCbQFSey
+	 n7FMFgoEpp11auytanaxCZSRtgTRNr0B0v/xIPh72zVwhBpXehPbblYxVYB7iFqd+MWEQ
+	 n+nEJimwJfqAY0WDquNIn/OdZvLwLT5WFvdjkXUIi0HACL44OdRsrQfLebPO0KjiRcA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=URJ69ifo;
-	arc=none smtp.remote-ip=95.215.58.201
-Received: from mta1.migadu.com (out-201.mta1.migadu.com [95.215.58.201])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=l+wnEHJf;
+	arc=none smtp.remote-ip=91.218.175.148
+Received: from mta0.migadu.com (out-148.mta0.migadu.com [91.218.175.148])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F94606A33F
-	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 06:59:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 63F94606A33F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E9F3606A31B
+	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 06:59:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E9F3606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=URJ69ifo
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=l+wnEHJf
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=xVc3emtqQK3gdjiaDH2/ozjRn5r+zA/0E88efrFuawg=;
+DKIM-Signature: a=rsa-sha256; bh=fD7pQ7iJNJUJ2Lt+Fn/kSJBY5hEsxqJHEyhADQZ0hVw=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793861965; v=1; x=1794466765;
- b=URJ69ifo97ROruZ6pmwjXf0aKmSur7mh2uvlDandRG7mz4fCmrISF3oG8QPrDgE6EtbpnoLX
- DDOkrLFAjlHrjyterio5ErE9cY4DTjD2rrmzaqCHaS/HCXbs+pcE5kLsyhLVR0lxf7DWy2zDiJH
- ybQo4+FLjg9nVwpWWXkCsyjQ=
+ t=1793861952; v=1; x=1794466752;
+ b=l+wnEHJf6Oiyr1JLlLvY1SuR55TOc9qTue71B8BOIDVVCSFo+lpfKq7XMsobufkA1UDFYuZg
+ S/4hbx3RQyzDu0U7TxzFT70wLujr3gW8YUSoIvIo9yke829B2TSk5zIlzdtImG9Q4nyXjjfNiiI
+ 9RSLtJX0JrbHg4jDSxSgZSDo=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 7015cdc676c618de;
-	Thu, 05 Nov 2026 06:59:25 +0000
-X-Mizu-Trace-ID: 7015cdc676c618de
+Received: by smtp.migadu.com with ESMTPS id deff676cf379e19e;
+	Thu, 05 Nov 2026 06:59:12 +0000
+X-Mizu-Trace-ID: deff676cf379e19e
 X-Migadu-Flow: FLOW_OUT
 From: Mengmeng Zhao <mengmeng.zhao@linux.dev>
 To: Jens Axboe <axboe@kernel.dk>,
@@ -73,12 +72,10 @@ Cc: linux-block@vger.kernel.org,
 	linux-xfs@vger.kernel.org,
 	linux-mm@kvack.org,
 	Li Wang <liwang@kylinos.cn>
-Subject: [RFC 1/6] block: refuse a dma-buf bio that carries a crypto context
-Date: Thu,  5 Nov 2026 14:58:42 +0800
-Message-ID: <20261105065847.196540-2-mengmeng.zhao@linux.dev>
+Subject: [RFC 0/6] ext4: Add dma-buf read/write support
+Date: Thu,  5 Nov 2026 14:58:41 +0800
+Message-ID: <20261105065847.196540-1-mengmeng.zhao@linux.dev>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261105065847.196540-1-mengmeng.zhao@linux.dev>
-References: <20261105065847.196540-1-mengmeng.zhao@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -92,32 +89,38 @@ Content-Transfer-Encoding: 8bit
 
 From: Mengmeng Zhao <zhaomengmeng@kylinos.cn>
 
-A dma-buf bio has no pages for the crypto layer to walk: the
-software fallback would read the map as bio_vecs.  Refuse it in
-blk_mq_submit_bio() before it can reach that path.
+This series add dma-buf read/write support for ext4. The dma-buf direct
+I/O infrastructure allows dma-buf to be handed to file I/O as an iov_iter,
+currently it only supports raw device. To better serve the GPU-NVME direct
+access through normal filesystem, prior work for XFS has been discussed
+at [1]. We also are interested in this field and working on it[2]. This
+patchset is based on Anuj Gupta's patchset as there are common parts at
+block/iomap. The base tree is:
+https://github.com/anuj7781/linux-kernel/tree/anuj/fs-dmabuf-rfc-v11-desc-v2
 
-Signed-off-by: Mengmeng Zhao <zhaomengmeng@kylinos.cn>
-Signed-off-by: Li Wang <liwang@kylinos.cn>
----
- block/blk-mq.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Patches 1-5 add dma-buf guards at several common paths at block,
+mm/filemap, dax and iomap. Patches 6 add dma-buf support for ext4.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index be5671966787..f0d978b1724f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3138,8 +3138,10 @@ void blk_mq_submit_bio(struct bio *bio)
- 		goto queue_exit;
- 	}
- 
-+	/* a dma-buf bio has no pages for integrity work or contents crypto */
- 	if (unlikely(op_is_dmabuf(bio->bi_opf) &&
--		bdev_has_integrity_csum(bio->bi_bdev))) {
-+	    (bdev_has_integrity_csum(bio->bi_bdev) ||
-+	     bio_has_crypt_ctx(bio)))) {
- 		bio_endio_status(bio, BLK_STS_NOTSUPP);
- 		goto queue_exit;
- 	}
+[1] https://lore.kernel.org/linux-xfs/20261016091919.971295-1-anuj1072538@gmail.com/
+[2] https://lore.kernel.org/all/20260908131545.105987-1-liwang@kylinos.cn/
+
+Mengmeng Zhao (6):
+  block: refuse a dma-buf bio that carries a crypto context
+  mm/filemap: refuse dmabuf iterators in the generic read/write copy
+    paths
+  dax: refuse dmabuf iterators in dax_iomap_rw()
+  iomap: refuse dmabuf iterators in iomap_file_buffered_write()
+  iomap: refuse dmabuf iterators on contents-encrypted inodes
+  ext4: support dma-buf registered buffers for direct I/O
+
+ block/blk-mq.c         |  4 +++-
+ fs/dax.c               |  4 ++++
+ fs/ext4/file.c         | 33 +++++++++++++++++++++++++++++++++
+ fs/iomap/buffered-io.c |  7 +++++++
+ fs/iomap/direct-io.c   | 10 ++++++++++
+ mm/filemap.c           | 22 +++++++++++++++++++++-
+ 6 files changed, 78 insertions(+), 2 deletions(-)
+
 -- 
 2.43.0
 
