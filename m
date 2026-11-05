@@ -1,58 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793896095;
-	b=XAdxgUoPXyjbRiVq+cxm3xzVwpvlfB9TcGFgU+68mrrHKbQIDB5ALZI5YMR1+8lA2uxw
-	 yoChqd6m5o11QiMYoUqcmExtCB3qxAT2avPmzWyaZYbDMOoChF3F0kFzmZr02ntiSKXB1
-	 9SFwoIyC2HmxGK5s48kwluVh9yU+rDy9DiavBsnL191YvBiPFghYYL3HdzyE4jneqW1wl
-	 bA8eO9VclVRdnYzoo75x2m24RJuWvRTY+EZzDcslWleb8QSwUFWno9FsVxte8EOL8Wb19
-	 MS8dJRbXohTFCTeAX5Gf8k1KDTw7HnN3/NjuUVwxelesS+8I3HOVhRbgOdl8AeNuQUQ==
+	t=1793897312;
+	b=aS04pAnbl8UBRzawozI90phlE9SF3kYMDpKlSgy1XYBJ6LRAjWBdqZ3M6Sppw1p7+ww3
+	 ESTY32WJOePDS/0oC0YLF5jwrRG5E69FDXCLrtcX3okgvOIDUS+Q4cdDreLbQ4liaFFPf
+	 AS02l6Zyr87FutAomsqdvqVSO3zm4cqkHh5b62Hu9WT2Ic3bIvnjTG2mojWio+1EYUlfn
+	 LvEE6lxSWh4r4a3MQKMLX3xfbtAoLomApNO0T1I1bKKA3ouit/GAOd7OcViYl8BKhwMVS
+	 8SSGtjh1bzsPixEtQ+JUIAGg6Z5qQzwd//ON5u0SluveN/FxS0wkoACPREwA9ZwDWKQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793896095;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer;
-	bh=ViB22PhtdvJTfgTdmabUFEVSK81diP/Lp6lp+HQ1/dw=;
-	b=Up2DnvP3X0fVGgruNurHzAqeRO7uVCze4cgQP1xd6sBk5yDoSn0fiQ/bfR4kEulldJYg
-	 /YJFLmzqDTRC7rjvV656W5i8KaI6YYnGbupfx3n8obZ2gBMJQRFqDfiLrEwnnA8pXHQ0h
-	 YTtRjMUQlerAUpVQF7inJqo9Y6h25th0XsysMb+JWwoXqcDIFGws6G3Rwh3yuPgFRiCjN
-	 bUapI69KsYfYyRPP17ZbKmGBZG5vsmKQEi4AfyRAzaaaFJIkHzFghL5lDqaI3Jlvmz6pI
-	 h/P8ujzrEVS0piMdA3RxBY6SE8+qiLqm2TjQtLq5LaHvXaG4E8hHzaJ1y480pcsoXPg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793897312;
+	h=Received:DKIM-Signature:Date:To:Cc:From:Message-Id:Subject;
+	bh=3nNnYS3rXGBEUIhHZKihqecq8rp1NDmqZJxqu67mjHY=;
+	b=1bNATpyHNAw+6TBWOw4OCJBK1g84Cm6pI/nFyyX6zA5He05i5s9xjxkS6pX7c1rwXT/t
+	 oH5uBoqgduulXfi4KGhcMel8S2kwFnj15RjUVPpkstTa23DNB4suT/7qpdn4vquOZAffM
+	 RaP85F6a8w/KngnUKSX8Z0Wr87vTi3oGqpado+AjVfnFrtvQZrdU2+IYrb71RrRxYlnUA
+	 NRBALSVOxG21tvQtzkQtPeAiTvasu7N3ggPY97SJQY3gy35jyTtyPmlUp9VrkWLXpVcFE
+	 Gqet6kBHMeDhyfnn+8uIBbq4w6ITEKuyrbGC5lCW/l/S6B1jEdVddYjv2UbMqy7ZSig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DU1+xN0S;
+	dkim=pass header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=korg header.b=ZY1udhAV;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E278606A32F;
-	Thu,  5 Nov 2026 16:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6B3606A329;
+	Thu,  5 Nov 2026 16:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DU1+xN0S
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B01A41F000C1;
-	Thu,  5 Nov 2026 16:28:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793896094;
-	bh=ViB22PhtdvJTfgTdmabUFEVSK81diP/Lp6lp+HQ1/dw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=DU1+xN0S4hrSiUhuKCm59PhPJnAjG4puGZJ6oHeW/NZRdyZD5qCWNJ5bGwiwhCUid
-	 H2TyEhWt8+dbHek4dDNgQKSXtdYHs1xDDW1ffnJV/KheipdrkILjy+9dyDtAHiu+6K
-	 l+2A98R2q/yak6sHZzXw9eW2UOrPRSrlSQb9RDVH7JAmzTCJeXEtVJuKgdqWbQIg4H
-	 +MfMxVklxgvK7x4ELR2J3DfRKRF6z1jRm6e6LCAaoquzBk2PXXZPKKlLUa04Iq0oz5
-	 G3sP0IKD5Nm8OmVj+VvXv+wC99IFu7aW+qFZ9Vve5m6XCIumQjXTIF1GHLhieDyd5c
-	 whB9slWb6TIsQ==
-From: Christian Brauner <brauner@kernel.org>
-To: Alexander Viro <viro@zeniv.linux.org.uk>, 
- Andrea Parri <parri.andrea@gmail.com>
-Cc: Jan Kara <jack@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, 
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-btrfs@vger.kernel.org, linux-mm@kvack.org, linux-api@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20261026180619.4147910-1-parri.andrea@gmail.com>
-References: <20261026180619.4147910-1-parri.andrea@gmail.com>
-Subject: Re: [PATCH] iov_iter: take an unsigned long segment count in
- import_iovec()
-Message-Id: <20261105-fixkosten-firma-regress-e73044c88ac5@brauner>
-Date: Thu, 05 Nov 2026 17:28:10 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=korg header.b=ZY1udhAV
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63F6A1F000C1;
+	Thu,  5 Nov 2026 16:48:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux-foundation.org; s=korg; t=1793897311;
+	bh=3nNnYS3rXGBEUIhHZKihqecq8rp1NDmqZJxqu67mjHY=;
+	h=Date:To:Cc:From:Subject;
+	b=ZY1udhAVpAvlluTuk0VV0ITiU7+6n9sCRl47dQHeqnBsOyMVVj/cHs3BsQEJ79WrN
+	 GrLAc6AJOPd34awsf74B/zRKFmsy3ICE4EcW7bPTxaOXzbuANJ77XDH3iS7HGUqnal
+	 R1b7c2un31wzSEogO+H1x6+H62hKut3GRV/bSPIg=
+Date: Thu, 05 Nov 2026 08:48:30 -0800
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>, Daehyeon Ko <4ncienth@gmail.com>,
+ Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Haocheng Yu <l1za0.sec@gmail.com>,
+ Tal Zussman <tz2294@columbia.edu>, stable@vger.kernel.org
+From: Andrew Morton <akpm@linux-foundation.org>
+Message-Id: <de6c68da958f43278194d4cf45a8fde2.1@linux-foundation.org>
+Subject: [PATCH 1/1] iov_iter: validate extracted segment for bvec alignment
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -61,36 +54,83 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-ce4c1
 
-On Mon, 26 Oct 2026 19:06:18 +0100, Andrea Parri wrote:
-> readv(), writev() and their positional variants, process_vm_readv(),
-> process_vm_writev(), vmsplice(), process_madvise(), vectored aio and
-> the btrfs encoded I/O ioctls all take a full-width segment count, and
-> all of them hand it to import_iovec() or __import_iovec().  Those take
-> an unsigned int count, so on 64-bit kernels the upper 32 bits are
-> dropped before iovec_from_user() checks the count against UIO_MAXIOV.
-> 
-> [...]
+From: Daehyeon Ko <4ncienth@gmail.com>
+Subject: iov_iter: validate extracted segment for bvec alignment
+Date: Thu, 15 Oct 2026 15:19:07 +0900
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+iov_iter_extract_bvecs() validates iter_iov_addr() and iter_iov_len()
+before iov_iter_extract_pages() selects the first nonempty segment and
+limits it by iter->count.  The checks can therefore cover a different
+range after a leading empty segment or iov_iter_truncate().
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+An unprivileged O_DIRECT preadv() reproduced the empty-segment case: an
+aligned empty segment followed by a misaligned one completed 4096 bytes
+instead of returning -EINVAL.  A truncated iterator has the same mismatch
+when its full segment length is aligned but its remaining count is not.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+The worst effect I have confirmed is an alignment-contract bypass.  An
+unprivileged O_DIRECT preadv() produced bvecs with offset/length pairs
+(1, 4095) and (0, 1).  The bio reached brd_submit_bio(), and the read
+completed 4096 bytes instead of failing with -EINVAL.
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+I have not demonstrated harmful behavior on real DMA hardware.  For a
+normal blk-mq target, blk_mq_submit_bio() calls
+__bio_split_to_limits(), where bio_split_io_at() rejects the misaligned
+bvec before queue_rq().  Virtio-blk and loop both returned -EINVAL in
+my controls.
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
+So a bio-based driver can receive a bvec which violates its advertised
+dma_alignment, but any further effect is driver-specific.  I have not
+reproduced memory corruption or a crash on real hardware.
 
-[1/1] iov_iter: take an unsigned long segment count in import_iovec()
-      https://git.kernel.org/vfs/vfs/c/7a15349d271b
+Bound the normal fast-path length by iter->count.  Keep
+first_iovec_segment() for leading empty segments so validation covers the
+remaining portion of the segment available for extraction.
 
+Link: https://lore.kernel.org/20261015061907.2713943-1-4ncienth@gmail.com
+Fixes: 14b007e17881 ("block: validate user space vectors during extraction")
+Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Closes: https://lore.kernel.org/r/20261012065520.1089147-1-4ncienth@gmail.com
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Hannes Reinecke <hare@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Haocheng Yu <l1za0.sec@gmail.com>
+Cc: Tal Zussman <tz2294@columbia.edu>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: <stable@vger.kernel.org>
+---
+
+ lib/iov_iter.c |    9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+--- a/lib/iov_iter.c~iov_iter-validate-extracted-segment-for-bvec-alignment
++++ a/lib/iov_iter.c
+@@ -1042,7 +1042,7 @@ static ssize_t iter_xarray_get_pages(str
+ 	return maxsize;
+ }
+ 
+-/* must be done on non-empty ITER_UBUF or ITER_IOVEC one */
++/* must be used on a non-empty ITER_UBUF, ITER_IOVEC or ITER_KVEC */
+ static unsigned long first_iovec_segment(const struct iov_iter *i, size_t *size)
+ {
+ 	size_t skip;
+@@ -1959,8 +1959,13 @@ ssize_t iov_iter_extract_bvecs(struct io
+ 		   iter_is_iovec(iter) ||
+ 		   iov_iter_is_kvec(iter))) {
+ 		unsigned long start = (unsigned long)iter_iov_addr(iter);
++		size_t seg_size = min(iter_iov_len(iter), iter->count);
+ 
+-		if ((start | iter_iov_len(iter)) & mem_align_mask)
++		if (unlikely(!seg_size && iter->count)) {
++			seg_size = iter->count;
++			start = first_iovec_segment(iter, &seg_size);
++		}
++		if ((start | seg_size) & mem_align_mask)
+ 			return -EINVAL;
+ 	} else if (iov_iter_alignment(iter) & mem_align_mask) {
+ 		return -EINVAL;
+_
