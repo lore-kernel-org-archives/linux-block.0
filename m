@@ -1,57 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793958608;
-	b=YlG1DWKWjlf117/XiliNqlZ3FCrknX/G/nTqAUXLlK9Z37EEKMeEPvssSNmi+w4XDsn3
-	 hNjSHqaov6/3UKpmfrzUZXga0YXnGRWNAM4A3Hq/XHbHKnLdVxUuRBUvOIzeIq4HVKNXh
-	 9J7G9g9qjglMzgBMuDY2aXx2eblfwvCdAZpPA86Xn5WLVLyrwnDtykF+U23r/CrcXW7B1
-	 N9+PNcjUXd9n1YOCU4tp5/NdZfXbiCWxWuV4NjzVcYFOlIHIjzptQ3wc98+KgmZ99JAzx
-	 sgjx99aIxtKy8f6bdt6blwSK355drmiAmDWPe/QpudnnKHLKzeFOGwzkt3fna2DSxmw==
+	t=1793961685;
+	b=oCEZ9S3yVDglPR5ZZc3QlURddN702CRLbijuKw2/JMTbyoKYXMMW3gjA0MQxdkOnMwh6
+	 mXyL2MaW3G73V/oW88PNOPstkzh5RydU8p2MsKMWreen8tGWrjjrW4+5P0h2Pb+AJVzwr
+	 v8VEMs5qIMzHRrvVDLEJOcF7pTr1twalaHnGLIgeMbZmeaJvcNM7dkLLli+KD9Ow4lHP/
+	 8N2GdMFB6xEIXvocgcY8+UhCVfW4VVSy3NuYYWIKXR6PfV0yYp8t6zEk3pqorBGun7a3L
+	 MjFOmp1qT2gf13fFzpljDYFzqzS7baeT4dSeOvGXYy2bLUnwCeyZMkitUuUHchX0+4Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793958608;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=kCUnCqn5HTWZnsrPGG7K4yZW4eeu6ReW8XRXv1w/mms=;
-	b=feFIPqkU/ZbRrF2zG8s/iiQBrySv21pGPKmn3zzEu/haxqJnyoxSkyhtP3HdIiOQ/tpW
-	 M7PL8W5t4j09FYdnyX/DokhMPk7CsPz5C/bYEbSkXWh+/2uBjaDjiDD2LW3vr4GXvxDS3
-	 JIcCWjfAKDO8MC0as64OwbFr5oARwt6LtqXZRbBeffvHS18lu9X5ojpSHfeSteuptF2CR
-	 nWSYme1NPvaTAm/DExOEW0nWMvm8GalcbJarUp6KDCYXwtISX0vhN8FQOtFItGFlihXyf
-	 yNGyWJyCXUNc7HKSEN+36c3UCFQuJmchAHVTJRTe8V9tIzu60NqiVxacovg8+vEoTUw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793961685;
+	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
+	bh=Y2B3K2s4CMkhzGfN/sXBCg6vT5zF/XqqON8igl9xOC0=;
+	b=lobasmR5c5J9H/BXmqc2VdsqpFtbglUTSJd0NzYoSZCPutuiSIbAxvoTvjug0UjMrrTy
+	 jB7QG/AU9ltyzOVYqQeNkMr+954IctBkT2R3CC/PjAgLi93lxHlW/DRYtjXXKHBOCa8ZB
+	 WAL85t0D/hiFJpm7gguI9ZohXz2rciNlmth5w0VX8H0Ymb21dYl1qcV1ODrgVH1cE40MW
+	 4fdUVpMcuomX7U0Pn58roerEgV1qqHoaPvbgmXHckSthKjam5TkBlsKu8IEGgPIe3zaRj
+	 veoMfp7E373t1Lrc4vAz2HYgQ+Usl+f0SFF4voliQp6QSTv9yoTYGzfy5+y73qpFhKw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=j4YBjvkV;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=lst.de;
+	spf=pass smtp.mailfrom=lst.de;
+	arc=none smtp.remote-ip=213.95.11.211
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BF6606A326;
-	Fri,  6 Nov 2026 09:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=j4YBjvkV
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7CB71F008A2;
-	Fri,  6 Nov 2026 09:50:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793958608;
-	bh=kCUnCqn5HTWZnsrPGG7K4yZW4eeu6ReW8XRXv1w/mms=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=j4YBjvkVgca9eK11r/pmkpmYVknRXQ1iskoPiA3nVhz6l4PLBxwItQPMezGI9RzXb
-	 UPvuwqXnJMsyrsdW8ntFbsn0WdTQ4LaFVeRIXjvHcjcXw+vJXy8u44+zE2b3BTPF9G
-	 uohVMaIXn0WeyrDi//pRdllPre2HvwFhzH1usLpvv11hATT0wd/Bghba+XTyDEFB9V
-	 TWj+FoknTLGuFwd03RiJDDUr141atCh5r+DxSBjsS5rQofufHTfk6Y3NH4kHMOLI6L
-	 K41v3KjaaSJd/H7gbyJO11e3/Wtew1FOv66Is2C+QSRKDeDkCVmY4wRpC4O+qr50E3
-	 R5fciyUwDyVzw==
-Date: Fri, 6 Nov 2026 10:50:02 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Pavel Begunkov <asml.silence@gmail.com>, 
-	Christoph Hellwig <hch@lst.de>
-Cc: Anuj Gupta <anuj1072538@gmail.com>, djwong@kernel.org, cem@kernel.org, 
-	axboe@kernel.dk, linux-block@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com, anuj20.g@samsung.com, nj.shetty@samsung.com
-Subject: Re: [RFC 0/4] fs: support dma-buf backed direct I/O
-Message-ID: <20261106-schalldicht-acker-fiskalisch-d53d55495e5e@brauner>
-References: <20261016091919.971295-1-anuj1072538@gmail.com>
- <4649a20f-aba9-418e-987f-66f21ab24410@gmail.com>
- <20261028162900.GA22640@lst.de>
- <69f1290c-1650-4ce4-bc0f-e8a3c03a5d14@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A459606A329;
+	Fri,  6 Nov 2026 10:41:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A459606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id E6E2C68BFE; Fri,  6 Nov 2026 11:41:19 +0100 (CET)
+Date: Fri, 6 Nov 2026 11:41:19 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Mengmeng Zhao <mengmeng.zhao@linux.dev>
+Cc: Jens Axboe <axboe@kernel.dk>, Dan Williams <djbw@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, tytso@mit.edu,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Baokun Li <libaokun@linux.alibaba.com>,
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
+	Zhang Yi <yi.zhang@huawei.com>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, asml.silence@gmail.com,
+	hch@lst.de, Anuj Gupta <anuj1072538@gmail.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, nvdimm@lists.linux.dev,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, Li Wang <liwang@kylinos.cn>
+Subject: Re: [RFC 1/6] block: refuse a dma-buf bio that carries a crypto
+ context
+Message-ID: <20261106104119.GA5668@lst.de>
+References: <20261105065847.196540-1-mengmeng.zhao@linux.dev> <20261105065847.196540-2-mengmeng.zhao@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -61,25 +62,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <69f1290c-1650-4ce4-bc0f-e8a3c03a5d14@gmail.com>
+In-Reply-To: <20261105065847.196540-2-mengmeng.zhao@linux.dev>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Oct 29, 2026 at 11:34:07AM +0000, Pavel Begunkov wrote:
-> I didn't check last time but there is space to spare. Maybe I don't
-> know about all production enabled options growing mutexes.
+On Thu, Nov 05, 2026 at 02:58:42PM +0800, Mengmeng Zhao wrote:
+> +	/* a dma-buf bio has no pages for integrity work or contents crypto */
+>  	if (unlikely(op_is_dmabuf(bio->bi_opf) &&
+> -		bdev_has_integrity_csum(bio->bi_bdev))) {
+> +	    (bdev_has_integrity_csum(bio->bi_bdev) ||
+> +	     bio_has_crypt_ctx(bio)))) {
 
-Meh, I agree with Christoph. We have rejected similar proposal from
-other users in the past that just needed a little bit of that spare
-space.
+This could really use a factored helper explaining all the refusals.
+And maybe we should use the chance to sit back and think what else
+would blow up and add it there as well.
 
-The  bytes that are left in the last cacheline are for things that are
-useful for every file and not for a rather nieche feature.
-
-> Filesystems should set it to a super block or something similar.
-> It's "unsigned long" for that exact reason. Shouldn't be a problem
-> for md either.
-
-I don't think any of this needs to be in struct file. There are creative
-ways to work around this. We draw a hard line when bloating struct file.
-Sorry.
