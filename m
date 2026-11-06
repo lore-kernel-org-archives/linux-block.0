@@ -1,75 +1,45 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793967890;
-	b=udL8SW7MRgD5yEkglYdBLOOCouawIhjyCqALnrAsRJpwYsNpsxg9qIG0aVdLKMP9WtaT
-	 CTki3qu/5CK/1k9iaagfA+zyy6wEAkna6AUYLhjs5zKgCNHajKQy3LO0iUmekIhZXrhbH
-	 sQAkcL3XSCER3T/n6Iuion/iG7TWRKgubYxtnek50OGWQQS43T5FAzOJN0H5T/Tw3XN7C
-	 gYfiSaBIsOMuO9Lw3zjsT48rbn+2Jk+HBPY0vf+/2HCcU2MXhxxUL0MoSdvR29D1nQKDE
-	 +PmAlFxrNsweOE5nQnD0tF3VUomAwIr91evy17aQvzin5dwlW4pMq8ZV0WbyAFac3ww==
+	t=1793969814;
+	b=jyPeICfuIYF8JW8iDL5jjJo0H3XtfzZdvjMmKmIqlrsBlEJ1/iQTHKeE2wrVii8vwIGa
+	 2pylbRsAg4q1Z+F6plJFfcBtGfc5INSYb7GnhwDraPvmVAd4CbB8HRUYyk6J7WtkP156s
+	 bDnyixs8wkkpVBtKNM5NU3Fu+N0q77g1jkimrktq4he30DS37cSOfEs9zl1Tw/qZ4Tfs7
+	 yJ9i27bQWt6/BgkinEA7ePFRSoSJ6nNaUgeYUUpc6eQXtHVS4XdxEk8dODuhlcC7h5XD+
+	 7CdZ7msTr7aFEHRfkPiZQppljmaUl6NshL+YROhPkHJHhTTQ3tRn9M4FNAwqWq4Aolw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793967890;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=CZa/+auwJ53QeObgCQyye3ozLJHNV1LzGLNqsS8IqWU=;
-	b=feghM5RBsYcPgVqxh6ddeI1mDnwf18xiMdlkudWe51q7cneNwAGDi+TR5OlWmwwgJ7tV
-	 l6+o9iZPvm6LUWhiQizOhNbprY1JQVJDq7VyhcJiUAl0p5upVgxFaQukukx4HVW5axMW9
-	 yYJFYWChROH+Kj9thXMAeahyckRij8sgxNic6B2Tb3olYYmZB9YzEsM0VihFkZl11pRgx
-	 SORJwvgGFQSeGuXQhucy2mYNj9MbZ7fGucxlXEyjNOFkpoj9F0ZH0IkRdn/pbJyLpESAZ
-	 9SvvBIU9+amqltLHHdxf+cjbkty2DewL+YeejaJ1yIJsLhODd0oY3MDW/hr3UZPSfzw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793969814;
+	h=Received:DKIM-Signature:Content-Type:MIME-Version:Message-Id:
+	 In-Reply-To:References:Subject:From:To:Cc:Date;
+	bh=ovnYpUVr+IdQBtBnTvW85eyzWvjLk9RyflmM2dhK/t0=;
+	b=fWZqdEx+2v19ch6GjoSGCtf/f8rV3w8L7kLRJOXaj7IAPqiOivTZOF9tHpGegMnIvVuK
+	 y9aBK7MSKyWDPiXFwhE+Zrki8ruuFs+FcLXoJkjFHArRDESUNvdsYwJTHlzTLGnSJAb+J
+	 MDEchjcpznwPcOgJnihltK0Rbpiot5MnQ44Hkb0PFsryRLrqwbQP2qseZfhzKkHrBHfv3
+	 47w/yqJWKz5ySHkM38lkSIEbFTXB+hSDYI9+0JdLd7MxuggqlO67GIouAREhWKheKmfge
+	 FQEYtK+G7hshfGN2d2M6bCD/kOkOw14IiDKq2XjtnNMowKxB9JE54c/KHPfXa03lOYQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=HTy9yykA;
-	arc=none smtp.remote-ip=91.218.175.131
-Received: from mta0.migadu.com (out-131.mta0.migadu.com [91.218.175.131])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hS6VoyOt;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2157606A339
-	for <linux-block@vger.kernel.org>; Fri,  6 Nov 2026 12:24:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F2157606A339
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D20606A32C;
+	Fri,  6 Nov 2026 12:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=HTy9yykA
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=jUmHwKNqJMANYN0pI4Lsx0VheHHuZ6sYGI5Hh257CJQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793967887; v=1; x=1794572687;
- b=HTy9yykAiSjmmXAZ+fCiGVONMQibu6bLOcCow0bfn2g6rOsoNk6emsZIpwwHI6PjArEQqZ3f
- R4ZGwDSZYBevuWk6Ez5ylc8vogiXUSq5u1Fms0h6GZJHtLoasVVg1CL2nV03RUFtXB/LKhdeQrJ
- hbdKdA19pl19HL8db7IH7Dcs=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id c5bfabdb6db8feb0;
-	Fri, 06 Nov 2026 12:24:47 +0000
-X-Mizu-Trace-ID: c5bfabdb6db8feb0
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: tj@kernel.org,
-	josef@toxicopanda.com,
-	axboe@kernel.dk,
-	alexei.starovoitov@gmail.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	andrii@kernel.org,
-	eddyz87@gmail.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	linux-kselftest@vger.kernel.org,
-	cui.tao@linux.dev,
-	cuitao@kylinos.cn,
-	ameryhung@gmail.com
-Subject: [RFC PATCH v13 4/4] docs: cgroup-v2: document the iocost BPF cost model attachment
-Date: Fri,  6 Nov 2026 20:23:56 +0800
-Message-ID: <20261106122356.3224638-5-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261106122356.3224638-1-cui.tao@linux.dev>
-References: <20261106122356.3224638-1-cui.tao@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hS6VoyOt
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A26CB1F008A4;
+	Fri,  6 Nov 2026 12:56:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793969814;
+	bh=ovnYpUVr+IdQBtBnTvW85eyzWvjLk9RyflmM2dhK/t0=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date;
+	b=hS6VoyOtgic16aZ0AgveOu3XhsVKgcvrasGkriV1nlFg8fTTyU8OpjY5SIhNGiWlO
+	 aymV9/0GO7jbB7dwbvaGBSpqXo40vQMInfuvrzXQA0jZ/CD3I1yrYyxCO/VrEU7DAo
+	 7TuKPASb4g/afkDwDT2TZqjvmUD1sm795roDYGVic28HkkEHAt2tbPrJkQIe8ZNKHw
+	 SoZNj4RTK2DlNNmwsJYj1diYFFjt8V0dZigW5aZW4WBcTHI9aorDcuQizm7z3/4zZl
+	 me196IJssApCckaMtEz5GF8fLlJv9TQG5fqKCwDgNw/BmCb2/dfIP56OntSpmyeoLz
+	 5vZGIoCOsHnSw==
+Content-Type: multipart/mixed; boundary="===============7160097930942034138=="
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -79,98 +49,114 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-Id: <3c8441b7a6884f0f66bf3fb4e00fd9fa675654b71b59dfb3966537c19d3e7989@mail.kernel.org>
+In-Reply-To: <20261106122356.3224638-4-cui.tao@linux.dev>
+References: <20261106122356.3224638-4-cui.tao@linux.dev>
+Subject: Re: [RFC PATCH v13 3/4] selftests/bpf: add iocost cost model test
+From: bot+bpf-ci@kernel.org
+To: cui.tao@linux.dev,tj@kernel.org,josef@toxicopanda.com,axboe@kernel.dk,alexei.starovoitov@gmail.com
+Cc: cgroups@vger.kernel.org,linux-block@vger.kernel.org,linux-kernel@vger.kernel.org,bpf@vger.kernel.org,andrii@kernel.org,eddyz87@gmail.com,ast@kernel.org,daniel@iogearbox.net,linux-kselftest@vger.kernel.org,cui.tao@linux.dev,cuitao@kylinos.cn,ameryhung@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
+Date: Fri,  6 Nov 2026 12:56:53 +0000 (UTC)
 
-From: Tao Cui <cuitao@kylinos.cn>
+--===============7160097930942034138==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Document the BPF cost model attachment in the io.cost.model section
-of the cgroup v2 documentation: attaching an iocost_model_ops
-struct_ops to a device by its major:minor, the model=bpf readback
-while attached (ctrl keeps describing the coefficients), the builtin
-model coming back on detach, and ctrl writes never selecting a model.
+> selftests/bpf: add iocost cost model test
 
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+TL;DR: Nits only in the iocost selftest models: stale deviation comments,
+macros duplicated across both progs, and a redundant op check in iocost_ms.c.
+
+> diff --git a/tools/testing/selftests/bpf/progs/iocost_model.c b/tools/testing/selftests/bpf/progs/iocost_model.c
+> new file mode 100644
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/iocost_model.c
+
+[ ... ]
+
+> + * One known deviation, mispricing only: the builtin does not move its cursor
+> + * for an IO whose cgroup fails to activate; this model does not see the
+> + * activation result. Another, narrower one: with "flushiops"
+> + * configured, the builtin also advances its cursor for a
+> + * preflushed discard, which this model still ignores.
+
+This isn't a bug, but submit_bio_noacct() already fails any bio carrying
+REQ_PREFLUSH or REQ_FUA unless its op is REQ_OP_WRITE or
+REQ_OP_ZONE_APPEND:
+
+    if (WARN_ON_ONCE(bio_op(bio) != REQ_OP_WRITE &&
+                     bio_op(bio) != REQ_OP_ZONE_APPEND))
+            goto end_io;
+
+so a preflushed discard never reaches iocost.  Could the deviation lists
+in the header comments of both progs be trimmed to the cases that can
+actually happen?  The same "flushiops" sentence is repeated in the
+iocost_ms.c header, which also carries the "measured 89x overcharge,
+12.9x throughput collapse" and "measured 107x undercharge" figures that
+might fit better in the changelog.
+
+[ ... ]
+
+> +#define IOCOST_REQ_OP_MASK	0xff		/* REQ_OP_MASK, not in BTF */
+> +
+> +/*
+> + * DIV64_U64_ROUND_UP / DIV_ROUND_UP_ULL equivalents, folded at
+> + * compile time
+> + */
+> +#define RU(x, y)		((x) / (y) + (((x) % (y)) ? 1 : 0))
+> +
+> +#define RBPS	174019176ULL
+> +#define RSEQIOPS	41708ULL
+> +#define RRANDIOPS	370ULL
+> +#define WBPS	178075866ULL
+> +#define WSEQIOPS	42705ULL
+> +#define WRANDIOPS	378ULL
+> +
+> +#define RPAGE	(RU(VTIME_PER_SEC, RU(RBPS, IOC_PAGE_SIZE)))
+> +#define RSEQIO	(RU(VTIME_PER_SEC, RSEQIOPS) - RPAGE)
+> +#define RRANDIO	(RU(VTIME_PER_SEC, RRANDIOPS) - RPAGE)
+> +#define WPAGE	(RU(VTIME_PER_SEC, RU(WBPS, IOC_PAGE_SIZE)))
+> +#define WSEQIO	(RU(VTIME_PER_SEC, WSEQIOPS) - WPAGE)
+> +#define WRANDIO	(RU(VTIME_PER_SEC, WRANDIOPS) - WPAGE)
+
+This isn't a bug, but these macros (IOCOST_REQ_OP_MASK, RU(), the six
+AUTOP_HDD parameters and the derived coefficients) and the
+READ/WRITE/ZONE_APPEND classification in calc_cost() appear verbatim in
+both progs/iocost_model.c and progs/iocost_ms.c.
+
+Could they go into a small progs/iocost_common.h, the way
+bpf_qdisc_common.h is shared by bpf_qdisc_fifo.c and bpf_qdisc_fq.c, so
+the two models don't drift apart?
+
+[ ... ]
+
+> diff --git a/tools/testing/selftests/bpf/progs/iocost_ms.c b/tools/testing/selftests/bpf/progs/iocost_ms.c
+
+[ ... ]
+
+> +	/*
+> +	 * only bios the builtin prices participate in stream tracking;
+> +	 * the early return below skips the merge discount, which only
+> +	 * applies to tracked data bios
+> +	 */
+> +	if (!(((opf & IOCOST_REQ_OP_MASK) == REQ_OP_READ ||
+> +	       (opf & IOCOST_REQ_OP_MASK) == REQ_OP_WRITE ||
+> +	       (opf & IOCOST_REQ_OP_MASK) == REQ_OP_ZONE_APPEND) && nbytes)) {
+
+This isn't a bug, but the earlier if/else chain in iocost_ms_calc_cost()
+already returns 0 for every op other than REQ_OP_READ, REQ_OP_WRITE and
+REQ_OP_ZONE_APPEND.  By this point the three-way op test is always true,
+so could this condition just be:
+
+    if (!nbytes) {
+
+?
+
+
 ---
- Documentation/admin-guide/cgroup-v2.rst | 49 +++++++++++++++++++++----
- 1 file changed, 41 insertions(+), 8 deletions(-)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 9e3c67b02ae2..608ebd311b79 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -2056,8 +2056,9 @@ IO Interface Files
- 	currently implements "io.weight" proportional control.  Lines
- 	are keyed by $MAJ:$MIN device numbers and not ordered.  The
- 	line for a given device is populated on the first write for
--	the device on "io.cost.qos" or "io.cost.model".  The following
--	nested keys are defined.
-+	the device on "io.cost.qos" or "io.cost.model", or when a BPF
-+	cost model is attached to it.  The following nested keys are
-+	defined.
- 
- 	  ======	=====================================
- 	  enable	Weight-based control enable
-@@ -2111,13 +2112,44 @@ IO Interface Files
- 	implements "io.weight" proportional control.  Lines are keyed
- 	by $MAJ:$MIN device numbers and not ordered.  The line for a
- 	given device is populated on the first write for the device on
--	"io.cost.qos" or "io.cost.model".  The following nested keys
--	are defined.
-+	"io.cost.qos" or "io.cost.model", or when a BPF cost model is
-+	attached to it.  The following nested keys are defined.
- 
--	  =====		================================
-+	  =====		==========================================
- 	  ctrl		"auto" or "user"
--	  model		The cost model in use - "linear"
--	  =====		================================
-+	  model		The cost model in use - "linear" or "bpf"
-+	  =====		==========================================
-+
-+	When BPF cost model support is available, a BPF cost model
-+	can be bound to a device by attaching an
-+	"iocost_model_ops" struct_ops carrying the whole disk's
-+	major:minor as encoded by makedev(3) in its "dev" member (a
-+	partition's major:minor is rejected).  Attaching creates the
-+	controller if needed, like
-+	an io.cost.model write does, switches the device's pricing to
-+	the model and populates the device's line in this file and in
-+	"io.cost.qos" if it did not exist yet.  Attaching fails with
-+	-EBUSY if the device already has a model attached.  It fails
-+	with -EOPNOTSUPP if dev names a partition or a device without
-+	a multiqueue queue, and with -ENODEV if the device has gone
-+	away.  The attached model prices IOs only while the controller
-+	is enabled through "io.cost.qos"; attaching does not enable it.
-+	IOs issued directly by the root cgroup bypass the model's
-+	per-IO pricing; the completion-time sizing of their requests
-+	still uses the attached model's transfer coefficients.
-+
-+	While a model is attached, "model" selects between it and the
-+	builtin model: "model=bpf" switches to the attached model and
-+	"model=linear" switches back to the builtin model, and neither
-+	detaches the struct_ops.
-+
-+	Detaching removes the model, after which "model=bpf"
-+	fails and the device prices with the builtin model again.
-+	Device removal ejects the attached model as well, while the
-+	struct_ops link remains until userspace destroys it.  "ctrl"
-+	accepts only "auto" and "user" and never selects a model.  It
-+	keeps describing the builtin coefficients, which take effect
-+	again when switched back.
- 
- 	When "ctrl" is "auto", the kernel may change all parameters
- 	dynamically.  When "ctrl" is set to "user" or any other
-@@ -2125,7 +2157,8 @@ IO Interface Files
- 	automatic changes are disabled.
- 
- 	When "model" is "linear", the following model parameters are
--	defined.
-+	defined.  They remain readable and writable while "model" is
-+	"bpf".
- 
- 	  =============	========================================
- 	  [r|w]bps	The maximum sequential IO throughput
--- 
-2.53.0
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/42219005018
+--===============7160097930942034138==--
