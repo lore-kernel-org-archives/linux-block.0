@@ -1,58 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.106
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793961850;
-	b=fI2dkpdkypyO92k3nBkEgJi6BfYcGAq7d3jksKdZDBz2jEfLQ6ANNRqY+aP7TWcc4Vjt
-	 dh3FriNB5xSQzWir3KVYDUek3ETwjMtzYL7gr5CWylin56n6vRHdnKhBYFDgMN8MheqwV
-	 ca89WlVcShU0bvnVFn6uIxerL/tSLYpq5gRLrgVJWN8u4gK5JlXEBP22V/DwXQMclT5JD
-	 Tfhc0FOqPkud+Upfah22hrZ+Q0bP/hxAgmKap0WHacykVpmbzZP9bpXHpooy4j7uIKiCF
-	 DAaqAEaIWZeXE4cFJKd52hSRf4YJjjAA/9KmnkJGvVuvtRoGG5LlaHMvo3uX7INLewQ==
+	t=1793967856;
+	b=3kUVQvC2ej3IxmLGzCshoM75b9hlC7qlBZyUtTZhJaYtpJc5U3boLmKMKwImlElMUgvl
+	 p1rcs5Sv/eNF9WsiZ4VtoC/x3AO79tIXji8HTT5Pb1X+InC62RNWWTmwCmNnpQsDCDx2C
+	 NVoMHD/sdK41cmz3FFK5gdc1vzB5AnGTeAFzsFdGWpA2lFNwho9TP5e+CAKQlShvMSCbS
+	 6x5Wp/S7QnczUrR3r0MtJYuNCuMcUFnH1VWWnDosG/QySH34OoK2iGJ/wCsVjIJJ9u4V2
+	 L+oLCwjNkAPC38h1Jo3rCYOrPvoYYJwviz/lBOQI8rRn67kvZh4r+OL4nfiFmDcElMg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793961850;
-	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
-	bh=SyHLvzb6celL0jDL0tyCZxUmWdmbDgVpxG3dwtVayYo=;
-	b=K1hmS+N8rtLhhvUrw1+JRV+TUq7CbMx4q0LYkeZYg/JvyoYotoXK4ga2GSurKg8Td5GU
-	 5ZFOE+4SpG2NVWAs/jw4Nu/axV4GVlrVz4feKBO7jNUiQqSpy+p0E+nsxnow5RXjod0Dv
-	 no3hx5052xIdTY8L93Iz4TaD9A5RbUaXj6Q3D20nlA3hz5AdhdfPE9xyj/OzZhrCUJ4JV
-	 gPTfytA/xqO1U4gDPRAjkgdyDqODHfJlM7RqToz/UmQCyNCJ2L2PqUJ/cvgOqOaMIzb2L
-	 UHr5gTMeIo9z6BOsoqR9+0pP9ApAv9srCqykzlDJhcVcqReriWRdEwKa1JSPASfJLsQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793967856;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=+WnGg6RHgnyqDd5ldVy5BEuIn5Cw/n9Yw7ajiiWZxlI=;
+	b=H9KjDNR0TyfdYShFFuI63fVDKqSaPGh4D0ia9Dl2+CB4nByZzebY7+f7/T2z1xmZmYP9
+	 fvf4+AYialbcBoqIjz5GUUl6BIGu295Ufk48x1eX8MBsnRwBjwqDo5Q2BHgV3OILPFKQj
+	 X1aTUzfZLSCzG7MVbonIy0eKvwuf+mzMMZYlYwn343RdQbp1wP+bbwpzmCcPvdy4E8/3v
+	 ZtzuYUp2nmq+6Z/YQDnheAPrqe01LALNEovmVLqUQpQLJwUhhlGzHofOTRIa91NryuTHj
+	 9ycGRRRARvlGWNaSmQqG/V1hqvMSTfWylkmk+U4Ptx021rPB9VBXBMi91UYl4QInZWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=lst.de;
-	spf=pass smtp.mailfrom=lst.de;
-	arc=none smtp.remote-ip=213.95.11.211
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=c6TY7xq8;
+	arc=none smtp.remote-ip=91.218.175.106
+Received: from mta0.migadu.com (out-106.mta0.migadu.com [91.218.175.106])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30745606A33E;
-	Fri,  6 Nov 2026 10:44:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30745606A33E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1CCC268BEB; Fri,  6 Nov 2026 11:44:04 +0100 (CET)
-Date: Fri, 6 Nov 2026 11:44:03 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Mengmeng Zhao <mengmeng.zhao@linux.dev>
-Cc: Jens Axboe <axboe@kernel.dk>, Dan Williams <djbw@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, tytso@mit.edu,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Baokun Li <libaokun@linux.alibaba.com>,
-	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
-	Zhang Yi <yi.zhang@huawei.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, asml.silence@gmail.com,
-	hch@lst.de, Anuj Gupta <anuj1072538@gmail.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-mm@kvack.org, Li Wang <liwang@kylinos.cn>
-Subject: Re: [RFC 5/6] iomap: refuse dmabuf iterators on contents-encrypted
- inodes
-Message-ID: <20261106104403.GC5668@lst.de>
-References: <20261105065847.196540-1-mengmeng.zhao@linux.dev> <20261105065847.196540-6-mengmeng.zhao@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C066606A326
+	for <linux-block@vger.kernel.org>; Fri,  6 Nov 2026 12:24:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0C066606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=c6TY7xq8
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=h/NpQVbSX0lmFSKYQ4kXG0v09GVq/A5mrfxqP7xtn18=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793967853; v=1; x=1794572653;
+ b=c6TY7xq883Haj25OXqwpRsd4NIM3krJcHN0WzFuy1+uDp9Me8N96kyYLRSTGIAW9r+g6/aaj
+ BlyvACGixAkQZIk3B5PDaxB4cNlwJoqzVVX94cVQFMwKJFPqARyJgz6vVxwvQtxd9rEQzoSq0B+
+ 6t8bl95TWsNXIKRdw2eGmM34=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 69ffad1ec8c56768;
+	Fri, 06 Nov 2026 12:24:13 +0000
+X-Mizu-Trace-ID: 69ffad1ec8c56768
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: tj@kernel.org,
+	josef@toxicopanda.com,
+	axboe@kernel.dk,
+	alexei.starovoitov@gmail.com
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	andrii@kernel.org,
+	eddyz87@gmail.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	linux-kselftest@vger.kernel.org,
+	cui.tao@linux.dev,
+	cuitao@kylinos.cn,
+	ameryhung@gmail.com
+Subject: [RFC PATCH v13 0/4] blk-iocost: BPF struct_ops cost model
+Date: Fri,  6 Nov 2026 20:23:52 +0800
+Message-ID: <20261106122356.3224638-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,15 +76,68 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261105065847.196540-6-mengmeng.zhao@linux.dev>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-I think contents-encrypted should be content-encrypted.
+From: Tao Cui <cuitao@kylinos.cn>
 
-But we really need to find a way to make these checks more
-systematic instead of sprinkling them everywhere.  E.g. have a flag
-in file->f_mode to allow it, which then only leaves the direct I/O
-to buffered I/O fallback as a special case.
+This series lets a BPF program take over the cost model of one
+device.  The BPF model provides calc_cost() for charged IOs plus two
+transfer coefficients for the completion-time sizing, io.cost.model
+selects between the attached model and the builtin one, and enabling
+and disabling the controller stays with io.cost.qos.
 
+The builtin model is a linear formula derived from a handful of device
+parameters, and the right formula is device specific.  A BPF model can
+be adapted to the device and updated without rebuilding the kernel.
+
+The series is based on next-20261105.
+
+Tao Cui (4):
+  blk-iocost: add BPF struct_ops cost model support
+  blk-iocost: add iocost_ioc_tick tracepoint for per-period device
+    summary
+  selftests/bpf: add iocost cost model test
+  docs: cgroup-v2: document the iocost BPF cost model attachment
+
+ Documentation/admin-guide/cgroup-v2.rst       |  49 +-
+ MAINTAINERS                                   |   1 +
+ block/Kconfig                                 |   4 +
+ block/blk-iocost.c                            | 284 +++++-
+ include/trace/events/iocost.h                 |  43 +
+ tools/testing/selftests/bpf/config            |   2 +
+ .../selftests/bpf/prog_tests/iocost_model.c   | 812 ++++++++++++++++++
+ .../selftests/bpf/progs/iocost_model.c        | 180 ++++
+ tools/testing/selftests/bpf/progs/iocost_ms.c | 197 +++++
+ 9 files changed, 1560 insertions(+), 12 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/iocost_model.c
+ create mode 100644 tools/testing/selftests/bpf/progs/iocost_model.c
+ create mode 100644 tools/testing/selftests/bpf/progs/iocost_ms.c
+
+Changes since v12:
+
+- the iocost_ioc_tick emission now sits inside the
+  trace_iocost_ioc_tick_enabled() check, as tracepoints.rst requires,
+  and the usage_pct trace field is widened to u64
+- detaching a model resets the autop stepping timestamps, so the
+  cooldown restarts fresh when the builtin model comes back
+- iocost_bpf_supported() probes kernel BTF for the struct_ops wrapper
+  type instead of /proc/config.gz, so an unavailable config no longer
+  skips the tests, and the probe result is cached across cases
+- the selftest sets up its private mount namespace and configfs mount
+  once instead of stacking them across cases
+- the multi-stream case feeds two interleaved streams and asserts that
+  calc_cost() actually priced them
+- the selftest cgroup names are created inside the per-pid work
+  directory (leading '/'), nullb_create() rolls back the instance on
+  its own error paths, and the streams test cleans up in the right
+  order
+- docs: document the attach rejection codes (-EOPNOTSUPP, -ENODEV,
+  -EBUSY) and that root-cgroup IOs still use the attached model's
+  transfer coefficients for completion-time sizing
+
+Tested on next-20261105 (qemu x86_64): the selftests pass, and the 2x
+example model doubles the charged cost over the builtin on a
+rotational device (2.00x measured), returning to 1.00x after
+"model=linear".
+
+Link: https://lore.kernel.org/r/20261103132613.1952975-1-cui.tao@linux.dev # v12
