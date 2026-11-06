@@ -1,54 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.208
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.219
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793916494;
-	b=LY0ER0Izncb91gIj4jkRFuTpT2LKEiEdOMGEc8u9CUDZJj/N7U/kJ4Aozd9PxlMJ2zBh
-	 z2O5p4TI1nESd2R5Pagkr7K2DfVGD7awez2jBb5hvUrLmN5NQNKg1KuazSor78UAMzuLq
-	 5msJsG+YuHy7lzOg5DR5J7o5msFhKpVw8JQb3fupqQnMF6FoppU323qslizwxpDE9tCzS
-	 Q0VUD2K6RU+JTTX0XB9f6Cu8VQZFmZ0kWDlFUu5wxbHtfZttUVEptHbH3QwdtqGk3hbap
-	 xVDdzv6EE2v94O/s922DVdS7Ym0YJxZTr/irFbkZdU/KDo1opUEznFP8fadf5xuf73w==
+	t=1793946312;
+	b=4ZFqqXwrg5V4DoiZxOF37AzjV4wf391rLB9wcSTmOiDuMRbm5dAyM+Vg6qgaIETb4WQW
+	 uqAcE+W84L3CIwtCTa4ckRuOm8K4fgSYMlTIjY+EC64X+pX3SmR3lJU1dj2DKNGdI4ICH
+	 xVEHseII65fZGTC7znwd0HBbmr9/TdMBaLfKcF0uRv+E1mA4uFBmjhLe79RldB4Jqw10H
+	 dhjbpDL69HFECRzDgfKTDSsh3Kd2Upwu+l0pLOwoLqEf3Ixk3tSYbDcoOQX0WOkzmZw+P
+	 jzTKlgjM1VH5HYJiyc/ykSE8eGFn54ELOAT84cCnAve4Yfh10163U08LKpjkvmuGXJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793916494;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=XYA3g2+HtqFAIS8I2EWomiFCDvHSGWyaU3MTisxAOLE=;
-	b=DO0kO/x45TK99iq0v2ZUQMvfrAHA3ibDmO0h+6NOfBSgxU4ag7HYn+fhlaP4C6F4ydy5
-	 pb2TWe00uK7Fvo/n4JBfVBgM6ienna92Q6gbFjHw7kAvriurH5COmqXQRomX2gkarNWcb
-	 gn0fieukw7mo/msCsmahdSV/MAF4sbMjuoZdni+LfoT05oeOJcj+DEY2eowuo8u/XzOFl
-	 IO273r7rVVcK8LEJR3GDJ4ABb1++3+aJQ560KfWv/l1duYxi+HkV/x1BwX18xbkjs1UEL
-	 qQXgiHqDuFvvD8Y6YGb7FjNqjlMfq+QeK4oZUkgA3k3G2wMQ+CrCt5EnCdkO48akyig==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793946312;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
+	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=4D5Aw1kmCq4DsiYS+lucaHDE9Hk1hB54tE80B9HVb3c=;
+	b=r255fUOdFJlXl6cOLrrmtSc75S7WgENzKncA521QhpR6VCOZSiEocf3Jp0d5Z5zpPFjh
+	 5EKJqLoU8AJauenxaXoYjS9VfygG7lxVeZN1mZH0/2HvKSkcVgmQ22XmvaShCNOsXqx9v
+	 KWkyh8WCCElumj8Lm2Q7oBD3FMgCBCHN3nPmfCWCRQB3huvfmyyRySsabFiW3FH/2k1JP
+	 UhtBUtWb7YO045r7nnvyg51yPEZyTgVDAORcuARofENSWg8jTvpPyRtwYZCce5OhTZvHo
+	 KAESV6sKiLsvuxF/39PeiBSH0s/9JkWyWUoUxL9CVTc1w6HJQ0sYP0DG9RxnTaV1RXg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="QH/HVW0h";
-	arc=none smtp.remote-ip=91.218.175.208
-Received: from mta0.migadu.com (out-208.mta0.migadu.com [91.218.175.208])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=n2GjRFhM;
+	arc=none smtp.remote-ip=113.46.200.219
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A590606A326
-	for <linux-block@vger.kernel.org>; Thu,  5 Nov 2026 22:08:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A590606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC10606A326;
+	Fri,  6 Nov 2026 06:25:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7CC10606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QH/HVW0h
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=PnYyaVx64MD1jaWFrbHNWMnyMKuFQYL/DiizwVaVslY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793916491; v=1; x=1794521291;
- b=QH/HVW0hpgJm35wNbRGzmwvZ10g2LybOwDKUHZ4P8dJuTSEKQcDDwh6PVWgxSY68jXhqxkcP
- M8WOED8XfgbQpgQqWrPt9BItzVObZ+TNhsEUU/L5wJimcNDwhBDdF3leBgbl95nIA+hR41Y7wko
- NmIsiCHV1EwF6neowfmol7n0=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id faa4b71d0d8cf75d;
-	Thu, 05 Nov 2026 22:08:11 +0000
-X-Mizu-Trace-ID: faa4b71d0d8cf75d
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <c043f698-176d-43c5-9086-2973d4ca0833@linux.dev>
-Date: Thu, 5 Nov 2026 23:08:06 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=n2GjRFhM
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=4D5Aw1kmCq4DsiYS+lucaHDE9Hk1hB54tE80B9HVb3c=;
+	b=n2GjRFhMc3wafmSu0U5/Vh/pP/CTWJY5KQGQzAJoCaPmgHNoYobyrykNuXv3IfCpBNR349n5D
+	dHjjVD1bcXbz/NWYOSjsG02TYia5VQFMujxyP9bCTVYI96kqfKVLMSlesCdP62ogF/w/M0RGXIW
+	vvlTZHrUzYGEDVnK1WmNFL4=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4jLTgB4lPHz1prmZ;
+	Fri,  6 Nov 2026 14:24:54 +0800 (CST)
+Received: from kwepemr200011.china.huawei.com (unknown [7.202.195.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 606B940561;
+	Fri,  6 Nov 2026 14:25:00 +0800 (CST)
+Received: from localhost.localdomain (10.50.159.234) by
+ kwepemr200011.china.huawei.com (7.202.195.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Fri, 6 Nov 2026 14:24:59 +0800
+From: zhangqiuhao <zhangqiuhao@huawei.com>
+To: <ldm@flatcap.org>, <axboe@kernel.dk>
+CC: <hewenliang4@huawei.com>, <yangyun50@huawei.com>,
+	<chenrenhui1@huawei.com>, <wuguanghao3@h-partners.com>, <wozizhi@huawei.com>,
+	<linux-ntfs-dev@lists.sourceforge.net>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: partitions: ldm: avoid overflow in VMDB size check
+Date: Fri, 6 Nov 2026 14:16:15 +0800
+Message-ID: <20261106061615.1688398-1-zhangqiuhao@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <179360149774.20265.17257530536010482220@huawei.com>
+References: <179360149774.20265.17257530536010482220@huawei.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,164 +72,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [v3 for-next 1/3] block: Reject unknown status tags in error
- injection rules
-To: Mohamed Khalfella <mkhalfella@purestorage.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org
-References: <20260928221634.43239-1-haris.iqbal@linux.dev>
- <20260928221634.43239-2-haris.iqbal@linux.dev> <20261005084917.GA9160@lst.de>
- <20261020223402.GA1582237-mkhalfella@purestorage.com>
- <58a98f7d-b2c5-47b5-a372-0ab5afa6a8ed@linux.dev>
- <20261105201827.GB2439-mkhalfella@purestorage.com>
-Content-Language: en-US
-From: Haris Iqbal <haris.iqbal@linux.dev>
-In-Reply-To: <20261105201827.GB2439-mkhalfella@purestorage.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemr200011.china.huawei.com (7.202.195.32)
 
+Hi, maintainers
 
+Kindly ping.
 
-On 11/5/26 21:18, Mohamed Khalfella wrote:
-> On Thu 2026-11-05 21:00:27 +0100, Haris Iqbal wrote:
->>
->>
->> On 10/21/26 00:34, Mohamed Khalfella wrote:
->>> On Mon 2026-10-05 10:49:17 +0200, Christoph Hellwig wrote:
->>>> On Tue, Sep 29, 2026 at 12:16:32AM +0200, Md Haris Iqbal wrote:
->>>>> tag_to_blk_status() returns BLK_STS_OK both for the "OK" tag and for a
->>>>> tag it does not recognize, so a caller cannot tell the two apart. The
->>>>> block error injection code (which is the sole user of this function
->>>>> currently) relies on error_inject_add() later to reject adding a rule with
->>>>> status=BLK_STS_OK. This is okay for the current state of error injection.
->>>>>
->>>>> The delay option added in the next commit makes the rule with status=OK
->>>>> valid, meaning the function tag_to_blk_status() now needs to explicitly
->>>>> match BLK_STS_OK for it, and fail for a tag it does not recognize. Hence
->>>>> make tag_to_blk_status() take a second param to update the matched status,
->>>>> and return true in case of a successful match. If a match is not found,
->>>>> the function tag_to_blk_status() returns false and *status remains
->>>>> unchanged.
->>>>>
->>>>> A repeated status= where an invalid tag comes first is now rejected
->>>>> instead of being overridden by the later one.
->>>>>
->>>>> Cc: Christoph Hellwig <hch@lst.de>
->>>>> Assisted-by: Claude:claude-opus-5
->>>>> Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
->>>>> ---
->>>>>    block/blk-core.c        | 14 ++++++--------
->>>>>    block/blk.h             |  2 +-
->>>>>    block/error-injection.c |  7 ++++---
->>>>>    3 files changed, 11 insertions(+), 12 deletions(-)
->>>>>
->>>>> diff --git a/block/blk-core.c b/block/blk-core.c
->>>>> index 13dc70e8f55d..c45846b9c50d 100644
->>>>> --- a/block/blk-core.c
->>>>> +++ b/block/blk-core.c
->>>>> @@ -225,21 +225,19 @@ const char *blk_status_to_tag(blk_status_t status)
->>>>>    	return blk_errors[idx].tag;
->>>>>    }
->>>>>    
->>>>> -blk_status_t tag_to_blk_status(const char *tag)
->>>>> +bool tag_to_blk_status(const char *tag, blk_status_t *status)
->>>>>    {
->>>>>    	int i;
->>>>>    
->>>>>    	for (i = 0; i < ARRAY_SIZE(blk_errors); i++) {
->>>>>    		if (blk_errors[i].tag &&
->>>>> -		    !strcmp(blk_errors[i].tag, tag))
->>>>> -			return (__force blk_status_t)i;
->>>>> +		    !strcmp(blk_errors[i].tag, tag)) {
->>>>> +			*status = (__force blk_status_t)i;
->>>>> +			return true;
->>>>> +		}
->>>>>    	}
->>>>>    
->>>>> -	/*
->>>>> -	 * Return BLK_STS_OK for mismatches as this function is intended to
->>>>> -	 * parse error status values.
->>>>> -	 */
->>>>> -	return BLK_STS_OK;
->>>>> +	return false;
->>>>>    }
->>>>>    
->>>>>    /**
->>>>> diff --git a/block/blk.h b/block/blk.h
->>>>> index 2cc03aa54c53..5fa54162c686 100644
->>>>> --- a/block/blk.h
->>>>> +++ b/block/blk.h
->>>>> @@ -52,7 +52,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
->>>>>    
->>>>>    const char *blk_status_to_str(blk_status_t status);
->>>>>    const char *blk_status_to_tag(blk_status_t status);
->>>>> -blk_status_t tag_to_blk_status(const char *tag);
->>>>> +bool tag_to_blk_status(const char *tag, blk_status_t *status);
->>>>>    enum req_op str_to_blk_op(const char *op);
->>>>>    
->>>>>    bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
->>>>> diff --git a/block/error-injection.c b/block/error-injection.c
->>>>> index e14bc4b723ef..db543fe27630 100644
->>>>> --- a/block/error-injection.c
->>>>> +++ b/block/error-injection.c
->>>>> @@ -171,15 +171,16 @@ static int match_op(substring_t *args, enum req_op *op)
->>>>>    static int match_status(substring_t *args, blk_status_t *status)
->>>>>    {
->>>>>    	const char *tag;
->>>>> +	bool found;
->>>>>    
->>>>>    	tag = match_strdup(args);
->>>>>    	if (!tag)
->>>>>    		return -ENOMEM;
->>>>> -	*status = tag_to_blk_status(tag);
->>>>> -	if (!*status)
->>>>> +	found = tag_to_blk_status(tag, status);
->>>>> +	if (!found)
->>>>>    		pr_warn("invalid status '%s'\n", tag);
->>>>>    	kfree(tag);
->>>>> -	return 0;
->>>>> +	return found ? 0 : -EINVAL;
->>>>
->>>> 	if (!found) {
->>>>     		pr_warn("invalid status '%s'\n", tag);
->>>> 		return -EINVAL;
->>>> 	}
->>>> 	return 0;
->>
->> As Mohamed mentioned below, "tag" would leak then.
->>
->>>
->>> Doing it this way will result in use-after-free. "tag" has already been
->>> freed above.
->>>
->>> Maybe change tag_to_blk_status() to return an int (0 on success and
->>> -EINVAL on failure) and use its return value without mapping it?
->>
->> I am not sure I get your suggestion completely. Even if we change the
->> return type of tag_to_blk_status(), we would have to free the "tag"
->> before returning.
-> 
-> Changing tag_to_blk_status() to return an int will not have an effect or
-> "tag" like you mentioned. But you will not need to map the return from
-> that function.
-> 
-> return found ? 0 : -EINVAL;
-> 
-> The line above just returns what tag_to_blk_status() returned.
-
-I would prefer to keep tag_to_blk_status() as a bool lookup. It's the 
-reverse of blk_status_to_tag(), and which errno to return is 
-match_status()'s call.
-
-> 
->>
->> What can make it simpler is allocating "tag" on stack, and then use
->> match_strlcpy() instead of match_strdup().
-> 
-> That can work too. Just make sure we limit the string size somehow.
-
-This I can do in v4. It should effectively remove the ternary operator too.
-
+On Mon, 2 Nov 2026 14:38:17 +0800, zhangqiuhao wrote:
+> ldm_validate_vmdb() can accept a VMDB whose declared VBLK extent
+> exceeds the TOCBLOCK configuration bitmap.
+>
+> For example, these fields on a 4 MiB image pass the preceding PRIVHEAD
+> and TOCBLOCK bounds checks:
+>
+>     disk capacity = 8192 sectors
+>     config_start  = 6144 sectors
+>     config_size   = 2048 sectors
+>     bitmap1_start =   17 sectors
+>     bitmap1_size  = 1024 sectors (524288 bytes)
+>     vblk_size     =  128 bytes
+>     last_vblk_seq = 0x02000008 (33554440)
+>
+> The configuration area fits on the disk, and the bitmap ends at sector
+> 1041 within the 2048-sector area. The VBLK extent is 128 * 33554440 =
+> 4294968320 bytes (4 GiB + 1024 bytes), so the VMDB should be rejected.
+> Both multiplicands are u32, however, so the product wraps to 1024 before
+>
+> it is promoted to u64 for the comparison. The check evaluates
+> 1024 > 524288 as false and incorrectly accepts the VMDB.
+>
+> Cast vblk_size to u64 before multiplying. The check then evaluates
+>
+> 4294968320 > 524288 as true and rejects the out-of-range extent.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: zhangqiuhao <zhangqiuhao@huawei.com>
+> ---
+>
+> Based on Jens Axboe's for-next at
+> 70866cfa169d5ee149364267289e71d50f9a7ae9.
+>
+>  block/partitions/ldm.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+> index c0bdcae58..d5c133a33 100644
+> --- a/block/partitions/ldm.c
+> +++ b/block/partitions/ldm.c
+> @@ -458,7 +458,8 @@ static bool ldm_validate_vmdb(struct parsed_partitions *state,
+>  	 * The last_vblkd_seq can be before the end of the vmdb, just make sure
+>  	 * it is not out of bounds.
+>  	 */
+> -	if ((vm->vblk_size * vm->last_vblk_seq) > (toc->bitmap1_size << 9)) {
+> +	if (((u64)vm->vblk_size * vm->last_vblk_seq) >
+> +	    (toc->bitmap1_size << 9)) {
+>  		ldm_crit ("VMDB exceeds allowed size specified by TOCBLOCK.  "
+>  				"Database is corrupt.  Aborting.");
+>  		goto out;
+> --
+> 2.33.0
