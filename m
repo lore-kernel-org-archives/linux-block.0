@@ -1,62 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=210.118.77.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793976185;
-	b=aSfkSKqrgBIWES3h3zHDfovDO4SXlLgTzQ+KipgBkkL+12GV+XwnXIXmh8Wjm19kfLwP
-	 idfTvix+l30EXasqwUJCdGilJKNuP+4ui8o+gLmXemmFj9+56RUh9BMCC8k/y6LbKSc6g
-	 uqkxoNkJcX4Zb3zpDKvxEuOXDDhfcREy6Oa9+5uXZ++QuFbTd0iZaQzsWIrr7fXRHnqZb
-	 73hwRc0EqZAztyIvhlB2XScoDQq2ERHVKVjnROdu4zKne1vps1LnUcyoYB/xrzA3djZf1
-	 XKRA1NaYm9BKseYFspxYXEm6wPUksOSe+7t1lCk/Lil9ir6lX4NS0efwTfv5+SuhCxQ==
+	t=1793976186;
+	b=fXc7fGE6KrE4Kz938VkvfDtk1Niku94ItxKanwVr9Drj3QXw2BRtbdKmmbibr6GMUPGi
+	 zbKXbUwvyX730G1MmCI+/Dg1DGyWi+ZVTRyYdqoAPCR3nI5kme5y3ZZ/5tw5fmbTuZ9Oa
+	 vol9Nacl691ckDjEhY+bXp1bfuxGVEzPDtxvS4qn5pqi6Rq9x9Van5NtlsNQYAoERzjQZ
+	 VneMmt4iEgsN28VOEX9Oicy08pvm8cS9vVHzr6MTmUMe96Bdi5/mHBTt+MLpcnxpuelUU
+	 u1M/duml0F0wrSKKaWJnG6Fxi9NzLOORJ3+82GHmMrC0CBmCKZqYh+YXa14kFsIlW+w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793976185;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793976186;
 	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
 	 From:Date:Subject:MIME-Version:Content-Transfer-Encoding:Message-Id:
 	 In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
 	 X-CMS-MailID:X-Msg-Generator:Content-Type:X-RootMTR:X-EPHeader:
 	 X-CMS-RootMailID:References;
-	bh=FoTgZCV1Goo86SpjfyfS0uvZJSie1dRSA+Nptn0ArC8=;
-	b=TcxGC9HexkWXwr8290oLXjgdjNJ1YU86lfHq6aRCBx86iD08ZH9tGtKctdsDfhh6v3E5
-	 OBIs9g29hfRQfUK4H56p7fPla12gskodoJGG1P7kWIHdMgxp7N9x/Qq6fI1AItLgOgfBm
-	 36fp5ZUF84oTJ6mTGqC1kOXo/NBaiYhCeIzQrcXrYZLsqSYtFnHWD/WyY3yOyeoNSFTvc
-	 pl4vy8HxQ1AZXOLLd7KXzxJNlqgSF7nSEDjZwJ6LHEsRur1lfVAvWZSTE3bVIy6I5s2n+
-	 XwNBAmdP/GF56MvULEpNfNn5AnT5Xc2ulJdFCtS1pFDYkE+te9P4GBobd5nj8v15LPA==
+	bh=tE044CLT+O9aM7ggt8NgUVH7lY5mxY8O8ZwLuiN0opU=;
+	b=cCGE1yh6S2GRxT65jM7iWrVyXyO8IvomlhQRebTiDkof4ojL4V8K3zh9LL7gxMDlNN2x
+	 ahXHA5aOiKh57hRXxwubyEhyLmWhicVUxC/3Iipo7IViqBoSrJgnrlwXxNinIvYkHETbe
+	 4DL7G+BnrJ4VEtxZNErT4jX3l1W73fgsrgzpi1mBGHVyLmFKZUXrAvd8TbTCvyxHCWWrj
+	 S0/5t8+1KtFiK0xsUt+RRzlNZDFtxGRmb4xMfMeRj+SbvAwyJNagwkwszarkpSF7GY/e6
+	 Kjc/4iMm3EXRpCOtIngEGVKRpOLcPobhScb59mDrhpZCELr0bUH50IXkHRxiIRdiXfg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=samsung.com;
 	spf=pass smtp.mailfrom=samsung.com;
-	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=F0Upi6Kj;
-	arc=none smtp.remote-ip=210.118.77.11
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b="Lk/Elm8B";
+	arc=none smtp.remote-ip=210.118.77.12
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D36606D801;
-	Fri,  6 Nov 2026 14:43:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 66D36606D801
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A185606D81F;
+	Fri,  6 Nov 2026 14:43:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7A185606D81F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=F0Upi6Kj
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20261106144302euoutp01e3afc94e2b93840d2dfd813d85bdd5a6~le9VP5hy42284422844euoutp01g;
-	Fri,  6 Nov 2026 14:43:02 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20261106144302euoutp01e3afc94e2b93840d2dfd813d85bdd5a6~le9VP5hy42284422844euoutp01g
+	dkim=pass (1024-bit key, unprotected) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=Lk/Elm8B
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20261106144303euoutp02eabd0503bf6a619d2956065db44053c9~le9WZOv5z1426614266euoutp02Y;
+	Fri,  6 Nov 2026 14:43:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20261106144303euoutp02eabd0503bf6a619d2956065db44053c9~le9WZOv5z1426614266euoutp02Y
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1793976182;
-	bh=FoTgZCV1Goo86SpjfyfS0uvZJSie1dRSA+Nptn0ArC8=;
+	s=mail20170921; t=1793976183;
+	bh=tE044CLT+O9aM7ggt8NgUVH7lY5mxY8O8ZwLuiN0opU=;
 	h=From:Date:Subject:In-Reply-To:To:Cc:References:From;
-	b=F0Upi6KjRBpfkn3FB5uW1jbpRrKlWwvL4AQpNHG1SZhHs+7tFYTDgH36uD20Whmo+
-	 249aMJvUN9m1wbI5MTcglfe8IIANGRUi8+NDhua7cWFRVLgzStiAyhVegoNwDkaEhs
-	 32fq2YkHNJqqZoFqXo7zHCoMRFBOtIXlWF9UfaIA=
+	b=Lk/Elm8BzZ3Q4byd+GCj1SL7xKT/tfnydUR7wmEZIeYeK5icO/drRV6YTcmoosbxh
+	 sNOuJN5kVo/Sc1xTgjo4ea30TYQSqNTYDIC7R4GxK4fqUABPcNXWA5r7RiU/QcCqXK
+	 Qn2MQfJEmc35oOItF0ahIwT7NDcEt/1+K3K5loAI=
 Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
 	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20261106144301eucas1p1882c2f6ac262ef7c10c3e0cabe333a6b~le9USbGSR2112621126eucas1p12;
-	Fri,  6 Nov 2026 14:43:01 +0000 (GMT)
+	20261106144303eucas1p10d145c55d4e168ac6d2d12758125a532~le9V8N_4w0320903209eucas1p1j;
+	Fri,  6 Nov 2026 14:43:03 +0000 (GMT)
 Received: from AMDC4942.eu.corp.samsungelectronics.net (unknown
 	[106.210.136.40]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20261106144259eusmtip10ef219b0b43a75100edc1390cf7fb029~le9St_xPI0550005500eusmtip1b;
-	Fri,  6 Nov 2026 14:42:59 +0000 (GMT)
+	20261106144301eusmtip168e2556b5065823be9a76df286f79ad9~le9UV2Sji0540305403eusmtip1R;
+	Fri,  6 Nov 2026 14:43:01 +0000 (GMT)
 From: Michal Wilczynski <m.wilczynski@samsung.com>
-Date: Fri, 06 Nov 2026 15:42:48 +0100
-Subject: [PATCH v2 08/15] lib/lz4: add the build environment for the
- vendored sources
+Date: Fri, 06 Nov 2026 15:42:49 +0100
+Subject: [PATCH v2 09/15] arch: boot: put the LZ4 freestanding headers on
+ the decompressor path
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -67,7 +67,7 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261106-lz4-vendor-upstream-v2-8-ee04c3f0d7dc@samsung.com>
+Message-Id: <20261106-lz4-vendor-upstream-v2-9-ee04c3f0d7dc@samsung.com>
 In-Reply-To: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
 To: Michal Wilczynski <m.wilczynski@samsung.com>,  Nathan Chancellor
 	<nathan@kernel.org>,  Nick Desaulniers <ndesaulniers@google.com>,  Bill
@@ -95,363 +95,112 @@ Cc: linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
 	<m.szyprowski@samsung.com>, linux-erofs@lists.ozlabs.org, 
 	linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=13756;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4734;
 	i=m.wilczynski@samsung.com; h=from:subject:message-id;
-	bh=WLJaU46vth6DQ+ro+pNGla0mX/S9QL0xdDoBMtKQdNY=;
-	b=owGbwMvMwCGWumv6zndzRCIZT6slMWS9fZ6qWNxu66Fd3TXH+1jM6uzPGrn9e6uMu1fvPLRK6
-	vqv91oSHaUsDGIcDLJiiixnN0YbSf5jeFp+/PEvmDmsTCBDGLg4BWAiUUWMDLf8Zy8oy5zAcylO
-	Q/qy6I9PG48nP3p6LcmpofbwsemLIl0ZGZaY1t9hClrGsTLjUYaKgUHdlpW/2O7ZZL0VLbD/ffM
-	eHwMA
+	bh=EjARMhFoCMzWsj3vk/VEbPmoiRLB6nbA/8uSS+4Yr4M=;
+	b=owGbwMvMwCGWumv6zndzRCIZT6slMWS9fZ4aecc/V2jNh+JNaSsN3dnetDZNjgrI3DbH40Pks
+	hKOkE2OHaUsDGIcDLJiiixnN0YbSf5jeFp+/PEvmDmsTCBDGLg4BWAiDjIM/6tSdvGlxk421Z/E
+	7VuzkYPn56FdL38IdArmOPQ9n+a1lJGR4dlfTjmH+/Hq02s4CnPWcPF2nbgSLpF+T/271NZdghN
+	fsAMA
 X-Developer-Key: i=m.wilczynski@samsung.com; a=openpgp;
 	fpr=CDB15B3219FE00E577C7E3FA65BA97B9EE9C1459
-X-CMS-MailID: 20261106144301eucas1p1882c2f6ac262ef7c10c3e0cabe333a6b
+X-CMS-MailID: 20261106144303eucas1p10d145c55d4e168ac6d2d12758125a532
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20261106144301eucas1p1882c2f6ac262ef7c10c3e0cabe333a6b
+X-RootMTR: 20261106144303eucas1p10d145c55d4e168ac6d2d12758125a532
 X-EPHeader: CA
-X-CMS-RootMailID: 20261106144301eucas1p1882c2f6ac262ef7c10c3e0cabe333a6b
+X-CMS-RootMailID: 20261106144303eucas1p10d145c55d4e168ac6d2d12758125a532
 References: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
-	<CGME20261106144301eucas1p1882c2f6ac262ef7c10c3e0cabe333a6b@eucas1p1.samsung.com>
+	<CGME20261106144303eucas1p10d145c55d4e168ac6d2d12758125a532@eucas1p1.samsung.com>
 
-lz4_deps.h makes the vendored upstream sources build in the kernel. It
-gives every upstream entry point internal linkage, so an object carries
-only the codec it forwards, selects heap mode with failing allocators so
-LZ4HC's ~64K optimal-parser buffer stays off the stack, and renames the
-entry points the kernel re-exports so the kernel's own definitions can
-use the real names. LZ4LIB_VISIBILITY carries __maybe_unused for the
-functions an object does not use.
+lib/decompress_unlz4.c pulls lib/lz4/lz4_decompress.c into the pre-boot
+decompressor on these five arches. A later patch makes that file include
+the vendored LZ4 sources, which include ISO C headers that -nostdinc does
+not provide, so put lib/lz4/freestanding on the include path first.
 
-freestanding/ forwards the four ISO C headers upstream includes to their
-<linux/> equivalents. lz4_kernel_api.h undoes the renaming; it carries
-its own copy of the exported prototypes until a later patch can include
-<linux/lz4.h> instead.
-
-Two settings upstream leaves to the build:
-
- - Unaligned access goes through memcpy() where the architecture has
-   efficient unaligned access, and through packed structs, as
-   get_unaligned() does, elsewhere. Left alone, upstream uses plain
-   misaligned loads on ARMv6.
-
- - On ppc64le, lz4.c marks functions __attribute__((optimize("O2"))) for
-   GCC, which drops command line options such as -fno-strict-aliasing
-   for them; see commit 080b6f407635 ("bpf: Don't rely on GCC
-   __attribute__((optimize)) to disable GCSE"). lz4_deps.h defines
-   optimize() to nothing for upstream's sources.
-
-Nothing includes either header yet.
+Only the one object that includes decompress_unlz4.c gets it, so the
+rest of each boot directory keeps -nostdinc's view.
 
 Signed-off-by: Michal Wilczynski <m.wilczynski@samsung.com>
 ---
- lib/lz4/freestanding/limits.h |  14 +++++
- lib/lz4/freestanding/stddef.h |  15 ++++++
- lib/lz4/freestanding/stdint.h |  14 +++++
- lib/lz4/freestanding/string.h |  14 +++++
- lib/lz4/lz4_deps.h            | 118 ++++++++++++++++++++++++++++++++++++++++++
- lib/lz4/lz4_kernel_api.h      |  90 ++++++++++++++++++++++++++++++++
- 6 files changed, 265 insertions(+)
+ arch/arm/boot/compressed/Makefile    | 3 +++
+ arch/mips/boot/compressed/Makefile   | 4 ++++
+ arch/parisc/boot/compressed/Makefile | 3 +++
+ arch/s390/boot/Makefile              | 3 +++
+ arch/x86/boot/compressed/Makefile    | 3 +++
+ 5 files changed, 16 insertions(+)
 
-diff --git a/lib/lz4/freestanding/limits.h b/lib/lz4/freestanding/limits.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..0d1cafbc77eb5d2f564b51feaa911748446abf60
---- /dev/null
-+++ b/lib/lz4/freestanding/limits.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
-+ * Author: Michal Wilczynski <m.wilczynski@samsung.com>
-+ *
-+ * Freestanding <limits.h> for the vendored upstream LZ4 sources; lz4.c needs
-+ * UINT_MAX and lz4hc.c needs INT_MAX.
-+ */
-+#ifndef __LZ4_FREESTANDING_LIMITS_H__
-+#define __LZ4_FREESTANDING_LIMITS_H__
+diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
+index e3f550d6285786c8405b16768255af87b4dc8222..713225008aa71e614af8c9c6472fda180354569b 100644
+--- a/arch/arm/boot/compressed/Makefile
++++ b/arch/arm/boot/compressed/Makefile
+@@ -92,6 +92,9 @@ targets       := vmlinux vmlinux.lds piggy_data piggy.o \
+ 		 head.o $(OBJS)
+ 
+ KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING
++# decompress.c includes decompress_unlz4.c, which builds the vendored LZ4
++# sources; they include a few ISO C headers -nostdinc drops.
++CFLAGS_decompress.o += -I$(srctree)/lib/lz4/freestanding
+ 
+ ccflags-y := -fpic $(call cc-option,-mno-single-pic-base,) -fno-builtin \
+ 	     -I$(srctree)/scripts/dtc/libfdt -fno-stack-protector \
+diff --git a/arch/mips/boot/compressed/Makefile b/arch/mips/boot/compressed/Makefile
+index e0b8ec9a9516281933b6cc5b175e82f4013c2f54..48f8a63c54a66826889634a54d3537d735f63512 100644
+--- a/arch/mips/boot/compressed/Makefile
++++ b/arch/mips/boot/compressed/Makefile
+@@ -30,6 +30,10 @@ endif
+ KBUILD_CFLAGS := $(KBUILD_CFLAGS) -D__KERNEL__ -D__DISABLE_EXPORTS \
+ 	-DBOOT_HEAP_SIZE=$(BOOT_HEAP_SIZE) -D"VMLINUX_LOAD_ADDRESS_ULL=$(VMLINUX_LOAD_ADDRESS)ull"
+ 
++# decompress.c includes decompress_unlz4.c, which builds the vendored LZ4
++# sources; they include a few ISO C headers -nostdinc drops.
++CFLAGS_decompress.o += -I$(srctree)/lib/lz4/freestanding
 +
-+#include <linux/limits.h>
-+
-+#endif
-diff --git a/lib/lz4/freestanding/stddef.h b/lib/lz4/freestanding/stddef.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..aaafd2413849210fa4ec4fa03ba0e9453a9fe026
---- /dev/null
-+++ b/lib/lz4/freestanding/stddef.h
-@@ -0,0 +1,15 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
-+ * Author: Michal Wilczynski <m.wilczynski@samsung.com>
-+ *
-+ * Freestanding <stddef.h> for the vendored upstream LZ4 sources; -nostdinc
-+ * drops the compiler's copy, and lz4.h needs size_t and NULL.
-+ */
-+#ifndef __LZ4_FREESTANDING_STDDEF_H__
-+#define __LZ4_FREESTANDING_STDDEF_H__
-+
-+#include <linux/stddef.h>	/* NULL, offsetof */
-+#include <linux/types.h>	/* size_t, ptrdiff_t */
-+
-+#endif
-diff --git a/lib/lz4/freestanding/stdint.h b/lib/lz4/freestanding/stdint.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..923db05b19f23fb4051d16e5df2bf134cd5ac11e
---- /dev/null
-+++ b/lib/lz4/freestanding/stdint.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
-+ * Author: Michal Wilczynski <m.wilczynski@samsung.com>
-+ *
-+ * Freestanding <stdint.h> for the vendored upstream LZ4 sources; forwards to
-+ * <linux/types.h>.
-+ */
-+#ifndef __LZ4_FREESTANDING_STDINT_H__
-+#define __LZ4_FREESTANDING_STDINT_H__
-+
-+#include <linux/types.h>
-+
-+#endif
-diff --git a/lib/lz4/freestanding/string.h b/lib/lz4/freestanding/string.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..8f3ea3b63013608a780a52fe9c33bf5df557584e
---- /dev/null
-+++ b/lib/lz4/freestanding/string.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
-+ * Author: Michal Wilczynski <m.wilczynski@samsung.com>
-+ *
-+ * Freestanding <string.h> for the vendored upstream LZ4 sources; lz4.c
-+ * includes it for memcpy()/memset(), which must resolve under -nostdinc.
-+ */
-+#ifndef __LZ4_FREESTANDING_STRING_H__
-+#define __LZ4_FREESTANDING_STRING_H__
-+
-+#include <linux/string.h>
-+
-+#endif
-diff --git a/lib/lz4/lz4_deps.h b/lib/lz4/lz4_deps.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..23d69c75867f71224cb533e9341bd38439b9dee8
---- /dev/null
-+++ b/lib/lz4/lz4_deps.h
-@@ -0,0 +1,118 @@
-+/* SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause */
-+/*
-+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
-+ * Author: Michal Wilczynski <m.wilczynski@samsung.com>
-+ *
-+ * Build environment for the vendored upstream LZ4 sources.
-+ *
-+ * upstream/ is LZ4 v1.10.0 plus three backports: 5ef1f16929b5, the aarch64
-+ * fast loop (0aa33884faf5, 51f8af506b4a, ed86bc1ed802) and the match length
-+ * limit of 587ed9557708, adapted.  Replace it with a later release rather
-+ * than patch it further.  The three entry point files include this header
-+ * first.
-+ */
-+
-+#ifndef __LZ4_DEPS_H__
-+#define __LZ4_DEPS_H__
-+
-+#include <linux/build_bug.h>	/* static_assert */
-+#include <linux/compiler.h>	/* __maybe_unused */
-+#include <linux/string.h>
-+#include <linux/types.h>
-+
-+/* lz4.c uses "current" as a local; <asm/current.h> breaks the build. */
-+#undef current
-+
-+/* Static so an object carries only the codec it forwards.  Each object
-+ * forwards only some of them, so mark them __maybe_unused rather than turn
-+ * off -Wunused-function, which the pre-boot builds would not see anyway.
-+ */
-+#define LZ4LIB_VISIBILITY static __maybe_unused
-+
-+/* Route upstream's "static linking only" entry points through
-+ * LZ4LIB_VISIBILITY too.
-+ */
-+#define LZ4_PUBLISH_STATIC_FUNCTIONS
-+
-+/* Heap mode only: the stack mode puts LZ4HC's ~64K opt[] in a frame.
-+ * Allocation goes through the failing stubs below; upstream handles
-+ * NULL by returning 0.
-+ */
-+#define LZ4_USER_MEMORY_FUNCTIONS
-+#define LZ4_HEAPMODE 1
-+#define LZ4HC_HEAPMODE 1
-+
-+/* Failing stubs; nothing in the kernel reaches these. */
-+static void *LZ4_malloc(size_t s) { return NULL; }
-+static void *LZ4_calloc(size_t n, size_t s) { return NULL; }
-+static void LZ4_free(void *p) { }
-+
-+/* Left alone, upstream reads unaligned words through packed structs, and
-+ * on ARMv6 through plain misaligned dereferences.  Use memcpy(), upstream's
-+ * documented default, where unaligned access is cheap, and packed structs,
-+ * as get_unaligned() does, where it is not: there GCC builds a memcpy()'d
-+ * word through a stack slot.
-+ */
-+#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
-+#define LZ4_FORCE_MEMORY_ACCESS 0
-+#else
-+#define LZ4_FORCE_MEMORY_ACCESS 1
-+#endif
-+
-+/* On ppc64le GCC, lz4.c marks its decompression entry points and every
-+ * LZ4_FORCE_INLINE helper optimize("O2"), which makes GCC forget command
-+ * line options such as -fno-strict-aliasing for those functions (see commit
-+ * 080b6f407635).  Expand the attribute to nothing; lz4_kernel_api.h undoes
-+ * this.
-+ */
-+#define optimize(level)
-+
-+/* lz4.c sets this before including lz4.h, since its own code calls
-+ * deprecated entry points.  lz4.h is included below, ahead of lz4.c.
-+ */
-+#define LZ4_DISABLE_DEPRECATE_WARNINGS 1
-+
-+/* Rename upstream's entry points out of the way; four of them take a
-+ * trailing wrkmem argument in the kernel.
-+ */
-+#define LZ4_compress_fast		__lz4_compress_fast
-+#define LZ4_compress_default		__lz4_compress_default
-+#define LZ4_compress_destSize		__lz4_compress_destSize
-+#define LZ4_resetStream			__lz4_resetStream
-+#define LZ4_loadDict			__lz4_loadDict
-+#define LZ4_saveDict			__lz4_saveDict
-+#define LZ4_compress_fast_continue	__lz4_compress_fast_continue
-+
-+#define LZ4_decompress_safe		__lz4_decompress_safe
-+#define LZ4_decompress_safe_partial	__lz4_decompress_safe_partial
-+#define LZ4_setStreamDecode		__lz4_setStreamDecode
-+#define LZ4_decompress_safe_continue	__lz4_decompress_safe_continue
-+#define LZ4_decompress_safe_usingDict	__lz4_decompress_safe_usingDict
-+
-+#define LZ4_compress_HC			__lz4_compress_HC
-+#define LZ4_resetStreamHC		__lz4_resetStreamHC
-+#define LZ4_loadDictHC			__lz4_loadDictHC
-+#define LZ4_compress_HC_continue	__lz4_compress_HC_continue
-+#define LZ4_saveDictHC			__lz4_saveDictHC
-+
-+/* Upstream declares these bare, so both entry point objects would define
-+ * them.  Declaring them static first gives them internal linkage (C11
-+ * 6.2.2p4): this one in lz4.h, the three below in lz4.c.
-+ */
-+static __maybe_unused int LZ4_compress_destSize_extState(void *state, const char *src,
-+		char *dst, int *srcSizePtr, int targetDstSize,
-+		int acceleration);
-+
-+#include "upstream/lz4.h"
-+
-+static __maybe_unused int LZ4_compress_forceExtDict(LZ4_stream_t *LZ4_dict,
-+		const char *source, char *dest, int srcSize);
-+static __maybe_unused int LZ4_decompress_safe_forceExtDict(const char *source,
-+		char *dest,
-+		int compressedSize, int maxOutputSize,
-+		const void *dictStart, size_t dictSize);
-+static __maybe_unused int LZ4_decompress_safe_partial_forceExtDict(const char *source,
-+		char *dest, int compressedSize, int targetOutputSize,
-+		int dstCapacity, const void *dictStart, size_t dictSize);
-+
-+#endif /* __LZ4_DEPS_H__ */
-diff --git a/lib/lz4/lz4_kernel_api.h b/lib/lz4/lz4_kernel_api.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..de75e5d976eb9dd318da5318a26b91d7aed81042
---- /dev/null
-+++ b/lib/lz4/lz4_kernel_api.h
-@@ -0,0 +1,90 @@
-+/* SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause */
-+/*
-+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
-+ * Author: Michal Wilczynski <m.wilczynski@samsung.com>
-+ *
-+ * lz4_kernel_api.h -- the LZ4 API this directory exports
-+ *
-+ * lz4_deps.h renames upstream's entry points to __lz4_* so that the kernel's
-+ * own definitions can use the real names; this header undoes that renaming
-+ * and the optimize() override, and declares what lib/lz4 exports.
-+ *
-+ * The same functions are declared to callers in <linux/lz4.h>, in terms of
-+ * opaque stream types.  We cannot include that header here -- it and
-+ * upstream's lz4.h describe the same library and collide -- so the
-+ * declarations are repeated, expressed in upstream's own types.  Keep the two
-+ * in step; <linux/lz4.h> is the one callers compile against.
-+ *
-+ * Include after upstream/lz4.c or upstream/lz4hc.c.
-+ */
-+
-+#undef LZ4_compress_fast
-+#undef LZ4_compress_default
-+#undef LZ4_compress_destSize
-+#undef LZ4_resetStream
-+#undef LZ4_loadDict
-+#undef LZ4_saveDict
-+#undef LZ4_compress_fast_continue
-+
-+#undef LZ4_decompress_safe
-+#undef LZ4_decompress_safe_partial
-+#undef LZ4_setStreamDecode
-+#undef LZ4_decompress_safe_continue
-+#undef LZ4_decompress_safe_usingDict
-+
-+#undef LZ4_compress_HC
-+#undef LZ4_resetStreamHC
-+#undef LZ4_loadDictHC
-+#undef LZ4_compress_HC_continue
-+#undef LZ4_saveDictHC
-+
-+#undef optimize
-+
-+/*
-+ * The objects that do not build lz4hc.c never see this type, and it is only
-+ * ever used through a pointer here.  Upstream declares it the same way.
-+ */
-+typedef union LZ4_streamHC_u LZ4_streamHC_t;
-+
-+/* Compression.  wrkmem is LZ4_MEM_COMPRESS bytes, supplied by the caller. */
-+int LZ4_compress_default(const char *source, char *dest, int inputSize,
-+			 int maxOutputSize, void *wrkmem);
-+int LZ4_compress_fast(const char *source, char *dest, int inputSize,
-+		      int maxOutputSize, int acceleration, void *wrkmem);
-+int LZ4_compress_destSize(const char *source, char *dest, int *sourceSizePtr,
-+			  int targetDestSize, void *wrkmem);
-+
-+/* Streaming compression. */
-+void LZ4_resetStream(LZ4_stream_t *LZ4_stream);
-+int LZ4_loadDict(LZ4_stream_t *streamPtr, const char *dictionary,
-+		 int dictSize);
-+int LZ4_saveDict(LZ4_stream_t *streamPtr, char *safeBuffer, int dictSize);
-+int LZ4_compress_fast_continue(LZ4_stream_t *streamPtr, const char *src,
-+			       char *dst, int srcSize, int maxDstSize,
-+			       int acceleration);
-+
-+/* Decompression. */
-+int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
-+			int maxDecompressedSize);
-+int LZ4_decompress_safe_partial(const char *source, char *dest,
-+				int compressedSize, int targetOutputSize,
-+				int maxDecompressedSize);
-+int LZ4_setStreamDecode(LZ4_streamDecode_t *LZ4_streamDecode,
-+			const char *dictionary, int dictSize);
-+int LZ4_decompress_safe_continue(LZ4_streamDecode_t *LZ4_streamDecode,
-+				 const char *source, char *dest,
-+				 int compressedSize, int maxDecompressedSize);
-+int LZ4_decompress_safe_usingDict(const char *source, char *dest,
-+				  int compressedSize, int maxDecompressedSize,
-+				  const char *dictStart, int dictSize);
-+
-+/* HC compression.  wrkmem is LZ4HC_MEM_COMPRESS bytes. */
-+int LZ4_compress_HC(const char *src, char *dst, int srcSize, int dstCapacity,
-+		    int compressionLevel, void *wrkmem);
-+void LZ4_resetStreamHC(LZ4_streamHC_t *streamHCPtr, int compressionLevel);
-+int LZ4_loadDictHC(LZ4_streamHC_t *streamHCPtr, const char *dictionary,
-+		   int dictSize);
-+int LZ4_compress_HC_continue(LZ4_streamHC_t *streamHCPtr, const char *src,
-+			     char *dst, int srcSize, int maxDstSize);
-+int LZ4_saveDictHC(LZ4_streamHC_t *streamHCPtr, char *safeBuffer,
-+		   int maxDictSize);
+ KBUILD_AFLAGS := $(KBUILD_AFLAGS) -D__ASSEMBLY__ \
+ 	-DBOOT_HEAP_SIZE=$(BOOT_HEAP_SIZE) \
+ 	-DKERNEL_ENTRY=$(VMLINUX_ENTRY_ADDRESS)
+diff --git a/arch/parisc/boot/compressed/Makefile b/arch/parisc/boot/compressed/Makefile
+index 14eefb5ed5d1d781a4ee0cb2ef61ab86c905cc56..9e82f9d1285f62b164073bdacc0d4a1828d4965c 100644
+--- a/arch/parisc/boot/compressed/Makefile
++++ b/arch/parisc/boot/compressed/Makefile
+@@ -12,6 +12,9 @@ targets += $(OBJECTS) sizes.h
+ 
+ KBUILD_CFLAGS := -D__KERNEL__ -O2 -DBOOTLOADER
+ KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING
++# misc.c includes decompress_unlz4.c, which builds the vendored LZ4
++# sources; they include a few ISO C headers -nostdinc drops.
++CFLAGS_misc.o += -I$(srctree)/lib/lz4/freestanding
+ KBUILD_CFLAGS += -fno-strict-aliasing
+ KBUILD_CFLAGS += $(cflags-y) -fno-delete-null-pointer-checks -fno-builtin-printf
+ KBUILD_CFLAGS += -fno-PIE -mno-space-regs -mdisable-fpregs -Os
+diff --git a/arch/s390/boot/Makefile b/arch/s390/boot/Makefile
+index 10b75e053a6f6bb9083548e8f82796f0aa9a9958..44355051a8c7f96b5c4dab5d110bc8aaf79c8f55 100644
+--- a/arch/s390/boot/Makefile
++++ b/arch/s390/boot/Makefile
+@@ -21,6 +21,9 @@ KBUILD_AFLAGS := $(filter-out $(CC_FLAGS_MARCH),$(KBUILD_AFLAGS_DECOMPRESSOR))
+ KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_MARCH),$(KBUILD_CFLAGS_DECOMPRESSOR))
+ KBUILD_AFLAGS += $(CC_FLAGS_MARCH_MINIMUM) -D__DISABLE_EXPORTS
+ KBUILD_CFLAGS += $(CC_FLAGS_MARCH_MINIMUM) -D__DISABLE_EXPORTS
++# decompressor.c includes decompress_unlz4.c, which builds the vendored LZ4
++# sources; they include a few ISO C headers -nostdinc drops.
++CFLAGS_decompressor.o += -I$(srctree)/lib/lz4/freestanding
+ KBUILD_CFLAGS += $(call cc-option, -Wno-default-const-init-unsafe)
+ 
+ CFLAGS_sclp_early_core.o += -I$(srctree)/drivers/s390/char
+diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+index 06934f9691d6a9d6952532ae5f7d96f5858719dd..328eafcfc35bd14a16bc4ec5472f6c6dc72336a1 100644
+--- a/arch/x86/boot/compressed/Makefile
++++ b/arch/x86/boot/compressed/Makefile
+@@ -30,6 +30,9 @@ KBUILD_CFLAGS += -fno-strict-aliasing -fPIE
+ KBUILD_CFLAGS += -fno-jump-tables
+ KBUILD_CFLAGS += -Wundef
+ KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING
++# misc.c includes decompress_unlz4.c, which builds the vendored LZ4
++# sources; they include a few ISO C headers -nostdinc drops.
++CFLAGS_misc.o += -I$(srctree)/lib/lz4/freestanding
+ cflags-$(CONFIG_X86_32) := -march=i386
+ cflags-$(CONFIG_X86_64) := -mcmodel=small -mno-red-zone
+ KBUILD_CFLAGS += $(cflags-y)
 
 -- 
 2.34.1
