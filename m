@@ -1,53 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.71.94.104
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794026021;
-	b=lCGSMV2wylEx0FiK6Cr+/vQ61BspK4/TEvBOoP4BN3iGN7ANMDH33W/qSBoTM5b//tup
-	 Iic3rofTBvbhLGROkvTtTwdMWUwq68kdrYbE5oOqwLAYOukV+BkToBT0aelC5D7V5ZUWO
-	 2qW5vpXGiO5HltrObdZWMA0+cfKK7QPubkXkVETk3f57CtZ1xAte5aQtQq6VZPY2shS+K
-	 7tqTO1UUxipfyOVf/RnLT5Kk0MET7TlvjCjDse0cYhf9OyiDizwRJJ2PHeck5ngfVRm5F
-	 ciyqTDAgZjXUIkXg7pM9ghuvMNfU0CCwpX+Ma5o1bUe2TTGJ61XG7hmi4VLVzqRIdGg==
+	t=1794034495;
+	b=z0vrEKqv0/0S+FUQNh1bmXe9Q7BguEO2883XPnzNUHQKPfUI9OHopYsFREtEAcq8slyl
+	 Of/YJ0cMNS+mWE9HNgFZH6oPweuHgpP6Z4aPnJhGkr3hOk27WQToZSuSMeXDV/Ks+gkpT
+	 sui3U87CHEOzRqY6iO6F5P+Ynq5m2l4BA+w9TX7hhp8a+IDyjA3fHnF0D8uVYYVNbvhxO
+	 0L8pFDW7f9+rDUIRlnPMLFeHxmSnH3eixD+p05ZUGfoqSpWqLe7cEseaw/jM4ADFrNLUO
+	 las0+3qjogsofA8Hx5GYEgdVKvoA9hsI7o55fMJRMxd2tibTBI1ASD8I1T+I7Yds0Sw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794026021;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Gm-Message-State:
-	 MIME-Version:X-Received:Date:X-Google-Appengine-App-Id:
-	 X-Google-Appengine-App-Id-Alias:Message-ID:Subject:From:To:
-	 Content-Type;
-	bh=7NFle5EcCexVV6wXsp0CMRBUK7BzcYXOnIxO69P4PHU=;
-	b=LWwzpTdrgD43B0ocIP44GdUzFl54ESyPO/8EMfzKdSa++Ynj7OAnyOl0jVMR/Ly0jD7r
-	 LtHrByGkIqoB7PqRyfX+j4pZZWBYoLMeck+2A5xAEqUHqXE1g8hg2AsoCfnA29vr8WjWM
-	 +3N7PTMFKKPYaHAvKNyemaKIW6DtHmahDKrYrJ5B5RYvUMt1ByfoA5sgc6hKaZPVPlNAQ
-	 X3Tcw0vBQ3vZq8EGJMsC+VD6WnLjpJYwzMS5T6mP0isjtWpdrMi85xdTvYtmP99q4crrY
-	 4YFgxI1MMKtR6Upy8mwtQdLb9QOZD5uzxi1dq31yLnBJpSwc5wIUXp6PXSA1hot2Qgw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794034495;
+	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-CM-TRANSID:X-Coremail-Antispam:Sender:X-CM-SenderInfo;
+	bh=trXAchNUwzPTGAZKdFBTshj/9uxdD6sxzX9w44/PK7U=;
+	b=S0MTsmO42XXfLlxghtdfX2V74VXCl31JPGcRba7qWP7G52T4SKn5DZxesfVtZOu9e82Y
+	 pZwdn5/jca+05Gn2PaD/CXU0B82+Pq6KnhcErIFtX2oxqxWkYTukbDuHyc2nxNpza2qN8
+	 G+rwNrsQTdSlrwsjZbCfSMgK7Q+qhPc0FoYJTXfk27D4srvyKxVT3RPmIomV61PZiUQVu
+	 vwfge+ZOLFF0zi9LhJJ/CBStTzn6Ax36jXtimNQAuMLlzTen8NOeZprLbRXavbsA9hWGu
+	 xbLAbSlOTGfF2s7hC2QIlwm0m7ySfAM03Yt81WLcOwoNT3nUrz5p8v4MDop8dJAZroQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.167.197
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=fail header.from=huawei.com;
+	spf=pass smtp.mailfrom=huaweicloud.com;
+	arc=none smtp.remote-ip=124.71.94.104
+Received: from dggmsgout13.his.huawei.com (dggmsgout13.his.huawei.com [124.71.94.104])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEC5606A32C
-	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 04:33:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EEC5606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-4dc57e2a3f2so1802234b6e.0
-        for <linux-block@vger.kernel.org>; Fri, 06 Nov 2026 20:33:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794026020; x=1794630820;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7NFle5EcCexVV6wXsp0CMRBUK7BzcYXOnIxO69P4PHU=;
-        b=uDSFIiTlZNwYBLiY4rrppRYAS62MfOP28wLdolpHijEHlP6mbut1P8L1RP2KHhmHMC
-         uP3x86Snm/fwpR+P5w2qLawbp1K8m6JRSbVz7XruZ6LhfbfPAq4rS2M1qbQhqsv2o0v5
-         IhmCLUcCBogpqQT3zCBB/NVg5/XzLaCjLVNIT5U538AQ8fxrjcUWyTVf/So2isNQFXyy
-         2QGLyYlS+mzNWxPnycjQzAuKXOeGSN2XpkgFWA9lc183iV12puFKrNjwa5C1LgViT/nb
-         lmh4ZtJTmoc4rgoQVymmBmCtMFVdcx/Djk77w+/kgoLaHeErme+ug8ScLtyQ6N48mals
-         Uhsw==
-X-Gm-Message-State: APuU4Z/c8/W0EhTpIGcNIKk3urpREOLPOGHsnUt1jRCErKXIvz1JHY9g
-	hX32K3lfn7y3J5ZF+igXRlJ+wJg5C7/EVP3a4RwjrVEzX97rD7CZuCp3D5Bsk45OigjlAOzlWg2
-	hw7Jx2QiS2/lOmZ+iEqHMmEaioDBwVzNOGo2KxVrWVtjefuHE71fLgqnwR3o=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72556606A334
+	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 06:54:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72556606A334
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggmsgout13.his.huawei.com (SkyGuard) with ESMTP id 4jM6Gd0Mk9z1rrTV
+	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 14:54:17 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 2A87840577
+	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 14:54:49 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgAHwgQ1y+5qHB5yDQ--.31669S4;
+	Sat, 07 Nov 2026 14:54:49 +0800 (CST)
+From: Yang Erkun <yangerkun@huawei.com>
+To: axboe@kernel.dk,
+	josef@toxicpanda.com,
+	xiubli@redhat.com,
+	prasanna.kalever@redhat.com,
+	ming.lei@redhat.com,
+	yukuai@fygo.io,
+	nilay@linux.ibm.com
+Cc: linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	yangerkun@huawei.com,
+	wangkefeng.wang@huawei.com,
+	leijitang@huawei.com,
+	yi.zhang@huawei.com,
+	chengzhihao1@huawei.com,
+	houtao1@huawei.com,
+	wozizhi@huawei.com
+Subject: [RFC PATCH 0/5] nbd: allow parallel genetlink operations
+Date: Sat,  7 Nov 2026 14:46:24 +0800
+Message-ID: <20261107064629.4093489-1-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.52.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -57,62 +69,52 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1b0a:b0:4ec:4c7e:37b5 with SMTP id
- 5614622812f47-567e154cc49mr3455968b6e.29.1794026020468; Fri, 06 Nov 2026
- 20:33:40 -0800 (PST)
-Date: Fri, 06 Nov 2026 20:33:40 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6aeeaa24.1da6ca5c.10a313.0000.GAE@google.com>
-Subject: [syzbot] Monthly block report (Nov 2026)
-From: syzbot <syzbot+list1913a7ecb8f6c20c529b@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgAHwgQ1y+5qHB5yDQ--.31669S4
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xr4fKryDuw13WF4xGrWDCFg_yoWkZrb_Wa
+	4UuaykGr48GFWFkF9akF4rAryUKw4ayF1UAFnYyFZ7Zr1xXrZ8Xr4vvr4qvF18Xa17Arnr
+	ur4qvw4Ikr47KjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb-xYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I
+	0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
+	GVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
+	0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0
+	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJbIYCTnIWIevJa73UjIFyTuYvjxUFrcTDUUUU
+Sender: yangerkun@huaweicloud.com
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-Hello block maintainers/developers,
+Each nbd doit only touches the state of one device; the only global
+state is nbd_index_idr, accessed briefly under nbd_index_mutex.
+genl_mutex nevertheless serializes the whole genetlink doit path, and
+nbd_disconnect_and_put() sleeps in flush_workqueue() while holding it,
+so one device's teardown blocks every other device.  This series
+enables parallel_ops for nbd.
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+Patches 1, 2 and 4 fix bugs that are reachable without parallel_ops;
+patch 3 makes device publication and the status walk consistent for
+concurrent genl handlers.  Patch 5 enables parallel_ops.
 
-During the period, 1 new issues were detected and 2 were fixed.
-In total, 30 issues are still open and 124 have already been fixed.
-There are also 34 low-priority issues.
+A minimal netlink client on an 8-vCPU KVM guest, 32 devices x 10
+connect/disconnect cycles, median of 3 runs: 390 ms -> 25 ms.
+Connect-only and status do not change.
 
-Some of the still happening issues:
+Yang Erkun (5):
+  nbd: validate the backend identifier under config_lock
+  nbd: decrement nbd_total_devices when a device is removed
+  nbd: publish devices atomically
+  nbd: hold config_lock while updating nr_hw_queues
+  nbd: allow genetlink operations to run in parallel
 
-Ref  Crashes Repro Title
-<1>  4342    No    general protection fault in lo_rw_aio
-                   https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28
-<2>  2419    Yes   possible deadlock in blkg_conf_prep
-                   https://syzkaller.appspot.com/bug?extid=144a1c0e22e53a08ef5a
-<3>  1749    Yes   INFO: task hung in blkdev_fallocate
-                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<4>  323     Yes   INFO: task hung in __rq_qos_throttle (2)
-                   https://syzkaller.appspot.com/bug?extid=53706c567afab5131044
-<5>  219     Yes   general protection fault in rtlock_slowlock_locked
-                   https://syzkaller.appspot.com/bug?extid=08df3e4c9b304b37cb04
-<6>  69      Yes   BUG: unable to handle kernel paging request in blk_mq_complete_request_remote
-                   https://syzkaller.appspot.com/bug?extid=2e3bf0bd49acd9b21d4b
-<7>  34      No    WARNING in blk_mq_dispatch_rq_list
-                   https://syzkaller.appspot.com/bug?extid=49b69d460fb5134ee1d7
-<8>  31      Yes   BUG: corrupted list in blk_mq_request_bypass_insert
-                   https://syzkaller.appspot.com/bug?extid=f4353e96f7004ae5a09e
-<9>  5       Yes   WARNING: lock held when returning to user space in blk_throtl_init
-                   https://syzkaller.appspot.com/bug?extid=1eb53c83ab8b0a0302a6
-<10> 3348    Yes   WARNING in blk_mq_free_tag_set
-                   https://syzkaller.appspot.com/bug?extid=02b37e31e64ea5cb6d29
+ drivers/block/nbd.c | 95 +++++++++++++++++++++++++++++++--------------
+ 1 file changed, 65 insertions(+), 30 deletions(-)
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
+2.52.0
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
