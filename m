@@ -1,44 +1,44 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.71.94.104
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.71.93.112
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794034496;
-	b=gUFiv4wIt1ua+0VkjVw+zJAeiDNky915wpKRsZGNb59RChbXEIAxmqEBwoYCqd+rYytm
-	 ODGIwYNPCq3NZduGbe9p9tn6KqjZVjlFFIjvWcbsz2Z0jE8258jYIaBF+jVUVxy4cI7ua
-	 wDz6MkGumZDl/XnhQe59qy4e5dBDdBL8Qu6W0E0ZfZ/DeV4EM0x2ttLOaGPUHAF4//U3c
-	 rTRZr7SSkxH2S/Fg10m6iaqdP8Cyyi9mrf2ObhkS5OLc7HlVJFuNqTlqvLhRQ9gm0DdOS
-	 JpTANrfT8K+upXtPD3WbpbMDj6LqbrsX2Wa3SIi5PRHJU9InlqldcXtEo4+4w1uRYIQ==
+	t=1794034499;
+	b=HRwcKdLGupl/YkCbQ2DULNkNRkKMFKvP6hBcL1aSthBFtrI6jLTdIGRNCkOWYDXOGckB
+	 /oS5PKwnAkul0uQbuETuvOUtj6iLBq5YBIa3G76jQ62bDYPF/5dV6Co2/Q8vXxGsyUhHo
+	 xUx1wPf/DP87pMf7Vaokwm7EOuR/3azFPOWYrAq1jyguouaCojVt/V9TfZR7GqsXECu4w
+	 uN6U/eQlvT9yHTWvK6Y7nfLWPPvSXVGcO6LM3onTq98cZlA/4ViTRY890oh9n50z8oA0W
+	 n5uNnkbtmqvOPrHMJoIP0NYr33AWx0CeVt34Ej2YxjrblIivAbAasAwmcJ42xcr9r7g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794034496;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794034499;
 	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:Sender:
 	 X-CM-SenderInfo;
-	bh=l96LmI8pJLNzPFH9ySmXS4gLTHLAsPZvo7Ax2hmQcgo=;
-	b=h5PneumpsseALOHpyxXhcmA9EVjgGUo4fYcAhWUuT3NtcGmD2AH7QwY5sAsG/sxOfLMy
-	 t+KbMvmRSwyC/sHHRJCriRmM4qXZ2gg0q3l7lk+eBUDcgWLGxlNk/0yBhAM0RFH/bgXwA
-	 sxtiXvzUFKLZG6D+t//AsMRjzhDmvh4e3pGYO7dMFdm9lLKCiixsT8z9I7s02goMAS3li
-	 aTrimTS85Bxaq5sUYN417GXl6gGL9uo+3x89sOv9Dr7eTqLqGuMxySm/5FWOPAYQHwLP8
-	 fIs8GwVMLBOjsYTyp3jrI1yHzvALrVJHr9GCq8az6KkySZ3KgKDnSA+C8Dti1Ann2Og==
+	bh=m4mmos7+sKcZJq+QzeTverze++CcBHiAuMrLuy1YFug=;
+	b=0p83CA8AtaD1QCN0xvB6STD2gRz/eVNhgdBTPDuiN4F4dWbpfUduCYoFRJIYnO0mbv3O
+	 3uZMM8iQHjo9+3/i8VEXj4XKmGeb61EsbZnDaxtcTI4XeVqilh18gj4sYsfLj5PwBa8Hu
+	 FLgqgcytVqkr0xAjoIqhKj5wkSyFQbTSzmTu+DM5PyM1yMBcHrD+2OSe9I/5axbEUa8L3
+	 1H7sDSibRnkTBv5awLFVUxerBocDuRuV4MSwvyziS8dyhdgBpfB5l+dlELwIHNSf1J/J0
+	 96c6uxgwYDz3O+8ThQWAozpcgSIfnGyQsq+SfgmrYE9taad1J4axXJEr3If3GCMJeLQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=fail header.from=huawei.com;
 	spf=pass smtp.mailfrom=huaweicloud.com;
-	arc=none smtp.remote-ip=124.71.94.104
-Received: from dggmsgout13.his.huawei.com (dggmsgout13.his.huawei.com [124.71.94.104])
+	arc=none smtp.remote-ip=124.71.93.112
+Received: from dggmsgout12.his.huawei.com (dggmsgout12.his.huawei.com [124.71.93.112])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5F7606A33B
-	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 06:54:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED5F7606A33B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F585606A326
+	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 06:54:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3F585606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggmsgout13.his.huawei.com (SkyGuard) with ESMTP id 4jM6Gd1cWKz1rrbp
-	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 14:54:17 +0800 (CST)
+	by dggmsgout12.his.huawei.com (SkyGuard) with ESMTP id 4jM6Gf37TGz20MG
+	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 14:54:18 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 55BF840573
+	by mail.maildlp.com (Postfix) with ESMTP id 92D8440573
 	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 14:54:49 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgAHwgQ1y+5qHB5yDQ--.31669S6;
+	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgAHwgQ1y+5qHB5yDQ--.31669S9;
 	Sat, 07 Nov 2026 14:54:49 +0800 (CST)
 From: Yang Erkun <yangerkun@huawei.com>
 To: axboe@kernel.dk,
@@ -57,9 +57,9 @@ Cc: linux-block@vger.kernel.org,
 	chengzhihao1@huawei.com,
 	houtao1@huawei.com,
 	wozizhi@huawei.com
-Subject: [RFC PATCH 2/5] nbd: decrement nbd_total_devices when a device is removed
-Date: Sat,  7 Nov 2026 14:46:26 +0800
-Message-ID: <20261107064629.4093489-3-yangerkun@huawei.com>
+Subject: [RFC PATCH 5/5] nbd: allow genetlink operations to run in parallel
+Date: Sat,  7 Nov 2026 14:46:29 +0800
+Message-ID: <20261107064629.4093489-6-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20261107064629.4093489-1-yangerkun@huawei.com>
 References: <20261107064629.4093489-1-yangerkun@huawei.com>
@@ -73,35 +73,48 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgAHwgQ1y+5qHB5yDQ--.31669S6
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xr47XrW7Cw1ftw4xGr43trb_yoWfKrX_Aw
-	17CF4kZrykKF4UCr4Uta1fZry0y3WIga1FkF1IqFZ3Xa47XFn3XwsFvr9Iq348WFW7C3Zx
-	Z345WrWIyr1xWjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb9xYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r15M2
-	8IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK
-	021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F
-	4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI
-	0_Jw0_GFyl42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20xyl4I8I3I0E4IkC
-	6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWw
-	C2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_
-	JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJV
-	WUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIY
-	CTnIWIevJa73UjIFyTuYvjxUF0eHDUUUU
+X-CM-TRANSID:_Ch0CgAHwgQ1y+5qHB5yDQ--.31669S9
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1DGF48uw47Zw1ktFWrKrg_yoW8Gw4xpF
+	WUXFZ7KFy8GF4rua1vya1xWFWYqwnrAFy2qa4qk34Y9ry5Ar9FqrWkKay8tw1qyr97AF12
+	vF4jqayIya4kC37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmKb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7Cj
+	xVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
+	C2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
+	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
+	kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvEw4C26cxK6c8Ij28IcwCFx2Iq
+	xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
+	106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
+	xVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcI
+	k0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j
+	6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFwIDUUUUU
 Sender: yangerkun@huaweicloud.com
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-nbd_total_devices is incremented in nbd_dev_add() but never decremented,
-so it ends up larger than the number of devices left in nbd_index_idr.
-nbd_genl_status() sizes the reply from it, so status allocates for
-devices that no longer exist.
+Each nbd doit only touches one device's state, and the global state
+(nbd_index_idr and nbd_total_devices) is accessed briefly under
+nbd_index_mutex.  genl_mutex nevertheless serializes the whole genetlink
+doit path.
 
-Decrement it in nbd_dev_remove() under nbd_index_mutex.
+The cost that matters is teardown: nbd_disconnect_and_put() calls
+flush_workqueue() while holding genl_mutex, so a disconnect blocks every
+other device for the duration of the flush.  Enable parallel_ops; the
+preceding patches make sure no handler relies on genl_mutex for
+correctness.
 
-Fixes: 47d902b90a32 ("nbd: add a status netlink command")
+Test with a minimal netlink client in an 8-vCPU KVM guest, 32 devices x
+10 connect/disconnect cycles, median of 3 runs:
+
+  parallel_ops=0:  378 ms
+  parallel_ops=1:   27 ms
+
+Connect-only and status do not improve, since their critical sections
+are short.
+
+Suggested-by: Xiu Jianfeng <xiujianfeng@huawei.com>
 Assisted-by: LLM
 Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 ---
@@ -109,17 +122,17 @@ Signed-off-by: Yang Erkun <yangerkun@huawei.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index fbade6ae4481..1448ee63fab5 100644
+index cf2a47fc572d..6a7060773e27 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -275,6 +275,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 	 */
- 	mutex_lock(&nbd_index_mutex);
- 	idr_remove(&nbd_index_idr, nbd->index);
-+	nbd_total_devices--;
- 	mutex_unlock(&nbd_index_mutex);
- 	destroy_workqueue(nbd->recv_workq);
- 	put_disk(disk);
+@@ -2542,6 +2542,7 @@ static struct genl_family nbd_genl_family __ro_after_init = {
+ 	.hdrsize	= 0,
+ 	.name		= NBD_GENL_FAMILY_NAME,
+ 	.version	= NBD_GENL_VERSION,
++	.parallel_ops	= 1,
+ 	.module		= THIS_MODULE,
+ 	.small_ops	= nbd_connect_genl_ops,
+ 	.n_small_ops	= ARRAY_SIZE(nbd_connect_genl_ops),
 -- 
 2.52.0
 
