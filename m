@@ -1,68 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.71.93.99
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=114.111.35.158
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794034501;
-	b=dLi7u1KiqEWUTCLQm5gcfOrAOQZ0AdpYZM5HkkHroF9oi4EW+zFyx/VgKriGNbfgnkvF
-	 fEW/HWdGGo7SCx1vMmUAdqQ9PDHC2evkwztfdGlEpHjBvtYyw/DOz3SCw76NVUuzW1ZIz
-	 Q8qQ52IMoa5rqNvgmKTdoH3UdTJC5Dyjh52w8TajjxngpVgZ+Ux4h1D56zxBt7TCVHzFY
-	 1g9F5g6X7sv9IkhSMhmpehLNIIqVZ8tNRSycSn56eEbx+w4AbnAm4Svtz1etNNmBovKkA
-	 CF6OrxeZqGRH7h8P1hqncSynOgf/LG2Pd0Gq/nJYDQspLYW/0tNq3f/+GLkz5NK7Jsw==
+	t=1794044146;
+	b=oCEDmD/cnP425Pm9Q8Ez93vTs91HHWEUwurPPBmXDDxzeiQwVbt78YGXKChBdVvhNeyU
+	 QrSK5hgjIpRSyKjNTRLuruq96tTFUOQsclDCCPk/KlDhIySBqjeXmCFta+V/YbgHtrjjJ
+	 wRHUE0Jj2O7jQkqoGSPdCmgtMo5GyFicUxjPWVZ2+6jQKpbF4R/M48R/MjJDw+F9j4BEL
+	 CO4Pvy2F8BOYvWJsPjaklBpQKqH4vHNY2FmjgoNniug2bd/5UYyW/Pj5Q8nV715MTcj/1
+	 mdt/Ojx/9yjAD5OqOSwhzs0S9XDQZ83+isMfuNJUbWbeBz/QSaNJGElfxsq0plPGG7w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794034501;
-	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:Sender:
-	 X-CM-SenderInfo;
-	bh=tTyy2Odm0CC2H0Otnjb4/F1KvcgaCWIP7CB3t+Td7Rw=;
-	b=pE+eXNAnCqqv3mvLIL35RT7aG2bbMkkguwlYBApVbXE1U7UkojwgSSReIpcJGkdqdr4v
-	 ZdwVVN4+JVjGV96dQtb6AACwc3Pjo794NaVEvtaBxtp8YGSgb729U0LkNborNAEV4aHKd
-	 ohkxFZ0zw4PcY9/3Iv1j3y605QRPGUd6iaUDE+pSnFckPlNAG0qbDK2gFEBioRhI36UEA
-	 CcWh/xGClVq18w9WaW6xLblPbHMaz2YedeZg1YcyO7VCIjgIzPCEkcy4sj3GVkzEPfeCf
-	 Df/AheH4ecgqWH4ykzGqPVO4nLqoIImpY/fNoYkk+aKuCmfwlQYO70juKbFPMIEML2A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794044146;
+	h=DMARC-Filter:X-Originating-IP:Received:DKIM-Signature:X-Session-ID:
+	 X-Originating-IP:X-Works-Send-Opt:X-Works-Smtp-Source:Received:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=/3diqcofIQZb45YZZQhvIySlUWGXY8v/QHQXJI4TsZ4=;
+	b=RevK6ilsgY5PAdOR5aQUNSQ/CgJ/Tt+HqhbYoyOKg9FYDMnQ5993J1W4ZaRK2+UYvF16
+	 RruRLuzOxojuXp4fLDfCHCllQ79K4bYsmJ+ggaCSaMpvcED0TSMuTUbcA0Ql0ar2LgW7A
+	 Xm5nyRGazIa8L2eZzWl4V6lDkkWNLkvpQxhWwHcAFu2KRypJwDjnyPaKfZi8+kKJYcium
+	 4+Tx8bn+j6ZJsJ6NP1xoT6QUkO+n+7HnNFauYGbcaqt1dJophIGlyWaoKEoohYw/BxoXk
+	 5lTMLTO4xOA14mf0yc2ZLq7XH3xCim+CNio9FM0bXsGrEHxkYwvaoLIXitbtbaXi4Dw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=huawei.com;
-	spf=pass smtp.mailfrom=huaweicloud.com;
-	arc=none smtp.remote-ip=124.71.93.99
-Received: from dggmsgout11.his.huawei.com (dggmsgout11.his.huawei.com [124.71.93.99])
+	dmarc=pass header.from=naver.com;
+	spf=pass smtp.mailfrom=naver.com;
+	dkim=pass header.d=naver.com header.i=@naver.com header.a=rsa-sha256 header.s=s20171208 header.b=YebCyZYe;
+	arc=none smtp.remote-ip=114.111.35.158
+Received: from cvsmtppost15.nm.naver.com (cvsmtppost15.nm.naver.com [114.111.35.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072F5606A32C
-	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 06:54:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 072F5606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggmsgout11.his.huawei.com (SkyGuard) with ESMTP id 4jM6Gc64z6z1c19b
-	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 14:54:16 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 6FC9C4099B
-	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 14:54:49 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.85.155])
-	by APP3 (Coremail) with UTF8SMTPSA id _Ch0CgAHwgQ1y+5qHB5yDQ--.31669S7;
-	Sat, 07 Nov 2026 14:54:49 +0800 (CST)
-From: Yang Erkun <yangerkun@huawei.com>
-To: axboe@kernel.dk,
-	josef@toxicpanda.com,
-	xiubli@redhat.com,
-	prasanna.kalever@redhat.com,
-	ming.lei@redhat.com,
-	yukuai@fygo.io,
-	nilay@linux.ibm.com
-Cc: linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	yangerkun@huawei.com,
-	wangkefeng.wang@huawei.com,
-	leijitang@huawei.com,
-	yi.zhang@huawei.com,
-	chengzhihao1@huawei.com,
-	houtao1@huawei.com,
-	wozizhi@huawei.com
-Subject: [RFC PATCH 3/5] nbd: publish devices atomically
-Date: Sat,  7 Nov 2026 14:46:27 +0800
-Message-ID: <20261107064629.4093489-4-yangerkun@huawei.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20261107064629.4093489-1-yangerkun@huawei.com>
-References: <20261107064629.4093489-1-yangerkun@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96AF1606A32F
+	for <linux-block@vger.kernel.org>; Sat,  7 Nov 2026 09:35:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96AF1606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=naver.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=naver.com header.i=@naver.com header.a=rsa-sha256 header.s=s20171208 header.b=YebCyZYe
+Received: from nv1s-hmac-real-15 ([10.180.31.91])
+  by cvsmtppost15.nm.naver.com with ESMTP id RGb8X2fCT1ONgt7gjZ6Lcg
+  for <linux-block@vger.kernel.org>;
+  Sat, 07 Nov 2026 09:35:37 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=naver.com; s=s20171208;
+	t=1794044137; bh=BZpIDUDSRj/MFpAbjVfD0gcX/NsJd/t1bpVkkbQXaao=;
+	h=From:To:Subject:Date:Message-ID:From:Subject:Feedback-ID:
+	 X-Works-Security;
+	b=YebCyZYeT88cijckvgk7CSsObO1xLzQ26wJAZiV0i3dxIa73MU+slyTRA1GXOGJGV
+	 gMABRHheDcRJNrv0yNsjGSLBCK8Dju6DSfyHpra4V8KuMx29p2P8p+cmyfIfSf6bb7
+	 vgFMx25H9LgUI2a4swiJ7eSzQVIvg8rH8Yi+DFrFrV/SEOXh8mponLVhDSznJ0xjdg
+	 xT9lH7xJ7RwE8hxOugFll0ooaaQkJxhebe+SQX4XeZxArlBNTuUgGXiQcu4KRbxSjs
+	 k5GNa9nsGwrpYQHU0low7+H8ocSOKRkRWvnTPFRMWMzLvtSbxxJzJa9OLq4E1FreBw
+	 MiFCSGcoPtwiA==
+X-Session-ID: uxigsGlVTHmaNT4Or5XJPw
+X-Works-Send-Opt: OlewpzGdjHmdKHFOMr39Ko3YKHmqjAudFqM9KqMqFxIYkEljxBmwjAg=
+X-Works-Smtp-Source: rqnwKAtlFqJZ+HmXKqbw+6E=
+Received: from localhost.localdomain ([115.136.205.4])
+  by mvnsmtp01.nm.naver.com with ESMTP id uxigsGlVTHmaNT4Or5XJPw
+  for <multiple recipients>
+  (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+  Sat, 07 Nov 2026 09:35:37 -0000
+From: Sung Byeongchan <tjdqudcks0424@naver.com>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH] ublk: retain server PID generation across timeout
+Date: Sat,  7 Nov 2026 18:35:31 +0900
+Message-ID: <20261107093531.619041-1-tjdqudcks0424@naver.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -73,83 +74,112 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgAHwgQ1y+5qHB5yDQ--.31669S7
-X-Coremail-Antispam: 1UD129KBjvJXoWxJryUWr43KryUWF1DZFy3twb_yoW8tr13pF
-	4YqFZrKryDCr4fGr48A3ZrWF15Jw4kAayrGryUJ3429FZ3Cr9Ig34rtFy5t3ZrJrZ5AFWk
-	tFW7Z3yvka1DJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmmb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ew
-	Av7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY
-	6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14
-	v26r1q6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVAKzI0EY4vE52x082I5MxC20s026xCa
-	FVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_Jr
-	Wlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j
-	6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r
-	1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1U
-	YxBIdaVFxhVjvjDU0xZFpf9x07UWc_-UUUUU=
-Sender: yangerkun@huaweicloud.com
-X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-nbd_dev_add() inserts the device into nbd_index_idr as soon as it has
-an index, but sets nbd->refs and nbd_total_devices only after add_disk(),
-the latter without nbd_index_mutex. With parallel_ops enabled in a later
-patch, a status walk can then report the half-initialized device while
-nbd_total_devices does not account for it yet, and overflow the reply
-(-EMSGSIZE).
 
-Set nbd->refs and nbd_total_devices together under nbd_index_mutex, and
-skip devices with a zero refcount in populate_nbd_status().  Then
-nbd_total_devices is an upper bound on the devices status reports, and a
-reply sized from it can't overflow.
+The UBLK char opener is recorded as a bare numeric tgid. A child can
+retain the char file after the opener exits, delaying final release while
+allowing the numeric PID to be reused.
 
-Assisted-by: LLM
-Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+START currently resolves the supplied number only long enough to compare
+it with the stored number. The request timeout later performs another
+numeric lookup and can therefore send SIGKILL to an unrelated task that
+acquired the opener's PID.
+
+Retain a reference to the opener's struct pid, compare START against that
+object, use the same generation in the timeout callback, and drop the
+reference after release work drains and resets the device.
+
+On the exact target, a local production-path fixture reproduced SIGKILL
+to an independent reused-PID victim in three of three baseline boots. The
+fixed kernel rejected the mismatched generation in three of three boots.
+Normal I/O, near-negative rejection, cleanup and following-valid recovery
+each passed in matched baseline and fixed lanes.
+
+The demonstrated impact is cross-principal process termination after UBLK
+delegation. Memory corruption, information disclosure, privilege
+escalation, RCE and LPE were not demonstrated.
+
+Fixes: dd7a8507319e ("ublk: look up ublk task via its pid in timeout handler")
+Assisted-by: OpenAI Codex
+
+Signed-off-by: Sung Byeongchan <tjdqudcks0424@naver.com>
 ---
- drivers/block/nbd.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 1448ee63fab5..8c2cb312f209 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -2029,10 +2029,15 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs,
- 		goto out_free_work;
- 
- 	/*
--	 * Now publish the device.
-+	 * Now publish the device.  nbd->refs and nbd_total_devices are
-+	 * updated together under nbd_index_mutex, so a concurrent idr
-+	 * lookup either sees a fully initialised device or one that it has
-+	 * to skip because its refcount is still zero.
+ drivers/block/ublk_drv.c |   16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 3d322fa1bc831..deb0a179a88ad 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -11,6 +11,7 @@
+  */
+ #include <linux/module.h>
+ #include <linux/moduleparam.h>
++#include <linux/pid.h>
+ #include <linux/sched.h>
+ #include <linux/fs.h>
+ #include <linux/pagemap.h>
+@@ -345,6 +346,7 @@ struct ublk_device {
  	 */
-+	mutex_lock(&nbd_index_mutex);
- 	refcount_set(&nbd->refs, refs);
- 	nbd_total_devices++;
-+	mutex_unlock(&nbd_index_mutex);
- 	return nbd;
+ 	bool canceling;
+ 	pid_t 	ublksrv_tgid;
++	struct pid	*ublksrv_pid;
+ 	struct delayed_work	exit_work;
+ 	struct work_struct	partition_scan_work;
  
- out_free_work:
-@@ -2537,6 +2542,16 @@ static int populate_nbd_status(struct nbd_device *nbd, struct sk_buff *reply)
- 	u8 connected = 0;
- 	int ret;
+@@ -2130,18 +2132,16 @@ static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
+ static enum blk_eh_timer_return ublk_timeout(struct request *rq)
+ {
+ 	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
+-	pid_t tgid = ubq->dev->ublksrv_tgid;
++	struct pid *pid = ubq->dev->ublksrv_pid;
+ 	struct task_struct *p;
+-	struct pid *pid;
  
-+	/*
-+	 * nbd_dev_add() inserts the device into the idr before it is fully
-+	 * initialised and only publishes it (sets nbd->refs) after
-+	 * add_disk(); skip a device that is not published yet or is already
-+	 * going away, so that the walk never reports a device that
-+	 * nbd_total_devices does not account for.
-+	 */
-+	if (!refcount_read(&nbd->refs))
-+		return 0;
+ 	if (!(ubq->flags & UBLK_F_UNPRIVILEGED_DEV))
+ 		return BLK_EH_RESET_TIMER;
+ 
+-	if (unlikely(!tgid))
++	if (unlikely(!pid))
+ 		return BLK_EH_RESET_TIMER;
+ 
+ 	rcu_read_lock();
+-	pid = find_vpid(tgid);
+ 	p = pid_task(pid, PIDTYPE_PID);
+ 	if (p)
+ 		send_sig(SIGKILL, p, 0);
+@@ -2410,6 +2410,7 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
+ 		return -EBUSY;
+ 	filp->private_data = ub;
+ 	ub->ublksrv_tgid = current->tgid;
++	ub->ublksrv_pid = get_pid(task_tgid(current));
+ 	mutex_lock(&ub->cancel_mutex);
+ 	ub->ch_file = filp;
+ 	mutex_unlock(&ub->cancel_mutex);
+@@ -2633,6 +2634,7 @@ static void ublk_ch_release_work_fn(struct work_struct *work)
+ 	ublk_reset_ch_dev(ub);
+ 	mutex_unlock(&ub->mutex);
+ 	ublk_put_disk(disk);
++	put_pid(xchg(&ub->ublksrv_pid, NULL));
+ 	clear_bit(UB_STATE_OPEN, &ub->state);
+ 
+ 	/* put the reference grabbed in ublk_ch_release() */
+@@ -4530,11 +4532,13 @@ static struct ublk_device *ublk_get_device_from_id(int idx)
+ 
+ static bool ublk_validate_user_pid(struct ublk_device *ub, pid_t ublksrv_pid)
+ {
++	bool valid;
 +
- 	/* This is a little racey, but for status it's ok.  The
- 	 * reason we don't take a ref here is because we can't
- 	 * take a ref in the index == -1 case as we would need
--- 
-2.52.0
+ 	rcu_read_lock();
+-	ublksrv_pid = pid_nr(find_vpid(ublksrv_pid));
++	valid = find_vpid(ublksrv_pid) == ub->ublksrv_pid;
+ 	rcu_read_unlock();
+ 
+-	return ub->ublksrv_tgid == ublksrv_pid;
++	return valid;
+ }
+ 
+ static bool ublk_dev_ready_or_stopping(const struct ublk_device *ub)
 
+base-commit: d48723711bae9b8cdc56719c448ba42fef28cbee
+-- 
+2.43.0
