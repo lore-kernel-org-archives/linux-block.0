@@ -1,49 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.205.221.233
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794076852;
-	b=nYfjEj6+n17cE8x1TJkJzB5bmA2JUbzBVIdPOD/2NVQ3D19b75xxhOkCrS/DCdEpq2yh
-	 RiZTTi7oHBTyM/7FuKCjf5/GACUej804aguhYGmo1Wh9gT+ExNa91/lpxWaCwZQDzITYd
-	 4CQreKToa5bQ8nPenK2rrsVuUrpg+D543P1hVdqYQfN7yCatdp1Yq85mNL7DmVYKPhAKg
-	 IcE0EGY1FK1YKfcV2egnWt6UmuNjiq8yLXFmIraEIXeXaiWX88GZw/mLdgESyEFNUiFXN
-	 j1bhfHEMG4HXYLs25ZLh1ykBIJpYKTdIPbbHJBLD61jZiJ0eH6GPzHDQ4aYefAoF8Kg==
+	t=1794104520;
+	b=Zb/Qz46jzOzRNtugh6mby3cqCKh7RHf17CzeN97u/1LbSyUuDDM46/JZxANGIAeBbnE4
+	 D85Wr4xm687oy+BqVWEPA+dfDvfTT727mPoCCPqw4Hv4RSHoDRdzF5gMZEYj6OjYoqgVF
+	 3e8AYZGOS7UMshOKMRsFBoX/V3DiMzUk0WRyvNbzlXZ1snjqvctqYmje3kgwUVLj5qfBW
+	 q0wHPmpRFr3K/jN2306Ndfrsz2fnc735iD5v7OZHdCDy47RQ64E1hjyuLXyTzGjQTPLq8
+	 AQUzjAO7salDTlD9uFlXpDZQvMDo/j2H+caUMx1sEEcUor1z69k8l6l+J1fNONX1+rQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794076852;
-	h=DMARC-Filter:Received:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-CM-TRANSID:X-Coremail-Antispam:X-Originating-IP:X-CM-SenderInfo;
-	bh=zdiEcxNwGVrB6YYalrXEx8Hp97b1eyb3JieGMsPO9nU=;
-	b=Fcpxjl+nMZcLnONAV+BKa+cL1Cc4hMQwiHsV1d2Uy4LKmvmxS7uprrjf8jODg/abCDol
-	 XrDaR8Lph2R2mQgyy/hUoAn65WCmZDErZlTtYu6MtiuoIeAzxXQETXR5EIopCt8+7007Q
-	 JuHDehOSeNbOBRd4DKGbu5lYVyIM4Cr+n1Q5MT6RDScxH7x+Rc0bi8cg+ktVcTHtkdLoa
-	 WZiSyX0rTa+sH267TWKVnIZM5PLEGjVVPjfWY7m3o0/IQgybOzdrywnEKPlAZ+Svhi0qV
-	 46R6cB4GafIEABuozQBpnqZShawQkbAuZmtlJ7eAfigvjRuBqfVE4VXE+EQWzFUYAUQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794104520;
+	h=DMARC-Filter:DKIM-Signature:Received:X-QQ-mid:Message-ID:
+	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Cc:Subject:Date:X-OQ-MSGID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=Lg3LEB/Jnk5uLMaIenRlE8DmDu3jBUWxyp6bBvfT6DQ=;
+	b=yqHSGSwcmkobo0mCFtRYsipOxtaMNEAU6BW4Q64h9EjDAVhzvGWZNq7TZuqL8HXXVlov
+	 +4XNixpqiJQ7XjNzMn8w9pYyBOEhkCS0DhcUOXMEiKDK5mx3JooiDfcFDp0sPpLm4UOYI
+	 rXO1CsLrwQJnibC6dQgMI7O/stbiVp6KCHu4k6Eo0V71TQQjQHb8nVehvuPoofwF4ahLv
+	 azZUP4RgU1OJZkOt4xCjjjUhAarf1NcY6RnqauiLd9VwUG1X5VI6+EgfIR+QCsP+YFTQl
+	 BisbMNL8PVvbuQmLSyWlVU7zL5FmgS1wHvRfuG63wF3nmCEyN/CN1CbFEwxdFgJRnTw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=iscas.ac.cn;
-	spf=pass smtp.mailfrom=iscas.ac.cn;
-	arc=none smtp.remote-ip=159.226.251.25
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=qq.com;
+	spf=pass smtp.mailfrom=qq.com;
+	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=GUzworsT;
+	arc=none smtp.remote-ip=203.205.221.233
+Received: from out203-205-221-233.mail.qq.com (out203-205-221-233.mail.qq.com [203.205.221.233])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662AF606A32C;
-	Sat,  7 Nov 2026 18:40:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 662AF606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [172.100.0.8] (unknown [36.110.52.2])
-	by APP-05 (Coremail) with SMTP id zQCowAAnwrencO9q3lCKAA--.26875S2;
-	Sun, 08 Nov 2026 02:40:40 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: Haris Iqbal <haris.iqbal@cloud.ionos.com>
-Cc: axboe@kernel.dk, bvanassche@acm.org, danil.kipnis@cloud.ionos.com,
- jgg@ziepe.ca, jinpu.wang@ionos.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, vulab@iscas.ac.cn
-Subject: Re: [PATCH] rnbd-srv: Fix sess_dev use-after-free in process_msg_close()
-In-Reply-To: <CAJpMwyia7fYUOq=dj8E2FWnrtjZ9jHjZQSBW2vwB2vRBkbi2eA@mail.gmail.com>
-References: <20260916094817.2007756-1-vulab@iscas.ac.cn>
- <CAJpMwyia7fYUOq=dj8E2FWnrtjZ9jHjZQSBW2vwB2vRBkbi2eA@mail.gmail.com>
-Date: Sat, 07 Nov 2026 18:40:37 -0000
-Message-ID: <179407683769.2688956.17160102252423154559@iscas.ac.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3C1606A31A;
+	Sun,  8 Nov 2026 02:21:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5E3C1606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=GUzworsT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1794104515; bh=Lg3LEB/Jnk5uLMaIenRlE8DmDu3jBUWxyp6bBvfT6DQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=GUzworsTLh+htg+aDcAHBmfqqfpU1z6hPtvTJ1eLuCgENYo2oYRqOj1uWJxG0zCh2
+	 ZsEFfLztr1ebclBsRjMENDIXbqeVSVVkJw4nVwcuCoAOcRKe3xOoEfPuOhC/l9eYeZ
+	 aBs+gEDUfwGd6+Z+yHP2/HoO7YDnBFPkv8V/kI6I=
+Received: from shuai-VMware-Virtual-Platform ([223.88.55.201])
+	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
+	id 574A5C8D; Sun, 08 Nov 2026 10:21:52 +0800
+X-QQ-mid: xmsmtpt1794104512te6neevu0
+Message-ID: <tencent_3B0DCBAE7C555338AE85D8D0C4ABBB9E3406@qq.com>
+X-QQ-XMAILINFO: OD1YwH4pKZ9p0QbDbk6hacEWhO72VxVUu5E7qQ9D7OfYbt8GZEeLOXmz8XEzpq
+	 r2tYKZKT5daONjH+Hip4nVgqZxSyHv3kPZzCjb/DUP5dWSB/fnjWvfAy4h/gKLCXo5TmfuuyZo9o
+	 lypoXbgFThT24z2gVb9a+6JSa1X3dGMOxB7cJCUgYGoDGpD77egiOp/XcWdfDn0tIkQfPXIHIQLB
+	 lwL7ytke5Sfo7PRdH0+L9NARPViWYgRl+oNnpoI5u8cm8Opu1AbsZKLUeibiLKa2ebu3pcd8c1PJ
+	 b7hiT1XpYF6uiF7pj6yZWzQHOE4CYYs/rqQDctRICuTb+m8UFlvsNiF9D+4KWMiQIsUzypOXVt4D
+	 B0HGUPbCN86jy5hfHF6Ju+K+70AE/cktXzBx45kXrYgnCk0vZNIpqfYxcNukgZ8363lPW+X00z78
+	 PpM9nCicPqdgmVXQSmmU3/fuvZxFMFgQK72wwIhX1Ur3BtWabsl+VUg7JBdHsij/s4ep6lzUsUmX
+	 zEMeEn3rpLU+DPSarV2WHzrnzM9UpK8szs8+YznByZBMwJStmG7Ho8Usd4pVUNTUqYyMOTpY2d+e
+	 5XXQolwxhXDiif7RHS5cY8XImREzEdY2EZaWYEJzfSVzU0xdv+fOQU2X0VwaVxjtIXU3n9/wPEgW
+	 xFOddT/NLWYn6iG+3wQOwKWG+lP43XbtdrIB/hoymO49x/105jyKJ6dPyLH8NdGvxiCu7kwRn4jc
+	 M92XTXT3Pu9bfioHOgXPLfKNde7XhYE4nfWrF8F12VM9v2W5/1RgbNDIS3v7aGfroi782cOHSTV/
+	 AUcNj7dJexB8Y/F+ys+c0Ap1EBIhPGnmSblOSaH4uAKbIpazWOXSuky4cvEy2gYSg/+XoXQCl1bb
+	 vH3MAdBQNxPxKadpZ3nL0/zHAbmlLqyPAdG6h73ZpPTC+D1Zr25L3J776rFIidByRi73b935BkLI
+	 F2Mwt5e51Ijysn0G8FybSF75LYudyHa9i0gbKPyRt/7BufixrCLVVmus19aROkLwlRePl3fhLvzp
+	 dzmRSn3omEn6zLrRIIIGukGdHHgZk/NfMwwiVk9uph/QAXovDBpOES8bM5DeLIMkwt+DswFNwmgF
+	 FSE4Ro
+X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+From: Shuai Liu <847807867@qq.com>
+To: syzbot+1eb53c83ab8b0a0302a6@syzkaller.appspotmail.com
+Cc: axboe@kernel.dk,
+	ming.lei@redhat.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	Shuai Liu <847807867@qq.com>
+Subject: [PATCH] block: release queue freeze lockdep locks under mq_freeze_lock
+Date: Sun,  8 Nov 2026 10:21:32 +0800
+X-OQ-MSGID: <20261108022132.790657-1-847807867@qq.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <6acba905.8cdf6287.1eb53.00e4.GAE@google.com>
+References: <6acba905.8cdf6287.1eb53.00e4.GAE@google.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -53,60 +84,92 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAAnwrencO9q3lCKAA--.26875S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ur4kAw1UuF4rtw1fXw1UZFb_yoW8Wr18pF
-	yYkF4DArn0kr1IkFnrZa18WFy0yFW09a15Ar1furyUAay5Wa47trWftF1FvFZrCrs5Wa4j
-	qFn0gws5A398Z3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvv1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4UJVWxJr1le2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-	JF0_Jw1lYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI
-	7VAKI48JMxAIw28IcVCjz48v1sIEY20_Gr43Wr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
-	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
-	IFyTuYvjfUw5l8UUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRMEA2rvPcsj-QABsx
 
-Hi Haris,
+The lockdep model for the queue freeze owner decides whether to acquire
+the q_usage_counter io and queue lockdep maps based on
+mq_freeze_disk_dead and mq_freeze_queue_dying.  These two flags are
+re-sampled by blk_freeze_set_owner() whenever the freeze depth drops to
+zero, i.e. after the previous owner released its freeze.
 
-Sorry for the very late reply. Your message arrived when I was already
-behind on this thread, and then it sat far longer than it should have.
-That is my fault, not a sign that the report was unimportant.
+blk_mq_unfreeze_queue_nomemrestore() used to release the matching
+lockdep locks only after dropping mq_freeze_lock.  Between dropping the
+lock and reading the live flags a new freeze can run
+blk_freeze_set_owner() and flip the flags from false to true if the disk
+dies in that window.  The original owner then observes the flipped
+flags and skips the release, leaking both lockdep maps, which triggers
+"WARNING: lock held when returning to user space" with
+&q->q_usage_counter(io) and &q->q_usage_counter(queue) still held.
 
-I have now gone through the Sashiko report, and it is right: the patch is
-wrong in exactly the way it describes.
+Perform the lockdep release while still holding mq_freeze_lock so that
+blk_freeze_set_owner() cannot interleave and the flags observed at
+release match the values sampled at acquire time.
 
-process_msg_close() takes a kref with rnbd_get_sess_dev() and then calls
-rnbd_srv_destroy_dev_session_sysfs(). That kobject_put() drops the last
-kobject reference, so rnbd_srv_sess_dev_release() -> rnbd_destroy_sess_dev()
-runs synchronously in the same thread, still under srv_sess->lock. That
-function does rnbd_put_sess_dev() and then waits on destroy_comp, but the
-reference this thread holds is only dropped after the wait returns. So a
-single CLOSE from a client hangs the teardown thread with the session lock
-held - I traded the race for a guaranteed deadlock, which is worse than
-what I set out to fix.
+Fixes: 6f491a8d4b92 ("block: track disk DEAD state automatically for modeling queue freeze lockdep")
+Reported-by: syzbot+1eb53c83ab8b0a0302a6@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?id=1eb53c83ab8b0a0302a6
+Signed-off-by: Shuai Liu <847807867@qq.com>
+---
+ block/blk-mq.c | 30 ++++++++++++++++++++++++------
+ 1 file changed, 24 insertions(+), 6 deletions(-)
 
-While checking this against the current tree I also found that the race
-itself has meanwhile been fixed upstream:
-
-  4912dab88baa ("rnbd-srv: fix use-after-free on two CLOSE messages")
-
-It takes srv_sess->lock first and looks the ID up with xa_load() under it,
-so a second teardown of the same ID finds nothing. It is in v7.4-rc1, and
-it also covers the force_close() interleaving that my patch was trying to
-address. A v2 of my patch would therefore only duplicate work that is
-already merged, so please drop this one - there is nothing here for you to
-apply.
-
-Thanks for pointing me at the Sashiko report.
-
-Regards,
-Wentao
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 025a799f35b9..db769c7c88ff 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -208,11 +208,10 @@ void blk_mq_freeze_queue_nomemsave(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_nomemsave);
+ 
+-bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
++/* caller has to hold q->mq_freeze_lock */
++static bool __blk_mq_unfreeze_queue_locked(struct request_queue *q,
++					   bool force_atomic)
+ {
+-	bool unfreeze;
+-
+-	mutex_lock(&q->mq_freeze_lock);
+ 	if (force_atomic)
+ 		q->q_usage_counter.data->force_atomic = true;
+ 	q->mq_freeze_depth--;
+@@ -221,7 +220,15 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
+ 		percpu_ref_resurrect(&q->q_usage_counter);
+ 		wake_up_all(&q->mq_freeze_wq);
+ 	}
+-	unfreeze = blk_unfreeze_check_owner(q);
++	return blk_unfreeze_check_owner(q);
++}
++
++bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
++{
++	bool unfreeze;
++
++	mutex_lock(&q->mq_freeze_lock);
++	unfreeze = __blk_mq_unfreeze_queue_locked(q, force_atomic);
+ 	mutex_unlock(&q->mq_freeze_lock);
+ 
+ 	return unfreeze;
+@@ -229,8 +236,19 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
+ 
+ void blk_mq_unfreeze_queue_nomemrestore(struct request_queue *q)
+ {
+-	if (__blk_mq_unfreeze_queue(q, false))
++	mutex_lock(&q->mq_freeze_lock);
++	/*
++	 * Release the lockdep freeze locks while still holding
++	 * mq_freeze_lock.  blk_freeze_set_owner() re-samples
++	 * mq_freeze_disk_dead/mq_freeze_queue_dying once the freeze depth
++	 * reaches zero, and reading the flags after dropping the lock races
++	 * with that re-sampling: if the disk died in between, the flags flip
++	 * and the release is skipped even though the matching acquire
++	 * grabbed the locks, leaking them.
++	 */
++	if (__blk_mq_unfreeze_queue_locked(q, false))
+ 		blk_unfreeze_release_lock(q);
++	mutex_unlock(&q->mq_freeze_lock);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue_nomemrestore);
+ 
+-- 
+2.53.0
 
