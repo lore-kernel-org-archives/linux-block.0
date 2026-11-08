@@ -1,80 +1,67 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.205.221.233
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.127.231.59
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794104520;
-	b=Zb/Qz46jzOzRNtugh6mby3cqCKh7RHf17CzeN97u/1LbSyUuDDM46/JZxANGIAeBbnE4
-	 D85Wr4xm687oy+BqVWEPA+dfDvfTT727mPoCCPqw4Hv4RSHoDRdzF5gMZEYj6OjYoqgVF
-	 3e8AYZGOS7UMshOKMRsFBoX/V3DiMzUk0WRyvNbzlXZ1snjqvctqYmje3kgwUVLj5qfBW
-	 q0wHPmpRFr3K/jN2306Ndfrsz2fnc735iD5v7OZHdCDy47RQ64E1hjyuLXyTzGjQTPLq8
-	 AQUzjAO7salDTlD9uFlXpDZQvMDo/j2H+caUMx1sEEcUor1z69k8l6l+J1fNONX1+rQ==
+	t=1794107928;
+	b=2ycGQ5zgC/ToUUnSlX8capnoKa5iZjyHgX34rbgwHapMBl37DSgNJl0mc1NzvooL/AH3
+	 BfutGg5vxIjYlFYsf1y7fA4GnTs9ncIWQ1Cvdk4y1wyDC2/6vTiifUKWQ/uIKQjccr5tK
+	 LOe2F2+lyKaEq2AQaXdhlQflxG909+6WyqzfWH7OmlDBG1fKvfVSeUVAYqe7wn0A5FDAb
+	 o2PLvh9o7iU0EOalwV30MG3o9gUvK50oEgVvPNGbkWlBoCnCtXnywyaZZQY5VHmA91IMj
+	 vvkoE6sMl7lpXV/jteGtV68Tjhpd/8F2YG1jEQLJ++zmHcOWKSX2zc/nRYiN+JNQgIA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794104520;
-	h=DMARC-Filter:DKIM-Signature:Received:X-QQ-mid:Message-ID:
-	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Cc:Subject:Date:X-OQ-MSGID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=Lg3LEB/Jnk5uLMaIenRlE8DmDu3jBUWxyp6bBvfT6DQ=;
-	b=yqHSGSwcmkobo0mCFtRYsipOxtaMNEAU6BW4Q64h9EjDAVhzvGWZNq7TZuqL8HXXVlov
-	 +4XNixpqiJQ7XjNzMn8w9pYyBOEhkCS0DhcUOXMEiKDK5mx3JooiDfcFDp0sPpLm4UOYI
-	 rXO1CsLrwQJnibC6dQgMI7O/stbiVp6KCHu4k6Eo0V71TQQjQHb8nVehvuPoofwF4ahLv
-	 azZUP4RgU1OJZkOt4xCjjjUhAarf1NcY6RnqauiLd9VwUG1X5VI6+EgfIR+QCsP+YFTQl
-	 BisbMNL8PVvbuQmLSyWlVU7zL5FmgS1wHvRfuG63wF3nmCEyN/CN1CbFEwxdFgJRnTw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794107928;
+	h=DMARC-Filter:DKIM-Signature:Date:X-Original-From:Content-Type:Cc:
+	 Subject:User-Agent:Received:References:Content-Transfer-Encoding:From:
+	 Reply-To:To:In-Reply-To:X-Lms-Return-Path:Message-Id:Mime-Version;
+	bh=hMhZT7psbWLR091aTqQWUxBezLC3JgL6hyV2GB3JK9A=;
+	b=N8TDTUwnN4URxiw9IqGsI5Epwrd94IDvAGaibgwuHLc+B2TK0F6b3pv7qPxo5lbC0a7B
+	 AcsREhMTuIwPTi9JiobsRLQKXwYIXrI0zHCKF55vrXIvK+SMihjNwVcrMreB8fIW3bnt/
+	 usGk8QMIOmtP0AhxtYOA+fSOYKOrXHwtA5EhcvPUlGPTmOWSihJh6SUL74KvUJwLrc/XD
+	 ZA9lUQAw27KpCXgLCqnU3udrIUz6JgO1418T8WxVe2+8MXTmplU1Wx6mj7NcCgZrMXLvd
+	 kgA0c0RPdvUKCmAIj786espyKEGbgHYoYC0O0kn0Dl8CkY3RdLjxKllPZHcP9p4gKQw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=qq.com;
-	spf=pass smtp.mailfrom=qq.com;
-	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=GUzworsT;
-	arc=none smtp.remote-ip=203.205.221.233
-Received: from out203-205-221-233.mail.qq.com (out203-205-221-233.mail.qq.com [203.205.221.233])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=fygo.io;
+	spf=pass smtp.mailfrom=fygo.io;
+	dkim=pass header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b="hkmOTbD/";
+	arc=none smtp.remote-ip=209.127.231.59
+Received: from va-2-59.ptr.blmpb.com (va-2-59.ptr.blmpb.com [209.127.231.59])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3C1606A31A;
-	Sun,  8 Nov 2026 02:21:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5E3C1606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71936606A31A
+	for <linux-block@vger.kernel.org>; Sun,  8 Nov 2026 03:18:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71936606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=GUzworsT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1794104515; bh=Lg3LEB/Jnk5uLMaIenRlE8DmDu3jBUWxyp6bBvfT6DQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=GUzworsTLh+htg+aDcAHBmfqqfpU1z6hPtvTJ1eLuCgENYo2oYRqOj1uWJxG0zCh2
-	 ZsEFfLztr1ebclBsRjMENDIXbqeVSVVkJw4nVwcuCoAOcRKe3xOoEfPuOhC/l9eYeZ
-	 aBs+gEDUfwGd6+Z+yHP2/HoO7YDnBFPkv8V/kI6I=
-Received: from shuai-VMware-Virtual-Platform ([223.88.55.201])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id 574A5C8D; Sun, 08 Nov 2026 10:21:52 +0800
-X-QQ-mid: xmsmtpt1794104512te6neevu0
-Message-ID: <tencent_3B0DCBAE7C555338AE85D8D0C4ABBB9E3406@qq.com>
-X-QQ-XMAILINFO: OD1YwH4pKZ9p0QbDbk6hacEWhO72VxVUu5E7qQ9D7OfYbt8GZEeLOXmz8XEzpq
-	 r2tYKZKT5daONjH+Hip4nVgqZxSyHv3kPZzCjb/DUP5dWSB/fnjWvfAy4h/gKLCXo5TmfuuyZo9o
-	 lypoXbgFThT24z2gVb9a+6JSa1X3dGMOxB7cJCUgYGoDGpD77egiOp/XcWdfDn0tIkQfPXIHIQLB
-	 lwL7ytke5Sfo7PRdH0+L9NARPViWYgRl+oNnpoI5u8cm8Opu1AbsZKLUeibiLKa2ebu3pcd8c1PJ
-	 b7hiT1XpYF6uiF7pj6yZWzQHOE4CYYs/rqQDctRICuTb+m8UFlvsNiF9D+4KWMiQIsUzypOXVt4D
-	 B0HGUPbCN86jy5hfHF6Ju+K+70AE/cktXzBx45kXrYgnCk0vZNIpqfYxcNukgZ8363lPW+X00z78
-	 PpM9nCicPqdgmVXQSmmU3/fuvZxFMFgQK72wwIhX1Ur3BtWabsl+VUg7JBdHsij/s4ep6lzUsUmX
-	 zEMeEn3rpLU+DPSarV2WHzrnzM9UpK8szs8+YznByZBMwJStmG7Ho8Usd4pVUNTUqYyMOTpY2d+e
-	 5XXQolwxhXDiif7RHS5cY8XImREzEdY2EZaWYEJzfSVzU0xdv+fOQU2X0VwaVxjtIXU3n9/wPEgW
-	 xFOddT/NLWYn6iG+3wQOwKWG+lP43XbtdrIB/hoymO49x/105jyKJ6dPyLH8NdGvxiCu7kwRn4jc
-	 M92XTXT3Pu9bfioHOgXPLfKNde7XhYE4nfWrF8F12VM9v2W5/1RgbNDIS3v7aGfroi782cOHSTV/
-	 AUcNj7dJexB8Y/F+ys+c0Ap1EBIhPGnmSblOSaH4uAKbIpazWOXSuky4cvEy2gYSg/+XoXQCl1bb
-	 vH3MAdBQNxPxKadpZ3nL0/zHAbmlLqyPAdG6h73ZpPTC+D1Zr25L3J776rFIidByRi73b935BkLI
-	 F2Mwt5e51Ijysn0G8FybSF75LYudyHa9i0gbKPyRt/7BufixrCLVVmus19aROkLwlRePl3fhLvzp
-	 dzmRSn3omEn6zLrRIIIGukGdHHgZk/NfMwwiVk9uph/QAXovDBpOES8bM5DeLIMkwt+DswFNwmgF
-	 FSE4Ro
-X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
-From: Shuai Liu <847807867@qq.com>
-To: syzbot+1eb53c83ab8b0a0302a6@syzkaller.appspotmail.com
-Cc: axboe@kernel.dk,
-	ming.lei@redhat.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	Shuai Liu <847807867@qq.com>
-Subject: [PATCH] block: release queue freeze lockdep locks under mq_freeze_lock
-Date: Sun,  8 Nov 2026 10:21:32 +0800
-X-OQ-MSGID: <20261108022132.790657-1-847807867@qq.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <6acba905.8cdf6287.1eb53.00e4.GAE@google.com>
-References: <6acba905.8cdf6287.1eb53.00e4.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=hkmOTbD/
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1794107922;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=hMhZT7psbWLR091aTqQWUxBezLC3JgL6hyV2GB3JK9A=;
+ b=hkmOTbD/mE2L9g3rImX7p8kDc8PjYRUdlMoL9iXg39p3gqLT1T4sTXFGUURll9W/cADouD
+ M7Tca8zRYKvaGfiQrm8MtQp0H1wuUnNYfrkH0UnsKrEr+nuTX64PJTLwO7s/Gf/F2Tmggt
+ NBlD0LHTKh0sgdMOfMtDrRtz7ElaRjsqPY9YbuXoSAtld7vs0lnvFgN5/MkX5892C8Vws7
+ wRL2aXI02yP3KEt722vMs+l2MSVXqPQ3EcxwldPK1U+wfwGcI9muWZrzM2zU71seBG3xXA
+ 3eOjM4DIXtDHLEiApQS7RKh/qruNo76DD2EuRGqRqYSs0QFQ6pkm1pNUwoteRg==
+Date: Sun, 8 Nov 2026 11:18:38 +0800
+X-Original-From: yu kuai <yukuai@fygo.io>
+Content-Type: text/plain; charset=UTF-8
+Cc: <syzbot+cd254889291ef8666036@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] md: avoid block autoload while importing rdev under reconfig_mutex
+User-Agent: Mozilla Thunderbird
+Received: from [192.168.1.104] ([39.182.0.55]) by smtp.larksuite.com with ESMTPS; Sun, 08 Nov 2026 03:18:41 +0000
+References: <20261103115530.2913093-1-wangjichen@kaihong.com>
+Content-Transfer-Encoding: quoted-printable
+From: "yu kuai" <yukuai@fygo.io>
+Reply-To: yukuai@fygo.io
+To: "Wang Jichen" <wangjichen@kaihong.com>, "Jens Axboe" <axboe@kernel.dk>, 
+	"Song Liu" <song@kernel.org>, "Li Nan" <magiclinan@didiglobal.com>, 
+	"Xiao Ni" <xiao@kernel.org>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, <linux-raid@vger.kernel.org>, 
+	"yu kuai" <yukuai@fygo.io>
+In-Reply-To: <20261103115530.2913093-1-wangjichen@kaihong.com>
+X-Lms-Return-Path: <lba+26aefea12+6aac98+vger.kernel.org+yukuai@fygo.io>
+Message-Id: <90fee426-1a0c-4964-bf20-8175a64917a4@fygo.io>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -83,93 +70,117 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
 
-The lockdep model for the queue freeze owner decides whether to acquire
-the q_usage_counter io and queue lockdep maps based on
-mq_freeze_disk_dead and mq_freeze_queue_dying.  These two flags are
-re-sampled by blk_freeze_set_owner() whenever the freeze depth drops to
-zero, i.e. after the previous owner released its freeze.
+Hi,
 
-blk_mq_unfreeze_queue_nomemrestore() used to release the matching
-lockdep locks only after dropping mq_freeze_lock.  Between dropping the
-lock and reading the live flags a new freeze can run
-blk_freeze_set_owner() and flip the flags from false to true if the disk
-dies in that window.  The original owner then observes the flipped
-flags and skips the release, leaking both lockdep maps, which triggers
-"WARNING: lock held when returning to user space" with
-&q->q_usage_counter(io) and &q->q_usage_counter(queue) still held.
+=E5=9C=A8 2026/11/3 19:55, Wang Jichen =E5=86=99=E9=81=93:
+> From: wangjichen <wangjichen@kaihong.com>
+>
+> md_import_device() runs with mddev->reconfig_mutex held from md_ioctl().
+> Opening a member disk via bdev_file_open_by_dev() triggers legacy block
+> autoload (blk_probe_dev), which takes major_names_lock. md_probe() can
+> run under that lock and call md_alloc(), which takes disks_mutex and
+> reconfig_mutex =E2=80=94 a lockdep ABBA with the ioctl path.
 
-Perform the lockdep release while still holding mq_freeze_lock so that
-blk_freeze_set_owner() cannot interleave and the flags observed at
-release match the values sampled at acquire time.
+Is this a real deadlock? mddev is already existed from md_import_device(),
+while md_alloc() just allocate a new mddev, so the reconfig_mtuex is not
+the same.
 
-Fixes: 6f491a8d4b92 ("block: track disk DEAD state automatically for modeling queue freeze lockdep")
-Reported-by: syzbot+1eb53c83ab8b0a0302a6@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?id=1eb53c83ab8b0a0302a6
-Signed-off-by: Shuai Liu <847807867@qq.com>
----
- block/blk-mq.c | 30 ++++++++++++++++++++++++------
- 1 file changed, 24 insertions(+), 6 deletions(-)
+>
+> Add bdev_file_open_by_dev_autoload() and use autoload=3Dfalse from
+> md_import_device(); member devices must already be present in the
+> block layer (normal mdadmin usage).
+>
+> Link: https://syzbot.org/bug?extid=3Dcd254889291ef8666036
+> Reported-by: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com
+> Tested-by: Wang Jichen <wangjichen@kaihong.com>
+> Signed-off-by: Wang Jichen <wangjichen@kaihong.com>
+> ---
+>   block/bdev.c           | 13 ++++++++++---
+>   drivers/md/md.c        |  8 ++++++--
+>   include/linux/blkdev.h |  2 ++
+>   3 files changed, 18 insertions(+), 5 deletions(-)
+>
+> diff --git a/block/bdev.c b/block/bdev.c
+> index f20f91b31..e78936556 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -1076,8 +1076,8 @@ static unsigned blk_to_file_flags(blk_mode_t mode)
+>   	return flags;
+>   }
+>  =20
+> -struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *hol=
+der,
+> -				   const struct blk_holder_ops *hops)
+> +struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode,
+> +		void *holder, const struct blk_holder_ops *hops, bool autoload)
+>   {
+>   	struct file *bdev_file;
+>   	struct block_device *bdev;
+> @@ -1088,7 +1088,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_m=
+ode_t mode, void *holder,
+>   	if (ret)
+>   		return ERR_PTR(ret);
+>  =20
+> -	bdev =3D blkdev_get_no_open(dev, true);
+> +	bdev =3D blkdev_get_no_open(dev, autoload);
+>   	if (!bdev)
+>   		return ERR_PTR(-ENXIO);
+>  =20
+> @@ -1110,6 +1110,13 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_=
+mode_t mode, void *holder,
+>   	}
+>   	return bdev_file;
+>   }
+> +EXPORT_SYMBOL(bdev_file_open_by_dev_autoload);
+> +
+> +struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *hol=
+der,
+> +				   const struct blk_holder_ops *hops)
+> +{
+> +	return bdev_file_open_by_dev_autoload(dev, mode, holder, hops, true);
+> +}
+>   EXPORT_SYMBOL(bdev_file_open_by_dev);
+>  =20
+>   struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 03e35386a..d3717e2e8 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -3858,9 +3858,13 @@ static struct md_rdev *md_import_device(dev_t newd=
+ev, int super_format, int supe
+>   	if (err)
+>   		goto out_clear_rdev;
+>  =20
+> -	rdev->bdev_file =3D bdev_file_open_by_dev(newdev,
+> +	/*
+> +	 * md_ioctl() holds reconfig_mutex; legacy autoload in bdev open takes
+> +	 * major_names_lock via blk_probe_dev() and can deadlock with md_probe(=
+).
+> +	 */
+> +	rdev->bdev_file =3D bdev_file_open_by_dev_autoload(newdev,
+>   			BLK_OPEN_READ | BLK_OPEN_WRITE,
+> -			super_format =3D=3D -2 ? &claim_rdev : rdev, NULL);
+> +			super_format =3D=3D -2 ? &claim_rdev : rdev, NULL, false);
+>   	if (IS_ERR(rdev->bdev_file)) {
+>   		pr_warn("md: could not open device unknown-block(%u,%u).\n",
+>   			MAJOR(newdev), MINOR(newdev));
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 0c2010230..e5121101a 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1699,6 +1699,8 @@ struct blk_holder_ops {
+>  =20
+>   struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *ho=
+lder,
+>   		const struct blk_holder_ops *hops);
+> +struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode,
+> +		void *holder, const struct blk_holder_ops *hops, bool autoload);
+>   struct file *bdev_file_open_by_path(const char *path, blk_mode_t mode,
+>   		void *holder, const struct blk_holder_ops *hops);
+>   int bd_prepare_to_claim(struct block_device *bdev, void *holder,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 025a799f35b9..db769c7c88ff 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -208,11 +208,10 @@ void blk_mq_freeze_queue_nomemsave(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_nomemsave);
- 
--bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
-+/* caller has to hold q->mq_freeze_lock */
-+static bool __blk_mq_unfreeze_queue_locked(struct request_queue *q,
-+					   bool force_atomic)
- {
--	bool unfreeze;
--
--	mutex_lock(&q->mq_freeze_lock);
- 	if (force_atomic)
- 		q->q_usage_counter.data->force_atomic = true;
- 	q->mq_freeze_depth--;
-@@ -221,7 +220,15 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- 		percpu_ref_resurrect(&q->q_usage_counter);
- 		wake_up_all(&q->mq_freeze_wq);
- 	}
--	unfreeze = blk_unfreeze_check_owner(q);
-+	return blk_unfreeze_check_owner(q);
-+}
-+
-+bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
-+{
-+	bool unfreeze;
-+
-+	mutex_lock(&q->mq_freeze_lock);
-+	unfreeze = __blk_mq_unfreeze_queue_locked(q, force_atomic);
- 	mutex_unlock(&q->mq_freeze_lock);
- 
- 	return unfreeze;
-@@ -229,8 +236,19 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- 
- void blk_mq_unfreeze_queue_nomemrestore(struct request_queue *q)
- {
--	if (__blk_mq_unfreeze_queue(q, false))
-+	mutex_lock(&q->mq_freeze_lock);
-+	/*
-+	 * Release the lockdep freeze locks while still holding
-+	 * mq_freeze_lock.  blk_freeze_set_owner() re-samples
-+	 * mq_freeze_disk_dead/mq_freeze_queue_dying once the freeze depth
-+	 * reaches zero, and reading the flags after dropping the lock races
-+	 * with that re-sampling: if the disk died in between, the flags flip
-+	 * and the release is skipped even though the matching acquire
-+	 * grabbed the locks, leaking them.
-+	 */
-+	if (__blk_mq_unfreeze_queue_locked(q, false))
- 		blk_unfreeze_release_lock(q);
-+	mutex_unlock(&q->mq_freeze_lock);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue_nomemrestore);
- 
--- 
-2.53.0
-
+--=20
+Thanks,
+Kuai
