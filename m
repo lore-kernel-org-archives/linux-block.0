@@ -1,54 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.2
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.114
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794157588;
-	b=TBEAjDn5WXcGW9+fmkIXjGzqORxIK5G9nOXKHkPw4DBmzAa6Y5moq9cwh3UJgk8lK7s1
-	 BAk9KWmXpta5ezJ+rBZ3jWPZ8WqpAbqII2zh1Ygi9RZYXLsAjX4uFHs4+xiaO90Ud6IRX
-	 sQ1w/Pn4J7m/GkefF4uGtS+6jPNGS1pIZ2+cBdiMxgxXDCYNnv2VrVaZs6vz7XtcWgQA6
-	 OPJCnQElt2We94shDN0DoLJnY4GY3Dprnt+jXOj2wO1mbTjizI0TZKtH5bl81fyrNgYw2
-	 yItzBxLEDMTrzMt0T5GlO4TK2rLzGRHskOv+Pa3WSDNDWV4221NhFgrN75mLnZJJL9A==
+	t=1794158001;
+	b=Fz+hAlh89YItLlU9r6WXvwR7vE79cKAyEknnaPz9b39FLkWl9azL4Icnz9HqQmQVk66X
+	 b4rn7TjuGAsGkG8JY6T0LGe+fZ3ijci2vRKoHhhIgJJwN90EjL170yGR7JMAlE7kejpjU
+	 P0y4dvdDoc0CoGq1mMOabt+RzpEoLdXnRS//Hpb+u9WN3J3JnjWW+8Tz9JCwt6DLINBHi
+	 vINUxomgkAmi+FCD+gstLDLwr86uA7YXYYbDzkU1Rgm3lCips+iyRPIl/k6dFqMFftIs4
+	 Qlbrq+KTauRM1BFwekRwSlDoUK7Yq1ZMavw38YXXobuQ1BjGeAfIbs7zRMq6jB64TxQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794157588;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794158001;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
 	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=IEd3jpYcDB0NK70MyV6liue2t6+43KsA976DKWNPe50=;
-	b=e8GQxysJhNRXAzZSjo3WLTq/SXRrhmVPH2vmSHpT1FOr0/kp5eJmRu2pSaqswuMtIw1x
-	 3l4z0DgMsFpKb0zNz/UYDavAOflGDyd3lrOk8KRdCWzlK+zbQBsOddy9OUX+9wZFg2Fl2
-	 isk71cbcIDP1KxLlKns5qc7PeLoDupLn+AFkYXhXXZ5xQwK3uUehkWiL9TRK8uyrm2suz
-	 bUwwLGxKoDhifNVnr/j58AxvrE/GPtZ6cpkt7pLXh6swcxGFbHryCQtnaE36P0hwQ6DQD
-	 kkuHvXQABUC+IBrBCIenb0kX63K+YWg/HwnwyTiK4g0DFWAUsh6MzpKIYTnllAT6QhA==
+	bh=iPoTbsPUcaAQM8kPYpsKksGB/wxM72SDm8WasouMY9c=;
+	b=b4gCvt7rb6sdhMetKMRjfe6dnvdqNvHQUWtR8juln5FzALBVdpcI4OUWXNZf0erlXNM2
+	 zK3jJO5wD0DAYQQL8GtH9iSgUaB61Ar1FXI904cDexGzBiToWgPlh/FdXzUvD5UqcKZ88
+	 QaHF7U8nKcN+5oA6CYgtUFhLoK5GW2do+O0CuCdL4xoL3ktuiF5ftqegd9/HaawB5/5RZ
+	 7/HL+dePLwHaqktjNaDa/OgU20RulA81/nzzgi3sCoOmpkX2P+cuNKmz9qyhpe7cgnH5d
+	 qbVSWPtdbkkfZX2wPEp12T5a2Rl4oAJNiQ0NJscVApOcBwssO/UO1yoaTt3XSWeIxgg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=V9MbJkdE;
-	arc=none smtp.remote-ip=91.218.175.2
-Received: from mta0.migadu.com (out-2.mta0.migadu.com [91.218.175.2])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VpIad7wD;
+	arc=none smtp.remote-ip=95.215.58.114
+Received: from mta1.migadu.com (out-114.mta1.migadu.com [95.215.58.114])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD20606A320
-	for <linux-block@vger.kernel.org>; Sun,  8 Nov 2026 17:06:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8FD20606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27FC606A320
+	for <linux-block@vger.kernel.org>; Sun,  8 Nov 2026 17:13:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D27FC606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=V9MbJkdE
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VpIad7wD
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=JkojSWXaqiTE4m7MsVL3k+FVelopN8MwdLMIVVaO17Q=;
+DKIM-Signature: a=rsa-sha256; bh=amKArKTv82RVKkSYoJyK4ALaBbAyN8c1ugX/yaRdhmY=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794157584; v=1; x=1794762384;
- b=V9MbJkdENmHNBeEfotWF+AMWMIuReMh3cMogaPPYpCteLNr+wC4V4KGEcKLFKMuaUjS7dHr/
- K3ddnXkXT3nWGA9mOrrn7vgz69jBW10m45EYdgFgK++emJu4r7GNjQhBNSwqNOvXs2uzQk34NmS
- fcetf0UxKuqHf3DfXX0TdLSY=
+ t=1794157997; v=1; x=1794762797;
+ b=VpIad7wDzyi+WfpCMwKx+0fjfyQFA24/hrUxTtg6N45SewVcLETXoYftLqEpwZA1jsaP9u3f
+ YuL7nRH9xvpSaQuUhyua6wcAJ8JPJF/8+vVuJvUJE8/pmiboSPWaw61irk+FCn7GnOE4lH0k4Gw
+ Qn++M/iOazBZzh5kdyqxq2U8=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta11.migadu.com with ESMTPS id 89021f10fe198751;
-	Sun, 08 Nov 2026 17:06:24 +0000
-X-Mizu-Trace-ID: 89021f10fe198751
+Received: by mta12.migadu.com with ESMTPS id f91c847ed652e982;
+	Sun, 08 Nov 2026 17:13:17 +0000
+X-Mizu-Trace-ID: f91c847ed652e982
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <3fc46788-d86d-44c5-8606-385d96fede4d@linux.dev>
-Date: Sun, 8 Nov 2026 17:06:21 +0000
+Message-ID: <6bc16c54-a9f1-4c51-ab68-b227eeecaf66@linux.dev>
+Date: Sun, 8 Nov 2026 17:13:16 +0000
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,78 +59,63 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] iomap: remove the atomic write length check in
- iomap_dio_bio_iter_one()
+Subject: Re: [PATCH 1/2] block: fail a short atomic bounce in
+ bio_iov_iter_bounce_write()
 To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
  Christian Brauner <brauner@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
  linux-fsdevel@vger.kernel.org
 References: <20261107-blkdev-atomic-bounce-v1-0-f66344262096@columbia.edu>
- <20261107-blkdev-atomic-bounce-v1-2-f66344262096@columbia.edu>
+ <20261107-blkdev-atomic-bounce-v1-1-f66344262096@columbia.edu>
 Content-Language: en-US
 From: John Garry <john.garry@linux.dev>
-In-Reply-To: <20261107-blkdev-atomic-bounce-v1-2-f66344262096@columbia.edu>
+In-Reply-To: <20261107-blkdev-atomic-bounce-v1-1-f66344262096@columbia.edu>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/8/26 04:24, Tal Zussman wrote:
-> bio_iov_iter_get_pages() and bio_iov_iter_bounce_write() now fail a
-> REQ_ATOMIC bio that doesn't cover the whole iterator, so the bio here
-> always covers iomap_length() and the check can't trigger. Remove the
-> check.
+> bio_iov_iter_get_pages() fails a REQ_ATOMIC bio that doesn't cover the
+> whole iterator, since an atomic write is submitted as a single bio, and
+> submitting only part of it would tear the write. In contrast,
+> bio_iov_iter_bounce_write() doesn't. If a folio allocation fails partway
+> through, it returns a short bio, which for an atomic write triggers a
+> WARN_ON_ONCE() in iomap_dio_bio_iter_one().
 > 
-> Suggested-by: John Garry <john.garry@linux.dev>
-> Link: https://lore.kernel.org/all/82978d5c-3e08-48e9-bf0a-7913e1cd0507@linux.dev/
+> Make bio_iov_iter_bounce_write() also check that a REQ_ATOMIC bio covers
+> the whole iterator, and clean up and return -EINVAL if it doesn't.
+> 
 > Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 
-Reviewed-by: John Garry <john.garry@linux.dev>
-
-This looks ok. But I am just thinking that a CoW-based atomic write does 
-not have the single bio restriction, so we don't need to fail the atomic 
-in this case. However, we should have consistent rules for iovec's 
-whether it's a block device or regular file for ext4 or xfs, so this 
-makes sense.
-
-thanks
-
-BTW, you could be a real hero and add an xfstests case for this also.
+This looks reasonable, as atomic stable writes are implied to be 
+supported from 3373503df025a ("xfs: use bounce buffering direct I/O when 
+the device requires stable pages"). I am wondering how to test and prove 
+this (change is good and maintained)?
 
 > ---
->   fs/iomap/direct-io.c | 14 --------------
->   1 file changed, 14 deletions(-)
+>   block/bio.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
 > 
-> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> index ad041ac3252a..aca7cbaea4af 100644
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -370,15 +370,6 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_iter *iter,
->   		goto out_put_bio;
->   	ret = bio->bi_iter.bi_size;
+> diff --git a/block/bio.c b/block/bio.c
+> index b0fcc69de653..61a3812520a2 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1523,6 +1523,16 @@ int bio_iov_iter_bounce_write(struct bio *bio, struct iov_iter *iter,
+>   		}
+>   	}
 >   
-> -	/*
-> -	 * An atomic write bio must cover the complete length.  If it doesn't,
-> -	 * error out.
-> -	 */
-> -	if ((op & REQ_ATOMIC) && WARN_ON_ONCE(ret != iomap_length(iter))) {
-> -		ret = -EINVAL;
-> -		goto out_bio_release_pages;
-> -	}
-> -
->   	if (dio->flags & IOMAP_DIO_WRITE)
->   		task_io_account_write(ret);
->   	else if ((dio->flags & IOMAP_DIO_USER_BACKED) &&
-> @@ -393,11 +384,6 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_iter *iter,
->   	iomap_dio_submit_bio(iter, dio, bio, pos);
->   	return ret;
->   
-> -out_bio_release_pages:
-> -	if (dio->flags & IOMAP_DIO_BOUNCE)
-> -		bio_free_folios(bio);
-> -	else
-> -		bio_release_pages(bio, false);
->   out_put_bio:
->   	bio_put(bio);
->   	return ret;
+> +	/*
+> +	 * An atomic write is submitted as a single bio, so it has to cover
+> +	 * the whole iterator or it would be torn.
+> +	 */
+> +	if ((bio->bi_opf & REQ_ATOMIC) && iov_iter_count(iter)) {
+> +		iov_iter_revert(iter, total_copied);
+> +		bio_free_folios(bio);
+> +		return -EINVAL;
+> +	}
+> +
+>   	return 0;
+>   }
+>   EXPORT_SYMBOL_GPL(bio_iov_iter_bounce_write);
 > 
 
