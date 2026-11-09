@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794248746;
-	b=b2b09CQdB1vOy4DXU+Ee42OYSEYYBo1Kr1zXnS4WSJ9Z+AGrWFFsoXxj+4ZUzqaX/b7a
-	 Ir7LmZc8IQChkFrZ/lMYR4qH6zGNNOiU4ADUf1s8mlPRI1FywsJlhmTAoDeW9KJp4z25x
-	 1LK7vDz6EajY8sX7hE4N8IaxE56vJwbr4HytJjsi65KHvbV2/okGWcl+BLkdGR8iV6q8t
-	 NjuogmREapzOJKZSETZNfPRoNtZ72b1EuSYaHXgXj0oX+ZOi//lmRotXsTVPT8AZX9jti
-	 evsQMyj9nBAxZ98/9nqPBb3ij4spio/jZ6sbWM7TnExE2bQiZm9BonADF+uE6yc/v8g==
+	t=1794248757;
+	b=0V6YGQxBGKvtr2rO4TwdUy2sXaQ6PWlvWDsWAqAQsAZtRq5GetAUcwcUh28/vjr0ZZ1d
+	 ARI1NIGZbqziPczjM688fhIx26I8nSpc8QdT8KvIO2ZZ6XXLyGHYfdLaGo1BZfYko1KG5
+	 TXj6iAOGy6EGYd1Wpj0AxWEF95j6tHdUtc0V7joKHNUFczgA2YEeHKn+6bQzkI8GhcfkD
+	 PLgJxEskY6H2ZIOBtqiHvy67CKu6g3mE0Vl2ayPl+sr3xpTzbvdKFL++j1++C2Tw8oV5P
+	 5qrmDv6iIo7YbIkC7iqZNh8ilIpJSdKFikofr/brrcchbCI+3Okckuy49dzkam5C+sg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794248746;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794248757;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=uNnpUKLFZFDZAIGfqh/0M8aoCDnLft+kz4dr3EpUusA=;
-	b=m3FbU1bQeGMOiffyqEcR4D94QbzO+AyFOE9iEKNYKifsa2chWZ0wTFISi5b+p/7qtk0q
-	 rRVVxDtFyCzvEvJ/HV0k+NnxVXq7VNExcDj5qlTe/FuupNtqWsFSDCiPnTnXN/mOXbbud
-	 MqoEif2c+Kb8SpZyMTbJ16by75zNg/LzOCC1uan9rR02eeU/Wl02aNjs5kemROd9U9tlU
-	 ZAoF6yx84nCQB+VzQPVBccrG0/fRSeacavm1LlbhHdVhlv9o3wirYzG5FPHW0gVnQXixY
-	 hojwNDKM1oN+VijVlIyvOY8sDy1dyNPGUH8r9DW7jJrLciPaag5DUhbPIcvumVcf7rQ==
+	bh=EOBLNFdEo9U1nkMeSubCwXPQCx/4OB0eWyI1PfnbzsM=;
+	b=gkc7yvEMBp5Qm5kLND0c9sfl4rBeJcMpPxQSnNG6ax8/n/4V47KaTbwl85pkyxwP/u4Q
+	 OhhkI1Em+Pq5zcPBLlCj6mWkBvYcQH0zVSfE6EQ89gjMR8XKJMljTbTa5dz3hDBMYcjJY
+	 v4sJLY8gleW8ghREwQqUmRy1WgBXGu4V+kksq6dmFi+kVkZz6zy1X8WaKR7qGk3jK6GpA
+	 4QCQCH62dASsqUv5DUPrQ2kTg8TtBdF98n18BtdwkBikaDs/He+xhmj9NJLGRVROMqPm6
+	 uTNEaLvJv2Kl/n5B1uZC07qKoJ/zvBdHx4LKV5KER5Bto3/ooFxtXRJd/d2Ufjpnumw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--lrizzo.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="PlNhP/g6";
-	arc=none smtp.remote-ip=209.85.218.71
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=PdpvfU96;
+	arc=none smtp.remote-ip=209.85.218.72
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA2F60A5BC4
-	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 18:25:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EBA2F60A5BC4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2026D60A2613
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 18:25:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2026D60A2613
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--lrizzo.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=PlNhP/g6
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-c3613c35145so137717866b.3
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 10:25:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=PdpvfU96
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c29c391bd2fso105336366b.2
+        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 10:25:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794248743; x=1794853543; darn=vger.kernel.org;
+        d=google.com; s=20260707; t=1794248754; x=1794853554; darn=vger.kernel.org;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=uNnpUKLFZFDZAIGfqh/0M8aoCDnLft+kz4dr3EpUusA=;
-        b=PlNhP/g64O4F/LV6s3lo6yAgzjtguT2ig6lN0S9xUQ6Xt5Lx+NO2QrUfCWeLWu52br
-         dIrhvnLS3y1mg0enuPo2VHd7l1KVOW7FupSPKtP/LLOEHnyPFeYcAYZsOHP10kohMvjO
-         kMuo0W+tG8Diy2uZP4ZxAvEJGh3a+CMQF390jb4Y+1XgDCprC8NYeFQAwp9qyyRBzt/f
-         QXKVD7rZPaOQKzRnnbODYGDb8SYdTKpcs8+V8itZHNfdgcv/sAZpizivd7rZtBrIaFag
-         54WKhu7ZB5UgGf5zqJHEpZbgLIklfRbmhRQcVqNTVcKHQY/yDkW6plAXweuzmHuDwo/N
-         M/fg==
+        bh=EOBLNFdEo9U1nkMeSubCwXPQCx/4OB0eWyI1PfnbzsM=;
+        b=PdpvfU96Z8/7uhYxnrzxRJxNWqiWwzNqm7V/1w3wz0wdhvWyaNN0VIjcGwQ7E47y2Z
+         ZRoxsmXRR1oVopQwrbNMhyRO5kZqLTLc2L3Yn5jl/UGGiJMh3TWSrRKGmvNfySxl8Fjb
+         KRZyWDKcfF5Neux8XTJk5rBWJA3CDcveyPumhI3JbMaiq7Cct5e2KeFloPLybuRgqFww
+         KLAPnWbMleb6dCMZcVDtgJtqyRd+8eRtm42CMC0HXADmB+jhlxhOBEntn5itOE1vX7vD
+         0RxrgzgGDaidESQqTVZb58EIpKh60NPpGsX+XhWv3FQ2BolE2keHcT0/6ezVqATFz3JH
+         Mnlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794248743; x=1794853543;
+        d=1e100.net; s=20260707; t=1794248754; x=1794853554;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=uNnpUKLFZFDZAIGfqh/0M8aoCDnLft+kz4dr3EpUusA=;
-        b=ldRoQVmu346SJkNYwEC1Gm+t/yZ+1GEfHUQJIfpwL4wMKpnUBbkVROKZhBymospirk
-         6RNJWWqDByavknndXx8NtpE4Iq/xHOV+tEub+LEO2JoSL6TNfb1UFkyYW7MJ5EIVRG7C
-         1BFA2RJZGiV7peuLvHLzm1Ic9OJeyRZefGeYk3bwHXfBiSLFrOBL9JwaTINIuba1Ng5T
-         wbyLBZFxOFtShrjcogqGYBx8O7WNoaPxyZbhmxQzR8B2ARkFC0RDZ27iDZaFn5r2QmKH
-         8IEYGpK9ubJdeNACEK66zeCrr9680H6636irNnp9aQKKplrsrugl5u/XUVV4KHsZLezS
-         THNg==
-X-Forwarded-Encrypted: i=1; AL+hErG9fpwYV5aIa0mCY1zR5N84uqZe38WNxsazfcApO/zd9ldw9QMDl/rgqLQgeszzlGna7mtXU0Jw4HgDjA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+GcvgGiEWaQISu/3QHBMKPQF8CBcoms8piBDQmhLW+SLH8K+P5
-	ZNwY9l9p9imhQwBUfcEPmRotq+iPbSFGy855yDxa3WxFIiTIqXtVsHFmdAfwdL1jHZ9/Ny8V+U9
-	bPKpC/w==
-X-Received: from ejet13.prod.google.com ([2002:a17:906:178d:b0:c3a:bb3c:9317])
- (user=lrizzo job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:794f:b0:c49:a539:aa45
- with SMTP id a640c23a62f3a-c50496b6556mr13388266b.42.1794248743157; Mon, 09
- Nov 2026 10:25:43 -0800 (PST)
-Date: Mon,  9 Nov 2026 18:25:14 +0000
+        bh=EOBLNFdEo9U1nkMeSubCwXPQCx/4OB0eWyI1PfnbzsM=;
+        b=yKJgWsQjLFyrg4paRJF2X0pv1Xc1CIuqIrSkD7E7F7ROL58I71rxwQfyG4qaZxsGD8
+         /KZ5X3jaFzJocptKk2wBfKdZhaLNWJiItIajPWjaFKH4gfhBvlouDu8kzhlHHaolHw6d
+         5ZRHTTS+bXs2zQEyeG11Zqw6ZCo6IVsxvfpwP/9eJN+2z1K3s4R5XsbQTVJkfLIq4msJ
+         i7hvCcET0IRTtO86gZGYCGH4IhHmBUqEPo6zzSOMyG6b/EatE480SMsuDTW19c1sfy3s
+         vGJQQPUKlG8ZqwS5YpdupqCIwSwF9YCCEWdKAkoJldpgvgvpd+wE/GQjC9RdJmogXxRG
+         U0uA==
+X-Forwarded-Encrypted: i=1; AL+hErG9hrF5TVEXxsBTtN8zHB90cG1v0bphyz2vvHTI9y3/cpdBhU2p0cEz3Obm8DNQBJcVLYMC5WKFWimUZg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+7momUMkO/gJzoaJDI0LWNsT79Ql2ZSkhOOyJKpfsshqC+aJRO
+	vZvKwHD8YhzTBGIU69nSEo4eVB5Imx1Nj9LIFVT8MRwitmhMIpdObn+eGntrAch1IOTYBKP5Cta
+	/EgVXAw==
+X-Received: from ejmc5.prod.google.com ([2002:a17:906:5285:b0:c29:6cda:93b5])
+ (user=lrizzo job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:cd07:b0:c42:e6c8:e494
+ with SMTP id a640c23a62f3a-c504955cc09mr14726566b.37.1794248753833; Mon, 09
+ Nov 2026 10:25:53 -0800 (PST)
+Date: Mon,  9 Nov 2026 18:25:25 +0000
 In-Reply-To: <20261003212241.3432303-1-lrizzo@google.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -81,9 +81,8 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261003212241.3432303-1-lrizzo@google.com>
 X-Mailer: git-send-email 2.56.0.542.g3ef89b7020-goog
-Message-ID: <20261109182533.3594984-7-lrizzo@google.com>
-Subject: [RFC PATCH v2 06/25] iommu/dma: Reserve a per-domain IOVA window for
- PISA pages
+Message-ID: <20261109182533.3594984-18-lrizzo@google.com>
+Subject: [RFC PATCH v2 17/25] net: Allocate small skb heads from PISA
 From: Luigi Rizzo <lrizzo@google.com>
 To: Luigi Rizzo <rizzo.unipi@gmail.com>, Joerg Roedel <joro@8bytes.org>, 
 	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@lst.de>, 
@@ -103,412 +102,706 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J . Wysocki" <rafae
 	Luigi Rizzo <lrizzo@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-PISA buffers need to be quickly identified from their iova, and may need
-to be mapped in multiple domains. We can achieve both by reserving an IOVA
-range for PISA pages in each domain.
+The linear part of most transmitted skbs is a small head from the
+skbuff_small_head cache. To avoid per-packet IOMMU map/unmap operations
+or bounce-buffer copies for headers, allow backing small TX skb heads
+with PISA memory.
 
-Add per-domain PISA IOVA window descriptors in struct iommu_dma_cookie
-and a global slot allocator (pisa_slot_alloc() / pisa_slot_free()).
-The window is sized to twice the maximum allowed PISA buffer space,
-defaulting to max(64MB, 1/4 of physical RAM).
-
-A buffer is mapped at the same slot offset in all windows for the domains
-that need to access it. IOVA allocation is done with a bitmap (1 bit
-per 2MB buffer, hence a 4KB bitmap supports 64GB of buffer space) at
-negligible cost.
+When per-device pisa_tx_skb_heads is enabled, create a parallel
+skbuff_small_head_pisa slab cache backed by zeroed, read-only PISA
+folios (SLAB_CACHE_PISA_RO). Eligible TX paths passing __GFP_PISA_RO
+allocate small heads from this cache and fall back to skbuff_small_head
+on failure.
 
 Signed-off-by: Luigi Rizzo <lrizzo@google.com>
 ---
- drivers/iommu/Makefile     |  3 ++
- drivers/iommu/dma-iommu.c  | 18 ++++++++
- drivers/iommu/dma-iommu.h  | 16 +++++++
- drivers/iommu/pisa-alloc.c | 12 ++++-
- drivers/iommu/pisa-kunit.c | 24 ++++++++++
- drivers/iommu/pisa-map.c   | 90 ++++++++++++++++++++++++++++++++++++++
- drivers/iommu/pisa-priv.h  | 58 ++++++++++++++++++++++++
- 7 files changed, 220 insertions(+), 1 deletion(-)
- create mode 100644 drivers/iommu/pisa-map.c
+ drivers/base/core.c        |   4 +-
+ drivers/iommu/pisa-alloc.c | 133 ++++++++++++++++++++++++++++++++-----
+ drivers/iommu/pisa-kunit.c |   5 +-
+ include/linux/device.h     |   6 ++
+ include/linux/pisa.h       |   6 ++
+ include/net/sock.h         |  74 ++++++++++++++++++---
+ net/core/skbuff.c          |  39 ++++++++---
+ net/core/sock.c            |  23 +++++--
+ net/ipv4/ip_output.c       |   8 ++-
+ net/ipv4/tcp.c             |   2 +-
+ net/ipv4/tcp_output.c      |  12 ++--
+ net/ipv6/ip6_output.c      |   8 ++-
+ 12 files changed, 263 insertions(+), 57 deletions(-)
 
-diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
-index bc58166f9303a..125cf7e813cdc 100644
---- a/drivers/iommu/Makefile
-+++ b/drivers/iommu/Makefile
-@@ -12,6 +12,9 @@ obj-$(CONFIG_IOMMU_API) += iommu-sysfs.o
- obj-$(CONFIG_IOMMU_DEBUGFS) += iommu-debugfs.o
- obj-$(CONFIG_IOMMU_DMA) += dma-iommu.o
- obj-$(CONFIG_PISA) += pisa-meta.o pisa-alloc.o pisa-node.o
-+ifeq ($(CONFIG_IOMMU_DMA),y)
-+obj-$(CONFIG_PISA) += pisa-map.o
-+endif
- obj-$(CONFIG_PISA_META_KUNIT_TEST) += pisa-kunit.o
- obj-$(CONFIG_IOMMU_IO_PGTABLE) += io-pgtable.o
- obj-$(CONFIG_IOMMU_IO_PGTABLE_ARMV7S) += io-pgtable-arm-v7s.o
-diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-index 78742aeba932d..fba6084feac81 100644
---- a/drivers/iommu/dma-iommu.c
-+++ b/drivers/iommu/dma-iommu.c
-@@ -36,6 +36,7 @@
- #include <trace/events/swiotlb.h>
+diff --git a/drivers/base/core.c b/drivers/base/core.c
+index ade0c94b02ae7..efc1f9b9d255d 100644
+--- a/drivers/base/core.c
++++ b/drivers/base/core.c
+@@ -2951,7 +2951,7 @@ static DEVICE_ATTR_RW(name)
+ PISA_BOOL_ATTR(pisa_coherent);
+ PISA_BOOL_ATTR(pisa_rx_bufs);
+ PISA_SET_ATTR(pisa_tx_bufs, net_pisa_tx_bufs_set);
+-PISA_BOOL_ATTR(pisa_tx_skb_heads);
++PISA_SET_ATTR(pisa_tx_skb_heads, net_pisa_tx_skb_heads_set);
  
- #include "dma-iommu.h"
-+#include "pisa-priv.h"
- #include "iommu-pages.h"
- #include "iommu-priv.h"
+ static struct attribute *dev_attr_pisa[] = {
+ 	&dev_attr_pisa_coherent.attr,
+@@ -3113,6 +3113,8 @@ static void device_remove_attrs(struct device *dev)
+ 		device_remove_group(dev, &dev_attr_pisa_group);
+ 		if (dev->pisa_tx_bufs)
+ 			net_pisa_tx_bufs_set(dev, false);
++		if (dev->pisa_tx_skb_heads)
++			net_pisa_tx_skb_heads_set(dev, false);
+ 	}
  
-@@ -76,6 +77,8 @@ struct iommu_dma_cookie {
- 	struct iommu_domain *fq_domain;
- 	/* Options for dma-iommu use */
- 	struct iommu_dma_options options;
-+	/* IOVA window reserved for PISA pages. Nothing else can go here. */
-+	struct pisa_window win_pisa;
- };
- 
- struct iommu_dma_msi_cookie {
-@@ -1215,6 +1218,21 @@ static inline size_t iova_unaligned(struct iova_domain *iovad, phys_addr_t phys,
- 	return iova_offset(iovad, phys | size);
- }
- 
-+/* Return @domain's PISA window, or NULL if @domain cannot use PISA. */
-+struct pisa_window *pisa_dma_window(struct iommu_domain *domain)
-+{
-+	if (static_branch_unlikely(&iommu_deferred_attach_enabled) ||
-+	    !domain || domain->cookie_type != IOMMU_COOKIE_DMA_IOVA)
-+		return NULL;
-+
-+	return &domain->iova_cookie->win_pisa;
-+}
-+
-+struct iova_domain *pisa_dma_iovad(struct iommu_domain *domain)
-+{
-+	return pisa_dma_window(domain) ? &domain->iova_cookie->iovad : NULL;
-+}
-+
- dma_addr_t iommu_dma_map_phys(struct device *dev, phys_addr_t phys, size_t size,
- 		enum dma_data_direction dir, unsigned long attrs)
- {
-diff --git a/drivers/iommu/dma-iommu.h b/drivers/iommu/dma-iommu.h
-index 040d002525632..f112b47396984 100644
---- a/drivers/iommu/dma-iommu.h
-+++ b/drivers/iommu/dma-iommu.h
-@@ -7,6 +7,9 @@
- 
- #include <linux/iommu.h>
- 
-+struct pisa_window;
-+struct iova_domain;
-+
- #ifdef CONFIG_IOMMU_DMA
- 
- void iommu_setup_dma_ops(struct device *dev, struct iommu_domain *domain);
-@@ -22,6 +25,9 @@ void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list);
- int iommu_dma_sw_msi(struct iommu_domain *domain, struct msi_desc *desc,
- 		     phys_addr_t msi_addr);
- 
-+struct iova_domain *pisa_dma_iovad(struct iommu_domain *domain);
-+struct pisa_window *pisa_dma_window(struct iommu_domain *domain);
-+
- extern bool iommu_dma_forcedac;
- 
- #else /* CONFIG_IOMMU_DMA */
-@@ -59,5 +65,15 @@ static inline int iommu_dma_sw_msi(struct iommu_domain *domain,
- 	return -ENODEV;
- }
- 
-+static inline struct iova_domain *pisa_dma_iovad(struct iommu_domain *domain)
-+{
-+	return NULL;
-+}
-+
-+static inline struct pisa_window *pisa_dma_window(struct iommu_domain *domain)
-+{
-+	return NULL;
-+}
-+
- #endif	/* CONFIG_IOMMU_DMA */
- #endif	/* __DMA_IOMMU_H */
+ 	if (dev->physical_location) {
 diff --git a/drivers/iommu/pisa-alloc.c b/drivers/iommu/pisa-alloc.c
-index de8009fd6fff3..d7b73c3a6c0b6 100644
+index 3b5c49d143a7e..7df2ecde32916 100644
 --- a/drivers/iommu/pisa-alloc.c
 +++ b/drivers/iommu/pisa-alloc.c
-@@ -84,10 +84,12 @@ static void pisa_release_page_rcu(struct rcu_head *head)
- 	/* Read @meta before freeing blocks; the frame can be reused immediately. */
- 	struct pisa_meta *meta = container_of(head, struct pisa_meta, rcu);
- 	struct page *block, *page = pfn_to_page(pisa_meta_to_pfn(meta));
--	unsigned int i, order = meta->pa->order;
-+	unsigned int i, order = meta->pa->order, slot = meta->slot;
- 
- 	WRITE_ONCE(meta->pa, NULL);
- 
-+	/* The page has been unmapped from every domain by pisa_release_page() */
-+	pisa_slot_free(slot);
- 	atomic_long_dec(&pisa_nr_pages);
- 	for (i = 0; i < PISA_BLOCKS(order); i++) {
- 		block = page + (i << order);
-@@ -426,10 +428,16 @@ static struct pisa_meta *pisa_alloc_split_page(unsigned int order, gfp_t gfp, in
- 	if (IS_ERR(meta))
- 		return meta;
- 
-+	if (unlikely(pisa_slot_alloc(meta))) {
-+		pisa_release_page(meta);
-+		return ERR_PTR(-ENOSPC);
-+	}
-+
- 	page = pfn_to_page(pisa_meta_to_pfn(meta));
- 
- 	/* Fails with -EBUSY if a concurrent PFN walker holds a speculative ref. */
- 	if (split_page_compound(page, PISA_ORDER, order)) {
-+		pisa_slot_free(meta->slot);
- 		pisa_release_page(meta);
- 		pisa_alloc_backoff(nid, can_block);
- 		return ERR_PTR(-EBUSY);
-@@ -782,6 +790,8 @@ static int __init pisa_init(void)
- 	if (!pisa_max_pages)
- 		pisa_max_pages = max(totalram_pages() >> (PISA_ORDER + 3), 16UL);
- 
-+	pisa_slots_init();
-+
- 	/* Preallocate the supported per-node allocators. */
- 	for_each_node_state(nid, N_MEMORY) {
- 		for (i = 0; i < ARRAY_SIZE(cfg); i++) {
-diff --git a/drivers/iommu/pisa-kunit.c b/drivers/iommu/pisa-kunit.c
-index 96bc8dbc38fb4..5a2e806e74654 100644
---- a/drivers/iommu/pisa-kunit.c
-+++ b/drivers/iommu/pisa-kunit.c
-@@ -10,6 +10,7 @@
- #include <linux/skbuff.h>
+@@ -37,6 +37,7 @@
+ #include <linux/slab.h>
+ #include <linux/spinlock.h>
+ #include <linux/workqueue.h>
++#include <net/hotdata.h>
  #include <net/sock.h>
  
-+#include "dma-iommu.h"
- #include "pisa-priv.h"
- 
- static void test_meta_init_and_roundtrip(struct kunit *test)
-@@ -179,6 +180,26 @@ static void test_alloc_and_recycle(struct kunit *test)
- 	WRITE_ONCE(pisa_max_pages, old_max);
+ #include "dma-iommu.h"
+@@ -922,37 +923,133 @@ int net_pisa_tx_bufs_set(struct device *dev, bool val)
  }
  
-+#ifdef CONFIG_IOMMU_DMA
-+static void test_window_helpers(struct kunit *test)
+ /*
+- * The sysfs attribute pisa_tx_bufs lives on the physical DMA parent
+- * (dev->dev.parent), whereas a socket route (dst->dev) may point to an upper
+- * virtual net_device (bond, VLAN, ipvlan, etc.). Walking lower devices via
+- * netdev_walk_all_lower_dev_rcu() on every TX allocation would be too
+- * expensive, so dev->pisa_tx_stamp caches the walk result on the net_device
+- * and refreshes it at most once every 256 jiffies:
+- *   bit 0 (PISA_TX_STAMP_OK):         pisa_tx_bufs enabled on lower device(s)
++ * dev->pisa_tx_skb_heads: when set on an egress device, small TX skb heads
++ * (__GFP_PISA_RO) come from a copy of skbuff_small_head whose slab pages are
++ * PISA blocks. The linear part of most transmitted skbs is then mapped
++ * through the PISA window without per-driver bounce buffers. Several heads
++ * share a slab page and each one ends with its skb_shared_info, so:
++ * - the allocators are TX-only (DMA_TO_DEVICE): their PISA pages are mapped device
++ *   read-only, and a DMA mapping that wants device writes gets a per-buffer
++ *   IOMMU mapping, as for any kmalloc() buffer;
++ * - slab pages are zeroed when taken from the allocator, so the device can read
++ *   skb heads (live or freed) but never older contents of the page.
++ * Heads are freed with kfree() whichever cache they came from, so the key
++ * can be toggled at any time. The cache and allocators are created on the first
++ * write and never destroyed.
++ */
++DEFINE_STATIC_KEY_FALSE(net_pisa_tx_skb_heads_key);
++EXPORT_SYMBOL(net_pisa_tx_skb_heads_key);
++
++static struct kmem_cache *pisa_skb_small_head_cache __read_mostly;
++
++/* Lazily initialize skbuff_small_head_pisa on first enable. */
++static int pisa_skb_head_init(void)
 +{
-+	struct pisa_window win = {};
++	unsigned int size = kmem_cache_size(net_hotdata.skb_small_head_cache);
++	struct kmem_cache_args args = {
++		/* As skbuff_small_head, see skb_init(). */
++		.useroffset	= 0,
++		.usersize	= SKB_WITH_OVERHEAD(size),
++		.sheaf_capacity	= 32,
++	};
++	static DEFINE_MUTEX(mutex);
++	struct kmem_cache *s;
++	int ret = 0;
 +
-+	KUNIT_ASSERT_EQ(test, pisa_meta_init(), 0);
++	mutex_lock(&mutex);
++	if (pisa_skb_small_head_cache)
++		goto out;
 +
-+	/* Empty window (base == 0) never owns any IOVA. */
-+	KUNIT_EXPECT_FALSE(test, is_pisa_iova(&win, 0));
-+	KUNIT_EXPECT_FALSE(test, is_pisa_iova(&win, SZ_4G));
-+
-+	win.base = SZ_4G;
-+	KUNIT_EXPECT_FALSE(test, is_pisa_iova(&win, SZ_4G - 1));
-+	KUNIT_EXPECT_TRUE(test, is_pisa_iova(&win, SZ_4G));
-+	KUNIT_EXPECT_TRUE(test, is_pisa_iova(&win, SZ_4G + pisa_window_size - 1));
-+	KUNIT_EXPECT_FALSE(test, is_pisa_iova(&win, SZ_4G + pisa_window_size));
++	/* No slab is allocated before the cache is published below. */
++	s = kmem_cache_create("skbuff_small_head_pisa", size, &args,
++			      SLAB_HWCACHE_ALIGN | SLAB_NO_MERGE | SLAB_CACHE_PISA_RO);
++	if (!s) {
++		ret = -ENOMEM;
++		goto out;
++	}
++	WRITE_ONCE(pisa_skb_small_head_cache, s);
++out:
++	mutex_unlock(&mutex);
++	return ret;
 +}
 +
-+#endif /* CONFIG_IOMMU_DMA */
-+
- static void test_reservoir_and_scrubber(struct kunit *test)
- {
- 	KUNIT_ASSERT_EQ(test, pisa_meta_init(), 0);
-@@ -190,6 +211,9 @@ static struct kunit_case pisa_meta_test_cases[] = {
- 	KUNIT_CASE(test_meta_invalid_phys),
- 	KUNIT_CASE(test_meta_active_toggle),
- 	KUNIT_CASE(test_alloc_and_recycle),
-+#ifdef CONFIG_IOMMU_DMA
-+	KUNIT_CASE(test_window_helpers),
-+#endif
- 	KUNIT_CASE(test_reservoir_and_scrubber),
- 	{}
- };
-diff --git a/drivers/iommu/pisa-map.c b/drivers/iommu/pisa-map.c
-new file mode 100644
-index 0000000000000..2e8d635dec34c
---- /dev/null
-+++ b/drivers/iommu/pisa-map.c
-@@ -0,0 +1,90 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+/*
-+ * PISA per-domain IOVA window management and IOMMU mapping.
-+ * See Documentation/core-api/pisa.rst for the architecture overview.
-+ */
-+
-+#include <linux/bitops.h>
-+#include <linux/cache.h>
-+#include <linux/mm.h>
-+#include <linux/moduleparam.h>
-+#include <linux/pisa.h>
-+#include <linux/slab.h>
-+#include <linux/spinlock.h>
-+
-+#include "dma-iommu.h"
-+#include "pisa-priv.h"
-+
-+#undef MODULE_PARAM_PREFIX
-+#define MODULE_PARAM_PREFIX "pisa."
-+
-+/* Optional module param override for pisa_nr_slots (0 = auto: 2 * max_pages). */
-+static unsigned int pisa_cfg_slots __read_mostly;
-+module_param_named(slots, pisa_cfg_slots, uint, 0444);
-+
-+/*
-+ * Number of 2MB IOVA slots in each domain's window (computed at init from
-+ * pisa_cfg_slots or 2 * max_pages). Each active PISA page holds one slot
-+ * in [0, pisa_nr_slots) and maps at slot * PISA_SIZE in every domain's window.
-+ */
-+unsigned int pisa_nr_slots __read_mostly;
-+u64 pisa_window_size __read_mostly;
-+/* One bit per IOVA slot, set while an active PISA page holds the slot. */
-+static unsigned long *pisa_slot_bitmap __read_mostly;
-+/* Metadata of the PISA page backing each active slot, or NULL. */
-+static struct pisa_meta **pisa_slot2meta __read_mostly;
-+static unsigned int pisa_slot_hint;	/* no free slot below this */
-+/* Protects pisa_slot_bitmap and pisa_slot_hint. */
-+static DEFINE_SPINLOCK(pisa_slot_lock);
-+
-+/* Cost is typically low though the bitmap can be up to O(100K) bits on large systems. */
-+int pisa_slot_alloc(struct pisa_meta *meta)
++int net_pisa_tx_skb_heads_set(struct device *dev, bool val)
 +{
-+	unsigned long flags;
-+	unsigned int slot;
++	static DEFINE_MUTEX(lock);
 +
-+	spin_lock_irqsave(&pisa_slot_lock, flags);
-+	slot = find_next_zero_bit(pisa_slot_bitmap, pisa_nr_slots, pisa_slot_hint);
-+	if (slot < pisa_nr_slots) {
-+		__set_bit(slot, pisa_slot_bitmap);
-+		pisa_slot_hint = slot + 1;
-+		WRITE_ONCE(meta->slot, slot);
-+		WRITE_ONCE(pisa_slot2meta[slot], meta);
++	if (val) {
++		int ret = pisa_skb_head_init();
++
++		if (ret)
++			return ret;
 +	}
-+	spin_unlock_irqrestore(&pisa_slot_lock, flags);
 +
-+	if (slot >= pisa_nr_slots)
-+		return -ENOSPC;
++	mutex_lock(&lock);
++	if (dev->pisa_tx_skb_heads != val) {
++		WRITE_ONCE(dev->pisa_tx_skb_heads, val);
++		if (val)
++			static_branch_inc(&net_pisa_tx_skb_heads_key);
++		else
++			static_branch_dec(&net_pisa_tx_skb_heads_key);
++	}
++	mutex_unlock(&lock);
 +	return 0;
 +}
 +
-+/* Return @slot once no domain can translate it any more. */
-+void pisa_slot_free(unsigned int slot)
++void *pisa_skb_head_alloc_node(gfp_t flags, int node)
 +{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&pisa_slot_lock, flags);
-+	WRITE_ONCE(pisa_slot2meta[slot], NULL);
-+	__clear_bit(slot, pisa_slot_bitmap);
-+	if (slot < pisa_slot_hint)
-+		pisa_slot_hint = slot;
-+	spin_unlock_irqrestore(&pisa_slot_lock, flags);
++	if (!static_branch_unlikely(&net_pisa_tx_skb_heads_key))
++		return NULL;
++	return kmem_cache_alloc_node(pisa_skb_small_head_cache,
++				     flags | __GFP_NOMEMALLOC | __GFP_NOWARN, node);
 +}
 +
-+void __init pisa_slots_init(void)
-+{
-+	/* Fixed at boot: sizes every domain's window (default 2 * max_pages). */
-+	pisa_nr_slots = pisa_cfg_slots ?: min_t(unsigned long, 2 * pisa_max_pages, UINT_MAX >> 1);
-+	pisa_slot_bitmap = kvcalloc(BITS_TO_LONGS(pisa_nr_slots),
-+				    sizeof(unsigned long), GFP_KERNEL);
-+	pisa_slot2meta = kvcalloc(pisa_nr_slots, sizeof(*pisa_slot2meta), GFP_KERNEL);
-+	if (!pisa_slot_bitmap || !pisa_slot2meta) {
-+		kvfree(pisa_slot_bitmap);
-+		kvfree(pisa_slot2meta);
-+		pisa_slot_bitmap = NULL;
-+		pisa_slot2meta = NULL;
-+		pisa_nr_slots = 0;
++/*
++ * The sysfs attributes pisa_tx_bufs and pisa_tx_skb_heads live on the
++ * physical DMA parent (dev->dev.parent), whereas a socket route (dst->dev)
++ * may point to an upper virtual net_device (bond, VLAN, ipvlan, etc.).
++ * Walking lower devices via netdev_walk_all_lower_dev_rcu() on every TX
++ * allocation would be too expensive, so dev->pisa_tx_stamp caches the walk
++ * result on the net_device and refreshes it at most once every 256 jiffies:
++ *   bit 0 (PISA_TX_STAMP_BUFS):       pisa_tx_bufs enabled on lower device(s)
++ *   bit 1 (PISA_TX_STAMP_HEADS):      pisa_tx_skb_heads enabled on lower device(s)
+  *   bits 31..8 (PISA_TX_STAMP_MASK):  upper 24 bits of (u32)jiffies
+  */
+-static int netdev_pisa_tx_bufs_walk(struct net_device *dev, struct netdev_nested_priv *priv)
++static u32 netdev_pisa_tx_flags(const struct net_device *dev)
+ {
+-	return dev->dev.parent && READ_ONCE(dev->dev.parent->pisa_tx_bufs);
++	struct device *parent = dev->dev.parent;
++	u32 flags = 0;
++
++	if (parent) {
++		if (READ_ONCE(parent->pisa_tx_bufs))
++			flags |= PISA_TX_STAMP_BUFS;
++		if (READ_ONCE(parent->pisa_tx_skb_heads))
++			flags |= PISA_TX_STAMP_HEADS;
 +	}
-+	/* Size of every domain's window: one 2MB page per slot. */
-+	pisa_window_size = (u64)pisa_nr_slots << PISA_SHIFT;
++	return flags;
+ }
+ 
+-/* Slow path of __netdev_tx_pisa_ok(): refresh dev->pisa_tx_stamp. */
+-bool netdev_tx_pisa_refresh(struct net_device *dev, u32 now)
++static int netdev_pisa_tx_walk(struct net_device *dev, struct netdev_nested_priv *priv)
+ {
+-	bool ok;
++	priv->data = (void *)((uintptr_t)priv->data | netdev_pisa_tx_flags(dev));
++	return 0;
 +}
-diff --git a/drivers/iommu/pisa-priv.h b/drivers/iommu/pisa-priv.h
-index d5ea83745ba47..3ef6e51402ceb 100644
---- a/drivers/iommu/pisa-priv.h
-+++ b/drivers/iommu/pisa-priv.h
-@@ -13,12 +13,35 @@
- #include <linux/types.h>
- #include <linux/workqueue.h>
  
-+/**
-+ * struct pisa_window - A domain's IOVA window reserved for PISA pages
-+ * @base: Window base IOVA (PISA_SIZE aligned), or 0 if unassigned
-+ * @domain_idx: Dense index + PISA_IDX_FIRST, or PISA_IDX_* sentinel while @base == 0
-+ * @idx_gen: Value of pisa_idx_gen when @domain_idx was set to NOIDX
-+ *
-+ * Lives in iommu_dma_cookie. Active PISA pages map at @base + slot * PISA_SIZE.
-+ */
-+struct pisa_window {
-+	dma_addr_t base;
-+	u16 domain_idx;
-+	u32 idx_gen;
-+};
-+
- #ifdef CONFIG_PISA
- 
- #define PISA_MAX_BLOCKS		512U
- 
- #define PISA_BLOCKS(order)	(1U << (PISA_ORDER - (order)))
- 
-+/* Sentinel values of pisa_window.domain_idx below PISA_IDX_FIRST. */
-+enum {
-+	PISA_IDX_NONE,	/* not attempted yet */
-+	PISA_IDX_NOHUGE,	/* @domain can never use PISA */
-+	PISA_IDX_NOWINDOW,	/* no IOVA range for the window */
-+	PISA_IDX_NOIDX,	/* all domain indices were in use */
-+	PISA_IDX_FIRST,	/* first valid domain index */
-+};
-+
- /*
-  * Lock hierarchy:
-  * - pisa_allocs_lock (rwlock): outermost; protects pisa_allocs list.
-@@ -32,6 +55,7 @@
-  * @nr_clean:	Zeroed available blocks in @clean_bitmap
-  * @nr_dirty:	Dirty available blocks in @dirty_bitmap
-  * @on_list:	Current placement in @pa (enum pisa_meta_list)
-+ * @slot:	Dense IOVA slot index in every domain's window
-  * @pa:		Owning pisa_alloc (NULL for reservoir pages)
-  * @list:	Node in @pa lists or per-node reservoir (pisa_node.pages)
-  * @llnode:	Node in lockless pisa_free_list for async release to the buddy allocator
-@@ -44,6 +68,7 @@ struct pisa_meta {
- 	u16 nr_clean;
- 	u16 nr_dirty;
- 	u8 on_list;
-+	u32 slot;
- 	struct pisa_alloc *pa;
- 	struct list_head list;
- 
-@@ -172,4 +197,37 @@ unsigned long pisa_reservoir_count(void);
- unsigned long pisa_reservoir_shrink(struct list_head *release_list, unsigned long nr_to_scan);
- 
- #endif /* CONFIG_PISA */
-+
-+#if defined(CONFIG_PISA) && defined(CONFIG_IOMMU_DMA)
-+
-+/* Size in bytes of every domain's PISA IOVA window, fixed at boot. */
-+extern u64 pisa_window_size;
-+extern unsigned int pisa_nr_slots;
-+
-+void pisa_slots_init(void);
-+int pisa_slot_alloc(struct pisa_meta *meta);
-+void pisa_slot_free(unsigned int slot);
-+
-+/* Return true if @dma falls within @win's reserved PISA IOVA window. */
-+static inline bool is_pisa_iova(const struct pisa_window *win, dma_addr_t dma)
++/* Slow path of __netdev_tx_pisa_ok(): refresh dev->pisa_tx_stamp. */
++u32 netdev_tx_pisa_refresh(struct net_device *dev, u32 now)
 +{
-+	/* Acquire pairs with the release of @base in pisa_window_assign(). */
-+	dma_addr_t base = smp_load_acquire(&win->base);
+ 	if (dev->dev.parent) {
+-		ok = READ_ONCE(dev->dev.parent->pisa_tx_bufs);
++		now |= netdev_pisa_tx_flags(dev);
+ 	} else {
++		struct netdev_nested_priv priv = {};
 +
-+	return base && dma - base < pisa_window_size;
+ 		rcu_read_lock();
+-		ok = netdev_walk_all_lower_dev_rcu(dev,
+-						   netdev_pisa_tx_bufs_walk,
+-						   NULL) != 0;
++		netdev_walk_all_lower_dev_rcu(dev, netdev_pisa_tx_walk, &priv);
+ 		rcu_read_unlock();
++		now |= (uintptr_t)priv.data;
+ 	}
+-	now |= ok ? PISA_TX_STAMP_OK : 0;
+ 	WRITE_ONCE(dev->pisa_tx_stamp, now);
+-	return now & PISA_TX_STAMP_OK;
++	return now;
+ }
+ EXPORT_SYMBOL(netdev_tx_pisa_refresh);
+ #endif /* CONFIG_NET */
+diff --git a/drivers/iommu/pisa-kunit.c b/drivers/iommu/pisa-kunit.c
+index 9cc1328893ace..3fc17024bc9d0 100644
+--- a/drivers/iommu/pisa-kunit.c
++++ b/drivers/iommu/pisa-kunit.c
+@@ -489,9 +489,10 @@ static void test_dev_pisa_attrs(struct kunit *test)
+ 	}
+ 	kunit_check_pisa_attr(test, dev, "pisa_coherent", &dev->pisa_coherent);
+ 	kunit_check_pisa_attr(test, dev, "pisa_rx_bufs", &dev->pisa_rx_bufs);
+-	if (IS_ENABLED(CONFIG_NET))
++	if (IS_ENABLED(CONFIG_NET)) {
+ 		kunit_check_pisa_attr(test, dev, "pisa_tx_bufs", &dev->pisa_tx_bufs);
+-	kunit_check_pisa_attr(test, dev, "pisa_tx_skb_heads", &dev->pisa_tx_skb_heads);
++		kunit_check_pisa_attr(test, dev, "pisa_tx_skb_heads", &dev->pisa_tx_skb_heads);
++	}
+ 	device_unregister(dev);
+ }
+ 
+diff --git a/include/linux/device.h b/include/linux/device.h
+index 08f511b978ded..d588ae27c960c 100644
+--- a/include/linux/device.h
++++ b/include/linux/device.h
+@@ -816,11 +816,17 @@ struct device {
+ 
+ #if defined(CONFIG_NET) && defined(CONFIG_PISA)
+ int net_pisa_tx_bufs_set(struct device *dev, bool val);
++int net_pisa_tx_skb_heads_set(struct device *dev, bool val);
+ #else
+ static inline int net_pisa_tx_bufs_set(struct device *dev, bool val)
+ {
+ 	return -EOPNOTSUPP;
+ }
++
++static inline int net_pisa_tx_skb_heads_set(struct device *dev, bool val)
++{
++	return -EOPNOTSUPP;
++}
+ #endif
+ 
+ #define __create_dev_flag_accessors(accessor_name, flag_name) \
+diff --git a/include/linux/pisa.h b/include/linux/pisa.h
+index b9c5197f2d88d..452b8fa20c8d7 100644
+--- a/include/linux/pisa.h
++++ b/include/linux/pisa.h
+@@ -113,6 +113,7 @@ unsigned long pisa_alloc_pages_bulk(gfp_t gfp, unsigned int order,
+ struct folio *pisa_alloc_folio(gfp_t gfp, unsigned int order, int nid);
+ bool pisa_has_free_blocks_rx(const struct device *dev, unsigned int order, int nid);
+ bool pisa_page_can_recycle(const struct page *page);
++void *pisa_skb_head_alloc_node(gfp_t flags, int node);
+ 
+ static inline gfp_t pisa_rx_gfp(const struct device *dev)
+ {
+@@ -169,6 +170,11 @@ static inline bool pisa_free_coherent(struct page *page, size_t size)
+ 	return false;
+ }
+ 
++static inline void *pisa_skb_head_alloc_node(gfp_t flags, int node)
++{
++	return NULL;
 +}
 +
-+#else /* !CONFIG_PISA || !CONFIG_IOMMU_DMA */
+ static inline bool pisa_page_can_recycle(const struct page *page)
+ {
+ 	return true;
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 73906351d11db..78f16b76dfc3b 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1900,6 +1900,10 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 		  sockptr_t optval, sockptr_t optlen);
+ int sock_gettstamp(struct socket *sock, void __user *userstamp,
+ 		   bool timeval, bool time32);
++struct sk_buff *__sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
++				       unsigned long data_len, int noblock,
++				       int *errcode, int max_page_order,
++				       gfp_t gfp);
+ struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
+ 				     unsigned long data_len, int noblock,
+ 				     int *errcode, int max_page_order);
+@@ -2671,20 +2675,27 @@ static inline struct page_frag *sk_page_frag(struct sock *sk)
+ }
+ 
+ /* 256-jiffy cache in dev->pisa_tx_stamp; see netdev_tx_pisa_refresh(). */
+-#define PISA_TX_STAMP_OK	BIT(0)
++#define PISA_TX_STAMP_BUFS	BIT(0)
++#define PISA_TX_STAMP_HEADS	BIT(1)
+ #define PISA_TX_STAMP_MASK	(~0xffU)
+ 
+ #ifdef CONFIG_PISA
+ DECLARE_STATIC_KEY_FALSE(net_pisa_tx_bufs_key);
++DECLARE_STATIC_KEY_FALSE(net_pisa_tx_skb_heads_key);
+ 
+ static inline bool net_pisa_tx_bufs_enabled(void)
+ {
+ 	return static_branch_unlikely(&net_pisa_tx_bufs_key);
+ }
+ 
+-bool netdev_tx_pisa_refresh(struct net_device *dev, u32 now);
++static inline bool net_pisa_tx_skb_heads_enabled(void)
++{
++	return static_branch_unlikely(&net_pisa_tx_skb_heads_key);
++}
+ 
+-static inline bool __netdev_tx_pisa_ok(const struct net_device *dev)
++u32 netdev_tx_pisa_refresh(struct net_device *dev, u32 now);
 +
-+#define pisa_nr_slots 0U
-+static inline void pisa_slots_init(void) {}
-+static inline int pisa_slot_alloc(struct pisa_meta *meta) { return 0; }
-+static inline void pisa_slot_free(unsigned int slot) {}
-+
-+static inline bool is_pisa_iova(const struct pisa_window *win, dma_addr_t dma)
++static inline bool __netdev_tx_pisa_ok(const struct net_device *dev, u32 flag)
+ {
+ 	u32 stamp, now;
+ 
+@@ -2692,9 +2703,9 @@ static inline bool __netdev_tx_pisa_ok(const struct net_device *dev)
+ 		return false;
+ 	stamp = READ_ONCE(dev->pisa_tx_stamp);
+ 	now = (u32)jiffies & PISA_TX_STAMP_MASK;
+-	if (likely((stamp & PISA_TX_STAMP_MASK) == now))
+-		return stamp & PISA_TX_STAMP_OK;
+-	return netdev_tx_pisa_refresh((struct net_device *)dev, now);
++	if (unlikely((stamp & PISA_TX_STAMP_MASK) != now))
++		stamp = netdev_tx_pisa_refresh((struct net_device *)dev, now);
++	return stamp & flag;
+ }
+ #else
+ static inline bool net_pisa_tx_bufs_enabled(void)
+@@ -2702,7 +2713,12 @@ static inline bool net_pisa_tx_bufs_enabled(void)
+ 	return false;
+ }
+ 
+-static inline bool __netdev_tx_pisa_ok(const struct net_device *dev)
++static inline bool net_pisa_tx_skb_heads_enabled(void)
 +{
 +	return false;
 +}
 +
-+#endif /* CONFIG_PISA && CONFIG_IOMMU_DMA */
- #endif /* _DRIVERS_IOMMU_PISA_PRIV_H */
++static inline bool __netdev_tx_pisa_ok(const struct net_device *dev, u32 flag)
+ {
+ 	return false;
+ }
+@@ -2714,20 +2730,58 @@ static inline bool __netdev_tx_pisa_ok(const struct net_device *dev)
+  * active, so only data that leaves the host in clear qualifies: IPsec payload
+  * is still plaintext here.
+  */
+-static inline bool dst_tx_pisa_ok(const struct dst_entry *dst)
++static inline bool __dst_tx_pisa_ok(const struct dst_entry *dst, u32 flag)
+ {
+ 	bool ok = false;
+ 
+-	if (!net_pisa_tx_bufs_enabled() || !dst)
++	if (!dst)
+ 		return false;
+ 
+ 	rcu_read_lock();
+ 	if (!dst_xfrm(dst))
+-		ok = __netdev_tx_pisa_ok(dst_dev_rcu(dst));
++		ok = __netdev_tx_pisa_ok(dst_dev_rcu(dst), flag);
+ 	rcu_read_unlock();
+ 	return ok;
+ }
+ 
++static inline bool dst_tx_pisa_ok(const struct dst_entry *dst)
++{
++	return net_pisa_tx_bufs_enabled() &&
++	       __dst_tx_pisa_ok(dst, PISA_TX_STAMP_BUFS);
++}
++
++static inline gfp_t pisa_tx_gfp_dst(const struct dst_entry *dst)
++{
++	if (net_pisa_tx_skb_heads_enabled() &&
++	    __dst_tx_pisa_ok(dst, PISA_TX_STAMP_HEADS))
++		return __GFP_PISA_RO;
++	return 0;
++}
++
++static inline gfp_t pisa_tx_gfp_sk(const struct sock *sk)
++{
++	if (net_pisa_tx_skb_heads_enabled() && sk) {
++		bool ok;
++
++		rcu_read_lock();
++		ok = __dst_tx_pisa_ok(rcu_dereference(sk->sk_dst_cache),
++				      PISA_TX_STAMP_HEADS);
++		rcu_read_unlock();
++		if (ok)
++			return __GFP_PISA_RO;
++	}
++	return 0;
++}
++
++static inline struct sk_buff *sock_alloc_send_skb_dst(struct sock *sk,
++						      unsigned long size,
++						      int noblock, int *errcode,
++						      const struct dst_entry *dst)
++{
++	return __sock_alloc_send_pskb(sk, size, 0, noblock, errcode, 0,
++				      pisa_tx_gfp_dst(dst));
++}
++
+ /* Is @pfrag the task's frag reserved for PISA-eligible data? */
+ static inline bool is_pisa_pfrag(const struct page_frag *pfrag)
+ {
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 8da53d5b76fc2..04ae3bb4bd905 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -93,6 +93,7 @@
+ #include <linux/user_namespace.h>
+ #include <linux/indirect_call_wrapper.h>
+ #include <linux/textsearch.h>
++#include <linux/pisa.h>
+ 
+ #include "dev.h"
+ #include "devmem.h"
+@@ -607,16 +608,23 @@ static void *kmalloc_pfmemalloc(size_t obj_size, gfp_t flags, int node)
+ static void *kmalloc_reserve(unsigned int *size, gfp_t flags, int node,
+ 			     struct sk_buff *skb)
+ {
++	bool pisa = flags & __GFP_PISA_RO;
+ 	size_t obj_size;
+ 	void *obj;
+ 
++	flags &= ~__GFP_PISA_RW;
+ 	obj_size = SKB_HEAD_ALIGN(*size);
+ 	if (obj_size <= SKB_SMALL_HEAD_CACHE_SIZE &&
+ 	    !(flags & KMALLOC_NOT_NORMAL_BITS)) {
++		*size = SKB_SMALL_HEAD_CACHE_SIZE;
++		if (unlikely(pisa)) {
++			obj = pisa_skb_head_alloc_node(flags, node);
++			if (likely(obj))
++				goto out;
++		}
+ 		obj = kmem_cache_alloc_node(net_hotdata.skb_small_head_cache,
+ 				flags | __GFP_NOMEMALLOC | __GFP_NOWARN,
+ 				node);
+-		*size = SKB_SMALL_HEAD_CACHE_SIZE;
+ 		if (likely(obj))
+ 			goto out;
+ 		/* Try again but now we are using pfmemalloc reserves */
+@@ -2144,6 +2152,15 @@ void skb_copy_header(struct sk_buff *new, const struct sk_buff *old)
+ }
+ EXPORT_SYMBOL(skb_copy_header);
+ 
++static inline gfp_t skb_head_pisa_gfp(const struct sk_buff *skb)
++{
++	if (net_pisa_tx_skb_heads_enabled() &&
++	    !skb->head_frag &&
++	    is_pisa_page(virt_to_page(skb->head)))
++		return __GFP_PISA_RO;
++	return 0;
++}
++
+ static inline int skb_alloc_rx_flag(const struct sk_buff *skb)
+ {
+ 	if (skb_pfmemalloc(skb))
+@@ -2182,7 +2199,7 @@ struct sk_buff *skb_copy(const struct sk_buff *skb, gfp_t gfp_mask)
+ 
+ 	headerlen = skb_headroom(skb);
+ 	size = skb_end_offset(skb) + skb->data_len;
+-	n = __alloc_skb(size, gfp_mask,
++	n = __alloc_skb(size, gfp_mask | skb_head_pisa_gfp(skb),
+ 			skb_alloc_rx_flag(skb), NUMA_NO_NODE);
+ 	if (!n)
+ 		return NULL;
+@@ -2226,7 +2243,8 @@ struct sk_buff *__pskb_copy_fclone(struct sk_buff *skb, int headroom,
+ {
+ 	unsigned int size = skb_headlen(skb) + headroom;
+ 	int flags = skb_alloc_rx_flag(skb) | (fclone ? SKB_ALLOC_FCLONE : 0);
+-	struct sk_buff *n = __alloc_skb(size, gfp_mask, flags, NUMA_NO_NODE);
++	struct sk_buff *n = __alloc_skb(size, gfp_mask | skb_head_pisa_gfp(skb),
++					flags, NUMA_NO_NODE);
+ 
+ 	if (!n)
+ 		goto out;
+@@ -2315,7 +2333,8 @@ int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
+ 	if (skb_pfmemalloc(skb))
+ 		gfp_mask |= __GFP_MEMALLOC;
+ 
+-	data = kmalloc_reserve(&size, gfp_mask, NUMA_NO_NODE, NULL);
++	data = kmalloc_reserve(&size, gfp_mask | skb_head_pisa_gfp(skb),
++			       NUMA_NO_NODE, NULL);
+ 	if (!data)
+ 		goto nodata;
+ 	size = SKB_WITH_OVERHEAD(size);
+@@ -2524,7 +2543,8 @@ struct sk_buff *skb_copy_expand(const struct sk_buff *skb,
+ 
+ 	oldheadroom = skb_headroom(skb);
+ 	n = __alloc_skb(newheadroom + skb->len + newtailroom,
+-			gfp_mask, skb_alloc_rx_flag(skb),
++			gfp_mask | skb_head_pisa_gfp(skb),
++			skb_alloc_rx_flag(skb),
+ 			NUMA_NO_NODE);
+ 	if (!n)
+ 		return NULL;
+@@ -5025,7 +5045,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+ 				hsize = len;
+ 
+ 			nskb = __alloc_skb(hsize + doffset + headroom,
+-					   GFP_ATOMIC, skb_alloc_rx_flag(head_skb),
++					   GFP_ATOMIC | skb_head_pisa_gfp(head_skb),
++					   skb_alloc_rx_flag(head_skb),
+ 					   NUMA_NO_NODE);
+ 
+ 			if (unlikely(!nskb))
+@@ -6974,7 +6995,8 @@ static int pskb_carve_inside_header(struct sk_buff *skb, const u32 off,
+ 	if (skb_pfmemalloc(skb))
+ 		gfp_mask |= __GFP_MEMALLOC;
+ 
+-	data = kmalloc_reserve(&size, gfp_mask, NUMA_NO_NODE, NULL);
++	data = kmalloc_reserve(&size, gfp_mask | skb_head_pisa_gfp(skb),
++			       NUMA_NO_NODE, NULL);
+ 	if (!data)
+ 		return -ENOMEM;
+ 	size = SKB_WITH_OVERHEAD(size);
+@@ -7096,7 +7118,8 @@ static int pskb_carve_inside_nonlinear(struct sk_buff *skb, const u32 off,
+ 	if (skb_pfmemalloc(skb))
+ 		gfp_mask |= __GFP_MEMALLOC;
+ 
+-	data = kmalloc_reserve(&size, gfp_mask, NUMA_NO_NODE, NULL);
++	data = kmalloc_reserve(&size, gfp_mask | skb_head_pisa_gfp(skb),
++			       NUMA_NO_NODE, NULL);
+ 	if (!data)
+ 		return -ENOMEM;
+ 	size = SKB_WITH_OVERHEAD(size);
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 695fefe316925..0ddb5e57f4969 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3061,9 +3061,10 @@ static long sock_wait_for_wmem(struct sock *sk, long timeo)
+  *	Generic send/receive buffer handlers
+  */
+ 
+-struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
+-				     unsigned long data_len, int noblock,
+-				     int *errcode, int max_page_order)
++struct sk_buff *__sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
++				       unsigned long data_len, int noblock,
++				       int *errcode, int max_page_order,
++				       gfp_t gfp)
+ {
+ 	struct sk_buff *skb;
+ 	long timeo;
+@@ -3092,7 +3093,8 @@ struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
+ 		timeo = sock_wait_for_wmem(sk, timeo);
+ 	}
+ 	skb = alloc_skb_with_frags(header_len, data_len, max_page_order,
+-				   errcode, sk->sk_allocation);
++				   errcode,
++				   sk->sk_allocation | (!data_len ? gfp : 0));
+ 	if (skb)
+ 		skb_set_owner_w(skb, sk);
+ 	return skb;
+@@ -3103,6 +3105,16 @@ struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
+ 	*errcode = err;
+ 	return NULL;
+ }
++EXPORT_SYMBOL(__sock_alloc_send_pskb);
++
++struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
++				     unsigned long data_len, int noblock,
++				     int *errcode, int max_page_order)
++{
++	return __sock_alloc_send_pskb(sk, header_len, data_len, noblock,
++				      errcode, max_page_order,
++				      pisa_tx_gfp_sk(sk));
++}
+ EXPORT_SYMBOL(sock_alloc_send_pskb);
+ 
+ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+@@ -3322,7 +3334,8 @@ bool skb_page_frag_refill_dev(unsigned int sz, struct page_frag *pfrag,
+ 		const struct dst_entry *dst = skb_dst(skb);
+ 
+ 		rcu_read_lock();
+-		if (__netdev_tx_pisa_ok(skb->dev ?: (dst ? dst_dev_rcu(dst) : NULL)))
++		if (__netdev_tx_pisa_ok(skb->dev ?: (dst ? dst_dev_rcu(dst) : NULL),
++					PISA_TX_STAMP_BUFS))
+ 			gfp |= __GFP_PISA_RO;
+ 		rcu_read_unlock();
+ 	}
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index a5ea530bc8b5b..c49a33355ea45 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1134,14 +1134,16 @@ static int __ip_append_data(struct sock *sk,
+ 			alloclen += alloc_extra;
+ 
+ 			if (transhdrlen) {
+-				skb = sock_alloc_send_skb(sk, alloclen,
+-						(flags & MSG_DONTWAIT), &err);
++				skb = sock_alloc_send_skb_dst(sk, alloclen,
++							      flags & MSG_DONTWAIT,
++							      &err, &rt->dst);
+ 			} else {
+ 				skb = NULL;
+ 				if (refcount_read(&sk->sk_wmem_alloc) + wmem_alloc_delta <=
+ 				    2 * sk->sk_sndbuf)
+ 					skb = alloc_skb(alloclen,
+-							sk->sk_allocation);
++							sk->sk_allocation |
++							pisa_tx_gfp_dst(&rt->dst));
+ 				if (unlikely(!skb))
+ 					err = -ENOBUFS;
+ 			}
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index b8d44a0638914..038063717951c 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -931,7 +931,7 @@ struct sk_buff *tcp_stream_alloc_skb(struct sock *sk, gfp_t gfp,
+ {
+ 	struct sk_buff *skb;
+ 
+-	skb = alloc_skb_fclone(MAX_TCP_HEADER, gfp);
++	skb = alloc_skb_fclone(MAX_TCP_HEADER, gfp | pisa_tx_gfp_sk(sk));
+ 	if (likely(skb)) {
+ 		bool mem_scheduled;
+ 
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index cf3ddc055d48d..b7f04a9df199a 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3892,8 +3892,8 @@ void tcp_send_fin(struct sock *sk)
+ 		}
+ 	} else {
+ 		skb = alloc_skb_fclone(MAX_TCP_HEADER,
+-				       sk_gfp_mask(sk, GFP_ATOMIC |
+-						       __GFP_NOWARN));
++				       sk_gfp_mask(sk, GFP_ATOMIC | __GFP_NOWARN) |
++				       pisa_tx_gfp_sk(sk));
+ 		if (unlikely(!skb))
+ 			return;
+ 
+@@ -3921,7 +3921,7 @@ void tcp_send_active_reset(struct sock *sk, enum sk_rst_reason reason)
+ 	TCP_INC_STATS(sock_net(sk), TCP_MIB_OUTRSTS);
+ 
+ 	/* NOTE: No TCP options attached and we never retransmit this. */
+-	skb = alloc_skb(MAX_TCP_HEADER, priority);
++	skb = alloc_skb(MAX_TCP_HEADER, priority | pisa_tx_gfp_sk(sk));
+ 	if (!skb) {
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPABORTFAILED);
+ 		return;
+@@ -4011,7 +4011,7 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+ 	int mss;
+ 	u64 now;
+ 
+-	skb = alloc_skb(MAX_TCP_HEADER, GFP_ATOMIC);
++	skb = alloc_skb(MAX_TCP_HEADER, GFP_ATOMIC | pisa_tx_gfp_dst(dst));
+ 	if (unlikely(!skb)) {
+ 		dst_release(dst);
+ 		return NULL;
+@@ -4548,7 +4548,7 @@ void __tcp_send_ack(struct sock *sk, u32 rcv_nxt, u16 flags)
+ 	 * sock.
+ 	 */
+ 	buff = alloc_skb(MAX_TCP_HEADER,
+-			 sk_gfp_mask(sk, GFP_ATOMIC | __GFP_NOWARN));
++			 sk_gfp_mask(sk, GFP_ATOMIC | __GFP_NOWARN) | pisa_tx_gfp_sk(sk));
+ 	if (unlikely(!buff)) {
+ 		struct inet_connection_sock *icsk = inet_csk(sk);
+ 		unsigned long delay;
+@@ -4601,7 +4601,7 @@ static int tcp_xmit_probe_skb(struct sock *sk, int urgent, int mib)
+ 
+ 	/* We don't queue it, tcp_transmit_skb() sets ownership. */
+ 	skb = alloc_skb(MAX_TCP_HEADER,
+-			sk_gfp_mask(sk, GFP_ATOMIC | __GFP_NOWARN));
++			sk_gfp_mask(sk, GFP_ATOMIC | __GFP_NOWARN) | pisa_tx_gfp_sk(sk));
+ 	if (!skb)
+ 		return -1;
+ 
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 957c38a08680c..47a6fea3456fe 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1695,14 +1695,16 @@ static int __ip6_append_data(struct sock *sk,
+ 				goto error;
+ 			}
+ 			if (transhdrlen) {
+-				skb = sock_alloc_send_skb(sk, alloclen,
+-						(flags & MSG_DONTWAIT), &err);
++				skb = sock_alloc_send_skb_dst(sk, alloclen,
++							      flags & MSG_DONTWAIT,
++							      &err, &rt->dst);
+ 			} else {
+ 				skb = NULL;
+ 				if (refcount_read(&sk->sk_wmem_alloc) + wmem_alloc_delta <=
+ 				    2 * sk->sk_sndbuf)
+ 					skb = alloc_skb(alloclen,
+-							sk->sk_allocation);
++							sk->sk_allocation |
++							pisa_tx_gfp_dst(&rt->dst));
+ 				if (unlikely(!skb))
+ 					err = -ENOBUFS;
+ 			}
 -- 
 2.56.0.542.g3ef89b7020-goog
 
