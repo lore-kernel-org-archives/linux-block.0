@@ -1,54 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.24
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794249880;
-	b=mm80SUKDWyt1u1LizkeRdA7VvcPGIXErxOkuKPiaYV4tx5MAfvxhxjbpD/Yr8nZOuAHQ
-	 20EvQY8S2KLWr1gibAOLy8bnIyMXAfCeBGX+tH5jJj2gUbcN7g49QzeRxkjvNPd7kWx9A
-	 qna2WaLFMRb3677Yxyv4s+jo++PSQGK785i8ocYRJyOuWCsxNVjLvmOtkY5nercGpVRRU
-	 1SwUqHvfG7Jhd1UZXXOJ3UQ8ZSQbgfatuXYvmws2Dzfjhyq4AZTIOs2h1oPaPVnYZuHhv
-	 qQd7JgOVLbFNIpyVObtFHUkbr7BMRiNj4j5fdj9z6nO69gpecfL6ZHz+k5EGZlysaaA==
+	t=1794253178;
+	b=aLVDEPSICOFzDBwc+CpQ6R4i9GWnNyEL2SCjMaZPboOdVFsV+0j9gpfuRJkcG0Zv3ssm
+	 lpZZ923Fm3EsqGIrQEYVUL2tS8TpmgbBIOs64tZYDdySFq+7kmnOWhcCnKfkYdg0sx4/5
+	 dEQKEBc+gBspKleEb3zMElfBdAPdNl/SqsR+6RtnCR8mNhyJC16aQJPiHGbVEEWFas27a
+	 XqDKxdUdq/TqtjpY57dfQZ9xLi6dcsthHd4UP83Jh2rvPvDdciLOowEn0K6+j2BJLMgDd
+	 pcTArDvDyctaTz3hDJVBHMgfnIjlmgBCJfVM1cTWJOrpkcIm7iRT8bu3Y0KPLE7lYdQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794249880;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=Bwh8vGADWjPBmVfab76LRrb7I0TG/Y5xxN+WzXcgV8c=;
-	b=i9yZuR/489r7PxspeUjXSH3LMtUz20YTXXSStrGyxilvbyHoc/xvEDWtagvSATX1/K3C
-	 eXIpv3aovYSue9ZvFanbE1WpYU6BnALIINqWhOa9/VY+BbPzzU+RTeY5nsz7vqBvhhZA+
-	 G16X0yt68DyYfcH31s6ETjxvmsBYBe3k7hpd7XE3C7B9Ip3Vwboirmt0IT8K3GDR8C6wZ
-	 hbZ0SVq8UFQdnDCDzwvOurg/qKsf4h5ndhRM7vGzpsVzfcznX8wnnDRshh6VH62Ik/+yd
-	 I8qJXPwtzG/NiYeuyH4xaC1Tj2dmzJIB/BzLvn7eCSPJkFTBO/aRsoUQNOP3vcsrzqg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794253178;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:
+	 X-Scanned-By;
+	bh=e88sGOaf8naSU5yJw1LRL2JX3D71whzaUkfVTT4pmiU=;
+	b=gvxsIX8GRX2BXZbs6KN9ysxq11rhKJAZdLioM5keSwIGQTzQdn4qCpvCrHTudl6hYwBe
+	 l48kG9AagXiz2azVKXFWkoz7eLQNtLa557idcWU2vXNxcnfv57MQHb2PLuX8d2rnIpIp6
+	 +gE/OJgbQB8AvxyK9vjA1R8OTjG2yt4H56ltzwwM+jG6Bans6PJirhM6v2679Dyg9cdQ3
+	 +kdIFt+E5ksE78k1sk+4HMG0LYznb69B7SKZcYij98lqU1hQ5yuq/yyZWLbeLruOTyixD
+	 3vDhomHO1PzWHR9sXZXDBTTBekGz02D6qntc71zZxuBAZhsOburh23F5S1Plp7rwzTg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=A6H3JcTC;
-	arc=none smtp.remote-ip=95.215.58.24
-Received: from mta1.migadu.com (out-24.mta1.migadu.com [95.215.58.24])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=VOzOnbNq;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C05606A331
-	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 18:44:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 74C05606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F9B606A331
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 19:39:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 05F9B606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=A6H3JcTC
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=eejodZC9+iYJaqetGqYUSu07t8YAd2/V+1t3zStwLwI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794249876; v=1; x=1794854676;
- b=A6H3JcTC5htqLiYhRXDZjfXACQRFaxlvUYQRreKY7EJX0jrkW6Js56RoUVL4F96nIoTG4x68
- HJDvpI/MVrOQSQHYut+E18rc9OeFYvDLnxKnlJQiiAmCGYjhIXAxbR6Rb1FgbGkYWPOKckztDZp
- N8vFbftLcph0V8HaTDKSD3LM=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by mta10.migadu.com with ESMTPS id 24141ff8b478b109;
-	Mon, 09 Nov 2026 18:44:35 +0000
-X-Mizu-Trace-ID: 24141ff8b478b109
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <4022d4f9-5e2e-45d1-b9b8-208c80f82ecf@linux.dev>
-Date: Mon, 9 Nov 2026 18:44:34 +0000
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=VOzOnbNq
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1794253176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=e88sGOaf8naSU5yJw1LRL2JX3D71whzaUkfVTT4pmiU=;
+	b=VOzOnbNqqEh7Cm1pb3E8zF7u5qs2rl6HYpdOtxeiy7yWhU7UZdRS+so4ZsbY5JPFKAG996
+	Lxmw9F4hT0KGMkWXKa88nSDbuW9BrgOvqa6Uo5gZdLhS1XN9UQTqb1mREiH+12f9YJWYgc
+	42iMJ5DHmk2fuKXQiWnS62tmJBjcc2I=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-551-uW_G6uEGMlOwOJcOACFO0Q-1; Mon,
+ 09 Nov 2026 14:39:33 -0500
+X-MC-Unique: uW_G6uEGMlOwOJcOACFO0Q-1
+X-Mimecast-MFC-AGG-ID: uW_G6uEGMlOwOJcOACFO0Q_1794253171
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F1FC1977321;
+	Mon,  9 Nov 2026 19:39:31 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E05531956089;
+	Mon,  9 Nov 2026 19:39:30 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6A9JdT86595121
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 9 Nov 2026 14:39:29 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6A9JdRH7595112;
+	Mon, 9 Nov 2026 14:39:27 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        "Martin K . Petersen" <mkp@kernel.org>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] block: stack max_user_discard_sectors
+Date: Mon,  9 Nov 2026 14:39:27 -0500
+Message-ID: <20261109193927.595104-1-bmarzins@redhat.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,104 +84,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] iomap: remove the atomic write length check in
- iomap_dio_bio_iter_one()
-To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
- Christian Brauner <brauner@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org
-References: <20261107-blkdev-atomic-bounce-v1-0-f66344262096@columbia.edu>
- <20261107-blkdev-atomic-bounce-v1-2-f66344262096@columbia.edu>
- <3fc46788-d86d-44c5-8606-385d96fede4d@linux.dev>
- <c27b9521-7c4f-41ff-88f8-55313b5f395c@columbia.edu>
-Content-Language: en-US
-From: John Garry <john.garry@linux.dev>
-In-Reply-To: <c27b9521-7c4f-41ff-88f8-55313b5f395c@columbia.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 11/9/26 18:34, Tal Zussman wrote:
-> 
-> 
-> On 11/8/26 12:06 PM, John Garry wrote:
->> On 11/8/26 04:24, Tal Zussman wrote:
->>> bio_iov_iter_get_pages() and bio_iov_iter_bounce_write() now fail a
->>> REQ_ATOMIC bio that doesn't cover the whole iterator, so the bio here
->>> always covers iomap_length() and the check can't trigger. Remove the
->>> check.
->>>
->>> Suggested-by: John Garry <john.garry@linux.dev>
->>> Link: https://lore.kernel.org/all/82978d5c-3e08-48e9-bf0a-7913e1cd0507@linux.dev/
->>> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
->>
->> Reviewed-by: John Garry <john.garry@linux.dev>
->>
-> 
-> Thanks!
-> 
->> This looks ok. But I am just thinking that a CoW-based atomic write does
->> not have the single bio restriction, so we don't need to fail the atomic
->> in this case. However, we should have consistent rules for iovec's
->> whether it's a block device or regular file for ext4 or xfs, so this
->> makes sense.
->>
->> thanks
->>
->> BTW, you could be a real hero and add an xfstests case for this also.
->>
-> 
-> What specifically would you want to see tested? I can do an atomic write with
-> a partially unmapped buffer, with and without stable writes, and check that it
-> fails and that nothing is written.
+blk_validate_limits() sets a device's max_discard_sectors partially
+based on the value of max_user_discard_sectors. For this to be set
+correctly on a stacked device, max_user_discard_sectors needs to be set
+to the smallest value of its underlying devices. Otherwise the stacked
+device can pass down discards that are over the size limit of the
+underlying device. This is a particular problem for request-based
+dm-multipath devices, where the underlying device does not have a chance
+to split the discard.
 
-Just something similar to the blktests case which you added.
+Fixes: 4f563a64732d ("block: add a max_user_discard_sectors queue limit")
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ block/blk-settings.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-BTW, have you tested this partially-unmapped case for CoW-based atomics 
-on xfs? You can just do that by setting atomic_wr=0
-
-Thanks,
-John
-
-> 
->>> ---
->>>    fs/iomap/direct-io.c | 14 --------------
->>>    1 file changed, 14 deletions(-)
->>>
->>> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
->>> index ad041ac3252a..aca7cbaea4af 100644
->>> --- a/fs/iomap/direct-io.c
->>> +++ b/fs/iomap/direct-io.c
->>> @@ -370,15 +370,6 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_iter *iter,
->>>    		goto out_put_bio;
->>>    	ret = bio->bi_iter.bi_size;
->>>    
->>> -	/*
->>> -	 * An atomic write bio must cover the complete length.  If it doesn't,
->>> -	 * error out.
->>> -	 */
->>> -	if ((op & REQ_ATOMIC) && WARN_ON_ONCE(ret != iomap_length(iter))) {
->>> -		ret = -EINVAL;
->>> -		goto out_bio_release_pages;
->>> -	}
->>> -
->>>    	if (dio->flags & IOMAP_DIO_WRITE)
->>>    		task_io_account_write(ret);
->>>    	else if ((dio->flags & IOMAP_DIO_USER_BACKED) &&
->>> @@ -393,11 +384,6 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_iter *iter,
->>>    	iomap_dio_submit_bio(iter, dio, bio, pos);
->>>    	return ret;
->>>    
->>> -out_bio_release_pages:
->>> -	if (dio->flags & IOMAP_DIO_BOUNCE)
->>> -		bio_free_folios(bio);
->>> -	else
->>> -		bio_release_pages(bio, false);
->>>    out_put_bio:
->>>    	bio_put(bio);
->>>    	return ret;
->>>
->>
-> 
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 1f5ee2453269..1f02a867061e 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -919,6 +919,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 
+ 		t->max_discard_sectors = min_not_zero(t->max_discard_sectors,
+ 						      b->max_discard_sectors);
++		t->max_user_discard_sectors = min_not_zero(t->max_user_discard_sectors,
++							   b->max_user_discard_sectors);
+ 		t->max_hw_discard_sectors = min_not_zero(t->max_hw_discard_sectors,
+ 							 b->max_hw_discard_sectors);
+ 		t->discard_granularity = max(t->discard_granularity,
+-- 
+2.56.0
 
