@@ -1,93 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.135.74
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794260983;
-	b=sVoiwOYZcGdZpL57T01UrOofNWvbFj5+389dnihuRADI7CbhtWb+/sSWIoOwxcpSIYEX
-	 ohJ9uwJRqV9fDUQ97hH6ElYIDQFRDBwvJXoQYEw2ajJcp5aetEIwmvXhvLGggvHHvcB6g
-	 mYTRuXnatfzuJWyoTwYCs0gxYw1vOLecmI8Bh+VLTbOrJZX4xQe7goQW+68zWfJHMgHKL
-	 vU7gFNfPUYp8cyIPY3NuyDllGc7UvvZoAfDtArVGONInmL2UW75BhRsf2RHVTrq4xiPD3
-	 SLyL+a7mn1RFCi+QFysgmoIgairzjRTMkLQbteMTHs/eylDu2E0teqcCAZSkuPkA3Ww==
+	t=1794264393;
+	b=gjeQeh/G4GGF8s9cxuFUYsMbNdNAsReCKYwoHZPPSTCBq+3FeaVFlc+LwxGDuoquctSc
+	 qk59Ei1arUPh30ebchLrcfhQCYmbDyJe9/17L9QO3Pd2QsKaVKrjmEfHImoaCe1IoYunP
+	 rqfBqnirV5BYZu3nMR5lsY06vsHUgYfptdvUJMmHvCTsGgqEaHTG6Qz+Hx5Drrflx/CXq
+	 YqoBKxbs4+9VH3d8dy4Whk7UN1DRSOqRpA99yAWr2mesLr7TOmjtKG7ELmFWhrG0JCWao
+	 y1CPeTrQsuCtBPCPJEuY/YBSXnDw7hXIJrHGyetUujEzEJIP3BI7ADhVwoqLodWcF7g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794260983;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
-	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:X-Mailer;
-	bh=/yGrwL4kadKURQ+8yKaETjBqyNejok2Cl0vxpAXk4aI=;
-	b=EAghgnNtXyrb15eiFaPXperEMc4kPuo9bzKmrnNmlUVg6VSwfhoGZsqLcZSmetTMhEy9
-	 I7EldKTHjV3SyhsF0qe3GiAeWkwg5FviWaOfEtfAp+92D9ljjroljnqt+c5HNiCuIdQCd
-	 j6cZLuyvc7RNm+I7QA6hbvYSSeDhB7hjk1BumAh7+pKJMfzpA+aXnm+QS4N2cmcbbgBKp
-	 eEVWg/5tSdzaBQFaqdM+0iFd857hcB1ZMuL3BHOhUVF0jbI5W5A82xmcLYTzilcwZK/4s
-	 dSPdVJlqyR+Pi/sLn6vNdqjCymAIcWqjcfPSttQAocjgKZz8WKzJ3sE13j6KfTOst7Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794264393;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Authority-Analysis:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=WIZBljhWyOjAV704JqzV8vhFcRwS8d3hm/gLxcJtn20=;
+	b=YmuDrPUnQaDPXfm5RDJ468yHJMsMnQhEDIkhnkYeRYxnCQQXImPFVAPUa0bWxWM5HCqj
+	 uTQcme69JLpQ2TXxxPAGXoyl2vXPlPNLLPKevKVn5BBfJokBvo5HObhGDbqjKy0gYdXSC
+	 8GxX+cKg1dIjDt9ITewpkBUnCe+/220DWPz6tBbklTYJOz7yEEvQndizGisABYgnRBeK2
+	 7+2gvoM0MYFeoQQA1ISU9zcU0O3hu/JM+yJByPDIjZqgUcvl3NOL3rzJeMWvU1teM+IES
+	 XNvL4gy1wHh95teQOBfujm8L4t326+y5Uf/CpmIWKUSLj9NestneDqYl6PeW8zyVTbQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=UHYiOT80;
-	arc=none smtp.remote-ip=209.85.210.176
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=columbia.edu;
+	spf=pass smtp.mailfrom=columbia.edu;
+	dkim=pass header.d=columbia.edu header.i=@columbia.edu header.a=rsa-sha256 header.s=pps01 header.b=rJPYJ+Pf;
+	dkim=pass header.d=columbia.edu header.i=@columbia.edu header.a=rsa-sha256 header.s=lionmail header.b=0enM7fbI;
+	arc=none smtp.remote-ip=148.163.135.74
+Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8D1606A31C
-	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 21:49:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC8D1606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6A2606A31C
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 22:46:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7C6A2606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=UHYiOT80
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8b612fd74e1so489187b3a.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 13:49:42 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=columbia.edu header.i=@columbia.edu header.a=rsa-sha256 header.s=pps01 header.b=rJPYJ+Pf;
+	dkim=pass (2048-bit key, unprotected) header.d=columbia.edu header.i=@columbia.edu header.a=rsa-sha256 header.s=lionmail header.b=0enM7fbI
+Received: from pps.filterd (m0167072.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A9MRgwN2027765
+	for <linux-block@vger.kernel.org>; Mon, 9 Nov 2026 17:46:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps01; bh=WIZB
+	ljhWyOjAV704JqzV8vhFcRwS8d3hm/gLxcJtn20=; b=rJPYJ+PfHhoR2aC5ddre
+	KeX0TdnGyNff0y44edc9qO8omnXiG0NrT5sfljaWfFAbsoL94MHrzXPazE3d+qFT
+	/SKQftG+Rknkszqx3bWtOTlRrOoqsD/qf1W7Pani/bgd3TS8I22tMOP8VJ5rRj10
+	l9M9Nu8XtoWOYmt5kHgVpCOWVmo9hHIiaGFMK8XsGzXv7eVyeq5gtDm9v8p8wJWJ
+	bSzVKEkv/r88EFjHPXlneH6gL9V9wgG7s3ylcsavjTXCEIPoyRKkPBLPwA4foQe5
+	VkG4/vTvUMZWQKljuE5sEeZynPzCtkcnfE372yfe2FTqyT24VAmBfWGBCf405lJL
+	uA==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4hujrnaesd-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 17:46:31 -0500 (EST)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-91c6c1e082bso25118256d6.0
+        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 14:46:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1794260982; x=1794865782; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/yGrwL4kadKURQ+8yKaETjBqyNejok2Cl0vxpAXk4aI=;
-        b=UHYiOT8059IRh5T8AyiOMu3BRaahFoVfyqNHSaWysgJIe46todlqo+ot6NiVJLjyEU
-         kkVpbdcUlIFX/gb+8hclkKRE+fwD+3eCB5e5aiqkhd0BfWw1NKCucG9OmGG3vjtnI+iY
-         +0BsCHM2SWBy+3kI2/QN3j5XFfKJ8btLQaUY+GhZ7eQ+NfeND86AxrIjMom6AOu/64ue
-         Ild89hI6HvmCcdIHyflYTrkT15hooCHvg/Sb7X+d0uNOhaqKg5Jows1svCn0BqGIodso
-         pGWMQjOKfVHDReNyzqkJRC2LKOlw6QnDsZ7P3XDF0mhD7JYhzXILwpD2Fw8ytlsnPUli
-         f/3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794260982; x=1794865782;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=columbia.edu; s=lionmail; t=1794264390; x=1794869190; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=/yGrwL4kadKURQ+8yKaETjBqyNejok2Cl0vxpAXk4aI=;
-        b=w5+6YbFWPHvzq/2bWxJHPHXElseawRyCj7M4kmkRB5UAf4FagqZnxcZWJ6ycL6A5Jw
-         ycShMSdgDvzXVyP5ECcN7yi2gG7YEVADosuVBmnfC5nTWh1qIuzKqQti1tFNICz2B2gT
-         bupKRW/pqEeDvzKTyuRWzGuGu3D8ZIuQG/n7qZa5aZp6KkyVSzHF9/t5cJ9Erh3GZG2z
-         x+vJvMHBjPWRYnmv+2w3m8OaBWP3QMZt2eBIy6rh0xZfM5K5QMG04rCk2SkFtmBcORPc
-         Tj4bDoxI2diga3WW3Z2pyqQzQMI8r9sI0cKF4mUdc/FDz0TaYomRfa5KbX0hW0XUxg2v
-         yzqQ==
-X-Gm-Message-State: APuU4Z/YxfdsOUYKSJD2OjrVWVWjtJHbxktK7JII4RyfYB6C64j1BUVh
-	69jgsJe8Ps1FAC14p6mPdNnrL+JzQBdiFD+oZ5QtVGUM4g8dXP1fV56INu+yTl3L5crAPHTf09d
-	sK7uCKLE=
-X-Gm-Gg: AYBFou20gy6aAVK4oQmSWeLMsrE17tocvylGKEXacMy52hcD1PosCYrlfyoZ1OB3H30
-	nEf/01KCXzL1b10H7hQSsfrFcJh7NtFHg+NqBqNnpNPCogTj00YgVlIs6xh5NFT647aQggILlIt
-	L1sYFWzpwGX3x/75GoFh39VRHI4yfzi8vNuvt0SKVF1G940aFDbKLydtmFO/uwf2UaiqHOzHxFq
-	Pq9BYOiiHTP7Sda7Vk9NYCBZ1RYCef2mEWdiBBvHcZQcp/nzaGmlVvfRPjLQRzQGrdT4dy6Hyse
-	MTaLRJ82apT9lDR+SuQSAOeSU05rdxb49Nj33oSlKYVXOsBoExssWQrelPK3yMWyzbPLBIQzQJY
-	A9k8Epf84du5KLFYzPLcVwU8QcU9vMEgYQ8skUxSbmpd36tVcCGkNGG6lGwyrsHJ1AvCUUFs5JT
-	9CGC3nU8pscKpmefK0bsG2umHF3qRi0nxLe1Q2kxtm9+pN6rWeX+BanH6I92FwpSXo9HD2fRtJ0
-	CBuKXyyW9uYioah9jb7e0AAhf14u7NxU4d36E+jOYXNMoAH5WPCqAM0d6C4+t/vFv4mSXnqcjpz
-	Vs879RJq+bu4Kn7npjBJYNVTeGqSePfUJmcmVcQuRbRpyKo+4sL3W8iuuvk9X8DxHaDJ9U0NN4b
-	5Ir6ZDHzlXEGf
-X-Received: by 2002:a05:6a00:a83:b0:8b6:54c2:a760 with SMTP id d2e1a72fcca58-8ba852373fdmr889315b3a.13.1794260982075;
-        Mon, 09 Nov 2026 13:49:42 -0800 (PST)
-Received: from [192.168.1.106] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8baaa1b2896sm129427b3a.17.2026.11.09.13.49.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 13:49:40 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Phillip Potter <phil@philpotter.co.uk>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20260902183723.1584-1-phil@philpotter.co.uk>
-References: <20260902183723.1584-1-phil@philpotter.co.uk>
-Subject: Re: [PATCH 0/1] cdrom: patch for inclusion
-Message-Id: <179426098008.155418.122225966967055817.b4-ty@b4>
-Date: Mon, 09 Nov 2026 14:49:40 -0700
+        bh=WIZBljhWyOjAV704JqzV8vhFcRwS8d3hm/gLxcJtn20=;
+        b=0enM7fbIEkgCaPHnwROs1AH+cT8C2XUcCsXLOvY0FNHtdlsJTHTXomRcBL2cs6p99B
+         jwtZ22W0o+vlGDwzmc7juR2+s5sw2UgSUSLcfgsW8SREua//529cOBkGMx72FFyAIaoz
+         m+dhgkl4Ic7F34MIlY1YAoisB6ujfzRxxGO7pKYE6J3qXDedlDM4/ZZPMQfd/TsY1FoF
+         TVfGm9FYineb6HKUXZdXw7+o+EuULwwDBXTiOwaP15VhRDjAWZoTT1vZoqy0OWnWFOIB
+         FlKAtgI8FATZ4nqzVjbnR7HnNJX/CvwrbhXfwXCgbUmBKdhP8nxmak5G7iOLfFqvHOgR
+         QRhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794264390; x=1794869190;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WIZBljhWyOjAV704JqzV8vhFcRwS8d3hm/gLxcJtn20=;
+        b=kEZ0DEKz24QcsVqnCVcOHBNlLgrcyKal24Oh5K3Y+v8JcHgYl+dZv07JF9gNrw3tWO
+         bo6CaqJ1GZ0sM6AEbTCHIRUfz2sXzag4O6LUd0a+Da5+bY5SYcE/syJUtQOrJabptwFC
+         rFf1vz7tqF4yXNoUzJlIKcBkxT5qz+w/otfVYQwN1XycJeFWFLvxk2hoZrI+fSuETIG/
+         aNZNpl9NNF+5g/QK/gJubEWr5+bVAnak0UD5E7jlNbGA715dX1JPE7+G5JauRvL2lFf+
+         7kq1uoIfV10rA52JTJEM/XfEo/KLwOO6UP1Q8c5rfBpyYVUEcZ/6J3D8rqAtiGcnh2BN
+         NU+g==
+X-Forwarded-Encrypted: i=1; AL+hErEoQ0Fnb63ZBKGMRh6WOQNYiFuN6t6mnhPmoEY+H9hcMqIBPuMjuPDvBZ07S4Q7YSjkSDk8ILinR1cW4Q==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8QGu41/XXScDdOm3c7HPgY7xqHYgQeKeHBJvR5PVE53O7/njm+
+	Tg7XvJwnFPkCg+v3iBydJQxeiSAgF9daO9ncv5Gn5wHCf309/tRZXybZ+4zeAq2wLt3wxsSQ+yj
+	BvDzZ7pwmaf4eQEDjTCVV7J5eQq0IJ0GJn6a0wxY9FphTYkqkjIwv7nPbs2r6
+X-Gm-Gg: AYBFou13x4o/BdU8Xj1iUCrz6hAljHplvZ0hk0tfSEA5rg53Vk9cCgPNJghsNagKlyU
+	e/N3n2WOL1Bt2d4dEjImZnlBOTlAchqUZeTawjYyhm2piKysaGFk/1xulcEHzRD9iMNaAxpauKR
+	ytPwC0Rug5lw2j6BNTfj4OMWfaFu1tdr086yyGE5/KrOngsB8rZmonZ69WCRTXcYPbLLDdFlZqL
+	MAz8kcxsTy3at9BD/cS6ouR/a+PZmoH/I1nuQM1qXiwx6eaTWRKfeYp3Q9pRqbsJw00dhOkIjzZ
+	zFArQ/tNXzCV/IbxTAuJeuB06L4dOTmkI9GTZDIoBXQQ5PF0wAm04R6C5Gr8N9JaYREg75OPm9Q
+	iIQOtRUwrxDVYXyNYxZZwV3uaU0BEpeRZdOawIUE2X4FdDGu65vFMK8t+PwY941UsbmY0FVXV77
+	/t6NuvMvRBwnSwfzkdwd4/9hw=
+X-Received: by 2002:a05:6214:cc8:b0:914:cdbf:b6e with SMTP id 6a1803df08f44-91ef049b91amr14954426d6.22.1794264390514;
+        Mon, 09 Nov 2026 14:46:30 -0800 (PST)
+X-Received: by 2002:a05:6214:cc8:b0:914:cdbf:b6e with SMTP id 6a1803df08f44-91ef049b91amr14954056d6.22.1794264390014;
+        Mon, 09 Nov 2026 14:46:30 -0800 (PST)
+Received: from [10.207.116.169] (nat-128-59-178-16.net.columbia.edu. [128.59.178.16])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91ef031aaddsm7023636d6.3.2026.11.09.14.46.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Nov 2026 14:46:29 -0800 (PST)
+Message-ID: <21793564-61f4-4d57-b375-1271ad9bc70c@columbia.edu>
+Date: Mon, 9 Nov 2026 17:46:28 -0500
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -97,31 +116,134 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] iomap: remove the atomic write length check in
+ iomap_dio_bio_iter_one()
+To: John Garry <john.garry@linux.dev>, Jens Axboe <axboe@kernel.dk>,
+        Christian Brauner <brauner@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20261107-blkdev-atomic-bounce-v1-0-f66344262096@columbia.edu>
+ <20261107-blkdev-atomic-bounce-v1-2-f66344262096@columbia.edu>
+ <3fc46788-d86d-44c5-8606-385d96fede4d@linux.dev>
+ <c27b9521-7c4f-41ff-88f8-55313b5f395c@columbia.edu>
+ <4022d4f9-5e2e-45d1-b9b8-208c80f82ecf@linux.dev>
+Content-Language: en-US
+From: Tal Zussman <tz2294@columbia.edu>
+In-Reply-To: <4022d4f9-5e2e-45d1-b9b8-208c80f82ecf@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+X-Authority-Analysis: v=2.4 cv=d8NgWhjE c=1 sm=1 tr=0 ts=6af24d47 cx=c_pps
+ a=UgVkIMxJMSkC9lv97toC5g==:117 a=Gl6UJ28otdLh1ydVN8wMBg==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=x7bEGLp0ZPQA:10 a=A0y_DWxS2BwA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=SsB-OO3BMngHh3ZO9fOt:22
+ a=-APkALjPeVA3zQJKllEA:9 a=QEXdDO2ut3YA:10 a=1HOtulTD9v-eNWfpl4qZ:22
+X-Proofpoint-ORIG-GUID: 9HfTrptfUX3Vi5s7MMbeCrJ7Dp5knU_O
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA5MDA5MCBTYWx0ZWRfX7ZkMy8r66+w0
+ jSu5rp4BS0Yma8fRXgXMNTqjC89ROlSGzeOzVn7J3mdOthTeY9NQVqmLHVXSNjeyqdh2PYJxqY3
+ vE2Z2ro50t8axLX4LvwQsAS8SA9tE48vV6/LtU9/HoTxrdCLueGZ
+X-Proofpoint-GUID: 9HfTrptfUX3Vi5s7MMbeCrJ7Dp5knU_O
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA5MDA5MCBTYWx0ZWRfX7jvHBLLSzHIz
+ nT/JxlojYvkw3F4TbH+UhRoFDM4nY6CM5T63rc8P4rzIWbBTzz5sRdtSHTqGP+LK7O0lOoWudMS
+ J88d/NNIPUw1v5Muf3g3xzI6M+rUK+itAAF+I/ksuopkpjl8Cgu/6r13z72dJCq+LJX2dLs6PBa
+ Scko6DCS6nhlvWuYcQNS91dTO0djcMI5sCY4nVMNZWAq7/Is2NAsx3rnRnv6pxr6Zl1+eh3cN6x
+ ExH1hynFBK1ztzmMFEcHcJ2bf20R5cNblrDePpYglNZzD7xzlJYb//pvuHC5xYUN3tSh2WWNi5W
+ r2IbwkB7ffFPqqF0JBTXwCvNQRIZ+jAxk56KbkHWA2hrQj8xPj2ySxFpr+m7q4yFC3SL3QGrPuC
+ ykukSPP6ig0ql/EV22WXgIaCmUIZpy/VhHqNP3TekO9SS/MbiCAz2mezZ82DxO6KmUa8IQ5WlxF
+ CJv+Pbfub6OlqJCxN3A==
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11961
+ signatures=596817
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 lowpriorityscore=10 impostorscore=10
+ bulkscore=10 phishscore=0 adultscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
+ definitions=main-2611090090
 
-
-On Wed, 02 Sep 2026 19:37:22 +0100, Phillip Potter wrote:
-> Please apply the following patch from Manuel Ebner, which fixes a typo
-> in the CDROM standard documentation. It has also been reviewed by Randy
-> Dunlap.
+On 11/9/26 1:44 PM, John Garry wrote:
+>> 
+>>> This looks ok. But I am just thinking that a CoW-based atomic write does
+>>> not have the single bio restriction, so we don't need to fail the atomic
+>>> in this case. However, we should have consistent rules for iovec's
+>>> whether it's a block device or regular file for ext4 or xfs, so this
+>>> makes sense.
+>>>
+>>> thanks
+>>>
+>>> BTW, you could be a real hero and add an xfstests case for this also.
+>>>
+>> 
+>> What specifically would you want to see tested? I can do an atomic write with
+>> a partially unmapped buffer, with and without stable writes, and check that it
+>> fails and that nothing is written.
 > 
-> Many thanks in advance.
+> Just something similar to the blktests case which you added.
 > 
-> Regards,
-> Phil
+
+Sounds good, I'll add it to the queue.
+
+> BTW, have you tested this partially-unmapped case for CoW-based atomics
+> on xfs? You can just do that by setting atomic_wr=0
 > 
-> [...]
 
-Applied, thanks!
+Yeah, I just tested it. It behaves as expected: returns -EFAULT with the file
+unchanged, both with and without bouncing.
 
-[1/1] cdrom: fix brackets
-      commit: aa7014f8d7565cfea117eac36a5de0a05eba65a4
+The single-bio check depends on REQ_ATOMIC, which only the HW atomic path sets,
+so it doesn't apply to CoW writes, both before and after this series.
 
-Best regards,
--- 
-Jens Axboe
+In terms of consistency, the unmapped buffer returns -EINVAL on the non-bounce
+HW path (from bio_iov_iter_get_pages()) but -EFAULT for all other paths. That
+should probably be made consistent across HW and SW and bounce vs. non-bounce,
+but that's a separate change.
+
+Thanks,
+Tal
 
 
+> Thanks,
+> John
+> 
+>> 
+>>>> ---
+>>>>    fs/iomap/direct-io.c | 14 --------------
+>>>>    1 file changed, 14 deletions(-)
+>>>>
+>>>> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+>>>> index ad041ac3252a..aca7cbaea4af 100644
+>>>> --- a/fs/iomap/direct-io.c
+>>>> +++ b/fs/iomap/direct-io.c
+>>>> @@ -370,15 +370,6 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_iter *iter,
+>>>>    		goto out_put_bio;
+>>>>    	ret = bio->bi_iter.bi_size;
+>>>>    
+>>>> -	/*
+>>>> -	 * An atomic write bio must cover the complete length.  If it doesn't,
+>>>> -	 * error out.
+>>>> -	 */
+>>>> -	if ((op & REQ_ATOMIC) && WARN_ON_ONCE(ret != iomap_length(iter))) {
+>>>> -		ret = -EINVAL;
+>>>> -		goto out_bio_release_pages;
+>>>> -	}
+>>>> -
+>>>>    	if (dio->flags & IOMAP_DIO_WRITE)
+>>>>    		task_io_account_write(ret);
+>>>>    	else if ((dio->flags & IOMAP_DIO_USER_BACKED) &&
+>>>> @@ -393,11 +384,6 @@ static ssize_t iomap_dio_bio_iter_one(struct iomap_iter *iter,
+>>>>    	iomap_dio_submit_bio(iter, dio, bio, pos);
+>>>>    	return ret;
+>>>>    
+>>>> -out_bio_release_pages:
+>>>> -	if (dio->flags & IOMAP_DIO_BOUNCE)
+>>>> -		bio_free_folios(bio);
+>>>> -	else
+>>>> -		bio_release_pages(bio, false);
+>>>>    out_put_bio:
+>>>>    	bio_put(bio);
+>>>>    	return ret;
+>>>>
+>>>
+>> 
+> 
 
