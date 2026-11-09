@@ -1,86 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.35
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794235521;
-	b=BFUaBK/DjIAoqdweKzbHDXC5YEB1RkLXlwIjdXYOemIVY/IPtWB1rPLbr/61gMhBiHDc
-	 yv1ljd6bbFM/zeWXtDSAgA6eKxk/ygZ6+qGlvKRANC5uT2g8RUku+osBSWdverbZBTtZL
-	 Y2q6nN/MlPzPmNPNZ8lX9JLCsjo2J6qnJvr//nncOXtVroUCNYTzQPehbrvh77/yVyMLz
-	 OhSelp/ootRjz02uHHRwSleMO4CPJfqY558KPALa0toP/Jmthc8I9Oe64ShNlIgNQBmLP
-	 VqxXechIUYDAGdi/YBY4mjMIZO/p+ycGTFnRMh+VKa4afI0G5cbNH08ZJfwKijsT/0g==
+	t=1794235879;
+	b=mglk1AUfwn5mmQYaubvsOeY6oXc4Mus5pCWCW9VIAndR4MpenKzWbETOqXLKYbGFCh4w
+	 qSuf/ZfHvCJlfDVkF3FudoKeOk9KbYTlKlTuwQMc87PU8PbGqH43R5gAzqn0R/+yLylut
+	 /zSVYSQqMGZObgKWeLOCVuBQXyxnQc1TZHZsuJmqI9hWOP4unAbObeyDkImmpj5USw0sS
+	 eBPKZ95dxNBWjlPEhAWJpULr75XlehX4BsI0BFM6TX7loUVyCHz/DveZl6oVKw8m0YfyJ
+	 0VIAgdSswNLkS+G0q6nkob3AZ6f9vaoQmDf0mwNEu0l0ckWaYrqvX5a1TeQPpZpMl7Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794235521;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Content-Language:To:From:Subject:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=QjfeGxjBgHeFZbXRRkDc44FRNrdtYAfDOz72ekRK868=;
-	b=3XGDiqYYcromeUL4bw5cIQyS/Mt+3K2g3Gvmiz3FMAX5G3s47cT0HYqf3axjbL8IKWmH
-	 7ZkkQ/B0eyaRxKZhwwGsQmBuNWVlq9Gn2XqKaTsmR3ZImc9fIB9lyFOpNbLMWi914G5Eb
-	 B6q34q4zqYKwZyBcbRgLNf5XxELGqaK2oCS2DtkqSnnB7vPa1/3UdlBRFj9gOZ30zBsdi
-	 UgXcJnQp/5FRFpqBEEuD12TQHdg2/0eSwYsM1WS7VVYJojuOc2NZ4Gpm/quLXjyiMQ2dn
-	 ZDId8dg88mBuT0K8LtOHMEtUuxD7awY9dWR4WxP14ogCMGN2rta3KHmmg6IWdLzB/Ug==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794235879;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 X-Zmail-TransId:X-Mailer:Message-ID:Date:Mime-Version:From:To:Cc:
+	 Subject:Content-Type:X-MAIL:X-TLS:X-ENVELOPE-SENDER:X-SOURCE-IP:
+	 X-CLEAN:X-Fangmail-Anti-Spam-Filtered:X-Fangmail-MID-QID;
+	bh=uLSflaxjO4OBevq7ky/l/4hrZCoxCuKgi5OqqZAksoc=;
+	b=a3uJ5bPvHu+NZnpdBSaXI6+WVomRAku7tOz40Lev04jYuBKZy7EOWA8roKKZ6vRgV6Vh
+	 xBjrPgHDQ2p0QWrw3DWajLj/K3K0zBOOAu/gSoE62y4QeZ031SQHls2/P8LeGwd7wG9DA
+	 x22H3EBZsx6RETugvyYncBNW1r7xTs/4NHsyGLdmRA8RS9oolNnwesbMfiHM8zpKkalwu
+	 NPcdOB5lWTHKqGrblfDwOfaPfa+cyoLZGESGjN3SQZ9Afbm5kRcSivKxB2KLHQMhUbQrL
+	 MtyDB3dNy1x4FM1seloAndDQiQCrL+fwETHOZypIiygpCgzMPLgdv8nhQbiYI3v9i6g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.com;
-	spf=pass smtp.mailfrom=suse.com;
-	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b="KFK/aQtF";
-	arc=none smtp.remote-ip=209.85.128.50
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=zte.com.cn;
+	spf=pass smtp.mailfrom=zte.com.cn;
+	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=HEAG+Oi7;
+	arc=none smtp.remote-ip=160.30.148.35
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB446606A323
-	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 14:45:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EB446606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B18606EE8A;
+	Mon,  9 Nov 2026 14:51:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3B18606EE8A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=KFK/aQtF
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4a215e64962so11132715e9.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 06:45:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1794235519; x=1794840319; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:subject:from:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=QjfeGxjBgHeFZbXRRkDc44FRNrdtYAfDOz72ekRK868=;
-        b=KFK/aQtFLegNJK98LFKD6Oei6GWS+XtyERPvlnh3sq5FpPVcwCiSzWXGwfa8mHLIqj
-         dCjo6QncuJKoLD2WgqM9z8eUjaxPgrZzy4D0hA2wFNMBVoUx/CpT/Bg+B/GfOl6piu4B
-         llRf1PC7DeOLOeSVJhDLYlWfqRmJ39ikqx+j6Ys+ArOHBRvh1TdHC6zfAG7ZBb6e9dr6
-         36C+cMpJXL3NAnyLSRcFWm8Lae2mY89MZAsLEOI7g1ieKNuEHjow1+aPmGsBfmxeMLBU
-         HUOy3beoZ8qRnsMffISED9gHNm93zZuayygzoIOMGFehfRmJ0DCspRBQpWVa1p6DjZ0j
-         Irig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794235519; x=1794840319;
-        h=content-transfer-encoding:content-type:subject:from:to
-         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=QjfeGxjBgHeFZbXRRkDc44FRNrdtYAfDOz72ekRK868=;
-        b=0pNP2Wuwk7M8Pl4qc6G5y6JnRz/SLUFnkKaYHVNwmK4dIsxNYre9LSabe0x1zXl0gG
-         EfGHNXd6jJYmnIgeCdb11lA2gjH+Y0aYD0wZG5DTdvN8HyKih4W0XSvW9D+9IqLa1701
-         d3BxpJ6I1k3YFEHQckSaqqI0SBz1DB9CbFkF7KXb2cM4jLSUzCyU5O5nQFlpjMiBOL/A
-         itzB68Jy+g2KqCZ72EH7FIMMQKdqFKAP5/GJC28v/aRQ+I707sQYHpGo6ODFkr1Qc7UP
-         hh7UYgB/mSAc5FOf0HN5ecjGSasfLaeXggUCaLPN0OS1D/uv2MhN/TfSl/wnhxn2GyB+
-         BvWg==
-X-Gm-Message-State: APuU4Z9N1pGkbJUdTSQ1l2gq5+UxJsJE1bN40LvB6zR7zUAcy9kRuVTI
-	BRyw141QN8t1oO3jzOXj9xiorSFFkNKASbf4YDYM5YZ+tK4BGy8OCJ29WWlYa43OxwUOr01M6nh
-	QvfTPlaw=
-X-Gm-Gg: AYBFou2yHOKGqDoVQ7nu+Vh2aXMXIQrN63B+DXVUZPiHbOWQBBPMWzP/zhb1mi3TAuR
-	cXFiaGsDwzltcmNfP5QU3d+Qn5OOXBqJGDhC/a5Jnb27AvLjrtd2fvetujZoJseBnCxhuufUpoe
-	7AL9JOLeKxXATsokrVlESIIC2Jf977chieEh/oEx4ZySzrcw05IIzQXqVWcJqSEyeLvPphzwZrP
-	1LwfkB3ZOw6KbBciZHTf6D1TxpbwCAVie69rx8FwajF3L2jR36KHg6FUrpnYmGzYRh+UbXKB0uc
-	qJk/WmwmQAiSZsRqtzdWAl5+5/1pfLJNl69rm/sSjVbt5KLE3d9ge/5exx2ZQS1LxWIBUWAKCha
-	NCoOqTxcX4yF2Tt4KuQpro+VNYP9foeeI8OLvdjjXOEYSgd0uR1o2Gwze5WKhp770lCzfiGSV9I
-	jeT2+VB93xC2w//9mcaEf6awYMHx9l3fENK5BngtIKv8lYh5TbaIvGyumfZGIzunIxTO8BxkMFZ
-	scuQgKCLJenc1+OkCnLoBbJ/kFuvqezWULMxdsU7HIbaywJsrjBTamWbNaX0rqXRLKg97Wu054Y
-	xZ2HAsApaprtPcGAKqc4OMIWbkZbNwI1SUfxxGypXkIyzK4VuTs4KFfMVHiR
-X-Received: by 2002:a05:600c:a00d:b0:4a5:5fb9:5d35 with SMTP id 5b1f17b1804b1-4b963c8e853mr65569055e9.21.1794235519093;
-        Mon, 09 Nov 2026 06:45:19 -0800 (PST)
-Received: from ?IPV6:2a07:de40:a101:3:ce70:3e6f:3b9c:9125? ([2a01:4a0:2e:ffff:ffff:ffff:ffff:ffff])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4967a70a35dsm7723097f8f.9.2026.11.09.06.45.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Nov 2026 06:45:18 -0800 (PST)
-Message-ID: <94510397-fef7-4856-a8cf-c9f5d9dd0ed8@suse.com>
-Date: Mon, 9 Nov 2026 15:45:17 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=HEAG+Oi7
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jNXm23mFkz8Xrkn;
+	Mon, 09 Nov 2026 22:51:14 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
+	s=z202610; t=1794235874;
+	bh=O0K5SqWPqnmgeQwtJ4LKSu5Ulb1IYQAL+e00tsD867I=;
+	h=Date:From:To:Cc:Subject;
+	b=HEAG+Oi7dQzW2ds1iDc2EOc+P/nT4MYWjvP6gUKHndN/P08BdqVmcWbzUte1UnYFL
+	 PlxPCEmy8Sv8c+EK39xWA7Dy+WAseMRNiijXg9edXuJQ0VCTdw5IT13UDfSZEWURW/
+	 umrS2ABfKJkA5nJcRmC5/Ib9DR1G13vNYgRJKQ3BiOj94bcsu/G0KJB3eDF6UxtAVw
+	 KGCJKeUIzcDcJktMEqw1D5GGNQnObUPSh5X2E+gDR0VtatLwfHMponAHpqFCBGuYVC
+	 sCaOtUmqOySptzXemKRll5wH7prYBCLEYJAq5HHLXcx9/qSf/9nNiMmhOdFIkN7ZuC
+	 Ih0ur3M0c3jng==
+Received: from xaxapp02.zte.com.cn ([10.88.97.241])
+	by mse-fl1.zte.com.cn with SMTP id 6A9Ep6id088728;
+	Mon, 9 Nov 2026 22:51:06 +0800 (+08)
+	(envelope-from shao.mingyin@zte.com.cn)
+Received: from mapi (xaxapp02[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Mon, 9 Nov 2026 22:51:10 +0800 (CST)
+X-Zmail-TransId: 2afa6af1dddedbd-74b87
+X-Mailer: Zmail v1.0
+Message-ID: <20261109225110056QQJAEflTHzwYHzwXlMBb_@zte.com.cn>
+Date: Mon, 9 Nov 2026 22:51:10 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -89,37 +69,53 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- kernel-security-sentinel@lists.suse.com
-From: Hannes Reinecke <hare@suse.com>
-Subject: Automated commit blacklisting
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+From: <shao.mingyin@zte.com.cn>
+To: <tom.leiming@gmail.com>, <linux-block@vger.kernel.org>
+Cc: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIXSB1YmxrOiBzdG9wIHJlcG9ydGluZyB6b25lcyBvbiBhbiBlbXB0eSByZXNwb25zZQ==?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 6A9Ep6id088728
+X-TLS: YES
+X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
+X-SOURCE-IP: 10.5.228.132 unknown Mon, 09 Nov 2026 22:51:14 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6AF1DDE2.000/4jNXm23mFkz8Xrkn
 
-Hey all,
+From: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-apparently there is an automated blacklisting bot running (cf 
-bug#1285635). However, there _also_ is another bug referencing
-the same commit (bug#1285636), for which the bot did not do
-a blacklist.
+ublk_report_zones() treats a zero-length zone as the end of a server
+response, but only breaks out of the inner loop.  If the server returns
+an empty report, done_zones and sector do not advance, so the driver
+keeps issuing REPORT ZONES requests at the same sector indefinitely.
 
-Which is a tad annoying.
+Finish the report when the zero-length marker is encountered and return
+the number of zones already reported.  Use the existing exit path to
+release the report buffer, including when the first response is empty.
 
-Can we somehow fix this up?
-IE can we modify the bot to not do automated action if there
-is another bugzilla pending?
-Or can we modify the bot to cross-link the bugzilla entries
-such that one can see what's happening?
+Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
+---
+ drivers/block/ublk_drv.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.com                                 +49 173 5876786
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: J.Jaser, A.McDonald, W.Knoblich
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 3d322fa1bc83..5c14daeaebbf 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -693,8 +693,10 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+ 			struct blk_zone *zone = buffer + i;
+ 
+ 			/* A zero length zone means no more zones in this response */
+-			if (!zone->len)
+-				break;
++			if (!zone->len) {
++				ret = done_zones;
++				goto out;
++			}
+ 
+ 			ret = disk_report_zone(disk, zone, done_zones, args);
+ 			if (ret)
