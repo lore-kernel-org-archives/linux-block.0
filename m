@@ -1,100 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794244960;
-	b=zJvop6KMV1jfo/S1IGl4D2TXRevAcTboTizkaC8PDUOZb0v4VxKEWwi475ZotZCbyIVa
-	 kXQoZkzkqm5r87NKCW0jCzWRJcRuH9+vkYl2fCXl9bo9YzgkOHd1LBrj2tpsi//R42sLO
-	 Vk5wk27hUz9/DwVq9bI5o/7vvD2hJjJu8hxM3+vRpy348Asyv3ZSmvrML4CW8AueOKmX9
-	 +YyQlmfETda8GYewzwnljFHdeSghJ0p0oC+lSHNdJGbkjX2TvDpyQ4b6FIHEFhdWVXWOG
-	 shz1q63rKmzUTbyVJcVyJ+8timd3r1uwJI6T84EAmNQlWxPg3uzRfAKrA2tSejLylXw==
+	t=1794246024;
+	b=XQorHHCyedaHa832wLK9UXfBfiDBT29y4yYVqqljvQ1a/6amK0oNPIK+4kunvZQJfMKD
+	 A/nZUhWtAdaLH6Cypccks6xlajR3gxDVza38XTBwwzFgFRSZUzxBZi931rJm0+1dmythg
+	 MCMhH83Pq/QAEnN3g51oQavT9jThVOApNJDg3MmrDGwxPN+V6QVGacInItXRY3AnygZGW
+	 P6oGh/Tt2t50LDg24bm8BKPtE2hUr/FK0cmWX09QNfRJMgCt+j3rbQNIdtQqLIhO2pBRd
+	 EQHoENrANXQUunPny2iuuzaDiQGqZSgPbg/8ICgriC4QdzH1Vr41SQbJYbrxuVK5ubg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794244960;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794246024;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:Mail-Followup-To:References:
-	 MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=b6mHS43xjC7bUToGiz9ZtsTkKl4SjMG7SXbvThwI2D0=;
-	b=CgBajcCTqfBuNJp6wkeiEpC/R/SfpNDfYFpeIgs170Fu5ep0iHoMVq/YHwCf1gOvBWk+
-	 VAztKl+FSJV1RmWPJvf5akrfB/IPlCKc5vdFnhTImcpYQg6eBAHbn44Z7vJIKK3JSLOeO
-	 jgT9N9bqqHhp5+IHzxfdjJ5QKLNG3bHcednwpF3uSnz9QAJgRkLFCVG3jqSL/tjDXLPlF
-	 7uGwjsj459/kOygRWhSOLYap5L9CBB1isCD/hE/Zjr58ViOK0H5XADuUyL9c3jcbpeHpR
-	 g77PmcILpjta3xzZin0k6Fxx+wM5qw6yCDmInyIV6r7D6WeQ09X+ugwG2W8fefJSQXA==
+	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
+	bh=RTN7GJRGxjj0prh56qCTTHNAOwYTCgOl6J/IwT1bHGo=;
+	b=zAWZ3HBTAZeos5GlSF4XLMF7hsIaDu4CTSblKM4EYa22LsrN9LqMeTaemtK3lFtonkTl
+	 b+wTsH0Xv0UuS9J526cRqpxaO4JBJjfBD1Es2PTdFQhh/uzSIjWzcFkzR1vPDl5yppMJF
+	 0LU8o841SKjo5lUpviCw9sDxdaCMzdpzTncBYUY4N7WWMwq/pkB73zccDoRAr9TPTYCZN
+	 +NtQD0hQFRjtqIyvHB6P6yTA0Qzb0eEY6jUetw6huwjtRJY95D3jPJfJ/jfV1pYlHF2dn
+	 Ee9jwiWk53sAOdnG4bZ1giGkGf4j5U2xPX7zTRx3jWbXgq+PicKT8PBJ8npy9a2kAVw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linbit.com;
-	spf=pass smtp.mailfrom=linbit.com;
-	dkim=pass header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=U4v0mlex;
-	arc=none smtp.remote-ip=209.85.221.44
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=TKz+LF0C;
+	arc=none smtp.remote-ip=74.125.82.169
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771E7606A33B
-	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 17:22:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 771E7606A33B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FEE606A33A
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 17:40:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 80FEE606A33A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=U4v0mlex
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-491971ac844so1116078f8f.2
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 09:22:39 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=TKz+LF0C
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-37198ed3727so1547177eec.0
+        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 09:40:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit.com; s=google; t=1794244958; x=1794849758; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:mail-followup-to:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=b6mHS43xjC7bUToGiz9ZtsTkKl4SjMG7SXbvThwI2D0=;
-        b=U4v0mlexhWlX56e50vl+rHtY0E4bzai4WnqBSNUoQGJvDFH+jhJZG+QNgLf/ou8Qhj
-         c4HdzeD9/Rvq4PLSw0i0SegdfnVBgRa09/CSARvygTBgoCOGLU3+zQutEf8u/FiuhFMW
-         qBH/0nEA6GfUKokeDCAqKFvRKRJhW6xSfRu1F9jQNByvFJtRvrszHUpPhpxL0oH0zt5E
-         8pNyo3s7ARdiyEuFvG4/2nP9ZwebN7wu5iKRFeejPNZ5YO85nvyWIXBcKsBeNIq+iuTT
-         LCKGawt2Bobn3BYRN36mW64rBrcAtzymMoS55QOhqALvVjMm8F7KHt/4h3QwtQ4mb1rv
-         Qaew==
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1794246021; x=1794850821; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=RTN7GJRGxjj0prh56qCTTHNAOwYTCgOl6J/IwT1bHGo=;
+        b=TKz+LF0CU9ykvW24qHkHBmZANsrDxSE+YQKhzk9llLhgvgZCWOa6B2astRojinp2fl
+         If3NI517QkeButaIP8z57vpRuErzEsGplyoOkGJg87a8FPDVnoh6Dxaf5WTkCSo1jtae
+         Zhte+uncYMMhTW7SH8CdvesLtgDulYzRj8y+sPxw+YB1WM2aGI9quKEl4XdJAw8wli4P
+         sPsQuYdTOltOGTZcg+eciOobSTr2qjTCEzL3oN0lv1YbQnRyxSp7YwhWRP3/6n1sk6MI
+         tImcZetcy08pofmpnlRjZFvdWs6WX7tca0QYPnl+2LqvLV0Ur0/iq21VjvIUERffzpmj
+         PtoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794244958; x=1794849758;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:mail-followup-to:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=b6mHS43xjC7bUToGiz9ZtsTkKl4SjMG7SXbvThwI2D0=;
-        b=Ps0hDqkqLIShLd4p6nowGdX5MpLKpQcEdL3Jj0azL9I7pk7lelRtSY+5zVZh4/sTJp
-         xjsd0FfUDckIbXI9MHsFedRPO9g7RoNrzrMB1tiN3zndhzYx7PxLk1BrTNnv37l4QIN0
-         e5y55FABczA+/pPkBYuo1r40DpMMph6BMStxm8gRIhK9u9abwmGgEvNl8dJDnMeD8TUW
-         MesgeuosBedbVR3MmF7UHr9seDoixehUVzQzsuPML9O3N1M2MgXcD/FS0Avdcf4GDMCO
-         jqBs6Ij9gJ1brl4CUdcISEOWe1yUXTt7k3JLUw4Fr8+Tqmu3w7ds8M2I1nIvh6TgU4G9
-         uzkw==
-X-Forwarded-Encrypted: i=1; AL+hErF7nTngKtm+lYChjktpPv7crY7uKeDEbd+01GiDWcLNGgUQEh8mixoYFdaYgTMn86VVU11E0j5t2fFJbQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+ixB4w+//Gs4ejLokuz1Bv+eiW5xH/mmCEfwPW9pUE7bBFZgNT
-	l8UfSKFfkTNTnDKHwdDZ4zXIPwG11w2PvjQpgeVbbEwQ6zrJNF5IaSugxx92OjB09d8=
-X-Gm-Gg: AYBFou1pbUXRcYc9GsZcH0hfP+UoqisQW+I+aFJzaRrFZkUBx27jQfMhvGbmbBaVvdh
-	/ahWynUDHwbOHJdNFdLzJlE0kfvfyDZV5oXs8HNN2xJZ4C0DV2kJUq4alQ5bh7J+TqueOGCM6rW
-	Jlk7w6ixpGpiWV6NDR3EcJO3Vd1IFR+jcGbIuiTFbfMkOUFOjej70Fh9DVEg8GbBnpG/BWIXgo/
-	kHPWl3XumliC8iWkleHc+lN/VZrTaK2i8uj8hA5xBSglG8CxZ61pTPJjLlWynPFAYnkVqIvIvny
-	9cvagGtuLJeKdLXdGmfQlZWxrGjFe2OloyrTouWceRJHfd8QUjCq77kpI9s+rexm+3q54h5CpYe
-	bVaAzxJLFC+qi8pnv4ZEyN896C2h9XMr9FkdrX0Ht4eB7MOVdxvyJXlb4i33ee8NFJy2nR7zzww
-	QTaIKgbxaa93k9K2ub+sz1/I6Ensp3ao3RKDiLuUdCFw/7++UcfK/t+9fnHhez7oj9d0/xXk9ea
-	IXLmxWvDDWsnLap4om/JF/jA5uTQSYQWCB7w4Pd6GEmw9wzKBzh/spU6YuUG/HieYF/HIypawKw
-	WP5+nPZEmicWgw6vOUfgRqOofWAFSGRNa8fFs38ZHQuqcfJ+VnwueUn+e8f+hT0Uw5qOjPlSJmF
-	YrL3q++tt3YEtBCkv/w==
-X-Received: by 2002:a05:600c:470a:b0:4a2:1655:87db with SMTP id 5b1f17b1804b1-4b943f76fdbmr96705385e9.0.1794244957763;
-        Mon, 09 Nov 2026 09:22:37 -0800 (PST)
-Received: from localhost (h082218129081.host.wavenet.at. [82.218.129.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba015c1e31sm4470385e9.1.2026.11.09.09.22.35
+        d=1e100.net; s=20260707; t=1794246021; x=1794850821;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=RTN7GJRGxjj0prh56qCTTHNAOwYTCgOl6J/IwT1bHGo=;
+        b=BoYH9e+loJvGwYup9E6VFhuLpw2OR8EUiEiwmA0RPeAwGtQUONIcwRF0Z2tQCrb+MF
+         FZin91Pf8W6dfAAn4uzpF3PW8lV1pwlVbsO5CoBSCqshOLRB/N4fQk8hLD0ZLYHwCsw/
+         zS5Q79hbNetvwjICUQ6MEkeeARG0dw4zNlkHXjEu0lw3sCNgoy8MU4/H3KJqJJC3Br17
+         dogHm+js9bk5sZ/TitvbF1Oo9Dm+MADJsFy2kA2t59JoeXpWl/IAbajS7sHxh8w699iI
+         YRZUGTUDvvV1J7nm3u3I3mpXhBSvYCyaF4Ci0L1h38UkTpU7In0kdjbu1SzTjtPgp2h3
+         9RMQ==
+X-Forwarded-Encrypted: i=1; AL+hErFl28tpVQfMsrXBQ7R6w4Vl1LZ2APDbZatkec2Jab0b+nlrE7i6nJYnu+alO1P9Pr64fBBd9+fprDcpww==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+hI+tdzs3dqjEtW6zkAZuseDG0dJ1g74HlTPXxYmUF+W1T1Bjq
+	e0Yo4cbs5MxSPTEEZX7Wv7rpG8v2YRVGhcpEVSgLvANXr+oxTddBJi/hYxe0ac2QELE=
+X-Gm-Gg: AYBFou0dc9Mikgf8fSoR9oc9J7xhQiizUN7fBLOcVsywU1BGC1dh1MONc6c9KvQK4SJ
+	Y2z6OXr91l7PvfNdZGYowIjJiyKPztO58NJWjw/u91W8F9GYNse2j+BVT+AwbDiZZDHNQ3uDZLn
+	+Z/fXQb16HtS4vKHwO1qCywqR2uqffx88HEk+Y77wU1Kq4E9NKV5EF4FMtctfDh24BLhs9wNPQ2
+	mBUfitdfMYehc+YKyKb1h99QNlpdKi1XzRhd8VE56uKqT2bsA0XeIizlqhSgqnLWomjjPe00SsF
+	Qt3wyskGauCc45IcOzZ71X4C76PuXKlTOUwB3MF5qFrIDmNwQqiGrOHvh8C9AiNAqTKaN4DTswL
+	Ays6eLLJXY2EjpAgILqq+TogGV+vup/4k15SEd2qKZ4xEaQX6lNBoNr7TpSl90pm6SPt7f2sudM
+	CKabnlLaxkQavFi4P8ZyT6S4aPehbyORdhg3GoTFuqxV66xvwHyPcw5WFDhjTpImFmc2JCN48+M
+	9O3oFMZ+ZmFU/NWu5NFeFcuKVu2IgZAbrpyjUSHy4ofzyqa6olX69o83JF/G/FNH/C4TlHFqCqr
+	n7GDeq5q84/I8oJDAFol4btviJOe/fxwfsrB7Hm7PeDZwCbUW+SQkox5mZnhgiueaxfCoHYzNZ/
+	ufR+4UljRKjSZ
+X-Received: by 2002:a05:7300:e9d9:20b0:36a:2f6c:490e with SMTP id 5a478bee46e88-37508f421a2mr245104eec.6.1794246021164;
+        Mon, 09 Nov 2026 09:40:21 -0800 (PST)
+Received: from [192.168.1.106] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-372656187f8sm13250129eec.5.2026.11.09.09.40.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 09:22:36 -0800 (PST)
-Date: Mon, 9 Nov 2026 18:22:35 +0100
-From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: Jens Axboe <axboe@kernel.dk>
+        Mon, 09 Nov 2026 09:40:20 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: =?utf-8?q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
 Cc: Philipp Reisner <philipp.reisner@linbit.com>, 
-	Lars Ellenberg <lars@linbit.com>, drbd-dev@lists.linux.dev, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>
-Subject: Re: [PATCH 0/7] drbd: preparation for DRBD 9
-Message-ID: <avIA1j2pX46pzOr0@linbit.com>
-Mail-Followup-To: Jens Axboe <axboe@kernel.dk>, 
-	Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars@linbit.com>, drbd-dev@lists.linux.dev, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lars Ellenberg <lars.ellenberg@linbit.com>
+ Lars Ellenberg <lars@linbit.com>, drbd-dev@lists.linux.dev, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Lars Ellenberg <lars.ellenberg@linbit.com>
+In-Reply-To: <20260923140608.1116713-1-christoph.boehmwalder@linbit.com>
 References: <20260923140608.1116713-1-christoph.boehmwalder@linbit.com>
+Subject: Re: [PATCH 0/7] drbd: preparation for DRBD 9
+Message-Id: <179424602031.19772.15096346833030118942.b4-ty@b4>
+Date: Mon, 09 Nov 2026 10:40:20 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,71 +100,45 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260923140608.1116713-1-christoph.boehmwalder@linbit.com>
+X-Mailer: b4 0.15.2
 
-On Wed, Sep 23, 2026 at 04:06:01PM +0200, Christoph Böhmwalder wrote:
->This series contains preparatory changes for bringing DRBD 9 upstream.
->Each patch moves a piece of the in-tree DRBD 8.4 code to the form it
->has in the out-of-tree DRBD 9 code. Doing these steps separately and
->up front keeps them out of the much larger rework that follows, so
->that rework shows only what DRBD 9 actually changes.
->
->The patches are a file rename, comment and internal cleanups, and two
->higher configuration maximums. Defaults are unchanged, all existing
->configurations remain valid, and apart from those limits only the
->wording of some log messages is visible to userspace.
->
->Christoph Böhmwalder (7):
->  drbd: rename drbd_worker.c to drbd_sender.c
->  drbd: modernize the file header comments
->  drbd: raise the socket buffer size limits to 128 MiB
->  drbd: raise the maximum resync rate to 8 GiB/s
->  drbd: replace the drbd_interval bitfields with a type and flags
->  drbd: move the packet name table to drbd_strings.c
->  drbd: rate limit log messages per object
->
-> drivers/block/drbd/Makefile                   |   2 +-
-> drivers/block/drbd/drbd_actlog.c              |  16 +-
-> drivers/block/drbd/drbd_bitmap.c              |  18 +-
-> drivers/block/drbd/drbd_debugfs.c             |   4 +
-> drivers/block/drbd/drbd_debugfs.h             |   4 +
-> drivers/block/drbd/drbd_int.h                 |  59 +++-
-> drivers/block/drbd/drbd_interval.c            |   4 +
-> drivers/block/drbd/drbd_interval.h            |  55 +++-
-> drivers/block/drbd/drbd_main.c                | 106 ++------
-> drivers/block/drbd/drbd_nl.c                  |  15 +-
-> drivers/block/drbd/drbd_polymorph_printk.h    | 256 ++++++++++++------
-> drivers/block/drbd/drbd_proc.c                |  10 +-
-> drivers/block/drbd/drbd_protocol.h            |   4 +
-> drivers/block/drbd/drbd_receiver.c            |  61 +++--
-> drivers/block/drbd/drbd_req.c                 |  40 ++-
-> drivers/block/drbd/drbd_req.h                 |  12 +-
-> .../drbd/{drbd_worker.c => drbd_sender.c}     |  42 ++-
-> drivers/block/drbd/drbd_state.c               |  15 +-
-> drivers/block/drbd/drbd_strings.c             | 138 ++++++++--
-> drivers/block/drbd/drbd_strings.h             |  27 +-
-> drivers/block/drbd/drbd_vli.h                 |  12 +-
-> include/uapi/linux/drbd.h                     |  12 +-
-> include/uapi/linux/drbd_limits.h              |  12 +-
-> 23 files changed, 534 insertions(+), 390 deletions(-)
-> rename drivers/block/drbd/{drbd_worker.c => drbd_sender.c} (98%)
->
->
->base-commit: 85bffad4d2fea373a72d68bed8012e8cbccb8ee7
->-- 
->2.55.0
->
 
-Hi Jens,
+On Wed, 23 Sep 2026 16:06:01 +0200, Christoph Böhmwalder wrote:
+> This series contains preparatory changes for bringing DRBD 9 upstream.
+> Each patch moves a piece of the in-tree DRBD 8.4 code to the form it
+> has in the out-of-tree DRBD 9 code. Doing these steps separately and
+> up front keeps them out of the much larger rework that follows, so
+> that rework shows only what DRBD 9 actually changes.
+> 
+> The patches are a file rename, comment and internal cleanups, and two
+> higher configuration maximums. Defaults are unchanged, all existing
+> configurations remain valid, and apart from those limits only the
+> wording of some log messages is visible to userspace.
+> 
+> [...]
 
-this never got a reply, and neither did the subsequent v2 drbd rework series
-that's based on it [1].
-I think this should still apply to 7.5, would you mind queueing it up?
+Applied, thanks!
 
-Thanks,
-Christoph
+[1/7] drbd: rename drbd_worker.c to drbd_sender.c
+      commit: 40059d1813d8834cf4779b8c9c2faa80b4a6a0a5
+[2/7] drbd: modernize the file header comments
+      commit: 4df3cf912f90dedfeee025b1fb34b6ecead7c8bf
+[3/7] drbd: raise the socket buffer size limits to 128 MiB
+      commit: 80869ca32c8969eeb857f4d1a3f959dba952109a
+[4/7] drbd: raise the maximum resync rate to 8 GiB/s
+      commit: ebf0023b636ad47afeb13ece37123507d27e131e
+[5/7] drbd: replace the drbd_interval bitfields with a type and flags
+      commit: 6826d3b194b1e01128fca6e0925a8afe72b7cca9
+[6/7] drbd: move the packet name table to drbd_strings.c
+      commit: b87ef682279fd67600b92eb83d10e70b01eccda5
+[7/7] drbd: rate limit log messages per object
+      commit: dc2ec1327db41fb8c7c0ae5a5e29654b6ca3fe17
 
-[1] https://lore.kernel.org/linux-block/20261006154607.3936501-1-christoph.boehmwalder@linbit.com/
+Best regards,
+-- 
+Jens Axboe
+
+
+
