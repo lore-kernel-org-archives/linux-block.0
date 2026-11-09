@@ -1,145 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.83.117
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794237242;
-	b=VCF/zNWHbTy6lc7kE0GzZhNKVrtXDEifzCbQTooVRl4y5auuoArDIUFe5lPLGM7N1Q6I
-	 iUnd4s7x9F4/tpybHOEjEEA0W9VDvQ9qASI7pKubJdVEwJAF1QV97GSECeXtjaAqwqAMP
-	 xC+ynby2wICW7Gzcw27sRe+Bz6pcX+f952k6LQyCkEZuP7nrxlPX7YbLcQoaxH2M6+Xyv
-	 HOce2Zy2WzIo7JJ+muE8wSmAKYtA+gR/AHKVkaPNawh5fS6YtHScSTC3t2sdL57NV7J15
-	 9FjsOV37HuVhmzDnIGbyHGkcAIQ37RL9mqsXC5sMZZGY77/fKAfp1ps6ZNvbtZtMGhQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794237242;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:CC:Subject:
-	 Thread-Topic:Thread-Index:Date:Message-ID:Accept-Language:
-	 Content-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:msip_labels:
-	 x-ms-publictraffictype:x-ms-traffictypediagnostic:
-	 x-ms-office365-filtering-correlation-id:x-ms-exchange-senderadcheck:
-	 x-ms-exchange-antispam-relay:x-microsoft-antispam:
-	 x-microsoft-antispam-message-info:x-forefront-antispam-report:
-	 x-ms-exchange-antispam-messagedata-chunkcount:
-	 x-ms-exchange-antispam-messagedata-0:
-	 x-ms-exchange-antispam-messagedata-1:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-AuthAs:X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-originalarrivaltime:
-	 X-MS-Exchange-CrossTenant-fromentityheader:
-	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
-	 X-MS-Exchange-CrossTenant-userprincipalname:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=BQKfqqFIW+XWKnskeiNVtv2CbvQX15ixpJt8mqa+ARQ=;
-	b=3LOipka5P5OvwDO2AN/NQh++r+BJF0U9FFvrG3lkAb4DQ1mYE5EtRr1iD2jNKEagt56t
-	 i5KsSFSqGq3u2/VYQjYkocgSnG/5pRN3OIAmXOfoxpbtWv0IQhp5N0nCUDbUBS1CCsW9y
-	 7BiywsfP1BeD+6Tq0C44vcGaPd+6vGujnKmD9YTuQ3MTSPuGgz++qIQpsFsZwh4kgf5ne
-	 g31oZtVJB60pkGlEnkBH5PXVRDDBhOLKQcCy8QRerlpKCKXSGgmFMXBixqG1yC2GSj69v
-	 BZ5eE1FVy+YOMSSr4jTQX3HczhrfXlCAhfZ2W+ClAbTjzrzVRRo3V4r+DeUGY88r83A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=tek-up.de;
-	spf=pass smtp.mailfrom=tek-up.de;
-	dkim=pass header.d=tekupde.onmicrosoft.com header.i=@tekupde.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-tekupde-onmicrosoft-com header.b=iFkX1TZO;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.83.117
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11023117.outbound.protection.outlook.com [52.101.83.117])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.200
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794238305;
+	b=h0SwWT46TjhjOVdAtQfB2yzM0C6Jx6Cvs+rNsRMAkEuqsSDMY3SzF0hX674KH5NzT9VO
+	 +YijDCn4r/x+aHV2HCxlA7RPYB4Pjc/iavwJ1xUIU0y8/EADbcUL95Fmz0J0V0YokJQG0
+	 h1QGn8WoCfUyvqfFTPXnYC8ZFtOrs2zn/6KAbBx3jQsGiq/F1MxHt9aGYYaSa2wUAbgNb
+	 AykUwA/7Se9Ni19BeX3REnnOTwowVZKctgxdniPGaVXuM8JEEX0FJMQymy5SmOb2XCshc
+	 fPQXge55Td8NWM1i+PZucfWoVbQMoSxypQqhcMBo+y+USuLl3u6r8/nNkiXWuttzGpg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794238305;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Content-Type;
+	bh=3TCmelbJhrC1Gcjo8LWEm8yQBYz7VAtFIcxL7M2b5HE=;
+	b=ISEa7gMYEoNYEUGamPvrtfqr3w39kw0VUatv5U1rWQswcGESF2hUGU+NYmMqq2cYGd9I
+	 CiKEkMcB8Xa5ralFEGmv5fJYrtEGZvb6IzMMZ1UKK+mbwhllgVn9MpzltUHU2zEJBxb9H
+	 HJ6AUqeqLfeL3cZSzPAwhyb8MidoJlOTC9gkQvJN8esKZJ+ShU1lcZLSLq53717Dolag0
+	 XlHSgEhAIVNNnyS2KoST8O8iMG0GPHIu+E7vDvBk4R20bJau6IBy+g8jgOiHhW9M7Bs6E
+	 jz8l2sAW+9VDGlapPfmL48zXRorgoVJ40rTQuciZqm0wauDv2BZ6Y4Hfdsl0gMYp1mw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.200
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC725606A32A;
-	Mon,  9 Nov 2026 15:14:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC725606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tek-up.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tek-up.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tekupde.onmicrosoft.com header.i=@tekupde.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-tekupde-onmicrosoft-com header.b=iFkX1TZO
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lsrniidUMHwLBe9w4w9Nt02fMa20fdTzNd8lxslmai2iL1yXVzybAiofubt13f/MxUIAh+dG6VaG4AYUnGg7gAXKKsjK5fuVXSAQC6yR5KWrxZ+gU9Sk22nxyhyoYJllByLNdusiQPmllN36ZWisO9gWu2Ib1ZJ8RalgdT94Ku7KxBW7utnaq8G3sV3nki7PR9c1b05Jz283avaSVdpu0FlpAhU02LztjvFfzAaEjYZXZ32/SZ0lT73JS1lk9d2Lkvickt+/sShgJAyWpz9j3T3+9I7YhLupQVpXcp05c7FjiLFp0vJHRhEJrlqJZXMoyzrbHkdQU+XaU6PROQXmZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BQKfqqFIW+XWKnskeiNVtv2CbvQX15ixpJt8mqa+ARQ=;
- b=B7NE4mxa2qPZG8MPfOtP141S+Q/7IuOF3s9THPRiBG+4K24whQ+4gbsPu4dxQNXSzHzeGnmvq0ZHqfENAXMXHlXU01OCtBxN53F0UDNgH9sVv/jn7e5P3PXqE2w5weOvXx4ZFicXrc4KV4j9dlEtXaGIICALKu2PbnB2BX+ZlPwkmvXSvgFyWOHSsWIc09/jilWos783oYR8rYOEr3LEPUnlTPM1XagwvhdVM0AmlyyUj3IELxeCCCnO1FjAJwTd3d+b5Pzvu/j+nwoeSFkdWRAkWMsxC+p7uMolRVRJdDAvLO1TObt8nZHFPaGTrN4vpglXSWdUE7bfk0H37aB+Nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=tek-up.de; dmarc=pass action=none header.from=tek-up.de;
- dkim=pass header.d=tek-up.de; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=tekupde.onmicrosoft.com; s=selector1-tekupde-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BQKfqqFIW+XWKnskeiNVtv2CbvQX15ixpJt8mqa+ARQ=;
- b=iFkX1TZOle4aRC5Vkp6vjCmeNTvnEe+jNyiZjtvYJuAEBFEYsZ96TfG6064nGfr3953tP8y2CbV5GpbDGZ1iW6Q4nJxtwwJLfH0VexbbNXznW9+565sdlKeamaHSSbjr/3TZ3oeib3skjls77rs6M71ZJEIG+jZuqvNW/3W+jc4LfKu6M532p7cI1WzLFOgtrMVraPjZ2LvSwhPXTKKDpYagZdmo5oETggpirQus4AjOqBRCSiaKG6yjakg+Nu3UpnD0tAL6Zera6B2JNIaktiXEucRZkCCNoWh6DYMsDPsvQBdDXZ7/R53bWIuKp6/wDapw2XHMOZ7V/gqL/Ytfxw==
-Received: from AS8PR07MB7560.eurprd07.prod.outlook.com (2603:10a6:20b:2ae::12)
- by DU0PR07MB8490.eurprd07.prod.outlook.com (2603:10a6:10:356::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.12; Mon, 9 Nov
- 2026 15:13:57 +0000
-Received: from AS8PR07MB7560.eurprd07.prod.outlook.com
- ([fe80::62d2:70e0:fdc3:d89a]) by AS8PR07MB7560.eurprd07.prod.outlook.com
- ([fe80::62d2:70e0:fdc3:d89a%4]) with mapi id 15.21.0592.012; Mon, 9 Nov 2026
- 15:13:57 +0000
-From: Wael HASNAOUI <wael.hasnaoui@tek-up.de>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"usama.arif@linux.dev" <usama.arif@linux.dev>, "llvm@lists.linux.dev"
-	<llvm@lists.linux.dev>
-Subject: [PATCH] block: order timestamp flag clearing before plug detachment
-Thread-Topic: [PATCH] block: order timestamp flag clearing before plug
- detachment
-Thread-Index: AQHdcFYyoG1mW+zVQEu1Cwt9IJObwA==
-Date: Mon, 9 Nov 2026 15:13:57 +0000
-Message-ID:
- <AS8PR07MB756032CE87F3CC0F35611CFBB0732@AS8PR07MB7560.eurprd07.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=tek-up.de;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS8PR07MB7560:EE_|DU0PR07MB8490:EE_
-x-ms-office365-filtering-correlation-id: a4d961ea-4e97-47e1-2a58-08df3e7413b2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|41320700013|366016|23010399003|10070799003|786006|376014|18002099003|6133799003|10067099003|3023799007|38070700021|5023799004|261028144727099003|261102123227099003|261021123027099003|261022105027099003|261022075727099003|261021121427099003|56012099006|261022115727099003|261021135927099003|261026140227099003|261009223027099003|261026121527099003;
-x-microsoft-antispam-message-info:
- f625X4c1POxYGDPWU1cQqjnEtcofx2oc3wuJqor3AFl+0TEgtB5qqUr7qClrTO2yAaPT0f+9VYJAVRN7pCdqno5+ytY8aoo0MlKK+1o0f/y4EGgz/NgemzqC5i4FByKTq0BexPg2q4qLowA7sukHZVGzxtobPEg4M+bcNSbSI2GjQ9P7Y6ySqxcW2fFitwpGckykHQTLEbvaXBnqvso+PIc4fMHmxiAOpXsTW0EtcysJv78WH+QO/UJhtWuelkZLotxT+/qqmUQWJOF/ATKyOROKup0wTuA1WLu09KLM9KJj9uqb3I6oFuEwwb1qZdKbuYdZePK3f3NdSR3PU9/ToT9zzNlA04x+jTxs9tXh7zrdnVISB+dsXcWIw8ixvBWM0yh8sUe2pQ66o8801bo1Rta+0o8JaKH7NF5MnpvvYu/FqY7sPuKRVjOMCVCmvKQLCtKFWrGCG6uv0BWyfSFN2ArtRePLuz/nhC1LcwfW/mvkQC+dRWAroffpgMQLNIrNenUgZ2VJnjqgGIeUWGwI4q01q62nUvNsaT+Nt+GwwNALLz+7SugRilFpXYniAFXwhll8WRX6U2hNuJjvTrDNmNCcp6fM8wDL+zBkobrGOaMNG05LEFGxfPKOX5M6DNpbFmbGnqX1gleVRToPNz5ULvNJLfSUOadMJ2cwCrfIIBv0N1oYno6GskH6z8n9ZcXY+QuSSebP6toRcZ1ylHjRfv0wbnAQ7ZOVDvZC2unGjj4=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR07MB7560.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(41320700013)(366016)(23010399003)(10070799003)(786006)(376014)(18002099003)(6133799003)(10067099003)(3023799007)(38070700021)(5023799004)(261028144727099003)(261102123227099003)(261021123027099003)(261022105027099003)(261022075727099003)(261021121427099003)(56012099006)(261022115727099003)(261021135927099003)(261026140227099003)(261009223027099003)(261026121527099003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?snPE7fKjAUzOgHfF3MJ2PmtFKcOilRU/vSzP8m4XoG8Zr8Xp0B9KBNjn8x?=
- =?iso-8859-1?Q?WOLlEPuXz4zAPXDB2AWF4E8eC7gIqmPgzPymP61prrGMwdCA83u0pERukX?=
- =?iso-8859-1?Q?w5Zw/MEd/bjAa+pUmURO7XzQYFBzv+Z7qQrWnBJ+rJLBimvy/uOuXys716?=
- =?iso-8859-1?Q?AXFy7eKYKbNO9Ugk6n3wCPQ1jYlYBUSGocluA6sw6DW3m8Kys502+zzz/H?=
- =?iso-8859-1?Q?y1XOwi2NtuKY5kXfEz8eeEQapQPqV392OW137MgAI72uVDmf8+6LN6/J3A?=
- =?iso-8859-1?Q?0EN/WvTSjslzhdzt7GTvsE+90iJMTFKPNmWIkjB/BMFXIPTjAnbj+otFvu?=
- =?iso-8859-1?Q?NNetDiVXJLkCLCiExhEan8lw7MGXhDiVPEV/tyds2AMRYZ8OpZBzBLBxhG?=
- =?iso-8859-1?Q?36aFEuseNLidm3GUiFxS4au0kVfN5wRv07+ETrQPNqMslbpk7biPTTSg95?=
- =?iso-8859-1?Q?XDkzTZbLHgH436O9xJyhrthDW4KR0l/PcM3q8M2oyYW5Ohdp/oTsGP8Um2?=
- =?iso-8859-1?Q?phcn+mIlwcRnDT7MYvz98BK0bKO2XHdAaW1hYigGKmf/yEuYo+APGb8UxQ?=
- =?iso-8859-1?Q?x13wocZ/1E/CkrwWjTtxK3+4d2YjCu68HZ/DLX9iW47/4ZZ48G5yUMO0Z5?=
- =?iso-8859-1?Q?4Yx06T0TW5u9Oe+ujMGBY0xa4LVSHEdDrpHmz27+lzbBmE1ECrRnqSmU9/?=
- =?iso-8859-1?Q?CfHLFJCR8iu9CntdtuNa1MGxY6U0tJUdjU75ZjDav/Tvx53e1imeiKS7hn?=
- =?iso-8859-1?Q?bgEYLt/a+TcFZqvkZGa8bNGXaHpnpU1ZgFdCpXbXhdbsplV4uwMWoOwXOb?=
- =?iso-8859-1?Q?Ewqv6I4Dvr8d4DCG9onxrNly/6/noYGzJ+rPRE3o3Zeg3h9rW6IBIX3Yiy?=
- =?iso-8859-1?Q?c6zOCONU9Dbh2QC6/Urz2kbFywD3ieDXS/JvznqFjfGcHp8/jDriNsyy+w?=
- =?iso-8859-1?Q?KnYG3NiZ9EKLqEL4T/TJmDEAN6EmQIwbU9JIn5PbcMPDlXnn8ufwLMCoqL?=
- =?iso-8859-1?Q?dgPTUhAupbdXKc9JXUAoZOOwiStsQq3St1eXLmN6nBjOxQ5RSLBJO+Jnvu?=
- =?iso-8859-1?Q?tuSf/1zaMmdYQFeoPyHTd2Ny8DEmM0P7VEBOAunkTqkpk8lcd0+fsLq27G?=
- =?iso-8859-1?Q?1XswSE7+uOhU7/FJxAf4g2tthW/KTrZ3QKfiexgKVY6NF4/W0MqCIxVoRf?=
- =?iso-8859-1?Q?yHTG8y0EfLpNxISywG6jiuDohEXJlI6dyKCrAeOGlMDETPk8+EAJshyuqu?=
- =?iso-8859-1?Q?U1qgeRAXNWUpESEz9lt9nS9ryB4JZj14kDm+W2f+wqLbzlxehU9ET/nfvj?=
- =?iso-8859-1?Q?U3VfeZFV4y5m6irgzIzg+9v3uCZPAK4slC9aCNsoB8MRrDRJbZQn6KOJuS?=
- =?iso-8859-1?Q?JqakjQIHuRbG0bBGdrmMbKaM+flvMhcLQNOLXIWFsMSaqBqZXE3UtbZugl?=
- =?iso-8859-1?Q?4QVku2JRpjbmOW1i99VA32XresY2ZzT090U4pGdAXY/zlzm6rjs3ysg0KC?=
- =?iso-8859-1?Q?JZvwsFyn3FXQyRfFpD3y4CfOn05C5ojLXuMciFns6yJ1m4IhABnk0n6nQu?=
- =?iso-8859-1?Q?SneMof3i/HbgJUsOO48/xBLWtKC5puZ4aWEBS8HSCbOSNNMjd66FdIXXnd?=
- =?iso-8859-1?Q?YmbUE7Lss9TgJG9AIUavZv6Xt8OnDcLEUnud2Ol73susZw18ffbLkfPogH?=
- =?iso-8859-1?Q?qUPjBy+3tvBhN4dbfFcgyRt1hAq/H/NmH4kc9M1kK6zh0kBNSGXC0tkXt9?=
- =?iso-8859-1?Q?EVd0FG+Uh7bpcZH6wWUGavIYWidnYH++FUAs5YNbgkcDy7RkPWFecF0bB3?=
- =?iso-8859-1?Q?dmxkOhmCEnAv8w5cPg85NDa3OMfA5VW7AKrsz63CsTlteyIucGq2MyvN95?=
- =?iso-8859-1?Q?yV?=
-x-ms-exchange-antispam-messagedata-1: nhQ3QzTvjr/27w==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A15C606A321
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 15:31:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A15C606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4b2d1eb484aso1302490b6e.2
+        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 07:31:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794238303; x=1794843103;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=3TCmelbJhrC1Gcjo8LWEm8yQBYz7VAtFIcxL7M2b5HE=;
+        b=0owMqdSDA7MI7VcycsPvNs+rAWlzfDwPFenQDuGRtycer5DEyE9DI8+vu9rPlgKjrL
+         c+oegEMz2mZm9TKzcPqCFumm2Uy/5Gtqad14+e6VkNVmm7E62BLyMYGst5OWmHxkQg5o
+         qrJ4ExyH9R+jSko8r3AuN2qJpdVXLULZEMekOqoa0/jk353bVy80rFoAdLf1jLHD1V3r
+         xbGcisHHtGIou0gNeur8gBoOrfQI1ddqiE69FpSzXW0pewKY3ozrlRZVdB4rE0H4khqP
+         cM+3BrIVJyZ28oYI1trJYwFnmIB72dQBvTcEEyxbb2/Ajpfkc8m84R/trSCISSnB/tw5
+         OY1Q==
+X-Forwarded-Encrypted: i=1; AL+hErG/nFxrSjO49qj0LUEh1YwOngCgPD1qy88uXZSSG1VxWBus6E5cNWsdDsJr4eo+Nqi5PLBkwaY7Jh10JQ==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/41rcMCIzhk44VkmpwyY5edvBrzycfgsVGvA0b1urm3w5c8ljJ
+	YHbp5O11Q/T3lJGfWifOEbblc6IfUSNFqZ110OZguP0iwucYQijqKD4HA/rLHoXOgAHapiC4XCv
+	OzbvqAK9rGJIUUwoyoQAkdcH4RGeB16hejeV3voCZjTkrihg+C9QWAGTbY/E=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -149,94 +58,445 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-OriginatorOrg: tek-up.de
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR07MB7560.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4d961ea-4e97-47e1-2a58-08df3e7413b2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2026 15:13:57.6694
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 889cdbee-d881-42dc-bd06-ad3237c34a53
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TE2TNRBPenzL1KzyyweM90LGWHb4KCpFqqZdBF4u8mEeq7oQIbo/ympB9TFoPtJ6Zek8oE9G9LVdMRP2B8UVgw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR07MB8490
+X-Received: by 2002:a05:6808:318b:b0:4e6:9390:e153 with SMTP id
+ 5614622812f47-568145f2896mr3186082b6e.24.1794238303329; Mon, 09 Nov 2026
+ 07:31:43 -0800 (PST)
+Date: Mon, 09 Nov 2026 07:31:43 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6af1e75f.3e87765f.91969.0010.GAE@google.com>
+Subject: [syzbot] [block?] [ext4?] INFO: task hung in bdev_freeze
+From: syzbot <syzbot+d4ecb9a1e5b3dcf8baec@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Wael Hasnaoui <wael.hasnaoui@tek-up.de>=0A=
-=0A=
-blk_plug_invalidate_ts() runs when a task is switched back in and assumes=
-=0A=
-that PF_BLOCK_TS implies a non-NULL current->plug. blk_finish_plug()=0A=
-clears the flag through __blk_flush_plug() before detaching the plug in=0A=
-the source, but nothing prevents the compiler from reordering those=0A=
-stores when the flush is inlined.=0A=
-=0A=
-An arm64 kernel built with Android Clang r596125 and AutoFDO contains=0A=
-the following sequence, where x19 is the plug and x20 is current:=0A=
-=0A=
-  str xzr, [x19, #0x20]   // plug->cur_ktime =3D 0=0A=
-  ldr w8, [x20, #0x54]    // current->flags=0A=
-  str xzr, [x20, #0xad8]  // current->plug =3D NULL=0A=
-  and w8, w8, #0xdfffffff=0A=
-  str w8, [x20, #0x54]    // clear PF_BLOCK_TS=0A=
-=0A=
-Preemption after detaching the plug but before storing the cleared=0A=
-flag exposes a NULL plug with PF_BLOCK_TS still set. When this task=0A=
-resumes, blk_plug_invalidate_ts() dereferences NULL before execution can=0A=
-return to the pending flag-clear store. This explains a recorded write=0A=
-fault at address 0x20 in the scheduler's timestamp invalidation.=0A=
-=0A=
-Add a compiler barrier between the flush and pointer detachment to=0A=
-preserve the invariant across preemption, including when the flush is=0A=
-inlined. This needs compiler ordering between accesses by the same task,=0A=
-not an additional hardware memory fence.=0A=
-=0A=
-Fixes: fad156c2af22 ("block: invalidate cached plug timestamp after task sw=
-itch")=0A=
-Cc: stable@vger.kernel.org=0A=
-Signed-off-by: Wael Hasnaoui <wael.hasnaoui@tek-up.de>=0A=
----=0A=
-Based on Linux 7.4-rc2 (7475ea8b58616b33c04afb976cf0fbaad9dd63fb).=0A=
-The same code is present in Android common 6.18.38.=0A=
-=0A=
-Validation:=0A=
-- The unsafe ordering is present in the installed arm64 Image. Its entire=
-=0A=
-  blk_finish_plug() function matches a symbol-bearing reference ELF;=0A=
-  the whole-build IDs differ, so attribution used that byte match.=0A=
-- A focused compile of unchanged Android common blk-core.c with Clang=0A=
-  r596125 and the public GKI AutoFDO profile reproduces the ordering.=0A=
-  With this barrier, the flag-clear store precedes pointer detachment.=0A=
-  Both compile without warnings under Kbuild's normal warning policy.=0A=
-- A bounded model of the actual instructions reaches the recorded 0x20=0A=
-  fault from a valid state at two interruption points. The corrected=0A=
-  order passes all 64 combinations of the tested switch boundaries.=0A=
-- The patch applies to both the mainline and Android common source.=0A=
-  Checkpatch reports no style issues; the absent local Fixes history=0A=
-  was checked against the public commit separately. DCO sign-off is=0A=
-  pending the author's review.=0A=
-=0A=
-This is not a full-kernel runtime reproducer. A full mainline build and=0A=
-on-device validation have not been performed. The saved panic does not=0A=
-retain the interrupted PC, so its precise historical interleaving is=0A=
-inferred. Supporting compiler/model evidence is available on request.=0A=
-=0A=
- block/blk-core.c | 6 ++++++=0A=
- 1 file changed, 6 insertions(+)=0A=
-=0A=
-diff --git a/block/blk-core.c b/block/blk-core.c=0A=
-index 8836c70..99f79bb 100644=0A=
---- a/block/blk-core.c=0A=
-+++ b/block/blk-core.c=0A=
-@@ -1299,6 +1299,12 @@ void blk_finish_plug(struct blk_plug *plug)=0A=
- {=0A=
- 	if (plug =3D=3D current->plug) {=0A=
- 		__blk_flush_plug(plug, false);=0A=
-+		/*=0A=
-+		 * A preempted task invalidates its cached timestamp when it is=0A=
-+		 * scheduled back in. Keep the PF_BLOCK_TS clear above ordered=0A=
-+		 * before detaching the plug, including when the flush is inlined.=0A=
-+		 */=0A=
-+		barrier();=0A=
- 		current->plug =3D NULL;=0A=
- 	}=0A=
- }=0A=
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    58c1eb84e977 arm64: sdei: Preserve the interrupted context..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=11932a4e580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a58b6b4d667e7a61
+dashboard link: https://syzkaller.appspot.com/bug?extid=d4ecb9a1e5b3dcf8baec
+compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=111be7a5580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e99409580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b1ec47537e12/disk-58c1eb84.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3bca0c2b1169/vmlinux-58c1eb84.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0a7c49594d5a/Image-58c1eb84.gz.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/80e50d025158/mount_0.gz
+  fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=17699409580000)
+
+AI-generated root cause summary:
+In ext4_force_shutdown(), EXT4_GOING_FLAGS_DEFAULT invokes
+bdev_freeze(sb->s_bdev) to freeze the underlying block device before setting
+EXT4_FLAGS_SHUTDOWN, and thaws it immediately afterwards via bdev_thaw().
+Because ext4_forced_shutdown() is tested only prior to bdev_freeze() and
+EXT4_FLAGS_SHUTDOWN is not set until bdev_freeze() returns, concurrent callers
+of EXT4_IOC_SHUTDOWN all bypass the shutdown check and serialize on
+bdev->bd_fsfreeze_mutex. Each caller must execute a full freeze_super() cycle
+involving s_umount exclusion, percpu_rwsem write transitions, and
+synchronize_rcu() calls, causing waiting tasks to stall in uninterruptible sleep
+(D state) on bd_fsfreeze_mutex and trigger hung-task timeouts.
+
+full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=d4ecb9a1e5b3dcf8baec
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d4ecb9a1e5b3dcf8baec@syzkaller.appspotmail.com
+
+INFO: task syz.1.3811:25659 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.1.3811      state:D stack:0     pid:25659 tgid:25638 ppid:20649  task_flags:0x400140 flags:0x00800001
+Call trace:
+ __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
+ context_switch kernel/sched/core.c:5583 [inline]
+ __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
+ __schedule_loop kernel/sched/core.c:7459 [inline]
+ schedule+0x13c/0x20c kernel/sched/core.c:7474
+ schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
+ __mutex_lock_common kernel/locking/mutex.c:726 [inline]
+ __mutex_lock+0x5d8/0x10b8 kernel/locking/mutex.c:821
+ mutex_lock_nested+0x24/0x30 kernel/locking/mutex.c:874
+ bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ ext4_force_shutdown+0x288/0x5ac fs/ext4/ioctl.c:826
+ ext4_ioctl_shutdown fs/ext4/ioctl.c:868 [inline]
+ __ext4_ioctl fs/ext4/ioctl.c:1888 [inline]
+ ext4_ioctl+0x21dc/0x4430 fs/ext4/ioctl.c:1932
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
+ do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
+ el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
+ el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
+INFO: task syz.1.3811:25660 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.1.3811      state:D stack:0     pid:25660 tgid:25638 ppid:20649  task_flags:0x400040 flags:0x00800001
+Call trace:
+ __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
+ context_switch kernel/sched/core.c:5583 [inline]
+ __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
+ __schedule_loop kernel/sched/core.c:7459 [inline]
+ schedule+0x13c/0x20c kernel/sched/core.c:7474
+ schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
+ rwsem_down_read_slowpath+0x544/0x7f8 kernel/locking/rwsem.c:1114
+ __down_read_common kernel/locking/rwsem.c:1291 [inline]
+ __down_read kernel/locking/rwsem.c:1304 [inline]
+ down_read+0xa0/0x2bc kernel/locking/rwsem.c:1576
+ __super_lock fs/super.c:62 [inline]
+ super_lock+0x258/0x344 fs/super.c:124
+ user_get_super+0xb8/0x1bc fs/super.c:1022
+ quotactl_block fs/quota/quota.c:889 [inline]
+ __do_sys_quotactl fs/quota/quota.c:955 [inline]
+ __se_sys_quotactl fs/quota/quota.c:917 [inline]
+ __arm64_sys_quotactl+0x4c8/0x90c fs/quota/quota.c:917
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
+ do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
+ el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
+ el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
+INFO: task syz.0.3808:25667 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.0.3808      state:D stack:0     pid:25667 tgid:25642 ppid:21229  task_flags:0x400140 flags:0x00800001
+Call trace:
+ __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
+ context_switch kernel/sched/core.c:5583 [inline]
+ __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
+ __schedule_loop kernel/sched/core.c:7459 [inline]
+ schedule+0x13c/0x20c kernel/sched/core.c:7474
+ schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
+ __mutex_lock_common kernel/locking/mutex.c:726 [inline]
+ __mutex_lock+0x5d8/0x10b8 kernel/locking/mutex.c:821
+ mutex_lock_nested+0x24/0x30 kernel/locking/mutex.c:874
+ bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ ext4_force_shutdown+0x288/0x5ac fs/ext4/ioctl.c:826
+ ext4_ioctl_shutdown fs/ext4/ioctl.c:868 [inline]
+ __ext4_ioctl fs/ext4/ioctl.c:1888 [inline]
+ ext4_ioctl+0x21dc/0x4430 fs/ext4/ioctl.c:1932
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
+ do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
+ el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
+ el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
+INFO: task syz.2.3812:25664 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.2.3812      state:D stack:0     pid:25664 tgid:25645 ppid:21748  task_flags:0x400140 flags:0x00800001
+Call trace:
+ __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
+ context_switch kernel/sched/core.c:5583 [inline]
+ __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
+ __schedule_loop kernel/sched/core.c:7459 [inline]
+ schedule+0x13c/0x20c kernel/sched/core.c:7474
+ schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
+ __mutex_lock_common kernel/locking/mutex.c:726 [inline]
+ __mutex_lock+0x5d8/0x10b8 kernel/locking/mutex.c:821
+ mutex_lock_nested+0x24/0x30 kernel/locking/mutex.c:874
+ bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ ext4_force_shutdown+0x288/0x5ac fs/ext4/ioctl.c:826
+ ext4_ioctl_shutdown fs/ext4/ioctl.c:868 [inline]
+ __ext4_ioctl fs/ext4/ioctl.c:1888 [inline]
+ ext4_ioctl+0x21dc/0x4430 fs/ext4/ioctl.c:1932
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
+ do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
+ el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
+ el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
+INFO: task syz.2.3812:25665 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.2.3812      state:D stack:0     pid:25665 tgid:25645 ppid:21748  task_flags:0x400040 flags:0x00800001
+Call trace:
+ __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
+ context_switch kernel/sched/core.c:5583 [inline]
+ __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
+ __schedule_loop kernel/sched/core.c:7459 [inline]
+ schedule+0x13c/0x20c kernel/sched/core.c:7474
+ schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
+ rwsem_down_read_slowpath+0x544/0x7f8 kernel/locking/rwsem.c:1114
+ __down_read_common kernel/locking/rwsem.c:1291 [inline]
+ __down_read kernel/locking/rwsem.c:1304 [inline]
+ down_read+0xa0/0x2bc kernel/locking/rwsem.c:1576
+ __super_lock fs/super.c:62 [inline]
+ super_lock+0x258/0x344 fs/super.c:124
+ user_get_super+0xb8/0x1bc fs/super.c:1022
+ quotactl_block fs/quota/quota.c:889 [inline]
+ __do_sys_quotactl fs/quota/quota.c:955 [inline]
+ __se_sys_quotactl fs/quota/quota.c:917 [inline]
+ __arm64_sys_quotactl+0x4c8/0x90c fs/quota/quota.c:917
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
+ do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
+ el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
+ el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
+INFO: task kmmpd-loop1:25649 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kmmpd-loop1     state:D stack:0     pid:25649 tgid:25649 ppid:2      task_flags:0x208040 flags:0x00000010
+Call trace:
+ __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
+ context_switch kernel/sched/core.c:5583 [inline]
+ __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
+ __schedule_loop kernel/sched/core.c:7459 [inline]
+ schedule+0x13c/0x20c kernel/sched/core.c:7474
+ percpu_rwsem_wait+0x2a0/0x2f8 kernel/locking/percpu-rwsem.c:164
+ __percpu_down_read+0x84/0xb4 kernel/locking/percpu-rwsem.c:180
+ percpu_down_read_internal include/linux/percpu-rwsem.h:67 [inline]
+ percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
+ __sb_start_write include/linux/fs/super.h:19 [inline]
+ sb_start_write include/linux/fs/super.h:125 [inline]
+ class_super_write_constructor include/linux/fs/super.h:130 [inline]
+ write_mmp_block+0x358/0x3e4 fs/ext4/mmp.c:63
+ kmmpd+0x2fc/0x938 fs/ext4/mmp.c:173
+ kthread+0x304/0x3d4 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:854
+INFO: task kmmpd-loop2:25651 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kmmpd-loop2     state:D stack:0     pid:25651 tgid:25651 ppid:2      task_flags:0x208040 flags:0x00000010
+Call trace:
+ __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
+ context_switch kernel/sched/core.c:5583 [inline]
+ __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
+ __schedule_loop kernel/sched/core.c:7459 [inline]
+ schedule+0x13c/0x20c kernel/sched/core.c:7474
+ percpu_rwsem_wait+0x2a0/0x2f8 kernel/locking/percpu-rwsem.c:164
+ __percpu_down_read+0x84/0xb4 kernel/locking/percpu-rwsem.c:180
+ percpu_down_read_internal include/linux/percpu-rwsem.h:67 [inline]
+ percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
+ __sb_start_write include/linux/fs/super.h:19 [inline]
+ sb_start_write include/linux/fs/super.h:125 [inline]
+ class_super_write_constructor include/linux/fs/super.h:130 [inline]
+ write_mmp_block+0x358/0x3e4 fs/ext4/mmp.c:63
+ kmmpd+0x2fc/0x938 fs/ext4/mmp.c:173
+ kthread+0x304/0x3d4 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:854
+INFO: task syz.3.3813:25671 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.3.3813      state:D stack:0     pid:25671 tgid:25657 ppid:22407  task_flags:0x400140 flags:0x00000001
+Call trace:
+ __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
+ context_switch kernel/sched/core.c:5583 [inline]
+ __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
+ __schedule_loop kernel/sched/core.c:7459 [inline]
+ schedule+0x13c/0x20c kernel/sched/core.c:7474
+ schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
+ __mutex_lock_common kernel/locking/mutex.c:726 [inline]
+ __mutex_lock+0x5d8/0x10b8 kernel/locking/mutex.c:821
+ mutex_lock_nested+0x24/0x30 kernel/locking/mutex.c:874
+ bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ ext4_force_shutdown+0x288/0x5ac fs/ext4/ioctl.c:826
+ ext4_ioctl_shutdown fs/ext4/ioctl.c:868 [inline]
+ __ext4_ioctl fs/ext4/ioctl.c:1888 [inline]
+ ext4_ioctl+0x21dc/0x4430 fs/ext4/ioctl.c:1932
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
+ do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
+ el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
+ el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
+
+Showing all locks held in the system:
+locks held by kworker/u8:0/12: 2, on CPU#1:
+ #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff80008fa47c20 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff80008fa47c20 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+locks held by khungtaskd/31: 1, last CPU#1:
+ #0: ffff800089aa56a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
+ #0: ffff800089aa56a0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffff800089aa56a0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x4c/0x188 kernel/locking/lockdep.c:6871
+locks held by kworker/u8:2/40: 3, last CPU#1:
+ #0: ffff0000c004b948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c004b948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff800090f97c20 ((work_completion)(&(&par->cursor_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff800090f97c20 ((work_completion)(&(&par->cursor_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+ #2: ffff800089a9ada0 (console_lock){+.+.}-{0:0}, at: fb_flashcursor+0x28/0x398 drivers/video/fbdev/core/fbcon.c:403
+locks held by kworker/u8:3/42: 3, on CPU#0:
+ #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff800090fb7c20 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff800090fb7c20 ((linkwatch_work).work){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+ #2: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
+locks held by kworker/u8:4/63: 3, on CPU#0:
+ #0: ffff0000c3d1e148 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c3d1e148 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff800092147c20 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff800092147c20 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+ #2: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
+locks held by kworker/u8:12/3416: 2, on CPU#0:
+ #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff80009c0f7c20 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff80009c0f7c20 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+locks held by getty/4496: 2, on CPU#0:
+ #0: ffff0000cd6e50a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3c/0x4c drivers/tty/tty_ldsem.c:340
+ #1: ffff8000932bb2e8 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x350/0xffc drivers/tty/n_tty.c:2211
+locks held by kworker/1:2/4689: 3, on CPU#1:
+ #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff80009a037c20 (deferred_process_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff80009a037c20 (deferred_process_work){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+ #2: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
+locks held by kworker/1:3/4758: 3, last CPU#1:
+ #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff800099ee7c20 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff800099ee7c20 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+ #2: ffff0000cde94258 (&data->fib_lock){+.+.}-{4:4}, at: nsim_fib_event_work+0x198/0x320 drivers/net/netdevsim/fib.c:1490
+locks held by kworker/1:4/4869: 3, on CPU#1:
+ #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff8000966c7c20 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff8000966c7c20 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+ #2: ffff0000c8af0258 (&data->fib_lock){+.+.}-{4:4}, at: nsim_fib_event_work+0x198/0x320 drivers/net/netdevsim/fib.c:1490
+locks held by kworker/1:5/5032: 4, on CPU#1:
+ #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
+ #1: ffff80009b147c20 ((work_completion)(&helper->damage_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
+ #1: ffff80009b147c20 ((work_completion)(&helper->damage_work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
+ #2: ffff0000c6fc6270 (&helper->lock){+.+.}-{4:4}, at: drm_fb_helper_fb_dirty drivers/gpu/drm/clients/drm_fbdev_helper.c:295 [inline]
+ #2: ffff0000c6fc6270 (&helper->lock){+.+.}-{4:4}, at: drm_fb_helper_damage_work+0x120/0xbc0 drivers/gpu/drm/clients/drm_fbdev_helper.c:336
+ #3: ffff0000c6f80128 (&dev->master_mutex){+.+.}-{4:4}, at: drm_master_internal_acquire+0x24/0x78 drivers/gpu/drm/drm_auth.c:435
+locks held by syz.1.3811/25641: 5, last CPU#1:
+ #0: ffff0000c14946a0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ #1: ffff0000c9688478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
+ #1: ffff0000c9688478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
+ #2: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:60 [inline]
+ #2: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock_excl fs/super.c:75 [inline]
+ #2: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: freeze_super+0x4a0/0xf6c fs/super.c:2242
+ #3: ffff0000c9688570 (sb_pagefaults){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
+ #3: ffff0000c9688570 (sb_pagefaults){++++}-{0:0}, at: freeze_super+0x4b8/0xf6c fs/super.c:2246
+ #4: ffff0000c9688668 (sb_internal){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
+ #4: ffff0000c9688668 (sb_internal){++++}-{0:0}, at: freeze_super+0x780/0xf6c fs/super.c:2260
+locks held by syz.1.3811/25659: 1, on CPU#1:
+ #0: ffff0000c14946a0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+locks held by syz.1.3811/25660: 1, on CPU#1:
+ #0: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:62 [inline]
+ #0: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: super_lock+0x258/0x344 fs/super.c:124
+locks held by syz.0.3808/25644: 2, last CPU#1:
+ #0: ffff0000c1495220 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ #1: ffff0000f0a58478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
+ #1: ffff0000f0a58478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
+locks held by syz.0.3808/25667: 1, on CPU#1:
+ #0: ffff0000c1495220 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+locks held by syz.0.3808/25668: 1, last CPU#1:
+ #0: ffff0000f0a58100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:62 [inline]
+ #0: ffff0000f0a58100 (&type->s_umount_key#32){++++}-{4:4}, at: super_lock+0x258/0x344 fs/super.c:124
+locks held by syz.2.3812/25646: 4, last CPU#0:
+ #0: ffff0000c1493b20 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ #1: ffff0000ea2de478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
+ #1: ffff0000ea2de478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
+ #2: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:60 [inline]
+ #2: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock_excl fs/super.c:75 [inline]
+ #2: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: freeze_super+0x4a0/0xf6c fs/super.c:2242
+ #3: ffff0000ea2de570 (sb_pagefaults){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
+ #3: ffff0000ea2de570 (sb_pagefaults){++++}-{0:0}, at: freeze_super+0x4b8/0xf6c fs/super.c:2246
+locks held by syz.2.3812/25664: 1, on CPU#0:
+ #0: ffff0000c1493b20 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+locks held by syz.2.3812/25665: 1, on CPU#0:
+ #0: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:62 [inline]
+ #0: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: super_lock+0x258/0x344 fs/super.c:124
+locks held by kmmpd-loop1/25649: 1, on CPU#1:
+ #0: ffff0000c9688478 (sb_writers#3){++++}-{0:0}, at: kmmpd+0x2fc/0x938 fs/ext4/mmp.c:173
+locks held by kmmpd-loop2/25651: 1, on CPU#1:
+ #0: ffff0000ea2de478 (sb_writers#3){++++}-{0:0}, at: kmmpd+0x2fc/0x938 fs/ext4/mmp.c:173
+locks held by syz.3.3813/25658: 2, last CPU#0:
+ #0: ffff0000c1492fa0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ #1: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
+ #1: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
+locks held by syz.3.3813/25671: 1, on CPU#0:
+ #0: ffff0000c1492fa0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+locks held by syz.3.3813/25672: 1, last CPU#0:
+ #0: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
+ #0: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: rcuwait_wake_up+0x38/0x25c kernel/exit.c:322
+locks held by syz.4.3814/25662: 2, last CPU#0:
+ #0: ffff0000c1492420 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
+ #1: ffff0000da54c478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
+ #1: ffff0000da54c478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
+locks held by syz-executor/25983: 1, on CPU#1:
+ #0: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
+locks held by syz-executor/26125: 7, on CPU#0:
+ #0: ffff0000d11a0478 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2762 [inline]
+ #0: ffff0000d11a0478 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x248/0xa0c fs/read_write.c:683
+ #1: ffff0000c9acb880 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x1b0/0x3b8 fs/kernfs/file.c:336
+ #2: ffff0000ca4c5008 (kn->active#55){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:73 [inline]
+ #2: ffff0000ca4c5008 (kn->active#55){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x1f0/0x3b8 fs/kernfs/file.c:337
+ #3: ffff80008a3ad460 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xd8/0x2d4 drivers/net/netdevsim/bus.c:233
+ #4: ffff0000da8f3128 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:1109 [inline]
+ #4: ffff0000da8f3128 (&dev->mutex){....}-{4:4}, at: __device_driver_lock+0x94/0xcc drivers/base/dd.c:1046
+ #5: ffff0000da8f2258 (&devlink->lock_key#14){+.+.}-{4:4}, at: devl_lock+0x24/0x34 net/devlink/core.c:314
+ #6: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
+locks held by syz-executor/26181: 3, on CPU#0:
+ #0: ffff8000898bbaf8 (&ops->srcu#2){.+.+}-{0:0}, at: srcu_lock_acquire include/linux/srcu.h:213 [inline]
+ #0: ffff8000898bbaf8 (&ops->srcu#2){.+.+}-{0:0}, at: srcu_read_lock include/linux/srcu.h:320 [inline]
+ #0: ffff8000898bbaf8 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x17c/0x26c net/core/rtnetlink.c:602
+ #1: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #1: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x38/0x10c net/core/rtnetlink.c:366
+ #2: ffff80008994a5a0 (wq_pool_mutex){+.+.}-{4:4}, at: __alloc_workqueue+0xa84/0x121c kernel/workqueue.c:6201
+locks held by syz-executor/26191: 1, on CPU#0:
+ #0: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
+
+=============================================
+
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
