@@ -1,109 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794222010;
-	b=njZqeacBYOXRvH0b7qK9yJfvQU7WjNOaF/JS+SzprFhZ+d9QlUNOcnlyTYHMumDDhL/U
-	 wDTHcBEQ8dk4exItVu4Ux9u+ZXS+PnBFuJz8Qd8Ydwl/XXTCh+T6BoIhy9My8PLLfAxky
-	 /jHjPuwNYzUuUlNgeqiuJJ4Qp+Wfk5/0+m4JFwokyHUDD89O/gV6jlj8Z4qOOUXo2RXbt
-	 BSKL8Fn7n8WnirrDi6brjZ1Zn7RrHoZE/N2/ejllGyTMYnXY2vpt/3QxQr4KUbVgT5f4V
-	 EYeKlOtEGXMSodJj0iKWnp3NoNgF78nLwmwzE34Olw9roImzLOVYyS9Lcpd5EG8WxdA==
+	t=1794222368;
+	b=WslDM2mPGPnCQVckkFIyh/kc7bclcHUQHvkS6MfHSCFykjCEw1Zr7qtACZ5GVQ1zdbon
+	 VkHVe0Nblt5Rjqf9+cRavzJreG5CwV3CQXqtRSdQzFAmNGIFhktbQ6NeelKUri/SdWc25
+	 HqICkyAcbvvRBN1uw4Q+Q2bDrgcm47Ycf9H1qATO5k2NIHjwnTHGwQpUUVUVxZS9xMTSP
+	 3txOR4/jpYRV+RkKz1JtYi8Yp+AH82qhYnHG0OmAETG5kvofbDdZvCbQe0iHj6p+h5sq6
+	 Oq4ppyBnMsQYe3LAMBZt2zOfPqvsbKN1aTPxfT4v8YqYWOiZP/UUA6LSkdD0DjybfiA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794222010;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=ElXE6Czu3kJtnBp4J8hepfVFWJpvs2+YyAeDoXoHd4Q=;
-	b=lVB8+/kgSGTwmEwULfyxOnOIdZrCrafF6gx9AGAhwlv0rajUAzJnDZwEpjXdqXswhEt7
-	 4bTr/3cZs5HFNrgEVPKgkLDzHXPWTx2OVfWV8ouAXWcfe4rt3tRPBZrh+X/ow6+yiTDfA
-	 gfBeTjX21Ud5HP79cFa+J+uPcEvFpbAkNN0wnxxgrKFjNlJaqTvxVDbBWJ+kWIOefpJ+p
-	 whxIepqFPOnF87jy/MNO/5FAFnziMKvCcY+8faGr7d4mwM/41aKf3xW6Q3hS3rlkXTP2c
-	 c1YRA0rB4f04tAzxD9GRGgcgySz+B7GM5BBG0yiy722Zsoda1wM1457pCL3U67mFKBw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794222368;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:Received:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-TM-AS-GCONF:
+	 X-Proofpoint-Reinject:X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
+	 X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=xxg0UqRxYEUrKq/Q8BY+QBId1hBHt/fyVMnZzjc96lI=;
+	b=Xn4POvaw+6Yqdr6cODdvgDGXFBJJYKKY6o7vwdVSVoQ0eviyKob/oziqYtPREptryCK7
+	 1CVSZHnH/AS75bDUY+4II219ERHPEOI8hoKO5SuTjqM9T0l55RHfshwLz9MRF9PlEh+I3
+	 5ozTE/rUqXBJwHr1i3nRvAZGcm6P+TILlR6Yyf4R2kTHO10lSiwtEztg8wK9fZBMk2xqY
+	 xhSu6yd2lRf6O8P8pj8rfTMpoPZkC6XpgsvjN1af/p8PfrLnxj8/OfI/P7bFNBrOzk7re
+	 Rojetw3lK0LlZaCcu0xmjV9yeJcmKVnL8lPOfe3Gb41HP8TI5txQ/XglDJhqHTy4V6Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oG7oDRzE;
-	arc=none smtp.remote-ip=74.125.82.170
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=linux.ibm.com;
+	spf=pass smtp.mailfrom=linux.ibm.com;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=HH6ZqzdG;
+	arc=none smtp.remote-ip=148.163.156.1
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2BD606A330
-	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 11:00:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F2BD606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE79606A31C;
+	Mon,  9 Nov 2026 11:06:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ADE79606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oG7oDRzE
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-36fc0a3fe93so1492894eec.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 03:00:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794222009; x=1794826809; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ElXE6Czu3kJtnBp4J8hepfVFWJpvs2+YyAeDoXoHd4Q=;
-        b=oG7oDRzEqlj9IqURnOyQtZsM7QJeODStDhyG2uQVdblnfvxu6nLFjyje5IHZeANfIj
-         YrT33mX+0voC65lpjBYHCDwumyWa8uM6W588NL+gKtUSMwWeL+a9FIx/vrsqBWgSLsK3
-         5G/GjFFcA/nGTrRe0AOqmca8DVVsNeVEcXaDex5wOXVtZvvlNWNZDh/BLUPoN0AaZqoF
-         lcDbjw6JfpOu2zjphkQgzlWFa21BDidBGCD7Y48JwojeRIMrJzKBbQmVnobdBfHIdqjc
-         lj/1pdkqVCUZ1jqZTMq0qCB99y/QytEKr7KSfEF4UKWTQVR0j65UnUE2ULpbcJOR+rtY
-         /OiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794222009; x=1794826809;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ElXE6Czu3kJtnBp4J8hepfVFWJpvs2+YyAeDoXoHd4Q=;
-        b=Gvtj+c2/CoNK96qzJpPNwiE6KeJbAPvBCGr7z5D0so6UYMliseG5LJZ8o940mc8U0+
-         4dtbpdV10WHjVhbYLDS5kORn/2h71EjytuIcVPaQBcUqO7VXvO8WGK/bY+zPTeezG/CV
-         GSxTE6IDIvw3CjTCPCF7BZbdMOU0uzi4eXAL6uAkgZwrsZW/o35tZW8ml72Qs1kWig84
-         MBKGtwEdA7HqmC/UUbfGxtfl+UahEJM2bs23fv9BPcPyV1uNmc1EYHjhXYM+XAg9cUar
-         pYAuDScx4M0MyfGtDOSs3dfQ+dvyBOK0hpZQu2mYIPkfovQxp1EPA4V+6cbV1bOxtUx4
-         8eNw==
-X-Forwarded-Encrypted: i=1; AL+hErErdKsZQvoqDc/qRdVQJL9lj/JqvWMBxlhuJUXC6iTR5hEuXrjUKY01sbe1HP1rPadmxrXuBZ2c9j8azQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9VKuy+fH7YRdqVS7R35sUaTQim9rgj6Us88bbQoUotoPKDFMdC
-	0O6iNegZ5GAgB/mpj3pg6/vmbsfMKLBo/gHulVMHLRP8JKzliRnYlKsM
-X-Gm-Gg: AYBFou0r3JF6I+wag7jn8YqxCZR3qgfhIVCd9BiVunTiFnFXJdeKTQymbGFyZpubv39
-	SXU7Q39k6tynXToA0H538uIDq9KnIzHjPGC5rO2aRp5Iwf5M2u1jAJKNo1AwGN7/71aAoTGghOF
-	C2ZoFkKqEj8pRFTdCy5reqM9+rMkQnbV6ANH4T+Z/miG1Jjkdxt/rSS4ClQVBCyGR/LhVebFHcr
-	ZQfBPwUyviW1/y2HWwdiV41eOrhy1VKzUoSW8AJL9iJZ8VhCekXAdFHZmwaFcXbG+IbxKi49/rX
-	IjzqPWumvc7QAkCqbMF06rT6kt3/94UnbWg+r0qaVw/rztwcWBGmlIWDzolB+qEnw1pdNPMk3eH
-	hWs4ZgYnpHYtlFzdtFWn5nIcEmyoz4TXBNO3B/QkFzP+0bFX35i75Nz8p+4x59CpgX0nxtlARZE
-	3vAwA2rKb8n0Yr8CUnIAJgZR4JB5nnMQIfOY+JhMaeX0suLyYPhXp/v9hqJf64wbDRmFZmMdZF7
-	riC5DcuGNG9z9pwVRC7QTL5LfSpU1bX7dFWUrgx5khMCMGHZ/SUkliSZS1H4Hg9fo2g144BtfBM
-	aAaNTcu+JIJhuri+ebQgX04NV6ph7BFnHlb7/USsjvGgIfzLzg==
-X-Received: by 2002:a05:693c:8808:20b0:36c:9e26:88b6 with SMTP id 5a478bee46e88-37256613f82mr6129121eec.9.1794222009245;
-        Mon, 09 Nov 2026 03:00:09 -0800 (PST)
-Received: from hongfeng.mioffice.cn ([43.224.245.240])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-37265c06c61sm11832518eec.14.2026.11.09.03.00.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 03:00:08 -0800 (PST)
-From: Hongfeng Chen <chenhongfeng0212@gmail.com>
-To: Nhat Pham <nphamcs@gmail.com>
-Cc: Hongfeng Chen <chenhongfeng0212@163.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Barry Song <baohua@kernel.org>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Yosry Ahmed <yosry@kernel.org>,
-	Wenchao Hao <haowenchao@xiaomi.com>,
-	Wenchao Hao <haowenchao22@gmail.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Hongfeng Chen <hongfengchen@xiaomi.com>,
-	Hongfeng Chen <chenhongfeng0212@gmail.com>
-Subject: Re: [RFC PATCH v4 0/2] mm/zsmalloc: defer object free to per-cpu batches
-Date: Mon,  9 Nov 2026 18:59:55 +0800
-Message-ID: <20261109105957.2577351-1-chenhongfeng0212@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <CAKEwX=M4jTnxmq6cj115Gw4u5jdY7Ex65jPtVTEopW70jGzfuQ@mail.gmail.com>
-References: <20261016120927.3191690-1-hongfengchen@xiaomi.com> <20261023123736.1542117-1-chenhongfeng0212@163.com> <CAKEwX=M4jTnxmq6cj115Gw4u5jdY7Ex65jPtVTEopW70jGzfuQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=HH6ZqzdG
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A9AE6n03322054;
+	Mon, 9 Nov 2026 11:05:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=xxg0Uq
+	RxYEUrKq/Q8BY+QBId1hBHt/fyVMnZzjc96lI=; b=HH6ZqzdGOij0KkpSjUG5ud
+	1SUNetgDFBKny0B1XE6nHLMEDduwB7fKwN2XrXrF/0eCPakp9S/in2BsvtX1/FR+
+	xIDLnCNpmaH7XpiOqCTJ2F05fooxdqeT8uiGobHMTWq5O4gVZJSRPWEjhqLAueXj
+	l6QwlfNalYhoO9B48SbrGrPkFIsoQQusGKj4TJnvf3dBsdw69mMuApdwHARn8ssz
+	RoXzvIy5uldqC3jaRRZQiIHJN5DAbQ+IpJs8XDUDVBDu0V4gz/YI1UVLpa2wb9v2
+	jHvMVvs/jftf3iZn6z6/q6dzC10MOnFtuMx6S45U+RNR1HxKx23ZrdCFG3MGqYTw
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hsug5vn61-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 09 Nov 2026 11:05:54 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A9AJogF4093682;
+	Mon, 9 Nov 2026 11:05:53 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4htepvqgm2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Nov 2026 11:05:53 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A9B5rop40370818
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Nov 2026 11:05:53 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2B3AD58059;
+	Mon,  9 Nov 2026 11:05:53 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0364C58058;
+	Mon,  9 Nov 2026 11:05:49 +0000 (GMT)
+Received: from [9.61.101.130] (unknown [9.61.101.130])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Nov 2026 11:05:48 +0000 (GMT)
+Message-ID: <e562995a-dbde-4c6b-9373-1d47b789adef@linux.ibm.com>
+Date: Mon, 9 Nov 2026 16:35:47 +0530
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -113,76 +86,121 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] blk-mq: take quiesce_lock when removing a queue from
+ the tag set
+To: mt4022@columbia.edu, Jens Axboe <axboe@kernel.dk>
+Cc: Mohamed Khalfella <mkhalfella@purestorage.com>,
+        Keith Busch <kbusch@kernel.org>, Ming Lei <tom.leiming@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
+        Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, tz2294@columbia.edu,
+        stable@vger.kernel.org
+References: <20261106-blk-mq-del-quiesce-lock-v2-1-cd4f72a6eb03@columbia.edu>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20261106-blk-mq-del-quiesce-lock-v2-1-cd4f72a6eb03@columbia.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: q4ZXlQ6vjS07HfIoR1c6Huw6xN7545dt
+X-Authority-Analysis: v=2.4 cv=PeVqFShd c=1 sm=1 tr=0 ts=6af1a913 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
+ a=WTJdmG3rAAAA:8 a=VnNF1IyMAAAA:8 a=npNqatxc2sd5QBqGfiMA:9 a=QEXdDO2ut3YA:10
+ a=q3NGepEMMmKWaCv8Sx90:22
+X-Proofpoint-GUID: jEaq0M2rO7FPtIYS8bgGuG88Iao1FqLq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA5MDA0MiBTYWx0ZWRfX3Hkkski1muN8
+ kzXY+XPtCyZ8kWHiFOaDaqs2zC0308SvqoiotyXnrEsRxCWA+38Zxbfe4mKgrje/HWTK0gMjXgV
+ JA/0KPINRE26VCCkZXZY/6+iflQ+uodCYlbS5NUM0xcPtelpg9hqXQp5gDeOPeNGxZc1O0dxy4p
+ gAfU4zOMh6jdlPae/b35BkfKHQqM+FxodbQhEUxjXJYvn819BIgkiWh2+1V2XAOX36GwzjG53GB
+ DYxKrqZ+o+4x+O3YjQMq7JdgX8dRIeobd4tK2gnn+db3+kTSOtqMrSCdkJo4PU47yw1FSxjUXTe
+ ilFv+N4OcDwnnPPtgdvZivcopYuXvz9NMyK8IsJA54icXGTTP7VaAst/iR0F87wyNT8MouMTCag
+ UQTNzaFiawqE38LF5Vq/eXtwO7vFy9y8KLXCUE87jWuY5w8P9eyJtzlg8qgdQ5iDNhb1+bbprd9
+ rmobPnRzaOP+02QHEhw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA5MDA0MiBTYWx0ZWRfXz/GmBHuoY8oW
+ Ap73ExYvU9VMwkgBUkLxk+uOZtZmZISPuj9l9pKBnW3uNIrIUDP4NdAToH149fhULd1bDBeIMyk
+ uMsQZAEWjkDmRiQMlQAa1ZXOAVTC7BY=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-09_04,2026-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 phishscore=0 suspectscore=0 impostorscore=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 malwarescore=0 clxscore=1015 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611090042
 
-From: Hongfeng Chen <chenhongfeng0212@163.com>
+On 11/6/26 10:23 PM, Mani Tofigh via B4 Relay wrote:
+> From: Mani Tofigh<mt4022@columbia.edu>
+> 
+> Unquiescing a tag set can run the hw queues of a queue whose hctxs were
+> already freed.  blk_mq_unquiesce_tagset() walks the tag set's queues
+> under quiesce_lock and rcu_read_lock().  Commit 71ec3c7d6db8 ("blk-mq:
+> quiesce a queue that joins a quiesced tag set") added quiesce_lock to
+> the walks and to adding a queue, but blk_mq_del_queue_tag_set() still
+> removes a queue without it.  The hctxs are then freed right away since
+> RCU only keeps the request_queue itself alive:
+> 
+>    Task A (controller reset)            Task B (namespace removal)
+>    blk_mq_unquiesce_tagset()
+>      /* finds q */
+>                                         blk_mq_del_queue_tag_set(q)
+>                                         blk_mq_release(q)
+>                                           /* frees the hctxs */
+>      blk_mq_run_hw_queues(q)
+>        /* reads freed hctxs */
+> 
+> The window is short.  On PREEMPT_RT quiesce_lock is a sleeping lock and
+> the walk can be preempted inside it, which is how it's hit here:
+> 
+>    [  399.851277] BUG: KASAN: slab-use-after-free in blk_mq_run_hw_queues+0x4bd/0x550
+>    [  399.851328] Read of size 8 at addr ff11000003014148 by task kworker/u9:2/116
+>    [  399.851352] CPU: 1 UID: 0 PID: 116 Comm: kworker/u9:2 Not tainted 7.3.0-16299-g81cb9aa43246 #1 PREEMPT_RT
+>    [  399.851425] Workqueue: nvme-reset-wq nvme_loop_reset_ctrl_work
+>    [  399.851441] Call Trace:
+>    [  399.851457]  <TASK>
+>    [  399.851551]  blk_mq_run_hw_queues+0x4bd/0x550
+>    [  399.851564]  blk_mq_unquiesce_tagset+0x128/0x210
+>    [  399.851576]  nvme_loop_reset_ctrl_work+0x78/0x4c0
+>    [  399.851600]  process_one_work+0x92b/0x16d0
+>    [  399.851660]  worker_thread+0x4e6/0xd60
+>    [  399.851707]  kthread+0x300/0x3e0
+>    [  399.851727]  ret_from_fork+0x4f0/0x6f0
+>    [  399.851776]  ret_from_fork_asm+0x1a/0x30
+>    [  399.851793]  </TASK>
+>    ...
+>    [  399.851988] Freed by task 111:
+>    [  399.852040]  kfree+0x1b3/0x4b0
+>    [  399.852050]  blk_mq_release+0x400/0x550
+>    [  399.852060]  blk_put_queue+0x94/0x120
+>    [  399.852068]  disk_release+0x1bd/0x3f0
+>    [  399.852102]  nvme_free_ns+0x39/0x270
+>    [  399.852113]  nvme_remove_nsid_range+0x2d1/0x4a0
+>    [  399.852123]  nvme_scan_ns_list+0x2cc/0x390
+>    [  399.852134]  nvme_scan_work+0x421/0x9f0
+>    ...
+> 
+> With BLK_CGROUP the disk's root blkg holds the queue until a grace
+> period later, which hides this for NVMe namespaces.  It's still open
+> without BLK_CGROUP, and from reading the code also for queues freed
+> without a disk (e.g., SCSI device queues on a UFS host).
+> 
+> Take quiesce_lock around the list_del_rcu() as well so that the walk
+> either finishes with a queue before it leaves the list or never sees
+> it, and say so in the comment of quiesce_lock.  With the fix, KASAN
+> doesn't report the use-after-free anymore.
+> 
+> This bug was identified and confirmed with the help of a deterministic
+> hypervisor currently under development.  The C reproducer below however
+> hits it about once every 20 minutes on a PREEMPT_RT kernel.
+> 
+> Fixes: 59e25ef2b413 ("block: Use RCU in blk_mq_[un]quiesce_tagset() instead of set->tag_list_lock")
+> Cc:stable@vger.kernel.org
+> Reviewed-by: Mohamed Khalfella<mkhalfella@purestorage.com>
+> Signed-off-by: Mani Tofigh<mt4022@columbia.edu>
 
-On Fri, Oct 23, 2026 at 11:19 AM Nhat Pham <nphamcs@gmail.com> wrote:
-> Is there any more juice we can squeeze from zsmalloc in that case?
->
-> It would be nice if you can perf zsmalloc freeing. And yeah, maybe we
-> can't optimize any further, but let's eliminate that first before we
-> rely on offloading.
+Looks good to me:
 
-Here is the perf breakdown of the free path:
-
-zram:
-
-  __swap_cluster_free_entries        90.28%
-    zram_slot_free_notify            86.01%
-      slot_free                      74.15%
-        zs_free                      56.01%
-          __free_frozen_pages        19.85%
-          kmem_cache_free            10.15%
-          _raw_spin_lock              5.53%
-          fix_fullness_group          3.31%
-          dec_zone_page_state         2.43%
-          obj_free                    2.17%
-          trylock_zspage              2.12%
-
-zswap:
-
-  __swap_cluster_free_entries        94.30%
-    zswap_invalidate                 93.49%
-      zswap_entry_free               73.76%
-        zs_free                      34.03%
-          __free_frozen_pages        11.13%
-          kmem_cache_free             5.57%
-          fix_fullness_group          2.66%
-          _raw_spin_lock              2.45%
-          trylock_zspage              1.75%
-          dec_zone_page_state         1.67%
-          obj_free                    0.96%
-        obj_cgroup_uncharge_zswap    13.90%
-        list_lru_del                 11.73%
-        kmem_cache_free               4.62%
-      xa_erase                       19.27%
-
-Most of zs_free() is returning memory: empty zspages, handles and
-zspage slab objects. So returning memory cannot be avoided, it can
-only be batched or deferred.
-
-In zram, zs_free() is 56% of the time, so deferring only zs_free()
-can speed up munmap() by at most about 2.3x. In zswap, zs_free() is
-34% of the time, so the speed up limit is about 1.5x.
-
-That leaves two places to go further.
-
-1. Async freeing at or above __swap_cluster_free_entries()
-
-Deferring at or above __swap_cluster_free_entries() covers zram and
-zswap with one mechanism.
-
-2. Optimizing zram alone
-
-For zram I would rather go back to v1 [1], which defers in zram. v1
-also uses a single gc_work per device to offer a best-effort service,
-which greatly reduces the impact of the unbound worker on other
-tenants.
-
-
-[1] https://lore.kernel.org/linux-mm/20260412060450.15813-1-baohua@kernel.org/
-
-Thanks,
-Hongfeng
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
