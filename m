@@ -1,66 +1,105 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.35
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794235879;
-	b=mglk1AUfwn5mmQYaubvsOeY6oXc4Mus5pCWCW9VIAndR4MpenKzWbETOqXLKYbGFCh4w
-	 qSuf/ZfHvCJlfDVkF3FudoKeOk9KbYTlKlTuwQMc87PU8PbGqH43R5gAzqn0R/+yLylut
-	 /zSVYSQqMGZObgKWeLOCVuBQXyxnQc1TZHZsuJmqI9hWOP4unAbObeyDkImmpj5USw0sS
-	 eBPKZ95dxNBWjlPEhAWJpULr75XlehX4BsI0BFM6TX7loUVyCHz/DveZl6oVKw8m0YfyJ
-	 0VIAgdSswNLkS+G0q6nkob3AZ6f9vaoQmDf0mwNEu0l0ckWaYrqvX5a1TeQPpZpMl7Q==
+	t=1794236598;
+	b=yE62+Y4+NlWx9OLiNkwejxYSdgNNo9qwxUUdAF6yFEP1zwnHdGOa4SrAJ1oq+K+mb7x9
+	 IYQlfiZSvek1w+k7Z7BY75Jx5lnsn/4i21U+JZ+aLKMcSCjpKveOEaoa0x73A4wEZpHq2
+	 ZMm+LiAzwf8TuHvA3+KIM7WESRodq7AUQo5+I5UCGT5J0+piAbOlbgu4aeSSi7C+CfQfD
+	 jCg6uD8jFD8ZM8ldTWymjJTT6xs9G10AKQjJqU+9TCjbhk4GLPMZdTbor2faWtY91JjY9
+	 NpSCj/Ep9X92UOGT59n4YI/WcEm8gCpsfkktKGlrUaXPOnzQAUxjuEjxva67KpacD8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794235879;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 X-Zmail-TransId:X-Mailer:Message-ID:Date:Mime-Version:From:To:Cc:
-	 Subject:Content-Type:X-MAIL:X-TLS:X-ENVELOPE-SENDER:X-SOURCE-IP:
-	 X-CLEAN:X-Fangmail-Anti-Spam-Filtered:X-Fangmail-MID-QID;
-	bh=uLSflaxjO4OBevq7ky/l/4hrZCoxCuKgi5OqqZAksoc=;
-	b=a3uJ5bPvHu+NZnpdBSaXI6+WVomRAku7tOz40Lev04jYuBKZy7EOWA8roKKZ6vRgV6Vh
-	 xBjrPgHDQ2p0QWrw3DWajLj/K3K0zBOOAu/gSoE62y4QeZ031SQHls2/P8LeGwd7wG9DA
-	 x22H3EBZsx6RETugvyYncBNW1r7xTs/4NHsyGLdmRA8RS9oolNnwesbMfiHM8zpKkalwu
-	 NPcdOB5lWTHKqGrblfDwOfaPfa+cyoLZGESGjN3SQZ9Afbm5kRcSivKxB2KLHQMhUbQrL
-	 MtyDB3dNy1x4FM1seloAndDQiQCrL+fwETHOZypIiygpCgzMPLgdv8nhQbiYI3v9i6g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794236598;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Rspamd-Queue-Id:X-Spam-Level:
+	 X-Rspamd-Server:X-Rspamd-Action:X-Spam-Flag:X-Spamd-Result:
+	 X-Spam-Score;
+	bh=zL34hpemwJ/qzvEYRIvykQ1ao1Jd830rA1cvrqq9dGk=;
+	b=rn4r2svL4ncAFKFo0Rv7CB7CiAUWxgSsVUwnre7CZWrWOyWcC/cRB4jxl0qSW5ThCauc
+	 SqAcPl+m+awFj33ojt6dboAptm4seCxonXv7UrzVxAnQ9mw1I/UsNQs/LV4wgXythHZzR
+	 6MRHe63DkBHqcxmSZzWB3TCHMOpwNRw3gKrQ9xKh2YQI246Iv3cHfY6uLcqCfblVXT/bv
+	 G7kqFhb1rf5pH6y4gWRDdPt3xDXPiFyPXMYkuHWPk6l4NVWnpSr3ORnxo6zh+Nf3bNNkR
+	 OqKYPmKIBTNXBn++KJPV4eTQqscEkc5J3Q/INivlr16N/K86udmsUKXWOytlyGwVfDQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=zte.com.cn;
-	spf=pass smtp.mailfrom=zte.com.cn;
-	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=HEAG+Oi7;
-	arc=none smtp.remote-ip=160.30.148.35
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=ftuNy+gd;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b="o6WhJ4/r";
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=ftuNy+gd;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b="o6WhJ4/r";
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B18606EE8A;
-	Mon,  9 Nov 2026 14:51:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3B18606EE8A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CEB606A333
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 15:03:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72CEB606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=HEAG+Oi7
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=ftuNy+gd;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=o6WhJ4/r;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=ftuNy+gd;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=o6WhJ4/r
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jNXm23mFkz8Xrkn;
-	Mon, 09 Nov 2026 22:51:14 +0800 (CST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
-	s=z202610; t=1794235874;
-	bh=O0K5SqWPqnmgeQwtJ4LKSu5Ulb1IYQAL+e00tsD867I=;
-	h=Date:From:To:Cc:Subject;
-	b=HEAG+Oi7dQzW2ds1iDc2EOc+P/nT4MYWjvP6gUKHndN/P08BdqVmcWbzUte1UnYFL
-	 PlxPCEmy8Sv8c+EK39xWA7Dy+WAseMRNiijXg9edXuJQ0VCTdw5IT13UDfSZEWURW/
-	 umrS2ABfKJkA5nJcRmC5/Ib9DR1G13vNYgRJKQ3BiOj94bcsu/G0KJB3eDF6UxtAVw
-	 KGCJKeUIzcDcJktMEqw1D5GGNQnObUPSh5X2E+gDR0VtatLwfHMponAHpqFCBGuYVC
-	 sCaOtUmqOySptzXemKRll5wH7prYBCLEYJAq5HHLXcx9/qSf/9nNiMmhOdFIkN7ZuC
-	 Ih0ur3M0c3jng==
-Received: from xaxapp02.zte.com.cn ([10.88.97.241])
-	by mse-fl1.zte.com.cn with SMTP id 6A9Ep6id088728;
-	Mon, 9 Nov 2026 22:51:06 +0800 (+08)
-	(envelope-from shao.mingyin@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Mon, 9 Nov 2026 22:51:10 +0800 (CST)
-X-Zmail-TransId: 2afa6af1dddedbd-74b87
-X-Mailer: Zmail v1.0
-Message-ID: <20261109225110056QQJAEflTHzwYHzwXlMBb_@zte.com.cn>
-Date: Mon, 9 Nov 2026 22:51:10 +0800 (CST)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6E6131FACA
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 15:03:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1794236595; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zL34hpemwJ/qzvEYRIvykQ1ao1Jd830rA1cvrqq9dGk=;
+	b=ftuNy+gdqMn+kJH8jq56ktPG5QzSGsGfLS9pszazxsIh0vDkPEYxFEZsYl7L376e3wrgD8
+	Yi1kbCh7//seRNNHUeXmJ1PHlysoQ7YhD2y6pIc54xqAm6RucO3+oCg9UCZtIAJ2gUbwiz
+	ifH5ozMOscpnh0EoKVzj5n6LC3LbE2k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1794236595;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zL34hpemwJ/qzvEYRIvykQ1ao1Jd830rA1cvrqq9dGk=;
+	b=o6WhJ4/rvazCPTzvrgYx8o8WGLH7ymiHZ74LQpCXx6dK+Mj6mds6K/hpRpWHLVNWkqEbFm
+	BASpgcbGlSiAy3Dg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ftuNy+gd;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="o6WhJ4/r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1794236595; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zL34hpemwJ/qzvEYRIvykQ1ao1Jd830rA1cvrqq9dGk=;
+	b=ftuNy+gdqMn+kJH8jq56ktPG5QzSGsGfLS9pszazxsIh0vDkPEYxFEZsYl7L376e3wrgD8
+	Yi1kbCh7//seRNNHUeXmJ1PHlysoQ7YhD2y6pIc54xqAm6RucO3+oCg9UCZtIAJ2gUbwiz
+	ifH5ozMOscpnh0EoKVzj5n6LC3LbE2k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1794236595;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zL34hpemwJ/qzvEYRIvykQ1ao1Jd830rA1cvrqq9dGk=;
+	b=o6WhJ4/rvazCPTzvrgYx8o8WGLH7ymiHZ74LQpCXx6dK+Mj6mds6K/hpRpWHLVNWkqEbFm
+	BASpgcbGlSiAy3Dg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 48B7713302
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 15:03:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id FDZACbPg8WrFDgAAD6G6ig
+	(envelope-from <hare@suse.de>)
+	for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 15:03:15 +0000
+Message-ID: <991e263b-4513-4cba-927c-94ff725806a1@suse.de>
+Date: Mon, 9 Nov 2026 16:03:14 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -69,53 +108,63 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-From: <shao.mingyin@zte.com.cn>
-To: <tom.leiming@gmail.com>, <linux-block@vger.kernel.org>
-Cc: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIXSB1YmxrOiBzdG9wIHJlcG9ydGluZyB6b25lcyBvbiBhbiBlbXB0eSByZXNwb25zZQ==?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 6A9Ep6id088728
-X-TLS: YES
-X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
-X-SOURCE-IP: 10.5.228.132 unknown Mon, 09 Nov 2026 22:51:14 +0800
-X-CLEAN: YES
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6AF1DDE2.000/4jNXm23mFkz8Xrkn
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Automated commit blacklisting
+To: linux-block@vger.kernel.org
+References: <94510397-fef7-4856-a8cf-c9f5d9dd0ed8@suse.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <94510397-fef7-4856-a8cf-c9f5d9dd0ed8@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 6E6131FACA
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-13.50 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-0.999];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_ONE(0.00)[1];
+	ARC_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email];
+	RCVD_TLS_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PREVIOUSLY_DELIVERED(0.00)[linux-block@vger.kernel.org];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Score: -13.50
 
-From: Shao Mingyin <shao.mingyin@zte.com.cn>
+On 11/9/26 3:45 PM, Hannes Reinecke wrote:
+> Hey all,
+> 
+Sheesh.
 
-ublk_report_zones() treats a zero-length zone as the end of a server
-response, but only breaks out of the inner loop.  If the server returns
-an empty report, done_zones and sector do not advance, so the driver
-keeps issuing REPORT ZONES requests at the same sector indefinitely.
+Sorry.
 
-Finish the report when the zero-length marker is encountered and return
-the number of zones already reported.  Use the existing exit path to
-release the report buffer, including when the first response is empty.
+Was not meant for this list (obviously).
 
-Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
----
- drivers/block/ublk_drv.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Cheers,
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3d322fa1bc83..5c14daeaebbf 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -693,8 +693,10 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
- 			struct blk_zone *zone = buffer + i;
- 
- 			/* A zero length zone means no more zones in this response */
--			if (!zone->len)
--				break;
-+			if (!zone->len) {
-+				ret = done_zones;
-+				goto out;
-+			}
- 
- 			ret = disk_report_zone(disk, zone, done_zones, args);
- 			if (ret)
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
