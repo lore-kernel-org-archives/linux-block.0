@@ -1,54 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.200
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.35
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794238305;
-	b=h0SwWT46TjhjOVdAtQfB2yzM0C6Jx6Cvs+rNsRMAkEuqsSDMY3SzF0hX674KH5NzT9VO
-	 +YijDCn4r/x+aHV2HCxlA7RPYB4Pjc/iavwJ1xUIU0y8/EADbcUL95Fmz0J0V0YokJQG0
-	 h1QGn8WoCfUyvqfFTPXnYC8ZFtOrs2zn/6KAbBx3jQsGiq/F1MxHt9aGYYaSa2wUAbgNb
-	 AykUwA/7Se9Ni19BeX3REnnOTwowVZKctgxdniPGaVXuM8JEEX0FJMQymy5SmOb2XCshc
-	 fPQXge55Td8NWM1i+PZucfWoVbQMoSxypQqhcMBo+y+USuLl3u6r8/nNkiXWuttzGpg==
+	t=1794239901;
+	b=seikPZHxWVJpJFIEIHIIBJXGgCTBf91bLCsH/x68inl3+eUo6g3Ub+kHFZOrp6P41Wjw
+	 yK1xgiXU40UQgssedrbHjVXNcYT7WsEQKg3VIiDoyrNB6vg/UbQh39pgqxakykWv3Vl5h
+	 R8cUy4/xBU8zGQ+S8Hl6s6xRVgbHpLe7mgTG3byBDul4iOKvl/rrSl8j6NB1iCyTMuzAo
+	 fRWpTEA+ABSqTcIwMUG5IwGTIAfeaaJCuYzX0cSZ2dGQc+pPyzrNa0P0ZsLWKPTQ+VDTQ
+	 l+ePU/KzPvJUjp97tntP54xEGSYrYy4xgNxUZ2HBo8gCs7rWxyuV5AMBqaaHwZH9Sdg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794238305;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:MIME-Version:X-Received:Date:
-	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
-	 Subject:From:To:Content-Type;
-	bh=3TCmelbJhrC1Gcjo8LWEm8yQBYz7VAtFIcxL7M2b5HE=;
-	b=ISEa7gMYEoNYEUGamPvrtfqr3w39kw0VUatv5U1rWQswcGESF2hUGU+NYmMqq2cYGd9I
-	 CiKEkMcB8Xa5ralFEGmv5fJYrtEGZvb6IzMMZ1UKK+mbwhllgVn9MpzltUHU2zEJBxb9H
-	 HJ6AUqeqLfeL3cZSzPAwhyb8MidoJlOTC9gkQvJN8esKZJ+ShU1lcZLSLq53717Dolag0
-	 XlHSgEhAIVNNnyS2KoST8O8iMG0GPHIu+E7vDvBk4R20bJau6IBy+g8jgOiHhW9M7Bs6E
-	 jz8l2sAW+9VDGlapPfmL48zXRorgoVJ40rTQuciZqm0wauDv2BZ6Y4Hfdsl0gMYp1mw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794239901;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 X-Zmail-TransId:X-Mailer:Message-ID:Date:Mime-Version:From:To:Cc:
+	 Subject:Content-Type:X-MAIL:X-TLS:X-ENVELOPE-SENDER:X-SOURCE-IP:
+	 X-CLEAN:X-Fangmail-Anti-Spam-Filtered:X-Fangmail-MID-QID;
+	bh=zLeBDeQcVR5Q0Jv6hH+HoARVZwuyEL/ztbGvicGzjrg=;
+	b=t90ZjwwYti1rh/ODAbfwd1CDlq2XcG+jOaNDq5sI6AmgESAC5BQlEXflp7C/nObiQeta
+	 LAM0eNl21zqHGX03IvTtd6JzaOxmzjIAw9/e7PAvWFVyTpXNaUFXO+Jh6aFzx5N3AyD2q
+	 VYbUL+fFOaPISpDnOUjILv9LSc2in0XLZTzbZig5AFLN4wNVzt4Kh8QBIVZumrm6MH+Ie
+	 dDUhCERiNfBqvl8N6CldBf8+dawY99Iztqgo4ODXPY0mToV6zBWjtSn8DtQqKDImNPcxl
+	 d95UyTAEvdyrUtaEIHVhhDzsEA66fgmiD7I8EHg4binjP99wCRNGF7U+xRKe+Z69W6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.167.200
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=zte.com.cn;
+	spf=pass smtp.mailfrom=zte.com.cn;
+	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=OQLaxX+1;
+	arc=none smtp.remote-ip=160.30.148.35
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A15C606A321
-	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 15:31:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A15C606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4b2d1eb484aso1302490b6e.2
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 07:31:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794238303; x=1794843103;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=3TCmelbJhrC1Gcjo8LWEm8yQBYz7VAtFIcxL7M2b5HE=;
-        b=0owMqdSDA7MI7VcycsPvNs+rAWlzfDwPFenQDuGRtycer5DEyE9DI8+vu9rPlgKjrL
-         c+oegEMz2mZm9TKzcPqCFumm2Uy/5Gtqad14+e6VkNVmm7E62BLyMYGst5OWmHxkQg5o
-         qrJ4ExyH9R+jSko8r3AuN2qJpdVXLULZEMekOqoa0/jk353bVy80rFoAdLf1jLHD1V3r
-         xbGcisHHtGIou0gNeur8gBoOrfQI1ddqiE69FpSzXW0pewKY3ozrlRZVdB4rE0H4khqP
-         cM+3BrIVJyZ28oYI1trJYwFnmIB72dQBvTcEEyxbb2/Ajpfkc8m84R/trSCISSnB/tw5
-         OY1Q==
-X-Forwarded-Encrypted: i=1; AL+hErG/nFxrSjO49qj0LUEh1YwOngCgPD1qy88uXZSSG1VxWBus6E5cNWsdDsJr4eo+Nqi5PLBkwaY7Jh10JQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/41rcMCIzhk44VkmpwyY5edvBrzycfgsVGvA0b1urm3w5c8ljJ
-	YHbp5O11Q/T3lJGfWifOEbblc6IfUSNFqZ110OZguP0iwucYQijqKD4HA/rLHoXOgAHapiC4XCv
-	OzbvqAK9rGJIUUwoyoQAkdcH4RGeB16hejeV3voCZjTkrihg+C9QWAGTbY/E=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8DA60A2633;
+	Mon,  9 Nov 2026 15:58:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB8DA60A2633
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=OQLaxX+1
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jNZFN434Dz8Xrnw;
+	Mon, 09 Nov 2026 23:58:16 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
+	s=z202610; t=1794239896;
+	bh=ZD5Vz0dYdMHAoRn66WdpVTqDsd56pq0fa4QdyoLKuG8=;
+	h=Date:From:To:Cc:Subject;
+	b=OQLaxX+11GbDnFLswRX/TE40XfrzbYOf4xISJ+RH0IThRMVMDvWrkDjjT0gKgnybs
+	 g2A6o0WJyqr2mAwKUC1BNxiVSZbbp/Ek1LJlvjIwkEN4AlbFdelVT+6VfWVFIrCOAO
+	 M1OdKNDDFUK/015H3s2R15hHvRD+E0fiy0+eq6pGo2M808nyiV+f0qFfoA4T9XaNoC
+	 VwXNvfV8HdzX0vPlbKS02H4JOzUQgIVVu6GsJ8HGqC+4xzdOkHylhvNQCshUBU+xVc
+	 8Rc+RfC8ECiIWq2q4xm8c4wKyFvy412h9hf5ucdVDBgVIXH1zB33sRQlRYluFfQNsj
+	 wQZ2rEzohr8Xw==
+Received: from xaxapp05.zte.com.cn ([10.99.98.109])
+	by mse-fl1.zte.com.cn with SMTP id 6A9Fw961036738;
+	Mon, 9 Nov 2026 23:58:09 +0800 (+08)
+	(envelope-from shao.mingyin@zte.com.cn)
+Received: from mapi (xaxapp01[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Mon, 9 Nov 2026 23:58:13 +0800 (CST)
+X-Zmail-TransId: 2af96af1ed95a12-a17af
+X-Mailer: Zmail v1.0
+Message-ID: <202611092358134332uegNg75loROSwL53Em6A@zte.com.cn>
+Date: Mon, 9 Nov 2026 23:58:13 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -57,446 +69,283 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-Received: by 2002:a05:6808:318b:b0:4e6:9390:e153 with SMTP id
- 5614622812f47-568145f2896mr3186082b6e.24.1794238303329; Mon, 09 Nov 2026
- 07:31:43 -0800 (PST)
-Date: Mon, 09 Nov 2026 07:31:43 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6af1e75f.3e87765f.91969.0010.GAE@google.com>
-Subject: [syzbot] [block?] [ext4?] INFO: task hung in bdev_freeze
-From: syzbot <syzbot+d4ecb9a1e5b3dcf8baec@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+From: <shao.mingyin@zte.com.cn>
+To: <tom.leiming@gmail.com>, <shuah@kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>
+Cc: <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIXSBzZWxmdGVzdHM6IHVibGs6IHByb3BhZ2F0ZSByZWNvdmVyeSB3b3JrZXIgZmFpbHVyZXM=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 6A9Fw961036738
+X-TLS: YES
+X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
+X-SOURCE-IP: 10.5.228.132 unknown Mon, 09 Nov 2026 23:58:16 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6AF1ED98.001/4jNZFN434Dz8Xrnw
 
-Hello,
+From: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-syzbot found the following issue on:
+The recovery tests update ERR_CODE in background subshells and use wait
+without PIDs. A worker can report a failure while the parent still prints
+PASS and exits with zero. Calling _show_result() from a failed worker also
+removes shared backing files while other workers may still be using them.
 
-HEAD commit:    58c1eb84e977 arm64: sdei: Preserve the interrupted context..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=11932a4e580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a58b6b4d667e7a61
-dashboard link: https://syzkaller.appspot.com/bug?extid=d4ecb9a1e5b3dcf8baec
-compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=111be7a5580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e99409580000
+Wait for each recorded worker PID and aggregate its status in the parent,
+keeping failures ahead of skips and preserving errors across batches.
+Return worker and device-creation errors without reporting or cleaning up
+from the child, so the parent can finish waiting before shared cleanup.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b1ec47537e12/disk-58c1eb84.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3bca0c2b1169/vmlinux-58c1eb84.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a7c49594d5a/Image-58c1eb84.gz.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/80e50d025158/mount_0.gz
-  fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=17699409580000)
-
-AI-generated root cause summary:
-In ext4_force_shutdown(), EXT4_GOING_FLAGS_DEFAULT invokes
-bdev_freeze(sb->s_bdev) to freeze the underlying block device before setting
-EXT4_FLAGS_SHUTDOWN, and thaws it immediately afterwards via bdev_thaw().
-Because ext4_forced_shutdown() is tested only prior to bdev_freeze() and
-EXT4_FLAGS_SHUTDOWN is not set until bdev_freeze() returns, concurrent callers
-of EXT4_IOC_SHUTDOWN all bypass the shutdown check and serialize on
-bdev->bd_fsfreeze_mutex. Each caller must execute a full freeze_super() cycle
-involving s_umount exclusion, percpu_rwsem write transitions, and
-synchronize_rcu() calls, causing waiting tasks to stall in uninterruptible sleep
-(D state) on bd_fsfreeze_mutex and trigger hung-task timeouts.
-
-full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=d4ecb9a1e5b3dcf8baec
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d4ecb9a1e5b3dcf8baec@syzkaller.appspotmail.com
-
-INFO: task syz.1.3811:25659 blocked for more than 144 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.1.3811      state:D stack:0     pid:25659 tgid:25638 ppid:20649  task_flags:0x400140 flags:0x00800001
-Call trace:
- __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
- context_switch kernel/sched/core.c:5583 [inline]
- __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
- __schedule_loop kernel/sched/core.c:7459 [inline]
- schedule+0x13c/0x20c kernel/sched/core.c:7474
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
- __mutex_lock_common kernel/locking/mutex.c:726 [inline]
- __mutex_lock+0x5d8/0x10b8 kernel/locking/mutex.c:821
- mutex_lock_nested+0x24/0x30 kernel/locking/mutex.c:874
- bdev_freeze+0x38/0x2e8 block/bdev.c:304
- ext4_force_shutdown+0x288/0x5ac fs/ext4/ioctl.c:826
- ext4_ioctl_shutdown fs/ext4/ioctl.c:868 [inline]
- __ext4_ioctl fs/ext4/ioctl.c:1888 [inline]
- ext4_ioctl+0x21dc/0x4430 fs/ext4/ioctl.c:1932
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
-INFO: task syz.1.3811:25660 blocked for more than 144 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.1.3811      state:D stack:0     pid:25660 tgid:25638 ppid:20649  task_flags:0x400040 flags:0x00800001
-Call trace:
- __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
- context_switch kernel/sched/core.c:5583 [inline]
- __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
- __schedule_loop kernel/sched/core.c:7459 [inline]
- schedule+0x13c/0x20c kernel/sched/core.c:7474
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
- rwsem_down_read_slowpath+0x544/0x7f8 kernel/locking/rwsem.c:1114
- __down_read_common kernel/locking/rwsem.c:1291 [inline]
- __down_read kernel/locking/rwsem.c:1304 [inline]
- down_read+0xa0/0x2bc kernel/locking/rwsem.c:1576
- __super_lock fs/super.c:62 [inline]
- super_lock+0x258/0x344 fs/super.c:124
- user_get_super+0xb8/0x1bc fs/super.c:1022
- quotactl_block fs/quota/quota.c:889 [inline]
- __do_sys_quotactl fs/quota/quota.c:955 [inline]
- __se_sys_quotactl fs/quota/quota.c:917 [inline]
- __arm64_sys_quotactl+0x4c8/0x90c fs/quota/quota.c:917
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
-INFO: task syz.0.3808:25667 blocked for more than 144 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.0.3808      state:D stack:0     pid:25667 tgid:25642 ppid:21229  task_flags:0x400140 flags:0x00800001
-Call trace:
- __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
- context_switch kernel/sched/core.c:5583 [inline]
- __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
- __schedule_loop kernel/sched/core.c:7459 [inline]
- schedule+0x13c/0x20c kernel/sched/core.c:7474
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
- __mutex_lock_common kernel/locking/mutex.c:726 [inline]
- __mutex_lock+0x5d8/0x10b8 kernel/locking/mutex.c:821
- mutex_lock_nested+0x24/0x30 kernel/locking/mutex.c:874
- bdev_freeze+0x38/0x2e8 block/bdev.c:304
- ext4_force_shutdown+0x288/0x5ac fs/ext4/ioctl.c:826
- ext4_ioctl_shutdown fs/ext4/ioctl.c:868 [inline]
- __ext4_ioctl fs/ext4/ioctl.c:1888 [inline]
- ext4_ioctl+0x21dc/0x4430 fs/ext4/ioctl.c:1932
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
-INFO: task syz.2.3812:25664 blocked for more than 144 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.2.3812      state:D stack:0     pid:25664 tgid:25645 ppid:21748  task_flags:0x400140 flags:0x00800001
-Call trace:
- __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
- context_switch kernel/sched/core.c:5583 [inline]
- __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
- __schedule_loop kernel/sched/core.c:7459 [inline]
- schedule+0x13c/0x20c kernel/sched/core.c:7474
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
- __mutex_lock_common kernel/locking/mutex.c:726 [inline]
- __mutex_lock+0x5d8/0x10b8 kernel/locking/mutex.c:821
- mutex_lock_nested+0x24/0x30 kernel/locking/mutex.c:874
- bdev_freeze+0x38/0x2e8 block/bdev.c:304
- ext4_force_shutdown+0x288/0x5ac fs/ext4/ioctl.c:826
- ext4_ioctl_shutdown fs/ext4/ioctl.c:868 [inline]
- __ext4_ioctl fs/ext4/ioctl.c:1888 [inline]
- ext4_ioctl+0x21dc/0x4430 fs/ext4/ioctl.c:1932
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
-INFO: task syz.2.3812:25665 blocked for more than 144 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.2.3812      state:D stack:0     pid:25665 tgid:25645 ppid:21748  task_flags:0x400040 flags:0x00800001
-Call trace:
- __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
- context_switch kernel/sched/core.c:5583 [inline]
- __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
- __schedule_loop kernel/sched/core.c:7459 [inline]
- schedule+0x13c/0x20c kernel/sched/core.c:7474
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
- rwsem_down_read_slowpath+0x544/0x7f8 kernel/locking/rwsem.c:1114
- __down_read_common kernel/locking/rwsem.c:1291 [inline]
- __down_read kernel/locking/rwsem.c:1304 [inline]
- down_read+0xa0/0x2bc kernel/locking/rwsem.c:1576
- __super_lock fs/super.c:62 [inline]
- super_lock+0x258/0x344 fs/super.c:124
- user_get_super+0xb8/0x1bc fs/super.c:1022
- quotactl_block fs/quota/quota.c:889 [inline]
- __do_sys_quotactl fs/quota/quota.c:955 [inline]
- __se_sys_quotactl fs/quota/quota.c:917 [inline]
- __arm64_sys_quotactl+0x4c8/0x90c fs/quota/quota.c:917
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
-INFO: task kmmpd-loop1:25649 blocked for more than 144 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kmmpd-loop1     state:D stack:0     pid:25649 tgid:25649 ppid:2      task_flags:0x208040 flags:0x00000010
-Call trace:
- __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
- context_switch kernel/sched/core.c:5583 [inline]
- __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
- __schedule_loop kernel/sched/core.c:7459 [inline]
- schedule+0x13c/0x20c kernel/sched/core.c:7474
- percpu_rwsem_wait+0x2a0/0x2f8 kernel/locking/percpu-rwsem.c:164
- __percpu_down_read+0x84/0xb4 kernel/locking/percpu-rwsem.c:180
- percpu_down_read_internal include/linux/percpu-rwsem.h:67 [inline]
- percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
- __sb_start_write include/linux/fs/super.h:19 [inline]
- sb_start_write include/linux/fs/super.h:125 [inline]
- class_super_write_constructor include/linux/fs/super.h:130 [inline]
- write_mmp_block+0x358/0x3e4 fs/ext4/mmp.c:63
- kmmpd+0x2fc/0x938 fs/ext4/mmp.c:173
- kthread+0x304/0x3d4 kernel/kthread.c:436
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:854
-INFO: task kmmpd-loop2:25651 blocked for more than 144 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kmmpd-loop2     state:D stack:0     pid:25651 tgid:25651 ppid:2      task_flags:0x208040 flags:0x00000010
-Call trace:
- __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
- context_switch kernel/sched/core.c:5583 [inline]
- __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
- __schedule_loop kernel/sched/core.c:7459 [inline]
- schedule+0x13c/0x20c kernel/sched/core.c:7474
- percpu_rwsem_wait+0x2a0/0x2f8 kernel/locking/percpu-rwsem.c:164
- __percpu_down_read+0x84/0xb4 kernel/locking/percpu-rwsem.c:180
- percpu_down_read_internal include/linux/percpu-rwsem.h:67 [inline]
- percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
- __sb_start_write include/linux/fs/super.h:19 [inline]
- sb_start_write include/linux/fs/super.h:125 [inline]
- class_super_write_constructor include/linux/fs/super.h:130 [inline]
- write_mmp_block+0x358/0x3e4 fs/ext4/mmp.c:63
- kmmpd+0x2fc/0x938 fs/ext4/mmp.c:173
- kthread+0x304/0x3d4 kernel/kthread.c:436
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:854
-INFO: task syz.3.3813:25671 blocked for more than 144 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.3.3813      state:D stack:0     pid:25671 tgid:25657 ppid:22407  task_flags:0x400140 flags:0x00000001
-Call trace:
- __switch_to+0x2b4/0x6e4 arch/arm64/kernel/process.c:792 (T)
- context_switch kernel/sched/core.c:5583 [inline]
- __schedule+0x1368/0x2b50 kernel/sched/core.c:7382
- __schedule_loop kernel/sched/core.c:7459 [inline]
- schedule+0x13c/0x20c kernel/sched/core.c:7474
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7531
- __mutex_lock_common kernel/locking/mutex.c:726 [inline]
- __mutex_lock+0x5d8/0x10b8 kernel/locking/mutex.c:821
- mutex_lock_nested+0x24/0x30 kernel/locking/mutex.c:874
- bdev_freeze+0x38/0x2e8 block/bdev.c:304
- ext4_force_shutdown+0x288/0x5ac fs/ext4/ioctl.c:826
- ext4_ioctl_shutdown fs/ext4/ioctl.c:868 [inline]
- __ext4_ioctl fs/ext4/ioctl.c:1888 [inline]
- ext4_ioctl+0x21dc/0x4430 fs/ext4/ioctl.c:1932
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __arm64_sys_ioctl+0x154/0x1cc fs/ioctl.c:583
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
-
-Showing all locks held in the system:
-locks held by kworker/u8:0/12: 2, on CPU#1:
- #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff80008fa47c20 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff80008fa47c20 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
-locks held by khungtaskd/31: 1, last CPU#1:
- #0: ffff800089aa56a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
- #0: ffff800089aa56a0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffff800089aa56a0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x4c/0x188 kernel/locking/lockdep.c:6871
-locks held by kworker/u8:2/40: 3, last CPU#1:
- #0: ffff0000c004b948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c004b948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff800090f97c20 ((work_completion)(&(&par->cursor_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff800090f97c20 ((work_completion)(&(&par->cursor_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
- #2: ffff800089a9ada0 (console_lock){+.+.}-{0:0}, at: fb_flashcursor+0x28/0x398 drivers/video/fbdev/core/fbcon.c:403
-locks held by kworker/u8:3/42: 3, on CPU#0:
- #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff800090fb7c20 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff800090fb7c20 ((linkwatch_work).work){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
- #2: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-locks held by kworker/u8:4/63: 3, on CPU#0:
- #0: ffff0000c3d1e148 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c3d1e148 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff800092147c20 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff800092147c20 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
- #2: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-locks held by kworker/u8:12/3416: 2, on CPU#0:
- #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c004c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff80009c0f7c20 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff80009c0f7c20 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
-locks held by getty/4496: 2, on CPU#0:
- #0: ffff0000cd6e50a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3c/0x4c drivers/tty/tty_ldsem.c:340
- #1: ffff8000932bb2e8 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x350/0xffc drivers/tty/n_tty.c:2211
-locks held by kworker/1:2/4689: 3, on CPU#1:
- #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff80009a037c20 (deferred_process_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff80009a037c20 (deferred_process_work){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
- #2: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-locks held by kworker/1:3/4758: 3, last CPU#1:
- #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff800099ee7c20 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff800099ee7c20 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
- #2: ffff0000cde94258 (&data->fib_lock){+.+.}-{4:4}, at: nsim_fib_event_work+0x198/0x320 drivers/net/netdevsim/fib.c:1490
-locks held by kworker/1:4/4869: 3, on CPU#1:
- #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff8000966c7c20 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff8000966c7c20 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
- #2: ffff0000c8af0258 (&data->fib_lock){+.+.}-{4:4}, at: nsim_fib_event_work+0x198/0x320 drivers/net/netdevsim/fib.c:1490
-locks held by kworker/1:5/5032: 4, on CPU#1:
- #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #0: ffff0000c002ad48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8c8/0x1250 kernel/workqueue.c:3578
- #1: ffff80009b147c20 ((work_completion)(&helper->damage_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3470 [inline]
- #1: ffff80009b147c20 ((work_completion)(&helper->damage_work)){+.+.}-{0:0}, at: process_scheduled_works+0x8d0/0x1250 kernel/workqueue.c:3578
- #2: ffff0000c6fc6270 (&helper->lock){+.+.}-{4:4}, at: drm_fb_helper_fb_dirty drivers/gpu/drm/clients/drm_fbdev_helper.c:295 [inline]
- #2: ffff0000c6fc6270 (&helper->lock){+.+.}-{4:4}, at: drm_fb_helper_damage_work+0x120/0xbc0 drivers/gpu/drm/clients/drm_fbdev_helper.c:336
- #3: ffff0000c6f80128 (&dev->master_mutex){+.+.}-{4:4}, at: drm_master_internal_acquire+0x24/0x78 drivers/gpu/drm/drm_auth.c:435
-locks held by syz.1.3811/25641: 5, last CPU#1:
- #0: ffff0000c14946a0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
- #1: ffff0000c9688478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
- #1: ffff0000c9688478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
- #2: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:60 [inline]
- #2: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock_excl fs/super.c:75 [inline]
- #2: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: freeze_super+0x4a0/0xf6c fs/super.c:2242
- #3: ffff0000c9688570 (sb_pagefaults){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
- #3: ffff0000c9688570 (sb_pagefaults){++++}-{0:0}, at: freeze_super+0x4b8/0xf6c fs/super.c:2246
- #4: ffff0000c9688668 (sb_internal){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
- #4: ffff0000c9688668 (sb_internal){++++}-{0:0}, at: freeze_super+0x780/0xf6c fs/super.c:2260
-locks held by syz.1.3811/25659: 1, on CPU#1:
- #0: ffff0000c14946a0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
-locks held by syz.1.3811/25660: 1, on CPU#1:
- #0: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:62 [inline]
- #0: ffff0000c9688100 (&type->s_umount_key#32){++++}-{4:4}, at: super_lock+0x258/0x344 fs/super.c:124
-locks held by syz.0.3808/25644: 2, last CPU#1:
- #0: ffff0000c1495220 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
- #1: ffff0000f0a58478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
- #1: ffff0000f0a58478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
-locks held by syz.0.3808/25667: 1, on CPU#1:
- #0: ffff0000c1495220 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
-locks held by syz.0.3808/25668: 1, last CPU#1:
- #0: ffff0000f0a58100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:62 [inline]
- #0: ffff0000f0a58100 (&type->s_umount_key#32){++++}-{4:4}, at: super_lock+0x258/0x344 fs/super.c:124
-locks held by syz.2.3812/25646: 4, last CPU#0:
- #0: ffff0000c1493b20 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
- #1: ffff0000ea2de478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
- #1: ffff0000ea2de478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
- #2: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:60 [inline]
- #2: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock_excl fs/super.c:75 [inline]
- #2: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: freeze_super+0x4a0/0xf6c fs/super.c:2242
- #3: ffff0000ea2de570 (sb_pagefaults){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
- #3: ffff0000ea2de570 (sb_pagefaults){++++}-{0:0}, at: freeze_super+0x4b8/0xf6c fs/super.c:2246
-locks held by syz.2.3812/25664: 1, on CPU#0:
- #0: ffff0000c1493b20 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
-locks held by syz.2.3812/25665: 1, on CPU#0:
- #0: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: __super_lock fs/super.c:62 [inline]
- #0: ffff0000ea2de100 (&type->s_umount_key#32){++++}-{4:4}, at: super_lock+0x258/0x344 fs/super.c:124
-locks held by kmmpd-loop1/25649: 1, on CPU#1:
- #0: ffff0000c9688478 (sb_writers#3){++++}-{0:0}, at: kmmpd+0x2fc/0x938 fs/ext4/mmp.c:173
-locks held by kmmpd-loop2/25651: 1, on CPU#1:
- #0: ffff0000ea2de478 (sb_writers#3){++++}-{0:0}, at: kmmpd+0x2fc/0x938 fs/ext4/mmp.c:173
-locks held by syz.3.3813/25658: 2, last CPU#0:
- #0: ffff0000c1492fa0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
- #1: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
- #1: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
-locks held by syz.3.3813/25671: 1, on CPU#0:
- #0: ffff0000c1492fa0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
-locks held by syz.3.3813/25672: 1, last CPU#0:
- #0: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:309 [inline]
- #0: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffff0000eab62478 (sb_writers#3){++++}-{0:0}, at: rcuwait_wake_up+0x38/0x25c kernel/exit.c:322
-locks held by syz.4.3814/25662: 2, last CPU#0:
- #0: ffff0000c1492420 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x38/0x2e8 block/bdev.c:304
- #1: ffff0000da54c478 (sb_writers#3){++++}-{0:0}, at: sb_wait_write fs/super.c:1977 [inline]
- #1: ffff0000da54c478 (sb_writers#3){++++}-{0:0}, at: freeze_super+0x498/0xf6c fs/super.c:2241
-locks held by syz-executor/25983: 1, on CPU#1:
- #0: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-locks held by syz-executor/26125: 7, on CPU#0:
- #0: ffff0000d11a0478 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2762 [inline]
- #0: ffff0000d11a0478 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x248/0xa0c fs/read_write.c:683
- #1: ffff0000c9acb880 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x1b0/0x3b8 fs/kernfs/file.c:336
- #2: ffff0000ca4c5008 (kn->active#55){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:73 [inline]
- #2: ffff0000ca4c5008 (kn->active#55){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x1f0/0x3b8 fs/kernfs/file.c:337
- #3: ffff80008a3ad460 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xd8/0x2d4 drivers/net/netdevsim/bus.c:233
- #4: ffff0000da8f3128 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:1109 [inline]
- #4: ffff0000da8f3128 (&dev->mutex){....}-{4:4}, at: __device_driver_lock+0x94/0xcc drivers/base/dd.c:1046
- #5: ffff0000da8f2258 (&devlink->lock_key#14){+.+.}-{4:4}, at: devl_lock+0x24/0x34 net/devlink/core.c:314
- #6: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-locks held by syz-executor/26181: 3, on CPU#0:
- #0: ffff8000898bbaf8 (&ops->srcu#2){.+.+}-{0:0}, at: srcu_lock_acquire include/linux/srcu.h:213 [inline]
- #0: ffff8000898bbaf8 (&ops->srcu#2){.+.+}-{0:0}, at: srcu_read_lock include/linux/srcu.h:320 [inline]
- #0: ffff8000898bbaf8 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x17c/0x26c net/core/rtnetlink.c:602
- #1: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #1: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x38/0x10c net/core/rtnetlink.c:366
- #2: ffff80008994a5a0 (wq_pool_mutex){+.+.}-{4:4}, at: __alloc_workqueue+0xa84/0x121c kernel/workqueue.c:6201
-locks held by syz-executor/26191: 1, on CPU#0:
- #0: ffff80008abcf5a0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x20/0x2c net/core/rtnetlink.c:80
-
-=============================================
-
-
-
+Fixes: 57e13a2e8cd2 ("selftests: ublk: support user recovery")
+Fixes: 533c87e2ed74 ("selftests: ublk: add test for UBLK_F_QUIESCE")
+Fixes: 63276182c513 ("selftests: ublk: add user copy test cases")
+Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Tested on native x86_64 Bash 5.2 with the recovery scripts and common
+helpers from the unpatched and patched trees. Device and I/O operations
+were replaced by test-only stubs. Single-worker failures at every launch
+position, multiple failures, skips, signal termination and device-creation
+errors no longer produce a final PASS or a zero exit status. Successful
+runs still pass, and cleanup follows all worker exits. Prerequisite skips
+still exit before preparation. The 71 scenarios passed their expected
+checks on each tree. This does not exercise real ublk devices or I/O.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ tools/testing/selftests/ublk/test_common.sh   | 23 +++++++++++++++++--
+ .../testing/selftests/ublk/test_recover_01.sh | 20 ++++++++++++----
+ .../testing/selftests/ublk/test_recover_02.sh | 20 ++++++++++++----
+ .../testing/selftests/ublk/test_recover_03.sh | 20 ++++++++++++----
+ .../testing/selftests/ublk/test_recover_04.sh | 14 ++++++++---
+ 5 files changed, 80 insertions(+), 17 deletions(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
+index af2ea4fa1..c5adb4d29 100755
+--- a/tools/testing/selftests/ublk/test_common.sh
++++ b/tools/testing/selftests/ublk/test_common.sh
+@@ -379,6 +379,26 @@ run_io_and_kill_daemon()
+ 	fi
+ }
+ 
++# Collect recovery workers in the parent before removing shared backing files.
++_wait_recovery_tests()
++{
++	local pid
++	local ret
++
++	for pid in "$@"; do
++		if wait "$pid"; then
++			continue
++		else
++			ret=$?
++		fi
++
++		# A failure takes precedence over a skipped worker.
++		if [ "$ERR_CODE" -eq 0 ] || [ "$ERR_CODE" -eq "$UBLK_SKIP_CODE" ]; then
++			ERR_CODE=$ret
++		fi
++	done
++}
++
+ run_io_and_recover()
+ {
+ 	local size=$1
+@@ -387,8 +407,7 @@ run_io_and_recover()
+ 	local dev_id
+ 
+ 	shift 2
+-	dev_id=$(_add_ublk_dev "$@")
+-	_check_add_dev "$TID" $?
++	dev_id=$(_add_ublk_dev "$@") || return $?
+ 
+ 	fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio \
+ 		--rw=randread --iodepth=256 --size="${size}" --numjobs=4 \
+diff --git a/tools/testing/selftests/ublk/test_recover_01.sh b/tools/testing/selftests/ublk/test_recover_01.sh
+index 1cddc2345..950928abd 100755
+--- a/tools/testing/selftests/ublk/test_recover_01.sh
++++ b/tools/testing/selftests/ublk/test_recover_01.sh
+@@ -11,8 +11,8 @@ ublk_run_recover_test()
+ 	ERR_CODE=$?
+ 	if [ ${ERR_CODE} -ne 0 ]; then
+ 		echo "$TID failure: $*"
+-		_show_result $TID $ERR_CODE
+ 	fi
++	return "$ERR_CODE"
+ }
+ 
+ if ! _have_program fio; then
+@@ -25,20 +25,32 @@ _create_backfile 0 256M
+ _create_backfile 1 128M
+ _create_backfile 2 128M
+ 
++pids=()
+ ublk_run_recover_test -t null -q 2 -r 1 -b &
++pids+=("$!")
+ ublk_run_recover_test -t loop -q 2 -r 1 -b "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_recover_test -t stripe -q 2 -r 1 -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
++pids=()
+ ublk_run_recover_test -t null -q 2 -r 1 &
++pids+=("$!")
+ ublk_run_recover_test -t loop -q 2 -r 1 "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_recover_test -t stripe -q 2 -r 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
++pids=()
+ ublk_run_recover_test -t null -q 2 -r 1 -i 1 &
++pids+=("$!")
+ ublk_run_recover_test -t loop -q 2 -r 1 -i 1 "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_recover_test -t stripe -q 2 -r 1 -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
+ _cleanup_test
+ _show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/test_recover_02.sh b/tools/testing/selftests/ublk/test_recover_02.sh
+index 9c3f48188..beeeb3535 100755
+--- a/tools/testing/selftests/ublk/test_recover_02.sh
++++ b/tools/testing/selftests/ublk/test_recover_02.sh
+@@ -11,8 +11,8 @@ ublk_run_recover_test()
+ 	ERR_CODE=$?
+ 	if [ ${ERR_CODE} -ne 0 ]; then
+ 		echo "$TID failure: $*"
+-		_show_result $TID $ERR_CODE
+ 	fi
++	return "$ERR_CODE"
+ }
+ 
+ if ! _have_program fio; then
+@@ -29,20 +29,32 @@ _create_backfile 0 256M
+ _create_backfile 1 128M
+ _create_backfile 2 128M
+ 
++pids=()
+ ublk_run_recover_test -t null -q 2 -r 1 -z -b &
++pids+=("$!")
+ ublk_run_recover_test -t loop -q 2 -r 1 -z -b "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_recover_test -t stripe -q 2 -r 1 -z -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
++pids=()
+ ublk_run_recover_test -t null -q 2 -r 1 -z &
++pids+=("$!")
+ ublk_run_recover_test -t loop -q 2 -r 1 -z "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_recover_test -t stripe -q 2 -r 1 -z "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
++pids=()
+ ublk_run_recover_test -t null -q 2 -r 1 -z -i 1 &
++pids+=("$!")
+ ublk_run_recover_test -t loop -q 2 -r 1 -z -i 1 "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_recover_test -t stripe -q 2 -r 1 -z -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
+ _cleanup_test
+ _show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/test_recover_03.sh b/tools/testing/selftests/ublk/test_recover_03.sh
+index 92f401217..0c6b312e2 100755
+--- a/tools/testing/selftests/ublk/test_recover_03.sh
++++ b/tools/testing/selftests/ublk/test_recover_03.sh
+@@ -11,8 +11,8 @@ ublk_run_quiesce_recover()
+ 	ERR_CODE=$?
+ 	if [ ${ERR_CODE} -ne 0 ]; then
+ 		echo "$TID failure: $*"
+-		_show_result $TID $ERR_CODE
+ 	fi
++	return "$ERR_CODE"
+ }
+ 
+ if ! _have_feature "QUIESCE"; then
+@@ -29,20 +29,32 @@ _create_backfile 0 256M
+ _create_backfile 1 128M
+ _create_backfile 2 128M
+ 
++pids=()
+ ublk_run_quiesce_recover -t null -q 2 -r 1 -b &
++pids+=("$!")
+ ublk_run_quiesce_recover -t loop -q 2 -r 1 -b "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_quiesce_recover -t stripe -q 2 -r 1 -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
++pids=()
+ ublk_run_quiesce_recover -t null -q 2 -r 1 &
++pids+=("$!")
+ ublk_run_quiesce_recover -t loop -q 2 -r 1 "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_quiesce_recover -t stripe -q 2 -r 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
++pids=()
+ ublk_run_quiesce_recover -t null -q 2 -r 1 -i 1 &
++pids+=("$!")
+ ublk_run_quiesce_recover -t loop -q 2 -r 1 -i 1 "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_quiesce_recover -t stripe -q 2 -r 1 -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
+ _cleanup_test
+ _show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/test_recover_04.sh b/tools/testing/selftests/ublk/test_recover_04.sh
+index 4c83c1840..232ae7d4a 100755
+--- a/tools/testing/selftests/ublk/test_recover_04.sh
++++ b/tools/testing/selftests/ublk/test_recover_04.sh
+@@ -11,8 +11,8 @@ ublk_run_recover_test()
+ 	ERR_CODE=$?
+ 	if [ ${ERR_CODE} -ne 0 ]; then
+ 		echo "$TID failure: $*"
+-		_show_result $TID $ERR_CODE
+ 	fi
++	return "$ERR_CODE"
+ }
+ 
+ if ! _have_program fio; then
+@@ -25,15 +25,23 @@ _create_backfile 0 256M
+ _create_backfile 1 128M
+ _create_backfile 2 128M
+ 
++pids=()
+ ublk_run_recover_test -t null -q 2 -r 1 -u &
++pids+=("$!")
+ ublk_run_recover_test -t loop -q 2 -r 1 -u "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_recover_test -t stripe -q 2 -r 1 -u "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
++pids=()
+ ublk_run_recover_test -t null -q 2 -r 1 -u -i 1 &
++pids+=("$!")
+ ublk_run_recover_test -t loop -q 2 -r 1 -u -i 1 "${UBLK_BACKFILES[0]}" &
++pids+=("$!")
+ ublk_run_recover_test -t stripe -q 2 -r 1 -u -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-wait
++pids+=("$!")
++_wait_recovery_tests "${pids[@]}"
+ 
+ _cleanup_test
+ _show_result $TID $ERR_CODE
