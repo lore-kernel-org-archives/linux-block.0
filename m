@@ -1,63 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.88
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794228262;
-	b=WWJnQfxV9uFlrZHOUMfGYXVreUWkt/nyz2oV0GlKEMqxFTcwfHv8RetY9G4kW4tWKxKv
-	 0XSjYnH2w1MJx3tKuf/2Jn36qkWCnE4JKUZ7kw2Xf6gZdqlPCFjS8aqr6RbmSY7DcBKvc
-	 2eYjSg/Dgmv+YTDIiWMhtw9hsaVIlDbdcYS4j8PAPNoEtU8i2FUV921PFV015C9GEn21G
-	 oYxJKpqXR0ORCyL5uE/2AdTU/O9S4t0GNKAXexkC3KDXAxCQ0BI6Ch60iSPIKMT7ds4jm
-	 G+6ux7DOYjCQzU476FmibV2Wp5rJr4quTnP1puPf+O+9fBM4EzsBe8jDrFeMq1t9NHg==
+	t=1794229567;
+	b=s6kWRVyc50Kdo7XpWKqDO8Jsy44XDkYikVWbaXO88bL6PjrIuFlxxceNgVq+HODKzTJV
+	 i2VWhMzcM/v/syl3kD23jHK9v+pdn2m43S9dsEV3J5cUgjkUdTz7zIxx903RoiJDMGcM6
+	 k150qgGPpaoJffAAJOYjnDYtYLSDD00b3BRTeERF3MSfKdBnMcF29CQUQu9gX+N/9ie5W
+	 5BcIDyI6JbgG3vZFMLP9kD5QcjyvyU+GoY9yiXidPoou6KdBW/MJKR++AyKiMuQgCe2Un
+	 baPu/joetIXSK3+pNjfAhFWfxnqkoLrN5Lqc0MbBuwrqZwlJvWnGf5v5wV9JwVlBqFA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794228262;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=wCwX+KhVRI6NnD4xYy03md5dg+U159xRfAejqBI6STk=;
-	b=xqOhA1rL1QnCVFCUAxTF0taNzRtVvM+iulxdNuNitWWVu7DY45mwfTo08iPdVSwH12Xf
-	 cRx8qIV+tqXAhSmEpyeRAqpgmqhQ7+1aJd0t7iQHjJtfZXXkIPgV2cEyl3kqej1+fLOzq
-	 BGkd6Z4wBo48WTQBYkDrRePDr2fWAEKNOYvgrBjFmNZ20h7fiS4V+WU2aBXfvb/STch1+
-	 LPqffhQUo3QRrLUD8bW/1YAD+BM2wA0t1a5YViMsbHYPE+gql8o4jU01ddj043D2kZiK8
-	 dBXA58FTYWmH+kGwBWC70lu2XsbFF2j7pXon8ylGZTUmkOsJ4I8WMdhpMuLim6GcTYQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794229567;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=91+PrshXlXFSwP6fmMo9THAMzpUAzOQonBKifsHDzvY=;
+	b=5VlKSEggmsMoMrAbsAWjcWmvZG3bDBP5RFsBHbhlMyLBNk0FQkAQkJ5UqSijM4rJkMRz
+	 k1QyHLnf4Ye0mZH0Px9qSHgA5568kQcWuMyPtVeiy0i1KccP+AlBKFX5MRWQUl5QmiFJ7
+	 Ze1gvkMgD6DH91ZkM1bM9jvPCGi7xC5vwZcMKf3Z350xstqZH5hQudvXQvT6VAEltaR4z
+	 MTNqARVh243Zr6JXsEvH2r4qtORD6/AkvO1ujbAz054VlvuXi9BFz5FFmwDyLoBISubRn
+	 xGM4yHxyJUrz5N+mGvdeIYk8quIy4p++TdaAGa3FJPjYX3qINVFokigbrLZYKZ67amA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DMYRPH2n;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	arc=none smtp.remote-ip=91.218.175.88
+Received: from mta0.migadu.com (out-88.mta0.migadu.com [91.218.175.88])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AC2606A330;
-	Mon,  9 Nov 2026 12:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DMYRPH2n
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BE3D1F008A3;
-	Mon,  9 Nov 2026 12:44:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794228262;
-	bh=wCwX+KhVRI6NnD4xYy03md5dg+U159xRfAejqBI6STk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=DMYRPH2nOnyhO126h3rnBoMgFE9SIn6NtdkYLP/jQoYQAC+CPkhoPgYSNASMBCrBS
-	 GL3Jm/5m9IPuggNS+rS1XbCwgaBEBF1Hr0GwdcGkQT08dsz/s0QOHb8+rXXejo8lK1
-	 4Q9OS6MdWFeYU5uvw5Z3ktDNtKg8p4tK46y378n/zoL0ybszWeuEmjeXL2pWAHxXCT
-	 1l5hqBUFc8hLywPrQvxAbtfTaVjZItMdhXVFhLGLraL+HD59t6oz5R6s5kaXCTWLWN
-	 A197unf8VTm5h517oeBMmkxhNl3X7oglc2pYfEcdipAa/m86U+/i1LmuJDVGY+Ph2k
-	 3DtKlqib2sxbw==
-From: Sasha Levin <sashal@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Sasha Levin <sashal@kernel.org>,
-	gregkh@linuxfoundation.org,
-	a.hindborg@kernel.org,
-	axboe@kernel.dk,
-	patches@lists.linux.dev,
-	pgovind2@uci.edu,
-	stable@vger.kernel.org,
-	ytan089@ucr.edu,
-	Boqun Feng <boqun@kernel.org>,
-	linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH 6.12 0630/1536] rust: block: fix `Send` bound for `GenDisk`
-Date: Mon,  9 Nov 2026 07:44:16 -0500
-Message-ID: <20261109120000.sasha-rc-reply-001@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261108163608.122524-1-ojeda@kernel.org>
-References: <20261107135015.226523646@linuxfoundation.org> <20261108163608.122524-1-ojeda@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B415606A325
+	for <linux-block@vger.kernel.org>; Mon,  9 Nov 2026 13:06:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B415606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=Vb2HvE4C+LsP6a08cxDbF41GOuV0T8q7dEJG6iihUxU=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794229563; v=1; x=1794834363;
+ b=W1CodLmtnLn5HrTpardRoGaMj16hktHrXTVqdiPkFobfGU4JR+kU4IM5lmByKudj3VepudO6
+ mFHukN3TlUy/MJ3hp18VecbNkd8LmVg7jgc/R0p+EtlzOnt5Yb+w2yCu4aQjS3UcDBdl8n9o+1P
+ ocGDrW3Cz4dlvwmAnvcujZc0=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 7c06950158a956d2;
+	Mon, 09 Nov 2026 13:06:03 +0000
+X-Mizu-Trace-ID: 7c06950158a956d2
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <1c4078e4-dd6a-4a70-bdda-d5cded19937a@linux.dev>
+Date: Mon, 9 Nov 2026 21:05:53 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -67,25 +55,76 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ linux-kselftest@vger.kernel.org, cuitao@kylinos.cn, ameryhung@gmail.com,
+ martin.lau@kernel.org, yonghong.song@linux.dev, mason@kernel.org,
+ ihor.solodrai@linux.dev
+Subject: Re: [RFC PATCH v13 2/4] blk-iocost: add iocost_ioc_tick tracepoint
+ for per-period device summary
+To: bot+bpf-ci@kernel.org, tj@kernel.org, josef@toxicopanda.com,
+ axboe@kernel.dk, alexei.starovoitov@gmail.com
+References: <20261106122356.3224638-3-cui.tao@linux.dev>
+ <ebb6ebc5ddce3089fe912ca2d6e7a0658864c7369d15e1cdb7f203eae6d5a0d0@mail.kernel.org>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <ebb6ebc5ddce3089fe912ca2d6e7a0658864c7369d15e1cdb7f203eae6d5a0d0@mail.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On Sun, Nov 08, 2026 at 04:36:08PM +0000, Miguel Ojeda wrote:
-> This one breaks most Rust builds:
->
->     error[E0220]: associated type `QueueData` not found for `T`
->        --> rust/kernel/block/mq/gen_disk.rs:198:8
->         |
->     198 |     T::QueueData: Send,
->         |        ^^^^^^^^^ associated type `QueueData` not found
->
-> because there is no `QueueData` in 6.12.y. We would also need commit
-> 06dad60393f2 ("rust: block: implement `Send` and `Sync` for `TagSet`")
-> for the other bound anyway.
->
-> I would suggest dropping the patch for the moment.
+Hello,
 
-Dropped from the 6.12 queue, thanks for the report.
+在 2026/11/6 20:56, bot+bpf-ci@kernel.org 写道:
+>> blk-iocost: add iocost_ioc_tick tracepoint for per-period device summary
+> 
+> TL;DR: Commit message only: it restates the code comment instead of giving the
+> motivation (monitoring without drgn) for the new iocost_ioc_tick tracepoint.
 
--- 
+Right, the changelog ended up restating the code comment.  I'll
+rewrite it to lead with the motivation: the tracepoint gives a
+per-period summary so monitoring iocost doesn't require drgn.  The
+emission semantics stay documented in the code.
+
 Thanks,
-Sasha
+Tao
+> Not a bug.
+> 
+>> blk-iocost: add iocost_ioc_tick tracepoint for per-period device summary
+>>
+>> Add iocost_ioc_tick, emitted once per period from ioc_timer_fn() with
+>> the overall controller state: period_us, vrate, busy_level, active iocg
+>> count and usage percentage.  busy_level, cur_period, nr_active and
+>> usage_us_sum are complete at the emission point.  usage is wall time
+>> over wall time, summed over iocgs, and is not capped at 100.  vrate and
+>> period_us reflect the current controller state, which an io.cost.qos
+>> write may have changed mid-period.
+>>
+>> The event fires every period the controller is running, including
+>> steady states, plus one final tick before the controller goes idle, so
+>> the transition to dormancy is directly visible.  The active iocg count
+>> is only gathered when the tracepoint is enabled.
+>>
+>> Suggested-by: Tejun Heo <tj@kernel.org>
+>> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+> 
+> this isn't a bug, but the middle of the first paragraph ("busy_level,
+> cur_period, nr_active and usage_us_sum are complete at the emission point
+> ... which an io.cost.qos write may have changed mid-period") restates the
+> block comment added above the tracepoint call in ioc_timer_fn() almost word
+> for word.
+> 
+> The reason for adding the event only appears in the comment in
+> include/trace/events/iocost.h ("so basic monitoring doesn't require drgn").
+> 
+> Could the changelog say why a per-period summary event is needed, for
+> example the monitoring-without-drgn motivation, rather than repeating the
+> code comment?
+> 
+> 
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> 
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/42219005018
+
