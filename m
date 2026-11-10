@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794330017;
-	b=XoeRf+u/ppS/uFPdgsVaeRJqQMTdaq9Ldp0xqRyVXCOMwCBu5ePQJ8OkwppduXde3Bw+
-	 gklotrxniUl4C1ZdjlQkQs4XSWUyGWgolt4VJ720BnLd9Q0pp1Xn5AJAd2oWvGMgql8GT
-	 cSH+if7rSdEBsN8GZl0ws2L7jUdaU7iRlaT9DKo0qQQrw0XWeKJAuAWbISBXBwxM6bswJ
-	 Tul4vIvrr0ZhBV0gfJQ4yt/8DN9YESJXPoyAr3wlASSVcR002LFggOI0ijmXJIFLuBqPw
-	 gxnk+JSmgNpphPaUKyXyDtawUSradpSQtdNsf5a+e1HB3rrJTPwmZTabP+Q/HzaUk+A==
+	t=1794330208;
+	b=Sk47Nid2ZjPfLlr+IjB2E2969fUiBXNBiergjsgSpzQtpmBtPcRark/MB9JY8BWR+wti
+	 t9lMrHOHffNi1scRxy0BYTo6vadlPGjIcqVNu+dnqOAgtef7FdxrRCas4JDrEpjWRvvXp
+	 SUBhCyVrECdNHMEYSpfgqYkTOPtc4NPOetgrt6DYbLefFmZ6g6Nz+VObvBV8Cejjom6/V
+	 SkCb3O1OmMxryPkEXh6onl2Xp2jmgh5XpjN8yRY5GTMCYPp/A/Zw8UOev5ZM1DUuWaAec
+	 pmNlci9NfbI3ef07aKgOl+EKQpKC0XzrshF66oOc0z4iu32WR+/2jNMmQ3Lxm0Fvb7g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794330017;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794330208;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=e9tGyPXz9xL70oEPM5OS0/SNYUGPcdfzb2vPyxxeOIc=;
-	b=PZmUpvScM+Pbe2mEakBh4oTxrf4k9IPHVffRVzPkkqeH0gm3Jfu72hZAkjhjcZoB9+33
-	 oprigc4N0erTmEc9LX8z2NgGJqmFYkBpuBIVh5bamfUKtUTQ55A352qpZbCp7M+IxS64i
-	 K0d0XXDnc09kolzLQylluAtOCo5bEoY2yDoeKElI90noWc7i7VdiYptbzY+eQ3DPfxB0g
-	 GjUM7Tvsa/60sJ8lwQq+oOcDGrPS7IjJxf0kYeUWtl4w71jIaNkWICf2qGx7TR7ixC7Zg
-	 36xxPOwlpCMqv5do2j3WRSPDs/gbYIEPiDE834il6yxnLGvWoCxYCH6g2Ouq8KhJ08A==
+	bh=OYBNS/wIwETszXOBgNpLsMvPx95qdQbX+4kEObkSrd4=;
+	b=wVpXSAz9wqLBE/OVoUJOIjhVy9dELK6b8xXpXllMWu7jDUtpsQtfHF4mhrblutdU9xlM
+	 hpd9tikSqWBVC4PmlrCRobqJxGMvOL0x8OZdJ2vA7twDCyhNB0bXrGlTyEB4Xr0I4VGK6
+	 vOk06GmXp60z9ku0bCR5KFkrclJl+LaAbNYPh+Pmyri+aEduZLx4f7nXyX/3oT9A+O5Jh
+	 OYMQgmWY3w5M7yT/6VBcXBj3RwUrNzpoSk6YbDMQqrx50lLUquPz1ACiKTNKfdRmS34WI
+	 wJ7fsBJywzrbmUqVa9+6b+sKuA7NltrBFTqkAHtrT6x+0CT+ubeYau5D1VO3boDlMtg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RJjGS4aJ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=h9xiN3w6;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C25606A81C;
-	Tue, 10 Nov 2026 17:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2A3606A31C;
+	Tue, 10 Nov 2026 17:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RJjGS4aJ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E6FE1F0089F;
-	Tue, 10 Nov 2026 17:00:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=h9xiN3w6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32CD81F008A3;
+	Tue, 10 Nov 2026 17:03:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794330016;
-	bh=e9tGyPXz9xL70oEPM5OS0/SNYUGPcdfzb2vPyxxeOIc=;
+	s=k20260515; t=1794330207;
+	bh=OYBNS/wIwETszXOBgNpLsMvPx95qdQbX+4kEObkSrd4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RJjGS4aJgoI4lZen2laaGmqFvmOokyg5KlyFv3ITPJzQK7nQoN1EH0vupyDu4eYdt
-	 mcgYPzP/L5UVUL1qt9J5GkXH7Q/3OFYCYebwiXqvEp5tT9oU9WeOwh5SEdlrt8oxfg
-	 WlQdNAQN5uJrxTdnbQjrhppykQ47HZ9CXAjKVIDX+aXA1M3OwXAJ0lQ8ecu4d1k7sm
-	 zws+3hX3Vq1FRf7CykYhr7msoJeGYx3JKUKxRrfP9USK4VqnBibHsXvxY/dRhoFKoo
-	 fNtKn8v0cneOg0aHwztoMu7E2uOUndOA4Vc0YhDLJh/7IS19X5XfwNRbT0Vzsm6JIN
-	 vzqxWiif6yw/g==
-Date: Tue, 10 Nov 2026 17:00:15 +0000
+	b=h9xiN3w6tQaZmnlGlFXHoQYdpAhIdrU1SCwWBhN4fRfNjkM+xDQIPj2Pba9imBt8x
+	 SrGL0Hayefiwa7HkLpIrlkOPy4h09Ukw3bDyV8IpF+nGgbb9hZNWvmEkP1GbwkYUsl
+	 wB5jx8genrtWxC5qMhpd3wEXiP7cpXpn/Cj7Zt3eSdLoqW3fSoHZyJlQ2fEPRvz1gI
+	 PVDFENGYdlYYuvtD6FgjB5EscgrFiYvWXUrcpjr1ASmO9dE+/N31CsETmVpuRSraZP
+	 8pO4w/TgE2wcEn82+N9jJoSQP9WPVgUBlZmOLJmDPZPHKRlsmuYX4fSfJL8a1NmcfC
+	 2rJqxQ61582SA==
+Date: Tue, 10 Nov 2026 17:03:25 +0000
 From: Yosry Ahmed <yosry@kernel.org>
 To: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>, 
@@ -47,10 +47,11 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Johannes Weiner <hannes@cmpxchg.org>, Brian Geffon <bgeffon@google.com>, 
 	Minchan Kim <minchan@kernel.org>, Richard Chang <richardycc@google.com>, 
 	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v2 10/11] zsmalloc: fold zs_obj_write() into zs_store()
-Message-ID: <avNNjoQoBs7qIXd3@google.com>
+Subject: Re: [PATCH v2 11/11] zsmalloc: populate new zspage outside
+ class->lock in zs_store()
+Message-ID: <avNOUwojK5x8IkOm@google.com>
 References: <20261110054836.1515030-1-senozhatsky@chromium.org>
- <20261110054836.1515030-11-senozhatsky@chromium.org>
+ <20261110054836.1515030-12-senozhatsky@chromium.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,34 +63,21 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261110054836.1515030-11-senozhatsky@chromium.org>
+In-Reply-To: <20261110054836.1515030-12-senozhatsky@chromium.org>
 
-On Tue, Nov 10, 2026 at 02:48:15PM +0900, Sergey Senozhatsky wrote:
-> zram and zswap always call zs_obj_write() right after zs_malloc(), and
-> zs_obj_write() has to take pool->lock and look up object location
-> again, which zs_malloc() just did.
+On Tue, Nov 10, 2026 at 02:48:16PM +0900, Sergey Senozhatsky wrote:
+> A new zspage is not on class fullness lists and is not movable until
+> zs_store() calls insert_zspage() and SetZsPageMovable(), so neither
+> other zs_store() callers nor compaction and page migration can see it.
+> Nobody else has the handle yet either.
 > 
-> Replace zs_malloc() and zs_obj_write() with one single zs_store()
-> call.
+> So for a new zspage allocate the object and copy the data before we
+> take class->lock, and don't take zspage read lock.  This makes
+> class->lock critical section shorter and saves a zspage lock/unlock.
 > 
-> zs_store() takes zspage read lock under class->lock, before it drops
-> class->lock to copy the data, while zs_obj_write() used to take it
-> under pool->lock.  Compaction and page migration already take zspage
-> lock under class->lock, so this follows the existing pool->lock ->
-> class->lock -> zspage->lock order.  We don't need pool->lock there,
-> zs_store() doesn't look up the object via the handle, it already has
-> the zspage from the allocation.
-> 
+> Suggested-by: Yosry Ahmed <yosry@kernel.org>
 > Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-> ---
->  Documentation/core-api/memory-allocation.rst |  2 +-
->  Documentation/mm/zsmalloc.rst                |  4 +-
->  drivers/block/zram/zram_drv.c                | 42 +++++---------
->  include/linux/zsmalloc.h                     |  6 +-
->  mm/zsmalloc.c                                | 58 +++++++++-----------
->  mm/zswap.c                                   |  5 +-
->  6 files changed, 47 insertions(+), 70 deletions(-)
 
-zswap and zsmalloc bits LGTM:
+LGTM:
 
 Reviewed-by: Yosry Ahmed <yosry@kernel.org>
