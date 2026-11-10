@@ -1,100 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.170
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794289758;
-	b=dOQwmWh01mR95Ve7bvOsEnSP7GF6NdvS1xVj5svrYBYDIzwM0RzXmBL+8LGEFLMsjMY7
-	 FqeQ7kyIUFeFQ54ylGgePBkUTRG0k7FCHImNfgEXdYDPcmMtBwoWXy4eJs+ehg2uis3zV
-	 zgQB7vPS5pwnmrC03TMMdsjM2ztIkadBJzV6B7Iy4g0Bzgrt65S4ck6WN1mEcpDRhImVV
-	 eZlnG0s2p3l5A41G1B4H60Ivk6b9BC0FVv62ZPWK5GNroKzt8nZZuwnZcliFb8ohu/I+m
-	 hu5uzVd8Lax/u8DT+3SVTuT3RNJIMP+TSejcwV3AGsgn10DZkZ7X6YHDDU2rB3kyS9A==
+	t=1794289763;
+	b=3lA9u2jO2cGu89d5szDN1NSffZ5V7F7DG9L2gm0L3it5xNAPKm/4c0cuXIM2ljzo868Y
+	 +eWkQzGN698vhGYsgPTZkRN6SbTPK9HDxy5VtJ8MouMvddkm8E2A68sPmXc+qiJPeYr4t
+	 D173GJEuFhh5kwqNvkki9lbaLxr/NsvtRIPX2BgLQ98nesGpPJt/pzg68mtuzQQ26wgNP
+	 Q4tJ2uEalCLNVnC7/FAONEZ6v2SFvT+TQWHS2TQ2LkYI4OPCV5b5dKFuG+jDeSap0oGt8
+	 NuOyrlY5Bv7cipbtZobJxEDcy2DTNQJ7rdjtZHT+ABlBbHGm1T0OUy3QphVGkCkdTUQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794289758;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794289763;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=lrmi2+lOFJxXdkix+UX3wdRa3hyeMQKr15+9Sj7OH3M=;
-	b=Fv26wxBki7K5qQg3SWZwxHVmtDGNClmaY+nTvcFZnCJH0S7rcBHWFbfiiXiRt6IMLeU5
-	 kxWmhSpTqcS7k7AJV7LC+pksgdkaOWJ+Td+rFWSAl/2ym+/VOVejyCrd4zOVj8WaN7L15
-	 K0ucEXL4hpSSmMM52WzIDjlX/8p85J1C9bwr73HT9gQASwAQgXEk7LsWL8buXctZdsa64
-	 Kwoj4GO9LqnwQHH4bBLSmj7fOkq5iF71p//vnNpYNSX6iRYCPTnLV8UTIGJW0xWqGiFt6
-	 7zYCJFTzNaqckYJL70j3dOJZI4h2iT0WXRqNo0d9AL8EkINTvhW2NuwLQtYqh8CEP5w==
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
+	 In-Reply-To;
+	bh=e1CwuUVsSjZnbMobjwr4r9fMJTFxCCqI+vgT8IsHHyE=;
+	b=BR81BK8OPqrzozxfkJdGuvpD+S33lt3xDjs7iEyHRCb7hTOVtUw/xfdbl/vfvq1rZz+k
+	 VtQBPLdeKmdT6gLgfeCBYrob9UA1mfDGBRC4A2Hm4H8oOS5fWWsoEApIg5HShoTQD/MWP
+	 4ctUDHECGZK9Hskkj3BsIa4y147iUjn+MQsOc+dSyBmVgy8oxofyJmffKEvggdrpoyLBx
+	 0GUeCn/8uHuS9y5FYW7TG5DCftYR8Z4iuyXBL1RmrRMUdMBMD1m5N4cY2zimKPDYku7TB
+	 EjHbs8wNwHmwxmavGA7rWmKXe0BduUZufns2unYo8wZ2YcNsmbA/MURRqyYegiyBGzA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=chromium.org;
 	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Bqgg+k0f;
-	arc=none smtp.remote-ip=209.85.214.182
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Ntx8of9R;
+	arc=none smtp.remote-ip=209.85.210.170
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B219606A335
-	for <linux-block@vger.kernel.org>; Tue, 10 Nov 2026 05:49:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3B219606A335
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C914160A260E
+	for <linux-block@vger.kernel.org>; Tue, 10 Nov 2026 05:49:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C914160A260E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Bqgg+k0f
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2e940d5d2beso6260345ad.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 21:49:18 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Ntx8of9R
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8b5e5e64494so834090b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 21:49:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1794289757; x=1794894557; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=lrmi2+lOFJxXdkix+UX3wdRa3hyeMQKr15+9Sj7OH3M=;
-        b=Bqgg+k0fTTa+pKyiYCST8SEKagAEW+44pMFRbd4swH8xMqrb9rwqpBMFvtyyvpTSPQ
-         JE863d2xzK182cvcqLpp/6ub1kQ1Zhn33Iy45nFeJ5Aa6lTffP8D0DxLgHCumOmm4Skr
-         j201polbUzLzWnbelffldwAjBud6vhJnOXSVk=
+        d=chromium.org; s=google; t=1794289762; x=1794894562; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=e1CwuUVsSjZnbMobjwr4r9fMJTFxCCqI+vgT8IsHHyE=;
+        b=Ntx8of9RtWT7VWFP+8UI2qGvxb7QsA9xAcmmQncetK5YIWQYal5uEtY/rivndaRZjy
+         rU0cwPplqFhBTIjuGAnTrn/domD/um+/F8BvTxnHmvYwK/K4HXYNZ0PzZWE+2pk3xLhB
+         8PbiiK6C6Lt2RBs1QMNH6sTgfIVwKTef1OQOY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794289757; x=1794894557;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=lrmi2+lOFJxXdkix+UX3wdRa3hyeMQKr15+9Sj7OH3M=;
-        b=anxT9zbT93Mp0dk6Fcx+bdVeK50E6j9gL+DT+tSNxqMsOAwxZqKIG4436729mduG78
-         SAKoMc0CwZERgmeY/96QEflzUEEVCcIPHC2v/hosO9T2zZmHTHd9c1lyGzVGdk4ErGVQ
-         EwlZBRq8lqM5TGc3iB759zZqc9Y/SlWHF+Qeandi6TxKGrap6BT2QKuR3778nj584Ryd
-         mDEMDXHDBQTlwLvmXpiH6+3224/wsLcX9qtUiJX/LAGhSiYWcJgQI1xamW0LQ6lsXDaM
-         OE3srbM7jZSoJYAf9LwZmkW8EjzBqcOXNN/0zo3DMqiMilGmTgXfFkqip2sQHg9kS92w
-         vmEA==
-X-Forwarded-Encrypted: i=1; AL+hErFSYAwy8/rllqYqP6lw3iYhr0Gl5GYnKc9NTAY1e7uy2KdUVRLvRc7aLhgEW3hfO3XyOSS2i+56MuKQgw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/7zIkazdiLCs1Hr7hRf2hWtfQ9BsWbGwFylmU54Dy9j8OsNMJt
-	rgSA6fu/lTHUHqeINF8HzYta8D+RZ3EfCBbh0l5zsZ15SyLEMOSMhBJNG9eP/Gcaww==
-X-Gm-Gg: AYBFou3c7uK0btIf3r29JYBRZeLPLGeuwm+2f2y2GIVeHlez8znbrL52d4Pker7kY89
-	hPuWuR1grw7073ln2rkGGJNXoIdI7LaPH4pdXZbkqNdPkPMWQ64EERR83sL9a29qupxDkZ2rEcC
-	9bDlvMHBzxGLrOwA2EOHL/XBT2Z69WSh0+Al0ky4Rwy3bEtoJZMsmcxx4SUnMgrq+61r8wJxe36
-	ASMnJ3B9kpx5cijJcPvF4g9s4sZ/AGFoJ4O8JySMa44orq3ITNgz0vHLxOgHgccILqo01QYE3GM
-	gIE+IvpIAAihQqpUB58PEcPDgBlE8Qabxe0O5LFVBcK8srsFFi2Q+NEXFbpjNKss6MFa/JD7jUp
-	XBglNnt1PEOYcCyFPd2uz9wbEz1l3OZu1ro+b8tCyFaSsekoznJB8F0hvkLZNnLjzO2Q/Mh+lTW
-	ZaNV/4IEV1il1t+5FrPRgd3pAvCqYijTazeo3cZsiVNnZaYST9JJlj4Hh1uC0gxYmmQ0wQUtLI+
-	wDi8dMLSx3uF6E85u4SvKgucUjPePo8F0RqFe8R7qO59bTD4iPVObuv/iuyvKhpAyE+AI5ZANh6
-	xkm47+l7TRbLW9O1Xg5V41oPNYgWhrbjGXOYl1q/tUOIXdOydzq/PCodNNJosNIAi7K74lRuEaj
-	44oQUTblT1MrSKFSlbw==
-X-Received: by 2002:a17:902:ccc4:b0:2dd:c0ff:e72c with SMTP id d9443c01a7336-2edb93179ffmr13147715ad.62.1794289757474;
-        Mon, 09 Nov 2026 21:49:17 -0800 (PST)
-Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:e137:9384:7cd8:6e40])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cdd8d67e53asm444634a12.5.2026.11.09.21.49.14
+        d=1e100.net; s=20260707; t=1794289762; x=1794894562;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=e1CwuUVsSjZnbMobjwr4r9fMJTFxCCqI+vgT8IsHHyE=;
+        b=KJkuFIPYY6jdfORhaE+EsvbW6S+XZtFt+D7lSkcgIIeDZG8uIADEI/0h+MFkmb1Sr4
+         NNI1DTilRn1LNPSy7jL1RpkucBtG+RjxVSffelFbdWxqa3kd8K7EMOBlgUoic3LyOOXY
+         Jz3U5bVw3fAc/MVUaM1QHGpezhyRNCKxjAKzZfce29gAztHbplPFB3Gg9wMXGrsokQGw
+         QvZ74nZ8rXKpj8x/MKXHP+r+R78Tr/7F5/Rs9xqHR28yk641MtELBnM07U2qcjsIHYoq
+         ubFKGmJlTi51WDpX/ZRg9ndRJxfUnx21F7WUc982OzSXvf4o1b6LtFSVZUks0SSuDI7R
+         g6Mw==
+X-Forwarded-Encrypted: i=1; AL+hErGvyG33P7q+Ib6xb2eohnjunVI8vI7XR9moD9J6UcEW0LPqoMgfekFgzS7umKt3z0QnqZqOvnPGaDmQ9g==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/5hZRb6VplmpyODnRHv8gc6knf4e/h0CQbquNySdSIjtQsP6SO
+	fBc46/u0maOIoJ5CvhrMGlAP6rugkrVCpEd2wpKudQvNOHcD1spUit3+WnncT6NLiQ==
+X-Gm-Gg: AYBFou1yNGhPzHuBPyHoK8IO78E28F9Pg9Sp4LwtfLhO12A8b+hsPP0rERMyQOfIInU
+	Os+ldB01H7+x4avbaV0RBsntdsRck76EUu86av1yp0vOzTBTd3O8tnoPmCWq3SQCmCrL3K3pwnl
+	MLpd9kgCGaZC9NmLupAmpbogoi448x0KrcO6VSjnnP8dsUijz8T8yroOxWIp72uP0cAzw9R8c3s
+	4wZ4LGYFA5cy4rxHXnJbad8IQTsPDFm4NPIs3/38nAjPu9MyxTY4tlZ24WAEiSRZv9lIp7SekVA
+	YemfDEaHQwAMdGoqW5Y4dkOTlgqTSpp7AxOEwkUSpRwsCZ1LcFufo5/HE/edGlYi0i+RGgdw+S8
+	LvTPls7Zz1fwc8IpEXtF/vTBgdsWspwmnZfUP+lXoMc609Dmltp5Nrqp+9hffAU/6nfk7UuVoZL
+	Gzs4fM8eM+JZad8z6apfmEvDU/zkJQqNfvvxHYcey6De+AmwlJG1cW4xYfLyUrhDVXxZpKFR3w7
+	xltEb6ZgHxUkpLO5W24MlqYZO5TjE2bZZ/8pt26SomyMOKzkAJmlm6I9RlM3yNXIjDG6bZ7v/FR
+	vanWv9u8DAuufDHexuVl6b+K7I03hrkLhGZSJpKvR22lax6atmFTrifRAdktgAfC5ZQBrA==
+X-Received: by 2002:a17:903:2a84:b0:2e5:e1de:9c3c with SMTP id d9443c01a7336-2edb91d9bfamr13050805ad.47.1794289762137;
+        Mon, 09 Nov 2026 21:49:22 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:e137:9384:7cd8:6e40])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2edb6d7e1c0sm4971905ad.34.2026.11.09.21.49.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 21:49:16 -0800 (PST)
+        Mon, 09 Nov 2026 21:49:21 -0800 (PST)
+Date: Tue, 10 Nov 2026 14:49:16 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Nhat Pham <nphamcs@gmail.com>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Brian Geffon <bgeffon@google.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Richard Chang <richardycc@google.com>,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Yosry Ahmed <yosry@kernel.org>
-Subject: [PATCH v2 11/11] zsmalloc: populate new zspage outside class->lock in zs_store()
-Date: Tue, 10 Nov 2026 14:48:16 +0900
-Message-ID: <20261110054836.1515030-12-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.56.0.506.g506a7eabc5-goog
-In-Reply-To: <20261110054836.1515030-1-senozhatsky@chromium.org>
-References: <20261110054836.1515030-1-senozhatsky@chromium.org>
+To: Yosry Ahmed <yosry@kernel.org>, Nhat Pham <nphamcs@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Brian Geffon <bgeffon@google.com>, 
+	Minchan Kim <minchan@kernel.org>, Richard Chang <richardycc@google.com>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 0/7] zsmalloc: redesign object alloc API
+Message-ID: <avKwQ4IEOVfYm-8J@google.com>
+References: <20261105044752.1997895-1-senozhatsky@chromium.org>
+ <auy9UfB30AlYabV8@google.com>
+ <CAKEwX=Nao4jWtY04FXEjxiHUNUhJU2A6nCZLqhRRm-dPBZTmcw@mail.gmail.com>
+ <CAO9r8zP_K0NF0gt71Emh+2dXmUh+C27uiu5TsyBcGUdLbCus1Q@mail.gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,72 +100,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAO9r8zP_K0NF0gt71Emh+2dXmUh+C27uiu5TsyBcGUdLbCus1Q@mail.gmail.com>
 
-A new zspage is not on class fullness lists and is not movable until
-zs_store() calls insert_zspage() and SetZsPageMovable(), so neither
-other zs_store() callers nor compaction and page migration can see it.
-Nobody else has the handle yet either.
+On (26/11/05 09:39), Yosry Ahmed wrote:
+> On Thu, Nov 5, 2026 at 9:37 AM Nhat Pham <nphamcs@gmail.com> wrote:
+> >
+> > On Thu, Nov 5, 2026 at 10:31 AM Yosry Ahmed <yosry@kernel.org> wrote:
+> > >
+> > > On Thu, Nov 05, 2026 at 01:47:30PM +0900, Sergey Senozhatsky wrote:
+> > > > Both zram and zswap already have per-entry structures that store zsmalloc
+> > > > handles, so allocating a separate handle_cachep object per stored page is
+> > > > redundant.  This series embeds struct zs_handle directly into zram and
+> > > > zswap entries and drops handle_cachep, saving 8 bytes and a slab
+> > > > alloc/free per stored object (2MB per 1GB of swapped out 4K pages).
+> > >
+> > > I always hated that extra layer of indirection, thanks for doing this!
+> >
+> > +1.
+> >
+> > The mental load saving excites me more than the memory saving :)
+> 
+> Oh I am 100% supporting this just for my own mental wellbeing, the
+> memory saving is the icing on the cake.
 
-So for a new zspage allocate the object and copy the data before we
-take class->lock, and don't take zspage read lock.  This makes
-class->lock critical section shorter and saves a zspage lock/unlock.
-
-Suggested-by: Yosry Ahmed <yosry@kernel.org>
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
----
- mm/zsmalloc.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
-index 09ce8c294c5e..2f4adbae82a5 100644
---- a/mm/zsmalloc.c
-+++ b/mm/zsmalloc.c
-@@ -1319,8 +1319,12 @@ int zs_store(struct zs_pool *pool, struct zs_handle *handle, const void *src,
- 		/* Now move the zspage to another fullness group, if required */
- 		fix_fullness_group(class, zspage);
- 		class_stat_add(class, ZS_OBJS_INUSE, 1);
-+		zspage_read_lock(zspage);
-+		spin_unlock(&class->lock);
- 
--		goto out;
-+		obj_write(class, zspage, obj, src, size);
-+		zspage_read_unlock(zspage);
-+		return 0;
- 	}
- 
- 	spin_unlock(&class->lock);
-@@ -1329,8 +1333,15 @@ int zs_store(struct zs_pool *pool, struct zs_handle *handle, const void *src,
- 	if (!zspage)
- 		return -ENOMEM;
- 
--	spin_lock(&class->lock);
-+	/*
-+	 * New zspage is not in class->fullness_list or movable yet, so we
-+	 * can allocate the object and copy data before taking class->lock
-+	 * and without zspage_read_lock().
-+	 */
- 	obj = obj_malloc(pool, zspage, handle);
-+	obj_write(class, zspage, obj, src, size);
-+
-+	spin_lock(&class->lock);
- 	newfg = get_fullness_group(class, zspage);
- 	insert_zspage(class, zspage, newfg);
- 	atomic_long_add(class->pages_per_zspage, &pool->pages_allocated);
-@@ -1339,13 +1350,8 @@ int zs_store(struct zs_pool *pool, struct zs_handle *handle, const void *src,
- 
- 	/* We completely set up zspage so mark them as movable */
- 	SetZsPageMovable(pool, zspage);
--out:
--	zspage_read_lock(zspage);
- 	spin_unlock(&class->lock);
- 
--	obj_write(class, zspage, obj, src, size);
--	zspage_read_unlock(zspage);
--
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(zs_store);
--- 
-2.56.0.506.g506a7eabc5-goog
-
+Thank you guys!
