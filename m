@@ -1,66 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.207.19.206
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794291557;
-	b=2to5DQAxdG16s3/yg+W1fLI+jZEqTkmkyDeuMSG/40wNzXINuToYWnrxgTb4SYMA9CeV
-	 7RjSm/pGycOF2JiVqp+QRXVNcFFUOGD61fwN7M/roPI7yFvUnIsKh8iWPepSizcCcrdzY
-	 3SF7lgT0TmfoLn8xGxOwdzIRnGo51w1tH1ks2TLneOpNmZ5yHnibllzZv9JkQHbnZjnRG
-	 UWerB/iqrgFtdHuVJefvkYWNh7mgHDW6xcH7IJ5K532WuWkHNc/Q2SNI39ZbKQb/mXQCk
-	 W7K4LdnURtlkNxeRplboMGE+x7U7Avqi/TShr+IgMV7LMdWWGP6eQ8pSqcNC9oElXZw==
+	t=1794292192;
+	b=KVHCGmbsUPf9rjLdm+rHMj/kzEe9CTXpV7CexTMgzivPGAXqWZXiGkHy2m1xyjhHYS6H
+	 h5EOUgaLgMSoIy/SHQQAlSDp68rg7Gxum8hvRE3nFUUJwMvNwCmxobPMyI1zK6RhTxlAP
+	 T4K51Q/XAVV4BMMK5DF74/4iGYCv5YOOBrsUL3orDIu/SnGVuP+y5/bjjJU/dz6+ZUEjK
+	 VG8uZfhzDUQdgH3+C9RkMVA+WL+LdqL8yP/lfWOfyVj+Tz1tV4s9mst6qf6Km+xrvY4lL
+	 ILemvXcwVJh48v8x8ou4E0I7XtFdqjpJ0hqUG1plUxLWYRNpvFNjAMraaMRvmVLVM8g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794291557;
-	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
-	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:From:To:Cc:
-	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID:X-QQ-XMAILINFO:
-	 X-QQ-XMRINFO:X-QQ-RECHKSPAM;
-	bh=9q94mvokRieXKGnBs5b3tHNUDFssGR+0bJKc/5ZbmjQ=;
-	b=0Ik/gziF1Widly8clJzmNJ2M69sslmJIYrY2zGehAsYe89UGpz34Zeqcsu2O50rXIHbN
-	 O/FPQLBX8OyPl7ehU17zMahliRSVpPwn0N+Yanb9Q6e/C26lA2a511fbCDly5/X2rKAi/
-	 yaAPBRnwh1+8asIQvruQOxjrknJUA1TxtFu4yhQQ+otlk2y6LvIuLsQdAl3zIM+UVVZiD
-	 FSNYa98intopVqPoTNFCClMc2Tk8sjzoBgEb8OAXcFHUIkm02xMQHPrnm9uJax5wPoxsj
-	 S3osYYmPxZEus0IpHw2+aVR+a+J0bH5fNJ3Fy6eUpnobQVwq5ftzTXMIMGcCYEtO8NQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794292192;
+	h=DMARC-Filter:Received:Received:Received:Received:Date:From:To:CC:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
+	 X-Originating-IP:X-ClientProxiedBy;
+	bh=mgKCRgRdNiIKmHGzM5jiXbcVj17jpTU0EAW2FbfsR2g=;
+	b=LsLrv4CFg8tXjAn5mH6NtmykcVqWGYPfZjMMiUHe7EfvIgHrUqbKnwEmFySr+gySLp+O
+	 Lad2RnPORZab68xhuoVYduGXZsM970Wj+LEOhVu8zGCfEesnvOTBAKEfg+xHQwdN9Gr9W
+	 GcoMUeHJY6jsPX3HpUtW46eOg+UAOobxeJcnZHf35khEUKJqETN2MNAczTVGKMWRCaBU+
+	 k/21mxOsXZ600dT7wdzFNkOJah9wnok1HEUhvBEmGRtvtmvqwtA88TY/T+XIy4YUNjZmK
+	 l/dbvKAEddGU1g/s7wlzY41Ix1wojf8sVRS7QdimGXbX53HC08CEmjpJWiBymj8LlHQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=uniontech.com;
-	spf=pass smtp.mailfrom=uniontech.com;
-	dkim=pass header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b="F//K2VJF";
-	arc=none smtp.remote-ip=54.207.19.206
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A819606A31C;
-	Tue, 10 Nov 2026 06:19:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A819606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=F//K2VJF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1794291518;
-	bh=9q94mvokRieXKGnBs5b3tHNUDFssGR+0bJKc/5ZbmjQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=F//K2VJFUm9rWsrH7Ksi5mVAccXUYfI69FjrvwlQHa7Py7Y4BgVLBPMX5ppSgca51
-	 baYZ5DW5T84IRCZ+CeoxF+eZBcmHyRhfDKslCfuvqnHyJi/Mpd1cN/iX++xKQ8jg0S
-	 z3lc90vlkRUApohCeuayW+VwV9EBUUUc7nMb92y0=
-X-QQ-mid: esmtpgz12t1794291513tf0e25603
-X-QQ-Originating-IP: 07VSOn+NQ9s9MIkOvzvN6mHo447AMd8/90EHHXccR+o=
-Received: from PEN202512010004 ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 10 Nov 2026 14:18:31 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 10405181404545203304
-EX-QQ-RecipientCnt: 6
-From: raoxu <raoxu@uniontech.com>
-To: minchan@kernel.org
-Cc: senozhatsky@chromium.org,
-	axboe@kernel.dk,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	raoxu@uniontech.com
-Subject: [PATCH] zram: Avoid duplicate slots in batched writeback
-Date: Tue, 10 Nov 2026 14:18:30 +0800
-Message-ID: <F24EF6333964B482+20261110061830.272091-1-raoxu@uniontech.com>
-X-Mailer: git-send-email 2.50.1
+	dmarc=pass header.from=hygon.cn;
+	spf=pass smtp.mailfrom=hygon.cn;
+	arc=none smtp.remote-ip=101.204.27.37
+Received: from spam01.hygon.cn (unknown [101.204.27.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4078606A321;
+	Tue, 10 Nov 2026 06:29:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D4078606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
+Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jNxZh5z6fzBCqx8;
+	Tue, 10 Nov 2026 14:29:32 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jNxZf5vhYzBCqx6;
+	Tue, 10 Nov 2026 14:29:30 +0800 (CST)
+Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
+	by maildlp2.hygon.cn (Postfix) with ESMTPS id E35FE30A6439;
+	Tue, 10 Nov 2026 14:28:45 +0800 (CST)
+Received: from hsj-2U-Workstation (172.19.24.226) by cncheex04.Hygon.cn
+ (172.23.18.114) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 10 Nov
+ 2026 14:29:28 +0800
+Date: Tue, 10 Nov 2026 14:29:26 +0800
+From: Huang Shijie <huangsj@hygon.cn>
+To: Jan Kara <jack@suse.cz>
+CC: <axboe@kernel.dk>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+	<zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>, <yingzhiwei@hygon.cn>,
+	<agruenba@redhat.com>, <mic@digikod.net>, <gnoack@google.com>,
+	<paul@paul-moore.com>, <jmorris@namei.org>, <serge@hallyn.com>,
+	<aleksa@amutable.com>, <legion@kernel.org>, <david@kernel.org>,
+	<sandeen@redhat.com>, <ebiggers@kernel.org>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<gfs2@lists.linux.dev>, <linux-security-module@vger.kernel.org>,
+	<sunjunchao@bytedance.com>
+Subject: Re: [PATCH 3/3] vfs: convert sb->s_inodes iteration to
+ super_iter_inodes()
+Message-ID: <avK5xg_TYW66t2PE@hsj-2U-Workstation>
+References: <20261015093854.2082600-1-huangsj@hygon.cn>
+ <20261015093854.2082600-4-huangsj@hygon.cn>
+ <wrknznlm52ffratfpdoe3otqhkgyd45vgmvtjkixrvurwpplyu@sfpz3yiwhidy>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,64 +68,35 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: OTFxv0hUyOzL3HZrZ3lvIrpTptYJIhyFo+tUNN8fHnBytFZkmKbAqhDi
-	A5Myvr6CBE4l17QBj9DC0xkDUBnp2lXjT0FbJDXHDdhW4kOdpFkQ5G8FUNCvX3Qf7/zOXoa
-	XI5++ZApWRM0tgc9LH33gWPM3ARdMfRVUH27FBNgFU50arrKGpbNsfygso+qDDb5soWVPUO
-	JrUo3BOM7ZBkA8tFuI5+dvtPAtX1Dxbxju2rl72M6IcWka9F0innUflPBn6HhJszSYD21xJ
-	CYHW5mdD8Gy/LHnIrs32q5pjmgyy1ouus8CfZG29HBzvu2gnSc4+JjkWfPG0n91EPCNYco/
-	rdyFC7GqFWDkzyPWdNIPktyCm4pifw1AO3ef1BAzsrh6Ls77Qwyizr2Qgp/Awey4Ikb1v6G
-	aixcffqAi/U39Ec1/uy0ZapZriV0TXTWF5wTBvoSa9LgB//wyRPH9dBq705RP45pa6QzeVe
-	3dmTCjSkuJZHte3A7nSPfzKQhHlVj7tNYye/Kq1PuAmP/CscoeLhdNt/XSjKQjdM48HxpQf
-	Ct52bN67Ys/X12gEHLD3W+oTokiaoPyt3CDfUHjjVtdlPfXxzdOei3IRwWowM5BksG2PVJZ
-	G5SlFCwYhO25yrmSxK5W3FUW+snET8E8whg4xnK6FKliU3T2EBIOhko3+ycsCuX/54BCqKv
-	DWmAbYuFsjVqUFmPhserZ3j+HWthyE5XObQyzH0RJjYFyu2+sERWeQMUEMapcF+I9NckP/U
-	7k6zzANEidev8zsPMCXEXlm5iwiAPYfUuKVAf4X2oLwNTBSozcyp1NjBh5aQ1BNzWYiqXVF
-	EijlwM7PGpw9eS/4USLEXuW4TovrkwFxnkneXjFIhlZae9fpjA8gxF5eE2SlRKzRpEyrS3f
-	CfK+gT2Rg1tpBGq2/jiPBOtO7pc1zAqqZBByuiO9zWUMWndyG6LOYs40e0n9Xhit9UID7oH
-	AIo690TL3UDWK739NsbIbGpWv3KkOoQKIB7MF9LwGZOVaT0feH2foajkiFF8UYrEGTshJsD
-	L/hXKl1JrRNcfzpq9C8ZK2zqEyEt06AtLFKOKMh26Fn9zpn18NSp/po68b8r8=
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <wrknznlm52ffratfpdoe3otqhkgyd45vgmvtjkixrvurwpplyu@sfpz3yiwhidy>
+X-ClientProxiedBy: cncheex06.Hygon.cn (172.23.18.116) To cncheex04.Hygon.cn
+ (172.23.18.114)
 
-From: Xu Rao <raoxu@uniontech.com>
+在 Mon, Nov 09, 2026 at 11:31:41AM +0100，Jan Kara 写道：
+> > +static int sync_bdev_fn(struct inode *inode, void *data)
+> >  {
+> > -	struct inode *inode, *old_inode = NULL;
+> > +	struct block_device *bdev;
+> > +	bool wait = *(bool *)data;
+> >  
+> > -	spin_lock(&blockdev_superblock->s_inode_list_lock);
+> > -	list_for_each_entry(inode, &blockdev_superblock->s_inodes, i_sb_list) {
+> > -		struct address_space *mapping = inode->i_mapping;
+> > -		struct block_device *bdev;
+> > +	if (inode->i_mapping->nrpages == 0)
+> 
+> Seeing these various checks iterators are doing before actually paying the
+> cost of grabbing (and dropping) the inode reference, I'd add a
+> ->elegible(inode) function to the iterator which will get called under
+> i_lock after other checks pass and can decide inode is not worth bothering
+> with and put the checks there. If it is NULL, the behavior would be as
+> currently.
+Okay.
+I will add the ->eligible() function to the iterator in next version.
 
-The writeback interface accepts multiple page_index and page_indexes
-parameters in one operation. Their ranges can overlap, but
-scan_slots_for_writeback() only excludes slots that are already being
-written back or marked as same-filled.
-
-A slot selected by an earlier range is placed on the post-processing list
-and marked with ZRAM_PP_SLOT. Without checking that flag, an overlapping
-range can enqueue the same slot again and submit it for writeback more
-than once.
-
-Skip slots already marked ZRAM_PP_SLOT while holding the slot lock. This
-keeps each slot in a writeback scan session represented by at most one
-post-processing entry and leaves the existing release and reuse paths
-unchanged.
-
-Signed-off-by: Xu Rao <raoxu@uniontech.com>
----
- drivers/block/zram/zram_drv.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index ab064c84b092..50a25989a23b 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1215,6 +1215,9 @@ static void scan_slots_for_writeback(struct zram *zram, u32 mode,
- 		if (!slot_allocated(zram, index))
- 			goto next;
-
-+		if (test_slot_flag(zram, index, ZRAM_PP_SLOT))
-+			goto next;
-+
- 		if (test_slot_flag(zram, index, ZRAM_WB) ||
- 		    test_slot_flag(zram, index, ZRAM_SAME))
- 			goto next;
---
-2.50.1
+Thanks
+Huang Shijie
 
