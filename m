@@ -1,91 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.219
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794292819;
-	b=1bUfJCzxi6ZwAdPw3cgNgULQXnd8+q3qlTg9jQBcnUkR3Us8MwtDiA8zmpD4KVjqksrA
-	 aKKaYEwdS4JrNK2w6CAUKymDnXrENY7MjigsDoY9q1fybCH/dLPMitcV6Jr4IDmcbfIrS
-	 CQLK8etKiyHM/MkIu/E0VYzJU1LxmVSBqUWm3GqjzCUni5hfWlC6hWk3NmhY9fU75qlwq
-	 XlmiAMjrUBxParNzcrTnuOgiz2t85Z1mVs5AcFv1F5dvAIVmi0DeCo8yDt2bC78IUVK4Z
-	 fYoYtEE578FG1JE/Bm4T/8KgaSV6liqoxC1kXdzYzAaIQ+jOX+noBTM0Kj8qGA7kbmw==
+	t=1794300129;
+	b=40drp6WdadKri+0/zhew3FmwEmio+B2lTkadVMjqoNAPFQe0BAp8DaE8b6IBq5hfVDOA
+	 VvMHJx0yo5DrA2Sezr08mdtWULtJPQz3Aoi7IySWqSJaCvytoJNMs8g+N7yPB0WmHcDC4
+	 6shIcRFYwCLeE236hPcrCvu+t/EHzkOemOyhj+084TX+0EtTF3UMjJw+vpdfblQ6jmmNH
+	 iFJw+PId6y9E7aoO1IEidAwwVbV5YLz/BOeT0jzMY2hTF1cg6mxcxMzAkal4Yp9Rv5rrA
+	 0ffL0tVVX12kqRHsxsrK8j+DQgdLm6Z7WPYSlikdf2FYyBQUgmwRIN6AHHLTdypk+7A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794292819;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=30Y3+K4f1eGRVFoUBblLntMtWkSSsaPfJrriyA8Q1b4=;
-	b=DI8WBIO7cyju1SSPguYgf0R2jEv08eISMo1/ZqfK30PM8xnYfn1mWfsE8+FJiZx2veJr
-	 pf2bIGDTXfFS/I4HGtMdPPSOiwfOxiljmzbGy/69Ncex5gyNgkonfbE2zY6bLrB4hPVUI
-	 Sk38owTAu47JEveQnDAWhFig9xOAXm1q0wZBJmHHaHqB6wgkWM6yiT3bJqn7vBajoEvbF
-	 BECFbuUDMnaTIe7hd/ZBx+0UCAkBjSIq469gn5i5GSbcILvVgQ/WQsHyvz/FIwD6sb+N/
-	 FFcULtHanrC5lZ9YTcVMt6RMojfdruf9BQlg3IRPUZTWNUZchhPAvlHB0HxbnJZ17fQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794300129;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=i4brgHD7VQEv4fdV28u/B9VtbZT4Ktb9wxX1zeKCj/Q=;
+	b=CxuK/yvgPJhshvcFcp1fL66CjemMclTPcZvZfve/tKKyFoow36/aZjyuz3Z+bKz3g8kG
+	 WyWKHj8Bl0ZQp+BkIAk832Ksx55JF7IQTurulcjCCouScjMb5wsWXdNqNOvBkoHbIckZ7
+	 rrwqofodw0cc7QmfTAN40e8ge8fp+c4EuzQmFTTvVuyIZs79AlekaXY/tPhpTGDBnDx59
+	 0fWBRMT+C4baiT+Ejx6mFd1UyPqMv66yNcXy3wIBhmPe5ZUklCrrbnSgqN4X7ueRwWwEG
+	 91G+GhWEknwZyU13fQrHEfBEfvu5+YrsgiXxbBL9+IF5ggK8T2xC2A3dyHKZyOnHsrA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ju1LXvaL;
-	arc=none smtp.remote-ip=209.85.216.51
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=N3tgEyP7;
+	arc=none smtp.remote-ip=91.218.175.219
+Received: from mta0.migadu.com (out-219.mta0.migadu.com [91.218.175.219])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972D8606A321
-	for <linux-block@vger.kernel.org>; Tue, 10 Nov 2026 06:40:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 972D8606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B90606A333
+	for <linux-block@vger.kernel.org>; Tue, 10 Nov 2026 08:42:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 00B90606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ju1LXvaL
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3ace1f3897cso963092a91.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 22:40:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1794292818; x=1794897618; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=30Y3+K4f1eGRVFoUBblLntMtWkSSsaPfJrriyA8Q1b4=;
-        b=ju1LXvaLqBO5kgzybhsbv3zRgCGu8niOwIDhEXiGbLiUasjW+BBbiBvEr02X3zBkXy
-         5k+Dllxj8Zim/zlv/qvEAiAlTS9UPoddJpxd5i3sCYJ8/S8Vqc0cM46mlokO4TLTeFov
-         dyGfkFuCNuAy0dLC/g3M3DKMtzFoYBvle/qQg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794292818; x=1794897618;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=30Y3+K4f1eGRVFoUBblLntMtWkSSsaPfJrriyA8Q1b4=;
-        b=vyHax1VWtlLgtzNj8z+EQuyV4gE7d4KNZSveknrDnDheSoHfpr9W8eVewW7cBchTsZ
-         8GLXaAA6dgTMSfjBmO9Xn3AqmQ/R0aREQX+bU9uwn//djS3qLUZIBAGmeq+rK495kpSa
-         1l4bygHYA0wcZW6LOk1KWrB1t8mhrfiMo6hvo2v+g+NQnBtm/zDu2heT24Nqb7CKLYEp
-         CsIhuc/8SFARHZm9520SeZcOgCN6xNWeBvfiEprk5coqfTBLepMmDPNxDaWQpOYPvQam
-         MTyYTiU2HXjyTeig226WyNlaQBQsVHjQHH3bDB37wyExZRFbImvppbpsV9SLt24R5Ckv
-         yVVw==
-X-Forwarded-Encrypted: i=1; AL+hErEB3DM7SVYenJpcwIFUMkJ8QxwaV9lxPQSwJi5762tBOgV9+7LjFMzwL+eHiUEinpKBIEpJXC0ovmWutg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/OeyzCpXU18vCklGOe7De/icUgFluh10JXU/XGLidFYZ08Mgq3
-	x41ZTMAz1cu9ChV4U1kbGNk5WuDG19yVWlSts3zKyQ0cRno0axsxOeMrpZHdd6E3/68Wa9defRi
-	Guis=
-X-Gm-Gg: AYBFou1f/5SwGcJtW56iyY7q+iIKrd/+ihwPcDYjDGO1vCoQrz2YjQS/dtfVJRkrs0s
-	NHDx3GQU9T9YOma4iAaLLeqkIb0P0MYQGUVT9g2BvrTYA0DeS1cR+EaY/5met6NOg0q/pBVTMj5
-	gHdRCa6sCSvBRlktjlVjFSB8Tv4whrh/0wypRDwBA3hI6k/WQmEKAX9TPeAuoxJ0e3OgMBRR4Co
-	gkXXpEQ9FeKkWUOJNSEf5w6g4La/zTKHOcDzqaRFBqTUtDQxlAfE8cJu+95o4PMDsCGm8MmMx3d
-	SDRYD4T9fKZj/Xg0ouh96GRWJuT2Su3NeD/LDMlXMmvsrv+d926bsYdKBR1EfYBlUCojZv/0sT/
-	tJ8Lh+nbT7RQlHAl3Q6DnR5pKY6w/PAWTjCkxKhDf0XztO7OCzws1jM26tL335x2TOrDmhvQS00
-	verMopnL5H7yDGqzHbCNYB3+zUfSx6th3f5s+CBI7WbjvT+rUjPY8n4pZbvpo1+hXdw6ENjAYMA
-	GZqe7GGbTIa8pLM5BVxu9CiyQSkiE5IEaXHu2d3MieTsK8bF8maivDfOGirZTVbQYKOYMGemNlW
-	xDbGmRyMeKV+kPzONw9gYZvTrJIu7aPTpArzPCsZ4LubGhkJkLGFLr+mAJb2a12J5yF9Xw==
-X-Received: by 2002:a17:90b:224f:b0:3a7:82ef:bcdd with SMTP id 98e67ed59e1d1-3b166d0512cmr2059326a91.41.1794292817853;
-        Mon, 09 Nov 2026 22:40:17 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:e137:9384:7cd8:6e40])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b16fea4243sm595945a91.14.2026.11.09.22.40.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 22:40:17 -0800 (PST)
-Date: Tue, 10 Nov 2026 15:40:13 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
-	Jens Axboe <axboe@kernel.dk>, raoxu <raoxu@uniontech.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: Avoid duplicate slots in batched writeback
-Message-ID: <avK6Y1VmIYIBrorl@google.com>
-References: <F24EF6333964B482+20261110061830.272091-1-raoxu@uniontech.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=N3tgEyP7
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=MpAEUXW15AK0vZ7aMmJr1Fk1OrZcbJXYROoJ2MHayrg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794300126; v=1; x=1794904926;
+ b=N3tgEyP7RxctFPQmoRdYR2r4Te36Wz0U9e2Jct14oyePSp0EbUx9bDvtkzxhbSetWpo1+OP7
+ cJy6r2e9T2feyomyfktBlQnPxtQ7baonVCFJ6E39tmLyotgwDwFe1fOP/kNujdeNvZ5mTGUBeoD
+ BbxFRpmWO7pzAoD9byh2vOJI=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by mta11.migadu.com with ESMTPS id 6fd72c2406077e29;
+	Tue, 10 Nov 2026 08:42:06 +0000
+X-Mizu-Trace-ID: 6fd72c2406077e29
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <f9fd6fc0-8694-45e5-bf00-77bd961ab788@linux.dev>
+Date: Tue, 10 Nov 2026 08:42:05 +0000
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -95,30 +58,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <F24EF6333964B482+20261110061830.272091-1-raoxu@uniontech.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] iomap: remove the atomic write length check in
+ iomap_dio_bio_iter_one()
+To: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
+ Christian Brauner <brauner@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org
+References: <20261107-blkdev-atomic-bounce-v1-0-f66344262096@columbia.edu>
+ <20261107-blkdev-atomic-bounce-v1-2-f66344262096@columbia.edu>
+ <3fc46788-d86d-44c5-8606-385d96fede4d@linux.dev>
+ <c27b9521-7c4f-41ff-88f8-55313b5f395c@columbia.edu>
+ <4022d4f9-5e2e-45d1-b9b8-208c80f82ecf@linux.dev>
+ <21793564-61f4-4d57-b375-1271ad9bc70c@columbia.edu>
+Content-Language: en-US
+From: John Garry <john.garry@linux.dev>
+In-Reply-To: <21793564-61f4-4d57-b375-1271ad9bc70c@columbia.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On (26/11/10 14:18), raoxu wrote:
-> The writeback interface accepts multiple page_index and page_indexes
-> parameters in one operation. Their ranges can overlap, but
-> scan_slots_for_writeback() only excludes slots that are already being
-> written back or marked as same-filled.
-> 
-> A slot selected by an earlier range is placed on the post-processing list
-> and marked with ZRAM_PP_SLOT. Without checking that flag, an overlapping
-> range can enqueue the same slot again and submit it for writeback more
-> than once.
-> 
-> Skip slots already marked ZRAM_PP_SLOT while holding the slot lock. This
-> keeps each slot in a writeback scan session represented by at most one
-> post-processing entry and leaves the existing release and reuse paths
-> unchanged.
-> 
-> Signed-off-by: Xu Rao <raoxu@uniontech.com>
+On 11/9/26 22:46, Tal Zussman wrote:
+>>> What specifically would you want to see tested? I can do an atomic write with
+>>> a partially unmapped buffer, with and without stable writes, and check that it
+>>> fails and that nothing is written.
+>> Just something similar to the blktests case which you added.
+>>
+> Sounds good, I'll add it to the queue.
 
-LGTM.
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Thanks
 
-Jens, do you want to pick it up and route via block tree or should
-we route via "more traditional" tree (Andrew's tree)?
+> 
+>> BTW, have you tested this partially-unmapped case for CoW-based atomics
+>> on xfs? You can just do that by setting atomic_wr=0
+>>
+> Yeah, I just tested it. It behaves as expected: returns -EFAULT with the file
+> unchanged, both with and without bouncing.
+> 
+> The single-bio check depends on REQ_ATOMIC, which only the HW atomic path sets,
+> so it doesn't apply to CoW writes, both before and after this series.
+> 
+> In terms of consistency, the unmapped buffer returns -EINVAL on the non-bounce
+> HW path (from bio_iov_iter_get_pages()) but -EFAULT for all other paths. That
+> should probably be made consistent across HW and SW and bounce vs. non-bounce,
+> but that's a separate change.
+
+Yeah, we should fail for the same reason on HW- and CoW-based atomics. I 
+would like if any such rules could be documented and we ensure that both 
+HW- and CoW-based atomics always fail for non-adherence to the rules.
+
+cheers
