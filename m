@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794302302;
-	b=GjgKKkTyrGu5m9PgbDIgTO+n75bTKWVX+TlI63r+DBk27yy2rfOQdGIVgUbSZGxZmAkA
-	 7s3MT8Zla4LNv7YmEtzUhllrWgtRsmVW6x0WA6Cbj56OjgfqrIrCrEOfMAACPVOhz3CrW
-	 KqMUiki4YHsmQHDVSuk1SfPeYDRUExU5qilMOAY0bMEbeKFcEuZWLAT+QaXo1sgLwnv4+
-	 vuEm86bLVf1CsBDTJGw++jkMVTo7DjUarcF+hjZu1g8oO2pHx3844iAvj5vBVUUogT2IT
-	 I7VuysWLzoZtvFIsDLFM7KSWS9CujYKueElP3CcI3ssXKOZ6MIUAptdlui8umTpasRQ==
+	t=1794302315;
+	b=5Rf3WnHBiKb/WXQMBhQAkxZEcdd3ol0xpb6zDHo2ldQM5dI4zn8cMgOTH00xOij23hxX
+	 WnMCP5Gb+5HU15/S4l3jWF4AAAPQZvp47umX6pd1a96bB5AtzM2nBms63NU94+byOxkFF
+	 BeXNc4Gxnpu3hRJWbKpy07Ab0ntcxJDFwyNru12qQSYFCF8sY5sUaJiYQkR/d1P1c5NzP
+	 JYKE2o9/d1eBQkj4t4kdOrZi7hGl0OIim3b8Wk/dVz3piJKxglQ9nUbbKVfW/C3IUijAT
+	 Fig+CtOJE/5mdIWjWGiwMrtYFpb67lIjaB4/bkeLSmMmTAik55gYvJT+52EPQJixyFA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794302302;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794302315;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=6xLCAE1ljQwjM/z7WMvrquNwq7v8NRQjtdpUDUMIMgw=;
-	b=Xwt1lRBjBZWqlhfnWloDpfDY+vE8oxFUl3YWGiO/m/OWnuwGGNBNiturZ1DYnjdZvxht
-	 bKAOcyBzRRUZHr7XOSA1+AFU9MHmVy5RTxVL4AYVWMollfcYX7Hhogcoet7CAEgumzTN/
-	 F7c3MNjbcaZMFogIxvAB8jvFuvUGkLD8OoKZh7BfD2qWuipPCGZklherZB20SDcnuCXt7
-	 rQsdpwv2ytKihOOMWAAJ1V1pBjGvtSLXScHstCl3Lo1bUgJWlBvb18Io2KCo6T6ev3YRW
-	 p6UtvSO9uu2+BWddDLv/bRnLrAsPiowG2CpCxP+d5qawm6y35FR3vYDeu2HuNrfPfmQ==
+	bh=B8RQTNfc/eWS72nZHsD5FmaXKvsQcX/MHrv0MZNEckg=;
+	b=me4Hjo6yqGv0zhrcbzPLc+KPMPqFDqYHXhaZUqyjgvVAwZtGxzTpyK6C/RO55nVK4FdD
+	 L7cRhOO43A3UJ1pSEkG95FwRquENEJLaO0HWBvO883oRr0uwd9GP3kZuFL2zHHNQBBDkW
+	 2VGIZfVQGhApFuUejCUt3XwUvK0SJjmncrcCdqgGk2+wb4XU4Iib4XcptWkATsV8Reumy
+	 1TsfcSldYO7+nCdd31OXiFt/5ffdSSv1EW/WhimmIU0miKq9D4+YIYxvI/MnC/12756Fz
+	 RMu2AfxvgILE0QBnwIfe78gJH64qGQU+3P555MdnGlxCbUA5NE6OSV/tH3gKjZ3t80Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="n/nPEmY/";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="c/Ap+R4z";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4532A6072F65;
-	Tue, 10 Nov 2026 09:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615A1606B17B;
+	Tue, 10 Nov 2026 09:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=n/nPEmY/
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99DB51F008A2;
-	Tue, 10 Nov 2026 09:18:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c/Ap+R4z
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A20071F0089F;
+	Tue, 10 Nov 2026 09:18:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794302301;
-	bh=6xLCAE1ljQwjM/z7WMvrquNwq7v8NRQjtdpUDUMIMgw=;
+	s=k20260515; t=1794302315;
+	bh=B8RQTNfc/eWS72nZHsD5FmaXKvsQcX/MHrv0MZNEckg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=n/nPEmY/gv4mqB2kXaUIe0isVNNuSFYe4ifWdFJtsRhYXSoI1dEqHjcK8jXDbyzkv
-	 ertikRvZXtvN4JZinzjTGl2V2W3t61CK19ISiQm4xZZKjvx6Ilozk7a062A5tyZVek
-	 8ONpx6cO+b1cP6f1iIgOK2yxVMDe8jOAVqYq0can3XlRZqUYI7Gp3FGNtEvO8RVw/T
-	 f+noE3Lf2FKsSSXSy3unTl1hqIHTI1UMmGoV2c8K2q9ES1gzqhEiirejgIGUZm9nYu
-	 NqYxgSkqeO0i1tDzYYX2q1T4FJPsyVEQu1wNublFH2+PjjrVHGb4S/n5iQ5M/xLuTU
-	 IGfiSO/ynwQJA==
+	b=c/Ap+R4zFMvV3/8vcuIEPdB/Gt2XHUlHZTBEX28zCRTGUeuDJCvLmXS2bTYSdzi9R
+	 0gr12Xdu/wNWC4bbLqs4TiHsR/YcW9JNs28CEkwEGUBB6TGWOirP4sbeOuKd4a7tZW
+	 afM3jYlHN6+MVYSwuAcf1MRkadLxCZQa5Ry8f4ildqJfo+Wt7K+lGKrO7TizAPDeis
+	 lj14KsNBHSrSqgHUxSQyH2WPPe6YEGnglY+yEWWsL8vk8c3l5TKaUlKahI+HbhISLF
+	 nnD6YXeLZZD0ZUXVgvIwonj2iwv3yWDlAmtq4vfzLGXczqU+vQuxgOQWxGbajWp8T+
+	 zqYWbwys3SKng==
 From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 10 Nov 2026 10:14:37 +0100
-Subject: [PATCH RFC 21/41] nfsd: use fc_init_pseudo()
+Date: Tue, 10 Nov 2026 10:14:39 +0100
+Subject: [PATCH RFC 23/41] fuse: use fc_init_pseudo() for fusectl
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -54,7 +54,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261110-work-loop-pseudo-v1-21-4c998976c6c7@kernel.org>
+Message-Id: <20261110-work-loop-pseudo-v1-23-4c998976c6c7@kernel.org>
 References: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
 In-Reply-To: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
 To: linux-fsdevel@vger.kernel.org
@@ -75,42 +75,42 @@ Cc: Jann Horn <jannh@google.com>, Chris Mason <mason@kernel.org>,
  linux-kselftest@vger.kernel.org, 
  "Christian Brauner (Amutable)" <brauner@kernel.org>
 X-Mailer: b4 0.17-dev-ce4c1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=896; i=brauner@kernel.org;
- h=from:subject:message-id; bh=O9QykJ0fSa/ei9QzD3DZ9rjO12HqESJ46S14fhxCm3g=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR9erBm2RVdl2pllcvx587P2/2Nj+HEnjubhYUvT5nG7
- rQvYfmalR2lLAxiXAyyYoosDu0m4XLLeSo2G2VqwMxhZQIZwsDFKQATSZVjZOiTVZZ9M+fcLevt
- JuW1WT9C9YytitQ/n2YJq0v/vW9H2Q5Ghh08Evn7XH9MsUgMSb9yk5f97OVSvTP7v7PqSMtvTvm
- Tyg4A
+X-Developer-Signature: v=1; a=openpgp-sha256; l=893; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=hjM1iJ4vU3paA5L4OQPDkADa3AqUdKJFLW5EmBnT+kw=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR9erCuT2albMuTpuPqTDYzVbc45F0XFJ6y9xJTg/iJB
+ vndWrxNHaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABPh02ZkeGybnbLv4dlnla2P
+ zh+U1FV/fVEjuEXs+QzeMzuWCLwPtWVk+PIs8Nv5vXPYWX98mZbrdj9iVbPCut91O9M+rQ7YuNr
+ gHTMA
 X-Developer-Key: i=brauner@kernel.org; a=openpgp;
  fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-Initialize the nfsd filesystem as a pseudo filesystem. This raises
-SB_I_PSEUDO and also SB_I_NOEXEC and SB_I_NODEV. It never holds
-executables or device nodes.
+Initialize fusectl as a pseudo filesystem. This raises SB_I_PSEUDO and
+also SB_I_NOEXEC and SB_I_NODEV. fusectl never holds executables or
+device nodes.
 
 Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- fs/nfsd/nfsctl.c | 2 ++
+ fs/fuse/control.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-index f32311f2d7cf..ce2666deddbd 100644
---- a/fs/nfsd/nfsctl.c
-+++ b/fs/nfsd/nfsctl.c
-@@ -9,6 +9,7 @@
- #include <linux/namei.h>
- #include <linux/ctype.h>
+diff --git a/fs/fuse/control.c b/fs/fuse/control.c
+index 21ffde596d61..4497362e7df0 100644
+--- a/fs/fuse/control.c
++++ b/fs/fuse/control.c
+@@ -10,6 +10,7 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
  #include <linux/fs_context.h>
 +#include <linux/pseudo_fs.h>
+ #include <linux/namei.h>
  
- #include <linux/sunrpc/cache.h>
- #include <linux/sunrpc/svcsock.h>
-@@ -1375,6 +1376,7 @@ static int nfsd_init_fs_context(struct fs_context *fc)
+ #define FUSE_CTL_SUPER_MAGIC 0x65735543
+@@ -334,6 +335,7 @@ static const struct fs_context_operations fuse_ctl_context_ops = {
+ 
+ static int fuse_ctl_init_fs_context(struct fs_context *fsc)
  {
- 	put_user_ns(fc->user_ns);
- 	fc->user_ns = get_user_ns(fc->net_ns->user_ns);
-+	fc_init_pseudo(fc);
- 	fc->ops = &nfsd_fs_context_ops;
++	fc_init_pseudo(fsc);
+ 	fsc->ops = &fuse_ctl_context_ops;
  	return 0;
  }
 
