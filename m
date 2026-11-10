@@ -1,49 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794302171;
-	b=XBo0ztfDUDzzRBZnGPJTv3mVeNJav+NltBtqFPDKLxUmmkZ2KwQdgr5MEi6HsvKYfhdW
-	 Lfep2b/0DDYjQEGynV9y/V50chfu1A/bmJKd6E/q8lQWaOgm49Z0KEHZk/dBIb5mVLjxD
-	 MeAEO6dFt/a41Z55JVWcFuiy23xVtJQClq3u1WkFe4Tx54jngpTb2mNwDEb+gwTUdh+/v
-	 z4Qmwi2OyFsmUp534LGZ9m/BW2x45ZUN+M/oJynLeLlsfcFVWob0WKVLS6Iuvz36DuNuW
-	 iaKsyv2FFHfgGBeEPLjX5kGmg28wlp1c1iWbKj6Vh6FP//wB44mXYRBcSPBe90GjPjg==
+	t=1794302192;
+	b=O5v5l9fiYYSAahvVTriZnovUEhbQwZuB1YcO3fh2EUMombrZsgDNatH+8q7btV6RSZCQ
+	 kMs5n87G4/X1hCGpggKBmE2Ely7sR6dKnzOdtFdkm9Jb2lNlx7Ez+fS8YWRF7C5QN/vNk
+	 mSAz6X0yJ173vBkvx8wgyBrwOEZkryisdfZV+HM+kU9KOH6fnDbZXjx/qKk8tDO4F6z2k
+	 KpoF2xdO6RepSwq1v+mRnyPFsKDv6kwDMkreGkM4BtpMpXIPonWDPA3qmDuL8n+q0J0YH
+	 OqJHCtrZaWX2SPTziQtEREPOrDQurs04+rmEDrqsHGJx0LtIIxqsnHlxZ8gJZR2E+IA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794302171;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794302192;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=48wS641dZNlMgTbgKHYJJRZjCIIpBYSCk6vN7nPVst0=;
-	b=DR+dwbHrptfZhTChU9EVE8BOBIF54/7M6fH5dqWSjfGkYUWpK5s/rzjy6iJd74c3+dv2
-	 o4VXtAj9jziof5IoWK0n3LgOr7vX7cChgiwkj5osckXe6R/V6sio3GShjTlOcVEsUqHQJ
-	 3cA0JYkMkAz+5gsvZK1vcdOH/lk+M8l7esCrhIeA4IxH0PMAvmlHXRTeAq8QHYxJO2bOX
-	 wyt61hQQjHWekiCq1D+4CM+yvAucApRPOYRfTzLizJirt+Kcvv51T6xrBTxnY6J0c4AkX
-	 551Y42Ab7LDAhwTRGRVmL+ddcV35eWxQOJLz3B8JHh20exlxApu5yIt4Ka8pNwrlaZA==
+	bh=eGG9W0yWfKzRivIQZoE53ERZFH3qHATHiSAlm/rfViI=;
+	b=NMbOlSXECiHXQDZsfb4n+hLapM2xhdpHv6upVwy4xzPpZrwFsPSkbq7yRlxBw1X6K/lv
+	 77RF/qFd18L5il/8akaswLoBccbKjBBIqRDl4kEx78BuGXN/qTzBK0ESznT3RADK2PHht
+	 KJlS020feEOMckJkS2r2W1w8ErGRKphq1kKIJhw6PO3DZfG2vligZ+oVj2LEduGM/ybLt
+	 wuL542qUbh7KTSfgQDmZjqupG9y4LwTpIjsJT6Xu8uyy+GBLKLzetOYfGReonXN074mNE
+	 BcEaitVoScli4C+DvaHwCkbcmFu0+a3CKLLZs7YxbTvEzwVmj86x2a8Feiz/0+3hSaQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B3k5bbEA;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CjYzYxSG;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CFE606A325;
-	Tue, 10 Nov 2026 09:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCA9606A334;
+	Tue, 10 Nov 2026 09:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B3k5bbEA
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF7381F0089F;
-	Tue, 10 Nov 2026 09:16:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CjYzYxSG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8126C1F00902;
+	Tue, 10 Nov 2026 09:16:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794302171;
-	bh=48wS641dZNlMgTbgKHYJJRZjCIIpBYSCk6vN7nPVst0=;
+	s=k20260515; t=1794302191;
+	bh=eGG9W0yWfKzRivIQZoE53ERZFH3qHATHiSAlm/rfViI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=B3k5bbEAWfpJtZp1vzeXux0KzrY0ieZxwUJi/83P+f7eKHCKBYc9mkYVfNK2b/51Z
-	 IE7odp0lQqQ7mwusK6pgB1WlHVkO/UlsckyLpTfE8Yp89sMOk+QjYT1he8sjTHJobl
-	 zbSxv5PQZ8XY+Ts/6iaugpn66hCj3rJCosVRpDg0+EuqU7+TpcsCN1TcwITx1L6QCL
-	 1C6NNljvCVnJ+dNekIZ/1LCG3UXVW6y81kv+eHD0umTjqyrBp3lV94BaeU5UIyHZKc
-	 zDKybfsspnrP1qhiqd+dsnxznVfYXFvZSeoRYSBElTyxocH2QJC3b5d8zXbtpIhziF
-	 ygU0pzxGVue5w==
+	b=CjYzYxSG4MF/PYOuhfPotw8YsrgHpqEMmvVsealc1nZYA5sYB8ePEA/BT0law6L4c
+	 H4DwOy7PJ6PWOuylSpgYpzMq2zQGYiIT8+FEalpf9CzWwtAbdti5C3COkrTAoZVyOC
+	 98zYnncAcJul/uKitX7mc2xPlqIIYPds4N05d66Wgi6oSv9azb1TV2yyF+MJgyG+uT
+	 +q4Aq0251HvqT0ZVS0wHPkEhV8CPEhOZQuBNIukUVbH00aNshGt3HqKek36mnvJebH
+	 4omkN8WkJOC0ohRp48kohw45G0TEI0wyMWnb2yC/I1jgI5cFhMlDgFavrTXU4YWzSj
+	 7d78+YdkJ4mOA==
 From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 10 Nov 2026 10:14:18 +0100
-Subject: [PATCH RFC 02/41] nvmet: check that the file backend supports
- ->{read,write}_iter
+Date: Tue, 10 Nov 2026 10:14:21 +0100
+Subject: [PATCH RFC 05/41] kernfs: use fc_init_pseudo()
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -55,7 +54,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261110-work-loop-pseudo-v1-2-4c998976c6c7@kernel.org>
+Message-Id: <20261110-work-loop-pseudo-v1-5-4c998976c6c7@kernel.org>
 References: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
 In-Reply-To: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
 To: linux-fsdevel@vger.kernel.org
@@ -76,47 +75,54 @@ Cc: Jann Horn <jannh@google.com>, Chris Mason <mason@kernel.org>,
  linux-kselftest@vger.kernel.org, 
  "Christian Brauner (Amutable)" <brauner@kernel.org>
 X-Mailer: b4 0.17-dev-ce4c1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1206; i=brauner@kernel.org;
- h=from:subject:message-id; bh=9rTO3vQgbbKMLgtf9DhInii/7oHGTrugRkWUh4dwMMs=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR9ejBtltmGmxnek3mf9QvZzp8xjWWx5Y+Awzls7lyHP
- /4+2Dk3oqOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAivzwZGU4478oq2RB1Nuut
- 48Jj7Tu4n8+545UyJdpwumO4VdS2g7kM/9TW5p9ep3/AsD+mInRXw3I+rR/SC0xnPXVmN7wifGZ
- vBB8A
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1308; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=oxvnYqP+iDvCdTKHYHpfovNIFRCjsigYBDc/6gG4KoE=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR9ejDzzd/Z9nGXbsVbBqjycnSqNVW8nKT5dary583xR
+ 9dNDt3g2VHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCRjaGMDOv3/hK7rKMoLKFw
+ cJvq3Wdf7eI+x+zYPCvtnPsBx+pD2VMYGd6l2F1wrJl6IHntnnLtfb/v/1wpEWL5tkZ74nuPD8z
+ fDFkB
 X-Developer-Key: i=brauner@kernel.org; a=openpgp;
  fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-The file backend calls ->read_iter() and ->write_iter() of the backing
-file directly but never checks that they exist. Everything that isn't a
-block device ends up in the file backend. So a namespace pointing to a
-file without them calls a NULL pointer on its first I/O. Only
-buffered_io=1 gets that far as the O_DIRECT open fails for such files.
+Initialize all kernfs based filesystems as pseudo filesystems in
+kernfs_get_tree() instead of raising SB_I_NOEXEC and SB_I_NODEV by hand
+in kernfs_fill_super(). This adds SB_I_PSEUDO for sysfs, cgroupfs and
+resctrl.
 
-Refuse them when the namespace is enabled the same way zloop does since
-commit 0c10f8a1a7ae ("zloop: check that the zone backing file support
-->{read,write}_iter").
-
-Fixes: d5eff33ee6f8 ("nvmet: add simple file backed ns support")
 Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- drivers/nvme/target/io-cmd-file.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/kernfs/mount.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/target/io-cmd-file.c b/drivers/nvme/target/io-cmd-file.c
-index 695963dd932e..dfa8aa46188c 100644
---- a/drivers/nvme/target/io-cmd-file.c
-+++ b/drivers/nvme/target/io-cmd-file.c
-@@ -47,6 +47,11 @@ int nvmet_file_ns_enable(struct nvmet_ns *ns)
- 		return ret;
- 	}
+diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
+index a0be784bfb06..6b60d212b003 100644
+--- a/fs/kernfs/mount.c
++++ b/fs/kernfs/mount.c
+@@ -8,6 +8,7 @@
+  */
  
-+	if (!ns->file->f_op->read_iter || !ns->file->f_op->write_iter) {
-+		ret = -EINVAL;
-+		goto err;
-+	}
-+
- 	nvmet_file_ns_revalidate(ns);
+ #include <linux/fs.h>
++#include <linux/pseudo_fs.h>
+ #include <linux/mount.h>
+ #include <linux/init.h>
+ #include <linux/magic.h>
+@@ -298,8 +299,6 @@ static int kernfs_fill_super(struct super_block *sb, struct kernfs_fs_context *k
+ 	struct dentry *root;
  
- 	/*
+ 	info->sb = sb;
+-	/* Userspace would break if executables or devices appear on sysfs */
+-	sb->s_iflags |= SB_I_NOEXEC | SB_I_NODEV;
+ 	sb->s_blocksize = PAGE_SIZE;
+ 	sb->s_blocksize_bits = PAGE_SHIFT;
+ 	sb->s_magic = kfc->magic;
+@@ -388,6 +387,7 @@ int kernfs_get_tree(struct fs_context *fc)
+ 	info->ns = kfc->ns_tag;
+ 	INIT_LIST_HEAD(&info->node);
+ 
++	fc_init_pseudo(fc);
+ 	fc->s_fs_info = info;
+ 	sb = sget_fc(fc, kernfs_test_super, kernfs_set_super);
+ 	if (IS_ERR(sb))
 
 -- 
 2.53.0
