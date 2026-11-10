@@ -1,64 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794292192;
-	b=KVHCGmbsUPf9rjLdm+rHMj/kzEe9CTXpV7CexTMgzivPGAXqWZXiGkHy2m1xyjhHYS6H
-	 h5EOUgaLgMSoIy/SHQQAlSDp68rg7Gxum8hvRE3nFUUJwMvNwCmxobPMyI1zK6RhTxlAP
-	 T4K51Q/XAVV4BMMK5DF74/4iGYCv5YOOBrsUL3orDIu/SnGVuP+y5/bjjJU/dz6+ZUEjK
-	 VG8uZfhzDUQdgH3+C9RkMVA+WL+LdqL8yP/lfWOfyVj+Tz1tV4s9mst6qf6Km+xrvY4lL
-	 ILemvXcwVJh48v8x8ou4E0I7XtFdqjpJ0hqUG1plUxLWYRNpvFNjAMraaMRvmVLVM8g==
+	t=1794292819;
+	b=1bUfJCzxi6ZwAdPw3cgNgULQXnd8+q3qlTg9jQBcnUkR3Us8MwtDiA8zmpD4KVjqksrA
+	 aKKaYEwdS4JrNK2w6CAUKymDnXrENY7MjigsDoY9q1fybCH/dLPMitcV6Jr4IDmcbfIrS
+	 CQLK8etKiyHM/MkIu/E0VYzJU1LxmVSBqUWm3GqjzCUni5hfWlC6hWk3NmhY9fU75qlwq
+	 XlmiAMjrUBxParNzcrTnuOgiz2t85Z1mVs5AcFv1F5dvAIVmi0DeCo8yDt2bC78IUVK4Z
+	 fYoYtEE578FG1JE/Bm4T/8KgaSV6liqoxC1kXdzYzAaIQ+jOX+noBTM0Kj8qGA7kbmw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794292192;
-	h=DMARC-Filter:Received:Received:Received:Received:Date:From:To:CC:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
-	 X-Originating-IP:X-ClientProxiedBy;
-	bh=mgKCRgRdNiIKmHGzM5jiXbcVj17jpTU0EAW2FbfsR2g=;
-	b=LsLrv4CFg8tXjAn5mH6NtmykcVqWGYPfZjMMiUHe7EfvIgHrUqbKnwEmFySr+gySLp+O
-	 Lad2RnPORZab68xhuoVYduGXZsM970Wj+LEOhVu8zGCfEesnvOTBAKEfg+xHQwdN9Gr9W
-	 GcoMUeHJY6jsPX3HpUtW46eOg+UAOobxeJcnZHf35khEUKJqETN2MNAczTVGKMWRCaBU+
-	 k/21mxOsXZ600dT7wdzFNkOJah9wnok1HEUhvBEmGRtvtmvqwtA88TY/T+XIy4YUNjZmK
-	 l/dbvKAEddGU1g/s7wlzY41Ix1wojf8sVRS7QdimGXbX53HC08CEmjpJWiBymj8LlHQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794292819;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=30Y3+K4f1eGRVFoUBblLntMtWkSSsaPfJrriyA8Q1b4=;
+	b=DI8WBIO7cyju1SSPguYgf0R2jEv08eISMo1/ZqfK30PM8xnYfn1mWfsE8+FJiZx2veJr
+	 pf2bIGDTXfFS/I4HGtMdPPSOiwfOxiljmzbGy/69Ncex5gyNgkonfbE2zY6bLrB4hPVUI
+	 Sk38owTAu47JEveQnDAWhFig9xOAXm1q0wZBJmHHaHqB6wgkWM6yiT3bJqn7vBajoEvbF
+	 BECFbuUDMnaTIe7hd/ZBx+0UCAkBjSIq469gn5i5GSbcILvVgQ/WQsHyvz/FIwD6sb+N/
+	 FFcULtHanrC5lZ9YTcVMt6RMojfdruf9BQlg3IRPUZTWNUZchhPAvlHB0HxbnJZ17fQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=hygon.cn;
-	spf=pass smtp.mailfrom=hygon.cn;
-	arc=none smtp.remote-ip=101.204.27.37
-Received: from spam01.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4078606A321;
-	Tue, 10 Nov 2026 06:29:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D4078606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jNxZh5z6fzBCqx8;
-	Tue, 10 Nov 2026 14:29:32 +0800 (CST)
-Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jNxZf5vhYzBCqx6;
-	Tue, 10 Nov 2026 14:29:30 +0800 (CST)
-Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp2.hygon.cn (Postfix) with ESMTPS id E35FE30A6439;
-	Tue, 10 Nov 2026 14:28:45 +0800 (CST)
-Received: from hsj-2U-Workstation (172.19.24.226) by cncheex04.Hygon.cn
- (172.23.18.114) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 10 Nov
- 2026 14:29:28 +0800
-Date: Tue, 10 Nov 2026 14:29:26 +0800
-From: Huang Shijie <huangsj@hygon.cn>
-To: Jan Kara <jack@suse.cz>
-CC: <axboe@kernel.dk>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-	<zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>, <yingzhiwei@hygon.cn>,
-	<agruenba@redhat.com>, <mic@digikod.net>, <gnoack@google.com>,
-	<paul@paul-moore.com>, <jmorris@namei.org>, <serge@hallyn.com>,
-	<aleksa@amutable.com>, <legion@kernel.org>, <david@kernel.org>,
-	<sandeen@redhat.com>, <ebiggers@kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<gfs2@lists.linux.dev>, <linux-security-module@vger.kernel.org>,
-	<sunjunchao@bytedance.com>
-Subject: Re: [PATCH 3/3] vfs: convert sb->s_inodes iteration to
- super_iter_inodes()
-Message-ID: <avK5xg_TYW66t2PE@hsj-2U-Workstation>
-References: <20261015093854.2082600-1-huangsj@hygon.cn>
- <20261015093854.2082600-4-huangsj@hygon.cn>
- <wrknznlm52ffratfpdoe3otqhkgyd45vgmvtjkixrvurwpplyu@sfpz3yiwhidy>
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ju1LXvaL;
+	arc=none smtp.remote-ip=209.85.216.51
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972D8606A321
+	for <linux-block@vger.kernel.org>; Tue, 10 Nov 2026 06:40:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 972D8606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ju1LXvaL
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3ace1f3897cso963092a91.0
+        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 22:40:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1794292818; x=1794897618; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=30Y3+K4f1eGRVFoUBblLntMtWkSSsaPfJrriyA8Q1b4=;
+        b=ju1LXvaLqBO5kgzybhsbv3zRgCGu8niOwIDhEXiGbLiUasjW+BBbiBvEr02X3zBkXy
+         5k+Dllxj8Zim/zlv/qvEAiAlTS9UPoddJpxd5i3sCYJ8/S8Vqc0cM46mlokO4TLTeFov
+         dyGfkFuCNuAy0dLC/g3M3DKMtzFoYBvle/qQg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794292818; x=1794897618;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=30Y3+K4f1eGRVFoUBblLntMtWkSSsaPfJrriyA8Q1b4=;
+        b=vyHax1VWtlLgtzNj8z+EQuyV4gE7d4KNZSveknrDnDheSoHfpr9W8eVewW7cBchTsZ
+         8GLXaAA6dgTMSfjBmO9Xn3AqmQ/R0aREQX+bU9uwn//djS3qLUZIBAGmeq+rK495kpSa
+         1l4bygHYA0wcZW6LOk1KWrB1t8mhrfiMo6hvo2v+g+NQnBtm/zDu2heT24Nqb7CKLYEp
+         CsIhuc/8SFARHZm9520SeZcOgCN6xNWeBvfiEprk5coqfTBLepMmDPNxDaWQpOYPvQam
+         MTyYTiU2HXjyTeig226WyNlaQBQsVHjQHH3bDB37wyExZRFbImvppbpsV9SLt24R5Ckv
+         yVVw==
+X-Forwarded-Encrypted: i=1; AL+hErEB3DM7SVYenJpcwIFUMkJ8QxwaV9lxPQSwJi5762tBOgV9+7LjFMzwL+eHiUEinpKBIEpJXC0ovmWutg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/OeyzCpXU18vCklGOe7De/icUgFluh10JXU/XGLidFYZ08Mgq3
+	x41ZTMAz1cu9ChV4U1kbGNk5WuDG19yVWlSts3zKyQ0cRno0axsxOeMrpZHdd6E3/68Wa9defRi
+	Guis=
+X-Gm-Gg: AYBFou1f/5SwGcJtW56iyY7q+iIKrd/+ihwPcDYjDGO1vCoQrz2YjQS/dtfVJRkrs0s
+	NHDx3GQU9T9YOma4iAaLLeqkIb0P0MYQGUVT9g2BvrTYA0DeS1cR+EaY/5met6NOg0q/pBVTMj5
+	gHdRCa6sCSvBRlktjlVjFSB8Tv4whrh/0wypRDwBA3hI6k/WQmEKAX9TPeAuoxJ0e3OgMBRR4Co
+	gkXXpEQ9FeKkWUOJNSEf5w6g4La/zTKHOcDzqaRFBqTUtDQxlAfE8cJu+95o4PMDsCGm8MmMx3d
+	SDRYD4T9fKZj/Xg0ouh96GRWJuT2Su3NeD/LDMlXMmvsrv+d926bsYdKBR1EfYBlUCojZv/0sT/
+	tJ8Lh+nbT7RQlHAl3Q6DnR5pKY6w/PAWTjCkxKhDf0XztO7OCzws1jM26tL335x2TOrDmhvQS00
+	verMopnL5H7yDGqzHbCNYB3+zUfSx6th3f5s+CBI7WbjvT+rUjPY8n4pZbvpo1+hXdw6ENjAYMA
+	GZqe7GGbTIa8pLM5BVxu9CiyQSkiE5IEaXHu2d3MieTsK8bF8maivDfOGirZTVbQYKOYMGemNlW
+	xDbGmRyMeKV+kPzONw9gYZvTrJIu7aPTpArzPCsZ4LubGhkJkLGFLr+mAJb2a12J5yF9Xw==
+X-Received: by 2002:a17:90b:224f:b0:3a7:82ef:bcdd with SMTP id 98e67ed59e1d1-3b166d0512cmr2059326a91.41.1794292817853;
+        Mon, 09 Nov 2026 22:40:17 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:e137:9384:7cd8:6e40])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b16fea4243sm595945a91.14.2026.11.09.22.40.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Nov 2026 22:40:17 -0800 (PST)
+Date: Tue, 10 Nov 2026 15:40:13 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>, 
+	Jens Axboe <axboe@kernel.dk>, raoxu <raoxu@uniontech.com>
+Cc: minchan@kernel.org, senozhatsky@chromium.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] zram: Avoid duplicate slots in batched writeback
+Message-ID: <avK6Y1VmIYIBrorl@google.com>
+References: <F24EF6333964B482+20261110061830.272091-1-raoxu@uniontech.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -68,35 +95,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <wrknznlm52ffratfpdoe3otqhkgyd45vgmvtjkixrvurwpplyu@sfpz3yiwhidy>
-X-ClientProxiedBy: cncheex06.Hygon.cn (172.23.18.116) To cncheex04.Hygon.cn
- (172.23.18.114)
+In-Reply-To: <F24EF6333964B482+20261110061830.272091-1-raoxu@uniontech.com>
 
-在 Mon, Nov 09, 2026 at 11:31:41AM +0100，Jan Kara 写道：
-> > +static int sync_bdev_fn(struct inode *inode, void *data)
-> >  {
-> > -	struct inode *inode, *old_inode = NULL;
-> > +	struct block_device *bdev;
-> > +	bool wait = *(bool *)data;
-> >  
-> > -	spin_lock(&blockdev_superblock->s_inode_list_lock);
-> > -	list_for_each_entry(inode, &blockdev_superblock->s_inodes, i_sb_list) {
-> > -		struct address_space *mapping = inode->i_mapping;
-> > -		struct block_device *bdev;
-> > +	if (inode->i_mapping->nrpages == 0)
+On (26/11/10 14:18), raoxu wrote:
+> The writeback interface accepts multiple page_index and page_indexes
+> parameters in one operation. Their ranges can overlap, but
+> scan_slots_for_writeback() only excludes slots that are already being
+> written back or marked as same-filled.
 > 
-> Seeing these various checks iterators are doing before actually paying the
-> cost of grabbing (and dropping) the inode reference, I'd add a
-> ->elegible(inode) function to the iterator which will get called under
-> i_lock after other checks pass and can decide inode is not worth bothering
-> with and put the checks there. If it is NULL, the behavior would be as
-> currently.
-Okay.
-I will add the ->eligible() function to the iterator in next version.
+> A slot selected by an earlier range is placed on the post-processing list
+> and marked with ZRAM_PP_SLOT. Without checking that flag, an overlapping
+> range can enqueue the same slot again and submit it for writeback more
+> than once.
+> 
+> Skip slots already marked ZRAM_PP_SLOT while holding the slot lock. This
+> keeps each slot in a writeback scan session represented by at most one
+> post-processing entry and leaves the existing release and reuse paths
+> unchanged.
+> 
+> Signed-off-by: Xu Rao <raoxu@uniontech.com>
 
-Thanks
-Huang Shijie
+LGTM.
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 
+Jens, do you want to pick it up and route via block tree or should
+we route via "more traditional" tree (Andrew's tree)?
