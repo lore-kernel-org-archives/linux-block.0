@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794328131;
-	b=z/80+ZwZoQN//hpm4x8jgJmIYbbEiSEIYul9hk+WgmqK3IT5mR5V1Rdu9uvF275dxJIx
-	 mkGxNUqlhULMBGvVNjKUUUO5k+WFUMykFcXZrYYW0bvZJSj3rKJd4n3Gzihu4TTO3Dt+i
-	 xMT8N56ciH6bq0eElBuVkK/HAA8mH531cmHIQjGhnLzkl2GiH6VA40pEe/7whaEQozBUS
-	 1N5f6l4VafYPqLsxNN0yt7A3/t3OVqJ2I5ijuM62Rqxt7doW+gNEfzYWZxvzFuohqCf6k
-	 P8W2GyhKpwEJVZcO337kxBtzfbRRk/1rCF4I/FmfR+gV3TvBzC/QHf564TMWM5MPIbw==
+	t=1794328559;
+	b=bHwW173Va/wSGuOwxrakukk3wCUjBVQAmePF4WMtFnJi6jHInajXmghLEVzqikTBnOTw
+	 Tt76dwU4IYRD6VccrOQiX3I+R35pvQ3WHiXsujdkU5fz4Ar5/rHHhKuLKUQKSztdpkbW0
+	 vCvnt7vGkwE3mLjYXqUrSeBT2O0AoKpwOvp7ylUEt9zEnOmEaPVrozOAY9sabBSyEeNY+
+	 8outGXGhgXugtfv0E+bo5dsWnfbn+uqUBfomm1gXzHPB5D/nbbP/oZrOB5pphN2/ByCiH
+	 I1N31fGixHun11Tb3DroaoxAFVS2gOCAUbJKtt9/+/dyb1C3Vd6QfjdVAYOkvT3y8yw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794328131;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794328559;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=jqTdiGrgVttSAor12rHHo7dssn/lkPOpavFY9gHvLGY=;
-	b=dVMVMcMSTuZ7Lk6Bt2uR2KqAZfDpzbvxF+WVKh6thVOpursV5fPciZPECjBqkUZHCyDp
-	 BeOqa0oS+1ZMQjUp8i4J6qyASQeyOhfa5HEoRwpUDBNGN4rTUXx3h5/5RXPH/c8f5Cu+f
-	 gjifhXZq0DtyNAkNxFxxrV1hxTYHAput0RtEUpzQfnHDK/gT34P0sb8pfFJhcmgGV3VTY
-	 gG2tQtEEv5BtPsQjmvJGmtccuS3EM2MWy76dGkulbiP6erb8PLR0z8mrTyJB0y7/MVsjs
-	 hHPnYG63X7Slvv09LeTamFGbJE7p0I/W1FoA8xKaRMCfUuEoiCqsq7V5qlLH3cWow6Q==
+	bh=6B8q2oqRr8i13Z8GdT5dzIPKIxv4OsmoKM7uYVudI50=;
+	b=d4mcQbtj8s/asbRUiuuvVOFDjtVGsGzcXBjWIlrHjY3iw5pMCbKyWZaqQdG2kNmINjGD
+	 HULlyMENou/SVpoKpH4ofTUWPnupfrJJvCqk/efUd87WbA207ZbFSIeqRcREPUyD249QT
+	 kw5UKwKPfS/UqkGcS8KDT620R/Wy+hzE60WyLPfmKZxxfnYPAEc9oKGU8txSAQGfXgC9f
+	 Q+RAJVWyhtZRHa6rHHfGEmMD2QggGp2gN22wFge4z/N4apeqBKY9THWTACPFXMXfOOvIF
+	 6uXIbbDxK/BbsbaE6TbaIyLrO7sA+rwEMW1n+AxPpBK9mEkFOWl1scFzUMxWlSYOjnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XiGp388F;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i1SkZeEE;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFA5606A320;
-	Tue, 10 Nov 2026 16:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14041606A211;
+	Tue, 10 Nov 2026 16:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XiGp388F
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58DC51F0089F;
-	Tue, 10 Nov 2026 16:28:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i1SkZeEE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 387081F0089F;
+	Tue, 10 Nov 2026 16:35:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794328130;
-	bh=jqTdiGrgVttSAor12rHHo7dssn/lkPOpavFY9gHvLGY=;
+	s=k20260515; t=1794328558;
+	bh=6B8q2oqRr8i13Z8GdT5dzIPKIxv4OsmoKM7uYVudI50=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=XiGp388F+LBQoDPScHe38P94OcaRfL1I/7LCZEV9XQyhQBfrObBCRp2tOJVWf17CM
-	 ajvv9s+2VWt9TLWlm/rvE2/TldaCEcMwPw2EVG+4CtTmOQDB//wCthK4k8z0VRolEY
-	 3ZgxVclLmiFLksiVRA1czkoxbd4OcHnA+nfewp0+XKrwaKPgg/ljMP0VTbJq1eVGbP
-	 V8qkn1egKl314eFeaajKU/lFCMsqTzA2aOzLE+3ODPs6a6L8//epSU8jhWx8CL4uQu
-	 kuZV3NrP6f9tU1UjqTCwQzPsJI2kPFvCDdJSDHopBOxDsE+HsGG+ob83L+TRnTjOL1
-	 pQPa0nsEy4gBQ==
-Date: Tue, 10 Nov 2026 16:28:49 +0000
+	b=i1SkZeEE/TPAW5CajYVIcy1XUV71QNqZ/NtonNl/JIuGfqXNpd5ZkIpdShFMEMPCx
+	 DiMXSUPKxkADORb0WktAtloGnZRbhr+Jev/m0tgRTdTNJ7PdUOwuEP0t3ljK/Qaa2q
+	 fo9yav1hYqrRUI6iF6tvMsAcfp1GrsGx0eFuO3WP7FrPWSik4KGbI8artMgSLDspQX
+	 mPVcEra8EiNHoueCe6T77cKuNXFZpww1Ypfd1KKFzRbHBpannY520Unq/gAYwfYZnX
+	 ++YkJ8Dz0kwAL46lQ4cRe+mlFkudAZ22c+90UEV0FGE+NQNPavpAy229+cAJCJ9tBk
+	 iFWkTl3boMCXg==
+Date: Tue, 10 Nov 2026 16:35:56 +0000
 From: Yosry Ahmed <yosry@kernel.org>
 To: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>, 
@@ -47,10 +47,10 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Johannes Weiner <hannes@cmpxchg.org>, Brian Geffon <bgeffon@google.com>, 
 	Minchan Kim <minchan@kernel.org>, Richard Chang <richardycc@google.com>, 
 	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v2 03/11] zsmalloc: return handle from obj_allocated()
-Message-ID: <avNGMNpCP5rNT-Rc@google.com>
+Subject: Re: [PATCH v2 04/11] zsmalloc: switch handle type to struct zs_handle
+Message-ID: <avNHoaIU-RV8_fEG@google.com>
 References: <20261110054836.1515030-1-senozhatsky@chromium.org>
- <20261110054836.1515030-4-senozhatsky@chromium.org>
+ <20261110054836.1515030-5-senozhatsky@chromium.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,16 +62,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261110054836.1515030-4-senozhatsky@chromium.org>
+In-Reply-To: <20261110054836.1515030-5-senozhatsky@chromium.org>
 
-On Tue, Nov 10, 2026 at 02:48:08PM +0900, Sergey Senozhatsky wrote:
-> Allocated handles are valid kernel addresses and never 0, so let
-> obj_allocated() return the handle directly (or 0 if unallocated)
-> instead of returning a bool.
+On Tue, Nov 10, 2026 at 02:48:09PM +0900, Sergey Senozhatsky wrote:
+> zsmalloc handle is an unsigned long that holds an address of a
+> handle_cachep object, so zsmalloc and its users have to cast it
+> back and forth.  Introduce struct zs_handle and switch zsmalloc,
+> zram and zswap to struct zs_handle pointers.  Functions that only
+> read the handle take a const pointer.
 > 
-> No functional change.
+> This is a preparation for embedding struct zs_handle into zram and
+> zswap entries.  No functional change.
 > 
-> Suggested-by: Yosry Ahmed <yosry@kernel.org>
 > Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> ---
+>  drivers/block/zram/zram_drv.c | 28 ++++++------
+>  drivers/block/zram/zram_drv.h |  2 +-
+>  include/linux/zsmalloc.h      | 13 +++---
+>  mm/zsmalloc.c                 | 85 +++++++++++++++++++----------------
+>  mm/zswap.c                    |  8 ++--
+
+
+zsmalloc and zswap changes LGTM with a small nit below:
 
 Reviewed-by: Yosry Ahmed <yosry@kernel.org>
+
+[..]
+> diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
+> index dab71f582103..3a6a7253fd01 100644
+> --- a/mm/zsmalloc.c
+> +++ b/mm/zsmalloc.c
+> @@ -264,6 +264,10 @@ struct link_free {
+>  	};
+>  };
+>  
+> +struct zs_handle {
+> +	unsigned long __private obj;
+> +};
+
+nit: Update the definition of ZS_HANDLE_SIZE to sizeof(zs_handle)?
