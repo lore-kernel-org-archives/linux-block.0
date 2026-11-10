@@ -1,96 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.207.19.206
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794289763;
-	b=3lA9u2jO2cGu89d5szDN1NSffZ5V7F7DG9L2gm0L3it5xNAPKm/4c0cuXIM2ljzo868Y
-	 +eWkQzGN698vhGYsgPTZkRN6SbTPK9HDxy5VtJ8MouMvddkm8E2A68sPmXc+qiJPeYr4t
-	 D173GJEuFhh5kwqNvkki9lbaLxr/NsvtRIPX2BgLQ98nesGpPJt/pzg68mtuzQQ26wgNP
-	 Q4tJ2uEalCLNVnC7/FAONEZ6v2SFvT+TQWHS2TQ2LkYI4OPCV5b5dKFuG+jDeSap0oGt8
-	 NuOyrlY5Bv7cipbtZobJxEDcy2DTNQJ7rdjtZHT+ABlBbHGm1T0OUy3QphVGkCkdTUQ==
+	t=1794291557;
+	b=2to5DQAxdG16s3/yg+W1fLI+jZEqTkmkyDeuMSG/40wNzXINuToYWnrxgTb4SYMA9CeV
+	 7RjSm/pGycOF2JiVqp+QRXVNcFFUOGD61fwN7M/roPI7yFvUnIsKh8iWPepSizcCcrdzY
+	 3SF7lgT0TmfoLn8xGxOwdzIRnGo51w1tH1ks2TLneOpNmZ5yHnibllzZv9JkQHbnZjnRG
+	 UWerB/iqrgFtdHuVJefvkYWNh7mgHDW6xcH7IJ5K532WuWkHNc/Q2SNI39ZbKQb/mXQCk
+	 W7K4LdnURtlkNxeRplboMGE+x7U7Avqi/TShr+IgMV7LMdWWGP6eQ8pSqcNC9oElXZw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794289763;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
-	 In-Reply-To;
-	bh=e1CwuUVsSjZnbMobjwr4r9fMJTFxCCqI+vgT8IsHHyE=;
-	b=BR81BK8OPqrzozxfkJdGuvpD+S33lt3xDjs7iEyHRCb7hTOVtUw/xfdbl/vfvq1rZz+k
-	 VtQBPLdeKmdT6gLgfeCBYrob9UA1mfDGBRC4A2Hm4H8oOS5fWWsoEApIg5HShoTQD/MWP
-	 4ctUDHECGZK9Hskkj3BsIa4y147iUjn+MQsOc+dSyBmVgy8oxofyJmffKEvggdrpoyLBx
-	 0GUeCn/8uHuS9y5FYW7TG5DCftYR8Z4iuyXBL1RmrRMUdMBMD1m5N4cY2zimKPDYku7TB
-	 EjHbs8wNwHmwxmavGA7rWmKXe0BduUZufns2unYo8wZ2YcNsmbA/MURRqyYegiyBGzA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794291557;
+	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
+	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID:X-QQ-XMAILINFO:
+	 X-QQ-XMRINFO:X-QQ-RECHKSPAM;
+	bh=9q94mvokRieXKGnBs5b3tHNUDFssGR+0bJKc/5ZbmjQ=;
+	b=0Ik/gziF1Widly8clJzmNJ2M69sslmJIYrY2zGehAsYe89UGpz34Zeqcsu2O50rXIHbN
+	 O/FPQLBX8OyPl7ehU17zMahliRSVpPwn0N+Yanb9Q6e/C26lA2a511fbCDly5/X2rKAi/
+	 yaAPBRnwh1+8asIQvruQOxjrknJUA1TxtFu4yhQQ+otlk2y6LvIuLsQdAl3zIM+UVVZiD
+	 FSNYa98intopVqPoTNFCClMc2Tk8sjzoBgEb8OAXcFHUIkm02xMQHPrnm9uJax5wPoxsj
+	 S3osYYmPxZEus0IpHw2+aVR+a+J0bH5fNJ3Fy6eUpnobQVwq5ftzTXMIMGcCYEtO8NQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Ntx8of9R;
-	arc=none smtp.remote-ip=209.85.210.170
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=uniontech.com;
+	spf=pass smtp.mailfrom=uniontech.com;
+	dkim=pass header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b="F//K2VJF";
+	arc=none smtp.remote-ip=54.207.19.206
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C914160A260E
-	for <linux-block@vger.kernel.org>; Tue, 10 Nov 2026 05:49:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C914160A260E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A819606A31C;
+	Tue, 10 Nov 2026 06:19:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A819606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Ntx8of9R
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8b5e5e64494so834090b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2026 21:49:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1794289762; x=1794894562; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=e1CwuUVsSjZnbMobjwr4r9fMJTFxCCqI+vgT8IsHHyE=;
-        b=Ntx8of9RtWT7VWFP+8UI2qGvxb7QsA9xAcmmQncetK5YIWQYal5uEtY/rivndaRZjy
-         rU0cwPplqFhBTIjuGAnTrn/domD/um+/F8BvTxnHmvYwK/K4HXYNZ0PzZWE+2pk3xLhB
-         8PbiiK6C6Lt2RBs1QMNH6sTgfIVwKTef1OQOY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794289762; x=1794894562;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=e1CwuUVsSjZnbMobjwr4r9fMJTFxCCqI+vgT8IsHHyE=;
-        b=KJkuFIPYY6jdfORhaE+EsvbW6S+XZtFt+D7lSkcgIIeDZG8uIADEI/0h+MFkmb1Sr4
-         NNI1DTilRn1LNPSy7jL1RpkucBtG+RjxVSffelFbdWxqa3kd8K7EMOBlgUoic3LyOOXY
-         Jz3U5bVw3fAc/MVUaM1QHGpezhyRNCKxjAKzZfce29gAztHbplPFB3Gg9wMXGrsokQGw
-         QvZ74nZ8rXKpj8x/MKXHP+r+R78Tr/7F5/Rs9xqHR28yk641MtELBnM07U2qcjsIHYoq
-         ubFKGmJlTi51WDpX/ZRg9ndRJxfUnx21F7WUc982OzSXvf4o1b6LtFSVZUks0SSuDI7R
-         g6Mw==
-X-Forwarded-Encrypted: i=1; AL+hErGvyG33P7q+Ib6xb2eohnjunVI8vI7XR9moD9J6UcEW0LPqoMgfekFgzS7umKt3z0QnqZqOvnPGaDmQ9g==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/5hZRb6VplmpyODnRHv8gc6knf4e/h0CQbquNySdSIjtQsP6SO
-	fBc46/u0maOIoJ5CvhrMGlAP6rugkrVCpEd2wpKudQvNOHcD1spUit3+WnncT6NLiQ==
-X-Gm-Gg: AYBFou1yNGhPzHuBPyHoK8IO78E28F9Pg9Sp4LwtfLhO12A8b+hsPP0rERMyQOfIInU
-	Os+ldB01H7+x4avbaV0RBsntdsRck76EUu86av1yp0vOzTBTd3O8tnoPmCWq3SQCmCrL3K3pwnl
-	MLpd9kgCGaZC9NmLupAmpbogoi448x0KrcO6VSjnnP8dsUijz8T8yroOxWIp72uP0cAzw9R8c3s
-	4wZ4LGYFA5cy4rxHXnJbad8IQTsPDFm4NPIs3/38nAjPu9MyxTY4tlZ24WAEiSRZv9lIp7SekVA
-	YemfDEaHQwAMdGoqW5Y4dkOTlgqTSpp7AxOEwkUSpRwsCZ1LcFufo5/HE/edGlYi0i+RGgdw+S8
-	LvTPls7Zz1fwc8IpEXtF/vTBgdsWspwmnZfUP+lXoMc609Dmltp5Nrqp+9hffAU/6nfk7UuVoZL
-	Gzs4fM8eM+JZad8z6apfmEvDU/zkJQqNfvvxHYcey6De+AmwlJG1cW4xYfLyUrhDVXxZpKFR3w7
-	xltEb6ZgHxUkpLO5W24MlqYZO5TjE2bZZ/8pt26SomyMOKzkAJmlm6I9RlM3yNXIjDG6bZ7v/FR
-	vanWv9u8DAuufDHexuVl6b+K7I03hrkLhGZSJpKvR22lax6atmFTrifRAdktgAfC5ZQBrA==
-X-Received: by 2002:a17:903:2a84:b0:2e5:e1de:9c3c with SMTP id d9443c01a7336-2edb91d9bfamr13050805ad.47.1794289762137;
-        Mon, 09 Nov 2026 21:49:22 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:e137:9384:7cd8:6e40])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2edb6d7e1c0sm4971905ad.34.2026.11.09.21.49.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 21:49:21 -0800 (PST)
-Date: Tue, 10 Nov 2026 14:49:16 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Yosry Ahmed <yosry@kernel.org>, Nhat Pham <nphamcs@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Brian Geffon <bgeffon@google.com>, 
-	Minchan Kim <minchan@kernel.org>, Richard Chang <richardycc@google.com>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 0/7] zsmalloc: redesign object alloc API
-Message-ID: <avKwQ4IEOVfYm-8J@google.com>
-References: <20261105044752.1997895-1-senozhatsky@chromium.org>
- <auy9UfB30AlYabV8@google.com>
- <CAKEwX=Nao4jWtY04FXEjxiHUNUhJU2A6nCZLqhRRm-dPBZTmcw@mail.gmail.com>
- <CAO9r8zP_K0NF0gt71Emh+2dXmUh+C27uiu5TsyBcGUdLbCus1Q@mail.gmail.com>
+	dkim=pass (1024-bit key, unprotected) header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=F//K2VJF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1794291518;
+	bh=9q94mvokRieXKGnBs5b3tHNUDFssGR+0bJKc/5ZbmjQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=F//K2VJFUm9rWsrH7Ksi5mVAccXUYfI69FjrvwlQHa7Py7Y4BgVLBPMX5ppSgca51
+	 baYZ5DW5T84IRCZ+CeoxF+eZBcmHyRhfDKslCfuvqnHyJi/Mpd1cN/iX++xKQ8jg0S
+	 z3lc90vlkRUApohCeuayW+VwV9EBUUUc7nMb92y0=
+X-QQ-mid: esmtpgz12t1794291513tf0e25603
+X-QQ-Originating-IP: 07VSOn+NQ9s9MIkOvzvN6mHo447AMd8/90EHHXccR+o=
+Received: from PEN202512010004 ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 10 Nov 2026 14:18:31 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 10405181404545203304
+EX-QQ-RecipientCnt: 6
+From: raoxu <raoxu@uniontech.com>
+To: minchan@kernel.org
+Cc: senozhatsky@chromium.org,
+	axboe@kernel.dk,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	raoxu@uniontech.com
+Subject: [PATCH] zram: Avoid duplicate slots in batched writeback
+Date: Tue, 10 Nov 2026 14:18:30 +0800
+Message-ID: <F24EF6333964B482+20261110061830.272091-1-raoxu@uniontech.com>
+X-Mailer: git-send-email 2.50.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -100,30 +70,64 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAO9r8zP_K0NF0gt71Emh+2dXmUh+C27uiu5TsyBcGUdLbCus1Q@mail.gmail.com>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: OTFxv0hUyOzL3HZrZ3lvIrpTptYJIhyFo+tUNN8fHnBytFZkmKbAqhDi
+	A5Myvr6CBE4l17QBj9DC0xkDUBnp2lXjT0FbJDXHDdhW4kOdpFkQ5G8FUNCvX3Qf7/zOXoa
+	XI5++ZApWRM0tgc9LH33gWPM3ARdMfRVUH27FBNgFU50arrKGpbNsfygso+qDDb5soWVPUO
+	JrUo3BOM7ZBkA8tFuI5+dvtPAtX1Dxbxju2rl72M6IcWka9F0innUflPBn6HhJszSYD21xJ
+	CYHW5mdD8Gy/LHnIrs32q5pjmgyy1ouus8CfZG29HBzvu2gnSc4+JjkWfPG0n91EPCNYco/
+	rdyFC7GqFWDkzyPWdNIPktyCm4pifw1AO3ef1BAzsrh6Ls77Qwyizr2Qgp/Awey4Ikb1v6G
+	aixcffqAi/U39Ec1/uy0ZapZriV0TXTWF5wTBvoSa9LgB//wyRPH9dBq705RP45pa6QzeVe
+	3dmTCjSkuJZHte3A7nSPfzKQhHlVj7tNYye/Kq1PuAmP/CscoeLhdNt/XSjKQjdM48HxpQf
+	Ct52bN67Ys/X12gEHLD3W+oTokiaoPyt3CDfUHjjVtdlPfXxzdOei3IRwWowM5BksG2PVJZ
+	G5SlFCwYhO25yrmSxK5W3FUW+snET8E8whg4xnK6FKliU3T2EBIOhko3+ycsCuX/54BCqKv
+	DWmAbYuFsjVqUFmPhserZ3j+HWthyE5XObQyzH0RJjYFyu2+sERWeQMUEMapcF+I9NckP/U
+	7k6zzANEidev8zsPMCXEXlm5iwiAPYfUuKVAf4X2oLwNTBSozcyp1NjBh5aQ1BNzWYiqXVF
+	EijlwM7PGpw9eS/4USLEXuW4TovrkwFxnkneXjFIhlZae9fpjA8gxF5eE2SlRKzRpEyrS3f
+	CfK+gT2Rg1tpBGq2/jiPBOtO7pc1zAqqZBByuiO9zWUMWndyG6LOYs40e0n9Xhit9UID7oH
+	AIo690TL3UDWK739NsbIbGpWv3KkOoQKIB7MF9LwGZOVaT0feH2foajkiFF8UYrEGTshJsD
+	L/hXKl1JrRNcfzpq9C8ZK2zqEyEt06AtLFKOKMh26Fn9zpn18NSp/po68b8r8=
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+X-QQ-RECHKSPAM: 0
 
-On (26/11/05 09:39), Yosry Ahmed wrote:
-> On Thu, Nov 5, 2026 at 9:37 AM Nhat Pham <nphamcs@gmail.com> wrote:
-> >
-> > On Thu, Nov 5, 2026 at 10:31 AM Yosry Ahmed <yosry@kernel.org> wrote:
-> > >
-> > > On Thu, Nov 05, 2026 at 01:47:30PM +0900, Sergey Senozhatsky wrote:
-> > > > Both zram and zswap already have per-entry structures that store zsmalloc
-> > > > handles, so allocating a separate handle_cachep object per stored page is
-> > > > redundant.  This series embeds struct zs_handle directly into zram and
-> > > > zswap entries and drops handle_cachep, saving 8 bytes and a slab
-> > > > alloc/free per stored object (2MB per 1GB of swapped out 4K pages).
-> > >
-> > > I always hated that extra layer of indirection, thanks for doing this!
-> >
-> > +1.
-> >
-> > The mental load saving excites me more than the memory saving :)
-> 
-> Oh I am 100% supporting this just for my own mental wellbeing, the
-> memory saving is the icing on the cake.
+From: Xu Rao <raoxu@uniontech.com>
 
-Thank you guys!
+The writeback interface accepts multiple page_index and page_indexes
+parameters in one operation. Their ranges can overlap, but
+scan_slots_for_writeback() only excludes slots that are already being
+written back or marked as same-filled.
+
+A slot selected by an earlier range is placed on the post-processing list
+and marked with ZRAM_PP_SLOT. Without checking that flag, an overlapping
+range can enqueue the same slot again and submit it for writeback more
+than once.
+
+Skip slots already marked ZRAM_PP_SLOT while holding the slot lock. This
+keeps each slot in a writeback scan session represented by at most one
+post-processing entry and leaves the existing release and reuse paths
+unchanged.
+
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+---
+ drivers/block/zram/zram_drv.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index ab064c84b092..50a25989a23b 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1215,6 +1215,9 @@ static void scan_slots_for_writeback(struct zram *zram, u32 mode,
+ 		if (!slot_allocated(zram, index))
+ 			goto next;
+
++		if (test_slot_flag(zram, index, ZRAM_PP_SLOT))
++			goto next;
++
+ 		if (test_slot_flag(zram, index, ZRAM_WB) ||
+ 		    test_slot_flag(zram, index, ZRAM_SAME))
+ 			goto next;
+--
+2.50.1
+
