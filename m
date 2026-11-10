@@ -1,49 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794302164;
-	b=FdbvbUK+GLBkOQgaztPrjC5AyvlwfeK6g5qCCKvPIAGSYsPNB0+w33Es9298osBCWyu6
-	 apsTs2XV8QIKKAzWjCo8aj2AccMkMNO9npi/NZKD54ZBwXIiefcQ/WbvW2BBBsU4qsQHU
-	 hkhxRqVMWLi56coGuG0RWDOO5xxQFG3mGIHa/CZt7W4UJD1+wafKWW9b/0wXfSp5j7R5x
-	 /yHiXFMLwjk2Ah+X7+UDfYeKj8AgleYPrJxqewAH+ogQf0OIzOgS6oTs7M/d8Ue78cInq
-	 8cax40wfLAyqCnPelSDWTk2Qrf2QmuxcmEHnZss3nMMEGc519hqjI5vyfXk94JTs0kg==
+	t=1794302185;
+	b=ySWRpzU/tofj4cHKvPG9+x9cqgHZTu2rEbBw9N21Ih8qVdDC8G2dl/qGYOQ1kZVfBoJJ
+	 izBuMW+ebQwktowcYesoH4Ygj/d6Chb2ZhgOvZI6VS2Psjy9ifUtksEfGGk6YCTWFWKQx
+	 Atq0PVeQ34Ha0Q3d/Q+XIzAaz9LwhzVdOAmMbu79cLInl4obvDb0+Ictfw4RutBoaB1DE
+	 OeY7QOY+/5t2Km1Rl9fu/vXK5y2CsQKQHrKOFGTEQR6nIwqNKkX01Z/UBAdME3B5SG5zb
+	 C7r0nMul38SA2R9HcWHkbPnXdn+VZC9n7YOZnacA8w2UNjOzfdiY4Ay9EsTlonXqySA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794302164;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794302185;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=2Uxnm4Cd0mizACq2HNobDQRQcgrPnhEO2KA80+bveeM=;
-	b=Czr4VCEzsGA5KjLlvOoN4FHNyHWabD/A2YSGAbacuRue8HfTgSRFTe85z0Be0Z0SOIS8
-	 UsU0syR8UWa8p1gMZvhWvnxZf72NO8ypSqHIiexG+0shvzPXYIv7klZSroBs2HKch6JS4
-	 pAhByfoKJ4A06cuDEtVUKc2rr/SdYBswEGwT8lgjCE6H2Lo73dDn9qmeNx+Xwsk1uNEwY
-	 JH6MABSaLbSrehge133cUAfi3gDbSkTpb9kjqWoZ2LlCwmm0ZW97PlOqRPW66p4gVzIQ0
-	 HF+BWeANU/8yBskBeqGyMw28q6EzDAvmhyiKED8ycPOxcxABb6SwFrQnocvKcxmLeBQ==
+	bh=+PlyOtqsg4uvOLuXQ3/FL9HLYIT+WYfLjjBDzOseC4E=;
+	b=cq55pJQ5Kx5ORL2uE0aY9VU51AsIxonCDqQ0YSzGFWivBtRx4eqiw5s6QbBLRZ5Duu4Y
+	 AweuQpScQpAjOQAA3fGSSTSKovW0MawdhIIG/4+DjBnkMmu1AB+0Xgy8BSSZ5nuWzEnIm
+	 aoZNP8De/pP+N8nj5UBBWhOvoy4sFuny3hxoEQf7YtO7IosN7JK+0ovInu2c2LrCkzDGf
+	 NoF6m/On6XelYma8E7heap97URWIi72hXxCDoiQMTb6Zt03eUjo5ivATBw0R58LYuIeTw
+	 WG7GlVNI3zsWOTOrtIYIFxlvptVNe+zom7vKsGibKCNafGwuSIyaNo+Tv/6q4tAJPLg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ba3Pyp5O;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JDSV52m4;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF40606A33B;
-	Tue, 10 Nov 2026 09:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B574606A33C;
+	Tue, 10 Nov 2026 09:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ba3Pyp5O
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D92891F008A2;
-	Tue, 10 Nov 2026 09:15:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JDSV52m4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C370A1F008BE;
+	Tue, 10 Nov 2026 09:16:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794302164;
-	bh=2Uxnm4Cd0mizACq2HNobDQRQcgrPnhEO2KA80+bveeM=;
+	s=k20260515; t=1794302185;
+	bh=+PlyOtqsg4uvOLuXQ3/FL9HLYIT+WYfLjjBDzOseC4E=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=ba3Pyp5OpjsLWNS18IN6KJmuJFLn691WGOW4O+tQFCTWln2eXYVZ3JE1wBRhcmoW6
-	 hLpwpT4jz67cKW4CJB9uIhzhbMhfgiFHlr2CZK53VaqCwK5HM1YqSaiFHCScsFMBkn
-	 Q0OzOCwsepsGyP/WRgtRo4+3FcZl8eUfyuWZ7KuL8XDVDG6tcU8rd25pxcEBVszf1y
-	 XJvR4c13VrmJU77uH8rLkN68FB+fLrhpSvF6buW7PxoKBBbfZNWSogmUA09LLIYVWc
-	 o8T8B1sqCgT2o3NyN+rjS4hlvf0pw7ESlo7MI8nYdimYq23hA2cdZ9j7+asrP+da9o
-	 Z/f8j2gHp/WZg==
+	b=JDSV52m4OfCcyst3hFku2YCPCNxNeOvikciB89hDYJCR1LbwEEt/lYeTuQQD7/iUW
+	 H5tRIQ9v6jXMgiZgkJiF4GqOivkKtZZw7NCQaQ+f1NR7twZvTqcjqI+/c/IH9v/Jxy
+	 EoKQxUfmWpqjCJS9oAmdJNyKK7FKdWto+bebjhA+fYE+FkEqbaHlH+Oa9uQsiCi9GB
+	 3VXoXUr7iZu5zDIGq4U4YgT3MCBnLcxw8LrsjsTPugWIr6zcD/ibPJDTK7P1rf/Nm/
+	 FeXmWLksNQuP1ST2JEb6k4O48XmygmJ7cLGcrIfDn6Eu2LG0Vr4DLcJUZZqj6ewXS2
+	 2mhb3DLeE7TVQ==
 From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 10 Nov 2026 10:14:17 +0100
-Subject: [PATCH RFC 01/41] loop: refuse backing files that aren't open for
- reading
+Date: Tue, 10 Nov 2026 10:14:20 +0100
+Subject: [PATCH RFC 04/41] fs: add SB_I_PSEUDO
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -55,7 +54,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261110-work-loop-pseudo-v1-1-4c998976c6c7@kernel.org>
+Message-Id: <20261110-work-loop-pseudo-v1-4-4c998976c6c7@kernel.org>
 References: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
 In-Reply-To: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
 To: linux-fsdevel@vger.kernel.org
@@ -74,58 +73,99 @@ Cc: Jann Horn <jannh@google.com>, Chris Mason <mason@kernel.org>,
  linuxppc-dev@lists.ozlabs.org, linux-usb@vger.kernel.org, 
  Amir Goldstein <amir73il@gmail.com>, linux-erofs@lists.ozlabs.org, 
  linux-kselftest@vger.kernel.org, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>, stable@vger.kernel.org
+ "Christian Brauner (Amutable)" <brauner@kernel.org>
 X-Mailer: b4 0.17-dev-ce4c1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1688; i=brauner@kernel.org;
- h=from:subject:message-id; bh=k5rFTn5qwSY0P1NIV6SDcJMZmh5p3efbZZ8FHYDs+to=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR9ejBVvfNKBs+f5kIhpoaev8LtD4oXZ1xL0i19ll21p
- i5fZsmkjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgInc3s/I0OHqXaH2k1fp545n
- UtNUpkUwfzq4/7uEmpjnzfcNZ9bvT2JkeCygm5CxsPhqWqRgSqf6D/8dk2afLnMX1LJ/rjh/3zZ
- BPgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3427; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=k3b1S5Aks24kDoWnRvLqsdiiPcKIlG2bf4Gt1cYJbvU=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR9ejDjkUK2x5tSpSe3sln+v7tvX2kk8yFWmKv/wMXyl
+ fsivk7i6ShlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZjIgXSGn4zTcuXEC9Zcm34h
+ e6vptpmiC3asPh6Q0BteemFfbSaHeDDDP+uZ7aUJ00OdGBbc/56893hNWHZRbjDHr99CTduPlCV
+ M4wIA
 X-Developer-Key: i=brauner@kernel.org; a=openpgp;
  fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-loop_configure() takes any file as long as it implements ->read_iter().
-Loop itself never checked whether the file was actually opened for
-reading. Buffered I/O went through vfs_iter_read() which refuses files
-without FMODE_READ. Direct I/O has called ->read_iter() of the backing
-file directly ever since loop grew support for it.
+Currently, there's no way to tell whether the files of a filesystem
+store data or whether they are kernel interfaces. Files on pseudo
+filesystems such as procfs or sysfs generate their contents when they're
+read and writes to them are commands to the kernel.
 
-Since commit f2fed441c69b ("loop: stop using vfs_iter_{read,write} for
-buffered I/O") buffered I/O calls ->read_iter() directly as well. That
-commit was about O_DIRECT handling and the FMODE_READ check went away
-as a side effect.
+But a few places in the kernel take an arbitrary file and use it as
+storage: loop, zloop, the nvme target's file backend, the scsi target's
+fileio backend, fuse passthrough, the usb mass storage gadget and erofs
+file-backed mounts. At most they check the file type and whether the
+file implements ->read_iter() and ->write_iter(). That's not enough.
+kernfs provides both for every sysfs attribute for example.
 
-So whoever can set up a loop device can read a file it was only allowed
-to open for writing. Open the file O_WRONLY, configure a loop device
-with it and read the contents through the loop device.
+Add SB_I_PSEUDO so a filesystem can state that its regular files are
+kernel interfaces and must not be used as storage.
 
-Refuse backing files that aren't open for reading. Loop always reads
-from its backing file so a write-only backing file never made sense in
-the first place.
+Pseudo filesystems also never hold executables or device nodes. But
+currently each of them decides on its own whether to raise SB_I_NOEXEC
+and SB_I_NODEV. Some do, most don't. Add fc_init_pseudo() as the common
+initialization point for all pseudo filesystems that raises all three
+flags and switch init_pseudo() over to it. The following patches
+convert the mountable pseudo filesystems.
 
-Fixes: bc07c10a3603 ("block: loop: support DIO & AIO")
-Fixes: f2fed441c69b ("loop: stop using vfs_iter_{read,write} for buffered I/O")
-Cc: stable@vger.kernel.org
+Nothing checks SB_I_PSEUDO yet so no functional changes.
+
 Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- drivers/block/loop.c | 3 +++
- 1 file changed, 3 insertions(+)
+ fs/libfs.c                     |  2 +-
+ include/linux/fs/super_types.h |  1 +
+ include/linux/pseudo_fs.h      | 11 +++++++++++
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index a3325ceab484..c96e35c3ef42 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -528,6 +528,9 @@ static void loop_assign_backing_file(struct loop_device *lo, struct file *file)
+diff --git a/fs/libfs.c b/fs/libfs.c
+index 96a6e9b1535f..8c8789489fdf 100644
+--- a/fs/libfs.c
++++ b/fs/libfs.c
+@@ -735,7 +735,7 @@ struct pseudo_fs_context *init_pseudo(struct fs_context *fc,
+ 		fc->fs_private = ctx;
+ 		fc->ops = &pseudo_fs_context_ops;
+ 		fc->sb_flags |= SB_NOUSER;
+-		fc->s_iflags |= SB_I_NOEXEC | SB_I_NODEV;
++		fc_init_pseudo(fc);
+ 		fc->global = true;
+ 	}
+ 	return ctx;
+diff --git a/include/linux/fs/super_types.h b/include/linux/fs/super_types.h
+index 72f4288e16c5..472200bdf081 100644
+--- a/include/linux/fs/super_types.h
++++ b/include/linux/fs/super_types.h
+@@ -359,5 +359,6 @@ struct super_block {
+ #define SB_I_NOIDMAP	0x00002000	/* No idmapped mounts on this superblock */
+ #define SB_I_ALLOW_HSM	0x00004000	/* Allow HSM events on this superblock */
+ #define SB_I_NO_DATA_INTEGRITY	0x00008000 /* fs cannot guarantee data persistence on sync */
++#define SB_I_PSEUDO	0x00010000	/* regular files are kernel interfaces, not storage */
  
- static int loop_check_backing_file(struct file *file)
- {
-+	if (!(file->f_mode & FMODE_READ))
-+		return -EBADF;
+ #endif /* _LINUX_FS_SUPER_TYPES_H */
+diff --git a/include/linux/pseudo_fs.h b/include/linux/pseudo_fs.h
+index a651e60d9410..0ca408aa60af 100644
+--- a/include/linux/pseudo_fs.h
++++ b/include/linux/pseudo_fs.h
+@@ -2,6 +2,7 @@
+ #define __LINUX_PSEUDO_FS__
+ 
+ #include <linux/fs_context.h>
++#include <linux/fs/super_types.h>
+ 
+ struct pseudo_fs_context {
+ 	const struct super_operations *ops;
+@@ -15,4 +16,14 @@ struct pseudo_fs_context {
+ struct pseudo_fs_context *init_pseudo(struct fs_context *fc,
+ 				      unsigned long magic);
+ 
++/*
++ * Common initialization for all pseudo filesystems, mountable or not. Their
++ * regular files are kernel interfaces. They don't store data and pseudo
++ * filesystems never hold executables or device nodes.
++ */
++static inline void fc_init_pseudo(struct fs_context *fc)
++{
++	fc->s_iflags |= SB_I_PSEUDO | SB_I_NOEXEC | SB_I_NODEV;
++}
 +
- 	if (!file->f_op->read_iter)
- 		return -EINVAL;
- 
+ #endif
 
 -- 
 2.53.0
