@@ -1,69 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794409095;
-	b=LI0c45DwfD2F7ygpIhqgMS6aBB7L3uYqjqXYlXpipcVn6sFaJTpPMpqOyX5M/66ZVqio
-	 Fq5P3xpa2a54uSNcZrJa8f4C7hpi3HYHToQw6DQDK9lI70lOB5pfTqTMALYBMJkItFa4M
-	 v7GF9HGAF3CMCfSipMYekHARTtv/hWj/VkSHICKKqo5D7XlLJ49P6LqF8l1ymNXoyExyu
-	 HQHNenm6ce4ylnQE+tWjQuRFx7NXwsuGrmEHJeOi0sYcg9Xm4/xOa54fMb3u4FLfrvGfI
-	 exZYlxyMCzbIRTBlBO1Dzfu9DTmuo/vzsXpvcpMLf2HRCfsA8s8FH0AUalvqrS5LPNw==
+	t=1794409381;
+	b=NAZtQx5OhJmyI2gKp0/m8LLcHQzK2RPRrGYj6tYY7YAUAoXkgyP/XSVZcnH5Y9u69tI2
+	 lY5oZT7oWU8S1QgLJw63Xq6j82QOEWtzYGMOq2PvQ2kWse/IogS8l7wYfuwv6/VLui8tW
+	 eKbB8374eJNe3qfJQdN4Kp9e97po4h1lwshuoYcbo8lakO6oxi8yN3knsLoVHah5zEt8R
+	 DQaFq/evurKyOdvRRCl+9Wiq1m2SnNUQkSr0ZcqwqrkycOVXE8jgXBsbXGh5FlLuYjs1p
+	 meri8ud5HDmC8pBLZFgQeAnPE8D4OJNl/Dj/ESxRogo74VdvI/18Y94425MyFFXDF+Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794409095;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 X-Zmail-TransId:X-Mailer:Message-ID:In-Reply-To:References:Date:
-	 Mime-Version:From:To:Cc:Subject:Content-Type:X-MAIL:X-TLS:
-	 X-ENVELOPE-SENDER:X-SOURCE-IP:X-CLEAN:X-Fangmail-Anti-Spam-Filtered:
-	 X-Fangmail-MID-QID;
-	bh=CpWCJ94xtknXCkn8v7FkrW6Znii5UB/65DwrssViU5k=;
-	b=AMFi9oeqQx0DnqLSyQoVwMjKxw+R7CQeR73uj9afALdr1tpkOG6eYDtikVTKKd196y//
-	 TJmW6nBbIcGOwXy9Luayw64rSW6ZU31qkypHb0t5c3pQAc7Q2N/BqDGwsKcVKGqZYvcJL
-	 vO7OUCJ4mMxIUrWzJZuVFy7iX3lO7b+UI6C++upYS3ABaq2L2++vX+PK3i3Htmf0AScCc
-	 Eh0vpGHF/OP2VPdq8vkpHbBbuHv2/VdlPe+aA/Dr5w4a5JgjxlKTGRv7bxyoydd0MV0lO
-	 BpuNvAiQ+y/kXUJbMF5TT+F4LQQcKV6WJ2st2I3GPizF/VCzP8ILSMqrnehAZ7u7N/Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794409381;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-SRS-Rewrite;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	b=hawEcfWYU+VZ36UK6LMrSThr4hoVCl5R4gqFfPD0QME2FCiOYnQFFwA1Q+Wj3GxVws0s
+	 WksXUDXf2vDHN+sgdOTqnzpGZOrJDiUKL7uBnHz205BjTxyH9wBDSL8MAbcLgKmdawjfF
+	 JrQci2Jtk/uNasZ1L0OEnDMa2LT+NiKFvPKRPg3doRdgLP32i4ZiKh+sQzvhYRRA5Pysj
+	 Z4DUSOPnoo4MwNFql5EZXCM6x+xhpFwU6KCTHg95P6aVuiJnr31XwkPjoRDgyoIBhonkA
+	 UfnLXGtWF+3FAsiVUqFyKyrrgZk0Ai3gdj63xra1/rKp0MKX/bkNEukwqqn4fTziXNg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=zte.com.cn;
-	spf=pass smtp.mailfrom=zte.com.cn;
-	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b="0qLYETa/";
-	arc=none smtp.remote-ip=183.62.165.209
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=E2r6yTve;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B46D60A263A;
-	Wed, 11 Nov 2026 14:58:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4B46D60A263A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8B3606A891;
+	Wed, 11 Nov 2026 15:03:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7F8B3606A891
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=0qLYETa/
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4jPmpz3tm4z4xPSq;
-	Wed, 11 Nov 2026 22:58:03 +0800 (CST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
-	s=z202610; t=1794409083;
-	bh=pRKfVc7wfVb7PMZfXlLg7JaYDLTtapskOa/+zvTpT80=;
-	h=In-Reply-To:References:Date:From:To:Cc:Subject;
-	b=0qLYETa/prukg6Sc1BuWXoVB0zs0aZB4MfkzKYinbyKT0BToDFsvP8uSsTXJQois3
-	 x39B5O6sezzSdB55i2Q+KZ3jFiTBGelYUw64WAs+6am6Jo2oBJIyIwYd7ZAMGvW4G2
-	 ypmbRX0ZDULHFwUkMy9UkNxy1TuBiwZaI6L95SB4X962k3NyOjvyf9awIRujjqJ4OU
-	 Z+pLkn91liWKfBvg/AVjmK4xJjMIYnm59mmZdSyBE5g7qBKJ2o45OyEMnzcyPuidXr
-	 zVLZ8eQJcHQV4LLvP9zWnoTu0HdC4Q9yVv8K0DE/RJmBWbAg+pCXvDKWDqAveT7Y6a
-	 oii8MWYclJrWQ==
-Received: from xaxapp05.zte.com.cn ([10.99.98.109])
-	by mse-fl1.zte.com.cn with SMTP id 6ABEvwcA003794;
-	Wed, 11 Nov 2026 22:57:58 +0800 (+08)
-	(envelope-from shao.mingyin@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Wed, 11 Nov 2026 22:58:02 +0800 (CST)
-X-Zmail-TransId: 2afa6af4827a592-8b453
-X-Mailer: Zmail v1.0
-Message-ID: <202611112258022807A4cJ4GoTzO_Q2qeMKeG1@zte.com.cn>
-In-Reply-To: <202611112257529855AMDZLzg8ZmFDQ3fBstbi@zte.com.cn>
-References: 202611112257529855AMDZLzg8ZmFDQ3fBstbi@zte.com.cn
-Date: Wed, 11 Nov 2026 22:58:02 +0800 (CST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=E2r6yTve
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=E2r6yTvegWYKxuIJUczQEwcI4M
+	WFvhEGpREQAmkJgjKxz70SDICYeWvWldDZ5jNgz6IpROxruzj2suKa7GU1NX/Aio/tHLEGLZcR94/
+	n+DP5/VA1eKROLu6QmmRiQyR+OlgANR8fO+KrwrNwtPWb46JzLhNunkzuAF0Uy5WMYndGsvxKQ3Qn
+	BdDO1F8tEpwI8K2M17tFW0rwyoDWPzoCQ2l/hyErYrkvY9acrOergYGUZtozgJUPojQH5QamNPy+w
+	Ya2uyh0FIaznX0Yocv4xvc7vjfzWxO5IZmV1VnKyKvL4b4UXafjMVidDRB4tkyL6ESrTb0dpSjk+k
+	JurLKc2g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xR9ql-000000072ed-24iw;
+	Wed, 11 Nov 2026 15:02:59 +0000
+Date: Wed, 11 Nov 2026 07:02:59 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Avi Weiss <thnkslprpt@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Subject: Re: [PATCH v2] block: avoid repeated notifications for dead disks
+Message-ID: <avSDo6mqkn0F25De@infradead.org>
+References: <20261031171325.4073830-2-thnkslprpt@gmail.com>
+ <20261105081007.816058-2-thnkslprpt@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -72,60 +65,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-From: <shao.mingyin@zte.com.cn>
-To: <tom.leiming@gmail.com>, <shuah@kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIIDQvNF0gc2VsZnRlc3RzOiB1YmxrOiBjbGVhciByZXVzZWQgYmF0Y2ggU1FFIGNvbW1hbmQgZmxhZ3M=?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 6ABEvwcA003794
-X-TLS: YES
-X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
-X-SOURCE-IP: 10.5.228.132 unknown Wed, 11 Nov 2026 22:58:03 +0800
-X-CLEAN: YES
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6AF4827B.000/4jPmpz3tm4z4xPSq
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261105081007.816058-2-thnkslprpt@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Shao Mingyin <shao.mingyin@zte.com.cn>
+Looks good:
 
-Batch FETCH commands set IORING_URING_CMD_MULTISHOT and select a buffer.
-When a SQE slot is reused for a PREP or COMMIT command, batch command
-initialization overwrites the SQE flags but leaves uring_cmd_flags set.
-The multishot flag then disagrees with buffer selection, so
-io_uring_cmd_prep() rejects the command with -EINVAL. The completion
-assertion aborts kublk, leaving a recovery device QUIESCED or its CLI
-waiting for a daemon notification that will never arrive.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Clear rw_flags when initializing a batch command. The FETCH path sets
-its multishot flag explicitly afterwards.
-
-Fixes: cb5a6b308700 ("selftests: ublk: handle UBLK_U_IO_FETCH_IO_CMDS")
-Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
----
-Tested on next-20261105 with CONFIG_BLK_DEV_UBLK=y in a local QEMU/KVM
-VM (4 vCPUs, 4 GiB), using real kublk and fio. With the same diagnostic
-kernel and batch null workload, the original binary received -EINVAL
-for a multishot COMMIT without buffer selection and its daemon exited,
-leaving the device QUIESCED. With this change the daemon remained alive
-and the device stayed LIVE before deliberate device deletion.
-
-The four recovery scripts also passed twice with this change and a
-separate fix for commits arriving after the quiesce cancellation scan.
-
- tools/testing/selftests/ublk/batch.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/ublk/batch.c b/tools/testing/selftests/ublk/batch.c
-index 625a9c32a..fcab2ca9e 100644
---- a/tools/testing/selftests/ublk/batch.c
-+++ b/tools/testing/selftests/ublk/batch.c
-@@ -241,6 +241,7 @@ static void ublk_init_batch_cmd(struct ublk_thread *t, __u16 q_id,
- 
- 	sqe->fd	= 0;	/* dev->fds[0] */
- 	sqe->opcode	= IORING_OP_URING_CMD;
-+	sqe->rw_flags	= 0;
- 	sqe->flags	= IOSQE_FIXED_FILE;
- 
- 	cmd->q_id	= q_id;
