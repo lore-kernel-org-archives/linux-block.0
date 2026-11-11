@@ -1,55 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.127.231.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.225.75
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794393456;
-	b=wWgZmx1X+LpK7regsLggkybpsk6sXlvF1UWzJZ93+IH8htwN2d9RJrxI/+cbnBeTm8ne
-	 oVAe/MF7ctXZafxItVzJQq99BNjniRm2Mybes/tn2qW/pTVjkw8LVHjfqjN+FX3kIKE5Z
-	 vPXdL5WGDSELLtDxDCEJ2ZRUvjMmnhlDmGY4gGq7opOz+oty1m82W0aPuh2dn8pSNZvu0
-	 MaURAFQqKQ27XKrir69YeRssBP+OkNXzcb+O/72VT8LB8tYo4dH65WQ3V1x8UZpd0oHbb
-	 vYrrmB5vLgzF0LFnLNiFaAfuaaZCAnfy6ifMMA+tazNeIW1UAA7tKFF+6bV42thIwDQ==
+	t=1794396569;
+	b=GpfwzZZrXWJWh60FXOvzY2wfd5EKObi1m5/0dKSKeO5IVAUlCBqXeB2kqJzW+2wAWLql
+	 6WgnWwL3rD/ccIVIkAb520LscNxNspdKatQIeW5aI/xlwFscjbnoqgdi+kkyu5yI0+Ckc
+	 JKfyqnynOPnhvVDiGWWKVNzunaVIXkRZh3Xx5E/U3ymFUiEGsqO2FW3DMg2PPYtHhfksm
+	 uoB/fWO/x2FaMDkQY8keGb2RL27XIIpSZkrS3bTVSOFslekO8796mMhAuPphC5WjNLDdq
+	 SdxneCSJxuQeR1qQuB5EOWrrY9d9NAlDwavxrc623vXEhNdYq8UsBW4lbcyYViNhi2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794393456;
-	h=DMARC-Filter:DKIM-Signature:Reply-To:To:Message-Id:Content-Type:
-	 Received:Mime-Version:Content-Transfer-Encoding:In-Reply-To:
-	 References:Cc:Subject:Date:User-Agent:From:X-Original-From:
-	 X-Lms-Return-Path;
-	bh=aNSRDIHMfArUzsdQdb8aFfjRjsd0lZAoJPAwWQjeJEQ=;
-	b=0nT7wt3Awy1mvEGheQ+7nAiyNx/0h6HhmINWh/H+INKfznki4mbpaVI/5ZJj8JS16Tn/
-	 a51hwQ2/e9yzsjfpmeLQ0NjDElozRXGeGM7wlCPsJDhQRIug1Yxu+OdoBgwmL8gj5R37C
-	 a4KQKl+cYLYGXmCZsf9nCniIpgaXdIDqIa3y9GDSvT0hnLFqELhna6Jz8o6wBAn6V987B
-	 5EnlESzwxH9IcN/P1jKxHsZy/wFdtLB2Om03/1aiVsHyJmEZGQ6uxp7qnEh1tvAi3xAKy
-	 8Os2iYmZh4lzk5UkrfuLkI1fM7o8lwaniDooLAKBpb/pOVpf/fKHJVI9Whx+Gr/NT3w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794396569;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=zTtDGLue5JqVxGOZgA8LDHzbFgoJeRKQNOdcqpXnAX4=;
+	b=ObWwzvUznwQoFnZmJ3mG4nb7gcX02nWDhTfrlfxth/5L8Tw2jdSwpEngx1bLQzWsFd8X
+	 13QuTk8IvXDvRkVglq+nRqs5vJdMBeedf6KuwHmQRuYunlv3rA6/bjgrsNUU8bV0EAioJ
+	 bJwENC/MihGi2oav3e4P3bQzYHMAIZY0yNxO2gIvD10UslAgAv/87miFU5MPs5lcH1jb5
+	 MIXnSNTO1Mw7Zc1Lo52gjdZ1AfIGUZOfpoAP+ofDsNEmbKtRC7hJdStrzGEQFO1ZaqWdT
+	 /X4jFVxHXyb9aPlVcusaVLLhY7OVgN+n8XLYoKAwUmiPUr9hAly+dQ+ZZDX0wrfHBvA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fygo.io;
-	spf=pass smtp.mailfrom=fygo.io;
-	dkim=pass header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=OUCNqEDu;
-	arc=none smtp.remote-ip=209.127.231.54
-Received: from va-2-54.ptr.blmpb.com (va-2-54.ptr.blmpb.com [209.127.231.54])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AUDKoIpN;
+	arc=none smtp.remote-ip=74.125.225.75
+Received: from mail-wr2-f11.google.com (mail-wr2-f11.google.com [74.125.225.75])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32CB606A324
-	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 10:37:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D32CB606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612E3606A326
+	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 11:29:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 612E3606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.a=rsa-sha256 header.s=s1 header.b=OUCNqEDu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1794393445;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=aNSRDIHMfArUzsdQdb8aFfjRjsd0lZAoJPAwWQjeJEQ=;
- b=OUCNqEDuQgKhmFpLzuNkvwQ+BkPHWtpEkA9yahNyrhsYIBFSJ6Kh5BDM2V3600QUfIIgXq
- swBV2Mtv5nRWEG/ma3UY1SCtuewMwWGOzWuBbZH/VnoaxDtnm+B1GWMxO/j5XrJnRLU1i7
- Xe5Zs7itOzJ3kFNqjEWlN3WCAHoBxwsx+F6PRQScuf4Nmtq0KeP4rQ/0C5N3vldLnbc++h
- Xu0LUEugIYzSVO1X2MqM7uXXhKA7YAm21TqSqF+fNW6N7Qs6o9gg5iYlkqTC0L9qwrNB7c
- b3q/4XhzJycZW3uMd/SQVOslLG/Vcia8n5cRqCloOLEooYg+Ne6RJu6YfgX6Xw==
-Reply-To: yukuai@fygo.io
-To: =?utf-8?q?=E7=8E=8B=E7=BB=A7=E6=99=A8?= <wangjichen@kaihong.com>, 
-	"yu kuai" <yukuai@fygo.io>
-Message-Id: <b9b085a3-b56e-41e3-b88c-2f1618c3835f@fygo.io>
-Content-Type: text/plain; charset=UTF-8
-Received: from [192.168.1.104] ([39.182.0.55]) by smtp.larksuite.com with ESMTPS; Wed, 11 Nov 2026 10:37:23 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AUDKoIpN
+Received: by mail-wr2-f11.google.com with SMTP id ffacd0b85a97d-48fdea35dafso1163640f8f.0
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 03:29:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794396568; x=1795001368; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=zTtDGLue5JqVxGOZgA8LDHzbFgoJeRKQNOdcqpXnAX4=;
+        b=AUDKoIpNLkyrldLXbo1ZDQ1otgEI/vNPvbgblUzXsd6GUuG+ssKADFJTm4mlhZLfJB
+         e0CNjY4GgiUGS5jDBQyVQSHuSoQ2xik0QvLToaSnKfCajJXiXpAFTASAyXzWqqXoyUZV
+         nWRI+54naZVSG88MTcp5WqQYt6GrzkXg5B8mXAgMl00pNfuU6ik7YvPsb7PQQAyRXXyH
+         6gwhKSE2aZ4d54dBSrJ8JCAAZiEpQ/Y540Y6Z5QXH01WZj9+RblibfioYVpVKsUriOGn
+         NQDqfm1zpSO1wMEvcDmpupAWl9kaPtrtMZP73bdn6nJIzzPWEbtwFbB8pS6Ln9PgbGXE
+         /How==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794396568; x=1795001368;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=zTtDGLue5JqVxGOZgA8LDHzbFgoJeRKQNOdcqpXnAX4=;
+        b=hqpr5WmK3qUnFqKJQ7JGFjGw90eXMZY/3PaVvG4tnosv0s+Ezy0ad3i6NoxwTAKba+
+         01vXYuW9U+n5cb1FHJHVxTLyNKnFTj1ZdejBdi3YXt8KaIWpWfWFQdAJKNR9BGqXsSDk
+         j8Z6XcXU/deC0sEWownVyG4/18iGbWvzqYg6spE+zW76tTsHmw5B7IK428SPjWzCtJdw
+         66uRl/xHVcrz73s87LlJEPxlrT6cP5rSmS06wnVx7NEwp3dGltLQOUpRW6Ydw6oBssqO
+         MapBQQ/b++5cDDh43aNfPc6Qm1csBv6DaZ8q9kF6H7d/RmfgOAliEdlmpPdjsGmW6dSr
+         +7/A==
+X-Forwarded-Encrypted: i=1; AL+hErFCY1MAxHSuAP5AbsRS0NzP8ysml2Vi/7MqiFrcUk7N1rQHN19RGaM7XzcO7QcxKUCB5fgX+1431cn/Jw==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/k5UEy599YdzVqpLgNaLCW8p/pmeelqg9DHeKxVZYngSt98eoy
+	cqUWa2r1bBKGg1FpT+bHfmMLSrvaL4/G7D4oCCZDsu4bCAbMlz+ovhVl
+X-Gm-Gg: AYBFou0pi9zXZCHIBlLfc65sPUaGrpm50TWfR2g1YgJJNhQiqQzNP/ZRuPFHfLWuEYT
+	W2CNUEI9tXuH04Ojb+ffDrouSSdWtTadGf9b1DCnUpBGgx1we6nYdSDILcAxyQT5yvfAA2JGcqX
+	G0wvjD9C+x+SOtZQDGyZLZi50X4XSuIjWPmeyIHpPrwl3wVwyAtUuqV/m+Al49OEOhK/w3IZRMQ
+	OoJCfxFmFGPRrsMlf9dVizWnZGXNepRN8Me+GLHc4sk2zuTlCxoSi6b/h3Iy/q1CvEXg+HyKrhG
+	OpnN3oVVdwMyY7XzjfZT6SqhkRpgfJpCccWmffTsI9FHJQWkp6TQEIDw/CDzBU7OY8p/2qdc1GG
+	rVPBZ0axX83oR1zRVpoheZK/tRl6XjZlrrS1bzQXFKVlVwPZUT3SyZbfjzkHwUTQc/vmMtqoQDL
+	QeA68TYGUIDH8MnVkDKVBoqmct/Phu+GgHkoD/AYXqgLw5i22+wabvEyIuLvMK4c9Jn2SJUYuLU
+	S4BzUN0hHWG9IiakFv2VzUxo5umPJuSfDDMZ3V/FsxWzt32sBYxvBBlE6CmgBOactxShiuLPdSE
+	uQS63eJOe5Tvbz2Lg7U6b/pP4TR+060=
+X-Received: by 2002:a05:6000:250e:b0:48e:75f:477d with SMTP id ffacd0b85a97d-499c4814a86mr3885367f8f.7.1794396567358;
+        Wed, 11 Nov 2026 03:29:27 -0800 (PST)
+Received: from fedora41 ([2a01:e0a:1058:7c30:e315:b955:cb8b:b86b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49835c37bdfsm10536016f8f.22.2026.11.11.03.29.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2026 03:29:27 -0800 (PST)
+From: Timo Joannin <timo.joannin@gmail.com>
+To: trintaeoitogc@gmail.com
+Cc: axboe@kernel.dk,
+	bvanassche@acm.org,
+	josef@toxicpanda.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	nbd@other.debian.org,
+	syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com
+Subject: Re: [PATCH] nbd: fix circular lock dependency
+Date: Wed, 11 Nov 2026 12:29:21 +0100
+Message-ID: <20261111112921.306969-1-timo.joannin@gmail.com>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261111101919.215767-1-trintaeoitogc@gmail.com>
+References: <20261111101919.215767-1-trintaeoitogc@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,252 +101,27 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <8b878c802e81b6b8dc57299e05cbda9f3dc94e50.3c3928d4.e7a4.4b9f.86dd.da76b4f384c7@feishu.cn>
-References: <20261103115530.2913093-1-wangjichen@kaihong.com> <90fee426-1a0c-4964-bf20-8175a64917a4@fygo.io> <8b878c802e81b6b8dc57299e05cbda9f3dc94e50.3c3928d4.e7a4.4b9f.86dd.da76b4f384c7@feishu.cn>
-Cc: "Jens Axboe" <axboe@kernel.dk>, "Song Liu" <song@kernel.org>, 
-	"Li Nan" <magiclinan@didiglobal.com>, "Xiao Ni" <xiao@kernel.org>, 
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<linux-raid@vger.kernel.org>, 
-	<syzbot+cd254889291ef8666036@syzkaller.appspotmail.com>
-Subject: Re: [PATCH] md: avoid block autoload while importing rdev under reconfig_mutex
-Date: Wed, 11 Nov 2026 18:37:19 +0800
-User-Agent: Mozilla Thunderbird
-From: "yu kuai" <yukuai@fygo.io>
-X-Original-From: yu kuai <yukuai@fygo.io>
-X-Lms-Return-Path: <lba+26af44564+72bb16+vger.kernel.org+yukuai@fygo.io>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On Wed, Nov 11, 2026 at 0:40 AM, Bart Van Assche <bvanassche@acm.org> wrote:
+> Moving nbd_get_socket() makes this patch much larger than necessary,
+> which makes reviewing and backporting it harder. Adding a single
+> nbd_reclassify_socket(sock) call in nbd_genl_reconnect_sock_cb() right
+> after the nbd_get_socket() call is sufficient. 
 
-=E5=9C=A8 2026/11/11 14:32, =E7=8E=8B=E7=BB=A7=E6=99=A8 =E5=86=99=E9=81=93:
->> From: "yu kuai"<yukuai@fygo.io>
->> Date:=C2=A0 Sun, Nov 8, 2026, 11:18
->> Subject:=C2=A0 Re: [PATCH] md: avoid block autoload while importing rdev=
- under reconfig_mutex
->> To: "Wang Jichen"<wangjichen@kaihong.com>, "Jens Axboe"<axboe@kernel.dk>=
-, "Song Liu"<song@kernel.org>, "Li Nan"<magiclinan@didiglobal.com>, "Xiao N=
-i"<xiao@kernel.org>, <linux-block@vger.kernel.org>, <linux-kernel@vger.kern=
-el.org>, <linux-raid@vger.kernel.org>, "yu kuai"<yukuai@fygo.io>
->> Cc: <syzbot+cd254889291ef8666036@syzkaller.appspotmail.com>
->> Hi,
->>  =20
->> =E5=9C=A8 2026/11/3 19:55, Wang Jichen =E5=86=99=E9=81=93:
->>> From: wangjichen <wangjichen@kaihong.com>
->>>
->>> md_import_device() runs with mddev->reconfig_mutex held from md_ioctl()=
-.
->>> Opening a member disk via bdev_file_open_by_dev() triggers legacy block
->>> autoload (blk_probe_dev), which takes major_names_lock. md_probe() can
->>> run under that lock and call md_alloc(), which takes disks_mutex and
->>> reconfig_mutex =E2=80=94 a lockdep ABBA with the ioctl path.
->>  =20
->> Is this a real deadlock? mddev is already existed from md_import_device(=
-),
->> while md_alloc() just allocate a new mddev, so the reconfig_mtuex is not
->> the same.
-> Hi Kuai,
->
-> Thanks for the question.
->
-> You're right that md_ioctl() holds reconfig_mutex on the existing array
-> mddev, while md_alloc() takes reconfig_mutex on a newly allocated mddev =
-=E2=80=94
-> they are different per-device mutex instances, not the same lock.
->
-> The syzbot/lockdep report is about a lock *class* cycle, not a
-> single-mddev self-deadlock. Lockdep treats all &mddev->reconfig_mutex as
-> one class, so the dependency it reports is:
->
->  =C2=A0 reconfig_mutex -> major_names_lock -> disks_mutex -> reconfig_mut=
-ex
->
-> Concrete race (syzbot extid cd254889291ef8666036, C repro on QEMU):
->
-> - Thread doing ADD_NEW_DISK on array A holds A's reconfig_mutex, then
->  =C2=A0 md_import_device() opens a member via bdev_file_open_by_dev(), wh=
-ich
->  =C2=A0 with legacy autoload calls blk_probe_dev() and takes major_names_=
-lock.
->
-> - Concurrent open of an unregistered md node takes major_names_lock in
->  =C2=A0 blk_probe_dev(), runs md_probe() -> md_alloc() for device B, take=
-s
->  =C2=A0 disks_mutex, then B's reconfig_mutex.
->
-> Without lockdep, the same ABBA ordering between threads can still hang;
-> the syzbot report includes the standard CPU0/CPU1 "Possible unsafe
-> locking scenario" text for this chain.
+Hi Guilherme and Bart,
 
-I still don't understand how is the ABBA deadlock possible, md_alloc() hold
-reconfig_mutex before add_disk() and kobject_add() for mddev->kobj, there i=
-s no
-concurrent context that can hold reconfig_mutex before md_alloc() hold it.
+Thanks for working on this! I'm currently fixing a possible deadlock
+in wg_ratelimiter_uninit 
+(Reported-by: syzbot+72fceb8393e04ce876d9@syzkaller.appspotmail.com)
+involving cpu_hotplug_lock and slab_mutex.
 
->
-> For context on when reconfig_mutex entered the md_alloc() path: the cycle
-> became visible after the fix for the half-initialised kobj window:
->
->  =C2=A0 ca39f7502425 ("md: fix mddev->kobj lifetime")
->  =C2=A0 d1472ca2ca5d ("md: don't hand out the array before md_alloc() has=
- added
->  =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 mddev->kobj=
-")
->
-> The latter holds reconfig_mutex across add_disk() and kobject_add() so
-> ioctls wait instead of touching an uninitialised mddev->kobj (Fixes:
-> ca39f7502425). That closes the kobject race but completes this lockdep
-> ring with ioctl + legacy autoload on the other side.
+My one syzbot test failed because of this lockdep
+false positive that this patch addresses. I applied Bart's suggested 1-line
+fix locally, and will see if it resolves the false positive.
+I will be submitting my cpu_hotplug_lock fix separately.
+I am looking forward to see your v2!
 
-For this test case, you can just use mddev private lockdep class to initial=
-ize
-reconfig_mutex, or if there is still other lockdep wanings please attach th=
-e
-report.
-
->
-> This patch does not revert that behaviour. It only breaks the ioctl-side
-> edge by not triggering legacy block autoload while reconfig_mutex is
-> held: md_import_device() uses bdev_file_open_by_dev_autoload(..., false).
-> Member disks are expected to already exist for normal mdadmin usage; the
-> syz repro still gets -ENXIO for bogus minors, but on a fixed kernel there
-> is no lockdep warning (Tested with syzbot's C repro on QEMU, 6628e7d4
-> bzImage, before/after).
->
-> If maintainers prefer a block-layer approach instead (e.g. not calling
-> md probe callbacks under major_names_lock in blk_probe_dev()), I'm happy
-> to respin.
->
-> Thanks,
-> Jichen
->
->>  =20
->>> Add bdev_file_open_by_dev_autoload() and use autoload=3Dfalse from
->>> md_import_device(); member devices must already be present in the
->>> block layer (normal mdadmin usage).
->>>
->>> Link: https://syzbot.org/bug?extid=3Dcd254889291ef8666036
->>> Reported-by: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com
->>> Tested-by: Wang Jichen <wangjichen@kaihong.com>
->>> Signed-off-by: Wang Jichen <wangjichen@kaihong.com>
->>> ---
->>>  =C2=A0 block/bdev.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 13 ++++++++++=
----
->>>  =C2=A0 drivers/md/md.c =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A08 ++++++--
->>>  =C2=A0 include/linux/blkdev.h | =C2=A02 ++
->>>  =C2=A0 3 files changed, 18 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/block/bdev.c b/block/bdev.c
->>> index f20f91b31..e78936556 100644
->>> --- a/block/bdev.c
->>> +++ b/block/bdev.c
->>> @@ -1076,8 +1076,8 @@ static unsigned blk_to_file_flags(blk_mode_t mode=
-)
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return flags;
->>>  =C2=A0 }
->>>   =20
->>> -struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *h=
-older,
->>> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const struct blk_holder_o=
-ps *hops)
->>> +struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode=
-,
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *holder, =
-const struct blk_holder_ops *hops, bool autoload)
->>>  =C2=A0 {
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct file *bdev_file;
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct block_device *bdev;
->>> @@ -1088,7 +1088,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk=
-_mode_t mode, void *holder,
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (ret)
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return =
-ERR_PTR(ret);
->>>   =20
->>> - =C2=A0 =C2=A0 =C2=A0 =C2=A0bdev =3D blkdev_get_no_open(dev, true);
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0bdev =3D blkdev_get_no_open(dev, autoload)=
-;
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!bdev)
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return =
-ERR_PTR(-ENXIO);
->>>   =20
->>> @@ -1110,6 +1110,13 @@ struct file *bdev_file_open_by_dev(dev_t dev, bl=
-k_mode_t mode, void *holder,
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return bdev_file;
->>>  =C2=A0 }
->>> +EXPORT_SYMBOL(bdev_file_open_by_dev_autoload);
->>> +
->>> +struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *h=
-older,
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const struct blk_holder_o=
-ps *hops)
->>> +{
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0return bdev_file_open_by_dev_autoload(dev,=
- mode, holder, hops, true);
->>> +}
->>>  =C2=A0 EXPORT_SYMBOL(bdev_file_open_by_dev);
->>>   =20
->>>  =C2=A0 struct file *bdev_file_open_by_path(const char *path, blk_mode_=
-t mode,
->>> diff --git a/drivers/md/md.c b/drivers/md/md.c
->>> index 03e35386a..d3717e2e8 100644
->>> --- a/drivers/md/md.c
->>> +++ b/drivers/md/md.c
->>> @@ -3858,9 +3858,13 @@ static struct md_rdev *md_import_device(dev_t ne=
-wdev, int super_format, int supe
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (err)
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto ou=
-t_clear_rdev;
->>>   =20
->>> - =C2=A0 =C2=A0 =C2=A0 =C2=A0rdev->bdev_file =3D bdev_file_open_by_dev(=
-newdev,
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0/*
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 * md_ioctl() holds reconfig_mutex; legacy=
- autoload in bdev open takes
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 * major_names_lock via blk_probe_dev() an=
-d can deadlock with md_probe().
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 */
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0rdev->bdev_file =3D bdev_file_open_by_dev_=
-autoload(newdev,
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 BLK_OPEN_READ | BLK_OPEN_WRITE,
->>> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0super_format =3D=3D -2 ? &claim_rdev : rdev, NULL);
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0super_format =3D=3D -2 ? &claim_rdev : rdev, NULL, false);
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (IS_ERR(rdev->bdev_file)) {
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pr_warn=
-("md: could not open device unknown-block(%u,%u).\n",
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 MAJOR(newdev), MINOR(newdev));
->>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->>> index 0c2010230..e5121101a 100644
->>> --- a/include/linux/blkdev.h
->>> +++ b/include/linux/blkdev.h
->>> @@ -1699,6 +1699,8 @@ struct blk_holder_ops {
->>>   =20
->>>  =C2=A0 struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, =
-void *holder,
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const s=
-truct blk_holder_ops *hops);
->>> +struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode=
-,
->>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *holder, =
-const struct blk_holder_ops *hops, bool autoload);
->>>  =C2=A0 struct file *bdev_file_open_by_path(const char *path, blk_mode_=
-t mode,
->>>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 void *h=
-older, const struct blk_holder_ops *hops);
->>>  =C2=A0 int bd_prepare_to_claim(struct block_device *bdev, void *holder=
-,
->>  =20
->> --=20
->> Thanks,
->> Kuai
->>  =20
-
---=20
 Thanks,
-Kuai
+Timo Joannin
