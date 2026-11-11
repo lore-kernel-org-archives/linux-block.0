@@ -1,69 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.34
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=183.62.165.209
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794409088;
-	b=y53TS6k9Xkikh7WhBJ6QNINPobmwjJe5FCi7s8HoS+yeWrXaIlHDQ2vLEm8KGmvP8Ccf
-	 MgtkIxsuNdtJ0wcJKmgYD9lZj6dhzUVfN+Vp0Sitwubaf1sKL2vO7p9y5I+gDL9V0eOew
-	 0mJzb6jGeOepAblIq10QT4GmvHEjerH85n7asnw+B7Q7tHWYRpeVxLRDf07yTyG0GkoSR
-	 m2/WIEjl1NuA526w+8wDnbVDy9Dh4/md7L3XxKKdogr39VRJWZ78EI5dlu4coe+YAOVBi
-	 Cl7pwl0XLd4bwUbvxBItcBq5vDFctv2in/cITpRqPNkROUey8dv+bBAa7iVMrRLp+yA==
+	t=1794409091;
+	b=HrmEP8Fvl4sDIIYMea6jxQJWUgcosdtppvkx1Iz8IkF88fJupwpJIMkaai8noln8drks
+	 uI55isrnwRKPhYG/ZvMgxhJoMurCDkiKT8/TtHqIGRyqsUiWBLzbUrilXaEJ2enlaYq6D
+	 sJ5SaLUqDHVw3zFLfCtvljyya4CsYNuoIpD/VI8N4v/QH/8Ty9gRZ24lZfvPvVyLHStWY
+	 bW1lWFIXdbIyB7p/rZRlq4/mF4lttvoFwUgqgONDUBEyirfLyb8L81XqQugmAugo6EIuB
+	 W+p9f48Mki1lmOzWeh9gLZx6sUwmF84xnxUmEdLxilCdDwWHWUPNxO8RkUQXJOYX6Gw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794409088;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794409091;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
 	 X-Zmail-TransId:X-Mailer:Message-ID:In-Reply-To:References:Date:
 	 Mime-Version:From:To:Cc:Subject:Content-Type:X-MAIL:X-TLS:
 	 X-ENVELOPE-SENDER:X-SOURCE-IP:X-CLEAN:X-Fangmail-Anti-Spam-Filtered:
 	 X-Fangmail-MID-QID;
-	bh=ZmVOIgqY7UvElWZIETg1Cecmw95r6BvR1m9duw4jE34=;
-	b=4FMdRcwrbfV1cM8NrSBFvRTX+k9YI1131kxwX5mJk5eDhRxomyhydn0Y/j2/J7K8eQMk
-	 a5gtmprNykU0vYokQVkEnzXANyLbPsvgyLaYwMTpFrzJDnbqA0QA5jp3AOlGVlsqYe6NQ
-	 fxNfEBpUeJH0aTCn8Evu80pmAZFuAtLmP0NEq2tmM7Zf6jl2KVoRNzzH0et7cPdP+CcW9
-	 fvaqIg9dp4DfOkgh9UpI7Mvlo25iuDGPnygsVHctSitDpZrg4ABjrY7Hi7kAlOyAQS3Mw
-	 4xvnRURjPggbCx3R50Mrvdxa/S1h0BApO9W92BcbKlmrSIOi+S5RwuvG+JcqiRg/tRg==
+	bh=3UcmAD2O5M6J4W2MnDVVK7WCpwTBcwfIWTbYAgmShto=;
+	b=NUYMuPD9Ji7v7TNT+5FT7cdRywI+IV20ozrYpIy75BxTYIKJst/eOLhyZ+N9osKqTWwt
+	 +EWG4WvKUoZlIV+dsWsBwsfe/9EAHHOOmozvIA93k/RDXrDhk07l5vgBWmNxFzcJRwMwo
+	 a009fOqOAW/OZUeh7HdTZP0yvsKgtryq2VL0A6QKvAyHQtYxFhhejtgn2gyAKr+AfD53H
+	 mOQ8RRuQI+Gw91FuRL2WI+OBLdEarD4hlogxFpHHlfhmwv4tfZUuqg6MrBk14EsMS2DLm
+	 PtmEsrAaITuoDINo7dbCY3RCUH2O3n+AysoJZME+2Cs6CgR/Q4TgJ9U/olIEyQoi/aQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=zte.com.cn;
 	spf=pass smtp.mailfrom=zte.com.cn;
-	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b="Uk6/S38Q";
-	arc=none smtp.remote-ip=160.30.148.34
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=dSaDc9gC;
+	arc=none smtp.remote-ip=183.62.165.209
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCB8606A32D;
-	Wed, 11 Nov 2026 14:58:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBCB8606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EEC606A8B6;
+	Wed, 11 Nov 2026 14:58:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 79EEC606A8B6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=Uk6/S38Q
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	dkim=pass (2048-bit key) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=dSaDc9gC
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jPmq22VzCz5BNRx;
-	Wed, 11 Nov 2026 22:58:06 +0800 (CST)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4jPmpv0Wcfz4xPSp;
+	Wed, 11 Nov 2026 22:57:59 +0800 (CST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
-	s=z202610; t=1794409086;
-	bh=Pp7nVk6cyVDatBLjK7a+1BF0c26oi4E5Yg+DHfhszHs=;
+	s=z202610; t=1794409079;
+	bh=wQvKiUyO5od0WgKA+S14UEB4DR0uKqEqs67IGBDqK5Y=;
 	h=In-Reply-To:References:Date:From:To:Cc:Subject;
-	b=Uk6/S38QCUCKr7/e1R+9gXReUdQRMN7GOBhYxV+VNsRQ+DmUzHJVjpm1JQ6i613GA
-	 QSUAa3RI1HJGYy1Mt9+cBUyrWhjCl+YgBBsjBwWhHN81esGIVYaN2EZN8mPFug3brO
-	 MEHQ0m7pD8aWp8QjcjsDsyjD/nOan+ap15gw5IqcqwaDNiEgbetTFi8Bx17QweTqMV
-	 xs59uwa7GlgUdnFQ6IcTLYgAjqz7gTRklHwUgQ51+pH7UHJ/mskkBT9MhYLG8PPWUW
-	 w/JRQGHMIxWEKvEfNqQz0S1/IkmDg6NG2vVqZaT8OroGSkEYFYHzcp7Xvtu9H2/9C8
-	 a3eKfcptXKtRw==
-Received: from xaxapp04.zte.com.cn ([10.99.98.157])
-	by mse-fl1.zte.com.cn with SMTP id 6ABEvs8T003777;
-	Wed, 11 Nov 2026 22:57:54 +0800 (+08)
+	b=dSaDc9gCovkB34zjXxN/LnupcnCQ5nsurDrqvW3GRz2JfOBIdvYA9A6gC3KAgNXJg
+	 S5SnGGejkmRxhGqMvYB2gOdwcddFbUGO+rCwJZUvdW7MoGAFL20RVx54sG0k1PFhKO
+	 dXtjBSJWGhklc8Cm7M3wqHVB3fXeX9Mg/L6wTt/S4QP9CvxegI2JVlDZdXD7hm4D+Q
+	 2a11uAksLmleO9A21uTRgBxKjTXDhqv7FEEq/G4i4gRQhOasCIftVo1cV96hDr8Cku
+	 RM14PYqOqDIJDDzYUT0iwCW3+acrMDBhs7xYoOwFwvpCNLkWyRBHGyN0PaaIVBTZYR
+	 iXUVlngg1f8uw==
+Received: from xaxapp02.zte.com.cn ([10.88.97.241])
+	by mse-fl2.zte.com.cn with SMTP id 6ABEvvxq073370;
+	Wed, 11 Nov 2026 22:57:57 +0800 (+08)
 	(envelope-from shao.mingyin@zte.com.cn)
 Received: from mapi (xaxapp04[null])
 	by mapi (Zmail) with MAPI id mid32;
-	Wed, 11 Nov 2026 22:57:58 +0800 (CST)
-X-Zmail-TransId: 2afb6af48276ab5-70991
+	Wed, 11 Nov 2026 22:58:01 +0800 (CST)
+X-Zmail-TransId: 2afb6af48279b97-70a73
 X-Mailer: Zmail v1.0
-Message-ID: <202611112257584444otw2q05tB3ZkEpW5_Q9j@zte.com.cn>
+Message-ID: <20261111225801025TKHDW7iZbMR4sFQAc8af5@zte.com.cn>
 In-Reply-To: <202611112257529855AMDZLzg8ZmFDQ3fBstbi@zte.com.cn>
 References: 202611112257529855AMDZLzg8ZmFDQ3fBstbi@zte.com.cn
-Date: Wed, 11 Nov 2026 22:57:58 +0800 (CST)
+Date: Wed, 11 Nov 2026 22:58:01 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -77,282 +77,116 @@ From: <shao.mingyin@zte.com.cn>
 To: <tom.leiming@gmail.com>, <shuah@kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kselftest@vger.kernel.org>
 Cc: <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIIDEvNF0gc2VsZnRlc3RzOiB1YmxrOiBwcm9wYWdhdGUgcmVjb3Zlcnkgd29ya2VyIGZhaWx1cmVz?=
+Subject: =?UTF-8?B?W1BBVENIIDMvNF0gdWJsazogY2FuY2VsIGNvbW1pdHMgYXJyaXZpbmcgYWZ0ZXIgdGhlIHF1aWVzY2Ugc2Nhbg==?=
 Content-Type: text/plain;
 	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 6ABEvs8T003777
+X-MAIL:mse-fl2.zte.com.cn 6ABEvvxq073370
 X-TLS: YES
 X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
-X-SOURCE-IP: 10.5.228.132 unknown Wed, 11 Nov 2026 22:58:06 +0800
+X-SOURCE-IP: 10.5.228.133 unknown Wed, 11 Nov 2026 22:57:59 +0800
 X-CLEAN: YES
 X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6AF4827E.000/4jPmq22VzCz5BNRx
+X-Fangmail-MID-QID: 6AF48277.000/4jPmpv0Wcfz4xPSp
 
 From: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-The recovery tests update ERR_CODE in background subshells and use wait
-without PIDs. A worker can report a failure while the parent still prints
-PASS and exits with zero. Calling _show_result() from a failed worker also
-removes shared backing files while other workers may still be using them.
+QUIESCE_DEV marks the queues canceling and cancels pending commands.
+A server can still be processing an I/O when that scan passes its slot.
+If it submits COMMIT_AND_FETCH_REQ afterwards, the newly published
+command can remain queued without a future request to complete it.
+The server waits for that completion and the device remains LIVE.
 
-Wait for each recorded worker PID and aggregate its status in the parent,
-keeping failures ahead of skips and preserving errors across batches.
-Return worker and device-creation errors without reporting or cleaning up
-from the child, so the parent can finish waiting before shared cleanup.
+Share the cancellation claim with the command handler and use it after
+processing a commit when the queue is canceling. The cancel lock and
+CANCELED flag ensure that the control path and command handler cannot
+complete the same command twice.
 
-Fixes: 57e13a2e8cd2 ("selftests: ublk: support user recovery")
-Fixes: 533c87e2ed74 ("selftests: ublk: add test for UBLK_F_QUIESCE")
-Fixes: 63276182c513 ("selftests: ublk: add user copy test cases")
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+Fixes: b465ae7b2524 ("ublk: add feature UBLK_F_QUIESCE")
+Cc: stable@vger.kernel.org
 Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
 ---
-v2:
-  - simplify the worker wait loop, as requested by Ming Lei.
-  - the simplified loop is exercised by the real-kernel recovery runs
-    described in the stress-worker patch of this series.
-v1: https://lore.kernel.org/all/202611092358134332uegNg75loROSwL53Em6A@zte.com.cn/
+Tested on next-20261105 with CONFIG_BLK_DEV_UBLK=y in a local QEMU/KVM
+VM (4 vCPUs, 4 GiB), using real ublk devices and fio. A test-only server
+hook held one COMMIT across a successful quiesce, then released it.
+In two runs per version, the original kernel left the device LIVE until
+a second quiesce; the fixed kernel reached QUIESCED without that retry.
+The paired runs used the same userspace probe and no kernel diagnostics.
 
-Tested on native x86_64 Bash 5.2 with the recovery scripts and common
-helpers from the unpatched and patched trees. Device and I/O operations
-were replaced by test-only stubs. Single-worker failures at every launch
-position, multiple failures, skips, signal termination and device-creation
-errors no longer produce a final PASS or a zero exit status. Successful
-runs still pass, and cleanup follows all worker exits. Prerequisite skips
-still exit before preparation. The 71 scenarios passed their expected
-checks on each tree. This does not exercise real ublk devices or I/O.
+The four original recovery scripts also passed twice with this change
+and a separate batch SQE initialization fix, without C or driver
+diagnostic instrumentation or reduced fio load.
 
- tools/testing/selftests/ublk/test_common.sh   | 20 +++++++++++++++++--
- .../testing/selftests/ublk/test_recover_01.sh | 20 +++++++++++++++----
- .../testing/selftests/ublk/test_recover_02.sh | 20 +++++++++++++++----
- .../testing/selftests/ublk/test_recover_03.sh | 20 +++++++++++++++----
- .../testing/selftests/ublk/test_recover_04.sh | 14 ++++++++++---
- 5 files changed, 77 insertions(+), 17 deletions(-)
+ drivers/block/ublk_drv.c |   40 ++++++++++++++++++++++++++--------------
+ 1 file changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
-index af2ea4f..367df2d 100755
---- a/tools/testing/selftests/ublk/test_common.sh
-+++ b/tools/testing/selftests/ublk/test_common.sh
-@@ -379,6 +379,23 @@ run_io_and_kill_daemon()
- 	fi
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 3d322fa1b..082f105f1 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -2792,14 +2792,33 @@ static void ublk_start_cancel(struct ublk_device *ub)
+ 	ublk_put_disk(disk);
  }
  
-+# Collect recovery workers in the parent before removing shared backing files.
-+_wait_recovery_tests()
++static void ublk_complete_cancelled_cmd(struct ublk_queue *ubq,
++					struct ublk_io *io,
++					unsigned int issue_flags)
 +{
-+	local pid
-+	local ret
++	struct io_uring_cmd *cmd = NULL;
++	bool done;
 +
-+	for pid in "$@"; do
-+		wait "$pid" && continue
-+		ret=$?
++	spin_lock(&ubq->cancel_lock);
++	done = !!(io->flags & UBLK_IO_FLAG_CANCELED);
++	if (!done) {
++		io->flags |= UBLK_IO_FLAG_CANCELED;
++		/* dependency ordered against smp_wmb() in ublk_prep_cancel() */
++		cmd = READ_ONCE(io->cmd);
++		io->cmd = NULL;
++	}
++	spin_unlock(&ubq->cancel_lock);
 +
-+		# A failure takes precedence over a skipped worker.
-+		if [ "$ERR_CODE" -eq 0 ] || [ "$ERR_CODE" -eq "$UBLK_SKIP_CODE" ]; then
-+			ERR_CODE=$ret
-+		fi
-+	done
++	if (!done && cmd)
++		io_uring_cmd_done(cmd, UBLK_IO_RES_ABORT, issue_flags);
 +}
 +
- run_io_and_recover()
+ static void ublk_cancel_cmd(struct ublk_queue *ubq, u16 tag,
+ 		unsigned int issue_flags)
  {
- 	local size=$1
-@@ -387,8 +404,7 @@ run_io_and_recover()
- 	local dev_id
+ 	struct ublk_io *io = &ubq->ios[tag];
+ 	struct ublk_device *ub = ubq->dev;
+-	struct io_uring_cmd *cmd = NULL;
+ 	struct request *req;
+-	bool done;
  
- 	shift 2
--	dev_id=$(_add_ublk_dev "$@")
--	_check_add_dev "$TID" $?
-+	dev_id=$(_add_ublk_dev "$@") || return $?
+ 	if (!(io->flags & UBLK_IO_FLAG_ACTIVE))
+ 		return;
+@@ -2818,18 +2837,7 @@ static void ublk_cancel_cmd(struct ublk_queue *ubq, u16 tag,
+ 	if (req && blk_mq_request_started(req) && req->tag == tag)
+ 		return;
  
- 	fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio \
- 		--rw=randread --iodepth=256 --size="${size}" --numjobs=4 \
-diff --git a/tools/testing/selftests/ublk/test_recover_01.sh b/tools/testing/selftests/ublk/test_recover_01.sh
-index 1cddc23..950928a 100755
---- a/tools/testing/selftests/ublk/test_recover_01.sh
-+++ b/tools/testing/selftests/ublk/test_recover_01.sh
-@@ -11,8 +11,8 @@ ublk_run_recover_test()
- 	ERR_CODE=$?
- 	if [ ${ERR_CODE} -ne 0 ]; then
- 		echo "$TID failure: $*"
--		_show_result $TID $ERR_CODE
- 	fi
-+	return "$ERR_CODE"
+-	spin_lock(&ubq->cancel_lock);
+-	done = !!(io->flags & UBLK_IO_FLAG_CANCELED);
+-	if (!done) {
+-		io->flags |= UBLK_IO_FLAG_CANCELED;
+-		/* dependency ordered against smp_wmb() in ublk_prep_cancel() */
+-		cmd = READ_ONCE(io->cmd);
+-		io->cmd = NULL;
+-	}
+-	spin_unlock(&ubq->cancel_lock);
+-
+-	if (!done && cmd)
+-		io_uring_cmd_done(cmd, UBLK_IO_RES_ABORT, issue_flags);
++	ublk_complete_cancelled_cmd(ubq, io, issue_flags);
  }
  
- if ! _have_program fio; then
-@@ -25,20 +25,32 @@ _create_backfile 0 256M
- _create_backfile 1 128M
- _create_backfile 2 128M
- 
-+pids=()
- ublk_run_recover_test -t null -q 2 -r 1 -b &
-+pids+=("$!")
- ublk_run_recover_test -t loop -q 2 -r 1 -b "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_recover_test -t stripe -q 2 -r 1 -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
-+pids=()
- ublk_run_recover_test -t null -q 2 -r 1 &
-+pids+=("$!")
- ublk_run_recover_test -t loop -q 2 -r 1 "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_recover_test -t stripe -q 2 -r 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
-+pids=()
- ublk_run_recover_test -t null -q 2 -r 1 -i 1 &
-+pids+=("$!")
- ublk_run_recover_test -t loop -q 2 -r 1 -i 1 "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_recover_test -t stripe -q 2 -r 1 -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
- _cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_recover_02.sh b/tools/testing/selftests/ublk/test_recover_02.sh
-index 9c3f481..beeeb35 100755
---- a/tools/testing/selftests/ublk/test_recover_02.sh
-+++ b/tools/testing/selftests/ublk/test_recover_02.sh
-@@ -11,8 +11,8 @@ ublk_run_recover_test()
- 	ERR_CODE=$?
- 	if [ ${ERR_CODE} -ne 0 ]; then
- 		echo "$TID failure: $*"
--		_show_result $TID $ERR_CODE
- 	fi
-+	return "$ERR_CODE"
- }
- 
- if ! _have_program fio; then
-@@ -29,20 +29,32 @@ _create_backfile 0 256M
- _create_backfile 1 128M
- _create_backfile 2 128M
- 
-+pids=()
- ublk_run_recover_test -t null -q 2 -r 1 -z -b &
-+pids+=("$!")
- ublk_run_recover_test -t loop -q 2 -r 1 -z -b "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_recover_test -t stripe -q 2 -r 1 -z -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
-+pids=()
- ublk_run_recover_test -t null -q 2 -r 1 -z &
-+pids+=("$!")
- ublk_run_recover_test -t loop -q 2 -r 1 -z "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_recover_test -t stripe -q 2 -r 1 -z "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
-+pids=()
- ublk_run_recover_test -t null -q 2 -r 1 -z -i 1 &
-+pids+=("$!")
- ublk_run_recover_test -t loop -q 2 -r 1 -z -i 1 "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_recover_test -t stripe -q 2 -r 1 -z -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
- _cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_recover_03.sh b/tools/testing/selftests/ublk/test_recover_03.sh
-index 92f4012..0c6b312 100755
---- a/tools/testing/selftests/ublk/test_recover_03.sh
-+++ b/tools/testing/selftests/ublk/test_recover_03.sh
-@@ -11,8 +11,8 @@ ublk_run_quiesce_recover()
- 	ERR_CODE=$?
- 	if [ ${ERR_CODE} -ne 0 ]; then
- 		echo "$TID failure: $*"
--		_show_result $TID $ERR_CODE
- 	fi
-+	return "$ERR_CODE"
- }
- 
- if ! _have_feature "QUIESCE"; then
-@@ -29,20 +29,32 @@ _create_backfile 0 256M
- _create_backfile 1 128M
- _create_backfile 2 128M
- 
-+pids=()
- ublk_run_quiesce_recover -t null -q 2 -r 1 -b &
-+pids+=("$!")
- ublk_run_quiesce_recover -t loop -q 2 -r 1 -b "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_quiesce_recover -t stripe -q 2 -r 1 -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
-+pids=()
- ublk_run_quiesce_recover -t null -q 2 -r 1 &
-+pids+=("$!")
- ublk_run_quiesce_recover -t loop -q 2 -r 1 "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_quiesce_recover -t stripe -q 2 -r 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
-+pids=()
- ublk_run_quiesce_recover -t null -q 2 -r 1 -i 1 &
-+pids+=("$!")
- ublk_run_quiesce_recover -t loop -q 2 -r 1 -i 1 "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_quiesce_recover -t stripe -q 2 -r 1 -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
- _cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_recover_04.sh b/tools/testing/selftests/ublk/test_recover_04.sh
-index 4c83c18..232ae7d 100755
---- a/tools/testing/selftests/ublk/test_recover_04.sh
-+++ b/tools/testing/selftests/ublk/test_recover_04.sh
-@@ -11,8 +11,8 @@ ublk_run_recover_test()
- 	ERR_CODE=$?
- 	if [ ${ERR_CODE} -ne 0 ]; then
- 		echo "$TID failure: $*"
--		_show_result $TID $ERR_CODE
- 	fi
-+	return "$ERR_CODE"
- }
- 
- if ! _have_program fio; then
-@@ -25,15 +25,23 @@ _create_backfile 0 256M
- _create_backfile 1 128M
- _create_backfile 2 128M
- 
-+pids=()
- ublk_run_recover_test -t null -q 2 -r 1 -u &
-+pids+=("$!")
- ublk_run_recover_test -t loop -q 2 -r 1 -u "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_recover_test -t stripe -q 2 -r 1 -u "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
-+pids=()
- ublk_run_recover_test -t null -q 2 -r 1 -u -i 1 &
-+pids+=("$!")
- ublk_run_recover_test -t loop -q 2 -r 1 -u -i 1 "${UBLK_BACKFILES[0]}" &
-+pids+=("$!")
- ublk_run_recover_test -t stripe -q 2 -r 1 -u -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
--wait
-+pids+=("$!")
-+_wait_recovery_tests "${pids[@]}"
- 
- _cleanup_test
- _show_result $TID $ERR_CODE
+ /*
+@@ -3560,6 +3568,10 @@ static int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
+ 			req->__sector = addr;
+ 		if (compl)
+ 			__ublk_complete_rq(req, io, ublk_dev_need_map_io(ub), NULL);
++
++		/* Quiesce may have scanned this slot before this command arrived. */
++		if (unlikely(READ_ONCE(ubq->canceling)))
++			ublk_complete_cancelled_cmd(ubq, io, issue_flags);
+ 		break;
+ 	}
+ 	case UBLK_IO_NEED_GET_DATA:
