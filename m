@@ -1,67 +1,123 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794434333;
-	b=MCID/QlGR28hBugg03HjhlTAS//ju/b5lY5b3LxtIPkifBMtfNS10pR3MQ9o/RhQCw4x
-	 QczEHN8Eed+YKCQA41HUCZXZz2XvGz8IpQgLREG46RmQ8zI98/DzyjBH1Q6F/JAF4UN2t
-	 dJIw9ZelsI/+vXb10v/JrRAb7X2jxMNKW99LDNxuAZzOWKmvg2YkF4mJs+qlHjqCbYu+j
-	 X4IMD87RMfltdzBtypUYxVR94/yy+HtktXfHUr9/CbjMnT1wlYYoamR9svP7xqoRGxX9Y
-	 RX9pVNTxKxGT6JV+hkBhsXse+YqoxHjrP7Frg0KsodZ/xWzpcTCHLUdvZJrVepjrQOg==
+	t=1794434587;
+	b=m0rJNXonjjzzwcTDcwTO4H1ldWx2S483c/CamjyQxS7tHfthY19pXuJ5mWXKXZgrmn9/
+	 zCyem5ACf1s8qYMaBl+RTOvNQRX4E7Siq5VCwrj0N3aFsJA/+JtSpg8wBP4VxEJuFMyxc
+	 2daXbJMRdBow7664nIwUmXNtHWAfVyTBNDdgdgSYhkWsD7DrBuqjE1J/D6yNcQCrSREpw
+	 lFw0SXr/a6Fp//aNF1HX7Ucud6e/iJRWSemd4gTWmSZN+XweB4RLrS9ukaWzvzYJJfhGz
+	 9fml/LOt8SWAtlhWgRMMGL7YyzrP/LUpaRYumD1GgEI9v6okCbNVAXFASPd3LyeP5gg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794434333;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=x1LsmbxOAx5CXXj8AXKZuuDkplqUnZlYf0CHx0xt86k=;
-	b=k3nUfa0RS0Mcp9+SngP+mPSgTAd9fvA19VgaiQTCiecmq78y2h3xE3X00rkJCUKp121/
-	 uPO+zuc6hmGrXMZk/8VqsH4YpeBOUCsLM5sTgBJeSXscWFc0F5yPJ3QthX+rObJoz4wGQ
-	 K0+2mqYJuV01zU8HiWjYIgR3YnJvh+k9/9lG1QkQfZAsjAdiCGVZ39xeubYVLKqWQC36g
-	 Jqtkd26kS8HMW55pMhJgDP1G1CD2X0fXZXoZBH51Qw6fSIE+RhHbRRDZmhP7FLXq6WbrK
-	 qjRjesfzlj5GwQEm9ukiZRhY5L8RUZrVkW0em4zXbL1lYXTiQyj9q1MmxOwZe1wbk7A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794434587;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 Mail-Followup-To:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=/29Fh1u2FOm5/5k1pmwlztbcmx561O6eu158ApMSsyU=;
+	b=oDLLqt2wZocMgWJg+j0Xz9D0Ncm7u4C7fyJizRS281dwA7RhjGR90esX195TmYd9taxq
+	 DwZw2WoEcxZ7dK7WtSk8N8ClxxsmuJ3j7XUuvlvGJwBx5d4i/pXO17rNfWNgL0UttUjSW
+	 el/a6J3GinaCMJgsmuQB1VZZEdgNn9AAygnKMp+QgKrYUO6dHN3hfprNfIfueoRJLQcD2
+	 jaY3J2mzyRMzUTIW8wp3L1caGOEiM8UOagT4m1PHCU/vt3aYVQk/xPGX69ABXpu1c275i
+	 +bIcDBqpTo/EVqtt8gknlNJkm9kqDQSJcPhVsTzS3Ftg5ndS1zVEsSlZyWJI7gt3dDg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=dYQYnpiM;
-	arc=none smtp.remote-ip=91.218.175.71
-Received: from mta0.migadu.com (out-71.mta0.migadu.com [91.218.175.71])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H2HTk8rO;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9F5606A8B7
-	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 21:58:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C9F5606A8B7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B77606A32D;
+	Wed, 11 Nov 2026 22:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=dYQYnpiM
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=tiZlHIKEfkKGCmYVTR7dQpyeUw+qsEmn5z+EEQEQDqE=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794434330; v=1; x=1795039130;
- b=dYQYnpiM8xHuFoDFccnswGD2mZ/elVIIHaAZpSXKS+q8NDpE6G/pcO/vakqaYWD0LQZYRcMf
- 4XaPjBH97r2W3Rj/y+I+7pFE3ySQIjFIqRqAklavXTA9wotQFcJyiHTGHaTor7Ch2eG+qb18Rvs
- BkvPQcW/MLDhIiYT2abNZXuA=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id c9c772de2866fb27;
-	Wed, 11 Nov 2026 21:58:50 +0000
-X-Mizu-Trace-ID: c9c772de2866fb27
-X-Migadu-Flow: FLOW_OUT
-From: Md Haris Iqbal <haris.iqbal@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Md Haris Iqbal <haris.iqbal@linux.dev>
-Subject: [v4 3/3] Documentation: block: document error injection delay feature
-Date: Wed, 11 Nov 2026 22:58:38 +0100
-Message-ID: <20261111215838.103356-4-haris.iqbal@linux.dev>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261111215838.103356-1-haris.iqbal@linux.dev>
-References: <20261111215838.103356-1-haris.iqbal@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H2HTk8rO
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2E751F00A05;
+	Wed, 11 Nov 2026 22:02:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794434586;
+	bh=/29Fh1u2FOm5/5k1pmwlztbcmx561O6eu158ApMSsyU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=H2HTk8rOLZgWw9Lm2uB8it44XJGQ1VP252zKM3Vsl27YeQT3fQC/oPf+9dR1GGuPe
+	 fTrdVHJg83sazuCLRwsK7FMBmZ65BjYmx/5l1Fr9V4zrWbVX2E4c/EGrAZHOJ23iP5
+	 K6oVJy3Ue6XdepxFi87RWoq3TdzVK9qDLL8BM8XMCz9n7H3pjJ8s2COHz+NjnFIDwg
+	 2eGJ+4dbOKk2dBpxqBDuRpXAU1slNtJxbA2Dkar3W/730CiqV+uxXwdTMmafxIRXoH
+	 hanK6KHxVmWrohkzaChiP47GtgTq+nQUar+jL+4xWJclsB1e8afff/e4uoWiQs4JB9
+	 jrQrJYXOzTbWA==
+Date: Wed, 11 Nov 2026 23:02:51 +0100
+From: Gao Xiang <xiang@kernel.org>
+To: Michal Wilczynski <m.wilczynski@samsung.com>
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>,
+	Nick Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>,
+	Chao Yu <chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Laight <david.laight.linux@gmail.com>,
+	Sungguk <sungguk.na@samsung.com>,
+	Jaehoon Chung <jh80.chung@samsung.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 12/15] lib/lz4: widen LZ4_DECOMPRESS_INPLACE_MARGIN
+ for the fast decode loop
+Message-ID: <avTmC_1I59FKA1FN@MacBookPro.fritz.box>
+Mail-Followup-To: Michal Wilczynski <m.wilczynski@samsung.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>,
+	Nick Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>,
+	Chao Yu <chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Laight <david.laight.linux@gmail.com>,
+	Sungguk <sungguk.na@samsung.com>,
+	Jaehoon Chung <jh80.chung@samsung.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-crypto@vger.kernel.org
+References: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
+ <CGME20261106144309eucas1p2a9bfcc1cf81779d473fb073e7d9139b7@eucas1p2.samsung.com>
+ <20261106-lz4-vendor-upstream-v2-12-ee04c3f0d7dc@samsung.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -71,89 +127,42 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20261106-lz4-vendor-upstream-v2-12-ee04c3f0d7dc@samsung.com>
 
-Document the delay_us option: the delay happens above the driver, a
-delayed bio is not run through the rules again, and holding a bio back
-reorders it against bios submitted later.
+Hi Michal,
 
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
----
- Documentation/block/error-injection.rst | 39 +++++++++++++++++++++----
- 1 file changed, 34 insertions(+), 5 deletions(-)
+On Fri, Nov 06, 2026 at 03:42:52PM +0100, Michal Wilczynski wrote:
+> erofs decompresses a pcluster in place when the slack after the output
+> is at least LZ4_DECOMPRESS_INPLACE_MARGIN(compressed size), upstream's
+> (compressedSize >> 8) + 32.
+> 
+> That holds for the fork, which overshoots its output by at most 8
+> bytes. Upstream's LZ4_FAST_DEC_LOOP, which the next patch brings in for
+> x86 and arm64, copies in 32-byte steps and can overwrite input it has
+> not read yet: of 172410 valid streams laid out as erofs does at exactly
+> that margin, 3660 fail to decode, none with the fork. The worst needs
+> (compressedSize >> 8) + 33. Images mkfs.erofs built did not hit this,
+> but nothing in the format rules it out.
+> 
+> Use (compressedSize >> 8) + (compressedSize >> 15) + 36, which takes a
+> 4K pcluster's margin from 48 to 52 bytes. Upstream's lz4.h defines the
+> macro too, so undefine it first.
+> 
+> Signed-off-by: Michal Wilczynski <m.wilczynski@samsung.com>
 
-diff --git a/Documentation/block/error-injection.rst b/Documentation/block/error-injection.rst
-index 81f31af82e65..3c86defddb80 100644
---- a/Documentation/block/error-injection.rst
-+++ b/Documentation/block/error-injection.rst
-@@ -7,9 +7,9 @@ Configurable Error Injection
- Overview
- --------
- 
--Configurable error injection allows injecting specific block layer status codes
--for sector ranges of a block device.  Errors can be injected unconditionally, or
--with a given probability.
-+Configurable error injection allows injecting delays and/or specific block
-+layer status codes for sector ranges of a block device by adding rules.  The
-+rules can be configured to trigger unconditionally, or with a given probability.
- 
- To use configurable error injection, CONFIG_BLK_ERROR_INJECTION must be enabled.
- 
-@@ -34,15 +34,36 @@ op=<string>		block layer operation this rule applies to.  This uses
- 			the XYZ for each REQ_OP_XYZ operation, e.g. READ, WRITE
- 			or DISCARD. Mandatory.
- status=<string>		Status to return.  This uses XYZ for each BLK_STS_XYZ
--			code, e.g. IOERR or MEDIUM. Mandatory.
-+			code, e.g. IOERR or MEDIUM.  Mandatory unless delay_us
-+			is given.
- start=<number>		First block layer sector the rule applies to.
- 			Optional, defaults to 0.
- nr_sectors=<number>	Number of sectors this rule applies.
- 			Optional, defaults to the remainder of the device.
--chance=<number>		Only return a failure with a likelihood of 1/chance.
-+chance=<number>		Only apply the rule with a likelihood of 1/chance.
- 			Optional, defaults to 1 (always).
-+delay_us=<number>	Hold the bio back for this many microseconds.  Without
-+			status the bio is then submitted to the device as
-+			usual.  With status it is failed once the delay has
-+			expired.  Bios with REQ_NOWAIT set fail with
-+			BLK_STS_AGAIN.  Optional, defaults to 0 (no delay).
-+			Values above 600 seconds are rejected.
- ===================	=======================================================
- 
-+Delays
-+------
-+
-+A delayed bio is held above the driver, so the device never sees a slow I/O.
-+A delay does not reach the blk-mq timeout handler or SCSI error handling.
-+
-+A bio that matched a delay rule is not evaluated against the rules again, even
-+after it is split and resubmitted internally.  Removing a rule does not release
-+bios it is already delaying.
-+
-+Holding a bio back reorders it against bios submitted later.  On zoned devices
-+this breaks sequential write ordering and the block layer fails the
-+out-of-order writes, so only delay reads there.
-+
- Example
- -------
- 
-@@ -54,6 +75,14 @@ Return BLK_STS_MEDIUM for every write to /dev/nvme0n1:
- 
- 	$ echo 'add,op=WRITE,start=0,status=MEDIUM' > /sys/kernel/debug/block/nvme0n1/error_injection
- 
-+Delay every read of /dev/nvme0n1 by 10 milliseconds, then issue it normally:
-+
-+	$ echo 'add,op=READ,delay_us=10000' > /sys/kernel/debug/block/nvme0n1/error_injection
-+
-+Fail one in 100 writes with BLK_STS_TIMEOUT, but only after 30 seconds:
-+
-+	$ echo 'add,op=WRITE,status=TIMEOUT,chance=100,delay_us=30000000' > /sys/kernel/debug/block/nvme0n1/error_injection
-+
- Remove all rules for /dev/nvme0n1:
- 
- 	$ echo 'removeall' > /sys/kernel/debug/block/nvme0n1/error_injection
--- 
-2.53.0
+First, I really think kernel LZ4 should be updated for many years, so
+thanks for this!
 
+But my personal thought is that could you just fold this patch into
+the next one ("lib/lz4: switch the decompressor to the vendored sources")?
+Because this one should be part of the fast loop update.
+
+Although the current patch order is also fine, but my potential concern
+is that people don't know the details maybe pick the random ones for
+backporting, which is what I'd like to avoid so I hope this patch could
+be just part of it, otherwise the inplace decompression could be broken.
+
+Thanks,
+Gao Xiang
