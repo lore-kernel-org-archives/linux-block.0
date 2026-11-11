@@ -1,100 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794379667;
-	b=XdikoefGd57ikSZNrQPgcz87ZxChAQqxcW6KmG21BzPOUe28/BGQQIwFasvVyOvzAYcl
-	 EpXAoj6RpxYpai5+p2NUKKKWTi8UptxB7F64+nc1wWIa7IeZTpsRqy3h1d1T2rcwKfcEy
-	 6X8VO+XjrLLn3z6L5jeS/4vASKVkEaS3/Vz3qAJS2RLFPAXWCukpgk75ChfqUGn3sMbgo
-	 A22Zn0PE/oiO77aezC00CanSXB5Mbc8q674ZzL0kxn4Sm2kxsC0GdH2il6E7fX5qlJnv7
-	 ppLkW4zuO+vNWSp5HQehRVlvgHpFDEiqTGB8ifke//KY84W4juDffV4gKbEn4s1WeZQ==
+	t=1794386111;
+	b=lqoBEC8fRYWrMj4k3YmEHAfoYOwMoGYSVAdVDy4ua+KsNVR22QQIA3aZvJazBqrum6lA
+	 0QR05CYKKcoI3PZGCiS2IhZVdPg6rYzMQl5oZggsBF+WD97QsQQXWDGCjcWEINMNgU6Be
+	 drAHQmhy4qE8DZUXVVLG/e9+5/BO6F4oD/9z3a3xQM8NVN7vVZt+5tyA/5qZR3lTu6nX+
+	 I/SrWyrJtRbqNSCYXr0ql/GWETeY0rBGi/hCDmltItp1d6R8zYAw4aAqknXeL5VQNQfQl
+	 JgV0RIyko9/k82egAZwh7ng1tFO4tFweaINKPvwDhyfyr2uTHDRGq6LqRCEsWwoyhCg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794379667;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794386111;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=bvnurKRq/kU9ebhETLig/zqsjvD96i3F51B+gs0iQaU=;
-	b=JIQ7IQEjeBMbK7ipkuIOV7JZrrjX97c9gLBubLT0yT2XFLDY4cw/yn3xvNnQSQn1VzbR
-	 +ur/M8lLd0BOM3mZrjrrFNlElCx2ojQpTgQBhbX1BTcsPso9Ywh58OzYR5gn2isLutuBl
-	 m7JOJVbFfeNsysHFr98yIM5dA+o9oAHceHR/OJR20J0nqTSDphULeQYtK8rmnOhxwlJIK
-	 izR3ihTMK/QvTYC5IiNFMoaQXYKa4ow/23ah940MiXGOEIDLiiJgdUeAYD5SB5Gnr4SEk
-	 sg+kj4qz2nYFnF1HL7Doj33NgrioyLcm/AbIurTsNG2E/XmeBu0DTvLGGW0uis0sz2g==
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=sSx1r6YADSLNod2etVKoZeGoyw4STJkD6JZ9QURsIZg=;
+	b=OTMBuVly9KeLhzhsvdnwC+OaggdUIyWYDoZf1Ozp54EYp29HbPGzUiJBeEhoS3DMRuTU
+	 n3Sk59LDzbrbXomG0asJrrpRVfH5A8MBGZZuU+ZNHrkFcwaIZWyH1RM0J6WBzgYNUW1P2
+	 acV5UbigPl1DCvBOBEbLXeFhltaJAkLTWIpkaIy30DSP/NMa6HiRVR+IvwLcfBX5f8WDY
+	 L3aDg5F51j5a9d2/r18No171heLgSF81Z08ILT2sr3+acxmYhy4/U4aF+z4YGrzfr66/3
+	 GnxSEkLS799RYPLoqxIhpi+LN27JaJb6hDL02binUcaAiG20Jlaouanku/zqX2IcG6Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=VLJ2HuRu;
-	arc=none smtp.remote-ip=209.85.216.46
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	dmarc=pass header.from=linbit.com;
+	spf=pass smtp.mailfrom=linbit.com;
+	dkim=pass header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=CNY0UGY3;
+	arc=none smtp.remote-ip=209.85.128.49
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D83606B47B
-	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 06:47:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4D83606B47B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6AE60A2602
+	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 08:35:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1B6AE60A2602
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=VLJ2HuRu
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3b09a83d12aso1960597a91.2
-        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2026 22:47:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=CNY0UGY3
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a207b02a2cso20053615e9.1
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 00:35:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1794379666; x=1794984466; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=bvnurKRq/kU9ebhETLig/zqsjvD96i3F51B+gs0iQaU=;
-        b=VLJ2HuRuoj5amitbJWoXTKqcESYkJs3OcUkRzhVvHMwJZpQGA2aGy5LI99GenuD+is
-         CG7BpF/xXSkoyIKVAhrJjE0CdSsBSaYgt+vPR4GtDS1HPsRCu89Huzu396qSj3hT3jNM
-         XPD//SbYtaO7o6inx+QxLcLXs0es5LZxvfIGU=
+        d=linbit.com; s=google; t=1794386108; x=1794990908; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=sSx1r6YADSLNod2etVKoZeGoyw4STJkD6JZ9QURsIZg=;
+        b=CNY0UGY3JRglswd07ZR9yUlhfd6OS9ERgZHYqKmGeAKBh88Ya4ND0QgAMYg7CKm3hj
+         g3n3tCczndcFCr0g5MO7TRSKXJX7zBkXydsA1pcFf0bX0WX4wb1rS7KYIhBTC6wXx+n3
+         J9575TilovYVqDp8ecz7Vmt6nHh10/dFxuYdAYzDy1VCd3C+RJ/FT10RmiHEpYQVPVL2
+         6romSk0CaluUQyLNSRrBLgqy7rmyrF2Rb97nppmave/fiEBO1Ulvb8Jxd6RJDx96TlSN
+         lEGSDew+YIS/a3hl3MhqyvxBKCuo1RfboigthRFXZsHFrWNhcilbOCEWOWx0O3l6S+Oq
+         5y8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794379666; x=1794984466;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=bvnurKRq/kU9ebhETLig/zqsjvD96i3F51B+gs0iQaU=;
-        b=wo+xSAG9SAuctq3oXLFtf30ID64pqYUOBrf3Aayiqq15z9fa3tRY903i940/5x7wXd
-         S1GUBAro+p+R6g55PyyhoiY3rMlNVWrvpJv2c+ZSweCGCUbhHqOuyREprHssAX8zcIw8
-         F5iYDivdC8e6t1J/qmMA0pkxM1qckSpwHq8vh1F3YfVsgUtd64/Vw/DRidTvCce63K94
-         R8Mr9imlBBpl6YRcDB2JWUK6iTuEfDJ/J8KRFM9ctyN7wfWt2MjVMlkTUNX6dS3LJhbd
-         ZhR5ELi7mbVjt4UQgKaWAjMmeHCeXWWj52Gux0qmDo+gYxsbaWwlY1siZ7jD4Qlu70jX
-         moTg==
-X-Forwarded-Encrypted: i=1; AL+hErFTe3kWpakOxng/419mEfDHsRGHGF6biB2r5G1wRFYpik9ZG4b4MZZCSrqGGE09JWpH6qnYytqvbKMmzg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8ERX0Zl9cgbB5hKny7Bj2XaTB8cny/TmnxAmaTRQVDWbATRsoE
-	//iDCAx2PsJuEBpuQ9pE8ReMjPCo/DoYcRcEuUEblllQa4+UAJ1Ifkn6xFscuwHHVg==
-X-Gm-Gg: AYBFou1fGEDrJHlDfLVPOUGDmxUIJRO7dz4YH0WwtE0AZRYV8j03S6gHL33HnWjNA2t
-	ePzhJ0rJGhSjnw8x4Tc9vdmvvicVavO/qMLHXdT+o3AHRsWBXEFKMB4zWE/viTo/DdCwyiILXm4
-	jccQ9ySKD6lf000lfdDHDuCaVpOeY8PLr9XYNVxamUlBFuTMWUAs5OqsAw9//VNeNxqMvPWn0+X
-	k+1R3CuT7hBg24zL3kjQpDNffYTxN9MSoPIJBba0OnhBiz3fzY25bzx40xwagdqNNp4talQqhKU
-	KE9WSmh/JuUibdpD/EqsWG7hHNxdq1nQl1yPSPxBeF+C2WJugqwpHUicEQRSQbDp+43tQMjQ3jO
-	pGwkzbLF/JbWKNhl/WhqBIwInNQQVR5GoFBcV8G35stiv4N1LLcPQC5ZrUIDZN+aYENZybW6q6n
-	KucSP/VjnirFGf9bEowommBPwRKiDy/xrfRjmvTE5/7GH9jEcduT1g7Ls31fKO36gdeOwEXfrdk
-	cs3OENMcvEdZ539Y/NvuR/tetTIz+zU+0xQIpuO/ghhHeMmQd3E5sxrKWR6hQOPAlqi/Snuhzqv
-	2OVoIsBI9sGARUxEidY1xyt5HXLRuXG9FOLZmfI/6H9YDi3g0LEV9fRxBtucIW2WSXRGzx0WAIX
-	8FVOLgom2CJzR4KAXHA==
-X-Received: by 2002:a17:90b:3c12:b0:3a8:bd51:205b with SMTP id 98e67ed59e1d1-3b182efb4e0mr1748244a91.37.1794379666174;
-        Tue, 10 Nov 2026 22:47:46 -0800 (PST)
-Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:ad6a:b446:df00:78dc])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b17db85a9bsm3268666a91.14.2026.11.10.22.47.43
+        d=1e100.net; s=20260707; t=1794386108; x=1794990908;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=sSx1r6YADSLNod2etVKoZeGoyw4STJkD6JZ9QURsIZg=;
+        b=OWTob6Aq8HcB/mjGwcrHZDjUgzm/BsfvfMYoVJF6zMYzjpd1bgCbD+LFG3gfjOjZcY
+         N6UKnOyrBpvuwB0Uy5Yzl+fsKxPotS7kpjJs4iD0TlAaId1Z5RP1quqLtxAY0UXImSCU
+         ludz+ERZt1LHOxFe8CVrgUJ1afVWmYyQTwaknMpYlr+dSaA71jyc1fN605iWrZ6RaCNc
+         VyEPDSYIlidmEHx71MdjldkDS2L/e/x2EEyFsELlLR+LdJPM9RuabJxEdmxQhl+UuJVU
+         ow3Jwml2CpAr6QVvwmvKpOSf0tDmBD5wlEOY8DLO7/vk4VpiqDoHekGnZIwekHailPAb
+         +fYQ==
+X-Forwarded-Encrypted: i=1; AL+hErEyUyDd9LJCO+Mf79jQ3qUCC0drunIZnpeFHF/WOKcbXM1dLloJII4w5bC9jTnUuP+MOZOj+JprKXNMqg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z83Ax/oFYd8a75oeXiqidwtUmx5zGySYvJyCi7q74PBdX7lWtrt
+	iGHPMNeKDSFW5RtKS3Rgpc4E9nQpezI6032F4vI7kOHjcRqBUJHIukqDYx1JCB3N5Xw=
+X-Gm-Gg: AYBFou08f0WxQA31F/wyW+DrmsE1BzCdxiaDHIprid6ftIaREPHZVGRJ69xZpF1ODmw
+	W2w8uYCrMc0W3W++cWcjyL0jIr1XijT+LVbx/uooQaBYlz0IxDnCb8Q3jr2aAV8IjE/lKt4mB81
+	YyZ6N8O1I/9+aexA44Ith2OyWPgiCNLV3v7+mFwmm44N24ZmiowLAZhpGw0fNcZGKaiBwlMLJGt
+	VQmj0QkY9eVxjka8Ijo7BzrV6f4uszUC+BpGB0kTYNQ1Yr8irQuRZVNhoVfI+N3KthpMmn6xI4I
+	8ceE6m8tBSaGiT19uN6qMz7GTwsXlIZP0UZ3bGWQ9oUFqXrdYJ0S6HETd5MXTzbLq7ZqHfg+bTF
+	LWWb7hk1eErUpB7BGFQ6XlfQ6OQQu6lye9EZoKirXz4CIMQl7RmfSopHUZBNtktLcSerT7XM52d
+	NHsRDusexaBbjFtQxSMga4Ht41thW92+naFTtzA1vdmduLoFFOnYamcmSMzw0dbFxk8uDp2FmHm
+	tpeNm79qXp8VQ1HcbDZOCwRl2C82vCK3ufDYIU6fha0Z0Hk/usUYncjRRWcNtvA12ZDcKMPG6aZ
+	feXDVm7FyBA0y/WnqcRzy6KFn6hPrJLtGho5e0gBobp2ZoXhFq+qzDgoeXBM9HpSjvQM5nnqMw=
+	=
+X-Received: by 2002:a05:600d:82e5:b0:4a1:faa1:3813 with SMTP id 5b1f17b1804b1-4ba0939c32dmr32175315e9.27.1794386108056;
+        Wed, 11 Nov 2026 00:35:08 -0800 (PST)
+Received: from linbit.com (h082218129081.host.wavenet.at. [82.218.129.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49835c37bdfsm9689492f8f.22.2026.11.11.00.35.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 22:47:45 -0800 (PST)
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Nhat Pham <nphamcs@gmail.com>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Brian Geffon <bgeffon@google.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Richard Chang <richardycc@google.com>,
+        Wed, 11 Nov 2026 00:35:07 -0800 (PST)
+From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
 	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Yosry Ahmed <yosry@kernel.org>
-Subject: [PATCH v3 11/11] zsmalloc: populate new zspage outside class->lock in zs_store()
-Date: Wed, 11 Nov 2026 15:46:34 +0900
-Message-ID: <20261111064707.2568433-12-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.56.0.542.g3ef89b7020-goog
-In-Reply-To: <20261111064707.2568433-1-senozhatsky@chromium.org>
-References: <20261111064707.2568433-1-senozhatsky@chromium.org>
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Subject: [PATCH] drbd: select CRYPTO and CRYPTO_HASH
+Date: Wed, 11 Nov 2026 09:35:05 +0100
+Message-ID: <20261111083505.3998706-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,74 +100,40 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-A new zspage is not on class fullness lists and is not movable until
-zs_store() calls insert_zspage() and SetZsPageMovable(), so neither
-other zs_store() callers nor compaction and page migration can see it.
-Nobody else has the handle yet either.
+DRBD uses the shash API for the data integrity, online verify and
+checksum-based resync algorithms and for peer authentication, but
+BLK_DEV_DRBD does not select the crypto core. With CRYPTO=n, a kernel
+with DRBD built in does not link:
 
-So for a new zspage allocate the object and copy the data before we
-take class->lock, and don't take zspage read lock.  This makes
-class->lock critical section shorter and saves a zspage lock/unlock.
+  ld: drbd_sender.c:(.text+0x137f): undefined reference to `crypto_shash_finup'
+  ld: drbd_receiver.c:(.text+0x58f): undefined reference to `crypto_alloc_shash'
 
-Suggested-by: Yosry Ahmed <yosry@kernel.org>
-Reviewed-by: Yosry Ahmed <yosry@kernel.org>
-Reviewed-by: Nhat Pham <nphamcs@gmail.com>
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Select CRYPTO and CRYPTO_HASH.
+
+Fixes: b411b3637fa7 ("The DRBD driver")
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
 ---
- mm/zsmalloc.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ drivers/block/drbd/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
-index 7f1cedd34081..4a6ec43f418b 100644
---- a/mm/zsmalloc.c
-+++ b/mm/zsmalloc.c
-@@ -1323,8 +1323,12 @@ int zs_store(struct zs_pool *pool, struct zs_handle *handle, const void *src,
- 		/* Now move the zspage to another fullness group, if required */
- 		fix_fullness_group(class, zspage);
- 		class_stat_add(class, ZS_OBJS_INUSE, 1);
-+		zspage_read_lock(zspage);
-+		spin_unlock(&class->lock);
+diff --git a/drivers/block/drbd/Kconfig b/drivers/block/drbd/Kconfig
+index 495a72da04c6..d707187d2cec 100644
+--- a/drivers/block/drbd/Kconfig
++++ b/drivers/block/drbd/Kconfig
+@@ -11,6 +11,8 @@ config BLK_DEV_DRBD
+ 	depends on PROC_FS && INET
+ 	select LRU_CACHE
+ 	select CRC32
++	select CRYPTO
++	select CRYPTO_HASH
+ 	help
  
--		goto out;
-+		obj_write(class, zspage, obj, src, size);
-+		zspage_read_unlock(zspage);
-+		return 0;
- 	}
- 
- 	spin_unlock(&class->lock);
-@@ -1333,8 +1337,15 @@ int zs_store(struct zs_pool *pool, struct zs_handle *handle, const void *src,
- 	if (!zspage)
- 		return -ENOMEM;
- 
--	spin_lock(&class->lock);
-+	/*
-+	 * New zspage is not in class->fullness_list or movable yet, so we
-+	 * can allocate the object and copy data before taking class->lock
-+	 * and without zspage_read_lock().
-+	 */
- 	obj = obj_malloc(pool, zspage, handle);
-+	obj_write(class, zspage, obj, src, size);
-+
-+	spin_lock(&class->lock);
- 	newfg = get_fullness_group(class, zspage);
- 	insert_zspage(class, zspage, newfg);
- 	atomic_long_add(class->pages_per_zspage, &pool->pages_allocated);
-@@ -1343,13 +1354,8 @@ int zs_store(struct zs_pool *pool, struct zs_handle *handle, const void *src,
- 
- 	/* We completely set up zspage so mark them as movable */
- 	SetZsPageMovable(pool, zspage);
--out:
--	zspage_read_lock(zspage);
- 	spin_unlock(&class->lock);
- 
--	obj_write(class, zspage, obj, src, size);
--	zspage_read_unlock(zspage);
--
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(zs_store);
+ 	  NOTE: In order to authenticate connections you have to select
+
+base-commit: aa7014f8d7565cfea117eac36a5de0a05eba65a4
 -- 
-2.56.0.542.g3ef89b7020-goog
+2.56.0
 
