@@ -1,51 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.28.121
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.10
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794378764;
-	b=gSE6ivNVByQdqs+DjadBpUDygKmUoX2DH3b2L3N4/q+Yl8tdEhUQnNUpaz7V+Q2U7MZp
-	 HPpQ/9YsufQ/BNhuzlH3zgkSW5ZwZ/Yg9ls6bEvUD7Y8xln3FVIIHLWSffy8AGB1beRJX
-	 BtuD/x7OsTtrOkK1DncerZ9R7mnTZfy9UawTE8Y8eO1MWGbBXu637FAe0szHj7o82ZyRW
-	 SuQ4rGdt0cj+/7hVqPR4hDGV0dtOsVcRHOJgBKS1RRLkMA4yGn80IIOYY+1f0y29q85Gs
-	 TnJq+/zqPpqYNrbPXREyooKZQIbn9vmIOfbcsgvGQj5kiiA+/phWWX5ObfQv/k738Nw==
+	t=1794378915;
+	b=ATpFBDb78qSvBLaPPh0KjvSufRvhjWmDjWrxadHG9hx3Tq9LFLEz61E5Be0PKBET6WUu
+	 5W/+dtY/pWgGicbKrur27VZuVS9qrUsLjdm9o7WOB9/Gm62Mvgf0ZGvsoNBN6Xi0UqRsC
+	 cSjF3BcGkwRx9DxZHpkGZ5Msd1LTatvjIxSLaZZXqShYfeH2Gzd8VbCPbsWThKF/oMcAc
+	 PgI2zE6nHh99soQBVZWwwCJz6Z+QRpiN4ZMouo7gGhmxUqR+Hqgr8VqcVnTfkzQqmdu8d
+	 LsZjV/c57jw3SDNs2e4Ezw1Ue2F/+Tx6STi9dag6r+lxKZKag5XsKJh2aRwb2b1ng3g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794378764;
-	h=DMARC-Filter:X-Alimail-AntiSpam:Received:X-Lms-Return-Path:
-	 References:Message-Id:To:Cc:Subject:From:Mime-Version:Content-Type:
-	 Date:In-Reply-To:Content-Transfer-Encoding;
-	bh=PuwfvEnwqO0+M6GUOFtsXMZ8uJz8SZx/2buZdVxTArU=;
-	b=kfntUZ+OkGweq02NNN6lvrZVeV4aXe8yqFunIi4hQ51vMOOeQRVt9aDlf3pB2eQ8sEsE
-	 MRQt7gHXTpgIF1A+TPM71URqEI2tvpCQIipkGzMGhAjZgNCH1ScTkjfsW8N3/MprjFwoH
-	 hwDvZpYUHm/Bmtjn9uNCTxTNqZdPDFmNHkBbXWzj6+ipuTmaeqWI2iwR7KYY+lzx8g9uz
-	 k62fmW2r9v43SI/yYUS/t8Y0rsw8vXMGMF4bGtZiU2ZyWeegLxzo8lqYdSy82En/MKJ23
-	 6DZ3b8LZdiRvpABS70PL7Z1bIT1POfxEBbmp9hHLSWgJ6T2fzdAEgYvDY91gxJSZUEA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794378915;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
+	bh=LfrfIaPttMHy+NA0zvlHejMmVLNzLwc+BVG+NmJ2ceI=;
+	b=a2ikOuPIbvsWtjDp9ETZunHWrIMwg+O1KUaDz4gf4BW3WgZP1Xs0F2JJjVhyJGco4IYf
+	 3NvGVEsYoeSM9cW9ZwG9FKs4yExkec5wpiknpasKZg8RA3ETe5PMJdRCIHHZeUoFKeOaH
+	 lfEzkREOCv7e1NO/n6HEB34kyuSg2y0Cul7TCuMrqnG7mWd7kTi9C3eSpwTZo21DYLcJK
+	 ZTrvv52JaLf8rQSB/67hjDidA/n/pyBKathiiAtmF3w9u66fol2Ag3Zr6LbYK7gPzpztU
+	 j872Tzre9NeeEm7/pbyUcVbMyw66+vKARB5yRH94ExPlyAtHXcBob/mNEBPNraot0wQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kaihong.com;
-	spf=pass smtp.mailfrom=kaihong.com;
-	arc=none smtp.remote-ip=115.124.28.121
-Received: from out28-121.mail.aliyun.com (out28-121.mail.aliyun.com [115.124.28.121])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Wv8pIcIT;
+	arc=none smtp.remote-ip=192.198.163.10
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584D2606A320;
-	Wed, 11 Nov 2026 06:32:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 584D2606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaihong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaihong.com
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07436259|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.0289249-0.0145536-0.956522;FP=9760352779942500346|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033045099153;MF=wangjichen@kaihong.com;NM=1;PH=DS;RN=9;RT=9;SR=0;TI=SMTPD_---.k.bVXEY_1794378749;
-Received: from localhost(mailfrom:wangjichen@kaihong.com fp:SMTPD_---.k.bVXEY_1794378749 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Wed, 11 Nov 2026 14:32:30 +0800
-X-Lms-Return-Path: <lba+16af40bfb+923b9e+vger.kernel.org+wangjichen@kaihong.com>
-References: <20261103115530.2913093-1-wangjichen@kaihong.com>
-	<90fee426-1a0c-4964-bf20-8175a64917a4@fygo.io>
-Message-Id: <8b878c802e81b6b8dc57299e05cbda9f3dc94e50.3c3928d4.e7a4.4b9f.86dd.da76b4f384c7@feishu.cn>
-To: <yukuai@fygo.io>
-Cc: "Jens Axboe" <axboe@kernel.dk>, "Song Liu" <song@kernel.org>, 
-	"Li Nan" <magiclinan@didiglobal.com>, "Xiao Ni" <xiao@kernel.org>, 
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<linux-raid@vger.kernel.org>, "yu kuai" <yukuai@fygo.io>, 
-	<syzbot+cd254889291ef8666036@syzkaller.appspotmail.com>
-Subject: Re: [PATCH] md: avoid block autoload while importing rdev under reconfig_mutex
-From: =?utf-8?q?=E7=8E=8B=E7=BB=A7=E6=99=A8?= <wangjichen@kaihong.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996E2606A320;
+	Wed, 11 Nov 2026 06:35:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 996E2606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Wv8pIcIT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1794378915; x=1825914915;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=xhFBa4njc9EoXTAaq558iOAlHkCa8Su/UIORcA2qYro=;
+  b=Wv8pIcITxgUEde2U0eXo9PXAfzJUIYKqe+vvDwIKalqw5y/eQXADre79
+   XFQbPo5MjRwQ5TCYX+yXPgyIfhAg5kUXvQ8yFceYXmneCWl2wO0h7dOa1
+   ulsyn28BWXT5A4Yn4aj+EuZT0waLrdqO5BRLSPT6Pe2KFgqEGVJpPVEPm
+   znmZ5EmJI9zE8wTI8XDWLWduAwXxn5mQMp6SAXHxv+nKH1Qw4KRzMB+1h
+   ddk1NwrrZDFUijiWdDQ+lXoeuFRRHjsyqmjwXi6OABZYRtJVYcth5kKFy
+   tceljukKLit24vwIV0Pse/6yZHbG0JIv/oASpTApNWpLGO1fiqVqP6NDb
+   A==;
+X-CSE-ConnectionGUID: 1rG2wGc2QouDu3VSm1iPZQ==
+X-CSE-MsgGUID: v9O65SboTOSfwjB+otJ2pg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11962"; a="3046355"
+X-IronPort-AV: E=Sophos;i="6.27,207,1787036400"; 
+   d="scan'208";a="3046355"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2026 22:35:14 -0800
+X-CSE-ConnectionGUID: SYVqADMXQtCcqIHgGHaURg==
+X-CSE-MsgGUID: yaBwFRXMQ1S1C44y/ZnpQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,207,1787036400"; 
+   d="scan'208";a="8203937"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 10 Nov 2026 22:35:11 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xR1vI-00000000yHH-3MXn;
+	Wed, 11 Nov 2026 06:35:08 +0000
+Date: Wed, 11 Nov 2026 14:34:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: oe-kbuild-all@lists.linux.dev, drbd-dev@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	linux-block@vger.kernel.org,
+	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>
+Subject: Re: [PATCH v3 20/20] drbd: remove BROKEN for DRBD
+Message-ID: <202611111410.3QaA5yy6-lkp@intel.com>
+References: <20261110162646.3028472-21-christoph.boehmwalder@linbit.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -54,220 +86,476 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 11 Nov 2026 14:32:26 +0800
-In-Reply-To: <90fee426-1a0c-4964-bf20-8175a64917a4@fygo.io>
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261110162646.3028472-21-christoph.boehmwalder@linbit.com>
+
+Hi Christoph,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on aa7014f8d7565cfea117eac36a5de0a05eba65a4]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-B-hmwalder/drbd-mark-as-BROKEN-during-DRBD-9-rework/20261110-172626
+base:   aa7014f8d7565cfea117eac36a5de0a05eba65a4
+patch link:    https://lore.kernel.org/r/20261110162646.3028472-21-christoph.boehmwalder%40linbit.com
+patch subject: [PATCH v3 20/20] drbd: remove BROKEN for DRBD
+config: xtensa-allyesconfig (https://download.01.org/0day-ci/archive/20261111/202611111410.3QaA5yy6-lkp@intel.com/config)
+compiler: xtensa-linux-gcc (GCC) 16.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261111/202611111410.3QaA5yy6-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611111410.3QaA5yy6-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/block/drbd/drbd_nl_84.c: In function 'compat84_overlay':
+>> drivers/block/drbd/drbd_nl_84.c:1125:1: warning: the frame size of 1856 bytes is larger than 1536 bytes [-Wframe-larger-than=]
+    1125 | }
+         | ^
 
 
-> From: "yu kuai"<yukuai@fygo.io>
-> Date:=C2=A0 Sun, Nov 8, 2026, 11:18
-> Subject:=C2=A0 Re: [PATCH] md: avoid block autoload while importing rdev =
-under reconfig_mutex
-> To: "Wang Jichen"<wangjichen@kaihong.com>, "Jens Axboe"<axboe@kernel.dk>,=
- "Song Liu"<song@kernel.org>, "Li Nan"<magiclinan@didiglobal.com>, "Xiao Ni=
-"<xiao@kernel.org>, <linux-block@vger.kernel.org>, <linux-kernel@vger.kerne=
-l.org>, <linux-raid@vger.kernel.org>, "yu kuai"<yukuai@fygo.io>
-> Cc: <syzbot+cd254889291ef8666036@syzkaller.appspotmail.com>
-> Hi,
->=C2=A0
-> =E5=9C=A8 2026/11/3 19:55, Wang Jichen =E5=86=99=E9=81=93:
-> > From: wangjichen <wangjichen@kaihong.com>
-> >
-> > md_import_device() runs with mddev->reconfig_mutex held from md_ioctl()=
-.
-> > Opening a member disk via bdev_file_open_by_dev() triggers legacy block
-> > autoload (blk_probe_dev), which takes major_names_lock. md_probe() can
-> > run under that lock and call md_alloc(), which takes disks_mutex and
-> > reconfig_mutex =E2=80=94 a lockdep ABBA with the ioctl path.
->=C2=A0
-> Is this a real deadlock? mddev is already existed from md_import_device()=
-,
-> while md_alloc() just allocate a new mddev, so the reconfig_mtuex is not
-> the same.
+vim +1125 drivers/block/drbd/drbd_nl_84.c
 
-Hi Kuai,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   693  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   694  /*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   695   * The generated *_from_attrs() parsers fill the vendored v1 wire
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   696   * structs (struct disk_conf, struct net_conf, ...), whose field sets
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   697   * differ from the core's neutral structs, so every set below parses into
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   698   * a local v1 struct and translates field by field into dst.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   699   *
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   700   * For the persistent config sets (disk_conf, net_conf, res_opts), dst
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   701   * already holds the object's current values. The parser only writes a
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   702   * field whose attribute is present, so the local struct is pre-seeded
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   703   * from dst and copied back whole: an absent attribute round-trips its
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   704   * old value, preserving drbd_nl.h's "absent attributes leave dst
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   705   * untouched" contract. Most one-shot action parms start from a zeroed
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   706   * dst, so a zeroed local struct already matches; resize_parms and
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   707   * start_ov_parms do not, and are pre-seeded the same way.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   708   *
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   709   * The v1 disk_conf treats backing_dev/meta_dev/meta_dev_idx as required, so
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   710   * a plain disk-options call parses with err == -ENOMSG while every other
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   711   * field is still filled in. drbd_nl.c tolerates -ENOMSG as non-fatal, so
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   712   * each case copies back (and stashes) before returning err, never on an
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   713   * early return.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   714   */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   715  static int compat84_overlay(struct drbd_adm_ctx *ctx, enum drbd_nl_attr_set set, void *dst)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   716  {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   717  	struct genl_info *info = compat84_req(ctx)->info;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   718  	struct compat84_req *req = compat84_req(ctx);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   719  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   720  	switch (set) {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   721  	case DRBD_NL_SET_DISK_CONF: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   722  		struct drbd_disk_conf *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   723  		struct disk_conf c = {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   724  			.meta_dev_idx			= d->meta_dev_idx,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   725  			.disk_size			= d->disk_size,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   726  			.on_io_error			= d->on_io_error,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   727  			.resync_after			= d->resync_after,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   728  			.al_extents			= d->al_extents,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   729  			.disk_barrier			= d->disk_barrier,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   730  			.disk_flushes			= d->disk_flushes,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   731  			.disk_drain			= d->disk_drain,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   732  			.md_flushes			= d->md_flushes,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   733  			.disk_timeout			= d->disk_timeout,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   734  			.read_balancing			= d->read_balancing,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   735  			.al_updates			= d->al_updates,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   736  			.discard_zeroes_if_aligned	= d->discard_zeroes_if_aligned,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   737  			.rs_discard_granularity		= d->rs_discard_granularity,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   738  			.disable_write_same		= d->disable_write_same,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   739  		};
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   740  		struct nlattr **ntb;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   741  		int err, ntb_err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   742  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   743  		memcpy(c.backing_dev, d->backing_dev, sizeof(c.backing_dev));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   744  		c.backing_dev_len = d->backing_dev_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   745  		memcpy(c.meta_dev, d->meta_dev, sizeof(c.meta_dev));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   746  		c.meta_dev_len = d->meta_dev_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   747  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   748  		err = disk_conf_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   749  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   750  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   751  		 * Copy back and stash before returning err: -ENOMSG from a
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   752  		 * plain disk-options call (see above) must not discard the
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   753  		 * fields it did send. Any other error leaves c at its
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   754  		 * pre-seeded values, so copying back is a no-op.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   755  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   756  		memcpy(d->backing_dev, c.backing_dev, sizeof(d->backing_dev));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   757  		d->backing_dev_len = c.backing_dev_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   758  		memcpy(d->meta_dev, c.meta_dev, sizeof(d->meta_dev));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   759  		d->meta_dev_len = c.meta_dev_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   760  		d->meta_dev_idx = c.meta_dev_idx;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   761  		d->disk_size = c.disk_size;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   762  		d->on_io_error = c.on_io_error;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   763  		d->resync_after = c.resync_after;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   764  		d->al_extents = c.al_extents;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   765  		d->disk_barrier = c.disk_barrier;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   766  		d->disk_flushes = c.disk_flushes;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   767  		d->disk_drain = c.disk_drain;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   768  		d->md_flushes = c.md_flushes;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   769  		d->disk_timeout = c.disk_timeout;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   770  		d->read_balancing = c.read_balancing;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   771  		d->al_updates = c.al_updates;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   772  		d->discard_zeroes_if_aligned = c.discard_zeroes_if_aligned;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   773  		d->rs_discard_granularity = c.rs_discard_granularity;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   774  		d->disable_write_same = c.disable_write_same;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   775  		/* max_bio_bvecs: no DRBD 9 equivalent, dropped. */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   776  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   777  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   778  		 * The resync-tuning fields belong to struct drbd_peer_device_conf,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   779  		 * fencing to net_conf.fencing_policy; neither is reachable
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   780  		 * through this dst. Re-parse the nested table for per-field
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   781  		 * presence and stash them for the attach/disk-options
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   782  		 * handlers.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   783  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   784  		ntb_err = disk_conf_ntb_from_attrs(&ntb, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   785  		if ((!ntb_err || ntb_err == -ENOMSG) && ntb) {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   786  			req->peer_device_conf_84.resync_rate = c.resync_rate;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   787  			req->peer_device_conf_84.has_resync_rate =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   788  				ntb[DRBD_A_DISK_CONF_RESYNC_RATE] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   789  			req->peer_device_conf_84.c_plan_ahead = c.c_plan_ahead;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   790  			req->peer_device_conf_84.has_c_plan_ahead =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   791  				ntb[DRBD_A_DISK_CONF_C_PLAN_AHEAD] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   792  			req->peer_device_conf_84.c_delay_target = c.c_delay_target;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   793  			req->peer_device_conf_84.has_c_delay_target =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   794  				ntb[DRBD_A_DISK_CONF_C_DELAY_TARGET] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   795  			req->peer_device_conf_84.c_fill_target = c.c_fill_target;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   796  			req->peer_device_conf_84.has_c_fill_target =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   797  				ntb[DRBD_A_DISK_CONF_C_FILL_TARGET] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   798  			req->peer_device_conf_84.c_max_rate = c.c_max_rate;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   799  			req->peer_device_conf_84.has_c_max_rate =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   800  				ntb[DRBD_A_DISK_CONF_C_MAX_RATE] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   801  			req->peer_device_conf_84.c_min_rate = c.c_min_rate;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   802  			req->peer_device_conf_84.has_c_min_rate =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   803  				ntb[DRBD_A_DISK_CONF_C_MIN_RATE] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   804  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   805  			req->fencing_policy_84 = c.fencing;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   806  			req->has_fencing_policy_84 =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   807  				ntb[DRBD_A_DISK_CONF_FENCING] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   808  		}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   809  		kfree(ntb);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   810  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   811  		return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   812  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   813  	case DRBD_NL_SET_NET_CONF: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   814  		struct drbd_net_conf *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   815  		struct net_conf c = {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   816  			.wire_protocol			= d->wire_protocol,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   817  			.connect_int			= d->connect_int,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   818  			.timeout			= d->timeout,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   819  			.ping_int			= d->ping_int,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   820  			.ping_timeo			= d->ping_timeo,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   821  			.sndbuf_size			= d->sndbuf_size,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   822  			.rcvbuf_size			= d->rcvbuf_size,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   823  			.ko_count			= d->ko_count,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   824  			.max_buffers			= d->max_buffers,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   825  			.max_epoch_size			= d->max_epoch_size,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   826  			.after_sb_0p			= d->after_sb_0p,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   827  			.after_sb_1p			= d->after_sb_1p,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   828  			.after_sb_2p			= d->after_sb_2p,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   829  			.rr_conflict			= d->rr_conflict,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   830  			.on_congestion			= d->on_congestion,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   831  			.cong_fill			= d->cong_fill,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   832  			.cong_extents			= d->cong_extents,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   833  			.two_primaries			= d->two_primaries,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   834  			.tcp_cork			= d->tcp_cork,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   835  			.always_asbp			= d->always_asbp,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   836  			.use_rle			= d->use_rle,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   837  			.csums_after_crash_only		= d->csums_after_crash_only,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   838  			.sock_check_timeo		= d->sock_check_timeo,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   839  		};
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   840  		struct nlattr **ntb;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   841  		int err, ntb_err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   842  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   843  		memcpy(c.shared_secret, d->shared_secret, sizeof(c.shared_secret));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   844  		c.shared_secret_len = d->shared_secret_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   845  		memcpy(c.cram_hmac_alg, d->cram_hmac_alg, sizeof(c.cram_hmac_alg));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   846  		c.cram_hmac_alg_len = d->cram_hmac_alg_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   847  		memcpy(c.integrity_alg, d->integrity_alg, sizeof(c.integrity_alg));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   848  		c.integrity_alg_len = d->integrity_alg_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   849  		memcpy(c.verify_alg, d->verify_alg, sizeof(c.verify_alg));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   850  		c.verify_alg_len = d->verify_alg_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   851  		memcpy(c.csums_alg, d->csums_alg, sizeof(c.csums_alg));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   852  		c.csums_alg_len = d->csums_alg_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   853  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   854  		err = net_conf_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   855  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   856  		/* Copy back and stash before returning err, as for DISK_CONF. */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   857  		memcpy(d->shared_secret, c.shared_secret, sizeof(d->shared_secret));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   858  		d->shared_secret_len = c.shared_secret_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   859  		memcpy(d->cram_hmac_alg, c.cram_hmac_alg, sizeof(d->cram_hmac_alg));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   860  		d->cram_hmac_alg_len = c.cram_hmac_alg_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   861  		memcpy(d->integrity_alg, c.integrity_alg, sizeof(d->integrity_alg));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   862  		d->integrity_alg_len = c.integrity_alg_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   863  		memcpy(d->verify_alg, c.verify_alg, sizeof(d->verify_alg));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   864  		d->verify_alg_len = c.verify_alg_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   865  		memcpy(d->csums_alg, c.csums_alg, sizeof(d->csums_alg));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   866  		d->csums_alg_len = c.csums_alg_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   867  		d->wire_protocol = c.wire_protocol;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   868  		d->connect_int = c.connect_int;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   869  		d->timeout = c.timeout;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   870  		d->ping_int = c.ping_int;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   871  		d->ping_timeo = c.ping_timeo;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   872  		d->sndbuf_size = c.sndbuf_size;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   873  		d->rcvbuf_size = c.rcvbuf_size;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   874  		d->ko_count = c.ko_count;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   875  		d->max_buffers = c.max_buffers;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   876  		d->max_epoch_size = c.max_epoch_size;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   877  		d->after_sb_0p = c.after_sb_0p;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   878  		d->after_sb_1p = c.after_sb_1p;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   879  		d->after_sb_2p = c.after_sb_2p;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   880  		d->rr_conflict = c.rr_conflict;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   881  		d->on_congestion = c.on_congestion;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   882  		d->cong_fill = c.cong_fill;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   883  		d->cong_extents = c.cong_extents;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   884  		d->two_primaries = c.two_primaries;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   885  		d->tcp_cork = c.tcp_cork;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   886  		d->always_asbp = c.always_asbp;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   887  		d->use_rle = c.use_rle;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   888  		d->csums_after_crash_only = c.csums_after_crash_only;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   889  		d->sock_check_timeo = c.sock_check_timeo;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   890  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   891  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   892  		 * fencing is a disk option in 8.4, so "net-options
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   893  		 * --set-defaults" must not reset it: keep the live value.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   894  		 * drbd_adm_net_opts() holds conf_update.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   895  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   896  		if (ctx->set_defaults && ctx->connection) {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   897  			struct drbd_net_conf *old;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   898  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   899  			rcu_read_lock();
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   900  			old = rcu_dereference(ctx->connection->transport.net_conf);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   901  			if (old)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   902  				d->fencing_policy = old->fencing_policy;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   903  			rcu_read_unlock();
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   904  		}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   905  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   906  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   907  		 * unplug_watermark is dropped: no DRBD 9 code reads it, and
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   908  		 * net_conf is connection-scoped while disk_conf, its DRBD 9
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   909  		 * home, is per device. discard_my_data/tentative belong to
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   910  		 * struct drbd_connect_parms; stash them for the connect handler.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   911  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   912  		ntb_err = net_conf_ntb_from_attrs(&ntb, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   913  		if ((!ntb_err || ntb_err == -ENOMSG) && ntb) {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   914  			req->connect_parms_84.discard_my_data = c.discard_my_data;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   915  			req->connect_parms_84.has_discard_my_data =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   916  				ntb[DRBD_A_NET_CONF_DISCARD_MY_DATA] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   917  			req->connect_parms_84.tentative = c.tentative;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   918  			req->connect_parms_84.has_tentative =
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   919  				ntb[DRBD_A_NET_CONF_TENTATIVE] != NULL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   920  		}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   921  		kfree(ntb);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   922  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   923  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   924  		 * fencing lives in the v1 disk_conf on the wire but in
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   925  		 * drbd_net_conf.fencing_policy on DRBD 9. The attach/disk-options
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   926  		 * handler stashed it while parsing disk_conf and re-enters
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   927  		 * this overlay for NET_CONF once it has the connection. A
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   928  		 * real NET_CONF request never has this flag set.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   929  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   930  		if (req->has_fencing_policy_84)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   931  			d->fencing_policy = req->fencing_policy_84;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   932  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   933  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   934  		 * DRBD 9 requires a connection name; v1 has no such concept.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   935  		 * Default it only for a freshly created connection (name_len
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   936  		 * == 0), matching the name drbd9 drbdsetup's own compat84 shim
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   937  		 * passes (--_name=remote).
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   938  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   939  		if (!d->name_len) {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   940  			static const char v1_conn_name[] = "remote";
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   941  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   942  			strscpy(d->name, v1_conn_name, sizeof(d->name));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   943  			d->name_len = strlen(v1_conn_name);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   944  		}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   945  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   946  		return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   947  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   948  	case DRBD_NL_SET_RES_OPTS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   949  		struct drbd_res_opts *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   950  		struct res_opts c = {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   951  			.on_no_data = d->on_no_data,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   952  		};
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   953  		int err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   954  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   955  		memcpy(c.cpu_mask, d->cpu_mask, sizeof(c.cpu_mask));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   956  		c.cpu_mask_len = d->cpu_mask_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   957  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   958  		err = res_opts_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   959  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   960  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   961  		 * The other fourteen DRBD 9 res_opts fields have no v1
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   962  		 * attribute, so v1's --set-defaults must not reset them
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   963  		 * either: that would drop drbd8_compat_mode and
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   964  		 * explicit_drbd8_compat and turn auto_promote back on.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   965  		 * drbd_adm_resource_opts() holds adm_mutex, so the live
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   966  		 * res_opts are stable here.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   967  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   968  		if (ctx->set_defaults && ctx->resource)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   969  			*d = ctx->resource->res_opts;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   970  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   971  		/* Copy back before returning err, as for DISK_CONF. */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   972  		memcpy(d->cpu_mask, c.cpu_mask, sizeof(d->cpu_mask));
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   973  		d->cpu_mask_len = c.cpu_mask_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   974  		d->on_no_data = c.on_no_data;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   975  		return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   976  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   977  	case DRBD_NL_SET_SET_ROLE_PARMS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   978  		struct drbd_set_role_parms *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   979  		struct set_role_parms c = { };
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   980  		int err = set_role_parms_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   981  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   982  		if (err)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   983  			return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   984  		/* v1's assume_uptodate is drbd-utils 8.9.x's wire name for --force. */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   985  		d->force = c.assume_uptodate;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   986  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   987  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   988  	case DRBD_NL_SET_RESIZE_PARMS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   989  		struct drbd_resize_parms *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   990  		/* drbd_adm_resize() pre-fills the current AL layout. */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   991  		struct resize_parms c = {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   992  			.resize_size = d->resize_size,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   993  			.resize_force = d->resize_force,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   994  			.no_resync = d->no_resync,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   995  			.al_stripes = d->al_stripes,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   996  			.al_stripe_size = d->al_stripe_size,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   997  		};
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   998  		int err = resize_parms_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10   999  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1000  		if (err)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1001  			return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1002  		d->resize_size = c.resize_size;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1003  		d->resize_force = c.resize_force;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1004  		d->no_resync = c.no_resync;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1005  		d->al_stripes = c.al_stripes;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1006  		d->al_stripe_size = c.al_stripe_size;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1007  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1008  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1009  	case DRBD_NL_SET_START_OV_PARMS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1010  		struct drbd_start_ov_parms *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1011  		/* drbd_adm_start_ov() pre-fills the resume position. */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1012  		struct start_ov_parms c = {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1013  			.ov_start_sector = d->ov_start_sector,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1014  			.ov_stop_sector = d->ov_stop_sector,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1015  		};
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1016  		int err = start_ov_parms_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1017  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1018  		if (err)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1019  			return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1020  		d->ov_start_sector = c.ov_start_sector;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1021  		d->ov_stop_sector = c.ov_stop_sector;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1022  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1023  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1024  	case DRBD_NL_SET_NEW_C_UUID_PARMS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1025  		struct drbd_new_c_uuid_parms *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1026  		struct new_c_uuid_parms c = { };
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1027  		int err = new_c_uuid_parms_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1028  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1029  		if (err)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1030  			return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1031  		d->clear_bm = c.clear_bm;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1032  		/* force_resync: DRBD 9 only, no v1 attribute; leave untouched. */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1033  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1034  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1035  	case DRBD_NL_SET_DISCONNECT_PARMS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1036  		struct drbd_disconnect_parms *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1037  		struct disconnect_parms c = { };
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1038  		int err = disconnect_parms_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1039  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1040  		if (err)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1041  			return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1042  		d->force_disconnect = c.force_disconnect;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1043  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1044  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1045  	case DRBD_NL_SET_DETACH_PARMS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1046  		struct drbd_detach_parms *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1047  		struct detach_parms c = { };
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1048  		int err = detach_parms_from_attrs(&c, info);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1049  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1050  		if (err)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1051  			return err;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1052  		d->force_detach = c.force_detach;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1053  		/* intentional_diskless_detach: DRBD 9 only; leave untouched. */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1054  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1055  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1056  	case DRBD_NL_SET_PEER_DEVICE_CONF: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1057  		struct drbd_peer_device_conf *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1058  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1059  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1060  		 * Not parsed from the wire: the DISK_CONF case stashed these
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1061  		 * while parsing the disk_conf that carried them. The
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1062  		 * attach/disk-options handler re-enters overlay() for
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1063  		 * PEER_DEVICE_CONF once it has the peer device.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1064  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1065  		if (req->peer_device_conf_84.has_resync_rate)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1066  			d->resync_rate = req->peer_device_conf_84.resync_rate;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1067  		if (req->peer_device_conf_84.has_c_plan_ahead)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1068  			d->c_plan_ahead = req->peer_device_conf_84.c_plan_ahead;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1069  		if (req->peer_device_conf_84.has_c_delay_target)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1070  			d->c_delay_target = req->peer_device_conf_84.c_delay_target;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1071  		if (req->peer_device_conf_84.has_c_fill_target)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1072  			d->c_fill_target = req->peer_device_conf_84.c_fill_target;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1073  		if (req->peer_device_conf_84.has_c_max_rate)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1074  			d->c_max_rate = req->peer_device_conf_84.c_max_rate;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1075  		if (req->peer_device_conf_84.has_c_min_rate)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1076  			d->c_min_rate = req->peer_device_conf_84.c_min_rate;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1077  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1078  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1079  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1080  	case DRBD_NL_SET_PATH_PARMS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1081  		struct drbd_path_parms *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1082  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1083  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1084  		 * v1 carries the endpoint addresses in DRBD_NLA_CFG_CONTEXT,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1085  		 * parsed once per request into req; drbd_adm_new_path()
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1086  		 * calls here once per path.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1087  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1088  		if (!req->ctx_my_addr_len || !req->ctx_peer_addr_len)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1089  			return -ENOMSG;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1090  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1091  		memcpy(d->my_addr, req->ctx_my_addr, req->ctx_my_addr_len);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1092  		d->my_addr_len = req->ctx_my_addr_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1093  		memcpy(d->peer_addr, req->ctx_peer_addr, req->ctx_peer_addr_len);
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1094  		d->peer_addr_len = req->ctx_peer_addr_len;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1095  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1096  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1097  	case DRBD_NL_SET_CONNECT_PARMS: {
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1098  		struct drbd_connect_parms *d = dst;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1099  
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1100  		/*
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1101  		 * Stashed by the NET_CONF case; dst is a fresh zeroed struct,
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1102  		 * so an unsent field already defaults to false.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1103  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1104  		if (req->connect_parms_84.has_discard_my_data)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1105  			d->discard_my_data = req->connect_parms_84.discard_my_data;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1106  		if (req->connect_parms_84.has_tentative)
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1107  			d->tentative = req->connect_parms_84.tentative;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1108  		return 0;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1109  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1110  	case DRBD_NL_SET_DEVICE_CONF:
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1111  	case DRBD_NL_SET_INVALIDATE_PARMS:
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1112  	case DRBD_NL_SET_INVALIDATE_PEER_PARMS:
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1113  	case DRBD_NL_SET_FORGET_PEER_PARMS:
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1114  	case DRBD_NL_SET_RENAME_RESOURCE_PARMS:
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1115  	case DRBD_NL_SET_SUSPEND_IO_PARMS:
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1116  	case DRBD_NL_SET_CBT_START_PARMS:
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1117  		/* No v1 counterpart: report a missing required attribute
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1118  		 * rather than silently proceeding with defaults.
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1119  		 */
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1120  		return -ENOMSG;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1121  	case __DRBD_NL_SET_MAX:
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1122  		break;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1123  	}
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1124  	return -EINVAL;
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10 @1125  }
+4f5fcbdce4b889 Christoph Böhmwalder 2026-11-10  1126  
 
-Thanks for the question.
-
-You're right that md_ioctl() holds reconfig_mutex on the existing array
-mddev, while md_alloc() takes reconfig_mutex on a newly allocated mddev =E2=
-=80=94
-they are different per-device mutex instances, not the same lock.
-
-The syzbot/lockdep report is about a lock *class* cycle, not a
-single-mddev self-deadlock. Lockdep treats all &mddev->reconfig_mutex as
-one class, so the dependency it reports is:
-
-=C2=A0 reconfig_mutex -> major_names_lock -> disks_mutex -> reconfig_mutex
-
-Concrete race (syzbot extid cd254889291ef8666036, C repro on QEMU):
-
-- Thread doing ADD_NEW_DISK on array A holds A's reconfig_mutex, then
-=C2=A0 md_import_device() opens a member via bdev_file_open_by_dev(), which
-=C2=A0 with legacy autoload calls blk_probe_dev() and takes major_names_loc=
-k.
-
-- Concurrent open of an unregistered md node takes major_names_lock in
-=C2=A0 blk_probe_dev(), runs md_probe() -> md_alloc() for device B, takes
-=C2=A0 disks_mutex, then B's reconfig_mutex.
-
-Without lockdep, the same ABBA ordering between threads can still hang;
-the syzbot report includes the standard CPU0/CPU1 "Possible unsafe
-locking scenario" text for this chain.
-
-For context on when reconfig_mutex entered the md_alloc() path: the cycle
-became visible after the fix for the half-initialised kobj window:
-
-=C2=A0 ca39f7502425 ("md: fix mddev->kobj lifetime")
-=C2=A0 d1472ca2ca5d ("md: don't hand out the array before md_alloc() has ad=
-ded
-=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 mddev->kobj")
-
-The latter holds reconfig_mutex across add_disk() and kobject_add() so
-ioctls wait instead of touching an uninitialised mddev->kobj (Fixes:
-ca39f7502425). That closes the kobject race but completes this lockdep
-ring with ioctl + legacy autoload on the other side.
-
-This patch does not revert that behaviour. It only breaks the ioctl-side
-edge by not triggering legacy block autoload while reconfig_mutex is
-held: md_import_device() uses bdev_file_open_by_dev_autoload(..., false).
-Member disks are expected to already exist for normal mdadmin usage; the
-syz repro still gets -ENXIO for bogus minors, but on a fixed kernel there
-is no lockdep warning (Tested with syzbot's C repro on QEMU, 6628e7d4
-bzImage, before/after).
-
-If maintainers prefer a block-layer approach instead (e.g. not calling
-md probe callbacks under major_names_lock in blk_probe_dev()), I'm happy
-to respin.
-
-Thanks,
-Jichen
-
->=C2=A0
-> >
-> > Add bdev_file_open_by_dev_autoload() and use autoload=3Dfalse from
-> > md_import_device(); member devices must already be present in the
-> > block layer (normal mdadmin usage).
-> >
-> > Link: https://syzbot.org/bug?extid=3Dcd254889291ef8666036
-> > Reported-by: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com
-> > Tested-by: Wang Jichen <wangjichen@kaihong.com>
-> > Signed-off-by: Wang Jichen <wangjichen@kaihong.com>
-> > ---
-> > =C2=A0 block/bdev.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 13 ++++++++++-=
 --
-> > =C2=A0 drivers/md/md.c =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A08 ++++++--
-> > =C2=A0 include/linux/blkdev.h | =C2=A02 ++
-> > =C2=A0 3 files changed, 18 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/block/bdev.c b/block/bdev.c
-> > index f20f91b31..e78936556 100644
-> > --- a/block/bdev.c
-> > +++ b/block/bdev.c
-> > @@ -1076,8 +1076,8 @@ static unsigned blk_to_file_flags(blk_mode_t mode=
-)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return flags;
-> > =C2=A0 }
-> > =C2=A0=C2=A0
-> > -struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *h=
-older,
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const struct blk_holder_o=
-ps *hops)
-> > +struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode=
-,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *holder, =
-const struct blk_holder_ops *hops, bool autoload)
-> > =C2=A0 {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct file *bdev_file;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct block_device *bdev;
-> > @@ -1088,7 +1088,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk=
-_mode_t mode, void *holder,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (ret)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return E=
-RR_PTR(ret);
-> > =C2=A0=C2=A0
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0bdev =3D blkdev_get_no_open(dev, true);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0bdev =3D blkdev_get_no_open(dev, autoload)=
-;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!bdev)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return E=
-RR_PTR(-ENXIO);
-> > =C2=A0=C2=A0
-> > @@ -1110,6 +1110,13 @@ struct file *bdev_file_open_by_dev(dev_t dev, bl=
-k_mode_t mode, void *holder,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return bdev_file;
-> > =C2=A0 }
-> > +EXPORT_SYMBOL(bdev_file_open_by_dev_autoload);
-> > +
-> > +struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *h=
-older,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const struct blk_holder_o=
-ps *hops)
-> > +{
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0return bdev_file_open_by_dev_autoload(dev,=
- mode, holder, hops, true);
-> > +}
-> > =C2=A0 EXPORT_SYMBOL(bdev_file_open_by_dev);
-> > =C2=A0=C2=A0
-> > =C2=A0 struct file *bdev_file_open_by_path(const char *path, blk_mode_t=
- mode,
-> > diff --git a/drivers/md/md.c b/drivers/md/md.c
-> > index 03e35386a..d3717e2e8 100644
-> > --- a/drivers/md/md.c
-> > +++ b/drivers/md/md.c
-> > @@ -3858,9 +3858,13 @@ static struct md_rdev *md_import_device(dev_t ne=
-wdev, int super_format, int supe
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (err)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out=
-_clear_rdev;
-> > =C2=A0=C2=A0
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0rdev->bdev_file =3D bdev_file_open_by_dev(=
-newdev,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0/*
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 * md_ioctl() holds reconfig_mutex; legacy=
- autoload in bdev open takes
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 * major_names_lock via blk_probe_dev() an=
-d can deadlock with md_probe().
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 */
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0rdev->bdev_file =3D bdev_file_open_by_dev_=
-autoload(newdev,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 BLK_OPEN_READ | BLK_OPEN_WRITE,
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0super_format =3D=3D -2 ? &claim_rdev : rdev, NULL);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0super_format =3D=3D -2 ? &claim_rdev : rdev, NULL, false);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (IS_ERR(rdev->bdev_file)) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pr_warn(=
-"md: could not open device unknown-block(%u,%u).\n",
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 MAJOR(newdev), MINOR(newdev));
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index 0c2010230..e5121101a 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -1699,6 +1699,8 @@ struct blk_holder_ops {
-> > =C2=A0=C2=A0
-> > =C2=A0 struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, v=
-oid *holder,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const st=
-ruct blk_holder_ops *hops);
-> > +struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode=
-,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *holder, =
-const struct blk_holder_ops *hops, bool autoload);
-> > =C2=A0 struct file *bdev_file_open_by_path(const char *path, blk_mode_t=
- mode,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 void *ho=
-lder, const struct blk_holder_ops *hops);
-> > =C2=A0 int bd_prepare_to_claim(struct block_device *bdev, void *holder,
->=C2=A0
-> --=C2=A0
-> Thanks,
-> Kuai
->=C2=A0
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
