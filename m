@@ -1,96 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794386111;
-	b=lqoBEC8fRYWrMj4k3YmEHAfoYOwMoGYSVAdVDy4ua+KsNVR22QQIA3aZvJazBqrum6lA
-	 0QR05CYKKcoI3PZGCiS2IhZVdPg6rYzMQl5oZggsBF+WD97QsQQXWDGCjcWEINMNgU6Be
-	 drAHQmhy4qE8DZUXVVLG/e9+5/BO6F4oD/9z3a3xQM8NVN7vVZt+5tyA/5qZR3lTu6nX+
-	 I/SrWyrJtRbqNSCYXr0ql/GWETeY0rBGi/hCDmltItp1d6R8zYAw4aAqknXeL5VQNQfQl
-	 JgV0RIyko9/k82egAZwh7ng1tFO4tFweaINKPvwDhyfyr2uTHDRGq6LqRCEsWwoyhCg==
+	t=1794386882;
+	b=HkofjQJc7TCR2VsWIz7NFgwW5I2Jha6Mt680ffl4SkyvLzwRtFn7IXDvarRgI4UDSIzN
+	 ZXX4qFuwE7rQ2HdmtcM4G6kC9qWOpCj3rtMP60OVHzN3cPPhvKH9G+lLYqYWA9wvm+Jtz
+	 dSwb8W50ennSn0kBjLCWkcTgXopScvRMlCymcs330slFuHTq0UrTY37ofBNhkQqONoxHo
+	 fd3jEQW/UpxZg+WMDL2J6LhKa9rdiERWK54PXkmwVLn0zWVVvm1ndL9JAdiJsY6SqD7ie
+	 k4w8gg2XYEEQG4Y1Hajl5p/POL0ycaHKW/kOFogRsneZqZO0UEB2qlIjynOD3ZdSxKg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794386111;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=sSx1r6YADSLNod2etVKoZeGoyw4STJkD6JZ9QURsIZg=;
-	b=OTMBuVly9KeLhzhsvdnwC+OaggdUIyWYDoZf1Ozp54EYp29HbPGzUiJBeEhoS3DMRuTU
-	 n3Sk59LDzbrbXomG0asJrrpRVfH5A8MBGZZuU+ZNHrkFcwaIZWyH1RM0J6WBzgYNUW1P2
-	 acV5UbigPl1DCvBOBEbLXeFhltaJAkLTWIpkaIy30DSP/NMa6HiRVR+IvwLcfBX5f8WDY
-	 L3aDg5F51j5a9d2/r18No171heLgSF81Z08ILT2sr3+acxmYhy4/U4aF+z4YGrzfr66/3
-	 GnxSEkLS799RYPLoqxIhpi+LN27JaJb6hDL02binUcaAiG20Jlaouanku/zqX2IcG6Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794386882;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:Received:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-TM-AS-GCONF:
+	 X-Proofpoint-Spam-Info:X-Authority-Analysis:X-Proofpoint-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=AjMEIi7lv07LvTskR3i0Su3EOrQGDfx9N4dCUycSW4I=;
+	b=R9JWMZbNZJq9QoEDVUJKoaVkGPybEaTC/t16Reu0+QQFIbkbhHDanO6l3eXzLx/QKgFH
+	 psCOlUvFGBb8M/exAzm0un7hXk3FEnEHqGnS2MmM3kROJX6pLx9zHw3tI/NE2ZsdlPJfa
+	 aZsb8fa193PD9iBmN4sKgLbWk8OPxORFh/8AP7zJXP2ZoIdv/1lM9yDWAHaGSXgKVJB6H
+	 9F1AJlbE/FkGggPTNiKLGKT1caCtohZmNRDDWtKo+8yyxDZ/D4cEx1VMCyaPQvsY/BXbo
+	 D7rgF8aDrQWqNRvhntZzjmoASB2jqiG2ZFDqb3qKs4zqzz6SnariP5uPmi7SEIBp1zg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linbit.com;
-	spf=pass smtp.mailfrom=linbit.com;
-	dkim=pass header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=CNY0UGY3;
-	arc=none smtp.remote-ip=209.85.128.49
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=linux.ibm.com;
+	spf=pass smtp.mailfrom=linux.ibm.com;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=XV5tSlvG;
+	arc=none smtp.remote-ip=148.163.158.5
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6AE60A2602
-	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 08:35:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1B6AE60A2602
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD87E606A31C
+	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 08:48:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD87E606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=CNY0UGY3
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a207b02a2cso20053615e9.1
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 00:35:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit.com; s=google; t=1794386108; x=1794990908; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sSx1r6YADSLNod2etVKoZeGoyw4STJkD6JZ9QURsIZg=;
-        b=CNY0UGY3JRglswd07ZR9yUlhfd6OS9ERgZHYqKmGeAKBh88Ya4ND0QgAMYg7CKm3hj
-         g3n3tCczndcFCr0g5MO7TRSKXJX7zBkXydsA1pcFf0bX0WX4wb1rS7KYIhBTC6wXx+n3
-         J9575TilovYVqDp8ecz7Vmt6nHh10/dFxuYdAYzDy1VCd3C+RJ/FT10RmiHEpYQVPVL2
-         6romSk0CaluUQyLNSRrBLgqy7rmyrF2Rb97nppmave/fiEBO1Ulvb8Jxd6RJDx96TlSN
-         lEGSDew+YIS/a3hl3MhqyvxBKCuo1RfboigthRFXZsHFrWNhcilbOCEWOWx0O3l6S+Oq
-         5y8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794386108; x=1794990908;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=sSx1r6YADSLNod2etVKoZeGoyw4STJkD6JZ9QURsIZg=;
-        b=OWTob6Aq8HcB/mjGwcrHZDjUgzm/BsfvfMYoVJF6zMYzjpd1bgCbD+LFG3gfjOjZcY
-         N6UKnOyrBpvuwB0Uy5Yzl+fsKxPotS7kpjJs4iD0TlAaId1Z5RP1quqLtxAY0UXImSCU
-         ludz+ERZt1LHOxFe8CVrgUJ1afVWmYyQTwaknMpYlr+dSaA71jyc1fN605iWrZ6RaCNc
-         VyEPDSYIlidmEHx71MdjldkDS2L/e/x2EEyFsELlLR+LdJPM9RuabJxEdmxQhl+UuJVU
-         ow3Jwml2CpAr6QVvwmvKpOSf0tDmBD5wlEOY8DLO7/vk4VpiqDoHekGnZIwekHailPAb
-         +fYQ==
-X-Forwarded-Encrypted: i=1; AL+hErEyUyDd9LJCO+Mf79jQ3qUCC0drunIZnpeFHF/WOKcbXM1dLloJII4w5bC9jTnUuP+MOZOj+JprKXNMqg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z83Ax/oFYd8a75oeXiqidwtUmx5zGySYvJyCi7q74PBdX7lWtrt
-	iGHPMNeKDSFW5RtKS3Rgpc4E9nQpezI6032F4vI7kOHjcRqBUJHIukqDYx1JCB3N5Xw=
-X-Gm-Gg: AYBFou08f0WxQA31F/wyW+DrmsE1BzCdxiaDHIprid6ftIaREPHZVGRJ69xZpF1ODmw
-	W2w8uYCrMc0W3W++cWcjyL0jIr1XijT+LVbx/uooQaBYlz0IxDnCb8Q3jr2aAV8IjE/lKt4mB81
-	YyZ6N8O1I/9+aexA44Ith2OyWPgiCNLV3v7+mFwmm44N24ZmiowLAZhpGw0fNcZGKaiBwlMLJGt
-	VQmj0QkY9eVxjka8Ijo7BzrV6f4uszUC+BpGB0kTYNQ1Yr8irQuRZVNhoVfI+N3KthpMmn6xI4I
-	8ceE6m8tBSaGiT19uN6qMz7GTwsXlIZP0UZ3bGWQ9oUFqXrdYJ0S6HETd5MXTzbLq7ZqHfg+bTF
-	LWWb7hk1eErUpB7BGFQ6XlfQ6OQQu6lye9EZoKirXz4CIMQl7RmfSopHUZBNtktLcSerT7XM52d
-	NHsRDusexaBbjFtQxSMga4Ht41thW92+naFTtzA1vdmduLoFFOnYamcmSMzw0dbFxk8uDp2FmHm
-	tpeNm79qXp8VQ1HcbDZOCwRl2C82vCK3ufDYIU6fha0Z0Hk/usUYncjRRWcNtvA12ZDcKMPG6aZ
-	feXDVm7FyBA0y/WnqcRzy6KFn6hPrJLtGho5e0gBobp2ZoXhFq+qzDgoeXBM9HpSjvQM5nnqMw=
-	=
-X-Received: by 2002:a05:600d:82e5:b0:4a1:faa1:3813 with SMTP id 5b1f17b1804b1-4ba0939c32dmr32175315e9.27.1794386108056;
-        Wed, 11 Nov 2026 00:35:08 -0800 (PST)
-Received: from linbit.com (h082218129081.host.wavenet.at. [82.218.129.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49835c37bdfsm9689492f8f.22.2026.11.11.00.35.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 00:35:07 -0800 (PST)
-From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	linux-block@vger.kernel.org,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Subject: [PATCH] drbd: select CRYPTO and CRYPTO_HASH
-Date: Wed, 11 Nov 2026 09:35:05 +0100
-Message-ID: <20261111083505.3998706-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=XV5tSlvG
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AB5iKdi286217;
+	Wed, 11 Nov 2026 08:47:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=AjMEIi
+	7lv07LvTskR3i0Su3EOrQGDfx9N4dCUycSW4I=; b=XV5tSlvG5bAKoEQW1GF70n
+	ULi6FNjoEDnmsKO+pwyQDMrK3IHv2Dr99hLD7ItcVG6NuPbma9r+HJ7TL4AxvXkk
+	RRO4LWcLt8D5geh/Wd3OgHMSQOtHpLFInbqp1cqVCfuR5KBoO4inBqukYi9h52VN
+	4BpXZ8OYokENJh4LuwmNy751C6jkzJurU78JaQgcQMCHXmeRPwc19OM84SaZ1LCW
+	nz1QNQv488nyxitu50T7NMdALIPOQStVP+QsG5BGA8zmubMvd/e7X8eVSXPHVVSu
+	tjn6obGGMhSkrSue4EITX1qTzNpuxaXf8V7rAft/fCTubGE3MNTSqqz3L+EW7CAQ
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hsumv0ejb-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 11 Nov 2026 08:47:50 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AB5Jvtp1747835;
+	Wed, 11 Nov 2026 08:47:50 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4hvd51sdc5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Nov 2026 08:47:50 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6AB8lnbb32047692
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Nov 2026 08:47:49 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C910158058;
+	Wed, 11 Nov 2026 08:47:49 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9818858057;
+	Wed, 11 Nov 2026 08:47:45 +0000 (GMT)
+Received: from [9.123.7.57] (unknown [9.123.7.57])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 11 Nov 2026 08:47:45 +0000 (GMT)
+Message-ID: <5ac651df-2140-4e56-a8d1-857f599a8046@linux.ibm.com>
+Date: Wed, 11 Nov 2026 14:17:44 +0530
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -100,40 +85,71 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests v2] nvme/081: test the per-queue io_cpu sysfs
+ attribute
+To: Saravanan D <saravanand@crusoe.ai>, linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com, linux-nvme@lists.infradead.org,
+        dwagner@suse.de, hare@suse.de, sagi@grimberg.me, kbusch@kernel.org,
+        iyamahata@crusoe.ai, kiyer@crusoe.ai, ganbalagane@crusoe.ai,
+        sjpark@crusoe.ai, bchen@crusoe.ai
+References: <cover.1794015622.git.saravanand@crusoe.ai>
+ <20261107095350.98072-1-saravanand@crusoe.ai>
+ <7a2bcf1c-990f-46fa-badd-dc1b14dfa96f@linux.ibm.com>
+ <20261110115005.47367-1-saravanand@crusoe.ai>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20261110115005.47367-1-saravanand@crusoe.ai>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTExMDAzNCBTYWx0ZWRfX2MTSknSqIWSp
+ GN0m3MgOiaXy1eDY9LUj34ZBm7u5GF8hCKzj4EgvbkDYnysQuwMqi6y80dvIjowTjhWLIqZZXUW
+ 3ly4vTjnKCMK5PPKQNhyRgIcf2/px9c=
+X-Authority-Analysis: v=2.4 cv=GISdgeNK c=1 sm=1 tr=0 ts=6af42bb6 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=sfnruoiRsdzNOXGBZVQA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: nlwaUSIBITl4O8vqNmsCiAdciW3MJZSz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTExMDAzNCBTYWx0ZWRfX6hbFs4hVUgg4
+ X2MpZccTxuXAtXlrxvLIJiY+fEvy8+WP0B/oRkJmV4tMbe+las+NfADI73s+DxEltqFZjH6gKjs
+ oCRu7tZpeD3I8ft1I52YlSbSd+NsXRb9BgTnuXcSb6xYbIxiscR0hBcogcXsI1fx3s6qq8NYT2z
+ YKnYpuAfjZhmEbRNGPJYD2uvT/lzlXMKia4V3Ll+/kMc5CKaSkl8CFASFgxxP7mJlzv8nMW8wW4
+ ReU0Fs2Ipg1W8PrOsMQqOnrmCUS2H4vs2tiVZq2DiX7LIraN30c/f0I5bTVD6NxmBOje/S2dCgO
+ inLLpA8ArIM9Mt23vjJctvDBnmW/v5hOBnyBNWoOnuwXdRPWOB/iB71mxMrKvfv8zAwF+pbKNnW
+ +UtLT4luD7Wxzv7V0Pk4aZNjaIbRVrrBn7ubxosuux2FCR5NEgaDsSJ6XNSb3VvMCJQTiuzrjIG
+ NQ2dtl+6+GtIaAMpktg==
+X-Proofpoint-ORIG-GUID: nlwaUSIBITl4O8vqNmsCiAdciW3MJZSz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-11_02,2026-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 bulkscore=0 impostorscore=0 clxscore=1015 adultscore=0
+ priorityscore=1501 phishscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611110034
 
-DRBD uses the shash API for the data integrity, online verify and
-checksum-based resync algorithms and for peer authentication, but
-BLK_DEV_DRBD does not select the crypto core. With CRYPTO=n, a kernel
-with DRBD built in does not link:
+On 11/10/26 5:20 PM, Saravanan D wrote:
+> nvme-tcp exposes/sys/class/nvme/nvmeX/queues/<qid>/io_cpu and managed,
+> so a control plane can choose the CPU that runs each I/O queue's socket
+> work [1]. Test that
+> 
+>    - io_cpu reads back a written CPU and rejects invalid values
+>    - managed is read only and turns 0 once io_cpu is written
+>    - an assignment and the queue directories survive a controller reset
+>    - the queue directories follow the queue count as attr_qid_max
+>      shrinks and grows it
+>    - removing the controller while io_cpu is written completes
+> 
+> The test skips when the kernel does not have the queues/ directory or
+> the io_cpu attribute.
+> 
+> [1]https://lore.kernel.org/linux-nvme/cover.1794015622.git.saravanand@crusoe.ai/
+> 
+> Assisted-by: Claude:claude-opus-5-5 [Claude Code]
+> Signed-off-by: Saravanan D<saravanand@crusoe.ai>
 
-  ld: drbd_sender.c:(.text+0x137f): undefined reference to `crypto_shash_finup'
-  ld: drbd_receiver.c:(.text+0x58f): undefined reference to `crypto_alloc_shash'
+Looks good to me:
 
-Select CRYPTO and CRYPTO_HASH.
-
-Fixes: b411b3637fa7 ("The DRBD driver")
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
----
- drivers/block/drbd/Kconfig | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/block/drbd/Kconfig b/drivers/block/drbd/Kconfig
-index 495a72da04c6..d707187d2cec 100644
---- a/drivers/block/drbd/Kconfig
-+++ b/drivers/block/drbd/Kconfig
-@@ -11,6 +11,8 @@ config BLK_DEV_DRBD
- 	depends on PROC_FS && INET
- 	select LRU_CACHE
- 	select CRC32
-+	select CRYPTO
-+	select CRYPTO_HASH
- 	help
- 
- 	  NOTE: In order to authenticate connections you have to select
-
-base-commit: aa7014f8d7565cfea117eac36a5de0a05eba65a4
--- 
-2.56.0
-
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
