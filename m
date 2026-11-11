@@ -1,55 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.13
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794349086;
-	b=rGkVAzuraZBETMn/q2jNVNFmXEqJb3d65QD1BbnZ95lxFKXOzdTEp6X16omv5OaGTqPu
-	 zM6yijAZ47af43d0bWTikm2X8jzJUi9DsDlCHikLQTRwXZjFhZheP17DyWKhwce/SrGFp
-	 WftwCmEiF0i9CA54evqI6oSC3JwMHPH4HcgdmqBYYoYqNJuii+F9hQ1sVYfjSiIEmCZis
-	 /7ImSNbw3XW733P/DRHDd7CcPXgx/Ge/A6MUc2Lq0duKuBq0686b2W5zPOyZUDaFWKTHU
-	 Wfa8Lo0vu54WyzJ7C4n2csh3AEb5AeMWZj48F3urm3aA4ekdG/ayknAZOAZv3Bli4Lg==
+	t=1794357326;
+	b=NXhGhS7Zj/8cUKuST9HWpRprYnxfmJ1LgQaSVrBBQxhIIEJueGm96yVTLjCqmhWiEOLI
+	 1fjiX+AMLuqXFghgAE9GzzwmOYktgimxahPgLUOQBUmVBzE+XeTqkutXwQmBLwgftWh/f
+	 hGH5BT46DZJYxA6GIgAXeDl5VV0nAh5ZvRkJy35TtTxl5tw8Sskh6u/HiRYz0kEVF8gUQ
+	 DHoGIEJ/XDyKyfA+Ca0HhNgL7haIHhrNkGoPDlBQpeGqFbgQgVF4AJIRSNm0fgmQ1eWIx
+	 IJlI0yVO430OA4Cw7gJPKyDPqH/Mhaow65sRvocu5CEGSIWSECH9/33NhMTyeqe0fbw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794349086;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=NHhP4xJkQwMEfsD9tU/7b9nUzi1hvFrNDI+uwR1r2jM=;
-	b=Ci3JR+P4F2l2VQ9fhWpg5TQBU8h1Nge5c3cANwIpFo2a76uoh8NNYfxeDq4uHO/SBpwv
-	 h/MBiswweVGqtYvnt+8RnXJlNFEIwK+kPr6T4VVO53YMa5aAMj0wxE4qFLasKKB7mjiGv
-	 IaiYDw1B+tVbCGK5FrR3qB/+SNMDZrPbgDmTQK81N3ljhopw0KHeoeaIFhdTbhfCXhzdS
-	 0wItQyjLeYV94/PCz02tHVt7WQOXjWHdUtx7Ud1THJqakn6vRhIuhOh0BbgoY2jTLZUpH
-	 nZ8XghQRkvrPeaMRJfyN5o2bC4tOaZR1iQQsAacLN12FezZwLhBOj2TZnyDHgJ3TYIg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794357326;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=/LjX/apOanhMTTgHpb6dSpB5C318IV1ibkYKm6FseBw=;
+	b=u4vCJYE2lG7APfpKA9imKPd4uXR9QKu1TdDFE53zL5+aC6jiej+GduVL8fk/AqfGYrhw
+	 nfRh8j2xo1PDCC+gD/byLOQ7GRwNohxH19Ny1ekByBpiQ3bsn9BwtwUPjcpoNBxVBGJKw
+	 Ux9Kpxmy9A8rjhzDh+GQN5x3Maqj/H29AfKtTf6BEuZCHYLJ+9PNGnGYuDbzuy79wRf4N
+	 Llq89nsTDZWQk0gIqGERndyag2F+YFZ0bH7z6vANW6LG655emIu9vFFkm+IcMfqFswHfH
+	 bBkmpMWD8xGlOP+0IdNEqxkCMmIB2Hy9bYZbwAK4P/PbpgfXlSrF4G1uuWL2RzGA2nw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=N9UpMRvo;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=QDe3hksN;
+	arc=none smtp.remote-ip=198.175.65.13
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D19606A326;
-	Tue, 10 Nov 2026 22:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADBD606A321;
+	Wed, 11 Nov 2026 00:35:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1ADBD606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=N9UpMRvo
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CDF1F008A2;
-	Tue, 10 Nov 2026 22:18:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794349085;
-	bh=NHhP4xJkQwMEfsD9tU/7b9nUzi1hvFrNDI+uwR1r2jM=;
-	h=From:To:Cc:Subject:Date;
-	b=N9UpMRvohbZSGM+1tcCCLQAtrRX7dSp9HD3jqU5otfCD2HYv6xyCgrr6o9++uza5r
-	 5og+6V0dISaFXtV+1G5kgeEP//NqKKCB39J4RdXEfdqGLBeTGJ21Xyy583zoBAidFN
-	 AoEFGf72LOT788v46+wjfOt64W4C86AvuGPiGajpJfhj/uM5t+Zxm+xKtq823v8p+V
-	 eS7xRH8BinS69XVjoCGajJxyJ1T5mVK7khzhCBuWvnjKKTweq3FSdHU2CKrennIn4S
-	 XdBDsRO5S0eKPjWv0msMiZj9dobnhtxCbkehlCPw4KazSgK2GjUlunyT/vd2qk1ZJs
-	 38jb3mnoQxaoA==
-From: Eric Biggers <ebiggers@kernel.org>
-To: stable@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=QDe3hksN
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1794357324; x=1825893324;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dkzIzMmZB7REKDaD0rvd1ZSTaFpES2DqmGzbU4n1gyY=;
+  b=QDe3hksNQJVlwy0jDN/sbLcS8O7sNyzwEbC1SNTiMXdpBKv+XDV5pQsS
+   nWwSU/GoRBWb2ihlJHdWNk4WCmxJ1yCvXSTWqWDWu4DgBCOZlGMkaN82Y
+   B6eBv43M2udXRe0hkAb+15qeqaX5LHNOzIkbK5jILDlM/mNi9XKYHos+v
+   4e2jUCDlDtstfR1mRU+m4xz+X2hzkVQJKE/75v0u8z3Rg3i7Y5e8vX9Cv
+   T9CEfASYbwjiQPNEDxb+fBt54L5FiKnVIIhHnwAfToPx8WKF9Zoher4vZ
+   lxBb6HaEY8ZpNbuyKHZzN6NYnIcSnmNTUoTiKY5Ael/wJneucKl2pgeez
+   Q==;
+X-CSE-ConnectionGUID: XzKMMXpHQSqKVUX8v8cpZg==
+X-CSE-MsgGUID: FlQKHCdrStuTk8pI/HVanA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11962"; a="3001346"
+X-IronPort-AV: E=Sophos;i="6.27,206,1787036400"; 
+   d="scan'208";a="3001346"
+Received: from fmviesa011.fm.intel.com ([10.60.135.151])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2026 16:35:24 -0800
+X-CSE-ConnectionGUID: 4lPyzWirRJmaoaHl5EEZzw==
+X-CSE-MsgGUID: aOGxk3CETXGrilTz8KFS9Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,206,1787036400"; 
+   d="scan'208";a="10074205"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by fmviesa011.fm.intel.com with ESMTP; 10 Nov 2026 16:35:22 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xQwJ5-00000000xlr-1Jmy;
+	Wed, 11 Nov 2026 00:35:19 +0000
+Date: Wed, 11 Nov 2026 08:34:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 6.1] blk-mq: end the request if getting a keyslot fails
-Date: Tue, 10 Nov 2026 14:17:48 -0800
-Message-ID: <20261110221748.54448-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.0
+Cc: oe-kbuild-all@lists.linux.dev, drbd-dev@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	linux-block@vger.kernel.org,
+	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>
+Subject: Re: [PATCH v3 20/20] drbd: remove BROKEN for DRBD
+Message-ID: <202611110819.YiyLkWx7-lkp@intel.com>
+References: <20261110162646.3028472-21-christoph.boehmwalder@linbit.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,58 +87,36 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261110162646.3028472-21-christoph.boehmwalder@linbit.com>
 
-From: Josef Bacik <josef@toxicpanda.com>
+Hi Christoph,
 
-commit e67cb6ed40e7f45912b63d7d575f18dfd2ebc98a upstream.
+kernel test robot noticed the following build warnings:
 
-When blk_crypto_rq_get_keyslot() fails, blk_mq_submit_bio() ends the bio
-by hand and frees the request. By then blk_mq_bio_to_request() has done
-the IO accounting, which blk_mq_free_request() doesn't undo, so the
-in_flight counter never drops and iostat shows a device that is 100%
-busy. If the bio went through zone write plugging the zone stays plugged
-as well, and every later write to it waits forever.
+[auto build test WARNING on aa7014f8d7565cfea117eac36a5de0a05eba65a4]
 
-Use blk_mq_end_request() like the dispatch path does for a request the
-driver rejected, after marking it for zone write plugging.
+url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-B-hmwalder/drbd-mark-as-BROKEN-during-DRBD-9-rework/20261110-172626
+base:   aa7014f8d7565cfea117eac36a5de0a05eba65a4
+patch link:    https://lore.kernel.org/r/20261110162646.3028472-21-christoph.boehmwalder%40linbit.com
+patch subject: [PATCH v3 20/20] drbd: remove BROKEN for DRBD
+config: m68k-defconfig (https://download.01.org/0day-ci/archive/20261111/202611110819.YiyLkWx7-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 16.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261111/202611110819.YiyLkWx7-lkp@intel.com/reproduce)
 
-Move the call to blk_zone_write_plug_init_request() before
-blk_crypto_rq_get_keyslot() so that it doesn't need to be duplicated.
-It doesn't depend on the keyslot.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611110819.YiyLkWx7-lkp@intel.com/
 
-Fixes: 99dc422335d8 ("block: support to account io_ticks precisely")
-Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
-Cc: stable@vger.kernel.org
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://patch.msgid.link/20261029200110.1328103-1-ebiggers@kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-[ Backport to 6.1.y: dropped the part related to
-  bio_zone_write_plugging(), which doesn't exist on this branch. ]
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- block/blk-mq.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+All warnings (new ones prefixed by >>):
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bc619519dd665..9722b0afdcee3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3030,9 +3030,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 
- 	ret = blk_crypto_rq_get_keyslot(rq);
- 	if (ret != BLK_STS_OK) {
--		bio->bi_status = ret;
--		bio_endio(bio);
--		blk_mq_free_request(rq);
-+		blk_mq_end_request(rq, ret);
- 		return;
- 	}
- 
+>> Warning: drivers/block/drbd/drbd_transport_tcp.c:670 function parameter 'transport' not described in 'dtt_socket_ok_or_free'
+>> Warning: drivers/block/drbd/drbd_transport_tcp.c:670 function parameter 'what' not described in 'dtt_socket_ok_or_free'
+>> Warning: drivers/block/drbd/drbd_transport_tcp.c:670 function parameter 'transport' not described in 'dtt_socket_ok_or_free'
+>> Warning: drivers/block/drbd/drbd_transport_tcp.c:670 function parameter 'what' not described in 'dtt_socket_ok_or_free'
 
-base-commit: c75b0cf0982c00cddfd88d1acf3872f79b40980c
--- 
-2.56.0
-
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
