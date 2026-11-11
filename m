@@ -1,90 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794414080;
-	b=GweBq5QTt1ElM+8Oj7atqHE3Ab2klDPzgcoO6hJWTYNRByB2qPMI0LhYlgJ7bI8K/1Ra
-	 CunHt8ear6SFWe9I39C5q7WwsPUDnSNerqV0dyyyhrztpXtewtxXKjITqgO6wJ1fhnfyK
-	 X6vIsoisuzZFTI0nQ87qI7BBAN6wK1/XPnFDRP4lBJvVdneAgJvpPF6wkh/vnUg9bRNLZ
-	 CV67gDiCnZp65Li0tjDL9i3+khytKGtNDO262ibU0DkheTOLImzHTpO9kppWGqDOHHZIl
-	 ncGOEJEltWaZSerIHKJ7ePFC1qUhP2HxlRIFCocYEz7DApqSBkuLqAzxinM2HuXthjw==
+	t=1794414120;
+	b=B3TRTC5munXgbI+EYW3nptuTBx+BJ7BZLBVUb2Mn2ulPMgkfrFiy8mKFQFxgmgA97xty
+	 040EihiUkE/YfkuS0CUfCzMEeomSrdEew0l01ABu07lcXbbaN/UZQ9V5JW6TLmTqkItpw
+	 oSIATHP3cDgu5XLJdnk3vKvcHWbFoTB5caPzYBSpAwWjLMiPh/ni9LxNkk0LPPIUiEjAl
+	 o0oFx/TVMgiqCxzRTfPfFjOekQmVVzG0JA4u/6UtVjslbL8PKzLJG24JzPV9334O1rB3A
+	 xFOs05t26BpgA1KRhcIH9Vt/rn660M3nBAAnoFjbgOtiTfjQGTLDa7mq/wD5swjhDxA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794414080;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:Received:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:X-Spamd-Result:
-	 X-Spam-Score:X-Spam-Level:X-Spam-Flag;
-	bh=bSSv9eG1iTWrGFTeMHmS2DVPwf3MYF59DxWDnGZ5sCE=;
-	b=G2VmcCuPA27hZ3j/G/jrIsiNXIEUulvPANyqwRA5ElzI20lGe0tk2+i2t0SWuan02SW3
-	 9mFpujjBeJuSMGjga8DPdiFTpVOZWleD7tUwwyYfwohRTZ6IUjSI3Sn0ZUGZXzJlOYiQe
-	 ddzmqbd8GWXqYK6cnHGg47GgL22GfmkjO2BG8VPVyTtjrhr51zhS/9+r4YutWahD0Ra1B
-	 i+/EukHdvGKHv3/w6BbiAUSfsUN+CVR+iQv+mCcMaY4CBRfM7QHGnFRsoPXFcyimjtNc2
-	 /z9AsAHEjsRa1ciyNqkFcEYRHfE8p57ljt/SU/5c5vnzMGgZC3klzs6rBVYpIWD8oog==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794414120;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=VJGtlaPINj1DXcWX4y85rvvcbuq32TLYXZeY2c0DWog=;
+	b=0yPFObeu9WLW9KR9UhZJ6SbbgLx4zwrS7G1+Gi/sOjMsTbIua6R7wrs/XShTksowJhN5
+	 DQNVJmzTJ422D41T4Do2gBmuQ1OAu/Dsrdd01YJIZ0dzxCDTCTTa6XaLPgupon6NMQ768
+	 TTbBQ9FQxa6IhzxM9FZeFGA4zFd1nu1PLSnp4y1FOgHv6iDlHK/dIipqT0duzaatIVeRo
+	 tUI7YCYtI0t9hF47vKFKJdxJWxpKhPN9fdSXWEk8fOTTlQLh+u7WfDmm9CJCosITWvEF/
+	 xwkUXKmzNO4gI86dFgia5gNUjEV0fp53u9/ERsqGCBZbw1XqCVQgjcfwfBvunzGowTQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.com;
-	spf=pass smtp.mailfrom=suse.com;
-	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=susede1 header.b=tg5PpfpL;
-	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=susede1 header.b=tg5PpfpL;
-	arc=none smtp.remote-ip=195.135.223.130
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=WRRqZqaP;
+	arc=none smtp.remote-ip=95.215.58.72
+Received: from mta1.migadu.com (out-72.mta1.migadu.com [95.215.58.72])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41265606A32E;
-	Wed, 11 Nov 2026 16:21:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41265606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D01606A324
+	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 16:21:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 42D01606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=susede1 header.b=tg5PpfpL;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=susede1 header.b=tg5PpfpL
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AEAB621D93;
-	Wed, 11 Nov 2026 16:21:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1794414077; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bSSv9eG1iTWrGFTeMHmS2DVPwf3MYF59DxWDnGZ5sCE=;
-	b=tg5PpfpLp/dgUzWIDV/iSAU0nguXlNp6hSiYcOS2zsUh9F8aeKmpYS2xNtgMMZj5NrJXWp
-	j5jbkXYSPf9jx4mCvwI5gphXASoF8HgrHDrsJBSvHBRiYAqDvvTjcNlsvHVa8yvkEJw0nA
-	esAZUn8gyTcAM46y8pDLpWjWGT4iS5k=
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1794414077; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bSSv9eG1iTWrGFTeMHmS2DVPwf3MYF59DxWDnGZ5sCE=;
-	b=tg5PpfpLp/dgUzWIDV/iSAU0nguXlNp6hSiYcOS2zsUh9F8aeKmpYS2xNtgMMZj5NrJXWp
-	j5jbkXYSPf9jx4mCvwI5gphXASoF8HgrHDrsJBSvHBRiYAqDvvTjcNlsvHVa8yvkEJw0nA
-	esAZUn8gyTcAM46y8pDLpWjWGT4iS5k=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5767C134E5;
-	Wed, 11 Nov 2026 16:21:17 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id AuQhCv2V9GocAwAAD6G6ig
-	(envelope-from <jgross@suse.com>); Wed, 11 Nov 2026 16:21:17 +0000
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Juergen Gross <jgross@suse.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger@xenproject.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH 3/3] xen-blkback: make statistics data persistent across disconnect/connect
-Date: Wed, 11 Nov 2026 17:20:58 +0100
-Message-ID: <20261111162058.804033-4-jgross@suse.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261111162058.804033-1-jgross@suse.com>
-References: <20261111162058.804033-1-jgross@suse.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=WRRqZqaP
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=EoFT4KkRoHJY5kdQFyTVPzb3Rq1uBeETUVCmnHBlUgM=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794414117; v=1; x=1795018917;
+ b=WRRqZqaP1PQfncI9QH8UiNKTsqKMbuIYmfwiUW8I9HD5mHgyPR5j69m7q1phtIUknEcMu48d
+ 8uA1HY/vvW89h6TwHeTN92QRwVFaLf0YUrjxtsG6qjGlOD7yf5dRARRGvyDX6YgOOdLi5hWJ4nf
+ QdMM10zkPxMxJrC1lDzDLyWE=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 73970e10ef5fd271;
+	Wed, 11 Nov 2026 16:21:57 +0000
+X-Mizu-Trace-ID: 73970e10ef5fd271
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: tj@kernel.org,
+	axboe@kernel.dk,
+	josef@toxicpanda.com
+Cc: oliver.sang@intel.com,
+	nilay@linux.ibm.com,
+	hch@lst.de,
+	yukuai@fygo.io,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cui.tao@linux.dev,
+	cuitao@kylinos.cn,
+	sashiko-bot@kernel.org
+Subject: [PATCH] blk-iocost: fix the lock order in ioc_cost_model_write()
+Date: Thu, 12 Nov 2026 00:21:37 +0800
+Message-ID: <20261111162137.295523-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -95,99 +74,47 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-11.80 / 50.00];
-	SUSE_INTERNAL_BYPASS(-9.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.995];
-	MIME_GOOD(-0.10)[text/plain];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Score: -11.80
-X-Spam-Level: 
-X-Spam-Flag: NO
 
-Today the statistics data is living in struct xen_blkif_ring only.
+ioc_cost_model_write() holds rq_qos_mutex, which is acquired by
+blkg_conf_open_bdev(), across blk_mq_freeze_queue(). ioc_qos_write()
+freezes the queue before taking the mutex instead.
 
-This means that a disconnect/connect cycle will reset the data, as the
-rings are freed and re-allocated in this case.
+The inversion cannot currently deadlock because blk_mq_freeze_queue()
+is in a noio scope since 1e1a9cecfa ("block: force noio scope in
+blk_mq_freeze_queue"), so a caller freezing a queue cannot recurse
+into the frozen queue through reclaim. Holding the mutex across
+the freeze needlessly serializes config writers behind it and
+leaves two different orderings in the same file. Release the mutex
+around the freeze to match ioc_qos_write(), mirroring the fix there
+in 9730763f4756 ("block: correct locking order for protecting
+blk-wbt parameters").
 
-Add a struct xen_blkif_stat in struct xen_blkif and sum up the per-ring
-data there when freeing the rings, and add those values to the printed
-statistics data.
-
-Signed-off-by: Juergen Gross <jgross@suse.com>
+Reported-by: sashiko-bot@kernel.org
+Link: https://sashiko.dev/#/patchset/20261103132613.1952975-1-cui.tao@linux.dev?part=1
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 ---
- drivers/block/xen-blkback/common.h |  2 ++
- drivers/block/xen-blkback/xenbus.c | 19 ++++++++++++++++---
- 2 files changed, 18 insertions(+), 3 deletions(-)
+ block/blk-iocost.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-index f8385c4b9d30..c35ec207b31d 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -327,6 +327,8 @@ struct xen_blkif {
- 	unsigned int		nr_rings;
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 1c1025157d8e..7fe0a6fa146e 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3605,7 +3605,14 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 		ioc = q_to_ioc(q);
+ 	}
  
- 	unsigned long		buffer_squeeze_end;
++	/*
++	 * Nothing in the cost model is protected yet; release rq_qos_mutex
++	 * around the freeze to match ioc_qos_write().
++	 */
++	mutex_unlock(&q->rq_qos_mutex);
+ 	memflags = blk_mq_freeze_queue(q);
++	mutex_lock(&q->rq_qos_mutex);
 +
-+	struct xen_blkif_stat	st;
- };
+ 	blk_mq_quiesce_queue(q);
  
- struct seg_buf {
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index b3ef483a92fd..f0d4cec4432a 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -346,6 +346,18 @@ static int xen_blkif_disconnect(struct xen_blkif *blkif)
- 	 */
- 	write_lock(&blkif->rings_lock);
- 
-+	for (r = 0; r < blkif->nr_rings; r++) {
-+		struct xen_blkif_ring *ring = &blkif->rings[r];
-+
-+		blkif->st.rd_req += ring->st.rd_req;
-+		blkif->st.wr_req += ring->st.wr_req;
-+		blkif->st.oo_req += ring->st.oo_req;
-+		blkif->st.f_req += ring->st.f_req;
-+		blkif->st.ds_req += ring->st.ds_req;
-+		blkif->st.rd_sect += ring->st.rd_sect;
-+		blkif->st.wr_sect += ring->st.wr_sect;
-+	}
-+
- 	rings = blkif->rings;
- 	blkif->rings = NULL;
- 	blkif->nr_rings = 0;
-@@ -399,13 +411,14 @@ void xen_blkif_interface_fini(void)
- 		struct backend_info *be = dev_get_drvdata(&dev->dev);	\
- 		struct xen_blkif *blkif = be->blkif;			\
- 		unsigned int i;						\
--		unsigned long long result = 0;				\
-+		unsigned long long result;				\
- 									\
- 		read_lock(&blkif->rings_lock);				\
--		if (!blkif->rings)				\
-+		result = blkif->st.name;				\
-+		if (!blkif->rings)					\
- 			goto out;					\
- 									\
--		for (i = 0; i < blkif->nr_rings; i++) {		\
-+		for (i = 0; i < blkif->nr_rings; i++) {			\
- 			struct xen_blkif_ring *ring = &blkif->rings[i];	\
- 									\
- 			result += ring->st.name;			\
+ 	spin_lock_irq(&ioc->lock);
 -- 
-2.56.0
+2.53.0
 
