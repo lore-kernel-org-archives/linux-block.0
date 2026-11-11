@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.117
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794408663;
-	b=UwF56spgkrs1eFJVd2KnG3nU0v6OdAStN8FEEcHxGmszXTH+WPc7G0a7GQ5JfIE0it56
-	 piF67128BVITShkaIbfI7hMjc3uQ11DjOCG8xEeUASjNj1zXXyUMqSKNUlCzMczyIOqol
-	 mF94W/474inX+jLpYxwGX+JhbnxFBHRONb52zr6kxoEg1xOCH7SNEJrwQo1V8U5TRdqw+
-	 FZNB9CgRxgz2C55YO3FVEohj4IrGK8K3xR1ZjvSa+KA+awF+zoIEDCI+zsU0uFRP/vW6d
-	 h+u6e+RSsUExuRERc7hpCPz4rKm3ZGobDQM7Qvl8ZWbD7nVUnUrmnKc3f1Cf44bdTWg==
+	t=1794408672;
+	b=kolKxL+MUfZ667GnSo5iQXBuC1dVQyM5qRe2aOlyFWjeMYTnRuILkmZ65fUl3t+DUeDw
+	 qpTuIbd4+hlFsY/mdz1h9BouviubiTYIdVELXjzEHXXls41aSPPvTbF0hHbgFIObMGHhD
+	 Me+hI3dk8MpDaG9xsa/fgO90mTdNDLiDsRFwBoXE/jOrgJ5AftHdxCcJTLmjOeM9tscmq
+	 +JkfnDNDiJlNrbu70fKc3MIMAbrWHoFDVcMJyJf10ltS3scFGvlqpd4NL0wbxYrSGmXBw
+	 5sHu+rRi6uQhFZeqbx4jI600CkdVcf5QhfN1R/u4bFpttG5Mmebpq0NJhILzgvkyN2A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794408663;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794408672;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=EJoVaWGGDNW1Id/n/9brJAEB3fKM8Jou3zLTRrF1e7U=;
-	b=Xelt5PaNanbR/retZPh411F5S0B+ImIx45tQtyROpB5kXrRVHISuWA3W8KzSol08eLH+
-	 ttAhQi6Ukk6lEp/bJYTZqB2s2nvpYbkwOm15FOMw520eRL8Zmnb2S0bbwAem1mfJv+m/t
-	 zocGNOtpqT1FptKHszejjIhRwGUUECeXoLRatZ3FjNKPRDOHJA3uozwN9vH66BSb6emS+
-	 Lk1bkil2L33zv8czk0oQaue+bUeq187yEisi9ezP25FpbHrcwwpmUkaSBOvk0V6QzKeJz
-	 3kX53BWdusRrhHCuVPPw7OwSAfJFhyfq21tdhIwvxZtrW2anCQvb8tGvzee7UzmAsmQ==
+	bh=g+jv8AtfpGafUC5wBdSfIamvnfKnHxDWwY7oWhWrKE0=;
+	b=FgxvkadsWcDnpghOQLT2DcBtynr7eiJ4rdZxVNnIWXwiwuMC92Is+jwo2NBGxeHqYczc
+	 TJmuAPlQwlCAAJePUKU4UxAcYGVyLztSgMugPB2loo30kjYAG8R0miI0fpx8sJ5YzpGq/
+	 rtM01AzahGep430wP6pJNZHk21q/vKkbk2JeIHDpfUz/FGLWah9Ju0V5j4EOeyyReXgko
+	 GEL+TabxiC3Gn49UsMosOdBF0WClMH9D4taollKggqidesDt7agXyYx/SaIrLXDWVIf/2
+	 8xnV+hp+lVu1Hlht/8S/NbWMoG+ZDekpccFE4sqlxMRME6v6U7NN8dlNrJQz0zD9c7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VO5lBtoU;
-	arc=none smtp.remote-ip=95.215.58.117
-Received: from mta1.migadu.com (out-117.mta1.migadu.com [95.215.58.117])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Po9Gdm7o;
+	arc=none smtp.remote-ip=95.215.58.131
+Received: from mta1.migadu.com (out-131.mta1.migadu.com [95.215.58.131])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9329F606A88B
-	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 14:51:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9329F606A88B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEC560A260F
+	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 14:51:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EEC560A260F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VO5lBtoU
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Po9Gdm7o
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=6BTSDkaYo+GkLYc1VRePzbZVpQvqYtmjYkbAZjXokg8=;
+DKIM-Signature: a=rsa-sha256; bh=xy5K9Cw6RLs5ZIVIwHbgzwEDhJquIkV4vlOTki38lhQ=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794408660; v=1; x=1795013460;
- b=VO5lBtoUEtVoeus0nYjvQfEZJgP5hfM+BiUlYoKSpEDMIeVtuq7aJ6raxAVT+jwAJnfHnOaO
- juz/m1mHxUcW1glOPSJRgesgBV7GZQ9hhQKQkxW8CimUk02p6qI3/vkSlcV2N0qq7B4kqBGg6co
- jmTBlL875ihc8ZZkXitc23oA=
+ t=1794408669; v=1; x=1795013469;
+ b=Po9Gdm7oiVslmglM7cR6dHG8MZzP0QUgzefHoPf2YJ9YcvzjIfCAyeaf6lnYj9vp+yWVYGj2
+ 3xjTci7xJQGJx5jQIIQXWkCBYqRrzUjqJZfo6zFZ7vPF9iw4okDAbDcpUvhImliv7s/m/obG0JE
+ L3LQET57+mehEjqh++d6BuPE=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 9da4ac12eb974c88;
-	Wed, 11 Nov 2026 14:51:00 +0000
-X-Mizu-Trace-ID: 9da4ac12eb974c88
+Received: by smtp.migadu.com with ESMTPS id fa600de2af1b08c0;
+	Wed, 11 Nov 2026 14:51:09 +0000
+X-Mizu-Trace-ID: fa600de2af1b08c0
 X-Migadu-Flow: FLOW_OUT
 From: Tao Cui <cui.tao@linux.dev>
 To: axboe@kernel.dk,
@@ -61,9 +61,9 @@ Cc: linux-block@vger.kernel.org,
 	mathieu.desnoyers@efficios.com,
 	cui.tao@linux.dev,
 	Tao Cui <cuitao@kylinos.cn>
-Subject: [PATCH v2 1/2] blktrace: require CAP_SYS_ADMIN for the blktrace interface
-Date: Wed, 11 Nov 2026 22:50:33 +0800
-Message-ID: <20261111145034.248717-2-cui.tao@linux.dev>
+Subject: [PATCH v2 2/2] scsi: sg: Require CAP_SYS_ADMIN for BLKTRACE passthrough ioctls
+Date: Wed, 11 Nov 2026 22:50:34 +0800
+Message-ID: <20261111145034.248717-3-cui.tao@linux.dev>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261111145034.248717-1-cui.tao@linux.dev>
 References: <20261111145034.248717-1-cui.tao@linux.dev>
@@ -80,87 +80,56 @@ Content-Transfer-Encoding: 8bit
 
 From: Tao Cui <cuitao@kylinos.cn>
 
-BLKTRACESETUP allocates user-sized relay buffers and sets up a trace
-that outlives the creating fd.  Every command of the interface,
-BLKTRACESETUP, BLKTRACESETUP2, BLKTRACESTART, BLKTRACESTOP,
-BLKTRACETEARDOWN and, on x86_64 with CONFIG_COMPAT, the 32-bit
-variant can be issued by anyone who can open the block device node,
-and the sysfs trace attribute group reaches the same tracing state
-without any check.  A container that is handed the node can hold
-trace state and relay memory on a shared queue; the relay files
-themselves stay root-only (0400).
+sg_ioctl_common() calls blk_trace_setup(), blk_trace_startstop()
+and blk_trace_remove() directly instead of going through
+blk_trace_ioctl(), so gating the block side does not close the sg
+passthrough: an unprivileged process with access to an /dev/sg node
+could still allocate relay buffers and control tracing state on the
+underlying request queue.
 
-Gate blk_trace_ioctl() and sysfs_blk_trace_attr_store() with
-CAP_SYS_ADMIN.  The ioctls return -EPERM, the sysfs store -EACCES
-like the md store callbacks it resembles.  Unprivileged callers now
-get one answer that depends only on their credentials, instead of
-values that revealed whether a trace existed and was running.
+Require CAP_SYS_ADMIN for the four passthrough commands.  The check
+sits after the command log line so the new rejections stay visible
+in the ioctl trace, and it is qualified with
+IS_ENABLED(CONFIG_BLK_DEV_IO_TRACE) so kernels without blktrace
+keep returning -ENOTTY for these commands instead of a new -EPERM.
 
-Traces survive the creating fd by design, so a creator that drops
-its privileges can no longer tear down its own trace.  Such traces
-wait for a privileged teardown or for the queue to go away;
-blk_trace_remove() from sg_device_destroy() and
-blk_trace_shutdown() from blk_unregister_queue() bound that wait for
-unplugged devices.
-Document the sysfs attributes in Documentation/ABI, where the group
-has been missing since it was added.
+BLKTRACE ioctls through sg now get the same answer they would get
+through the block device node: -EPERM for unprivileged callers,
+regardless of the trace or queue state behind the node.
 
 Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 ---
- Documentation/ABI/stable/sysfs-block | 18 ++++++++++++++++++
- kernel/trace/blktrace.c              |  6 ++++++
- 2 files changed, 24 insertions(+)
+ drivers/scsi/sg.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 900b3fc4c72d..177c4b95a47d 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -939,3 +939,21 @@ Description:
- 		==  ==============================================
+diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
+index 6551f1284d44..f863979604ef 100644
+--- a/drivers/scsi/sg.c
++++ b/drivers/scsi/sg.c
+@@ -911,6 +911,13 @@ static int put_compat_request_table(struct compat_sg_req_info __user *o,
+ }
+ #endif
  
- 		For more details refer Documentation/admin-guide/iostats.rst
++/* keep in sync with the commands blk_trace_ioctl() gates */
++static bool sg_is_blktrace_cmd(unsigned int cmd)
++{
++	return cmd == BLKTRACESETUP || cmd == BLKTRACESTART ||
++	       cmd == BLKTRACESTOP || cmd == BLKTRACETEARDOWN;
++}
 +
-+
-+What:		/sys/block/<disk>/trace/{enable,act_mask,pid,start_lba,end_lba}
-+		/sys/block/<disk>/<partition>/trace/{enable,act_mask,pid,start_lba,end_lba}
-+Date:		January 2009
-+Contact:	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>
-+Description:
-+		Configure blktrace for this device's request queue.
-+		"enable" creates (1) or removes (0) the per-queue trace
-+		bookkeeping; "act_mask" selects the traced action
-+		categories, either as a number or as a list of category
-+		names; "pid" restricts tracing to one process;
-+		"start_lba" and "end_lba" bound the traced sector range.
-+		Reading an attribute shows the current setting and needs
-+		no privilege; writing any attribute requires
-+		CAP_SYS_ADMIN.  Enabling from sysfs does not set up
-+		relay buffers; full tracing is armed through the
-+		BLKTRACESETUP ioctl.
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 8cd2520b4c99..f56d57a924bf 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -927,6 +927,9 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- 	int ret, start = 0;
- 	char b[BDEVNAME_SIZE];
+ static long
+ sg_ioctl_common(struct file *filp, Sg_device *sdp, Sg_fd *sfp,
+ 		unsigned int cmd_in, void __user *p)
+@@ -922,6 +929,9 @@ sg_ioctl_common(struct file *filp, Sg_device *sdp, Sg_fd *sfp,
  
-+	if (!capable(CAP_SYS_ADMIN))
+ 	SCSI_LOG_TIMEOUT(3, sg_printk(KERN_INFO, sdp,
+ 				   "sg_ioctl: cmd=0x%x\n", (int) cmd_in));
++	if (IS_ENABLED(CONFIG_BLK_DEV_IO_TRACE) &&
++	    sg_is_blktrace_cmd(cmd_in) && !capable(CAP_SYS_ADMIN))
 +		return -EPERM;
-+
- 	switch (cmd) {
- 	case BLKTRACESETUP2:
- 		snprintf(b, sizeof(b), "%pg", bdev);
-@@ -2079,6 +2082,9 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- 	u64 value;
- 	ssize_t ret = -EINVAL;
+ 	read_only = (O_RDWR != (filp->f_flags & O_ACCMODE));
  
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EACCES;
-+
- 	if (count == 0)
- 		goto out;
- 
+ 	switch (cmd_in) {
 -- 
 2.53.0
 
