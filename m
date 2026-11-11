@@ -1,50 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.165
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.168
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794434329;
-	b=O4pr4qn4jguwowYMyTaJ/TYolxXEK17GO4qxYfNHvRgm9FrbfhGnYLCcZE8TfyNGsIu+
-	 HdXvHvJ2bwXtKSp0IRguHiGmcOUBXhJN0NVBl6HNkTdonvNfdE9BAjx8+7l6+ySersy1n
-	 amT65KQEwRydwAssyXerY/2fG+HUsv6NBKncx+WVcXnWxizJgMZNFfu/AwrBfHLs+VwyG
-	 FR0O5wJNKANLX80J+SVWWOogNeSDRZvpSir8axkNunfDl3jnwTKrvI9/N0wTZ3QVktkiy
-	 A3IFfKbTTwYUfcHLUkcHJ72dnXui2ERhtBkkKauPbhP95KF9bkeqBlndMteh7mPJ0Kg==
+	t=1794434331;
+	b=cENGkXkzLFbK/0Ujw7pI1vr5Q5NGWVXrilyPbPJQ5Ls/eQFi1ou3ECShwnn5I6/Ipqki
+	 PHOdCLLUsYYM7spEp9rADWaMlajoXf45IeeCZc/oNAnXB6N3wvPMMwpVmycuDQ+2HVD8g
+	 lK63R7j92ZMABdcbdptfzCKSAQV69Z3K87qPVqAZQIrSMcr9UNcTHcmmmZyVdqkkp3VYB
+	 /2PwZwZccI+2p/moEqhs0/G5ttjmg1yrokOJK2eHIEpv/c0hgS+s9UWTSBOV+ClU58KcH
+	 KLGJlHGjS08naPHnNSYxoo0nifbmNxczhLkLVEyN1Ngwo/I55IkUqoNyqiwsJwXpyKg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794434329;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794434331;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=hgsipuaL/nPkrvd++ekAvRrCwo9loHK4VYxFcf9R04E=;
-	b=Wwpl5I2yMle6OErN3PSWX9+ABCE7KWOXbjveb7TXPth7sgjteHyYaBDyH2e+yFmwlu3k
-	 llJDU3fwYXsCudI/fKsZh9xd1BFeIHjEy8PpGhBTXKSCfIx8saKjh313JbKPS6zI4n+hA
-	 6UhOADihswSmOB/ZtXuLslipXV++bcXNITNrWhj30Dn4gUPVL/hkslohBci0eLavvXJ0z
-	 GvU+0IylPel4u9kET874CyUg6V3ppy5imPlaFhTXKS0VZYasFqgDkZcQ/YHo1QWZ/4f6Y
-	 v2UgQuTwwsIWv6j+Xk84ygsuPXsUGnzXxGN0NluPEEUZpL8o12Wa0k9z/PmPD3MyUuQ==
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=C+Gn6RummdqO4CrCZxOhHXaoNeGZaSqp0ZgNY3d5bAo=;
+	b=raxHYM+nPcG/9AXSoPEWvtxYWYfHcCme+tBaluLTkzN2lo1be2HQeMyOKjIuZTLikw7D
+	 6RdzFtliEOippT6UArrM7nthr0x9NOK262HvPG3J2/v5G7R6rNOKQHJ17/G1GOISY5rwA
+	 7NiwPYqU/VrTzPWrjTCNG/P2fcoa0OUbieKHs+zTnVtlc/Gc0XsRvWzwjsEdfqvLGCwvz
+	 thKdg+QX4THH2qfeabtoobLAfOfre1oD7wyTS0ANR6QV2kAgUqdriG4zYf6sAcY3z3G+F
+	 uGIdVsRuvfv+IZJbvXgjKHD4vVywr75qpINBVA5ABJ6voBAPJpaIBQwcHR/OePNjCcA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=PSTIS7BE;
-	arc=none smtp.remote-ip=95.215.58.165
-Received: from mta1.migadu.com (out-165.mta1.migadu.com [95.215.58.165])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=k2Epol4T;
+	arc=none smtp.remote-ip=95.215.58.168
+Received: from mta1.migadu.com (out-168.mta1.migadu.com [95.215.58.168])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE29F606A881
-	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 21:58:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DE29F606A881
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0359606A89A
+	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 21:58:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0359606A89A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=PSTIS7BE
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=k2Epol4T
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=3ph4Vs/VB5qe6KjUKpfqQwTICzKcmVO8q2/wRUsGmTU=;
+DKIM-Signature: a=rsa-sha256; bh=szU6BENnGtaOWNLKR0jKnvvcedxpIyMKQtFwTvNdL5k=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794434326; v=1; x=1795039126;
- b=PSTIS7BE6b02L+DLNNYX0zuBiMR/hK8Qh13Rv5vTbAeL0JHSkFmbsFtiidktsyc7LlYNU4fd
- UzSP05n+x+eov9Sn6gaHNV6GY9lvHD65c8n8GqBmBd8cLyLcqxdn6r0dSfJVENPGKNE9/rjMAJn
- KWXglt9XhDUNmkKexRrWeo8o=
+ t=1794434329; v=1; x=1795039129;
+ b=k2Epol4TSVIJbKVaNAqeSLxetxd5/MvfTG0EpXx4AQC5QQsKXV8JVG5yJuobXsa1RzT8dgrC
+ ImjaZIooMDCMOblLUazuNTiBO62WG7MTAWI7wb5YmVG8VmM7BG35NurZmX6jXlt1JASAP/H0RCi
+ tl+twPCfoSdU/OHiAhOgTlwY=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 1d1b02ecd1481e3c;
-	Wed, 11 Nov 2026 21:58:46 +0000
-X-Mizu-Trace-ID: 1d1b02ecd1481e3c
+Received: by smtp.migadu.com with ESMTPS id c3e555939cfd8b79;
+	Wed, 11 Nov 2026 21:58:48 +0000
+X-Mizu-Trace-ID: c3e555939cfd8b79
 X-Migadu-Flow: FLOW_OUT
 From: Md Haris Iqbal <haris.iqbal@linux.dev>
 To: Jens Axboe <axboe@kernel.dk>,
@@ -55,10 +56,12 @@ Cc: linux-kernel@vger.kernel.org,
 	Jonathan Corbet <corbet@lwn.net>,
 	linux-doc@vger.kernel.org,
 	Md Haris Iqbal <haris.iqbal@linux.dev>
-Subject: [v4 0/3] block: delay support for error injection
-Date: Wed, 11 Nov 2026 22:58:35 +0100
-Message-ID: <20261111215838.103356-1-haris.iqbal@linux.dev>
+Subject: [v4 1/3] block: Reject unknown status tags in error injection rules
+Date: Wed, 11 Nov 2026 22:58:36 +0100
+Message-ID: <20261111215838.103356-2-haris.iqbal@linux.dev>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261111215838.103356-1-haris.iqbal@linux.dev>
+References: <20261111215838.103356-1-haris.iqbal@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,81 +73,100 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Error injection can only fail a bio today.  This adds a delay_us option so
-that a rule can hold a bio back first, to model a slow device.  The delay
-happens above the driver, so it tests the code waiting above the block
-layer, not the blk-mq timeout handler.
+tag_to_blk_status() returns BLK_STS_OK both for the "OK" tag and for a
+tag it does not recognize, so a caller cannot tell the two apart. The
+block error injection code (which is the sole user of this function
+currently) relies on error_inject_add() later to reject adding a rule with
+status=BLK_STS_OK. This is okay for the current state of error injection.
 
-A delayed bio is marked with a new BIO_ERROR_INJECTED flag so the rules
-are not applied to it again, even after a split.  Christoph asked on v2
-to avoid the flag by allowing a delay only together with an error.  I kept
-delay-only rules, as a slow device that succeeds is the more useful case,
-so the flag question is still open.
+The delay option added in the next commit makes the rule with status=OK
+valid, meaning the function tag_to_blk_status() now needs to explicitly
+match BLK_STS_OK for it, and fail for a tag it does not recognize. Hence
+make tag_to_blk_status() take a second param to update the matched status,
+and return true in case of a successful match. If a match is not found,
+the function tag_to_blk_status() returns false and *status remains
+unchanged.
 
-Holding a bio back reorders it against bios submitted later, which breaks
-sequential write ordering on zoned devices.
+A repeated status= where an invalid tag comes first is now rejected
+instead of being overridden by the later one.
 
-Patch 1 is a prep cleanup.  It moves the rejection of an unknown status
-tag into the parser, because patch 2 makes a rule without a status valid.
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
+---
+ block/blk-core.c        | 14 ++++++--------
+ block/blk.h             |  2 +-
+ block/error-injection.c |  7 ++++---
+ 3 files changed, 11 insertions(+), 12 deletions(-)
 
-Tested in a VM.
-
-Claude helped with parts of patch 2 and the documentation, and was used to
-review the series before each posting.  I went through all of it and tested
-it myself.
-
-v1: https://lore.kernel.org/linux-block/20260827000115.128093-1-haris.iqbal@linux.dev/
-v2: https://lore.kernel.org/linux-block/20260830012002.80275-1-haris.iqbal@linux.dev/
-v3: https://lore.kernel.org/linux-block/20260928221634.43239-1-haris.iqbal@linux.dev/
-
-Changes since v3:
-
- - Patch 2: share the failure path in a helper, return early in the work
-   function, fail REQ_NOWAIT bios with BLK_STS_AGAIN instead of skipping
-   the delay, warn when a delay can't be allocated, set the flag as soon
-   as a rule matches, and drop comments that state the obvious.
-
- - Patch 3: document that REQ_NOWAIT bios fail with BLK_STS_AGAIN.
-
- - All patches: drop the Assisted-by tag, following commit 1e035297ffda
-   ("docs: remove Assisted-by references").
-
-Changes since v2:
-
- - Patch 1: return bool, rewrite the commit message.
-
- - Patch 2: drop __submit_bio_noacct_nocheck(); the flag alone stops the
-   rules being applied again.  Log the error when a delayed bio is failed.
-
- - Patch 3: trim the documentation.
-
-Changes since v1:
-
- - Add the BIO_ERROR_INJECTED bio flag.  v1 only resubmitted a delayed bio
-   below the injection hook, which left the remainder of a split going
-   through the hook and matching the same rule again, so a bio was held
-   once per split instead of once.
-
- - Patch 1: tag_to_blk_status() returns an error and passes the status back
-   through a pointer, instead of returning BLK_STS_OK for both the "OK" tag
-   and an unknown one.  A delay-only rule has no status, so the two have to
-   be told apart.
-
- - Documentation: a delayed bio is held once rather than once per split.
-
-Md Haris Iqbal (3):
-  block: Reject unknown status tags in error injection rules
-  block: allow error injection rules to delay bios
-  Documentation: block: document error injection delay feature
-
- Documentation/block/error-injection.rst |  39 +++++-
- block/blk-core.c                        |  14 +--
- block/blk.h                             |   2 +-
- block/error-injection.c                 | 150 +++++++++++++++++++++---
- block/error-injection.h                 |   1 +
- include/linux/blk_types.h               |   1 +
- 6 files changed, 175 insertions(+), 32 deletions(-)
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 8836c7028568..2ee079c1ce15 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -226,21 +226,19 @@ const char *blk_status_to_tag(blk_status_t status)
+ 	return blk_errors[idx].tag;
+ }
+ 
+-blk_status_t tag_to_blk_status(const char *tag)
++bool tag_to_blk_status(const char *tag, blk_status_t *status)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(blk_errors); i++) {
+ 		if (blk_errors[i].tag &&
+-		    !strcmp(blk_errors[i].tag, tag))
+-			return (__force blk_status_t)i;
++		    !strcmp(blk_errors[i].tag, tag)) {
++			*status = (__force blk_status_t)i;
++			return true;
++		}
+ 	}
+ 
+-	/*
+-	 * Return BLK_STS_OK for mismatches as this function is intended to
+-	 * parse error status values.
+-	 */
+-	return BLK_STS_OK;
++	return false;
+ }
+ 
+ /**
+diff --git a/block/blk.h b/block/blk.h
+index 0e38e4b88cf5..105fff157bfb 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -52,7 +52,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
+ 
+ const char *blk_status_to_str(blk_status_t status);
+ const char *blk_status_to_tag(blk_status_t status);
+-blk_status_t tag_to_blk_status(const char *tag);
++bool tag_to_blk_status(const char *tag, blk_status_t *status);
+ enum req_op str_to_blk_op(const char *op);
+ 
+ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
+diff --git a/block/error-injection.c b/block/error-injection.c
+index e14bc4b723ef..db543fe27630 100644
+--- a/block/error-injection.c
++++ b/block/error-injection.c
+@@ -171,15 +171,16 @@ static int match_op(substring_t *args, enum req_op *op)
+ static int match_status(substring_t *args, blk_status_t *status)
+ {
+ 	const char *tag;
++	bool found;
+ 
+ 	tag = match_strdup(args);
+ 	if (!tag)
+ 		return -ENOMEM;
+-	*status = tag_to_blk_status(tag);
+-	if (!*status)
++	found = tag_to_blk_status(tag, status);
++	if (!found)
+ 		pr_warn("invalid status '%s'\n", tag);
+ 	kfree(tag);
+-	return 0;
++	return found ? 0 : -EINVAL;
+ }
+ 
+ static ssize_t blk_error_injection_parse_options(struct gendisk *disk,
 -- 
 2.53.0
 
