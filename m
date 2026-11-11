@@ -1,95 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.28.121
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794377118;
-	b=E3Qj1SIo8M7JVvP9BKXM/yt7ekfipmMzMLCPQSiwl0yiH/taCnXZ5bLF1PJoC+wKyOtL
-	 144lBDJTNQo343/ky6PUdOhoPTEHvGcdklzoSNeH1do4Z8CGvrtjdTQBs53VWk5ZQdNnF
-	 gmDKQ41MJKXHi1KGhpw0t139nNpvutaqF1WwToNHUeqpGo+trYNcOFbjyjnGWaqihbSrI
-	 AK8Ge3snhRGmi5diNJCXd55c6Z1YeMFLNK+UOiWMs1MBNMcRtfwBqXBXZn6gU7/ZKXUtH
-	 POdC39IcIxHgbCWd7QXknTMiP8EyGwodXgPUJTVEH2LImXV4/edwaqy37n0ZLGXCWDg==
+	t=1794378764;
+	b=gSE6ivNVByQdqs+DjadBpUDygKmUoX2DH3b2L3N4/q+Yl8tdEhUQnNUpaz7V+Q2U7MZp
+	 HPpQ/9YsufQ/BNhuzlH3zgkSW5ZwZ/Yg9ls6bEvUD7Y8xln3FVIIHLWSffy8AGB1beRJX
+	 BtuD/x7OsTtrOkK1DncerZ9R7mnTZfy9UawTE8Y8eO1MWGbBXu637FAe0szHj7o82ZyRW
+	 SuQ4rGdt0cj+/7hVqPR4hDGV0dtOsVcRHOJgBKS1RRLkMA4yGn80IIOYY+1f0y29q85Gs
+	 TnJq+/zqPpqYNrbPXREyooKZQIbn9vmIOfbcsgvGQj5kiiA+/phWWX5ObfQv/k738Nw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794377118;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
-	 In-Reply-To;
-	bh=IM8our1qODgBYXBjuIaJFEMcF7pAsbTKhqQQH1o60eI=;
-	b=wSopNY0iMM+axxQcDgshZcv/uQWmceosXYBRnCtlTg6TBPtRZIeMkQfPav1UhK7s6uDE
-	 1mbElK0zs+Ug0Q5ddW/dj6FMaCG3notq9aq8F5xPvEmBHejbTnc/HVbnu+cxwiact+qlJ
-	 KglkTYKY6UHCMrsqZHFLZ4Y/Qn+tKdWbtzo9j6s7vW6KLseMCQuIOImJpX+SGtv33AUAS
-	 xtAYUgxnc6W0wMc4WDPiY2MCbR6AbDFyMD+aIhqjYgVA902oGuCz/dr2MCicxs8ofUDl8
-	 2RX4viHB5yigrA2BvKYM5LREy7pscZSPT1Nihxe/EfV8xq6GVa/smuD2buxpxFExcgA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794378764;
+	h=DMARC-Filter:X-Alimail-AntiSpam:Received:X-Lms-Return-Path:
+	 References:Message-Id:To:Cc:Subject:From:Mime-Version:Content-Type:
+	 Date:In-Reply-To:Content-Transfer-Encoding;
+	bh=PuwfvEnwqO0+M6GUOFtsXMZ8uJz8SZx/2buZdVxTArU=;
+	b=kfntUZ+OkGweq02NNN6lvrZVeV4aXe8yqFunIi4hQ51vMOOeQRVt9aDlf3pB2eQ8sEsE
+	 MRQt7gHXTpgIF1A+TPM71URqEI2tvpCQIipkGzMGhAjZgNCH1ScTkjfsW8N3/MprjFwoH
+	 hwDvZpYUHm/Bmtjn9uNCTxTNqZdPDFmNHkBbXWzj6+ipuTmaeqWI2iwR7KYY+lzx8g9uz
+	 k62fmW2r9v43SI/yYUS/t8Y0rsw8vXMGMF4bGtZiU2ZyWeegLxzo8lqYdSy82En/MKJ23
+	 6DZ3b8LZdiRvpABS70PL7Z1bIT1POfxEBbmp9hHLSWgJ6T2fzdAEgYvDY91gxJSZUEA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=BM3W0ImJ;
-	arc=none smtp.remote-ip=209.85.216.50
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=none header.from=kaihong.com;
+	spf=pass smtp.mailfrom=kaihong.com;
+	arc=none smtp.remote-ip=115.124.28.121
+Received: from out28-121.mail.aliyun.com (out28-121.mail.aliyun.com [115.124.28.121])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386A1606A321
-	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 06:05:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 386A1606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=BM3W0ImJ
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3b08a162d4bso1604876a91.3
-        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2026 22:05:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1794377117; x=1794981917; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=IM8our1qODgBYXBjuIaJFEMcF7pAsbTKhqQQH1o60eI=;
-        b=BM3W0ImJ/AnF6hGKXgR5cMiYjO9JnWPpCmADsQJeLCubm8lklE3HbOnzULfoeBiGFD
-         9UsR25vVppFKHNWEwM52J84Osd3lAfTkcFb1cxZd7AJdGNiqjHw8FjR5cj8sjbr0q6GZ
-         i4ZT6VY7c4lNVVwOIYCC54Tr6eAwgM9EugRO8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794377117; x=1794981917;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=IM8our1qODgBYXBjuIaJFEMcF7pAsbTKhqQQH1o60eI=;
-        b=sImAbsWF3HSMACvF6hklVesraPVlVskH7KF59SUyo4OgWibhjsLbkodwEyoNBrc7Ml
-         D6icgJ9gFPYIpELtv05N2G19qoPhqEdv9isBhNzqrno6ElcOwcLLQ7jyZi4algujNgCU
-         Lc+xFqcqYfhlgrnpp3Lyo1RoPQPS7s3CAvdJL3+25P269svknJSv7Gg2dZZEyyNYANqM
-         DE14ET7RqZfaeT4sr1fItZk6FOjNrj8RNFTJzFFTxy3cNLMkT/eJC3kGJd1x6ou0ENlZ
-         wgD8XoAXyr9dyJQmF+yDwwkBhGpaUpS7LeBNQkUFOMi3112nYMVra+ZzsVkrg0KAljs7
-         u7Uw==
-X-Forwarded-Encrypted: i=1; AL+hErG7vIPvN6/tBDY3erwcXO5/+dw/RGLvHWklJ4vw5TlERNFfBopxMdV9c/PJpPyiWXqmpA+pwxJDyoYwnQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8qWsxCvA13x9PjjELyutRnSvnTmhpGv4LCM4AljekAcTqL6XOT
-	WWz/HO84UD5BmS5Zb+PAJVBZIAyanNrb/nUN2RQL6EFknt2RV8WESY7so5ESxLCz/g==
-X-Gm-Gg: AYBFou0UCq4O9zBs8dXPDt7VFosUyqmazpuoRqhmUqf6vXEUnabRySVZRKbVT4o1Gin
-	vz0BQ5DFPKIaoe/r2iL/zA4+s/Eyqqn+zDzezCyEO/5YfxUZWiy0xh22NDpk1cJlxzDdtDzisGy
-	ZUvuTu1Obq1GZVbpexbEY7jk/NkQoiXwjYdy37JGlS9C6zVpHJoAAu6JF4H0waAEYTEmy6ZfpuW
-	EQuL832kYqrZHiKYAWXVCSPk39RzamrN4JfV/g67O0vrKxLdpC9TbVD7Rae6JYE9yUO7fRMsbhq
-	PcDU0Oo3i6NM1ma4Q4QSeqpwTOGuo01xNUBlh95spdlTZkl+Hcsbv1UUt8gQBJ+uWU3LSBF1Hg8
-	cWjAuDqSdaZ+s/IUfEAzJw0KeQtXqHdM6GmwO2R1a/aRCkf/nGqVt4GW74h8NGo4NitU3qngfUB
-	rasab00ZfzVrU7BBr+Nf9Kh33feYkocN6WfZWL1eMvj8DlefTzu7/h4bWPQY05cjTmr5/1WC6rE
-	mE1MkxQ0aOQLujgcQn9N2cwJnNgrBGR4sFO9udQg2uUolPZ8Ww7R40grm9NreLtkSBXfnu/yqGA
-	YH7CEiLC63AiOi3DEIZPjzecHq4ne1CBr3QcFObLKDoLpJFtdKTCkW4rWObpBM2S4rQ0cA==
-X-Received: by 2002:a17:90a:e708:b0:3a4:6f38:f2a2 with SMTP id 98e67ed59e1d1-3b182f26e6bmr1551048a91.25.1794377117628;
-        Tue, 10 Nov 2026 22:05:17 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:ad6a:b446:df00:78dc])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b17e313932sm2766371a91.16.2026.11.10.22.05.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 22:05:16 -0800 (PST)
-Date: Wed, 11 Nov 2026 15:05:11 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Nhat Pham <nphamcs@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Brian Geffon <bgeffon@google.com>, 
-	Minchan Kim <minchan@kernel.org>, Richard Chang <richardycc@google.com>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v2 10/11] zsmalloc: fold zs_obj_write() into zs_store()
-Message-ID: <avQFhb2EwjRkSM-a@google.com>
-References: <20261110054836.1515030-1-senozhatsky@chromium.org>
- <20261110054836.1515030-11-senozhatsky@chromium.org>
- <CAKEwX=PJObB4gDPtsOWGjW6FJD4dtoz0qDu9KpK9jzP0=N=d_w@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584D2606A320;
+	Wed, 11 Nov 2026 06:32:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 584D2606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaihong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaihong.com
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07436259|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.0289249-0.0145536-0.956522;FP=9760352779942500346|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033045099153;MF=wangjichen@kaihong.com;NM=1;PH=DS;RN=9;RT=9;SR=0;TI=SMTPD_---.k.bVXEY_1794378749;
+Received: from localhost(mailfrom:wangjichen@kaihong.com fp:SMTPD_---.k.bVXEY_1794378749 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Wed, 11 Nov 2026 14:32:30 +0800
+X-Lms-Return-Path: <lba+16af40bfb+923b9e+vger.kernel.org+wangjichen@kaihong.com>
+References: <20261103115530.2913093-1-wangjichen@kaihong.com>
+	<90fee426-1a0c-4964-bf20-8175a64917a4@fygo.io>
+Message-Id: <8b878c802e81b6b8dc57299e05cbda9f3dc94e50.3c3928d4.e7a4.4b9f.86dd.da76b4f384c7@feishu.cn>
+To: <yukuai@fygo.io>
+Cc: "Jens Axboe" <axboe@kernel.dk>, "Song Liu" <song@kernel.org>, 
+	"Li Nan" <magiclinan@didiglobal.com>, "Xiao Ni" <xiao@kernel.org>, 
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<linux-raid@vger.kernel.org>, "yu kuai" <yukuai@fygo.io>, 
+	<syzbot+cd254889291ef8666036@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] md: avoid block autoload while importing rdev under reconfig_mutex
+From: =?utf-8?q?=E7=8E=8B=E7=BB=A7=E6=99=A8?= <wangjichen@kaihong.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -98,34 +54,220 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKEwX=PJObB4gDPtsOWGjW6FJD4dtoz0qDu9KpK9jzP0=N=d_w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 11 Nov 2026 14:32:26 +0800
+In-Reply-To: <90fee426-1a0c-4964-bf20-8175a64917a4@fygo.io>
+Content-Transfer-Encoding: quoted-printable
 
-On (26/11/10 11:01), Nhat Pham wrote:
-> On Mon, Nov 9, 2026 at 10:49 PM Sergey Senozhatsky
-> <senozhatsky@chromium.org> wrote:
-> >
-> > zram and zswap always call zs_obj_write() right after zs_malloc(), and
-> > zs_obj_write() has to take pool->lock and look up object location
-> > again, which zs_malloc() just did.
-> >
-> > Replace zs_malloc() and zs_obj_write() with one single zs_store()
-> > call.
-> >
-> > zs_store() takes zspage read lock under class->lock, before it drops
-> > class->lock to copy the data, while zs_obj_write() used to take it
-> > under pool->lock.  Compaction and page migration already take zspage
-> > lock under class->lock, so this follows the existing pool->lock ->
-> > class->lock -> zspage->lock order.  We don't need pool->lock there,
-> > zs_store() doesn't look up the object via the handle, it already has
-> > the zspage from the allocation.
-> 
-> Oh nice, this looks like it'd save a pool lock acquisition?
-> 
-> That (effectively global) lock can be quite contend-y under memory
-> fragmentation, etc...
 
-Right.
+> From: "yu kuai"<yukuai@fygo.io>
+> Date:=C2=A0 Sun, Nov 8, 2026, 11:18
+> Subject:=C2=A0 Re: [PATCH] md: avoid block autoload while importing rdev =
+under reconfig_mutex
+> To: "Wang Jichen"<wangjichen@kaihong.com>, "Jens Axboe"<axboe@kernel.dk>,=
+ "Song Liu"<song@kernel.org>, "Li Nan"<magiclinan@didiglobal.com>, "Xiao Ni=
+"<xiao@kernel.org>, <linux-block@vger.kernel.org>, <linux-kernel@vger.kerne=
+l.org>, <linux-raid@vger.kernel.org>, "yu kuai"<yukuai@fygo.io>
+> Cc: <syzbot+cd254889291ef8666036@syzkaller.appspotmail.com>
+> Hi,
+>=C2=A0
+> =E5=9C=A8 2026/11/3 19:55, Wang Jichen =E5=86=99=E9=81=93:
+> > From: wangjichen <wangjichen@kaihong.com>
+> >
+> > md_import_device() runs with mddev->reconfig_mutex held from md_ioctl()=
+.
+> > Opening a member disk via bdev_file_open_by_dev() triggers legacy block
+> > autoload (blk_probe_dev), which takes major_names_lock. md_probe() can
+> > run under that lock and call md_alloc(), which takes disks_mutex and
+> > reconfig_mutex =E2=80=94 a lockdep ABBA with the ioctl path.
+>=C2=A0
+> Is this a real deadlock? mddev is already existed from md_import_device()=
+,
+> while md_alloc() just allocate a new mddev, so the reconfig_mtuex is not
+> the same.
+
+Hi Kuai,
+
+Thanks for the question.
+
+You're right that md_ioctl() holds reconfig_mutex on the existing array
+mddev, while md_alloc() takes reconfig_mutex on a newly allocated mddev =E2=
+=80=94
+they are different per-device mutex instances, not the same lock.
+
+The syzbot/lockdep report is about a lock *class* cycle, not a
+single-mddev self-deadlock. Lockdep treats all &mddev->reconfig_mutex as
+one class, so the dependency it reports is:
+
+=C2=A0 reconfig_mutex -> major_names_lock -> disks_mutex -> reconfig_mutex
+
+Concrete race (syzbot extid cd254889291ef8666036, C repro on QEMU):
+
+- Thread doing ADD_NEW_DISK on array A holds A's reconfig_mutex, then
+=C2=A0 md_import_device() opens a member via bdev_file_open_by_dev(), which
+=C2=A0 with legacy autoload calls blk_probe_dev() and takes major_names_loc=
+k.
+
+- Concurrent open of an unregistered md node takes major_names_lock in
+=C2=A0 blk_probe_dev(), runs md_probe() -> md_alloc() for device B, takes
+=C2=A0 disks_mutex, then B's reconfig_mutex.
+
+Without lockdep, the same ABBA ordering between threads can still hang;
+the syzbot report includes the standard CPU0/CPU1 "Possible unsafe
+locking scenario" text for this chain.
+
+For context on when reconfig_mutex entered the md_alloc() path: the cycle
+became visible after the fix for the half-initialised kobj window:
+
+=C2=A0 ca39f7502425 ("md: fix mddev->kobj lifetime")
+=C2=A0 d1472ca2ca5d ("md: don't hand out the array before md_alloc() has ad=
+ded
+=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 mddev->kobj")
+
+The latter holds reconfig_mutex across add_disk() and kobject_add() so
+ioctls wait instead of touching an uninitialised mddev->kobj (Fixes:
+ca39f7502425). That closes the kobject race but completes this lockdep
+ring with ioctl + legacy autoload on the other side.
+
+This patch does not revert that behaviour. It only breaks the ioctl-side
+edge by not triggering legacy block autoload while reconfig_mutex is
+held: md_import_device() uses bdev_file_open_by_dev_autoload(..., false).
+Member disks are expected to already exist for normal mdadmin usage; the
+syz repro still gets -ENXIO for bogus minors, but on a fixed kernel there
+is no lockdep warning (Tested with syzbot's C repro on QEMU, 6628e7d4
+bzImage, before/after).
+
+If maintainers prefer a block-layer approach instead (e.g. not calling
+md probe callbacks under major_names_lock in blk_probe_dev()), I'm happy
+to respin.
+
+Thanks,
+Jichen
+
+>=C2=A0
+> >
+> > Add bdev_file_open_by_dev_autoload() and use autoload=3Dfalse from
+> > md_import_device(); member devices must already be present in the
+> > block layer (normal mdadmin usage).
+> >
+> > Link: https://syzbot.org/bug?extid=3Dcd254889291ef8666036
+> > Reported-by: syzbot+cd254889291ef8666036@syzkaller.appspotmail.com
+> > Tested-by: Wang Jichen <wangjichen@kaihong.com>
+> > Signed-off-by: Wang Jichen <wangjichen@kaihong.com>
+> > ---
+> > =C2=A0 block/bdev.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 13 ++++++++++-=
+--
+> > =C2=A0 drivers/md/md.c =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A08 ++++++--
+> > =C2=A0 include/linux/blkdev.h | =C2=A02 ++
+> > =C2=A0 3 files changed, 18 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/block/bdev.c b/block/bdev.c
+> > index f20f91b31..e78936556 100644
+> > --- a/block/bdev.c
+> > +++ b/block/bdev.c
+> > @@ -1076,8 +1076,8 @@ static unsigned blk_to_file_flags(blk_mode_t mode=
+)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return flags;
+> > =C2=A0 }
+> > =C2=A0=C2=A0
+> > -struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *h=
+older,
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const struct blk_holder_o=
+ps *hops)
+> > +struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode=
+,
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *holder, =
+const struct blk_holder_ops *hops, bool autoload)
+> > =C2=A0 {
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct file *bdev_file;
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct block_device *bdev;
+> > @@ -1088,7 +1088,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk=
+_mode_t mode, void *holder,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (ret)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return E=
+RR_PTR(ret);
+> > =C2=A0=C2=A0
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0bdev =3D blkdev_get_no_open(dev, true);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0bdev =3D blkdev_get_no_open(dev, autoload)=
+;
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!bdev)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return E=
+RR_PTR(-ENXIO);
+> > =C2=A0=C2=A0
+> > @@ -1110,6 +1110,13 @@ struct file *bdev_file_open_by_dev(dev_t dev, bl=
+k_mode_t mode, void *holder,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return bdev_file;
+> > =C2=A0 }
+> > +EXPORT_SYMBOL(bdev_file_open_by_dev_autoload);
+> > +
+> > +struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *h=
+older,
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const struct blk_holder_o=
+ps *hops)
+> > +{
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0return bdev_file_open_by_dev_autoload(dev,=
+ mode, holder, hops, true);
+> > +}
+> > =C2=A0 EXPORT_SYMBOL(bdev_file_open_by_dev);
+> > =C2=A0=C2=A0
+> > =C2=A0 struct file *bdev_file_open_by_path(const char *path, blk_mode_t=
+ mode,
+> > diff --git a/drivers/md/md.c b/drivers/md/md.c
+> > index 03e35386a..d3717e2e8 100644
+> > --- a/drivers/md/md.c
+> > +++ b/drivers/md/md.c
+> > @@ -3858,9 +3858,13 @@ static struct md_rdev *md_import_device(dev_t ne=
+wdev, int super_format, int supe
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (err)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out=
+_clear_rdev;
+> > =C2=A0=C2=A0
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0rdev->bdev_file =3D bdev_file_open_by_dev(=
+newdev,
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0/*
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 * md_ioctl() holds reconfig_mutex; legacy=
+ autoload in bdev open takes
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 * major_names_lock via blk_probe_dev() an=
+d can deadlock with md_probe().
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 */
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0rdev->bdev_file =3D bdev_file_open_by_dev_=
+autoload(newdev,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 BLK_OPEN_READ | BLK_OPEN_WRITE,
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0super_format =3D=3D -2 ? &claim_rdev : rdev, NULL);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0super_format =3D=3D -2 ? &claim_rdev : rdev, NULL, false);
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (IS_ERR(rdev->bdev_file)) {
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pr_warn(=
+"md: could not open device unknown-block(%u,%u).\n",
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 MAJOR(newdev), MINOR(newdev));
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index 0c2010230..e5121101a 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -1699,6 +1699,8 @@ struct blk_holder_ops {
+> > =C2=A0=C2=A0
+> > =C2=A0 struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, v=
+oid *holder,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const st=
+ruct blk_holder_ops *hops);
+> > +struct file *bdev_file_open_by_dev_autoload(dev_t dev, blk_mode_t mode=
+,
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *holder, =
+const struct blk_holder_ops *hops, bool autoload);
+> > =C2=A0 struct file *bdev_file_open_by_path(const char *path, blk_mode_t=
+ mode,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 void *ho=
+lder, const struct blk_holder_ops *hops);
+> > =C2=A0 int bd_prepare_to_claim(struct block_device *bdev, void *holder,
+>=C2=A0
+> --=C2=A0
+> Thanks,
+> Kuai
+>=C2=A0
