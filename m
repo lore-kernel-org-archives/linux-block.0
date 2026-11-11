@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.168
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.68
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794434331;
-	b=cENGkXkzLFbK/0Ujw7pI1vr5Q5NGWVXrilyPbPJQ5Ls/eQFi1ou3ECShwnn5I6/Ipqki
-	 PHOdCLLUsYYM7spEp9rADWaMlajoXf45IeeCZc/oNAnXB6N3wvPMMwpVmycuDQ+2HVD8g
-	 lK63R7j92ZMABdcbdptfzCKSAQV69Z3K87qPVqAZQIrSMcr9UNcTHcmmmZyVdqkkp3VYB
-	 /2PwZwZccI+2p/moEqhs0/G5ttjmg1yrokOJK2eHIEpv/c0hgS+s9UWTSBOV+ClU58KcH
-	 KLGJlHGjS08naPHnNSYxoo0nifbmNxczhLkLVEyN1Ngwo/I55IkUqoNyqiwsJwXpyKg==
+	t=1794434332;
+	b=NO3iZnvoKhVTjTAr4vsvBud6XpRlekmXD05QW84e8vh63WDCyrMh6ED0wUE3w7741Tb4
+	 eX93LI13IwWU8F8SCxRTUiifcfH2MOXDvXO9ERpBob5oGju5UwgfYXWLRTZZ0HQc8I8Av
+	 zUAmji7Ezc+yM0K8x3Wl4+ynNK/V1+YsSaXzC6mtahx3NAHeSrngUl/8oyaV2VnQsWqPx
+	 7zMkaCZS46l8kxw1yzy0XOxKsHmpNu+VanmsBrHLvsazBxgFllzwJNdWsOtVKZkS0lbr6
+	 g0Q128EYGmZtNeToJC6ptkEUDgaG3jtgUliFI9oOMau/g4T220Ecb6ayEz6RBOGtmKA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794434331;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794434332;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=C+Gn6RummdqO4CrCZxOhHXaoNeGZaSqp0ZgNY3d5bAo=;
-	b=raxHYM+nPcG/9AXSoPEWvtxYWYfHcCme+tBaluLTkzN2lo1be2HQeMyOKjIuZTLikw7D
-	 6RdzFtliEOippT6UArrM7nthr0x9NOK262HvPG3J2/v5G7R6rNOKQHJ17/G1GOISY5rwA
-	 7NiwPYqU/VrTzPWrjTCNG/P2fcoa0OUbieKHs+zTnVtlc/Gc0XsRvWzwjsEdfqvLGCwvz
-	 thKdg+QX4THH2qfeabtoobLAfOfre1oD7wyTS0ANR6QV2kAgUqdriG4zYf6sAcY3z3G+F
-	 uGIdVsRuvfv+IZJbvXgjKHD4vVywr75qpINBVA5ABJ6voBAPJpaIBQwcHR/OePNjCcA==
+	bh=7is/EuGUyxJzrWCnl+bqzRKPbHplfvRNCrGUMaUa/8g=;
+	b=IKAYhMuwGr5TCYq9aPmDYl22fziSCt5Vc19xJm+3dJc7y/i7fIT6DKCtuuK+LNE4Bz23
+	 h2h7dz/nt5t2Ro2ZESRc7Fw98t4FqK+cmwKUjtjS04ujO9t87QLjD9M4DiD8QS7/MvHQj
+	 Eis0OWnCGDzBD5QkqSOCZQ/fLyYLwPcPZ4/Dj7HTAYMNMWqLsBL9MyZTZy8733ScQd/xE
+	 QYCifqZpBR1P04V1N5VGLbGyPtBfGw69sOvys75l61YLx6ZxccusWAMzYfdnxmszSitPa
+	 ZfT7IdQgbuIRVGKkTZ6ENmSdoLn86F7bqnmUbXwSm96E4nuAUmwhsbyfW5d0T188kAg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=k2Epol4T;
-	arc=none smtp.remote-ip=95.215.58.168
-Received: from mta1.migadu.com (out-168.mta1.migadu.com [95.215.58.168])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=niFKsA2X;
+	arc=none smtp.remote-ip=91.218.175.68
+Received: from mta0.migadu.com (out-68.mta0.migadu.com [91.218.175.68])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0359606A89A
-	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 21:58:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0359606A89A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAF3606A8AA
+	for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 21:58:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DFAF3606A8AA
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=k2Epol4T
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=niFKsA2X
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=szU6BENnGtaOWNLKR0jKnvvcedxpIyMKQtFwTvNdL5k=;
+DKIM-Signature: a=rsa-sha256; bh=3FhA4vWfPSmw7LsNUlTwxgLiHA4CFcE8Kepmszjn6cE=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
  t=1794434329; v=1; x=1795039129;
- b=k2Epol4TSVIJbKVaNAqeSLxetxd5/MvfTG0EpXx4AQC5QQsKXV8JVG5yJuobXsa1RzT8dgrC
- ImjaZIooMDCMOblLUazuNTiBO62WG7MTAWI7wb5YmVG8VmM7BG35NurZmX6jXlt1JASAP/H0RCi
- tl+twPCfoSdU/OHiAhOgTlwY=
+ b=niFKsA2Xy3Yl1NmhQMGmbtmCkM84vQLzMms9bgozmax9q8Sk+C3+DUInuyER0tKk/ZoCz07G
+ MJgVHOKX/tbENW1gG8aK+sAXQ4Q7E2Wo+I3ppjF9wDtTLW8m8jy9wTjzZJ2xeDO+3DzHT8lGc5C
+ CoOqx30pE5IenuiPVo7SOztE=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id c3e555939cfd8b79;
-	Wed, 11 Nov 2026 21:58:48 +0000
-X-Mizu-Trace-ID: c3e555939cfd8b79
+Received: by smtp.migadu.com with ESMTPS id d8db100ecdc5fe7b;
+	Wed, 11 Nov 2026 21:58:49 +0000
+X-Mizu-Trace-ID: d8db100ecdc5fe7b
 X-Migadu-Flow: FLOW_OUT
 From: Md Haris Iqbal <haris.iqbal@linux.dev>
 To: Jens Axboe <axboe@kernel.dk>,
@@ -56,9 +56,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Jonathan Corbet <corbet@lwn.net>,
 	linux-doc@vger.kernel.org,
 	Md Haris Iqbal <haris.iqbal@linux.dev>
-Subject: [v4 1/3] block: Reject unknown status tags in error injection rules
-Date: Wed, 11 Nov 2026 22:58:36 +0100
-Message-ID: <20261111215838.103356-2-haris.iqbal@linux.dev>
+Subject: [v4 2/3] block: allow error injection rules to delay bios
+Date: Wed, 11 Nov 2026 22:58:37 +0100
+Message-ID: <20261111215838.103356-3-haris.iqbal@linux.dev>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261111215838.103356-1-haris.iqbal@linux.dev>
 References: <20261111215838.103356-1-haris.iqbal@linux.dev>
@@ -73,100 +73,302 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-tag_to_blk_status() returns BLK_STS_OK both for the "OK" tag and for a
-tag it does not recognize, so a caller cannot tell the two apart. The
-block error injection code (which is the sole user of this function
-currently) relies on error_inject_add() later to reject adding a rule with
-status=BLK_STS_OK. This is okay for the current state of error injection.
+Error injection can only fail a bio today. Add a delay_us option so that
+a rule can hold a bio back first, to model a slow device.
 
-The delay option added in the next commit makes the rule with status=OK
-valid, meaning the function tag_to_blk_status() now needs to explicitly
-match BLK_STS_OK for it, and fail for a tag it does not recognize. Hence
-make tag_to_blk_status() take a second param to update the matched status,
-and return true in case of a successful match. If a match is not found,
-the function tag_to_blk_status() returns false and *status remains
-unchanged.
+If a matching rule has delay_us set, the bio is held for that long. It is
+then failed if the rule also has a status, or resubmitted otherwise.
 
-A repeated status= where an invalid tag comes first is now rejected
-instead of being overridden by the later one.
+The resubmission is done through submit_bio_noacct_nocheck(), which is
+where the injection hook sits. To avoid the same delay rule being applied
+to it again, mark the bio with the BIO_ERROR_INJECTED flag as soon as a
+rule matches. This also prevents bios that are split later and resubmitted
+from being evaluated for delay (or error injection) again. __bio_clone()
+does not propagate the flag, so a clone a stacking driver aims at a lower
+device is still evaluated.
+
+The bio is submitted from a workqueue rather than from the timer, because
+submitting a bio can sleep. A REQ_NOWAIT bio is failed with BLK_STS_AGAIN
+instead of being delayed. Values above 600 seconds are rejected.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Md Haris Iqbal <haris.iqbal@linux.dev>
 ---
- block/blk-core.c        | 14 ++++++--------
- block/blk.h             |  2 +-
- block/error-injection.c |  7 ++++---
- 3 files changed, 11 insertions(+), 12 deletions(-)
+ block/error-injection.c   | 143 ++++++++++++++++++++++++++++++++++----
+ block/error-injection.h   |   1 +
+ include/linux/blk_types.h |   1 +
+ 3 files changed, 130 insertions(+), 15 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 8836c7028568..2ee079c1ce15 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -226,21 +226,19 @@ const char *blk_status_to_tag(blk_status_t status)
- 	return blk_errors[idx].tag;
- }
- 
--blk_status_t tag_to_blk_status(const char *tag)
-+bool tag_to_blk_status(const char *tag, blk_status_t *status)
- {
- 	int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(blk_errors); i++) {
- 		if (blk_errors[i].tag &&
--		    !strcmp(blk_errors[i].tag, tag))
--			return (__force blk_status_t)i;
-+		    !strcmp(blk_errors[i].tag, tag)) {
-+			*status = (__force blk_status_t)i;
-+			return true;
-+		}
- 	}
- 
--	/*
--	 * Return BLK_STS_OK for mismatches as this function is intended to
--	 * parse error status values.
--	 */
--	return BLK_STS_OK;
-+	return false;
- }
- 
- /**
-diff --git a/block/blk.h b/block/blk.h
-index 0e38e4b88cf5..105fff157bfb 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -52,7 +52,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- const char *blk_status_to_str(blk_status_t status);
- const char *blk_status_to_tag(blk_status_t status);
--blk_status_t tag_to_blk_status(const char *tag);
-+bool tag_to_blk_status(const char *tag, blk_status_t *status);
- enum req_op str_to_blk_op(const char *op);
- 
- bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
 diff --git a/block/error-injection.c b/block/error-injection.c
-index e14bc4b723ef..db543fe27630 100644
+index db543fe27630..a6de52229ef3 100644
 --- a/block/error-injection.c
 +++ b/block/error-injection.c
-@@ -171,15 +171,16 @@ static int match_op(substring_t *args, enum req_op *op)
- static int match_status(substring_t *args, blk_status_t *status)
- {
- 	const char *tag;
-+	bool found;
+@@ -6,9 +6,17 @@
+ #include <linux/blkdev.h>
+ #include <linux/parser.h>
+ #include <linux/seq_file.h>
++#include <linux/workqueue.h>
+ #include "blk.h"
+ #include "error-injection.h"
  
- 	tag = match_strdup(args);
- 	if (!tag)
- 		return -ENOMEM;
--	*status = tag_to_blk_status(tag);
--	if (!*status)
-+	found = tag_to_blk_status(tag, status);
-+	if (!found)
- 		pr_warn("invalid status '%s'\n", tag);
- 	kfree(tag);
--	return 0;
-+	return found ? 0 : -EINVAL;
++/*
++ * Cap the delay so that a typo can't wedge a device for good.  This is still
++ * well beyond the default hung task timeout, which is one of the things a
++ * delay is useful for triggering.
++ */
++#define BLK_ERROR_INJECT_MAX_DELAY_US	(600 * USEC_PER_SEC)
++
+ struct blk_error_inject {
+ 	struct list_head		entry;
+ 	sector_t			start;
+@@ -18,14 +26,97 @@ struct blk_error_inject {
+ 
+ 	/* only inject every 1 / chance times */
+ 	unsigned int			chance;
++
++	/* hold the bio for this long before submitting or failing it */
++	unsigned int			delay_us;
++};
++
++/*
++ * A bio held by a delay rule.  It does not point back at the rule, so rules
++ * can be removed while delayed bios are outstanding.  The submitter holds the
++ * bdev open until the bio completes, so the disk and queue stay allocated.
++ * A delayed bio holds no queue usage counter reference, so it does not hold
++ * up a queue freeze either.
++ */
++struct blk_error_inject_delay {
++	struct delayed_work		dwork;
++	struct bio			*bio;
++	blk_status_t			status;
+ };
+ 
++static struct workqueue_struct *blk_error_inject_wq;
++
+ DEFINE_STATIC_KEY_FALSE(blk_error_injection_enabled);
+ 
++static void blk_error_inject_fail(struct bio *bio, blk_status_t status)
++{
++	pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
++			bio->bi_bdev->bd_disk->part0, blk_status_to_str(status),
++			blk_op_str(bio_op(bio)), bio->bi_iter.bi_sector,
++			bio_sectors(bio));
++	bio_endio_status(bio, status);
++}
++
++static void blk_error_inject_delay_work(struct work_struct *work)
++{
++	struct blk_error_inject_delay *d = container_of(to_delayed_work(work),
++			struct blk_error_inject_delay, dwork);
++	struct bio *bio = d->bio;
++	blk_status_t status = d->status;
++
++	kfree(d);
++
++	if (status != BLK_STS_OK) {
++		blk_error_inject_fail(bio, status);
++		return;
++	}
++
++	/*
++	 * Resubmit.  The BIO_ERROR_INJECTED flag ensures that a bio that was
++	 * delayed once skips error injection entirely from here on, including
++	 * any other rule that covers it.
++	 */
++	submit_bio_noacct_nocheck(bio, false);
++}
++
++static bool blk_error_inject_delay(struct gendisk *disk, struct bio *bio,
++		blk_status_t status, unsigned int delay_us)
++{
++	struct blk_error_inject_delay *d;
++
++	/* fail a bio that can't block, as a real queue would */
++	if (bio->bi_opf & REQ_NOWAIT) {
++		bio_wouldblock_error(bio);
++		return true;
++	}
++
++	d = kmalloc_obj(*d, GFP_NOIO);
++	if (!d) {
++		pr_warn_ratelimited("%pg: failed to delay %s at sector %llu:%u\n",
++				disk->part0, blk_op_str(bio_op(bio)),
++				bio->bi_iter.bi_sector, bio_sectors(bio));
++		return false;
++	}
++
++	pr_info_ratelimited("%pg: delaying %s at sector %llu:%u by %uus\n",
++			disk->part0, blk_op_str(bio_op(bio)),
++			bio->bi_iter.bi_sector, bio_sectors(bio), delay_us);
++
++	d->bio = bio;
++	d->status = status;
++	INIT_DELAYED_WORK(&d->dwork, blk_error_inject_delay_work);
++
++	queue_delayed_work(blk_error_inject_wq, &d->dwork,
++			usecs_to_jiffies(delay_us));
++	return true;
++}
++
+ bool __blk_error_inject(struct bio *bio)
+ {
+ 	struct gendisk *disk = bio->bi_bdev->bd_disk;
+ 	struct blk_error_inject *inj;
++	blk_status_t status = BLK_STS_OK;
++	unsigned int delay_us = 0;
+ 
+ 	rcu_read_lock();
+ 	list_for_each_entry_rcu(inj, &disk->error_injection_list, entry) {
+@@ -45,29 +136,34 @@ bool __blk_error_inject(struct bio *bio)
+ 		if (inj->chance > 1 && (get_random_u32() % inj->chance) != 0)
+ 			continue;
+ 
+-		pr_info_ratelimited("%pg: injecting %s error for %s at sector %llu:%u\n",
+-				disk->part0, blk_status_to_str(inj->status),
+-				blk_op_str(inj->op), bio->bi_iter.bi_sector,
+-				bio_sectors(bio));
+-		bio->bi_status = inj->status;
+-		rcu_read_unlock();
+-		bio_endio(bio);
+-		return true;
++		status = inj->status;
++		delay_us = inj->delay_us;
++		bio_set_flag(bio, BIO_ERROR_INJECTED);
++		break;
+ 	}
+ 	rcu_read_unlock();
+-	return false;
++
++	if (delay_us && blk_error_inject_delay(disk, bio, status, delay_us))
++		return true;
++	if (status == BLK_STS_OK)
++		return false;
++
++	blk_error_inject_fail(bio, status);
++	return true;
  }
  
- static ssize_t blk_error_injection_parse_options(struct gendisk *disk,
+ static int error_inject_add(struct gendisk *disk, enum req_op op,
+ 		sector_t start, u64 nr_sectors, blk_status_t status,
+-		unsigned int chance)
++		unsigned int chance, unsigned int delay_us)
+ {
+ 	struct blk_error_inject *inj;
+ 	int error = -EINVAL;
+ 
+ 	if (op == REQ_OP_LAST)
+ 		return -EINVAL;
+-	if (status == BLK_STS_OK)
++	if (status == BLK_STS_OK && !delay_us)
++		return -EINVAL;
++	if (delay_us > BLK_ERROR_INJECT_MAX_DELAY_US)
+ 		return -EINVAL;
+ 
+ 	inj = kzalloc_obj(*inj);
+@@ -86,6 +182,7 @@ static int error_inject_add(struct gendisk *disk, enum req_op op,
+ 	inj->start = start;
+ 	inj->status = status;
+ 	inj->chance = chance;
++	inj->delay_us = delay_us;
+ 
+ 	pr_debug_ratelimited("%pg: adding %s injection for %s at sector %llu:%llu\n",
+ 			disk->part0, blk_status_to_str(status),
+@@ -139,6 +236,7 @@ enum options {
+ 	Opt_nr_sectors		= (1u << 18),
+ 	Opt_status		= (1u << 19),
+ 	Opt_chance		= (1u << 20),
++	Opt_delay_us		= (1u << 21),
+ 
+ 	Opt_invalid,
+ };
+@@ -151,6 +249,7 @@ static const match_table_t opt_tokens = {
+ 	{ Opt_nr_sectors,		"nr_sectors=%u"		},
+ 	{ Opt_status,			"status=%s"		},
+ 	{ Opt_chance,			"chance=%u"		},
++	{ Opt_delay_us,			"delay_us=%u"		},
+ 	{ Opt_invalid,			NULL,			},
+ };
+ 
+@@ -187,7 +286,7 @@ static ssize_t blk_error_injection_parse_options(struct gendisk *disk,
+ 		char *options)
+ {
+ 	enum { Unset, Add, Removeall } action = Unset;
+-	unsigned int option_mask = 0, chance = 1;
++	unsigned int option_mask = 0, chance = 1, delay_us = 0;
+ 	enum req_op op = REQ_OP_LAST;
+ 	u64 start = 0, nr_sectors = 0;
+ 	blk_status_t status = BLK_STS_OK;
+@@ -230,6 +329,9 @@ static ssize_t blk_error_injection_parse_options(struct gendisk *disk,
+ 			if (!error && chance == 0)
+ 				error = -EINVAL;
+ 			break;
++		case Opt_delay_us:
++			error = match_uint(args, &delay_us);
++			break;
+ 		default:
+ 			pr_warn("unknown parameter or missing value '%s'\n", p);
+ 			error = -EINVAL;
+@@ -241,7 +343,7 @@ static ssize_t blk_error_injection_parse_options(struct gendisk *disk,
+ 	switch (action) {
+ 	case Add:
+ 		return error_inject_add(disk, op, start, nr_sectors, status,
+-				chance);
++				chance, delay_us);
+ 	case Removeall:
+ 		if (option_mask & ~Opt_removeall)
+ 			return -EINVAL;
+@@ -277,10 +379,11 @@ static int blk_error_injection_show(struct seq_file *s, void *private)
+ 
+ 	rcu_read_lock();
+ 	list_for_each_entry_rcu(inj, &disk->error_injection_list, entry) {
+-		seq_printf(s, "%llu:%llu op=%s,status=%s,chance=%u",
++		seq_printf(s, "%llu:%llu op=%s,status=%s,chance=%u,delay_us=%u",
+ 			   inj->start, inj->end,
+ 			   blk_op_str(inj->op),
+-			   blk_status_to_tag(inj->status), inj->chance);
++			   blk_status_to_tag(inj->status), inj->chance,
++			   inj->delay_us);
+ 		seq_putc(s, '\n');
+ 	}
+ 	rcu_read_unlock();
+@@ -315,3 +418,13 @@ void blk_error_injection_exit(struct gendisk *disk)
+ {
+ 	error_inject_removeall(disk);
+ }
++
++static int __init blk_error_injection_init_wq(void)
++{
++	blk_error_inject_wq = alloc_workqueue("blk_error_inject",
++					      WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
++	if (!blk_error_inject_wq)
++		panic("Failed to create blk_error_inject wq\n");
++	return 0;
++}
++subsys_initcall(blk_error_injection_init_wq);
+diff --git a/block/error-injection.h b/block/error-injection.h
+index 9821d773abab..8b3809d85e83 100644
+--- a/block/error-injection.h
++++ b/block/error-injection.h
+@@ -13,6 +13,7 @@ static inline bool blk_error_inject(struct bio *bio)
+ {
+ 	if (IS_ENABLED(CONFIG_BLK_ERROR_INJECTION) &&
+ 	    static_branch_unlikely(&blk_error_injection_enabled) &&
++	    !bio_flagged(bio, BIO_ERROR_INJECTED) &&
+ 	    test_bit(GD_ERROR_INJECT, &bio->bi_bdev->bd_disk->state))
+ 		return __blk_error_inject(bio);
+ 	return false;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 0cc09b975d8f..1a5812fa4052 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -328,6 +328,7 @@ enum {
+ 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
+ 	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
+ 	BIO_COMPLETE_IN_TASK, /* complete bi_end_io() in task context */
++	BIO_ERROR_INJECTED, /* error injection rules already applied */
+ 	BIO_FLAG_LAST
+ };
+ 
 -- 
 2.53.0
 
