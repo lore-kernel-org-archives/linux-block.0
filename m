@@ -1,66 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794357629;
-	b=ueeRylb8YiYVjSpGcyH9h0IdATMHc3xEUiGEB6bc1T/xBBNpgp9/Ilpqyo+tDnrVk34t
-	 OoNMxU3TVyN4rXE42uZlfIFmgOCrGf+VaX2DI9KyoJW92af49LADncqB2WqEZKTq6KQHo
-	 n1i2d8wP+yvZLv5aITEGqLFcaCKBE/AT2VaVeg1KjX6Rh5F5KrmQ31lo85jthb6Sris0s
-	 kw7ls3C8iC2K4Pb4CeKwBePlhuDwgS5+yvYhbjj1vMmVFiYS48NesoAIMjDHDsIDVVlci
-	 3A1pMFPnaMwTGHkzwsm2iveWBkv8/hEThi3jsy3ZWRfeVuIMikPV+oiG2jIEmeadbjA==
+	t=1794366902;
+	b=W/s8K2uW8oxAYMiiMhtFJq4OxiM0LFj8/I1hbt/8eMLT1nuLCTBl8u9oHdYs4ALuEoWl
+	 s3EW4ER89iyG+xJQRdHo6opt06bEpPjJmxSf4jva7b+C9xYI8u0dvfHV3eVaQ3kyif9sj
+	 +JyyKAdJ501UQkiyOmVCVjFspaUnDEc0uGrjKS0eIqZ/jT/Q64YvLZYYCx68yRbAOkhiL
+	 TMXifIRR6EStCG3OeLc1uYAJV/wTlStjghR0eU6vufZkGsMJMU7yjDr++X5KNToye4cuc
+	 uXN2x+sXBtWdEqXsxBzxpGhDpVAbxScP/D1hbWJi3JoBgB8hjrA/IVrB1CRaFtZqsvQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794357629;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=iea+cKs+9SRn0f7ya3vvcLTwUK2Ejys1AxFgxCV/XPs=;
-	b=ytEiu0YaZtS+PuWrv6V3bJqkbIFsy4SpSs/1Qx3EmSTfKV9iWYqUskbuYWcstsayKmI4
-	 34wgK0uOOvsA2JFm4f41+2pwZboj1S4/8MK7/2NwZRUtxpCDXqHi6I6/iNUdYqjZkVFtf
-	 IA7E18s5zMsIuR7HYbvrr3YbMpI75E1KiaY0qAEavLxBGM5c/5gRuXLZwbF16r0/9SsaX
-	 xpDORX91nkLF0UL2R4dbVXloUSif0CYmZ2V28ve8p/VS5HG8zyStQkNvYXfe+yWuNoArn
-	 Icm0ABzRq14ttmyBldMG+PpYomWglgfAOD0WDR73JwwKLIAtTPKc1Diq3JddTuiUP/g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794366902;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 X-Zmail-TransId:X-Mailer:Message-ID:Date:Mime-Version:From:To:Cc:
+	 Subject:Content-Type:X-MAIL:X-TLS:X-ENVELOPE-SENDER:X-SOURCE-IP:
+	 X-CLEAN:X-Fangmail-Anti-Spam-Filtered:X-Fangmail-MID-QID;
+	bh=vSUHmE4vytXRZsVTE0GVn4B6yi9H36WZeuZp8buKn00=;
+	b=JRz0aZ8LnHSWWcVLDrbzatWCz6pylv8mougLaAh9+sxvbmL70OnC1YFGpFh7T5zgJ52c
+	 DbPbaH7wyzjr/Ze309vF3SlX4morql1hZrug09Fmv4kpWo9lsDyURNLqa8vGSPWYw2dxk
+	 tO+CdiqyBx7zE5UKEJPT4rCQd4E1f8kjhK2ujCTBy2Xw5meql00DkGZkboO3Vmj+4OnGc
+	 K6a2o1AQ/CRAAlVJaKr2YEob8STnGebqq8dkMPv4sSrTRVQMsl3f8Cc3AFlMGiT+2c+hV
+	 QT58b71YeJ2+q+XKxXUkHAMTMOxZtVLi6csPJkFMTTBiaDKqesG0WM1Pam9e178BT6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=acm.org;
-	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=rgGFzJ6o;
-	arc=none smtp.remote-ip=199.89.1.16
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	dmarc=pass header.from=zte.com.cn;
+	spf=pass smtp.mailfrom=zte.com.cn;
+	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=TdnfqtEv;
+	arc=none smtp.remote-ip=160.30.148.34
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9589A606A31C;
-	Wed, 11 Nov 2026 00:40:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9589A606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4054C606A31C;
+	Wed, 11 Nov 2026 03:15:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4054C606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=rgGFzJ6o
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jPPnR6fm8zlfftt;
-	Wed, 11 Nov 2026 00:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1794357624; x=1796949625; bh=iea+cKs+9SRn0f7ya3vvcLTw
-	UK2Ejys1AxFgxCV/XPs=; b=rgGFzJ6oFiFhSsXSB20TqPVGrg5q5NQEesc4DNQs
-	VSxtmhphMCt7og4aQ0R9x5APR85lSZtvOibBMQ6jr4SsHP/Da4k4SGD3q1jjIxMr
-	hYY4NpfF1IgiK1ZJiSn3AyK/LtTPPaZqSoZQM9AEc4wzZgRNZOiBnP9XKQi8pROC
-	0ZMc/VQF5RtUuAGp17HXSa72LsskMynyowCuh4uTFn8u09Q0ujVLCG33hCRhuWgm
-	vAZevPXnQrYQ9JNrIrZaxKPFf3BW2LEcROIHrltOqtrdfZGaE/HwLxcMthfta9PD
-	JZsAE9zFDn53GErHtA3MKBOP35Gl5m5LPx03V/Ew6fQhTw==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id cjNtGs3iPHG8; Wed, 11 Nov 2026 00:40:24 +0000 (UTC)
-Received: from [100.80.231.125] (unknown [104.135.182.41])
+	dkim=pass (2048-bit key, unprotected) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=TdnfqtEv
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jPPnN3CqzzlgyGr;
-	Wed, 11 Nov 2026 00:40:24 +0000 (UTC)
-Message-ID: <99cd5aa0-4afe-4796-86c4-926273e72a6e@acm.org>
-Date: Tue, 10 Nov 2026 16:40:23 -0800
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jPTCk4KZxz5BNRx;
+	Wed, 11 Nov 2026 11:14:58 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
+	s=z202610; t=1794366898;
+	bh=u1vkrHhsgfeiJpzw0tLA8Qp7ipFlGUM9uSXBo2WgUsE=;
+	h=Date:From:To:Cc:Subject;
+	b=TdnfqtEveey6qysOjcHuOxZha8th1RHtykzw2EGqkwurEudmkA937oum/D8qPTimK
+	 F6jqaGIMUZVoeNA+plr5D1Nwkm4gwAXx2Cu8LVFdo3CV/uX5kQRYLma20towfiAy1z
+	 pZWdBICg+70brliY20vxTNvZQOVf0xygYXp3RbvBX+hJCfnJZPWUPBBFaJIb7HVF4u
+	 ZVn0f8nOjwdBKi2uZVoG0KT64L/KnPU9Vt7l+cBQNHsYSuxChloLSfbxK01bCu1P/h
+	 LVtwMqTApK6gvu2FXVhSB3DwQpWCGHU3i2voF7K8VAULMb5c10C7Csuc8M8ajl/A67
+	 uwBdEMsZ7lCrw==
+Received: from xaxapp04.zte.com.cn ([10.99.98.157])
+	by mse-fl2.zte.com.cn with SMTP id 6AB3Es4t021158;
+	Wed, 11 Nov 2026 11:14:54 +0800 (+08)
+	(envelope-from shao.mingyin@zte.com.cn)
+Received: from mapi (xaxapp05[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Wed, 11 Nov 2026 11:14:55 +0800 (CST)
+X-Zmail-TransId: 2afc6af3ddafe12-55106
+X-Mailer: Zmail v1.0
+Message-ID: <20261111111455541qAdd9RB0rUfpsuO-qYSne@zte.com.cn>
+Date: Wed, 11 Nov 2026 11:14:55 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -69,84 +69,80 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nbd: fix circular lock dependency
-To: Guilherme Giacomo Simoes <trintaeoitogc@gmail.com>, josef@toxicpanda.com,
- axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, nbd@other.debian.org,
- linux-kernel@vger.kernel.org,
- syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com
-References: <20261110215723.199948-1-trintaeoitogc@gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20261110215723.199948-1-trintaeoitogc@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+From: <shao.mingyin@zte.com.cn>
+To: <tom.leiming@gmail.com>, <linux-block@vger.kernel.org>
+Cc: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIIHYyXSB1YmxrOiBzdG9wIHJlcG9ydGluZyB6b25lcyBvbiBhbiBlbXB0eSByZXNwb25zZQ==?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 6AB3Es4t021158
+X-TLS: YES
+X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
+X-SOURCE-IP: 10.5.228.133 unknown Wed, 11 Nov 2026 11:14:58 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6AF3DDB2.000/4jPTCk4KZxz5BNRx
 
-On 11/10/26 1:57 PM, Guilherme Giacomo Simoes wrote:
- > Subject: [PATCH] nbd: fix circular lock dependency
+From: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-There is no real circular lock dependency here. This patch addresses a
-lockdep false positive caused by the missing socket reclassification in
-the reconnect path. Please change the subject into something like
-"nbd: Also reclassify sockets in the reconnect path".
+ublk_report_zones() treats a zero-length zone as the end of the current
+server response and keeps asking for the remaining zones from the sector
+after the last reported one.  A response that carries no zone at all
+therefore advances neither done_zones nor sector, and the driver issues
+REPORT ZONES requests for the same sector forever.  Both BLKREPORTZONE
+and the zone revalidation done when the device starts hang, and the task
+cannot be killed.
 
- > instead of the NBD-specific class leading to a possible lock dependency.
+Only a response with no zone cannot make progress.  Terminate the whole
+report in that case, and keep following up on a short but non-empty
+response as before, which is what sd_zbc and virtio_blk do.
 
-Please change "possible lock dependency" into "lockdep false positive".
+Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
+Suggested-by: Ming Lei <tom.leiming@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
+---
+v2:
+- Stop only when a response carries no zone at all, so that a short but
+  non-empty response is still followed up from the advanced sector.
+  The v1 form ended the whole report at the first zero-length zone and
+  truncated such reports (reported by Ming Lei).
+v1: https://lore.kernel.org/all/20261109225110056QQJAEflTHzwYHzwXlMBb_@zte.com.cn/
 
- > Reported-by: syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com
- > Link: https://syzkaller.appspot.com/bug?extid=d7d72f3d467710442af0
+ drivers/block/ublk_drv.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Please use Closes: instead of Link: for the syzbot report. Has this
-patch been tested against the syzbot reproducer, e.g. with "#syz test"?
-If so, please mention this.
-
- > -static struct socket *nbd_get_socket(struct nbd_device *nbd, 
-unsigned long fd,
- > -				     int *err)
- > -{
-[ ... ]
- > +static struct socket *nbd_get_socket(struct nbd_device *nbd, 
-unsigned long fd,
- > +				     int *err)
- > +{
-
-Moving nbd_get_socket() makes this patch much larger than necessary,
-which makes reviewing and backporting it harder. Adding a single
-nbd_reclassify_socket(sock) call in nbd_genl_reconnect_sock_cb() right
-after the nbd_get_socket() call is sufficient. If the reclassification
-should happen in nbd_get_socket(), please move nbd_reclassify_socket()
-up instead of moving nbd_get_socket() down.
-
-Additionally, reclassifying the socket in nbd_get_socket() happens
-before it is known whether NBD will use the socket. If
-nbd_genl_reconnect_sock_cb() does not find a dead connection, or if
-nbd_add_socket() fails, the socket is returned to user space with the
-NBD lock class. While this only affects lockdep and while the
-nbd_add_socket() error paths already behave this way, it is another
-reason to only reclassify a socket once it is really being used.
-
- > +	/*
- > +	 * NBD sockets are used from block/swap/writeback context, which can
- > +	 * already hold locks that fs_reclaim depends on.  Give them their own
- > +	 * lockdep class so that a page fault on an unrelated userspace socket
- > +	 * (sk_lock -> mmap_lock) is not chained to the NBD socket lock.
- > +	 */
-
-The description of commit d532cddb6c60 says that the problem is
-fs_reclaim being triggered while sk_lock is held, not a page fault
-(sk_lock -> mmap_lock). Please make this comment match the actual
-lockdep report or leave it out. The description of commit d532cddb6c60
-already explains why NBD sockets are reclassified.
-
- > +	if (sock)
- > +		nbd_reclassify_socket(sock);
-
-"sock" can't be NULL here because all code paths where it is NULL have
-already returned. Please remove the "if (sock)" test.
-
-Thanks,
-
-Bart.
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -661,6 +661,7 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+ 		struct request *req;
+ 		struct ublk_zoned_report_desc desc;
+ 		blk_status_t status;
++		unsigned int i;
+ 
+ 		memset(buffer, 0, buffer_length);
+ 
+@@ -689,7 +690,7 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+ 		if (ret)
+ 			goto out;
+ 
+-		for (unsigned int i = 0; i < zones_in_request; i++) {
++		for (i = 0; i < zones_in_request; i++) {
+ 			struct blk_zone *zone = buffer + i;
+ 
+ 			/* A zero length zone means no more zones in this response */
+@@ -704,6 +705,10 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+ 			sector += zone_size_sectors;
+ 
+ 		}
++
++		/* An empty response cannot make progress, stop asking. */
++		if (!i)
++			break;
+ 	}
+ 
+ 	ret = done_zones;
+-- 
+2.27.0
