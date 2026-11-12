@@ -1,80 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=66.163.188.212
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794448237;
-	b=xrqFAJ/OQzkn9lF2wy3yTGpz9qME6ZtBvgm4VdHBFKCmnwzzQUDoUMUc3AYNE7vnyybi
-	 t+GkjYLndE9e+UoeV+yQPxvYZCPu6T8RKYovowJZx8UPUeNZ192BaP7CwtmaEtemqVMSo
-	 FP6PnhdPXu6Ts2bsd3JUc42/HmmbM43imAjCXSByVsIlonmyAbKTMhfzlO3y+IKtfFmq/
-	 I7XJ39yHDdg9BxXqX0jnrqySB6qAHP+erDsl/zHjUlhoNf1fLf592t2QqQQxRUAgdYXj/
-	 40emxiHyd4UWomfE6XwjoAqz1OaAx8tkdB7olIECmYXA5w0d8TWtEsliJ8MBOAQg+fQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794448237;
-	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
-	 X-Sonic-ID:Received:Received:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=O8h9fybdyu+Al7CdWlfRBQ6LgqQutaBSF+Rc2HGjCVE=;
-	b=aBvkpAYmgbKZOHLHoGxJ1bs1nheq+RRqSQjmLXsfg1B8iOK8hrtoEqgyuOg7fFgeJjVt
-	 ZqwoM1p+vGRRIoLeWToku68/UKq7qppLI0I2ixDFIAYtHno0Q3gBaucLfa3usI6+RZ10a
-	 KDsx3ENUp6NfKSnIX6d/hzIxBd8KPeHODthFLdWckNXF5EcEFWIWRgn4KRXbvYbjomC9g
-	 wDK45qS99bVc3zXEWc1RR4vjr6QFo1k2KYxTkX0hdmI/1kt2TGPZzgrUCHMrM5QBqk29I
-	 A3ypkzw6UKvrETiR/r13OfLm+df9sNZ11Ito8VcIJDbnv0F2+F425InXoCTJpruLnSg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=schaufler-ca.com;
-	spf=pass smtp.mailfrom=schaufler-ca.com;
-	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=F+m434hx;
-	arc=none smtp.remote-ip=66.163.188.212
-Received: from sonic311-31.consmr.mail.ne1.yahoo.com (sonic311-31.consmr.mail.ne1.yahoo.com [66.163.188.212])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794449872;
+	b=J2PNvmdBevTd+uIW/ddK1nGY994FA4AFI8oSjzKNH7m0niNXQH+evbyHDbEFjB2AhNy/
+	 nw+DaUCWIpqjsXX8z8PoB9wlfKhUJq6tnd+0NK/MZXbyyzxnnaUNg5G+OzUy4AHfU2KAp
+	 Z8LKEiu5QXFX/GEjlkCjIXzt0qMsqRkieqWCm8eGhXQOTTdt4wsOJByZoQE4urCKYOSwN
+	 CM2p+bsBCZ2qKokRq8ojO9qq5TDTNoHTL2yVcSg3kiXR/tDHNSNLQjtKZKRUlv0UmZMqV
+	 ZyUmWYgHh0RA4PxY67JNGfUAjPOQybn3oG1PMdUN+J59s6ccn6Jzym6DGyAsSkTrCiA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794449872;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=18c+l13wo1CDSqYQQfVUxqYZ3FBSaP7ISw6R2DTgxTM=;
+	b=eHID6Irrbyio/Gl0K9P3165VieuO0ncLmlao+0UOuY3dlA6RdKzX1wzNSCxbdVSspXQg
+	 9+9mP006PWKc4fp5GkviShTpwyv7lqCwLmks6tiX9B6lH0z1nxS1aKmLfkxESc3pJ/STq
+	 KxV5Q8yzsJu5LQIUVGQFwr3n1UKPcaS2TShW2ep6TVPbRO5YypvTnGWTDbSrN50GKxdI0
+	 EdNBBgVWvLHcMhc6IhNeheJuH86WeHY/Cs6ZZP1YrpWi8kwRwceiZYGtT4D0aJw6FHZh+
+	 cwPreCVykaNLAJPHAFqxJuVsWkXt/i85J1y0BTN/19d2n1xI3PEYtH6USdB1TPUP1Rw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YTJEkIcP;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3468606A323;
+	Thu, 12 Nov 2026 02:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YTJEkIcP
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1794449872;
+	b=VO8AbkDZD9xbYUtdDdbe5V64Q/mJQz32HD4bDWe/Hgy1OGkovRLDTSL8cU04HGtA7mki
+	 KoOCA8HId7LH5xNgTZtkyQcHkau+g6UgoOX6UUjvjKa6Q6Nb8Ld+w8g5Wy2zvjI8QR/QV
+	 LDskt8aQcF8XG3zla2P0lYRbu8zjbGhmlYsM1KsQ92VAxzND4Uoe0XJf9ULQFF40G6OMC
+	 NEKfMjW+iLixh9kH2rF68yQmNueJovA8v30AwWwnU5//n4YfYYVNB/BT5sK+G21ZJUDQc
+	 4N/4LZQMBFhQH0A+BQeYl/UOIUuQJGvr+3CTHo6qKiGuHRSFtMfQ5hMwniQwcjjvOag==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1794449872;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=18c+l13wo1CDSqYQQfVUxqYZ3FBSaP7ISw6R2DTgxTM=;
+	b=ikxPWoY6yJkGEyaJ/eLjyjnFeX0c9V1Az6bXyPhmxHjaw0itknuGzjsUYJXaMZ4DNmxi
+	 JX4MbImqhYS59i76QwadSjiweHVRK4lsb5mueA+Zm3z6/DOvdAYlAFsGXBeadOVyim705
+	 mxtNfryP6qg6dKcTUexs40Uhtqogf9/WOmiA1cuPWRWDfhMDlyuZKL+xuM7KqACl3vTKL
+	 WMWamgNbTwxa8+vwOL2wcA8PXiWBCmh9p0o4TfpalRH7OtXL3bEAtRIsBAgls6ommZKz4
+	 Duq4qdWP+2G46dJgSts7Xsw1OsQf4v5Ef96qYcM2Iu3SV8HptqYyiLu4mdUqBGr0sXQ==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B204F606A338
-	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 01:50:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B204F606A338
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=F+m434hx
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794448235; bh=O8h9fybdyu+Al7CdWlfRBQ6LgqQutaBSF+Rc2HGjCVE=; h=Date:Subject:To:Cc:References:From:In-Reply-To:Content-Type:From:Subject:Reply-To:Content-Type; b=F+m434hxnazo+znIsDN87b1q6q2BjDXrSK85l4sPO4/7/Nv6ouklEMGBpfrTHUnO8eGiNQoV5Bbw/uB3JZACliQBg8PtdTRYRP97HHZoegx3ArYwH69kAdVaUPkV7WcyNd89YKs91cZCwmWeziNsUM+FCRLahqzZW3a6Ku8pvIiJlMO/7XaKbdkzRicymfmmSk9XFsFNG+fkHI8UO70pZ1hFT9v2XQiwRrAslvpHUFbDR+3rpTT4Ikh/N/oSBL0qRMnhxDrBkdI0Mmku6tTsyJWpgcJjSTSvBuepznmh0kGiP8yElqSHRAm6ov8qvVTBbZJZj+71HtVfmpD+WAp7XA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794448235; bh=cB6ms4YZu3OSr7Oj5Ktyy9vRYllWqlKKBSjCDtAOhd3=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=Wh5tO+A7k6l9RAB9CmF+7nFPpV+s7vwQOvHRCpB836zmpk+EmZdiT1obFQYb3eEYUV/ZZrDMNSGrpqiSFrVBvEAP1+BcX3bVXL8AkZe5aM0djERGyxVy+oivb40ItIA89tHRP/kW5BzO7GaPGZrOTfFkDQF1HHnKQVH/ifoH5PYTL/BXjLkbPViq5JKecTMlRIryhz3iU6NkOHkP1F3oliaijdeTD+Tk00HCA4w802Q1PFZvsZSndMk6hlb4A1wMRPh3z4tVeu12oZckS5JIJR1ywCFknBKWBE+hVxojbZ57Qr3RCaKJrua5vLBD1s/SnsdmRZ+/JLOhUlVDaAQyJw==
-X-YMail-OSG: zqmnDtkVM1n5t6ueog55b_vkFHSYM5E1qoECEJywzBr3UwiKAfUIVI_o6w7R9SH
- CQ1t93f4qyBpZEcVGjU2OBO9C0Of8.lRAD_UtcVdUMSf6_GiG98G7rNXb1ZhUGsyYLDyJE5oLG69
- MPpknxdoviNcfunvMa.q1ATsxUiRNZaaYFEtaSi7o3ARz3uzFbYwa4zXUFVTxVNR1M4yEm8E_vMu
- CX3lc6b1b0MWbnmh3DAeGebLmTpZwI12LuF9QH7MRRpV.Y7YkiPkkooycQl42qWPa_ZCsKSCVnTi
- cfYjzn7ZtEqmGYVjYEY1kEbVCA4JoS5GMMDKMoO39G5YhBugROnX2jrgGh0AwdwAby30.ZBxmd.l
- S62hS2hlPvIDoPxGhzS2whxCcIZrt8XbiUGRsBq2lfu8t9x.TIubZ4wIiRqzfDYoZIwioLDCjm6k
- .cljRFJEOnSix_ImX_sSyVP7eQAAEJ1GsHeUHb7atzAIHDlw0lV7YT_EQZaDbjuCghjYyGwMa7FJ
- LxdRDFOXlr05WMcbROqV0a4sd0J7UyT01rGVa2p8mqlfg_ZPSk1p0.zKLMJDr5A1o8n0sxe4LbiR
- qbREBgT6XAwECEJNbNHKO1YTM4iOmevp8GvnGDd6MDNapigfFoPwfu59SMy7zYd9LO3Z8_0VkIJt
- aPlGTgcyxBF.v1wQggIdb30_WaSmydGJlcGPdQ03irHq2wrwxiCoQO6IJUZEr0jypo3mUQnAGyDG
- k9vUUntKtCsyi.w0t_vFjR1T1M3Z6Xk5RLKDL9njS7LNW.CupQSEmNQ1GkX7kSwPFQP21HwmyMsp
- i9SdJowJ0s5y.bw2SrHxrP7sM6YbNToNL5ZVELMODpe5VuCBtDWl7VcCxYMmahr5455.ZE_hGmHs
- LrmFJx1uQ46OcZ2Ii956498sukETOy0INQsrtoq.ypS01I6QTO8GSI7rVFeq81ZNfcHhvUGJ06ME
- B8yJmeeVBase_8cBDx_Yk7y0xRppCWZz9S9bNwiHzQcmhSHJ99JaTf4E0zOIsgLWqU5tZh4wLZKp
- MnYneLIuBkBNwjBcYTuKXcpCwff8fTcsfan2g9ag6_HRqbKvb3lqTrnQRPIG.IGMBIXdu4D1HB2r
- Ygn65JHFmN1QF2ROBGshwilsGajQNSqHXHgx.co9RO5Evfjv8vx67t__1ew7rn3sc1C.7W_m4N4M
- cSR8SYdV43PcknGSee9yB1x8pWannWLYRUROzisZnoPLwDPX1S0a5pIeYojUo9jnHaAdfaOw5IJs
- bc0nB3tQZQ.0b782FrYX_n_pf05DxifKK1hrJ0OqXSo23BlRt.p63_4auT8X4tq9HTs9fxQLg0OA
- ydi2BtTIKopjFdQtWH0NOUC1U6_wILbgtZfZnlVsbVhHJ7Tk.UZGmAVff_vQl8b4id5D4T9jwtS9
- 8nKfk1Ghey2tqeZDF9SgVACRH_x6kJa81R1e4J_83TMyBY4Ays_MTt39YbFzXRfBMRqG0I92h9IS
- Xl4i4wMK_gUqmjpP0P_oaDsTzptxLp7NMOmOY3T81w3i60pQpmuYMvggEU3dv.ebRC4Brat.KcXq
- ZyjrZ4BouQUvapbNSNNP1Y253sBId7Ys37DryRT0fCsyFp6LIN0DYA1xElaICSH34S2v84muDGZe
- .CGRnjEo0Q2679LeUfRrG7eDmdHtGbtXa02kyQjntuOc7VrR9y8jRUHqkLiiITgSdxH1QGB5PWuQ
- ARpFP1xjX3OHKFGeQd7o8WX3xDhKeppcWAPJEhIosno79RY0IQ4.4JX7WCaXgDYbj6BL4okuPPnu
- 9CEiWKr_A1oRBHcXo_t2XyX1N2Jd1tPqjLAB1WY0vIGe1SVdGRdRloM6.RT24mU1pbFP4DjeRn1w
- _aXrAymHoztvd7BVNk78MI6f1URU2iBFJ6msmP6JgXQac5cfrtvlS9yn2eohnwEPfv__IKNy26n1
- mYs7i0yOvj6LH9jEvBJfejsFOAeuf8LBdL.MbTk8ZZiVorhzaxO81Zf4PRAQwZfM29CLtP5dAKbb
- klVicXy3HgsPrMZiM94qTb2yOlO2WSLEgrPS_2Vx31FNEHJNJpuKXHkfgTtKgjLPmpCr4Taq44yO
- KB8vbaoDybAHzNwFN22pWQG3NDp.x8aciLmMT8fUQgwMgW8NlLKb6ErL7ChYlwsHUhzhzMbUfvnT
- 2bA6QlHpoN4OcRsGeb2ygbIpUCMhvL1tqClAnkg41oGlCJa3crNRCKKeXXqZBarf9KzLHJa8i581
- 0YgHHROuHzbtZ8GRm6ggBoLbsrITMfTGKIshO9uwpGYYxl6nVscbC6LtZUsxlV5iP8t8XsYi.ga0
- EDsRWYHlK
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: 4e6572e0-628c-4102-8309-f6caa349ac8e
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.ne1.yahoo.com with HTTP; Thu, 12 Nov 2026 01:50:35 +0000
-Received: by hermes--production-gq1-fd7994565-9vhlr (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 15d81e1a8a6348ae9dcd84771e3b8196;
-          Thu, 12 Nov 2026 01:50:33 +0000 (UTC)
-Message-ID: <41617b0a-90d9-484e-a143-78e2a92e872c@schaufler-ca.com>
-Date: Wed, 11 Nov 2026 17:50:30 -0800
+	by smtp.kernel.org (Postfix) with ESMTPS id 20EF71F00A10;
+	Thu, 12 Nov 2026 02:17:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794449872;
+	bh=18c+l13wo1CDSqYQQfVUxqYZ3FBSaP7ISw6R2DTgxTM=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=YTJEkIcPkbAqwEYUtMdd0la9sHj6frmrrgi8T9gaUflFiQalOmap1aRMxfDrTbVuA
+	 TeXEi9KGXbxJqUlGSRYuTiNYd1AoxUKaBzl/hpsXE3HgH9iH8SV4wFw6Hg6NKSpNE+
+	 WYSKCTLHaLiLI4WQXlOrvXi7UK82rNq2/zgaJyCJ5mGobfhVgqe+rM7BUwWBgn4HZ8
+	 erTQ6Wq0HzpF+sDh2k9itQbuoGjpGbBVju4d0JYzp3YdRNYMqvPaN+ynY1U81kXBXI
+	 d6o9H+sNFW3oJFsO7BbE0HG74R8x7tV/q8fOJEvv1sU5aYp+B+zU5RT9Zdtv9P55in
+	 ZfDvhLDfQVx+Q==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 776D3491D2;
+	Thu, 12 Nov 2026 02:17:51 +0000 (UTC)
+From: Zi-Hao Huang via B4 Relay <devnull+zi-hao.huang.mediatek.com@kernel.org>
+Date: Thu, 12 Nov 2026 10:16:45 +0800
+Subject: [PATCH] block: fix PF_BLOCK_TS/current->plug ordering in
+ blk_finish_plug()
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -84,68 +83,94 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [apparmor] [PATCH RFC 19/41] smack: use fc_init_pseudo() for
- smackfs
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
-Cc: linux-efi@vger.kernel.org, Jan Kara <jack@suse.cz>,
- Amir Goldstein <amir73il@gmail.com>, linux-nvme@lists.infradead.org,
- fuse-devel@lists.linux.dev, linux-mm@kvack.org,
- target-devel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Chris Mason <mason@kernel.org>, Christoph Hellwig <hch@lst.de>,
- linux-s390@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- driver-core@lists.linux.dev, Jann Horn <jannh@google.com>,
- selinux@vger.kernel.org, apparmor@lists.ubuntu.com,
- Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, Alexander Viro <viro@zeniv.linux.org.uk>,
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-security-module@vger.kernel.org, bpf@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Casey Schaufler <casey@schaufler-ca.com>
-References: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
- <20261110-work-loop-pseudo-v1-19-4c998976c6c7@kernel.org>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <20261110-work-loop-pseudo-v1-19-4c998976c6c7@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261112-blk-plug-fix-v1-1-7fa2a6215b8d@mediatek.com>
+X-B4-Tracking: v=1; b=H4sIAIwh9WoC/x2MQQqAIBAAvyJ7bkE3COkr0SFrsyWpUIpA/HvSc
+ QZmMiSOwgl6lSHyI0nOo4JpFMzbdHhGWSoDaeqMMYQu7HiF2+MqL666s04Ttc5qqMkVuep/N4y
+ lfLI0MNNeAAAA
+X-Change-ID: 20261112-blk-plug-fix-f068b0223b80
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, Zi-Hao Huang <zi-hao.huang@mediatek.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794449870; l=2373;
+ i=zi-hao.huang@mediatek.com; s=20261112; h=from:subject:message-id;
+ bh=DSlAJhYD9b51DNkmYc4nFsWMsjAUVzpJL8gmeV8NUTI=;
+ b=m+EwD6l34QlcaXVjnEekIZcWqqZn31q4Zy44HLlVzHKLacaYxyRPGRbpj9clW1DitiCgSrHUr
+ HC7yeFeW3cPCofwB22Q+zt77gqTdpjrtb7SB2b0MLxpB+9+y9xEctQk
+X-Developer-Key: i=zi-hao.huang@mediatek.com; a=ed25519;
+ pk=tbMIVegYSSBtz5MaQSUCX9RJO88MA/AI5cbmQKbaoIc=
+X-Endpoint-Received: by B4 Relay for zi-hao.huang@mediatek.com/20261112
+ with auth_id=1493
+X-Original-From: Zi-Hao Huang <zi-hao.huang@mediatek.com>
+Reply-To: zi-hao.huang@mediatek.com
 Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.26943 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-On 11/10/2026 1:14 AM, Christian Brauner via AppArmor wrote:
-> Initialize smackfs as a pseudo filesystem. This raises SB_I_PSEUDO and
-> also SB_I_NOEXEC and SB_I_NODEV. smackfs never holds executables or
-> device nodes.
->
-> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+From: Zi-Hao Huang <zi-hao.huang@mediatek.com>
 
-Please include me at least as a CC on Smack patches.
-I ain't dead yet. Nonetheless,
+blk_plug_invalidate_ts() runs on context switch and assumes that
+PF_BLOCK_TS set implies current->plug != NULL. blk_finish_plug() breaks
+this: it clears PF_BLOCK_TS in __blk_flush_plug() and then sets
+current->plug = NULL, with plain accesses.
 
-Acked-by: Casey Schaufler <casey@schaufler-ca.com>
+clang inlines __blk_flush_plug() and emits the store to current->plug
+before the store that clears the flag (arm64, Android common kernel):
 
-> ---
->  security/smack/smackfs.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/security/smack/smackfs.c b/security/smack/smackfs.c
-> index a72bc7fabea9..4a56bbeaeca3 100644
-> --- a/security/smack/smackfs.c
-> +++ b/security/smack/smackfs.c
-> @@ -25,6 +25,7 @@
->  #include <linux/magic.h>
->  #include <linux/mount.h>
->  #include <linux/fs_context.h>
-> +#include <linux/pseudo_fs.h>
->  #include "smack.h"
->  
->  #define BEBITS	(sizeof(__be32) * 8)
-> @@ -2880,6 +2881,7 @@ static const struct fs_context_operations smk_context_ops = {
->   */
->  static int smk_init_fs_context(struct fs_context *fc)
->  {
-> +	fc_init_pseudo(fc);
->  	fc->ops = &smk_context_ops;
->  	return 0;
->  }
->
+  ldr  w8, [x20, #0x44]     // w8 = current->flags
+  str  xzr, [x20, #0xaa8]   // current->plug = NULL
+  and  w8, w8, #0xdfffffff  // w8 &= ~PF_BLOCK_TS  <- preempted here
+  str  w8, [x20, #0x44]     // current->flags = w8
+
+If an interrupt hits there and preempts the task, the task is later
+scheduled back in with PF_BLOCK_TS set and no plug, and
+blk_plug_invalidate_ts() writes to NULL + 0x20 (plug->cur_ktime):
+
+  Unable to handle kernel NULL pointer dereference at 0000000000000020
+  pc : __schedule+0x108c
+   preempt_schedule_irq+0x48/0xa8
+   el1_interrupt+0x48/0x8c
+   blk_finish_plug+0x6c/0x18c
+   ext4_do_writepages+0xd3c/0xef8
+
+The window is only a few instructions wide, so this is rare. It was hit
+at cycle 127 of a warm reboot stress test.
+
+Add a compiler barrier so the flag is cleared before the plug is
+dropped. A compiler barrier is enough because the race is with
+preemption of the same task on the same CPU. With the barrier, the same
+build stores current->flags before current->plug.
+
+Fixes: 06b23f92af87 ("block: update cached timestamp post schedule/preemption")
+Cc: stable@vger.kernel.org # v6.9+
+Signed-off-by: Zi-Hao Huang <zi-hao.huang@mediatek.com>
+---
+ block/blk-core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 8836c7028568..ad2a8e4fe7a8 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1299,6 +1299,12 @@ void blk_finish_plug(struct blk_plug *plug)
+ {
+ 	if (plug == current->plug) {
+ 		__blk_flush_plug(plug, false);
++		/*
++		 * blk_plug_invalidate_ts() runs on context switch and expects a
++		 * plug whenever PF_BLOCK_TS is set, so clear the flag (done in
++		 * __blk_flush_plug()) before dropping the plug.
++		 */
++		barrier();
+ 		current->plug = NULL;
+ 	}
+ }
+
+---
+base-commit: 067c5c24cef23d913b67eaaf71ae67e7169a6620
+change-id: 20261112-blk-plug-fix-f068b0223b80
+
+Best regards,
+-- 
+Zi-Hao Huang <zi-hao.huang@mediatek.com>
+
+
