@@ -1,90 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794465296;
-	b=CzOW5izG2V9p9LsOWu6SCsQXi40XDIA7tGm2VUktzL7qZCs7yjwTkbPwfI+hihebXf4b
-	 Ol3kGHLfgonnToXv/gqZH7HwlArdbrqDrMpRL8Oo4hkqnGhL/Lt4hvOsPyZswgQ2LWNC5
-	 juNHd0KmIguSBC2iJahOpb2L0kvXhTFIIw8CRRVZJZ6ti9lQ6Y87qiGOJfiPE0PoM2KGb
-	 L8XR3pTOg6agH/If8uOdQObPKUwMExQVfDq3lKGoxOT74HLs0QC8Uh8gGV+BypuS2As3z
-	 Q6Y5JLkKx615U+wPG7qMdwj6H5tP4nAZocOVQJa15urp/UcloRwR3zaIepYsEAdwYYQ==
+	t=1794466933;
+	b=CpUI/OZsGlrRC34Sw81h0JX1Q62ftZSDJRSl6hONCPzA/6RB/bGtZKuyb0EP5JmbHZ4S
+	 mi7UubNrpn9h+Oo3u2BASMMS88Oz81ON0Eu7AfHTrM99RAL4qZJPPFuE8as70g638+zEC
+	 MVJ4XRSC9wzFHBjnwk7CFX6Z9f+nBJPvw14FA0NWBlucFQjyUcmwLeqt0fyPyNZwRvdnx
+	 HyGvUtVKJkA8djIbU6spisZtj3Tr2lfX/NxyVKsmGpLoQl0wHOnFy3OukpiBJJlubTMVA
+	 EkCVEfSGTBFInglXg05AJl1ChJf7EQ3WyVWOaVEbLkYPlXxU5qM0VIUcKf9UD1m+anA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794465296;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794466933;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:Autocrypt:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=XzN+ftZH8nOljyMprPWsB+uz3H4ojG5d3KlA9M9z9jE=;
-	b=JCy/+Vk1Xj/h84HUTd8J9KIJfWG4S4DsKbjue/wy9V4TsscdSGLBL+FascFukYSwZoYN
-	 HMJY9Rz/56cQwj2+CtskZ4hRdQWDOlJNa8339hf9KvIoi2VHTXqqhg1a9xmNw5nkVA2J8
-	 Z54cQfWiSJYs+2R5WqI0WnVlC7qTf2iy2Df+NjVofEBFTH0R7WPp3y1qw9KxtrftU9ZwC
-	 9TFTcLdf9foltzb7UuLBiNOFVoGZ4KwG9DlxwR2vgPKbJ5hAMoINPOyx6NHajnbuNT8Qt
-	 MK8NmgZwFP5Z6jtBcByxAnWxPYtj1PHnjT/vVAg5PuP3S+GgcBJqsdKWA+0NtsiY6OA==
+	 Content-Language:From:Autocrypt:In-Reply-To:Content-Type;
+	bh=/4MtBLSGAeSlREMeMpXOJglcbVkwCt0++4H9V4EMMVM=;
+	b=jS4ZSlghYH0V0Wo2kBrG7LwpTXKCQTMSGURCFP8X8Fc0mKyw53eV2LE3T3xwylOOrQCH
+	 y8rc+YhK1y1FDtCmw8gOPS27cUgiSf5HXCFuC3HhC7YmGrY7xnZhAtmi67KScLHFrcBIL
+	 2sJ0dt5VB3sclhNZ+IyotFhGebWRR0H2qWfLQ8SD/55g+3cMTAKLVJMMRDJrWqtQRjZy8
+	 FXKeOwT+nccff1PW4IABIzNq3oHostaBO2AzbidJZ8Ir6jolgh0GjTFVoJ40oXk3bT9cp
+	 WnWr6H0EsOjHWuXt17DK+oq0xIisaUyHN3+XAGXbXaYNYBfokUhuG0vwU2j2J6xuI1g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=suse.com;
 	spf=pass smtp.mailfrom=suse.com;
-	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=f24zqfC2;
-	arc=none smtp.remote-ip=209.85.128.48
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=Bjvcdfpw;
+	arc=none smtp.remote-ip=209.85.208.41
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB7F606A31C
-	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 06:34:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5DB7F606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A1A606A321
+	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 07:02:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8A1A606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=f24zqfC2
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4a2153c8525so29693065e9.3
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 22:34:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=Bjvcdfpw
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6a642495d81so761065a12.2
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 23:02:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1794465295; x=1795070095; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=XzN+ftZH8nOljyMprPWsB+uz3H4ojG5d3KlA9M9z9jE=;
-        b=f24zqfC2sGIBsI0kWpFkCCkygINwUTYVlHQDYSfiHVWQuqnAzYSUFr9LugKke/eiJ6
-         tbZbVWjzCj1v6zO8JPipjGRc4mAGUg/3pUBsVG9fpR7qdQEyRjYh3zH4QHiB2rYFNoLW
-         DC7IjCohdHpkzeUM73jSCYcY8ACK/NNMvXhoZMey9+ocS7Nn8Ar2EvoU1mtcVXY9+GPu
-         h9WYYKLoxcNw5/ue/rIB67dFH43SKyl2IvFbxc1QlD304HW65aHW+CBa8sJPEP6rVWop
-         plV6211Y97rUz8XcJDmelyEkqg7uTXE4xNjhs1EPdls+Qopspn4rH5MvsK2apotCM00O
-         zNeA==
+        d=suse.com; s=google; t=1794466931; x=1795071731; darn=vger.kernel.org;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=/4MtBLSGAeSlREMeMpXOJglcbVkwCt0++4H9V4EMMVM=;
+        b=BjvcdfpwCSBKwnvk9dCuZdO5bKIE7LwAVDFAJ/gmxSf74WWDcshOCc4hWUyXyWXXUr
+         4sZTuk4jlequbSGaosO1Aa9C45fjTvXFUCFwQ/9zmPG8TnCwSWyOtFW1WxdYViy06yTc
+         HyFX1dQtACLjFDtpRnNOcP/J81n1jrZC0X6gNuRiOoKvRw3BaT3Wwd6O03XwNbf5Ueuw
+         PEtIxT25lUKN7ekbFyaixdV6RqZwO4LjKFYjA5f4dlm2xzjsWBm8x1RzGDJxAAkgyreV
+         /vcr+SLLhddZFEgHZqgHxdSZH+baDtgbno3TWD21Uj+EIETHVKbPhaDJZ4K6/jVbpari
+         RNBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794465295; x=1795070095;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=XzN+ftZH8nOljyMprPWsB+uz3H4ojG5d3KlA9M9z9jE=;
-        b=Wmjbdo807wO73uBNCCYuEbLKlSeUU1p0B76zL2QsoBoaw1KqqVXfBZsrq2m8AZJbyT
-         gpH81tFXXeAq4O3tqN/0pRml+lMTFxLvDLOx96SE8Uy2NpR2eNGJmHyqbbfjPTYYQv+3
-         OWGVN5I9JR8lu1zzNAEckShaEw0fawBWMbVaqlGovKTn7CHNrQi48mhUWYT3F/fEhwgb
-         8KOWMQ2OK/10nBOrbrZ7XK8vveU0Rar1jKdaXgXdIP8P00TJGkmUVOX5zG11V7C5E3c6
-         sGQexrI3fsEOvZfyzzT+3nfJWLPphF+CmqrNiw0n6o6ur6vc2XIKwZqTIqEoRU1xzlaE
-         aWew==
-X-Forwarded-Encrypted: i=1; AL+hErFS70JIG6UDmFvQedPs5wZD8LPS1pryee+FVhWHEh3ipE+5aTa6A3JTYuuStlzGTh5wO4NWXDwnLXEr4A==@vger.kernel.org
-X-Gm-Message-State: APuU4Z99cAXy0kFJptcJ305w/hC5qr35Svumeo8y0SkhE15O0BIBMtTo
-	X4QIFKzQ7kyHpXngUzR6Pz4JUAAJv37Qx6Vt1YE/h4Kct6U2kd9YZnmLObE8GvCn5g==
-X-Gm-Gg: AYBFou2rdBLZHt9OOMazr/AqN6BaIYSWAm021yI5JA222iwZH4Qb0GBRc/2I5h9v53J
-	CD9wkWIG89jAbgBAdDtne0q5cXgiMUWmuwIl5De71jfHG01rOjaG5v0kDI6fBrJG0NdcBqKHPYe
-	GtzNwgpGoi0qPHYdSCwkNMWQnapAD4ptwxQtl0dRfRLxDmr1ylWk2pQWYT+gh0yY4E8WMvpYzT0
-	BxgrAQSwHTHYuENayJDW675djgSFrYq8vepUC8FW0MBbwbD7bHUN9O8CLwQOiOhSGk2cBTlJ6wA
-	llC17HZJgeeWhjp+g8IdtzCcg4e+3E6cyCb0uIWaZ+aC64WPaQ6biybTzYYuAUe3lDTvVISZoQX
-	vcajbZ7vgiflyS2zDtaQrd/t31Q8oeCTtegrwHI03ao4G4zgk1g/nKYzVxoQX1H62mhbojHvQjT
-	BSpOGOvE9Fmye3aHkPVuL8ww5n4OsgFFgnFlX6fYZyFPbmdij9bylZqHcW50pzl9oHyJug8FCZF
-	+amoPTc6OK0saZmG9zLYiutirIFvMcOm1pRrSm0KKD6/VyBUSu4Q5hnMwHBXehqJ0c5ni6RaKIj
-	YGk95mGnwF//A9qt6XrjH2g6T37/O+SA+EKlTt8ylpTwc9+UE4i6yq5vxrr9gxnZbxASObyKh1w
-	GeubXF+UGOM+YEzLZmvkad4HMeCExjyZG2PbhkWOuXgkgM8gm53DqHUvE2vNtr5WsR+f2UFwt6Z
-	O1eOE6uOY=
-X-Received: by 2002:a05:600c:3151:b0:4a5:cfc:1e95 with SMTP id 5b1f17b1804b1-4ba093ac1f6mr79613765e9.33.1794465294776;
-        Wed, 11 Nov 2026 22:34:54 -0800 (PST)
-Received: from ?IPV6:2003:ca:b726:28fe:61da:a0a6:3f98:b9fb? (p200300cab72628fe61daa0a63f98b9fb.dip0.t-ipconnect.de. [2003:ca:b726:28fe:61da:a0a6:3f98:b9fb])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb4e271378sm52598445e9.13.2026.11.11.22.34.54
+        d=1e100.net; s=20260707; t=1794466931; x=1795071731;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/4MtBLSGAeSlREMeMpXOJglcbVkwCt0++4H9V4EMMVM=;
+        b=XOdqI1POq2u0mMNaG0LKirijy98ReKJIk7gbNy9ad6neKWDsvrqgE28Em7sDQkVRcy
+         nt7MG26qtgupNz3p21x5t64pO55gu0NdNP2oMlVUbb/R8yUm8aFvZkefTsuS6qOaAySU
+         I6etV1Vgf1hbVYExNhMPM084AG6939Bfudf+gYeuIv1s/rZScl1YTLBKihgYqeP8OpiO
+         N02aXtolygFB1039TvGiwIYfmDwG3qR7zwcp1cISLYi5v5xnU4lt0KKrOrNCG+c2Sfiq
+         YBaNtVmifmGLP4DOEONYACMDXmllHN7/HZ4yWizr820iT/MeMkv9+husTZ8+AK7u+G2j
+         lhcg==
+X-Forwarded-Encrypted: i=1; AL+hErHL9E4qcHBi2ZyqTc6BQYID9d0Oi6YbQDiIj51X9Yg/JXYUUIsyWwDpdYIJhZgQ/nt75wxmA/ivlrhGpQ==@vger.kernel.org
+X-Gm-Message-State: APuU4Z85SFuOPQ4W+OP5UkFtalcK5BTdHpj981kyN2s0mQ+uaIhbN+0B
+	/ok76HKsaJ/2KV2e5m7I5QXE/i/LtjjG7zv5liNFMdwA68xAnT2WSTBxDnEqQALgQsc=
+X-Gm-Gg: AYBFou1StBzR9kAQmLDSadyJI6ectAqmK9b+242r5+cTM43dJAf1qXwOLrzEuPj3H3N
+	asmbXU3J7ANYaob87wvReJkS8l5qVhhUFuT+k/xEeQ86bcSjYPPlrfVFXaki83Umjcfbb4mFVe7
+	FzLgv8cGvFzF/wFtEkj7hHeO9bgMd/3J5IOVKwrbPi8cs1JExYvl8Vd8SdI8CCh+lNXkGHEXf9s
+	+C9A66ngpTpM747WasQwmb+Fxl2UxeNwpim9j8it5+S27UGj6G8kKlx/c5RLJGPRk7iBoGrdGfC
+	V+51wjvMYmELTz4adwvq3pMoKGErS+XEHgJrbhhftNA8CxMHsLiTsQbmced6Z2Z13Gpcvs0wl6s
+	ryUmUvqnL0WvMYH8L83xyOb9RApuiA9MBaHT87f2m3DefrIZGFJP64u0AKHEMzSc87Gz+I7mlwd
+	l8SS9UL7PbYZuJmDtVdtRhMJCai2xurNUuk4qS5HQ9aucP5rXYucl100rykxwv4+sBSkXMuOTEF
+	aSvipmSWmu9h4+tayo4IbJskqgWQk7ko6aLZWyKFTfOxTEOwqmpT9USoI2EPfoiTjEs+LOzNXLA
+	4mh5abvizJyZ0t+4rZX+zJsBOLvTRH10GX0b2Ujba2zLsZfBxccH7NZfoHVdMOdqNZAo2cmoFgZ
+	K7OsTazn/HU4t2sIumDmEYEy3BAKi80HfXXlPEx9IeghPHGatPjZ9AhXihgVQ0ahHoNoLRgHZ
+X-Received: by 2002:a05:6402:1e94:b0:6b5:61fe:982a with SMTP id 4fb4d7f45d1cf-6b777824953mr3292179a12.45.1794466916038;
+        Wed, 11 Nov 2026 23:01:56 -0800 (PST)
+Received: from ?IPV6:2a00:12d0:afa3:c01:92cc:e257:77ba:97a1? (2a00-12d0-afa3-c01-92cc-e257-77ba-97a1.ip.tng.de. [2a00:12d0:afa3:c01:92cc:e257:77ba:97a1])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b7ada54c88sm112091a12.2.2026.11.11.23.01.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Nov 2026 22:34:54 -0800 (PST)
-Message-ID: <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
-Date: Thu, 12 Nov 2026 07:34:54 +0100
+        Wed, 11 Nov 2026 23:01:54 -0800 (PST)
+Message-ID: <3a052d2c-8d14-4cb1-b6fd-277a6b0c8196@suse.com>
+Date: Thu, 12 Nov 2026 08:01:53 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -96,52 +93,117 @@ Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 0/3] xen-blkback: do some I/O statistics rework
-To: Juergen Gross <jgross@suse.com>
+To: Jan Beulich <jbeulich@suse.com>
 Cc: =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger@xenproject.org>,
  Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
  linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 References: <20261111162058.804033-1-jgross@suse.com>
+ <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
 Content-Language: en-US
-From: Jan Beulich <jbeulich@suse.com>
-Autocrypt: addr=jbeulich@suse.com; keydata=
- xsDiBFk3nEQRBADAEaSw6zC/EJkiwGPXbWtPxl2xCdSoeepS07jW8UgcHNurfHvUzogEq5xk
- hu507c3BarVjyWCJOylMNR98Yd8VqD9UfmX0Hb8/BrA+Hl6/DB/eqGptrf4BSRwcZQM32aZK
- 7Pj2XbGWIUrZrd70x1eAP9QE3P79Y2oLrsCgbZJfEwCgvz9JjGmQqQkRiTVzlZVCJYcyGGsD
- /0tbFCzD2h20ahe8rC1gbb3K3qk+LpBtvjBu1RY9drYk0NymiGbJWZgab6t1jM7sk2vuf0Py
- O9Hf9XBmK0uE9IgMaiCpc32XV9oASz6UJebwkX+zF2jG5I1BfnO9g7KlotcA/v5ClMjgo6Gl
- MDY4HxoSRu3i1cqqSDtVlt+AOVBJBACrZcnHAUSuCXBPy0jOlBhxPqRWv6ND4c9PH1xjQ3NP
- nxJuMBS8rnNg22uyfAgmBKNLpLgAGVRMZGaGoJObGf72s6TeIqKJo/LtggAS9qAUiuKVnygo
- 3wjfkS9A3DRO+SpU7JqWdsveeIQyeyEJ/8PTowmSQLakF+3fote9ybzd880fSmFuIEJldWxp
- Y2ggPGpiZXVsaWNoQHN1c2UuY29tPsJgBBMRAgAgBQJZN5xEAhsDBgsJCAcDAgQVAggDBBYC
- AwECHgECF4AACgkQoDSui/t3IH4J+wCfQ5jHdEjCRHj23O/5ttg9r9OIruwAn3103WUITZee
- e7Sbg12UgcQ5lv7SzsFNBFk3nEQQCACCuTjCjFOUdi5Nm244F+78kLghRcin/awv+IrTcIWF
- hUpSs1Y91iQQ7KItirz5uwCPlwejSJDQJLIS+QtJHaXDXeV6NI0Uef1hP20+y8qydDiVkv6l
- IreXjTb7DvksRgJNvCkWtYnlS3mYvQ9NzS9PhyALWbXnH6sIJd2O9lKS1Mrfq+y0IXCP10eS
- FFGg+Av3IQeFatkJAyju0PPthyTqxSI4lZYuJVPknzgaeuJv/2NccrPvmeDg6Coe7ZIeQ8Yj
- t0ARxu2xytAkkLCel1Lz1WLmwLstV30g80nkgZf/wr+/BXJW/oIvRlonUkxv+IbBM3dX2OV8
- AmRv1ySWPTP7AAMFB/9PQK/VtlNUJvg8GXj9ootzrteGfVZVVT4XBJkfwBcpC/XcPzldjv+3
- HYudvpdNK3lLujXeA5fLOH+Z/G9WBc5pFVSMocI71I8bT8lIAzreg0WvkWg5V2WZsUMlnDL9
- mpwIGFhlbM3gfDMs7MPMu8YQRFVdUvtSpaAs8OFfGQ0ia3LGZcjA6Ik2+xcqscEJzNH+qh8V
- m5jjp28yZgaqTaRbg3M/+MTbMpicpZuqF4rnB0AQD12/3BNWDR6bmh+EkYSMcEIpQmBM51qM
- EKYTQGybRCjpnKHGOxG0rfFY1085mBDZCH5Kx0cl0HVJuQKC+dV2ZY5AqjcKwAxpE75MLFkr
- wkkEGBECAAkFAlk3nEQCGwwACgkQoDSui/t3IH7nnwCfcJWUDUFKdCsBH/E5d+0ZnMQi+G0A
- nAuWpQkjM1ASeQwSHEeAWPgskBQL
-In-Reply-To: <20261111162058.804033-1-jgross@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------XnKNkkfJknfgjGY9Ag00BvNt"
 
-On 11.11.2026 17:20, Juergen Gross wrote:
-> Some rework of the blkback statics data handling.
-> 
-> Juergen Gross (3):
->   xen-blkback: Remove statistics logging on console
->   xen-blkback: move statistics data into sub-structure
->   xen-blkback: make statistics data persistent across disconnect/connect
-Reviewed-by: Jan Beulich <jbeulich@suse.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------XnKNkkfJknfgjGY9Ag00BvNt
+Content-Type: multipart/mixed; boundary="------------znQNYWv2cH6gyTbCeqXfd0fm";
+ protected-headers="v1"; hp="clear"
+Message-ID: <3a052d2c-8d14-4cb1-b6fd-277a6b0c8196@suse.com>
+Date: Thu, 12 Nov 2026 08:01:53 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] xen-blkback: do some I/O statistics rework
+To: Jan Beulich <jbeulich@suse.com>
+Cc: =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger@xenproject.org>,
+ Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20261111162058.804033-1-jgross@suse.com>
+ <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
+Content-Language: en-US
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
 
-In the last patch a brief comment on the global stats instance may be
-worth, to indicate it's guarded by the rings lock.
+--------------znQNYWv2cH6gyTbCeqXfd0fm
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Also, do I maybe get a Reported-by: on the last patch?
+T24gMTIuMTEuMjYgMDc6MzQsIEphbiBCZXVsaWNoIHdyb3RlOg0KPiBPbiAxMS4xMS4yMDI2
+IDE3OjIwLCBKdWVyZ2VuIEdyb3NzIHdyb3RlOg0KPj4gU29tZSByZXdvcmsgb2YgdGhlIGJs
+a2JhY2sgc3RhdGljcyBkYXRhIGhhbmRsaW5nLg0KPj4NCj4+IEp1ZXJnZW4gR3Jvc3MgKDMp
+Og0KPj4gICAgeGVuLWJsa2JhY2s6IFJlbW92ZSBzdGF0aXN0aWNzIGxvZ2dpbmcgb24gY29u
+c29sZQ0KPj4gICAgeGVuLWJsa2JhY2s6IG1vdmUgc3RhdGlzdGljcyBkYXRhIGludG8gc3Vi
+LXN0cnVjdHVyZQ0KPj4gICAgeGVuLWJsa2JhY2s6IG1ha2Ugc3RhdGlzdGljcyBkYXRhIHBl
+cnNpc3RlbnQgYWNyb3NzIGRpc2Nvbm5lY3QvY29ubmVjdA0KPiBSZXZpZXdlZC1ieTogSmFu
+IEJldWxpY2ggPGpiZXVsaWNoQHN1c2UuY29tPg0KDQpUaGFua3MuDQoNCj4gSW4gdGhlIGxh
+c3QgcGF0Y2ggYSBicmllZiBjb21tZW50IG9uIHRoZSBnbG9iYWwgc3RhdHMgaW5zdGFuY2Ug
+bWF5IGJlDQo+IHdvcnRoLCB0byBpbmRpY2F0ZSBpdCdzIGd1YXJkZWQgYnkgdGhlIHJpbmdz
+IGxvY2suDQo+IA0KPiBBbHNvLCBkbyBJIG1heWJlIGdldCBhIFJlcG9ydGVkLWJ5OiBvbiB0
+aGUgbGFzdCBwYXRjaD8NClllcyB0byBib3RoLiA6LSkNCg0KDQpKdWVyZ2VuDQo=
 
-Jan
+--------------znQNYWv2cH6gyTbCeqXfd0fm--
+
+--------------XnKNkkfJknfgjGY9Ag00BvNt
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmr1ZGEFAwAAAAAACgkQsN6d1ii/Ey+j
+5Qf/VkOKnOQT0F4EOFuBzac7B3dirk00TyTViv89zfyTCzNWvQ1NhWRd612k2Xgs3lS/oMFgAlZt
+8xcOpUaNnM+ubudMuiHRsf94cKCdh2EubF04ANK9kn012eDseJjkCweKmxjVDDoPM/A1BVSwq5yQ
+aTE8k+xGcOzKNYrGHwaFiC1C/jsIcw4DN+CCV/vPDL0iIkhFP0qWbOE8d7kQ0czpFzwJBXAI6LBQ
+r/PKwaH/JwSwwW28ipAGIYNwTdlJWfsu18dP/C3j/A4UOiFGDFTWlFq31EaSvZkKmMSl+tQ2LHse
+EX30z7qV/A7ZAEiQet8JXCQ9qtLsznVIwO+Q8Zn1JQ==
+=hvYA
+-----END PGP SIGNATURE-----
+
+--------------XnKNkkfJknfgjGY9Ag00BvNt--
