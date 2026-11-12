@@ -1,73 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794499668;
-	b=dEX/O85+hr5bSzjDPbycBmq5lsUEVRzq1kKyGzsS6t7U897QuEnc9W89JIgqn3n/OqJm
-	 J9crPtD6qaerbEL1XzQsQC7uTxLGwowd88xcPW3UeNFzzSCnldeVnmElwI1QS1ozJPw52
-	 Ov9YFsF+pAsX7TK64YDFl4YU2YG9IRWyg5ET8yF+i3xz4JtPEu0yvOpGZnO31hKloiFqZ
-	 hwCBUVWuHCTfwL0r+0R1+fug5hW448tb2hR7biD4Neu7PNTno6cnHzep7LeCPh7wtFGv3
-	 Re5YGMQIRgbhdganfZZ7+/yUCD68mudLbrmyeMmbdDeZV1viCtjeDIuk91plHsGS64A==
+	t=1794500311;
+	b=fgAChHwzzHOGes99nOKDWRxu4fBKezE5u/+tZq/gWOiCe2zL9V0fZmmkH0iuAwUW5PUH
+	 O6YKFRqmjwUl7Gy97IuQAF/jnYDz5Pdj48Kgx5VGvFBHRDPai6sGfaNBlC9lHPRlrUZoV
+	 LTkzaP10gj/YSoz8yfcN1/L9EHUrheBiLMWTgWDrARKAc/QTNSyLqlBjovfh3+ytUMlER
+	 BlyYnS4UgZXBfiMZ4GGMXPwvSZ3n4TolF17ncIFGZUzPccoD8vGAzuQyqWbVD8dWO51RJ
+	 vkTY4PCWeM54U2fKH6i7Hdnnoui3JEdisZbrDgFDlSWgbptVroQwpvSloUzLC81wBRg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794499668;
-	h=DMARC-Filter:DKIM-Signature:Received:X-QQ-mid:Message-ID:
-	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Cc:Subject:X-OQ-MSGID:Date:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	bh=GxEAh1VPtSYJm7RgQ8GwuBf7Xw9of2C5ciQVntp50E0=;
-	b=fTI+TwfdGM2X+A3Tlggc6PSJIFRzKSC2Ohetj/EWgdwQnCA+psAYVRV+q3q3EfjBkukO
-	 eKboB5CRjb7Oh3xs6wOu5o/+/QpgZr4jdRkWlXLjbfv+2OH7y3WjwUaTAjWKspWNqiw97
-	 /t39GQyMaqNdZUO3de6B/w0t6qQe1EKpW1ngaSoC6WfC45cfosJzZidx26Xrk4MvhC+6P
-	 7tpFotso3JJJ3gUqHdnrHeNhPvaI21QR2nidon9csDS/blmhWETXcPMUXVmSrbzrUFMQo
-	 2iOk+0NNpM9FVFsusqoDa/9WDKX5bO0IUteGPcl2GVPWX83Xp6I5sl6vn4DqV0+y6mQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794500311;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
+	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-Mailer;
+	bh=D+wwjazAct4IZB2YuQKwqi24Rar1lXO2vO79SPb/nCE=;
+	b=GwfwLYBr0lbvdYCsSwRz2YLrFQPEl4YsetDvICMDn6AKPlfq2ge8D+zIQJ5qQ6LJs3TE
+	 R3PjqyHuNNKyd6vgIQu3wu77lzH3M1xv15ovuDS4+jh6lwG0kkk2CMJ18Ikak9OHvnCaY
+	 58ERd8PDFdTPqmEHGNXgr8MXYwIOYv4ExuPjE+sYPlPSmtexoNnrfAVR1BzUuhj2DitA2
+	 1Kclxia7B8Tjeb+MVfxPD6HGk8BENlCZnfsnoOMQMF+eohHqvd8BxdGUq0abClzrzcIjA
+	 CorsLIFhRVg50hD3i8Mlxfu3/pAONGoOwUearXisW7TxsJXZrntAPOqLdKvx36k2dYA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=qq.com;
-	spf=pass smtp.mailfrom=qq.com;
-	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=TP3FNqnB;
-	arc=none smtp.remote-ip=162.62.58.216
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=none header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=XIDnrxIo;
+	arc=none smtp.remote-ip=74.125.82.50
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BDF606A32E;
-	Thu, 12 Nov 2026 16:07:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72BDF606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3B7606A321
+	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 16:18:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DF3B7606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=TP3FNqnB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1794499661; bh=GxEAh1VPtSYJm7RgQ8GwuBf7Xw9of2C5ciQVntp50E0=;
-	h=From:To:Cc:Subject:Date;
-	b=TP3FNqnBPbHOWz6OGI0NiaRMQCeo8Ph+Womix3t9hLHDIwvKypNaMF8wOzRB+R4Yc
-	 AkxGfcNWoGPgRRXEYqU+dUveBZx+TgYVzYwNaOYFCKGfCDcWPwh0QFqoyL/CVz2Z0w
-	 x0VPno+JaHufd/cTm85g4OBdDDxjiVyabaW6GGUg=
-Received: from [172.18.4.77] ([202.113.185.209])
-	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
-	id 1E7B98F9; Fri, 13 Nov 2026 00:07:39 +0800
-X-QQ-mid: xmsmtpt1794499659tr0eenu2o
-Message-ID: <tencent_444214B18F57945FAADD37F108ABD3A22906@qq.com>
-X-QQ-XMAILINFO: NYXSVuwhoxRbJ+PBQO6iO+2Qb3cYRBc/B4kjx1OTwvBa+gMuvI8lRkK7cayto/
-	 Pm/QnoaHNXbgzcfiBXM32OuKDKXE5U9V6yW63MaOHcsGBBZJcxhcROf14ynK+txvuJhRmnL09SkE
-	 IqW+Tj0iI7fr295urfw7Vav3QIhLjngZc0gZtkwcHK2Li5ugIxboNlP+5hCvuMG538C+STTAGLS4
-	 1eOpXUAMXPkFc6Fu/jhOVsQ8XYTxVYaVARiOaHlhn7EDZD0n64MKixv2k3+snLBFyEsX0yszv5gZ
-	 4w5BGNZoWzv3natZdmGNuxus3H58Kuh/qPQsBSlF2ayvBaz5TVJkorAMaHvutpnMT/UM/iVUuIxC
-	 1NcHCrjHus5k1KWAaGcHLZrAZYQJQ2VS0hENiDoasgN1y0POfMHOzF7yQVXaXvTt3l/eS0Pnmqaq
-	 Xue9gRom4QAuC9rQgRxHIqD3edKN1pk+Yn2mCHA7l+dEX60fo0mbJY97HaiYS12lPZZTXJlok1lm
-	 OwVTPotYyWUdZefAeP4NdC3qSbDEzk2eywz2Hg38X96fc3G3V60ShNAD1D3cTBuPSgFgidNJYc8Y
-	 G0C/G8MzTTMxuzfIqCo3bq/Zw612JNlJYJZY1ndfaYEYe27OkcANyCozPOhtpfDukU2DXK8r1bGb
-	 xV/z0CA/HDvjseEP/tLWj+25t3B38gsBwYc+BtP4/fl4bfK0K02psKImcrGTWQf9phCwu0QhBUjE
-	 E7plNn7XbEZKHnzh3QxM+tMnn/EnF+auKXQkdUoorow3IzF1ufl2q/AOwYkAvd7v+hGdMXCLkPgB
-	 YQPPjmhAjbhm4B2LIIKJsAXRjLb+27ITd4gfDWOisw5z716+TEIkNKcUVYxny6KpyhsY9uueJCht
-	 jcv9ZgzQtkWNrxC5mt4TrZummofFxxJ6OxhP6NPNwOvP14kl4cb76E8m+b0iP6tInMb7mx+L4aNl
-	 zbS+6BQDNZRjEMWQ50+vhFVQfPCHE/HV6lsJhbJ6JXvjTZDJ5b9aBGaWLZLWUPwBit+AGx0pRZmy
-	 WlM6XJA7K2rQJ1SkmLjqXyNut/VvQ=
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-From: Guikun Yang <yangguikun19@qq.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [Bug report] partitions/aix: unbounded lvname string read panics the
- boot partition scan (regression in v7.1)
-X-OQ-MSGID: <aix-lvname-oob-20261112@qq.com>
-Date: Thu, 12 Nov 2026 20:00:00 +0800
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (2048-bit key, unprotected) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=XIDnrxIo
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-170135e43c7so3223203c88.0
+        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 08:18:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1794500309; x=1795105109; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=D+wwjazAct4IZB2YuQKwqi24Rar1lXO2vO79SPb/nCE=;
+        b=XIDnrxIo8sdAfxBpG12mCoHmS3PnwLDutuMW741oRA+n9e4WbIIvTqMp09b9XX+s4w
+         QSbiYy99el4yMTlCueAcpwrBbT1woLxB5HEXiSpt0WUh174EE8//peCgTpTg5gcQSCJX
+         2Rg5y4uJVRHqrj66Qz6uqfGwI9uwy2nHgTkG8PCe2fVAZ/gY4byMVm1FEbRFDBzyC2+Z
+         m6EJNf6UCceuTC3cdgeCVDtir/QZ6N3RkyZXKJz/z+zXXL5VaApjALhpCqLMF6MlG9JN
+         4qkvZPUFw0v8dB0LXziaWteP82Lg6O0UINHqU+CQ7wCRfG4I4/Ms5fd/nLIXB2MF7NcZ
+         nskg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794500309; x=1795105109;
+        h=content-transfer-encoding:content-type:mime-version:date:message-id
+         :subject:references:in-reply-to:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=D+wwjazAct4IZB2YuQKwqi24Rar1lXO2vO79SPb/nCE=;
+        b=gNkor1nf2TgVITwYxVD8xx885JwBk2fLUKskDgmsucuswhoxdbI1B3pSWm3udr5aI+
+         MKDgAx7o16C4mIkUlXawIT1RO02VAzs5OBOCG6XHl4EaxSmwrrNj52uoUX6acYHMrBIR
+         HgKBLoArf6quXkzUigEZu0/p/kQaDOLx66rGjKfaPYW754UHYDfof2z/ifD6jA5k12Le
+         Qxc5gG7iNF5L9LXD4XHiusL0a/IMg+KdnexsJoe3yN4mVrYmd7X2mAzCmzuUoH/yVM4q
+         irvb9VrzoCfpAPBmHw9nlMj9RLAsDvxtntFitvgM4znq5PcLHu9C/ScQRS8+ogVuqkKF
+         XRYg==
+X-Gm-Message-State: APuU4Z+oHwU5BzmF/3/YNt1LqWLogT9zAv3+6MRQZvnYWSxSGR463OB1
+	RkMs7v9jkt0cM3np80IyA911MYocuEuOkFrjLkFEikmKnXq8VSIrOPLnYdOXqU/lo8I=
+X-Gm-Gg: AYBFou1Ct1s1Abr3/HPEakGryRaNeWqLRBbRKB2Kt31NeCfbeXlvQFUPOksu1N8efIC
+	s0Xe/PW/kY6QuNwMmZxYZep10qKa9EOK5xovbWvryLTPF3fyMc+G+1EE+oJSmY5u+oBMfZIm4o1
+	q9lowTV6O6Ww1NyfsM5r4VW52w95rb07/YWhjT506sEItbZO68mNQHXTThQqs640yOa+GXISUTp
+	kHKHMF8J35Rr7ffXoJUHQ3JoMGOkjAMewJ0la9jv2bbXq6otm7BoQvtd8+dGaQgETy2b6UUcvEI
+	N7jHCo/v095CEKOEE2bgC2wpAxbQGIH/O886utqtWWelUwqvzcERLLFwvG6g8Sm0YhPHvm6dN4A
+	mkBNBf8Q/Tq4psl9ruKoZxkAK2gaq/btNtxLFCdYeHKquPcDo9ZS1jQCrV+qR0jr4tBDi1/EEgv
+	fy8qjL67p0szQoWsHl6KU8PdohQpA0Wmwhr2F+x5kpu6P18k3mVrXnzdfqj/5QAtEY24AxmMovG
+	eCVAfpZAdcAmDXNCC10AtWt2aHqmTfR+aN5QoFIwML1EgQC9dE9Zi6oanVbA3XP3LXmg6zV489d
+	VcJJtXFhDwcJSon4wco+UKSDx19qmL3zMy8V/F7+s2S5pwMNE68rEUYwWHtk5Okn92BRM8CYZwk
+	w2yJbplpX3GrmIV0IUomQzbGmf9zagi7Yjw==
+X-Received: by 2002:a05:701b:4554:10b0:19b:39f4:88c9 with SMTP id a92af1059eb24-1b503115701mr40021c88.10.1794500308848;
+        Thu, 12 Nov 2026 08:18:28 -0800 (PST)
+Received: from [192.168.1.142] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5031918c7sm63092c88.9.2026.11.12.08.18.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Nov 2026 08:18:28 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Stefan Haberland <sth@linux.ibm.com>
+Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
+ linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
+ Vasily Gorbik <gor@linux.ibm.com>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20261112102608.1057852-1-sth@linux.ibm.com>
+References: <20261112102608.1057852-1-sth@linux.ibm.com>
+Subject: Re: [PATCH 0/4] s390/dasd: fixes for RCD retry and BIODASDCHECKFMT
+Message-Id: <179450030814.6809.12199806849669724692.b4-ty@b4>
+Date: Thu, 12 Nov 2026 09:18:28 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -77,126 +99,40 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-Hi Jens,
 
-Booting a kernel with CONFIG_AIX_PARTITION=y on a disk whose AIX LVM
-logical volume name area contains no NUL byte panics during the
-automatic partition scan. The name is read from disk into a
-kmalloc(16384) buffer and then handed to seq_buf_printf() as a C
-string, so vsnprintf() walks past the end of the allocation:
+On Thu, 12 Nov 2026 11:26:04 +0100, Stefan Haberland wrote:
+> please apply the following DASD fixes.
+> 
+>  - Re-initialize the RCD buffer magic "V1.0" before every start of the
+>    request to fix a condition where z/VM omitted the UIT and the paths
+>    were wrongly reported as leading to different devices.
+>  - Two fixes for the BIODASDCHECKFMT ioctl, both reported by Sashiko:
+>    a wrong free plus a refcount leak in the dasd_eckd_build_check_tcw()
+>    error path, and an info leak caused by trusting the userspace-supplied
+>    result field.
+>  - A typo fix in a function name, dasd_sleep_on_immediatly(). It is a
+>    prerequisite for the RCD patch.
+> 
+> [...]
 
-  BUG: KASAN: use-after-free in string+0x4a9/0x4f0
-  Read of size 1 at addr ffff888004ab4000 by task swapper/0/1
-   string
-   vsnprintf
-   seq_buf_printf
-   aix_partition+0xd42
-   msdos_partition
-   bdev_disk_changed
-   disk_scan_partitions
-   virtblk_probe
-  unable to handle page fault for address: ffff888004ab4000
-  Oops: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN NOPTI
-  Kernel panic - not syncing: Fatal exception
+Applied, thanks!
 
-## How the bound was lost
+[1/4] s390/dasd: Fix typo 'immediatly' -> 'immediately'
+      commit: ae6f19236b5ae4eef4df2780d51bee19add0eba8
+[2/4] s390/dasd: Re-initialize RCD buffer with "V1.0" before every start
+      commit: 25cdc1f63227a1ea69a1ec823a8a860e33299169
+[3/4] s390/dasd: Fix wrong free and refcount leak in build_check_tcw error path
+      commit: df56f7a6c20a5eb2794c0a7391bde50ba7c8c54b
+[4/4] s390/dasd: Don't trust userspace-supplied result field in format check
+      commit: 7cc2dda4f7aaf596c1796184649007151ff98f8d
 
-The lack of NUL termination in on-disk lvname strings is a known
-property. d43fdae7ba ("partitions/aix: append null character to print
-data from disk", 2018) says so explicitly and bounded the pr_warn()
-consumer with a local buffer:
+Best regards,
+-- 
+Jens Axboe
 
-  char tmp[sizeof(n[i].name) + 1]; // null char
-  snprintf(tmp, sizeof(tmp), "%s", n[i].name);
 
-At that time the other consumer was equally bounded:
-
-  char tmp[70];
-  snprintf(tmp, sizeof(tmp), " <%s>\n", n[lv_ix].name);
-  strlcat(state->pp_buf, tmp, PAGE_SIZE);
-
-c2d466b9fe ("block: partitions: Replace pp_buf with struct seq_buf")
-removed that pair in favour of a direct call, as part of eliminating
-local tmp buffers:
-
--				char tmp[70];
--				snprintf(tmp, sizeof(tmp), " <%s>\n",
--					 n[lv_ix].name);
--				strlcat(state->pp_buf, tmp, PAGE_SIZE);
-+				seq_buf_printf(&state->pp_buf, " <%s>\n",
-+					       n[lv_ix].name);
-
-seq_buf_printf() bounds the destination, but the source is now the raw
-on-disk string with no length limit, so the read is unbounded. The
-pr_warn() path kept its 2018 buffer and is still safe; only this
-consumer regressed.
-
-alloc_lvn() fills the whole allocation from disk with no terminator
-handling (block/partitions/aix.c):
-
-  size_t count = sizeof(struct lvname) * LVM_MAXLVS;   /* 64 * 256 */
-  p = kmalloc(count, GFP_KERNEL);
-  read_lba(state, lba, (u8 *)p, count);
-
-struct lvname is just char name[64], and lv_ix is bounded by
-state->limit (DISK_MAX_PARTS = 256, equal to LVM_MAXLVS), so the array
-index itself is in range - it is the string read that runs off the end
-of the 16 KiB object.
-
-## Affected versions
-
-Checked by fetching block/partitions/aix.c at each tag:
-
-  v7.0      char tmp[70] + snprintf   bounded
-  v7.1      seq_buf_printf            unbounded
-  v7.2      seq_buf_printf            unbounded
-  v7.3      seq_buf_printf            unbounded
-  v7.4-rc2  seq_buf_printf            unbounded
-
-So this is a regression introduced in v7.1 and still present in
-mainline.
-
-## Reproduction
-
-The trigger is the boot-time partition scan; no userspace action, no
-race, no special mount options. CONFIG_AIX_PARTITION=y is already
-enabled in distribution kernels.
-
-An image whose lvname area is filled with non-NUL bytes panics 3/3.
-The negative control differs only in having a NUL-terminated short
-name: the same code path parses it normally and prints
-"vda1 <lv000000>" with no KASAN report.
-
-## Suggested fix
-
-Restore the read bound. Either give the conversion a precision:
-
--	seq_buf_printf(&state->pp_buf, " <%s>\n", n[lv_ix].name);
-+	seq_buf_printf(&state->pp_buf, " <%.*s>\n",
-+		       (int)sizeof(n[lv_ix].name), n[lv_ix].name);
-
-or terminate every name once, right after the read in alloc_lvn(),
-which also covers any future consumer:
-
-  if (read_lba(state, lba, (u8 *)p, count) < count) {
-          kfree(p);
-          return NULL;
-  }
-+ for (i = 0; i < LVM_MAXLVS; i++)
-+         p[i].name[sizeof(p[i].name) - 1] = '\0';
-  return p;
-
-I prefer the second: the 2018 fix bounded one consumer at a time, and
-this regression happened because the other one lost its buffer.
-Terminating at the source removes that class of mistake.
-
-Reproducer (image builder for both the positive and negative case,
-serial logs) available on request. Happy to send this as a patch if
-you prefer.
-
-Fixes: c2d466b9fe ("block: partitions: Replace pp_buf with struct seq_buf")
-
-Thanks,
-Guikun Yang
 
