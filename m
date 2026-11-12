@@ -1,67 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.108.3.162
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=66.163.188.212
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794442423;
-	b=hBvWAbBW5kV9qooYG9s7n5rQiRBuc1XG3a+lLWjrezNqCn+fHu2mAmpgvbCvv9fHFwYR
-	 rzLJ7nKkdRT5VFLvX3C97f+HMO7xvmqKGKEqqYXJpIrfecOPutckNqmAkZUAhpnhvFBgr
-	 i2OYxpQOXNoKE87ueionaQpPfDAWU7N99KwZoToEFRZvibgx/kMfNqLj4I1DYEOiKitKR
-	 zFZPp51v48/hlZCSzMlSMxJ7wk8RzodcB6cpRp4fhLb/MJGUGuQFMxGmx3oxmP6Cy61ts
-	 Z9rvAantLM+vursQvhDVG/0MEDnbBQGJFq+ag8flCQOKQiNj9kTcVqir6oWQ69PF6Rw==
+	t=1794448237;
+	b=xrqFAJ/OQzkn9lF2wy3yTGpz9qME6ZtBvgm4VdHBFKCmnwzzQUDoUMUc3AYNE7vnyybi
+	 t+GkjYLndE9e+UoeV+yQPxvYZCPu6T8RKYovowJZx8UPUeNZ192BaP7CwtmaEtemqVMSo
+	 FP6PnhdPXu6Ts2bsd3JUc42/HmmbM43imAjCXSByVsIlonmyAbKTMhfzlO3y+IKtfFmq/
+	 I7XJ39yHDdg9BxXqX0jnrqySB6qAHP+erDsl/zHjUlhoNf1fLf592t2QqQQxRUAgdYXj/
+	 40emxiHyd4UWomfE6XwjoAqz1OaAx8tkdB7olIECmYXA5w0d8TWtEsliJ8MBOAQg+fQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794442423;
-	h=DMARC-Filter:DKIM-Signature:X-SMAIL-HELO:Received:X-Sender:X-Auth-ID:
-	 X-SMAIL-MID:X-SMAIL-UIID:From:To:Cc:Subject:Date:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=D64g9BJ+4yZXICHv3vdK6fiAhMhXikQmmHwRmcMdR90=;
-	b=bexvkp3fUUT1SHq0An1XAlIteEZTZ95rOFe2iYyc8oCN1lp4Ph3zBlgtSv0D7YcHbKgB
-	 6eW86xfn8QfINeOk2684uVTJTs6N2jIMozf/yRDiu8zdVgdQ6wDq6V96XlXy9FUIsFCJ2
-	 n9DNADPlRxLH7QAI+fvQWTp6Jgsw8Z4IjkRm2Hw5PlIaBWZktCsMQC+Qm8PBgmDt7JxlJ
-	 Q765kOGto9N+4jMgEIsQlySJ/DUnQRmzDnBzDjUaNDfZy/NgJ2nqWnNledQ+3khYya6nF
-	 Y9wI3ONc+10wf7Wd6Vdnjsnfa01dnevDKWw42HmVUjjphpM3q4qBsqS4wqkCVEtsVag==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794448237;
+	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
+	 X-Sonic-ID:Received:Received:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Mailer;
+	bh=O8h9fybdyu+Al7CdWlfRBQ6LgqQutaBSF+Rc2HGjCVE=;
+	b=aBvkpAYmgbKZOHLHoGxJ1bs1nheq+RRqSQjmLXsfg1B8iOK8hrtoEqgyuOg7fFgeJjVt
+	 ZqwoM1p+vGRRIoLeWToku68/UKq7qppLI0I2ixDFIAYtHno0Q3gBaucLfa3usI6+RZ10a
+	 KDsx3ENUp6NfKSnIX6d/hzIxBd8KPeHODthFLdWckNXF5EcEFWIWRgn4KRXbvYbjomC9g
+	 wDK45qS99bVc3zXEWc1RR4vjr6QFo1k2KYxTkX0hdmI/1kt2TGPZzgrUCHMrM5QBqk29I
+	 A3ypkzw6UKvrETiR/r13OfLm+df9sNZ11Ito8VcIJDbnv0F2+F425InXoCTJpruLnSg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=sina.com;
-	spf=pass smtp.mailfrom=sina.com;
-	dkim=pass header.d=sina.com header.i=@sina.com header.a=rsa-sha256 header.s=201208 header.b=nWs8+lVQ;
-	arc=none smtp.remote-ip=202.108.3.162
-Received: from mail3-162.sinamail.sina.com.cn (mail3-162.sinamail.sina.com.cn [202.108.3.162])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=schaufler-ca.com;
+	spf=pass smtp.mailfrom=schaufler-ca.com;
+	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=F+m434hx;
+	arc=none smtp.remote-ip=66.163.188.212
+Received: from sonic311-31.consmr.mail.ne1.yahoo.com (sonic311-31.consmr.mail.ne1.yahoo.com [66.163.188.212])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CC0606A31C
-	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 00:13:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 80CC0606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B204F606A338
+	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 01:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B204F606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schaufler-ca.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=sina.com header.i=@sina.com header.a=rsa-sha256 header.s=201208 header.b=nWs8+lVQ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1794442421;
-	bh=D64g9BJ+4yZXICHv3vdK6fiAhMhXikQmmHwRmcMdR90=;
-	h=From:Subject:Date:Message-ID;
-	b=nWs8+lVQIUzNU0WcveGh1Cw3x8669exTaeGjNvjtSHCrfOhti80SUenEx9Vf1Mhmm
-	 TK7DJSnGRQuzMWxBDgObKypnkulVLHJWRN0x8LzGsKQ65BqaloeGDr697XGsFZFXOt
-	 VJwBUCPGQ1sa0iYqiHbgaKYRerLR7hNXiC2W105w=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.246.239.16])
-	by sina.com (10.54.253.34) with ESMTP
-	id 6AF504A900002169; Thu, 12 Nov 2026 08:13:32 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 4742026292082
-X-SMAIL-UIID: EB0B7AD7AF8746D584DAB56F33A6C72D-20261112-081332-1
-From: Hillf Danton <hdanton@sina.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Guilherme Giacomo Simoes <trintaeoitogc@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	nbd@other.debian.org,
-	syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com
-Subject: Re: [PATCH] nbd: fix circular lock dependency
-Date: Thu, 12 Nov 2026 08:13:18 +0800
-Message-ID: <20261112001319.463-1-hdanton@sina.com>
-In-Reply-To: <c2f4dbce-f8e0-4f04-8dee-3f8d413f4d0d@acm.org>
-References: 
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=F+m434hx
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794448235; bh=O8h9fybdyu+Al7CdWlfRBQ6LgqQutaBSF+Rc2HGjCVE=; h=Date:Subject:To:Cc:References:From:In-Reply-To:Content-Type:From:Subject:Reply-To:Content-Type; b=F+m434hxnazo+znIsDN87b1q6q2BjDXrSK85l4sPO4/7/Nv6ouklEMGBpfrTHUnO8eGiNQoV5Bbw/uB3JZACliQBg8PtdTRYRP97HHZoegx3ArYwH69kAdVaUPkV7WcyNd89YKs91cZCwmWeziNsUM+FCRLahqzZW3a6Ku8pvIiJlMO/7XaKbdkzRicymfmmSk9XFsFNG+fkHI8UO70pZ1hFT9v2XQiwRrAslvpHUFbDR+3rpTT4Ikh/N/oSBL0qRMnhxDrBkdI0Mmku6tTsyJWpgcJjSTSvBuepznmh0kGiP8yElqSHRAm6ov8qvVTBbZJZj+71HtVfmpD+WAp7XA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794448235; bh=cB6ms4YZu3OSr7Oj5Ktyy9vRYllWqlKKBSjCDtAOhd3=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=Wh5tO+A7k6l9RAB9CmF+7nFPpV+s7vwQOvHRCpB836zmpk+EmZdiT1obFQYb3eEYUV/ZZrDMNSGrpqiSFrVBvEAP1+BcX3bVXL8AkZe5aM0djERGyxVy+oivb40ItIA89tHRP/kW5BzO7GaPGZrOTfFkDQF1HHnKQVH/ifoH5PYTL/BXjLkbPViq5JKecTMlRIryhz3iU6NkOHkP1F3oliaijdeTD+Tk00HCA4w802Q1PFZvsZSndMk6hlb4A1wMRPh3z4tVeu12oZckS5JIJR1ywCFknBKWBE+hVxojbZ57Qr3RCaKJrua5vLBD1s/SnsdmRZ+/JLOhUlVDaAQyJw==
+X-YMail-OSG: zqmnDtkVM1n5t6ueog55b_vkFHSYM5E1qoECEJywzBr3UwiKAfUIVI_o6w7R9SH
+ CQ1t93f4qyBpZEcVGjU2OBO9C0Of8.lRAD_UtcVdUMSf6_GiG98G7rNXb1ZhUGsyYLDyJE5oLG69
+ MPpknxdoviNcfunvMa.q1ATsxUiRNZaaYFEtaSi7o3ARz3uzFbYwa4zXUFVTxVNR1M4yEm8E_vMu
+ CX3lc6b1b0MWbnmh3DAeGebLmTpZwI12LuF9QH7MRRpV.Y7YkiPkkooycQl42qWPa_ZCsKSCVnTi
+ cfYjzn7ZtEqmGYVjYEY1kEbVCA4JoS5GMMDKMoO39G5YhBugROnX2jrgGh0AwdwAby30.ZBxmd.l
+ S62hS2hlPvIDoPxGhzS2whxCcIZrt8XbiUGRsBq2lfu8t9x.TIubZ4wIiRqzfDYoZIwioLDCjm6k
+ .cljRFJEOnSix_ImX_sSyVP7eQAAEJ1GsHeUHb7atzAIHDlw0lV7YT_EQZaDbjuCghjYyGwMa7FJ
+ LxdRDFOXlr05WMcbROqV0a4sd0J7UyT01rGVa2p8mqlfg_ZPSk1p0.zKLMJDr5A1o8n0sxe4LbiR
+ qbREBgT6XAwECEJNbNHKO1YTM4iOmevp8GvnGDd6MDNapigfFoPwfu59SMy7zYd9LO3Z8_0VkIJt
+ aPlGTgcyxBF.v1wQggIdb30_WaSmydGJlcGPdQ03irHq2wrwxiCoQO6IJUZEr0jypo3mUQnAGyDG
+ k9vUUntKtCsyi.w0t_vFjR1T1M3Z6Xk5RLKDL9njS7LNW.CupQSEmNQ1GkX7kSwPFQP21HwmyMsp
+ i9SdJowJ0s5y.bw2SrHxrP7sM6YbNToNL5ZVELMODpe5VuCBtDWl7VcCxYMmahr5455.ZE_hGmHs
+ LrmFJx1uQ46OcZ2Ii956498sukETOy0INQsrtoq.ypS01I6QTO8GSI7rVFeq81ZNfcHhvUGJ06ME
+ B8yJmeeVBase_8cBDx_Yk7y0xRppCWZz9S9bNwiHzQcmhSHJ99JaTf4E0zOIsgLWqU5tZh4wLZKp
+ MnYneLIuBkBNwjBcYTuKXcpCwff8fTcsfan2g9ag6_HRqbKvb3lqTrnQRPIG.IGMBIXdu4D1HB2r
+ Ygn65JHFmN1QF2ROBGshwilsGajQNSqHXHgx.co9RO5Evfjv8vx67t__1ew7rn3sc1C.7W_m4N4M
+ cSR8SYdV43PcknGSee9yB1x8pWannWLYRUROzisZnoPLwDPX1S0a5pIeYojUo9jnHaAdfaOw5IJs
+ bc0nB3tQZQ.0b782FrYX_n_pf05DxifKK1hrJ0OqXSo23BlRt.p63_4auT8X4tq9HTs9fxQLg0OA
+ ydi2BtTIKopjFdQtWH0NOUC1U6_wILbgtZfZnlVsbVhHJ7Tk.UZGmAVff_vQl8b4id5D4T9jwtS9
+ 8nKfk1Ghey2tqeZDF9SgVACRH_x6kJa81R1e4J_83TMyBY4Ays_MTt39YbFzXRfBMRqG0I92h9IS
+ Xl4i4wMK_gUqmjpP0P_oaDsTzptxLp7NMOmOY3T81w3i60pQpmuYMvggEU3dv.ebRC4Brat.KcXq
+ ZyjrZ4BouQUvapbNSNNP1Y253sBId7Ys37DryRT0fCsyFp6LIN0DYA1xElaICSH34S2v84muDGZe
+ .CGRnjEo0Q2679LeUfRrG7eDmdHtGbtXa02kyQjntuOc7VrR9y8jRUHqkLiiITgSdxH1QGB5PWuQ
+ ARpFP1xjX3OHKFGeQd7o8WX3xDhKeppcWAPJEhIosno79RY0IQ4.4JX7WCaXgDYbj6BL4okuPPnu
+ 9CEiWKr_A1oRBHcXo_t2XyX1N2Jd1tPqjLAB1WY0vIGe1SVdGRdRloM6.RT24mU1pbFP4DjeRn1w
+ _aXrAymHoztvd7BVNk78MI6f1URU2iBFJ6msmP6JgXQac5cfrtvlS9yn2eohnwEPfv__IKNy26n1
+ mYs7i0yOvj6LH9jEvBJfejsFOAeuf8LBdL.MbTk8ZZiVorhzaxO81Zf4PRAQwZfM29CLtP5dAKbb
+ klVicXy3HgsPrMZiM94qTb2yOlO2WSLEgrPS_2Vx31FNEHJNJpuKXHkfgTtKgjLPmpCr4Taq44yO
+ KB8vbaoDybAHzNwFN22pWQG3NDp.x8aciLmMT8fUQgwMgW8NlLKb6ErL7ChYlwsHUhzhzMbUfvnT
+ 2bA6QlHpoN4OcRsGeb2ygbIpUCMhvL1tqClAnkg41oGlCJa3crNRCKKeXXqZBarf9KzLHJa8i581
+ 0YgHHROuHzbtZ8GRm6ggBoLbsrITMfTGKIshO9uwpGYYxl6nVscbC6LtZUsxlV5iP8t8XsYi.ga0
+ EDsRWYHlK
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 4e6572e0-628c-4102-8309-f6caa349ac8e
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.ne1.yahoo.com with HTTP; Thu, 12 Nov 2026 01:50:35 +0000
+Received: by hermes--production-gq1-fd7994565-9vhlr (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 15d81e1a8a6348ae9dcd84771e3b8196;
+          Thu, 12 Nov 2026 01:50:33 +0000 (UTC)
+Message-ID: <41617b0a-90d9-484e-a143-78e2a92e872c@schaufler-ca.com>
+Date: Wed, 11 Nov 2026 17:50:30 -0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -71,63 +84,68 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [apparmor] [PATCH RFC 19/41] smack: use fc_init_pseudo() for
+ smackfs
+To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
+Cc: linux-efi@vger.kernel.org, Jan Kara <jack@suse.cz>,
+ Amir Goldstein <amir73il@gmail.com>, linux-nvme@lists.infradead.org,
+ fuse-devel@lists.linux.dev, linux-mm@kvack.org,
+ target-devel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Chris Mason <mason@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ linux-s390@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ driver-core@lists.linux.dev, Jann Horn <jannh@google.com>,
+ selinux@vger.kernel.org, apparmor@lists.ubuntu.com,
+ Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, Alexander Viro <viro@zeniv.linux.org.uk>,
+ linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, bpf@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, Casey Schaufler <casey@schaufler-ca.com>
+References: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
+ <20261110-work-loop-pseudo-v1-19-4c998976c6c7@kernel.org>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <20261110-work-loop-pseudo-v1-19-4c998976c6c7@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.26943 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-On Wed, 11 Nov 2026 09:13:45 -0800 Bart Van Assche wrote:
->On 11/11/26 3:38 AM, Guilherme Giacomo Simoes wrote:
-> > After tested, how can I mention this in my patch?
+On 11/10/2026 1:14 AM, Christian Brauner via AppArmor wrote:
+> Initialize smackfs as a pseudo filesystem. This raises SB_I_PSEUDO and
+> also SB_I_NOEXEC and SB_I_NODEV. smackfs never holds executables or
+> device nodes.
 >
->If syzbot confirms the fix, you can either:
->- Add a "Tested-by: syzbot..." tag if syzkaller provides one, or
->- Mention it below the "---" separator in your patch (in the changelog/notes
->   section), e.g.:
->   Tested against syzbot reproducer via #syz test: <link-to-syzbot-result>
->
-> > What do you think now? We will call nbd_reclassify_socket() inside
-> > nbd_get_socket() and call this only one time? Or is a better way call the
-> > nbd_reclassify_socket() inside nbd_genl_reconnect_sock_cb() when we 
->have sure
-> > that we will use the socket?
->
->Calling nbd_reclassify_socket(sock) directly inside
->nbd_genl_reconnect_sock_cb() (right after nbd_get_socket()) is definitely
->the best approach:
->1. It is a 1-line addition to nbd_genl_reconnect_sock_cb().
->2. It mirrors what nbd_add_socket() already does.
->3. No code needs to be moved around, keeping the git diff minimal and making
->    the fix trivial to review and backport to stable kernels.
->
-> > What do you think:
-> > ```
-> > nbd: must reclassify socket when socket is created
-> >
-> > When we need to connect or reconnect a new socket, we need to call
-> > nbd_reclassify_socket() to ensure that a false positive lock_dep
-> > circular warning fires. [...]
-> > ```
->
-> Please use the imperative mood, e.g. as follows:
-> 
-> nbd: Reclassify sockets in the reconnect path
-> 
-> Commit d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep circular 
-> dependency") introduced nbd_reclassify_socket() to prevent lockdep false 
-> positives when NBD sockets are used in memory reclaim paths. While 
-> nbd_add_socket() reclassifies newly added sockets, 
-> nbd_genl_reconnect_sock_cb() omitted this call when replacing dead 
-> sockets during reconnection. Consequently, reconnected sockets retain 
-> the generic socket lockdep class and trigger false-positive lockdep reports.
-> 
-> Fix this by reclassifying the replacement socket in 
-> nbd_genl_reconnect_sock_cb().
-> 
-> Fixes: d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep circular 
-> dependency")
-> Reported-by: syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com 
-> Closes: https://syzkaller.appspot.com/bug?extid=d7d72f3d467710442af0
-> 
-FYI reclassifying sockets is also corrupting memory [11], so can you fix
-the corrupter before reclassifying again?
+> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 
-[11] Subject: [syzbot] BUG: spinlock already unlocked in corrupted
-https://lore.kernel.org/lkml/6aec63fd.5f5735a5.290c1c.0003.GAE@google.com/
+Please include me at least as a CC on Smack patches.
+I ain't dead yet. Nonetheless,
+
+Acked-by: Casey Schaufler <casey@schaufler-ca.com>
+
+> ---
+>  security/smack/smackfs.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/security/smack/smackfs.c b/security/smack/smackfs.c
+> index a72bc7fabea9..4a56bbeaeca3 100644
+> --- a/security/smack/smackfs.c
+> +++ b/security/smack/smackfs.c
+> @@ -25,6 +25,7 @@
+>  #include <linux/magic.h>
+>  #include <linux/mount.h>
+>  #include <linux/fs_context.h>
+> +#include <linux/pseudo_fs.h>
+>  #include "smack.h"
+>  
+>  #define BEBITS	(sizeof(__be32) * 8)
+> @@ -2880,6 +2881,7 @@ static const struct fs_context_operations smk_context_ops = {
+>   */
+>  static int smk_init_fs_context(struct fs_context *fc)
+>  {
+> +	fc_init_pseudo(fc);
+>  	fc->ops = &smk_context_ops;
+>  	return 0;
+>  }
+>
