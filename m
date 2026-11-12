@@ -1,62 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794492191;
-	b=KB5tvTciDBJ6V1uInuMU5KHo8TC3sNXiKiNH72RP/Ml/iwYf3RQZJ3ADrjBqPF4B0DxA
-	 AWGiAbnlEr0rxyp5tyxkRWa+w0RJaKhmvlV9rJT9zn+V4bVcx9oR6NBjbx0OmBpbGhnUQ
-	 fM8nZ1f+ItOz9/Bljt/ezL6q16dz6hbg31lGYfhq9EGmsQKl+wPfgVbO5UOuZQBEauAwY
-	 iE4NichgHIuc01UUFwCsMHkk48eA+Yb6dCW0ANKhc7ySU5lKgtFOevHwZNnHj6cwI/YnI
-	 SRL868zXbBH49d3kxGT9q2SUJh72LO2FAbeNFsbPlqmMYRt2f1+LLjc/45YNu8FKoZQ==
+	t=1794492210;
+	b=JOzVSJaZFO5KqY7bKybkxmTDTaYhnFfFGNLDW0Bn001WQ2xDTnr36Ag9k7Mc58ztSrym
+	 OI3psbgByQXJsesHQAT6ArUK6L3y6SqEw7k3CJLbWcGg/wwWoYiTyYHwDyZUph7UDpVRW
+	 ukZi6sCWredRyk2lYj2y3fEtLjK2MuuJFWag1FAXIsWq0L33gtaLC5bY1K52zlYsLbcSX
+	 5RYkhVFPjL75YKDnvZncrU9n/V9elaVlXJbRc0UptJAKln8n1yig7iKZw/jtFOmbZKULw
+	 LfL9Gnmll0nuzB1voV7IuWXW9mx8Dj/j6soRxIMcJj/H5VrTr2GExYxJRZS+OZQhpiQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794492191;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794492210;
 	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
 	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
 	 In-Reply-To:X-SRS-Rewrite;
-	bh=82eMXmhzgoPTKKBAMOVTGfqvSuE7xkGl7D8/qkqwjWA=;
-	b=D8E2MZBIhKMTIOhTnPPvuCSsQb2u92isf3IDNVxW92PC2o3cydh02yLB4ajnjd7xafji
-	 MwTnt9oZVy9XsOmHLNGe2aW4rKC9uVdeMQwo88jEyZGFmgHxyKNZ9c11o/iHUq4PwYCO+
-	 VoAfnwa+Me/Ap5cMKkGf4rCEOhln214afVCp12tdYLZdlfNxsMTuO98ZKf+0Aol7fDuwS
-	 JYimEw6GLONY5eNkP2kUypbMiKjnw3kmJ56ducaUjX7bo5f5fdD4lwprqa8B61AGU14Tj
-	 mqOh6oXVoctIVgykuqlkjRBTaMqX02iLYPvoDLK+aycyvkNHmvHXj7IHRt7aPtr3KqA==
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	b=AqdwUakWs0FoP++o7P0uySk6AXm/DPOjV3YBeQ6DppOGxqzUo99RLj7JR/9SYEr7jmyk
+	 SGzD+ufTWvPPrBe3pnja78NLN5xg+dtxWHoG25ybfTJAZazKsL9CPRd1ITNvSk/DVOgjE
+	 Et+F4HrLR08MCFrmGyLcEb5NqRAMOvKEAOvSGiwQzRlxPgoi6Di8hPMk3/3yAZUAz0p7d
+	 iuugkyQX2X60axU0ugerq98OkcHMgSFQSBUeqXBolOuy+toNp9R/x8IfSw69xmPPhqjGU
+	 f8qz2UqIFYwxuYttNTLM/WU83bugDIOz7PuDKxoCW+Godbw9HwKcwUqKbE447O0HijA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=DTR9xK5V;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=pSyfo4RH;
 	arc=none smtp.remote-ip=198.137.202.133
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E014A606C711;
-	Thu, 12 Nov 2026 14:03:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E014A606C711
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C834A606A31C;
+	Thu, 12 Nov 2026 14:03:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C834A606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=DTR9xK5V
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=pSyfo4RH
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=82eMXmhzgoPTKKBAMOVTGfqvSuE7xkGl7D8/qkqwjWA=; b=DTR9xK5VBNTsK4/4jnuGCPoD+X
-	PXtzrpiEnaNC6K/tVZF9hN6IdxNx4xfBsi021dY++3HCLcBBqnMAPPoRiaADjyu69SUYvvXeu9YHc
-	XH8c9ho0ck/ghYPr+q/4UeYylQvBO84gSd/tA+a/1sJyD/0EmjKvwY/Tt7xLcyug6LmSywoJS3t1H
-	A67/0OjvyEyW4KfDq5t7eGeIHpcUAIhB+pqpzDfHJS//TVQ93dlE2G1LYst7W6msiI0k9gO+wnu+b
-	AC0ET99n3xUYMgcZOiklcQwOEAjX+8TV7sW4AP2qXFp9Q+haNqGtM1vIUcY7NfytxZliAesPgOtDH
-	NYYwvpYQ==;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=pSyfo4RHTzCscXv7ZxxzmaLBtl
+	Gl5CWM05eySyLdwEA8oJN0lSSYQofh5i6dKRoYB13VrtHvYxqWXhya9D031H6CBI5r3l+4Erlwq+M
+	MlZScSPpA+mXBWfuBOLfrRGWvqsKJWQ9/wNBLJiuENCLxEIVHln1UKoTynQZnB7brzPELaYIqINu2
+	RXrvsiGCtFOPCtySfIKDRkFZVy16uoPuCTUbUwnArT5w+0WQtNl6jPE7z7NqGcR4RArPd6HcQCt6x
+	k8vkPSye+pJDu0VcAo2ez0KPLiPDeE+9MZaYe9gFSX6/xjRtwDu5HfXRB0c42bmk4qYySN0XiRPAS
+	tL0yDm6A==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xRVOP-0000000AAnA-0ija;
-	Thu, 12 Nov 2026 14:03:09 +0000
-Date: Thu, 12 Nov 2026 06:03:09 -0800
+	id 1xRVOi-0000000AApX-3FUZ;
+	Thu, 12 Nov 2026 14:03:28 +0000
+Date: Thu, 12 Nov 2026 06:03:28 -0800
 From: Christoph Hellwig <hch@infradead.org>
 To: Qiliang Yuan <qiliang.yuan@linux.dev>
 Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>,
 	Ming Lei <tom.leiming@gmail.com>,
 	Nilay Shroff <nilay@linux.ibm.com>, Hannes Reinecke <hare@suse.de>,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] block: make rewriting the current I/O scheduler
- cheap again
-Message-ID: <avXHHU1LxT4_dCNv@infradead.org>
+Subject: Re: [PATCH 1/2] block: don't request a module for the none elevator
+Message-ID: <avXHMOew2ZuSbEGI@infradead.org>
 References: <20261111-bug-block-elevator-unchanged-v1-0-583198bd4e21@linux.dev>
+ <20261111-bug-block-elevator-unchanged-v1-1-583198bd4e21@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -68,8 +68,9 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261111-bug-block-elevator-unchanged-v1-0-583198bd4e21@linux.dev>
+In-Reply-To: <20261111-bug-block-elevator-unchanged-v1-1-583198bd4e21@linux.dev>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Nit, but I think the Subject should say "change" instead of "rewrite".
+Looks good:
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
