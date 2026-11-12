@@ -1,87 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.127.231.113
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794466933;
-	b=CpUI/OZsGlrRC34Sw81h0JX1Q62ftZSDJRSl6hONCPzA/6RB/bGtZKuyb0EP5JmbHZ4S
-	 mi7UubNrpn9h+Oo3u2BASMMS88Oz81ON0Eu7AfHTrM99RAL4qZJPPFuE8as70g638+zEC
-	 MVJ4XRSC9wzFHBjnwk7CFX6Z9f+nBJPvw14FA0NWBlucFQjyUcmwLeqt0fyPyNZwRvdnx
-	 HyGvUtVKJkA8djIbU6spisZtj3Tr2lfX/NxyVKsmGpLoQl0wHOnFy3OukpiBJJlubTMVA
-	 EkCVEfSGTBFInglXg05AJl1ChJf7EQ3WyVWOaVEbLkYPlXxU5qM0VIUcKf9UD1m+anA==
+	t=1794470331;
+	b=3mOMnnpj9K3l8SsN6Ow5JCOBOCi40g+y8lnkf6rQ2mxasHtO/lz/kZ/mZbpBUBqqJn/R
+	 t8Mf61WOIpO3G9/CsR+QGlGE1JOHOsQIS+hGQ0zvXcUseqOOxtRnQwxCK3nuDrsUuZpoK
+	 UkN2IieUh8TSKJX3dkMfeNNnmH7XV2e5E5xhle7/AETUelTsOkBzkI2qklHuUf9yD1OjV
+	 4ssrfiKcXvpukWSLqbx8LvuEdGAljTF7v6/LGkzokwufCDUW1XsYn4UDOiEfp4oTnLlDM
+	 MtEcKVbHijBCuVzhNkC8llTJQohh+ZF0nmbCzW+PIqm+ooLU+n2MkD5jKB2Y9Kpc1XQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794466933;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:Autocrypt:In-Reply-To:Content-Type;
-	bh=/4MtBLSGAeSlREMeMpXOJglcbVkwCt0++4H9V4EMMVM=;
-	b=jS4ZSlghYH0V0Wo2kBrG7LwpTXKCQTMSGURCFP8X8Fc0mKyw53eV2LE3T3xwylOOrQCH
-	 y8rc+YhK1y1FDtCmw8gOPS27cUgiSf5HXCFuC3HhC7YmGrY7xnZhAtmi67KScLHFrcBIL
-	 2sJ0dt5VB3sclhNZ+IyotFhGebWRR0H2qWfLQ8SD/55g+3cMTAKLVJMMRDJrWqtQRjZy8
-	 FXKeOwT+nccff1PW4IABIzNq3oHostaBO2AzbidJZ8Ir6jolgh0GjTFVoJ40oXk3bT9cp
-	 WnWr6H0EsOjHWuXt17DK+oq0xIisaUyHN3+XAGXbXaYNYBfokUhuG0vwU2j2J6xuI1g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794470331;
+	h=DMARC-Filter:DKIM-Signature:Message-Id:X-Original-From:
+	 Content-Transfer-Encoding:X-Lms-Return-Path:To:From:Mime-Version:
+	 X-Mailer:Cc:Date:Subject:Content-Type;
+	bh=+4Pj5fMw5JaEDS11w0GPPkKr9F4BJw0sbKvK5YLXRt0=;
+	b=W1EFoUPNpIdrucP571I66UAvW6LrhiCBopaFkF6Dsh8RDkA5iegr1QD2e5m+ayLISsDs
+	 Bjs847Ufm/9dxAZ8AkdUpfOls/9kh58b4vEEhcP+bU52L/hsAsRZXzPLc5oE8/dW3Ydu0
+	 n8jjEocWDQ4Z1tkDKxTqZCqmQ15PNagTc9JKG3tz9QzLFlyKVhKurN5m6bzPygAg32ejT
+	 XQwPODnnllJFCPON9t0IvRu66Oc8/0o4O/Tv5MgPLRaAxhj0UXK+mP3EP+aQwLXOO1c/T
+	 rk7r9Jh4wEQdA/x4afQeWd56wyVwz2uHOGSzLa1fV2OEK7ld+VR1g51NORiM7KJf/HQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.com;
-	spf=pass smtp.mailfrom=suse.com;
-	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=Bjvcdfpw;
-	arc=none smtp.remote-ip=209.85.208.41
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	dmarc=pass header.from=bytedance.com;
+	spf=pass smtp.mailfrom=bytedance.com;
+	dkim=pass header.d=bytedance.com header.i=@bytedance.com header.a=rsa-sha256 header.s=2212171451 header.b=Q0Mk9aCK;
+	arc=none smtp.remote-ip=209.127.231.113
+Received: from va-2-113.ptr.blmpb.com (va-2-113.ptr.blmpb.com [209.127.231.113])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A1A606A321
-	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 07:02:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8A1A606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFDB606A323
+	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 07:58:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5EFDB606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=Bjvcdfpw
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6a642495d81so761065a12.2
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2026 23:02:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1794466931; x=1795071731; darn=vger.kernel.org;
-        h=content-type:in-reply-to:autocrypt:from:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=/4MtBLSGAeSlREMeMpXOJglcbVkwCt0++4H9V4EMMVM=;
-        b=BjvcdfpwCSBKwnvk9dCuZdO5bKIE7LwAVDFAJ/gmxSf74WWDcshOCc4hWUyXyWXXUr
-         4sZTuk4jlequbSGaosO1Aa9C45fjTvXFUCFwQ/9zmPG8TnCwSWyOtFW1WxdYViy06yTc
-         HyFX1dQtACLjFDtpRnNOcP/J81n1jrZC0X6gNuRiOoKvRw3BaT3Wwd6O03XwNbf5Ueuw
-         PEtIxT25lUKN7ekbFyaixdV6RqZwO4LjKFYjA5f4dlm2xzjsWBm8x1RzGDJxAAkgyreV
-         /vcr+SLLhddZFEgHZqgHxdSZH+baDtgbno3TWD21Uj+EIETHVKbPhaDJZ4K6/jVbpari
-         RNBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794466931; x=1795071731;
-        h=content-type:in-reply-to:autocrypt:from:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/4MtBLSGAeSlREMeMpXOJglcbVkwCt0++4H9V4EMMVM=;
-        b=XOdqI1POq2u0mMNaG0LKirijy98ReKJIk7gbNy9ad6neKWDsvrqgE28Em7sDQkVRcy
-         nt7MG26qtgupNz3p21x5t64pO55gu0NdNP2oMlVUbb/R8yUm8aFvZkefTsuS6qOaAySU
-         I6etV1Vgf1hbVYExNhMPM084AG6939Bfudf+gYeuIv1s/rZScl1YTLBKihgYqeP8OpiO
-         N02aXtolygFB1039TvGiwIYfmDwG3qR7zwcp1cISLYi5v5xnU4lt0KKrOrNCG+c2Sfiq
-         YBaNtVmifmGLP4DOEONYACMDXmllHN7/HZ4yWizr820iT/MeMkv9+husTZ8+AK7u+G2j
-         lhcg==
-X-Forwarded-Encrypted: i=1; AL+hErHL9E4qcHBi2ZyqTc6BQYID9d0Oi6YbQDiIj51X9Yg/JXYUUIsyWwDpdYIJhZgQ/nt75wxmA/ivlrhGpQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z85SFuOPQ4W+OP5UkFtalcK5BTdHpj981kyN2s0mQ+uaIhbN+0B
-	/ok76HKsaJ/2KV2e5m7I5QXE/i/LtjjG7zv5liNFMdwA68xAnT2WSTBxDnEqQALgQsc=
-X-Gm-Gg: AYBFou1StBzR9kAQmLDSadyJI6ectAqmK9b+242r5+cTM43dJAf1qXwOLrzEuPj3H3N
-	asmbXU3J7ANYaob87wvReJkS8l5qVhhUFuT+k/xEeQ86bcSjYPPlrfVFXaki83Umjcfbb4mFVe7
-	FzLgv8cGvFzF/wFtEkj7hHeO9bgMd/3J5IOVKwrbPi8cs1JExYvl8Vd8SdI8CCh+lNXkGHEXf9s
-	+C9A66ngpTpM747WasQwmb+Fxl2UxeNwpim9j8it5+S27UGj6G8kKlx/c5RLJGPRk7iBoGrdGfC
-	V+51wjvMYmELTz4adwvq3pMoKGErS+XEHgJrbhhftNA8CxMHsLiTsQbmced6Z2Z13Gpcvs0wl6s
-	ryUmUvqnL0WvMYH8L83xyOb9RApuiA9MBaHT87f2m3DefrIZGFJP64u0AKHEMzSc87Gz+I7mlwd
-	l8SS9UL7PbYZuJmDtVdtRhMJCai2xurNUuk4qS5HQ9aucP5rXYucl100rykxwv4+sBSkXMuOTEF
-	aSvipmSWmu9h4+tayo4IbJskqgWQk7ko6aLZWyKFTfOxTEOwqmpT9USoI2EPfoiTjEs+LOzNXLA
-	4mh5abvizJyZ0t+4rZX+zJsBOLvTRH10GX0b2Ujba2zLsZfBxccH7NZfoHVdMOdqNZAo2cmoFgZ
-	K7OsTazn/HU4t2sIumDmEYEy3BAKi80HfXXlPEx9IeghPHGatPjZ9AhXihgVQ0ahHoNoLRgHZ
-X-Received: by 2002:a05:6402:1e94:b0:6b5:61fe:982a with SMTP id 4fb4d7f45d1cf-6b777824953mr3292179a12.45.1794466916038;
-        Wed, 11 Nov 2026 23:01:56 -0800 (PST)
-Received: from ?IPV6:2a00:12d0:afa3:c01:92cc:e257:77ba:97a1? (2a00-12d0-afa3-c01-92cc-e257-77ba-97a1.ip.tng.de. [2a00:12d0:afa3:c01:92cc:e257:77ba:97a1])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b7ada54c88sm112091a12.2.2026.11.11.23.01.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Nov 2026 23:01:54 -0800 (PST)
-Message-ID: <3a052d2c-8d14-4cb1-b6fd-277a6b0c8196@suse.com>
-Date: Thu, 12 Nov 2026 08:01:53 +0100
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.a=rsa-sha256 header.s=2212171451 header.b=Q0Mk9aCK
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1794470324; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=+4Pj5fMw5JaEDS11w0GPPkKr9F4BJw0sbKvK5YLXRt0=;
+ b=Q0Mk9aCKdAJA3rDaA59iWWcvmbXh9j+ne6ojSR4BPyTmCTiXP347xaTt0rkk/NDl3PPOuT
+ C8idSDvHge3bmYI76Qd699UMx1q9FdpdWRp/O6uDlu7faMN9G6I0MzB9zDN2HmFrOASFVr
+ lzQnpPuptdCiBVCGNddSTGZenv9QH26qZUpjdFk/CgMu8NWA5Pe0AtHfI6simmSGI5SH+j
+ kE7ucH6ry4Gnudx4WS/0xXUx1tRlEZ0rFyeqxN0iAp956U6R/jOkcczW/xE+/32COPZeMm
+ fzIl3SwdPgVTZclFyrPF4k83iMTfTOM5zzyYnbZn1OptF6feSZwf7FNTb7Sz2g==
+Message-Id: <20261112075806.53821-1-zhaogongyi@bytedance.com>
+X-Original-From: Zhao Gongyi <zhaogongyi@bytedance.com>
+Content-Transfer-Encoding: 7bit
+X-Lms-Return-Path: <lba+26af571b2+901462+vger.kernel.org+zhaogongyi@bytedance.com>
+To: "Jens Axboe" <axboe@kernel.dk>
+From: "Zhao Gongyi" <zhaogongyi@bytedance.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -90,120 +57,262 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] xen-blkback: do some I/O statistics rework
-To: Jan Beulich <jbeulich@suse.com>
-Cc: =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger@xenproject.org>,
- Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20261111162058.804033-1-jgross@suse.com>
- <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
-Content-Language: en-US
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------XnKNkkfJknfgjGY9Ag00BvNt"
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+Cc: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	"Jan Kara" <jack@suse.cz>, "Zhao Gongyi" <zhaogongyi@bytedance.com>
+Date: Thu, 12 Nov 2026 15:58:06 +0800
+Subject: [PATCH] loop: protect geometry changes in loop_set_status
+Content-Type: text/plain; charset=UTF-8
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------XnKNkkfJknfgjGY9Ag00BvNt
-Content-Type: multipart/mixed; boundary="------------znQNYWv2cH6gyTbCeqXfd0fm";
- protected-headers="v1"; hp="clear"
-Message-ID: <3a052d2c-8d14-4cb1-b6fd-277a6b0c8196@suse.com>
-Date: Thu, 12 Nov 2026 08:01:53 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] xen-blkback: do some I/O statistics rework
-To: Jan Beulich <jbeulich@suse.com>
-Cc: =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger@xenproject.org>,
- Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20261111162058.804033-1-jgross@suse.com>
- <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
-Content-Language: en-US
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <7af69a18-fcd7-48f9-a9e4-c2ddc060755e@suse.com>
+LOOP_SET_STATUS accepts offset and size-limit changes while a filesystem
+is mounted on the loop device. An offset change can redirect filesystem
+I/O to different backing-file sectors, risking data corruption. Shrinking
+the size limit can remove sectors the filesystem still uses. A rejected
+request to change geometry can also invalidate the block-device cache
+before validation.
 
---------------znQNYWv2cH6gyTbCeqXfd0fm
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Validate the request before invalidation. Claim the whole loop device for
+geometry changes, including ioctls through a partition fd, so mounted
+sibling partitions also block the change. Keep the claim through partition
+scanning. Leave non-geometry updates such as AUTOCLEAR available while
+mounted.
 
-T24gMTIuMTEuMjYgMDc6MzQsIEphbiBCZXVsaWNoIHdyb3RlOg0KPiBPbiAxMS4xMS4yMDI2
-IDE3OjIwLCBKdWVyZ2VuIEdyb3NzIHdyb3RlOg0KPj4gU29tZSByZXdvcmsgb2YgdGhlIGJs
-a2JhY2sgc3RhdGljcyBkYXRhIGhhbmRsaW5nLg0KPj4NCj4+IEp1ZXJnZW4gR3Jvc3MgKDMp
-Og0KPj4gICAgeGVuLWJsa2JhY2s6IFJlbW92ZSBzdGF0aXN0aWNzIGxvZ2dpbmcgb24gY29u
-c29sZQ0KPj4gICAgeGVuLWJsa2JhY2s6IG1vdmUgc3RhdGlzdGljcyBkYXRhIGludG8gc3Vi
-LXN0cnVjdHVyZQ0KPj4gICAgeGVuLWJsa2JhY2s6IG1ha2Ugc3RhdGlzdGljcyBkYXRhIHBl
-cnNpc3RlbnQgYWNyb3NzIGRpc2Nvbm5lY3QvY29ubmVjdA0KPiBSZXZpZXdlZC1ieTogSmFu
-IEJldWxpY2ggPGpiZXVsaWNoQHN1c2UuY29tPg0KDQpUaGFua3MuDQoNCj4gSW4gdGhlIGxh
-c3QgcGF0Y2ggYSBicmllZiBjb21tZW50IG9uIHRoZSBnbG9iYWwgc3RhdHMgaW5zdGFuY2Ug
-bWF5IGJlDQo+IHdvcnRoLCB0byBpbmRpY2F0ZSBpdCdzIGd1YXJkZWQgYnkgdGhlIHJpbmdz
-IGxvY2suDQo+IA0KPiBBbHNvLCBkbyBJIG1heWJlIGdldCBhIFJlcG9ydGVkLWJ5OiBvbiB0
-aGUgbGFzdCBwYXRjaD8NClllcyB0byBib3RoLiA6LSkNCg0KDQpKdWVyZ2VuDQo=
+Signed-off-by: Zhao Gongyi <zhaogongyi@bytedance.com>
+---
+The earlier attempt, commit 08e136ebd193 ("loop: don't change loop device
+under exclusive opener in loop_set_status"), claimed every status update.
+It was reverted by commit a6abd64e145c ("loop: revert exclusive opener
+loop status change") after a udisks unmount regression.
 
---------------znQNYWv2cH6gyTbCeqXfd0fm--
+Tests:
+- QEMU A/B: mounted whole-disk and sibling-partition geometry changes
+  returned -EBUSY with this patch.
+- Non-root udisksctl loop-setup/mount/unmount/loop-delete passed.
+- A flag-only AUTOCLEAR update while mounted succeeded.
 
---------------XnKNkkfJknfgjGY9Ag00BvNt
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+ drivers/block/loop.c | 89 ++++++++++++++++++++++++++++----------------
+ 1 file changed, 57 insertions(+), 32 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index a3325ceab484..d122cb008811 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -803,17 +803,7 @@ static void loop_free_idle_workers_timer(struct timer_list *timer)
+ 	return loop_free_idle_workers(lo, false);
+ }
+ 
+-/**
+- * loop_set_status_from_info - configure device from loop_info
+- * @lo: struct loop_device to configure
+- * @info: struct loop_info64 to configure the device with
+- *
+- * Configures the loop device parameters according to the passed
+- * in loop_info64 configuration.
+- */
+-static int
+-loop_set_status_from_info(struct loop_device *lo,
+-			  const struct loop_info64 *info)
++static int loop_validate_status_from_info(const struct loop_info64 *info)
+ {
+ 	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
+ 		return -EINVAL;
+@@ -835,12 +825,18 @@ loop_set_status_from_info(struct loop_device *lo,
+ 	if (info->lo_offset > LLONG_MAX || info->lo_sizelimit > LLONG_MAX)
+ 		return -EOVERFLOW;
+ 
++	return 0;
++}
++
++static void
++loop_set_status_from_info(struct loop_device *lo,
++			  const struct loop_info64 *info)
++{
+ 	lo->lo_offset = info->lo_offset;
+ 	lo->lo_sizelimit = info->lo_sizelimit;
+ 
+ 	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
+ 	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
+-	return 0;
+ }
+ 
+ static unsigned int loop_default_blocksize(struct loop_device *lo)
+@@ -951,9 +947,10 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 		goto out_unlock;
+ 	}
+ 
+-	error = loop_set_status_from_info(lo, &config->info);
++	error = loop_validate_status_from_info(&config->info);
+ 	if (error)
+ 		goto out_unlock;
++	loop_set_status_from_info(lo, &config->info);
+ 	lo->lo_flags = config->info.lo_flags;
+ 
+ 	if (!(file->f_mode & FMODE_WRITE) || !(mode & BLK_OPEN_WRITE) ||
+@@ -1140,24 +1137,47 @@ static int loop_clr_fd(struct loop_device *lo)
+ }
+ 
+ static int
+-loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
++loop_set_status(struct loop_device *lo, blk_mode_t mode,
++		struct block_device *bdev, const struct loop_info64 *info)
+ {
++	struct block_device *claim_bdev = bdev_whole(bdev);
+ 	int err;
+ 	bool partscan = false;
+ 	bool size_changed = false;
++	bool claiming = false;
+ 	unsigned int memflags;
+ 
++retry:
+ 	err = mutex_lock_killable(&lo->lo_mutex);
+ 	if (err)
+-		return err;
++		goto out_abort_claiming;
+ 	if (lo->lo_state != Lo_bound) {
+ 		err = -ENXIO;
+ 		goto out_unlock;
+ 	}
+ 
+-	if (lo->lo_offset != info->lo_offset ||
+-	    lo->lo_sizelimit != info->lo_sizelimit) {
+-		size_changed = true;
++	err = loop_validate_status_from_info(info);
++	if (err)
++		goto out_unlock;
++
++	size_changed = lo->lo_offset != info->lo_offset ||
++		lo->lo_sizelimit != info->lo_sizelimit;
++	if (size_changed &&
++	    !((mode & BLK_OPEN_EXCL) && bdev == claim_bdev) && !claiming) {
++		/*
++		 * lo_offset and lo_sizelimit are whole-device geometry.
++		 * A partition fd does not own sibling partitions, so claim
++		 * the whole loop device before changing the mapping.
++		 */
++		mutex_unlock(&lo->lo_mutex);
++		err = bd_prepare_to_claim(claim_bdev, loop_set_status, NULL);
++		if (err)
++			return err;
++		claiming = true;
++		goto retry;
++	}
++
++	if (size_changed) {
+ 		sync_blockdev(lo->lo_device);
+ 		invalidate_bdev(lo->lo_device);
+ 	}
+@@ -1165,9 +1185,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	/* I/O needs to be drained before changing lo_offset or lo_sizelimit */
+ 	memflags = blk_mq_freeze_queue(lo->lo_queue);
+ 
+-	err = loop_set_status_from_info(lo, info);
+-	if (err)
+-		goto out_unfreeze;
++	loop_set_status_from_info(lo, info);
+ 
+ 	partscan = !(lo->lo_flags & LO_FLAGS_PARTSCAN) &&
+ 		(info->lo_flags & LO_FLAGS_PARTSCAN);
+@@ -1178,7 +1196,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	/* update the direct I/O flag if lo_offset changed */
+ 	loop_update_dio(lo);
+ 
+-out_unfreeze:
+ 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+ 	if (partscan)
+ 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+@@ -1190,6 +1207,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	mutex_unlock(&lo->lo_mutex);
+ 	if (partscan)
+ 		loop_reread_partitions(lo);
++out_abort_claiming:
++	if (claiming)
++		bd_abort_claiming(claim_bdev, loop_set_status);
+ 
+ 	return err;
+ }
+@@ -1267,7 +1287,9 @@ loop_info64_to_old(const struct loop_info64 *info64, struct loop_info *info)
+ }
+ 
+ static int
+-loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
++loop_set_status_old(struct loop_device *lo, blk_mode_t mode,
++		    struct block_device *bdev,
++		    const struct loop_info __user *arg)
+ {
+ 	struct loop_info info;
+ 	struct loop_info64 info64;
+@@ -1275,17 +1297,19 @@ loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
+ 	if (copy_from_user(&info, arg, sizeof (struct loop_info)))
+ 		return -EFAULT;
+ 	loop_info64_from_old(&info, &info64);
+-	return loop_set_status(lo, &info64);
++	return loop_set_status(lo, mode, bdev, &info64);
+ }
+ 
+ static int
+-loop_set_status64(struct loop_device *lo, const struct loop_info64 __user *arg)
++loop_set_status64(struct loop_device *lo, blk_mode_t mode,
++		  struct block_device *bdev,
++		  const struct loop_info64 __user *arg)
+ {
+ 	struct loop_info64 info64;
+ 
+ 	if (copy_from_user(&info64, arg, sizeof (struct loop_info64)))
+ 		return -EFAULT;
+-	return loop_set_status(lo, &info64);
++	return loop_set_status(lo, mode, bdev, &info64);
+ }
+ 
+ static int
+@@ -1468,14 +1492,14 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 	case LOOP_SET_STATUS:
+ 		err = -EPERM;
+ 		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_status_old(lo, argp);
++			err = loop_set_status_old(lo, mode, bdev, argp);
+ 		break;
+ 	case LOOP_GET_STATUS:
+ 		return loop_get_status_old(lo, argp);
+ 	case LOOP_SET_STATUS64:
+ 		err = -EPERM;
+ 		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_status64(lo, argp);
++			err = loop_set_status64(lo, mode, bdev, argp);
+ 		break;
+ 	case LOOP_GET_STATUS64:
+ 		return loop_get_status64(lo, argp);
+@@ -1569,7 +1593,8 @@ loop_info64_to_compat(const struct loop_info64 *info64,
+ }
+ 
+ static int
+-loop_set_status_compat(struct loop_device *lo,
++loop_set_status_compat(struct loop_device *lo, blk_mode_t mode,
++		       struct block_device *bdev,
+ 		       const struct compat_loop_info __user *arg)
+ {
+ 	struct loop_info64 info64;
+@@ -1578,7 +1603,7 @@ loop_set_status_compat(struct loop_device *lo,
+ 	ret = loop_info64_from_compat(arg, &info64);
+ 	if (ret < 0)
+ 		return ret;
+-	return loop_set_status(lo, &info64);
++	return loop_set_status(lo, mode, bdev, &info64);
+ }
+ 
+ static int
+@@ -1606,8 +1631,8 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 	case LOOP_SET_STATUS:
+ 		err = -EPERM;
+ 		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_status_compat(lo,
+-				(const struct compat_loop_info __user *)arg);
++			err = loop_set_status_compat(lo, mode, bdev,
++						     (const struct compat_loop_info __user *)arg);
+ 		break;
+ 	case LOOP_GET_STATUS:
+ 		err = loop_get_status_compat(lo,
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmr1ZGEFAwAAAAAACgkQsN6d1ii/Ey+j
-5Qf/VkOKnOQT0F4EOFuBzac7B3dirk00TyTViv89zfyTCzNWvQ1NhWRd612k2Xgs3lS/oMFgAlZt
-8xcOpUaNnM+ubudMuiHRsf94cKCdh2EubF04ANK9kn012eDseJjkCweKmxjVDDoPM/A1BVSwq5yQ
-aTE8k+xGcOzKNYrGHwaFiC1C/jsIcw4DN+CCV/vPDL0iIkhFP0qWbOE8d7kQ0czpFzwJBXAI6LBQ
-r/PKwaH/JwSwwW28ipAGIYNwTdlJWfsu18dP/C3j/A4UOiFGDFTWlFq31EaSvZkKmMSl+tQ2LHse
-EX30z7qV/A7ZAEiQet8JXCQ9qtLsznVIwO+Q8Zn1JQ==
-=hvYA
------END PGP SIGNATURE-----
-
---------------XnKNkkfJknfgjGY9Ag00BvNt--
+base-commit: 8bb045949e86cc2e929e868f52de3fa86c379e30
+-- 
+2.39.5 (Apple Git-154)
