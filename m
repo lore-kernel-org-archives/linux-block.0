@@ -1,110 +1,105 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794474589;
-	b=LzfZ6Rtrd0Ly89hPO2J8xURxJMbwltofREf2a/MunBpcl0Lko8pUh7M8rL4F/X4I2MjQ
-	 T5jIY2mlrBfw/IZJtYEDpUQHCiwzB5h1qiQqM6FiaxZdvTk9HTc4dGOmaNogoqsaqjzTZ
-	 9PZ8BtOPEZ02ScNPuxFS/vSRf2tJpzfungfxMF2Z7lKWWNeYJwCeaoEqX95AOqcRy/+4S
-	 szj6n+HovRWYsyh+RYlWSqIBpti7Kohad7gdoz2xUDc0O6Mu0xETSPARvBIW+zsDwxwKA
-	 CRDn5ZYqOnnVc3bH/sqriYmtDI/NTqe9361DOlTJLmo8MnXNJgEep0lUQVayFbwVueg==
+	t=1794475056;
+	b=SwDFzG6COcKqZUXgTAW4PID89NJw+CWgAmLLxS9robCZqsDKEdGkIz1966Ac04tqn4V5
+	 Q7D9toGLrbSCKyQCsUkjr1o41sSfII/KCFEnL46926W0jrr+6DbSXfNK6+R8K6qIDKrsr
+	 NFOeXwWDqbOPaG3UnAqiOE06WmhpNqUCGOG4s5VSz0zPjxauXoZvQYFAGEfsDbJrzCjfv
+	 UJDavOoW7orZBpyclkInzX5Dfa1Rc7hxMYfQUtWKZahlAxL3axIRsvryZpHjVoAm9BO0P
+	 NA5rfbz0iyv2QfB7TQpPLpubGONmqfVV2WLgQFO0JNgM+OWlm/u1YkYBfjdivL/txKA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794474589;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794475056;
 	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
 	 DKIM-Signature:Received:Received:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-Spamd-Result:X-Rspamd-Server:X-Rspamd-Action:X-Spam-Flag:
-	 X-Spam-Score:X-Spam-Level:X-Rspamd-Queue-Id;
-	bh=uCDrkEYxV2ULCH5YyNEcivwL1pA4Zyk7Fz79VpMLnvA=;
-	b=Fztb/N6NGpn23GAaBChJre3fqic9C151DVxd9HfBiCznA+WqRrZu1W88gfiHDEV4U6xW
-	 jJ4z1fHdauL4roE8JkGObpbg6iE3ZwGDd7XUVFz0D7qgLlS87d9nt+jro+hpaEQlpcmzz
-	 Gbi3GdGZu9mWul0330+CTedW+ykpExfntngKEf7ck9QH7Jx5rsqEJBBz5LAQ72nJcCbXT
-	 50VDBMmVya5DlKJRkD3UJBWv5i1q54Hm8MYe0UXcfi5v6qyS9cC4U3/jR+GEYgRFeATwN
-	 11ZrMozs3b2jR/brya4GnuAA6awNBiQPLawRndYMZJ5550y2uzgg7ENDgbOHSv9iWWg==
+	 X-Spam-Flag:X-Spam-Level:X-Spamd-Result:X-Spam-Score;
+	bh=29b4/rpGvhobptMw/kABM3APQ8tfqrxkqYMWKjuPMvI=;
+	b=2lGAdtDIsAsnCwBGnEJYZRc7nTr+O8Hls8ZV88dYEQ0D5puaOe3oDrhPEBEb/L5IZFLM
+	 3ozF6KIprvPLeG071QhknDiTBtDhfpcsoo7wjl255+/LbTdcy9e/opVfivdcDVJMl/TIp
+	 Q51HtS2f0C/iiNWHm73oyTnn4iL67X6+g7jN83vwuKSth/9yhJiWwgSV1VCRMfPK/JLU4
+	 rrvlMkCMxLCTV6FTf1mfbqH1Q15sY7QhAT2CwpYMVDhXC2Kr1z4uodqArwXEuWwqEq2Sa
+	 cxOUryqCnfP5PcZu1KobBkPa/ZBjKEfOQNWVLh3jdRCTTPH84TupR7z8lYIS5yNgEZw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=suse.de;
 	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=OwYUwF+T;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=0mhjkOKZ;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=OwYUwF+T;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=0mhjkOKZ;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=KTGVIk5P;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dQSUvYPP;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=KTGVIk5P;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dQSUvYPP;
+	arc=none smtp.remote-ip=195.135.223.130
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B755606A335;
-	Thu, 12 Nov 2026 09:09:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1B755606A335
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E3F606A321
+	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 09:17:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 47E3F606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=OwYUwF+T;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=0mhjkOKZ;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=OwYUwF+T;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=0mhjkOKZ
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=KTGVIk5P;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dQSUvYPP;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=KTGVIk5P;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=dQSUvYPP
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 3854B1F390;
-	Thu, 12 Nov 2026 09:09:47 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6FC0E21E73;
+	Thu, 12 Nov 2026 09:17:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1794474587; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1794475054; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uCDrkEYxV2ULCH5YyNEcivwL1pA4Zyk7Fz79VpMLnvA=;
-	b=OwYUwF+ThKZk+4PAeOfovoKumVG42D4uOCNPDwI5m+lj+VPAGvAGMjdZeHUTtkhReCXLGe
-	ko3Xt9hw5UIVNwbUJ/oEZArmXoFj5JwlhMgkNcJTp8jQnkURJLUIZlol3nuGyIV9xsEINt
-	wBnu2Gbf1dWUVjObsbyBCHGsEkQkMEM=
+	bh=29b4/rpGvhobptMw/kABM3APQ8tfqrxkqYMWKjuPMvI=;
+	b=KTGVIk5P0kN0zFMRP5qToi/IUI6jwaZvHPpksntaERfKWrj/fY7CEDKce0jvluwQHobnZM
+	DhyfCY4laq90Cc9t5pHoVkwLKx/dIJPAO5TlxDTdx+awAEcgkcSGPHx8asA+C2lvTzO1pv
+	+YyRSxvLAk66qBiEEkyztbVBMPlYqAU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1794474587;
+	s=susede2_ed25519; t=1794475054;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uCDrkEYxV2ULCH5YyNEcivwL1pA4Zyk7Fz79VpMLnvA=;
-	b=0mhjkOKZdj37Nev2rjX+G2XzkaBUF1DfkKh/T9yga2ENd3vdfgHoZDBspb1nBpWJCWT95Q
-	r/bwQdrwYKi9ItCQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=OwYUwF+T;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=0mhjkOKZ
+	bh=29b4/rpGvhobptMw/kABM3APQ8tfqrxkqYMWKjuPMvI=;
+	b=dQSUvYPPz+VhJLwdjvyFbanGlHthSrmW1Yk8bDIVOHFoOp3UoDQxhIJgTrwiba+GIvJ7gD
+	jvseyVwAK6hOYfBw==
+Authentication-Results: smtp-out1.suse.de;
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1794474587; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1794475054; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uCDrkEYxV2ULCH5YyNEcivwL1pA4Zyk7Fz79VpMLnvA=;
-	b=OwYUwF+ThKZk+4PAeOfovoKumVG42D4uOCNPDwI5m+lj+VPAGvAGMjdZeHUTtkhReCXLGe
-	ko3Xt9hw5UIVNwbUJ/oEZArmXoFj5JwlhMgkNcJTp8jQnkURJLUIZlol3nuGyIV9xsEINt
-	wBnu2Gbf1dWUVjObsbyBCHGsEkQkMEM=
+	bh=29b4/rpGvhobptMw/kABM3APQ8tfqrxkqYMWKjuPMvI=;
+	b=KTGVIk5P0kN0zFMRP5qToi/IUI6jwaZvHPpksntaERfKWrj/fY7CEDKce0jvluwQHobnZM
+	DhyfCY4laq90Cc9t5pHoVkwLKx/dIJPAO5TlxDTdx+awAEcgkcSGPHx8asA+C2lvTzO1pv
+	+YyRSxvLAk66qBiEEkyztbVBMPlYqAU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1794474587;
+	s=susede2_ed25519; t=1794475054;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uCDrkEYxV2ULCH5YyNEcivwL1pA4Zyk7Fz79VpMLnvA=;
-	b=0mhjkOKZdj37Nev2rjX+G2XzkaBUF1DfkKh/T9yga2ENd3vdfgHoZDBspb1nBpWJCWT95Q
-	r/bwQdrwYKi9ItCQ==
+	bh=29b4/rpGvhobptMw/kABM3APQ8tfqrxkqYMWKjuPMvI=;
+	b=dQSUvYPPz+VhJLwdjvyFbanGlHthSrmW1Yk8bDIVOHFoOp3UoDQxhIJgTrwiba+GIvJ7gD
+	jvseyVwAK6hOYfBw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F216C134A0;
-	Thu, 12 Nov 2026 09:09:46 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3D2F4134A0;
+	Thu, 12 Nov 2026 09:17:34 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ejR1M1qC9WoocQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Thu, 12 Nov 2026 09:09:46 +0000
-Date: Thu, 12 Nov 2026 10:09:31 +0100
+	id 6fFqBi6E9WogeQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 12 Nov 2026 09:17:34 +0000
+Date: Thu, 12 Nov 2026 10:17:29 +0100
 From: Daniel Wagner <dwagner@suse.de>
-To: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc: Ming Lei <ming.lei@redhat.com>, Surabhi Gogte <sgogte@purestorage.com>, 
-	Hannes Reinecke <hare@kernel.org>, Nilay Shroff <nilay@linux.ibm.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Aaron Tomlin <atomlin@atomlin.com>, 
-	Maurizio Lombardi <mlombard@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] blk-mq: use a housekeeping CPU for passthrough
- requests on isolated hctxs
-Message-ID: <a979c78b-40f9-4777-b76f-fb257120a93c@flourine.local>
-References: <20261103-nvme-fabrics-isolcpu-v2-1-95ec70d58254@suse.de>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH blktests 09/10] nvme: skip the tests which need a feature
+ the remote target lacks
+Message-ID: <c170db9b-6659-4fb2-a465-9c4adee0471c@flourine.local>
+References: <20261104-nvme-target-control-v1-0-b31b40537bb4@suse.de>
+ <20261104-nvme-target-control-v1-9-b31b40537bb4@suse.de>
+ <avRD23enUQ1UfQpj@shinmob>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -116,76 +111,48 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261103-nvme-fabrics-isolcpu-v2-1-95ec70d58254@suse.de>
-X-Spamd-Result: default: False [-13.51 / 50.00];
+In-Reply-To: <avRD23enUQ1UfQpj@shinmob>
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spamd-Result: default: False [-13.30 / 50.00];
 	SUSE_INTERNAL_BYPASS(-9.00)[];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MISSING_XM_UA(0.00)[];
 	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:dkim];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -13.51
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 3854B1F390
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -13.30
 
-On Tue, Nov 03, 2026 at 03:57:22PM +0100, Daniel Wagner wrote:
-> blk_mq_alloc_request_hctx uses the first online CPU in hctx->cpumask to
-> select the software context for a request.
+On Wed, Nov 11, 2026 at 07:33:36PM +0900, Shin'ichiro Kawasaki wrote:
+> > +	features=" $("${nvme_target_control}" config --show-features) "
+> > +	for feature in "$@"; do
+> > +		if [[ "${features}" != *" ${feature} "* ]]; then
 > 
-> Since commit a46c27026da1 ("blk-mq: don't schedule block kworker on
-> isolated CPUs"), hctx->cpumask excludes isolated CPUs. If a hardware
-> context is mapped only to isolated CPUs, the mask is empty and
-> blk_mq_alloc_request_hctx fails with -EXDEV.
+> The line above is a bit confusing for me. I guess the line can be simpler as
+> follows:
 > 
-> The NVMe fabrics transports use blk_mq_alloc_request_hctx to allocate
-> the Connect command for each I/O queue. As a result, connecting to a
-> controller can fail when using isolcpus=domain or an isolated cpuset
-> partition.
+> 		if [[ "${features}" =~ " ${feature} " ]]; then
 > 
-> Passthrough requests bypass the software queues and go directly to
-> hctx->dispatch. Their software context is only used to select the
-> completion CPU and as a hint when freeing the tag.
-> 
-> Use the software context of an online housekeeping CPU for passthrough
-> requests.
-> 
-> Fixes: a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
-> Tested-by: Maurizio Lombardi <mlombard@redhat.com>
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> ---
-> Connecting a fabrics controller fails when all CPUs of a hardware
-> context are isolated with isolcpus=domain or an isolated cpuset
-> partition. Since commit a46c27026da1 ("blk-mq: don't schedule block
-> kworker on isolated CPUs") the CPU mask of such a hardware context is
-> empty and blk_mq_alloc_request_hctx() fails the Connect command with
-> -EXDEV. This patch lets passthrough requests use the software context
-> of a housekeeping CPU instead.
-> 
-> The nvme fabrics fixes from v1 (patches 1 and 3-5) are in nvme-7.4, so
-> only the blk-mq patch is left. The blktest for this patch is nvme/070,
-> posted separately.
+> May I ask you to confirm it?
 
-Keith, Jens: any chance to get this one picked up?
+Agreed, Klaus likes complex stuff, after he is German. An a more serious
+note: though to keep the logic consistent it would be
 
-Thanks,
-Daniel
+        if [[ ! "${features}" =~ " ${feature} " ]]; then
+
+The original line checks if the feature is missing so that the function
+can skip the test.
+
+I'll change it. Thanks!
