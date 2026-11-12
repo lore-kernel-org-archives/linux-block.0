@@ -1,95 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.15
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794505696;
-	b=oHiDQTbQTf8kUaI1j8sHYWVJRiRV8REgGZoq+lhxGHOUxWLCZJPowBNfRHnwMgodpN+r
-	 xt8m0R6XIK2H4g3Dcws78H0CU7gxqqROxYmcDnmM1BucrZGo4VDbEdxwZtmgUQcb9nvcm
-	 Z5Innh3rFdAfjAjR9aq1L9vLdgCK6/g3I5clw7/UsxDKLnFCwSzyjGO+1pWIXNql3hwNB
-	 6iZqWZkmdLKytKbsFQFAH2hTj9fyFUTpD4JAkFXoQqiupfdDwaLKaGVYQtljwU+kWF7z4
-	 1MORE5g5UIJ1Gs3uPZ8nT55yhSK9VrSg2rKJ7BKN8AsC95GlY1vXrKlY8ZBdBVRtHcw==
+	t=1794511132;
+	b=TwAKypZ0odGNQVBSDuQnMQzSpuMt/HSWsmDxEJ9PeS4MFI4pw7TP+k6TMM/FFsO4Se9c
+	 OqYbG8LFO/0nugTFZ740ADzMrUiM6apjXYOZ/MwPqb0LJ4oGV96Dm/h6fR4JStKRlhNs8
+	 3qBhtKKNsy+734Jd0eYis2VeEifSGaGxM+sCmaH/z143WUrrVVBn6atTWlLghV0wizfjr
+	 r4N++rZgr55or5vTxMJjdZs4Wv93u2m7XGt9dhzANq3eJph/7pqr4Tf8GGFDYm21UACmS
+	 kmAjDV8Rh80BpUX+an1WE6/P6KnPJB91R/LKrweDX0+RCFgcMboMl5hn1iv+NfXeI1Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794505696;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=wUuadG0Yw2Izwr3UTyTfSeRMzW9ur52zaG54mUGgnbs=;
-	b=D2WrllgF/CTzraU2CdicRoZ67Zxyz2gTeqXigP9UR5ZWaX2t7LXu0q3K06Mu2vD79LNT
-	 +EXwS9AgsuRtPudd5YbJ0B3Nu9ohTo5SEE315jscOQ9MWYi1fBnBX93ykKG8xglY+Vwwq
-	 Wrm/Tb+E7LiEgLSUAJoEcB9YsOOOXF9kvotKdt0CAeIS3B26lqyNhuVooKM8WyPcQQNQJ
-	 a9Kjpl25QlIToLIkQH3HXlTdIuFt2qhGiFFtXdhb/K7TFRvwg8I7zjom9ENfQbhzbMQhc
-	 9rjy5nSGiDmGWiOp8zxS7D+OUMXhHmjaIjaASG4C2KrqTGpjEXJAWdc53bZjrrKswaQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794511132;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=n+k8QuVBsbcS7lt+1FuYH5jEsin9o5MtevrgXnCVhMY=;
+	b=3/Mo7xr+bipkRTYGzLS1/fux5yl7u4WMeXN0dXqvZwWADFpsjYLE9uK7jqOps+qQpQJM
+	 1wUqdGXvOYdVWY3Avm046MN25KsYajUG4bj/ywOxxe3ExEikgzgZvDQWBBJAkkHj75wNy
+	 2mBsf8yJ6lrc491F9IsmOvgyNbwPiygHNp7lHSx8B+bgcDtcMtdV5Fd0jZkhQWcHPFo3S
+	 IufyxbmP2VYLyb6yHOfbxW2DGou1viQ7TMl7XOwoJUbR1ewXABqPH4g3uTqMObYaTdRfc
+	 561ONDYA8HsfSpG5IM7htDZugOORvWreeUJwPwHWBR9f0YxmdLqSIydCLBOHN/dggWw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cs.unc.edu;
-	spf=pass smtp.mailfrom=cs.unc.edu;
-	dkim=pass header.d=cs.unc.edu header.i=@cs.unc.edu header.a=rsa-sha256 header.s=google header.b=WcZiU7dq;
-	arc=none smtp.remote-ip=209.85.160.179
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=khMs140n;
+	arc=none smtp.remote-ip=198.175.65.15
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4AF606A32E
-	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 17:48:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF4AF606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cs.unc.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.unc.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B92E606A31C;
+	Thu, 12 Nov 2026 19:18:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7B92E606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cs.unc.edu header.i=@cs.unc.edu header.a=rsa-sha256 header.s=google header.b=WcZiU7dq
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-53664b4860bso44258571cf.1
-        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 09:48:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cs.unc.edu; s=google; t=1794505695; x=1795110495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wUuadG0Yw2Izwr3UTyTfSeRMzW9ur52zaG54mUGgnbs=;
-        b=WcZiU7dqYkVn3XbOr7LnVDUkgYhzKfqKV+4wtU9Ll/aqiDDEMIJM8j2AheQt4peZbR
-         5YglCi/0y31gAuQm99zSTUGraQofwuVsLVeoM0lIYCvP/X7IFeU8zjfduNXaeKM9CZD7
-         x9jW8WUySgUi4NRi/HAeWE+dMhhATm9Brnihy5/G6T5xujc8r6UtLDPo9JNb8yBD4UBQ
-         e+bCaRqtCn/FU9d13zcEmTSjcxr4WW5EUHPMf+Wd04NbR8Qz8qi7oat2638a63hhfr+R
-         PGt2GoUCzwuLjtBXMDNULtkV+m6sPwUsg0P4UWEpu1ioMfb1SDW2SIh8h+QtmXo06LCl
-         F3lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794505695; x=1795110495;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wUuadG0Yw2Izwr3UTyTfSeRMzW9ur52zaG54mUGgnbs=;
-        b=CPXP/RtNZWfd7dzD3soLezJDKLfbyeTWlAEpb1cDOXR2EhvhnC4oDa0QEAq2Px+1Jh
-         J3LsTd56cE1HUIXrFveYpEOjRBWlYdgCtQhbuffWkM/vREtzbUPhkW4YN3dPWpEUUaD/
-         /4tHmp8dM/2GaGs3coZ+uPRbDpPNxBwTq14m3M1SqD+7acwWuSiMtOBC2xG3ZuJn0zp2
-         09smV2M5EZwPuV5eLmjvWbj6mm7g1+QSP72Us7wp/SCnItnI54JuFozP7LMg1R2haFzj
-         mNT1u2VaaUm8cQe72ZPTGS/07ULQDJ6Z4dy+cgG6g0tC3sOl4mMCftgCOnQRduee9Pk6
-         RSZQ==
-X-Forwarded-Encrypted: i=1; AL+hErHDLxiz8bkU7HljQjuyOt8/DPkV/CV3/uf0JeLKGQ47iYpFHwkrhd1AzWwT3pnL1o3ff66jdvgk3EblBg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+a4Zf0IMsqnveW2ySJaIKvLqEHC7+xMwcbEKMxgruhfcmDBxMU
-	J2pPyxFjuwWKbtUTRBEB/KCImRmqvNYqWJAib4sscD1+hnFumXcRZfdUY2ELRqkS/w==
-X-Gm-Gg: AYBFou12pIN4UQ4HU8o7NtB+n3lOJHdPSaf8MUGI2koa4aeY74mGXM2i/USz01SMn2Y
-	XargEx8X/6QZCd0ksrkHBHtY0nwGqeQSRCyzgLHvYeka91ed1pas55sg5hR3msRqqEpW02JxgxA
-	ufirZ97kvt0teilrNOdpSK+/+Qco9hlP1Iauz1hW9wBdMZrAiut9N2IzcmspcPXmDvFlmA+TyOE
-	OBZ4RXD+pRskTe4dg+wUuErYOxCL07RYx57aVLl6yAbuqVpypMl9fMEEmhfoQOkXEbahdZ6sl0I
-	nWpcz4Yr7MSAQ+BnUD1rJQtC1emBecioiiO8QTZlYDpYXIwX14P66bXEVERyLw6qHmeLdZfouY+
-	44sxtIW+LTeXmMvjKeuL55TNSoXcW/0RWzlO+FIwcih4MyQEFqLIdOzw26b41reQUwwuaRiPBSg
-	w6XJhfaSSAIkPs8SCGaBpqu5OiFZr0IncQUgwGnEkNz7TLzE2bfv3uYn+N2q1loTleDmBqcvK6Q
-	zZMc0ASUCMFCOyVX08GVDdlQGvhllFsP3P/LStY71AdwIYNKQpWvDZx7vloN7lqbukwPQZ7wcGh
-	sOsB/g1QMybb9CUPl4z+UYh+7qCWQUX8g+Da/zjlvXDcotc7cXmO
-X-Received: by 2002:a05:622a:17c7:b0:535:a5f9:7526 with SMTP id d75a77b69052e-55ac9089440mr1514941cf.69.1794505694735;
-        Thu, 12 Nov 2026 09:48:14 -0800 (PST)
-Received: from cobra01.cs.unc.edu (cobra01.cs.unc.edu. [152.2.130.143])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-55ad0ffeba0sm70521cf.17.2026.11.12.09.48.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 09:48:14 -0800 (PST)
-From: Hengyu Liang <hengyul@cs.unc.edu>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Luis Chamberlain <mcgrof@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@suse.de>,
-	John Garry <john.garry@linux.dev>,
-	linux-block@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=khMs140n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1794511132; x=1826047132;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YCnToFH2jDdO0u9ni7OYkpQv2fHW7DDUyxMYmDB7nm0=;
+  b=khMs140ny2UFiIARxxDsE4KY5orz5mMEvctCEoqiF70aaDX87/EM8fCN
+   FhBh5wRUQCGktHzjJwHZBQ+/UJIJTlVLvE4CUUU82hCfRRCKqU1rmqs2l
+   52RwkEvF0+rF6li8g60DT9ZbBvkqVX4TEGRJV4YaTnuZYYvtAFB6Vb4d9
+   Zp5seR++ixH9+0llnvm7FSn++RV7Y4LI/XjsoqjWkrCoR2aOmdhnv3rYz
+   kYbhUMkknLylYiM/c8oRS7IoeVrMAfOE/lpMAlWKu5Hu3PoU6bH7jYETp
+   PdRKNctKEYwf2ljoPrCBbBS/+4Vmu1DP1n1b86aTIv4L5fnlGxlMhZ86J
+   Q==;
+X-CSE-ConnectionGUID: 8I91yA8dTTSNEtV+hZO01Q==
+X-CSE-MsgGUID: QRaoLyknRhG9rVM6fs0U1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11964"; a="3312464"
+X-IronPort-AV: E=Sophos;i="6.27,210,1787036400"; 
+   d="scan'208";a="3312464"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2026 11:18:51 -0800
+X-CSE-ConnectionGUID: J349Wq4+Q1CKLjGTR7p67g==
+X-CSE-MsgGUID: RpoPHp4nTfyLsRhJrrSQJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,210,1787036400"; 
+   d="scan'208";a="9075973"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 12 Nov 2026 11:18:48 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xRaJp-000000011xt-0DgA;
+	Thu, 12 Nov 2026 19:18:45 +0000
+Date: Fri, 13 Nov 2026 03:17:53 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jack Wang <jinpu.wang@cloud.ionos.com>, Yu Kuai <yukuai@fygo.io>,
+	Song Liu <song@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
+	linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] bdev: do not report a statx block size below the block size
-Date: Thu, 12 Nov 2026 12:48:05 -0500
-Message-ID: <20261112174805.1200379-1-hengyul@cs.unc.edu>
-X-Mailer: git-send-email 2.53.0
+Subject: Re: [PATCH v4 1/2] block: suspend bio based disks around queue
+ limits updates
+Message-ID: <202611130354.oOiDWpa1-lkp@intel.com>
+References: <20261112134700.372702-2-jinpu.wang@cloud.ionos.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -99,69 +87,68 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261112134700.372702-2-jinpu.wang@cloud.ionos.com>
 
-Commit 425fbcd62d2e ("bdev: use bdev_io_min() for statx block size")
-made stat() report the minimum I/O size of a block device as
-st_blksize, so that devices with a large minimum I/O size get large
-enough I/O. Commit 777d0961ff95 ("fs: move the bdex_statx call to
-vfs_getattr_nosec") did the same for fstat().
+Hi Jack,
 
-However, the minimum I/O size of most disks is 512 bytes, and
-st_blksize was 4096 for them before. As of now, programs that size
-their buffer by st_blksize, such as stdio, write to these disks 512
-bytes at a time. Each write that covers only part of a block makes the
-kernel read the block from the disk first.
+kernel test robot noticed the following build warnings:
 
-The issue can be reproduced on a disk with 512-byte sectors with:
+[auto build test WARNING on 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4]
 
-    stat -c %o /dev/vda
+url:    https://github.com/intel-lab-lkp/linux/commits/Jack-Wang/block-suspend-bio-based-disks-around-queue-limits-updates/20261112-144659
+base:   6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+patch link:    https://lore.kernel.org/r/20261112134700.372702-2-jinpu.wang%40cloud.ionos.com
+patch subject: [PATCH v4 1/2] block: suspend bio based disks around queue limits updates
+config: arm-randconfig-1002-20261112 (https://download.01.org/0day-ci/archive/20261113/202611130354.oOiDWpa1-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 1b1fed44d3dcca649a9877915d57c3357a98124e)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261113/202611130354.oOiDWpa1-lkp@intel.com/reproduce)
 
-Before commit 425fbcd62d2e ("bdev: use bdev_io_min() for statx block
-size"), the result is:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611130354.oOiDWpa1-lkp@intel.com/
 
-    4096
+All warnings (new ones prefixed by >>):
 
-After that commit, the result is:
+   In file included from block/blk-map.c:12:
+>> block/blk.h:680:10: warning: releasing mutex 'disk->queue->limits_lock' that was not held [-Wthread-safety-analysis]
+     680 |                 return queue_limits_commit_update(disk->queue, lim);
+         |                        ^
+   block/blk.h:681:9: warning: releasing mutex 'disk->queue->limits_lock' that was not held [-Wthread-safety-analysis]
+     681 |         return queue_limits_commit_update_frozen(disk->queue, lim);
+         |                ^
+   2 warnings generated.
+--
+   In file included from block/blk-sysfs.c:14:
+>> block/blk.h:680:10: warning: releasing mutex 'disk->queue->limits_lock' that was not held [-Wthread-safety-analysis]
+     680 |                 return queue_limits_commit_update(disk->queue, lim);
+         |                        ^
+   block/blk.h:681:9: warning: releasing mutex 'disk->queue->limits_lock' that was not held [-Wthread-safety-analysis]
+     681 |         return queue_limits_commit_update_frozen(disk->queue, lim);
+         |                ^
+>> block/blk-sysfs.c:909:3: warning: mutex '(kobj - #undefined)->queue->limits_lock' is not held on every path through here [-Wthread-safety-analysis]
+     909 |                 blk_disk_resume(disk);
+         |                 ^
+   block/blk-sysfs.c:897:9: note: mutex acquired here
+     897 |                 lim = queue_limits_start_update(q);
+         |                       ^
+   3 warnings generated.
 
-    512
 
-This patch will report the block size of the block device when it is
-larger than the minimum I/O size.
+vim +680 block/blk.h
 
-Fixes: 425fbcd62d2e ("bdev: use bdev_io_min() for statx block size")
-Signed-off-by: Hengyu Liang <hengyul@cs.unc.edu>
----
-Application impact (Ubuntu 26.04 user space): "bzcat sd.img.bz2 >
-/dev/vda" (bzip2 1.0.8, 64 MiB image, disk with 512-byte sectors). On
-v6.14, it reads at most 688 sectors from the disk. On v6.15, it reads
-about 108,000 sectors (53 MiB) while writing the image.
+   675	
+   676	static inline int blk_disk_commit_limits(struct gendisk *disk,
+   677						 struct queue_limits *lim)
+   678	{
+   679		if (disk->fops->suspend)
+ > 680			return queue_limits_commit_update(disk->queue, lim);
+   681		return queue_limits_commit_update_frozen(disk->queue, lim);
+   682	}
+   683	
 
-Tested on block-7.4: with this patch, stat reports 4096 again and bzcat
-reads at most 2,104 sectors.
-
- block/bdev.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/block/bdev.c b/block/bdev.c
-index f20f91b3176e..c9a3d7832c42 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -1430,7 +1430,11 @@ void bdev_statx(const struct path *path, struct kstat *stat, u32 request_mask)
- 			0);
- 	}
- 
--	stat->blksize = bdev_io_min(bdev);
-+	/*
-+	 * A buffered write that covers only part of a block has to read the
-+	 * block first, so do not report less than the block size.
-+	 */
-+	stat->blksize = max(bdev_io_min(bdev), block_size(bdev));
- 
- 	blkdev_put_no_open(bdev);
- }
-
-base-commit: 8067050e7226844fb32062b5cea947e5897d3d7e
--- 
-2.53.0
-
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
