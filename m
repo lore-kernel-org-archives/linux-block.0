@@ -1,64 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.221
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.14
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794496552;
-	b=GwKfhP2ZmFFMJfisu1ZpASQK3EEmVASPuYF8Xc40ssjggVNRwLCJ7230z6DAb4S8LA1f
-	 Zcw02eLZPYn7MPiyINQsQneI2hR4DlU4cne+VofEHqloo21nVELqXX+//iRGFngqoZytX
-	 BTPc+v9wR+YHQQdZeJbooA5DF+yCmb9OaX29Rywr40FmnM66/bpaSUBrPJte5U9vMXpVS
-	 j/h8tllaRYWxAuQEW+Zyom8eUzRhzvWtjKlqVbZU3z/86GpKolnaYjXy3Pi+BumhdC610
-	 FHUDsYyMqkKwmbuSNb1BYiHBOvqYj7GLM4L+G1Iqy/cr89TklkqKqkBxRTv3H0+HhvQ==
+	t=1794496789;
+	b=OC9Zz7WiXDCnW2n8e200JqjbfW9NcmOSQtuvmmemVHgxjUUjIj+1rZgGrkdNrO3BSHGq
+	 qu7sj1Ub611/6GtHf5AevQTdbuJEzPL/z+KMYDaxEwTLBbTgNmUU9d5EhYXJyAVglmWbe
+	 /MRCLXgHJddH6fDhnDe+IG2ooL+M392MjHbvXc9qsvJ0gNQrwectq+Ns7kMw1fEQ0bfQ4
+	 76wyHXdtoTHmzgIBmpcZ4uFigzDGRs1ycyX+odCoTFq3g0n3TElZD5vST59z3B3p8235H
+	 Y6AwbhkSH0lwH29rTrHJ49wHHXMlMyC8ojsHaY8Le+WFATIK9Z1qEfbuMVHAnl7UeYQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794496552;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Date:From:To:CC:Subject:User-Agent:
-	 In-Reply-To:References:Message-ID:MIME-Version:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1794496789;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
+	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 References:Content-Language:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=3iXofka/ijAZ8YI184eortXle/aCUVIrItu1XLah2E4=;
-	b=pK+m452m0ytLImTmRvIRdH/IO+QaQheI9Yao40BqHxOpm2LF9ZO248GMFsYr0hANwaSB
-	 xZ3X0juYKdkkomUH3Di6tVGVdWS7i6tcVSRxvj/PDdPsaMO0lDr7avRwNqKRSD3tNPGXA
-	 ee9H6+CUNEzbRMi8HwzvSt0dmfeqJqfMjuo++qmf+42p0H89Cm9TPhgtbqPEJe8Sr5NL2
-	 Na4dDXfFjTz/AEd9GrQBjOJjeMiD/0iKVxb+qZZIuxNF3GFwm4AhiE4dr6x3ZIZo3Xu9J
-	 BDFhGojzWOvJyLPq6qljOrLcDusEdINJkQ/+Ccw/Puruuo1FNY9Q1IJQ57c74ztyXiA==
+	bh=xn95LSz/4Q5qOXQfaKWapMI61xXf4O/U8M/B4PFFbzA=;
+	b=jLjaOiidvZm4cXPLxjOR9MJYJblDAMTEN8xNfqrD2MO2AutdPyWROHRV9+BqrSgEo9gn
+	 vhF7qTAuJxCPk83TtcM+gvWW3+xUZYH4ISThzqMhkH/dh9mMkx2O0bYhL0P3HwUugYjex
+	 5hCuUstb6uwt/boCG3XOaXzCYVTEbBCwtnfy4ne1t7gUONAMs3WGZUfy0tMXqU9TvHIp+
+	 kA7cfk4ArB78UTdGLAoxdEofoDWW/pBHgwyQXBsW97/dUoehafPdnwwMp6z7g/O7UOeqk
+	 9q7/kzOVipNtr6TWa6Tv0uKzuv8nPOzKXHqKdWXTtXATRCVfGXJbcTwW2y8ERH9oVhQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=sGdM+++x;
-	arc=none smtp.remote-ip=91.218.175.221
-Received: from mta0.migadu.com (out-221.mta0.migadu.com [91.218.175.221])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=acm.org;
+	spf=pass smtp.mailfrom=acm.org;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b="S/BbsfO3";
+	arc=none smtp.remote-ip=199.89.1.14
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C49606A885
-	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 15:15:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 00C49606A885
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7485560A382F;
+	Thu, 12 Nov 2026 15:19:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7485560A382F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=sGdM+++x
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=w3akmbf0AFdJvzUPfaISDxeZcbJmAzfupNJkIFkNAFo=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794496549; v=1; x=1795101349;
- b=sGdM+++xxm1S7BWDjSbeG93Bfze4vRikOOD+/UcCuhXB0Rr4BUBIaHet7FQLp0nKYg96aUYh
- wOadRMQOjoQJQII5JSL+a3bmbdvDxHNPfuxwDJkj/26RnviJQnzdTChzOQNJv3gJVfal7pRWiYi
- cjW8jbz3M33SUTO4NUwxHPxo=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id e0e3d63694f38fef;
-	Thu, 12 Nov 2026 15:14:48 +0000
-X-Mizu-Trace-ID: e0e3d63694f38fef
-X-Migadu-Flow: FLOW_OUT
-Date: Thu, 12 Nov 2026 23:14:45 +0800
-From: Tao Cui <cui.tao@linux.dev>
-To: Tejun Heo <tj@kernel.org>
-CC: axboe@kernel.dk, josef@toxicpanda.com, oliver.sang@intel.com,
- nilay@linux.ibm.com, hch@lst.de, yukuai@fygo.io, linux-block@vger.kernel.org,
- cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, cuitao@kylinos.cn,
- sashiko-bot@kernel.org, cui.tao@linux.dev
-Subject: Re: [PATCH] blk-iocost: fix the lock order in ioc_cost_model_write()
-User-Agent: Thunderbird for Android
-In-Reply-To: <bfe5007b2758bb06504b6966abaf1f7e@kernel.org>
-References: <20261111162137.295523-1-cui.tao@linux.dev> <bfe5007b2758bb06504b6966abaf1f7e@kernel.org>
-Message-ID: <55824DEC-A6E9-4607-B1DF-C61A24D59FFA@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=S/BbsfO3
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jQPFV4m8Zz1XMYJJ;
+	Thu, 12 Nov 2026 15:19:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1794496774; x=1797088775; bh=xn95LSz/4Q5qOXQfaKWapMI6
+	1xXf4O/U8M/B4PFFbzA=; b=S/BbsfO3FeItgOuBI37Uqh6YgB43xAjP7vLfwcOw
+	tOdpXF6IUcb7/3xM/VYA89QOCxBwIiDPft2TWylPgf6LO6x3QPz/boHznIz1gMmh
+	acf4skQNpmrGoHwgxcRnwelRmQmndg3rNg1Z/W6KtWGGwmfHqtA3ePyOaDVB69ty
+	zU+lUgSKHQuTgF4Rt6y1VvZRCJM904vi7JJWtEEUPQRsrinDz+4kIkEAmKFLxKXF
+	DulL/503kTzLYXSQPYa7d5tcV7rfWspI7iVSxG2Moq6gDnfqmNGzr2/c02Tw/R2+
+	mI772A4I0Dt5iC3DE3u+WhlgmkOu5oc+C0cQzExzPqzGcQ==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id RvWb9nU2z54j; Thu, 12 Nov 2026 15:19:34 +0000 (UTC)
+Received: from [192.168.51.14] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jQPFK49bPz1XMYJV;
+	Thu, 12 Nov 2026 15:19:33 +0000 (UTC)
+Message-ID: <59c577b6-4749-4edc-9dd9-a83f2a124adb@acm.org>
+Date: Thu, 12 Nov 2026 07:19:32 -0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -68,88 +70,120 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/9] scsi: ufs: core: Defer link recovery on reserved PM
+ command timeout
+To: Stanley Jhu <stanleyjhu@google.com>, linux-scsi@vger.kernel.org,
+ "Martin K. Petersen" <mkp@kernel.org>
+Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman
+ <avri.altman@sandisk.com>, Bean Huo <beanhuo@micron.com>,
+ Peter Wang <peter.wang@mediatek.com>, Stanley Chu
+ <stanley.chu@mediatek.com>, Can Guo <quic_cang@quicinc.com>,
+ "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
+ Asutosh Das <quic_asutoshd@quicinc.com>,
+ Hongjie Fang <hongjiefang@asrmicro.com>,
+ Praveen Talari <praveen.talari@oss.qualcomm.com>,
+ HOYOUNG SEO <hy50.seo@samsung.com>, Brian Kao <powenkao@google.com>,
+ Jens Axboe <axboe@kernel.dk>, "Rafael J. Wysocki"
+ <rafael.j.wysocki@intel.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20261112051542.1539779-1-stanleyjhu@google.com>
+ <20261112051542.1539779-3-stanleyjhu@google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20261112051542.1539779-3-stanleyjhu@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello, Tejun, Christoph,
+On 11/11/26 9:15 PM, Stanley Jhu wrote:
+> diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
+> index e9dcab35a4cd..6a5f5fa732d9 100644
+> --- a/drivers/ufs/core/ufshcd.c
+> +++ b/drivers/ufs/core/ufshcd.c
+> @@ -7147,7 +7147,7 @@ static void ufshcd_err_handler(struct work_struct *work)
+>   	spin_unlock_irqrestore(&hba->host->host_lock, flags);
+>   
+>   	/* Complete requests that have door-bell cleared by h/w */
+> -	if (!stop)
+> +	if (!stop && ufshcd_is_hba_active(hba))
+>   		ufshcd_complete_requests(hba, false);
+>   	spin_lock_irqsave(&hba->host->host_lock, flags);
+>   again:
+> @@ -9689,6 +9689,50 @@ static void ufshcd_async_scan(void *data, async_cookie_t cookie)
+>   		dev_err(hba->dev, "%s failed: %d\n", __func__, ret);
+>   }
+>   
+> +/*
+> + * Claim @scmd before stopping the HBA in case normal completion raced with
+> + * scsi_timeout(), then complete @scmd so the PM caller releases
+> + * hba->dev_cmd.lock and the reserved tag before error recovery runs.
+> + */
+> +static void ufshcd_eh_pm_cmd_timed_out(struct ufs_hba *hba,
+> +				       struct scsi_cmnd *scmd)
+> +{
+> +	struct request *rq = scsi_cmd_to_rq(scmd);
+> +	struct ufs_hw_queue *hwq;
+> +
+> +	if (!hba->mcq_enabled) {
+> +		if (!ufshcd_clear_outstanding_reqs(hba, BIT(rq->tag)))
+> +			return;
+> +		ufshcd_hba_stop(hba);
+> +		ufshcd_force_error_recovery(hba);
+> +		set_host_byte(scmd, DID_TIME_OUT);
+> +		scsi_done(scmd);
+> +		return;
+> +	}
+> +
+> +	hwq = ufshcd_mcq_req_to_hwq(hba, rq);
+> +	if (ufshcd_is_hba_active(hba))
+> +		ufshcd_mcq_poll_cqe_lock(hba, hwq);
+> +	scoped_guard(spinlock_irqsave, &hwq->cq_lock) {
+> +		if (test_bit(SCMD_STATE_COMPLETE, &scmd->state))
+> +			return;
+> +	}
+> +	spin_lock_irq(&hba->host->host_lock);
+> +	hba->force_reset = true;
+> +	if (hba->ufshcd_state != UFSHCD_STATE_ERROR)
+> +		hba->ufshcd_state = UFSHCD_STATE_EH_SCHEDULED_FATAL;
+> +	spin_unlock_irq(&hba->host->host_lock);
+> +	ufshcd_hba_stop(hba);
+> +	ufshcd_mcq_compl_all_cqes_lock(hba, hwq);
+> +	ufshcd_force_error_recovery(hba);
+> +	scoped_guard(spinlock_irqsave, &hwq->cq_lock) {
+> +		if (!test_bit(SCMD_STATE_COMPLETE, &scmd->state)) {
+> +			set_host_byte(scmd, DID_TIME_OUT);
+> +			scsi_done(scmd);
+> +		}
+> +	}
+> +}
+> +
+>   static enum scsi_timeout_action ufshcd_eh_timed_out(struct scsi_cmnd *scmd)
+>   {
+>   	struct ufs_hba *hba = shost_priv(scmd->device->host);
+> @@ -9698,6 +9742,11 @@ static enum scsi_timeout_action ufshcd_eh_timed_out(struct scsi_cmnd *scmd)
+>   		return SCSI_EH_NOT_HANDLED;
+>   	}
+>   
+> +	if (!ufshcd_is_scsi_cmd(scmd)) {
+> +		ufshcd_eh_pm_cmd_timed_out(hba, scmd);
+> +		return SCSI_EH_DONE;
+> +	}
+> +
+>   	/*
+>   	 * Handle the timeout directly to prevent a deadlock between
+>   	 * ufshcd_set_dev_pwr_mode() and ufshcd_err_handler().
 
-Thanks for the reviews=2E
-
-
-=E4=BA=8E 2026=E5=B9=B411=E6=9C=8812=E6=97=A5 GMT+08:00 01:31:38=EF=BC=8CT=
-ejun Heo <tj@kernel=2Eorg> =E5=86=99=E9=81=93=EF=BC=9A
->Hello, Tao=2E
->
->On Thu, Nov 12, 2026 at 12:21:37AM +0800, Tao Cui wrote:
->> The inversion cannot currently deadlock because blk_mq_freeze_queue()
->> is in a noio scope since 1e1a9cecfa ("block: force noio scope in
->> blk_mq_freeze_queue"), so a caller freezing a queue cannot recurse
->> into the frozen queue through reclaim=2E Holding the mutex across
->> the freeze needlessly serializes config writers behind it and
->> leaves two different orderings in the same file=2E
->
->There is no deadlock here to begin with, and the noio scope isn't why=2E
->Freezing is counted and doesn't exclude other freezers, and a freeze only
->waits for in-flight IOs to drain, none of which takes rq_qos_mutex=2E The
-
-I got this wrong=2E I treated the freeze as something that could deadlock
-against the mutex, but it is a counted wait for in-flight I/O to drain,
-and the drain paths don't take rq_qos_mutex, so there was never a
-deadlock here to fix=2E The noio scope of blk_mq_freeze_queue() addresses
-a different concern: preventing reclaim from recursing into the frozen
-queue=2E I conflated the two=2E
-
->patch doesn't make the ordering consistent either=2E blk_iocost_init() st=
-ill
->freezes under the mutex through rq_qos_add() and blkcg_activate_policy(),
->and so do blk_throtl_init() and blk_iolatency_init()=2E
->
-I also missed that holding rq_qos_mutex across a freeze is the normal
-pattern in these paths, so the "two different orderings in the same
-file" premise of the commit message was wrong to begin with=2E
-
->> +	mutex_unlock(&q->rq_qos_mutex);
->>  	memflags =3D blk_mq_freeze_queue(q);
->> +	mutex_lock(&q->rq_qos_mutex);
->
->This lets the disk be deleted in the middle=2E @ioc was looked up before =
-the
->unlock and rq_qos_exit() can tear it down before the mutex is retaken=2E
->With a delay added after the unlock and a null_blk device deleted during
->it, the write goes on to use the ioc after ioc_rqos_exit() and KASAN
->reports use-after-free in blk_mq_quiesce_queue() called from
->ioc_cost_model_write()=2E
->
->So, this fixes nothing and adds a bug=2E
->
->Separately, ioc_qos_write() already has the same window=2E It retakes the
->mutex without rechecking disk_live(), so with the disk deleted in between=
-,
->it initializes iocost on the dead disk and hits the same use-after-free=
-=2E
->That's the part which needs fixing=2E
->
-Thanks for the reproducer=2E This is what I missed: the mutex also
-protects the lifetime of @ioc against rq_qos_exit(), and releasing it
-around the freeze drops that protection=2E
-
-On Wed, Nov 11, 2026 at 05:33:06PM +0100, Christoph Hellwig wrote:
-> blkg_conf_open_bdev takes rq_qos_mutex aronud the disk_live call=2E  So
-> you'll have to redo it here=2E
-
-You're right, releasing the mutex voids the disk_live() check made under
-it in blkg_conf_open_bdev()=2E  I'll withdraw this version=2E
-
-Sorry for the noise, and thank you both for the explanations=2E I'll
-take a closer look at these locking and lifetime semantics and come
-back with a new version once it's properly tested=2E
+I don't like the approach of this patch series. I think this series 
+changes much more code than what is necessary. There is a much simpler
+way to fix the issue reported in the cover letter: instead of calling
+ufshcd_link_recovery(hba) from ufshcd_eh_timed_out(), remove that call
+from ufshcd_eh_timed_out() and instead call ufshcd_link_recovery(hba)
+from ufshcd_set_dev_pwr_mode() if the SCSI error code returned by
+ufshcd_execute_start_stop() indicates that the SCSI START STOP UNIT
+command has timed out.
 
 Thanks,
-Tao
 
+Bart.
 
->Thanks=2E
->
->--
->tejun
