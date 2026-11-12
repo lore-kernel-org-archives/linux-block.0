@@ -1,79 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794449872;
-	b=J2PNvmdBevTd+uIW/ddK1nGY994FA4AFI8oSjzKNH7m0niNXQH+evbyHDbEFjB2AhNy/
-	 nw+DaUCWIpqjsXX8z8PoB9wlfKhUJq6tnd+0NK/MZXbyyzxnnaUNg5G+OzUy4AHfU2KAp
-	 Z8LKEiu5QXFX/GEjlkCjIXzt0qMsqRkieqWCm8eGhXQOTTdt4wsOJByZoQE4urCKYOSwN
-	 CM2p+bsBCZ2qKokRq8ojO9qq5TDTNoHTL2yVcSg3kiXR/tDHNSNLQjtKZKRUlv0UmZMqV
-	 ZyUmWYgHh0RA4PxY67JNGfUAjPOQybn3oG1PMdUN+J59s6ccn6Jzym6DGyAsSkTrCiA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794449872;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=18c+l13wo1CDSqYQQfVUxqYZ3FBSaP7ISw6R2DTgxTM=;
-	b=eHID6Irrbyio/Gl0K9P3165VieuO0ncLmlao+0UOuY3dlA6RdKzX1wzNSCxbdVSspXQg
-	 9+9mP006PWKc4fp5GkviShTpwyv7lqCwLmks6tiX9B6lH0z1nxS1aKmLfkxESc3pJ/STq
-	 KxV5Q8yzsJu5LQIUVGQFwr3n1UKPcaS2TShW2ep6TVPbRO5YypvTnGWTDbSrN50GKxdI0
-	 EdNBBgVWvLHcMhc6IhNeheJuH86WeHY/Cs6ZZP1YrpWi8kwRwceiZYGtT4D0aJw6FHZh+
-	 cwPreCVykaNLAJPHAFqxJuVsWkXt/i85J1y0BTN/19d2n1xI3PEYtH6USdB1TPUP1Rw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YTJEkIcP;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3468606A323;
-	Thu, 12 Nov 2026 02:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.139
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794450617;
+	b=E/7NvToe8Op33z14awGwTTlTjhqWD8LSd/OZu1z7TdWSXqJ401sKfcv3Q4YaqSpbrzlx
+	 HFumH9pc2nxBx07tUfZ9ERPQHL7zO6XCsHYsQK+4g7dZ++uko/j/p1L1DEXDa+3VvtkJj
+	 Ae256w644eSvhwhhrQSEC8Y1x7GU1mKEPlwlgRE2CHdIdRklBfHM5cGrRiJp3pjejoL5n
+	 2nXEsypG187q+PfVEBYbxEwpsp4ptBuRkEbvfasui/W0E++K/6moqRwB7Zq4aFChOTuj/
+	 M4ywbiIpFGwDXG85UIVzhlhf+SB9EGi6ZwljnQnkZ//Hoqdt8odJS9v9ZwPVcmQ9vKg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794450617;
+	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
+	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=oAKsCevx3uX25D7nBgvsehpj1Do0NWR5rPVL5dcze5M=;
+	b=Sqv0cbXJFifdD6GNWHLFk49jTYlzoT6ohdx995Yce+lTwV0H8l3Azqj8FH+zTZQEy3Vx
+	 fLWLLIsCVbWARuUSCJRPpQYGWhGnKIp6K7QstgOcMok5HWaHiPgw3Zz6TKx0v1WuOETQ3
+	 UtqgoRCo8JJOaKgGh0wePKHJ2/8t0mJ7ileh8t5dpesem5LJgjHdhhqq6YsHtxuqMKOM+
+	 1xO7ya40VuhA8vJolaxb+IOuOFLz/jLcpQRVDZwUnaAcKsnlWoPQXnYZC2CfCMvZMHy1B
+	 DxPOktYEmXhSQvaKcgXdPmV7zVXRazBXT37twg67gzoVbT0HyjtNIY5FxawThbpEtig==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=cmss.chinamobile.com;
+	spf=pass smtp.mailfrom=cmss.chinamobile.com;
+	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=naVsIZeS;
+	arc=none smtp.remote-ip=111.22.67.139
+Received: from cmccmta6.chinamobile.com (cmccmta6.chinamobile.com [111.22.67.139])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C0F606A31C;
+	Thu, 12 Nov 2026 02:30:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 73C0F606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YTJEkIcP
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1794449872;
-	b=VO8AbkDZD9xbYUtdDdbe5V64Q/mJQz32HD4bDWe/Hgy1OGkovRLDTSL8cU04HGtA7mki
-	 KoOCA8HId7LH5xNgTZtkyQcHkau+g6UgoOX6UUjvjKa6Q6Nb8Ld+w8g5Wy2zvjI8QR/QV
-	 LDskt8aQcF8XG3zla2P0lYRbu8zjbGhmlYsM1KsQ92VAxzND4Uoe0XJf9ULQFF40G6OMC
-	 NEKfMjW+iLixh9kH2rF68yQmNueJovA8v30AwWwnU5//n4YfYYVNB/BT5sK+G21ZJUDQc
-	 4N/4LZQMBFhQH0A+BQeYl/UOIUuQJGvr+3CTHo6qKiGuHRSFtMfQ5hMwniQwcjjvOag==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1794449872;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=18c+l13wo1CDSqYQQfVUxqYZ3FBSaP7ISw6R2DTgxTM=;
-	b=ikxPWoY6yJkGEyaJ/eLjyjnFeX0c9V1Az6bXyPhmxHjaw0itknuGzjsUYJXaMZ4DNmxi
-	 JX4MbImqhYS59i76QwadSjiweHVRK4lsb5mueA+Zm3z6/DOvdAYlAFsGXBeadOVyim705
-	 mxtNfryP6qg6dKcTUexs40Uhtqogf9/WOmiA1cuPWRWDfhMDlyuZKL+xuM7KqACl3vTKL
-	 WMWamgNbTwxa8+vwOL2wcA8PXiWBCmh9p0o4TfpalRH7OtXL3bEAtRIsBAgls6ommZKz4
-	 Duq4qdWP+2G46dJgSts7Xsw1OsQf4v5Ef96qYcM2Iu3SV8HptqYyiLu4mdUqBGr0sXQ==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 20EF71F00A10;
-	Thu, 12 Nov 2026 02:17:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794449872;
-	bh=18c+l13wo1CDSqYQQfVUxqYZ3FBSaP7ISw6R2DTgxTM=;
-	h=From:Date:Subject:To:Cc:Reply-To;
-	b=YTJEkIcPkbAqwEYUtMdd0la9sHj6frmrrgi8T9gaUflFiQalOmap1aRMxfDrTbVuA
-	 TeXEi9KGXbxJqUlGSRYuTiNYd1AoxUKaBzl/hpsXE3HgH9iH8SV4wFw6Hg6NKSpNE+
-	 WYSKCTLHaLiLI4WQXlOrvXi7UK82rNq2/zgaJyCJ5mGobfhVgqe+rM7BUwWBgn4HZ8
-	 erTQ6Wq0HzpF+sDh2k9itQbuoGjpGbBVju4d0JYzp3YdRNYMqvPaN+ynY1U81kXBXI
-	 d6o9H+sNFW3oJFsO7BbE0HG74R8x7tV/q8fOJEvv1sU5aYp+B+zU5RT9Zdtv9P55in
-	 ZfDvhLDfQVx+Q==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 776D3491D2;
-	Thu, 12 Nov 2026 02:17:51 +0000 (UTC)
-From: Zi-Hao Huang via B4 Relay <devnull+zi-hao.huang.mediatek.com@kernel.org>
-Date: Thu, 12 Nov 2026 10:16:45 +0800
-Subject: [PATCH] block: fix PF_BLOCK_TS/current->plug ordering in
- blk_finish_plug()
+	dkim=pass (1024-bit key) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=naVsIZeS
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=cmss.chinamobile.com; s=default; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=naVsIZeSE9U3e65WdrwP6bK5b/8aqj1JQOrDKfcu1i/hT0X9e0iQg0RlIuer/fRi7rW9sAkJU7tCg
+	 ibybtsPqdGh31odb9rAOFJPH3lDsECEWI/nCCq5gdnS9q/nn+kFfEyMkonjn01lzD6YA+I+J95isA7
+	 n3RJhbKtYYNXrUPs=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app01-12001 (RichMail) with SMTP id 2ee16af524b7092-b8611;
+	Thu, 12 Nov 2026 10:30:15 +0800 (CST)
+X-RM-TRANSID:2ee16af524b7092-b8611
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from devin-VMware-Virtual-Platform (unknown[10.55.1.72])
+	by rmsmtp-syy-appsvr07-12007 (RichMail) with SMTP id 2ee76af524b6e2d-ef184;
+	Thu, 12 Nov 2026 10:30:15 +0800 (CST)
+X-RM-TRANSID:2ee76af524b6e2d-ef184
+From: Zhu Jun <zhujun2@cmss.chinamobile.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zhu Jun <zhujun2@cmss.chinamobile.com>
+Subject: [PATCH] blk-mq: Mark concurrent accesses to dispatch_busy
+Date: Thu, 12 Nov 2026 10:30:13 +0800
+Message-ID: <20261112023014.118106-1-zhujun2@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.51.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -83,94 +68,103 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261112-blk-plug-fix-v1-1-7fa2a6215b8d@mediatek.com>
-X-B4-Tracking: v=1; b=H4sIAIwh9WoC/x2MQQqAIBAAvyJ7bkE3COkr0SFrsyWpUIpA/HvSc
- QZmMiSOwgl6lSHyI0nOo4JpFMzbdHhGWSoDaeqMMYQu7HiF2+MqL666s04Ttc5qqMkVuep/N4y
- lfLI0MNNeAAAA
-X-Change-ID: 20261112-blk-plug-fix-f068b0223b80
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Zi-Hao Huang <zi-hao.huang@mediatek.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1794449870; l=2373;
- i=zi-hao.huang@mediatek.com; s=20261112; h=from:subject:message-id;
- bh=DSlAJhYD9b51DNkmYc4nFsWMsjAUVzpJL8gmeV8NUTI=;
- b=m+EwD6l34QlcaXVjnEekIZcWqqZn31q4Zy44HLlVzHKLacaYxyRPGRbpj9clW1DitiCgSrHUr
- HC7yeFeW3cPCofwB22Q+zt77gqTdpjrtb7SB2b0MLxpB+9+y9xEctQk
-X-Developer-Key: i=zi-hao.huang@mediatek.com; a=ed25519;
- pk=tbMIVegYSSBtz5MaQSUCX9RJO88MA/AI5cbmQKbaoIc=
-X-Endpoint-Received: by B4 Relay for zi-hao.huang@mediatek.com/20261112
- with auth_id=1493
-X-Original-From: Zi-Hao Huang <zi-hao.huang@mediatek.com>
-Reply-To: zi-hao.huang@mediatek.com
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-From: Zi-Hao Huang <zi-hao.huang@mediatek.com>
+Dispatching on different CPUs updates the same hardware context's
+dispatch_busy estimate without a common lock. Scheduling and debugfs also
+read it concurrently, as reported by KCSAN.
 
-blk_plug_invalidate_ts() runs on context switch and assumes that
-PF_BLOCK_TS set implies current->plug != NULL. blk_finish_plug() breaks
-this: it clears PF_BLOCK_TS in __blk_flush_plug() and then sets
-current->plug = NULL, with plain accesses.
+Use READ_ONCE() and WRITE_ONCE() for the shared estimate. The EWMA remains
+an approximate dispatch hint; concurrent updates do not need to preserve
+every observation.
 
-clang inlines __blk_flush_plug() and emits the store to current->plug
-before the store that clears the flag (arm64, Android common kernel):
+OpenAI Codex assisted with analysis and patch preparation.
 
-  ldr  w8, [x20, #0x44]     // w8 = current->flags
-  str  xzr, [x20, #0xaa8]   // current->plug = NULL
-  and  w8, w8, #0xdfffffff  // w8 &= ~PF_BLOCK_TS  <- preempted here
-  str  w8, [x20, #0x44]     // current->flags = w8
-
-If an interrupt hits there and preempts the task, the task is later
-scheduled back in with PF_BLOCK_TS set and no plug, and
-blk_plug_invalidate_ts() writes to NULL + 0x20 (plug->cur_ktime):
-
-  Unable to handle kernel NULL pointer dereference at 0000000000000020
-  pc : __schedule+0x108c
-   preempt_schedule_irq+0x48/0xa8
-   el1_interrupt+0x48/0x8c
-   blk_finish_plug+0x6c/0x18c
-   ext4_do_writepages+0xd3c/0xef8
-
-The window is only a few instructions wide, so this is rare. It was hit
-at cycle 127 of a warm reboot stress test.
-
-Add a compiler barrier so the flag is cleared before the plug is
-dropped. A compiler barrier is enough because the race is with
-preemption of the same task on the same CPU. With the barrier, the same
-build stores current->flags before current->plug.
-
-Fixes: 06b23f92af87 ("block: update cached timestamp post schedule/preemption")
-Cc: stable@vger.kernel.org # v6.9+
-Signed-off-by: Zi-Hao Huang <zi-hao.huang@mediatek.com>
+Fixes: 6e768717304b ("blk-mq: dequeue request one by one from sw queue if hctx is busy")
+Signed-off-by: Zhu Jun <zhujun2@cmss.chinamobile.com>
 ---
- block/blk-core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ block/blk-mq-debugfs.c | 2 +-
+ block/blk-mq-sched.c   | 4 ++--
+ block/blk-mq.c         | 8 ++++----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 8836c7028568..ad2a8e4fe7a8 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1299,6 +1299,12 @@ void blk_finish_plug(struct blk_plug *plug)
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 6754d8f9449c..d8b4e3b606e6 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -488,7 +488,7 @@ static int hctx_dispatch_busy_show(void *data, struct seq_file *m)
  {
- 	if (plug == current->plug) {
- 		__blk_flush_plug(plug, false);
-+		/*
-+		 * blk_plug_invalidate_ts() runs on context switch and expects a
-+		 * plug whenever PF_BLOCK_TS is set, so clear the flag (done in
-+		 * __blk_flush_plug()) before dropping the plug.
-+		 */
-+		barrier();
- 		current->plug = NULL;
- 	}
+ 	struct blk_mq_hw_ctx *hctx = data;
+ 
+-	seq_printf(m, "%u\n", hctx->dispatch_busy);
++	seq_printf(m, "%u\n", READ_ONCE(hctx->dispatch_busy));
+ 	return 0;
  }
-
----
-base-commit: 067c5c24cef23d913b67eaaf71ae67e7169a6620
-change-id: 20261112-blk-plug-fix-f068b0223b80
-
-Best regards,
+ 
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index d7b45778732b..66e03b676838 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -92,7 +92,7 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 	LIST_HEAD(rq_list);
+ 	int count = 0;
+ 
+-	if (hctx->dispatch_busy)
++	if (READ_ONCE(hctx->dispatch_busy))
+ 		max_dispatch = 1;
+ 	else
+ 		max_dispatch = hctx->queue->nr_requests;
+@@ -300,7 +300,7 @@ static int __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 			return 0;
+ 		need_dispatch = true;
+ 	} else {
+-		need_dispatch = hctx->dispatch_busy;
++		need_dispatch = READ_ONCE(hctx->dispatch_busy);
+ 	}
+ 
+ 	if (hctx->queue->elevator)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5ae22d556540..322bad6896d4 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2007,7 +2007,7 @@ static void blk_mq_update_dispatch_busy(struct blk_mq_hw_ctx *hctx, bool busy)
+ {
+ 	unsigned int ewma;
+ 
+-	ewma = hctx->dispatch_busy;
++	ewma = READ_ONCE(hctx->dispatch_busy);
+ 
+ 	if (!ewma && !busy)
+ 		return;
+@@ -2017,7 +2017,7 @@ static void blk_mq_update_dispatch_busy(struct blk_mq_hw_ctx *hctx, bool busy)
+ 		ewma += 1 << BLK_MQ_DISPATCH_BUSY_EWMA_FACTOR;
+ 	ewma /= BLK_MQ_DISPATCH_BUSY_EWMA_WEIGHT;
+ 
+-	hctx->dispatch_busy = ewma;
++	WRITE_ONCE(hctx->dispatch_busy, ewma);
+ }
+ 
+ #define BLK_MQ_RESOURCE_DELAY	3		/* ms units */
+@@ -2587,7 +2587,7 @@ static void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 	 * Try to issue requests directly if the hw queue isn't busy to save an
+ 	 * extra enqueue & dequeue to the sw queue.
+ 	 */
+-	if (!hctx->dispatch_busy && !run_queue_async) {
++	if (!READ_ONCE(hctx->dispatch_busy) && !run_queue_async) {
+ 		blk_mq_run_dispatch_ops(hctx->queue,
+ 			blk_mq_try_issue_list_directly(hctx, list));
+ 		if (list_empty(list))
+@@ -3235,7 +3235,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 
+ 	hctx = rq->mq_hctx;
+ 	if ((rq->rq_flags & RQF_USE_SCHED) ||
+-	    (hctx->dispatch_busy && (q->nr_hw_queues == 1 || !is_sync))) {
++	    (READ_ONCE(hctx->dispatch_busy) && (q->nr_hw_queues == 1 || !is_sync))) {
+ 		blk_mq_insert_request(rq, 0);
+ 		blk_mq_run_hw_queue(hctx, true);
+ 	} else {
 -- 
-Zi-Hao Huang <zi-hao.huang@mediatek.com>
+2.51.0
+
 
 
