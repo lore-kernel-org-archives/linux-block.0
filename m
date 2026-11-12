@@ -1,98 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=210.118.77.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794481902;
-	b=3xy8IDsLhGedM8QgyGPUM1uj57fhF59S65/IsxeMrZlQTDiAC+PqC/SbK2VuJ5vCAdCY
-	 1LEpJUsESXYZ6juvDTzzM25UtygJcRb+vqWB/f0WpLjGRVT5IquWL1yzZDaj8ReKrUpMi
-	 C1aipV9yD94nkJR5WI3MAqzEiWVpZsb9Nty4DYjDkAO3te1hc2ihFhoHTOF7nnbolh2uw
-	 brF3yLDRBfjqsrLu2+CxWLrdNhxKOGdg6xyDSQwUBACAwYu4X7wTnMObwiuVdTOqC48Ri
-	 sJC8TPjy6BLriKYVCnDECjEg4JbABzaDDSl8mw5pEyvr+I50BJeo6YKUdnT/lPh2xvQ==
+	t=1794482753;
+	b=uyn3ezUhKHZDketJEvQsshKc+C2LUCakBRMUb1rZD505lo/7ELTT/OHxmqXbebTb+Bkj
+	 bIMt1AlyFKHlItoImxR5gr9jR0i2NX43kM3vY6Efq2Hl7fdqF2AT8q2DLbGQqV/krXtG0
+	 gfIvrrU46yuoKqmNgE3LA/u3INTqEa6OSyyb5ikVE7jhub38JBvHaPyNwTCHNz33CXZys
+	 plhKrbT65PZBK/5mtca5yTstYgzP0jqVhMJGVQ3Nc2pORV/4uKSUiSaws/ViS9S+I00Lr
+	 I+ZkVAq9PhZKnebNNbTpXxNiyMlWX/UWKBbycfmsuf4Jc8I1JuxjipVoXVqhttLsq2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794481902;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=f+jGuGb1qkK7jSM3drmVQfuryQok7tFfCPkS9qY3leo=;
-	b=yvR1rNrPFNlqgmGaPQP2vjg3W88VYdOnSeDdu2Z+/lC0tHbXFSDLlBE/yVCWCvCVX1LM
-	 qDhjc7G5XsfZWHZNiSAqgA+hh0keByQkNYy/HnnE9eXNFrtOai6e/Fky8CFXnckov8/FK
-	 SWsc7Ze6VrW/MkaQn5+2u1aG7IggyungZHtgwN/YLWrEUcwadjUGa7/bnr2HL5s0dONVx
-	 n0r+aJQlhNUk+IZsYl5ibeqj7zkbPhy93+Y/VI9SWXVRGImvglQFRT0ZBVumVCmcBf51A
-	 cz1VYvQpp4tF2asmgjH+fbym8Ikt1QNvqsgYcCtP/wuLPQ+q1LJjiRO81uz9E7gyeaA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794482753;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 Content-Language:From:In-Reply-To:Content-Transfer-Encoding:
+	 X-CMS-MailID:X-Msg-Generator:Content-Type:X-RootMTR:X-EPHeader:
+	 X-CMS-RootMailID:References;
+	bh=ipHsKGzdySUFK43kUSa1EUse/xjwdqGzCAkyYU+4IsQ=;
+	b=wOjgBBnKlTbkNYq1oXMwxGdYjuep2KycyIihhh8gv/iXoDyANppBkgwAOIItL4VpQZq8
+	 XHEpKfUxECJU2628+BNWeE3MHnrGjW/jhMqnKHolh8pIe1p/8uBn6aAfjU5mLo4XZMzWH
+	 z63ykvgpE9t3F9f4+e2G1b1YrhKBYOlvVNRxqJT356OEFy0z2ZZoYd0+1vBGm9bV4QMhF
+	 fOvJUdd7vaX3/Diqtfgzr2RtEKOkr4fuRjIPgZ3jJjNBQOvwgggmCATogi6WXKb5sKxwc
+	 DYaEcHezSL2HunlmfSSb7i0m+E6QIpZACNwDIaZCYgY0SmgWpXzwaGwh5QHV470MDxg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="XO8Zx/M9";
-	arc=none smtp.remote-ip=209.85.128.181
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=samsung.com;
+	spf=pass smtp.mailfrom=samsung.com;
+	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=AvhYjNqW;
+	arc=none smtp.remote-ip=210.118.77.11
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506D2606A31C
-	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 11:11:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 506D2606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBDC606A880;
+	Thu, 12 Nov 2026 11:25:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ABBDC606A880
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XO8Zx/M9
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-8b308fca7c3so41618207b3.2
-        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 03:11:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794481901; x=1795086701; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=f+jGuGb1qkK7jSM3drmVQfuryQok7tFfCPkS9qY3leo=;
-        b=XO8Zx/M9pgKkHWbWAsPy0iS5nA3/oaY/fdCIIx9lZQuF/3RsuRmqm6A+wxa6qZq1KQ
-         OXvAnnjpRC6L3m41Mwn42Y2AuklJdosCTFt6pyvDFpLnx1fKvVo5odS/RT/5cu6PVV+y
-         BfuqX07e5L87OH54/4nTytI7APytMn9CejB6Wh2LzvIH03q/fJbkHTCegepIC9wmQN3e
-         kWFhSWDMnqicU0IEN2nCBOL46bMYRPRFqJIaInLX4qfOaiZm689RgMRTXyY1wInM6E9F
-         rJgk4TqesyKIaBd8EAmaidEjaMce4dbffOAo0gyy6jV6II153N9bE2KsKILRzVDtuMgn
-         dFSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794481901; x=1795086701;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=f+jGuGb1qkK7jSM3drmVQfuryQok7tFfCPkS9qY3leo=;
-        b=q7eJ30KHKiWKWn93kqvDxh+V8uTXFmqeNlm6idB91XqMI7+VqB51ZRERfRFFLgc8O3
-         8nEIaUFHjPy75gZkHLi84f9u3XqFjPsMgbODGY2kDoYHz7iM/AjLRPgm/I2hMFVisOBm
-         iG++R1dFfq/ho0xweOAxC5+xIsiDOoWMPdsGw2jk1k4z8SjYaK2Ebr4woFgfUXGKD5tg
-         LKzQa5T6sBXVwkYWA9v4QL9PVYkPHhaf3f5yI/ZiOm2K94BLcF1Qaa3qx+0Rnx62ZmBY
-         iMw7OcEOxayYxFV2bHRwZYmewjGcWlH1OdngZllnDaPe7ryx460n7gU0gDG67ojAXaqb
-         2ieg==
-X-Forwarded-Encrypted: i=1; AL+hErGsqUv4s5ScEN90sFtinr6uXgQAbsIKpi4z1/iOprEsAQv9dHbXI7kG26LJKD8H8aav/Nd7aZ9GR2JTQA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+pxYKXdWe5s1lzzqbncTi0sqWzvWcQ8gSE6qt3JryIlmxeYHe4
-	I3yFJOLInPZ/HmzY8lK+9+I+OjNgGkVbTW8mDEER3ocLcpgqvEjGdPF7
-X-Gm-Gg: AYBFou34jzw0y53wQrn8qxXO7vBiCPI7+42GuzO35ovmIIgkmEvHOpXQ2epLUz8+c9X
-	XxUUsoSXV2s/y1TUmvJWETeOwy/nGvxswtwMniS4KojMkiktLaDuYXKv+G/1a3r0N5agh8Pp/wI
-	FZxeZwa/NAzK2j+huCShEH/oTsuUMaEImtE6fKzQvanf0GOW7nzldkHku8/sToHnFEBA1XRhmgb
-	UfeTDhqUgrzrA/H3mjXBXzV/tYvJTOAxlREntmlrKy5gdY0Dri9apEt100JdVMMtxsd4bi71v4M
-	pj3H5eoqA4+RoCdV4yTwJ6dZ7AeSTyEbkDQ3ySiuop5PqERJYReg4RFGjoGeRpLRuP2YLwSKvz1
-	9s4m1qdc0dFkzNmIrUBP2D6giGH1rCm77VbV1cnkODXsl9RAb8O0scmM0S297qf/fqduDJkBXUi
-	PkkWrF2t42Tc+qQF1kDGfWd9UGknhLfA14dl7e5gbucGJo75XDILFnKgawEt7XJ71mF8qXSWywZ
-	9Iqs/wrvSlc4kReGRWY9s1+FehuUkYfOBOvKzDAxdHXnChFtdjaAXJUksxezGYyZrWQAc54fygy
-	niKFCRj6e3LBkDGJGoLEELNIZ9CtG5wRTvkhHkhDDysyhPBuI/+wEsmTeIo15VeWGCZezDYZokx
-	0q1aM4wxXNVUZ7eJzjGpz33N6LoWVv+E=
-X-Received: by 2002:a05:690c:c10d:b0:8b3:4022:d81b with SMTP id 00721157ae682-8b3a7d8e436mr35968017b3.4.1794481901382;
-        Thu, 12 Nov 2026 03:11:41 -0800 (PST)
-Received: from fedora ([187.120.157.132])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8b3933d1047sm66813717b3.19.2026.11.12.03.11.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 03:11:41 -0800 (PST)
-From: Guilherme Giacomo Simoes <trintaeoitogc@gmail.com>
-To: hdanton@sina.com
-Cc: bvanassche@acm.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	nbd@other.debian.org,
-	syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com,
-	trintaeoitogc@gmail.com
-Subject: Re: [PATCH] nbd: fix circular lock dependency
-Date: Thu, 12 Nov 2026 08:11:28 -0300
-Message-ID: <20261112111128.261395-1-trintaeoitogc@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20261112001319.463-1-hdanton@sina.com>
-References: <20261112001319.463-1-hdanton@sina.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=AvhYjNqW
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20261112112543euoutp010f016eb7fa47ed13835ab3afff799d5d~nSIxA7B940644806448euoutp01J;
+	Thu, 12 Nov 2026 11:25:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20261112112543euoutp010f016eb7fa47ed13835ab3afff799d5d~nSIxA7B940644806448euoutp01J
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1794482743;
+	bh=ipHsKGzdySUFK43kUSa1EUse/xjwdqGzCAkyYU+4IsQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=AvhYjNqWqGDSDWciDHfOXU3HOJjD8I0PqyiBFvEino+CXJ/Ts8YCaLP0CTP7r83SV
+	 D0u2NoLv9bExEfdz3CuNTS48kAhibm5QmC2eYY3NRLEJ1vo1+7ksYjGgKf8B93b7Ln
+	 eIdw+0vhCIWca8FGDq/+owQFBplfxnoB2Ht47E5M=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20261112112543eucas1p2f3aa7565474df56edb967cbecfd1858d~nSIwwzSqJ0570005700eucas1p2G;
+	Thu, 12 Nov 2026 11:25:43 +0000 (GMT)
+Received: from [192.168.1.44] (unknown [106.210.136.40]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20261112112540eusmtip2793b80df566384250842db8b2aa8054b~nSIuZrphA1705017050eusmtip2o;
+	Thu, 12 Nov 2026 11:25:40 +0000 (GMT)
+Message-ID: <feca1837-fb17-4d96-b6d9-7e5d413ef222@samsung.com>
+Date: Thu, 12 Nov 2026 12:25:40 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -102,57 +64,61 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/15] lib/lz4: stop forking upstream LZ4, vendor it
+ instead
+To: Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+	<justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, Thomas
+	Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+	<James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, Heiko
+	Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander
+	Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
+	<borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
+	Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>, Sergey
+	Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Andrew
+	Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>, Nick
+	Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>, Chao Yu
+	<chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>, Eric Biggers
+	<ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, David
+	Laight <david.laight.linux@gmail.com>, Sungguk <sungguk.na@samsung.com>,
+	Jaehoon Chung <jh80.chung@samsung.com>, Marek Szyprowski
+	<m.szyprowski@samsung.com>, linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org
+Content-Language: en-US
+From: Michal Wilczynski <m.wilczynski@samsung.com>
+In-Reply-To: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20261112112543eucas1p2f3aa7565474df56edb967cbecfd1858d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20261106144247eucas1p15bdd0704f32d1cb3b19f9d2296a0cbc3
+X-EPHeader: CA
+X-CMS-RootMailID: 20261106144247eucas1p15bdd0704f32d1cb3b19f9d2296a0cbc3
+References: <CGME20261106144247eucas1p15bdd0704f32d1cb3b19f9d2296a0cbc3@eucas1p1.samsung.com>
+	<20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
 
-Hillf Danton <hdanton@sina.com> wrote:
-> FYI reclassifying sockets is also corrupting memory [11], so can you fix
-> the corrupter before reclassifying again?
+Hi everyone,
+
+On 11/6/26 15:42, Michal Wilczynski wrote:
 > 
-> [11] Subject: [syzbot] BUG: spinlock already unlocked in corrupted
-> https://lore.kernel.org/lkml/6aec63fd.5f5735a5.290c1c.0003.GAE@google.com/
-Important thing to do.
+> The import is the v1.10.0 release tag.
 
-I'm not a nbd/net specialist, I only get the "fix possible circular dependency"
-bug to resolve because this appears in mm subsystem syzbot.
-But, I read this bug and see that is a race condition between inet_shutdown()
-and sock_allow_reclassification().
+It appears v1.11.0, followed by v1.11.1 were released in the
+meantime. The next revision of this patchset will import from the
+v1.11.1 release tag to take advantage of the newest code. It already
+contains the backported commits so I will drop the backports.
 
-How IA analysis say:
-"""
-- Thread 1 (runner/shutdown) calls inet_shutdown() -> release_sock(sk). Inside
- release_sock(), Thread 1 acquires spin_lock_bh(&sk->sk_lock.slock).
+I will redo all the measurements with the newr version for the v3.
 
-- Thread 2 (reclassifier) enters nbd_add_socket() ->
- nbd_reclassify_socket(sock). Right before Thread 1 acquired the lock,
- sock_allow_reclassification(sk) returned true. Thread 2 calls
- sock_lock_init_class_and_name(), which invokes
- spin_lock_init(&sk->sk_lock.slock) while Thread 1 is holding slock.
+> 
 
-- spin_lock_init() zeroes the spinlock and marks it unlocked
- (SPINLOCK_OWNER_INIT).
-
-- Thread 1 finishes processing in release_sock() and calls
- spin_unlock_bh(&sk->sk_lock.slock).
- ... 
-"""
-
-What lead me think that when Thread 1 try acquire lock this would must be
-blocked to acquire this lock, so a spin_lock(&sk->sk_lock.slock) inside
-nbd_reclassify_socker right bellow sock_allow_reclassification(sk) fix this
-bug?
-
-```
-static void nbd_reclassify_socket(struct socket *sock)
-{
-	struct sock *sk = sock->sk;
-
-	if (!sock_allow_reclassification(sk))
-		return;
-
-	spin_lock(&sk->sk_lock.slock);
-
-    ...
-```
-
-thanks,
-guilherme
+Best regards,
+-- 
+Michal Wilczynski <m.wilczynski@samsung.com>
