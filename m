@@ -1,66 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.62.58.216
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794496789;
-	b=OC9Zz7WiXDCnW2n8e200JqjbfW9NcmOSQtuvmmemVHgxjUUjIj+1rZgGrkdNrO3BSHGq
-	 qu7sj1Ub611/6GtHf5AevQTdbuJEzPL/z+KMYDaxEwTLBbTgNmUU9d5EhYXJyAVglmWbe
-	 /MRCLXgHJddH6fDhnDe+IG2ooL+M392MjHbvXc9qsvJ0gNQrwectq+Ns7kMw1fEQ0bfQ4
-	 76wyHXdtoTHmzgIBmpcZ4uFigzDGRs1ycyX+odCoTFq3g0n3TElZD5vST59z3B3p8235H
-	 Y6AwbhkSH0lwH29rTrHJ49wHHXMlMyC8ojsHaY8Le+WFATIK9Z1qEfbuMVHAnl7UeYQ==
+	t=1794499668;
+	b=dEX/O85+hr5bSzjDPbycBmq5lsUEVRzq1kKyGzsS6t7U897QuEnc9W89JIgqn3n/OqJm
+	 J9crPtD6qaerbEL1XzQsQC7uTxLGwowd88xcPW3UeNFzzSCnldeVnmElwI1QS1ozJPw52
+	 Ov9YFsF+pAsX7TK64YDFl4YU2YG9IRWyg5ET8yF+i3xz4JtPEu0yvOpGZnO31hKloiFqZ
+	 hwCBUVWuHCTfwL0r+0R1+fug5hW448tb2hR7biD4Neu7PNTno6cnHzep7LeCPh7wtFGv3
+	 Re5YGMQIRgbhdganfZZ7+/yUCD68mudLbrmyeMmbdDeZV1viCtjeDIuk91plHsGS64A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794496789;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=xn95LSz/4Q5qOXQfaKWapMI61xXf4O/U8M/B4PFFbzA=;
-	b=jLjaOiidvZm4cXPLxjOR9MJYJblDAMTEN8xNfqrD2MO2AutdPyWROHRV9+BqrSgEo9gn
-	 vhF7qTAuJxCPk83TtcM+gvWW3+xUZYH4ISThzqMhkH/dh9mMkx2O0bYhL0P3HwUugYjex
-	 5hCuUstb6uwt/boCG3XOaXzCYVTEbBCwtnfy4ne1t7gUONAMs3WGZUfy0tMXqU9TvHIp+
-	 kA7cfk4ArB78UTdGLAoxdEofoDWW/pBHgwyQXBsW97/dUoehafPdnwwMp6z7g/O7UOeqk
-	 9q7/kzOVipNtr6TWa6Tv0uKzuv8nPOzKXHqKdWXTtXATRCVfGXJbcTwW2y8ERH9oVhQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794499668;
+	h=DMARC-Filter:DKIM-Signature:Received:X-QQ-mid:Message-ID:
+	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Cc:Subject:X-OQ-MSGID:Date:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	bh=GxEAh1VPtSYJm7RgQ8GwuBf7Xw9of2C5ciQVntp50E0=;
+	b=fTI+TwfdGM2X+A3Tlggc6PSJIFRzKSC2Ohetj/EWgdwQnCA+psAYVRV+q3q3EfjBkukO
+	 eKboB5CRjb7Oh3xs6wOu5o/+/QpgZr4jdRkWlXLjbfv+2OH7y3WjwUaTAjWKspWNqiw97
+	 /t39GQyMaqNdZUO3de6B/w0t6qQe1EKpW1ngaSoC6WfC45cfosJzZidx26Xrk4MvhC+6P
+	 7tpFotso3JJJ3gUqHdnrHeNhPvaI21QR2nidon9csDS/blmhWETXcPMUXVmSrbzrUFMQo
+	 2iOk+0NNpM9FVFsusqoDa/9WDKX5bO0IUteGPcl2GVPWX83Xp6I5sl6vn4DqV0+y6mQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=acm.org;
-	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b="S/BbsfO3";
-	arc=none smtp.remote-ip=199.89.1.14
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=qq.com;
+	spf=pass smtp.mailfrom=qq.com;
+	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=TP3FNqnB;
+	arc=none smtp.remote-ip=162.62.58.216
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7485560A382F;
-	Thu, 12 Nov 2026 15:19:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7485560A382F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BDF606A32E;
+	Thu, 12 Nov 2026 16:07:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72BDF606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=S/BbsfO3
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jQPFV4m8Zz1XMYJJ;
-	Thu, 12 Nov 2026 15:19:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1794496774; x=1797088775; bh=xn95LSz/4Q5qOXQfaKWapMI6
-	1xXf4O/U8M/B4PFFbzA=; b=S/BbsfO3FeItgOuBI37Uqh6YgB43xAjP7vLfwcOw
-	tOdpXF6IUcb7/3xM/VYA89QOCxBwIiDPft2TWylPgf6LO6x3QPz/boHznIz1gMmh
-	acf4skQNpmrGoHwgxcRnwelRmQmndg3rNg1Z/W6KtWGGwmfHqtA3ePyOaDVB69ty
-	zU+lUgSKHQuTgF4Rt6y1VvZRCJM904vi7JJWtEEUPQRsrinDz+4kIkEAmKFLxKXF
-	DulL/503kTzLYXSQPYa7d5tcV7rfWspI7iVSxG2Moq6gDnfqmNGzr2/c02Tw/R2+
-	mI772A4I0Dt5iC3DE3u+WhlgmkOu5oc+C0cQzExzPqzGcQ==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id RvWb9nU2z54j; Thu, 12 Nov 2026 15:19:34 +0000 (UTC)
-Received: from [192.168.51.14] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jQPFK49bPz1XMYJV;
-	Thu, 12 Nov 2026 15:19:33 +0000 (UTC)
-Message-ID: <59c577b6-4749-4edc-9dd9-a83f2a124adb@acm.org>
-Date: Thu, 12 Nov 2026 07:19:32 -0800
+	dkim=pass (1024-bit key, unprotected) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=TP3FNqnB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1794499661; bh=GxEAh1VPtSYJm7RgQ8GwuBf7Xw9of2C5ciQVntp50E0=;
+	h=From:To:Cc:Subject:Date;
+	b=TP3FNqnBPbHOWz6OGI0NiaRMQCeo8Ph+Womix3t9hLHDIwvKypNaMF8wOzRB+R4Yc
+	 AkxGfcNWoGPgRRXEYqU+dUveBZx+TgYVzYwNaOYFCKGfCDcWPwh0QFqoyL/CVz2Z0w
+	 x0VPno+JaHufd/cTm85g4OBdDDxjiVyabaW6GGUg=
+Received: from [172.18.4.77] ([202.113.185.209])
+	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
+	id 1E7B98F9; Fri, 13 Nov 2026 00:07:39 +0800
+X-QQ-mid: xmsmtpt1794499659tr0eenu2o
+Message-ID: <tencent_444214B18F57945FAADD37F108ABD3A22906@qq.com>
+X-QQ-XMAILINFO: NYXSVuwhoxRbJ+PBQO6iO+2Qb3cYRBc/B4kjx1OTwvBa+gMuvI8lRkK7cayto/
+	 Pm/QnoaHNXbgzcfiBXM32OuKDKXE5U9V6yW63MaOHcsGBBZJcxhcROf14ynK+txvuJhRmnL09SkE
+	 IqW+Tj0iI7fr295urfw7Vav3QIhLjngZc0gZtkwcHK2Li5ugIxboNlP+5hCvuMG538C+STTAGLS4
+	 1eOpXUAMXPkFc6Fu/jhOVsQ8XYTxVYaVARiOaHlhn7EDZD0n64MKixv2k3+snLBFyEsX0yszv5gZ
+	 4w5BGNZoWzv3natZdmGNuxus3H58Kuh/qPQsBSlF2ayvBaz5TVJkorAMaHvutpnMT/UM/iVUuIxC
+	 1NcHCrjHus5k1KWAaGcHLZrAZYQJQ2VS0hENiDoasgN1y0POfMHOzF7yQVXaXvTt3l/eS0Pnmqaq
+	 Xue9gRom4QAuC9rQgRxHIqD3edKN1pk+Yn2mCHA7l+dEX60fo0mbJY97HaiYS12lPZZTXJlok1lm
+	 OwVTPotYyWUdZefAeP4NdC3qSbDEzk2eywz2Hg38X96fc3G3V60ShNAD1D3cTBuPSgFgidNJYc8Y
+	 G0C/G8MzTTMxuzfIqCo3bq/Zw612JNlJYJZY1ndfaYEYe27OkcANyCozPOhtpfDukU2DXK8r1bGb
+	 xV/z0CA/HDvjseEP/tLWj+25t3B38gsBwYc+BtP4/fl4bfK0K02psKImcrGTWQf9phCwu0QhBUjE
+	 E7plNn7XbEZKHnzh3QxM+tMnn/EnF+auKXQkdUoorow3IzF1ufl2q/AOwYkAvd7v+hGdMXCLkPgB
+	 YQPPjmhAjbhm4B2LIIKJsAXRjLb+27ITd4gfDWOisw5z716+TEIkNKcUVYxny6KpyhsY9uueJCht
+	 jcv9ZgzQtkWNrxC5mt4TrZummofFxxJ6OxhP6NPNwOvP14kl4cb76E8m+b0iP6tInMb7mx+L4aNl
+	 zbS+6BQDNZRjEMWQ50+vhFVQfPCHE/HV6lsJhbJ6JXvjTZDJ5b9aBGaWLZLWUPwBit+AGx0pRZmy
+	 WlM6XJA7K2rQJ1SkmLjqXyNut/VvQ=
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+From: Guikun Yang <yangguikun19@qq.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [Bug report] partitions/aix: unbounded lvname string read panics the
+ boot partition scan (regression in v7.1)
+X-OQ-MSGID: <aix-lvname-oob-20261112@qq.com>
+Date: Thu, 12 Nov 2026 20:00:00 +0800
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,120 +77,126 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/9] scsi: ufs: core: Defer link recovery on reserved PM
- command timeout
-To: Stanley Jhu <stanleyjhu@google.com>, linux-scsi@vger.kernel.org,
- "Martin K. Petersen" <mkp@kernel.org>
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman
- <avri.altman@sandisk.com>, Bean Huo <beanhuo@micron.com>,
- Peter Wang <peter.wang@mediatek.com>, Stanley Chu
- <stanley.chu@mediatek.com>, Can Guo <quic_cang@quicinc.com>,
- "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
- Asutosh Das <quic_asutoshd@quicinc.com>,
- Hongjie Fang <hongjiefang@asrmicro.com>,
- Praveen Talari <praveen.talari@oss.qualcomm.com>,
- HOYOUNG SEO <hy50.seo@samsung.com>, Brian Kao <powenkao@google.com>,
- Jens Axboe <axboe@kernel.dk>, "Rafael J. Wysocki"
- <rafael.j.wysocki@intel.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20261112051542.1539779-1-stanleyjhu@google.com>
- <20261112051542.1539779-3-stanleyjhu@google.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20261112051542.1539779-3-stanleyjhu@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 11/11/26 9:15 PM, Stanley Jhu wrote:
-> diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-> index e9dcab35a4cd..6a5f5fa732d9 100644
-> --- a/drivers/ufs/core/ufshcd.c
-> +++ b/drivers/ufs/core/ufshcd.c
-> @@ -7147,7 +7147,7 @@ static void ufshcd_err_handler(struct work_struct *work)
->   	spin_unlock_irqrestore(&hba->host->host_lock, flags);
->   
->   	/* Complete requests that have door-bell cleared by h/w */
-> -	if (!stop)
-> +	if (!stop && ufshcd_is_hba_active(hba))
->   		ufshcd_complete_requests(hba, false);
->   	spin_lock_irqsave(&hba->host->host_lock, flags);
->   again:
-> @@ -9689,6 +9689,50 @@ static void ufshcd_async_scan(void *data, async_cookie_t cookie)
->   		dev_err(hba->dev, "%s failed: %d\n", __func__, ret);
->   }
->   
-> +/*
-> + * Claim @scmd before stopping the HBA in case normal completion raced with
-> + * scsi_timeout(), then complete @scmd so the PM caller releases
-> + * hba->dev_cmd.lock and the reserved tag before error recovery runs.
-> + */
-> +static void ufshcd_eh_pm_cmd_timed_out(struct ufs_hba *hba,
-> +				       struct scsi_cmnd *scmd)
-> +{
-> +	struct request *rq = scsi_cmd_to_rq(scmd);
-> +	struct ufs_hw_queue *hwq;
-> +
-> +	if (!hba->mcq_enabled) {
-> +		if (!ufshcd_clear_outstanding_reqs(hba, BIT(rq->tag)))
-> +			return;
-> +		ufshcd_hba_stop(hba);
-> +		ufshcd_force_error_recovery(hba);
-> +		set_host_byte(scmd, DID_TIME_OUT);
-> +		scsi_done(scmd);
-> +		return;
-> +	}
-> +
-> +	hwq = ufshcd_mcq_req_to_hwq(hba, rq);
-> +	if (ufshcd_is_hba_active(hba))
-> +		ufshcd_mcq_poll_cqe_lock(hba, hwq);
-> +	scoped_guard(spinlock_irqsave, &hwq->cq_lock) {
-> +		if (test_bit(SCMD_STATE_COMPLETE, &scmd->state))
-> +			return;
-> +	}
-> +	spin_lock_irq(&hba->host->host_lock);
-> +	hba->force_reset = true;
-> +	if (hba->ufshcd_state != UFSHCD_STATE_ERROR)
-> +		hba->ufshcd_state = UFSHCD_STATE_EH_SCHEDULED_FATAL;
-> +	spin_unlock_irq(&hba->host->host_lock);
-> +	ufshcd_hba_stop(hba);
-> +	ufshcd_mcq_compl_all_cqes_lock(hba, hwq);
-> +	ufshcd_force_error_recovery(hba);
-> +	scoped_guard(spinlock_irqsave, &hwq->cq_lock) {
-> +		if (!test_bit(SCMD_STATE_COMPLETE, &scmd->state)) {
-> +			set_host_byte(scmd, DID_TIME_OUT);
-> +			scsi_done(scmd);
-> +		}
-> +	}
-> +}
-> +
->   static enum scsi_timeout_action ufshcd_eh_timed_out(struct scsi_cmnd *scmd)
->   {
->   	struct ufs_hba *hba = shost_priv(scmd->device->host);
-> @@ -9698,6 +9742,11 @@ static enum scsi_timeout_action ufshcd_eh_timed_out(struct scsi_cmnd *scmd)
->   		return SCSI_EH_NOT_HANDLED;
->   	}
->   
-> +	if (!ufshcd_is_scsi_cmd(scmd)) {
-> +		ufshcd_eh_pm_cmd_timed_out(hba, scmd);
-> +		return SCSI_EH_DONE;
-> +	}
-> +
->   	/*
->   	 * Handle the timeout directly to prevent a deadlock between
->   	 * ufshcd_set_dev_pwr_mode() and ufshcd_err_handler().
+Hi Jens,
 
-I don't like the approach of this patch series. I think this series 
-changes much more code than what is necessary. There is a much simpler
-way to fix the issue reported in the cover letter: instead of calling
-ufshcd_link_recovery(hba) from ufshcd_eh_timed_out(), remove that call
-from ufshcd_eh_timed_out() and instead call ufshcd_link_recovery(hba)
-from ufshcd_set_dev_pwr_mode() if the SCSI error code returned by
-ufshcd_execute_start_stop() indicates that the SCSI START STOP UNIT
-command has timed out.
+Booting a kernel with CONFIG_AIX_PARTITION=y on a disk whose AIX LVM
+logical volume name area contains no NUL byte panics during the
+automatic partition scan. The name is read from disk into a
+kmalloc(16384) buffer and then handed to seq_buf_printf() as a C
+string, so vsnprintf() walks past the end of the allocation:
+
+  BUG: KASAN: use-after-free in string+0x4a9/0x4f0
+  Read of size 1 at addr ffff888004ab4000 by task swapper/0/1
+   string
+   vsnprintf
+   seq_buf_printf
+   aix_partition+0xd42
+   msdos_partition
+   bdev_disk_changed
+   disk_scan_partitions
+   virtblk_probe
+  unable to handle page fault for address: ffff888004ab4000
+  Oops: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN NOPTI
+  Kernel panic - not syncing: Fatal exception
+
+## How the bound was lost
+
+The lack of NUL termination in on-disk lvname strings is a known
+property. d43fdae7ba ("partitions/aix: append null character to print
+data from disk", 2018) says so explicitly and bounded the pr_warn()
+consumer with a local buffer:
+
+  char tmp[sizeof(n[i].name) + 1]; // null char
+  snprintf(tmp, sizeof(tmp), "%s", n[i].name);
+
+At that time the other consumer was equally bounded:
+
+  char tmp[70];
+  snprintf(tmp, sizeof(tmp), " <%s>\n", n[lv_ix].name);
+  strlcat(state->pp_buf, tmp, PAGE_SIZE);
+
+c2d466b9fe ("block: partitions: Replace pp_buf with struct seq_buf")
+removed that pair in favour of a direct call, as part of eliminating
+local tmp buffers:
+
+-				char tmp[70];
+-				snprintf(tmp, sizeof(tmp), " <%s>\n",
+-					 n[lv_ix].name);
+-				strlcat(state->pp_buf, tmp, PAGE_SIZE);
++				seq_buf_printf(&state->pp_buf, " <%s>\n",
++					       n[lv_ix].name);
+
+seq_buf_printf() bounds the destination, but the source is now the raw
+on-disk string with no length limit, so the read is unbounded. The
+pr_warn() path kept its 2018 buffer and is still safe; only this
+consumer regressed.
+
+alloc_lvn() fills the whole allocation from disk with no terminator
+handling (block/partitions/aix.c):
+
+  size_t count = sizeof(struct lvname) * LVM_MAXLVS;   /* 64 * 256 */
+  p = kmalloc(count, GFP_KERNEL);
+  read_lba(state, lba, (u8 *)p, count);
+
+struct lvname is just char name[64], and lv_ix is bounded by
+state->limit (DISK_MAX_PARTS = 256, equal to LVM_MAXLVS), so the array
+index itself is in range - it is the string read that runs off the end
+of the 16 KiB object.
+
+## Affected versions
+
+Checked by fetching block/partitions/aix.c at each tag:
+
+  v7.0      char tmp[70] + snprintf   bounded
+  v7.1      seq_buf_printf            unbounded
+  v7.2      seq_buf_printf            unbounded
+  v7.3      seq_buf_printf            unbounded
+  v7.4-rc2  seq_buf_printf            unbounded
+
+So this is a regression introduced in v7.1 and still present in
+mainline.
+
+## Reproduction
+
+The trigger is the boot-time partition scan; no userspace action, no
+race, no special mount options. CONFIG_AIX_PARTITION=y is already
+enabled in distribution kernels.
+
+An image whose lvname area is filled with non-NUL bytes panics 3/3.
+The negative control differs only in having a NUL-terminated short
+name: the same code path parses it normally and prints
+"vda1 <lv000000>" with no KASAN report.
+
+## Suggested fix
+
+Restore the read bound. Either give the conversion a precision:
+
+-	seq_buf_printf(&state->pp_buf, " <%s>\n", n[lv_ix].name);
++	seq_buf_printf(&state->pp_buf, " <%.*s>\n",
++		       (int)sizeof(n[lv_ix].name), n[lv_ix].name);
+
+or terminate every name once, right after the read in alloc_lvn(),
+which also covers any future consumer:
+
+  if (read_lba(state, lba, (u8 *)p, count) < count) {
+          kfree(p);
+          return NULL;
+  }
++ for (i = 0; i < LVM_MAXLVS; i++)
++         p[i].name[sizeof(p[i].name) - 1] = '\0';
+  return p;
+
+I prefer the second: the 2018 fix bounded one consumer at a time, and
+this regression happened because the other one lost its buffer.
+Terminating at the source removes that class of mistake.
+
+Reproducer (image builder for both the positive and negative case,
+serial logs) available on request. Happy to send this as a patch if
+you prefer.
+
+Fixes: c2d466b9fe ("block: partitions: Replace pp_buf with struct seq_buf")
 
 Thanks,
-
-Bart.
+Guikun Yang
 
