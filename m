@@ -1,99 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794481402;
-	b=PjVOvwrWDNqcySeuzi0xlPAMISicN+z9Ly4hiQatn0ojjeA85FQEOJNGUYw+VfhOsULo
-	 U6wHq1BGxI+uqzcRhyaPxZCIcx0XYyUi29ykVp1XmCr8a7u5R2OWqDwaFEvldbd/djNM6
-	 iDtsCb9Ip1gSy1N4hjD3HAK5FFRf5KFojNsLrHs93ASBgqrn3kb9kD5LmNFGt0N2QDkZK
-	 /kQBGtMMfyECbIbDAdDLa3QkmoEyuDN0z90MDfAhZ/Enn8HywFufBukUhel73EEvdqD1s
-	 YS+xEiJzjv9Z3EbO6WU+lZ5e11moOZNiYQ9BnAclWAYITO0G6afAEdJtYFwO0AOlr7g==
+	t=1794481902;
+	b=3xy8IDsLhGedM8QgyGPUM1uj57fhF59S65/IsxeMrZlQTDiAC+PqC/SbK2VuJ5vCAdCY
+	 1LEpJUsESXYZ6juvDTzzM25UtygJcRb+vqWB/f0WpLjGRVT5IquWL1yzZDaj8ReKrUpMi
+	 C1aipV9yD94nkJR5WI3MAqzEiWVpZsb9Nty4DYjDkAO3te1hc2ihFhoHTOF7nnbolh2uw
+	 brF3yLDRBfjqsrLu2+CxWLrdNhxKOGdg6xyDSQwUBACAwYu4X7wTnMObwiuVdTOqC48Ri
+	 sJC8TPjy6BLriKYVCnDECjEg4JbABzaDDSl8mw5pEyvr+I50BJeo6YKUdnT/lPh2xvQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794481402;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794481902;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=vxUbqSaYvhE3NBiIJJTjM4BHgOZOReR7NzFQSOvhlQg=;
-	b=bEgfrWcZGFxpS3rqq1mlJJXDN+xNJOXWuaSpVZBi1WS730BN2QXsNEqczscvaGMA5liD
-	 LhfeEKZprhHmE52NkMHTkipk1zTNcWGfMzBU/dIB3rAnJKMB7X5VThE5EFCWlpFR6Nv1a
-	 TbChdTM34uIKPtEHjUAQ9l8QepZ1Hd49iNbd+8mNOPpOrVzda9NmjWR5d5genslAQJrFm
-	 CDK6oCYsO+dw0aS6Wwts4c4C0P42BaoQRNW6XzsqlG3NklGiNsMuMAXYN+HKgMIZv3dOE
-	 IZjTymU5QblCT/0AkhrqoJhjSTR2/ZatlD0nqy/fiSOn7HOKhdyZ+wcxGeaZ8Om5sog==
+	bh=f+jGuGb1qkK7jSM3drmVQfuryQok7tFfCPkS9qY3leo=;
+	b=yvR1rNrPFNlqgmGaPQP2vjg3W88VYdOnSeDdu2Z+/lC0tHbXFSDLlBE/yVCWCvCVX1LM
+	 qDhjc7G5XsfZWHZNiSAqgA+hh0keByQkNYy/HnnE9eXNFrtOai6e/Fky8CFXnckov8/FK
+	 SWsc7Ze6VrW/MkaQn5+2u1aG7IggyungZHtgwN/YLWrEUcwadjUGa7/bnr2HL5s0dONVx
+	 n0r+aJQlhNUk+IZsYl5ibeqj7zkbPhy93+Y/VI9SWXVRGImvglQFRT0ZBVumVCmcBf51A
+	 cz1VYvQpp4tF2asmgjH+fbym8Ikt1QNvqsgYcCtP/wuLPQ+q1LJjiRO81uz9E7gyeaA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j4WpPLKS;
-	arc=none smtp.remote-ip=74.125.224.49
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="XO8Zx/M9";
+	arc=none smtp.remote-ip=209.85.128.181
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE882606A323
-	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 11:03:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE882606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506D2606A31C
+	for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 11:11:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 506D2606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j4WpPLKS
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-675617e81f9so4303123d50.3
-        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 03:03:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XO8Zx/M9
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-8b308fca7c3so41618207b3.2
+        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2026 03:11:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794481401; x=1795086201; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794481901; x=1795086701; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=vxUbqSaYvhE3NBiIJJTjM4BHgOZOReR7NzFQSOvhlQg=;
-        b=j4WpPLKSM/7Vdg2oT87cL7Z3ITYR8YL3O/rFnO34LHaybdj9WJ9u27kZR7mWooZvgR
-         SHbtSnVXAn0VL9Wl7jSwN0grF+fT9/OlZVn4FLOCnPsDeEgtNgXJWA57dwZnNLONCloQ
-         pbEiLJKUV2+UiG1E3uwGp/JfCjgTZe9oe2wWo61XW21HP6UgC4gYFNhl8qsFj4VcG86n
-         QpRXs15pJBcoZOcggid+nUCPBa00Ebrze/m32y9EGkUWq/PrWztEieSblVO/bWtsYdwd
-         B+G4tQLKjB1oPlEuQWdXrMnWQx4JtBM62m6J14omtgjQSHzVXrSsATUB/Fydl48mjclE
-         Oivw==
+        bh=f+jGuGb1qkK7jSM3drmVQfuryQok7tFfCPkS9qY3leo=;
+        b=XO8Zx/M9pgKkHWbWAsPy0iS5nA3/oaY/fdCIIx9lZQuF/3RsuRmqm6A+wxa6qZq1KQ
+         OXvAnnjpRC6L3m41Mwn42Y2AuklJdosCTFt6pyvDFpLnx1fKvVo5odS/RT/5cu6PVV+y
+         BfuqX07e5L87OH54/4nTytI7APytMn9CejB6Wh2LzvIH03q/fJbkHTCegepIC9wmQN3e
+         kWFhSWDMnqicU0IEN2nCBOL46bMYRPRFqJIaInLX4qfOaiZm689RgMRTXyY1wInM6E9F
+         rJgk4TqesyKIaBd8EAmaidEjaMce4dbffOAo0gyy6jV6II153N9bE2KsKILRzVDtuMgn
+         dFSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794481401; x=1795086201;
+        d=1e100.net; s=20260707; t=1794481901; x=1795086701;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=vxUbqSaYvhE3NBiIJJTjM4BHgOZOReR7NzFQSOvhlQg=;
-        b=2eA+V/WOEEM9rNWL2nuh9urZa2t3ECIA60XDZeYDuQz5k+k0GZzHdp2BAAzWNmsaWG
-         98oFPpsNHqoX2SQLBj2IfPVMCDS1PkNdbbsWY87vLdsSkCvbTj7RxPljGsm/JFPe8SS7
-         13rGr9CMU9WpC0BnPwd/13+8+cnToKmjOZcW27wix1YrGn/blxxDJoly2byxJ92E+Pbg
-         HdaM+JrhIdlyD6ob9eh3WieXxBaHyWcObg9TGlMUoKAZtG+EEKZOBrEtKaTnj0EG186b
-         hy4QwktyX8PnGbicAK+BjOTeptYenWzNsfHJThHI4SXuMDhKsboJUy0E55dxLSEm8Jbg
-         HmBQ==
-X-Forwarded-Encrypted: i=1; AL+hErHwMZrM9NXoqfTYdNC62F+aUOTyQ601pg6BXxUrXbId6F0UYt4Xdk6i17QCrgoM8bYnqFojXyqvO0zDig==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+fPlFuzwVHCca5tIeYcEJmEu9SpYeLO69Vb4pzT3hoij03POwm
-	N7Oae1Qge4mDwC3Hwn+MFTKsmmrbXtUKYkEGRPtmKQLFUhUvk+LNtf+a
-X-Gm-Gg: AYBFou2LxXhrnsv10Pfi3sP5iLMqDGaDi3hT29JEWh0mvcX5GKdSBFgRgIl0HcLo9SJ
-	5GDbMwnG8B1D038hC20yL/dLq6r+v0VQZOTGAd7TVlbMfdLQqJYGrPL7y3dYqWEBY86eXD9XCeG
-	QUKMq9ABnjsMg6wXUA9pmtjuQ2xk2i++Vw83+GCyS/8NWs/RYxuLq1/KywP1rSvFOvLbnSB2jxq
-	t8pCY4rcsccYBZJcyg+jrosqfhtnOvNKw2JceVa/G90w9P/M2iU3Vj2UGy3mHaAj6UTarlR+otH
-	gfZ+JABvg230aO5/yd1sUqnN7W3ZRw2rsAuG2BJAfSSEVLMDBkRypHNLsHwYHzK2mutlx+hr6eU
-	fs9QoD0RgrFFNwOfsBzKzRfu9kwdEWbUNDH8hrWCa+ofMqgkLHKARNTIMR+uSaYQplI12DzBD56
-	ph+peK/EPQVkDjqaWbyhcv+//Fkt/euJzTcFK+lVtUGiHYAaoQqvRZumkCo1rsqVReC4W4zsDZA
-	vZw3o1PXSyuhcBN+AM5RKNHrGlz/WVIiNOvlvV/00RISO0rojLRydfOv5FRHmXzSGBG9wB0zeXY
-	HeKukG6uWRpI6DBvNxjO31RHTDDVxqsf0jBKQfu6XbdkxjTxcBlDJv7dBObyxrQ+bDJrVcFKu+Z
-	Iq4IsAvn5
-X-Received: by 2002:a05:690e:144f:b0:677:cf4d:a932 with SMTP id 956f58d0204a3-67c67fd80c1mr4309351d50.63.1794481399903;
-        Thu, 12 Nov 2026 03:03:19 -0800 (PST)
+        bh=f+jGuGb1qkK7jSM3drmVQfuryQok7tFfCPkS9qY3leo=;
+        b=q7eJ30KHKiWKWn93kqvDxh+V8uTXFmqeNlm6idB91XqMI7+VqB51ZRERfRFFLgc8O3
+         8nEIaUFHjPy75gZkHLi84f9u3XqFjPsMgbODGY2kDoYHz7iM/AjLRPgm/I2hMFVisOBm
+         iG++R1dFfq/ho0xweOAxC5+xIsiDOoWMPdsGw2jk1k4z8SjYaK2Ebr4woFgfUXGKD5tg
+         LKzQa5T6sBXVwkYWA9v4QL9PVYkPHhaf3f5yI/ZiOm2K94BLcF1Qaa3qx+0Rnx62ZmBY
+         iMw7OcEOxayYxFV2bHRwZYmewjGcWlH1OdngZllnDaPe7ryx460n7gU0gDG67ojAXaqb
+         2ieg==
+X-Forwarded-Encrypted: i=1; AL+hErGsqUv4s5ScEN90sFtinr6uXgQAbsIKpi4z1/iOprEsAQv9dHbXI7kG26LJKD8H8aav/Nd7aZ9GR2JTQA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+pxYKXdWe5s1lzzqbncTi0sqWzvWcQ8gSE6qt3JryIlmxeYHe4
+	I3yFJOLInPZ/HmzY8lK+9+I+OjNgGkVbTW8mDEER3ocLcpgqvEjGdPF7
+X-Gm-Gg: AYBFou34jzw0y53wQrn8qxXO7vBiCPI7+42GuzO35ovmIIgkmEvHOpXQ2epLUz8+c9X
+	XxUUsoSXV2s/y1TUmvJWETeOwy/nGvxswtwMniS4KojMkiktLaDuYXKv+G/1a3r0N5agh8Pp/wI
+	FZxeZwa/NAzK2j+huCShEH/oTsuUMaEImtE6fKzQvanf0GOW7nzldkHku8/sToHnFEBA1XRhmgb
+	UfeTDhqUgrzrA/H3mjXBXzV/tYvJTOAxlREntmlrKy5gdY0Dri9apEt100JdVMMtxsd4bi71v4M
+	pj3H5eoqA4+RoCdV4yTwJ6dZ7AeSTyEbkDQ3ySiuop5PqERJYReg4RFGjoGeRpLRuP2YLwSKvz1
+	9s4m1qdc0dFkzNmIrUBP2D6giGH1rCm77VbV1cnkODXsl9RAb8O0scmM0S297qf/fqduDJkBXUi
+	PkkWrF2t42Tc+qQF1kDGfWd9UGknhLfA14dl7e5gbucGJo75XDILFnKgawEt7XJ71mF8qXSWywZ
+	9Iqs/wrvSlc4kReGRWY9s1+FehuUkYfOBOvKzDAxdHXnChFtdjaAXJUksxezGYyZrWQAc54fygy
+	niKFCRj6e3LBkDGJGoLEELNIZ9CtG5wRTvkhHkhDDysyhPBuI/+wEsmTeIo15VeWGCZezDYZokx
+	0q1aM4wxXNVUZ7eJzjGpz33N6LoWVv+E=
+X-Received: by 2002:a05:690c:c10d:b0:8b3:4022:d81b with SMTP id 00721157ae682-8b3a7d8e436mr35968017b3.4.1794481901382;
+        Thu, 12 Nov 2026 03:11:41 -0800 (PST)
 Received: from fedora ([187.120.157.132])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-67c589ea7acsm6965693d50.14.2026.11.12.03.03.16
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-8b3933d1047sm66813717b3.19.2026.11.12.03.11.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 03:03:19 -0800 (PST)
+        Thu, 12 Nov 2026 03:11:41 -0800 (PST)
 From: Guilherme Giacomo Simoes <trintaeoitogc@gmail.com>
-To: bvanassche@acm.org
-Cc: axboe@kernel.dk,
-	josef@toxicpanda.com,
+To: hdanton@sina.com
+Cc: bvanassche@acm.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	nbd@other.debian.org,
 	syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com,
 	trintaeoitogc@gmail.com
 Subject: Re: [PATCH] nbd: fix circular lock dependency
-Date: Thu, 12 Nov 2026 08:03:07 -0300
-Message-ID: <20261112110307.261098-1-trintaeoitogc@gmail.com>
+Date: Thu, 12 Nov 2026 08:11:28 -0300
+Message-ID: <20261112111128.261395-1-trintaeoitogc@gmail.com>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <c2f4dbce-f8e0-4f04-8dee-3f8d413f4d0d@acm.org>
-References: <c2f4dbce-f8e0-4f04-8dee-3f8d413f4d0d@acm.org>
+In-Reply-To: <20261112001319.463-1-hdanton@sina.com>
+References: <20261112001319.463-1-hdanton@sina.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -105,12 +104,55 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
->> After tested, how can I mention this in my patch?
->
-> If syzbot confirms the fix, you can either:
-> - Add a "Tested-by: syzbot..." tag if syzkaller provides one, or
-> - Mention it below the "---" separator in your patch (in the changelog/notes
->   section), e.g.:
->   Tested against syzbot reproducer via #syz test: <link-to-syzbot-result>
-Unfortunately the syzbot test is temporarily disabled:
-https://github.com/google/syzkaller/issues/8122
+Hillf Danton <hdanton@sina.com> wrote:
+> FYI reclassifying sockets is also corrupting memory [11], so can you fix
+> the corrupter before reclassifying again?
+> 
+> [11] Subject: [syzbot] BUG: spinlock already unlocked in corrupted
+> https://lore.kernel.org/lkml/6aec63fd.5f5735a5.290c1c.0003.GAE@google.com/
+Important thing to do.
+
+I'm not a nbd/net specialist, I only get the "fix possible circular dependency"
+bug to resolve because this appears in mm subsystem syzbot.
+But, I read this bug and see that is a race condition between inet_shutdown()
+and sock_allow_reclassification().
+
+How IA analysis say:
+"""
+- Thread 1 (runner/shutdown) calls inet_shutdown() -> release_sock(sk). Inside
+ release_sock(), Thread 1 acquires spin_lock_bh(&sk->sk_lock.slock).
+
+- Thread 2 (reclassifier) enters nbd_add_socket() ->
+ nbd_reclassify_socket(sock). Right before Thread 1 acquired the lock,
+ sock_allow_reclassification(sk) returned true. Thread 2 calls
+ sock_lock_init_class_and_name(), which invokes
+ spin_lock_init(&sk->sk_lock.slock) while Thread 1 is holding slock.
+
+- spin_lock_init() zeroes the spinlock and marks it unlocked
+ (SPINLOCK_OWNER_INIT).
+
+- Thread 1 finishes processing in release_sock() and calls
+ spin_unlock_bh(&sk->sk_lock.slock).
+ ... 
+"""
+
+What lead me think that when Thread 1 try acquire lock this would must be
+blocked to acquire this lock, so a spin_lock(&sk->sk_lock.slock) inside
+nbd_reclassify_socker right bellow sock_allow_reclassification(sk) fix this
+bug?
+
+```
+static void nbd_reclassify_socket(struct socket *sock)
+{
+	struct sock *sk = sock->sk;
+
+	if (!sock_allow_reclassification(sk))
+		return;
+
+	spin_lock(&sk->sk_lock.slock);
+
+    ...
+```
+
+thanks,
+guilherme
