@@ -1,100 +1,133 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.42
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794557484;
-	b=1UrQmGkmsvx9a/dqcxnmsX6Vtn7r6OmkeHxMF3tcH5kVaXsAR+P/fcjKORlFmsdRy5LN
-	 JvVs6cpgDD5yc0dO5VBRtavf+4aqM4YXdFFYzDVd4NdClqW3pSdA65/glAJUD6clvJP4u
-	 XPuGP2/zACG6Ec7dDEo50l7BBpzopgPa5++iQW4p1Ub4aRlYXYoRWiKKs6pN1OgdCrBL8
-	 NvmePFCPzEfEGmWHnQU3QeJIH6FUuUNBTGR5lALW7uytqv6xDweUsledZZxZFojRouELO
-	 DuW5Hu54tQsmiuyK1OYoQAcaJ0ZKyJ/CryKXYg8zvg4sWd3xJldpSyDDTon/S2ii++g==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794557484;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=ky1fNcYST3cXVSIleurQJpPQOjWYx5UwkSzn2L6E/3w=;
-	b=yaas3T9N/TnmWFmZlkmbe2ATWmKBOPeidE0xTA07UPpAJHcXvOd0tfDo4uNNJQGg8BzU
-	 23CjoQGnCof9LA9pGGKw584xXtvZG7Q9qeTbBeg8VMdjHWDYQ8AuQtuyfV7VFBprvbh/S
-	 5uqlm4lXdZZO68T2Jn7bFzZ33EQjmqoKQ7spuBGd8lBPGiJ1UjhTl7zdUtciFpqi4Dofx
-	 YHNnK6U9xV+zO5TkN+DoigkCAD04gBmr7vKy6/RgQWSo/k/KD7lag5PvsUOC9VKK1u6ll
-	 Jwx1HV9etX6emVbaCnwyeUs78N4kgbAeUWFbDCWdKC9rH0yLOXpbEdK3bncxAjaSbrQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cloud.ionos.com;
-	spf=pass smtp.mailfrom=ionos.com;
-	dkim=pass header.d=cloud.ionos.com header.i=@cloud.ionos.com header.a=rsa-sha256 header.s=google header.b=RoiB4+Uo;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.42
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794559665;
+	b=XbrIlj6sPOffWLpQhMqaZHo2xIC8DqVUBxiE4TukYLMw3LSwWGgbR9/y4A0peRTV1Q0V
+	 88M7TqrPsEMnJWE6JzLS9fUl8bL4FOOBuvY099r873kFgpmSz3QsS6vFw22pw9vRb9OLu
+	 /Tw8efIW7bbFSNeG/Ro+HRnK8jUiCn1+zWQP9hmxa7U5Fh0yUnnIsl7waGTCCHireAh9E
+	 meA1+cvQ+woAvWKqf4xYzO6yaYmJmjPH3Dc3mqd4xWGRfmbHs6HF4jRP85Ex2CGdwn7X5
+	 +AeKnIZy7i+lDM6f3VXBt5gTwHNrAMFqP7a7pa0zXll2K1AJ4DIuyfwWVfqmaGbTZ2g==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794559665;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 X-Developer-Signature:X-Developer-Key:Content-Transfer-Encoding:
+	 X-Spamd-Result:X-Spam-Score:X-Spam-Level:X-Spam-Flag;
+	bh=Z98a10fHzT++6ngZEHshG/H2z2HCNkc0ofB6cf23iao=;
+	b=j/B0HIvVj5NnSaKJGL5wQJgnE71sFwfBrbO+7dI8JKKIvDWwfzbvAqhhMNQUrlA1tLUJ
+	 3N7TTcrCoea+M89ypyIeEscGw9ralUx8mWTzfBjrSvBzsgxOySe5G2SdhWWzWy9uVwJLm
+	 xHgTaEEkixG3TNsDb2nKyi9ccheOl/KloJEkkOVx0B6cnu67cTavmeJ0O9VUJQ8+05jni
+	 DedrhIZceAEbhIjmDHw4ro7tgi2XEUoAyVDSXACz0VKeUKVI3X4FBtpzrq+8HYn0Ym8TK
+	 DkSg9TFTLyUB5ufJhCvXAKVcjDvhuNtTPUdk+UKb8EPMzboaZ7AgLyHXeBXSM/hhlLA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=none header.from=suse.cz;
+	spf=pass smtp.mailfrom=suse.cz;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=p1PjY5Ov;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=59b71h5U;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=p1PjY5Ov;
+	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=59b71h5U;
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CE2606A32D
-	for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 08:11:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 49CE2606A32D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cloud.ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50C8606B363;
+	Fri, 13 Nov 2026 08:47:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D50C8606B363
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.a=rsa-sha256 header.s=google header.b=RoiB4+Uo
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c2af2ae1258so11758066b.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 00:11:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794557482; cv=none;
-        d=google.com; s=arc-20260327;
-        b=AHxAfRjgMSID+IBx8Ole7bLAWcgHniWCPc0kXTW+WzMc4expIgMwLOQkC2Of7MCJN6
-         tKxluaOThCqFs6kkhG1xSaLPAkkVksLAt76DoepvJIfu+8blz/8V2NPr3iiXkZra0V4G
-         3ZEwl89BSCeyri6cHF6Wn0p5zn5JS9IDLl5kmjAWcMfaheUcUeasQ1Z5Vk6blYWUo5Vb
-         Xbvk0tvVSY22YCExoS0avZjmFJP30JkOso9xlV51xxlVSkNu1D/FEng7Ye96yted3xTn
-         YQ4SmgcDnqCMNFC01cLam/FFlZK15SFk0cXwfbk3jA7LOTYqtgjOnwXOBWi/bLSuHL4y
-         fqHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ky1fNcYST3cXVSIleurQJpPQOjWYx5UwkSzn2L6E/3w=;
-        fh=Zlz+8Ms2UIByTpW+APlFW/1/j1U+/0EmmvSy6SpQHoE=;
-        b=kizzVPLjTQM+cUTbBojnLFYeKR/qra0VEsObdnScB4jtcSGv/aymOhpgpeTDwx7qW5
-         AEjX7UTAtNlOZDsBZinRpC8NwbEuFBvCyeAJubYH+GaGj4r6xzN7yaIPTKejxYtRPa+L
-         xkBcWFQo+bC+ZZNouqlqcKksegrok9F0ZKqt7hxOVlcRHpNsKvXCiaNd5myS1PBb8Y/2
-         8uerfQ8HDmNH1OmI+y13rbnV7iUsXKgkWnsh4hwHC8/bk1ISOlExB/SrjS0M/ucE3eEk
-         TeVOZUU5A1zqkw5wiZ0CPiZBpYQdAHKQ5R6b8B+NDTh1TCU3V87b8T6KRdm0K94Mn8wE
-         fW4Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google; t=1794557482; x=1795162282; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ky1fNcYST3cXVSIleurQJpPQOjWYx5UwkSzn2L6E/3w=;
-        b=RoiB4+UoGSczVUtmvGGqpCMRdVCJB7IYCoFNsDaXMTFxQglY8TD9+u00qf9xfVBLTM
-         OVUgTPCC25F+Ez/mrvl6dgpMVGIzbBpmJ9drIsW6Q8/HCtCMvvdBsAbH1cmmbBkAF/ye
-         4GMeoWkKO6XKgzzBCJu6ad8YOym0QKOKJf3Zd+oceBCFSAeoiLl68MzvSGU54u3HPl3k
-         MJ8UxTZ08ogM3OjhlkTAwNiK0rv1R5b5Q+EhfIIQ+lcA1+vQFiumEDay+FpnpOKcfrhe
-         W/742E3xH6z0ccxiwYHGJ9YgELqSd1U/kuJHlJo7Wk7kF45PJ/vt5MNigvWAn4elvSAx
-         ODNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794557482; x=1795162282;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ky1fNcYST3cXVSIleurQJpPQOjWYx5UwkSzn2L6E/3w=;
-        b=F//y9ntClFJsmyy6r7MAYxGEjhb77OFhnRG7wECt3u8PAa4o2XF0MFWPN9Fc4Kigip
-         umZ8Isq7cNuNtSvpSI+PBKCjO9eh+hCsvbJeu1rfdHsqspmceLfIRxpLY6HXVDLI70a3
-         2lMG1h7j6WmMTXaFS+RjCik/zlVw+WtyL3TK+9CqIGukztdG9MQOA9sJGP5h8wXkDt8B
-         VdWhvlRDPAYXUYQtjwBsn6vXZlrjN3eGoVP/D+2fnazUdjUU0yXlQfzAVNx66gbkINBD
-         14GWstDFtmbKylWL+oyFl++FB6peA8XWVLAYMnftGFU217LiZav5TCY1ownemgb9/k9B
-         78Bw==
-X-Forwarded-Encrypted: i=1; AL+hErErxaBfV1stmdPn4QtrCpAq2jV9VMBu12jl03Xy1bXLWdSGeGoGWf2HHrViYjfmFilaPdHtD6V8YKkRZg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9xwRt7ZT0K6wsKsHYTtQQPJR+3qS0GYYpLlMps+EK93WgjCWn0
-	N/fVdegKWsGTElHX5IQ4pJcHDA8LecKNuQMjK+1OqskHoNGMrCxaZ1artC/0X3U/hxDBJf08yIg
-	2+n4pwocgmWpSo4zuWpA4zPIslkmwGsC+YKrYhBSDHg==
-X-Gm-Gg: AYBFou2pGMHrtLRGP1FR+wnP5biGB/eeewHiG/2ffpCsVlDUuZnUHSVCIlBdeTYh+7X
-	yYuKAcFHs6HgZY1AZJIMu93Droci08K6/FZ3i2u5+Y/LLwGXdt5zhdHtqw2lLui9bTmFDy+Vbzc
-	6rGtoOUwvog0Hls52t6Av6XVSSDPx+EnK0Khzpe23IOsxG9kVSnUL13op4vMsXztG1s2RY25gAI
-	F8LzRsJ7LUh6UJoI0jyKlzVY/3YoLzkafJ8ETgEs1zyBQIjPw2M8/i+YLjXDN/1GniI4f+pyT0B
-	F01jq2PhCUQNDRW9sXAQPru7qmBuxhiVq2B/G7rbIAmZ2Nv5kcEcbWmYt9dchJZIOQvVKGD9PA1
-	U/75xtNJymZckBCWYneLNa5hQWC27/k5EsGJOHtN8VE6+a6Tck5sdRKkizZ16du6mv36Rdg==
-X-Received: by 2002:a17:906:f183:b0:c2e:3698:dbba with SMTP id
- a640c23a62f3a-c509642ceeamr126451666b.4.1794557481497; Fri, 13 Nov 2026
- 00:11:21 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=p1PjY5Ov;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=59b71h5U;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=p1PjY5Ov;
+	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=59b71h5U
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 579C61F82F;
+	Fri, 13 Nov 2026 08:47:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1794559663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z98a10fHzT++6ngZEHshG/H2z2HCNkc0ofB6cf23iao=;
+	b=p1PjY5OvtCLshRodLIl+qksUzxWjYgUbxkQZYFV8Fi21RjfBL4MWoqMkzNdzoSkpP1oU0Q
+	7PYpKecMrALj0u00wTTXafOy4mx2jhIxH1m6KD8RnjT8VzuwJw5xpUDb4mDC2msBku2DuD
+	ASOWKb3Gc0MPzYAY82vEOjPpDmlLH2o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1794559663;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z98a10fHzT++6ngZEHshG/H2z2HCNkc0ofB6cf23iao=;
+	b=59b71h5UpNNXXrIHVb3Mbia9BjwFaXND0ms8AH+dtl2fOpYULX3Amygl/rPASpvrjFtajI
+	W/J1ScVxYvMNUOCA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1794559663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z98a10fHzT++6ngZEHshG/H2z2HCNkc0ofB6cf23iao=;
+	b=p1PjY5OvtCLshRodLIl+qksUzxWjYgUbxkQZYFV8Fi21RjfBL4MWoqMkzNdzoSkpP1oU0Q
+	7PYpKecMrALj0u00wTTXafOy4mx2jhIxH1m6KD8RnjT8VzuwJw5xpUDb4mDC2msBku2DuD
+	ASOWKb3Gc0MPzYAY82vEOjPpDmlLH2o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1794559663;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z98a10fHzT++6ngZEHshG/H2z2HCNkc0ofB6cf23iao=;
+	b=59b71h5UpNNXXrIHVb3Mbia9BjwFaXND0ms8AH+dtl2fOpYULX3Amygl/rPASpvrjFtajI
+	W/J1ScVxYvMNUOCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E17361368B;
+	Fri, 13 Nov 2026 08:47:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 7BOYMK7O9mqPFwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 13 Nov 2026 08:47:42 +0000
+Received: by quack.suse.cz (Postfix, from userid 1000)
+	id 2E9F422C30; Fri, 13 Nov 2026 09:47:42 +0100 (CET)
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: <linux-fsdevel@vger.kernel.org>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	gfs2@lists.linux.dev,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	devel@lists.orangefs.org,
+	Dave Kleikamp <shaggy@kernel.org>,
+	jfs-discussion@lists.sourceforge.net,
+	Carlos Maiolino <cem@kernel.org>,
+	linux-xfs@vger.kernel.org,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	linux-afs@lists.infradead.org,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	fuse-devel@lists.linux.dev,
+	<linux-block@vger.kernel.org>,
+	Chuck Lever <cel@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	linux-nfs@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	linux-fscrypt@vger.kernel.org,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 04/13] fs: Provide inode_is_dirty() helper
+Date: Fri, 13 Nov 2026 09:47:04 +0100
+Message-ID: <20261113084700.739002-17-jack@suse.cz>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261113083336.15152-1-jack@suse.cz>
+References: <20261113083336.15152-1-jack@suse.cz>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,111 +137,64 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261112134700.372702-2-jinpu.wang@cloud.ionos.com> <202611130354.oOiDWpa1-lkp@intel.com>
-In-Reply-To: <202611130354.oOiDWpa1-lkp@intel.com>
-From: Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date: Fri, 13 Nov 2026 09:11:10 +0100
-X-Gm-Features: AclHuK_ijeVtZl53-Nr24xIboJn-g0mWRkSzGcLkYkpL9J_f9DfqfuDTwKSOTUg
-Message-ID: <CAMGffE=bCVxcuDzUdGk=btfu-bdHhwofHQ6qkgx7UmQTpvSyhQ@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] block: suspend bio based disks around queue limits updates
-To: kernel test robot <lkp@intel.com>, sashiko-reviews@lists.linux.dev
-Cc: Yu Kuai <yukuai@fygo.io>, Song Liu <song@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
-	Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>, linux-raid@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Developer-Signature: v=1; a=openpgp-sha256; l=953; i=jack@suse.cz; h=from:subject; bh=xOmo84WJOisQVAhQnOPGQkdou8zuAdb6TcwawJJufqw=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBq9s6Gf2G0M3LorDLP5OvjOgq4WAHvSsH554SUA qj6hLx64miJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCavbOhgAKCRCcnaoHP2RA 2VGQB/9ekMeVHsyMTY52QC9Ajnl7GwwQOMx4b5NxdHjsWCmVMFrkMT3opTfSbHtdFDSepchQMt2 g+NskCoAOO1J1kD8DXBuIByMnLhzEs14RPJYZzVKSiM/yzbL4MQOqIW5QGk+BNojsbQtCApCen3 3gjdj9pUxfCA69MPNHb6GkRt2j045meRcgI7kQeKRPHTbce8RADmIdfIbkks14hfna0skwaiTXs uv/vAgUgb9KpFQ276vNtde87gqaBHyf/jpqe0z5Pd40UcwpZVyII7jBZ/6oSWkKGtnnsXWwjHZs Li4c1jot+3hZKifTXS475/z/6mf/pRJbRPgtfsK1iewhS7jr
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-11.80 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.984];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLyaw51ggmke6bkcxeyajg5whq)];
+	RCVD_COUNT_THREE(0.00)[3];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -11.80
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-Hi, all
+Provide inode_is_dirty() helper for use by filesystems (mostly fsync
+methods).
 
-I will fix the __releases(&disk->queue->limits_lock) annotation in
-next version, will wait a bit if any other comments.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ include/linux/fs.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Thanks!
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 99caef43ff3c..025f5d890689 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2217,6 +2217,17 @@ static inline void mark_inode_dirty_sync(struct inode *inode)
+ 	__mark_inode_dirty(inode, I_DIRTY_SYNC);
+ }
+ 
++/*
++ * Check whether inode itself needs to be written out either at all or for
++ * the purposes of datasync if @datasync is set.
++ */
++static inline bool inode_is_dirty(struct inode *inode, bool datasync)
++{
++	int mask = datasync ? I_DIRTY_DATASYNC : (I_DIRTY_INODE | I_DIRTY_TIME);
++
++	return inode_state_read_once(inode) & mask;
++}
++
+ static inline void set_inode_metadata_writeback(struct inode *inode)
+ {
+ 	spin_lock(&inode->i_lock);
+-- 
+2.53.0
 
-
-On Thu, Nov 12, 2026 at 8:18=E2=80=AFPM kernel test robot <lkp@intel.com> w=
-rote:
->
-> Hi Jack,
->
-> kernel test robot noticed the following build warnings:
->
-> [auto build test WARNING on 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Jack-Wang/block-su=
-spend-bio-based-disks-around-queue-limits-updates/20261112-144659
-> base:   6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
-> patch link:    https://lore.kernel.org/r/20261112134700.372702-2-jinpu.wa=
-ng%40cloud.ionos.com
-> patch subject: [PATCH v4 1/2] block: suspend bio based disks around queue=
- limits updates
-> config: arm-randconfig-1002-20261112 (https://download.01.org/0day-ci/arc=
-hive/20261113/202611130354.oOiDWpa1-lkp@intel.com/config)
-> compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 1=
-b1fed44d3dcca649a9877915d57c3357a98124e)
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20261113/202611130354.oOiDWpa1-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202611130354.oOiDWpa1-lkp=
-@intel.com/
->
-> All warnings (new ones prefixed by >>):
->
->    In file included from block/blk-map.c:12:
-> >> block/blk.h:680:10: warning: releasing mutex 'disk->queue->limits_lock=
-' that was not held [-Wthread-safety-analysis]
->      680 |                 return queue_limits_commit_update(disk->queue,=
- lim);
->          |                        ^
->    block/blk.h:681:9: warning: releasing mutex 'disk->queue->limits_lock'=
- that was not held [-Wthread-safety-analysis]
->      681 |         return queue_limits_commit_update_frozen(disk->queue, =
-lim);
->          |                ^
->    2 warnings generated.
-> --
->    In file included from block/blk-sysfs.c:14:
-> >> block/blk.h:680:10: warning: releasing mutex 'disk->queue->limits_lock=
-' that was not held [-Wthread-safety-analysis]
->      680 |                 return queue_limits_commit_update(disk->queue,=
- lim);
->          |                        ^
->    block/blk.h:681:9: warning: releasing mutex 'disk->queue->limits_lock'=
- that was not held [-Wthread-safety-analysis]
->      681 |         return queue_limits_commit_update_frozen(disk->queue, =
-lim);
->          |                ^
-> >> block/blk-sysfs.c:909:3: warning: mutex '(kobj - #undefined)->queue->l=
-imits_lock' is not held on every path through here [-Wthread-safety-analysi=
-s]
->      909 |                 blk_disk_resume(disk);
->          |                 ^
->    block/blk-sysfs.c:897:9: note: mutex acquired here
->      897 |                 lim =3D queue_limits_start_update(q);
->          |                       ^
->    3 warnings generated.
->
->
-> vim +680 block/blk.h
->
->    675
->    676  static inline int blk_disk_commit_limits(struct gendisk *disk,
->    677                                           struct queue_limits *lim=
-)
->    678  {
->    679          if (disk->fops->suspend)
->  > 680                  return queue_limits_commit_update(disk->queue, li=
-m);
->    681          return queue_limits_commit_update_frozen(disk->queue, lim=
-);
->    682  }
->    683
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
