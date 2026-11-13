@@ -1,104 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794559665;
-	b=Km7uL/daa67ksaxLlP1QD+4eAW26B8+yxlF1pXIJuzI+0hSl7weJzg/MDWcul5jQbeek
-	 4WNdUSfY3zzazcL7DNxbz6J595U2c1RubUG7O5fEffTNonNhf3I4TmZQRK/jpRrIcBRiB
-	 nYQZn0/UxUzCO+oh/IWxkk4CV7+gXIv6e2pPOC8B8a8xlSI84foRXNFmHiHcFnYPKuPtn
-	 Jz2HrE6U9cPW7NmeP94ay5NFNVQ1xtuIzOKkRxfSCoylMbxaYNsljt+B01Po2xwBQcOIr
-	 dG3+wbRDbE1aJB8cOSD91QjL9XTZpL3lIR+HOmIT/dSQLlKWrj6LGivHDCBoqkgy0+Q==
+	b=j1gwfWsgnC6lP7uYd3Cs+qLf4oOaWXOKeQqeoH94kSqoK9xMob46WNe8gYDO1iWWFylT
+	 +gHeYqMby4vCzlFCO9YLOpsOif2Z7nw1l4hz+O2qpbKCxeqN2BLZbqb21UTIlE1x3mYlK
+	 TP2Y538Z2V2SyPDJt11PWZjSDqRusC1RY41tUBjawACCS1Sc6/MG8HsQ3wcCtRYPI14ui
+	 8VZpm/IHUvJtlcT7eg9PsXMpk8F6etJec9jOGmBLGH3A3WVliQ75LQFUi/KxY5xh1eTZp
+	 Lb4hNmH9ZjfxEdRHxHMYTldtEXlKuw0dwWzNjWVzclC/XQDMtUFt8D60u+Bm102vU2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794559665;
 	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
 	 DKIM-Signature:Received:Received:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 X-Developer-Signature:X-Developer-Key:Content-Transfer-Encoding:
-	 X-Rspamd-Queue-Id:X-Spam-Level:X-Rspamd-Server:X-Rspamd-Action:
-	 X-Spam-Flag:X-Spamd-Result:X-Spam-Score;
-	bh=6RcxWg+VNIX8+XsK7mGJgNjvUHrjRXmWMJ6Gaak6N9g=;
-	b=cpP8YfhISr0q7i/cUM3w4T1Hyz5e0L5buz+0T4GHVpmlb2xOqpCoicpeVsomp0INGIUG
-	 w/rbIfGEx7qLuBTw3H0FFxedlyRNN6R6SgwgiACcc7iMqxERhxsdZbXTGQaqmLbe3dwb0
-	 EC2NyByzCW+Xfawghw0zhAvIDX0/hbWhk9jFsnXtgz9YxxwGAhvpsX+bLVvBxi2kUjPOp
-	 0cYDbN17rjlE5kOsZkQOs57PPIDEvMyTZvU3i7jPdpBadpHJ9EoodOeolD7dXjdZDszzg
-	 RdJwWZQwJK6xx/Wv8v0qd+nQUR9LjU+PlR2JjC7Kfygaf+hEKZiX3UgjwqDPAbJP2kg==
+	 X-Spam-Flag:X-Spam-Level:X-Spamd-Result:X-Spam-Score;
+	bh=6iRKFoGPoNxIxzoHziVi3ti4Tp9wo3z3sJ/WWTfiGCA=;
+	b=sNaGxU1wdmRRfa8KuYihPlNVL8S3JwUUGf6eZx1N2lXbz1ADmxeHO/dL4WyokGGEMYBO
+	 XIWjMM2Tm80WuKM5dCW2yc0rv5YiECOZcUHqrDLl45VS1ftrVxMEB0FhHbJs41Mu2+cDy
+	 ye13YrE3w3jK+yvlJvAJ44mVpPL+LCcIbXBE/zEGrWW5dbC8aGdaNnCBrrEgjzw/eTcGF
+	 PBB/pENbsg4KGCtQEDhgLVL4macQ1KSX6Wb4CeEgww1DJ4XIoV68C9GCLlQ81bdphpL4h
+	 1qvDeMWTTmQgPMC6h9biP3EFdrJo3tnemAix0vDLWdS401KSZg/akX/oLu/KfFWXbqw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=suse.cz;
 	spf=pass smtp.mailfrom=suse.cz;
-	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=p2T6cmZM;
-	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=iMKXRHIQ;
-	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=p2T6cmZM;
-	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=iMKXRHIQ;
-	arc=none smtp.remote-ip=195.135.223.130
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=NBTuXoOG;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=JIvxzRQa;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=NBTuXoOG;
+	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=JIvxzRQa;
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD5D606B35F;
-	Fri, 13 Nov 2026 08:47:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CBD5D606B35F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B095606C1AC;
+	Fri, 13 Nov 2026 08:47:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3B095606C1AC
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=p2T6cmZM;
-	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=iMKXRHIQ;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=p2T6cmZM;
-	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=iMKXRHIQ
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=NBTuXoOG;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=JIvxzRQa;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=NBTuXoOG;
+	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=JIvxzRQa
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3740C22229;
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 912051FA54;
 	Fri, 13 Nov 2026 08:47:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
 	t=1794559663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6RcxWg+VNIX8+XsK7mGJgNjvUHrjRXmWMJ6Gaak6N9g=;
-	b=p2T6cmZM+oLaydtNdDp9veN3DeTJg6wiR2SIg3cAUJjbxWv4nJIfKY0QJJUZuQFdmhR+P/
-	ebfZOoAE/Ev4mqumgZ8h6a3jmt4UJnoQ2q7wcK4SVPOgfKP/XC6scLvxLUFXysvQ5CBekv
-	rXbxa0z/W4LPufhmObrQXtT8ERH/ng4=
+	bh=6iRKFoGPoNxIxzoHziVi3ti4Tp9wo3z3sJ/WWTfiGCA=;
+	b=NBTuXoOGjjzZ6A3qO5rJXmNU/Z93mbCmPsecD0kY1JYAmAuc4TYWGrZMAFmtzmPU6sjprm
+	9xwYwEMok1CvQFR2l7kArLbMFNO7hs3VnMEVjGcjt099jxcP71ivYA2NvpcoLAxQQBc3im
+	dw/CrtYaQq1PkbGo8f7RU5RiP7k+YDY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
 	s=susede2_ed25519; t=1794559663;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6RcxWg+VNIX8+XsK7mGJgNjvUHrjRXmWMJ6Gaak6N9g=;
-	b=iMKXRHIQ9XkLvFFO3bkO60s2BJDhcV5uCoOjptggwko4twuPoX64ko4Pk9saxMruYBqXWG
-	gahPSgJIoU08D6CQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=p2T6cmZM;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=iMKXRHIQ
+	bh=6iRKFoGPoNxIxzoHziVi3ti4Tp9wo3z3sJ/WWTfiGCA=;
+	b=JIvxzRQa2B1gVvTr4p3WA6SqNMxSA/rMn4GFZU3HJYIwZIv+lsfEIJJtuGmgRj+uHJYNFY
+	Ggfeuncrle1AwtDA==
+Authentication-Results: smtp-out2.suse.de;
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
 	t=1794559663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6RcxWg+VNIX8+XsK7mGJgNjvUHrjRXmWMJ6Gaak6N9g=;
-	b=p2T6cmZM+oLaydtNdDp9veN3DeTJg6wiR2SIg3cAUJjbxWv4nJIfKY0QJJUZuQFdmhR+P/
-	ebfZOoAE/Ev4mqumgZ8h6a3jmt4UJnoQ2q7wcK4SVPOgfKP/XC6scLvxLUFXysvQ5CBekv
-	rXbxa0z/W4LPufhmObrQXtT8ERH/ng4=
+	bh=6iRKFoGPoNxIxzoHziVi3ti4Tp9wo3z3sJ/WWTfiGCA=;
+	b=NBTuXoOGjjzZ6A3qO5rJXmNU/Z93mbCmPsecD0kY1JYAmAuc4TYWGrZMAFmtzmPU6sjprm
+	9xwYwEMok1CvQFR2l7kArLbMFNO7hs3VnMEVjGcjt099jxcP71ivYA2NvpcoLAxQQBc3im
+	dw/CrtYaQq1PkbGo8f7RU5RiP7k+YDY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
 	s=susede2_ed25519; t=1794559663;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6RcxWg+VNIX8+XsK7mGJgNjvUHrjRXmWMJ6Gaak6N9g=;
-	b=iMKXRHIQ9XkLvFFO3bkO60s2BJDhcV5uCoOjptggwko4twuPoX64ko4Pk9saxMruYBqXWG
-	gahPSgJIoU08D6CQ==
+	bh=6iRKFoGPoNxIxzoHziVi3ti4Tp9wo3z3sJ/WWTfiGCA=;
+	b=JIvxzRQa2B1gVvTr4p3WA6SqNMxSA/rMn4GFZU3HJYIwZIv+lsfEIJJtuGmgRj+uHJYNFY
+	Ggfeuncrle1AwtDA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D0CDE13516;
-	Fri, 13 Nov 2026 08:47:42 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3103413750;
+	Fri, 13 Nov 2026 08:47:43 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id PRxDLK7O9mqMFwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 13 Nov 2026 08:47:42 +0000
+	id Mz7UAK/O9mqaFwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 13 Nov 2026 08:47:43 +0000
 Received: by quack.suse.cz (Postfix, from userid 1000)
-	id 27C5E22C2E; Fri, 13 Nov 2026 09:47:42 +0100 (CET)
+	id 4712022C38; Fri, 13 Nov 2026 09:47:42 +0100 (CET)
 From: Jan Kara <jack@suse.cz>
 To: Christian Brauner <brauner@kernel.org>
 Cc: <linux-fsdevel@vger.kernel.org>,
@@ -124,9 +122,9 @@ Cc: <linux-fsdevel@vger.kernel.org>,
 	Jaegeuk Kim <jaegeuk@kernel.org>,
 	linux-fscrypt@vger.kernel.org,
 	Jan Kara <jack@suse.cz>
-Subject: [PATCH 03/13] orangefs: Check PAGECACHE_TAG_DIRTY instead of I_DIRTY_PAGES inode state
-Date: Fri, 13 Nov 2026 09:47:03 +0100
-Message-ID: <20261113084700.739002-16-jack@suse.cz>
+Subject: [PATCH 08/13] fs: Provide inode_or_folios_dirty() helper
+Date: Fri, 13 Nov 2026 09:47:08 +0100
+Message-ID: <20261113084700.739002-21-jack@suse.cz>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261113083336.15152-1-jack@suse.cz>
 References: <20261113083336.15152-1-jack@suse.cz>
@@ -139,83 +137,62 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1851; i=jack@suse.cz; h=from:subject; bh=Qg6paIpRmdoc51ruf7pUBhSwnRMQQ/P9xxdUTZcJVcw=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBq9s6GSt8f88LyKpBCH8mV2gd5d4KlCJYJL+E12 59BdENIj4yJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCavbOhgAKCRCcnaoHP2RA 2SedCACmIj5ss6ykbgKk8qGdtOXF2yuDM53FGdPSxUragzPmPvNBLVyZeMjr4G/LAsfHygmVj61 d8RcBvygq6eDI/OXUvBcQpFfAHvXBnV8twu79qUYvZRHkhwDroh1wl7PCajCQOHa5XRByln3Zqo mKIMt3P7p0bN/i7Tf++K4BcouVaGMMjR2E2hK+6t+MPTUOusC57SpPx9szPy1EuIbQeoaeB8hxc tNPYTaE00/ew2X20cUID+bzYdNUroJvjH7SwVi1J5HL0m53GDsctRvmSQrNts79EuXzKHrkVryP jnUTFPqnHfj0jltjISffQUOJPFycAQAh7n1Cge4xL0DAgQ3b
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1078; i=jack@suse.cz; h=from:subject; bh=air2t+jjpODu/KcuQssVmunzU4STOOKtGPrRiC3+PDg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBq9s6KgCLcrr68IISe8krmX8iMaQxGIJYwSTtJn aSN3yFLpHqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCavbOigAKCRCcnaoHP2RA 2TWKB/4rl9qoWaAPLsndIFCvAf+JaC/7OY8xvwAflW3e0tiYjiktW9Q8NQcrH1ZwIK2I+pDqaNQ hZ4IA0InqAZo8FW5jTbb6zdVlazu74suBN4hSl3e0aFMqowDJNiV4AcM1+FIOWAHQJgKI56hgwy 5kO1YQ98OHYWsc5YBwwrudD8IwD5uuwLzR3lp5LoiB6AGDAGEixphUEC0QNDPh5CgyIqWe3oXXi AmgEBhMFgmvGXuXBIh/WMmrAdokM+qM8JWqmbrPL5rR5OrD6FuoPxZ0UxkDEJI+DMzMZOmviHm3 PTS4dRKYwwzK3Pd2hfZgp9ds9oEsgqQ6fQSgTuT+mH+22m1S
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3740C22229
-X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
 X-Spam-Flag: NO
-X-Spamd-Result: default: False [-12.01 / 50.00];
+X-Spam-Level: 
+X-Spamd-Result: default: False [-11.80 / 50.00];
 	SUSE_INTERNAL_BYPASS(-9.00)[];
 	BAYES_HAM(-3.00)[100.00%];
 	MID_CONTAINS_FROM(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-0.999];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	R_RATELIMIT(0.00)[to_ip_from(RL51pwup9t9rrf6fhpcri3z6a5)];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TO_DN_SOME(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLyaw51ggmke6bkcxeyajg5whq)];
 	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Spam-Score: -12.01
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:email]
+X-Spam-Score: -11.80
 
-PAGECACHE_TAG_DIRTY is the authoritative source of dirty folios present
-in the mapping. Use that instead of looking at I_DIRTY_PAGES inode state
-which can get stale (e.g. when folios are written directly with
-filemap_fdatawrite()).
+Provide a helper function checking whether inode itself or some of its
+folios are dirty. We'll use it in filesystems instead of direct i_state
+checks. Note that this check returns true also if only timestamps are
+dirty when lazytime is enabled. This is what users really want.
 
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/orangefs/orangefs-utils.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ include/linux/fs.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/fs/orangefs/orangefs-utils.c b/fs/orangefs/orangefs-utils.c
-index 9ab1119ebd28..4c4036f470cd 100644
---- a/fs/orangefs/orangefs-utils.c
-+++ b/fs/orangefs/orangefs-utils.c
-@@ -247,7 +247,8 @@ int orangefs_inode_getattr(struct inode *inode, int flags)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 025f5d890689..f602deacf953 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2228,6 +2228,13 @@ static inline bool inode_is_dirty(struct inode *inode, bool datasync)
+ 	return inode_state_read_once(inode) & mask;
+ }
+ 
++/* Check whether anything in the inode itself or its folios need writing */
++static inline bool inode_or_folios_dirty(struct inode *inode)
++{
++	return inode_state_read_once(inode) & I_DIRTY_ALL ||
++		mapping_tagged(inode->i_mapping, PAGECACHE_TAG_DIRTY);
++}
++
+ static inline void set_inode_metadata_writeback(struct inode *inode)
+ {
  	spin_lock(&inode->i_lock);
- 	/* Must have all the attributes in the mask and be within cache time. */
- 	if ((!flags && time_before(jiffies, orangefs_inode->getattr_time)) ||
--	    orangefs_inode->attr_valid || inode_state_read(inode) & I_DIRTY_PAGES) {
-+	    orangefs_inode->attr_valid ||
-+	    mapping_tagged(inode->i_mapping, PAGECACHE_TAG_DIRTY)) {
- 		if (orangefs_inode->attr_valid) {
- 			spin_unlock(&inode->i_lock);
- 			write_inode_now(inode, 1);
-@@ -281,13 +282,14 @@ int orangefs_inode_getattr(struct inode *inode, int flags)
- 	spin_lock(&inode->i_lock);
- 	/* Must have all the attributes in the mask and be within cache time. */
- 	if ((!flags && time_before(jiffies, orangefs_inode->getattr_time)) ||
--	    orangefs_inode->attr_valid || inode_state_read(inode) & I_DIRTY_PAGES) {
-+	    orangefs_inode->attr_valid ||
-+	    mapping_tagged(inode->i_mapping, PAGECACHE_TAG_DIRTY)) {
- 		if (orangefs_inode->attr_valid) {
- 			spin_unlock(&inode->i_lock);
- 			write_inode_now(inode, 1);
- 			goto again2;
- 		}
--		if (inode_state_read(inode) & I_DIRTY_PAGES) {
-+		if (mapping_tagged(inode->i_mapping, PAGECACHE_TAG_DIRTY)) {
- 			ret = 0;
- 			goto out_unlock;
- 		}
 -- 
 2.53.0
 
