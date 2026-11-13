@@ -1,73 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.202.193.197
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794580200;
-	b=oEzxKbHfHcz42b8USJg154JpZ2IDnIQ7hJgcI6wLihka0QXY15ne3wNN7/n5K7iiKrSB
-	 RTzyZYfhXvdyndlhnsm6+6F9mlXjd1R9PAf2U+AqEBq50dIaufVISjOFEWrFvR/mE88CJ
-	 /Fyh7zEggO3PAJF+livPysaF9w1m9LZGoZEHUx4rLa4pGHbBy5etDRnZ1Ie462xar249z
-	 BqCl0FhsaoLV1VXWzukFZi/f1hbGzksiMnedPAmatnwJEt2seTbkZXH58JWbWORXujR5R
-	 R5Mh03OglrWrpR1CI5W/rX3P9C1RtxRWbhrJ9BO2FYOBr9rgreFyUlIIyo1GdUQJXLQ==
+	t=1794590735;
+	b=f84icSHCH1VpZUW4Kvw4Gac4QmoOoA2/AZ+8QxKEKtko4Ji/yuSYPwaY4fJ7BRSwJPqn
+	 MKt1OCliKnv7m1TuSoe8WwyiZ4Iz7Q9rFlAr6sVBI31tMeZEeFXAh9E3aRwCptnvL61CX
+	 rrXSMv4vU/6LWbKwz459eL8JlrG0YoY1jGo+j0e9bX4DfkQH4kZesi3oypx3WEibRSg1A
+	 xW65B0jKdDtQzpHt/sdMm5rGHR9Jw62St5VnIdEf2ibRd+kPKnTQRi7V5YXLu5cbb/TyS
+	 +zaaaMI4TvVduwntu+j4cYzQXoYJGbjdsuWmIjGhRxFZZ9cUZn17N1IN8b+x8PFzdDg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794580200;
-	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
-	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
-	 References:Subject:Content-Type:Content-Transfer-Encoding;
-	bh=r44VGVXjpBZvSPH3AAkVDqbr/+AiQktps6NDmxi0hik=;
-	b=pC1mA31+Xz4GRVXFTO3dPfF8SzWtwBqckdCfaYnaXyZ1Zds9Oc+1HJxaeRyPYjG4sZcP
-	 /elgXjz/hZ1LtAjeo6eF75vk+hhnikIMuzpsi/+NSLwlUJmcrTRE4dv2xaz4WUgQ651va
-	 IdaSM4GQSZUlkcsTDQqr9TDgZghwyH+Z471brk0G+5zP+eL+086iSP1SU2Bkfml7s9CcS
-	 j12ArarwZ4WnLeTwuoVTfrTWO04LB4kF5H1bw8xFWRdwfeV+6nUuEmjUwXeaTCjJIlffq
-	 xF1qA/8oepjEvrmWuZe1WF4XKH3LE8Szl9hPNVFZlF1wLzM47VyWWYn3jxQusIAVvbQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794590735;
+	h=DMARC-Filter:DKIM-Signature:DKIM-Signature:Feedback-ID:
+	 X-Pm-Original-To:Received:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-MIME-Autoconverted;
+	bh=v5VCnw1Fvtd/Gip4papkzUmc4LWV8dOqyxkMmZU8NKA=;
+	b=CtW0cINWT1hz50vjPmlrBSXxlHz7pvoLfYWY8qN66PXu75MGsdi3JI+slgd6nBOnm/BT
+	 8ADHMvrezv4PMeNPAhS4cdFM/pcD8DATCNNH3SROe9Z/fdNERw7zklmV6ctiGVnHBGR4O
+	 +tLrcWjOxPyU756bdWWZrKNjNAxsS33k98wo7hCoRcoHmnr4F1ox2Ht/Cp+apyhm2XXEF
+	 dgvycFP8wX6QBNSUffIW9rrRxY1ATWu8OFVjLv+7EiJkJ6LAA3SbpmZDV39cKgSDjfdFn
+	 mp5k1BgnSm5QQuc6Mxk9KL4T7FGXexLmZjevQ/kCbZvqa32ckAmJeP1mbHRLZ4Xh+ZQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cabKdAfX;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=mzk1.dev;
+	spf=pass smtp.mailfrom=mzk1.dev;
+	dkim=pass header.d=mzk1.dev header.i=@mzk1.dev header.a=rsa-sha256 header.s=purelymail1 header.b=V9KuuWcN;
+	dkim=pass header.d=purelymail.com header.i=@purelymail.com header.a=rsa-sha256 header.s=purelymail1 header.b=oBQ+mx6w;
+	arc=none smtp.remote-ip=34.202.193.197
+Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BD3606A335;
-	Fri, 13 Nov 2026 14:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00B8607A5FC
+	for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 17:25:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C00B8607A5FC
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mzk1.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mzk1.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cabKdAfX
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 095671F000C6;
-	Fri, 13 Nov 2026 14:29:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794580200;
-	bh=r44VGVXjpBZvSPH3AAkVDqbr/+AiQktps6NDmxi0hik=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=cabKdAfXY7aGxVymE5PIFWVdOhyZVGq2bOqJkmXAH6qWZireQnyao0TX/kzgsiXOc
-	 T2s7HI0Z9PlHVuMCGJ2d2DSCusaNOIawK3+rUnv/DAjjxfTj7oInwKAaBrefXEoUER
-	 DDqhXYoJ3IhyhrTaShc0zbxIJxQzIaQuuXdk3C6xXQj2V2EwZQF4ObiNBuvfctM9dF
-	 OIY8neFsqvmA09frvGBB8iSTuEvnfSq4EMNp1njEtxYx/WwUGPiR0A2HceiBKlUt3a
-	 ryOCdHQlltw5FIcBupvvKEzoukoZC1OS2jBdYVX13IV/ctQyP6szu7HwJgHUFcan4b
-	 Pn7A1Juy33PCg==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 4ED74F40069;
-	Fri, 13 Nov 2026 09:29:58 -0500 (EST)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Fri, 13 Nov 2026 09:29:58 -0500
-X-ME-Sender: <xms:5h73ajHbLgXGptB-dLn7JolU98xqZzvOYw5qiuUWzN2H88vb2mSYCA>
-    <xme:5h73arItnLhI9Lm7rBE_uEwXyrLRPez3-oCsJnuPte095JZZJGJX7SNvcpr2FPe5j
-    VCKhzJvUfwORn2e4PKQZLgr6bBGF7dbq3t8atIUb5yw-OBySTQp>
-X-ME-Proxy-Cause: dmFkZTE/tOQp30OUl6utnn/w64DIjqD/RRWwsaN4vYA/Um7X8Hi0+38VBMJkOTI7il1dTj
-    9GDGmQ/tntw9pB4r639GENnQSS374aTm40SaYFhBJb3/rc4NqayYCYuv1cKjeuZg5ozGVy
-    9jm7SGRy4mjVCAtZDk0OdyfrgbxcxBpVg14dRsf0FSl7GYPyf0jxpJ1PaglA/Ahgitf50G
-    tYf1fz57lsz+ArTGdypZQerbtMPD5NCxF8t0eYyQzLLvMxL2aVj/hfqm5mTSRMEgkI7f8M
-    ja5juPSxNHeEwWmT3TeN7Pc0PhZPmsRgLvOF8/1AqpMQl194E1ME6BcwdlmnUUYYVf1pOl
-    f4ISQDtRi/ca9iO5bylZkJ5n1ii862vn5VxiQYK2st5/K9VvhXIWxsRjxNDQyrrzSQaIIX
-    qYNHGwJdBf2n0IED9fucthumcfPCnuIFgE5bW7gcKB9i2tv1KP8j3wAivqD+M0Jb3EUUfz
-    5UPyiEYvfAcy0Iq0oB8yJFdexYPJ6OHATFxTYEKvNs3dyHhXcN4cH1S15eCJSu9yQh9Pvo
-    Aw2PRO9mukA+Ppx9rHF9R6ZvFgc2COflEqJVrAbgJs9LwQh2tiR7063LZB7buOUx6/inml
-    cbuYc7B9acJtwWkXY4E+AwHyPl/Xc1Q4rb75SkDGZYUHQIizezNpW/19N+OQ
-X-ME-Proxy: <xmx:5h73alzwDHiX-GqJeiEDrfQ4osAGX0cKV9iJhjL_T68AiBQRTwMi_w>
-    <xmx:5h73ahWwQxeiluvyUOtPmRU0tBvZKrM12OZ6CAfurTRXRDl05eO8_g>
-    <xmx:5h73aqrMz5qopQ5fw7RU9o095_0BPg80zPUHkwETH8klJEEm4PruSQ>
-    <xmx:5h73amc9f7nbs-9G9HBwNcRIuxYjQ-0rEV4palYsrSyfjiX9oltsSQ>
-    <xmx:5h73agEuLlqwQZTcPwpye9FI79QIQundgG14hhc6Npf2nRtwNxjRHBbv>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 23F69780075; Fri, 13 Nov 2026 09:29:58 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key, unprotected) header.d=mzk1.dev header.i=@mzk1.dev header.a=rsa-sha256 header.s=purelymail1 header.b=V9KuuWcN;
+	dkim=pass (2048-bit key, unprotected) header.d=purelymail.com header.i=@purelymail.com header.a=rsa-sha256 header.s=purelymail1 header.b=oBQ+mx6w
+DKIM-Signature: a=rsa-sha256; b=V9KuuWcNuAVuhSLxrM/zeH0iiGGKN10vfTI0UZhwRvvAXLJHa//5AtkMwwsG3gCGAovoNsfB6hpYEgc8leoXQUGc3/8p26yo2AbMKr4N8FW/LOA31BXHMALHMZndryJ2bRblSLKlBru7/L/NZbQLm8yERMaTSjveV29YKeCTjzf+qjX7/x6JEcIHE9QwVm3ZDkAZS7rWi8D/Qznheaq0uy5AgjiKPmroDRTyP9YEz18ufg+fiHWGBH7IAOQ17MbVpb87Se1RL/+ZtlaB87gz6kg6Ds4oy7V6p30VvgaGUuylpVDc7+iuQMOhq16oi1WZpPlYZWcX3X7mn//U+cIbng==; s=purelymail1; d=mzk1.dev; v=1; bh=ynwczMvkRVmR6wZnOkUfy2B4rEh3V7zlSMQ4smUy/aE=; h=Received:Message-ID:Date:Subject:To:From;
+DKIM-Signature: a=rsa-sha256; b=oBQ+mx6wIpb4CdkjkexxCs/iwcIZEOxTo+I8V5tlwLba+APf1rElu5WKFdEKmnjGvdpqlSSej2wWvTauBnYzXLqM79/MZEufKvzA6xs0v2VZuhX2FXil5DWPzI50R7Q4u5YpNMBA/h6LC4P0SI8GTn0zm4nKzUZGXswVt1cLxlg+thzmy3PEVlJFZO3hbOq1K1U1ODu2dVfCz02GpjItX7O58AXnyF2ClmSKz3YSxMxXvMH5ARUVFy1NZztWH/HAPKhtjeu0PrnjzJXt2JyRVzidyuPZ+E5JjJIWM0tfmotnFkx1WINmVcIJWMovcO0H/GvvKj2+JeSXvK6QXkbvUw==; s=purelymail1; d=purelymail.com; v=1; bh=ynwczMvkRVmR6wZnOkUfy2B4rEh3V7zlSMQ4smUy/aE=; h=Feedback-ID:Received:Message-ID:Date:Subject:To:From;
+Feedback-ID: 1682458:65466:null:purelymail
+X-Pm-Original-To: linux-block@vger.kernel.org
+Authentication-Results: purelymail.com; auth=pass
+Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 2110463954;
+          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+          Fri, 13 Nov 2026 17:24:17 +0000 (UTC)
+Message-ID: <3246e50d-2489-4a79-8a72-550bd90fbd90@mzk1.dev>
+Date: Sat, 14 Nov 2026 01:24:08 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -77,65 +55,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-ThreadId: AhoMoQ4eTUpJ
-Date: Fri, 13 Nov 2026 09:29:38 -0500
-From: "Chuck Lever" <cel@kernel.org>
-To: "Jeff Layton" <jlayton@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "Christian Brauner" <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org,
- "Andreas Gruenbacher" <agruenba@redhat.com>, gfs2@lists.linux.dev,
- "Mike Marshall" <hubcap@omnibond.com>,
- "Martin Brandenburg" <martin@omnibond.com>, devel@lists.orangefs.org,
- "Dave Kleikamp" <shaggy@kernel.org>, jfs-discussion@lists.sourceforge.net,
- "Carlos Maiolino" <cem@kernel.org>, linux-xfs@vger.kernel.org,
- "David Howells" <dhowells@redhat.com>,
- "Marc Dionne" <marc.dionne@auristor.com>, linux-afs@lists.infradead.org,
- "Miklos Szeredi" <miklos@szeredi.hu>, fuse-devel@lists.linux.dev,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-nfs@vger.kernel.org, "Eric Biggers" <ebiggers@kernel.org>,
- "Jaegeuk Kim" <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org
-Message-Id: <8f7083c7-2a37-4a41-8cdf-5504dd889f44@app.fastmail.com>
-In-Reply-To: <bda5f50707205ff7fa55120247fec46300d420ad.camel@kernel.org>
-References: <20261113083336.15152-1-jack@suse.cz>
- <20261113084700.739002-24-jack@suse.cz>
- <bda5f50707205ff7fa55120247fec46300d420ad.camel@kernel.org>
-Subject: Re: [PATCH 11/13] nfsd: Use inode_or_folios_dirty() for dirtiness check in
- wait_for_concurrent_writes()
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 83/83] block: rnull: add zone offline and readonly
+ configfs files
+To: Andreas Hindborg <a.hindborg@kernel.org>,
+ "Liam R. Howlett" <liam@infradead.org>, Alice Ryhl <aliceryhl@google.com>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Boqun Feng <boqun@kernel.org>,
+ Danilo Krummrich <dakr@kernel.org>,
+ FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ Frederic Weisbecker <frederic@kernel.org>, Gary Guo <gary@garyguo.net>,
+ Jens Axboe <axboe@kernel.dk>, John Stultz <jstultz@google.com>,
+ Lorenzo Stoakes <ljs@kernel.org>, Lyude Paul <lyude@redhat.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Stephen Boyd <sboyd@kernel.org>,
+ Thomas Gleixner <tglx@kernel.org>, Trevor Gross <tmgross@umich.edu>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, rust-for-linux@vger.kernel.org
+References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
+ <20260609-rnull-v6-19-rc5-send-v2-83-82c7404542e2@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?B?5pyd5YCJ5rC05biM?= <mizuk1@mzk1.dev>
+In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-83-82c7404542e2@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by Purelymail
 
+On 2026/6/10 03:09, Andreas Hindborg wrote:
+> +        let mut cache_guard =3D tree_guard.cache_tree.lock();
+> +        let mut disk_guard =3D tree_guard.cache_tree.lock();
 
+This takes cache_tree twice; the second one should be disk_tree.
 
-On Fri, Nov 13, 2026, at 8:08 AM, Jeff Layton wrote:
-> On Fri, 2026-11-13 at 09:47 +0100, Jan Kara wrote:
->> The check for dirtiness in wait_for_concurrent_writes() is racy because
->> I_DIRTY_PAGES flag can be temporarily cleared by
->> __writeback_single_inode(). Use inode_or_folios_dirty() helper to avoid
->> that. This also makes sure inode timestamps properly persisted when
->> lazytime is enabled.
->> 
->> Signed-off-by: Jan Kara <jack@suse.cz>
->> ---
->>  fs/nfsd/vfs.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
->> index 56c49b5bc5bb..a314ca39272f 100644
->> --- a/fs/nfsd/vfs.c
->> +++ b/fs/nfsd/vfs.c
->> @@ -1249,7 +1249,7 @@ static int wait_for_concurrent_writes(struct file *file)
->>  		dprintk("nfsd: write resume %d\n", task_pid_nr(current));
->>  	}
->>  
->> -	if (inode_state_read_once(inode) & I_DIRTY) {
->> +	if (inode_or_folios_dirty(inode)) {
->>  		dprintk("nfsd: write sync %d\n", task_pid_nr(current));
->>  		err = vfs_fsync(file, 0);
->>  	}
->
-> Reviewed-by: Jeff Layton <jlayton@kernel.org>
-
-Acked-by: Chuck Lever <cel@kernel.org>
-
--- 
-Chuck Lever (Come to NFS bake-a-thon! https://nfsv4bat.org)
+Best regards,
+=E6=9C=9D=E5=80=89=E6=B0=B4=E5=B8=8C
