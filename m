@@ -1,51 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.202.193.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=216.40.44.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794590735;
-	b=f84icSHCH1VpZUW4Kvw4Gac4QmoOoA2/AZ+8QxKEKtko4Ji/yuSYPwaY4fJ7BRSwJPqn
-	 MKt1OCliKnv7m1TuSoe8WwyiZ4Iz7Q9rFlAr6sVBI31tMeZEeFXAh9E3aRwCptnvL61CX
-	 rrXSMv4vU/6LWbKwz459eL8JlrG0YoY1jGo+j0e9bX4DfkQH4kZesi3oypx3WEibRSg1A
-	 xW65B0jKdDtQzpHt/sdMm5rGHR9Jw62St5VnIdEf2ibRd+kPKnTQRi7V5YXLu5cbb/TyS
-	 +zaaaMI4TvVduwntu+j4cYzQXoYJGbjdsuWmIjGhRxFZZ9cUZn17N1IN8b+x8PFzdDg==
+	t=1794591416;
+	b=D+u6RmLKZvpbQlQ5B8nSmz6lgF10xyzovNP/qpDT0o4lNERVO/a+Swe1sOlQQDu/WvpM
+	 JjmjVVchZxeuR/3A4Te8/rx+7iNQx/vBL9DNgxlgyDBq5srVmeTsy7UvlnOVbyGkeOtTe
+	 pkGyvT3P3ainE0264WlOQT6QDw6MKGQe6zz/Jn17G9Q9Im3vkANxecuynsaYkc/U4rWDT
+	 Hfj6xnuvFU8Eyzw1icSyI35bh8esob99aL8/ncrj6szvvbDam3jGxO8i1OuRVvhkqU0r+
+	 A4317Vm7RNEgft5b6GGLwKR6gpDHHgXW69h4At9e9RywR/gVfeeqRcqLC0MDPuWea0Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794590735;
-	h=DMARC-Filter:DKIM-Signature:DKIM-Signature:Feedback-ID:
-	 X-Pm-Original-To:Received:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-MIME-Autoconverted;
-	bh=v5VCnw1Fvtd/Gip4papkzUmc4LWV8dOqyxkMmZU8NKA=;
-	b=CtW0cINWT1hz50vjPmlrBSXxlHz7pvoLfYWY8qN66PXu75MGsdi3JI+slgd6nBOnm/BT
-	 8ADHMvrezv4PMeNPAhS4cdFM/pcD8DATCNNH3SROe9Z/fdNERw7zklmV6ctiGVnHBGR4O
-	 +tLrcWjOxPyU756bdWWZrKNjNAxsS33k98wo7hCoRcoHmnr4F1ox2Ht/Cp+apyhm2XXEF
-	 dgvycFP8wX6QBNSUffIW9rrRxY1ATWu8OFVjLv+7EiJkJ6LAA3SbpmZDV39cKgSDjfdFn
-	 mp5k1BgnSm5QQuc6Mxk9KL4T7FGXexLmZjevQ/kCbZvqa32ckAmJeP1mbHRLZ4Xh+ZQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794591416;
+	h=DMARC-Filter:Received:Received:Date:From:To:Cc:Subject:Message-ID:
+	 In-Reply-To:References:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-Spam-Status:X-Rspamd-Server:
+	 X-Stat-Signature:X-Rspamd-Queue-Id:X-Session-Marker:X-Session-ID:
+	 DKIM-Signature:X-HE-Tag:X-HE-Meta;
+	bh=LQiCIvonuLx8A220NEYPOfjw1OhsHbpg/4uyaQR8I7o=;
+	b=OUhuDP5WzQNBggzbtJQMlbB6EXwIT9HpyM+307ut7MS8a17cULaIJnSUsJLn750klROH
+	 l5IZwQ7JsvaIKX48fgz7kGweFpDcOtcyONABzsob586F8Ff570cd2H8IG4ukBaDi5r2Zk
+	 uUwGRcexHL0RExFU1gTpnB1oBg+LquNDERvRPZyt8hUvXm2UIJqu10j/XtIncrYpVpA+z
+	 F6Sf5wAbGTlGOc2Tu6jcpLWj1kiTpe8f9tYiatRlGBTHwWdqM4Ugxe6YiLAZC9nnb+yA+
+	 jjzkK7k5+6VZFyhJKHWWmwesp1G1TdLZbv+oJKWL4VN6yLPqq90B093i7wj66dq7qoA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=mzk1.dev;
-	spf=pass smtp.mailfrom=mzk1.dev;
-	dkim=pass header.d=mzk1.dev header.i=@mzk1.dev header.a=rsa-sha256 header.s=purelymail1 header.b=V9KuuWcN;
-	dkim=pass header.d=purelymail.com header.i=@purelymail.com header.a=rsa-sha256 header.s=purelymail1 header.b=oBQ+mx6w;
-	arc=none smtp.remote-ip=34.202.193.197
-Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
+	dmarc=pass header.from=goodmis.org;
+	spf=pass smtp.mailfrom=goodmis.org;
+	dkim=pass header.d=goodmis.org header.i=@goodmis.org header.a=rsa-sha256 header.s=dkim1 header.b=vQfFN0Dz;
+	arc=none smtp.remote-ip=216.40.44.11
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00B8607A5FC
-	for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 17:25:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C00B8607A5FC
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mzk1.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mzk1.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39FE6079D79;
+	Fri, 13 Nov 2026 17:36:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E39FE6079D79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=mzk1.dev header.i=@mzk1.dev header.a=rsa-sha256 header.s=purelymail1 header.b=V9KuuWcN;
-	dkim=pass (2048-bit key, unprotected) header.d=purelymail.com header.i=@purelymail.com header.a=rsa-sha256 header.s=purelymail1 header.b=oBQ+mx6w
-DKIM-Signature: a=rsa-sha256; b=V9KuuWcNuAVuhSLxrM/zeH0iiGGKN10vfTI0UZhwRvvAXLJHa//5AtkMwwsG3gCGAovoNsfB6hpYEgc8leoXQUGc3/8p26yo2AbMKr4N8FW/LOA31BXHMALHMZndryJ2bRblSLKlBru7/L/NZbQLm8yERMaTSjveV29YKeCTjzf+qjX7/x6JEcIHE9QwVm3ZDkAZS7rWi8D/Qznheaq0uy5AgjiKPmroDRTyP9YEz18ufg+fiHWGBH7IAOQ17MbVpb87Se1RL/+ZtlaB87gz6kg6Ds4oy7V6p30VvgaGUuylpVDc7+iuQMOhq16oi1WZpPlYZWcX3X7mn//U+cIbng==; s=purelymail1; d=mzk1.dev; v=1; bh=ynwczMvkRVmR6wZnOkUfy2B4rEh3V7zlSMQ4smUy/aE=; h=Received:Message-ID:Date:Subject:To:From;
-DKIM-Signature: a=rsa-sha256; b=oBQ+mx6wIpb4CdkjkexxCs/iwcIZEOxTo+I8V5tlwLba+APf1rElu5WKFdEKmnjGvdpqlSSej2wWvTauBnYzXLqM79/MZEufKvzA6xs0v2VZuhX2FXil5DWPzI50R7Q4u5YpNMBA/h6LC4P0SI8GTn0zm4nKzUZGXswVt1cLxlg+thzmy3PEVlJFZO3hbOq1K1U1ODu2dVfCz02GpjItX7O58AXnyF2ClmSKz3YSxMxXvMH5ARUVFy1NZztWH/HAPKhtjeu0PrnjzJXt2JyRVzidyuPZ+E5JjJIWM0tfmotnFkx1WINmVcIJWMovcO0H/GvvKj2+JeSXvK6QXkbvUw==; s=purelymail1; d=purelymail.com; v=1; bh=ynwczMvkRVmR6wZnOkUfy2B4rEh3V7zlSMQ4smUy/aE=; h=Feedback-ID:Received:Message-ID:Date:Subject:To:From;
-Feedback-ID: 1682458:65466:null:purelymail
-X-Pm-Original-To: linux-block@vger.kernel.org
-Authentication-Results: purelymail.com; auth=pass
-Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 2110463954;
-          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Fri, 13 Nov 2026 17:24:17 +0000 (UTC)
-Message-ID: <3246e50d-2489-4a79-8a72-550bd90fbd90@mzk1.dev>
-Date: Sat, 14 Nov 2026 01:24:08 +0800
+	dkim=pass (1024-bit key, unprotected) header.d=goodmis.org header.i=@goodmis.org header.a=rsa-sha256 header.s=dkim1 header.b=vQfFN0Dz
+Received: from omf16.hostedemail.com (lb01a-stub [10.200.18.249])
+	by unirelay07.hostedemail.com (Postfix) with ESMTP id 4DA96160293;
+	Fri, 13 Nov 2026 17:36:47 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf16.hostedemail.com (Postfix) with ESMTPA id 3C77620013;
+	Fri, 13 Nov 2026 17:36:45 +0000 (UTC)
+Date: Fri, 13 Nov 2026 12:36:39 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Tahera Fahimi <taherafahimi@linux.microsoft.com>
+Cc: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Yaxiong Tian
+ <tianyaxiong@kylinos.cn>, axboe@kernel.dk, mathieu.desnoyers@efficios.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 0/3] Tracing: Accelerate Kernel Boot by
+ Asynchronizing
+Message-ID: <20261113123639.1c014478@gandalf.local.home>
+In-Reply-To: <avYiC0Csf45o44CQ@vm-dev.d0aziqou4eyuzblxqhi51nu2sc.xx.internal.cloudapp.net>
+References: <20260204015103.155025-1-tianyaxiong@kylinos.cn>
+	<20260204191552.881a00764093cf63557a372a@kernel.org>
+	<20260206152511.41782db1@gandalf.local.home>
+	<avYiC0Csf45o44CQ@vm-dev.d0aziqou4eyuzblxqhi51nu2sc.xx.internal.cloudapp.net>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -55,37 +65,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 83/83] block: rnull: add zone offline and readonly
- configfs files
-To: Andreas Hindborg <a.hindborg@kernel.org>,
- "Liam R. Howlett" <liam@infradead.org>, Alice Ryhl <aliceryhl@google.com>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Boqun Feng <boqun@kernel.org>,
- Danilo Krummrich <dakr@kernel.org>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Frederic Weisbecker <frederic@kernel.org>, Gary Guo <gary@garyguo.net>,
- Jens Axboe <axboe@kernel.dk>, John Stultz <jstultz@google.com>,
- Lorenzo Stoakes <ljs@kernel.org>, Lyude Paul <lyude@redhat.com>,
- Miguel Ojeda <ojeda@kernel.org>, Stephen Boyd <sboyd@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>, Trevor Gross <tmgross@umich.edu>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, rust-for-linux@vger.kernel.org
-References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
- <20260609-rnull-v6-19-rc5-send-v2-83-82c7404542e2@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?B?5pyd5YCJ5rC05biM?= <mizuk1@mzk1.dev>
-In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-83-82c7404542e2@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by Purelymail
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Server: rspamout06
+X-Stat-Signature: wq41m8hqon5hnrrodestcu99stsj7nrr
+X-Rspamd-Queue-Id: 3C77620013
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19ylmP1ak2tkDT7FvdGPbP5uW0RhH9pqu4=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=goodmis.org; h=date:from:to:cc:subject:message-id:in-reply-to:references:mime-version:content-type:content-transfer-encoding; s=dkim1; bh=LQiCIvonuLx8A220NEYPOfjw1OhsHbpg/4uyaQR8I7o=; b=vQfFN0DzJvcUWnImL7rjiativNqgZwosel7ruGW1Y5os1Qp8Eod0DcP4HEPj6BeV5yn993g0UOHEiTlilUYD/UbQWBFMCHDmvzvx9oUUQSScMMGw1AkQEH4CAuhfuSNF97Hq4vcc1rgsRjmKSf6/m7IBqFySRkW0kfNSDojrRew=
+X-HE-Tag: 1794591405-292952
+X-HE-Meta: U2FsdGVkX19CIcf+vibfiCDVNnrOn6Q61iRgCn9nVowSUXmxZzXsha4XyNgpzcaP7CiNHwwS5skg60gjt49GyTQhLydTQ3JRzyUUSOhyWWVi82d3WLKRBGCz6O3PTJV84Y4tr08Wn7ox1vu738gNh8QEH602Nlf3A6cblyl77ntupz/J0evdq1OfXiMEUK0c5oXKpLpTxNUOHYPw64eGDMqSsgFkSWSwFw8eoGtbbPClrXzNSUhnaEOaPMlzue/t1FZZtNO8txh4sb1n30HPOIgyt6olCOLWLJ9/egZuyO9wis2BJ/MEo3BOpxKmjNV2JNKpl+2ymWmBUmwAIaZogkG/R2cpJ2ru5lWFIs8LyOvfoUGWL/qn1g==
 
-On 2026/6/10 03:09, Andreas Hindborg wrote:
-> +        let mut cache_guard =3D tree_guard.cache_tree.lock();
-> +        let mut disk_guard =3D tree_guard.cache_tree.lock();
+On Thu, 12 Nov 2026 13:31:07 -0700
+Tahera Fahimi <taherafahimi@linux.microsoft.com> wrote:
 
-This takes cache_tree twice; the second one should be disk_tree.
+> > > Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>  
+> Hello all,
+> 
+> Following up on this series, I am evaluating the series on x86_64, with base kernel 6.1.192 and I
+> see boot time improvement.
+> 
+> > Thanks, I'll add this to tracing/core.  
+> Steve, would this series be suitable for queueing for an upcoming merge window?
 
-Best regards,
-=E6=9C=9D=E5=80=89=E6=B0=B4=E5=B8=8C
+Yeah, I'm working on it. With the AI bug fix explosion, I got buried and
+fell behind. I'm trying to triage all the patches I have, which is over 160 :-p
+
+But it's not forgotten.
+
+-- Steve
