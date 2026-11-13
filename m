@@ -1,52 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794565851;
-	b=EoLqF5h+/TK90K6m6JJxb8ENDZ4NuT5omC9GzYIVyy6pehBkvz9zkIFWRRn8UywbX67z
-	 3chHNy6ik1FkUakb2n3DO97yMXV1cIU2dUScTtrp7N7pqqP05AFS43jjIYSORwc8kOqwK
-	 Ny1XCPe3ICJdZxt0YQb8j2YqRutSb1d5EYXrkd1grlSBtE5I7x17f8NFsVNtO2AJzqd52
-	 JkBwPpJ4QSdxw+X648XMoFseVnfg3hqyT86glnnrK4uiNJd+mfCtB/OZiS1n/y9pnHIqO
-	 cyl9x9C/7BvWBrLjL6tYwCElL2bnT7Y1M3FBZVMjGd5bGq9I/LpyQhyckiV5lvbyA/g==
+	t=1794565883;
+	b=VqVMGP2BLOcsM3yezWH1Nx8DauWzwnLeXM8Fe3bR3AkjS1RBOEsdcFRQqAj9xvxkwThK
+	 R11LGzGENOWMoAScthMsUqfc0WKB7Wd+3v8Y5L2mudgIcri8VvqxF5c2lrWNsUbMnZ0Qv
+	 EePnZYXAGILsA8zlrUFl/lDE6mkfJfq+T0zsZZ6hzohuvL39VfQWNxG5Yl6wpx1rZZFbO
+	 QmSWwjdagcxXnpYksfepvYOq+TQ2v8bL9leB1A9t/ZfvMoG/MvxGcJ2XOj21WOA2bv7SS
+	 pQu0omj2iy5Ona3iP+HftP/PGY3pKGm+7wnHovtmxCm6dzZuaZcA93sHCstCKyCf1nw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794565851;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794565883;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer;
-	bh=YVyO34/+vwkp8pkrCOkfsJrmVw+ShcRwN5uH3EK9AOQ=;
-	b=vwAZpR8VQu7DG81aZSk0ZVmXmKKD5cT3p0DQUBWHH48tsJT3MUna5BfIZdfYnJJ5ocEq
-	 3+PAoObwuFgSwcQ5Sv473B+u3qQr6sn5TwB6wBJiL1QiMbK4RSmG3psSr+ZTgJJ/CHGbZ
-	 ZDgzZBwsET/jWEQwCsR0zzyjR98KHk8Kmop6Rbj3eHij1yIT3q5xtwz3n31u+tpprX941
-	 +0ZJdLzGtn1FIie07LUnCarGqxYcSKac575mWa9kIymquxAFfa+MSTUEhKvXHMHPUK+Xo
-	 5r8fw1tf/ZI8tFZruhitWrZ/uFD95FN8g/26U/lkv+/MBhJkqgX7sDFUQcP/9DyePdA==
+	bh=MhfgKwbasrCVcesvtSIzmyPCwlK0O+X4pOMtLALs5hM=;
+	b=CeJjFBe9INAHLdqn3/RAGvuyPsdTDGmD+x9dlUA/aORszV4MsTFB+Z02zFfkupKBEe3h
+	 mdGbJh+PabsKBBlY7/DXmM/oqx01GxXNKKsYd7cXC4687pjyh4skaeunlAEJVUBALXAoJ
+	 ADYwGtuai7l8KUPYGmf9XJ5Jjp/Ycde5XSQVQonmbsxwUR69njTHoqOHZlYC9c/gSsyO9
+	 HEylKBP6MC8h/v1lQTI+zHk5DdFjAHJYW9XHw16eSrWYuCY2sqQ1RQeFIzm0OU4cw+VZS
+	 2l4cejFzPsD5JcnodQvN8oy7Dgybg+q45L0VCUOm9WLEmnruAtJriH+n5d37n/QHS+g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LtqXe8qJ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QZ0nGwjw;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DAE606A31C;
-	Fri, 13 Nov 2026 10:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348B0606A33B;
+	Fri, 13 Nov 2026 10:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LtqXe8qJ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B041F000C4;
-	Fri, 13 Nov 2026 10:30:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QZ0nGwjw
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E59E1F000C4;
+	Fri, 13 Nov 2026 10:31:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794565850;
-	bh=YVyO34/+vwkp8pkrCOkfsJrmVw+ShcRwN5uH3EK9AOQ=;
+	s=k20260515; t=1794565883;
+	bh=MhfgKwbasrCVcesvtSIzmyPCwlK0O+X4pOMtLALs5hM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LtqXe8qJjoCs6EgAPAbRpq91b52a2VyeQM1Gmbh1aszCIQsHw90zu2II0XhvZBVPf
-	 MYe4sCeWsUIT4Qk1u+8y141B9pvooL1UVPFd4jVeuj583/dWSS0d8wIZXTRqeo8Cmr
-	 jX0clMTXPzsOgqjpxbfc1oq46h+KocQFM3MQ934rxvl7SR7DdRoDmc6Oxb3/xmKe2C
-	 wl8K8UDU/hOCVkeESaZt2xwyECXACM3PlylmDK3o568qfqNsFmFKM3uzFK4Va3DPl2
-	 ljQeGJWVYW2W0/PMV9BcmlO9j3pNwLvEEUbnzib0+EcpdDyUPufXUZKKoMr92Uz2ED
-	 0eedJIL8aZeJQ==
-Date: Fri, 13 Nov 2026 11:30:34 +0100
+	b=QZ0nGwjwbFT5/0UqQlQOqloIqVpmJQtyPKbypXiHH4u9UmV35jhvS0moU8HiPhERK
+	 OYtkqSX92q69Km9I4E8xNYYOMsxYyYzOmXoSgwzTwneQy18R5aX22/n969sGiVNwUL
+	 6SUjKYMS3YUWhkS730JAWOH945Y/h8aFp/ldtTYn9DZ7LL5i9bkSEEiu0YEONnjq3D
+	 xBjU3Kng985IW7lsgwiiD5Yt8IncJNsiU+zlT2ZFITzjjNszvDT0Fj1S2FOGNp1Y+p
+	 NHoypfS8qMH5/GUnYxyMB7mSIDnAR6qBjDTfSdABUy8fdWSXOA2F2oVUD+QatOiZtK
+	 wJ1580x/47tmQ==
+Date: Fri, 13 Nov 2026 11:31:17 +0100
 From: Daniel Gomez <da.gomez@kernel.org>
 To: Arthur Simchaev <arthur.simchaev@sandisk.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, Andres Freund <andres@anarazel.de>, Pankaj Raghav <pankaj.raghav@linux.dev>, GOST <gost.dev@samsung.com>, Daniel Gomez <da.gomez@samsung.com>, Avi.Shchislowski@sandisk.com, Alex.Lemberg@sandisk.com
-Subject: Re: [PATCH RFC 1/2] block: add BLK_FEAT_ATOMIC_WRITE_MULTI
-Message-ID: <20261113103711.1-da.gomez@kernel.org>
-In-Reply-To: <20261103093849.203851-1-arthur.simchaev@sandisk.com>
-References: <20260929-nvme-mam-v1-1-48dcbe79cece@samsung.com> <20261103093849.203851-1-arthur.simchaev@sandisk.com>
+Subject: Re: [PATCH RFC 2/2] nvme: enable multiple atomicity mode
+Message-ID: <20261113104220.2-da.gomez@kernel.org>
+In-Reply-To: <20261103093856.203861-1-arthur.simchaev@sandisk.com>
+References: <20260929-nvme-mam-v1-2-48dcbe79cece@samsung.com> <20261103093856.203861-1-arthur.simchaev@sandisk.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -61,36 +61,68 @@ X-Mailer: lorebird
 
 
 
-On 2026-11-03T11:38:49+02:00, Arthur Simchaev <arthur.simchaev@sandisk.com> wrote:
-> On Tue, Sep 29, 2026 at 01:17:11PM +0200, Daniel Gomez wrote:
+On 2026-11-03T11:38:56+02:00, Arthur Simchaev <arthur.simchaev@sandisk.com> wrote:
+> On Tue, Sep 29, 2026 at 01:17:12PM +0200, Daniel Gomez wrote:
 > [...]
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index d003a9d2d1f6c..92efd4ff67f26 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -360,6 +360,9 @@ typedef unsigned int __bitwise blk_features_t;
-> >  #define BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE \
-> >  	((__force blk_features_t)(1u << 15))
+> > @@ -993,6 +993,9 @@ static bool nvme_valid_atomic_write(struct request *req)
+> >  	struct request_queue *q = req->q;
+> >  	u32 boundary_bytes = queue_atomic_write_boundary_bytes(q);
 > >  
-> > +/* device writes each atomic write boundary window of a command atomically */
-> > +#define BLK_FEAT_ATOMIC_WRITE_MULTI	((__force blk_features_t)(1u << 16))
+> > +	if (q->limits.features & BLK_FEAT_ATOMIC_WRITE_MULTI)
+> > +		return true;
+> > +
 >
-> With this flag set, a request with REQ_ATOMIC may now carry several independent
-> atomic writes rather than one. Code that looks at REQ_ATOMIC on a request (e.g.
-> blk_insert_cloned_request(), or a future SCSI WRITE ATOMIC user) needs to know
-> that. Could the comment here (or Documentation/block/) spell out what REQ_ATOMIC
-> means on a merged request, and what a driver must guarantee before setting the
-> flag?
+> With the flag set this skips all checks. Since each REQ_ATOMIC bio carries
+> exactly one RWF_ATOMIC write (blkdev and iomap reject atomic writes that need
+> more than one bio), could it instead check every bio of the merged request with
+> __rq_for_each_bio(), using the existing size and boundary checks? That would
+> keep the safety net described in the comment above the function, at the cost of
+> a few comparisons per bio.
 
-Makes sense. I'll update accordingly on both places.
+I don't think this is really necessary in NVMe. But I agree with the
+suggestion to honor the request and potentially other drivers that may
+be more strict.
 
 >
-> It might also be useful to expose the feature in sysfs next to the other
-> atomic_write_* attributes, so users can tell whether merging across boundaries
-> is active on a device.
+> [...]
+> > +static bool nvme_mam_compliant(struct nvme_id_ns *id)
+> > +{
+> > +	if (id->nabspf != id->nawupf)
+> > +		return false;
+> > +	if (id->nabsn && id->nabsn != id->nabspf)
+> > +		return false;
+> > +	if (id->nawun && id->nawun != id->nawupf)
+> > +		return false;
+> > +	return true;
+> > +}
+>
+> This deliberately accepts NABSN == 0 and NAWUN == 0. I assume this is because
+> Linux only uses the power-fail values (NAWUPF/NABSPF) for atomic writes? If so,
 
-TBH, I was initially hesitant with the idea of adding another attribute.
-I'll add it and if we find it not useful we can drop it during review
-time.
+I'll work on the clarification.
+
+> a comment would help. Still, NVM Command Set 1.1 Figure 9 requires NABSN to
+> equal NAWUN (or AWUN when NAWUN is not reported) and NABSPF in MAM. NABSN == 0
+> means no boundary for normal operation while the device claims MAM, and NAWUN ==
+> 0 would need NABSN == AWUN, which the driver does not track today. Would it be
+> safer to treat both as inconsistent, as your QEMU series does?
+
+I'd need to double check this.
+
+>
+> [...]
+> > +		if (id->nsfeat & NVME_NS_FEAT_MAM) {
+> > +			if (nvme_mam_compliant(id))
+> > +				lim->features |= BLK_FEAT_ATOMIC_WRITE_MULTI;
+> > +			else
+> > +				dev_warn_once(ns->ctrl->device,
+> > +					"Inconsistent MAM parameters, ignoring\n");
+> > +		}
+>
+> Minor: dev_warn_once() uses one static flag per call site, so only the first
+> affected controller is reported. Maybe dev_warn() (this runs on namespace scan,
+> not in the I/O path), and print the four values to make the report actionable?
+
+Do we need the 4 values when users can check them out with nvme-cli?
 
 
