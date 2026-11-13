@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.248
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794553708;
-	b=3QRfqij20Z/eCZA8sbSl9HyY0unTtY9oH0pWgS54fj2IijhnkNCOv0azKgxi0Z7kpXpz
-	 61vSebb3SiZVZbQiqElSo+Yl6wCFu5ILALH6H7pOLeabvCI0FdjbY1+4MVjDxKpAZcA5G
-	 eqXSotR/K+dlNMxQg3CJAmt/2mkwLnt4TkWpyiHwcTEvzja+u5uLkxqiQq7GwCs6JwhxK
-	 hY/Zu6bODLIONorE1AdTLXmuRQFCYc60VWAK6dx79/jK0TCysq+rgbSs+p1gu+H26dhOd
-	 rhWMXMI8VosMxNql16I03vB9Sc023iOP0Yta4GFlgVPAexPpJkOukdzni3t27TT3/hQ==
+	t=1794553724;
+	b=4ihDkmtVrZUM0NdRs217iPPEmorlIl4WQON/nASNb0yonoZ2NcFleMYLVrVpbQT9AygH
+	 HqDw8CKwp9dteOAPjL95lF8pB3iQNaCcq7HEesemjXkpeh+jtbPX6i/ive13Iyh8inW0z
+	 Mu8gcsdrzpzGcLa/AJ8I2BNJ2ox4VO3kYLcQfegTq6TnVzHh744k3hwt3xD/10zAXdOlw
+	 UshOrsCz7v40FxqFt8QQlu1lbhxLkzVCl7QRDEwHf8P01sIAx6Pd8r+HBo0gCVqEkFdWS
+	 kdEcsmcbNCueF/J1RVH92+0JVEvyoyep/piyuI36po+KM5j7olyMQVXeLBoCTKOCLGw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794553708;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794553724;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=q9BgpFw0ufMu19UJTjQSwCtISl+oS7rSgMfXQF0eEZ4=;
-	b=XNi4eZXUuEWXzJr6UuYWeXU5yazg8n9MKdtQl8BfL3jupLTd2veo4cuOrpQsdWM7Y6HJ
-	 DX+rGtuGbdfaUU3ZASWUqzLKAmP+uFbMs0U38HQdtDYYXex62kIN3975ztEfeF3Iadi/D
-	 dRKZrvhIe+Oqafv8GfYkFNgXDqiaV2tqkUHjnHeFxBezy7PREphSA1BQwb69FvoNW/bgg
-	 3PhLZYI2CBJF4rWFlaqHg3rReHTpgVIf3A+ooF6FIT+x1a46/qxn+4rw9TDuGNOwpV7DY
-	 sr24xjcTzARsb7BU6tc3BbQe+ycGWBPoZK+WXcoN/Elm5GoXo+DpbHKGSQ3YGha2aoA==
+	bh=XYDjtxaf0lVfH8OsewVAiM2b9d3+k+o70NuMLB1ofvM=;
+	b=hcodq4q52m/ip/070c/1OoS7OA7Hs8hBiEaYJzT8m8EzL3w1VQzBETW9V+Du734Y8yH+
+	 3Pt1CHzVDw1I6w/Z4p22+hlU9SWkjjXQ0+2TAs803EVucYLT5F6KuYOG+JPfuH4UQqRKC
+	 XVnKo5K4S7QBYoUzkdfVo3q2Neu9kydFkPNjzkSrZE0B++3/gkk1+JE+sF80Fc6/NPvUW
+	 GdvuAU8uUTQWz24ewJfRQiIpSbUGqhnvexVLCB2VLQx5xo31Ufeq/gWuCeLARKlcYohbe
+	 p+HAw0y2usn65ahCwRDgat441LGEGEzgT5lL2eWfba2tJiokd8TF9xf4Y15k5mgtaIQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="WhsRw/By";
-	arc=none smtp.remote-ip=95.215.58.248
-Received: from mta1.migadu.com (out-248.mta1.migadu.com [95.215.58.248])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Og0Gdirg;
+	arc=none smtp.remote-ip=95.215.58.16
+Received: from mta1.migadu.com (out-16.mta1.migadu.com [95.215.58.16])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A280606A889
-	for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 07:08:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7A280606A889
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D8C606A887
+	for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 07:08:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 80D8C606A887
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=WhsRw/By
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Og0Gdirg
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=h0psyJSsZc6uejB5ctZO4cfJpptBMMcNxc+MzOps6DE=;
+DKIM-Signature: a=rsa-sha256; bh=CjYG6lLCB1BYJrLcL7BR63FCu2vQ5oxiLdcSaVMwGGM=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794553705; v=1; x=1795158505;
- b=WhsRw/Bys6a3qr/++6mehDnEgTptoGJ1Wk7R2guWx70tfM6VJQK712zDk4tYNDAafjd4Mj0G
- WYic548JofpIx196IJLioAOXGR6F9mevuC22WZxUDQbIWbBPxaO0Z39KA4zwYr/i6G/7OJOysxM
- XZwT0WAY7u/5JT5Ay9cajaHY=
+ t=1794553721; v=1; x=1795158521;
+ b=Og0GdirgiW0AJtxt7oGJ07VLbw8+sRWSKE2NEOI4lZcL7S4iJoMFw1LSb2a+qpOS8krcn8Ek
+ BcDTgAG0DLCYfWO0wkYKq1Glqf6hpSpX4Bvg7zpGjw0M768W47l0FvXzSHCnhbuGRamQdrOCT3E
+ 97xeAo/3WPtOdFXdC6WMXsCM=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id c50c61e7e1cb5563;
-	Fri, 13 Nov 2026 07:08:25 +0000
-X-Mizu-Trace-ID: c50c61e7e1cb5563
+Received: by smtp.migadu.com with ESMTPS id 0eecb32ce231a7d3;
+	Fri, 13 Nov 2026 07:08:41 +0000
+X-Mizu-Trace-ID: 0eecb32ce231a7d3
 X-Migadu-Flow: FLOW_OUT
 From: Mengmeng Zhao <mengmeng.zhao@linux.dev>
 To: Christoph Hellwig <hch@lst.de>,
@@ -82,9 +82,9 @@ Cc: linux-block@vger.kernel.org,
 	linaro-mm-sig@lists.linaro.org,
 	Li Wang <liwang@kylinos.cn>,
 	Mengmeng Zhao <zhaomengmeng@kylinos.cn>
-Subject: [RFC PATCH v2 6/8] fs: add FMODE_CAN_DMABUF_IO and require it for dma-buf I/O contexts
-Date: Fri, 13 Nov 2026 15:06:19 +0800
-Message-ID: <20261113070621.273953-7-mengmeng.zhao@linux.dev>
+Subject: [RFC PATCH v2 7/8] dax: refuse dma-buf iterators in dax_iomap_rw()
+Date: Fri, 13 Nov 2026 15:06:20 +0800
+Message-ID: <20261113070621.273953-8-mengmeng.zhao@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261113070621.273953-1-mengmeng.zhao@linux.dev>
 References: <20261113070621.273953-1-mengmeng.zhao@linux.dev>
@@ -101,143 +101,32 @@ Content-Transfer-Encoding: 8bit
 
 From: Mengmeng Zhao <zhaomengmeng@kylinos.cn>
 
-Add a file mode bit for files that can be the target of dma-buf I/O and
-require it when a buffer is registered.  Block device files set it when
-the backing disk supports dma-buf I/O, and filesystems can set it for
-inodes whose data can be reached without the page cache.  The bit is
-coarse: a driver that installs ->init_dma_buf_io_ctx for every
-namespace, like nvme, still decides per device at registration.
-
-dma_buf_io_ctx_create() is the only caller of ->init_dma_buf_io_ctx, so
-the capability and the O_DIRECT requirement are checked there for every
-file type rather than in each helper; O_DIRECT belongs at registration
-because F_SETFL can change it afterwards.  Add bdev_can_dmabuf_io() so
-the open-time and registration checks share one predicate.
+DAX copies data through the CPU, so a dma-buf iterator has no meaning
+in the DAX I/O path and must be refused.  A DAX inode does not get
+FMODE_CAN_DMABUF_IO at open time, but DAX can be enabled later, so
+check per I/O.
 
 Signed-off-by: Mengmeng Zhao <zhaomengmeng@kylinos.cn>
 Signed-off-by: Li Wang <liwang@kylinos.cn>
 ---
- block/bdev.c                 |  8 ++++----
- block/fops.c                 |  2 +-
- drivers/dma-buf/dma-buf-io.c | 13 +++++++++----
- include/linux/blkdev.h       |  7 ++++++-
- include/linux/fs.h           |  8 +++++++-
- 5 files changed, 27 insertions(+), 11 deletions(-)
+ fs/dax.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 88e3f552f5d4..4e7a7f7e1e8b 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -61,14 +61,12 @@ struct block_device *file_bdev(struct file *bdev_file)
- }
- EXPORT_SYMBOL(file_bdev);
+diff --git a/fs/dax.c b/fs/dax.c
+index 94ba41273347..84d24db5ed35 100644
+--- a/fs/dax.c
++++ b/fs/dax.c
+@@ -1752,6 +1752,10 @@ dax_iomap_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 	if (!iomi.len)
+ 		return 0;
  
--int bdev_init_dma_buf_io_ctx(struct file *file, struct block_device *bdev,
-+int bdev_init_dma_buf_io_ctx(struct block_device *bdev,
- 			     struct dma_buf_io_ctx *ctx)
- {
--	if (!(file->f_flags & O_DIRECT))
--		return -EINVAL;
- 	if (ctx->dmabuf->size > UINT_MAX)
- 		return -EINVAL;
--	if (!bdev->bd_disk->fops->init_dma_buf_io_ctx)
-+	if (!bdev_can_dmabuf_io(bdev))
- 		return -EOPNOTSUPP;
- 	return bdev->bd_disk->fops->init_dma_buf_io_ctx(bdev, ctx);
- }
-@@ -1041,6 +1039,8 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
- 
- 	bdev_file->f_flags |= O_LARGEFILE;
- 	bdev_file->f_mode |= FMODE_CAN_ODIRECT;
-+	if (bdev_can_dmabuf_io(bdev))
-+		bdev_file->f_mode |= FMODE_CAN_DMABUF_IO;
- 	if (bdev_nowait(bdev))
- 		bdev_file->f_mode |= FMODE_NOWAIT;
- 	if (mode & BLK_OPEN_RESTRICT_WRITES)
-diff --git a/block/fops.c b/block/fops.c
-index 86bf1f298b79..7e5702e047a2 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -1008,7 +1008,7 @@ static int blkdev_mmap_prepare(struct vm_area_desc *desc)
- static int blkdev_init_dma_buf_io_ctx(struct file *file,
- 				      struct dma_buf_io_ctx *ctx)
- {
--	return bdev_init_dma_buf_io_ctx(file, file_bdev(file), ctx);
-+	return bdev_init_dma_buf_io_ctx(file_bdev(file), ctx);
- }
- 
- const struct file_operations def_blk_fops = {
-diff --git a/drivers/dma-buf/dma-buf-io.c b/drivers/dma-buf/dma-buf-io.c
-index 8440151de860..9575b7d65ec5 100644
---- a/drivers/dma-buf/dma-buf-io.c
-+++ b/drivers/dma-buf/dma-buf-io.c
-@@ -152,9 +152,11 @@ static void dma_buf_io_ctx_shutdown(struct dma_buf_io_ctx *ctx)
-  * @out_ctx:	[out]	resulting ctx
-  *
-  * Create a new I/O context from the given DMA buffer for the given file.
-- * It only works with files implementing ->init_dma_buf_io_ctx and fails
-- * with -EOPNOTSUPP otherwise. Once created, the user can create a map
-- * and use it to issue I/O, such as read/write requests, to @file.
-+ * It only works with files implementing ->init_dma_buf_io_ctx,
-+ * advertising FMODE_CAN_DMABUF_IO and currently opened for direct I/O,
-+ * and fails with -EOPNOTSUPP or -EINVAL otherwise. Once created, the
-+ * user can create a map and use it to issue I/O, such as read/write
-+ * requests, to @file.
-  */
- int dma_buf_io_ctx_create(struct file *file,
- 			   struct dma_buf *dmabuf,
-@@ -164,8 +166,11 @@ int dma_buf_io_ctx_create(struct file *file,
- 	struct dma_buf_io_ctx *ctx;
- 	int ret;
- 
--	if (!file->f_op->init_dma_buf_io_ctx)
-+	if (!file->f_op->init_dma_buf_io_ctx ||
-+	    !(file->f_mode & FMODE_CAN_DMABUF_IO))
- 		return -EOPNOTSUPP;
-+	if (!(file->f_flags & O_DIRECT))
-+		return -EINVAL;
- 
- 	ctx = kzalloc_obj(*ctx);
- 	if (!ctx)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index b98f43478cc0..0cfb6fb6b4e2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1610,9 +1610,14 @@ struct block_device_operations {
- 	int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
- };
- 
--int bdev_init_dma_buf_io_ctx(struct file *file, struct block_device *bdev,
-+int bdev_init_dma_buf_io_ctx(struct block_device *bdev,
- 			     struct dma_buf_io_ctx *ctx);
- 
-+static inline bool bdev_can_dmabuf_io(struct block_device *bdev)
-+{
-+	return !!bdev->bd_disk->fops->init_dma_buf_io_ctx;
-+}
++	/* a dma-buf iterator has no CPU-visible pages to copy through */
++	if (iov_iter_is_dmabuf_map(iter))
++		return -EOPNOTSUPP;
 +
- #ifdef CONFIG_COMPAT
- extern int blkdev_compat_ptr_ioctl(struct block_device *, blk_mode_t,
- 				      unsigned int, unsigned long);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 99caef43ff3c..f5524fc770d4 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -121,7 +121,13 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- /* File supports atomic writes */
- #define FMODE_CAN_ATOMIC_WRITE	((__force fmode_t)(1 << 7))
- 
--/* FMODE_* bit 8 */
-+/*
-+ * File can be the target of dma-buf I/O.  Set it for files whose data can be
-+ * reached with direct I/O without the page cache: a dma-buf iterator has no
-+ * pages to copy, so a buffered path cannot serve it.  The bit is coarse; both
-+ * the device behind it and O_DIRECT are checked when a buffer is registered.
-+ */
-+#define FMODE_CAN_DMABUF_IO	((__force fmode_t)(1 << 8))
- 
- /* 32bit hashes as llseek() offset (for directories) */
- #define FMODE_32BITHASH         ((__force fmode_t)(1 << 9))
+ 	if (iov_iter_rw(iter) == WRITE) {
+ 		lockdep_assert_held_write(&iomi.inode->i_rwsem);
+ 		iomi.flags |= IOMAP_WRITE;
 -- 
 2.43.0
 
