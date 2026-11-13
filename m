@@ -1,58 +1,105 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794570848;
-	b=A6XjidinAGt46vlxgOlnk0JeYlhCwcOZ8vnKq9N1lMK7OxVAi6bCYLEdBNPNkX1v483n
-	 b8lXCDsKvFTINdmTzWS+481PFmnTl8SfM8ULHPyzNtsZ/EAZ9xtcpvq/G/c8Fwy5F+pRn
-	 MWufqp359gjM/lb8QQOzFNme11VrIWA1MiJX5rcP0ykmIdw+BLXKNFkkIMBPRGIejjPr0
-	 Co1zxNiOlUiBWN0CT1Kt3sub1Ft+5FspkE/zNo6xofdoj6Vj0CAhUnQ+9tiMwh6+ek1OI
-	 IvSkoera5B139Scmzj1t8TgQXym/jK52YTpyhq1fs9hu7Yo/3tYU+iK+5HmceXK4cHQ==
+	t=1794571015;
+	b=IkgpWaNdq3etpMIsGbTQ7GMrsbVm8OBYtar4J3x4voNaOUNP//0dZipw4msJKl3UgYiY
+	 AtE9cjSsWyPzPuZSY8qwRX6YD019+5EOhbAtff5f/d7HB14PqXMM5F3cwuKqJ7o/0+mWg
+	 5mU+rkgyx2PzfrWzRQ3mOdkiSlMItdM0hnj5sAcxkMKt2iGBnfH3iLTt4LUG5Tnp+TAZY
+	 jhDVoe+GhlKIWSC9K5wILOpy5oAxOppQaiJwugBqLnUpnCRBaI/arX11nWg3xoXC8yHwd
+	 SBlD2VlsGU2WymWtvyRJ41yp852Ci2scyyPV8eHkvHcgzgjOimRQqfiewvhcCO7Hlmw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794570848;
-	h=DMARC-Filter:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Debian-User;
-	bh=G+lYotQNwdxfkBFSIeUojHCFQQyxXxiBjs1TYiuhj1w=;
-	b=nJyk4GvAlBUIvBCFLUWAmtVX6LK0oElQY+itzutIjhZ7kbYzTu1qzGI8NXMcyhS4HWtM
-	 XnDyycckevg31a+OaYCcq6QrTTecBGSEK1KCYFBQARVSB3968Ck0X8h5Xc4mZJ25Znnti
-	 BdFGWRhRAUlpc0I4yeEhi1i9HhyML+O09mKCqtdnRWNMed0CsnPX6neDosZ/CrCK+ns+G
-	 DyEPhRm5/zNxV4pL+WgVPlQN9cwcICHs9sRGu6e1hWMsC2PZ0HpuhUKPmGMbU7bgRNPJy
-	 nxOJB85HVypxCuxITjjVTRUX50w0+PAhN7IiLwlnPzqazMtotNP5bhFh0oV9qHXPgyg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794571015;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-Spamd-Result:X-Spam-Score:X-Spam-Level:X-Spam-Flag;
+	bh=MH3o4FBHHt7qDwNo2lih97+n6LSLplF5mRfnEXmEdN0=;
+	b=DpyADc8WaHxVRsL61ZA93nn96fRyjwDrS7mtoe3x+4EtpNG3dFI9ekzB2VaMYqalus6R
+	 za9fFFBVZpLqfbhY0owBUeKTWCjXHoom913u9Fgn0klZxNCbfDYDZUzFA5UpDWorLrgad
+	 T4XiPtX5ZhsLBi9dc9w1lR/ILemU8/9xr3CVidy2JIrBBtdLwNEOYgrVN85DxasLZZVxs
+	 XiWx8HZ6FWikZSs2KqK98XL0CX+D3umg1aC0CvH/xdlfC3zWE231GCY3gsy71a9CUQP5m
+	 Ue6C6ksTFFdKb6EdsKbb/G3aqfe7ph3THRrv8ptZRmlHH0NZximZBQ+tzUoOCz5SNFg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=debian.org;
-	spf=pass smtp.mailfrom=debian.org;
-	dkim=pass header.d=debian.org header.i=@debian.org header.a=rsa-sha256 header.s=smtpauto.stravinsky header.b=BOU2kMQy;
-	arc=none smtp.remote-ip=82.195.75.108
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	dmarc=none header.from=suse.cz;
+	spf=pass smtp.mailfrom=suse.cz;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b="VA/1+JbP";
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b="uawk/2nJ";
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b="VA/1+JbP";
+	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b="uawk/2nJ";
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B856606A330;
-	Fri, 13 Nov 2026 11:54:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6B856606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A37606A321;
+	Fri, 13 Nov 2026 11:56:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30A37606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.a=rsa-sha256 header.s=smtpauto.stravinsky header.b=BOU2kMQy
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=G+lYotQNwdxfkBFSIeUojHCFQQyxXxiBjs1TYiuhj1w=; b=BOU2kMQy5uNVc/B49Xl7Ih/dQr
-	wRtqRuT5bNpnGZoYrW5A95vqYGrHRnLKqynmUpZmMvPldD82eSQ1vqxJbpgAB2hWESPyP/TzFQlgb
-	Uuy6l7kWLUao0PFhVwZ2xQ6Z38yVLUZgryDHp1uzmm2e3zHaQv+LZHNyDo8JK89H2C3vAFfHw0s2P
-	zgUkmUuuqrDfeoT0IBSVBIaDnJlFpBtOUAUmLnDPArS0FrZ+ShumwR46XSmOeJSz3RljZLwvGWLx5
-	kNfEnyfKBXjklfsuTRVnMC3HTqErbxm/GetFK0zylSUQVaWABcb9Igb3oT5vaTeQa3QApr9fcMZzM
-	M2KlqBYw==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1xRpr3-00EjRl-0S;
-	Fri, 13 Nov 2026 11:54:05 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 13 Nov 2026 03:51:45 -0800
-Subject: [PATCH RFC 2/3] iov_iter: add copy_bvecs_to_iter_full()
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=VA/1+JbP;
+	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=uawk/2nJ;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=VA/1+JbP;
+	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=uawk/2nJ
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 46BE01F8C4;
+	Fri, 13 Nov 2026 11:56:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1794571013; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MH3o4FBHHt7qDwNo2lih97+n6LSLplF5mRfnEXmEdN0=;
+	b=VA/1+JbPVOVc1KGGH9pk5vRZvn0tDFaTEK3B2azqtClThQpVq0cGP5JBMFH9ZyiLsn0yCP
+	783B31vN7K6WHbABTYigDERNZK5LrTPlTZA8F9aL1M+G3GjzydoKfZ1IRyzpmYWz8T8++b
+	fTzDgESi8s1Zy8AFeomomL/APg6Ycdk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1794571013;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MH3o4FBHHt7qDwNo2lih97+n6LSLplF5mRfnEXmEdN0=;
+	b=uawk/2nJIRiwGGs3KvK4qu5WM2rAjZPUm8CjzgpMF2l5donD33xXlPpbbmtgw/6mt04fg+
+	w1QOE6jIxu2vQjDA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1794571013; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MH3o4FBHHt7qDwNo2lih97+n6LSLplF5mRfnEXmEdN0=;
+	b=VA/1+JbPVOVc1KGGH9pk5vRZvn0tDFaTEK3B2azqtClThQpVq0cGP5JBMFH9ZyiLsn0yCP
+	783B31vN7K6WHbABTYigDERNZK5LrTPlTZA8F9aL1M+G3GjzydoKfZ1IRyzpmYWz8T8++b
+	fTzDgESi8s1Zy8AFeomomL/APg6Ycdk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1794571013;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MH3o4FBHHt7qDwNo2lih97+n6LSLplF5mRfnEXmEdN0=;
+	b=uawk/2nJIRiwGGs3KvK4qu5WM2rAjZPUm8CjzgpMF2l5donD33xXlPpbbmtgw/6mt04fg+
+	w1QOE6jIxu2vQjDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1919D1344A;
+	Fri, 13 Nov 2026 11:56:53 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id r3n5OAT79mrCXAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 13 Nov 2026 11:56:53 +0000
+Received: by quack.suse.cz (Postfix, from userid 1000)
+	id 9BE8622CB5; Fri, 13 Nov 2026 12:56:48 +0100 (CET)
+Date: Fri, 13 Nov 2026 12:56:48 +0100
+From: Jan Kara <jack@suse.cz>
+To: Zhao Gongyi <zhaogongyi@bytedance.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH] loop: protect geometry changes in loop_set_status
+Message-ID: <tca2e6diwswopvmhl2qrrt2ibndzepblbubfmxmsclz76xa2wx@urytvddxmq37>
+References: <20261112075806.53821-1-zhaogongyi@bytedance.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,146 +109,293 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261113-pipe-pool-regression-smap-v1-2-b0dc69558ab3@debian.org>
-References: <20261113-pipe-pool-regression-smap-v1-0-b0dc69558ab3@debian.org>
-In-Reply-To: <20261113-pipe-pool-regression-smap-v1-0-b0dc69558ab3@debian.org>
-To: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- linux-block@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
- kernel-team@meta.com
-X-Mailer: b4 0.17-dev-ce4c1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3728; i=leitao@debian.org;
- h=from:subject:message-id; bh=U/NRLZWrctGe+2fy7wNHdm+hsE9iuqTyfUNWsdpX00I=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBq9vpOiU+J8qKVmXoilto/l5+P6XKCUpQR9lV9o
- dq7l17WpMqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCavb6TgAKCRA1o5Of/Hh3
- bfh4D/9f1DwpbTVDgHLVwxRELZ22BsB9GDWgT1det7iGn1FvNAZpBbH8Y944lUL6NxrsB6LSRdp
- VlP8VI1W/ovYZRcad9cZFUmWcE14Beo4b70qXIED6x12WkJuk3zY55MHTK7Mffs+sTEh49WVbQd
- GWd5wblRaAwMNcxzsyGnGsbRxD+Ue3RVnRVSEKJkbK+sSz6cgMHuww5tKO+EAeUY+ASfgoXgdl9
- f1ITY+Mceqt8Hzeenn0Nviz1f9QApEYoJitvqG3sJm/rBJL0HN2CcYiGI8qtflW4BFVKFZ0K67f
- WZS51LFglPdl7K+zQ5W6LK8/uGBK26eiRX75m8pqs+R3GxwadY+Csic1BBSf2v7tIu5uUS8LJDP
- LgPJ7mI9C8HVnrMCiq1QHyhflpwWJmP1wy9QtHzkFe6BzHZYkWSX6ROYamOAChKLN7Czjr5GUCI
- 98wn852rCduoN6Xd4/rVk7c95jwmhUL5iMNGp6Xw0WMCmyHUTqHynqUs5aL4eUP3ur94eaaW49G
- 7vaXelZQD49mkA6Tpxj4GpjlzyleuFCOYjet+ItfSuOVcgw+g1rWfs4Pvcx/surQNS2wtngz2SI
- n43xHf2lgqGRkanLmWhe03ll3Xa79RTiYjblhO/hLJ1PxJUb8ZWxk/hSInvS933NtUXj/CuuiKh
- dE/XlTXuZv2ZLiQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261112075806.53821-1-zhaogongyi@bytedance.com>
+X-Spamd-Result: default: False [-12.80 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	URIBL_BLOCKED(0.00)[suse.cz:email,imap1.dmz-prg2.suse.org:helo,bytedance.com:email,suse.com:email];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bytedance.com:email,imap1.dmz-prg2.suse.org:helo,suse.cz:email,suse.com:email]
+X-Spam-Score: -12.80
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-copy_page_to_iter() opens and closes a user access section for every
-page it copies to a user buffer. On x86 that is a STAC/CLAC pair per
-page, even when the caller holds a batch of pages, as anon_pipe_read()
-does, that one section could cover.
+On Thu 12-11-26 15:58:06, Zhao Gongyi wrote:
+> LOOP_SET_STATUS accepts offset and size-limit changes while a filesystem
+> is mounted on the loop device. An offset change can redirect filesystem
+> I/O to different backing-file sectors, risking data corruption. Shrinking
+> the size limit can remove sectors the filesystem still uses. A rejected
+> request to change geometry can also invalidate the block-device cache
+> before validation.
+> 
+> Validate the request before invalidation. Claim the whole loop device for
+> geometry changes, including ioctls through a partition fd, so mounted
+> sibling partitions also block the change. Keep the claim through partition
+> scanning. Leave non-geometry updates such as AUTOCLEAR available while
+> mounted.
+> 
+> Signed-off-by: Zhao Gongyi <zhaogongyi@bytedance.com>
 
-Add copy_bvecs_to_iter_full(), which copies an array of pages to an
-iov_iter like a copy_page_to_iter() loop, but all or nothing: after a
-short copy the iterator is reverted, as copy_from_iter_full() does.
+Looks good. Feel free to add:
 
-For a plain user buffer (ITER_UBUF) on architectures that provide
-unsafe_copy_user_generic(), all the copies run inside one scoped user
-write access. It keeps the usercopy fault injection and the
-instrumentation that copy_to_user_iter() does for every copy. Every
-other destination gets the copy_page_to_iter() loop.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- include/linux/uio.h |  2 ++
- lib/iov_iter.c      | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 63 insertions(+)
+								Honza
 
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 76e4103b9ec423..7ab25080b0edea 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -197,6 +197,8 @@ size_t fault_in_iov_iter_writeable(const struct iov_iter *i, size_t bytes);
- size_t iov_iter_single_seg_count(const struct iov_iter *i);
- size_t copy_page_to_iter(struct page *page, size_t offset, size_t bytes,
- 			 struct iov_iter *i);
-+bool copy_bvecs_to_iter_full(const struct bio_vec *bv, unsigned int nr,
-+			     struct iov_iter *i);
- size_t copy_page_from_iter(struct page *page, size_t offset, size_t bytes,
- 			 struct iov_iter *i);
- size_t copy_folio_from_iter_atomic(struct folio *folio, size_t offset,
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index de7a48205e0117..2df0539228be84 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -387,6 +387,67 @@ size_t copy_page_to_iter(struct page *page, size_t offset, size_t bytes,
- }
- EXPORT_SYMBOL(copy_page_to_iter);
- 
-+#ifdef unsafe_copy_user_generic
-+static bool copy_bvecs_to_ubuf_full(const struct bio_vec *bv, unsigned int nr,
-+				    struct iov_iter *i)
-+{
-+	char __user *dst = i->ubuf + i->iov_offset;
-+	size_t len = 0, off = 0;
-+	unsigned int k;
-+
-+	for (k = 0; k < nr; k++)
-+		len += bv[k].bv_len;
-+	if (len > iov_iter_count(i) || should_fail_usercopy())
-+		return false;
-+
-+	might_fault();
-+	scoped_user_write_access_size(dst, len, efault) {
-+		for (k = 0; k < nr; off += bv[k].bv_len, k++) {
-+			void *src = page_address(bv[k].bv_page) +
-+				    bv[k].bv_offset;
-+
-+			instrument_copy_to_user(dst + off, src, bv[k].bv_len);
-+			if (unsafe_copy_user_generic((__force void *)dst + off,
-+						     src, bv[k].bv_len))
-+				goto efault;
-+		}
-+	}
-+	iov_iter_advance(i, len);
-+	return true;
-+
-+efault:
-+	return false;
-+}
-+#endif
-+
-+/*
-+ * Copy the pages in @bv to @i one after the other, like copy_page_to_iter(),
-+ * but all or nothing: after a short copy @i is reverted. For a plain user
-+ * buffer the copies share one user access section where the architecture
-+ * allows it.
-+ */
-+bool copy_bvecs_to_iter_full(const struct bio_vec *bv, unsigned int nr,
-+			     struct iov_iter *i)
-+{
-+	size_t copied = 0, n;
-+	unsigned int k;
-+
-+#ifdef unsafe_copy_user_generic
-+	if (iter_is_ubuf(i))
-+		return copy_bvecs_to_ubuf_full(bv, nr, i);
-+#endif
-+	for (k = 0; k < nr; k++) {
-+		n = copy_page_to_iter(bv[k].bv_page, bv[k].bv_offset,
-+				      bv[k].bv_len, i);
-+		copied += n;
-+		if (n != bv[k].bv_len) {
-+			iov_iter_revert(i, copied);
-+			return false;
-+		}
-+	}
-+	return true;
-+}
-+
- size_t copy_page_to_iter_nofault(struct page *page, unsigned offset, size_t bytes,
- 				 struct iov_iter *i)
- {
-
+> ---
+> The earlier attempt, commit 08e136ebd193 ("loop: don't change loop device
+> under exclusive opener in loop_set_status"), claimed every status update.
+> It was reverted by commit a6abd64e145c ("loop: revert exclusive opener
+> loop status change") after a udisks unmount regression.
+> 
+> Tests:
+> - QEMU A/B: mounted whole-disk and sibling-partition geometry changes
+>   returned -EBUSY with this patch.
+> - Non-root udisksctl loop-setup/mount/unmount/loop-delete passed.
+> - A flag-only AUTOCLEAR update while mounted succeeded.
+> 
+>  drivers/block/loop.c | 89 ++++++++++++++++++++++++++++----------------
+>  1 file changed, 57 insertions(+), 32 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index a3325ceab484..d122cb008811 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -803,17 +803,7 @@ static void loop_free_idle_workers_timer(struct timer_list *timer)
+>  	return loop_free_idle_workers(lo, false);
+>  }
+>  
+> -/**
+> - * loop_set_status_from_info - configure device from loop_info
+> - * @lo: struct loop_device to configure
+> - * @info: struct loop_info64 to configure the device with
+> - *
+> - * Configures the loop device parameters according to the passed
+> - * in loop_info64 configuration.
+> - */
+> -static int
+> -loop_set_status_from_info(struct loop_device *lo,
+> -			  const struct loop_info64 *info)
+> +static int loop_validate_status_from_info(const struct loop_info64 *info)
+>  {
+>  	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
+>  		return -EINVAL;
+> @@ -835,12 +825,18 @@ loop_set_status_from_info(struct loop_device *lo,
+>  	if (info->lo_offset > LLONG_MAX || info->lo_sizelimit > LLONG_MAX)
+>  		return -EOVERFLOW;
+>  
+> +	return 0;
+> +}
+> +
+> +static void
+> +loop_set_status_from_info(struct loop_device *lo,
+> +			  const struct loop_info64 *info)
+> +{
+>  	lo->lo_offset = info->lo_offset;
+>  	lo->lo_sizelimit = info->lo_sizelimit;
+>  
+>  	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
+>  	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
+> -	return 0;
+>  }
+>  
+>  static unsigned int loop_default_blocksize(struct loop_device *lo)
+> @@ -951,9 +947,10 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+>  		goto out_unlock;
+>  	}
+>  
+> -	error = loop_set_status_from_info(lo, &config->info);
+> +	error = loop_validate_status_from_info(&config->info);
+>  	if (error)
+>  		goto out_unlock;
+> +	loop_set_status_from_info(lo, &config->info);
+>  	lo->lo_flags = config->info.lo_flags;
+>  
+>  	if (!(file->f_mode & FMODE_WRITE) || !(mode & BLK_OPEN_WRITE) ||
+> @@ -1140,24 +1137,47 @@ static int loop_clr_fd(struct loop_device *lo)
+>  }
+>  
+>  static int
+> -loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+> +loop_set_status(struct loop_device *lo, blk_mode_t mode,
+> +		struct block_device *bdev, const struct loop_info64 *info)
+>  {
+> +	struct block_device *claim_bdev = bdev_whole(bdev);
+>  	int err;
+>  	bool partscan = false;
+>  	bool size_changed = false;
+> +	bool claiming = false;
+>  	unsigned int memflags;
+>  
+> +retry:
+>  	err = mutex_lock_killable(&lo->lo_mutex);
+>  	if (err)
+> -		return err;
+> +		goto out_abort_claiming;
+>  	if (lo->lo_state != Lo_bound) {
+>  		err = -ENXIO;
+>  		goto out_unlock;
+>  	}
+>  
+> -	if (lo->lo_offset != info->lo_offset ||
+> -	    lo->lo_sizelimit != info->lo_sizelimit) {
+> -		size_changed = true;
+> +	err = loop_validate_status_from_info(info);
+> +	if (err)
+> +		goto out_unlock;
+> +
+> +	size_changed = lo->lo_offset != info->lo_offset ||
+> +		lo->lo_sizelimit != info->lo_sizelimit;
+> +	if (size_changed &&
+> +	    !((mode & BLK_OPEN_EXCL) && bdev == claim_bdev) && !claiming) {
+> +		/*
+> +		 * lo_offset and lo_sizelimit are whole-device geometry.
+> +		 * A partition fd does not own sibling partitions, so claim
+> +		 * the whole loop device before changing the mapping.
+> +		 */
+> +		mutex_unlock(&lo->lo_mutex);
+> +		err = bd_prepare_to_claim(claim_bdev, loop_set_status, NULL);
+> +		if (err)
+> +			return err;
+> +		claiming = true;
+> +		goto retry;
+> +	}
+> +
+> +	if (size_changed) {
+>  		sync_blockdev(lo->lo_device);
+>  		invalidate_bdev(lo->lo_device);
+>  	}
+> @@ -1165,9 +1185,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  	/* I/O needs to be drained before changing lo_offset or lo_sizelimit */
+>  	memflags = blk_mq_freeze_queue(lo->lo_queue);
+>  
+> -	err = loop_set_status_from_info(lo, info);
+> -	if (err)
+> -		goto out_unfreeze;
+> +	loop_set_status_from_info(lo, info);
+>  
+>  	partscan = !(lo->lo_flags & LO_FLAGS_PARTSCAN) &&
+>  		(info->lo_flags & LO_FLAGS_PARTSCAN);
+> @@ -1178,7 +1196,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  	/* update the direct I/O flag if lo_offset changed */
+>  	loop_update_dio(lo);
+>  
+> -out_unfreeze:
+>  	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+>  	if (partscan)
+>  		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+> @@ -1190,6 +1207,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  	mutex_unlock(&lo->lo_mutex);
+>  	if (partscan)
+>  		loop_reread_partitions(lo);
+> +out_abort_claiming:
+> +	if (claiming)
+> +		bd_abort_claiming(claim_bdev, loop_set_status);
+>  
+>  	return err;
+>  }
+> @@ -1267,7 +1287,9 @@ loop_info64_to_old(const struct loop_info64 *info64, struct loop_info *info)
+>  }
+>  
+>  static int
+> -loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
+> +loop_set_status_old(struct loop_device *lo, blk_mode_t mode,
+> +		    struct block_device *bdev,
+> +		    const struct loop_info __user *arg)
+>  {
+>  	struct loop_info info;
+>  	struct loop_info64 info64;
+> @@ -1275,17 +1297,19 @@ loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
+>  	if (copy_from_user(&info, arg, sizeof (struct loop_info)))
+>  		return -EFAULT;
+>  	loop_info64_from_old(&info, &info64);
+> -	return loop_set_status(lo, &info64);
+> +	return loop_set_status(lo, mode, bdev, &info64);
+>  }
+>  
+>  static int
+> -loop_set_status64(struct loop_device *lo, const struct loop_info64 __user *arg)
+> +loop_set_status64(struct loop_device *lo, blk_mode_t mode,
+> +		  struct block_device *bdev,
+> +		  const struct loop_info64 __user *arg)
+>  {
+>  	struct loop_info64 info64;
+>  
+>  	if (copy_from_user(&info64, arg, sizeof (struct loop_info64)))
+>  		return -EFAULT;
+> -	return loop_set_status(lo, &info64);
+> +	return loop_set_status(lo, mode, bdev, &info64);
+>  }
+>  
+>  static int
+> @@ -1468,14 +1492,14 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
+>  	case LOOP_SET_STATUS:
+>  		err = -EPERM;
+>  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+> -			err = loop_set_status_old(lo, argp);
+> +			err = loop_set_status_old(lo, mode, bdev, argp);
+>  		break;
+>  	case LOOP_GET_STATUS:
+>  		return loop_get_status_old(lo, argp);
+>  	case LOOP_SET_STATUS64:
+>  		err = -EPERM;
+>  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+> -			err = loop_set_status64(lo, argp);
+> +			err = loop_set_status64(lo, mode, bdev, argp);
+>  		break;
+>  	case LOOP_GET_STATUS64:
+>  		return loop_get_status64(lo, argp);
+> @@ -1569,7 +1593,8 @@ loop_info64_to_compat(const struct loop_info64 *info64,
+>  }
+>  
+>  static int
+> -loop_set_status_compat(struct loop_device *lo,
+> +loop_set_status_compat(struct loop_device *lo, blk_mode_t mode,
+> +		       struct block_device *bdev,
+>  		       const struct compat_loop_info __user *arg)
+>  {
+>  	struct loop_info64 info64;
+> @@ -1578,7 +1603,7 @@ loop_set_status_compat(struct loop_device *lo,
+>  	ret = loop_info64_from_compat(arg, &info64);
+>  	if (ret < 0)
+>  		return ret;
+> -	return loop_set_status(lo, &info64);
+> +	return loop_set_status(lo, mode, bdev, &info64);
+>  }
+>  
+>  static int
+> @@ -1606,8 +1631,8 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
+>  	case LOOP_SET_STATUS:
+>  		err = -EPERM;
+>  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+> -			err = loop_set_status_compat(lo,
+> -				(const struct compat_loop_info __user *)arg);
+> +			err = loop_set_status_compat(lo, mode, bdev,
+> +						     (const struct compat_loop_info __user *)arg);
+>  		break;
+>  	case LOOP_GET_STATUS:
+>  		err = loop_get_status_compat(lo,
+> 
+> base-commit: 8bb045949e86cc2e929e868f52de3fa86c379e30
+> -- 
+> 2.39.5 (Apple Git-154)
 -- 
-2.53.1-Meta
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
