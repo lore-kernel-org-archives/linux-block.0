@@ -1,93 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.33
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794553742;
-	b=4+gMvz3Si3JgGCq7BA9G3FJzFmN1hP4S8pCrWa7zMq12IDHm5Log4/uN/ovj4hADu2hK
-	 8Wm425REteN3zzKX5hyBNZP1hr7EaSgcQUq30D2Xg/jbfTEzsFelWireo7gQyagtffYrM
-	 dhXb6wzJww1SNE0Vuu+LAKhQqdANiLLlYzPqerMqtolpcYi0p4JzmKRPQf/qfNp08wGqv
-	 U3CcGLb2BTdoAx12Si04kUdwttWc1blhoNXXeRY0GJve0baJVcfG4We6RQSGyNgETaR0p
-	 +UU+TKQDJGNtT30i+JPCaY2NHnOEqgV3cHKHcKniJcxdgeGOOhfGBqapPmY5elrxB+Q==
+	t=1794554782;
+	b=QFTR3A6xcTi4MQTfO00TXxms+ZiK18kNxQM36ytsDHu3QSpslOPo0D88VUCOIkgIFks2
+	 XYs+QXFVJeE5hOru4iVfyw4/NU+aTnb/IpOUP+KWhcHDaje1+q+1A1DpTX5cK4Ze72r/a
+	 eY1aTyPRre3UEYqeMdNJ2PmuB/Oa+m9m54bdDluJrY16ZA/go1k8z8ukudDOvgYZ9Q8WR
+	 xxYIVgp2DsPafeaAyi2OsAPY//mQ3/Aisz2Y/kkxGEloBOQg50tyiu7WUBhoWEMBA+eFX
+	 9nBjGEjf1j83hRiOWkUQ1iylzMYcOkhxAfMnYmgApAudIGn/eo6+YhWOX7vfQvyZwjA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794553742;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1794554782;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-Id:
+	 In-Reply-To:References:X-Mailer:Mime-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=SYhdRBfbhOCrZODwMof2LJJutjMOsW3pk0k9wT+4x1s=;
-	b=5jqWM4hUhpoA57cKLomyVx/Nfg7YvgYxiiIOKdi39HKpA0NuLFgOdJfOSEYBZLje+uj3
-	 PqQUuvGso1oeEoBo30VsIOzhzlFKSzuBkBXZuQMIVjm2mpoktNZ6LrdF3QX2wq6HNZKZr
-	 EKl/HXPN7kFAdwx2gYp/vvTw/R95u+OiK7k3gQ0oBx+iRfyruaRuHtl7GQqS73UwRTVxR
-	 rmUuJuhJWuEGC9YyztWcKl2Wc8btVBpCW9vTR9w4WHSEb0VHRxHHqvyeZncnwTGpy5JQ7
-	 CVGPxFu7nlD9giH1+Wh+JYhHulzj1SbwM6fZI4VstQAZBWygmKmTrGUF30TnEA2vrlA==
+	bh=mjetfSPbiI8lpCBkAc9d8XX/FbfRsCkUf9M0ZvVFMfo=;
+	b=ac2a6++esm63hbslYKUcbn0MV8CQTjgEWiPm8T5Lkdbrxz1+NRCYf9wnbNkKv7vlD5jK
+	 HGn0PuFjh0cYQvRDSIXGnLxn/CdfXWV+7NRrfONY5VwDfnXGELs465xJZWAmW/SLeqZ8C
+	 tuj+JZnrCfDP8POctG4EB5pRcFXV8PubVusKD+GlCAWNN+UteSjx7Bxp98OCW7fl5RJCo
+	 XZesjB2B6UnHULz8AgGJD7o3lfbswYVFEZcxpETfaIa6cEgRTePRxXn8AYktcNm4EEoyn
+	 gRjGTHpsk2bYs227dxYp262eUdUufaW+xuZgvFeiimTy6mUxAh3OAsfPXjOVXmu6ZbA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QH7wDdMd;
-	arc=none smtp.remote-ip=95.215.58.33
-Received: from mta1.migadu.com (out-33.mta1.migadu.com [95.215.58.33])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=korg header.b=pBI7ON1M;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EC860A3836
-	for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 07:09:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 63EC860A3836
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F96606A321;
+	Fri, 13 Nov 2026 07:26:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QH7wDdMd
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=ePA00gWH1MMaJNHfq4j4NnI+p0p7J/Mr89Hwy2EXwkk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794553739; v=1; x=1795158539;
- b=QH7wDdMdT3cBuf8Cy1Eksg/9++TqcmKawcGKnBoHIokEoykmH2fiYv9YBaaogXgPXdQvqH6x
- aq2Bsn99mPSWBFhH+AB5LKz1vdQ2as2NL7NFp/liSinXo8qAW3sXI/OEyNO7JY2e8NHyfbTYxEN
- qtlNbGAWZLbOUB6HkQbF8WUw=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 60ee62a93959a5fb;
-	Fri, 13 Nov 2026 07:08:57 +0000
-X-Mizu-Trace-ID: 60ee62a93959a5fb
-X-Migadu-Flow: FLOW_OUT
-From: Mengmeng Zhao <mengmeng.zhao@linux.dev>
-To: Christoph Hellwig <hch@lst.de>,
-	Anuj Gupta <anuj1072538@gmail.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	christian.koenig@amd.com,
-	Philipp Stanner <phasta@kernel.org>,
-	Dan Williams <djbw@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	tytso@mit.edu,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Baokun Li <libaokun@linux.alibaba.com>,
-	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
-	Zhang Yi <yi.zhang@huawei.com>,
-	asml.silence@gmail.com,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	nvdimm@lists.linux.dev,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org,
-	Li Wang <liwang@kylinos.cn>,
-	Mengmeng Zhao <zhaomengmeng@kylinos.cn>
-Subject: [RFC PATCH v2 8/8] ext4: support dma-buf registered buffers for direct I/O
-Date: Fri, 13 Nov 2026 15:06:21 +0800
-Message-ID: <20261113070621.273953-9-mengmeng.zhao@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261113070621.273953-1-mengmeng.zhao@linux.dev>
-References: <20261113070621.273953-1-mengmeng.zhao@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=korg header.b=pBI7ON1M
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 551521F000C4;
+	Fri, 13 Nov 2026 07:26:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux-foundation.org; s=korg; t=1794554782;
+	bh=mjetfSPbiI8lpCBkAc9d8XX/FbfRsCkUf9M0ZvVFMfo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=pBI7ON1MSiLCMpsXkclVp2s4htuA6KX7gsbrUSt5jIBYqpWSgEPrJtVMQWPhS4Tew
+	 akJdCZaHtme9YY8L2SZbeoQBt/DfoTBZqoXBQ5lUfUmCM7R2/VAF3zq0taItxmB4SB
+	 BUIcADXrNinI7DB5jqXHfQSKMFWh6s1SVKhHY5ho=
+Date: Thu, 12 Nov 2026 23:26:21 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>, raoxu <raoxu@uniontech.com>,
+ minchan@kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, David Hildenbrand <david@kernel.org>
+Subject: Re: [PATCH] zram: Avoid duplicate slots in batched writeback
+Message-Id: <20261112232621.6e8916a6e92bbb1afeb1e2a3@linux-foundation.org>
+In-Reply-To: <avK6Y1VmIYIBrorl@google.com>
+References: <F24EF6333964B482+20261110061830.272091-1-raoxu@uniontech.com>
+	<avK6Y1VmIYIBrorl@google.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -96,177 +57,47 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Mengmeng Zhao <zhaomengmeng@kylinos.cn>
+On Tue, 10 Nov 2026 15:40:13 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
 
-Advertise FMODE_CAN_DMABUF_IO for inodes that can support dma-buf I/O
-and implement ->init_dma_buf_io_ctx() by registering the buffer against
-the filesystem's block device.  The capability follows
-ext4_dio_alignment(), so an inode that can never do direct I/O -
-fs-verity, data=journal or inline data - is refused at open, and
-encrypted inodes are refused on the inode flag, which is set even
-without CONFIG_FS_ENCRYPTION.  The inode is rechecked at registration
-because DAX can be enabled after the file was opened.
+> On (26/11/10 14:18), raoxu wrote:
+> > The writeback interface accepts multiple page_index and page_indexes
+> > parameters in one operation. Their ranges can overlap, but
+> > scan_slots_for_writeback() only excludes slots that are already being
+> > written back or marked as same-filled.
+> > 
+> > A slot selected by an earlier range is placed on the post-processing list
+> > and marked with ZRAM_PP_SLOT. Without checking that flag, an overlapping
+> > range can enqueue the same slot again and submit it for writeback more
+> > than once.
+> > 
+> > Skip slots already marked ZRAM_PP_SLOT while holding the slot lock. This
+> > keeps each slot in a writeback scan session represented by at most one
+> > post-processing entry and leaves the existing release and reuse paths
+> > unchanged.
+> > 
+> > Signed-off-by: Xu Rao <raoxu@uniontech.com>
+> 
+> LGTM.
+> Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> 
+> Jens, do you want to pick it up and route via block tree or should
+> we route via "more traditional" tree (Andrew's tree)?
 
-A dma-buf iterator has no pages to copy from, so it must never reach the
-page cache.  ext4_buffered_read_iter() and ext4_buffered_write_iter() are
-the single sinks of the buffered fallbacks and refuse it there; a short
-direct I/O write still reports its progress, and the DAX write path
-refuses at its entry instead of after starting a journal handle.
+I grabbed it.
 
-Signed-off-by: Mengmeng Zhao <zhaomengmeng@kylinos.cn>
-Signed-off-by: Li Wang <liwang@kylinos.cn>
----
- fs/ext4/ext4.h | 11 +++++++++++
- fs/ext4/file.c | 44 +++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 52 insertions(+), 3 deletions(-)
+I did recently attempt to pull zram out of the mm project, by moving it
+from mm.git's mm-unstable branch and into mm.git's mm-nonmm-unstable
+branch.  Because "why does the mm project contain a block device
+driver".
 
-diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
-index f38fec3167fb..028b2e5ddc8b 100644
---- a/fs/ext4/ext4.h
-+++ b/fs/ext4/ext4.h
-@@ -4135,6 +4135,17 @@ static inline bool ext4_inode_can_atomic_write(struct inode *inode)
- 		EXT4_SB(inode->i_sb)->s_awu_min > 0;
- }
- 
-+/*
-+ * dma-buf I/O needs an inode that supports direct I/O without the page cache.
-+ * IS_ENCRYPTED() tests the inode flag, which is set even without
-+ * CONFIG_FS_ENCRYPTION.
-+ */
-+static inline bool ext4_inode_can_dmabuf_io(struct inode *inode)
-+{
-+	return !IS_DAX(inode) && !IS_ENCRYPTED(inode) &&
-+	       ext4_dio_alignment(inode) != 0;
-+}
-+
- extern int ext4_block_write_begin(handle_t *handle, struct folio *folio,
- 				  loff_t pos, unsigned len,
- 				  get_block_t *get_block);
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 50d3c92709c8..5a8481637da5 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -30,6 +30,7 @@
- #include <linux/uio.h>
- #include <linux/mman.h>
- #include <linux/backing-dev.h>
-+#include <linux/blkdev.h>
- #include "ext4.h"
- #include "ext4_jbd2.h"
- #include "xattr.h"
-@@ -66,6 +67,15 @@ static bool ext4_should_use_dio(struct kiocb *iocb, struct iov_iter *iter)
- 	return IS_ALIGNED(iocb->ki_pos | iov_iter_alignment(iter), dio_align);
- }
- 
-+static ssize_t ext4_buffered_read_iter(struct kiocb *iocb, struct iov_iter *to)
-+{
-+	/* a dma-buf iterator has no pages for the page cache to copy into */
-+	if (iov_iter_is_dmabuf_map(to))
-+		return -EOPNOTSUPP;
-+
-+	return generic_file_read_iter(iocb, to);
-+}
-+
- static ssize_t ext4_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
- {
- 	ssize_t ret;
-@@ -88,7 +98,7 @@ static ssize_t ext4_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 		 * taken.
- 		 */
- 		iocb->ki_flags &= ~IOCB_DIRECT;
--		return generic_file_read_iter(iocb, to);
-+		return ext4_buffered_read_iter(iocb, to);
- 	}
- 
- 	ret = iomap_dio_read_simple(iocb, to, ext4_iomap_begin);
-@@ -119,7 +129,7 @@ static ssize_t ext4_dax_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	if (!IS_DAX(inode)) {
- 		inode_unlock_shared(inode);
- 		/* Fallback to buffered IO in case we cannot support DAX */
--		return generic_file_read_iter(iocb, to);
-+		return ext4_buffered_read_iter(iocb, to);
- 	}
- 	ret = dax_iomap_rw(iocb, to, &ext4_iomap_ops);
- 	inode_unlock_shared(inode);
-@@ -146,7 +156,7 @@ static ssize_t ext4_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	if (iocb->ki_flags & IOCB_DIRECT)
- 		return ext4_dio_read_iter(iocb, to);
- 
--	return generic_file_read_iter(iocb, to);
-+	return ext4_buffered_read_iter(iocb, to);
- }
- 
- static ssize_t ext4_file_splice_read(struct file *in, loff_t *ppos,
-@@ -354,6 +364,10 @@ static ssize_t ext4_buffered_write_iter(struct kiocb *iocb,
- 	if (iocb->ki_flags & IOCB_NOWAIT)
- 		return -EOPNOTSUPP;
- 
-+	/* a dma-buf iterator cannot be handled by buffered I/O */
-+	if (iov_iter_is_dmabuf_map(from))
-+		return -EOPNOTSUPP;
-+
- 	inode_lock(inode);
- 
- 	/*
-@@ -688,6 +702,10 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		ssize_t err;
- 		loff_t endbyte;
- 
-+		/* a dma-buf iterator cannot fall back to buffered I/O */
-+		if (iov_iter_is_dmabuf_map(from))
-+			return ret;
-+
- 		/*
- 		 * There is no support for atomic writes on buffered-io yet,
- 		 * we should never fallback to buffered-io for DIO atomic
-@@ -731,6 +749,10 @@ ext4_dax_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	bool extend = false;
- 	struct inode *inode = file_inode(iocb->ki_filp);
- 
-+	/* a dma-buf iterator cannot be handled by DAX either */
-+	if (iov_iter_is_dmabuf_map(from))
-+		return -EOPNOTSUPP;
-+
- 	if (iocb->ki_flags & IOCB_NOWAIT) {
- 		if (!inode_trylock(inode))
- 			return -EAGAIN;
-@@ -1014,6 +1036,8 @@ static int ext4_file_open(struct inode *inode, struct file *filp)
- 		filp->f_mode |= FMODE_CAN_ATOMIC_WRITE;
- 
- 	filp->f_mode |= FMODE_NOWAIT | FMODE_CAN_ODIRECT;
-+	if (ext4_inode_can_dmabuf_io(inode))
-+		filp->f_mode |= FMODE_CAN_DMABUF_IO;
- 	return dquot_file_open(inode, filp);
- }
- 
-@@ -1050,10 +1074,24 @@ loff_t ext4_llseek(struct file *file, loff_t offset, int whence)
- 	return vfs_setpos(file, offset, maxbytes);
- }
- 
-+static int ext4_file_init_dma_buf_io_ctx(struct file *file,
-+					 struct dma_buf_io_ctx *ctx)
-+{
-+	struct inode *inode = file_inode(file);
-+
-+	/* DAX can be enabled after the file was opened */
-+	if (!ext4_inode_can_dmabuf_io(inode))
-+		return -EOPNOTSUPP;
-+
-+	/* all file data lives on s_bdev, which never changes for ext4 */
-+	return bdev_init_dma_buf_io_ctx(inode->i_sb->s_bdev, ctx);
-+}
-+
- const struct file_operations ext4_file_operations = {
- 	.llseek		= ext4_llseek,
- 	.read_iter	= ext4_file_read_iter,
- 	.write_iter	= ext4_file_write_iter,
-+	.init_dma_buf_io_ctx = ext4_file_init_dma_buf_io_ctx,
- 	.iopoll		= iocb_bio_iopoll,
- 	.unlocked_ioctl = ext4_ioctl,
- #ifdef CONFIG_COMPAT
--- 
-2.43.0
+I undid that change after about a week - it didn't work out because
+zram is joined at the hip with mm/zsmalloc.c.  zsmalloc is also used by
+mm/zswap.c.
+
+Oh well.  afaik the zram story has been going smoothly for a long
+time(?).
 
