@@ -1,146 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794688048;
-	b=hO7A0/SLz0Yz1ntLIPCUcT4trmakEYNbjykqBq3cBjzi+GbSzPJTcpKyagh14wTzAUoH
-	 fIMiVbU28TEvAgbtHVmV5OPqY0c36hRH3vtPONLbiAyx+IW6ly11T408KUTwyZJ+VW5X6
-	 yq1TNDthsCrqsOsMpN/3OSct6AC9DQqqLZVNj5ha8Io4/64XPQ7uLT7yD2uOseA4ltpxP
-	 5yoy5fMjDRgQcFgUmw0I7ky0ek5s4aP2/H4MBNG5GvD8L2tyQ0Yu8SMoDx7UuuiqjQX8A
-	 4lNtFoe4t0jkneNLfW2aUIK63yyOujU0Mvo1VjAqLtyOoG4WyRBKpBy0sR3XOwcoI7Q==
+	t=1794690103;
+	b=Ajba9YlUgzX9UpzhyLWjfU4G9sd+cgVWC2yCXyPDlv2qlL6dFxJzwMrTUp1dkYXLkDwP
+	 aS7vd1FkhNDWSGs2sLck9ym7ZCLgNThIrE1ZfvJLSeszEY5WPnijPz6q56dXzQHCsgpTf
+	 2vkkcw1BqJV3fKUsDu0damvPnz9dAMmwI7DFHb2FpsxU6NyCiYIksGoFqu1M4JmFj6CK0
+	 z+iXs4QPQ52Ehxtt72549V4UiSMa14M0VkzMUY+VUWDzO/4CkulCPJQssvql3shL1UfWy
+	 uN7jxy7UkxOXBmI1q+xzSk6oTp5e0n8CgnfMEBWcaHGgR5QVjNP96GYJ0l1tQwEz7FQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794688048;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=LfkfapyQaXHB8T99IkenQj1dMnikIM4i8S8xipB/rew=;
-	b=asXYQukrz9grqE+R5bB5/h4y9apjt9RIhs34WG5SJVp013a30+YD2FqKbVTKju8biZGG
-	 6EEaqnDhhfXcMeZxLMUu66e5P/NI53j7MZz1B6VFx3lrEzd9cCtKSf2PZMRbKnILQ/Mrb
-	 OKsQVlhgFEkC78YUy9tyEuX2oti7eTLgxghOfp3f95QXCKJHiMC99tlB16RdC/erF2hx3
-	 qL1NiPSWRebSH0xocoED6Ux+iowA+Nmi3qCK5d1Qsd8Kez3CLY2v7fAhFwgM8+4bLxVHz
-	 4hriU55ZtX3hTGoy0z9nT/2OLn6XAcMLQki6r/qnABvZKi+HWOD1pdvImVGhxVIZAtw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794690103;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:Date:From:To:cc:Subject:
+	 In-Reply-To:Message-ID:References:MIME-Version:Content-Type:
+	 X-Scanned-By;
+	bh=W36WF/9m32YwszJFJtP4N6eElBtazo+wbR9k9iqRXpE=;
+	b=LF/189okxIzlzFXyJ2PhvH2+V2wwyg6c8o4n6HovOLJyIH6SitYaOGyQbF4nqT4Uj1ba
+	 DS0tvSkoGel+sU8BLyi51YdnykMjIvQEi/IgzTriVtJopEP/oEHt/8FdVbRPrJocrSNHH
+	 XkbijYCm/zXUJ+0QjypXVEV/fKUrMKXvCoNVBWEwpNw7StkwFs26C9ndldGiCM2tIp2N9
+	 ksCk6KJHULIEGshdhwLi6I0pxVS3rP45KIq79OhFo7pQ+e5lenaPFLLVd9/l0J7dQGUoo
+	 IVfT6D0uwUyz+xP2hRhz42Jgj4vm8AjTFGwE5FjLP38GkmFOgV1Jw0/05XQwRD6Xd0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=pd+Ad0bz;
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=DoAvnG9n;
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBE1606FAD8;
-	Sat, 14 Nov 2026 20:27:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9BBE1606FAD8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7741606A32D
+	for <linux-block@vger.kernel.org>; Sat, 14 Nov 2026 21:01:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E7741606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=pd+Ad0bz
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=LfkfapyQaXHB8T99IkenQj1dMnikIM4i8S8xipB/rew=; b=pd+Ad0bzAd8xTR1JjwD4oFjSGH
-	JfBYfPLz11DyfWWnkiCUkI7riV6CxKDnKVKGLpxlrMgBzDX5m7u0VSVAXnfPyoevCZ+ZrnzmUw1xL
-	j/dWSsJdcdrnbhyY8ritNU8xSL3O7zBwc9uSDVYqQS+V9ePeGG32VV4wHyyag6NovMDPb+uJpnMRr
-	NE6OQf8BRese+r6meXZlwtHULS8LPMXX6qKc4mh80jnCSKrNhE9WtW8Reypn75q6AFAkpAE1YtTH5
-	ExpRINSRbfrwGa+9LBPo5ALgtbXk7CLpWN58t04LugKzbsJXVrD2V9/vlrQCT9ZZhfxwKqAxQiZf9
-	AET5AX2g==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xSKLF-0000000Giga-0jjJ;
-	Sat, 14 Nov 2026 20:27:19 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-doc@vger.kernel.org,
-	David Hildenbrand <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	linux-mm@kvack.org,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	linux-sound@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowangio@gmail.com>,
-	David Heidelberg <david@ixit.cz>,
-	oe-linux-nfc@lists.linux.dev,
-	Chas Williams <3chas3@gmail.com>,
-	linux-atm-general@lists.sourceforge.net,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Helge Deller <deller@gmx.de>,
-	linux-fbdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	MPT-FusionLinux.pdl@broadcom.com,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <mkp@kernel.org>,
-	linux-scsi@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	linux-mtd@lists.infradead.org,
-	Neill Kapron <nkapron@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-usb@vger.kernel.org,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	xen-devel@lists.xenproject.org,
-	Hans de Goede <hansg@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	linux-ext4@vger.kernel.org,
-	Mike Marshall <hubcap@omnibond.com>,
-	devel@lists.orangefs.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Benson Leung <bleung@chromium.org>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	amd-gfx@lists.freedesktop.org,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	intel-gfx@lists.freedesktop.org,
-	Matthew Brost <matthew.brost@intel.com>,
-	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-xe@lists.freedesktop.org
-Subject: [PATCH 10/12] docs: ioctl-number: update FS entries
-Date: Sat, 14 Nov 2026 12:26:48 -0800
-Message-ID: <20261114202653.3113381-11-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261114202653.3113381-1-rdunlap@infradead.org>
-References: <20261114202653.3113381-1-rdunlap@infradead.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=DoAvnG9n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1794690102;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W36WF/9m32YwszJFJtP4N6eElBtazo+wbR9k9iqRXpE=;
+	b=DoAvnG9nJCL/pO0B3XnA6sttUoBobIbv7LeBfBUGPc1dyFd3S0xmeEs14PrMWz+aPk3w3/
+	/nxdpbvTn2hTl6iaFNfsZ6IKiWIZZpbkg+JuoW5zJsyxHGeUYE8AGY2qDitBR+ddObu2aH
+	fNdsQ/+XMeAdQ5t7wN3DTVLwRFUJ5PI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-bk35ufeUMt6PX4spgoE_Fw-1; Sat,
+ 14 Nov 2026 16:01:36 -0500
+X-MC-Unique: bk35ufeUMt6PX4spgoE_Fw-1
+X-Mimecast-MFC-AGG-ID: bk35ufeUMt6PX4spgoE_Fw_1794690095
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74810180049F;
+	Sat, 14 Nov 2026 21:01:34 +0000 (UTC)
+Received: from mpatocka-thinkpadx1carbongen12.rmtcz.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D37A530000E5;
+	Sat, 14 Nov 2026 21:01:31 +0000 (UTC)
+Date: Sat, 14 Nov 2026 22:01:29 +0100 (CET)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Mike Snitzer <snitzer@kernel.org>
+cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@infradead.org>, 
+    Keith Busch <kbusch@meta.com>, axboe@kernel.dk, dm-devel@lists.linux.dev, 
+    bmarzins@redhat.com, linux-block@vger.kernel.org
+Subject: Re: block: let a stacking device inherit its members' DMA
+ alignment
+In-Reply-To: <avdNg7ckyt6-M8si@kernel.org>
+Message-ID: <f1831833-335b-5b63-95b9-9eac893accb4@redhat.com>
+References: <20260709161519.1559723-1-kbusch@meta.com> <20260709161519.1559723-2-kbusch@meta.com> <atpBVtPqGDWZ2AFo@kernel.org> <aumxcHVjVonjs6OV@infradead.org> <auoab2ewQZGDpRi3@kbusch-mbp> <avdNg7ckyt6-M8si@kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -150,86 +79,94 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Update the list of files where filesystem ioctls are defined and update
-the ranges of function numbers that are used.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-[Since having multiple maintainers trying to merge these would
-cause some conflicts, it would be more manageable for Jon to
-take all of these through the docs-next tree.]
 
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-doc@vger.kernel.org
-Cc: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: "Theodore Ts'o" <tytso@mit.edu>
-Cc: linux-ext4@vger.kernel.org
-Cc: Mike Marshall <hubcap@omnibond.com>
-Cc: devel@lists.orangefs.org
-Cc: Paulo Alcantara <pc@manguebit.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-Cc: Chao Yu <chao@kernel.org>
-Cc: linux-f2fs-devel@lists.sourceforge.net
+On Fri, 13 Nov 2026, Mike Snitzer wrote:
 
- Documentation/userspace-api/ioctl/ioctl-number.rst |    9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+> On Tue, Nov 03, 2026 at 10:31:27AM -0700, Keith Busch wrote:
+> > On Tue, Nov 03, 2026 at 02:03:28AM -0800, Christoph Hellwig wrote:
+> > > On Thu, Oct 22, 2026 at 01:01:10PM -0400, Mike Snitzer wrote:
+> > > > On Thu, Jul 09, 2026 at 09:15:17AM -0700, Keith Busch wrote:
+> > > > > From: Keith Busch <kbusch@kernel.org>
+> > > > > 
+> > > > > All device mappers that want to override the dma_alignment do so.
+> > > 
+> > > Don't start a patch description by quoting another mail.
+> > > 
+> > > > Direct I/O from memory every member accepts is therefore rejected at
+> > > > the stacking device, and callers that check the advertised alignment
+> > > > (for instance through STATX_DIOALIGN) fall back to buffered I/O.
+> > > > 
+> > > > Leave dma_alignment at zero in blk_set_stacking_limits() so that the
+> > > > stacked value is the strictest of the members'.  blk_validate_limits()
+> > > > still applies the SECTOR_SIZE - 1 default when nothing was stacked,
+> > > > such as for a table with no devices.  Targets that process the data
+> > > > themselves and need logical-block-aligned memory already set
+> > > > dma_alignment in their io_hints (dm-crypt, dm-integrity, dm-verity,
+> > > > dm-log-writes), and NVMe multipath sets its own.
+> > > 
+> > > Chances are very high that this will introduce bugs somewhere,
+> > > as a lot of drivers are historically not ready to deal with lower
+> > > alignments, and will creeat nasty exploitable bugs.
+> > > 
+> > > So you'll need to audit each driver that wants to relax this
+> > > individually, and then override the value for them.  Alternatively
+> > > we could start with 0 in the block layer, but then you need to
+> > > lift the current setting into each caller first, and only remove
+> > > them one-by-one with a commit per driver explaining why that is safe
+> > > (and sensible).
+> > 
+> > I suppose it would be safer to have each stacking driver that can
+> > tolerate lower alignment granularity explicitly override the limit to 0
+> > to inherit whatever the stacking members require. For md-raid,
+> > that's not too bad as it can set lim.dma_alignment = 0 in
+> > raid0_set_limits() after md_init_stacking_limits(). But other device
+> > mappers don't have a way to override it so I guess something has to
+> > happen in dm_calculate_queue_limits() to allow this option.
+> 
+> DM devices have the ability to change limits really well, both in DM
+> core and the individual DM targets using .io_hints hook in their
+> target_type struct.  Mikulas knows what is needed for DM.
+> 
+> Mike
 
---- linux-next-20261113.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
-+++ linux-next-20261113/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -187,6 +187,7 @@ Code  Seq#    Include File
- 'I'   all    linux/isdn.h                                              conflict!
- 'I'   00-0F  drivers/isdn/divert/isdn_divert.h                         conflict!
- 'I'   40-4F  linux/mISDNif.h                                           conflict!
-+'I'   00     linux/inotify.h
- 'K'   all    linux/kd.h
- 'L'   00-1F  linux/loop.h                                              conflict!
- 'L'   10-21  drivers/scsi/mpt3sas/mpt3sas_ctl.h                        conflict!
-@@ -275,7 +276,7 @@ Code  Seq#    Include File
- 'f'   00-1F  linux/ext2_fs.h                                           conflict!
- 'f'   00-1F  linux/ext3_fs.h                                           conflict!
- 'f'   00-0F  fs/jfs/jfs_dinode.h                                       conflict!
--'f'   00-0F  fs/ext4/ext4.h                                            conflict!
-+'f'   00-2F  fs/ext4/ext4.h                                            conflict!
- 'f'   00-0F  linux/fs.h                                                conflict!
- 'f'   00-0F  fs/ocfs2/ocfs2_fs.h                                       conflict!
- 'f'   13-27  linux/fscrypt.h
-@@ -300,6 +301,7 @@ Code  Seq#    Include File
- 'k'   00-0F  linux/spi/spidev.h                                        conflict!
- 'k'   00-05  video/kyro.h                                              conflict!
- 'k'   10-17  linux/hsi/hsi_char.h                                      HSI character device
-+'k'   01-0F  fs/orangefs/protocol.h                                    <mailto:devel@lists.orangefs.org>
- 'l'   00-3F  linux/tcfs_fs.h                                           transparent cryptographic file system
-                                                                        <http://web.archive.org/web/%2A/http://mikonos.dia.unisa.it/tcfs>
- 'l'   40-7F  linux/udf_fs_i.h                                          in development:
-@@ -373,7 +375,7 @@ Code  Seq#    Include File
- 0x92  00-0F  drivers/usb/mon/mon_bin.c
- 0x93  60-7F  linux/auto_fs.h
- 0x94  all    fs/btrfs/ioctl.h                                          Btrfs filesystem
--             and linux/fs.h                                            some lifted to vfs/generic
-+0x94  all    linux/fs.h                                                some lifted from Btrfs to vfs/generic
- 0x97  00-7F  fs/ceph/ioctl.h                                           Ceph file system
- 0x99  00-0F                                                            537-Addinboard driver
-                                                                        <mailto:buk@buks.ipn.de>
-@@ -442,7 +444,7 @@ Code  Seq#    Include File
- 0xCC  00-0F  drivers/misc/ibmvmc.h                                     pseries VMC driver
- 0xCD  01     linux/reiserfs_fs.h                                       Dead since 6.13
- 0xCE  01-02  uapi/linux/cxl_mem.h                                      Compute Express Link Memory Devices
--0xCF  02     fs/smb/client/cifs_ioctl.h
-+0xCF  01-0F  fs/smb/client/cifs_ioctl.h                                <mailto:linux-cifs@vger.kernel.org>
- 0xDD  00-3F                                                            ZFCP device driver see drivers/s390/scsi/
-                                                                        <mailto:aherrman@de.ibm.com>
- 0xE5  00-3F  linux/fuse.h
-@@ -451,6 +453,7 @@ Code  Seq#    Include File
- 0xEF  00-0F  uapi/linux/ntfs.h                                         NTFS
- 0xF3  00-3F  drivers/usb/misc/sisusbvga/sisusb.h                       sisfb
- 0xF3  00-3F  video/sisfb.h                                             <mailto:thomas@winischhofer.net>
-+0xF5  01-1F  uapi/linux/f2fs.h                                         <mailto:linux-f2fs-devel@lists.sourceforge.net>
- 0xF6  all                                                              LTTng Linux Trace Toolkit Next Generation
-                                                                        <mailto:mathieu.desnoyers@efficios.com>
- 0xF8  all    arch/x86/include/uapi/asm/amd_hsmp.h                      AMD HSMP EPYC system management interface driver
+The problem is that the limits may change. I.e. for example, you can have 
+a linear device on the top of a disk that allows unaligned bio vectors, 
+you take a snapshot of the device, and suddenly, the dm device stops 
+supporting unaligned bio vectors.
+
+There would be a race condition:
+1. you check queue limits, see that it supports unaligned vectors
+2. you construct a bio with unaligned vectors
+3. you reload the dm table with a target that doesn't support unaligned 
+vectors
+4. you submit the bio
+5. the bio with unaligned vectors is delivered to a target that doesn't 
+support them and misbehaves on them (for example, dm-raid1 used to 
+livelock if it received unaligned vectors, and other targets may misbehave 
+as well because they were written in the era when all vectors were 
+aligned)
+
+So, if we want to support unaligned vectors in dm, we must make sure that 
+device mapper never misbehaves on unaligned bio vector, regardless of 
+which dm target is used.
+
+Auditing and rewriting all the targets to support unaligned vectors 
+doesn't seem practical.
+
+One possibility how to support it would be to make per-target flag whether 
+the target accepts unaligned vectors. Then, we would have a per-table flag 
+that is true if all the targets in the table support unaligned vectors.
+
+Then, if dm receives a bio and the table doesn't have the flag set, we 
+would check the alignment of bio vectors in the dm core and terminate the 
+bio with BLK_STS_INVAL without giving it to the target.
+
+I just don't know how much this extra walk through the bio vector would 
+degrade performance for the common case (i.e. no unaligned vectors).
+
+Mikulas
+
