@@ -1,94 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794624106;
-	b=AVy/crvx5QpPMx6QiMYVnlgk9dOgNDulxi9SAEddnE8CqxZZApXM5JtJXqvVAzSInfuA
-	 bUvEuUVhOg8wmc/dE5GkIy141s+IucYI2Dd3BEbCDrURlL2Py2AFxsu5N3pXuKTcz72hw
-	 kNtptTlRYTl941kUGatl6qjuOdoVetvQm2BWebzHQEtr1BGjJEuzTWRIfO8Ktbs7PujZ2
-	 9YaGGDYGA9AbkhlikuYmlCI7tAdVIuTqpTimiTsDv7n6B1km3dcyy1mGjWZ9VAldAuOrP
-	 zD3Y18oBBq3sMl+pAAkbkfe7GT2xyZiXbZ6njlCFIP49yqIuRbUrN02WEWlyqCE3XRA==
+	t=1794642819;
+	b=tDN1bqoP+8lD4ujy49UBw+Wi8sELkWMRRqG71H8uvcF0aNQKN+g4tZFpOEXgiOYjxDA2
+	 JIaiTkUrm9fs3kZXIbXCGMKdQAhu78PURUsIp2tus0hLW/VRgMlPNO/Qh1BSZ2ZA1W4PM
+	 SyPbq5w9WgKiMIRAdsgss9NnpYc+8pqy8r0K+kKyElu0rywN1DnqbDID++49qHm5ZBmIq
+	 yQ9d4RQLGfWN0MkBR6b9KsvVLnAJHOKLGbxXfCyJMIhDTVU5n7XsXlc0FTYKPbYKvUsgU
+	 O1oT5yWMTf3wNsgAXC/3r5ZCXqteA4XhAru1yvWX9lTIVbnFl6Vjp4ycoEFOLqfFptQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794624106;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=BRx4eAMdYV73QvASEjGEoxzHdyiMslK/yjtX9V0T5Tc=;
-	b=cRMmTVYvsLbmTkwmRVFQgKU3jTZ2vr46I6RFznmy7LRinWYmMBnrK4RDBLRAA62yZLLw
-	 VoYIOgteG1roS1JTDqAf0wchkBmfWzDMlWJtu0BnjLHqzLV2sFYGq6V3FyGDr/aK4NojU
-	 bKTVL5kuDiN1qgfGosDxRU4Z7UPd6u/m38CAkC3SrjhLiFF8xtqKyeMKs/XJqYfP7Xegm
-	 d8ZwS+1fZJrR894wyy90VGpBue7esGVZhLQkY2dP8MWTWKjBxN2PsROd8eyP9R0PToNbR
-	 9Wt1ObkTxckkwoMWsZ12sKXH9mg1zDn3aYZGCNBuUks1Yp6qTpKgEcHxuZgyMOhsBCQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794642819;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:In-Reply-To:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Content-Type;
+	bh=r4DsVmhEAhzMsYDrOpx+P90QR124Jp6lr98wj7KvrTk=;
+	b=F+nBz3O83rmdg83B+4VmbeybrUmX0BSR2Qa9r8oTg7b8WGBg9vlkpUatYLPQsfAJwyj8
+	 ifkMCEIB/2HP+ejJY0FjPZOrZQeX7rhsRgupoEEoMdNwrbexFlWqa1MdmIcUXNROkZQzD
+	 tJAB0yGBatdOt9nUNuxD+Hc1umwGthfXkN+KmlUcQwqejGH0G8+q3qDgFIROH3W8P6kG1
+	 uStdNo1iHBH3Vd3Q5vU8HFef8QhQQdJXeFy4DMyuNymkU0ubIKjADc/8u31+Qa89vBiC0
+	 LeYpgUGJiqRNMmZJkjzDhIQN+/mrRlungx9DspXMiHCz8RPQlFix22Mc6ew48GrtnhQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b="Oh/A7P2y";
-	arc=none smtp.remote-ip=74.125.82.169
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.200
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F64606A323
-	for <linux-block@vger.kernel.org>; Sat, 14 Nov 2026 02:41:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 42F64606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Oh/A7P2y
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-3720addb068so2586584eec.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 18:41:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1794624105; x=1795228905; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=BRx4eAMdYV73QvASEjGEoxzHdyiMslK/yjtX9V0T5Tc=;
-        b=Oh/A7P2y/i7OaeP0elOfugLH6LZVJdGwvDVLLPQTYFkuyjrI4DXSuTCQml9Ay2xisC
-         p01/pRceBbJVM+EvcmMhUNVKptbnP9KgK26AntLzuPB6BuW/azxZEzQL0GGB5nK7ZO4B
-         Rrx3Z04RzaYdTvWnLNvyHSTZIn9QXUy4Gd3gY=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CB2606A327
+	for <linux-block@vger.kernel.org>; Sat, 14 Nov 2026 07:53:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F0CB2606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-5727b04b81eso4222b6e.3
+        for <linux-block@vger.kernel.org>; Fri, 13 Nov 2026 23:53:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794624105; x=1795228905;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=BRx4eAMdYV73QvASEjGEoxzHdyiMslK/yjtX9V0T5Tc=;
-        b=XMlScc3I5ZRA+o519QjaUpK7IURyrO2/Ns40Hcfmtw3AbXepe2Wgw79320SV/Xd/ip
-         85/Q/v1EtvwGRX4V51UToSGpcEFy7Aey/sNU65xsOsGRJXByeowfoGRyrx1BZZZ0j4Y9
-         RXz0ma/M4VIGTm3nqgJUeM8MZfeJDnRQR1K06TJVpNg7CNoIEYW4/UmwGgQ4RHBYBZRs
-         xXvlv/ywv/g28+9zWxnm/AbZJckoisVCMaoANwxbsKo9UhBX5jMIcwFmSnahWswn0SYo
-         sIIzfXRK2pPBEukWPq5oe4U7j4P8z+VDtUrfRU2dJmcUQb5PiiMLlPQycMQDVnYQ3zZ7
-         zVSQ==
-X-Forwarded-Encrypted: i=1; AL+hErH7kxmuEm8Z9Hc7UTBDMpqpPY92SZly77SE1M10rMFsoSpRTtntvc2GRULpX6Q0Tov2WcwcBSNq4BbIQw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/+YrUWzzPkaWvuFbeVG145AL8tTVL6UnBypY9fDv8Lfk2z5U1K
-	R9B/YBQQBJ5/hkoPMBH9uv1kghNEsD3P0SZ9WVKtYRJqRxyBH58uTzONPiRZcwrk+A==
-X-Gm-Gg: AYBFou1LYccgcy5Y4PSw8YFJWL3F+ftuxpDMIOVCQmzlAwcxQ3abAzDcJtt6aPxj+R3
-	yRA+ORYsHD0+lctmJROMjte/A5mAI34ZeVFCpmM2qrUrZ1hRf8agGZB62//Fyp5elE1d9ET6EjP
-	q87FQac7sCxiANihzV6ardlwbE9BlawDaEUxhVw/Lj+buNr4KpNUwi/1rH6wA/yTeWh/gFbARwo
-	GVXUbVb1Yn0VJTy2vvHWxqE8ZOEuZLe11ayqn0VgDzq860l/QxJhEYngSea+1rwy1ZUDGw0kAvP
-	K/6Xb3Fn3JzKAuE+fcbFJR1NXzW8w7DeDST/v4iwIZbj7jHX86DKWxBcynpruZviMVHBjsWOFPH
-	qH6XfJEGEk6TWWVPEizpcpUGVnH3gFSplS0FJBKd4LkkymKOL78YKKYyuCilBDnWZfjF2nlSxDc
-	JDvKkrYTFeXXT/mKtLZw126LjDScBoJ8ZuKq1zsuHKooe1c+8Fc6cP3okBiqfeg5/oyk3Y35MCt
-	fQtdmNeGcyVZYujxMe/BIR9aUWl1YeMWb3lS03K5YBQzDNHUcSRT8cXmdWu4qnxdzgj35qyK/YV
-	ZC7zyymhx5qqvukO2ZnRenUlfzp4xG2aNAGXiv3juQeovIOic1lOvQ6GN3qbcrIRUE5N9wl7daw
-	/dB/thovBbF4fWKw=
-X-Received: by 2002:a05:693c:864b:10b0:35e:f4ac:5f8e with SMTP id 5a478bee46e88-37960384530mr3982500eec.0.1794624105009;
-        Fri, 13 Nov 2026 18:41:45 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:d97f:ef68:a8e1:6af5])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-37955f02ff0sm10977717eec.16.2026.11.13.18.41.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Nov 2026 18:41:44 -0800 (PST)
-Date: Sat, 14 Nov 2026 11:41:39 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, raoxu <raoxu@uniontech.com>, 
-	minchan@kernel.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: Avoid duplicate slots in batched writeback
-Message-ID: <avfJOxrS2l-f5ZA3@google.com>
-References: <F24EF6333964B482+20261110061830.272091-1-raoxu@uniontech.com>
- <avK6Y1VmIYIBrorl@google.com>
- <20261112232621.6e8916a6e92bbb1afeb1e2a3@linux-foundation.org>
- <1707907e-2261-4d3b-87fb-3dfc662e0347@kernel.org>
+        d=1e100.net; s=20260707; t=1794642818; x=1795247618;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=r4DsVmhEAhzMsYDrOpx+P90QR124Jp6lr98wj7KvrTk=;
+        b=aYL641TzbqK/0cdoDaK38Kl8VHjCechW5qeNCUpFzc9u5JFPne3ybfirEluAoIHi3I
+         PJCxdNmGfyMSSAA8GoQ9XIIlLMGy+Z3oVfM/DZblrwlJ9MnlkocH3LSG8fTE04c61Bmg
+         TCohOWbtBqcAeu0RvlJd5YcIdp1FSb2PJfSc22VO9qj8vjI3sUNtTHvbPViCb4qa8nI/
+         sSQIQYCzMcTI/AxVdznfDc6Ygdgk19g94LHTTvL8Z+5eJRvoNzCtARm3aiZNG8PDRpNh
+         GMRr28BbL3blL2wolkqbUD3RBHLYqwXqrkCHjmy6voJqQDdF8Gx2jJhScqjZwABRj8tx
+         bnFw==
+X-Forwarded-Encrypted: i=1; AL+hErFavoq/ZpE88wTNh+VSMpDhit/MTafwzEFYl1dJugZkUHHL5C15sw9ID5PVuym71/+HpWTUewhi6J71GQ==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/3xY2FV+gCrw571zod27sN6j7zRoSXXW3ud8/8ERpu6fQ1WgKo
+	O3jIGN/C3I3O78/8pIEeCYkNkVxFyEpFU2TTuS741XwJiO/VM8rd+XOsePNOgJBt8iAlSEMimpm
+	HJx+8iQ4BnJZFAXpjAcbk0pqvnTiQbPQ9OxC++9KrkXhzFH9vncdbNphSS2I=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -98,33 +58,112 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1707907e-2261-4d3b-87fb-3dfc662e0347@kernel.org>
+X-Received: by 2002:a05:6808:320d:b0:4d6:90f3:74b1 with SMTP id
+ 5614622812f47-56e650088a6mr3675079b6e.49.1794642817893; Fri, 13 Nov 2026
+ 23:53:37 -0800 (PST)
+Date: Fri, 13 Nov 2026 23:53:37 -0800
+In-Reply-To: <6a88e8f5.91706f20.16b6e3.02ad.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6af81381.7750847f.3ad41e.0031.GAE@google.com>
+Subject: Re: [syzbot] [block?] WARNING in blk_mq_dispatch_rq_list
+From: syzbot <syzbot+49b69d460fb5134ee1d7@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On (26/11/13 10:50), David Hildenbrand (Arm) wrote:
-> > I grabbed it.
-> > 
-> > I did recently attempt to pull zram out of the mm project, by moving it
-> > from mm.git's mm-unstable branch and into mm.git's mm-nonmm-unstable
-> > branch.  Because "why does the mm project contain a block device
-> > driver".
-> > 
-> > I undid that change after about a week - it didn't work out because
-> > zram is joined at the hip with mm/zsmalloc.c.  zsmalloc is also used by
-> > mm/zswap.c.
-> 
-> Are there cleaner ways of isolating both things?
-> 
-> Like, many drivers use kmalloc() etc, and they are not part of core-mm :)
+syzbot has found a reproducer for the following issue on:
 
-This dev cycle is a little unusual, because on the zsmalloc side we
-removed that "kmalloc()" [1] (along with other exported symbols that
-both zram and zswap use), introduced new "kmalloc" API and this
-happened atop of a very large and intrusive zram rework [2].
+HEAD commit:    ad3fc05c7e65 arm64: suspend: Only track cpuidle context fo..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=11a6964d580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4e8e6c1701ad8af2
+dashboard link: https://syzkaller.appspot.com/bug?extid=49b69d460fb5134ee1d7
+compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+userspace arch: arm64
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14809bed580000
 
-We don't change zsmalloc exported API too often, but it happens,
-sometimes.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+49b69d460fb5134ee1d7@syzkaller.appspotmail.com
 
-[1] https://lore.kernel.org/lkml/20261111064707.2568433-1-senozhatsky@chromium.org/
-[2] https://lore.kernel.org/linux-kernel/20261025021839.1542805-1-senozhatsky@chromium.org
+------------[ cut here ]------------
+WARNING: block/blk-mq.c:2131 at blk_mq_dispatch_rq_list+0x960/0x13a8 block/blk-mq.c:2131, CPU#1: kworker/1:1H/4531
+Modules linked in:
+CPU: 1 UID: 0 PID: 4531 Comm: kworker/1:1H Not tainted syzkaller #0 PREEMPT 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/06/2026
+Workqueue: kblockd blk_mq_run_work_fn
+pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : blk_mq_dispatch_rq_list+0x960/0x13a8 block/blk-mq.c:2131
+lr : blk_mq_dispatch_rq_list+0x960/0x13a8 block/blk-mq.c:2131
+sp : ffff800099cf77e0
+x29: ffff800099cf78c0 x28: 0000000000000000 x27: ffff0000c8f66880
+x26: 1fffe00019214142 x25: ffff0000c90a0a48 x24: ffff0000c8f66800
+x23: dfff800000000000 x22: ffff0000c90a0a10 x21: ffff800099cf7a48
+x20: ffff800099cf7a40 x19: ffff0000c8f66948 x18: 0000000000000000
+x17: 0000000000000001 x16: 0000000100000000 x15: ffff80008b586000
+x14: ffff80008bdbe7b0 x13: 0000000000000002 x12: 0000000000000000
+x11: 0000000000000000 x10: ffff70001339ef12 x9 : 0000000000000000
+x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000000000
+x5 : ffff80008b769280 x4 : 0000000000000000 x3 : 0000000000000010
+x2 : 0000000000000000 x1 : ffff0000d25c5880 x0 : 0000000000000000
+Call trace:
+ blk_mq_dispatch_rq_list+0x960/0x13a8 block/blk-mq.c:2131 (P)
+ __blk_mq_sched_dispatch_requests+0x250/0x10e8 block/blk-mq-sched.c:299
+ blk_mq_sched_dispatch_requests+0xa8/0x158 block/blk-mq-sched.c:329
+ blk_mq_run_work_fn+0x214/0x2e4 block/blk-mq.c:2556
+ process_one_work kernel/workqueue.c:3495 [inline]
+ process_scheduled_works+0x91c/0x1250 kernel/workqueue.c:3578
+ worker_thread+0x798/0xbd0 kernel/workqueue.c:3659
+ kthread+0x304/0x3d4 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:854
+irq event stamp: 156
+hardirqs last  enabled at (155): [<ffff80008697a49c>] __raw_spin_unlock_irq include/linux/spinlock_api_smp.h:219 [inline]
+hardirqs last  enabled at (155): [<ffff80008697a49c>] _raw_spin_unlock_irq+0x30/0x80 kernel/locking/spinlock.c:229
+hardirqs last disabled at (156): [<ffff800086954060>] el1_brk64+0x20/0x54 arch/arm64/kernel/entry-common.c:484
+softirqs last  enabled at (0): [<ffff800080302e10>] copy_process+0x12d4/0x35a0 kernel/fork.c:2267
+softirqs last disabled at (0): [<0000000000000000>] 0x0
+---[ end trace 0000000000000000 ]---
+------------[ cut here ]------------
+WARNING: block/blk.h:723 at req_ref_put_and_test block/blk.h:723 [inline], CPU#1: kworker/1:1H/4531
+WARNING: block/blk.h:723 at blk_mq_free_request+0x190/0x210 block/blk-mq.c:849, CPU#1: kworker/1:1H/4531
+Modules linked in:
+CPU: 1 UID: 0 PID: 4531 Comm: kworker/1:1H Tainted: G        W           syzkaller #0 PREEMPT 
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/06/2026
+Workqueue: kblockd blk_mq_run_work_fn
+pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : req_ref_put_and_test block/blk.h:723 [inline]
+pc : blk_mq_free_request+0x190/0x210 block/blk-mq.c:849
+lr : req_ref_put_and_test block/blk.h:723 [inline]
+lr : blk_mq_free_request+0x190/0x210 block/blk-mq.c:849
+sp : ffff800099cf7730
+x29: ffff800099cf7730 x28: ffff70001339ef0c x27: ffff0000c90a0a00
+x26: ffff0000d25c5880 x25: 1fffe00019214143 x24: 1fffe00019214160
+x23: dfff800000000000 x22: dfff800000000000 x21: ffff0000c90a0a9c
+x20: 000000000000007f x19: ffff0000c90a0a00 x18: 0000000000000000
+x17: 0000000000000001 x16: 0000000100000000 x15: ffff80008b586000
+x14: 00000000001addca x13: 0000000000000001 x12: 0000000000000000
+x11: 0000000000000000 x10: ffff600019214154 x9 : 0000000000000000
+x8 : 0000000000000000 x7 : ffff800081839f14 x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000000 x3 : ffff8000818151e0
+x2 : 000000000000007f x1 : ffff0000d25c5880 x0 : 0000000000000000
+Call trace:
+ req_ref_put_and_test block/blk.h:723 [inline] (P)
+ blk_mq_free_request+0x190/0x210 block/blk-mq.c:849 (P)
+ __blk_mq_end_request+0x32c/0x434 block/blk-mq.c:-1
+ blk_mq_end_request+0x68/0x8c block/blk-mq.c:1169
+ blk_mq_dispatch_rq_list+0x410/0x13a8 block/blk-mq.c:2153
+ __blk_mq_sched_dispatch_requests+0x250/0x10e8 block/blk-mq-sched.c:299
+ blk_mq_sched_dispatch_requests+0xa8/0x158 block/blk-mq-sched.c:329
+ blk_mq_run_work_fn+0x214/0x2e4 block/blk-mq.c:2556
+ process_one_work kernel/workqueue.c:3495 [inline]
+ process_scheduled_works+0x91c/0x1250 kernel/workqueue.c:3578
+ worker_thread+0x798/0xbd0 kernel/workqueue.c:3659
+ kthread+0x304/0x3d4 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:854
+irq event stamp: 186
+hardirqs last  enabled at (185): [<ffff800080562850>] seqcount_lockdep_reader_access+0x7c/0xf8 include/linux/seqlock.h:75
+hardirqs last disabled at (186): [<ffff800086954060>] el1_brk64+0x20/0x54 arch/arm64/kernel/entry-common.c:484
+softirqs last  enabled at (178): [<ffff8000800204f4>] __do_softirq+0x14/0x20 kernel/softirq.c:703
+softirqs last disabled at (159): [<ffff8000800204f4>] __do_softirq+0x14/0x20 kernel/softirq.c:703
+---[ end trace 0000000000000000 ]---
