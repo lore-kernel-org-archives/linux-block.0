@@ -1,45 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.137
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794664506;
-	b=dFULKUlpSf6cJv8vlLSA8J7ZIzQqdqmTQM89l2Dxy1Hdqn2C/+y0hyVCTCExk9u3ifMy
-	 SRcOGcq1Sjb24iQYd/xjD3KjPHOmmbH/SeZ5CQ4cg3KcgajoYKbFwIQjLIiprAtMsVq8P
-	 5YQB+5Lw5+zF0o+RO15yPOCdagSBHmfewN5BZ7UKQVtpkGVNknEUnufq0sT+FH2ew7yWn
-	 xUswKFVmpu0VGjR9fJR5s+KLT161L8WOy9h7xnp/go9ONgoWpYF4KoZUOO9RONxNtCj+m
-	 TFExwtRuNAcQhKPB+JgFCQnMMfhk9qz9yMpiQVKc8QZt7f6JpshEULhsu2tNE9ZZ1Ew==
+	t=1794668760;
+	b=hxzQMGUPxGqGxYz+HuEnmvl5V890/oCBU+Ap7Dv3sn824/c6ndiIOKXF9DJo6AMT5nhX
+	 mwKH3kyU0YoJpEJzuXtuim5r2KscfRNzn4/SaezotCfZdBTpZHA3iC/oaElgNgsT5tykL
+	 qz0B4MkL1rVTUEXYU7wH/oe9rakThdLkdLvtJZqwZr3loQtwLNgESYL1ODcYTnl83xEiZ
+	 O/2rZYjgrGv5Bl+oINMmzyYvzEK1uk+S+mN+AgYPKrehQ3nPBB4OQMFYrN+L/CfL+KdU9
+	 Xtt30Ey641xmUE/JXmFPVh/oEIgUBlYc1sYqKuWRA6K/vvOLWWIwhhrT7W8IkL9/Deg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794664506;
-	h=Received:DKIM-Signature:Content-Type:MIME-Version:Message-Id:
-	 In-Reply-To:References:Subject:From:To:Cc:Date;
-	bh=gZCOg3PYW5/XzYktPPO7fZbRJ9jC/nh9/3WC5LHdP9k=;
-	b=hXY0DqmenbfI+3T5ge4+EoX9i3cpPrl44Pw2sJDk/0UpqdvK6T1+RR8S39nxUDw94uxp
-	 FH4aL0rBYG6dBDMrQwEu4o2SLO7PnNWrmbIgRHaCZ0JPM2DoeBzR1r+3dkLJg967QJMJh
-	 IIXiLxd84C+ycGsOHCX/KP/IlY8wMI+QGF2Xk3w/IEBzq2GEqFvaVxrFMPCx2KLPXKUtg
-	 2ImZkYNaybwMrMH8ujZhShTb6OQtP2mtWbqXWUzCSdKr8lJxiIgY+GacAT7gokXY+yCzL
-	 PpkvAkEWlurTRdRtHvD903r3rOq8kW+5Ha0oaySWWfG+dK08Fo98Oc+aZA4QJjuRb1Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794668760;
+	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
+	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=/mxt8P+p8nf0AiOazDgUB7JS7ORkdSvZiaaLa5AtUKc=;
+	b=LXolftgfT0ydqIOKm0Nry5LgmeynfgLe5UoLcfyXYvknDbTc+hqHBXuhg4ftulZLBV2M
+	 iMRuTRhE6DH/rFPVwAkMJg/dNS1XOadPsj6IX5a7clw2SVz4Ic/Pq/cGZSpXffM7bUWBo
+	 +gnw14g08aZJi5r3qNgR3jxkN7CCsdQzDqH7Z1ESOIt5CWU5p6ou67bCN+Av64XX/YGqX
+	 sLVPSqHICf7CsQm8BErS5JamB2f5wtxP6kMaovFGj1y9jrX371idgkf6FK9a7kCp71rvO
+	 Ju2fH5iwqel2dVkG9spH3Rirw4gMW3QLDqxz9SyJyTSsBwoZ5IcoNpI2NulRHdEPDzw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lC1rRmz7;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87187606A338;
-	Sat, 14 Nov 2026 13:55:06 +0000 (UTC)
+	dmarc=pass header.from=cmss.chinamobile.com;
+	spf=pass smtp.mailfrom=cmss.chinamobile.com;
+	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=mf5fqHeK;
+	arc=none smtp.remote-ip=111.22.67.137
+Received: from cmccmta4.chinamobile.com (cmccmta4.chinamobile.com [111.22.67.137])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950E7606A330;
+	Sat, 14 Nov 2026 15:05:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 950E7606A330
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lC1rRmz7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E73891F000C5;
-	Sat, 14 Nov 2026 13:55:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794664506;
-	bh=gZCOg3PYW5/XzYktPPO7fZbRJ9jC/nh9/3WC5LHdP9k=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=lC1rRmz7ahj/srEYA2ijCYwgAqxvBpBEiZzJTz1BT/wrTEWhRCAJRjIQUg90ualPp
-	 8fNiGIog6yGBq7jcPWwPg3KTZ4hhP7wzOgQinag8fVT+8JrN/YD10tUBIHBk4t50YO
-	 lVbRqj+kObH/VFAULApyIEa7KJo13ikHhn4sjSYyAVLzN15VB21GTINJSJZ5zSjoJ2
-	 SqbEpuE67Y8c73FjyTC9QAtGI69lnMt18W/xx4/7c8YFqB+lo9IQTij1vjYC2G1yJC
-	 gbXcz8wGq7FFvOpMP/hQpyy359bbb1860T3yz8/mr3WEBUyRt+SVvwAJEu6hB8hDoE
-	 Jru9mkTF+Jtaw==
-Content-Type: multipart/mixed; boundary="===============0802335019258284520=="
+	dkim=pass (1024-bit key) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=mf5fqHeK
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=cmss.chinamobile.com; s=default; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=mf5fqHeKuc5bU5TH8fTSzCRqE13f/jgJFdelRXx6kMGeDMulRczsq9NTFgf1Ds94uK0thS95oObIm
+	 PcHn1FieVBL2lnLEDMeI3tRMvuqp7iWcbsEa+RbNXvIHpz+7KRP703tCyaGW9b2lvM2Uud7B2kDoXW
+	 temuXqNFacPRBob4=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app08-12008 (RichMail) with SMTP id 2ee86af878cebd0-91f2c;
+	Sat, 14 Nov 2026 23:05:50 +0800 (CST)
+X-RM-TRANSID:2ee86af878cebd0-91f2c
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from FHD-W7400297 (unknown[10.55.1.70])
+	by rmsmtp-syy-appsvr06-12006 (RichMail) with SMTP id 2ee66af878cb188-47d2b;
+	Sat, 14 Nov 2026 23:05:49 +0800 (CST)
+X-RM-TRANSID:2ee66af878cb188-47d2b
+From: Aibing Chen <chenaibing@cmss.chinamobile.com>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: edumazet@kernel.org,
+	kuniyu@google.com,
+	pabeni@redhat.com,
+	willemb@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+b29ed72382b0e218323a@syzkaller.appspotmail.com,
+	Aibing Chen <chenaibing@cmss.chinamobile.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] nbd: do not reinitialize a live socket lock when reclassifying
+Date: Sat, 14 Nov 2026 23:05:46 +0800
+Message-ID: <20261114150547.842-1-chenaibing@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.50.1.windows.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -49,97 +79,96 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Message-Id: <91e245da9f3df6d6e61808e72a4ad0213a9a6b838f594d0be74dd70ab228422f@mail.kernel.org>
-In-Reply-To: <20261114-work-loop-pseudo-v2-33-98639a2286fb@kernel.org>
-References: <20261114-work-loop-pseudo-v2-33-98639a2286fb@kernel.org>
-Subject: Re: [PATCH RFC v2 33/42] fs: add file_check_backing()
-From: bot+bpf-ci@kernel.org
-To: brauner@kernel.org,linux-fsdevel@vger.kernel.org
-Cc: jannh@google.com,mason@kernel.org,josef@toxicpanda.com,hch@lst.de,linux-block@vger.kernel.org,linux-kernel@vger.kernel.org,linux-nvme@lists.infradead.org,viro@zeniv.linux.org.uk,jack@suse.cz,linux-scsi@vger.kernel.org,target-devel@vger.kernel.org,driver-core@lists.linux.dev,linux-mm@kvack.org,bpf@vger.kernel.org,linux-security-module@vger.kernel.org,selinux@vger.kernel.org,apparmor@lists.ubuntu.com,linux-nfs@vger.kernel.org,netdev@vger.kernel.org,fuse-devel@lists.linux.dev,linux-efi@vger.kernel.org,xen-devel@lists.xenproject.org,ocfs2-devel@lists.linux.dev,linux-s390@vger.kernel.org,linuxppc-dev@lists.ozlabs.org,linux-usb@vger.kernel.org,amir73il@gmail.com,linux-erofs@lists.ozlabs.org,linux-kselftest@vger.kernel.org,brauner@kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
-Date: Sat, 14 Nov 2026 13:55:02 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 
---===============0802335019258284520==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep circular
+dependency") reclassifies the socket passed via NBD_SET_SOCK (or the
+netlink equivalent) with sock_lock_init_class_and_name().  That helper
+is meant for freshly created sockets: besides setting the lockdep
+class it clears sk_lock.owned, reinitializes the wait queue and
+reinitializes sk_lock.slock with spin_lock_init().
 
-> fs: add file_check_backing()
+The NBD protocol has userspace keep the socket fd open, so the socket
+can be in active use while it is being reclassified: an inet_shutdown()
+or lock_sock() racing the reclassification can hold sk_lock.slock
+across spin_lock_init(), leaving the live lock zeroed.  On
+DEBUG_LOCK_ALLOC kernels this surfaces as "BUG: spinlock already
+unlocked" (debug_spin_unlock()) from the shutdown/lock_sock path
+running in parallel.
 
-TL;DR: file_check_backing() may call d_real_inode() on O_PATH overlayfs files,
-which could hit WARN in ovl_d_real() (panic with panic_on_warn) and let the
-pseudo-fs check pass wrongly; reachable via fuse backing open, needs
-CAP_SYS_ADMIN.
+Add sock_lock_reclassify_and_name(), a variant that only re-arms the
+lockdep class and name of the live sk_lock (plus the module owner
+tracking) without touching the lock itself, sk_lock.owned or the wait
+queue, and switch nbd_reclassify_socket() to it.  The
+sock_allow_reclassification() guard is kept to narrow the window in
+which the lock is in use by lock_sock().
 
-> diff --git a/fs/read_write.c b/fs/read_write.c
-> --- a/fs/read_write.c
-> +++ b/fs/read_write.c
-
-[ ... ]
-
-> +int file_check_backing(const struct file *file, fmode_t mode, umode_t type)
-> +{
-
-[ ... ]
-
-> +	/* Look through stacking filesystems at the inode with the data. */
-> +	if (d_real_inode(file->f_path.dentry)->i_sb->s_iflags & SB_I_PSEUDO)
-> +		return -EINVAL;
-
-With FMODE_PATH accepted, can d_real_inode() be reached for an O_PATH file
-here?  No ->open() has run on such a file.
-
-For an overlayfs metacopy file whose data is in a data-only lower layer,
-the lowerdata redirect is only resolved lazily, by ovl_open() via
-ovl_verify_lowerdata() or by ovl_d_real().  For an O_PATH file this means
-d_real_inode() goes into ovl_d_real(), which does the lookup and verity
-check itself:
-
-    err = ovl_verify_lowerdata(dentry);
-    if (err)
-        goto bug;
-    ...
-bug:
-    WARN(1, "%s(%pd4, %d): real dentry not found\n", __func__, dentry, type);
-    return dentry;
-
-ovl_maybe_lookup_lowerdata() treats a failed lookup as a normal runtime
-event (pr_warn_ratelimited("lazy lowerdata lookup failed ...")).  It can
-also return -EINTR from ovl_inode_lock_interruptible(), and
-ovl_maybe_validate_verity() returns -EIO for a missing or wrong digest with
-verity=require.  Each of these would hit WARN(1) when reached through this
-helper, which panics with panic_on_warn.
-
-In that case ovl_d_real() returns the overlayfs dentry, so the SB_I_PSEUDO
-test looks at the overlayfs superblock and passes.  Does the check fail
-open there?
-
-Nothing calls the helper in this commit, but later in the series
-f79b9e79484f ("fuse: refuse files on pseudo filesystems as passthrough
-backing files") adds file_check_backing(file, FMODE_PATH, 0) to
-fuse_backing_open_file().  That gets its fd via CLASS(fd_raw), which
-accepts O_PATH:
-
-FUSE_DEV_IOC_BACKING_OPEN
-  fuse_backing_new()
-    fuse_backing_open_file()
-      file_check_backing()
-        d_real_inode()
-          ovl_d_real()
-            ovl_verify_lowerdata() fails -> WARN
-
-This needs CAP_SYS_ADMIN and an overlayfs with data-only layers where the
-data file is missing, the digest check fails, or the inode lock is
-contended while a signal is pending.  No fix for this was found later in
-the series.
-
-Could the pseudo filesystem check avoid forcing the lazy lowerdata lookup
-on O_PATH files, or should ovl_d_real() stop warning on lookup failures now
-that it has callers besides trace_uprobe?
-
-
+Reported-by: syzbot+b29ed72382b0e218323a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=b29ed72382b0e218323a
+Fixes: d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep circular dependency")
+Cc: stable@vger.kernel.org
+Signed-off-by: Aibing Chen <chenaibing@cmss.chinamobile.com>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ drivers/block/nbd.c |  6 +++---
+ include/net/sock.h  | 16 ++++++++++++++++
+ 2 files changed, 19 insertions(+), 3 deletions(-)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/43599461726
---===============0802335019258284520==--
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index ffce519bf..28274a48d 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1251,19 +1251,19 @@ static void nbd_reclassify_socket(struct socket *sock)
+ 
+ 	switch (sk->sk_family) {
+ 	case AF_INET:
+-		sock_lock_init_class_and_name(sk, "slock-AF_INET-NBD",
++		sock_lock_reclassify_and_name(sk, "slock-AF_INET-NBD",
+ 					      &nbd_slock_key[0],
+ 					      "sk_lock-AF_INET-NBD",
+ 					      &nbd_key[0]);
+ 		break;
+ 	case AF_INET6:
+-		sock_lock_init_class_and_name(sk, "slock-AF_INET6-NBD",
++		sock_lock_reclassify_and_name(sk, "slock-AF_INET6-NBD",
+ 					      &nbd_slock_key[1],
+ 					      "sk_lock-AF_INET6-NBD",
+ 					      &nbd_key[1]);
+ 		break;
+ 	case AF_UNIX:
+-		sock_lock_init_class_and_name(sk, "slock-AF_UNIX-NBD",
++		sock_lock_reclassify_and_name(sk, "slock-AF_UNIX-NBD",
+ 					      &nbd_slock_key[2],
+ 					      "sk_lock-AF_UNIX-NBD",
+ 					      &nbd_key[2]);
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 3144efad8..2b305777c 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1704,6 +1704,22 @@ do {									\
+ 	lockdep_init_map(&(sk)->sk_lock.dep_map, (name), (key), 0);	\
+ } while (0)
+ 
++/*
++ * Reclassify the lockdep class of a live socket lock.  Unlike
++ * sock_lock_init_class_and_name() this variant does not touch the
++ * lock itself, sk_lock.owned or the wait queue, so it is safe on a
++ * socket that userspace still holds.  The caller should check
++ * sock_allow_reclassification() first to narrow the window in which
++ * the lock is in use by lock_sock().
++ */
++#define sock_lock_reclassify_and_name(sk, sname, skey, name, key)	\
++do {									\
++	sk_owner_set(sk, THIS_MODULE);					\
++	lockdep_set_class_and_name(&(sk)->sk_lock.slock,		\
++				   (skey), (sname));			\
++	lockdep_init_map(&(sk)->sk_lock.dep_map, (name), (key), 0);	\
++} while (0)
++
+ static inline bool lockdep_sock_is_held(const struct sock *sk)
+ {
+ 	return lockdep_is_held(&sk->sk_lock) ||
+-- 
+2.50.1.windows.1
+
+
+
