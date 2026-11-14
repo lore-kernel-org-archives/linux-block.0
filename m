@@ -1,66 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.35
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794674034;
-	b=uYBNpoB2LeYd42fgikjOxAq17KItg8MZYDzlkY+ysC4h0M+hqMot071eqlpdLPHAw65x
-	 IRJ1CQ6l9qqBQMfbU/yOHlY6pARHhilGWoS4zBVFlH7ORckNp9OhREv79JADwke5RIQUl
-	 hpLB7OMLDMgSEeIyJm9CA9WVrhDhPplWirSIbGLiHdZsuk8HoAbWB+ORmw7vsyyY/RJPZ
-	 0Fz+KIvuNg7tCG9IMln1AbQxoB9BBV9B/2Ri25IWYvJIX9ApIcF+COdVk+k5uH1JXhA5v
-	 +/vI9QzMnlO5P+TXWeWEjQ9NGp3ypvzIt5xKfbKdCfild0jEiESLLuFkEEX9v3sRkuw==
+	t=1794674036;
+	b=gv2z6UKioviOzhMPaKsmbZG4wWQvMDW3t56ZgBhBlfkoJgiksVi9Na6tSMDUzKeIYjcX
+	 P71tgyagkJdYL8J5naFZ26RltAyDwcjF5pGIk90czCLbCYT3RIxxMpFGQUrnFmhqz9qR7
+	 9SHx1j2Coiq+1rKTKKEXdPzzk/PeK5v209j04GmfkpRvIknvuMr0mDtyvBqW/BM4xvZAT
+	 vnsJ9TijURmJERzXmXuINEtYeR1z+aySnxUk+mZts/+/ZDsuO9DhqenBRRMatxLmsR7zj
+	 x21340DY1vUhBMM9lz757jDQgN7Lz2C0X6vTCRfkSbbuCA5fhPNUg2yc+D6SeqYrX0A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794674034;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794674036;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
 	 X-Zmail-TransId:X-Mailer:Message-ID:Date:Mime-Version:From:To:Cc:
 	 Subject:Content-Type:X-MAIL:X-TLS:X-ENVELOPE-SENDER:X-SOURCE-IP:
 	 X-CLEAN:X-Fangmail-Anti-Spam-Filtered:X-Fangmail-MID-QID;
-	bh=Qf78webqKTFQH3x1OeHEf1XBGifGs4T6pxOG/rNraig=;
-	b=eNYnVHTUAu1e9RnOszJVlHIs/7s7ErUYgKurNGoNYfrK5JBtPGzVM5b6dyQoHArr0T9P
-	 4kZxwMxTzwMMR2m8xZKerGB3/HJPp3/7cAUdCLkWGJBsUhlzLiNK8UlnBZuZX6r3wYHdR
-	 CaBQVSwdHRct+o5D2dOt8/5uxDFC3xxa8VgBGN1LzX9ujMDPX55/JG4bjC+j67k5irwIX
-	 9Bo7RO7l/01j+MlgybRbR+zQFJzoonpiovCbAlxxQRSyyl7RXaH4GS2CRfk/RIs4QsFlo
-	 4+DQOrnKX21Y33stk47Mm6dBjMBYC0Ve9ZGI2Sw6ZF3ue3+Zwksxb9rxH3vR049pQmg==
+	bh=p1kQxs3bANvsyismFuTLlcI8zV+SjZ75q5bNTjnq76M=;
+	b=2yjbQaL1ObsZJFEEiegXw/cMkish/7ucJAE/ymeJpLh8lXZ1nEZgDijrCSHp77QLp9SW
+	 DdXazfLs4uZkBV8yjW3EcksYxJQ9j6nO/SCRNC+X/2hEiFASoM6NeKRUgrFrADYuLwvRM
+	 /ZXyZ+AnH/Ky6cyMfN+u9dKRmc/GkwLm+7nnQLSim+ZIHX7w1PhQPPNEPR6O0z2ZxDuM5
+	 JRXJC1AGxjDdXTh1pnKZ2rxj7ZI185aNd3KWeMY/1umB0m41TNR7BU9LTfBgQKpp2rfAq
+	 sR5dmfLSs3eHBR4tr8UNrPdLx71j5FCyARSVaaXXGPP2OvnQ0MedBnEY3MRN2IBRnug==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=zte.com.cn;
 	spf=pass smtp.mailfrom=zte.com.cn;
-	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=b0T94ja+;
-	arc=none smtp.remote-ip=183.62.165.209
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=EEK6+clL;
+	arc=none smtp.remote-ip=160.30.148.35
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F03606A8B7;
-	Sat, 14 Nov 2026 16:33:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6F03606A8B7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB4260A260B;
+	Sat, 14 Nov 2026 16:33:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BFB4260A260B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=b0T94ja+
+	dkim=pass (2048-bit key) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=EEK6+clL
 Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4jRfp139jXz4xPSF;
-	Sun, 15 Nov 2026 00:33:45 +0800 (CST)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jRfpB2hb5z8Xrr9;
+	Sun, 15 Nov 2026 00:33:54 +0800 (CST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
-	s=z202610; t=1794674025;
-	bh=xLDgdr6+3qwbQBx6NEyLbkgD2NvygyaSYz0mi5aeCD8=;
+	s=z202610; t=1794674034;
+	bh=OsixfxYyH+pb1boFiLUyWsJVY4ci0p0pP60R3pBRhuU=;
 	h=Date:From:To:Cc:Subject;
-	b=b0T94ja+GO6I95dOEM/ESsVHlo1rrG7M4uAYWricVXiSRcN2nw/fittxXBwX82RlV
-	 WJXo5Fy5peFP27qFgVfMnXOPe3LLs/Nc1uIGzH9zLeR/WubSSJQOjfjujs3mDE2LpO
-	 cp0uz+Y7IaucmLqd124pJtwuEYZp24MNAn+BCL7Um1AEraV6UbHkzOER5hMt+99lqJ
-	 1Tv6YQEhr5o3MYdBC2K7w6v9Vm/9pwZ0kA7YPwf9dlUVQnIle8xDgdkn6hG59E4NSU
-	 9DnkQJ5fp1J1BqCI5AVpO0W240hX157xZHU56tX7dp1kcIHNpcsn7VZlroiiVBoIeH
-	 0JNN1j3O+xBrg==
-Received: from xaxapp05.zte.com.cn ([10.99.98.109])
-	by mse-fl2.zte.com.cn with SMTP id 6AEGXhVj085692;
-	Sun, 15 Nov 2026 00:33:43 +0800 (+08)
+	b=EEK6+clLyRfBD2kGp2W7HupYmXZXQPIa+ECxPap+6ojJx2UyxOBsssWX5i84cp1Dk
+	 KQKzwhVyJAa7gwFkf92vogHJK52lX3b/q3nplcZje+rV5munnnV3lWOkDBHWBCSu3e
+	 0rxla2UeJzwEmsoWb5LNlEV6+TB78wbl8Xh035QWQzq9MLwLGFfcIMoaSJZccNvt+u
+	 JGcG585gofBUbbAgLlOv/5wFTgm/1u/whN/ON/XZhnVXTyC05LUVx5vFJJ03VMrsLS
+	 iW10WD4cvBUmmNHVi8GJ4+eYP7+CvZEI7X/bwWUO9NgXpjjoD/pnszXdYNQJ4VWJ6d
+	 fhvhRMrsl6DeQ==
+Received: from xaxapp04.zte.com.cn ([10.99.98.157])
+	by mse-fl2.zte.com.cn with SMTP id 6AEGXkba085735;
+	Sun, 15 Nov 2026 00:33:46 +0800 (+08)
 	(envelope-from shao.mingyin@zte.com.cn)
-Received: from mapi (xaxapp05[null])
+Received: from mapi (xaxapp01[null])
 	by mapi (Zmail) with MAPI id mid32;
-	Sun, 15 Nov 2026 00:33:47 +0800 (CST)
-X-Zmail-TransId: 2afc6af88d6b33b-25316
+	Sun, 15 Nov 2026 00:33:49 +0800 (CST)
+X-Zmail-TransId: 2af96af88d6d2fb-292d2
 X-Mailer: Zmail v1.0
-Message-ID: <20261115003347468yvY7EkDVXpRQABqNYceKf@zte.com.cn>
-Date: Sun, 15 Nov 2026 00:33:47 +0800 (CST)
+Message-ID: <20261115003349683IFDCSTYhPzQtBozUiO8qN@zte.com.cn>
+Date: Sun, 15 Nov 2026 00:33:49 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -71,79 +71,75 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 Mime-Version: 1.0
 From: <shao.mingyin@zte.com.cn>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIXSBwYXJ0aXRpb25zOiBzdW46IGNhbGN1bGF0ZSBwYXJ0aXRpb24gc3RhcnRzIGluIHNlY3Rvcl90?=
+To: <tom.leiming@gmail.com>, <linux-block@vger.kernel.org>
+Cc: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIXSB1YmxrOiB2YWxpZGF0ZSBhbGwgcGFyYW1ldGVycyBmb3Igem9uZWQgZGV2aWNlcw==?=
 Content-Type: text/plain;
 	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 6AEGXhVj085692
+X-MAIL:mse-fl2.zte.com.cn 6AEGXkba085735
 X-TLS: YES
 X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
-X-SOURCE-IP: 10.5.228.133 unknown Sun, 15 Nov 2026 00:33:45 +0800
+X-SOURCE-IP: 10.5.228.133 unknown Sun, 15 Nov 2026 00:33:54 +0800
 X-CLEAN: YES
 X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6AF88D69.000/4jRfp139jXz4xPSF
+X-Fangmail-MID-QID: 6AF88D72.000/4jRfpB2hb5z8Xrr9
 
 From: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-The Sun label parser calculates sectors per cylinder and partition
-starts in unsigned long. On 32-bit systems a start above UINT_MAX
-sectors wraps before put_partition() receives it, potentially exposing
-a partition at the wrong location. The same label is parsed differently
-on a 64-bit system.
+ublk_validate_params() returns as soon as zoned parameters are valid,
+skipping the subsequent DMA alignment, segment and integrity checks.
+SET_PARAMS therefore accepts combinations that it rejects for a
+non-zoned device, including integrity parameters without UBLK_F_INTEGRITY.
+Invalid parameters may reach disk creation or advertise an integrity
+format that the server cannot access.
 
-Keep both values in sector_t and promote the first geometry operand
-before multiplication. This also prevents the two 16-bit geometry
-fields from being multiplied as signed int when their product exceeds
-INT_MAX.
+Continue checking the remaining parameter types after successful zoned
+validation. Preserve the zoned validator's errors and the requirement
+for zoned devices to supply zoned parameters.
 
-Cc: stable@vger.kernel.org
+Fixes: e84025d2a9cb ("ublk: add DMA alignment limit")
 Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
 ---
-Testing:
-Built with W=1 for i386 and m68k. Ran the complete parser against five
-checksummed labels in freestanding i386 and x86_64 test programs with
-substitutes for disk reads and partition registration. The base parser
-miscalculates two starts on each ABI; the fixed parser matches the
-independently calculated starts for all five labels on each ABI.
+Tested on next-20261105 in an x86_64 QEMU/KVM guest (4 vCPUs, 4 GiB,
+4 KiB pages), with CONFIG_BLK_DEV_UBLK, CONFIG_BLK_DEV_ZONED and
+CONFIG_BLK_DEV_INTEGRITY enabled. The same userspace program submits
+ADD_DEV, SET_PARAMS and DEL_DEV through io_uring to both kernels.
 
-Also tested a checksummed Sun label in x86_64 QEMU/KVM with both geometry
-fields set to 65535. The base kernel discards its partition because of
-the miscalculated start; the fixed kernel reports start sector
-4294836225 and length 128. The backing disk is a sparse image.
+Independently invalid DMA alignment, segment boundary and integrity
+parameters without UBLK_F_INTEGRITY are accepted by the original kernel
+and rejected with -EINVAL by the fix. The integrity test uses valid DMA
+and segment parameters; enabling UBLK_F_INTEGRITY makes the same parameters
+valid on both kernels. Valid optional parameters are also accepted by
+both. All five checks pass on three independent boots per kernel.
 
-The arithmetic is already present in the initial Linux git snapshot;
-its original introducing commit has not been identified.
+Separate userspace function tests cover 4 KiB and 64 KiB page-size
+boundaries. The QEMU tests exercise SET_PARAMS only, without START_DEV
+or block I/O.
 
-base-commit: 84abb955b1015477aa11a96e2f3ac1b938b77f48
+ drivers/block/ublk_drv.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
- block/partitions/sun.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/block/partitions/sun.c b/block/partitions/sun.c
-index 92c645fcd2e09bfd82a51fdfa81e4ee61f42051d..02ddc967846b884d2e03e3858c0ecfdf5be888b2 100644
---- a/block/partitions/sun.c
-+++ b/block/partitions/sun.c
-@@ -64,7 +64,7 @@ int sun_partition(struct parsed_partitions *state)
- 		__be16 csum;       /* Label xor'd checksum */
- 	} * label;
- 	struct sun_partition *p;
--	unsigned long spc;
-+	sector_t spc;
- 	int use_vtoc;
- 	int nparts;
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 3d322fa1bc83160f51fbd97fb89b17ee94bc1213..ce1c192e3590cb8ddfeb495629540a653658513a 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1011,10 +1011,14 @@ static int ublk_validate_params(const struct ublk_device *ub)
+ 	if (ub->params.types & UBLK_PARAM_TYPE_DEVT)
+ 		return -EINVAL;
  
-@@ -102,9 +102,9 @@ int sun_partition(struct parsed_partitions *state)
- 	 */
- 	use_vtoc = use_vtoc || !(label->vtoc.sanity ||
- 				 label->vtoc.version || label->vtoc.nparts);
--	spc = be16_to_cpu(label->ntrks) * be16_to_cpu(label->nsect);
-+	spc = (sector_t)be16_to_cpu(label->ntrks) * be16_to_cpu(label->nsect);
- 	for (i = 0; i < nparts; i++, p++) {
--		unsigned long st_sector;
-+		sector_t st_sector;
- 		unsigned int num_sectors;
+-	if (ub->params.types & UBLK_PARAM_TYPE_ZONED)
+-		return ublk_dev_param_zoned_validate(ub);
+-	else if (ublk_dev_is_zoned(ub))
++	if (ub->params.types & UBLK_PARAM_TYPE_ZONED) {
++		int ret = ublk_dev_param_zoned_validate(ub);
++
++		if (ret)
++			return ret;
++	} else if (ublk_dev_is_zoned(ub)) {
+ 		return -EINVAL;
++	}
  
- 		st_sector = be32_to_cpu(p->start_cylinder) * spc;
+ 	if (ub->params.types & UBLK_PARAM_TYPE_DMA_ALIGN) {
+ 		const struct ublk_param_dma_align *p = &ub->params.dma;
 -- 
 2.43.0
