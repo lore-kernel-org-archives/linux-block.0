@@ -1,49 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794653313;
-	b=gHImyo9oe41TSTmstu3+In0PeAnTw2GbvGWrajcUdsbbaL8YROx8FHC+ogf+Nj5nee9g
-	 eHiBxLkHxoqulZopE9FDO3YiuIJ4oY4tvbZABCLGaJ7aUbWfZG748eBxlqdjuhk2eSK5E
-	 0rdjrBpK+7Xl8voIac5HoQ8XOcvPtFUaPmeMHIN6iM9zm7HqtM3uLbzjQKrq+NBsI1GeE
-	 CEM+FrD7nXZ7RHZiL2E/Wc0K6E0c+5kZItAv1HcuvjyDA4WAJrU5GREFN90uUvM3AZNXV
-	 pl7cj9AYodupDbrhjKz1sZcZ6d5AsOudA4OmL6XzsFsufXI9ihQ/bpHHtC2CwxiTHBg==
+	t=1794657338;
+	b=GSSBZLcXwKo1oLjH1XO0Z1CjjXt6THdO2/hZ4RYqZds/J4HodvVGyolzxE4YtHnak3d/
+	 0oonCpXsj8nYvd58aavZbC0PfLZowAajfZjuE5UTjGRR+yG7wyiVCowCkxtUEUzEqcI0G
+	 ZtnOkzD0kMuT86Xx3npWNbt354mDgNfohTNgSOCMUfot9vTbHWCkY3h6N7bUOOGtP3/Yn
+	 vXf4OV7yey7m9HmbsRRl0l3Z9vuocrEKhitYx/iVdoJS7yK+Y7OuLcbAC9AemgnSrOURK
+	 QD6zxGhjprYwgIvvQASKRbp8PWhwfkGcatbLQIO2NGK01hH7q740ifc8503P9koiwWw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794653313;
-	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=vlnGjiz0WitO6a++5wfKz3FIFE4QfP7og6wENObjkjQ=;
-	b=z9Zyg1hraQkR4V8epnKq9TcTioD8q95lQ0Jj47tJ+j0RytC7Wxh89LBghNGcjm6mU/03
-	 WqHV+J06FVW6pD0lTKpE7wCRROiNByL1IP4ueotT8vmIiMt5OMQpv2Ubaij92i8mWOZ8E
-	 8QNUIkCdCBHtDrL66uDI8WvqKbQMNuF+QRT1nBolkw1wN51UU51V1VatEK7JyX4qUfC+V
-	 UbhP+rTejxoD3d6fEKpAnFy51S5evuJ3C9TQDqEEYe3b5Jjl5ygonYZ6HvTkWh+Zz2YEI
-	 hsI9cRxPfwI2Prc0Ln4rHSb9gCNnzh8BW6faG/w+XEMvoKKfMszQHD/U+skNwRs542Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794657338;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
+	 In-Reply-To;
+	bh=nJvs09p7QWIuuw8YOzj5TR133+2IJ5+yRajckn/hsO0=;
+	b=Dj0/x9dxWRP60kD29ess4+0rA/SgvFDoSUcdqe6yZ1QheqiY24puA2zC/VQEETXYSMce
+	 Kc2cGYFRVKU2zNH4nBwceNmJkCPj0GZgfelGXU098Uy2VcVbssJjGpZ9dmtpvOgRwCi/U
+	 OEyGkjBLStRF3/7PJX2prz35D+mPakSl9kmw9jvPIRD2zVYaiNd0kTouCUVYH8Le/bCaY
+	 DgftJs0wj6wmxhUW6MfL1ZEXAx6C5sbfVqH50fGr+O45NpOCKRtcWlSfOdI98znGdkA3t
+	 oRpdssaVsPVA98ovEFV2tCymJ5xkhth37JHU/tctH6McjPI2eVFWKFEs9jZekKuuGrA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YAmKiFKv;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MrTBjpIE;
+	arc=none smtp.remote-ip=209.85.218.47
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E14606B4B3;
-	Sat, 14 Nov 2026 10:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65725606A32E
+	for <linux-block@vger.kernel.org>; Sat, 14 Nov 2026 11:55:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 65725606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YAmKiFKv
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A92A31F000C5;
-	Sat, 14 Nov 2026 10:48:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794653313;
-	bh=vlnGjiz0WitO6a++5wfKz3FIFE4QfP7og6wENObjkjQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=YAmKiFKvxF2dqJ70rHRHIFzWFOSENglPJ7iVVtlJMeJPizgjDyjwhj1/ROXABd4Et
-	 bS2LB9Ar8T/0BNx16VCKlFg2fabI/kYgKN6KizzxYI5hiXrnQTHWsqMD/vVhp0iJw6
-	 BSh3zGBgjYZNG2gGvg840yNfMmHJsvEL8e0NiGtV60KvyTSoQnhMOfIvmGvHR/12L1
-	 6O92HQnZ5CbQImtytcFhNmkbwvgKXh/wZFcE7DrlN8z5jJwVu0pRBV+DH48kGKy4a6
-	 uhb9TA2ol473UTjKLxFsdZUDTZPbBtK2UOzRFmB4BQI/sDP67dC+HHuUTOorpen3/E
-	 JmS8GlEYJRJ6Q==
-From: Christian Brauner <brauner@kernel.org>
-Date: Sat, 14 Nov 2026 11:47:19 +0100
-Subject: [PATCH 12/12] nfsd: take freeze protection for the truncate on
- open
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MrTBjpIE
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c50604721c8so370135466b.3
+        for <linux-block@vger.kernel.org>; Sat, 14 Nov 2026 03:55:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794657337; x=1795262137; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=nJvs09p7QWIuuw8YOzj5TR133+2IJ5+yRajckn/hsO0=;
+        b=MrTBjpIEXzsSZaANjc7oExJhwGnF+j3pBQoJGLV3AozjECewWnT/dOn8PoCfUIeYGI
+         mRgldWBhVoyoY4kjpOu/TkcCPMpetn8bMN74Irqnk0JnK5MAQS777TE3iVfENO0qNvUE
+         8qb82pxhdLikkA/6tATGUpByZMee1vHTbdl6A6vtosorr3+hE9wD/mpuH76lS1WAZqyn
+         nUdTyabyG8UAyWqGnpYJGfY62DgpvBldD5kNADP5MARyaYxmHHJYDsQkr6qVKrnaldzF
+         KHIyaxdpU8Pcl80WjVwUUXXw+yU81KD0D8RdN7wE6Dhf//BzElFXAKq/AgQBu3vGzFII
+         7JmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794657337; x=1795262137;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=nJvs09p7QWIuuw8YOzj5TR133+2IJ5+yRajckn/hsO0=;
+        b=o9AGfOT6wlH9/RVRYXfP6Xz48HqYJpqhsGvY65bzsHGJa288M/NaLDQbcmsxoeMKdO
+         ZDr9OiUaBvpBPMbZBLhKxoU+uzkgBwbB++sIlhXA3wZvPZyYgQYVJ8euvSKfT2m6AjPH
+         F2dyNHNHy3uiisdiuRYo5QNpGSzYxa+KcH32HpGEMyC0ljmi/wCziPaWP56tkXJVu6Jf
+         KFpZxoO7ZyQh5UAoue22V2IzF5Y1fBG6r5oD4zSl//T7/GxzgHAX6HIdw45RQ5Lr3cVS
+         4iZr8v9gN54z3R1uwATu5AE2vouU/CAL7a7VD/nTOoaQhHItjE1SaAriJ7otRYK9a/9n
+         5cbw==
+X-Forwarded-Encrypted: i=1; AL+hErF3iLXW8Wv0q6vlffpWGLl835SbgljFVCm2FeIIwHOlX5F9EMSC6WtCv1soqo6VdF1LIHPHoAo1xFfPOw==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+o+nFdFvunyDFUL/eMdI+hun4fbqsj9F/00k9mePZ3ttNst/ue
+	LQ5LSJwmGnO+0IPGcAP8gXtbtsz5GIWjWKuybesUrTxbHIcTIkJEqbH6
+X-Gm-Gg: AYBFou2VxUmkzsIlaG8jaQ970odnnuUyOospNBlVbRK6bZaPVZ4jSrtXby3SNsZqM9R
+	ElpC7fcpyW1zAUdKsdaRMF2fs8svJXcAf4owtONV8FGhGj1RyP2LWB1N5eZIXaXOD70FDXNehH6
+	obyGJoRR1VegXgz+md8hg2S794R5FedJP9WNnDLc07XykmnEzAOXu/CnOzvpipAhdoRAZP322oP
+	AHWIxCYaDmeBsegrNWJ+2AihBE0WWnYEiIrYqXopMRnpbGznP5gVGJ3bBecXfazvaWYSJ1deguy
+	LUqzuzmYH/4s5Jb0k27Im7fdnFY8BkPQc53oINdlm3lKYvQAQXBEsg5YJiO28nVVBQuYNo2yNIc
+	9B1HawGa49YLbwQomu7bB1v/VDH0R4FdBDcNinlES8jAlXE4aXMPvkyr402XuD2BBkH3V4Hruq7
+	vONeXHYcy1apVwg05IsbM1II4NJPLXYKBXtMv/IlwwWDlII77g4rtvR9b9r9r7fo6yHh/x8fISF
+	O6giWjIS9KsV6QdZ/VEpaQzO1ia54TqXog+FP/+TiwGOS8IlLQGq3MdqtVOZpnSdKGBjcKEdGxV
+	rDcIir0+iBCMv7QMh9OHzzOgkzURf1U6S6Mn9/kTeXfDaRCjTH9jZ96AgmJ4hq0np8fDidiEln+
+	3X41fgucMfho=
+X-Received: by 2002:a17:907:3e10:b0:c40:231:6eab with SMTP id a640c23a62f3a-c5096370c31mr441592966b.16.1794657336589;
+        Sat, 14 Nov 2026 03:55:36 -0800 (PST)
+Received: from localhost (178-84-201-199.dynamic.upc.nl. [178.84.201.199])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c5095b41f44sm206223866b.31.2026.11.14.03.55.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Nov 2026 03:55:36 -0800 (PST)
+Date: Sat, 14 Nov 2026 12:55:35 +0100
+From: Amir Goldstein <amir73il@gmail.com>
+To: Alexander Mikhalitsyn <alex@amutable.com>
+Cc: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>,
+	Chris Mason <mason@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+	driver-core@lists.linux.dev, linux-mm@kvack.org,
+	bpf@vger.kernel.org, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org, apparmor@lists.ubuntu.com,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	fuse-devel@lists.linux.dev, linux-efi@vger.kernel.org,
+	xen-devel@lists.xenproject.org, ocfs2-devel@lists.linux.dev,
+	linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-usb@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC 38/41] fuse: refuse files on pseudo filesystems as
+ passthrough backing files
+Message-ID: <avhMN39TECaur0sS@amir-ThinkPad-T480>
+References: <20261110-work-loop-pseudo-v1-0-4c998976c6c7@kernel.org>
+ <20261110-work-loop-pseudo-v1-38-4c998976c6c7@kernel.org>
+ <20261111151202.GA11391@lst.de>
+ <fb1d72cf25d10a960da627f6d93a3e041820ed3a.camel@amutable.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -53,74 +116,34 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261114-work-fs-frozen_writes-v1-12-f5ae61c898b1@kernel.org>
-References: <20261114-work-fs-frozen_writes-v1-0-f5ae61c898b1@kernel.org>
-In-Reply-To: <20261114-work-fs-frozen_writes-v1-0-f5ae61c898b1@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Shakeel Butt <shakeel.butt@linux.dev>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, 
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
- io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- linux-scsi@vger.kernel.org, target-devel@vger.kernel.org, 
- linux-unionfs@vger.kernel.org, bpf@vger.kernel.org, 
- linux-nfs@vger.kernel.org, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.17-dev-ce4c1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1520; i=brauner@kernel.org;
- h=from:subject:message-id; bh=d7TUoTxYNm2vxq8SD7MXgIqBY32W95I8i/PEQ3ekloQ=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT9sPFiW6704Ye5dNmFuomL3BbsvtPb+kPxGdPsVa67P
- 7o82+3+p6OUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAi174z/LMOSc6Mqtz59FDO
- 3c8h5icXPbZ7tY73LsfkZuud07ee1rvEyPBrFbv4LU3zRP5kzytbKn/yzmRlu/9aLmLORO6HIS/
- 6wlgB
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fb1d72cf25d10a960da627f6d93a3e041820ed3a.camel@amutable.com>
 
-An OPEN that truncates an existing file ends up in nfsd4_truncate()
-which calls nfsd_setattr() on the already verified file handle. For a
-verified file handle nfsd_setattr() leaves fh_want_write() to the
-caller but nfsd4_truncate() never takes it, and do_lookup_open() has
-dropped its own write access by then. So a freeze of the exported
-filesystem that lands in between lets the truncate modify a frozen
-filesystem.
+On Fri, Nov 13, 2026 at 11:25:57AM +0100, Alexander Mikhalitsyn wrote:
+> Hi Christoph,
+> 
+> On Wed, 2026-11-11 at 16:12 +0100, Christoph Hellwig wrote:
+> > I've seen setups where people use fuse to mediate access to sysfs
+> > sysfs in odd ways.  No idea if that's still around, but if so, this
+> > patch will break it.
+> 
+> 
+> Oh, that's painful. Do they use backing files for that?
+> It's a relatively new feature in FUSE...
+> 
 
-Take write access around nfsd_setattr() like nfsd4_setattr() does.
+Very unlikely that they use FUSE passthrough and if they did
+very unlikely that it would break their filesystem.
 
-Fixes: 9f67f189939e ("nfsd: notify_change needs elevated write count")
-Cc: stable@vger.kernel.org
-Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
----
- fs/nfsd/nfs4state.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+The API for fuse passthrough is that the server requests to setup a
+backing file before open via ioctl and if ioctl fails (as this patch
+does) then server falls back to non-passthrough open.
 
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index 1de6c6d757c3e..e561903b9180f 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -6681,11 +6681,19 @@ nfsd4_truncate(struct svc_rqst *rqstp, struct svc_fh *fh,
- 	struct nfsd_attrs attrs = {
- 		.na_iattr	= &iattr,
- 	};
-+	__be32 status;
-+	int err;
-+
- 	if (!open->op_truncate)
- 		return 0;
- 	if (!(open->op_share_access & NFS4_SHARE_ACCESS_WRITE))
- 		return nfserr_inval;
--	return nfsd_setattr(rqstp, fh, &attrs, NULL);
-+	err = fh_want_write(fh);
-+	if (err)
-+		return nfserrno(err);
-+	status = nfsd_setattr(rqstp, fh, &attrs, NULL);
-+	fh_drop_write(fh);
-+	return status;
- }
- 
- static __be32 nfs4_get_vfs_file(struct svc_rqst *rqstp, struct nfs4_file *fp,
+The ioctl can already fail for many reasons such as MAX_STACK_DEPTH on
+procfs as the commit message says, so server needs to cope with the
+fall back.
 
--- 
-2.53.0
-
+Thanks,
+Amir.
