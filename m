@@ -1,66 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.35
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794674036;
-	b=gv2z6UKioviOzhMPaKsmbZG4wWQvMDW3t56ZgBhBlfkoJgiksVi9Na6tSMDUzKeIYjcX
-	 P71tgyagkJdYL8J5naFZ26RltAyDwcjF5pGIk90czCLbCYT3RIxxMpFGQUrnFmhqz9qR7
-	 9SHx1j2Coiq+1rKTKKEXdPzzk/PeK5v209j04GmfkpRvIknvuMr0mDtyvBqW/BM4xvZAT
-	 vnsJ9TijURmJERzXmXuINEtYeR1z+aySnxUk+mZts/+/ZDsuO9DhqenBRRMatxLmsR7zj
-	 x21340DY1vUhBMM9lz757jDQgN7Lz2C0X6vTCRfkSbbuCA5fhPNUg2yc+D6SeqYrX0A==
+	b=2LAD12IyPv5kfvG4/7k+AsoEEky5j7dhqgvMXJ0Kar+vgA5IZkXI6CYT5eV8mRmOyY0z
+	 wdazVz5SK87M9gbKQl9z7HVl6LVz3ThgJQ1y51LdomonQ5Zeuy/faP2IiIiKkgysq8EdK
+	 Uvzush/7Q9JXY+l/Dw8epcp5g32rP4Ej4h5gmvsSjfM93YQO4FxJ4w4aNriBhhBi6o2PK
+	 qe2XHmGXsqzlN3Iegb3NitrI8Q7NIAp4qQuRGukmNJ1oujAUVqDj53d6zFO5LsctkrSEy
+	 J0+UozZjNKD8lTGERU+hznWodSApych7shUH4bJdZ7urQ5WMVopQluaSeYtQwY2pdPg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794674036;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
 	 X-Zmail-TransId:X-Mailer:Message-ID:Date:Mime-Version:From:To:Cc:
 	 Subject:Content-Type:X-MAIL:X-TLS:X-ENVELOPE-SENDER:X-SOURCE-IP:
 	 X-CLEAN:X-Fangmail-Anti-Spam-Filtered:X-Fangmail-MID-QID;
-	bh=p1kQxs3bANvsyismFuTLlcI8zV+SjZ75q5bNTjnq76M=;
-	b=2yjbQaL1ObsZJFEEiegXw/cMkish/7ucJAE/ymeJpLh8lXZ1nEZgDijrCSHp77QLp9SW
-	 DdXazfLs4uZkBV8yjW3EcksYxJQ9j6nO/SCRNC+X/2hEiFASoM6NeKRUgrFrADYuLwvRM
-	 /ZXyZ+AnH/Ky6cyMfN+u9dKRmc/GkwLm+7nnQLSim+ZIHX7w1PhQPPNEPR6O0z2ZxDuM5
-	 JRXJC1AGxjDdXTh1pnKZ2rxj7ZI185aNd3KWeMY/1umB0m41TNR7BU9LTfBgQKpp2rfAq
-	 sR5dmfLSs3eHBR4tr8UNrPdLx71j5FCyARSVaaXXGPP2OvnQ0MedBnEY3MRN2IBRnug==
+	bh=L9ZradzAwO1zQAENGExoJrWKxMjcauMXjqXObbjyWo4=;
+	b=X3jLmy84SDW88DNg4XSTJ5TY14tMIfHQa7SJFjk1rg7UXimknUvIsKpSc4nReiy90xwj
+	 WUSUxxBiFUeWBXobi2Bi5w3Ni7FY4RgQjZUaMdX7po0YA8i6kmXeNshcyUtyiX/GrOoWD
+	 Fxz62juiyYVqaTwrXjQ3CQyePsSl6LYfgCBt/2+Zq6wxXAAHFrZ/svOXTxrmjgXXT/an0
+	 yUKimpulaps4iYCHNiwNkIqBJDdHS3YAdNEmULk8MMbUUPfHevpkP309Ke6+seO3laAog
+	 +QkEWxfO4DdqVJOurA7rcUDoAZUYFXds1P+sjVXVTqPURpGTKZOGzEXqw8BKC/ZIaLw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=zte.com.cn;
 	spf=pass smtp.mailfrom=zte.com.cn;
-	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=EEK6+clL;
-	arc=none smtp.remote-ip=160.30.148.35
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=KJNUVcsC;
+	arc=none smtp.remote-ip=160.30.148.34
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB4260A260B;
-	Sat, 14 Nov 2026 16:33:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BFB4260A260B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197DD606A33E;
+	Sat, 14 Nov 2026 16:33:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 197DD606A33E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=EEK6+clL
+	dkim=pass (2048-bit key) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=KJNUVcsC
 Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jRfpB2hb5z8Xrr9;
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jRfpB603Qz5BNRx;
 	Sun, 15 Nov 2026 00:33:54 +0800 (CST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
 	s=z202610; t=1794674034;
-	bh=OsixfxYyH+pb1boFiLUyWsJVY4ci0p0pP60R3pBRhuU=;
+	bh=bM/vbRRrJY0G3M1hBhy9INv2M4mCgrIGctSPzSG4asA=;
 	h=Date:From:To:Cc:Subject;
-	b=EEK6+clLyRfBD2kGp2W7HupYmXZXQPIa+ECxPap+6ojJx2UyxOBsssWX5i84cp1Dk
-	 KQKzwhVyJAa7gwFkf92vogHJK52lX3b/q3nplcZje+rV5munnnV3lWOkDBHWBCSu3e
-	 0rxla2UeJzwEmsoWb5LNlEV6+TB78wbl8Xh035QWQzq9MLwLGFfcIMoaSJZccNvt+u
-	 JGcG585gofBUbbAgLlOv/5wFTgm/1u/whN/ON/XZhnVXTyC05LUVx5vFJJ03VMrsLS
-	 iW10WD4cvBUmmNHVi8GJ4+eYP7+CvZEI7X/bwWUO9NgXpjjoD/pnszXdYNQJ4VWJ6d
-	 fhvhRMrsl6DeQ==
-Received: from xaxapp04.zte.com.cn ([10.99.98.157])
-	by mse-fl2.zte.com.cn with SMTP id 6AEGXkba085735;
-	Sun, 15 Nov 2026 00:33:46 +0800 (+08)
+	b=KJNUVcsC0sHI9IT6ZvwaegDUd7zVRpuL7VFSn1p38AvaHAR89QROWNZuH1X27upOg
+	 6lmpCGbaWEwT8qKe/HCp4C+7BFw7G08xOsdiQXBhTTNs/CRRSXuS94LHeS/mSqB30o
+	 WYYOy4QMtg9eTGKICFfbW+Rdf9L1BgrmOFuD78vIv+IVYKF9Wh2yai6a1VAx9MJFC3
+	 4eWHx//axZI3hyOuLvG5ynA37/uCmO4499T2wd3uoqyKlnh58JOMuVg8YZ/k2RVHqG
+	 l2euEg1Ftf/HPGoXENC3iSph9vdCFi+e6Y7vM8qR8bQq+UGWPnbk+CuE4sqiN+0dKJ
+	 F3CByr1Misl/w==
+Received: from xaxapp05.zte.com.cn ([10.99.98.109])
+	by mse-fl2.zte.com.cn with SMTP id 6AEGXmlo085736;
+	Sun, 15 Nov 2026 00:33:48 +0800 (+08)
 	(envelope-from shao.mingyin@zte.com.cn)
-Received: from mapi (xaxapp01[null])
+Received: from mapi (xaxapp04[null])
 	by mapi (Zmail) with MAPI id mid32;
-	Sun, 15 Nov 2026 00:33:49 +0800 (CST)
-X-Zmail-TransId: 2af96af88d6d2fb-292d2
+	Sun, 15 Nov 2026 00:33:52 +0800 (CST)
+X-Zmail-TransId: 2afb6af88d70444-2841c
 X-Mailer: Zmail v1.0
-Message-ID: <20261115003349683IFDCSTYhPzQtBozUiO8qN@zte.com.cn>
-Date: Sun, 15 Nov 2026 00:33:49 +0800 (CST)
+Message-ID: <20261115003352168cE_tyVxSyZV124AM31htL@zte.com.cn>
+Date: Sun, 15 Nov 2026 00:33:52 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -72,74 +72,102 @@ Precedence: list
 Mime-Version: 1.0
 From: <shao.mingyin@zte.com.cn>
 To: <tom.leiming@gmail.com>, <linux-block@vger.kernel.org>
-Cc: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIXSB1YmxrOiB2YWxpZGF0ZSBhbGwgcGFyYW1ldGVycyBmb3Igem9uZWQgZGV2aWNlcw==?=
+Cc: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIXSB1YmxrOiBkaXNwYXRjaCB0aGUgbmV4dCBmZXRjaCBhZnRlciBhIGJhdGNoIGZhaWx1cmU=?=
 Content-Type: text/plain;
 	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 6AEGXkba085735
+X-MAIL:mse-fl2.zte.com.cn 6AEGXmlo085736
 X-TLS: YES
 X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
 X-SOURCE-IP: 10.5.228.133 unknown Sun, 15 Nov 2026 00:33:54 +0800
 X-CLEAN: YES
 X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6AF88D72.000/4jRfpB2hb5z8Xrr9
+X-Fangmail-MID-QID: 6AF88D72.000/4jRfpB603Qz5BNRx
 
 From: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-ublk_validate_params() returns as soon as zoned parameters are valid,
-skipping the subsequent DMA alignment, segment and integrity checks.
-SET_PARAMS therefore accepts combinations that it rejects for a
-non-zoned device, including integrity parameters without UBLK_F_INTEGRITY.
-Invalid parameters may reach disk creation or advertise an integrity
-format that the server cannot access.
+When a batch fetch fails, for example because its provided-buffer group
+is empty, ublk_batch_dispatch() removes the failed fetch and returns.
+Pending I/O tags stay in evts_fifo even if another fetch with usable
+buffers is already queued. With no new I/O or fetch submission to select
+it, that fetch and the outstanding block requests cannot make progress.
 
-Continue checking the remaining parameter types after successful zoned
-validation. Preserve the zoned validator's errors and the requirement
-for zoned devices to supply zoned parameters.
+Claim the next queued fetch under evts_lock before completing and freeing
+the failed one, then schedule its dispatch in the proper task context.
+Marking it active before dropping the lock also prevents cancellation
+from taking it before its task work is queued.
 
-Fixes: e84025d2a9cb ("ublk: add DMA alignment limit")
+Fixes: a4d883755399 ("ublk: add UBLK_U_IO_FETCH_IO_CMDS for batch I/O processing")
+Cc: stable@vger.kernel.org
 Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
 ---
-Tested on next-20261105 in an x86_64 QEMU/KVM guest (4 vCPUs, 4 GiB,
-4 KiB pages), with CONFIG_BLK_DEV_UBLK, CONFIG_BLK_DEV_ZONED and
-CONFIG_BLK_DEV_INTEGRITY enabled. The same userspace program submits
-ADD_DEV, SET_PARAMS and DEL_DEV through io_uring to both kernels.
+Tested on next-20261105 in an x86_64 QEMU/KVM guest (4 vCPUs, 2 GiB)
+with CONFIG_BLK_DEV_UBLK=y and the in-tree kublk batch server. A test-only
+userspace change leaves the first fetch's buffer group empty and does
+not resubmit that failed fetch. The same server binary is used for both
+kernels; there are no test hooks in the driver.
 
-Independently invalid DMA alignment, segment boundary and integrity
-parameters without UBLK_F_INTEGRITY are accepted by the original kernel
-and rejected with -EINVAL by the fix. The integrity test uses valid DMA
-and segment parameters; enabling UBLK_F_INTEGRITY makes the same parameters
-valid on both kernels. Valid optional parameters are also accepted by
-both. All five checks pass on three independent boots per kernel.
+With partition scanning disabled, one 4 KiB O_DIRECT read stalls on the
+original kernel after the first fetch returns -ENOBUFS. With the fix,
+the already queued second fetch receives the tag and the read completes.
+All three independent boots per kernel reproduce this difference. Three
+normal-buffer control boots per kernel also complete the read.
 
-Separate userspace function tests cover 4 KiB and 64 KiB page-size
-boundaries. The QEMU tests exercise SET_PARAMS only, without START_DEV
-or block I/O.
-
- drivers/block/ublk_drv.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ drivers/block/ublk_drv.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3d322fa1bc83160f51fbd97fb89b17ee94bc1213..ce1c192e3590cb8ddfeb495629540a653658513a 100644
+index 3d322fa1bc83160f51fbd97fb89b17ee94bc1213..6ca62a2ff7453001d005a854f5923e204952adb0 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -1011,10 +1011,14 @@ static int ublk_validate_params(const struct ublk_device *ub)
- 	if (ub->params.types & UBLK_PARAM_TYPE_DEVT)
- 		return -EINVAL;
+@@ -835,23 +835,27 @@ static void __ublk_release_fcmd(struct ublk_queue *ubq)
+ 	WRITE_ONCE(ubq->active_fcmd, NULL);
+ }
  
--	if (ub->params.types & UBLK_PARAM_TYPE_ZONED)
--		return ublk_dev_param_zoned_validate(ub);
--	else if (ublk_dev_is_zoned(ub))
-+	if (ub->params.types & UBLK_PARAM_TYPE_ZONED) {
-+		int ret = ublk_dev_param_zoned_validate(ub);
+-/*
+- * Nothing can move on, so clear ->active_fcmd, and the caller should stop
+- * dispatching
+- */
+-static void ublk_batch_deinit_fetch_buf(struct ublk_queue *ubq,
+-					const struct ublk_batch_io_data *data,
+-					struct ublk_batch_fetch_cmd *fcmd,
+-					int res)
++static struct ublk_batch_fetch_cmd *__ublk_acquire_fcmd(struct ublk_queue *ubq);
 +
-+		if (ret)
-+			return ret;
-+	} else if (ublk_dev_is_zoned(ub)) {
- 		return -EINVAL;
-+	}
++/* Remove the failed fetch and claim the next one before dropping its reference. */
++static struct ublk_batch_fetch_cmd *
++ublk_batch_deinit_fetch_buf(struct ublk_queue *ubq,
++			    const struct ublk_batch_io_data *data,
++			    struct ublk_batch_fetch_cmd *fcmd,
++			    int res)
+ {
++	struct ublk_batch_fetch_cmd *next_fcmd;
++
+ 	spin_lock(&ubq->evts_lock);
+ 	list_del_init(&fcmd->node);
+ 	WARN_ON_ONCE(fcmd != ubq->active_fcmd);
+ 	__ublk_release_fcmd(ubq);
++	next_fcmd = __ublk_acquire_fcmd(ubq);
+ 	spin_unlock(&ubq->evts_lock);
  
- 	if (ub->params.types & UBLK_PARAM_TYPE_DMA_ALIGN) {
- 		const struct ublk_param_dma_align *p = &ub->params.dma;
+ 	io_uring_cmd_done(fcmd->cmd, res, data->issue_flags);
+ 	ublk_batch_free_fcmd(fcmd);
++	return next_fcmd;
+ }
+ 
+ static int ublk_batch_fetch_post_cqe(struct ublk_batch_fetch_cmd *fcmd,
+@@ -2040,7 +2044,10 @@ again:
+ 	}
+ 
+ 	if (ret < 0) {
+-		ublk_batch_deinit_fetch_buf(ubq, data, fcmd, ret);
++		new_fcmd = ublk_batch_deinit_fetch_buf(ubq, data, fcmd, ret);
++		if (new_fcmd)
++			io_uring_cmd_complete_in_task(new_fcmd->cmd,
++						      ublk_batch_tw_cb);
+ 		return;
+ 	}
+ 
 -- 
 2.43.0
