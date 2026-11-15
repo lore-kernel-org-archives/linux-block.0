@@ -1,69 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.35
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794733305;
-	b=3bI02/pP/MjYzKpaJ9TXLQuxikJ6nIFoko79uQCjwLZMCbsNBH1moMI9plbz6sc0g3+n
-	 ydfaxS2IYPp67uaAHjofAjsHQYNL0vZoVGfAcRX+JizkU1LedVNone7fzmB7JQJ8LIEAH
-	 f2prVTOt+UETBIMyKPGMdbSK9JGEKVaouAXSfphbJ9S7qNDBnLojS3ByeTbmwERBbLDgW
-	 hxO85YXcaIHSQzCtvAeyZB/2Dbqz2JnpZOAHQVV6MheHP5bJRU+Duq9VU7TVepcTxWp+x
-	 a5w+SgduAz4sTJXdEmlSf/i6XxSOjoC7cUNB4bEU1lCNS6BUKsSqLAvgpC/6/GohXmQ==
+	t=1794735028;
+	b=b/TCEgmp3b8beD8k89ZUpwm9oWCZL1/bRAEkAGfSeWQ2HLrg/3UZPX/l6wom0B0Ynn1R
+	 0SWspLz2cpPr1bpAnNxLzwmpY61DqYOgkzT7diN82j9e+dZF/eQaP3qYA3rQFEFPF1RHq
+	 5i9zefvHp99ybr0uFpmEJ+A5JYpngfonZrZjJ6og9oRPIP5+3CxKtk+E7rQzO4BXerRT3
+	 mcbVBzEYFazT8Pdu8brQ55Ak8h4xo/KX9XhD+lNGSqfSYip7PuieEduD+U5MIbI/9IJRP
+	 qmdd3jnSy5YVd3YCjS5UWSJ47AWfr7gAmi2AOJJLE9bvhQtaOCO8g+orr7A72T0t5SQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794733305;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 X-Zmail-TransId:X-Mailer:Message-ID:In-Reply-To:References:Date:
-	 Mime-Version:From:To:Cc:Subject:Content-Type:X-MAIL:X-TLS:
-	 X-ENVELOPE-SENDER:X-SOURCE-IP:X-CLEAN:X-Fangmail-Anti-Spam-Filtered:
-	 X-Fangmail-MID-QID;
-	bh=6PDKL1rAzaImATTAORc/yJkECZgOXtmpf6KdI2W0Yzg=;
-	b=ePz7rHpEgTzzmK6TvTjQ1SsJcGz3EXiKztP2kgAQhXxOU0k6J0bZJlhls2utKWcVWUVn
-	 8VnLC+VEh8R397ateYWpGAnMJ2p1k6WJMvnEzmRBobGodUERwFdLX8P2fjgvYaDCwOSt6
-	 tydu5MaGfb5hd33pvw6N3vLAsBvEgOKzRsde02CbtNKDzI9VXGTXyaQAULcg6LUOWLdu5
-	 X5/P+xWMU5WcF4kPwJaAl/6UWnB50FKFTl0qgWmgF3Q1Jncadp84CMBkhC7zjrhwbgEmG
-	 QOHJOmXbFBq/cAvEzctTFrU5RdF9+HfeY4ZX29Hb5P+5yh2dA+pLf1eMbjQ5OMDGCpw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794735028;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=e7MOyX724bqCWJsCrd4OjXjEcyjDNuCUpHqJ3uJvgjY=;
+	b=if4FE9mFZTimctrs8840DtaN3sZa3U65goiDLRxCaxLrrGG05+K09f75mJt1KNYo5vyI
+	 O5dCT/Hic+q+T1XD7UCX7MVyAutR5Qc92gulcGwWMERame5Lm15sdIBoPu9nWv3XgVlCs
+	 Nnm37prBB4V4Gu7dWMaksZDeerVlIzOl1cG1qE7u348alPfdcZtj2EeyB3Qesf8YS3XEC
+	 xmTmLgTQH20wjAr1UXlsImKTO9Rwf5x1WfVbs2Njxbk9fd5fx/HAqdnY+s4gmnMgofWKt
+	 gn7NxbV1ReTRxc6Qvb6mIGrj0xk3CrDM3xMqKm+EyCQgLTdSzQpsKz3ngW55UEMxubw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=zte.com.cn;
-	spf=pass smtp.mailfrom=zte.com.cn;
-	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b="MEDHLg/e";
-	arc=none smtp.remote-ip=160.30.148.35
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=D4BDbSLF;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC2D606A31A;
-	Sun, 15 Nov 2026 09:01:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CCC2D606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF2A606A327;
+	Sun, 15 Nov 2026 09:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=MEDHLg/e
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jS4jw6Pxjz8XrrJ;
-	Sun, 15 Nov 2026 17:01:40 +0800 (CST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
-	s=z202610; t=1794733300;
-	bh=6PDKL1rAzaImATTAORc/yJkECZgOXtmpf6KdI2W0Yzg=;
-	h=In-Reply-To:References:Date:From:To:Cc:Subject;
-	b=MEDHLg/eaADWM7nJ42GBGAoxynM/3cxQk0ZakECcU0wXrpI6JAHlV9lDLpWzoJRed
-	 FxxYCWeOcmm7nz/kgosSJJzYWc3XZqp6+1lZcXQ0WvpGMPitIbulPjZaAFKDlvu9E5
-	 nHLCJ0Vz4UR6waGlsydsHt5njTjgnMhcA/8ZMzpfZtO2KIZj6kn9E4xSRtHcJdHxz1
-	 TtEXwee62wzxDeDAb1rgE6rAqlThcd9ndmR8l2xPZTA2Ln88lv/xgVCDr+x1RT0DQ/
-	 CFIl3d4yibQ97bmVXiwYR4/IWOg0hZa0HRAnj5NfvTpk7Mw1JUZKvPaEKfJ0TkwD4A
-	 XBmAdZUg6VyyA==
-Received: from xaxapp02.zte.com.cn ([10.88.97.241])
-	by mse-fl1.zte.com.cn with SMTP id 6AF91anr094626;
-	Sun, 15 Nov 2026 17:01:36 +0800 (+08)
-	(envelope-from shao.mingyin@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Sun, 15 Nov 2026 17:01:38 +0800 (CST)
-X-Zmail-TransId: 2afa6af974f2466-6c1fc
-X-Mailer: Zmail v1.0
-Message-ID: <20261115170138759eOTny6ELzQaEpo1MVAd6r@zte.com.cn>
-In-Reply-To: <avkYMF-_bBaIfBly@fedora-laptop>
-References: 202611112257529855AMDZLzg8ZmFDQ3fBstbi@zte.com.cn,20261111225801025TKHDW7iZbMR4sFQAc8af5@zte.com.cn,avkYMF-_bBaIfBly@fedora-laptop
-Date: Sun, 15 Nov 2026 17:01:38 +0800 (CST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=D4BDbSLF
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 926E11F000C4;
+	Sun, 15 Nov 2026 09:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794735028;
+	bh=e7MOyX724bqCWJsCrd4OjXjEcyjDNuCUpHqJ3uJvgjY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=D4BDbSLFVk4e+fV6ihG6kKryjFjt03+TIbG64DUmJoPCcOlP1b9vDrUdSBoHvEXxJ
+	 ldj3rhO3iRDntZCKRLkvsUOAmXeS1mHMkR0qC9TiqDgSaT+m9Owk/1bZbmBLJxsQh8
+	 PTW4FfSElqmIKtraDSDebgIUuu6ZZR0FCa8QmYQBAfd2LN1q3XSnlHSyVEPHKMl5eJ
+	 F533fyUtOVcdvUYNq3jrnkuV3ByRLnh+ry56M4lSxZ6/Hp1rYOL4urCykZ2AAfXMp6
+	 K11q3gPNCNfLg9bjJG+AqAl+3I8V2sWY6Pv15+bcu15Ch7utqYTM9Huq11ly4MDsvE
+	 LbISVNk4ZZhuw==
+Date: Sun, 15 Nov 2026 10:30:22 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Shakeel Butt <shakeel.butt@linux.dev>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, 
+	target-devel@vger.kernel.org, linux-unionfs@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 04/12] target: fileio: don't free the aio command under
+ the filesystem
+Message-ID: <20261115-rasch-haltbar-gebrechen-faac5fad7805@brauner>
+References: <20261114-work-fs-frozen_writes-v1-0-f5ae61c898b1@kernel.org>
+ <20261114-work-fs-frozen_writes-v1-4-f5ae61c898b1@kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -72,98 +61,160 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-From: <shao.mingyin@zte.com.cn>
-To: <tom.leiming@gmail.com>
-Cc: <shuah@kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stable@vger.kernel.org>, <axboe@kernel.dk>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSCAzLzRdIHVibGs6IGNhbmNlbCBjb21taXRzIGFycml2aW5nIGFmdGVyIHRoZSBxdWllc2NlIHNjYW4=?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 6AF91anr094626
-X-TLS: YES
-X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
-X-SOURCE-IP: 10.5.228.132 unknown Sun, 15 Nov 2026 17:01:40 +0800
-X-CLEAN: YES
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6AF974F4.000/4jS4jw6Pxjz8XrrJ
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20261114-work-fs-frozen_writes-v1-4-f5ae61c898b1@kernel.org>
 
-> Please add this as a new recovery selftest in v2, so the fix is
-> covered.
+On Sat, Nov 14, 2026 at 11:47:11AM +0100, Christian Brauner wrote:
+> The read completed and freed the command before ext4_dio_read_iter() got
+> to file_accessed(iocb->ki_filp).
+> 
+> Do what loop, zloop and fs/backing-file.c do and hold a reference to the
+> command until the I/O is submitted.
 
-Thanks for the reproducer. I've prepared a driver revision and a new
-recovery selftest using fault_inject's existing delay, with no kernel
-hooks. The selftest has three cases; the first is your reproducer. It
-waits for an in-flight direct write, quiesces the device, and requires
-both the write and QUIESCED before cleanup can issue another control
-command. The base stays LIVE; the revised driver passes.
+As sashiko pointed out (cf. [1]) the completion callback still completes
+the command. That drops the LUN reference while ->read_iter() or
+->write_iter() may still be running. The device and its backing file
+can go away underneath the filesystem. So we must complete the command
+on the final put as well. I've folded:
 
-> With zero copy or auto buffer registration the committed request
-> may still be in flight when the command is aborted here.
+5/12 gets simpler on top of this. kiocb_end_write() just moves into
+cmd_rw_aio_complete() which is now called exactly once for every I/O.
+I've folded both.
 
-I've made the distinction explicit rather than bypassing the guard at
-one call site. After COMMIT's buffer operations, the new command is
-marked COMMIT_READY before the old request's references are dropped.
-Both non-batch dispatch paths clear that bit before queuing task work.
-With cancellation set while dispatch is quiesced, the scan can cancel a
-waiting command even if its previous request remains started, while
-preserving the guard for a new request already queued to the command.
+[1]: https://lore.kernel.org/r/sashiko-outbox-214401@kernel.org
 
-This also matters if cancellation starts just after COMMIT: an early
-check alone misses that case. The third case uses a registered buffer:
-it submits COMMIT first and verifies that the write is still
-outstanding. The scan must abort all four commands, and releasing the
-buffer must then let the committed write complete successfully. My
-earlier draft passed the first two cases but failed this one; the
-current revision passes all three.
+-- >8 --
+Subject: [PATCH] target: fileio: don't free the aio command under the filesystem
 
-> If ublk_wait_for_idle_io() fails with -EBUSY or -EINTR, ->canceling
-> is left set and ublk_cancel_dev() isn't called.
+With fd_async_io=1 the fileio backend allocates a command that holds the
+kiocb for every read and write and frees it in the completion callback.
+Nothing keeps the command alive until ->read_iter() or ->write_iter()
+return. But a filesystem may use the kiocb after it queued the I/O. ext4
+does that for direct reads:
 
-I've documented that the idle-wait error leaves canceling set and skips
-the scan. The next late command receives ABORT even though QUIESCE_DEV
-returned an error; this change does not roll cancellation back. That
-error-path behavior was checked in source, not established by the runtime
-tests below.
+  BUG: KASAN: slab-use-after-free in ext4_dio_read_iter+0x5e1/0x690
+  Workqueue: target_submission target_queued_submit_work
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x5d/0x80
+   print_report+0x14b/0x4b0
+   kasan_report+0x108/0x130
+   ext4_dio_read_iter+0x5e1/0x690
+   fd_execute_rw+0xd30/0x1700
+   __target_execute_cmd+0x53/0x190
+   transport_generic_new_cmd+0x65a/0xdb0
+   __target_submit+0x12c/0x380
+   target_queued_submit_work+0x73/0x270
+   process_one_work+0x946/0x1820
+   worker_thread+0x4f1/0xd60
+   kthread+0x364/0x460
+   ret_from_fork+0x525/0x770
+   ret_from_fork_asm+0x1a/0x30
+   </TASK>
 
-> The new check fires whenever ->canceling is set, not only for
-> QUIESCE_DEV, so the subject and commit log are narrower than the
-> change.
+  Allocated by task 59:
+   __kmalloc_noprof+0x223/0x830
+   fd_execute_rw+0x766/0x1700
+   __target_execute_cmd+0x53/0x190
+   transport_generic_new_cmd+0x65a/0xdb0
+   __target_submit+0x12c/0x380
+   target_queued_submit_work+0x73/0x270
 
-Agreed. The new subject is "ublk: cancel late commands while the queue is
-canceling", and the log includes STOP_DEV and server exit.
+  Freed by task 14:
+   kfree+0x267/0x6a0
+   blk_update_request+0x3f5/0x1260
+   blk_mq_end_request+0x59/0x450
+   blk_complete_reqs+0xb0/0x130
+   handle_softirqs+0x20c/0x860
+   run_ksoftirqd+0x31/0x60
 
-The helper is renamed ublk_complete_canceled_cmd().
+The read completed and freed the command before ext4_dio_read_iter() got
+to file_accessed(iocb->ki_filp).
 
-> io->cmd and UBLK_IO_FLAG_ACTIVE are stored here before ->canceling
-> is read, with no barrier in between ...
+Do what loop, zloop and fs/backing-file.c do and hold a reference to the
+command until the I/O is submitted. Only complete the target command
+when the last reference is dropped as well. Otherwise the command drops
+its LUN reference while the filesystem still uses the kiocb and the
+device and with it the backing file can go away underneath it.
 
-I've added explicit paired smp_mb() barriers between command publication
-and the cancellation check, and before the scan's ACTIVE load, with a
-comment explaining the pairing. Queue quiescing serializes queue_rq, but
-the uring command handler can publish independently, so I would rather
-make that publication ordering explicit than rely on quiescing alone.
+Fixes: 769031c92c8b ("scsi: target: target/file: Add support of direct and async I/O")
+Cc: stable@vger.kernel.org
+Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+---
+ drivers/target/target_core_file.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-> If ublk_get_data() fails and falls back to requeue ...
+diff --git a/drivers/target/target_core_file.c b/drivers/target/target_core_file.c
+index ab9824a4852f1..4b23fadd7bb88 100644
+--- a/drivers/target/target_core_file.c
++++ b/drivers/target/target_core_file.c
+@@ -15,6 +15,7 @@
+ #include <linux/timer.h>
+ #include <linux/blkdev.h>
+ #include <linux/slab.h>
++#include <linux/refcount.h>
+ #include <linux/spinlock.h>
+ #include <linux/module.h>
+ #include <linux/vmalloc.h>
+@@ -243,25 +244,34 @@ static void fd_destroy_device(struct se_device *dev)
+ 
+ struct target_core_file_cmd {
+ 	unsigned long	len;
++	long		ret;
+ 	struct se_cmd	*cmd;
++	refcount_t	ref;
+ 	struct kiocb	iocb;
+ 	struct bio_vec	bvecs[];
+ };
+ 
+-static void cmd_rw_aio_complete(struct kiocb *iocb, long ret)
++static void cmd_rw_aio_put(struct target_core_file_cmd *cmd)
+ {
+-	struct target_core_file_cmd *cmd;
+-
+-	cmd = container_of(iocb, struct target_core_file_cmd, iocb);
++	if (!refcount_dec_and_test(&cmd->ref))
++		return;
+ 
+-	if (ret != cmd->len)
++	if (cmd->ret != cmd->len)
+ 		target_complete_cmd(cmd->cmd, SAM_STAT_CHECK_CONDITION);
+ 	else
+ 		target_complete_cmd(cmd->cmd, SAM_STAT_GOOD);
+-
+ 	kfree(cmd);
+ }
+ 
++static void cmd_rw_aio_complete(struct kiocb *iocb, long ret)
++{
++	struct target_core_file_cmd *cmd;
++
++	cmd = container_of(iocb, struct target_core_file_cmd, iocb);
++	cmd->ret = ret;
++	cmd_rw_aio_put(cmd);
++}
++
+ static sense_reason_t
+ fd_execute_rw_aio(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 	      enum dma_data_direction data_direction)
+@@ -288,6 +298,8 @@ fd_execute_rw_aio(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 
+ 	iov_iter_bvec(&iter, is_write, aio_cmd->bvecs, sgl_nents, len);
+ 
++	/* The filesystem may still use the kiocb after it queued the I/O. */
++	refcount_set(&aio_cmd->ref, 2);
+ 	aio_cmd->cmd = cmd;
+ 	aio_cmd->len = len;
+ 	aio_cmd->iocb.ki_pos = cmd->t_task_lba * dev->dev_attrib.block_size;
+@@ -305,6 +317,7 @@ fd_execute_rw_aio(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 
+ 	if (ret != -EIOCBQUEUED)
+ 		cmd_rw_aio_complete(&aio_cmd->iocb, ret);
++	cmd_rw_aio_put(aio_cmd);
+ 
+ 	return 0;
+ }
 
-The second case holds NEED_GET_DATA across a successful quiesce, then
-submits an unmappable address. This reaches the real mapping
-failure/requeue path. The base completes only three of four commands
-with ABORT; the revised driver completes all four, and the device
-reaches QUIESCED after the server's ring/file references are released.
-The common post-processing cancellation check covers this fallthrough
-path.
-
-All three cases (fault_inject delay, NEED_GET_DATA/requeue, registered
-buffer) were run against the same next-20261113 x86_64 base and fixed
-guests, using QEMU/KVM with four vCPUs and 2 GiB RAM. The existing
-stop_restart and stop_live_restart modes also passed on both kernels,
-with eight successful reads per mode. Kernel W=1 and selftest -Werror
-builds completed; the driver has the same pre-existing shmem stack-frame
-warning on both builds. I have not tested concurrent off-task
-registrations, automatic buffer registration, or a weakly ordered
-architecture.
-
-Thanks,
-Shao
+-- 
