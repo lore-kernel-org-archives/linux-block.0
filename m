@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794785616;
-	b=Jg1mnsnbR33v0GpMkZcAXgz0G84R6h0ibQS1KHIDAiggSb+ujwkeyDb4Ls4KjH4SSEJM
-	 prgy0qxNZ8SGvmCRxqW2sHn9Q8xGGGlteNbM8nJw+kxXX5Fk5eZngG58UtP6F3xvpM5PF
-	 H/3yoitZv7m0IklGDtxQjobngO64erOe73P3KtiutSiN2lLn07TLYRn+dc6gXQsseIORr
-	 jb1CndwXSeTntsLtA44uFfUbfDUk3CaOPXkn+giFUDLzFH1ilPU9nEVgG23WomG0/dM0U
-	 qq5EiMrgb6sPqt2Oi7MW6uQE16u23VpG4w51ODVyroekVH8QO5nAJ+4D8UKNc5VM6Ww==
+	t=1794785617;
+	b=QAEaXnzQB5rds/Et26Xe7G1/ClcKD3VOann1nvDie9TV17VK9Jd3rU8aXf5yLtIxWtGL
+	 Lib2xkhVVTKcnRldT2m89yRe+V48XwJQE9pyW8YFu26yrvof9rTEC4YkBhfq0gBus+0BO
+	 24MmSL0yIuy9qGpmVGA4tb5wpSwtZmBOIoGlBOSxqYhtgQEHY97WsaIwyplPhj+snlqkS
+	 ntIn8sR7O2mDsCGFQL80ARmcg7V0aAAe57/G5LUEUJ6ijBtHHomdPz9GnAOgxIFPWbkt2
+	 GKkQApQPfxUUcS41GjCdMnWpK4dRSmqZGDVR8zdGUYjrRyu5adfTx0LqdnPqtF1AZUA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794785616;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794785617;
 	h=Received:DKIM-Signature:From:To:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=cXhc1JETHrCa4ztbt/iIQGS3A3bf9fAOS2+YChTsM7o=;
-	b=deGbBUochrhShGZie1SjWetT9qqHtkfLHMFD5YPgsp45GvNTyKAAx0BuJrEV68lv5BnM
-	 3p4ySnh4fQ4bH41gvtvBdEnBtcrrZJfWt9FCCCNqKpSusUr7RpS3LVVNr6nRAxfP/N/ef
-	 GknRyjIQafa4Kv+pFjUWaKcytM+Im0svDAsr7irV5puwY5ok8Fvj0aemspPEL+7Iy0dAL
-	 EIQlyueCXcGLqLcodawiIQ84LMo5JTf0jPqCfm7w/iOZirceFWxQguiWU7WFXqiFT39/H
-	 xq8DwsxqIX5uVeVNhwX1Q8ZVIVMmiga7ckvylptfIWvXEjALonVW3L3AjmFkivhuECg==
+	bh=G5YVQU6TomNxhFPfWOkS7sLIwi5OJ/jkEyrAtrT74bk=;
+	b=vMC/Ib/SEePbNjmBYHoL03/Fr7Lr6SeltjIFauCDVtEM3NwnaIxNgaubdyjVPd9TmAVZ
+	 VTaL1eV+6HuEu3LPAbnfnc/xq0CP5pBXCx1KENt8Zi4wWNM3r6MhzaHacSgY9/aRHWbG9
+	 GVWY0kUlnMKPBCx7c++wMQzKKytTHk2SlrB4OEBmkLynlCpxEgjavLUvO3wg9V/Rngp4F
+	 GZdpsdGj2PGZkd4+7ENSIJRzprai7KreG9OQJ4DhnE8aAPdPeaLDGbpPQQGUVstzSiSBq
+	 drT02cg7zra4OG+Aad50OQr76kAPFVLeC/tC+aeHsUKYq4QRWl09EQvSfnuUi50s2IA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UkFD++cM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jL6PJyXs;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6457F606A33D;
-	Sun, 15 Nov 2026 23:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB0C606A339;
+	Sun, 15 Nov 2026 23:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UkFD++cM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8638A1F000C4;
-	Sun, 15 Nov 2026 23:33:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jL6PJyXs
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 933D71F000C5;
+	Sun, 15 Nov 2026 23:33:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794785616;
-	bh=cXhc1JETHrCa4ztbt/iIQGS3A3bf9fAOS2+YChTsM7o=;
+	s=k20260515; t=1794785617;
+	bh=G5YVQU6TomNxhFPfWOkS7sLIwi5OJ/jkEyrAtrT74bk=;
 	h=From:To:Subject:Date:In-Reply-To:References;
-	b=UkFD++cMFBpOCskFqLj7p1SYAIalQAAiUPI/bubBb7NeE0Z6NbZh6NgYzj7tkb4TS
-	 kdoqx6ne5nBaH9lH12jEACo7HOU3rNqAUWqe48ujql4jSZZpsvrluI+yL4AWQUPLo9
-	 CEy3uLSZWeVfC1q4IbKICP7k7foNBx0qC3Fucm87UD601sdmkWRCUC9f99F+AHg00A
-	 OZRa/kWg0uwWWkrex7rQFz/xQu2TJ4nJcOFyROZPT3ATgOHOHCKGNL7+6R6NhXJZUy
-	 QSGNZunGzOqXKksKcCNpalxFRNqqlKyW48lz5pDrMBVQIjUSLpagv/wpDgvL3HHmGT
-	 PW45ljvstcetw==
+	b=jL6PJyXsg6bU/L6Finp1o62eQ+8F1aPrDtOerb2HyfWU+MTlDsphAB8AahHBNsmu5
+	 tbHjep3txmNKYnUBdyRBeYcMQmQM1WLPsrIEvnfc/xDP7s7wKvsqOXEye/BsNly+xx
+	 I3W5iC8HhDjW1r+SkyTEOd72vowzlDKEb8Z5OEU12btiHXrBua0Ej5esC6RLXe/T+p
+	 iQoGOrOPJT/etKcJQ/V7OnYtKBkkblGf19FqROyw/l6IgFTz9dGO04aA65q13PA5nJ
+	 cnag2zqZ4d+3jhaAHUtfFwjz9jXLOnTtLzaNEbbE3gsy22rj348TRJD+S0r5FnyLQl
+	 4iWr3BbXUaVvA==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v10 06/13] zloop: fix ordered zone append handling
-Date: Mon, 16 Nov 2026 08:33:20 +0900
-Message-ID: <20261115233327.941586-7-dlemoal@kernel.org>
+Subject: [PATCH v10 07/13] zloop: fix zone reporting consistency
+Date: Mon, 16 Nov 2026 08:33:21 +0900
+Message-ID: <20261115233327.941586-8-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261115233327.941586-1-dlemoal@kernel.org>
 References: <20261115233327.941586-1-dlemoal@kernel.org>
@@ -62,223 +62,33 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For oredered zone append commands, the function
-zloop_set_zone_append_sector() increments a zone write pointer without
-checking if the zone is already open (implicitly or explicitly). This
-check is done only when the command is later executed using a work item,
-and the zone is only then implicitly open if needed. This creates a short
-time window where a report zone can show an empty zone with a write
-pointer that is not equal to the zone start sector, which is incorrect.
-
-Calling zloop_do_open_zone() in zloop_set_zone_append_sector() is required
-but introduces locking complexity as the zone mutex cannot be taken in the
-context of zloop_queue_rq(). Instead introduce the ordered workqueue
-append_workqueue to handle zone append commands when ordered zone append
-is enabled. This ensure that all zone append operations are executed in
-the order of there submission. This removes the need for setting the
-command sector in the context of zloop_queue_rq() and we can rely on the
-reguar command execution done by zloop_rw(). With this change,
-zloop_seq_write_prep() is simplified and zloop_set_zone_append_sector() is
-removed entirely.
-
-This change does reduce the command execution concurrency and impact
-performance with ordered zone append enabled for file systems using zone
-append. This is however not a critical option and the default unordered
-zone append handling is unaffected.
+In zloop_report_zones(), filling the write pointer and condition of a zone
+descriptor separately outside of the zone wp_lock can lead to an
+inconsistent zone report with a write pointer potentially not being
+consistent with the condition being reported. Avoid such inconsistency by
+filling both fields while holding the zone wp_lock.
 
 Fixes: fcc6eaa3a03a ("zloop: introduce the ordered_zone_append configuration parameter")
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 ---
- drivers/block/zloop.c | 115 +++++++++++++++++-------------------------
- 1 file changed, 47 insertions(+), 68 deletions(-)
+ drivers/block/zloop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index 96666742523b..0cf67acf8096 100644
+index 0cf67acf8096..bea62cd31668 100644
 --- a/drivers/block/zloop.c
 +++ b/drivers/block/zloop.c
-@@ -129,6 +129,7 @@ struct zloop_device {
- 	struct gendisk		*disk;
- 
- 	struct workqueue_struct *workqueue;
-+	struct workqueue_struct *append_workqueue;
- 	bool			buffered_io;
- 	bool			zone_append;
- 	bool			ordered_zone_append;
-@@ -590,32 +591,24 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
- 	 * when submitted.
- 	 */
- 	if (is_append) {
--		/*
--		 * If ordered zone append is in use, we already checked and set
--		 * the target sector in zloop_queue_rq().
--		 */
--		if (!zlo->ordered_zone_append) {
--			if (zone->cond == BLK_ZONE_COND_FULL ||
--			    zone->wp + nr_sectors > zone_end) {
--				ret = -EIO;
--				goto out_unlock;
--			}
--			cmd->sector = zone->wp;
--		}
--	} else {
--		if (cmd->sector != zone->wp) {
--			if (zone->wp == ULLONG_MAX)
--				pr_err("%pg: Zone %u: write to %s zone: sect %llu\n",
--				       zlo->disk->part0, zone_no,
--				       blk_zone_cond_str(zone->cond),
--				       cmd->sector);
--			else
--				pr_err("%pg: Zone %u: unaligned write: sect %llu, wp %llu\n",
--				       zlo->disk->part0, zone_no, cmd->sector,
--				       zone->wp);
-+		if (zone->cond == BLK_ZONE_COND_FULL ||
-+		    zone->wp + nr_sectors > zone_end) {
- 			ret = -EIO;
- 			goto out_unlock;
- 		}
-+		cmd->sector = zone->wp;
-+	} else if (cmd->sector != zone->wp) {
-+		if (zone->wp == ULLONG_MAX)
-+			pr_err("%pg: Zone %u: write to %s zone: sect %llu\n",
-+			       zlo->disk->part0, zone_no,
-+			       blk_zone_cond_str(zone->cond),
-+			       cmd->sector);
-+		else
-+			pr_err("%pg: Zone %u: unaligned write: sect %llu, wp %llu\n",
-+			       zlo->disk->part0, zone_no, cmd->sector,
-+			       zone->wp);
-+		ret = -EIO;
-+		goto out_unlock;
- 	}
- 
- 	/* Implicitly open the target zone. */
-@@ -625,15 +618,13 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
- 	}
- 
- 	/*
--	 * Advance the write pointer, unless ordered zone append is in use. If
--	 * the write fails, the write pointer position will be corrected when
--	 * the next I/O starts execution.
-+	 * Advance the write pointer. If the write fails, the write pointer
-+	 * position will be corrected when the next I/O starts execution.
- 	 */
--	if (!is_append || !zlo->ordered_zone_append) {
--		zone->wp += nr_sectors;
--		if (zone->wp == zone_end)
--			zloop_mark_full(zlo, zone);
--	}
-+	zone->wp += nr_sectors;
-+	if (zone->wp == zone_end)
-+		zloop_mark_full(zlo, zone);
-+
- out_unlock:
- 	spin_unlock(&zone->wp_lock);
- 	return ret;
-@@ -885,58 +876,27 @@ static void zloop_complete_rq(struct request *rq)
- 	blk_mq_end_request(rq, sts);
- }
- 
--static bool zloop_set_zone_append_sector(struct request *rq)
--{
--	struct zloop_device *zlo = rq->q->queuedata;
--	unsigned int zone_no = rq_zone_no(rq);
--	struct zloop_zone *zone = &zlo->zones[zone_no];
--	sector_t zone_end = zone->start + zlo->zone_capacity;
--	sector_t nr_sectors = blk_rq_sectors(rq);
--
--	spin_lock(&zone->wp_lock);
--
--	if (zone->cond == BLK_ZONE_COND_FULL ||
--	    zone->wp + nr_sectors > zone_end) {
+@@ -952,8 +952,8 @@ static int zloop_report_zones(struct gendisk *disk, sector_t sector,
+ 		blkz.len = zlo->zone_size;
+ 		spin_lock(&zone->wp_lock);
+ 		blkz.wp = zone->wp;
 -		spin_unlock(&zone->wp_lock);
--		return false;
--	}
--
--	rq->__sector = zone->wp;
--	zone->wp += blk_rq_sectors(rq);
--	if (zone->wp >= zone_end)
--		zloop_mark_full(zlo, zone);
--
--	spin_unlock(&zone->wp_lock);
--
--	return true;
--}
--
- static blk_status_t zloop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 				   const struct blk_mq_queue_data *bd)
- {
- 	struct request *rq = bd->rq;
- 	struct zloop_cmd *cmd = blk_mq_rq_to_pdu(rq);
- 	struct zloop_device *zlo = rq->q->queuedata;
-+	struct workqueue_struct *wq;
- 
- 	if (data_race(READ_ONCE(zlo->state)) == Zlo_deleting) {
- 		rq->rq_flags |= RQF_QUIET;
- 		return BLK_STS_IOERR;
- 	}
- 
--	/*
--	 * If we need to strongly order zone append operations, set the request
--	 * sector to the zone write pointer location now instead of when the
--	 * command work runs.
--	 */
--	if (zlo->ordered_zone_append && req_op(rq) == REQ_OP_ZONE_APPEND) {
--		if (!zloop_set_zone_append_sector(rq))
--			return BLK_STS_IOERR;
--	}
--
- 	blk_mq_start_request(rq);
- 
- 	INIT_WORK(&cmd->work, zloop_cmd_workfn);
--	queue_work(zlo->workqueue, &cmd->work);
-+	if (zlo->ordered_zone_append && req_op(rq) == REQ_OP_ZONE_APPEND)
-+		wq = zlo->append_workqueue;
-+	else
-+		wq = zlo->workqueue;
-+	queue_work(wq, &cmd->work);
- 
- 	return BLK_STS_OK;
- }
-@@ -1029,6 +989,8 @@ static void zloop_free_disk(struct gendisk *disk)
- 
- 	fput(zlo->data_dir);
- 	destroy_workqueue(zlo->workqueue);
-+	if (zlo->append_workqueue)
-+		destroy_workqueue(zlo->append_workqueue);
- 	kfree(zlo->base_dir);
- 	kvfree(zlo);
- }
-@@ -1285,6 +1247,21 @@ static int zloop_ctl_add(struct zloop_options *opts)
- 		goto out_free_idr;
- 	}
- 
-+	/*
-+	 * Use an ordered workqueue for strongly ordered zone append operations
-+	 * so that we can keep processing the operations in the same order as
-+	 * they are submitted.
-+	 */
-+	if (zlo->ordered_zone_append) {
-+		zlo->append_workqueue =
-+			alloc_ordered_workqueue("zloop%d_append", WQ_FREEZABLE,
-+						zlo->id);
-+		if (!zlo->append_workqueue) {
-+			ret = -ENOMEM;
-+			goto out_destroy_workqueue;
-+		}
-+	}
-+
- 	if (opts->base_dir)
- 		zlo->base_dir = kstrdup(opts->base_dir, GFP_KERNEL);
- 	else
-@@ -1391,6 +1368,8 @@ static int zloop_ctl_add(struct zloop_options *opts)
- 	kfree(zlo->base_dir);
- out_destroy_workqueue:
- 	destroy_workqueue(zlo->workqueue);
-+	if (zlo->append_workqueue)
-+		destroy_workqueue(zlo->append_workqueue);
- out_free_idr:
- 	mutex_lock(&zloop_ctl_mutex);
- 	idr_remove(&zloop_index_idr, zlo->id);
+ 		blkz.cond = zone->cond;
++		spin_unlock(&zone->wp_lock);
+ 		if (test_bit(ZLOOP_ZONE_CONV, &zone->flags)) {
+ 			blkz.type = BLK_ZONE_TYPE_CONVENTIONAL;
+ 			blkz.capacity = zlo->zone_size;
 -- 
 2.56.0
 
