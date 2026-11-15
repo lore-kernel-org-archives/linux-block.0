@@ -1,43 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=174.142.148.226
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794738955;
-	b=Q5bQv22khR5WECIZWcJQK7V6rdDnzJICYyasrLIU/KZZok/e9LDosmko9yOczFXP0Aya
-	 aN0Mpc8mAFK16XSmztlZSTdk3FWXHvkVd7gWaiO+nH1QsWokPnnqQlxYPL5GA0uoFek2v
-	 Eo7lE05blJM4nQOSWsfUytP6eeI8PexAkE4/UAnlAgbdPf32Wnx64BZooxnCM3SZ2piLY
-	 emAKT5yWMTQ7X+Q/mv58v/D4kLyH2/wPwpCnZmqb1YlkB3zwto3zH7WGIx+76TbWVGnL8
-	 t/GXvfuMT51+PDRJNlC4drGYvG51dEOyCK3WSrdUzrXoKnEBXy8N3Bla1p+GY1cMFXA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794738955;
-	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=Nhl2t4L6TkxzXfInRClWp4avrcdnLduLOcL5y1yZrzU=;
-	b=2V6GgGdEojRMDBfM+BSIVvPdMFFkjnxQvI9gpLLoecjvKMqpMX9e+atAG5N94BNwEUOF
-	 FdNr1GsqwrkyWLFf0omrEl4vkGN4rVwHZBYxB7jr+m3C306+RIrDoOu7qxjFuy2fhv0Mm
-	 gixGqwFW9Ouv0Ki2xupuoeEJNhJrSO08ECZQn8r9oO6zlHT0nJh0SVYzJB8A1iU+3/Gn2
-	 3+xSGwQ07wuNB1NTmFYYHevI9OvAUg4OLp1vL5PnYzYABFb2vWfjfTan9y5SD5xJVGEMp
-	 KrYd2QX9lkDyzxPsZdiqIQhIxSL7VVRtWYuTN9tGGDwV03/oPXvaJMpq615rUcrDsRg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=umail.furryterror.org;
-	spf=pass smtp.mailfrom=drax.hungrycats.org;
-	arc=none smtp.remote-ip=174.142.148.226
-Received: from drax.kayaks.hungrycats.org (drax.kayaks.hungrycats.org [174.142.148.226])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C820E606A31E;
-	Sun, 15 Nov 2026 10:35:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C820E606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=umail.furryterror.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=drax.hungrycats.org
-Received: by drax.kayaks.hungrycats.org (Postfix, from userid 1002)
-	id CE9EE1CD7E13; Sun, 15 Nov 2026 05:35:47 -0500 (EST)
-Date: Sun, 15 Nov 2026 05:35:47 -0500
-From: Zygo Blaxell <ce3g8jdj@umail.furryterror.org>
-To: Alexey Kuznetsov <axet@me.com>
-Cc: linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev
-Subject: Re: [RFC PATCH 1/1] btrfs: track physical bad extents, fast-fail,
- persist, and relocate
-Message-ID: <avmLAy52vfyJ5qze@hungrycats.org>
-References: <20261112134703.38510-1-nondet@yandex.ru>
- <20261112134703.38510-2-nondet@yandex.ru>
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=209.85.210.54
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
+	t=1794741103;
+	b=MyrS62axA1KwzJTqNsfn8mvaqFU/ZNKc6Z80Ce9mpqM8adeygN7nSXoi2iqG/QTI2pgp
+	 Zxd2oJyRMKz0hlQevbLH/yolhdTWZS3TrNSQ5AkKCvj1VnNrZDbphgcOn7X7bSEePLMyV
+	 d5kBkD6HB2OL6Roh3RJY0UECVbv/vFRsU6ls9P0zAFt9vv/GtKA3pFsW0hNM2TfdNAVTs
+	 rNEhgWvJi3FLp6y4U8h6aGKLCcJcfeW7BeC/3BlkFzMN/6gUjHjTvv5bC1jZvb5uM+BnM
+	 p7hhrSdAObPEZ+MXzWzIaM4V6c/nIXBNrkhMGZ6m1naGtJCZY/3OjZ67FoO1EVz4JyA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794741103;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=niupttma8X2M6tpT9/+fkvKpJUleDbchTCyz/6AChGU=;
+	b=zw1aqzzQ/IeLpu8r2U5HF38SZMgD74jwBWxGcSsaPHjycypN21Fl6iVeMnvE54UBb5uH
+	 MSIAZNGr7jdsSXwa5eJ7bQCn8fF+Ls0Tj1smfYjOfafwcpMYmZzLc8wQ2HGQhP4aA0EuY
+	 uxkTUGow3XLxVkTPZcqJN0eklzLmySb0KzYo21TDU3UvZvUD6Mxr7MsoNbhL0WuRzvpQo
+	 HC1tPBDPtWcLl5wISGPAhyBezbJop9kM34tjLJMoiGY/Ov2Uvivwz7QYxIzJ+11WRrVQz
+	 4DJ6IcvM3rzSVI+VtHblz2/0BsVAIR+IYAcFCPEWfm8uCRekzmf1w2aZE7MBQj1k2SA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=of3jASAY;
+	arc=fail smtp.remote-ip=209.85.210.54
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FEB606A323
+	for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 11:11:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 92FEB606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=of3jASAY
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-84e513874f8so2606667a34.2
+        for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 03:11:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794741102; cv=none;
+        d=google.com; s=arc-20260327;
+        b=gOodhfWubCo+ILUqxinD3004cDsWSYzpjF8BP3q+v9ZC4zI8Qhj2IZtPb1mNzpgQVv
+         LxrAfGwQFVov2/wUfZy5taQbZdjT/lmh/XEtEYwBNG2UFk52IGzgwbHuEn/r8AalFHBb
+         /idlwJibJKUJ+Ng0rXaWJy+UVkVe5Jc9A7t/Dr7HFEt2Zr7Iy16GKhwwzUmdR1HO1Pad
+         dHKzjPrdFiBoVUDZf9lP+ckaa6Ke82ZJ2pxnxr47Z86L9DloUrtOA0xTvZgdF1syOeuK
+         42rm1BmP8zFqlS8PpHkWSqneu85eLG+mYYg8c0nK7anxIs4kik47rBtlk/lBTpBg9lLw
+         WSXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=niupttma8X2M6tpT9/+fkvKpJUleDbchTCyz/6AChGU=;
+        fh=kpyAIPklI/98s2FYuanlCT3pZTSPw1Xtujggda6/BP4=;
+        b=b/4fzDNdsIMFRRw9/fZVxfldYPwuMz+N/D+idAruoXInR8gCJkS7wX57nXZKa3M6zJ
+         6gWGdpva+qJ9hC7eYNpY5nt+hiKs+cnLEg49LInrngJ3AejqRYSbksFQ622ClPmau0Xs
+         DRlVLMthEZI54hLGtehIKk2nWDcdr/IIJvI1gNAtIBd0VxvDbpNsQQkyJ0GuPVSNRUIi
+         Qlcwof2OzBvhCjlHFQwJTEFvrFmwxAMWxQ3HqgKo0Edhj8KBIcZtQ8k2Xxq5XI5CHmJb
+         Jh7Gad5Frkdkvji8LRHvkfKl9GIVRE2DBAD+mlWoKq5XRdOZPgqNIR9mDZEmNcAPQslq
+         RIMw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794741102; x=1795345902; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=niupttma8X2M6tpT9/+fkvKpJUleDbchTCyz/6AChGU=;
+        b=of3jASAY2uRq/jJWJtu/J+egIQO1aiAxkyVYlqd8JDWFDtFgfEM/Ma9B8dkH712nlU
+         FwU+6/jbKtlEGp+Te4LjsNsdHikC39GeG4Nl9n3ilFv24t3C8VTdUA9jVreMg2jF0crV
+         etX6Qs1vrc1s6u9lg9S4EZP4HwAE5e4ybxFh+06r4L2XrA/e/pqm9QUnr0HVjdj0toYX
+         0UeYI6CwkDYj95zh0ysL4i2peIRMgecP+5lvvpTKeZB7JzWwfBKpl+Pws08y8ZmK7NJA
+         pOvfunaaFGTpvE2TjiFqAnvKDCOaHNvdi6lYP8Qu5gY/UTUJdyhnNjwXvZDIXDHxCzfj
+         nbTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794741102; x=1795345902;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=niupttma8X2M6tpT9/+fkvKpJUleDbchTCyz/6AChGU=;
+        b=MSqmXhSN6P1WpmWUmpagmsrxt2TpxExdctinHMpufNT+OLLV+/Z4wsQmM/h2O7Zyoq
+         SACn9hkjMarmMZugy7NCwEH3TaJqd7YzQvtq6LZqXyTBppHmkaG5Z/oxabwZh/Ikd+Vl
+         OKDMyZBsCnOZst6L8eFTI0uokiuVmWCxpkXfRy00MDRS9LjRVDGIb5v9n5/ECWVpDr00
+         ImL57Th+RTkyuXXlZrGIkp8S2mAHVn76npFvXbKEwn+CCZ9Sby+RTJD8bGtIrcxScvZP
+         7a9oIYMn9bLxCF2osmmwpJ+VpTjxqbre4Ns0z+Sghijd+ZePpRTuUINsfLE9H891f+YZ
+         EfGg==
+X-Gm-Message-State: APuU4Z+DTOtr5fpAL0+Mvx8DmS4YeiJuQudyYoUJYlZSGNYQRajCmsXr
+	6OHXs9SLpSeDW/fz2U/OsPGcQGfyeqOaUVEz7IRIrEMYpdAy970Rfe6Mr4FHZdPr6+X2Jj4t/iw
+	EK7uCYo+5sxTiIJwdFGhcp2Z/tHUbAXA=
+X-Gm-Gg: AYBFou3BF/1Fcn0cZhoTm0jbHTzWu2DqMHjmsLWicbVvI7Loa3Ts2yMmSPyxog6rHP5
+	1vwLAde4SjJUSUhFQJ97lDzPppPxVENOopnszpGDSxkTiCcXWLLa0I7OuCd8nsFKP0EjGhQL1KT
+	yLrqfLF/lFXvJLy6u1nacR9sV2eLiaZSbkR9KvO7Gm3H6bEz5lKGLZEQeqOiZTmHxzgCDPNz0xQ
+	Iew3Vw+u9tcXFzuh9gSAe79BjXPu15SaSJhH22SYOXCNSMAOaAyDDyQb83mJRjbl3hzLVCwvv1j
+	JdBCaAhkxctGT+ffThta0NhReY+gVB0Ss0Yn4roAJNArlDhxD9HXHNOeo/UCO4OKZek3Xi7Z6q+
+	hmyovWUiOjoAsMqUcNTQXTpERDCQwYgLP4I5TLX90u20yjjXbPcvK+hkMH3A3pOPKORahrfv0gS
+	t+TwrXkr+9sIsDsx+NBm6dfZwn5nm7/9pnMvWxKU+7dYmGbLZZEM/Ui3J9zQ==
+X-Received: by 2002:a05:6820:4189:b0:716:d376:1676 with SMTP id
+ 006d021491bc7-71ab523f56fmr4513622eaf.87.1794741102408; Sun, 15 Nov 2026
+ 03:11:42 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -47,181 +104,40 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261112134703.38510-2-nondet@yandex.ru>
+References: <20261115003352168cE_tyVxSyZV124AM31htL@zte.com.cn>
+In-Reply-To: <20261115003352168cE_tyVxSyZV124AM31htL@zte.com.cn>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Sun, 15 Nov 2026 05:11:30 -0600
+X-Gm-Features: AclHuK-yfkBjfTlRzPqncy1or8kBWwirdyvLakJdI7oKdEpo6iQh6u-uxa2CP6A
+Message-ID: <CACVXFVM_nfkBVnVr8oEVjjTOYp7mhox7KvhkME30QBc52b-yxQ@mail.gmail.com>
+Subject: Re: [PATCH] ublk: dispatch the next fetch after a batch failure
+To: shao.mingyin@zte.com.cn
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 12, 2026 at 08:47:03AM -0500, Alexey Kuznetsov wrote:
-> Feedback wanted on: on-disk representation (device-tree items vs a
-> dedicated tree vs extending RST), per-sector vs per-bio failure, whether
-> the I/O path should record errors or only scrub/userspace, how to
-> coordinate with device replace and balance, and whether an incompat bit
-> is the right compatibility mechanism for a feature that changes read
-> semantics.
+On Sat, Nov 14, 2026 at 10:33=E2=80=AFAM <shao.mingyin@zte.com.cn> wrote:
+>
+> From: Shao Mingyin <shao.mingyin@zte.com.cn>
+>
+> When a batch fetch fails, for example because its provided-buffer group
+> is empty, ublk_batch_dispatch() removes the failed fetch and returns.
+> Pending I/O tags stay in evts_fifo even if another fetch with usable
+> buffers is already queued. With no new I/O or fetch submission to select
+> it, that fetch and the outstanding block requests cannot make progress.
+>
+> Claim the next queued fetch under evts_lock before completing and freeing
+> the failed one, then schedule its dispatch in the proper task context.
+> Marking it active before dropping the lock also prevents cancellation
+> from taking it before its task work is queued.
+>
+> Fixes: a4d883755399 ("ublk: add UBLK_U_IO_FETCH_IO_CMDS for batch I/O pro=
+cessing")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-Thanks for putting this together.  I'm not sure why btrfs needs to be
-involved at all, though.
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-The btrfs error-handling model already assumes a drive that remaps bad
-sectors in firmware.  A read hits a bad sector and gets EIO (or a csum
-mismatch), btrfs reads another copy, and writes the good data back to
-the failed location.  That write is where the drive moves the sector to
-a spare.  From then on the LBA is good again, and the filesystem never
-needs to know where the bad media is.  The model breaks only when the
-drive can't remap anymore, because its spares are used up or because
-its firmware won't do it.
-
-So the missing piece is exactly a device that behaves like that firmware
-when the real firmware doesn't.  Put stock btrfs on top of it and nothing
-in btrfs has to change.  It also works for every other filesystem, swap,
-and raw users, which an in-btrfs list can't do.
-
-The patch shows how hard it is to do this inside the filesystem.  I had
-a LLM read it against v6.12 (I haven't run it, because it has problems
-too severe to be worth testing), and the mirror redirect, read fast-fail
-and persistence all have problems that come from btrfs trying to remap
-underneath itself.  The LLM found:
-
-  - The write redirect in btrfs_map_block() tests the bad list against
-    *length, which at that point is the distance to the end of the
-    chunk.  For RAID1/RAID1C3/RAID1C4/DUP, one confirmed sector diverts
-    every write below it in the chunk.  The read check uses the real
-    bio length, so the diverted copy keeps old data that reads can
-    still reach.  On nodatasum files that's stale data returned
-    without an error.  The filesystem still believes those blocks are
-    mirrored.
-
-  - btrfs_map_repair_block() goes through the same redirect, so repair
-    writes land on the healthy copy, and the "skip repair write" checks
-    never see the bad device.
-
-  - Fast-fail returns true after a bio split, so the remainder of the
-    bbio is never submitted and the reader hangs.  Every fast-fail also
-    increments read_io_errs without doing any I/O.
-
-  - Device replace reuses the devid, so the new disk inherits the old
-    disk's bad ranges at the next mount.  The incompat bit is cleared
-    when one device's list empties, even if other devices still have
-    ranges.
-
-  - The existing test doesn't detect the bugs.  It only writes at the
-    bad offset, and it compares the file right after sync, so it reads
-    the page cache rather than either disk copy.
-
-  - There are inaccuracies on free space tracking for metadata (with
-    remapped blocks removed) that can cause a filesystem abort.
-
-  - The LLM found more issues, but I'll stop here.
-
-While these problems could be fixed, none of these problems exist if
-the remapping happens below the filesystem and supports existing btrfs
-write error handling.
-
-Currently only CMR spinning drives support badblocks-style LBA-based
-remap lists.  Other storage types don't have stable LBA-to-physical
-mappings, and a badblock-style remap list doesn't work on these devices.
-Users with healthy CMR drives that have not exhausted their remap sectors
-also gain nothing from this patch.  By doing the sector remapping in
-the dm layer, the runtime cost is paid only by those who use the layer.
-
-What I'd want from a dm-quarantine kernel target:
-
-The target detects failures on the lower device itself, and keeps the
-remap table on the device.  There are two kinds of failure to handle,
-because a drive with no spares left often accepts the write and fails
-on the read:
-
-  - A write fails on the lower device: allocate a reserve block, write
-    the data there, add the mapping, and complete the bio successfully.
-
-  - A read fails on the lower device: mark the block pending and return
-    EIO.  The next write to a pending block goes straight to a new
-    reserve block.  A later successful read of a pending block removes
-    it from the pending list, since the error was never confirmed.
-
-That's the same thing drives do with their pending sector list, and with
-btrfs on top, the next write is the repair write from the good copy.
-
-Because a block is only remapped when it is written, the reserve copy
-always holds data the filesystem wrote.  That avoids the problem of
-remapping an in-use sector to a reserve block full of garbage, and
-nothing needs to be salvaged first.
-
-The remap unit should be the lower device's logical block size, so
-there's never a read-modify-write through a bad sector.
-
-The table has to be crash-consistent with the data.  A remapped write must
-not be reported durable before its mapping is.  Committing table changes
-on FLUSH/FUA, the way dm-thin and dm-cache do with dm-persistent-data,
-gives the right semantics.  Keep two copies of the table so that a bad
-sector under it isn't fatal.
-
-Reserve allocations never move.  New defects should take the next
-free reserve block, and existing mappings stay put.  The current dmq
-build_table() doesn't do this.  It assigns reserve offsets in sorted
-order every time the table is rebuilt, and the map file doesn't record
-them, so adding a bad range below an existing one silently points every
-later remap at different reserve sectors.  That needs fixing even in
-the userspace-only dm-linear version.
-
-The target's header goes at the start of the lower device, with the
-reserved sectors at the end, making the upper device shorter than
-the lower device by the size of the reserved area.  The filesystem's
-superblock locations are remapped like bad sectors, with the superblocks
-copied to the upper device, and zeroed out on the lower device.  Then udev
-and btrfs device scan find the filesystem only on the dm device and never
-through the raw device, so they won't bypass the remap.  The current dmq
-doesn't hide the lower device's superblocks.  The same trick converts
-an existing filesystem in place, as discussed in the GitHub issue.
-
-Modern drives ship with tens of thousands of spare sectors.  Anyone who
-wants to keep using a drive whose own remap table is full has already
-grown more defects than that, so a reasonable default reserve size is
-about 256 MiB.
-
-When the remap table is full, failing the write with EIO is the only
-option.  That's what drive firmware does too.  It's not harmless on
-btrfs: when a write error hits an ordered extent and no write to a
-mirror or parity stripe succeeded, the ordered extent is silently
-deleted, and data that write(2) already reported as written is lost.
-The difference from firmware is that a kernel module can add more
-reserve.  Shrink the upper device and take more space from the top end
-of the lower device, so the reserve area grows downward.  The target
-should raise an event when free reserve drops below a threshold, like
-dm-thin's low_water_mark, so userspace can shrink the filesystem and
-extend the reserve before the table fills.
-
-The table should be a log that userspace can read and act on, not just
-a private mapping.  Every remap, pending entry and failure is recorded,
-and the admin can intervene: inspect the entries, clear a pending
-block, force a remap ahead of time from a badblocks scan, or retire a
-remap.  Counters for remapped, pending and failed blocks cover the
-summary.
-
-btrfs scrub does need a different approach to error reporting, but
-not the one in the patch.  Scrub can't write errors to the device
-tree on a read-only filesystem, especially on a filesystem that goes
-read-only because of its write errors.  dmesg isn't a substitute either:
-it's rate-limited, so a scratch on the disk yields only a fraction
-of the affected files per scrub run.  I outlined another method in
-btrfs-progs#836 [1]: btrfs collects error events (physical address, error
-type, repair result, block type) in ring buffers that userspace fetches
-through a sysfs file, with blocking reads so a daemon can listen all
-the time.  Userspace resolves the addresses to files, and can feed the
-same events into the dm target's bad block remapping table.  Nothing is
-written to the filesystem, so it works on a read-only mount, and it
-catches errors outside of scrub too.  If the buffer overruns, the reader
-should be told how many events were lost, so it knows to scrub again.
-
-dm-quarantine as posted is mostly dm-linear plus dm-error with runtime
-messages, and the messages are a problem.  dmq reloads it as suspend,
-load an empty table, resume, then send the ranges, so for a moment a
-mounted filesystem sees no remaps.  Messages are fine as the
-intervention interface, as long as they change the on-device log
-rather than a table that only exists until the next reload.
-
-So my suggestion is to drop the btrfs patch, fix at least the two
-dmq issues above for the dm-linear version, and put the effort into a
-remapping target with an on-device table.
-
-[1] https://github.com/kdave/btrfs-progs/issues/836
+Thanks,
+Ming
