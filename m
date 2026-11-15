@@ -1,94 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794757376;
-	b=KGXcY5CcoyAUu0vO/GVOwy9LdOH3C5rUaaroSc2chXuad/nz9YZ7JTZjeZNHMhfopxsM
-	 Ae+uAFSlLHZ0wdApLjK2nRiLz5J9aPdJM9LHfZowvqxwFS2HkxkA2oVoD4ZbzW3Xk50N/
-	 bOkGTAdJkvbkYDVEtU4MsT5ZXMdr9s8BwDIT6lBSvIIGJWqlttgDnczZm01aruhWOcht+
-	 fRpTK3I9yw/7PNQ9YRHkYzhCveAa/S4u0WlLSpw92aUxKhtzVWzwvhaKYS+6PFwpRXp6H
-	 r92eTkm3HqQO/HEEKHQG9PPr2dnCGzrcAE0SX7cDYi5TNr067EpJMFvanPRnkRgW18Q==
+	t=1794761938;
+	b=gOiog8J4XuB2hjV/K6YFNbXcdyhUnElEaqsCPBI3p6GeevjMouGSGiJuQn7+MH2T8mZd
+	 VqI/tyl74+9z6dd24dGfN3ailIyDwHZdEHiTFjzFGgipMKF+qV5k5GIZO10fP67+Lxq6o
+	 XMcmFkoLkh5lpBAP3m9eSbLvMn5KNuaP69gAVbCKAROWpe75ad8DO34PXryRTz0C3VMWa
+	 CRnzmv8JHBKUUO+J9yA7dcS4ALvsNs+vDprw7fy5fyTCHJQsK2ePdAZwSUGolHx1EFHPj
+	 roJ4pTVO+Kj+mcrWtAc3tKIAIM6KLFETP8oc/XV7eRi7swSPrYmS/a5NHIZKv5QAPog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794757376;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=DejR3krB2UUOuNcnZkNWRCdn92MbyftYbWjEZOleI5Y=;
-	b=Ido2VVNp+lNocrvo5/I17+WQ+BIzT6cCMPUcB5sqnxvk/RNMOPuc4YdBoLSDnQe4JgdT
-	 ZKaEXyBDa8UnxnEMIcz76/jaiVsw/FleJ6hgLuDuvfeudRjlv+JOLcg2cCoa+T1pPqkF7
-	 G8qdA/h7Fwog2bHaLT6GqZyb63V/kn6ZZQkIBIYvDBr/X1b2Ii/8NGwYbyJC8W72luan1
-	 nLMKEDtPnzG1F/t3+KtkbB+kqh96Ay8T6DS6qKbTugYG2CoKPNE9XxcXQ481lhUNyq+K0
-	 49sLlU/H/8jFORRwrpR9d4nPJ6u2jlUCZh7WquhWsgCdPvL4uAhvJ7kwSeWu6I9trgA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794761938;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=7icfoIT+Mng+FLAG3S5PMcuwQv7cbo7W5CDYKdjKwU4=;
+	b=uhGkRhQ0X5gGVVF4M3f/wQ0+JdJMr7ntoxErF6nQrPxWrENsdM/TdaQ9xu2QZsBcHzLU
+	 hWvzG5sxYssZCZll1/KB82X02FAFAwHMfYtfL9/ZR4gWGaNCDpgbyh7VjVcD+kBvTjok7
+	 MTm+aOpzZP6iLLuuhJfdi8nPxVCPs3RXe1M7V0bfUztW9WB3uHYYaA8D8taqaZz6wJL+S
+	 mLV9CHK4cHBJ8lSqv6Qzhq4PWGsULBOecTqYWN1dIDROykVXsGRaE3CeyoAXksA8v/hcD
+	 Tlf5JGRrGWdefrMzIwaueRXPteGYEb9/dyqbKw3/4lqvxl8CZ0eumOisAMXLVL5BxYA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=Bqsx4zwI;
-	arc=none smtp.remote-ip=74.125.82.170
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GoWFHZsl;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C6D606A330
-	for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 15:42:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C9C6D606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08485606A31D;
+	Sun, 15 Nov 2026 16:58:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=Bqsx4zwI
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-36dbde64409so3890955eec.0
-        for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 07:42:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1794757375; x=1795362175; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=DejR3krB2UUOuNcnZkNWRCdn92MbyftYbWjEZOleI5Y=;
-        b=Bqsx4zwIkginSB1+zS+iluuGCfsoh1lrWajyafASq7xICgRjN0kfnmGca15hg2kFDO
-         zGLbMdOzRdMez5mqA7M6NRrW/2rPqwFQRH59SPER0s+ejRC3ZatkxI1kQhoF+C2f9eLs
-         hTf8xRi9NdWyUvE9Hsl0gNkRYU5b1VXB+zpTf2a9FpwTTIFXT8dO577Krmi6HQs5l0UY
-         gdYwSFY6GxIxcxenzWpXUdgNsVAS+GG/SAOH+YwLn4cIH8oMz99cTANdyFo+7A3V/CmP
-         bQWbxa+vZv5LF+BswRa7OdGybOcMw2STtXJ0u3oEhiIyM+U9ssnyfUhDjfFk7rrQl9iD
-         Z+gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794757375; x=1795362175;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=DejR3krB2UUOuNcnZkNWRCdn92MbyftYbWjEZOleI5Y=;
-        b=Zs/k5z291mgiFXkQNjgC7w78ZOK7/fP4Xpl5X+iCxfgk+t7C0GKFyFzLg9hCRPxJef
-         Glv0sshxMnL9abpUT00YcGJkemssHI5Hd6BRQYyb0MkdvEcjrcd9iLyjamaIGPE99/gk
-         5Y2KOH8tRiTWvswFw2AMltkDlGfbOLljg48kcvMq87VPZt0xkzaFxc1j6TWGnLeb85hG
-         KwcLSYHhwvn2LKxQri+YtdkCJAN+V8ZcvSGVOT7nU/nFfCagPf72NTEawApQtNoHhU4e
-         0gIYLJut74eB+KJhqWNm72g1wt8KTxxtLjSYpddmOpkcikD0YsjpK3p3T32XOLBWP4ar
-         7pkw==
-X-Forwarded-Encrypted: i=1; AL+hErHp75mLSASqHTmiMS+KpvFeMK1GE8Yyt8zJrH+RvRr+xJ8a0AzkgUrlgnNHBfWVhTYzjP0Q38aTiaOYPA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+eMuYZLXLYVXQzTk2Sa5lH0YQ2YYIF9cB8J3tBo8P1q4mAk8LK
-	T9KiD7ucxNTA+eu3FxJcKbtM/F0zXhMyv7BHL2EVx2jNLxkTxBFmgqfAzK6/MY/GXls=
-X-Gm-Gg: AYBFou0dNVYZVVdMaW9QqE4Yi/teC2FIlZs5+DhxSz1JIhRY2q8bWab5TyVC6jWoTwp
-	O9L+IbF3qSZnJqro3nID55nCajSit96mtra/CMX0MnOagpFy803QTxXdUYrXxZ5wkNv+kCPLtKx
-	e/B1s4ozBu0lPkUWfA6rA2e4OVGmlOwbKOfDTS7LxXLk39p1gX2fmzLErgfF7JNzjhAqAE4gFrb
-	T9tZrt5OQF7NHJURLvMTCVTFOgf5qpSDGJ2FaaKpcUmRdXkU3pDyFh0hPkz/MZMKdkyCGAaxYqO
-	4y8I5IeLYWHCF0zDFZBXlpM2f7yDRTJh53q+rtTKaBlYsr3JkEo1XKJLPUFedkZE/yt7l5O50DP
-	jSXlbFZdi4zlTAjbSm8PUiGF+vcjxhsjf9gsx3ldFt6KWx2eg+avOrleakN9bhc+T/roIQQ9M9+
-	fnUAHJHU8YhP47mo0fpRZzc4fag3V11vT5OT8C8rh2ChLh9hD1X7ysMg90U5IyU7xFmHbvo1A9Z
-	iQdyZ6Ob4vUYTqfhEuiFmFeU1LFAxPp2L5tIZYQTWDUZd12VcGakUa4RGfBOfIC8GTyKyqAIKf2
-	ieMpkSL4iNXZHSquXJTsyMCli6/GfzyHxXMUR/rB4wRCZBiKMQ2fdZsOvqhgu5mhuiFwMjJDI72
-	2yHSqxC5lI+M0
-X-Received: by 2002:a05:693c:69d0:b0:36a:15ee:c20e with SMTP id 5a478bee46e88-379675fd90bmr8136632eec.33.1794757374739;
-        Sun, 15 Nov 2026 07:42:54 -0800 (PST)
-Received: from [192.168.1.142] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-379558231eesm25665134eec.12.2026.11.15.07.42.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Nov 2026 07:42:54 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: tom.leiming@gmail.com, linux-block@vger.kernel.org, 
- shao.mingyin@zte.com.cn
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-In-Reply-To: <20261115003352168cE_tyVxSyZV124AM31htL@zte.com.cn>
-References: <20261115003352168cE_tyVxSyZV124AM31htL@zte.com.cn>
-Subject: Re: [PATCH] ublk: dispatch the next fetch after a batch failure
-Message-Id: <179475737404.32615.15503411123776192792.b4-ty@b4>
-Date: Sun, 15 Nov 2026 08:42:54 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GoWFHZsl
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC631F000C4;
+	Sun, 15 Nov 2026 16:58:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794761937;
+	bh=7icfoIT+Mng+FLAG3S5PMcuwQv7cbo7W5CDYKdjKwU4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=GoWFHZslNnHYuGjrh/bx7l/8F07iyWDyej/GltR19PHb0krwpgQZnzQ/w29MU9yvY
+	 9N/ydZSw/qY2tK5FaOYCK1ORBjMwxhvWBnuouItS4XKDkbn9gWaeGjF+XgXMKjfDRb
+	 yRjP08VgPpWhb821Sp+uoP9Td3foxZ3vOKkFT2wkHSIOuMW3DhfBOncL7YGvQAJ7mS
+	 moyJ26SpKW7UvwaxAzqtXI2cUraP21SQ9Ax6dJRbxzUvfCguVEowEmmIQeonLglFpU
+	 MQxnJgWY8X4ntDgBifkx9ExXqmq/oX+Iv0Gpat2G+lyO4H7GjhcZ2VGKcIIaDnB2Ev
+	 itbJF0Q8f6G0Q==
+Message-ID: <f37ccd71-8e1d-4dd4-b11a-e22b9e617dea@kernel.org>
+Date: Sun, 15 Nov 2026 17:58:23 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -98,33 +51,122 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/12] docs: ioctl-number: update MM entries
+To: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-doc@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-mm@kvack.org, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowangio@gmail.com>, David Heidelberg <david@ixit.cz>,
+ oe-linux-nfc@lists.linux.dev, Chas Williams <3chas3@gmail.com>,
+ linux-atm-general@lists.sourceforge.net,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Helge Deller <deller@gmx.de>,
+ linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ MPT-FusionLinux.pdl@broadcom.com,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org,
+ Neill Kapron <nkapron@google.com>, Andrey Konovalov <andreyknvl@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Hans de Goede <hansg@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, Jan Kara <jack@suse.cz>,
+ linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
+ linux-ext4@vger.kernel.org, Mike Marshall <hubcap@omnibond.com>,
+ devel@lists.orangefs.org, Paulo Alcantara <pc@manguebit.org>,
+ Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+ linux-f2fs-devel@lists.sourceforge.net,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ Tzung-Bi Shih <tzungbi@kernel.org>, Benson Leung <bleung@chromium.org>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ amd-gfx@lists.freedesktop.org, Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, intel-gfx@lists.freedesktop.org,
+ Matthew Brost <matthew.brost@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ intel-xe@lists.freedesktop.org
+References: <20261114202653.3113381-1-rdunlap@infradead.org>
+ <20261114202653.3113381-2-rdunlap@infradead.org>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <20261114202653.3113381-2-rdunlap@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
 
+On 11/14/26 21:26, Randy Dunlap wrote:
+> Add ioctl number entries for test_hmm_uapi and gup_test.
 
-On Sun, 15 Nov 2026 00:33:52 +0800, shao.mingyin@zte.com.cn wrote:
-> When a batch fetch fails, for example because its provided-buffer group
-> is empty, ublk_batch_dispatch() removes the failed fetch and returns.
-> Pending I/O tags stay in evts_fifo even if another fetch with usable
-> buffers is already queued. With no new I/O or fetch submission to select
-> it, that fetch and the outstanding block requests cannot make progress.
-> 
-> Claim the next queued fetch under evts_lock before completing and freeing
-> the failed one, then schedule its dispatch in the proper task context.
-> Marking it active before dropping the lock also prevents cancellation
-> from taking it before its task work is queued.
-> 
-> [...]
+Just curious, why do we care about uapi for test interfaces that never see the
+light of day in production kernels and their sole purpose is to go a long a
+dedicated selftest?
 
-Applied, thanks!
-
-[1/1] ublk: dispatch the next fetch after a batch failure
-      commit: a6f37fb3f5747bb7cca5cd6630dfeea4435022a1
-
-Best regards,
 -- 
-Jens Axboe
+Cheers,
 
-
-
+David
