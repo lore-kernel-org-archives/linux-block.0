@@ -1,74 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.198
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.35
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794730808;
-	b=Ap6nCz0fp990Ux1qk4R9KfPkepZNqEDAL20GfH1qRzBZMlqiLpbz7y81tYi9rbHxRK3G
-	 qd5Um2uaFqAEk31Dq4SWYRrfeqYMHzhVxImwvL7tUZfKXPhRXi0bdI6grgNo9k65CS3Ps
-	 vy31hD7fNNLRFY0Lwsj3MTzd8/4P3b4oAIY+7oJdtb2AA7uxMH5hIHZlPA10btarW8aN+
-	 M2y7KPsr4F+1yRm+kJNPRW6mpde4K/UG6KbAbulqjKhcPNwHMJ0Z+b+qEiWiPBZGqiY3A
-	 HOObTuhtmZlQFfaqG7J3J/k7mZPXt+c4jmOAXhWHDmExYqPMkFfs37+OuHsiJzUGGtw==
+	t=1794733305;
+	b=3bI02/pP/MjYzKpaJ9TXLQuxikJ6nIFoko79uQCjwLZMCbsNBH1moMI9plbz6sc0g3+n
+	 ydfaxS2IYPp67uaAHjofAjsHQYNL0vZoVGfAcRX+JizkU1LedVNone7fzmB7JQJ8LIEAH
+	 f2prVTOt+UETBIMyKPGMdbSK9JGEKVaouAXSfphbJ9S7qNDBnLojS3ByeTbmwERBbLDgW
+	 hxO85YXcaIHSQzCtvAeyZB/2Dbqz2JnpZOAHQVV6MheHP5bJRU+Duq9VU7TVepcTxWp+x
+	 a5w+SgduAz4sTJXdEmlSf/i6XxSOjoC7cUNB4bEU1lCNS6BUKsSqLAvgpC/6/GohXmQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794730808;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:In-Reply-To:
-	 Mime-Version:References:Message-ID:Date:Subject:From:To:Cc:
-	 Content-Type;
-	bh=cvkRQ9vTEHp2sTanBdWux8S9LLOQ1dWCdfqy76FCS9s=;
-	b=K6KDlQtGkrWiVh9WR6XRQcYJFbOjarOGUcghz0SCz9lzrlNsFwXNR4J/N6qMhPpD7t9V
-	 5A6F/UocDBc0HCuanAlcMozyJ1tCUgMUxRSHVJRabml/gFvkIABtKqbtKcjb2MxfXjYib
-	 0r8gq9teIqCIPFvtiwrFZtwf/Fy+bxGdTyOLl69qKrw5lk0MzNZMkKdWhPIdLqLMDNm0y
-	 8/d51BsvqnNIo/w30CsVhZ3do7NlrQBwde9pDc1uMM+0PFHoNa3JOJnCP/jR5625/l5Fq
-	 JnBJ0cm4f2OMwh2V2M0qGbDAVPS9THGuWpUaWw5Lec8ZIcT7yeWJZB0A31FOHaRm2yw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794733305;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 X-Zmail-TransId:X-Mailer:Message-ID:In-Reply-To:References:Date:
+	 Mime-Version:From:To:Cc:Subject:Content-Type:X-MAIL:X-TLS:
+	 X-ENVELOPE-SENDER:X-SOURCE-IP:X-CLEAN:X-Fangmail-Anti-Spam-Filtered:
+	 X-Fangmail-MID-QID;
+	bh=6PDKL1rAzaImATTAORc/yJkECZgOXtmpf6KdI2W0Yzg=;
+	b=ePz7rHpEgTzzmK6TvTjQ1SsJcGz3EXiKztP2kgAQhXxOU0k6J0bZJlhls2utKWcVWUVn
+	 8VnLC+VEh8R397ateYWpGAnMJ2p1k6WJMvnEzmRBobGodUERwFdLX8P2fjgvYaDCwOSt6
+	 tydu5MaGfb5hd33pvw6N3vLAsBvEgOKzRsde02CbtNKDzI9VXGTXyaQAULcg6LUOWLdu5
+	 X5/P+xWMU5WcF4kPwJaAl/6UWnB50FKFTl0qgWmgF3Q1Jncadp84CMBkhC7zjrhwbgEmG
+	 QOHJOmXbFBq/cAvEzctTFrU5RdF9+HfeY4ZX29Hb5P+5yh2dA+pLf1eMbjQ5OMDGCpw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=C0LwxZF6;
-	arc=none smtp.remote-ip=209.85.214.198
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=zte.com.cn;
+	spf=pass smtp.mailfrom=zte.com.cn;
+	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b="MEDHLg/e";
+	arc=none smtp.remote-ip=160.30.148.35
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A777606A329
-	for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 08:20:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2A777606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--stanleyjhu.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC2D606A31A;
+	Sun, 15 Nov 2026 09:01:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CCC2D606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=C0LwxZF6
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2ee1ed68286so16281485ad.1
-        for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 00:20:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794730807; x=1795335607; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:date:message-id:references
-         :mime-version:in-reply-to:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=cvkRQ9vTEHp2sTanBdWux8S9LLOQ1dWCdfqy76FCS9s=;
-        b=C0LwxZF6+BFl6wgUmpOceGqyxcXU3fj+WC5/Cgs6h9OMxjU5KJcHmONuMZv7DiZX5Z
-         7ouvr9YUsPYgzxkRzA4mIrwal94AZW2LseWerMZqopLEsTqxJzI1UcZB+T9yluKFSTPm
-         UEEy8X68/7sEeMFquUJJm96w1//g2IJMsevD+D+aZdmp+7KT/om3YmAI7ZOYWW7CagS4
-         bRb+DkO7jzmcyMQmeL0KlKD5HBmRDBaf5Ebid8numYxRfknjg6YjPuOKNUY9sQNBMb+n
-         hxcLz9/8jxxWvwXJ/40Mp+TsPK1oQ1QoZkCToeA3YpNdmyNot8c1LKjDn5nUgsEFsssG
-         CkqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794730807; x=1795335607;
-        h=content-type:cc:to:from:subject:date:message-id:references
-         :mime-version:in-reply-to:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=cvkRQ9vTEHp2sTanBdWux8S9LLOQ1dWCdfqy76FCS9s=;
-        b=KGEln709fEzPZ88cTGKwULucli8bX8flD9Nv4sDrtbS38pzNclvpGfxewifBdHEouk
-         66yEppBLU6gjzUEzuXSQlwy4bgoiKxxnLnqg17hZqE0Zo0ChyPvAtLuI7eR6b+nzPNj+
-         a5FTxfPFJMzpeOJVtajVF5zA04BRbKeCLMBqQ3BnSQ4ESRNRju0g8LUGUuxGOYfG16Vp
-         syN9alYUPuFH6Z/u13ZzxqIMJCA4iKXo5vAQiaW/PpRMewXgMPXnlDrnxmz9vZOqiF+C
-         ubSbzHHH0VQ+DLTI2dm3grE78HIz4+1TL604BdCGX6ajOQ4sZ3jjdzSgGxQvNvIc5Oxe
-         /CMw==
-X-Forwarded-Encrypted: i=1; AL+hErEzokcuf7EArVcDSsJXe4rCBV8B4Y0mebu7Y8umsnigfl9s5HsYxToGPbBBGA/T/RlSpWK8Du9GY+J8vA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8muEWUYcj+Jhkih7DgMu2amgnmhQI5udGQbwu7CLCroEXbo88g
-	jZ4WNpxd33cvplAzzIP4yWIt59zZitKD3VBJMLoIYo6o84bqv9jyD89Ptj3SUtOyIyb2f5F8e4W
-	UsFSg+uyxKpQrSv7ECCQ8Tw==
-X-Received: from plhn3.prod.google.com ([2002:a17:903:1103:b0:2ee:20a7:da27])
- (user=stanleyjhu job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:2281:b0:2e9:55fc:ded2 with SMTP id d9443c01a7336-2ee0dec63demr78859485ad.52.1794730807271;
- Sun, 15 Nov 2026 00:20:07 -0800 (PST)
-In-Reply-To: <99108d6b-ce90-4008-85bf-fef12204faef@acm.org>
+	dkim=pass (2048-bit key, unprotected) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=MEDHLg/e
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jS4jw6Pxjz8XrrJ;
+	Sun, 15 Nov 2026 17:01:40 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
+	s=z202610; t=1794733300;
+	bh=6PDKL1rAzaImATTAORc/yJkECZgOXtmpf6KdI2W0Yzg=;
+	h=In-Reply-To:References:Date:From:To:Cc:Subject;
+	b=MEDHLg/eaADWM7nJ42GBGAoxynM/3cxQk0ZakECcU0wXrpI6JAHlV9lDLpWzoJRed
+	 FxxYCWeOcmm7nz/kgosSJJzYWc3XZqp6+1lZcXQ0WvpGMPitIbulPjZaAFKDlvu9E5
+	 nHLCJ0Vz4UR6waGlsydsHt5njTjgnMhcA/8ZMzpfZtO2KIZj6kn9E4xSRtHcJdHxz1
+	 TtEXwee62wzxDeDAb1rgE6rAqlThcd9ndmR8l2xPZTA2Ln88lv/xgVCDr+x1RT0DQ/
+	 CFIl3d4yibQ97bmVXiwYR4/IWOg0hZa0HRAnj5NfvTpk7Mw1JUZKvPaEKfJ0TkwD4A
+	 XBmAdZUg6VyyA==
+Received: from xaxapp02.zte.com.cn ([10.88.97.241])
+	by mse-fl1.zte.com.cn with SMTP id 6AF91anr094626;
+	Sun, 15 Nov 2026 17:01:36 +0800 (+08)
+	(envelope-from shao.mingyin@zte.com.cn)
+Received: from mapi (xaxapp02[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Sun, 15 Nov 2026 17:01:38 +0800 (CST)
+X-Zmail-TransId: 2afa6af974f2466-6c1fc
+X-Mailer: Zmail v1.0
+Message-ID: <20261115170138759eOTny6ELzQaEpo1MVAd6r@zte.com.cn>
+In-Reply-To: <avkYMF-_bBaIfBly@fedora-laptop>
+References: 202611112257529855AMDZLzg8ZmFDQ3fBstbi@zte.com.cn,20261111225801025TKHDW7iZbMR4sFQAc8af5@zte.com.cn,avkYMF-_bBaIfBly@fedora-laptop
+Date: Sun, 15 Nov 2026 17:01:38 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -78,31 +73,97 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 Mime-Version: 1.0
-References: <20261113111202.3551341-1-stanleyjhu@google.com>
- <20261113111202.3551341-2-stanleyjhu@google.com> <99108d6b-ce90-4008-85bf-fef12204faef@acm.org>
-Message-ID: <18e82a2906bde9db.3137322e31362e3131332e313435.7ae79.0000sendgmr@google.com>
-Date: Sun, 15 Nov 2026 08:20:07 +0000
-Subject: Re: [PATCH v2 1/2] scsi: ufs: core: Recover link in
- ufshcd_set_dev_pwr_mode() on timeout
-From: Stanley Jhu <stanleyjhu@google.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: linux-scsi@vger.kernel.org, "Martin K. Petersen" <mkp@kernel.org>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, Bean Huo <beanhuo@micron.com>, 
-	Peter Wang <peter.wang@mediatek.com>, Brian Kao <powenkao@google.com>, 
-	Can Guo <can.guo@oss.qualcomm.com>, "Bao D. Nguyen" <quic_nguyenb@quicinc.com>, 
-	Hongjie Fang <hongjiefang@asrmicro.com>, Praveen Talari <praveen.talari@oss.qualcomm.com>, 
-	Hoyoung Seo <hy50.seo@samsung.com>, John Garry <john.garry@linux.dev>, 
-	Hyeoncheol Jeong <hyenc.jeong@samsung.com>, Jens Axboe <axboe@kernel.dk>, 
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+From: <shao.mingyin@zte.com.cn>
+To: <tom.leiming@gmail.com>
+Cc: <shuah@kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>, <axboe@kernel.dk>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSCAzLzRdIHVibGs6IGNhbmNlbCBjb21taXRzIGFycml2aW5nIGFmdGVyIHRoZSBxdWllc2NlIHNjYW4=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 6AF91anr094626
+X-TLS: YES
+X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
+X-SOURCE-IP: 10.5.228.132 unknown Sun, 15 Nov 2026 17:01:40 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6AF974F4.000/4jS4jw6Pxjz8XrrJ
 
-On 11/13/26 12:37 PM, Bart Van Assche wrote:
-> One change per patch please.
+> Please add this as a new recovery selftest in v2, so the fix is
+> covered.
 
-Agreed. I tried to fix too much in one go. I will split this up
-and address it step by step. Please drop this version for now.
+Thanks for the reproducer. I've prepared a driver revision and a new
+recovery selftest using fault_inject's existing delay, with no kernel
+hooks. The selftest has three cases; the first is your reproducer. It
+waits for an in-flight direct write, quiesces the device, and requires
+both the write and QUIESCED before cleanup can issue another control
+command. The base stays LIVE; the revised driver passes.
+
+> With zero copy or auto buffer registration the committed request
+> may still be in flight when the command is aborted here.
+
+I've made the distinction explicit rather than bypassing the guard at
+one call site. After COMMIT's buffer operations, the new command is
+marked COMMIT_READY before the old request's references are dropped.
+Both non-batch dispatch paths clear that bit before queuing task work.
+With cancellation set while dispatch is quiesced, the scan can cancel a
+waiting command even if its previous request remains started, while
+preserving the guard for a new request already queued to the command.
+
+This also matters if cancellation starts just after COMMIT: an early
+check alone misses that case. The third case uses a registered buffer:
+it submits COMMIT first and verifies that the write is still
+outstanding. The scan must abort all four commands, and releasing the
+buffer must then let the committed write complete successfully. My
+earlier draft passed the first two cases but failed this one; the
+current revision passes all three.
+
+> If ublk_wait_for_idle_io() fails with -EBUSY or -EINTR, ->canceling
+> is left set and ublk_cancel_dev() isn't called.
+
+I've documented that the idle-wait error leaves canceling set and skips
+the scan. The next late command receives ABORT even though QUIESCE_DEV
+returned an error; this change does not roll cancellation back. That
+error-path behavior was checked in source, not established by the runtime
+tests below.
+
+> The new check fires whenever ->canceling is set, not only for
+> QUIESCE_DEV, so the subject and commit log are narrower than the
+> change.
+
+Agreed. The new subject is "ublk: cancel late commands while the queue is
+canceling", and the log includes STOP_DEV and server exit.
+
+The helper is renamed ublk_complete_canceled_cmd().
+
+> io->cmd and UBLK_IO_FLAG_ACTIVE are stored here before ->canceling
+> is read, with no barrier in between ...
+
+I've added explicit paired smp_mb() barriers between command publication
+and the cancellation check, and before the scan's ACTIVE load, with a
+comment explaining the pairing. Queue quiescing serializes queue_rq, but
+the uring command handler can publish independently, so I would rather
+make that publication ordering explicit than rely on quiescing alone.
+
+> If ublk_get_data() fails and falls back to requeue ...
+
+The second case holds NEED_GET_DATA across a successful quiesce, then
+submits an unmappable address. This reaches the real mapping
+failure/requeue path. The base completes only three of four commands
+with ABORT; the revised driver completes all four, and the device
+reaches QUIESCED after the server's ring/file references are released.
+The common post-processing cancellation check covers this fallthrough
+path.
+
+All three cases (fault_inject delay, NEED_GET_DATA/requeue, registered
+buffer) were run against the same next-20261113 x86_64 base and fixed
+guests, using QEMU/KVM with four vCPUs and 2 GiB RAM. The existing
+stop_restart and stop_live_restart modes also passed on both kernels,
+with eight successful reads per mode. Kernel W=1 and selftest -Werror
+builds completed; the driver has the same pre-existing shmem stack-frame
+warning on both builds. I have not tested concurrent off-task
+registrations, automatic buffer registration, or a weakly ordered
+architecture.
 
 Thanks,
-Stanley
+Shao
