@@ -1,57 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=216.128.148.134
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794753694;
-	b=G2wgA0PTzMohQgnnxpfLCn8s42Zh2go4qBoE1dOmbGnhgsM4qXr9VKg9aqVuwjZvQQdM
-	 j4BoTDAsrfX4S54h82b50KiCHRGFiD4UIpNBSeEaWppa1yyplO0Lq8cu1arLeMFE7tevc
-	 3kGx5oqK8S9GmhaAkU52b9dIpaZpzQzPeKCvRo75moe08vr3qijYw1s5/9rFbWIEF2JAn
-	 +Mn9oVFw+uQN8GFF+LW0tpkxUICKGWHtBFfjDrmDx+e63ohzXbzg58tmcu+xd42fGd9TK
-	 Lz7x23NLZsvlzhlbiQOmcUexyKVVvApvC0zAWmLaY98zX0F9X/C1PgcOXrjHO7v3Z5w==
+	t=1794754219;
+	b=xWRfxNM7GRW1SPLA5xKStOkdQrqd2VXF59tpNKflaJBxjZD3gPbdZPQeNvrEd0T5gTZE
+	 96LIASu7HEH3Fvyk00TNtlyvQNZytRgPzXBW5R/pJJpd2O3qxE3n3r3TVLm21yvx0Odpk
+	 MyUei4HAmp0R0mAOvi/AGYxfqiNMgiS3MDAIS152PnXAXkMojN6dOAfIaM0SVOAlJIMP9
+	 mAH9M7DBUnQLhtvOU7/cbont33Sq1xMmECu4NLIximJxKkErN4Jr0FhSybUtwDQ3tQ2uj
+	 ZfTP33LVy1+bwwBrnnPuRj85QWk0gNx+7tpepnk+57hUP+BZF+l6dGJxdZCnqsOLcig==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794753694;
-	h=DMARC-Filter:From:DKIM-Signature:To:Subject:Date:Message-ID:
-	 In-Reply-To:References:MIME-Version:Cc:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=e1bgO6Fj3CxlMe7EFyu5MVBDrIMFpF1oc9kKBs8zGgw=;
-	b=GWAKSw/cohtKFBrqZXgESVF5P8zfrALAIFvcir8ZJv+BPq/VdfQAWoobIgyLjUmByCyP
-	 Au7k/PYKu8qyZM0RWgAZlZ7Z8xrod+U82zkhYZwAMxr/bWw6juBiHpt0plNs1KHkRfQ2X
-	 tnqmXj+VL5zB8OalDnTxcSNza2SPQKPsK0sUd8rDQbmlr30uOZQuoOZFkda5XCswV0HS0
-	 a4NL9zOFtQIMtEqZUI6/E+qmoX+y4EIou99+PUU5i9uNPckHJZ5ZoR7KXpqsaTeDSkrIz
-	 kVG4NCtBE2SxrW3JTHn8N5dY9uRrEVWVhmK0jOpobZadOySjmWh+B5VDcb5IaZZMEng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794754219;
+	h=Received:DKIM-Signature:From:To:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=svG0nk+4KxvSRS2+yy8D9zKfzMdUcXDsRQ7QMMGiMao=;
+	b=F1YOdxyrfJ6b9iU71ax1B6PIjtN0yRRAjZnxPwho80Ebj40p3HwzVXjSwpu+un4f2t1K
+	 ZySA3WJfEgQmA9PMxVzqbiFOPvy1H31C6MuQ8B/dPx55CDjXUHzuli9nadqRo2p3ZPCFf
+	 208IGu1ZUmqDPXS/SXihR1nCNgjlh34h32E/EvO19Rxm8R8wo/d4Qg6GscDBHrdFI5Efy
+	 cjaNILdADX/EssG+OU/+olo3Fn5z3tJ9ySXVTX1sut1MGT1u/5ilGFkEXKKdGBlwY9w3L
+	 y5vSFzUo8E5Q404Xu7i89u8nkMexFCYkW+jWq/Gr2aLCRfIeOsOC9EVd8PqAYiV2uMw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=eversole.co;
-	spf=pass smtp.mailfrom=eversole.co;
-	dkim=pass header.d=eversole.co header.i=@eversole.co header.a=rsa-sha256 header.s=mail header.b=ZtXFBZKo;
-	arc=none smtp.remote-ip=216.128.148.134
-Received: from mail.taqjiao.com (mail.taqjiao.com [216.128.148.134])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GU59RVzX;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85720606A31F
-	for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 14:41:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 85720606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=eversole.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eversole.co
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF34606A31D;
+	Sun, 15 Nov 2026 14:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=eversole.co header.i=@eversole.co header.a=rsa-sha256 header.s=mail header.b=ZtXFBZKo
-From: James Eversole <james@eversole.co>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=eversole.co; s=mail;
-	t=1794753686;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e1bgO6Fj3CxlMe7EFyu5MVBDrIMFpF1oc9kKBs8zGgw=;
-	b=ZtXFBZKoK/NOaH8lAwQIERjSU1zd5sLDPwBwphbZ9ItCW1TdtjYIusifEQMGbhqoN/IrMG
-	erGxnHKfumYQ+O+aMM5k611cgDxrTBpDm1t1IM0lrBUY1S41jLAJyhBBSQcrE3pFx5wGl+
-	FXVqgQy36w+vP7YPkk+B4I50aAShCD0=
-To:
- Ye Bin <yebin@huaweicloud.com>, axboe@kernel.dk, linux-block@vger.kernel.org
-Subject:
- Re: [PATCH v2] blk-flush: fix possible deadlock when process nvme_timeout()
-Date: Sun, 15 Nov 2026 08:41:24 -0600
-Message-ID: <179475368487.107480.2931723348388347514@eversole.co>
-In-Reply-To: <20261112135019.3290131-1-yebin@huaweicloud.com>
-References: <20261112135019.3290131-1-yebin@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GU59RVzX
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B91591F000C4;
+	Sun, 15 Nov 2026 14:50:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794754218;
+	bh=svG0nk+4KxvSRS2+yy8D9zKfzMdUcXDsRQ7QMMGiMao=;
+	h=From:To:Subject:Date;
+	b=GU59RVzXqMk8aIatILswMZg/D483q/Rq7uDjggFdpU4gX7BLYUwjI0YsXk/WzwLUt
+	 cuibx1zqcBc2sMjduX7ufvfA40bK8Onm1hZ4hVb5yk6bOX7y5mYi3REQOhJZ2Qq4sU
+	 6GO1jDglA1vmHEDVw7NnW72AEaD4C94GqrQ9f0Lqy5ybSWcAWf2/dpeS6aFsuoLnA4
+	 hkS9TN4sDl24eeF1FLT+Pa3VFgAjIEEOeZp4NDrEB0cNevs/0JtocGM+smj2vUXLmb
+	 Wfi2mI0BIvawh6swlaRv3CW9przNeW8kBoFhQDvthI6e7EfWjj3PAsaNlhdXS6hPFL
+	 lMadPBZNNm5CA==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH v9 00/13] Add support for storage element depopulation
+Date: Sun, 15 Nov 2026 23:50:02 +0900
+Message-ID: <20261115145015.938426-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -61,42 +58,109 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Cc: ming.lei@redhat.com
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Ye,
+Jens,
 
-On November 15, 2026, I hit what looks like the same deadlock on Linux
-6.18.56 (NixOS), using a Kingston NV2 2TB with firmware SBK00104 as the
-root disk.
+These patches define a new set of block device operations for generically
+using from the block layer the storage element depopulation feature of
+zoned block devices. Support for this feature is added to the SCSI disk
+driver and an emulation of this feature added to the zloop driver.
 
-A FLUSH request on QID 4 timed out, then timed out again 30 seconds later,
-triggering a controller reset. Recovery remained stuck for over 100
-minutes with this stack:
+The management operations can be accessed using block layer API, which is
+intended for file systems (e.g. zonefs and XFS), as well as using ioctls
+for users using zoned disks directly from user space.
 
-  msleep
-  blk_mq_tagset_wait_completed_request
-  nvme_dev_disable
-  nvme_timeout
-  blk_mq_handle_expired
-  bt_iter
-  blk_mq_queue_tag_busy_iter
-  blk_mq_timeout_work
+Changes from v8:
+ - Addressed Sashiko comment on patch 7 by adding patch 6. Patch 7 is
+   unmodified.
+ - Addressed Sashiko comments on patch 8 and patch 12
+ - Added review tags to unmodified pacthes
 
-The controller remained in "resetting". Debugfs showed one busy request:
-FLUSH tag 171, state=complete.
+Changes from v7:
+A significant amount of changes in this version to address most of the
+Sashiko review comments and to simplify the code. In more details, the
+changes are:
+ - Added patches 3, 6, and 9.
+ - Dropped former patch 5 as the use of irq-disabling spinlocks in zloop
+   is not necessary.
+ - Reworked patch 4 by migrating the idepop operation wait loops to the
+   device drivers. This simplifies the implementation in zloop without
+   making the sd driver implementation more difficult. Also fixed problems
+   with errors during restoration and zone write plugs state.
+ - Reworked patch 7 and 11 to be consistent with the changes in patch 4.
 
-A read-only BPF probe in blk_mq_tagset_count_completed_rqs(), filtered to
-the stuck worker, recorded:
+Changes from v6:
+ - Addressed the nit pointed out by Christoph in patch 4
+ - Added review tags
 
-  tag=171 state=2 ref=2 end_io=flush_end_io
+Changes from v5:
+ - Rebased on latest block/for-next
+ - Addressed Christoph's comments on patch 3
+ - Added patch 5 to address a potential deadlock in zloop (signaled by
+   sashiko)
+ - Reworked the restoration of storage elements in patch 6 to avoid an
+   inconsistent state of storage elements in case of error. Also added
+   protection against disk removal during storage element removal and
+   restoration execution.
+ - Added review tags
 
-The kernel and systemd were still running, but root filesystem I/O was
-blocked.
+Changes from v4:
+ - Rebased on latest block/for-next
+ - Added review tags to patch 1 and 2
+ - Reworked patch 3, 4 and 5 to address Christoph's and sashiko comments
 
-I haven't tested your patch yet, but wanted to report this independent
-occurrence. I have the netconsole logs, task stacks, and probe output
-available if useful.
+Changes from v3:
+ - Reworked patch 1 to only provide the disk_zone_is_offline() helper
+   function. Failing of read operations to offline zones is handled
+   directly by the zloop driver and the new patch 7 is added to handle
+   failing early read operations to offline zones of ZBC SCSI disks.
+ - Added patch 2
+ - Addressed further valid comments from Sashiko
+   The biggest changes are in patch 2 to save the number of storage
+   elements of a disk in struct gendisk and to serialize the execution of
+   the storage element management operations using the zone revalidation
+   mutex.
+ - Rebased on latest block/for-next
 
-James Eversole
+Changes from v2:
+ - Addressed further valid comments from Sashiko
+ - Rebased on latest block/for-next
+
+Changes from v1:
+ - Addressed the many valid comments that Sashiko had
+ - Rebased on latest block/for-next
+
+Damien Le Moal (13):
+  block: introduce disk_zone_is_offline()
+  block: refactor blk_revalidate_disk_zones()
+  block: allow dropping all zone write plugs on revalidation
+  block: introduce storage element management
+  block: add storage element management ioctls
+  zloop: keep zone write pointer and condition consistent
+  zloop: fix zone reporting consistency
+  zloop: add storage element emulation
+  zloop: add degrade_element control command
+  scsi: scsi_proto: refine the definition of storage element health
+  scsi: sd_zbc: always revalidate zones for disks supporting head depopulation
+  scsi: sd_zbc: define storage element management operations
+  scsi: sd: fail read commands to offline zones early
+
+ .../admin-guide/blockdev/zoned_loop.rst       |  33 +-
+ block/blk-zoned.c                             | 450 +++++++++-
+ block/blk.h                                   |  14 +
+ block/genhd.c                                 |   4 +
+ block/ioctl.c                                 |   4 +
+ drivers/block/zloop.c                         | 841 +++++++++++++++++-
+ drivers/scsi/sd.c                             |  23 +-
+ drivers/scsi/sd.h                             |   5 +
+ drivers/scsi/sd_zbc.c                         | 538 ++++++++++-
+ include/linux/blkdev.h                        |  64 ++
+ include/scsi/scsi_proto.h                     |   6 +-
+ include/uapi/linux/blkzoned.h                 | 106 +++
+ include/uapi/linux/fs.h                       |   1 +
+ 13 files changed, 2007 insertions(+), 82 deletions(-)
+
+-- 
+2.56.0
+
