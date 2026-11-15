@@ -1,65 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.199
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794743271;
-	b=BdK9H1y+HNRqD/jOpQfiJ8CK50RxEZMCjwgIS48DNkylfGZf+h7yYt+dLR/rohWShFPk
-	 wfY+Vi1XUiR4xQoz/9dl0reIiXKOG5wLW7gkB4jYbbvKAp0onbjRpWAq3h6DDbAxHfbTR
-	 5/PaQlaVaf7TtFwba6zsHiW9KlQbLjzo0EerdKKIi48ZFuJLc3WH+ltRAnMLBo+gAqRpL
-	 ov61lFfeKEVmTbros4bY5hLqTBfdHKhysZz363XUX2UJKA7MroJWDEdJE++rHrOfqDHYG
-	 NlZSY4qxT1OqOgEdTD541oNseZI8+FDCzpXM+gOKg5I+2qmGEiQp5Da0bFa+VHsozfA==
+	t=1794753324;
+	b=IUXyiOCfOwc5vJhRDaQC4rTW9UvWs+UHIF7BGi6oqRyjP3KkNRIkJOOjDkOqakMWzJnC
+	 bOR64ULx3SCbHbSkJWP86wi5YLDx98diRMA8GWcUwIT8ACEQjXDFgXlAeDtnmDpNOFda3
+	 2gANFELXj0wQjhozKeBziQmyiANbB6tZIMU2u4AHj4MBInBAor8pJ8oELodet0AqkbM6T
+	 Xlhw8vC/8ybpEebngZCaHi39ZqM+Pvx0K7pOhKG7tnvVfvQbOJVhyCjSPAU17geCVPdnK
+	 Af6XJiys8s0DsCnKYDvHJfVKtbKC/nQOGJvYAOcdREfgns4mc89AOqEEs7y0G27aQog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794743271;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=dUUoDFkPJkBg6tiiX+gwUNqdlWB0vRGU4J1TlhHh7ZE=;
-	b=iuKSIOwNdjXAi2+nKsqu7pIfpzXuLtuj3wXCa1g9MN5BFnFnH+efqOzfUtJXvT2zUGGl
-	 V9IfHEzKQzynFa9Fuo1ssXUF+7C+Eoevg9R/uDVp3b207QzEgfuu6a4+z5JoRhmzh2QN0
-	 9vJY2NJZgqRfrAE94UuSb7lSNUhcz8q8wGqjWRw5n7k7BXCLYZBSkg22ZgvSiHJnnwpNY
-	 2bXzqhTqJYzU82V3hEswRLXZDMXOPwMPocN2bf1yYrFAEINhs1DN1LNIND4gakdX7BwOF
-	 /NBQXI11IeC+qk96wRGrOuIRB815lx2fweUabl5k2cTyNpurMwEGTlfjb0o79097iFQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794753324;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:In-Reply-To:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Content-Type;
+	bh=ZR+ct1BlyfsQpj8tJxWd+p0AnYqKGIjonighQ8kjDfI=;
+	b=xnOBLGIh9I5MsK63FYIy2laGYHirUltiWR3aIrYPxXoL2cJ8JPjjn1n4EAsaxCjspkdC
+	 nqr/MALywikOTA7ASVtNMUs+N4ffk0AgD5NrMsY0o8nrEtYgXdNJBigGLfuDaTxT6ayw7
+	 FBq0oPpzptS2Dr0RN7opTwCpjDePGwhqNt+XCp0IuBWIVwn2Cew96li2y/w51o69ltEej
+	 zOUxYXEFfBU7JE+X9CtSh3NOqYdQuAPG0fFxJ5pshtdCKN67oyioyO4V0UWURobAas2tp
+	 wQyUWyxtM6MWHt4K4VTqZAwFO1OcKx0Jt57axfwpZ8iwM8yo45r2NwypKeDfQlXryWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O5UCROmp;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.199
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C6D606A32E;
-	Sun, 15 Nov 2026 11:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O5UCROmp
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FF671F000C4;
-	Sun, 15 Nov 2026 11:47:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794743270;
-	bh=dUUoDFkPJkBg6tiiX+gwUNqdlWB0vRGU4J1TlhHh7ZE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=O5UCROmpYOxPof//EVMXlzhE8CwpBAuLxySuhjVJTwgdWIcUjDEHfxQDjag+uTRua
-	 Z+qDIjnj4mqHBNrUw8Ko1zjkZMcqAeFq8ldvZlzCVbByFB+ptCuml13g6R68XiAcOc
-	 tTmUPUcRTu4mDvyiHtXFi/q4pZoMhhtkVDTdv1WqLRxEzoDBelkcsk5jYXJt2EAUob
-	 xjg6qsjtw4gR2WGGuYhHVN3Y9VjEoACQTHM3FtneMm5yNVilA99bE1xWageT1rHDiS
-	 UNAqlNNFNjgatsQNOofsxEUu3m18tcJw6JldfrHIojxyBAVmlXl979klg5KOmmNJfI
-	 Ivyq26TJMKVYg==
-Date: Sun, 15 Nov 2026 12:47:41 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: Chris Down <chris@chrisdown.name>, linux-fsdevel@vger.kernel.org, 
-	Jann Horn <jannh@google.com>, Chris Mason <mason@kernel.org>, 
-	Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, linux-scsi@vger.kernel.org, 
-	target-devel@vger.kernel.org, driver-core@lists.linux.dev, linux-mm@kvack.org, 
-	bpf@vger.kernel.org, linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
-	apparmor@lists.ubuntu.com, linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
-	fuse-devel@lists.linux.dev, linux-efi@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	ocfs2-devel@lists.linux.dev, linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-usb@vger.kernel.org, linux-erofs@lists.ozlabs.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC v2 33/42] fs: add file_check_backing()
-Message-ID: <20261115-boxen-mundschutz-jacht-0ab871beca58@brauner>
-References: <20261114-work-loop-pseudo-v2-0-98639a2286fb@kernel.org>
- <20261114-work-loop-pseudo-v2-33-98639a2286fb@kernel.org>
- <20261114120557.4bc1eb6e57218cdc@chrisdown.name>
- <CAOQ4uxhGxpBtMZ5kfuzR1tQAewiecoX7UjXQRo91QjJHH9T_Yw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D45F606A31E
+	for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 14:35:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7D45F606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-4b597558c4cso3038374b6e.1
+        for <linux-block@vger.kernel.org>; Sun, 15 Nov 2026 06:35:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794753323; x=1795358123;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ZR+ct1BlyfsQpj8tJxWd+p0AnYqKGIjonighQ8kjDfI=;
+        b=eAFDFwMM6ZtmdpwrBh5vMhFl/6jR+ZjKuarLWxlsXwAfbIhrqx6iXKm47qvvXRTbng
+         4PAWQbOQnD94oOK8k/4HCQa7omzVtChkaO4byXiBSehmjP075ulaFcE7N1B/DTGog5Of
+         a4P44flKFUNfey8t341LDTvmcqb81DHnxcW5ks1F44ReFNefPf16X/Z2df0nGlQFE0g8
+         9XczMjfg2nxo2AL/+o0sYQoqUivEv3m8QWLPVJmD2x2vVVLstNiaFhjAemsR7F4Zj1ku
+         ucMQ+G+xDzJLArAFciYpCGhYCdmoSSu/4kJd4MD+Tc5kIA3ESzILxenPN19p8uCzFxFG
+         f8BA==
+X-Forwarded-Encrypted: i=1; AL+hErHjZetsCzxOghE+Uy6U/lNIZGa7UlARmXjMqJuId/Per/CeXUFDOCAXCSeAQXJHByKPX+rHtIA5wfX+rQ==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/G1kAROLkG3i1k7CqbHpvqaw0Bj8xXU+o+/lbry5IA1OX18v6s
+	QGG8lm5qWWHfR8d6ciRTcoGEe2TE5jlqxq10QxzdQ6wxbA8zeLEDjcVJ7oFaDMvRynjNndd9MIZ
+	hhVf+2tXVyHXWtyD8NntwMaMjC34dDWdqWSV9w5PdZDQ0qcn6EJjYeYIVsAw=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -69,70 +58,235 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxhGxpBtMZ5kfuzR1tQAewiecoX7UjXQRo91QjJHH9T_Yw@mail.gmail.com>
+X-Received: by 2002:a05:6808:c211:b0:53c:8f0e:ee3e with SMTP id
+ 5614622812f47-56e647dead7mr6941205b6e.36.1794753323551; Sun, 15 Nov 2026
+ 06:35:23 -0800 (PST)
+Date: Sun, 15 Nov 2026 06:35:23 -0800
+In-Reply-To: <6ae67a19.6552420f.2a0efc.001e.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6af9c32b.84fe3b82.798c4.0003.GAE@google.com>
+Subject: Re: [syzbot] [block?] possible deadlock in wbt_init_enable_default
+From: syzbot <syzbot+e2e1def00b1be94f0a22@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Nov 15, 2026 at 12:19:57AM +0100, Amir Goldstein wrote:
-> On Sat, Nov 14, 2026 at 9:06 PM Chris Down <chris@chrisdown.name> wrote:
-> >
-> > Hi Christian,
-> >
-> > Christian Brauner writes:
-> > >+      /* Look through stacking filesystems at the inode with the data. */
-> > >+      if (d_real_inode(file->f_path.dentry)->i_sb->s_iflags & SB_I_PSEUDO)
-> > >+              return -EINVAL;
-> >
-> > This looks good in general, but what the bots said about O_PATH files
-> > here is real. With FMODE_PATH this is reached for a file that was never
-> > opened, so on overlayfs nothing has been through ovl_open() to look up
-> > the lowerdata of a metacopy file yet. ovl_d_real() then does the lookup
-> > itself, and when that fails it hits the WARN(1) at its end and returns
-> > the overlayfs dentry, so the check passes as well.
-> >
-> > Only fuse passes FMODE_PATH, so it takes CAP_SYS_ADMIN to get there, but
-> > it's easy to trigger with that. From a quick test with a metacopy file
-> > whose redirect into a data-only layer points at nothing, registering an
-> > O_PATH fd of it with FUSE_DEV_IOC_BACKING_OPEN gives
-> >
-> >      ovl_d_real(/f, 0): real dentry not found
-> >      WARNING: fs/overlayfs/super.c:79 at ovl_d_real+0xc9/0x210
-> >      [...]
-> >       file_check_backing+0x308/0x5e0
-> >       fuse_backing_new+0x219/0x4a0
-> >       fuse_backing_open+0xe8/0x390
-> >       fuse_dev_ioctl+0x53a/0x7d0
-> >
-> > and the ioctl still succeeds. A normal open of that file fails with
-> > ENOENT, so nothing could have used it as a backing file anyway, but with
-> > panic_on_warn this is now a panic.
-> >
-> > Maybe ovl_d_real() should just stop warning when the lookup fails, now
-> > that it has a caller that isn't trace_uprobe?
-> 
-> Yeh I guess that this needs to be a Fixes for lazy data lookup.
+syzbot has found a reproducer for the following issue on:
 
-I have a fix for that.
+HEAD commit:    23c62304dde2 Merge tag 'for-linus-7.4a-rc3-tag' of git://g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=152e564d580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1cf189394a856f11
+dashboard link: https://syzkaller.appspot.com/bug?extid=e2e1def00b1be94f0a22
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17944d3d580000
 
-> The correct fix would be to teach all the callers to deal with an error.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-23c62304.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0f7bce229a50/vmlinux-23c62304.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7a152fd539c6/bzImage-23c62304.xz
 
-I've also implemented that. It wasn't that hard and it's also a bug. Not
-a bad one but still.
+AI-generated root cause summary:
+A race between disk registration in dm_setup_md_queue() and concurrent device
+removal (dm_destroy() -> blk_mark_disk_dead()) causes the queue freeze lockdep
+state tracking in block/blk-mq.c and block/blk.h to become inconsistent.
+Although rq_qos_add() freezes and subsequently unfreezes the queue during
+wbt_init_enable_default(), blk_unfreeze_release_lock() skips releasing
+q->io_lockdep_map because the disk was concurrently marked dead/dying. When
+wbt_init_enable_default() immediately proceeds to acquire q->debugfs_mutex,
+lockdep detects an apparent circular locking dependency against the leaked
+lockdep map. In production kernels without CONFIG_LOCKDEP, the queue is properly
+unfrozen and no deadlock or memory corruption occurs.
 
-> > The check would still pass
-> > for an O_PATH file whose lowerdata couldn't be looked up at that point,
-> > though.
-> 
-> One observation relevant to this patch set is that a datadir layer has no
-> business being a pseudo fs and that can and should be blocked explicitly
-> at overlayfs mount time.
+full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=e2e1def00b1be94f0a22
 
-I agree.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e2e1def00b1be94f0a22@syzkaller.appspotmail.com
 
-> The other observation is that fuse_passthrough_open() should probably
-> check the backing_file that was opened for io in addition to checking
-> in fuse_backing_open(), which could have different FMODE and specifically
-> could be FMODE_PATH.
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz.1.1969/12485 is trying to acquire lock:
+ffff88803a2da498 (&q->debugfs_mutex){+.+.}-{4:4}, at: blk_debugfs_lock_nomemsave block/blk.h:816 [inline]
+ffff88803a2da498 (&q->debugfs_mutex){+.+.}-{4:4}, at: blk_debugfs_lock block/blk.h:830 [inline]
+ffff88803a2da498 (&q->debugfs_mutex){+.+.}-{4:4}, at: wbt_init_enable_default+0xf6/0x170 block/blk-wbt.c:794
 
-Sounds good.
+but task is already holding lock:
+ffff88803a2d9c50 (&q->q_usage_counter(io)#1954){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:206
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #3 (&q->q_usage_counter(io)#1954){++++}-{0:0}:
+       lock_acquire kernel/locking/lockdep.c:5942 [inline]
+       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+       blk_alloc_queue+0x610/0x790 block/blk-core.c:505
+       __blk_alloc_disk+0xa0/0x170 block/genhd.c:1527
+       alloc_dev drivers/md/dm.c:2349 [inline]
+       dm_create+0x5e8/0x1530 drivers/md/dm.c:2563
+       dev_create+0x121/0x2a0 drivers/md/dm-ioctl.c:977
+       ctl_ioctl+0x4d2/0xcc0 drivers/md/dm-ioctl.c:2221
+       dm_ctl_ioctl+0x22/0x30 drivers/md/dm-ioctl.c:2243
+       vfs_ioctl fs/ioctl.c:52 [inline]
+       __do_sys_ioctl fs/ioctl.c:598 [inline]
+       __se_sys_ioctl fs/ioctl.c:584 [inline]
+       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:584
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x123/0x7b0 arch/x86/entry/syscall_64.c:89
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #2 (fs_reclaim){+.+.}-{0:0}:
+       lock_acquire kernel/locking/lockdep.c:5942 [inline]
+       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+       __fs_reclaim_acquire mm/page_alloc.c:4375 [inline]
+       fs_reclaim_acquire+0xc4/0x100 mm/page_alloc.c:4389
+       might_alloc include/linux/sched/mm.h:316 [inline]
+       slab_pre_alloc_hook mm/slub.c:4673 [inline]
+       slab_alloc_node mm/slub.c:5011 [inline]
+       kmem_cache_alloc_lru_noprof+0x5f/0x6a0 mm/slub.c:5066
+       __d_alloc+0x34/0xad0 fs/dcache.c:1967
+       d_alloc+0x4a/0x1e0 fs/dcache.c:2053
+       lookup_one_qstr_excl+0x171/0x250 fs/namei.c:1812
+       __start_dirop fs/namei.c:2926 [inline]
+       start_dirop+0x59/0xb0 fs/namei.c:2948
+       simple_start_creating+0xf9/0x110 fs/libfs.c:2281
+       debugfs_start_creating.part.0+0x7b/0x150 fs/debugfs/inode.c:397
+       debugfs_start_creating fs/debugfs/inode.c:371 [inline]
+       debugfs_create_dir+0x6c/0x440 fs/debugfs/inode.c:575
+       regulator_init+0x97/0x180 drivers/regulator/core.c:6787
+       do_one_initcall+0x11c/0x6f0 init/main.c:1419
+       do_initcall_level init/main.c:1481 [inline]
+       do_initcalls init/main.c:1497 [inline]
+       do_basic_setup init/main.c:1517 [inline]
+       kernel_init_freeable+0x6ea/0x7b0 init/main.c:1732
+       kernel_init+0x21/0x1e0 init/main.c:1622
+       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #1 (&sb->s_type->i_mutex_key#3/1){+.+.}-{4:4}:
+       lock_acquire kernel/locking/lockdep.c:5942 [inline]
+       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+       down_write_nested+0x8f/0x1f0 kernel/locking/rwsem.c:1757
+       inode_lock_nested include/linux/fs.h:1072 [inline]
+       __start_dirop fs/namei.c:2924 [inline]
+       start_dirop+0x4b/0xb0 fs/namei.c:2948
+       simple_start_creating+0xf9/0x110 fs/libfs.c:2281
+       debugfs_start_creating.part.0+0x7b/0x150 fs/debugfs/inode.c:397
+       debugfs_start_creating fs/debugfs/inode.c:371 [inline]
+       debugfs_create_dir+0x6c/0x440 fs/debugfs/inode.c:575
+       blk_register_queue+0x199/0x640 block/blk-sysfs.c:968
+       __add_disk+0x7dd/0xf10 block/genhd.c:531
+       add_disk_fwnode+0x279/0x480 block/genhd.c:604
+       add_disk include/linux/blkdev.h:799 [inline]
+       brd_alloc.isra.0+0x5ab/0x820 drivers/block/brd.c:340
+       brd_init+0x167/0x190 drivers/block/brd.c:420
+       do_one_initcall+0x11c/0x6f0 init/main.c:1419
+       do_initcall_level init/main.c:1481 [inline]
+       do_initcalls init/main.c:1497 [inline]
+       do_basic_setup init/main.c:1517 [inline]
+       kernel_init_freeable+0x6ea/0x7b0 init/main.c:1732
+       kernel_init+0x21/0x1e0 init/main.c:1622
+       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 (&q->debugfs_mutex){+.+.}-{4:4}:
+       check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3209
+       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+       validate_chain kernel/locking/lockdep.c:3952 [inline]
+       __lock_acquire+0x1528/0x1f40 kernel/locking/lockdep.c:5288
+       lock_acquire kernel/locking/lockdep.c:5942 [inline]
+       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19f/0x1c10 kernel/locking/mutex.c:821
+       blk_debugfs_lock_nomemsave block/blk.h:816 [inline]
+       blk_debugfs_lock block/blk.h:830 [inline]
+       wbt_init_enable_default+0xf6/0x170 block/blk-wbt.c:794
+       blk_register_queue+0x4b8/0x640 block/blk-sysfs.c:995
+       __add_disk+0x7dd/0xf10 block/genhd.c:531
+       add_disk_fwnode+0x118/0x480 block/genhd.c:600
+       add_disk include/linux/blkdev.h:799 [inline]
+       dm_setup_md_queue+0x1e2/0x550 drivers/md/dm.c:2632
+       table_load+0x4e8/0x7b0 drivers/md/dm-ioctl.c:1661
+       ctl_ioctl+0x4d2/0xcc0 drivers/md/dm-ioctl.c:2221
+       dm_ctl_ioctl+0x22/0x30 drivers/md/dm-ioctl.c:2243
+       vfs_ioctl fs/ioctl.c:52 [inline]
+       __do_sys_ioctl fs/ioctl.c:598 [inline]
+       __se_sys_ioctl fs/ioctl.c:584 [inline]
+       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:584
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x123/0x7b0 arch/x86/entry/syscall_64.c:89
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  &q->debugfs_mutex --> fs_reclaim --> &q->q_usage_counter(io)#1954
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->q_usage_counter(io)#1954);
+                               lock(fs_reclaim);
+                               lock(&q->q_usage_counter(io)#1954);
+  lock(&q->debugfs_mutex);
+
+ *** DEADLOCK ***
+
+locks held by syz.1.1969/12485: 6, on CPU#2:
+ #0: ffff888059796190 (&md->type_lock){+.+.}-{4:4}, at: table_load+0x22d/0x7b0 drivers/md/dm-ioctl.c:1644
+ #1: ffff8880597960e8 (&md->table_devices_lock){+.+.}-{4:4}, at: dm_setup_md_queue+0x1ab/0x550 drivers/md/dm.c:2631
+ #2: ffff8880464629c0 (&set->update_nr_hwq_lock){++++}-{4:4}, at: add_disk_fwnode+0x107/0x480 block/genhd.c:599
+ #3: ffff88803a2da200 (&q->sysfs_lock){+.+.}-{4:4}, at: blk_register_queue+0x10a/0x640 block/blk-sysfs.c:965
+ #4: ffff88803a2d9c50 (&q->q_usage_counter(io)#1954){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:206
+ #5: ffff88803a2d9c88 (&q->q_usage_counter(queue)#63){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:206
+
+stack backtrace:
+CPU: 2 UID: 0 PID: 12485 Comm: syz.1.1969 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
+ print_circular_bug.cold+0x178/0x1be kernel/locking/lockdep.c:2087
+ check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2219
+ check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3209
+ check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+ validate_chain kernel/locking/lockdep.c:3952 [inline]
+ __lock_acquire+0x1528/0x1f40 kernel/locking/lockdep.c:5288
+ lock_acquire kernel/locking/lockdep.c:5942 [inline]
+ lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x19f/0x1c10 kernel/locking/mutex.c:821
+ blk_debugfs_lock_nomemsave block/blk.h:816 [inline]
+ blk_debugfs_lock block/blk.h:830 [inline]
+ wbt_init_enable_default+0xf6/0x170 block/blk-wbt.c:794
+ blk_register_queue+0x4b8/0x640 block/blk-sysfs.c:995
+ __add_disk+0x7dd/0xf10 block/genhd.c:531
+ add_disk_fwnode+0x118/0x480 block/genhd.c:600
+ add_disk include/linux/blkdev.h:799 [inline]
+ dm_setup_md_queue+0x1e2/0x550 drivers/md/dm.c:2632
+ table_load+0x4e8/0x7b0 drivers/md/dm-ioctl.c:1661
+ ctl_ioctl+0x4d2/0xcc0 drivers/md/dm-ioctl.c:2221
+ dm_ctl_ioctl+0x22/0x30 drivers/md/dm-ioctl.c:2243
+ vfs_ioctl fs/ioctl.c:52 [inline]
+ __do_sys_ioctl fs/ioctl.c:598 [inline]
+ __se_sys_ioctl fs/ioctl.c:584 [inline]
+ __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:584
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x123/0x7b0 arch/x86/entry/syscall_64.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f1219da94d9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f121aca8028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f121a025fa0 RCX: 00007f1219da94d9
+RDX: 0000200000000380 RSI: 00000000c138fd09 RDI: 0000000000000004
+RBP: 00007f1219e3804e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f121a026038 R14: 00007f121a025fa0 R15: 00007ffd63a60148
+ </TASK>
+device-mapper: ioctl: device has been removed from the dev hash table.
