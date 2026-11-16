@@ -1,53 +1,48 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.71.93.99
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794836386;
-	b=WCALsow5OL3AtdHiZp7W6EOivfSqdka58yEFPY2YZqz3MXQ6M/arjWWJri3kge2B4N9P
-	 fyI3UtxPz+g5WiTq8Hbb0oFFIbTT5o7ik+UrGu8Wov8y7jJbIYtJ0b0K2S+fI4RlhIhmK
-	 IpNeYxK9YnU+M3rovmslSubKgaDEsZ5vVyhWy/BKbPiuBubw0KXUv4ipgK8+jL3sKVLey
-	 sWMMLvqxp4o3Rqm4/RWJjpEZvJRwX6A2zRVGuJmwcAurEfwBgWXZWAs+rO/feiH+YDMWn
-	 6uOlLLJBl9whz8gIt/Iui4ZCJGx+WI81Vc4rh6RgML/P5G3i4RToL9Xnu+v22NQR9LA==
+	t=1794838896;
+	b=1T1JqLXIiaTlgMoAolrGF6kQy1JF0qMbo0wXihpDwNhDJMFzETfPE6cSqI18RDh/yQSn
+	 7loKAqr8llufmAxIPZl09xhqAJcSo7hN+a0zIEOFW+f6RB4Lsnj+W338U2R8n0xTgqYXm
+	 DYD/bCZmBGKTbJ6+KEudQNddJjM1wJKASzsiuEVm+ITiWDXPeqQEDFTWiW/Mgoudie0/O
+	 6jZC9ccopP1tfzwhiQmg537VO0/3sYZRpgAcb50nbzkTEwrHYeoVqSb3ouIYg0z/WD4OM
+	 u/A8q27nXVIozRu2+uYndY1JdJZ8EuFaQFYUe51nxkVfq25YT1u3R+SuPI7sfRC4oIA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794836386;
-	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
-	bh=HVLhfDPAtkuIIkET2H5DHISx8bl/sic6XsQLMtIUZKo=;
-	b=E7Tk6nW/gUkDAjqln+dd1qsbxXG0tWRmNoc3gPjShll7aQ4NF5Ao3qujJINNLS5zSHNS
-	 g4PvuEegjEkIh1PUCAnEBCjYGnX4be1QT87mj7HmgALqEgWePByCNmFIN0CyB6EnxRTP3
-	 fUzfwKRl9ut852dK0LA61UoyKqjZ4oswodY28mcd09xeHJxgZRlIlN8wpYa+GSPOzYZ22
-	 6in0i0E8dAhLna8o2KjEDhAanjH6xTzN+cty4A6MChU+N9MGdZF3QYCDcZH9/p8bgXj/0
-	 BvHCvtWwLw8LGZGNzmfdUy6Ltimydr67X8m77NvPvPr/hg3xxBcsv+gzO9OSBc4NYvQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794838896;
+	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=avroJVXI7FYPP9BX1mpXsZCBZ9F8Uq429Emp0GZBvxk=;
+	b=ameqZ8NH880NrTIpqBG5WzWhx7kfBLWv5F16oK+qprArPu4bw9ctv7l4O+UUg2u/GJei
+	 NmxsVaWOXVSW0JApTYlAqHk9ZftjbB52x3HQ1lCiwbwn7uLEwJA+dEfBqwkR67EBxbr4S
+	 n4b6Pnm4fsq7QCc33+KCiwGkrT9sabfoHV+24kyW1hccUE/1QRds9vxnooCkIz7XxAonN
+	 dhW5C3xxRJoh/vFMZ34W00O7a5tBTR2EYEwhaC06Za7Clf9dQdhUGdKhUEk+E/ObuBiTU
+	 Cuisrwmmq5/KMyyAFVPHxm+eJUhJGWg82ZgiSoKvg3b3iSdpq3+YzeEUMe+OslivN0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=huaweicloud.com;
-	spf=pass smtp.mailfrom=huaweicloud.com;
-	arc=none smtp.remote-ip=124.71.93.99
-Received: from dggmsgout11.his.huawei.com (dggmsgout11.his.huawei.com [124.71.93.99])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YU0t6OjF;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40FE6606A31C
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 13:39:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 40FE6606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggmsgout11.his.huawei.com (SkyGuard) with ESMTP id 4jSpqD5XJZz1c0Qp
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:38:48 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 22EFB40561
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:39:38 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.87.132])
-	by APP4 (Coremail) with UTF8SMTPSA id gCh0CgD3L++YB_tq_dlZEg--.38663S4;
-	Mon, 16 Nov 2026 21:39:38 +0800 (CST)
-From: Ye Bin <yebin@huaweicloud.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Cc: ming.lei@redhat.com,
-	bvanassche@acm.org
-Subject: [PATCH v3] blk-flush: fix a possible deadlock in the nvme timeout path
-Date: Mon, 16 Nov 2026 21:29:43 +0800
-Message-Id: <20261116132943.419435-1-yebin@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C950606A31C;
+	Mon, 16 Nov 2026 14:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YU0t6OjF
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7252A1F000C4;
+	Mon, 16 Nov 2026 14:21:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794838895;
+	bh=avroJVXI7FYPP9BX1mpXsZCBZ9F8Uq429Emp0GZBvxk=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=YU0t6OjFrvjgkDDvOuuKnQWnjekr+xxSg16q9vPrkImGDCbn83dqyPNqFv3qxxNR5
+	 PqGdB4hyPeN8vKZM9TMClVa9zrVFeVMdStgn/w6FsWiFsYEtwvas/FpLblwu6NjmJV
+	 deO7Kzzs4mspJZo+TFxUHMy9EmBcQYPpTBv3ixAq15LH2YKdp3KlQMOSf9t7QofZtK
+	 a8c1VfGYV5BYm03eznfItWSdAbeampwj6gSVV6gDC9C4eQ+Z2je8dhxtp/q9VE9F9a
+	 UNxy4wOW4nK4zjryOzmqYBDmc99ysNZI4gRC90BtHx9DP8Fo/Fblf4P7wX3xv3c1PA
+	 05TY6YhW2AAUQ==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+Date: Mon, 16 Nov 2026 15:21:00 +0100
+Subject: [PATCH v22 3/5] rust: implement `ForeignOwnable` for `Owned`
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -57,270 +52,156 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3L++YB_tq_dlZEg--.38663S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3AF4xuFyUCFWxAry3Ar18Xwb_yoWfuw4kpF
-	W5XayYkr4rWr40qrs3Aw4UAw1aqw4IyF13JFWFyr13Arn8G39akFyfJFyFqF45Ar93Ar47
-	WFs8K39rZFyqv37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUglb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-	kEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMI
-	IF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVF
-	xhVjvjDU0xZFpf9x07UE-erUUUUU=
-X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261116-unique-ref-v22-3-12029383206d@kernel.org>
+References: <20261116-unique-ref-v22-0-12029383206d@kernel.org>
+In-Reply-To: <20261116-unique-ref-v22-0-12029383206d@kernel.org>
+To: Danilo Krummrich <dakr@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
+ Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett" <liam@infradead.org>, 
+ Uladzislau Rezki <urezki@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+ Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Tamir Duberstein <tamird@kernel.org>, 
+ Alexandre Courbot <acourbot@nvidia.com>, 
+ =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+ Lyude Paul <lyude@redhat.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
+ Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+ Igor Korotin <igor.korotin@linux.dev>, Viresh Kumar <vireshk@kernel.org>, 
+ Nishanth Menon <nm@ti.com>, Stephen Boyd <sboyd@kernel.org>, 
+ Bjorn Helgaas <bhelgaas@google.com>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ Pavel Tikhomirov <ptikhomirov@virtuozzo.com>, 
+ Michal Wilczynski <m.wilczynski@samsung.com>, Ira Weiny <iweiny@kernel.org>, 
+ Matthew Brost <matthew.brost@intel.com>, 
+ =?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+ Johan Hovold <johan@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ Dave Jiang <dave.jiang@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, 
+ Jonathan Cameron <jic23@kernel.org>, 
+ Markus Probst <markus.probst@posteo.de>, Ira Weiny <iweiny@kernel.org>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>, 
+ Philipp Stanner <phasta@kernel.org>, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+ driver-core@lists.linux.dev, linux-block@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ linux-fsdevel@vger.kernel.org, linux-pm@vger.kernel.org, 
+ linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
+ linux-usb@vger.kernel.org, linux-media@vger.kernel.org, 
+ linaro-mm-sig@lists.linaro.org, linux-serial@vger.kernel.org
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3413; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=yxSwAMf1WCPKfeJBxmCTAk/DQrKQubqT1B9hug50/gI=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBq+xFS+9cTttA9+oADXGC7GEWmmDosjg6s4Ao7a
+ qKVHkrzi2yJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCavsRUgAKCRD6UCkIqsW9
+ 0O3jD/49Splh6UzX1b0EokN7/Bp9lpjcX/DWmN5abF8blBytH3yV6+s4lAYrTuN4IbwrH6lGWP+
+ G0TE5WjwSJMFPIGikWQ+VuqTHmrYBgy34ckfY3sgSCgpLZe1Ulq4aeRUqc6LPTBcW/PcxZzctJc
+ SMWpuB9vMTCEX7wCDBCFIGA0I7XZKRZ+sT2eSleHRevwnmQ5qG/k7uG6qot2gWi5xWFi67AH29M
+ 39V8/VIFeNaKaGWj5FcEUAYL0i/c3GHNiDONnKhPkzRsBspNENw1A1ljRP1a/aP6vCE1yaIOxWF
+ u/eWmPlBAvD1DN3JxG2QHn89Lb3tvpETyGuXRfp/vExtaQhPcK6hhjI8glNSy+taBQUhUciaZ7o
+ HbMhLvYLOZ+DI187LcoitByoRm7L5ZpQZxwB6mmIvcrL2kBLNVD3WueR9xrMAGTmBItRXInawml
+ lVoE/5RXApo+8R3y903FvVcx1P79l9P/KRf+DEmo/S1yyd84RPEvWjD6rBnZDZ2atX8zB/AhAw4
+ Lv4hSHlmrR//tO9SiqOnLgWhiw0S8YrY502KaW0j7zpyoGvQzn6cJq1dsO7xsw1KockvDh597lr
+ xBMInACeni6dtSLhueSr4IqgRIC9vD9lUhfcvQNA0/JX3iA2+U0UpmEc3526Y2BUhOsLgth0g+Y
+ FZT/S29GIWWp2GQ==
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
+ fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-From: Ye Bin <yebin10@huawei.com>
+Implement `ForeignOwnable` for `Owned<T>`. This allows use of `Owned<T>` in
+places such as the `XArray`.
 
-When processing nvme_timeout():
+Note that `T` does not need to implement `ForeignOwnable` for `Owned<T>` to
+implement `ForeignOwnable`.
 
-[  206.734601][ T8184] nvme nvme0: I/O tag 512 (1200) opcode 0x0 (I/O Cmd) QID 3 timeout, aborting req_op:FLUSH(2) size:0
-[  206.736112][    C0] nvme nvme0: Abort status: 0x0
-[  208.094637][ T8184] nvme nvme0: I/O tag 512 (1200) opcode 0x0 (I/O Cmd) QID 3 timeout, reset controller
-
-[root@localhost ~]# cat /proc/8184/stack
-[<0>] msleep+0x37/0x50
-[<0>] blk_mq_tagset_wait_completed_request+0x6f/0xe0
-[<0>] nvme_cancel_tagset+0x79/0xa0
-[<0>] nvme_dev_disable+0x55c/0x7e0
-[<0>] nvme_timeout+0x25b/0x1530
-[<0>] blk_mq_handle_expired+0x210/0x2c0
-[<0>] bt_iter+0x2bb/0x360
-[<0>] blk_mq_queue_tag_busy_iter+0x9f8/0x1f30
-[<0>] blk_mq_timeout_work+0x5dc/0x7d0
-[<0>] process_one_work+0xa08/0x1d00
-[<0>] worker_thread+0x698/0xeb0
-[<0>] kthread+0x408/0x540
-[<0>] ret_from_fork+0xa4d/0xdd0
-[<0>] ret_from_fork_asm+0x1a/0x30
-
-The above issue may happen as follows:
-nvme_timeout  // tag 512 request's flush request the first timeout
-  iod->aborted = 1;
-  abort_req = nvme_alloc_request(dev->ctrl.admin_q, &cmd,
-         BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);  // Abort tag 512 flush request
-  blk_execute_rq_nowait(abort_req->q, NULL, abort_req, 0, abort_endio);
-     // Abort request completion, will no wait
-        ....
- ****'abort_req' not complete***
-        ....
-nvme_timeout  // tag 512 request's flush request the second timeout
- if (!nvmeq->qid || (iod->flags & IOD_ABORTED))
-   nvme_req(req)->flags |= NVME_REQ_CANCELLED;
-   goto disable;
-     ...
-   **** tag 512 request's flush request end ****
-        nvme_try_complete_req  // PATH[1]
-         blk_mq_complete_request_remote(req);
-          WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-           ...
-            nvme_end_req(req);
-             blk_mq_end_request(req, status);
-              __blk_mq_end_request(rq, error);
-               if (rq->end_io)
-                rq->end_io(rq, error);
-                 flush_end_io(rq, error);
-                 // The timeout process holds the reference count.
-                 // so request keep MQ_RQ_COMPLETE state
-                  if (!refcount_dec_and_test(&flush_rq->ref))
-                   fq->rq_status = error;
-                   return;
-   **** tag 512 flush request is MQ_RQ_COMPLETE state ****
-disable:
-  nvme_dev_disable(dev, false);
-    nvme_cancel_tagset(&dev->ctrl);
-      blk_mq_tagset_busy_iter(&dev->tagset, nvme_cancel_request,
-                              &dev->ctrl);
-        nvme_cancel_request
-          if (blk_mq_request_completed(req)) // PATH[2]
-            return true;
-     blk_mq_tagset_wait_completed_request(&dev->tagset);
-       while (true)
-         blk_mq_tagset_busy_iter(tagset,
-                          blk_mq_tagset_count_completed_rqs, &count);
-            blk_mq_tagset_count_completed_rqs();
-            // request is MQ_RQ_COMPLETE state
-               if (blk_mq_request_completed(rq))   // return true
-                 (*count)++;
-         if (!count) // So the value of 'count' is never 0, loop endless
-             break;
-         msleep(5);
-
-The root cause is that a flush request is moved to MQ_RQ_IDLE only when its
-reference count drops to zero, which was introduced by commit 9f16a66733c9
-("block: mark flush request as IDLE when it is really finished"). When the
-last reference is held by the timeout work itself (PATH[1] and PATH[2]),
-flush_end_io() returns early and leaves the request in MQ_RQ_COMPLETE, so
-blk_mq_tagset_wait_completed_request() called from the same timeout path
-never observes count == 0 and loops forever.
-
-Mark the flush request MQ_RQ_IDLE as soon as its completion is processed,
-before waiting for the remaining references. Reference counting still
-prevents the request from being freed or reused until the last reference is
-dropped, so its tag cannot be reallocated underneath a holder.
-
-flush_end_io() is also invoked from blk_mq_put_rq_ref() when a tag iterator
-drops its reference, including for flush requests that are still in flight.
-That path must not change the request state, otherwise the timeout handler
-would no longer see an in-flight flush request (blk_mq_req_expired()
-requires MQ_RQ_IN_FLIGHT) and blk_mq_queue_inflight()/nvme_cancel_tagset()
-would skip it. Use a separate helper for that path that only drops the
-reference.
-
-Fixes: 9f16a66733c9 ("block: mark flush request as IDLE when it is really finished")
-Signed-off-by: Ye Bin <yebin10@huawei.com>
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
-v2 -> v3:
-  - Don't mark the flush request IDLE unconditionally in flush_end_io():
-    that path is also entered from blk_mq_put_rq_ref() for a request that
-    may still be in flight, which would hide it from the timeout, cancel
-    and inflight paths and reintroduce the bug fixed by 9f16a66733c9.
-  - Split out flush_end_io_put_ref(); only the completion path now marks
-    the request IDLE, so blk_mq_tagset_wait_completed_request() no longer
-    spins when an iterator holds the last reference.
-  - Add blk_flush_put_rq_ref() for the iterator path, which only drops the
-    reference and leaves the request state untouched.
-  - Correct the commit message.
-  - Fix grammar, drop leading spaces, trim the call trace and shorten the
-    source comment. 
+ rust/kernel/owned.rs | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
- block/blk-flush.c | 63 ++++++++++++++++++++++++++++++++++++-----------
- block/blk-mq.c    |  2 +-
- block/blk.h       |  1 +
- 3 files changed, 50 insertions(+), 16 deletions(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 38bd4ae5d9e7..ba6f3119b389 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -198,19 +198,18 @@ static void blk_flush_complete_seq(struct request *rq,
- 	blk_kick_flush(q, fq, cmd_flags);
- }
- 
--static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
--				       blk_status_t error,
--				       const struct io_comp_batch *iob)
-+/*
-+ * Drop a reference to a flush request and, if it was the last one, run the
-+ * final cleanup. The caller must hold fq->mq_flush_lock.
-+ */
-+static enum rq_end_io_ret flush_end_io_put_ref(struct request *flush_rq,
-+					       blk_status_t error)
- {
- 	struct request_queue *q = flush_rq->q;
- 	struct list_head *running;
- 	struct request *rq, *n;
--	unsigned long flags = 0;
- 	struct blk_flush_queue *fq = blk_get_flush_queue(flush_rq->mq_ctx);
- 
--	/* release the tag's ownership to the req cloned from */
--	spin_lock_irqsave(&fq->mq_flush_lock, flags);
--
- 	if (!req_ref_put_and_test(flush_rq)) {
- 		/*
- 		 * Remember the status of the flush for whoever drops the last
-@@ -219,17 +218,10 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
- 		 */
- 		if (error != BLK_STS_OK)
- 			fq->rq_status = error;
--		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
- 		return RQ_END_IO_NONE;
- 	}
- 
- 	blk_account_io_flush(flush_rq);
--	/*
--	 * Flush request has to be marked as IDLE when it is really ended
--	 * because its .end_io() is called from timeout code path too for
--	 * avoiding use-after-free.
--	 */
--	WRITE_ONCE(flush_rq->state, MQ_RQ_IDLE);
- 	if (fq->rq_status != BLK_STS_OK) {
- 		error = fq->rq_status;
- 		fq->rq_status = BLK_STS_OK;
-@@ -257,10 +249,51 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
- 		blk_flush_complete_seq(rq, fq, seq, error);
- 	}
- 
--	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
- 	return RQ_END_IO_NONE;
- }
- 
-+static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
-+				       blk_status_t error,
-+				       const struct io_comp_batch *iob)
-+{
-+	struct blk_flush_queue *fq = blk_get_flush_queue(flush_rq->mq_ctx);
-+	enum rq_end_io_ret ret;
-+	unsigned long flags;
-+
-+	/* release the tag's ownership to the req cloned from */
-+	spin_lock_irqsave(&fq->mq_flush_lock, flags);
-+
-+	/*
-+	 * Mark the request IDLE as soon as its completion is processed. If an
-+	 * iterator holds the last reference (e.g. the timeout handler that is
-+	 * running nvme_timeout()), leaving it in MQ_RQ_COMPLETE would make
-+	 * blk_mq_tagset_wait_completed_request() loop forever. Reference
-+	 * counting still prevents the request from being reused.
-+	 */
-+	WRITE_ONCE(flush_rq->state, MQ_RQ_IDLE);
-+
-+	ret = flush_end_io_put_ref(flush_rq, error);
-+	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
-+	return ret;
-+}
-+
-+/*
-+ * Called when a tag iterator drops its reference to a flush request. It must
-+ * not change the request state: the iterator may be looking at a request that
-+ * is still in flight.
-+ */
-+enum rq_end_io_ret blk_flush_put_rq_ref(struct request *flush_rq)
-+{
-+	struct blk_flush_queue *fq = blk_get_flush_queue(flush_rq->mq_ctx);
-+	unsigned long flags;
-+	enum rq_end_io_ret ret;
-+
-+	spin_lock_irqsave(&fq->mq_flush_lock, flags);
-+	ret = flush_end_io_put_ref(flush_rq, BLK_STS_OK);
-+	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
-+	return ret;
-+}
-+
- bool is_flush_rq(struct request *rq)
- {
- 	return rq->end_io == flush_end_io;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5ae22d556540..1bb75de288c1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1688,7 +1688,7 @@ static bool blk_mq_req_expired(struct request *rq, struct blk_expired_data *expi
- void blk_mq_put_rq_ref(struct request *rq)
- {
- 	if (is_flush_rq(rq)) {
--		if (rq->end_io(rq, 0, NULL) == RQ_END_IO_FREE)
-+		if (blk_flush_put_rq_ref(rq) == RQ_END_IO_FREE)
- 			blk_mq_free_request(rq);
- 	} else if (req_ref_put_and_test(rq)) {
- 		__blk_mq_free_request(rq);
-diff --git a/block/blk.h b/block/blk.h
-index 0e38e4b88cf5..c190ecd9bd66 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -45,6 +45,7 @@ struct blk_flush_queue {
+diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
+index 51da9bc7e1f4..c255420f8383 100644
+--- a/rust/kernel/owned.rs
++++ b/rust/kernel/owned.rs
+@@ -15,6 +15,8 @@
+     ptr::NonNull, //
  };
  
- bool is_flush_rq(struct request *req);
-+enum rq_end_io_ret blk_flush_put_rq_ref(struct request *req);
- 
- struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
- 					      gfp_t flags);
++use kernel::types::ForeignOwnable;
++
+ /// Types that specify their own way of performing allocation and destruction. Typically, this trait
+ /// is implemented on types from the C side.
+ ///
+@@ -272,3 +274,58 @@ fn drop(&mut self) {
+         unsafe { T::release(self.ptr) };
+     }
+ }
++
++// SAFETY: We derive the pointer to `T` from a valid `T`, so the returned
++// pointer satisfy alignment requirements of `T`.
++unsafe impl<T: Ownable> ForeignOwnable for Owned<T> {
++    const FOREIGN_ALIGN: usize = core::mem::align_of::<T>();
++
++    type Borrowed<'a>
++        = &'a T
++    where
++        Self: 'a;
++    type BorrowedMut<'a>
++        = Pin<&'a mut T>
++    where
++        Self: 'a;
++
++    #[inline]
++    fn into_foreign(self) -> *mut kernel::ffi::c_void {
++        Owned::into_raw(self).as_ptr().cast()
++    }
++
++    #[inline]
++    unsafe fn from_foreign(ptr: *mut kernel::ffi::c_void) -> Self {
++        // SAFETY: By function safety contract, `ptr` came from `into_foreign` and cannot be null.
++        let ptr = unsafe { NonNull::new_unchecked(ptr.cast()) };
++
++        // SAFETY: By the function safety contract, `ptr` was returned by `into_foreign`, which
++        // consumed an `Owned<T>` without calling `T::release`. The requirements that were upheld
++        // for that `Owned<T>` are still upheld, as the ownership it represented was only held by
++        // the foreign pointer in the meantime. We retake that ownership here.
++        unsafe { Owned::from_raw(ptr) }
++    }
++
++    #[inline]
++    unsafe fn borrow<'a>(ptr: *mut kernel::ffi::c_void) -> Self::Borrowed<'a> {
++        // SAFETY: By function safety requirements, `ptr` came from `into_foreign` and the
++        // `Owned<T>` it was created from is not reconstructed or mutably borrowed during `'a`. By
++        // the type invariants of that `Owned<T>`, `ptr` points to a valid `T` and it is sound to
++        // create a shared reference to the `T` for `'a`.
++        unsafe { &*ptr.cast() }
++    }
++
++    #[inline]
++    unsafe fn borrow_mut<'a>(ptr: *mut kernel::ffi::c_void) -> Self::BorrowedMut<'a> {
++        // SAFETY: By function safety requirements, `ptr` came from `into_foreign` and the
++        // `Owned<T>` it was created from is not reconstructed or otherwise borrowed during `'a`. By
++        // the type invariants of that `Owned<T>`, `ptr` points to a valid `T` and it is sound to
++        // create a mutable reference to the `T` for `'a`, given that we only hand it out as a
++        // `Pin<&mut T>` below.
++        let inner = unsafe { &mut *ptr.cast() };
++
++        // SAFETY: We never move out of inner, and we do not hand out mutable
++        // references when `T: !Unpin`.
++        unsafe { Pin::new_unchecked(inner) }
++    }
++}
+
 -- 
-2.34.1
+2.54.0
+
 
