@@ -1,53 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794787655;
-	b=y1Ls740/0BqVw80ybVfrlNxBYlxQSJFeWZH+Eg8PM84aMg+v18IFYz0vr74hod1le20W
-	 ruJ2QSGEJGOnZvJj1C9wCqSv4ZthEKjgCUHJPb708ua8WuAdYRQU94LP6VGh59yK7TvhX
-	 b5BuGg4CR2e+qF4SIHQdBm4a2JltuhNkX462y9JBc11Tp1UpL80SQWbAK1VwrPfOW+MPQ
-	 +TprBY5sh40lovmQ5+xDnH2n6C6iT+ELxGj2njY29XqN/a7Tb82xfb5G+Xm9HW+6yyLC3
-	 OW+967f5RckD/stxwMccAUn7aHwYqxuUUm8yk8wRAc9ItfilJoU52AV/e8xbavq9skg==
+	t=1794789923;
+	b=qLqWPv57iyDayy7LXtSsRn+XmtOBrnpDwjV42ld8lBV02gRBbksqAGqSjVND5Vx2xa7V
+	 NFMciI/hKh0eqD95V/2VEv5E8+yvyn347EWhO/Aip7kBk/heJ3TZSjRQlrcObo1GrsJPx
+	 +BeVud5sYggfDiTi+bvYUYSLUjhBtlxD1/ofgppL32Yv7rQh8Hhe+jJoJTrswuobvxdjq
+	 7IyJ60vpC0Kzl0wCGmNSpte1WqVzHkgRil+5usMKNJULFreSXyWh7gGNpnGgpFnN/84GL
+	 3IfzocYyAhDWwOFFjBP5wpN5KDoW+MX7e1dqVYivxn3eCcXqz+ojhvRvy29zy2b06nA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794787655;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=KynMk6tfaUF3/byRhIeOBBnOgXm4IwVi/zkKqYpvSGU=;
-	b=mmWTIaUfTQhRh/HWkkYmMINnISTLjZK4uSQo2PII9+OHgG3Qj9yts65yBhbm+oq6xzHd
-	 J4QClFAG36aKM6e9DauwCLPqMnQ2tEhsedB0LIC0stSZmFNiqcg/bwLt92H5tw09aCvuw
-	 Jtt4CGTk7r68DU9WjV+bpcK6Vb1Iv2lzZe/wnjF1PyWAMxCXq9c97lUj512rt14nImK2j
-	 WRNX7s8g8vCaCrUUAj5cJVjCMwRZ4AS+UvHNuQ98a2NnPBwQbKjo7/COwF/H2d8Mafh7z
-	 VXEV93y1m0fKf3G9aAEhQdIPC33lT6Fg0IvFNGjXuPdzixiWASmPiCngEGYW8xqD22Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794789923;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=nEPXf1cG5J+Lghgn3UQeDfptX1Hk+zVJPSj0Zk2IzFQ=;
+	b=XA8jO1bImAyQq652g+O9ysgTK9J0LNpAnQUCF6P0+KREaZyDH97zgP0cbZgKW4QBrVzh
+	 0Szb5+liCTrpnniEQpam4TQzQiTdyPwgIetNUM9e4tp1kPMxcqWFH0c28PXNjacbrUwsE
+	 NrEoBQbjRGB0e4L4wkn8WlGuSvRzbsDtErzZd7ZxcYyMgDPnpeiDYfljqMxAet5pOtv96
+	 cLqrf0F+eYXXk0fH05px2IeetyTx8Dj1dyuHWoOJ4XWJ01Q66b8KC9SyJu8ixbF7dWKfl
+	 T6WkWVOEKaypXGwxu+wOStxtQF8PEqc9/NrnbSp9BZUU3iC23HAQuZnqTYjLOkOYrFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=S2zpy3vl;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=infradead.org;
+	spf=pass smtp.mailfrom=infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=Ov44YrtP;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C0D606A31F;
-	Mon, 16 Nov 2026 00:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A57606A31F;
+	Mon, 16 Nov 2026 00:45:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91A57606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=S2zpy3vl
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA8FA1F000C4;
-	Mon, 16 Nov 2026 00:07:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794787655;
-	bh=KynMk6tfaUF3/byRhIeOBBnOgXm4IwVi/zkKqYpvSGU=;
-	h=From:To:Cc:Subject:Date;
-	b=S2zpy3vlRQ9XEQjJUFEcHTyU3/jVmzyr9s1nHs+IsH9Fs3xd2z2qKzIYupzWO9NEN
-	 cDfY2w5NQMb1byCrS7437tT5GcxSs9LMEiU/TO1VLcm8UcQU+S2lxd1p2kAlKeHPok
-	 2n/blieiLnELfpeM1Sap0S5R/j6Y6HPnfmFmc6SvHAVZKSPTziLDzcm2ptsdnb0uuo
-	 mSOAWyHacwJsdZMarTFxyEmw4Z8MpzEaWzo/QzFwZ6btor4HiaEZKeMsrZbDP5Gr6T
-	 S0T/jWvu8QSNFh6YEkREPMUBrwKdnsb8W7gVnywuNXt48LCCL8mFSQ1+lrJ58BXo/h
-	 Ip94XVT7EH5Cw==
-From: Chao Yu <chao@kernel.org>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chao Yu <chao@kernel.org>
-Subject: [PATCH] block: prevent reordering of PF_BLOCK_TS clear and plug NULLing
-Date: Mon, 16 Nov 2026 00:07:23 +0000
-Message-ID: <20261116000723.934826-1-chao@kernel.org>
-X-Mailer: git-send-email 2.56.0.611.g1030f0b940-goog
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=Ov44YrtP
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=nEPXf1cG5J+Lghgn3UQeDfptX1Hk+zVJPSj0Zk2IzFQ=; b=Ov44YrtPxUC++hYRNDHSdmdpGW
+	JaxLbFR1NnGayLi7FHLtyTi+He4ZYSfoC7yWmGobJ7E/AIaLAiwDiqmK+og7vdQvnP4EzvIpr462x
+	EDmrhZM3u/N2SWbcqZV+o7jR7R+AN7ZLDYmWxP5FpNx3G+I1qCrQflyake80HiJ9rMKVM/x4eT782
+	9JEn4jhTrQPKUH9n7ugwPApkYe7cQrElzRWPUKP8gRVT9cQSw9rpPJq9AX3iS6GqmzfQn0wqcsM7f
+	leTLxbzdojuK+f/LSdN/KzQKSZ97Y6xYotP0eKRTTUizqT5t8J7W/n/cd6b1FIlVQIvCGZw4VHm9P
+	KD0dlVWg==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xSkqM-00000000pP7-2dPd;
+	Mon, 16 Nov 2026 00:45:10 +0000
+Message-ID: <bbdb3140-dc5f-4ae1-a5a9-c2e25387409a@infradead.org>
+Date: Sun, 15 Nov 2026 16:45:07 -0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -57,111 +58,87 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/12] docs: ioctl-number: update MM entries
+To: "David Hildenbrand (Arm)" <david@kernel.org>, linux-kernel@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-doc@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-mm@kvack.org, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowangio@gmail.com>, David Heidelberg <david@ixit.cz>,
+ oe-linux-nfc@lists.linux.dev, Chas Williams <3chas3@gmail.com>,
+ linux-atm-general@lists.sourceforge.net,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Helge Deller <deller@gmx.de>,
+ linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ MPT-FusionLinux.pdl@broadcom.com,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org,
+ Neill Kapron <nkapron@google.com>, Andrey Konovalov <andreyknvl@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Hans de Goede <hansg@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, Jan Kara <jack@suse.cz>,
+ linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
+ linux-ext4@vger.kernel.org, Mike Marshall <hubcap@omnibond.com>,
+ devel@lists.orangefs.org, Paulo Alcantara <pc@manguebit.org>,
+ Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+ linux-f2fs-devel@lists.sourceforge.net,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ Tzung-Bi Shih <tzungbi@kernel.org>, Benson Leung <bleung@chromium.org>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ amd-gfx@lists.freedesktop.org, Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, intel-gfx@lists.freedesktop.org,
+ Matthew Brost <matthew.brost@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ intel-xe@lists.freedesktop.org
+References: <20261114202653.3113381-1-rdunlap@infradead.org>
+ <20261114202653.3113381-2-rdunlap@infradead.org>
+ <f37ccd71-8e1d-4dd4-b11a-e22b9e617dea@kernel.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <f37ccd71-8e1d-4dd4-b11a-e22b9e617dea@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Chao Yu <chao@kernel.org>
 
-We hit below kernel panic while running fsstress on f2fs on an arm64
-Android device:
 
- Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
- Internal error: Oops: 0000000096000046 [#1] PREEMPT SMP
- CPU: 1 UID: 0 PID: 9196 Comm: fsstress Tainted: G S      W  O       6.12.96-android16-6-maybe-dirty-4k #1
- pc : __schedule+0xeb8/0x1de4
- lr : __schedule+0x7b4/0x1de4
- Call trace:
-  __schedule+0xeb8/0x1de4
-  preempt_schedule_irq+0x48/0xa8
-  arm64_preempt_schedule_irq+0x30/0x48
-  el1_interrupt+0x48/0x8c
-  el1h_64_irq_handler+0x18/0x24
-  el1h_64_irq+0x7c/0x80
-  blk_finish_plug+0x70/0x18c
-  f2fs_write_data_pages+0x1bc/0x14f4
-  do_writepages+0x98/0x1b0
-  filemap_fdatawrite_wbc+0x60/0x9c
-  filemap_write_and_wait_range+0x7c/0x210
-  f2fs_flush_buffered_write+0x24/0x50
-  f2fs_file_write_iter+0x650/0x798
-  ksys_write+0x2d8/0x500
-  __arm64_sys_write+0x1c/0x2c
-  invoke_syscall+0x58/0xe8
-  do_el0_svc+0x80/0xb0
-  el0_svc+0x4c/0xd8
-  el0t_64_sync_handler+0x94/0x10c
-  el0t_64_sync+0x1bc/0x1c0
- Code: b4ffa688 97c33675 17fffd32 f9454e68 (f900111f)
- Kernel panic - not syncing: Oops: Fatal exception
+On 11/15/26 8:58 AM, David Hildenbrand (Arm) wrote:
+> On 11/14/26 21:26, Randy Dunlap wrote:
+>> Add ioctl number entries for test_hmm_uapi and gup_test.
+> 
+> Just curious, why do we care about uapi for test interfaces that never see the
+> light of day in production kernels and their sole purpose is to go a long a
+> dedicated selftest?
 
-The faulting instructions are in blk_plug_invalidate_ts(), which is
-inlined into finish_task_switch():
+a. We don't control who builds/runs these tests.
+b. There might be some USB gadget or HID driver running at the same time
+   as these tests.
+c. It's preferable not to have conflicts, so any additions to this file
+   should try to avoid these documented ioctls.
 
-	ldr	x8, [x19, #0xa98]	// x8 = current->plug, which is NULL
-	str	xzr, [x8, #0x20]	// current->plug->cur_ktime = 0
-
-blk_plug_invalidate_ts() assumes current->plug is valid as long as
-PF_BLOCK_TS is set. However, in blk_finish_plug(), __blk_flush_plug() is
-inlined, and the compiler is free to reorder the store that clears
-PF_BLOCK_TS after the store that sets current->plug to NULL, since
-nothing tells it there is a dependency between them:
-
-	str	xzr, [x19, #0x20]	// plug->cur_ktime = 0
-	ldr	w8, [x20, #0x44]	// w8 = current->flags
-	str	xzr, [x20, #0xa98]	// current->plug = NULL
-	and	w8, w8, #0xdfffffff	// w8 &= ~PF_BLOCK_TS
-	str	w8, [x20, #0x44]	// current->flags = w8 <- blk_finish_plug+0x70
-
-The race is as below:
-
-- blk_finish_plug
- - __blk_flush_plug
-  - plug->cur_ktime = 0
- - current->plug = NULL
-					: IRQ arrives at blk_finish_plug+0x70,
-					: PF_BLOCK_TS is still set
-					- preempt_schedule_irq
-					 - __schedule
-					  - finish_task_switch
-					   - blk_plug_invalidate_ts
-					    : current->flags & PF_BLOCK_TS
-					    : current->plug->cur_ktime = 0
-					    : NULL pointer dereference
- - current->flags &= ~PF_BLOCK_TS
-
-Commit 691b052139c9 ("block: fix race in blk_time_get_ns() returning 0")
-already added a barrier() on the side that sets PF_BLOCK_TS, but the
-side that clears it in __blk_flush_plug() is still unordered against
-current->plug = NULL.
-
-Fix it by adding a barrier() after clearing PF_BLOCK_TS in
-__blk_flush_plug(), so that the compiler can not move the store of
-current->plug = NULL in blk_finish_plug() before it. Both stores and
-the reader in finish_task_switch() run on the same CPU in the context
-of current task, so a compiler barrier is enough here.
-
-Fixes: fad156c2af22 ("block: invalidate cached plug timestamp after task switch")
-Signed-off-by: Chao Yu <chao@kernel.org>
----
- block/blk-core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 8836c7028568..65379d5a1686 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1283,6 +1283,12 @@ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
- 
- 	plug->cur_ktime = 0;
- 	current->flags &= ~PF_BLOCK_TS;
-+	/*
-+	 * Ensure PF_BLOCK_TS is cleared before blk_finish_plug() sets
-+	 * current->plug to NULL, otherwise blk_plug_invalidate_ts() can
-+	 * dereference a NULL current->plug if preempted in between.
-+	 */
-+	barrier();
- }
- 
- /**
 -- 
-2.49.0
+~Randy
 
