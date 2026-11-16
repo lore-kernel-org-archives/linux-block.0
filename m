@@ -1,61 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794865699;
-	b=Tjgo5OmLew5ondOsfOpwMeXBpD4v4Fb4SxC/dj0pnYIkQXAHD0VBz9LJ9jIzqxzy33pf
-	 E8VkPlKkmnZAexFJ6hetNl0D46EmQK05bJ4XepeJigWtbrWVTO+x+poXLz+gR8uxJJqj5
-	 aOsRoAXxoFpmXu7EjSA5bmkEapBb/7ROnvxpIGKULwFN2+J/6psFpUNdj4SlUCmf7C+eb
-	 9ziyfoMUyTwE3GOPzHfsIHHe3JOnUI0rvKQZj3rsf7rmYCLlH9s7QU+b72OWv5iXM7KCP
-	 E6hAV33LwZe3muSklUBUz4VjQXn8Gfv9wfVRAqODKTkyPYhaufJDazX9FkF1uX91CzA==
+	t=1794865700;
+	b=uvVqAvjBKnyoWRIB2WHUHoAF8XIMNY5IVwQMjBfcssvFifNQW3g4N4MnmoCzRc4oUaSw
+	 LdMSdhd13mP1603/2Q6A9VVvcKfpFvhD+RCVguiW1xDTu7ZbKHWA3QrMNm0JxOZGisSvi
+	 aobgZOIJD/t/5d2Dj3BPJ3+2dPnTTe6sUW32l6iSkoc4+ZK8mHWAYCj7XBjvkd45JX5sp
+	 OCkp5x4Cv7F338WG4nvgl3WlH4TUJCu5Fh7OXKbiGgAlHn7hkU7hWHiRbPrkvg1UlSnNe
+	 x0arkKp4PrZ2i1HZmA22k6UOYaEJJRQHEFX00Ou+j2sk6qjyoPnJuWsuTxLdLx6J8xw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794865699;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794865700;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=WqHkRG09x5uGZCJcQ5xBEX+lcS7fQPhyozl8pVJvZ8Q=;
-	b=JFvnfWM64GIkkQxpllms9pOj9F8Q7w95KC1eNLasNIOmrFq1jMHdarEYMwh8H8uvGODS
-	 dlys9dzHM5SjqU0FM5A3lGvZCtTvFi++sqN0fTGPQ4nugyuYKnzs4WeFVaKlE5x4fMzRk
-	 vT3cX9XcjmL9iSjI2yUr/qa8GRvi7CNM/LDBY3sWkwYmJcP8fITMAWv5wXUxDIcO4tHIB
-	 BjSEgKA9FNM2lg6LBmRClWeyQ4k0Egy9KvWwFSH+uK7Mkld2MePwrS4UTIzXJJAEvy0jc
-	 JhA/Csh/aLmp99TOWDsPAL5ys8KCJzPk1k94eBX3NN0GsbwUc/PtqeQUwHHMjqOh6tQ==
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding;
+	bh=hoOcG+dfuokBuzs2pXEu7dc9JBwfur+utfuNxA6+P8o=;
+	b=YFnCRBFjTlUrxHdOU1rhsX0YWe/2IPSzYUx7z+Pc/nahgPRVvNn+wRWEHGqLUSbY42Ae
+	 qqXScuse22C8a3APBhdVI5HBMJvWPG9QaiCuzxyu3LwQElDngynlaZstuK8naCoiPF/G+
+	 GJGntNVnK6sUFntC71yJiPaTM7TxqP/eSoTfphL4agpzV6ITKiqlHfLmGUSHb+fNtyINA
+	 qZDHHLdwZ+2t4H9awlvzPpci2dtaMMJt0EwMwLGY7UKy4koa0HeK1LmXxZ35npkVDK8Fz
+	 9IUnC24zLR9pve29CYjg5PMIDHIXFwb4VJhzqCjo91Z5vEQgD7qpgi7noVc9EuI30sA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=acm.org;
 	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=KwKeMDLD;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=hLGC0XUj;
 	arc=none smtp.remote-ip=199.89.1.16
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A59606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B128F606A323
 	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:48:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44A59606A31C
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B128F606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=KwKeMDLD
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=hLGC0XUj
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1h25xWwzlfftg;
-	Mon, 16 Nov 2026 21:48:18 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1h32YW2zlfcm2;
+	Mon, 16 Nov 2026 21:48:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1794865695; x=1797457696; bh=WqHkRG09x5uGZCJcQ5xBEX+lcS7fQPhyozl
-	8pVJvZ8Q=; b=KwKeMDLDjZ2IS1urCm+6p5tdr2FStekdcLmjDyywZIzKT899fqN
-	WT41r5JzPI4ObfY33QYBJ6yrzwxQk4zx9g6PUKx9p4t2UdKoHL5DNgr6WEcvjqgU
-	hhByA0VM+7VcVS+roM45mZ43lgYmvGlio/3cIipye/+9SrvXG6OMLEgiy5G3MDV4
-	8cDiRLWWNQ8ekUdJ5y7GR/WVdfutgvg0c1qQ6at9tG9sCpo21ju+r0hJoI10PZj0
-	xpnS/ZKHhGEDIueBXzZZf6xkcsbcU+oVdA93r2StpyQBIh+IhJN9BXthnyM6gKL3
-	6Pox+g4rlufSPUhAkI69RonXlLMnQUQC/Ig==
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1794865696; x=1797457697; bh=hoOcG
+	+dfuokBuzs2pXEu7dc9JBwfur+utfuNxA6+P8o=; b=hLGC0XUjsQsAKJEEmkVEk
+	O2gb2kP+zqFUlvs4rATLKCDGxqjvH3yVYvkr7g8qnz4a6WYGq7ETmXfIxqQJPxqU
+	cGRV3N30mKg+Bd4iGOB0vCKVkXFOnaKBLRDt0ObmGy07AD8OGx0fXuud2U1rTpQa
+	86HEXvOW4aqwz6ldMQwsoIy2LWDg6zFACPMMve4pE2NtXwqEbhmLEQBLJzZVkIkp
+	GTT6XKF5vF5YWZJHsO/2PHTKq6AqHNgFdYdynIqEOMwWpecODQPM4lv0F5mHeUFS
+	yaYZRoWNk896JeFRq9YuSuC3PglKwss1hTX0Kbelfqqoa6WdzczSV7I6RTtIhDgG
+	w==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 9nRMyIozUQda; Mon, 16 Nov 2026 21:48:15 +0000 (UTC)
+ id kK-bW0M2D8Kh; Mon, 16 Nov 2026 21:48:16 +0000 (UTC)
 Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1gz3QHvzlpHx8;
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1h00F9TzlpHws;
 	Mon, 16 Nov 2026 21:48:15 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
@@ -64,10 +65,12 @@ Cc: linux-block@vger.kernel.org,
 	Eric Dumazet <edumazet@kernel.org>,
 	Aibing Chen <chenaibing@cmss.chinamobile.com>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 0/8] nbd: Defer request transmission to a workqueue
-Date: Mon, 16 Nov 2026 13:48:00 -0800
-Message-ID: <cover.1794865298.git.bvanassche@acm.org>
+Subject: [PATCH 1/8] nbd: Wake up config->conn_wait when setting NBD_RT_DISCONNECTED
+Date: Mon, 16 Nov 2026 13:48:01 -0800
+Message-ID: <d7888d6ceb7cc7d2b82009cd3dfc4792c6d3a0e5.1794865298.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
+In-Reply-To: <cover.1794865298.git.bvanassche@acm.org>
+References: <cover.1794865298.git.bvanassche@acm.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -79,55 +82,55 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jens,
+Wake up config->conn_wait in sock_shutdown() after setting
+NBD_RT_DISCONNECTED and marking all sockets dead, and also in
+nbd_mark_nsock_dead() when it sets NBD_RT_DISCONNECTED because the last
+live connection died after a disconnect request. Remove the wake_up()
+call from nbd_disconnect_and_put() since it is no longer necessary.
 
-The NBD driver transmits requests over sockets owned by user space direct=
-ly
-from nbd_queue_rq(). Hence, sk_lock is acquired while blk-mq holds
-q->q_usage_counter and set->srcu. Since other kernel code acquires sk_loc=
-k
-before fs_reclaim, mm->mmap_lock and other subsystem locks, syzbot report=
-s
-multiple circular locking dependencies. Socket lockdep reclassification, =
-the
-existing workaround, introduces new races and module reference count leak=
-s,
-and does not suppress all of these reports.
+wait_for_reconnect() waits on config->conn_wait for NBD_RT_DISCONNECTED
+to be set or for a live connection to become available. However, neither
+sock_shutdown() nor nbd_mark_nsock_dead() woke up config->conn_wait after
+setting NBD_RT_DISCONNECTED. Hence, callers of wait_for_reconnect() kept
+waiting until dead_conn_timeout expired unless the flag was set by
+sock_shutdown() called from nbd_disconnect_and_put(). Waking up waiters
+wherever NBD_RT_DISCONNECTED is set also guarantees that a wakeup happens
+if sock_shutdown() returns early because nbd_mark_nsock_dead() already
+set NBD_RT_DISCONNECTED.
 
-This patch series fixes these lockdep complaints by deferring request
-transmission to a workqueue, similar to the loop driver, and by removing
-the socket lockdep reclassification code. Since requests are no longer
-transmitted from a context in which signals can be pending, the
-partial-send handling code is removed.
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/block/nbd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-This patch series is organized as follows:
-- Patch 1 fixes a missing wakeup of wait_for_reconnect() callers when
-  NBD_RT_DISCONNECTED is set.
-- Patches 2 and 3 prepare for deferring request transmission by
-  simplifying the nbd_send_cmd() return values and by no longer taking a
-  config_refs reference for each request.
-- Patch 4 defers request transmission to a workqueue.
-- Patch 5 fixes a nsock->tx_lock -> cpu_hotplug_lock lockdep complaint.
-- Patch 6 removes the socket lockdep reclassification code.
-- Patches 7 and 8 remove the partial-send handling code that has become
-  unreachable.
-
-Please consider this patch series for the next merge window.
-
-Thanks,
-
-Bart.
-
-Bart Van Assche (8):
-  nbd: Wake up config->conn_wait when setting NBD_RT_DISCONNECTED
-  nbd: Requeue requests directly in nbd_send_cmd()
-  nbd: Stop taking a config_refs reference per request
-  nbd: Defer request transmission to a workqueue
-  nbd: Call sk_set_memalloc() outside nsock->tx_lock
-  nbd: Remove socket lockdep reclassification
-  nbd: Remove the partial-send handling
-  nbd: Remove the sent argument of sock_xmit()
-
- drivers/block/nbd.c | 394 ++++++++++++++++----------------------------
- 1 file changed, 142 insertions(+), 252 deletions(-)
-
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index ffce519bf008..864746624ff5 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -322,6 +322,7 @@ static void nbd_mark_nsock_dead(struct nbd_device *nb=
+d, struct nbd_sock *nsock,
+ 					       &nbd->config->runtime_flags)) {
+ 				set_bit(NBD_RT_DISCONNECTED,
+ 					&nbd->config->runtime_flags);
++				wake_up(&nbd->config->conn_wait);
+ 				dev_info(nbd_to_dev(nbd),
+ 					"Disconnected due to user request.\n");
+ 			}
+@@ -420,6 +421,7 @@ static void sock_shutdown(struct nbd_device *nbd)
+ 		nbd_mark_nsock_dead(nbd, nsock, 0);
+ 		mutex_unlock(&nsock->tx_lock);
+ 	}
++	wake_up(&config->conn_wait);
+ 	dev_warn(disk_to_dev(nbd->disk), "shutting down sockets\n");
+ }
+=20
+@@ -2327,7 +2329,6 @@ static void nbd_disconnect_and_put(struct nbd_devic=
+e *nbd)
+ 	mutex_lock(&nbd->config_lock);
+ 	nbd_disconnect(nbd);
+ 	sock_shutdown(nbd);
+-	wake_up(&nbd->config->conn_wait);
+ 	/*
+ 	 * Make sure recv thread has finished, we can safely call nbd_clear_que=
+()
+ 	 * to cancel the inflight I/Os.
