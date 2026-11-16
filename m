@@ -1,75 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.69
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794830457;
-	b=SBeJYnZvIQtHNLdsPRX+tiTnQ1pAKRt+93QKd9W1YZ31htgL+RDS2yrHP5TSi3eO4NP/
-	 5EiuVQYIQtYPMOh2IdE1KY6UWErVNI8vwBDpR++ju3sgoGfJ5HakOwyVpfWH9JXYpOYjc
-	 8Ndoc861WtgP/6RgubywDDJCUN+5TUyYZxL6muPGw19CFDkVfKgyKXbqX+IN4bZe4X7Of
-	 CwUX2N00bfXR3AeIgPQvEggJCM7OP2YYVS+MW+JeACizm/sf/q1YgKZAQ+0ExUztV7dWa
-	 heH8cxUSAjxQtCXucKnQqD3G2OkPEQ/57aPd8dLKlJQxQdP2XqXYlsPR9ZUQfzfj1RA==
+	t=1794833002;
+	b=RGLEfLu3ctKeaXOd6PuCI5IN9KKYIDFfo2bglqa4xTAkYjnAlfNlzyb24jzA7Isw0yVk
+	 XSWVVGJJUSsfJIQuwnUisElkUmlTo3OvWcNJvFuQkCBn0jbocqnPmYm1ss5RXawBpEmuw
+	 9XbqnuZ60e38EwTVHhpm7rjxKMry4XKL7SOLPPTvz7M7LDd857qOk2Irl3SKYgyycCW9U
+	 EtTXWrlvoRsNU1fsEZxP4IotsM76jyi95wSQ7O5CTo1unIfjJ9BMsyvqEhEs/7Sq/MPlz
+	 eMsuW0B4LHH0ALilw0LOBqKBLwvk85u/0zOoEYYXv3O+Yj73ghfK8A+kB9DVafwqBwA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794830457;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
-	 Content-Type;
-	bh=kLAz6sn1EqmF7aJ7KDEBtraVgj4ybxLcfJJY1MY6K34=;
-	b=LQHy4DglvefUKBWDeO7X9UgH4ASgk7rmip/277ZJitKOQ9VTXAi3QtB9mDJIgMpzcWyF
-	 2ZtpMyI3wTCizfYfhKIIu5xeKaO7d3qOhM9c1oS2tdwIf3GYPm+9Fdcu2tH/SPg8DLGNG
-	 YLIWh8g3puqoj/Ndia65vlrpwWC1vSd4nkfIG+x2OEQl0lL7HS2fJuSGdaqO9EJDmBH34
-	 y9wJkaeJC1Yx1DvUzr32QnXvbzzEpBxB1gmUZGb9Qwyieul9rbhQO2dksIhtOHzaC8Kze
-	 MnY1AZG+ldzg+s81TiwPDApqnDUx9XWrBmpS4xkHvrqynbbutdmjkmkJZfpBi1i/cMA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794833002;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=CUoPl1l8usOofd78Ed60am7yd2LiyfDr+gb/uSMrxrQ=;
+	b=2dwc8StXNG1wpfo9cj8FgyNZVl0qzGd5wjARmzHsOxKyuRzOdqPzBu9CE1TMTRhD0oSb
+	 4vw2MMPFgu5NjD0TCmOXaywFNdO4maCXoBWDuDs8Cr/IulT9KTbPdS41VkH8yKmz/znX6
+	 Ghf9VQqh2mWTKDvDrQZDy04d7eyMezn+Mohs+v5ciqaGhfMJmCxiRfertQkbM5m7kPpIk
+	 g4rULIKJs/uTwd42v80nSIliPmKkJaAVmkQTO8/IDS1L/CoAWa3seS0wxBVHyoHd1if5G
+	 qUxScJbGRX6OL5kah+pNCGiCX4jBX04r4sAc3YLcxZHhUIpWAybqO+R+2TocHXpHlcw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=HPhDK7mh;
-	arc=none smtp.remote-ip=209.85.221.69
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=I1s9A41H;
+	arc=none smtp.remote-ip=95.215.58.45
+Received: from mta1.migadu.com (out-45.mta1.migadu.com [95.215.58.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B17C606A336
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 12:00:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B17C606A336
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34B7606A323
+	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 12:43:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E34B7606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=HPhDK7mh
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4923b9fdd43so2415778f8f.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 04:00:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794830456; x=1795435256; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=kLAz6sn1EqmF7aJ7KDEBtraVgj4ybxLcfJJY1MY6K34=;
-        b=HPhDK7mhvKoexu3wV/J5cAKBVCjdxnE0WqiM219E8yH7eWl2bpFOUxbsfidw15OaBQ
-         3v/oOiLCUqOJKC7nE/sfeHMGODuUIsJx0HNirhnEfTrkTSlF6mxsAka4bN3HHTEKuz8X
-         I7ILCePljUvo3TBsSDLONNTI31MYsfntJafmj4EM/wfNH8zBljPNWXbjdXsxXgFWpxK7
-         QBsjZgUghWzTrvW3gB62VO1cEaBa05GYc2ZRtlRGIidAi9COFMIabjVojBmfGFLgZQra
-         H+ROglAj/Ny78kycfy7M7MzfDC6v9ICyF5eD9XUlfn5SvIi4OODpHA/Ny8dfvpbuHFYW
-         7n/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794830456; x=1795435256;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=kLAz6sn1EqmF7aJ7KDEBtraVgj4ybxLcfJJY1MY6K34=;
-        b=0f4tUnUsfekIOoCl0+I8zv4DGhVRYJWnBLMKbdYhYng4tBs2WKrE7xuLtJpWVgp2FE
-         40lWK7m3aBnDe8HgtslLeBrjl8t+bxaltTr1l/KWv44riWkOezvBC/Sa+6eA+XTK5vR6
-         onQR83kG0MehW0V86d7EwbIfIQORMx867yItA3yBUor3BN3GGPC3+oVwA3Hhnwg7Rqtg
-         xCMfnyam4j6csf8YCM+yVjCPyUIT9putp71wxNzDHCiUmmbyXpndFUdQLNBGFYNhjzkF
-         CFMnWo4udpHLR3tIvc/IaWyniaWT+WBSroE0mT7H76ROWYAh6GerKvATBbgy6maOAwxY
-         P+Eg==
-X-Forwarded-Encrypted: i=1; AL+hErE4qWsoli/Lf9jeMeMNHwUPy36/sFh/BYCctQFiIwF57gY9q2uNUGv2y26IhXRalzeOkm6YYbZivIGvKQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8d73cOLHunoeY9uyP9eRkAFfTTktQ4sd4zAz0vcsmKuX3NuQ7L
-	q7s/vaWz/2+xLjCreiXhY2f91yl0s+R8VSNiRIiPThosXQ3fyi+ErZvdg3P1iKlpnCVmCd/+E11
-	dCpA3AfgB4lE3UxERUA==
-X-Received: from wrso13.prod.google.com ([2002:a5d:474d:0:b0:493:3d97:6e88])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:adf:e007:0:20b0:48e:3697:708d with SMTP id ffacd0b85a97d-49c70ed8e41mr16698595f8f.12.1794830455230;
- Mon, 16 Nov 2026 04:00:55 -0800 (PST)
-Date: Mon, 16 Nov 2026 12:00:53 +0000
-In-Reply-To: <20261116-work-loop-pseudo-v3-12-8cbbea1cf34f@kernel.org>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=I1s9A41H
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=aV0qlpDNLooNPnrXY/O+0ggSMhmcS5vAI4Fpci/O2HM=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794832998; v=1; x=1795437798;
+ b=I1s9A41HT3FiYpPUzewZNWQf8vkqhHIR5ARVQKbAS7SluRlbI2ihtVhd5lhnKrQhcJUMCIoY
+ eNwzEYRSRu+xLaJ5egcR9w3ULxO87tojrrLTl/r9R3iJElHDuTAqzvuuvVWpgRcAaxAzfBIIPQp
+ KiXCd1WtAFdxn6UXLCj7xSVU=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id fca2d1d817ea616d;
+	Mon, 16 Nov 2026 12:43:18 +0000
+X-Mizu-Trace-ID: fca2d1d817ea616d
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <d0128189-f454-42bf-972b-90f6a8536b83@linux.dev>
+Date: Mon, 16 Nov 2026 20:43:08 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -78,33 +57,76 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-References: <20261116-work-loop-pseudo-v3-0-8cbbea1cf34f@kernel.org> <20261116-work-loop-pseudo-v3-12-8cbbea1cf34f@kernel.org>
-X-Mailer: git-send-email 2.56.0.611.g1030f0b940-goog
-Message-ID: <20261116120053.371591-1-aliceryhl@google.com>
-Subject: Re: [PATCH RFC v3 12/44] rust_binderfs: use fc_init_pseudo()
-From: Alice Ryhl <aliceryhl@google.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Alice Ryhl <aliceryhl@google.com>, linux-fsdevel@vger.kernel.org, 
-	Jann Horn <jannh@google.com>, Chris Mason <mason@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jan Kara <jack@suse.cz>, linux-scsi@vger.kernel.org, target-devel@vger.kernel.org, 
-	driver-core@lists.linux.dev, linux-mm@kvack.org, bpf@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
-	apparmor@lists.ubuntu.com, linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
-	fuse-devel@lists.linux.dev, linux-efi@vger.kernel.org, 
-	xen-devel@lists.xenproject.org, ocfs2-devel@lists.linux.dev, 
-	linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-usb@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, 
-	linux-erofs@lists.ozlabs.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, tj@kernel.org, josef@toxicpanda.com,
+ bvanassche@acm.org, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-ioprio: check capabilities before promoting a cgroup
+ to RT
+To: Hungyu Lin <dennylin0707@gmail.com>, axboe@kernel.dk
+References: <20261116090529.69650-1-dennylin0707@gmail.com>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20261116090529.69650-1-dennylin0707@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 16, 2026 at 12:04:45PM +0100, Christian Brauner wrote:
-> Initialize binderfs as a pseudo filesystem instead of raising SB_I_NOEXEC
-> by hand. This adds SB_I_PSEUDO. binderfs_fill_super() keeps clearing
-> SB_I_NODEV for the binder device nodes.
+
+
+在 2026/11/16 17:05, Hungyu Lin 写道:
+> ioprio_set() and the per-request I/O priority of aio and io_uring only
+> hand out IOPRIO_CLASS_RT to tasks that have CAP_SYS_ADMIN or
+> CAP_SYS_NICE. The io.prio.class cgroup attribute has no such check.
+> Writing "promote-to-rt", or its alias "none-to-rt", to it changes the
+> requests of the cgroup to the RT class.
 > 
-> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+> The attribute exists in every cgroup that has the io controller enabled
+> and it is not hierarchical. A user that got a cgroup delegated owns the
+> files of the child cgroups it creates there, so it can create a child
+> cgroup, move into it and write "promote-to-rt" to its io.prio.class.
+> Its requests are then issued with IOPRIO_CLASS_RT although ioprio_set()
+> fails with -EPERM for the same task, and mq-deadline dispatches them
+> before the best-effort requests of everybody else.
+> 
+> The delegation model in Documentation/admin-guide/cgroup-v2.rst expects
+> the settings of all resource controllers to be hierarchical, so that a
+> delegatee can only distribute further what it received from its parent.
+> This attribute lets it raise the priority class of its own requests
+> instead.
+> 
+> Require CAP_SYS_ADMIN or CAP_SYS_NICE for the two policies that raise
+> the priority class, like ioprio_check_cap() does. The other policies are
+> left alone.
+> 
+> Fixes: 556910e39249 ("block: Introduce the ioprio rq-qos policy")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Hungyu Lin <dennylin0707@gmail.com>
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Reviewed-by: Tao Cui <cuitao@kylinos.cn>
+> ---
+>  block/blk-ioprio.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+> index 8fa8bca35062..ea32db727b16 100644
+> --- a/block/blk-ioprio.c
+> +++ b/block/blk-ioprio.c
+> @@ -14,6 +14,7 @@
+>  
+>  #include <linux/blk-mq.h>
+>  #include <linux/blk_types.h>
+> +#include <linux/capability.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include "blk-cgroup.h"
+> @@ -91,6 +92,9 @@ static ssize_t ioprio_set_prio_policy(struct kernfs_open_file *of, char *buf,
+>  	ret = sysfs_match_string(policy_name, buf);
+>  	if (ret < 0)
+>  		return ret;
+> +	if ((ret == POLICY_PROMOTE_TO_RT || ret == POLICY_NONE_TO_RT) &&
+> +	    !capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
+> +		return -EPERM;
+>  	blkcg->prio_policy = ret;
+>  	return nbytes;
+>  }
+
