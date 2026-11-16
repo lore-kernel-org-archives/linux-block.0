@@ -1,59 +1,50 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794822116;
-	b=5Ev03nY4/0uSQ6H/ARijX1NCxcvNyjCBEAnIlYe1PYK4LbbHEblB5ZzpG22ojKEK3IQS
-	 V3zAQ4Rr7cCC/zP88Xq7vGHC3a6YIrwZf59xAKxHRQp/8I+av11yF1wYE94WqrFR85KRO
-	 N/PVKnyd033NIi1RPqWJ84o8yzhdYCHSOfuWr2DFcV2IcVFF1zwiVCjxDwzGCOnD3Gz2T
-	 D1HaNhbMo9EUxjGcJhd4MQRPUVEz6gMKTwxqzCxRGmW+2VcPyM7C4UZipBiJPWoIXkqwf
-	 Sz+nNJs0aXbRILgoMkfnDcA8QNw32M1B0a9CyCtrTXmtWClANat8e/TiKGXIktH5VNQ==
+	t=1794827065;
+	b=Mp2w7l8puSqP3/mF7EOi+lC0EvA2gs2oy/OCov4A4yEuYtHGHgdcOggC0KZvLGtvLDFx
+	 0XCvFqOW1MT5GKYnKhJ9LXdGi1Ahod1onLqDJoBM/I8RMM7grpdXtmvimAU7xFMa8jWWa
+	 01ndclItPf2lv0VY0WmWVAbSkjzr3nr9UTjEFcrySVlXxfofvUq6CiMBGptfwfC9Zulw5
+	 OeuOIglFzgaM91DzhdgchTsEobJFFM5Xzr9my9PIh9Y67NnDgBiBzaGp+9NogYn/mDtKz
+	 Dya/fJjjNd05LyAvhBE9UAQFRcpjBTY9HW44lF7BShYnYJ1kDk3oHXcdGeawFqtdhGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794822116;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=hXng9hYJH3diUcfIm+3EkeLNi/DrI5XwE9hJbmJZ9MI=;
-	b=oUierVuHroArdb2avcHbgg00z1/++vjuSRFkaEhrt2R8Gh9cFowsD7nKYUNx1l6aBsv1
-	 Ls/1ZJvVOdTnAQkm/k0LFdKjYZHovybI9Nt/4oWC52TDAxQcjK5zWTAnrVf/ZHilN3XVh
-	 vHCstgcUlugf6yZKaY8FNZJw4aFamHtG7IZKUQ+DHfu/tqtNE5sWggMfS0zCPnCcA7629
-	 iNbdpaozy/aQytQG0ArBTa6zUGSV7iUGa2cmBnTyJ0afkDWT39CO6dA7fsZw4fAh6WsAh
-	 po6H9u4aoBp4rfILauspuhaC3beTYR0U4664m9br/ypLwVeu2yG7+ufwjAnIBED14+w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794827065;
+	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=K6hcsOKot76i6ofOuhnqMqhE4PYGjzAJldUZv2AbfjY=;
+	b=TZYjSp03rT+BhHwAj4k+bVnSSruv9QB2cqbeYrkt/vay3puYzYIsXEWTANx4zREiIf0c
+	 TDLOQSXShhPwQ/qU6NfrdnahhpaES3HY4LJsSLnd4iRT7Zxqt9MU5dJ6lIMU4+j3Yi00w
+	 yiWx3YqE9OZ9bmYljqx44ihORSPhK1DyM2wuUlZgG+jIpdSPYsSnT5XEPUAISs6MnCX2D
+	 ADmy6O8HgfjKfIeGIAx2Wn82pRJChEBFHtC6iKMXq6D9QRQ2AmKUqcelP8BfOIg2dIyP5
+	 EXHr1zObHA4sRK9oN5BULjo1puzSzVAdYDo6vNVulLxwgChhAy+S+9vdV8OsMiMzKdg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kzkbn6tP;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Yv+83Ada;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3138C606A329;
-	Mon, 16 Nov 2026 09:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1331E606A323;
+	Mon, 16 Nov 2026 11:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kzkbn6tP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5A231F000C5;
-	Mon, 16 Nov 2026 09:41:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Yv+83Ada
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 086591F000D1;
+	Mon, 16 Nov 2026 11:04:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794822116;
-	bh=hXng9hYJH3diUcfIm+3EkeLNi/DrI5XwE9hJbmJZ9MI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=kzkbn6tPB2bS/Zn/Pn5gXJRXwYUjckO+3EyZRv12Tme1m2pQkOlyS27Q2NJx0bLjq
-	 iAF35/8jh5WK0aPjealgqEWqPtYQ2eIjwus2l7uEA6Rw6F/DzFARz9BZlmZeeRX4IA
-	 a8T9Xm8NCDxJP3dX2atLlDz9ZBm8mqYBsqZVK7vDVaxJ/ohv+LFKZYXH6eS5lGqyub
-	 cuo0dCjJOQ9Cm7L88ZJ23RQ4pRGG9KOeHzD56rkH8lmKmPt3M3ylorww7aaA+S2CPt
-	 kiO/myHptFlIERKjXIXwXpMeNSX+FLQjdkTiW70P+l/3Lf4R8ggQC98SE8Kxc70N4V
-	 A+Zhh9qKrjqLA==
-Date: Mon, 16 Nov 2026 10:41:49 +0100
+	s=k20260515; t=1794827064;
+	bh=K6hcsOKot76i6ofOuhnqMqhE4PYGjzAJldUZv2AbfjY=;
+	h=From:Subject:Date:To:Cc;
+	b=Yv+83AdaI+rMIF6ZcVumQESxSFqk/+q4KEQ/dNYe1vqGAjhO4UZuY0f32upeyeIcL
+	 U7luNKMRuAsOI84eZrIlAJi/zJYCE8A/tcPIQNVv+qkGeMR+iT2Qd/a23r3cWeRQU+
+	 uTSVeXg9wu6s2JknLRPylmOgOMgs4JvwAc752i150GOLDrUHLrkFmN2Gzfynarvx/9
+	 MQjhumagM8tTagR1n3h7iQmHaV8zyZ3rBpUM5zVesg7Yce9jIpL6WN2evAWJQVcUQz
+	 5lL6SvuerYCNW4EDL0oKuEOdAKrLTwc4zYsCSCXp8DAReNjFGyaadFvjQMB+WH5CwD
+	 iQFheHbOkWpOg==
 From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, target-devel@vger.kernel.org, 
-	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH 07/12] zloop: take freeze protection when recording write
- pointers
-Message-ID: <20261116-biegen-flaute-flanke-cebddae97444@brauner>
-References: <20261114-work-fs-frozen_writes-v1-0-f5ae61c898b1@kernel.org>
- <20261114-work-fs-frozen_writes-v1-7-f5ae61c898b1@kernel.org>
- <20261116064820.GB2964@lst.de>
+Subject: [PATCH v2 00/17] fs: take freeze protection for writes to backing
+ files
+Date: Mon, 16 Nov 2026 12:03:40 +0100
+Message-Id: <20261116-work-fs-frozen_writes-v2-0-ecc4a2aac40e@kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -63,129 +54,110 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20261116064820.GB2964@lst.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WOQQ6CMBBFr0K6toRWRHTlPQwxbZ1CxbRmBkEl3
+ F2KceHC5Zv8eXkjI0AHxPbJyBB6Ry74GeQqYaZRvgbuzjMzmclCCLHmQ8CWW+IWwwv8aUDXAfE
+ sl0ZtC6mtLtn8e0Ow7rF4j9WH6a4vYLooiwutCLhG5U0TT1GbWkp/tGkcxXHjqAv4XCp7EaXfo
+ PxPUC94xu1GQSFMuSu1OLSAHq5pwJpV0zS9AYIJ+TH6AAAA
+X-Change-ID: 20261113-work-fs-frozen_writes-042ca762bfb8
+To: Jan Kara <jack@suse.cz>
+Cc: Shakeel Butt <shakeel.butt@linux.dev>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, 
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ linux-scsi@vger.kernel.org, target-devel@vger.kernel.org, 
+ linux-unionfs@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, 
+ "Christian Brauner (Amutable)" <brauner@kernel.org>, stable@vger.kernel.org, 
+ Amir Goldstein <amir73il@gmail.com>
+X-Mailer: b4 0.17-dev-ce4c1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3938; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=aJ8lkhUZfSAZD0d0zDSWnIQ89Aj8tUdfJ3u4ID7PtUE=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT9eixbv91/Cx9PdNTthXsErvIYvLi4cEr/18tX/HtEJ
+ pfvP/W+sKOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAie24w/A+ctEfepmXaNH6+
+ fUv+voy9HejBG/Od15BdYyPzrWxh5+WMDKe+GJ5fa2TqoDH18nZZNmF57r7kO2y31r/wVrK0UDL
+ h4QAA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-On Mon, Nov 16, 2026 at 07:48:20AM +0100, Christoph Hellwig wrote:
-> Looks good:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> Can we get some kind of debug check into vfs_setxattr to enforce
-> callers have taken the write protection?
+While testing the pseudo filesystem series I noticed that zloop, the
+nvme target's file backend and the fileio backend of the scsi target
+with fd_async_io=1 call ->write_iter() of their backing files without
+taking freeze protection. So their writes go straight through to a
+frozen filesystem. ext4 complains loudly:
 
-I considered that and decided against it becuase it will mean everyone
-starts splatting which means everyone needs to get their act together by
-7.5.
+    WARNING: fs/ext4/ext4_jbd2.c:90 at ext4_journal_check_start+0x1f6/0x2d0
 
-You might not have seen it but I sent out a bunch of bug reports for
-subsystems that suffer from the same bug class but that need way more
-invasive fixes than anything I'm doing here.
+Loop doesn't get it right for discard and write zeroes. Those end up
+calling ->fallocate() of the backing file directly. The fileio backend
+does the same for UNMAP. And zloop records its write pointers on flush
+with vfs_setxattr() which leaves freeze protection to the caller. So all
+of them modify a frozen filesystem just the same. Fix them too.
 
-But I guess we can do it if we use the VFS_* macros which are compiled
-out unless CONFIG_DEBUG_FS is set. This will still mean that syzbot will
-start splatting at these subsystems. If we're fine with that I'm good to
-go with this.
+Looking for more of the same turned up a few simple ones. coredump
+truncates the core file, overlayfs stores its uuid xattr on mount, nfsd
+truncates on OPEN and the BPF xattr kfuncs modify xattrs, all without
+freeze protection. Fix those as well. The ones that need more work in
+their subsystems I have reported separately.
 
-Fwiw, the check can't go into __vfs_setxattr(), __vfs_setxattr_noperm()
-or __vfs_removexattr(). cap_inode_killpriv(), IMA and EVM call those
-from ->write_iter() via file_remove_privs() and kiocb_start_write()
-hides the freeze protection from lockdep for aio and io_uring. I have
-not bothered to figure out why. Maybe you already know? In any case,
-until that's fixed we can't place it there which means this doesn't
-catch IMA/EVM at which point this patch becomes pointless.
+The fileio backend also frees its aio command in the completion handler
+while the filesystem may still be using the kiocb. KASAN catches ext4
+doing that for direct reads on v7.4-rc1. ext4 gets its own fix (cf. [1])
+but fileio should hold a reference across the submission like loop,
+zloop and fs/backing-file.c do.
 
-So that kiocb_start_write() stuff needs to be sorted first by someone.
-I'm about 300+ patches or more deep into various tree-wide cleanups. I'm
-going to defer this as this seems minor to all the other sh*it that's
-waiting to be cleaned up.
+[1]: https://lore.kernel.org/r/20261113-work-ext4-dio_read_kiocb-v1-1-172a88be803c@kernel.org
+[2]: https://lore.kernel.org/r/20261116064654.GA2964@lst.de
 
--- >8 --
-Subject: [PATCH] fs: assert freeze protection for xattr and acl writes
-
-Writing an xattr or a POSIX ACL modifies the filesystem but
-vfs_setxattr() and friends leave freeze protection to the caller. Most
-callers get it from mnt_want_write(). Some in-kernel callers forgot
-about it. zloop and overlayfs are fixed earlier in this series and
-ecryptfs and ksmbd have been reported. Christoph asked for a debug check
-to catch the next one (cf. [1]).
-
-So warn in __vfs_setxattr_locked(), __vfs_removexattr_locked(),
-vfs_set_acl(), vfs_remove_acl() and set_posix_acl() if SB_FREEZE_WRITE
-isn't held. This only does something with CONFIG_DEBUG_VFS and lockdep.
-Without lockdep sb_write_started() can't tell and claims it's held.
-Until ecryptfs and ksmbd are fixed this will warn for them.
-
-Note that __vfs_setxattr(), __vfs_setxattr_noperm() and
-__vfs_removexattr() don't get the check. They're also called from
-->write_iter() via file_remove_privs() -> notify_change() for
-security.capability and by IMA and EVM. aio, io_uring and the in-kernel
-async writers call kiocb_start_write() which hides the freeze protection
-from lockdep before ->write_iter() is called. So the check would fire
-for writes that are perfectly fine.
-
-[1]: https://lore.kernel.org/r/20261116064820.GB2964@lst.de
-
-Suggested-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- fs/posix_acl.c | 6 ++++++
- fs/xattr.c     | 4 ++++
- 2 files changed, 10 insertions(+)
+Changes in v2:
+- Add kiocb_write_iter() and kiocb_end_write_iter() and use them for
+  zloop, the nvme target and fileio as per Christoph's suggestion.
+- Add a file_write guard and use it for loop discard and write zeroes
+  and fileio unmap.
+- Convert loop, vfs_iocb_iter_write() and fs/backing-file.c to the new
+  helpers.
+- Only complete the fileio target command when the last reference to
+  the aio command is dropped.
+- Link to v1: https://patch.msgid.link/20261114-work-fs-frozen_writes-v1-0-f5ae61c898b1@kernel.org
 
-diff --git a/fs/posix_acl.c b/fs/posix_acl.c
-index fe77934ea8f20..61de6f105ff4f 100644
---- a/fs/posix_acl.c
-+++ b/fs/posix_acl.c
-@@ -942,6 +942,8 @@ set_posix_acl(const struct mnt_idmap *idmap, struct dentry *dentry,
- {
- 	struct inode *inode = d_inode(dentry);
- 
-+	VFS_WARN_ON_ONCE(!sb_write_started(inode->i_sb));
-+
- 	if (!IS_POSIXACL(inode))
- 		return -EOPNOTSUPP;
- 	if (!inode->i_op->set_acl)
-@@ -1099,6 +1101,8 @@ int vfs_set_acl(const struct mnt_idmap *idmap, struct dentry *dentry,
- 	struct inode *inode = d_inode(dentry);
- 	struct delegated_inode delegated_inode = { };
- 
-+	VFS_WARN_ON_ONCE(!sb_write_started(inode->i_sb));
-+
- 	acl_type = posix_acl_type(acl_name);
- 	if (acl_type < 0)
- 		return -EINVAL;
-@@ -1220,6 +1224,8 @@ int vfs_remove_acl(const struct mnt_idmap *idmap, struct dentry *dentry,
- 	struct inode *inode = d_inode(dentry);
- 	struct delegated_inode delegated_inode = { };
- 
-+	VFS_WARN_ON_ONCE(!sb_write_started(inode->i_sb));
-+
- 	acl_type = posix_acl_type(acl_name);
- 	if (acl_type < 0)
- 		return -EINVAL;
-diff --git a/fs/xattr.c b/fs/xattr.c
-index 0705801a62cc5..715d04111c274 100644
---- a/fs/xattr.c
-+++ b/fs/xattr.c
-@@ -302,6 +302,8 @@ __vfs_setxattr_locked(const struct mnt_idmap *idmap, struct dentry *dentry,
- 	struct inode *inode = dentry->d_inode;
- 	int error;
- 
-+	VFS_WARN_ON_ONCE(!sb_write_started(inode->i_sb));
-+
- 	error = xattr_permission(idmap, inode, name, MAY_WRITE);
- 	if (error)
- 		return error;
-@@ -564,6 +566,8 @@ __vfs_removexattr_locked(const struct mnt_idmap *idmap,
- 	struct inode *inode = dentry->d_inode;
- 	int error;
- 
-+	VFS_WARN_ON_ONCE(!sb_write_started(inode->i_sb));
-+
- 	error = xattr_permission(idmap, inode, name, MAY_WRITE);
- 	if (error)
- 		return error;
+---
+Christian Brauner (17):
+      fs: add kiocb_start_write_trylock()
+      fs: add kiocb_write_iter() and kiocb_end_write_iter()
+      fs: add file_write guard
+      zloop: take freeze protection for writes
+      nvmet: take freeze protection for writes to files
+      target: fileio: don't free the aio command under the filesystem
+      target: fileio: take freeze protection for aio writes
+      loop: take freeze protection for discard and write zeroes
+      zloop: take freeze protection when recording write pointers
+      target: fileio: take freeze protection for unmap
+      coredump: take freeze protection for the truncate
+      ovl: take freeze protection when storing the uuid
+      bpf: fs/xattr: take freeze protection in the xattr kfuncs
+      nfsd: take freeze protection for the truncate on open
+      loop: use kiocb_write_iter()
+      fs: use kiocb_write_iter() in vfs_iocb_iter_write()
+      backing-file: use kiocb_end_write_iter()
 
--- 
+ drivers/block/loop.c              | 13 ++++---
+ drivers/block/zloop.c             | 12 +++++--
+ drivers/nvme/target/io-cmd-file.c | 20 +++++++----
+ drivers/target/target_core_file.c | 31 +++++++++++-----
+ fs/backing-file.c                 |  8 ++---
+ fs/bpf_fs_kfuncs.c                |  8 +++++
+ fs/coredump.c                     |  6 ++--
+ fs/nfsd/nfs4state.c               | 10 +++++-
+ fs/overlayfs/util.c               |  8 +++--
+ fs/read_write.c                   |  7 ++--
+ include/linux/fs.h                | 75 +++++++++++++++++++++++++++++++++++++++
+ io_uring/rw.c                     |  9 +----
+ 12 files changed, 158 insertions(+), 49 deletions(-)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20261113-work-fs-frozen_writes-042ca762bfb8
+
