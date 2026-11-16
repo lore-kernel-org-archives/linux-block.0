@@ -1,73 +1,76 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794865708;
-	b=P7IwpzA6uZCEzE+VdzZB5FhVXKSWJHRN0UDY+LzEdu0Voy8yx4EOu2tZpqgzKb/mzjFb
-	 LuH5DUkksiwZilHuciNOL7jZE4Y2LHpQKUxooUKf74uG3gZXFuiKYhW6+wtFc/Gc2wTR2
-	 R8kJaemd900p702DotNYKGOkzvNuBuTH1XSoueqeBENW1GYSSX/o7sIvnlzvEQXiJcfXQ
-	 zG1T88kqPxH5NCVp3BmsVGpBLnDqjbUYQrQLZb+83vtr8i6xSrEb18FhVnnzD5Z/HZ8GU
-	 NLkwGaq0AUYqXZWOVpRMPPDEuZ0tgJb9qU1VgJm7lByJfZ1U3UOPnqNFy1WETZBhvqQ==
+	t=1794865710;
+	b=OCNsu2Vn7HuqtLP1h7x5hr+JC8ZF5+vaGsKJ5oGcZ46nd8DI0kpvxISd8tQzKgXzs+Xa
+	 5nOFyvOSL5oSJrFu7NAv2ZlLnPfqlCLiYwFVPImPQtutfM7QlQxSDUmrcSmX5gCyZHuTz
+	 Ju86mrf0eldEt1+DJrOg7UJ7fD62arl6r4sF1+uBe2TZ4WwhRGKEhGRIGUZ6qRQMLZBnA
+	 hbmi1c1NffI/azRRx9KAmmo78DI8UjBLWRXmB4ZkQhYz5K/NUT58rPFnzE/Ke24FNm4tc
+	 TFNZSKOKD7bnxyGXJEUjuqxEE4rPkSZNr4bI8UFV6bi0ylUxs8XJAOH73sya0IwJzAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794865708;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794865710;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=SA+ugrH06z9Kyf3DVP9ZAFZyQyDdMdcbBTuzq5d9rr0=;
-	b=fsEu99Hhrmaar6MqkRmFd6qVwVEOXog+cpJTLePJ+GeN/KPIZBGQ7BccvVe4MipTFW9+
-	 RKfeLpuRfThJyg3rvk56xhc0qt4rZH7jfpYjOC4wbwrWdUqNotX2lsrM+PgihoSP45xM+
-	 iSGwYesGzQg38fLaYJNIdcRO2YpNcFcVD30z+XCKU2mYK63t9H+WAiabeQYWtexSf5JC1
-	 5LbzAIK67NiLR1h/blirIpUWub3z2xuGFe2hGMzU5nGgrcdgV4XYUJLlz+CL+xUTgXFIe
-	 r49RiVYFE7EnfDPsi79DJcmq3pZEplBnNUt362jDMAF5gZkMxDjcwIYh5ApPEiINW2Q==
+	bh=QhmfvHWDQOgNx3cI+gJFcFvX8YeaeMzEeD2gdw1+oAY=;
+	b=FKX9W2xgoltdSY3Dpjm1rNhz29wVHUe9feWRD5zVy2Sh3UcGMwhjyN2VDHUsqc1Fnrc2
+	 U5RRDUdJaHwKgYSDyEb/6rhx/sDMeMTNbR+M1ls2W6T49eT4cobDvaBivXemS5LOx8Jj/
+	 u0gePFx0+0UQaE5FK0lIGeGdwHzixbteR6Y2Po9ghlJs661me9KEL2KQHY7wb83Qb1qTz
+	 obBn0AxhDhftBJPGgvfaaYBshnUSthpUCEVpVwThW/YcpHqI80Bn5i0bn1WiqD7phougC
+	 FMEXC8roQBxSu1cgUni7SEXTvs1jSEuh+l+gCMlEPIBEXtxHGT8Q1Tg5M/dOdIBAH0A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=acm.org;
 	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=xCypnHZl;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=ZWz91koJ;
 	arc=none smtp.remote-ip=199.89.1.16
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F83B606A323
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:48:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0F83B606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA95606A31C
+	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:48:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBA95606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=xCypnHZl
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=ZWz91koJ
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1hC0SgfzlpHwn;
-	Mon, 16 Nov 2026 21:48:27 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1hF36PWzlpHws;
+	Mon, 16 Nov 2026 21:48:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1794865699; x=1797457700; bh=SA+ug
-	rH06z9Kyf3DVP9ZAFZyQyDdMdcbBTuzq5d9rr0=; b=xCypnHZlMM2LTh+lzKU5R
-	oi9Xbdy3yqra5WrctJqdbUuDFf0isubaEgRh5i4HXJxZdFLapDtJTBsIYgjRVY42
-	JkWif7GuCiGnv8FaLxaHptGba1b8JS136QXoBxkALwAuUvaY+EPtpiWRYFktuSr9
-	AkpMxNqTKSoQ83b0OGbBpbZOOn1zLlSpuSs45eWv3Xv9rrpUkDLu5PJmPKLSCkFM
-	eUNYTtt6x28++U2BaEAykBqN7KmPyhvYO05nDiadx7NiuOwBpO9nrC9dAYacz3Tx
-	2xfx8lXY6lY0jDayqia/8mHGrFgpdcz6pnUqQPDUc8SlvJBv2yvzZNgILqf4Lgb2
+	:received:received; s=mr01; t=1794865699; x=1797457700; bh=Qhmfv
+	HWDQOgNx3cI+gJFcFvX8YeaeMzEeD2gdw1+oAY=; b=ZWz91koJ5X+wdZKq6rDFG
+	JgzWsM08wzjJnil5y738jx6+XHqAJLm/Ieu7vHATVeZ2XHAiueIuulQI8aojGYCI
+	5DMIBjJvaOrbfs6s2Zvwl6+oVYq1/5QCYGEIRtlLlTD3c52Wu+opTNxU2PiFhytK
+	9IUjoZoaIk5LH8gnCG3iBwE6ddTTe+B9vS8Y8U5L9aqfyvhQ3mivAx+GtvUhxpsO
+	lESWr5kWyBENBCprG4JeLgg21I6EG4S+xfLrxXpsGcjGUC8mSLvozz9hKxLlMxv7
+	HfLoJ9TZnL56VyHEeb8b2BD/N8F1hbDTbezKUpQSTl7cYKjGx9y7lNn2Qv5cb527
 	w==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id wqjuQD8UzGkc; Mon, 16 Nov 2026 21:48:19 +0000 (UTC)
+ id Gi4JUBe0XLoi; Mon, 16 Nov 2026 21:48:19 +0000 (UTC)
 Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1h21NnCzlpHxm;
-	Mon, 16 Nov 2026 21:48:18 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1h1086tzlpHxY;
+	Mon, 16 Nov 2026 21:48:16 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Josef Bacik <josef@toxicpanda.com>,
 	Eric Dumazet <edumazet@kernel.org>,
 	Aibing Chen <chenaibing@cmss.chinamobile.com>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 7/8] nbd: Remove the partial-send handling
-Date: Mon, 16 Nov 2026 13:48:07 -0800
-Message-ID: <9edeabfb42318663d06c640604bb113aed3e8a9f.1794865298.git.bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>,
+	syzbot+a761911cb2560f3ca2f7@syzkaller.appspotmail.com,
+	syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com,
+	syzbot+e0faf21748da6475085c@syzkaller.appspotmail.com
+Subject: [PATCH 4/8] nbd: Defer request transmission to a workqueue
+Date: Mon, 16 Nov 2026 13:48:04 -0800
+Message-ID: <a06a0e569bc1612d1808c82ea8271555fd1e5b1f.1794865298.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
 In-Reply-To: <cover.1794865298.git.bvanassche@acm.org>
 References: <cover.1794865298.git.bvanassche@acm.org>
@@ -82,334 +85,347 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Remove was_interrupted(), nbd_sched_pending_work(),
-nbd_pending_cmd_work(), NBD_CMD_PARTIAL_SEND and the nsock->pending,
-nsock->sent and nsock->work members. Treat a failure of sock_xmit() in
-nbd_send_cmd() the same way regardless of the error code: mark the socket
-dead and requeue the request.
+Transmit requests from a per-device unbound workqueue using a per-socket
+command list and work item instead of transmitting directly from
+nbd_queue_rq(), similar to the loop driver.
 
-The partial-send handling was introduced for the case where sendmsg()
-fails with -ERESTARTSYS or -EINTR because a signal is pending in the task
-that called nbd_queue_rq(). Since requests are now transmitted from
-nbd_tx_work(), which runs on a kernel worker thread, no signal can be
-pending while sending and that code is unreachable. Other send errors,
-including a send timeout after part of a request has been sent, already
-mark the socket dead and requeue the request, so a truncated request is
-never followed by another request on the same socket.
+Transmitting over a socket directly from nbd_queue_rq() acquires
+cmd->lock, nsock->tx_lock, and sk_lock while blk-mq holds
+q->q_usage_counter, q->elevator_lock, and set->srcu. Because NBD sockets
+are created and owned by user space, other operations on those sockets
+or sockets sharing the same lockdep class acquire sk_lock before memory
+reclaim (fs_reclaim), mm->mmap_lock, or other subsystem locks, causing
+circular lockdep dependency reports.
 
+Break this dependency chain by queueing commands onto a per-socket
+cmd_list protected by a spinlock in nbd_queue_rq() and performing socket
+transmission from a workqueue under memalloc_noio_save().
+
+Keep BLK_MQ_F_BLOCKING although nbd_queue_rq() no longer sleeps. With
+that flag, blk_mq_quiesce_queue() waits for an SRCU grace period of the
+tag set instead of a system-wide RCU grace period. nbd_clear_que() is
+called for every NBD_CLEAR_SOCK ioctl and every configuration teardown,
+and dropping the flag makes blktests nbd/003 about 20 times slower. Since
+nbd_queue_rq() only acquires the nsock->cmd_lock spinlock while holding
+set->srcu, keeping the flag does not reintroduce the lockdep dependency
+chains described above.
+
+Allocate the send workqueue with the same flags as the receive
+workqueue. WQ_MEM_RECLAIM is required because the send workqueue is in
+the writeback path, e.g. for swap over NBD, and because nbd_clear_que()
+flushes it from recv_work() and from the block layer timeout handler,
+both of which may run on WQ_MEM_RECLAIM workqueues. Do not use
+WQ_FREEZABLE since request transmission was not frozen during system
+suspend before this change.
+
+Since request transmission now happens from a kernel worker thread, no
+signal can be pending while sending and the partial-send handling in
+nbd_send_cmd() is only kept for robustness. Destroy the send workqueue
+before freeing the tag set in nbd_dev_remove().
+
+Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up ea=
+rlier")
+Reported-by: syzbot+a761911cb2560f3ca2f7@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/6aec646f.aca85a03.3b899.0000.GAE@goo=
+gle.com/
+Reported-by: syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/6aec66fc.059f5055.2712e4.0001.GAE@go=
+ogle.com/
+Reported-by: syzbot+e0faf21748da6475085c@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/6aec699e.73adde43.12e2c1.0001.GAE@go=
+ogle.com/
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/nbd.c | 178 +-------------------------------------------
- 1 file changed, 3 insertions(+), 175 deletions(-)
+ drivers/block/nbd.c | 158 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 112 insertions(+), 46 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index f713779b5a5d..3d834e4e1349 100644
+index 6373363cc4c4..4d362e3cc395 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -57,12 +57,9 @@ static int nbd_total_devices =3D 0;
- struct nbd_sock {
- 	struct socket *sock;
- 	struct mutex tx_lock;
--	struct request *pending;
--	int sent;
- 	bool dead;
+@@ -63,6 +63,10 @@ struct nbd_sock {
  	int fallback_index;
  	int cookie;
--	struct work_struct work;
- 	spinlock_t cmd_lock;
- 	struct list_head cmd_list;
- 	struct work_struct tx_work;
-@@ -147,9 +144,6 @@ struct nbd_device {
-  */
- #define NBD_CMD_INFLIGHT	2
+ 	struct work_struct work;
++	spinlock_t cmd_lock;
++	struct list_head cmd_list;
++	struct work_struct tx_work;
++	int index;
+ };
 =20
--/* Just part of request header or data payload is sent successfully */
--#define NBD_CMD_PARTIAL_SEND	3
--
+ struct recv_thread_args {
+@@ -123,6 +127,7 @@ struct nbd_device {
+ 	struct mutex config_lock;
+ 	struct gendisk *disk;
+ 	struct workqueue_struct *recv_workq;
++	struct workqueue_struct *send_workq;
+ 	struct work_struct remove_work;
+=20
+ 	struct list_head list;
+@@ -136,7 +141,7 @@ struct nbd_device {
+=20
+ #define NBD_CMD_REQUEUED	1
+ /*
+- * This flag will be set if nbd_queue_rq() succeed, and will be checked =
+and
++ * This flag will be set if nbd_send_cmd() succeeded, and will be checke=
+d and
+  * cleared in completion. Both setting and clearing of the flag are prot=
+ected
+  * by cmd->lock.
+  */
+@@ -148,6 +153,7 @@ struct nbd_device {
  struct nbd_cmd {
  	struct nbd_device *nbd;
  	struct mutex lock;
-@@ -336,8 +330,6 @@ static void nbd_mark_nsock_dead(struct nbd_device *nb=
-d, struct nbd_sock *nsock,
- 		}
- 	}
- 	WRITE_ONCE(nsock->dead, true);
--	nsock->pending =3D NULL;
--	nsock->sent =3D 0;
- }
++	struct list_head list_entry;
+ 	int index;
+ 	int cookie;
+ 	int retries;
+@@ -267,6 +273,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
+ 	struct gendisk *disk =3D nbd->disk;
 =20
- static void nbd_apply_limits(struct queue_limits *lim, u32 flags)
-@@ -475,12 +467,6 @@ static enum blk_eh_timer_return nbd_xmit_timeout(str=
-uct request *req)
- 	if (!mutex_trylock(&cmd->lock))
- 		return BLK_EH_RESET_TIMER;
+ 	del_gendisk(disk);
++	destroy_workqueue(nbd->send_workq);
+ 	blk_mq_free_tag_set(&nbd->tag_set);
 =20
--	/* partial send is handled in nbd_sock's work function */
--	if (test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags)) {
--		mutex_unlock(&cmd->lock);
--		return BLK_EH_RESET_TIMER;
--	}
--
- 	if (!test_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
- 		mutex_unlock(&cmd->lock);
- 		return BLK_EH_DONE;
-@@ -623,47 +609,6 @@ static int sock_xmit(struct nbd_device *nbd, int ind=
-ex, int send,
- 	return __sock_xmit(nbd, sock, send, iter, msg_flags, sent);
- }
-=20
--/*
-- * Different settings for sk->sk_sndtimeo can result in different return=
- values
-- * if there is a signal pending when we enter sendmsg, because reasons?
-- */
--static inline int was_interrupted(int result)
--{
--	return result =3D=3D -ERESTARTSYS || result =3D=3D -EINTR;
--}
--
--/*
-- * We've already sent header or part of data payload, have no choice but
-- * to set pending and schedule it in work.
-- *
-- * The request must not be requeued, otherwise this same request may be
-- * re-dispatched with different tag, but our header has been sent out wi=
-th
-- * old tag, and this way does confuse reply handling.
-- *
-- * Returns true if nsock->work has been scheduled. Returns false if no
-- * config_refs reference could be obtained because the device is being t=
-orn
-- * down. In that case the caller must mark @nsock dead, since a truncate=
-d
-- * request has been sent, and fail the request.
-- */
--static bool nbd_sched_pending_work(struct nbd_device *nbd,
--				   struct nbd_sock *nsock,
--				   struct nbd_cmd *cmd, int sent)
--{
--	struct request *req =3D blk_mq_rq_from_pdu(cmd);
--
--	/* pending work should be scheduled only once */
--	WARN_ON_ONCE(test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags));
--
--	if (!refcount_inc_not_zero(&nbd->config_refs))
--		return false;
--
--	nsock->pending =3D req;
--	nsock->sent =3D sent;
--	set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
--	schedule_work(&nsock->work);
--	return true;
--}
--
- /*
-  * Returns BLK_STS_IOERR if sending failed and cannot be retried.
-  */
-@@ -681,7 +626,6 @@ static blk_status_t nbd_send_cmd(struct nbd_device *n=
-bd, struct nbd_cmd *cmd,
- 	u64 handle;
- 	u32 type;
- 	u32 nbd_cmd_flags =3D 0;
--	int sent =3D nsock->sent, skip =3D 0;
+ 	/*
+@@ -1080,6 +1087,7 @@ static bool nbd_clear_req(struct request *req, void=
+ *data)
+ static void nbd_clear_que(struct nbd_device *nbd)
+ {
+ 	blk_mq_quiesce_queue(nbd->disk->queue);
++	flush_workqueue(nbd->send_workq);
+ 	blk_mq_tagset_busy_iter(&nbd->tag_set, nbd_clear_req, NULL);
+ 	blk_mq_unquiesce_queue(nbd->disk->queue);
+ 	dev_dbg(disk_to_dev(nbd->disk), "queue cleared\n");
+@@ -1139,36 +1147,12 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd=
+ *cmd, int index)
+ {
+ 	struct request *req =3D blk_mq_rq_from_pdu(cmd);
+ 	struct nbd_device *nbd =3D cmd->nbd;
+-	struct nbd_config *config;
++	struct nbd_config *config =3D nbd->config;
+ 	struct nbd_sock *nsock;
+ 	blk_status_t ret;
 =20
  	lockdep_assert_held(&cmd->lock);
- 	lockdep_assert_held(&nsock->tx_lock);
-@@ -704,23 +648,7 @@ static blk_status_t nbd_send_cmd(struct nbd_device *=
-nbd, struct nbd_cmd *cmd,
- 	if ((req->cmd_flags & REQ_NOUNMAP) && (type =3D=3D NBD_CMD_WRITE_ZEROES=
-))
- 		nbd_cmd_flags |=3D NBD_CMD_FLAG_NO_HOLE;
 =20
--	/* We did a partial send previously, and we at least sent the whole
--	 * request struct, so just go and send the rest of the pages in the
--	 * request.
--	 */
--	if (sent) {
--		if (sent >=3D sizeof(request)) {
--			skip =3D sent - sizeof(request);
--
--			/* initialize handle for tracing purposes */
--			handle =3D nbd_cmd_handle(cmd);
--
--			goto send_pages;
--		}
--		iov_iter_advance(&from, sent);
--	} else {
--		cmd->cmd_cookie++;
--	}
-+	cmd->cmd_cookie++;
- 	cmd->index =3D index;
- 	cmd->cookie =3D nsock->cookie;
- 	cmd->retries =3D 0;
-@@ -738,36 +666,13 @@ static blk_status_t nbd_send_cmd(struct nbd_device =
-*nbd, struct nbd_cmd *cmd,
- 		req, nbdcmd_to_ascii(type),
- 		(unsigned long long)blk_rq_pos(req) << 9, blk_rq_bytes(req));
- 	result =3D sock_xmit(nbd, index, 1, &from,
--			(type =3D=3D NBD_CMD_WRITE) ? MSG_MORE : 0, &sent);
-+			(type =3D=3D NBD_CMD_WRITE) ? MSG_MORE : 0, NULL);
- 	trace_nbd_header_sent(req, handle);
- 	if (result < 0) {
--		if (was_interrupted(result)) {
--			/*
--			 * If we haven't sent anything we can just requeue,
--			 * however if we have sent something we need to make
--			 * sure we only allow this req to be sent until we are
--			 * completely done.
--			 */
--			if (sent) {
--				if (nbd_sched_pending_work(nbd, nsock, cmd,
--							   sent))
--					return BLK_STS_OK;
--				/*
--				 * Don't send anything after a truncated request.
--				 * The device is being torn down, so don't notify
--				 * user space that the link is dead.
--				 */
--				nbd_mark_nsock_dead(nbd, nsock, 0);
--				return BLK_STS_IOERR;
--			}
--			nbd_requeue_cmd(cmd);
--			return BLK_STS_OK;
--		}
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 			"Send control failed (result %d)\n", result);
- 		goto requeue;
- 	}
--send_pages:
- 	if (type !=3D NBD_CMD_WRITE)
- 		goto out;
-=20
-@@ -784,23 +689,8 @@ static blk_status_t nbd_send_cmd(struct nbd_device *=
-nbd, struct nbd_cmd *cmd,
- 			dev_dbg(nbd_to_dev(nbd), "request %p: sending %d bytes data\n",
- 				req, bvec.bv_len);
- 			iov_iter_bvec(&from, ITER_SOURCE, &bvec, 1, bvec.bv_len);
--			if (skip) {
--				if (skip >=3D iov_iter_count(&from)) {
--					skip -=3D iov_iter_count(&from);
--					continue;
--				}
--				iov_iter_advance(&from, skip);
--				skip =3D 0;
--			}
--			result =3D sock_xmit(nbd, index, 1, &from, flags, &sent);
-+			result =3D sock_xmit(nbd, index, 1, &from, flags, NULL);
- 			if (result < 0) {
--				if (was_interrupted(result)) {
--					if (nbd_sched_pending_work(nbd, nsock,
--								   cmd, sent))
--						return BLK_STS_OK;
--					nbd_mark_nsock_dead(nbd, nsock, 0);
--					return BLK_STS_IOERR;
--				}
- 				dev_err(disk_to_dev(nbd->disk),
- 					"Send data failed (result %d)\n",
- 					result);
-@@ -819,20 +709,10 @@ static blk_status_t nbd_send_cmd(struct nbd_device =
-*nbd, struct nbd_cmd *cmd,
- 	}
- out:
- 	trace_nbd_payload_sent(req, handle);
--	nsock->pending =3D NULL;
--	nsock->sent =3D 0;
- 	__set_bit(NBD_CMD_INFLIGHT, &cmd->flags);
- 	return BLK_STS_OK;
-=20
- requeue:
 -	/*
--	 * Can't requeue in case we are dealing with partial send
--	 *
--	 * We must run from pending work function.
--	 * */
--	if (test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags))
--		return BLK_STS_OK;
--
- 	/* retry on a different socket */
- 	dev_err_ratelimited(disk_to_dev(nbd->disk),
- 			    "Request send failed, requeueing\n");
-@@ -841,44 +721,6 @@ static blk_status_t nbd_send_cmd(struct nbd_device *=
-nbd, struct nbd_cmd *cmd,
- 	return BLK_STS_OK;
- }
-=20
--/* handle partial sending */
--static void nbd_pending_cmd_work(struct work_struct *work)
--{
--	struct nbd_sock *nsock =3D container_of(work, struct nbd_sock, work);
--	struct request *req =3D nsock->pending;
--	struct nbd_cmd *cmd =3D blk_mq_rq_to_pdu(req);
--	struct nbd_device *nbd =3D cmd->nbd;
--	unsigned long deadline =3D READ_ONCE(req->deadline);
--	unsigned int wait_ms =3D 2;
--
--	mutex_lock(&cmd->lock);
--
--	WARN_ON_ONCE(test_bit(NBD_CMD_REQUEUED, &cmd->flags));
--	if (WARN_ON_ONCE(!test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags)))
--		goto out;
--
--	mutex_lock(&nsock->tx_lock);
--	while (true) {
--		nbd_send_cmd(nbd, cmd, cmd->index);
--		if (!nsock->pending)
--			break;
--
--		/* don't bother timeout handler for partial sending */
--		if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >=3D deadline) {
--			cmd->status =3D BLK_STS_IOERR;
--			blk_mq_complete_request(req);
--			break;
--		}
--		msleep(wait_ms);
--		wait_ms *=3D 2;
--	}
--	mutex_unlock(&nsock->tx_lock);
--	clear_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
--out:
--	mutex_unlock(&cmd->lock);
--	nbd_config_put(nbd);
--}
--
- static int nbd_read_reply(struct nbd_device *nbd, struct socket *sock,
- 			  struct nbd_reply *reply)
- {
-@@ -1179,19 +1021,8 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd =
-*cmd, int index)
- 		goto again;
- 	}
-=20
--	/* Handle the case that we have a pending request that was partially
--	 * transmitted that _has_ to be serviced first.  We need to call requeu=
-e
--	 * here so that it gets put _after_ the request that is already on the
--	 * dispatch list.
+-	 * No config_refs reference is held here. nbd->config and
+-	 * config->socks remain valid because nbd_config_put() calls
+-	 * nbd_clear_que(), which quiesces the request queue, before freeing
+-	 * them. The only other place that modifies config->socks is
+-	 * nbd_add_socket(). It only runs before nbd_start_device(), while the
+-	 * capacity is zero and the write cache is disabled, so no request
+-	 * reaches this driver concurrently (see also commit 285908f554fe
+-	 * ("nbd: remove queue freeze in nbd_add_socket")).
 -	 */
- 	blk_mq_start_request(req);
--	if (unlikely(nsock->pending && nsock->pending !=3D req)) {
--		nbd_requeue_cmd(cmd);
--		ret =3D BLK_STS_OK;
--		goto out;
+-	if (!refcount_read(&nbd->config_refs)) {
+-		dev_err_ratelimited(disk_to_dev(nbd->disk),
+-				    "Socks array is empty\n");
+-		return BLK_STS_IOERR;
 -	}
- 	ret =3D nbd_send_cmd(nbd, cmd, index);
--out:
- 	mutex_unlock(&nsock->tx_lock);
+-	/* Pairs with smp_wmb() in nbd_alloc_and_init_config(). */
+-	smp_rmb();
+-	config =3D READ_ONCE(nbd->config);
+-
+-	if (index >=3D config->num_connections) {
+-		dev_err_ratelimited(disk_to_dev(nbd->disk),
+-				    "Attempted send on invalid socket\n");
+-		return BLK_STS_IOERR;
+-	}
+ 	cmd->status =3D BLK_STS_OK;
+ again:
+ 	nsock =3D config->socks[index];
+@@ -1189,6 +1173,7 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *=
+cmd, int index)
+ 			 * and instead just error out.
+ 			 */
+ 			sock_shutdown(nbd);
++			blk_mq_start_request(req);
+ 			return BLK_STS_IOERR;
+ 		}
+ 		goto again;
+@@ -1211,33 +1196,98 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd=
+ *cmd, int index)
  	return ret;
  }
-@@ -1374,14 +1205,11 @@ static int nbd_add_socket(struct nbd_device *nbd,=
- unsigned long arg,
- 	nsock->dead =3D false;
- 	mutex_init(&nsock->tx_lock);
- 	nsock->sock =3D sock;
--	nsock->pending =3D NULL;
--	nsock->sent =3D 0;
+=20
++static void nbd_tx_work(struct work_struct *work)
++{
++	struct nbd_sock *nsock =3D container_of(work, struct nbd_sock, tx_work)=
+;
++	struct nbd_cmd *cmd;
++	unsigned int memflags;
++
++	/* See nbd_queue_rq() for why nsock and nbd->config remain valid. */
++	memflags =3D memalloc_noio_save();
++
++	spin_lock(&nsock->cmd_lock);
++	while (!list_empty(&nsock->cmd_list)) {
++		struct request *req;
++		blk_status_t ret;
++
++		cmd =3D list_first_entry(&nsock->cmd_list, struct nbd_cmd,
++				       list_entry);
++		list_del_init(&cmd->list_entry);
++		spin_unlock(&nsock->cmd_lock);
++
++		req =3D blk_mq_rq_from_pdu(cmd);
++		/*
++		 * Since we look at the bio's to send the request over the
++		 * network we need to make sure the completion work doesn't
++		 * mark this request done before we are done doing our send.
++		 * This keeps us from dereferencing freed data if we have
++		 * particularly fast completions (ie we get the completion
++		 * before we exit sock_xmit on the last bvec) or in the case
++		 * that the server is misbehaving (or there was an error)
++		 * before we're done sending everything over the wire.
++		 */
++		mutex_lock(&cmd->lock);
++		clear_bit(NBD_CMD_REQUEUED, &cmd->flags);
++		ret =3D nbd_handle_cmd(cmd, nsock->index);
++		if (ret !=3D BLK_STS_OK)
++			cmd->status =3D ret;
++		mutex_unlock(&cmd->lock);
++
++		if (ret !=3D BLK_STS_OK)
++			blk_mq_complete_request(req);
++
++		cond_resched();
++
++		spin_lock(&nsock->cmd_lock);
++	}
++	spin_unlock(&nsock->cmd_lock);
++
++	memalloc_noio_restore(memflags);
++}
++
+ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 			const struct blk_mq_queue_data *bd)
+ {
+-	struct nbd_cmd *cmd =3D blk_mq_rq_to_pdu(bd->rq);
+-	blk_status_t ret;
++	struct request *req =3D bd->rq;
++	struct nbd_cmd *cmd =3D blk_mq_rq_to_pdu(req);
++	struct nbd_device *nbd =3D cmd->nbd;
++	struct nbd_config *config;
++	struct nbd_sock *nsock;
++	unsigned int index =3D hctx->queue_num;
+=20
+ 	/*
+-	 * Since we look at the bio's to send the request over the network we
+-	 * need to make sure the completion work doesn't mark this request done
+-	 * before we are done doing our send.  This keeps us from dereferencing
+-	 * freed data if we have particularly fast completions (ie we get the
+-	 * completion before we exit sock_xmit on the last bvec) or in the case
+-	 * that the server is misbehaving (or there was an error) before we're
+-	 * done sending everything over the wire.
++	 * No config_refs reference is held here or in nbd_tx_work().
++	 * nbd->config and config->socks remain valid because
++	 * nbd_config_put() calls nbd_clear_que(), which quiesces the request
++	 * queue and flushes nbd->send_workq, before freeing them. The only
++	 * other place that modifies config->socks is nbd_add_socket(). It only
++	 * runs before nbd_start_device(), while the capacity is zero and the
++	 * write cache is disabled, so no request reaches this driver
++	 * concurrently (see also commit 285908f554fe ("nbd: remove queue freez=
+e
++	 * in nbd_add_socket")).
+ 	 */
+-	mutex_lock(&cmd->lock);
+-	clear_bit(NBD_CMD_REQUEUED, &cmd->flags);
++	if (!refcount_read(&nbd->config_refs)) {
++		dev_err_ratelimited(disk_to_dev(nbd->disk),
++				    "Socks array is empty\n");
++		return BLK_STS_IOERR;
++	}
++	/* Pairs with smp_wmb() in nbd_alloc_and_init_config(). */
++	smp_rmb();
++	config =3D READ_ONCE(nbd->config);
+=20
+-	/* We can be called directly from the user space process, which means w=
+e
+-	 * could possibly have signals pending so our sendmsg will fail.  In
+-	 * this case we need to return that we are busy, otherwise error out as
+-	 * appropriate.
+-	 */
+-	ret =3D nbd_handle_cmd(cmd, hctx->queue_num);
+-	mutex_unlock(&cmd->lock);
++	if (index >=3D config->num_connections) {
++		dev_err_ratelimited(disk_to_dev(nbd->disk),
++				    "Attempted send on invalid socket\n");
++		return BLK_STS_IOERR;
++	}
+=20
+-	return ret;
++	nsock =3D config->socks[index];
++	spin_lock(&nsock->cmd_lock);
++	list_add_tail(&cmd->list_entry, &nsock->cmd_list);
++	queue_work(nbd->send_workq, &nsock->tx_work);
++	spin_unlock(&nsock->cmd_lock);
++
++	return BLK_STS_OK;
+ }
+=20
+ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned lo=
+ng fd,
+@@ -1364,6 +1414,10 @@ static int nbd_add_socket(struct nbd_device *nbd, =
+unsigned long arg,
+ 	nsock->pending =3D NULL;
+ 	nsock->sent =3D 0;
  	nsock->cookie =3D 0;
- 	nsock->index =3D config->num_connections;
- 	spin_lock_init(&nsock->cmd_lock);
- 	INIT_LIST_HEAD(&nsock->cmd_list);
- 	INIT_WORK(&nsock->tx_work, nbd_tx_work);
--	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
++	nsock->index =3D config->num_connections;
++	spin_lock_init(&nsock->cmd_lock);
++	INIT_LIST_HEAD(&nsock->cmd_list);
++	INIT_WORK(&nsock->tx_work, nbd_tx_work);
+ 	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
  	socks[config->num_connections++] =3D nsock;
  	atomic_inc(&config->live_connections);
+@@ -1766,7 +1820,7 @@ static int nbd_alloc_and_init_config(struct nbd_dev=
+ice *nbd)
+ 	 * readers that observe a non-zero config_refs also observe the new
+ 	 * nbd->config value. Pairs with the barrier after
+ 	 * refcount_inc_not_zero() in nbd_get_config_unlocked() and with the
+-	 * smp_rmb() in nbd_handle_cmd().
++	 * smp_rmb() in nbd_queue_rq().
+ 	 */
+ 	smp_wmb(); /* Pairs with smp_rmb() and smp_mb__after_atomic(). */
+ 	refcount_set(&nbd->config_refs, 1);
+@@ -1965,6 +2019,7 @@ static int nbd_init_request(struct blk_mq_tag_set *=
+set, struct request *rq,
+ 	struct nbd_cmd *cmd =3D blk_mq_rq_to_pdu(rq);
+ 	cmd->nbd =3D set->driver_data;
+ 	cmd->flags =3D 0;
++	INIT_LIST_HEAD(&cmd->list_entry);
+ 	mutex_init(&cmd->lock);
+ 	return 0;
+ }
+@@ -2040,6 +2095,15 @@ static struct nbd_device *nbd_dev_add(int index, u=
+nsigned int refs,
+ 		goto out_err_disk;
+ 	}
 =20
++	nbd->send_workq =3D alloc_workqueue("nbd%d-send",
++					  WQ_MEM_RECLAIM | WQ_HIGHPRI |
++					  WQ_UNBOUND, 0, nbd->index);
++	if (!nbd->send_workq) {
++		dev_err(disk_to_dev(nbd->disk), "Could not allocate knbd send work que=
+ue.\n");
++		err =3D -ENOMEM;
++		goto out_free_recv_work;
++	}
++
+ 	mutex_init(&nbd->config_lock);
+ 	refcount_set(&nbd->config_refs, 0);
+ 	/*
+@@ -2066,6 +2130,8 @@ static struct nbd_device *nbd_dev_add(int index, un=
+signed int refs,
+ 	return nbd;
+=20
+ out_free_work:
++	destroy_workqueue(nbd->send_workq);
++out_free_recv_work:
+ 	destroy_workqueue(nbd->recv_workq);
+ out_err_disk:
+ 	put_disk(disk);
