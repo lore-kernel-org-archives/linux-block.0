@@ -1,79 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794865710;
-	b=OCNsu2Vn7HuqtLP1h7x5hr+JC8ZF5+vaGsKJ5oGcZ46nd8DI0kpvxISd8tQzKgXzs+Xa
-	 5nOFyvOSL5oSJrFu7NAv2ZlLnPfqlCLiYwFVPImPQtutfM7QlQxSDUmrcSmX5gCyZHuTz
-	 Ju86mrf0eldEt1+DJrOg7UJ7fD62arl6r4sF1+uBe2TZ4WwhRGKEhGRIGUZ6qRQMLZBnA
-	 hbmi1c1NffI/azRRx9KAmmo78DI8UjBLWRXmB4ZkQhYz5K/NUT58rPFnzE/Ke24FNm4tc
-	 TFNZSKOKD7bnxyGXJEUjuqxEE4rPkSZNr4bI8UFV6bi0ylUxs8XJAOH73sya0IwJzAA==
+	t=1794867681;
+	b=t61v6YeTAto91/DzmC09uzF4ylkH15T6ktH4UXpROQzgtCtrm/WDuxgv+lj9XRqJRSRg
+	 aekHFrXxD1tRNBNYHPutZcztQL8TaUz7iAJI/XMW9MMxbbVViedUrNAnkZur+Y5FZ+/AT
+	 c9Uo6lpBD11Tqx3k8e0I3IUXmdKGkWO7rI9KMr/gSbHzg4Cj9szNMUgRMAGLTvX4xAmeG
+	 cygqQ76vLbAaD/AHIAQ+nIiDBiJHUFMETDyq4CclfpPzMFNyC1xwWmqYgR7DJk0ygqFrb
+	 V24PnzdMKDnMgMzBUBZwxaiDZwuwJv1vj5KENDJURyKLyD5gS6mHy2K/VC9ZPXbELgQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794865710;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=QhmfvHWDQOgNx3cI+gJFcFvX8YeaeMzEeD2gdw1+oAY=;
-	b=FKX9W2xgoltdSY3Dpjm1rNhz29wVHUe9feWRD5zVy2Sh3UcGMwhjyN2VDHUsqc1Fnrc2
-	 U5RRDUdJaHwKgYSDyEb/6rhx/sDMeMTNbR+M1ls2W6T49eT4cobDvaBivXemS5LOx8Jj/
-	 u0gePFx0+0UQaE5FK0lIGeGdwHzixbteR6Y2Po9ghlJs661me9KEL2KQHY7wb83Qb1qTz
-	 obBn0AxhDhftBJPGgvfaaYBshnUSthpUCEVpVwThW/YcpHqI80Bn5i0bn1WiqD7phougC
-	 FMEXC8roQBxSu1cgUni7SEXTvs1jSEuh+l+gCMlEPIBEXtxHGT8Q1Tg5M/dOdIBAH0A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794867681;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=BXL/fDhspKdov1Fv9R2cAMXBgedf/LG6cvi6/7Jo65c=;
+	b=NVwdxoYAW8UUkS37HCnUpIxatbGHdyqcbWW/sL7FwdzOdOyeyuatp8K2zKIkrjLHh+Bq
+	 DgcRfG6RQL3diGvGPv/xdSPALyhxspZvHGOlH8hY+Fm5+AobJbpOvvh0kT4UB8b4VdG2o
+	 KPnZ5M0jKw5/gDvkuOkF627k24G/JYBmlakHRqxhV5846mH9Jszb+1mfMYjmp97LENOM8
+	 84L3rH5mIVbMImEvjFrSd3CMtemKNR91YrXGNzm4d5oDaTmFAfQPT4ORu5zMYRCUWxCRL
+	 SKMpAwnaDcNtjs1pzfl/euwhyDgcdKBOkxtKyIlEd18KYfHOJdWj22LXYKO5QwAe70Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=acm.org;
-	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=ZWz91koJ;
-	arc=none smtp.remote-ip=199.89.1.16
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	dmarc=pass header.from=infradead.org;
+	spf=pass smtp.mailfrom=infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=VThYQCTK;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA95606A31C
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:48:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBA95606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1411E606A31C;
+	Mon, 16 Nov 2026 22:21:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1411E606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=ZWz91koJ
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1hF36PWzlpHws;
-	Mon, 16 Nov 2026 21:48:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1794865699; x=1797457700; bh=Qhmfv
-	HWDQOgNx3cI+gJFcFvX8YeaeMzEeD2gdw1+oAY=; b=ZWz91koJ5X+wdZKq6rDFG
-	JgzWsM08wzjJnil5y738jx6+XHqAJLm/Ieu7vHATVeZ2XHAiueIuulQI8aojGYCI
-	5DMIBjJvaOrbfs6s2Zvwl6+oVYq1/5QCYGEIRtlLlTD3c52Wu+opTNxU2PiFhytK
-	9IUjoZoaIk5LH8gnCG3iBwE6ddTTe+B9vS8Y8U5L9aqfyvhQ3mivAx+GtvUhxpsO
-	lESWr5kWyBENBCprG4JeLgg21I6EG4S+xfLrxXpsGcjGUC8mSLvozz9hKxLlMxv7
-	HfLoJ9TZnL56VyHEeb8b2BD/N8F1hbDTbezKUpQSTl7cYKjGx9y7lNn2Qv5cb527
-	w==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id Gi4JUBe0XLoi; Mon, 16 Nov 2026 21:48:19 +0000 (UTC)
-Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1h1086tzlpHxY;
-	Mon, 16 Nov 2026 21:48:16 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Aibing Chen <chenaibing@cmss.chinamobile.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	syzbot+a761911cb2560f3ca2f7@syzkaller.appspotmail.com,
-	syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com,
-	syzbot+e0faf21748da6475085c@syzkaller.appspotmail.com
-Subject: [PATCH 4/8] nbd: Defer request transmission to a workqueue
-Date: Mon, 16 Nov 2026 13:48:04 -0800
-Message-ID: <a06a0e569bc1612d1808c82ea8271555fd1e5b1f.1794865298.git.bvanassche@acm.org>
-X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
-In-Reply-To: <cover.1794865298.git.bvanassche@acm.org>
-References: <cover.1794865298.git.bvanassche@acm.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=VThYQCTK
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=BXL/fDhspKdov1Fv9R2cAMXBgedf/LG6cvi6/7Jo65c=; b=VThYQCTK0+YExl2+ZO7Tuknnrf
+	6kyowduHpBQVpfb7n1tSXedtpFNkU4jMk3jIu9Hkgh6YTzADUmrCxgKLrv9IjmY8LwM/wyAWTvTDD
+	e/sSQp4UOb5tjuY3MxqRJvsxNsiNknNcq0RGaoSG8yJ8wUiQCVmAZBGlVLxfcZjyr94azpjr9IOnd
+	AWdz3ni0uhKjLd3gREkk+4rC3s26NSvhlfY2UUaXgX8uIh0R2U5pwjQCQjGVYJS1A2bXWMI8l49wW
+	l2fyCL1r+D2yYRXbpcd1pUH4Eqp+JWnGEwFXHp6SFfFUzbYmxjvOpOGIgf4yt8A3Gek5Rph3JughC
+	ysCNVjJg==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xT54Y-000000042c2-2GpG;
+	Mon, 16 Nov 2026 22:21:10 +0000
+Message-ID: <65bab646-fbf6-4da0-b833-2314d568a845@infradead.org>
+Date: Mon, 16 Nov 2026 14:21:07 -0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -83,349 +58,146 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 09/12] docs: ioctl-number: update virtualization entries
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org,
+ David Hildenbrand <david@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Jason Gunthorpe <jgg@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>, linux-mm@kvack.org,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ linux-sound@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowangio@gmail.com>, David Heidelberg <david@ixit.cz>,
+ oe-linux-nfc@lists.linux.dev, Chas Williams <3chas3@gmail.com>,
+ linux-atm-general@lists.sourceforge.net,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Helge Deller <deller@gmx.de>,
+ linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ MPT-FusionLinux.pdl@broadcom.com,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org,
+ Neill Kapron <nkapron@google.com>, Andrey Konovalov <andreyknvl@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Hans de Goede <hansg@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, Jan Kara
+ <jack@suse.cz>, linux-fsdevel@vger.kernel.org, Theodore Ts'o
+ <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+ Mike Marshall <hubcap@omnibond.com>, devel@lists.orangefs.org,
+ Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>,
+ linux-cifs@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+ Chao Yu <chao@kernel.org>, linux-f2fs-devel@lists.sourceforge.net,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ Tzung-Bi Shih <tzungbi@kernel.org>, Benson Leung <bleung@chromium.org>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ amd-gfx@lists.freedesktop.org, Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, intel-gfx@lists.freedesktop.org,
+ Matthew Brost <matthew.brost@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ intel-xe@lists.freedesktop.org
+References: <20261114202653.3113381-1-rdunlap@infradead.org>
+ <20261114202653.3113381-10-rdunlap@infradead.org>
+ <avsSjioXqbCOn834@seanjc-mac.roam.internal>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <avsSjioXqbCOn834@seanjc-mac.roam.internal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Transmit requests from a per-device unbound workqueue using a per-socket
-command list and work item instead of transmitting directly from
-nbd_queue_rq(), similar to the loop driver.
 
-Transmitting over a socket directly from nbd_queue_rq() acquires
-cmd->lock, nsock->tx_lock, and sk_lock while blk-mq holds
-q->q_usage_counter, q->elevator_lock, and set->srcu. Because NBD sockets
-are created and owned by user space, other operations on those sockets
-or sockets sharing the same lockdep class acquire sk_lock before memory
-reclaim (fs_reclaim), mm->mmap_lock, or other subsystem locks, causing
-circular lockdep dependency reports.
 
-Break this dependency chain by queueing commands onto a per-socket
-cmd_list protected by a spinlock in nbd_queue_rq() and performing socket
-transmission from a workqueue under memalloc_noio_save().
+On 11/16/26 6:26 AM, Sean Christopherson wrote:
+> On Sat, Nov 14, 2026, Randy Dunlap wrote:
+>> Update the list of files where virtualization ioctls are defined.
+>>
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>> ---
+>> [Since having multiple maintainers trying to merge these would
+>> cause some conflicts, it would be more manageable for Jon to
+>> take all of these through the docs-next tree.]
+>>
+>> Cc: Jonathan Corbet <corbet@lwn.net>
+>> Cc: Shuah Khan <skhan@linuxfoundation.org>
+>> Cc: linux-doc@vger.kernel.org
+>> Cc: Juergen Gross <jgross@suse.com>
+>> Cc: Stefano Stabellini <sstabellini@kernel.org>
+>> Cc: xen-devel@lists.xenproject.org
+>> Cc: Hans de Goede <hansg@kernel.org>
+>> Cc: Arnd Bergmann <arnd@arndb.de>
+>> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Jason Wang <jasowangio@gmail.com>
+>> Cc: Eugenio Pérez <eperezma@redhat.com>
+>> Cc: Sean Christopherson <seanjc@google.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: kvm@vger.kernel.org
+>> Cc: virtualization@lists.linux.dev
+>>
+>>  Documentation/userspace-api/ioctl/ioctl-number.rst |    6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> --- linux-next-20261113.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
+>> +++ linux-next-20261113/Documentation/userspace-api/ioctl/ioctl-number.rst
+>> @@ -200,6 +200,7 @@ Code  Seq#    Include File
+>>  'M'   01-03  drivers/scsi/megaraid/megaraid_sas.h
+>>  'M'   00-03  drivers/video/fbdev/mb862xx/mb862xxfb.h
+>>  'M'   00-0F  drivers/video/fsl-diu-fb.h                                conflict!
+>> +'M'   01-03  xen/interface/xen-mca.h                                   conflict!
+>>  'N'   00-1F  drivers/usb/scanner.h
+>>  'N'   40-7F  uapi/linux/nvme_ioctl.h
+>>  'N'   80-83  uapi/linux/ntsync.h and uapi/linux/nvme_ioctl.h           conflict!
+>> @@ -239,6 +240,7 @@ Code  Seq#    Include File
+>>  'U'   64     drivers/usb/misc/usbtest.c                                conflict!
+>>  'V'   all    linux/vt.h                                                conflict!
+>>  'V'   all    linux/videodev2.h                                         conflict!
+>> +'V'   00-1F  linux/vboxguest.h                                         conflict!
+>>  'V'   C0     linux/ivtvfb.h                                            conflict!
+>>  'V'   C0     linux/ivtv.h                                              conflict!
+>>  'V'   C0     media/si4713.h                                            conflict!
+>> @@ -357,6 +359,7 @@ Code  Seq#    Include File
+>>  '|'   80-9F  samples/                                                  Any sample and example drivers
+>>  0x80  00-1F  linux/fb.h
+>>  0x81  00-1F  linux/vduse.h
+>> +             drivers/vdpa/vdpa_user/vduse_dev.c
+>>  0x89  00-07  asm-generic/sockios.h
+>>  0x89  06-07  linux/sockios.h
+>>  0x89  0B-DF  linux/sockios.h
+>> @@ -398,8 +401,11 @@ Code  Seq#    Include File
+>>                                                                         <mailto:kvm@vger.kernel.org>
+>>  0xAE  40-FF  linux/kvm.h                                               Kernel-based Virtual Machine
+>>                                                                         <mailto:kvm@vger.kernel.org>
+>> +0xAE  C6     arch/x86/kvm/x86.c                                        X86 KVM
+> 
+> I'd rather omit this entry.  0xAE C6 is covered by the entry above, and the horror
+> in arch/x86/kvm/x86.c is purely a 32-bit compatibility alias for an ioctl that is
+> defined in kvm.h (the structure payload defines an pointer instead of a __u64).
 
-Keep BLK_MQ_F_BLOCKING although nbd_queue_rq() no longer sleeps. With
-that flag, blk_mq_quiesce_queue() waits for an SRCU grace period of the
-tag set instead of a system-wide RCU grace period. nbd_clear_que() is
-called for every NBD_CLEAR_SOCK ioctl and every configuration teardown,
-and dropping the flag makes blktests nbd/003 about 20 times slower. Since
-nbd_queue_rq() only acquires the nsock->cmd_lock spinlock while holding
-set->srcu, keeping the flag does not reintroduce the lockdep dependency
-chains described above.
+OK.
 
-Allocate the send workqueue with the same flags as the receive
-workqueue. WQ_MEM_RECLAIM is required because the send workqueue is in
-the writeback path, e.g. for swap over NBD, and because nbd_clear_que()
-flushes it from recv_work() and from the block layer timeout handler,
-both of which may run on WQ_MEM_RECLAIM workqueues. Do not use
-WQ_FREEZABLE since request transmission was not frozen during system
-suspend before this change.
+> If it's a sticking point, e.g. this will trip automated tooling over and over, then
+> I vote to move the relevant definitions to uapi headers, e.g.
 
-Since request transmission now happens from a kernel worker thread, no
-signal can be pending while sending and the partial-send handling in
-nbd_send_cmd() is only kept for robustness. Destroy the send workqueue
-before freeing the tag set in nbd_dev_remove().
+I don't know of anything like that.
 
-Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up ea=
-rlier")
-Reported-by: syzbot+a761911cb2560f3ca2f7@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/lkml/6aec646f.aca85a03.3b899.0000.GAE@goo=
-gle.com/
-Reported-by: syzbot+d7d72f3d467710442af0@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/lkml/6aec66fc.059f5055.2712e4.0001.GAE@go=
-ogle.com/
-Reported-by: syzbot+e0faf21748da6475085c@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/lkml/6aec699e.73adde43.12e2c1.0001.GAE@go=
-ogle.com/
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/nbd.c | 158 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 112 insertions(+), 46 deletions(-)
+-- 
+~Randy
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 6373363cc4c4..4d362e3cc395 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -63,6 +63,10 @@ struct nbd_sock {
- 	int fallback_index;
- 	int cookie;
- 	struct work_struct work;
-+	spinlock_t cmd_lock;
-+	struct list_head cmd_list;
-+	struct work_struct tx_work;
-+	int index;
- };
-=20
- struct recv_thread_args {
-@@ -123,6 +127,7 @@ struct nbd_device {
- 	struct mutex config_lock;
- 	struct gendisk *disk;
- 	struct workqueue_struct *recv_workq;
-+	struct workqueue_struct *send_workq;
- 	struct work_struct remove_work;
-=20
- 	struct list_head list;
-@@ -136,7 +141,7 @@ struct nbd_device {
-=20
- #define NBD_CMD_REQUEUED	1
- /*
-- * This flag will be set if nbd_queue_rq() succeed, and will be checked =
-and
-+ * This flag will be set if nbd_send_cmd() succeeded, and will be checke=
-d and
-  * cleared in completion. Both setting and clearing of the flag are prot=
-ected
-  * by cmd->lock.
-  */
-@@ -148,6 +153,7 @@ struct nbd_device {
- struct nbd_cmd {
- 	struct nbd_device *nbd;
- 	struct mutex lock;
-+	struct list_head list_entry;
- 	int index;
- 	int cookie;
- 	int retries;
-@@ -267,6 +273,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 	struct gendisk *disk =3D nbd->disk;
-=20
- 	del_gendisk(disk);
-+	destroy_workqueue(nbd->send_workq);
- 	blk_mq_free_tag_set(&nbd->tag_set);
-=20
- 	/*
-@@ -1080,6 +1087,7 @@ static bool nbd_clear_req(struct request *req, void=
- *data)
- static void nbd_clear_que(struct nbd_device *nbd)
- {
- 	blk_mq_quiesce_queue(nbd->disk->queue);
-+	flush_workqueue(nbd->send_workq);
- 	blk_mq_tagset_busy_iter(&nbd->tag_set, nbd_clear_req, NULL);
- 	blk_mq_unquiesce_queue(nbd->disk->queue);
- 	dev_dbg(disk_to_dev(nbd->disk), "queue cleared\n");
-@@ -1139,36 +1147,12 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd=
- *cmd, int index)
- {
- 	struct request *req =3D blk_mq_rq_from_pdu(cmd);
- 	struct nbd_device *nbd =3D cmd->nbd;
--	struct nbd_config *config;
-+	struct nbd_config *config =3D nbd->config;
- 	struct nbd_sock *nsock;
- 	blk_status_t ret;
-=20
- 	lockdep_assert_held(&cmd->lock);
-=20
--	/*
--	 * No config_refs reference is held here. nbd->config and
--	 * config->socks remain valid because nbd_config_put() calls
--	 * nbd_clear_que(), which quiesces the request queue, before freeing
--	 * them. The only other place that modifies config->socks is
--	 * nbd_add_socket(). It only runs before nbd_start_device(), while the
--	 * capacity is zero and the write cache is disabled, so no request
--	 * reaches this driver concurrently (see also commit 285908f554fe
--	 * ("nbd: remove queue freeze in nbd_add_socket")).
--	 */
--	if (!refcount_read(&nbd->config_refs)) {
--		dev_err_ratelimited(disk_to_dev(nbd->disk),
--				    "Socks array is empty\n");
--		return BLK_STS_IOERR;
--	}
--	/* Pairs with smp_wmb() in nbd_alloc_and_init_config(). */
--	smp_rmb();
--	config =3D READ_ONCE(nbd->config);
--
--	if (index >=3D config->num_connections) {
--		dev_err_ratelimited(disk_to_dev(nbd->disk),
--				    "Attempted send on invalid socket\n");
--		return BLK_STS_IOERR;
--	}
- 	cmd->status =3D BLK_STS_OK;
- again:
- 	nsock =3D config->socks[index];
-@@ -1189,6 +1173,7 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *=
-cmd, int index)
- 			 * and instead just error out.
- 			 */
- 			sock_shutdown(nbd);
-+			blk_mq_start_request(req);
- 			return BLK_STS_IOERR;
- 		}
- 		goto again;
-@@ -1211,33 +1196,98 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd=
- *cmd, int index)
- 	return ret;
- }
-=20
-+static void nbd_tx_work(struct work_struct *work)
-+{
-+	struct nbd_sock *nsock =3D container_of(work, struct nbd_sock, tx_work)=
-;
-+	struct nbd_cmd *cmd;
-+	unsigned int memflags;
-+
-+	/* See nbd_queue_rq() for why nsock and nbd->config remain valid. */
-+	memflags =3D memalloc_noio_save();
-+
-+	spin_lock(&nsock->cmd_lock);
-+	while (!list_empty(&nsock->cmd_list)) {
-+		struct request *req;
-+		blk_status_t ret;
-+
-+		cmd =3D list_first_entry(&nsock->cmd_list, struct nbd_cmd,
-+				       list_entry);
-+		list_del_init(&cmd->list_entry);
-+		spin_unlock(&nsock->cmd_lock);
-+
-+		req =3D blk_mq_rq_from_pdu(cmd);
-+		/*
-+		 * Since we look at the bio's to send the request over the
-+		 * network we need to make sure the completion work doesn't
-+		 * mark this request done before we are done doing our send.
-+		 * This keeps us from dereferencing freed data if we have
-+		 * particularly fast completions (ie we get the completion
-+		 * before we exit sock_xmit on the last bvec) or in the case
-+		 * that the server is misbehaving (or there was an error)
-+		 * before we're done sending everything over the wire.
-+		 */
-+		mutex_lock(&cmd->lock);
-+		clear_bit(NBD_CMD_REQUEUED, &cmd->flags);
-+		ret =3D nbd_handle_cmd(cmd, nsock->index);
-+		if (ret !=3D BLK_STS_OK)
-+			cmd->status =3D ret;
-+		mutex_unlock(&cmd->lock);
-+
-+		if (ret !=3D BLK_STS_OK)
-+			blk_mq_complete_request(req);
-+
-+		cond_resched();
-+
-+		spin_lock(&nsock->cmd_lock);
-+	}
-+	spin_unlock(&nsock->cmd_lock);
-+
-+	memalloc_noio_restore(memflags);
-+}
-+
- static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			const struct blk_mq_queue_data *bd)
- {
--	struct nbd_cmd *cmd =3D blk_mq_rq_to_pdu(bd->rq);
--	blk_status_t ret;
-+	struct request *req =3D bd->rq;
-+	struct nbd_cmd *cmd =3D blk_mq_rq_to_pdu(req);
-+	struct nbd_device *nbd =3D cmd->nbd;
-+	struct nbd_config *config;
-+	struct nbd_sock *nsock;
-+	unsigned int index =3D hctx->queue_num;
-=20
- 	/*
--	 * Since we look at the bio's to send the request over the network we
--	 * need to make sure the completion work doesn't mark this request done
--	 * before we are done doing our send.  This keeps us from dereferencing
--	 * freed data if we have particularly fast completions (ie we get the
--	 * completion before we exit sock_xmit on the last bvec) or in the case
--	 * that the server is misbehaving (or there was an error) before we're
--	 * done sending everything over the wire.
-+	 * No config_refs reference is held here or in nbd_tx_work().
-+	 * nbd->config and config->socks remain valid because
-+	 * nbd_config_put() calls nbd_clear_que(), which quiesces the request
-+	 * queue and flushes nbd->send_workq, before freeing them. The only
-+	 * other place that modifies config->socks is nbd_add_socket(). It only
-+	 * runs before nbd_start_device(), while the capacity is zero and the
-+	 * write cache is disabled, so no request reaches this driver
-+	 * concurrently (see also commit 285908f554fe ("nbd: remove queue freez=
-e
-+	 * in nbd_add_socket")).
- 	 */
--	mutex_lock(&cmd->lock);
--	clear_bit(NBD_CMD_REQUEUED, &cmd->flags);
-+	if (!refcount_read(&nbd->config_refs)) {
-+		dev_err_ratelimited(disk_to_dev(nbd->disk),
-+				    "Socks array is empty\n");
-+		return BLK_STS_IOERR;
-+	}
-+	/* Pairs with smp_wmb() in nbd_alloc_and_init_config(). */
-+	smp_rmb();
-+	config =3D READ_ONCE(nbd->config);
-=20
--	/* We can be called directly from the user space process, which means w=
-e
--	 * could possibly have signals pending so our sendmsg will fail.  In
--	 * this case we need to return that we are busy, otherwise error out as
--	 * appropriate.
--	 */
--	ret =3D nbd_handle_cmd(cmd, hctx->queue_num);
--	mutex_unlock(&cmd->lock);
-+	if (index >=3D config->num_connections) {
-+		dev_err_ratelimited(disk_to_dev(nbd->disk),
-+				    "Attempted send on invalid socket\n");
-+		return BLK_STS_IOERR;
-+	}
-=20
--	return ret;
-+	nsock =3D config->socks[index];
-+	spin_lock(&nsock->cmd_lock);
-+	list_add_tail(&cmd->list_entry, &nsock->cmd_list);
-+	queue_work(nbd->send_workq, &nsock->tx_work);
-+	spin_unlock(&nsock->cmd_lock);
-+
-+	return BLK_STS_OK;
- }
-=20
- static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned lo=
-ng fd,
-@@ -1364,6 +1414,10 @@ static int nbd_add_socket(struct nbd_device *nbd, =
-unsigned long arg,
- 	nsock->pending =3D NULL;
- 	nsock->sent =3D 0;
- 	nsock->cookie =3D 0;
-+	nsock->index =3D config->num_connections;
-+	spin_lock_init(&nsock->cmd_lock);
-+	INIT_LIST_HEAD(&nsock->cmd_list);
-+	INIT_WORK(&nsock->tx_work, nbd_tx_work);
- 	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
- 	socks[config->num_connections++] =3D nsock;
- 	atomic_inc(&config->live_connections);
-@@ -1766,7 +1820,7 @@ static int nbd_alloc_and_init_config(struct nbd_dev=
-ice *nbd)
- 	 * readers that observe a non-zero config_refs also observe the new
- 	 * nbd->config value. Pairs with the barrier after
- 	 * refcount_inc_not_zero() in nbd_get_config_unlocked() and with the
--	 * smp_rmb() in nbd_handle_cmd().
-+	 * smp_rmb() in nbd_queue_rq().
- 	 */
- 	smp_wmb(); /* Pairs with smp_rmb() and smp_mb__after_atomic(). */
- 	refcount_set(&nbd->config_refs, 1);
-@@ -1965,6 +2019,7 @@ static int nbd_init_request(struct blk_mq_tag_set *=
-set, struct request *rq,
- 	struct nbd_cmd *cmd =3D blk_mq_rq_to_pdu(rq);
- 	cmd->nbd =3D set->driver_data;
- 	cmd->flags =3D 0;
-+	INIT_LIST_HEAD(&cmd->list_entry);
- 	mutex_init(&cmd->lock);
- 	return 0;
- }
-@@ -2040,6 +2095,15 @@ static struct nbd_device *nbd_dev_add(int index, u=
-nsigned int refs,
- 		goto out_err_disk;
- 	}
-=20
-+	nbd->send_workq =3D alloc_workqueue("nbd%d-send",
-+					  WQ_MEM_RECLAIM | WQ_HIGHPRI |
-+					  WQ_UNBOUND, 0, nbd->index);
-+	if (!nbd->send_workq) {
-+		dev_err(disk_to_dev(nbd->disk), "Could not allocate knbd send work que=
-ue.\n");
-+		err =3D -ENOMEM;
-+		goto out_free_recv_work;
-+	}
-+
- 	mutex_init(&nbd->config_lock);
- 	refcount_set(&nbd->config_refs, 0);
- 	/*
-@@ -2066,6 +2130,8 @@ static struct nbd_device *nbd_dev_add(int index, un=
-signed int refs,
- 	return nbd;
-=20
- out_free_work:
-+	destroy_workqueue(nbd->send_workq);
-+out_free_recv_work:
- 	destroy_workqueue(nbd->recv_workq);
- out_err_disk:
- 	put_disk(disk);
