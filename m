@@ -1,54 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794789923;
-	b=qLqWPv57iyDayy7LXtSsRn+XmtOBrnpDwjV42ld8lBV02gRBbksqAGqSjVND5Vx2xa7V
-	 NFMciI/hKh0eqD95V/2VEv5E8+yvyn347EWhO/Aip7kBk/heJ3TZSjRQlrcObo1GrsJPx
-	 +BeVud5sYggfDiTi+bvYUYSLUjhBtlxD1/ofgppL32Yv7rQh8Hhe+jJoJTrswuobvxdjq
-	 7IyJ60vpC0Kzl0wCGmNSpte1WqVzHkgRil+5usMKNJULFreSXyWh7gGNpnGgpFnN/84GL
-	 3IfzocYyAhDWwOFFjBP5wpN5KDoW+MX7e1dqVYivxn3eCcXqz+ojhvRvy29zy2b06nA==
+	t=1794800288;
+	b=OUr65sfGFPjssltT8C93HTWFCodEhVugbc/XHFjyU0xtWnU4NUB9tWP6V68wtFShEHH1
+	 e0zyJ5QePMZEmasUXaacUVXPXV5b4mlitvOTUQdLKmL/+yKGqdIemu61z+LSZKuz/BmoO
+	 E8FWCFxaJwe9km576JBybRR7VSpo09CWbaY+6ymE5ksY5L47uDxxzydaS3Wf3QTvtIjeL
+	 2oemRsHCBGKfGld+OrzvhY4zUUO308fiYYOERQzZbkM07rW3Qvj2zkFcKyf2D5Phm0LQm
+	 SvPL41vGJy6sati/cgJ72dj2l5ClqgQRYz/kGAWxg1LdJ7GgEDihw8F565JtWRlxJLA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794789923;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=nEPXf1cG5J+Lghgn3UQeDfptX1Hk+zVJPSj0Zk2IzFQ=;
-	b=XA8jO1bImAyQq652g+O9ysgTK9J0LNpAnQUCF6P0+KREaZyDH97zgP0cbZgKW4QBrVzh
-	 0Szb5+liCTrpnniEQpam4TQzQiTdyPwgIetNUM9e4tp1kPMxcqWFH0c28PXNjacbrUwsE
-	 NrEoBQbjRGB0e4L4wkn8WlGuSvRzbsDtErzZd7ZxcYyMgDPnpeiDYfljqMxAet5pOtv96
-	 cLqrf0F+eYXXk0fH05px2IeetyTx8Dj1dyuHWoOJ4XWJ01Q66b8KC9SyJu8ixbF7dWKfl
-	 T6WkWVOEKaypXGwxu+wOStxtQF8PEqc9/NrnbSp9BZUU3iC23HAQuZnqTYjLOkOYrFw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794800288;
+	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=Msgd0NATVk+Deh7ARJ6zRdTSPp77qlTcudhDUDfWd/g=;
+	b=0gpt2DDy17K47z6ogbQU2ekzyYEdVdRORfZV+99YNwF1+rpi3fUhlAsGlVgXMycqT0SL
+	 bYA8djcaXrQ3RZ7CA1LkXbeTnm88yNfCRI/ueCuDbP6rbbA8FnEPKxCDssnqbgY9QdB27
+	 M1o5rzUAix2s7zEKJ+5luY8JskG4+/srqVgOEQlHn9ZQ7jtB5+pWc8FF3eE2XIrX+o/Jx
+	 b1Nh4mSU2BrdwqrUVuhVtK7VvwtRug6whcSvEOF1O7TNukxGHJlm6CYUCnxpb2TVNACsD
+	 Zl2omcEyUIjn8KFljmP946tZxf8L73hVNAc6K2IN4sqZ5HRIrCArQ9jYKWQaLiSmPWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=Ov44YrtP;
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YosgrFBI;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A57606A31F;
-	Mon, 16 Nov 2026 00:45:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91A57606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A75606A31C;
+	Mon, 16 Nov 2026 03:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=Ov44YrtP
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=nEPXf1cG5J+Lghgn3UQeDfptX1Hk+zVJPSj0Zk2IzFQ=; b=Ov44YrtPxUC++hYRNDHSdmdpGW
-	JaxLbFR1NnGayLi7FHLtyTi+He4ZYSfoC7yWmGobJ7E/AIaLAiwDiqmK+og7vdQvnP4EzvIpr462x
-	EDmrhZM3u/N2SWbcqZV+o7jR7R+AN7ZLDYmWxP5FpNx3G+I1qCrQflyake80HiJ9rMKVM/x4eT782
-	9JEn4jhTrQPKUH9n7ugwPApkYe7cQrElzRWPUKP8gRVT9cQSw9rpPJq9AX3iS6GqmzfQn0wqcsM7f
-	leTLxbzdojuK+f/LSdN/KzQKSZ97Y6xYotP0eKRTTUizqT5t8J7W/n/cd6b1FIlVQIvCGZw4VHm9P
-	KD0dlVWg==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xSkqM-00000000pP7-2dPd;
-	Mon, 16 Nov 2026 00:45:10 +0000
-Message-ID: <bbdb3140-dc5f-4ae1-a5a9-c2e25387409a@infradead.org>
-Date: Sun, 15 Nov 2026 16:45:07 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YosgrFBI
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D387B1F000C4;
+	Mon, 16 Nov 2026 03:38:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794800287;
+	bh=Msgd0NATVk+Deh7ARJ6zRdTSPp77qlTcudhDUDfWd/g=;
+	h=From:Date:Subject:To:Cc;
+	b=YosgrFBIhZ970IDZCA81XrArA7Nl6Z9x9ixYiw8bmoVP+meP9znfgx9LnUfq6MvSP
+	 LZxVZIan5rX4tZf2ph/FDBp23cDbwTqnQw36RhoIvR/ieSjRDvWebskv4mmNmoOmUU
+	 oaEdDfx+9EsznKyFmGHtjJV/y3kBtq2rDpAM5vUCAeysndrKlcgrsGi5PRZkA4lOlC
+	 vb9lgtCpSZMzVQsrIT6yrZjbf+zTAftAJsu2+PmNDSI9QRt6PPViS6UYQxFQCndIaO
+	 XGWr4YF/pk37ykHXycc8OMhUbYEPAdipcp06PV+SU/BnAcSwcRBULUtUhZICpoMI3W
+	 cRJNX1jh4x72w==
+From: Nathan Chancellor <nathan@kernel.org>
+Date: Sun, 15 Nov 2026 20:37:57 -0700
+Subject: [PATCH v2] blk-throttle: Avoid unsequenced accesses to jiffies in
+ throtl_schedule_pending_timer()
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,87 +53,96 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/12] docs: ioctl-number: update MM entries
-To: "David Hildenbrand (Arm)" <david@kernel.org>, linux-kernel@vger.kernel.org
-Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- linux-doc@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
- Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
- linux-mm@kvack.org, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowangio@gmail.com>, David Heidelberg <david@ixit.cz>,
- oe-linux-nfc@lists.linux.dev, Chas Williams <3chas3@gmail.com>,
- linux-atm-general@lists.sourceforge.net,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Helge Deller <deller@gmx.de>,
- linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- MPT-FusionLinux.pdl@broadcom.com,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org,
- Neill Kapron <nkapron@google.com>, Andrey Konovalov <andreyknvl@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
- Hans de Goede <hansg@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Jan Kara <jack@suse.cz>,
- linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
- linux-ext4@vger.kernel.org, Mike Marshall <hubcap@omnibond.com>,
- devel@lists.orangefs.org, Paulo Alcantara <pc@manguebit.org>,
- Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
- Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
- linux-f2fs-devel@lists.sourceforge.net,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- Tzung-Bi Shih <tzungbi@kernel.org>, Benson Leung <bleung@chromium.org>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- amd-gfx@lists.freedesktop.org, Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
- <tursulin@ursulin.net>, intel-gfx@lists.freedesktop.org,
- Matthew Brost <matthew.brost@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- intel-xe@lists.freedesktop.org
-References: <20261114202653.3113381-1-rdunlap@infradead.org>
- <20261114202653.3113381-2-rdunlap@infradead.org>
- <f37ccd71-8e1d-4dd4-b11a-e22b9e617dea@kernel.org>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <f37ccd71-8e1d-4dd4-b11a-e22b9e617dea@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20261115-blk-throttle-wunsequenced-v2-1-1d297c891b82@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAA/42NQQ6CMBBFr0K6dgzTiiGuvIdhAe0UKqTVaUEN4
+ e4CXsDlS95/fxaR2FEUl2wWTJOLLvgV5CETuqt9S+DMykLm8oyIJ2iGHlLHIaWB4DX6SM+RvCY
+ DWluVl7VUGhux7h9M1r339q36cRybO+m0BTejczEF/uznE27ePz8TAoKRJZmiKJS16toTexqOg
+ VtRLcvyBe60FUHVAAAA
+X-Change-ID: 20261114-blk-throttle-wunsequenced-ccf308a23c1b
+To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+ Jens Axboe <axboe@kernel.dk>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev, stable@vger.kernel.org, 
+ Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2881; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=HDprAJyUPEVxg+gggrc0F17vpUYJT+ZMNUoLcllntCA=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFm/qmZFhv3bttnO9eiDHfvfZ9v9+Llpk+Rk8QDxxWvW8
+ YaLJmfu6ihlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQATOa/M8L9WYbd/tvrkzmvM
+ ZUEO/OsDeSZYPL9853/Uxa5zmzek39vByDDfcetG3+LZ28RPVkVXfllsfZerffLBJearf3BUqc1
+ ST+AGAA==
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
+After a recent improvement in clang to warn on unsequenced accesses to
+volatile variables [1], two instances appear in
+throtl_schedule_pending_timer(), which can break the build with
+CONFIG_WERROR=y / W=e:
 
+  block/blk-throttle.c:469:25: error: unsequenced accesses to volatile qualified 'jiffies' [-Werror,-Wunsequenced]
+    469 |                    expires - jiffies, jiffies);
+        |                              ~~~~~~~  ^
+  block/blk-throttle.c:469:25: error: unsequenced accesses to volatile qualified 'jiffies' [-Werror,-Wunsequenced]
+    469 |                    expires - jiffies, jiffies);
+        |                              ~~~~~~~  ^
 
-On 11/15/26 8:58 AM, David Hildenbrand (Arm) wrote:
-> On 11/14/26 21:26, Randy Dunlap wrote:
->> Add ioctl number entries for test_hmm_uapi and gup_test.
-> 
-> Just curious, why do we care about uapi for test interfaces that never see the
-> light of day in production kernels and their sole purpose is to go a long a
-> dedicated selftest?
+Per C11 5.1.2.3.2, accessing a volatile object is a side effect. Per C11
+6.5.2, unsequenced side effects on the same scalar object are undefined
+behavior. Per C11 6.5.2.2.10/12, the evaluation of arguments in a
+function call is indeterminately sequenced, meaning any side effects in
+the arguments are unsequenced.
 
-a. We don't control who builds/runs these tests.
-b. There might be some USB gadget or HID driver running at the same time
-   as these tests.
-c. It's preferable not to have conflicts, so any additions to this file
-   should try to avoid these documented ioctls.
+Add a local variable to hold the value of jiffies before the function
+call so that there are no unsequenced side effects, clearing up the
+warning.
 
--- 
-~Randy
+Cc: stable@vger.kernel.org
+Fixes: 69df0ab030c9 ("blk-throttle: separate out throtl_service_queue->pending_timer from throtl_data->dispatch_work")
+Closes: https://github.com/ClangBuiltLinux/linux/issues/2191
+Link: https://github.com/llvm/llvm-project/commit/955715460eaf9188c241c74750637fc82dfcc423 [1]
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+Changes in v2:
+- Reuse value of jiffies in max_expire to avoid
+  -Wunused-but-set-variable for j when CONFIG_BLK_DEV_IO_TRACE is
+  disabled (Sashiko)
+- Link to v1: https://patch.msgid.link/20261114-blk-throttle-wunsequenced-v1-1-d28ed5553ff3@kernel.org
+---
+ block/blk-throttle.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index c5e26551956a..8e58e50bce4d 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -453,7 +453,8 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
+ static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
+ 					  unsigned long expires)
+ {
+-	unsigned long max_expire = jiffies + 8 * DFL_THROTL_SLICE;
++	unsigned long j = jiffies;
++	unsigned long max_expire = j + 8 * DFL_THROTL_SLICE;
+ 
+ 	/*
+ 	 * Since we are adjusting the throttle limit dynamically, the sleep
+@@ -466,7 +467,7 @@ static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
+ 		expires = max_expire;
+ 	mod_timer(&sq->pending_timer, expires);
+ 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
+-		   expires - jiffies, jiffies);
++		   expires - j, j);
+ }
+ 
+ /**
+
+---
+base-commit: ab43ec385580b8f8abf72d70fa3acbf4e4f098a5
+change-id: 20261114-blk-throttle-wunsequenced-ccf308a23c1b
+
+Best regards,
+--  
+Cheers,
+Nathan
 
