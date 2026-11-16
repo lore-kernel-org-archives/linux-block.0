@@ -1,76 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.197
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794839185;
-	b=ixlnsdxHg4+WvfJvNkhqGs3/mpOhLatLeIv0qUKY1SvebF5AegwCOwmzEiWA01PD5zjb
-	 csrfB0GFs9XuYvT4qzQDahqazfP1JtUioRPqYMPrC0LuqPi6VUEofPlXXv0qtoyex4APe
-	 wv2s70Esc85kpDvIBWvQlBieIRjT4QCthI651qP6BGLYQYAsaYZUCkaon8w4qAd4Tm9Uv
-	 /7VbKKQ/o673v7HI2hjCm7vrPQgLyj5bmsqgWk4GO7RuTq06I6xQ3293alHWH5sfu0gMd
-	 enku7IxkG9KfvT2uimwT4donI3OpEMM11tZzwHg4c+fEXJZcvVYCqLPLnjN6+LweySA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794839185;
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=209.85.219.49
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
+	t=1794843159;
+	b=cfuQ1mBOK4bkd4J0mP5liVf9PIHe6zUbmVCMqwE15lO1iTZJCID47cIRijYab0mzWErI
+	 8jpo3AH3wnyqpohFvYJNxEHWbewlQ79zg9+HEdd0e2/4t4p++l42JdiR0lqqyYHLXpY1m
+	 C1RGv2YcTk3X0Z1+/kP6oX85ulPTWh2PXLwWXXyJ/paWOkfQ3k9vM+gn88ZAAVskgB1/U
+	 dfGd6QCnqYE1b/SgOUPLoSZr2EiOkxUB0TDuGmXSGcBA0zbi5oEl95YXKlSRd1o6llviW
+	 X2lfhuJU9UhCGOO9oK3GS70T0J682nilUwbG2gbGnUpdWH4301IPXJz/U1gRiRXr57A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794843159;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:Message-ID:Subject:From:To:Cc:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=Julx96UTlwUpy/yEEb6XKUMDaihQ6nHqBxqUTRWWoDs=;
-	b=J/yabYPoZROhf+p80vRY/ziX31kMNW9Bs3NhBmfVUkTyvA5ViptMteK2F6NkgDZ94Ja0
-	 fD3vKHxTjT9fpq6LKfFtwzog4NxQQioBoPx08hB3Vdk92/uhnREx7TmrYyPaYFjierJS0
-	 4wc/fq/tu+b4p0tNwSlF4u8t6/mP1/+g0hCGw4d3cCmTYE9wrszDGvF/d6sAHOM5iTWsO
-	 dK2XUZwTO0nbc5uGmZs1SXX79LwIWOiMKJIOW3L7zDDcCFtvkfJ7Zma4Y65W4a5k+h1QD
-	 zxMFxR3uKU7p5c1FGRvRzu6EYwUDE7uxIiLyFzEmokvTLQCJUJBTGbaV+XVZhuWWyAQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=o04lO8GG;
-	arc=none smtp.remote-ip=209.85.210.197
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type;
+	bh=UZfjUUdOGV4n+muBluIHHduUrTQ0oRHWELrphw0Vc24=;
+	b=YQFJO/MdrbrTKvlwogXO72GM3Ojf2uqlIT+a/TTr6GHLQAKFG1VHgW4U3orMIc3O3a6n
+	 9WQI/uxwWD/6LbtuSaBL/WjWFcFK5OvSKey1Yfy+ERfufP6hAf79JHUQvnO2ww0v/p2W8
+	 bDcPCo4nzOJ326HppFOc1R7Xhg3TfHeEtdrlQZXckDousJnMO9x/nmh2ci7Yv+1+N6ssr
+	 rQyBpxSM3AF5YSUZcEtotUIHpPmAsrYE6EkTT+urxj6T6VoQzQiSvgIK9s22VkDEnJKRl
+	 F8koVLuj8AHyDTXcsTQ9CmyXWf3QPgm6og1q0a/R1r+EfTp72fKudr4ZtIbKUeHCqQw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vJiYISSE;
+	arc=fail smtp.remote-ip=209.85.219.49
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9A9606A329
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 14:26:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC9A9606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2CB606A31C
+	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 15:32:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EF2CB606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=o04lO8GG
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-8b69b8c6dd5so4468408b3a.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 06:26:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vJiYISSE
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-91ea0c05c92so51039586d6.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 07:32:38 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794843158; cv=none;
+        d=google.com; s=arc-20260327;
+        b=XQauuzPhSiJsfb+EF8y9u8ttafXRD+itOej1zZyDWDiGJzLvswvbbi54rK0U56UdIN
+         guUcBx5opK9Vj6drlF8hFhcumYsV/EgUJi8insNgJhzseXHPzYZX0ubWXPiACn+fNzph
+         DBIgxMmcDSUH0j9OS8OaLreP7XvjeSufZaifJAZl/yj+AjxO+yO+uBTCpCavMiFbhYFj
+         gwYF5AKu/WDzsQJ2e1wAybTHJ2mXxHDiSKkI+8JE/7MeeKdcX2Q5HdYfYefL8QNeswqj
+         3dSt3Tzu9X3+tWsEVs3Oii6SxbpXf53/pmdke5cyukitXQKLvXTYAWB6JTecwA1X8K4d
+         Xihg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=UZfjUUdOGV4n+muBluIHHduUrTQ0oRHWELrphw0Vc24=;
+        fh=a2eciKvubi64cDRtq+Cr2umtNxDZR7TgbL4uzisuGsQ=;
+        b=ORdM4OOvFcdyu1Gl5q0GJzVG77aOzk0N8ubDqAVAjd8rztWUCoqA3n0JdKqZx5uLcx
+         K/lI3KmQ5n1DdFYr4sZG4aARQuQPLkiiUc+TKxel1QbogeMT+3mb+1JpoqQiklUpa9a4
+         MRbof3s4F+sgteNkX2uGrvtvvU+Ep6vl3R1ZKb/ZE7yJV8uKZW5dkuzIWmgbsH2u5Kl7
+         4pDFJvG1ct0ubb5drhME1KjOlxt440bX/nRg+RQsd86tn5D1E/eH5KGRoinyQjyLX0bH
+         iAjAQWWpaSktsbwG74X2qKUftGUkXajbdyXsdDNSnLvB37Ekz00kpCD3uZal2xPB5LIx
+         YeUQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794839184; x=1795443984; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Julx96UTlwUpy/yEEb6XKUMDaihQ6nHqBxqUTRWWoDs=;
-        b=o04lO8GGgXrESFKdzPFhg+2CZ66oWV/D9RCdkmGQv5zmRx4ocR7cMj49UAZWLzQ08p
-         Exgjw5nzv+VU/noSZj1qNSRM42Efhd5UU9M4zYhj9hYL33RguWZjEdRIwhZZKtjjmAWK
-         CZHQW0LenzCeV4Az+D9oYTYe1+JdnXTThTdnyyA0qyK3iEfA5CNu2rFJPxjCMaEbDPPa
-         4GWRcxQfsKciv2s2Xnp6TE4BCnhHiUeXbt2eHpPmzKjfbnT06BfdZVvWfMuXAZ4NfG2z
-         lvfm/r/kXhSPWJ2Thy+3cctCZhv0qphjwQepT6O3eDBYyRmyUCFE1kDkMxO3F8tlJaEg
-         ursQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794839184; x=1795443984;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20260707; t=1794843158; x=1795447958; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Julx96UTlwUpy/yEEb6XKUMDaihQ6nHqBxqUTRWWoDs=;
-        b=l4oBzjcc9/NIupTWCNk8ovAoHgkpQnsLHhOO9RedusFSns9+UtMLqqU4ox2RDDkSyr
-         Jq9WXWa345BM4z++KTcz67qYyaofrmUwPkzc8RiTnmTa1Anv5hcICZ8aYfV2+x67ToVL
-         tWajO3GYu0YzysGrqR6Fc5sXq1LuxueOOEqbyU7dYB5QoP8azh9l4FfDV6YNsLlPOW5q
-         RtefpIOn/V7vyLE5cvhTkpxO0sKywGxgdBWaQ0Fhk2l0LIZT6fuKXkt1jtcv8lF+7mLH
-         p/Mxcp1ytw/t6+32Y2vQJifWIlJjHUTLcjnPffJxqOLe7fT9fLg391CpbqH/HUzwxi4c
-         z4yA==
-X-Forwarded-Encrypted: i=1; AL+hErHSa5fC97JZcC2WJh50KIgqqUe4tr0pplkjx4tV7EFZx1nwWMgzQLYADwwslgf7AP1NZ4/As7ZnB2y3qQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z97PUXfpAjKNzlsaNMeD/CZUBByG2+vdpq9bUMkiQxnl86Qc7sc
-	SzTG0cHdIeqTJVEFwFsBlvu5mzEh89e8jKY1RClENd+A+orWj7qUb3aT7verkToNaEnOmQBHbhK
-	zHlwQ4Q==
-X-Received: from pffm4-n2.prod.google.com ([2002:a05:6a00:c304:20b0:8a0:70d8:a2ef])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4fc3:b0:89f:b166:bde6
- with SMTP id d2e1a72fcca58-8beb8cc8ad6mr9720424b3a.54.1794839183449; Mon, 16
- Nov 2026 06:26:23 -0800 (PST)
-Date: Mon, 16 Nov 2026 06:26:22 -0800
-In-Reply-To: <20261114202653.3113381-10-rdunlap@infradead.org>
+        bh=UZfjUUdOGV4n+muBluIHHduUrTQ0oRHWELrphw0Vc24=;
+        b=vJiYISSEW85hJMCPpfsyCN3ZkSJKg0MWSYEXXGl1KGF8rw9JNmPK3TazqOtdRKHN5o
+         LVaxVKgv8fFDR6iFvvanbAkKpFTnsG/f17IrYDvhp0N3oOsyOAj1D0EII5U1fMwXWvw+
+         cFO2hOKT6kOyZ/buLAbuFZBU5eAHCZd4Pnk8mGb2QXHKBjXX4osgIvYSLSoq3HHBYKQU
+         q2LSf2rGBAgADwC6pg/0gLDdyHv37OZ285IfJ7soH8NiE6Ij5SThvWgN91odFNR6dr9J
+         Z7T8RJ+4EsCLA1Il9n85LOTVDE7kgahkDvvJ66NAUujuut7iVbpynvNz5r/zT8hXmbYp
+         hjKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794843158; x=1795447958;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=UZfjUUdOGV4n+muBluIHHduUrTQ0oRHWELrphw0Vc24=;
+        b=sV7AlMKgaUein8KjSF35T8R5OrQ5VR7OAyzu2akvQ15UXrP/yZIb1N3/6sJCQY8SFj
+         Mi9NS/rZAhXMtn9I1SPA+jZjmvPEOZKwWUV/+Mxsp3TTvlq/14/8xPSJNYF3whLWXupH
+         zWdoY2l6TAWhF2YOJfJsE+MOz7xZDuBCyWY16C9AexUb9jABio+gFn8u0fG746fXJAEQ
+         XLCm8LnetFGbTwaPv/qxxPwsxHBRs7xXAVzGstKS6tzW6zP++UnDGFfACtwgj4yKNO0h
+         AScYaBN5ohOvB6LslPr1BFEWavJrpCAWmYCfp+UvSWdeIWtIEl5Fxruy+eNY2KaOk0Rj
+         16xA==
+X-Forwarded-Encrypted: i=1; AL+hErGqIAZYehk1gMwxrbqp4xQMRmuM/Z6tQlUzGC06js1I7fwGbRCtTPzZ8OcGXzA89wweGfWs9DP1C6sDzw==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/m0YSx1vf6rC7CHfQT7yORYqzUcwVEaZgKF30b/mQRMerbcO+f
+	NwJG0bEjcKk1jyliHa7+a4YAJ8NILQ2JSyo313M8mv1Qpt7YKc4vufzhL3l/fj9f4uHFJElygfO
+	HnQ4aw8dZ0vl4PYQBq+pnwB+WvLkcHV0=
+X-Gm-Gg: AZFdTZc2gYK6PcNXYwM8sjx1+wNLCS5ackTwmcsdUGzYrH5dPzZh1amysPsccEBRSR9
+	N+Jk7Ar5JB22ENF2iY7sv4wDhR9za2C94VrBMlKOSJIQkZA8l3TVlKwDwQQZIHx5aPPqGW7DzuQ
+	9q4Ezv1QB/bi1cR53XseFaXJQ6LLdJdCbl1M1m4kwBEP+LdxHiXCBApFud74Ft4nFVaBqjLz8Uw
+	fjgkIoIGmRokNGEGFSHHj4yNuQraVGZxv81VKly5I8hx/rZe9sfke1nUcNWKWyZ9gecEx4vfw2V
+	ZTcPRcf7u136WP7hHYGaRJjCceVqpZP9Lu5AoWXwaMY4Zcvxyd8B8kZY3w8RekZw1svn1E7N9sG
+	WULwOvqmqHh05Zo7IlN6W3vSl+9yq2578i4hjewtzL+Lv8pgxUhYnTwaRRW1numFWBqt/j7BPED
+	YaPaQ=
+X-Received: by 2002:a05:6214:c6f:b0:91c:133d:4916 with SMTP id
+ 6a1803df08f44-91f24258d3bmr175963246d6.57.1794843157790; Mon, 16 Nov 2026
+ 07:32:37 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -79,222 +103,105 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-References: <20261114202653.3113381-1-rdunlap@infradead.org> <20261114202653.3113381-10-rdunlap@infradead.org>
-Message-ID: <avsSjioXqbCOn834@seanjc-mac.roam.internal>
-Subject: Re: [PATCH 09/12] docs: ioctl-number: update virtualization entries
-From: Sean Christopherson <seanjc@google.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org, 
-	David Hildenbrand <david@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, linux-mm@kvack.org, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowangio@gmail.com>, 
-	David Heidelberg <david@ixit.cz>, oe-linux-nfc@lists.linux.dev, 
-	Chas Williams <3chas3@gmail.com>, linux-atm-general@lists.sourceforge.net, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Helge Deller <deller@gmx.de>, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, MPT-FusionLinux.pdl@broadcom.com, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org, 
-	Neill Kapron <nkapron@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org, 
-	Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, 
-	Hans de Goede <hansg@kernel.org>, Arnd Bergmann <arnd@arndb.de>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"Eugenio =?utf-8?B?UMOpcmV6?=" <eperezma@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, Jan Kara <jack@suse.cz>, 
-	linux-fsdevel@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>, linux-ext4@vger.kernel.org, 
-	Mike Marshall <hubcap@omnibond.com>, devel@lists.orangefs.org, 
-	Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, 
-	linux-f2fs-devel@lists.sourceforge.net, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	Tzung-Bi Shih <tzungbi@kernel.org>, Benson Leung <bleung@chromium.org>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Alex Deucher <alexander.deucher@amd.com>, 
-	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, amd-gfx@lists.freedesktop.org, 
-	Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, intel-gfx@lists.freedesktop.org, 
-	Matthew Brost <matthew.brost@intel.com>, 
-	"Thomas =?utf-8?Q?Hellstr=C3=B6m?=" <thomas.hellstrom@linux.intel.com>, intel-xe@lists.freedesktop.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+References: <20261112134703.38510-1-nondet@yandex.ru> <20261112134703.38510-2-nondet@yandex.ru>
+ <avmLAy52vfyJ5qze@hungrycats.org>
+In-Reply-To: <avmLAy52vfyJ5qze@hungrycats.org>
+From: Alexey Kuznetsov <kuznetsov.alexey@gmail.com>
+Date: Mon, 16 Nov 2026 15:31:59 +0000
+X-Gm-Features: Aa3M54oeRpvY83d0nLazjOVqW7eXFFClTJV0uMrGDZK8xguOz0qojD8xIBRH0QU
+Message-ID: <CAO1Zr+q5hhK5oPJtQu8v3oh=-AfB9FuPF2VQA=zpSGA0afB-FQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/1] btrfs: track physical bad extents, fast-fail,
+ persist, and relocate
+To: Zygo Blaxell <ce3g8jdj@umail.furryterror.org>
+Cc: linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org, 
+	dm-devel@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Nov 14, 2026, Randy Dunlap wrote:
-> Update the list of files where virtualization ioctls are defined.
->=20
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> [Since having multiple maintainers trying to merge these would
-> cause some conflicts, it would be more manageable for Jon to
-> take all of these through the docs-next tree.]
->=20
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Shuah Khan <skhan@linuxfoundation.org>
-> Cc: linux-doc@vger.kernel.org
-> Cc: Juergen Gross <jgross@suse.com>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: xen-devel@lists.xenproject.org
-> Cc: Hans de Goede <hansg@kernel.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowangio@gmail.com>
-> Cc: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Cc: virtualization@lists.linux.dev
->=20
->  Documentation/userspace-api/ioctl/ioctl-number.rst |    6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> --- linux-next-20261113.orig/Documentation/userspace-api/ioctl/ioctl-numb=
-er.rst
-> +++ linux-next-20261113/Documentation/userspace-api/ioctl/ioctl-number.rs=
-t
-> @@ -200,6 +200,7 @@ Code  Seq#    Include File
->  'M'   01-03  drivers/scsi/megaraid/megaraid_sas.h
->  'M'   00-03  drivers/video/fbdev/mb862xx/mb862xxfb.h
->  'M'   00-0F  drivers/video/fsl-diu-fb.h                                c=
-onflict!
-> +'M'   01-03  xen/interface/xen-mca.h                                   c=
-onflict!
->  'N'   00-1F  drivers/usb/scanner.h
->  'N'   40-7F  uapi/linux/nvme_ioctl.h
->  'N'   80-83  uapi/linux/ntsync.h and uapi/linux/nvme_ioctl.h           c=
-onflict!
-> @@ -239,6 +240,7 @@ Code  Seq#    Include File
->  'U'   64     drivers/usb/misc/usbtest.c                                c=
-onflict!
->  'V'   all    linux/vt.h                                                c=
-onflict!
->  'V'   all    linux/videodev2.h                                         c=
-onflict!
-> +'V'   00-1F  linux/vboxguest.h                                         c=
-onflict!
->  'V'   C0     linux/ivtvfb.h                                            c=
-onflict!
->  'V'   C0     linux/ivtv.h                                              c=
-onflict!
->  'V'   C0     media/si4713.h                                            c=
-onflict!
-> @@ -357,6 +359,7 @@ Code  Seq#    Include File
->  '|'   80-9F  samples/                                                  A=
-ny sample and example drivers
->  0x80  00-1F  linux/fb.h
->  0x81  00-1F  linux/vduse.h
-> +             drivers/vdpa/vdpa_user/vduse_dev.c
->  0x89  00-07  asm-generic/sockios.h
->  0x89  06-07  linux/sockios.h
->  0x89  0B-DF  linux/sockios.h
-> @@ -398,8 +401,11 @@ Code  Seq#    Include File
->                                                                         <=
-mailto:kvm@vger.kernel.org>
->  0xAE  40-FF  linux/kvm.h                                               K=
-ernel-based Virtual Machine
->                                                                         <=
-mailto:kvm@vger.kernel.org>
-> +0xAE  C6     arch/x86/kvm/x86.c                                        X=
-86 KVM
+Hi Zygo,
 
-I'd rather omit this entry.  0xAE C6 is covered by the entry above, and the=
- horror
-in arch/x86/kvm/x86.c is purely a 32-bit compatibility alias for an ioctl t=
-hat is
-defined in kvm.h (the structure payload defines an pointer instead of a __u=
-64).
+Thanks for the detailed review. It changed the design, not just the patch.
 
-If it's a sticking point, e.g. this will trip automated tooling over and ov=
-er, then
-I vote to move the relevant definitions to uapi headers, e.g.
+I agree with the core point: physical bad-sector handling belongs below the
+filesystem. A drive with spare sectors already does the useful part in
+firmware: the filesystem sees EIO or a checksum mismatch, retries another
+copy, and rewrites the good data to the failed LBA. That rewrite is what makes
+the drive move the sector to a spare. We only need a block-layer replacement
+when the drive can no longer remap, because the spares are exhausted or the
+firmware refuses.
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
-m.h
-index 00ce265391e1..e02ef7a39f7c 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -230,6 +230,18 @@ struct kvm_msr_filter {
- 	struct kvm_msr_filter_range ranges[KVM_MSR_FILTER_MAX_RANGES];
- };
+I also accept the consequences you spelled out: the remap unit has to be the
+lower device's logical block size; reserve allocations must never move; and
+the table has to be crash-consistent with the data, with FLUSH/FUA committing
+table changes and two copies protecting the metadata. btrfs should not
+intercept physical I/O for this.
 
-+struct kvm_msr_filter_range_compat {
-+	__u32 flags;
-+	__u32 nmsrs;
-+	__u32 base;
-+	__u32 bitmap;
-+};
-+
-+struct kvm_msr_filter_compat {
-+	__u32 flags;
-+	struct kvm_msr_filter_range_compat ranges[KVM_MSR_FILTER_MAX_RANGES];
-+};
-+
- struct kvm_cpuid_entry {
- 	__u32 function;
- 	__u32 eax;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0771efaf94c8..ef9f92cba589 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4260,21 +4260,6 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- }
+Verified defects
+----------------
 
- #ifdef CONFIG_KVM_COMPAT
--/* for KVM_X86_SET_MSR_FILTER */
--struct kvm_msr_filter_range_compat {
--	__u32 flags;
--	__u32 nmsrs;
--	__u32 base;
--	__u32 bitmap;
--};
--
--struct kvm_msr_filter_compat {
--	__u32 flags;
--	struct kvm_msr_filter_range_compat ranges[KVM_MSR_FILTER_MAX_RANGES];
--};
--
--#define KVM_X86_SET_MSR_FILTER_COMPAT _IOW(KVMIO, 0xc6, struct kvm_msr_fil=
-ter_compat)
--
- long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
- 			      unsigned long arg)
- {
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 8dff2fc1972e..54dbdabd0e9b 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1477,6 +1477,7 @@ struct kvm_enc_region {
+I checked each point against 6.12 and I am not disputing any of them:
 
- /* Available with KVM_CAP_X86_MSR_FILTER */
- #define KVM_X86_SET_MSR_FILTER	_IOW(KVMIO,  0xc6, struct kvm_msr_filter)
-+#define KVM_X86_SET_MSR_FILTER_COMPAT _IOW(KVMIO, 0xc6, struct kvm_msr_fil=
-ter_compat)
+- the write redirect used the chunk/map length, not the bio length;
+- repair writes went through the redirect as well;
+- fast-fail after a split dropped the remainder;
+- fast-fail inflated read_io_errs without doing I/O;
+- device replace reused the old devid, so persisted ranges followed it;
+- the incompat bit was cleared when one device's list emptied, not when the
+  filesystem had no ranges left;
+- the mirror-collapse test could pass from the page cache;
+- dmq renumbered reserve offsets on every rebuild;
+- dmq reloaded the table and only then installed the ranges, leaving a window
+  with no remaps.
 
- /* Available with KVM_CAP_DIRTY_LOG_RING */
- #define KVM_RESET_DIRTY_RINGS		_IO(KVMIO, 0xc7)
+The last two are already fixed in the userspace side. The map schema now
+stores a per-range reserve_start and the allocator cursor; reconciliation
+keeps existing offsets and only allocates new gaps. Live updates diff the
+target's range list and send incremental add_bad/remove_bad messages, so a
+range-only change does not reload the table at all. Geometry changes are
+refused while the mapped device is mounted. The userspace suite covers
+add-below, remove-middle, idempotent re-apply, split boundaries,
+poison-to-redirect, and reserve exhaustion.
 
->  0xAE  20-3F  linux/nitro_enclaves.h                                    N=
-itro Enclaves
->  0xAF  00-1F  linux/fsl_hypervisor.h                                    F=
-reescale hypervisor
-> +0xAF  00-8F  linux/vhost.h                                             c=
-onflict!
-> +0xAF  31-32  drivers/vhost/test.h                                      c=
-onflict!
->  0xB0  all                                                              R=
-ATIO devices in development:
->                                                                         <=
-mailto:vgo@ratio.de>
->  0xB1  00-1F                                                            P=
-PPoX
+Status of the btrfs patch
+-------------------------
+
+The btrfs patch is withdrawn from upstream consideration and kept as an
+experiment in the branch. I will not resend it and I am not preparing a
+btrfs v2. Scrub reporting and targeted relocation may still be useful, but as
+filesystem features that feed the block layer, not as I/O interception.
+
+Proposed dm-first staging
+-------------------------
+
+I am not claiming crash-safe redirect yet. For a first submission I would
+like the target to do detection, keep a pending list, and poison confirmed
+ranges (return EIO, never stale or zero data). The volatile table would be
+restored by userspace before mount, but nothing would move data to a reserve,
+so no acknowledged write can outlive a lost mapping. Redirect would arrive
+with the persistent log: a small self-checksummed area at the end of the
+device, two copies, a generation number, and the mapping committed before the
+remapped write is reported durable.
+
+Does that split make sense as a first submission, or would you rather see
+redirect and the persistent table in one series?
+
+Two smaller decisions:
+
+- Geometry. I plan to require the lower device to be a partition by default.
+  Whole-disk ownership, including LBA 0, becomes an explicit mode with a
+  documented recovery path (initramfs or rescue media), because the target
+  has to own the partition table and the boot loader's sectors too. Is the
+  partition requirement reasonable, or is whole-disk the more useful default?
+- Reserve. User-specified size with a documented default, not a hardcoded
+  constant; new defects take the next free block and existing mappings never
+  move. Any preference on the default or on whether the pool may grow?
+
+I am rejecting zoned-device support for v1.
+
+I will post the dm design and the on-disk format as a separate RFC once the
+format and crash-ordering rules are written down. If you are willing to look
+at the format before there is code, that is the review that would save the
+most time.
+
+Thanks again,
+Alexey
