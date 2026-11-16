@@ -1,70 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.46
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794845798;
-	b=ZTe9h7Ufv86lnttBy4X88mOhAbW6CtWG++V5Og4pLoeM5ZrM9pLxaEyEVHGHOxooC6E6
-	 5wF9S+nW/nkKVQEksAJFLUs1xXJlejOy1S+0AFnv5ndhlGX+DOcfRfTwjGK8Q6InutsKS
-	 2P7tEEnrUF0dUZVHwZYpOiVzVFX6PtWArA2WbHGlma9qZdLMu3qynDU1TdCsknM4tp9WP
-	 Jc+kd+0idRyVYN2pPNiv21VC7OWZdCWbqQOCAF/F0UroawE0sCnLmPaszibb6uyvUZz0t
-	 Ruc7S+ISU1x27vmIXyPvIkmp6V3/jQgLONEjZrJZQI4HzFttTils04bacVyOfF47Tfw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794845798;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Gm-Message-State:
-	 X-Gm-Gg:X-Received:Received:Message-ID:Date:MIME-Version:User-Agent:
-	 Reply-To:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=yCSzCrkdCOCPlR1zdVahyL9VLjI4SbXe7wRt306JhTo=;
-	b=PF5OImTt5UBwmEKVgK2AnYObPMshNIgzpr4RvpQfhc3vJSHjonLIaGDuRkSuOUbarMDX
-	 jmvQbT6INfzwfP8qBqiWVFpUfjS2bzkwTkAZ7id13oxK8SwT84fJOsG5cx59aJk+xXy5J
-	 XkiMe4jt8coDe+fPghDaXY66kfSvNenFqxp1Mu+b5EfJRjhvgutX8kxGOvZ82QBzW74Cw
-	 xgTdgvKGC7JElBY0wo5mdLtkJGfBZtezX2m7KAkf8e4ytcLaG+3jppGG1g/7xYOppJAcA
-	 rDU8O83RzSxiwbvOQi4+Gwn8xFwXpEkZ7NOCQ7Jz2t3tZ5luHtyW9XlB/DASmhVPOww==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=linux.com;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.49
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794849420;
+	b=bmyVER6amkL+nP/J/3Gzl6wMeOuyz/keqNgF+K/J/vLTSYFWYMCQx6hLL6b+hm5VsuT4
+	 Cp3kHtoM0hx2ACWvaKYNcpP+//Y/7IxoRd8yRmPP8GDZIO+Yw/h6v4rWBPkQmTI+3nOI2
+	 eNCml2v6dYbFrpP8f4581DKCW2rztwJaB8YOyDi5uwiq5Md4DPl8ZjLblSRfD7f5w80eY
+	 YArJW3CeWS8OgZ3qCAE8ZAMSgsPKlTJwMwoGgjq+ryIYsvuPYG8xvvSF+YPs1KWoUp9e1
+	 cuv33jD3MJU/SdC+nc0K/8sdWRuoa1KdKNJFOJJZKao9ZO3vs72Qb9XmKXO0sUD/N0A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794849420;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=cvhlwTnVB5qObUR1donDWKQFcI5lhmN3ZPbArGLp5LQ=;
+	b=xLBM5AZH4wqEb3D1PGpnR6423HJ6knN8xU0kjuaUn5u+eI/dchpxifXI15m+5IGDPH7+
+	 U0ShEnP+EsNPbbCLmscs/2tvTigz5jorbmF2F+48FxiSSkEva4qfuGniRDCOpMYMMrAbT
+	 ZycpH7n03hIOalmhiVsPylO2uLAEh0XSYEEKPlOFhj5N65q72LaWzAAVFTwEFMu4hAeqW
+	 g+vmBUrkM98w75Csvp7zKCJbujdO6jr+w/ASC/s6wYS+Rnkl2xXWmpypQJAxibAzEl91n
+	 GGluPMMI73Jy5junLjwJQFNLotBYfOTipxn6/Fo9nZfj31qMk5PC/0SJbc6q++NuBSg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	arc=none smtp.remote-ip=209.85.161.46
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=muR038w6;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.49
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4E9606A31C
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 16:16:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E4E9606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E595B606A89C
+	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 17:16:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E595B606A89C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-71ab5e64742so2968891eaf.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 08:16:37 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=muR038w6
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6b587538a37so5448125a12.2
+        for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 09:16:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794849418; cv=none;
+        d=google.com; s=arc-20260327;
+        b=cbhVR7ZaDr+HnmMFk4Hbm2u46FLSnRjox2JC6sPcjFG2fzdhTC2cPMv98tfoRCdslX
+         wr70yFy+jv97k4xhZu4qqhQWKMu6imJCGcnNdd/ZYT0CK2qdeUCFIQWCUjIEIuKrgHRI
+         A4a+VMdQQ7TrOrJkzJ3+WCHwRHfY3Cn4EvzH8YSW8gAGLRFrx/AgXLsxC6tg4+oBMDjp
+         0kc9H/Mye9I1/3W8tYYAw3fHijuf9c/84nT613t4GtAM7Dn5XSqXgqpGzCirS0Sx/LAg
+         D8Pe9/O23tAKQtXbF9lymQCqvI0dthRTRfQCuJ5MM1K+iTpIi9+vYo/AV9d6C1yU96MX
+         4Zbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cvhlwTnVB5qObUR1donDWKQFcI5lhmN3ZPbArGLp5LQ=;
+        fh=ih5R4Cx49iraYsfpa9SpFDqriouc3Y6C1QrwqZ1W7XM=;
+        b=Y9sOPbsFpFFA/WyVeQ8Jxwc+FIYwtKDCOsvscjywBdAe7hHRIfm8Zx5sdnXg6Sdyrp
+         VSxbjzkbfDeFo0g0X0XGq4MoSeyWiVt/BjZVBIzhXbcUDjv06ZdnWUyH2FBOwb3n6Zfc
+         jU3SBeJpG0qlgmb1F+Q/Np8iVlpAQ3LsxYj8AnaUMuWpkY5MeJwStV0GYiAzaWaRa0SO
+         bR4FPvR1MoF/pVLwa8Y24tA3L9rmrRfIOfqmRkFRLyrXBl+FcM/8sRc4P5rAHN0WPjzd
+         W6uQHyzZv/3o+lNul+bB2bOXqxIf9ODoBbdz6azyvtTIUme66tFg2xMxDki/Ashn783s
+         MtZA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794849418; x=1795454218; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cvhlwTnVB5qObUR1donDWKQFcI5lhmN3ZPbArGLp5LQ=;
+        b=muR038w65/upa4T3A8TQUgAZPPu00HSp8IEYxLeziP5g7EOqEdvXR4kRn7l7HqC4oM
+         V/H7jmVddckf4li4Y0IfO1NYwf6mTpnVcEibSiDpSUGa4rmH8J48GG/AdleQHZhCXsRY
+         RKMQZVymvxJl7k97IWLEoqvjx7NjiZbQg2uAM4mR3pJQKz5WqOab8nzYhREPb/6gAZ9i
+         pBA6UOQY1B36uqzP1y0SScadwu/L0Druqoe1fQdOxwb3sdGBUZ1ThrB2CqjVL4+PzHGX
+         wt9TbJGmNBshQby+yMN9+pQ2Lz5tWQc68vsAD3w5jK3lYbmvcjKJb74HqwwAi+/L+rlV
+         RvOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794845796; x=1795450596;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=yCSzCrkdCOCPlR1zdVahyL9VLjI4SbXe7wRt306JhTo=;
-        b=hN0SeNTUY1BrsLQvjn63NbnZK3U8cczmjCT4mdnctmGdVZr7H6TK+ujwPW2oNlBz9f
-         Wjg12LAQNvGBS6JrEXtYvhaSrgDuJBZGf7KUtOegrJt+0ARMPhD6Wc6z9f1jt9BA/U/R
-         eZnD1PaGU89+cblK+i0o+AinaCu1WKSwcUM52kgjIMHmtWU4bV3dqMYIxVBlcePgwCQ+
-         XjU93MfC0923/e6WFve3F53xcIbVEdOSnc9vKz+XV1FNWsiPpDK8KDwaoQbw17WjMplB
-         dGyjlz77Roz4Oe71VQb5ta50WXvoJrvqXAQHWXaIOmEl/aFD14mbAMF3uXo7AToEsRJh
-         HTLw==
-X-Gm-Message-State: APuU4Z/LA0UMJZ1Kx4+97gi2uYF9jbPgkACDt6jygsRqqDtQuf/XUwgE
-	lZctB5F+duF4Jsns6b1Vvvk4fgBjCLDTWJyfkEeRGdcY4Ie3wL2Pdqq7NMGBeQ==
-X-Gm-Gg: AYBFou23fvk+bDPs5psqTmoPM1RGRUF7nD8kl+Gb25LCNJ3EBIDNbzz7sy4YVYvWgrk
-	1GPMi3avbMLIfMPWcTsirxhmLZHSliKMlVotgrIRRZLodeKs35lt9IpHxvXYvdQqxvtp2ldp+2v
-	Oc0x/XWJbuJBudp3GJ72+skcXQFm1bp8MqImUbffl8zjRmRRAX/Y2pFuX4d3PJfFk5BtlHMgxq+
-	dIEFZjHnrDbot4sQhzuVbOLSrhZ6Yy03SfsbL1fYbzQpGiipItKEwhQOu34icYF31ea9xAircN+
-	gm2Vxv0dPUKlUbEiOueulgFtfwP2bhTIbGZuKauy4OAPGepkxeiUFjeC7X/MPQcTTQWY89xcXAS
-	kFpeCOG0DBLCZyt5flotxrtSeYc5YYxHzhbkcfmYXd1t1UfDNkOlsc9eXiLHylqnFOcSQL8oes+
-	YjcLQlB5IeoYMjn3UsvnyNraOrve2B52N3x9W7BJJ2PvDr+vBJWAvrXAg4gT1QPqUXyAiqMLdLc
-	7roL9NG37JV/QmKweRf0o67gnyi40xgRCK3Row+OpJ5whOBFLaZwgQUAXt0l/GIeFZkIUv6gQvj
-	0q3ZWt1/tNOXlP0bO5E5t1WvHwMzLwFV9WFcIdkp/uhCOAUYctV9g0QnA+76Lowz8brk
-X-Received: by 2002:a05:6820:570b:10b0:71a:fa49:2f33 with SMTP id 006d021491bc7-71afa49313dmr939115eaf.41.1794845796620;
-        Mon, 16 Nov 2026 08:16:36 -0800 (PST)
-Received: from [10.68.32.41] (bba-217-164-143-222.alshamil.net.ae. [217.164.143.222])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-71ab42c41e9sm8997106eaf.6.2026.11.16.08.16.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Nov 2026 08:16:35 -0800 (PST)
-Message-ID: <a89b5be6-998a-4f3e-8768-0a64a9b33d61@linux.com>
-Date: Mon, 16 Nov 2026 20:16:30 +0400
+        d=1e100.net; s=20260707; t=1794849418; x=1795454218;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cvhlwTnVB5qObUR1donDWKQFcI5lhmN3ZPbArGLp5LQ=;
+        b=xJLjNzoaUn0YLo/OMoyNyuKia41HDAQtYgph+wKFMRhRp4pQetAfFcR/urAo1E0l5R
+         yjUomiHdtm3N1CHn9/LO9AWTIXmdx6V61tb3ZkxMYGw3nPvaezWxaMUxVSPY16d0171k
+         GXSP5RdEpaT1S61kkj9QbcNzfX6cx+/zD3bGx0/l+ZqWj7ZJFYTdF+cWCSVBMj9WOP4G
+         AmpuFpPJSeMMrmJzD7Y9oLICMMVtSmrc7ZhVBRkbBJVSBKozMW31y+uL2CtOAuFy19Yl
+         knCT+dfdBSa9nMY80vX+9dK1fZppnIWctIvazaBG4JrGTZE32oMQbT3LwAUyWmdjRUY4
+         wOqw==
+X-Forwarded-Encrypted: i=1; AL+hErFy3k5lFKJYoyJqDdvlHbC9IjDJF9m+Au5+zhQFb5BRm1qaNDOh7Wbpm2Oaeqib/E3jpft4GmcqDprx0g==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+iwg5fzlFjrz2SD9NsJuluIejX4NFty5F0tENCe1NzPG+xis/o
+	cGmAFmTZiR6Rv4a/fDj0oKQ6JGJRcHmaBBuugU2AWDIswSrz1BGyiVLY3/KvPfedpSK3QkT7qY0
+	u+rFCPZSA4rRThzlEE4l0rr7HEZjy1t0=
+X-Gm-Gg: AYBFou2o656zFg2ff49oXT1wOWz2gx99TVEsgoaoXN2zgK65QfGTyYEf9EDe9UoHgsZ
+	73Oo7d+YElWgrhOgQqWhGokGoOGzLBKuxhDOIYZHoPt8oN/DKWZAsX0TYKke8yZXCRKD6AIjpWM
+	SmPMRdCty0Xj5sTwbTqY6mt3ZmJg4INUqoMRol1b7ITPwi4YSv81zvu0f/gy62ysJ7Usb6HW002
+	wwqGJgf3rfVR14elm0Vm5w6niAAjfBqv0uDT1b+88EkLteahyTx9/6yuO43yEaRhE5nj37Nra2B
+	5MJ3n2e2D5zAtH2Vo5ydZXgMBjyD1xiQISJA/RzsK33Hl4kJ671/51fYCy7u7Ut0JJTB43I9tkI
+	7twe17S1khoo6dVgmsjAkQ8D6SFG0SiOFZJH7sKbGqOmVN1ZV/2Ue0jYB/mKzCDaAr8qymrGPBi
+	sZydqcOLIHWUgBGQ0=
+X-Received: by 2002:aa7:c258:0:b0:6b7:d69a:a3d3 with SMTP id
+ 4fb4d7f45d1cf-6b7d69aa8fbmr5089335a12.39.1794849418257; Mon, 16 Nov 2026
+ 09:16:58 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -74,85 +105,224 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: efremov@linux.com
-Subject: Re: [PATCH] floppy: Avoid unsequenced accesses to jiffies in
- show_floppy()
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <20261114-floppy-wunsequenced-v1-1-a54dba6754c4@kernel.org>
-Content-Language: en-US, ru-RU
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-In-Reply-To: <20261114-floppy-wunsequenced-v1-1-a54dba6754c4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20261116-work-loop-pseudo-v3-0-8cbbea1cf34f@kernel.org> <20261116-work-loop-pseudo-v3-34-8cbbea1cf34f@kernel.org>
+In-Reply-To: <20261116-work-loop-pseudo-v3-34-8cbbea1cf34f@kernel.org>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Mon, 16 Nov 2026 18:16:46 +0100
+X-Gm-Features: AclHuK_s2Kpb4OdbgPngYJl9gLHjfhlAmiJMqLtxRnpTDibz-Ni4SZJspSV9laM
+Message-ID: <CAOQ4uxjJVgy-skUbbScfz=eAEATf=iMpqRHNshX=eKu3oiwnrA@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 34/44] selftests/ovl: test data-only layers on
+ pseudo filesystems
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
+	Chris Mason <mason@kernel.org>, Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>, linux-scsi@vger.kernel.org, target-devel@vger.kernel.org, 
+	driver-core@lists.linux.dev, linux-mm@kvack.org, bpf@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
+	apparmor@lists.ubuntu.com, linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+	fuse-devel@lists.linux.dev, linux-efi@vger.kernel.org, 
+	xen-devel@lists.xenproject.org, ocfs2-devel@lists.linux.dev, 
+	linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	linux-usb@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, Nov 16, 2026 at 12:10=E2=80=AFPM Christian Brauner <brauner@kernel.=
+org> wrote:
+>
+> Add tests that overlayfs refuses data-only layers on pseudo filesystems:
+>
+> - sysfs and procfs via the "::" separator in "lowerdir=3D"
+> - sysfs and procfs via "datadir+" by path
+> - sysfs and procfs via "datadir+" by file descriptor
+> - tmpfs as data-only layer
+> - sysfs as regular lower layer
+>
+> The last two must keep mounting.
+>
+> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 
-Applied, thanks!
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
 
-c1a8feb71ba8 floppy: Avoid unsequenced accesses to jiffies in show_floppy()
-
-https://github.com/evdenis/linux-floppy branch for-7.5/floppy
-
-Denis
-
-On 15/11/2026 08:41, Nathan Chancellor wrote:
-> After a recent improvement in clang to warn on unsequenced accesses to
-> volatile variables [1], an instance appears in show_floppy(), which can
-> break the build with CONFIG_WERROR=y / W=e:
-> 
->   drivers/block/floppy.c:1839:30: error: unsequenced accesses to volatile qualified 'jiffies' [-Werror,-Wunsequenced]
->    1839 |                 jiffies, interruptjiffies, jiffies - interruptjiffies,
->         |                 ~~~~~~~                    ^
-> 
-> Per C11 5.1.2.3.2, accessing a volatile object is a side effect. Per C11
-> 6.5.2, unsequenced side effects on the same scalar object are undefined
-> behavior. Per C11 6.5.2.2.10/12, the evaluation of arguments in a
-> function call is indeterminately sequenced, meaning any side effects in
-> the arguments are unsequenced.
-> 
-> Add a local variable to hold the value of jiffies before the function
-> call so that there are no unsequenced side effects, clearing up the
-> warning.
-> 
-> Cc: stable@vger.kernel.org
-> Closes: https://github.com/ClangBuiltLinux/linux/issues/2198
-> Link: https://github.com/llvm/llvm-project/commit/955715460eaf9188c241c74750637fc82dfcc423 [1]
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 > ---
->  drivers/block/floppy.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index c677d783811f..f6339d779be9 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -1830,13 +1830,14 @@ static void reset_fdc(void)
->  
->  static void show_floppy(int fdc)
->  {
-> +	unsigned long j = jiffies;
->  	int i;
->  
->  	pr_info("\n");
->  	pr_info("floppy driver state\n");
->  	pr_info("-------------------\n");
->  	pr_info("now=%lu last interrupt=%lu diff=%lu last called handler=%ps\n",
-> -		jiffies, interruptjiffies, jiffies - interruptjiffies,
-> +		j, interruptjiffies, j - interruptjiffies,
->  		lasthandler);
->  
->  	pr_info("timeout_message=%s\n", timeout_message);
-> 
-> ---
-> base-commit: ab43ec385580b8f8abf72d70fa3acbf4e4f098a5
-> change-id: 20261114-floppy-wunsequenced-8b739d08b849
-> 
-> Best regards,
-> --  
-> Cheers,
-> Nathan
-> 
-
+>  .../selftests/filesystems/overlayfs/.gitignore     |   1 +
+>  .../selftests/filesystems/overlayfs/Makefile       |   1 +
+>  .../filesystems/overlayfs/pseudo_datadir.c         | 131 +++++++++++++++=
+++++++
+>  3 files changed, 133 insertions(+)
+>
+> diff --git a/tools/testing/selftests/filesystems/overlayfs/.gitignore b/t=
+ools/testing/selftests/filesystems/overlayfs/.gitignore
+> index b343cc430051d..e1410fee2269d 100644
+> --- a/tools/testing/selftests/filesystems/overlayfs/.gitignore
+> +++ b/tools/testing/selftests/filesystems/overlayfs/.gitignore
+> @@ -3,3 +3,4 @@ dev_in_maps
+>  set_layers_via_fds
+>  idmapped_mounts
+>  automount_in_layer
+> +pseudo_datadir
+> diff --git a/tools/testing/selftests/filesystems/overlayfs/Makefile b/too=
+ls/testing/selftests/filesystems/overlayfs/Makefile
+> index 382a59bda5e70..ace75f5627e0f 100644
+> --- a/tools/testing/selftests/filesystems/overlayfs/Makefile
+> +++ b/tools/testing/selftests/filesystems/overlayfs/Makefile
+> @@ -10,6 +10,7 @@ TEST_GEN_PROGS :=3D dev_in_maps
+>  TEST_GEN_PROGS +=3D set_layers_via_fds
+>  TEST_GEN_PROGS +=3D idmapped_mounts
+>  TEST_GEN_PROGS +=3D automount_in_layer
+> +TEST_GEN_PROGS +=3D pseudo_datadir
+>
+>  include ../../lib.mk
+>
+> diff --git a/tools/testing/selftests/filesystems/overlayfs/pseudo_datadir=
+.c b/tools/testing/selftests/filesystems/overlayfs/pseudo_datadir.c
+> new file mode 100644
+> index 0000000000000..3b59fd3e9f5c2
+> --- /dev/null
+> +++ b/tools/testing/selftests/filesystems/overlayfs/pseudo_datadir.c
+> @@ -0,0 +1,131 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#define _GNU_SOURCE
+> +
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <sched.h>
+> +#include <stdbool.h>
+> +#include <stdio.h>
+> +#include <sys/mount.h>
+> +#include <sys/stat.h>
+> +#include <unistd.h>
+> +
+> +#include "kselftest_harness.h"
+> +#include "../wrappers.h"
+> +
+> +static int setup_tmp(void)
+> +{
+> +       if (unshare(CLONE_NEWNS))
+> +               return -errno;
+> +       if (sys_mount(NULL, "/", NULL, MS_REC | MS_PRIVATE, NULL))
+> +               return -errno;
+> +       if (sys_mount("tmpfs", "/tmp", "tmpfs", 0, NULL))
+> +               return -errno;
+> +       if (mkdir("/tmp/lower", 0755) || mkdir("/tmp/data", 0755) ||
+> +           mkdir("/tmp/merged", 0755))
+> +               return -errno;
+> +       return 0;
+> +}
+> +
+> +/* Mount an overlayfs with the legacy "lowerdir=3D" option. */
+> +static int mount_lowerdir(const char *lowerdir)
+> +{
+> +       char opts[256];
+> +
+> +       snprintf(opts, sizeof(opts), "lowerdir=3D%s", lowerdir);
+> +       if (sys_mount("overlay", "/tmp/merged", "overlay", MS_RDONLY, opt=
+s))
+> +               return -errno;
+> +       if (umount2("/tmp/merged", 0))
+> +               return -errno;
+> +       return 0;
+> +}
+> +
+> +static int set_layer(int fd_context, const char *key, const char *path,
+> +                    bool by_fd)
+> +{
+> +       int fd, ret =3D 0;
+> +
+> +       if (!by_fd) {
+> +               if (sys_fsconfig(fd_context, FSCONFIG_SET_STRING, key, pa=
+th, 0))
+> +                       return -errno;
+> +               return 0;
+> +       }
+> +
+> +       fd =3D open(path, O_DIRECTORY | O_CLOEXEC);
+> +       if (fd < 0)
+> +               return -errno;
+> +       if (sys_fsconfig(fd_context, FSCONFIG_SET_FD, key, NULL, fd))
+> +               ret =3D -errno;
+> +       close(fd);
+> +       return ret;
+> +}
+> +
+> +/* Create an overlayfs with "lowerdir+" and "datadir+" through fsconfig.=
+ */
+> +static int fsmount_layers(const char *lower, const char *data, bool by_f=
+d)
+> +{
+> +       int fd_context, fd_mnt, ret;
+> +
+> +       fd_context =3D sys_fsopen("overlay", FSOPEN_CLOEXEC);
+> +       if (fd_context < 0)
+> +               return -errno;
+> +
+> +       ret =3D set_layer(fd_context, "lowerdir+", lower, by_fd);
+> +       if (ret)
+> +               goto out;
+> +       ret =3D set_layer(fd_context, "datadir+", data, by_fd);
+> +       if (ret)
+> +               goto out;
+> +
+> +       if (sys_fsconfig(fd_context, FSCONFIG_CMD_CREATE, NULL, NULL, 0))=
+ {
+> +               ret =3D -errno;
+> +               goto out;
+> +       }
+> +
+> +       fd_mnt =3D sys_fsmount(fd_context, FSMOUNT_CLOEXEC, 0);
+> +       if (fd_mnt < 0)
+> +               ret =3D -errno;
+> +       else
+> +               close(fd_mnt);
+> +out:
+> +       close(fd_context);
+> +       return ret;
+> +}
+> +
+> +TEST(datadir_sysfs)
+> +{
+> +       ASSERT_EQ(setup_tmp(), 0);
+> +
+> +       EXPECT_EQ(mount_lowerdir("/tmp/lower::/sys/kernel"), -EINVAL);
+> +       EXPECT_EQ(fsmount_layers("/tmp/lower", "/sys/kernel", false), -EI=
+NVAL);
+> +       EXPECT_EQ(fsmount_layers("/tmp/lower", "/sys/kernel", true), -EIN=
+VAL);
+> +}
+> +
+> +TEST(datadir_procfs)
+> +{
+> +       ASSERT_EQ(setup_tmp(), 0);
+> +
+> +       EXPECT_EQ(mount_lowerdir("/tmp/lower::/proc"), -EINVAL);
+> +       EXPECT_EQ(fsmount_layers("/tmp/lower", "/proc", false), -EINVAL);
+> +       EXPECT_EQ(fsmount_layers("/tmp/lower", "/proc", true), -EINVAL);
+> +}
+> +
+> +TEST(datadir_tmpfs)
+> +{
+> +       ASSERT_EQ(setup_tmp(), 0);
+> +
+> +       EXPECT_EQ(mount_lowerdir("/tmp/lower::/tmp/data"), 0);
+> +       EXPECT_EQ(fsmount_layers("/tmp/lower", "/tmp/data", false), 0);
+> +       EXPECT_EQ(fsmount_layers("/tmp/lower", "/tmp/data", true), 0);
+> +}
+> +
+> +TEST(lowerdir_sysfs)
+> +{
+> +       ASSERT_EQ(setup_tmp(), 0);
+> +
+> +       EXPECT_EQ(mount_lowerdir("/sys/kernel:/tmp/lower"), 0);
+> +       EXPECT_EQ(mount_lowerdir("/sys/kernel::/tmp/data"), 0);
+> +       EXPECT_EQ(fsmount_layers("/sys/kernel", "/tmp/data", false), 0);
+> +       EXPECT_EQ(fsmount_layers("/sys/kernel", "/tmp/data", true), 0);
+> +}
+> +
+> +TEST_HARNESS_MAIN
+>
+> --
+> 2.53.0
+>
