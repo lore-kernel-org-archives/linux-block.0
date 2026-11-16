@@ -1,74 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794865704;
-	b=r3XSc2HNxIZ8CMHV5hvX+SGM/b3xuzD69Ae0n21GOobvM4DWbnYGEtUjxsqpyWpHVJ+o
-	 7/X8mIWn4tlmKH+o2/LzF4d4XdjrlsRXECQT7E4LIw6EyVsVH04h3AQCRnhHojtNrpp/t
-	 J5E77/m+OE1Etx0PC6TB67sJ3lDd5qAFhr5EWuFoBe+g9SteFnjiZTbwx9UwrC9KLw5YA
-	 nhvwJBFVOch3jYMeEd4ginipzsR8zokierUqWa8UvRE86nzUR37VeD8wbRHsfYYaBzzrN
-	 ZuTFM6Jif55TTK7l8cfvoj4j8iGcSKpG9d1tgNh43fJdxDMO9wn1HLajKBHythcG9sQ==
+	t=1794865705;
+	b=x5c4ueyMhNdH6MFn0ccstuOO59VARoU9yntmVA2JFqmxofLemyE/xBVCegUNXqWUvOmM
+	 Nq78gDPiQWC5ssRWHFLumXwDwCzdq2pmSgakEiT/XO1w1xR10hyKb/3xDfgU6j+ZRUOgm
+	 8YfwWGunye7TFQxl/VgwVajk92nKBGCA1rLAQ5drcd5pv8+aySJkeqe4kknbMJTiYzcOn
+	 7uLMpvCEVTmkPxQXMyaHmGVSZ9MUsmh1qSZn6vA2CPZkFWyumxNb/HWxxbrsvf8ephw9Y
+	 rBg+MIDbv5xKAJQ28fHpfk1fr2lTiBA9Jo3+B7bXbgfwKkbCUYAj/EbxLTO1ZQeKmqQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794865704;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794865705;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=cumaufiNoF2gw1e2LAAbTjYg75bMtDQYVLindkgKuS0=;
-	b=wEpRsg2xP2gJL+Id2QPP4XiCGkqm1ICNhY9Uxt3wJvXrmaV96xlupTt9swc6kGR80c3u
-	 aRuJ4/mJ+L9S8GojRVxtoPH1a0wtJvw+gWG7oEDM45B5wkrAw7Pw8Wbh3zSpIbdQCTyeo
-	 UGo3wPtU3bLzff4FaNX0Nranhr+iEXLUe73yHu1EdnOysw/ubzZFljrmpffjsmIIfCC6b
-	 E32TwrfPBLBgjtoNkY/JOch6K5ycbBgyi28vXIOVqDEgzWtF30oes3W55Ndmk+AoA/wc6
-	 e0zEd7VQuG3++V4cibJKSvtq0tGnS92fMeKSojSNFEnWLjrZ6T2+2u5060EuMLSxw6g==
+	bh=Dz8CbyIcyRsbPdtBGhM1jybkO5ORrgBtDiK5T4j0DPw=;
+	b=ODXkGduJYeUmy8+vIrh1QO/kWBVPhhFsqeIF34T2v0aSK31ZEFrEkuC3Jni6wJY1BVQH
+	 4IQ7hQiE0IHnOWbIRAJ7P5l3TCSsu+9LLP4Tm/HT94gVPiWRHXlsbpEKyj1tfWV5eql/A
+	 ay8JLfIoOftPsPe6JW8Z42uzO+6mVOZjyqleYptjhNGv2FBLx3Pfq1F7z34jwYdrIgW80
+	 nrGu7IHWRGd+0ndoLHjh2uNmTbP75+A++37bQUzyJkqp4FQynERpPDl8qbVV4zgpi63GQ
+	 4Y802asxvUB7zfuCEn35Habj8T+H2sM7fvuTkle+Qag6oGdyCszfVgKhXHpmDRPZfYA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=acm.org;
 	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=uBFS0bnS;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=SR+sF+mr;
 	arc=none smtp.remote-ip=199.89.1.16
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85C3606A331
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:48:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B85C3606A331
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FA3606A32C
+	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:48:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B4FA3606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=uBFS0bnS
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=SR+sF+mr
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1h73vcWzlpJ43;
-	Mon, 16 Nov 2026 21:48:23 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1h83pHLzlpJ46;
+	Mon, 16 Nov 2026 21:48:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1794865699; x=1797457700; bh=cumau
-	fiNoF2gw1e2LAAbTjYg75bMtDQYVLindkgKuS0=; b=uBFS0bnSkl3flNP3mImAg
-	mGHCB4gSF6MI+xGzykciUHzAJSHD16tbfZ5KHa+TcVAHp0jIbExsDcMFqDN+Rf4h
-	YnFyJvG/WErZ3DGWor45Zb0h2ryRDntCTKptbM2ilR4CwiwXqZlAWAxbac0NYyQi
-	C8hY1zmtTGSr1kVggpfbMwaq2FYdhPgWgXUWBvEBj8OJfr9SKI2OOEIxrd8I30GH
-	QsOjiEUyLH6LLtPDdqjUS///HYU1jJ/or82LZqG1HHMmLi+bD4eYf8WkCwdjBYbI
-	AU0rTJW8SSdgWQTB+xn6WF1mToXlbBKiO+uQc72B/6DeJfbsQlzBlH7m/hi6iM+b
-	A==
+	:received:received; s=mr01; t=1794865698; x=1797457699; bh=Dz8Cb
+	yIcyRsbPdtBGhM1jybkO5ORrgBtDiK5T4j0DPw=; b=SR+sF+mrzULTD5puC9SCF
+	RAlqHH8cHdhhkgxrFJEIG/Vxuo8T7/6FgwzpIhXDKOWV9Huv00HLhUnQ9h/nrwgi
+	1J8vX5NxFT6hGMJzAktIEw/clSwnZNriqQ/yU/GeXRqpr31H1aLXBJcoNYjIuSMY
+	34XYkfohBc3rpJSEVkE5juHv5TY1z7sV2vdU6PNth5iKP6nR9W66ArPQCMV2MQt+
+	4UQYR417JWKmxdU+bS7I3dvLtzZ2hYNY4ZUPjmzL9SIk5Dt8EJuFvrThbjShuUXF
+	bBwwnhave9V44cCViyM5raBXcVuVJs9MAVYUjAc9ZZAeUMXfafeHXRHtqEqUGSkB
+	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id kSR_gcFrDSBw; Mon, 16 Nov 2026 21:48:19 +0000 (UTC)
+ id 1D2dlVNE6wup; Mon, 16 Nov 2026 21:48:18 +0000 (UTC)
 Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1h15vcTzlpHxj;
-	Mon, 16 Nov 2026 21:48:17 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1h04vjGzlpHwn;
+	Mon, 16 Nov 2026 21:48:16 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Josef Bacik <josef@toxicpanda.com>,
 	Eric Dumazet <edumazet@kernel.org>,
 	Aibing Chen <chenaibing@cmss.chinamobile.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	syzbot+b29ed72382b0e218323a@syzkaller.appspotmail.com
-Subject: [PATCH 6/8] nbd: Remove socket lockdep reclassification
-Date: Mon, 16 Nov 2026 13:48:06 -0800
-Message-ID: <b4af82c8a780afdf7497d2cc7873552c63eb9bd2.1794865298.git.bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 3/8] nbd: Stop taking a config_refs reference per request
+Date: Mon, 16 Nov 2026 13:48:03 -0800
+Message-ID: <bb40820497231f3ced93f6996ccce150975fae74.1794865298.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
 In-Reply-To: <cover.1794865298.git.bvanassche@acm.org>
 References: <cover.1794865298.git.bvanassche@acm.org>
@@ -83,101 +82,186 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Remove nbd_reclassify_socket() and its lockdep class keys, reverting
-commit d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep circular
-dependency") and commit 9280e6edf656 ("nbd: don't warn when reclassifying
-a busy socket lock").
+Check refcount_read(&nbd->config_refs) instead of calling
+nbd_get_config_unlocked() and nbd_config_put() for every request in
+nbd_handle_cmd(), and use refcount_inc_not_zero() in
+nbd_sched_pending_work().
 
-Unlike kernel-internal sockets created via sock_create_kern(), NBD socket=
-s
-are passed from user space as already-connected file descriptors and
-remain accessible to user-space system calls, timers, and softirqs.
-Calling sock_lock_init_class_and_name() on a live user-space socket:
-- Races lockdep_init_map_type() against concurrent lock_acquire() calls
-  in bh_lock_sock() and lock_sock_nested(), corrupting lockdep state and
-  causing spinlock/lockdep splats.
-- Calls sk_owner_set() repeatedly when the same socket fd is passed to
-  NBD_SET_SOCK multiple times, leaking module reference counts because
-  sk_prot_free() only calls sk_owner_put() once.
-- Does not prevent circular lockdep reports when user space performs
-  sendmsg() on the retained socket fd and faults in user pages under
-  sk_lock-AF_INET-NBD.
+nbd_config_put() calls nbd_clear_sock() -> nbd_clear_que(), which
+quiesces the request queue before freeing config->socks and nbd->config.
+Any nbd_queue_rq() call that observes config_refs > 0 completes before
+blk_mq_quiesce_queue() returns, and any nbd_queue_rq() call after
+blk_mq_unquiesce_queue() observes either config_refs =3D=3D 0 or a newly
+allocated configuration. The only other function that modifies
+config->socks is nbd_add_socket(). It only runs before
+nbd_start_device(), while the capacity is zero and the write cache is
+disabled, so no request reaches the driver concurrently. Avoiding
+nbd_config_put() in the request submission path also avoids acquiring
+nbd->config_lock from the send workqueue when request transmission is
+deferred to a workqueue.
 
-The reclassification suppressed a false positive involving the chain
-fs_reclaim -> q->q_usage_counter -> ... -> sk_lock, where the last step
-was socket transmission from nbd_queue_rq(). Now that request
-transmission is deferred from nbd_queue_rq() to a workqueue, sk_lock is
-no longer acquired while blk-mq holds q->q_usage_counter, and
-transmission happens under memalloc_noio_save(), so no fs_reclaim ->
-sk_lock dependency is recorded for NBD sockets. Hence socket lockdep
-reclassification is no longer needed.
+If nbd_sched_pending_work() fails because config_refs dropped to zero
+after part of a request has been sent, mark the socket dead so that no
+other request is sent after the truncated request.
 
-Fixes: d532cddb6c60 ("nbd: Reclassify sockets to avoid lockdep circular d=
-ependency")
-Fixes: 9280e6edf656 ("nbd: don't warn when reclassifying a busy socket lo=
-ck")
-Reported-by: syzbot+b29ed72382b0e218323a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6aec63fd.5f5735a5.290c1c.0003.GAE@goo=
-gle.com/
+Use smp_wmb() instead of smp_mb__before_atomic() in
+nbd_alloc_and_init_config() because refcount_set() is not a
+read-modify-write operation, and document both readers that pair with
+this barrier.
+
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/nbd.c | 37 -------------------------------------
- 1 file changed, 37 deletions(-)
+ drivers/block/nbd.c | 67 ++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 48 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index fd0789849612..f713779b5a5d 100644
+index 64f2265fb5d9..6373363cc4c4 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1318,42 +1318,6 @@ static struct socket *nbd_get_socket(struct nbd_de=
-vice *nbd, unsigned long fd,
- 	return sock;
+@@ -629,11 +629,16 @@ static inline int was_interrupted(int result)
+  * We've already sent header or part of data payload, have no choice but
+  * to set pending and schedule it in work.
+  *
+- * And we have to return BLK_STS_OK to block core, otherwise this same
+- * request may be re-dispatched with different tag, but our header has
+- * been sent out with old tag, and this way does confuse reply handling.
++ * The request must not be requeued, otherwise this same request may be
++ * re-dispatched with different tag, but our header has been sent out wi=
+th
++ * old tag, and this way does confuse reply handling.
++ *
++ * Returns true if nsock->work has been scheduled. Returns false if no
++ * config_refs reference could be obtained because the device is being t=
+orn
++ * down. In that case the caller must mark @nsock dead, since a truncate=
+d
++ * request has been sent, and fail the request.
+  */
+-static void nbd_sched_pending_work(struct nbd_device *nbd,
++static bool nbd_sched_pending_work(struct nbd_device *nbd,
+ 				   struct nbd_sock *nsock,
+ 				   struct nbd_cmd *cmd, int sent)
+ {
+@@ -642,11 +647,14 @@ static void nbd_sched_pending_work(struct nbd_devic=
+e *nbd,
+ 	/* pending work should be scheduled only once */
+ 	WARN_ON_ONCE(test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags));
+=20
++	if (!refcount_inc_not_zero(&nbd->config_refs))
++		return false;
++
+ 	nsock->pending =3D req;
+ 	nsock->sent =3D sent;
+ 	set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
+-	refcount_inc(&nbd->config_refs);
+ 	schedule_work(&nsock->work);
++	return true;
  }
 =20
--#ifdef CONFIG_DEBUG_LOCK_ALLOC
--static struct lock_class_key nbd_key[3];
--static struct lock_class_key nbd_slock_key[3];
--
--static void nbd_reclassify_socket(struct socket *sock)
--{
--	struct sock *sk =3D sock->sk;
--
--	if (!sock_allow_reclassification(sk))
--		return;
--
--	switch (sk->sk_family) {
--	case AF_INET:
--		sock_lock_init_class_and_name(sk, "slock-AF_INET-NBD",
--					      &nbd_slock_key[0],
--					      "sk_lock-AF_INET-NBD",
--					      &nbd_key[0]);
--		break;
--	case AF_INET6:
--		sock_lock_init_class_and_name(sk, "slock-AF_INET6-NBD",
--					      &nbd_slock_key[1],
--					      "sk_lock-AF_INET6-NBD",
--					      &nbd_key[1]);
--		break;
--	case AF_UNIX:
--		sock_lock_init_class_and_name(sk, "slock-AF_UNIX-NBD",
--					      &nbd_slock_key[2],
--					      "sk_lock-AF_UNIX-NBD",
--					      &nbd_key[2]);
--		break;
--	}
--}
--#else
--static inline void nbd_reclassify_socket(struct socket *sock) {}
--#endif
--
- static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 			  bool netlink)
- {
-@@ -1376,7 +1340,6 @@ static int nbd_add_socket(struct nbd_device *nbd, u=
-nsigned long arg,
- 	sock =3D nbd_get_socket(nbd, arg, &err);
- 	if (!sock)
- 		return err;
--	nbd_reclassify_socket(sock);
+ /*
+@@ -734,8 +742,16 @@ static blk_status_t nbd_send_cmd(struct nbd_device *=
+nbd, struct nbd_cmd *cmd,
+ 			 * completely done.
+ 			 */
+ 			if (sent) {
+-				nbd_sched_pending_work(nbd, nsock, cmd, sent);
+-				return BLK_STS_OK;
++				if (nbd_sched_pending_work(nbd, nsock, cmd,
++							   sent))
++					return BLK_STS_OK;
++				/*
++				 * Don't send anything after a truncated request.
++				 * The device is being torn down, so don't notify
++				 * user space that the link is dead.
++				 */
++				nbd_mark_nsock_dead(nbd, nsock, 0);
++				return BLK_STS_IOERR;
+ 			}
+ 			nbd_requeue_cmd(cmd);
+ 			return BLK_STS_OK;
+@@ -772,8 +788,11 @@ static blk_status_t nbd_send_cmd(struct nbd_device *=
+nbd, struct nbd_cmd *cmd,
+ 			result =3D sock_xmit(nbd, index, 1, &from, flags, &sent);
+ 			if (result < 0) {
+ 				if (was_interrupted(result)) {
+-					nbd_sched_pending_work(nbd, nsock, cmd, sent);
+-					return BLK_STS_OK;
++					if (nbd_sched_pending_work(nbd, nsock,
++								   cmd, sent))
++						return BLK_STS_OK;
++					nbd_mark_nsock_dead(nbd, nsock, 0);
++					return BLK_STS_IOERR;
+ 				}
+ 				dev_err(disk_to_dev(nbd->disk),
+ 					"Send data failed (result %d)\n",
+@@ -1126,17 +1145,28 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd=
+ *cmd, int index)
 =20
- 	if (!netlink && !nbd->task_setup &&
- 	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
+ 	lockdep_assert_held(&cmd->lock);
+=20
+-	config =3D nbd_get_config_unlocked(nbd);
+-	if (!config) {
++	/*
++	 * No config_refs reference is held here. nbd->config and
++	 * config->socks remain valid because nbd_config_put() calls
++	 * nbd_clear_que(), which quiesces the request queue, before freeing
++	 * them. The only other place that modifies config->socks is
++	 * nbd_add_socket(). It only runs before nbd_start_device(), while the
++	 * capacity is zero and the write cache is disabled, so no request
++	 * reaches this driver concurrently (see also commit 285908f554fe
++	 * ("nbd: remove queue freeze in nbd_add_socket")).
++	 */
++	if (!refcount_read(&nbd->config_refs)) {
+ 		dev_err_ratelimited(disk_to_dev(nbd->disk),
+ 				    "Socks array is empty\n");
+ 		return BLK_STS_IOERR;
+ 	}
++	/* Pairs with smp_wmb() in nbd_alloc_and_init_config(). */
++	smp_rmb();
++	config =3D READ_ONCE(nbd->config);
+=20
+ 	if (index >=3D config->num_connections) {
+ 		dev_err_ratelimited(disk_to_dev(nbd->disk),
+ 				    "Attempted send on invalid socket\n");
+-		nbd_config_put(nbd);
+ 		return BLK_STS_IOERR;
+ 	}
+ 	cmd->status =3D BLK_STS_OK;
+@@ -1159,7 +1189,6 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *=
+cmd, int index)
+ 			 * and instead just error out.
+ 			 */
+ 			sock_shutdown(nbd);
+-			nbd_config_put(nbd);
+ 			return BLK_STS_IOERR;
+ 		}
+ 		goto again;
+@@ -1179,7 +1208,6 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *=
+cmd, int index)
+ 	ret =3D nbd_send_cmd(nbd, cmd, index);
+ out:
+ 	mutex_unlock(&nsock->tx_lock);
+-	nbd_config_put(nbd);
+ 	return ret;
+ }
+=20
+@@ -1734,12 +1762,13 @@ static int nbd_alloc_and_init_config(struct nbd_d=
+evice *nbd)
+=20
+ 	nbd->config =3D config;
+ 	/*
+-	 * Order refcount_set(&nbd->config_refs, 1) and nbd->config assignment,
+-	 * its pair is the barrier in nbd_get_config_unlocked().
+-	 * So nbd_get_config_unlocked() won't see nbd->config as null after
+-	 * refcount_inc_not_zero() succeed.
++	 * Order the nbd->config assignment before refcount_set(), such that
++	 * readers that observe a non-zero config_refs also observe the new
++	 * nbd->config value. Pairs with the barrier after
++	 * refcount_inc_not_zero() in nbd_get_config_unlocked() and with the
++	 * smp_rmb() in nbd_handle_cmd().
+ 	 */
+-	smp_mb__before_atomic();
++	smp_wmb(); /* Pairs with smp_rmb() and smp_mb__after_atomic(). */
+ 	refcount_set(&nbd->config_refs, 1);
+=20
+ 	return 0;
