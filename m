@@ -1,73 +1,74 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794865702;
-	b=ifOOEiq1mYyPtT2TObhjLMogmspEP2k6H0DMpz+vjjf150TDCwBSUFJ2i/YBRGMnkkO5
-	 ZYSSOlD5CIhj4rTWfC+c0ZpubjTfxOMJSI9uvnnO+L4wvaDWT6iWmni4RIPppoe/fa01G
-	 v5sPzIj1yxs8z8s3T3m6JsWhhWbXmWqvgOBN1LuDO1qOsUh8wiYabSaOlKef37B4djo9x
-	 yeH/48WSniiA6rvetNgLJSPuwmn2ckROX6Or9xp5LLtAgVq5kUpdOwR+SaGEQ/BZkiBsa
-	 zissr9dzlKfkt9kbuuh6R1SnFuLx3eoRYp8c1R8M+rV+fw+hA1bJf0riJ4PfZ4EGl4A==
+	t=1794865703;
+	b=XAEqdwePNJKqQerRci3t2VAK74+t5+3Uy24tzvtJI2qF7Fdf6BOzu6WToLlTFZkrjJKP
+	 7RosYGTUhaTs++TXQnuQ2tZJpFAnlVkmQIMKu7rS6sXPcMJzZhLIkwTQeTR3lWU9venbl
+	 8PSsaksgjoFr7nS4fFay4NvStdtTHrUbua4yDWnbk+VkbP838kLx6CVILj9S6piH20XY3
+	 9a6EndYOafHzolpV8rEnB9uPQeIa7iR2KV3PYHWlF3FeMdXQCADwQyW0M3Evx0fRDiaGp
+	 ao1CcWfO7kL3fHkhY+8b+nY03Nj2lepn3v5iy/ztkD88vH6e/00RvTdO7593DqZEB7g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794865702;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794865703;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=aF1D0j2mtu5Yyhyv/KL8sQQtFNOU+dKzV6vQx6Q6ToY=;
-	b=yxrNROPlNboeWmvmbaPaLEvmXqxi1y8MfDGyZ/rsc7j7Nq9jAoxR2VQ3quFQsl40ZEd5
-	 GTKzVoPk+frT2kNuwD/Q8hCfQTaJsNLmbBV5TZG89+O7H3hhdEorUcjNnwX0Bx0G6pQgu
-	 DE6B47sOtsqdffUOzdj/NQObdN5E4MKhDsnNK95KHtRZI14LbLF7KuTjFwUXGD72h8Rgm
-	 udTI8oghSiaEvgUsYTh/ZhNOMYnMQVSLYyKcuFva9xSfRQqeWjnDIAb7OAyGYEItlwjCo
-	 2jiORD6vwmHLeKEUUvb45y3skXivN2OuIZCPQVoEV381/AANM4C0Kik9Stzzqb4x5ig==
+	bh=ihOd46Z1r7lc3Fvx08G7KbSHEwB67LojQs9y5hYYQgs=;
+	b=RAw2wflETKLlAXskWwIP6f+679S/zYvK+6j8Z0VGpxxG3PDeLvg3l1HQy+2vDh7P/rer
+	 URJrxMi9sr9wNuZ/wkT4n/2DEBjaCAGWRIHdqZOt82UsrMDvL2EhDCY7IqhqSxuABSgCa
+	 ercKvkjyzeM+/AkLpMnzU2rIzOm1RojJ0naXc8UfM4eEP87mky1218mR2AYDuY2GJHrH1
+	 7h3EAUFyKtZGtIhyexeXH75p2S26oi6D+ahVtkjoQ6jmUC53vQItsG1PSXMWBi+xuK6bu
+	 /fJdbSoDYbdZuOdiZnltxka6wYni1fEk16lvMwilIwL1hSxS+1BkIgqTFczP+gwZw0g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=acm.org;
 	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=x3rmrSsf;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=gj1A2Usx;
 	arc=none smtp.remote-ip=199.89.1.16
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25146606A31C
-	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:48:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 25146606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB84606A323
+	for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 21:48:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AAB84606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=x3rmrSsf
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=gj1A2Usx
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1h559GYzlg7MM;
-	Mon, 16 Nov 2026 21:48:21 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jT1h63RmlzlpHx8;
+	Mon, 16 Nov 2026 21:48:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1794865698; x=1797457699; bh=aF1D0
-	j2mtu5Yyhyv/KL8sQQtFNOU+dKzV6vQx6Q6ToY=; b=x3rmrSsf/8XA2U0fBqzdP
-	BTwf1dEAAzpkwrNYL6dFJDa0LwbXuMtYpLYKb9YTntcyW8jQOzKk86ybgABoVRSA
-	hUTAxNvDH7JfGnGCRbVlR/eGsT+bKTuOXyaqieS93tgcQzPsRe+5tY0PCEe/KzSB
-	AKlJ+cRMvhcPIf8wxa5FsEF/t20QtXgpSqyu8s8p20852o3feZYJ0P+kJBlkHm2w
-	f45ldgqECJdpkzC5RMX+pLAQjKphQWv4Re6BAOhGzxYClpaVfBe5MLQ6yFDRBjnS
-	/qVTHZ/jxwqVUk7QYsB+0KmNLXIh6Xye8JmTJeDtcVM8Ysoo2zFxum0xWMvGL3DT
+	:received:received; s=mr01; t=1794865699; x=1797457700; bh=ihOd4
+	6Z1r7lc3Fvx08G7KbSHEwB67LojQs9y5hYYQgs=; b=gj1A2UsxmJ8V413eSg8r9
+	Gn2Ql822ky5/cyZbJ2G5rPT3i3Fod7uQagrlsGW1zFMlvS8JoKNCJPAwJEuUiJUL
+	pttIrUdCCtIweMP0Ei4ZMdYQPFz47NULIvKFseFTHe3sCPRnk3XLf2KRVvDp1cpV
+	f4P77/nNJaChQfD2q9v4E4qQkbSl4CAlIpGDdGy4d/0QrbrPDR7nvkqSsxhPXCSW
+	YHYRaW55qsFPBrUHj1E6q/NoeP67BMqlkxjN2AUsgUm4kxiPbdAoRbobBQ1ZmCeA
+	Ig+e29QAwDhoJXhq2qlvJfn5TjPeeVsJeh/LVHgMvwBAcPgm6D4zz2f4itBfLQ5u
 	A==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id LXAgg4NBZvOb; Mon, 16 Nov 2026 21:48:18 +0000 (UTC)
+ id dVkgliVttX1G; Mon, 16 Nov 2026 21:48:19 +0000 (UTC)
 Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1h02ZqCzlpHxb;
-	Mon, 16 Nov 2026 21:48:16 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jT1h13KDwzlpHxg;
+	Mon, 16 Nov 2026 21:48:17 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Josef Bacik <josef@toxicpanda.com>,
 	Eric Dumazet <edumazet@kernel.org>,
 	Aibing Chen <chenaibing@cmss.chinamobile.com>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 2/8] nbd: Requeue requests directly in nbd_send_cmd()
-Date: Mon, 16 Nov 2026 13:48:02 -0800
-Message-ID: <d97789b6d23d4b6b61873c5c1f1dacbbbc9d5812.1794865298.git.bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>,
+	syzbot+72fceb8393e04ce876d9@syzkaller.appspotmail.com
+Subject: [PATCH 5/8] nbd: Call sk_set_memalloc() outside nsock->tx_lock
+Date: Mon, 16 Nov 2026 13:48:05 -0800
+Message-ID: <99643c402a9ba2d7bdb18b32acd29484f401f912.1794865298.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
 In-Reply-To: <cover.1794865298.git.bvanassche@acm.org>
 References: <cover.1794865298.git.bvanassche@acm.org>
@@ -82,57 +83,81 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Call nbd_requeue_cmd(cmd) and return BLK_STS_OK when sock_xmit() is
-interrupted before any bytes have been sent in nbd_send_cmd(), instead of
-setting NBD_CMD_REQUEUED and returning BLK_STS_RESOURCE.
+Call sk_set_memalloc() before acquiring nsock->tx_lock in
+nbd_genl_reconnect_sock_cb() instead of while holding nsock->tx_lock.
 
-nbd_handle_cmd() already calls blk_mq_start_request(req) before invoking
-nbd_send_cmd(). Calling nbd_requeue_cmd(cmd) transitions the started
-request back to MQ_RQ_IDLE via blk_mq_requeue_request() and ensures
-nbd_send_cmd() only returns BLK_STS_OK or BLK_STS_IOERR, which simplifies
-deferring request transmission to a workqueue.
+sk_set_memalloc() increments the memalloc_socks_key static branch, which
+acquires cpu_hotplug_lock and jump_label_mutex. Calling it under
+nsock->tx_lock creates a nsock->tx_lock -> cpu_hotplug_lock lockdep
+dependency chain. Because nbd_genl_reconnect_sock_cb() is called with
+nbd->config_lock held and is the only place that transitions nsock->dead
+from true to false, nsock->dead cannot become false after the initial
+check, so sk_set_memalloc() can safely be called before acquiring
+nsock->tx_lock. Since other contexts may set nsock->dead concurrently,
+read it with READ_ONCE() and annotate the stores in
+nbd_mark_nsock_dead() and nbd_genl_reconnect_sock_cb() with
+WRITE_ONCE().
 
+Fixes: b7aa3d39385d ("nbd: add a reconfigure netlink command")
+Reported-by: syzbot+72fceb8393e04ce876d9@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/6aece79e.382bd2ce.33e041.0001.GAE@go=
+ogle.com/
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/nbd.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/block/nbd.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 864746624ff5..64f2265fb5d9 100644
+index 4d362e3cc395..fd0789849612 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -650,8 +650,7 @@ static void nbd_sched_pending_work(struct nbd_device =
-*nbd,
- }
-=20
- /*
-- * Returns BLK_STS_RESOURCE if the caller should retry after a delay.
-- * Returns BLK_STS_IOERR if sending failed.
-+ * Returns BLK_STS_IOERR if sending failed and cannot be retried.
-  */
- static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd =
-*cmd,
- 				 int index)
-@@ -728,7 +727,8 @@ static blk_status_t nbd_send_cmd(struct nbd_device *n=
-bd, struct nbd_cmd *cmd,
- 	trace_nbd_header_sent(req, handle);
- 	if (result < 0) {
- 		if (was_interrupted(result)) {
--			/* If we haven't sent anything we can just return BUSY,
-+			/*
-+			 * If we haven't sent anything we can just requeue,
- 			 * however if we have sent something we need to make
- 			 * sure we only allow this req to be sent until we are
- 			 * completely done.
-@@ -737,8 +737,8 @@ static blk_status_t nbd_send_cmd(struct nbd_device *n=
-bd, struct nbd_cmd *cmd,
- 				nbd_sched_pending_work(nbd, nsock, cmd, sent);
- 				return BLK_STS_OK;
+@@ -335,7 +335,7 @@ static void nbd_mark_nsock_dead(struct nbd_device *nb=
+d, struct nbd_sock *nsock,
  			}
--			set_bit(NBD_CMD_REQUEUED, &cmd->flags);
--			return BLK_STS_RESOURCE;
-+			nbd_requeue_cmd(cmd);
-+			return BLK_STS_OK;
  		}
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 			"Send control failed (result %d)\n", result);
+ 	}
+-	nsock->dead =3D true;
++	WRITE_ONCE(nsock->dead, true);
+ 	nsock->pending =3D NULL;
+ 	nsock->sent =3D 0;
+ }
+@@ -1447,26 +1447,31 @@ static int nbd_genl_reconnect_sock_cb(struct nbd_=
+device *nbd, unsigned long arg)
+ 		return -ENOMEM;
+ 	}
+=20
++	lockdep_assert_held(&nbd->config_lock);
++
+ 	for (i =3D 0; i < config->num_connections; i++) {
+ 		struct nbd_sock *nsock =3D config->socks[i];
+=20
+-		if (!nsock->dead)
++		/*
++		 * Only this function, with config_lock held, clears
++		 * nsock->dead. Other contexts may set it concurrently; if that
++		 * happens after this check, the socket is reconnected on a
++		 * later reconfigure request.
++		 */
++		if (!READ_ONCE(nsock->dead))
+ 			continue;
+=20
+-		mutex_lock(&nsock->tx_lock);
+-		if (!nsock->dead) {
+-			mutex_unlock(&nsock->tx_lock);
+-			continue;
+-		}
+ 		sk_set_memalloc(sock->sk);
+ 		if (nbd->tag_set.timeout)
+ 			sock->sk->sk_sndtimeo =3D nbd->tag_set.timeout;
+ 		atomic_inc(&config->recv_threads);
+ 		refcount_inc(&nbd->config_refs);
++
++		mutex_lock(&nsock->tx_lock);
+ 		old =3D nsock->sock;
+ 		nsock->fallback_index =3D -1;
+ 		nsock->sock =3D sock;
+-		nsock->dead =3D false;
++		WRITE_ONCE(nsock->dead, false);
+ 		INIT_WORK(&args->work, recv_work);
+ 		args->index =3D i;
+ 		args->nbd =3D nbd;
