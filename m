@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794827119;
-	b=RdxYIoZKjNOB3iNt/FDlHJLvfaINHQw+E1Q8AsAwQtD823mGwyed3SjrZle2+CFql8Io
-	 rssVF+wsXUN9Dk0yGLqabM9ZF1pXp3U640yQNocGppbXbYZeVeCVxxEF9QlH1wZS+qMUU
-	 ARz6dASTGEMN55ALrgRXGayESlxRSRdthq83anXWhLB8hRzwdwa3+e4/JzCs5hs5hgAjA
-	 AaNn7WJxHzN+f44H2SzmkNJUVAqioZEJcFb3fn+sgt4hf3jpySwxEQIyCTekzWEimKpg0
-	 J4ySbAxKzAfEPDBK9AzHj7JL/HJ5QSdHCiGioZiKGxI/gUTqySs8Hld3040MASXnlRw==
+	t=1794827131;
+	b=3xTys3C1Rjw2AFXYTqn9tDTFQUzVnvlHnXTEsiswbZtsApoRVMO+TVFiSacWg8p6uQtt
+	 7O4S2IQSYVesaw0j+ep6j6GF/fpOHRtO08lcdUUjGGK39EATBLR66guCs2NoKTnRa8ssQ
+	 TCIkKEXtEzM5K1lLIxXHzbHGLAt/tyiEa7C3tBaLb3RUB+kjA9wYnYJapLamI3mFEtK1U
+	 CHo+koLrFHwgIDSh1vEWkr065zdLjtrrUMGGp7gnGkyIVX8aSfcx/pQgb1cm7AydHlNHA
+	 UvvRh0uekEj7gfyV7V1iCPRb4U7IvrkQGXLz6dFb5+GsxRqlsROGarZPxRIaSR679Hw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794827119;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794827131;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=iQwkLUdwk9b1HJi0bdxPWAy3VpDyPS0j6oQB4RnL5Xk=;
-	b=YcvFpzbk/Gp3DFiHTjYrJV8JdfODcG1jGa+9cR9Sk8eya4LsjeV9Dk/xMsKNQKrN++aU
-	 FeSdYWhZpZzeI4Qe72EhDzIfxguHEoxRMBDd2KGmS6XOR7pb1M8E0yMfxqCf1INwpbMu3
-	 KQY74pt7B9TWvAnNWloKzdF6ylcxwWuj1fxE6nTM0sUSoshhYwzJuGO2GiycZy/RtXSp1
-	 AK7d7eCVfBmEj91P+QNNAs9nxtOaiZEw3ojWxNZBTrNOMVKCo8aRaBouyFTwyEPVBxNe9
-	 PkEmkFSts7m41zAbcjWRFA1rr2ifAg4Dwh6EpmboJWwQh21tGGQ0y9uK3Fgy28KziRg==
+	bh=Up4QcDgioDZqUrec7no2Sv6eS8z1skBOes4Nvk8uSaY=;
+	b=kjY53zj/FVL2422I4/doWGVRvAb+3TAN/KOZxjIPAZ4h0oFSdgjRwo+9wuiiTT/1R+vM
+	 O/iO4goNWS9OlJC3xJm+X5M5poGGVBgOTcUPInQqDOiKcnM2BgN97/I/DfuWqChRGZ2M4
+	 Zx1jxfsiEyczcpOIaA0Y8Qqh7dnhnlGMRlR0tRHpQ1g07WwOCGlsJdYC3pWzOGGBFjUuO
+	 NxXhlST0sAzDpRpR2dQ4FhICgW1WNDCO2gJcQh2Ew2ti60CU/d2joO5vnGMKqMCGVqtmG
+	 +1EWySmYb2LkwHAnISnxQXgoI0e5poUx1Pp823G1joSCP3Dp7hhRtGIWNxw26DTxEng==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TCGsMSU0;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="UJf/sVnW";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5371860A2629;
-	Mon, 16 Nov 2026 11:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A433F60A263D;
+	Mon, 16 Nov 2026 11:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TCGsMSU0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77D171F000C8;
-	Mon, 16 Nov 2026 11:05:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UJf/sVnW
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7DAB1F00926;
+	Mon, 16 Nov 2026 11:05:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794827119;
-	bh=iQwkLUdwk9b1HJi0bdxPWAy3VpDyPS0j6oQB4RnL5Xk=;
+	s=k20260515; t=1794827131;
+	bh=Up4QcDgioDZqUrec7no2Sv6eS8z1skBOes4Nvk8uSaY=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=TCGsMSU0VLtPHC6d/+ESb62tB6A5OnT5thXMuSszj0X5SUrXTBlGJp1Uj+AYZe+b7
-	 M6HysKQdgtmSCsAwgJMeEx7nwplOmGQG0k7sii/MZZCEhur/88d3NJPaUnDq/j9QkG
-	 X+za0+knnV7BnsIiOWGJCFcT/hjb+uNPDTAzp/KopV2X6mnbRtgkBhso+/o9Wz8Emg
-	 GLN0MTTmw1FY14Dtm1V9VE8Z320kaoSZDLv0wZWZR8TXN7H7cJiMzgITAI+YkJnZSI
-	 H0oWS7BM5D3vYdjjNnCUwfJZ3AsAxv3uvegQseurk6gWMUJIHo37fMDP5z5z07M8tA
-	 UrwymwOwwteqg==
+	b=UJf/sVnWA5PbX7ZnzaL5uM5WD2CNUwQM2ooXztogsWbtOE1shubZUqTcSwkLkRFQq
+	 FAhnv2rRmOrIR9n6e15wIFY5690R32XIGNOE5nneN5BsA/53klUD4O2b3SjyXye+2l
+	 tFOKWD662r/pcXHsBEn5J7I8x7L37ljUXyU3b7esgv4TQdDYtYBaDDuxpiAUlOutx4
+	 hfico32rbTfgNCKvOCfMnwrZIHczpPeZC4/trq8cZ2uwAzDdy103/i+3g4/bF3ydnq
+	 PvCytT/H66q3RwtTUpQh2d9/XVkkHy2eBh4HCZ8X90WETLxPbZgmuIzsEVrV79ouWe
+	 cBtvTC9Ei56Cw==
 From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 16 Nov 2026 12:03:53 +0100
-Subject: [PATCH v2 13/17] bpf: fs/xattr: take freeze protection in the
- xattr kfuncs
+Date: Mon, 16 Nov 2026 12:03:56 +0100
+Subject: [PATCH v2 16/17] fs: use kiocb_write_iter() in
+ vfs_iocb_iter_write()
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -55,7 +55,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261116-work-fs-frozen_writes-v2-13-ecc4a2aac40e@kernel.org>
+Message-Id: <20261116-work-fs-frozen_writes-v2-16-ecc4a2aac40e@kernel.org>
 References: <20261116-work-fs-frozen_writes-v2-0-ecc4a2aac40e@kernel.org>
 In-Reply-To: <20261116-work-fs-frozen_writes-v2-0-ecc4a2aac40e@kernel.org>
 To: Jan Kara <jack@suse.cz>
@@ -67,69 +67,55 @@ Cc: Shakeel Butt <shakeel.butt@linux.dev>,
  linux-scsi@vger.kernel.org, target-devel@vger.kernel.org, 
  linux-unionfs@vger.kernel.org, bpf@vger.kernel.org, 
  linux-nfs@vger.kernel.org, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>, stable@vger.kernel.org
+ "Christian Brauner (Amutable)" <brauner@kernel.org>
 X-Mailer: b4 0.17-dev-ce4c1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1908; i=brauner@kernel.org;
- h=from:subject:message-id; bh=NJMGFUseCC73mMaQQ+G2n/tqmaWyJnxTdoOaGvDxcf8=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT9eqyz4vOTvRd7PnScFlrJUFmSOf2LzNqtX3/pV02s/
- duVsbJ1S0cpC4MYF4OsmCKLQ7tJuNxynorNRpkaMHNYmUCGMHBxCsBEMsMY/nts27Bi0jnThyk3
- rgTkx0uv3JDduWHPlrVNT+w/7PRg5NnOyLD8w+6Pzpvr8jqZuHVV/N37WGys/62TCZGeMe1cfrW
- NOTcA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1463; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=MCaMNnJkL9G2ZH6ZyKJ0L2XRF9HMQi7Wd1t5jXBxpyk=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT9emxwMOyM8JrvK5ZdNFvFsuCiy8fCH8/Wpcn/1vXM/
+ Dw5Ush4d0cpC4MYF4OsmCKLQ7tJuNxynorNRpkaMHNYmUCGMHBxCsBE0qQYGdpNBeuZ5rlJmD4p
+ SHz5Yu19p9yF99dum3W/kEe8ipXliTMjwy652s4dFQEfzqgFmQnbOc7+1+OT/fVc45rT9tvjp1m
+ +YQIA
 X-Developer-Key: i=brauner@kernel.org; a=openpgp;
  fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-bpf_set_dentry_xattr() and bpf_remove_dentry_xattr() go through
-__vfs_setxattr() and __vfs_removexattr() which leave freeze protection
-to the caller. BPF LSM programs call them from sleepable hooks such as
-file_open where nobody holds it. So a program can modify a frozen
-filesystem.
+vfs_iocb_iter_write() open-codes what kiocb_write_iter() does. Use it.
+The kiocb is marked with IOCB_WRITE now so the caller can drop freeze
+protection with kiocb_end_write_iter().
 
-The hook may already hold freeze protection or locks a frozen
-filesystem would make us wait under. So don't wait for a thaw. Fail
-with -EBUSY if the filesystem is frozen.
+This also means that an IOCB_NOWAIT write fails with -EAGAIN instead of
+waiting for a frozen filesystem. No caller passes IOCB_NOWAIT today.
+overlayfs and fuse passthrough don't set FMODE_NOWAIT and cachefiles
+and nfsd don't ask for it.
 
-The _locked variants are only used from hooks that run inside setattr,
-setxattr, removexattr, unlink and rmdir. Their callers hold freeze
-protection already.
-
-Fixes: 56467292794b ("bpf: fs/xattr: Add BPF kfuncs to set and remove xattrs")
-Cc: stable@vger.kernel.org
 Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- fs/bpf_fs_kfuncs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ fs/read_write.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/fs/bpf_fs_kfuncs.c b/fs/bpf_fs_kfuncs.c
-index 35ccd98a4de64..7f61e2efa08ba 100644
---- a/fs/bpf_fs_kfuncs.c
-+++ b/fs/bpf_fs_kfuncs.c
-@@ -295,9 +295,13 @@ __bpf_kfunc int bpf_set_dentry_xattr(struct dentry *dentry, const char *name__st
- 	if (!inode)
- 		return -EINVAL;
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 6767283108991..eca0aa73e5a4d 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -923,7 +923,7 @@ ssize_t vfs_iter_read(struct file *file, struct iov_iter *iter, loff_t *ppos,
+ EXPORT_SYMBOL(vfs_iter_read);
  
-+	/* The hook may hold locks or freeze protection already. */
-+	if (!sb_start_write_trylock(inode->i_sb))
-+		return -EBUSY;
- 	inode_lock(inode);
- 	ret = bpf_set_dentry_xattr_locked(dentry, name__str, value_p, flags);
- 	inode_unlock(inode);
-+	sb_end_write(inode->i_sb);
- 	return ret;
- }
+ /*
+- * Caller is responsible for calling kiocb_end_write() on completion
++ * Caller is responsible for calling kiocb_end_write_iter() on completion
+  * if async iocb was queued.
+  */
+ ssize_t vfs_iocb_iter_write(struct file *file, struct kiocb *iocb,
+@@ -946,10 +946,7 @@ ssize_t vfs_iocb_iter_write(struct file *file, struct kiocb *iocb,
+ 	if (ret < 0)
+ 		return ret;
  
-@@ -323,9 +327,13 @@ __bpf_kfunc int bpf_remove_dentry_xattr(struct dentry *dentry, const char *name_
- 	if (!inode)
- 		return -EINVAL;
- 
-+	/* The hook may hold locks or freeze protection already. */
-+	if (!sb_start_write_trylock(inode->i_sb))
-+		return -EBUSY;
- 	inode_lock(inode);
- 	ret = bpf_remove_dentry_xattr_locked(dentry, name__str);
- 	inode_unlock(inode);
-+	sb_end_write(inode->i_sb);
- 	return ret;
- }
+-	kiocb_start_write(iocb);
+-	ret = file->f_op->write_iter(iocb, iter);
+-	if (ret != -EIOCBQUEUED)
+-		kiocb_end_write(iocb);
++	ret = kiocb_write_iter(iocb, iter);
+ 	if (ret > 0)
+ 		fsnotify_modify(file);
  
 
 -- 
