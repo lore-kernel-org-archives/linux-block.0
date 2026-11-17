@@ -1,88 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.39
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794883623;
-	b=u6zn3ymdQQLxTwZFjkYp2RraDDdBwyUFiKgVyP4AyWVqlwnqQN5X28gChpMql+WpSatG
-	 H8kd0KyHiC9boB7vcFhrz3xPmzUsxGxCuqauCdwuyWQema55PVHUfYnSZDxcG2ZqjChdv
-	 ox6ghNE+6ZG4gAf65P4iYPRCFk8vNeag5LVNUJNF77oRaPDECQhJQLjw+TZYcGDhhOyzL
-	 UghuUvmmp3ga/qS7pcBqJ0h2Wh9WFl3CfcaH3GWmqQc8F5cngQWxZbjQf5cS9DDUKAfNv
-	 ZCRLUGs9dNB3dx2NfdPDpOhX/uEMtAppcyN3W2fsc15tdJz1tNoNMWdYzMXjtFvuHiA==
+	t=1794884226;
+	b=Z3OTCjs03MFJpM+YiJt/tiUCu1WpRzUAquUeVAsZsYByapCqbXhiLHhdJY4XKkg6bPJb
+	 rJPzASZ99EUmNypS3qGWdE4xbvZfsEhtsntOKtcaKZ1/nZiDpJYOzMUACxI3lD1Uq1oqi
+	 QBGc1zdk3EiVHcJfVIwv38bHwpDTGwLFKwjZabrCbGb2H1VU22vA+YI0SNKOaZvek3i1z
+	 LrBQRQqpxmxedAh3r4jqkkPX6Mani5Y/cpK8iKXku//P/L7ScglCv4MaUWGtI2BM1mxVM
+	 IvU7sbljvxu0ypK/KbBOJOP8eYHCnB0Oq5Pv6UQnbm3sT6tCvtHbFtXqLDRUKMDAQFw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794883623;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=kppDiR8SAoyWMpIoxP3YdLOzzMX1Xx/Ex7LekvPyid8=;
-	b=Kf2YogPb7FgSF+V66zKCMyPlzHpZhgX9vhS0VJbwcAyDh2xG/KM9I1Y4nF21KAM4EvMr
-	 jaBH9lsnDi4UxBIykGFORgj7YYJ8xR3SgwxLm/z4jMtxyUSlA/cjqY25BWG5e6TW4y2Vq
-	 BC7d7J6eSKSiMVRo1HgPh0A2aic7JVryozzNohxkOErU67jsu6DQPZMX2Uaq+40yPBzbL
-	 RtOjv7t/Utg12vH4S+CMMvldPkzEOEimA3OVSwSGnmkgTdMNYdGADBKmk+AVtAwQOqZ5J
-	 FZWy95Ci/EnK2THH6IBTQoWGWo2hoEWqUp/3jyWj/IsfmvMO9C4hDY+Z6g4gp4eFwtA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794884226;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:To:
+	 Cc:X-Mailer;
+	bh=H+W8VLD35JYBchsjwLqIneI/2/pBJGvyqvo7Y3mgx4s=;
+	b=Gx13V421UHSkXxhc9r88y/zGGJznjh9Wjkz1CwWAvufDpbGoz5K4aPW3JK/K/RtNe5Mr
+	 EADD6CoXi4JWfpGweh+3xRjDzVVrjfXxaWWOAuNvyBWw496MMIi8tn+/pG1h3G4hHC9L9
+	 dSUfhHcPflLdaK/IlYlVFuGRxow07Q1/9sz0NtGPmtmsiQenHkYLO12ooYjY0rf1KqvRR
+	 dwptHM/3tqvF858D/6hqObXClDAuUr6HnW+C06NmVCeRWCDUYINFkznrVIdfHEkPALQpy
+	 BAZQYCowzJ1TPA18EzJI9v6oeLMCF5tbXJXsUu0l5Gt7lFIQGeLGMTXIqqJohmsyYow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=h0+Xp2uU;
-	arc=none smtp.remote-ip=74.125.82.180
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=sWb7tFVu;
+	arc=none smtp.remote-ip=95.215.58.39
+Received: from mta1.migadu.com (out-39.mta1.migadu.com [95.215.58.39])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19BF606A31C
-	for <linux-block@vger.kernel.org>; Tue, 17 Nov 2026 02:47:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D19BF606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6320606A323
+	for <linux-block@vger.kernel.org>; Tue, 17 Nov 2026 02:57:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E6320606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=h0+Xp2uU
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-3791619605cso7691835eec.0
-        for <linux-block@vger.kernel.org>; Mon, 16 Nov 2026 18:47:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1794883622; x=1795488422; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=kppDiR8SAoyWMpIoxP3YdLOzzMX1Xx/Ex7LekvPyid8=;
-        b=h0+Xp2uU1Vs52/5cXSLJ3ctFuEzm2nhK9wmRJm4sixZ63nzfx2bfYZ/B/mRsxGxSr4
-         0vPyZjxvUTnHENTdeU79r6kUp9R/OUFCEuPv0Ii2a7YTZI+bdVvzHz9HwIc1E3ViyjSb
-         VOyLWIkcavbQzOivw3pS5gd6cUCY79tEKeXirPtz10xznZQTBKBIrHBvcfWsscLlZLSl
-         VdPaTwqEbjX/zatXzsDMU0HEawlk/SM0691GhKUm8zmZylwls9x3gnAsY23wZWLK7qSQ
-         tNFwDdVSs0Gqv205mNii6J0qYVb7z/UC23QzEZmmKaAbPTj8sLy3rrUPFDEkSzrsbN48
-         +AMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794883622; x=1795488422;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=kppDiR8SAoyWMpIoxP3YdLOzzMX1Xx/Ex7LekvPyid8=;
-        b=zwdCSgh9gOYC/OmMcA38GVOumlyJeabsKkWAdkk5mVL/TkLPu2AwNRJYQjZUmxeyeM
-         9vxA8/teSZVhTUWk2ydQzZlsv7h6WUPNS4YgD6cmjlBWymhACBggZ/pgH6KILlOmOvN9
-         xcVktw/aoWMSjPuuVuh2ZO7sp6Qpc21mvwSE2wfU6rJ1q8NXzGVEaNalspDLagoMehOz
-         A2HxqoE1lF9Cemf5o3gtQcjlMXVWoL0UNiQPSND79U2/aaDhy6jzBLQ48M7qRmzZd1Mi
-         Otl8NR38hcZembU1XVyMH9pnXInt7fAHiLgQUvxCluHlW798DbiK7QIx7FzGSGljAu8q
-         S5rQ==
-X-Gm-Message-State: APuU4Z/ihixKe53USzSfVpyIQRsiAbZjCHqQ7nBHWsCO0BObcP50Kmb4
-	l8rfyIAfZ8d3Ty1xZ2FI8+lXGUIOMltxURR8qc2Kig7eufNRaHZaS9S2klxJRkmT+n31mxjZB5n
-	n+1glMG8=
-X-Gm-Gg: AZFdTZeV9J5CCYs4iVTycn1VWAdo3kty6tTi/x0I5sRaR7CHw25BzBQbvhMXqD50Vv2
-	U6VjXlv9w7MieKZZePpQuUOaTyRTRXsNT0VzeEepxWpLha7CsUbpOTP1P48jtYAOoFJbMDRif9B
-	vrBdY5KXxB/vvGj0h+PwcKTTqwN2N4/qW++P3ndLKl3y9s8vrNfGwDMd+4WwS/XdRvrHtgMnW0U
-	MZ/6iWLxBWSZNdbI6kQSpUiINBES+FGptrdlbqliAWBVLmI7SsBw3mRxPli+R0QtMxzjpgilXda
-	GFeVI5GjkvRPe161422Wt5Rt+ZrNZ439WFoDazVaNioEHyjof4wYqc0Ou5u8dpaWl9/5ZxzTgY6
-	iBsNeHkZgerostrK80R9jJR3w+TAXTLhgvfRrZqqfsxiONV5eJr4GLAl3A0kcvOC4nsfIJU9X3X
-	M6pBYOFqVpT2UDQVmk7bANpbpuIvOBI85Fq32KSY/GjtIdD6Ck5SLWi5OC+LXwbYoCze4dWl+Gw
-	qRcxoH1xKgs21RB0If1mSLnk0Fq4AGH8CVpFdE5blq6dKunTInCtqyyYtHSv/8BrpSmaDC2nuRX
-	INRFFaqm6MISYFvIQr156iiy40HdNqangzmwuEDh4ih5ypJyHCFQqEXNu5wRNe9Es4DKfd76kGB
-	Pi4H2nPebEsoT3g==
-X-Received: by 2002:a05:693c:4146:20b0:36f:551:2bd5 with SMTP id 5a478bee46e88-379e16d093cmr11774287eec.32.1794883621530;
-        Mon, 16 Nov 2026 18:47:01 -0800 (PST)
-Received: from [192.168.1.142] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-37956bad6casm37856627eec.26.2026.11.16.18.47.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Nov 2026 18:47:01 -0800 (PST)
-Message-ID: <3868f992-20ee-4b04-9416-40a5a333cc27@kernel.dk>
-Date: Mon, 16 Nov 2026 19:47:00 -0700
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=sWb7tFVu
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=pjmw2DXdHjzYOG43hIsqQG79giXui/V+G7YocSUZJKg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794884224; v=1; x=1795489024;
+ b=sWb7tFVuz8BCB2MYqCSJLHg41ub5xhTloj6/GO7jTCUtIVYzMW/Zd7qrVNO7EovXFtfcnj3q
+ bbbrKhOlBODDOVJZ26RphplCxRXTV/vdTOa4PtVqFY67wXFmvXH/EfNufsIJ3ojr5DsWmr7pPVj
+ d9K8ktUwPpopuJ4u2pp4CL4Q=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 3c523f9f826b9f15;
+	Tue, 17 Nov 2026 02:57:03 +0000
+X-Mizu-Trace-ID: 3c523f9f826b9f15
+X-Migadu-Flow: FLOW_OUT
+From: Qiliang Yuan <qiliang.yuan@linux.dev>
+Subject: [PATCH v3 0/2] block: make changing to the current I/O scheduler
+ cheap again
+Date: Mon, 16 Nov 2026 21:56:53 -0500
+Message-Id: <20261116-bug-block-elevator-unchanged-v3-0-cb4dda2dadf4@linux.dev>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -92,52 +61,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/8] nbd: Defer request transmission to a workqueue
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
- Eric Dumazet <edumazet@kernel.org>,
- Aibing Chen <chenaibing@cmss.chinamobile.com>
-References: <cover.1794865298.git.bvanassche@acm.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <cover.1794865298.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHbC+2oC/43NwQ6CMAwG4FchO1vDCgJ68j2Mh0ELLJLNbLJgC
+ O/uwAs37e1v/n6dhWen2YtLMgvHQXttTQzZIRFNr0zHoClmgSkWMg7UYwf1YJsH8MBBvayD0Xy
+ rBKpoCKksJGWViMTTcaunjb/dY+61jwfv7VuQ6/ZPOEhI4VRl8lzVlDPK66DNOB2Jg1jhgHss/
+ 4HhiinZckkltirdY8uyfAC4d341FQEAAA==
+To: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>, 
+ Ming Lei <tom.leiming@gmail.com>, Nilay Shroff <nilay@linux.ibm.com>, 
+ Hannes Reinecke <hare@suse.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Qiliang Yuan <qiliang.yuan@linux.dev>, Christoph Hellwig <hch@lst.de>
+X-Mailer: b4 0.13.0
 
-On 11/16/26 2:48 PM, Bart Van Assche wrote:
-> Hi Jens,
-> 
-> The NBD driver transmits requests over sockets owned by user space directly
-> from nbd_queue_rq(). Hence, sk_lock is acquired while blk-mq holds
-> q->q_usage_counter and set->srcu. Since other kernel code acquires sk_lock
-> before fs_reclaim, mm->mmap_lock and other subsystem locks, syzbot reports
-> multiple circular locking dependencies. Socket lockdep reclassification, the
-> existing workaround, introduces new races and module reference count leaks,
-> and does not suppress all of these reports.
-> 
-> This patch series fixes these lockdep complaints by deferring request
-> transmission to a workqueue, similar to the loop driver, and by removing
-> the socket lockdep reclassification code. Since requests are no longer
-> transmitted from a context in which signals can be pending, the
-> partial-send handling code is removed.
-> 
-> This patch series is organized as follows:
-> - Patch 1 fixes a missing wakeup of wait_for_reconnect() callers when
->   NBD_RT_DISCONNECTED is set.
-> - Patches 2 and 3 prepare for deferring request transmission by
->   simplifying the nbd_send_cmd() return values and by no longer taking a
->   config_refs reference for each request.
-> - Patch 4 defers request transmission to a workqueue.
-> - Patch 5 fixes a nsock->tx_lock -> cpu_hotplug_lock lockdep complaint.
-> - Patch 6 removes the socket lockdep reclassification code.
-> - Patches 7 and 8 remove the partial-send handling code that has become
->   unreachable.
-> 
-> Please consider this patch series for the next merge window.
+Writing the scheduler a queue already uses to queue/scheduler takes
+about 10 ms and freezes the queue, which stalls I/O on live disks every
+time a udev rule or tuning tool sets the scheduler unconditionally.
 
-Something like this _really_ needs performance numbers.
+Patch 1 stops requesting a "none-iosched" module on every write of
+"none". Patch 2 returns before freezing the queue when the elevator
+wouldn't change.
 
+On a null_blk disk (median of 20 writes, all kernels measured in the
+same run):
+
+  operation                   base (ms)  patch 1 (ms)  patch 1+2 (ms)
+  none -> none                    13.10          9.11            0.08
+  mq-deadline -> mq-deadline      10.95          9.05            0.08
+  mq-deadline -> none             13.00          7.97            6.03
+
+Signed-off-by: Qiliang Yuan <qiliang.yuan@linux.dev>
+---
+V2 -> V3:
+- Point Fixes in patch 2 at the commit that added the freeze, as
+  Christoph pointed out
+- Add Christoph's Reviewed-by to patch 2
+- Rebase onto v7.4-rc2-1025-g666539eecdf4
+
+V1 -> V2:
+- Keep the elevator check under the freeze and note the race in the
+  comment, as Christoph suggested
+- Say "change" instead of "rewrite" in the cover letter subject
+- Rebase onto v7.4-rc2-470-g7e1392a42ea2 and update the numbers from a
+  new run
+
+v2: https://lore.kernel.org/r/20261114-bug-block-elevator-unchanged-v2-0-5a1fe7d72fa0@linux.dev
+v1: https://lore.kernel.org/r/20261111-bug-block-elevator-unchanged-v1-0-583198bd4e21@linux.dev
+
+---
+Qiliang Yuan (2):
+      block: don't request a module for the none elevator
+      block: return early when the elevator doesn't change
+
+ block/elevator.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+---
+base-commit: 666539eecdf4db623f5e3c3e55cf9f2dfad24aa4
+change-id: 20261111-bug-block-elevator-unchanged-a6cd2d761d38
+
+Best regards,
 -- 
-Jens Axboe
+Qiliang Yuan <qiliang.yuan@linux.dev>
 
