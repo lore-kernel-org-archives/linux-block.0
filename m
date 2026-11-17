@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.167.242.64
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794923853;
-	b=CVeQM0QXyZyrlx/Kz+opp+pt6m14RPp2ZnjfTFSSvy+FKFHdX+LJaD5E9kf2sJKnQVXd
-	 vnQrgmUnEctuYs8uw7F3ds3zaXMPl+6g92ar2Z4WRV3FLytbcAOHw1isr6xo1L2D25TN7
-	 kJ9Mgjdw25BACxnb7wyDWnnjh80o0G28e19N3QDh3lQYQ8gv+cKR/4GlvvVfyedJzyOyS
-	 JH2QwE7mFS7umOMgpVCqoGQxdohkgauILNR4ynxXJrWEb27IjE5C9MauOGDGf2kHhjpb5
-	 I/+hweQdPKr/jSXJfZ3spbHQTpusZvTnmYM2HAwneBcz47GntkSLok23sTFtRJT1UXQ==
+	t=1794923851;
+	b=WPkbLHXemsIEnBmjXS5wo4Qgb9OROhFuNy+DXnDNPfD3tqJ05Hkg38aH8LvtfmnLTnMR
+	 8gV0ah19iVE5TUAiyacSbol0MRHKExsK0wgdqeIb4MeJjBt8lftOqB/R3XsC2/NNRosr9
+	 1tExuIC/2XFfrKAfQjxQGHAvCDocm7NQfN2xBKlo3m/PEqkcSJ+ftoM+hEvYko0RcDaql
+	 W0FjPYYi3PblduyPs7FUwfzcdyMktg/wGmKqJ50AcXX5HKN9Fohc4vnSo2AQB+/b5akSD
+	 6gAwEmKZR3TD0X/JF3K7Ce8ITfthKAPxJ+o6JTqr1Gy+dcFZY1mVrYbHQ0NJOVxYlLQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794923853;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794923851;
 	h=DMARC-Filter:Received:DKIM-Signature:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
 	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=oHtd/pbTnvrVurwDdLnofK84OY4uScGFLO1awwqENQs=;
-	b=zCmS4FTG2dtvIPPXO5txN2ThDZQ7TBGAvujTgFnap71mnY0TOAbtWAxbKYbetVqFrDQi
-	 6izHmR/e9B/kDRi1cjVfRgrwzfx3noUoJBULKzAoZpMdVCmlDg5ESj0xYUSlASflgWc8Q
-	 HKvhWLzFbVW0/fEc0hQvV1BY29wBOT+33Hrjx5Fw+6ccNFv0sHVbFLUAmxYSO5Y7+T8Ph
-	 lTvznCof4AXad2EOby9tuQ36tXdvPOgukL2MUODsFU84eYPn/cWuRhGNsXJnNahYrig3j
-	 yTpA3xahFmWx2N0g6FOY0ijKyBYyhCuxXaZqTUxRcQJSNcCnUs9+YXOB5x+/upKT7VA==
+	bh=fEuhClmaJB9i6FXWuXFxHEVU2l5a2ORvSS+UOcUmAQg=;
+	b=1B/JtAOKxPe2SIf3RtRaniHX6MobdZj/181QaySzNjVWl+Y/ACnvVuXp+PQbrj4lBSNJ
+	 EWdBgTtN5PbVHII9+eRTJKf8GYGtOYWu2knCgFNuRrvhdV3M6fJTIwlBDmzeC1SHG3KZo
+	 ihlsCbRRpM0OPOivGLvGfeVpRsRaOfYMqQPsw7snYGtCvUAGNB87Oo+9avF2Oo/Cjz0Ey
+	 Ozx/OoBt8zE91lIV9swigQvYHHUsHVtPfATPC4NGQhlwWFUE8YukfPkJuISmA6LUIgsWt
+	 YlZ+GSwR4TUvdOKzkKEK8ww839SkbzCoXj3FyVlAZYMgErTw7+Wz7jYpfxp/qvNsd2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=ideasonboard.com;
 	spf=pass smtp.mailfrom=ideasonboard.com;
-	dkim=pass header.d=ideasonboard.com header.i=@ideasonboard.com header.a=rsa-sha256 header.s=mail header.b=CpC5ga6d;
+	dkim=pass header.d=ideasonboard.com header.i=@ideasonboard.com header.a=rsa-sha256 header.s=mail header.b=kLRKax7Q;
 	arc=none smtp.remote-ip=213.167.242.64
 Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E592606A32F;
-	Tue, 17 Nov 2026 13:57:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E592606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291EF606A31C;
+	Tue, 17 Nov 2026 13:57:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 291EF606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.a=rsa-sha256 header.s=mail header.b=CpC5ga6d
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.a=rsa-sha256 header.s=mail header.b=kLRKax7Q
 Received: from [127.0.1.1] (cpc89244-aztw30-2-0-cust6594.18-1.cable.virginm.net [86.31.185.195])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 1B85220F7;
-	Tue, 17 Nov 2026 14:55:02 +0100 (CET)
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 1C34A15B2;
+	Tue, 17 Nov 2026 14:54:59 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1794923703;
-	bh=cHwdwzNargfc3BeW78Sng/2AI2tSJgiS/RyUNFGs4no=;
+	s=mail; t=1794923700;
+	bh=SGdF8nfS37ls6JI/8WVlvHSMe1DjBMEx5/IrVzLhb5w=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=CpC5ga6dMSesEiJ7rir/HGZ/EmCLaDwGe9KKBODAzTTQe9qb/FE9Z7pS1Vbob8EO5
-	 nao8uNB0WdtbLekaQrGnC6Mm831Sne7+b68QlWZwm9QUd20Q1PvJd+O4zQlsTY7Gqt
-	 7+BU3J/S+zF6WWD6zh/hZP6W1nQVuofFZqNsM/5Y=
+	b=kLRKax7Qdo2KFM3LRtNj1wG6mRam6bxjFgr5dCY7LNwEAE1gDePOPuSKuLCdROShE
+	 mDwtbAi6e5MZMtd83tcyjjfIV9fF1MrkMF8gYJzpcRzRD2SnOGUK+FEnsvfWt8wrCF
+	 xBePtEZipHyK/7oo6aczGgDw1CKchbKhlg6G3Aoo=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -54,8 +54,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v2 02/26] mm/fbatch: allow folios_put_refs() to skip
- xa_is_value() entries
+Subject: Re: [PATCH v2 00/26] mm/fbatch: drain lru_add_drain() and _all()
 From: Alen Karnil <alen.karnil@ideasonboard.com>
 To: Hugh Dickins <hughd@google.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, 
@@ -84,34 +83,36 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
  Zach O'Keefe <zokeefe@google.com>, Zi Yan <ziy@nvidia.com>, 
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
  linux-kernel@vger.kernel.org, linux-mm@kvack.org
-In-Reply-To: <c441176c-33b7-c8f8-fb7f-51774e1fd853@google.com>
+In-Reply-To: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
 References: <e28f9a94-4339-f8ac-8301-6be3c9b5b7ce@google.com>
- <c441176c-33b7-c8f8-fb7f-51774e1fd853@google.com>
 Date: Tue, 17 Nov 2026 13:57:16 +0000
-Message-Id: <179492383660.1554713.7829576009911841106.b4-review@b4>
+Message-Id: <179492383658.1554713.9260140415931487684.b4-review@b4>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=633;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=713;
  i=alen.karnil@ideasonboard.com; h=from:subject:message-id;
- bh=cHwdwzNargfc3BeW78Sng/2AI2tSJgiS/RyUNFGs4no=;
- b=owGbwMvMwCUWeK6p+sMV/3mMp9WSGLL+xLr5F3F9/Ne5sF+97axIV8yeF3s0wz/diZ8/a5390
- 5kHXh7d0VHKwiDGxSArpsjy5ZDM9KU2K8IuaIZwwsxhZQIZwsDFKQATuXGY4Z8t//sVyvX7C61P
- +zM8UP0bNMPF/HDfq3l5rku3M389btfI8D/Z+eg+wWCmdwW3Zj7QWjAxdgdjH2+hx7515lF3j9i
- pXmABAA==
+ bh=SGdF8nfS37ls6JI/8WVlvHSMe1DjBMEx5/IrVzLhb5w=;
+ b=owGbwMvMwCUWeK6p+sMV/3mMp9WSGLL+xDr0pdpNea1+QsDbv6z1/MembZb8+62j3efM//qG6
+ 59XmMr1jlIWBjEuBlkxRZYvh2SmL7VZEXZBM4QTZg4rE8gQBi5OAZhIMzfDbxbtTzlN+op2wge3
+ BJtvdVutoaIlusZ26wbjRV/WT/rNHsfwP59xlbfJTeOzJaf7RQxdTF7Pmz3P4c+RKskibv3ZKyR
+ aGQA=
 X-Developer-Key: i=alen.karnil@ideasonboard.com; a=openpgp;
  fpr=F4C21C97A53CA856D029540951CE827BF0D44F9E
 
-On Wed, 09 Sep 2026 02:44:34 -0700, Hugh Dickins <hughd@google.com> wrote:
-> Let folios_put_refs() (hence folio_batch_release()) skip xa_is_value()
-> entries, and therefore remove unneeded folio_batch_remove_exceptionals().
+On Wed, 09 Sep 2026 02:39:08 -0700, Hugh Dickins <hughd@google.com> wrote:
+> mm/fbatch: drain lru_add_drain() and _all()
 > 
-> It made some sense when introduced in 3.1 for shmem swap entries only,
-> but workingset shadows popularized exceptional entries in 3.15, and it's
-> silly for so many sites to be squashing exceptionals out of the fbatch,
-> merely to suit an inadequacy in folios_put_refs().
+> [PATCH v2 00/26] mm/fbatch: drain lru_add_drain() and _all()
+> 
+> This series was prompted by lru_add_drain_all() appearing in watchdog
+> backtraces: not to blame, but blocked on an unresponsive CPU to run
+> its workqueue. lru_add_drain_all() is a heavyweight operation, which
+> we often hope to avoid by a much lighter lru_add_drain(); but even
+> those local drains can aggravate the lruvec lock contention which
+> per-cpu fbatches are intended to ease.
 > 
 > [...]
 
-Reviewed-by: Alen Karnil <alen.karnil@ideasonboard.com>
+Tested-by: Alen Karnil <alen.karnil@ideasonboard.com>
 
 -- 
 Alen Karnil <alen.karnil@ideasonboard.com>
