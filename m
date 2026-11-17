@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794931076;
-	b=dow5+XDR61QTFHFMt2vfFPDzdwRFTz6GmJbtDWQ464vZZvsa+g6Uz30oTmUtKEEvaWoN
-	 yLklmiuMockbPukRPPH1dFjOVCxLoza4cHzTf2qCvTtE9MbaFmq+nnCE2sG7jTYSsl0cE
-	 rKyr32CuuNizQgB3xCqwYCNiPFmBboY8NY5Q7I4i+t9/HguLDh8mG+oktW9U+bFJL/Spy
-	 UriYdxny+rMUb112Mkpu/ILpCesnNTTFzzi06XqJWh9HtledEYY8lTmFlQ7J8qAr7jjA/
-	 TyDCohz7Y6aqUR3hmNZWkWDvrTwwNfD2jQ1gD+qWNDHoX3+U9wPujA0rXiBGwdeEKRw==
+	t=1794931072;
+	b=OjBtClqXCOO85Y9TQY2y3tqi7Kw5jhuYJVoRzj9Gto8k1AxkQDKKnUXQpkjuX5GV6Vhx
+	 hjJWGGKAcfFi6mozuti/a86dP8/CLX66SucXLDn3pulE9Viv6kTY2xJFDUs8k6KRD1Wk/
+	 C2AevmGEYOa5ibX/rj73M+mij5M3Si90fEloYS/f8EAVZt+sYrDeOqApSb+funjXHum3H
+	 C3zR7yX2o8BXZ1ulXwOhuT7v4x4oRqT/5qb8lgzopurrYt2Ds4k+feNuO3F6hm6FmJB2e
+	 GkMcPeuq2bq1u1hZbQVR04dQmnqXl9J9YbM3qV4m9XoFEUcANcJNb28NKeqicFM5NuQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794931076;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794931072;
 	h=Received:DKIM-Signature:From:To:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=ZKegxsbbmoMFGDS8M/5cc0FvMCKD2N+sBIwEvEtBL20=;
-	b=kTgEQMw8NagTXs7rss58qCjiAO7LaIlsdymlsppMDFItREHuKkpwciml5FxCSr867uWv
-	 boo5Df+A3K4f027cijUjWeXChVslUw5Z5jLCxZvZQMoZ8zNq1TClXt3AUPlsZt5W1zTFk
-	 9kn6UkETVtJuKg2Fn54CF+Qdp44n0nuvl+2xvJ9asqqVcacKEUzXd62lIxF/n6csMh0rD
-	 iP6wkgix/kQ/qJsh6AKzaE6Wh0FpyOrZ2YESS8aqGM2GiB5dpHH3or76jzfp0vHowMXoC
-	 Q4zQq6s3JezRPdSuz7plV6DPOQ385JWkP9XHMhHpDZ42Y7uSzgjZtSWXQbsYW21il/Q==
+	bh=dgd31cNTxL2P+0SedpsCaizJP3EtNoxzn8sqyokuGjg=;
+	b=HUqlOI9cfcEIQ7gSkUmVhxi9kKSaaJoE7oLRYKUmMdlqLX/tD2hGLyogIqEsqYEMwobK
+	 yoSUAd8RgKgHAnEr9SgF3iO9coXveHVKtzJfpiHTzbtUkDLvgZXiPjRVyU2UowP8knGVA
+	 +UOfiAsHsYtJZYUi1M32CsS10BBaYLtXX66w6rSj6bySLbspgOolSIx0vvjpTb5sYWCJj
+	 j6FuvPLjaXlKQWwNl/3qY7IfxIaywbiqsUZl2O6gL86XQCUsGsYZ4yc9TBN7hQKSKYpg3
+	 SZr60Hx+DnHd9Da/1rvUWS0zGRJFZYOzJ7nhLZLEFL4QHZ8q7Q7czkY5xDBMhwLyHtg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="M3/qYKvr";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VgvAUIrc;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBED0606A883;
-	Tue, 17 Nov 2026 15:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFDC606A8A5;
+	Tue, 17 Nov 2026 15:57:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=M3/qYKvr
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0527A1F000C5;
-	Tue, 17 Nov 2026 15:57:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VgvAUIrc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 890C21F000CE;
+	Tue, 17 Nov 2026 15:57:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794931075;
-	bh=ZKegxsbbmoMFGDS8M/5cc0FvMCKD2N+sBIwEvEtBL20=;
+	s=k20260515; t=1794931072;
+	bh=dgd31cNTxL2P+0SedpsCaizJP3EtNoxzn8sqyokuGjg=;
 	h=From:To:Subject:Date:In-Reply-To:References;
-	b=M3/qYKvr7ItpxhaebLPWH3EZZEZa/aYM6pM1yhpO6TLMNAfLFq0nEt2F8P7Oe7Gz9
-	 npNVRrOSgahVYkeCLK43R2hQPQ45QdPmm38BtECaf0WK6PkWVNLJwhdpRG+kQIbbZW
-	 2HPtT1WDM0LcZFR6JV8NTMECLfnS7z9HztPXAzkInA/uHUF2sE3uea+O+6HZVfKJEm
-	 SoYMG7OICTOubQy5Gf5lf6TkHaVMsxWvzx8FvfWiNR+FhTw3Z6ocw/agVGlkDLAgUe
-	 eF6kSOGQKWBBUVUtfuPqm0SN43NlbdKsMNhBN7wQoYtQByVtXCELrkQYqHKc2bWQT+
-	 rvbIpHz5+HrIA==
+	b=VgvAUIrcgxooIGyimf7uTeW6hcyRbjHrLGpt/5Vc6O+0Lh5uBcoRD9VKaLYJstAPS
+	 bRBw7p3Zk8u5ppgxqrRssWXpLWNDc5mjYSRPYU9tC/EBdz6TmS84XvpvU/9pe8HFgA
+	 egDsecFMr3CUCtoM1NK/ri4HnddUEvQ5zaFXjBHvPtOJA3DAXiyqUZT7hsAJSU5VAK
+	 P5kyW75eCe3hPGFT6m4iyKd3n8jUfAxoZJRYMPTB0YQofl4E0fishOMnDOrZ8HBa7u
+	 RYR7ffWqroONc1T/dXzXYWruh2aQV7s4r01mo4XpAO5x+6Wb2EcUuh+vSiQuUuoFRo
+	 nVR6RqHCM7iOw==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v12 12/13] scsi: sd_zbc: define storage element management operations
-Date: Wed, 18 Nov 2026 00:57:38 +0900
-Message-ID: <20261117155739.304506-13-dlemoal@kernel.org>
+Subject: [PATCH v12 09/13] zloop: add degrade_element control command
+Date: Wed, 18 Nov 2026 00:57:35 +0900
+Message-ID: <20261117155739.304506-10-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261117155739.304506-1-dlemoal@kernel.org>
 References: <20261117155739.304506-1-dlemoal@kernel.org>
@@ -62,585 +62,281 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Define the storage element management operations using struct blk_se_ops.
-These operations are valid only on SMR disks supporting the storage
-element depopulation featu, with support for the GET PHYSICAL ELEMENTS
-STATUS command being mandatory. The support for the modify_zones operation
-is already indicated by the depop_modify_zones_supported SCSI disk flag.
-sd_zbc_check_depop_supported() is modified to add detection for the
-command RESTORE ELEMENTS AND REBUILD, which is indicated with the new
-SCSI disk flag depop_restore_supported.
+Allow users to mark storage elements of a zloop device as degraded using
+the new "degrade_element" control command. The element to degrade is
+indicated using the element_id option. Example:
 
-Both the remove_element and restore_elements operations will block
-until the operation completes or an error is detected.
+echo "degrade_element id=0,element_id=2" > /dev/zloop-control
+
+If the element ID identifies an all access storage element, both read and
+write operations targeting a zone served by the degraded element are
+failed. In the case of a partial access storage element, any write access
+to a zone whose write element is degraded will fail, and read accesses
+to a zone whose read element is degraded will result in an error.
+
+The zoned_loop.rst documentation file is also updated to explain this new
+feature.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <mkp@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 ---
- drivers/scsi/sd.c     |   3 +
- drivers/scsi/sd.h     |   3 +
- drivers/scsi/sd_zbc.c | 479 +++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 484 insertions(+), 1 deletion(-)
+ .../admin-guide/blockdev/zoned_loop.rst       |  25 ++++-
+ drivers/block/zloop.c                         | 100 +++++++++++++++++-
+ 2 files changed, 121 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index dc45df819c42..34b44d72b2b7 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3939,6 +3939,9 @@ static const struct block_device_operations sd_fops = {
- 	.get_unique_id		= sd_get_unique_id,
- 	.free_disk		= scsi_disk_free_disk,
- 	.pr_ops			= &sd_pr_ops,
-+#ifdef CONFIG_BLK_DEV_ZONED
-+	.se_ops			= &sd_zbc_se_ops,
-+#endif
+diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
+index 80a564836c1b..be8a3d7729fe 100644
+--- a/Documentation/admin-guide/blockdev/zoned_loop.rst
++++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
+@@ -9,7 +9,8 @@ Zoned Loop Block Device
+ 	1) Overview
+ 	2) Creating a Zoned Device
+ 	3) Deleting a Zoned Device
+-	4) Example
++	4)  Degrading a storage element
++	5) Example
+ 
+ 
+ 1) Overview
+@@ -63,6 +64,7 @@ The options available for the add command can be listed by reading the
+ 	$ cat /dev/zloop-control
+         add id=%d,capacity_mb=%u,zone_size_mb=%u,zone_capacity_mb=%u,conv_zones=%u,max_open_zones=%u,base_dir=%s,nr_queues=%u,queue_depth=%u,buffered_io,zone_append=%u,ordered_zone_append,discard_write_cache,stor_elements=%u
+         remove id=%d
++        degrade_element id=%d,element_id=%u
+ 
+ In more details, the options that can be used with the "add" command are as
+ follows.
+@@ -144,7 +146,26 @@ the zoned device will not be created.
+ To fully delete a zoned device, after executing the remove operation, the device
+ base directory containing the backing files of the device zones must be deleted.
+ 
+-4) Example
++4) Degrading a storage element
++------------------------------
++
++When storage element emulation is enabled, storage elements can be set in a
++degraded state to emulate defective storage elements (e.g. defective heads of a
++hard disk). This is done by issuing the "degrade_element" command to
++/dev/zloop-control, specifying the ID of the target device and the ID of the
++storage element to degrade::
++
++        $ echo "degrade_element id=X,element_id=Y" > /dev/zloop-control
++
++Depending on the type of the storage element specified, a read or write access
++to sectors of a zone served by a degraded storage element will result in a
++failure. For partial access storage elements, write accesses are always failed
++if the write element serving the zone is degraded. Likewise, read accesses are
++failed if the read element serving the zone is degraded. When storage elements
++are emulated as all access physical elements, both read and write operations are
++failed when the storage element serving the zones being accessed is degraded.
++
++5) Example
+ ----------
+ 
+ The following sequence of commands creates a 2GB zoned device with zones of 64
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index a4536e6240c0..62b3d0ddab3f 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -39,6 +39,7 @@ enum {
+ 	ZLOOP_OPT_DISCARD_WRITE_CACHE	= (1 << 11),
+ 	ZLOOP_OPT_MAX_OPEN_ZONES	= (1 << 12),
+ 	ZLOOP_OPT_STOR_ELEMENTS		= (1 << 13),
++	ZLOOP_OPT_ELEMENT_ID		= (1 << 14),
  };
  
- /**
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 84c87d0f05d8..8a32e5f771d8 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -158,6 +158,7 @@ struct scsi_disk {
- 	unsigned	use_atomic_write_boundary : 1;
- 	unsigned	depop_report_supported : 1;
- 	unsigned	depop_modify_zones_supported : 1;
-+	unsigned	depop_restore_supported : 1;
+ static const match_table_t zloop_opt_tokens = {
+@@ -56,6 +57,7 @@ static const match_table_t zloop_opt_tokens = {
+ 	{ ZLOOP_OPT_DISCARD_WRITE_CACHE, "discard_write_cache"	},
+ 	{ ZLOOP_OPT_MAX_OPEN_ZONES,	"max_open_zones=%u"	},
+ 	{ ZLOOP_OPT_STOR_ELEMENTS,	"stor_elements=%u"	},
++	{ ZLOOP_OPT_ELEMENT_ID,		"element_id=%u"		},
+ 	{ ZLOOP_OPT_ERR,		NULL			}
  };
- #define to_scsi_disk(obj) container_of(obj, struct scsi_disk, disk_dev)
  
-@@ -244,6 +245,8 @@ unsigned int sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
- int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,
- 		unsigned int nr_zones, struct blk_report_zones_args *args);
+@@ -82,6 +84,7 @@ enum zloop_stor_elements {
+ #define ZLOOP_DEF_ZONE_APPEND		true
+ #define ZLOOP_DEF_ORDERED_ZONE_APPEND	false
+ #define ZLOOP_DEF_STOR_ELEMENTS		ZLOOP_STOR_ELEMENTS_NONE
++#define ZLOOP_DEF_ELEMENT_ID		0
  
-+extern const struct blk_se_ops sd_zbc_se_ops;
-+
- #else /* CONFIG_BLK_DEV_ZONED */
+ /* Arbitrary limit on the zone size (16GB). */
+ #define ZLOOP_MAX_ZONE_SIZE_MB		16384
+@@ -102,6 +105,7 @@ struct zloop_options {
+ 	bool			ordered_zone_append;
+ 	bool			discard_write_cache;
+ 	enum zloop_stor_elements stor_elements;
++	unsigned int		element_id;
+ };
  
- static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index bf2e60071d57..201d5456d72b 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -12,6 +12,7 @@
- #include <linux/vmalloc.h>
- #include <linux/sched/mm.h>
- #include <linux/mutex.h>
-+#include <linux/delay.h>
- 
- #include <linux/unaligned.h>
- 
-@@ -522,7 +523,8 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf,
-  * @sdkp: Target SCSI disk
-  * @buf: command buffer
-  *
-- * Check if the device supports the REMOVE ELEMENT AND MODIFY ZONES command.
-+ * Check if the device supports the storage elements depopulation management
-+ * commands.
-  */
- static void sd_zbc_check_depop_supported(struct scsi_disk *sdkp,
- 					 unsigned char *buf)
-@@ -534,6 +536,7 @@ static void sd_zbc_check_depop_supported(struct scsi_disk *sdkp,
- 				   SAI_GET_PHYSICAL_ELEMENT_STATUS) == 1;
- 	if (!sdkp->depop_report_supported) {
- 		sdkp->depop_modify_zones_supported = false;
-+		sdkp->depop_restore_supported = false;
- 		return;
- 	}
- 
-@@ -541,6 +544,11 @@ static void sd_zbc_check_depop_supported(struct scsi_disk *sdkp,
- 		scsi_report_opcode(sdkp->device, buf, SD_BUF_SIZE,
- 				   SERVICE_ACTION_IN_16,
- 				   SAI_REMOVE_ELEMENT_AND_MODIFY_ZONES) == 1;
-+
-+	sdkp->depop_restore_supported =
-+		scsi_report_opcode(sdkp->device, buf, SD_BUF_SIZE,
-+				   SERVICE_ACTION_IN_16,
-+				   SAI_RESTORE_ELEMENTS_AND_REBUILD) == 1;
- }
- 
- static void sd_zbc_print_zones(struct scsi_disk *sdkp)
-@@ -548,6 +556,11 @@ static void sd_zbc_print_zones(struct scsi_disk *sdkp)
- 	if (sdkp->device->type != TYPE_ZBC || !sdkp->capacity)
- 		return;
- 
-+	if (sdkp->depop_modify_zones_supported)
-+		sd_printk(KERN_NOTICE, sdkp, "Depop modify zones supported\n");
-+	if (sdkp->depop_restore_supported)
-+		sd_printk(KERN_NOTICE, sdkp, "Depop restoration supported\n");
-+
- 	if (sdkp->capacity & (sdkp->zone_info.zone_blocks - 1))
- 		sd_printk(KERN_NOTICE, sdkp,
- 			  "%u zones of %u logical blocks + 1 runt zone\n",
-@@ -560,6 +573,470 @@ static void sd_zbc_print_zones(struct scsi_disk *sdkp)
- 			  sdkp->zone_info.zone_blocks);
- }
- 
-+static void sd_zbc_parse_storage_element(struct scsi_disk *sdkp, u8 *desc,
-+					 struct blk_se *element)
-+{
-+	struct scsi_device *sdp = sdkp->device;
-+	sector_t zone_sectors = sd_zbc_zone_sectors(sdkp);
-+	u64 capacity;
-+
-+	memset(element, 0, sizeof(*element));
-+
-+	element->id = get_unaligned_be32(&desc[4]);
-+	element->restore_allowed = desc[13] & 0x01;
-+
-+	switch (desc[14]) {
-+	case SCSI_PHYS_ELEM_TYPE_ALL_ACCESS_STORAGE:
-+		element->type = BLK_SE_TYPE_RDWR;
-+		capacity = get_unaligned_be64(&desc[16]);
-+		if (!zone_sectors || capacity == ULLONG_MAX)
-+			element->nr_zones = 0;
-+		else
-+			element->nr_zones =
-+				logical_to_sectors(sdp, capacity) >>
-+					ilog2(zone_sectors);
-+		break;
-+	case SCSI_PHYS_ELEM_TYPE_FRAC_ACCESS_STORAGE:
-+		element->paired_id = get_unaligned_be32(&desc[16]);
-+		if (desc[20] & 0x01)
-+			element->type = BLK_SE_TYPE_READ;
-+		else
-+			element->type = BLK_SE_TYPE_WRITE;
-+		element->nr_zones = get_unaligned_be64(&desc[24]);
-+		if (!zone_sectors || element->nr_zones == ULLONG_MAX)
-+			element->nr_zones = 0;
-+		break;
-+	default:
-+		element->type = BLK_SE_TYPE_UNKNOWN;
-+	}
-+
-+	if (desc[15] >= SCSI_PHYS_ELEM_HEALTH_WITHIN_SPEC_LIMITS_MIN &&
-+	    desc[15] <= SCSI_PHYS_ELEM_HEALTH_WITHIN_SPEC_LIMITS_MAX) {
-+		element->status = BLK_SE_STS_OK;
-+		return;
-+	}
-+
-+	if (desc[15] >= SCSI_PHYS_ELEM_HEALTH_OUTSIDE_SPEC_LIMITS_MIN &&
-+	    desc[15] <= SCSI_PHYS_ELEM_HEALTH_OUTSIDE_SPEC_LIMITS_MAX) {
-+		element->status = BLK_SE_STS_DEGRADED;
-+		return;
-+	}
-+
-+	switch (desc[15]) {
-+	case SCSI_PHYS_ELEM_HEALTH_AT_SPEC_LIMITS:
-+		element->status = BLK_SE_STS_OK_LIMIT;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_REVOKE_ERR:
-+		element->status = BLK_SE_STS_RESTORE_ERROR;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_REVOKE_IN_PROGRESS:
-+		element->status = BLK_SE_STS_RESTORE_IN_PROGRESS;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_ERR:
-+		element->status = BLK_SE_STS_REMOVE_ERROR;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_IN_PROGRESS:
-+		element->status = BLK_SE_STS_REMOVE_IN_PROGRESS;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_DEPOP_OK:
-+		element->status = BLK_SE_STS_REMOVED;
-+		break;
-+	case SCSI_PHYS_ELEM_HEALTH_NOT_REPORTED:
-+	default:
-+		element->status = BLK_SE_STS_UNKNOWN;
-+		break;
-+	}
-+}
-+
-+/*
-+ * Large hard limit on the number of storage elements. This accommodates all
-+ * known devices today and likely forever :)
-+ */
-+#define SD_ZBC_MAX_STORAGE_ELEMENTS	255
-+
-+struct sd_zbc_se_report {
-+	struct blk_se *elements;
-+	unsigned int nr_elements;
-+	unsigned int nr_reported_elements;
-+	bool need_free_elements;
-+	u8 *buf;
-+	unsigned int buf_size;
-+};
-+
-+static int sd_zbc_alloc_se_report(struct blk_se *elements,
-+				  unsigned int nr_elements,
-+				  bool alloc_elements,
-+				  struct sd_zbc_se_report *rep)
-+{
-+	/*
-+	 * We need at least 32B for the report header and 32B for each
-+	 * descriptor. Note that we use GFP_KERNEL here, which may block. That
-+	 * is fine when called from ioctl context. When called from a file
-+	 * system, the FS can use memalloc_noio_save()/restore() or
-+	 * memalloc_nofs_save()/restore() if GFP_NOFS is required to avoid I/Os
-+	 * and/or FS re-entry.
-+	 */
-+	rep->need_free_elements = alloc_elements;
-+	rep->nr_elements = min(SD_ZBC_MAX_STORAGE_ELEMENTS, nr_elements);
-+	rep->buf_size = ALIGN((rep->nr_elements + 1) * 32, SECTOR_SIZE);
-+	rep->buf = kzalloc(rep->buf_size, GFP_KERNEL);
-+	if (!rep->buf)
-+		return -ENOMEM;
-+
-+	if (!alloc_elements) {
-+		rep->elements = elements;
-+		return 0;
-+	}
-+
-+	rep->elements =
-+		kzalloc_objs(struct blk_se, rep->nr_elements, GFP_KERNEL);
-+	if (!rep->elements) {
-+		kfree(rep->buf);
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+static void sd_zbc_free_se_report(struct sd_zbc_se_report *rep)
-+{
-+	kfree(rep->buf);
-+	if (rep->need_free_elements)
-+		kfree(rep->elements);
-+}
-+
-+static int sd_zbc_report_se(struct scsi_disk *sdkp,
-+			    struct sd_zbc_se_report *rep)
-+{
-+	struct scsi_device *sdp = sdkp->device;
-+	const int timeout = sdp->request_queue->rq_timeout;
-+	struct scsi_sense_hdr sshdr;
-+	struct scsi_failure failure_defs[] = {
-+		/* Allow up to retry 3 times */
-+		{
-+			.result = SCMD_FAILURE_RESULT_ANY,
-+			.allowed = 3,
-+		},
-+		{}
-+	};
-+	struct scsi_failures failures = {
-+		.failure_definitions = failure_defs,
-+	};
-+	const struct scsi_exec_args exec_args = {
-+		.sshdr = &sshdr,
-+		.failures = &failures,
-+	};
-+	unsigned char cmd[16];
-+	unsigned int nr_descs;
-+	int i, result;
-+	u8 *desc;
-+
-+	memset(cmd, 0, 16);
-+	cmd[0] = SERVICE_ACTION_IN_16;
-+	cmd[1] = SAI_GET_PHYSICAL_ELEMENT_STATUS;
-+	put_unaligned_be32(rep->buf_size, &cmd[10]);
-+
-+	result = scsi_execute_cmd(sdp, cmd, REQ_OP_DRV_IN,
-+			rep->buf, rep->buf_size, timeout, 1, &exec_args);
-+	if (result) {
-+		if (result > 0) {
-+			sd_print_result(sdkp, "GET PHYSICAL ELEMENT STATUS",
-+					result);
-+			if (scsi_sense_valid(&sshdr))
-+				sd_print_sense_hdr(sdkp, &sshdr);
-+			return -EIO;
-+		}
-+		return result;
-+	}
-+
-+	nr_descs = get_unaligned_be32(&rep->buf[0]);
-+	if (!nr_descs) {
-+		sd_printk(KERN_ERR, sdkp,
-+			  "Invalid number of phys element descriptors\n");
-+		return -EIO;
-+	}
-+	if (nr_descs > SD_ZBC_MAX_STORAGE_ELEMENTS) {
-+		sd_printk(KERN_ERR, sdkp,
-+			  "Too many phys element descriptors\n");
-+		return -EIO;
-+	}
-+
-+	if (!rep->elements) {
-+		rep->nr_reported_elements = nr_descs;
-+		return 0;
-+	}
-+
-+	rep->nr_reported_elements =
-+		min(rep->nr_elements, get_unaligned_be32(&rep->buf[4]));
-+	if (!rep->nr_reported_elements) {
-+		sd_printk(KERN_ERR, sdkp,
-+			"Invalid number of reported phys element descriptors\n");
-+		return -EIO;
-+	}
-+
-+	desc = &rep->buf[32];
-+	for (i = 0; i < rep->nr_reported_elements; i++, desc += 32)
-+		sd_zbc_parse_storage_element(sdkp, desc, &rep->elements[i]);
-+
-+	return 0;
-+}
-+
-+static int sd_zbc_report_storage_elements(struct gendisk *disk,
-+					  struct blk_se *elements,
-+					  unsigned int *nr_elements)
-+{
-+	struct scsi_disk *sdkp = scsi_disk(disk);
-+	struct sd_zbc_se_report rep;
-+	int ret;
-+
-+	if (!sdkp->depop_report_supported)
-+		return -EOPNOTSUPP;
-+
-+	ret = sd_zbc_alloc_se_report(elements, *nr_elements, false, &rep);
-+	if (ret)
-+		return ret;
-+
-+	ret = sd_zbc_report_se(sdkp, &rep);
-+	if (!ret)
-+		*nr_elements = rep.nr_reported_elements;
-+
-+	sd_zbc_free_se_report(&rep);
-+
-+	return ret;
-+}
-+
-+static int sd_zbc_execute_storage_element_cmd(struct scsi_disk *sdkp,
-+					      u8 action, u32 element_id)
-+{
-+	struct scsi_device *sdp = sdkp->device;
-+	const int timeout = sdp->request_queue->rq_timeout;
-+	struct scsi_sense_hdr sshdr;
-+	const struct scsi_exec_args exec_args = {
-+		.sshdr = &sshdr,
-+	};
-+	unsigned char cmd[16];
-+	const char *cmd_name;
-+	int result;
-+
-+	memset(cmd, 0, sizeof(cmd));
-+	cmd[0] = SERVICE_ACTION_IN_16;
-+	cmd[1] = action;
-+	if (action == SAI_REMOVE_ELEMENT_AND_MODIFY_ZONES) {
-+		put_unaligned_be32(element_id, &cmd[10]);
-+		cmd_name = "REMOVE ELEMENT AND MODIFY ZONES";
-+	} else {
-+		cmd_name = "RESTORE ELEMENTS AND REBUILD";
-+	}
-+
-+	result = scsi_execute_cmd(sdp, cmd, REQ_OP_DRV_IN, NULL, 0,
-+				  timeout, 1, &exec_args);
-+	if (result) {
-+		sd_printk(KERN_ERR, sdkp, "%s failed\n", cmd_name);
-+		if (result > 0) {
-+			if (scsi_sense_valid(&sshdr))
-+				sd_print_sense_hdr(sdkp, &sshdr);
-+			result = -EIO;
-+		}
-+		return result;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Wait for the completion of a storage element remove operation. Note that the
-+ * standards advise to use pollable sense data with the REQUEST SENSE command to
-+ * detect if a remove operation is in progress. However, since REQUEST SENSE
-+ * will return sense data only for the last executed command, and since we are
-+ * not blocking commands, this method would be unreliable as we may end up
-+ * seeing sense data (or no sense data) for a command that is not the REMOVE
-+ * ELEMENT AND MODIFY ZONES we issued.
-+ */
-+static int sd_zbc_wait_for_se_removal(struct scsi_disk *sdkp,
-+				      struct sd_zbc_se_report *rep,
-+				      unsigned int element_id)
-+{
-+	bool element_checked, element_removed;
-+	unsigned int i, in_progress;
-+	int ret;
-+
-+	/*
-+	 * Poll the storage elements health to see that we get the element we
-+	 * are interested in and that its removal completed. Since we do not
-+	 * know how long the operation may take, we cannot have a timeout on
-+	 * this loop. So check for fatal signals so that the user can terminate
-+	 * this loop if the device misbehaves.
-+	 */
-+	do {
-+		msleep(1000);
-+
-+		ret = sd_zbc_report_se(sdkp, rep);
-+		if (ret)
-+			return ret;
-+		if (rep->nr_reported_elements != rep->nr_elements)
-+			return -EIO;
-+
-+		element_checked = false;
-+		element_removed = false;
-+		in_progress = 0;
-+		for (i = 0; i < rep->nr_reported_elements; i++) {
-+			if (rep->elements[i].id == element_id)
-+				element_checked = true;
-+			switch (rep->elements[i].status) {
-+			case BLK_SE_STS_REMOVED:
-+				if (rep->elements[i].id == element_id)
-+					element_removed = true;
-+				break;
-+			case BLK_SE_STS_REMOVE_IN_PROGRESS:
-+				in_progress++;
-+				break;
-+			default:
-+				break;
-+			}
-+		}
-+
-+		if (!element_checked)
-+			return -EIO;
-+		if (!in_progress) {
-+			if (element_removed)
-+				return 0;
-+			return -EIO;
-+		}
-+	} while (!fatal_signal_pending(current));
-+
-+	return -EINTR;
-+}
-+
-+static int sd_zbc_remove_storage_element(struct gendisk *disk,
-+					 unsigned int element_id)
-+{
-+	struct scsi_disk *sdkp = scsi_disk(disk);
-+	struct sd_zbc_se_report rep;
-+	int ret;
-+
-+	if (!sdkp->depop_modify_zones_supported)
-+		return -EOPNOTSUPP;
-+
-+	/*
-+	 * Get the resources we need to prepare for waiting for the operation to
-+	 * complete.
-+	 */
-+	ret = sd_zbc_alloc_se_report(NULL, disk->nr_storage_elements,
-+				     true, &rep);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * Execute the remove command and wait for the element removal operation
-+	 * to complete.
-+	 */
-+	ret = sd_zbc_execute_storage_element_cmd(sdkp,
-+			SAI_REMOVE_ELEMENT_AND_MODIFY_ZONES, element_id);
-+	if (!ret)
-+		ret = sd_zbc_wait_for_se_removal(sdkp, &rep, element_id);
-+	if (!ret)
-+		sd_printk(KERN_NOTICE, sdkp,
-+			  "Removed storage element %u\n", element_id);
-+
-+	sd_zbc_free_se_report(&rep);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Wait for the completion of the restoration of removed storage elements.
-+ * See the note for sd_zbc_wait_for_se_removal().
-+ */
-+static int sd_zbc_wait_for_se_restore(struct scsi_disk *sdkp,
-+				      struct sd_zbc_se_report *rep)
-+{
-+	unsigned int i, in_progress, in_error;
-+	int ret;
-+
-+	/*
-+	 * Poll the storage elements health to see if we have any element still
-+	 * being restored or if we got errors. Since restoration is a best
-+	 * effort process, we care only about failed restoration for elements
-+	 * that are allowed to be restored.
-+	 * Since we do not know how long the operation may take, we cannot have
-+	 * a timeout on this loop. So check for fatal signals so that the user
-+	 * can terminate this retry loop if the device misbehaves.
-+	 */
-+	do {
-+		msleep(1000);
-+
-+		ret = sd_zbc_report_se(sdkp, rep);
-+		if (ret)
-+			return ret;
-+		if (rep->nr_reported_elements != rep->nr_elements)
-+			return -EIO;
-+
-+		in_progress = 0;
-+		in_error = 0;
-+		for (i = 0; i < rep->nr_reported_elements; i++) {
-+			switch (rep->elements[i].status) {
-+			case BLK_SE_STS_RESTORE_IN_PROGRESS:
-+				in_progress++;
-+				break;
-+			case BLK_SE_STS_RESTORE_ERROR:
-+				if (rep->elements[i].restore_allowed)
-+					in_error++;
-+				break;
-+			default:
-+				break;
-+			}
-+		}
-+
-+		if (!in_progress) {
-+			if (in_error)
-+				return -EIO;
-+			return 0;
-+		}
-+	} while (!fatal_signal_pending(current));
-+
-+	return -EINTR;
-+}
-+
-+static int sd_zbc_restore_storage_elements(struct gendisk *disk)
-+{
-+	struct scsi_disk *sdkp = scsi_disk(disk);
-+	struct sd_zbc_se_report rep;
-+	int ret;
-+
-+	if (!sdkp->depop_restore_supported)
-+		return -EOPNOTSUPP;
-+
-+	/*
-+	 * Get the resources we need to prepare for waiting for the operation to
-+	 * complete.
-+	 */
-+	ret = sd_zbc_alloc_se_report(NULL, disk->nr_storage_elements,
-+				     true, &rep);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * Execute the restore command and wait for the elements restoration
-+	 * operation to complete.
-+	 */
-+	ret = sd_zbc_execute_storage_element_cmd(sdkp,
-+					SAI_RESTORE_ELEMENTS_AND_REBUILD, 0);
-+	if (!ret)
-+		ret = sd_zbc_wait_for_se_restore(sdkp, &rep);
-+	if (!ret)
-+		sd_printk(KERN_NOTICE, sdkp, "Restored storage elements\n");
-+
-+	sd_zbc_free_se_report(&rep);
-+
-+	return ret;
-+}
-+
-+const struct blk_se_ops sd_zbc_se_ops = {
-+	.report_elements	= sd_zbc_report_storage_elements,
-+	.remove_element		= sd_zbc_remove_storage_element,
-+	.restore_elements	= sd_zbc_restore_storage_elements,
-+};
-+
  /*
-  * Call blk_revalidate_disk_zones() if any of the zoned disk properties have
-  * changed that make it necessary to call that function. Called by
+@@ -1175,6 +1179,31 @@ static int zloop_report_elements(struct gendisk *disk,
+ 	return 0;
+ }
+ 
++static int zloop_degrade_element(struct zloop_device *zlo,
++				 unsigned int element_id)
++{
++	struct blk_se *se;
++	int ret = 0;
++
++	if (zlo->stor_elements == ZLOOP_STOR_ELEMENTS_NONE)
++		return -EOPNOTSUPP;
++
++	if (!element_id || element_id > zlo->nr_elements)
++		return -EINVAL;
++
++	mutex_lock(&zlo->stor_elements_lock);
++
++	se = &zlo->elements[element_id - 1];
++	if (READ_ONCE(se->status) <= BLK_SE_STS_DEGRADED)
++		WRITE_ONCE(se->status, BLK_SE_STS_DEGRADED);
++	else
++		ret = -EINVAL;
++
++	mutex_unlock(&zlo->stor_elements_lock);
++
++	return ret;
++}
++
+ static int zloop_execute_remove_element(struct zloop_device *zlo)
+ {
+ 	struct gendisk *disk = zlo->disk;
+@@ -1801,6 +1830,11 @@ static int zloop_ctl_add(struct zloop_options *opts)
+ 	int ret = -EINVAL;
+ 	bool restore;
+ 
++	if (opts->mask & ZLOOP_OPT_ELEMENT_ID) {
++		pr_err("Invalid option specified for add\n");
++		return -EINVAL;
++	}
++
+ 	__module_get(THIS_MODULE);
+ 
+ 	nr_zones = opts->capacity >> ilog2(opts->zone_size);
+@@ -2109,6 +2143,49 @@ static int zloop_ctl_remove(struct zloop_options *opts)
+ 	return 0;
+ }
+ 
++static int zloop_ctl_degrade_element(struct zloop_options *opts)
++{
++	struct zloop_device *zlo;
++	int ret = 0;
++
++	if (!(opts->mask & ZLOOP_OPT_ID)) {
++		pr_err("No ID specified for degrade_element\n");
++		return -EINVAL;
++	}
++
++	if (!(opts->mask & ZLOOP_OPT_ELEMENT_ID)) {
++		pr_err("No element ID specified for degrade_element\n");
++		return -EINVAL;
++	}
++
++	if (opts->mask & ~(ZLOOP_OPT_ID | ZLOOP_OPT_ELEMENT_ID)) {
++		pr_err("Invalid option specified for degrade_element\n");
++		return -EINVAL;
++	}
++
++	ret = mutex_lock_killable(&zloop_ctl_mutex);
++	if (ret)
++		return ret;
++
++	zlo = idr_find(&zloop_index_idr, opts->id);
++	if (!zlo || zlo->state == Zlo_creating)
++		ret = -ENODEV;
++	else if (zlo->state == Zlo_deleting)
++		ret = -EINVAL;
++	if (ret)
++		goto unlock;
++
++	ret = zloop_degrade_element(zlo, opts->element_id);
++	if (!ret)
++		pr_info("%pg: degraded element %u\n",
++			zlo->disk->part0, opts->element_id);
++
++unlock:
++	mutex_unlock(&zloop_ctl_mutex);
++
++	return ret;
++}
++
+ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
+ {
+ 	substring_t args[MAX_OPT_ARGS];
+@@ -2129,6 +2206,7 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
+ 	opts->zone_append = ZLOOP_DEF_ZONE_APPEND;
+ 	opts->ordered_zone_append = ZLOOP_DEF_ORDERED_ZONE_APPEND;
+ 	opts->stor_elements = ZLOOP_DEF_STOR_ELEMENTS;
++	opts->element_id = ZLOOP_DEF_ELEMENT_ID;
+ 
+ 	if (!buf)
+ 		return 0;
+@@ -2280,6 +2358,13 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
+ 			}
+ 			opts->stor_elements = token;
+ 			break;
++		case ZLOOP_OPT_ELEMENT_ID:
++			if (match_uint(args, &token)) {
++				ret = -EINVAL;
++				goto out;
++			}
++			opts->element_id = token;
++			break;
+ 		case ZLOOP_OPT_ERR:
+ 		default:
+ 			pr_warn("unknown parameter or missing value '%s'\n", p);
+@@ -2308,14 +2393,16 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
+ enum {
+ 	ZLOOP_CTL_ADD,
+ 	ZLOOP_CTL_REMOVE,
++	ZLOOP_CTL_DEGRADE_ELEMENT,
+ };
+ 
+ static struct zloop_ctl_op {
+ 	int		code;
+ 	const char	*name;
+ } zloop_ctl_ops[] = {
+-	{ ZLOOP_CTL_ADD,	"add" },
+-	{ ZLOOP_CTL_REMOVE,	"remove" },
++	{ ZLOOP_CTL_ADD,		"add" },
++	{ ZLOOP_CTL_REMOVE,		"remove" },
++	{ ZLOOP_CTL_DEGRADE_ELEMENT,	"degrade_element" },
+ 	{ -1,	NULL },
+ };
+ 
+@@ -2363,6 +2450,9 @@ static ssize_t zloop_ctl_write(struct file *file, const char __user *ubuf,
+ 	case ZLOOP_CTL_REMOVE:
+ 		ret = zloop_ctl_remove(&opts);
+ 		break;
++	case ZLOOP_CTL_DEGRADE_ELEMENT:
++		ret = zloop_ctl_degrade_element(&opts);
++		break;
+ 	default:
+ 		pr_err("Invalid operation\n");
+ 		ret = -EINVAL;
+@@ -2386,6 +2476,8 @@ static int zloop_ctl_show(struct seq_file *seq_file, void *private)
+ 		tok = &zloop_opt_tokens[i];
+ 		if (!tok->pattern)
+ 			break;
++		if (tok->token == ZLOOP_OPT_ELEMENT_ID)
++			continue;
+ 		if (i)
+ 			seq_putc(seq_file, ',');
+ 		seq_puts(seq_file, tok->pattern);
+@@ -2396,6 +2488,10 @@ static int zloop_ctl_show(struct seq_file *seq_file, void *private)
+ 	seq_puts(seq_file, zloop_ctl_ops[1].name);
+ 	seq_puts(seq_file, " id=%d\n");
+ 
++	/* Degrade element operation */
++	seq_puts(seq_file, zloop_ctl_ops[2].name);
++	seq_puts(seq_file, " id=%d,element_id=%u\n");
++
+ 	return 0;
+ }
+ 
 -- 
 2.56.1
 
