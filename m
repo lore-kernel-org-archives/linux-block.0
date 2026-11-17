@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794931070;
-	b=2W2yue+O0Uuz9D2fn+I/92gMzXX3cwSK2OCm2uNANl1VqfssbRFmCxq+N57VbD20JfZf
-	 PrLte3qKvmyiIZBJxKRqGG0rmh1D2rQaVU0FX8PhAbFr7pLnfW171FWjpQzxqJJl6aUMs
-	 I9MOw/rTCemraD7g23xC9blEc1yQBws+bx01rVyctMmRgqtI5ObtlXL9Zp6zdO3n25fy+
-	 tZMxjmu4zlFnjuJTtAW8hVyS2jcw0ZRmBTfqPfAPJvHB9BTiJeR5z6Rjp0lqqFaUX3nVv
-	 kiKLukngvQnNpdJvv6gecpJN0tSlco+Z+yUNYpXtA+pjR0L5XXbrvx1ZCnPSjfVANPw==
+	t=1794931065;
+	b=5dxqUdXRbhNZECWYR7uG4sLoD9nTc5N/iUmjDflYNBJGOY8IgEBp3LaaoUzwchoApZzC
+	 2YEzXqGFC3FrqTaHXO9EbtY7hoKpFVlCB//ZEvLiOuIvv+nWf4xAViaGFDJyY1MZhcaKj
+	 Q8fIgtiNq1bUvqMPp2WLkw0W5PrUHrFoPP1QFC/of079yec/H8vVPJ5mi6p5Dsr8DhaXN
+	 UQ7IWZXLJB5emu9Rpu78Asx573VCmwnQrEH/jQxwDRaxkdZlPOP0ENGIIuL+Vx8s198DZ
+	 VeaJHQloxPv7MFWcY5VcUu/y4+OPd/vSgRRYUb6Wb1cdVoU2bFZdh0/Rbiz2E+uzfSQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794931070;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794931065;
 	h=Received:DKIM-Signature:From:To:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=MEWUIA8EFD6426LiIW3WNwL+ZDOjXx3FCY1R8/PbnWs=;
-	b=QiTTr6dqE+XJYNTLUZY3hoOk/lefzCXyfUlHukW33bSXUHAvkymSWX84z51Sfaqx4m4u
-	 eyqnAFJ4JAVSDdIjlm80NuCHngN0pLow1PqrIFU3ELMSGqakmFwZt57kXMSN2Qdv31BYE
-	 LtS8cDkPM8kn3vSnhjjuf2Hgz8jguLCrUBQ836p1iFAD0n40NbaCMg9AMIu9RS5VFomvs
-	 xUCOwzl+guQZQzdQUjofmk6zFQLAVe2NYofUKwi692ex66l+WxSFlYIS1hMqyQ8pNyxpj
-	 Rbw20greQwBONze01SxZdX5x5UWCsHYink1x9rVWaE1QEiwj8oXlvvwz+y7VeCqoGuA==
+	bh=8BkUdf1S46KqyubGGpY/YhD1wSuJJFemJippob/xq/A=;
+	b=PTh/ItbYBxfVSNJHE9m0nLBpWUHyKBIx76vh6VjKpARveIbfzOw2dlA0rJJqs1o1hPxZ
+	 6/jltRN3AcHHkQui7yRv6kU6jmcuIFszE4q2tsMB0nzQ2sTGaqFy3DIXqaCXNtSIYyWAp
+	 RFfGVxowF7DlDYinjwnnnCHEnBaSBHAcQuE7aFFqcyzOBZCWrvgAPpolv6/6cKru9lSSI
+	 zdV7sTlnoz5JaJE6v7GcdkbqZdI241Uw1jEw3VgrR5zCq+swHtkhohJJrKpr6bHyzEUzP
+	 c0wRBTz9F7r4DuGE2RPxlG5IpYIizhH4rPVrSsbnDe3qRuV5p9OgCyhBxKzuIWkc/6Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RhPcd+4k;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZKFKbgnN;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A63606A89C;
-	Tue, 17 Nov 2026 15:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA4B606A884;
+	Tue, 17 Nov 2026 15:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RhPcd+4k
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E8881F000C9;
-	Tue, 17 Nov 2026 15:57:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZKFKbgnN
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D6B21F000C6;
+	Tue, 17 Nov 2026 15:57:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794931070;
-	bh=MEWUIA8EFD6426LiIW3WNwL+ZDOjXx3FCY1R8/PbnWs=;
+	s=k20260515; t=1794931065;
+	bh=8BkUdf1S46KqyubGGpY/YhD1wSuJJFemJippob/xq/A=;
 	h=From:To:Subject:Date:In-Reply-To:References;
-	b=RhPcd+4kQzxYJUyHL4QqTcC/mqWMmmelF9omlJoWGbw1wLVeaSRAElXH2Pw+MC3XR
-	 7lxQ/VKxAc3nxHY9WJI/SVJkhdmJfuMW06JJG4fqJEfWB7bHVUb+ZKJ+0PSCQCxEP9
-	 uiF9Q9bxFvaWQA0TzHvhX9rel9pTthLmebVzd7RGVjO+DnP/cu6Aoi0GJc7Vf48ntM
-	 NmFLuM2P0+L+Rd3eeTFHW1S3/dF/dVpVi+VACwsIsjHIVyW8FPY/kxhjHTQgE/9ojP
-	 YAmzSLnZJQFSTOm/uIVLCQHKznu1ubz0L+j3C83rI3K5u1OWUSYjfcC0OW2nh9Ag+2
-	 f1EH3xJytYJ4w==
+	b=ZKFKbgnN8xHsOJn/WDG1l4DSFLvZEYTxQBGqBRzBgN/3at0bcJSRNZBC3O4EQKGfT
+	 jCjJ1kxJXBhZrIIx1tiKZuhZOakjph9GCzi1n+bFR7S2dIjCB5qma4TrWtbTFaBG0U
+	 DulDSWpiPn0/t2H7+1QouD6sCEGan8yiobrlAVjmbMEiBhpgHWtFh5O635VjWylj9m
+	 rAY+B1+WFB6mFMidhazqmsLKBMr7pebzZ7Yyjyw2gvLKsvnh+HWwdLrTNcjiyQG1Qq
+	 BNcxdXhAujYt8fJVIeRodyZiFhhLCs/CxP/F1d+0Gs0ntlu6nZE4vYa5mQUPNaQ9BH
+	 PO8JqZjkBZiYg==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v12 07/13] zloop: fix zone reporting consistency
-Date: Wed, 18 Nov 2026 00:57:33 +0900
-Message-ID: <20261117155739.304506-8-dlemoal@kernel.org>
+Subject: [PATCH v12 03/13] block: allow dropping all zone write plugs on revalidation
+Date: Wed, 18 Nov 2026 00:57:29 +0900
+Message-ID: <20261117155739.304506-4-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261117155739.304506-1-dlemoal@kernel.org>
 References: <20261117155739.304506-1-dlemoal@kernel.org>
@@ -62,34 +62,56 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In zloop_report_zones(), filling the write pointer and condition of a zone
-descriptor separately outside of the zone wp_lock can lead to an
-inconsistent zone report with a write pointer potentially not being
-consistent with the condition being reported. Avoid such inconsistency by
-filling both fields while holding the zone wp_lock.
+In preparation for supporting storage element depopulation, modify the
+function disk_revalidate_zones() to take an additional boolean parameter
+drop_all_zwplugs to force removing all zone write plugs from a disk hash
+table.  Removing all zone write plugs is done in the same manner as for a
+capacity change, using the function disk_drop_zone_wplug() applied to all
+hashed zone write plugs.
 
-Fixes: fcc6eaa3a03a ("zloop: introduce the ordered_zone_append configuration parameter")
+Calls to disk_revalidate_zones() with the argument drop_all_zwplugs set to
+true will be used when restoring depopulated storage elements as such
+operation clears all sequential zones, modifying them to be empty.
+
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/zloop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-zoned.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index 19949ed3824f..6bb68022ab30 100644
---- a/drivers/block/zloop.c
-+++ b/drivers/block/zloop.c
-@@ -950,8 +950,8 @@ static int zloop_report_zones(struct gendisk *disk, sector_t sector,
- 		blkz.len = zlo->zone_size;
- 		spin_lock(&zone->wp_lock);
- 		blkz.wp = zone->wp;
--		spin_unlock(&zone->wp_lock);
- 		blkz.cond = zone->cond;
-+		spin_unlock(&zone->wp_lock);
- 		if (test_bit(ZLOOP_ZONE_CONV, &zone->flags)) {
- 			blkz.type = BLK_ZONE_TYPE_CONVENTIONAL;
- 			blkz.capacity = zlo->zone_size;
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 600d6bd008ae..3761e634650e 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -2552,7 +2552,7 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+ 	return ret;
+ }
+ 
+-static int disk_revalidate_zones(struct gendisk *disk)
++static int disk_revalidate_zones(struct gendisk *disk, bool drop_all_zwplugs)
+ {
+ 	struct blk_revalidate_zone_args args = { };
+ 	struct blk_report_zones_args rep_args = {
+@@ -2563,6 +2563,9 @@ static int disk_revalidate_zones(struct gendisk *disk)
+ 	int retries = 2;
+ 	int ret;
+ 
++	if (drop_all_zwplugs)
++		disk_for_all_zone_wplugs(disk, disk_drop_zone_wplug, NULL);
++
+ again:
+ 	ret = disk_revalidate_capacity(disk, &args);
+ 	if (ret)
+@@ -2647,7 +2650,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 	 * eventually change the disk zone information.
+ 	 */
+ 	mutex_lock(&disk->zone_revalidate_mutex);
+-	ret = disk_revalidate_zones(disk);
++	ret = disk_revalidate_zones(disk, false);
+ 	mutex_unlock(&disk->zone_revalidate_mutex);
+ 
+ 	return ret;
 -- 
 2.56.1
 
