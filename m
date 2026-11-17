@@ -1,82 +1,104 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794927271;
-	b=t8zte1FKU2T3cJyexp0ZlhIQ+dvweWRObXTD3lWvgz9B4l6qQi37a+/omN8i+0PqOSXy
-	 8s8EGFxkBd5XESimRMQajTgasuAieli3dfUA8/fD2dv/ywPgefLAqFsgrdAMpkBn+G7Wu
-	 QdYYx1SOasedhMqk+fGxRyXYnNwVQ1j1+SZIbiOLtkHg4CkKQnf0QfNcee0613xUPBs6j
-	 86VPXmj3NbvuA3ggLjquTVnXU8r+md1yZDIJQfhQysKKKvTuiO2oGnosGQMfuIpqo6Y19
-	 vzz+Px9IL/XkJubJsp4qXldgyRujc/r0hBUT+PFqQooxQblp5ddfXiw+nh6JiS6gMGg==
+	t=1794928774;
+	b=q9Xog5AHhbtx7cBMuT+m897O2BRg261n4QgOqisVyS5FivlFmJk6pmFqy45U+wlJDiqy
+	 lX85/9RKWdZJ8XGxkLIV4HzudZPzUKS7OhnrYUwE4Qm/SsajKaW5X1NxU11uS6EbLmG36
+	 MWE3FZwJxsvZAJW5Vc/KfnAlo8N74iGDc+Lj+wlaYUZBXsznAKlsi+FrpD3h+A359RfPf
+	 Zy6LlQCQlt4KgoAz09+EPs0myk/yuk23hO/d1v0N5PJre6KrAniKIpOHqOi0MxkS6RO18
+	 eHU+ocffTgTdTNE+MFXxCPOEZNPANlORG5t7k48sX5m3FHaFCikUmojgZtO8es5Hqvg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794927271;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:Message-ID:Date:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1794928774;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
 	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-TM-AS-GCONF:
-	 X-Proofpoint-Reinject:X-Proofpoint-Spam-Info:X-Proofpoint-GUID:
-	 X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=G2z1WNSCI5+9W0otpYmPG1HlbmXpwdh9y3di0gUnCg0=;
-	b=LnYXWtCsEtsW2MEBtovwXKuR0P4EHKpam47ZCYCK8SRteszc8/jm9idVOaQ1DSwjdP0s
-	 /wwalwl8POTF2ECjZP4Gdz9Kwx6MTm4ROlRvoahicEb8pEDl+VpnXmROBtVm/cHkvEjzi
-	 xVoSTrk7yIThx/o9/LRZDD5TGgR2D3V+AiDj1ZAwT+3r4fKo3R5SZqfCqgt2sGsxc02/z
-	 0kAiW8eaIv1OXlOkLhsiwDIQvlOr1agH2ZXlMu/RDrzFAH+EWS0Fio190UAU/z7omHEmn
-	 Tc0x+TKOqkmH5+g5AZT4GtVr8Ma6shw1K/IhwcA8Ol5TEFivj78dM/vF8a2LTdPZmxg==
+	 Content-Type:Content-Transfer-Encoding:X-Rspamd-Queue-Id:X-Spam-Level:
+	 X-Rspamd-Server:X-Rspamd-Action:X-Spam-Flag:X-Spamd-Result:
+	 X-Spam-Score;
+	bh=SLxX9cBUMsfysM0uF3hHPfTjkK/3YTq6mJ/05AhlM7A=;
+	b=Kxuqzair+DhhWpJnK3yRUnN16AbBMLGVsTZ9ct66hEhjgBSNaxO0kCR0r88Bv0CYGW/E
+	 rlDVWPLPmPCr8wthF/KPdN3PL8Fwjx3kx0BFNo6F0jnHNHoxtrKDHT3e0KE6EgXgwFMXd
+	 1IZP9VO12Wt79tYGoIEeTDjVJetA338UBWL9MzO9MBpLaqd1HOyaHf1JAWU/te4IF6Y5Y
+	 t7/1eWckHKu9E65wOr+sNenRUXjKyCbkQwAXOu7s+UsoXdJExJutmMm7VhgmQXbF0rlq9
+	 LytRkeXq5NRLg/1Z1P7Kv628KQT5RCqYP5yzPuQ1ihdRGISjUwFvkVwGDSRwuuQQCtw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.ibm.com;
-	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=febUlXed;
-	arc=none smtp.remote-ip=148.163.158.5
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=tgHtkwJB;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=VCZ6q+xG;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=mtOdb5iU;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b="56DER/uZ";
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C47F606A32A;
-	Tue, 17 Nov 2026 14:54:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C47F606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E31606A31C;
+	Tue, 17 Nov 2026 15:19:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E6E31606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=febUlXed
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AHBwbIp1089802;
-	Tue, 17 Nov 2026 14:54:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=G2z1WN
-	SCI5+9W0otpYmPG1HlbmXpwdh9y3di0gUnCg0=; b=febUlXedSv0fOZyNM4toYN
-	pyfeQC6dy7gNvVTfcRdxgB2fUzwsApBgMgjwiLSyvnkmYorthpGF/4dCEdQHQ0mh
-	woXv5L89isg3NXd86vObo5Vo9yY0q+0R8iutl+uJpxV78jgE+ZS9D12WAp3IBD17
-	Nx4mqyHyaGK1ZZqQDOUCz2kFemq1IAipLOuQ/IOTFlUg/IMyWkEhrRkIbnbMEV38
-	dI4HiYVs77bZehmysFylepNOYUNf+vvFFKIB+fzIcueZ77ky3S3nhhy2qMV7uGUg
-	l/OAw4qyiHX5hp6B2tPV1h+TCcJP/6s4wtmlFY5YbJptX9ragMPPduh1ZAFdNO5A
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hxe2db6x0-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 17 Nov 2026 14:54:16 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AHC5tAP3508343;
-	Tue, 17 Nov 2026 14:54:15 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4j067nc3p2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Nov 2026 14:54:15 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6AHErOMQ27853368
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Nov 2026 14:53:24 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9BB1058066;
-	Tue, 17 Nov 2026 14:54:14 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5101058060;
-	Tue, 17 Nov 2026 14:54:12 +0000 (GMT)
-Received: from [9.61.5.249] (unknown [9.61.5.249])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 17 Nov 2026 14:54:12 +0000 (GMT)
-Message-ID: <11341b42-f641-49da-b823-d7c083d83a9a@linux.ibm.com>
-Date: Tue, 17 Nov 2026 20:24:10 +0530
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=tgHtkwJB;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=VCZ6q+xG;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=mtOdb5iU;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=56DER/uZ
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DFFDA1F78F;
+	Tue, 17 Nov 2026 15:19:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1794928772; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SLxX9cBUMsfysM0uF3hHPfTjkK/3YTq6mJ/05AhlM7A=;
+	b=tgHtkwJBCnag/jNmquBSqxQ1M8ZmClCPTxHXvKyECTIQab2PPqnhtxJ5O6PxFxhWJAzpNB
+	82qGKnXKhVCY/54L34veyV+Vn8NKgBqbuwTo/ks5vBOjRBtUIwbgMAaadQR+QX2rgu96FB
+	1n3BQCnk9uXe+sQU6jvc8zLBY2C1530=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1794928772;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SLxX9cBUMsfysM0uF3hHPfTjkK/3YTq6mJ/05AhlM7A=;
+	b=VCZ6q+xGv0x9hdh9MODQ66qRQ5K5Ow55Msquyw3/3YgdSyNaufTqHrIstEJMUoHh8xl72m
+	yaf+iOJGCRsJNACw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=mtOdb5iU;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="56DER/uZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1794928771; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SLxX9cBUMsfysM0uF3hHPfTjkK/3YTq6mJ/05AhlM7A=;
+	b=mtOdb5iUDqARfREPbPXUjquaOhW2T+w5glX/bU2+kirSOVugwR64JIeUVApz8ZeyOwQZPT
+	U5ItAJ6asKt25CTsC/3EahyEWVVtZpS7Rj1OEKrZ+lnHgNryyOR7lhgyMjfRSFyVQLJ1WL
+	0uANqg97ZAwtaoTwuVa56H7peWbSZxI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1794928771;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SLxX9cBUMsfysM0uF3hHPfTjkK/3YTq6mJ/05AhlM7A=;
+	b=56DER/uZduSbDcAOr5sz+PfgoMEb5F3ULphnupYRPqK/dzRyxJEg9zmyzkWjGeJt5ukkGy
+	7nf1a7ZCfo6ZnUDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7F8761334C;
+	Tue, 17 Nov 2026 15:19:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id LeW/EoNw/GpOcQAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 17 Nov 2026 15:19:31 +0000
+Message-ID: <3d134488-d8ab-404b-bd0e-c9e68d6fad47@suse.de>
+Date: Tue, 17 Nov 2026 16:19:30 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -87,82 +109,107 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] block: return early when the elevator doesn't
- change
+Subject: Re: [PATCH v3 1/2] block: don't request a module for the none
+ elevator
 To: Qiliang Yuan <qiliang.yuan@linux.dev>, Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <dlemoal@kernel.org>, Ming Lei <tom.leiming@gmail.com>,
-        Hannes Reinecke <hare@suse.de>
+ Damien Le Moal <dlemoal@kernel.org>, Ming Lei <tom.leiming@gmail.com>,
+ Nilay Shroff <nilay@linux.ibm.com>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
+ Christoph Hellwig <hch@lst.de>
 References: <20261116-bug-block-elevator-unchanged-v3-0-cb4dda2dadf4@linux.dev>
- <20261116-bug-block-elevator-unchanged-v3-2-cb4dda2dadf4@linux.dev>
+ <20261116-bug-block-elevator-unchanged-v3-1-cb4dda2dadf4@linux.dev>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20261116-bug-block-elevator-unchanged-v3-2-cb4dda2dadf4@linux.dev>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20261116-bug-block-elevator-unchanged-v3-1-cb4dda2dadf4@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE3MDA1NyBTYWx0ZWRfX07yao+Tok/F/
- TNnmoz0tLbdZrao4DDgSwTvuPlMQf8A+LRAzR0Qk4vGlsFGa71pQCJfOT0Dzp1A3/9d+pAHNTnr
- Fl1EVyENoWRlc1nC0fnGm7rqxit/FAQ=
-X-Proofpoint-GUID: 9I0Bk_QM5L8rCCqSV5WjolE2W5Mhoco3
-X-Proofpoint-ORIG-GUID: PQsvkT4QhkRE6BeE1zFigzzaZ-XNRkwX
-X-Authority-Analysis: v=2.4 cv=IruL47/g c=1 sm=1 tr=0 ts=6afc6a99 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
- a=0xM2EKjX6uQc8llLSOYA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE3MDA1NyBTYWx0ZWRfX1XT07RgyJfio
- 0brGkaf+U1gMvDloTCIm/vopopUuHQaEBa/jVqTuy4ytE9A4kl05GDaJvA9YSd6NSNbN+YMhmlS
- Ptjj8x2WDpWz/gWd0p8y/eswN/B4n2PwGSbqLNbyjexLIpVQgndRpgqyjQRzNGvPi+oaQG8ZP1X
- NrOjew8C+XJXifUte/ZeccWF0AIIdH6FfBA34GQi0oNBWCM+8WHZ8T9F+NIt6TLeVuUb7kA0gLa
- GdLmieQyMSNJrXiEM8+fL9xK2D0bnGIRlclRT0WeETHeM1NwY1rUgVcvYnMZ9bAhVF7De91WXTl
- a05wJHBk/aoMYwua6Ri8LSFxD3wIGJ/2KHcTxi14czeP0FjqmjwYUvkAFmMNNK6kSwYp5I7SkUc
- vX2NGnOh+n5ZBxa2637XbuOidcLrySqtbIbQ21tu7cwfatnd5Nh0Kxxnq0gOCl3V2bj74ALyxm4
- mKOUJPSnskL84B0smaQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-17_02,2026-11-16_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 impostorscore=0 adultscore=0 suspectscore=0 bulkscore=0
- malwarescore=0 phishscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611170057
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: DFFDA1F78F
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-12.00 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[linux.dev,kernel.dk,kernel.org,gmail.com,linux.ibm.com];
+	MIME_TRACE(0.00)[0:+];
+	URIBL_BLOCKED(0.00)[suse.de:dkim,suse.de:email,linux.dev:email,lst.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,lst.de:email,linux.dev:email]
+X-Spam-Score: -12.00
 
-On 11/17/26 8:26 AM, Qiliang Yuan wrote:
-> Writing the scheduler a queue already uses to queue/scheduler used to
-> be a no-op. elevator_change() now only checks for an unchanged elevator
-> after freezing the queue, and doesn't treat "none" on a queue without
-> an elevator as unchanged at all, so that case also quiesces the queue
-> in elevator_switch() and resets nr_requests.
+On 11/17/26 3:56 AM, Qiliang Yuan wrote:
+> elv_iosched_store() calls elv_iosched_load_module() for the requested
+> name before anything else, and loads "<name>-iosched" if no elevator
+> type of that name is registered. "none" never is, so every write of
+> "none" to queue/scheduler ends up in request_module("none-iosched").
 > 
-> Every such write therefore drains in-flight I/O and waits for an RCU
-> grace period. udev rules and tuning tools that set the scheduler
-> unconditionally stall I/O on live disks each time they run.
+> That runs a modprobe helper which can never find the module, and adds
+> several milliseconds to every switch to "none", including rewrites of
+> it by udev rules or tuning tools that set the scheduler on each disk.
 > 
-> Check under elevator_lock whether anything would change before
-> allocating scheduler resources and freezing the queue. The check can
-> race with another elevator change, which at worst leads to a redundant
-> switch, so keep the one done under the freeze as well.
+> Return early for "none", like elevator_change() did before the module
+> loading moved into elv_iosched_load_module().
 > 
-> Writing the current scheduler to queue/scheduler of a null_blk disk 20
-> times takes (median):
+> Writing queue/scheduler of a null_blk disk 20 times takes (median):
 > 
->    operation                 before (ms)  after (ms)  change
->    none -> none                     9.11        0.08    -99%
->    mq-deadline -> mq-deadline       9.05        0.08    -99%
+>    operation             before (ms)  after (ms)  change
+>    none -> none                13.10        9.11    -30%
+>    mq-deadline -> none         13.00        7.97    -39%
 > 
-> 4k random reads at queue depth 1 for 10 seconds, while "none" is
-> written to queue/scheduler every 50 ms:
+> Fixes: 734e1a8603128 ("block: Prevent deadlocks when switching elevators")
+> Signed-off-by: Qiliang Yuan <qiliang.yuan@linux.dev>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+> ---
+>   block/elevator.c | 3 +++
+>   1 file changed, 3 insertions(+)
 > 
->    metric             before  after  change
->    IOPS               340562 390392    +15%
->    max latency (us)    16302   1224    -92%
+> diff --git a/block/elevator.c b/block/elevator.c
+> index 66edf1a5768a8..9d9b2e84a1288 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -775,6 +775,9 @@ static void elv_iosched_load_module(const char *elevator_name)
+>   {
+>   	struct elevator_type *found;
+>   
+> +	if (!strncmp(elevator_name, "none", 4))
+> +		return;
+> +
+>   	spin_lock(&elv_list_lock);
+>   	found = __elevator_find(elevator_name);
+>   	spin_unlock(&elv_list_lock);
 > 
-> Fixes: af2814149883e ("block: freeze the queue in queue_attr_store")
-> Signed-off-by: Qiliang Yuan<qiliang.yuan@linux.dev>
-> Reviewed-by: Christoph Hellwig<hch@lst.de>
 
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
