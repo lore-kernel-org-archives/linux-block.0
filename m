@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794931072;
-	b=OjBtClqXCOO85Y9TQY2y3tqi7Kw5jhuYJVoRzj9Gto8k1AxkQDKKnUXQpkjuX5GV6Vhx
-	 hjJWGGKAcfFi6mozuti/a86dP8/CLX66SucXLDn3pulE9Viv6kTY2xJFDUs8k6KRD1Wk/
-	 C2AevmGEYOa5ibX/rj73M+mij5M3Si90fEloYS/f8EAVZt+sYrDeOqApSb+funjXHum3H
-	 C3zR7yX2o8BXZ1ulXwOhuT7v4x4oRqT/5qb8lgzopurrYt2Ds4k+feNuO3F6hm6FmJB2e
-	 GkMcPeuq2bq1u1hZbQVR04dQmnqXl9J9YbM3qV4m9XoFEUcANcJNb28NKeqicFM5NuQ==
+	t=1794931074;
+	b=rpOcW8ierZZi+aysLrQ895gSrekTzM4hf2YTRzqXbLnZ+7iFIk+GJ6nvzExsfsOOtMrR
+	 V2NmaQhy6lyvsk7RPYmdQGwzf32i3napoV476XfUxiLq7ItxMM9lS/1Hwk8zFjCA7hI5L
+	 etmn+haJkOV+BwqRQVP+R9QBgMSZb6JdSlLwZsizRc+ZZNhMETMuG1inyCOxDISYZXCQD
+	 +WPfYMEJe9/RYbZjbFjZBdqTj89e+ouPk7I3xf+SDy1eevTbjaEIuGPxEJcW37c8dQUsS
+	 MW21YmpZ8+yUjcT28R//OkJ9VtKQweKEBqYJKba5t1k1WQBFnG70FfjqvuKeJdqsvdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794931072;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794931074;
 	h=Received:DKIM-Signature:From:To:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=dgd31cNTxL2P+0SedpsCaizJP3EtNoxzn8sqyokuGjg=;
-	b=HUqlOI9cfcEIQ7gSkUmVhxi9kKSaaJoE7oLRYKUmMdlqLX/tD2hGLyogIqEsqYEMwobK
-	 yoSUAd8RgKgHAnEr9SgF3iO9coXveHVKtzJfpiHTzbtUkDLvgZXiPjRVyU2UowP8knGVA
-	 +UOfiAsHsYtJZYUi1M32CsS10BBaYLtXX66w6rSj6bySLbspgOolSIx0vvjpTb5sYWCJj
-	 j6FuvPLjaXlKQWwNl/3qY7IfxIaywbiqsUZl2O6gL86XQCUsGsYZ4yc9TBN7hQKSKYpg3
-	 SZr60Hx+DnHd9Da/1rvUWS0zGRJFZYOzJ7nhLZLEFL4QHZ8q7Q7czkY5xDBMhwLyHtg==
+	bh=3Vo9II34r+vXp8sn8wqU4dnBZeV9Jv3jA463zN7CRak=;
+	b=dqKaCqCtilVTpCtwfKNUwIX3qNbTGvyTMhI/kfJ8jnXIlQAwUWOSYTZfzEg4alqSsdv1
+	 ZOZM7CLTWabx7HKs1ps1Y1H77nEy/b2LDB043kE3H73nr09pOQUCHwL8EvOTocF0Y4jJ5
+	 1DzKkh9K9HLqQB29khKiJEYu0EK+d0QmiLFHuxqUoKaMGB+rFXQ6VLwuvsiT4I8xZSOfK
+	 ejPlqGqd9/T8XVHfsKN/iKMo+3PC4IdmPqngbZ6B9tvcb6ORUCzYUAC8OrX36LzAKp2X+
+	 ZAouLDpdcqepPJ7Ek8FYPvkbWOSSNiuBiVNJmBZcHS+6TWFlM36DyBWGPkMe6k3C35g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VgvAUIrc;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jv323uS+;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFDC606A8A5;
-	Tue, 17 Nov 2026 15:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9260606A880;
+	Tue, 17 Nov 2026 15:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VgvAUIrc
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 890C21F000CE;
-	Tue, 17 Nov 2026 15:57:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jv323uS+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D57931F000C5;
+	Tue, 17 Nov 2026 15:57:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794931072;
-	bh=dgd31cNTxL2P+0SedpsCaizJP3EtNoxzn8sqyokuGjg=;
+	s=k20260515; t=1794931074;
+	bh=3Vo9II34r+vXp8sn8wqU4dnBZeV9Jv3jA463zN7CRak=;
 	h=From:To:Subject:Date:In-Reply-To:References;
-	b=VgvAUIrcgxooIGyimf7uTeW6hcyRbjHrLGpt/5Vc6O+0Lh5uBcoRD9VKaLYJstAPS
-	 bRBw7p3Zk8u5ppgxqrRssWXpLWNDc5mjYSRPYU9tC/EBdz6TmS84XvpvU/9pe8HFgA
-	 egDsecFMr3CUCtoM1NK/ri4HnddUEvQ5zaFXjBHvPtOJA3DAXiyqUZT7hsAJSU5VAK
-	 P5kyW75eCe3hPGFT6m4iyKd3n8jUfAxoZJRYMPTB0YQofl4E0fishOMnDOrZ8HBa7u
-	 RYR7ffWqroONc1T/dXzXYWruh2aQV7s4r01mo4XpAO5x+6Wb2EcUuh+vSiQuUuoFRo
-	 nVR6RqHCM7iOw==
+	b=Jv323uS+uHlOc0cK12UezOk0Vd56bPR9uOQNFHgkOw4mPpE2BsSJTA4FwOuKWsYUQ
+	 4Sm7k1cGkz2jZop1YLMzAAvXVvCiDRIFM1dUzchkTpzhAiAMMNpg2lCplei3Ywg11q
+	 0Wrt67wQ80UJV0lcYmo9oszWCHxF5woWXP4fXxb+uRf43/CvO4eet8t8rLkZgCC76l
+	 A+MntRQExbjRdO3b3VG/5bUPQC1dMNJZSVgZ430uaUsula/DwCLdDh4L45GN0KRcql
+	 PlI0EwDJ5+3SoffyVcb0QfvCxH1Bh4tlLp/oUd+JgVCb1p5X+21C0BwPLnGK0TfL0w
+	 NNy3HD/TZYuTQ==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v12 09/13] zloop: add degrade_element control command
-Date: Wed, 18 Nov 2026 00:57:35 +0900
-Message-ID: <20261117155739.304506-10-dlemoal@kernel.org>
+Subject: [PATCH v12 11/13] scsi: sd_zbc: always revalidate zones for disks supporting head depopulation
+Date: Wed, 18 Nov 2026 00:57:37 +0900
+Message-ID: <20261117155739.304506-12-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261117155739.304506-1-dlemoal@kernel.org>
 References: <20261117155739.304506-1-dlemoal@kernel.org>
@@ -62,281 +62,154 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow users to mark storage elements of a zloop device as degraded using
-the new "degrade_element" control command. The element to degrade is
-indicated using the element_id option. Example:
+sd_zbc_revalidate_zones() skips revalidating the zones of a ZBC device if
+the zone size and total number of zones of the disk has not changed. This
+is to avoid the sometimes slow report zones for the entire disk that
+blk_revalidate_disk_zones() will generate.
 
-echo "degrade_element id=0,element_id=2" > /dev/zloop-control
+For ZBC devices that support the storage element depopulation feature, a
+revalidation after executing a passthrough REMOVE ELEMENT AND TRUNCATE
+command will thus correctly trigger a zone revalidation as the disk
+capacity and number of zones changed.
 
-If the element ID identifies an all access storage element, both read and
-write operations targeting a zone served by the degraded element are
-failed. In the case of a partial access storage element, any write access
-to a zone whose write element is degraded will fail, and read accesses
-to a zone whose read element is degraded will result in an error.
+However, for devices supporting the data preserving head depopulation
+variant of the depopulation feature (REMOVE ELEMENT AND MODIFY ZONES
+command), a disk capacity and number of zones does not change after a head
+is depopulated. Only the conditions of the zones served by the head that
+was depopulated change. These zones are transitioned to either read-only
+or offline.
 
-The zoned_loop.rst documentation file is also updated to explain this new
-feature.
+While the block layer storage element management functions always call
+blk_revalidate_disk_zones() to catch these changes, a user scan, libata
+device rescan after EH or a depopulation or restoration action executed
+through SG_IO would not. In these cases, not calling
+blk_revalidate_disk_zones() prevents the block layer from taking
+appropriate actions on the zone write plugs of the disk.
+
+Avoid any issue with the block layer view of the zone conditions by not
+skipping the call to blk_revalidate_disk_zones() for disks that support
+both the GET PHYSICAL ELEMENTS STATUS and REMOVE ELEMENT AND MODIFY ZONES
+commands. This check is done from sd_zbc_read_zones() using the helper
+function sd_zbc_check_depop_supported(). The new SCSI disk flags
+depop_report_supported and depop_modify_zones_supported are defined to
+remember the result of this check.
+
+This change will slow down a little SMR disk revalidation. However, user
+forced revalidations are normally rare, and other revalidations triggered
+by udev only happen when the disk device files is not in use anymore
+(closed). So this slow down should in practice not be an issue.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <mkp@kernel.org>
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- .../admin-guide/blockdev/zoned_loop.rst       |  25 ++++-
- drivers/block/zloop.c                         | 100 +++++++++++++++++-
- 2 files changed, 121 insertions(+), 4 deletions(-)
+ drivers/scsi/sd.h     |  2 ++
+ drivers/scsi/sd_zbc.c | 47 +++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
-index 80a564836c1b..be8a3d7729fe 100644
---- a/Documentation/admin-guide/blockdev/zoned_loop.rst
-+++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
-@@ -9,7 +9,8 @@ Zoned Loop Block Device
- 	1) Overview
- 	2) Creating a Zoned Device
- 	3) Deleting a Zoned Device
--	4) Example
-+	4)  Degrading a storage element
-+	5) Example
- 
- 
- 1) Overview
-@@ -63,6 +64,7 @@ The options available for the add command can be listed by reading the
- 	$ cat /dev/zloop-control
-         add id=%d,capacity_mb=%u,zone_size_mb=%u,zone_capacity_mb=%u,conv_zones=%u,max_open_zones=%u,base_dir=%s,nr_queues=%u,queue_depth=%u,buffered_io,zone_append=%u,ordered_zone_append,discard_write_cache,stor_elements=%u
-         remove id=%d
-+        degrade_element id=%d,element_id=%u
- 
- In more details, the options that can be used with the "add" command are as
- follows.
-@@ -144,7 +146,26 @@ the zoned device will not be created.
- To fully delete a zoned device, after executing the remove operation, the device
- base directory containing the backing files of the device zones must be deleted.
- 
--4) Example
-+4) Degrading a storage element
-+------------------------------
-+
-+When storage element emulation is enabled, storage elements can be set in a
-+degraded state to emulate defective storage elements (e.g. defective heads of a
-+hard disk). This is done by issuing the "degrade_element" command to
-+/dev/zloop-control, specifying the ID of the target device and the ID of the
-+storage element to degrade::
-+
-+        $ echo "degrade_element id=X,element_id=Y" > /dev/zloop-control
-+
-+Depending on the type of the storage element specified, a read or write access
-+to sectors of a zone served by a degraded storage element will result in a
-+failure. For partial access storage elements, write accesses are always failed
-+if the write element serving the zone is degraded. Likewise, read accesses are
-+failed if the read element serving the zone is degraded. When storage elements
-+are emulated as all access physical elements, both read and write operations are
-+failed when the storage element serving the zones being accessed is degraded.
-+
-+5) Example
- ----------
- 
- The following sequence of commands creates a 2GB zoned device with zones of 64
-diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index a4536e6240c0..62b3d0ddab3f 100644
---- a/drivers/block/zloop.c
-+++ b/drivers/block/zloop.c
-@@ -39,6 +39,7 @@ enum {
- 	ZLOOP_OPT_DISCARD_WRITE_CACHE	= (1 << 11),
- 	ZLOOP_OPT_MAX_OPEN_ZONES	= (1 << 12),
- 	ZLOOP_OPT_STOR_ELEMENTS		= (1 << 13),
-+	ZLOOP_OPT_ELEMENT_ID		= (1 << 14),
+diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
+index 574af8243016..84c87d0f05d8 100644
+--- a/drivers/scsi/sd.h
++++ b/drivers/scsi/sd.h
+@@ -156,6 +156,8 @@ struct scsi_disk {
+ 	unsigned	ignore_medium_access_errors : 1;
+ 	unsigned	rscs : 1; /* reduced stream control support */
+ 	unsigned	use_atomic_write_boundary : 1;
++	unsigned	depop_report_supported : 1;
++	unsigned	depop_modify_zones_supported : 1;
  };
+ #define to_scsi_disk(obj) container_of(obj, struct scsi_disk, disk_dev)
  
- static const match_table_t zloop_opt_tokens = {
-@@ -56,6 +57,7 @@ static const match_table_t zloop_opt_tokens = {
- 	{ ZLOOP_OPT_DISCARD_WRITE_CACHE, "discard_write_cache"	},
- 	{ ZLOOP_OPT_MAX_OPEN_ZONES,	"max_open_zones=%u"	},
- 	{ ZLOOP_OPT_STOR_ELEMENTS,	"stor_elements=%u"	},
-+	{ ZLOOP_OPT_ELEMENT_ID,		"element_id=%u"		},
- 	{ ZLOOP_OPT_ERR,		NULL			}
- };
- 
-@@ -82,6 +84,7 @@ enum zloop_stor_elements {
- #define ZLOOP_DEF_ZONE_APPEND		true
- #define ZLOOP_DEF_ORDERED_ZONE_APPEND	false
- #define ZLOOP_DEF_STOR_ELEMENTS		ZLOOP_STOR_ELEMENTS_NONE
-+#define ZLOOP_DEF_ELEMENT_ID		0
- 
- /* Arbitrary limit on the zone size (16GB). */
- #define ZLOOP_MAX_ZONE_SIZE_MB		16384
-@@ -102,6 +105,7 @@ struct zloop_options {
- 	bool			ordered_zone_append;
- 	bool			discard_write_cache;
- 	enum zloop_stor_elements stor_elements;
-+	unsigned int		element_id;
- };
- 
- /*
-@@ -1175,6 +1179,31 @@ static int zloop_report_elements(struct gendisk *disk,
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 8cbf171e6fab..bf2e60071d57 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -516,6 +516,33 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf,
  	return 0;
  }
  
-+static int zloop_degrade_element(struct zloop_device *zlo,
-+				 unsigned int element_id)
++/*
++ * sd_zbc_check_depop_supported - Check if the device supports storage element
++ *				  depopulation
++ * @sdkp: Target SCSI disk
++ * @buf: command buffer
++ *
++ * Check if the device supports the REMOVE ELEMENT AND MODIFY ZONES command.
++ */
++static void sd_zbc_check_depop_supported(struct scsi_disk *sdkp,
++					 unsigned char *buf)
 +{
-+	struct blk_se *se;
-+	int ret = 0;
++	/* Mandate support for reporting storage elements health. */
++	sdkp->depop_report_supported =
++		scsi_report_opcode(sdkp->device, buf, SD_BUF_SIZE,
++				   SERVICE_ACTION_IN_16,
++				   SAI_GET_PHYSICAL_ELEMENT_STATUS) == 1;
++	if (!sdkp->depop_report_supported) {
++		sdkp->depop_modify_zones_supported = false;
++		return;
++	}
 +
-+	if (zlo->stor_elements == ZLOOP_STOR_ELEMENTS_NONE)
-+		return -EOPNOTSUPP;
-+
-+	if (!element_id || element_id > zlo->nr_elements)
-+		return -EINVAL;
-+
-+	mutex_lock(&zlo->stor_elements_lock);
-+
-+	se = &zlo->elements[element_id - 1];
-+	if (READ_ONCE(se->status) <= BLK_SE_STS_DEGRADED)
-+		WRITE_ONCE(se->status, BLK_SE_STS_DEGRADED);
-+	else
-+		ret = -EINVAL;
-+
-+	mutex_unlock(&zlo->stor_elements_lock);
-+
-+	return ret;
++	sdkp->depop_modify_zones_supported =
++		scsi_report_opcode(sdkp->device, buf, SD_BUF_SIZE,
++				   SERVICE_ACTION_IN_16,
++				   SAI_REMOVE_ELEMENT_AND_MODIFY_ZONES) == 1;
 +}
 +
- static int zloop_execute_remove_element(struct zloop_device *zlo)
+ static void sd_zbc_print_zones(struct scsi_disk *sdkp)
  {
- 	struct gendisk *disk = zlo->disk;
-@@ -1801,6 +1830,11 @@ static int zloop_ctl_add(struct zloop_options *opts)
- 	int ret = -EINVAL;
- 	bool restore;
+ 	if (sdkp->device->type != TYPE_ZBC || !sdkp->capacity)
+@@ -545,6 +572,7 @@ int sd_zbc_revalidate_zones(struct scsi_disk *sdkp)
+ 	u32 zone_blocks = sdkp->early_zone_info.zone_blocks;
+ 	unsigned int nr_zones = sdkp->early_zone_info.nr_zones;
+ 	unsigned int flags;
++	bool print_zones;
+ 	int ret;
  
-+	if (opts->mask & ZLOOP_OPT_ELEMENT_ID) {
-+		pr_err("Invalid option specified for add\n");
-+		return -EINVAL;
-+	}
-+
- 	__module_get(THIS_MODULE);
- 
- 	nr_zones = opts->capacity >> ilog2(opts->zone_size);
-@@ -2109,6 +2143,49 @@ static int zloop_ctl_remove(struct zloop_options *opts)
- 	return 0;
- }
- 
-+static int zloop_ctl_degrade_element(struct zloop_options *opts)
-+{
-+	struct zloop_device *zlo;
-+	int ret = 0;
-+
-+	if (!(opts->mask & ZLOOP_OPT_ID)) {
-+		pr_err("No ID specified for degrade_element\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!(opts->mask & ZLOOP_OPT_ELEMENT_ID)) {
-+		pr_err("No element ID specified for degrade_element\n");
-+		return -EINVAL;
-+	}
-+
-+	if (opts->mask & ~(ZLOOP_OPT_ID | ZLOOP_OPT_ELEMENT_ID)) {
-+		pr_err("Invalid option specified for degrade_element\n");
-+		return -EINVAL;
-+	}
-+
-+	ret = mutex_lock_killable(&zloop_ctl_mutex);
-+	if (ret)
-+		return ret;
-+
-+	zlo = idr_find(&zloop_index_idr, opts->id);
-+	if (!zlo || zlo->state == Zlo_creating)
-+		ret = -ENODEV;
-+	else if (zlo->state == Zlo_deleting)
-+		ret = -EINVAL;
-+	if (ret)
-+		goto unlock;
-+
-+	ret = zloop_degrade_element(zlo, opts->element_id);
-+	if (!ret)
-+		pr_info("%pg: degraded element %u\n",
-+			zlo->disk->part0, opts->element_id);
-+
-+unlock:
-+	mutex_unlock(&zloop_ctl_mutex);
-+
-+	return ret;
-+}
-+
- static int zloop_parse_options(struct zloop_options *opts, const char *buf)
- {
- 	substring_t args[MAX_OPT_ARGS];
-@@ -2129,6 +2206,7 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
- 	opts->zone_append = ZLOOP_DEF_ZONE_APPEND;
- 	opts->ordered_zone_append = ZLOOP_DEF_ORDERED_ZONE_APPEND;
- 	opts->stor_elements = ZLOOP_DEF_STOR_ELEMENTS;
-+	opts->element_id = ZLOOP_DEF_ELEMENT_ID;
- 
- 	if (!buf)
+ 	/*
+@@ -554,11 +582,22 @@ int sd_zbc_revalidate_zones(struct scsi_disk *sdkp)
+ 	if (!blk_queue_is_zoned(q))
  		return 0;
-@@ -2280,6 +2358,13 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
- 			}
- 			opts->stor_elements = token;
- 			break;
-+		case ZLOOP_OPT_ELEMENT_ID:
-+			if (match_uint(args, &token)) {
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			opts->element_id = token;
-+			break;
- 		case ZLOOP_OPT_ERR:
- 		default:
- 			pr_warn("unknown parameter or missing value '%s'\n", p);
-@@ -2308,14 +2393,16 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
- enum {
- 	ZLOOP_CTL_ADD,
- 	ZLOOP_CTL_REMOVE,
-+	ZLOOP_CTL_DEGRADE_ELEMENT,
- };
  
- static struct zloop_ctl_op {
- 	int		code;
- 	const char	*name;
- } zloop_ctl_ops[] = {
--	{ ZLOOP_CTL_ADD,	"add" },
--	{ ZLOOP_CTL_REMOVE,	"remove" },
-+	{ ZLOOP_CTL_ADD,		"add" },
-+	{ ZLOOP_CTL_REMOVE,		"remove" },
-+	{ ZLOOP_CTL_DEGRADE_ELEMENT,	"degrade_element" },
- 	{ -1,	NULL },
- };
++	/*
++	 * If the zone size and number of zones has not changed, and the disk
++	 * does not support depopulating heads, skip the rather slow call to
++	 * blk_revalidate_disk_zones().
++	 */
+ 	if (sdkp->zone_info.zone_blocks == zone_blocks &&
+ 	    sdkp->zone_info.nr_zones == nr_zones &&
+-	    disk->nr_zones == nr_zones)
++	    disk->nr_zones == nr_zones &&
++	    !sdkp->depop_modify_zones_supported)
+ 		return 0;
  
-@@ -2363,6 +2450,9 @@ static ssize_t zloop_ctl_write(struct file *file, const char __user *ubuf,
- 	case ZLOOP_CTL_REMOVE:
- 		ret = zloop_ctl_remove(&opts);
- 		break;
-+	case ZLOOP_CTL_DEGRADE_ELEMENT:
-+		ret = zloop_ctl_degrade_element(&opts);
-+		break;
- 	default:
- 		pr_err("Invalid operation\n");
- 		ret = -EINVAL;
-@@ -2386,6 +2476,8 @@ static int zloop_ctl_show(struct seq_file *seq_file, void *private)
- 		tok = &zloop_opt_tokens[i];
- 		if (!tok->pattern)
- 			break;
-+		if (tok->token == ZLOOP_OPT_ELEMENT_ID)
-+			continue;
- 		if (i)
- 			seq_putc(seq_file, ',');
- 		seq_puts(seq_file, tok->pattern);
-@@ -2396,6 +2488,10 @@ static int zloop_ctl_show(struct seq_file *seq_file, void *private)
- 	seq_puts(seq_file, zloop_ctl_ops[1].name);
- 	seq_puts(seq_file, " id=%d\n");
- 
-+	/* Degrade element operation */
-+	seq_puts(seq_file, zloop_ctl_ops[2].name);
-+	seq_puts(seq_file, " id=%d,element_id=%u\n");
++	print_zones =
++		sdkp->zone_info.zone_blocks != zone_blocks ||
++		sdkp->zone_info.nr_zones != nr_zones ||
++		disk->nr_zones != nr_zones;
 +
+ 	sdkp->zone_info.zone_blocks = zone_blocks;
+ 	sdkp->zone_info.nr_zones = nr_zones;
+ 
+@@ -571,7 +610,8 @@ int sd_zbc_revalidate_zones(struct scsi_disk *sdkp)
+ 		return ret;
+ 	}
+ 
+-	sd_zbc_print_zones(sdkp);
++	if (print_zones)
++		sd_zbc_print_zones(sdkp);
+ 
  	return 0;
  }
+@@ -610,6 +650,9 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, struct queue_limits *lim,
+ 	sdkp->device->use_10_for_rw = 0;
+ 	sdkp->device->use_16_for_sync = 1;
  
++	/* Check if storage element depopulation is supported. */
++	sd_zbc_check_depop_supported(sdkp, buf);
++
+ 	/* Check zoned block device characteristics (unconstrained reads) */
+ 	ret = sd_zbc_check_zoned_characteristics(sdkp, buf);
+ 	if (ret)
 -- 
 2.56.1
 
