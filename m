@@ -1,97 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794926096;
-	b=Y8P51PZZodn+TE5jknAlKtZfbTmRzL6twDgwDNtYiDlDtb17NAgQEBEtM/SqzVpc7alg
-	 GC4Rm+/97SmBeugH7p5JODZIhoIfOp4xO2K8FUPgRJ9Dk1bwfZ0nmI26u4FFmYCyc5/bc
-	 HOvNHbm4Q59nfAyo0RV5t/94KcnE63b/+sWtfYiW8k11pY6IjXK0CjPgNXgAnWq8vp3+B
-	 0ZjNdzFhpa2VFZd7e6Wr7jsRTE0tvaDB9Bb7vtBPlfHOq4AVvlZCIYQorNRy7VO9fItAL
-	 hC6qi5ODNhcDyatCwhJdgW5Ao9BVCqIZvkTc7L/aWKtwNfTjmrtU+3+9C6f3FVhycEQ==
+	t=1794927271;
+	b=t8zte1FKU2T3cJyexp0ZlhIQ+dvweWRObXTD3lWvgz9B4l6qQi37a+/omN8i+0PqOSXy
+	 8s8EGFxkBd5XESimRMQajTgasuAieli3dfUA8/fD2dv/ywPgefLAqFsgrdAMpkBn+G7Wu
+	 QdYYx1SOasedhMqk+fGxRyXYnNwVQ1j1+SZIbiOLtkHg4CkKQnf0QfNcee0613xUPBs6j
+	 86VPXmj3NbvuA3ggLjquTVnXU8r+md1yZDIJQfhQysKKKvTuiO2oGnosGQMfuIpqo6Y19
+	 vzz+Px9IL/XkJubJsp4qXldgyRujc/r0hBUT+PFqQooxQblp5ddfXiw+nh6JiS6gMGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794926096;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
-	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:X-Originating-IP:X-ClientProxiedBy;
-	bh=msllHZEApp54KuI+5jaT9flmvof2Z7mHw32VX8stWY0=;
-	b=n3Lh2GePrqMRt7LkBUE/Tu8vbkL/wY2uazwCY3zRX7ygoPmTaHBz2qALR1Qh1mrxFMUR
-	 Q72WX2t9jg11xHsc33Pu/+4PNz/u3L+UVIn1d2YejffWZlexK8/c70dUAjRmvCE1oQjbn
-	 AD8ARgpR+gecMnYSZ2omzQQmvGtVbhlu4dDXRaJo5BoDEMcz4kiRu+fzl4Zs7VnQCjqr5
-	 cBH3TxSqIrmjg4S1ueoqyuWFcRSfYbRCgWcsFYc2i8MR0GOr6WQDnPMqIeEGHuXQjxHJx
-	 XP6FLfZdhENDyarcEw1/QpXhmGIAqhHeFJoS6zn4Cz9d6C8cCi7HXkOdg3a4nFyLNOw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794927271;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:Received:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-TM-AS-GCONF:
+	 X-Proofpoint-Reinject:X-Proofpoint-Spam-Info:X-Proofpoint-GUID:
+	 X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=G2z1WNSCI5+9W0otpYmPG1HlbmXpwdh9y3di0gUnCg0=;
+	b=LnYXWtCsEtsW2MEBtovwXKuR0P4EHKpam47ZCYCK8SRteszc8/jm9idVOaQ1DSwjdP0s
+	 /wwalwl8POTF2ECjZP4Gdz9Kwx6MTm4ROlRvoahicEb8pEDl+VpnXmROBtVm/cHkvEjzi
+	 xVoSTrk7yIThx/o9/LRZDD5TGgR2D3V+AiDj1ZAwT+3r4fKo3R5SZqfCqgt2sGsxc02/z
+	 0kAiW8eaIv1OXlOkLhsiwDIQvlOr1agH2ZXlMu/RDrzFAH+EWS0Fio190UAU/z7omHEmn
+	 Tc0x+TKOqkmH5+g5AZT4GtVr8Ma6shw1K/IhwcA8Ol5TEFivj78dM/vF8a2LTdPZmxg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=V6bOwBUa;
-	arc=none smtp.remote-ip=113.46.200.222
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+	dmarc=pass header.from=linux.ibm.com;
+	spf=pass smtp.mailfrom=linux.ibm.com;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=febUlXed;
+	arc=none smtp.remote-ip=148.163.158.5
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82588606A32A;
-	Tue, 17 Nov 2026 14:34:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 82588606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C47F606A32A;
+	Tue, 17 Nov 2026 14:54:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C47F606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=V6bOwBUa
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=msllHZEApp54KuI+5jaT9flmvof2Z7mHw32VX8stWY0=;
-	b=V6bOwBUaRpYicAoW86gz1i+ASQtPeNBlM8OZ7NHbPrX6MWN9ICi9GmKraEtAAGwopdaQRAICJ
-	hDY+a6I4ZJYCIRe/RM2NyY6q3CBXeiUM9oQL1xXTv7XWisfIrbhg4r3N6TyqQHKrNKcToM49+ed
-	SWm0X1qYsJ1N+G1fbxM+0Es=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4jTS153XkTzLlXD;
-	Tue, 17 Nov 2026 22:34:33 +0800 (CST)
-Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
-	by mail.maildlp.com (Postfix) with ESMTPS id 855474055B;
-	Tue, 17 Nov 2026 22:34:52 +0800 (CST)
-Received: from octopus.huawei.com (10.67.174.191) by
- whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Tue, 17 Nov 2026 22:34:46 +0800
-From: Cai Xinchen <caixinchen1@huawei.com>
-To: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
-	<brauner@kernel.org>, <jack@suse.cz>, <caixinchen1@huawei.com>
-CC: <amir73il@gmail.com>, <andrii@kernel.org>, <apparmor@lists.ubuntu.com>,
-	<ast@kernel.org>, <axboe@kernel.dk>, <bpf@vger.kernel.org>,
-	<casey@schaufler-ca.com>, <cel@kernel.org>, <cem@kernel.org>,
-	<chenxiaosong@chenxiaosong.com>, <code@tyhicks.com>, <corbet@lwn.net>,
-	<Dai.Ngo@oracle.com>, <dakr@kernel.org>, <daniel@iogearbox.net>,
-	<dhowells@redhat.com>, <dlemoal@kernel.org>, <dmitry.kasatkin@gmail.com>,
-	<driver-core@lists.linux.dev>, <dsterba@suse.com>,
-	<ecryptfs@vger.kernel.org>, <eddyz87@gmail.com>, <emil@etsalapatis.com>,
-	<eric.snowberg@oracle.com>, <exfat@lists.linux.dev>,
-	<georgia.garcia@canonical.com>, <gregkh@linuxfoundation.org>, <hch@lst.de>,
-	<hirofumi@mail.parknet.co.jp>, <hyc.lee@gmail.com>,
-	<ihor.solodrai@linux.dev>, <jlayton@kernel.org>, <jmorris@namei.org>,
-	<johan@kernel.org>, <john.fastabend@gmail.com>,
-	<john.johansen@canonical.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
-	<linkinjeon@kernel.org>, <linux-api@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
-	<linux-cifs@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <linux-unionfs@vger.kernel.org>,
-	<linux-xfs@vger.kernel.org>, <liubaolin12138@163.com>,
-	<martin.lau@linux.dev>, <mason@kernel.org>, <mathieu.desnoyers@efficios.com>,
-	<matt@bobrowski.net>, <memxor@gmail.com>, <mhiramat@kernel.org>,
-	<miklos@szeredi.hu>, <neil@brown.name>, <netfs@lists.linux.dev>,
-	<ntfs@lists.linux.dev>, <okorniev@redhat.com>, <omosnacek@gmail.com>,
-	<penguin-kernel@I-love.SAKURA.ne.jp>, <rafael@kernel.org>,
-	<rdunlap@infradead.org>, <roberto.sassu@huawei.com>, <rostedt@goodmis.org>,
-	<selinux@vger.kernel.org>, <senozhatsky@chromium.org>, <serge@hallyn.com>,
-	<sj1557.seo@samsung.com>, <skhan@linuxfoundation.org>, <song@kernel.org>,
-	<stephen.smalley.work@gmail.com>, <takedakn@nttdata.co.jp>, <tom@talpey.com>,
-	<viro@zeniv.linux.org.uk>, <yonghong.song@linux.dev>, <yuezhang.mo@sony.com>,
-	<zohar@linux.ibm.com>, <utilityemal77@gmail.com>, <lujialin4@huawei.com>
-Subject: [PATCH -next -v4 16/17] samples/landlock: Add metadata rights to sandboxer
-Date: Tue, 17 Nov 2026 23:05:41 +0800
-Message-ID: <20261117150542.1169451-17-caixinchen1@huawei.com>
-X-Mailer: git-send-email 2.18.0.huawei.25
-In-Reply-To: <20261117150542.1169451-1-caixinchen1@huawei.com>
-References: <20261117150542.1169451-1-caixinchen1@huawei.com>
+	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=febUlXed
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AHBwbIp1089802;
+	Tue, 17 Nov 2026 14:54:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=G2z1WN
+	SCI5+9W0otpYmPG1HlbmXpwdh9y3di0gUnCg0=; b=febUlXedSv0fOZyNM4toYN
+	pyfeQC6dy7gNvVTfcRdxgB2fUzwsApBgMgjwiLSyvnkmYorthpGF/4dCEdQHQ0mh
+	woXv5L89isg3NXd86vObo5Vo9yY0q+0R8iutl+uJpxV78jgE+ZS9D12WAp3IBD17
+	Nx4mqyHyaGK1ZZqQDOUCz2kFemq1IAipLOuQ/IOTFlUg/IMyWkEhrRkIbnbMEV38
+	dI4HiYVs77bZehmysFylepNOYUNf+vvFFKIB+fzIcueZ77ky3S3nhhy2qMV7uGUg
+	l/OAw4qyiHX5hp6B2tPV1h+TCcJP/6s4wtmlFY5YbJptX9ragMPPduh1ZAFdNO5A
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hxe2db6x0-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 17 Nov 2026 14:54:16 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AHC5tAP3508343;
+	Tue, 17 Nov 2026 14:54:15 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4j067nc3p2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Nov 2026 14:54:15 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6AHErOMQ27853368
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Nov 2026 14:53:24 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9BB1058066;
+	Tue, 17 Nov 2026 14:54:14 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5101058060;
+	Tue, 17 Nov 2026 14:54:12 +0000 (GMT)
+Received: from [9.61.5.249] (unknown [9.61.5.249])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 17 Nov 2026 14:54:12 +0000 (GMT)
+Message-ID: <11341b42-f641-49da-b823-d7c083d83a9a@linux.ibm.com>
+Date: Tue, 17 Nov 2026 20:24:10 +0530
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -101,121 +86,83 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- whupemk100010.china.huawei.com (7.152.184.41)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] block: return early when the elevator doesn't
+ change
+To: Qiliang Yuan <qiliang.yuan@linux.dev>, Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <dlemoal@kernel.org>, Ming Lei <tom.leiming@gmail.com>,
+        Hannes Reinecke <hare@suse.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+References: <20261116-bug-block-elevator-unchanged-v3-0-cb4dda2dadf4@linux.dev>
+ <20261116-bug-block-elevator-unchanged-v3-2-cb4dda2dadf4@linux.dev>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20261116-bug-block-elevator-unchanged-v3-2-cb4dda2dadf4@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE3MDA1NyBTYWx0ZWRfX07yao+Tok/F/
+ TNnmoz0tLbdZrao4DDgSwTvuPlMQf8A+LRAzR0Qk4vGlsFGa71pQCJfOT0Dzp1A3/9d+pAHNTnr
+ Fl1EVyENoWRlc1nC0fnGm7rqxit/FAQ=
+X-Proofpoint-GUID: 9I0Bk_QM5L8rCCqSV5WjolE2W5Mhoco3
+X-Proofpoint-ORIG-GUID: PQsvkT4QhkRE6BeE1zFigzzaZ-XNRkwX
+X-Authority-Analysis: v=2.4 cv=IruL47/g c=1 sm=1 tr=0 ts=6afc6a99 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
+ a=0xM2EKjX6uQc8llLSOYA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE3MDA1NyBTYWx0ZWRfX1XT07RgyJfio
+ 0brGkaf+U1gMvDloTCIm/vopopUuHQaEBa/jVqTuy4ytE9A4kl05GDaJvA9YSd6NSNbN+YMhmlS
+ Ptjj8x2WDpWz/gWd0p8y/eswN/B4n2PwGSbqLNbyjexLIpVQgndRpgqyjQRzNGvPi+oaQG8ZP1X
+ NrOjew8C+XJXifUte/ZeccWF0AIIdH6FfBA34GQi0oNBWCM+8WHZ8T9F+NIt6TLeVuUb7kA0gLa
+ GdLmieQyMSNJrXiEM8+fL9xK2D0bnGIRlclRT0WeETHeM1NwY1rUgVcvYnMZ9bAhVF7De91WXTl
+ a05wJHBk/aoMYwua6Ri8LSFxD3wIGJ/2KHcTxi14czeP0FjqmjwYUvkAFmMNNK6kSwYp5I7SkUc
+ vX2NGnOh+n5ZBxa2637XbuOidcLrySqtbIbQ21tu7cwfatnd5Nh0Kxxnq0gOCl3V2bj74ALyxm4
+ mKOUJPSnskL84B0smaQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-17_02,2026-11-16_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 impostorscore=0 adultscore=0 suspectscore=0 bulkscore=0
+ malwarescore=0 phishscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611170057
 
-Handle the two new access rights in the sandboxer: READ_METADATA joins
-the read-only set, WRITE_METADATA the read-write set, and both join
-ACCESS_FILE.  Bump LANDLOCK_ABI_LAST to 13 and remove the rights for
-ABI < 13 in the fallback switch.
+On 11/17/26 8:26 AM, Qiliang Yuan wrote:
+> Writing the scheduler a queue already uses to queue/scheduler used to
+> be a no-op. elevator_change() now only checks for an unchanged elevator
+> after freezing the queue, and doesn't treat "none" on a queue without
+> an elevator as unchanged at all, so that case also quiesces the queue
+> in elevator_switch() and resets nr_requests.
+> 
+> Every such write therefore drains in-flight I/O and waits for an RCU
+> grace period. udev rules and tuning tools that set the scheduler
+> unconditionally stall I/O on live disks each time they run.
+> 
+> Check under elevator_lock whether anything would change before
+> allocating scheduler resources and freezing the queue. The check can
+> race with another elevator change, which at worst leads to a redundant
+> switch, so keep the one done under the freeze as well.
+> 
+> Writing the current scheduler to queue/scheduler of a null_blk disk 20
+> times takes (median):
+> 
+>    operation                 before (ms)  after (ms)  change
+>    none -> none                     9.11        0.08    -99%
+>    mq-deadline -> mq-deadline       9.05        0.08    -99%
+> 
+> 4k random reads at queue depth 1 for 10 seconds, while "none" is
+> written to queue/scheduler every 50 ms:
+> 
+>    metric             before  after  change
+>    IOPS               340562 390392    +15%
+>    max latency (us)    16302   1224    -92%
+> 
+> Fixes: af2814149883e ("block: freeze the queue in queue_attr_store")
+> Signed-off-by: Qiliang Yuan<qiliang.yuan@linux.dev>
+> Reviewed-by: Christoph Hellwig<hch@lst.de>
 
-Update the trace example in events-landlock.rst accordingly.
-
-Signed-off-by: Cai Xinchen <caixinchen1@huawei.com>
----
- Documentation/trace/events-landlock.rst | 18 ++++++++++--------
- samples/landlock/sandboxer.c            | 16 +++++++++++++---
- 2 files changed, 23 insertions(+), 11 deletions(-)
-
-diff --git a/Documentation/trace/events-landlock.rst b/Documentation/trace/events-landlock.rst
-index dc5f05a17c2c..f415eaa0eabf 100644
---- a/Documentation/trace/events-landlock.rst
-+++ b/Documentation/trace/events-landlock.rst
-@@ -88,7 +88,7 @@ Landlock, not from regular file permissions::
-   $ LC_ALL=C LL_FS_RO=/usr:/lib:/lib64:/bin:/etc/ld.so.cache LL_FS_RW=/tmp \
-       ./sandboxer cat /etc/passwd
-   $ cat /sys/kernel/tracing/trace_pipe
--  cat-127 [...] landlock_create_ruleset: ruleset=195cc6b76.0 handled_fs=execute|write_file|read_file|read_dir|remove_dir|remove_file|make_char|make_dir|make_reg|make_sock|make_fifo|make_block|make_sym|refer|truncate|ioctl_dev|resolve_unix handled_net= scoped= handled_permissions=
-+  cat-127 [...] landlock_create_ruleset: ruleset=195cc6b76.0 handled_fs=execute|write_file|read_file|read_dir|remove_dir|remove_file|make_char|make_dir|make_reg|make_sock|make_fifo|make_block|make_sym|refer|truncate|ioctl_dev|resolve_unix|read_metadata|write_metadata handled_net= scoped= handled_permissions=
-   cat-127 [...] landlock_create_domain: domain=195cc6b7c parent=0 ruleset=195cc6b76.6
-   cat-127 [...] landlock_enforce_domain: domain=195cc6b7c complete=1 process_wide=1 no_new_privs=1
-   cat-127 [...] landlock_deny_access_fs: domain=195cc6b7c same_exec=0 logged=0 blockers=read_file dev=0:17 ino=5901179 path=/etc/passwd
-@@ -279,20 +279,22 @@ For example, a program sandboxed with read and execute access to the
- whole filesystem reads ``/etc/passwd``; both the ``execve()`` and the
- read match the rule covering ``/`` (inode 2), so ``check_rule_inode`` fires
- with the requested rights intersected against what that rule grants.
--The ``access_request=`` mask includes ``truncate`` because the file-open hook
--evaluates that optional right alongside the required access, but the
--rule does not grant it, so ``truncate`` never appears in ``grants=``::
-+The ``access_request=`` mask includes ``truncate``, ``read_metadata`` and
-+``write_metadata`` because the file-open hook evaluates those optional rights
-+alongside the required access.  The read-only rule grants ``read_metadata``,
-+so it appears in ``grants=``, while ``truncate`` and ``write_metadata`` are
-+not granted and therefore do not::
- 
--  cat-127 [...] landlock_check_rule_inode: domain=1e40cb56f access_request=execute|read_file|truncate dev=0:17 ino=2 grants={execute|read_file}
--  cat-127 [...] landlock_check_rule_inode: domain=1e40cb56f access_request=read_file|truncate dev=0:17 ino=2 grants={read_file}
-+  cat-127 [...] landlock_check_rule_inode: domain=1e40cb56f access_request=execute|read_file|truncate|read_metadata|write_metadata dev=0:17 ino=2 grants={execute|read_file|read_metadata}
-+  cat-127 [...] landlock_check_rule_inode: domain=1e40cb56f access_request=read_file|truncate|read_metadata|write_metadata dev=0:17 ino=2 grants={read_file|read_metadata}
- 
- The ``[...]`` replaces the ftrace CPU, flags, and timestamp columns.  A
- single ``grants=`` group means the enforcing domain has one layer.  With
- two nested sandboxes that each grant the same rights, the rule spans both
- layers, so ``grants=`` has one group per layer::
- 
--  cat-128 [...] landlock_check_rule_inode: domain=184788b52 access_request=execute|read_file|truncate dev=0:17 ino=2 grants={execute|read_file,execute|read_file}
--  cat-128 [...] landlock_check_rule_inode: domain=184788b52 access_request=read_file|truncate dev=0:17 ino=2 grants={read_file,read_file}
-+  cat-128 [...] landlock_check_rule_inode: domain=184788b52 access_request=execute|read_file|truncate|read_metadata|write_metadata dev=0:17 ino=2 grants={execute|read_file|read_metadata,execute|read_file|read_metadata}
-+  cat-128 [...] landlock_check_rule_inode: domain=184788b52 access_request=read_file|truncate|read_metadata|write_metadata dev=0:17 ino=2 grants={read_file|read_metadata,read_file|read_metadata}
- 
- eBPF access
- ===========
-diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-index 1362f08ff14b..29965ef90bed 100644
---- a/samples/landlock/sandboxer.c
-+++ b/samples/landlock/sandboxer.c
-@@ -137,6 +137,8 @@ static int parse_path(char *env_path, const char ***const path_list)
- 	LANDLOCK_ACCESS_FS_EXECUTE | \
- 	LANDLOCK_ACCESS_FS_WRITE_FILE | \
- 	LANDLOCK_ACCESS_FS_READ_FILE | \
-+	LANDLOCK_ACCESS_FS_READ_METADATA | \
-+	LANDLOCK_ACCESS_FS_WRITE_METADATA | \
- 	LANDLOCK_ACCESS_FS_TRUNCATE | \
- 	LANDLOCK_ACCESS_FS_IOCTL_DEV | \
- 	LANDLOCK_ACCESS_FS_RESOLVE_UNIX)
-@@ -487,7 +489,8 @@ static bool check_ruleset_scope(const char *const env_var,
- #define ACCESS_FS_ROUGHLY_READ ( \
- 	LANDLOCK_ACCESS_FS_EXECUTE | \
- 	LANDLOCK_ACCESS_FS_READ_FILE | \
--	LANDLOCK_ACCESS_FS_READ_DIR)
-+	LANDLOCK_ACCESS_FS_READ_DIR | \
-+	LANDLOCK_ACCESS_FS_READ_METADATA)
- 
- #define ACCESS_FS_ROUGHLY_WRITE ( \
- 	LANDLOCK_ACCESS_FS_WRITE_FILE | \
-@@ -503,7 +506,8 @@ static bool check_ruleset_scope(const char *const env_var,
- 	LANDLOCK_ACCESS_FS_REFER | \
- 	LANDLOCK_ACCESS_FS_TRUNCATE | \
- 	LANDLOCK_ACCESS_FS_IOCTL_DEV | \
--	LANDLOCK_ACCESS_FS_RESOLVE_UNIX)
-+	LANDLOCK_ACCESS_FS_RESOLVE_UNIX | \
-+	LANDLOCK_ACCESS_FS_WRITE_METADATA)
- 
- /* clang-format on */
- 
-@@ -570,7 +574,7 @@ static int add_quiet_access(const char *const env_var,
- 	return 0;
- }
- 
--#define LANDLOCK_ABI_LAST 12
-+#define LANDLOCK_ABI_LAST 13
- 
- #define XSTR(s) #s
- #define STR(s) XSTR(s)
-@@ -780,6 +784,12 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 		ruleset_attr.handled_permissions &=
- 			~(LANDLOCK_PERMISSION_NAMESPACE_USE |
- 			  LANDLOCK_PERMISSION_CAPABILITY_USE);
-+		__attribute__((fallthrough));
-+	case 12:
-+		/* Removes metadata rights for ABI < 13 */
-+		ruleset_attr.handled_access_fs &=
-+			~(LANDLOCK_ACCESS_FS_READ_METADATA |
-+			  LANDLOCK_ACCESS_FS_WRITE_METADATA);
- 		/* Must be printed for any ABI < LANDLOCK_ABI_LAST. */
- 		fprintf(stderr,
- 			"Hint: You should update the running kernel "
--- 
-2.18.0.huawei.25
-
+Looks good to me:
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
