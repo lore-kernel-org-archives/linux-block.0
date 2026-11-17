@@ -1,65 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794936043;
-	b=R0GzW35ch1sFXOTDvZ1m/bkOUlq90tNlr4TpCAbDcyguiODRTRDGsxbLZRffMK4jOKUF
-	 ZDqsm/CBXrWQzyQKNS98nDtDJ23WmzzBHszBBcizKSOdDqSnMIhpXQ/LLWTDNDuiBH6D4
-	 7f3shRRGcYcvRqiSk8fQ3ucIoVAD+Yhn+dJ3QPbdDRllB5IGHbNeCTM8jyITItmzMZolL
-	 HzWr8IwU3VGcv3p+LvVzT+lvYFS/oDufcC3yQ5ydAEfEfWecwUH0MZ0O4BpZb9CvC1S+p
-	 snsxJnQpk7x6FFZIwYGAdP00iZns/Qs4sUnK8UZm8vgJUrzGhl4bB6Ca7MZLTVkwikw==
+	t=1794936057;
+	b=kbdVVYF1ivrVSj6JQnUv+CPcrb0McgMYWsvRcQAuUtGO19uUz6J8wxlysYm6JNxfHo3X
+	 vL8iupGdr2ChBLMCVzW/9AdWl/GOYBsxdts/Euc8/Wq8CfI+7xRV2r6ocXibrA6e8sHKO
+	 3enh2Q0ApViAv/gz4J7wYKiZmrzi7fmu59vXR5GBB9eA9tlDA6pUWSvZQ63KMVbl+Owx/
+	 vz1a8RkFIdD6+S8GUDoPKSAaxCydtvz7tm6T7WOl5qFPNWjckGje/JGRoVLBHAnlJ0cdl
+	 WjHvBITSeGf3W4cbAb7UBDnNLQbV8oCGR3ieGrgcg+2lAoG4AKmjwOc4Vo5dixzr1tg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794936043;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794936057;
 	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
 	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
 	 Message-ID:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-Scanned-By;
-	bh=PhNajVV4YOAVa6HzjBax5Vzcm0CeXg6v0Uflf51EUrc=;
-	b=ISBWizvAP/hhKiFDSCEkZoTBD9hQk406QjL0JC71p7Vut3m91OEn/7uLt/HqteiFHn8y
-	 1d1a356PtHTU4kV0wu1/qBukRCFzZt8tJ3ydKe14bhKzDUsm0kaBUp4e8qDZDUUg7qfdD
-	 96CI8Bi0UiyJUEvWCfiQ/0mUBuBD/DIe5//nBP6gbc75nw86Y8BkuwXd3ipq3c35b+uI4
-	 4vTVbAoFwXwRqjvlvtAu3YpveDohdni20rXaTVvSD1E4pT17VC3UWvm2f3Ay66Bftv66m
-	 2aYUwlvYqod+US9+2JBtKCXagABGuzM7DWLcduIlBLbGNdCjKW4MngMG/9drS3VDi+w==
+	bh=lsH8O6RhbgeGydp95APU9gEGG0tijm0KMW6RoD9esjk=;
+	b=5LfGFtnlU1NZgrGkvJ+XUMWniM17CgVLmeZiLN47IzwJYNGlcGn38dHoBcHT2xao2M1B
+	 /L9UnXDETIkrJWDDT+fh+rtuZT1OD5ChQwU2KjogjHaYkvCJUybXJSAgyENm78WR8q59K
+	 GPrpkGnwVTJxJY4nXY93wAjbaJLXQ6T3hZPRHX5y2z2/Wg2Cx9lFA7Yozwv3UJQM3HZRN
+	 OImGxjlsDcwTFWEljbWKBml0QJi7c3dlKwQqAs+JOhO6i1CD5ohAxsuzBa8E/0Vk7R5+l
+	 XF850s/ZPAto56KK3ITo5i/Mlldr4C0EgnjB0Ei0xs77FrxOaG7TesxsGHUuZRuMZxw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=redhat.com;
 	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=CnWhvzkj;
-	arc=none smtp.remote-ip=170.10.133.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=f7bbEw+1;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F165606A880
-	for <linux-block@vger.kernel.org>; Tue, 17 Nov 2026 17:20:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6F165606A880
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7FA606A332
+	for <linux-block@vger.kernel.org>; Tue, 17 Nov 2026 17:20:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0D7FA606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=CnWhvzkj
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=f7bbEw+1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1794936040;
+	s=mimecast20190719; t=1794936056;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PhNajVV4YOAVa6HzjBax5Vzcm0CeXg6v0Uflf51EUrc=;
-	b=CnWhvzkjRQC2b1IXAzsfvzndE2RsilXzH81glW8XgKFUdCr4qfDbcbh+pVLNSnKWemRee9
-	YoyX+avOfcS2Aw29lIfYgxG8OK3bP1WJr0Bllr3sRAZFrKQgXvDA2xhk2GHLfLiSt4AilE
-	UuEAgWVH98vdfogXipTAYnpydJ7RmbQ=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=lsH8O6RhbgeGydp95APU9gEGG0tijm0KMW6RoD9esjk=;
+	b=f7bbEw+1mKU/siC2t/nqtFXfTVdQ+/6sEm3wANIiquFdoW+IXdgjVC8UdCKQoQ9rXTn/BZ
+	buntDkO9J54K7NDlkWuj4pMDRprsZFX4gAaFuFnxRoaXVsCiiZU3Krx56Nl3C3JTzXoO+S
+	VM9XTfUI3ERGFP3/h7ehZCucmJo2Kq0=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-250-pu-Za_vLO3apluNSLWQvkA-1; Tue,
- 17 Nov 2026 12:20:36 -0500
-X-MC-Unique: pu-Za_vLO3apluNSLWQvkA-1
-X-Mimecast-MFC-AGG-ID: pu-Za_vLO3apluNSLWQvkA_1794936033
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-5Ck-N2iBPI26j-jhueYlAg-1; Tue,
+ 17 Nov 2026 12:20:52 -0500
+X-MC-Unique: 5Ck-N2iBPI26j-jhueYlAg-1
+X-Mimecast-MFC-AGG-ID: 5Ck-N2iBPI26j-jhueYlAg_1794936050
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E5E5B1956053;
-	Tue, 17 Nov 2026 17:20:31 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9202E18005A6;
+	Tue, 17 Nov 2026 17:20:49 +0000 (UTC)
 Received: from dhowells-thinkpadp1gen8.rmtgb.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9EE441801971;
-	Tue, 17 Nov 2026 17:20:27 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5DED518011D9;
+	Tue, 17 Nov 2026 17:20:45 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -82,9 +82,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@infradead.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH v18 02/17] Add a function to kmap one page of a multipage bio_vec
-Date: Tue, 17 Nov 2026 17:19:00 +0000
-Message-ID: <20261117171958.2982801-3-dhowells@redhat.com>
+Subject: [PATCH v18 05/17] iov_iter: Add an API document for the bvecq structure
+Date: Tue, 17 Nov 2026 17:19:03 +0000
+Message-ID: <20261117171958.2982801-6-dhowells@redhat.com>
 In-Reply-To: <20261117171958.2982801-1-dhowells@redhat.com>
 References: <20261117171958.2982801-1-dhowells@redhat.com>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -97,14 +97,12 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add a function to kmap one page of a multipage bio_vec by offset (which is
-added to the offset in the bio_vec internally).  The caller is responsible
-for calculating how much of the page is then available.
+Add an API description document for the bvecq structure.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 cc: Matthew Wilcox <willy@infradead.org>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Christoph Hellwig <hch@infradead.org>
@@ -112,34 +110,318 @@ cc: linux-block@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- include/linux/bvec.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ Documentation/core-api/bvecq.rst | 250 +++++++++++++++++++++++++++++++
+ Documentation/core-api/index.rst |   1 +
+ MAINTAINERS                      |   1 +
+ fs/netfs/bvecq.c                 |   2 +
+ include/linux/bvecq.h            |   2 +
+ 5 files changed, 256 insertions(+)
+ create mode 100644 Documentation/core-api/bvecq.rst
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index b63914ff56e3..7ea62643cfb7 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -344,4 +344,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
- 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
- }
+diff --git a/Documentation/core-api/bvecq.rst b/Documentation/core-api/bvecq.rst
+new file mode 100644
+index 000000000000..b2896992b284
+--- /dev/null
++++ b/Documentation/core-api/bvecq.rst
+@@ -0,0 +1,250 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++=========================================
++bvecq - Chainable bio_vec queue structure
++=========================================
++
++Author: David Howells <dhowells@redhat.com>
++
++.. Contents:
++
++ * Overview
++ * Allocating bvecqs
++ * Refcounting
++ * Expandable buffer
++ * Producer functions
++ * Consumer functions
++ * Utility functions
++ * I/O iterators
++ * API Function Reference
++
++
++Overview
++========
++
++The ``bvecq`` struct can be used to form chains of arrays of ``bio_vec``
++structures - kind of a single layer of indirection.  Each bvecq segment points
++to the previous and next bvecq segments in the chain, but is not intended to
++form a circular queue as there are applications where the producer is adding to
++one end whilst the consumer is taking off the other.
++
++To use this, the caller should do::
++
++	#include <linux/bvecq.h>
++
++The publicly accessible members of the structure are::
++
++	struct bvecq {
++		struct bvecq	*next;
++		struct bvecq	*prev;
++		u32		priv;
++		u16		nr_slots;
++		u16		max_slots;
++		enum bvecq_mem	mem_type:3;
++		struct bio_vec	*bv;
++		...
++	};
++
++A pair of pointers are provided, ``next`` and ``prev``, that point to the
++segments on either side of the segment being accessed.  Whilst this is a
++doubly-linked list, it is intentionally not a circular list; the outward
++sibling pointers in terminal segments should be NULL.
++
++The ``priv`` member is for the owner of the bvecq to use as they will.
++
++The ``bv`` pointer points at an array of bio_vecs that list a number of regions
++of memory.  ``max_slots`` indicates how large the array is and ``nr_slots``
++says how much of the array is being used.  Note that there are access functions
++for nr_slots that insert appropriate barriering in the case that there are
++separate producer and consumer threads.
++
++The ``mem_type`` member informs bvecq_put() of how to clean up the bio_vecs
++attached to this segment.  It can be one of:
++
++ * ``BVECQ_MEM_EXTERNAL`` - Externally managed; no cleanup.
++ * ``BVECQ_MEM_PAGECACHE`` - Part of pagecache; put_page() used.
++ * ``BVECQ_MEM_GUP`` - Pinned userspace memory; unpin_user_page() used.
++ * ``BVECQ_MEM_ALLOCED`` - Allocated page; __free_pages() used, may be pooled.
++
++
++Allocating bvecqs
++=================
++
++A number of functions are provided to allocate bvecqs::
++
++	struct bvecq *bvecq_alloc_one(size_t nr_slots,
++				      gfp_t gfp,
++				      unsigned int *flags);
++	struct bvecq *bvecq_alloc_chain(size_t nr_slots,
++					gfp_t gfp,
++					unsigned int *flags);
++	struct bvecq *bvecq_alloc_buffer(size_t size,
++					 gfp_t gfp,
++					 unsigned int *flags);
++	struct bvecq *bvecq_alloc_buffer2(size_t size,
++					  unsigned int pre_slots,
++					  gfp_t gfp,
++					  unsigned int *flags);
++
++The first of these, ``bvecq_alloc_one()`` allocates a single bvecq with at
++least the requested number of inline slots.  The size of the object is rounded
++up to the size of the slab granule that it will be allocated in and the number
++of slots increased appropriately to match.
++
++Two convenience slot count constants are provided:
++
++ * ``BVECQ_POOL_SLOTS`` - The right number of slots to alloc from the mempool
++ * ``BVECQ_4KB_SLOTS`` - The right number of slots to get a 4K allocation
++
++``bvecq_alloc_chain()`` will allocate a sufficiently large chain of bvecqs to
++hold the requested number of slots, capping each allocation at 4K.
++
++``bvecq_alloc_buffer()`` will allocate a chain and populate it, allocating
++sufficient pages to provide a buffer of the specified size attached to the
++chain.  ``bvecq_alloc_buffer2()`` is similar, but it reserves some unused slots
++at the front of the chain.  Note that these functions may add multipage pages
++in the future.
++
++With regard to the ``*flags``, if ``BVECQ_USE_REQ_POOL`` or
++``BVECQ_USE_SUBREQ_POOL`` is set therein, then the netfslib writeback bvecq
++pools will be used to backstop the allocation if the initial slab request
++fails; in such a case, the number of slots in the affected bvecq will be
++``BVECQ_POOL_SLOTS`` and ``*flags`` will have ``BVECQ_HIT_OOM`` set in it.
++
++There are two pools, one for use at the request level and one at the subrequest
++level so that a process which has allocated at one level won't then deadlock
++against the other.
++
++For the chain and buffer allocation functions, if ``BVECQ_SHORT_OKAY`` is set
++in ``*flags`` then the returned chain may be shorter than requested if an OOM
++condition is hit but the mempool is tapped.  In such a case, ``BVECQ_HIT_OOM``
++will have been set in ``*flags``.
++
++Access to the bvecq mempool is throttled.  Only a certain number of processes
++may be using it at any one time (it contains 2 bvecq per process allowed in)
++and if the calling process is granted access, ``BVECQ_HOLD_POOL_SEM`` is set in
++the flags.  To clean up the emergency pool state, the caller must call::
++
++	void bvecq_pool_unlock(unsigned int *flags);
++
++after it is done allocating with the flags left by the last allocation call.
++
++
++Refcounting
++===========
++
++Each bvecq has a refcount and two functions are provided to handle that::
++
++	struct bvecq *bvecq_get(struct bvecq *bq);
++	void bvecq_put(struct bvecq *bq);
++
++The first of these gets a new reference and the second drops a reference.  When
++the refcount hits zero, the second iteratively drops the refs along the chain
++until it hits a segment that has a refcount that doesn't reduce to zero.
++
++
++Expandable buffer
++=================
++
++This facility provides a function to manage an expandable buffer::
++
++	int bvecq_expand_buffer(struct bvecq **_buffer,
++				size_t *_cur_size,
++				size_t size,
++				gfp_t gfp);
++
++Pages are added to the bvecq chain and the chain expanded such that, on
++returning, it holds ``size`` amount of space (without losing any content).  The
++caller needs to retain ``*_cur_size`` between calls as that tracks the amount
++of space currently allocated.  Note that pages in the chain may be allocated as
++compound pages larger than PAGE_SIZE.
++
++
++Producer functions
++==================
++
++When building and filling a bvecq, there are a number of utility functions that
++can be used to provide the correct barriering and to query the fields in the
++bvecq currently being filled.
++
++Firstly, there's a function to check to see if a bvecq has any spare slots
++left::
++
++	bool bvecq_is_full(const struct bvecq *bvecq);
++
++If not, ``bvecq_alloc_one()`` can be called to allocate a new segment which can
++be initialised and then added to the chain with::
++
++	void bvecq_append(struct bvecq *to, struct bvecq *add);
++
++bio_vec slots in the segment can then be filled and the number of occupied
++slots updated by calling::
++
++	void bvecq_filled_to(struct bvecq *bvecq,
++			     unsigned int to);
++
++to insert the appropriate barrier.
++
++
++Consumer functions
++==================
++
++When consuming and destroying a bvecq, there are some utility functions for
++that too, providing the needed barriering.  Firstly, there's a function to find
++out how many slots have been used in the current bvecq::
++
++	unsigned int bvecq_nr_slots_acquire(const struct bvecq *bvecq);
++
++Or, more conveniently, if the current slot position is valid within the bvecq::
++
++	bool bvecq_acquire_slot(const struct bvecq *bvecq,
++				unsigned int slot);
++
++If this returns true, the slot is valid and can be looked at; if it returns
++false, the bvecq may have been consumed.  If it has, the next bvecq can be
++obtained by calling::
++
++	struct bvecq *bvecq_next(const struct bvecq *bq);
++
++which inserts the appropriate barrier - though bvecq_acquire_slot should be
++rechecked after calling this in case the producer added more slots and then
++extended the list.
++
++
++Utility functions
++=================
++
++A utility function is provided to list the bio_vecs pointed to by a bvecq
++chain::
++
++	void bvecq_dump(const struct bvecq *bq);
++
++
++I/O iterators
++=============
++
++bvecq chains can be used with the ``iov_iter`` facility too.  An iterator can
++be initialised to point at a chain by calling::
++
++	void iov_iter_bvec_queue(struct iov_iter *i,
++				 unsigned int direction,
++				 const struct bvecq *bvecq,
++				 unsigned int first_slot,
++				 unsigned int offset,
++				 size_t count);
++
++In addition to setting the iterator, direction and count, the first bvecq in
++the chain to be iterated over is set, along with the starting slot in that
++iterator and the offset into the slot.  Once the iterator is set up, it can be
++treated like any other I/O iterator.
++
++In a producer/consumer environment, it is expected that when an iterator is set
++up, all the bvecqs and all the slots within the count of the iterator must
++exist and must be populated before this function is called.
++
++
++API Function Reference
++======================
++
++.. kernel-doc:: include/linux/bvecq.h
++.. kernel-doc:: fs/netfs/bvecq.c
+diff --git a/Documentation/core-api/index.rst b/Documentation/core-api/index.rst
+index 92f91c6a0d79..e39edef58ab6 100644
+--- a/Documentation/core-api/index.rst
++++ b/Documentation/core-api/index.rst
+@@ -39,6 +39,7 @@ Library functionality that is used throughout the kernel.
+    kref
+    cleanup
+    assoc_array
++   bvecq
+    folio_queue
+    xarray
+    maple_tree
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 250d0e324d49..a57adc745196 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10386,6 +10386,7 @@ M:	Paulo Alcantara <pc@manguebit.org>
+ L:	netfs@lists.linux.dev
+ L:	linux-fsdevel@vger.kernel.org
+ S:	Supported
++F:	Documentation/core-api/bvecq.rst
+ F:	Documentation/filesystems/caching/
+ F:	Documentation/filesystems/netfs_library.rst
+ F:	fs/netfs/
+diff --git a/fs/netfs/bvecq.c b/fs/netfs/bvecq.c
+index 8ac2dc235258..0ee9ce8b9df1 100644
+--- a/fs/netfs/bvecq.c
++++ b/fs/netfs/bvecq.c
+@@ -3,6 +3,8 @@
+  *
+  * Copyright (C) 2026 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
++ *
++ * See also Documentation/core-api/bvecq.rst
+  */
  
-+/**
-+ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
-+ * @bvec: bvec to map
-+ * @offset: Offset into bvec
+ #include <linux/bvecq.h>
+diff --git a/include/linux/bvecq.h b/include/linux/bvecq.h
+index 676cccb6ce2c..f7865ca51f11 100644
+--- a/include/linux/bvecq.h
++++ b/include/linux/bvecq.h
+@@ -3,6 +3,8 @@
+  *
+  * Copyright (C) 2026 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
 + *
-+ * Map the page containing the byte at @offset into the kernel virtual address
-+ * space.  The caller is responsible for making sure this doesn't overrun.
-+ *
-+ * Call kunmap_local on the returned address to unmap.
-+ */
-+static inline void *bvec_kmap_partial(const struct bio_vec *bvec, size_t offset)
-+{
-+	offset += bvec->bv_offset;
-+
-+	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
-+		(offset & ~PAGE_MASK);
-+}
-+
- #endif /* __LINUX_BVEC_H */
++ * See also Documentation/core-api/bvecq.rst
+  */
+ 
+ #ifndef _LINUX_BVECQ_H
 
