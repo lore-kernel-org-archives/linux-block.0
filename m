@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795015436;
-	b=RaRpuE+g1mqQAbH/quDoWEuwMwyvsNlAKzJNgwHW2AfAlTEILKqsJlV7uhh4FzuJ4SDh
-	 IIb/EQf0GU4eTbgWIdjsYwc8qw5C1k7k2vpo35oqHden5zZRsPeGV4Pbk+ram4LuTPiuk
-	 11aIaRM9it28jCrtaL5RPinK3wLwCFnz755oNYA4viZfjYhKuVt7zPHN1RU5BCL8QB0TQ
-	 R7sGul4hzDPBcU6RcIk8DMfKpJoD0QqSRyae0VtrZOkS09iZOuOrKpstNruYBxJvE0ASu
-	 yGnyJi38fq5ZoYFKDA+28yA4ajfXUh3gQOQeMNNEqdZraovH9THJzMpJ1iMW5mVe8wg==
+	t=1795015441;
+	b=TwrGCAB9hNB9uDA2BXUysQSDy4yGTc/ydFGvgLiF7+V54sRsTaSNIXHM43G9x1XzzLgj
+	 YYySSaqkfQE6kNWaRWdcIrKBrRLTCkGQdk3AZf1tKwV4MtfmWcfSv9mMK4uuEv+sdJtoe
+	 JRwZLGrXcqUFryFaQ41AnLBJ9y+gMsxzMJz1F0/W81zzIHY4uXY5wRGRsw8ND2Tih3nk7
+	 I+/jCCpBBA6z5zm1o2eY2s5K7Hca0Wqi5PwmD5WkTdyTWmfm8zcR/tAnd0fyejMp9M3aD
+	 ZOogO7SGY77/3V1+m7uRDYaOE2rIY4UDNGGoBEEa71BTyyq3V3whinYpjhApu8EWr1Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795015436;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795015441;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:In-Reply-To:References:
 	 Date:Message-ID:MIME-Version:Content-Type;
-	bh=/wWuoNoKhTnCurVf+R9Dm8cUyc6MlIAKk64n3z/RBEY=;
-	b=MxgHQHnbuupE9+AFd9kK90gW/qVM1uXfC3sxGuW9G6dVxijc7AAxei0JOmS+Mfx6XUdo
-	 KaapKDS9e8GSOBkEb4vyQ0DmAr9/TIiVc8/PnwwTnlE4aUpK+82c6fBY/yxAUnDhWHcZ7
-	 ruS//3ICbC5pHY2euiMSc8by9Xa9sQF5qs2qxbqq6KoTPBh6L2jyMI49dXIplbVtisfxR
-	 Z8Mkb8fkZ/fj14+9yYpUZn68/GupPvaYsAzUtHu5yIjRlZcrKt/+/XMqC+rw39fNnvraR
-	 JGYZe0Cp85cyku+JJLsmgjjla6S1Qsu02pofYyjcKPSNg+cdCt49X2MEPe/f8KveR5Q==
+	bh=RQcOM5LZ+A50DskRP5nF4QpJYB2S5F35ZVxDxecyXLE=;
+	b=rgHW1tL4MkYAjshT3r5BdRlR6C2KtZ+ooxD73/BDYbD4CgHXHRN1lmDswZrOWyoeHAzY
+	 Cd/h2sGBP/w2GnmM4KnnRvNxs2+AwkMEJUGQZh8R7PHT0UmKZtiMTYtdjVQkveHd4HZVb
+	 CTsXsIecK4U53Y0xYbNhBlqyJ6IU4GvTG/kYoMcYXT+fOwqtBOpJ3EoUUmJbOpkss3pY2
+	 nYMWOGielhn0FSNujjAetg0sUrlUsGaZZK0VIca33PnwBMZBjia6mB0G/OAg5TFjk8Max
+	 PPW2a579j0885OBw8XZhSuhTyaDiNehmGds4jug0U8AjSL8WSng4TjFT7Gltbln5y/g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VpWF6okg;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bAu+g7DZ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D65760A2611;
-	Wed, 18 Nov 2026 15:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1A3606A32A;
+	Wed, 18 Nov 2026 15:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VpWF6okg
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C03411F000C5;
-	Wed, 18 Nov 2026 15:23:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bAu+g7DZ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C755F1F000D0;
+	Wed, 18 Nov 2026 15:23:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795015436;
-	bh=/wWuoNoKhTnCurVf+R9Dm8cUyc6MlIAKk64n3z/RBEY=;
+	s=k20260515; t=1795015441;
+	bh=RQcOM5LZ+A50DskRP5nF4QpJYB2S5F35ZVxDxecyXLE=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=VpWF6okg+6brufuDUnD/0rcm3ikR/TGcAO2b+kf1nmmezjf+ioumZyaJ/hW1XAXHc
-	 i8+zQr8ldIQD0EwrkfLPgRuItBcHyIZGOM9ZjDoPmyJ1lmnkSn4IWArch/xtz+If9D
-	 DG3rxW6pXD2Lxv1OKCtUjy80q7COvdcFrxOToK+yGr980IxJ1Q+I/s65bGLw80Gp98
-	 fgGv05L88j/j0lYcRWqAAwMUORJzu7XIZ7ttOGLTRaeCxIqA75DJOHItpxUN0JKiXG
-	 ilTvBNtJXKBxAAwlwwkJ6flU0YBv1XT+qIIumi2wFcjWs/rqbqqj1cif+sSDD0fUkB
-	 i1OiklgN/SJsg==
+	b=bAu+g7DZw3J/d5gjI5fKw3TQ5XEKjEBdA61DLneCyxO9RyQFJT6NDl4rp2J/zIrby
+	 UTRU6hZ4OvYXpq9U96p5J+Jp0RqsBkW0dTjYTMVk1ETfP71i70Qnb9En+xPV1yXXsM
+	 5MPUfHlg8dz8XISX3fRv5jql4mAeUyn4Tlx/96Xz6lR1VVeDlDm4SXsJO7iB0jBfqG
+	 iACcY4jLn1auGGi1XCeSv4z5KNXdBIdEAld5BQoR4aTSY6tmKz9mgq8ojXPiafJAk1
+	 II6HR8YBy70CWBDAWiWqZVZxI7NoTPmt+kZQo2OSHntI+1N6AGCuaBk5PS6wXtHDQ3
+	 KVcn3u0OBQG1Q==
 From: Andreas Hindborg <a.hindborg@kernel.org>
 To: Vitaly Wool <vitaly.wool@konsulko.se>, Jens Axboe <axboe@kernel.dk>,
  Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>
@@ -54,14 +54,14 @@ Cc: Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
  rust-for-linux@vger.kernel.org, linux-mm@kvack.org,
  linux-kernel@vger.kernel.org, Igor B <igor.b@beldev.am>, Vitaly Wool
  <vitaly.wool@konsulko.se>
-Subject: Re: [PATCH 1/3] rust: block: add bio segment iteration and request
- accessors
-In-Reply-To: <20261117233211.3137168-2-vitaly.wool@konsulko.se>
+Subject: Re: [PATCH 2/3] rust: page: add reference counting, raw pointers
+ and a private bit lock
+In-Reply-To: <20261117233211.3137168-3-vitaly.wool@konsulko.se>
 References: <20261117233211.3137168-1-vitaly.wool@konsulko.se>
- <3wemO2s0BrkamlAGBfPqORofFz9yCXPMZUZ0-dUQxmJmEhmz2T2yaCjcaTVXEB_gwLj8SdBNjkOR8r6aERjk9Q==@protonmail.internalid>
- <20261117233211.3137168-2-vitaly.wool@konsulko.se>
-Date: Wed, 18 Nov 2026 16:19:13 +0100
-Message-ID: <87a4n6upzi.fsf@t14s.mail-host-address-is-not-set>
+ <nJAtLmDmAV24rOe6aN54vqMAgr06LVJtplZTvmqfydTzMhml3convxW0wdHq0nMHqmRM7qsioK1kV78UIwCkzQ==@protonmail.internalid>
+ <20261117233211.3137168-3-vitaly.wool@konsulko.se>
+Date: Wed, 18 Nov 2026 16:23:40 +0100
+Message-ID: <877biaups3.fsf@t14s.mail-host-address-is-not-set>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -73,47 +73,40 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Hi Vitaly,
-
 "Vitaly Wool" <vitaly.wool@konsulko.se> writes:
 
 > From: Igor B <igor.b@beldev.am>
 >
-> The Rust blk-mq abstractions only cover what the null block driver
-> needs: requests can be started and ended, but a driver cannot find out
-> what a request asks for or reach its data.
+> A `Page` always owns its page exclusively, with no way to take another
+> reference or keep it as a raw pointer. Add:
 >
-> For a driver that actually transfers data we need:
+> - `Page::get()`, which takes another reference with `get_page()`;
+> - `Page::into_raw()` and `Page::from_raw()`, to convert a `Page` to and
+>   from the `struct page` pointer it holds a reference to;
+> - `Page::try_get_raw()`, which takes a reference from a possibly stale
+>   pointer with `get_page_unless_zero()`, for lock-free lookups like
+>   brd_lookup_page(). This is sound because a `struct page` is never
+>   freed, even once its memory is;
+> - `Page::lock_private_bit()`, which takes a bit spinlock in the page's
+>   `private` field and returns a guard that releases it. This gives a
+>   page used as plain memory a lock of its own at no memory cost.
 >
-> - A `bio` module with a `Bio` wrapper, an iterator over the bios of a
->   request and an iterator over the single-page segments of a bio, the
->   equivalent of rq_for_each_segment(). Segments can be copied to and
->   from a `Page` and zeroed, with bounds checks. Iteration goes through
->   two new C helpers wrapping bio_iter_iovec() and
->   bio_advance_iter_single(), so the multi-page bvec handling stays in
->   C.
+> Add Rust helpers for `get_page()`, `get_page_unless_zero()`,
+> `bit_spin_lock()` and `bit_spin_unlock()`.
 >
-> - `Request::command()`, `Request::sector()`, `Request::bytes()` and
->   `Request::bio_iter()`, exposing the operation, start sector, length
->   and bios of a request. REQ_OP_MASK is added as a constant helper,
->   since bindgen cannot evaluate it.
->
-> - `GenDiskBuilder::max_hw_discard_sectors()` and
->   `GenDiskBuilder::discard_granularity()`, so drivers can advertise
->   discard support.
->
-> These are used by the rbrd driver added in forthcoming patch.
+> This patch was tested with the help of  Claude Code AI coding assistant.
 >
 > Signed-off-by: Igor Belousov <igor.b@beldev.am>
 > Signed-off-by: Vitaly Wool <vitaly.wool@konsulko.se>
 
-I already submitted this [1]. I have a version rebased on v7.4 if you are
-interested.
-
+I already submitted most of this as part of the `Ownable` work [1]. I
+sent v22 of the `Ownable` series a few days ago [2]. I stripped out the
+page stuff to send as a separate series. I plan to send the page things
+this week. It covers both reference counted pages and frozen pages.
 
 Best regards,
 Andreas Hindborg
 
-
-[1] https://lore.kernel.org/all/20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org/
+[1] https://lore.kernel.org/all/20260910-unique-ref-v21-0-e83257373062@kernel.org/
+[2] https://lore.kernel.org/all/20261116-unique-ref-v22-0-12029383206d@kernel.org/
 
