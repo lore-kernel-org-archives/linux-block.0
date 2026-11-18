@@ -1,94 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795018073;
-	b=b7Gg7uEOTjVz/uWXO0M9Mfx7w56dz77BexhcY0G0k1ln8lbBkmdjewQAe3Ffl9zLN62D
-	 5afj+x2p0lDEDi0Bi1Rck0XYwua4yXk+s+uFOXeTdSXAl1rkbX8489H5kkpagBxga8lkL
-	 pnkD/qBhp45geu6VH8v1rfi/PDLKNXWUAP6KWgx0cUBwJfypLE/hh1cfOdXlaLKn2BygP
-	 iMBsNUF/yZ31K2QNkPnc0UbSYsQ3zQI/Nc4HAYn36rMYD3ftHsHtTs5iGbwlZdDGobWOX
-	 ykTY2T8oRmZwHM43uKP52oPhmQ8nt0KkXX2AkJhgqv6dy3KOALGGWFoMXsF5sUe+cWA==
+	t=1795026158;
+	b=IOLbxIhKVPg1QIW/qqaWuS4gRFaOkD0DCkvCN7zBcps+/lHAPqWpre+9YdHiyQddThaD
+	 A5W7RrvonHjEiEs37SGl7RNIVz5wWA9qAS4EnQzBO02Anu7+cKDychwPT204I0jdh9zci
+	 2/Z7KwQEqLDrZhOkca/XuDlkdQEuZwLbubR+zd1tuMS4CEw8yV71zLODPIm/xrkDt6HAg
+	 CH1MF8I9WaIIkwL4ZJSKGqll0JW3mRd95V3IgdX1z06r285bxJQ55fF3JdhV1slxcnrpr
+	 ieepwCbvmUXY/TJmMU0vew+ptYBA13Lah2k/y5pGqGjIUD6CNLapQqwrK+FTBlYKIcg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795018073;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
-	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:X-Mailer;
-	bh=Sq9RmYzcNH9B/wayIUueB9ggWDiYP1P/tLsuJW/Tbnw=;
-	b=iYnujVDsXPZukawxypAsyHDUB9mg4gxXRY/mpvLErn0CAv8C+HPcC+Z2muQJLB601/t6
-	 lZJe5QNskLr+dYZrUE99NFF2umtZMSUUzqFRZyriY3jaTUBFKxM13kKxJ+jrUBccJlEzm
-	 zraS7ljwh4cpqwfGsvuhf19lVBZXPSECYspy2NhdlAt4SY3svl+XuZEV0BWKEuHXhgLjS
-	 1j12yVUe6wR8XDzg5TnvZoF38vvGObar9n088GTwcyAXT5yHMHJAduQ9Gjepr0RfTTDWt
-	 ZcCr9g6gTAx9MScJMMk7ADebMs6UFmvfm+QjHwzQK4W6eJB7X0eSb4zthHdQeZ/YK8w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795026158;
+	h=Received:DKIM-Signature:Date:To:Cc:From:Message-Id:Subject;
+	bh=4pu6z1Ov5wsBhDkCoZ/+vEL5wykOdNzSLuoNYPfbkfU=;
+	b=zJBn+zDPHyI7gl6oPrHdwQyE8AagB1hA0FoCtcea0pc/x9BRHIxOFB08qdHQpREjOKZ9
+	 y7fiMBn0d2XzwQpCkAYWuHlYcxyPdas226SRodLR9v2Wpw3JPKoRSCNt9vCfO7+8p+Oh/
+	 rdbk9x6P42Vz/BJtsq1O8KmTXNxcwHKVEK7KIbvbBIDB2V5QtRXBq0/C2eizAyTztXzBW
+	 uowElXQ9nEEQAuzrb3qjHVJ7afqCGO24OmR5061L5d4XO5zv6kzXL2dqf1f9NrXbljVD5
+	 cHt61MLnJH6xgcB4PW00JauxxnGULsWyAd6z/w0IaLn25YQOlZ3uDIzRATGoZSFGaEA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=dTgR1f3o;
-	arc=none smtp.remote-ip=209.85.161.50
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=korg header.b=wGjb+nc1;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1521660A2628
-	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 16:07:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1521660A2628
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0B5606A32C;
+	Wed, 18 Nov 2026 18:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=dTgR1f3o
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-71ad1db7e31so1502555eaf.1
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 08:07:53 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=korg header.b=wGjb+nc1
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD9541F000CA;
+	Wed, 18 Nov 2026 18:22:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1795018072; x=1795622872; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Sq9RmYzcNH9B/wayIUueB9ggWDiYP1P/tLsuJW/Tbnw=;
-        b=dTgR1f3og9a0vBhrk79J1moJmlLMa/Fa6bpbkeW9vt/uz99+uvVA4CNebGriNhtftB
-         3KScmsBDYtIouXo/NWiqMm5BqyXTGIO+u4eeRjaVUfcuM40shyAyRSXMCOkPd/cC26u1
-         WOnHUaA5WQg8bQYexiUTpf73CbV4aB1kjJPhR3IiqikKxwcGjkzQP8iZidIuE55TfjYN
-         C3ZM0ZYPIsNXrb1Jj3StcFa1N/5OsDo8WrytQXXoTjfJLgwJighHosOeOXNt0jL4rQQZ
-         1NNE9jBw5/3sC6M2pYKyQIJddk8h/QOYHo2kWVRymfltt/Q/RhyBVcOaWuRehwkYH7o/
-         pAbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795018072; x=1795622872;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Sq9RmYzcNH9B/wayIUueB9ggWDiYP1P/tLsuJW/Tbnw=;
-        b=Rar7uyfXI188AA2pt1krdMzA9bsD3NQF2rqLHduU7eeQr19xgzi3vSUxcUM56AKMgt
-         Gx5gMjfr9+9/7qXPnR/UeRdboHQ718JR4Q7Vyp1LcQ07GOr+nu83RbXjCfyIpNhi8dqv
-         S66rBglHgaVz83Zax/W1kMb16D4ysz2uydWMo70rusOEJFkP38xpU4o9EoaU3rMPUOhD
-         1uBShwinl13BSJH8J36x3X0dVAaZCqe+171I77ivb9f4O62+w47TAM0ZMqZG7aODWn0U
-         05JF+mevpIUmMdO7eoA3xKEKyHvGKXc+y2hodqzs43F6Rl6o6J0j0Rwoa5f3ADgJYq3o
-         KIPg==
-X-Gm-Message-State: APuU4Z+qPuYeBCAuGVUo1RpcI4c887Zz7PpUodjeeH+OgcpPBMdfvxuS
-	1SiQf62xpWo7qWAlWOL2o+wLikjz+fb3KYg45KZ/YalhJuIuTgUf2a9zf4UllmxkLds=
-X-Gm-Gg: AYBFou1GxD5T7ZzYzKdIVkdfVqotvgkEG8SzpCWknBVnLH4SjKPdjkjL9N7s1h6Y841
-	eKHOXNB/hmPuAvIW7YNz//5ve241uYobrHFzS4nnVffIawKGi7kPkqdjhUQmQEKvNec1p1izXOo
-	xn5XJBtfAyRuLMEg9NL9NCxdoRtAeryh2YRox6tR3zsCC46korejLs+s//psED5se4tdSzKBO0l
-	aE5ze7FXCD6AnAUG3R41H/2Hz/NpQh9gwnO7/dugBlyIjrhiRKIyyT8js7ep1VctNToF5VgJY1M
-	spWB9PV4vn7Ky1TyFD/gZh0gjpx5DVOc3CaIJHVhfjC7vWbQHtYF4/kFgdsNnHSJGM0k48hRV2/
-	/kLPAUffprcpXakLi/UlANNZTYSX/KhcJdxohflAornFRdB/I2K3WLCIvUuAU1nkFK9SuFeoY2c
-	4/HAyQvGjfF2xHkt/iK5U4xTHw7en/yMdz06hannDNo37DMp4cILR6jW/mlj5krZLSXv5y2cu5K
-	JMoLhsqwub6e4h+H1rqvwjEfaWvRT3+k3lD1NqA1oK0R5KVTXcaSGOZ0+BD9Xl+6cH3wL8KsYX4
-	IP9nJT+31E+vMCyXeQTQ4he99algpOjAHd78W1ddIhggaCHblxdZES9MtOnCDi26woKe/bjUTKU
-	2tW/L2+Wu8+N2z2Olnmc90MHRa7jZ5GarvzZS3rNnT9ipi5gDwBk=
-X-Received: by 2002:a05:6820:308b:b0:70b:930f:9a9d with SMTP id 006d021491bc7-71b028d29a7mr4357375eaf.31.1795018072097;
-        Wed, 18 Nov 2026 08:07:52 -0800 (PST)
-Received: from [192.168.11.112] ([96.43.243.130])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm2624231fac.6.2026.11.18.08.07.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 08:07:50 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Md Haris Iqbal <haris.iqbal@linux.dev>
-Cc: linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
- Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- linux-doc@vger.kernel.org
-In-Reply-To: <20261111215838.103356-1-haris.iqbal@linux.dev>
-References: <20261111215838.103356-1-haris.iqbal@linux.dev>
-Subject: Re: [v4 0/3] block: delay support for error injection
-Message-Id: <179501806989.17649.3138860274842922761.b4-ty@b4>
-Date: Wed, 18 Nov 2026 09:07:49 -0700
+	d=linux-foundation.org; s=korg; t=1795026157;
+	bh=4pu6z1Ov5wsBhDkCoZ/+vEL5wykOdNzSLuoNYPfbkfU=;
+	h=Date:To:Cc:From:Subject;
+	b=wGjb+nc1YWq3gAciA4hqq/atiwGomfGG8wCFfivt+YG+4J7PAiK/p5SzkDhZrbi9v
+	 BOJjBzHvMXf1643JPSSdT3t55z8jXpis7KnNspNVyqQu5k+w7VKkNnNh/0JkOeShjC
+	 7ionM2lzysSXoTe0HVXZhh+9jxvTUDRXkoQBifU8=
+Date: Wed, 18 Nov 2026 10:22:37 -0800
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>, Daehyeon Ko <4ncienth@gmail.com>,
+ Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Haocheng Yu <l1za0.sec@gmail.com>,
+ Tal Zussman <tz2294@columbia.edu>, stable@vger.kernel.org
+From: Andrew Morton <akpm@linux-foundation.org>
+Message-Id: <bc6dc5eaf825462783cd3a606636e92b.1@linux-foundation.org>
+Subject: [PATCH] iov_iter: validate extracted segment for bvec alignment
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -97,38 +54,82 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
 
+From: Daehyeon Ko <4ncienth@gmail.com>
+Subject: iov_iter: validate extracted segment for bvec alignment
+Date: Thu, 15 Oct 2026 15:19:07 +0900
 
-On Wed, 11 Nov 2026 22:58:35 +0100, Md Haris Iqbal wrote:
-> Error injection can only fail a bio today.  This adds a delay_us option so
-> that a rule can hold a bio back first, to model a slow device.  The delay
-> happens above the driver, so it tests the code waiting above the block
-> layer, not the blk-mq timeout handler.
-> 
-> A delayed bio is marked with a new BIO_ERROR_INJECTED flag so the rules
-> are not applied to it again, even after a split.  Christoph asked on v2
-> to avoid the flag by allowing a delay only together with an error.  I kept
-> delay-only rules, as a slow device that succeeds is the more useful case,
-> so the flag question is still open.
-> 
-> [...]
+iov_iter_extract_bvecs() validates iter_iov_addr() and iter_iov_len()
+before iov_iter_extract_pages() selects the first nonempty segment and
+limits it by iter->count.  The checks can therefore cover a different
+range after a leading empty segment or iov_iter_truncate().
 
-Applied, thanks!
+An unprivileged O_DIRECT preadv() reproduced the empty-segment case: an
+aligned empty segment followed by a misaligned one completed 4096 bytes
+instead of returning -EINVAL.  A truncated iterator has the same mismatch
+when its full segment length is aligned but its remaining count is not.
 
-[1/3] block: Reject unknown status tags in error injection rules
-      commit: d239710cf3e6bd5fec66766957c3752d9cfbd2c5
-[2/3] block: allow error injection rules to delay bios
-      commit: 6bd856cc99963b786cb530141745ef733de76cc3
-[3/3] Documentation: block: document error injection delay feature
-      commit: 5a29cfaf51105039d156dd8a61d2783e8b653667
+The worst effect I have confirmed is an alignment-contract bypass.  An
+unprivileged O_DIRECT preadv() produced bvecs with offset/length pairs
+(1, 4095) and (0, 1).  The bio reached brd_submit_bio(), and the read
+completed 4096 bytes instead of failing with -EINVAL.
 
-Best regards,
--- 
-Jens Axboe
+I have not demonstrated harmful behavior on real DMA hardware.  For a
+normal blk-mq target, blk_mq_submit_bio() calls
+__bio_split_to_limits(), where bio_split_io_at() rejects the misaligned
+bvec before queue_rq().  Virtio-blk and loop both returned -EINVAL in
+my controls.
 
+So a bio-based driver can receive a bvec which violates its advertised
+dma_alignment, but any further effect is driver-specific.  I have not
+reproduced memory corruption or a crash on real hardware.
 
+Bound the normal fast-path length by iter->count.  Keep
+first_iovec_segment() for leading empty segments so validation covers the
+remaining portion of the segment available for extraction.
 
+Link: https://lore.kernel.org/20261015061907.2713943-1-4ncienth@gmail.com
+Fixes: 14b007e17881 ("block: validate user space vectors during extraction")
+Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Closes: https://lore.kernel.org/r/20261012065520.1089147-1-4ncienth@gmail.com
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Hannes Reinecke <hare@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Haocheng Yu <l1za0.sec@gmail.com>
+Cc: Tal Zussman <tz2294@columbia.edu>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: <stable@vger.kernel.org>
+
+ lib/iov_iter.c |    9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+--- a/lib/iov_iter.c~iov_iter-validate-extracted-segment-for-bvec-alignment
++++ a/lib/iov_iter.c
+@@ -1042,7 +1042,7 @@ static ssize_t iter_xarray_get_pages(str
+ 	return maxsize;
+ }
+ 
+-/* must be done on non-empty ITER_UBUF or ITER_IOVEC one */
++/* must be used on a non-empty ITER_UBUF, ITER_IOVEC or ITER_KVEC */
+ static unsigned long first_iovec_segment(const struct iov_iter *i, size_t *size)
+ {
+ 	size_t skip;
+@@ -1959,8 +1959,13 @@ ssize_t iov_iter_extract_bvecs(struct io
+ 		   iter_is_iovec(iter) ||
+ 		   iov_iter_is_kvec(iter))) {
+ 		unsigned long start = (unsigned long)iter_iov_addr(iter);
++		size_t seg_size = min(iter_iov_len(iter), iter->count);
+ 
+-		if ((start | iter_iov_len(iter)) & mem_align_mask)
++		if (unlikely(!seg_size && iter->count)) {
++			seg_size = iter->count;
++			start = first_iovec_segment(iter, &seg_size);
++		}
++		if ((start | seg_size) & mem_align_mask)
+ 			return -EINVAL;
+ 	} else if (iov_iter_alignment(iter) & mem_align_mask) {
+ 		return -EINVAL;
+_
