@@ -1,117 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.146
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794967864;
-	b=epdd779LHdpOpjgYUV3fM5iT4BOrJl+U8Ugr4BQM/gAWWv8anM0tSzfVbojptiwF4rTm
-	 7MqX8v+cQyJdj20JZdetCn7g6zauMmwzh+H+xvmrq3FoAfJVeIru0MqydQDnuvJN/STLW
-	 LzIwIWj971qVzuF1SxTcksFI/gn1uuglerp1c0smfgg0EXZ50dyX4QtV8qrIr80eikA2I
-	 0UChEwOpKP3mMX8FJCwMYjMCBWr8y6U6ia4Lq+DeW3MUUVCo1FG5aRslZHHtDjJl4M9wp
-	 CmWuyMXJFZZ29vXNh2Kvh7Li0/jE9PwzddcBqoXOnGUWMrmODrxuHMxJZC4V7VBeV2A==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794967864;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=ziy1w63v7SeG7UKq8aHtdaHbjEeIY8YSPukZ/uZGJJg=;
-	b=VNKtNPRZzBV9KT+tkKtwXgG7NT+uzF04fIJpLAv5bKyHQPGV5zVsbO0kx+Dt0BU00k1d
-	 7c/2f6Xje6ZWsd+GbBRMqYiZWia8qjDOfd5v5+J4fcnuPv6ULSExZcVHi1ugrSGOwj5oI
-	 j597i4qcxAOZlZHdyo0m5F4whVpJ5bufAWFc29u4XfM8EjVMN8IPFJW/hM2xAGN2qhRrz
-	 BPBoNgA3YfQFK2wsoj4lhetoGZwt/2uAxOu1PoqqSiNFJjNw6m10pLOwD3BVFY10BZQ9f
-	 1/HPv2Feql6X3qKxMzPEHbzc6aFsaSAlv6Sd2Ybhh93mberiv32xOQY2+DirmrBa9PA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=timdoug.com;
-	spf=pass smtp.mailfrom=timdoug.com;
-	dkim=pass header.d=timdoug.com header.i=@timdoug.com header.a=rsa-sha256 header.s=fm3 header.b="c9WDN/jq";
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b="W0K/zCOc";
-	arc=none smtp.remote-ip=103.168.172.146
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794969134;
+	b=357lp8HXa4Bq9yAMCc6ussvvHNkCOef1nbr8qoj6JE/S+hB3sBzM7GA40JJVlwKM5uGu
+	 88097oY4q3C0/TDpns46qZPUbS3rrGaI3/GPZ4mmBdztZbFqfhD4SbaYdRg6RZj3FF/Tf
+	 H9NalibagMA2NfNA1lWqD/SbK3/oCw9UaBXX/1WEpwNDE3gI8b05Ejpw+Ffup0ec7tOSl
+	 Tpq/CH9DAH2uJ1sEegMwIqhGXPyk9ywgI/sHE31JaVkwQdzT9Rh2w1+XNWHL9OUfBSaCi
+	 EJGvos/kcZOLE0Y72qLZk4nt0PUQ504oLCiKX6z87Vbc00MzCo8XpNTsXmESRb5ydHQ==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794969134;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=g8HIvnqqvGqRI0REomTZZBB1KyLjsxfTvtaiObTtY0o=;
+	b=cPmNV4kwJfq+YynInDa+JYOWe/8eSxaeSfJT9Zq81QiUhvSe5kF+IlJFlPgyhGc+ujdv
+	 TCUaZjAqNW0E3Lv4m/2/K3MrP3LcZ62gOAOJUU4R+IpZrsIDIn+jmofuNqjWrfEJ0Lgw+
+	 O3T4ZzsneJwYO1NC3bRCnAb8ov+BAB4cYYXOFUxj3kC8c55/ND0pNxBs+ai1ddJ+PxwTU
+	 Rtpmaqb5GhPumi/XolCCS9kl7suiQX9DKeOhJDD7wc9zStGYR+WzP+4TywiDGUmeRGFGx
+	 ybQL1YJqp3xwK/DbW3Fozf43VQusli+nKEEmVTqeCl5ZOK83OzV/IsIKG/07fJZy0nA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AYWNqaoT;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0303A606A325;
+	Wed, 18 Nov 2026 02:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AYWNqaoT
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1794969133;
+	b=PgdDmhcu7yv0d+zWQgAKG+SY/0byijFs7m0C2UBu5YNmkxqtsqxqb5ydSI/72lK/9GdD
+	 cHLZ/jFQboO5irkJZemnH/Bh3+r8dkzkNx3DDNmMCLi1oq4cdN2hZE4nTjOF5UzmkQ3pe
+	 v2jakp6s7rtBzD2w2wKtXYSnbQIDtUsbkpNAPMUsF9Z1zSOvkhH0NFQ05NcNip2Xh3wW2
+	 geZu46sCNQw327EV+FIAHxzLGJvGGHm9gDubKxt1Er0qYa9dJjbmoyo0axCQ9gIk+4F2u
+	 rXDEd9UXBNKGVHcsxGNyjsHKuiJQswSK1Fm+ubTFPnPUYnp2wQGd9cnKirEjLQSDEsg==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1794969133;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=g8HIvnqqvGqRI0REomTZZBB1KyLjsxfTvtaiObTtY0o=;
+	b=l20cCV6WN6lGPVayBZGI+vc78bVPibwzzdgnK2ArGQI6A1u+wjGeuSqtSaYHoUQknUmy
+	 Ozn1b2pObMrTpNWe1ND6YLUr9p4/FMSxqLs8OxDn7UV0ciarESazq0V/K7KokqvZcQ76U
+	 7kSC8jLhUJ7KMxVYSfdAPJxpuXFaIVL4Xi7KQCat0xrW/C/v/i01FzMcT6oxqt8aGp0Cx
+	 8Sp50+uXScsBaxO2cozRNDw/NujM7DJ+9Tppbb5H14X0xy6urdzRtb9xD75NZ8BO1I4QN
+	 9aa75UXX+ZQTwJaZPXIWzu5isLZPj3iVDmGzmhW419iswuYT1rUIHEcpABVAGL19sYg==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF82606A31C
-	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 02:11:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2FF82606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=timdoug.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=timdoug.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=timdoug.com header.i=@timdoug.com header.a=rsa-sha256 header.s=fm3 header.b=c9WDN/jq;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=W0K/zCOc
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 5268CEC08B4
-	for <linux-block@vger.kernel.org>; Tue, 17 Nov 2026 21:11:02 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Tue, 17 Nov 2026 21:11:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=timdoug.com; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1794967862; x=1795054262; bh=ziy1w63v7SeG7UKq8aHtd
-	aHbjEeIY8YSPukZ/uZGJJg=; b=c9WDN/jqtzX/5BeXhh2eri0C1uWgwWWN1gpJZ
-	BbS40cU1opj+XxWlJNAjSBNr7G5tGlRtVLK9NURgyho4Ymo+AnCdF1vKBgrVS0d4
-	klu56k5m2YBVipeaGjLMFpP4tF7obuThOE99PXz9FRVKhs9Ww1XybJ/fcy1EO1UI
-	3OmMZ0Q/LChEcvBGpc9wcKAYGAkkAliprIoAfss1BodQZcU90H9cSdOb8rbPmL/e
-	fJFJILG2PqmubLRkxU1998PZQrdRgTjq+wOJrQ9qUdne25m8Ey5z81j7P0DxPy3Z
-	xurvra8iFtWU8AdaBe97s2UNLLTBZwEnjCQkgQ7a4pno/XG4g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1794967862; x=1795054262; bh=ziy1w63v7SeG7UKq8aHtdaHbjEeIY8YSPuk
-	Z/uZGJJg=; b=W0K/zCOckg0S5q82zT1oLR/YWN+pXLUn0pEyeDSawP8k0pSUjCF
-	LGhI54ZJ5UR1DUW89UpGN5BUCfuFTxnA74oKG6fmh+owA4AyW7ckNoFJM5KMmTh1
-	pCjuLWfZSXY2YaApfxC2jONlWzTn2aAyLARqPIITiS5MH0dVxTzYxpgkjXsMLy+w
-	40r9J53Ptx0ouxssI1zKsysT3nLnq9hkcXYvMigsLeGWp7TSdHRYJlN3Ct+RYOIf
-	989BkPR9TWm2hT5SrHuGMW+HUBqWkA4jblRVKB0tMErsWIqNTub/PYJAkt5HtV7W
-	mqkrCbvLLfW6EvCDr7qchZzJ/8dj1r9EfmA==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=timdoug.com a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1794967862; d=timdoug.com;
-	mf=PG1lQHRpbWRvdWcuY29tPg==;
-	rt=PGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZz4=;
-	s=fm3:rsa-sha256:CXxdQrviuEnwwlJoqPTR8p+Mzk1hXUO08r58oxyxUunpYBQ
-	eZLtQBzNLv5wfXomZRrgR+Wk6vZtYztxlLS6zqdSRdGOt4XXWApT2R2YyCwL9Q5f
-	yC2Ks2AxiRFhd+v1fJMSp4RoXw18cXlVEjuOmg9Z6HQkXTNF71I600FIE/njbxAu
-	8nnEpZgANJlNRvNeFaJqhjCsU2U/yUtx4bjJmgidxmP9RVck4ulEepT7TsZXWSU2
-	fPkfVvbyhME0aY/fVMoy4KCa0pG6RuyezV8H0yuYSPvymL5FQSOfgmQGMFvzLQKZ
-	oLtF/Lf9VXC12LyiXHeZAZabIk5PTU21I0sqffg==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:7EdqGiKLdCF3MKtOwJCAEcebBcuCV1VzQl1rJ3W+QMo=:yzYxXzsAIOIPV1qNp7Ts9sHjwkwvUnZdtCS+R34Xlbc=;
-X-ME-Sender: <xms:Ngn9ak2U8OqXsu94CjfLh4rMGCqPzY_Lcij7mYBg-gynJC_MJktOsw>
-    <xme:Ngn9am3WcpN0l07Ww61jGkYx7-_ZcZ8avQ5zv7oEwfDJt3ztcHGlfoOSlCvrCpjOv
-    usQVMbyBieGe3KWUiplDDFGzMg_88NpN9sPqolDcN0uyLDBSZvJYg>
-X-ME-Received: <xmr:Ngn9av-1aJHYF4VSrgH2IxjxQKxQDK3bkhuURkUtFuNJS9rZbrT4KL05Q9dD>
-X-ME-Proxy-Cause: dmFkZTGjbgA28vwLdPbFOdf7H0ccPQuCqgA3cR2SqcqANF9B5xKZCzb8tjc/E2emOU9724
-    f3qU9uNU0kYTjGlti8J2WNpfJk/vgeBG7+oGn7d04KFyg8vGlwRd4ay4YSYFBYQcmG9n83
-    4y3x6ULYlOf+S4IU9tE2w73GTfX9sjG0jM1EoUadHvIFGZaVJts51KChwbn/H3E94N6ER8
-    sUeHoYxEjJNg2yxAZt+qV/kwBA+j8HgxxOOF0B8fwx/waG4NYuGEtc1aCL49v8z/MUiEsK
-    HhBjkzZO1xrHLWxX5uPIqCZDxT4kyR7r/mHlup2KFnHBebb6NEEkGrD1PEhDu8PVroRcpw
-    Suyoklh2M9FhyBAavuJaOod0LkC9QD6x0OzigrIUoa/llLdme4mj6qbiPDEvZUoB6zDXky
-    ZIyr0GDuj0KuiVX5/wztrQLpjYdv1iXZCy2JnSDE02bE7k6OBVZ6Z55kuyuUkIxHfbP3U4
-    pRlaEK6z7rbOsQH9UinyuQ8IAt03JRp4cWjahgokX42UECJBTcaeH1d93EGVunvzREkJfR
-    KC1ikhlVBA/Udzjgc4Dtt/hzboK4nNORDZAUUWmKSm3l3K+XNBjg5tg6yKYUzmOsK1JW1m
-    AsMg/6+08qxq8NAiDsBzcT0/tbmRbQBAKFxFag+fSiou/+jp78nXf+us4bgA
-X-ME-Proxy: <xmx:Ngn9ar0YvvAgGZjvmMS5QS-QmG6MsUTnVOQNuRGAs2rp89NIt2N9_g>
-    <xmx:Ngn9ak9gOW015vTFIwMtrKIKqhh_tzJgEPPBFX_VF6vcBUagZGDIpw>
-    <xmx:Ngn9aju897v2Uqj52oaLdUXr8BGsT7WJrL_prvuTy6A5rgvdTjLxRA>
-    <xmx:Ngn9avA05rmOppATMIrcs8mgi0KT1oy-M9_2MddQxG7ZgigOo437Zg>
-    <xmx:Ngn9amTDLlEDqI3balmrBSMbDKYPPjPapoL7oVfAJOTMlEIzyDBJ6EEg>
-Feedback-ID: i12bc4175:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 17 Nov 2026 21:11:01 -0500 (EST)
-From: Tim Douglas <me@timdoug.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: partitions: mac: record Apple partition names
-Date: Tue, 17 Nov 2026 21:10:59 -0500
-Message-ID: <20261118021059.84192-1-me@timdoug.com>
-X-Mailer: git-send-email 2.54.0
+	by smtp.kernel.org (Postfix) with ESMTPS id 370381F000C5;
+	Wed, 18 Nov 2026 02:32:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794969133;
+	bh=g8HIvnqqvGqRI0REomTZZBB1KyLjsxfTvtaiObTtY0o=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=AYWNqaoTUpFohkx9Vy8klujvR3usQqbmB7e0XT0tmcomnoCfDcA6e01O1RJbIOI2H
+	 Z+uQN28OcJW6IRqN3rGl4t0OjyZyVuqFFfCeRqo0/2890yKrgpp/tVXIcD5RrTqcOT
+	 c/tBEmJIIzlNzzAo8jLTpKd6vAUT1aI/JDPPWv1MI9mBUohV9oku2t3M5Q3IuwvmJW
+	 hAc0ARQfwVyjB3wkbME3SUPDeKQxmTKHm/xm3DIKS6Ts7IRJ5h4y4rqz4PY1Ko59qt
+	 5Sp7Y4Mvj4ZbKl7sSc/Pj1UabPRDeWxIfG1liRLQiYnSqnSgwhOhYq7ozPvie7RYHf
+	 PDk227aefbDvA==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 8AEA54ABA8;
+	Wed, 18 Nov 2026 02:32:12 +0000 (UTC)
+From: Zi-Hao Huang via B4 Relay <devnull+zi-hao.huang.mediatek.com@kernel.org>
+Date: Wed, 18 Nov 2026 10:31:42 +0800
+Subject: [PATCH v2] block: fix PF_BLOCK_TS/current->plug ordering in
+ blk_finish_plug()
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -121,47 +83,104 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261118-blk-plug-fix-v2-1-4acbeec5d512@mediatek.com>
+X-B4-Tracking: v=1; b=H4sIAA0O/WoC/3WMyw6CMBAAf4Xs2TXdNSLx5H8YDi0ssOGZFomG9
+ N+t3D3OJDM7BPEqAe7ZDl42DTpPCfiUQdXZqRXUOjGw4ZyIGN3Q4zK8Wmz0jY3JC2eYL64wkJL
+ FS9LH7lkm7jSss/8c941+9s9oIyS8NZZtznR1Rf0YpVa7Sn+u5hHKGOMXW3GED6sAAAA=
+X-Change-ID: 20261112-blk-plug-fix-f068b0223b80
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Chao Yu <chao@kernel.org>, stable@vger.kernel.org, 
+ Zi-Hao Huang <zi-hao.huang@mediatek.com>, 
+ Sandeep Dhavale <dhavale@google.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794969131; l=2708;
+ i=zi-hao.huang@mediatek.com; s=20261112; h=from:subject:message-id;
+ bh=yzVnLTZw+V0byMgdM9XGWdyVxiHY2j5nto3cl5zYTUw=;
+ b=YreCA/+/lxEewEeUdbmQqFTXZK9vYT/ZIJn38ItYb2h92mIT9j114TDFWBTozc6GL+lHZXlrX
+ 496eudRghoJCRE0IrwkTnO0nnGdLBh5hc83YVTYF2yVzBYdKYnAh0Mm
+X-Developer-Key: i=zi-hao.huang@mediatek.com; a=ed25519;
+ pk=tbMIVegYSSBtz5MaQSUCX9RJO88MA/AI5cbmQKbaoIc=
+X-Endpoint-Received: by B4 Relay for zi-hao.huang@mediatek.com/20261112
+ with auth_id=1493
+X-Original-From: Zi-Hao Huang <zi-hao.huang@mediatek.com>
+Reply-To: zi-hao.huang@mediatek.com
+Content-Transfer-Encoding: 7bit
 
-Early root=PARTLABEL= lookup fails on Apple Partition Map disks
-because the on-disk names are absent from the kernel's partition
-metadata. Copy the name from each entry and append a NUL terminator
-so that names that fill the 32-byte field can be used.
+From: Zi-Hao Huang <zi-hao.huang@mediatek.com>
 
-Tested on an arm64 QEMU guest with Linux v7.4-rc3 and no initramfs.
-Before the patch, boot failed with PARTLABEL and succeeded with
-the device path for the same partition. With the patch, boot succeeded
-with both a short name and a 32-byte name. Boot with
-root=PARTLABEL=6200-Linux was also verified on a Performa 6200CD
-using a kernel with local platform support.
+blk_plug_invalidate_ts() runs on context switch and assumes that
+PF_BLOCK_TS set implies current->plug != NULL. blk_finish_plug() breaks
+this: it clears PF_BLOCK_TS in __blk_flush_plug() and then sets
+current->plug = NULL, with plain accesses.
 
-AI assistance was used to investigate early root lookup and draft
-the change.
+clang inlines __blk_flush_plug() and emits the store to current->plug
+before the store that clears the flag (arm64, Android common kernel):
 
-Signed-off-by: Tim Douglas <me@timdoug.com>
+  ldr  w8, [x20, #0x44]     // w8 = current->flags
+  str  xzr, [x20, #0xaa8]   // current->plug = NULL
+  and  w8, w8, #0xdfffffff  // w8 &= ~PF_BLOCK_TS  <- preempted here
+  str  w8, [x20, #0x44]     // current->flags = w8
+
+If an interrupt hits there and preempts the task, the task is later
+scheduled back in with PF_BLOCK_TS set and no plug, and
+blk_plug_invalidate_ts() writes to NULL + 0x20 (plug->cur_ktime):
+
+  Unable to handle kernel NULL pointer dereference at 0000000000000020
+  pc : __schedule+0x108c
+   preempt_schedule_irq+0x48/0xa8
+   el1_interrupt+0x48/0x8c
+   blk_finish_plug+0x6c/0x18c
+   ext4_do_writepages+0xd3c/0xef8
+
+The window is only a few instructions wide, so this is rare. It was hit
+at cycle 127 of a warm reboot stress test.
+
+Add a compiler barrier so the flag is cleared before the plug is
+dropped. A compiler barrier is enough because the race is with
+preemption of the same task on the same CPU. With the barrier, the same
+build stores current->flags before current->plug.
+
+Fixes: fad156c2af22 ("block: invalidate cached plug timestamp after task switch")
+Cc: stable@vger.kernel.org
+Signed-off-by: Zi-Hao Huang <zi-hao.huang@mediatek.com>
+Reviewed-by: Sandeep Dhavale <dhavale@google.com>
 ---
- block/partitions/mac.c | 6 ++++++
+Changes in v2:
+- Point the Fixes tag at fad156c2af22, which dropped the NULL check and
+  made the preemption race possible, and drop the stable version
+  (Sandeep)
+- Collect Reviewed-by
+- Link to v1: https://lore.kernel.org/r/20261112-blk-plug-fix-v1-1-7fa2a6215b8d@mediatek.com
+---
+ block/blk-core.c | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/block/partitions/mac.c b/block/partitions/mac.c
-index f372392af..da170a65d 100644
---- a/block/partitions/mac.c
-+++ b/block/partitions/mac.c
-@@ -100,6 +100,12 @@ int mac_partition(struct parsed_partitions *state)
- 			(sector_t)be32_to_cpu(part->start_block) * (secsize/512),
- 			(sector_t)be32_to_cpu(part->block_count) * (secsize/512));
- 
-+		/* Expose the APM name for early root=PARTLABEL lookup. */
-+		memcpy(state->parts[slot].info.volname, part->name,
-+		       sizeof(part->name));
-+		state->parts[slot].info.volname[sizeof(part->name)] = '\0';
-+		state->parts[slot].has_info = true;
-+
- 		if (!strncasecmp(part->type, "Linux_RAID", 10))
- 			state->parts[slot].flags = ADDPART_FLAG_RAID;
- #ifdef CONFIG_PPC_PMAC
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 8836c7028568..ad2a8e4fe7a8 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1299,6 +1299,12 @@ void blk_finish_plug(struct blk_plug *plug)
+ {
+ 	if (plug == current->plug) {
+ 		__blk_flush_plug(plug, false);
++		/*
++		 * blk_plug_invalidate_ts() runs on context switch and expects a
++		 * plug whenever PF_BLOCK_TS is set, so clear the flag (done in
++		 * __blk_flush_plug()) before dropping the plug.
++		 */
++		barrier();
+ 		current->plug = NULL;
+ 	}
+ }
 
-base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+---
+base-commit: 067c5c24cef23d913b67eaaf71ae67e7169a6620
+change-id: 20261112-blk-plug-fix-f068b0223b80
+
+Best regards,
 -- 
-2.39.5
+Zi-Hao Huang <zi-hao.huang@mediatek.com>
+
 
