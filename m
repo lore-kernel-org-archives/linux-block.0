@@ -1,75 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.203
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.225
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795007477;
-	b=iaKwHHMgB5Y3Vj0dI+HkyaGbiGLiiJoSOz8tbKO+7g/SlzSwVWqCVuwswtAM2ZSol1NQ
-	 SKyMXwJHqEkcXWjlRpWzdc27mgAZD9rbB8repKnBOd3iWehqgMsG3oZ+vy0cI6D7I/mNz
-	 TKMCs5sLTTxMjQYacC8UdORP8myA1uubYH0zu6BCkipeQp2L1TvzFThBdAjM9363t+Zpy
-	 N77YFUu+MGP6T0224yPusgiTCk/gVQn8+Ydw2NI2FxKaRe7o9afyUJO414hJKnz5FUSQn
-	 t7wYaC+JM2uWuzsHzJX+Wifltubu6x8lMmQ7E/4Z//4/y5oGdVF4ZTgY5FuVuM5tojg==
+	t=1795007865;
+	b=kYgG6Mj3JC7HGojGwX5SJYCKtCjxRCFeaO0xcT9F57f+HyVgSsY4eU/F04UxiZnEMII+
+	 45FEv+C83MJC0tmm6UhLh+lZq+XBpB3ui9MTWvoa6aD1Z4tJBT0MrTrvWxns6nj8wRtMf
+	 zrj6IQqeUNs6LCqhDv/oEPgfma5+Ym8UBIacpgwuV/e5JC1zWI45nG0MNXMwF+9t/XwVp
+	 qHZ5/lV6uW/6oXbkPp24ooFRaZEX2dsbSzAGu+W+KX/vYhGuTpicbb/nMuDbsIdahOe1+
+	 8eEDBDM7Pbkyx4TKo+kb09g5X0Ft5udz9Cofwx5Orv/svFoo/9T/Q8RmWEaUgiHeDMQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795007477;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795007865;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=QJAC08ngDRm9W4yawdTHyboRVQ9MGN7haYElLNq+7pU=;
-	b=JXbID7Tlgs8cHSwUDj4Qy7e+cZR5lNyFfiY2hKgWgQ1yf0QxR4KXq3HgY64wqBSFuTeq
-	 jEDaZxxnFtKddV1AIVbMc2FU3Zd4OsxdzG5gZpUE6ujKKoZplqb8zuZ+BEDZAe7QuuDTB
-	 Oa2IJxBISPePbSNwDkebHYQA3/h44lMj+DhCOuOpwalZqsyY5FwP8NVsqQaETI5v8uQ3y
-	 KQwV3GpeElVSMpIuL4ZZn3J2FiymY6YxxSptHXI+4mTEUbsRuZDBtRZ98lK4vudk0gh/F
-	 jk6MEzQktsopypBKlYKEjD44b6NudTsDq40e28FNJs55HZ6quk9shBsz5Tow0yjjsoQ==
+	bh=ou7VqJIvrJwbDof8WuTCn2yqRr3nuLImwl+n8z/KCYU=;
+	b=GzoAgLDIMl/MUy80m3xsNcJ7IE0iP4mTVmeCYKTsmznX7wbIy9TOcm6VVYU3zMcOvg0H
+	 JKmAYjnygjWDp5uU0wgbfYYeFQspujqt1bf1CcTLUER9SAQ2/T5viRX0lDmuvd98mNgXJ
+	 3yx4bXuDUP11kApV7iyRBLDv8Qn5Ne0iU9/qDtnvzhNIOsaFS6uvpuba609Vw+K0VNl0h
+	 9QSIZzzFEPumbDV1nBs0ERhl2cBuYGUguWSiU/mDyShgmIm6zWZ+72r0p8e+gD289tJES
+	 6alp7pHswIw4aCsoHGu4YpgAgLyLg3VbGTr/GFiPeHkS7kAgiQLK/AoOS8/JP3RwDaw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=WyZI6CJM;
-	arc=none smtp.remote-ip=95.215.58.203
-Received: from mta1.migadu.com (out-203.mta1.migadu.com [95.215.58.203])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=wRuLXZI5;
+	arc=none smtp.remote-ip=91.218.175.225
+Received: from mta0.migadu.com (out-225.mta0.migadu.com [91.218.175.225])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD5C606A32F
-	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 13:11:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8DD5C606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78183606A331
+	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 13:17:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 78183606A331
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=WyZI6CJM
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=wRuLXZI5
 X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=RMpd59Gb6dpKtX3get0waM32XpfRzKJRh6E8RWM6GBM=;
+DKIM-Signature: a=rsa-sha256; bh=/ZzSIR3rPfPXJJtOS8PvCdyzoY8bbs32yVXQ2eK08Ew=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795007474; v=1; x=1795612274;
- b=WyZI6CJMpR2JzG0xH9pWLqLOd9sD5rcrzUY3EyZSpuedZRCwAcV0ju6Cbq+bBG9I9tozVrKv
- ahN5j7O3ka+rk9/fDYa4C6TlWsyJB6WkDsha63OcVJ15xKmJ/aRTuw4ToWB/MHj+VSP+9ozXuuk
- 9MbkuYctNf0NJ6cx4I3QHOjA=
+ t=1795007862; v=1; x=1795612662;
+ b=wRuLXZI55fFf4X88ZVUxePGmdNFnkBpJPhJ5pfnszsresV0CwftRxx0PxzRELfa+UBAfZcMO
+ FQOInKGpTqEv5BS5eDRQ8sUT32bNtNTkQwggRCG8l0wsmd759p4mOgBuhycUrmPvr+EK5cJvEop
+ luJovKH0Z0iVLm04/TBuf5y8=
 X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 8bd3cc9683cdaa16;
-	Wed, 18 Nov 2026 13:11:14 +0000
-X-Mizu-Trace-ID: 8bd3cc9683cdaa16
+Received: by smtp.migadu.com with ESMTPS id 663fd380a80634db;
+	Wed, 18 Nov 2026 13:17:42 +0000
+X-Mizu-Trace-ID: 663fd380a80634db
 X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: tj@kernel.org,
-	josef@toxicopanda.com,
-	axboe@kernel.dk,
-	ast@kernel.org,
-	alexei.starovoitov@gmail.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	andrii@kernel.org,
-	eddyz87@gmail.com,
-	daniel@iogearbox.net,
-	linux-kselftest@vger.kernel.org,
-	cui.tao@linux.dev,
-	cuitao@kylinos.cn,
-	ameryhung@gmail.com
-Subject: [RFC PATCH v14 4/4] docs: cgroup-v2: document the iocost BPF cost model attachment
-Date: Wed, 18 Nov 2026 21:10:29 +0800
-Message-ID: <20261118131029.797007-5-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261118131029.797007-1-cui.tao@linux.dev>
-References: <20261118131029.797007-1-cui.tao@linux.dev>
+Message-ID: <0da8e4bf-ad3d-4a69-a1af-b2be9c63160c@linux.dev>
+Date: Wed, 18 Nov 2026 21:17:36 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -79,104 +58,67 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, daniel@iogearbox.net, linux-kselftest@vger.kernel.org,
+ cuitao@kylinos.cn, ameryhung@gmail.com
+Subject: Re: [RFC PATCH v14 0/4] blk-iocost: BPF struct_ops cost model
+To: tj@kernel.org, josef@toxicopanda.com, axboe@kernel.dk, ast@kernel.org,
+ alexei.starovoitov@gmail.com
+References: <20261118131029.797007-1-cui.tao@linux.dev>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20261118131029.797007-1-cui.tao@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Tao Cui <cuitao@kylinos.cn>
+Hello, Alexei,
 
-Document the BPF cost model attachment in the io.cost.model section
-of the cgroup v2 documentation: attaching an iocost_model_ops
-struct_ops to a device by its major:minor, the model=bpf readback
-while attached (ctrl keeps describing the coefficients), the builtin
-model coming back on detach, and ctrl writes never selecting a model.
+在 2026/11/18 21:10, Tao Cui 写道:
+> This series lets a BPF program take over the cost model of one
+> device. The BPF model provides calc_cost() for charged IOs plus two
+> transfer coefficients for the completion-time sizing, io.cost.model
+> selects between the attached model and the builtin one, and enabling
+> and disabling the controller stays with io.cost.qos.
+> 
+> The builtin model is a linear formula derived from a handful of device
+> parameters, and the right formula is device specific. A BPF model can
+> be adapted to the device and updated without rebuilding the kernel.
+> 
+> The series is based on next-20261117.
 
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
----
- Documentation/admin-guide/cgroup-v2.rst | 55 +++++++++++++++++++++----
- 1 file changed, 47 insertions(+), 8 deletions(-)
+p1 changed quite a bit since the version you acked, mostly from
+tj's review and Sashiko's testing reports, so here's a quick
+summary.
 
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 9e3c67b02ae2..a3c402f03ae9 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -2056,8 +2056,9 @@ IO Interface Files
- 	currently implements "io.weight" proportional control.  Lines
- 	are keyed by $MAJ:$MIN device numbers and not ordered.  The
- 	line for a given device is populated on the first write for
--	the device on "io.cost.qos" or "io.cost.model".  The following
--	nested keys are defined.
-+	the device on "io.cost.qos" or "io.cost.model", or when a BPF
-+	cost model is attached to it.  The following nested keys are
-+	defined.
- 
- 	  ======	=====================================
- 	  enable	Weight-based control enable
-@@ -2111,13 +2112,50 @@ IO Interface Files
- 	implements "io.weight" proportional control.  Lines are keyed
- 	by $MAJ:$MIN device numbers and not ordered.  The line for a
- 	given device is populated on the first write for the device on
--	"io.cost.qos" or "io.cost.model".  The following nested keys
--	are defined.
-+	"io.cost.qos" or "io.cost.model", or when a BPF cost model is
-+	attached to it.  The following nested keys are defined.
- 
--	  =====		================================
-+	  =====		==========================================
- 	  ctrl		"auto" or "user"
--	  model		The cost model in use - "linear"
--	  =====		================================
-+	  model		The cost model in use - "linear" or "bpf"
-+	  =====		==========================================
-+
-+	When BPF cost model support is available, a BPF cost model
-+	can be bound to a device by attaching an
-+	"iocost_model_ops" struct_ops carrying the whole disk's
-+	major:minor as encoded by makedev(3) in its "dev" member (a
-+	partition's major:minor is rejected).  The loader supplies
-+	"dev" when the map is created and it cannot be changed
-+	afterward.  Attaching creates the controller if needed, like an
-+	io.cost.model write does, switches the device's pricing to the
-+	model and populates the device's line in this file and in
-+	"io.cost.qos" if it did not exist yet.  Attaching fails with
-+	-EBUSY if the device already has a model attached, with
-+	-EINVAL if the model fails its attach-time validation, with
-+	-EOPNOTSUPP if dev names a partition or a device without a
-+	multiqueue queue, and with -ENODEV if dev does not name an
-+	existing device or if the device has gone away.  Updating the
-+	link to a different model is not supported and fails with
-+	-EINVAL or -EOPNOTSUPP; switching models requires detaching
-+	first.  The
-+	attached model prices IOs only while the controller is enabled
-+	through "io.cost.qos"; attaching does not enable it.  IOs issued
-+	directly by the root cgroup bypass the model's per-IO pricing;
-+	the completion-time sizing of their requests still uses the
-+	attached model's transfer coefficients.
-+
-+	While a model is attached, "model" selects between it and the
-+	builtin model: "model=bpf" switches to the attached model and
-+	"model=linear" switches back to the builtin model, and neither
-+	detaches the struct_ops.
-+
-+	Detaching removes the model, after which "model=bpf"
-+	fails and the device prices with the builtin model again.
-+	Device removal ejects the attached model as well, while the
-+	struct_ops link remains until userspace destroys it.  "ctrl"
-+	accepts only "auto" and "user" and never selects a model.  It
-+	keeps describing the builtin coefficients, which take effect
-+	again when switched back.
- 
- 	When "ctrl" is "auto", the kernel may change all parameters
- 	dynamically.  When "ctrl" is set to "user" or any other
-@@ -2125,7 +2163,8 @@ IO Interface Files
- 	automatic changes are disabled.
- 
- 	When "model" is "linear", the following model parameters are
--	defined.
-+	defined.  They remain readable and writable while "model" is
-+	"bpf".
- 
- 	  =============	========================================
- 	  [r|w]bps	The maximum sequential IO throughput
--- 
-2.53.0
+The flag enum and the model accessors are renamed. The merge flag
+is now enum iocost_calc_flags with IOCOST_CALC_MERGE, calc_cost()
+takes a calc_flags parameter, and ioc_model()/model become
+ioc_bpf_model()/bpf_model so the builtin model is no longer
+represented as a NULL model. The named enum also makes the flags
+discoverable through BTF.
 
+calc_cost() now has the same pricing scope as the builtin model:
+bios with no data and no flush state and ops other than reads,
+writes and zone appends cost nothing, flushes are passed through
+so the model can price them from the bio flags, and
+completion-time sizing now follows the model's transfer
+coefficients.
+
+On attach iocost holds its own reference on the struct_ops map,
+so a model cannot go away while it is pricing. A dead owning map
+reports -ENODEV instead of -EBUSY now, and the autop stepping
+timestamps are cleared at attach so a stale pre-attach profile
+cannot fire a step at the model=linear switchback.
+
+The attached and attached_link updates also moved out of
+ioc->lock: rq_qos_mutex already orders all their accessors, and
+ioc->lock is only needed for publishing bpf_model to the timer
+and show paths.
+
+I'm still carrying your Acked-by. Since p1 changed quite a bit,
+I'm happy to drop it until you've had a chance to take another
+look if you'd prefer.
+
+Thanks,
+Tao
