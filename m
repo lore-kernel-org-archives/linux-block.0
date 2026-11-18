@@ -1,58 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.224
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794993434;
-	b=SZjtEk4+03rUjxb6jpY8KjvCwW8Iu9cWIZJGAu0BCSaRC33vxYDYr385MdAePDR3Zerv
-	 Y1b5/3TBUCenZ9ipuVeHPvFdMSyiHXu54geZHeojvBy305gS2w/NQWV2HVOldhBko47S9
-	 p+T09XKMxkpGq0ghzD7NxwMKDtjYRh8HNs5Ng8SCYFiqVwRq/uyShKvZDhdnzKCmOSV1z
-	 4LEiWkgnP6h1o7XO19bvcGiG8Tj0/SV7kms6nk5801SGtxCefPloGDCDnocHqmzzrL92m
-	 GzpKa7aA2hCXsm5dMSAn8yucmFz19jEtHcY7vZUyouEoZdRbPIy7KJfr5G/LEkvMR7A==
+	t=1794994005;
+	b=5VXto5w/WE2CWtkW/fFLjVEJ3PkkeEk7dT6tqVZDMQN69GDng4BruFjxsP9QG9HwTHTp
+	 5dIpiUDZTYQlY/WTZoBurIopGM97P1BdE/yLys2rfPRv4L8PT9yGlOrGJifr269KBmaCB
+	 led+eA9P/eTmMRe+BSK6wSsh5BglkSUNYeGfUS935iE4BPiMz+DOOQCj2zcsyj7BkLGx8
+	 hW6oMzedFXdfXqGi2zN5ht3IZDFO40GeJz91QZRO+XSrhNKfRU0bvSgJz5OMjrNbqAzoN
+	 PIBj2Wz+v3Ebxw3ec1IkV4KYUIWjQuCZy6ezuHjgAWkkNnHMtiYNaERXmoeg+lFasbg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794993434;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:CC:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
-	bh=xsIsDZiCZyB7+lKhnSB47LX6hbKq7VMg+O30s3v8xU0=;
-	b=5gGwX4qeeuNA0xE4XiLnTNe6+OuoMxrBar7wo0rKhrIQrXUKaBJopV7ClykQyawWgYIN
-	 QTpUaGXNPCc3yb7/JoDRa1MsRVwohSgje4p8jcGXiTjR4zcK7NKTa57UzhYs2PXVaBMFC
-	 ICDAAG50uvl95Mr1Mu/pcFX/Dg+Nop555aSZx7VK0TbOnx9uJpJrgRTUI5cQqt3k1xt+M
-	 jgE+p96MvtX8QNUXtaR3INblbJEAyrWl8sfJDkI7ZzIBzp/cAZG/1ciAuLzD5XR9it8nw
-	 wXMiFbKPZ0jWoBX+xYXyGGj1CosrE1v2c58A/yJEmldtupyd90BNDO+hmqBsXPBBPyw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794994005;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Spam-Flag:X-Spam-Level:X-Spamd-Result:
+	 X-Spam-Score;
+	bh=oeyfLCxsP9w5ROWq/+IA3erdwWt3rQ3/CJxahg2mGAI=;
+	b=ZysY7ZNY/x+6VoQQ4x9/PiNYz+rK77DoBdkg8X09/3Jp7qGzmeIZV7Yb9/6MLY3aeij/
+	 Q3b8LWO2giBxHirWJySWLKxANdg1MoLZNm1q9dr82Sa+HSjfmuxBNOVbd+BrJNP4U+rFE
+	 3ucPlGHsMUzXj2DsqRJthxI5AY8czci7gBRtmt3VtRT/ukW3vBJdgsSjv8moP4QmJiaD2
+	 mV7oSqy5Y7HE67BW1liUP+Nr1VRo39bmghfF83FLr5iJfEQ+wJ0B0jSExpNhzUHxo+C7Q
+	 qEW6y+MrbOMr8cgkmniHsMH7VG/JvtBAjNbHl90G0puHnyJhXXhxFhMjuPyIQLlp9NQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=PV3E+oEf;
-	arc=none smtp.remote-ip=113.46.200.224
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=GFhnPvoP;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=d0w5dp0P;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=GFhnPvoP;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=d0w5dp0P;
+	arc=none smtp.remote-ip=195.135.223.130
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0925606A31C;
-	Wed, 18 Nov 2026 09:17:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B0925606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B4A606A31C
+	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 09:26:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 25B4A606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=PV3E+oEf
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=xsIsDZiCZyB7+lKhnSB47LX6hbKq7VMg+O30s3v8xU0=;
-	b=PV3E+oEfe6GWTlN7IzcOZNtMuGokpGaMaE5HT+w5Vk98jOWnb53YzhdAAkTed93AvGp6D+ngZ
-	ftGk2P047j6/rbz8Ke0Kewk86yZLKYBKuM/FH/uksdfAvh6qdTvxfoyU41EsmNujsw5oLc+20hb
-	oGEWnwe8RZuneZEt42a2+8c=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4jTww23GW7z1cySm;
-	Wed, 18 Nov 2026 17:16:50 +0800 (CST)
-Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
-	by mail.maildlp.com (Postfix) with ESMTPS id 41D7540586;
-	Wed, 18 Nov 2026 17:17:10 +0800 (CST)
-Received: from [10.67.110.140] (10.67.110.140) by
- whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Wed, 18 Nov 2026 17:17:02 +0800
-Message-ID: <61823b38-032d-4e4c-bcbb-82fe83c34ade@huawei.com>
-Date: Wed, 18 Nov 2026 17:17:01 +0800
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=GFhnPvoP;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=d0w5dp0P;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=GFhnPvoP;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=d0w5dp0P
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1438E22229;
+	Wed, 18 Nov 2026 09:26:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1794994002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oeyfLCxsP9w5ROWq/+IA3erdwWt3rQ3/CJxahg2mGAI=;
+	b=GFhnPvoPhnsMIBT6Dxzd9s/hqtyrutd4OBEgLZgfKmh3+S/44jVpKT7Iywg0Z9Bw0OaMXj
+	7A4W8ARPkGb5Ho9PPvPbNHxU9cpIuErQ/91FIZvxvgjhRvmT07ocB29hjymhC/2WJXFY39
+	WTU1BhK4LVeoINXTA3l3iChNynJe2Wk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1794994002;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oeyfLCxsP9w5ROWq/+IA3erdwWt3rQ3/CJxahg2mGAI=;
+	b=d0w5dp0P5dFMBjQowd3e+OJVGPKsUsQ1OU9tK0ylCxn0QrjbEgE4Y9k+CLmDbGvOworG4t
+	mMP1rmdjXE/YqiAg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1794994002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oeyfLCxsP9w5ROWq/+IA3erdwWt3rQ3/CJxahg2mGAI=;
+	b=GFhnPvoPhnsMIBT6Dxzd9s/hqtyrutd4OBEgLZgfKmh3+S/44jVpKT7Iywg0Z9Bw0OaMXj
+	7A4W8ARPkGb5Ho9PPvPbNHxU9cpIuErQ/91FIZvxvgjhRvmT07ocB29hjymhC/2WJXFY39
+	WTU1BhK4LVeoINXTA3l3iChNynJe2Wk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1794994002;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oeyfLCxsP9w5ROWq/+IA3erdwWt3rQ3/CJxahg2mGAI=;
+	b=d0w5dp0P5dFMBjQowd3e+OJVGPKsUsQ1OU9tK0ylCxn0QrjbEgE4Y9k+CLmDbGvOworG4t
+	mMP1rmdjXE/YqiAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BEB501334C;
+	Wed, 18 Nov 2026 09:26:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id lIVbJVFv/Wq3fQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 18 Nov 2026 09:26:41 +0000
+From: Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v2 0/9] nvme: make NVME_TARGET_CONTROL work with
+ remote targets
+Date: Wed, 18 Nov 2026 10:26:38 +0100
+Message-Id: <20261118-nvme-target-control-v2-0-d191bbbf5dd6@suse.de>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,63 +105,131 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next -v4 01/17] fs: pass struct path to notify_change()
-To: Al Viro <viro@zeniv.linux.org.uk>
-CC: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
-	<brauner@kernel.org>, <jack@suse.cz>, <amir73il@gmail.com>,
-	<andrii@kernel.org>, <apparmor@lists.ubuntu.com>, <ast@kernel.org>,
-	<axboe@kernel.dk>, <bpf@vger.kernel.org>, <casey@schaufler-ca.com>,
-	<cel@kernel.org>, <cem@kernel.org>, <chenxiaosong@chenxiaosong.com>,
-	<code@tyhicks.com>, <corbet@lwn.net>, <Dai.Ngo@oracle.com>,
-	<dakr@kernel.org>, <daniel@iogearbox.net>, <dhowells@redhat.com>,
-	<dlemoal@kernel.org>, <dmitry.kasatkin@gmail.com>,
-	<driver-core@lists.linux.dev>, <dsterba@suse.com>,
-	<ecryptfs@vger.kernel.org>, <eddyz87@gmail.com>, <emil@etsalapatis.com>,
-	<eric.snowberg@oracle.com>, <exfat@lists.linux.dev>,
-	<georgia.garcia@canonical.com>, <gregkh@linuxfoundation.org>, <hch@lst.de>,
-	<hirofumi@mail.parknet.co.jp>, <hyc.lee@gmail.com>,
-	<ihor.solodrai@linux.dev>, <jlayton@kernel.org>, <jmorris@namei.org>,
-	<johan@kernel.org>, <john.fastabend@gmail.com>,
-	<john.johansen@canonical.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
-	<linkinjeon@kernel.org>, <linux-api@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
-	<linux-cifs@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <linux-unionfs@vger.kernel.org>,
-	<linux-xfs@vger.kernel.org>, <liubaolin12138@163.com>,
-	<martin.lau@linux.dev>, <mason@kernel.org>, <mathieu.desnoyers@efficios.com>,
-	<matt@bobrowski.net>, <memxor@gmail.com>, <mhiramat@kernel.org>,
-	<miklos@szeredi.hu>, <neil@brown.name>, <netfs@lists.linux.dev>,
-	<ntfs@lists.linux.dev>, <okorniev@redhat.com>, <omosnacek@gmail.com>,
-	<penguin-kernel@i-love.sakura.ne.jp>, <rafael@kernel.org>,
-	<rdunlap@infradead.org>, <roberto.sassu@huawei.com>, <rostedt@goodmis.org>,
-	<selinux@vger.kernel.org>, <senozhatsky@chromium.org>, <serge@hallyn.com>,
-	<sj1557.seo@samsung.com>, <skhan@linuxfoundation.org>, <song@kernel.org>,
-	<stephen.smalley.work@gmail.com>, <takedakn@nttdata.co.jp>, <tom@talpey.com>,
-	<yonghong.song@linux.dev>, <yuezhang.mo@sony.com>, <zohar@linux.ibm.com>,
-	<utilityemal77@gmail.com>, <lujialin4@huawei.com>
-References: <20261117150542.1169451-1-caixinchen1@huawei.com>
- <20261117150542.1169451-2-caixinchen1@huawei.com>
- <20261117183059.GP989762@ZenIV> <20261117183440.GQ989762@ZenIV>
-Content-Language: en-US
-From: Cai Xinchen <caixinchen1@huawei.com>
-In-Reply-To: <20261117183440.GQ989762@ZenIV>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- whupemk100010.china.huawei.com (7.152.184.41)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/32Py26DMBBFfwV5XVd+1RhW+Y8qC8YMxE0w1GNQq
+ yj/XkOqLrsczcw5994ZYQpIrK3uLOEWKMyxDOqlYv7SxRF56MvMlFBWSmF43CbkuUsjZu7nmNN
+ 844MApRu0DlTDyueScAhfB/Wdwe2akTKx83NDK3ygzzt0v70EynP6PgJs8vj417VJLjhoCUa86
+ RrAnGglfO2RnR9PQcLPtfTIv/6/GqXVAZY1p2tY+BSIQhx5jwtxLQrQGds4b9qSo6CgIyzaaQq
+ 5rerGazXs3hp8ZzujnYbaNEILqZx12g8WLJiS4vEDTS3Ni1UBAAA=
+X-Change-ID: 20261104-nvme-target-control-f0b239e68b29
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ Daniel Wagner <dwagner@suse.de>
+X-Mailer: b4 0.16.0
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spamd-Result: default: False [-13.30 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -13.30
 
-Yes.  ovl_do_notify_change() passes
-ovl_upper_mnt(ofs) together with the real upperdentry, so the sb matches,
-and the idmap handed down is ovl_upper_mnt_idmap(ofs), i.e. taken from
-that very mount.  It runs under with_ovl_creds(), like the other ovl_do_*
-forwards, so an LSM sees a genuine upper-layer path instead of a merged
-dentry whose mount we cannot name - which is the point of converting the
-metadata helpers.
+Hi all,
 
-On 11/18/2026 2:34 AM, Al Viro wrote:
-> Incidentally, will the mount reference you are supplying in case of overlayfs
-> upper layer be any good for LSM users?
+this series makes running the nvme tests against a remote target with
+NVME_TARGET_CONTROL actually work. The first six patches of v1 have been
+applied, this is the rest. It applies on top of the series that makes
+tests skip when a program they need is missing.
+
+The first two patches are fixes: nvme/047 looks up the namespace again
+after reconnecting, and the nvmet target picks free service IDs for its
+ports. The third is a cleanup, nvme/042 and nvme/043 iterate over the
+DH-HMAC-CHAP hashes by name.
+
+The remaining patches let tests skip instead of failing when the remote
+target lacks a feature they need, including the DH-HMAC-CHAP hashes and
+DH groups the target doesn't support, add port and host key support for
+remote targets, and add a NetApp ONTAP target as an example of a target
+that can do less than nvmet.
+
+Tested against nvmet in a second VM, which also exported other
+subsystems on its own ports, and against a NetApp ONTAP array. All tests
+that can run against a remote target pass, except nvme/077 against
+nvmet, which checks attr_qid_max in the local nvmet configfs. Against
+the array, nvme/061 and nvme/070 fail because it refuses the reconnect
+after a subsystem is deleted and doesn't support Identify CNS 07h, and
+nvme/068 because the host runs a 6.4 kernel. The tests that need the
+kernel target still pass with the local target.
+
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+Changes in v2:
+- Drop the six patches that were applied.
+- Fix nvme/047 to look up the namespace again after reconnecting.
+- Pick free service IDs for new nvmet ports.
+- Pass the TLS option in the argument array instead of an unquoted
+  command substitution; quoting it would pass an empty argument without
+  TLS. (Shin'ichiro)
+- Check the features with =~, with an SC2076 exception for the literal
+  match. (Shin'ichiro)
+- List the DH-HMAC-CHAP algorithms a target supports, iterate over them
+  by name in nvme/042 and nvme/043 and skip the ones the target lacks.
+- Put the fixes first, then the cleanup, then the features.
+- Depend on the series that makes tests skip when a program is missing.
+- Link to v1: https://patch.msgid.link/20261104-nvme-target-control-v1-0-b31b40537bb4@suse.de
+
+---
+Daniel Wagner (9):
+      nvme/047: look up the namespace again after reconnecting
+      contrib/nvme-target-control: pick a free service ID for new nvmet ports
+      nvme/042, nvme/043: iterate over the DH-HMAC-CHAP hashes by name
+      nvme: skip tests that need a feature the remote target lacks
+      contrib/nvme-target-control: list the DH-HMAC-CHAP algorithms
+      nvme: skip the DH-HMAC-CHAP algorithms the target doesn't support
+      common/nvme: support the ports of a remote target
+      nvme/rc: change the host keys on a remote target
+      contrib/nvme-target-control: add a NetApp ONTAP target
+
+ Documentation/running-tests.md                     |  49 ++-
+ common/nvme                                        |  88 ++++-
+ contrib/nvme-target-control/README.md              |  72 +++-
+ .../nvme_target_control/target.py                  |  19 +
+ .../nvme_target_control/targets/nvmet.py           |  12 +-
+ .../nvme_target_control/targets/nvmet.sh           |   7 +-
+ .../nvme_target_control/targets/ontap.py           | 397 +++++++++++++++++++++
+ contrib/nvme-target-control/tests/test_ontap.py    | 357 ++++++++++++++++++
+ .../tests/test_target_control.py                   |   4 +-
+ tests/nvme/031                                     |   1 +
+ tests/nvme/041                                     |   1 +
+ tests/nvme/042                                     |  12 +-
+ tests/nvme/042.out                                 |   8 +-
+ tests/nvme/043                                     |   9 +-
+ tests/nvme/043.out                                 |   6 +-
+ tests/nvme/044                                     |   1 +
+ tests/nvme/045                                     |   1 +
+ tests/nvme/047                                     |   2 +
+ tests/nvme/057                                     |   1 +
+ tests/nvme/062                                     |   1 +
+ tests/nvme/063                                     |   5 +-
+ tests/nvme/rc                                      |  58 +++
+ 22 files changed, 1069 insertions(+), 42 deletions(-)
+---
+base-commit: 79c32fb31b7bca6a4383b749030128683cf6b6b4
+change-id: 20261104-nvme-target-control-f0b239e68b29
+prerequisite-change-id: 20261117-skip-missing-deps-30b4084698c4:v1
+prerequisite-patch-id: 9478a4106d922c8432a4d297dcb18ed68a9c8d61
+prerequisite-patch-id: 635fcb82ae72c78b84ad593a58d82315a166724d
+prerequisite-patch-id: 528ad89bda84f0b0d9cbc0d38b6e1384332f86cd
+prerequisite-patch-id: 2758a16b44a326eea5113ff4967e6093ad42e71c
+prerequisite-patch-id: 9acbf0ff52b0b46035e4635035662cd9d9309f77
+
+Best regards,
+--  
+Daniel Wagner <dwagner@suse.de>
+
