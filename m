@@ -1,96 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795018060;
-	b=yXlSI04rMYcX+AlY3HfPsviV2H+bKzDHDGD7TzkbhyKw1nPg31MXHKVyzwQ0Ee1Pe7Gt
-	 fltPWf9YOQzrIdZ3k0A9aZX6VPwWQsK8I/vourVxWwi69cPJ9BLR7QUOFACkV9sZ5IbCd
-	 MQga4hf1lKUhkKMtbFulOJ5V/oF9f39jfFw230T6qgSt0CoX3+BG/30JP9qSWqOmSrFJ7
-	 6Lt9pdslwSZpl6ibNiFCRBFlplTzUof6DHECQNNKndTaODQsCe/g88X48RW+ReJdiyW+r
-	 6YtVoZy5sH0bPf75B56JXbxasrY1arD8qIsfZ/sOTSmOmzbjQjTkP9vvJPFQ+cIZx+g==
+	t=1795018061;
+	b=c1J/iN8eYsXu0sDqnjCZdbfVp9Y8LFERuTFan+IrNenKuo6jBy4WXvjWj0esBOgiVxms
+	 07LFHWirtBKocIs68Zbip35e73oKSQNeL92Zf4Hd6goh3D9zvCDPusfQPVscKEpE3Y2M5
+	 Fql0DRVyFp/hhkCsPFx3rpOJhLcMLTpK3ByJQOX5jy4SmcGu5AtxGvBGEiYoNbFveloqC
+	 l6idknVJRq2rx6s/K957Zm4TH1zXfSeSZOw0N82YAuVeGNkimNGmQq05V4/x59URpbnEg
+	 B/c/0oPtp4ObFdShupKc0UbVJonH1YiwCYnzeFzFwwvlCAOTnRVOvQZRtjpPA6xLo0Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795018060;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795018061;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
-	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:X-Mailer;
-	bh=GmuWkJzh1iCQH+rXKDpsn8JTG/S53WJETWtD1300bps=;
-	b=4ZM0rKRXbGy6IYcfemXTRDPnGA3MQHpQYJ460l/P1DRbvGyDwXmuj17srEFzMUrTYEYA
-	 D2xDPGdsftaT4dsivHyV2y3gY8vTqUa77spveTpc5xDbbMbhK6ZP/GqOQdOW09aiodnVx
-	 jCxR2GzShc2j62i/7r79tDE0s/ZooYf++Y0ipaXRfZf6xwJkBXRoKzzpjYzpyq+e4e/QY
-	 qGAFJIBQREeUd44S8pAsy6U4eVLpJ8uKDLh0pJJpGlC6aBCsUlHChlDAax7tQ5dwmAqzG
-	 UFlO/tvEMzmz4ycHzD60we4YWt94ssgeBZb3q40Dhjc2pjpSUZLARWrhmlmDt4I0M+A==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
+	bh=ujkN+eC6Zu+/+obGmDVtyoxxt+WJSJZ0U/kWRfaBMgw=;
+	b=ydlDoxiFfJvuo7dAj0vuSzB6fqzfkyUrIWdQVmM8WuSXYz5LK9v1NELzuaYrss3BpAX+
+	 4gu4Evfc3lUZiy/tpBQLDU98q3oTAYNwnVURtyDGzfICFyUscTSIPtWHdU79zg8QlRHX7
+	 b6XD/oGegktYPg1Em6YCxyaogOyP5XOlqUjXyR+UT3T+/PpV0oub8Pywa9HEGyTLJrSNo
+	 48mCWFv1Mrdqz9+CzO9LxEAZ7ncLL20Ok+gVeMwTfsAVMiSBkNDmWLhFpSnaAmxxr7q7J
+	 LAWCjxLH9k1Z4C6RC9PZJDxobqh8oLuNa87R0cD2vgrPwwaUzkVxRWwINmwVyoDFVgw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="aji2d/Kr";
-	arc=none smtp.remote-ip=209.85.160.54
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=WW6ACKA7;
+	arc=none smtp.remote-ip=209.85.161.52
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86BC60A2601
-	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 16:07:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B86BC60A2601
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FD860A260D
+	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 16:07:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 74FD860A260D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=aji2d/Kr
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-499f20c7054so639694fac.0
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 08:07:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=WW6ACKA7
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-717080a2d50so1023465eaf.0
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 08:07:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1795018059; x=1795622859; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1795018060; x=1795622860; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GmuWkJzh1iCQH+rXKDpsn8JTG/S53WJETWtD1300bps=;
-        b=aji2d/Kr8V6k7QQba0rRBp0IMiEQuDL0q7D5u7T1vwWrBP5XLREHI/CF+dOabfJmNB
-         UOywoE42CQSdL5XDF02JyLEPcCoViE1p4a+M+FSykcnW/mR8VYwJiZpALoIX2O8E20Xg
-         9UlYN/D3K8nHSSVGmyvrVUAIUedI075J/bBSALiqxa/lXI4gKMNw2HS0YJQKMRZRvkB/
-         EXbiNZ0if/JrI/DZ7K9PLIYcx6y8mSvTtViSJLsST0yXmp0LQs2epcbEnIGrZDRab5bx
-         F+T+9BqbHZngk7FahaUQ/HuKZT/wEYbDSNBrONJhAI7sDxgEaNWmmPXaX27w7QYft3E5
-         S9CA==
+        bh=ujkN+eC6Zu+/+obGmDVtyoxxt+WJSJZ0U/kWRfaBMgw=;
+        b=WW6ACKA7UVZiX0KfAzzg+edxiER4uOGUTJowPB7yetEcRNF0o4/Kgsp9BxcVCXTdif
+         Tgv4mmpcq1Wmrf7KxcoFOWJZbPQfmjFqlCYt+veaAJCLfJJpjJJ0+pe+WJbg9pSpDyX4
+         hEB4mBStC6AtALo5N6bjSJ5/23Si3ahmHjbu+4GyrjanqO9Z9FQL7hr4Y+i5Dj6ojLaN
+         f8kgHBRGEQ82u2/SnxNtKDHtkRKPlhx5anbGuZ15xZocj+BHbgcKoOetIUpg1RZEvvJo
+         MQ27KN1ViJofCC9c5ILfBA0ZvkCbNS1QGKsj6P7llq7rDd/KfASgsSuCATFnW+exUF01
+         J99A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795018059; x=1795622859;
+        d=1e100.net; s=20260707; t=1795018060; x=1795622860;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=GmuWkJzh1iCQH+rXKDpsn8JTG/S53WJETWtD1300bps=;
-        b=qZyKHElmIyiJtGLCtjcQQ9QM918rMnMtlxlyxve5qRmuY9wxR5R3GUgl69DypM7/ro
-         /FYd67xbFkGdjaO48WZAMybywmWN3E849oRU5mZL5k3UCGPUUEWIaK3V+a5jU0L3EQyG
-         BMYMD6C4rYoqg6I2Ys3RYAA8Joo2WuL1bAZjf37UoCxeL/AHZtCYh1qD9OQR9fGb24q/
-         qUnV1bQoMOpyT2IqhvwR1hzvyg8P7RzUrmwZ6IZDvyCLI5zH9K0/oTpAryVIybtUTaUG
-         1Pz2nEXMfWqOdNk7PmCvnbaL8IcYynxSv/r4zbReBcFH9ut9sq7t66YB42GS2T3nt6Z9
-         7cIQ==
-X-Gm-Message-State: APuU4Z94cnWkBD/RQcEbVTsw0ZijbmLZTubDwRSL608r6zGg8w5bnc13
-	j9uzFEtVRQaul3OVQccQY0OJgz5tJX1Z+94vSqCzhNC60lo0TIQ0oxaiGX7JPlNCgGo=
-X-Gm-Gg: AYBFou0VDId+x7DFZ3eTDb/gs4ScuR3Flx2ElewTFQ3hSqXE4EFpupgWtB3turJ1NLH
-	MOgKUsMKMNB3UsOGLVerVEjzYyqbn76K3NsNMXf5oo7/7Wmnz8EX0FbFhZ3pPUAeN1OeK5iRxGi
-	4XWADpaj237exAVCWaovL2upIUS5HuXAa1VIrseVCR7ExHHiTGd4Ke5AlhQmlwQIBTilI72kEHp
-	szQETZYdrZ59b4TxetR4Y9hyx274TzBbccgaciQlHprZdfEETjcl6vQHQ1/0GdsySHJuTpfdKWy
-	JV08GzcH5ewAzG0BGZdWf+sKUOS5whJZLnxeO1deJ8QhMocpuBz4BCaJITu47bfDOnXq+I6xtD/
-	DsoYqmDFZQcah0GneLL6qc38fre+byq63hPMj3sBlABDntdQ5OSAVR2mKJvjElu0fBgg7DRyE/d
-	bejPBjJwqrSTz039gvzCN5uFgAWdkYIIFfKMVjHLjVn8JAn5ffPB5bY3crpszHbcIiywbStOGHH
-	HJ4PhvAkKBA4oNKdlNqSumSSp1Fi5LE3jGLbwBSQ2DBFxp7f5vx1JhYZ6XIjL8xMOUH8Sx5taVW
-	2dV+GDAy42jH20QgcdF8J/Nnc3918a306M1MCeku9roMoiEpKlVG5xJ2xhnVq1YZexzJyZWFX8b
-	A+YL0epwz7YjWtS+1f9XvAXJ6/Dq0HAhZVa2TEOolnNwyODODwndyUEWEwXpf4Wr1nLh8FHfc
-X-Received: by 2002:a05:6870:2e90:b0:468:2c18:a031 with SMTP id 586e51a60fabf-4b75f029d72mr2362162fac.12.1795018058604;
-        Wed, 18 Nov 2026 08:07:38 -0800 (PST)
+        bh=ujkN+eC6Zu+/+obGmDVtyoxxt+WJSJZ0U/kWRfaBMgw=;
+        b=ag9QeXbp95ZJnN5N67QcKs9fhoJiKQnf/WI8dsT2Z7xPPua480OKnI0dd+TkNIz3/g
+         cPKg+1DA7W/DUEINGyFl40EE8waT63Nec0LEkIKe+KXsOzog+dGVeVtObyVaJK77wpjR
+         CMZs95DfUIHE8Ye8n+W75dF0Y6MV9P459FAV+aOB8AaMPmi0W6fHVrjMj/CuL5ZIWE6s
+         gY8+qM/akwTrJOvyKneV0S5xYuBNTh2GhPd9ROR3PkE+E2uPtr0v6eAJ7kIhUe+2n+/C
+         KG6gEIkZD8hcDOyiU9qZ64XFrd6DZOXc98eN2lGKEPxpklq/ggNgsYNtbWybiu12K+wX
+         bLJw==
+X-Forwarded-Encrypted: i=1; AL+hErHniEhosqfEL9XF4C6eXvzz6lHJEJzMZgNrzky5I7b7iq2JXonAWkMD1B4DEDzzQ9bqPLAQXp8JkJ81sg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8Tg1qLwsJQ+Th2+GC/FxAEOORo9XQpWZMghtgBStXTHj9ZRqke
+	cdQogr18VqkEE2v3O/RQXd+Be7ReCaOBwV5Mvbzg+nRi36SgNRlen5+oT6pB4Y8+h/g=
+X-Gm-Gg: AYBFou2bYIGiVMZRP/rpBxVYs4rKKMOqjJs46JBqSDmJBTAxtCkehopRYs7QbRuDu82
+	c5hA5np/51Mq7sYsROtyuKFTISuF0HW3z+0NaQx4pdmXROKvTZF6LU4Gs5jcvHulK7toK106M2w
+	FsnN0vaMaPtWVn59Bq2dWOkXLjNKQvOmTuCMaX8kidn0D4Xl+GPAgl/wld/ZmCG7DpA9EScI9Sq
+	yQ6MWav+gTf/NnvCplXaaXgDci5KiF9smbacold4fR/atB2puhBrjObSUL/RBaKqQW2FRN5AM2o
+	QEgPaDIIT5eAriY9YJrXJWFk4czz4HWxhb09L0QhJ54FKEUHAnWK4QTTOVdZiWNOhPMhCmctL1d
+	9vzrZ67K9BsXXEAz3C7ldUN+cwrIFpXAOOR6ZRtdiktnuiSGD2ppb8EVMY2A6D4Tt+Rr9ngeN9R
+	3SXtT+e8q28HJeSPnc0aUPusrK+WwdGMgUhk1jO03VYuduECbX9gzcfqYtEX1kwjYLoFXySLqf6
+	xFf+xCdmbDbyCRbGUe85IwfHQXXDxfXoc702SrlAmbX1ketcPDGpS8V8gddHpGcHlGuE2Q0o2Fc
+	+YIOoWifJ2oCMHa31pXOJAUfMSA2zPpNxie911Q018to74PLzdg9TkY71SplgTOcRVDS/Efovbu
+	LSrUpr2rqIjMSuqj133A0BFkQw5Cf0fGE6EoTjd1dHN3nP/sVilDus/XTJmdSOR3amRPYVDoG
+X-Received: by 2002:a05:6820:807:b0:71a:fa06:4dd7 with SMTP id 006d021491bc7-71b18454b50mr2463359eaf.28.1795018060423;
+        Wed, 18 Nov 2026 08:07:40 -0800 (PST)
 Received: from [192.168.11.112] ([96.43.243.130])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm2624231fac.6.2026.11.18.08.07.37
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm2624231fac.6.2026.11.18.08.07.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 08:07:38 -0800 (PST)
+        Wed, 18 Nov 2026 08:07:39 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Damien Le Moal <dlemoal@kernel.org>, Ming Lei <tom.leiming@gmail.com>, 
- Nilay Shroff <nilay@linux.ibm.com>, Hannes Reinecke <hare@suse.de>, 
- Qiliang Yuan <qiliang.yuan@linux.dev>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20261114-bug-block-elevator-unchanged-v2-0-5a1fe7d72fa0@linux.dev>
-References: <20261114-bug-block-elevator-unchanged-v2-0-5a1fe7d72fa0@linux.dev>
-Subject: Re: [PATCH v2 0/2] block: make changing to the current I/O
- scheduler cheap again
-Message-Id: <179501805754.17649.16701221943802051712.b4-ty@b4>
-Date: Wed, 18 Nov 2026 09:07:37 -0700
+To: tom.leiming@gmail.com, shuah@kernel.org, linux-block@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, shao.mingyin@zte.com.cn
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+In-Reply-To: <202611112257529855AMDZLzg8ZmFDQ3fBstbi@zte.com.cn>
+References: <202611112257529855AMDZLzg8ZmFDQ3fBstbi@zte.com.cn>
+Subject: Re: [PATCH 0/4] ublk: report recovery test failures and fix the
+ exposed defects
+Message-Id: <179501805884.17649.3891543607346842206.b4-ty@b4>
+Date: Wed, 18 Nov 2026 09:07:38 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -105,23 +104,30 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Sat, 14 Nov 2026 20:58:31 -0500, Qiliang Yuan wrote:
-> Writing the scheduler a queue already uses to queue/scheduler takes
-> about 10 ms and freezes the queue, which stalls I/O on live disks every
-> time a udev rule or tuning tool sets the scheduler unconditionally.
+On Wed, 11 Nov 2026 22:57:52 +0800, shao.mingyin@zte.com.cn wrote:
+> The four patches make the ublk recovery tests report failures from their
+> workers, and then fix the two defects that the stricter tests exposed.
+> They are one series because the later work came out of the earlier
+> patches: patch 2 applies on top of patch 1, and patches 3 and 4 are the
+> two independent fixes that patch 2's testing uncovered.
 > 
-> Patch 1 stops requesting a "none-iosched" module on every write of
-> "none". Patch 2 returns before freezing the queue when the elevator
-> wouldn't change.
+> Patch 1 waits for the recorded recovery worker PIDs and reports their
+> status from the parent, so a failed worker no longer ends in PASS.  It is
+> a v2 of the patch posted separately on 11-09; the only change is the
+> simplified wait loop Ming Lei asked for, and his Reviewed-by is kept.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/2] block: don't request a module for the none elevator
-      commit: c85f570121c94679854b570cae2c0dbcc0eae43b
-[2/2] block: return early when the elevator doesn't change
-      commit: 375a88c6176ffe05e521c2df31b1ceaf4ae5fbaf
+[1/4] selftests: ublk: propagate recovery worker failures
+      commit: 6f3393515ee6526cf66175a85f3327899db765e3
+[2/4] selftests: ublk: propagate stress worker failures
+      commit: 01fe9c1894fc4cce7b04cdae5522c86519ba835e
+[3/4] ublk: cancel commits arriving after the quiesce scan
+      commit: b79225a8965f80b448dcdd236da2e1ca0690238e
+[4/4] selftests: ublk: clear reused batch SQE command flags
+      commit: 73f6a1d93040ac8cbdb03b3702a66e6a14773d02
 
 Best regards,
 -- 
