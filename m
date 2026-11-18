@@ -1,99 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795018069;
-	b=AVLvTx6j11OshUKZ9uYx5Gk9qh7pqQoQhGj/55tSldqSUvzicAavXliMIGbSax5/i4Ss
-	 CN5UQpEwQVU423XFBYQRjiv0V/e6I4NXiroKzqDUWAPiC0DVrdYcecva3VHAmY7fMUEGe
-	 sKGFMLs8/TAZQXt+lwvxSWLJMRbIAPonMcA+G6XKEqyjFFktDKSvCgPvOEclxm9poaliQ
-	 WZBdGwmWoIW1/sJzqpz7ZsoDaKgZzeZ4ZXvlr8U37QWFwZkWtaN22+iIb6cyYUvWTLiPK
-	 MvrXCagq4T/PMZw0sQzA2iDd8bmxIqIA6R+VqQ53VsFDJqVPOeuqXTvj9nQyExIr9Eg==
+	t=1795018073;
+	b=b7Gg7uEOTjVz/uWXO0M9Mfx7w56dz77BexhcY0G0k1ln8lbBkmdjewQAe3Ffl9zLN62D
+	 5afj+x2p0lDEDi0Bi1Rck0XYwua4yXk+s+uFOXeTdSXAl1rkbX8489H5kkpagBxga8lkL
+	 pnkD/qBhp45geu6VH8v1rfi/PDLKNXWUAP6KWgx0cUBwJfypLE/hh1cfOdXlaLKn2BygP
+	 iMBsNUF/yZ31K2QNkPnc0UbSYsQ3zQI/Nc4HAYn36rMYD3ftHsHtTs5iGbwlZdDGobWOX
+	 ykTY2T8oRmZwHM43uKP52oPhmQ8nt0KkXX2AkJhgqv6dy3KOALGGWFoMXsF5sUe+cWA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795018069;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795018073;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=uMY6Jb3UDbPrg75ENQ5Iey0rgsluCVDooajDuLXd0cE=;
-	b=oW/5QTCLHOTjshNHQXsH6FRxrvcq/vCXJte6gV7gAp6L22J/jkYTRDCKIUbZ3nnXJG5Y
-	 RMgf2RoYG4XR/0wKqIf2DEKIiemUHtHEyrB+7mQk0Lm9mki1ncLieiKrCgETGB3ZiRc7f
-	 2BP6yfAS5By6dAUl4IFCQo0jQbObyYEABfY9Y5yhhUGusyvXqdm46EEQa7be4QpwlaaDB
-	 fdZgw0k8RwGY2IOBqR0gwFGsLfEsozMc8PTwYkIBLOuEPkl6LlaxyOI5ScGhL6+A6ISOH
-	 7saGJXZMGkS7KzZ73MJBMadNJaxGSV40PjYAPAqnikZbypSUHcHeTVbzPbteP0Z93WQ==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
+	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-Mailer;
+	bh=Sq9RmYzcNH9B/wayIUueB9ggWDiYP1P/tLsuJW/Tbnw=;
+	b=iYnujVDsXPZukawxypAsyHDUB9mg4gxXRY/mpvLErn0CAv8C+HPcC+Z2muQJLB601/t6
+	 lZJe5QNskLr+dYZrUE99NFF2umtZMSUUzqFRZyriY3jaTUBFKxM13kKxJ+jrUBccJlEzm
+	 zraS7ljwh4cpqwfGsvuhf19lVBZXPSECYspy2NhdlAt4SY3svl+XuZEV0BWKEuHXhgLjS
+	 1j12yVUe6wR8XDzg5TnvZoF38vvGObar9n088GTwcyAXT5yHMHJAduQ9Gjepr0RfTTDWt
+	 ZcCr9g6gTAx9MScJMMk7ADebMs6UFmvfm+QjHwzQK4W6eJB7X0eSb4zthHdQeZ/YK8w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="K2kH/UYx";
-	arc=none smtp.remote-ip=209.85.160.51
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=dTgR1f3o;
+	arc=none smtp.remote-ip=209.85.161.50
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5972F60A5BC7
-	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 16:07:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5972F60A5BC7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1521660A2628
+	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 16:07:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1521660A2628
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=K2kH/UYx
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-48ed188ee81so664405fac.1
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 08:07:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=dTgR1f3o
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-71ad1db7e31so1502555eaf.1
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 08:07:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1795018068; x=1795622868; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1795018072; x=1795622872; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=uMY6Jb3UDbPrg75ENQ5Iey0rgsluCVDooajDuLXd0cE=;
-        b=K2kH/UYxJ1s9QIk2I+iFE+8oy6FJi8D0+gEKDqY+gZ6pmW+8qIuvQdlK1zDDZ2tqn9
-         +grxhnhVVFi4vC6NoXujmaBAsELkdHD/ni+akIyIdYfnQVXIUdefoLtZsRuvr+oAWjod
-         D2kOcmXFzzguDmC6XlwD514NWwSbkg28+3FtOt4YIfS+BzJB8WflsXo9S0UVl6D+SSMZ
-         CeUaoy++aAN5yOC7dc450MBb2IQmziuDqQJL1p/6pk+Bkx7pDd2i+HrMHxPHvS7zRqnm
-         RGaipKK3GMXRuwVd3yNsQnE8F9AoDHxyWIXb8pin1xjuivCgF6cf5Uuo6uS+rfAjDy+w
-         RNkA==
+        bh=Sq9RmYzcNH9B/wayIUueB9ggWDiYP1P/tLsuJW/Tbnw=;
+        b=dTgR1f3og9a0vBhrk79J1moJmlLMa/Fa6bpbkeW9vt/uz99+uvVA4CNebGriNhtftB
+         3KScmsBDYtIouXo/NWiqMm5BqyXTGIO+u4eeRjaVUfcuM40shyAyRSXMCOkPd/cC26u1
+         WOnHUaA5WQg8bQYexiUTpf73CbV4aB1kjJPhR3IiqikKxwcGjkzQP8iZidIuE55TfjYN
+         C3ZM0ZYPIsNXrb1Jj3StcFa1N/5OsDo8WrytQXXoTjfJLgwJighHosOeOXNt0jL4rQQZ
+         1NNE9jBw5/3sC6M2pYKyQIJddk8h/QOYHo2kWVRymfltt/Q/RhyBVcOaWuRehwkYH7o/
+         pAbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795018068; x=1795622868;
+        d=1e100.net; s=20260707; t=1795018072; x=1795622872;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=uMY6Jb3UDbPrg75ENQ5Iey0rgsluCVDooajDuLXd0cE=;
-        b=NbxEpK7YzaCXrysimpgQkW1Cj5wX1imgb/N/e2xLr5HaS7O0E68OtgMFPATi5H+gnL
-         QJsvmFeJgIcrQj3GJWpfxkjOq+RGbocc5Gztv9ZnFTR8PAOqYCcphf8XDWryi+xjBaOo
-         wHNix0j9DiVJqLVf4gXPvil4AL6hY2JndyPmiYQpMhnFx6cisSp7Bt4cJvZ65THFKLqs
-         q526UI8ehJU1rY9aXVztO1KPsdYfmYHcsB65VcP5H33SkKaXvBezJNmnr7OqgY8DZH/H
-         mYN91BN/jv7aGDJlUNe1K6GwF1SErKeBnn+AJ6PSrLtNDRVp07EeTIyIZU8eNgXYy4EK
-         lFFQ==
-X-Forwarded-Encrypted: i=1; AL+hErEAptGEWcB2QQJGn3mfJ3njbsHP7YYbNuKUSBWMcbiW+Z6CUPVl9glK63GF9fYYxLmYu//eIarlqF69GQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9ZZ4jYNuR9lFS24X3L6kIzqLlDYXrRptNMhV1LUOJK0KMXBe+g
-	ULrl08u1YGQbZWehLUXRTsL2fKpXwNPXqQZCmfP9Qh6Dz/3NQZ8uKzPmpPEWbthYzoQ=
-X-Gm-Gg: AYBFou3WHUEZLCfGdBmS2YyPZfQH/a2VgWKzwphgt87jn0b5p3CCqMAYcLt7hImEo8v
-	OTRDqP21PMKQduIJw9SoDn/OatWuFzC52YAZi8VDPyIxkwFKTIJTNtnCfgj9oxq+rPzoeNT6hmJ
-	4oTk3+08kiPUfNs9Pu5NzTyoUsaSPS4KjVfRpBj5dBXmXweXME0qI32XowDUn4N10hxPv1iYqWr
-	d2uHA6VzjLF7nkMh/6MqI0/1hHocCPTs814GMaAYcodz0yzFyG8H4tpVUFXELceOYp988J1l7Fn
-	3Uw/9bYaVUgpKRDlIPvrTsg3iFmGysopcj92z5QY7eYVakqtGTrLlX2O84/36ZehIm4ehgpTCSX
-	KxSPGHD84DQM4jEUj4Fzsfb0UvmtfFs5vH2KWzClVc3LO/YzJ3ASJJkCBtgy6IAdGZ2/t6TQPFc
-	LlXrfGxcr2vl3hbwii/vA3TD7VP3UCXBxnM6enj8/mgi+Nih+iHTX+Io5wTmE7q1JNkioBiG4O0
-	J/Uu0Bqc/amxK8Vmg85lEFLIxBKBMpK4iqd5o6JDcV0Zu8B4GjbP1CE4I53f6hGtCNdk2L63rig
-	P/mQLFK9/MQYlxgd4J8p9ay3YwLvu28GxPtZI5Kjuu/RVukk6tsPqw0TP76jUdoQIAzwY0RvFBd
-	fAKtvG9L5VaDuN92CyJJ/YHOiX04k2tv8HBMYHQ0wR7wH6spcwi0TiW4CtHdvcWvS/U5GViO+
-X-Received: by 2002:a05:6870:4692:b0:486:c1b6:643a with SMTP id 586e51a60fabf-4b75c3790dfmr2555326fac.19.1795018068283;
-        Wed, 18 Nov 2026 08:07:48 -0800 (PST)
+        bh=Sq9RmYzcNH9B/wayIUueB9ggWDiYP1P/tLsuJW/Tbnw=;
+        b=Rar7uyfXI188AA2pt1krdMzA9bsD3NQF2rqLHduU7eeQr19xgzi3vSUxcUM56AKMgt
+         Gx5gMjfr9+9/7qXPnR/UeRdboHQ718JR4Q7Vyp1LcQ07GOr+nu83RbXjCfyIpNhi8dqv
+         S66rBglHgaVz83Zax/W1kMb16D4ysz2uydWMo70rusOEJFkP38xpU4o9EoaU3rMPUOhD
+         1uBShwinl13BSJH8J36x3X0dVAaZCqe+171I77ivb9f4O62+w47TAM0ZMqZG7aODWn0U
+         05JF+mevpIUmMdO7eoA3xKEKyHvGKXc+y2hodqzs43F6Rl6o6J0j0Rwoa5f3ADgJYq3o
+         KIPg==
+X-Gm-Message-State: APuU4Z+qPuYeBCAuGVUo1RpcI4c887Zz7PpUodjeeH+OgcpPBMdfvxuS
+	1SiQf62xpWo7qWAlWOL2o+wLikjz+fb3KYg45KZ/YalhJuIuTgUf2a9zf4UllmxkLds=
+X-Gm-Gg: AYBFou1GxD5T7ZzYzKdIVkdfVqotvgkEG8SzpCWknBVnLH4SjKPdjkjL9N7s1h6Y841
+	eKHOXNB/hmPuAvIW7YNz//5ve241uYobrHFzS4nnVffIawKGi7kPkqdjhUQmQEKvNec1p1izXOo
+	xn5XJBtfAyRuLMEg9NL9NCxdoRtAeryh2YRox6tR3zsCC46korejLs+s//psED5se4tdSzKBO0l
+	aE5ze7FXCD6AnAUG3R41H/2Hz/NpQh9gwnO7/dugBlyIjrhiRKIyyT8js7ep1VctNToF5VgJY1M
+	spWB9PV4vn7Ky1TyFD/gZh0gjpx5DVOc3CaIJHVhfjC7vWbQHtYF4/kFgdsNnHSJGM0k48hRV2/
+	/kLPAUffprcpXakLi/UlANNZTYSX/KhcJdxohflAornFRdB/I2K3WLCIvUuAU1nkFK9SuFeoY2c
+	4/HAyQvGjfF2xHkt/iK5U4xTHw7en/yMdz06hannDNo37DMp4cILR6jW/mlj5krZLSXv5y2cu5K
+	JMoLhsqwub6e4h+H1rqvwjEfaWvRT3+k3lD1NqA1oK0R5KVTXcaSGOZ0+BD9Xl+6cH3wL8KsYX4
+	IP9nJT+31E+vMCyXeQTQ4he99algpOjAHd78W1ddIhggaCHblxdZES9MtOnCDi26woKe/bjUTKU
+	2tW/L2+Wu8+N2z2Olnmc90MHRa7jZ5GarvzZS3rNnT9ipi5gDwBk=
+X-Received: by 2002:a05:6820:308b:b0:70b:930f:9a9d with SMTP id 006d021491bc7-71b028d29a7mr4357375eaf.31.1795018072097;
+        Wed, 18 Nov 2026 08:07:52 -0800 (PST)
 Received: from [192.168.11.112] ([96.43.243.130])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm2624231fac.6.2026.11.18.08.07.46
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm2624231fac.6.2026.11.18.08.07.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 08:07:47 -0800 (PST)
+        Wed, 18 Nov 2026 08:07:50 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Mani Tofigh <mt4022@columbia.edu>
-Cc: Mohamed Khalfella <mkhalfella@purestorage.com>, 
- Keith Busch <kbusch@kernel.org>, Ming Lei <tom.leiming@gmail.com>, 
- Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>, 
- Nilay Shroff <nilay@linux.ibm.com>, Josef Bacik <josef@toxicpanda.com>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- tz2294@columbia.edu, stable@vger.kernel.org
-In-Reply-To: <20261106-blk-mq-del-quiesce-lock-v2-1-cd4f72a6eb03@columbia.edu>
-References: <20261106-blk-mq-del-quiesce-lock-v2-1-cd4f72a6eb03@columbia.edu>
-Subject: Re: [PATCH v2] blk-mq: take quiesce_lock when removing a queue
- from the tag set
-Message-Id: <179501806686.17649.15466634007148423129.b4-ty@b4>
-Date: Wed, 18 Nov 2026 09:07:46 -0700
+To: linux-block@vger.kernel.org, Md Haris Iqbal <haris.iqbal@linux.dev>
+Cc: linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+ Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ linux-doc@vger.kernel.org
+In-Reply-To: <20261111215838.103356-1-haris.iqbal@linux.dev>
+References: <20261111215838.103356-1-haris.iqbal@linux.dev>
+Subject: Re: [v4 0/3] block: delay support for error injection
+Message-Id: <179501806989.17649.3138860274842922761.b4-ty@b4>
+Date: Wed, 18 Nov 2026 09:07:49 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -108,21 +103,28 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Fri, 06 Nov 2026 11:53:21 -0500, Mani Tofigh wrote:
-> Unquiescing a tag set can run the hw queues of a queue whose hctxs were
-> already freed.  blk_mq_unquiesce_tagset() walks the tag set's queues
-> under quiesce_lock and rcu_read_lock().  Commit 71ec3c7d6db8 ("blk-mq:
-> quiesce a queue that joins a quiesced tag set") added quiesce_lock to
-> the walks and to adding a queue, but blk_mq_del_queue_tag_set() still
-> removes a queue without it.  The hctxs are then freed right away since
-> RCU only keeps the request_queue itself alive:
+On Wed, 11 Nov 2026 22:58:35 +0100, Md Haris Iqbal wrote:
+> Error injection can only fail a bio today.  This adds a delay_us option so
+> that a rule can hold a bio back first, to model a slow device.  The delay
+> happens above the driver, so it tests the code waiting above the block
+> layer, not the blk-mq timeout handler.
+> 
+> A delayed bio is marked with a new BIO_ERROR_INJECTED flag so the rules
+> are not applied to it again, even after a split.  Christoph asked on v2
+> to avoid the flag by allowing a delay only together with an error.  I kept
+> delay-only rules, as a slow device that succeeds is the more useful case,
+> so the flag question is still open.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] blk-mq: take quiesce_lock when removing a queue from the tag set
-      commit: 495f22c5a99ac38e527294cdc4f3972718b9bee0
+[1/3] block: Reject unknown status tags in error injection rules
+      commit: d239710cf3e6bd5fec66766957c3752d9cfbd2c5
+[2/3] block: allow error injection rules to delay bios
+      commit: 6bd856cc99963b786cb530141745ef733de76cc3
+[3/3] Documentation: block: document error injection delay feature
+      commit: 5a29cfaf51105039d156dd8a61d2783e8b653667
 
 Best regards,
 -- 
