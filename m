@@ -1,97 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795018059;
-	b=WoNZVLdGBDRIxLTD6jGzkyJppSP6/8qcwpJHM0z7cqScrncE+ULy9hQ3JeZRARYSkbGB
-	 RQHPDPDc9yeBcHwPNZSvJQl86sbd3xxnLIqbWAJU4OrqHAYq3ghsPPMzmgxOLSqu7VpUT
-	 AJqFDFw29fRarfoSSu8OvH4Vup5phMYHux2vlDG2IJkK+UAmpsqOH19E+lBa395vSCYuW
-	 2l92wMEJMOomziM1VavZf6n6a6UxZVYK/jV2Alvhka7daiSnd9H3kHDEQy2FCJyuYHqXz
-	 c81j0hVPgYl85m2fhEvILo07FqHCnRvIWCFOUcICMDHQbBGyKxjWutIr9XNSLG+PpGA==
+	t=1795018060;
+	b=yXlSI04rMYcX+AlY3HfPsviV2H+bKzDHDGD7TzkbhyKw1nPg31MXHKVyzwQ0Ee1Pe7Gt
+	 fltPWf9YOQzrIdZ3k0A9aZX6VPwWQsK8I/vourVxWwi69cPJ9BLR7QUOFACkV9sZ5IbCd
+	 MQga4hf1lKUhkKMtbFulOJ5V/oF9f39jfFw230T6qgSt0CoX3+BG/30JP9qSWqOmSrFJ7
+	 6Lt9pdslwSZpl6ibNiFCRBFlplTzUof6DHECQNNKndTaODQsCe/g88X48RW+ReJdiyW+r
+	 6YtVoZy5sH0bPf75B56JXbxasrY1arD8qIsfZ/sOTSmOmzbjQjTkP9vvJPFQ+cIZx+g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795018059;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795018060;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=CV7oamrSYXfpp3NnleoEpP5E6f5lbD9kU3nbbqKEnc8=;
-	b=gyglfaABSuLjhRuWOwxfGXavepmsYDfwftzMLBHAetWnCI8RSdQ5uh0NlqWnDGjYqxXr
-	 g5OCH793MLNPEoY/apTLBZ/YOImE991550G3tmf43hvleiHg3ERSq+zL2OZNx6UeIsjci
-	 PZgdwB80YiXYYgs0eureKhVsqPuicPJ6OA2/91FMXN4JrHm3i4vePPcnsQxgMGPiPCgst
-	 fcUcuOSAhac+wML11XTOZPHqF+v9CmeRPqNvkWQg/xTmZEUoQn9WHrtPn0spKuCK6qcnd
-	 mI9UDR0j07QRjpGQo9wU5AjbRLO9JCFy0/e/azaIoGOeq5tbrovmGN2J6qydcLCMiPA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:In-Reply-To:
+	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-Mailer;
+	bh=GmuWkJzh1iCQH+rXKDpsn8JTG/S53WJETWtD1300bps=;
+	b=4ZM0rKRXbGy6IYcfemXTRDPnGA3MQHpQYJ460l/P1DRbvGyDwXmuj17srEFzMUrTYEYA
+	 D2xDPGdsftaT4dsivHyV2y3gY8vTqUa77spveTpc5xDbbMbhK6ZP/GqOQdOW09aiodnVx
+	 jCxR2GzShc2j62i/7r79tDE0s/ZooYf++Y0ipaXRfZf6xwJkBXRoKzzpjYzpyq+e4e/QY
+	 qGAFJIBQREeUd44S8pAsy6U4eVLpJ8uKDLh0pJJpGlC6aBCsUlHChlDAax7tQ5dwmAqzG
+	 UFlO/tvEMzmz4ycHzD60we4YWt94ssgeBZb3q40Dhjc2pjpSUZLARWrhmlmDt4I0M+A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=a5rhgeb3;
-	arc=none smtp.remote-ip=209.85.160.46
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	dkim=pass header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="aji2d/Kr";
+	arc=none smtp.remote-ip=209.85.160.54
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE914606A333
-	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 16:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE914606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86BC60A2601
+	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 16:07:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B86BC60A2601
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=a5rhgeb3
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-4a85c656c58so793889fac.3
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 08:07:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20260707.gappssmtp.com header.i=@kernel-dk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=aji2d/Kr
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-499f20c7054so639694fac.0
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 08:07:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1795018057; x=1795622857; darn=vger.kernel.org;
+        d=kernel-dk.20260707.gappssmtp.com; s=20260707; t=1795018059; x=1795622859; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=CV7oamrSYXfpp3NnleoEpP5E6f5lbD9kU3nbbqKEnc8=;
-        b=a5rhgeb35b8T5xllNNAeAnECO5OGWZ6FRR7g3JBTBjO3p29UNlMA5n5uAkVzlQrWDb
-         9X9tktBgkFW+N1AWN82LjGdQogSQ4C20Uq3ZqEfNc6b6QQnInosH7yAuraUEAckqLXRN
-         H8QXC6YWgM0rKmm4+aQArZeRlYHi5A9ujcVq17/4jz1Po88aC8PZnbgZwqfdfkRwCDwC
-         qIHH+l6buu7Fbly+5y4La0q2XL0yaSHrAlzPVTYXoW28SKbupT9CWG8AVuN6tBNNGPlM
-         8hw0B9CbHIRCEOd4dlJM8dAk2Ph1GA2THTGe5CsJF+6hPmUpcm7u9I0yji42m2YfX3bz
-         V/bw==
+        bh=GmuWkJzh1iCQH+rXKDpsn8JTG/S53WJETWtD1300bps=;
+        b=aji2d/Kr8V6k7QQba0rRBp0IMiEQuDL0q7D5u7T1vwWrBP5XLREHI/CF+dOabfJmNB
+         UOywoE42CQSdL5XDF02JyLEPcCoViE1p4a+M+FSykcnW/mR8VYwJiZpALoIX2O8E20Xg
+         9UlYN/D3K8nHSSVGmyvrVUAIUedI075J/bBSALiqxa/lXI4gKMNw2HS0YJQKMRZRvkB/
+         EXbiNZ0if/JrI/DZ7K9PLIYcx6y8mSvTtViSJLsST0yXmp0LQs2epcbEnIGrZDRab5bx
+         F+T+9BqbHZngk7FahaUQ/HuKZT/wEYbDSNBrONJhAI7sDxgEaNWmmPXaX27w7QYft3E5
+         S9CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795018057; x=1795622857;
+        d=1e100.net; s=20260707; t=1795018059; x=1795622859;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=CV7oamrSYXfpp3NnleoEpP5E6f5lbD9kU3nbbqKEnc8=;
-        b=TlnUzLG/9PJ4glsZQFXxrOPKbAXuzoShLFePkuMpH44BihpHTPHlJsvoppuXc9xYEA
-         uBQNzlGYgPPI8y/5efCalbNC6ujoLfgRqjcl2fVoa1T1ycuPYQiRKH5K40VTyAvLBTiY
-         jug4f/p/2z32uHA4SbYYPUgT7j8PkUfJqQV9ZC6skziI4sZmOehLSziEZP1+poAq3gT2
-         32MFOgltXKrYCJyDLCUjST/BX9+WHzCdIkyh1qksfOD4khJZjwYQirhOPUu5D/RLtFIx
-         vRjiziH4vVdR1le9Cu0COxfEQcVG8dfbh3V0JA4vQ13gWpjbUYYp5eN7F6NkRpO2DBcU
-         Ob8w==
-X-Forwarded-Encrypted: i=1; AL+hErENk10qZcUQyG9BMV7qeE96Qz7rtgrWhXm+P0UOLG2hqglkPhUMbEmx42k1VJ2Nn7JKZo5fbeCWVEn2Ww==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/7UvldhM1eZJIJ169pKNU/05y2Q3tFu/un2JPj/n9/5TqzHMhj
-	k7upBvEIYvM+w/zZVfj7MnpWtZFfVmL34tWFSmItLrQScy31KtQXziODsPiw2CGf2ixnDQuZBAQ
-	20CsiJY4=
-X-Gm-Gg: AYBFou0Vxw3KiFVyHbAgRmGsT6Q7zLe78/VpXtcPrHc65XRI86EbR0MCxLDffrkoQxX
-	nQoo5kTYkjh8QwBOkJF27PU/FLTNQcfMLuuf6ezEqsh3uVsTHennTvIEuUiwSFrv0J0RbU4bIuR
-	nB6O76/T8YmWtaJL/yV59Hj0m8QSyIp9NDxBxOLqU88gl3p3IcvZnO349MWRlwjZBk8fiz6OLp6
-	//G3SR5cFDoO04kugWwXdtsl6xIAwUS4TXhkhKqOwwPZKwCvCYAsi5ccfYcX4qNAGKbKRZhLTB/
-	ex6sT4pjcgi7NfKN7eXHY4jwpPbYkjUM22bZRnhUYP1z/AmSviEtdnK4CWM01Y8eVaP8RUTwSHv
-	ncYmUZE0MTmX7mNMLpAE3NEJmk/p7u4mKgYiht6ZqEnm1Vb+JiJcZVKg/qAFVFUESSBVixkdFgX
-	OnjJ1MLUwONhVMimqY2IezJ7rliEu1t9SlH/SUFmndBVekOsKlOogBDrawNjViWIKatoIPEn6J4
-	n1R0lcbvOMMO3SMe0c1Cm4358u67odrBaaIpgeXwXPXGNrtj1MD2d5PGqcEKvDH62icN7FQun8H
-	iJ3CKArv/BV+AMVPnthEj/CsgPmhlSd6rU9b2hIDIpZ9xKnf9g/TdGKzm3GJtJNHfnbfbThESQd
-	15EFOf6rieZHvcdY2oSlzJvDkrGsquwvixh/TZIhPopskNgai7O4=
-X-Received: by 2002:a05:6870:d285:b0:4ad:5a7a:f7e9 with SMTP id 586e51a60fabf-4b7613c52femr2613744fac.34.1795018057354;
-        Wed, 18 Nov 2026 08:07:37 -0800 (PST)
+        bh=GmuWkJzh1iCQH+rXKDpsn8JTG/S53WJETWtD1300bps=;
+        b=qZyKHElmIyiJtGLCtjcQQ9QM918rMnMtlxlyxve5qRmuY9wxR5R3GUgl69DypM7/ro
+         /FYd67xbFkGdjaO48WZAMybywmWN3E849oRU5mZL5k3UCGPUUEWIaK3V+a5jU0L3EQyG
+         BMYMD6C4rYoqg6I2Ys3RYAA8Joo2WuL1bAZjf37UoCxeL/AHZtCYh1qD9OQR9fGb24q/
+         qUnV1bQoMOpyT2IqhvwR1hzvyg8P7RzUrmwZ6IZDvyCLI5zH9K0/oTpAryVIybtUTaUG
+         1Pz2nEXMfWqOdNk7PmCvnbaL8IcYynxSv/r4zbReBcFH9ut9sq7t66YB42GS2T3nt6Z9
+         7cIQ==
+X-Gm-Message-State: APuU4Z94cnWkBD/RQcEbVTsw0ZijbmLZTubDwRSL608r6zGg8w5bnc13
+	j9uzFEtVRQaul3OVQccQY0OJgz5tJX1Z+94vSqCzhNC60lo0TIQ0oxaiGX7JPlNCgGo=
+X-Gm-Gg: AYBFou0VDId+x7DFZ3eTDb/gs4ScuR3Flx2ElewTFQ3hSqXE4EFpupgWtB3turJ1NLH
+	MOgKUsMKMNB3UsOGLVerVEjzYyqbn76K3NsNMXf5oo7/7Wmnz8EX0FbFhZ3pPUAeN1OeK5iRxGi
+	4XWADpaj237exAVCWaovL2upIUS5HuXAa1VIrseVCR7ExHHiTGd4Ke5AlhQmlwQIBTilI72kEHp
+	szQETZYdrZ59b4TxetR4Y9hyx274TzBbccgaciQlHprZdfEETjcl6vQHQ1/0GdsySHJuTpfdKWy
+	JV08GzcH5ewAzG0BGZdWf+sKUOS5whJZLnxeO1deJ8QhMocpuBz4BCaJITu47bfDOnXq+I6xtD/
+	DsoYqmDFZQcah0GneLL6qc38fre+byq63hPMj3sBlABDntdQ5OSAVR2mKJvjElu0fBgg7DRyE/d
+	bejPBjJwqrSTz039gvzCN5uFgAWdkYIIFfKMVjHLjVn8JAn5ffPB5bY3crpszHbcIiywbStOGHH
+	HJ4PhvAkKBA4oNKdlNqSumSSp1Fi5LE3jGLbwBSQ2DBFxp7f5vx1JhYZ6XIjL8xMOUH8Sx5taVW
+	2dV+GDAy42jH20QgcdF8J/Nnc3918a306M1MCeku9roMoiEpKlVG5xJ2xhnVq1YZexzJyZWFX8b
+	A+YL0epwz7YjWtS+1f9XvAXJ6/Dq0HAhZVa2TEOolnNwyODODwndyUEWEwXpf4Wr1nLh8FHfc
+X-Received: by 2002:a05:6870:2e90:b0:468:2c18:a031 with SMTP id 586e51a60fabf-4b75f029d72mr2362162fac.12.1795018058604;
+        Wed, 18 Nov 2026 08:07:38 -0800 (PST)
 Received: from [192.168.11.112] ([96.43.243.130])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm2624231fac.6.2026.11.18.08.07.36
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm2624231fac.6.2026.11.18.08.07.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 08:07:36 -0800 (PST)
+        Wed, 18 Nov 2026 08:07:38 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
- Nathan Chancellor <nathan@kernel.org>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev, stable@vger.kernel.org
-In-Reply-To: <20261115-blk-throttle-wunsequenced-v2-1-1d297c891b82@kernel.org>
-References: <20261115-blk-throttle-wunsequenced-v2-1-1d297c891b82@kernel.org>
-Subject: Re: [PATCH v2] blk-throttle: Avoid unsequenced accesses to jiffies
- in throtl_schedule_pending_timer()
-Message-Id: <179501805630.17649.245726738544852847.b4-ty@b4>
-Date: Wed, 18 Nov 2026 09:07:36 -0700
+To: Damien Le Moal <dlemoal@kernel.org>, Ming Lei <tom.leiming@gmail.com>, 
+ Nilay Shroff <nilay@linux.ibm.com>, Hannes Reinecke <hare@suse.de>, 
+ Qiliang Yuan <qiliang.yuan@linux.dev>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20261114-bug-block-elevator-unchanged-v2-0-5a1fe7d72fa0@linux.dev>
+References: <20261114-bug-block-elevator-unchanged-v2-0-5a1fe7d72fa0@linux.dev>
+Subject: Re: [PATCH v2 0/2] block: make changing to the current I/O
+ scheduler cheap again
+Message-Id: <179501805754.17649.16701221943802051712.b4-ty@b4>
+Date: Wed, 18 Nov 2026 09:07:37 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -106,25 +105,23 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Sun, 15 Nov 2026 20:37:57 -0700, Nathan Chancellor wrote:
-> After a recent improvement in clang to warn on unsequenced accesses to
-> volatile variables [1], two instances appear in
-> throtl_schedule_pending_timer(), which can break the build with
-> CONFIG_WERROR=y / W=e:
+On Sat, 14 Nov 2026 20:58:31 -0500, Qiliang Yuan wrote:
+> Writing the scheduler a queue already uses to queue/scheduler takes
+> about 10 ms and freezes the queue, which stalls I/O on live disks every
+> time a udev rule or tuning tool sets the scheduler unconditionally.
 > 
->   block/blk-throttle.c:469:25: error: unsequenced accesses to volatile qualified 'jiffies' [-Werror,-Wunsequenced]
->     469 |                    expires - jiffies, jiffies);
->         |                              ~~~~~~~  ^
->   block/blk-throttle.c:469:25: error: unsequenced accesses to volatile qualified 'jiffies' [-Werror,-Wunsequenced]
->     469 |                    expires - jiffies, jiffies);
->         |                              ~~~~~~~  ^
+> Patch 1 stops requesting a "none-iosched" module on every write of
+> "none". Patch 2 returns before freezing the queue when the elevator
+> wouldn't change.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] blk-throttle: Avoid unsequenced accesses to jiffies in throtl_schedule_pending_timer()
-      commit: ae1171f38098098e88c13c38e462d27babb50038
+[1/2] block: don't request a module for the none elevator
+      commit: c85f570121c94679854b570cae2c0dbcc0eae43b
+[2/2] block: return early when the elevator doesn't change
+      commit: 375a88c6176ffe05e521c2df31b1ceaf4ae5fbaf
 
 Best regards,
 -- 
