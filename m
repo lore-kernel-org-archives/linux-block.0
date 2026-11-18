@@ -1,58 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794992392;
-	b=e0YMyep6eJwCCQBU9a/9LeYja2WYaSPNUnD2B3aTOeLnJoWfFvhL4DQLOMSwg1AEMvur
-	 lOb4SbTNRdtrBoj+PvMbM+3zEqqrdhTClguw7XofUYf4cQphQs2OJKf/3J8A7f97P4rAx
-	 pbneEDxV1vtDZB3pWa/9sC5aMpd+PYEoaTgNElPxhSo3CzBFCcGPEQ5e+ELp+ZIl0S/aW
-	 pbGkO9VP/gFYbOIHupiy2ShQsMlQWGXp+xdkaHsP8kUQlS/JsScP5Drypdxi51rdm+SjR
-	 BmwnXEtXyXyj/XV8hXYWP4a7g+/hgwULRg/UXWaDcqHj/xl4Rz2FGBan4+/CpvX4K7A==
+	t=1794993143;
+	b=lbB1/mOKFwFZmi0Pd0zNB/qHj434VnkwQ8apq8Ktz23iPhY090T4Qtd/PKq81pyLCRXW
+	 DBWErIonmm1rVQTuWl/wt0gSV11hjhyOg19aQd4zNkL5fxdCz9XMkrBEm4qHpqledKvG8
+	 4Oc9qJkdY+BJfw2zdaFXBWuWKQaEZjp1ndTRFwd1yPVLPrwj0ZTAKHrw/w41wJw4Rdhp1
+	 IU+5GL7dEntjhGMT1nKIBOFVkUYOYIwFpBexgVR6d1d46kam2XYCfiB9AJ57QqM/As9Jw
+	 XA1ZmT+1Pv9xJ452QKFsCwzOHMfF/JhUf/I5TXqL+Z/vhCmdDp9zIexpGRehT7EQk9g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794992392;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:CC:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
-	bh=zDjwPIFBALJRu9G1JpFQxNCh37Ku2FGitfdnf5CWttU=;
-	b=XgtlHz/XhptJpgOSFRInWECSMvdZl2+AsM95Yj11y7A/b29Js3+A70h6tddO2mtfo8um
-	 R9zx/Jq1jk9rr1ypLrv0bQEMrNXP561sqk5wX/y75rrEmoImIzSyBp0T/wBsmXPqOBNCF
-	 zWqa9yIPAeofnsjmowFhgyxBrPmj8oDvYgbZ8SnIvataqnpPdw7sCvVQd3NJtMI42F5cE
-	 JPjKROiod3fvkkwgVA9CvDFq0Y6azPmrokS0JIYgMJL54uTbKg6hYFVOmrrbkOkObfVDP
-	 p5SRbMEz4e8sWZqkXufYtwyskJOATRENeejQgrNUfi3oaq4dk6tPjjNSMqSIj9lE8TA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794993143;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=BI3jlQaoExbnk+vPObY1KIVTTk7LgUYkBG0JnOIqAeo=;
+	b=XhJAtPl1/ovnMx0OiczgpZi5DtxleI7o1/+WMSL1vhJE1za19nyszRi6LEWEqXg4K2Ad
+	 APbLBR5y1EDOLaoKKg3DlRQdDpsJaBSnnAxp1vWEL1hXtiJyELYrH8p4TvhR1Jl0qcIVq
+	 oRz67yy5+D70pVIq2bHDIPxkmZ2uHpZLBNC+InsYe//a/m8jRhTmD1ShzLqvNu95B5ZC5
+	 r8jHitl+u7gmyWiJFwm3zEfKX2PELjuV/68BgzXYHidXRs/QNJ+9GTPAdmPKBfm+Gy0uH
+	 n79GV5bKTtQ7nfpJB/Q3R2PpOxbQTj4ZwLU73e2XHIppsZdo84s7eqLi1fsBCmmbpHA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=YG0f5s+2;
-	arc=none smtp.remote-ip=113.46.200.223
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=dpqsNx8I;
+	arc=none smtp.remote-ip=91.218.175.42
+Received: from mta0.migadu.com (out-42.mta0.migadu.com [91.218.175.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70493606A325;
-	Wed, 18 Nov 2026 08:59:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 70493606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E941B606A886
+	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 09:12:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E941B606A886
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=YG0f5s+2
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=zDjwPIFBALJRu9G1JpFQxNCh37Ku2FGitfdnf5CWttU=;
-	b=YG0f5s+2kvHrKlKCN7CB4HY4p0LT+CaaaGw+BSvo7+/ssB/SQ9sM0FXb1MTh9BFkL9Mv7Wn3S
-	BNOqmdVJd6x1gk7TjCfNf3D3ZpPYsdFv+Yf8GC5xj0argsiNrvpyQ++8NgtWzUN+FazgOOGwEZ0
-	m7pnB1IrMWzbaj4bmorQi1I=
-Received: from mail.maildlp.com (unknown [172.19.163.163])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4jTwWs2RMwzmV6N;
-	Wed, 18 Nov 2026 16:59:21 +0800 (CST)
-Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
-	by mail.maildlp.com (Postfix) with ESMTPS id B45424048B;
-	Wed, 18 Nov 2026 16:59:40 +0800 (CST)
-Received: from [10.67.110.140] (10.67.110.140) by
- whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Wed, 18 Nov 2026 16:59:31 +0800
-Message-ID: <bdc22808-9f22-46f7-b42d-e6bd8e1eeaca@huawei.com>
-Date: Wed, 18 Nov 2026 16:59:29 +0800
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=dpqsNx8I
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=AKmb/ylIwU5QcbIrWMlATiUhIAEOL4n1lsJVBH1e2ac=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794993140; v=1; x=1795597940;
+ b=dpqsNx8IfAg8LjRnnFH9duu7W9N6LhVSpJT7Ox1ugoicShBnt4BLEyDoPK878w9NCi+NprkU
+ gsIO+CKhq/GcHUKqtuVSJxV1C5aZZs9/t2G/DGszBwBN21ZMrTfdEoEIFXQtyvHaEbIShItxz3z
+ uNXzCq8qmziPDPDfj9Vdypdk=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by mta12.migadu.com with ESMTPS id 2edfd5dd97a48bf8;
+	Wed, 18 Nov 2026 09:12:19 +0000
+X-Mizu-Trace-ID: 2edfd5dd97a48bf8
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <ac42e923-06bf-489d-bb9f-2ebec21b20f7@linux.dev>
+Date: Wed, 18 Nov 2026 17:12:15 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -63,131 +59,74 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next -v4 02/17] LSM: pass struct path to the
- inode_setsecctx hook
-To: Al Viro <viro@zeniv.linux.org.uk>
-CC: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
-	<brauner@kernel.org>, <jack@suse.cz>, <amir73il@gmail.com>,
-	<andrii@kernel.org>, <apparmor@lists.ubuntu.com>, <ast@kernel.org>,
-	<axboe@kernel.dk>, <bpf@vger.kernel.org>, <casey@schaufler-ca.com>,
-	<cel@kernel.org>, <cem@kernel.org>, <chenxiaosong@chenxiaosong.com>,
-	<code@tyhicks.com>, <corbet@lwn.net>, <Dai.Ngo@oracle.com>,
-	<dakr@kernel.org>, <daniel@iogearbox.net>, <dhowells@redhat.com>,
-	<dlemoal@kernel.org>, <dmitry.kasatkin@gmail.com>,
-	<driver-core@lists.linux.dev>, <dsterba@suse.com>,
-	<ecryptfs@vger.kernel.org>, <eddyz87@gmail.com>, <emil@etsalapatis.com>,
-	<eric.snowberg@oracle.com>, <exfat@lists.linux.dev>,
-	<georgia.garcia@canonical.com>, <gregkh@linuxfoundation.org>, <hch@lst.de>,
-	<hirofumi@mail.parknet.co.jp>, <hyc.lee@gmail.com>,
-	<ihor.solodrai@linux.dev>, <jlayton@kernel.org>, <jmorris@namei.org>,
-	<johan@kernel.org>, <john.fastabend@gmail.com>,
-	<john.johansen@canonical.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
-	<linkinjeon@kernel.org>, <linux-api@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
-	<linux-cifs@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <linux-unionfs@vger.kernel.org>,
-	<linux-xfs@vger.kernel.org>, <liubaolin12138@163.com>,
-	<martin.lau@linux.dev>, <mason@kernel.org>, <mathieu.desnoyers@efficios.com>,
-	<matt@bobrowski.net>, <memxor@gmail.com>, <mhiramat@kernel.org>,
-	<miklos@szeredi.hu>, <neil@brown.name>, <netfs@lists.linux.dev>,
-	<ntfs@lists.linux.dev>, <okorniev@redhat.com>, <omosnacek@gmail.com>,
-	<penguin-kernel@i-love.sakura.ne.jp>, <rafael@kernel.org>,
-	<rdunlap@infradead.org>, <roberto.sassu@huawei.com>, <rostedt@goodmis.org>,
-	<selinux@vger.kernel.org>, <senozhatsky@chromium.org>, <serge@hallyn.com>,
-	<sj1557.seo@samsung.com>, <skhan@linuxfoundation.org>, <song@kernel.org>,
-	<stephen.smalley.work@gmail.com>, <takedakn@nttdata.co.jp>, <tom@talpey.com>,
-	<yonghong.song@linux.dev>, <yuezhang.mo@sony.com>, <zohar@linux.ibm.com>,
-	<utilityemal77@gmail.com>, <lujialin4@huawei.com>
-References: <20261117150542.1169451-1-caixinchen1@huawei.com>
- <20261117150542.1169451-3-caixinchen1@huawei.com>
- <20261117184342.GR989762@ZenIV> <20261118001641.GA1669148@ZenIV>
-Content-Language: en-US
-From: Cai Xinchen <caixinchen1@huawei.com>
-In-Reply-To: <20261118001641.GA1669148@ZenIV>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- whupemk100010.china.huawei.com (7.152.184.41)
+Subject: Re: [PATCH] blk-mq: run the hw queue synchronously for unplugged
+ scheduler inserts
+To: Qiliang Yuan <qiliang.yuan@linux.dev>
+Cc: Qiliang Yuan <odys.yuan@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ Ming Lei <tom.leiming@gmail.com>, Wen Xiong <wenxiong@linux.ibm.com>,
+ yukuai3@huawei.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ zhuzongzhen@sangfor.com.cn
+References: <20260930-bug-blk-mq-noplug-sched-dispatch-v1-1-ff1e49e52b00@gmail.com>
+ <dfa3f8d1-fa82-4c4b-91bc-e2529fbb5ddc@linux.dev>
+ <20261115022713.391768-1-qiliang.yuan@linux.dev>
+From: Kaitao Cheng <kaitao.cheng@linux.dev>
+In-Reply-To: <20261115022713.391768-1-qiliang.yuan@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Sorry, this is a major issue. I checked the current state of the patchset
-
-- fs/attr.c, fs/open.c, fs/inode.c, fs/utimes.c, fs/namei.c,
-fs/coredump.c, drivers/block/loop.c: nd->path or file->f_path (in loop.c:
-the f_path of the backing file, where file == NULL is intentional).
-
-- drivers/base/devtmpfs.c: the mount point of the parent directory, 
-which contains a directory entry that was just created or is about to be 
-deleted.
-
-- fs/cachefiles/xattr.c: cache->mnt, under which a directory entry is 
-searched.
-
-- fs/ecryptfs: ecryptfs_lower_path(), which is the mount point of the 
-lower-level directory entry itself.
-
-- fs/nfsd: exp->ex_path.mnt, which contains fh_dentry, a value decoded via
-exportfs_decode_fh_raw(exp->ex_path.mnt,...), or exp->ex_path.dentry.
-
-- fs/overlayfs: ovl_upper_mnt(ofs), which contains the actual 
-upper-level directory entry.
-
-There are two places that violate (1), both introduced by this series of 
-patches in ksmbd:
-
-smb2_parent_compressed() and smb_inherit_dacl() pair the directory entry 
-returned by dget_parent()
-
-with path->mnt, and problems arise once that directory entry becomes the 
-root of its mount point.
-
-I will fix these issues in v5 and ensure this invariant.
-
-If you find any place where (1) still does not hold, please point it 
-out, and I
-will fix it.
-
-On 11/18/2026 8:16 AM, Al Viro wrote:
-> On Tue, Nov 17, 2026 at 06:43:42PM +0000, Al Viro wrote:
->> On Tue, Nov 17, 2026 at 11:05:27PM +0800, Cai Xinchen wrote:
->>> The inode_setsecctx hook and its security_inode_setsecctx() caller in
->>> fs/nfsd operate on a dentry even though both have a struct path
->>> available.  Pass a const struct path so that the coming conversion of the
->>> xattr helpers can be reflected in the implementations; for now SELinux
->>> and Smack keep passing path->dentry and &nop_mnt_idmap to
->>> __vfs_setxattr_locked().
->>>
->>> Also document in lsm_hook_defs.h what a struct path argument may be used
->>> for: it can be passed to VFS helpers taking a struct path, but nothing is
->>> guaranteed about path->mnt.
->> No, with the side of Hell, No.
+在 2026/11/15 10:27, Qiliang Yuan 写道:
+> Hi Kaitao,
+> 
+> On Thu, Oct 29, 2026 at 09:09:19PM +0800, Kaitao Cheng wrote:
+>> Our customer ran fio tests with --bs=4K --rw=randwrite --iodepth=1 --numjobs=1
+>> and confirmed that adding bio plugging to __submit_bio() improves performance.
 >>
->>> + * Hooks that take a struct path argument: the VFS only sanctions passing
->>> + * the path to VFS helpers that take a struct path (e.g. notify_change());
->>> + * it makes no guarantees with regard to path->mnt, whose layout and
->>> + * implementation details are subject to change.  Implementations must
->>> + * not rely on its properties.
->> NAKed-by: Al Viro <viro@zeniv.linux.org.uk>
->>
->> If that kind of stuff actually does get passed to any existing hooks, we need
->> to fix that ASAP.  If not, consider that a blanket NAK on any patch series
->> that would introduce such.
->>
->> We are not going there.  At all.  "Must not rely on its properties" ==
->> "must make sure that no existing functions with struct path * arguments
->> ever have such malformed instances passed to them".  Which is not going
->> to be feasible to enforce.  And yes, that very much includes any VFS helpers.
-> To elaborate a bit: correctness of quite a few places does depend upon the
-> following invaraint:
-> 	path->mnt->mnt_sb == path->dentry->d_sb		(1)
-> for all struct path pointers they might possibly run into.  _Some_
-> functions might _currently_ be safe to call with that constraint violated;
-> there's neither a list of such functions nor any promise whatsoever that
-> call that is currently safe in such conditions will remain safe at any
-> later point.
->
-> _IF_ you can guarantee that (1) is not violated, we have something to
-> talk about; otherwise, don't call your object struct path and don't
-> pass it to anything that expects to deal with struct path.
+>> Without bio plugging in __submit_bio():
+>> fio:
+>> __submit_bio                              (17.16%)
+>>   → blk_mq_submit_bio                     (16.80%)
+>>     → blk_mq_run_hw_queue                 (9.97%)
+>>       → blk_mq_delay_run_hw_queue         (9.41%)
+>>         → kblockd_mod_delayed_work_on     (9.13%)
+> [...]
+>> With bio plugging in __submit_bio():
+>> __submit_bio                                (26.94%)
+>>   → __blk_flush_plug                        (21.36%)
+>>     → blk_mq_flush_plug_list                (21.24%)
+>>       → blk_mq_flush_plug_list.part.0       (18.38%)
+>>         → blk_mq_run_hw_queue               (15.34%)
+>>           → blk_mq_sched_dispatch_requests  (14.55%)
+> [...]
+>> Adding bio plugging increased IOPS from 60,000 to 74,000 and reduced latency
+>> from 12.4 µs to 9.5 µs.
+> 
+> Thanks, this is the same pattern on NVMe with an I/O scheduler. Without
+> the plug every request is dispatched by kblockd, with it the submitter
+> dispatches the request itself through blk_mq_run_hw_queue(). This patch
+> leaves __submit_bio() unplugged and runs the queue from the submitter
+> for scheduler inserts, which should give the plugged profile without
+> the plug.
+
+I previously submitted a similar patch that went further, though the
+implementation differs from yours. At the time, it was not intended
+to address the plugging issue introduced by 9cbbac29d752.
+
+For details, see:
+https://lore.kernel.org/all/20261017105400.95967-1-kaitao.cheng@linux.dev/
+
+> Could you run the same fio job on the unplugged kernel with this patch
+> applied? Ming asked earlier whether real devices see a difference, so a
+> Tested-by from an NVMe setup would help if it gets back to about 74K
+> IOPS.
+> 
+
++Cc: zhuzongzhen
+
+zhuzongzhen helped with the testing back then. I'm not sure whether he
+still has the test environment available.
+
+-- 
+Thanks
+Kaitao Cheng
+
