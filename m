@@ -1,59 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794994022;
-	b=T4++sjy6QW9sIntG5mKwupmgdtxKkjEbAGlzxSGD7JYH4c6lVKRfn9fg69IR6ugZwUkN
-	 jcMVoyIdWss7Sv4rsgfA4K+T2+ZFxxVctIUiNYqLAFK2QyilB9A9SvBMWkvGFUQeEadM0
-	 hZ4pv78afzkJuzMbC37w4Ti4J1O2uWO0FJnaYbPamBQudP9l/k4KMMUm/7qLe3eXckGPr
-	 AdN8e0x+a+SKaApFP3iQPRO756d2wNhbc0+B7CiA7jTr9OGFBRRuiiOMJOJtPNvMMyjw1
-	 7YmSHAWSufL/dLrCo7a+uNRvqmN+QBJVtVuO3N3ghp2B94sHJJqA173nxZyKQmgh20Q==
+	t=1794994563;
+	b=uige0oKgeJWHNoG03Q1AnC9RbaARJdL19qZ9Cg6wcaiovz6lJg0OI4jSfLdshI6pv/KA
+	 jNTbX25cpcj4qJwBTfPw+8JDoufK3Fvp/jbnvx0D+tUohfBDDtOjT6dOISs3ecs2GGbYo
+	 G5AThHr8o3ab/U7fSBbVlYmKRXC77kzPLvdQgTB7LxWQH9yN/WhNIVZugbODndFujLfNz
+	 mBMbC3/TqZPWxIx7G3SPse7KNk8zpjbUjizLLu+bDk9ihboeT//pRIrBRvxjDfgQgjgpS
+	 zYvse4vQKSHZ1TPSXiDV5BeuXCMzxHxJKoPJumVuTsxW5B82CRCALk/SKsDf13HgYPA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794994022;
-	h=DMARC-Filter:Received:Received:Received:From:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 References:In-Reply-To:To:Cc:X-Mailer:X-Rspamd-Pre-Result:
-	 X-Rspamd-Queue-Id:X-Rspamd-Pre-Result:X-Rspamd-Action:X-Rspamd-Server:
-	 X-Spam-Level:X-Spamd-Result:X-Spam-Flag:X-Spam-Score;
-	bh=mOFD4t4htn3go1wtln9hHPE1WpTilYczqad29GntHpw=;
-	b=QvPdvydZRD1W6q2V79jBcRetR8X/V7v4EQE8BkJqAgViOb/gahhw5CwjHKwWCDLnr6Zk
-	 J0mKT/OlyzZ3+tE5FbGHKiVjKXex/8DePUMwuhiFZW3QuFJ7w8cS4Lezjwn2zO+k0sd3q
-	 +Wy2/qc5fQA9ci5C4LkXvSlxr68huDO+fp3SigPJJml2RSl+BGQrwFw4Q+oTp0Wm+6leB
-	 3YKqQbdTX8EGZ5DeaGE+H179pFI5RuNJOZgkkivbUC48frUWwkfm95LT1fY32v+j97Ss3
-	 RnCX1U8ew3oEFRqf50+oUm5gP4ye4FgNic7NqnNsf4Th7MuPAFOY7rAL9y3ijAm0IcA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794994563;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=oEtrs9YN++TIvppEtfu/diqt2HKppGf1oq8L8HaJ3VE=;
+	b=JHHT6GeaZBO6zG1NBYKWec1cXinR97AX7khOViQRUydYGKs8oRGE8KnVjaK8LhOUL+ZW
+	 rYalF4yIvB1/GcW3Gh6XFeHnIQQU1RrVXzJKOiPSF/tmESHYxAltdbu8PyNrFbZKEOwoW
+	 ieHmCdmJqFi16QijcxgD4pZ7esxPiMB3xrxcFcFAMWg8QhqrDXE/hVlLi7NE9PhfQa48N
+	 m0UHIkDkylbLWRYiv7HzD98MIKFWkl4feBVjd+nwcBXkE1hu2exRzTREtQqK1NE7gs8si
+	 zlGbHK7KLZ6EWISue9p52Vro7wvl3vAtremgw33zWnDqWGo+aPs65LeSnimlleR9NSw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nahPYjtB;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A77606A325
-	for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 09:27:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 33A77606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id AB62C1F7CC;
-	Wed, 18 Nov 2026 09:26:59 +0000 (UTC)
-Authentication-Results: smtp-out2.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 578831334C;
-	Wed, 18 Nov 2026 09:26:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id W2Y2DGNv/WpZfgAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 18 Nov 2026 09:26:59 +0000
-From: Daniel Wagner <dwagner@suse.de>
-Date: Wed, 18 Nov 2026 10:26:47 +0100
-Subject: [PATCH blktests v2 9/9] contrib/nvme-target-control: add a NetApp
- ONTAP target
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8235B606A31C;
+	Wed, 18 Nov 2026 09:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nahPYjtB
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F321F000C4;
+	Wed, 18 Nov 2026 09:35:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794994563;
+	bh=oEtrs9YN++TIvppEtfu/diqt2HKppGf1oq8L8HaJ3VE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=nahPYjtBD1Iaas2FHy09zfnsVzzPWV2xfnaZM4o2uDixquvqwuHvQ+/o6Lx3RmcT7
+	 A5MLlaaWHi5zeDFe6Pr6Zu/1tZf365UdM7zLPXtacuahcYasmLgD5icYRCqSxPoOAQ
+	 apSPaDPnXbhT/Rjv6/c4yyGGAb3a6EIjZs+gpHbG4KtSnFEboWn87xat6LJyla++Jd
+	 yjbLXh2HQKcIglQe/QgOIjdxO0MlY4PzADbD2mLPuxiLGazQOP1N6OqiCY11zDd0cS
+	 +PtK7soRS49YQWtEbo0XhLlRb2q60FYLSeh5q1DNqhKbRWl7YpSpO779dHK9eKPFp5
+	 s/bgKJ6Xw8nfA==
+Date: Wed, 18 Nov 2026 10:35:40 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Cai Xinchen <caixinchen1@huawei.com>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, mic@digikod.net, gnoack@google.com, 
+	paul@paul-moore.com, jack@suse.cz, amir73il@gmail.com, andrii@kernel.org, 
+	apparmor@lists.ubuntu.com, ast@kernel.org, axboe@kernel.dk, bpf@vger.kernel.org, 
+	casey@schaufler-ca.com, cel@kernel.org, cem@kernel.org, chenxiaosong@chenxiaosong.com, 
+	code@tyhicks.com, corbet@lwn.net, Dai.Ngo@oracle.com, dakr@kernel.org, 
+	daniel@iogearbox.net, dhowells@redhat.com, dlemoal@kernel.org, 
+	dmitry.kasatkin@gmail.com, driver-core@lists.linux.dev, dsterba@suse.com, 
+	ecryptfs@vger.kernel.org, eddyz87@gmail.com, emil@etsalapatis.com, 
+	eric.snowberg@oracle.com, exfat@lists.linux.dev, georgia.garcia@canonical.com, 
+	gregkh@linuxfoundation.org, hch@lst.de, hirofumi@mail.parknet.co.jp, hyc.lee@gmail.com, 
+	ihor.solodrai@linux.dev, jlayton@kernel.org, jmorris@namei.org, johan@kernel.org, 
+	john.fastabend@gmail.com, john.johansen@canonical.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linkinjeon@kernel.org, linux-api@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, liubaolin12138@163.com, 
+	martin.lau@linux.dev, mason@kernel.org, mathieu.desnoyers@efficios.com, 
+	matt@bobrowski.net, memxor@gmail.com, mhiramat@kernel.org, miklos@szeredi.hu, 
+	neil@brown.name, netfs@lists.linux.dev, ntfs@lists.linux.dev, okorniev@redhat.com, 
+	omosnacek@gmail.com, penguin-kernel@i-love.sakura.ne.jp, rafael@kernel.org, 
+	rdunlap@infradead.org, roberto.sassu@huawei.com, rostedt@goodmis.org, 
+	selinux@vger.kernel.org, senozhatsky@chromium.org, serge@hallyn.com, 
+	sj1557.seo@samsung.com, skhan@linuxfoundation.org, song@kernel.org, 
+	stephen.smalley.work@gmail.com, takedakn@nttdata.co.jp, tom@talpey.com, yonghong.song@linux.dev, 
+	yuezhang.mo@sony.com, zohar@linux.ibm.com, utilityemal77@gmail.com, 
+	lujialin4@huawei.com
+Subject: Re: [PATCH -next -v4 02/17] LSM: pass struct path to the
+ inode_setsecctx hook
+Message-ID: <20261118-nordlicht-badeort-daumen-813a1e9fd0b3@brauner>
+References: <20261117150542.1169451-1-caixinchen1@huawei.com>
+ <20261117150542.1169451-3-caixinchen1@huawei.com>
+ <20261117184342.GR989762@ZenIV>
+ <20261118001641.GA1669148@ZenIV>
+ <bdc22808-9f22-46f7-b42d-e6bd8e1eeaca@huawei.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -63,901 +87,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261118-nvme-target-control-v2-9-d191bbbf5dd6@suse.de>
-References: <20261118-nvme-target-control-v2-0-d191bbbf5dd6@suse.de>
-In-Reply-To: <20261118-nvme-target-control-v2-0-d191bbbf5dd6@suse.de>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- Daniel Wagner <dwagner@suse.de>
-X-Mailer: b4 0.16.0
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Queue-Id: AB62C1F7CC
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -4.00
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <bdc22808-9f22-46f7-b42d-e6bd8e1eeaca@huawei.com>
 
-Add a target that configures a NetApp ONTAP storage virtual machine
-through its REST API. It implements list-ports, show-port and set-host,
-and shows how a target that can do less than nvmet works with the tests.
-README.md documents the configuration and the limitations.
+On Wed, Nov 18, 2026 at 04:59:29PM +0800, Cai Xinchen wrote:
+> There are two places that violate (1), both introduced by this series of
+> patches in ksmbd:
+>
+> smb2_parent_compressed() and smb_inherit_dacl() pair the directory entry
+> returned by dget_parent()
+>
+> with path->mnt, and problems arise once that directory entry becomes the
+> root of its mount point.
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- Documentation/running-tests.md                     |   3 +-
- contrib/nvme-target-control/README.md              |  48 +++
- .../nvme_target_control/target.py                  |   1 +
- .../nvme_target_control/targets/ontap.py           | 397 +++++++++++++++++++++
- contrib/nvme-target-control/tests/test_ontap.py    | 357 ++++++++++++++++++
- 5 files changed, 805 insertions(+), 1 deletion(-)
+No, (1) holds there. dget_parent() never leaves the superblock so the
+parent has the same ->d_sb as path->dentry.
 
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index 149b3656d7c8..6ce406a61423 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -306,5 +306,6 @@ If list-ports prints nothing, blktests connects to the address config shows.
-   --dhgroup DHGROUP
- 
- contrib/nvme-target-control implements this interface. It configures a Linux
--nvmet target over ssh and can be extended for other targets, see
-+nvmet target over ssh or a NetApp ONTAP storage virtual machine through its
-+REST API, and can be extended for other targets, see
- contrib/nvme-target-control/README.md.
-diff --git a/contrib/nvme-target-control/README.md b/contrib/nvme-target-control/README.md
-index 8afbfc0be322..9111cb50db54 100644
---- a/contrib/nvme-target-control/README.md
-+++ b/contrib/nvme-target-control/README.md
-@@ -49,6 +49,7 @@ nothing, to run against a target which is configured already.
- | Type | Target |
- | --- | --- |
- | `nvmet` (default) | Linux nvmet target, configured through configfs |
-+| `ontap` | NetApp ONTAP storage virtual machine, through the REST API |
- | `package.module:Class` | A `Target` subclass outside this package |
- 
- ### nvmet
-@@ -81,6 +82,53 @@ The target needs sshd, configfs, losetup and the nvmet modules for the
- transport. The ssh destination may be an alias from the ssh config, `traddr`
- is then its `HostName`.
- 
-+### ontap
-+
-+Configures a storage virtual machine (SVM) of a NetApp ONTAP cluster through
-+the ONTAP REST API. blktests connects over NVMe/TCP to the LIFs of the SVM:
-+
-+    [target]
-+    type = "ontap"
-+    host = "192.0.2.100"
-+    user = "admin"
-+    password_file = "/root/.config/blktests/ontap-password"
-+    svm = "svm1"
-+    aggregate = "aggr1"
-+
-+The first time blktests asks for the subsystem UUID, the target creates the
-+volume and the namespace `/vol/VOLUME/ns1` unless they exist. The volume
-+gets no snapshots: the tests rewrite the namespace, snapshots would fill
-+the volume. Setup creates the subsystem, allows the host and maps the
-+namespace to it. Cleanup deletes the subsystem. The volume and namespace
-+stay for the next run. The target caches the namespace UUID, the SVM UUID
-+and the LIFs in `cache_dir`, and the DH-HMAC-CHAP secrets of the hosts,
-+which ONTAP doesn't return.
-+
-+ONTAP derives the subsystem NQN from the subsystem name: `config
-+--show-subsysnqn` shows the NQN of the subsystem `blktests`. The tests which
-+use other NQNs need the NQN prefix of the SVM. The ports are the NVMe/TCP
-+LIFs, numbered 1 to N by LIF name, each subsystem is reachable on all of
-+them. The target implements `list-ports`, `show-port` and `set-host`.
-+ONTAP can't modify the DH-HMAC-CHAP settings of a host: `set-host` removes
-+the host and adds it again, which drops its connections. ONTAP manages the
-+ANA states and doesn't support SHA-384. The target doesn't set up TLS.
-+
-+| Option | Meaning |
-+| --- | --- |
-+| `host` | cluster management address |
-+| `user` | ONTAP user |
-+| `password_file` | password of `user` in the first line, mode 0600 |
-+| `svm` | the SVM |
-+| `aggregate` | aggregate for the volume, needed if it doesn't exist |
-+| `volume` | volume of the namespace, default `blktests` |
-+| `volume_size` | size of a new volume, default `4G` |
-+| `ns_size` | size of a new namespace, default `2G` |
-+| `verify_tls` | verify the certificate of `host`, default true |
-+| `cache_dir` | default `~/.cache/nvme-target-control` |
-+
-+The user needs the rights to manage volumes, namespaces and NVMe
-+subsystems of the SVM.
-+
- ## Adding a target
- 
- A target is a subclass of `nvme_target_control.target.Target`. It gets the
-diff --git a/contrib/nvme-target-control/nvme_target_control/target.py b/contrib/nvme-target-control/nvme_target_control/target.py
-index 1b3576bffbbf..1661b822e2aa 100644
---- a/contrib/nvme-target-control/nvme_target_control/target.py
-+++ b/contrib/nvme-target-control/nvme_target_control/target.py
-@@ -228,6 +228,7 @@ OPTIONAL_COMMANDS = {
- 
- TARGETS = {
-     'nvmet': 'nvme_target_control.targets.nvmet:NvmetTarget',
-+    'ontap': 'nvme_target_control.targets.ontap:OntapTarget',
- }
- 
- 
-diff --git a/contrib/nvme-target-control/nvme_target_control/targets/ontap.py b/contrib/nvme-target-control/nvme_target_control/targets/ontap.py
-new file mode 100644
-index 000000000000..a39c2e7ca0c0
---- /dev/null
-+++ b/contrib/nvme-target-control/nvme_target_control/targets/ontap.py
-@@ -0,0 +1,397 @@
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (c) 2026 SUSE LLC and contributors
-+"""NetApp ONTAP storage virtual machine (SVM), through the ONTAP REST API.
-+
-+blktests connects over NVMe/TCP to the LIFs of the SVM. [target] options:
-+
-+  host           cluster management address
-+  user           ONTAP user
-+  password_file  file with the password of user in the first line
-+  svm            the SVM
-+  aggregate      aggregate for the volume, needed if it doesn't exist
-+  volume         volume of the namespace, default 'blktests'
-+  volume_size    size of the volume if it is created, default 4G
-+  ns_size        size of the namespace if it is created, default 2G
-+  verify_tls     verify the certificate of host, default true
-+  cache_dir      default ~/.cache/nvme-target-control
-+
-+The first time blktests asks for the subsystem UUID, the target creates the
-+volume, without snapshots, and the namespace /vol/VOLUME/ns1 unless they
-+exist, and caches the namespace UUID, the SVM UUID and the LIFs. Setup
-+creates an NVMe subsystem, allows the host and maps the namespace to it.
-+Cleanup deletes the subsystem. The volume and namespace stay.
-+
-+ONTAP derives the subsystem NQN from the subsystem name and the SVM.
-+'config --show-subsysnqn' shows the NQN of the subsystem 'blktests'. Other
-+NQNs only work with the NQN prefix of the SVM.
-+
-+The ports are the NVMe/TCP LIFs, numbered 1..N by LIF name. Every
-+subsystem is reachable on all of them. Ports can't be added or removed and
-+ONTAP manages the ANA states. ONTAP can't modify the DH-HMAC-CHAP settings
-+of a host: set-host removes the host and adds it again, which drops its
-+connections. The target doesn't set up TLS.
-+"""
-+
-+import base64
-+import json
-+import ssl
-+import time
-+import urllib.error
-+import urllib.parse
-+import urllib.request
-+from pathlib import Path
-+from typing import Any
-+
-+from ..target import Port, Subsystem, Target, dhchap_features
-+
-+NQN_PREFIX = 'nqn.1992-08.com.netapp:sn.{}:subsystem.'
-+DEF_SUBSYSTEM = 'blktests'
-+
-+# The names blktests uses for the DH-HMAC-CHAP hash and DH group, and the
-+# ones ONTAP uses. ONTAP doesn't support SHA-384.
-+HASHES = {
-+    'hmac(sha256)': 'sha_256',
-+    'hmac(sha512)': 'sha_512',
-+}
-+DHGROUPS = {
-+    'null': 'none',
-+    'ffdhe2048': '2048_bit',
-+    'ffdhe3072': '3072_bit',
-+    'ffdhe4096': '4096_bit',
-+    'ffdhe6144': '6144_bit',
-+    'ffdhe8192': '8192_bit',
-+}
-+
-+
-+class OntapError(OSError):
-+    """An ONTAP REST request failed, status is its HTTP status."""
-+
-+    def __init__(self, message: str, status: int = 0) -> None:
-+        super().__init__(message)
-+        self.status = status
-+
-+
-+class OntapTarget(Target):
-+    """NetApp ONTAP storage virtual machine with NVMe/TCP LIFs."""
-+
-+    extra_features = dhchap_features(
-+        [h.removeprefix('hmac(').removesuffix(')') for h in HASHES]
-+        + list(DHGROUPS)
-+    )
-+
-+    def __init__(self, config: dict[str, Any]) -> None:
-+        super().__init__(config)
-+        self.svm = str(config['svm'])
-+        self.volume = str(config.get('volume', 'blktests'))
-+        self.ns_path = f'/vol/{self.volume}/ns1'
-+        cache = Path(
-+            config.get('cache_dir', '~/.cache/nvme-target-control')
-+        ).expanduser()
-+        self.cache_file = cache / f'ontap-{config["host"]}-{self.svm}.json'
-+        # The DH-HMAC-CHAP settings of the hosts, by subsystem name: ONTAP
-+        # doesn't return the secrets, set_host needs them.
-+        self.hosts_file = self.cache_file.with_suffix('.hosts.json')
-+
-+    # REST
-+
-+    def _request(
-+        self,
-+        method: str,
-+        path: str,
-+        body: dict[str, Any] | None = None,
-+        query: dict[str, str] | None = None,
-+    ) -> dict[str, Any]:
-+        url = f'https://{self.config["host"]}/api{path}'
-+        if query:
-+            url += '?' + urllib.parse.urlencode(query)
-+        password = (
-+            Path(self.config['password_file']).read_text().split('\n')[0]
-+        )
-+        auth = f'{self.config["user"]}:{password}'.encode()
-+        req = urllib.request.Request(
-+            url,
-+            method=method,
-+            data=json.dumps(body).encode() if body is not None else None,
-+            headers={
-+                'Authorization': 'Basic ' + base64.b64encode(auth).decode(),
-+                'Accept': 'application/json',
-+                'Content-Type': 'application/json',
-+            },
-+        )
-+        ctx = (
-+            None
-+            if self.config.get('verify_tls', True)
-+            else ssl._create_unverified_context()
-+        )
-+        try:
-+            with urllib.request.urlopen(req, context=ctx, timeout=60) as r:
-+                data = r.read()
-+                status = r.status
-+        except urllib.error.HTTPError as e:
-+            with e:
-+                text = e.read().decode(errors='replace')
-+            raise OntapError(
-+                f'{method} {path}: {e.code} {text}', e.code
-+            ) from None
-+        result: dict[str, Any] = json.loads(data) if data else {}
-+        if status == 202 and 'job' in result:
-+            self._wait_job(result['job']['uuid'])
-+        return result
-+
-+    def _wait_job(self, uuid: str) -> None:
-+        for _ in range(300):
-+            job = self._request('GET', f'/cluster/jobs/{uuid}')
-+            if job['state'] == 'success':
-+                return
-+            if job['state'] == 'failure':
-+                raise OntapError(f'job {uuid}: {job.get("message")}')
-+            time.sleep(1)
-+        raise OntapError(f'job {uuid} did not finish')
-+
-+    def _records(
-+        self, path: str, query: dict[str, str]
-+    ) -> list[dict[str, Any]]:
-+        records: list[dict[str, Any]] = self._request(
-+            'GET', path, query={'svm.name': self.svm, **query}
-+        ).get('records', [])
-+        return records
-+
-+    # Values blktests asks for many times per test: cached
-+
-+    def _cache(self) -> dict[str, Any]:
-+        try:
-+            cache: dict[str, Any] = json.loads(self.cache_file.read_text())
-+            return cache
-+        except (OSError, ValueError):
-+            pass
-+        svm = self._request('GET', '/svm/svms', query={'name': self.svm})
-+        lifs = self._records(
-+            '/network/ip/interfaces',
-+            {'services': 'data_nvme_tcp', 'fields': 'name,ip.address'},
-+        )
-+        cache = {
-+            'svm_uuid': svm['records'][0]['uuid'],
-+            'lifs': [
-+                lif['ip']['address']
-+                for lif in sorted(lifs, key=lambda lif: str(lif['name']))
-+            ],
-+            'ns_uuid': self._namespace_uuid(),
-+        }
-+        self.cache_file.parent.mkdir(parents=True, exist_ok=True)
-+        self.cache_file.write_text(json.dumps(cache))
-+        return cache
-+
-+    def _namespace_uuid(self) -> str:
-+        """Return the UUID of the namespace, create it first if needed."""
-+        ns = self._records(
-+            '/storage/namespaces', {'name': self.ns_path, 'fields': 'uuid'}
-+        )
-+        if ns:
-+            return str(ns[0]['uuid'])
-+        if not self._records('/storage/volumes', {'name': self.volume}):
-+            self._request(
-+                'POST',
-+                '/storage/volumes',
-+                {
-+                    'name': self.volume,
-+                    'svm': {'name': self.svm},
-+                    'aggregates': [{'name': self.config['aggregate']}],
-+                    'size': self.config.get('volume_size', '4G'),
-+                    # The tests rewrite the namespace: snapshots of it
-+                    # would fill the volume and fail the writes
-+                    'snapshot_policy': {'name': 'none'},
-+                    'space': {'snapshot': {'reserve_percent': 0}},
-+                },
-+            )
-+        self._request(
-+            'POST',
-+            '/storage/namespaces',
-+            {
-+                'svm': {'name': self.svm},
-+                'name': self.ns_path,
-+                'os_type': 'linux',
-+                'space': {'size': self.config.get('ns_size', '2G')},
-+            },
-+        )
-+        return self._namespace_uuid()
-+
-+    def traddr(self) -> str:
-+        return str(self._cache()['lifs'][0])
-+
-+    def subsysnqn(self) -> str:
-+        return self._nqn_prefix() + DEF_SUBSYSTEM
-+
-+    def subsys_uuid(self) -> str:
-+        return str(self._cache()['ns_uuid'])
-+
-+    def _nqn_prefix(self) -> str:
-+        return NQN_PREFIX.format(self._cache()['svm_uuid'].replace('-', ''))
-+
-+    def _name(self, subsysnqn: str) -> str:
-+        """Return the subsystem name ONTAP derives subsysnqn from."""
-+        prefix = self._nqn_prefix()
-+        if not subsysnqn.startswith(prefix):
-+            raise OntapError(
-+                f'{subsysnqn}: ONTAP subsystem NQNs start with {prefix}'
-+            )
-+        return subsysnqn[len(prefix) :]
-+
-+    # Subsystems
-+
-+    def _subsystem(self, name: str) -> dict[str, Any] | None:
-+        subsys = self._records('/protocols/nvme/subsystems', {'name': name})
-+        return subsys[0] if subsys else None
-+
-+    def _delete_subsystem(self, uuid: str) -> None:
-+        self._request(
-+            'DELETE',
-+            f'/protocols/nvme/subsystems/{uuid}',
-+            query={
-+                'allow_delete_while_mapped': 'true',
-+                'allow_delete_with_hosts': 'true',
-+            },
-+        )
-+
-+    def setup(
-+        self, subsys: Subsystem, nr_ports: int = 1, tls: str = 'none'
-+    ) -> None:
-+        if tls != 'none':
-+            raise NotImplementedError('OntapTarget does not set up TLS')
-+        name = self._name(subsys.nqn)
-+        # A subsystem left by an aborted run would keep the namespace
-+        stale = self._records(
-+            '/protocols/nvme/subsystem-maps',
-+            {
-+                'namespace.name': self.ns_path,
-+                'fields': 'subsystem.name,subsystem.uuid',
-+            },
-+        )
-+        for m in stale:
-+            if not m['subsystem']['name'].startswith(DEF_SUBSYSTEM):
-+                raise OntapError(
-+                    f'{self.ns_path} is mapped to {m["subsystem"]["name"]}'
-+                )
-+            self._delete_subsystem(m['subsystem']['uuid'])
-+
-+        chap = {}
-+        if subsys.hostkey:
-+            chap['host_secret_key'] = subsys.hostkey
-+        if subsys.ctrlkey:
-+            chap['controller_secret_key'] = subsys.ctrlkey
-+        self._request(
-+            'POST',
-+            '/protocols/nvme/subsystems',
-+            {
-+                'svm': {'name': self.svm},
-+                'name': name,
-+                'os_type': 'linux',
-+                'hosts': [self._host(subsys.hostnqn, chap)],
-+            },
-+        )
-+        hosts = self._hosts()
-+        hosts[name] = {subsys.hostnqn: chap}
-+        self._save_hosts(hosts)
-+        self._request(
-+            'POST',
-+            '/protocols/nvme/subsystem-maps',
-+            {
-+                'svm': {'name': self.svm},
-+                'subsystem': {'name': name},
-+                'namespace': {'name': self.ns_path},
-+            },
-+        )
-+
-+    def cleanup(self, subsysnqn: str) -> None:
-+        name = self._name(subsysnqn)
-+        subsys = self._subsystem(name)
-+        if subsys:
-+            self._delete_subsystem(subsys['uuid'])
-+        hosts = self._hosts()
-+        if hosts.pop(name, None) is not None:
-+            self._save_hosts(hosts)
-+
-+    # Hosts
-+
-+    @staticmethod
-+    def _host(hostnqn: str, chap: dict[str, str]) -> dict[str, Any]:
-+        for field in ('host_secret_key', 'controller_secret_key'):
-+            # DHHC-1:02: is a secret transformed with SHA-384
-+            if chap.get(field, '').startswith('DHHC-1:02:'):
-+                raise OntapError('ONTAP does not support SHA-384 secrets')
-+        host: dict[str, Any] = {'nqn': hostnqn}
-+        if chap:
-+            host['dh_hmac_chap'] = chap
-+        return host
-+
-+    def _hosts(self) -> dict[str, dict[str, dict[str, str]]]:
-+        try:
-+            hosts: dict[str, dict[str, dict[str, str]]] = json.loads(
-+                self.hosts_file.read_text()
-+            )
-+            return hosts
-+        except (OSError, ValueError):
-+            return {}
-+
-+    def _save_hosts(self, hosts: dict[str, dict[str, dict[str, str]]]) -> None:
-+        self.hosts_file.parent.mkdir(parents=True, exist_ok=True)
-+        # The file holds secrets
-+        self.hosts_file.touch(mode=0o600)
-+        self.hosts_file.write_text(json.dumps(hosts))
-+
-+    def set_host(self, hostnqn: str, attrs: dict[str, str]) -> None:
-+        """Change the DH-HMAC-CHAP settings of the host.
-+
-+        ONTAP can't modify them: remove the host from the subsystems setup
-+        created and add it again. This drops the connections of the host
-+        to these subsystems; the host reconnects.
-+        """
-+        fields = {
-+            'hostkey': ('host_secret_key', None),
-+            'ctrlkey': ('controller_secret_key', None),
-+            'hash': ('hash_function', HASHES),
-+            'dhgroup': ('group_size', DHGROUPS),
-+        }
-+        hosts = self._hosts()
-+        for name, subsys_hosts in hosts.items():
-+            if hostnqn not in subsys_hosts:
-+                continue
-+            # Change a copy: the host keeps its settings if one is invalid
-+            chap = dict(subsys_hosts[hostnqn])
-+            for attr, value in attrs.items():
-+                field, names = fields[attr]
-+                if not value:
-+                    chap.pop(field, None)
-+                elif names is None:
-+                    chap[field] = value
-+                elif value in names:
-+                    chap[field] = names[value]
-+                else:
-+                    raise OntapError(f'ONTAP does not support {attr} {value}')
-+            host = self._host(hostnqn, chap)
-+            subsys_hosts[hostnqn] = chap
-+            subsys = self._subsystem(name)
-+            if not subsys:
-+                continue
-+            path = f'/protocols/nvme/subsystems/{subsys["uuid"]}/hosts'
-+            quoted = urllib.parse.quote(hostnqn, safe='')
-+            try:
-+                self._request('DELETE', f'{path}/{quoted}')
-+            except OntapError as e:
-+                # Gone if an earlier set-host failed to add it again
-+                if e.status != 404:
-+                    raise
-+            self._request('POST', path, host)
-+        self._save_hosts(hosts)
-+
-+    # Ports: the LIFs
-+
-+    def list_ports(self, subsysnqn: str) -> list[str]:
-+        if not self._subsystem(self._name(subsysnqn)):
-+            return []
-+        return [str(i) for i in range(1, len(self._cache()['lifs']) + 1)]
-+
-+    def show_port(self, port: str) -> Port:
-+        lifs = self._cache()['lifs']
-+        if not port.isdigit() or not 1 <= int(port) <= len(lifs):
-+            raise OntapError(f'no port {port}')
-+        return Port('tcp', lifs[int(port) - 1], self.value('trsvid'))
-diff --git a/contrib/nvme-target-control/tests/test_ontap.py b/contrib/nvme-target-control/tests/test_ontap.py
-new file mode 100644
-index 000000000000..e202b3e16fbe
---- /dev/null
-+++ b/contrib/nvme-target-control/tests/test_ontap.py
-@@ -0,0 +1,357 @@
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (c) 2026 SUSE LLC and contributors
-+"""Tests for the ONTAP target, against a fake ONTAP REST API."""
-+
-+import base64
-+import io
-+import json
-+import sys
-+import tempfile
-+import unittest
-+import urllib.error
-+import urllib.parse
-+import urllib.request
-+import uuid
-+from pathlib import Path
-+from typing import Any
-+from unittest import mock
-+
-+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-+
-+from nvme_target_control import target
-+from nvme_target_control.target import Subsystem
-+from nvme_target_control.targets import ontap
-+
-+SVM_UUID = 'd714f2f5-ab77-11ed-af12-00a0988fb732'
-+PREFIX = 'nqn.1992-08.com.netapp:sn.d714f2f5ab7711edaf1200a0988fb732'
-+NQN = PREFIX + ':subsystem.blktests'
-+HOSTNQN = 'nqn.2014-08.org.nvmexpress:uuid:57c34e91'
-+KEY = 'DHHC-1:01:aGVsbG8gd29ybGQgaGVsbG8gd29ybGQgaGVsbG8hISEhTr8=:'
-+KEY2 = 'DHHC-1:00:YW5vdGhlciBrZXkgYW5vdGhlciBrZXkgYW5vdGhlciEhIUV8=:'
-+
-+
-+class Response(io.BytesIO):
-+    def __init__(self, status: int, body: dict[str, Any] | None) -> None:
-+        super().__init__(
-+            json.dumps(body).encode() if body is not None else b''
-+        )
-+        self.status = status
-+
-+
-+def records(r: list[dict[str, Any]]) -> tuple[int, dict[str, Any]]:
-+    """A collection GET reply."""
-+    return 200, {'records': r, 'num_records': len(r)}
-+
-+
-+class FakeOntap:
-+    """The REST resources the ONTAP target uses, in memory."""
-+
-+    def __init__(self) -> None:
-+        self.requests: list[tuple[str, str, dict[str, Any] | None]] = []
-+        self.auth: list[str] = []
-+        self.contexts: list[Any] = []
-+        self.lifs = [
-+            {'name': 'lif-b', 'ip': {'address': '192.0.2.2'}},
-+            {'name': 'lif-a', 'ip': {'address': '192.0.2.1'}},
-+        ]
-+        self.volumes: dict[str, dict[str, Any]] = {}
-+        self.namespaces: dict[str, str] = {}
-+        self.subsystems: dict[str, dict[str, Any]] = {}
-+        self.maps: dict[str, str] = {}  # namespace name -> subsystem name
-+        self.job_state = 'success'
-+
-+    def urlopen(
-+        self,
-+        req: urllib.request.Request,
-+        context: Any = None,
-+        timeout: int = 0,
-+    ) -> Response:
-+        url = urllib.parse.urlsplit(req.full_url)
-+        query = dict(urllib.parse.parse_qsl(url.query))
-+        body = (
-+            json.loads(req.data)  # type: ignore[arg-type]
-+            if req.data
-+            else None
-+        )
-+        method = req.get_method()
-+        path = urllib.parse.unquote(url.path.removeprefix('/api'))
-+        self.requests.append((method, path, body))
-+        self.auth.append(req.get_header('Authorization') or '')
-+        self.contexts.append(context)
-+        status, result = self.handle(method, path, query, body)
-+        if status >= 400:
-+            raise urllib.error.HTTPError(
-+                req.full_url,
-+                status,
-+                'error',
-+                {},  # type: ignore[arg-type]
-+                io.BytesIO(json.dumps(result).encode()),
-+            )
-+        return Response(status, result)
-+
-+    def handle(
-+        self,
-+        method: str,
-+        path: str,
-+        query: dict[str, str],
-+        body: dict[str, Any] | None,
-+    ) -> tuple[int, dict[str, Any] | None]:
-+        if (method, path) == ('GET', '/svm/svms'):
-+            return records([{'uuid': SVM_UUID, 'name': query['name']}])
-+        if (method, path) == ('GET', '/network/ip/interfaces'):
-+            return records(self.lifs)
-+        if path == '/storage/volumes':
-+            if method == 'POST':
-+                assert body is not None
-+                self.volumes[body['name']] = body
-+                return 202, {'job': {'uuid': 'job-1'}}
-+            vols = [{'name': query['name']}] * (query['name'] in self.volumes)
-+            return records(vols)
-+        if path.startswith('/cluster/jobs/'):
-+            return 200, {'state': self.job_state, 'message': 'no space'}
-+        if path == '/storage/namespaces':
-+            if method == 'POST':
-+                assert body is not None
-+                self.namespaces[body['name']] = str(uuid.uuid4())
-+                return 201, None
-+            name = query['name']
-+            if name not in self.namespaces:
-+                return records([])
-+            return records([{'uuid': self.namespaces[name]}])
-+        if path == '/protocols/nvme/subsystem-maps':
-+            if method == 'POST':
-+                assert body is not None
-+                self.maps[body['namespace']['name']] = body['subsystem'][
-+                    'name'
-+                ]
-+                return 201, None
-+            subsys = self.maps.get(query['namespace.name'])
-+            if subsys is None:
-+                return records([])
-+            uid = self.subsystems[subsys]['uuid']
-+            return records([{'subsystem': {'name': subsys, 'uuid': uid}}])
-+        if path == '/protocols/nvme/subsystems':
-+            if method == 'POST':
-+                assert body is not None
-+                self.subsystems[body['name']] = {
-+                    'uuid': str(uuid.uuid4()),
-+                    'hosts': {h['nqn']: h for h in body['hosts']},
-+                }
-+                return 201, None
-+            name = query['name']
-+            if name not in self.subsystems:
-+                return records([])
-+            return records([{'name': name, **self.subsystems[name]}])
-+        parts = path.split('/')
-+        found = [
-+            n for n, s in self.subsystems.items() if s['uuid'] == parts[4]
-+        ]
-+        if not found:
-+            return 404, {'error': {'message': 'no subsystem'}}
-+        subsys = found[0]
-+        hosts = self.subsystems[subsys]['hosts']
-+        if method == 'DELETE' and len(parts) == 5:
-+            del self.subsystems[subsys]
-+            self.maps = {k: v for k, v in self.maps.items() if v != subsys}
-+            return 200, None
-+        if method == 'DELETE':
-+            if parts[6] not in hosts:
-+                return 404, {'error': {'message': 'no host'}}
-+            del hosts[parts[6]]
-+            return 200, None
-+        assert body is not None
-+        hosts[body['nqn']] = body
-+        return 201, None
-+
-+
-+class OntapTestCase(unittest.TestCase):
-+    def setUp(self) -> None:
-+        tmp = tempfile.TemporaryDirectory()
-+        self.addCleanup(tmp.cleanup)
-+        self.tmp = Path(tmp.name)
-+        (self.tmp / 'password').write_text('secret\n')
-+        self.fake = FakeOntap()
-+        patch = mock.patch.object(urllib.request, 'urlopen', self.fake.urlopen)
-+        patch.start()
-+        self.addCleanup(patch.stop)
-+
-+    def target(self, **config: Any) -> ontap.OntapTarget:
-+        cfg = {
-+            'type': 'ontap',
-+            'host': '192.0.2.100',
-+            'user': 'admin',
-+            'password_file': str(self.tmp / 'password'),
-+            'svm': 'svm1',
-+            'aggregate': 'aggr1',
-+            'cache_dir': str(self.tmp / 'cache'),
-+            **config,
-+        }
-+        tgt = target.create(cfg)
-+        assert isinstance(tgt, ontap.OntapTarget)
-+        return tgt
-+
-+    def subsys(self, **keys: str) -> Subsystem:
-+        tgt = self.target()
-+        return Subsystem(NQN, tgt.value('subsys_uuid'), HOSTNQN, **keys)
-+
-+
-+class TestOntapConfig(OntapTestCase):
-+    def test_values(self) -> None:
-+        tgt = self.target()
-+        self.assertEqual(tgt.value('traddr'), '192.0.2.1')
-+        self.assertEqual(tgt.value('trsvid'), '4420')
-+        self.assertEqual(tgt.value('subsysnqn'), NQN)
-+        self.assertEqual(
-+            tgt.value('subsys_uuid'), self.fake.namespaces['/vol/blktests/ns1']
-+        )
-+        self.assertEqual(
-+            tgt.features(),
-+            [
-+                'list-ports',
-+                'show-port',
-+                'set-host',
-+                'dhchap-sha256',
-+                'dhchap-sha512',
-+                'dhchap-null',
-+                'dhchap-ffdhe2048',
-+                'dhchap-ffdhe3072',
-+                'dhchap-ffdhe4096',
-+                'dhchap-ffdhe6144',
-+                'dhchap-ffdhe8192',
-+            ],
-+        )
-+
-+    def test_creates_volume_without_snapshots(self) -> None:
-+        self.target(volume='bt', ns_size='1G').value('subsys_uuid')
-+        vol = self.fake.volumes['bt']
-+        self.assertEqual(vol['aggregates'], [{'name': 'aggr1'}])
-+        self.assertEqual(vol['snapshot_policy'], {'name': 'none'})
-+        self.assertEqual(vol['space'], {'snapshot': {'reserve_percent': 0}})
-+        self.assertIn('/vol/bt/ns1', self.fake.namespaces)
-+
-+    def test_cached(self) -> None:
-+        self.target().value('subsys_uuid')
-+        nr = len(self.fake.requests)
-+        tgt = self.target()
-+        for name in ['traddr', 'subsysnqn', 'subsys_uuid']:
-+            tgt.value(name)
-+        self.assertEqual(len(self.fake.requests), nr)
-+
-+    def test_request(self) -> None:
-+        self.target(verify_tls=False).value('traddr')
-+        auth = base64.b64encode(b'admin:secret').decode()
-+        self.assertEqual(set(self.fake.auth), {'Basic ' + auth})
-+        self.assertTrue(all(c is not None for c in self.fake.contexts))
-+        self.fake.contexts.clear()
-+        self.target(cache_dir=str(self.tmp / 'c2')).value('traddr')
-+        self.assertTrue(all(c is None for c in self.fake.contexts))
-+
-+    def test_job_failure(self) -> None:
-+        self.fake.job_state = 'failure'
-+        with self.assertRaisesRegex(ontap.OntapError, 'no space'):
-+            self.target().value('subsys_uuid')
-+
-+
-+class TestOntapSubsystems(OntapTestCase):
-+    def test_setup_cleanup(self) -> None:
-+        tgt = self.target()
-+        tgt.setup(self.subsys(hostkey=KEY, ctrlkey=KEY2), 4)
-+        subsys = self.fake.subsystems['blktests']
-+        self.assertEqual(
-+            subsys['hosts'][HOSTNQN]['dh_hmac_chap'],
-+            {'host_secret_key': KEY, 'controller_secret_key': KEY2},
-+        )
-+        self.assertEqual(self.fake.maps, {'/vol/blktests/ns1': 'blktests'})
-+        self.assertEqual(tgt.list_ports(NQN), ['1', '2'])
-+        self.assertEqual(
-+            tgt.show_port('2'), target.Port('tcp', '192.0.2.2', '4420')
-+        )
-+        self.assertEqual(tgt.hosts_file.stat().st_mode & 0o777, 0o600)
-+
-+        tgt.cleanup(NQN)
-+        self.assertEqual((self.fake.subsystems, self.fake.maps), ({}, {}))
-+        self.assertEqual(tgt.list_ports(NQN), [])
-+        self.assertEqual(json.loads(tgt.hosts_file.read_text()), {})
-+
-+    def test_stale_subsystem(self) -> None:
-+        tgt = self.target()
-+        tgt.setup(self.subsys())
-+        tgt.setup(self.subsys())
-+        self.assertEqual(list(self.fake.subsystems), ['blktests'])
-+        self.fake.maps['/vol/blktests/ns1'] = 'other'
-+        self.fake.subsystems['other'] = {'uuid': 'u', 'hosts': {}}
-+        with self.assertRaisesRegex(ontap.OntapError, 'mapped to other'):
-+            tgt.setup(self.subsys())
-+
-+    def test_unsupported(self) -> None:
-+        tgt = self.target()
-+        with self.assertRaisesRegex(ontap.OntapError, 'start with'):
-+            tgt.setup(Subsystem('nqn.foo', 'u', HOSTNQN))
-+        with self.assertRaises(NotImplementedError):
-+            tgt.setup(self.subsys(), tls='required')
-+        with self.assertRaisesRegex(ontap.OntapError, 'no port 3'):
-+            tgt.show_port('3')
-+        with self.assertRaises(NotImplementedError):
-+            tgt.set_ana('1', 1, 'optimized')
-+
-+
-+class TestOntapSetHost(OntapTestCase):
-+    def chap(self) -> dict[str, str]:
-+        hosts = self.fake.subsystems['blktests']['hosts']
-+        chap: dict[str, str] = hosts[HOSTNQN]['dh_hmac_chap']
-+        return chap
-+
-+    def test_set_host(self) -> None:
-+        tgt = self.target()
-+        tgt.setup(self.subsys(hostkey=KEY))
-+        tgt.set_host(HOSTNQN, {'hash': 'hmac(sha512)', 'dhgroup': 'ffdhe8192'})
-+        self.assertEqual(
-+            self.chap(),
-+            {
-+                'host_secret_key': KEY,
-+                'hash_function': 'sha_512',
-+                'group_size': '8192_bit',
-+            },
-+        )
-+        # A new target, as for the next command, knows the secrets
-+        self.target().set_host(HOSTNQN, {'hostkey': KEY2, 'ctrlkey': KEY})
-+        self.assertEqual(self.chap()['host_secret_key'], KEY2)
-+        self.assertEqual(self.chap()['controller_secret_key'], KEY)
-+        deletes = [r for r in self.fake.requests if r[0] == 'DELETE']
-+        self.assertEqual(len(deletes), 2)
-+
-+    def test_unsupported_hash(self) -> None:
-+        tgt = self.target()
-+        tgt.setup(self.subsys(hostkey=KEY))
-+        with self.assertRaisesRegex(ontap.OntapError, 'hmac.sha384'):
-+            tgt.set_host(HOSTNQN, {'hash': 'hmac(sha384)'})
-+
-+    def test_sha384_secret(self) -> None:
-+        tgt = self.target()
-+        with self.assertRaisesRegex(ontap.OntapError, 'SHA-384 secrets'):
-+            tgt.setup(self.subsys(hostkey='DHHC-1:02:abc:'))
-+        tgt.setup(self.subsys(hostkey=KEY))
-+        with self.assertRaisesRegex(ontap.OntapError, 'SHA-384 secrets'):
-+            tgt.set_host(HOSTNQN, {'ctrlkey': 'DHHC-1:02:abc:'})
-+        # The host is still allowed with the old key
-+        self.assertEqual(self.chap(), {'host_secret_key': KEY})
-+
-+    def test_host_already_removed(self) -> None:
-+        tgt = self.target()
-+        tgt.setup(self.subsys(hostkey=KEY))
-+        del self.fake.subsystems['blktests']['hosts'][HOSTNQN]
-+        tgt.set_host(HOSTNQN, {'hostkey': KEY2})
-+        self.assertEqual(self.chap(), {'host_secret_key': KEY2})
-+
-+    def test_http_error(self) -> None:
-+        tgt = self.target()
-+        tgt.setup(self.subsys())
-+        self.fake.subsystems['blktests']['uuid'] = 'gone'
-+        self.fake.subsystems['x'] = {'uuid': 'other', 'hosts': {}}
-+        with self.assertRaises(ontap.OntapError) as e:
-+            tgt._delete_subsystem('missing')
-+        self.assertEqual(e.exception.status, 404)
-+
-+
-+if __name__ == '__main__':
-+    unittest.main()
-
--- 
-2.56.1
-
+What happens at the root of a mount is that the parent isn't below
+path->mnt->mnt_root anymore. That's a different property and struct path
+doesn't guarantee that (open_by_handle_at(), nfsd with
+no_subtree_check). So there's nothing to fix for (1) in those two.
