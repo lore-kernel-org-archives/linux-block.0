@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.99
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795071967;
-	b=zcQY2sBL8PZKNFkv3452nynW2Ay5k+85uZ/TXoKB+UkN+qpENhizRULsAuUOlNLD1iM6
-	 Wa0BfVthY4kzrzJF5/H+0h3loFiOTsZ/cJMOHyBpia4KbnsCFAf246hpMDob9henGUrje
-	 d3KOzNfiTNUnippZjTI/L96ijPI0mZANevqcY4dTH/j5F6ei8bc6ZYaaWzlGDfxUDg6DR
-	 6ERtE965y8k3u6ekrBWf5mIUgV5P5iBew7x69FYbmPpBIPCjC+vtDVv7IzmtIJYwDxg6a
-	 W4O1vGD//oVrlgZnhCcUq3nXVE2PYcwLha1hMlJy+BwPjXuASmAV0/NZ2uo+MNwTWQg==
+	t=1795071968;
+	b=N98gPFVYo+5DzPaScy7vIRpsDI2T8CGgEtUXiSwRtAHqlHwUP/O1MGFl9Q23QD9BOh3Y
+	 2TWBV7ScCJ3S2QYTz0ZPeksE9NzKn97QYTGAw0TiAxSCwDz3kza1CcnCq17Lom7uqWBHJ
+	 a4I2QzOo53RtxX35GQY43Osi7/wlA3OLzVoX7CVYyV/PzHlxIewH1ACMqrUXpwAIalQyR
+	 0P14YvmqZTCelcqt2AeK2LF8e2kTifsQMOfmBOnNRgzgMVG6RBJrI/bhDvDC87zvT7tVd
+	 mtO8N+vPpFQTmgAkP+KXnEB0wZnVfqyktxp9/ba9cztd96iaguQenTRMeKzfGGvPlQw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795071967;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795071968;
 	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:From:To:Cc:
 	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=b2oHOKkIVIFYmxWgnb/5q+IHBUc+S62NOaQv/v8cd7M=;
-	b=eb8WXVESd0UmhhVv46DrKp3bdqbF/jJvCSoY9FWrbMAIKSCj7CQybZ28LPuTZN67VPUo
-	 dQASmiVMRTcbMcQ5BlQbY5z3ogxCzO+5W1XrEg8OTI/rzbswKOV6stK3lC4oXOlSP7Tg6
-	 V+nAV6lOP3dks7KJXnqS14YwE+bgRBMYQf3t44C39Way29KTbUHNCQ/fepp6oGpC+G+/9
-	 qkWiGn7zSF78bu0A5TVFpS1j7h2flxmKD0cwKeHmKHNBXlH/8ELwaCCSXRlmPtJd/HEHp
-	 r+iL4KzWJsB22CJYscsxDjOENtDF7yom3LGS6Rz1WD34G2XqMj2kIFTaDGozJ6Bt4QQ==
+	bh=V+8xx5GM+ujOa1laZ12P0srdFBwzc8hmmfbg6tCKZp0=;
+	b=fCWh6jRz0W67sBf11gpW+yT/mmx3sNlP06/3p+S50JvHFPWOYA8vV99koWkHkV64nBaY
+	 cmbQeNlBUh70Er66t8Acs2ssWCN9XWMHU92FYRAc5dZKTIAdCL6d2mMT2NsvYQwlCvlw6
+	 +Mj9c2InjAKTUQH5sw/e2h1T7coJKQE48F9o+mBZblNJQXcUO/6O42/z871mOsqXa4ohi
+	 aDuFMwxt/GuJFYjL/GtJQ4azD+n0ERMVe3eC09mBfX0jBwjY25cepAaTH880/cvk6vYYq
+	 IehpJ9a2XthtlXjGcf6KYerk1nE1bjBCsFjZ8qPKOV/R2NEjTzemJf/sQGL54UKg2rQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.alibaba.com;
 	spf=pass smtp.mailfrom=linux.alibaba.com;
-	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=mDkXs+U6;
+	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=cj7n5sAW;
 	arc=none smtp.remote-ip=115.124.30.99
 Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A764606A32F
-	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 07:06:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A764606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562D2606A325
+	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 07:06:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 562D2606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=mDkXs+U6
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=cj7n5sAW
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1795071963; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=b2oHOKkIVIFYmxWgnb/5q+IHBUc+S62NOaQv/v8cd7M=;
-	b=mDkXs+U6dAJU7GBt/qW4bF//FoUiXIZwOkPD8LCnJUYU+X1vUvzciJGRypYaroKBCJ8576itQGWJDk8djZdR7aVZPIvwplsiPWh9r1pVc2JBw98E2IIgTTX3PWE/K9lliwOs4JQRDir3Q2d6LYdTfiT6/CAmMUzImx04xI1l2Do=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R821e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037033178;MF=kanie@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0XF2mP1k_1795071961;
-Received: from localhost(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0XF2mP1k_1795071961 cluster:ay36)
+	t=1795071958; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=V+8xx5GM+ujOa1laZ12P0srdFBwzc8hmmfbg6tCKZp0=;
+	b=cj7n5sAW0vQyzs9rSVWwerOZdOoeu0IInHoK7oTw9LuQnww8qBz1WBWi2A5ZttaVMGwFkEpxxhniQnzo3jzoAGip2L8bOn7VpqZ2t9uEkQad9d60+XLPeqjK7z2uhpNRtLwCWDtOGB4FgKYfE1YJ3VcGSJIHavhmRfNaliNIIsg=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R611e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=kanie@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0XF2mP.R_1795071956;
+Received: from localhost(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0XF2mP.R_1795071956 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Thu, 19 Nov 2026 15:06:02 +0800
+          Thu, 19 Nov 2026 15:05:56 +0800
 From: Guixin Liu <kanie@linux.alibaba.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
@@ -51,9 +51,9 @@ To: Jens Axboe <axboe@kernel.dk>,
 	Ming Lei <ming.lei@redhat.com>,
 	Hannes Reinecke <hare@suse.de>
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 7/7] blk-mq: unpublish the tags before deferring their free to SRCU
-Date: Thu, 19 Nov 2026 15:05:48 +0800
-Message-ID: <20261119070548.3125491-8-kanie@linux.alibaba.com>
+Subject: [PATCH 1/7] blk-mq: free the rqs arrays of tags in the SRCU callback
+Date: Thu, 19 Nov 2026 15:05:42 +0800
+Message-ID: <20261119070548.3125491-2-kanie@linux.alibaba.com>
 X-Mailer: git-send-email 2.43.7
 In-Reply-To: <20261119070548.3125491-1-kanie@linux.alibaba.com>
 References: <20261119070548.3125491-1-kanie@linux.alibaba.com>
@@ -68,49 +68,107 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-__blk_mq_free_map_and_rqs() frees set->tags[hctx_idx] first, which
-starts the tags_srcu grace period, and only then stores NULL into the
-slot. The store is a plain store, unordered against the plain load in
-blk_mq_tagset_busy_iter(), which reads set->tags[i] to find the tags to
-walk. A reader that enters the SRCU read side after the grace period
-snapshot, but still loads the old, non-NULL pointer, is not waited for
-by that grace period, so blk_mq_free_tags_callback() can free the tags
-and everything they point to while the iterator is about to walk them.
+struct blk_mq_tags and the requests are kept alive until the iterators
+under tags_srcu are gone, and the bitmaps were recently moved into that
+SRCU callback as well, but the tags->rqs[] and tags->static_rqs[] arrays
+are still freed right away by blk_mq_free_rq_map(). An iterator holding
+a tags pointer dereferences both arrays per set bit, e.g.
+blk_mq_find_and_get_req(), so when the number of hardware queues shrinks
+the arrays can be freed while blk_mq_tagset_busy_iter() is about to walk
+them.
 
-blk_mq_tagset_busy_iter() is reachable from the nvme and scsi timeout
-and error recovery paths without any queue freeze gating the free, so
-nothing else serializes the two.
+Free both arrays in the SRCU callback together with the bitmaps. With
+that blk_mq_free_rq_map() is a trivial wrapper of blk_mq_free_tags(),
+so drop it and call blk_mq_free_tags() directly.
 
-Clear set->tags[hctx_idx] before blk_mq_free_map_and_rqs(), so a reader
-either sees NULL and skips the tags, or loads the pointer before
-entering the SRCU read side, in which case the grace period waits for
-it.
-
-Fixes: 995412e23bb25 ("blk-mq: Replace tags->lock with SRCU for tag iterators")
+Fixes: 995412e23bb2 ("blk-mq: Replace tags->lock with SRCU for tag iterators")
+Fixes: ad0d05dbddc1 ("blk-mq: Defer freeing of tags page_list to SRCU callback")
 Cc: stable@vger.kernel.org
 Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
 ---
- block/blk-mq.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/blk-mq-tag.c |  2 ++
+ block/blk-mq.c     | 18 +++---------------
+ block/blk-mq.h     |  1 -
+ 3 files changed, 5 insertions(+), 16 deletions(-)
 
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 3515031b3226..ee5413ebab01 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -611,6 +611,8 @@ static void blk_mq_free_tags_callback(struct rcu_head *head)
+ 		kmemleak_free(page_address(page));
+ 		__free_pages(page, page->private);
+ 	}
++	kfree(tags->rqs);
++	kfree(tags->static_rqs);
+ 	/* An iterator may walk the bitmaps for as long as it may see the tags */
+ 	sbitmap_queue_free(&tags->bitmap_tags);
+ 	sbitmap_queue_free(&tags->breserved_tags);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 87c1ccdf66ab..b58f73256202 100644
+index 5ae22d556540..ae12f2a52cc9 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -4179,10 +4179,11 @@ void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
- static void __blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
- 				      unsigned int hctx_idx)
- {
--	if (!blk_mq_is_shared_tags(set->flags))
--		blk_mq_free_map_and_rqs(set, set->tags[hctx_idx], hctx_idx);
-+	struct blk_mq_tags *tags = set->tags[hctx_idx];
- 
- 	set->tags[hctx_idx] = NULL;
-+	if (!blk_mq_is_shared_tags(set->flags))
-+		blk_mq_free_map_and_rqs(set, tags, hctx_idx);
+@@ -3532,16 +3532,6 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 	 */
  }
  
- static void blk_mq_map_swqueue(struct request_queue *q)
+-void blk_mq_free_rq_map(struct blk_mq_tags *tags)
+-{
+-	kfree(tags->rqs);
+-	tags->rqs = NULL;
+-	kfree(tags->static_rqs);
+-	tags->static_rqs = NULL;
+-
+-	blk_mq_free_tags(tags);
+-}
+-
+ static enum hctx_type hctx_idx_to_type(struct blk_mq_tag_set *set,
+ 		unsigned int hctx_idx)
+ {
+@@ -3594,12 +3584,10 @@ static struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+ 					GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+ 					node);
+ 	if (!tags->static_rqs)
+-		goto err_free_rqs;
++		goto err_free_tags;
+ 
+ 	return tags;
+ 
+-err_free_rqs:
+-	kfree(tags->rqs);
+ err_free_tags:
+ 	blk_mq_free_tags(tags);
+ 	return NULL;
+@@ -4155,7 +4143,7 @@ struct blk_mq_tags *blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+ 
+ 	ret = blk_mq_alloc_rqs(set, tags, hctx_idx, depth);
+ 	if (ret) {
+-		blk_mq_free_rq_map(tags);
++		blk_mq_free_tags(tags);
+ 		return NULL;
+ 	}
+ 
+@@ -4183,7 +4171,7 @@ void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
+ {
+ 	if (tags) {
+ 		blk_mq_free_rqs(set, tags, hctx_idx);
+-		blk_mq_free_rq_map(tags);
++		blk_mq_free_tags(tags);
+ 	}
+ }
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 1e64236d34d4..ba7bd917c361 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -62,7 +62,6 @@ void blk_mq_put_rq_ref(struct request *rq);
+  */
+ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 		     unsigned int hctx_idx);
+-void blk_mq_free_rq_map(struct blk_mq_tags *tags);
+ struct blk_mq_tags *blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+ 				unsigned int hctx_idx, unsigned int depth);
+ void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
 -- 
 2.43.7
 
