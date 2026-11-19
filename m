@@ -1,68 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.22
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795095259;
-	b=QU2o5iJVr3ORba7GP4csB6pzpXkaEj8AeaNheIXuQA+e6GYNRTphtZGMjHDnujuC16s6
-	 FyImgV98KRwE4cb/50Rr7js0j4qa+IdT8fsiGgHN0MsM4RYQD6wEKulwrc1RUqikjLM3H
-	 GuXapOOrMc8cAMc+MaCyrGL1iKCVDJu1krB8Sk6cGiN0xMKQFQdVS4oVaGGzTHdmiYBZz
-	 IZMHD5q4WGpDRCLjzFHGsfJQY0S4ctlwlg/rVQ9Wnj6bwu4X2ID+O9hOefNkDyLYdmJYZ
-	 q0AgObOqsX/hI8AzZqvF1iaO+jLc7LlxiL9ZgWIEX0yp31EB+TGa0NKMmNbf1q1i2EA==
+	t=1795095621;
+	b=WSa14p6SagJOnTnmX2DsKn4UUh9iqJiRdzf89FsqCfy8+jKA4Sr1GnTM5+vYWKzn4hFA
+	 C7k9fHAdo6Z1+H6MZYf6E87x/0D96kTxWd8ZXO1wxSqpkZjKNjdrP3CioEeklRJyJL5ep
+	 O0ZeiaJBYM8Gwe4NNpT8Sj1iurALSZt3As0Y8Gm8AB7BuE1lPMTuWopsGPHNC+gnQg97/
+	 zsXTXEJ2TheQ+Xv4BeIEwjypaKIFAXTyJ8NUCS4W797w0oINSE4VBN+sPNJW/spJDDh3D
+	 QsFjJCFRvldW6oyishi36zeiONjW7EVM6pk10iAUJ4n2xVEbSHhSWVBks034dxvZDoQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795095259;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:X-Developer-Signature:X-Developer-Key:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795095621;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=ZEhJOzyXKju3tKMEHQwkNUXNp0T51VucdQQfkmvqiQM=;
-	b=EQj48L4yjFUZFqABGaYV0M+Thbr/SMDvI98bH4a39EfjdJ7ronMfUI0T9q1HVR0pbhjp
-	 uKsVdXBZ8cGf6Kgt52+62mWm0tsSwR9IyvTcP31inEI9uAOtrvIXcm2tPfvUAx1PBZzKo
-	 +I6/SeYFpii8090QAIcIKJ8hfLhQ33yVUqmbuki56NksQ6R7Tnpx+vB/FuIJ4l4Hhlt1i
-	 qFc1FcyoxU4SWBLd9TYGpx/H9knTxq1vfR66IJXRYS6E2sPH5z3tgZvQedQAUpuHxm7EB
-	 s8mM9tHlqoWIn91XwywgC3yB78t8YbXgkMjv3R7hqMHKdui9PS5fj4r3GEEG/wm9YPQ==
+	bh=gPl5KchtJ7gSYI9BGlQRZWaqJepQuVy2xisNPh0UVQo=;
+	b=VCB47UVE1U2nCv4IV0QWCgTdlsEY0V+y4YhvT9hcJo8d/e+7t2Vet3tXgHVkvrRZ6S+T
+	 0U0Kn7ViqoO8SvxIuj2NgZW58dWZITifFegoOoEv3JGdifvuvRgXSqOrFUgJO4goQcg1W
+	 +ZSeSGCnEeFgwAFJTaf75N4Zxc82NbXp3omcQcIxJIbh5kqRZsNjHiLsmvZYkIldZzto5
+	 8P8wUrqYXPghU9Rim8m0X8wIPCLOUS/DHPvhdi1pM27XKKZ9G6mTSlZJOJDnnE9RaqPCK
+	 6qD/sDnpqOvY2u5UaKsgGu8Q/wg1ICO5OEtKtJlCjU3JViAiM1+hHKok04cqUNhLGsQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="GrCxvm/1";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=SydRjGah;
+	arc=none smtp.remote-ip=95.215.58.22
+Received: from mta1.migadu.com (out-22.mta1.migadu.com [95.215.58.22])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3144606A324;
-	Thu, 19 Nov 2026 13:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453E0606A338
+	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 13:40:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 453E0606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GrCxvm/1
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1FAA1F000C5;
-	Thu, 19 Nov 2026 13:34:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795095258;
-	bh=ZEhJOzyXKju3tKMEHQwkNUXNp0T51VucdQQfkmvqiQM=;
-	h=From:To:Cc:Subject:Date;
-	b=GrCxvm/1lTIpcplkRdycUOpd8LVxmcPVO6UlPCcpghV8chsq66wX7A7O7TxLup21a
-	 pWIcbGGSrVmxkJTuFAJgNiOVC4ou3TGAx8Gmgh2LFsrtjcM1eYJ/sqRT7p+z09a5Ku
-	 +FkxP7Y4U+dV7F9m3UXNaWI544KdtoU5vOTRGSbMCrIrWYHK7h+NtQUXQHr/IZaZjM
-	 qv0yO2QAK4wQBVFeiYu7q0dMivT1CnGyBlmaULCWxP50XnjNFaACPP/IEUAgaYRg2e
-	 1uX5zf32+m1tKzZO5Hsp1MBL8GjysMxL372SXHLPLsPpadYgh/NfVjrC8Bx5G//qwU
-	 Soeyhs3nmUgpQ==
-From: Christian Brauner <brauner@kernel.org>
-To: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	bpf@vger.kernel.org
-Cc: Christian Brauner <brauner@kernel.org>,
-	lsf-pc@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	"Martin K. Petersen" <mkp@kernel.org>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Jan Kara <jack@suse.cz>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>
-Subject: LSF/MM/BPF: 2027: Call for Proposals
-Date: Thu, 19 Nov 2026 14:33:58 +0100
-Message-ID: <20261119-lsfmm-2027-cfp-b7edcf7eee48@brauner>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=SydRjGah
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=AC3uZA3GEYvvmvMEJuC9OE+1bUyjPme/5LL8+pA6u7c=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795095618; v=1; x=1795700418;
+ b=SydRjGahMXk8uCrz7q1Dcr7oy5WSFHYTxsMZJ8WUJ9DYaGcDJVSHjmHb3u2lL1bOwAxhjzCR
+ 3P3tI9Yzs1SD8zL2XDwZ9xpIC3j8juOP2bUtPYFibiP98+aBPBxUoXHvfjEK9JdT8MgR7vSD5Oo
+ hJlizGWrKeLKXLjw6mLiUkbU=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id ec6f0d9818d8147f;
+	Thu, 19 Nov 2026 13:40:17 +0000
+X-Mizu-Trace-ID: ec6f0d9818d8147f
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <473ff2e1-329f-49c0-a124-b9e2194d7bcf@linux.dev>
+Date: Thu, 19 Nov 2026 21:40:08 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -72,142 +58,97 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4868; i=brauner@kernel.org; h=from:subject:message-id; bh=cENfH9cFzvlCJSmEwugWKvbkFTl+BgVyZRO6iqPrl+M=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT9+3VG1DDxxd21Poei9nSxHb701fr/tFS26NI9pTvER DV/vPD37ChlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZhI/X+G/2H/jtyIlWyy/Kzx pkTjrv7suc3aO9J/f7a59nzzxGs/iw4xMnxfnLzy8SvWLZstLi0+oXpXekH66ZjLC5b3zF69ztR vrjULAA==
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/7] blk-iocost: don't take rq_qos_mutex before the queue
+ is frozen in cost model write
+To: Guixin Liu <kanie@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
+ Josef Bacik <josef@toxicpanda.com>, Nilay Shroff <nilay@linux.ibm.com>,
+ Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
+References: <20261119070548.3125491-1-kanie@linux.alibaba.com>
+ <20261119070548.3125491-4-kanie@linux.alibaba.com>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <20261119070548.3125491-4-kanie@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The annual Linux Storage, Filesystem, Memory Management, and BPF
-(LSF/MM/BPF) Summit for 2027 will be held April 27-29, 2027 in Porto,
-Portugal.
+Hello, Guixin,
 
-LSF/MM/BPF is a small, invitation-only technical workshop for the
-people who develop and maintain the Linux storage, filesystem, memory
-management, and BPF subsystems. We get together to work through
-problems and to map out improvements that will make their way into the
-mainline kernel within the coming years.
+在 2026/11/19 15:05, Guixin Liu 写道:
+> ioc_cost_model_write() freezes the queue while holding rq_qos_mutex,
+> which blkg_conf_open_bdev() acquired first. Every other path takes
+> rq_qos_mutex only after the queue is frozen: ioc_qos_write() releases
+> and re-acquires the mutex around blk_mq_freeze_queue(), and rq_qos_add()
+> documents that its caller holds the mutex with the queue frozen.
+> Waiting for in-flight IO while holding rq_qos_mutex breaks that rule,
+> and on the first write to a queue without iocost the path even calls
+> blk_iocost_init() -> rq_qos_add() -> blk_mq_freeze_queue() while
+> nothing has frozen the queue yet.
+> 
+> Mirror the release-freeze-reacquire sequence of ioc_qos_write(). The
+> unfreeze moves to the close_bdev label so the error exits after the
+> freeze don't leave the queue frozen, and it runs before
+> blkg_conf_close_bdev() drops the bdev reference, while the queue is
+> still pinned.
+>
 
-The summit runs for three days and has four subsystem-specific tracks.
-Topics that touch more than one subsystem get joint sessions with all
-affected tracks in the room. You're welcome to sit in on sessions of
-other tracks too. There's also time for BoFs, hacking sessions and the
-hallway track.
+I tried the same change in cost model write recently and it turned out flawed, these two reviews explain it better than I can [1][2].
 
-The sessions are supposed to be interactive, inclusive discussions. The
-discussion leader outlines the problem and then the room works through
-it. Slides and visualizations are encouraged but please refrain from
-lengthy presentations.
+In short: the disk_live() check in blkg_conf_open_bdev() only holds while rq_qos_mutex is kept, and dropping it around the freeze lets the disk and the ioc go away; Tejun reproduced a use-after-free that way.
 
-The agenda is built from the topics proposed on the mailing lists. The
-discussion a proposal gets on the list helps us figure out which topics
-are important. The program committee then selects the topics and sends
-out the invitations.
+I've been busy with another thread lately, so I'm glad to see you proposing a fix for this. Hope the links help.
 
-Attendance is limited to keep the sessions productive. When you request
-an invitation, please tell us what you'd like to discuss and what
-expertise you bring. We also want to make sure that people who are new
-to the community get proper consideration. So if you're a maintainer or
-have been around for a while, please nominate newer contributors in the
-form.
+Thanks,
+Tao
 
-LSF/MM/BPF is an in-person event and we don't offer general remote
-participation. If you're needed for a topic but can't travel, let us
-know and we'll try to find a solution.
+[1] https://lore.kernel.org/all/20261111163306.GA17267@lst.de/
+[2] https://lore.kernel.org/all/bfe5007b2758bb06504b6966abaf1f7e@kernel.org/
+ 
+> Fixes: 2b2da2f6dc80 ("blk-iocost: prevent configuration update concurrent with io throttling")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
+> ---
+>  block/blk-iocost.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 1c1025157d8e..8e06b83691aa 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -3589,6 +3589,15 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+>  	ret = blkg_conf_open_bdev(&ctx);
+>  	if (ret)
+>  		return ret;
+> +	/*
+> +	 * Nothing is protecting QoS state yet, so release q->rq_qos_mutex,
+> +	 * which was first acquired in blkg_conf_open_bdev, and re-acquire it
+> +	 * after freezing the queue to maintain the correct locking order.
+> +	 */
+> +	mutex_unlock(&ctx.bdev->bd_queue->rq_qos_mutex);
+> +
+> +	memflags = blk_mq_freeze_queue(ctx.bdev->bd_queue);
+> +	mutex_lock(&ctx.bdev->bd_queue->rq_qos_mutex);
+>  
+>  	body = ctx.body;
+>  	q = bdev_get_queue(ctx.bdev);
+> @@ -3605,7 +3614,6 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+>  		ioc = q_to_ioc(q);
+>  	}
+>  
+> -	memflags = blk_mq_freeze_queue(q);
+>  	blk_mq_quiesce_queue(q);
+>  
+>  	spin_lock_irq(&ioc->lock);
+> @@ -3663,9 +3671,9 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+>  	spin_unlock_irq(&ioc->lock);
+>  
+>  	blk_mq_unquiesce_queue(q);
+> -	blk_mq_unfreeze_queue(q, memflags);
+>  
+>  close_bdev:
+> +	blk_mq_unfreeze_queue(q, memflags);
+>  	blkg_conf_close_bdev(&ctx);
+>  	return ret ?: nbytes;
+>  }
 
-Important dates
-===============
-
-    January 27, 2027    Deadline for invitation requests
-    Mid-February        First round of invitations
-    April 27-29, 2027   LSF/MM/BPF 2027 in Porto, Portugal
-
-Venue
-=====
-
-The event will take place at the 
-
-    Sheraton Porto Hotel & Spa
-    R. do Ten. Valadim 146
-    4100-476 Porto, Portugal
-
-Do note that for this years iteration it is of the utmost importance
-that you make use of the Linux Foundation hotel block.
-
-All further details are availabe on the event site:
-
-    https://events.linuxfoundation.org/lsfmmbpf/
-
-Requesting an invitation
-========================
-
-To attend, please fill out this form by January 27, 2027. Proposing a
-topic on the list without filling out the form will lead to us discussing
-it without you!
-
-    https://forms.gle/hhC9zXMsAJCR2dda6
-
-In the form, please tell us:
-
-    - what general areas you'd like to discuss and what expertise you bring
-    - whether you need a visa. We handle those requests in the first
-      round of invitations, so please don't wait.
-
-We realize that travel is an ever-changing target, but the requests
-help us get an idea of possible attendance numbers.
-
-Proposing a topic
-=================
-
-In addition to the form, please send each topic as a new thread with
-[LSF/MM/BPF TOPIC] in the subject to:
-
-    lsf-pc@lists.linux-foundation.org
-
-and Cc the lists that are relevant for the topic:
-
-    FS:     linux-fsdevel@vger.kernel.org
-    MM:     linux-mm@kvack.org
-    Block:  linux-block@vger.kernel.org
-    ATA:    linux-ide@vger.kernel.org
-    SCSI:   linux-scsi@vger.kernel.org
-    NVMe:   linux-nvme@lists.infradead.org
-    BPF:    bpf@vger.kernel.org
-
-Please use exactly this subject prefix so we can find the topic
-proposals when putting together the schedule. The mailing list
-discussions will be linked from the schedule so other attendees can get
-a sense of whether a topic is of interest to them.
-
-Previous years
-==============
-
-LWN has covered previous iterations of LSF/MM/BPF extensively:
-
-    2014: https://lwn.net/Articles/LSFMM2014/
-    2015: https://lwn.net/Articles/lsfmm2015/
-    2016: https://lwn.net/Articles/lsfmm2016/
-    2017: https://lwn.net/Articles/lsfmm2017/
-    2018: https://lwn.net/Articles/lsfmm2018/
-    2019: https://lwn.net/Articles/lsfmm2019/
-    2020: 404 - Cancelled by The Plague
-    2021: 404 - Cancelled by The Plague
-    2022: https://lwn.net/Articles/lsfmm2022/
-    2023: https://lwn.net/Articles/lsfmmbpf2023/
-    2024: https://lwn.net/Articles/lsfmmbpf2024/
-    2025: https://lwn.net/Articles/lsfmmbpf2025/
-    2026: https://lwn.net/Articles/lsfmmbpf2026/
-
-Program committee
-=================
-
-    Kanchan Joshi      (Storage)
-    Martin K. Petersen (Storage)
-    Christian Brauner  (Filesystems)
-    Amir Goldstein     (Filesystems)
-    Jan Kara           (Filesystems)
-    Vlastimil Babka    (MM)
-    Matthew Wilcox     (MM)
-    Daniel Borkmann    (BPF)
-    Alexei Starovoitov (BPF)
-
-Thank you,
-Christian Brauner
