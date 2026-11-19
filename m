@@ -1,102 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795073090;
-	b=ufU7tU/xJNQrWLujrCvEN9rmyvhxy745EmT42iBHfzLfgn9nfd7NVsrzgxf4/IepNtZD
-	 dNgg9AaLvQh6WKFJvsF1w1j9Gd60kFS01KiaN1YpHPvxaj56dpPuZRxR6ceOuI+t24H8l
-	 u+uVtct+kEult44EY3m2LuvGCU9ycKb1JpWIns1wlk4HqY6yNyJxT0ArZwALLN7bQ36WS
-	 ceh6j9ub2KQWPzvgh1Adt1HD3MlsMV1cB+j/UOaztg6lddN1nXt5bi2g3P1YOwRQhqGk8
-	 oIbD5mw8NGKIN6fajb9fNrwO1C712UXhRjQDmo/sDYiCGXnydh6DXozrbpL+T8yDiPA==
+	t=1795077553;
+	b=azvn1sZ9WJXAsA80oatRBbwGddweUaJpgYls4bAQBUf6Y/VYDqiJVIzpqKR7dVnHTQYQ
+	 2if1w78kCnUlH/O0Oe+dQZLc5DxE+xyA6A/QtmyTwIM3RdpeEJ4qOX/L+tvSNKXKtzr8w
+	 7jq/lWoCZ1a43FVHJuzNHAvSmZyPs7R7uu9y6CuedRejI3WEkZ0c4gcskn57i5yCGQsig
+	 BYP6iPsWVcJYTrgZmzi/rkMN36wJ6+ot1BfFJxdPeOzWQkR8W08Dd49eeSAmtmIP9w5sU
+	 GJxIy8eybZVvBalmDGcT5RXy88Q3C+fo3VC+LAsmsKO/qAWaoqVX0lFZOvhykAHenhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795073090;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Spam-Score:
-	 X-Spam-Level:X-Spam-Flag;
-	bh=Z2CU09g/rx7JNyFGOoWlNZJxHrWJRck4HYEfS/GMMig=;
-	b=PiOSTwmGzKDqewAz9732MEM99fy8lgxjZwjfdvkSFizrRxGo5QZgxSafLI9TEy+aegyP
-	 Ocinsmr3FbBp2rWadPep7d9JgYZQSj1qOVGwYf0WAwTEAUbb912xt+8j8T5JsIc6HZWxY
-	 NYXwZX2FED9yozZve1lYUuhSIFYmEdrFWCXfNRCXkoSQn5pE8AZY7udOVQ4S/QECiuA+d
-	 2fVJ900WCuUtjcwoY+TshhG9F1mWDK4YkqinTIaopPSA8HwuVTLWa/aK9ZLqD3kmofi1h
-	 s5wO2mFWQvcvF8T4yvCsX4mn4Tfmk7yFAkDrXzHD1Al0Ec0kqV7rYiuCyrDbgY6B2aA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795077553;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-Scanned-By;
+	bh=y3TtDW1WKRbGF0ZusHGDdMsHnXiCQqqrodTZSz3UVtw=;
+	b=ej7iWO/yfCQprOWZQnmchesO3nrC2i5QjxrcYyux1BBWVDMumDfK6zYsLOpYEfC0C83D
+	 Nt54vQxSUiJ93PPSre+7UO/huYVK8EjbHX/XW2MJaN7xzz6268CNm7P6HWkWsiiDnU0OP
+	 YiDDSOhU0CVfoYSdLUzT1gQStSSGhD57wJaYynhWwzFhvPO2e6LqxdCB4NHuBTvOubbnm
+	 kluu812iUIs2/RSdZPvjruxbToUW5gb8q3Z9r26EW49fQd/p1MD3Hoo9IE2zTKozTP+F1
+	 i7fpClPDj+FGdeZGYB8P1HN3Xka7EzkwPFCjonJXxyLhtXZgh/AYFsRVUwEimeNpThg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=1FQYXKbK;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=sLiT6gSz;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b="vZt8/KwU";
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=46LvWbMC;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ii72kMsX;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A81606A325;
-	Thu, 19 Nov 2026 07:24:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84A81606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C23606A330
+	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 08:39:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32C23606A330
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=1FQYXKbK;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=sLiT6gSz;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=vZt8/KwU;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=46LvWbMC
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ii72kMsX
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1795077552;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y3TtDW1WKRbGF0ZusHGDdMsHnXiCQqqrodTZSz3UVtw=;
+	b=ii72kMsXTlIbeG53gCChMQjePajKVfIRi7aXNQ/oJfwb5U/7C1glIupuu7LxHhB+Ixqh72
+	ccYMJaIp3vi8Y5YQZutExeDYv9XMX0IqQFBExZUpk7VEYbRWLssejJ0NgHR4gKNIGPKPUF
+	SoQY/6f2Xwa//WxQeMCgvzYxsOMGguE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-569-HsE9A_8xNgOpa4zQ7C4pEA-1; Thu,
+ 19 Nov 2026 03:39:08 -0500
+X-MC-Unique: HsE9A_8xNgOpa4zQ7C4pEA-1
+X-Mimecast-MFC-AGG-ID: HsE9A_8xNgOpa4zQ7C4pEA_1795077546
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 8F6421F7A2;
-	Thu, 19 Nov 2026 07:24:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1795073087; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z2CU09g/rx7JNyFGOoWlNZJxHrWJRck4HYEfS/GMMig=;
-	b=1FQYXKbK1mOAiZa/4uzTYibJ3qvHKx+l8lkql937bUyH/BXIRU0ISOGLfYOiQFrXi2xUW1
-	vxajaLHYMY0AnluS6hoWIosOo8E6e3L4+RTR65mcgJN4n0wswFijPYFteWCYWcBGja6QdX
-	VU+lwgeKsXh7JLHbWh7sOwlPOpGawNA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1795073087;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z2CU09g/rx7JNyFGOoWlNZJxHrWJRck4HYEfS/GMMig=;
-	b=sLiT6gSz34auHDKYDQCimHov0/j3YlxZNBf63byR5TnP+UOAe2/m5On74e8Vd5M9BT8a+A
-	zWkxUIFrOjghf6CA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1795073086; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z2CU09g/rx7JNyFGOoWlNZJxHrWJRck4HYEfS/GMMig=;
-	b=vZt8/KwU10e9lCqfMT4vlrt/0cv5WMi+2sIM223b99B6nlT1hOV89RKrU9x8+p8beV2MGk
-	KUwwLc8XN6ljjxmq8VlNOXYy3j4TN/MTWIYJK0YPb3jB7l8nCLkCuwe7jfN1rQL8jk4xz5
-	Vm+Fyvvs+A6+Gqfh6lYxWCfr1ehDdiE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1795073086;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z2CU09g/rx7JNyFGOoWlNZJxHrWJRck4HYEfS/GMMig=;
-	b=46LvWbMC5GlHQZPsaY0nM6j/51uVY2+KG3ajEMSDynNcEk/G6nr4YTRXgNS6bota2FRWK2
-	QzB+CneRbUI+zJCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 485641334C;
-	Thu, 19 Nov 2026 07:24:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id glo7CD6k/mpoUgAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 19 Nov 2026 07:24:46 +0000
-Message-ID: <06b06739-33d9-4314-8080-ccf28fa77b94@suse.de>
-Date: Thu, 19 Nov 2026 08:24:45 +0100
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AD7F2180034F;
+	Thu, 19 Nov 2026 08:39:05 +0000 (UTC)
+Received: from dhowells-thinkpadp1gen8.rmtgb.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EB40A1956088;
+	Thu, 19 Nov 2026 08:38:59 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH v19 01/17] iov_iter: Fix kunit test to remove __init and __refdata marks
+Date: Thu, 19 Nov 2026 08:38:32 +0000
+Message-ID: <20261119083851.3306418-2-dhowells@redhat.com>
+In-Reply-To: <20261119083851.3306418-1-dhowells@redhat.com>
+References: <20261119083851.3306418-1-dhowells@redhat.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -106,71 +96,311 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 12/13] scsi: sd_zbc: define storage element management
- operations
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>
-References: <20261116213702.225970-1-dlemoal@kernel.org>
- <20261116213702.225970-13-dlemoal@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20261116213702.225970-13-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-13.29 / 50.00];
-	SUSE_INTERNAL_BYPASS(-9.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-0.997];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
-X-Spam-Score: -13.29
-X-Spam-Level: 
-X-Spam-Flag: NO
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 11/16/26 10:37 PM, Damien Le Moal wrote:
-> Define the storage element management operations using struct blk_se_ops.
-> These operations are valid only on SMR disks supporting the storage
-> element depopulation featu, with support for the GET PHYSICAL ELEMENTS
-> STATUS command being mandatory. The support for the modify_zones operation
-> is already indicated by the depop_modify_zones_supported SCSI disk flag.
-> sd_zbc_check_depop_supported() is modified to add detection for the
-> command RESTORE ELEMENTS AND REBUILD, which is indicated with the new
-> SCSI disk flag depop_restore_supported.
-> 
-> Both the remove_element and restore_elements operations will block
-> until the operation completes or an error is detected.
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   drivers/scsi/sd.c     |   3 +
->   drivers/scsi/sd.h     |   3 +
->   drivers/scsi/sd_zbc.c | 489 +++++++++++++++++++++++++++++++++++++++++-
->   3 files changed, 494 insertions(+), 1 deletion(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
+Remove the __init marks from the functions in the iov_iter kunit test so
+that they don't get removed after the module is loaded or if the test is
+built in as the tests can be triggered through debugfs too.
 
-Cheers,
+Also remove the __refdata mark which is unnecessary if the table so marked
+doesn't point at any __init funcs.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+This was found by claude-opus-5-5 run locally.
+
+Fixes: 2d71340ff1d4 ("iov_iter: Kunit tests for copying to/from an iterator")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: linux-block@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ lib/tests/kunit_iov_iter.c | 96 +++++++++++++++++++-------------------
+ 1 file changed, 47 insertions(+), 49 deletions(-)
+
+diff --git a/lib/tests/kunit_iov_iter.c b/lib/tests/kunit_iov_iter.c
+index 32e42d8c7ca1..b4ad38d1a4bd 100644
+--- a/lib/tests/kunit_iov_iter.c
++++ b/lib/tests/kunit_iov_iter.c
+@@ -48,9 +48,9 @@ static void iov_kunit_unmap(void *data)
+ 	vfree(data);
+ }
+ 
+-static void *__init iov_kunit_create_buffer(struct kunit *test,
+-					    struct page ***ppages,
+-					    size_t npages)
++static void *iov_kunit_create_buffer(struct kunit *test,
++				     struct page ***ppages,
++				     size_t npages)
+ {
+ 	struct page **pages;
+ 	unsigned long got, last;
+@@ -90,11 +90,11 @@ static void *__init iov_kunit_create_buffer(struct kunit *test,
+ 	return buffer;
+ }
+ 
+-static void __init iov_kunit_load_kvec(struct kunit *test,
+-				       struct iov_iter *iter, int dir,
+-				       struct kvec *kvec, unsigned int kvmax,
+-				       void *buffer, size_t bufsize,
+-				       const struct kvec_test_range *pr)
++static void iov_kunit_load_kvec(struct kunit *test,
++				struct iov_iter *iter, int dir,
++				struct kvec *kvec, unsigned int kvmax,
++				void *buffer, size_t bufsize,
++				const struct kvec_test_range *pr)
+ {
+ 	size_t size = 0;
+ 	int i;
+@@ -116,7 +116,7 @@ static void __init iov_kunit_load_kvec(struct kunit *test,
+ /*
+  * Test copying to a ITER_KVEC-type iterator.
+  */
+-static void __init iov_kunit_copy_to_kvec(struct kunit *test)
++static void iov_kunit_copy_to_kvec(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -166,7 +166,7 @@ static void __init iov_kunit_copy_to_kvec(struct kunit *test)
+ /*
+  * Test copying from a ITER_KVEC-type iterator.
+  */
+-static void __init iov_kunit_copy_from_kvec(struct kunit *test)
++static void iov_kunit_copy_from_kvec(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -234,12 +234,12 @@ static const struct bvec_test_range bvec_test_ranges[] = {
+ 	{ -1, -1, -1 }
+ };
+ 
+-static void __init iov_kunit_load_bvec(struct kunit *test,
+-				       struct iov_iter *iter, int dir,
+-				       struct bio_vec *bvec, unsigned int bvmax,
+-				       struct page **pages, size_t npages,
+-				       size_t bufsize,
+-				       const struct bvec_test_range *pr)
++static void iov_kunit_load_bvec(struct kunit *test,
++				struct iov_iter *iter, int dir,
++				struct bio_vec *bvec, unsigned int bvmax,
++				struct page **pages, size_t npages,
++				size_t bufsize,
++				const struct bvec_test_range *pr)
+ {
+ 	struct page *can_merge = NULL, *page;
+ 	size_t size = 0;
+@@ -275,7 +275,7 @@ static void __init iov_kunit_load_bvec(struct kunit *test,
+ /*
+  * Test copying to a ITER_BVEC-type iterator.
+  */
+-static void __init iov_kunit_copy_to_bvec(struct kunit *test)
++static void iov_kunit_copy_to_bvec(struct kunit *test)
+ {
+ 	const struct bvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -328,7 +328,7 @@ static void __init iov_kunit_copy_to_bvec(struct kunit *test)
+ /*
+  * Test copying from a ITER_BVEC-type iterator.
+  */
+-static void __init iov_kunit_copy_from_bvec(struct kunit *test)
++static void iov_kunit_copy_from_bvec(struct kunit *test)
+ {
+ 	const struct bvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -392,10 +392,10 @@ static void iov_kunit_destroy_folioq(void *data)
+ 	}
+ }
+ 
+-static void __init iov_kunit_load_folioq(struct kunit *test,
+-					struct iov_iter *iter, int dir,
+-					struct folio_queue *folioq,
+-					struct page **pages, size_t npages)
++static void iov_kunit_load_folioq(struct kunit *test,
++				  struct iov_iter *iter, int dir,
++				  struct folio_queue *folioq,
++				  struct page **pages, size_t npages)
+ {
+ 	struct folio_queue *p = folioq;
+ 	size_t size = 0;
+@@ -429,7 +429,7 @@ static struct folio_queue *iov_kunit_create_folioq(struct kunit *test)
+ /*
+  * Test copying to a ITER_FOLIOQ-type iterator.
+  */
+-static void __init iov_kunit_copy_to_folioq(struct kunit *test)
++static void iov_kunit_copy_to_folioq(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -491,7 +491,7 @@ static void __init iov_kunit_copy_to_folioq(struct kunit *test)
+ /*
+  * Test copying from a ITER_FOLIOQ-type iterator.
+  */
+-static void __init iov_kunit_copy_from_folioq(struct kunit *test)
++static void iov_kunit_copy_from_folioq(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -560,10 +560,10 @@ static void iov_kunit_destroy_xarray(void *data)
+ 	kfree(xarray);
+ }
+ 
+-static void __init iov_kunit_load_xarray(struct kunit *test,
+-					 struct iov_iter *iter, int dir,
+-					 struct xarray *xarray,
+-					 struct page **pages, size_t npages)
++static void iov_kunit_load_xarray(struct kunit *test,
++				  struct iov_iter *iter, int dir,
++				  struct xarray *xarray,
++				  struct page **pages, size_t npages)
+ {
+ 	size_t size = 0;
+ 	int i;
+@@ -591,7 +591,7 @@ static struct xarray *iov_kunit_create_xarray(struct kunit *test)
+ /*
+  * Test copying to a ITER_XARRAY-type iterator.
+  */
+-static void __init iov_kunit_copy_to_xarray(struct kunit *test)
++static void iov_kunit_copy_to_xarray(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -649,7 +649,7 @@ static void __init iov_kunit_copy_to_xarray(struct kunit *test)
+ /*
+  * Test copying from a ITER_XARRAY-type iterator.
+  */
+-static void __init iov_kunit_copy_from_xarray(struct kunit *test)
++static void iov_kunit_copy_from_xarray(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -712,7 +712,7 @@ static void __init iov_kunit_copy_from_xarray(struct kunit *test)
+ /*
+  * Test the extraction of ITER_KVEC-type iterators.
+  */
+-static void __init iov_kunit_extract_pages_kvec(struct kunit *test)
++static void iov_kunit_extract_pages_kvec(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -792,7 +792,7 @@ static void __init iov_kunit_extract_pages_kvec(struct kunit *test)
+ /*
+  * Test the extraction of ITER_BVEC-type iterators.
+  */
+-static void __init iov_kunit_extract_pages_bvec(struct kunit *test)
++static void iov_kunit_extract_pages_bvec(struct kunit *test)
+ {
+ 	const struct bvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -870,7 +870,7 @@ static void __init iov_kunit_extract_pages_bvec(struct kunit *test)
+ /*
+  * Test the extraction of ITER_FOLIOQ-type iterators.
+  */
+-static void __init iov_kunit_extract_pages_folioq(struct kunit *test)
++static void iov_kunit_extract_pages_folioq(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct folio_queue *folioq;
+@@ -949,7 +949,7 @@ static void __init iov_kunit_extract_pages_folioq(struct kunit *test)
+ /*
+  * Test the extraction of ITER_XARRAY-type iterators.
+  */
+-static void __init iov_kunit_extract_pages_xarray(struct kunit *test)
++static void iov_kunit_extract_pages_xarray(struct kunit *test)
+ {
+ 	const struct kvec_test_range *pr;
+ 	struct iov_iter iter;
+@@ -1033,8 +1033,7 @@ struct iov_kunit_iter_to_sg_data {
+ 	size_t npages;
+ };
+ 
+-static void __init
+-iov_kunit_iter_unpin_sgt(void *data)
++static void iov_kunit_iter_unpin_sgt(void *data)
+ {
+ 	struct sg_table *sgt = data;
+ 
+@@ -1042,9 +1041,9 @@ iov_kunit_iter_unpin_sgt(void *data)
+ 		unpin_user_page(sg_page(&sgt->sgl[i]));
+ }
+ 
+-static void __init
+-iov_kunit_iter_to_sg_init(struct kunit *test, size_t bufsize, bool user,
+-			  struct iov_kunit_iter_to_sg_data *data)
++static void iov_kunit_iter_to_sg_init(struct kunit *test, size_t bufsize,
++				      bool user,
++				      struct iov_kunit_iter_to_sg_data *data)
+ {
+ 	struct page **spages;
+ 	struct scatterlist *sg;
+@@ -1080,10 +1079,9 @@ iov_kunit_iter_to_sg_init(struct kunit *test, size_t bufsize, bool user,
+ 	memset(data->scratch, 0, bufsize);
+ }
+ 
+-static void __init
+-iov_kunit_iter_to_sg_check(struct kunit *test, struct iov_iter *iter,
+-			   size_t bufsize,
+-			   struct iov_kunit_iter_to_sg_data *data)
++static void iov_kunit_iter_to_sg_check(struct kunit *test, struct iov_iter *iter,
++				       size_t bufsize,
++				       struct iov_kunit_iter_to_sg_data *data)
+ {
+ 	static const size_t tail = 16 * PAGE_SIZE;
+ 	size_t i;
+@@ -1128,7 +1126,7 @@ iov_kunit_iter_to_sg_check(struct kunit *test, struct iov_iter *iter,
+ 	KUNIT_EXPECT_EQ(test, i, bufsize);
+ }
+ 
+-static void __init iov_kunit_iter_to_sg_kvec(struct kunit *test)
++static void iov_kunit_iter_to_sg_kvec(struct kunit *test)
+ {
+ 	struct iov_kunit_iter_to_sg_data data;
+ 	struct iov_iter iter;
+@@ -1145,7 +1143,7 @@ static void __init iov_kunit_iter_to_sg_kvec(struct kunit *test)
+ 	iov_kunit_iter_to_sg_check(test, &iter, bufsize, &data);
+ }
+ 
+-static void __init iov_kunit_iter_to_sg_bvec(struct kunit *test)
++static void iov_kunit_iter_to_sg_bvec(struct kunit *test)
+ {
+ 	struct iov_kunit_iter_to_sg_data data;
+ 	struct page *p, *can_merge = NULL;
+@@ -1173,7 +1171,7 @@ static void __init iov_kunit_iter_to_sg_bvec(struct kunit *test)
+ 	iov_kunit_iter_to_sg_check(test, &iter, bufsize, &data);
+ }
+ 
+-static void __init iov_kunit_iter_to_sg_folioq(struct kunit *test)
++static void iov_kunit_iter_to_sg_folioq(struct kunit *test)
+ {
+ 	struct iov_kunit_iter_to_sg_data data;
+ 	struct folio_queue *folioq;
+@@ -1190,7 +1188,7 @@ static void __init iov_kunit_iter_to_sg_folioq(struct kunit *test)
+ 	iov_kunit_iter_to_sg_check(test, &iter, bufsize, &data);
+ }
+ 
+-static void __init iov_kunit_iter_to_sg_xarray(struct kunit *test)
++static void iov_kunit_iter_to_sg_xarray(struct kunit *test)
+ {
+ 	struct iov_kunit_iter_to_sg_data data;
+ 	struct xarray *xarray;
+@@ -1207,7 +1205,7 @@ static void __init iov_kunit_iter_to_sg_xarray(struct kunit *test)
+ 	iov_kunit_iter_to_sg_check(test, &iter, bufsize, &data);
+ }
+ 
+-static void __init iov_kunit_iter_to_sg_ubuf(struct kunit *test)
++static void iov_kunit_iter_to_sg_ubuf(struct kunit *test)
+ {
+ 	struct iov_kunit_iter_to_sg_data data;
+ 	struct iov_iter iter;
+@@ -1221,7 +1219,7 @@ static void __init iov_kunit_iter_to_sg_ubuf(struct kunit *test)
+ 	iov_kunit_iter_to_sg_check(test, &iter, bufsize, &data);
+ }
+ 
+-static struct kunit_case __refdata iov_kunit_cases[] = {
++static struct kunit_case iov_kunit_cases[] = {
+ 	KUNIT_CASE(iov_kunit_copy_to_kvec),
+ 	KUNIT_CASE(iov_kunit_copy_from_kvec),
+ 	KUNIT_CASE(iov_kunit_copy_to_bvec),
+
