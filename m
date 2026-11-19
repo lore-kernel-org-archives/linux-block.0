@@ -1,68 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.126.103.232
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795077604;
-	b=p0/jbEMF1hdKoK7Xe7w8ymD8r2No2Quf8vVP7wcBUSdOjZUKDCeD/KJc79kag7+cE7ja
-	 aHq/aLeRTYXmPDzvuB6nMfiD+ebrJq7UH1rN5f/vbEnj9yvaP7TdKGkOEGj4sd7MqPyaf
-	 EPuBiyWd2fh36XS01025csPoxnwrnnT63A+M2VGiyNGLDbKPVv1MoOHAHx+WndYXdv7CS
-	 Exv3/LO/fBt9B8CQHvg201chsAsDbTP9csjC7hWg8FhiQK/cjtkUosYJCEjUY6SxRnIAM
-	 aVoM90goZgpm45+1HB8Ax/3/I3o4xgcWo3Hp5ycaD3AhqmlBDj0sYHD6tYk581VluNQ==
+	t=1795080087;
+	b=LyQ6vdWKOoUNQVqxSKPeJ6i3n5esIS/dK/x2GoGaJZmEhU5UnLQzHox2yKS2ioJg++bX
+	 HZG31QDKfSZ9uBa5ydXOWVNlzgfEbJrK6rFfLdy6W4hW6VdOQHjcutiRnt36+2MTb016e
+	 HdoXY8IrTlWqbcmEe3sGD6dFWa7itlKRVYfpzoP3IMawVw/m8O8zGCaRYwjn/SEQuPvsP
+	 Uvto6USiNK7CV330CCkiaBREXvs3HTH3shNWkmgSfaLwYJzz5uZVm+lG7gkVOsCTEe9Hp
+	 MwWPdUX8uYTjUavO3qi0CW9Hqq1YwOYpWno/NFBLUK9UZ8j9DwOGpOYW8SjuInuiCxw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795077604;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Scanned-By;
-	bh=ZUkx4OaXOF6YZXsR0sLEGuaFMGKluKkbp9xVjv6nwmI=;
-	b=fFOtQiVEzr+1xw0+U/cyS3vkGuTmpf7Cq4RBqmfYMo58yVxJpAeLSJDQweUGQnutZ1gB
-	 QdoW+t5PzlzahXRQOy5wLjHOaMc3zg7XCYI99pbSnySLlqU4E1LrZbbQJm9taB4E1QtFH
-	 kVpduWCYLqhh2uxNXytvtpLdkRWWB4qVyBe82+nFkFh7rNeFqM3o8VqcCT4k5Scwn6+Y5
-	 clQm5a0P8ZJ/fkujzXEZxBXEiFN1gz4ZrKx4jApmtV1sxztSXdD8fcd7UEbUM2b0dLbk9
-	 1FPIrAjYqVspE8K7/Mjey/R/bGm7umPkPRqh2caXcikz+t2x7I6rrsEYr4xqMsFUDTw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795080087;
+	h=DMARC-Filter:X-UUID:X-CID-P-RULE:X-CID-O-INFO:X-CID-META:X-CID-BVR:
+	 X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:X-User:Received:From:To:Cc:
+	 Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=phJmb426aoRooYkR2Gofxf73gCjIrRfzoC/1uf618JI=;
+	b=YlKEdRuuI+W/aSyTShtezAE+WtCiDPevniJyAtvWvztS9Wxi9xOrpPkePoVU6KB5kehg
+	 jca8WKr+cluQvIvlV4xha+5qfmeJb9id8A7I5XrQd6uh70rEqE2nJVq/NpckyasG/i0xQ
+	 cBFPqmdwo+iolTmn+zFZ1DwtfMdltUBpnV/nEXD94cjhnFmZkoIcua7mfdup11wt0CP6Z
+	 89FDta1xil5R9n9oOf2mO9FJ57ZsOpOiptPfXiU+kA1PBox1AvZDX32Abag8Gd3yDbv98
+	 oh4249rpWl+D1kGRQhfazqKU3xVHgw0avwuXEjO9gBTttYKwpndCEnyEHQpWp/zaLZQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=PTJtRPtC;
-	arc=none smtp.remote-ip=170.10.133.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	dmarc=none header.from=kylinos.cn;
+	spf=pass smtp.mailfrom=kylinos.cn;
+	arc=none smtp.remote-ip=124.126.103.232
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9A6606AEF7
-	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 08:40:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E9A6606AEF7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=PTJtRPtC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1795077602;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZUkx4OaXOF6YZXsR0sLEGuaFMGKluKkbp9xVjv6nwmI=;
-	b=PTJtRPtC/u71h3NP/5DdoQsS7dWFiDg7hu2/j7Q7LM361nuKIH6AfwnWGJz7b36WPE9QSM
-	LO48zlQ3v2aZ7tQSjnrJIeCrYjHNdD4Y/kgwdfRIM+PSV+IfDid2x+mjCREva0Jp6ww6VH
-	Aa2R6IUGPudHjQnWoo/Iv3whpfmbUkw=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-S-U3nshMMKKcaD_rIDTt6A-1; Thu,
- 19 Nov 2026 03:39:59 -0500
-X-MC-Unique: S-U3nshMMKKcaD_rIDTt6A-1
-X-Mimecast-MFC-AGG-ID: S-U3nshMMKKcaD_rIDTt6A_1795077596
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50C8518002A2;
-	Thu, 19 Nov 2026 08:39:56 +0000 (UTC)
-Received: from dhowells-thinkpadp1gen8.rmtgb.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4CE2D3001DAD;
-	Thu, 19 Nov 2026 08:39:52 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1805606A337;
+	Thu, 19 Nov 2026 09:21:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A1805606A337
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 93cdc67ee3fa11f19a56ed5b684f684d-20261119
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:3e6c968f-f40c-41d1-b7b3-9939313b65b4,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:20
+X-CID-META: VersionHash:7db8b62,CLOUDID:6521bea9981703ccd9b9ae390e9a61cd,BulkI
+	D:nil,BulkQuantity:0,SF:81|82|83|102|850|865|898,TC:nil,Content:0|15|50|99
+	|100|102|153,EDM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 93cdc67ee3fa11f19a56ed5b684f684d-20261119
+X-User: wangyibo@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <wangyibo@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 727782934; Thu, 19 Nov 2026 17:21:18 +0800
+From: Wang Yibo <wangyibo@kylinos.cn>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
 	Paulo Alcantara <pc@manguebit.org>,
 	Matthew Wilcox <willy@infradead.org>,
 	Namjae Jeon <linkinjeon@kernel.org>,
@@ -71,6 +61,8 @@ Cc: David Howells <dhowells@redhat.com>,
 	Eric Van Hensbergen <ericvh@kernel.org>,
 	Dominique Martinet <asmadeus@codewreck.org>,
 	Ilya Dryomov <idryomov@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
 	netfs@lists.linux.dev,
 	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
@@ -78,15 +70,14 @@ Cc: David Howells <dhowells@redhat.com>,
 	ceph-devel@vger.kernel.org,
 	v9fs@lists.linux.dev,
 	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH v19 10/17] netfs: Pass the write length to request creation where appropriate
-Date: Thu, 19 Nov 2026 08:38:41 +0000
-Message-ID: <20261119083851.3306418-11-dhowells@redhat.com>
-In-Reply-To: <20261119083851.3306418-1-dhowells@redhat.com>
-References: <20261119083851.3306418-1-dhowells@redhat.com>
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v19 01/17] iov_iter: Fix kunit test to remove __init and __refdata marks
+Date: Thu, 19 Nov 2026 17:21:15 +0800
+Message-Id: <20261119092115.3957212-1-wangyibo@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20261119083851.3306418-2-dhowells@redhat.com>
+References: <20261119083851.3306418-2-dhowells@redhat.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -97,121 +88,39 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-For unbuffered/DIO writes and writes to single-type objects, pass the
-length down into the request creation function so that wreq->len gets set
-correctly.  For buffered writeback and pgpriv2 copying, this remains 0 as
-we don't know in advance how big the request will be.
+Hi David,
 
-A subsequent patch will use this to set as the i_size on single-type
-objects (e.g. afs directories) as we don't care what the old i_size was and
-we don't want to see inode->i_size in the netfs file changing due to
-third-party invalidation before we update fscache to say how big the object
-is going to be.
+> Remove the __init marks from the functions in the iov_iter kunit test so
+> that they don't get removed after the module is loaded or if the test is
+> built in as the tests can be triggered through debugfs too.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christoph Hellwig <hch@infradead.org>
-cc: linux-block@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/direct_write.c | 4 ++--
- fs/netfs/internal.h     | 2 +-
- fs/netfs/read_pgpriv2.c | 2 +-
- fs/netfs/write_issue.c  | 9 +++++----
- 4 files changed, 9 insertions(+), 8 deletions(-)
+The reasoning looks right to me.  The suite is registered with
+kunit_test_suites(), so it gets a debugfs "run" file and can be re-run
+after the init sections have been freed; calling into an __init function
+from there is a use-after-free, and __refdata on the case array keeps
+modpost from flagging the reference to init text.
 
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index cc46b7d9321f..ff1795e1f0cb 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -222,7 +222,7 @@ static void netfs_unbuffered_write_async(struct work_struct *work)
-  * encrypted file.  This can also be used for direct I/O writes.
-  */
- ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *iter,
--						  struct netfs_group *netfs_group)
-+					   struct netfs_group *netfs_group)
- {
- 	struct netfs_io_request *wreq;
- 	ssize_t ret, n;
-@@ -241,7 +241,7 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *
- 
- 	_debug("uw %llx-%llx", start, end);
- 
--	wreq = netfs_create_write_req(iocb->ki_filp->f_mapping, iocb->ki_filp, start,
-+	wreq = netfs_create_write_req(iocb->ki_filp->f_mapping, iocb->ki_filp, start, len,
- 				      iocb->ki_flags & IOCB_DIRECT ?
- 				      NETFS_DIO_WRITE : NETFS_UNBUFFERED_WRITE);
- 	if (IS_ERR(wreq))
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 10688314660f..3a2fd263946e 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -240,7 +240,7 @@ void netfs_write_collection_worker(struct work_struct *work);
-  */
- struct netfs_io_request *netfs_create_write_req(struct address_space *mapping,
- 						struct file *file,
--						uoff_t start,
-+						uoff_t start, size_t len,
- 						enum netfs_io_origin origin);
- void netfs_prepare_write(struct netfs_io_request *wreq,
- 			 struct netfs_io_stream *stream,
-diff --git a/fs/netfs/read_pgpriv2.c b/fs/netfs/read_pgpriv2.c
-index 5280b606fda4..85084aad9e31 100644
---- a/fs/netfs/read_pgpriv2.c
-+++ b/fs/netfs/read_pgpriv2.c
-@@ -103,7 +103,7 @@ static struct netfs_io_request *netfs_pgpriv2_begin_copy_to_cache(
- 	if (!fscache_resources_valid(&rreq->cache_resources))
- 		goto cancel;
- 
--	creq = netfs_create_write_req(rreq->mapping, NULL, folio_pos(folio),
-+	creq = netfs_create_write_req(rreq->mapping, NULL, folio_pos(folio), 0,
- 				      NETFS_PGPRIV2_COPY_TO_CACHE);
- 	if (IS_ERR(creq))
- 		goto cancel;
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index 0fcfb5ab49bd..7787ecdbcd39 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -89,7 +89,7 @@ static void netfs_kill_dirty_pages(struct address_space *mapping,
-  */
- struct netfs_io_request *netfs_create_write_req(struct address_space *mapping,
- 						struct file *file,
--						uoff_t start,
-+						uoff_t start, size_t len,
- 						enum netfs_io_origin origin)
- {
- 	struct netfs_io_request *wreq;
-@@ -98,7 +98,7 @@ struct netfs_io_request *netfs_create_write_req(struct address_space *mapping,
- 			     origin == NETFS_WRITEBACK_SINGLE ||
- 			     origin == NETFS_PGPRIV2_COPY_TO_CACHE);
- 
--	wreq = netfs_alloc_request(mapping, file, start, 0, origin);
-+	wreq = netfs_alloc_request(mapping, file, start, len, origin);
- 	if (IS_ERR(wreq))
- 		return wreq;
- 
-@@ -575,7 +575,8 @@ int netfs_writepages(struct address_space *mapping,
- 	if (!folio)
- 		goto out;
- 
--	wreq = netfs_create_write_req(mapping, NULL, folio_pos(folio), NETFS_WRITEBACK);
-+	wreq = netfs_create_write_req(mapping, NULL, folio_pos(folio), 0,
-+				      NETFS_WRITEBACK);
- 	if (IS_ERR(wreq)) {
- 		error = PTR_ERR(wreq);
- 		goto couldnt_start;
-@@ -661,7 +662,7 @@ int netfs_writeback_single(struct address_space *mapping,
- 		return 1;
- 	}
- 
--	wreq = netfs_create_write_req(mapping, NULL, 0, NETFS_WRITEBACK_SINGLE);
-+	wreq = netfs_create_write_req(mapping, NULL, 0, len, NETFS_WRITEBACK_SINGLE);
- 	if (IS_ERR(wreq)) {
- 		ret = PTR_ERR(wreq);
- 		goto couldnt_start;
+There is one more file in the tree with the same problem:
 
+  lib/tests/bitfield_kunit.c:60   __init test_bitfields_constants()
+  lib/tests/bitfield_kunit.c:103  __init test_bitfields_variables()
+  lib/tests/bitfield_kunit.c:140  __refdata bitfields_test_cases[]
+  lib/tests/bitfield_kunit.c:151  kunit_test_suites(&bitfields_test_suite)
+
+(line numbers from v7.4-rc1; test_bitfields_compile() is also marked
+__init but is only built under TEST_BITFIELD_COMPILE and is not in the
+case array)
+
+I went through the other suites that still have __init case functions --
+drivers/char/misc_minor_kunit.c, init/initramfs_test.c,
+security/landlock/id.c and lib/kunit/kunit-example-test.c -- and they
+are fine: they are all registered with
+kunit_test_init_section_suites(), which does not create a "run" file, so
+keeping __init there is correct.
+
+Do you want the bitfields one folded into this series, or would you
+rather I send it separately?
+
+Thanks,
+Wang Yibo
