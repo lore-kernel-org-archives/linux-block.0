@@ -1,60 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795097329;
-	b=yOhhkmNxhRZHkA5raXFGntqX7vjwu5zSg7IuZWPNHkEnWPYS1kvNzxpjZ7KFo096JPrK
-	 s+Ylw/KZOUkFY/0ti7LjT92H5o6yHvhz6RRGsrrfgiD6stNeZC6LBxeR4J5uuZcLKZgXB
-	 osrasvGwR8SLK50juR3tNc2bqE1q/9SBaxCue0pyLc7n5wU33FmKrumDQXt58XJA+crUY
-	 xtr664owg8dwG5FNxBiNAdcNgWP7qPGXf/myn/m3oPq9d8J5SagdxYKpe3KLLDuMlvwDj
-	 OFaLCzwnUyq89Jn+DKUmkLBKwNI+4+AIFTaEDUjFtFd2HkSVsRFXeubWODn83KI9b3A==
+	t=1795097853;
+	b=qU9joVQF8UabbsNFhciBNSCOsAqeY3hRh18kPzMFopnNai+jv0Ob7nM15nQJ7FD8qenL
+	 yYSpg64mu6zmh8pNW6US5fxJ13rQtgMZnt0NIw+GtrA+uL10N5ZKouQU8a1FoGEVLvGgU
+	 edNJMm4FCO4NoLt/dzBRPwDqDjmQg+w982WcRKBu4+215QY7+Fj0xfY5OVosCHo9tgn6R
+	 EgcHU5NAsRwoZC2g2EiqKFz+0BPFWD6K0ko0PTNwELrUtWMRgWuMzhxDVlAbM2JqTUwef
+	 vzGpx8HRisidco2Sf/K1ljTDo5bp96NPCElFLUR1gIAMNghDRPXBY4fWcJDSrYYxswg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795097329;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=IkUQ/Hyn5hzUG4i31KA8ExA7XZ1o5KCxvl7XJP+wUrc=;
-	b=EtTAGiuhHMt9a4+MFEWemuMjdAbwhGV8TPvI1B1GlbYyK1BivmyeBT5oU3VVLaCapb18
-	 EbHnJ3wXp5BmI5flEAxwlMWCSAIWijQs/818A7zIl7Jiiw2KSqBpZOcjFW/jCFim9aluR
-	 0gYzBR3HgcHZ7TFwg8pUw6N3Q4ZiBiPqXc657Dh/Fe0FuGyRb9FQlYNRDGVfh5K1rqINx
-	 KKhNkeNNx/YvO0WI+MmRSVsQzhUg2lR3qVlt0sUgmRDXGQjgg6AKjzUizHYsLD0INyE0O
-	 44ayv84GB9tQTJVORuki1FYK0fqJy6HbFEvbrsQg+BwYoCBxFvRWHbtRSeNAL4sXbVA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795097853;
+	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
+	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Mailer;
+	bh=4a2jBxmTGeS7x0J+UPLdZcnBsOb+omT2yoUVF4EpeHM=;
+	b=ZmBvPUbh/gHurok9Z7iXfh2XhHOp/AlLEeO+OXkB/bcqEhXUAZuyy7h1C9CWDTsrdYU6
+	 LGhxl7GPIQFAoYx1VP3isQw8JABQnVPekJSkO44Yi6Uylg2N8C0DQIJeugsaw8VnhXQ24
+	 K2Tqa0ZFzcUf8WDWhRQNowY6h5aJfutCMAKgg9281hU7YLz1RoyFt6AtxRADTGcoiM+Gf
+	 zeaq/5PFxXrFzgupNypFcYImeN7IF+WkQaBo7x+tKwlmxgymYonnv99DY7j4MmU+DXaGh
+	 7otMbzzk/Uf4de5P6hyTi4msUAiWHKFI7Z2txC/8ekKNBIF7HNZEogt5biNHpX95yNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iZVAzrSC;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aGeyCwJP;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D514606A330;
-	Thu, 19 Nov 2026 14:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE09606A324;
+	Thu, 19 Nov 2026 14:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iZVAzrSC
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EFCA1F000CC;
-	Thu, 19 Nov 2026 14:08:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aGeyCwJP
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F3BE1F000C4;
+	Thu, 19 Nov 2026 14:17:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795097329;
-	bh=IkUQ/Hyn5hzUG4i31KA8ExA7XZ1o5KCxvl7XJP+wUrc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iZVAzrSC/zPggAViGnqaEJtmJy7btxJmXzo/R04++vmD2qHLSgc86vEuVAfNxmZXh
-	 ILkv23+8qHJSDJUyUjsINbMPGLDNua7FtGLbSztALTdavdDKbDQSITi8JshAbbo+FD
-	 W4XHyd//VxD4Cnuxc7D6sQ5yDe7VI3g5FqAzDEgkKyCwfR9H7Qq4U5fKtTaixKOpoS
-	 Bj4nv+w2hE1tnrM0vcq8Nz07EOwVc0Q0YMwCoSZziQpnEPrLBpUlUUn+F7s7mB5UBs
-	 8V63Mhl3R1Um82PCX8r62jy7ypDwbb2ayAK9hnP0WIpTsMp+r6ocINZS95qQ9cHUhH
-	 Fkdzn8f0h391Q==
-From: Miguel Ojeda <ojeda@kernel.org>
-To: gregkh@linuxfoundation.org
-Cc: axboe@kernel.dk,
-	hch@lst.de,
-	patches@lists.linux.dev,
-	sashal@kernel.org,
-	stable@vger.kernel.org,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Boqun Feng <boqun@kernel.org>,
-	linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH 6.12 0534/1756] block: remove BLK_MQ_F_SHOULD_MERGE
-Date: Thu, 19 Nov 2026 15:08:30 +0100
-Message-ID: <20261119140830.15616-1-ojeda@kernel.org>
-In-Reply-To: <20261118150030.389817521@linuxfoundation.org>
-References: <20261118150030.389817521@linuxfoundation.org>
+	s=k20260515; t=1795097852;
+	bh=4a2jBxmTGeS7x0J+UPLdZcnBsOb+omT2yoUVF4EpeHM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=aGeyCwJPpTXE+mb4vrU34Ck9HTX8hTPwoByPNqaY4fBorqdYdyRnYT89SlsWMypq0
+	 FghWPT2lrkdazc/twL3n8P7Nc/LJh//5LqzPbw/eQ9x/JuT3wxVFGOQep3sx7ZyhCU
+	 Aah8tPaygOZ5RLWKFxFNt60IDxpW49Td6vQQ/qhiwgzm0klHZklhfkGGTZwHCqmanz
+	 H1yCpTcuU1LllyPYmmtZAvvDr224na5HEiPViwxOgoyuaicsLOq29KSDEJqny1oprk
+	 II9a2xmrdr8kxzmfkWdjzgih0L3G+2P4uzc8IyP/oK6W+Jitjyys1RpG5btrNMmMvF
+	 Ca5aitBdpdS5A==
+From: Christian Brauner <brauner@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+ Daehyeon Ko <4ncienth@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, 
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
+ Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+ Haocheng Yu <l1za0.sec@gmail.com>, Tal Zussman <tz2294@columbia.edu>, 
+ stable@vger.kernel.org
+In-Reply-To: <bc6dc5eaf825462783cd3a606636e92b.1@linux-foundation.org>
+References: <bc6dc5eaf825462783cd3a606636e92b.1@linux-foundation.org>
+Subject: Re: [PATCH] iov_iter: validate extracted segment for bvec
+ alignment
+Message-Id: <20261119-zweihundert-zerknirschen-halsschlagader-e8fdcc40189b@brauner>
+Date: Thu, 19 Nov 2026 15:17:27 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -64,40 +63,38 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.17-dev-04696
 
-On Wed, 18 Nov 2026 15:44:21 +0100 Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
->
-> BLK_MQ_F_SHOULD_MERGE is set for all tag_sets except those that purely
-> process passthrough commands (bsg-lib, ufs tmf, various nvme admin
-> queues) and thus don't even check the flag.  Remove it to simplify the
-> driver interface.
+On Wed, 18 Nov 2026 10:22:37 -0800, Andrew Morton wrote:
+> iov_iter_extract_bvecs() validates iter_iov_addr() and iter_iov_len()
+> before iov_iter_extract_pages() selects the first nonempty segment and
+> limits it by iter->count.  The checks can therefore cover a different
+> range after a leading empty segment or iov_iter_truncate().
+> 
+> An unprivileged O_DIRECT preadv() reproduced the empty-segment case: an
+> aligned empty segment followed by a misaligned one completed 4096 bytes
+> instead of returning -EINVAL.  A truncated iterator has the same mismatch
+> when its full segment length is aligned but its remaining count is not.
+> 
+> [...]
 
->  enum {
-> -	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
->  	BLK_MQ_F_TAG_QUEUE_SHARED = 1 << 1,
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
 
-This causes:
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-    error[E0425]: cannot find value `BLK_MQ_F_SHOULD_MERGE` in crate `bindings`
-      --> rust/kernel/block/mq/tag_set.rs:55:38
-       |
-    55 |                     flags: bindings::BLK_MQ_F_SHOULD_MERGE,
-       |                                      ^^^^^^^^^^^^^^^^^^^^^ not found in `bindings`
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-We need:
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
-  31d813a3b8cb ("rust: block: fix use of BLK_MQ_F_SHOULD_MERGE")
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Sasha Levin <sashal@kernel.org>
-Cc: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun@kernel.org>
-Cc: linux-block@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org
+[1/1] iov_iter: validate extracted segment for bvec alignment
+      https://git.kernel.org/vfs/vfs/c/5f149185fdea
 
-I hope that helps!
-
-Cheers,
-Miguel
