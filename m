@@ -1,47 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.101
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795071968;
-	b=mepW4DkVPGK+H6JQQgXx9j4JEatwheuOv8y5zT7s+Wb8bS03gevwUCXw9kFjlYUtsfom
-	 4zQzkjZih4Fw64c5UI5GBOfExXVj6PsYr7zl8SmsMFRFdV+/m8cTc47R77DeW36HG/X1n
-	 bGMib+kGTeTGTC23L2AFfG53/5qmZlzrA25i5LlWz/3zucP17HP2c9iw6xYE3R82P1toA
-	 I8nM1flAZ0G2zdlRYgJSdz97zXRIf324+YI/ux9kLHSgHHvZWYd5UKM2hBq+wsjyWjJtz
-	 ysImQi5isU8lSRCiJzU9edg0KNsBwzyZImyEsPo9seZyUZBxFOt/A+8T8FmXy+9xlVA==
+	t=1795071969;
+	b=BXyEnPxbY1ivSqatnHc5+jmoRQc1RX7VbMGqVq7J0OPH8nsLBjXOsimdBoC5fPknhyWd
+	 L5uGCtZeskLndkDwoLsYBh0uDvsJ6NdDugSU3av3MR2RmB3smC3b1wimdXSBbLAui7K6Z
+	 1cBTzj9vN1nPrIYS42l8ov5Rg//xUXIiRdbeJSGLZqq3yYFxxRmFITyinpuaXVnu4Wq0L
+	 HU9/FTuOHIGly++RL7WIgDn73Yuf/VDHnFq62EzDdhjJ1RuCJlAyY5GX4RiA+OAs99cFU
+	 YPKRhPgJY55wDF/WjXjuKLqoX73uJ6XO46rKLonEzxwzCn/IITCGeIk5d4+VE4XHNrw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795071968;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795071969;
 	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:From:To:Cc:
 	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=gzS1LHFp65SD1UCrporzHKX/WpvFu5cvA8Vm7v+e8qY=;
-	b=Ym8wqAOZMjlS+u6M0IRNBxLzVh5EhDY10E0xFo7YxaPnHbAvgDHjif5E5OW66MJ3pPFS
-	 WrAq3o01ppaV+BK1/RCbq1k3wt8B8L9cTuJJvuF0UJHP629wC1Ub/sm6g8NfpZ4t7Z+4s
-	 8rPUrp0UBEwE+Rei4F6wpHEeO59Qx6ReS7kIs9qU9AVcUV/+6ci7IXKzFGqOwVTOveCBQ
-	 4gd9YPNFUN+C7rHGO4J8rktbeb4diDz7vSdrgDe8aroZr/TODy9+kXOdZyg75uvmtcbox
-	 K5QeAHD6FQlZtdG69iIqewOAoMOpQI3CQi4QSM006eLyYnq6f5NgX6dItHtyB3a+o+A==
+	bh=8B5AVIXLEidDXzfM5otETGwMbGi9w/TxhNSx1EDQpxk=;
+	b=fTYl+yNpn6d/tM0oJiafYZrX4C3zuRRxJdx/4pE2rcYKt1ScT4FVXw8dheJBYXC0C7jx
+	 JJ+SSJhgVV26AYvVr+wghrtHLyFxcB+Yi4Pv9DIGyj2PBftS+lkkDgg+5BpZJS2cQ5530
+	 Z4AX9hF3sz6fuURVy4CiP9wuG3nxM+0yPdS63iNDxRpv0RyOcnwKklISsNUgFGr9uzSAD
+	 skGJxKkIclVazKHS0nWrBXD1Kf/uKkfwHhHSMm5AEVa7lntawlGnrfmUqk0qCWY34Vr+J
+	 pbjfBP9LV1bq7PUEOriB5jqnfJZZDr36CPy6/C3z9YcCD+749qjj2ZMp6yM8qpV4s/A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.alibaba.com;
 	spf=pass smtp.mailfrom=linux.alibaba.com;
-	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=UAAq+MQW;
-	arc=none smtp.remote-ip=115.124.30.113
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=LB+QeCJZ;
+	arc=none smtp.remote-ip=115.124.30.101
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A56606A32C
-	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 07:06:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E2A56606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC579606A326
+	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 07:06:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC579606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=UAAq+MQW
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=LB+QeCJZ
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1795071959; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=gzS1LHFp65SD1UCrporzHKX/WpvFu5cvA8Vm7v+e8qY=;
-	b=UAAq+MQW4yRmqoeaNaDbppqAUB16EMRln8bTl/C6TQDFMzKyAcD84PETLgNxBQu4jlChcFrcE1o1TFwoPuBH20uLenylxH9g3HjY7qwjAxmkKxZYxMfxGyWd951VhZ9VtU9OhEVut5Bjtgms8p7g+vzd3E8oUphWYEO9zpv1ERg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R561e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=kanie@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0XF2mP0E_1795071958;
-Received: from localhost(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0XF2mP0E_1795071958 cluster:ay36)
+	t=1795071961; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=8B5AVIXLEidDXzfM5otETGwMbGi9w/TxhNSx1EDQpxk=;
+	b=LB+QeCJZ8uywpZNp3hfO8EOAedFlRvt7rcjjXsuPAzB16r8pbQDA0vrGf+tf8ZXQYLrhLb9ZnCEGlP4omLLL6jkEU7ndZ2StIg/RUXM5aSgp+IdLOzlPfv/13Gpc5dYY3p3PpRx3QmnMu33oZHB0qtgs4vpjDnAk/6ibOXi1sQM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=kanie@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0XF2hAXd_1795071959;
+Received: from localhost(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0XF2hAXd_1795071959 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Thu, 19 Nov 2026 15:05:58 +0800
+          Thu, 19 Nov 2026 15:05:59 +0800
 From: Guixin Liu <kanie@linux.alibaba.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
@@ -51,9 +51,9 @@ To: Jens Axboe <axboe@kernel.dk>,
 	Ming Lei <ming.lei@redhat.com>,
 	Hannes Reinecke <hare@suse.de>
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 3/7] blk-iocost: don't take rq_qos_mutex before the queue is frozen in cost model write
-Date: Thu, 19 Nov 2026 15:05:44 +0800
-Message-ID: <20261119070548.3125491-4-kanie@linux.alibaba.com>
+Subject: [PATCH 4/7] blk-iocost: unfreeze the queue before dropping the bdev reference in qos write
+Date: Thu, 19 Nov 2026 15:05:45 +0800
+Message-ID: <20261119070548.3125491-5-kanie@linux.alibaba.com>
 X-Mailer: git-send-email 2.43.7
 In-Reply-To: <20261119070548.3125491-1-kanie@linux.alibaba.com>
 References: <20261119070548.3125491-1-kanie@linux.alibaba.com>
@@ -68,68 +68,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ioc_cost_model_write() freezes the queue while holding rq_qos_mutex,
-which blkg_conf_open_bdev() acquired first. Every other path takes
-rq_qos_mutex only after the queue is frozen: ioc_qos_write() releases
-and re-acquires the mutex around blk_mq_freeze_queue(), and rq_qos_add()
-documents that its caller holds the mutex with the queue frozen.
-Waiting for in-flight IO while holding rq_qos_mutex breaks that rule,
-and on the first write to a queue without iocost the path even calls
-blk_iocost_init() -> rq_qos_add() -> blk_mq_freeze_queue() while
-nothing has frozen the queue yet.
+ioc_qos_write() calls blkg_conf_close_bdev() before
+blk_mq_unfreeze_queue(). close_bdev drops the bdev reference the
+writer holds; if that is the last reference, the queue enters its
+release path and only the RCU-delayed free in blk_free_queue() keeps
+it alive across the unfreeze. Unfreeze before the close instead,
+while the writer's own bdev reference still pins the queue, matching
+ioc_cost_model_write().
 
-Mirror the release-freeze-reacquire sequence of ioc_qos_write(). The
-unfreeze moves to the close_bdev label so the error exits after the
-freeze don't leave the queue frozen, and it runs before
-blkg_conf_close_bdev() drops the bdev reference, while the queue is
-still pinned.
-
-Fixes: 2b2da2f6dc80 ("blk-iocost: prevent configuration update concurrent with io throttling")
+Fixes: 9730763f4756 ("block: correct locking order for protecting blk-wbt parameters")
 Cc: stable@vger.kernel.org
 Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
 ---
- block/blk-iocost.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ block/blk-iocost.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 1c1025157d8e..8e06b83691aa 100644
+index 8e06b83691aa..b251ecc66d8a 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -3589,6 +3589,15 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	ret = blkg_conf_open_bdev(&ctx);
- 	if (ret)
- 		return ret;
-+	/*
-+	 * Nothing is protecting QoS state yet, so release q->rq_qos_mutex,
-+	 * which was first acquired in blkg_conf_open_bdev, and re-acquire it
-+	 * after freezing the queue to maintain the correct locking order.
-+	 */
-+	mutex_unlock(&ctx.bdev->bd_queue->rq_qos_mutex);
-+
-+	memflags = blk_mq_freeze_queue(ctx.bdev->bd_queue);
-+	mutex_lock(&ctx.bdev->bd_queue->rq_qos_mutex);
- 
- 	body = ctx.body;
- 	q = bdev_get_queue(ctx.bdev);
-@@ -3605,7 +3614,6 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 		ioc = q_to_ioc(q);
- 	}
- 
--	memflags = blk_mq_freeze_queue(q);
- 	blk_mq_quiesce_queue(q);
- 
- 	spin_lock_irq(&ioc->lock);
-@@ -3663,9 +3671,9 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	spin_unlock_irq(&ioc->lock);
- 
- 	blk_mq_unquiesce_queue(q);
--	blk_mq_unfreeze_queue(q, memflags);
+@@ -3370,7 +3370,6 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 			     size_t nbytes, loff_t off)
+ {
+ 	struct blkg_conf_ctx ctx;
+-	struct request_queue *q;
+ 	struct gendisk *disk;
+ 	struct ioc *ioc;
+ 	u32 qos[NR_QOS_PARAMS];
+@@ -3511,9 +3510,8 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	blk_mq_unquiesce_queue(disk->queue);
  
  close_bdev:
-+	blk_mq_unfreeze_queue(q, memflags);
+-	q = ctx.bdev->bd_queue;
++	blk_mq_unfreeze_queue(ctx.bdev->bd_queue, memflags);
  	blkg_conf_close_bdev(&ctx);
+-	blk_mq_unfreeze_queue(q, memflags);
  	return ret ?: nbytes;
- }
+ 
+ einval:
 -- 
 2.43.7
 
