@@ -1,90 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.89.141.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795062561;
-	b=WIvgs/J1px5PL3sMqB2PxJSfgfK90+nJhG0pzbK/mv3S/xlfkunPRUvp9+wDL1D1/ILg
-	 JpEmEYn7YmAdcsO2G6Edw39NCrPSldDOPPW9yExT6FPfsTZnpNMkBESWPkiwwK1rL6IHd
-	 0p+yJr2jr+maBQX7JkmZ3VGNPz+CnyacWv6fOIxN4/jJkMncQBJAQrSi9kL0nzcL5gC3l
-	 hhqbEaoFY3P3y6sx3AB1n68DmjUV5loF42KWBTQfp5KeMBlO6Ig+Ewwwn1lBNhfOGKKw3
-	 qLPyEDqxc6T4kfI6RQ++XI+Woi4JXEDbc33Brcudylua9knViofLMBDNV9sxxUqA0dg==
+	t=1795065850;
+	b=WVcoqzNjdtF171AniYQPhukiXAmZ0zmxrJyA+UgMeVYQzDD1brHJgjqKd9vk+TRpjHMz
+	 yyC2gRnRtCdTK8JIGeOYGZNvBylY+chXpg+JGCJQS4NtzEY+y4c6l9JnP6i6cZ3Klskk+
+	 6vtdnam3h5HqFQWKjr1OA7j8/FaJ+WTff56e66BkxXz1Eo/Up1bitufgf6FGNRQU0MZFS
+	 9/kjA8YWQQ+uwWj8sa+mcOvN25OcTTBsZwyuJEcLBhQBrWOMP8xWgVhQH7bicNvj+zlXj
+	 pNzGZVce1dwfoltaicWKOpHn63ZZHtMmPHduN/IcgoZYakZabRvYijAoS7X1a7Fex2A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795062561;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=dCICOQDRVMWPO5nwEzDmnqXj88ffqAN3Sthv4ao13Hs=;
-	b=IWH9lV5VenzB9yLMTIgiE35mvj+M0jvilQ9mGO5bzhMa6OAmFn9D6dmSeMUzu3m8tZCK
-	 GrfpfKx5GjaR7oNtAp6sxpS4bVxoAk0Jm8lk6XlIjLt7bb72QHQZSBWzKbSZS42kqhyT1
-	 uiK1SVPz19cPa8c088ai6h5uHV9hXkSOSrDjzId0iAw3RZXYl59bQ0Fh8Bnx78KlYYYaJ
-	 ExZDPlAcvQ26Kx0LN2p/1oBYRPVQX73o6QgSnEN0qla36SLOJdWEHqBttrsLtPqw4J1OW
-	 Vhim4GsLMPhEpi06j2BL90Va4K2NpNdKhicUOoVxr0D3peacV3OfTJN/KCLtNPBenWQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795065850;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:Sender;
+	bh=4wIPBSNjEoWaDOrCHG3/HEZVU2V/dMehfnugzAp7piY=;
+	b=gUOzS6gIvkvy/YE9lSFm9kAtiIU9DUh+mNYp0EJOM+zJE16NyXY137SOBf0QsvchVxEb
+	 UnpccoEDHV7lms5WNroJw1k7OboDkzRdUBKwfH2pDu0Qi6OzkH3WDTTInx53l0OBayhT+
+	 r3eoE2bq1fuLIeO2EmpSR7sVjPKmenVrPXBtiFB6s3xt3qGZbiWyNQXkhLKiYuECnaW9D
+	 ODmOzB2F2RxxQPFNMtzGD4kwJyR4khAV1nAP/IiqYeiQMpKUMEKqgbb9cttc1T54UnwQo
+	 59FUboI5gc7/GDJ8CTf58UeHTEZqS7VZ+UCnqrszGTqLClle/xtEKP7KB0WCEoaDCkA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Zq7L4T3J;
-	arc=none smtp.remote-ip=209.85.214.177
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=zeniv.linux.org.uk;
+	spf=none smtp.mailfrom=ftp.linux.org.uk;
+	dkim=pass header.d=linux.org.uk header.i=@linux.org.uk header.a=rsa-sha256 header.s=zeniv-20220401 header.b=XTj4OJNT;
+	arc=none smtp.remote-ip=62.89.141.173
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89CE606A325
-	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 04:29:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D89CE606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E7D606A325;
+	Thu, 19 Nov 2026 05:24:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A1E7D606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Zq7L4T3J
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2f00fc215f9so6926605ad.0
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2026 20:29:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1795062560; x=1795667360; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=dCICOQDRVMWPO5nwEzDmnqXj88ffqAN3Sthv4ao13Hs=;
-        b=Zq7L4T3J8M42EFfoxkNRZCacZXcWTgN/kfBStmAHfA92PN3CWDZ15fxTLn257uEIfu
-         jZz7TTlyUbIsW+hz4oljQdAXyxU5G+0KQMiDhorTmAwACDLQogma/l6ndlQe2OlzEF5C
-         F7GEhB5DQcaD7uzwPIJZnGdQRiQLMeasgf7eg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795062560; x=1795667360;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=dCICOQDRVMWPO5nwEzDmnqXj88ffqAN3Sthv4ao13Hs=;
-        b=J6buDV6wrj40Fky1LIcpdh9PoQtNC3WBxq8BQsP3Npc6W8H62qWg06EvxC6m6qIgaP
-         36ZVsjjL5qi1vaqBlRBSk+AR/CcBUv4kKvLKyuu3I9QgJf4uGfEZd7neRKST7FZUN2Gu
-         +kjPZ5ulp0jfoxSMJnSdD0Qh8bYtN5+djY6RnQq/ksmr80jtO2Mk7BwnnP260eVbCGJ0
-         wG1Q+7V8Ckk3Uurw5E1VvYyUavh03K4lRwUylRNghmagEVkKOOVy8yNNHals1T+7A+3X
-         zWLxEoB9bclrBYqnitBfcYDUZuyQsSWDVJ9S/aQ72gcWiG5ei3CxIAX+PZekF9dsA/gA
-         nh2A==
-X-Forwarded-Encrypted: i=1; AL+hErFjJiNZ7armtxj1kERdkaIqsfrH+mKlLWd8agLwwKdrgO//U13DDU7KkTxoIZPMPngkq58bRBdCB6VzrQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+secHv3kJ+G/F5Rhmu8byJTwOqZ1vBFDJDWhm3HkZJMH3n7KoA
-	Ln4LT9HyRI20XBSvDkIRGSfQTfAFq5UmqIAQSkH1gL0orfdN82wd5OQ5+bxI9ngeTw==
-X-Gm-Gg: AZFdTZeThp3o5o0FAVHQpeXz1pkFIXIj5B91R0ggfo9G/LgHv9yR81kJnFprTGDSjuv
-	NDaS68a9fjLlTQ5YgGoKKkvvv2cVcbpW4cFrM63uu3Z25MOys8NN2y51wiC2jQixLnxzIj2VOsi
-	iDrG8ky50l9PYDx2PYssbJGVnsSylWE5Tl3KIzCoqhTQkMPt7vzdV6fCXP3+zwHYuDB8tdCh1tw
-	Y1c4vlJBK4xfZrqNmeVD4+4j4MeIY/FTtqbepduD3adXi1l4wM8BhQysw9PEHjLJ0UtekplmjK3
-	2CyRJhIL4J8kAOKPdjvIlkk9cHDqVwDLXiOoiIv7Qjjt4UEJBeB2ygB0sTEU+Vap+n7EbR42hvA
-	JN3h/ZC/mJCIyOu2bU0AWmNPYNgJofbJj6lSXtQG1rv6qmu/12MogePFEaUQgSdZ3nG/nei5qHz
-	CD53o8Va6TACHCu5kRmSmW1Dwls6S9WdZRKCX6VfHwu2x7YCWnBEiz8HMbAMfnj5nylzRbwgASl
-	dyrcNF3s6v4obyYoWWtRM5tebjJCieYqbMr75V5agWEg8TnyzmM2LiUKGmgD3TFd9x7NoUeXRgu
-	zsu1yzH+y3odyBNi8IYRKN8YE/srGiTk2pww+jxHc1SFcGbDJBt8eya+p3/4DovbTXn1nw==
-X-Received: by 2002:a17:903:3bd0:b0:2e9:5829:9b48 with SMTP id d9443c01a7336-2eff72ea3f2mr42869015ad.20.1795062560125;
-        Wed, 18 Nov 2026 20:29:20 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:9297:4989:4c44:dad6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2eff5ec9cd0sm23174315ad.11.2026.11.18.20.29.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 20:29:19 -0800 (PST)
-Date: Thu, 19 Nov 2026 13:29:16 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-mm@kvack.org
-Subject: Re: [PATCH 1/2] zsmalloc: fix SPDX license identifier
-Message-ID: <av56Sq5ZxntVn3al@google.com>
-References: <39f6056e0c8834fc3eca2001fcb44f3b6048f74d.1795061575.git.senozhatsky@chromium.org>
+	dkim=pass (2048-bit key, unprotected) header.d=linux.org.uk header.i=@linux.org.uk header.a=rsa-sha256 header.s=zeniv-20220401 header.b=XTj4OJNT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=4wIPBSNjEoWaDOrCHG3/HEZVU2V/dMehfnugzAp7piY=; b=XTj4OJNT5IuDqV/yIcnzKva4nx
+	pocorNO75aqnFm9/1Ze9bHSwKOfz5CS4qaLbAtUnG13eC9jQJed2MGMyOeWGA3C4Zb6Es3Dg8EZqJ
+	8O3GXDLjd7n4E+68EzDacDIjDIC/pXlb2rpz3kkFNt2pdRMiuDG5jFCy5tJJZRMrQJ1g1Supi6ilv
+	8jzkSvOLaf4yvqj1FdnScIn03dupGsH/g5ozR/EgMqAQZbnhAFd/n0pmpOM26Qp1zPMkmnHeOTQlm
+	l5+iRyWJ8N1Wbkl9GJhAZqkw141ykK1gb1FM1Wk9sFq85ig69qtmoNp6dFkz8syOpiUBbRIX/NHR9
+	Z1CRIKfQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xTucV-00000005d11-45eR;
+	Thu, 19 Nov 2026 05:23:40 +0000
+Date: Thu, 19 Nov 2026 05:23:39 +0000
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Cai Xinchen <caixinchen1@huawei.com>
+Cc: mic@digikod.net, gnoack@google.com, paul@paul-moore.com,
+	brauner@kernel.org, jack@suse.cz, amir73il@gmail.com,
+	andrii@kernel.org, apparmor@lists.ubuntu.com, ast@kernel.org,
+	axboe@kernel.dk, bpf@vger.kernel.org, casey@schaufler-ca.com,
+	cel@kernel.org, cem@kernel.org, chenxiaosong@chenxiaosong.com,
+	code@tyhicks.com, corbet@lwn.net, Dai.Ngo@oracle.com,
+	dakr@kernel.org, daniel@iogearbox.net, dhowells@redhat.com,
+	dlemoal@kernel.org, dmitry.kasatkin@gmail.com,
+	driver-core@lists.linux.dev, dsterba@suse.com,
+	ecryptfs@vger.kernel.org, eddyz87@gmail.com, emil@etsalapatis.com,
+	eric.snowberg@oracle.com, exfat@lists.linux.dev,
+	georgia.garcia@canonical.com, gregkh@linuxfoundation.org,
+	hch@lst.de, hirofumi@mail.parknet.co.jp, hyc.lee@gmail.com,
+	ihor.solodrai@linux.dev, jlayton@kernel.org, jmorris@namei.org,
+	johan@kernel.org, john.fastabend@gmail.com,
+	john.johansen@canonical.com, jolsa@kernel.org, kpsingh@kernel.org,
+	linkinjeon@kernel.org, linux-api@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-security-module@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-unionfs@vger.kernel.org,
+	linux-xfs@vger.kernel.org, liubaolin12138@163.com,
+	martin.lau@linux.dev, mason@kernel.org,
+	mathieu.desnoyers@efficios.com, matt@bobrowski.net,
+	memxor@gmail.com, mhiramat@kernel.org, miklos@szeredi.hu,
+	neil@brown.name, netfs@lists.linux.dev, ntfs@lists.linux.dev,
+	okorniev@redhat.com, omosnacek@gmail.com,
+	penguin-kernel@i-love.sakura.ne.jp, rafael@kernel.org,
+	rdunlap@infradead.org, roberto.sassu@huawei.com,
+	rostedt@goodmis.org, selinux@vger.kernel.org,
+	senozhatsky@chromium.org, serge@hallyn.com, sj1557.seo@samsung.com,
+	skhan@linuxfoundation.org, song@kernel.org,
+	stephen.smalley.work@gmail.com, takedakn@nttdata.co.jp,
+	tom@talpey.com, yonghong.song@linux.dev, yuezhang.mo@sony.com,
+	zohar@linux.ibm.com, utilityemal77@gmail.com, lujialin4@huawei.com
+Subject: Re: [PATCH -next -v4 01/17] fs: pass struct path to notify_change()
+Message-ID: <20261119052339.GT989762@ZenIV>
+References: <20261117150542.1169451-1-caixinchen1@huawei.com>
+ <20261117150542.1169451-2-caixinchen1@huawei.com>
+ <20261117183059.GP989762@ZenIV>
+ <32b8d9c9-27d2-4da9-8618-ccfc44dee7a3@huawei.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -96,18 +103,28 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <39f6056e0c8834fc3eca2001fcb44f3b6048f74d.1795061575.git.senozhatsky@chromium.org>
+In-Reply-To: <32b8d9c9-27d2-4da9-8618-ccfc44dee7a3@huawei.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On (26/11/19 13:13), Sergey Senozhatsky wrote:
-[..]
-> +++ b/mm/zsmalloc.c
-> @@ -1,16 +1,10 @@
-> -// SPDX-License-Identifier: GPL-2.0-or-later
-> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
+On Wed, Nov 18, 2026 at 05:13:31PM +0800, Cai Xinchen wrote:
+> On whether we want the mount references at all: they are not for NTFS.
+> The path-based LSM hooks need them - Landlock's check walks the hierarchy
+> up from the object with path->mnt->mnt_root and follow_up(), for every
+> layer, and the idmap we pass has to be the one of the mount the path was
+> checked in.
 
-So this was introduced by commit 91d0ec834786 ("replace kmap_atomic
-with kmap_local_page").  It doesn't look like I have reviewed that
-patch [1].  Somehow.  It would have been difficult to spot that
-SPDX one-liner among all the kmap changes anyway.
+Then it won't be happy with overlayfs ones:
+        upper_mnt = clone_private_mount(upperpath);
+...
+        upper_layer->mnt = upper_mnt;
+in ovl_get_upper(),
+                err = ovl_get_upper(sb, ofs, &layers[0], &ctx->upper);
+in ovl_fill_super_creds()
+combined with
+static inline struct vfsmount *ovl_upper_mnt(struct ovl_fs *ofs)
+{
+        return ofs->layers[0].mnt;
+}
 
-[1] https://lkml.kernel.org/r/20241001175358.12970-1-quic_pintu@quicinc.com
+mean that the mount you get won't be attached to anything.  How (un)happy
+would landlock be with that?
