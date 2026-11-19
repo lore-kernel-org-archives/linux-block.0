@@ -1,59 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=18.9.28.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795097853;
-	b=qU9joVQF8UabbsNFhciBNSCOsAqeY3hRh18kPzMFopnNai+jv0Ob7nM15nQJ7FD8qenL
-	 yYSpg64mu6zmh8pNW6US5fxJ13rQtgMZnt0NIw+GtrA+uL10N5ZKouQU8a1FoGEVLvGgU
-	 edNJMm4FCO4NoLt/dzBRPwDqDjmQg+w982WcRKBu4+215QY7+Fj0xfY5OVosCHo9tgn6R
-	 EgcHU5NAsRwoZC2g2EiqKFz+0BPFWD6K0ko0PTNwELrUtWMRgWuMzhxDVlAbM2JqTUwef
-	 vzGpx8HRisidco2Sf/K1ljTDo5bp96NPCElFLUR1gIAMNghDRPXBY4fWcJDSrYYxswg==
+	t=1795099701;
+	b=VkjuLks5gNbMvJG2ylMgd9i5VFWFa3a2pMxfjxRW4V907FY4V5GILujfH5AgrL10F5/k
+	 cvM2AYQ83xtyNT2IRNvyEd4fP6LJo2Zw61Enib4ejD7YVuY93m0BAQssaYhKsT7SdAxMe
+	 xX/m2oWTdlujPukjYEeV+hS4L6qcX03+K8HFtz1V8MWtU2lmO5N6cH6JgZo51FFZw824T
+	 5IsDf3hpQukm8PTNh1etm/qEm+pvuk0smE6XTnvvBpssytlWkTfjplE1kWieN/UXQrhlW
+	 RQl0wQl3k/YtiJBDkyOb+yj+ZsVxbdekqEIZJYDK0c7lK5KN7pEGwyHpjGCvw7amLsQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795097853;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer;
-	bh=4a2jBxmTGeS7x0J+UPLdZcnBsOb+omT2yoUVF4EpeHM=;
-	b=ZmBvPUbh/gHurok9Z7iXfh2XhHOp/AlLEeO+OXkB/bcqEhXUAZuyy7h1C9CWDTsrdYU6
-	 LGhxl7GPIQFAoYx1VP3isQw8JABQnVPekJSkO44Yi6Uylg2N8C0DQIJeugsaw8VnhXQ24
-	 K2Tqa0ZFzcUf8WDWhRQNowY6h5aJfutCMAKgg9281hU7YLz1RoyFt6AtxRADTGcoiM+Gf
-	 zeaq/5PFxXrFzgupNypFcYImeN7IF+WkQaBo7x+tKwlmxgymYonnv99DY7j4MmU+DXaGh
-	 7otMbzzk/Uf4de5P6hyTi4msUAiWHKFI7Z2txC/8ekKNBIF7HNZEogt5biNHpX95yNA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795099701;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=T3vSSCG3nDSVHiHTKgUz4Oge4REQVEiV7vanpzDz560=;
+	b=UAY7KcpLDCUSuVwjucit9KM04vPtHHHF3RaO4cAJrAeFPC86c2JCDIQ4xjejabxAI4jd
+	 LQsIc6q9C5OAY9RQ/Kd5jIOHrRhhfNWdtZIbE0ScJRoM6dpIAnikZlW1jCPXhWocxoNFH
+	 t1zfOnMwouWyEBoaaphAD9baiMfoaX8n05vYGYLRBQ4vmleemEjFOEETMmOUoLorgRwIS
+	 DoZTnOTwL4ygan9sOvfv7SdSVAwUl/FsyOqUZ63Na8CMEr5fH5cQAtHcsi3NPmHygx1PN
+	 wZ5ybWk85ZVmd9f3/WZywOPHTdXjGimn0Em+OoT/btqsT8pzTincjUys7Lz40EsXMgA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aGeyCwJP;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=mit.edu;
+	spf=pass smtp.mailfrom=mit.edu;
+	dkim=pass header.d=mit.edu header.i=@mit.edu header.a=rsa-sha256 header.s=outgoing header.b=WX4MedJb;
+	arc=none smtp.remote-ip=18.9.28.11
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE09606A324;
-	Thu, 19 Nov 2026 14:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645F2606E132
+	for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 14:48:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 645F2606E132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aGeyCwJP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F3BE1F000C4;
-	Thu, 19 Nov 2026 14:17:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795097852;
-	bh=4a2jBxmTGeS7x0J+UPLdZcnBsOb+omT2yoUVF4EpeHM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=aGeyCwJPpTXE+mb4vrU34Ck9HTX8hTPwoByPNqaY4fBorqdYdyRnYT89SlsWMypq0
-	 FghWPT2lrkdazc/twL3n8P7Nc/LJh//5LqzPbw/eQ9x/JuT3wxVFGOQep3sx7ZyhCU
-	 Aah8tPaygOZ5RLWKFxFNt60IDxpW49Td6vQQ/qhiwgzm0klHZklhfkGGTZwHCqmanz
-	 H1yCpTcuU1LllyPYmmtZAvvDr224na5HEiPViwxOgoyuaicsLOq29KSDEJqny1oprk
-	 II9a2xmrdr8kxzmfkWdjzgih0L3G+2P4uzc8IyP/oK6W+Jitjyys1RpG5btrNMmMvF
-	 Ca5aitBdpdS5A==
-From: Christian Brauner <brauner@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
- Daehyeon Ko <4ncienth@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, 
- Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
- Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>, 
- Haocheng Yu <l1za0.sec@gmail.com>, Tal Zussman <tz2294@columbia.edu>, 
- stable@vger.kernel.org
-In-Reply-To: <bc6dc5eaf825462783cd3a606636e92b.1@linux-foundation.org>
-References: <bc6dc5eaf825462783cd3a606636e92b.1@linux-foundation.org>
-Subject: Re: [PATCH] iov_iter: validate extracted segment for bvec
- alignment
-Message-Id: <20261119-zweihundert-zerknirschen-halsschlagader-e8fdcc40189b@brauner>
-Date: Thu, 19 Nov 2026 15:17:27 +0100
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.a=rsa-sha256 header.s=outgoing header.b=WX4MedJb
+Received: from trampoline.thunk.org (pool-173-48-114-214.bstnma.fios.verizon.net [173.48.114.214])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 6AJElgqT018265
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Nov 2026 09:47:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1795099666; bh=T3vSSCG3nDSVHiHTKgUz4Oge4REQVEiV7vanpzDz560=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=WX4MedJbJdIL78aoFBT9P0brpEumjGLvCHT7A0vM+Y+BCKpFSdHgl0NmiiEmyt5pg
+	 qd2kcHfgYht0hKbYZOZAPPJ2iMBxR6z7P3SVl3vQThEothU5fJJdurWhIZOc9GTaH1
+	 01D1w7tioqBH9KbkMUvM0VvxqxRhUWB1+EB8L+8JlBIQxuCxpLh4WR7dC//QaR4olP
+	 MU2VIU/HIsLdv49uf1w39nOI2hjaST8Z9zIfmZWw1e+el0R+9eDdvwtOGd0+CXP2Cu
+	 YkCwOlbNTC2drtusZ+QsVSDcgKcZqKs7hl2KZguyYKUd6SgS4j/rUrx4PByyyh5HfG
+	 Dyww/f37blLDw==
+Received: by trampoline.thunk.org (Postfix, from userid 15806)
+	id 73D532E019B; Thu, 19 Nov 2026 09:47:33 -0500 (EST)
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Baokun Li <libaokun@linux.alibaba.com>, Jan Kara <jack@suse.cz>,
+        Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+        "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
+        Zhang Yi <yi.zhang@huawei.com>, Christoph Hellwig <hch@lst.de>,
+        John Garry <john.garry@linux.dev>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Tal Zussman <tz2294@columbia.edu>
+Cc: "Theodore Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sashiko <sashiko-bot@kernel.org>
+Subject: Re: [PATCH RFC v2 0/3] ext4: don't complete atomic writes through buffered I/O
+Date: Thu, 19 Nov 2026 09:47:24 -0500
+Message-ID: <179509948702.1938961.13602175294944718049.b4-ty@b4>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
+References: <20261012-ext4-atomic-no-fallback-v2-0-c4b30c60e500@columbia.edu>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -64,37 +77,35 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-04696
+Content-Transfer-Encoding: 8bit
 
-On Wed, 18 Nov 2026 10:22:37 -0800, Andrew Morton wrote:
-> iov_iter_extract_bvecs() validates iter_iov_addr() and iter_iov_len()
-> before iov_iter_extract_pages() selects the first nonempty segment and
-> limits it by iter->count.  The checks can therefore cover a different
-> range after a leading empty segment or iov_iter_truncate().
+
+On Mon, 12 Oct 2026 13:17:39 -0400, Tal Zussman wrote:
+> ext4_dio_write_iter() has two ways to finish a write through the page
+> cache: the fallback for inodes that can't do direct I/O at all, and the
+> completion of a short direct write. Neither provides torn-write
+> protection, and neither refuses IOCB_ATOMIC.
 > 
-> An unprivileged O_DIRECT preadv() reproduced the empty-segment case: an
-> aligned empty segment followed by a misaligned one completed 4096 bytes
-> instead of returning -EINVAL.  A truncated iterator has the same mismatch
-> when its full segment length is aligned but its remaining count is not.
+> Patch 1 fixes a reachable bug: an atomic write to a data-journaled
+> inode is advertised by statx() and then silently done as a buffered
+> write. Patch 2 makes a short atomic direct write fail with -EIO instead
+> of falling back. That path should be unreachable today, so this is
+> defensive. Patch 3 closes the same kind of gap for DAX inodes,
+> which ext4_file_write_iter() hands to the DAX path before any atomic
+> write handling. No DAX-capable device advertises atomic write limits
+> today, so this one is defensive too, and matches XFS.
 > 
 > [...]
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+Applied, thanks!
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+[1/3] ext4: reject atomic writes on inodes that can't do direct I/O
+      commit: 44805e53d2cab4cfc58faaae9c70fde0206eecb6
+[2/3] ext4: never fall back to buffered I/O for atomic direct writes
+      commit: 4562556caa2bedd549038690a4a1481c6446ec41
+[3/3] ext4: don't advertise atomic writes for DAX inodes
+      commit: 078b328cafee53d4284528a3b07454e0cab955a4
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
-
-[1/1] iov_iter: validate extracted segment for bvec alignment
-      https://git.kernel.org/vfs/vfs/c/5f149185fdea
-
+Best regards,
+-- 
+Theodore Ts'o <tytso@mit.edu>
