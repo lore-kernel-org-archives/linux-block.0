@@ -1,94 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.63
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795143385;
-	b=ewCiVxHrhCbsV8/2VBu4nJCOPDZNf2b4i0bBh6sGw8x/HooLAst6PZhl4AGEDDcGNbRO
-	 7eKINVuahmOwKGzWvQ2KW2ntGkvUYQxIGbxzYnqSIhotXIepteQoxgGCM5ifDX5zoIqkD
-	 V+b2er8aWlh2mEgQ54PH79b1E1X94mjOsc99EPcvlLB0Hzn+148Uh9Qp8F1xcWOZKnEf7
-	 +2wv0/e4mvzBdwheZqVePUMxkiv3jAEZ2YOMyld5hx1ijtu2ct1WAGPaYyhacNBfYSkv9
-	 Aqxrnh2Ntnjkp/LPmnCRHsbLWgYU9JG3OjG4dxQbnqTbVAN5sgnBL27xo50ROstuGXg==
+	t=1795143401;
+	b=Y/GLHxwbJNYQ1FBfgx05qfEkhvNslR6d9APp0i7vS4efvf/2TPiRKz2F1W4LHFkHb3a0
+	 V/WwwAKFhN0fsi5K+ihKOEcz9u0WvO5zVEoHMa3IrhtnlD4vYigcSCw6dUegQU5JexJrc
+	 hDMpnxR5pxBi/siDB3+kFd8hnPBME1HpeNDL/W1MlSvRQaQXtIQ0o6/bUyxZchDLa4S9I
+	 GSMERHLPezjCudH+S0Hvy4paE97jR5INQ7IHjNttX7LkKPYHw4uaR/FuoiiQQJGrrWyI/
+	 O6Vzk4fv+y4D4gkBfd9wBd2y6FgiFE4szZwTBEgq9zaqqKNsbGX+IWckPRXBndUQ3Xw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795143385;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795143401;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=KWEY6nl/y5ZxN2FGJqAD1BanEQOLjtbrxGkg3tG9xY0=;
-	b=kDNxWEnBKU3QOXMGdNiJWtKAU1vb2Iz4urdL4GvmZFDhtUIvqFmnE1SqLMu3OAxkZcun
-	 wm6Dfmowm2wf3xonDvrVOjWXkZxQ/e7jyC/l1POwdrlKtiKUqPh/YhHTygXOyKlGlBFEz
-	 JNDOjDvk01vT67+bFxkeBixEZGBm0QEwZI5J4hD+o1+tqwL+GnZNMVVFkLWVwcp1EQs3O
-	 Lx/sH4FEaq+8fTVyeUa3zteBC37jZnzN4YkDoTesboBhb8ugOlQmPBy8CAvML/hjuwodU
-	 am0BHkjAk3w7NGmWF1PPl8qe+vWUarBJbf6O5wdwEPVDQ2auJjwc7X3TDypqzJqW4iQ==
+	bh=AGh7gO8xAUb32hxlaVb7cp0MZEDs//ukTFJwii+IUdQ=;
+	b=E4ARBKpUA+sk0qB9Rim8K1iZ/RofLxMaLlG+93KQFFgGqXTPwv8x0PCoLMdW+lwF0MBg
+	 aFFQqb473kqdCT7HVqjRLk3gA9fEzTLuSevyGHiKE5rTGt+CuXf2pWohurppI31Y7UBKr
+	 aWtuw6gZ4KIHMMseleN5l/+ZvHGh8x6s6ZkNfb+dXrbMjxhbLEeUI90I4fmGoKtBl862N
+	 LMFVua4bA5tbt87hok2hrFh1hZ1M5AXahkSbYDRHJJlv1TmPw/vs3RFXCEiOmFVf5jYR0
+	 gzMUxFjFLyeyDp60KMRQB+l8Rjj7CeTYZHVoLciF8Hdgfe/FO94Q/kY26gPlPLOoVMg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=smartx.com;
-	spf=pass smtp.mailfrom=smartx.com;
-	dkim=pass header.d=smartx-com.20260707.gappssmtp.com header.i=@smartx-com.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=NVEghiJ7;
-	arc=none smtp.remote-ip=209.85.216.50
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=J2Po1Ljw;
+	arc=none smtp.remote-ip=91.218.175.63
+Received: from mta0.migadu.com (out-63.mta0.migadu.com [91.218.175.63])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C46260A2616
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 02:56:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3C46260A2616
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smartx.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8D5606A320
+	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 02:56:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C8D5606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20260707.gappssmtp.com header.i=@smartx-com.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=NVEghiJ7
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3b08cf16decso314773a91.0
-        for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 18:56:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20260707.gappssmtp.com; s=20260707; t=1795143385; x=1795748185; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=KWEY6nl/y5ZxN2FGJqAD1BanEQOLjtbrxGkg3tG9xY0=;
-        b=NVEghiJ7Ob3LqdXCc9Q3IfI1SEwA7mDDRvIfvBHpL4Hc7e8ehixqSDwd62wlpsqLMi
-         PDj/Z3OiLuoxMDFGHRN7c8W917rU343Rq5uLhv8VUjS4aQKjKJoS2VNYSkxuts3qlXSL
-         m1miO/XS+ayG9BzUn17rXTJaXrZNUhsBy8vA0YSoeDdJLqSPleYAgiElnw67Ovm/NOvR
-         LihMt4I7FY/DLzsCivTMn0Jm7cRdwGxFXf9jG9HacYdfJsx1OhIAw4bzkj0+VuEWspnZ
-         trFDDPDCQuBunBYrdcc4YynNO5PY+PhY73q8cWDDKpkL7mZQGBQQ7UmggjvROBbWQStL
-         LbKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795143385; x=1795748185;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=KWEY6nl/y5ZxN2FGJqAD1BanEQOLjtbrxGkg3tG9xY0=;
-        b=mQ4gIdLFcl3eRM/3dTxoagB3+pGwARWms1vGs+1vfvTc1SR+yJmvbkWA2mSTDfapXJ
-         SnJilWNiB/ShLKwvH5DO4cYUMx60WHdrprS7pgEGLtzIfgDvodqsOH0h0jFWMOswgzxU
-         fJLAP3ZMEqRj0XqSA979Okzm8JPr2q2GnEN300+kTGxzebuCoiCkM2bFf+kOQufIjbKl
-         lZfUWTVTJiRkH1mJi7EjzhGRKpK5t9kPYmgeSrNCeR7jaU0G3VJPHRLFHQ5hFOTrw8cD
-         patbZFA+byt4aVpSVXuWS7Gb/CXv11+BdTjtMsKDpmuAJrE2BmnSqkEUWawytXYd1vEv
-         pDoA==
-X-Gm-Message-State: APuU4Z8IsU62GLpRklMCLUd/7YazDS5iGw5gT5+UcP/Pzqbui0YL9b7k
-	6Yp4W3xxh8uCn8dFSPNOfxTvA0zzaVG7XEKDNknccwjgdIKG0Qrstk5y8JTyvgJKadH6cymhmF9
-	1wU9BaBMndM6bW2a3Ir2wqh31ama9OKxJXE7HdweWHaHj6nRzWqUIb8DKBQ==
-X-Gm-Gg: AZFdTZf56EnGI7mB+tKh+sj4pRtG8FmVmr0xjTnFvBEN4zLu+HThtbaX4oiRSGcml01
-	ZvbjCS2DmpEJnsNu1nEjfs1K3fqWK/ZbBepvVabxC3lbZ/k55Vj2UzXX8HKb3rIRHd2RIBSzuPk
-	EF0o3qz2YzEo3mxnhIMX7L+92tzfsp4haipdir1MmM1wQWNumEOd5pvokibY3E0ElM0rd9iJKG1
-	ZPfJEtb3uwVIlIFuVfVYbgdVHUKUTf/dG5PyjZfRDiGecruEYE9wZJVoI2EhqoEJeSnGUPVAtyi
-	QbGNbFtHiZQqfDSv47SN7IE5F/SCuf7ZQbf+zLynbqXHCQfHfbogY9YQ1OwyPtxPEejYzKIAOey
-	XT0t/qRdIY/noALOYmHSQLQMxdjo+fk+aGS8xyIT8XW1x/lYBL57jLuPEdymw6WNRujzvcZZutU
-	8KLoaRlqFdaeDJHiqFPXVqL69v3T1gnreTFBffQ6PI9LFUTjXXDMOty/eauZ0B0NZnpRGRXX9U0
-	UeFWDLE9Ef/hM0n9tDBYMwPZSjrAVnt1mkPIhdFfbzJJe+fQpCqURxcGywORak9FkE7/fEW/4f4
-	LQhRqMQYHoTqBiAKPBzyiluhvIn1xemCiHLAVQ==
-X-Received: by 2002:a17:90b:17cd:b0:3b3:ab8c:c7e5 with SMTP id 98e67ed59e1d1-3b41c95f65fmr1345392a91.56.1795143384542;
-        Thu, 19 Nov 2026 18:56:24 -0800 (PST)
-Received: from localhost.localdomain ([103.26.8.217])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-3b405d63728sm5546461a91.8.2026.11.19.18.56.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 18:56:24 -0800 (PST)
-From: Lei Chen <lei.chen@smartx.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lei Chen <lei.chen@smartx.com>
-Subject: [PATCH v2 5/5] scsi: mpt3sas: Link tag set debugfs to the controller
-Date: Fri, 20 Nov 2026 10:56:04 +0800
-Message-ID: <afdf1d26951b84f4de98c0a8b34d3800019df3f0.1795143228.git.lei.chen@smartx.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1795143228.git.lei.chen@smartx.com>
-References: <20261009030111.57784-1-lei.chen@smartx.com> <cover.1795143228.git.lei.chen@smartx.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=J2Po1Ljw
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=XhRjMNS6NK3aNMlNMOlEhLqN52rU2XtXdGtW9U0p1Vw=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795143398; v=1; x=1795748198;
+ b=J2Po1LjwAk7su+6Sh4n9bXcuFfVUByvdRdf52ShQVAjhU24pzaAI1PJNwIy74g+Prkr1Bd47
+ rFR2EqJ6DYTsonJyN8M1gqhorHEiYXC1rsVWb8/rMDVxj9dv8PbGnfhok7mPGiCLZDPqJvUfgj/
+ SssP+jF5L8S1JL5VXfvuYvhc=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 874576962382fad4;
+	Fri, 20 Nov 2026 02:56:38 +0000
+X-Mizu-Trace-ID: 874576962382fad4
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <7106a456-8e3d-4fe2-ae7d-b8e753e2b131@linux.dev>
+Date: Fri, 20 Nov 2026 10:56:17 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -98,41 +58,120 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: cui.tao@linux.dev, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/7] blk-iocost: don't take rq_qos_mutex before the queue
+ is frozen in cost model write
+To: Guixin Liu <kanie@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
+ Josef Bacik <josef@toxicpanda.com>, Nilay Shroff <nilay@linux.ibm.com>,
+ Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
+References: <20261119070548.3125491-1-kanie@linux.alibaba.com>
+ <20261119070548.3125491-4-kanie@linux.alibaba.com>
+ <473ff2e1-329f-49c0-a124-b9e2194d7bcf@linux.dev>
+ <70f7faf8-e362-4a1c-ae5d-33c168337755@linux.alibaba.com>
+From: Tao Cui <cui.tao@linux.dev>
+In-Reply-To: <70f7faf8-e362-4a1c-ae5d-33c168337755@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The tag set debugfs directory lists the adapter's request queues, but
-does not link to its IOC dump and host recovery debugfs entries.
+Hello, Guixin,
 
-Link the SCSI host tag set to the mpt3sas/scsi_host<host-no> debugfs
-directory after adapter debugfs setup succeeds. Remove the controller
-link before deleting the adapter directory.
+在 2026/11/20 10:14, Guixin Liu 写道:
+> 
+> 
+> 在 2026/11/19 21:40, Tao Cui 写道:
+>> Hello, Guixin,
+>>
+>> 在 2026/11/19 15:05, Guixin Liu 写道:
+>>> ioc_cost_model_write() freezes the queue while holding rq_qos_mutex,
+>>> which blkg_conf_open_bdev() acquired first. Every other path takes
+>>> rq_qos_mutex only after the queue is frozen: ioc_qos_write() releases
+>>> and re-acquires the mutex around blk_mq_freeze_queue(), and rq_qos_add()
+>>> documents that its caller holds the mutex with the queue frozen.
+>>> Waiting for in-flight IO while holding rq_qos_mutex breaks that rule,
+>>> and on the first write to a queue without iocost the path even calls
+>>> blk_iocost_init() -> rq_qos_add() -> blk_mq_freeze_queue() while
+>>> nothing has frozen the queue yet.
+>>>
+>>> Mirror the release-freeze-reacquire sequence of ioc_qos_write(). The
+>>> unfreeze moves to the close_bdev label so the error exits after the
+>>> freeze don't leave the queue frozen, and it runs before
+>>> blkg_conf_close_bdev() drops the bdev reference, while the queue is
+>>> still pinned.
+>>>
+>> I tried the same change in cost model write recently and it turned out flawed, these two reviews explain it better than I can [1][2].
+>>
+>> In short: the disk_live() check in blkg_conf_open_bdev() only holds while rq_qos_mutex is kept, and dropping it around the freeze lets the disk and the ioc go away; Tejun reproduced a use-after-free that way.
+>>
+>> I've been busy with another thread lately, so I'm glad to see you proposing a fix for this. Hope the links help.
+>>
+>> Thanks,
+>> Tao
+>>
+>> [1] https://lore.kernel.org/all/20261111163306.GA17267@lst.de/
+>> [2] https://lore.kernel.org/all/bfe5007b2758bb06504b6966abaf1f7e@kernel.org/
+>>  
+> Hi Tao,
+>   Thanks for the review, right, this patch enter the same issue, I will drop this
+> in next version.
+>
 
-Signed-off-by: Lei Chen <lei.chen@smartx.com>
----
- drivers/scsi/mpt3sas/mpt3sas_debugfs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks for checking the history before reworking. I'm still busy with another thread, so if you have time, feel free to take this forward.
 
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_debugfs.c b/drivers/scsi/mpt3sas/mpt3sas_debugfs.c
-index 183391f6b8d1..9f64a7c9db60 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_debugfs.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_debugfs.c
-@@ -144,6 +144,8 @@ mpt3sas_setup_debugfs(struct MPT3SAS_ADAPTER *ioc)
- 	snprintf(name, sizeof(name), "host_recovery");
- 	debugfs_create_u8(name, 0444, ioc->debugfs_root, &ioc->shost_recovery);
+Thanks,
+Tao
  
-+	blk_mq_tagset_debugfs_link_controller(&ioc->shost->tag_set,
-+					    ioc->debugfs_root);
- }
- 
- /*
-@@ -152,6 +154,6 @@ mpt3sas_setup_debugfs(struct MPT3SAS_ADAPTER *ioc)
-  */
- void mpt3sas_destroy_debugfs(struct MPT3SAS_ADAPTER *ioc)
- {
-+	blk_mq_tagset_debugfs_unlink_controller(&ioc->shost->tag_set);
- 	debugfs_remove_recursive(ioc->debugfs_root);
- }
--
--- 
-2.43.0
+>   And about the ioc_qos_write()'s disk_live race window, My patch 6 fixed the issue,
+> could you please take a look?
+> 
+> Best Regards,
+> Guixin Liu
+>>> Fixes: 2b2da2f6dc80 ("blk-iocost: prevent configuration update concurrent with io throttling")
+>>> Cc: stable@vger.kernel.org
+>>> Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
+>>> ---
+>>>  block/blk-iocost.c | 12 ++++++++++--
+>>>  1 file changed, 10 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+>>> index 1c1025157d8e..8e06b83691aa 100644
+>>> --- a/block/blk-iocost.c
+>>> +++ b/block/blk-iocost.c
+>>> @@ -3589,6 +3589,15 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+>>>  	ret = blkg_conf_open_bdev(&ctx);
+>>>  	if (ret)
+>>>  		return ret;
+>>> +	/*
+>>> +	 * Nothing is protecting QoS state yet, so release q->rq_qos_mutex,
+>>> +	 * which was first acquired in blkg_conf_open_bdev, and re-acquire it
+>>> +	 * after freezing the queue to maintain the correct locking order.
+>>> +	 */
+>>> +	mutex_unlock(&ctx.bdev->bd_queue->rq_qos_mutex);
+>>> +
+>>> +	memflags = blk_mq_freeze_queue(ctx.bdev->bd_queue);
+>>> +	mutex_lock(&ctx.bdev->bd_queue->rq_qos_mutex);
+>>>  
+>>>  	body = ctx.body;
+>>>  	q = bdev_get_queue(ctx.bdev);
+>>> @@ -3605,7 +3614,6 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+>>>  		ioc = q_to_ioc(q);
+>>>  	}
+>>>  
+>>> -	memflags = blk_mq_freeze_queue(q);
+>>>  	blk_mq_quiesce_queue(q);
+>>>  
+>>>  	spin_lock_irq(&ioc->lock);
+>>> @@ -3663,9 +3671,9 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+>>>  	spin_unlock_irq(&ioc->lock);
+>>>  
+>>>  	blk_mq_unquiesce_queue(q);
+>>> -	blk_mq_unfreeze_queue(q, memflags);
+>>>  
+>>>  close_bdev:
+>>> +	blk_mq_unfreeze_queue(q, memflags);
+>>>  	blkg_conf_close_bdev(&ctx);
+>>>  	return ret ?: nbytes;
+>>>  }
+> 
 
