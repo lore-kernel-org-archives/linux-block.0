@@ -1,100 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.161.49
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795199371;
-	b=f8psSOApheGBtG7/SWlfIwtf/nX+HI9B9/pmMYjH1+pehYUjiaTq0n+qLzdVM3fr6cAg
-	 4PtGk7vFDDm+dgTyU187JVaaCPQYFQdmIbJ7Tx66pIrfLGDasSs3taoYosyjo0VoxGgKC
-	 JjcNIfPpuVzqlMfQEoNSboc4sdDiZTel7goe9mH8M4zIY26liiLJcbdKaaBwoKcY3agOP
-	 QimDxoOAwHTMxx4YO9V0oDmNGG9/Lu2bSZFF//EASPOs0NvmsMoj+UpPyAgBnxUt/nF3d
-	 Xr1KREZEbPnp3g4GvF548A8rOS0/HvPQYW1FwQvciiImkwKJAvSDmGy7tI+fn91RCaA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795199371;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=rgUMX9qHZUJbBmUpguL56XnLssX5w+QXcL03YNunXoQ=;
-	b=VDo9/liDxzSxpBPEwEUUevvuTtBX4K7DwOn1ti5NfkPgtCyNZ//m/EzoQK3UVJNf/iTw
-	 4ibWZO5wJptTPS0Tv8CJgJ9fqFtSXA39+rZcNqSQBa58R6s5dqY9z2dZ6wFo1ToG4ujVz
-	 zrIuLT53e0NEJP45k+EigO8mp3FyWh6CTcEk8HN94S2XAZWWfsHetXlHeydUV7YFqX77r
-	 /GYZgaEwGxUv+TgRGRfYNrPuT/+/G6uOQqpIxi5X/ZQvtqUZAZMplgIuY8wZemtCV+CMr
-	 aEd3ZkIb9b7g0/wJrH4obr8KgneAPPPTfC+BWfRoGJ29mzH2obqN7HplLCAKZUYCoPw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=purestorage.com;
-	spf=pass smtp.mailfrom=purestorage.com;
-	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=EURERcJH;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.161.49
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795199840;
+	b=GyEztmP1yIrLbXHCxcYaGr9SS43FXAPNiRPmgjS/hq2tbKyzbhprxRImj1N/KfrsizZi
+	 /vrCF47Blqb4DdgxZN2O5+aEvrUpIQ+KlWHN9jluHI0SV1DVn1ZmS5EGwZ0UgO+/nPqc4
+	 X0HebG0N+pRZ4jXVptCVNiBCu5NuY+/uODHH/3etYx4jPffVsrSzW50ipRF+mX8pExIM6
+	 gvgtSdM7izPGOP1I6WvibKrcs4xthWckgQX0qaQgSGIAGaZZ+AIOyOV2B/e6rGPjRcQ6v
+	 JP1fBfXXuaX7t+nTdZwPL+m5OaPfri6h2pSoFH2KjwgSGipQKM/kjmOSyeN8Y2BS64A==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795199840;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To;
+	bh=wQl/JtE6qQZueMrPh3nuZAtCFAUhv4LS8vfk9kIDRRQ=;
+	b=stbCiZIk3LcjTTFFdpF/JwhLV8PQR5H+/uosu5AvebN5rTZNY4yv82WlXo2NfctHpWIl
+	 zjGZr8n1hSIa2y1oK5xxsp19x/02qpbPyjl7G/rVCcCfBPhCKiBmjZtHQCjLWHgL94Uxk
+	 d7h0y6DJkwyfbYIDDcRUfqU7NGuCqb9xdlInyb8vRnvWvM6nxYtGtzoMESrvnP6NHG3dj
+	 V5xLlNL/WsOaRPTaVfpQQfHPYfQbc+hS/91PpB3w+XJs4z4QJ4aM6BgE+53IrU5fMjmKM
+	 jpVDFS1L9s/CeIjePQJ/iYU3YBVwQnr4WpJVMQpgoUFdHskSUQJhKUAcnuAP8zUfvSA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hpt+mBTx;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCED606A32A
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 18:29:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2BCED606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EBF60A2601;
+	Fri, 20 Nov 2026 18:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=EURERcJH
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-6dd8e918218so48004eaf.1
-        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 10:29:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795199370; cv=none;
-        d=google.com; s=arc-20260327;
-        b=e1zZyY32CQYxWNYU8N+lKxi5+l94a/jWY9C3x0yNUmKLAhrFBaB+u2e031iDx/QKRa
-         Gr4HtLYg+mVBWSy1h7IsF/7J96zuxqZ4FOyFJ8NeMmjxGXaByAla5mzsw0YLXXLjOk7R
-         QWUwuCcigQ5a5kmZq3k7pdV/e+yW8E09p5H1Pmhjy7Y6pABacqZkkiKY/w88TDhQsQ8u
-         4scbVfJCIhidj0TJO83EJOiCN0HvERGEqlmDdjvAjjJiQAeCNkFePQcAxIXA4BEsUnmt
-         VWvJXQ9h4LndOuzNBEk7z6PU4sl/hmVUCccTws7gqSsz0zCNaGVxZonu39hlvoQ3LjrJ
-         Gdsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=rgUMX9qHZUJbBmUpguL56XnLssX5w+QXcL03YNunXoQ=;
-        fh=oR7zkHOSnfRWVAUXqpolmEKTLdi+to2y+MuQzVtv7Qk=;
-        b=Tk02uAlUQhzXah+t3QtzWKgDEhpMMeHQmi3dKBSn+iWg5QtAsbCobeif6l0tSxHTuu
-         sUKde4huS23G1j+Wq6T+Km5At6bWYC9LS2WzDkH3A7s/eLzLs9j3+jMWQnTmR3A+WGEl
-         c93h7R+DtSld9RbemDCrKkKdFTntJnnmOyO7hdYT2F7gQRmEASOCnDub6GJxFHjnWwg6
-         avN1Q+FZ/uPdAx2SJXVdxhexbtsabQesanJlQLi2O0xjCH8O6a78BGzWajt5sBRqnylT
-         3pMePfGnEIqWNDI0TPZa/ez4opz0rYTFn0sWHzFBEB7r+obLhDXcvaHXH1apepTHEHGi
-         ISIA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1795199370; x=1795804170; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=rgUMX9qHZUJbBmUpguL56XnLssX5w+QXcL03YNunXoQ=;
-        b=EURERcJHBg/we6G4bCd9KT0WhwgCqkCqdasBxX1RwqaGtm2cTV8z2rS3D6RBus6cbf
-         2drAznMT1+UywPsyrUg/PgNwnaHMYM7ooA4Ux30lxYwXp3BmZYM82xapVrnn25CRj6ZR
-         vnh8DOUreOt2ltczLQp1DRj3Uy8s6ijcaOpN51zrZp0NUx1LSIhZkfZNl8gzND/Spo1T
-         uH7Z0+fqMGnzvYbGylTnSSugza8bMEtSv+HIOD4m0rIu/dhY3R+W8fd/w5Tl7OQ6iecw
-         NlpDGMYSkVOa01kd8jLggDMQvv1hScyPc6gpHqoII4vjxZsLWp+5zq9n1U8Hb+yFv7B6
-         jpMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795199370; x=1795804170;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=rgUMX9qHZUJbBmUpguL56XnLssX5w+QXcL03YNunXoQ=;
-        b=NIvklysXcM7WP9hzQiaG2gDeOxDPvbhzzmrqQiVOFR43GTsC1nV6n/PKIn9nLlTxJo
-         EAbrRYmCDYrdRb3G4Veht/xGt4nOG6D+bIg9SJkrvN6fmCJNU32/wXAj05nAc0yZTScm
-         JJURVQ8P0EilzxZPRyi6azyKCs/BGhH68ryA7nDn2TXXGTVii5jPhutrqMFOc7IXHyX/
-         LbhQ4SpyOnKBXGOaHdk37ksYQ7lMWwWnGMb6pmLrPo8ioFSa8KhUyCBE2tCSMLolUAhZ
-         nQsBv9yaqMqgzYEvaR2+0/9+GaOz2Eg+aQj9JxqunWApU8DXhSrhqOtTez6s625Zv/7w
-         1RmQ==
-X-Forwarded-Encrypted: i=1; AL+hErEm4nBt8C/6i/Nh2h81aX37NCDCM2P3Y9EsyOh83X8C1bJ0JavK9lkyBYYYgQvxBCmMXUCIM2knCe27lw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/8UFazrxNFzPslDBO9fxfIXOgvQCd53KnCGa+B8IT22LdAkV+B
-	TSRUHrwk7ZyYRr/HEg+rPfv8opkB/K6OppmsmUu6ia7saUIAjd7pc5XvqSECM0wj8hylx2X7RR5
-	gVH6/qmzgw8qYSW03cAxbOEFlCpfEPVyBkNAWYeRJDw==
-X-Gm-Gg: AYBFou06wUa8T9j9MEkO4J49iuqVR6UIi2Ege2lxzUPjbwX9KHMkEQforTW07GmSke7
-	Y6T+UyQWwngL24UekU6vXK38uwa+ajyxzrpyS5RatKIcQhQUMs6AFB2/C5mXuA0x4SVeGYGwSMn
-	TkvTPlltWUt+nuxdLUY1r+PK4JUQfaSo3Qy8Lx2bxe7OeGIwcXwYKL0hJabkCM5cBBVBWK7hjI8
-	FeZwZuGsdDjiWzJhWGD0qzYEb3wcT9AYPcq9rtK9030Fpm3P3AXsmV6bQwzSq0yRZ28H0pNG0IE
-	ZBnxu4hMzJNSoC+wLUs0sT/Efi6G9C4UG+uJdVrfbe/F3kGwjoAEVdA0c3bmM9P3pIUiZLKyVff
-	rEoNELZ041yd6tTJwKyiNZRxIO/cwev8l/lUz
-X-Received: by 2002:a05:6820:c2c9:10b0:70c:bf79:3e6e with SMTP id
- 006d021491bc7-71b39033ddbmr4203075eaf.0.1795199369899; Fri, 20 Nov 2026
- 10:29:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hpt+mBTx
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 741391F000CF;
+	Fri, 20 Nov 2026 18:37:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795199840;
+	bh=wQl/JtE6qQZueMrPh3nuZAtCFAUhv4LS8vfk9kIDRRQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=hpt+mBTxzbdDIytY5Ra5HXawSDxB+VevHShWI3OUlzMIYTNgGwfy/WYbsq/dkjrkx
+	 CLYw/IRUFX1JDiVLF0jGTwIjFo7+wKplSXfE9YuAxawRzElqER1I6ar2oxti0CgQM8
+	 q1yovDnD2f5IhTj6eCnluGx0X/z9YF6wcFEUGfYJ4Q1nR1XKlZNieHmH6wjhsStrlA
+	 x5ZP//q09dHkLi2GZHKmwUWc9OJOqrPsbNjh4MQGVIgO/MdBknDLKjmCnwDoDopVp6
+	 4/VbLrBfvp7F+CEIEIJIj/caDZDUuj+epQ4bLIcz69Sc8QbwNwpJJG8rQG2AtFtfrm
+	 vjkAoT5uuXQEA==
+Date: Fri, 20 Nov 2026 11:37:17 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Zakaria Belkadi <zakaria.belkadi@inria.fr>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>, florence.schadle@ssi.gouv.fr,
+	frederic.tronel@centralesupelec.fr, louis.rilling@irisa.fr,
+	stable@vger.kernel.org, "Martin K. Petersen" <mkp@kernel.org>
+Subject: Re: [PATCH RESEND] block: pin user PI pages for writing when ref
+ tags are remapped
+Message-ID: <awCTXQYhwCdqgnuY@kbusch-mbp>
+References: <awBnB-55HQ54C1x6@infradead.org>
+ <20261120162257.498238-1-zakaria.belkadi@inria.fr>
+ <awB8OODx0fCFGc5G@kbusch-mbp>
+ <awB_xd60To4UawrJ@infradead.org>
+ <awCCG3FWbMHHvYd5@kbusch-mbp>
+ <CADUfDZqNM2=KzsnpA+R5ygAbS-SiUzQczZvgM_NoYrhR7Qyj9w@mail.gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,143 +68,54 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261120064806.752251-1-csander@purestorage.com> <awBuiVyOQj_YHCZD@infradead.org>
-In-Reply-To: <awBuiVyOQj_YHCZD@infradead.org>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Fri, 20 Nov 2026 10:29:18 -0800
-X-Gm-Features: AclHuK-s6j1YsrlPtwSKf7apfEUcNespK_RTRNAYp4u75GuQefesSFhUkseeyTs
-Message-ID: <CADUfDZonvcOkM7DD76Gg=Z6NHhM87a+n0xPirfTYS+wLLnHfmQ@mail.gmail.com>
-Subject: Re: [PATCH] block/t10-pi: deduplicate blk_reftag_remap_{prepare,complete}()
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqNM2=KzsnpA+R5ygAbS-SiUzQczZvgM_NoYrhR7Qyj9w@mail.gmail.com>
 
-On Fri, Nov 20, 2026 at 8:00=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
-g> wrote:
->
-> Good idea.  But I think the new function name is a bit misleading and the
-> double ternary operators on a single initialization line obfuscate the
-> code compared to the old if/else.
->
-> Can we do something like this instead?
->
-> diff --git a/block/t10-pi.c b/block/t10-pi.c
-> index a19b4e102a83..f24ededd70a8 100644
-> --- a/block/t10-pi.c
-> +++ b/block/t10-pi.c
-> @@ -436,69 +436,32 @@ static void blk_tuple_remap_end(union pi_tuple *tup=
-le, void *ptuple,
->         bvec_iter_advance(bip->bip_vec, iter, len);
->  }
->
-> -static void blk_set_ext_unmap_ref(struct crc64_pi_tuple *pi, u64 virt,
-> -                                 u64 ref_tag)
-> +static void blk_set_ext_remap_ref(struct crc64_pi_tuple *pi, u64 from, u=
-64 to)
->  {
->         u64 ref =3D get_unaligned_be48(&pi->ref_tag);
->
-> -       if (ref =3D=3D lower_48_bits(ref_tag) && ref !=3D lower_48_bits(v=
-irt))
-> -               put_unaligned_be48(virt, pi->ref_tag);
-> +       if (ref =3D=3D lower_48_bits(from) && ref !=3D lower_48_bits(to))
-> +               put_unaligned_be48(to, pi->ref_tag);
->  }
->
-> -static void blk_set_t10_unmap_ref(struct t10_pi_tuple *pi, u32 virt,
-> -                                 u32 ref_tag)
-> +static void blk_set_t10_remap_ref(struct t10_pi_tuple *pi, u32 from, u32=
- to)
->  {
->         u32 ref =3D get_unaligned_be32(&pi->ref_tag);
->
-> -       if (ref =3D=3D ref_tag && ref !=3D virt)
-> -               put_unaligned_be32(virt, &pi->ref_tag);
-> +       if (ref =3D=3D from && ref !=3D to)
-> +               put_unaligned_be32(to, &pi->ref_tag);
->  }
->
-> -static void blk_reftag_remap_complete(struct blk_integrity *bi,
-> -                                     union pi_tuple *tuple, u64 virt, u6=
-4 ref)
-> +static void blk_tuple_remap(struct blk_integrity *bi, union pi_tuple *tu=
-ple,
-> +                            u64 from, u64 to)
->  {
->         switch (bi->csum_type) {
->         case BLK_INTEGRITY_CSUM_CRC64:
-> -               blk_set_ext_unmap_ref(&tuple->crc64_pi, virt, ref);
-> +               blk_set_ext_remap_ref(&tuple->crc64_pi, from, to);
->                 break;
->         case BLK_INTEGRITY_CSUM_CRC:
->         case BLK_INTEGRITY_CSUM_IP:
-> -               blk_set_t10_unmap_ref(&tuple->t10_pi, virt, ref);
-> -               break;
-> -       default:
-> -               WARN_ON_ONCE(1);
-> -               break;
-> -       }
-> -}
-> -
-> -static void blk_set_ext_map_ref(struct crc64_pi_tuple *pi, u64 virt,
-> -                               u64 ref_tag)
-> -{
-> -       u64 ref =3D get_unaligned_be48(&pi->ref_tag);
-> -
-> -       if (ref =3D=3D lower_48_bits(virt) && ref !=3D ref_tag)
-> -               put_unaligned_be48(ref_tag, pi->ref_tag);
-> -}
-> -
-> -static void blk_set_t10_map_ref(struct t10_pi_tuple *pi, u32 virt, u32 r=
-ef_tag)
-> -{
-> -       u32 ref =3D get_unaligned_be32(&pi->ref_tag);
-> -
-> -       if (ref =3D=3D virt && ref !=3D ref_tag)
-> -               put_unaligned_be32(ref_tag, &pi->ref_tag);
-> -}
-> -
-> -static void blk_reftag_remap_prepare(struct blk_integrity *bi,
-> -                                    union pi_tuple *tuple,
-> -                                    u64 virt, u64 ref)
-> -{
-> -       switch (bi->csum_type) {
-> -       case BLK_INTEGRITY_CSUM_CRC64:
-> -               blk_set_ext_map_ref(&tuple->crc64_pi, virt, ref);
-> -               break;
-> -       case BLK_INTEGRITY_CSUM_CRC:
-> -       case BLK_INTEGRITY_CSUM_IP:
-> -               blk_set_t10_map_ref(&tuple->t10_pi, virt, ref);
-> +               blk_set_t10_remap_ref(&tuple->t10_pi, from, to);
->                 break;
->         default:
->                 WARN_ON_ONCE(1);
-> @@ -524,9 +487,9 @@ static void __blk_reftag_remap(struct bio *bio, struc=
-t blk_integrity *bi,
->                 ptuple =3D blk_tuple_remap_begin(&tuple, bi, bip, &iter);
->
->                 if (prep)
-> -                       blk_reftag_remap_prepare(bi, ptuple, virt, *ref);
-> +                       blk_tuple_remap(bi, ptuple, virt, *ref);
->                 else
-> -                       blk_reftag_remap_complete(bi, ptuple, virt, *ref)=
-;
-> +                       blk_tuple_remap(bi, ptuple, *ref, virt);
+On Fri, Nov 20, 2026 at 09:44:13AM -0800, Caleb Sander Mateos wrote:
+> On Fri, Nov 20, 2026 at 9:23 AM Keith Busch <kbusch@kernel.org> wrote:
+> >
+> > On Fri, Nov 20, 2026 at 09:13:41AM -0800, Christoph Hellwig wrote:
+> > > On Fri, Nov 20, 2026 at 09:58:32AM -0700, Keith Busch wrote:
+> > > > > Agreed. I'll keep the PI iterator as ITER_SOURCE. In v2,
+> > > > > bio_integrity_map_user() will bounce the user PI buffer for REQ_OP_WRITE
+> > > > > when the integrity profile has BLK_INTEGRITY_REF_TAG. That way the
+> > > > > block layer can remap the tags in its own copy.
+> > > >
+> > > > Can avoid bouncing? I think the remapping flags can be tied to the
+> > > > user's reftag check request.
+> > > >
+> > > > If BIP_CHECK_REFTAG is set from the user setting IO_INTEGRITY_CHK_REFTAG
+> > > > on a write, we can map the PI buffer for writing. The user explicitly
+> > > > asked to have the ref tags checked by the device, and partitions require
+> > > > remapping them, so they've told the kernel to write to their buffer.
+> > >
+> > > No, the user did not ask for violating the mapping direction.  The
+> > > whole remapping thing very much is an internal implementation detail
+> >
+> > Okay, fine. But can we skip bouncing and remapping if the flag isn't
+> > set?
+> 
+> Currently, the remapping happens regardless of BIP_CHECK_REFTAG. It
+> depends only on whether the block device reports ref tag support via
+> BLK_INTEGRITY_REF_TAG (i.e. Type 1 or Type 2 PI). I think it would be
+> a UAPI behavior change to make the ref tag remapping conditional on
+> BIP_CHECK_REFTAG.
 
-Sure, happy to switch to an if statement instead of the ternaries to
-initialize from and to. However, the code generation is worse with the
-2 calls to blk_reftag_remap()/blk_tuple_remap(). The compiler doesn't
-notice that the calls are identical except for the swapped arguments
-and emits 2 out-of-line calls to the function instead of inlining it.
+Right, today remapping is checked when BLK_INTEGRITY_REF_TAG is set in
+the profile flags. My proposal is to change that check to
+BIP_CHECK_REFTAG in the bio integrity flags. That is indeed a user
+visible change in behavior, so that really hurts the suggestion.
+ 
+> I don't see a way to tell ahead of time whether remapping will be
+> required without walking the metadata buffer an additional time in
+> bio_integrity_map_iter() to check the current ref tags. 
 
-Best,
-Caleb
+The flag is set in the bip_flags, and you can't merge bio's that have
+different bip_flags. So you only need to check the first one rather than
+walk all of them.
 
->
->                 blk_tuple_remap_end(&tuple, ptuple, bi, bip, &iter);
->                 (*intervals)--;
-> --
-> 2.53.0
->
+But it's a moot point because of the user visible change. I suppose you
+just shouldn't use a PI format if you don't want your metadata to have
+that interpretation overlayed on it.
