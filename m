@@ -1,46 +1,46 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795144409;
-	b=OPt9RJcegBQK8PQhApgmNgHEfp9jscPpvapaN6lfJb6cwtadAc6ZCdPSViK+m3TXRVAq
-	 vBVyyIYKK4gtZGLScfA6umYzo2ziunRynyWzo8u2y96NveroINTEwMFiTdLDIAt2RT94h
-	 ys5CUXWeB10Ck22xRCPer/oiY0/jYseLR9DztpjZjbaNIqyLLwRwYF/8ZWfUGMU7FmrvE
-	 6hmq2qECQc3PL2LJ0R7JHK4Z4AV2bKFID5BprdzUjgTPIf6DOneHxEnWH2BNRilgQaFC4
-	 nDlT+2EBvXm/2o/qGt8r2pyePJWLNx4eiaLO1RM28g7cZ47SlBPNHzjSF4n1trOdAYw==
+	b=JYcgJ4DjGkadenm94+KEHyuHtcka+MLqvQuRDdjOZk6p0gEYwe60/irYHbCiwnM1LlE/
+	 vkYpaxpPVij9ZZnRaZhr6jI6qXkdZvhbRbySx1R/HQMepZ2wzyJym5pfNjxlzIXaFZxzd
+	 PgRSfES7e78fRlgtyCpOJWkYaJAfMC8a1eQgsctcc5EmW/CzGwtJHLWZQbpoWndyOT/3s
+	 Zz3Gl0uonWDmbmt1wuUxM2qcPWli9Y+cU5TVn7v2e+54Dl/guSr1+CJyxzSEO2x35+Rso
+	 M4ottPskY8HI9iqcdgq1c0kiQXq1BRQCglNENWFYtM3v8Xsr/5LwgT61VDzEQAWfNhg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795144409;
 	h=DMARC-Filter:Received:Received:Received:Received:From:To:CC:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
 	 X-ClientProxiedBy;
-	bh=Js6rt0O1NPfO/eZ3eJEf2HOYL7oxLujLdUYutg/+J1c=;
-	b=e779qwrvI8+uOgeJXOucrltFpnldNxV6DhE1Mip4WVtE1H4QKAOHWCuY6aMPq/JIp3us
-	 R2aT0p2/FBFb8cs3pltxHAcUKkQM0MxRf+CuR5t7e7inKaVV/QIABjTJD+96O7IBDCa13
-	 fscIuBsCG4mrQttJX1tZ+RjToCSxoy44AACRrMjjDBaDMAvffIrug5PXTGG8tSITIvcsO
-	 +WxcRHAr72cAo3fNPeF9Eb/uiodleh6i/8llOHFRzjwNXeJBiCLaeQ32mDP/d+zjo9o8m
-	 9qksftOB+lpKmJeJTJ7tZATL3pQUROhmWj2KVoD3r8zjWglpH69+6wwUH/cWYsu76iA==
+	bh=uIEansB0MuhQ4c3Aqig7WqzSZmGjWpCxBCheQKcMU/8=;
+	b=I8gnDprkFvphk3QMWHMq5vyvZMhMgJ2/um4JvrKx3wN6EYgNWcLdE5CKvmJ+T0YJcJ6z
+	 69lmKMxgI7bqvlsfM3VbVaTNvC3+QX2PA/5J6oIY4gZWwCXJK2wQG5qWqO1C+HgQoA2l4
+	 yBEhPs0o5Wck1lzcbby00pZLHJ5VxRyXJkxdUBKwCDRoJA6CMA5ZHQqXabDsMG6PqT3Vu
+	 kJFC3+NzdRUki9sGfuskJRXXwxyACyKzbT2MWmZt7q8ZEI1fv87c9pxQNkZCMrLMs0g7K
+	 vFt4Kkq8D/g8A9nwgoBcAAOctXD74oNxHzhqZG/U7JfgsfyM83PmJFy6xeZqMh0WqwQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=hygon.cn;
 	spf=pass smtp.mailfrom=hygon.cn;
 	arc=none smtp.remote-ip=101.204.27.37
 Received: from spam01.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD443606A332;
-	Fri, 20 Nov 2026 03:13:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DD443606A332
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7EC3606A334;
+	Fri, 20 Nov 2026 03:13:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7EC3606A334
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jW0lk3DVXzVcB8;
-	Fri, 20 Nov 2026 11:13:22 +0800 (CST)
-Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jW0lj4PJhzVcB8;
-	Fri, 20 Nov 2026 11:13:21 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jW0ln3Df0zVcB6;
+	Fri, 20 Nov 2026 11:13:25 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jW0lm1s1QzVcB6;
+	Fri, 20 Nov 2026 11:13:24 +0800 (CST)
 Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp1.hygon.cn (Postfix) with ESMTPS id 505DFC087;
-	Fri, 20 Nov 2026 11:13:12 +0800 (CST)
+	by maildlp2.hygon.cn (Postfix) with ESMTPS id D859330CB6D6;
+	Fri, 20 Nov 2026 11:12:20 +0800 (CST)
 Received: from hsj-2U-Workstation.hygon.cn (172.19.24.226) by
  cncheex04.Hygon.cn (172.23.18.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 20 Nov 2026 11:13:19 +0800
+ 15.2.1544.36; Fri, 20 Nov 2026 11:13:21 +0800
 From: Huang Shijie <huangsj@hygon.cn>
 To: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
 	<hch@infradead.org>, <agruenba@redhat.com>, <mic@digikod.net>,
@@ -53,9 +53,9 @@ CC: <gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
 	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
 	<linux-security-module@vger.kernel.org>, Huang Shijie <huangsj@hygon.cn>
-Subject: [PATCH v3 03/11] fs/quota: convert remove_dquot_ref() to super_iter_inodes_locked()
-Date: Fri, 20 Nov 2026 11:12:57 +0800
-Message-ID: <20261120031305.3561045-4-huangsj@hygon.cn>
+Subject: [PATCH v3 04/11] block: convert nr_blockdev_pages() to super_iter_inodes_locked()
+Date: Fri, 20 Nov 2026 11:12:58 +0800
+Message-ID: <20261120031305.3561045-5-huangsj@hygon.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261120031305.3561045-1-huangsj@hygon.cn>
 References: <20261120031305.3561045-1-huangsj@hygon.cn>
@@ -73,114 +73,44 @@ Content-Type: text/plain
 X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
  (172.23.18.114)
 
-Convert remove_dquot_ref() to super_iter_inodes_locked().
+Convert nr_blockdev_pages() to super_iter_inodes_locked()
 No functional change.
 
 Signed-off-by: Huang Shijie <huangsj@hygon.cn>
 ---
- fs/quota/dquot.c | 68 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 40 insertions(+), 28 deletions(-)
+ block/bdev.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/fs/quota/dquot.c b/fs/quota/dquot.c
-index a3d503591871..9aaf2cfa9e1b 100644
---- a/fs/quota/dquot.c
-+++ b/fs/quota/dquot.c
-@@ -83,6 +83,8 @@
- 
- #include <linux/uaccess.h>
- 
-+#include "../internal.h"
-+
- /*
-  * There are five quota SMP locks:
-  * * dq_list_lock protects all lists with quotas and quota formats.
-@@ -165,6 +167,11 @@ static struct kmem_cache *dquot_cachep;
- /* workqueue for work quota_release_work*/
- static struct workqueue_struct *quota_unbound_wq;
- 
-+struct dquot_ref_data {
-+	int type;
-+	int reserved;
-+};
-+
- void register_quota_format(struct quota_format_type *fmt)
- {
- 	spin_lock(&dq_list_lock);
-@@ -1117,41 +1124,46 @@ static int add_dquot_ref(struct super_block *sb, int type)
- 	return err;
+diff --git a/block/bdev.c b/block/bdev.c
+index f20f91b3176e..3c1d38475607 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -558,16 +558,19 @@ void bdev_drop(struct block_device *bdev)
+ 	iput(BD_INODE(bdev));
  }
  
--static void remove_dquot_ref(struct super_block *sb, int type)
-+static int remove_dquot_ref_fn(struct inode *inode, void *priv)
- {
--	struct inode *inode;
--#ifdef CONFIG_QUOTA_DEBUG
--	int reserved = 0;
--#endif
-+	struct dquot_ref_data *ref = priv;
- 
--	spin_lock(&sb->s_inode_list_lock);
--	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
--		/*
--		 *  We have to scan also I_NEW inodes because they can already
--		 *  have quota pointer initialized. Luckily, we need to touch
--		 *  only quota pointers and these have separate locking
--		 *  (dq_data_lock).
--		 */
--		spin_lock(&dq_data_lock);
--		if (!IS_NOQUOTA(inode)) {
--			struct dquot __rcu **dquots = i_dquot(inode);
--			struct dquot *dquot = srcu_dereference_check(
--				dquots[type], &dquot_srcu,
--				lockdep_is_held(&dq_data_lock));
-+	spin_lock(&dq_data_lock);
-+	if (!IS_NOQUOTA(inode)) {
-+		struct dquot __rcu **dquots = i_dquot(inode);
-+		struct dquot *dquot = srcu_dereference_check(
-+			dquots[ref->type], &dquot_srcu,
-+			lockdep_is_held(&dq_data_lock));
- 
- #ifdef CONFIG_QUOTA_DEBUG
--			if (unlikely(inode_get_rsv_space(inode) > 0))
--				reserved = 1;
-+		if (unlikely(inode_get_rsv_space(inode) > 0))
-+			ref->reserved++;
- #endif
--			rcu_assign_pointer(dquots[type], NULL);
--			if (dquot)
--				dqput(dquot);
--		}
--		spin_unlock(&dq_data_lock);
-+		rcu_assign_pointer(dquots[ref->type], NULL);
-+		if (dquot)
-+			dqput(dquot);
- 	}
--	spin_unlock(&sb->s_inode_list_lock);
-+	spin_unlock(&dq_data_lock);
++static int bdev_pages_count(struct inode *inode, void *priv)
++{
++	long *pages = priv;
++
++	*pages += inode->i_mapping->nrpages;
 +	return INO_ITER_RET_NEXT;
 +}
 +
-+static void remove_dquot_ref(struct super_block *sb, int type)
-+{
-+	struct dquot_ref_data ref = {
-+		.type = type,
-+	};
-+
-+	/*
-+	 * We have to scan I_NEW inodes because they can already
-+	 * have quota pointer initialized. Luckily, we need to touch
-+	 * only quota pointers and these have separate locking
-+	 * (dq_data_lock) so the existence guarantee that
-+	 * super_iter_inodes_locked() provides inodes passed to
-+	 * remove_dquot_ref_fn() is sufficient for this operation.
-+	 */
-+	super_iter_inodes_locked(sb, remove_dquot_ref_fn, &ref);
- #ifdef CONFIG_QUOTA_DEBUG
--	if (reserved) {
-+	if (ref.reserved) {
- 		printk(KERN_WARNING "VFS (%s): Writes happened after quota"
- 			" was disabled thus quota information is probably "
- 			"inconsistent. Please run quotacheck(8).\n", sb->s_id);
+ long nr_blockdev_pages(void)
+ {
+-	struct inode *inode;
+ 	long ret = 0;
+ 
+-	spin_lock(&blockdev_superblock->s_inode_list_lock);
+-	list_for_each_entry(inode, &blockdev_superblock->s_inodes, i_sb_list)
+-		ret += inode->i_mapping->nrpages;
+-	spin_unlock(&blockdev_superblock->s_inode_list_lock);
+-
++	super_iter_inodes_locked(blockdev_superblock, bdev_pages_count, &ret);
+ 	return ret;
+ }
+ 
 -- 
 2.53.0
 
