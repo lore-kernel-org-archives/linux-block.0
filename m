@@ -1,59 +1,46 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795192135;
-	b=RzcxNBIq+0BRXhjGDl2RxfOyQw0oT2mKcTRk31DInSXmEKNu84i3Kp2GhHyd5l72zXAT
-	 cXtcvroZD1SoNL+vsv38JUnibgJd4/zJVcVze4LfiDu5mOTdn2Gko6IuOQEufr8dN1XK4
-	 NzZv41DV7/m8WEL0sPnBIish+dQgLcBVvSovR9L9GGN8EaCO+EkOB2BbnS2N0KiWJIcPT
-	 o8ux9WX+xOMOlnxPv2tISsC5iGlnaT5JoAnUApIMNtkT2dTJC2kSGvxOjVHasaBgsZOAI
-	 3EpWyGYHKsXlfngkXwluDN1+gdGUGHUJrklzWNLA86PgSj6BpUfpL0Vayd/LpO2Is0w==
+	t=1795192993;
+	b=x3oiYs7xn8BCMd7rA9OostRCtilHNylSGRfTdDe2CCvAwqTHvRolUgLH0BryQoN+OmV7
+	 CJYpdResjcXF+Ys21gXOYIwNk66N+KZIvJMEbHC73BZyAr9u++u3BDZPABLnP7NF1rGlc
+	 CqeYpEGhQ0uqiWnm4MaHetDfWRa1kytHhjkNYc0Bzl3GqnuEJqu29GsnTqN+TIE8wAfIn
+	 qHUuckDpNJlkl88UqK1q/t2G87bIbCule3SV+saRqvFQMuTStyb6JmjNYC4Q1RWP7adZ6
+	 +ytNmqSSm7bByBJIWFPOy3cUqgHaLcheurYkpnOkf1l8oJoVba5Z7hkKhJGnQV5zczw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795192135;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=hKTq5offfOb2bDNEYaRHVBez+Fjet5kFrAEYBp90cl8=;
-	b=sjHdc+gLs0aES4XCX7NizgwpJA6vnDKq68kYFjWWSpoKM2HFlFqgoW4U3sqIVvR9x62u
-	 S7b2WNpMHXVBE8blacqiSfGYOKiAzZIcc55WQFK+epWjV2jo+BLbSt7faFQpw6d6EU8D8
-	 d8GQbawsanAvnQRv8Ip4ezQzgQWP6Rg80ceEmZPIapEDnE4CEFo548CJu9Qm/SY89I3vi
-	 aI4V4aKj1fq24A3BTrXIz7LszFNxBWXK5MrpBkvsU7BHJp2WhEU9eRaTjAJuoWGpnYicn
-	 GZPvCNYMgXu+uX7F4tW/Idb1/EHu8r+Ti6BSoUw/5eWz3yNdI6l7+HzXwTLI8ww0/sA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795192993;
+	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
+	bh=+31TwLq8mlbw/chbUXL8vDb3S/TW39pYqyiL0lr5JVs=;
+	b=A3F8mIfK7TSbNEORSuLTU5QRGLGB54TbVAmVCDRvgSoh4+dBwytHri7TRC/WrCNeWDDg
+	 Bc2ljGzJYJaDqehLUCPUM0YFCrOrbf6G9iK6qAq4aircdJqPOsehl23vVt2dvECpCvJWg
+	 tEYmkoAP48oUM7jD6vpwH8hQya//mV88Tf+MZ+D5iaAnGjUJOaiq03j4qOlRGPJGSbKBQ
+	 CTUyFn+/ts4m07sDPOe+NmRqiT8oPBVoLuhlEJciH56JPhaCYNVP+ZigkK3cZ7SoWotWR
+	 6zo42FiFQYXWqcmXbeMXsZCuWr03s/HVAWrF9jZsMVXjKvgxoy4q7QKj4vVPj5Kroyg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=djEjpth8;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=lst.de;
+	spf=pass smtp.mailfrom=lst.de;
+	arc=none smtp.remote-ip=213.95.11.211
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19AA606A320;
-	Fri, 20 Nov 2026 16:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=djEjpth8
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCE771F000CF;
-	Fri, 20 Nov 2026 16:28:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795192134;
-	bh=hKTq5offfOb2bDNEYaRHVBez+Fjet5kFrAEYBp90cl8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=djEjpth8BxGSnk2aoPvo4XYFFDO0eGaPld+QWKK55LA1ccQyLBAdB2stBwKJLD8Tt
-	 0GTRafVzuFXkm4T0YeloOMLe9PX/FMEi9N/4XSlwf127ASmQmYU20C4U9jbt8i6sFE
-	 BgxHxm6U0xv45Ud76OaFnxTvUKkesnBffKEOEhpKxjDxE/vPyWCoD2jAi9npzodOvk
-	 WmmHMgazxZ1L7kGpkwBdveM28Ukn8zlNyJJVZV0KNV6MfG+XSHqaFjAU1a6QmdU6Bj
-	 D7eDE3IxKG85ygq033he358+BkhRUl01bnZpeWJea/6LDEJtrQl5msL4Gpsk91iyB9
-	 X9uoFcSqNNRXw==
-Date: Fri, 20 Nov 2026 17:28:47 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, 
-	Andreas Gruenbacher <agruenba@redhat.com>, gfs2@lists.linux.dev, Mike Marshall <hubcap@omnibond.com>, 
-	Martin Brandenburg <martin@omnibond.com>, devel@lists.orangefs.org, Dave Kleikamp <shaggy@kernel.org>, 
-	jfs-discussion@lists.sourceforge.net, Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	linux-afs@lists.infradead.org, Miklos Szeredi <miklos@szeredi.hu>, fuse-devel@lists.linux.dev, 
-	linux-block@vger.kernel.org, Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
-	linux-nfs@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org
-Subject: Re: [PATCH v2 0/13] fs: Various I_DIRTY_* state handling fixes
-Message-ID: <20261120-ampel-ungepflegt-begeben-9da8182f2de3@brauner>
-References: <20261116171044.6938-1-jack@suse.cz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E591D606A33A;
+	Fri, 20 Nov 2026 16:43:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E591D606A33A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id AE6396732A; Fri, 20 Nov 2026 17:43:09 +0100 (CET)
+Date: Fri, 20 Nov 2026 17:43:09 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Tal Zussman <tz2294@columbia.edu>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>, John Garry <john.garry@linux.dev>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 0/2] block: fail short atomic bounce bios in
+ bio_iov_iter_bounce_write()
+Message-ID: <20261120164309.GB32683@lst.de>
+References: <20261107-blkdev-atomic-bounce-v1-0-f66344262096@columbia.edu> <20261120-gratwanderung-wickeln-mitkommen-1fa50bede59a@brauner>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -63,10 +50,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261116171044.6938-1-jack@suse.cz>
+In-Reply-To: <20261120-gratwanderung-wickeln-mitkommen-1fa50bede59a@brauner>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Nov 18, 2026 at 03:59:34PM +0100, Jan Kara wrote:
+On Fri, Nov 20, 2026 at 10:04:37AM +0100, Christian Brauner wrote:
+> No objections per se, I just would like see Christoph take a look first.
 
-I'll wait for your v3. :)
+No fucking idea.  As far a I can tell atomic writes are a mess and we
+should not have done them in the first place.  Ask the people who
+create this mess.
+
+---end quoted text---
