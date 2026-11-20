@@ -1,71 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.134.164.83
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795191800;
-	b=YvcGHqqwOz2wjw3xn216pRMD6sLmOlnPoCkv7TQ92ud9P7RQceUCZrOHa8UlS6NyFC02
-	 mqE2dCAhA5lQ8IG1IrWG1e73WWtU4d/69UUY3hVxnrWpSPZhFQx0y0uiJ8figMLqwk8eB
-	 D0D2WsmFCy1eSgx5BaDCeBEboVQrTm/kNry8hjf7V14o1BjAx/qH44Pi5CkDT/P86qJq9
-	 yCgCLGZawbmblthudqPPoKyvV2vP66Wh4+LdzyxMWjHmPp6iO+wLYguSj5SmAoE7N1bCG
-	 DbBLSr37vcNfDqmcVaMPYazKKNxI3lLU2HtQdzdS8jX6Makrtry4v9DWTp+pfg5byLA==
+	t=1795192135;
+	b=RzcxNBIq+0BRXhjGDl2RxfOyQw0oT2mKcTRk31DInSXmEKNu84i3Kp2GhHyd5l72zXAT
+	 cXtcvroZD1SoNL+vsv38JUnibgJd4/zJVcVze4LfiDu5mOTdn2Gko6IuOQEufr8dN1XK4
+	 NzZv41DV7/m8WEL0sPnBIish+dQgLcBVvSovR9L9GGN8EaCO+EkOB2BbnS2N0KiWJIcPT
+	 o8ux9WX+xOMOlnxPv2tISsC5iGlnaT5JoAnUApIMNtkT2dTJC2kSGvxOjVHasaBgsZOAI
+	 3EpWyGYHKsXlfngkXwluDN1+gdGUGHUJrklzWNLA86PgSj6BpUfpL0Vayd/LpO2Is0w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795191800;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=W+TpxS1i+J9I/NKJ3cSN+tLGKZHGRM6TY2QWiTn+Pqw=;
-	b=DNfaWustBveXnfQxvS7/44Y3gdifONn0CtsNADDear77rhd/bi9IzMrztGEBup/TKBsQ
-	 938Y3VqJnolkUjsgYL+WnS6G3GzCyX/8MUKJTh9NlFLKGcFBf4LxEynsueCBVmzkEttp8
-	 NpOfB7UUuWU3qdDg8It2+zPtVItgkrRFSWFT9drXHkQ4Q7U9DKcIGeBmKXypvLPchsJ0F
-	 COAWMVJpCJ15WXu2twag2U7wJdftwQidux02BrQ2+xsTp9xMujcUFcwJJwsWxDUWvl2d0
-	 UNwl0jy6uUoKAhAMlL6+t6MN23Q9JGNE0HFpDs7WNlK5Af60S2qK7GYx5b3jeR701Iw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795192135;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=hKTq5offfOb2bDNEYaRHVBez+Fjet5kFrAEYBp90cl8=;
+	b=sjHdc+gLs0aES4XCX7NizgwpJA6vnDKq68kYFjWWSpoKM2HFlFqgoW4U3sqIVvR9x62u
+	 S7b2WNpMHXVBE8blacqiSfGYOKiAzZIcc55WQFK+epWjV2jo+BLbSt7faFQpw6d6EU8D8
+	 d8GQbawsanAvnQRv8Ip4ezQzgQWP6Rg80ceEmZPIapEDnE4CEFo548CJu9Qm/SY89I3vi
+	 aI4V4aKj1fq24A3BTrXIz7LszFNxBWXK5MrpBkvsU7BHJp2WhEU9eRaTjAJuoWGpnYicn
+	 GZPvCNYMgXu+uX7F4tW/Idb1/EHu8r+Ti6BSoUw/5eWz3yNdI6l7+HzXwTLI8ww0/sA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=inria.fr;
-	spf=pass smtp.mailfrom=inria.fr;
-	dkim=pass header.d=inria.fr header.i=@inria.fr header.a=rsa-sha256 header.s=dc header.b=YDaM9KU6;
-	arc=none smtp.remote-ip=192.134.164.83
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=djEjpth8;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C71606A320;
-	Fri, 20 Nov 2026 16:23:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3C71606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19AA606A320;
+	Fri, 20 Nov 2026 16:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=inria.fr header.i=@inria.fr header.a=rsa-sha256 header.s=dc header.b=YDaM9KU6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=W+TpxS1i+J9I/NKJ3cSN+tLGKZHGRM6TY2QWiTn+Pqw=;
-  b=YDaM9KU6/kXBvD6g49Wx5jS4NOymnKZuz69pkB3lGxpPAlej1Sy6vLUn
-   JyGASBlcmBuAuIWHtbDFDY3CYOYw5UrbD6+7micLm6C/Cis51ZbGI/aXA
-   e5BhfK7lwNyeBzNbJ6xAqI7uUcWX1VQK2MftcH7E2C66y7LR7/Unx+FsK
-   w=;
-X-CSE-ConnectionGUID: PUjWxCQKTyq/W1N/uAkTuQ==
-X-CSE-MsgGUID: VcX/fQEXTbeOvkyefUMb3A==
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=zakaria.belkadi@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.27,223,1787004000"; 
-   d="scan'208";a="306591356"
-Received: from unknown (HELO Dellisimo.rennes.centralesupelec.fr) ([192.70.40.1])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2026 17:23:06 +0100
-From: Zakaria Belkadi <zakaria.belkadi@inria.fr>
-To: Christoph Hellwig <hch@infradead.org>,
-	Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	florence.schadle@ssi.gouv.fr,
-	frederic.tronel@centralesupelec.fr,
-	louis.rilling@irisa.fr,
-	stable@vger.kernel.org
-Subject: Re: [PATCH RESEND] block: pin user PI pages for writing when ref tags are remapped
-Date: Fri, 20 Nov 2026 17:22:57 +0100
-Message-Id: <20261120162257.498238-1-zakaria.belkadi@inria.fr>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <awBnB-55HQ54C1x6@infradead.org>
-References: <awBnB-55HQ54C1x6@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=djEjpth8
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCE771F000CF;
+	Fri, 20 Nov 2026 16:28:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795192134;
+	bh=hKTq5offfOb2bDNEYaRHVBez+Fjet5kFrAEYBp90cl8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=djEjpth8BxGSnk2aoPvo4XYFFDO0eGaPld+QWKK55LA1ccQyLBAdB2stBwKJLD8Tt
+	 0GTRafVzuFXkm4T0YeloOMLe9PX/FMEi9N/4XSlwf127ASmQmYU20C4U9jbt8i6sFE
+	 BgxHxm6U0xv45Ud76OaFnxTvUKkesnBffKEOEhpKxjDxE/vPyWCoD2jAi9npzodOvk
+	 WmmHMgazxZ1L7kGpkwBdveM28Ukn8zlNyJJVZV0KNV6MfG+XSHqaFjAU1a6QmdU6Bj
+	 D7eDE3IxKG85ygq033he358+BkhRUl01bnZpeWJea/6LDEJtrQl5msL4Gpsk91iyB9
+	 X9uoFcSqNNRXw==
+Date: Fri, 20 Nov 2026 17:28:47 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org, 
+	Andreas Gruenbacher <agruenba@redhat.com>, gfs2@lists.linux.dev, Mike Marshall <hubcap@omnibond.com>, 
+	Martin Brandenburg <martin@omnibond.com>, devel@lists.orangefs.org, Dave Kleikamp <shaggy@kernel.org>, 
+	jfs-discussion@lists.sourceforge.net, Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	linux-afs@lists.infradead.org, Miklos Szeredi <miklos@szeredi.hu>, fuse-devel@lists.linux.dev, 
+	linux-block@vger.kernel.org, Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
+	linux-nfs@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org
+Subject: Re: [PATCH v2 0/13] fs: Various I_DIRTY_* state handling fixes
+Message-ID: <20261120-ampel-ungepflegt-begeben-9da8182f2de3@brauner>
+References: <20261116171044.6938-1-jack@suse.cz>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -75,21 +63,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20261116171044.6938-1-jack@suse.cz>
 
-Christoph, Caleb,
+On Wed, Nov 18, 2026 at 03:59:34PM +0100, Jan Kara wrote:
 
-Thanks to both of you for the review.
-
-On Fri, Nov 20, 2026 at 07:28:07AM -0800, Christoph Hellwig wrote:
-> I don't think we can just pin memory as writable that wasn't given to
-> us as writable.  So this needs to force bounce buffering, at least when
-> remapping might be required.
-
-Agreed. I'll keep the PI iterator as ITER_SOURCE. In v2,
-bio_integrity_map_user() will bounce the user PI buffer for REQ_OP_WRITE
-when the integrity profile has BLK_INTEGRITY_REF_TAG. That way the
-block layer can remap the tags in its own copy.
-
-Thanks,
-Zakaria
+I'll wait for your v3. :)
