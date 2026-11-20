@@ -1,146 +1,142 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795182075;
-	b=mJiIVFkZAdmhpwGLpFBuHcuv9pyx1CdC48eF3u0dOf6wBrya2DYqL6eXx41wfK+qGDJ4
-	 yRHYUWUOYBVKMqoS1HfDk/QD8vrchxoEwMVKR8xqQtkU/NGeHV8gxMXeDotd8pyefhd93
-	 ErJg6aB1zNNP7GMfKQQArxpdEnVl8jC8AGHm92tsyjfDgNZrnzZjiPMPbbGBTGD5xkz2L
-	 +uMB0GoHiLcjRb24earNj5N7ta8mWLEs+2fZM/ZPj/aoKTbvX4P5ZIHFnFjgLhtv6Kql5
-	 P1alJQZAb/CDHffHFnHqKWs5cX/yMifQcn3Nn5GPy617SLtfalWsLDW8P/YtLqIanMA==
+	t=1795182618;
+	b=H4/PQpYKEiWUe/GDuzzSMruPMVVXZvc3VwiT6dRMu7SMHkXDiPQULcR0BqYB7Xl02q+s
+	 rj+5r0n3E8DQAgJNcpb/sPMFYsg3XjSujp60IcM5sM1Fr6xfZuIxktY9spebCnvFTO1hx
+	 qPmXWNydlcRUVbtqQDVKmy1VtzW8qcQdwzDuSQPZ1MruzkzGqRqAipEJKtpa64gOqgCI5
+	 NRjJs3MMDjZYc5s/osIvQHpGHcHgioeVTdoSmeOSYopt0z4KOmvSD2To3dcjXuxm/Wx1d
+	 bqJNtIyUyUzQ6MCE1J9CHp5a58QxZkCR+4Bv4vmSvUI39u3MNOZJVAPyPm1ReMjyjXg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795182075;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Message-ID:Subject:
-	 From:To:Cc:Date:In-Reply-To:References:Autocrypt:Content-Type:
-	 MIME-Version:OpenPGP;
-	bh=YW4oRhO1MuXRHyeWQ9Lx5ixnye7cuXD9in5rMS24y2A=;
-	b=gTlPgdbzb/5Gfv3hXIbgMWvII/zu+pAm/Xy76ZXtUvQTQ1mL4q+xuUWvnEHfCkHDs8Ry
-	 Y63Y8k0Fa/C7dA8o/6Tk8ITLnsBN+/91buxuB+aW6gvgopFJVcuBDGn9S++YE8A8HMqzq
-	 S+vJ1sFsCF8Oy8CcFT4BpaiEBCYPE4F4LA/sTwN5a0ZrQfmNas9ojtLZ4SdlJPUisro2f
-	 vsf4mAFw6OL5roNy/enfNivr55Zr45gq5ZHL1ZShQkrIUkhEexwxKafHC3HssxPe9rAeI
-	 k0qyeqolbMfvftH9bUoqEWLOEe3HduLqfhl2iu3muqP9vngUlyu+s7866BrgJmpUmbQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795182618;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=uU+g78pFe3woDmujMNPfhZ/0Qi8mHsxDvK4Ws3nTpkw=;
+	b=Pjr3+GDw8zjHadkqlhYI9+QUZEGsK0FHWyPw0/zaN/pvEprcLCQA1DXh3lHLdmoSE+CP
+	 7N98lrN6yIXpaZmWyrDaUGQHRtwWSkM7P7kQ2N099h+YQpPkx2X2veGX+CLqYQzJR4S3+
+	 VAYKHYBpIAzvt4pfswI8OuY18edouzERGNMinuz8U68cGNiPZ6A9zlQrYdpjL+9pwWEWD
+	 DYXiCJiKxOcgiswvQ4eHS55uIDkLMsdEQS1eDay631IpfjNGPGWnIVAP5Wqj13LenXMib
+	 xbrk7q9pYDIZzrFQ+mwbOUQ2eLKNN0Sbk2o/SX0D/s/ySN2SgC3ZCbPybkMkAn89xow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=posteo.de;
-	spf=pass smtp.mailfrom=posteo.de;
-	dkim=pass header.d=posteo.de header.i=@posteo.de header.a=rsa-sha256 header.s=1984.8680eb header.b=hWh+t93A;
-	arc=none smtp.remote-ip=185.67.36.66
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=none header.from=ziepe.ca;
+	spf=pass smtp.mailfrom=ziepe.ca;
+	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=ehz6mMEB;
+	arc=none smtp.remote-ip=209.85.222.182
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A536D606A339
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 13:41:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A536D606A339
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A009F606A339
+	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 13:50:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A009F606A339
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.a=rsa-sha256 header.s=1984.8680eb header.b=hWh+t93A
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id 1E6B1240101
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 14:41:07 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.de;
-	s=1984.8680eb; t=1795182067;
-	bh=YW4oRhO1MuXRHyeWQ9Lx5ixnye7cuXD9in5rMS24y2A=;
-	h=Message-ID:Subject:From:To:Cc:Date:Autocrypt:Content-Type:
-	 MIME-Version:OpenPGP:From;
-	b=hWh+t93AQ89D3y7Q9jrCyuBHB12xO/fjpp2KbQYXJeT2L3X6wH/D4DMbcDgYcqtgT
-	 pePRFyBthjOtirmgOI5czcXW1Xr1VnxH6GfasweXjJm4J9Mm4Hw+mn7yRccYA1M89r
-	 ckxYsVMo6pN37AZxMbKEL4i2LBGKnzK6/RJiaHheArZW644ZeQGqGoyhhM2h3T4JFH
-	 Dk2Hxfv0uSl3GCmBxQb7acaV1ilGCR5zeH72IlA7Ii3mLlwUcevf0AERKWuKOWgNhS
-	 bpETuEoWTvJyWgDofyUyxOmTRbCQ1514fODehAyVg1kPoYini/8kpChbhDu6bw685P
-	 5EShivwIQiQoA==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4jWGgr36MZz6tyT;
-	Fri, 20 Nov 2026 14:40:56 +0100 (CET)
-Message-ID: <e4c77581b1c09f8e0c8be570283f653a2a7e2147.camel@posteo.de>
-Subject: Re: [PATCH v22 4/5] rust: rename `AlwaysRefCounted` to `RefCounted`
-From: Markus Probst <markus.probst@posteo.de>
-To: Andreas Hindborg <a.hindborg@kernel.org>, Danilo Krummrich
- <dakr@kernel.org>,  Lorenzo Stoakes	 <ljs@kernel.org>, Vlastimil Babka
- <vbabka@kernel.org>, "Liam R. Howlett"	 <liam@infradead.org>, Uladzislau
- Rezki <urezki@gmail.com>, Miguel Ojeda	 <ojeda@kernel.org>, Boqun Feng
- <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,  =?ISO-8859-1?Q?Bj=F6rn?=
- Roy Baron	 <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Alice Ryhl	 <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Daniel Almeida	 <daniel.almeida@collabora.com>, Tamir Duberstein
- <tamird@kernel.org>,  Alexandre Courbot <acourbot@nvidia.com>, Onur
- =?ISO-8859-1?Q?=D6zkan?= <work@onurozkan.dev>, Lyude Paul	
- <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Christian Brauner	 <brauner@kernel.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Dave Ertman	 <david.m.ertman@intel.com>, Leon
- Romanovsky <leon@kernel.org>, Paul Moore	 <paul@paul-moore.com>, Serge
- Hallyn <sergeh@kernel.org>, David Airlie	 <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, Alexander Viro	 <viro@zeniv.linux.org.uk>, Jan
- Kara <jack@suse.cz>, Igor Korotin	 <igor.korotin@linux.dev>, Viresh Kumar
- <vireshk@kernel.org>, Nishanth Menon	 <nm@ti.com>, Stephen Boyd
- <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,  Krzysztof
- =?UTF-8?Q?Wilczy=C5=84ski?=	 <kwilczynski@kernel.org>, Pavel Tikhomirov
- <ptikhomirov@virtuozzo.com>,  Michal Wilczynski <m.wilczynski@samsung.com>,
- Ira Weiny <iweiny@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
- Thomas =?ISO-8859-1?Q?Hellstr=F6m?=	 <thomas.hellstrom@linux.intel.com>,
- Johan Hovold <johan@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,  Dave Jiang
- <dave.jiang@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, Saeed Mahameed
- <saeedm@nvidia.com>,  Zhi Wang <zhiw@nvidia.com>, Jonathan Cameron
- <jic23@kernel.org>
-Cc: Philipp Stanner <phasta@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- driver-core@lists.linux.dev, 	linux-block@vger.kernel.org,
- linux-security-module@vger.kernel.org, 	dri-devel@lists.freedesktop.org,
- linux-fsdevel@vger.kernel.org, 	linux-pm@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-media@vger.kernel.org, 
-	linaro-mm-sig@lists.linaro.org, linux-serial@vger.kernel.org, Oliver
- Mangold	 <oliver.mangold@pm.me>, Viresh Kumar <viresh.kumar@linaro.org>,
- Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=	 <ukleinek@kernel.org>
-Date: Fri, 20 Nov 2026 13:41:05 +0000
-In-Reply-To: <20261116-unique-ref-v22-4-12029383206d@kernel.org>
-References: <20261116-unique-ref-v22-0-12029383206d@kernel.org>
-	 <20261116-unique-ref-v22-4-12029383206d@kernel.org>
-Autocrypt: addr=markus.probst@posteo.de; prefer-encrypt=mutual;
- keydata=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
- jfGillcaQOqFZ3WwVqyzG1BUfTow==
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-1bC6az0UrhT7nf2a398O"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=ehz6mMEB
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-949680e6d82so131312285a.2
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 05:50:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1795182616; x=1795787416; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=uU+g78pFe3woDmujMNPfhZ/0Qi8mHsxDvK4Ws3nTpkw=;
+        b=ehz6mMEBp7FU9O4IkG6ucYOPrN/2FptPlSVzAMegQhkSAM21Hz39XQX76haUWfk977
+         A2S7LqWAyzQ/MMpQcJ9hlw5/i8t5QmFoKEbwfS2++6OthszxDFhEwhu48SFckK+V0pvW
+         ZrB7pLti4QW/zlyDdG0NHqvUQqc55WcUlTDasvdx4/7cbllh7O44dOopIvf3GjZWbJGD
+         Hp2pPFYqt09CILTVYoO85olovSxlw20uhMs3fEFAaJjWsbuz4Ruyjz74FAK8xTbPsjJm
+         YNZjjLR6Muw2SduJu6y83jD/L3yp3ZXbUhG9xHOIQjqowZufFq2KjlStO23Q1v2+do05
+         Ehqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795182616; x=1795787416;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=uU+g78pFe3woDmujMNPfhZ/0Qi8mHsxDvK4Ws3nTpkw=;
+        b=Y5uId6kW6/0LlOH8lzDzlpJDCDRWXDnTxAUMNMO3Ah8F3ciSz2gAZLpv3YtmbVNUWX
+         exa1y/nA8e4EU3WxAS9wziYBqwegrnGIHiT8YgpFWIBlKgv/RtTdjlqkNhlzzj0lLH16
+         k7hHxIbNWwE0d3sJUAyIgFAGrJEk0qm+OOqq3W/677ybN8KrS1svRwVs9f5mpCJhteDl
+         7sKkFQIvKwjbCGrb+iLiNOoK9fgNJq0056D1qMiTdC4maNFsPz1N2Fz4bma+9zmjWDJG
+         htdTeaqDqztvUBW+9b2ZvHEktm+ZyeVWpCHiRkJewuPYfixwRsRCgH14x/mwdbFp89LA
+         7Lfw==
+X-Forwarded-Encrypted: i=1; AL+hErHCBLvrTla+JCOTBwyMUh3jL5TT1JiqYnEypDv95hc+nXxaL5zxkD61hJEoxxR9Gkp4cukJ8r8Nr5wwIA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/6zJcHi2E5vKVKFTJsyAk9H4ctEGuJLo8Ht92kBtGo/QVuLtRS
+	LCGn401okR8u4b3I8R5z7SEa/eGUmlHgRebmmrslzlAWQrrpWqcpDrisX20uGdojJNU=
+X-Gm-Gg: AYBFou0dmvfChDCJjmXnrmrjxgfPaM5PHAEr+ruJlCkve7HNJv7N8F6j4BbG+CNItgT
+	2Xrs2insBf2P+MNsBXDMrIgHwtS0dWZWCPizIX8BX62D4Z3nNMUPZZVJ/s3yyLGkIipM8d0T9Id
+	bOEq7Q646WCoJrvEIDNXfLs55/0q01+Kk9+i3tpkzJE/xoPFZF6+brRanwiZjR/Z9aqt7+cRCrs
+	t1ora7LUN2TH6yLEe83ZgOoyerDb8THje4ibPYrXSI6rL+CUUb6L+JPiOUv7j1wL9D07O56kWsu
+	KlyYQryTDSVGcwViKbEf7XcytGIuKdyXJcLh91fVpF/4o1iq7wisRmBSq56tNMqnXZzWpZvGlZN
+	T2Ie6x7LMGOPqUTygdVv0sDUsz9gHc9ts/iZKV+MLl5nIESEtJ1TZCqHIejxeOq7ugUJFSsdB/E
+	xGLFHzaZDkHk6uAMbYLzp6qlyIsLF7SjyYwv5/2syph3fay+7tveUV5Bp0yZsE4yfhcR54EivVG
+	yC/OjPet58/9XMVwX+4b8GvfSJqhoViNuKC09glB/iak35HumWeTJmlIGhU9vt7mfx/rGlh0Qvm
+	3YjHvw==
+X-Received: by 2002:a05:620a:4111:b0:939:5cd5:e243 with SMTP id af79cd13be357-949ba80f8acmr491343985a.6.1795182615989;
+        Fri, 20 Nov 2026 05:50:15 -0800 (PST)
+Received: from ziepe.ca ([142.166.156.71])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-949bb3f7cf3sm190597085a.31.2026.11.20.05.50.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Nov 2026 05:50:15 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1xUP0H-00000003hHG-3ovL;
+	Fri, 20 Nov 2026 09:50:13 -0400
+Date: Fri, 20 Nov 2026 09:50:13 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Luigi Rizzo <lrizzo@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Vlastimil Babka <vbabka@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Luigi Rizzo <rizzo.unipi@gmail.com>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	"Liam R . Howlett" <liam@infradead.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Brendan Jackman <brendan.jackman@linux.dev>,
+	Zi Yan <ziy@nvidia.com>, Harry Yoo <harry@kernel.org>,
+	Christoph Lameter <cl@gentwo.org>,
+	David Rientjes <rientjes@google.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Hao Li <hao.li@linux.dev>, Matthew Wilcox <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>, Jann Horn <jannh@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Joshua Washington <joshwash@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Naman Gulati <namangulati@google.com>,
+	Pranjal Shrivastava <praan@google.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Randy Dunlap <rdunlap@infradead.org>, linux-mm@kvack.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	driver-core@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v3 00/25] PISA: Pre-mapped IOVA Superpage Allocator
+ for DMA and CoCo
+Message-ID: <20261120135013.GO3115493@ziepe.ca>
+References: <20261109182533.3594984-1-lrizzo@google.com>
+ <20261120010655.467825-1-lrizzo@google.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -150,75 +146,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-OpenPGP: url=https://posteo.de/keys/markus.probst@posteo.de.asc; preference=encrypt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261120010655.467825-1-lrizzo@google.com>
 
+On Fri, Nov 20, 2026 at 01:06:30AM +0000, Luigi Rizzo wrote:
+> This is v3 of the RFC previously posted as DMA_PMD [0], now renamed PISA
+> ("Pre-mapped IOVA Superpage Allocator"). The text below follows
+> Documentation/core-api/pisa.rst (patch 25/25), which has the details.
 
---=-1bC6az0UrhT7nf2a398O
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I thought the conclusion was to just do this stuff in netdev pagepool,
+now you come with an enormous AI series spread across the entire
+kernel?
 
-On Mon, 2026-11-16 at 15:21 +0100, Andreas Hindborg wrote:
-> From: Oliver Mangold <oliver.mangold@pm.me>
->=20
-> There are types where it may both be reference counted in some cases and
-> owned in others. For such types, obtaining an `ARef<T>` from a `&T` may b=
-e
-> unsound, as it allows creation of an `ARef<T>` from a `&Owned<T>`.
->=20
-> Therefore, we split `AlwaysRefCounted` into `RefCounted` (which `ARef<T>`
-> would require) and a marker trait to indicate that the `&T` -> `ARef<T>`
-> conversion is sound for the type. A type that implements `Ownable` may
-> only implement the marker trait if it allows an `ARef<T>` to exist
-> together with an `Owned<T>`.
->=20
-> - Rename `AlwaysRefCounted` to `RefCounted`.
-> - Add a new unsafe trait `AlwaysRefCounted`.
-> - Implement the new trait `AlwaysRefCounted` for the newly renamed
->   `RefCounted` implementations. This leaves functionality of existing
->   implementers of `AlwaysRefCounted` intact.
->=20
-> Suggested-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
-> [ Andreas: Updated commit message, rebased on v7.4-rc2, converted new
->   implementers, relaxed the `ForeignOwnable` bound for `ARef<T>`, updated
->   safety comments. ]
-> Acked-by: Igor Korotin <igor.korotin.linux@gmail.com>
-> Acked-by: Danilo Krummrich <dakr@kernel.org>
-> Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
-> Co-developed-by: Andreas Hindborg <a.hindborg@kernel.org>
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-> Acked-by: Uwe Kleine-K=C3=B6nig <ukleinek@kernel.org> # for pwm.rs
+> - Needs bounce buffers: in Confidential Computing VMs, PISA allocators
+>   pre-decrypt 2MB pages in place, avoiding swiotlb bounce-buffer copies.
 
-I haven't unterstood yet what use case this has, so I am trusting the
-other ACKs here. Maybe a precise example would help?
+It seems this was ignored too. We want the bounce buffers in CC. They
+serve a security purpose. You cannot loose control of the shared
+memory buffers have have them leak into SKBs, user mappings and so
+on. It is not secure.
 
-For serdev:
+I don't see how any of this is valuable or necessary for CC,
+especially when we really don't even expect to have an vIOMMU for CC
+very often..
 
-Acked-by: Markus Probst <markus.probst@posteo.de>
-
-Thanks
-- Markus Probst
-
---=-1bC6az0UrhT7nf2a398O
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQJPBAABCAA5FiEEgnQYxPSsWOdyMMRzNHYf+OetQ9IFAmsATecbFIAAAAAABAAO
-bWFudTIsMi41KzEuMTIsMiwyAAoJEDR2H/jnrUPSANQP/R1hB8C5F3mypETYwCgo
-/31OX6ODiCHu568feU0OwqqnH1gKua6thOPxdUzO4oz9uHEvJOy9k0pAUuqhIoUR
-cwWGFajvqbq0iEcbMMls3ezTo63QhALeYKpaK+p4wCU6HqazGDnsTiqXqIBnSMFF
-/zhMCLHxApAYueLhRzmTe9z4DIEhOaUdcOowPIV35HlxhghSQZ/uaZclBwv6h+xn
-PDpQAKnR2JxW4CcyT1Fm62hItTX+Djvef/Q6aac3xdMq1JSPlsbNUlThWsY+EjbX
-eBTAO766WENw3Hw3SxnX/pcUQwUVsRa3bxxgBxSfwZtm6nSfhxmBzAHsiR7aA4wq
-hrI46P32JW6WcL+jToQJC/QjQienV9rV/QTWrfp83Z59ce3lL43XtMlofu0EoK6W
-IWoX/O4IoSM3YDlzHsSYGQR7KG+VGDXyJAb6HhVyNdMTiegz8UxWwYqGviS9mTON
-a3YA8htdMngXmkwT5CQKhsNbS0sLqGb3nDrqmLV2hSDpjGkdUe86bahObcVCXonf
-7Gdl1/15c46K0QRbEf7q5kgreejRoLqFdi2eyw406ruUxE7Bd71t9faF5zWzaJRK
-ewr2s+IremZr522ABFhIX0SFkqu1sPzXqNLKXQa5fz5XxTh6jQziddGf3Q2z71dB
-79I2PETkcl5NqkNBz+UkmsCH
-=iSw7
------END PGP SIGNATURE-----
-
---=-1bC6az0UrhT7nf2a398O--
+Jason
