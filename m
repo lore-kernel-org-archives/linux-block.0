@@ -1,53 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.105
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795178448;
-	b=H3roLsEC0f+P0G4/K3NyrR8Eyry7aYd8qm8yeVBr8CJRJk4PHreZSg3yFDE7NixA/QrU
-	 SgnFTv1JjTTjJc+LG4p1L35kNnJ57YCNuUF3T7/XX0BSM8M2alJzBhZY7qRFhCmAsHTgN
-	 72ab1P3vis/CVVh7Xe1Xwi7ZCYXZrO6rAs2nJ0J1zYo5b/RFaalkWp/Xj18ak+lrNm3KO
-	 MaEpzXMbrzXYVvYaKJQcAE9uZINKUOGEpOTufS96CWuNXQkOGlSb1TCD+DOecvhzYYo9h
-	 3g6DkQ1VDKV2YA9wqUvft8UUgW7y7Hnx4J4SmYVARBLwSIFL3KGQsIwnJK/dxfF6Azg==
+	t=1795179089;
+	b=Sjw+tyuNppQ88DSwN/3KQa6Gc8QnmIWt9hQ+VerMCYuC5tlxSk7OsyYU0o6/r1EszZkv
+	 8fBeExyoFKsbblgoJVE6ECxnOag3K7Z+be6rrVh6f5DQkTsF7udJcN6fdWqFK2N0NdLAo
+	 IKBp/wCq0V9ma6So4NnGvS5WPrpG8AlPRfPv9UEqlDZtBlcE/zg8KbTZGT3R2hKeXUNjG
+	 MWg1WFJc45Z9WSEw9LRba2IAXLl4phSK9ZPtnSeHDixWHTgMBrTCStiB+K0b6y2jsNgQ+
+	 LhChcYYT8pkUdg/8SAQC4oX5ZXfB/MDHRfzH7zMCZEVzwU6mdlGkHK4PdMQ+rr/1eng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795178448;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795179089;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=1CwJfyBCLxLwL0PnTLvwM2o7XRXX/a3CQUs39Q4YTPY=;
-	b=s3vKGk449ssqOEhjWWZWF0FdhBB1WoIYLZpGDC/pfRHJKyioCAYiFwF5r2uT3QgYf+Yd
-	 wNlNn4F1hnAsyageFtz7fRawdkap3guGyohAWl87Z8vvJ1uToKpkyAVZMdRye6miJMG0X
-	 HFboQ1xnzSR6tgl64wOjdO7f1qZcenyjLiu0Bp50+2OO9q39b5iKyIAISjUxwHXTIpqEP
-	 Its3tkOY8pMmZiX23MzO5FxFMutCQ4co8d/pAJCm9MLjTk/O9As+ldrD+jAbi8P8cAj7p
-	 1LpI5RD3z/JZlzzvgRA1RgjOqYE0ph5Tczz8T7X5nR9iBgWhd0u+MzYEucNuNmakbBw==
+	bh=RwK+sZmEfro4R2XrALiEL0NIpL3hInhE+mN5nJsjAK8=;
+	b=TnuRuY/1iH/LAAj1agXE+LaMRYxXYaj5YSNngpbU+SJGkvNff8x8iRj33UnfAXCquA2y
+	 x/3uthPPZsnVOs3oTymZFTjpYeGKuJJRj7HJ8cI/S8UPcz8EeXH/FjVZghQ/KZjR50e7U
+	 3I9XeomBt6QTf1qXhdS+sKHRNm2RN7+vLaqUlJA7a0iF35j85f4UBYlMOvsTf2JNsDvmp
+	 julqbjkhY11TSAbQkh3CjUazfRHKH1mHVEGeLP/tzc4jxQJdVzFVtmrSsgfHwWTR+OMCY
+	 FGmawkhDnIduoW8cx22J4NeV3slIMbRa2bjWsmd0Tti31eRZgu6+iqBY9QgyfGSHEWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="V/7IqG9G";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=CVboDCpu;
+	arc=none smtp.remote-ip=91.218.175.105
+Received: from mta0.migadu.com (out-105.mta0.migadu.com [91.218.175.105])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF633606A32A;
-	Fri, 20 Nov 2026 12:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B6160A261E
+	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 12:51:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 53B6160A261E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=V/7IqG9G
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E4F01F000CA;
-	Fri, 20 Nov 2026 12:40:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795178447;
-	bh=1CwJfyBCLxLwL0PnTLvwM2o7XRXX/a3CQUs39Q4YTPY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=V/7IqG9G1aidQOASPSvwPkH4jR5IteEbffKLBoJx7IYUuoYfE6R+NRwB0TMrsY2He
-	 ly0RjzZpz3tFAnSo/S6kG/lMLdVxgc7kO5njSGvZqpjYJDMuRw5WDEFghTsdNDMSCK
-	 A+9es7dmLcqJK7QGyGGMzuyIf75k6AKYJRTfZcvFa655K1nubrvLN3VkjkrOaeLabD
-	 gdPG16XXJ7r8vbHsefZ258tJTKEhhM8Jkja8e1JiyzZPcW37XNDej/IvRShk42OCTc
-	 ci4M8GWW9DGW6TNSJForFI6V+cW8ibPN6TAG0+xvwbJi2RfvbZGpcnw0mv8KYpPkkB
-	 60pMEO+uDHqZw==
-Date: Fri, 20 Nov 2026 13:40:42 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Ethan <yangyizhen3198@phytium.com.cn>, Jens Axboe <axboe@kernel.dk>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/1] block: long udev open waits during cache teardown
-Message-ID: <20261120-hassliebe-arena-kaufvertrag-3ac58fd0483a@brauner>
-References: <20261117105107.14236-1-yangyizhen3198@phytium.com.cn>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=CVboDCpu
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=/M71l9OR+PuswlMFy8Wbwhup3v6OafAF4YhJlLt/84U=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795179086; v=1; x=1795783886;
+ b=CVboDCpuuv2WqQiy/vtf05zSEtSkLQsRJ/djYGgQWt91weN3dja9zelbY5vaAyy3HckRz8nB
+ LTBIz+A0NBi0SxrULdX4yPc6ILwbmx6ofWOwOp9UzoFU9UnVUAYdYhC2d48tOPwt0UJKs6MIxos
+ hQ8bQNPKUm99WaSVdem1tj90=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 624a9615c12efaf1;
+	Fri, 20 Nov 2026 12:51:26 +0000
+X-Mizu-Trace-ID: 624a9615c12efaf1
+X-Migadu-Flow: FLOW_OUT
+Date: Fri, 20 Nov 2026 13:51:14 +0100
+From: "Pankaj Raghav (Samsung)" <pankaj.raghav@linux.dev>
+To: Jan Kara <jack@suse.cz>
+Cc: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
+	Andreas Gruenbacher <agruenba@redhat.com>, gfs2@lists.linux.dev, Mike Marshall <hubcap@omnibond.com>, 
+	Martin Brandenburg <martin@omnibond.com>, devel@lists.orangefs.org, Dave Kleikamp <shaggy@kernel.org>, 
+	jfs-discussion@lists.sourceforge.net, Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	linux-afs@lists.infradead.org, Miklos Szeredi <miklos@szeredi.hu>, fuse-devel@lists.linux.dev, 
+	linux-block@vger.kernel.org, Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
+	linux-nfs@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org
+Subject: Re: [PATCH 01/13] bdev: Drop pointless loop from
+ blkdev_flush_mapping()
+Message-ID: <awBAeS9ROaFyOjzB@quentin>
+References: <20261116171044.6938-1-jack@suse.cz>
+ <20261118145941.1063127-14-jack@suse.cz>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -57,30 +72,76 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261117105107.14236-1-yangyizhen3198@phytium.com.cn>
+In-Reply-To: <20261118145941.1063127-14-jack@suse.cz>
 
-On Tue, Nov 17, 2026 at 06:51:06PM +0800, Ethan wrote:
-> The main questions are whether __fput is an acceptable hook, whether
-> this should instead remain an explicit userspace action, and whether
-> a different block close locking design would better address the issue.
+On Wed, Nov 18, 2026 at 03:59:35PM +0100, Jan Kara wrote:
+> bdev_write_inode() is really odd loop calling write_inode_now(). The
+> bdev doesn't have any pages by now and if there are any dirty bits in
+> the inode state, they are stale. Just call write_inode_now() once to
+> clear them.
+> 
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-No, __fput() is very wrong for this. It runs for the final fput of
-every block device file. So every close of any block device fd would
-fsync the whole device and throw away its page cache, including the
-cache of everyone else who has it open. udev opens and closes block
-devices all the time. That makes the common case a lot worse.
+When I looked at the commit that introduced bdev_write_inode()[1], it says
+to call write_inode_now() on the final put of the block device. At the
+moment, tt looks like we call bdev_write_inode() only when bd_openers is 0.
 
-Mainline already syncs before taking open_mutex when it looks like the
-last opener is going away. Exactly to avoid multi-minute syncs under the
-mutex, look at bdev_release().
+Looks good,
+Reviewed-by: Pankaj Raghav (Samsung) <pankaj.raghav@linux.dev>
 
-What's left under open_mutex is the kill_bdev() in
-blkdev_flush_mapping() and going by your numbers that's the truncate
-you're waiting on. If that still reproduces on mainline it's a question
-about the bdev release locking. It absolutely isn't something to hook
-into the generic file release path.
+--
+Pankaj
 
-And mkfs can just fsync() and POSIX_FADV_DONTNEED the device itself
-before it closes it.
+[1] 564f00f6c03a ("block_dev: only write bdev inode on close")
+> ---
+>  block/bdev.c | 25 ++++++-------------------
+>  1 file changed, 6 insertions(+), 19 deletions(-)
+> 
+> diff --git a/block/bdev.c b/block/bdev.c
+> index f20f91b3176e..9fa72df4f47a 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -60,24 +60,6 @@ struct block_device *file_bdev(struct file *bdev_file)
+>  }
+>  EXPORT_SYMBOL(file_bdev);
+>  
+> -static void bdev_write_inode(struct block_device *bdev)
+> -{
+> -	struct inode *inode = BD_INODE(bdev);
+> -	int ret;
+> -
+> -	spin_lock(&inode->i_lock);
+> -	while (inode_state_read(inode) & I_DIRTY) {
+> -		spin_unlock(&inode->i_lock);
+> -		ret = write_inode_now(inode, true);
+> -		if (ret)
+> -			pr_warn_ratelimited(
+> -	"VFS: Dirty inode writeback failed for block device %pg (err=%d).\n",
+> -				bdev, ret);
+> -		spin_lock(&inode->i_lock);
+> -	}
+> -	spin_unlock(&inode->i_lock);
+> -}
+> -
+>  /* Kill _all_ buffers and pagecache , dirty or not.. */
+>  static void kill_bdev(struct block_device *bdev)
+>  {
+> @@ -755,7 +737,12 @@ static void blkdev_flush_mapping(struct block_device *bdev)
+>  	WARN_ON_ONCE(bdev->bd_holders);
+>  	sync_blockdev(bdev);
+>  	kill_bdev(bdev);
+> -	bdev_write_inode(bdev);
+> +	/*
+> +	 * All data is written out and evicted but inode can have some stale
+> +	 * I_DIRTY bits set. Call write_inode_now() to get rid of them so that
+> +	 * the inode can be evicted.
+> +	 */
+> +	write_inode_now(BD_INODE(bdev), 1);
+>  }
+>  
+>  static void blkdev_put_whole(struct block_device *bdev)
+> -- 
+> 2.53.0
+> 
