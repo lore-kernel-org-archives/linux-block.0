@@ -1,49 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795155752;
-	b=UxP4qWQ6Ue6YdfnFnU0y4OnLt2yyIM/JX5F3z3COE/QUz/p08dlb8+BJVfcbv3/sLNRB
-	 IuvuQR5fLD5+5XiMNC95/ou7RbAeU5kzUhXplYJ2/j9bOaT8XwUqSBtfxn3nfWn3H5XwL
-	 1vz05b/rAvSvLN9Wj3Ng7SwRH5J7rzLaVHsej+6cHHyZMkIVOlOWZI02Fy/30Wvi+HnyE
-	 LlIeke+3qCB1YAkQ8fabg+iPmOKInB2HmRabYCyfa73ccZ8mE64dEhftEpvv/eu8MoQgE
-	 HCRKarnQSqrR6p5cX9ESeYMdy4O5KW/nxtnBBJvpT1cJyTFc8qhjBTyk2batChhBz4A==
+	t=1795156472;
+	b=SOXgXSns35HLNIswUT/oToRKRUqy4BgQEJDF63K9VRnAZjF8N562QHhJRDZqPwXlmNvZ
+	 P3I9yXfHgExWduZHc/9ITW+Ex2yqhMQyhDxJrZGHedon2AH29iXWL+BsiVCe4vprgYin/
+	 3XfKHGWGuuVdiIFU4Jkypyt9A3OQnfk4eosqfTUJmzkysJNwiX5i9V3ouXVYZ0d51MERa
+	 x3Qq66FSqWQAGY4FDfMzVzF8TDOWOV0XJjvpK16DfaIduAuKL633V3GOS1EWVuvKiILDJ
+	 8183p8rWetrs45TkMBkoub41KR/F7TVKbIe0Oofy/d8qp+D44pQeywNsI1tPyQeyytQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795155752;
-	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=NOaTyhylhEHBdEu/Q+Vut7aTIPl77OWMbtvKrns69xg=;
-	b=IBFy8XaXDdHFYnGjdqs9yLqT+ocbpwyBcdmF+lbBiwEe4QiNQrEOTQyG5E00y/3RLJUH
-	 6v14npQb8vaVvtotpeZnbAT1aTkq+XLWKRFfYOhiwTxXaJ7b7VX8jwrWMFAnR5pVP+zBT
-	 Lfxj/U1LMisuxbelF/IfJsTIt5fGTYKvh5StxAb40KKl9KjdES5Tb4TfJfqofC/Io/N/t
-	 Mg1ZMqpSvlaaHMXr6tq+3pZdD05OKc+2pqfo0MdpL36pzWrT/SM2nB0YoaV6oujVQ55Cu
-	 EH0oHOwya3OpOXNeJaBqGFLBC1OcMHDnLpRwAfHOJPZmqTP/sKGdJ7Oe6Y8dheQ+asQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795156472;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=l2nH2XTb5frL3IcF+3+XVhqdfkR4kPSpm/fGUJr6SFY=;
+	b=MpNuIcRxCaRC6X5Jj9TlHJyxATYU9R49EtQ3ryw2iv4jsB98IGG+9T55CD7R4k6VibJT
+	 ERDBwmgkIZpQdVtwsIfSuSw3EM9YwWm4h0yO6Rbv8zeUja8eJJ29FHx77x+q6WF0Vz1wb
+	 RvNKxi1Qk5MmswsPBzRS8LPYJo6AkIeQ5ZeJyEwzr0qIPCOrYZ7GTKYgr4Mi2mDB05q8K
+	 1TB0bTvelnETtBkIDhwjvbWl7mqthFzJhOXebTllEPdokH1Mkct5+V2reYFRY1ehHa/+E
+	 GGD10ThBNZNnelIu0OqGc1KUHK+qjK8dU4TR6HHYSTGUOwO7eAoWCqvSrPpSY9dq9Rg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.alibaba.com;
-	spf=pass smtp.mailfrom=linux.alibaba.com;
-	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=cvB3vrlv;
-	arc=none smtp.remote-ip=115.124.30.100
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=C0qrljRq;
+	arc=none smtp.remote-ip=74.125.82.44
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586D8606A338
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 06:22:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 586D8606A338
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D503E606A32A
+	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 06:34:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D503E606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=cvB3vrlv
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1795155748; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=NOaTyhylhEHBdEu/Q+Vut7aTIPl77OWMbtvKrns69xg=;
-	b=cvB3vrlvXo9bzIDduUVTCSG7sS66WyorFr6LrxmD9vG4pjlK6HvzEXGVZsb0zfiPml3FzKhENvVi5CBHCENku1BpABVZl8g7WO8HZWmG2JBVp9g26jwq+8oz01WWkiOVjFPOftnch1Td5HAYkZ32PKmFQgOJUDmF+ZbwNm6mVVY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=kanie@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0XF5WxSs_1795155746;
-Received: from 30.178.67.37(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0XF5WxSs_1795155746 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 20 Nov 2026 14:22:27 +0800
-Message-ID: <115b841b-eb67-421d-a192-436df5262c91@linux.alibaba.com>
-Date: Fri, 20 Nov 2026 14:22:25 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=C0qrljRq
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-1b3a05f8b5bso778683c88.1
+        for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 22:34:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795156471; x=1795761271; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=l2nH2XTb5frL3IcF+3+XVhqdfkR4kPSpm/fGUJr6SFY=;
+        b=C0qrljRqr6WB5mcG2FJbWz0ZpX9xYi9k13zz9r6fJw7gy4F+Ayk/9gAIFz9swn8N9A
+         qDjZXXGtcj0FZFKkzL+1NzcNDsO5LoPqkgJ0oW7b1Bhgqc1wZKyOaIiQVvkFz+MCqQNJ
+         vH4a6+2RxDKcRA9eM2kHGdplYeHgqCM4yXDrnSCaCTnV78oGu5Srgcp1amxaui2zAXdl
+         r01hCXvD/Fl0Kja049jzB1A6rIlgG03lKD/dsY31annm+LRUDzeKvTburg+a15/l28+p
+         oQv0XBoiQBQUv9GAeSAzesTFbCvR9lMwEhZI7UgVlpGkTPHz0SaBWUw7NdzHOQKRM1+S
+         UHTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795156471; x=1795761271;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=l2nH2XTb5frL3IcF+3+XVhqdfkR4kPSpm/fGUJr6SFY=;
+        b=IlSoHR2ePzKeKmIguTXqRM3l6d2hOvX8cSn11RyIjaBCp/s5V5S4gOX2lhoteMaUAM
+         sT2px8C26tsXIrjWjgTElcEEJaCWlOh+k1TnoGXjJxUYrtLerbxKNkHrCind8PcWVr3G
+         4B9Zi7mQgqA4C67w1mKRYZhY9w5YxWWB9LRxS/1CrHuEsST1pn+8UicFxZeJFj0m0QSE
+         0Xy2xE+OhR+HvFkpYLP1w0Yw7bknolLKhv0mDUjYnt3zezyjvjNc9Lg0UyMlCgqUHcMj
+         iVLCkwmESPs9FjjiziURsgmrbnbGBZ12IvnCsLBUWhVvWOdoZxao+BtPcMQ22GWLAg1t
+         TJHw==
+X-Forwarded-Encrypted: i=1; AL+hErHTA1l3vAptVHoTk6I7/3Ywr9zmlp90WefRCPd0NiQcpMwcvzLjuX3yCPxob5foX+nIrToXIi1HLBNznw==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/Nx9TlGiaZKgAropEPSsNj4Z7ryIKwt9/jNIj+uCWGjGftlUHO
+	TvvMsO6hMrwyd07qyhnHZpR6T4lION/jn0YGbmncDkVmVrloktbcpcT3
+X-Gm-Gg: AZFdTZccsKclOkQNPEWFrwLwFQ+WVBv/fJDKAL/wBp7mxhx55ciE3qfBEtw9CDF+AgO
+	+rc0aLU8ylJE6t5tyqBFO5q1M7Zhr/LW60uLNuYQE9bbUj0MPUYQ8v+TefB29QKd5Gk3f/nmaR/
+	uyYNqezD9JfXFLcZ91A7+Z0SRdtJmEe5n3EkYa9HnNfkjxfX19is4a7eJ/2RRSmt299mf+AWGDw
+	7RWIbha1cTxZlPIJbpNtUOjqat/6otWdei0naBzwYZM1VFiUeVginWWx/yKHUjCb2dD1Y//Kw/a
+	gkbVrcK1rfpgpUCS1WsFM7GYpTXxO0LDLhUYqqwKDbTNUSSCcB/26sYsu9WSfwUGq/Tb5xW9w7j
+	74UpjqAMW1TSHyiQk9xalHxwR67n9wC6V6n0b6p5g386TB1SC4Wko+NmTmgFaXoh3m+sCuAQdCH
+	vX+ALw5mA00L32tI8HP+RCnubiGkDij96gIDnEzvFLvbjsXJlKVXpa7O45x3oWr6HlZUWcREz9w
+	DyRKvjk50bXNyhukTEaZlEv+TDc+c8Z2l2lAhPQtpl5VJIT6UlqKbHzZbhnWi8mCiDhdbBeYXWC
+	B0bhuRxXyJBPqG0vycxO9tL51jGrlQhINalqfIZ5798JPFSPQDA=
+X-Received: by 2002:a05:7300:c01b:20b0:385:4b9:18ea with SMTP id 5a478bee46e88-38571027a68mr2036926eec.35.1795156470715;
+        Thu, 19 Nov 2026 22:34:30 -0800 (PST)
+Received: from annie-ProLiant-DL380-Gen11.. ([119.204.109.68])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-38566fdce48sm4821319eec.14.2026.11.19.22.34.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Nov 2026 22:34:30 -0800 (PST)
+From: Annie Kim <pulpannie@gmail.com>
+To: "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowangio@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	virtualization@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Hyokyung Kim <pulpannie@gmail.com>
+Subject: [PATCH] virtio_blk: validate zone append sector from device
+Date: Fri, 20 Nov 2026 15:30:39 +0900
+Message-ID: <20261120063039.4155597-1-pulpannie@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -53,102 +100,125 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/7] blk-stat: account for the mean of the source in
- blk_rq_stat_sum()
-To: Tao Cui <cui.tao@linux.dev>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
- Josef Bacik <josef@toxicpanda.com>, Nilay Shroff <nilay@linux.ibm.com>,
- Hannes Reinecke <hare@suse.de>, Tang Yizhou <yizhou.tang@shopee.com>
-Cc: linux-block@vger.kernel.org
-References: <20261119070548.3125491-1-kanie@linux.alibaba.com>
- <20261119070548.3125491-6-kanie@linux.alibaba.com>
- <d64b0846-2da8-409e-af7f-86b4e0e02a2a@linux.dev>
- <6687d72e-1a1b-4509-aa89-b99c9406b98a@linux.alibaba.com>
- <1e27d0b9-faab-46fe-b6a6-a3fbcff12e7e@linux.dev>
-From: Guixin Liu <kanie@linux.alibaba.com>
-In-Reply-To: <1e27d0b9-faab-46fe-b6a6-a3fbcff12e7e@linux.dev>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+From: Hyokyung Kim <pulpannie@gmail.com>
 
+The device reports the starting sector for REQ_OP_ZONE_APPEND completions,
+and virtio_blk copies it into req->__sector without checking that it
+still refers to the requested zone. A buggy or malicious device can
+therefore make upper layers believe the append landed at an arbitrary
+location.
 
-在 2026/11/20 10:50, Tao Cui 写道:
-> Hello, Guixin
->
-> 在 2026/11/20 10:04, Guixin Liu 写道:
->>
->> 在 2026/11/19 21:32, Tao Cui 写道:
->>> Hello, Guixin,
->>>
->>> 在 2026/11/19 15:05, Guixin Liu 写道:
->>>> blk_rq_stat_sum() folds a src into a dst by combining dst->mean with
->>>> src->batch only, so it is only correct while src has never been folded
->>>> itself: its mean is then either zero or stale. blk-iolatency folds the
->>>> per-cpu stats into a window-local stat first and then folds that result
->>>> into iolat->cur_stat, so the second fold drops the whole window and
->>>> cur_stat.rqs.mean stays at zero. On rotating disks, where the mean
->>>> decides whether the accumulated window meets the latency target,
->>>> iolatency_check_latencies() therefore always considers the accumulated
->>>> window OK and scales up more aggressively than intended.
->>>>
->>>> Fold src->mean * src->nr_samples into the result as well. The per-cpu
->>>> users keep their mean at zero through blk_rq_stat_init(), so their
->>>> behavior is unchanged.
->>>>
->>> I posted a fix for the same issue before, which Tang Yizhou reviewed:
->>>
->>> https://lore.kernel.org/all/20260904065426.1281914-1-cui.tao@linux.dev/
->>>
->>> Adding him here to take a look at your approach as well. Hope the link helps.
->>>
->>> Thanks,
->>> Tao
->> Hi Tao,
->>   My thanks for the review, your v3 is better, I will drop my patch5 in
->> next version.
->>
-> Sorry, that's not what I meant. The issue is real and your patch works; I just felt changing the contract of blk_rq_stat_sum() has a wider impact, so I adapted the fix to the contract in the caller instead. That said, my v3 has been pending for months without review, so it may well have problems I haven't noticed myself, seeing your patch I also realized my Fixes tag is wrong.
-OK, I will hold, waiting for other miantainers to review this patch.
+Validate successful zone append completions before updating
+req->__sector. The returned sector must not precede the request start
+and the entire request must fit within the zone writable capacity.
+Reject invalid completions with BLK_STS_IOERR.
 
-Best Regards,
-Guixin Liu
->
-> Thanks,
-> Tao
->> Best Regards,
->> Guixin Liu
->>>> Fixes: 451bb7c33197 ("blk-iolatency: keep track of previous windows stats")
->>>> Cc: stable@vger.kernel.org
->>>> Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
->>>> ---
->>>>  block/blk-stat.c | 8 ++++++--
->>>>  1 file changed, 6 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/block/blk-stat.c b/block/blk-stat.c
->>>> index d57c2fc6bf06..6345ae366658 100644
->>>> --- a/block/blk-stat.c
->>>> +++ b/block/blk-stat.c
->>>> @@ -24,7 +24,10 @@ void blk_rq_stat_init(struct blk_rq_stat *stat)
->>>>  	stat->batch = 0;
->>>>  }
->>>>  
->>>> -/* src is a per-cpu stat, mean isn't initialized */
->>>> +/*
->>>> + * The mean of @src must have been calculated or set to zero by
->>>> + * blk_rq_stat_init() before calling this.
->>>> + */
->>>>  void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
->>>>  {
->>>>  	if (dst->nr_samples + src->nr_samples <= dst->nr_samples)
->>>> @@ -33,7 +36,8 @@ void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
->>>>  	dst->min = min(dst->min, src->min);
->>>>  	dst->max = max(dst->max, src->max);
->>>>  
->>>> -	dst->mean = div_u64(src->batch + dst->mean * dst->nr_samples,
->>>> +	dst->mean = div_u64(dst->mean * dst->nr_samples +
->>>> +				src->mean * src->nr_samples + src->batch,
->>>>  				dst->nr_samples + src->nr_samples);
->>>>  
->>>>  	dst->nr_samples += src->nr_samples;
+The polling path may batch successful completions, so perform the same
+validation before admitting a request to the batch. Invalid append
+completions then fall back to the normal completion path and are
+completed with an error instead of being reported as successful.
+
+Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
+Assisted-by: Codex:GPT-5
+Signed-off-by: Hyokyung Kim <pulpannie@gmail.com>
+---
+Tested on v7.4-rc3+ using modified QEMU backend that returned incorrect
+zone-append sectors on a memory-backed null_blk zoned device.
+
+ drivers/block/virtio_blk.c | 50 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 41 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 2b462005c..8f88570b4 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -331,15 +331,45 @@ static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
+ 	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
+ }
+ 
+-static inline void virtblk_update_zone_append_sector(struct request *req,
+-						     struct virtblk_req *vbr)
++#ifdef CONFIG_BLK_DEV_ZONED
++static inline blk_status_t
++virtblk_update_zone_append_sector(struct request *req,
++				  struct virtblk_req *vbr,
++				  blk_status_t status)
+ {
+ 	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
++	sector_t req_start, sector, zone_end;
++	unsigned int nr_sectors;
++
++	if (req_op(req) != REQ_OP_ZONE_APPEND || status != BLK_STS_OK)
++		return status;
++
++	req_start = blk_rq_pos(req);
++	sector = virtio64_to_cpu(vblk->vdev, vbr->in_hdr.zone_append.sector);
++	nr_sectors = blk_rq_sectors(req);
++	zone_end = req_start + disk_zone_capacity(vblk->disk, req_start);
++
++	if (zone_end < req_start || sector < req_start || sector >= zone_end ||
++	    nr_sectors > zone_end - sector) {
++		dev_err_ratelimited(&vblk->vdev->dev,
++				    "zone append sector %llu + %u outside valid range [%llu, %llu)\n",
++				    (u64)sector, nr_sectors,
++				    (u64)req_start, (u64)zone_end);
++		return BLK_STS_IOERR;
++	}
+ 
+-	if (req_op(req) == REQ_OP_ZONE_APPEND)
+-		req->__sector = virtio64_to_cpu(vblk->vdev,
+-						vbr->in_hdr.zone_append.sector);
++	req->__sector = sector;
++	return status;
+ }
++#else
++static inline blk_status_t
++virtblk_update_zone_append_sector(struct request *req,
++				  struct virtblk_req *vbr,
++				  blk_status_t status)
++{
++	return status;
++}
++#endif
+ 
+ static inline void virtblk_request_done(struct request *req)
+ {
+@@ -349,7 +379,7 @@ static inline void virtblk_request_done(struct request *req)
+ 	virtblk_unmap_data(req, vbr);
+ 	virtblk_cleanup_cmd(req);
+ 
+-	virtblk_update_zone_append_sector(req, vbr);
++	status = virtblk_update_zone_append_sector(req, vbr, status);
+ 
+ 	blk_mq_end_request(req, status);
+ }
+@@ -1242,7 +1272,6 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
+ 
+ 		virtblk_unmap_data(req, vbr);
+ 		virtblk_cleanup_cmd(req);
+-		virtblk_update_zone_append_sector(req, vbr);
+ 	}
+ 	blk_mq_end_request_batch(iob);
+ }
+@@ -1260,11 +1289,14 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+ 
+ 	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
+ 		struct request *req = blk_mq_rq_from_pdu(vbr);
+-		u8 status = virtblk_vbr_status(vbr);
++		blk_status_t status;
++
++		status = virtblk_result(virtblk_vbr_status(vbr));
++		status = virtblk_update_zone_append_sector(req, vbr, status);
+ 
+ 		found++;
+ 		if (!blk_mq_complete_request_remote(req) &&
+-		    !blk_mq_add_to_batch(req, iob, status != VIRTIO_BLK_S_OK,
++		    !blk_mq_add_to_batch(req, iob, status != BLK_STS_OK,
+ 					 virtblk_complete_batch))
+ 			virtblk_request_done(req);
+ 	}
+-- 
+2.53.0
 
