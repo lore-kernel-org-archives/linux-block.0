@@ -1,64 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795199840;
-	b=GyEztmP1yIrLbXHCxcYaGr9SS43FXAPNiRPmgjS/hq2tbKyzbhprxRImj1N/KfrsizZi
-	 /vrCF47Blqb4DdgxZN2O5+aEvrUpIQ+KlWHN9jluHI0SV1DVn1ZmS5EGwZ0UgO+/nPqc4
-	 X0HebG0N+pRZ4jXVptCVNiBCu5NuY+/uODHH/3etYx4jPffVsrSzW50ipRF+mX8pExIM6
-	 gvgtSdM7izPGOP1I6WvibKrcs4xthWckgQX0qaQgSGIAGaZZ+AIOyOV2B/e6rGPjRcQ6v
-	 JP1fBfXXuaX7t+nTdZwPL+m5OaPfri6h2pSoFH2KjwgSGipQKM/kjmOSyeN8Y2BS64A==
+	t=1795203851;
+	b=sq5G09LVzSiFjKdHvZAgD/LBCzMiOXBjuc0oZiTgOW9WYCysYjWxSphuY2otVYHLTzkq
+	 w2QIJx2C46Ft4KuZTvoW9ZE9oY/MdWFS/B/AnLwgUeiz7uo2h70K0GHBGblLoh45/ujvD
+	 mKXSnoGiivgf5geM+wPEI7OF1qKHl9qmmj049fyPRDvlYt0Qb6/ZrilZwLVKJ2XX+j2G9
+	 TE+PNej67rz0M1QUAlAPL0edFT5sPHCXxjqjvAdeg1Y4lEWq2oeUTIij4+Xiph9xA4HFe
+	 s7lDkYtDyKdLLEK5CJKIozjS54vZfQMdM4jVZ6KivKDPHjuoo2jrk1atcY2Kd87Cb2A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795199840;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=wQl/JtE6qQZueMrPh3nuZAtCFAUhv4LS8vfk9kIDRRQ=;
-	b=stbCiZIk3LcjTTFFdpF/JwhLV8PQR5H+/uosu5AvebN5rTZNY4yv82WlXo2NfctHpWIl
-	 zjGZr8n1hSIa2y1oK5xxsp19x/02qpbPyjl7G/rVCcCfBPhCKiBmjZtHQCjLWHgL94Uxk
-	 d7h0y6DJkwyfbYIDDcRUfqU7NGuCqb9xdlInyb8vRnvWvM6nxYtGtzoMESrvnP6NHG3dj
-	 V5xLlNL/WsOaRPTaVfpQQfHPYfQbc+hS/91PpB3w+XJs4z4QJ4aM6BgE+53IrU5fMjmKM
-	 jpVDFS1L9s/CeIjePQJ/iYU3YBVwQnr4WpJVMQpgoUFdHskSUQJhKUAcnuAP8zUfvSA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795203851;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:Received:Received:Date:From:
+	 To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:X-Scanned-By;
+	bh=wqj7eho1qsScUX7Rstv/jSo5ybS3FSLuhvGplwRCAqU=;
+	b=1P6yXf3LSZQEzHxCuwR/kog1z3Po0pwFAtY7xR9cdSZYJ/ClYO2oFOoojEaf3CPPXaRv
+	 g0V/2EBmAPZFWl5qa1dqO+4LrnFZDlXk3VyQWk5MyXiE78ZXaIZfDQSPDP92GWveHB/wy
+	 zqSKrFzYPd3gEpmnFgblHWxXj9DcC4gfvo/EC077xEhP6QxFz9YJQxcuhE0G03WaIl2Tk
+	 2Ia+6iTJ+pgYZA//McoZ6dejWtY5l8iZ8CqXkwQFFGpj3aBYRYMlzlCRC5t78Y0WLRwHc
+	 cfOSB3YNJpgXt2BcVFvV6wU+2Md8iUpk176jUl/1kb4LzajQuLkh4uG+bWgSqQDYCxw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hpt+mBTx;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=E5nJ6FkK;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EBF60A2601;
-	Fri, 20 Nov 2026 18:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B752606A6C5
+	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 19:44:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4B752606A6C5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hpt+mBTx
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 741391F000CF;
-	Fri, 20 Nov 2026 18:37:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795199840;
-	bh=wQl/JtE6qQZueMrPh3nuZAtCFAUhv4LS8vfk9kIDRRQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hpt+mBTxzbdDIytY5Ra5HXawSDxB+VevHShWI3OUlzMIYTNgGwfy/WYbsq/dkjrkx
-	 CLYw/IRUFX1JDiVLF0jGTwIjFo7+wKplSXfE9YuAxawRzElqER1I6ar2oxti0CgQM8
-	 q1yovDnD2f5IhTj6eCnluGx0X/z9YF6wcFEUGfYJ4Q1nR1XKlZNieHmH6wjhsStrlA
-	 x5ZP//q09dHkLi2GZHKmwUWc9OJOqrPsbNjh4MQGVIgO/MdBknDLKjmCnwDoDopVp6
-	 4/VbLrBfvp7F+CEIEIJIj/caDZDUuj+epQ4bLIcz69Sc8QbwNwpJJG8rQG2AtFtfrm
-	 vjkAoT5uuXQEA==
-Date: Fri, 20 Nov 2026 11:37:17 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Zakaria Belkadi <zakaria.belkadi@inria.fr>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>, florence.schadle@ssi.gouv.fr,
-	frederic.tronel@centralesupelec.fr, louis.rilling@irisa.fr,
-	stable@vger.kernel.org, "Martin K. Petersen" <mkp@kernel.org>
-Subject: Re: [PATCH RESEND] block: pin user PI pages for writing when ref
- tags are remapped
-Message-ID: <awCTXQYhwCdqgnuY@kbusch-mbp>
-References: <awBnB-55HQ54C1x6@infradead.org>
- <20261120162257.498238-1-zakaria.belkadi@inria.fr>
- <awB8OODx0fCFGc5G@kbusch-mbp>
- <awB_xd60To4UawrJ@infradead.org>
- <awCCG3FWbMHHvYd5@kbusch-mbp>
- <CADUfDZqNM2=KzsnpA+R5ygAbS-SiUzQczZvgM_NoYrhR7Qyj9w@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=E5nJ6FkK
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1795203849;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wqj7eho1qsScUX7Rstv/jSo5ybS3FSLuhvGplwRCAqU=;
+	b=E5nJ6FkKdlJvx7kQKcNZEC/PpF+7p7wbV6+VTVYDltEgJrep/koHY+Roy3ex4tOl59xgZI
+	DS6AKcP8cebPxvDXJ9Z7I/s6QLOueCa5upZWwZ8coVXnpPVAeTyeNq5WGO1jOnEOW93L4F
+	tFBHkqP6AeMEFIQKzWhQJxitiviGFZQ=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-593-N45WE1kOOaaqJwZtFKTBdA-1; Fri,
+ 20 Nov 2026 19:44:03 +0000
+X-MC-Unique: N45WE1kOOaaqJwZtFKTBdA-1
+X-Mimecast-MFC-AGG-ID: N45WE1kOOaaqJwZtFKTBdA_1795203842
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C88E71801337;
+	Fri, 20 Nov 2026 19:44:01 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7A8661956041;
+	Fri, 20 Nov 2026 19:44:01 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6AKJi0pB1530875
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 20 Nov 2026 14:44:00 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6AKJhxUp1530867;
+	Fri, 20 Nov 2026 14:43:59 -0500
+Date: Fri, 20 Nov 2026 14:43:59 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        "Martin K . Petersen" <mkp@kernel.org>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: stack max_user_discard_sectors
+Message-ID: <awCi_9_Xykc_Mmk-@redhat.com>
+References: <20261109193927.595104-1-bmarzins@redhat.com>
+ <20261120154040.GB28611@lst.de>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -68,54 +86,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZqNM2=KzsnpA+R5ygAbS-SiUzQczZvgM_NoYrhR7Qyj9w@mail.gmail.com>
+In-Reply-To: <20261120154040.GB28611@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Nov 20, 2026 at 09:44:13AM -0800, Caleb Sander Mateos wrote:
-> On Fri, Nov 20, 2026 at 9:23 AM Keith Busch <kbusch@kernel.org> wrote:
-> >
-> > On Fri, Nov 20, 2026 at 09:13:41AM -0800, Christoph Hellwig wrote:
-> > > On Fri, Nov 20, 2026 at 09:58:32AM -0700, Keith Busch wrote:
-> > > > > Agreed. I'll keep the PI iterator as ITER_SOURCE. In v2,
-> > > > > bio_integrity_map_user() will bounce the user PI buffer for REQ_OP_WRITE
-> > > > > when the integrity profile has BLK_INTEGRITY_REF_TAG. That way the
-> > > > > block layer can remap the tags in its own copy.
-> > > >
-> > > > Can avoid bouncing? I think the remapping flags can be tied to the
-> > > > user's reftag check request.
-> > > >
-> > > > If BIP_CHECK_REFTAG is set from the user setting IO_INTEGRITY_CHK_REFTAG
-> > > > on a write, we can map the PI buffer for writing. The user explicitly
-> > > > asked to have the ref tags checked by the device, and partitions require
-> > > > remapping them, so they've told the kernel to write to their buffer.
-> > >
-> > > No, the user did not ask for violating the mapping direction.  The
-> > > whole remapping thing very much is an internal implementation detail
-> >
-> > Okay, fine. But can we skip bouncing and remapping if the flag isn't
-> > set?
+On Fri, Nov 20, 2026 at 04:40:40PM +0100, Christoph Hellwig wrote:
+> On Mon, Nov 09, 2026 at 02:39:27PM -0500, Benjamin Marzinski wrote:
+> >  		t->max_discard_sectors = min_not_zero(t->max_discard_sectors,
+> >  						      b->max_discard_sectors);
+> > +		t->max_user_discard_sectors = min_not_zero(t->max_user_discard_sectors,
+> > +							   b->max_user_discard_sectors);
 > 
-> Currently, the remapping happens regardless of BIP_CHECK_REFTAG. It
-> depends only on whether the block device reports ref tag support via
-> BLK_INTEGRITY_REF_TAG (i.e. Type 1 or Type 2 PI). I think it would be
-> a UAPI behavior change to make the ref tag remapping conditional on
-> BIP_CHECK_REFTAG.
+> I don't think we should take the underlying max_user_discard_sectors
+> into account here, just max_discard_sectors.
 
-Right, today remapping is checked when BLK_INTEGRITY_REF_TAG is set in
-the profile flags. My proposal is to change that check to
-BIP_CHECK_REFTAG in the bio integrity flags. That is indeed a user
-visible change in behavior, so that really hurts the suggestion.
- 
-> I don't see a way to tell ahead of time whether remapping will be
-> required without walking the metadata buffer an additional time in
-> bio_integrity_map_iter() to check the current ref tags. 
+Is that to handle devices that call blk_queue_disable_discard()? I
+didn't think about that. Makes sense.
 
-The flag is set in the bip_flags, and you can't merge bio's that have
-different bip_flags. So you only need to check the first one rather than
-walk all of them.
+> But otherwise yes, this
+> should be stacked.
+> 
+> Please avoid the overly long lines, though.
 
-But it's a moot point because of the user visible change. I suppose you
-just shouldn't use a PI format if you don't want your metadata to have
-that interpretation overlayed on it.
+Sure.
+
+-Ben
+
