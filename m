@@ -1,46 +1,46 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795144420;
-	b=h/lIKIhRNJBiXr+rPSLlb+5oKvO/RlCVFQ2Ow+omjwJNlIraQ8qvYY5M5NHbONYMhS7y
-	 DJzd+pz3o0fF2n8tIoSnfoeppew0AtaUfeJUDG/oG4QOLST5CcS1+HvbQqK/EYPa23hnF
-	 u3qZLBCsOGzlWT1fbt7IxMiOtB1HwRMyZ1sYEigzJ//8WJCQ5T2OQi3ZvCm/9Qj1+0lvB
-	 YvJWABzEIgohjz5ADtyBI8PqscOdCpO7RU/9ZYEcF6FnjZi3hU93Bk9zCuUAE7qiXGyfK
-	 xZ6X2/3aD6Si2YsoSSoLPNwFev6HMtVfAUnJueY+H2/UKi2YcA23UrLKp9cCebqqxSw==
+	t=1795144426;
+	b=W5l4Px0dYsbjtA52feZrBeO8iYWXNUExrLgUGnKQUdOT1AGKuFh/BxBDee7h0EBej4wr
+	 6J+2lHvZQtcOQfyFcgVrkiMIPaXNX5mhbtVugQEQW0nApjTrtkpY2vGGGOxA/M0yfd2g9
+	 XF+8A86E9GvPjvFGURb9ZzY7qTWQB7o5b6iAXMYZyvRDPQ7omZmeEWcPMCZ6CNdFyuwXH
+	 j24ekTNXIXYXNrHG4TU0mP53cgOCfnzK+s7AVI7n41ypeqctotjL4Cm0ZN0tsT6tuKFRC
+	 8d0iw57GZ5zDjJP4/hxylEesRDh6Fsm1Z8W3j/8VaxdNlJGdH/PungKQmz2kMo02INw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795144420;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795144426;
 	h=DMARC-Filter:Received:Received:Received:Received:From:To:CC:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
 	 X-ClientProxiedBy;
-	bh=MXn/vipY2N1l4qLdGnwApO+16GsInZpYm0yxQZl82ao=;
-	b=aHhBPiLICr3tOnysBDD/pmUdGjf53Fb5PInrZ1hmapvYKbqYO0aDCLyt3mVoUeqsStvK
-	 HrI9VJuOgkcQYqCoFqIWWfP7GIrIJxm8pu88rd5lRotWBlsM62yGChNg6rmZp43JFbn1s
-	 ACGfOQ7gz4fuWH2t2SEFY/KwSgG37HHwKqd93f4jTJ9/Q5XMk4svzUEh0UxEa1JBodw2s
-	 +W71atqvM55i1pCAcpprAMTMQj4U9SOd7PQm7rpiz0k1NfY6LmjBLwT6SwLZyPtvWY0rT
-	 8Yk3/U9JvSw/Sgeh/HfxnBM8NWoFobyOvhnO8zFc6KKSEidKXM50lh8Opd3Xr49weNQ==
+	bh=WAE71jRExM1HToAOokplb7JGRyz27FwuaBPVyfzmFKA=;
+	b=DCy9lP6vwQTVB9xc63jx/QIaWh7RUNGzyFkno7Bed/eDz1mvpJT1nbcIkLy8buXmKJgm
+	 JU2YI9rDH0tIVEdvRzHp6UYrf74C0Npfmbur+OJChZaS3FxNsoAbK7T3eDLLEKZm98dj7
+	 2v4vFH0KFgEmv2hNWaopfBiwt9iDkkNdCOx0m3fwiLmP0YDTxucP1HK74dVJ5m/Su+UGy
+	 +2cDP6E79OXAmtl0qiOvpJcPXm+Z1PPTlK/3cDyINwo/RCPv9eHkRM/SbZ8YgtyhBwG6q
+	 TVQPy1vlyFMnmbqGLUwLgz9p2wtRni2PpaLBd8y6jBBKhHr14vecTOOs7JQS4FaUPZQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=hygon.cn;
 	spf=pass smtp.mailfrom=hygon.cn;
 	arc=none smtp.remote-ip=101.204.27.37
 Received: from spam01.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B262060A2621;
-	Fri, 20 Nov 2026 03:13:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B262060A2621
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE94260A2627;
+	Fri, 20 Nov 2026 03:13:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE94260A2627
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
 Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jW0m13Dy9zVcBC;
-	Fri, 20 Nov 2026 11:13:37 +0800 (CST)
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jW0m73F7wzVcBP;
+	Fri, 20 Nov 2026 11:13:43 +0800 (CST)
 Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jW0m05NyKzVcBC;
-	Fri, 20 Nov 2026 11:13:36 +0800 (CST)
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jW0m56z3bzVcBK;
+	Fri, 20 Nov 2026 11:13:41 +0800 (CST)
 Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp1.hygon.cn (Postfix) with ESMTPS id 73A1FC087;
-	Fri, 20 Nov 2026 11:13:27 +0800 (CST)
+	by maildlp1.hygon.cn (Postfix) with ESMTPS id AA2F7C087;
+	Fri, 20 Nov 2026 11:13:32 +0800 (CST)
 Received: from hsj-2U-Workstation.hygon.cn (172.19.24.226) by
  cncheex04.Hygon.cn (172.23.18.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 20 Nov 2026 11:13:34 +0800
+ 15.2.1544.36; Fri, 20 Nov 2026 11:13:39 +0800
 From: Huang Shijie <huangsj@hygon.cn>
 To: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
 	<hch@infradead.org>, <agruenba@redhat.com>, <mic@digikod.net>,
@@ -53,9 +53,9 @@ CC: <gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
 	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
 	<linux-security-module@vger.kernel.org>, Huang Shijie <huangsj@hygon.cn>
-Subject: [PATCH v3 09/11] fs/quota: convert add_dquot_ref() to super_iter_inodes()
-Date: Fri, 20 Nov 2026 11:13:03 +0800
-Message-ID: <20261120031305.3561045-10-huangsj@hygon.cn>
+Subject: [PATCH v3 11/11] gfs2: convert gfs2_evict_inodes() to super_iter_inodes()
+Date: Fri, 20 Nov 2026 11:13:05 +0800
+Message-ID: <20261120031305.3561045-12-huangsj@hygon.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261120031305.3561045-1-huangsj@hygon.cn>
 References: <20261120031305.3561045-1-huangsj@hygon.cn>
@@ -73,104 +73,68 @@ Content-Type: text/plain
 X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
  (172.23.18.114)
 
-Convert add_dquot_ref() to super_iter_inodes()
+Convert gfs2_evict_inodes to super_iter_inodes().
 
-No functional change.
+The original code also handed out an inode which was already being
+torn down when need_resched() was set. That is not preserved: taking a
+reference on an I_FREEING inode whose count has already reached zero
+lets a second iput() run on it once the reference is dropped again.
 
 Signed-off-by: Huang Shijie <huangsj@hygon.cn>
 ---
- fs/quota/dquot.c | 71 +++++++++++++++++++-----------------------------
- 1 file changed, 28 insertions(+), 43 deletions(-)
+ fs/gfs2/ops_fstype.c | 29 +++++++----------------------
+ 1 file changed, 7 insertions(+), 22 deletions(-)
 
-diff --git a/fs/quota/dquot.c b/fs/quota/dquot.c
-index 9aaf2cfa9e1b..6453949c8af6 100644
---- a/fs/quota/dquot.c
-+++ b/fs/quota/dquot.c
-@@ -1066,56 +1066,41 @@ static int dqinit_needed(struct inode *inode, int type)
+diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
+index 6ec47376aecf..a6f8e95a4187 100644
+--- a/fs/gfs2/ops_fstype.c
++++ b/fs/gfs2/ops_fstype.c
+@@ -1717,6 +1717,12 @@ static int gfs2_meta_init_fs_context(struct fs_context *fc)
  	return 0;
  }
  
--/* This routine is guarded by s_umount semaphore */
--static int add_dquot_ref(struct super_block *sb, int type)
-+static bool add_dquot_ref_eligible(struct inode *inode, void *priv)
++/* Nothing to do because we just want to bounce the inode through iput() */
++static int gfs2_evict_inode_fn(struct inode *inode, void *priv)
++{
++	return INO_ITER_RET_NEXT;
++}
++
+ /**
+  * gfs2_evict_inodes - evict inodes cooperatively
+  * @sb: the superblock
+@@ -1739,31 +1745,10 @@ static int gfs2_meta_init_fs_context(struct fs_context *fc)
+  */
+ static void gfs2_evict_inodes(struct super_block *sb)
  {
--	struct inode *inode, *old_inode = NULL;
--#ifdef CONFIG_QUOTA_DEBUG
--	int reserved = 0;
--#endif
--	int err = 0;
-+	struct dquot_ref_data *ref = priv;
+-	struct inode *inode, *toput_inode = NULL;
+ 	struct gfs2_sbd *sdp = sb->s_fs_info;
  
+ 	set_bit(SDF_EVICTING, &sdp->sd_flags);
+-
 -	spin_lock(&sb->s_inode_list_lock);
 -	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
 -		spin_lock(&inode->i_lock);
--		if ((inode_state_read(inode) & (I_FREEING | I_WILL_FREE | I_NEW)) ||
--		    !atomic_read(&inode->i_writecount) ||
--		    !dqinit_needed(inode, type)) {
+-		if ((inode_state_read(inode) & (I_FREEING | I_WILL_FREE | I_NEW)) &&
+-		    !need_resched()) {
 -			spin_unlock(&inode->i_lock);
 -			continue;
 -		}
 -		__iget(inode);
 -		spin_unlock(&inode->i_lock);
 -		spin_unlock(&sb->s_inode_list_lock);
-+	return atomic_read(&inode->i_writecount) &&
-+	       dqinit_needed(inode, ref->type);
-+}
-+
-+static int add_dquot_ref_fn(struct inode *inode, void *priv)
-+{
-+	struct dquot_ref_data *ref = priv;
-+	int ret;
- 
- #ifdef CONFIG_QUOTA_DEBUG
--		if (unlikely(inode_get_rsv_space(inode) > 0))
--			reserved = 1;
-+	if (unlikely(inode_get_rsv_space(inode) > 0))
-+		ref->reserved++;
- #endif
--		iput(old_inode);
--		err = __dquot_initialize(inode, type);
--		if (err) {
--			iput(inode);
--			goto out;
--		}
-+	ret = __dquot_initialize(inode, ref->type);
-+	if (ret)
-+		return ret;
-+	return INO_ITER_RET_NEXT;
-+}
- 
--		/*
--		 * We hold a reference to 'inode' so it couldn't have been
--		 * removed from s_inodes list while we dropped the
--		 * s_inode_list_lock. We cannot iput the inode now as we can be
--		 * holding the last reference and we cannot iput it under
--		 * s_inode_list_lock. So we keep the reference and iput it
--		 * later.
--		 */
--		old_inode = inode;
+-
+-		iput(toput_inode);
+-		toput_inode = inode;
+-
 -		cond_resched();
 -		spin_lock(&sb->s_inode_list_lock);
 -	}
 -	spin_unlock(&sb->s_inode_list_lock);
--	iput(old_inode);
--out:
-+/* This routine is guarded by s_umount semaphore */
-+static int add_dquot_ref(struct super_block *sb, int type)
-+{
-+	struct dquot_ref_data ref = {
-+		.type = type,
-+	};
-+	int err;
-+
-+	err = super_iter_inodes(sb, add_dquot_ref_fn,
-+				add_dquot_ref_eligible, &ref, 0);
- #ifdef CONFIG_QUOTA_DEBUG
--	if (reserved) {
-+	if (ref.reserved) {
- 		quota_error(sb, "Writes happened before quota was turned on "
- 			"thus quota information is probably inconsistent. "
- 			"Please run quotacheck(8)");
+-	iput(toput_inode);
++	super_iter_inodes(sb, gfs2_evict_inode_fn, NULL, NULL, 0);
+ }
+ 
+ static void gfs2_kill_sb(struct super_block *sb)
 -- 
 2.53.0
 
