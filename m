@@ -1,70 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.134.164.104
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795204631;
-	b=dC7AKSilkNyWzWPq93MjVorp69t8kK5cnRcSaFjcSELib0Ww2zQ5Cd8O5QRfLDbo+JuZ
-	 Agrl2xjWQIAYyqbQPBqplN8Bbf3lcOPQlHJvUs8a6bPwiFwXVYn46LSekqaaRvq0SDSVJ
-	 x41bKEBASY6JnaUQPWjgibKDiFlFcZxgsVYVf9nYITzVfM+S+1fR6A4mDuSLOZEHNsT8+
-	 leCeEIBNlED28jOusRUPUCmOz/0kofTNUe2Bno9CgNDGyFbeDoCgdzjLh8x6nAuV3Yh7x
-	 oclm1xa8joDpcg9PE7kuz3MJKgkXtfMqFQt9LErWwDXwwwI03llZpYKrbrI65NkZlDQ==
+	t=1795208814;
+	b=dfnst/b1w58VzW+TmwXIlYSgUOKgnIt/UHsK6Cpd9xWUJwwByKgfh9lY2M+a+G1BMloG
+	 iJv1hdIYwS0Yd7K2otI0tXOcV0uoK1hMc69L0bwuXufmb5ubZdc4vfF9XzTDTL1V0PN6K
+	 lT/Ek9gE3RdtZ9O14q24kwTFkgtlBlWSLqO1LEKJVapoAHrkFE8cCqkGkjzmJpwYLZyKi
+	 a92cs7UfFTM+9RtXfWVo1WlibFPYCEo7uHR92IjLyEUJFcTew5xdHkVcRKWGeecYGM8fa
+	 HSATgF4kJhgslZZPdU2hBMtdQ5CB8Lri165LG0s0zr0eEktpteWB3ucTmJGbxDuCbBg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795204631;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795208814;
+	h=Received:DKIM-Signature:From:To:Subject:Date:Message-ID:X-Mailer:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=kts9umuHZcQ0nV78PhfIV7Gm0gO8Avsdz1JCYlFElQc=;
-	b=UciwwlIdZ3owVNAHep9rnF8vZeuKmG48TWYevfYeCnuJqT3dHLmNhXyp3IYrjloN408H
-	 /hpx7w7ZpcA3Tl3OnwQbMonUGW748aOvfivEqO93TSddkWUwx+VzQ2afMaJtylWs79ffM
-	 VAaTdiUe2hXaaq28o9j/ius0c8DUAN7zbDchGxPnfsdZMgGnxRc2OhmOGHj6+pURSBIRJ
-	 wdCgS3PnITNNceKxPBRKtJrNEm65vkcE6l+7hqK5JJulVdVxS2JKJLek92+obGc7CjUuw
-	 Y+TxdbtqzAv/mAcQ/AywxuVxRdIq2dPAKl7ViIqZWbxzcIv3Qp+VOeeeoxzyISIu4Fg==
+	bh=Mo5GwVgfK18iqXRVbQY7NIWQqh5s4EqnC9PxdI0u1Oo=;
+	b=fhf6S1o2f5w9F6JIvSmLr8HqBjS+f41Z5snQNYtsXWr20nYaivC5pOChk6iYtTumk4aI
+	 XSi+61JwZKa8Tbqsp6C8GmBltm2G94tSPRttXMyORGZaezoDpFSmj4JtjIUDOCACHzYve
+	 k82F7zcJuIR0ezURkkXE40TqbI+60ZSBxqvfKpEhh42grteHaHT0M7wbvothxeCug9tVm
+	 at1SMYj7SE17BLIWCqqTIJWxQKyiUpVZCeZZVvIc+YGyP1lCjH15Qw9vv0kOdfr1Dc3O9
+	 hufVLGR1terA4zJnOwfrxdTL0H0/tJCCod3VpT8fH98y20Y4Jy9aFJcWKg0aeIYu9lQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=inria.fr;
-	spf=pass smtp.mailfrom=inria.fr;
-	dkim=pass header.d=inria.fr header.i=@inria.fr header.a=rsa-sha256 header.s=dc header.b=FMA0IFMO;
-	arc=none smtp.remote-ip=192.134.164.104
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="TXMlb/pN";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E3A606A6CB;
-	Fri, 20 Nov 2026 19:57:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A1E3A606A6CB
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD7D606A69F;
+	Fri, 20 Nov 2026 21:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=inria.fr header.i=@inria.fr header.a=rsa-sha256 header.s=dc header.b=FMA0IFMO
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=kts9umuHZcQ0nV78PhfIV7Gm0gO8Avsdz1JCYlFElQc=;
-  b=FMA0IFMOazt28GH5anBaOmqLd5qcwmjAXAgk/ZpebDMblOzLbwVh+36U
-   U+c1uRzx6TBxev85ZO5qjLi6aPBFch9qwWdOqR+638bsHX/d5yixPeick
-   ApZyUBwRAntOQQ4E29kAvyemFtmWRzELUEjDItNXErqrlQUR/y+rgXKHb
-   o=;
-X-CSE-ConnectionGUID: 1l0saygmS3S2onbeuMaNnQ==
-X-CSE-MsgGUID: lmGETQJgTsedddpLkUgNJA==
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=zakaria.belkadi@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.27,223,1787004000"; 
-   d="scan'208";a="163459881"
-Received: from rezo-rennes-os2.pck.nerim.net (HELO localhost.localdomain) ([62.212.118.53])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2026 20:56:55 +0100
-From: Zakaria Belkadi <zakaria.belkadi@inria.fr>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Keith Busch <kbusch@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TXMlb/pN
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BF01F000C4;
+	Fri, 20 Nov 2026 21:06:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795208813;
+	bh=Mo5GwVgfK18iqXRVbQY7NIWQqh5s4EqnC9PxdI0u1Oo=;
+	h=From:To:Subject:Date;
+	b=TXMlb/pN8JLS3NkpqVC2rnIogXVpxStteAAV7nN1D3j/AqS43O2HBTyqTYqCGJuOs
+	 lk9itZ/3IR6X7wWYZBZVjs3Im0slgT55S16xHWsNa339VFtwStv22LfAskYuyTc18o
+	 ASUaJyJfuKGarbu69IxICqIJmq3WWc2HV/Z0AWBLq4zd/5L8EzoPnCOXta04b0eHJ0
+	 sgdlIeI75ME0NBOQ3B2ZHn31a8KpT78B2oyK7ng2L55JcB+OUrgEzmjvhuEdGOxZO/
+	 UALY22Vhs0gnxz0MdcHIitQ4ImOrzXIqZ5zrsP9CH8ihEcYw3hK+cnBLmCOjXdLIlt
+	 hOH+AR+Dl7q3w==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	florence.schadle@ssi.gouv.fr,
-	frederic.tronel@centralesupelec.fr,
-	louis.rilling@irisa.fr
-Subject: [PATCH v2] block: bounce user PI when writes may remap reference tags
-Date: Fri, 20 Nov 2026 20:56:44 +0100
-Message-Id: <20261120195644.19511-1-zakaria.belkadi@inria.fr>
-X-Mailer: git-send-email 2.39.5
+	Christoph Hellwig <hch@lst.de>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH v13 00/13] Add support for storage element depopulation
+Date: Sat, 21 Nov 2026 06:06:38 +0900
+Message-ID: <20261120210651.580511-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -76,85 +60,127 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On an io_uring O_DIRECT write, bio_integrity_map_user() can attach the
-caller's protection information (PI) buffer directly to the bio. The
-block layer pins the pages for reading, but reference-tag remapping can
-write to those same pages.
+Jens,
 
-A caller with write access to a block device whose integrity profile
-enables reference-tag remapping can therefore modify a page it can
-only map for reading. In testing, remapping changed a tag in the page
-cache of a read-only file. With a PI buffer backed by the shared zero
-page, the kernel faulted during remapping.
+These patches define a new set of block device operations for generically
+using from the block layer the storage element depopulation feature of
+zoned block devices. Support for this feature is added to the SCSI disk
+driver and an emulation of this feature added to the zloop driver.
 
-Use the existing bounce-buffer path for REQ_OP_WRITE when the queue's
-integrity profile has BLK_INTEGRITY_REF_TAG set. This copies the PI
-buffer into kernel memory before remapping, so the caller's buffer
-retains its original reference tags.
+The management operations can be accessed using block layer API, which is
+intended for file systems (e.g. zonefs and XFS), as well as using ioctls
+for users using zoned disks directly from user space.
 
-I found this issue during a source review assisted by an LLM.
+Changes from v12:
+ - Modified patch 8 to ensure that zloop device removal waits for the
+   completion of storage element removal and restoration operations.
+ - Added review tags.
 
-Fixes: 3d8b5a22d404 ("block: add support to pass user meta buffer")
-Cc: stable@vger.kernel.org
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Zakaria Belkadi <zakaria.belkadi@inria.fr>
----
-v2:
-- Bounce the user PI buffer instead of pinning it for writing (Christoph).
-- Dropped Caleb's Reviewed-by, since the patch changed.
-- Corrected what the caller controls (Caleb): it chooses the address of
-  the PI buffer, the seed and the device offset, so both where the tag
-  is stored and its value.
+Changes from v11:
+ - Addressed two silly mistakes pointed out by Sashiko in patch 8 (missing
+   EIO error return) and patch 12 (dead code left over from previous
+   version).
 
-v1: https://lore.kernel.org/linux-block/20261118154053.13218-1-zakaria.belkadi@inria.fr/
+Changes from v10:
+ - Addressed sashiko comment on patch 8 and 12.
+ - Added review tags
 
-Open question on stacked devices: the test uses the profile of the
-top-level queue. By my reading of the source, a device-mapper target
-with members of different profiles can get a top-level profile without
-BLK_INTEGRITY_REF_TAG while a member has it, because
-dm_set_device_limits() ignores a stacking mismatch. This condition
-would then not force a bounce. I have not tested whether such a
-configuration can accept user PI and reach reference-tag remapping on
-the underlying device.
+Changes from v9:
+ - Addressed Sashiko comments on patch 6. This change redesigns the
+   ordered zone append handling to simplify the code and avoid locking
+   difficulties.
+ - Addressed Sashiko comments on patch 8.
 
-Would you prefer bouncing all user PI buffers on writes to cover this
-case?
+Changes from v8:
+ - Addressed Sashiko comment on patch 7 by adding patch 6. Patch 7 is
+   unmodified.
+ - Addressed Sashiko comments on patch 8 and patch 12
+ - Added review tags to unmodified pacthes
 
-Tested on v7.4-rc3 in a QEMU guest, emulated NVMe namespace with
-T10-DIF type 1, as an unprivileged user who owns only the device node:
-- PI buffer = read-only mapping of a root-owned file: without the patch
-  the reference tag in the file changes; with it the write succeeds and
-  the file is unchanged.
-- PI buffer = shared zero page: without the patch the kernel oopses in
-  blk_integrity_remap(); with it the write succeeds with no fault.
-- Writable PI buffers still work, and the kernel no longer modifies
-  them.
-- Stored tags (as root): a write with a seed different from the block
-  number succeeds with reference-tag checking enabled. A subsequent
-  read using the block number as the seed returns the expected remapped
-  tags, with identical results before and after the patch.
+Changes from v7:
+A significant amount of changes in this version to address most of the
+Sashiko review comments and to simplify the code. In more details, the
+changes are:
+ - Added patches 3, 6, and 9.
+ - Dropped former patch 5 as the use of irq-disabling spinlocks in zloop
+   is not necessary.
+ - Reworked patch 4 by migrating the idepop operation wait loops to the
+   device drivers. This simplifies the implementation in zloop without
+   making the sd driver implementation more difficult. Also fixed problems
+   with errors during restoration and zone write plugs state.
+ - Reworked patch 7 and 11 to be consistent with the changes in patch 4.
 
- block/bio-integrity.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Changes from v6:
+ - Addressed the nit pointed out by Christoph in patch 4
+ - Added review tags
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index d3df726e0..aaea5802e 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -394,6 +394,11 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- 	copy = iov_iter_alignment(iter) &
- 			blk_lim_dma_alignment_and_pad(&q->limits);
- 
-+	/* Reference-tag remapping must operate on a private copy of user PI. */
-+	if (bio_op(bio) == REQ_OP_WRITE &&
-+	    (q->limits.integrity.flags & BLK_INTEGRITY_REF_TAG))
-+		copy = true;
-+
- 	if (blk_queue_pci_p2pdma(q))
- 		extraction_flags |= ITER_ALLOW_P2PDMA;
- 
+Changes from v5:
+ - Rebased on latest block/for-next
+ - Addressed Christoph's comments on patch 3
+ - Added patch 5 to address a potential deadlock in zloop (signaled by
+   sashiko)
+ - Reworked the restoration of storage elements in patch 6 to avoid an
+   inconsistent state of storage elements in case of error. Also added
+   protection against disk removal during storage element removal and
+   restoration execution.
+ - Added review tags
 
-base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+Changes from v4:
+ - Rebased on latest block/for-next
+ - Added review tags to patch 1 and 2
+ - Reworked patch 3, 4 and 5 to address Christoph's and sashiko comments
+
+Changes from v3:
+ - Reworked patch 1 to only provide the disk_zone_is_offline() helper
+   function. Failing of read operations to offline zones is handled
+   directly by the zloop driver and the new patch 7 is added to handle
+   failing early read operations to offline zones of ZBC SCSI disks.
+ - Added patch 2
+ - Addressed further valid comments from Sashiko
+   The biggest changes are in patch 2 to save the number of storage
+   elements of a disk in struct gendisk and to serialize the execution of
+   the storage element management operations using the zone revalidation
+   mutex.
+ - Rebased on latest block/for-next
+
+Changes from v2:
+ - Addressed further valid comments from Sashiko
+ - Rebased on latest block/for-next
+
+Changes from v1:
+ - Addressed the many valid comments that Sashiko had
+ - Rebased on latest block/for-next
+
+Damien Le Moal (13):
+  block: introduce disk_zone_is_offline()
+  block: refactor blk_revalidate_disk_zones()
+  block: allow dropping all zone write plugs on revalidation
+  block: introduce storage element management
+  block: add storage element management ioctls
+  zloop: fix ordered zone append handling
+  zloop: fix zone reporting consistency
+  zloop: add storage element emulation
+  zloop: add degrade_element control command
+  scsi: scsi_proto: refine the definition of storage element health
+  scsi: sd_zbc: always revalidate zones for disks supporting head depopulation
+  scsi: sd_zbc: define storage element management operations
+  scsi: sd: fail read commands to offline zones early
+
+ .../admin-guide/blockdev/zoned_loop.rst       |  36 +-
+ block/blk-zoned.c                             | 450 ++++++++-
+ block/blk.h                                   |  14 +
+ block/genhd.c                                 |   4 +
+ block/ioctl.c                                 |   4 +
+ drivers/block/zloop.c                         | 946 ++++++++++++++++--
+ drivers/scsi/sd.c                             |  23 +-
+ drivers/scsi/sd.h                             |   5 +
+ drivers/scsi/sd_zbc.c                         | 524 +++++++++-
+ include/linux/blkdev.h                        |  64 ++
+ include/scsi/scsi_proto.h                     |   6 +-
+ include/uapi/linux/blkzoned.h                 | 106 ++
+ include/uapi/linux/fs.h                       |   1 +
+ 13 files changed, 2054 insertions(+), 129 deletions(-)
+
 -- 
-2.39.5
+2.56.1
 
