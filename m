@@ -1,67 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.135
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=128.116.240.228
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795170666;
-	b=0LzJqZz0VaS+agcwHwgJAJ0cf1fiUbeMBkRnuULLjWynPBaOhR+xr306JijU+MKTMGL4
-	 d3prqHouBYrxQZvubQubl2HFJYeaFm73AO0lTeddhaR+RHBEvx2NTG3ux75OzPpieqX7Y
-	 Gv42q+pSj5xPa/v+SUVkG+3eigUXK19ygnhk9n5hi6e+Rf25QrxMDId+Vlp/BV3cOKDi2
-	 oOSwshEWD4RdHu8bSyfz4+LqQdRUvLnvKGDJfQS2jmpSlRx7qBc5JiR5vtR5PM3Ue7uRV
-	 M5XbLr9kcAvFe8h27ucYvKKAxHxWQu7FH85sEnvqlSMHcV40WUeLSwfiVpBd898BrHg==
+	t=1795171149;
+	b=n792u5AGAxePMwECyN+KfBZud7R+Jb53Czk3La9c9PGXt5dCaXA5KoiGNFQXl+6n7nhi
+	 y+PI5IxBZacPfrmJL0EKNBtBVKVUsg8x/U9WWQRPVIQspoxuAkKqwdmh5RV+h/yES09qO
+	 W9FjkFq7gnrjkFnDTnIAlmLNqEg/DLnpRpby6qM+7YyORWhJxu2y4Mkvf1O0TWqHxxEDy
+	 D3K3/9/fv95dnKmvFVBHQzr5CAQGRXaHKNjgbEsri8wqHmcBxueTFlfjBfvcn42eST7tS
+	 SSN0JmVcSGDnH4t/bXjFxAf6W2rjLxG1ZZzRJ0wW6xczLBPYZsY3WLS/xMPTnKKH5Wg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795170666;
-	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
-	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
-	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=4NvHKXhj5jAm3S6feuHHzXaGQeaH4gvsk2BBP8dDlfk=;
-	b=yXDuTKTnMdQ+ZvyoTYT4r76Bt7plTmgENkUz4YWTzasLrwxsb5VEA+VmH2nKNXD2BQdB
-	 edJ9/M+K0PBllTiwkUGT3PX6gBfnG2JIFe0DNHswmJAxtbVc5xKR9j77czWZuVflLt55r
-	 lxjyMWOD9w/BeKQqJtLXkuU6tmlqB8M0qmfhqCEEmkMx5dSPNaXfkcFpXwbjtlgJRA0uU
-	 bxrKYcRoNintB10UlckNodlK9lBMmROQHag4mSRH35pGcBswyqhBsHNYJjfeCvxqzGTNA
-	 z2g03U+2NczsucNC3G7pPREyWbQj9qfKg0iwEkFABJGafftd3UskIZcTCYMjIKnZiNQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795171149;
+	h=DMARC-Filter:DKIM-Signature:Received:Mime-Version:
+	 Content-Transfer-Encoding:Content-Type:Date:Message-Id:Subject:From:
+	 To:Cc:X-Mailer:References:In-Reply-To;
+	bh=zlkamX5Jctv2QPEDuxaMTq34VUUNBdtzDbfXWAEi37o=;
+	b=49RWs5kTp0Ots6Y3cOkRumHAwGzyBu106n8eYvoKDbGO7QoPijBAPEMzcc0edpMQvCN4
+	 gNxYUvSi4vAMiIYV/FiMFaAoLxlGFLOHFRM52MDw5KlFquNQVNWMvBPwk7C0j5ujVqqV3
+	 AbIsVCyPQLmavp6GcVaXmn7anbcSDHsJ5yoPftucBBkgRZlfbjVXZAhmN/wdhMobZ2Jxb
+	 zc5ELzEwmY3Rr3v+Dw8HiIU/Za0zk8Qkodn4FgDdtyPQmUyflIp9qgrPnLuns/pAh2apo
+	 hS2zlTfAdhnU6Na26ITuFxK75YucxJMrK0I7AIvdfgsxYUbgc4fDCaF8hwyr5ejyqVw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cmss.chinamobile.com;
-	spf=pass smtp.mailfrom=cmss.chinamobile.com;
-	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=pTABLHA3;
-	arc=none smtp.remote-ip=111.22.67.135
-Received: from cmccmta2.chinamobile.com (cmccmta2.chinamobile.com [111.22.67.135])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87FB606A325;
-	Fri, 20 Nov 2026 10:31:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C87FB606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
+	dmarc=pass header.from=arkamax.eu;
+	spf=pass smtp.mailfrom=arkamax.eu;
+	dkim=pass header.d=arkamax.eu header.i=@arkamax.eu header.a=rsa-sha256 header.s=mail1 header.b=DL4KBPCU;
+	arc=none smtp.remote-ip=128.116.240.228
+Received: from arkamax.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DB9606A320;
+	Fri, 20 Nov 2026 10:39:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A7DB9606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arkamax.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arkamax.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=pTABLHA3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=cmss.chinamobile.com; s=default; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=pTABLHA3DMizer+6TGFcFFOQEYD5yCYbfcxUXLtwzuCNVcdNUFTEYQGts+wpGdzTho5wslE0KZbYB
-	 rQNaRoULrAB+fBC0cm6hRfRy2up3jS2B+cmuLGAwIovc4axtbwgx2G1dlEl3Uk+7j12xPWCcT2BGY5
-	 CdSW2LbAGvqa8wm0=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
-	by rmmx-syy-dmz-app03-12003 (RichMail) with SMTP id 2ee36b002162a49-f4a51;
-	Fri, 20 Nov 2026 18:31:00 +0800 (CST)
-X-RM-TRANSID:2ee36b002162a49-f4a51
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from localhost.localdomain (unknown[10.55.1.72])
-	by rmsmtp-syy-appsvr06-12006 (RichMail) with SMTP id 2ee66b00216348e-223d5;
-	Fri, 20 Nov 2026 18:31:00 +0800 (CST)
-X-RM-TRANSID:2ee66b00216348e-223d5
-From: tongzhiwei <tongzhiwei@cmss.chinamobile.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: tongzhiwei@cmss.chinamobile.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+1288484b13bf6af3620d@syzkaller.appspotmail.com
-Subject: [PATCH] block: fix divide by zero in queue_limit_discard_alignment()
-Date: Fri, 20 Nov 2026 18:30:13 +0800
-Message-ID: <20261120103040.610-1-tongzhiwei@cmss.chinamobile.com>
-X-Mailer: git-send-email 2.45.0.windows.1
+	dkim=pass (2048-bit key, unprotected) header.d=arkamax.eu header.i=@arkamax.eu header.a=rsa-sha256 header.s=mail1 header.b=DL4KBPCU
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; s=mail1; bh=zlkamX5Jctv2QP
+	EDuxaMTq34VUUNBdtzDbfXWAEi37o=; h=in-reply-to:references:cc:to:from:
+	subject:date; d=arkamax.eu; b=DL4KBPCUkFcb3TR4cUmvv2Iy0VIf5v46WaNTNNPK
+	hDP++nfFvvFweTRJnH7gase5TjG4AqFX4zEfuOuwO6JvrKiTd21NvXcsGiqTxLu2MU+QTW
+	biFWOXNZJGeJc+HRAOxLFt3FSno0jKpRMV4ou/Jr/C1WP2fugZKad4+Hg8Ouh25smtOy0I
+	ZSAguwkKOoHs67naxN1FSfWqwECkQhk/lzdRaYGuTCt14/3jCiVy8ZQIqOuHlsisgvjN6Z
+	1ICHvacvzcbUH1rYOv8D8G2QZii0tVI3BYJvuyzaOAiVgLD0MT6PDF7Pl+lGKE9XskR3Nx
+	NoBrnG8gBUkdPZgsOIXIEg==
+Received: from localhost (128-116-240-228.dyn.eolo.it [128.116.240.228])
+	by arkamax.eu (OpenSMTPD) with ESMTPSA id 8a545b90 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 20 Nov 2026 11:38:59 +0100 (CET)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,59 +52,35 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 20 Nov 2026 11:38:58 +0100
+Message-Id: <DMZZ2434KSYI.25CV1W4LPLQ6@arkamax.eu>
+Subject: Re: [PATCH v2] blk-mq: use a housekeeping CPU for passthrough
+ requests on isolated hctxs
+From: "Maurizio Lombardi" <mlombard@arkamax.eu>
+To: "Daniel Wagner" <dwagner@suse.de>, "Keith Busch" <kbusch@kernel.org>,
+ "Jens Axboe" <axboe@kernel.dk>, "Christoph Hellwig" <hch@lst.de>, "Sagi
+ Grimberg" <sagi@grimberg.me>
+Cc: "Ming Lei" <ming.lei@redhat.com>, "Surabhi Gogte"
+ <sgogte@purestorage.com>, "Hannes Reinecke" <hare@kernel.org>, "Nilay
+ Shroff" <nilay@linux.ibm.com>, "Frederic Weisbecker" <frederic@kernel.org>,
+ "Aaron Tomlin" <atomlin@atomlin.com>, "Maurizio Lombardi"
+ <mlombard@redhat.com>, "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
+ <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>
+X-Mailer: aerc 0.22.0
+References: <20261103-nvme-fabrics-isolcpu-v2-1-95ec70d58254@suse.de>
+ <a979c78b-40f9-4777-b76f-fb257120a93c@flourine.local>
+In-Reply-To: <a979c78b-40f9-4777-b76f-fb257120a93c@flourine.local>
 
+On Thu Nov 12, 2026 at 10:09 AM CET, Daniel Wagner wrote:
+>
+> Keith, Jens: any chance to get this one picked up?
 
-NOTE: this commit is worked completely by LLM
+Hello, gentle ping: any reason why this has not been picked up yet?
 
-Commit e924da7d6622 ("block: Drop granularity check in
-queue_limit_discard_alignment()") removed the check for a sub-sector
-discard granularity on the assumption that lim->discard_granularity
-is always at least SECTOR_SIZE.
-
-That assumption does not hold for every queue: a backing device can
-report a non-zero discard granularity smaller than 512 bytes.  When
-blk_stack_limits() stacks such limits, only the non-zero granularity
-is checked, and queue_limit_discard_alignment() shifts the value down
-to zero and divides by it:
-
-  Oops: divide error: 0000 [#1] SMP KASAN NOPTI
-  RIP: 0010:queue_limit_discard_alignment block/blk-settings.c:645 [inline]
-  RIP: 0010:blk_stack_limits+0x1105/0x2d00 block/blk-settings.c:916
-  dm_calculate_queue_limits+0x70c/0x1510 drivers/md/dm-table.c:1823
-  dm_setup_md_queue+0x199/0x4f0 drivers/md/dm.c:2618
-  table_load+0x4fd/0x8a0 drivers/md/dm-ioctl.c:1661
-
-Restore the check, which was originally added in commit 59771079c18c
-("blk: avoid divide-by-zero with zero discard granularity") and had
-survived the move of the helper into block/blk-settings.c: with a
-sub-sector granularity there is no meaningful discard alignment to
-compute.
-
-Fixes: e924da7d6622 ("block: Drop granularity check in queue_limit_discard_alignment()")
-Reported-by: syzbot+1288484b13bf6af3620d@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1288484b13bf6af3620d
-Signed-off-by: tongzhiwei <tongzhiwei@cmss.chinamobile.com>
----
- block/blk-settings.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -643,6 +643,10 @@
- 	alignment = lim->discard_alignment >> SECTOR_SHIFT;
- 	granularity = lim->discard_granularity >> SECTOR_SHIFT;
- 
-+	/* sub-sector granularity: no meaningful alignment, avoid div by 0 */
-+	if (!granularity)
-+		return 0;
-+
- 	/* Offset of the partition start in 'granularity' sectors */
- 	offset = sector_div(sector, granularity);
-
--- 
-2.43.0
-
+Thanks,
+Maurizio
 
