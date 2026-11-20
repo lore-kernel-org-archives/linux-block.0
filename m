@@ -1,45 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795188077;
-	b=Fvx53GRd64i7pT7J5RylOXKZup57jQl2wh8oM8CSBHIujfzwRexQw7e3CRzBkgIOMBfg
-	 pMCQPlZ6wWabgJnPcJEqP5NgvS0EtKWeBmTQUFZiquxQNksMAv0JRHjy55dgmxgBg+WF4
-	 E09vgmXdpFnL/yPWSE27dxPpJzX1ugitENjquU3vtn29qcDPEInOG9IEQ0ttdSktHFSa6
-	 6gHIaZWPUhQaDufTQTGb6nGygivFoq5D3NhR+2G6/PPX1Wt/OfoskCvL1MCJcyiIOxe64
-	 16W0T/Y4OMlrcscnKIT5Qa1nJqmdbUDhzfrP0BSmd0bPt0nB8XXQym4JicH/0QP0vsA==
+	t=1795188142;
+	b=Lu/3iMhQE8gvzwEgzQACDk3/yKvkvQKOdV4hIFZDz1u8wEIzH9mPkfvzkmaT83zxtIss
+	 R3BJFREp4+OuW6JMWhAHz8KhN9c/yZNWiYoKx9CzVCkWWK4oX+cy2VKuU6rU4Tq+CABB0
+	 9weqOaqN0AWU093O0S0euDLsfFHVD7Mm9y6CG3rQ9zShSDTa01vD7sSq1YcpPMdhPU9ye
+	 m0H41bOPz5iUE03aKjUsBq6Ub9OLP9b6Ajvle/B2c473DLlrVuQfVI3iOOz4Gh9Q/8WYS
+	 Xilaf45oOGFVfBXtBSOCcnQEvPo3nAiS+abYlDy2aRdp4OTRLIYX0wBlCvrpgQuoK/g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795188077;
-	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	b=f2jluw/mRcSnVW7E2kZY/+gSsmvjZSqwf57NxDZm2oTR8P25N6Zzk+8UpXt28fROUrKl
-	 oIHM+U8Wr6nBaThjm+q6KYB6bAYLq3PtNSgty2CHYpCdY55Rz4iWgchfV74os956R1R8Y
-	 TvW4irHoihJ70VVdfopt+ZbljexHo04tOmTVMi0rCUUo6htaR0vq/ktFhyysq9jHPqJYQ
-	 SdpPl7UmMzzMEexXMOoPJgrxZKr2KPNrJXEUyJX00XYiMjjz5tzQ7MxTn3T2PdY1NR5ay
-	 7b0Yzc8nQvRbaZPxC/B693J540nSZ+kLiZSxIQ1YHVSTVWeJ7NjiZ1CTnwrSVhEh5vg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795188142;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-SRS-Rewrite;
+	bh=rsy4DwQA+i0NEZBScsPjOPX4JjtcB79SgylulL4Lhzk=;
+	b=w1ScgXg3n5xbPWncK38s5H5z1suIG5DDQTfwzWvP17afjJ6nnUgmR3cF/WrmXstmlyJz
+	 hBWpD/2mAY8nJBwoyqwTeYzpZdoxGvXdxGVVy86s7obF0srTkbPETa0S1nbZRwCq6pbbz
+	 SAyQ95wX5wbLlm31hzegu1aKwO2X0dIGmSWIL7+utkrRSrP0vSSZKiMXQVHaDTBpTMx3x
+	 /TMUYrbOHa208M90mn/x82FKG8lLJZ3UpIWdUjc/PHSc3grnhL6nwQSEg6xD5piYp8YDv
+	 mWnZXuC6eSGn+6CQN1q5AArZfy/JWpb/9uzuP1bsH9BZV2FlCEk80lzDL5pjCafClig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=lst.de;
-	spf=pass smtp.mailfrom=lst.de;
-	arc=none smtp.remote-ip=213.95.11.211
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=G8PIDRBn;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C2E606A320;
-	Fri, 20 Nov 2026 15:21:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4C2E606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 93EDB6732A; Fri, 20 Nov 2026 16:21:13 +0100 (CET)
-Date: Fri, 20 Nov 2026 16:21:13 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v11 12/13] scsi: sd_zbc: define storage element
- management operations
-Message-ID: <20261120152113.GC26913@lst.de>
-References: <20261116213702.225970-1-dlemoal@kernel.org> <20261116213702.225970-13-dlemoal@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D55606A320;
+	Fri, 20 Nov 2026 15:22:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E2D55606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=G8PIDRBn
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=rsy4DwQA+i0NEZBScsPjOPX4JjtcB79SgylulL4Lhzk=; b=G8PIDRBnx71sTaraFoEjvuYds0
+	CpdlXs8HW69pllSZORFRu3MEkkWlpTH7nONYfWuTJ7oyqBbPd/6Vc1xTO9NyLiN9LyccG15gCPEaa
+	OErzGfB4btucPPrzYjf0z2zGpejwUwCZvHE1d0arOJ60NeOS4dp8kzBMRKQAG46z6q5VImGtKn36+
+	wHJQa7qXA1b9OpOQxBGQeDHBunMBR3xElw4YLiSi0MbalCUsQiqeg2ZjFh7ViNIUPTZ81gAI2P+tw
+	+Rk9zQY9bIgaxZpdD6vuOyLnTVP4L5qkmoANORb2f7aaxF3hT1JVvwHvAKtuPKc5uZTrwm7A650iv
+	DxyQg0Uw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xUQRL-0000000FOdL-0Qa0;
+	Fri, 20 Nov 2026 15:22:15 +0000
+Date: Fri, 20 Nov 2026 07:22:15 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Hungyu Lin <dennylin0707@gmail.com>
+Cc: axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+	mtsai@redhat.com, stable@vger.kernel.org, hch@lst.de
+Subject: Re: [PATCH v4] block: fix discard alignment for non-power-of-two
+ granularities
+Message-ID: <awBlp41S0RxBowC3@infradead.org>
+References: <20261120101758.45513-1-dennylin0707@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -51,10 +67,9 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261116213702.225970-13-dlemoal@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20261120101758.45513-1-dennylin0707@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Looks good:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+FYI, this still looks good, and it would be great to get this into
+7.4-rc ASAP.
 
