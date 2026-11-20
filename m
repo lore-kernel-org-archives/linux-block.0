@@ -1,66 +1,70 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.14
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795209811;
-	b=oRXIG2fzQUBB/UWqVekSKW+262LpyBzrnzx8PcO5igfRFpZ5QVbwbUurodP9/+eOuHEr
-	 z4Jhs/ezpOdaMD6YMGJZEjmGYlwYzqbTmtrxD5r9qnbAI/qrxsXkt3kZYh0Q5XiYS3EbH
-	 oikZpkJ5BEun1pQ8TGesDBS41AKtSiV4Zv/vMZJycHk19AewbIf/bvZqgEp/03yfi9E7b
-	 FtEQMVFoLIAaQdnKnQM4ythThaXK3LFlWup9JuK0Sn3T/+PSVDLs51r+/ro5Zsg/6msEt
-	 RbS4lRzqXJSzn4U9uMKGXefPMpS8INww0+1JZWsZLA83OvcPRs/vHC8pfhTmZLTbQEQ==
+	t=1795210489;
+	b=jZktz5GhH64izdM+eEfTCAOcP3xtrLBMPlD48/vT5eQVmoZ7CYkyuWjZYQE/rihFjDkD
+	 i+f+P2AdcZLfluH5eJQ2B3Pq3BY+rw93k1QwHmimKB6xpizPO6JshuaZITYhZJDZKL7qX
+	 kC9pRbmclCu1xUmgwjfLpSFTSTFb0tIiPpGxR1kjnABfJnqQ+yIzpQg8UjGMcWzAE/+XO
+	 8EDNRQi4KHVLQ728ho3uKyPM2e5UKyU8pNX25QbuVsYbY9SV0mz/ZxR2fmekgxx4C+V1T
+	 rpZTvRdm799Yk33fybWzYy4/LNbI+Q7kUtNjz75hxi5G8vnljkQXCWHSkEgpak0Sn4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795209811;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795210489;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=M8u1XVMFyHF1hXnfW9u2WFmeDsUzEDO20LNBH8tl3wQ=;
-	b=CAwETNMheqYepJRtF7JVh48oIOEijfINhseSwGIKUDPsvGVep901WMk/P6ImCeup7yJa
-	 o3jAV9/6qHEfuLWWlHn1FsAmgM5MeJq4XX5BjFX/8SgQjor/BFOTTT+jHRyP0m5MD74gF
-	 YjIduxR/L/+EZTLsEGnrGLqxTmGMsI6GQ7tJ/IDbhdUVwjVVw1XDF1EAnnSGsa4s9r/Xq
-	 Z/SfEsszRnD+CqhBDfiv2gAVg15fIjcnlVGtMYdB0awVtwyNC8KTMRjpwgl67WBc2W2C8
-	 uRmwk39YVVn6Cu5RuzLH4Qj5XCSgM1/BDlkDB6fVyx1c6N+inNrjDOyd4zhNb5FXkFA==
+	bh=OrTNQo/nFBLP8VTq9caUd+/LnpXs90EP5CZ00jxgXC4=;
+	b=RsL978GniNNwjkUbQPAOUqNaRTyq2f9MAVXIQE+pJxzwBL+0f51EA7QxKeT6dgQvgBoH
+	 vc69blNguX9C9Mmgsrs11xQELqxBlXdT76ZpK9N1lE2NJohBZTDx+8QF35QwkCQ9g+ecg
+	 /scbPgmdylmr4VxcVW/1M+h/2g93y4QFIj63BVdsKaD76H2p04VpbOc64f42Nb/ZENrE+
+	 WfY42lZZaycg9hzbQi/jqh87NHRARIK1TwiXAp6+1vDNHsvVLCmydatBfrD8fDLNPblc4
+	 s3IKIArm41pPN2ESQX9/sSClfaf2uv8oMlkov2TyLPTD+XaQcKD387kYnjUmYUYfpyQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=acm.org;
 	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b="gkd/7U+C";
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=2DLEiLHf;
 	arc=none smtp.remote-ip=199.89.1.14
 Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2495C606A687;
-	Fri, 20 Nov 2026 21:23:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2495C606A687
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F3B606A6BF
+	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 21:34:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D9F3B606A6BF
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=gkd/7U+C
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=2DLEiLHf
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jWSxS2057z1XM0p5;
-	Fri, 20 Nov 2026 21:23:24 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jWTBW2kLlz1XLwXN;
+	Fri, 20 Nov 2026 21:34:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1795209802; x=1797801803; bh=M8u1XVMFyHF1hXnfW9u2WFme
-	DsUzEDO20LNBH8tl3wQ=; b=gkd/7U+CQtmg/607Ca66FlkHf98+RvUnNOcCENfe
-	ue/n+N5A0CPYnAyTL4PEEe8keXdXIU0+QsMCVUvfnl56sjRGIkGxgGtTBEvv3JkK
-	TslQR8zFfg/BRCi7gVZtHAz11453oe8sBo8m9fvdZYMQMUh/p7fbI4qzbDbh8eFD
-	g81ocGCHsrrS9GALRDQ1Mox+G2QvwnyEZtKHxOT3hqgeMOjdC6hreg3mMeTU7FJ1
-	KXs2R7nCRlj15mXH+onfWJAVPZMvkC8LXAloms0FA1wkGb1iA3kyk4vcEACBXuzA
-	FBxGogcI7dDftZ5gxzztUGpLyvMESKXLXvhR7WrHPAGr8g==
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1795210482; x=1797802483; bh=OrTNQo/nFBLP8VTq9caUd+/LnpXs90EP5CZ
+	00jxgXC4=; b=2DLEiLHfMPX5sZoQkqRXPK56TWrZy3neM/i6kSiZieRCVpwaMYY
+	hJoav5RH+bhHbYRUoZnqYCpo6oVASVRjeActZB91ckvnLPnkaZbZNwmeamHKfjyq
+	PiBsuWb+Il2uv3TG8DXNTKEFWWl7trtahPriWs1W0ujiuc0wg8P/MLA5ceKsBkJw
+	0HPzorAb5Bi+pcaH/61SwB7Kdefhpr60I0H/deHVcNpwzj6h9NuQ4FK115OgifIA
+	2MyeA1iCoQWlGIEO+Z+Bf4cgWoeeBzfNQqaUUwwa5kxjyUqArKKkY4vaeKLoqBoe
+	edS7dZu543fFFGET2rstAbF1N8A7rR5OiAQ==
 X-Virus-Scanned: by MailRoute
 Received: from 011.lax.mailroute.net ([127.0.0.1])
  by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id MkiQKUL8H2XL; Fri, 20 Nov 2026 21:23:22 +0000 (UTC)
-Received: from [100.80.227.185] (unknown [104.135.182.41])
+ id sOEwClyUPnKW; Fri, 20 Nov 2026 21:34:42 +0000 (UTC)
+Received: from bvanassche.c.googlers.com.com (57.237.82.34.bc.googleusercontent.com [34.82.237.57])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jWSxQ1YvQz1XM6JB;
-	Fri, 20 Nov 2026 21:23:22 +0000 (UTC)
-Message-ID: <f00cd07f-348d-470f-894a-c70435f45076@acm.org>
-Date: Fri, 20 Nov 2026 13:23:21 -0800
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jWTBT6cZ3z1XM6JB;
+	Fri, 20 Nov 2026 21:34:41 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH blktests v2 0/2] Add an NBD performance test
+Date: Fri, 20 Nov 2026 13:34:32 -0800
+Message-ID: <20261120213434.2945873-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,28 +74,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6] loop: defer the queue limits clear to a workqueue
-To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk, hch@lst.de,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: cuitao@kylinos.cn, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260928093512.3153646-1-cui.tao@linux.dev>
- <df36224b-7fcb-45c4-ab78-d7e726bfeb9d@acm.org>
- <edfc22ef-799d-4f70-8668-bde0caf67bcf@linux.dev>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <edfc22ef-799d-4f70-8668-bde0caf67bcf@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 9/28/26 7:08 PM, Tao Cui wrote:
-> I'll send v7 with the comment fixed and the redundant cancel removed
-> once Tetsuo's series has landed.
+Hi Shin'ichiro,
 
-I can't find v7 in my mailbox. Did I perhaps overlook something? As you
-may have noticed there are no plans to merge Tetsuo's series.
+This patch series adds an NBD performance test. Please consider it for
+inclusion in blktests.
 
 Thanks,
 
 Bart.
+
+Changes compared to v1:
+ - Added queue depth one tests.
+ - Added a bug fix for tests/nbd/rc.
+
+
+Bart Van Assche (2):
+  nbd/rc: Declare the loop variables of the wait helpers local
+  nbd/006: Measure NBD IOPS with a null_blk backing device
+
+ tests/nbd/006     | 202 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nbd/006.out |   2 +
+ tests/nbd/rc      |   4 +
+ 3 files changed, 208 insertions(+)
+ create mode 100755 tests/nbd/006
+ create mode 100644 tests/nbd/006.out
+
