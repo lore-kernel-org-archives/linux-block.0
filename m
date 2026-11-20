@@ -1,96 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.97
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795156472;
-	b=SOXgXSns35HLNIswUT/oToRKRUqy4BgQEJDF63K9VRnAZjF8N562QHhJRDZqPwXlmNvZ
-	 P3I9yXfHgExWduZHc/9ITW+Ex2yqhMQyhDxJrZGHedon2AH29iXWL+BsiVCe4vprgYin/
-	 3XfKHGWGuuVdiIFU4Jkypyt9A3OQnfk4eosqfTUJmzkysJNwiX5i9V3ouXVYZ0d51MERa
-	 x3Qq66FSqWQAGY4FDfMzVzF8TDOWOV0XJjvpK16DfaIduAuKL633V3GOS1EWVuvKiILDJ
-	 8183p8rWetrs45TkMBkoub41KR/F7TVKbIe0Oofy/d8qp+D44pQeywNsI1tPyQeyytQ==
+	t=1795157295;
+	b=OF62m06Fspf9YexZqtcv0iXH0YJ8LMlPMGUDv5gr8ObNpwdyq/GWqc5vuuHgxc2x5iR9
+	 18FVZ6mZTpUADIzGRByv1SsdyDIL9778l2oaq/bd0h+quo6TejsBU6hx7Nc36oOg6SSEb
+	 dRm5MqA0TZhRGA3ThxUM5etetN8Ef6YepLzYwYoqpVJBSvbKCjoChCUHoMmbiUzXS/M2v
+	 ror6UB5JrmNvE0w+UcgH8LhChXbT/6djQGqfpdQZY3zOFr3sUgqd5oXW4u/HvBocSEugH
+	 hOTgTb1Mnnl2T/CbahIa3zp+QOzhLCyhJgMMe/5IYqO5YXN71yleGslTHkk8o3LKgQg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795156472;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795157295;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=l2nH2XTb5frL3IcF+3+XVhqdfkR4kPSpm/fGUJr6SFY=;
-	b=MpNuIcRxCaRC6X5Jj9TlHJyxATYU9R49EtQ3ryw2iv4jsB98IGG+9T55CD7R4k6VibJT
-	 ERDBwmgkIZpQdVtwsIfSuSw3EM9YwWm4h0yO6Rbv8zeUja8eJJ29FHx77x+q6WF0Vz1wb
-	 RvNKxi1Qk5MmswsPBzRS8LPYJo6AkIeQ5ZeJyEwzr0qIPCOrYZ7GTKYgr4Mi2mDB05q8K
-	 1TB0bTvelnETtBkIDhwjvbWl7mqthFzJhOXebTllEPdokH1Mkct5+V2reYFRY1ehHa/+E
-	 GGD10ThBNZNnelIu0OqGc1KUHK+qjK8dU4TR6HHYSTGUOwO7eAoWCqvSrPpSY9dq9Rg==
+	 X-Relaying-Domain:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=m9mm5+7Hc6lezEU2Ja7irFZ2zPpiy3QWaS35ycsd9PY=;
+	b=UkfyeWKbxOt0PuTTLMjwddN/avH+WV53Yt3/QtThZoSxAM//B/cgcYB0kyCj2H5+xrjI
+	 EOayh82j9BFV079n/aVSGxn8WFmNQGIroza+upCVR7ysyWa7AZuH74A6XBVyo3P7p+xaG
+	 nyZzLdm/P1xzmHe4jyRdoCQzskkxJrCsFV50Ey2sVpg+Fs5nXVpw1IwUH3nkY53lfmLPp
+	 D5v1TrF0vHTSvc1os350dWzSZ8a8H8RB+iWbzY6uT1egz6Ax56rTx2dkb75buF6/H/ODi
+	 qqZTNO0H+Jp8Rs270EfKG9E/RuQHafHbb8AiNaFopDU9k5s5gyIfEMbsZxJF8VkOr/Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=C0qrljRq;
-	arc=none smtp.remote-ip=74.125.82.44
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	dmarc=pass header.from=purestorage.com;
+	spf=pass smtp.mailfrom=purestorage.com;
+	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=CwicoD2q;
+	arc=none smtp.remote-ip=209.85.217.97
+Received: from mail-vs1-f97.google.com (mail-vs1-f97.google.com [209.85.217.97])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D503E606A32A
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 06:34:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D503E606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B92D606A320
+	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 06:48:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1B92D606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=C0qrljRq
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-1b3a05f8b5bso778683c88.1
-        for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 22:34:31 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=CwicoD2q
+Received: by mail-vs1-f97.google.com with SMTP id ada2fe7eead31-7d2f53aa93eso11243137.0
+        for <linux-block@vger.kernel.org>; Thu, 19 Nov 2026 22:48:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795156471; x=1795761271; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1795157294; x=1795762094; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=l2nH2XTb5frL3IcF+3+XVhqdfkR4kPSpm/fGUJr6SFY=;
-        b=C0qrljRqr6WB5mcG2FJbWz0ZpX9xYi9k13zz9r6fJw7gy4F+Ayk/9gAIFz9swn8N9A
-         qDjZXXGtcj0FZFKkzL+1NzcNDsO5LoPqkgJ0oW7b1Bhgqc1wZKyOaIiQVvkFz+MCqQNJ
-         vH4a6+2RxDKcRA9eM2kHGdplYeHgqCM4yXDrnSCaCTnV78oGu5Srgcp1amxaui2zAXdl
-         r01hCXvD/Fl0Kja049jzB1A6rIlgG03lKD/dsY31annm+LRUDzeKvTburg+a15/l28+p
-         oQv0XBoiQBQUv9GAeSAzesTFbCvR9lMwEhZI7UgVlpGkTPHz0SaBWUw7NdzHOQKRM1+S
-         UHTA==
+        bh=m9mm5+7Hc6lezEU2Ja7irFZ2zPpiy3QWaS35ycsd9PY=;
+        b=CwicoD2qhPQ3J1ltkzaTDequZJ++sHGYEmjODDt0RX4VFHDmH0ZhYFWaBFngTrcfpU
+         fq87pmGO8XZf1+F1nh2qgRhMM2U3v7hiZY+t+W0PfQCuGxy1KAQj5socvnvmC1NvPcbm
+         xGnKgzirtpOCbgaytXvyhuzuTBcVnJYnoQkMpw6O2m7SLgw8fS2daNg4B0z9wftebOZ1
+         ARgPxV4MDEn2711AsJJYAh/J/Y4k5EWo9xG7ZLES7B1O6CiTn4nC7w8vlwMTiPokgv+X
+         ufWYfzT78PGe0QDTvcO7aONQdCOl0/tGYEE7OIPq9mQzTJT/aTl+qlFJzAla1GwOcxzQ
+         fUrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795156471; x=1795761271;
+        d=1e100.net; s=20260707; t=1795157294; x=1795762094;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=l2nH2XTb5frL3IcF+3+XVhqdfkR4kPSpm/fGUJr6SFY=;
-        b=IlSoHR2ePzKeKmIguTXqRM3l6d2hOvX8cSn11RyIjaBCp/s5V5S4gOX2lhoteMaUAM
-         sT2px8C26tsXIrjWjgTElcEEJaCWlOh+k1TnoGXjJxUYrtLerbxKNkHrCind8PcWVr3G
-         4B9Zi7mQgqA4C67w1mKRYZhY9w5YxWWB9LRxS/1CrHuEsST1pn+8UicFxZeJFj0m0QSE
-         0Xy2xE+OhR+HvFkpYLP1w0Yw7bknolLKhv0mDUjYnt3zezyjvjNc9Lg0UyMlCgqUHcMj
-         iVLCkwmESPs9FjjiziURsgmrbnbGBZ12IvnCsLBUWhVvWOdoZxao+BtPcMQ22GWLAg1t
-         TJHw==
-X-Forwarded-Encrypted: i=1; AL+hErHTA1l3vAptVHoTk6I7/3Ywr9zmlp90WefRCPd0NiQcpMwcvzLjuX3yCPxob5foX+nIrToXIi1HLBNznw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/Nx9TlGiaZKgAropEPSsNj4Z7ryIKwt9/jNIj+uCWGjGftlUHO
-	TvvMsO6hMrwyd07qyhnHZpR6T4lION/jn0YGbmncDkVmVrloktbcpcT3
-X-Gm-Gg: AZFdTZccsKclOkQNPEWFrwLwFQ+WVBv/fJDKAL/wBp7mxhx55ciE3qfBEtw9CDF+AgO
-	+rc0aLU8ylJE6t5tyqBFO5q1M7Zhr/LW60uLNuYQE9bbUj0MPUYQ8v+TefB29QKd5Gk3f/nmaR/
-	uyYNqezD9JfXFLcZ91A7+Z0SRdtJmEe5n3EkYa9HnNfkjxfX19is4a7eJ/2RRSmt299mf+AWGDw
-	7RWIbha1cTxZlPIJbpNtUOjqat/6otWdei0naBzwYZM1VFiUeVginWWx/yKHUjCb2dD1Y//Kw/a
-	gkbVrcK1rfpgpUCS1WsFM7GYpTXxO0LDLhUYqqwKDbTNUSSCcB/26sYsu9WSfwUGq/Tb5xW9w7j
-	74UpjqAMW1TSHyiQk9xalHxwR67n9wC6V6n0b6p5g386TB1SC4Wko+NmTmgFaXoh3m+sCuAQdCH
-	vX+ALw5mA00L32tI8HP+RCnubiGkDij96gIDnEzvFLvbjsXJlKVXpa7O45x3oWr6HlZUWcREz9w
-	DyRKvjk50bXNyhukTEaZlEv+TDc+c8Z2l2lAhPQtpl5VJIT6UlqKbHzZbhnWi8mCiDhdbBeYXWC
-	B0bhuRxXyJBPqG0vycxO9tL51jGrlQhINalqfIZ5798JPFSPQDA=
-X-Received: by 2002:a05:7300:c01b:20b0:385:4b9:18ea with SMTP id 5a478bee46e88-38571027a68mr2036926eec.35.1795156470715;
-        Thu, 19 Nov 2026 22:34:30 -0800 (PST)
-Received: from annie-ProLiant-DL380-Gen11.. ([119.204.109.68])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-38566fdce48sm4821319eec.14.2026.11.19.22.34.28
+        bh=m9mm5+7Hc6lezEU2Ja7irFZ2zPpiy3QWaS35ycsd9PY=;
+        b=S/YPSuysq+qeccwNiIDHCgpEjG9zvj3D9v1pMXpZtMcUTNHj45KFbJ3rzqyGaDV9/X
+         tvsUvw0CebDZ4QKyyaf5XnZfj+fbZ1qCCUOIWIC9YXv/X4U6ghGihKppuXgh6Y7AqX9R
+         aAMg2zs4qlg3nCyy1nkhK+5CTVfqRlxoFH+NuPZReawd4NTwgr2aypSqGxAdYB4359NK
+         IX9nQFHX6t242WRIy4Igd1WHDxC41grlHj8tiNpy/V9pFz7KB7pvbs2UvsxnN/XA/Tte
+         YaQylgJbRU5RgRek8U9zpbJ6Gij/46DQsJJtCa2xnj4FSmnqxyvhgvDIyksxMz8ePNPF
+         fY2Q==
+X-Forwarded-Encrypted: i=1; AL+hErFGd0HYcgPtRe5CgG1tZZwRhU3QCBobHWG3skXObpA4E3d24/Xi0Z5V45sCnAMPTXBmxleYLRmfafZBMA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+ZU5IRX1OZ6encjIrQ84hC3NkNGvOI67Q/6NalQoGYAztfw/N7
+	hWwU7gqxA2PhqAruMQ+55Ptnpwj1I1tqZHQSJKiGe3jPdraecmzHoUWrRE/nhWvY5X6VCCuv8gk
+	LNGELBQWPYnNycosok2dBr+1z62FsHDeHgPmF
+X-Gm-Gg: AZFdTZcDtqIjABQimITydBX/TV+EcRavF+FlJoX1cRxMRzUc8p2xmMrfsUWcA8xpaeD
+	rFGdA06MwdrSaJoNCNrHRlLch9F2hyF5BOazDM36ZZWby3E9NPfVpLrvQfas9kttK/2wPQMKzac
+	NGmdr1x5HcBboonl58Vk8cKCnzjw7wuVUZRIlMA4/XoLahqYlbLq3WaX/y2rOUc6xPHysCV+29P
+	bedd79g8wFWdpOgde/PXwGhQbv6lSnM8a6V/cp6qTNPAR8RvXYEhMZ8jR6r9WbpQuXZ5LED4SRj
+	XZDK9vhEAoy5a/g4V3wE06x26dC0+BAn2dD28wDTpE3TRqQCcnEIUUfAO1gh7t8N/lDZEBy3Eb7
+	POQuaQ8Z9zhrZyBkx6ojTeFVd2xIE+YDz
+X-Received: by 2002:a05:6102:8604:20b0:7d2:7784:23b5 with SMTP id ada2fe7eead31-7d72b3479fbmr956508137.1.1795157293844;
+        Thu, 19 Nov 2026 22:48:13 -0800 (PST)
+Received: from c7-smtp-2026.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id a1e0cc1a2514c-99e6e02e099sm222308241.1.2026.11.19.22.48.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 22:34:30 -0800 (PST)
-From: Annie Kim <pulpannie@gmail.com>
-To: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowangio@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	virtualization@lists.linux.dev,
+        Thu, 19 Nov 2026 22:48:13 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.17.2.4])
+	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id 00E32400D3;
+	Thu, 19 Nov 2026 23:48:13 -0700 (MST)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id EC9D1E40211; Thu, 19 Nov 2026 23:48:12 -0700 (MST)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Caleb Sander Mateos <csander@purestorage.com>,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Hyokyung Kim <pulpannie@gmail.com>
-Subject: [PATCH] virtio_blk: validate zone append sector from device
-Date: Fri, 20 Nov 2026 15:30:39 +0900
-Message-ID: <20261120063039.4155597-1-pulpannie@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block/t10-pi: deduplicate blk_reftag_remap_{prepare,complete}()
+Date: Thu, 19 Nov 2026 23:48:05 -0700
+Message-ID: <20261120064806.752251-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -102,123 +102,144 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Hyokyung Kim <pulpannie@gmail.com>
+blk_set_{t10,ext}_map_ref() and blk_set_{t10,ext}_unmap_ref() are
+identical except that one updates the PI ref tag from virt to ref_tag
+and the other does the opposite. And since blk_reftag_remap_prepare()
+and blk_reftag_remap_complete() just dispatch to the corresponding
+map/unmap functions based on the PI tuple format, they too are identical
+except for the ref tag update direction.
 
-The device reports the starting sector for REQ_OP_ZONE_APPEND completions,
-and virtio_blk copies it into req->__sector without checking that it
-still refers to the requested zone. A buggy or malicious device can
-therefore make upper layers believe the append landed at an arbitrary
-location.
+Combine blk_set_{t10,ext}_{un,}map_ref() into new functions
+blk_set_{t10,ext}_remap_ref() taking arguments "from" and "to". Also
+combine blk_reftag_remap_prepare() and blk_reftag_remap_complete() into
+a new function blk_reftag_remap(). In __blk_reftag_remap(), use the
+value of prep to select which value to pass as "from" and "to" to
+blk_reftag_remap().
 
-Validate successful zone append completions before updating
-req->__sector. The returned sector must not precede the request start
-and the entire request must fit within the zone writable capacity.
-Reject invalid completions with BLK_STS_IOERR.
+blk_set_ext_unmap_ref()'s check to skip setting already correct ref tags
+also had an extra lower_48_bits() that blk_set_ext_map_ref() lacked.
+Either approach is correct since the check is purely an optimization.
+blk_set_ext_unmap_ref()'s tighter condition would skip more redundant
+put_unaligned_be48() calls on a theoretical block device with more than
+2 ** 48 integrity intervals. So keep that tighter check in the combined
+blk_set_ext_remap_ref().
 
-The polling path may batch successful completions, so perform the same
-validation before admitting a request to the batch. Invalid append
-completions then fall back to the normal completion path and are
-completed with an error instead of being reported as successful.
-
-Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
-Assisted-by: Codex:GPT-5
-Signed-off-by: Hyokyung Kim <pulpannie@gmail.com>
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 ---
-Tested on v7.4-rc3+ using modified QEMU backend that returned incorrect
-zone-append sectors on a memory-backed null_blk zoned device.
+ block/t10-pi.c | 66 ++++++++++----------------------------------------
+ 1 file changed, 13 insertions(+), 53 deletions(-)
 
- drivers/block/virtio_blk.c | 50 +++++++++++++++++++++++++++++++-------
- 1 file changed, 41 insertions(+), 9 deletions(-)
+diff --git a/block/t10-pi.c b/block/t10-pi.c
+index a19b4e102a83..5aebe582d09b 100644
+--- a/block/t10-pi.c
++++ b/block/t10-pi.c
+@@ -434,73 +434,36 @@ static void blk_tuple_remap_end(union pi_tuple *tuple, void *ptuple,
+ 	}
+ 
+ 	bvec_iter_advance(bip->bip_vec, iter, len);
+ }
+ 
+-static void blk_set_ext_unmap_ref(struct crc64_pi_tuple *pi, u64 virt,
+-				  u64 ref_tag)
++static void blk_set_ext_remap_ref(struct crc64_pi_tuple *pi, u64 from, u64 to)
+ {
+ 	u64 ref = get_unaligned_be48(&pi->ref_tag);
+ 
+-	if (ref == lower_48_bits(ref_tag) && ref != lower_48_bits(virt))
+-		put_unaligned_be48(virt, pi->ref_tag);
++	if (ref == lower_48_bits(from) && ref != lower_48_bits(to))
++		put_unaligned_be48(to, pi->ref_tag);
+ }
+ 
+-static void blk_set_t10_unmap_ref(struct t10_pi_tuple *pi, u32 virt,
+-				  u32 ref_tag)
++static void blk_set_t10_remap_ref(struct t10_pi_tuple *pi, u32 from, u32 to)
+ {
+ 	u32 ref = get_unaligned_be32(&pi->ref_tag);
+ 
+-	if (ref == ref_tag && ref != virt)
+-		put_unaligned_be32(virt, &pi->ref_tag);
++	if (ref == from && ref != to)
++		put_unaligned_be32(to, &pi->ref_tag);
+ }
+ 
+-static void blk_reftag_remap_complete(struct blk_integrity *bi,
+-				      union pi_tuple *tuple, u64 virt, u64 ref)
++static void blk_reftag_remap(struct blk_integrity *bi, union pi_tuple *tuple,
++			     u64 from, u64 to)
+ {
+ 	switch (bi->csum_type) {
+ 	case BLK_INTEGRITY_CSUM_CRC64:
+-		blk_set_ext_unmap_ref(&tuple->crc64_pi, virt, ref);
++		blk_set_ext_remap_ref(&tuple->crc64_pi, from, to);
+ 		break;
+ 	case BLK_INTEGRITY_CSUM_CRC:
+ 	case BLK_INTEGRITY_CSUM_IP:
+-		blk_set_t10_unmap_ref(&tuple->t10_pi, virt, ref);
+-		break;
+-	default:
+-		WARN_ON_ONCE(1);
+-		break;
+-	}
+-}
+-
+-static void blk_set_ext_map_ref(struct crc64_pi_tuple *pi, u64 virt,
+-				u64 ref_tag)
+-{
+-	u64 ref = get_unaligned_be48(&pi->ref_tag);
+-
+-	if (ref == lower_48_bits(virt) && ref != ref_tag)
+-		put_unaligned_be48(ref_tag, pi->ref_tag);
+-}
+-
+-static void blk_set_t10_map_ref(struct t10_pi_tuple *pi, u32 virt, u32 ref_tag)
+-{
+-	u32 ref = get_unaligned_be32(&pi->ref_tag);
+-
+-	if (ref == virt && ref != ref_tag)
+-		put_unaligned_be32(ref_tag, &pi->ref_tag);
+-}
+-
+-static void blk_reftag_remap_prepare(struct blk_integrity *bi,
+-				     union pi_tuple *tuple,
+-				     u64 virt, u64 ref)
+-{
+-	switch (bi->csum_type) {
+-	case BLK_INTEGRITY_CSUM_CRC64:
+-		blk_set_ext_map_ref(&tuple->crc64_pi, virt, ref);
+-		break;
+-	case BLK_INTEGRITY_CSUM_CRC:
+-	case BLK_INTEGRITY_CSUM_IP:
+-		blk_set_t10_map_ref(&tuple->t10_pi, virt, ref);
++		blk_set_t10_remap_ref(&tuple->t10_pi, from, to);
+ 		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		break;
+ 	}
+@@ -519,17 +482,14 @@ static void __blk_reftag_remap(struct bio *bio, struct blk_integrity *bi,
+ 		*ref += bio->bi_iter.bi_size >> bi->interval_exp;
+ 		return;
+ 	}
+ 
+ 	while (iter.bi_size && *intervals) {
+-		ptuple = blk_tuple_remap_begin(&tuple, bi, bip, &iter);
+-
+-		if (prep)
+-			blk_reftag_remap_prepare(bi, ptuple, virt, *ref);
+-		else
+-			blk_reftag_remap_complete(bi, ptuple, virt, *ref);
++		u64 from = prep ? virt : *ref, to = prep ? *ref : virt;
+ 
++		ptuple = blk_tuple_remap_begin(&tuple, bi, bip, &iter);
++		blk_reftag_remap(bi, ptuple, from, to);
+ 		blk_tuple_remap_end(&tuple, ptuple, bi, bip, &iter);
+ 		(*intervals)--;
+ 		(*ref)++;
+ 		virt++;
+ 	}
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 2b462005c..8f88570b4 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -331,15 +331,45 @@ static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
- 	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
- }
- 
--static inline void virtblk_update_zone_append_sector(struct request *req,
--						     struct virtblk_req *vbr)
-+#ifdef CONFIG_BLK_DEV_ZONED
-+static inline blk_status_t
-+virtblk_update_zone_append_sector(struct request *req,
-+				  struct virtblk_req *vbr,
-+				  blk_status_t status)
- {
- 	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
-+	sector_t req_start, sector, zone_end;
-+	unsigned int nr_sectors;
-+
-+	if (req_op(req) != REQ_OP_ZONE_APPEND || status != BLK_STS_OK)
-+		return status;
-+
-+	req_start = blk_rq_pos(req);
-+	sector = virtio64_to_cpu(vblk->vdev, vbr->in_hdr.zone_append.sector);
-+	nr_sectors = blk_rq_sectors(req);
-+	zone_end = req_start + disk_zone_capacity(vblk->disk, req_start);
-+
-+	if (zone_end < req_start || sector < req_start || sector >= zone_end ||
-+	    nr_sectors > zone_end - sector) {
-+		dev_err_ratelimited(&vblk->vdev->dev,
-+				    "zone append sector %llu + %u outside valid range [%llu, %llu)\n",
-+				    (u64)sector, nr_sectors,
-+				    (u64)req_start, (u64)zone_end);
-+		return BLK_STS_IOERR;
-+	}
- 
--	if (req_op(req) == REQ_OP_ZONE_APPEND)
--		req->__sector = virtio64_to_cpu(vblk->vdev,
--						vbr->in_hdr.zone_append.sector);
-+	req->__sector = sector;
-+	return status;
- }
-+#else
-+static inline blk_status_t
-+virtblk_update_zone_append_sector(struct request *req,
-+				  struct virtblk_req *vbr,
-+				  blk_status_t status)
-+{
-+	return status;
-+}
-+#endif
- 
- static inline void virtblk_request_done(struct request *req)
- {
-@@ -349,7 +379,7 @@ static inline void virtblk_request_done(struct request *req)
- 	virtblk_unmap_data(req, vbr);
- 	virtblk_cleanup_cmd(req);
- 
--	virtblk_update_zone_append_sector(req, vbr);
-+	status = virtblk_update_zone_append_sector(req, vbr, status);
- 
- 	blk_mq_end_request(req, status);
- }
-@@ -1242,7 +1272,6 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
- 
- 		virtblk_unmap_data(req, vbr);
- 		virtblk_cleanup_cmd(req);
--		virtblk_update_zone_append_sector(req, vbr);
- 	}
- 	blk_mq_end_request_batch(iob);
- }
-@@ -1260,11 +1289,14 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- 
- 	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
- 		struct request *req = blk_mq_rq_from_pdu(vbr);
--		u8 status = virtblk_vbr_status(vbr);
-+		blk_status_t status;
-+
-+		status = virtblk_result(virtblk_vbr_status(vbr));
-+		status = virtblk_update_zone_append_sector(req, vbr, status);
- 
- 		found++;
- 		if (!blk_mq_complete_request_remote(req) &&
--		    !blk_mq_add_to_batch(req, iob, status != VIRTIO_BLK_S_OK,
-+		    !blk_mq_add_to_batch(req, iob, status != BLK_STS_OK,
- 					 virtblk_complete_batch))
- 			virtblk_request_done(req);
- 	}
+base-commit: 6e6d4b23e92742a9f56008beb35c20ed4902611b
 -- 
-2.53.0
+2.56.1
 
