@@ -1,44 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795197906;
-	b=SdukC+CiBTqQOkCIN0TVknltzx99nQRJLow6EFOaVf6Pv8wDQoIeoa42FQp37nBuR0Rs
-	 gxxgBz5ETPhEbCp73Z4VP9uTOwKkZ6PjtEuC03u4JdGc07+NclYoOSbqXMtcttro5P2OI
-	 zrZ9J7u2Xc3oPliMi94+3b9Fx2CxAFbcjYHvaRdAjrCoJDqmJV+uJdiqtigob5x+cFHlD
-	 LVceQIhS25RZQF7xOPEiZO5D53MEUpoltwZ9iuULolubZm8G/nscGRD3aIrqcj8yZr4yq
-	 vJR5pzmmxk+ezIlutRKo5WUlaF5jE7dck6408eI2SvhgmvF2Uj2C6fA/9lgLBij50bQ==
+	t=1795198625;
+	b=5h+yfFQTjRLiM1b18fbXqQAV70bHUHuKhrFkF0QZpxLCHUpBVutF+VKHDdNoHSsdjNIS
+	 EeOaw4nmZqst/2hyPN5Wu3PrwrNWXIJrYk45vye7o4lL5vcWBvWIm5CAos2ql76VPNbBe
+	 f1+E08NPNdq4s+N5nGYHVt9iOB57IuDtHDkZ/DfFfX3M/S2lACiC3dVnMfXVLP04MWCvY
+	 vLVbbtjh+AFdhi5Xx4luAFHS6tiefkIKMX/6hatI4yqBwsUdnN03tXGB0G6u3+3JuOV+W
+	 UWtX0R3DDUJ4Ut0ixoIEhFQ5ph4naCw9t/urmJ6lZlNh4AV62+UlpIvqEt1BfqWFsAw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795197906;
-	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
-	bh=TV+ndjB6kD/fXUGkTTVfQZ6BpqYm9zK2BcubZNKV3/A=;
-	b=CTZhLlS6gOT/6pDyubAbGgptbgAIQkIUZ1Tw0rIIGxHfv+I6xe2D3DZUkEq6mAoMNul7
-	 OqvW2WSGSKUEvMwGIyVGqbuPeDWTZOPIxBqZRvLFokoKsqB2Mfxrpk1T/DyY5H7X4kxht
-	 iUUHxA+hxPvPmWEW9kVF1hWXWuW39yN1FydOXmzSnpRy5xKGGYmyIOzkWr5U/IVpzXk7s
-	 4lnJRNSdGXGAylcL4a9sCszOiNBj5e4yWN3gecXxw6hrQCCamjnQ7YosJOsPDqfDoNEmr
-	 4KGWrVL3iGCdUFKfG8YFa0oKxgr0AjVwSYnFER29Zx/fsv6nvTYOdcSCp7rEmqIZI6w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795198625;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=kHnPkHdygJLWUd6Raio1OZlzrSr7Mg2iPFJR6vcJsn0=;
+	b=zgPXnpDV6SoTqwzntHhzHeShTUtCoxEh3gdckCaR7rY6Ld389L7w032nbK1JDr3EjxRV
+	 atY4PQzt0WUXR0sotbREfXEsAjkRbK6YgFc8yC2lT77BwXXcXZcd2FH0xmrOWo0d/C1UY
+	 nY2m86w2ng/t14zr06AwRrbLJCVZOuWm2Dg8971woDWizR0sntlWUVMPZYezxBEQTJwnV
+	 ROcKUuyRiW4YndaS5EFYQ8SP1DNczm1ALiG3FDhmg4/p2iFy0wUlZhlrMBlJ/1o28ROgU
+	 wPaS6fz/5FS1cWC48214LhV5s8CS9YX0ykQytA5BN2OgY+ZK4ZNsaarDFcxApSXIhLQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=lst.de;
-	spf=pass smtp.mailfrom=lst.de;
-	arc=none smtp.remote-ip=213.95.11.211
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FDZ1T56E;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53C060A5BD7;
-	Fri, 20 Nov 2026 18:05:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B53C060A5BD7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 337996732A; Fri, 20 Nov 2026 19:05:01 +0100 (CET)
-Date: Fri, 20 Nov 2026 19:05:01 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v11 08/13] zloop: add storage element emulation
-Message-ID: <20261120180501.GA1810@lst.de>
-References: <20261116213702.225970-1-dlemoal@kernel.org> <20261116213702.225970-9-dlemoal@kernel.org> <20261120152038.GB26913@lst.de> <ac126584-6fa3-4cdb-b6c3-ec99f75dafff@kernel.org> <20261120173609.GA1206@lst.de> <82e0ce43-73cb-4374-8761-22c178a29f05@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E062606BDCE;
+	Fri, 20 Nov 2026 18:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FDZ1T56E
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D22F71F00A3D;
+	Fri, 20 Nov 2026 18:16:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795198624;
+	bh=kHnPkHdygJLWUd6Raio1OZlzrSr7Mg2iPFJR6vcJsn0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=FDZ1T56EY/NGSZoTmntCLex0+4xeE8PucuiZ4OpXHfBdGoiLzo9IrSDqKpJcWcAEx
+	 HknAu50zTJt9dXHaiwcX0LMuj3DCFHLZKTlZ0YSp49BB1UazfGAdNiorcEbNBdAlE0
+	 Jm9XmV45fyiwhBKVkrrMsFJuZMkH80dEj76iDZAD5W2/MMLs8dD601KcImYLSCmqnA
+	 RsuHa3JuDXI8q0CnuESnUy9+uoR0ap/AR56Kh1DZuL9oQd9rYo460sqP0G7aiGVMdG
+	 ikxyOkxyt/pNSE1U3xl1nLM3UxG/UnmmNBmnk44dmqDb2p3sgftQKUtl/+bp4ieAy4
+	 ZzkCSKckENgFA==
+Date: Fri, 20 Nov 2026 18:16:52 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: "David Hildenbrand (Arm)" <david@kernel.org>
+Cc: Luigi Rizzo <lrizzo@google.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Vlastimil Babka <vbabka@kernel.org>, Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
+	Robin Murphy <robin.murphy@arm.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Jens Axboe <axboe@kernel.dk>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Luigi Rizzo <rizzo.unipi@gmail.com>, 
+	"Liam R . Howlett" <liam@infradead.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <brendan.jackman@linux.dev>, Zi Yan <ziy@nvidia.com>, Harry Yoo <harry@kernel.org>, 
+	Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Hao Li <hao.li@linux.dev>, Matthew Wilcox <willy@infradead.org>, 
+	Jan Kara <jack@suse.cz>, Jann Horn <jannh@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J . Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Simon Horman <horms@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Dragos Tatulea <dtatulea@nvidia.com>, Naman Gulati <namangulati@google.com>, 
+	Pranjal Shrivastava <praan@google.com>, Mostafa Saleh <smostafa@google.com>, 
+	Randy Dunlap <rdunlap@infradead.org>, linux-mm@kvack.org, iommu@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	driver-core@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-api@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v3 00/25] PISA: Pre-mapped IOVA Superpage Allocator
+ for DMA and CoCo
+Message-ID: <awCOitDwwIoz632b@gremlin>
+References: <20261109182533.3594984-1-lrizzo@google.com>
+ <20261120010655.467825-1-lrizzo@google.com>
+ <awBYFhnpFGtEXZ6r@gremlin>
+ <8c9bd441-db5e-4857-8e39-79f147422454@kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -50,15 +86,16 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <82e0ce43-73cb-4374-8761-22c178a29f05@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <8c9bd441-db5e-4857-8e39-79f147422454@kernel.org>
 
-On Fri, Nov 20, 2026 at 09:51:41AM -0800, Damien Le Moal wrote:
-> Hmmm... That can actually happen regardless of storage elements operations
-> because we do idr_remove() with zloop_ctl_mutex() being held, but before calling
-> del_gendisk() without the zloop_ctl_mutex being held. So we do have a race for
-> the device ID being reused, no?
+On Fri, Nov 20, 2026 at 05:12:25PM +0100, David Hildenbrand (Arm) wrote:
+> On 11/20/26 15:54, Lorenzo Stoakes (ARM) wrote:
+> > TL;DR: NAK. All of it. (And yeah, I'm steeling myself for the inevitable 'oh
+> > Lorenzo' :)
+>
+> Oh Lorenzo ... you are absolutely right.
 
-There is a race, but it should not matter because del_gendisk quiesces
-all I/O through the queue.  
+:)))
 
+--
+Cheers, Lorenzo
