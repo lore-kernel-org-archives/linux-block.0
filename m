@@ -1,107 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795162127;
-	b=cRRasoQTObwdC/WtvTrU3Fd8kuQaVwJV18tht7O7FGKDpbK7L9Z1u2vcDLmrbP6L0ICG
-	 pS8J/zfTkBKcWL/slWeK0tS+fa41sQhuVQyNB+iSHt0lpO5iBAvUQiS3SXrgU3YtrvVN6
-	 +HAeNuKPIbKOgzmy/fc+Wnv/wmZVTxzH7FVfSoxLRi6nld/VhRAvekc6s++ubRGQTxHF4
-	 d2LrjGRxhWdvE+PMajx2foPZjezTiC6kMNnVAFNRPFrTZZ9ICc1JLxYe5AgWP9qSUF4D5
-	 nOgSP1ALSXP0NMsQeuy0VIyuCR7HFxWJpruEeGiMaJzOQc/rShKmeSOuRBFhw65DyzQ==
+	t=1795165482;
+	b=Vvz17fu8Fc46E/n5SRfgVjKff6GrOODqSO7Qrs46vDxQa8uyI/tdB0FOfoexkLoCR8Ov
+	 UYtv89DGuznjPVZ4CDDLIrSlHMUJWHg7Mo2M5R7ya0/hEPOP+63BCnqwp1flj6pQCJ/qk
+	 c7dknDcsuRlxnuEWgyWdHZUUZYuRZ1OVUItNi8nWqQRCnfDvPL2Ur4FKHB9ytrSvWa0xX
+	 TTO2lMU2GLBfgZn2AIB4NCp9TeY2793gEn+muFAU1F9KbpPUVPzuqFT6lLRsJQwKBh7IV
+	 /mX+7LCwfcBFqsXFCQb5gntTyzd1T4L3oJP0vuJf8syJltWo0GDF8C7UubkgMWcJR1g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795162127;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795165482;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=nhWTtz/XtWf+zHzkg8QT/u7XDoQ0xAQ0UFQlVcaEpd4=;
-	b=4USGx7nU205lARgP8/HDMojtNV3S9Dy3CAbuVMSlQgfXg8a19uE++7GCxTO+NrZXTFce
-	 Q8KX7f9QfjO5hWvd6kdgdDKiEr8yy9Gcl+vstmYOz1yJukXOXHfB5bIB7DRUDsCvja5Fm
-	 2ZqFU1eDKnbRxV8lX46t2HvYovtD+QyCkcCzGoKyjMzm6OCjHThz0mvWMz+etUjca4tej
-	 37f8cwYZRPIC3JiuTKVyuE6Yc7LRUt6R1UhG2/Rj5rJMivZ2ulbiixFm78lNdoazYaOui
-	 S1J8uBaPv5eaVcygetjd8CD/l0hzRwgxIC3LqaU6bFGB2DBWL/oxK4zixZBD3sYAXCQ==
+	bh=0i1q7QXoQpyw7U+kbS9CbTzSUpFctyuEhoMiaekUXV0=;
+	b=N7qyMagp6UgA648wmNwEaXsOOq54zqx6kr5iDOkHkXOiwUDGjlglyL0MunKKyQEiOMrq
+	 RDPc6ZMlgKuTioB88HXuyQoqLVd4pXXyowr63URTTJmMN87RHI4axn06RGL5G+PHPeA0y
+	 jSrLkm7q/7DbeQ46GUeLEMvgvF26lfJvSLKcMQ7zkhTGeNx8il6TRXd6gvnxlMxDy2lYo
+	 idmG4H0Wkjt0j+nrQNU1ipxCDwLEQKFdHjHfuVvEILyuO4YBPrvuSJULuzualtAMqBZ6K
+	 tH9dO6iAy7ltod4bMrFS6XxjZYXSe9gDfsPcOEiQqd9KKk28W2ssj5l9Tmbe61TZwuA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=oNThT0mS;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IhrGSlie;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F661606A331;
-	Fri, 20 Nov 2026 08:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2E6606A333;
+	Fri, 20 Nov 2026 09:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=oNThT0mS
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 042371F000CA;
-	Fri, 20 Nov 2026 08:08:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1795162127;
-	bh=nhWTtz/XtWf+zHzkg8QT/u7XDoQ0xAQ0UFQlVcaEpd4=;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IhrGSlie
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C384A1F000C6;
+	Fri, 20 Nov 2026 09:04:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795165481;
+	bh=0i1q7QXoQpyw7U+kbS9CbTzSUpFctyuEhoMiaekUXV0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oNThT0mSGG6kUZAwqZsOB53nYtEkre5+BXqj2CeCW2DezGxoseqckwyiR/VE/H5rV
-	 fasb29VNh/hB3PNLtjFkss79IjJ2QxSftm4LCX3QTWO6ojWb5uhH6sv3drEWCZAFZL
-	 WHSdRIgt+zBwwz1WhpggeQETXK/uvYvzW9vMcVhg=
-Date: Fri, 20 Nov 2026 09:08:23 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org,
-	David Hildenbrand <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-mm@kvack.org,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	linux-sound@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowangio@gmail.com>, David Heidelberg <david@ixit.cz>,
-	oe-linux-nfc@lists.linux.dev, Chas Williams <3chas3@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Helge Deller <deller@gmx.de>,
-	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	MPT-FusionLinux.pdl@broadcom.com,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	linux-mtd@lists.infradead.org, Neill Kapron <nkapron@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>, linux-usb@vger.kernel.org,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	xen-devel@lists.xenproject.org, Hans de Goede <hansg@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-	linux-ext4@vger.kernel.org, Mike Marshall <hubcap@omnibond.com>,
-	devel@lists.orangefs.org, Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Benson Leung <bleung@chromium.org>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	amd-gfx@lists.freedesktop.org,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	intel-gfx@lists.freedesktop.org,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-xe@lists.freedesktop.org
-Subject: Re: [PATCH v2 08/12] docs: ioctl-number: update USB entries
-Message-ID: <2026112013-crave-ocean-6117@gregkh>
-References: <20261119053514.255348-1-rdunlap@infradead.org>
- <20261119053514.255348-9-rdunlap@infradead.org>
+	b=IhrGSlieICNdpQD+S2EFBPZbistZAhe5LomuJdvVVJj61IRoirzeBTM3qemoO3lT9
+	 GqcetHnecqBmRhrcqPij5z1BQxNa1TyVn1qfoBM1Gyb1w3ztBVQlo1I0YcFSgX45yn
+	 ke2ZY7lMRlDk0uJpweHBGJ9TjQc2t57B+g5DSUWxzvfgc205/yGI8O7A1MA1zuUHUo
+	 2LgFe1yV6EBsqFLvqu3Fj26GWae9y28vu9qeGXs5KjD2BC6XZeeiAIGLH9Eey8NKjB
+	 hQen8Th96khGc/3hFyKwHZEA2+1KYvbMQuvnh6W7Vdm5dOXC8itUEuHsN2Ri35Ownd
+	 8lPa2Yq34KlmQ==
+Date: Fri, 20 Nov 2026 10:04:37 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Tal Zussman <tz2294@columbia.edu>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, John Garry <john.garry@linux.dev>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 0/2] block: fail short atomic bounce bios in
+ bio_iov_iter_bounce_write()
+Message-ID: <20261120-gratwanderung-wickeln-mitkommen-1fa50bede59a@brauner>
+References: <20261107-blkdev-atomic-bounce-v1-0-f66344262096@columbia.edu>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -111,19 +58,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261119053514.255348-9-rdunlap@infradead.org>
+In-Reply-To: <20261107-blkdev-atomic-bounce-v1-0-f66344262096@columbia.edu>
 
-On Wed, Nov 18, 2026 at 09:35:09PM -0800, Randy Dunlap wrote:
-> Update the list of files where USB ioctls are defined.
+On Sat, Nov 07, 2026 at 11:24:34PM -0500, Tal Zussman wrote:
+> bio_iov_iter_get_pages() fails a short REQ_ATOMIC bio. In contrast,
+> bio_iov_iter_bounce_write() doesn't, so a bounced atomic write that runs
+> into a folio allocation failure triggers a WARN_ON_ONCE() in
+> iomap_dio_bio_iter_one().
 > 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> The first patch makes bio_iov_iter_bounce_write() also check that a
+> REQ_ATOMIC bio covers the whole iterator, and clean up and return
+> -EINVAL if it doesn't. With both paths covered the iomap check can't
+> trigger, so the second patch removes it, as suggested by John Garry.
+> 
 > ---
-> v2: no change
-> 
-> [Since having multiple maintainers trying to merge these would
-> cause some conflicts, it would be more manageable for Jon to
-> take all of these through the docs-next tree.]
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+No objections per se, I just would like see Christoph take a look first.
