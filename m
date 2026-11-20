@@ -1,46 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795189690;
-	b=vCcZlFDBest6zu+9hYi1DX3NmOvRsWAuBtjppi8jXBlVkvdoEh+D0EWZQYazUg33+GVz
-	 +sXGaYyzMkX1rfpxrCWIikNvt6/gvSAvyiYQQRs08MRYPa65KUBnjTn4MzAQbLM9rCy1x
-	 YjOcWJD3F82fS3+7fAZZGiBhFBJfRtl+7heqPA5pyAPK8zcWNeidAfmQoEyT+UucgsP35
-	 yz0M+GSmQa3SljbhRn88R0elua+2U2l5FfpwGQHNyXPVitg3gkyB6uMIcJrLBFQHnBDvo
-	 t2oyI2sidFTwM7GzBDbrueUaf/pobwHfhaQSCqbarYdZGCoGDrVBZv67Lsvu37cDlIA==
+	t=1795190411;
+	b=C6vzXqlzerWxegR+JdwzlCSBDY0GzGwsOpraK95Dhgs7p3M/Mc9pHwFGDceSboiQj4c1
+	 mUW83dUdlZ2N+I+lvEmsw3UCIvS1SrFcSB0s83pnRCOvpRtWIdj0pIVAXxn+EYCmjsf3n
+	 S02RPMlbmG/gaw4njTx/jhcJCqmMhBaqAxpI55jHDRpb1r5eqiKS6glWQw7uwQc9EAVtB
+	 1HtoJRW68kDt8nZfHe+43vni70lgb8GVDND5lOC0U3YEmscsyjHZsg9qHi4npPZrqfpI1
+	 xlZTmoeub6EUHhkhqOo5Y0rLXqMZFtcHcknuoYCKXpxepS8LsmVOlywEz96Tl/cHdOw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795189690;
-	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
-	bh=O9sgv0Xtuy4Ab3/HyLD7kYrQOtr3uhHOKGiF8EK8M6c=;
-	b=ooCRJOXwAD43ZN6LtDUtyq7ihatOQSYDkucZi9g5XwT7k4ysukR01eEivyO6cMSEnx8t
-	 4wDzouJ+TTovEgD6fqgTUGFHgxy8+XcYg1gG4OG3sQits3xPF1PdwVTeuhUiXvF7KMaUh
-	 7D7T86iBl6rGvNzt3CfP/pYQUq7sPqMb7UQfgb/BLkHwP2MGRo2Y06FCuN08kALmUyIQe
-	 nQGwnYWlhD51FtmoFq9zOq38NO4XG+obfPPRGzlK032Vsaxn9WrNELplnBydkvVQkXBCz
-	 cULztRay91nSuzJSh6fu5nru6ZLvgcgvqYJGf1Lnx48GR5Jr8n+bfRoOg1a73u4ZWjA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795190411;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-SRS-Rewrite;
+	bh=Gyd+o3rbJ0cvanHvrmWmlBzYCWCHR5gVRmr27oWkjQg=;
+	b=ox/4j8fkIMCWpMAcnviAB7Lwm/HMTOazkKRGNgJhaHPOGt5SeVpyb73FgRo2W6l+FXTy
+	 OqU7gFRwNpgJWbB6uKs7oBH+0YKkOypOZrRCUmScxooJxU2ph0zvgMsy6Djdst6wK8+1V
+	 zy7vUNuXa/08IGG95HAWcPklZZjzFWL6x/Mw37R7drHTg4r+/oy1sBpdXqnRr5Bntf8rp
+	 xuvsUYPiXEl8CCWP0OUEqySFxMLx/4iG94gRQUosV+HZjdhsE41ELZf6za0p4SDfBapky
+	 C2BGgfpp2RFpyb6ECSMPVwWHp8rqDvS/YnHOjiQxsjvXxA6JcexDvZG4SebdA+c63ZQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=lst.de;
-	spf=pass smtp.mailfrom=lst.de;
-	arc=none smtp.remote-ip=213.95.11.211
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=UObdxYBY;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018B4606A32A
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 15:48:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 018B4606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7C25B68AFE; Fri, 20 Nov 2026 16:48:02 +0100 (CET)
-Date: Fri, 20 Nov 2026 16:48:01 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Guixin Liu <kanie@linux.alibaba.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-	Nilay Shroff <nilay@linux.ibm.com>, Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 RESEND] block: rename need_dispatch to
- piecemeal_dispatch in blk-mq sched
-Message-ID: <20261120154801.GA29236@lst.de>
-References: <20261119071728.3145752-1-kanie@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E58606A332;
+	Fri, 20 Nov 2026 16:00:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 90E58606A332
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=UObdxYBY
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Gyd+o3rbJ0cvanHvrmWmlBzYCWCHR5gVRmr27oWkjQg=; b=UObdxYBYxDlovD3ovoOjHcRlGv
+	cLU2YR6B7FghjvIZBOI+W/O7XTQgTP1gV9QY3mXxMoEnIYibO7tcw0RSwBB3NvrjJPWniHn4dxdkO
+	HKbJh8SQ3dLCTRH8uth8z5EYhLjTSA0d3UX2phRXt+6TZCGbv37lM9eIcBDLRsGSwbXRT7cuSv/+9
+	Jlo2n4WmDuq3nCJaGEs+q+G1crPOhb47IKhUX7vT2GIo0TTVSlrdYmfdD0OVcKojJfn6WN8BGRnao
+	hNAhHt8a20Pt+cz0SmkiyqeSr7FyrfTsSfNscX/rZ7kdYr7JFLE1o15kSQpTSYosF8zll8WuXz9rE
+	2Znj1YWw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xUR21-0000000FUim-1fwT;
+	Fri, 20 Nov 2026 16:00:09 +0000
+Date: Fri, 20 Nov 2026 08:00:09 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block/t10-pi: deduplicate
+ blk_reftag_remap_{prepare,complete}()
+Message-ID: <awBuiVyOQj_YHCZD@infradead.org>
+References: <20261120064806.752251-1-csander@purestorage.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -52,10 +66,111 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261119071728.3145752-1-kanie@linux.alibaba.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20261120064806.752251-1-csander@purestorage.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Not sure there's much of a point, but at least this doesn't make
-things worse:
+Good idea.  But I think the new function name is a bit misleading and the
+double ternary operators on a single initialization line obfuscate the
+code compared to the old if/else.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Can we do something like this instead?
+
+diff --git a/block/t10-pi.c b/block/t10-pi.c
+index a19b4e102a83..f24ededd70a8 100644
+--- a/block/t10-pi.c
++++ b/block/t10-pi.c
+@@ -436,69 +436,32 @@ static void blk_tuple_remap_end(union pi_tuple *tuple, void *ptuple,
+ 	bvec_iter_advance(bip->bip_vec, iter, len);
+ }
+ 
+-static void blk_set_ext_unmap_ref(struct crc64_pi_tuple *pi, u64 virt,
+-				  u64 ref_tag)
++static void blk_set_ext_remap_ref(struct crc64_pi_tuple *pi, u64 from, u64 to)
+ {
+ 	u64 ref = get_unaligned_be48(&pi->ref_tag);
+ 
+-	if (ref == lower_48_bits(ref_tag) && ref != lower_48_bits(virt))
+-		put_unaligned_be48(virt, pi->ref_tag);
++	if (ref == lower_48_bits(from) && ref != lower_48_bits(to))
++		put_unaligned_be48(to, pi->ref_tag);
+ }
+ 
+-static void blk_set_t10_unmap_ref(struct t10_pi_tuple *pi, u32 virt,
+-				  u32 ref_tag)
++static void blk_set_t10_remap_ref(struct t10_pi_tuple *pi, u32 from, u32 to)
+ {
+ 	u32 ref = get_unaligned_be32(&pi->ref_tag);
+ 
+-	if (ref == ref_tag && ref != virt)
+-		put_unaligned_be32(virt, &pi->ref_tag);
++	if (ref == from && ref != to)
++		put_unaligned_be32(to, &pi->ref_tag);
+ }
+ 
+-static void blk_reftag_remap_complete(struct blk_integrity *bi,
+-				      union pi_tuple *tuple, u64 virt, u64 ref)
++static void blk_tuple_remap(struct blk_integrity *bi, union pi_tuple *tuple,
++			     u64 from, u64 to)
+ {
+ 	switch (bi->csum_type) {
+ 	case BLK_INTEGRITY_CSUM_CRC64:
+-		blk_set_ext_unmap_ref(&tuple->crc64_pi, virt, ref);
++		blk_set_ext_remap_ref(&tuple->crc64_pi, from, to);
+ 		break;
+ 	case BLK_INTEGRITY_CSUM_CRC:
+ 	case BLK_INTEGRITY_CSUM_IP:
+-		blk_set_t10_unmap_ref(&tuple->t10_pi, virt, ref);
+-		break;
+-	default:
+-		WARN_ON_ONCE(1);
+-		break;
+-	}
+-}
+-
+-static void blk_set_ext_map_ref(struct crc64_pi_tuple *pi, u64 virt,
+-				u64 ref_tag)
+-{
+-	u64 ref = get_unaligned_be48(&pi->ref_tag);
+-
+-	if (ref == lower_48_bits(virt) && ref != ref_tag)
+-		put_unaligned_be48(ref_tag, pi->ref_tag);
+-}
+-
+-static void blk_set_t10_map_ref(struct t10_pi_tuple *pi, u32 virt, u32 ref_tag)
+-{
+-	u32 ref = get_unaligned_be32(&pi->ref_tag);
+-
+-	if (ref == virt && ref != ref_tag)
+-		put_unaligned_be32(ref_tag, &pi->ref_tag);
+-}
+-
+-static void blk_reftag_remap_prepare(struct blk_integrity *bi,
+-				     union pi_tuple *tuple,
+-				     u64 virt, u64 ref)
+-{
+-	switch (bi->csum_type) {
+-	case BLK_INTEGRITY_CSUM_CRC64:
+-		blk_set_ext_map_ref(&tuple->crc64_pi, virt, ref);
+-		break;
+-	case BLK_INTEGRITY_CSUM_CRC:
+-	case BLK_INTEGRITY_CSUM_IP:
+-		blk_set_t10_map_ref(&tuple->t10_pi, virt, ref);
++		blk_set_t10_remap_ref(&tuple->t10_pi, from, to);
+ 		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+@@ -524,9 +487,9 @@ static void __blk_reftag_remap(struct bio *bio, struct blk_integrity *bi,
+ 		ptuple = blk_tuple_remap_begin(&tuple, bi, bip, &iter);
+ 
+ 		if (prep)
+-			blk_reftag_remap_prepare(bi, ptuple, virt, *ref);
++			blk_tuple_remap(bi, ptuple, virt, *ref);
+ 		else
+-			blk_reftag_remap_complete(bi, ptuple, virt, *ref);
++			blk_tuple_remap(bi, ptuple, *ref, virt);
+ 
+ 		blk_tuple_remap_end(&tuple, ptuple, bi, bip, &iter);
+ 		(*intervals)--;
+-- 
+2.53.0
+
