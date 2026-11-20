@@ -1,62 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795188285;
-	b=mEWUel4vXS1ixahm0ECWP16IMJb8G+k4yXdaio+wWCmn2zMqR2DTYNPvfV8UyQeguG7r
-	 JGNxZhfJlDmVzJuo2V+fQlFWHesamwlkJUgz8mXIttbEekdkaMixtln3Ykb7qrXoE0/TR
-	 /xPviygdyyoW8SKzFCe95L56ILMrhiLoQyTXp0TTxXgNlrhZSd78msUMz3xbqZZaNqL2I
-	 yo8USz+hjrEDsgqYCNv5RXXHD/dX/eBepQ5crfuz8LYYknRB0eRxSQgZdzV5+Kef2OYdv
-	 jQChuLEU8SBv5vXZaCkDo7lHYzqooJ5pS5jyhnGC45UjTlV9StVEZQvJBaeYhVvYUng==
+	t=1795188491;
+	b=h2obWuszPCJoqzmwLhxFhqpFaWQCmco3VEsDGicHLbYywVn+Swcu6xUoDT9IabtoMgJK
+	 u5THlcIawFlSPWw3PZ7XngpF1RWfXNBPptgavyTuoqVuz+Sb4UzEoMOpNmvoh3VPKgDoF
+	 0V9nw+O9TCg9wC4z42VQ4r4h7yPC63Hy/kxyGCmfYHQBQeqz7eHyvdt8RX3imI0UlcrEP
+	 9DbN9B6C7zylxbgf7ZtPRAMG+RsxKbkGhe6psqixtt0XCkVdP1ZOuVkUcbN9gy5Nybu02
+	 RM2ZmQDTbcCeVOQfABnFZb18j6iBulmNDrDs1QvpT/BLPokA+haJVMsgj1RKUyoVcIg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795188285;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795188491;
 	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
 	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
 	 In-Reply-To:X-SRS-Rewrite;
-	bh=SpN6lK+ZTM45pGVSTME2zCdRIELg0pbhb5h4WrRIpEg=;
-	b=iNleJAfjqKeR3GSTO5eG58B5wRRf3gbZrSRxQrw+50K7K92sV3Th5ldJPpX+4yYW21+Z
-	 rAj8XBe/wchp17e0NVD3kKyeFQp6Ec9LVe2+Vp+Kcy4pMFR7FGOq8gCJ771A5dc9QlVmD
-	 TP8v59CHQH5WMULR5xltrbPCnhobZ+ZglAKJj6qZl+6Tcij9TxXHQdqP78lkWgoXpai8R
-	 ZIXoguTOQcH04UCBaWhNr8iEyhfo0zFCVWik+3binKOaXj7ssgnC1Rxl+T97HaIy1Ls9Z
-	 rc36Nfxb/oLk/yYAUOUB9cSPsLEPqsQMUorSJwyNT55t8EjX5Jkg8IlMf4PuHvtpAzw==
+	bh=Vmnslzco2VFlTAvIBJ5u1f30UOcTFAjsRmY4Ir9CuYU=;
+	b=MueIWejbgNfwMgbIYy34Ccy7sVqtrEyz/k3xtWhyN9o6JJzxtYgBZv9KZrPza2K3k4+Y
+	 Ip/co3KsGUg9bSGmc2I+vCiJLFpZQyzNehPK5cgXw0HOTkwLz/ACmDaBlD2PDMwQuv4F4
+	 y4hNdV12RTRN384QuP031tjGDtZg+53O17cnGqOpbccTq9PfxX/Ohv1nV8EqnbfndRntu
+	 Eptvl0IhtA+zo6i2w3annrx6Ju9eyoLPhnv8IGzXRBEE7naQNyeiJIcJEuYs5kkk/Wq8w
+	 fnRAtmFNYabzbEalyecuZGw8hOVQdODH/Lgk/ur3kRlDUgU5ICQLmOOyCvKi5Qn5gPw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=iorlInwk;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=CLzWti4m;
 	arc=none smtp.remote-ip=198.137.202.133
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED238606A332;
-	Fri, 20 Nov 2026 15:24:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED238606A332
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F33606A325;
+	Fri, 20 Nov 2026 15:28:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 46F33606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=iorlInwk
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=CLzWti4m
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=SpN6lK+ZTM45pGVSTME2zCdRIELg0pbhb5h4WrRIpEg=; b=iorlInwkb1vVdxSQUJWI8rObEf
-	Ndm24D0wj3iOgCbxGhLNDv0UhmZ0k3TR3GaSETaVftmOoWdF8Lk9jmFiBL62gi5lVkdAEky2GPV6Z
-	/Fy5TKiPWVAEKmIw1LcCVet25gmmNgYHpn/hMSlg4EnVJo9feCsuFequkW73wlVZ2BytPFFh68169
-	vZt92pJ0z9heE9BzyQTNTKy5x0i4SZ341OY8swk59WyXzQEOijE8vG8UIOtyfW4fQDeW1UoY3HOMO
-	w1MW5iDx6rbTXqG3C1m/e/uoBLvotouQKC+H20rvk8X5pM5qI7n959RF3zzXjbp+5ChYo2e4jpReJ
-	j5pSWsIg==;
+	bh=Vmnslzco2VFlTAvIBJ5u1f30UOcTFAjsRmY4Ir9CuYU=; b=CLzWti4mMgs1L0148e68QDbnFY
+	obunPTpbdRcx2qLz7GW1hqsf1jh1wwLCTuM8wna5OT5YSdSGi202Nw0RzFT8cMlTuu+g2QoCXIOgv
+	zhHTKkfH407sc0Zu+fvSxA3xsAhMxCNehsxhIoBgBEuZkeSz7Q0Xv53Y3fSskleNh1S6vbkBbURk+
+	kXdPzaDjLpKstaZbYatqG8eQQDlXkscCRZ1JxMKZGsBjzYeNBgbz5FnhY1szcwHjhNJiSnqzVM9RY
+	8lxvVdwheXvmuig5U0PJxcIdlTbR1B7+F0nCSW45VfxolXsJIYe3eatkKwPrGoQUVED+0skilThPT
+	kFy2ZM5g==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xUQTi-0000000FP26-1OUk;
-	Fri, 20 Nov 2026 15:24:42 +0000
-Date: Fri, 20 Nov 2026 07:24:42 -0800
+	id 1xUQX1-0000000FQND-3Gp8;
+	Fri, 20 Nov 2026 15:28:07 +0000
+Date: Fri, 20 Nov 2026 07:28:07 -0800
 From: Christoph Hellwig <hch@infradead.org>
-To: tongzhiwei <tongzhiwei@cmss.chinamobile.com>
+To: Zakaria Belkadi <zakaria.belkadi@inria.fr>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+1288484b13bf6af3620d@syzkaller.appspotmail.com
-Subject: Re: [PATCH] block: fix divide by zero in
- queue_limit_discard_alignment()
-Message-ID: <awBmOrGl2dlMEd-q@infradead.org>
-References: <20261120103040.610-1-tongzhiwei@cmss.chinamobile.com>
+	linux-kernel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>, florence.schadle@ssi.gouv.fr,
+	frederic.tronel@centralesupelec.fr, louis.rilling@irisa.fr,
+	stable@vger.kernel.org
+Subject: Re: [PATCH RESEND] block: pin user PI pages for writing when ref
+ tags are remapped
+Message-ID: <awBnB-55HQ54C1x6@infradead.org>
+References: <20261118154053.13218-1-zakaria.belkadi@inria.fr>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -68,21 +69,18 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261120103040.610-1-tongzhiwei@cmss.chinamobile.com>
+In-Reply-To: <20261118154053.13218-1-zakaria.belkadi@inria.fr>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Nov 20, 2026 at 06:30:13PM +0800, tongzhiwei wrote:
-> Commit e924da7d6622 ("block: Drop granularity check in
-> queue_limit_discard_alignment()") removed the check for a sub-sector
-> discard granularity on the assumption that lim->discard_granularity
-> is always at least SECTOR_SIZE.
-> 
-> That assumption does not hold for every queue: a backing device can
-> report a non-zero discard granularity smaller than 512 bytes.  When
-> blk_stack_limits() stacks such limits, only the non-zero granularity
-> is checked, and queue_limit_discard_alignment() shifts the value down
-> to zero and divides by it:
+On Wed, Nov 18, 2026 at 04:40:53PM +0100, Zakaria Belkadi wrote:
+> +	/*
+> +	 * blk_integrity_prepare() remaps the reference tags of a write in
+> +	 * place, so the PI pages are written. Pin them for writing.
+> +	 */
+> +	if (bio_op(bio) == REQ_OP_WRITE && (bi->flags & BLK_INTEGRITY_REF_TAG))
+> +		it.data_source = ITER_DEST;
 
-Well, then let's fix the setup time to reject this.  Because a discard
-granularity less than a sector by definition makes no sense whatsoever.
+I don't think we can just pin memory as writable that wasn't given to
+us as writable.  So this needs to force bounce buffering, at least when
+remapping might be required.
 
