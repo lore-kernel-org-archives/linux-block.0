@@ -1,69 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795180283;
-	b=EsUR0acrkpX8Bvtp6P20jEyu6W8MINLal9nUqwgRSN4z0aoqCooJnllpW6P+LnxEbK0P
-	 lfyodOusl284ZBuxFEKpdx1g53vOjsv+JBV5HM6H89FNHtoDaNfgcWHy8ihb2OPeYsEKR
-	 nzOqZPJb6mOK6NgHlzGxrpFoKvFPc6BFj4JDmcHEYVvPiNCuforcphFYTXePdCyFBIBzJ
-	 Oedvwm0OD7d3IAr7nTpbIETAnVGfz/CAQQ5yrCCKOJ1/13hP7l3lmHji4sqpPXfK4q0n5
-	 MfJR1LEYJOmhz9sv8tuI9i0EEwDzzE8LPRL6nTlijVWNGrX33m9gSZslBAUe06w0Dgg==
+	t=1795181394;
+	b=n1RqLEZs1CvBPfNF+12M4NKZyavRJwkGJhdEfN/w77sbz0wzZEmFmLBu7ypqr6ffDs7P
+	 JjNEMpNkDyAiwE3clYyJqP8Uu7N1A7cSauOq0UG9sKCG68TYrUGPl20ehoIJ470pi4vc/
+	 defgJt5Rj0EBtgG8IGU7WwT2NPWm+0zHhoCHvT7Y2xGfu0PGWpZirIXR/S0QBIvb3Bwzs
+	 LFC2uuYMB6DqaMjJRZvSi2oNbHQmSjgHtF+HoNuAc6Bp81jLGPniETMV2OPPW1yG+SALb
+	 Tuovc6YRGoR8WPDlwbxqYHFT/mlggHM8LqTU6ttSciYGgQEiXBjelOrLySe+aityGwA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795180283;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=11EUqqsBHqKJhSEKaLjedxJRvUSCpiSlKRotGWVYopQ=;
-	b=rgWaWZYNdh0J36r8yaGD/8LarVWJxyPYU1Ifg6kq5bZGwIUxq1vhfKvEw4PBY0MHRHvO
-	 9w9sMfhPOF5wcB77rV2wWMN80oQ80kIPoec3xfXNiAK2NJLVCI7BkKZ7EKNlJ8EQioCtI
-	 ivz6cmvNAshZcy+6J3euVSpbAchVg3i7DAyvv6ITlBVO7YFWygCLhbCp+aH9wGsGMaPP8
-	 J63GnA5Em33hRByvFZWreu8pqo5SBIGj4heXiQ6VN1t/bMLSTk9GPvkaVWJnU8bKdLzba
-	 3SXhDAJhAHw/UffsvsrJhrXIeqvesaOod3gFkIc3LaV2GSqzk2GGKCFSImubL/X7puQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795181394;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:Content-Language:Organization:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=KIuubySBEKoRCjnxozdpuIhIHzXPI2vtLhHLMXp0fx4=;
+	b=LfB53z8N4g/Cyt3c/capiJhDAOpe0nH0RQuVbsVbOPYxdJPPEEL0qjyA45ide3DSkY+i
+	 /i/ApDtdvitcToDWgc1dvlL74nDRCWuEag9vyy87/bsTVA4nTgkSRIfJ8rq99mBf75vNh
+	 1Poic4LmkIjC2YrHc7l47S1gWvpqTWfjSSGd+xNOE4R4AJnKFJiGTffqIgzki7Bcvc3/G
+	 urd+zKasmetrmKkMazbx3kX/B+q7RcsGzSN+yefYB08phIP/Lmr/lq8h5zVMERykcbQoP
+	 ku7TmTMm0PwEWOPWWkVN8nH/MdtRPeKrqI1TvNfNgW2UghlurTwxCi4e+Xa3Vp1tu4w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=pcpMXMRk;
-	arc=none smtp.remote-ip=91.218.175.179
-Received: from mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="T+0q/4Ul";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FA2606A332
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 13:11:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6FA2606A332
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D59606A32A;
+	Fri, 20 Nov 2026 13:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=pcpMXMRk
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=AFN9OOtQlK1HJO8cWelVMtGeAQ6PKLi87EwwnhaP1iY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795180281; v=1; x=1795785081;
- b=pcpMXMRkQ4Ns6fd064vPWWatVGroU9IVtkGO3ROe58Y6pOfgmdrRaA8URbSyfTUF5AbEgZhD
- i68/L46VO8eq6YVzH9zTsvTRNPM0a79tLxALqyXzHBnW3aN7CqxWw7P6596t4l+BKqmEoxYpK8c
- D1wn0Zhz0yPrczpYDf0gH1hM=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 1d043ee31403846b;
-	Fri, 20 Nov 2026 13:11:20 +0000
-X-Mizu-Trace-ID: 1d043ee31403846b
-X-Migadu-Flow: FLOW_OUT
-Date: Fri, 20 Nov 2026 14:11:11 +0100
-From: "Pankaj Raghav (Samsung)" <pankaj.raghav@linux.dev>
-To: Jan Kara <jack@suse.cz>
-Cc: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	Andreas Gruenbacher <agruenba@redhat.com>, gfs2@lists.linux.dev, Mike Marshall <hubcap@omnibond.com>, 
-	Martin Brandenburg <martin@omnibond.com>, devel@lists.orangefs.org, Dave Kleikamp <shaggy@kernel.org>, 
-	jfs-discussion@lists.sourceforge.net, Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	linux-afs@lists.infradead.org, Miklos Szeredi <miklos@szeredi.hu>, fuse-devel@lists.linux.dev, 
-	linux-block@vger.kernel.org, Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
-	linux-nfs@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org, 
-	Carlos Maiolino <cmaiolino@redhat.com>
-Subject: Re: [PATCH 02/13] xfs: Drop pointless I_DIRTY_PAGES check in
- xfs_can_free_cowblocks()
-Message-ID: <awBGYTkywYFOaYOI@quentin>
-References: <20261116171044.6938-1-jack@suse.cz>
- <20261118145941.1063127-15-jack@suse.cz>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=T+0q/4Ul
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 949861F000C4;
+	Fri, 20 Nov 2026 13:29:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795181394;
+	bh=KIuubySBEKoRCjnxozdpuIhIHzXPI2vtLhHLMXp0fx4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=T+0q/4UlfyZmiXdWBOBSwrYSzlx1WaHw/hwBWjGCtpHxAoHiLxvLq+1hQiQEnfs7w
+	 n2FHuYJjSQBV2K+tTMN8uj8FAGfQi3DMT2s/3z+cw0uVXaB+tM+oYp4ZRFHOMGYB5V
+	 p4tEr9cyi0vSt27LCkJgTUB0IRfkQtjYnJS9pao2e8CMAootYoN54lHxBA8Fv0GozH
+	 YhD+aWg0tdXJN0WSfNMhHF1b9o+8XzviHIcBfeJBLirfMk+X+IuWrwOZSuCn9AJJCV
+	 Il3OTOZehXVO90JKQk2dBkOR3abMDSMnjIJq+vL8RlEgWgosu1mdLv5YfVL02AW7R8
+	 +X2sPRBnZKnBg==
+Message-ID: <83804b12-39c7-41cf-8a70-2bab8b3fa2b0@kernel.org>
+Date: Fri, 20 Nov 2026 05:29:52 -0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -73,40 +51,155 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261118145941.1063127-15-jack@suse.cz>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] virtio_blk: validate zone append sector from device
+To: Annie Kim <pulpannie@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowangio@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, virtualization@lists.linux.dev,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20261120063039.4155597-1-pulpannie@gmail.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20261120063039.4155597-1-pulpannie@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 18, 2026 at 03:59:36PM +0100, Jan Kara wrote:
-> PAGECACHE_TAG_DIRTY is the authoritative source of information about any
-> folio being dirty in the mapping. I_DIRTY_PAGES is just an approximation
-> used by writeback code that can get stale under certain situations. So
-> just rely on the authoritative check.
+On 2026/11/19 22:30, Annie Kim wrote:
+> From: Hyokyung Kim <pulpannie@gmail.com>
 > 
-> Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
-> Signed-off-by: Jan Kara <jack@suse.cz>
+> The device reports the starting sector for REQ_OP_ZONE_APPEND completions,
+> and virtio_blk copies it into req->__sector without checking that it
+> still refers to the requested zone. A buggy or malicious device can
+> therefore make upper layers believe the append landed at an arbitrary
+> location.
+> 
+> Validate successful zone append completions before updating
+> req->__sector. The returned sector must not precede the request start
+> and the entire request must fit within the zone writable capacity.
+> Reject invalid completions with BLK_STS_IOERR.
+> 
+> The polling path may batch successful completions, so perform the same
+> validation before admitting a request to the batch. Invalid append
+> completions then fall back to the normal completion path and are
+> completed with an error instead of being reported as successful.
+> 
+> Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
+> Assisted-by: Codex:GPT-5
 
-Looks good,
-Reviewed-by: Pankaj Raghav (Samsung) <pankaj.raghav@linux.dev>
+This tag is not necessary.
 
+> Signed-off-by: Hyokyung Kim <pulpannie@gmail.com>
 > ---
->  fs/xfs/xfs_reflink.h | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+> Tested on v7.4-rc3+ using modified QEMU backend that returned incorrect
+> zone-append sectors on a memory-backed null_blk zoned device.
 > 
-> diff --git a/fs/xfs/xfs_reflink.h b/fs/xfs/xfs_reflink.h
-> index 683c1841e640..1310cc9fe829 100644
-> --- a/fs/xfs/xfs_reflink.h
-> +++ b/fs/xfs/xfs_reflink.h
-> @@ -17,8 +17,7 @@ xfs_can_free_cowblocks(struct xfs_inode *ip)
->  {
->  	struct inode *inode = VFS_I(ip);
+>  drivers/block/virtio_blk.c | 50 +++++++++++++++++++++++++++++++-------
+>  1 file changed, 41 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 2b462005c..8f88570b4 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -331,15 +331,45 @@ static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
+>  	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
+>  }
 >  
-> -	if ((inode_state_read_once(inode) & I_DIRTY_PAGES) ||
-> -	    mapping_tagged(inode->i_mapping, PAGECACHE_TAG_DIRTY) ||
-> +	if (mapping_tagged(inode->i_mapping, PAGECACHE_TAG_DIRTY) ||
->  	    mapping_tagged(inode->i_mapping, PAGECACHE_TAG_WRITEBACK) ||
->  	    atomic_read(&inode->i_dio_count))
->  		return false;
-> -- 
-> 2.53.0
-> 
+> -static inline void virtblk_update_zone_append_sector(struct request *req,
+> -						     struct virtblk_req *vbr)
+> +#ifdef CONFIG_BLK_DEV_ZONED
+> +static inline blk_status_t
+> +virtblk_update_zone_append_sector(struct request *req,
+> +				  struct virtblk_req *vbr,
+> +				  blk_status_t status)
+>  {
+>  	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
+> +	sector_t req_start, sector, zone_end;
+> +	unsigned int nr_sectors;
+> +
+> +	if (req_op(req) != REQ_OP_ZONE_APPEND || status != BLK_STS_OK)
+> +		return status;
+
+I would move this if outside of the function and call this function under this
+if. That would avoid passing status, make this function a void one, and avoid
+unnecessary function calls for commands other than zone append when the inline
+is not honored by the compiler.
+
+> +
+> +	req_start = blk_rq_pos(req);
+> +	sector = virtio64_to_cpu(vblk->vdev, vbr->in_hdr.zone_append.sector);
+> +	nr_sectors = blk_rq_sectors(req);
+
+req_start and nr_sectors could be initialized when declared.
+
+Other than this, this looks fine to me.
+
+> +	zone_end = req_start + disk_zone_capacity(vblk->disk, req_start);
+> +
+> +	if (zone_end < req_start || sector < req_start || sector >= zone_end ||
+> +	    nr_sectors > zone_end - sector) {
+> +		dev_err_ratelimited(&vblk->vdev->dev,
+> +				    "zone append sector %llu + %u outside valid range [%llu, %llu)\n",
+> +				    (u64)sector, nr_sectors,
+> +				    (u64)req_start, (u64)zone_end);
+> +		return BLK_STS_IOERR;
+> +	}
+>  
+> -	if (req_op(req) == REQ_OP_ZONE_APPEND)
+> -		req->__sector = virtio64_to_cpu(vblk->vdev,
+> -						vbr->in_hdr.zone_append.sector);
+> +	req->__sector = sector;
+> +	return status;
+>  }
+> +#else
+> +static inline blk_status_t
+> +virtblk_update_zone_append_sector(struct request *req,
+> +				  struct virtblk_req *vbr,
+> +				  blk_status_t status)
+> +{
+> +	return status;
+> +}
+> +#endif
+>  
+>  static inline void virtblk_request_done(struct request *req)
+>  {
+> @@ -349,7 +379,7 @@ static inline void virtblk_request_done(struct request *req)
+>  	virtblk_unmap_data(req, vbr);
+>  	virtblk_cleanup_cmd(req);
+>  
+> -	virtblk_update_zone_append_sector(req, vbr);
+> +	status = virtblk_update_zone_append_sector(req, vbr, status);
+>  
+>  	blk_mq_end_request(req, status);
+>  }
+> @@ -1242,7 +1272,6 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
+>  
+>  		virtblk_unmap_data(req, vbr);
+>  		virtblk_cleanup_cmd(req);
+> -		virtblk_update_zone_append_sector(req, vbr);
+>  	}
+>  	blk_mq_end_request_batch(iob);
+>  }
+> @@ -1260,11 +1289,14 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+>  
+>  	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
+>  		struct request *req = blk_mq_rq_from_pdu(vbr);
+> -		u8 status = virtblk_vbr_status(vbr);
+> +		blk_status_t status;
+> +
+> +		status = virtblk_result(virtblk_vbr_status(vbr));
+> +		status = virtblk_update_zone_append_sector(req, vbr, status);
+>  
+>  		found++;
+>  		if (!blk_mq_complete_request_remote(req) &&
+> -		    !blk_mq_add_to_batch(req, iob, status != VIRTIO_BLK_S_OK,
+> +		    !blk_mq_add_to_batch(req, iob, status != BLK_STS_OK,
+>  					 virtblk_complete_batch))
+>  			virtblk_request_done(req);
+>  	}
+
+
+-- 
+Damien Le Moal
+Western Digital Research
