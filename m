@@ -1,97 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.98
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795235272;
-	b=k9mcIeqPww6TPxjqixW4rzyqG5X0SziOELkUYv/jt0uoBwTvfc3wY2sUJ92L/oc3t653
-	 KRlx8jUK3i0F/+QE0zGFR4yrBHVzI3o2+KPbUse5RWeH9RqGmS/INgJYce54+ljM2w17u
-	 Pg3H6tbKL9kXWDo2oqdkshzOyhv6wqAMBm5L0JNsqHGxvH4N2AbZB8/9N9k4QFOzr24fB
-	 BVA4gRAvMLNfFN4fDfke/SqBH9DPuUmu5CScyN5xtDrBL8mnGfCHVubl76m9XUEkr31Zd
-	 09TKOx+VZ8J88EIu54pegt/NcfM4AVoU25iqS6SLNE+xkzpZLN1lOJg/UuR77yOaWpA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795235272;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.179
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795238629;
+	b=I2El8pTB0Awm87V4O287Y8/QX72tcSyyJZL57nXXB2ByWpVsaHllQobSuqfFM2/om7c5
+	 ncb91rUoh+lRiXKI7RK6hpAil/E/wJeeqv+0Gv74HBEypYkXFZTlqbJRwgFnX9r1bMNFU
+	 y0rrdrg8OIo5TcMD7yZz7qAGs3K1PpGXnFB9m404zwhSNwqAEQWV5mhjZaG0v91tA9DjG
+	 JGNQhDFu7QLNbqcgwa2k3I14f7zLG2fQh0xCk51yhVlTdx4ZuPULPmN3TX+CA+BJs+Rg0
+	 a3qSRg9ZZd8fwYh0ye/cjO5BUeFWbW/zI9hSiJGOCFNsBjk99HN/TljRxm5kJQtkLQw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795238629;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 X-Relaying-Domain:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=Yi/uH6QkwQZeC/8s/khHkralPXKS62YQlHIuDLKLPe8=;
-	b=m5JjnHZ54D8rk0luBrX8wXR5iEVVTsEOUwz0nwjI9AS3k2+xgC9B0wms7cajx4snU3v7
-	 GumbSJZFpwgtxAYUhpEhD7M88Wmp+eWi496bOqYl0+Ju7q349HX87NmayaStgw9FRYwXg
-	 9i5HwjJvl0rNmnuyRyxxq2VEcA3h9yMaLic3jXP+AwSHnTlc2lU+pvsMgE9jMwmSIg4Cs
-	 JUDjWSHRMyxYzGrbKSA6Sonb4XFoHaG/gb5TxaBBzgoy9ZURZWxkZUlnMjOWgalrHr5CA
-	 8k1gfBCxCcDSbX+i1vWa3PvViQTtJfbBJWjF/QlkaZIbiYqPw23CQAcGGhP/yrp4JbQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=purestorage.com;
-	spf=pass smtp.mailfrom=purestorage.com;
-	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=a26IRCtD;
-	arc=none smtp.remote-ip=209.85.216.98
-Received: from mail-pj1-f98.google.com (mail-pj1-f98.google.com [209.85.216.98])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=ZxgWGW3Jd0IDrSARARfAMJtvz5q15JiqcmzOCWYp1E0=;
+	b=m+7w3Y4KreKkVDLZooS4NVIbRrczvvXc/KFIMwHRPXTA+f3AETx89KipuMkQxCsbfh9k
+	 bnWHVbt8cV4iNIUNWDN69GFuKeFE2ibjcVo1jvinCh0I19XU99y/kjRsr/V01DM/HWErB
+	 V9dV1B+qWp0hQbYmHcepAF2+zayqbkaAJI6ig5+xR9V7EZzCc3ix1quWPJfVskSSu8Zck
+	 cvnKoMRFCqrW67N5uq6SJW7PI48S/Xfnw7C0FqNuZ/6FReLZExwu6E3qD7uoHOExmbZ0K
+	 8YLhHCZAtPnaoMNzqlWHtmmB8DN9VvHMCHCmecqWeRg9e8CD1a1lJ9iy/8F8olbbMKw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=zze3KQLN;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.179
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A3C606A68D
-	for <linux-block@vger.kernel.org>; Sat, 21 Nov 2026 04:27:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C3A3C606A68D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A7B606A682
+	for <linux-block@vger.kernel.org>; Sat, 21 Nov 2026 05:23:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 35A7B606A682
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=a26IRCtD
-Received: by mail-pj1-f98.google.com with SMTP id 98e67ed59e1d1-3b083afebe4so224235a91.0
-        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 20:27:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=zze3KQLN
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-4e4a4d77e5bso1917553b6e.0
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 21:23:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795238628; cv=none;
+        d=google.com; s=arc-20260327;
+        b=pmc0c+ODMu1BlYecuF9ErDiTLRUyUX/QBUu4GaPhOIkY4umNlXXLLgoA+Q8zkwnOcB
+         ZGOvDVCUcH1yihYdRsY156hX//v2Sv5RMOylNiJNDIx1Xg0VaJZ5anQTocnZn1HEGEZ5
+         glXZeavtgqmSiWOBoHuFeCVpZGES1Z0jdLsqvi0zjOBMy8Q8H6ksQP/zoCKEK8ggFzaL
+         MeubDdrrmkAOnT3KuU5fZM5wCY+yCKzrNY25eEhymIuwDNZ2kZ8z5tD+m9MVWQPFJDEk
+         mvswRHPdH7bx8R+O7pF4q/MhXeOnyxBSqGKepA2TXyuQQPK4/5kO2H5FSeJNJo2OCDo5
+         eGWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZxgWGW3Jd0IDrSARARfAMJtvz5q15JiqcmzOCWYp1E0=;
+        fh=9+29bCqgU4BTx69UJQfsxGesmT+kGkZIIi6UKy8L5pQ=;
+        b=oPhwl24e3G/KsvsdUstTQAdQjo/FEqJArDgrwyACuF19gseDJw6tz8i+v2c71HkI50
+         N0GVwbfJG5l93olLqIxw1izyHW10gDlnXSG3eLzoPAuKzvqKdG8vloQEiHvslPaKu9DD
+         NlQmVeNKQQqgBpDV7XdsCrEIkqqSGYxrmHRdqg/OeiRyjEPLyPn/r5cUxjqHNvTWzJrP
+         Tk/BSV6lIs9YLLow8zDxiM9nKFYzqiPXj6uOTb56dIkbAuraI4IjSChycvfEZMuaBVdG
+         fcYdM/95a56yQ46wrjoPQbtvNRDkZd60u9fIp+r55dOtvIHuWM0zURSE1KZMfJAislQc
+         Jizg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1795235268; x=1795840068; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Yi/uH6QkwQZeC/8s/khHkralPXKS62YQlHIuDLKLPe8=;
-        b=a26IRCtDwTODN+RaMit+yGxvRC63u+qFT+5Nk0GzWa2B7BiknyiPwzW9oR51TRVFa4
-         0Q1nv/ESRhv5a4fXglln9Jar8b4NCbch4+f1LStDWQbGhPrCj0hzJNib+W3J2W4VyqrO
-         6oQQmJ212EyIrDsIkjYNeJJiyDQZiBkErW1X64J4/tgI7RnuLSMs7/uiX7wUflHpTZct
-         zUc8byaXuTjS9cMimNPqSbGR75IQxoGXX2SPTctlfW/QABWeD6jk2TB0Vu2G3J+os2Qo
-         Fhc2hoZSajwJhipvo1er7QCQZaLq1p0vxmVnlTV49j69CgkrGLKRykZ+FDmaovU371rG
-         3/hA==
+        d=gmail.com; s=20260707; t=1795238628; x=1795843428; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ZxgWGW3Jd0IDrSARARfAMJtvz5q15JiqcmzOCWYp1E0=;
+        b=zze3KQLNaSvxYJtnBiO+GQXybRXr9oyo5bl9FFqDF+LCPMI/1jE03nRdBhxHTqt+Bi
+         jMnZ61FpvuQdoJ7LRdNESJkweJwJ+gbLjyGYv0ilZoAg/v2aVfiSgd3tqqMC/xwbrN5m
+         4kdEB0IIBEYQnBiLvDBKcwWc+NmDqYMYw+7bete4cdcUBKQ0V5cJhZ3/1+wQAp/fZDgx
+         aEDYjtLDYldqRdl10epdRGZQ3P/dBxTP03p2p7W8l96vtuM49LxSEQ1cpaeMbfp3JvQH
+         uC6PofkIyK1c1UQUPLldOXUWE3Gv/RbQpWhi+wiXrFmqWvQaNkPaRxEofg9VOGpgt3sV
+         xsFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795235268; x=1795840068;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Yi/uH6QkwQZeC/8s/khHkralPXKS62YQlHIuDLKLPe8=;
-        b=a/WgCnnIGgwmIE1lgL5ju13AX/YaPlLGC+d8IX5lEdfwDojIqI+R0D5ICXduaamRl/
-         Bk7hQTVxrB+Wa5c58bA2sUZUDKr7K6F8uUZ0Of6uCKTtmoJVrpw+VWPZaS9G54P8ndAJ
-         t15fO8DwPQE/n9VvumZNWkJtwFnYCAt83yKwhqE8PhOCZTnvupgN8edbFIKOk7KZfGZk
-         Tq3M7fLyZhYkCPceF6uGWoKpjOBUyJeHBZoBkU4bsiOOn+gVYTUSkIBgnE0uOdn/z5fc
-         mVKw6yMPbKQ7MJBGxp6qSsFI2xRZZwyCwbsHVu9eoVUfMwmp5Mhksbt285EzY8w384eS
-         0Oeg==
-X-Forwarded-Encrypted: i=1; AL+hErHKQEXXvNSLiCo9qui9itbF6M5tUZwg6ITmYx1/l9eT1V2ijvOiSmDQrqOYyf/t4OKaLMf9ShtgUOCjig==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9FacyY/ty8gYymtp5nOoi/HNt9cYv5TEHZ4Wr6W7Yxox/ljfsV
-	J8NDOEsCKFWtHdlmH2ehQBoZbBSoja2RHW8PfLwauaoM0d+oS2DZ1foqBlsaenDMmujXuUOGvhI
-	ty8YJESeK4/lELZscrd8fMRIwSIiZkamFWIuQIwMLTwN0xfB1ASQG
-X-Gm-Gg: AZFdTZdCMFwhZL/kNS/uK0at4FOzQW/R86FoB+BIIrS1UB5sE6Poa8Mzo0luY7qbbP3
-	FAv5JsMNO5lz0z7ReCib3jrxbjSVge8v3PW94u1DP0vBoZ4agpZycUJG347htij2B6u4d2gMFcg
-	PhFFpF4KMInWrg9rHD0X1QC3tvQ63Fv7ZqKHbckIrXYgoA20Rt38gFSLRc2kXIDEkV3SPDHh53o
-	7LUw8gYw+MisBPSrnioRpClhQWIRuW0792iIHOJsWJXGwxjXlW8YzCzPjMh+ibMULcWOIfVuJTA
-	9CZlyiEnThPMmYEERBO6IouDgWoVQClZozk1SJ07YVZPQQnT5VV2X+EvRHXEspVf77p3+/JhT7t
-	uyBH2HPjoD43cbVRc0g==
-X-Received: by 2002:a17:90b:3d8d:b0:3ab:a188:b898 with SMTP id 98e67ed59e1d1-3b41c80b970mr8003532a91.2.1795235268031;
-        Fri, 20 Nov 2026 20:27:48 -0800 (PST)
-Received: from c7-smtp-2026.dev.purestorage.com ([2620:125:9017:12:36:3:6:0])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3b41add899dsm3314578a91.3.2026.11.20.20.27.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 20:27:48 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [IPv6:2620:125:9025:23::204])
-	by c7-smtp-2026.dev.purestorage.com (Postfix) with ESMTP id 58451401E3;
-	Fri, 20 Nov 2026 21:27:47 -0700 (MST)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 51C29E4010B; Fri, 20 Nov 2026 21:27:47 -0700 (MST)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Keith Busch <kbusch@kernel.org>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] block/t10-pi: deduplicate blk_reftag_remap_{prepare,complete}()
-Date: Fri, 20 Nov 2026 21:27:42 -0700
-Message-ID: <20261121042743.1139584-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.56.1
+        d=1e100.net; s=20260707; t=1795238628; x=1795843428;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ZxgWGW3Jd0IDrSARARfAMJtvz5q15JiqcmzOCWYp1E0=;
+        b=GXYO4KG5l0Saz58D4qn9EHWYsX5YNutAB1C2fZgcjsekqHKnZFuGlbtg0llYVyOu9G
+         V40NRu3ZlKDfsWDjary080+6cVlbVv4ppHR0Cc++kVpcJLdH9orsYp9UG8GbXnqeF7HF
+         Sqs9X0WBzuzs66kQgQtbX2nwxEOGzbYmBSWPjqo7oLDDxabblqV4GmZx4HxVUWZjykEN
+         tvyGh0IpR6DoHaIPy8F+V0OpzXX6nxUCn/gtDrF8/VN2Yoo07kNJAJZ+Zb4/CdrfuOv8
+         qfWm4WnuducYwE+u6l2ni3TwIapFqrlb1jtdYmGygyT4vWFCndr41u/qp2PjZvmYvX5r
+         Aiqg==
+X-Forwarded-Encrypted: i=1; AL+hErGaGi7l7OWGu7/8c5L9KX/K+uP7BLCDsJg9hB2oOCS0MdyrXyGTRQNdmeM9rkZ987YNMxdJ6yVMlJq1Ew==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8bjDMRgz0sgBDOS5d0cCJy7eTPpx32mWv/uvuliq1iKD5xIq4g
+	XQrsEjn8mKzZXS3hjCFWUrX6vdzImZY+OizcBsWlz7qxuBFy+WzfhrofHAYHtjsWTwEZ986PDzu
+	UJXmUVFYW2S27dSznQl08RrFPU/8oyZg=
+X-Gm-Gg: AYBFou2hFckv169CKgobiVzzT4RfVJqqHvDQ3UFDmnrsYf7cMTP1IgaEns8uiN1UXn8
+	sQRbcAboYxEZH2cHWbxCi6KWb9RSUgSITWjAQV/2z2LYM4xxpcySXy+Jc/HGAz5j7v7qMZQtxO1
+	ejnHl4RMN1ywNup7IwM/BmG14DrQ9eGtC6ptNa6YjKQyRDMR4bvyoW4/IpHXMP4S53+2OZpTUVL
+	sjXkLpTdzAg+S83rVM1Z2Wk96YrGZF+RjT+AAr5YkyXJtD1jcWANwXNdicxoGEwC/awR+dIG2fk
+	WYysyc1iMC47Ox2raI7+kCnVWAJm+2WlSLI+LGZWWmI2O5Ei6S3fX+S3tBZAKK7Z3W9E7n7A+xg
+	j0nHKbIsq6KareNo/H4EJe0gLag5NZGgdZs12T5CGx7PB1McyTPTbBed9v1881LNh+TSiJB0d43
+	cwPkp8ob7Gpi9xSuIFU9LY4ZyMsV7BkRc0JG9MIyei8b6qfWzPAfn4+yszWA==
+X-Received: by 2002:a05:6808:4f0f:b0:4f5:dc0d:e013 with SMTP id
+ 5614622812f47-579789cf52cmr6048212b6e.4.1795238628066; Fri, 20 Nov 2026
+ 21:23:48 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -101,160 +105,329 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAFS5DSFUi28HgX8t5bRRGVqPkOZ+VqrP+LtyMiwPQhyRpTxFTg@mail.gmail.com>
+ <556c4720-0159-4874-8d5b-6379566f6d4a@bsbernd.com> <CAFS5DSEhgk8fJgAwEn+-U-7vnBchCrx6L1uReT3Upm+AA22=Wg@mail.gmail.com>
+ <CAFS5DSEsdz8Eu1vmeCkE+6eeXgk+9yS6EwqyHSeD2jkq90DZaA@mail.gmail.com>
+In-Reply-To: <CAFS5DSEsdz8Eu1vmeCkE+6eeXgk+9yS6EwqyHSeD2jkq90DZaA@mail.gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Fri, 20 Nov 2026 23:23:35 -0600
+X-Gm-Features: Aa3M54r-1Qm2wOa9Pkp5dJnwKyl6aDgAycS9C5SRiXFExx6r8aHR9F25Y7zOCvQ
+Message-ID: <CACVXFVPEaJ6oPOaoZZo_XMpywHCzFWSYCrKG=srEDpCqPRp=Dw@mail.gmail.com>
+Subject: Re: [REGRESSION] ublk: dispatched IO intermittently never posts its
+ fetch completion (v7.0)
+To: Luciano Lo Giudice <lmlogiudice@gmail.com>
+Cc: Bernd Schubert <bernd@bsbernd.com>, linux-block@vger.kernel.org, 
+	io-uring@vger.kernel.org, regressions@lists.linux.dev, axboe@kernel.dk, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-blk_set_{t10,ext}_map_ref() and blk_set_{t10,ext}_unmap_ref() are
-identical except that one updates the PI ref tag from virt to ref_tag
-and the other does the opposite. And since blk_reftag_remap_prepare()
-and blk_reftag_remap_complete() just dispatch to the corresponding
-map/unmap functions based on the PI tuple format, they too are identical
-except for the ref tag update direction.
+On Fri, Nov 20, 2026 at 8:26=E2=80=AFPM Luciano Lo Giudice
+<lmlogiudice@gmail.com> wrote:
+>
+> Hello everyone,
+>
+> Using Bernd's repo, I was _unable_ to reproduce the bug after several
+> runs (it used to hang in about 1 out of 3 runs). I had to add a small
+> compat layer to make the module build in 7.0, but it was overall
+> pretty easy. I will be now using this module for any development on
+> 7.0 (thanks, Bernd!) and will report if any other issues arise.
 
-Combine blk_set_{t10,ext}_{un,}map_ref() into new functions
-blk_remap_{t10,ext}_ref() taking arguments "from" and "to". Also combine
-blk_reftag_remap_prepare() and blk_reftag_remap_complete() into
-a new function blk_tuple_remap(). In __blk_reftag_remap(), use the
-value of prep to select which value to pass as "from" and "to" to
-blk_tuple_remap().
+I can't reproduce it on 7.4-rc, and we did merge many similar fixes recentl=
+y.
+Unfortunately, 7.0 isn't a stable release, so can you move to 7.3
+stable release?
+Otherwise, you may have to sort out the backport by yourself.
 
-blk_set_ext_unmap_ref()'s check to skip setting already correct ref tags
-also had an extra lower_48_bits() that blk_set_ext_map_ref() lacked.
-Either approach is correct since the check is purely an optimization.
-blk_set_ext_unmap_ref()'s tighter condition would skip more redundant
-put_unaligned_be48() calls on a theoretical block device with more than
-2 ** 48 integrity intervals. So keep that tighter check in the combined
-blk_remap_ext_ref().
+Thanks,
+Ming
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
-v2:
-- Avoid ternaries to compute from and to (Christoph)
-- Rename blk_reftag_remap() to blk_tuple_remap() (Christoph)
-- Rename blk_set_{t10,ext}_remap_ref() to blk_remap_{t10,ext}_ref()
 
-v1: https://lore.kernel.org/linux-block/20261120064806.752251-1-csander@purestorage.com/
+>
+> All the best,
+> Luciano.
+>
+> On Fri, Nov 20, 2026 at 8:40=E2=80=AFPM Luciano Lo Giudice
+> <lmlogiudice@gmail.com> wrote:
+> >
+> > Hello Bernd,
+> >
+> > Yes, I can do that. I'll go ahead and compile ublk_drv from your repo
+> > for the 7.0 backport and see how that goes.
+> >
+> > All the best,
+> > Luciano.
+> >
+> > On Fri, Nov 20, 2026 at 8:27=E2=80=AFPM Bernd Schubert <bernd@bsbernd.c=
+om> wrote:
+> > >
+> > >
+> > >
+> > > On 11/20/26 23:55, Luciano Lo Giudice wrote:
+> > > > From: Luciano Lo Giudice <lmlogiudice@gmail.com>
+> > > > To: linux-block@vger.kernel.org, io-uring@vger.kernel.org
+> > > > Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+> > > >     stable@vger.kernel.org, regressions@lists.linux.dev
+> > > > Subject: [REGRESSION] ublk: dispatched IO intermittently never post=
+s its
+> > > >  fetch completion (v7.0)
+> > > >
+> > > > Hello everyone,
+> > > >
+> > > > I'm writing a library that implements various block devices in user=
+space by
+> > > > utilizing the ublk framework. Every so often, I'm hitting a complet=
+ion loss on
+> > > > Linux 7.0, in which an inflight request is lost forever, which lead=
+s to an
+> > > > unkillable process and a ublk block device that cannot be torn down=
+, and so the
+> > > > machine needs to be rebooted to remedy this. I've tested the attach=
+ed reproducer
+> > > > on 6.8, but found no hangs after many runs. Details of the bug are =
+below.
+> > >
+> > > Hi Luciano,
+> > >
+> > > I just scanned the io-uring list and found this by accident. I have b=
+een
+> > > working on this for a couple of month.
+> > >
+> > >
+> > > Would you be open to test a specific branch or dkms module? I actuall=
+y
+> > > wanted to send this to upstream last months already, but then found a=
+nd
+> > > fixed (with a lot of AI help) more issues and also got busy with othe=
+r
+> > > tasks.
+> > >
+> > > https://github.com/bsbernd/linux/tree/ublk-stop-races-with-tests-for-=
+7.3
+> > >
+> > > and here the backports, that also work on 7.0 (with a compat patch) a=
+nd
+> > > that is used for our dkms module
+> > >
+> > > https://github.com/bsbernd/linux/tree/niova-ublk-7.1-fix-backports
+> > >
+> > > The 7.3 patches are actually verified through tla+ and an ublk branch
+> > > for https://github.com/brauner/linux-formal
+> > >
+> > >
+> > > @Ming the patches for 7.3 include heavy ublk state changes (it is now=
+ a
+> > > bit closer to what fuse-io-uring does) and also adds debugfs that can=
+ be
+> > > used understand state issues.
+> > >
+> > >
+> > > Thanks,
+> > > Bernd
+> > >
+> > >
+> > > >
+> > > > 1. Environment
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > >
+> > > > - Breaks on 7.0.0-31-generic and 7.0.0-43-generic using the kernels=
+ that ship
+> > > >   with Ubuntu. Tested on amd64 and the ublk_drv module.
+> > > > - An identical binary was run on 6.8.0-117-generic but no hangs wer=
+e reproduced.
+> > > > - This was run on virtual machines provisioned with LXD and with 4 =
+CPUs.
+> > > > - After reading the code, I suspect the issue arises due to the 202=
+5 rework (the
+> > > >   list batching first appeared in 6.15 and the per-IO task tracking=
+ in 6.16).
+> > > >   I have not run any kernels between 6.8 and 7.0
+> > > >
+> > > > 2. About the attached reproducer
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > >
+> > > > - It's a single C file that requires only liburing.
+> > > > - 3 devices are loaded (2 are file-backed, the other memory-backed)=
+.
+> > > > - A fourth device is added, started, loaded (briefly), stopped and
+> > > >   deleted in a loop while the others are under loaded. This is the
+> > > >   fastest way I found to reproduce the issue.
+> > > > - On 7.0, this hangs within the first 2 runs. On 6.8, no hangs were
+> > > >   observed after more than 10 runs. When the issue is detected, the
+> > > >   program prints what evidence it can gather (per-device inflight
+> > > >   operation numbers, the running threads' waiting channels and the
+> > > >   io_uring's pending CQE counts).
+> > > > - Bonus: 2 additional bugs where found when shrinking the workload:
+> > > >   A queue was leaking its io_uring (keeping the chardev pinned), an=
+d
+> > > >   START_DEV issued for a queued that had died before arming. Both s=
+talled
+> > > >   the program identically on 6.8 and both were fixed in the attache=
+d version.
+> > > >
+> > > > 3. What indicates a failure (from userspace's POV)
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> > > >
+> > > > - The issue is always connected to a READ request:
+> > > >   /sys/block/ublkb$N/inflight yields "1 0" and is never modified ag=
+ain.
+> > > > - The thread that handles the queue is blocked in io_cqring_wait (a=
+s seen by
+> > > >   inspecting /proc/$TID/wchan), byt the ring has no entries to cons=
+ume.
+> > > > - The ublksrv_io_desc for the corresponding tag was written by the =
+kernel
+> > > >   at dispatch. The server reads descriptors after a CQE is posted, =
+but
+> > > >   this never happens.
+> > > > - There is no way (AFAIK) to recover the tag. The lost completion i=
+s the
+> > > >   one that would set UBLK_IO_FLAG_OWNED_BY_SRV so a COMMIT_AND_FETC=
+H for
+> > > >   the tag is rejected (returns -EINVAL).
+> > > > - Something very similar also shows on the control plane, which is =
+why I
+> > > >   suspect shared implementation details rather than something queue=
+-specific.
+> > > > - START_DEV, STOP_DEV and DEL_DEV will occassionnally never post th=
+eir CQE
+> > > >   after the kernel provably completes. In one capture, the deleted =
+block
+> > > >   device was already gone from /sys/block when the caller's 30 seco=
+nds
+> > > >   time bound fired. Repeated re-enters never produced the completio=
+n.
+> > > > - DEL_DEV was seen stalling 30-90 seconds on the kernel for operati=
+ons that
+> > > >   should complete instantly. The io-wq worker thread was blocked in=
+:
+> > > >
+> > > >   ublk_ctrl_del_dev
+> > > >     del_gendisk
+> > > >       blk_mq_freeze_queue_wait
+> > > >
+> > > >   the device was stuck half-deleted, and it reacted to ADD_DEV by r=
+eturning
+> > > >   -EEXIST for minutes. In the worst instance it survivied its own s=
+erver
+> > > >   exiting and stayed un-deletable (needed a reboot).
+> > > > - A START_DEV completed with -EINTR. The process was detached and a=
+rms no
+> > > >   signal sources. I didn't capture the pending signal set in that i=
+nstance,
+> > > >   so I cannot rule out a spurious signal, but the same op's immedia=
+te retry
+> > > >   stalled for a full 30 seconds.
+> > > > - Not needed to repro the bug: COOP_TASKRUN, readahead bursts, even=
+tfd wakeups.
+> > > >
+> > > > 4. Aftermath
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > >
+> > > > - AFter the request is lost, teardown hangs and takes the control p=
+lane with
+> > > >   it. Looking at /proc/*/wchan and dmesg of a hanged instance shows=
+ that the
+> > > >   teardown uring command (running in an io-wq worker) is stucj in
+> > > >
+> > > >   ublk_stop_dev/ublk_ctrl_del_dev
+> > > >     del_gendisk
+> > > >       blk_unregister_queue
+> > > >         elevator_set_none
+> > > >           blk_mq_freeze_queue_wait
+> > > >
+> > > >   And the message printed by the kernel is:
+> > > >
+> > > >     INFO: task iou-wrk-2115:2118 blocked for more than 122 seconds.
+> > > >     [...]
+> > > >      ublk_stop_dev_unlocked.part.0+0x38/0x160 [ublk_drv]
+> > > >      ublk_ctrl_uring_cmd+0x629/0x830 [ublk_drv]
+> > > >
+> > > > - Subsequent control command hangs on the control mutex:
+> > > >     task iou-wrk-12720:12721 is blocked on a mutex likely owned by =
+task
+> > > >     iou-wrk-12626:12629.
+> > > >     [...]
+> > > >      ublk_ctrl_get_params+0x8b/0x190 [ublk_drv]
+> > > >
+> > > > - Killing the process doesn't help. The worker thread keeps waiting=
+ on the
+> > > >   queue and the frozen queue waits for a request whose owner (the s=
+erver) is
+> > > >   gone. On 7.0, ublk_timeout(...) only takes action for unprivilege=
+d devices by
+> > > >   SIGKILL'ing the server. On privileged processes it retursn BLK_EH=
+_RESET_TIMER
+> > > >   so a lost request is re-armed forever and never aborted, even whe=
+n the
+> > > >   server is dead.
+> > > >
+> > > > - When the process exits, the io_uring io-wq teardown warns while a=
+ worker is
+> > > >   still stuck and the process remains a zombie. The following messa=
+ge is
+> > > >   printed by the kernel:
+> > > >
+> > > >     WARNING: io_uring/io-wq.c:1370 at io_wq_put_and_exit+0x10d/0x2e=
+0,
+> > > >     CPU#3: live_server_ram/2115
+> > > >
+> > > > 5. Where I suspect is the problem
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > >
+> > > > - Evidence points at the completion side of the 2025 rework.
+> > > > - per-IO task tracking ( ("ublk: require unique task per io instead=
+ of
+> > > >   unique task per queue", Pure Storage, 04/2025,
+> > > >   https://patchew.org/linux/20250416-ublk._5Ftask._5Fper._5Fio-v5-0=
+-9261ad7bff20@purestorage.com/):
+> > > >   our fetches are all submitted by the queue's own thread, so io->t=
+ask
+> > > >   should always match at dispatch time;
+> > > > - rq_list batching: ublk_queue_rqs() coalesces same-<ctx_handle, ta=
+sk>
+> > > >   requests into one list and queues a single
+> > > >   io_uring_cmd_complete_in_task(io->cmd, ublk_cmd_list_tw_cb) for t=
+he
+> > > >   whole batch. If that single task work is lost, every request in t=
+he
+> > > >   list strands - the observations are consistent with one lost requ=
+est per
+> > > >   occurrence.
+> > > >
+> > > > 6. Follow-ups
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > >
+> > > > - Does this ring any bells in the 7.0 completion rework (lost task =
+work
+> > > >   for ublk_cmd_list_tw_cb / ublk_cmd_tw_cb, or io->task mismatch ta=
+king
+> > > >   a path that neither completes nor aborts)? Is a fix already in
+> > > >   flight?
+> > > > - Independently of the completion loss: should ublk_timeout() for
+> > > >   privileged daemons fail a request whose ublk server is gone? Toda=
+y
+> > > >   BLK_EH_RESET_TIMER keeps a lost request - and with it the del_gen=
+disk
+> > > >   freeze and the control mutex - stuck forever after server's death=
+,
+> > > >   which turns a single lost completion into a machine-level hang.
+> > > >
+> > > > I can test candidate patches on 7.0.0-43 or bisect across 6.15-7.0 =
+on a
+> > > > VM, or capture the trace of a missing completion.
+> > > >
+> > > > #regzbot introduced: v6.8..v7.0
+> > > >
+> > > > Best regards,
+> > > > Luciano
+> > >
 
- block/t10-pi.c | 73 ++++++++++++++------------------------------------
- 1 file changed, 20 insertions(+), 53 deletions(-)
 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index a19b4e102a83..06d4eaa6d292 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -434,73 +434,36 @@ static void blk_tuple_remap_end(union pi_tuple *tuple, void *ptuple,
- 	}
- 
- 	bvec_iter_advance(bip->bip_vec, iter, len);
- }
- 
--static void blk_set_ext_unmap_ref(struct crc64_pi_tuple *pi, u64 virt,
--				  u64 ref_tag)
-+static void blk_remap_ext_ref(struct crc64_pi_tuple *pi, u64 from, u64 to)
- {
- 	u64 ref = get_unaligned_be48(&pi->ref_tag);
- 
--	if (ref == lower_48_bits(ref_tag) && ref != lower_48_bits(virt))
--		put_unaligned_be48(virt, pi->ref_tag);
-+	if (ref == lower_48_bits(from) && ref != lower_48_bits(to))
-+		put_unaligned_be48(to, pi->ref_tag);
- }
- 
--static void blk_set_t10_unmap_ref(struct t10_pi_tuple *pi, u32 virt,
--				  u32 ref_tag)
-+static void blk_remap_t10_ref(struct t10_pi_tuple *pi, u32 from, u32 to)
- {
- 	u32 ref = get_unaligned_be32(&pi->ref_tag);
- 
--	if (ref == ref_tag && ref != virt)
--		put_unaligned_be32(virt, &pi->ref_tag);
-+	if (ref == from && ref != to)
-+		put_unaligned_be32(to, &pi->ref_tag);
- }
- 
--static void blk_reftag_remap_complete(struct blk_integrity *bi,
--				      union pi_tuple *tuple, u64 virt, u64 ref)
-+static void blk_tuple_remap(struct blk_integrity *bi, union pi_tuple *tuple,
-+			    u64 from, u64 to)
- {
- 	switch (bi->csum_type) {
- 	case BLK_INTEGRITY_CSUM_CRC64:
--		blk_set_ext_unmap_ref(&tuple->crc64_pi, virt, ref);
-+		blk_remap_ext_ref(&tuple->crc64_pi, from, to);
- 		break;
- 	case BLK_INTEGRITY_CSUM_CRC:
- 	case BLK_INTEGRITY_CSUM_IP:
--		blk_set_t10_unmap_ref(&tuple->t10_pi, virt, ref);
--		break;
--	default:
--		WARN_ON_ONCE(1);
--		break;
--	}
--}
--
--static void blk_set_ext_map_ref(struct crc64_pi_tuple *pi, u64 virt,
--				u64 ref_tag)
--{
--	u64 ref = get_unaligned_be48(&pi->ref_tag);
--
--	if (ref == lower_48_bits(virt) && ref != ref_tag)
--		put_unaligned_be48(ref_tag, pi->ref_tag);
--}
--
--static void blk_set_t10_map_ref(struct t10_pi_tuple *pi, u32 virt, u32 ref_tag)
--{
--	u32 ref = get_unaligned_be32(&pi->ref_tag);
--
--	if (ref == virt && ref != ref_tag)
--		put_unaligned_be32(ref_tag, &pi->ref_tag);
--}
--
--static void blk_reftag_remap_prepare(struct blk_integrity *bi,
--				     union pi_tuple *tuple,
--				     u64 virt, u64 ref)
--{
--	switch (bi->csum_type) {
--	case BLK_INTEGRITY_CSUM_CRC64:
--		blk_set_ext_map_ref(&tuple->crc64_pi, virt, ref);
--		break;
--	case BLK_INTEGRITY_CSUM_CRC:
--	case BLK_INTEGRITY_CSUM_IP:
--		blk_set_t10_map_ref(&tuple->t10_pi, virt, ref);
-+		blk_remap_t10_ref(&tuple->t10_pi, from, to);
- 		break;
- 	default:
- 		WARN_ON_ONCE(1);
- 		break;
- 	}
-@@ -519,17 +482,21 @@ static void __blk_reftag_remap(struct bio *bio, struct blk_integrity *bi,
- 		*ref += bio->bi_iter.bi_size >> bi->interval_exp;
- 		return;
- 	}
- 
- 	while (iter.bi_size && *intervals) {
--		ptuple = blk_tuple_remap_begin(&tuple, bi, bip, &iter);
--
--		if (prep)
--			blk_reftag_remap_prepare(bi, ptuple, virt, *ref);
--		else
--			blk_reftag_remap_complete(bi, ptuple, virt, *ref);
-+		u64 from, to;
- 
-+		ptuple = blk_tuple_remap_begin(&tuple, bi, bip, &iter);
-+		if (prep) {
-+			from = virt;
-+			to = *ref;
-+		} else {
-+			from = *ref;
-+			to = virt;
-+		}
-+		blk_tuple_remap(bi, ptuple, from, to);
- 		blk_tuple_remap_end(&tuple, ptuple, bi, bip, &iter);
- 		(*intervals)--;
- 		(*ref)++;
- 		virt++;
- 	}
 
-base-commit: 6e6d4b23e92742a9f56008beb35c20ed4902611b
--- 
-2.56.1
-
+--=20
+Ming Lei
