@@ -1,99 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.161.42
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795218025;
-	b=x9OgLwOSfM8G02qvT6G/lo3mIpUTLm5j8lBYttdPQ3NFFpz66K3Im2oKxzZhCDd1jrMk
-	 IzBDRdBX7Wnu9KpWYB1KA2oul4TzeB3/C9xcR67Zdo2EzAMbE2feDSdAiXbL+jMKV492N
-	 s/SwFcl/ECIRJXAv4gnjOc+vm4ouZBJHcFsaLmEysG894LAcCiXS0uCq3ojN2zAAmiS8j
-	 /pbRaz+pqGewkRCbjpQC092coO9sMkQRIKSqe55QOVGmj6KI+Lp+UjtiKAC4lFG0jO4fa
-	 eYbX/2u0JuYhFxx8j9bmAwleV6EFYXcz0PMwxhjhLTjBkHhrpwhACouzGvbpl3RXXbw==
+	t=1795219683;
+	b=Zny9VRqjtNh2tJmz6GuUbv6Kt9jGXddMeCfIUyrMKJrOzR+SobJPi1guT14n4IeCz1ha
+	 nZ2V7sZCAigpj9uWR7WuDRt9mWtVj+hihHevLusmUYMwmJ0G1GFuEE9NStqaj/KZxnrG8
+	 pJwAP972j3gbYm81uQCTOpkmqAsfo8P+zWdhaAuuxcCEt/LNUN2sHIi2tPAcMedQCRDMl
+	 UJnkufZd7iPSE2XTTTWow0ZcYVQNEEHqPWW8K1Adt6S7GbQwHSpyoBHCtHX73i2LjDMwA
+	 6erRNZdwGevsXKcTHoqz9miPzlu2Nj6AroWQ8gns/yrpOtSmJ2eGdYIEVk5WORtz/vA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795218025;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795219683;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=P575Q9brE/+upDEGKX8xapQROmOnKTqfCZs6ZbbAFyE=;
-	b=XZtirR7//BvJZ+LhqdGGSPszrTN1N/+im8msuEx7OlcRIVXRJGjWQTZRkWDbHcjrRxxc
-	 x7wMsoutly0hJBnjRZ8Zl01n3OJzhcJwriB1PgQbSC9nvlYuBoyfMwix8E4bcSUcpdG9R
-	 oCK923x2GNGOx2llFchvjE6zrec54CbAHoXxx2V625MHWWgNK10ug/DtKr5Oy9o4BhBNb
-	 MhurG9hZd4drE1XM8qKBagQ9D4n0ipcP3V+lhOon6EFgpXluSFvz0xuvmilmn/IACWXW+
-	 gaibzZ6z9EIP64jXQKQYnYCHPk+VNS74GyDNb40c3Medlsz4P8OvykfD23DWgNL9dcg==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=FsYdnJMQiXGx+l4wB1iS5+Tppoq3uO18Wl9vnGYexkM=;
+	b=blshuXMc6ZnC9Eyw+r8CaoYcF30kUTWCMVcTtQzvkB5WKYhNwQ9MypfPsHNhTa3n72f9
+	 WrQV1OIDlBODxqcF86KaXP78Si+fQi7U83jcKF5wWMJGbv/FGPfjYmawQQOj8URyiWg+a
+	 6HH7sxHy7BCBT78Diik9HYSe7jnemwKzMsDnUGtd47vfpHr8R/IJLj7XfUWjvtEKMCBhB
+	 Jfe8pYfqmiVE1odlj9CAWd5zH9PVKbVhXlOMO76kPSrHtd5mTBTEHgQfclB1XgKOYdqkf
+	 qhxnJV2V0dwZCBZ+aoBMeS4DrDrbD2O1TahD+gmefXmb4Ex8Gh76v4hHUJh3xjVLbGw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LTsIrEnj;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.53
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	dmarc=pass header.from=purestorage.com;
+	spf=pass smtp.mailfrom=purestorage.com;
+	dkim=pass header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=Ed2U7PXw;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.161.42
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A8D606A698
-	for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 23:40:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 05A8D606A698
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C88606A69C
+	for <linux-block@vger.kernel.org>; Sat, 21 Nov 2026 00:08:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 94C88606A69C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LTsIrEnj
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-679aeeddc6bso1462986d50.2
-        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 15:40:22 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795218022; cv=none;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.a=rsa-sha256 header.s=google2022 header.b=Ed2U7PXw
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-716f259f52eso32163eaf.1
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2026 16:08:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795219679; cv=none;
         d=google.com; s=arc-20260327;
-        b=kSuf6GahnSW6KwfEWQy1xeL2RWlZ71/+w6GY8LLiRcgoPqs6+Eqj0qxBVGODiANK8u
-         kut3F2HNMsCdSO5V+ZOPUJ23gmdQub4yaMJWP1F3b/EPk+AUvR7j7frBGycYzXio8nIm
-         rx5UTyfkxknzQNpcd12HwsW/q2BiIVtocgXdtMQaMEUVgIYlsO6Cu8UzUgbuPyE2qLut
-         5zN3OiBhmhrBUSoTvH1Buy2nciKRisKNcKolTrUX2bQz3Xxlo1R67fJuJh44iVJdX249
-         MEMgPhhCs9qYHThfZfwIjo/4s8LI/uP8FgqEoYa6REniPbZm2Lp0+Myov+r7/FIOgHbe
-         1JQQ==
+        b=VXWZEPth25HUVf5HEg+zRGNfReJ4I8X7ExJmeLDtXksyGOlIXduGvzd8ojayl1G3zz
+         v+OwSQ1WF6ez9Tkd9BQL4fIWJHkEZJk4hwYVLY2rTjaaK8MCoUYiDCdxYCRZmDlS+ORV
+         +8hnLdcEoEbyiaPwXxdHpM7ksreuQQwljTFJrNrKmOrM7ciuh+3YGgv1z4ie1eUwD0Vx
+         hyz82cEYSO01x5PnCLDxY+1OWCOke89Rf4rdPKBhPbhgm7fd9L4dx/FLT3CdcotHQ9BW
+         xSZh1vNXtRcCqwdsJAiymv2+6HEkgG8rNV06xkrUxiiFjmXZwwVsHS+f1BH27uKQutpG
+         Ce6g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=P575Q9brE/+upDEGKX8xapQROmOnKTqfCZs6ZbbAFyE=;
-        fh=nywHiBQObux+AKTKPL09//ZFUzAcz+dNIMyPSYw0jIQ=;
-        b=ox+CNrNKWDP0Vwopt8ATxB27EzbBEbv6uxrIMxRNvdNOvj2SGieoj9AjaJoKWi0qGx
-         qSUw4JbJax4pvgLVSwLYuaPlbrzcL331YPp4C/C9W4ymrgO3a36eWCg6fjSBXlFX+vtr
-         cpdIF8pQCqK8rrjeSRJwPUrrEVtS3MMSKAlLymxsBLHrBvt5nQyDoaNzuiT8MjLbIoIO
-         +NJhGTUApkCLw6mURihz/vmcJUm/BsNqRRSJlIQbS9/NkDtTsqbSwg+piAzznhBCxVys
-         reuv4gZiyseudeDPtsDXzW8cSvOiup+HJmlWPlCNFFI4LemVQIN6ygfiG4mNuAoLtkuL
-         ilog==;
+        bh=FsYdnJMQiXGx+l4wB1iS5+Tppoq3uO18Wl9vnGYexkM=;
+        fh=8WcqJMa5oi67G99qCGQsms9Nllzvkotq1+9SJfbKQkY=;
+        b=rjvWo0TcvJV3lMc0eZQ1G8Xcmru+ZVa/ERH6LpXlonaPqM5717d1Th3HsLE9oRUkBk
+         GSRajVH0Rc6Ql63ekm0UutLLU8Z9JwH+D6PKt3Du481cC5qsIo5EY8StUMqB7yX/7n1O
+         WMiaWiF2ZaaWUIXQVF975gnFtlCoQQfEd57D8PRw8a5JJSCouAds318XldNP2d/T1Jgy
+         eeErTIS2bUNV+/2Dn+CPD2SeQBARItJtmyOj5HYWFRBkR4oS1a8N/jj2k6ozwQjYmf/w
+         dA4zHbAqegy0O8H7B/MKxSK70Vaemj8dI5iN+KiL+018Gh97qJeDvahwHrIb7T26mBCi
+         FmJg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795218022; x=1795822822; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1795219679; x=1795824479; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=P575Q9brE/+upDEGKX8xapQROmOnKTqfCZs6ZbbAFyE=;
-        b=LTsIrEnjM1Z8Scsa2rHSnmi2P0zH2qbuHBDRFUWRw9ZO2ElAGo3z2FrSd7b92HKRDu
-         dPKCdW45zD4QsSNXsPAi/rNZxAFc+k2BqoJPuOiteVkxmWFNXKgmVu6nnn+wjkXst1Yt
-         EYN9Umf3jHCRB7lQIyasjUjJyshUeEjhPEId0YExsUNEKeEzVLBzwAwO/lox0tiM+oe6
-         RT7FSk7LaNdAQ3zVQvN5tYsWNx9wxZzKggIYdMUe8u8wzHA9pf5ve3DKetSeYTp9fZhV
-         lpq6eg+iFRZFSGzjmoclOByYKK4SgoeqIArkjPyRbvnYRfV7XYdYCtnseEmdHbE+PZ+i
-         6IqA==
+        bh=FsYdnJMQiXGx+l4wB1iS5+Tppoq3uO18Wl9vnGYexkM=;
+        b=Ed2U7PXw6MISwxBLMOCl+VIadm1US5dV+Ir45yownslIgxA8LVqntjLWpYBc0Eb3ih
+         tuBOgHGJlmEiI9IG+4enilv0JZqtryrgJcEVls4oyensXmdxdLCdhEsS3QK/PE9GQYfo
+         T2TzLop2IOwT5Jby8AZJEsKqgLn3uEyIqaFon2Z3Yflw8KuvdMwC3+rKEd30ADiTiTX8
+         q8Er/iHZm8vsSNpRI83WDVEisA4kjGFtAVn5fRR90a3gt+aqgUjEz2nuRqJGZjQZIQfV
+         +OL6nEUtDY8rqjdJgMBZfgMSfq+kpalrgBtVkNl/77i04XJ3j/kEpoeh01v18xUtW/ge
+         RCPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795218022; x=1795822822;
+        d=1e100.net; s=20260707; t=1795219679; x=1795824479;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=P575Q9brE/+upDEGKX8xapQROmOnKTqfCZs6ZbbAFyE=;
-        b=1pqT88CgGpo96EeD0qj5KRGl/A4HOypdMK768J4Zh4msVr/ZPLvd5w2vGC4pjEPCbI
-         xQRGctXC8sPWbsoomKnwjBqERBLkSzKeCo90znG9D+iFXZQhBK3DiEXGQstg7Pg97DdJ
-         Kqve24S9+c7eRiGwdgFNaDU7VCGw6DgcNgyG3sQk4WT5bPd24l8jt2dSqfIMd17rwgt5
-         HcCAntdUPSvaQyVaQtfQSJ79/UImh2bVfd5YCdVfhNzIGVZ2g0YgEBqLJ27DiFOTpFe3
-         sXGggXbZSqW3NZaaXUzdivS7PnN8o7IdJWpL7xLK9HlwDHdROul2N0Dcg4ggOSv/PO+S
-         N2cA==
-X-Gm-Message-State: APuU4Z9YFzuRzZkXEV7U6cNEeGOnBHs8r15twNgbwl9FW9NHMAle486s
-	ujDIUHyxDaB7W5OES4l6CZdjJtJ7DI3cHhJSYV99/zbxf8FmkEAOBqgYithxQb8q4XCNAmgPp9M
-	sigwelg/Qi6FAmF2P+OPiDWgoEYIjiNU=
-X-Gm-Gg: AZFdTZeqqDPNR3E7IJB4RgmmHjvNkeVolAxAEpJXKqBU+YGUJozP7OTJpItA/nsuNas
-	U0AIf62BxCLukhhlmWJfQTN8iX6TavQ5Hv8OGPQrDOI5I06fbeW29Ic4GUQL6VUkoTfOzGbaHNc
-	xyNqh5niCGE5ZMzvZouAX47jgDsXKO66zrBAXI4mkSW4CNQGqZTJPFB1C4Exx/vfKs89548Q1ze
-	QjV2/b6h1ZnH1/tewHRsuV5spfuoYLB3Ogwy2fAOI1gQqPoYT2XIT+erM2XOeLk9prkExfd2/kw
-	GMt1GSzWAymLnSJH99M+S+bzsGyx5JIeTgZBm5n8/OrZN0eXRgDM6TCa4JuJmuV2y9aVgItEsnI
-	DpXMzhFSuUZMMip2DVNZzbugKPHfc/pZgkuU=
-X-Received: by 2002:a05:690e:478f:10b0:67d:c046:4f74 with SMTP id
- 956f58d0204a3-67df44234b3mr1082543d50.25.1795218022001; Fri, 20 Nov 2026
- 15:40:22 -0800 (PST)
+        bh=FsYdnJMQiXGx+l4wB1iS5+Tppoq3uO18Wl9vnGYexkM=;
+        b=qjlPbeX0x3IkUxDjAxw7WoH1LrJ2Kq09rghJyIjW2WqctHiFISXIdZTg90wl8HrVEp
+         MURIY3/xFGEHddzu4tvMkaKBqS59hhL46yF0L9uB6jJg2gdwPSergRmxzTW6vjvp2nEB
+         6k8YogynT6F06xZtiyiR5HZArcBnbHUJvFEjrJhNfBNXIaa1xQsxLOchAYo5vq7c//03
+         89Ap3EfGVY6A5nVcs+Ln9JaJKU44zhEuvnTFSLtmGTfl4/Q07Dc2sI/0+8jFxvMAETLk
+         kfsQgWNiq84nSMuL8476ZIDjTFXRaRHvoQBA48QDZ6020pqUNGeAG/AdFl3v4qJ0MnWO
+         z+WA==
+X-Forwarded-Encrypted: i=1; AL+hErH+ygldOfYUmwQnhrR9aMjUcVNcFom1vCWGtZNd6Vzg+aju/GlWp1XSTpR/ljzeWz+60PI/CNPJ1/sEvg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+9WRJmADzASu89ymg64RhyFxaCumhrPvJ3rHzXSpSeEgGAQ4CL
+	s6ovaEEdXSUMqrHMnPbXLYzkIu0XBRiy8ahHplb8/HZnLCxn1SjdSE+1EWd3rhVom1x8EXYB3o3
+	e3Egvj0TKaGHVJIDO1m9+JnxOQZHhJuvoBXZcY+k5EA==
+X-Gm-Gg: AYBFou2Hy+shu7SPCWbRC02WC4L7V6OJs/W9Fn5swqWEkWnESMOwPmfPZon1GCwupXr
+	y6T0xf0+wqk18g2Zb3Rsy3Bp5V4TtS+KSF4EiDf7uW2HIpZQnvkTEAUp0crwoaOgifcsASJVyMo
+	X5u0a5f4bHDXCvhTZnkZzPQBe1UYwhiGD34jOMNHBGt3RoJG5J69DIUE7rvzppLQsVNw4uKhHoG
+	SRzHewgAe+Bn61c/k+6p1IQZNxBIpXAw/IS81TKeBWzZ6cLIz2lonW5voyFW17z1VQI/+LjSltR
+	SSqTeiLPCpw4lzcAaBKZ4MTaOgJNmaJrvSLD8zQ3s0viXVg8utErlGPtqlAH/6tXTDNxXgUNXoT
+	piBm+rdtfhlnjgunm6Zk9WGYDikR20sRIdgdN
+X-Received: by 2002:a05:6820:8599:10b0:70d:73e2:ff02 with SMTP id
+ 006d021491bc7-71b3932ca28mr4872166eaf.1.1795219679399; Fri, 20 Nov 2026
+ 16:07:59 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -103,266 +104,113 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <CAFS5DSFUi28HgX8t5bRRGVqPkOZ+VqrP+LtyMiwPQhyRpTxFTg@mail.gmail.com>
- <556c4720-0159-4874-8d5b-6379566f6d4a@bsbernd.com>
-In-Reply-To: <556c4720-0159-4874-8d5b-6379566f6d4a@bsbernd.com>
-From: Luciano Lo Giudice <lmlogiudice@gmail.com>
-Date: Fri, 20 Nov 2026 20:40:09 -0300
-X-Gm-Features: Aa3M54rtJZ9pDNW5zIOi0412D3UCWrKeKTEw-1RlRRJd1NmXScLarnrzrZaMguk
-Message-ID: <CAFS5DSEhgk8fJgAwEn+-U-7vnBchCrx6L1uReT3Upm+AA22=Wg@mail.gmail.com>
-Subject: Re: [REGRESSION] ublk: dispatched IO intermittently never posts its
- fetch completion (v7.0)
-To: Bernd Schubert <bernd@bsbernd.com>
-Cc: linux-block@vger.kernel.org, io-uring@vger.kernel.org, 
-	regressions@lists.linux.dev, axboe@kernel.dk, stable@vger.kernel.org, 
-	Ming Lei <tom.leiming@gmail.com>
+References: <20261120195644.19511-1-zakaria.belkadi@inria.fr>
+In-Reply-To: <20261120195644.19511-1-zakaria.belkadi@inria.fr>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Fri, 20 Nov 2026 16:07:48 -0800
+X-Gm-Features: Aa3M54rN4fU2kZ1g3VyH3yN2HzL0XDhjtM9rK5s54_qMhP3uUFFQ5hk9tg3rtPg
+Message-ID: <CADUfDZpvgi5t_iy2AOhUTfQ9p9XNC_xosdKkMsQ-D11KntK-Yg@mail.gmail.com>
+Subject: Re: [PATCH v2] block: bounce user PI when writes may remap reference tags
+To: Zakaria Belkadi <zakaria.belkadi@inria.fr>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@kernel.org>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>, 
+	Anuj Gupta <anuj20.g@samsung.com>, florence.schadle@ssi.gouv.fr, 
+	frederic.tronel@centralesupelec.fr, louis.rilling@irisa.fr
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hello Bernd,
+On Fri, Nov 20, 2026 at 11:56=E2=80=AFAM Zakaria Belkadi
+<zakaria.belkadi@inria.fr> wrote:
+>
+> On an io_uring O_DIRECT write, bio_integrity_map_user() can attach the
+> caller's protection information (PI) buffer directly to the bio. The
+> block layer pins the pages for reading, but reference-tag remapping can
+> write to those same pages.
+>
+> A caller with write access to a block device whose integrity profile
+> enables reference-tag remapping can therefore modify a page it can
+> only map for reading. In testing, remapping changed a tag in the page
+> cache of a read-only file. With a PI buffer backed by the shared zero
+> page, the kernel faulted during remapping.
+>
+> Use the existing bounce-buffer path for REQ_OP_WRITE when the queue's
+> integrity profile has BLK_INTEGRITY_REF_TAG set. This copies the PI
+> buffer into kernel memory before remapping, so the caller's buffer
+> retains its original reference tags.
+>
+> I found this issue during a source review assisted by an LLM.
+>
+> Fixes: 3d8b5a22d404 ("block: add support to pass user meta buffer")
+> Cc: stable@vger.kernel.org
+> Suggested-by: Christoph Hellwig <hch@infradead.org>
+> Signed-off-by: Zakaria Belkadi <zakaria.belkadi@inria.fr>
 
-Yes, I can do that. I'll go ahead and compile ublk_drv from your repo
-for the 7.0 backport and see how that goes.
+This approach also looks good, thanks.
 
-All the best,
-Luciano.
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-On Fri, Nov 20, 2026 at 8:27=E2=80=AFPM Bernd Schubert <bernd@bsbernd.com> =
-wrote:
->
->
->
-> On 11/20/26 23:55, Luciano Lo Giudice wrote:
-> > From: Luciano Lo Giudice <lmlogiudice@gmail.com>
-> > To: linux-block@vger.kernel.org, io-uring@vger.kernel.org
-> > Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-> >     stable@vger.kernel.org, regressions@lists.linux.dev
-> > Subject: [REGRESSION] ublk: dispatched IO intermittently never posts it=
-s
-> >  fetch completion (v7.0)
-> >
-> > Hello everyone,
-> >
-> > I'm writing a library that implements various block devices in userspac=
-e by
-> > utilizing the ublk framework. Every so often, I'm hitting a completion =
-loss on
-> > Linux 7.0, in which an inflight request is lost forever, which leads to=
- an
-> > unkillable process and a ublk block device that cannot be torn down, an=
-d so the
-> > machine needs to be rebooted to remedy this. I've tested the attached r=
-eproducer
-> > on 6.8, but found no hangs after many runs. Details of the bug are belo=
-w.
->
-> Hi Luciano,
->
-> I just scanned the io-uring list and found this by accident. I have been
-> working on this for a couple of month.
->
->
-> Would you be open to test a specific branch or dkms module? I actually
-> wanted to send this to upstream last months already, but then found and
-> fixed (with a lot of AI help) more issues and also got busy with other
-> tasks.
->
-> https://github.com/bsbernd/linux/tree/ublk-stop-races-with-tests-for-7.3
->
-> and here the backports, that also work on 7.0 (with a compat patch) and
-> that is used for our dkms module
->
-> https://github.com/bsbernd/linux/tree/niova-ublk-7.1-fix-backports
->
-> The 7.3 patches are actually verified through tla+ and an ublk branch
-> for https://github.com/brauner/linux-formal
->
->
-> @Ming the patches for 7.3 include heavy ublk state changes (it is now a
-> bit closer to what fuse-io-uring does) and also adds debugfs that can be
-> used understand state issues.
->
->
-> Thanks,
-> Bernd
->
->
-> >
-> > 1. Environment
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > - Breaks on 7.0.0-31-generic and 7.0.0-43-generic using the kernels tha=
-t ship
-> >   with Ubuntu. Tested on amd64 and the ublk_drv module.
-> > - An identical binary was run on 6.8.0-117-generic but no hangs were re=
-produced.
-> > - This was run on virtual machines provisioned with LXD and with 4 CPUs=
+> ---
+> v2:
+> - Bounce the user PI buffer instead of pinning it for writing (Christoph)=
 .
-> > - After reading the code, I suspect the issue arises due to the 2025 re=
-work (the
-> >   list batching first appeared in 6.15 and the per-IO task tracking in =
-6.16).
-> >   I have not run any kernels between 6.8 and 7.0
-> >
-> > 2. About the attached reproducer
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > - It's a single C file that requires only liburing.
-> > - 3 devices are loaded (2 are file-backed, the other memory-backed).
-> > - A fourth device is added, started, loaded (briefly), stopped and
-> >   deleted in a loop while the others are under loaded. This is the
-> >   fastest way I found to reproduce the issue.
-> > - On 7.0, this hangs within the first 2 runs. On 6.8, no hangs were
-> >   observed after more than 10 runs. When the issue is detected, the
-> >   program prints what evidence it can gather (per-device inflight
-> >   operation numbers, the running threads' waiting channels and the
-> >   io_uring's pending CQE counts).
-> > - Bonus: 2 additional bugs where found when shrinking the workload:
-> >   A queue was leaking its io_uring (keeping the chardev pinned), and
-> >   START_DEV issued for a queued that had died before arming. Both stall=
-ed
-> >   the program identically on 6.8 and both were fixed in the attached ve=
-rsion.
-> >
-> > 3. What indicates a failure (from userspace's POV)
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-> >
-> > - The issue is always connected to a READ request:
-> >   /sys/block/ublkb$N/inflight yields "1 0" and is never modified again.
-> > - The thread that handles the queue is blocked in io_cqring_wait (as se=
-en by
-> >   inspecting /proc/$TID/wchan), byt the ring has no entries to consume.
-> > - The ublksrv_io_desc for the corresponding tag was written by the kern=
-el
-> >   at dispatch. The server reads descriptors after a CQE is posted, but
-> >   this never happens.
-> > - There is no way (AFAIK) to recover the tag. The lost completion is th=
-e
-> >   one that would set UBLK_IO_FLAG_OWNED_BY_SRV so a COMMIT_AND_FETCH fo=
-r
-> >   the tag is rejected (returns -EINVAL).
-> > - Something very similar also shows on the control plane, which is why =
-I
-> >   suspect shared implementation details rather than something queue-spe=
-cific.
-> > - START_DEV, STOP_DEV and DEL_DEV will occassionnally never post their =
-CQE
-> >   after the kernel provably completes. In one capture, the deleted bloc=
-k
-> >   device was already gone from /sys/block when the caller's 30 seconds
-> >   time bound fired. Repeated re-enters never produced the completion.
-> > - DEL_DEV was seen stalling 30-90 seconds on the kernel for operations =
-that
-> >   should complete instantly. The io-wq worker thread was blocked in:
-> >
-> >   ublk_ctrl_del_dev
-> >     del_gendisk
-> >       blk_mq_freeze_queue_wait
-> >
-> >   the device was stuck half-deleted, and it reacted to ADD_DEV by retur=
-ning
-> >   -EEXIST for minutes. In the worst instance it survivied its own serve=
-r
-> >   exiting and stayed un-deletable (needed a reboot).
-> > - A START_DEV completed with -EINTR. The process was detached and arms =
-no
-> >   signal sources. I didn't capture the pending signal set in that insta=
-nce,
-> >   so I cannot rule out a spurious signal, but the same op's immediate r=
-etry
-> >   stalled for a full 30 seconds.
-> > - Not needed to repro the bug: COOP_TASKRUN, readahead bursts, eventfd =
-wakeups.
-> >
-> > 4. Aftermath
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > - AFter the request is lost, teardown hangs and takes the control plane=
- with
-> >   it. Looking at /proc/*/wchan and dmesg of a hanged instance shows tha=
-t the
-> >   teardown uring command (running in an io-wq worker) is stucj in
-> >
-> >   ublk_stop_dev/ublk_ctrl_del_dev
-> >     del_gendisk
-> >       blk_unregister_queue
-> >         elevator_set_none
-> >           blk_mq_freeze_queue_wait
-> >
-> >   And the message printed by the kernel is:
-> >
-> >     INFO: task iou-wrk-2115:2118 blocked for more than 122 seconds.
-> >     [...]
-> >      ublk_stop_dev_unlocked.part.0+0x38/0x160 [ublk_drv]
-> >      ublk_ctrl_uring_cmd+0x629/0x830 [ublk_drv]
-> >
-> > - Subsequent control command hangs on the control mutex:
-> >     task iou-wrk-12720:12721 is blocked on a mutex likely owned by task
-> >     iou-wrk-12626:12629.
-> >     [...]
-> >      ublk_ctrl_get_params+0x8b/0x190 [ublk_drv]
-> >
-> > - Killing the process doesn't help. The worker thread keeps waiting on =
-the
-> >   queue and the frozen queue waits for a request whose owner (the serve=
-r) is
-> >   gone. On 7.0, ublk_timeout(...) only takes action for unprivileged de=
-vices by
-> >   SIGKILL'ing the server. On privileged processes it retursn BLK_EH_RES=
-ET_TIMER
-> >   so a lost request is re-armed forever and never aborted, even when th=
-e
-> >   server is dead.
-> >
-> > - When the process exits, the io_uring io-wq teardown warns while a wor=
-ker is
-> >   still stuck and the process remains a zombie. The following message i=
-s
-> >   printed by the kernel:
-> >
-> >     WARNING: io_uring/io-wq.c:1370 at io_wq_put_and_exit+0x10d/0x2e0,
-> >     CPU#3: live_server_ram/2115
-> >
-> > 5. Where I suspect is the problem
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > - Evidence points at the completion side of the 2025 rework.
-> > - per-IO task tracking ( ("ublk: require unique task per io instead of
-> >   unique task per queue", Pure Storage, 04/2025,
-> >   https://patchew.org/linux/20250416-ublk._5Ftask._5Fper._5Fio-v5-0-926=
-1ad7bff20@purestorage.com/):
-> >   our fetches are all submitted by the queue's own thread, so io->task
-> >   should always match at dispatch time;
-> > - rq_list batching: ublk_queue_rqs() coalesces same-<ctx_handle, task>
-> >   requests into one list and queues a single
-> >   io_uring_cmd_complete_in_task(io->cmd, ublk_cmd_list_tw_cb) for the
-> >   whole batch. If that single task work is lost, every request in the
-> >   list strands - the observations are consistent with one lost request =
-per
-> >   occurrence.
-> >
-> > 6. Follow-ups
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > - Does this ring any bells in the 7.0 completion rework (lost task work
-> >   for ublk_cmd_list_tw_cb / ublk_cmd_tw_cb, or io->task mismatch taking
-> >   a path that neither completes nor aborts)? Is a fix already in
-> >   flight?
-> > - Independently of the completion loss: should ublk_timeout() for
-> >   privileged daemons fail a request whose ublk server is gone? Today
-> >   BLK_EH_RESET_TIMER keeps a lost request - and with it the del_gendisk
-> >   freeze and the control mutex - stuck forever after server's death,
-> >   which turns a single lost completion into a machine-level hang.
-> >
-> > I can test candidate patches on 7.0.0-43 or bisect across 6.15-7.0 on a
-> > VM, or capture the trace of a missing completion.
-> >
-> > #regzbot introduced: v6.8..v7.0
-> >
-> > Best regards,
-> > Luciano
+> - Dropped Caleb's Reviewed-by, since the patch changed.
+> - Corrected what the caller controls (Caleb): it chooses the address of
+>   the PI buffer, the seed and the device offset, so both where the tag
+>   is stored and its value.
+>
+> v1: https://lore.kernel.org/linux-block/20261118154053.13218-1-zakaria.be=
+lkadi@inria.fr/
+>
+> Open question on stacked devices: the test uses the profile of the
+> top-level queue. By my reading of the source, a device-mapper target
+> with members of different profiles can get a top-level profile without
+> BLK_INTEGRITY_REF_TAG while a member has it, because
+> dm_set_device_limits() ignores a stacking mismatch. This condition
+> would then not force a bounce. I have not tested whether such a
+> configuration can accept user PI and reach reference-tag remapping on
+> the underlying device.
+>
+> Would you prefer bouncing all user PI buffers on writes to cover this
+> case?
+>
+> Tested on v7.4-rc3 in a QEMU guest, emulated NVMe namespace with
+> T10-DIF type 1, as an unprivileged user who owns only the device node:
+> - PI buffer =3D read-only mapping of a root-owned file: without the patch
+>   the reference tag in the file changes; with it the write succeeds and
+>   the file is unchanged.
+> - PI buffer =3D shared zero page: without the patch the kernel oopses in
+>   blk_integrity_remap(); with it the write succeeds with no fault.
+> - Writable PI buffers still work, and the kernel no longer modifies
+>   them.
+> - Stored tags (as root): a write with a seed different from the block
+>   number succeeds with reference-tag checking enabled. A subsequent
+>   read using the block number as the seed returns the expected remapped
+>   tags, with identical results before and after the patch.
+>
+>  block/bio-integrity.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> index d3df726e0..aaea5802e 100644
+> --- a/block/bio-integrity.c
+> +++ b/block/bio-integrity.c
+> @@ -394,6 +394,11 @@ int bio_integrity_map_user(struct bio *bio, struct i=
+ov_iter *iter)
+>         copy =3D iov_iter_alignment(iter) &
+>                         blk_lim_dma_alignment_and_pad(&q->limits);
+>
+> +       /* Reference-tag remapping must operate on a private copy of user=
+ PI. */
+> +       if (bio_op(bio) =3D=3D REQ_OP_WRITE &&
+> +           (q->limits.integrity.flags & BLK_INTEGRITY_REF_TAG))
+> +               copy =3D true;
+> +
+>         if (blk_queue_pci_p2pdma(q))
+>                 extraction_flags |=3D ITER_ALLOW_P2PDMA;
+>
+>
+> base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+> --
+> 2.39.5
 >
