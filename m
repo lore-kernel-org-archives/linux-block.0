@@ -1,68 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.15
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795383108;
-	b=Fmx/z02zPP9ySiigk+lJ4rx+gqCkiIgyghoQOv4Mw6nEIVoEEF+PhutxM4wziHhWXmwJ
-	 lMsRWtKB1lU7xINdOgRjGmli2j+A0me+2bScfI/tzyzdLYRFC/MG2E0bGaus0TnugcKmi
-	 Mxlpsd7ro02peGerUzQPQMfb928b+ul3hxy/5T7ob4I0QeIhpx0jeobPxIgQV4l1q6dhf
-	 wI+NL13Yo2J0okKXTT85W4XILJDIur4rk/9mT7mqYI1wIEXAJVhbaIl3kLYsaBf2f4kEP
-	 1GVQBCZ1sNs3ZERbet4i/ll4RKsM5qcXlU0/8bsTai5iAx9m6zQ7fOedI3Ze7aSM0Pg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795383108;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-ZohoMailClient;
-	bh=4Da26eW8Um/2wSqYK3x7AJPTzG5yvEtwSmXbjg+Qb4E=;
-	b=boaczwKnB0IefoxFx+doMLdZvPFx00GGIDpOhcIXZfYpK0Rmd8Ngkltjya4O2rymUzF3
-	 H8HLX5ZjciJ2TF2vWXnAMFpGtIdNh3i6pvv0oal9InCYkkvEfUhzqZvNI0xbTBeazZ1sR
-	 kgdbNu/kLxOYzM6/2xFmgFgT1RPu5+pvolg38ziEI0p3l/Air44V1XLwPdsbAOsBe1xT9
-	 kChe+pAkbTnVfRt7Go0vrFoFegikg4d7AsPeG/IHJBdNTtt5lcuPhfzKIPVUrM2OQTSW4
-	 rP32Al2+UWnQQ5CCa2Tojn7uoS0HQPNjwh9JtQtE4chVNzB8nlY2VPwxfs8m31YGMsg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=laveeshbansal.com;
-	spf=pass smtp.mailfrom=laveeshbansal.com;
-	dkim=pass header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=ctc+hlCt;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.15
-Received: from sender6-op-o15.zoho.com (sender6-op-o15.zoho.com [165.173.180.15])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795384611;
+	b=EK5IaxLE51FwooOo8yxPBCz3NHiIuo2k7HniJJhYvSGuZMFP7ceNONGLQDDWFlPoOmp7
+	 6d/CgbV7JIM+gZjpoggaG8UBhX0wT8bLV6krXADO01nDZ8rf4khE/Y+By3xq8uZ2NDNkR
+	 WD2qAH9oWshcgfyK4KW1cuj8LuXoe/lOMQnv6JNs6Z60yq161Uu08K5rQEP+J2MI5aW5y
+	 SFegQGpnOaOEm1I9kHITAaq2J0SO1BZt80oPQgQy9mblh0n8MrN84d5YytoCnvg6Ps/Ek
+	 jrYaWfx5Dk4qYChwxVkoNet6JjgRlkCKyVTresliAiVxTzr8hmpnpFISZLT8VBl+4KQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795384611;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-Scanned-By;
+	bh=RzVUiAa1Zi78olaFHxQ5LfIrbXTA4wMcR/QDA0Z5cBM=;
+	b=e1KSRPgWSNhjglwSwt/57gN3+5Dj5j3lwdQlUD4wpfik55eXyMn8HCk2+SOqxmyNSgsc
+	 Weao+F5EcnLqZwppMxtGFt9AMZvm1MRPZsH/aWET0JI80brVtd9PoeRofmtbk1k0OcIY8
+	 7nOYbUUJgqb/Md13mW+wQ2gWqj7hDKLgog4k8wnxRoKz9p1E0ZZyZ/WOOD3U0VgCWO1jg
+	 O00tODe8JYdYb/DCr00yt5DB61XWIvzD4Dq4Qxuax7LGSXbPPTRHTijm7p46jrXLS6Vcg
+	 KtaLGkvCBOS1rICzelU5Wj5Nxstg3UUfCDKdRf6UIIZGOoHQ5vPzv9LjuVDHxGzBvSg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=JWyRMRvM;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAA1606A31A;
-	Sun, 22 Nov 2026 21:31:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CCAA1606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C522606A31E
+	for <linux-block@vger.kernel.org>; Sun, 22 Nov 2026 21:56:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C522606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=ctc+hlCt
-ARC-Seal: i=1; a=rsa-sha256; t=1795383091; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=F75hLaiX0g07PSKho6TTYeNwZgUiIegt3onfbar6bHrMrW/1SW1xafD/o3odxLnzAjiHgtrzO8g7XAwiJrR1t1nEd2KBQX9Tv9ubyEeDw6gHjX5TfJ46UYPfG6rF+SonloGTICzNYlxs6ZEgNRRqbPqBfyfbdcII7TBGMPNcrNY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1795383091; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=4Da26eW8Um/2wSqYK3x7AJPTzG5yvEtwSmXbjg+Qb4E=; 
-	b=fK71F375RdKR0P8UUiLfeyU/zFovBkDjySQCBiRiKJtDLFRGzSLwgqpXQjIicFeISBp4Ox3BHsnM38GyQSHI+RLPe5HfPjUcrLCfHWXuCdWpfkdBF757FFHp1nTxTYLQqzn0uq3m3xa1sEpm+OpndMBnfwxvzoJ+Gdpds6mR84U=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=laveeshbansal.com;
-	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
-	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
-DKIM-Signature: a=rsa-sha256; b=ctc+hlCtD37eGZr3h8/TagiPVPxK6T4HwnnbMauSG/XU5tMq/enEdqh7jtPv4ywC/vufNxzfTYiFPwLA2yjr6IBfGu/EaUu9vvkWZtqU4Qv1/kidodhLqBH9s2rKw9hwvHRTx0A0LbhbQxogvaC9X6sCifJuRlqHHvaxtHBkQq4=; c=relaxed/relaxed; s=zoho; d=laveeshbansal.com; v=1; bh=4Da26eW8Um/2wSqYK3x7AJPTzG5yvEtwSmXbjg+Qb4E=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
-Received: by smtp.zohomail.com with SMTPS id 1795383089229257.78063783334767;
-	Sun, 22 Nov 2026 13:31:29 -0800 (PST)
-From: Laveesh Bansal <laveeshb@laveeshbansal.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Eric Biggers <ebiggers@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com,
-	linux-block@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] blk-crypto: avoid fs reclaim under profile->lock in the fallback
-Date: Sun, 22 Nov 2026 13:31:20 -0800
-Message-ID: <20261122213120.20974-1-laveeshb@laveeshbansal.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=JWyRMRvM
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1795384609;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RzVUiAa1Zi78olaFHxQ5LfIrbXTA4wMcR/QDA0Z5cBM=;
+	b=JWyRMRvMSYu+u1GOH5oOO+pPv8AB/62d+8ev/uCupg9H8+pSXjXv4yJdmZ1Mrt67+ikP8u
+	4KhYAxkDFXMak76Xb+goI8aCgXWcWkEFaEXTW+xnbSmhqPTR2WjNeqn+/LeG+LHuIkRdfo
+	dKEniLD5w76UD6zv7O1DpNO5oaCGrYA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-79-NgiR78idO2OqH4yJswBNaA-1; Sun,
+ 22 Nov 2026 21:56:45 +0000
+X-MC-Unique: NgiR78idO2OqH4yJswBNaA-1
+X-Mimecast-MFC-AGG-ID: NgiR78idO2OqH4yJswBNaA_1795384604
+Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D90A1956056;
+	Sun, 22 Nov 2026 21:56:43 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BA170421;
+	Sun, 22 Nov 2026 21:56:42 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6AMLufYt2865299
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sun, 22 Nov 2026 16:56:41 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6AMLufZA2865298;
+	Sun, 22 Nov 2026 16:56:41 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>,
+        "Martin K . Petersen" <mkp@kernel.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] block: stack max_hw_discard_sectors on bottom max_discard_sectors
+Date: Sun, 22 Nov 2026 16:56:41 -0500
+Message-ID: <20261122215641.2865290-1-bmarzins@redhat.com>
+In-Reply-To: <awNF-dV2TacxpUqf@redhat.com>
+References: <awNF-dV2TacxpUqf@redhat.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -73,104 +89,80 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
-Setting a key in blk-crypto-fallback can deadlock on profile->lock.
-blk_crypto_get_keyslot() holds it across keyslot_program, whose setkey
-allocates with GFP_KERNEL (Adiantum); direct reclaim can evict an fscrypt
-inode, and blk_crypto_evict_key() then takes profile->lock again. syzbot
-reports it as an fs_reclaim vs profile->lock cycle. Since
-commit 5acc6f649a68 ("fscrypt: Always use blk-crypto for contents on
-block-based filesystems") hitting it no longer needs -o inlinecrypt.
+blk_validate_limits() sets a device's max_discard_sectors from the
+minimum of max_hw_discard_sectors and max_user_discard_sectors. For a
+stacked device to correctly limit max_discard_sectors to a value that
+the lower device can handle, max_hw_discard_sectors should be based on
+the lower device's max_discard_sectors. Otherwise the stacked device can
+pass down discards that are over the size limit of a lower device whose
+max_discard_sectors is smaller than its max_hw_discard_sectors.  This is
+a particular problem for request-based dm-multipath devices, where the
+underlying device does not have a chance to split the discard.
 
-Use memalloc_noio_save() around both setkey calls (keyslot_program and
-the blank-key clear in evict_keyslot), as blk_crypto_alloc_enc_bio()
-does.
+Use the upper device's max_hw_discard_sectors to limit this, instead of
+max_user_discard_sectors, to ensure that it respects the lower device's
+limits, including their user settings. A user raising the upper device's
+max_user_discard_sectors should not be able to make it send larger
+discards than the underlying devices can handle.
 
-Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
-Cc: stable@vger.kernel.org # v7.3+
-Reported-by: syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/r/6a9b25c3.b5d4176b.238c3e.0004.GAE@google.com
-Signed-off-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
+Device-mapper does stacking in two passes. Each target calculates its
+limits from its underlying devices, and applies any target io_hints.
+Then the overall device calculates its limits from all its targets. For
+the overall limits to be stacked correctly with this change, each target
+needs to set its max_discard_sectors to its max_hw_discard_sectors
+before being stacked into the overall limit. Otherwise the
+max_hw_discard_sectors io_hints values from the targets will be ignored.
+
+Fixes: 4f563a64732d ("block: add a max_user_discard_sectors queue limit")
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
 ---
-I used an LLM for the analysis, the patch and the test runs.
 
-A scope in blk_crypto_hw_enter() would also cover hardware drivers (qcom
-ICE allocates under the lock); I kept this to the fallback.
+Changes from v1 (sent as "block: stack max_user_discard_sectors")
+- switch from stacking max_user_discard_sectors to
+  max_hw_discard_sectors
+- Adapt device-mapper to the change.
 
-Tested on arm64 and x86_64 (QEMU, base c44104f3642d, KASAN and lockdep;
-patched runs and fstests include comment-only revisions): f2fs with an
-Adiantum policy, creating encrypted files and reading them back with
-O_DIRECT under a memory hog, about a minute per run.
-Runs showing each symptom:
+ block/blk-settings.c  | 6 +++++-
+ drivers/md/dm-table.c | 5 ++++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-                                              base      patched
-  lockdep cycle warning, arm64                2 of 2    0 of 6
-  lockdep cycle warning, x86_64               6 of 6    0 of 16
-  task deadlocked on its own lock, arm64      0 of 2    0 of 6
-  task deadlocked on its own lock, x86_64     5 of 6    0 of 16
-  lockdep cycle warning, x86_64 as uid 65534  2 of 2    0 of 2
-  task deadlocked, x86_64 as uid 65534        1 of 2    0 of 2
-  profile->lock -> fs_reclaim edge in
-    lockdep's dump (runs that got to it)      3 of 3    0 of 21
-
-No KASAN reports. Some runs, base and patched, hit unrelated stalls under the
-hog (f2fs and page allocation); none has a blk-crypto frame. fstests -g
-encrypt on arm64: f2fs passes; ext4 passes except generic/435, which ran out
-of space on a 1 GB scratch device and passes on 2 GB. Could not reproduce on
-ext4; fstests not run on x86_64.
-
- block/blk-crypto-fallback.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index 12e0b487e23a..2df418f16932 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -89,17 +89,24 @@ static struct bio_set enc_bio_set;
-  */
- static u8 blank_key[BLK_CRYPTO_MAX_RAW_KEY_SIZE];
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 1f5ee2453269..52ac00c59a0e 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -919,8 +919,12 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
  
-+/*
-+ * setkey can allocate while profile->lock is held, and reclaim takes that lock
-+ * to evict a key.  Use NOIO so those allocations can't recurse into the fs.
-+ */
- static void blk_crypto_fallback_evict_keyslot(unsigned int slot)
- {
- 	struct blk_crypto_fallback_keyslot *slotp = &blk_crypto_keyslots[slot];
- 	enum blk_crypto_mode_num crypto_mode = slotp->crypto_mode;
-+	unsigned int memflags;
- 	int err;
- 
- 	WARN_ON(slotp->crypto_mode == BLK_ENCRYPTION_MODE_INVALID);
- 
- 	/* Clear the key in the skcipher */
-+	memflags = memalloc_noio_save();
- 	err = crypto_sync_skcipher_setkey(slotp->tfms[crypto_mode], blank_key,
- 				     blk_crypto_modes[crypto_mode].keysize);
-+	memalloc_noio_restore(memflags);
- 	WARN_ON(err);
- 	slotp->crypto_mode = BLK_ENCRYPTION_MODE_INVALID;
- }
-@@ -112,6 +119,7 @@ blk_crypto_fallback_keyslot_program(struct blk_crypto_profile *profile,
- 	struct blk_crypto_fallback_keyslot *slotp = &blk_crypto_keyslots[slot];
- 	const enum blk_crypto_mode_num crypto_mode =
- 						key->crypto_cfg.crypto_mode;
-+	unsigned int memflags;
- 	int err;
- 
- 	if (crypto_mode != slotp->crypto_mode &&
-@@ -119,8 +127,10 @@ blk_crypto_fallback_keyslot_program(struct blk_crypto_profile *profile,
- 		blk_crypto_fallback_evict_keyslot(slot);
- 
- 	slotp->crypto_mode = crypto_mode;
-+	memflags = memalloc_noio_save();
- 	err = crypto_sync_skcipher_setkey(slotp->tfms[crypto_mode], key->bytes,
- 				     key->size);
-+	memalloc_noio_restore(memflags);
- 	if (err) {
- 		blk_crypto_fallback_evict_keyslot(slot);
- 		return err;
+ 		t->max_discard_sectors = min_not_zero(t->max_discard_sectors,
+ 						      b->max_discard_sectors);
++		/*
++		 * Use bottom device's max_discard_sectors to limit the top
++		 * device by what the bottom device can actually handle.
++		 */
+ 		t->max_hw_discard_sectors = min_not_zero(t->max_hw_discard_sectors,
+-							 b->max_hw_discard_sectors);
++							 b->max_discard_sectors);
+ 		t->discard_granularity = max(t->discard_granularity,
+ 					     b->discard_granularity);
+ 		t->discard_alignment = lcm_not_zero(t->discard_alignment, alignment) %
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 48f25ab6b7fa..4cabe2645094 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1834,8 +1834,11 @@ int dm_calculate_queue_limits(struct dm_table *t,
+ combine_limits:
+ 		/*
+ 		 * Merge this target's queue limits into the overall limits
+-		 * for the table.
++		 * for the table. In blk_stack_limits() the upper device's
++		 * max_hw_discard_sectors is based on the lower device's
++		 * max_discard_sectors, so copy this value over first.
+ 		 */
++		ti_limits.max_discard_sectors = ti_limits.max_hw_discard_sectors;
+ 		if (blk_stack_limits(limits, &ti_limits, 0) < 0)
+ 			DMWARN("%s: adding target device (start sect %llu len %llu) "
+ 			       "caused an alignment inconsistency",
 -- 
-2.43.0
+2.56.0
 
