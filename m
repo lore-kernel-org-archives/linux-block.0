@@ -1,99 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.51
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795343618;
-	b=5aE+m0j6TgiUftRsLkosM8J1a2vT8gt+V2x8z00Yx75AndL2eb8x04VU7QHUCec2vCYj
-	 8z10BznOdvth6dfhbwhSY9ppE1DWdR3zrKc/KzQ1cwO09V331IVTw8Rs0nZq+Mo2QW8+b
-	 UMvZRe4a6O1ZdvBM2XSPoj/wAtEbNKneq3CyJ0SETY7OSQJ31o+7tfq2zJ+GbdkFXSlj6
-	 KqJx6l/zzoM8lYrCgTViUw2nLt9YKUuRViLcb0U55S6HBBBaAMKHNEivH+viO3wLxRFUj
-	 hfvb8VixmXue/xMCuIIUgwOxHVXuqKRJQC3SlxPU+mLmyfSOEHsNNjqQZPEGZ0uYDvQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795343618;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=CulNdxDlkl+Npn2nZi3nvTZ1THmtrMUTp3GyBn2Qbxw=;
-	b=X68ptKs/iCBLi9eEv7Bf6wX06NHAQwUhMvobWagFKK1Vq8d7Of7jK9r+Yb9vV7MfvymG
-	 1OHVUKgkxfevgvuDqPugNWdlSAs0FCuGdBGDxEveD+1Q+HYLShYvwdvrlOQszhcZoJrCW
-	 /3OfiJiJSx50w+V5azSkbIH7paTlnkjgojDCnXkTrqVsPyv1bW4xri/gFBCE9ajddXHO7
-	 Hv90Sk2rTcx9TCHKsIo5pBo6l4gusV+jf2GGg5W6rEv/f0Rvw9DXhQfH2Gat/2qaUlT+f
-	 f6PfREndeh0ALkudEOj+JtDs4cdAJA82lgyOfVjXluj2nho1cv2txP9L//ETK6eRQrg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=dmnsz0m2;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.51
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=160.30.148.34
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795360910;
+	b=G5mkMuIcLk5FHmR+YlWe4JBX/oAMjK6AEZ8cz+Z8U4cPZIZ3JZTHXlXskFxRxxVnUBrZ
+	 7dST+pEiA94o5h+H4HNZeq+75nQrxp73u5qfPLzer3SgGLFALJLAc7x5smM6aopNlkpeh
+	 s/znku9f0iOaLR5vpqvO7f3lPleGEhw5eNMIyhiJTCpZAShJGwzVmoduogIgePqQQLEul
+	 lGEmIgjC/ow21n0ugQ0c5hEYuPVizMoyTb0VUOuKA+a+LfCK0l6UDSo7iLqlrZ4qiCzYb
+	 /4gBk8O3TqiRaQMHYyTqD1zTy7krH8YphSpt4zy2y4WowuYBGSAN5XasiXMaR0qi+RA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795360910;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 X-Zmail-TransId:X-Mailer:Message-ID:Date:Mime-Version:From:To:Cc:
+	 Subject:Content-Type:X-MAIL:X-TLS:X-ENVELOPE-SENDER:X-SOURCE-IP:
+	 X-CLEAN:X-Fangmail-Anti-Spam-Filtered:X-Fangmail-MID-QID;
+	bh=F+I6BMzskhaBkNn131+nOHuhnEqj2ntJ9K1Ch7/kHzU=;
+	b=EwK60dvc6RTRPwfXJZc9hogzmaybrX+WRcitWIocGWrLXzGnZNz/aG4MxDsiOBRXuCMW
+	 /p/12sencrHo+0g4fl8Qrc8w+j2VfjyUfo5w7b3jpC2frNDKlqCBDJ92XcbSLTJtdAyLX
+	 8Evw6sRZMCzmG6j7a6MZs7k98cxnjQlYFlbufaSvTgH9ckV+y0tn8D+tGsF0SWXVfzSKV
+	 fdNT2PuRehRj4Sd4RnsyXneZDwDz/CnthCx15QDa/C8MxN3YqPCU/RIFqZVaoYZovKxwk
+	 LnKd+JJt2rqmF9DWG1NMXJpBjvv6GWOZpPmrc0oJtbgl875KRMQwSDfcmuuKJDOjCDw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=zte.com.cn;
+	spf=pass smtp.mailfrom=zte.com.cn;
+	dkim=pass header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=z5kVN5tb;
+	arc=none smtp.remote-ip=160.30.148.34
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11B8606A320
-	for <linux-block@vger.kernel.org>; Sun, 22 Nov 2026 10:33:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F11B8606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77448606A320
+	for <linux-block@vger.kernel.org>; Sun, 22 Nov 2026 15:21:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 77448606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=dmnsz0m2
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-1b3acec6677so3328764c88.1
-        for <linux-block@vger.kernel.org>; Sun, 22 Nov 2026 02:33:37 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795343617; cv=none;
-        d=google.com; s=arc-20260327;
-        b=k+JPG+NovY/SfHUoMrmvDiUZRT0AnzkwRTvU9v41NLtxyQOdTCWsy9FpnQMrGVh4vv
-         OxVHluTXOYAkzP0ZHVm3KRD30FOASXw/rJtJG7fQhOYE3Y7n9LhCwbRjsosqJ/K1Seen
-         0dJakXvwVIQ94V+1HcfkBrn9u5rlh7pqg+GMIHHWRAqqNcl4X4xyXQPBO6W0ZPMh4QdR
-         yHK4pObZRhfFvnGMWeKf49AAOmSnof27BIwEG4zE44gGss+rkZz0lREd2JkXhMnsQiUx
-         LKoVi6FS9r2Dc5rRF4ydbNCguj2MJyknwczQUyDzdDI+o7g1UhAOq7cV8O9sm1TRESLS
-         pEiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=CulNdxDlkl+Npn2nZi3nvTZ1THmtrMUTp3GyBn2Qbxw=;
-        fh=TaoqpsDqOewZ+k1uBQQVTLx1kDmKTbVOj7lomQIxnz8=;
-        b=grvnyc/xBnEzDLx9NjI9qDD+6HZNRxemcJpM8eg+5QFedapZh8EaLJ3I3vvBnob9rE
-         wkoLHCXOT3fxQuea8gfxwa6a7D9B2s2x6Y+fGNtHaAJuGGA51CIm0+O7comrMjlxouhD
-         KOLsSxRu3ejKt8jj+PHRkYQMgxp4VKCsmVWNMftaSqJuEHy9u1cjy7h40KPBt3vZeNqZ
-         NJ4a6dgwMpdwxQ0GvRCPvtRP3W9hztiZ3+Kf/uwIAcx1KFJP+iQaPBdDCBaQQg1jB5ay
-         fK36V7s9OyTGbG8ws/p2RyaWhH/FNgwpMx3naMLqU31h1e+oFSrGXArW0YgPAH9Nxzl0
-         njNg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795343617; x=1795948417; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CulNdxDlkl+Npn2nZi3nvTZ1THmtrMUTp3GyBn2Qbxw=;
-        b=dmnsz0m2P81EbaAv3ZbcfDHUeug3L48SE/TSsl89jT2YIjTAtSO0KvBeRop76tk4kO
-         1GJwIpKxj7BiewXfM8/bWlMkp6GOE1NNojNQ8XMU/KuN5htcEK6kZ7N5hbA6ZsiqdP0F
-         sslShoK6Wgj8hdLSy/ryyRgHqxqafbpoUBMuY7mQh4snBBnyHVIzob6luvmM276iQdrd
-         solTdq3QhIyDiSmQiCIudiHhcm/kwtRYd2RsG78VrD3wj7VHJjw/Lfj273InZOrh2gGA
-         3nhO2MKNBsNpQQ0HmSnqH0i1IfjUCeUq0t+nL0rlGV03kxxlLLEbLv5Og39z2GR14dCl
-         4s5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795343617; x=1795948417;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=CulNdxDlkl+Npn2nZi3nvTZ1THmtrMUTp3GyBn2Qbxw=;
-        b=rL3kl+hlQ5f8Ap/0KQMqNMA3gByaoXgaWNUyTcuZjR7U7jTZrFn3erdLsfGTbHxRxv
-         b4aQT5V0CQOcnHfWz5vUhdnmCkJk2nIeeBxt90K7M81/MRFBmdVs28GUl+Aa/9lV+KH6
-         DAfeLgRUQ3jwbMed3jhYfGmO000IbLnVwA93oObBjXCVk/E6c8V6VgvFJOfIVn8eSM4C
-         A9CS9tfKs8HZfM4QylTVTx57F/sfVyM5rhk4Y9fTyErCf85yhuHiIJOqm2S12BFF+MFD
-         brYQacQciMdhvmYKwk+CVSS/I7v/IAV4kQ1HIrbljOaz98Q1Xr+fdQ8p/9a8F2TQIdXy
-         y4nA==
-X-Forwarded-Encrypted: i=1; AL+hErEgKWBszTXaBouQKW3u36dDkIXyKwXhAO/qA2iYMpippK2Y+LSdwTU0LzcWmQhC/cvrFd1lb89krHkJXg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/Yo1zcUn3GSX4t/bhwxsyrQPQYZSuN+I5Omfo6OtH0WbTZfYoy
-	qLJwkDOKwbMNmtLZY0aMeJyhDx5sD6bi/eyxps4o7SfBI1L0ZjbLOjFxcQaXKhC4mzolSeYaQFh
-	Icun3TPkYCFOzTdMZO4v9HEyNaAHW77ivWawrEurBj/nOueNNZUs5l+jb1lg=
-X-Gm-Gg: AZFdTZfOll4UZHX414QHZVBZV7qNb3o0bvhsNYSngdwaEYPsOHBqUh75GvwUWofzZI9
-	1GraPAUblSy1kIuK1P110VpPfkC1GHSmCAHgpX/cPEXyM9iNtqAioGYpiYGyR56CZgjYlrKK6BF
-	jUxIL5lQIdBztPjYMNQGJpTxooSvnVd9fQt4572O5LYQbfYVrb8DC8trL02F/dBLR9xaHT7DlUW
-	OAncjaoJKTMUH2S82N0AIDA0vs173fFqwXrgb/4hLPjg2RaxvDKiSqdL24DPNxtKARsM+FlW2R2
-	Sr4mxIeO7hCN+5wgdd175QZreINRl4JLVsT6bhP2eLLSaUSaCcWFykGlwUxjy5/Z5EBojhWh4R/
-	u9UbXkFVMWrqfP8IB8Vr4J0G89WpITQvSx97zawZS1sswwEUs6WoLa5jHQf+Fxxvh+nlh
-X-Received: by 2002:a05:7022:f509:b0:1b2:41af:c21c with SMTP id
- a92af1059eb24-1b55694689amr7182140c88.39.1795343616145; Sun, 22 Nov 2026
- 02:33:36 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=zte.com.cn header.i=@zte.com.cn header.a=rsa-sha256 header.s=z202610 header.b=z5kVN5tb
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4jXXqF0RDqz5BNRx;
+	Sun, 22 Nov 2026 23:21:45 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zte.com.cn;
+	s=z202610; t=1795360905;
+	bh=7TVER/Dsyuz1t+0sSmrqKzeyTx07d/XDv9Jwk3uQt1Q=;
+	h=Date:From:To:Cc:Subject;
+	b=z5kVN5tbiQuwl/m+FEIyZNslBfQoMe+/nMbt3HDTvXBZqugg0z3FthqikTsERvBX/
+	 hhgSwCnfoSlnyNMk52MkNIxkssTq2N97KQQPB9k85OCcwl3IF6vBgOP6GgKpa04ji4
+	 yG/VTrntf+Rr+iqJKPYCgoMwWXbfASwVIf77IUvxQjF0lwOxT9b5YPxz4DrwSMdxM9
+	 +TGzTLx4sacXUEcfY/1xDtayEHl6R/aB5fnVoY29MlaipYigDKvSi0F4TUmfBHDLGI
+	 5o4fFX2+xdIN0DN/cbWC/dCWJ+pM3YEvy0Iv5qC1u6OjI8qC+y8fwtnb7iHjDK7+NN
+	 yGFNJ/Na86isw==
+Received: from xaxapp05.zte.com.cn ([10.99.98.109])
+	by mse-fl1.zte.com.cn with SMTP id 6AMFLc6f037907;
+	Sun, 22 Nov 2026 23:21:38 +0800 (+08)
+	(envelope-from shao.mingyin@zte.com.cn)
+Received: from mapi (xaxapp05[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Sun, 22 Nov 2026 23:21:40 +0800 (CST)
+X-Zmail-TransId: 2afc6b030884cf8-6b891
+X-Mailer: Zmail v1.0
+Message-ID: <202611222321403031Pk7f3Tfpgbp9XT5FmLgI@zte.com.cn>
+Date: Sun, 22 Nov 2026 23:21:40 +0800 (CST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -102,53 +69,80 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <20191105182746.217864-1-elver@google.com> <20261122093626.205973-1-mail@jregg.de>
-In-Reply-To: <20261122093626.205973-1-mail@jregg.de>
-From: Marco Elver <elver@google.com>
-Date: Sun, 22 Nov 2026 11:32:59 +0100
-X-Gm-Features: Aa3M54pWRpZOziNx0XZevcGRIZfg4AdbVWAwJV7K3bXLfNj9_ykaSPPwuk0TrM4
-Message-ID: <CANpmjNM9n+nCb46nEAUcrU6kecC5LOyYSxKWN0So0pZwYZ34GQ@mail.gmail.com>
-Subject: Re: [PATCH] blk-wbt: Fix data race and avoid possible false sharing
-To: Jenson Johnathon Reggentin <mail@jregg.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+From: <shao.mingyin@zte.com.cn>
+To: <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIXSBicmQ6IHNraXAgdW5hbGxvY2F0ZWQgcGFnZXMgZHVyaW5nIGRpc2NhcmQ=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 6AMFLc6f037907
+X-TLS: YES
+X-ENVELOPE-SENDER: shao.mingyin@zte.com.cn
+X-SOURCE-IP: 10.5.228.132 unknown Sun, 22 Nov 2026 23:21:45 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6B030889.000/4jXXqF0RDqz5BNRx
 
-On Sun, 22 Nov 2026 at 10:37, Jenson Johnathon Reggentin <mail@jregg.de> wrote:
->
->
-> While looking at Bugzilla reports I noticed that the fix I would have
-> written for https://bugzilla.kernel.org/show_bug.cgi?id=220759, is the
-> same as the fix Marco Elver proposed,
-> https://lore.kernel.org/all/20191105182746.217864-1-elver@google.com/
-> long before the bugzilla report. I could not find public comments or an
-> accepted patch.
->
-> I tested the patch applied to Axboe's Tree with KCSAN and a mixed
-> read/write workload on null_blk. The patch fixed the KCSAN reports, in
-> my test runs.
->
-> Was there a reason this did not get applied?
+From: Shao Mingyin <shao.mingyin@zte.com.cn>
 
-Probably was just forgotten or it wasn't serious enough.
+brd_do_discard() calls __xa_erase() for every page index in the
+discard range while holding the XArray lock. Large discards on mostly
+unwritten RAM disks therefore spend most of their time looking up
+indices that have no backing pages.
 
-> If there needs to be testing done or something else I would be happy to
-> do it.
+Walk the populated entries with xas_for_each() and erase them with
+xas_store(). Keep the existing range rounding, capacity limit, page
+reference handling and allocated-page accounting.
 
-While data races can cause all sorts of problems, or are the symptom
-of a deeper problem, the kernel has historically been more lax in
-tolerating "benign" data races; the C language says they cause UB, the
-kernel's own memory model (LKMM) is more relaxed about data races:
-https://docs.kernel.org/dev-tools/lkmm/docs/access-marking.html [1]
+Signed-off-by: Shao Mingyin <shao.mingyin@zte.com.cn>
+---
+Tested in a QEMU/KVM guest with 4 KiB pages: BLKDISCARD over a 16 GiB
+range containing 64 pages took a median of 61.4 ms before and 9.16 us
+after; a fully populated 128 MiB range went from 2.28 ms to 1.80 ms.
+Each median uses 63 calls measured over three boots, with data
+population and readback outside the timed interval.
 
-While we should be marking these accesses per [1] all over the kernel,
-doing so blindly would paper over more serious race-condition bugs, or
-cases where we need proper *ONCE/atomic_t use. In many cases, nobody
-has had the time to investigate.
+ drivers/block/brd.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-For the "wbt_wait / wbt_wait" case, I think marking with
-READ_ONCE/WRITE_ONCE is appropriate, otherwise the compiler may
-optimize away the load-compare.
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 00cc8122068f..11fa833a3f1b 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -182,21 +182,22 @@ static void brd_do_discard(struct brd_device *brd, sector_t sector, u32 size)
+ 	sector_t aligned_sector = round_up(sector, PAGE_SECTORS);
+ 	sector_t aligned_end = round_down(
+ 			sector + (size >> SECTOR_SHIFT), PAGE_SECTORS);
++	XA_STATE(xas, &brd->brd_pages, aligned_sector >> PAGE_SECTORS_SHIFT);
++	unsigned long last_index;
+ 	struct page *page;
+ 
++	aligned_end = min_t(sector_t, aligned_end, rd_size * 2);
+ 	if (aligned_end <= aligned_sector)
+ 		return;
+ 
+-	xa_lock(&brd->brd_pages);
+-	while (aligned_sector < aligned_end && aligned_sector < rd_size * 2) {
+-		page = __xa_erase(&brd->brd_pages, aligned_sector >> PAGE_SECTORS_SHIFT);
+-		if (page) {
+-			put_page(page);
+-			brd->brd_nr_pages--;
+-		}
+-		aligned_sector += PAGE_SECTORS;
++	last_index = (aligned_end - 1) >> PAGE_SECTORS_SHIFT;
++	xas_lock(&xas);
++	xas_for_each(&xas, page, last_index) {
++		xas_store(&xas, NULL);
++		put_page(page);
++		brd->brd_nr_pages--;
+ 	}
+-	xa_unlock(&brd->brd_pages);
++	xas_unlock(&xas);
+ }
+ 
+ static void brd_submit_bio(struct bio *bio)
 
-Thanks,
--- Marco
+base-commit: d09b6d9d1fcce0770c1824c8b2b8ab153f2672d2
+-- 
+2.27.0
