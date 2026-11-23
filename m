@@ -1,58 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795424460;
-	b=NGJ0NlliKQUeUJ9hhOLbLYBFjiAUnszH+QcELKG2GCMNBOssR6P/tYKtnFtyJ+TZixlz
-	 E+U4aZCxoVWLKvigZLTwNJrbVBm3/5YQyv+vvdJpkkM70q5Y9ChwNLZO+HUreyghFmlGs
-	 kP8g32NMZyt4i+WqtHv2d8rOXf9nkfOJk2vB5Q43nhDld9wpDpmLnAIKYAr+oo9IwitBb
-	 o2/SaTRUG/VcAUuZ+U12nDRBjW3nIINs0sUtDhuS1r7eAd55ZW4jDAzibMwzux9gEOvHk
-	 9SIVr/06MNWdQeGPCGuWfaKdRmyEuG+BJ7+Q2RrYWc4x4oEO6eICEmhP/T9jhiI+nWQ==
+	b=q6V0p12ixLCh9034Ei1eU1Zk1zJetCbpK5YG/xdEB+MOUgw9xFDPIFTiGd53ahUsFF43
+	 bQ/zJs4pcsIYxZteZIDyAN7zRnVa0qZB5n+ltzq5ZUE8nYxqhw9kpz38Rl/djZ4Lq47X0
+	 k3+CZlK70cjTFnlxhDJRnQK0vxNwuVg2bhpXoDXkfethN3dYyES/7Xk8Txf8m1yWnvuSE
+	 L+85cK2KhpC4IBbya+vzHw43fQUBWubuVbWZqyuX5ddzxMXa5Ve+/0W4seHA36LONCtyG
+	 he+14WNdesAgohVSR8spIlb6GC+VG+96JC/jBdopr4tx/KFaSbvHpEaGHLxFNAmPluQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795424460;
 	h=DMARC-Filter:Received:Received:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 X-Developer-Signature:X-Developer-Key:Content-Transfer-Encoding:
-	 X-Rspamd-Pre-Result:X-Rspamd-Queue-Id:X-Rspamd-Pre-Result:
-	 X-Rspamd-Action:X-Rspamd-Server:X-Spam-Level:X-Spamd-Result:
-	 X-Spam-Flag:X-Spam-Score;
-	bh=uPhxwqgRwFr2c0Wk/MJfXbhM5TnmiRTw7EakaKv1UGA=;
-	b=HJhCmbBhN75aP0BfK3wQm8Uq65TD/Sox1z/3QSuXE+8uFUALV7uEEHuNfTwcOgYHvkrn
-	 slB+yD2BXgPPN1ueEuhknGJpj8/z2FwB2adBrmBGvqx+KfOWYOILb8pqWDTtKb+Lm2dH0
-	 RLvL+w4uL9JJh+7z1rM+FILFYXeahclG391Jlih6o/2KJei69b2DwxR933964/5vYSMtE
-	 ZLSn3Zi/oHYLaNaajozERBwFGmFORSMlUBEwO8KdbAkAdJb0FQppYJlW1RE4MQ29tp9LC
-	 P5x/t9A0gojsh5U3chxmqDsCyCD68sASAANEhCBTMgLoMNdYf+gR3e8E8xt44JO1qjw==
+	 X-Rspamd-Pre-Result:X-Rspamd-Server:X-Spamd-Result:X-Spam-Flag:
+	 X-Spam-Score:X-Spam-Level:X-Rspamd-Queue-Id:X-Rspamd-Pre-Result:
+	 X-Rspamd-Action;
+	bh=lpvhanw9TJqEMsFgXkrvlifU06FN6p6MwkWBWozOy8Q=;
+	b=tkXJCYxDu2Bu1ULfe/Va1l9Jpv+X/c5nkLuL/szN3JvZfBPktxs0/PIY09pu8EEabyFj
+	 xA5DOIp6IKyVJPFHTHfm73UhbMcrdQutjvOMLyR1hDbS43fVZ5jm7wG6CwJAMseGm3gRt
+	 OO/wtHuK/ScHI0UZXH+8caJEvxMEIqnv52U3ThxIBINw3YRMv/t9emHGxcc2sGZSPvE97
+	 7eKaAUg/VQT1bIlIoVpXMWEF5ivZajbC+VvmMNcwNzapUq+gwwfIWiFRrFb0vei8oysAV
+	 0ceLuRwFZA6i5jwd6FCKxSPRKrl4t7MzLbFkfLO/qII9DlzkcYj1uLQjebA2MKTDxjw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=suse.cz;
 	spf=pass smtp.mailfrom=suse.cz;
-	arc=none smtp.remote-ip=195.135.223.131
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	arc=none smtp.remote-ip=195.135.223.130
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918DE606A32A;
-	Mon, 23 Nov 2026 09:00:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 918DE606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44483606A682;
+	Mon, 23 Nov 2026 09:01:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44483606A682
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 01B2B1F7F3;
+	by smtp-out1.suse.de (Postfix) with ESMTPS id AA1BA220A3;
 	Mon, 23 Nov 2026 09:00:58 +0000 (UTC)
-Authentication-Results: smtp-out2.suse.de;
+Authentication-Results: smtp-out1.suse.de;
 	none
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CF80413532;
-	Mon, 23 Nov 2026 09:00:57 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 68FFD13532;
+	Mon, 23 Nov 2026 09:00:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id B2ulLMkABGvgBgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 23 Nov 2026 09:00:57 +0000
+	id tJ5XD8oABGv7BgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 23 Nov 2026 09:00:58 +0000
 Received: by quack.suse.cz (Postfix, from userid 1000)
-	id 54A9B275FA; Mon, 23 Nov 2026 10:00:57 +0100 (CET)
+	id 808472760A; Mon, 23 Nov 2026 10:00:57 +0100 (CET)
 From: Jan Kara <jack@suse.cz>
 To: Christian Brauner <brauner@kernel.org>
 Cc: <linux-fsdevel@vger.kernel.org>,
@@ -77,11 +77,10 @@ Cc: <linux-fsdevel@vger.kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>,
 	Jaegeuk Kim <jaegeuk@kernel.org>,
 	linux-fscrypt@vger.kernel.org,
-	Jan Kara <jack@suse.cz>,
-	"Pankaj Raghav (Samsung)" <pankaj.raghav@linux.dev>
-Subject: [PATCH v3 01/13] bdev: Drop pointless loop from blkdev_flush_mapping()
-Date: Mon, 23 Nov 2026 10:00:36 +0100
-Message-ID: <20261123090040.19006-14-jack@suse.cz>
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH v3 09/13] gfs2: Fix dirtiness checks in gfs2_write_inode() and evict_linked_inode()
+Date: Mon, 23 Nov 2026 10:00:44 +0100
+Message-ID: <20261123090040.19006-22-jack@suse.cz>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261123085601.21199-1-jack@suse.cz>
 References: <20261123085601.21199-1-jack@suse.cz>
@@ -94,78 +93,59 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1749; i=jack@suse.cz; h=from:subject; bh=GZumrknrM8DPyabr5Jne8KkRCS0p4/yNON9cCW4wy70=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBrBAC4xsOQMPEQ2oKCGhB4uItf13zp0U70aCwz8 BgxDEqYscuJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCawQAuAAKCRCcnaoHP2RA 2Yg5B/42IPKKHMy6SSIbhPKxdCra8evAwnyXErezZac3fbRHGUyfm2yWf5konhAEdX/MLMTYQDt /cr4G9mwfK3/V0zMBR2I2u07NDAl2X9fnk7M+qBRQ5nMlv7nGooy48BccVa6qi1XdCekw9BZOuD 4/jDvTQy0fmEcr64knYRC+oSlc/r+nThyOkEAzk1iZCzdjjQhLZl6zAJDPcf1iL01TJwfwZ8GBO APpIdoItWy7+qAmaDZddSfNwxedGcf43/Ju1297VRa8qbXDM21j9E/fbmK+syjfw+MSZyjrtnsp OGwtIwKfv8OL3hw9OvBMuWeFt8mgXY4s8P0TNKFi7kyDubak
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1407; i=jack@suse.cz; h=from:subject; bh=VNCyIkn/glslaPM032BDlF6PyzMHDTmuaiaadhiEfv8=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBrBAC/crBm0TUVlw+aAlbOWDKQSd2UB+UtZWP1t gKye0F6v1qJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCawQAvwAKCRCcnaoHP2RA 2fWKCACym/yM62OerHOpBJLwO+l0T8PQZHq8IDlrrFM5qyCtuGCk/yVfMfSDihPUm8aoHfHualH mi7RzqSZ3TMO1NOjqeHjPX+cE/OdkdB2QNWBAhlNLhRqY/eLEexCLLiEUCqx8OjsFya4W+zdB0Z PL8TlBmbw82XeGlM9cOd8kX7NJQ5V472z47nofimZFGtofcRUZh9gS/xNR7WNZaqtVdY8Y1tFKi cN4SxYlglM3RdKam0wfxeTnLFR14gC3GgQ0LAiC0u6Rv1F/Xq0eBGKexgsWoI20DXlGepnK0cHb 3g8L0rf59SSYKgIoBDusG/IFexuop7kK4Upjb/P+zLfMx07Z
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Pre-Result: action=no action;
 	module=replies;
 	Message is reply to one we originated
-X-Rspamd-Queue-Id: 01B2B1F7F3
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spam-Level: 
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 X-Spamd-Result: default: False [-4.00 / 50.00];
 	REPLY(-4.00)[]
 X-Spam-Flag: NO
 X-Spam-Score: -4.00
+X-Spam-Level: 
+X-Rspamd-Queue-Id: AA1BA220A3
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Action: no action
 
-bdev_write_inode() is really odd loop calling write_inode_now(). The
-bdev doesn't have any pages by now and if there are any dirty bits in
-the inode state, they are stale. Just call write_inode_now() once to
-clear them.
+The checks are bogus because they check against inode->i_flags instead
+of inode->i_state. Use the inode_or_folios_dirty() helper which actually
+checks what was intended.
 
-Reviewed-by: Pankaj Raghav (Samsung) <pankaj.raghav@linux.dev>
+Fixes: 957a7acd46e6 ("gfs2: Remove inode from ordered write list in gfs2_write_inode()")
+Fixes: bd67f17718cc ("gfs2: Fix data loss during inode evict")
+Reviewed-by: Andreas Gruenbacher <agruenba@redhat.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/bdev.c | 25 ++++++-------------------
- 1 file changed, 6 insertions(+), 19 deletions(-)
+ fs/gfs2/super.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index f20f91b3176e..9fa72df4f47a 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -60,24 +60,6 @@ struct block_device *file_bdev(struct file *bdev_file)
- }
- EXPORT_SYMBOL(file_bdev);
+diff --git a/fs/gfs2/super.c b/fs/gfs2/super.c
+index 04bb4cf787d4..9b723dd591a5 100644
+--- a/fs/gfs2/super.c
++++ b/fs/gfs2/super.c
+@@ -460,7 +460,7 @@ static int gfs2_write_inode(struct inode *inode, struct writeback_control *wbc)
+ 		mark_inode_dirty_sync(inode);
+ 	else {
+ 		spin_lock(&inode->i_lock);
+-		if (!(inode->i_flags & I_DIRTY))
++		if (!inode_or_folios_dirty(inode))
+ 			gfs2_ordered_del_inode(ip);
+ 		spin_unlock(&inode->i_lock);
+ 	}
+@@ -1418,7 +1418,8 @@ static int evict_linked_inode(struct inode *inode, struct gfs2_holder *gh)
+ 	struct address_space *metamapping = gfs2_glock2aspace(gl);
+ 	int ret;
  
--static void bdev_write_inode(struct block_device *bdev)
--{
--	struct inode *inode = BD_INODE(bdev);
--	int ret;
--
--	spin_lock(&inode->i_lock);
--	while (inode_state_read(inode) & I_DIRTY) {
--		spin_unlock(&inode->i_lock);
--		ret = write_inode_now(inode, true);
--		if (ret)
--			pr_warn_ratelimited(
--	"VFS: Dirty inode writeback failed for block device %pg (err=%d).\n",
--				bdev, ret);
--		spin_lock(&inode->i_lock);
--	}
--	spin_unlock(&inode->i_lock);
--}
--
- /* Kill _all_ buffers and pagecache , dirty or not.. */
- static void kill_bdev(struct block_device *bdev)
- {
-@@ -755,7 +737,12 @@ static void blkdev_flush_mapping(struct block_device *bdev)
- 	WARN_ON_ONCE(bdev->bd_holders);
- 	sync_blockdev(bdev);
- 	kill_bdev(bdev);
--	bdev_write_inode(bdev);
-+	/*
-+	 * All data is written out and evicted but inode can have some stale
-+	 * I_DIRTY bits set. Call write_inode_now() to get rid of them so that
-+	 * the inode can be evicted.
-+	 */
-+	write_inode_now(BD_INODE(bdev), 1);
- }
+-	if (!(test_bit(GLF_DIRTY, &gl->gl_flags) || inode->i_flags & I_DIRTY))
++	if (!(test_bit(GLF_DIRTY, &gl->gl_flags) ||
++	      inode_or_folios_dirty(inode)))
+ 		goto clean;
  
- static void blkdev_put_whole(struct block_device *bdev)
+ 	/* The inode glock must be held exclusively and be instantiated. */
 -- 
 2.53.0
 
