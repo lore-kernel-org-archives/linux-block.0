@@ -1,99 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.45
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795452047;
-	b=c5zlwXP6mf7HHWEHqomprzuUP/4jPUviXh1mxStXrKCkI9ZHHDslW9VRjrIaBSAUwu68
-	 PwmxXlx0vUOOecDp2+HQN8DbHnxPJOa28gQPN9uBOz7wWgkh07ZziXp5UHggVBJzD79Ig
-	 IOrpcCixrmQmLVceVzLM6Ff4x7kgPRObAo/HdL3Puj+QHY9sEunipk6GRv6hjqhf5H58d
-	 cAu+0iKMI6jr1BQBpLTTuKIsrvYu1M2oy4yBEE9dhWLUotRkLCQ7WBzcAwpbPkfHBIFK+
-	 5iGOPmSMOJyh8YUnf8WDmlZbpnH3aa9Lhwte3jvMjyMZhDnNdWkD0VGTkiUFtPutA8g==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795452047;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.44
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795456255;
+	b=TBmo/dnqRji4/7l0D61gpTI+IQw7HJmnbXU0pVv5uT/ebpA2ytt+3e+St45DjTbC0ADr
+	 6ahGWEwZHISyZyBltPdaCTfUo5Wp8lPCZMkXCp1RudwVWvok1orzt0kRs9cs4pzqzKk9X
+	 Fo8GVd1mZBkXkqioBjQmmHzGH7oY9u9Q82Zz1M/8o9wbcX8HCgpg9VHEFEeVJwzm8ukZ0
+	 ImUycXT2RDe8C9HEzU1+/s/x/NVDEHmMfYSKoTctbokB/UvrljccfRkRipPfpZ4Rh4sw0
+	 1xYM74r34Nt6JVXd0IQX1TK1I7z4NJdiJ/jfSryMinBFIp65Kc5mfeBXuXkdaF1DjfA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795456255;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=P5/ZiEeoOQolEtqZd6duqT2B+ydqubbd46Mv2EwUK7A=;
-	b=i7uKDRTV0McEcevZ+5cOhY8hsteL0SrCp+tf3OOWbeegj1iqzbkm73QKZJ+hzPPH+b7c
-	 aLy0gqAt2Zn97f+R/iQSvgyLVY5V5ZtMPe6sjagUkP51OCsvzJ99VcKgcffq4TqL+5jkq
-	 hNSQUxnx8+vTQzQozEfKykwnzFEUSYvYKl8PbRdAIbGpm1U8PvEX6CCOM65fFwozBXyuu
-	 5Qc4bA8VUXAQ2dmb+opRUxo0x43UXJzWAymwZRYL1JuA74AcKFx6+CqPk4pMW2rn5m1SQ
-	 x1HurdFY2hWQbditrT0lVjGxyZ4Anln9mIQMMahw4BVFqP8G2+9hy4Rrh4P3Wu/XdTA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vbpMdQoi;
-	arc=none smtp.remote-ip=74.125.82.45
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=ezlDWRMj9kmxxJBJDvLQDaV+rNJm+P/qJAKPI2Vbze4=;
+	b=fMTrYfTe01EjSpSZC2r7BR7384wTcjTnSlklZHHzc4RmhbemFf1MlbUU0447n5/ZMmqW
+	 InZQdEfjOK4ZONx93nVg/20dAK8oDTCyU4XMEQDsWOLP4lnbH7n9fL/AmYmHq9MocfYQx
+	 4Sb9R4dUfJnw4aSKxvDsP1opQS7dXgD3OpH+e1rbaxo/kniD62LFjAvqtcz+MtosyXZ86
+	 TCCgAIk7Ml/gOvTxku7TVqFdGEV3EEJaX3quE4MNSj8eNEZP1ol/1vUUSg+VAZaMyWiGm
+	 TooJy5seKEunLx0Erv3ptE6bCP+0SuNcsR1PErqj0gAlyEkDuKNMDUbGi+T1A58B1og==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Rw6Pf2ZE;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.44
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4B5606A31A
-	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 16:40:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF4B5606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E307606A31A
+	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 17:50:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3E307606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vbpMdQoi
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1a2af4c8d00so5967960c88.0
-        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 08:40:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Rw6Pf2ZE
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4bb6860f867so102445e9.1
+        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 09:50:55 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795456254; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Kul0sSdrRGJY8kRsKhU5SwXx5LuuC2Pg2se6RwBgDcd4jDtrqHMx77YuwfuZOUOt3J
+         Si+ZOP47NBOzl383gEbMsozkDfrKLxLCGYOFK6sZiZCoIBfL5eaQNVQthOxlAuW1T0PS
+         4m3adN83EmXzGwWmVyniZ7/n9AvO9wNt3Q5WSoW17okhkxSO8ZFsctiX9klrFmd3G5WC
+         Zg76j5Cn027Q+q/Y26Xtb3qhD/GSDx5QITiHGe0q/tVZzGjECybCzYkhrU5uALqMslRg
+         bcVOVLVA15cB8c03Ubztaob24kkqVmwdw1RDd0p+/8S7F5Kf7MolKILd59sPMeNjtCq7
+         xRcA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ezlDWRMj9kmxxJBJDvLQDaV+rNJm+P/qJAKPI2Vbze4=;
+        fh=/aJsAOl36ypIEf89QEx+4A/CMyIxgGSbpaqOTj5g0p4=;
+        b=BJ1EyH7reAT11suKEbge/QStTC79PIxlMTj3B6TfjaBUwGZILsj2Lj++uxUKWV56ZZ
+         Teacvmup4FgRItXT6APrdM0aemc1VcoQdOz1t86/1Hz9LAWQ/UoiR2r9vC2KpSuk1jIL
+         XiZr6bMeIw+VdiBJV/BhPs4t8OmOkeezbMhVEwODYS7VPuz99wm9VAsDrpSJckRLeEsl
+         KE2qmo4py9j4aNK6kgBVRxUabTh41zcJpejOeVd0s3RvwJQBh8fA9xevZWBZDAk04w8q
+         cf1wYJUi4RJasDTH30jGMXsXtqbO2HR3lEu0F7ynqQXGaU9SN5A6xuCj/QwidZMLMvdD
+         HhMQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795452046; x=1796056846; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=P5/ZiEeoOQolEtqZd6duqT2B+ydqubbd46Mv2EwUK7A=;
-        b=vbpMdQoiG9qBH8Tl6U7EVOleFGxsrHTy0mVYXW6H+MRhrHrfwiAVBAdwZayZumctqK
-         TjAfKEAnfrjr4j6oEW/cEYCOBj1+AV19XLVfz2mSeSpyi0+JFw8DFQVJXbtbFtagdP0E
-         baE/uVWY9vzZstUi/ZpsJ07RzWunWb//7HKrxuNGitcvwHrLPXNwaPmXzMWgE05nLAQl
-         sS5QwQMzgs4+UdkcXzbn4Mt8ueUsE5U3xufdoU+dhEZlXnDT4P/6Pgpg9X3SJxrhdr0E
-         djNugvM++2GRtA2GnhQMsxjY3VIrtZO8oloUIyWEZKFD/GXznbLz5MwpfhzUqzgwVZ/R
-         a8pw==
+        d=google.com; s=20260707; t=1795456254; x=1796061054; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ezlDWRMj9kmxxJBJDvLQDaV+rNJm+P/qJAKPI2Vbze4=;
+        b=Rw6Pf2ZEwkI1UXO7urWIQFYldmXs8W5N8krS6E97FFE6mZKhIHwUDIn10TfS01gjv0
+         2ad/qxb2eC2QJ2UwmKmpX8g2xrOhdsb+6+H6gCquaMukF9SRNBjDmZHbmjQIwwKtRQiz
+         4OnUASOkQ+gEQPbp4T/4aQR4JKBPgDMoGv8nxz+UYm2NOW8p0PGH2bBJwz/WImNU3r1U
+         7r8Czk+/KdZ24CppBqkaigsCmxPO9BAkydO5jrN1Xf3tfO/6af1kY2RhTIaGc/+at7nS
+         QY++jE75t3ZW+U8KeoNEjOh2ljFPeod1xGq4fsrYeZNmNMxs/loEagZUSbz58olNW7Oy
+         5/Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795452046; x=1796056846;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=P5/ZiEeoOQolEtqZd6duqT2B+ydqubbd46Mv2EwUK7A=;
-        b=noGWklX7QZ6hiGTLPc9q+pQhuDdBZJiCJowKxM/o5yHLtaNYbbTorVaBg8SJSjJqdi
-         Nk0coCl1RaSeYUOe/1YmlPNwDCWT1InAtZGRQcq9QoFkStMTXKdL5yw0GiXR3DaM2za9
-         2OU3TwlVZkh1w/Ykr1I6k7gCxCxNjNN8Ls/sQ0dUFnxnkP8pmh4aNKUI07J5fO06zuoo
-         oKvJJS7nLIYDOSdt6MS5MFTi8njiLH0sorVbRihxjpi412tRdhotAb4aeRwzggSpKniU
-         f89LtLFn9xcJNeFa2aoLUMmWqjrA/602NGADRR4bYKxarcUAtJx/DhJ6vdVt95yX4qFK
-         SH8w==
-X-Forwarded-Encrypted: i=1; AL+hErEfRRqrnPwAfAtgPjXZeK5I6LXI/F1OOYTqZnfOWeFdEitT6FqcEMXRmRKCBs4l0qClJaPfgfzhcY6QEA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8nYe4ZWmL9DMD1c5gBBmWPeHw4ZZTk1azVqCTAtuNR3JdDkSMl
-	6r+rDr3ObAD/UcsFKeVBv5f+pYqAZXr8igcGTgyv1eaX4R+Q4EccXm0f
-X-Gm-Gg: AZFdTZeBHksWH7l+nA1NGGYRgwkcWxlsO6TH5DaagaBJTkMORpfgbdo1EDFrURkqYIR
-	Yw1QfKQguV5joFpvPgDNvXAsnyyAY/gICRf1YC2SWu+jNR0HF00UihR3nHfwLEIHqcS3kQ8ziSg
-	DvrJMHmWynfrpB2SXhxXFXlqbRpHsDli0Wvlt4HnLT3EU4UxEdx2AiZjv8Js3znthB6ip1TnRow
-	gmZlz1fj71sM88CT7eFscmjLOOLQrzl47JXaW59fgDMh88I73UNRzJ3Ty+INfSNm83MJ0uNY6f3
-	KT4jclbHH0OUNLon2eBx1U0sqKHwFb7T6HXgvw+Eiv+7IVCzuB7fXWiZ4+Bigo+839gym3dO6HA
-	bKIAcIowivd+kXbHtP4KwZBy1VslegfPnbXyaUlgeSpGZ+2X+KNo3GZEE09deqCTTr7ttHw8u1c
-	WM1aeV1L4j33R8t2rPqTJ1IpAvO1/DsJrs1qliEyCLpaY4CXTpaT4cXzfQjirogKto+xKLpNfZ6
-	lPrOQvqA6UEviuWgc5o3FYvoEIQ5txWyoH6MtJ9UGzHJMhaUN71lxHJIRzRPf5SbzYQOdlejnJv
-	SMOHVZ9SjWuPnoTvir5pgBcWFzgvm5JhpgO2BY+nwGQPhm5Foa5OUFOTuUhHruWuXXg5FvVYb/5
-	LWzoIm1um
-X-Received: by 2002:a05:701a:844e:20b0:1b5:6c13:c76c with SMTP id a92af1059eb24-1b56c13c7a8mr6689110c88.15.1795452045824;
-        Mon, 23 Nov 2026 08:40:45 -0800 (PST)
-Received: from lounas.tail428e48.ts.net ([157.131.129.22])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b556847fdasm33225486c88.13.2026.11.23.08.40.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 08:40:45 -0800 (PST)
-From: Louis Thiery <thiery.louis@gmail.com>
-To: agk@redhat.com,
-	snitzer@kernel.org,
-	mpatocka@redhat.com,
-	bmarzins@redhat.com
-Cc: ming.lei@redhat.com,
-	dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Louis Thiery <thiery.louis@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] dm: clear REQ_DM_POLL_LIST on embedded clone bio
-Date: Mon, 23 Nov 2026 16:40:21 +0000
-Message-ID: <20261123164021.463361-1-thiery.louis@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20260707; t=1795456254; x=1796061054;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ezlDWRMj9kmxxJBJDvLQDaV+rNJm+P/qJAKPI2Vbze4=;
+        b=XbDi5wfVW6pFkgQ6acM7kyEIIxBS5EP2nCP7leERH2o+CfsnVtK8jTiRB+F5/WT1zH
+         IIQZYi/GFZUojc9BxoseBkNI1MR7uu7wLqB3WFPug0EG1MzvFaJ2M9PUla5oqTan+HKL
+         VxxcKzWJo5xvjyVvkXSO9WbJJGPtewuGxgMCrCG5zLe7LNIud5QYO5XSIzr6t8RVr7Vp
+         bMAjrqDGvnSHTrgqdXrL/1zZ4mtfyO+a+2nfkelGxkflByYtC5r/xoIpqX3QjMrjQ7fu
+         k04M4g36WCIRfD96AdzOZd1fxDqb4rYhZFq8UhTahiVb9jE+B+7cEQxuTlFzVc4qE3Zj
+         AY3w==
+X-Forwarded-Encrypted: i=1; AL+hErHgfgIiWPmoQ0NPrIH7DetYb/MLdYUxqgv7BQJYDnJQ0V5wWVOe2CLVTZUXvW6D/3tf8iDlWpJtVwS+pA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9ZNvHZ5jlOw1XYEv60NHQ4b5yz7s/TyvgTky/GeF7l31HYRx/5
+	8Wy1GazdQOy5XQnB4xpM9WlMmS0phRYfLHziJ/Hn41hY6F6zpQbhyfwGlZRf3go9DDceqeh4P7s
+	vc++rCqUQ5F3nqrSo2Wd69NzFMwOzaYORoVnMtgAO
+X-Gm-Gg: AZFdTZcT2fSBC9hG98TmJ7EM2yWWFFtxGzQvWM5EtsGUESg4z43TonNyKBpUggYUUfj
+	Oouh4YkqqNZGGFrFuvMVpFpCiEFNkZeJI6aTK2WD8TZziUGLnjt/mC4Fr+cpsehdwhd72wCFV3+
+	7jfhpJl5gE5ANTVViXVYJQ43SVhPtro/9218V9ws1r1M6ooghQ1z52/p2l3nDvr3uk8+9QhJgn+
+	BobbbYJraqCipj71D4EOmsDJ6mQ+d6RmzYj7BR+RgplH2Xc1j2MzWzWY8wRSwYlkX3u5RT/XIUP
+	ZMOCMHzJVuQJeSdQqRH+LFyDKZgNd8AaCkWw7NdKgrz/8lChc7Cml4m5I6KzxnjDPFr5/q1o1L3
+	bMswPP7z4ub2zD7FzmR2qw4JWW1fvOjC3GTZb4lViXfz5rTTUZ4/MgWmI4Bb62nwK86U=
+X-Received: by 2002:a05:600c:287:b0:4a1:e368:cbf7 with SMTP id
+ 5b1f17b1804b1-4bb909d0619mr1867585e9.0.1795456253076; Mon, 23 Nov 2026
+ 09:50:53 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -103,71 +104,156 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261109182533.3594984-1-lrizzo@google.com> <20261120010655.467825-1-lrizzo@google.com>
+ <20261120135013.GO3115493@ziepe.ca> <CAMOZA0LmZ9PFzxLcc1SuS8piFyZu6P=vX_qR2jy-3QRUoNCUKA@mail.gmail.com>
+ <1f10002ea9ee16a17087bd06e4a1685a973fdf6e.camel@linux.ibm.com>
+In-Reply-To: <1f10002ea9ee16a17087bd06e4a1685a973fdf6e.camel@linux.ibm.com>
+From: Naman Gulati <namangulati@google.com>
+Date: Mon, 23 Nov 2026 09:50:40 -0800
+X-Gm-Features: Aa3M54qK7IY8ZMBupflhQ8_7jK3YPX7yjpTGqvTp5f5henwr9osR6FHQsicVdiQ
+Message-ID: <CAMP57yVZx=s-JXHfQfd_ouv2jV6MMsJXpxVLkQQHG=7qfFVJfA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 00/25] PISA: Pre-mapped IOVA Superpage Allocator
+ for DMA and CoCo
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Luigi Rizzo <lrizzo@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Vlastimil Babka <vbabka@kernel.org>, Joerg Roedel <joro@8bytes.org>, 
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe <axboe@kernel.dk>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Luigi Rizzo <rizzo.unipi@gmail.com>, 
+	Lorenzo Stoakes <ljs@kernel.org>, "Liam R . Howlett" <liam@infradead.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <brendan.jackman@linux.dev>, Zi Yan <ziy@nvidia.com>, Harry Yoo <harry@kernel.org>, 
+	Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Hao Li <hao.li@linux.dev>, 
+	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>, Jann Horn <jannh@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J . Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Willem de Bruijn <willemb@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Joshua Washington <joshwash@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Christoph Hellwig <hch@lst.de>, Dragos Tatulea <dtatulea@nvidia.com>, Pranjal Shrivastava <praan@google.com>, 
+	Mostafa Saleh <smostafa@google.com>, Randy Dunlap <rdunlap@infradead.org>, linux-mm@kvack.org, 
+	iommu@lists.linux.dev, netdev@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, driver-core@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-api@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When a polled bio is split across a target boundary (for example a
-dm-striped chunk boundary), dm_split_and_process_bio() re-submits the
-trimmed remainder of the original bio and then calls dm_queue_poll_io(),
-which sets REQ_DM_POLL_LIST (aliased to REQ_DRV) on the original bio.
+On Mon, Nov 23, 2026 at 2:10=E2=80=AFAM Niklas Schnelle <schnelle@linux.ibm=
+.com> wrote:
+>
+> On Fri, 2026-11-20 at 15:19 +0100, Luigi Rizzo wrote:
+> > On Fri, Nov 20, 2026 at 2:50=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> =
+wrote:
+> > >
+> > > On Fri, Nov 20, 2026 at 01:06:30AM +0000, Luigi Rizzo wrote:
+> > > > This is v3 of the RFC previously posted as DMA_PMD [0], now renamed=
+ PISA
+> > > > ("Pre-mapped IOVA Superpage Allocator"). The text below follows
+> > > > Documentation/core-api/pisa.rst (patch 25/25), which has the detail=
+s.
+> > >
+> > > I thought the conclusion was to just do this stuff in netdev pagepool=
+,
+> > > now you come with an enormous AI series spread across the entire
+> > > kernel?
+> >
+> > There were surely comments claiming nothing outside net/ cares or needs=
+ this.
+> >
+> > I respectfully disagree, witness is the fact that e.g. there was alread=
+y an
+> > io_uring proposal which is smaller, but does not address applications
+> > that want to use the standard disk I/O paths (libaio, buffer cache etc)
+> >
+> > Nothing has changed from the initial series in terms of size, use cases=
+ or
+> > subsystems involved. Large files are placed where they should,
+> > the series covers the same three use cases (disk, network, CoCo), and
+> > touches three parts which it has to touch: mm (most of it; it is a
+> > memory allocator
+> > extension after all), dma (it hooks into map and unmap, not a large cha=
+nge)
+> > and net (the pagepool change is a couple of lines; the tx path needs to
+> > touch more places because the current stack assumes all paths have
+> > the same I/O requirements).
+> >
+> > For CoCo, there are very fine grained controls so the bounce buffers
+> > can be enabled only when they don't pose a risk, which in turn
+> > depends on the threat model.
+> >
+> > Specifically, for network tx buffers or disk writes, the user-to-kernel=
+ copy
+> > is basically a bounce buffer provided it is used correctly and not leak=
+ed
+> > elsewhere (which is the design; of course the implementation
+> > needs to be verified and possibly fixed so that it matches the design).
+> >
+> > cheers
+> > luigi
+>
+> Hi Luigi, Hi Jason,
+>
+> I've been lurking but following this series since the start. I am torn.
+> On s390 where the IOMMU is always enabled on our closest equivalent to
+> bare metal (non paging LPAR hypervisor), and where we also default to
+> an emulated IOMMU in KVM guests, the underlying problem is a real pain.
+> We're also in the process of enabling large IOMMU mappings via the
+> generic_pt API which are 1M and 2G on s390. So, the idea of making
+> better use of larger mappings is very attractive to us and I applaud
+> you for trying to tackle this very real issue.
+>
+> That said I do have to agree with the critique. This series is too
+> invasive, too unclear in its layering, and most importantly it feels
+> like you're trying to do everything in a big swoop ignoring advice from
+> the maintainers just because it would limit the scope of a first step.
+>
+> I also don't think Jason's point is that nothing outside net/ cares, I
+> think, it's rather that the IOMMU and DMA layers already offer the
+> tools and each subsystem needs to use the right combination for its
+> specific requirements. And if a tool is missing this needs to be stated
+> very precisely including how the addition keeps layering intact.
+>
+> I don't claim to have a simple solution to offer, if I did I would have
+> sent patches already, but let me state my thoughts. First I think this
+> really needs an iterative approach with much smaller self contained
+> steps and focus on specific issues. With that, I think this should
+> focus on the network stack, while the io_uring specific proposal can go
+> after the block layer. Also in my experience networking is where this
+> hurts most.
+>
+> Now, I wonder if we can't start with something simple. What if the page
+> pool could start by allocating in batches of PMD sized and aligned
+> folios of contiguous pages that can share a single large IOMMU
+> translation. The page pool can then still hand out pages from that
+> batch without having to do sub-page allocation but would already use
+> much fewer IOTLB entries and the locality might even help non IOMMU
+> workloads. So, I'd even hope this could be enabled by default and this
+> is actually something I don't like about this series, I really don't
+> like having a tunable when we know that larger IOMMU mappings are
+> strictly better when you have an IOMMU that supports them.
+>
+> I think that approach would also align with Jason's idea to keep things
+> within the network stack and to work with the tools we have until their
+> limits become very clear.
 
-When the remainder subsequently enters dm_split_and_process_bio(),
-alloc_io() clones it into the embedded io->tio.clone, inheriting
-REQ_DM_POLL_LIST. alloc_tio() only clears REQ_DM_POLL_LIST in its else
-branch for non-embedded clones, leaving REQ_DRV set on the embedded
-clone that polled normal I/O uses.
+Hi Niklas,
 
-The leaked REQ_DRV flag is misinterpreted by lower layers. On NVMe
-(where REQ_NVME_MPATH is also defined as REQ_DRV), nvme_start_request()
-calls nvme_mpath_start_request(). For a single-path namespace where
-ns->head->disk is NULL (with CONFIG_NVME_MULTIPATH=y), dereferencing
-disk->queue triggers a kernel NULL pointer dereference:
+I have been working on this idea exactly - extending the network
+page-pool with a memory provider that allocates large pages, splitting
+them into N smaller pages that all share a single IOMMU entry. I
+breifly shared my approach in the v1 PMD series [1]. I'm readying a
+short RFC to share shortly, would appreciate your feedback.
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000050
-  RIP: 0010:nvme_mpath_start_request+0x28/0xc0
-  Call Trace:
-   nvme_prep_rq+0x5e0/0xa90
-   nvme_queue_rq+0x40/0x1a0
-   __blk_mq_issue_directly+0x45/0xb0
-   blk_mq_try_issue_directly+0x85/0x100
-   blk_mq_submit_bio+0x6c9/0x710
-   submit_bio_noacct_nocheck+0x127/0x330
-   blkdev_direct_IO+0x230/0x680
 
-On stacked DM devices, a lower DM layer also sees REQ_DM_POLL_LIST
-already set on the incoming clone and treats its bi_private as a dm_io
-poll list head.
+[1] https://lore.kernel.org/netdev/CAMP57yWvHO0pWCR3-9q1gtwVe8WV4Y6i69trmw+=
+BJRVYf3JB1g@mail.gmail.com/
 
-Move the REQ_DM_POLL_LIST clear out of the else branch in alloc_tio() so
-it applies to both embedded and non-embedded clones.
-
-Fixes: b99fdcdc3636 ("dm: support bio polling")
-Cc: stable@vger.kernel.org
-Signed-off-by: Louis Thiery <thiery.louis@gmail.com>
----
- drivers/md/dm.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 1881d8611..79972f17f 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -628,13 +628,13 @@ static struct bio *alloc_tio(struct clone_info *ci, struct dm_target *ti,
- 		if (!clone)
- 			return NULL;
- 
--		/* REQ_DM_POLL_LIST shouldn't be inherited */
--		clone->bi_opf &= ~REQ_DM_POLL_LIST;
--
- 		tio = clone_to_tio(clone);
- 		tio->flags = 0; /* also clears DM_TIO_INSIDE_DM_IO */
- 	}
- 
-+	/* REQ_DM_POLL_LIST shouldn't be inherited */
-+	clone->bi_opf &= ~REQ_DM_POLL_LIST;
-+
- 	tio->magic = DM_TIO_MAGIC;
- 	tio->io = ci->io;
- 	tio->ti = ti;
--- 
-2.43.0
-
+>
+> Thanks,
+> Niklas
+> > >
