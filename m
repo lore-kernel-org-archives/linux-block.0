@@ -1,100 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795456255;
-	b=TBmo/dnqRji4/7l0D61gpTI+IQw7HJmnbXU0pVv5uT/ebpA2ytt+3e+St45DjTbC0ADr
-	 6ahGWEwZHISyZyBltPdaCTfUo5Wp8lPCZMkXCp1RudwVWvok1orzt0kRs9cs4pzqzKk9X
-	 Fo8GVd1mZBkXkqioBjQmmHzGH7oY9u9Q82Zz1M/8o9wbcX8HCgpg9VHEFEeVJwzm8ukZ0
-	 ImUycXT2RDe8C9HEzU1+/s/x/NVDEHmMfYSKoTctbokB/UvrljccfRkRipPfpZ4Rh4sw0
-	 1xYM74r34Nt6JVXd0IQX1TK1I7z4NJdiJ/jfSryMinBFIp65Kc5mfeBXuXkdaF1DjfA==
+	t=1795457684;
+	b=nbIE6ozgHuIxe0sRhj44xyOMGKoziueiBSDxluBEDwgZHlR+pTg4gSD2Qreg1L9U/XBB
+	 kyvUIgfqtk5OqFBJx2oD0CX/+f5iHSjG8lWa3c0fxYpHIWW456wYeHOXO68VCq08dXieb
+	 VmO6lQKsrxdXlyWFKV20Cy9PlObRc4g3rAiSIWxBW86XiH3j2X9azdCRNCRQJNmJHpnLn
+	 ER6GTTB8Q5RSKJyBuiUzJZm1+gGFFg+gnzk3FPBLgMk8MELzDy1LDOY2MzgGfNLK16eTB
+	 i9TvxmxZuxc/oml+5o7mf6tVysXgZxlrSSZTdXlMQ7WGeyEq2r8eMJdUNP9kQGEnGmw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795456255;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=ezlDWRMj9kmxxJBJDvLQDaV+rNJm+P/qJAKPI2Vbze4=;
-	b=fMTrYfTe01EjSpSZC2r7BR7384wTcjTnSlklZHHzc4RmhbemFf1MlbUU0447n5/ZMmqW
-	 InZQdEfjOK4ZONx93nVg/20dAK8oDTCyU4XMEQDsWOLP4lnbH7n9fL/AmYmHq9MocfYQx
-	 4Sb9R4dUfJnw4aSKxvDsP1opQS7dXgD3OpH+e1rbaxo/kniD62LFjAvqtcz+MtosyXZ86
-	 TCCgAIk7Ml/gOvTxku7TVqFdGEV3EEJaX3quE4MNSj8eNEZP1ol/1vUUSg+VAZaMyWiGm
-	 TooJy5seKEunLx0Erv3ptE6bCP+0SuNcsR1PErqj0gAlyEkDuKNMDUbGi+T1A58B1og==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795457684;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-ZohoMailClient;
+	bh=yOy40zyrDNkufLfX1+5C1rSlLdTXQCSrlMTkU/yGIbE=;
+	b=kxNu6xUoBJwWoOhPdgksddAZjI4E7g2CDNpCHvlWmQJG8zmR5332m3sSUiQaWETveVuw
+	 5vIOwKbtAgFnZRBR7aKkTmQpxrzbRbLFf8OQqBqfOaUItJRRiIPL+i8lBwzFCw5GAuzle
+	 lLyAWTJUoIbAGNB0MzQlHDkFaCrbDT6/opCnF0OEzbeAaQAi3WO6SpmoISPUalSvHfdiV
+	 5Ohc191kBfeKX3kBA/Ti6fITS/Hz5YraL+eTliA/DZSZXkhs0GX8ZqT/UPA+VfiziQdmK
+	 5A0UUF+09LCjwW7G96QcAFMrh19nu5eWTr8jqGe2Qd6aOvPh+R9ApoCe3FVO2omzaEg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Rw6Pf2ZE;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.44
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=none header.from=laveeshbansal.com;
+	spf=pass smtp.mailfrom=laveeshbansal.com;
+	dkim=pass header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b="WUZJWl/W";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
+Received: from sender5-op-o15.zoho.com (sender5-op-o15.zoho.com [165.173.182.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E307606A31A
-	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 17:50:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3E307606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74173606A31A;
+	Mon, 23 Nov 2026 18:14:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 74173606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Rw6Pf2ZE
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4bb6860f867so102445e9.1
-        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 09:50:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795456254; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Kul0sSdrRGJY8kRsKhU5SwXx5LuuC2Pg2se6RwBgDcd4jDtrqHMx77YuwfuZOUOt3J
-         Si+ZOP47NBOzl383gEbMsozkDfrKLxLCGYOFK6sZiZCoIBfL5eaQNVQthOxlAuW1T0PS
-         4m3adN83EmXzGwWmVyniZ7/n9AvO9wNt3Q5WSoW17okhkxSO8ZFsctiX9klrFmd3G5WC
-         Zg76j5Cn027Q+q/Y26Xtb3qhD/GSDx5QITiHGe0q/tVZzGjECybCzYkhrU5uALqMslRg
-         bcVOVLVA15cB8c03Ubztaob24kkqVmwdw1RDd0p+/8S7F5Kf7MolKILd59sPMeNjtCq7
-         xRcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ezlDWRMj9kmxxJBJDvLQDaV+rNJm+P/qJAKPI2Vbze4=;
-        fh=/aJsAOl36ypIEf89QEx+4A/CMyIxgGSbpaqOTj5g0p4=;
-        b=BJ1EyH7reAT11suKEbge/QStTC79PIxlMTj3B6TfjaBUwGZILsj2Lj++uxUKWV56ZZ
-         Teacvmup4FgRItXT6APrdM0aemc1VcoQdOz1t86/1Hz9LAWQ/UoiR2r9vC2KpSuk1jIL
-         XiZr6bMeIw+VdiBJV/BhPs4t8OmOkeezbMhVEwODYS7VPuz99wm9VAsDrpSJckRLeEsl
-         KE2qmo4py9j4aNK6kgBVRxUabTh41zcJpejOeVd0s3RvwJQBh8fA9xevZWBZDAk04w8q
-         cf1wYJUi4RJasDTH30jGMXsXtqbO2HR3lEu0F7ynqQXGaU9SN5A6xuCj/QwidZMLMvdD
-         HhMQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795456254; x=1796061054; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ezlDWRMj9kmxxJBJDvLQDaV+rNJm+P/qJAKPI2Vbze4=;
-        b=Rw6Pf2ZEwkI1UXO7urWIQFYldmXs8W5N8krS6E97FFE6mZKhIHwUDIn10TfS01gjv0
-         2ad/qxb2eC2QJ2UwmKmpX8g2xrOhdsb+6+H6gCquaMukF9SRNBjDmZHbmjQIwwKtRQiz
-         4OnUASOkQ+gEQPbp4T/4aQR4JKBPgDMoGv8nxz+UYm2NOW8p0PGH2bBJwz/WImNU3r1U
-         7r8Czk+/KdZ24CppBqkaigsCmxPO9BAkydO5jrN1Xf3tfO/6af1kY2RhTIaGc/+at7nS
-         QY++jE75t3ZW+U8KeoNEjOh2ljFPeod1xGq4fsrYeZNmNMxs/loEagZUSbz58olNW7Oy
-         5/Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795456254; x=1796061054;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ezlDWRMj9kmxxJBJDvLQDaV+rNJm+P/qJAKPI2Vbze4=;
-        b=XbDi5wfVW6pFkgQ6acM7kyEIIxBS5EP2nCP7leERH2o+CfsnVtK8jTiRB+F5/WT1zH
-         IIQZYi/GFZUojc9BxoseBkNI1MR7uu7wLqB3WFPug0EG1MzvFaJ2M9PUla5oqTan+HKL
-         VxxcKzWJo5xvjyVvkXSO9WbJJGPtewuGxgMCrCG5zLe7LNIud5QYO5XSIzr6t8RVr7Vp
-         bMAjrqDGvnSHTrgqdXrL/1zZ4mtfyO+a+2nfkelGxkflByYtC5r/xoIpqX3QjMrjQ7fu
-         k04M4g36WCIRfD96AdzOZd1fxDqb4rYhZFq8UhTahiVb9jE+B+7cEQxuTlFzVc4qE3Zj
-         AY3w==
-X-Forwarded-Encrypted: i=1; AL+hErHgfgIiWPmoQ0NPrIH7DetYb/MLdYUxqgv7BQJYDnJQ0V5wWVOe2CLVTZUXvW6D/3tf8iDlWpJtVwS+pA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9ZNvHZ5jlOw1XYEv60NHQ4b5yz7s/TyvgTky/GeF7l31HYRx/5
-	8Wy1GazdQOy5XQnB4xpM9WlMmS0phRYfLHziJ/Hn41hY6F6zpQbhyfwGlZRf3go9DDceqeh4P7s
-	vc++rCqUQ5F3nqrSo2Wd69NzFMwOzaYORoVnMtgAO
-X-Gm-Gg: AZFdTZcT2fSBC9hG98TmJ7EM2yWWFFtxGzQvWM5EtsGUESg4z43TonNyKBpUggYUUfj
-	Oouh4YkqqNZGGFrFuvMVpFpCiEFNkZeJI6aTK2WD8TZziUGLnjt/mC4Fr+cpsehdwhd72wCFV3+
-	7jfhpJl5gE5ANTVViXVYJQ43SVhPtro/9218V9ws1r1M6ooghQ1z52/p2l3nDvr3uk8+9QhJgn+
-	BobbbYJraqCipj71D4EOmsDJ6mQ+d6RmzYj7BR+RgplH2Xc1j2MzWzWY8wRSwYlkX3u5RT/XIUP
-	ZMOCMHzJVuQJeSdQqRH+LFyDKZgNd8AaCkWw7NdKgrz/8lChc7Cml4m5I6KzxnjDPFr5/q1o1L3
-	bMswPP7z4ub2zD7FzmR2qw4JWW1fvOjC3GTZb4lViXfz5rTTUZ4/MgWmI4Bb62nwK86U=
-X-Received: by 2002:a05:600c:287:b0:4a1:e368:cbf7 with SMTP id
- 5b1f17b1804b1-4bb909d0619mr1867585e9.0.1795456253076; Mon, 23 Nov 2026
- 09:50:53 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=WUZJWl/W
+ARC-Seal: i=1; a=rsa-sha256; t=1795457656; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=GO/PQr/knQKRwutlrxpwmQnlF4ufiC1/MxPjTAEzuUQ1JguR57eiMoVdXUD1X0AUduAakU6A5sLNMSyGaFSYW7Sp4oR8jNmF2f5WP04t0LCn25Up5MlHbWvURM+l4L9OwnxpM9F/ALmJf7zgJXHXmzEk04rjIWqUagq70iDzuFw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1795457656; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=yOy40zyrDNkufLfX1+5C1rSlLdTXQCSrlMTkU/yGIbE=; 
+	b=awhHWwnYOwCb3N6C0YPM59LdRm3Y5BtyaYEuTOhHe7hijdDD+gIFhTAMqLfheZiDkFuQdnb0E/xEh03lFogFBLQx3zcoKpGGK+gX2/GEiP3POJFhYC0VQw8BFzCIzGQc7bpnmV4r6dAmaOrNqa72f56FOXjS9zSU0veebSdWEc0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=laveeshbansal.com;
+	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
+	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
+DKIM-Signature: a=rsa-sha256; b=WUZJWl/WqOw+OCdZAhZQPiZ+P3MWrUa09CnEksyxXKsCB/Am4F1s50PJq0XhRWHTAPRz+UgEEK3KWCFOlcBNZ/xAFnk4XDXHVjt5GNseG/05CMmBT1aXVCLIhdsUht96tV/TvlU4ZfIVrSNekJMUVAR2wWzv/mHlX1xFmtcjGQk=; c=relaxed/relaxed; s=zoho; d=laveeshbansal.com; v=1; bh=yOy40zyrDNkufLfX1+5C1rSlLdTXQCSrlMTkU/yGIbE=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
+Received: by smtp.zohomail.com with SMTPS id 1795457654842487.56845822427283;
+	Mon, 23 Nov 2026 10:14:14 -0800 (PST)
+From: Laveesh Bansal <laveeshb@laveeshbansal.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Eric Biggers <ebiggers@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com,
+	linux-block@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] blk-crypto: use a NOIO scope while holding profile->lock
+Date: Mon, 23 Nov 2026 10:14:08 -0800
+Message-ID: <20261123181408.62972-1-laveeshb@laveeshbansal.com>
+X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,156 +72,131 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261109182533.3594984-1-lrizzo@google.com> <20261120010655.467825-1-lrizzo@google.com>
- <20261120135013.GO3115493@ziepe.ca> <CAMOZA0LmZ9PFzxLcc1SuS8piFyZu6P=vX_qR2jy-3QRUoNCUKA@mail.gmail.com>
- <1f10002ea9ee16a17087bd06e4a1685a973fdf6e.camel@linux.ibm.com>
-In-Reply-To: <1f10002ea9ee16a17087bd06e4a1685a973fdf6e.camel@linux.ibm.com>
-From: Naman Gulati <namangulati@google.com>
-Date: Mon, 23 Nov 2026 09:50:40 -0800
-X-Gm-Features: Aa3M54qK7IY8ZMBupflhQ8_7jK3YPX7yjpTGqvTp5f5henwr9osR6FHQsicVdiQ
-Message-ID: <CAMP57yVZx=s-JXHfQfd_ouv2jV6MMsJXpxVLkQQHG=7qfFVJfA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 00/25] PISA: Pre-mapped IOVA Superpage Allocator
- for DMA and CoCo
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Luigi Rizzo <lrizzo@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Vlastimil Babka <vbabka@kernel.org>, Joerg Roedel <joro@8bytes.org>, 
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe <axboe@kernel.dk>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Luigi Rizzo <rizzo.unipi@gmail.com>, 
-	Lorenzo Stoakes <ljs@kernel.org>, "Liam R . Howlett" <liam@infradead.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Brendan Jackman <brendan.jackman@linux.dev>, Zi Yan <ziy@nvidia.com>, Harry Yoo <harry@kernel.org>, 
-	Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Hao Li <hao.li@linux.dev>, 
-	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>, Jann Horn <jannh@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J . Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Joshua Washington <joshwash@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Christoph Hellwig <hch@lst.de>, Dragos Tatulea <dtatulea@nvidia.com>, Pranjal Shrivastava <praan@google.com>, 
-	Mostafa Saleh <smostafa@google.com>, Randy Dunlap <rdunlap@infradead.org>, linux-mm@kvack.org, 
-	iommu@lists.linux.dev, netdev@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, driver-core@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-api@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Mon, Nov 23, 2026 at 2:10=E2=80=AFAM Niklas Schnelle <schnelle@linux.ibm=
-.com> wrote:
->
-> On Fri, 2026-11-20 at 15:19 +0100, Luigi Rizzo wrote:
-> > On Fri, Nov 20, 2026 at 2:50=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> =
-wrote:
-> > >
-> > > On Fri, Nov 20, 2026 at 01:06:30AM +0000, Luigi Rizzo wrote:
-> > > > This is v3 of the RFC previously posted as DMA_PMD [0], now renamed=
- PISA
-> > > > ("Pre-mapped IOVA Superpage Allocator"). The text below follows
-> > > > Documentation/core-api/pisa.rst (patch 25/25), which has the detail=
-s.
-> > >
-> > > I thought the conclusion was to just do this stuff in netdev pagepool=
-,
-> > > now you come with an enormous AI series spread across the entire
-> > > kernel?
-> >
-> > There were surely comments claiming nothing outside net/ cares or needs=
- this.
-> >
-> > I respectfully disagree, witness is the fact that e.g. there was alread=
-y an
-> > io_uring proposal which is smaller, but does not address applications
-> > that want to use the standard disk I/O paths (libaio, buffer cache etc)
-> >
-> > Nothing has changed from the initial series in terms of size, use cases=
- or
-> > subsystems involved. Large files are placed where they should,
-> > the series covers the same three use cases (disk, network, CoCo), and
-> > touches three parts which it has to touch: mm (most of it; it is a
-> > memory allocator
-> > extension after all), dma (it hooks into map and unmap, not a large cha=
-nge)
-> > and net (the pagepool change is a couple of lines; the tx path needs to
-> > touch more places because the current stack assumes all paths have
-> > the same I/O requirements).
-> >
-> > For CoCo, there are very fine grained controls so the bounce buffers
-> > can be enabled only when they don't pose a risk, which in turn
-> > depends on the threat model.
-> >
-> > Specifically, for network tx buffers or disk writes, the user-to-kernel=
- copy
-> > is basically a bounce buffer provided it is used correctly and not leak=
-ed
-> > elsewhere (which is the design; of course the implementation
-> > needs to be verified and possibly fixed so that it matches the design).
-> >
-> > cheers
-> > luigi
->
-> Hi Luigi, Hi Jason,
->
-> I've been lurking but following this series since the start. I am torn.
-> On s390 where the IOMMU is always enabled on our closest equivalent to
-> bare metal (non paging LPAR hypervisor), and where we also default to
-> an emulated IOMMU in KVM guests, the underlying problem is a real pain.
-> We're also in the process of enabling large IOMMU mappings via the
-> generic_pt API which are 1M and 2G on s390. So, the idea of making
-> better use of larger mappings is very attractive to us and I applaud
-> you for trying to tackle this very real issue.
->
-> That said I do have to agree with the critique. This series is too
-> invasive, too unclear in its layering, and most importantly it feels
-> like you're trying to do everything in a big swoop ignoring advice from
-> the maintainers just because it would limit the scope of a first step.
->
-> I also don't think Jason's point is that nothing outside net/ cares, I
-> think, it's rather that the IOMMU and DMA layers already offer the
-> tools and each subsystem needs to use the right combination for its
-> specific requirements. And if a tool is missing this needs to be stated
-> very precisely including how the addition keeps layering intact.
->
-> I don't claim to have a simple solution to offer, if I did I would have
-> sent patches already, but let me state my thoughts. First I think this
-> really needs an iterative approach with much smaller self contained
-> steps and focus on specific issues. With that, I think this should
-> focus on the network stack, while the io_uring specific proposal can go
-> after the block layer. Also in my experience networking is where this
-> hurts most.
->
-> Now, I wonder if we can't start with something simple. What if the page
-> pool could start by allocating in batches of PMD sized and aligned
-> folios of contiguous pages that can share a single large IOMMU
-> translation. The page pool can then still hand out pages from that
-> batch without having to do sub-page allocation but would already use
-> much fewer IOTLB entries and the locality might even help non IOMMU
-> workloads. So, I'd even hope this could be enabled by default and this
-> is actually something I don't like about this series, I really don't
-> like having a tunable when we know that larger IOMMU mappings are
-> strictly better when you have an IOMMU that supports them.
->
-> I think that approach would also align with Jason's idea to keep things
-> within the network stack and to work with the tools we have until their
-> limits become very clear.
+Setting a key in blk-crypto-fallback can deadlock on profile->lock.
+blk_crypto_get_keyslot() holds it across keyslot_program, whose setkey
+allocates with GFP_KERNEL (Adiantum); direct reclaim can evict an fscrypt
+inode, and blk_crypto_evict_key() then takes profile->lock again. syzbot
+reports it as an fs_reclaim vs profile->lock cycle. Since
+commit 5acc6f649a68 ("fscrypt: Always use blk-crypto for contents on
+block-based filesystems") hitting it no longer needs -o inlinecrypt.
 
-Hi Niklas,
+Enter a NOIO scope in blk_crypto_hw_enter() and leave it in
+blk_crypto_hw_exit(), so allocations made under the lock, by the
+fallback or a hardware driver, can't recurse into the filesystem. The
+saved flags live in the profile. blk_crypto_reprogram_all_keys() takes
+the lock directly, so it gets the same scope.
 
-I have been working on this idea exactly - extending the network
-page-pool with a memory provider that allocates large pages, splitting
-them into N smaller pages that all share a single IOMMU entry. I
-breifly shared my approach in the v1 PMD series [1]. I'm readying a
-short RFC to share shortly, would appreciate your feedback.
+Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
+Cc: stable@vger.kernel.org # v7.3+
+Reported-by: syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/r/6a9b25c3.b5d4176b.238c3e.0004.GAE@google.com
+Signed-off-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
+---
+I used an LLM for the analysis, the patch and the test runs.
 
+Changes in v2:
+ - Moved the NOIO scope from the two setkey calls into
+   blk_crypto_hw_enter()/blk_crypto_hw_exit(), as Christoph suggested,
+   and added it to blk_crypto_reprogram_all_keys().
+ - The scope now also covers the hardware drivers' keyslot callbacks. I
+   could not test those; it only narrows reclaim for them.
+v1: https://lore.kernel.org/r/20261122213120.20974-1-laveeshb@laveeshbansal.com
 
-[1] https://lore.kernel.org/netdev/CAMP57yWvHO0pWCR3-9q1gtwVe8WV4Y6i69trmw+=
-BJRVYf3JB1g@mail.gmail.com/
+Tested on arm64 and x86_64 (QEMU, base c44104f3642d, KASAN and lockdep;
+patched runs include comment-only revisions): f2fs with an Adiantum
+policy, creating encrypted files and reading them back with O_DIRECT
+under a memory hog, about a minute per run. Runs showing each symptom:
 
->
-> Thanks,
-> Niklas
-> > >
+                                              base      v2
+  lockdep cycle warning, arm64                2 of 2    0 of 8
+  lockdep cycle warning, x86_64               6 of 6    0 of 12
+  task deadlocked on its own lock, arm64      0 of 2    0 of 8
+  task deadlocked on its own lock, x86_64     5 of 6    0 of 12
+  lockdep cycle warning, x86_64 as uid 65534  2 of 2    0 of 2
+  task deadlocked, x86_64 as uid 65534        1 of 2    0 of 2
+  profile->lock -> fs_reclaim edge in
+    lockdep's dump (runs that got to it)      3 of 3    0 of 18
+
+No KASAN reports. Under the hog memory runs out, and 3 of the 12 x86 runs
+stalled in page allocation, two without finishing; base stalls the same
+way. In one, the task holding profile->lock was waiting in the setkey
+allocation with kswapd queued behind it. That stall began earlier, in the
+RAM-backed disk's own allocation, and lockdep reported nothing: NOIO stops
+the allocation recursing into key eviction, not a wait for free memory.
+
+fstests -g encrypt on arm64 passes on f2fs and ext4. Could not reproduce
+on ext4; fstests not run on x86_64.
+
+ block/blk-crypto-profile.c         | 7 +++++++
+ include/linux/blk-crypto-profile.h | 1 +
+ 2 files changed, 8 insertions(+)
+
+diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
+index 53126c091b0b..395829fe7bcc 100644
+--- a/block/blk-crypto-profile.c
++++ b/block/blk-crypto-profile.c
+@@ -29,6 +29,7 @@
+ #include <linux/atomic.h>
+ #include <linux/mutex.h>
+ #include <linux/pm_runtime.h>
++#include <linux/sched/mm.h>
+ #include <linux/wait.h>
+ #include <linux/blkdev.h>
+ #include <linux/blk-integrity.h>
+@@ -53,11 +54,14 @@ static inline void blk_crypto_hw_enter(struct blk_crypto_profile *profile)
+ 	if (profile->dev)
+ 		pm_runtime_get_sync(profile->dev);
+ 	down_write(&profile->lock);
++	/* Reclaim evicts keys under this lock; don't recurse into the fs. */
++	profile->memflags = memalloc_noio_save();
+ }
+ 
+ static inline void blk_crypto_hw_exit(struct blk_crypto_profile *profile)
+ 	__releases(&profile->lock)
+ {
++	memalloc_noio_restore(profile->memflags);
+ 	up_write(&profile->lock);
+ 	if (profile->dev)
+ 		pm_runtime_put_sync(profile->dev);
+@@ -397,6 +401,7 @@ int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
+  */
+ void blk_crypto_reprogram_all_keys(struct blk_crypto_profile *profile)
+ {
++	unsigned int memflags;
+ 	unsigned int slot;
+ 
+ 	if (profile->num_slots == 0)
+@@ -404,6 +409,7 @@ void blk_crypto_reprogram_all_keys(struct blk_crypto_profile *profile)
+ 
+ 	/* This is for device initialization, so don't resume the device */
+ 	down_write(&profile->lock);
++	memflags = memalloc_noio_save();
+ 	for (slot = 0; slot < profile->num_slots; slot++) {
+ 		const struct blk_crypto_key *key = profile->slots[slot].key;
+ 		int err;
+@@ -414,6 +420,7 @@ void blk_crypto_reprogram_all_keys(struct blk_crypto_profile *profile)
+ 		err = profile->ll_ops.keyslot_program(profile, key, slot);
+ 		WARN_ON(err);
+ 	}
++	memalloc_noio_restore(memflags);
+ 	up_write(&profile->lock);
+ }
+ EXPORT_SYMBOL_GPL(blk_crypto_reprogram_all_keys);
+diff --git a/include/linux/blk-crypto-profile.h b/include/linux/blk-crypto-profile.h
+index 4f39e9cd7576..9209b6a14b98 100644
+--- a/include/linux/blk-crypto-profile.h
++++ b/include/linux/blk-crypto-profile.h
+@@ -174,6 +174,7 @@ struct blk_crypto_profile {
+ 	 */
+ 	struct rw_semaphore lock;
+ 	struct lock_class_key lockdep_key;
++	unsigned int memflags;
+ 
+ 	/* List of idle slots, with least recently used slot at front */
+ 	wait_queue_head_t idle_slots_wait_queue;
+-- 
+2.43.0
+
