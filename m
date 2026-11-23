@@ -1,77 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795419745;
-	b=tne9gxjqv+a4SHUSARH3s5q34Vdubr8M/0ZPJTddKLQrfYmjilm1DxNVgS3JAYFQZN9u
-	 VkSX7MlGDgFLwGuoEipXJkH1L59hscP6X3UMfzML7lOLKZlUphbnOxNS+pGTb/jro/Qrj
-	 3dEhFCP6mPyTwenbYVu0zt0YneG9gR0np6MXYAX6w19XoTIHWFNkU7wNeHrtOFWG+Njou
-	 6W3wXeOOTTIbWOhqiQfgp+82U7YRziSqw/KQe+DsSlWSbU2fV4oeqhuLDQaBYm7uvSfD3
-	 fu5C1X3zhMzoqo4MoCypNlPFQeSPVlrFj2Q7XWW7fFyCTjtE2Fzj+JFijy5rIu9TMhg==
+	t=1795422655;
+	b=X0gT62ImbdSoO2VCpPAEZjzfAGnRQl5y8dv/NrY3oK4jhnMYg8nemV57nmD0ql+WMP1S
+	 /zW4pezgZs9qc9FMj4MMUy5oPY0oqkjJaUuKyP+xD1xMan72vU5hZMjW1CE5jezeVlXGs
+	 b6STv027YFpU4xYsZ6yz2tW/n56v3eUUu5FYWx6T/SJerAYXg4DuGpqTwEFbdo/hhNuL/
+	 ENkuoO7WyVqPc89X8roZ4u0jd03+eiLJVXFp5bpmNQCclYHGWZxAWgLVYrJvahzsNGDxc
+	 spf0FJHh3MLP87hqDKznpPzrrQyPEtb4h2+2QegCgKKVtZ54ikiLKMf1WVeUcPyvv8A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795419745;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:Received:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 IronPort-SDR:Received:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 WDCIronportException:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=XX/UPCKp/YOud/Nk2FEAAiZRkVqumzqqTFMCQ2ihimQ=;
-	b=B9Id7SzYe9n0AgSNvPztSBMH/ESPNAi9eSooiMx4Q+EWKGUO1gri295MWEFVxoK84NmI
-	 +Bb3XdAvqecXm13oTWVzWB7x8/BOCxvyLyx5DQA/3pOU+/7XlIcdCytg0QW/48B22WQOj
-	 cI4Cx2UgMQPSbw6ytsyrdyaUM3rQBnSuQJrIDlKZCkLrqKkHrlTWejQKapTDh4vRQbzZG
-	 7fFaH7U9wXu4cZw4lYENI5siVJboC33VI7ttLPOgMMSSjHF7qSM1I8kcXnQTkoc17PXG/
-	 Wn28WkEfpe/npqjxeF9CyxvrAsukvv3GeGI2TbzJiWcgNBcM5BxCkFza/aWBng4RoKg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795422655;
+	h=DMARC-Filter:Received:Received:Received:Received:Date:From:To:CC:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
+	 X-Originating-IP:X-ClientProxiedBy;
+	bh=6tDd9eRJndUwaYYrTyVQpmqvbWmO76hktr/KZipnuAY=;
+	b=l7snZys+o60zJo5QS6ugS67U2gTauk4/d6ygfr/ICobsKWBc6QSKC0/M/TTlSft0Dvif
+	 mg14OKuTSznwk4H7esPMrUuIm9TnOZzMtfDegVobBl5gqeS8labnUMaiwSe94VEWtp+WS
+	 XlEp/vUUIVTRqbUuibjEBwpf3gNnNIJy6iq1ldZut3wrtEoMAXfuP0ePy7ojAM29KBSQO
+	 E4+yG6+e/k6N2QGnGYFfyAw4bWRhmWNpVybVthY7DeXdNE3uETxtoTfFP9tlefGuieq8f
+	 e1UmmHJsx/PrVTw3wSKF2Pre4DhAUyB6GFoqcDNict8sax75o4MywbVPeHKe9w3lazQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=wdc.com;
-	spf=pass smtp.mailfrom=wdc.com;
-	dkim=pass header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=cKp9petU;
-	arc=none smtp.remote-ip=216.71.154.45
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F30606A31A
-	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 07:42:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 89F30606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=cKp9petU
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1795419744; x=1826955744;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=f2w98vmrsQ5YTEWsGzRFWWG8lUit3s008i9OPf4FgTo=;
-  b=cKp9petUJJmGiNWTTCcA+ehkWMWaPGVRKYQyQwMp1LCwOqZP0AkfaYJ4
-   jFTVyHUxzHnuwuuFKpVuSgKcn8wBnOhwBcNW+AjhwuP0CcWmZZ8uCj5cf
-   h8JhRab5tsRt+qJ0WnvVxfzZAyxWerffBhuU/dwEVuVbTmyqUijXG3mpW
-   9Dd4FdxYWwzwioykyaWc4OaqBNWFI13y/KsOCNYaL9/xED+GZftyaitSD
-   JL6jJTuXxYmVRev1Z2eQ7Yx4Erus3wzauP4/Dp5bwTsQi6S5pCcK2BY+C
-   8iMmC/6g3D/OgLu/nEz2M0gpZbgtaadPRXuo8muyJrRPBSwFongdIQ/Yn
-   A==;
-X-CSE-ConnectionGUID: wBdzRm77RiqJvIlWayFJfQ==
-X-CSE-MsgGUID: kSivLPsOQLqvylIU3WF1Gw==
-X-IronPort-AV: E=Sophos;i="6.27,227,1786982400"; 
-   d="scan'208";a="159923146"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-esad1-o.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 23 Nov 2026 15:42:18 +0800
-X-CSE-ConnectionGUID: osq12VOSQVWl6CiEItCjsA==
-X-CSE-MsgGUID: UU+Rcbb8QL2iE5jANEGVjw==
-IronPort-SDR: 6b03ee5a_qQOuPOGUV7T4xeA/vrQZmd3inizpeG51aXpSAelF8nepzMz
- r9TVhsXbSVzUMU0y0viFpV3kKmZfTA9/38GC/8g==
-Received: from uls-op-esai1-o.wdc.com ([10.248.3.45])
-  by uls-op-esad1-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Nov 2026 23:42:18 -0800
-X-CSE-ConnectionGUID: Q48hYuvZSoiUPMpwTGvI2g==
-X-CSE-MsgGUID: osZscT+pRtqrtYj8KrtmnQ==
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.67.30])
-  by uls-op-esai1-o.wdc.com with ESMTP; 22 Nov 2026 23:42:18 -0800
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: Daan De Meyer <daan@amutable.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests] check: avoid double calls of the cleanup function
-Date: Mon, 23 Nov 2026 16:42:17 +0900
-Message-ID: <20261123074217.1446119-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.56.0
+	dmarc=pass header.from=hygon.cn;
+	spf=pass smtp.mailfrom=hygon.cn;
+	arc=none smtp.remote-ip=101.204.27.37
+Received: from spam01.hygon.cn (unknown [101.204.27.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A62606A31A;
+	Mon, 23 Nov 2026 08:30:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9A62606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
+Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jXzfS70p3zg1cV;
+	Mon, 23 Nov 2026 16:30:40 +0800 (CST)
+Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jXzfR3Pf6zVcB5;
+	Mon, 23 Nov 2026 16:30:39 +0800 (CST)
+Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
+	by maildlp1.hygon.cn (Postfix) with ESMTPS id B48A01555;
+	Mon, 23 Nov 2026 16:30:36 +0800 (CST)
+Received: from hsj-2U-Workstation (172.19.24.226) by cncheex04.Hygon.cn
+ (172.23.18.114) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 23 Nov
+ 2026 16:30:37 +0800
+Date: Mon, 23 Nov 2026 16:30:35 +0800
+From: Huang Shijie <huangsj@hygon.cn>
+To: Andreas Gruenbacher <agruenba@redhat.com>
+CC: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
+	<hch@infradead.org>, <mic@digikod.net>, <axboe@kernel.dk>,
+	<gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
+	<serge@hallyn.com>, <legion@kernel.org>, <aleksa@amutable.com>,
+	<libaokun@linux.alibaba.com>, <ebiggers@kernel.org>, <djwong@kernel.org>,
+	<sandeen@redhat.com>, <zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>,
+	<yingzhiwei@hygon.cn>, <wujianyong@hygon.cn>, <shijie8@gmail.com>,
+	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
+	<linux-security-module@vger.kernel.org>
+Subject: Re: [PATCH v3 01/11] vfs: add super_iter_inodes()
+Message-ID: <awP5q_CmS3uIqfCw@hsj-2U-Workstation>
+References: <20261120031305.3561045-1-huangsj@hygon.cn>
+ <20261120031305.3561045-2-huangsj@hygon.cn>
+ <CAHc6FU7VUBLg=gX-xspFfp4jPffdH7Pc4oVx5nRDo7A3aiVWug@mail.gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -81,43 +68,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHc6FU7VUBLg=gX-xspFfp4jPffdH7Pc4oVx5nRDo7A3aiVWug@mail.gmail.com>
+X-ClientProxiedBy: cncheex06.Hygon.cn (172.23.18.116) To cncheex04.Hygon.cn
+ (172.23.18.114)
 
-Since the commit e25f27939668, the registered cleanup function is called
-twice: once from the explicit _cleanup() call in _call_test(), and once
-more from the EXIT trap when the test subshell exits. At the second
-call, TMPDIR has already been removed and unset, and the output is no
-longer redirected to the test output file.
+在 Fri, Nov 20, 2026 at 03:56:23PM +0100，Andreas Gruenbacher 写道：
+> > +
+> > +int super_iter_inodes(struct super_block *sb, ino_iter_fn iter_fn,
+> > +                     ino_iter_eligible_fn eligible, void *priv, int flags);
+> > +
+> >  struct super_operations {
+> >         struct inode *(*alloc_inode)(struct super_block *sb);
+> >         void (*destroy_inode)(struct inode *inode);
+> > --
+> > 2.53.0
+> 
+> Sorry to say, but this has gone quite a bit off course. Can you try a
+> construct like iomap_iter() instead?
 
-This was unnoticed because existing cleanup functions work fine at the
-second call. However, the cleanup function of the new test case added by
-GitHub PR 260 does not work well. It refers to TMPDIR to stop the nbd
-server, and the second call prints the error messages below:
+Christian had suggested to use the following methed:
+  https://lore.kernel.org/all/20261120-mitverantwortlich-drehbaren-kantholz-241300d20168@brauner/
 
-     cat: /nbd.pid: No such file or directory
-     tests/nbd/rc: line 87: kill: `': not a pid or valid job spec
-
-Avoid the second call by unsetting TEST_CLEANUP after calling it.
-
-Link: https://github.com/linux-blktests/blktests/pull/260
-Fixes: e25f27939668 ("check: Add the ability to call a cleanup function after a test ends")
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- check | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/check b/check
-index 3ef36b4..58eae3c 100755
---- a/check
-+++ b/check
-@@ -417,6 +417,7 @@ _register_test_cleanup() {
- _cleanup() {
- 	if [[ -v TEST_CLEANUP ]]; then
- 		${TEST_CLEANUP}
-+		unset TEST_CLEANUP
- 	fi
- 
- 	if [[ "${TMPDIR:-}" ]]; then
--- 
-2.56.0
+Thanks
+Huang Shijie
 
