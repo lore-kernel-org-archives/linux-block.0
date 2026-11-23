@@ -1,59 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795410926;
-	b=oD/xCmpirecLp3yea6+1i50m/a5gpbs2wJiSKmXzqTUZCfH6uz7EVU3I2Og6ME05bOPK
-	 VyfX9Qdv3eLT6xj0wdkg9BVNYyL7+tLEwy2PX+67lKzE/OhpNBZU78JkbM2duHFXVG49Z
-	 /NkMWiKEbT1D8/I+B1HSQdoqtaaZo2pXeQMNc15uC6lDRTvOYmZXyilOw0PrpB2P5Iv3p
-	 KScTH+UbPLidAeitARN2Qw9XLHXbiyrM1VMQ9quH8P9kWAijmjwbL7QGayILraXkTvaGW
-	 mtqEssA/v6x8E8KiTya/gxAdOt6/HrxygQvMF/Dw2L+0GRAweiVrQtZT3dW4W+naIiQ==
+	t=1795410985;
+	b=F+O2eDSgl2vw2AibEROdfjN81WTQVVnvcwySstFMU37vfaSBXqDUTZ5wzYwddfdZoJ/+
+	 BFOVK/lkNwCz8qSTc6OsdfA4/Ovji6iunzI/jvhvb5C3/pCI1C7HaR1+bl1RJfLT92N1e
+	 w/xTPqEWfWE9k3MnLiMg9rbZX97SKzUy/A54mFTR2v31aHyJa+moXtAKMvmQ0AKzIDZ6p
+	 oWOc4pUFqi9YfXIM8SQAT4iJvCA6+F+88JbpNOzgrGNMtk2V8USgca8x9jsvytr4SP4Ms
+	 pAY3Cq1jzoqGw6KNWswZ1fjaJx+MVbalT90HFq3VqyT6g2UOw48e0Bdf1u+j1qYh4mw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795410926;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795410985;
 	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
 	 Mime-Version:Subject:Reply-To:Sender:From:To:CC:X-Priority:
-	 X-Content-Kind-Code:X-CPGS-Detection:X-Drm-Type:X-Msg-Generator:
-	 X-Msg-Type:X-Reply-Demand:Message-ID:Date:X-CMS-MailID:
-	 Content-Transfer-Encoding:Content-Type:X-Sendblock-Type:CMS-TYPE:
-	 X-CPGSPASS:X-CPGSPASS:cpgsPolicy:X-CFilter-Loop:X-CMS-RootMailID:
-	 References;
-	bh=WSL0PpZL8lyfGMXRe4lS1H2Z/npyzNFI+yLAETxkfdc=;
-	b=sKTQ8BqFLAjjIxgvkTbcB7UTu7qg/0TPMc7cnj1ZKxpF3vOm5OSZGi5jyVqhwEWNxu5N
-	 gXlLvvgX6g4tNqwzZQ8oTDWLodnOCWjrLfmC4lzn+QC1HZpvXXQ9iMfKVRUD4LI3M3S1R
-	 xEXrQECTnBYOB9yK2o9uunxCpudGRYgw76BOYLIYRYYwURRNMvfVvAF7NCaDj02pCqh4t
-	 wORqfYUNVApaoqqP88Nq3A7kebFaVw8tXdLARDeus16xqyjb+KJpEujfKhtyED1MYo2uk
-	 0j5FSBrSlCtP2f20Oh0yqr8pWAW2F54JhhNhEeBvXtHxRe//jipF6ETMK+ERKou8k0A==
+	 X-Content-Kind-Code:In-Reply-To:X-CPGS-Detection:X-Drm-Type:
+	 X-Msg-Generator:X-Msg-Type:X-Reply-Demand:Message-ID:Date:
+	 X-CMS-MailID:Content-Transfer-Encoding:Content-Type:X-Sendblock-Type:
+	 CMS-TYPE:X-CPGSPASS:X-CPGSPASS:cpgsPolicy:X-CFilter-Loop:
+	 X-CMS-RootMailID:References;
+	bh=r5Z6BlcBuMGN6YcRZqc0PnW/X18q5FAHDnfGNUaecNY=;
+	b=suhgBl1/EdGnSL3R1kcQJlnfl4zDpeUiyZgmDi57I4zGRE+Jyc5PZJG5TubwI/Ryv0Bj
+	 axkY64Z+fmvkjCMsUsnpX8H+8EU2vHKM/+oUZrxP2V9HjMTZKLPTYLvj6AdjAl8QlmZF0
+	 V0spfdh94c2BoON9LUrva7tecwTrjgDNZGdH55MiA/s+APWD1MIepW/Xi+oS7IafmnvSi
+	 P11FTADdrEHLI/QGYwemrHMa8UBU8K7Z0Qy1k9rUR8e6fiSKkqkGG5yufh1DpCA6aS7YV
+	 co53KKsELxri6TBv59lcz8hkgTgKQk0Q55Rj7M6NvUg4CYC+xKzDGzBHwRrv3fBKyYg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=samsung.com;
 	spf=pass smtp.mailfrom=samsung.com;
-	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=r7oURB1C;
-	arc=none smtp.remote-ip=203.254.224.25
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b="rKiR/444";
+	arc=none smtp.remote-ip=203.254.224.34
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59342606A327
-	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 05:15:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 59342606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF1C606A31F
+	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 05:16:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5DF1C606A31F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=r7oURB1C
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20261123051523epoutp0265309869f0186ba4b9d33178b60907d4~qlLjdWqi02515225152epoutp02z
-	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 05:15:23 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20261123051523epoutp0265309869f0186ba4b9d33178b60907d4~qlLjdWqi02515225152epoutp02z
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=rKiR/444
+Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20261123051622epoutp04d67a969aa3ed5a99d207e4060a89577b~qlMa5rjTI2003320033epoutp04M
+	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 05:16:22 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20261123051622epoutp04d67a969aa3ed5a99d207e4060a89577b~qlMa5rjTI2003320033epoutp04M
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1795410923;
-	bh=WSL0PpZL8lyfGMXRe4lS1H2Z/npyzNFI+yLAETxkfdc=;
-	h=Subject:Reply-To:From:To:CC:Date:References:From;
-	b=r7oURB1C2V+r6jMr4yC2MblTgHGpr1zjpAIf3QzRNOG93I/GxVvHGmXuEW2JyrieL
-	 YH9oMAkZ3kAroF2hPOiOgvW4SDgfh7zLuWlr9B/tmLSc15goHva0Eh9y+1db/7SwGH
-	 mD5EemUIJu5n4bIs7/kQGayNJ2rHeyKWqe57GWNg=
+	s=mail20170921; t=1795410982;
+	bh=r5Z6BlcBuMGN6YcRZqc0PnW/X18q5FAHDnfGNUaecNY=;
+	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+	b=rKiR/444DeEpMhCliz9Wt9Zd3MNFpL9TbmEbYsKvQ1nTg2ai/Itxa0jE3eBx/qpbm
+	 0tRFzvRlv5e+EYBqfBAYeFb/vCXnV4n9p9b3Vn7JqBOvJNQe53HiSe8ITj+ykMpm36
+	 OT9mv4P4Fx34IQKgkdQ41AONK4IuZz4mmVhnNXaQ=
 Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas2p3.samsung.com (KnoxPortal) with ESMTPS id
-	20261123051522epcas2p32103811faa2a1f97ae61ecd4bee71c7e~qlLi-s1GR2060120601epcas2p3E;
-	Mon, 23 Nov 2026 05:15:22 +0000 (GMT)
-Received: from epcas2p1.samsung.com (unknown [182.195.38.206]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4jXvK62QJKz6B9mK; Mon, 23 Nov
-	2026 05:15:22 +0000 (GMT)
+	epcas2p2.samsung.com (KnoxPortal) with ESMTPS id
+	20261123051622epcas2p28ce34ddbddc2dd758bfdeb29de21e853~qlMaUwYtd1102411024epcas2p2T;
+	Mon, 23 Nov 2026 05:16:22 +0000 (GMT)
+Received: from epcas2p4.samsung.com (unknown [182.195.38.205]) by
+	epsnrtp04.localdomain (Postfix) with ESMTP id 4jXvLF42jKz6B9mH; Mon, 23 Nov
+	2026 05:16:21 +0000 (GMT)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -63,8 +63,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 Mime-Version: 1.0
-Subject: [RFC PATCH RESEND 0/3] block: cgroup-based and explicit write
- stream placement for NVMe FDP
+Subject: [RFC PATCH RESEND 1/3] block: distinguish unspecified and explicit
+ device-default write streams
 Reply-To: suho.son@samsung.com
 Sender: Suho Son <suho.son@samsung.com>
 From: Suho Son <suho.son@samsung.com>
@@ -86,14 +86,15 @@ CC: "tj@kernel.org" <tj@kernel.org>, "hannes@cmpxchg.org"
 	<jinheon09.kim@samsung.com>, Suho Son <suho.son@samsung.com>
 X-Priority: 3
 X-Content-Kind-Code: NORMAL
+In-Reply-To: <20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p2>
 X-CPGS-Detection: blocking_info_exchange
 X-Drm-Type: N,general
 X-Msg-Generator: Mail
 X-Msg-Type: PERSONAL
 X-Reply-Demand: N
-Message-ID: <20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p2>
-Date: Mon, 23 Nov 2026 14:15:21 +0900
-X-CMS-MailID: 20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e
+Message-ID: <20261123051620epcms2p77535b9a42e657932e12f3367f98344a3@epcms2p7>
+Date: Mon, 23 Nov 2026 14:16:20 +0900
+X-CMS-MailID: 20261123051620epcms2p77535b9a42e657932e12f3367f98344a3
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
@@ -103,156 +104,195 @@ X-CPGSPASS: Y
 cpgsPolicy: CPGSC10-223,Y
 X-CFilter-Loop: Reflected
 X-CMS-RootMailID: 20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e
-References: <CGME20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p2>
+References: <20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p2>
+	<CGME20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p7>
 
-Hello,
+From: Suho Son <suho.son@samsung.com>
 
-Resending: my earlier posting of this cover letter went out without
-the patches threaded to it.  Sorry for the noise.
+bio->bi_write_stream uses zero to mean two different things: "the
+issuer did not express a stream" and "place this write in the
+device-default stream".  With the io_uring per-I/O attribute and the
+inode write hint as the only producers this conflation is harmless,
+but it prevents a later, lower-precedence producer from telling
+whether a stream was requested at all.
 
-This RFC proposes an operator- and application-controlled write stream
-interface on top of the existing write stream plumbing
-(sqe->write_stream, bio->bi_write_stream, and the NVMe FDP placement
-translation, which are unchanged by this series):
+Introduce WRITE_STREAM_NONE ((u8)-1) as the "unset" sentinel and
+initialize bios with it in bio_init()/bio_reset().  Resolve any
+residual sentinel to the device default (0) in
+submit_bio_noacct_nocheck(), before the bio can be turned into a
+request or merged, so drivers never observe the sentinel regardless
+of kernel configuration.
 
-  1/3 block: distinguish unspecified and explicit device-default write streams
-  2/3 io_uring: add IORING_WRITE_STREAM_DEFAULT for explicit device-default placement
-  3/3 blk-cgroup: add cgroup-based write stream placement
+In blkdev_direct_IO(), keep the existing precedence and add the
+missing distinction: a concrete stream is validated against the
+device limit; otherwise the inode write hint is used if it was
+actually set (WRITE_LIFE_NOT_SET no longer maps to stream 0);
+otherwise the sentinel is left for later resolution.
 
-The series is based on the block tree's for-next branch (see the
-base-commit below).
+Also carry ki_write_stream through kiocb_clone(), which is used by
+forwarded direct I/O (fs/backing-file.c, fs/erofs/ishare.c), so a
+clone does not silently drop the issuer's stream selection.
 
-Motivation and background are described in our HotStorage '26 paper:
+No driver changes: NVMe converts bi_write_stream to FDP placement
+identifiers as before.
 
-  Link: https://doi.org/10.1145/3837053.3837343
+Signed-off-by: Suho Son <suho.son@samsung.com>
+---
+ block/bio.c               |  3 ++-
+ block/blk-core.c          | 12 ++++++++++++
+ block/fops.c              | 25 +++++++++++++++++++------
+ include/linux/blk_types.h | 13 +++++++++++++
+ include/linux/fs.h        | 11 ++++++++++-
+ 5 files changed, 56 insertions(+), 8 deletions(-)
 
-Motivation
-
-NVMe Flexible Data Placement reduces write amplification by grouping
-similarly-aged data into per-reclaim-unit placement handles, and the
-kernel already lets a single application tag writes through io_uring.
-Two gaps remain:
-
-  (a) an operator cannot place whole workloads per cgroup without
-      modifying applications, and
-  (b) an application cannot force the device-default placement and be
-      sure that no policy overrides that choice.
-
-The series addresses the root cause shared by both: write stream zero
-currently means both "unspecified" and "device default", so lower-
-precedence producers cannot tell whether a stream was requested.  The
-resulting precedence, most specific first, is:
-
-  explicit io_uring stream (including DEFAULT)
-    > inode write hint
-    > cgroup io.stream
-    > device default (0)
-
-Patch 1 introduces the WRITE_STREAM_NONE sentinel for unspecified
-streams, resolves it centrally before the bio reaches the driver, and
-carries ki_write_stream through kiocb_clone() used by forwarded direct
-I/O.  Patch 2 adds the explicit-default UAPI value, decided at prep
-time so it survives async re-issues.  Patch 3 adds the io.stream cgroup
-v2 interface: per-device upsert entries, "inherit" reset, explicit 0,
-validation against device queue limits, lazy policy activation, and a
-single-word policy state read locklessly under RCU, with writers
-serialized by the queue lock held across blkg_conf_prep().
-
-Runtime verification
-
-We exercised the series, as posted, on an NVMe 2.0 FDP device (8 RUHs)
-with bpftrace observers at blkcg_set_iostream() entry/return,
-__submit_bio() and the nvme_setup_cmd() dsmgmt export:
-
-  - explicit streams 2/5/8 -> placement IDs 1/4/7 (tracepoint-verified)
-  - IORING_WRITE_STREAM_DEFAULT -> concrete 0, no placement exported,
-    not overridable by an io.stream policy
-  - stream > max_write_streams -> -EINVAL, no bio issued
-  - io.stream explicit value observed end-to-end; nested cgroup
-    inherits the parent's entry; explicit io.stream 0 resolves the
-    sentinel to 0
-  - io.stream rejects streams above the device limit and the reserved
-    255 with -EINVAL, and devices without write streams with
-    -EOPNOTSUPP; the root cgroup has no io.stream file
-  - the inode write hint beats the io.stream value, as documented
-  - IOSQE_ASYNC: an explicit stream, IORING_WRITE_STREAM_DEFAULT and
-    the submitting task's cgroup association all survive io-wq
-    deferral
-  - a 512K direct write splits into multiple bios; all keep the stream
-  - 64 concurrent writers with a common stream: 64/64 tagged, stable,
-    no warnings
-  - buffered writeback on a mounted ext4: writeback bios adopt the
-    first-dirtying cgroup via wbc_init_bio() and carry the resulting
-    placement ID to the device; the nested cgroup inherits the
-    parent's entry, explicit 0 and the child's own entry override it,
-    and "inherit" restores the parent's value
-
-Each patch builds without warnings at W=1, with
-CONFIG_BLK_CGROUP_IOSTREAM both enabled and disabled.
-
-Not yet verified (please treat accordingly)
-
-  - WAF improvements on a production multi-tenant workload are not yet
-    measured; device-level fdp status counters moved consistently with
-    the placement IDs, but per-case deltas were below the background
-    noise of the test setup
-
-RFC aspects we would like feedback on
-
-  - the API shape of io.stream (per-device "MAJ:MIN <stream>" string,
-    upsert and inherit semantics, explicit 0 as a real entry)
-  - the WRITE_STREAM_NONE sentinel as a u8 reservation, which caps
-    addressable streams at 254 through the io_uring interface and
-    excludes 255 from io.stream
-  - whether io.stream belongs in io.* under cgroup v2, and its
-    interaction with the existing io controller file hierarchy
-  - buffered writeback semantics: attribution to the writeback owner is
-    arguably what an operator wants, but degenerate share cases deserve
-    a second opinion
-
-No MAINTAINERS update is needed: block/ is covered by the BLOCK LAYER
-entry, and the io_uring paths by the IO_URING entry.
-
-Tool use
-
-This series was developed with substantial help from LLM coding
-assistants, in an interactive session rather than from a single prompt.
-The assistant drafted a large part of the implementation (the
-WRITE_STREAM_NONE sentinel and its central resolution, the fops.c
-precedence rework, the kiocb_clone() propagation, and the io.stream
-single-word policy state and its RCU lifetime), the changelogs, the
-cgroup-v2.rst section and this cover letter.  It also wrote the
-io_uring and bpftrace test harnesses used for the runtime verification
-above, and rebased the series onto the current tree.  I made the design
-decisions, directed and reviewed the testing, and reviewed, revised and
-take responsibility for all of the code and text.
-
-Suho Son (3):
-  block: distinguish unspecified and explicit device-default write
-    streams
-  io_uring: add IORING_WRITE_STREAM_DEFAULT for explicit device-default
-    placement
-  blk-cgroup: add cgroup-based write stream placement
-
- Documentation/admin-guide/cgroup-v2.rst |  58 ++++-
- block/Kconfig                           |  16 ++
- block/Makefile                          |   1 +
- block/bio.c                             |   3 +-
- block/blk-core.c                        |  14 ++
- block/blk-iostream.c                    | 315 ++++++++++++++++++++++++
- block/blk-iostream.h                    |  18 ++
- block/fops.c                            |  25 +-
- include/linux/blk_types.h               |  13 +
- include/linux/fs.h                      |  11 +-
- include/linux/io_uring_types.h          |   4 +
- include/uapi/linux/io_uring.h           |  26 ++
- io_uring/rw.c                           |  16 ++
- 13 files changed, 510 insertions(+), 10 deletions(-)
- create mode 100644 block/blk-iostream.c
- create mode 100644 block/blk-iostream.h
-
-
-base-commit: d09b6d9d1fcce0770c1824c8b2b8ab153f2672d2
+diff --git a/block/bio.c b/block/bio.c
+index b0fcc69de6535..0fbf0dfefe85c 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -223,7 +223,7 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
+ 	bio->bi_flags = 0;
+ 	bio->bi_ioprio = 0;
+ 	bio->bi_write_hint = 0;
+-	bio->bi_write_stream = 0;
++	bio->bi_write_stream = WRITE_STREAM_NONE;
+ 	bio->bi_status = 0;
+ 	bio->bi_bvec_gap_bit = 0;
+ 	bio->bi_iter.bi_sector = 0;
+@@ -278,6 +278,7 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
+ 	bio_uninit(bio);
+ 	memset(bio, 0, BIO_RESET_BYTES);
+ 	atomic_set(&bio->__bi_remaining, 1);
++	bio->bi_write_stream = WRITE_STREAM_NONE;
+ 	bio->bi_io_vec = bv;
+ 	bio->bi_bdev = bdev;
+ 	if (bio->bi_bdev)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2ee079c1ce150..5054a6e21020c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -765,6 +765,18 @@ void submit_bio_noacct_nocheck(struct bio *bio, bool split)
+ 
+ 	blk_cgroup_bio_start(bio);
+ 
++	/*
++	 * Resolve the write-stream sentinel before the bio can be turned into
++	 * a request or merged. By now every higher-precedence producer has had
++	 * its chance (an io_uring per-I/O attribute at init time, io.stream via
++	 * bio_set_ioprio()); a field still holding WRITE_STREAM_NONE expressed
++	 * no stream, so it falls back to the device default (0). This is the
++	 * single point that guarantees the sentinel never reaches the driver,
++	 * independent of CONFIG_BLK_CGROUP_IOSTREAM.
++	 */
++	if (bio->bi_write_stream == WRITE_STREAM_NONE)
++		bio->bi_write_stream = 0;
++
+ 	if (!bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+ 		trace_block_bio_queue(bio);
+ 		/*
+diff --git a/block/fops.c b/block/fops.c
+index a0ccadaa9c79d..4dab46da49032 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -417,20 +417,33 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 	if (iov_iter_rw(iter) == WRITE) {
+ 		u16 max_write_streams = bdev_max_write_streams(bdev);
+ 
+-		if (iocb->ki_write_stream) {
++		if (iocb->ki_write_stream &&
++		    iocb->ki_write_stream != WRITE_STREAM_NONE) {
+ 			if (iocb->ki_write_stream > max_write_streams)
+ 				return -EINVAL;
+-		} else if (max_write_streams) {
++		} else if (max_write_streams &&
++			   !(iocb->ki_flags & IOCB_WRITE_STREAM_EXPLICIT)) {
+ 			enum rw_hint write_hint =
+ 				file_inode(iocb->ki_filp)->i_write_hint;
+ 
+ 			/*
+-			 * Just use the write hint as write stream for block
+-			 * device writes.  This assumes no file system is
+-			 * mounted that would use the streams differently.
++			 * No concrete stream was expressed on this I/O and
++			 * the issuer did not request the device default
++			 * explicitly either (in which case the concrete
++			 * stream 0 is kept so neither the inode write hint
++			 * nor a cgroup io.stream value applies). Use the
++			 * inode write hint as the write stream for block
++			 * device writes (this assumes no file system is
++			 * mounted that would use the streams differently);
++			 * otherwise leave the field as WRITE_STREAM_NONE so a
++			 * lower-precedence producer (io.stream) can fill it
++			 * in at submit time.
+ 			 */
+-			if (write_hint <= max_write_streams)
++			if (write_hint != WRITE_LIFE_NOT_SET &&
++			    write_hint <= max_write_streams)
+ 				iocb->ki_write_stream = write_hint;
++			else
++				iocb->ki_write_stream = WRITE_STREAM_NONE;
+ 		}
+ 	}
+ 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 1a5812fa40529..016707437702f 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -203,6 +203,19 @@ typedef __u32 __bitwise blk_opf_t;
+ typedef unsigned int blk_qc_t;
+ #define BLK_QC_T_NONE		-1U
+ 
++/*
++ * Sentinel value for bi_write_stream / ki_write_stream meaning "no write
++ * stream expressed". Distinguished from an explicit request for the
++ * device-default stream (0): a concrete stream set by an issuer (e.g. an
++ * io_uring per-I/O write attribute) always wins, while a field still holding
++ * WRITE_STREAM_NONE lets a lower-precedence producer (io.stream) fill it in.
++ * The submit path converts any residual WRITE_STREAM_NONE to 0 before the bio
++ * reaches the driver. Both fields are u8, so the sentinel is (u8)-1 = 255;
++ * kernel interfaces limit selectable stream identifiers to 0..254, so the
++ * sentinel never collides with a stream an issuer can request.
++ */
++#define WRITE_STREAM_NONE	((u8)-1)
++
+ /*
+  * main unit of I/O for the block layer and lower layers (ie drivers and
+  * stacking drivers)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 99caef43ff3c4..e796a1858e187 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -357,6 +357,13 @@ struct readahead_control;
+ /* kiocb is a read or write operation submitted by fs/aio.c. */
+ #define IOCB_AIO_RW		(1 << 22)
+ #define IOCB_HAS_METADATA	(1 << 23)
++/*
++ * The issuer explicitly requested the device-default write stream
++ * (IORING_WRITE_STREAM_DEFAULT in the io_uring SQE): ki_write_stream
++ * holds a concrete 0 and must not be overridden by the inode write hint
++ * or a cgroup io.stream value.
++ */
++#define IOCB_WRITE_STREAM_EXPLICIT	BIT(24)
+ 
+ /* for use in trace events */
+ #define TRACE_IOCB_STRINGS \
+@@ -374,7 +381,8 @@ struct readahead_control;
+ 	{ IOCB_NOIO,		"NOIO" }, \
+ 	{ IOCB_ALLOC_CACHE,	"ALLOC_CACHE" }, \
+ 	{ IOCB_AIO_RW,		"AIO_RW" }, \
+-	{ IOCB_HAS_METADATA,	"AIO_HAS_METADATA" }
++	{ IOCB_HAS_METADATA,	"AIO_HAS_METADATA" }, \
++	{ IOCB_WRITE_STREAM_EXPLICIT, "WRITE_STREAM_EXPLICIT" }
+ 
+ struct kiocb {
+ 	struct file		*ki_filp;
+@@ -2202,6 +2210,7 @@ static inline void kiocb_clone(struct kiocb *kiocb, struct kiocb *kiocb_src,
+ 		.ki_filp = filp,
+ 		.ki_flags = kiocb_src->ki_flags,
+ 		.ki_ioprio = kiocb_src->ki_ioprio,
++		.ki_write_stream = kiocb_src->ki_write_stream,
+ 		.ki_pos = kiocb_src->ki_pos,
+ 	};
+ }
 -- 
 2.43.0
 
