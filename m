@@ -1,95 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795423630;
-	b=cusIdowwFcpa9nBZyaucXK8H8PmGztHiKIdOkoYfBI8ddyLTA5xQuiKoHiOI4NxiLq0H
-	 Fbxv8upYFuRErGwLZOaVEYNvc6Uog9DB6I7vejDErOntPT6DtUWbDjUGabZ2acw3P+wzS
-	 a02nMzwz73Mxl29Ag+DAYMWFcj9/1YZhJZ1fiwd1aWd7LXFIF490jtJkyBuIWkXuOmQzI
-	 MUUG/KAu4AsHGnVYuGpxGXCqyPNbonKueYZjZge3F7jYAKSgJM65ZI+wAscgZDR4V+0n5
-	 rBRthOb3SGJ+TsqHOKEjPr8CKIuFupUu1NhSe4yHF6Ybd2xytNtpPP8VmAOEAVtUETA==
+	t=1795424460;
+	b=NGJ0NlliKQUeUJ9hhOLbLYBFjiAUnszH+QcELKG2GCMNBOssR6P/tYKtnFtyJ+TZixlz
+	 E+U4aZCxoVWLKvigZLTwNJrbVBm3/5YQyv+vvdJpkkM70q5Y9ChwNLZO+HUreyghFmlGs
+	 kP8g32NMZyt4i+WqtHv2d8rOXf9nkfOJk2vB5Q43nhDld9wpDpmLnAIKYAr+oo9IwitBb
+	 o2/SaTRUG/VcAUuZ+U12nDRBjW3nIINs0sUtDhuS1r7eAd55ZW4jDAzibMwzux9gEOvHk
+	 9SIVr/06MNWdQeGPCGuWfaKdRmyEuG+BJ7+Q2RrYWc4x4oEO6eICEmhP/T9jhiI+nWQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795423630;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=6TuXSWDdixhSOXgwiZNhSVNfQgsPxpgQ0Wl0SXXvDBk=;
-	b=0me161IcBkikXwzGITup+18/Hosa9nJYhh/UTONRCKJhPUGUoJVKrVLoSYzucxcNIJ6l
-	 cijKeznchhQcqLb+UfyvKT2jHzNQRCcJNAbuoAxt71wzfzN+0+4bFG2ZgGOQFBSKwxnqu
-	 65T/mFAq8LvnG+G7JhAuzlRJln3EbUuu4DfuS2bHMvBV4Qn1FdlKOTYGgi+qLKbtHorSw
-	 tLktQVQC9qdoxIStf3mLAATbbbvudfDWpyDMC2vD23U2Agyl3Xra3ycfWlJmPOfWrr8KN
-	 aM+d64gpdZFoavBIxjI4KaRniTRLIfmvxFpZ+X6qyspPy5zG5WoYsl/nKhfdTHoqkxQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795424460;
+	h=DMARC-Filter:Received:Received:Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 X-Developer-Signature:X-Developer-Key:Content-Transfer-Encoding:
+	 X-Rspamd-Pre-Result:X-Rspamd-Queue-Id:X-Rspamd-Pre-Result:
+	 X-Rspamd-Action:X-Rspamd-Server:X-Spam-Level:X-Spamd-Result:
+	 X-Spam-Flag:X-Spam-Score;
+	bh=uPhxwqgRwFr2c0Wk/MJfXbhM5TnmiRTw7EakaKv1UGA=;
+	b=HJhCmbBhN75aP0BfK3wQm8Uq65TD/Sox1z/3QSuXE+8uFUALV7uEEHuNfTwcOgYHvkrn
+	 slB+yD2BXgPPN1ueEuhknGJpj8/z2FwB2adBrmBGvqx+KfOWYOILb8pqWDTtKb+Lm2dH0
+	 RLvL+w4uL9JJh+7z1rM+FILFYXeahclG391Jlih6o/2KJei69b2DwxR933964/5vYSMtE
+	 ZLSn3Zi/oHYLaNaajozERBwFGmFORSMlUBEwO8KdbAkAdJb0FQppYJlW1RE4MQ29tp9LC
+	 P5x/t9A0gojsh5U3chxmqDsCyCD68sASAANEhCBTMgLoMNdYf+gR3e8E8xt44JO1qjw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="USn5/FiM";
-	arc=none smtp.remote-ip=74.125.82.171
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=none header.from=suse.cz;
+	spf=pass smtp.mailfrom=suse.cz;
+	arc=none smtp.remote-ip=195.135.223.131
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB564606A327
-	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 08:47:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EB564606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=USn5/FiM
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-38587f3de36so3674098eec.0
-        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 00:47:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795423629; x=1796028429; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=6TuXSWDdixhSOXgwiZNhSVNfQgsPxpgQ0Wl0SXXvDBk=;
-        b=USn5/FiMiXtfonckmifWNZaUXgbtRUUj0WWQIefud08911IOpuM4pYR2XBCRPrKz8B
-         a6cNRdaVPG2aNb5wEGCYWUfZbUtrDuC7nS2mP5LHKSZ+sgI+k4ZsQFxFK7hc1L/aIalD
-         pOcVcYvZ0gGsGXYpiH5ZlaT272vEqzYEaobIcLPdIDVDhEzkcVR7V/6pFuuiBWd/er+B
-         ls2T/whCK7JU/QydAPtlcYtC+ybcPjHjW+k8E2RHsw7Xxile1On2NajZCPr8MhNa9gfb
-         6gtniwBsy7C/Ppl+XFnHfLlyVkgNJLQwWXdmYn94xwNt/nDRNmDuPseMdLYrCQBH5c37
-         HsXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795423629; x=1796028429;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=6TuXSWDdixhSOXgwiZNhSVNfQgsPxpgQ0Wl0SXXvDBk=;
-        b=FYkFHr+lRMkxX/U0EfxCO0mTKtwu3jKVteecE8qllogJ5czl6vJ3xfChguF0JbFcFI
-         UGx4E/eVzCkpGo4gvU7sigyRmaNKS847JGcuW6rGLCygxTDjwOkbrA2VpblKKZhGja+8
-         PmjqhK52lfKNtI8eOi3LNu+EXmCpC3A6+PPy19vkWHdHrJg43q+P7Gklq8aWgH/AFCBz
-         iVQYpGPvibaS0OehJLXi9yStn2kgDlCt7moaH6g1pt2gllUXRkGWmrTQSdJjKCKB1Cgx
-         sgy0jwQ2UxCEQNI1PqfZAxvpzyfLtYcPq/fOagtz4fjVeEMoaJAlvzETa2lernwCFkbF
-         IQRg==
-X-Forwarded-Encrypted: i=1; AL+hErH2KLe58LRxUfcJFNtHftDZNrohxYHvsiLI6rFHYZoqL0X2+6XCz9e0AsfhjIJD2R+3whgfiWveYr4Hvg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+n7c5nE4XiCjJH+TGck1OYOnmEGJPfU6Br5+yy4+Olv1UGHw4L
-	99fKBw9v4VO8NV+LA/bhk3fLu55BtmYpZyC5dEHs+PVvmTZHQ5ZoLBSv
-X-Gm-Gg: AZFdTZdfi9rF6C2qVZU6xdmmPiQwuAUwZde5P7Flm1KYir+Oj5v/YIyjVZcsC3EbKhS
-	KUfznyPGS0xorMoleWBfOdQDn/hBtwlEIqPxEHiyJQvV01JA7W9CEgmRV9hYBtxb8C3IkXmnNyu
-	Qvpp6+zxWJlcLjH/9pUGpexdgWGuL+Jin7Bcg2s+QiO6mgWyIwOuNw2yP9e8kEeJW47/0wiSBe2
-	QGkk3hx1DiwhPSeT7awQlQEUX0Fffw4h1uE5I6jZ4G75HG36cvKedW2z6z+XFGs0I3t4bHR3Dq2
-	cupcMxqtTAAn1YXQmyOE2O8P0YmP5UeREh3OjszNFIUXLzYGJuLr6eY12CWc2Z9YSOaHaXgrZKK
-	ZeYjwwLyWmrGViwk1TurcEvKzFTtNax8RdNXkzdpd3zaex5cOThPwjaR4lGovrGklgbwfy7qU2v
-	W+WL5wSJlgK0mCO+T0SfLJY+PUUfxivmJgIEB3tjp/ritGvbxmEydXY7M+cEfBpRx9HHEZsQtLF
-	HH7zhmiXRuccqGzi8yCZM8vGGzEmNus+hkDc0H1ykvmezK1HD3FYlEh0L6gc06xV6G+eSGJXosK
-	Zs4k+wX3s+ipqRJEjoBjPACOKC378DAevI1Cz07MrHzWgdwumd6zXoc5Kp0VB12qD8qjCOM=
-X-Received: by 2002:a05:7301:6187:10b0:386:a193:7eeb with SMTP id 5a478bee46e88-386a1938b8dmr5853810eec.30.1795423629042;
-        Mon, 23 Nov 2026 00:47:09 -0800 (PST)
-Received: from annie-ProLiant-DL380-Gen11.. ([119.204.109.68])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385666e7f59sm36040839eec.6.2026.11.23.00.47.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 00:47:08 -0800 (PST)
-From: Annie Kim <pulpannie@gmail.com>
-To: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowangio@gmail.com>
-Cc: Hyokyung Kim <pulpannie@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	virtualization@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] virtio_blk: validate zone append sector from device
-Date: Mon, 23 Nov 2026 17:46:59 +0900
-Message-ID: <20261123084701.2616027-1-pulpannie@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918DE606A32A;
+	Mon, 23 Nov 2026 09:00:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 918DE606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 01B2B1F7F3;
+	Mon, 23 Nov 2026 09:00:58 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CF80413532;
+	Mon, 23 Nov 2026 09:00:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id B2ulLMkABGvgBgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 23 Nov 2026 09:00:57 +0000
+Received: by quack.suse.cz (Postfix, from userid 1000)
+	id 54A9B275FA; Mon, 23 Nov 2026 10:00:57 +0100 (CET)
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: <linux-fsdevel@vger.kernel.org>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	gfs2@lists.linux.dev,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	devel@lists.orangefs.org,
+	Dave Kleikamp <shaggy@kernel.org>,
+	jfs-discussion@lists.sourceforge.net,
+	Carlos Maiolino <cem@kernel.org>,
+	linux-xfs@vger.kernel.org,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	linux-afs@lists.infradead.org,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	fuse-devel@lists.linux.dev,
+	<linux-block@vger.kernel.org>,
+	Chuck Lever <cel@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	linux-nfs@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	linux-fscrypt@vger.kernel.org,
+	Jan Kara <jack@suse.cz>,
+	"Pankaj Raghav (Samsung)" <pankaj.raghav@linux.dev>
+Subject: [PATCH v3 01/13] bdev: Drop pointless loop from blkdev_flush_mapping()
+Date: Mon, 23 Nov 2026 10:00:36 +0100
+Message-ID: <20261123090040.19006-14-jack@suse.cz>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261123085601.21199-1-jack@suse.cz>
+References: <20261123085601.21199-1-jack@suse.cz>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -99,158 +94,78 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1749; i=jack@suse.cz; h=from:subject; bh=GZumrknrM8DPyabr5Jne8KkRCS0p4/yNON9cCW4wy70=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBrBAC4xsOQMPEQ2oKCGhB4uItf13zp0U70aCwz8 BgxDEqYscuJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCawQAuAAKCRCcnaoHP2RA 2Yg5B/42IPKKHMy6SSIbhPKxdCra8evAwnyXErezZac3fbRHGUyfm2yWf5konhAEdX/MLMTYQDt /cr4G9mwfK3/V0zMBR2I2u07NDAl2X9fnk7M+qBRQ5nMlv7nGooy48BccVa6qi1XdCekw9BZOuD 4/jDvTQy0fmEcr64knYRC+oSlc/r+nThyOkEAzk1iZCzdjjQhLZl6zAJDPcf1iL01TJwfwZ8GBO APpIdoItWy7+qAmaDZddSfNwxedGcf43/Ju1297VRa8qbXDM21j9E/fbmK+syjfw+MSZyjrtnsp OGwtIwKfv8OL3hw9OvBMuWeFt8mgXY4s8P0TNKFi7kyDubak
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Queue-Id: 01B2B1F7F3
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
 
-From: Hyokyung Kim <pulpannie@gmail.com>
+bdev_write_inode() is really odd loop calling write_inode_now(). The
+bdev doesn't have any pages by now and if there are any dirty bits in
+the inode state, they are stale. Just call write_inode_now() once to
+clear them.
 
-The device reports the starting sector for REQ_OP_ZONE_APPEND completions,
-and virtio_blk copies it into req->__sector without checking that it
-still refers to the requested zone. A buggy or malicious device can
-therefore make upper layers believe the append landed at an arbitrary
-location.
-
-Validate successful zone append completions before updating
-req->__sector. The returned sector must not precede the request start
-and the entire request must fit within the zone writable capacity.
-Reject invalid completions with BLK_STS_IOERR.
-
-The polling path may batch successful completions, and a batch can only
-be completed as successful. Perform the same validation in
-virtblk_poll() before admitting a request to the batch, so that invalid
-zone append completions are not batched and are completed with an error
-instead. Move the request completion into __virtblk_request_done(),
-which takes the status from its caller, so that a polled completion that
-is not batched is not validated a second time.
-
-Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
-Signed-off-by: Hyokyung Kim <pulpannie@gmail.com>
+Reviewed-by: Pankaj Raghav (Samsung) <pankaj.raghav@linux.dev>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
-Damien, thank you so much for the thoughtful review of v1. As a beginner
-contributor I learned a lot from your comments :).
+ block/bdev.c | 25 ++++++-------------------
+ 1 file changed, 6 insertions(+), 19 deletions(-)
 
-Changes in v2:
-- Check the request op and status in the callers and drop the status
-  argument of virtblk_update_zone_append_sector() (Damien). The function
-  still returns blk_status_t, since the callers need to fail the request
-  when the reported sector is invalid.
-- Initialize req_start and nr_sectors at declaration (Damien)
-- Drop the Assisted-by tag (Damien)
-- Fix the sector being validated twice for polled requests that were not
-  batched (Sashiko). virtblk_poll() now completes those requests through
-  __virtblk_request_done(), which does not validate again.
-- Link to v1: https://lore.kernel.org/lkml/20261120063039.4155597-1-pulpannie@gmail.com/
-
-Tested on v7.4-rc3+ using modified QEMU backend that returned incorrect
-zone-append sectors on a memory-backed null_blk zoned device.
-
- drivers/block/virtio_blk.c | 63 +++++++++++++++++++++++++++++---------
- 1 file changed, 49 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 2b462005cdb6..547291c3ab99 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -331,29 +331,60 @@ static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
- 	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
+diff --git a/block/bdev.c b/block/bdev.c
+index f20f91b3176e..9fa72df4f47a 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -60,24 +60,6 @@ struct block_device *file_bdev(struct file *bdev_file)
  }
+ EXPORT_SYMBOL(file_bdev);
  
--static inline void virtblk_update_zone_append_sector(struct request *req,
--						     struct virtblk_req *vbr)
-+#ifdef CONFIG_BLK_DEV_ZONED
-+static inline blk_status_t
-+virtblk_update_zone_append_sector(struct request *req, struct virtblk_req *vbr)
- {
- 	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
-+	sector_t req_start = blk_rq_pos(req);
-+	unsigned int nr_sectors = blk_rq_sectors(req);
-+	sector_t sector, zone_end;
-+
-+	sector = virtio64_to_cpu(vblk->vdev, vbr->in_hdr.zone_append.sector);
-+	zone_end = req_start + disk_zone_capacity(vblk->disk, req_start);
-+
-+	if (zone_end < req_start || sector < req_start || sector >= zone_end ||
-+	    nr_sectors > zone_end - sector) {
-+		dev_err_ratelimited(&vblk->vdev->dev,
-+				    "zone append sector %llu + %u outside valid range [%llu, %llu)\n",
-+				    (u64)sector, nr_sectors,
-+				    (u64)req_start, (u64)zone_end);
-+		return BLK_STS_IOERR;
-+	}
- 
--	if (req_op(req) == REQ_OP_ZONE_APPEND)
--		req->__sector = virtio64_to_cpu(vblk->vdev,
--						vbr->in_hdr.zone_append.sector);
-+	req->__sector = sector;
-+	return BLK_STS_OK;
-+}
-+#else
-+static inline blk_status_t
-+virtblk_update_zone_append_sector(struct request *req, struct virtblk_req *vbr)
-+{
-+	return BLK_STS_OK;
- }
-+#endif
- 
--static inline void virtblk_request_done(struct request *req)
-+static inline void __virtblk_request_done(struct request *req,
-+					  blk_status_t status)
- {
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
--	blk_status_t status = virtblk_result(virtblk_vbr_status(vbr));
- 
- 	virtblk_unmap_data(req, vbr);
- 	virtblk_cleanup_cmd(req);
- 
--	virtblk_update_zone_append_sector(req, vbr);
+-static void bdev_write_inode(struct block_device *bdev)
+-{
+-	struct inode *inode = BD_INODE(bdev);
+-	int ret;
 -
- 	blk_mq_end_request(req, status);
- }
- 
-+static inline void virtblk_request_done(struct request *req)
-+{
-+	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-+	blk_status_t status = virtblk_result(virtblk_vbr_status(vbr));
-+
-+	if (req_op(req) == REQ_OP_ZONE_APPEND && status == BLK_STS_OK)
-+		status = virtblk_update_zone_append_sector(req, vbr);
-+
-+	__virtblk_request_done(req, status);
-+}
-+
- static void virtblk_done(struct virtqueue *vq)
+-	spin_lock(&inode->i_lock);
+-	while (inode_state_read(inode) & I_DIRTY) {
+-		spin_unlock(&inode->i_lock);
+-		ret = write_inode_now(inode, true);
+-		if (ret)
+-			pr_warn_ratelimited(
+-	"VFS: Dirty inode writeback failed for block device %pg (err=%d).\n",
+-				bdev, ret);
+-		spin_lock(&inode->i_lock);
+-	}
+-	spin_unlock(&inode->i_lock);
+-}
+-
+ /* Kill _all_ buffers and pagecache , dirty or not.. */
+ static void kill_bdev(struct block_device *bdev)
  {
- 	struct virtio_blk *vblk = vq->vdev->priv;
-@@ -1242,7 +1273,6 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
- 
- 		virtblk_unmap_data(req, vbr);
- 		virtblk_cleanup_cmd(req);
--		virtblk_update_zone_append_sector(req, vbr);
- 	}
- 	blk_mq_end_request_batch(iob);
+@@ -755,7 +737,12 @@ static void blkdev_flush_mapping(struct block_device *bdev)
+ 	WARN_ON_ONCE(bdev->bd_holders);
+ 	sync_blockdev(bdev);
+ 	kill_bdev(bdev);
+-	bdev_write_inode(bdev);
++	/*
++	 * All data is written out and evicted but inode can have some stale
++	 * I_DIRTY bits set. Call write_inode_now() to get rid of them so that
++	 * the inode can be evicted.
++	 */
++	write_inode_now(BD_INODE(bdev), 1);
  }
-@@ -1260,13 +1290,18 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
  
- 	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
- 		struct request *req = blk_mq_rq_from_pdu(vbr);
--		u8 status = virtblk_vbr_status(vbr);
-+		blk_status_t status = virtblk_result(virtblk_vbr_status(vbr));
- 
- 		found++;
--		if (!blk_mq_complete_request_remote(req) &&
--		    !blk_mq_add_to_batch(req, iob, status != VIRTIO_BLK_S_OK,
-+		if (blk_mq_complete_request_remote(req))
-+			continue;
-+
-+		if (req_op(req) == REQ_OP_ZONE_APPEND && status == BLK_STS_OK)
-+			status = virtblk_update_zone_append_sector(req, vbr);
-+
-+		if (!blk_mq_add_to_batch(req, iob, status != BLK_STS_OK,
- 					 virtblk_complete_batch))
--			virtblk_request_done(req);
-+			__virtblk_request_done(req, status);
- 	}
- 
- 	if (found)
+ static void blkdev_put_whole(struct block_device *bdev)
 -- 
-2.43.0
+2.53.0
 
