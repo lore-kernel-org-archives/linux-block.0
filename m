@@ -1,102 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795451907;
-	b=qTmPU1aOYGUNj9x99ILMKuikYWWFhb7FwMaGAyUJzkO9hd1Hu0SbBb5E839sHzGwknF/
-	 wVwj90ocv+Py7nsjWhaSZHIkR1o6eCCmes8Aat62eGxeVOslvkGGd8iqng0D7QPHskzOG
-	 HKNkaYP8+Dcv0vPGsrjASnoNycrnE1hOKEBDKiGpJ2O7IopYmFiY3JTl8a4fu7UyVkLZb
-	 086AMl3icEwyjofVbkRZrKJlrGJXk6dgie5dWa8MXir02X6ChGbEDaGnPOgLR2Nnm9PUX
-	 iM0SLe3kbnluE8EiscAxrdahOnQQN0xfjY8JgaoVnN8Wb1PdkU5XAHLSpWPkeqn6UHQ==
+	t=1795452047;
+	b=c5zlwXP6mf7HHWEHqomprzuUP/4jPUviXh1mxStXrKCkI9ZHHDslW9VRjrIaBSAUwu68
+	 PwmxXlx0vUOOecDp2+HQN8DbHnxPJOa28gQPN9uBOz7wWgkh07ZziXp5UHggVBJzD79Ig
+	 IOrpcCixrmQmLVceVzLM6Ff4x7kgPRObAo/HdL3Puj+QHY9sEunipk6GRv6hjqhf5H58d
+	 cAu+0iKMI6jr1BQBpLTTuKIsrvYu1M2oy4yBEE9dhWLUotRkLCQ7WBzcAwpbPkfHBIFK+
+	 5iGOPmSMOJyh8YUnf8WDmlZbpnH3aa9Lhwte3jvMjyMZhDnNdWkD0VGTkiUFtPutA8g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795451907;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Spam-Score:
-	 X-Spam-Level:X-Spam-Flag;
-	bh=aYPAr8C4xnLTxtYkhQI3Bwh0Sx/atle2gFHpTJk8O/8=;
-	b=3xcm64JeTb1Bzy8xJ5G2UHx86XXyCPm7h+ZIu54K7aXE/BBWbRI/uI7x9vhKiALxXZLb
-	 c/2P3jssgwBggKRdHIy3UkFbK6J1mcV4xiFfsp2aSgZKOQA2UA+RuNbnfWYBNlxQekqxF
-	 u3mPg119+x4fbpsuJoCorKK98wkEg9911cCTIghowf9Devo8J+uMeKN2zxT7+RfcTDUqf
-	 7UTGJwatSjc1g54ackcRtzg6Da0sPnr53FfC5EUdFYUe1mAvRGvEImVSjRe3AgVpADIn8
-	 lF4v8eKGER+ZcmjXDpneQEUABK7T/2N4rl8p0bLtWhXJcAmc7O8Pc2pnSVMcubc27HA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795452047;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=P5/ZiEeoOQolEtqZd6duqT2B+ydqubbd46Mv2EwUK7A=;
+	b=i7uKDRTV0McEcevZ+5cOhY8hsteL0SrCp+tf3OOWbeegj1iqzbkm73QKZJ+hzPPH+b7c
+	 aLy0gqAt2Zn97f+R/iQSvgyLVY5V5ZtMPe6sjagUkP51OCsvzJ99VcKgcffq4TqL+5jkq
+	 hNSQUxnx8+vTQzQozEfKykwnzFEUSYvYKl8PbRdAIbGpm1U8PvEX6CCOM65fFwozBXyuu
+	 5Qc4bA8VUXAQ2dmb+opRUxo0x43UXJzWAymwZRYL1JuA74AcKFx6+CqPk4pMW2rn5m1SQ
+	 x1HurdFY2hWQbditrT0lVjGxyZ4Anln9mIQMMahw4BVFqP8G2+9hy4Rrh4P3Wu/XdTA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.de;
-	spf=pass smtp.mailfrom=suse.de;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=a4OfJP3c;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=5ec6cRNi;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=a4OfJP3c;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=5ec6cRNi;
-	arc=none smtp.remote-ip=195.135.223.130
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vbpMdQoi;
+	arc=none smtp.remote-ip=74.125.82.45
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21ED9606A31A;
-	Mon, 23 Nov 2026 16:38:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 21ED9606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4B5606A31A
+	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 16:40:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF4B5606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=a4OfJP3c;
-	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=5ec6cRNi;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=a4OfJP3c;
-	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=5ec6cRNi
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1CC7A220FD;
-	Mon, 23 Nov 2026 16:38:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1795451905; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aYPAr8C4xnLTxtYkhQI3Bwh0Sx/atle2gFHpTJk8O/8=;
-	b=a4OfJP3cfakyj+bd+uVP560Ufc3LlS09Y/mhODPvL8jTTfqiztnWBLk75Qlo8cXuN1PgPi
-	sDHZ7dnOUI73IAPozTtX1W2LSzackzpAp3jkIzKxBDZmG4qpWGHUVFMfWyvXCoL89GkShi
-	BT7/BbReD11FIBOIdVNNtTp88fVwcPg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1795451905;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aYPAr8C4xnLTxtYkhQI3Bwh0Sx/atle2gFHpTJk8O/8=;
-	b=5ec6cRNiAa8Nm3VjOcKS83+6HcylU8plSE5zL1AQCDxrrYo85XjzJ6HUqJJu1BtNHChsUH
-	eAep4v2coaDPL5Cg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1795451905; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aYPAr8C4xnLTxtYkhQI3Bwh0Sx/atle2gFHpTJk8O/8=;
-	b=a4OfJP3cfakyj+bd+uVP560Ufc3LlS09Y/mhODPvL8jTTfqiztnWBLk75Qlo8cXuN1PgPi
-	sDHZ7dnOUI73IAPozTtX1W2LSzackzpAp3jkIzKxBDZmG4qpWGHUVFMfWyvXCoL89GkShi
-	BT7/BbReD11FIBOIdVNNtTp88fVwcPg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1795451905;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aYPAr8C4xnLTxtYkhQI3Bwh0Sx/atle2gFHpTJk8O/8=;
-	b=5ec6cRNiAa8Nm3VjOcKS83+6HcylU8plSE5zL1AQCDxrrYo85XjzJ6HUqJJu1BtNHChsUH
-	eAep4v2coaDPL5Cg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C0D4A13505;
-	Mon, 23 Nov 2026 16:38:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id atHMHwBsBGtnYQAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 23 Nov 2026 16:38:24 +0000
-Message-ID: <a0740379-6e93-43eb-a81b-02302423a6f9@suse.de>
-Date: Mon, 23 Nov 2026 17:38:24 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vbpMdQoi
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1a2af4c8d00so5967960c88.0
+        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 08:40:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795452046; x=1796056846; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=P5/ZiEeoOQolEtqZd6duqT2B+ydqubbd46Mv2EwUK7A=;
+        b=vbpMdQoiG9qBH8Tl6U7EVOleFGxsrHTy0mVYXW6H+MRhrHrfwiAVBAdwZayZumctqK
+         TjAfKEAnfrjr4j6oEW/cEYCOBj1+AV19XLVfz2mSeSpyi0+JFw8DFQVJXbtbFtagdP0E
+         baE/uVWY9vzZstUi/ZpsJ07RzWunWb//7HKrxuNGitcvwHrLPXNwaPmXzMWgE05nLAQl
+         sS5QwQMzgs4+UdkcXzbn4Mt8ueUsE5U3xufdoU+dhEZlXnDT4P/6Pgpg9X3SJxrhdr0E
+         djNugvM++2GRtA2GnhQMsxjY3VIrtZO8oloUIyWEZKFD/GXznbLz5MwpfhzUqzgwVZ/R
+         a8pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795452046; x=1796056846;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=P5/ZiEeoOQolEtqZd6duqT2B+ydqubbd46Mv2EwUK7A=;
+        b=noGWklX7QZ6hiGTLPc9q+pQhuDdBZJiCJowKxM/o5yHLtaNYbbTorVaBg8SJSjJqdi
+         Nk0coCl1RaSeYUOe/1YmlPNwDCWT1InAtZGRQcq9QoFkStMTXKdL5yw0GiXR3DaM2za9
+         2OU3TwlVZkh1w/Ykr1I6k7gCxCxNjNN8Ls/sQ0dUFnxnkP8pmh4aNKUI07J5fO06zuoo
+         oKvJJS7nLIYDOSdt6MS5MFTi8njiLH0sorVbRihxjpi412tRdhotAb4aeRwzggSpKniU
+         f89LtLFn9xcJNeFa2aoLUMmWqjrA/602NGADRR4bYKxarcUAtJx/DhJ6vdVt95yX4qFK
+         SH8w==
+X-Forwarded-Encrypted: i=1; AL+hErEfRRqrnPwAfAtgPjXZeK5I6LXI/F1OOYTqZnfOWeFdEitT6FqcEMXRmRKCBs4l0qClJaPfgfzhcY6QEA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8nYe4ZWmL9DMD1c5gBBmWPeHw4ZZTk1azVqCTAtuNR3JdDkSMl
+	6r+rDr3ObAD/UcsFKeVBv5f+pYqAZXr8igcGTgyv1eaX4R+Q4EccXm0f
+X-Gm-Gg: AZFdTZeBHksWH7l+nA1NGGYRgwkcWxlsO6TH5DaagaBJTkMORpfgbdo1EDFrURkqYIR
+	Yw1QfKQguV5joFpvPgDNvXAsnyyAY/gICRf1YC2SWu+jNR0HF00UihR3nHfwLEIHqcS3kQ8ziSg
+	DvrJMHmWynfrpB2SXhxXFXlqbRpHsDli0Wvlt4HnLT3EU4UxEdx2AiZjv8Js3znthB6ip1TnRow
+	gmZlz1fj71sM88CT7eFscmjLOOLQrzl47JXaW59fgDMh88I73UNRzJ3Ty+INfSNm83MJ0uNY6f3
+	KT4jclbHH0OUNLon2eBx1U0sqKHwFb7T6HXgvw+Eiv+7IVCzuB7fXWiZ4+Bigo+839gym3dO6HA
+	bKIAcIowivd+kXbHtP4KwZBy1VslegfPnbXyaUlgeSpGZ+2X+KNo3GZEE09deqCTTr7ttHw8u1c
+	WM1aeV1L4j33R8t2rPqTJ1IpAvO1/DsJrs1qliEyCLpaY4CXTpaT4cXzfQjirogKto+xKLpNfZ6
+	lPrOQvqA6UEviuWgc5o3FYvoEIQ5txWyoH6MtJ9UGzHJMhaUN71lxHJIRzRPf5SbzYQOdlejnJv
+	SMOHVZ9SjWuPnoTvir5pgBcWFzgvm5JhpgO2BY+nwGQPhm5Foa5OUFOTuUhHruWuXXg5FvVYb/5
+	LWzoIm1um
+X-Received: by 2002:a05:701a:844e:20b0:1b5:6c13:c76c with SMTP id a92af1059eb24-1b56c13c7a8mr6689110c88.15.1795452045824;
+        Mon, 23 Nov 2026 08:40:45 -0800 (PST)
+Received: from lounas.tail428e48.ts.net ([157.131.129.22])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b556847fdasm33225486c88.13.2026.11.23.08.40.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 08:40:45 -0800 (PST)
+From: Louis Thiery <thiery.louis@gmail.com>
+To: agk@redhat.com,
+	snitzer@kernel.org,
+	mpatocka@redhat.com,
+	bmarzins@redhat.com
+Cc: ming.lei@redhat.com,
+	dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Louis Thiery <thiery.louis@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] dm: clear REQ_DM_POLL_LIST on embedded clone bio
+Date: Mon, 23 Nov 2026 16:40:21 +0000
+Message-ID: <20261123164021.463361-1-thiery.louis@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -106,132 +103,71 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 08/13] zloop: add storage element emulation
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>
-References: <20261116213702.225970-1-dlemoal@kernel.org>
- <20261116213702.225970-9-dlemoal@kernel.org>
- <a102ffd1-7eb3-420d-84eb-eb4705a43b4c@suse.de>
- <bebc3f8c-822e-40b8-b7fb-c2fd8277b10f@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <bebc3f8c-822e-40b8-b7fb-c2fd8277b10f@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-13.29 / 50.00];
-	SUSE_INTERNAL_BYPASS(-9.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-0.998];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	URIBL_BLOCKED(0.00)[suse.de:email];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -13.29
-X-Spam-Level: 
-X-Spam-Flag: NO
 
-On 11/19/26 1:57 PM, Damien Le Moal wrote:
-> On 11/18/26 23:24, Hannes Reinecke wrote:
->> On 11/16/26 10:36 PM, Damien Le Moal wrote:
->>> Emulate the storage element depopulation feature of SMR disks in the
->>> zloop driver. This emulation is controlled using the new stor_elements
->>> option. This option can take several values:
->>>    - ZLOOP_STOR_ELEMENTS_NONE (0): no emulation (default)
->>>    - ZLOOP_STOR_ELEMENTS_RDWR (1): emulate all access storage elements
->>>      (e.g.  read+write heads)
->>>    - ZLOOP_STOR_ELEMENTS_PAIRS (2): emulate fractional access storage
->>>      elements (e.g. pairs of read and write heads)
->>>
->>> If enabled with the value 1 or 2, the number of storage elements, or of
->>> pairs of fractional access storage elements, is automatically calculated
->>> based on the number of zones of the device so that we have at least 2 and
->>> at most 32 storage elements or pairs of fractional access storage
->>> elements.
->>>
->>> The mapping of zones to storage elements is defined simply as the modulo
->>> of a zone number with the number of storage elements for the all access
->>> storage elements emulation and with the number of storage element pairs
->>> for the fractional access storage element emulation case. E.g, removing
->>> a storage element from a set of 4 all access storage elements will
->>> offline 1 zone every 4 zones.
->>>
->>> The storage element management operations are specified with the
->>> structure zloop_se_ops (struct blk_se_ops).
->>>
->>> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
->>> ---
->>>    .../admin-guide/blockdev/zoned_loop.rst       |  11 +-
->>>    drivers/block/zloop.c                         | 710 +++++++++++++++++-
->>>    2 files changed, 694 insertions(+), 27 deletions(-)
->>>
->> [ .. ]
->>> diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
->>> index 6bb68022ab30..1731e4ad5c98 100644
->>> --- a/drivers/block/zloop.c
->>> +++ b/drivers/block/zloop.c
->>> @@ -18,6 +18,7 @@
->>>    #include <linux/parser.h>
->>>    #include <linux/seq_file.h>
->>>    #include <linux/xattr.h>
->>> +#include <linux/delay.h>
->>>    
->>>    /*
->>>     * Options for adding (and removing) a device.
->>
->> [ ..  ]
->>
->>> @@ -1149,6 +1699,74 @@ static int zloop_init_zone(struct zloop_device *zlo, struct zloop_options *opts,
->>>    	return ret;
->>>    }
->>>    
->>> +#define ZLOOP_MIN_STOR_ELEMENTS			2
->>> +#define ZLOOP_MAX_STOR_ELEMENTS			32
-> 
-> This one is indeed a limit, so that we do not go crazy on the number of storage
-> elements, resulting in an emulation that is representative of a real disk. Note
-> that for a real disk, this would mean that we have 16-disks (1 head per surface,
-> 2 heads per disk) and no disk today on the market have that many. So this is
-> already "large".
-> 
-Well, typically an emulation (on this level) also serves to evaluate
-scaling limitations, where HW limitations are less interesting.
+When a polled bio is split across a target boundary (for example a
+dm-striped chunk boundary), dm_split_and_process_bio() re-submits the
+trimmed remainder of the original bio and then calls dm_queue_poll_io(),
+which sets REQ_DM_POLL_LIST (aliased to REQ_DRV) on the original bio.
 
->>> +#define ZLOOP_MIN_ZONES_PER_STOR_ELEMENTS	32
-> 
-> This one is not a limit, but rather what we aim for when the number of zones is
-> low so that we have a reasonable number of zones per element. Basically, to
-> avoid the rather silly case on one zone per element for small devices.
-> 
-Oh, yeah, I get why you set these limits.
-My intention was more to use zloop to precisely evaluate these daft 
-corner cases.
+When the remainder subsequently enters dm_split_and_process_bio(),
+alloc_io() clones it into the embedded io->tio.clone, inheriting
+REQ_DM_POLL_LIST. alloc_tio() only clears REQ_DM_POLL_LIST in its else
+branch for non-embedded clones, leaving REQ_DRV set on the embedded
+clone that polled normal I/O uses.
 
-But okay, if it's just to emulate 'real' HW than I'm fine.
+The leaked REQ_DRV flag is misinterpreted by lower layers. On NVMe
+(where REQ_NVME_MPATH is also defined as REQ_DRV), nvme_start_request()
+calls nvme_mpath_start_request(). For a single-path namespace where
+ns->head->disk is NULL (with CONFIG_NVME_MULTIPATH=y), dereferencing
+disk->queue triggers a kernel NULL pointer dereference:
 
-So:
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
+  BUG: kernel NULL pointer dereference, address: 0000000000000050
+  RIP: 0010:nvme_mpath_start_request+0x28/0xc0
+  Call Trace:
+   nvme_prep_rq+0x5e0/0xa90
+   nvme_queue_rq+0x40/0x1a0
+   __blk_mq_issue_directly+0x45/0xb0
+   blk_mq_try_issue_directly+0x85/0x100
+   blk_mq_submit_bio+0x6c9/0x710
+   submit_bio_noacct_nocheck+0x127/0x330
+   blkdev_direct_IO+0x230/0x680
 
-Cheers,
+On stacked DM devices, a lower DM layer also sees REQ_DM_POLL_LIST
+already set on the incoming clone and treats its bi_private as a dm_io
+poll list head.
 
-Hannes
+Move the REQ_DM_POLL_LIST clear out of the else branch in alloc_tio() so
+it applies to both embedded and non-embedded clones.
+
+Fixes: b99fdcdc3636 ("dm: support bio polling")
+Cc: stable@vger.kernel.org
+Signed-off-by: Louis Thiery <thiery.louis@gmail.com>
+---
+ drivers/md/dm.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 1881d8611..79972f17f 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -628,13 +628,13 @@ static struct bio *alloc_tio(struct clone_info *ci, struct dm_target *ti,
+ 		if (!clone)
+ 			return NULL;
+ 
+-		/* REQ_DM_POLL_LIST shouldn't be inherited */
+-		clone->bi_opf &= ~REQ_DM_POLL_LIST;
+-
+ 		tio = clone_to_tio(clone);
+ 		tio->flags = 0; /* also clears DM_TIO_INSIDE_DM_IO */
+ 	}
+ 
++	/* REQ_DM_POLL_LIST shouldn't be inherited */
++	clone->bi_opf &= ~REQ_DM_POLL_LIST;
++
+ 	tio->magic = DM_TIO_MAGIC;
+ 	tio->io = ci->io;
+ 	tio->ti = ti;
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.43.0
+
