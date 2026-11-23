@@ -1,74 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=78.46.152.61
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.14
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795443537;
-	b=vHVN0LuHkJzLS7WRXH1TqCDr0mTdLz/773Hp0m+DFW9S4FjocgemnWEDhnr0s3QC/a6G
-	 BGnZj9lQoC1+apvgtCN44UeG8HvezPGny2RIH0R6cyVIEZl6fFo3I4EknXaBAvkShJNUX
-	 jlBZm8A1cesg/m6PTLIVvrcncIdE87V0JEJpVZNlCxp6kzF+RRltgkYQOwEoBJ+gEYzzp
-	 UKcmqfbFUqrzvzJO3lEAind4fGtX8bUmLdYpFaH6q+01JvissrYOmzJJjq7FTsW8yeTM0
-	 mRg4mvBzDHn4G5tk0uV4EOpzYztEPOOKgffhvNjzpfeUXTigyjdz9EFpCiocrKxCYXA==
+	t=1795450499;
+	b=FDqfZ57BN6HIp5hUWh+pSMl8bNRTWFMCNj8B1va9AHrbxJ1KzwMjdcvNTtriHTuCtEGG
+	 40K9daPGf4XEpDU1nuIizOJkrk8Ht544vHXAiYa2cPqQ4JlN39b0pPVu0k1u6E+UaLnek
+	 rNMwnSkqI6l+I7lNQWFzDmZYQ3Lu5sjMBS3ViJ2J9Bss3ax28ZLuOl05Zkhr7v+/Fcccz
+	 25EQzqL2qe4bpEggmpnDrf3J36X6p6dISpsAifdp1YCB4OCaRKMc2ab5fBQ1j7Yv0Q0qo
+	 XW+jAPWn921ribjSNI8p5xbUNDEikFIE1BREp+g4qyEVyB3ZmYQaVuCw2wKxONIOTUQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795443537;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Virus-Scanned;
-	bh=L/aQTbe9wAoE1ruRv87uPYYfnTniS7DIV+mGMqkZ3SE=;
-	b=jUSvQmFTqAzdunjeHBO4cuw44vFL3cOUMPBbWDwYOjhzDQryqVsdC5Bt4WcZQwVWYRQA
-	 dRA68HlzYDug3/8d/UmY3N8oJcVrl4KULXI3+BIYx+TDSrTCwDBZsIdyuX/VsBu/C9tDB
-	 RJ8EC0iNDiSa1vBfaCAOTFdbkqLOw7ag9xglIus2D/Ni848ywulaOYSKtIWiRFi3dcVQb
-	 VI8qjhk91devWkOgcyatdIsVlXgWZ3CA2PYjePyXk5QcaNTlpJHsOWhKQHN0oyQwknkml
-	 phLbAtuDRORzSMguf0gGywA3E5p7xkNvhh8X2EJJQqbVdYFvaJSvZpJCiVyVxy4o0kg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795450499;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
+	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 References:Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=tL1jl09/wD2r0AUVPR2uNsPqb8HB+xJhrdsmnnw5yC0=;
+	b=nfDRpeBke6v5CFbA33wsmjanCZRSpP39moJ6qTt/9EwPOf3Q72fEY+h3IiwOw3k+O6hg
+	 vuCjFMx1Q5YL1Ju7Fzrms+EAudIpC7tAVyWlKgDypjIulEjlP8ktl4t3R6n2n0Id6XHRe
+	 CRHo4YwD1dw0WolXIdXySVUPAE57eolJVf+28HvuycGT+Mt5p7c6lDGia4kjgzGy7VipG
+	 /pCP9oqzm/a3rxhC9i8HNiTTl76cEyszR1DExb0Hl7Xr8RMr4lB/2Qa2ElB8f1+Mo2+GS
+	 ugyi2rnRnqOiYe6MlI9Ddu4RoY40muvU70KP1lRFzFkPe558WGOM8oYl3iCITNZXXYg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=jregg.de;
-	spf=pass smtp.mailfrom=jregg.de;
-	dkim=pass header.d=jregg.de header.i=@jregg.de header.a=rsa-sha256 header.s=default2602 header.b=J6mBWweh;
-	arc=none smtp.remote-ip=78.46.152.61
-Received: from www421.your-server.de (www421.your-server.de [78.46.152.61])
+	dmarc=pass header.from=acm.org;
+	spf=pass smtp.mailfrom=acm.org;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=jlAk3eCL;
+	arc=none smtp.remote-ip=199.89.1.14
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF21606A31A;
-	Mon, 23 Nov 2026 14:18:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CBF21606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jregg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jregg.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209BB606A31A
+	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 16:14:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 209BB606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=jregg.de header.i=@jregg.de header.a=rsa-sha256 header.s=default2602 header.b=J6mBWweh
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=jregg.de;
-	s=default2602; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=L/aQTbe9wAoE1ruRv87uPYYfnTniS7DIV+mGMqkZ3SE=; b=J6mBWwehWdpwXjiS7o1dCkdR3n
-	wBLf7azH5pVfDFSMuomo3V61rIwjoh5QtvgkMHBniWkLF5WGtXnuW+uI6thThQ7G5rvZVvAyOKYup
-	XmvzUd1/n5R6lak2K4iG2ZW2TyEjgUFdUzVPvzRhAN+2DvRzIwTfpIOjxtGJKrq89Bqd9UMJLqROT
-	0/QDL21UZyTUlJySYp3XO4TZOFkPy69pYA0Jf24D2wF6zsnsgAXlxetzb/gdWoZVnlqWDRagEhfGu
-	diZ/vp2dwtWiDrDP5J1yIvFNDuRi64KPPsUJ8WQobwN5DboSAEPhw49PhycLrROFVkfGrtbIzhBWq
-	SwUAZKDw==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www421.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <mail@jregg.de>)
-	id 1xVUsZ-000KcK-2h;
-	Mon, 23 Nov 2026 15:18:48 +0100
-Received: from localhost ([127.0.0.1])
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mail@jregg.de>)
-	id 1xVUsa-000K2g-1x;
-	Mon, 23 Nov 2026 15:18:48 +0100
-From: Jenson Johnathon Reggentin <mail@jregg.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Jenson Johnathon Reggentin <mail@jregg.de>,
-	Marco Elver <elver@google.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+ba8947364367f96fe16b@syzkaller.appspotmail.com
-Subject: [PATCH v2] blk-wbt: Fix data race and avoid possible false sharing
-Date: Mon, 23 Nov 2026 15:17:43 +0100
-Message-ID: <20261123141745.237765-1-mail@jregg.de>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <CANpmjNM9n+nCb46nEAUcrU6kecC5LOyYSxKWN0So0pZwYZ34GQ@mail.gmail.com>
-References: <CANpmjNM9n+nCb46nEAUcrU6kecC5LOyYSxKWN0So0pZwYZ34GQ@mail.gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=jlAk3eCL
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jY9yB4RHTz1XM6Hx;
+	Mon, 23 Nov 2026 16:14:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1795450497; x=1798042498; bh=tL1jl09/wD2r0AUVPR2uNsPq
+	b8HB+xJhrdsmnnw5yC0=; b=jlAk3eCLFs2W2gl79qOBQzr6oy4bvbFDByd5h4hp
+	GD8RZlo+JhUDdDbuNz8YYp1M6eFj/nXXAvvDJ3mNKtI42LiJI+m1/5YVQX69Tjx1
+	H4aIF/k0I1khznRtgysXGjz4rl7mHKb3AnexetZoofNfzz8uBJ8GTUCLZMZWMKEs
+	XNbhmQ3UXzqbi4yQtuIT4GSqVwGl1Dr5mO/dYArm2pL7pJxZEUtyW8lAUSP3Ohj7
+	2kfgrRAvn/ImHrvvKKPBNms9OZf/yNREtjTXA7PEy5t9uYtrwNwFXOJMB0Nu5wq4
+	zZzF7Sn/47si8ksghOngk4jftkXqLWfBwneVNX49FsNl2g==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id KMps1G-8GXEL; Mon, 23 Nov 2026 16:14:57 +0000 (UTC)
+Received: from [100.80.227.185] (unknown [104.135.182.41])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jY9y93dHCz1XM4Tn;
+	Mon, 23 Nov 2026 16:14:57 +0000 (UTC)
+Message-ID: <f251a666-ea13-4dec-882b-85af5e964b9d@acm.org>
+Date: Mon, 23 Nov 2026 08:14:55 -0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -78,58 +70,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.6/28192/Mon Nov 23 07:24:27 2026)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests v2 2/2] nbd/006: Measure NBD IOPS with a null_blk
+ backing device
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org
+References: <20261120213434.2945873-1-bvanassche@acm.org>
+ <20261120213434.2945873-3-bvanassche@acm.org> <awQaJh_NFpD2_-PK@shinmob>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <awQaJh_NFpD2_-PK@shinmob>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Marco Elver <elver@google.com>
+On 11/23/26 4:11 AM, Shin'ichiro Kawasaki wrote:
+> Just for curiosity, I wonder how performance regressions can be caputured with
+> this test case. The performance numbers are reported as described above, but the
+> test case does not report failure even when the performance numbers get worse
+> than previous runs. How do we catch such regressions in automated way?
+> 
+> Does this test case have other value than the performance regression check? For
+> example, the test case uses Unix domain socket, so I guess that this test case
+> extends nbd driver code coverage.
 
-The pattern here is to avoid possible false sharing. However, due to
-compiler optimizations the code may simply collapse to the write if we
-omit READ_ONCE/WRITE_ONCE:
-https://github.com/google/ktsan/wiki/READ_ONCE-and-WRITE_ONCE#it-may-improve-performance
+Detecting performance regressions falls outside the scope of this test.
+However, anyone who wants to use this test as the basis for automating
+detection of NBD performance regressions is welcome to do so.
 
-Fixes: e34cbd307477 ("blk-wbt: add general throttling mechanism")
-Reported-by: syzbot+ba8947364367f96fe16b@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/all/20191105182746.217864-1-elver@google.com/
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=220759
-Signed-off-by: Marco Elver <elver@google.com>
-Signed-off-by: Jenson Johnathon Reggentin <mail@jregg.de>
----
-v2: Pick up Marco Elver's 2019 patch with updated testing and an updated
-Fixes Tag.
+Thanks,
 
-Tested with KCSAN, HZ=1000 and null_blk in a 4-vCPU,
-2-GiB virtme-ng VM. The 30 second fio workload used two direct 4-KiB
-random readers and one buffered 64-KiB writer.
-
-The baseline produced two wbt_wait/wbt_wait and three wbt_done/wbt_done
-reports.
-Neither signature was observed with this patch. All fio jobs
-completed without errors.
-
-I also did an AI Code Review, it really wanted to add READ_ONCE
-instructions for the reads inside the close_io function. These changes did not 
-impact any of the KCSAN reports, in my testing, though.
-So I consider them outside of the scope, but I thought I'd mention it for 
-completeness sake.
-
- block/blk-wbt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 953d400fd013..a60df3524b98 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -156,8 +156,8 @@ static void wb_timestamp(struct rq_wb *rwb, unsigned long *var)
- 	if (rwb_enabled(rwb)) {
- 		const unsigned long cur = jiffies;
- 
--		if (cur != *var)
--			*var = cur;
-+		if (cur != READ_ONCE(*var))
-+			WRITE_ONCE(*var, cur);
- 	}
- }
- 
-
-base-commit: 77cc1587b17a356f1638f09ade33872a919a82ab
+Bart.
