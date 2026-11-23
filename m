@@ -1,59 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795411645;
-	b=FVFPrLIcoEbdSqHMeX/6MOdnCnK2p9RgBkv7Q8nHCHJrepNadF/Lm6CZq9574m6nk8qq
-	 BtOYSlcYFDsM5w22mG8/9aTyZgFB/bPcJiQg0Fe0107IMD+zBtoB46s5CYcXLO9lTrZai
-	 l7056VpnKsmMOwKHNc2gf1FU/F09Cw15K4/2Dh1JHL04t8dm6/wkqNDRGRKq/RTVEZ7T7
-	 8GFix++7dPFo4BLfT4jt3qXcpD5EVQ5B4hEcbp4huIs0COxJKvRxD/3ci4Q1tJ1n7pjuP
-	 ATtjgSwMSvOrDgGwHx3asoNQ5SMM0BLCEetcfdXxrcagzPsa37UL04PmyDnZGgs9DZA==
+	t=1795412203;
+	b=WS+jI33Qk2CS0QTCnDws0edI/9shpWmLaHxzfDRmFSgb8h7WUhaPqOR4Tq49u/CwmzJj
+	 zmH6NxrLX8o0nP+PWY2PISQtVIJBtDhbWRsDlSt4Tl7R7/JqxKmMAEixQMoZIULfwtH8W
+	 gfqwVS95yA9tG+crArwC4JehSlB+t6YN8dkjTlM6TovlJ2W7vHGmWyV72/qadLzxi6FnO
+	 r6+BrUxFo4XPg4NHSwE1SG+nvDynqiq33porivztT0cjWR/8UHpLa8v8bhwf7ObO585in
+	 JnBDkphIOkfhcZoP0MFE415ofITzaMkB2SHk/NhPfDFHHvMI38YNn15KlsxLrcVRsDQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795411645;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
-	 Mime-Version:Subject:Reply-To:Sender:From:To:CC:X-Priority:
-	 X-Content-Kind-Code:In-Reply-To:X-CPGS-Detection:X-Drm-Type:
-	 X-Msg-Generator:X-Msg-Type:X-Reply-Demand:Message-ID:Date:
-	 X-CMS-MailID:Content-Transfer-Encoding:Content-Type:X-Sendblock-Type:
-	 CMS-TYPE:X-CPGSPASS:X-CPGSPASS:cpgsPolicy:X-CFilter-Loop:
-	 X-CMS-RootMailID:References;
-	bh=7DjN14704yiowaIqyEGYRNsbumCAuKtOz7zG7vlkpsk=;
-	b=covUtC/n+1ExjURUxQUnffPtOcHzxZhKOmAPHNrh3g4jt++sc7wwpSyrmoPyOladnocN
-	 R0wejbemKOAyijxX2UegNUjfZsgfzNyrmcuTEa7xgauR9GO1R8lngvhVX77n9AK0qZ9P7
-	 81tvMWt3R65pGoFLDNUNf4I1TZY1PkXnInR/98aISkDKxzFoesEebIDTCOe9x++uC5jkJ
-	 MwpqdViA+n0IvYpcUP7rCFo+hLXTKUrvNacKnP3G8xDcJz5bhcSQ6q2qPsO59vrcSSoNH
-	 q6q1wQuwLoDv6VUVE2q8UbQ8Qx5zWXfU73pexgLdRcDx3W1W1+zc3kJJq5NSPFU1Irg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795412203;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=KnMxzhHOEHpbsDB95jN4ZokxNKIXrj2a5/W65iB8kpI=;
+	b=ZIcTwNfKzaWXP1wI2Mkt/guy7txk3pk5QuPiGiiZ4whrqs1mmRjJETZGFOvzuKNS6cyg
+	 UFX5NHpsGRQSDUl/BweCyob49UblSFnqtn41Y34frOQ9pOGeIpt8ojAmIttpFE62HqknI
+	 Pd23ZO2ciYSloza1u7aK7YP0m26qcivTYAPvx5jdlANfA3O9EYz/JQw3SrWKE34cgKKuP
+	 7AAcb1xMI/e3Xrlxq/g/wVYIH7twBK0qMziGOxAJ8ho6MbrISsI7BMS1R9xfEWHtBS8e/
+	 P9n+59VVEveDyxmkkd2Po5kx8JByinevi4ID14DwZG3nZ+AHtFOEb3ThijclAMKkLhQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=samsung.com;
-	spf=pass smtp.mailfrom=samsung.com;
-	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=apVk5raI;
-	arc=none smtp.remote-ip=203.254.224.33
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b="FROH/d5A";
+	arc=none smtp.remote-ip=209.85.214.180
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB70606A327
-	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 05:27:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2EB70606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2935C606A331
+	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 05:36:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2935C606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=apVk5raI
-Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20261123052721epoutp03156e01e9d231ee021d06124d4f49db3d~qlWAIf4qO2777427774epoutp03p
-	for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 05:27:21 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20261123052721epoutp03156e01e9d231ee021d06124d4f49db3d~qlWAIf4qO2777427774epoutp03p
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1795411641;
-	bh=7DjN14704yiowaIqyEGYRNsbumCAuKtOz7zG7vlkpsk=;
-	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-	b=apVk5raIaiAkm+DpRE0NO73GwWy4uBC9qJUv1OT1bPTThKIzjD3wpqEJB7LLbNKXk
-	 b8+AhhZK1lQgGQzHIOjkFL/ycOtuCw2rnYxCZyCPFVA6zSN95bHEepeBp/Sk3NUkBG
-	 SJy5IEpK9ZkPgNDVctfo2UXATo1uYgzX3XgzODp8=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas2p3.samsung.com (KnoxPortal) with ESMTPS id
-	20261123052720epcas2p3c28e60beda29b106799ffbf512a18ae8~qlV-frHuI2883428834epcas2p3x;
-	Mon, 23 Nov 2026 05:27:20 +0000 (GMT)
-Received: from epcas2p4.samsung.com (unknown [182.195.38.212]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4jXvZw0dPtz3hhTD; Mon, 23 Nov
-	2026 05:27:20 +0000 (GMT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=FROH/d5A
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2f04fab527eso20024255ad.0
+        for <linux-block@vger.kernel.org>; Sun, 22 Nov 2026 21:36:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1795412202; x=1796017002; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=KnMxzhHOEHpbsDB95jN4ZokxNKIXrj2a5/W65iB8kpI=;
+        b=FROH/d5A+4MWwKPhgc4NmbqjIc79nO2WpJllGoHK7iggmMjxoUyYnoA0XBG8fe3xGF
+         Fghk099M5QeK6zVC0ZudIgN9uAjy5EQAYw5M8fTpwFRLNVFfWyd56IkZJLmU5m4JzLLH
+         UUsBUFUaviJVCY66UwyoHBRbh5ljO8W8GiMmI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795412202; x=1796017002;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=KnMxzhHOEHpbsDB95jN4ZokxNKIXrj2a5/W65iB8kpI=;
+        b=e/kpEsCKrxys9vkjp9RWx0Yeug02MNNWu1KAc2ekh0iD1LPb8CnXOmrvYHHKbeIHkH
+         Uj9+74ZJdjUbZHl3EyTkhQobfxW7erv6FDj32n5PPs5fMDTR+pORHeHHd8hFGYtYTh69
+         DMvwoSnrlcVkZv5mB/Vy06U7XC27Ytyex05zXEEwK19RxMuDahpSZBQkCPAW4epbd5LJ
+         aJXgTIPhNknZZhJIp33V2APuEhAi7EWdIfdAQ4frf6mM6x4ZPr+UnfFKGai3m0/+q1sK
+         wBlHtvcC5vOCktOdkd2M8i7m9Wh2M5L5PFouFycla3H8VwJAdOtKJaJmzwuimRvVKbKH
+         RZCQ==
+X-Forwarded-Encrypted: i=1; AL+hErGMvGFzwDedVzgE+Q1vEf5r/QCdQvHO8mbwfEKanBgjFcKaAMENQ6KKrtWOvzkmIoFuf9yHPjC1+JQuFA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+8va2FLIodTEPFUDC9SA/8x53O2IFmvgyi8f5+wFC6AkTE0BqI
+	BiVbnEeksZ9L4LAu2Uzem6jBhh6SK9qXMdCl8xf/nn/HhChD3duv8bImCStaU7ZqDg==
+X-Gm-Gg: AZFdTZd6QTmgff/NegkosdXSUCrB3vISxZ/uyZpvbp7BpmHJzDzip1CO4yaZ3IJG24x
+	Yx/bdvdxBDk9J8n8gr06i56P9JE8+kEkL9gXEsP0kqrwXcozLm2UmYVZ+lffNg6ZRHY4O7BTWiJ
+	KRG4az+hSUFweiCrrwi1wancQr6IhUhpVG+XXwfjLp9vZ0QWkgq7FFN3PtQRM4Db4BmP4RflYzX
+	D2kHnyhOAFvClThyRQe9yMg4D87ujnAhtJTdd4dPi3c9xROYy6VLh6GGGol2ZggtqGumDMMILNa
+	DKAjKzLAkp0Zt5LDNLeiwV+Xz5xKBmWgXA4JhdpDmxYLrIGbpa+FCTWjps2pypKuT79g9Smfjgk
+	iKgbjLOOP9JPK6EtMVIiW7V8Fsl6myP61H3LviFMRSkN9OyIn6gPO45qTrIEpv9lkrd5SXt0o/r
+	FPgw3fzomI4EBCKm959FoQnkcSyFiZ97Zfyw9TQ9omFdJVbWfZ6DHwsX0io1MF/jOXrwsc9Qh14
+	1XsJlGDDwv4UhfxO+yR2DNrIp+fQLG6wAkwCLlYJhhqSvKSU9McW+NV8RIr9T10b/bxqcWkK1Mi
+	YOO6ixrpZeMxqHz+HSdKfC+HCKa90wHPMmL+D4Fy9iBH3qIiO7bmqFZPLCkd7a266aZ0x1rD0Jj
+	tzWnLQgsjbpjhtK19GA==
+X-Received: by 2002:a17:90b:442c:b0:3b4:12a9:2e9 with SMTP id 98e67ed59e1d1-3b41c7d17e4mr9833343a91.6.1795412202399;
+        Sun, 22 Nov 2026 21:36:42 -0800 (PST)
+Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:d8fa:c511:e415:e0d0])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde6cea7c38sm4636531a12.2.2026.11.22.21.36.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Nov 2026 21:36:41 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Nhat Pham <nphamcs@gmail.com>,
+	Yosry Ahmed <yosry@kernel.org>,
+	Hongfeng Chen <hongfengchen@xiaomi.com>,
+	Brian Geffon <bgeffon@google.com>,
+	Minchan Kim <minchan@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH v2 1/2] zsmalloc: free a zspage's pages in one batch
+Date: Mon, 23 Nov 2026 14:36:24 +0900
+Message-ID: <a74aca7a3d27333972782b29786c7b33861a56f1.1795412161.git.senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,541 +98,121 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Subject: [RFC PATCH RESEND 3/3] blk-cgroup: add cgroup-based write stream
- placement
-Reply-To: suho.son@samsung.com
-Sender: Suho Son <suho.son@samsung.com>
-From: Suho Son <suho.son@samsung.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
-CC: "tj@kernel.org" <tj@kernel.org>, "hannes@cmpxchg.org"
-	<hannes@cmpxchg.org>, "mkoutny@suse.com" <mkoutny@suse.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, "skhan@linuxfoundation.org"
-	<skhan@linuxfoundation.org>, "rdunlap@infradead.org"
-	<rdunlap@infradead.org>, "viro@zeniv.linux.org.uk"
-	<viro@zeniv.linux.org.uk>, "brauner@kernel.org" <brauner@kernel.org>,
-	"jack@suse.cz" <jack@suse.cz>, "io-uring@vger.kernel.org"
-	<io-uring@vger.kernel.org>, "cgroups@vger.kernel.org"
-	<cgroups@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "ngeol564@gmail.com" <ngeol564@gmail.com>,
-	KiYoung Lee <kiyoung77.lee@samsung.com>, JinHeon Kim
-	<jinheon09.kim@samsung.com>, Suho Son <suho.son@samsung.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p2>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20261123052718epcms2p7a27038aca05d1af19c7c26c4a60b4176@epcms2p7>
-Date: Mon, 23 Nov 2026 14:27:18 +0900
-X-CMS-MailID: 20261123052718epcms2p7a27038aca05d1af19c7c26c4a60b4176
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-cpgsPolicy: CPGSC10-223,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e
-References: <20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p2>
-	<CGME20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p7>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Suho Son <suho.son=40samsung.com>
+__free_frozen_pages() and dec_zone_page_state() take about 22% of the
+profile [1].
 
-NVMe Flexible Data Placement (FDP) allows writes with similar
-lifetimes to be placed in separate reclaim units, reducing write
-amplification.  However, existing write stream interfaces require
-applications to explicitly assign streams, leaving unmodified
-buffered-I/O workloads without an operator-controlled placement
-mechanism.
+Collect the pages of a multi-page zspage in a folio_batch and free
+them with folios_put(), which takes the pcp lock once per run of
+same-zone pages, and update NR_ZSPAGES once per such run as well
+A zspage never has more pages than a folio_batch holds.
 
-Introduce io.stream, a cgroup v2 I/O controller interface that allows
-operators to assign write streams on a per-device basis.  Write I/O
-attributed to the cgroup carries the tag via bio->bi_write_stream:
-direct writes issued by tasks in the cgroup, and buffered writeback
-owned by the cgroup (wbc_init_bio() re-associates writeback bios with
-the writeback owner's blkcg_css; requires CONFIG_CGROUP_WRITEBACK).
-Devices that support write streams (e.g. NVMe FDP) translate the tag
-into a placement identifier so similarly-aged data ends up in the
-same reclaim unit.
+Single-page zspages, incompressible or power of 2 size classes, use
+the current inline path.  There is nothing to batch there, and
+folio_batch is not free, hence the batch path lives in its own
+noinline function.
 
-Key properties:
+munmap() test:
+                    next-20261119      v7.4-rc3
+  256 MiB           -2.0% .. -4.1%     -4.4%
+  1 GiB             -2.8% .. -4.4%     -3.8%
 
-- Per-device entries are upserts; =22MAJ:MIN inherit=22 restores the
-  default state, which adopts the parent's effective stream for the
-  device.  An explicit stream 0 is a real entry which pins the cgroup
-  to the device default and stops the inheritance walk.
-- Configured streams are validated against the device queue limits;
-  devices without write streams are rejected with -EOPNOTSUPP, and
-  the reserved sentinel (255) is not selectable.
-- Only bios still carrying the WRITE_STREAM_NONE sentinel are
-  filled: explicit application placement (an io_uring per-I/O stream,
-  and filesystem-internal assignments such as f2fs) always wins.
-- The policy state is a single word read with READ_ONCE() on the
-  submission path; writers are serialized by the queue lock held
-  across blkg_conf_prep()/blkg_conf_unprep().  Policy data is freed
-  via kfree_rcu() so lockless readers are safe against policy
-  deactivation, and the policy activates lazily on first use per
-  disk, mirroring blk-throttle.
+[1] https://lore.kernel.org/20261109105957.2577351-1-chenhongfeng0212@gmail.com
 
-Link: https://doi.org/10.1145/3837053.3837343
-
-Signed-off-by: Suho Son <suho.son=40samsung.com>
+Reported-by: Hongfeng Chen <hongfengchen@xiaomi.com>
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- Documentation/admin-guide/cgroup-v2.rst =7C  58 ++++-
- block/Kconfig                           =7C  16 ++
- block/Makefile                          =7C   1 +
- block/blk-core.c                        =7C   2 +
- block/blk-iostream.c                    =7C 315 ++++++++++++++++++++++++
- block/blk-iostream.h                    =7C  18 ++
- 6 files changed, 408 insertions(+), 2 deletions(-)
- create mode 100644 block/blk-iostream.c
- create mode 100644 block/blk-iostream.h
+ mm/zsmalloc.c | 52 +++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 46 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-=
-guide/cgroup-v2.rst
-index 9e3c67b02ae2e..b0fd93f86027f 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-=40=40 -2020,8 +2020,9 =40=40 blk-throttle and apply to all devices, while =
-weight based proportional
- distribution is provided by the iocost cost model controller
- (CONFIG_BLK_CGROUP_IOCOST) and, when the BFQ I/O scheduler is in use
- for a device, by BFQ's own cgroup support.  Latency-based protection
--(CONFIG_BLK_CGROUP_IOLATENCY) and I/O priority assignment
--(CONFIG_BLK_CGROUP_IOPRIO) are also available.
-+(CONFIG_BLK_CGROUP_IOLATENCY), I/O priority assignment
-+(CONFIG_BLK_CGROUP_IOPRIO), and per-device write stream placement
-+(CONFIG_BLK_CGROUP_IOSTREAM) are also available.
-=20
-=20
- IO Interface Files
-=40=40 -2443,6 +2444,59 =40=40 The algorithm to set the I/O priority class =
-for a request is as follows:
-   into the maximum of the I/O priority class policy number and the numeric=
-al
-   I/O priority class.
-=20
-+IO Stream Placement
-+=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E=7E
-+
-+The stream placement cgroup policy (CONFIG_BLK_CGROUP_IOSTREAM) allows
-+an operator to assign write streams on a per-device basis for write
-+I/O attributed to a cgroup.  Write streams are a block-layer hint
-+(bio->bi_write_stream) that devices which support write placement
-+directives, such as NVMe Flexible Data Placement (FDP), translate into
-+placement identifiers, so that data with similar lifetimes is grouped
-+into the same reclaim unit.  Write I/O is attributed to the cgroup as
-+follows: direct writes issued by tasks in the cgroup, and buffered
-+writeback owned by the cgroup; the writeback case requires
-+CONFIG_CGROUP_WRITEBACK.
-+
-+Only bios that do not already carry a stream are affected: a stream
-+explicitly assigned by an application or by a file system always
-+wins, and a write that expresses no stream at all is placed in the
-+device-default stream.
-+
-+  io.stream
-+	A read-write flat-keyed file which exists on non-root
-+	cgroups.  Lines are keyed by =24MAJ:=24MIN device numbers.
-+
-+	Writing =22MAJ:MIN <stream>=22 assigns the write stream to use on
-+	that device.  Valid stream numbers are 0 up to the device's
-+	maximum write stream count: 0 explicitly selects the
-+	device-default stream, larger values select the corresponding
-+	device stream.  Writing the same device twice replaces the
-+	previous value.  Writing =22MAJ:MIN inherit=22 restores the
-+	default state, and a cgroup in the default state adopts the
-+	effective stream of the closest ancestor with an entry for
-+	that device; an explicit 0 is a real entry which stops this
-+	inheritance walk.
-+
-+	Stream numbers above the device's maximum, and the reserved
-+	value 255, are rejected with -EINVAL.  Configuring a device
-+	which does not support write streams is rejected with
-+	-EOPNOTSUPP.
-+
-+	Reading returns only the explicit entries; a cgroup in the
-+	inherit state has no line for the device.  For example::
-+
-+	  8:16 3
-+
-+	To place the writes of a cgroup in stream 3 of a device
-+	currently exposed as 8:16, write::
-+
-+	  echo =228:16 3=22 > io.stream
-+
-+On direct I/O to a raw block device, the file's write lifetime hint
-+(F_SET_RW_HINT) takes precedence over the cgroup value; the cgroup
-+value only applies to writes that express no stream.
-+
- PID
- ---
-=20
-diff --git a/block/Kconfig b/block/Kconfig
-index 70e4a66d941ff..558d1251c4343 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-=40=40 -170,6 +170,22 =40=40 config BLK_CGROUP_IOPRIO
- 	scheduler and block devices process requests. Only some I/O schedulers
- 	and some block devices support I/O priorities.
-=20
-+config BLK_CGROUP_IOSTREAM
-+	bool =22Cgroup I/O controller for assigning a per-device write stream=22
-+	depends on BLK_CGROUP
-+	help
-+	Enable the io.stream interface that lets a cgroup associate a
-+	block-layer write stream tag with a specific block device. Writes
-+	attributed to the cgroup then carry that tag via
-+	bio->bi_write_stream. This covers direct I/O issued by tasks in
-+	the cgroup as well as buffered writeback owned by the cgroup
-+	(which requires CONFIG_CGROUP_WRITEBACK), so devices that support
-+	write streams (e.g. NVMe FDP) can group similarly-aged data into
-+	the same reclaim unit, reducing write amplification and tail
-+	latency for multi-tenant workloads.
-+
-+	If unsure, say N.
-+
- config BLK_DEBUG_FS
- 	bool =22Block layer debugging information in debugfs=22
- 	default y
-diff --git a/block/Makefile b/block/Makefile
-index e7bd320e3d697..4b76d99bec298 100644
---- a/block/Makefile
-+++ b/block/Makefile
-=40=40 -21,6 +21,7 =40=40 obj-=24(CONFIG_BLK_CGROUP_RWSTAT)	+=3D blk-cgroup=
--rwstat.o
- obj-=24(CONFIG_BLK_CGROUP_FC_APPID) +=3D blk-cgroup-fc-appid.o
- obj-=24(CONFIG_BLK_DEV_THROTTLING)	+=3D blk-throttle.o
- obj-=24(CONFIG_BLK_CGROUP_IOPRIO)	+=3D blk-ioprio.o
-+obj-=24(CONFIG_BLK_CGROUP_IOSTREAM)	+=3D blk-iostream.o
- obj-=24(CONFIG_BLK_CGROUP_IOLATENCY)	+=3D blk-iolatency.o
- obj-=24(CONFIG_BLK_CGROUP_IOCOST)	+=3D blk-iocost.o
- obj-=24(CONFIG_MQ_IOSCHED_DEADLINE)	+=3D mq-deadline.o
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5054a6e21020c..ac346f8fe0aa9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-=40=40 -51,6 +51,7 =40=40
- =23include =22blk-cgroup.h=22
- =23include =22blk-throttle.h=22
- =23include =22blk-ioprio.h=22
-+=23include =22blk-iostream.h=22
- =23include =22error-injection.h=22
-=20
- struct dentry *blk_debugfs_root;
-=40=40 -952,6 +953,7 =40=40 static void bio_set_ioprio(struct bio *bio)
- 	if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) =3D=3D IOPRIO_CLASS_NONE)
- 		bio->bi_ioprio =3D get_current_ioprio();
- 	blkcg_set_ioprio(bio);
-+	blkcg_set_iostream(bio);
- =7D
-=20
- /**
-diff --git a/block/blk-iostream.c b/block/blk-iostream.c
-new file mode 100644
-index 0000000000000..c3577c0e24601
---- /dev/null
-+++ b/block/blk-iostream.c
-=40=40 -0,0 +1,315 =40=40
-+// SPDX-License-Identifier: GPL-2.0
+diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
+index d5f313754934..a1b6161fd237 100644
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -37,6 +37,7 @@
+ #include <linux/debugfs.h>
+ #include <linux/zsmalloc.h>
+ #include <linux/fs.h>
++#include <linux/folio_batch.h>
+ #include <linux/workqueue.h>
+ #include "zpdesc.h"
+ 
+@@ -837,6 +838,44 @@ static int trylock_zspage(struct zspage *zspage)
+ 	return 0;
+ }
+ 
 +/*
-+ * Block cgroup policy that assigns a per-device write stream tag.
-+ *
-+ * The user writes =22MAJ:MIN <stream>=22 into io.stream of a cgroup. Writ=
-e
-+ * I/O attributed to that cgroup then carries the tag via
-+ * bio->bi_write_stream. This covers direct writes issued by tasks in
-+ * the cgroup and buffered writeback owned by the cgroup (wbc_init_bio()
-+ * re-associates writeback bios with the writeback owner's blkcg_css).
-+ * Devices that support write streams (e.g. NVMe FDP) translate the tag
-+ * into a placement identifier so similarly-aged data ends up in the
-+ * same reclaim unit.
-+ *
-+ * Per-device entries are upserted, not appended: writing the same
-+ * MAJ:MIN twice replaces the previous value. The default state of a
-+ * cgroup is inherit, which adopts the parent's effective stream for
-+ * that device. An explicit stream of 0 is a distinct configuration
-+ * that pins the cgroup to the device default stream and blocks
-+ * inheritance. Writing =22MAJ:MIN inherit=22 restores the default
-+ * inherit state.
++ * Free the pages of a multi-page zspage in one go, see folios_put().
++ * Not inlined, so that the folio_batch is only set up (and, with
++ * CONFIG_INIT_STACK_ALL_ZERO, zero-filled) when there is something
++ * to batch.
 + */
++static noinline void free_page_chain(struct zpdesc *zpdesc)
++{
++	struct zone *zone = zpdesc_zone(zpdesc);
++	struct folio_batch fbatch;
++	int nr = 0;
 +
-+=23include <linux/bio.h>
-+=23include <linux/blk-mq.h>
-+=23include <linux/blk_types.h>
-+=23include <linux/blkdev.h>
-+=23include <linux/kernel.h>
-+=23include <linux/module.h>
-+=23include <linux/rcupdate.h>
-+=23include <linux/seq_file.h>
-+=23include <linux/slab.h>
-+=23include <linux/string.h>
++	static_assert(ZS_MAX_PAGES_PER_ZSPAGE <= FOLIO_BATCH_SIZE);
 +
-+=23include =22blk-cgroup.h=22
-+=23include =22blk-iostream.h=22
++	folio_batch_init(&fbatch);
++	do {
++		struct zpdesc *next = get_next_zpdesc(zpdesc);
 +
-+static struct blkcg_policy blkcg_policy_iostream;
++		VM_BUG_ON_PAGE(!zpdesc_is_locked(zpdesc), zpdesc_page(zpdesc));
++		reset_zpdesc(zpdesc);
++		zpdesc_unlock(zpdesc);
 +
-+/*
-+ * Per-(cgroup, device) data. The first member must embed
-+ * struct blkg_policy_data so the blkcg core can hand us a pd pointer
-+ * that round-trips through container_of().
-+ *
-+ * =40stream is the whole policy state in a single word:
-+ *
-+ *	IOSTREAM_INHERIT (-1): the default state; adopt the parent's
-+ *			      effective stream for this device.
-+ *	0:		      explicit device-default placement; a real
-+ *			      entry that stops the inheritance walk.
-+ *	1..max_write_streams:  explicit stream identifier.
-+ *
-+ * Writers are serialized by the queue lock, which blkg_conf_prep()
-+ * holds until blkg_conf_unprep() (see iostream_write()). A lockless
-+ * READ_ONCE() of the single word therefore yields either the previous
-+ * or the new complete configuration, never a mix of both.
-+ */
-+=23define IOSTREAM_INHERIT	(-1)
++		/* NR_ZSPAGES is per zone: one update per same-zone run */
++		if (unlikely(zpdesc_zone(zpdesc) != zone)) {
++			mod_zone_page_state(zone, NR_ZSPAGES, -nr);
++			zone = zpdesc_zone(zpdesc);
++			nr = 0;
++		}
++		nr++;
 +
-+struct iostream_grp =7B
-+	struct blkg_policy_data	pd;
-+	int			stream;
-+	struct rcu_head		rcu;
-+=7D;
++		folio_batch_add(&fbatch, zpdesc_folio(zpdesc));
++		zpdesc = next;
++	} while (zpdesc);
 +
-+static struct iostream_grp *pd_to_isg(struct blkg_policy_data *pd)
-+=7B
-+	return pd ? container_of(pd, struct iostream_grp, pd) : NULL;
-+=7D
++	mod_zone_page_state(zone, NR_ZSPAGES, -nr);
++	folios_put(&fbatch);
++}
 +
-+static struct iostream_grp *blkg_to_isg(struct blkcg_gq *blkg)
-+=7B
-+	return pd_to_isg(blkg_to_pd(blkg, &blkcg_policy_iostream));
-+=7D
-+
-+static struct blkg_policy_data *iostream_pd_alloc(struct gendisk *disk,
-+						  struct blkcg *blkcg,
-+						  gfp_t gfp)
-+=7B
-+	struct iostream_grp *isg;
-+
-+	isg =3D kzalloc_node(sizeof(*isg), gfp, disk->node_id);
-+	if (=21isg)
-+		return NULL;
-+
-+	return &isg->pd;
-+=7D
-+
-+static void iostream_pd_init(struct blkg_policy_data *pd)
-+=7B
-+	struct iostream_grp *isg =3D pd_to_isg(pd);
-+
-+	isg->stream =3D IOSTREAM_INHERIT;
-+=7D
-+
-+static void iostream_pd_free(struct blkg_policy_data *pd)
-+=7B
-+	/*
-+	 * blkcg_set_iostream() dereferences the pd from the bio submission
-+	 * path under rcu_read_lock() without holding the queue or blkcg
-+	 * lock, so the memory must survive an RCU grace period after it is
-+	 * detached from blkg->pd=5B=5D. This covers both free paths:
-+	 * blkcg_deactivate_policy(), which frees the pd immediately while
-+	 * bios may still be in flight, and blkg_free_workfn(), which only
-+	 * runs once the last blkg reference (including the one held by any
-+	 * in-flight bio) is dropped.
-+	 */
-+	kfree_rcu(pd_to_isg(pd), rcu);
-+=7D
-+
-+static u64 iostream_prfill(struct seq_file *sf, struct blkg_policy_data *p=
-d,
-+			   int off)
-+=7B
-+	struct iostream_grp *isg =3D pd_to_isg(pd);
-+	const char *dname =3D blkg_dev_name(pd->blkg);
-+	int stream;
-+
-+	/*
-+	 * Called under rcu_read_lock() from blkcg_print_blkgs(), so the
-+	 * pd dereference is safe against iostream_pd_free(). Report every
-+	 * explicit configuration, including an explicit stream 0, so the
-+	 * readback reflects what was written.
-+	 */
-+	if (=21dname)
-+		return 0;
-+
-+	stream =3D READ_ONCE(isg->stream);
-+	if (stream =3D=3D IOSTREAM_INHERIT)
-+		return 0;
-+
-+	seq_printf(sf, =22%s %u=5Cn=22, dname, stream);
-+	return 0;
-+=7D
-+
-+static int iostream_show(struct seq_file *sf, void *v)
-+=7B
-+	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), iostream_prfill,
-+			  &blkcg_policy_iostream, 0, false);
-+	return 0;
-+=7D
-+
-+static ssize_t iostream_write(struct kernfs_open_file *of, char *buf,
-+			      size_t nbytes, loff_t off)
-+=7B
-+	struct blkcg *blkcg =3D css_to_blkcg(of_css(of));
-+	struct blkg_conf_ctx ctx;
-+	struct iostream_grp *isg;
-+	char *body;
-+	unsigned int v;
-+	char dummy;
-+	int ret;
-+
-+	blkg_conf_init(&ctx, buf);
-+
-+	ret =3D blkg_conf_open_bdev(&ctx);
-+	if (ret)
-+		goto out_finish;
-+
-+	/*
-+	 * The policy is activated lazily on first use of io.stream for a
-+	 * given disk, mirroring blk-throttle's blk_throtl_init() pattern.
-+	 * Devices that do not support write streams are rejected up front.
-+	 */
-+	if (=21bdev_max_write_streams(ctx.bdev)) =7B
-+		ret =3D -EOPNOTSUPP;
-+		goto close_bdev;
-+	=7D
-+
-+	if (=21blkcg_policy_enabled(ctx.bdev->bd_queue, &blkcg_policy_iostream)) =
-=7B
-+		ret =3D blkcg_activate_policy(ctx.bdev->bd_disk,
-+					    &blkcg_policy_iostream);
-+		if (ret)
-+			goto close_bdev;
-+	=7D
-+
-+	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_iostream, &ctx);
-+	if (ret)
-+		goto close_bdev;
-+
-+	isg =3D blkg_to_isg(ctx.blkg);
-+	body =3D strim(ctx.body);
-+	ret =3D -EINVAL;
-+
-+	if (body=5B0=5D && =21strncasecmp(body, =22inherit=22, 7) && body=5B7=5D =
-=3D=3D '=5C0') =7B
-+		/* restore the default inherit state */
-+		WRITE_ONCE(isg->stream, IOSTREAM_INHERIT);
-+		ret =3D 0;
-+	=7D else if (sscanf(body, =22%u %c=22, &v, &dummy) =3D=3D 1 &&
-+		   v <=3D bdev_max_write_streams(ctx.bdev) &&
-+		   v <=3D U8_MAX && v =21=3D WRITE_STREAM_NONE) =7B
-+		/*
-+		 * bi_write_stream is a u8 that reserves 255
-+		 * (WRITE_STREAM_NONE) as the =22unset=22 sentinel, hence the
-+		 * U8_MAX bound and the WRITE_STREAM_NONE exclusion: a
-+		 * device advertising more than 254 streams cannot have
-+		 * its stream 255 selected through this interface. The
-+		 * single-word =40stream state and its locking are
-+		 * described at struct iostream_grp.
-+		 */
-+		WRITE_ONCE(isg->stream, (int)v);
-+		ret =3D 0;
-+	=7D
-+
-+	blkg_conf_unprep(&ctx);
-+
-+close_bdev:
-+	blkg_conf_close_bdev(&ctx);
-+out_finish:
-+	return ret ?: nbytes;
-+=7D
-+
-+/**
-+ * blkcg_set_iostream - apply the cgroup's per-device write stream to a bi=
-o
-+ * =40bio: the bio about to be submitted
-+ *
-+ * Called from bio_set_ioprio() in the submit_bio() path with
-+ * bio->bi_blkg already attached (see bio_associate_blkg() in
-+ * bio_init/bio_reset). All write bios funnel through this hook: direct
-+ * I/O issued by tasks in the cgroup and buffered writeback owned by
-+ * the cgroup (wbc_init_bio() associates writeback bios with the
-+ * writeback owner's blkcg_css, which requires CONFIG_CGROUP_WRITEBACK).
-+ * Reads are naturally skipped by the op_is_write() filter. Devices
-+ * that do not advertise write streams are skipped.
-+ *
-+ * Inheritance: the walk visits the bio's blkg and its ancestors and
-+ * stops at the first one with an explicit entry for this device. A
-+ * cgroup in the default inherit state (no entry) adopts the parent's
-+ * effective stream; an explicit 0 is a real entry that stops the walk
-+ * and pins the bio to the device default stream.
-+ *
-+ * Precedence: if the bio already carries a concrete bi_write_stream
-+ * (i.e. anything other than WRITE_STREAM_NONE, e.g. set by an io_uring
-+ * per-I/O write attribute), leave it alone =E2=80=94=20the=20more=20speci=
-fic=20source=0D=0A+=20*=20wins.=20The=20cgroup=20value=20only=20fills=20in=
-=20a=20bio=20that=20expressed=20no=20stream.=0D=0A+=20*=20A=20residual=20WR=
-ITE_STREAM_NONE=20(no=20issuer=20stream=20and=20no=20cgroup=20stream)=0D=0A=
-+=20*=20is=20resolved=20to=20the=20device-default=200=20later=20in=20the=20=
-submit=20path=0D=0A+=20*=20(submit_bio_noacct_nocheck()),=20so=20the=20driv=
-er=20never=20sees=20the=20sentinel.=0D=0A+=20*=0D=0A+=20*=20Locking:=20the=
-=20blkg=20and=20its=20->parent=20chain=20are=20stable=20for=20the=20lifetim=
-e=0D=0A+=20*=20of=20the=20bio's=20blkg=20reference=20(blkg_tryget_closest()=
-,=20blkg_get(parent)=0D=0A+=20*=20at=20creation),=20but=20the=20per-device=
-=20policy=20data=20is=20not:=20it=20can=20be=20freed=0D=0A+=20*=20by=20blkc=
-g_deactivate_policy()=20while=20a=20bio=20is=20still=20in=20flight.=20The=
-=20pd=0D=0A+=20*=20is=20therefore=20only=20dereferenced=20inside=20an=20RCU=
-=20read-side=20critical=0D=0A+=20*=20section,=20pairing=20with=20the=20kfre=
-e_rcu()=20in=20iostream_pd_free().=20The=0D=0A+=20*=20enabled=20check=20is=
-=20repeated=20inside=20the=20RCU=20section=20so=20the=20walk=20cannot=0D=0A=
-+=20*=20race=20past=20policy=20deactivation.=20See=20struct=20iostream_grp=
-=20for=20the=0D=0A+=20*=20locking=20of=20the=20single-word=20policy=20state=
-.=0D=0A+=20*/=0D=0A+void=20blkcg_set_iostream(struct=20bio=20*bio)=0D=0A+=
-=7B=0D=0A+=09struct=20blkcg_gq=20*blkg=20=3D=20bio->bi_blkg;=0D=0A+=09int=
-=20stream=20=3D=20IOSTREAM_INHERIT;=0D=0A+=0D=0A+=09if=20(=21op_is_write(bi=
-o->bi_opf))=0D=0A+=09=09return;=0D=0A+=09if=20(bio->bi_write_stream=20=21=
-=3D=20WRITE_STREAM_NONE)=0D=0A+=09=09return;=0D=0A+=09if=20(=21bdev_max_wri=
-te_streams(bio->bi_bdev))=0D=0A+=09=09return;=0D=0A+=0D=0A+=09rcu_read_lock=
-();=0D=0A+=09if=20(blkcg_policy_enabled(blkg->q,=20&blkcg_policy_iostream))=
-=20=7B=0D=0A+=09=09/*=0D=0A+=09=09=20*=20Walk=20up=20to=20find=20the=20firs=
-t=20ancestor=20with=20an=20explicit=0D=0A+=09=09=20*=20entry=20for=20this=
-=20device,=20including=20an=20explicit=200.=0D=0A+=09=09=20*/=0D=0A+=09=09w=
-hile=20(blkg)=20=7B=0D=0A+=09=09=09struct=20iostream_grp=20*isg=20=3D=20blk=
-g_to_isg(blkg);=0D=0A+=09=09=09int=20s;=0D=0A+=0D=0A+=09=09=09if=20(=21isg)=
-=0D=0A+=09=09=09=09break;=0D=0A+=09=09=09s=20=3D=20READ_ONCE(isg->stream);=
-=0D=0A+=09=09=09if=20(s=20=21=3D=20IOSTREAM_INHERIT)=20=7B=0D=0A+=09=09=09=
-=09stream=20=3D=20s;=0D=0A+=09=09=09=09break;=0D=0A+=09=09=09=7D=0D=0A+=09=
-=09=09blkg=20=3D=20blkg->parent;=0D=0A+=09=09=7D=0D=0A+=09=7D=0D=0A+=09rcu_=
-read_unlock();=0D=0A+=0D=0A+=09if=20(stream=20=21=3D=20IOSTREAM_INHERIT)=0D=
-=0A+=09=09bio->bi_write_stream=20=3D=20stream;=0D=0A+=7D=0D=0A+=0D=0A+stati=
-c=20struct=20cftype=20iostream_files=5B=5D=20=3D=20=7B=0D=0A+=09=7B=0D=0A+=
-=09=09.name=09=09=3D=20=22stream=22,=0D=0A+=09=09.flags=09=09=3D=20CFTYPE_N=
-OT_ON_ROOT,=0D=0A+=09=09.seq_show=09=3D=20iostream_show,=0D=0A+=09=09.write=
-=09=09=3D=20iostream_write,=0D=0A+=09=7D,=0D=0A+=09=7B=20=7D=20/*=20sentine=
-l=20*/=0D=0A+=7D;=0D=0A+=0D=0A+static=20struct=20blkcg_policy=20blkcg_polic=
-y_iostream=20=3D=20=7B=0D=0A+=09.dfl_cftypes=09=3D=20iostream_files,=0D=0A+=
-=0D=0A+=09.pd_alloc_fn=09=3D=20iostream_pd_alloc,=0D=0A+=09.pd_init_fn=09=
-=3D=20iostream_pd_init,=0D=0A+=09.pd_free_fn=09=3D=20iostream_pd_free,=0D=
-=0A+=7D;=0D=0A+=0D=0A+static=20int=20__init=20iostream_init(void)=0D=0A+=7B=
-=0D=0A+=09return=20blkcg_policy_register(&blkcg_policy_iostream);=0D=0A+=7D=
-=0D=0A+=0D=0A+static=20void=20__exit=20iostream_exit(void)=0D=0A+=7B=0D=0A+=
-=09blkcg_policy_unregister(&blkcg_policy_iostream);=0D=0A+=7D=0D=0A+=0D=0A+=
-module_init(iostream_init);=0D=0A+module_exit(iostream_exit);=0D=0Adiff=20-=
--git=20a/block/blk-iostream.h=20b/block/blk-iostream.h=0D=0Anew=20file=20mo=
-de=20100644=0D=0Aindex=200000000000000..eb3ca243ad791=0D=0A---=20/dev/null=
-=0D=0A+++=20b/block/blk-iostream.h=0D=0A=40=40=20-0,0=20+1,18=20=40=40=0D=
-=0A+/*=20SPDX-License-Identifier:=20GPL-2.0=20*/=0D=0A+=0D=0A+=23ifndef=20_=
-BLK_IOSTREAM_H_=0D=0A+=23define=20_BLK_IOSTREAM_H_=0D=0A+=0D=0A+=23include=
-=20<linux/kconfig.h>=0D=0A+=0D=0A+struct=20bio;=0D=0A+=0D=0A+=23ifdef=20CON=
-FIG_BLK_CGROUP_IOSTREAM=0D=0A+void=20blkcg_set_iostream(struct=20bio=20*bio=
-);=0D=0A+=23else=0D=0A+static=20inline=20void=20blkcg_set_iostream(struct=
-=20bio=20*bio)=0D=0A+=7B=0D=0A+=7D=0D=0A+=23endif=0D=0A+=0D=0A+=23endif=20/=
-*=20_BLK_IOSTREAM_H_=20*/=0D=0A--=20=0D=0A2.43.0=0D=0A=0D=0A
+ /*
+  * Three free helpers, kept apart here:
+  *
+@@ -855,21 +894,22 @@ static int trylock_zspage(struct zspage *zspage)
+  */
+ static inline void __free_zspage_lockless(struct zspage *zspage)
+ {
+-	struct zpdesc *zpdesc, *next;
++	struct zpdesc *zpdesc;
+ 
+ 	VM_BUG_ON(get_zspage_inuse(zspage));
+ 	VM_BUG_ON(zspage->fullness != ZS_INUSE_RATIO_0);
+ 
+-	next = zpdesc = get_first_zpdesc(zspage);
+-	do {
++	zpdesc = get_first_zpdesc(zspage);
++	if (get_next_zpdesc(zpdesc)) {
++		free_page_chain(zpdesc);
++	} else {
++		/* Single-page zspage, e.g. a huge object: nothing to batch */
+ 		VM_BUG_ON_PAGE(!zpdesc_is_locked(zpdesc), zpdesc_page(zpdesc));
+-		next = get_next_zpdesc(zpdesc);
+ 		reset_zpdesc(zpdesc);
+ 		zpdesc_unlock(zpdesc);
+ 		zpdesc_dec_zone_page_state(zpdesc);
+ 		zpdesc_put(zpdesc);
+-		zpdesc = next;
+-	} while (zpdesc != NULL);
++	}
+ 
+ 	cache_free_zspage(zspage);
+ }
+-- 
+2.56.1.750.gf70dc682cf-goog
+
