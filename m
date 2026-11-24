@@ -1,66 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.14
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795538284;
-	b=5N3mtdyu+mLU6WhcbJH+QDyODYtrXDnwacmPV41H5b6D+gxzKYagBCYIHDI4rUjuPMLd
-	 6+XohbffIiPOxsV+1+wxs0ksrVpyQEL3Tp1Mjfl5uHLn/2BSn449fZO1nK7Ckq/i+0Yx1
-	 XKs3VDOpvNaRZYxJqiQQ7tf1DGJ40TU3p3uueuLP5FKlDaI5G6t+n4T6o1vBkVJeBUKA8
-	 cwjOt5IxN9OenOO29Usv+clPLEmshTpIVd5oWP4xReJb0Dw+gCWRRtb+NxraMcTzd9keZ
-	 82y5M8bfQciqX/IFkuYZzokH16ZA90WMJEGv3oidxfKdZ7TMVm/WpwHD0tcLW2VyULw==
+	t=1795539411;
+	b=zRA1wm3rkG2Qr5r5ZVjM+jnArtdE0He6XhJR7ZJSYzUP0hR9hJHb6rFHzJ9yH43v/p0A
+	 7xhOIcU9+4zjZVeeHr/TNFgEqPCgyrevs2DRqzT+lO8yVGuPtJeJIi6XeyGkH0RNjb9N4
+	 Gp2wSTHUY0Nqm4bO0SVNAZsVYGkUOyVDWtaOa/PcCwI0KvycviGSD2wrR0e4S0CTHMbtG
+	 /5v6r/Q2sJuSrN1XibBTYRcDmUAitEWIZhlfkwH1tFzECy9e5tBoOo/PbHEzRQcClzXa7
+	 unLc7OBS+p5g2i49mDtSTS2FIP5zjnus16+Ebxn0iQD/D3YjGjatL/f7fY3pcgUzgpA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795538284;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795539411;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
 	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
 	 References:Content-Language:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=VcKqAindQ+wtPkjkunJkcwHZ0Zj0u+55F0mjged3HyQ=;
-	b=M4lwzgHHMtvuqKDBn8ncyy+0eo8l664cAyns56wSxYReLxa+BBXhTcOtRO6IH58eMbLa
-	 GimHgM6w3ePz6D6l4xoVMUpv+E+LTrDj2U7GZF86S7wMFF4I5SM/5sz6/hYj5VgXtJasE
-	 qclFJo6d30omX50+eqg5JHt1WOmQ9jl6f5J1zWbiIFfAFthak1tfJWWiDyjuFjlsEv+KS
-	 unJyg91/tnOfb78CBZBNTRHJ9wmdHPjgHRuZZy41S/ocWzKxUagBZwgIVHWMzA4wstcC2
-	 nWeNxYJZrp/PUPRzeW5sF/uqe2Ei+dO0+wr+/YnJAJp69apRCknG9q4Rg99mY5JV8lQ==
+	bh=LzEyIRkIpKpUCITFC4vhksTMabFd5PcRoeKfvhGw5D4=;
+	b=4DCjgVp2tfyErX5dqOaa/LRv8FHnzrOKOC4LTLX1gaJypE7AwVk5VUcu3EMnE/nw7MVt
+	 B3gMyNLwyV3pY+ySMMRJmuC02mgU48lc/HDhsXlKGn15ZekNyoC0r0fZdwJEHCwhk+3+x
+	 n9ZLeiDvXj9+S8NpT/ncJTQuLiNMJ6TEiSE1vAITDnrjSh0hKQLa9YSOxDfOrwN26yx0b
+	 kUwiFdrNwBQN5SDcCI+kBr1jENqsUmbEoSTpgeNu9YdXimaETCbStHzmsREm22NKw0XvE
+	 OJqbeYilZiAJmX3QFdrT8oZ6f4cld1f/31hJRKkg1JeO9MOdj5rmppXugi+68aetkXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=acm.org;
 	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=AaHe7eAY;
-	arc=none smtp.remote-ip=199.89.1.16
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=R9PGPGgQ;
+	arc=none smtp.remote-ip=199.89.1.14
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C289606A32D;
-	Tue, 24 Nov 2026 16:38:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6C289606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1784E606A32C;
+	Tue, 24 Nov 2026 16:56:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1784E606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=AaHe7eAY
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=R9PGPGgQ
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jYpQF6p9WzlfvqM;
-	Tue, 24 Nov 2026 16:37:57 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jYpr237cgz1XM5kD;
+	Tue, 24 Nov 2026 16:56:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1795538272; x=1798130273; bh=VcKqAindQ+wtPkjkunJkcwHZ
-	0Zj0u+55F0mjged3HyQ=; b=AaHe7eAYuU8vzjg7cR1Z3k75naI24NXULG++7wgI
-	DLYImG5O+Q6lE0HGJ/IwjQQVs6tal314bXGukXQj/dlzsGqFUZ7e7AvEliOJ9Mdw
-	iMqzZR9NzQ4tPcaDAfsJmhDhe7BE4yIMrJXWSnnig+KDgX9s0L0F9IoLHjEERY+7
-	OU8yqGz/E2JfbItUw6FU1vyt2XXtWuBejLx55PbSwmJtsLdUD/8CXxRd7+PmcmVh
-	JA8c76xbSiV0/7oMrZeQQDkVCox03oA8fgAyardlcqOH3RKhO9mRn6ExKndlMKC8
-	rkPbNdC3afxHuJObuUQGtF1TBqXo2HfWL2xAyq6fs6Rz9Q==
+	 s=mr01; t=1795539406; x=1798131407; bh=LzEyIRkIpKpUCITFC4vhksTM
+	abFd5PcRoeKfvhGw5D4=; b=R9PGPGgQ7ZWGf3Z3mArn8x94eocq/0bVk/29vXvK
+	EdSSY+zrnK0GNbY7oeUzE8uvqrLIqP+oXvoQJkJIJbcNrh/UNDTHck/SHBxBr0fE
+	WFVZD2YbpXwOrFj84OA28MrD7bCi3HdlhAmX4nsPIex6BExi5B8rrIfi4Uto9zq2
+	K0k+G3aWztudGxxpLLJ/24X5qgyVcmVGMZPEJ0w3NkU6m9TMN/hUXa8eyo4K4Xw1
+	xtwvqKU1A6BUcrAllXo3mGCpUFcSIvnRndKUnI8RbQhIAzTsSu4ajZVBFYdz5ihy
+	GMiAh6SNAlnXWQ0CMW6xTIy+S5AFuddTbdZYJeFZnEIndw==
 X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id LkaBam14LBfH; Tue, 24 Nov 2026 16:37:52 +0000 (UTC)
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id HnAIoYKlkglc; Tue, 24 Nov 2026 16:56:46 +0000 (UTC)
 Received: from [IPV6:2a00:79e0:2ed2:d:b87d:aea9:8f72:a6cd] (unknown [104.135.182.41])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jYpQ83pdbzlkvPv;
-	Tue, 24 Nov 2026 16:37:52 +0000 (UTC)
-Message-ID: <207069e4-6c99-40b3-ac0c-7ffe675a0c9f@acm.org>
-Date: Tue, 24 Nov 2026 08:37:51 -0800
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jYpqy14dCz1XM4Tn;
+	Tue, 24 Nov 2026 16:56:46 +0000 (UTC)
+Message-ID: <f8d3056d-2950-428c-b5f3-c41b5fa10eb2@acm.org>
+Date: Tue, 24 Nov 2026 08:56:45 -0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -71,84 +71,67 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] loop: fix stale dma_alignment when direct I/O is silently
- dropped
-To: Tao Cui <cui.tao@linux.dev>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.cz>,
- Ming Lei <tom.leiming@gmail.com>, Damien Le Moal <dlemoal@kernel.org>,
- Hannes Reinecke <hare@kernel.org>, Zhao Gongyi <zhaogongyi@bytedance.com>,
- stable@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cuitao@kylinos.cn
-References: <20261124093342.838490-1-cui.tao@linux.dev>
- <96ffc97d-62bc-4a91-ae3d-9baa28ef500b@linux.dev>
+Subject: Re: [PATCH v7] loop: defer the queue limits clear to a workqueue
+To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk, hch@lst.de,
+ Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: cuitao@kylinos.cn, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20261124031238.555291-1-cui.tao@linux.dev>
+ <b48806fb-22a5-40da-a682-22e010c8316d@linux.dev>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <96ffc97d-62bc-4a91-ae3d-9baa28ef500b@linux.dev>
+In-Reply-To: <b48806fb-22a5-40da-a682-22e010c8316d@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/24/26 2:56 AM, Tao Cui wrote:
- > I noticed the sashiko report [1].  The lock order in loop_set_status()
- > is indeed different from 06a2ff603f1f, but I think the reported
- > deadlock cannot be reached through this code.  The queue is frozen and
- > fully drained before queue_limits_start_update() takes q->limits_lock,
- > and nothing between start_update() and commit_update() blocks, so the
- > new code never waits for anything while holding the lock.
+On 11/24/26 12:10 AM, Tao Cui wrote:
+ > For v8, my plan is to stop deciding whether to quiet a request at
+ > queue_rq() time and instead quiet repeated failures at the point of
+ > failure. The verdicts remain recorded for the lifetime of the backing
+ > file and are cleared only on rebind or unbind. loop_clear_limits()
+ > reports whether a verdict is new, and repeated failures mark only
+ > their own request quiet. That guarantees the first failure for each
+ > mode is reported, regardless of how dispatch and queue freezing
+ > interleave.
+ >
+ > [ ... ]
+ >
+ > Does this approach look reasonable to you? If so, I'll send the
+ > already tested patch as v8.
 
-Whether or not a deadlock can be triggered, I expect lockdep to complain
-about this patch. blk_mq_freeze_queue() acquires q->io_lockdep_map and
-that map is only released by blk_mq_unfreeze_queue(). Hence, calling
-queue_limits_start_update() between these two calls records the
-dependency q_usage_counter(io) -> limits_lock. The opposite order is
-already used by loop_set_dio(), loop_set_block_size() and
-queue_limits_commit_update_frozen(). This is the same complaint that has
-been fixed by commit 06a2ff603f1f ("loop: Fix recently introduced lock
-inversion"). A lockdep complaint is a problem by itself since it
-disables lockdep and hence hides later reports. Has this patch been
-tested with lockdep enabled?
+That approach sounds reasonable to me. If the verdicts are kept for the
+lifetime of the backing file, I think the following simplifications are
+possible:
+- The clear_limits_pending member variable is no longer needed. The
+   work function can read the mask with the unsupported modes without
+   resetting it.
+- lo_fallocate() can return -EOPNOTSUPP without calling
+   file->f_op->fallocate() if the mode is already known to be
+   unsupported.
 
- > I am more worried about the suggested reorder: with start_update()
- > before blk_mq_freeze_queue(), loop_set_status() would hold limits_lock
- > while draining, and an in-flight write-zeroes request on an
- > unsupported backing file would block in loop_clear_limits() on that
- > lock while holding a queue usage counter, so the freeze would never
- > complete.
+Tracking the verdicts per mode also fixes the following issue in v7:
+clear_limits_pending is not per mode, so a failed discard suppresses
+the error message for the first write-zeroes failure.
 
-That scenario is not specific to loop_set_status(). loop_set_dio(),
-loop_set_block_size() and the sysfs store methods already hold
-limits_lock while freezing the queue. Making loop_set_status() follow
-the same convention does not introduce a new class of problems. The
-proper fix is the loop_clear_limits() rework, so please make this patch
-depend on "loop: defer the queue limits clear to a workqueue" instead of
-deviating from the locking convention.
-
- > The snapshot taken before the drain could also overwrite a concurrent
- > loop_clear_limits() commit.
-
-I don't think that can happen. limits_lock is held from
-queue_limits_start_update() until queue_limits_commit_update(), so
-loop_clear_limits() cannot commit anything in between.
-
- > So I would like to keep the patch as it stands, but happy to discuss
- > further.
-
-Please call queue_limits_start_update() before blk_mq_freeze_queue() in
-loop_set_status() and call loop_set_dma_limit() and
-queue_limits_commit_update() after loop_update_dio().
-
-A few more comments about the patch itself:
-- lo_can_use_dio() is now evaluated twice, once before the limits are
-   committed and once in loop_update_dio(), and both results must agree.
-   That seems fragile to me. Please consider documenting this
-   requirement above loop_set_dma_limit().
-- With this patch every LOOP_SET_STATUS call updates the queue limits.
-   Can that be restricted to the case where LO_FLAGS_DIRECT_IO has been
-   cleared?
-- Please mention in the patch description that the stale limit is too
-   strict rather than too permissive, in other words, that the effect is
-   that O_DIRECT I/O with 512-byte aligned buffers is rejected.
-- How has this patch been tested? A blktests test would be welcome.
-- Please use 12 characters for the commit ID in the Fixes: tag.
+A few more comments about v7 that also apply to v8:
+- loop_clear_limits() calls schedule_work() after clear_limits_lock has
+   been unlocked. Can a request that passed the lo->lo_backing_file
+   check queue the work item after cancel_work_sync() has been called
+   by __loop_clr_fd() or loop_remove()? Since lo_free_disk() no longer
+   cancels the work item, I think that would result in a use-after-free.
+   How about calling schedule_work() while holding clear_limits_lock and
+   resetting the state before calling cancel_work_sync() in
+   __loop_clr_fd()?
+- The code that resets clear_limits_mode occurs three times. Please
+   introduce a helper function. Is the reset in
+   loop_assign_backing_file() needed since __loop_clr_fd() already
+   resets the state and since loop_clear_limits() ignores failures for
+   a backing file that is no longer current?
+- The work function freezes the queue and commits the queue limits even
+   if no mode has been recorded. Please return early in that case.
+- The changelog for v7 is missing. Please include a "Changes since v7"
+   and a "Changes since v6" section in v8.
 
 Thanks,
 
