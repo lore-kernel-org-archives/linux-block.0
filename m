@@ -1,92 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795497628;
-	b=Jdz5nXoYxldrGr6pks4eAfsJLTLPm7I7BGBrG2ACigCtvlturWxD6+MGDHBHDI4D8u9b
-	 Rb7GcPPIRYsGdgOKlsCH+w1c1RrpLGSm9p5wM6wI+Yl7Iam4oA74JlX73xY9ahXi7ymqp
-	 12UJarzGfF20eoxMkkMN2g3S4XRP9tQYLgKKZzekHPpEKpuzvcA4bvwT2WLqpH6xWcyWV
-	 GkOdGoG+akxNRWO2xrNhzGfAKELLgsQJt8UP3S0t69W4etEYT3rvz8LGX9y0rM2e/FMdl
-	 pD7Ll0L/yEX/sjE5e04izq5/8He/O9WWk2nKmNBiQDNatdnbsKyuHPGYi2uU3HFZ4wQ==
+	t=1795503376;
+	b=e83K824RrsKckqaw99JY3rSFjqZDreQl6kyGoOUGIQYwzQC13FVtVbY1Ia8IJ72OsGkg
+	 XH7d2jXbihu1bYtZa3h7YEBwTkbskJ1aP7wjBcISPlByjlZsWskHW2dRJ/uDjo2FJXupy
+	 vy2FUF2QcoXf24sftlrERNXokIdw7OMaMHaXyd+dGqcz//IIhwNWxMFl/AT9zyO6qSM+i
+	 ubXUvtxV5I1oeGt5Vx5kV1dbU6fNP4YiVK3DayNhDxmKSYOgH4hwkeAjEYRgIVZmvVFGa
+	 GkTPWOm/bAzNc0ZMvhT3qYNhoWA/JUeK6WsDho1sVbcgK+1iASHYHEWbZnpg+mhbpNg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795497628;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795503376;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=mVtjzQmPQKIEc4dGp9Zs/tHMBCi6CBGBAodRqCIBW78=;
-	b=43LlPm/LgOwbnhhkKzQ/36px2bsI9baWt/dAyfdYhWwIrOzC2/izYQEwJ+RA1JHrh+e/
-	 7e6XrauYfEEJcjYfZsdrMFobitviFgjZOmKeK0EYz1xoUx3uvVaYn3lgAONUtrh4oyHWi
-	 +KKtiggLuYL362v9LHpIEy8IFfXHCfx/3upNA7zGZezkmwF6INQFP5G4ALajiIcKu6Qb4
-	 15brZiSRwuCDc41Sh5V/RzYbpZpSs2ldodXrDnV8CZ9h1zFjUSiRu33qEYZi7l+nr4E1Z
-	 +87ISd/rBu1olx5K3qRnYDjtneB+bTXND4PLzyUSQYzOUNrFyRbrh3XXEwE9WKF32nA==
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:Subject:From:To:
+	 Cc:In-Reply-To:References:Date:Message-Id:X-Mailer;
+	bh=UVO5OB1k44w8QyXiR0HTLo6A7H6lDK9wq0dt8nRl/vE=;
+	b=341hZdaNF7f7S6dLnJuZiA0TlK4Ux9lPjI9JsgmiL3qMxnroR8LxmHsnyG0fQ0lgGGOH
+	 Bfvkgz8v3GJ5AgfuXX53CWXXXx9VRTqq/PnKQ284jXViypE1hgoqycYYlX4y6tjMiKRbf
+	 O5dczMxTXPMaEomFa3PG/DaKSXPf8BXPiqyIzcko14WMmJzD3lXlKymp508vxdM6BI9Fs
+	 KeR/o7ssHWYAiI5YHCYsxWVfhfjRhQk98SpRVjEzl/+jUUDPDJ6iQUFzMFDZebr/ZO5JO
+	 Aj0bxRF71sJyPzB3AVL7ca2zBINKdPbcGsmGoOR88kHVcSC+3we22yzfqF36XeEDHcA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dUdhtoTo;
-	arc=none smtp.remote-ip=209.85.214.174
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="b5u3H/Jn";
+	arc=none smtp.remote-ip=74.125.82.45
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A27C606A31E
-	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 05:20:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A27C606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A5E606A31E
+	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 06:56:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 06A5E606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dUdhtoTo
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2f048476ab9so28475165ad.0
-        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 21:20:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=b5u3H/Jn
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1b50dc340d9so93707c88.1
+        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 22:56:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795497627; x=1796102427; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mVtjzQmPQKIEc4dGp9Zs/tHMBCi6CBGBAodRqCIBW78=;
-        b=dUdhtoTodP04LDlKygoQBNZjzBBCpCBROX9Ei+GIJwwEKJUXGVxd/k0FzMWlWHZVgc
-         uC7k2VmwdqoE1VGIC9okJn+R18CsoB3ULWhSNzpOrvH1Ay3YchTYG7VtPnDr2lo30rXz
-         O9lEOJoKYiPzVE0TtET/kyVjf80C2rWNbaFdcAKWMmRGE7Ki9CyKs/c5d/Fr1X97vgq7
-         d88HUUEmUOFs2ySjUFdB5BT4t1Ke/VGDKOUsFDtj0GHlFUqh5+BzUvfPGVzDdpkgaWnR
-         k+5lAiYVWk9r259Ee9aHhcKXOK+xpCs9B78mrDLlz6t3wQA65ALhvVMdeaepK+sG37Qr
-         bLyA==
+        d=gmail.com; s=20260707; t=1795503375; x=1796108175; darn=vger.kernel.org;
+        h=message-id:date:references:in-reply-to:cc:to:from:subject
+         :content-transfer-encoding:content-type:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=UVO5OB1k44w8QyXiR0HTLo6A7H6lDK9wq0dt8nRl/vE=;
+        b=b5u3H/JnbH2I32gH/tcsxgvML6wKhSj8T+IXUKc9yha4JxQDuOIdMYrt2OehCitR0s
+         zWbi1pWCFnFC+QcXv65hDxHi5io9eOVeDeIt8PDJndJSfeMtuI7LghrcaV1axmMPyRkN
+         woKaqvcJld7a0+RSqlscFNGkaqH113aECJq6Z56liV/8NbdL0S8QCypVCMi3rdKG2VgO
+         bQnQChgURvSaQiI8y/s288iZECRhr6ekZeK3hET/6wRGrQCr5IlCKBrzf6U+SOgRcKQp
+         No4bAzwvB1XHABiwotbbriZR6E0iGYOkA6/YQq45ym763jOLfkKmBPHqW34nr7rAHlvX
+         3h3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795497627; x=1796102427;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mVtjzQmPQKIEc4dGp9Zs/tHMBCi6CBGBAodRqCIBW78=;
-        b=0xwFha79oo530CxjtAdoOuWwEx3NJR7FdeYtLmDZXRjAMNLZJQUudyIAIYdRCsaJMG
-         LOl4vounzNy0zz7+eB+GBvao2/xdUGH5eTRn5eFrBavMq5e1q9kxMYmk1kQCYjmLtDRA
-         4eL0cd9sVLzTLYhF+BIN6AMlkMdqGTjbxElIhafoe1lLBjPYwl/IjYGgvakY1YQvsh7I
-         fxTJJBJ51EBFO1J7jCbigcIDR2O7DuaccVd4olJCeEK5YNZUNYqsh+m1yCf+klJZvlQW
-         dFbjV5yeFA6F0sGHadf7cbqkfM8A8+l4M9dteNp6EZYnBy4bIyntkuk6B8Cto0NJTDtH
-         weJQ==
-X-Forwarded-Encrypted: i=1; AL+hErHO/ODku1qNfjgOIBvmFEetxn2CDa97/9yhLIOZOOTh3ED6Ac6aawfHSHNv/SMoJZk7dvfvc5ywvOsAwg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+9i06Xt5nno3Rg07bcR76VPmVPq77Dcm+YR9GosbQLTrvGEHnv
-	L/cv00l7pJsQTrn2tdOgbfFJfc0bQ9r7Bn+I9x1fZdh57uY58YLc8rNb
-X-Gm-Gg: AZFdTZfxWTGthCjlc0IAPTwZyc0ZlZ61/JSSfG4cewXrH9G5KD/LMhFwZKICUMwEtCe
-	jUOr9BE4JjPXNBJHVQ+1ztFz0T910boa9q1T/EZ0hItSfOUiOKeA2rnAyRuUpI5asCR1IChB0am
-	P/2cgVahASKPJk1oyAmS2lZVl9Ik8hTUK3fPq6fV4fTA9CkEb3/n2E6JxsGEvo7h8nfzY34Tg/r
-	ANrK1G60pQjk2P7xDkyPt4d9JpgU/FFPcidVFhxpPPR1bY10bgwnZ82pg+JWk5CQIO/ZE/Eb1Nn
-	UrFxkHuti9hD24yIoqkTMPsXC9X/IMes16VqHlRjtK4vLAH9eHfpTDGy5TYFW8+91syeNEX9nEP
-	RwvUCjI9QzTwjCf8jlqWafjovE06N6p/OWJPv1zIJYo9e183ylkGcrySmeoV/uFar7OhNVxSy92
-	Osd3LVhoSeB27NLU6svalTyJk/1FarN2/JiPyrvNpLwJNRIlTwV9byMEcQaatvjmWs+w3papelc
-	yBWkDt4nfbybPx8e+x6ZJtUIMmhceNDvW3M5PluVR6CBCiBVXmFeBwSTqdNmkkrSytI4IcMEs7e
-	33IdxAl8Iahc9K3jDXKmBh9x1SEKy+yM
-X-Received: by 2002:a17:903:19cb:b0:2f0:3d60:9165 with SMTP id d9443c01a7336-2f03f0fcd4dmr130546855ad.11.1795497627540;
-        Mon, 23 Nov 2026 21:20:27 -0800 (PST)
-Received: from thangnn-ASUS.. ([2a09:bac1:7ac0:e88::247:18])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f0c1a74sm65038495ad.12.2026.11.23.21.20.25
+        d=1e100.net; s=20260707; t=1795503375; x=1796108175;
+        h=message-id:date:references:in-reply-to:cc:to:from:subject
+         :content-transfer-encoding:content-type:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UVO5OB1k44w8QyXiR0HTLo6A7H6lDK9wq0dt8nRl/vE=;
+        b=r+aHE83ZZiGEe1juJJfYYUDfRIGvH2Ly4MHvepP0BBQfU2cCFklswYykvjGjl0KK/s
+         T72YinZ87dzNiZb//SGEle/zeeDL+xvuG1cgQyXvnTBhZha0NN5HUnBZ7t3MxzNMaJSv
+         iGsL5P6NOgbmQNIAAqx/gD7Jx9iJMpl2yQXFCZoBYAO1Zk6+eq7hBTmncycz/RJxGr1t
+         bEGj8kyzm/acEmuQYefPGaSZiu3VIpHPtCG6Yt4jHeMDZx0JbeOb/LeiMynLXWGhzuL0
+         i7jLFb8WESLn8VOrw7j45s6/8VewDPtdGMQQ1PmdJ7n5HC0gchBm8yctXV2vkOApY/9b
+         eqpQ==
+X-Forwarded-Encrypted: i=1; AL+hErExoWKxAbKg9wjD+rd2IkrHL4ebHkhIweUonQpTnyg3ahEdMsiZI/7DQHhAlse501QAlzFWW+mq+K8NqA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8hDh/HuHhDcDL6qbJJ2N6jxQkHwvEpYagSQ253vJi3RtfPkaP8
+	uzjbMNDeSyHycQClja/g0Gc1ve5ZLBb9d67R/pJvBD4kLhoEp7COrfk+
+X-Gm-Gg: AZFdTZdiYURX9vkerqd5mzSdOblQ8jhGBAV3nlHn1VQn3D05auUWTxr/Kjx+LBEYV+S
+	37axKAKmDiHpMkfmaDOXYb4ymmDS63fthcu/MBbSSWeAHVo/7g6eLnHcql/f3h9y38vqFEqbfjh
+	B3EEfeWpghSeV8fe/iLEZ/UXgF/U9AxBGZVuoEnoL42s33uM455BM7Zyiln7yi6lE6BOYARQDIk
+	ohM3LNWddP5+LUnglu+7yjIX2QUpXrEmv9b47vkxA4aP7tckTHsHecmRSOUlDxyMFkbB/vgJqEe
+	80GDCUOFc+lprSreCLloQ6MGt8PoE8WHTeJYiOhnsGP8kXUtzNCxXvQjFo5HBLSUqOBkVUE7HKU
+	J/FwuKq5Iazn1QIluySv9uPLg8j1B57v6mEtBQxj31WeosCiDvcoT8cG3KZLMvOnUf9BGh/ZGyq
+	rlxV17vnCuSeYzJDgYi+Jf6erlRHScQvscxWKOLHtHt2lXkcxm6FBktuCYtIXGVZAiubx0iV3QN
+	eREue5N961ztBiI0A6DQbG89cgBxZZtLRo6YmaiYgj4arxIdN6S3eGpbzkOMFOMhRlj3GGN8mGV
+	aHpDunJq1j7PD8hU6B8ISWmDxGAvOJGOiMy7CxxqehpzMOVX1TU3ukx4X5Oooi/I3GEa
+X-Received: by 2002:a05:701b:2919:b0:1b3:a881:a67b with SMTP id a92af1059eb24-1b5568a8a08mr19174015c88.1.1795503374683;
+        Mon, 23 Nov 2026 22:56:14 -0800 (PST)
+Received: from o6.lan ([2602:fce1:44f:115e::])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b556829d31sm53879891c88.9.2026.11.23.22.56.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 21:20:27 -0800 (PST)
-From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	syzbot+48ca80a8587c1d97c433@syzkaller.appspotmail.com
-Subject: [PATCH] block: release freeze lockdep map under mq_freeze_lock
-Date: Tue, 24 Nov 2026 12:20:23 +0700
-Message-ID: <20261124052023.63506-1-ngocthang2710.1999@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Mon, 23 Nov 2026 22:56:14 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -96,133 +88,83 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RFC 0/3] zram: avoid copying spanning LZ4 objects
+ before decompression
+From: Xueyuan Chen <xueyuan.chen21@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Xueyuan Chen <xueyuan.chen21@gmail.com>, 
+ Minchan Kim <minchan@kernel.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+In-Reply-To: <20261121201511.GG1975@quark>
+References: <20261122-zram-split-decomp-mm-rfc-v1-0-4e69b08c0fed@gmail.com>
+ <20261121201511.GG1975@quark>
+Date: Tue, 24 Nov 2026 14:56:09 +0800
+Message-Id: <179550336970.2385422.4070914679921452831.b4-reply@b4>
+X-Mailer: b4 0.16.0
 
-The outermost freezer records the lockdep state of the queue in
-q->mq_freeze_disk_dead and q->mq_freeze_queue_dying, and the unfreeze
-path checks them again to decide which lockdep maps to release.  That
-check runs in blk_mq_unfreeze_queue_nomemrestore() after
-__blk_mq_unfreeze_queue() has dropped mq_freeze_lock.  At that point
-mq_freeze_depth may already be zero, so another task can start a new
-freeze and overwrite both flags before the old owner reads them.
+On 2026-11-21 12:15 -0800, Eric Biggers wrote:
+> Hi Xueyuan,
+> 
+> On Sun, Nov 22, 2026 at 01:09:23AM +0800, Xueyuan Chen wrote:
+> > I measured the time to swap in 1 GiB of synthetic data on arm64 with
+> > 4 KiB pages. Each page started with pseudorandom data of one of 16
+> > lengths, followed by zeros. On this workload, 32.6% of compressed
+> > reads spanned two pages with LZ4 and 34.4% with LZ4HC.
+> > 
+> > The table shows median swap-in times over seven pairs. The last two
+> > columns summarize the percentage change within each pair.
+> > 
+> >   Codec  Workers  Baseline (ms)  Patched (ms)   Median   Range
+> >   LZ4          1        1403.81       1344.45   -4.21%   -4.64% to -1.61%
+> >   LZ4          8         222.57        216.36   -2.73%   -4.19% to -1.97%
+> >   LZ4HC        1        1403.35       1336.99   -4.74%   -5.07% to -2.90%
+> >   LZ4HC        8         222.10        215.77   -3.16%   -4.39% to -1.27%
+> > 
+> > These timings include both skipping the copy and switching decoders.
+> > 
+> > I used Codex to help implement this series.
+> > Do you think the swap-in improvement justifies maintaining a second
+> > LZ4 decoder?
+> > 
+> > Assisted-by: LLM
+> > Signed-off-by: Xueyuan Chen <xueyuan.chen21@gmail.com>
+> 
+> LZ4_decompress_safe_split() isn't actually very well optimized.  While
+> it avoids the copy of the source data into a contiguous buffer, it
+> copies every match and literal run with a variable-length memcpy(),
+> which on most data is a very slow way to implement LZ decompression.
+> 
+> I suspect it looked good on your synthetic benchmark (pseudorandom data
+> followed by 0's) only because that tended to generate 1 very long
+> literal run and 1 very long match.  Whereas normal data would have lots
+> of interleaved literal runs and matches of much shorter lengths where an
+> external memcpy() call does very poorly; that is why the existing LZ4
+> decompression code does not do it that way.
+> 
+> To some extent the literal run and match copy performance is fixable
+> with a better implementation.  However, having to handle two different
+> source buffers still introduces overhead that cannot go away.
+> 
+> So I feel this approach is probably not worth it.  If you'd like to
+> continue to explore it, it would need to be tested on different data and
+> would need to be properly optimized.
+> 
+> - Eric
+> 
+Hi Eric,
 
-syzbot hits this with device-mapper: DM_TABLE_LOAD calls add_disk() and
-freezes the queue in elevator_change() while the queue is still alive,
-so q_lockdep_map is acquired.  A concurrent DM_DEV_REMOVE calls
-blk_mark_disk_dead(), which sets QUEUE_FLAG_DYING and starts a new
-freeze right after the elevator unfreeze drops mq_freeze_lock.  The new
-freeze sets mq_freeze_queue_dying, the old owner skips
-rwsem_release(), and lockdep reports:
+I reran the benchmark on arm64 with pages from an Android phone's
+zram export. Optimizing short match copies cut cycles per spanning
+read by 22–27% compared with the RFC decoder.
 
-  WARNING: lock held when returning to user space!
-  #0: (&q->q_usage_counter(queue)#22){+.+.}-{0:0}, at: elevator_change+0x194/0x480
+I also tried restoring the LZ4 short-sequence fast path within each
+input fragment. That version was still slower than the existing
+copy-and-decompress path in all 28 paired runs. Swap-in took about
+6.6–6.8% longer with one worker and 3.8% longer with eight workers.
 
-Release the lockdep maps in __blk_mq_unfreeze_queue() while
-mq_freeze_lock is still held, so a new freezer cannot change the flags
-first.  __del_gendisk() now relies on that release in its unfreeze
-branch.  In its GD_OWNS_QUEUE branch the queue stays frozen, so it
-still releases the maps directly.
-
-Fixes: f6661b1d0525 ("block: track queue dying state automatically for modeling queue freeze lockdep")
-Reported-by: syzbot+48ca80a8587c1d97c433@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=48ca80a8587c1d97c433
-Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
----
-Tested in QEMU (x86_64, 4 vCPUs, PROVE_LOCKING) with a C reproducer that
-races DM_TABLE_LOAD of a request-based multipath table against
-DM_DEV_REMOVE.  With a debug-only msleep(5) right after mutex_unlock() in
-__blk_mq_unfreeze_queue() to widen the window:
-
-  base: 3/3 runs hit "lock held when returning to user space" within 1s
-  fix:  5/5 runs clean for 120s (~7.5k load/remove collisions each)
-
-Without the delay, the fixed kernel ran 2x120s clean (~5k collisions
-each) with debug_locks still 1.
-
- block/blk-mq.c | 16 ++++++++--------
- block/blk.h    |  2 +-
- block/genhd.c  | 14 ++++++++------
- 3 files changed, 17 insertions(+), 15 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 54ccfc43c27c2..11abb296c3bb4 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -208,10 +208,8 @@ void blk_mq_freeze_queue_nomemsave(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_nomemsave);
- 
--bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
-+void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- {
--	bool unfreeze;
--
- 	mutex_lock(&q->mq_freeze_lock);
- 	if (force_atomic)
- 		q->q_usage_counter.data->force_atomic = true;
-@@ -221,16 +219,18 @@ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- 		percpu_ref_resurrect(&q->q_usage_counter);
- 		wake_up_all(&q->mq_freeze_wq);
- 	}
--	unfreeze = blk_unfreeze_check_owner(q);
-+	/*
-+	 * Release under mq_freeze_lock: once it is dropped, a new freezer may
-+	 * overwrite the mq_freeze_{disk_dead,queue_dying} flags it checks.
-+	 */
-+	if (blk_unfreeze_check_owner(q))
-+		blk_unfreeze_release_lock(q);
- 	mutex_unlock(&q->mq_freeze_lock);
--
--	return unfreeze;
- }
- 
- void blk_mq_unfreeze_queue_nomemrestore(struct request_queue *q)
- {
--	if (__blk_mq_unfreeze_queue(q, false))
--		blk_unfreeze_release_lock(q);
-+	__blk_mq_unfreeze_queue(q, false);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue_nomemrestore);
- 
-diff --git a/block/blk.h b/block/blk.h
-index 105fff157bfbd..13648d3483930 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -55,7 +55,7 @@ const char *blk_status_to_tag(blk_status_t status);
- bool tag_to_blk_status(const char *tag, blk_status_t *status);
- enum req_op str_to_blk_op(const char *op);
- 
--bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
-+void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
- bool blk_queue_start_drain(struct request_queue *q);
- bool __blk_freeze_queue_start(struct request_queue *q,
- 			      struct task_struct *owner);
-diff --git a/block/genhd.c b/block/genhd.c
-index 69204d44adae1..2f478f320aa48 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -772,13 +772,15 @@ static void __del_gendisk(struct gendisk *disk)
- 	 * If the disk does not own the queue, allow using passthrough requests
- 	 * again.  Else leave the queue frozen to fail all I/O.
- 	 */
--	if (!test_bit(GD_OWNS_QUEUE, &disk->state))
-+	if (!test_bit(GD_OWNS_QUEUE, &disk->state)) {
- 		__blk_mq_unfreeze_queue(q, true);
--	else if (queue_is_mq(q))
--		blk_mq_exit_queue(q);
--
--	if (start_drain)
--		blk_unfreeze_release_lock(q);
-+	} else {
-+		if (queue_is_mq(q))
-+			blk_mq_exit_queue(q);
-+		/* still frozen, so the freeze flags are stable */
-+		if (start_drain)
-+			blk_unfreeze_release_lock(q);
-+	}
- }
- 
- static void disable_elv_switch(struct request_queue *q)
--- 
-2.43.0
+I'll drop this RFC. Thanks for pointing me toward the short-copy
+overhead and the workload issue.
 
