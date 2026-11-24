@@ -1,90 +1,70 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=188.68.63.102
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795509819;
-	b=RtkvKrkE8tC4RUFprO20+stWtP969v1gB1vVqkOyrBfa8NSu5EGGmrQqqgYkhia6Qpwh
-	 yhO2nTkuutmomb4XHAWH0vVFHm1d0JvN8gkRVeCT/vMzvsiivwiwyCYM7An0UgDRoygAP
-	 Ndtjezc6StcQczbvR5WPET8V6lhNkfp+DyZ4707adQQstjLOIeqZz5DIqy+5WTOrp9hta
-	 AxZ9M63ISQkI4fv/zOOu0Aae0kEUM1BZCGREv3w5HQF9rzRLYU/UVX4G4urFWvqreRcTk
-	 a4RLvFTybje8gyQ1x5zwIlWowIZRmzYpVIWaxgk9kWUpSTTW6U5xxC7tiPNA2jJzZog==
+	t=1795510553;
+	b=rfB8lndqLXEZuP4mzJSktfOj8tM4xPVKUnvZo2aTwyhDSqFgQpEedSrjIWBAHqiUW5EU
+	 BmXU5jIa+LVxU3ANfkVoQfeypdaXC/rC9SF9sCGWxHihRDrx18wx2SCGg3+r7J9TW+rlT
+	 ClUN1gwGcmxQfhIghGiPtXGxbFLvXe9pbD4ti2iVKdpUKBnXFyugSRC26eZ4tltVO49iC
+	 Vcmq9JDrzIW+FzjefqFi7ZRd5RJIDp5/86OGkPfB5oItiomU2LudjhQqcwIJRJp+RpgaB
+	 KA2dLGQd6yLB/TwTKqVegmrzLgqL24aay+tqhcm03Rd52HbkMHtUhXEcdtYv5ErgHPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795509819;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
-	 Received:Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
-	 In-Reply-To:MIME-Version:Content-Transfer-Encoding:X-CMS-MailID:
-	 X-Msg-Generator:Content-Type:X-Sendblock-Type:CMS-TYPE:cpgsPolicy:
-	 X-CFilter-Loop:X-CMS-RootMailID:References;
-	bh=bv+w4SPqJHgJSc/Ri/nAxGFknxpTeekag4KmQjPOdAY=;
-	b=HuKmHZz1uCbvmAD1vUZuH/bYaFCFHRnaTGrXIQ14h0X1VW6TPygfWsrlSuqzoxn+fQrD
-	 pz7gVA7RWCKPapvYslrIkwrul1mk6A8Je7gx7tSTtSsiV1hRSTK1EO/V+wro++YKeu/aD
-	 9i05M7qxzjO4Lu1NsVXAP8jTC654rdLH1oRA3ZGa8bARZv2XlN4FnetVNIisOiC63iX4w
-	 cDeuFN31qcU6HxOYjWoxwF4ekre0XKscbkzFbp5GNlg/rkt+Z27XU7/TRFJBOttvq01aw
-	 ANpjDUznqpkvxKBIMpPfjbndQbexyTY/9rOeD2bq6vZqOoqRZCKhADQtGd/sOSybNIA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795510553;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received-SPF:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 References:From:Content-Language:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-PPP-Message-ID:X-Rspamd-Server:
+	 X-Rspamd-Queue-Id:X-NC-CID;
+	bh=7PI24Hp56cbBIOzGihzdyiMCzKymcXcc/gN95e0vkU0=;
+	b=XAmF+bEecsGvI1gyjw14iuskomiLe3BNntuBJkhVIxArnFUdgHHplnS817nM7mzrKEeP
+	 lPLxhhOVKmIXHyiFdADzdqIkGPBYv98ti1xgdUgEG1r7I3Ep9Obx6mljqqYk64pmBUJko
+	 xLzUsyprPOhYT2VEwtUr82duiFcUTo4+8EK5i8JYUv5SsU9Tjy1CsMfztyCpBkkjYmSbX
+	 ONHiR+aMlvxBykgE3aslUi9ykIuYNBXOy9O01Xvq2GA0JO9Tt7PRJltvSIMkpai7KKW8Q
+	 BtRZmVGZxxjdcbyLlT+/TsoVm3gsnC2o3T1/vkF4+wxLQsUdqGWkqghrxx+m8wzb7tA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=samsung.com;
-	spf=pass smtp.mailfrom=samsung.com;
-	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=FmBAPLPP;
-	arc=none smtp.remote-ip=203.254.224.33
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=leemhuis.info;
+	spf=pass smtp.mailfrom=leemhuis.info;
+	dkim=pass header.d=leemhuis.info header.i=@leemhuis.info header.a=rsa-sha256 header.s=key2 header.b=WeO8+g7k;
+	arc=none smtp.remote-ip=188.68.63.102
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD86606A335;
-	Tue, 24 Nov 2026 08:43:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CD86606A335
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F78606A31E;
+	Tue, 24 Nov 2026 08:55:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 58F78606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=FmBAPLPP
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20261124084335epoutp0378f116da01da84f15e0af23bfa22fa36~q7qogInvm1692416924epoutp03d;
-	Tue, 24 Nov 2026 08:43:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20261124084335epoutp0378f116da01da84f15e0af23bfa22fa36~q7qogInvm1692416924epoutp03d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1795509815;
-	bh=bv+w4SPqJHgJSc/Ri/nAxGFknxpTeekag4KmQjPOdAY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FmBAPLPP2mhGFVwNHvYu9RLbxnRYBoVw/8ymAq7p6DsxiuqRByG2O+15P/bQz45wH
-	 ONOcDc3+s/GAA8aVXLubnSYuAWzZF6xY/sedOKG3cCL32MYutURDGQnzSa2eejzxiF
-	 6GioVndOT2s5GhkSElScO45slA2g1jz2ijYeqjn0=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20261124084335epcas5p2c84e920886d69e131764edcb7537c200~q7qnxZ8BJ1183811838epcas5p2V;
-	Tue, 24 Nov 2026 08:43:35 +0000 (GMT)
-Received: from epcas5p3.samsung.com (unknown [182.195.38.87]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4jYbtt2JwWz6B9mC; Tue, 24 Nov
-	2026 08:43:34 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d~q7o0df1RC0651506515epcas5p3W;
-	Tue, 24 Nov 2026 08:41:31 +0000 (GMT)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20261124084126epsmtip20d1bb7fc51b7be9416c78f041855e347~q7owLbH482941029410epsmtip2v;
-	Tue, 24 Nov 2026 08:41:26 +0000 (GMT)
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Mengmeng Zhao <mengmeng.zhao@linux.dev>
-Cc: Anuj Gupta <anuj20.g@samsung.com>, Christoph Hellwig <hch@lst.de>, Anuj
-	Gupta <anuj1072538@gmail.com>, Nitesh Shetty <nj.shetty@samsung.com>, Pavel
-	Begunkov <asml.silence@gmail.com>, Jens Axboe <axboe@kernel.dk>, Sumit
-	Semwal <sumit.semwal@linaro.org>, Christian Koenig
-	<christian.koenig@amd.com>, Philipp Stanner <phasta@kernel.org>, Dan
-	Williams <djbw@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jan Kara
-	<jack@suse.cz>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner
-	<brauner@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger
-	<adilger.kernel@dilger.ca>, Baokun Li <libaokun@linux.alibaba.com>, Ojaswin
-	Mujoo <ojaswin@linux.ibm.com>, Ritesh Harjani <ritesh.list@gmail.com>, Zhang
-	Yi <yi.zhang@huawei.com>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
-	<skhan@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, Li Wang
-	<liwang@kylinos.cn>, Mengmeng Zhao <zhaomengmeng@kylinos.cn>
-Subject: Re: [RFC PATCH v2 0/8] ext4: Add dma-buf read/write support
-Date: Tue, 24 Nov 2026 14:10:25 +0530
-Message-Id: <20261124084025.2101804-1-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <361c4312-f77b-495f-9ee4-e0b9612b4463@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=leemhuis.info header.i=@leemhuis.info header.a=rsa-sha256 header.s=key2 header.b=WeO8+g7k
+Received: from mors-relay-2502.netcup.net (localhost [127.0.0.1])
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4jYc921hBhz6VFl;
+	Tue, 24 Nov 2026 09:55:50 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1795510550;
+	bh=7PI24Hp56cbBIOzGihzdyiMCzKymcXcc/gN95e0vkU0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WeO8+g7kYIbpdK/En8ogyNyW7BQQrzBKJfvljsFLHYi4PfmBhA8bj+lDSw/aCNhkG
+	 DxJHajwbbiQLEoRdi0qy8X4F1K/GCKO+K1wFW6IE5jTwiBbvaBSLFeE0nwa9YN0qn2
+	 vLL1izH5vrEBHSjbOdQI3YNq9XVNevyPYNPC/fdgAnSfOC8Y+uBi0ADrbMcAW3uDk9
+	 dZQM/YVJkzWt75hXo36SmeKPvL/peK/WN1WtowuL9N1mlJQlKpLzOJ1kvkq/zGiw0I
+	 F+rJvPvG98Jq80tczUTPnbyDxARB+GvvTAiFNrUCjRvkpb+E4LTGVv8MXRX9JxVz/5
+	 YuNbKz3UfuTFA==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4jYc920rZlz4xRy;
+	Tue, 24 Nov 2026 09:55:50 +0100 (CET)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4jYc903rKkz8sZw;
+	Tue, 24 Nov 2026 09:55:48 +0100 (CET)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id CCFB75F9CD;
+	Tue, 24 Nov 2026 09:55:42 +0100 (CET)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <ec36d13e-e4c2-4bfb-8b50-69d4a1628839@leemhuis.info>
+Date: Tue, 24 Nov 2026 09:55:41 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -94,40 +74,49 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d
-References: <20261113070621.273953-1-mengmeng.zhao@linux.dev>
-	<20261120154153.GC28611@lst.de>
-	<361c4312-f77b-495f-9ee4-e0b9612b4463@linux.dev>
-	<CGME20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d@epcas5p3.samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] DMAR fault by Intel H97 SATA controller since
+ "block: Increase BLK_DEF_MAX_SECTORS_CAP" (6.17-rc1)
+To: Tobias Laas <tobias.laas@posteo.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ regressions@lists.linux.dev, linux-block@vger.kernel.org,
+ linux-ide@vger.kernel.org, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
+ Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Niklas Cassel <cassel@kernel.org>
+References: <5ad27a97aafbc08a8702d5b90d09cd59@posteo.de>
+ <awSs5Cw3hFkf4O4T@ryzen>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <awSs5Cw3hFkf4O4T@ryzen>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <179551054343.1350673.149703183801774800@mxe9fb.netcup.net>
+X-Rspamd-Server: rspamd-worker-8404
+X-Rspamd-Queue-Id: CCFB75F9CD
+X-NC-CID: DCewlNIOHCbu9CVBhGpOPu7ikYcAXBgk+sLCzd4bkxfPEMobKqs=
 
-On Mon, Nov 23, 2026 at 09:51:41AM +0800, Mengmeng Zhao wrote:
-> Hi Anuj, I'd be happy to help pull our patches together into a single
-> unified series and send it out for review, if you're okay with that—and
-> would appreciate your review once it's posted as well. Please let me know how
-> you'd like to coordinate, or if you have any updates in progress on your
-> side before I put the series together.
+[Reminder, this is not my area of expertise, so this might be sending
+everyone in the wrong direction -- so handle it carefully]
 
-Hi Mengmeng,
+On 11/23/26 22:15, Niklas Cassel wrote:
+>> Since the issue with mounting the rootfs disappears with intel_iommu=off, I
+>> wonder, whether there is a limitation on the maxmium block size either by
+>> the hardware or from the configuration of the IOMMU and SATA controller by
+>> the kernel.
+> Considering how common your SSD is, my guess is that it is somehow an
+> IOMMU or a BIOS/ACPI bug (since the BIOS generates specific ACPI tables -
+> DMAR on Intel).
 
-We already have updates in progress on the XFS side.
+I just a few days privately was told that "intel_iommu=on,sp_off" solved
+problems wrt to one unresolved regression related to iommu with a
+similar generation intel hardware. The user wrote "[kernel] code
+improperly thinking that the CPU supports something called "superpages",
+which it does, but only when the integrated GPU is disabled (speciality
+of Intel Haswell)."
 
-We will consolidate the combined series along with your ext4 work and
-related patches, keeping your authorship.
+Could that maybe related? Do you use the iGPU? Does that parameter
+prevent the problems? It's a long shot, but quickly tested, so I thought
+it was worth mentioning.
 
-One more thing that we are looking at combining is the ability to share
-the registration across files. Pavel had mentioned this earlier in our
-xfs series [1] and posted a series too [2] which needs some more work.
-
-FWIW, we also had ext4 changes, but intentionally started with one
-filesystem (XFS) so that the common interface could settle first.
-
-[1] https://lore.kernel.org/linux-block/4649a20f-aba9-418e-987f-66f21ab24410@gmail.com/
-[2] https://lore.kernel.org/linux-block/cover.1793751001.git.asml.silence@gmail.com/
+Ciao, Thorsten
