@@ -1,59 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.241
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795510992;
-	b=fxQBN3DYMLA8cldW6thsXgZMeoiB3ryyw+LiDzVbKu12+612HyFVeOnMVLbZhLpZNygW
-	 A/NaYn32Z+qkXBpDAl9JT6/COJ7yzh16VLKTl/hsji0DoJv08epFxLaCNuysSmjuILZVW
-	 kWRdrq9AWmQwMCtqs2d5+TvVKzt9v1oHBMl2UmfRZEVEEIGTpNmoVHKg6zPPrpe35GQiU
-	 CVyUW245uo+c41tYcHdKCaclD5sHyGGRSHWUryJBGPozJ47Axxm+RnegRlPi1epon74dd
-	 8XPak84HITH4EnkqfaonsbimPGQtMvdJ5NPhUHhQrAb8ZASDeTUOZ6txKjdayQJ98xQ==
+	t=1795512842;
+	b=hntgQym/9XnprHcA1+p5nqshP2paR+vmcXzo90Tykg41K2EBUQAhOSemoJvQvD08kY5N
+	 BGjrlYVsoe0NVhUgByKUOKOm77dbf/KEqfYhThQCxcE9nbCzZyC2rq6rBC1f1JbsXSOaW
+	 cyA141LZmrrtyaRYSulAp8KqNyXpUTUoy7SX+9CXhgq2YxiyIAy21QqRe/aptCeIlY0hu
+	 Of/TxqlphNFW7LtKhrz2M4F1fTZkvas1xqVLrh43lA/y25hVdgGYtobvqTTPBoyNmmNft
+	 QhFGOC9ygWDwm4zdfFXUCQPRSEUh6WHXNT9NH2ZLWDeJKaCaUB+tM/RBqxGU9gP7lcQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795510992;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
-	 Mime-Version:Subject:Reply-To:Sender:From:To:CC:X-Priority:
-	 X-Content-Kind-Code:In-Reply-To:X-CPGS-Detection:X-Drm-Type:
-	 X-Msg-Generator:X-Msg-Type:X-Reply-Demand:Message-ID:Date:
-	 X-CMS-MailID:Content-Transfer-Encoding:Content-Type:X-Sendblock-Type:
-	 CMS-TYPE:X-CPGSPASS:X-CPGSPASS:cpgsPolicy:X-CFilter-Loop:
-	 X-CMS-RootMailID:References;
-	bh=OeIpI24/F3WB52LFABE1SqnVRMCOX+nmt79ZJQb7pzk=;
-	b=OCPMhjQDDxSADGbYIh/zggG8x/Fk4xgCvXN3wfrBgnEjOzfppPJUFfdD+qDL4Dx9yXUN
-	 ERVVCyq3JIDkPmD7SMoaqZYCNqNHmN0YCi/o92fBuvAcQIKKgT7WSm/EJcfUV2+tEwadP
-	 5vXGRWL66bI0nOBO+rLyNfwrSewrx8XlrXWz0pZrA6rWOnpd7cKt3V8p3Dl3hvSyXWHbZ
-	 AJ3X1Wm5kQ/a+L0/pC4fEq9rjFet4atIRl265WGU6vSHZ9ZN6yoQ6+0c8FSgYmNGWJ0K5
-	 ydb3rGEfpgUwDiqbXy7ORrlq0D08cPm2aNkk/bLDPHX6/YewTNnDPXk4S2dNnAiA8oQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795512842;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=xnHM6QCSfz4haO8qh+eGQ5MTOzq7qkQC9H2pOHh/vPs=;
+	b=tIeUkO0hjyCGpNqlchl9X99OUPkJ7rMobcxi2SCBfUMtbPZhmj3c2A8R6qutlECX3sVX
+	 /zItBxk2Npnp6Q5UgnzL8DKq08XXpeIK1rjRib3PkUnwqBEGK1aIF+fFhLYxrPY2LXmuC
+	 vSIlJqGX+kkx+T1qRLIOYZ6OVUCXtMV3hZovEi6pn8uqBieEPTl0MXkegQyiongk4g7Zr
+	 3Ek9h2pttDqXAnj2EI+QjFHj914m7u6icUOfK5y28Z9W3vLmw6NaPzPQoP6Nzzl/w0S2O
+	 ye/apSoNrmaTmvmfmsSYsMT2y0EmUD+FtbsfRdVRdl+X/4aUjs3CQ0lebL34/Lu4XjQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=samsung.com;
-	spf=pass smtp.mailfrom=samsung.com;
-	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=PrOCn4Ey;
-	arc=none smtp.remote-ip=203.254.224.24
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=NOloo2kW;
+	arc=none smtp.remote-ip=95.215.58.241
+Received: from mta1.migadu.com (out-241.mta1.migadu.com [95.215.58.241])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE9A606A327
-	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 09:03:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0BE9A606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42E7606A326
+	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 09:34:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B42E7606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=PrOCn4Ey
-Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20261124090303epoutp01bac13bd1f67e28c57819d1c877471614~q77nnredr2957729577epoutp01-
-	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 09:03:03 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20261124090303epoutp01bac13bd1f67e28c57819d1c877471614~q77nnredr2957729577epoutp01-
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1795510983;
-	bh=OeIpI24/F3WB52LFABE1SqnVRMCOX+nmt79ZJQb7pzk=;
-	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-	b=PrOCn4EyHRBzCb07htG/ZubDvLHcbN2eCWr/kQVTcyg0mRdH5vjL4j+N9sIcXtod7
-	 WAd2LsOlpCNgeRq41bHohcadgNII1Y80xe0ROxcZIF6LrExTig9B/5yljgPHpjdGCr
-	 bht1RAWMdGNSVvyi6B9kj5epBWp246IoCXrdEmts=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas2p1.samsung.com (KnoxPortal) with ESMTPS id
-	20261124090302epcas2p1699090c5343d3ab887ece39e23e0758e~q77m87Ro92037020370epcas2p1f;
-	Tue, 24 Nov 2026 09:03:02 +0000 (GMT)
-Received: from epcas2p2.samsung.com (unknown [182.195.38.202]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4jYcKL0xxwz6B9mK; Tue, 24 Nov
-	2026 09:03:02 +0000 (GMT)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=NOloo2kW
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=GYbL3+eOGyznpi+w5XQwf2OJd3SoN6YCyYiWbmrjVzE=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795512838; v=1; x=1796117638;
+ b=NOloo2kWnlG5LoWIxCLgiwDCTtmRE2Pv8tGIj/d2rdCb32NHPpq1V9DmsYEO9oi4JxwXvL4p
+ +nyu2N40/WpDjXLEFQBZf2FKKm3tU7TG+UXSFOAZ+PwkufyMUcwE7ZI81UV2cOHEiwS1UYn9nMU
+ 40VaX/2pJq5tqI2gEcT6JRVA=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 8c63c8a366e7c598;
+	Tue, 24 Nov 2026 09:33:58 +0000
+X-Mizu-Trace-ID: 8c63c8a366e7c598
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>,
+	Bart Van Assche <bvanassche@acm.org>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Hannes Reinecke <hare@kernel.org>,
+	Zhao Gongyi <zhaogongyi@bytedance.com>,
+	stable@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cuitao@kylinos.cn,
+	cui.tao@linux.dev
+Subject: [PATCH] loop: fix stale dma_alignment when direct I/O is silently dropped
+Date: Tue, 24 Nov 2026 17:33:42 +0800
+Message-ID: <20261124093342.838490-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -62,73 +72,135 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Subject: RE: [RFC PATCH RESEND 0/3] block: cgroup-based and explicit write
- stream placement for NVMe FDP
-Reply-To: suho.son@samsung.com
-Sender: Suho Son <suho.son@samsung.com>
-From: Suho Son <suho.son@samsung.com>
-To: Tejun Heo <tj@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "mkoutny@suse.com"
-	<mkoutny@suse.com>, "corbet@lwn.net" <corbet@lwn.net>,
-	"skhan@linuxfoundation.org" <skhan@linuxfoundation.org>,
-	"rdunlap@infradead.org" <rdunlap@infradead.org>, "viro@zeniv.linux.org.uk"
-	<viro@zeniv.linux.org.uk>, "brauner@kernel.org" <brauner@kernel.org>,
-	"jack@suse.cz" <jack@suse.cz>, "io-uring@vger.kernel.org"
-	<io-uring@vger.kernel.org>, "cgroups@vger.kernel.org"
-	<cgroups@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"kbusch@kernel.org" <kbusch@kernel.org>, "asml.silence@gmail.com"
-	<asml.silence@gmail.com>, KiYoung Lee <kiyoung77.lee@samsung.com>, JinHeon
-	Kim <jinheon09.kim@samsung.com>, "ngeol564@gmail.com" <ngeol564@gmail.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <03f83d9625a179d35d7e4a5c2ad0e09e@kernel.org>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20261124090301epcms2p1d0a27ea82ad2689fc0091c97450a86cd@epcms2p1>
-Date: Tue, 24 Nov 2026 18:03:01 +0900
-X-CMS-MailID: 20261124090301epcms2p1d0a27ea82ad2689fc0091c97450a86cd
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-cpgsPolicy: CPGSC10-223,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20261123095752epcas2p421880961d49868158deabb5ba9fd6e67
-References: <03f83d9625a179d35d7e4a5c2ad0e09e@kernel.org>
-	<20261123051521epcms2p2445107f926f3acaa2d51c5e12abea90e@epcms2p2>
-	<CGME20261123095752epcas2p421880961d49868158deabb5ba9fd6e67@epcms2p1>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Tejun,
+From: Tao Cui <cuitao@kylinos.cn>
 
-Tejun Heo wrote:
-> On Mon, Nov 23, 2026 at 02:15:21PM +0900, Suho Son wrote:
-> >   - whether io.stream belongs in io.* under cgroup v2, and its
-> >     interaction with the existing io controller file hierarchy
->
-> It doesn't. cgroup controllers and their interface files are for
-> hierarchical resource control and this isn't that.
-[...]
-> Nacked-by: Tejun Heo <tj@kernel.org>
+LOOP_SET_BLOCK_SIZE and LOOP_CONFIGURE can silently drop
+LO_FLAGS_DIRECT_IO when the new block size is smaller than the backing
+device's DIO alignment or the offset is unaligned.  The drop happens in
+loop_update_dio(), which runs after queue_limits_commit_update(), so the
+committed limits keep the dma_alignment computed from the pre-drop flag
+state, i.e. the backing file's alignment.  With an f2fs backing file,
+setting the block size to 512 then leaves every O_DIRECT request
+requiring 4K-aligned buffers.
 
-Understood. I'll drop the cgroupfs interface.
+loop_set_status() has the same window in a different shape: an offset
+change can drop the flag but nothing recomputes the queue limits.
 
-Jens, would a minimal BPF hook for selecting the write stream in the
-submit path, with target cgroups identified by cgroup ID as Tejun
-suggested, be acceptable for the block layer, or would you prefer a
-different approach? This is for unmodified workloads, including their
-buffered writeback.
+Judge direct I/O usability against the block size the limits are being
+computed for rather than the committed one, and let loop_set_dma_limit()
+fall back to SECTOR_SIZE - 1 when the flag is about to be dropped, which
+is the order loop_set_dio() already uses.  Recompute the DMA alignment
+after the flag flip in loop_set_status().
 
-Adding Christoph, Keith and Pavel.
+Fixes: 6c8dec275ccc35e8f ("loop: set dma_alignment from the backing file for direct I/O")
+Cc: stable@vger.kernel.org
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+---
+ drivers/block/loop.c | 31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
 
-Thanks,
-Suho
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 194f51d9dab6..4798c4d47a0e 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -179,11 +179,11 @@ static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
+  * of backing device, and the logical block size of loop is bigger than that of
+  * the backing device.
+  */
+-static bool lo_can_use_dio(struct loop_device *lo)
++static bool lo_can_use_dio(struct loop_device *lo, unsigned int bsize)
+ {
+ 	if (!(lo->lo_backing_file->f_mode & FMODE_CAN_ODIRECT))
+ 		return false;
+-	if (queue_logical_block_size(lo->lo_queue) < lo->lo_min_dio_size)
++	if (bsize < lo->lo_min_dio_size)
+ 		return false;
+ 	if (lo->lo_offset & (lo->lo_min_dio_size - 1))
+ 		return false;
+@@ -204,7 +204,8 @@ static inline void loop_update_dio(struct loop_device *lo)
+ 	WARN_ON_ONCE(lo->lo_state == Lo_bound &&
+ 		     lo->lo_queue->mq_freeze_depth == 0);
+ 
+-	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !lo_can_use_dio(lo))
++	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) &&
++	    !lo_can_use_dio(lo, queue_logical_block_size(lo->lo_queue)))
+ 		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
+ }
+ 
+@@ -840,13 +841,17 @@ static unsigned int loop_default_blocksize(struct loop_device *lo)
+ 	return SECTOR_SIZE;
+ }
+ 
+-static void loop_set_dma_limit(struct loop_device *lo, struct queue_limits *lim)
++static void loop_set_dma_limit(struct loop_device *lo, struct queue_limits *lim,
++		unsigned int bsize)
+ {
+ 	/*
+ 	 * Direct I/O forwards the user pages to the backing file unchanged, so
+ 	 * track the backing's DMA alignment requirement as the mode is toggled.
++	 * Judge usability against @bsize rather than the committed block size,
++	 * so limits computed for a pending change match the flag state that
++	 * loop_update_dio() settles on right after the commit.
+ 	 */
+-	if (lo->lo_flags & LO_FLAGS_DIRECT_IO)
++	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && lo_can_use_dio(lo, bsize))
+ 		lim->dma_alignment = max_t(unsigned int, lo->lo_dio_mem_align,
+ 					   SECTOR_SIZE - 1);
+ 	else
+@@ -874,7 +879,7 @@ static void loop_update_limits(struct loop_device *lo, struct queue_limits *lim,
+ 	lim->logical_block_size = bsize;
+ 	lim->physical_block_size = bsize;
+ 	lim->io_min = bsize;
+-	loop_set_dma_limit(lo, lim);
++	loop_set_dma_limit(lo, lim, bsize);
+ 	lim->features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_ROTATIONAL);
+ 	if (file->f_op->fsync && !(lo->lo_flags & LO_FLAGS_READ_ONLY))
+ 		lim->features |= BLK_FEAT_WRITE_CACHE;
+@@ -1134,6 +1139,7 @@ loop_set_status(struct loop_device *lo, blk_mode_t mode,
+ 		struct block_device *bdev, const struct loop_info64 *info)
+ {
+ 	struct block_device *claim_bdev = bdev_whole(bdev);
++	struct queue_limits lim;
+ 	int err;
+ 	bool partscan = false;
+ 	bool size_changed = false;
+@@ -1189,6 +1195,15 @@ loop_set_status(struct loop_device *lo, blk_mode_t mode,
+ 	/* update the direct I/O flag if lo_offset changed */
+ 	loop_update_dio(lo);
+ 
++	/*
++	 * The offset change may have silently dropped LO_FLAGS_DIRECT_IO;
++	 * refresh the DMA alignment so the queue limits match the new flag
++	 * state.
++	 */
++	lim = queue_limits_start_update(lo->lo_queue);
++	loop_set_dma_limit(lo, &lim, queue_logical_block_size(lo->lo_queue));
++	queue_limits_commit_update(lo->lo_queue, &lim);
++
+ 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+ 	if (partscan)
+ 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+@@ -1361,7 +1376,7 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+ 		return 0;
+ 
+ 	if (use_dio) {
+-		if (!lo_can_use_dio(lo))
++		if (!lo_can_use_dio(lo, queue_logical_block_size(lo->lo_queue)))
+ 			return -EINVAL;
+ 		/* flush dirty pages before starting to use direct I/O */
+ 		vfs_fsync(lo->lo_backing_file, 0);
+@@ -1373,7 +1388,7 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+ 		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
+ 	else
+ 		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
+-	loop_set_dma_limit(lo, &lim);
++	loop_set_dma_limit(lo, &lim, queue_logical_block_size(lo->lo_queue));
+ 	queue_limits_commit_update(lo->lo_queue, &lim);
+ 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+ 	return 0;
+-- 
+2.53.0
+
