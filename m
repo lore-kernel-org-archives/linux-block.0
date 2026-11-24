@@ -1,13 +1,13 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=216.71.153.141
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795528231;
-	b=ShHT8vkENwpm2GWXJtlhMrF9WhFBxjXMGUmPOnNiRs3ZCep12zP1LxIOTxr7RNZy68j1
-	 DEbwmfbJNs8zoxSaWkk2LNgETzvfQq7swwRh4O/WXUYhqRJgKhNVwjUZSWKLKUQQyKDe/
-	 6aU6HJfyE3/bW9HYqMCMc+8q0jfnqRTiQehg7Zw/ZCRf0WpqP0JVdNmb7XqNPf5W7l7IJ
-	 wObVWYX6bW3cDW0v8ZASxmLYd/zsgLbNirCIAcXNzXIP8vMWSrX1iYUlfXKir2EMZdEIj
-	 yBQ2LJVbEfjUIvMAMtIo+uk8w1SQGxKm+5mAKrK0gNhydSNeuVffcB3Go0QWvFr8+yA==
+	t=1795528233;
+	b=f9Iw1whL7pjHh33YSUTNhmgDVHsDS5yTFHmc1LTSnmUcJRnCmKILMrmHBUqbi9hLPfV5
+	 6gF6V26gmRXScr1rr8yqkjdMyWdP50i1zF3U/sDY0gbYUx7hIwDnwTvYBJly9IVQhe+fr
+	 pqGM3Liw4HWQuhDf1bkwUDnY8sqxH+7s0lzKFp7cgc44GaYoV2tYYT1igl0rAJihow/Do
+	 NhlxIYDJKeh1mx852Mzn+qyq0WBWAZG/Q0tvpgkKpNW7Bjr1FGH3jReDsfgK+gB1EBnOB
+	 0o+kHCUekL4YMPS3U8l8bayA2LfkeXS1+isqyHvAem4EIOiPn4MYGTa85oRUaL96KrQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795528231;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795528233;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:Received:DKIM-Signature:Received:Received:From:To:Cc:
 	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
@@ -29,74 +29,74 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=XB68ighT7h/bKMXcuLH6jaC1TdN4kpyp0Brr/Mc61oI=;
-	b=efSlQzmrgv1ncp/ZoKntzq5sDL+RZJr3hIBZbIqdZt9kqgeN664l/b1Hzod/XTc7LlF4
-	 pK+M4UoT5MI8I06hTaHSvfQIlT7mOPSRF3ZXkK9WS0MYEV2V8txrme3KVtQcvrJmccKa4
-	 LWWF4pKnPk2xvL1VN1i1FLF5zqdg63wPKzucOiwxXh/+e0cZy0DCPWLtduqgdR6W9CrHl
-	 aV/3beW+8P/mmunE6iBzx3JSn4W3nMi6Ti2Yp+U7EwH89Ra14JDhBz2VAsqXJ4MbuK88j
-	 IuC60YJ1HoKl5PVh18PlBB7ZVag55FC8cxwLXRB0gjkvW5yohOoMq0AsN4DBiCiI0xQ==
+	bh=aL7A7vl9NH7+rUKIsVhWcZCj2Wid6QX38FkGlw0cdJk=;
+	b=RPKO4qEi3BlCCfPQfsn36DSjLqwLvNWzCYBvgDxZXWObVWxgpRwp9XUAAHpSTekKoyi3
+	 9lde3JsYRJQt4k26iIE5bqCW6/xgPLLcVDSuD662yPmr0Cr8x5iX/qAwOxgrfJUnh86hW
+	 wMyqJq3wDf1U3g7C5ufDSf0NraE7bq8GfVYRtD8JZvvZaT+VUEFFlfiyhEEmtvShNERAD
+	 2K5HDXUk2ihi26XeTt99oHjDkYUVbqLg1SHbEB9FY3tT8NiugPbEIBGS+fleWz3ZGxuBJ
+	 WEx1P2rpuUBEWJeEObry1DdCmXITL0Abp7ApULaSckCdI1MEIo3X6pYVCV4c/6k+e7A==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=wdc.com;
 	spf=pass smtp.mailfrom=wdc.com;
-	dkim=pass header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=CyZPhgTO;
-	dkim=pass header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=XOrHOX0A;
+	dkim=pass header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=BlRG2vJQ;
+	dkim=pass header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=EPe9xFrh;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=216.71.153.141
 Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573B8606A322
-	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 13:50:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 573B8606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BA1606A330
+	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 13:50:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19BA1606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=CyZPhgTO;
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=XOrHOX0A
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.a=rsa-sha256 header.s=dkim.wdc.com header.b=BlRG2vJQ;
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.a=rsa-sha256 header.s=selector2-sharedspace-onmicrosoft-com header.b=EPe9xFrh
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1795528231; x=1827064231;
+  t=1795528233; x=1827064233;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=I8CKYHpO0ub+AjyVpt0fTEQdPGC6UXqw5DrQcngkzUo=;
-  b=CyZPhgTOaBJgDFQKxleX+QwCy66WCZhRWlMUroQssqCTRwGt9/i3p6Jd
-   dWf5XY+FkG/mRl99mbNFN9HeUDvA+Jgqhtwwsze/Em2RGSrH3P+bR0KQ5
-   rZKrDclyFzgWlcJVv8n+DcKsgXaqbNUzWJPmGpYwX7yLvJtcRWtVfguGJ
-   ZZLaxgb2gu8qYLW1SBuqCViHRKUlqvczEgxnOiQBqIJrrO2hXUSb70hH6
-   lLdWt4RuGCiNIblJlQN/ALnGwq1G9yLtnORF2WdKwtQwbPR62eRsFrORv
-   ak9PYHeqQf2c/Kbjk/tSCEUTAjHAdqLuRe84eaOMvWMYxLTgfVokot1/+
-   Q==;
-X-CSE-ConnectionGUID: M+fLZJEHSlOVZV4Xazsj5Q==
-X-CSE-MsgGUID: z/j1crcQRMCbD6CdevFBsg==
+  bh=LDa/TGBAvOquaHOHAJlS5Kty7Zz2KIjhepeI4y1Sm44=;
+  b=BlRG2vJQC3R8UNJI4QJxr+JT2MrRbVzQKv0lm8lu+Vaa2GhFeKAGqjAo
+   wYQ97efewIPssRwtmhLYvCxiakHOLRl63+E3X+QUDD3f1r2VoBqrCGT7C
+   EYZKj6og8d0NRhF1HS02n9AfwC5yEH8RHE2jX2dp6FiNUw9zKwayl6Fwi
+   bzmNa551v8+mXdyZhY4aDKbM4DevXroRwrJqomIaiSncETHi85dljVtED
+   wuK5eCZS/UjQiP9o0hRAtr9ZQLYRUZkBOx1fpdt8ACs3EdxNWaflQJukY
+   XfxO1+mX1/bJN7F7Y3TL+xCYDB92MuXiM6IzzNdaKPwE2R67Nhbl+FE85
+   w==;
+X-CSE-ConnectionGUID: 14jM0rVpRMG4H2i7DzD19Q==
+X-CSE-MsgGUID: 37BxhN5bRRSCkXZ1+b23ag==
 X-IronPort-AV: E=Sophos;i="6.27,230,1786982400"; 
-   d="scan'208";a="161651018"
-Received: from mail-westcentralusazon11013052.outbound.protection.outlook.com (HELO CY3PR05CU001.outbound.protection.outlook.com) ([40.93.201.52])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Nov 2026 21:50:31 +0800
+   d="scan'208";a="161651023"
+Received: from mail-westcentralusazon11013063.outbound.protection.outlook.com (HELO CY3PR05CU001.outbound.protection.outlook.com) ([40.93.201.63])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Nov 2026 21:50:32 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sc9KAZ12FJPrAxnJyiI1pAs5eZNBXRDy60NXFkkdXHMsd3GX/57PUpiyuzB5C6N+oULmWonxtjqgFw0vDoFL4uf1X/MtjE+Ckz3yDrPw8vD7u3hEf7EDx7aW8cvVGPTZaZVYmHg+WDpyzT6tV/HXijCi2k8thrX9MxXi5uUE0Jmnk1Uspw/jpW87nrnVgaNDYHZNKWhuqIbhLsVPwFAmsWPtwYb+yak9jA82875UT1jX4dUlV5ZSIixJXN7jny094mECqDevJ+tOyHr1EDuyGtKTypk+d92CogNE9gMUxRx9HOQWVQIq9o/jFKTp0D3bHwX9/2aM3Efa7XU9wiyCTg==
+ b=r5bw+pVRGYqz521CMFYWe/eO73JLGybI9YeUl6CNE6pb8O7TNEy10I/bX6FPFbgj5OBIO/RHTDLruMAVXaDnlw9ADKgkrEA6ZHu4GPML0J35S/4NM7lhAj9c4NwkgwP+rGktNiLy7xEdGjxk8jW10qwms/D3xCtyJkA0tVqF59/n0hH3J2h7Fk3XQV1YVHVsGTQcxiorIOVvi9oWir8U/0SconRFbhGo4O6U4DXCU2D6gJMK2uTQZy95dD1JQ4daoPSS8fQ2zWMw3W0MIf7WiwKMBlZQ8U5oScOD1/hW7qSFqRKSXphNgPa/B/Q9Lhp1Od+vK62cwC2qKzAId3gHow==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XB68ighT7h/bKMXcuLH6jaC1TdN4kpyp0Brr/Mc61oI=;
- b=QQ4kFdQ+Cg81VikNBCC/XtZGSMunX66L4wfbOY8cbYjtdgVBE1Y4+usc1xo+dxdm8YzW32XdxI2tL/oKTvq+psh+hIrrOHOZVzHwEQx1DjIp9R+C8RSe9araBXXwFvg5wLPg/e0TWd/y4WDpoOEKYf06OnGPndSOuONy3RlXVd0D9KZQ2uHq+tGSF9ftTbyN3BnXkyXcbRJb1jj0GIq6ycqjSNCwwFZRz3xVdRy6ywSj4B/FQ8m2A8DjSu+kfjst9BAhAF1plqYg6yD5WIib1XTsyGFsoXEQhwTzFxge49FzxxoRHJVX31z5ChHA7P4Ebs7v3VoIWP9Ng8af5SjD/Q==
+ bh=aL7A7vl9NH7+rUKIsVhWcZCj2Wid6QX38FkGlw0cdJk=;
+ b=hUtzMaNtxP+RzYqeGlSfR9vkffsiDzxwbnh3Vlbguwwli6+6Klhg3MMKlchYW+OQ3lrT8qzBMnbGXygvJkTrhBzmN5q3C8i0kvUGijrovsO47IVf6wF0Yb954q/0C3ey5MmhfLPJ8r6yaIRonTjr+nF371j8uB7ii4e092Irr1rygrpdd3vBXf4KzDwlun1dc8Uhka7LuYez496peQEKupUzUK8201tvfL7a9+i0PmNAa2fe+xdDnOyjFdrn5r/yuc+Kqu05BompPvysXrZm32frlpA1ltC8uuAzHJWnYB4lSWpsZifgwsDmKWIUA+VIStiFUsQm7PGdxYjbrcngtw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XB68ighT7h/bKMXcuLH6jaC1TdN4kpyp0Brr/Mc61oI=;
- b=XOrHOX0AgFs5Zlh77ofNFacZk/WgGkX4vwGvJrU3nH7Kio5oaWkjhz4Ll0H5s0fdEgMcmd1FjbuasVWmvySKGtDBNxOQDAwtd3yJMYswM9W0WJP/pfrpwKUO6e7R/8aI9f+gFVxQ7aujz51ZFdJ119QRXI5F+GyFAy1Et/+BOek=
+ bh=aL7A7vl9NH7+rUKIsVhWcZCj2Wid6QX38FkGlw0cdJk=;
+ b=EPe9xFrhmI9P9p0HncQF09NKkiqQcNRSDGfBGM4mJ0kqv+ytlskZeidFFFsWWUUe82t0k6WiX5eoR2mHJRk36ani7TDNywnlKJHOBC2FlABb4/YEuu8b0qMFo4aAe3TfIxhUPu7YV12eEzfg71xQIWZtkt6tkNic+z+dWtxYY2c=
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 Received: from SA6PR04MB9447.namprd04.prod.outlook.com (2603:10b6:806:436::21)
  by BL4PR04MB993740.namprd04.prod.outlook.com (2603:10b6:207:300::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.639.13; Tue, 24 Nov
- 2026 13:50:29 +0000
+ 2026 13:50:31 +0000
 Received: from SA6PR04MB9447.namprd04.prod.outlook.com
  ([fe80::14c6:1c14:485f:1825]) by SA6PR04MB9447.namprd04.prod.outlook.com
  ([fe80::14c6:1c14:485f:1825%6]) with mapi id 15.21.0639.012; Tue, 24 Nov 2026
- 13:50:29 +0000
+ 13:50:31 +0000
 From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc: linux-block@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc: linux-block@vger.kernel.org,
 	Niklas Cassel <cassel@kernel.org>,
 	Hannes Reinecke <hare@suse.de>,
 	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 1/5] blktrace: add blktrace ABI compatibility check test
-Date: Tue, 24 Nov 2026 14:50:12 +0100
-Message-ID: <20261124135016.153657-2-johannes.thumshirn@wdc.com>
+Subject: [PATCH 2/5] blktrace: add iotprio recording test
+Date: Tue, 24 Nov 2026 14:50:13 +0100
+Message-ID: <20261124135016.153657-3-johannes.thumshirn@wdc.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261124135016.153657-1-johannes.thumshirn@wdc.com>
 References: <20261124135016.153657-1-johannes.thumshirn@wdc.com>
@@ -128,325 +128,290 @@ Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SA6PR04MB9447:EE_|BL4PR04MB993740:EE_
-X-MS-Office365-Filtering-Correlation-Id: f08b52f0-befa-408c-591a-08df4a31e6af
+X-MS-Office365-Filtering-Correlation-Id: 83f9571c-6f33-438e-5470-08df4a31e7ae
 WDCIPOUTBOUND: EOP-TRUE
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|10070799003|376014|23010399003|1800799024|19092799006|10067099003|11063799006|56012099006|261026140227099003|261021121427099003|261102123227099003|261022113327099003|261009223027099003|261022105027099003|261026121527099003|261028144727099003|22082099003|18002099003|6133799003;
+	BCL:0;ARA:13230040|366016|10070799003|376014|23010399003|1800799024|19092799006|10067099003|5023799004|11063799006|56012099006|261026140227099003|261021121427099003|261102123227099003|261022113327099003|261009223027099003|261022105027099003|261022075727099003|261026121527099003|261028144727099003|22082099003|18002099003|3023799007;
 X-Microsoft-Antispam-Message-Info:
-	Z9U6ePp3k1cM1virroEn/LkkZ3EChWoEmz2YXB+0IJ72oLf10cu58VjuobiIuhF3lFW+fqEuTCQ43DeiiCkIpWm59rmg/DbhvSNdegHIgXYgU1jDEWSwcIC2PnbsU5m9yLEvRqRREj6igRJcgTJHCcphOrxyExI9DYmRlmrwfKwprcPJlEjiYQLgTh9wzgv670Et5SDbCTUylW34JHltFYZ1JqIu6BcZA2/6zVxqMr5PRCZnJxNep2mEIzetw1M3giP4gLVaYe1TkjARuA65mzRONnV7S4ZTVNo9P8Va86uVRcjVHkZgG2njD/IRUCLxwnIth/UVGWz1rc3ttdfw9WeIdZP/1QaGBzSFVC2ZIRWP2Lf+ci+5PehJ2Q6mpqMBXJsH0ojXx2pdtElk0S5Y8hhUYLibVwdkvPPRhh80ZWXWpBXB3IwQlXIdMH++EaG5BEV30K91Ak6aPnTl/WjuxeVVshDUMcaPenq/HUERh1rj8HemH1lfhqokMygrT6kb+8ELT991gT13ny887dI+XEyxukAoFcKU2DTdKQLdyexfawAsqE4rmZLuBFP9h2rukJqsQkuyM5aKBb7QcAYXRMebK/rjuKNdd3q663Xr4M/wGDyg+ac0voeILuwDKTjFCGimy0nsGcgP8VgvXel5KxYXxS5K+JMeWG0u2gOpKbY=
+	WHdVbtiNC8um2viIxt0oIlwoW/wdqq3rOy08dOLNXkoOcDdKaK3y0X6lVeZoBQYW5M4zJSlkDFbkbujywHAnUsG+0z3QQRKjw+K4NcNp69xsYeEdtuP/aGlF1GwajBdCKrl8ZfxR3q0hpYEooff0x/T3/fjfypSHLXP7LxXJeBDR1XdwR4smPHdRxeiRI+27LTJRuxKJSWASkaZf9u+8ve2rQtdb5wbunpgCNv9EHFnIPRVkc462mJV7ymQwFQ7sNllnpDxlqDQ18l/dmUbJh4VDMI3Qjub1NUS0KbNiQoiEYQNwO2z2gHCItaaYlABC9z80OQFwx+cVFSs26xDpBxLgWwBxMoRxty+hts2ImUxgnzOhNxE3X83Uzdv3G076TR3hq7m5olhmrMpE6v3Vj9neA15kuVgcl8N3UscjXuhqB5n8Z9fPpfI8y1vncHzz32JCYBJmkdOtvdFtjgPbjNCRV/klNrAuH/xEo2yqm2ykC+etMASbYKOVQYpCN0NjSRE6xso5BlCtms0L9a6VjCxDCyUr4FF4VoIrpbVt5kXeZLuRBs9LxE9kDYJyB2boqp8RYf9tmHBF/5Vjb4HQnI0Ge2hMkMf9LDn2Ih3LD5XxM8y5q6t2yqL2FPkx4ZdhI/Su/xt8GpKzAQKwUW2OWZj+7O0F796KJLY3trWgGjU=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR04MB9447.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(10070799003)(376014)(23010399003)(1800799024)(19092799006)(10067099003)(11063799006)(56012099006)(261026140227099003)(261021121427099003)(261102123227099003)(261022113327099003)(261009223027099003)(261022105027099003)(261026121527099003)(261028144727099003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR04MB9447.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(10070799003)(376014)(23010399003)(1800799024)(19092799006)(10067099003)(5023799004)(11063799006)(56012099006)(261026140227099003)(261021121427099003)(261102123227099003)(261022113327099003)(261009223027099003)(261022105027099003)(261022075727099003)(261026121527099003)(261028144727099003)(22082099003)(18002099003)(3023799007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SP/qqyWmJe3dLSlETvFv2d6LBad7n9pSERK76aCn82vM1sHVbUWSqQJ2mgVr?=
- =?us-ascii?Q?AvokhGBgmrAJZyXbDnKspI+nbirgTrvw3Lpvkv8MvW2busX6uTkppDEs877g?=
- =?us-ascii?Q?0XFx2abw6BwotS6fPIvGNPUy0GDYg//ZyREJMjjRbqKTNPOLf/8r4NPe9Z7q?=
- =?us-ascii?Q?y6aXvu8+0kCEDPrTnJNUnv4VcOKmAh5SMZ001KHypd0KVYobnxF//XmICDe3?=
- =?us-ascii?Q?AEgMLuJNMlzxyC9ymQ5ngarqE67kQekFxd5V7Mg8XOkQxEkWYb7u7x+jL2ZE?=
- =?us-ascii?Q?nAifSKfENJizXtl0rlGraTw8l7E9Vq3BnRPl4/x2JqjD25IccLlMNR7FvmX1?=
- =?us-ascii?Q?/z9ypIFdPJASdnl7wA4ee2rVv1YdTCnKJOCzNmTC3qI1/dbzZqm5KsoBI6D1?=
- =?us-ascii?Q?wYIc/SlDjpQECgcYiOfJXIDj0MUjMLo41FP0AAPSRpQ6CNQw8tWkULfLpy0K?=
- =?us-ascii?Q?Vh2kA8UTP91t0mDMv2EvFxuwvfYkXuKGtVy3EaHKuyrllfmfNIT8VIK55NIk?=
- =?us-ascii?Q?sXuhLlZIkaHKziyNt38OSu5zgqJUIjOE/FqPZXBbAmOI2DdwhgwFbGaXfzVZ?=
- =?us-ascii?Q?c9AVc6D3OLVoqHzy6a7Bd45NbUYUfvCT92LUOUoyQkU8KSoqV9COyexNGqVF?=
- =?us-ascii?Q?xmvR6zdWvcU35QM9m9v3q4Md1pSCF5G3AI4vwXwkYV+DJGMjFh+ul73qF4l8?=
- =?us-ascii?Q?K7w/dmhmyKWZ8DiNjgCYyTbRxEn1ofEj/VZoILoDDMUIkFt4c3zSBdMvezYo?=
- =?us-ascii?Q?b7YbAt8LTCMeMl6II9guVikCRPuQgGnY139v7TDZkxqxE7CHwtD/+O4Q4s0m?=
- =?us-ascii?Q?+v444M6L7VoIJMJOWtTre8SDLynVdT5EmQjMQaGHZJ4i3YDqY7jXHMJskOmc?=
- =?us-ascii?Q?xxfUIkp7i576qGyVdiuiZOudyOmstTCk8EArZKc+i1G7Z6K5elC0VBnmm50a?=
- =?us-ascii?Q?NsnXY91YjV9HZhVWKmGrlMBy7YSxRBIrYuMiN52ISD9aNk/x+i+g75yAPigz?=
- =?us-ascii?Q?e0xZg3PPTsZba8be838WhqQkJ4rCiaF7oeCh7m1u/EqgbCVc7hCdJUCsKPAX?=
- =?us-ascii?Q?aXifhVy8miZAkJf0ZyKPxgTGIvDC9LJoE6HYzz6bVqNm2QiufQ0JIvewdfMS?=
- =?us-ascii?Q?Iq+1/BU4plPpjy9dCkUmcecdowVujdpoeQ+fDG3Hq/tYu9XX8NPxNkaGT4X+?=
- =?us-ascii?Q?JrlGIQXl52dwSUsTtNIQPjRs8lUz4KqwoFqEuBfHb/lA0MlXbcI1TZEzrLxS?=
- =?us-ascii?Q?U9DgfaN3ALZLFVhZG17+s212WZkhqpaNHXT4nsiRfnxhYj8oCIws9GRT+3aG?=
- =?us-ascii?Q?ShTz4XrgSMXcJhyduj4Weqs/KtBO8yP+BjPgKHLWZAVYEtSJAY+j4Xsfjcq1?=
- =?us-ascii?Q?KqmUQQND59s6pjRxxczI1v82MCJkX7O54MMtb9jiprRi7s3eXm2siFigXv1j?=
- =?us-ascii?Q?b70plhi7e8iXL1XZzerqenEYQye6AVGj3razbSxQPy0P8gdnPctWIcP8B1IR?=
- =?us-ascii?Q?YrtSI1or0Cyc1ESGVNKdgGXR84ascHvt0HL5wbKLN5L/pVCTsEHEUF7Ya3R9?=
- =?us-ascii?Q?721L/4C/aoAl1427KcbH/2yKaaAOqCmbxio3/bFi0zxM9pL/49B1AEEmsGhy?=
- =?us-ascii?Q?DnpVUOfeAVy4ymK5sf/gYjntWpg6L9lyBMcBBcJD92l2gA0Ngjw44XE+zvU1?=
- =?us-ascii?Q?uc1ZZDkj/NDTXQPjJu9pDEfKFLgr4zhrtbozIjNUN9O7/ngNW6LCNfF8u9g6?=
- =?us-ascii?Q?DZQwe7DWGCM/WpIBC74TleTbX0//Ikmd2ymQx8G+y1+9akURTu/8fUXmstJd?=
-X-MS-Exchange-AntiSpam-MessageData-1: Shfvi7C0buY4N1QNqUKOFdeA0HaTaq+MIZQ=
+	=?us-ascii?Q?RSAb1pRo5RJSqqhTHsArUmAbnexWBw6PaM+K0r7/+YPn0cpYtv3PuIXbJft5?=
+ =?us-ascii?Q?dBallWDmQBxeMMXD8nUefI29Dc3OGZmZgpqSizvpLyRvt5LriZQH4jWZEdcw?=
+ =?us-ascii?Q?mYEeh43E4EeKu5QwjrACH2SsEaEcb1qqeGy4rRgho8IU6DSHkZobdysfZX3L?=
+ =?us-ascii?Q?SfjvyZlceyNpgZ0hG5BAjSQDh7swx14m+WIlBIhL+PJ7p/32Au/nlKJJxpiR?=
+ =?us-ascii?Q?9ZNZ/UyPHF8vnjSgQRh1PVM8NraTm5tn/7UaOzYdnj0IYWG400xweVAXrK3l?=
+ =?us-ascii?Q?v4BKDE7i4NubxzXXYm1St2MHG+CcVaqJ4C6U99E+FSsfYq0XA/4ZKQsOxA8e?=
+ =?us-ascii?Q?sMvSwG7OiFYt+hfPIKouAWu6OqjZ18sNM9/cm8UllDZUaBCaJ32zlvDZFPNl?=
+ =?us-ascii?Q?Tqdn+e+SrNkuVOVgTAKSeL0Z9Ew0DzHAh7nxookLICi0aHLLTet8iNzyYCCF?=
+ =?us-ascii?Q?q/pduMwCuHJfjTgn9PFTCj0wOnQ+LIiEMSS127mB4QQDC3jbFanPI0gN45tG?=
+ =?us-ascii?Q?B6FrMSHwo8b9ncPKmvsQW05tBST6rNCe3QJWEuLWSvgesSDog93GiGpSFeF0?=
+ =?us-ascii?Q?gY0u7HaqpebeSDyzNJhFzKaMQtR0J3SV/dQ1aHFstVHOnrabM2Qq3fO0cYXv?=
+ =?us-ascii?Q?p7Y2r/fseyoFbeRHuCjq0lMN2Mam3EFICKdYg8D47IZ24QCP6bR1g4V3VTP2?=
+ =?us-ascii?Q?4WTY++fC5OVm4jkO2Bdru9Eiah94RMcu0QZYQtPLZ5bs+H1p4FI4mAD4V5XI?=
+ =?us-ascii?Q?a/lH5jx54Zi1G32gagSiBbXhuc6EVIEzIz2cNfJgMA8giZIVtgmrNxfe/8BI?=
+ =?us-ascii?Q?Zk7KCav1hW7OfgWkZL1Mo/XyLh9cYvqSGHipIhbsVMa7kGJBQYD/NwUIKAPH?=
+ =?us-ascii?Q?X7rXrqw3XA8YMt98o/G+PVfkfFAqlOODp81/J6x4XPUVC8aQ4MVbSAhLYFoe?=
+ =?us-ascii?Q?2eBJAhJKbvF6NYF69V6iYyQF8aK/mVbcFT8Q/8twdpcf4TzroTUvlUGUSj+1?=
+ =?us-ascii?Q?cc14S42/NUcQFVxhRT8X1oAQAO+4j3NHyKQakQdUXWG3La6t08q4ge41aMuo?=
+ =?us-ascii?Q?8fUGbMgtVGmaD0mvrEi4nnRbpnKFoSW0Bma3+romdYbDh+ShprQ3rmVRtNV7?=
+ =?us-ascii?Q?vCUJS6PkEtRtX4gB2/bP4r6HNQwKZ5rIAfRDzoB/5fz1wR8djNLf00yogufd?=
+ =?us-ascii?Q?JPjbTONG6A5BUw9GEVGPpEKnVx6SIUYTg2uCUOwLW1Aow3gcS6R8ss1yEx0J?=
+ =?us-ascii?Q?OGtuzsFTQswV8A4yfngc0uV72kOgfl78c1iZcVtNZzcogQvCJG66FCI8sCB6?=
+ =?us-ascii?Q?G0S40ae8GrORuVssRbNvb3zniLWCwMhtP1BykI7P8FYdynWCdCiI1Q7r6HQa?=
+ =?us-ascii?Q?LjF7Ws5xZijtOumPPXikuQnn8NjN6di2+lwAfdk6SQ9sZS8+EuwhHuwJk9cm?=
+ =?us-ascii?Q?EyrebK9H4c0W8Zuv27U7ae1XaEOj7xP1pJNVhGqno+IB8CflkZn2dtsF6Nlw?=
+ =?us-ascii?Q?uQ9ETXmhSmqWKj78ebwLF46StRhyj562NoTnh+gmd01ggb7+y8o1E1ffUCpi?=
+ =?us-ascii?Q?CRwyXM8oGcyGUgjhIyOlsyXqWvxqqUvGZKkz1lVbZ3oRh0aHgkkqvEc0s0Ge?=
+ =?us-ascii?Q?mqHysMYGNarsjtfECH+++lPs4Wt7ed04DhOUduCwO/z+4j+sGYMxXrcTkPSi?=
+ =?us-ascii?Q?jczwVEb4MvDDoA+dsslhnmZZgxQomkegQF4yJJourXoaXLkkHNEjBOHnzSFr?=
+ =?us-ascii?Q?v1GIRA24NPGIPJG3MCMRpZIse8jKCFYsWLWoCNhYKsTHDf0g39qvheNg6z7z?=
+X-MS-Exchange-AntiSpam-MessageData-1: E6sKA0MH1RJlq2Q4RTVwiy8Bt4Oe43L9ADE=
 X-Exchange-RoutingPolicyChecked:
-	olXab/8gSLIWGKP+Zr8o9Gy6nzk2CFfO+L9C6ujCNkC7lUaqmjPXhe1RaYUiO9kJiWBIF04cTOo9pIOL00VALVnIaE9V5UZgGtxzQVclo9dp7jIbfYLaq/F+oxNlVEpRiEmIFJqmODCC4ejqPNCBeL5kbnBsVHaUM7Vs6FOgKZ8MIN50FC7kzIuLX2iEsJ2KpWiqKnX+7wha2K5aoTRUthhvma5J3Ivk58ItoivsP5m9wI0rzyY+Ig/6GyyisV/Xk8p4MmrmJWbKZCxlAGmdkdlCq3daByUKaBoRkwNnly7fTPk8TCYuBg/hzMaoILa7LuGeotWj8raTYipmE2i6Rg==
+	gO8v3VT+qbNUlysYEbBgtL6coFZ0TQlUFsLD1vW/YTscAuC9AEm7QqvG0BW/c67JVLdn7iUz9M99T3fJrxGTjWaaB05c+/2xX7p5sLztYU6kjTYBTLHh81tLamkxwxNUSo/0Q9KBRDPxeDRL+2vx5ywZu8KYB4pdX6sWtGyUqk/tLjt7SwJw2XD+SblapN20sBS5g1HT5/inYLZgBbWArXMg0nlULrRLI807zgMzyzO3Y4WUCfrHkHouJhCAeqEcAxgUIHdXJj72iNZ0OZNI6XSlXbJHc1qgUaAUlGG+72GtY2vvwyfG4FA3M2Q64pPizmyLqPYXBsHbsA91gWi4Fw==
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	X2NyT7jzdZk04WLC13vXhd/mxCrKwebBovPU5YZa7gcagK1gHnL0gUZXx0PNRHAR8KIHo6T6ewt7zv+at7m9ZGFz8ClgJCraymf0g46frRTKzLdvHbaUZ3n4zQnjpmFwdmkLziYdjF1mNIk4dd4z6tR9Xhnr1BzKd0nuEjh6+QCGnNU9ezWtT9UQEIcuWFJg0VLNPWAyVL0srk/YygYdeWdxfMmLvQMb2H/YIbE9XykhSWVOF7wV7fT/dqw3enEc6HF8tyCBBXgY33x3TVEkmlyVmEVD60zVY7eobx46BvtCZLngoBfsyYT7JdslfmNY7OQGA5UCk1qEc5j6x76DrD/2G3iFl9KxcQly9HBD4BPOcl3NmQUP8Y+1x1exNem7NKW8I06f0Q0AXLkDh0RPRypAa/4lqCV/gVGru615JJ5UZ7gXaoMNxTf7Bf0gi+Eu1aQ8LjvaTbyqVbYofUfwTsOVtmyB0gg+whchOSthJiE2JO2bVYs/Md7arJdR1PT5UMsoaXtQr2qRVbTNw1ykz+Fdlkph7TFzvdGMBSPiKUKW1Tc013DK7pZKMod7auQi/uXOSsarz7uBAk0Ep4e0cn2LcgOyPJ4J7OMyStY1kNjRqsU5u8IW9vrm7iodm4UV
+	EuNtdo7wPD4P75Eg0KJt39/Or9hzDEIN6Sd2HdSezklAa8HGq5lvWoasZWG32vGaFpoC4qduWCPzj/M8z1Rz2jdBP4eSGmlZFH3bz678/VF/gcogUgXt1EcZLoHsVgmJRQwGxdMpsFEP6l5Ksdp3/eHx+vphbqa7pFMLlOVXVxJODxfO12I3IgY5kj1hL+2K9TJs7FbjYsttezdUiqqkxTe6uU5NbKGqyEBiqB+4dQjaCmRDoguHirP/NNTYFNadn3q/Kl/4YGwCJcvqQDB+Q8oeuH7BNgTmd8AIqUgIY/477KxWPg58iGhNzYd8nyQbySqkKxho01G6FFTvYhIevxMVicWohUUpJf7wwHewlbIN/7HQMh7aKmMNgKZoYLqOw6/dyBroQ+2IroY+w0wi1/pB491F0Yo1Li/Tu4/65regkbyq9fSapKj58weUrhzhYJE8nW7GcGQjzrKdFkcT6nmZqeuTVIASNBEj/PzvN0BoFygjsF2MZfCLxZoPxZfEkQ8ooFPcaTuHQDAMyHh015hMS8jAwPs6Nqh78bXUx1bAfXI1DJLSx4ze8y0ICplbctihWJwfzQ0cRj9rcPP18gRWAbhdD0448nPSF1/XbjwrdfaB7CyoN37IXlsAFdbW
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f08b52f0-befa-408c-591a-08df4a31e6af
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83f9571c-6f33-438e-5470-08df4a31e7ae
 X-MS-Exchange-CrossTenant-AuthSource: SA6PR04MB9447.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 13:50:29.4887
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 13:50:31.2541
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +O+bKmrq6eKTLihUvGD7VGy4b5fkYAWMbOg/ueU81psifaKSRB/ZaT2yKPEayPRQgk2TGIFY7qSN86MJLCYvQsrTEH5BiA/3QTp7g++EPSE=
+X-MS-Exchange-CrossTenant-UserPrincipalName: WRPX3tsfo5drsxuuWSDmXPkLnuuHDB8tPTsvLz9qqzPmvofibw3W3vNmntSt2wtGY2HQt9MkaGsKpZ4LvM62fgqaclLj7vnHBhjCf488TAM=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR04MB993740
 
-Check the BLKTRACESETUP2 flags ABI: BLKTRACE_FLAG_IOPRIO is accepted,
-unknown flag bits are still rejected with -EINVAL and the existing v1
-and v2 setups without flags keep working.
+Check that blktrace --ioprio records the I/O priority of bio and request
+based events in the v2 trace format. Every SCSI command duration limit
+(CDL) hint (IOPRIO_HINT_DEV_DURATION_LIMIT_1..7), no hint, and the RT
+and IDLE classes are covered. The hint is passed through the block layer
+as is, so no CDL capable device is needed for this.
 
 Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- src/.gitignore         |   1 +
- src/Makefile           |   1 +
- src/blktrace-setup.c   | 108 +++++++++++++++++++++++++++++++++++++++++
- tests/blktrace/003     |  51 +++++++++++++++++++
- tests/blktrace/003.out |   8 +++
- tests/blktrace/rc      |  26 ++++++++++
- 6 files changed, 195 insertions(+)
- create mode 100644 src/blktrace-setup.c
- create mode 100755 tests/blktrace/003
- create mode 100644 tests/blktrace/003.out
+ tests/blktrace/004     | 107 +++++++++++++++++++++++++++++++++++++++++
+ tests/blktrace/004.out |  13 +++++
+ tests/blktrace/rc      |  70 +++++++++++++++++++++++++++
+ 3 files changed, 190 insertions(+)
+ create mode 100755 tests/blktrace/004
+ create mode 100644 tests/blktrace/004.out
 
-diff --git a/src/.gitignore b/src/.gitignore
-index c299ecf..cbe70ec 100644
---- a/src/.gitignore
-+++ b/src/.gitignore
-@@ -2,6 +2,7 @@
- /bio-bounce-read
- /bio-full-trim
- /bio-trim-pin-leak
-+/blktrace-setup
- /dio-fallback-race
- /dio-offsets
- /discontiguous-io
-diff --git a/src/Makefile b/src/Makefile
-index 5af0c9f..e5888b8 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -17,6 +17,7 @@ C_TARGETS := \
- 	bio-bounce-read \
- 	bio-full-trim \
- 	bio-trim-pin-leak \
-+	blktrace-setup \
- 	dio-offsets \
- 	loblksize \
- 	loop_get_status_null \
-diff --git a/src/blktrace-setup.c b/src/blktrace-setup.c
-new file mode 100644
-index 0000000..bb4c57a
---- /dev/null
-+++ b/src/blktrace-setup.c
-@@ -0,0 +1,108 @@
-+// SPDX-License-Identifier: GPL-3.0+
-+// Copyright (C) 2026 Western Digital Corporation or its affiliates.
-+//
-+// Issue BLKTRACESETUP (v1) or BLKTRACESETUP2 (v2) with the given setup flags
-+// on a block device, print the result as "0" or "-<errno>" and tear the trace
-+// down again.
-+
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+#include <unistd.h>
-+#include <linux/types.h>
-+
-+/*
-+ * Private copies of the UAPI definitions, so that this builds against kernel
-+ * headers which do not have BLKTRACESETUP2 yet and does not clash with headers
-+ * which do.
-+ */
-+struct bt_user_trace_setup {
-+	char name[32];
-+	__u16 act_mask;
-+	__u32 buf_size;
-+	__u32 buf_nr;
-+	__u64 start_lba;
-+	__u64 end_lba;
-+	__u32 pid;
-+};
-+
-+struct bt_user_trace_setup2 {
-+	char name[64];
-+	__u64 act_mask;
-+	__u32 buf_size;
-+	__u32 buf_nr;
-+	__u64 start_lba;
-+	__u64 end_lba;
-+	__u32 pid;
-+	__u32 flags;
-+	__u64 reserved[11];
-+};
-+
-+#define BT_SETUP	_IOWR(0x12, 115, struct bt_user_trace_setup)
-+#define BT_TEARDOWN	_IO(0x12, 118)
-+#define BT_SETUP2	_IOWR(0x12, 142, struct bt_user_trace_setup2)
-+
-+static void usage(const char *progname)
-+{
-+	fprintf(stderr, "usage: %s <device> v1|v2 [flags]\n", progname);
-+	exit(EXIT_FAILURE);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct bt_user_trace_setup2 buts2;
-+	struct bt_user_trace_setup buts;
-+	unsigned long flags = 0;
-+	char *end;
-+	int fd, ret;
-+
-+	if (argc < 3 || argc > 4)
-+		usage(argv[0]);
-+
-+	if (argc == 4) {
-+		errno = 0;
-+		flags = strtoul(argv[3], &end, 0);
-+		if (errno || *end || flags > 0xffffffffUL)
-+			usage(argv[0]);
-+	}
-+
-+	fd = open(argv[1], O_RDONLY);
-+	if (fd < 0) {
-+		perror("open");
-+		return EXIT_FAILURE;
-+	}
-+
-+	if (strcmp(argv[2], "v1") == 0) {
-+		if (flags)
-+			usage(argv[0]);
-+		memset(&buts, 0, sizeof(buts));
-+		buts.buf_size = 4096;
-+		buts.buf_nr = 2;
-+		ret = ioctl(fd, BT_SETUP, &buts);
-+	} else if (strcmp(argv[2], "v2") == 0) {
-+		memset(&buts2, 0, sizeof(buts2));
-+		buts2.buf_size = 4096;
-+		buts2.buf_nr = 2;
-+		buts2.flags = flags;
-+		ret = ioctl(fd, BT_SETUP2, &buts2);
-+	} else {
-+		usage(argv[0]);
-+	}
-+
-+	if (ret < 0) {
-+		printf("%d\n", -errno);
-+	} else {
-+		printf("0\n");
-+		if (ioctl(fd, BT_TEARDOWN) < 0) {
-+			perror("BLKTRACETEARDOWN");
-+			close(fd);
-+			return EXIT_FAILURE;
-+		}
-+	}
-+
-+	close(fd);
-+	return EXIT_SUCCESS;
-+}
-diff --git a/tests/blktrace/003 b/tests/blktrace/003
+diff --git a/tests/blktrace/004 b/tests/blktrace/004
 new file mode 100755
-index 0000000..b89b803
+index 0000000..4f863da
 --- /dev/null
-+++ b/tests/blktrace/003
-@@ -0,0 +1,51 @@
++++ b/tests/blktrace/004
+@@ -0,0 +1,107 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2026 Western Digital Corporation or its affiliates.
 +#
-+# Check the BLKTRACESETUP2 flags ABI: BLKTRACE_FLAG_IOPRIO is accepted, unknown
-+# flag bits are still rejected with -EINVAL and the existing v1 and v2 setups
-+# without flags keep working.
++# Check that blktrace --ioprio records the I/O priority of bio and request
++# based events in the v2 trace format. Every SCSI command duration limit (CDL)
++# hint (IOPRIO_HINT_DEV_DURATION_LIMIT_1..7), no hint, and the RT and IDLE
++# classes are covered. The hint is passed through the block layer as is, so no
++# CDL capable device is needed for this.
 +
 +. tests/blktrace/rc
 +. common/null_blk
++. common/fio
 +
-+DESCRIPTION="blktrace setup flags ABI for I/O priority tracing"
++DESCRIPTION="blktrace records I/O priorities and CDL hints"
 +QUICK=1
 +
 +requires() {
 +	_have_null_blk
 +	_have_src_program blktrace-setup
++	_have_blktrace_ioprio_userspace
++	_have_fio_ver 3 36
 +}
 +
-+# $1: label, $2: v1 or v2, $3: setup flags (v2 only)
-+try_setup() {
-+	local label=$1
-+	shift
-+
-+	echo "${label}: $("$SRCDIR/blktrace-setup" "$dev" "$@")"
-+}
++# "class level hint" per job, job i reads 64k at offset i MiB
++JOBS=(
++	"be 4 0"
++	"be 4 1"
++	"be 4 2"
++	"be 4 3"
++	"be 4 4"
++	"be 4 5"
++	"be 4 6"
++	"be 4 7"
++	"rt 1 3"
++	"idle 0 2"
++)
 +
 +test() {
 +	echo "Running ${TEST_NAME}"
 +
-+	local dev=/dev/nullb1
++	local dev=/dev/nullb1 i class level hint
 +
-+	if ! _configure_null_blk nullb1 power=1; then
++	if ! _configure_null_blk nullb1 size=1024 power=1; then
++		return 1
++	fi
++	echo none > /sys/block/nullb1/queue/scheduler
++
++	if ! _require_blktrace_ioprio_kernel "$dev"; then
++		_exit_null_blk
++		return 0
++	fi
++
++	if ! _blktrace_start "$dev" ioprio --ioprio; then
++		_exit_null_blk
 +		return 1
 +	fi
 +
-+	if _require_blktrace_ioprio_kernel "$dev"; then
-+		try_setup "v1" v1
-+		try_setup "v2 no flags" v2 0
-+		try_setup "v2 ioprio" v2 "$BLKTRACE_FLAG_IOPRIO"
-+		try_setup "v2 unknown flag" v2 $((1 << 31))
-+		try_setup "v2 ioprio + unknown flag" v2 \
-+			$((BLKTRACE_FLAG_IOPRIO | (1 << 31)))
-+		try_setup "v2 all unknown flags" v2 \
-+			$((0xffffffff & ~BLKTRACE_FLAG_IOPRIO))
-+	fi
++	for i in "${!JOBS[@]}"; do
++		read -r class level hint <<< "${JOBS[$i]}"
++		if ! _ioprio_read_job "$dev" "$class" "$level" "$hint" "$i"; then
++			echo "fio ${JOBS[$i]} failed"
++		fi
++	done
++
++	_blktrace_stop
++
++	_blkparse ioprio -f "%a %S %i\n" > "$TMPDIR/fmt"
++	_blkparse ioprio > "$TMPDIR/default"
++	cat "$TMPDIR/default" >> "$FULL"
++
++	for i in "${!JOBS[@]}"; do
++		read -r class level hint <<< "${JOBS[$i]}"
++		awk -v idx="$i" -v want="${class},${hint},${level}" '
++		FNR == NR {
++			# "%a %S %i" output, 2048 sectors per MiB
++			if ($1 ~ /^[QGIDC]$/ && int($2 / 2048) == idx) {
++				if ($3 == want)
++					ok[$1]++
++				else
++					bad++
++			}
++			next
++		}
++		# Default output: the ioprio token follows the RWBS column.
++		$6 == "D" && int($9 / 2048) == idx {
++			if ($8 == want)
++				dflt++
++			else
++				bad++
++		}
++		END {
++			printf "%s: queue=%d issue=%d complete=%d default=%d mismatch=%d\n",
++			       want, (ok["Q"] > 0), (ok["D"] > 0),
++			       (ok["C"] > 0), (dflt > 0), bad
++		}' "$TMPDIR/fmt" "$TMPDIR/default"
++	done
++
++	# Plug and unplug events have no bio, so they must not carry an ioprio.
++	awk '$1 ~ /^(P|U|UT)$/ && $3 != "-" { n++ }
++	     END { printf "plug/unplug events with ioprio: %d\n", n }' \
++		"$TMPDIR/fmt"
 +
 +	_exit_null_blk
 +
 +	echo "Test complete"
 +}
-diff --git a/tests/blktrace/003.out b/tests/blktrace/003.out
+diff --git a/tests/blktrace/004.out b/tests/blktrace/004.out
 new file mode 100644
-index 0000000..5fa47cd
+index 0000000..1b36040
 --- /dev/null
-+++ b/tests/blktrace/003.out
-@@ -0,0 +1,8 @@
-+Running blktrace/003
-+v1: 0
-+v2 no flags: 0
-+v2 ioprio: 0
-+v2 unknown flag: -22
-+v2 ioprio + unknown flag: -22
-+v2 all unknown flags: -22
++++ b/tests/blktrace/004.out
+@@ -0,0 +1,13 @@
++Running blktrace/004
++be,0,4: queue=1 issue=1 complete=1 default=1 mismatch=0
++be,1,4: queue=1 issue=1 complete=1 default=1 mismatch=0
++be,2,4: queue=1 issue=1 complete=1 default=1 mismatch=0
++be,3,4: queue=1 issue=1 complete=1 default=1 mismatch=0
++be,4,4: queue=1 issue=1 complete=1 default=1 mismatch=0
++be,5,4: queue=1 issue=1 complete=1 default=1 mismatch=0
++be,6,4: queue=1 issue=1 complete=1 default=1 mismatch=0
++be,7,4: queue=1 issue=1 complete=1 default=1 mismatch=0
++rt,3,1: queue=1 issue=1 complete=1 default=1 mismatch=0
++idle,2,0: queue=1 issue=1 complete=1 default=1 mismatch=0
++plug/unplug events with ioprio: 0
 +Test complete
 diff --git a/tests/blktrace/rc b/tests/blktrace/rc
-index 04c599f..5b521ab 100644
+index 5b521ab..de61e13 100644
 --- a/tests/blktrace/rc
 +++ b/tests/blktrace/rc
-@@ -11,3 +11,29 @@ group_requires() {
- 	_have_blktrace
- 	_have_program blkparse
+@@ -37,3 +37,73 @@ _require_blktrace_ioprio_kernel() {
+ 	fi
+ 	return 0
  }
 +
-+# blk_user_trace_setup2.flags bit requesting I/O priority recording.
-+BLKTRACE_FLAG_IOPRIO=$((1 << 0))
++# Start blktrace in the background on whole disk $1, writing to
++# "$TMPDIR/$2.blktrace.*". The remaining arguments are passed to blktrace.
++# Returns once the trace is running.
++_blktrace_start() {
++	local dev=$1 name=$2 debugfs_dir i
++	shift 2
 +
-+# Check that the blktrace user space tools support I/O priority tracing.
-+_have_blktrace_ioprio_userspace() {
-+	if ! blktrace 2>&1 | grep -q -- '--ioprio'; then
-+		SKIP_REASONS+=("blktrace does not support --ioprio")
-+		return 1
-+	fi
-+	return 0
++	debugfs_dir=/sys/kernel/debug/block/$(basename "$(realpath "$dev")")
++	blktrace -d "$dev" -D "$TMPDIR" -o "$name" "$@" >> "$FULL" 2>&1 &
++	BLKTRACE_PID=$!
++
++	for ((i = 0; i < 100; i++)); do
++		if ! kill -0 "$BLKTRACE_PID" 2>/dev/null; then
++			wait "$BLKTRACE_PID"
++			echo "blktrace $* failed to start ($?)"
++			unset BLKTRACE_PID
++			return 1
++		fi
++		if compgen -G "${debugfs_dir}/trace[0-9]*" > /dev/null; then
++			# Give blktrace time to issue BLKTRACESTART.
++			sleep 0.5
++			return 0
++		fi
++		sleep 0.1
++	done
++
++	echo "timed out waiting for blktrace to start"
++	_blktrace_stop
++	return 1
 +}
 +
-+# Check that the kernel accepts BLKTRACE_FLAG_IOPRIO for BLKTRACESETUP2 on
-+# block device $1. This needs an existing device, so call it from test() or
-+# test_device().
-+_require_blktrace_ioprio_kernel() {
-+	local ret
-+
-+	ret=$("$SRCDIR/blktrace-setup" "$1" v2 "$BLKTRACE_FLAG_IOPRIO")
-+	if [[ "$ret" != 0 ]]; then
-+		SKIP_REASONS+=("kernel does not support BLKTRACE_FLAG_IOPRIO (${ret})")
-+		return 1
++_blktrace_stop() {
++	if [[ -n "$BLKTRACE_PID" ]]; then
++		kill -INT "$BLKTRACE_PID" 2>/dev/null
++		wait "$BLKTRACE_PID" 2>/dev/null
++		unset BLKTRACE_PID
 +	fi
-+	return 0
++}
++
++# Run blkparse quietly on trace $1 in $TMPDIR. Remaining arguments are passed
++# to blkparse.
++_blkparse() {
++	local name=$1
++	shift
++
++	blkparse -q -D "$TMPDIR" -i "$name" "$@" 2>> "$FULL"
++}
++
++# Run a small direct read job with I/O priority $2 (class), $3 (level) and
++# $4 (hint) on $1, starting at MiB offset $5. Remaining arguments are passed to
++# fio. The resulting ioprio is printed by the kernel and blkparse as the token
++# "class,hint,level".
++_ioprio_read_job() {
++	local dev=$1 class=$2 level=$3 hint=$4 offset_mb=$5 prioclass
++	shift 5
++
++	case "$class" in
++	rt) prioclass=1 ;;
++	be) prioclass=2 ;;
++	idle) prioclass=3 ;;
++	*) echo "bad class $class"; return 1 ;;
++	esac
++
++	fio --name="ioprio-${class}-${level}-${hint}" --filename="$dev" \
++		--rw=read --bs=4k --size=64k --offset="${offset_mb}M" \
++		--direct=1 --ioengine=psync --numjobs=1 \
++		--prioclass="$prioclass" --prio="$level" --priohint="$hint" \
++		"$@" >> "$FULL" 2>&1
 +}
 -- 
 2.56.1
