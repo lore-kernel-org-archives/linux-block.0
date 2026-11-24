@@ -1,55 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.171
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795504842;
-	b=m5iF0jBxLeJqjoh6QH7dESnLaRAHV4knxzhjMtxxRf/SilcX7Ct+fCZm1GavKCgiK/y2
-	 7G0NlHR8NtAye/RAYyYS2vAdGH2m+FJHUYOUlKj9sMMRNI4E+/TuW7PtTVEk6ZuIiKcLw
-	 ORE7cvzmOPyw2TdCPAGFp86PdTkiNRBxIF+73Vr4plQtXgr7eqF/CU5UWT8m/687vAG+6
-	 ng7HeK7kRGutwQvNzxCFWKYRvuRae+2/UWl2r7hoT0AQ9EaB+pC83/30JusIyxQ6xj1xh
-	 L5Ufm5rsMBRCuYRfXiuhJvjF4tb0kxwpnuyMM5lpHlE4Vn5wr0OemehoifeUCfCO+9Q==
+	t=1795505324;
+	b=dOF5nlHnpLv4pp2tKOv50tHnfRUI0nVIxZeQ9a6hwhufnkYc38Ceh1sMbcOvuwODdXTp
+	 0BbMXUgQ3ZPsh0/mHsqMa4lXMlPQ8/gZuTVMLzDafEqTJ4s/nSRqh1p0BFR8HV9kj8wR6
+	 rsZWE6pgFoF/78Nm1KNy+2heUELd37zZx/j1deTjFGmYaOkgtrOr1W45FZniMLqb6eMKw
+	 MycpM4HvHoiSL52m7U2bWXG2Tz0Gj0hgV+s72qnsl4uh2a7m9jq2Ule61F8SzavitTNM3
+	 NpG2BSq577/myUA70Krwiv3i4MoHdCy1Twj1Y7iujnaYiXTxHcCjgcCrbL2cdXC1dNg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795504842;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:MIME-Version:Date:From:
-	 To:Cc:Subject:In-Reply-To:References:Message-ID:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=tHvSxvXCf5VkLnPhHQoHOjXTPcUMHCtMx3XeIE3rH08=;
-	b=CMmrFcUVPjU9bxY4WHHAOtbXXDdW0p5HYrRvF+eezRVpQv7Fy0o//9M8MqI/uGbdwWrm
-	 Ap7exqDdjudKZqGWcTRJmwBzo9PfUNBXMFow99LyrItvcztuxgFcKom0P+IzoVhj5RZjt
-	 Dbre2HgS11vmUB+Bse06QbIEWcUqJy3LkakejDnHaZGEcFlDfnsd0rlWgqvuemQaHkFP5
-	 iHdU7zNgzOab8xoKxHz2sW9usDB1rxsIG8vEYcOnSQjJ4nL2xdNdY583cEuR+gpH8ja5X
-	 9LBXVbGN99Ph9BsJRXFxVhrsxUYNhxpLngazUA3H3n3nYjrb1yNf/iPgK5ge2AP9Wsw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795505324;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=WtLZKv4PnV43ule2KMeNIz98TT04uu2TzULijbQvMnI=;
+	b=bj4JJ0APc6lV0Cuss53z/CmRmB25yT6HFTxdkZiekoWWo03AvUOmWurUNaFD9tj7Si0h
+	 X8MFdYf327u6oJPzMNZL43zYX94iJ0NqvRNjG4T+7S0GlguoVDKJvPoawUmvj3ESWTVxM
+	 aJVW/XyAok19L30TfHCNTI1TsKLZdozpOblwGT117arfw8DY2hDQveQBg55om6a4NYwVC
+	 OJZsQDyfW/6vyhc6BmQwfUW52SufBEn38JLxUHPTt8kGvDR6u3LQvs+3qA1yKG6oo9D/4
+	 Q5t6e8uFLA0+MvWFKVxu2m7z1elq/bOiP34OoGFT/i58gbFQ37DSCyuXCcAUg9+Xq6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=posteo.de;
-	spf=pass smtp.mailfrom=posteo.de;
-	dkim=pass header.d=posteo.de header.i=@posteo.de header.a=rsa-sha256 header.s=1984.8680eb header.b=CsoC5hck;
-	arc=none smtp.remote-ip=185.67.36.66
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=QuSDH9g0;
+	arc=none smtp.remote-ip=74.125.82.171
+Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D47606A32A
-	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 07:20:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7D47606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351B7606A321
+	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 07:28:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 351B7606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.a=rsa-sha256 header.s=1984.8680eb header.b=CsoC5hck
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id E8578240103
-	for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 08:20:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.de;
-	s=1984.8680eb; t=1795504839;
-	bh=tHvSxvXCf5VkLnPhHQoHOjXTPcUMHCtMx3XeIE3rH08=;
-	h=MIME-Version:Date:From:To:Cc:Subject:Message-ID:Content-Type:
-	 Content-Transfer-Encoding:From;
-	b=CsoC5hcktA08PIURAy8uvdKnj1gYgr5vDUKTQma8mgYzRrKQ38bWNDlB8LJ97gi4w
-	 rK3727e8WOkEgU7XgZnOg5EMSySyOKmfVb+C061+W1AJ1wOCmg57Pf/VPG0Nu5uKCS
-	 fvlhYRQ5MLZBJbHORM3Jd6++PHSsXpnqSBCX6D8BqSn4lhRIfkJtynDJ/B2akwqWFQ
-	 P0ojy/ceRnTi8T7tf0dZOtuJJ3dh1xCbAQb7HN6/Iw+TgDU6Ixqwm87X5HSYG+0jnM
-	 GhsAsP7OioCl6JweO0wkLN68Xr2dqc4pvyorANu2ykPcgwb4lF9xBJ9uAkxoDu1Wtj
-	 iHKlpdzmsrTCQ==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4jYZ3B1gqXz6tsb;
-	Tue, 24 Nov 2026 08:20:38 +0100 (CET)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=QuSDH9g0
+Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-33bf40b0c8bso9050959eec.0
+        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2026 23:28:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1795505323; x=1796110123; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=WtLZKv4PnV43ule2KMeNIz98TT04uu2TzULijbQvMnI=;
+        b=QuSDH9g0Yf1FWzuIb52bLRWBfPmSOfshu7ZDI9PbEK461SZrYtGMFyFm5hVWhm7E89
+         UdhFa9srtOTK43Nzl1sJG4bkO5u6bEgjqvpbmV1GjahzECGTMrJDfU9zrxJNtOjrVzuj
+         X3wMQHhQJBg/YbyZVdFuLz18WgrhRrqez6gBQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795505323; x=1796110123;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=WtLZKv4PnV43ule2KMeNIz98TT04uu2TzULijbQvMnI=;
+        b=yWILtdmxEYOtHZFLNE+HOlS5ya7eTEfQ5vJBcxI5qq0lppRwijtwcncd+9KCLetsgp
+         15tY9r8KER/gOvG+Dx9U4F1ox7OyNjztJRc3B4VFDGLlGEC+CAz6gnBK6iXwYxhD6I3r
+         dI/aT0tBvwcFi0O1WQDxO6GfdfKxls1IdKxwhtlUTYwaj14LxPeL+tuXmvVIwYh+z2c0
+         9iSA9OEdbRYOybSDLqK47HbDVoU/qeI2Oy6a5FVlnQaeUCQKpMly3kJDSOOgxFnN4kAN
+         +Pri9sxvG6fdug78sypPVlAWdhpl3Mps/+KCpXvQqj1/Ji3fV5vekg4FnmmTt/zeCH+T
+         r8xg==
+X-Forwarded-Encrypted: i=1; AL+hErHnpHrwFCPGQbyKDGNkmiTwuJ3BoSEh3DPMEq3dX+to8l8Xgzp1sJ3Od8G8j9P0cjp0MXJfRiPWAqvS1A==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9XPPz2r3aAVn8u5K2lT4wyvvXe5bDSjY545h1q5emNL4kyiL2l
+	NvJKQtPa/6DCoOX+pl/iYi9SEgPN04nykDMReWh8ixV8dCorzawgx3J02TTWAva98g==
+X-Gm-Gg: AZFdTZcbLXke9M2HhezbhnB538uorq44DOzeAqExReVhAekq2r+Knu3HWXKxLFhNLIi
+	7ruA2HbNK+Bjo0sNXaeHiEPHy0k+h4mVguEPuRbpvoW7w6O9Bq595yowYL6431tLaPPjQQrDOvN
+	49FmP9CVmJAE0rq+eGnAmuHcO5VlDrMbU5wngvLTJERysGQQmydub3Ge6uS6FyYFAM64AmR1N1v
+	GkhVVo02X+cmMvRayTpLed1j2qybn3++m3tSWIga0PrqJSPCp2LiYEJDBy00+dfRNAiUyNDou0B
+	1pt1HbNr6LNCcQoQXOiw93YTyWta82nmUWNavRcdyppbHOSM1G6tkh8Tmun+wmhF4rQaE2r5pTB
+	6blzUGnEpy5zm04huYYn65DkTrr2+oqIyZl4rORQ51SRPmz5lpfglcpJ6G4q0+FM7hHpuI2iXdV
+	Fat2kcjwCkB1HgOoI1xPXP2MI0Ak7h0a7lrE0M+NENQ7y3xtaJSKgERtIkMKXKMxildwYtX2xIH
+	dD5Yj8iejl6Jd/qgD3VS8en8xL3BY/7YJNDK2uWpiagmO8Wa/ZnKP+jSR6P7e0ZBcWPgDP2CnXt
+	N1bkCY4TosHe2wfDkpZ1VjpZJJ2p8frL2EA3pULrnaBILLeN107qS5UceebwGNaaY1Sg/jcdvLf
+	6yC1X8tEHmskU+ac=
+X-Received: by 2002:a05:693c:8083:b0:376:6530:248f with SMTP id 5a478bee46e88-38570a3717dmr16522843eec.24.1795505323304;
+        Mon, 23 Nov 2026 23:28:43 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:d159:d585:9ced:38ba])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-38567daaf70sm44118149eec.28.2026.11.23.23.28.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 23:28:42 -0800 (PST)
+Date: Tue, 24 Nov 2026 16:28:39 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Xueyuan Chen <xueyuan.chen21@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Nhat Pham <nphamcs@gmail.com>, Yosry Ahmed <yosry@kernel.org>
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH RFC 2/3] lib/lz4: add safe decompression from two input
+ buffers
+Message-ID: <awU7nwcEVC20uGMi@google.com>
+References: <20261122-zram-split-decomp-mm-rfc-v1-0-4e69b08c0fed@gmail.com>
+ <20261122-zram-split-decomp-mm-rfc-v1-2-4e69b08c0fed@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,105 +98,239 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Date: Tue, 24 Nov 2026 07:20:39 +0000
-From: Tobias Laas <tobias.laas@posteo.de>
-To: Niklas Cassel <cassel@kernel.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- regressions@lists.linux.dev, linux-block@vger.kernel.org,
- linux-ide@vger.kernel.org, iommu@lists.linux.dev,
- linux-kernel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>, Lu
- Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, Will
- Deacon <will@kernel.org>
-Subject: Re: [REGRESSION] DMAR fault by Intel H97 SATA controller since
- "block: Increase =?UTF-8?Q?BLK=5FDEF=5FMAX=5FSECTORS=5FCAP=22=20=28=36=2E?=
- =?UTF-8?Q?=31=37-rc=31=29?=
-In-Reply-To: <awSs5Cw3hFkf4O4T@ryzen>
-References: <5ad27a97aafbc08a8702d5b90d09cd59@posteo.de>
- <awSs5Cw3hFkf4O4T@ryzen>
-Message-ID: <572a3776f303846961d9897c55421a0e@posteo.de>
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261122-zram-split-decomp-mm-rfc-v1-2-4e69b08c0fed@gmail.com>
 
-Am 23.11.2026 22:15 schrieb Niklas Cassel:
-> Hello Tobias,
-> 
-> On Mon, Nov 23, 2026 at 06:51:03PM +0000, Tobias Laas wrote:
->> One way forward could be to a new entry to __ata_dev_max_sec_quirks
->> similarly to the recent commit 
->> a12cc63129380a5364e787d92b30a3257f66c250
->> ("ata: libata-core: Add max sector quirk to INTEL SSDSCKKB240G8"). 
->> However,
->> I wonder, whether that would fix the underlying issue or rather be a
->> workaround, because 4088 does not fit the pattern of all other 
->> entries,
->> which specify either a power of 2 or a power of 2 minus 1.
-> 
-> Your attached kernel log shows that you have a
-> Samsung SSD 860 PRO 1TB, FW: RVM02B6Q
-> 
-> This SSD is probably quite common, so I somewhat doubt that it is the
-> SSD that is at fault here.
-Hello Niklas,
+Let me Cc Herbert and zswap folks on this.  Herbert mentioned previously
+(back in the days when we landed SG-list based zsmalloc object read API)
+that lz4 can be extended to support spanning zsmalloc objects and, if this
+lands, then zswap may also be interested in adopting it (along with zram).
 
-thanks for the the quick reply. Indeed the Samsung SSD 860 PRO series is 
-quite common.
+On (26/11/22 01:09), Xueyuan Chen wrote:
+> LZ4_decompress_generic() assumes contiguous input. Its wide literal
+> loads can cross the boundary between independently mapped fragments.
 > 
->> 
->> Furthermore, the first error messages are DMAR faults, and a SATA SSD 
->> that
->> isn't functioning properly shouldn't cause any DMAR faults, because 
->> the SATA
->> controller should never read from or write to areas outside its memory
->> region.
->> Since the issue with mounting the rootfs disappears with 
->> intel_iommu=off, I
->> wonder, whether there is a limitation on the maxmium block size either 
->> by
->> the hardware or from the configuration of the IOMMU and SATA 
->> controller by
->> the kernel.
+> Add a dictionary-free block decoder that reads from two buffers and
+> handles literals, lengths and offsets that cross the split.
 > 
-> Considering how common your SSD is, my guess is that it is somehow an
-> IOMMU or a BIOS/ACPI bug (since the BIOS generates specific ACPI tables 
-> -
-> DMAR on Intel).
+> Signed-off-by: Xueyuan Chen <xueyuan.chen21@gmail.com>
+> ---
+>  include/linux/lz4.h      |  18 ++++++
+>  lib/lz4/lz4_decompress.c | 163 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 181 insertions(+)
 > 
+> diff --git a/include/linux/lz4.h b/include/linux/lz4.h
+> index ad6042a718b5..3b6217bd9a9b 100644
+> --- a/include/linux/lz4.h
+> +++ b/include/linux/lz4.h
+> @@ -292,6 +292,24 @@ int LZ4_decompress_fast(const char *source, char *dest, int originalSize);
+>  int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
+>  	int maxDecompressedSize);
+>  
+> +/**
+> + * LZ4_decompress_safe_split() - Decode a single block from two buffers
+> + * @first: address of the first input fragment
+> + * @first_len: bytes in the first input fragment
+> + * @second: address of the second input fragment
+> + * @second_len: bytes in the second input fragment
+> + * @dst: output buffer, disjoint from the input buffers
+> + * @capacity: bytes available in the output buffer
+> + *
+> + * The fragments, in order, contain one dictionary-free LZ4 block.
+> + * Their addresses need not be adjacent. An empty fragment may be NULL.
+> + *
+> + * Return: the decoded size, or -EINVAL on error.
+> + */
+> +int LZ4_decompress_safe_split(const u8 *first, size_t first_len,
+> +			      const u8 *second, size_t second_len,
+> +			      u8 *dst, int capacity);
+> +
+>  /**
+>   * LZ4_decompress_safe_partial() - Decompress a block of size 'compressedSize'
+>   *	at position 'source' into buffer 'dest'
+> diff --git a/lib/lz4/lz4_decompress.c b/lib/lz4/lz4_decompress.c
+> index 3a2cd9acada4..548197faa3e3 100644
+> --- a/lib/lz4/lz4_decompress.c
+> +++ b/lib/lz4/lz4_decompress.c
+> @@ -39,6 +39,11 @@
+>  #include <linux/kernel.h>
+>  #include <linux/unaligned.h>
+>  
+> +#ifndef STATIC
+> +#include <linux/errno.h>
+> +#include <linux/limits.h>
+> +#endif
+> +
+>  /*-*****************************
+>   *	Decompression functions
+>   *******************************/
+> @@ -705,6 +710,164 @@ int LZ4_decompress_fast_usingDict(const char *source, char *dest,
+>  }
+>  
+>  #ifndef STATIC
+> +struct lz4_split_input {
+> +	const u8 *first;
+> +	const u8 *second;
+> +	size_t split;
+> +	size_t size;
+> +	size_t pos;
+> +};
+> +
+> +static __always_inline size_t
+> +lz4_split_input_left(const struct lz4_split_input *in)
+> +{
+> +	return in->size - in->pos;
+> +}
+> +
+> +static __always_inline int lz4_split_get_byte(struct lz4_split_input *in)
+> +{
+> +	size_t pos = in->pos;
+> +
+> +	if (unlikely(pos == in->size))
+> +		return -1;
+> +	in->pos++;
+> +	if (pos < in->split)
+> +		return in->first[pos];
+> +	return in->second[pos - in->split];
+> +}
+> +
+> +/* The caller has checked that two bytes remain in the block. */
+> +static __always_inline int lz4_split_get_offset(struct lz4_split_input *in)
+> +{
+> +	size_t pos = in->pos;
+> +
+> +	in->pos += 2;
+> +	if (pos >= in->split)
+> +		return get_unaligned_le16(in->second + (pos - in->split));
+> +	if (in->split - pos >= 2)
+> +		return get_unaligned_le16(in->first + pos);
+> +	return in->first[pos] | (in->second[0] << 8);
+> +}
+> +
+> +static __always_inline bool
+> +lz4_split_copy_literals(struct lz4_split_input *in, u8 *dst, size_t len)
+> +{
+> +	size_t pos = in->pos;
+> +
+> +	if (unlikely(len > lz4_split_input_left(in)))
+> +		return false;
+> +	if (!len)
+> +		return true;
+> +	if (pos < in->split) {
+> +		size_t n = min(len, in->split - pos);
+> +
+> +		memcpy(dst, in->first + pos, n);
+> +		pos += n;
+> +		dst += n;
+> +		len -= n;
+> +	}
+> +	if (len)
+> +		memcpy(dst, in->second + (pos - in->split), len);
+> +	in->pos = pos + len;
+> +	return true;
+> +}
+> +
+> +/* The decoder has checked the lookbehind distance and output capacity. */
+> +static __always_inline void
+> +lz4_split_copy_match(u8 *dst, size_t distance, size_t len)
+> +{
+> +	size_t copied = min(distance, len);
+> +
+> +	if (distance == 1) {
+> +		memset(dst, dst[-1], len);
+> +		return;
+> +	}
+> +
+> +	memcpy(dst, dst - distance, copied);
+> +	/* Reuse the period already written, keeping each copy disjoint. */
+> +	while (len - copied > copied) {
+> +		memcpy(dst + copied, dst, copied);
+> +		copied *= 2;
+> +	}
+> +	if (copied < len)
+> +		memcpy(dst + copied, dst, len - copied);
+> +}
+> +
+> +static __always_inline int
+> +lz4_split_read_length(struct lz4_split_input *in, int length, int limit)
+> +{
+> +	int byte;
+> +
+> +	if (length > limit)
+> +		return -EINVAL;
+> +	if (length < RUN_MASK)
+> +		return length;
+> +
+> +	do {
+> +		byte = lz4_split_get_byte(in);
+> +		if (byte < 0 || byte > limit - length)
+> +			return -EINVAL;
+> +		length += byte;
+> +	} while (byte == 255);
+> +	return length;
+> +}
+> +
+> +int LZ4_decompress_safe_split(const u8 *first, size_t first_len,
+> +			      const u8 *second, size_t second_len,
+> +			      u8 *dst, int capacity)
+> +{
+> +	struct lz4_split_input in = {
+> +		.first = first,
+> +		.second = second,
+> +		.split = first_len,
+> +	};
+> +	int written = 0, min_last_literals = 0;
+> +
+> +	if (capacity < 0 || !dst || (!first && first_len) ||
+> +	    (!second && second_len) || first_len > SIZE_MAX - second_len)
+> +		return -EINVAL;
+> +	in.size = first_len + second_len;
+> +
+> +	for (;;) {
+> +		int token, literal, distance, match;
+> +
+> +		token = lz4_split_get_byte(&in);
+> +		if (token < 0)
+> +			return -EINVAL;
+> +		literal = lz4_split_read_length(&in, token >> ML_BITS,
+> +						capacity - written);
+> +		if (literal < 0 ||
+> +		    !lz4_split_copy_literals(&in, dst + written, literal))
+> +			return -EINVAL;
+> +		written += literal;
+> +		if (!lz4_split_input_left(&in))
+> +			return literal >= min_last_literals ? written : -EINVAL;
+> +
+> +		/* A match must leave room for the final literal sequence. */
+> +		if (lz4_split_input_left(&in) < 2 + 1 + LASTLITERALS ||
+> +		    capacity - written < MFLIMIT)
+> +			return -EINVAL;
+> +
+> +		distance = lz4_split_get_offset(&in);
+> +		if (!distance || distance > written)
+> +			return -EINVAL;
+> +		match = lz4_split_read_length(&in, token & ML_MASK,
+> +					      capacity - written - MINMATCH -
+> +					      LASTLITERALS);
+> +		if (match < 0)
+> +			return -EINVAL;
+> +		match += MINMATCH;
+> +		lz4_split_copy_match(dst + written, distance, match);
+> +		written += match;
+> +		/*
+> +		 * Leave at least LASTLITERALS bytes and end at least MFLIMIT
+> +		 * bytes past the start of the last match.
+> +		 */
+> +		min_last_literals = max(LASTLITERALS, MFLIMIT - match);
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(LZ4_decompress_safe_split);
+> +
+>  EXPORT_SYMBOL(LZ4_decompress_safe);
+>  EXPORT_SYMBOL(LZ4_decompress_safe_partial);
+>  EXPORT_SYMBOL(LZ4_decompress_fast);
 > 
-> We have seen similar reports here:
-> https://bugzilla.kernel.org/show_bug.cgi?id=220693
-> https://bugzilla.kernel.org/show_bug.cgi?id=221713
-Thanks for the pointer. The first report sounds as if it discusses 
-several issues. I agree with Ivan's comment at 
-https://bugzilla.kernel.org/show_bug.cgi?id=220693#c42 .
-
-I am afraid the second report is specific to HP server mainboards. In 
-contrast to the logs in the Debian bug report, I have never seen the 
-following error:
-DMAR: DRHD: handling fault status reg 2
-DMAR: [INTR-REMAP] Request device [01:00.0] fault index 0x1c [fault 
-reason 0x26] Blocked an interrupt request due to source-id verification 
-failure.
-On my mainboard, I have only observed DMAR errors with [fault reason 
-0x0c] non-zero reserved fields in PTE.
+> -- 
+> 2.47.3
 > 
-> Does it work if you 
-> revert:https://posteo.de/webmail/?_task=mail&_id=4553111306b0538dd90e75&_action=compose#
-> d373449d8e97 ("iommu/vt-d: Use the generic iommu page table") ?
-To be honest I built many kernel versions between the increase in 
-BLK_DEF_MAX_SECTORS_CAP (~ 6.17-rc1) and HEAD for the bisection, and 
-since the change you mention was not included until 6.19-rc1, I have 
-tested kernels with and without this change, so I doubt a revert would 
-help.
-
-Best regards,
-Tobias Laas
-> 
-> It would be nice if we could involve some Intel IOMMU experts.
-> 
-> If the ACPI DMAR is at fault, perhaps it is possible for the kernel to
-> patch the ACPI DMAR for your platform.
-> 
-> 
-> Kind regards,
-> Niklas
