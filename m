@@ -1,93 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795579097;
-	b=XToEdFw2pWLAl+RF/7sobmLuzvCfBve0Sy2kSfMwE8tVfdDLDImti4vvvuWHO2gNtmwY
-	 0TM/AtVFraNmXsf94jyIuVg+2Gd/zbbtw83Mzc2JAJCXAaY4lbCeTSWH9oh6yACftTBbT
-	 kIXgzEggC0rXFbGucZdtjxjCY7vbTBmkb5UNRawv0taWuzGykwFQ607tcNOZt1ymXmpuQ
-	 aK485aHsCKLS//UkSdsoA8lV9xJ+x7sUNoc6Cb2u5K5JRMvUFdMRwTUUBPEapTcw5zpk+
-	 CJuozUpJcgfqlTl19ttLaJGvv0L0qdJqgnmMed73BPnOTJDT8uDFwP1D802DobOxsIg==
+	t=1795582193;
+	b=LmL7X0V6EObkvcziQSwUDtx5SnTxD8mDgXaWfDxBwP4s2+P7NIsWE4K4moacl4n0bRx/
+	 4FEpkkhOCZCd4PWhWZcAx1wT0fPhpM3EIYhi6Ab9e9eYDQR5gYjkRkrjKJ/ZmRivwywSW
+	 5LtJLFJBx+1uHN8prLW+RMpujec+20UX8meWGEgIVHWmf/BxPLK7+C9yn0bheOhq125zv
+	 1mguiV1W3cRV0YYHMbjC5KYqLvVNURLI40LeULBo+ZNGoRiOUJXmDHYGs7o/QvU/+rNmV
+	 PGqBCzlD9eQc3KPXtHZdPpYH9t4VwyzOJNdPkN71gPTfn28PjkrpPEkv26l3IekGEEQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795579097;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=w2GcGq8IeDHEJo2hhv/gnTH7TQqHvIsjQUqf1AKZb4w=;
-	b=yPw3Wka3fcoBppwc2ot2DH7JzxvX8f77MOqh0xQDmIiRykM2Vh/X5Eiay7g8tBq0Dqr2
-	 qW6v/yRaemknB9Qi7fvFxn+zNY8aiu1XmjUJ1aAZkMPub0Vm754X3iiz1l0Xl1PLVWCyM
-	 UZ+T9uYM7B5b0fE+P8oOenmxWzI5WC0pztEF9t5BV6bSrI8dFQeE3KoCZJgZ2enFxIfcI
-	 AXU1aqxWc5XsDMUhKTlBC9ODEom0f/JHEdRpOIsBvCUS6KOj19scRu59mZs027VzHh3i0
-	 a3q8YiW0/ur+cvhELMsTZdWMcCht+VehgZOCaUI/FL4sJs4nmTPJWr4FCmBmsiGNJoA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795582193;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-SRS-Rewrite;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	b=iAtWl3ePut9bU4J1pXfBSYnkdXkYmaA4x+A+a8E8r4fph5r678Iw1+Y136HY8rF4xq/W
+	 m7sjb8iNqmpGLOK93RaloAVM+MWVthYj3DNP7dTO2b1p4YiAtGRoGmHiyAf2nAETDVHdB
+	 ybk7UBBSw7KgLwRDEXELAkVCgLFE9ppXNjauBF9joMiersj3cJEtdRrsmnl4lKwsiNWFU
+	 19UC8RQewvtcKZaUM4aJqmK0oYgTpxXUzzc9nYalv7fAEEl9XDybzGZ1Ycv601oZVvhff
+	 lqbm0eLEZ9cAXE6nOS1ppyPKtv9ecJ0OPi+mIfcte996Tlk/OmtTKTQciKfFJh9C2jQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b="F/1yAGIj";
-	arc=none smtp.remote-ip=209.85.214.172
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=DgWwtZIk;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44300606A323
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 03:58:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44300606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F288606A321;
+	Wed, 25 Nov 2026 04:49:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F288606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=F/1yAGIj
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2f0a0d1a1e5so13755405ad.0
-        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2026 19:58:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1795579096; x=1796183896; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=w2GcGq8IeDHEJo2hhv/gnTH7TQqHvIsjQUqf1AKZb4w=;
-        b=F/1yAGIj/vcfN7GxWSyHI5pxXFN0ejhz7qzfGjsqQHA2+2JR2IAaROcSBAfpzzzxWO
-         BN9JFLF/x8m6OSL6w/5Sm5s73ZacJ1/WVYaZz1NNVZndrqx3M3F12apLSAuTMOBOLF2Q
-         Y6k8pe6IEUHaGveiTj8UYrQXllDitfggHo3RQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795579096; x=1796183896;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=w2GcGq8IeDHEJo2hhv/gnTH7TQqHvIsjQUqf1AKZb4w=;
-        b=D8t/O0Pycn9PWgb6TJyEg6Llkn8YHWnpLSmoh+ZcQ7/tDwYDsnracpdsnC1bO4hJ4I
-         ASYyvinqudouD9id+Ig4LZI4t87ycqJveTOh+95qfxgy/vrHJMwOe5Hpy7R2QxrIX5kF
-         1A1qm35cE6wSoGx9vj6HviOTGZW003SG1pBl+4O/wlxlqktj+WTeII1zn3V9tP8SyQmX
-         ih6C1aTXnmF0fqn9LdpnkncqQUIfYZEOxedFOh+r8SiZl+ZyWhhk+Kdc4zraBQfd0Fzr
-         IDZso/5n7Nx2NN30HCweyR8Au1m2bTB2dhm/HRmsFSTgxa63XpTXiLY+kM+msqrFKPc0
-         Z2Cw==
-X-Forwarded-Encrypted: i=1; AL+hErHZBuBrjkcmcERj5GkXsF3htlY6hcDPu2N2HqzeFPbyFe0NaU8WbFhD7N0SHBteQBtuzT7rQ/r3BAHuhw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z83kD8Fd1AoTHLfUJ0XobvXUmv5cvHfqq4dDzwNFsoPGBCUZwVC
-	mNcKWUEYINyaCNIaBIuS5wOmVwlJn8gj3wUzPjZXAyBdG6KAlMaqValLiwfyA0Mz3A==
-X-Gm-Gg: AZFdTZcpBOoLv/6TMl0WBSEjPylz3Nqc98xkLNrMLPwoJ+bE2JNuKAl4E0ja9GrD2T5
-	p/JZXpjXxPQ4nhuUbKqHagLmI1OkCYFwRjcqPAVZ+6xJRkjYcHtjw0miuk5j00ov+05x+jkj0sg
-	rup3NyPjIdpt/gZu+yQi2g/fRORHQtiUQNV3kzqYe9JLIly0WM5SyFtXJa+Bf1dvp/lAn5AO7sf
-	Od9IXhlVc2PV3vHIBMJQlrdfILnSAK4Rx1QH1tBNbXWE/2YNab6Wmi85iD3wIB8HH9WlkrkOcZK
-	NAkNm1nd1B607zII2+5UOjHkFgoN+dUwA5lDzEoXBci3oRE2kjmDfLcZufQXiIgudB8YABM0Npe
-	h1jm55fiqzT+5amX7sXwmoPq5CAu/elG0E4elmJA/+0KVv4eBaz7WI6ZORaJRTkAbLgZhN9NduL
-	h2kftNlskKyZKrMTuYztqXxCvgoHjyMBGEe6TbuRoerEZb18m+mJfeFzZY4PW/vv/oBEd2FUdbB
-	HjJ1rSGxzJZzZdpIpxMFOVQM7sMkaJdCI3ktYQ2u2/IPJa8q/wqpRe+NUIPU1xnJd2vSEDhvIJj
-	ctabFTit7h8JPdZHOnsQXN1fiissT1UWvEB/6YhTGnY79Q/SVK8kGaILAU21Kd6ElstiuA==
-X-Received: by 2002:a17:903:2984:b0:2ed:e22b:77a2 with SMTP id d9443c01a7336-2f03f1ea587mr159665435ad.55.1795579093844;
-        Tue, 24 Nov 2026 19:58:13 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:46fc:328c:bd84:94eb])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f0c2ad2sm77813365ad.16.2026.11.24.19.58.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 19:58:13 -0800 (PST)
-Date: Wed, 25 Nov 2026 12:58:09 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Nhat Pham <nphamcs@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry@kernel.org>, 
-	Hongfeng Chen <hongfengchen@xiaomi.com>, Brian Geffon <bgeffon@google.com>, 
-	Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-mm@kvack.org
-Subject: Re: [PATCH v2 1/2] zsmalloc: free a zspage's pages in one batch
-Message-ID: <awZcfYOQXpYLcZSp@google.com>
-References: <a74aca7a3d27333972782b29786c7b33861a56f1.1795412161.git.senozhatsky@chromium.org>
- <CAKEwX=MJJVBfdE+LL-j+jwfkNP=OHaV21XLJxEOBv4XwsBLiiw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=DgWwtZIk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=DgWwtZIkxXh00d969uwVXzoHd9
+	JoQkoJFiq4O0/UDxwr9g0zMMprh/TVd1AMAJwL0a0oVcbLUf3cvPNG1ZrkdwQ13u02HtsxGVUmM0N
+	jab8ve9ssoT6ccDWpHjBc1MBYuvrSxAv8Ajtc8BnpmdhQ6tItqF5V/jTsUqnRdRtgD6UZDuFLjVox
+	WKg4TX57mgr2Dx0fSr+nhivnbvL8m6396QHWt7by98dKNua1aDx4EwX2MYOSufNraeyjWMz3pTums
+	jRqAANaj2n29DgKxHp1Dk/DjAXJoPKGNXZ2lg35/82t0u9dcHac8tDnFe1VsVmcL4RuEWOOhj+u58
+	fNTrPfwQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xW4wz-00000008QFb-3lfR;
+	Wed, 25 Nov 2026 04:49:45 +0000
+Date: Tue, 24 Nov 2026 20:49:45 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] block/t10-pi: deduplicate
+ blk_reftag_remap_{prepare,complete}()
+Message-ID: <awZo6f_htvceejen@infradead.org>
+References: <20261121042743.1139584-1-csander@purestorage.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -99,20 +67,9 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKEwX=MJJVBfdE+LL-j+jwfkNP=OHaV21XLJxEOBv4XwsBLiiw@mail.gmail.com>
+In-Reply-To: <20261121042743.1139584-1-csander@purestorage.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On (26/11/24 16:16), Nhat Pham wrote:
-[..]
-> [...]
-> 
-> > ---
-> > +       zpdesc = get_first_zpdesc(zspage);
-> > +       if (get_next_zpdesc(zpdesc)) {
-> > +               free_page_chain(zpdesc);
-> > +       } else {
-> > +               /* Single-page zspage, e.g. a huge object: nothing to batch */
-> 
-> I wonder if it's worth keeping the old logic for incompressible case.
+Looks good:
 
-It does appear to be worth it, it's visible in profiles.  Batching comes
-as a win for multi-page zspages.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
