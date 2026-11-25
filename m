@@ -1,143 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.33
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587252;
-	b=ewHlSMP8rpLkWIDVpUu41zVc6v846CBULUzYbDWL5lgRx7JME+UPXSC9h7OJgI5uOe6o
-	 zw8bWzmquWmjXhxbNSG54VNa7+3CQLVhpGRsRQoBlSdBhg6wJjO86d7/hEDMAG61GXm4E
-	 rXy/Xmr1i2daMHBgj1bQG53juSDuBJPxDUKuWDb1ydTD0eUCqESGD/hxPWZAqlDwS+A7G
-	 I6WI7BPjtWWkCMaaWwnkTqWgvH7MW1ovnDwEGxBmmfcHzbWCWuFiqPWdFDRx2D2z0JbIg
-	 xqqc9/ItCuDetehAUUyEEazeanAX/2Tc0Rm4wM38wSWMGaY1YkGdMLxH7VELnQxMftg==
+	t=1795589616;
+	b=SZlllH9tDJwTIAjpRAEUtplCoxO8TTTsa8DzDdvBo15lcPjkG3C2Y6gOlClyMEla2o/J
+	 u/CJYWrkH8ctSJ7sxYqXoZwgVoH6MTyw8hWAkdxPMTHxsEitNFKEINHsXS6fA6vqAcbCp
+	 i71yuhOqNnFwTE+XpmZB9bczbW1NDqyz6/ikii6fBgblnnCPo3L+PkPjVGNFIAe+aY9gZ
+	 RbDH4rH1LBvWSRY2WXjuPDnyhhr2DBUDL1+D/zY9dfOvVB9l3yPfJHT7BNKremBCpk3wL
+	 +dtKMxQ7tOdn3u8Eo0WgKQ89tcRC40sYzMgRCtC9FJqU8v+IqR5w79yVm2cOAZ3WQ7w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587252;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=nH1JDKUpxZKr2E7xywv7sSC/lG5A4nxPxWDHndTmH+U=;
-	b=hUhEEe/BfZ5BXebxZ3LAwfTmiEjluT69SppI5QVfVblHOxk88Kodfewj3MaGdqcKs03T
-	 mkhZpRKKAfCQaYxsNXTj+bfW6j1ij8UoIu2tEDxGo8O+sM/rIp5J3OHgcvO2TRCGI7RKF
-	 DbwomOpyLkM2ULZRD1y/+belpPDmBhTO01Y44XYoNmH0h08JPhm3+0LiYnDzzcQhIOj9N
-	 F4VFnSuiEz4vtWLsTlHuu1NT96oftX7pZu5p041qm3Ky+L0TK2SPa72rGR8EMjLPYYu39
-	 7mvQF41r1fbgBxZ3N3heLL19aL5g4pvZci/jyOOTyL5Hb2ix/QcdWE347c22d/HJQww==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795589616;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
+	 Mime-Version:Subject:Reply-To:Sender:From:To:CC:X-Priority:
+	 X-Content-Kind-Code:In-Reply-To:X-CPGS-Detection:X-Drm-Type:
+	 X-Msg-Generator:X-Msg-Type:X-Reply-Demand:Message-ID:Date:
+	 X-CMS-MailID:Content-Transfer-Encoding:Content-Type:X-Sendblock-Type:
+	 CMS-TYPE:cpgsPolicy:X-CFilter-Loop:X-CMS-RootMailID:References;
+	bh=GvHylzyoegywHLUbpb97lAiOTzRqA3xdB9sXNXo5lVc=;
+	b=pjQ0Cdu9iWeLj5ochQrYnaxQpr4bmzhVBRwm7r4CgGMsp++E9FSSRVxrWb2lWotHuE7m
+	 ZqOhUPoEi98w8XMGfZORGSbxHS/54Kz7xd194De2RIor01bACXuUexc5mhtT2r00w5u0z
+	 JaiEShSDmeHM+A4XMENwmBticAA22H8Bf52xKrvdyKhyGW+/uOBolxoAHJ1SsRSWW820K
+	 mp0H4MOaVipQPYe9zFfrVyFLzQh+JqW3VhAG5xNN0i6J71Rx/iJfcc1LycPLTXF7inj6K
+	 JzAsJmYuIMeXRmJLi6qNgDIedmo/YbvwdlZXH+RQ1MPWdXYoGo2yNoTLJGjNr7Z5egg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=OQ10UQlo;
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=samsung.com;
+	spf=pass smtp.mailfrom=samsung.com;
+	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=R492tAS9;
+	arc=none smtp.remote-ip=203.254.224.33
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC72606E94B;
-	Wed, 25 Nov 2026 06:14:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2FC72606E94B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE59606A335
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 06:53:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9DE59606A335
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=OQ10UQlo
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:
-	To:From:Sender:Reply-To:Content-ID:Content-Description;
-	bh=nH1JDKUpxZKr2E7xywv7sSC/lG5A4nxPxWDHndTmH+U=; b=OQ10UQlojOOElMejsET63HIbzZ
-	3DHzvbtYIGqi3qtZVmlnOiTGbSwjJaXCrsDgpHInm2eUGr8Xc79IeDQYDrtJVitNB0FwJZCPO4B8q
-	+iOBeVWlbGzBejGX44u6FBx6jMlOzwnzs0/RPybD92JWe+ZEhd2F0VZXPfoSXXKlqmHkpJj3BYeff
-	PI7xG81lPzaQFyumhKdnS4tNxkr8IW9Cdx3c7fbkK4m5X/Zh5Rgxrc0VYPw9ZDhRuFltHqM60uFWP
-	hZDBs8jxgJq594XvPuA6d95qyJlYfVavjeq76w/EreE8GdBtyeqVTX0Sp6D1XhKyU0S94iu4liry5
-	Ut1LqIcw==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xW6Gh-00000008Wvh-0GYM;
-	Wed, 25 Nov 2026 06:14:11 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-doc@vger.kernel.org,
-	David Hildenbrand <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	linux-mm@kvack.org,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	linux-sound@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowangio@gmail.com>,
-	David Heidelberg <david@ixit.cz>,
-	oe-linux-nfc@lists.linux.dev,
-	Chas Williams <3chas3@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Helge Deller <deller@gmx.de>,
-	linux-fbdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	MPT-FusionLinux.pdl@broadcom.com,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <mkp@kernel.org>,
-	linux-scsi@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	linux-mtd@lists.infradead.org,
-	Neill Kapron <nkapron@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-usb@vger.kernel.org,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	xen-devel@lists.xenproject.org,
-	Hans de Goede <hansg@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	linux-ext4@vger.kernel.org,
-	Mike Marshall <hubcap@omnibond.com>,
-	devel@lists.orangefs.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Benson Leung <bleung@chromium.org>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	amd-gfx@lists.freedesktop.org,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	intel-gfx@lists.freedesktop.org,
-	Matthew Brost <matthew.brost@intel.com>,
-	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-xe@lists.freedesktop.org
-Subject: [PATCH v3 12/12] docs: ioctl-number: update DRM entries
-Date: Tue, 24 Nov 2026 22:13:39 -0800
-Message-ID: <20261125061340.3402300-13-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261125061340.3402300-1-rdunlap@infradead.org>
-References: <20261125061340.3402300-1-rdunlap@infradead.org>
+	dkim=pass (1024-bit key, unprotected) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=R492tAS9
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20261125065333epoutp036a35d72334997def1ab58155ea8dcb0d~rNz10CO9v0698806988epoutp03F
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 06:53:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20261125065333epoutp036a35d72334997def1ab58155ea8dcb0d~rNz10CO9v0698806988epoutp03F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1795589613;
+	bh=GvHylzyoegywHLUbpb97lAiOTzRqA3xdB9sXNXo5lVc=;
+	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+	b=R492tAS9yfXXci4C+6kyBivteQf/dj0qehGEKEGrU9ZAcX6HXckPk047sZlotmPDp
+	 jx7RxhjmAi9AHytUG8nDAxAmy7jSb0O5ZWmyi33zrI0/57/zW6eXvg6e3ryIS8y+w4
+	 1if3ug2YjfxpgO/go9A2SrRdGQzKuj5J6mRnlbsA=
+Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
+	epcas2p3.samsung.com (KnoxPortal) with ESMTPS id
+	20261125065333epcas2p32e62833f901046cffe29825525ac7527~rNz1gQ50P0744907449epcas2p3F;
+	Wed, 25 Nov 2026 06:53:33 +0000 (GMT)
+Received: from epcas2p1.samsung.com (unknown [182.195.38.204]) by
+	epsnrtp04.localdomain (Postfix) with ESMTP id 4jZ9PS6nFqz6B9m6; Wed, 25 Nov
+	2026 06:53:32 +0000 (GMT)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -146,67 +61,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Subject: RE(2): [PATCH] blk-mq: scope the no-sleep requirement in
+ blk_mq_alloc_request_hctx()
+Reply-To: hmi.jeon@samsung.com
+Sender: =?UTF-8?B?7KCE66+87Iud?= <hmi.jeon@samsung.com>
+From: =?UTF-8?B?7KCE66+87Iud?= <hmi.jeon@samsung.com>
+To: Christoph Hellwig <hch@infradead.org>
+CC: "axboe@kernel.dk" <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, =?UTF-8?B?7KCE66+87Iud?=
+	<hmi.jeon@samsung.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <awZqQEp3W5Ewp45T@infradead.org>
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20261125065332epcms2p4e172702703233beeab6a683dd69676f2@epcms2p4>
+Date: Wed, 25 Nov 2026 15:53:32 +0900
+X-CMS-MailID: 20261125065332epcms2p4e172702703233beeab6a683dd69676f2
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+cpgsPolicy: CPGSC10-223,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20261124002518epcms2p847d3246dc989469f326f7a2b47f2f950
+References: <awZqQEp3W5Ewp45T@infradead.org>
+	<20261124002518epcms2p847d3246dc989469f326f7a2b47f2f950@epcms2p8>
+	<CGME20261124002518epcms2p847d3246dc989469f326f7a2b47f2f950@epcms2p4>
 
-Update the list of files where DRM ioctls are defined.
+On Wed, 25 Nov 2026 at 13:55 +0900, Christoph Hellwig wrote:
+> This commit messages reiterates in annoying detail what the change does,
+> which is mostly obvious from the code.  It entirely fails to explain
+> why you want to make this change.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-v2: no change
-v3: rebase
-
-[Since having multiple maintainers trying to merge these would
-cause some conflicts, it would be more manageable for Jon to
-take all of these through the docs-next tree.]
-
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-doc@vger.kernel.org
-Cc: David Airlie <airlied@gmail.com>
-Cc: Simona Vetter <simona@ffwll.ch>
-Cc: dri-devel@lists.freedesktop.org
-Cc: Alex Deucher <alexander.deucher@amd.com>
-Cc: Christian König <christian.koenig@amd.com>
-Cc: amd-gfx@lists.freedesktop.org
-Cc: Jani Nikula <jani.nikula@linux.intel.com>
-Cc: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
-Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
-Cc: Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: intel-gfx@lists.freedesktop.org
-Cc: Matthew Brost <matthew.brost@intel.com>
-Cc: Thomas Hellström <thomas.hellstrom@linux.intel.com>
-Cc: intel-xe@lists.freedesktop.org
-
- Documentation/userspace-api/ioctl/ioctl-number.rst |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
---- linux-next-20261123.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
-+++ linux-next-20261123/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -98,6 +98,7 @@ Code  Seq#    Include File
- 0x1b  all                                                              InfiniBand Subsystem
-                                                                        <http://infiniband.sourceforge.net/>
- 0x20  all    drivers/cdrom/cm206.h
-+0x20  00-01  drivers/gpu/drm/amd/amdgpu/amdgpu_umr.h
- 0x22  all    scsi/sg.h
- 0x3E  00-0F  linux/counter.h                                           <mailto:linux-iio@vger.kernel.org>
- '!'   00-1F  uapi/linux/seccomp.h
-@@ -268,7 +269,7 @@ Code  Seq#    Include File
- 'c'   08     drivers/scsi/ch.c                                         conflict!
- 'c'   80-9F  arch/s390/include/asm/chsc.h                              conflict!
- 'c'   A0-AF  arch/x86/include/asm/msr.h conflict!
--'d'   00-FF  linux/char/drm/drm.h                                      conflict!
-+'d'   00-FF  drm/drm.h                                                 conflict!
- 'd'   02-40  pcmcia/ds.h                                               conflict!
- 'd'   F0-FF  linux/digi1.h
- 'e'   all    linux/digi1.h                                             conflict!
-@@ -292,6 +293,8 @@ Code  Seq#    Include File
-                                                                        <mailto:zapman@interlan.net>
- 'h'   00-1F  linux/hpet.h                                              conflict!
- 'h'   80-8F  fs/hfsplus/ioctl.c
-+'i'   00-02  drm/i915_drm.h
-+'i'   00-04  drm/xe_drm.h
- 'i'   00-3F  linux/i2o-dev.h                                           conflict!
- 'i'   0B-1F  linux/ipmi.h                                              conflict!
- 'i'   80-8F  linux/i8k.h
+Fair. The motivation I left out: BLK_MQ_REQ_NOWAIT is mandatory in
+blk_mq_alloc_request_hctx() only to keep blk_mq_get_tag() from re-picking
+data->hctx after io_schedule(). But the same flags value is passed on to
+blk_queue_enter(), so a caller also takes -EAGAIN for a transient freeze
+that has no bearing on hctx selection. There is no way to ask for the
+hctx guarantee without also opting out of waiting.
