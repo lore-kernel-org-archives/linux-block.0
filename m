@@ -1,64 +1,119 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795597948;
-	b=MvpDK7c9ssx9YzYYY/4EbtWxuG7h/UDzeMj4rqfD8zYirnjPhVO3eJY/ImdXEgMmqLJ0
-	 eJQ225tTGaXxJ2iCPciTe42eqVoJHZfc0VMyTl/trutQYFYFV/+qB36wrmGO9Jw+FBEjb
-	 bq8BP0UY8sVYA51iHD5jDizBXSPoIlA6QiB7Ibhcfg8YUnpGSjtWGmPJ3ztTufpgggrZc
-	 ZT0tkd/5N/Jcm/pxJ3f5GHbz8JahU52HKqWU9wzzxqONgJKaCGbHg3c2WMc2PpCySId5E
-	 A8Ci+EPSy4BlgSPzjSHd8JUIUpekwisJ88StWKEBYUFi5BenpyH9CGSsNk2iaB0F3kA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795597948;
-	h=DMARC-Filter:Received:Received:Received:Received:From:To:CC:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=/6O+blZWFeGtJIpYuxgB4qiZ+0l3PmKkDlPDd+QWUBU=;
-	b=NpVNQ9s6Imh+lmzhwFZLAPxjJaKmJEcEzBwKy5/NbhyWrStckIrZ08DO+3Av/XMMP/TS
-	 xT/HB6XKL5dGMV6seVXFgPe1ZkDI9JI0jRsH37IoZLaLFMgH6bjk0RYzmED0qe89MvOkN
-	 tm/DMxZxSDCWnGxgUR8ceRAd1GXrk+zy29ytS63AzFaDHVV1kga//8ZlWMSQNTvxBS3ha
-	 oxUVXG/S6LKfhDUveNLhmuExK+q99pKQCKQIcjhUAL0uJq+Q89YgjaBjBflLO6adM3P8B
-	 LVq3rPUKBHO56sVook/tBxPAFPXXe7rUtmZSaC5F7E54EIRn8vZkeDA/B8PwBAF6/Aw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=hygon.cn;
-	spf=pass smtp.mailfrom=hygon.cn;
-	arc=none smtp.remote-ip=101.204.27.37
-Received: from spam01.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BEE606A326;
-	Wed, 25 Nov 2026 09:12:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 78BEE606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTh29FjzVcBJ;
-	Wed, 25 Nov 2026 17:12:24 +0800 (CST)
-Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTd2x4vzVcBC;
-	Wed, 25 Nov 2026 17:12:21 +0800 (CST)
-Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp1.hygon.cn (Postfix) with ESMTPS id B62751548;
-	Wed, 25 Nov 2026 17:12:14 +0800 (CST)
-Received: from hsj-2U-Workstation.hygon.cn (172.19.24.226) by
- cncheex04.Hygon.cn (172.23.18.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 25 Nov 2026 17:12:19 +0800
-From: Huang Shijie <huangsj@hygon.cn>
-To: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
-	<hch@infradead.org>, <agruenba@redhat.com>, <mic@digikod.net>,
-	<axboe@kernel.dk>
-CC: <gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<serge@hallyn.com>, <legion@kernel.org>, <aleksa@amutable.com>,
-	<libaokun@linux.alibaba.com>, <ebiggers@kernel.org>, <djwong@kernel.org>,
-	<sandeen@redhat.com>, <zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>,
-	<yingzhiwei@hygon.cn>, <wujianyong@hygon.cn>, <shijie8@gmail.com>,
-	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
-	<linux-security-module@vger.kernel.org>, Huang Shijie <huangsj@hygon.cn>
-Subject: [PATCH v4 06/11] fs/inode: convert evict_inodes() to sb_inode_iter
-Date: Wed, 25 Nov 2026 17:11:52 +0800
-Message-ID: <20261125091157.1822521-7-huangsj@hygon.cn>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261125091157.1822521-1-huangsj@hygon.cn>
-References: <20261125091157.1822521-1-huangsj@hygon.cn>
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=170.10.133.124
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795598234;
+	b=v25PXRSwf2FbnyOzvBqOmhFyNU5RVVgFd11aQ1LHcqG//OxbHwih32vy1jZa9M4XgURB
+	 EW2yVx7rCnUGje8IMWsJtqT3EzptZPbyja+1WI9FnwEfm+swuqlL4duqP7j7X27d9IfgK
+	 oreavajvWyMrFwWps/AiZ61X6XoDkkQivgaMiiSLkTWwnSz/9RHILIPu++KGZgcgDm+gJ
+	 fRnql2nD87JPOosZNEiuqIGTE+e0S/I8DmZE9worwKDbkeBh85OMDqlJgyxGM8m+3Mew4
+	 m2Lgb4cXwPEtPi6cHvHl8ymxhCjmb7KSlUqiTODfQ49ten0Oq8ZZ4mjC4T3HO3QaPsg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795598234;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:
+	 Cc:Content-Type:Content-Transfer-Encoding;
+	bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
+	b=vq4g3REMqZwkq0IC4n/wT1qwOsl3UB11tz1+yY2jB/tCzt53WsPH2r4zMrsxbUHvWVlk
+	 9QJjtNRE0v7dVGNWO/GI+9X5IhwUJZ5J7pz7a5XTi07veigCSxKjofQ6+lcgWtUa8gv50
+	 IHn4kp2SmdaYy74czs2SxjRGWqDF/JXsffZsMTTSFFyfuqj28Bl9G+BYZIHBMlGfNHaWz
+	 sRka9dlEVcCIyIEBc8gOljf10+SCKuLTKBq2cbF+bI0gFfa/imNHsKDW7MXhvM0nXYa2j
+	 yvD3Qq/86kp0GVaNcSZbtqQc2RFQBNHysVGKHLtRDg/XwU9FRWpOgp+yqz6VSVkByHA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ciGEVnWH;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=JudkF65J;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D2F606A680
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 09:17:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2D2F606A680
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ciGEVnWH;
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=JudkF65J
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1795598232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
+	b=ciGEVnWHm+m6pmaqeVd7C4zNrSasb5/wyhZP9jyIabcJ7+O+bSbHDGQLXuL1LUSFgqgl0B
+	umFC8NXHXe/TE0DSNV5kE+wJvOLcoiIZNFoARE6BbWMkGegSv/VaxX1sllsNp0ND0AiFEj
+	sWL9mx0JdcvSzslgMKWP/8azpLPkGC8=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-522-onaxC6DTN8mqdXzNA2HhGQ-1; Wed, 25 Nov 2026 09:17:10 +0000
+X-MC-Unique: onaxC6DTN8mqdXzNA2HhGQ-1
+X-Mimecast-MFC-AGG-ID: onaxC6DTN8mqdXzNA2HhGQ_1795598230
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-85d630e451aso5140266a34.2
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 01:17:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795598230; cv=none;
+        d=google.com; s=arc-20260327;
+        b=UgttoKgkehTjKfkx7q3KeVnxga1fIGcV4XLB76ESSyx2Dwx0gNCY/weTCORCqN60jE
+         tlcXfHydoK+Y6tzbRclECZ+u9TuUIDJB15mFzPcF5NUGHzNeGFkmAB8yHqHp2x60J0HP
+         nJB73raIXZI9Zai89XQyf4kOid1g1y6kI1+0GiVsQSJa/co6vwoet8V0hz1qKzMJjOvp
+         CzH80Q7XOtPjLJCTbxM1cmYWeh6pCDyqG6FjlJwhWnA8kSdJshS6kN1xZqn9H5mQuwoQ
+         jNvaPriI4LnQne0Xw/V0CBRmTv2AseW6ncfJx7lsRfEz2fHrnC2PZkmDYkiXvBgdUcsX
+         Mo4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
+        fh=V1/e7DCuAHjTHdJreWSiSwxzCwkdwNjA75uJc8tVDuo=;
+        b=hlj99rlSuzFOF12SWCdK2utQsZ3ODocYQRsihdv81qw4t4916RPTWkpB0x/RCcb4cQ
+         qJxqqa/PCSuEF1mygObxiFvsqyDs9CuCYoagJ7G9X4PCLAPry2j/Akp7nWH5530ycTfw
+         tHzN2Z38s7ioGa9YrVpxPIPBtCc21SZ6ID4+C28wPFWFjlqvE1XnW07WxNnHOv8uXqZS
+         BHwgc6GqVaMMe3thDM9wR92XYqTyt47YpbuJpVCadtlQ5QBzUgnzSZfpYVCwVG0xiY8V
+         7ANU+fQ9k2w+sJy1190VSYaebPiafbs3AecTQTHziJm0Njj6lbBW9KK3LzJeVIY4cG+r
+         bNVg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1795598230; x=1796203030; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
+        b=JudkF65JwYvbeb5GQWVmPLdEHPSFf2+gNky2kvpZc2DGvjUf1O+EG0ZrDaj1mFmCHx
+         NhYmFNfgKv+3QPOP4L/nax4E8dJUax8cODhz1kupNoQeSTQM8+J6eVokJPBTzKyf0sD2
+         o/N0AEWyZ3Ygs8yKoPiXFsDRNHT4E6Br4XQQUYIPL7YsSZXGyvbc1W1DTMR/vUBR/KIF
+         HI1TgRO8Pz/EeOOfHh/EUURmVZw+JTRnG3tIt/Sunr6scHaG08kHoolJS8CMKkrii1eP
+         aQdgiD6VutyvftdrR2XLK6vQlYfp5TT6bqf4vQhvkb9XUwd0bmnMcPxIx5lgVPoChVHf
+         uDew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795598230; x=1796203030;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
+        b=zcA4NkXo7P/rQnpRmptUKm+kVTidJROZ24tXy4EimxqIYAzSgWHAVcxQmq8WsFF+H6
+         CiN/D7fTCay+jY98UpIKSbcP7JHnCNt6N53QnodgzAojphfqGx2v8mWZeYh3GtqQ8uvV
+         kVgrjrVc9AK/47MsLYN2HNXWGztHTDvMIAIXfcPVkvwzU5nDFvSm4AetGLIaAjLmOytJ
+         XcR/TAqXF2nwu6PtPGUa5STwVTxmimi805ErB2PfAPct/+wQXX2+C2OuLlq1ceB3rLe3
+         LZyMIe6Cr4Y0p6GrkSqAinTGU+eq5HLDaD+2FTHV/Y357BPL/H40kxyuxLZXntGrUOdS
+         Cq0A==
+X-Gm-Message-State: APuU4Z/AUNcF2qBQn8g4oyYIvxyEDAlnjio2Xn809rXxYDh87tHC6Xcs
+	xoB48Jk1nnWyJNuaxXdnd23OfZ5D0SxWiTe1TVjqjDH2VGly0u3N7DyoP+oSN+6bzK6b/prZniU
+	eOMmXKJCq//I/1OZAR++PpTFC29wrXqMeXX/mLT6rFt4CxR+4HWR1EdBZiCd4sk6x/2lg/ZnXxB
+	I7mK1ZeldgriQ2tuSmUXSEfJpoVXzpmn60LwNJGnA=
+X-Gm-Gg: AZFdTZeD6hyxPpmYIY+TFDCFneIt/Q7f3MZMuGCqR63EZFhxJ74WONdbOrgufDiSgvs
+	cHJhxTusti490nljD/wyETfyApScTRufILS7TZm5ouPJRONUnbVP6udBnQH1Q2+v3KQWumHepnW
+	MfbT9u6uUzqwiCOP+MzOV72c2Imb19ykz9sLQ//SoLVwBBpNtEYkLulJdkFO42eSXRvVl55larZ
+	CEYEDMv7HvCeZZ4
+X-Received: by 2002:a05:6830:6816:b0:862:c3f1:634c with SMTP id 46e09a7af769-86315a059cbmr19500996a34.25.1795598229901;
+        Wed, 25 Nov 2026 01:17:09 -0800 (PST)
+X-Received: by 2002:a05:6830:6816:b0:862:c3f1:634c with SMTP id
+ 46e09a7af769-86315a059cbmr19500980a34.25.1795598229514; Wed, 25 Nov 2026
+ 01:17:09 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -68,82 +123,39 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
- (172.23.18.114)
+References: <20261125083947.263216-1-afaria@redhat.com> <20261125083947.263216-2-afaria@redhat.com>
+ <ad36d8e4-27af-4c6a-b3af-984118434797@wdc.com>
+In-Reply-To: <ad36d8e4-27af-4c6a-b3af-984118434797@wdc.com>
+From: Alberto Faria <afaria@redhat.com>
+Date: Wed, 25 Nov 2026 09:16:33 +0000
+X-Gm-Features: Aa3M54oSeBIW-vwAXD8TpkpgkEkcEGIL-t9H6mGs9BbDZ7mXBgrqV757jr0lyIM
+Message-ID: <CAELaAXwH8-gn+nuD96gDSeKZMgKZjX22Q-hVywXbQL8si6S1Pw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] virtio_blk: add fua write support
+To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: linux-block@vger.kernel.org, virtualization@lists.linux.dev, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jens Axboe <axboe@kernel.dk>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jason Wang <jasowangio@gmail.com>, dlemoal@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use sb_inode_iter with %INO_ITER_F_NOREF | %INO_ITER_F_NOIGET, which
-hands out only zero-count inodes and takes no reference on them.
+On Wed, Nov 25, 2026 at 9:07=E2=80=AFAM Johannes Thumshirn
+<johannes.thumshirn@wdc.com> wrote:
+> On 11/25/26 9:39 AM, Alberto Faria wrote:
+> > +     /*
+> > +      * Do not advertise FUA when the device is zoned, since we
+> > +      * would not be able to handle it on REQ_OP_ZONE_APPEND.
+> > +      */
+> > +     if (virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS) &&
+> > +         virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA) &&
+> > +         !(lim.features & BLK_FEAT_ZONED))
+> > +             lim.features |=3D BLK_FEAT_FUA;
+> > +
+>
+> Can you elaborate why?
 
-Signed-off-by: Huang Shijie <huangsj@hygon.cn>
----
- fs/inode.c | 33 ++++++++++-----------------------
- 1 file changed, 10 insertions(+), 23 deletions(-)
+The virtio spec currently only defines FUA for OUT requests, so there
+would be no way to pass on the REQ_FUA to the device on a zone append.
 
-diff --git a/fs/inode.c b/fs/inode.c
-index f63535ee3629..0830a11a37e9 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -865,6 +865,13 @@ static void dispose_list(struct list_head *head)
- 	}
- }
- 
-+static bool evict_inode_eligible(struct inode *inode, void *data)
-+{
-+	inode_state_set(inode, I_FREEING);
-+	inode_lru_list_del(inode);
-+	return true;
-+}
-+
- /**
-  * evict_inodes	- evict all evictable inodes for a superblock
-  * @sb:		superblock to operate on
-@@ -879,40 +886,20 @@ void evict_inodes(struct super_block *sb)
- 	struct inode *inode;
- 	LIST_HEAD(dispose);
- 
--	spin_lock(&sb->s_inode_list_lock);
--	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
--		if (icount_read_once(inode))
--			continue;
--
--		spin_lock(&inode->i_lock);
--		if (icount_read(inode)) {
--			spin_unlock(&inode->i_lock);
--			continue;
--		}
--		if (inode_state_read(inode) & (I_NEW | I_FREEING | I_WILL_FREE)) {
--			spin_unlock(&inode->i_lock);
--			continue;
--		}
--
--		inode_state_set(inode, I_FREEING);
--		inode_lru_list_del(inode);
--		spin_unlock(&inode->i_lock);
--
-+	CLASS(sb_inode_iter, iter)(sb, evict_inode_eligible, &dispose,
-+				   INO_ITER_F_NOREF | INO_ITER_F_NOIGET);
-+	while ((inode = sb_inode_iter_next(&iter))) {
- 		/*
- 		 * Keep this inode out of dispose so it stays on s_inodes while
- 		 * the list lock is dropped. I_FREEING prevents new references
- 		 * and leaves eviction to us, so we can resume the walk from it.
- 		 */
- 		if (need_resched()) {
--			spin_unlock(&sb->s_inode_list_lock);
- 			cond_resched();
- 			dispose_list(&dispose);
--			spin_lock(&sb->s_inode_list_lock);
- 		}
- 		list_add(&inode->i_lru, &dispose);
- 	}
--	spin_unlock(&sb->s_inode_list_lock);
--
- 	dispose_list(&dispose);
- }
- EXPORT_SYMBOL_GPL(evict_inodes);
--- 
-2.53.0
-
+Alberto
 
