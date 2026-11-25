@@ -1,56 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.37
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=188.68.63.170
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795596104;
-	b=uVHIKvGN5nth+eZwj19BAAyHnrcnGkWXUkqq818sVuwMpg/6HyXiQTIbuzlEFjAbiTBK
-	 vr88iUXbEKQmQSV7u2EuGhMqn+FMR9suNyEkilZSH0i1VD7qFyPVLUE/oDYuCbTUYwh2j
-	 xIZwWsybgpNHtpEvStnGKh4X4vGlT7Gk4G36/3A6Cjef5WnV9uT5TdjOEI29mFKUTOEyA
-	 TSRAi/oWRxjfXQuocRv7f95t9YC64JZ+X6UTP3KcgU1FAbpzG3iqCnifCadX+r7lDeqb9
-	 SeW6Ao3nwK9ycXloz77MlRtSkohA76UAmtMCsZvsIcDXGJobWSFnQdhGZbM1t8X5qaw==
+	t=1795596802;
+	b=q9h9Ilzfi+VAP7IezQaQt+maLSoVaRC6z/JPp9MGIb54a3sjc6PgP/L6Y/54pyzdrO5+
+	 8zOvJ/xqunv2S7SWKiK0QwKWK59COnUqO3qyNLo02dZv1HoWsW8z8iFcuC2Vat50S+9Nk
+	 4MHKxFM8VLTYySDHRuPs0nIEniFQZgnpXTQk1efJAhQn1EIaDDRtZ4xYXJSkMJQVuqKUm
+	 kwuZcvHo9uxDnWj32dzl1IFH8D6L6KC7R2XrKuITlRZuqoZwd9At+fWxxGgK1VNvArFGt
+	 qAjMe9y+X8hmjcj69E/EG0bKovTbPWdxduX0q8Ff5BCtmF0I+AhckMzCKOe2Fc7m+hg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795596104;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:Date:Subject:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:Message-Id:X-B4-Tracking:To:Cc:
-	 X-Mailer;
-	bh=0loQZHPBjLNYdasA1EMZfMX85Vaac5IkP7Fw5i4r2dI=;
-	b=nqnDj6URljEIDR82uUjjqPLykdkwUpCWQ0CmVupMakzR9sTyw/1L2o9DNNwpBP64IZAI
-	 F/qf1Hr1qy9cAzBHB/ZbMPDzmM0a4cnsEzU8A30Pfhk/Itbu4NMjef1i46tpPrQzinROC
-	 bw/2+6igAshPptQg77bpSk/gSaUk6OiVWVbg9MdWD+LXAuy5HW/i+CXFNBLgTVMcFy6zH
-	 PhuURNOFdgwZqG2dnTL+kNWhPGj2z4jmynohvggHT8SdM2u8i/mai7MQe3qelFX5rf1S5
-	 ACl3bENdBHITmjJ8C/CeNUPO3LJdRy6EU8L7N/D/K/Rhv14lBujM/I3ovd89fuzG3/g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795596802;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:X-Virus-Scanned:
+	 X-Spam-Flag:X-Spam-Score:X-Spam-Level:X-Spam-Status:Received:Received:
+	 Received-SPF:Message-ID:Date:MIME-Version:User-Agent:Subject:From:To:
+	 Cc:References:Content-Language:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-PPP-Message-ID:X-NC-CID;
+	bh=yQ5oP8B/ewMdIJyV3jySqk1F2J/QMkaLPJwixo6jHK8=;
+	b=qsj/PSSIoRjXf0m2cC0bOVQ5GTHP88rsWtZ4txO7DEHa0wS7TsZBqyQVs73a1en1Yx1U
+	 Ng80rmkZXyYPXNpjYb9BYB9GR/BBEwhKIep4Eqey0aAb/YMrEngUuLRpV9bEtjt9rfTjO
+	 joDzfXlryJuzIeJUNxZcUX4aCumCq5Q9l4+HONrE+1EW/aYSbKZUCQ6D3BpaUL6WFel8M
+	 kzqHYo4t/y/OHZbBwsnjZovsJqOVdYTBATHCsoJ0Pqo6McHVQRIsc3w9cJdwUshPEySdH
+	 AMBcutDnsbFYbGjKLRiJ7T+rqCrcokCeEYwbaNybDVwo5+S+7tw4fu7bpZZa2MXc6kg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=xGwLo4wE;
-	arc=none smtp.remote-ip=91.218.175.37
-Received: from mta0.migadu.com (out-37.mta0.migadu.com [91.218.175.37])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=leemhuis.info;
+	spf=pass smtp.mailfrom=leemhuis.info;
+	dkim=pass header.d=leemhuis.info header.i=@leemhuis.info header.a=rsa-sha256 header.s=key2 header.b="U/u/HCof";
+	arc=none smtp.remote-ip=188.68.63.170
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.170])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45C2606A31E
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 08:41:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A45C2606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF20606A31E;
+	Wed, 25 Nov 2026 08:53:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1FF20606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=xGwLo4wE
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=sERThpnRkKY48QAqz89vLAJFHQqh6vsXe+M60btYjZY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795596101; v=1; x=1796200901;
- b=xGwLo4wEaxrU5CInGeA7c4e9uw/CXWn+0nJSVQDRi4SmU6apH1j+hmQI/5cIJS1A/PpfaXCK
- BFulhbOFLbRhISiS6U9tbrhqJpDCvUvfTUgiaIJAmqqcgfyWVl4RM4DnOfR68Ww5IbWidDR5L2b
- lEDjuUkoNHqB8dfXbxTuN4xk=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 8ce7b261336591e2;
-	Wed, 25 Nov 2026 08:41:41 +0000
-X-Mizu-Trace-ID: 8ce7b261336591e2
-X-Migadu-Flow: FLOW_OUT
-From: Qiliang Yuan <qiliang.yuan@linux.dev>
-Date: Wed, 25 Nov 2026 03:41:36 -0500
-Subject: [PATCH v3] block: don't wait for all RCU callbacks when freeing
- zone write plugs
+	dkim=pass (2048-bit key, unprotected) header.d=leemhuis.info header.i=@leemhuis.info header.a=rsa-sha256 header.s=key2 header.b=U/u/HCof
+Received: from mors-relay8203.netcup.net (localhost [127.0.0.1])
+	by mors-relay8203.netcup.net (Postfix) with ESMTPS id 4jZD3Y0mRLz8rjd;
+	Wed, 25 Nov 2026 08:53:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1795596793;
+	bh=AlE/5na4fH2NUXIJkY/rENlw2S0DFjAKYsvCxIq5tLA=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=U/u/HCoff96pu2i1H5b/2oiNQRFeojCP8QwRojd8XWeiwzVAbKeydBXSac5mMIGM2
+	 vwEmwPAzOX+P1gXwRyMPYCmrt4q2ayMt7nF9YXhbmwMxvI00qYA5vn7o1fIvU3A9Hu
+	 yYV5DNBaz8znvMCOIKW5gPOCkjpUUU9kunqEBRJKrVmRWYdS91+XK9hY4TqkMGIScn
+	 Z3RDf7z87DwZhK7Zj31WGGpPTU+s6tkg4R+1LY8pqabMFtjQ3WDMfK/sg4KLOK+82P
+	 Z92ieAlUBWdH75gkx+H8FTiQ5c7GcNs1/+cMrCu0R7xvyAET5jKbpkhZbFRv8x47mI
+	 Ye3NcJPwU0Lvg==
+Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay8203.netcup.net (Postfix) with ESMTPS id 4jZD3Y01pPz8rfS;
+	Wed, 25 Nov 2026 08:53:13 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
+X-Spam-Flag: NO
+X-Spam-Score: -2.901
+X-Spam-Level: 
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4jZD3V2kGBz8vKH;
+	Wed, 25 Nov 2026 09:53:10 +0100 (CET)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id BEE4E5FA03;
+	Wed, 25 Nov 2026 09:52:53 +0100 (CET)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <87b1bbd8-8113-4890-8623-738b19a9cc7b@leemhuis.info>
+Date: Wed, 25 Nov 2026 09:52:49 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -60,127 +78,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261125-feat-blk-zoned-rcu-barrier-v3-1-707f65bae05a@linux.dev>
-X-B4-Tracking: v=1; b=H4sIAD+fBmsC/33NSw6CMBSF4a2Qjr2GXmhBR+7DOOjjIo0ETIEGJ
- ezdQmLCiOF/Bt+ZWU/eUc+uycw8Bde7ro2RnRJmatU+CZyNzTBFyTmmUJEaQDcv+HYtWfBmBK1
- 8NDwYfUnznGShdMYi8PZUuWnD74/YteuHzn+2r8DX9c/yIzZw4FBIWRZCCxSabo1rx+lsKbCVD
- bin8kMKIyUtIkeVl0aYPbUsyw/TjuQ8DwEAAA==
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Qiliang Yuan <qiliang.yuan@linux.dev>
-X-Mailer: b4 0.13.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] DMAR fault by Intel H97 SATA controller since
+ "block: Increase BLK_DEF_MAX_SECTORS_CAP" (6.17-rc1)
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+To: Tobias Laas <tobias.laas@posteo.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ regressions@lists.linux.dev, linux-block@vger.kernel.org,
+ linux-ide@vger.kernel.org, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
+ Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ 70sp <70sp@protonmail.com>, Laurence Oberman <loberman@redhat.com>
+References: <5ad27a97aafbc08a8702d5b90d09cd59@posteo.de>
+ <awSs5Cw3hFkf4O4T@ryzen> <ec36d13e-e4c2-4bfb-8b50-69d4a1628839@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <ec36d13e-e4c2-4bfb-8b50-69d4a1628839@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: 
+ <179559677445.1390226.15266907353962811620@mxe9fb.netcup.net>
+X-NC-CID: unDnwYxQmKKySfnwJIdL5+kRq/d1VVk2Z7PmvJii7yq21dAmEHM=
 
-Zone write plugs are allocated from a per-disk mempool and freed with
-call_rcu(). Before destroying the mempool, which happens every time a
-zoned disk is released, disk_destroy_zone_wplugs_hash_table() calls
-rcu_barrier() so that no zone write plug is still waiting to be returned
-to it.
+On 11/24/26 09:55, Thorsten Leemhuis wrote:
+> [Reminder, this is not my area of expertise, so this might be sending
+> everyone in the wrong direction -- so handle it carefully]
+> 
+> On 11/23/26 22:15, Niklas Cassel wrote:
+>>> Since the issue with mounting the rootfs disappears with intel_iommu=off, I
+>>> wonder, whether there is a limitation on the maxmium block size either by
+>>> the hardware or from the configuration of the IOMMU and SATA controller by
+>>> the kernel.
+>> Considering how common your SSD is, my guess is that it is somehow an
+>> IOMMU or a BIOS/ACPI bug (since the BIOS generates specific ACPI tables -
+>> DMAR on Intel).
+> 
+> I just a few days privately was told that "intel_iommu=on,sp_off" solved
+> problems wrt to one unresolved regression related to iommu with a
+> similar generation intel hardware. [...]
 
-rcu_barrier() waits for the RCU callbacks queued on every CPU by anyone,
-which usually takes a grace period or more, even when the disk had no
-zone write plug left to free. Removing many zoned disks, such as the SMR
-drives of a storage node taken offline, pays this once per disk.
+For completeness, Šimon Pospíchal (now CCed) shared findings and a WIP
+fix (both with the help of a LLM) meanwhile here:
 
-Count the zone write plugs of the disk that wait for their RCU callback,
-and wait only for that count to drop to zero.
+https://lore.kernel.org/all/QISmXFlpPMgvFUKmdIBDwqn4JHHXt2NZeJzerMLHF_5icLo0lPKVlN0Ig9v8Vb52NmCeSFdyrao4x8KoN1DCXtDlnZS7eRIClC6vZyu-hPU%3D@protonmail.com/
 
-Removing 32 zoned null_blk or scsi_debug devices, base and patched
-kernels alternating over 2 rounds of 3 runs, median of the 6 runs and
-range in parentheses; "with plugs" leaves four partially written zones,
-and so four zone write plugs, on each null_blk device:
-
-  devices                      before (ms)      after (ms)   change
-  null_blk                   820 (805-885)   438 (424-454)     -47%
-  null_blk, with plugs       876 (852-883)   844 (805-877)      -4%
-  scsi_debug, host-managed   958 (945-991)   642 (630-652)     -33%
-
-Signed-off-by: Qiliang Yuan <qiliang.yuan@linux.dev>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
----
-V2 -> V3:
-- Initialize nr_zone_wplugs_freeing in disk_init_zone_resources() (Damien Le Moal)
-
-V1 -> V2:
-- Keep the original comment above the wait (Damien Le Moal)
-- Add Reviewed-by (Damien Le Moal)
-
-v2: https://lore.kernel.org/r/20261124-feat-blk-zoned-rcu-barrier-v2-1-6d2212a48c5c@linux.dev
-v1: https://lore.kernel.org/r/20261121-feat-blk-zoned-rcu-barrier-v1-1-766875b525be@linux.dev
----
- block/blk-zoned.c      | 11 +++++++++--
- include/linux/blkdev.h |  1 +
- 2 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 4c58892961912..2e61a9f23b270 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -18,6 +18,7 @@
- #include <linux/mempool.h>
- #include <linux/kthread.h>
- #include <linux/freezer.h>
-+#include <linux/wait_bit.h>
- 
- #include <trace/events/block.h>
- 
-@@ -724,8 +725,11 @@ static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
- {
- 	struct blk_zone_wplug *zwplug =
- 		container_of(rcu_head, struct blk_zone_wplug, rcu_head);
-+	struct gendisk *disk = zwplug->disk;
- 
--	mempool_free(zwplug, zwplug->disk->zone_wplugs_pool);
-+	mempool_free(zwplug, disk->zone_wplugs_pool);
-+	if (atomic_dec_and_test(&disk->nr_zone_wplugs_freeing))
-+		wake_up_var(&disk->nr_zone_wplugs_freeing);
- }
- 
- static void disk_free_zone_wplug(struct blk_zone_wplug *zwplug)
-@@ -745,6 +749,7 @@ static void disk_free_zone_wplug(struct blk_zone_wplug *zwplug)
- 	atomic_dec(&disk->nr_zone_wplugs);
- 	spin_unlock_irqrestore(&disk->zone_wplugs_hash_lock, flags);
- 
-+	atomic_inc(&disk->nr_zone_wplugs_freeing);
- 	call_rcu(&zwplug->rcu_head, disk_free_zone_wplug_rcu);
- }
- 
-@@ -2022,6 +2027,7 @@ void disk_init_zone_resources(struct gendisk *disk)
- {
- 	mutex_init(&disk->zone_revalidate_mutex);
- 	atomic_set(&disk->nr_zone_wplugs, 0);
-+	atomic_set(&disk->nr_zone_wplugs_freeing, 0);
- 	spin_lock_init(&disk->zone_wplugs_hash_lock);
- 	spin_lock_init(&disk->zone_wplugs_list_lock);
- 	INIT_LIST_HEAD(&disk->zone_wplugs_list);
-@@ -2149,7 +2155,8 @@ static void disk_destroy_zone_wplugs_hash_table(struct gendisk *disk)
- 	 * Wait for the zone write plugs to be RCU-freed before destroying the
- 	 * mempool.
- 	 */
--	rcu_barrier();
-+	wait_var_event(&disk->nr_zone_wplugs_freeing,
-+		       !atomic_read_acquire(&disk->nr_zone_wplugs_freeing));
- 	mempool_destroy(disk->zone_wplugs_pool);
- 	disk->zone_wplugs_pool = NULL;
- }
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 215753171cef0..b3b356f832267 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -204,6 +204,7 @@ struct gendisk {
- 	u8 __rcu		*zones_state;
- 	unsigned int		zone_wplugs_hash_bits;
- 	atomic_t		nr_zone_wplugs;
-+	atomic_t		nr_zone_wplugs_freeing;
- 	spinlock_t		zone_wplugs_hash_lock;
- 	struct mempool		*zone_wplugs_pool;
- 	struct hlist_head	*zone_wplugs_hash;
-
----
-base-commit: 5f22fb20497f4983094131f00a734362300d22d2
-change-id: 20261120-feat-blk-zoned-rcu-barrier-cb9044e67ab3
-
-Best regards,
--- 
-Qiliang Yuan <qiliang.yuan@linux.dev>
-
+Ciao, Thorsten
