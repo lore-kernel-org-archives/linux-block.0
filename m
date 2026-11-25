@@ -1,45 +1,46 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795597941;
-	b=VC4N5S5hbLSQwwVgjLAbyx0NG7EglCitey3xiVHyXEdDV3os51/xJMhvDySjlv4rKIJJ
-	 EEqrAlk/TsbPhbv0iOSY323ntSgnL3laF41nk6Mg2wZzyx7hFseepgyjzzrd8W9drw8Ll
-	 edey4P6FKy3LQ05YajeZHrV6laFN5ZD9w+8HDFSKh9XraRkrJo3ma82R48HifEknovqiN
-	 XC676AUxBQma/bHo4NkdwjU6JtnHGI9T69E3fwi1aj3B2pY5LbLEa1uU9F/+pj9g6a8kN
-	 0XZFJHBgS8jl79xHhi/90q3I+2XvdhRsF11MZPJYT/mN1kyEEoWIulLlFkPiq5CGsnA==
+	b=CLeYnD12wzFmqs4tARxlbFLegrz1yfI1QBdof5GtXZCq4Dih93ct8SJcgCYZ1ZOJxCeH
+	 TC9XaJnzBq6vsnRe/D1aUh50JB/Sehb/sC0QeQjbJ4dII1E2hNqYe0Hoz/I7fHi2cUirJ
+	 dXJ+gaL6TeoJ8zS0wclZctspU6kdJtKIuFJ36bR4mEs0MjBn7lOdapqeLrpqbR13SR6Oi
+	 wygD3hafSRL0TcxzQK5dpy80VPT8IFC6R3i5lc/xPC1b5beSRiGcAvkZoNjU6kLiYDIEQ
+	 qZo9cj1hPBc9Cu/hKgowzMY0FMU3OJTbfnvhYkx/G9aZwzxbYRXGcAlLVLQk06/cJUg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795597941;
 	h=DMARC-Filter:Received:Received:Received:Received:From:To:CC:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 Content-Type:X-Originating-IP:X-ClientProxiedBy;
-	bh=PoDUmL89J9kwKXxxu04mqcDBvGz9q2h1SGMDm/ZaSOU=;
-	b=feuTia6SmchY9ZjsuNDQgxSY6xOKNZEAJsKzgxQ2jUmjKr+QWOFdC1FKy/3h9ytvqk4U
-	 TJf7Vyq3agqfiui1LcQ5cngNH0K5yIX22cWYU33kOgzfrwkCU/2UY8kR8pBU2AuwzGKPr
-	 8Ns6pVFjXrd3+r/dqeh09X37mQx1yjTZWiWqFIBzdbUXQCBWUkb2EuRZc0njQxiafMGSW
-	 i1u4XFvuRBOny0yt6H1lUJ1H2wCf8/QonYx7lxx/tEyEx4LruPdZT6x8N80/RWkuYeTg/
-	 DxNhZdtpIafIrGuYTCpFBljlMJW+LruWpu6Gh1Cfn6xQDjxzHrDH+ZIXqHO9C0n6rdQ==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=y3AlrLrmzijoOmmLMUS871ALaIug8w67kopjsTk4pe4=;
+	b=OFx5lB1V/yTIKn0sczN3RxFeMm4qm5N0raTVy47BudO3TDzwfeqyzpm/LOON+HQqg6vi
+	 k7bqDsxgm+dPB7egtWd7D1rAhu13jqGV+Q0c+V8+H6FK+GODnpVCw6YrKUX40b0c9hkTk
+	 exsCX4Mci/pBwCvyX5BjJeMr5AROf5uC7Kqye3BRwTA8O7aay6XEnaSHsTL5OzAL5gD3X
+	 cZQ/LpqEgxyNW+07T/3iX75FKqSYU3eFWPTOyrvAObwUU+lXtMGCZqM3SCjJ3iI1GqrFb
+	 BIlLv4bonMb1eXAjc1MhkBGbEdLObCZWvhGLC5SHzkfXzAS3i7AjPa/zpxICJ3ORHSA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=hygon.cn;
 	spf=pass smtp.mailfrom=hygon.cn;
 	arc=none smtp.remote-ip=101.204.27.37
 Received: from spam01.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D10E606A31E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D249606A329;
 	Wed, 25 Nov 2026 09:12:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2D10E606A31E
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2D249606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTP28wtzVcB9;
+Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTP28vrzVcB8;
 	Wed, 25 Nov 2026 17:12:09 +0800 (CST)
-Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTM1JV8zVhfS;
-	Wed, 25 Nov 2026 17:12:07 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTP1HGTzVhfS;
+	Wed, 25 Nov 2026 17:12:09 +0800 (CST)
 Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp1.hygon.cn (Postfix) with ESMTPS id 81A051662;
-	Wed, 25 Nov 2026 17:12:00 +0800 (CST)
+	by maildlp2.hygon.cn (Postfix) with ESMTPS id 84690300B6F1;
+	Wed, 25 Nov 2026 17:10:56 +0800 (CST)
 Received: from hsj-2U-Workstation.hygon.cn (172.19.24.226) by
  cncheex04.Hygon.cn (172.23.18.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 25 Nov 2026 17:12:04 +0800
+ 15.2.1544.36; Wed, 25 Nov 2026 17:12:06 +0800
 From: Huang Shijie <huangsj@hygon.cn>
 To: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
 	<hch@infradead.org>, <agruenba@redhat.com>, <mic@digikod.net>,
@@ -52,10 +53,12 @@ CC: <gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
 	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
 	<linux-security-module@vger.kernel.org>, Huang Shijie <huangsj@hygon.cn>
-Subject: [PATCH v4 00/11] vfs: add inode iteration methods
-Date: Wed, 25 Nov 2026 17:11:46 +0800
-Message-ID: <20261125091157.1822521-1-huangsj@hygon.cn>
+Subject: [PATCH v4 01/11] vfs: add sb_inode_iter_next()
+Date: Wed, 25 Nov 2026 17:11:47 +0800
+Message-ID: <20261125091157.1822521-2-huangsj@hygon.cn>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261125091157.1822521-1-huangsj@hygon.cn>
+References: <20261125091157.1822521-1-huangsj@hygon.cn>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,157 +73,193 @@ Content-Type: text/plain
 X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
  (172.23.18.114)
 
-This series adds a superblock inode iterator and converts the open-coded
-sb->s_inodes walks in the VFS to it.  The design follows the cursor-based
-construct proposed by Christian Brauner:
+Walking sb->s_inodes requires taking sb->s_inode_list_lock, grabbing a
+reference on the next inode, dropping the lock and then working on the
+inode.  That sequence is open coded in several places, each with its own
+subtleties around rescheduling and iput().
 
-  https://lore.kernel.org/all/20261120-mitverantwortlich-drehbaren-kantholz-241300d20168@brauner/
+Add struct sb_inode_iter, which the caller declares and owns, plus
+sb_inode_iter_next() to step through the list and sb_inode_iter_end() to
+release the last reference.
 
-and is the same direction as Dave Chinner's patch set:
+As the cursor inode is referenced or pinned by other method, it cannot be
+unlinked from sb->s_inodes, so the walk resumes from it after the caller
+has dropped the lock.
 
-  "vfs: improving inode cache iteration scalability"
-  https://lore.kernel.org/all/20241002014017.3801899-1-david@fromorbit.com/
+Callers that need to filter inodes can provide iter->eligible,
+which is called with inode->i_lock held, and callers that need to
+stop early can set iter->status.
 
-The caller owns the iterator state and drives the walk itself:
+Signed-off-by: Huang Shijie <huangsj@hygon.cn>
+---
+ fs/super.c                     | 102 +++++++++++++++++++++++++++++++++
+ include/linux/fs/super_types.h |  40 +++++++++++++
+ 2 files changed, 142 insertions(+)
 
-  CLASS(sb_inode_iter, iter)(sb, eligible, priv, flags);
-  while ((inode = sb_inode_iter_next(&iter)))
-          /* do stuff */;
-
-The lock does not span iterations.  sb_inode_iter_next() takes
-sb->s_inode_list_lock, takes a reference on the next inode, drops the lock
-again and hands the inode out; the reference is what keeps the cursor on
-sb->s_inodes so that the next call can resume from it.  As the iterator
-is a cleanup class, a caller that breaks out early does not have to call
-sb_inode_iter_end() explicitly.
-
-Two optional channels let a caller keep its own state instead of filling in
-a shared context:
-
-  - iter->eligible is called with inode->i_lock held, so that a caller can
-    reject an inode before a reference is paid for.
-
-  - iter->status carries an error out of the walk.  Setting it to a
-    negative value makes sb_inode_iter_next() return NULL.
-
-Most callers just want a referenced inode and use no flags at all.  Three
-flags cover the walks that need something else:
-
-  - %INO_ITER_F_REFERENCED restricts the walk to inodes that still have a
-    reference, preserving the "only handle referenced inodes" rule of
-    landlock's sb-delete walk.
-
-  - %INO_ITER_F_NOREF hands out only inodes whose reference count has
-    already reached zero, and %INO_ITER_F_NOIGET suppresses the reference.
-    Neither keeps the inode alive, so the caller has to make the inode
-    unclaimable itself.
-
-A second, internal iterator covers the walks that must not take a
-reference at all:
-
-  static inline int sb_inode_iter_locked(struct super_block *sb,
-                                         int (*iter_fn)(struct inode *,
-                                                        void *),
-                                         void *priv);
-
-  - It keeps sb->s_inode_list_lock held for the whole walk and takes no
-    inode reference, so @iter_fn only has an existence guarantee: it must
-    not block, and it must do its own inode state checks and its own
-    reference handling.  A callback returns a negative value to stop the
-    walk with that error, and 0 to continue.
-
-  - It lives in fs/internal.h as a static inline rather than being
-    exported: it is a VFS internal facility, and the small callbacks
-    inline into their callers.
-
-  It serves the three walks that cannot use sb_inode_iter_next():
-
-  - nr_blockdev_pages() is reached from si_meminfo(), which kdb calls, and
-    the iput() that the referenced iterator would do can sleep.
-
-  - remove_dquot_ref() has to scan I_NEW inodes as well, which the
-    referenced iterator filters out; it only touches the quota pointers,
-    and those have their own locking in dq_data_lock.
-
-  - the generic_shutdown_super() poisoning loop has to touch every inode
-    still on the list, including the I_NEW, I_FREEING and I_WILL_FREE
-    ones that sb_inode_iter_next() filters out, and it must not bounce
-    them through __iget()/iput(): the loop overwrites i_sb with
-    VFS_PTR_POISON, and evict() dereferences i_sb->s_op on the way out.
-
-  Patch 1 adds sb_inode_iter_next().
-  Patch 2 adds sb_inode_iter_locked().
-  Patch 3-5 convert the callers which cannot use referenced inodes
-          (nr_blockdev_pages(), dquot removal and the
-          generic_shutdown_super() poisoning loop).
-  Patch 6-11 convert the remaining callers (inode eviction, sync_bdevs,
-          drop_pagecache_sb, add_dquot_ref, landlock's hook_sb_delete
-          and gfs2_evict_inodes()).
-
-
-BTW:
-  This series is based on v7.4-rc2, and applies on top of the last commit
-  of that base, which is the small patch this series depends on:
-
-      v7.4-rc2-22-ga02161f70fcf
-      commit a02161f70fcf ("fs/drop_caches: skip filesystems without page cache writeback")
-
-  That patch was posted as:
-      https://lore.kernel.org/all/20260923070116.3226846-1-huangsj@hygon.cn/
-
-v3-->v4:
-   -the interface is redone as a caller-owned cursor, following Christian's
-    sb_inode_iter construct: sb_inode_iter_next() returns a referenced
-    inode with sb->s_inode_list_lock dropped, and the reference keeps the
-    cursor on sb->s_inodes.  The callback-based interface of v3, with its
-    ino_iter_fn and INO_ITER_RET_* return values, is gone.
-
-   -the iterator is wrapped in a cleanup class, so a caller that breaks out
-    of the walk does not have to call sb_inode_iter_end().
-
-   -an inode can be rejected before a reference is paid for: @eligible is
-    called with inode->i_lock held.
-
-   -the error channel is now iter->status rather than a three-valued
-    callback return.
-
-   -super_iter_inodes() and super_iter_inodes_locked() are renamed to
-    sb_inode_iter_next() and sb_inode_iter_locked(), and the latter stays
-    in fs/internal.h for the three walks that must not take a reference.
-
-   -evict_inodes() uses INO_ITER_F_NOREF | INO_ITER_F_NOIGET: it only
-    takes inodes whose reference count has reached zero, pins each one by
-    setting I_FREEING and dropping it from the LRU, and runs dispose_list()
-    with the list lock dropped.
-
-   v3: https://lore.kernel.org/all/20261120031305.3561045-1-huangsj@hygon.cn/
-   v2: https://lore.kernel.org/all/20261113115702.586594-1-huangsj@hygon.cn/
-   v1: https://lore.kernel.org/all/20261015093854.2082600-1-huangsj@hygon.cn/
-
-Huang Shijie (11):
-  vfs: add sb_inode_iter_next()
-  vfs: add sb_inode_iter_locked()
-  block: convert nr_blockdev_pages() to sb_inode_iter_locked()
-  fs/quota: convert remove_dquot_ref() to sb_inode_iter_locked()
-  fs: convert generic_shutdown_super() poison loop
-  fs/inode: convert evict_inodes() to sb_inode_iter
-  block: convert sync_bdevs() to sb_inode_iter
-  fs/drop_caches: convert drop_pagecache_sb() to sb_inode_iter
-  fs/quota: convert add_dquot_ref() to sb_inode_iter
-  landlock: convert hook_sb_delete() to sb_inode_iter
-  gfs2: convert gfs2_evict_inodes() to sb_inode_iter
-
- block/bdev.c                   |  58 ++++++----------
- fs/drop_caches.c               |  36 ++++------
- fs/gfs2/ops_fstype.c           |  26 ++-----
- fs/inode.c                     |  33 +++------
- fs/internal.h                  |  25 +++++++
- fs/quota/dquot.c               | 120 +++++++++++++++-----------------
- fs/super.c                     | 121 ++++++++++++++++++++++++++++++---
- include/linux/fs/super_types.h |  40 +++++++++++
- security/landlock/fs.c         |  67 +++++-------------
- 9 files changed, 297 insertions(+), 229 deletions(-)
-
+diff --git a/fs/super.c b/fs/super.c
+index c5a0658f7aaf..077e772fa19b 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -171,6 +171,108 @@ static void super_wake(struct super_block *sb, unsigned int flag)
+ 	wake_up_var(&sb->s_flags);
+ }
+ 
++static bool sb_inode_iter_check(struct sb_inode_iter *iter, struct inode *inode)
++{
++	bool ret = false;
++
++	if ((iter->flags & INO_ITER_F_REFERENCED) && !icount_read_once(inode))
++		return false;
++
++	if ((iter->flags & INO_ITER_F_NOREF) && icount_read_once(inode))
++		return false;
++
++	spin_lock(&inode->i_lock);
++
++	if ((iter->flags & INO_ITER_F_NOREF) && icount_read(inode))
++		goto out_unlock;
++
++	if (inode_state_read(inode) & (I_NEW | I_FREEING | I_WILL_FREE))
++		goto out_unlock;
++
++	if (iter->eligible && !iter->eligible(inode, iter->priv))
++		goto out_unlock;
++
++	if (!(iter->flags & INO_ITER_F_NOIGET))
++		__iget(inode);
++
++	ret = true;
++out_unlock:
++	spin_unlock(&inode->i_lock);
++	return ret;
++}
++
++static inline bool sb_inode_iter_flags_valid(int flags)
++{
++	switch (flags) {
++	case 0:
++	case INO_ITER_F_REFERENCED:
++	case INO_ITER_F_NOREF | INO_ITER_F_NOIGET:
++		/* only used by evict_inodes() */
++		return true;
++	default:
++		return false;
++	}
++}
++
++/**
++ * sb_inode_iter_next - return the next inode of @iter->sb
++ * @iter: iterator state
++ *
++ * The returned inode stays on sb->s_inodes for the next round
++ * without holding sb->s_inode_list_lock:
++ *  -- By default, this inode has an increased reference count.
++ *  -- If INO_ITER_F_NOIGET is set, this inode will not change
++ *	its reference count.
++ *
++ * Return the next inode, or NULL once the walk is over or @iter->status is
++ * negative.
++ */
++struct inode *sb_inode_iter_next(struct sb_inode_iter *iter)
++{
++	struct super_block *sb = iter->sb;
++	struct inode *prev = iter->inode, *inode;
++
++	if (!sb_inode_iter_flags_valid(iter->flags)) {
++		VFS_WARN_ON_ONCE(1);
++		iter->status = -EINVAL;
++		return NULL;
++	}
++
++	if (iter->status || iter->done)
++		return NULL;
++
++	spin_lock(&sb->s_inode_list_lock);
++	VFS_WARN_ON_ONCE(prev && list_empty(&prev->i_sb_list));
++	inode = list_prepare_entry(prev, &sb->s_inodes, i_sb_list);
++	list_for_each_entry_continue(inode, &sb->s_inodes, i_sb_list) {
++		if (!sb_inode_iter_check(iter, inode))
++			continue;
++
++		spin_unlock(&sb->s_inode_list_lock);
++		iter->inode = inode;
++		if (!(iter->flags & INO_ITER_F_NOIGET))
++			iput(prev);
++		return inode;
++	}
++	spin_unlock(&sb->s_inode_list_lock);
++
++	iter->inode = NULL;
++	iter->done = true;
++	if (!(iter->flags & INO_ITER_F_NOIGET))
++		iput(prev);
++	return NULL;
++}
++EXPORT_SYMBOL_GPL(sb_inode_iter_next);
++
++void sb_inode_iter_end(struct sb_inode_iter *iter)
++{
++	if (!(iter->flags & INO_ITER_F_NOIGET))
++		iput(iter->inode);
++	iter->inode = NULL;
++	iter->done = true;
++}
++EXPORT_SYMBOL_GPL(sb_inode_iter_end);
++
+ /*
+  * One thing we have to be careful of with a per-sb shrinker is that we don't
+  * drop the last active reference to the superblock from within the shrinker.
+diff --git a/include/linux/fs/super_types.h b/include/linux/fs/super_types.h
+index 72f4288e16c5..b844e5259360 100644
+--- a/include/linux/fs/super_types.h
++++ b/include/linux/fs/super_types.h
+@@ -80,6 +80,46 @@ enum freeze_holder {
+ 	FREEZE_EXCL		= (1U << 3),
+ };
+ 
++/* Caller-owned state for walking sb->s_inodes. */
++struct sb_inode_iter {
++	struct super_block	*sb;
++	struct inode		*inode;
++	bool			(*eligible)(struct inode *inode, void *priv);
++	void			*priv;
++	bool			done;
++	int			status;
++	int			flags;
++};
++
++/* Only hand out inodes that still have a reference. */
++#define INO_ITER_F_REFERENCED	BIT(0)
++/* Only hand out inodes whose reference count has reached zero. */
++#define INO_ITER_F_NOREF	BIT(1)
++/* Do not take a reference on the inodes handed out. */
++#define INO_ITER_F_NOIGET	BIT(2)
++
++struct inode *sb_inode_iter_next(struct sb_inode_iter *iter);
++void sb_inode_iter_end(struct sb_inode_iter *iter);
++
++static inline struct sb_inode_iter
++sb_inode_iter_init(struct super_block *sb,
++		   bool (*eligible)(struct inode *inode, void *priv),
++		   void *priv, int flags)
++{
++	return (struct sb_inode_iter){
++		.sb		= sb,
++		.eligible	= eligible,
++		.priv		= priv,
++		.flags		= flags,
++	};
++}
++
++DEFINE_CLASS(sb_inode_iter, struct sb_inode_iter,
++	     sb_inode_iter_end(&_T),
++	     sb_inode_iter_init(sb, eligible, priv, flags),
++	     struct super_block *sb, bool (*eligible)(struct inode *, void *),
++	     void *priv, int flags)
++
+ struct super_operations {
+ 	struct inode *(*alloc_inode)(struct super_block *sb);
+ 	void (*destroy_inode)(struct inode *inode);
 -- 
 2.53.0
 
