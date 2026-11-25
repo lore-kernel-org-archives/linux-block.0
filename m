@@ -1,126 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795610734;
-	b=VCrj/Bf5epI3k5Hi9qZFirPDKbnUV7xPfvcM2qvDavDP+T6CMBZfwHUEG7C2nTGYYekY
-	 Tu3LK3qRdCtYPkD6Tmb7LtDPwcoPrayKM2ea0T23sNWcM0BhyXigrBclthoyUI7argika
-	 knEdYX8u8aB6GpIr5yfG789J7liqXgssZEryuo49Y3Zf2MuB28edZguzGSlVUBZjGtbHQ
-	 0/UeEyh1B+lEL75hl09Wo1FdgReXWHeOD+lTVs6EQkVHRCcIZK4SLtAPYuLG9EI31TZwy
-	 +dPdTd8zC/5yf9rz7Cd3hFSsV3ia4XMDVimKt/Qnpw2Qz5ViWkgjTk5FbMx8fdm2qtA==
+	t=1795620918;
+	b=wUbZScHuZqCTjwoI7YUCfBI9R1EOSfJx4OV4WY3M7Leahvm8WZs2WdiaPQcbrBYCuZgf
+	 q7FXbdlKG17GCRgWDQROrFCvs71TeoRN8vt2/xWvM5j0fmxd7ycDmOYg+YsC6NdpvpFys
+	 cejgds6FuVOCLMhhRmiyZg55Gi3P4BTMogooedkRbeSDyObO6WWS5iLT6Ia3VDnQpZT1N
+	 5uZkI8nM8scympMF9xN137RPzG+rIU9uQWwbaudydTX8GOICpN09N/cXzblOSnDvnJeh1
+	 CywzUwKda+FaMU8gth5WUud0hKKUmF/NONFCgr/PCx0b87zHq6gTDWm/cv+Xxj2mNoA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795610734;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 X-Received:Received:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
-	 References:Content-Type:Content-Transfer-Encoding:User-Agent:
-	 MIME-Version;
-	bh=zMekMOFYYzs6d6I/5DTGKyfePdDJNtHmrLQaB2m40Gk=;
-	b=Tf2sl2S4jMkpymrnOpN25OSIrAOM4bzG2kPQergdpcY14BuowvGRmX5CjLFC7C7nAI4m
-	 eWwgiEbc04jzQQCEz80dsiJBduFn2oS8nhuQJRbv9CSMC9e2bjRkhWEK1uZ8u0F8I5jfC
-	 ccmVFvN36ghxpGDPyqmLUEehAZm2+LEUG2Q4EKKhFr/BedxigTrWEU04S7hJnS4CJFxpA
-	 v5kiTWyE0rN34sSxrWdZAks5LjXKipTFzfoeWXl6CdC2ucnp0qJjw+mj/x7DFYtrAXNiA
-	 jbSoycnGH3dQZLQb3YCfTc/TYHukHyuNPpqQyNH9ZWxlZbcCA4nUlAND1gL4yXxMR7g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795620918;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=heq3AsQ6ua66ixuTUqAY8bU1AMYg/OwxMrZJKDM3k1U=;
+	b=k0r5qHZVsM5K7jbr9AbgiZCdhIgFndjVhP+n9cpNZQ9Ewu/fKcBZV9YNEXEXxzyzUn2W
+	 nsYyvrNOpw9sZQ4CQ0vI7Hr4kPnP1PJzXjgxeTltZNRT/v1FBvkpBvLK9Uv2cwZGea5o1
+	 U/1UzFcxbZ5STlBmaUKRONOizuTX+WN03WCR4lujAF1+RNF3JeytpuYd01ChRUD5f7RKP
+	 +Pcu49sSc1Y89FVu63R++/lrNmhiPZkF78jIRoqnLBr8gBW+St7Ae11E/LI6vM3UTZugB
+	 /JBNrx+fSrGRTZVdYlUHt99M8+KIuXAFigDucC/fziwwd4P0ZungSJcLec03YzCfmAw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=IH5p3XWf;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=s1usKEE3;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linbit.com;
+	spf=pass smtp.mailfrom=linbit.com;
+	dkim=pass header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=j6CsXjPw;
+	arc=none smtp.remote-ip=209.85.221.47
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F147B606A682
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 12:45:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F147B606A682
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569B7606A32A
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 15:35:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 569B7606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=IH5p3XWf;
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=s1usKEE3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1795610733;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zMekMOFYYzs6d6I/5DTGKyfePdDJNtHmrLQaB2m40Gk=;
-	b=IH5p3XWfM6etCyIfZkVazjWz3JfKLSyFCp/LW4KU00kXaijG/BmFx8isEplEUYk0qZEOzH
-	8bBI/PFmQ8of59on8s24PoH4PJNlzAbVQBjatFDM2qhA8pNB1ukAxwdtu5EJW1//Mk02s2
-	LNMSKc9k8UHEpR2mmcrBzTNbr06KTqk=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-17-FXFYWA2fMROwud5bR9PLZA-1; Wed, 25 Nov 2026 12:45:30 +0000
-X-MC-Unique: FXFYWA2fMROwud5bR9PLZA-1
-X-Mimecast-MFC-AGG-ID: FXFYWA2fMROwud5bR9PLZA_1795610730
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-93e92aad34aso1007311185a.0
-        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 04:45:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=j6CsXjPw
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-49465892f7bso4312685f8f.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 07:35:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1795610730; x=1796215530; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:content-type
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=zMekMOFYYzs6d6I/5DTGKyfePdDJNtHmrLQaB2m40Gk=;
-        b=s1usKEE3c/lir38ykqA4U0gP6UYjLg0PoJ3SXfpJj8adc85rAabCNLPKuMvNIG/BhC
-         pwdeGomCe2lWiJk7ZEO5lcu+3v7qz+jKA90nwhhg0ZlVdwTVffdD6UZbrYksz7eaIL2s
-         891iZW/KJa3hFhBsjV1bdQZCkt8KdcBY5bfbYacQB8wSd2OZAzz2o1dWmQ/2mT0OPFz6
-         O7b+xIcqlAZ8VTeGjXFz9UNBvv0GYyXZYVqZoIjTWyp6XqJY2ard+U1JytEiP9RfFBhH
-         eSjndd1SePNLxOwJ2dANwWYMmrK2vczYF7FekeHZp97S/bD/+XQBJ6ZhRLds6jbBE5Xv
-         b4qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795610730; x=1796215530;
-        h=mime-version:user-agent:content-transfer-encoding:content-type
-         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=linbit.com; s=google; t=1795620916; x=1796225716; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=zMekMOFYYzs6d6I/5DTGKyfePdDJNtHmrLQaB2m40Gk=;
-        b=v3UwMhX511DQBfdgiguNptICz27MJyLQGkzB+ZWgQj5WRhWu77iAMrJhLr4w0aZIhu
-         IQnmbK5/oyc6dusktdx3sFRTwvdY85ASkeSBqC4CLkVAnxZlLwFDZzb36mDOBYb/4eIV
-         UFCzDxDPPUL/5f54meL4rQKxDHZ6cWPexWylMWuORu6JX9LR0RGjpO6qwSgRf3vBFXwN
-         ituexQUSpD5zRUmUKB02pOKQuPC7eRjSRguS2yxg5foiaEm9E0AzIEkwhxrkk42WSBTq
-         An5teUdmEn37cQdy9PwCawhtdBPSiS2XagMFU7Nve9HNZsbE7r3pCJIKXQVMflBMCOiD
-         8T7g==
-X-Forwarded-Encrypted: i=1; AL+hErE7/qwdxcXlAHehjUljhjFqPdkKOhQFTh0QqF8zi/bVPdMMnQGZ5FNsJVzx4Q81MgUsNY14JaKDcbhSBA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/CX4nGS5mXH0unbKF2E2GjRZTAwkH71z41Qn/ZF/UyACW/EKIE
-	3L3IW6q0zHULmznJAf1w5LefoWqswFn7rA+SZKYRHmp7x1P0qn0NOgx+HjLbF4XCS/xMOTN2LPa
-	D79Lc7IjD3M0fb9EtpZnWpI8Eq3vELiVNePUyuz8BVncDyHhtsVXW6vB1H4Fvm4se9010smrC
-X-Gm-Gg: AZFdTZcaIswAJjMbUZ3ikuqI+WvXRDBgDHQeukdPVHfHxG+V4oZGcatI93P7XjSy0KE
-	1AM8VmqnZVH+sSWBZnB4o0qk4tNDmSI7kiehHSqCLP3EyDosktvEatV4zvXLzjKwa35YdEZ2stj
-	Ma8FYYQReFT0d8ly9MeZqS9EWodZ5pLCfySx6hHH05L1Et3xhXA5AWU5pkF4SuCBTUqxqV/Gvi7
-	Bx0oH+rVT0E370WZQJHZWhdIyhwpUMSa2tLDEUVk8U/iec05ralGiuAtXgtqEJpnvURITUmL8ws
-	JOBRBukam0Tk7NlgKcHGO97gyNaaxazq0SFnaGFy0r1sztM1h/82XiZGLZLWAz1fLaAotfXLWGO
-	lvkw3+t0hhff6D9AhruTubwrzwAgsP4ZB68ObTMPMs6KNBZJEzM/AiTJODi3e/CsNBu2dqbM89o
-	wXPuvvAZxqAy4+BYe7wum/q51S5flg2AKJRgrnoP1O5SBHKUNHsvv83xZpaEzlWUS+uOV7Hdo=
-X-Received: by 2002:a05:620a:8395:b0:949:849d:e3c7 with SMTP id af79cd13be357-949baa0b24bmr3012431185a.33.1795610729623;
-        Wed, 25 Nov 2026 04:45:29 -0800 (PST)
-X-Received: by 2002:a05:620a:8395:b0:949:849d:e3c7 with SMTP id af79cd13be357-949baa0b24bmr3012424385a.33.1795610729010;
-        Wed, 25 Nov 2026 04:45:29 -0800 (PST)
-Received: from loberman-thinkpadp16gen3.rmtusma.csb ([2600:6c65:2440:d8c:aa2b:ddff:fe88:da74])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-949bb349db3sm1293829285a.7.2026.11.25.04.45.27
+        bh=heq3AsQ6ua66ixuTUqAY8bU1AMYg/OwxMrZJKDM3k1U=;
+        b=j6CsXjPwKBhn0D3F+YEhUqN6H+QvRV6IL5tmgWNCi5Ko0wIcE99byUo1c7gXZb7VTK
+         xk4VlZd67fJFhBVV/0yhdCGiIpT/xTv73QEeqGvVMa77Oi3ecuUMxU2Zpb0SH0L8+GfG
+         DNPAnSnr9FeW6DaLpMH95dWYzrqqgkpi5apH/uEhFhhLGnXpmWApA4Yev7zoCXv4sVOt
+         KoXFGgyS2KPDox85F+hO+FK9fyerkgOgLBLnTbFzbMzRv+omWwFggp8OcRavql6gIiep
+         vnCJ9UbUY1LpuI2aBKostHXXA4IonGlqK2Uy0JKgddDoKxN5OmIMwCktz8qn/ayXPcXQ
+         tsLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795620916; x=1796225716;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=heq3AsQ6ua66ixuTUqAY8bU1AMYg/OwxMrZJKDM3k1U=;
+        b=Gbt2msg79FtDVehvIjGlkHi9thB3suhBeeJXTM2Cpop/74zgrZ2qCyQxOVbUTlgJwI
+         FFHT0jiJrylbWiGwvaIQ8OP6ue715PbvCIFMSpTTGgw1VNBc0LxY4I/M5arky0RkMqT9
+         zsVgrQt2sRUqRTFGW6GLUKA+ax9QFA+8vyXF2lscoD2I0tz57yF3+EctTcqSvLk+F+ug
+         1AhaNYii+4iREl1QsEoDc8LNlBLL9BeHqe+Z4DtaWU7VpOkgmSrqFpRbifAXqoV4Uwug
+         Sqvbcqfct0cbnbjX3K+z67L4COWNjaHVxp+qXeeg4BK37f2MwXW0UvsgNpMN7XYyZPkF
+         ZP/Q==
+X-Forwarded-Encrypted: i=1; AL+hErGMIgN28LJAF8d/zOIFTkl3Txrx8e/pWQ9Mcy3+RKgfxwJ9ObbnVFtUZaJa3Lq6lMiuCBeF6JE50cCn/A==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9degZbUpZ31J+1BMQtrAD9tWr1yp5y/wZEIpzh+3jsftstDet3
+	pPdqrOr8AKbhoAXVx5vzDjC0hRoCd2qkoHXEM4YHA3okRW2Yzbu9790Jrd7hbEfVano=
+X-Gm-Gg: AZFdTZc+csH/djmCkp5vmNfNUoU5Dn8pTGmEqhUTIRJJiwJgovU+H3kNPWuGZN5bAs+
+	jJCFL/yfpvKi0841mnT8juScvMkxUvNKLIVmrK5dEN25mW3/ByBF1Io4fYUFguD1MTjccHtoBnq
+	y8BxFMdX18hFlELw/2vzWmFlhQ/nMgum1zQBrBN09gOddq46N11wiFKXVl5drNpnZY55I96ZWMr
+	KR283r2DQ1iFxSJnPRf8ws8UcCPlCYKeHoCRDsOIBNL3nf/hvHEaVRAJQ7yPvNXjHMA4AmcSxWl
+	lQs7jeCNhbaTi0nNR+gQfxfv+VZtnzYSpuQWoHvky9hftcL9ckq05XTGmmzAEf2gsodIBiVRHEN
+	LpTN0MfvxbeArwtlip4Y75W5dEpISIM+JCsHL4ZdTSF27Kd7j1vrKe25eD99ez181+4QL3UgNOa
+	e3j5C9gGin8Ji3eDFBzBYvFR6qTwZGWML1rvcb1sdn24gOJwJ2jCfPQ07IHGMBluoQQ4G1VUY4K
+	B1oI2i1q1OiE4k+nGe2qvQtMOOFNbECXyEO/LQvtVxuWlvFP16u7YbKcnYb8YT7xa90xfqgM3hw
+	ZC/rYeJBDPhA/vxa9Hi08ZRLwXodid12TOJ16oewBt6nplhPptaXJkqDFYTNV6UymglpH3A/T2h
+	Qv5VxWt0afHH9O/XVMhM=
+X-Received: by 2002:a05:6000:2489:b0:4a5:8f40:a644 with SMTP id ffacd0b85a97d-4abb1baa9eamr37631802f8f.9.1795620915562;
+        Wed, 25 Nov 2026 07:35:15 -0800 (PST)
+Received: from linbit.com (h082218129081.host.wavenet.at. [82.218.129.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab658e2d60sm35816275f8f.3.2026.11.25.07.35.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 04:45:28 -0800 (PST)
-Message-ID: <8bb1bdab536b9f727b00e6b6d2246f44d5ff8567.camel@redhat.com>
-Subject: Re: [REGRESSION] DMAR fault by Intel H97 SATA controller since
- "block: Increase BLK_DEF_MAX_SECTORS_CAP" (6.17-rc1)
-From: Laurence Oberman <loberman@redhat.com>
-To: Tobias Laas <tobias.laas@posteo.de>, Thorsten Leemhuis
-	 <regressions@leemhuis.info>
-Cc: Niklas Cassel <cassel@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>, regressions@lists.linux.dev,
- linux-block@vger.kernel.org, 	linux-ide@vger.kernel.org,
- iommu@lists.linux.dev, linux-kernel@vger.kernel.org,  David Woodhouse
- <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel
- <joro@8bytes.org>, Will Deacon <will@kernel.org>
-Date: Wed, 25 Nov 2026 07:45:27 -0500
-In-Reply-To: <ea064dc05dbf146814f1495adad4d39e@posteo.de>
-References: <5ad27a97aafbc08a8702d5b90d09cd59@posteo.de>
-	 <awSs5Cw3hFkf4O4T@ryzen>
-	 <7eb28c6334a655eb5bfbf3035cf1f1ff1041bb3e.camel@redhat.com>
-	 <ea064dc05dbf146814f1495adad4d39e@posteo.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-3.fc44) 
+        Wed, 25 Nov 2026 07:35:15 -0800 (PST)
+From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Chuck Lever <cel@kernel.org>,
+	kernel-tls-handshake@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	Dan Williams <djbw@kernel.org>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Alison Schofield <alison.schofield@intel.com>,
+	nvdimm@lists.linux.dev,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH v4 00/21] drbd: DRBD 9 rework
+Date: Wed, 25 Nov 2026 16:34:50 +0100
+Message-ID: <20261125153511.3060599-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -130,202 +116,186 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, 2026-11-25 at 08:29 +0000, Tobias Laas wrote:
-> Am 23.11.2026 22:49 schrieb Laurence Oberman:
-> > Hi Niklas, Tobias,
->=20
-> Hi Torsten, hi Laurence,
->=20
-> I am responding to both of your emails in this email, because you
-> both=20
-> suggested to check out intel_iommu=3Don,sp_off.
->=20
-> >=20
-> > I tried to help here but (full transparency) I had some LLM help
-> > for
-> > further ideas after I coul dnot repriduce this on my platform.
-> >=20
-> > I tried to reproduce this on a Coffee Lake desktop (i7-8700, Cannon
-> > Lake PCH AHCI 00:17.0) whose INCLUDE_ALL DRHD reports the same
-> > relevant capabilities as Tobias's dmar1:
-> >=20
-> > =C2=A0 dmar1: cap d2008c40660462 ecap f050da
-> > =C2=A0 (SLLPS =3D 2M|1G, ecap.C =3D 0, MGAW 39, SAGAW 4-level only)
-> >=20
-> > with intel_iommu=3Don, DMA-FQ default domain, max_sectors_kb =3D 4096.
-> >=20
-> > - 6.12-based kernel (pre d373449d8e97, i.e. the old VT-d page table
-> > =C2=A0 code, with the larger BLK_DEF_MAX_SECTORS_CAP): 2M O_DIRECT
-> > reads,
-> > =C2=A0 clean.
-> > - 7.4.0-rc1 (generic iommu page table): 2M and 4M O_DIRECT reads
-> > and
-> > =C2=A0 2M writes from hugepage-backed buffers against a SATA SSD, ~15k
-> > =C2=A0 I/Os, no DMAR or ATA errors. The iommu:map tracepoint shows
-> > =C2=A0 2 MiB-aligned iova/paddr mappings, and domain_translation_struct
-> > =C2=A0 shows 2 MiB leaf PDEs (e.g. 0x000000039c200082, PS set), so the
-> > =C2=A0 superpage path was exercised.
-> >=20
-> > The 4088 vs 4089 threshold matches exactly the point where a
-> > request
-> > first needs a full 512-page (2 MiB) IOVA, which is where superpage
-> > mappings become possible. All three of Tobias's fault addresses
-> > fall
-> > in the same 2 MiB window at 0xff400000.
-> >=20
-> > So on this hardware neither the old nor the generic page table code
-> > shows the problem, which supports Niklas's suspicion of something
-> > platform specific. One difference: on Tobias's system dmar0 reports
-> > no superpage support (cap c0000020660462) while dmar1 does; on mine
-> > both do.
-> >=20
-> > Tobias, a few things that would maybe help narrow it down:
-> >=20
-> > =C2=A0 1. Boot with intel_iommu=3Don,sp_off and an unmodified cap. If t=
-he
-> > =C2=A0=C2=A0=C2=A0=C2=A0 faults go away, superpages are involved.
-> Very nice. I just tried with a kernel with the cap at 8191, which I
-> had=20
-> at hand (the new default cap is 8192 IIRC): with
-> intel_iommu=3Don,sp_off=20
-> the faults go away, indeed. More on this below.
->=20
-> > =C2=A0 2. The full dmesg from a failing boot, including the DMAR/DRHD
-> > =C2=A0=C2=A0=C2=A0=C2=A0 lines. The faults are reported as DMA Write wh=
-ile the
-> > outstanding
-> > =C2=A0=C2=A0=C2=A0=C2=A0 commands were WRITE FPDMA QUEUED, and I'd like=
- to see what
-> > else
-> > =C2=A0=C2=A0=C2=A0=C2=A0 was in flight.
-> To be honest, I'd like to avoid having to capture a full log when the
-> error occurs, because I can't think of a good way to save it.=20
-> Technically, I hope the logs up to the first fault are identical with
-> the various caps. As you can see in the log corresponding to the
-> first=20
-> screen full of errors in the attachment, there are exactly two WRITE=20
-> FPDMA QUEUED commands that fail at a time (with the cap at 4089
-> IIRC),=20
-> so the log looks very repetitive. After the first couple of errors,
-> the=20
-> kernel starts reducing the ATA link speed (and later maybe also the
-> UDMA=20
-> speeds) and continues to do so until it gives up on mounting the
-> rootfs.=20
-> Then I=E2=80=99m greeted by an initramfs shell prompt, and I=E2=80=99m no=
-t sure if I
-> can=20
-> mount any other filesystem at this point with the slimmed down kernel
-> config I used to speed up the bisection.
-> I=E2=80=99m not sure if I=E2=80=99ve understood you correctly regarding y=
-our second=20
-> sentence: I don=E2=80=99t see any contradiction here=E2=80=94for a WRITE =
-FPDMA QUEUED
-> command, there should be an associated DMA write. The QUEUED just=20
-> indicates that the SSD can reorder the commands in the queue (NCQ).
->=20
-> Am 24.11.2026 09:55 schrieb Thorsten Leemhuis:
-> > I just a few days privately was told that "intel_iommu=3Don,sp_off"=20
-> > solved
-> > problems wrt to one unresolved regression related to iommu with a
-> > similar generation intel hardware. The user wrote "[kernel] code
-> > improperly thinking that the CPU supports something called=20
-> > "superpages",
-> > which it does, but only when the integrated GPU is disabled
-> > (speciality
-> > of Intel Haswell)."
-> >=20
-> > Could that maybe related? Do you use the iGPU? Does that parameter
-> > prevent the problems? It's a long shot, but quickly tested, so I=20
-> > thought
-> > it was worth mentioning.
-> Yes, it could very well be related. My CPU is a Haswell (Refresh)=20
-> Desktop processor, and I do use the iGPU. And sp_off seems to prevent
-> the problems, see above.
->=20
-> But what I still don't understand is why DMAR faults occur. There are
-> dmar0 and dmar1, and as Laurence explained, dmar0 does not support=20
-> superpages on my board. I guess this is because the iGPU is supposed
-> to=20
-> be associated with dmar0 (The BIOS might configure this differently
-> when=20
-> I install a PCIe GPU and deactivate the iGPU). Is there any conflict
-> if=20
-> dmar1 uses superpages and dmar0 doesn't? Or does the kernel not
-> respect=20
-> that dmar0 does not support superpages? Or is the iGPU associated
-> with=20
-> dmar1? Who determines this: the kernel or the BIOS?
->=20
-> Best regards,
-> Tobias Laas
+As discussed (context: [0]), here is our DRBD 9 rework series, intended
+for linux-next via for-7.x/drbd.
 
-Hi Tobias, Thorsten,
+This replays about 10-15 years of active out-of-tree development work
+[1], depending on your way of counting. The out-of-tree module has
+severely diverged from the in-tree version over the years, which is
+what we are aiming to fix now.
 
-Againe, I had LLM help here trying to get clarification.
+Hopefully that somewhat excuses (or at least explains) the massive
+diffs -- we've tried to come up with a way to group the changes by
+topic, but I realize it's still not exactly trivial to review.
 
-Thanks Tobias, the sp_off result confirms that superpage mappings are
-involved. No need for the full failing log; the question about DMA
-Write vs. WRITE FPDMA no longer matters given this.
+We've been polishing this series for a while now, and we have taken
+great care to make it as "upstream-presentable" as possible. That said,
+there are still probably imperfections. It's a start -- feedback
+welcome!
 
-To your questions: the BIOS defines which devices each DRHD covers,
-via the ACPI DMAR table. On your board dmar0 (flags 0x0) covers only
-the iGPU (00:02.0), and dmar1 (INCLUDE_PCI_ALL) covers everything
-else, including the SATA controller at 00:1f.2. The iGPU is not
-behind dmar1.
+The netlink interface has been reworked so that userspace is not
+broken: the existing "drbd" generic netlink family keeps being served
+at version 1, and this series does not touch its generated
+serialization or its UAPI header.
+Every shipped drbd-utils release therefore keeps working against this
+driver. DRBD 9's own utilities speak a new family, "drbd2", written as
+a YNL specification under Documentation/netlink/specs/ and following
+current genetlink conventions; its generated code is checked in as
+usual. The driver registers both families and translates each onto the
+same wire-neutral core, so the multi-peer administration model is only
+reachable through drbd2, while version-1 clients see the single-peer
+semantics they expect.
 
-If I read the history right, this comes from three things combining:
+The RDMA and load-balancing TCP (lb-tcp) transports are not part of
+this series; they will be submitted separately once they have had the
+same treatment. The rdma_ctrl_rcvbuf_size
+and rdma_ctrl_sndbuf_size net options do remain in the UAPI: they are
+generic transport options that are interpreted by whichever transport is
+in use, so there is no reason to remove and later re-add them.
 
-  - Before v6.13, intel-iommu used the lowest common superpage level
-    across all active IOMMUs (domain_update_iommu_superpage()). Since
-    your dmar0 reports no superpage support (cap c0000020660462),
-    superpages were never used anywhere on your system.
+The base for these patches is for-7.5/block, which has the preparation
+patches [2] this series builds on.
 
-  - 5bdd86ec5d19 ("iommu/vt-d: Remove domain_update_iommu_superpage()",
-    v6.13-rc1) made superpage support per-IOMMU, so dmar1 started
-    using its advertised 2M pages (cap d2008c20660462, SLLPS =3D 2M|1G).
+As discussed, the goal is to get this applied to a for-7.x/drbd branch
+so it can land in linux-next via block-next. After letting it mature
+in linux-next for a while, it should go in via the block tree.
 
-  - 9b8b84879d4a ("block: Increase BLK_DEF_MAX_SECTORS_CAP",
-    v6.17-rc1) raised the default cap from 2560 sectors (1.25 MiB) to
-    4 MiB. Block I/O can now produce 2 MiB-aligned 512-page mappings,
-    which is the first time AHCI DMA hits the superpage path by
-    default. That explains both the bisect result and the 4088/4089
-    threshold: 4088 sectors is exactly 511 pages, 4089 needs a full
-    2 MiB mapping.
+Thanks,
+Christoph
 
-All three of your fault addresses (0xff400000, 0xff4a0000,
-0xff450000) fall in the same 2 MiB IOVA window, and fault reason 0x0c
-(non-zero reserved fields in PTE) at scattered 4K addresses inside it
-would fit the IOMMU not handling the 2M leaf entry correctly. That is
-similar to the Geminilake igfx superpage issue fixed a few years ago.
+[0] https://lore.kernel.org/linux-next/899e0337-9642-4ca6-9050-aeab14fa22ef@kernel.dk/
+[1] https://github.com/LINBIT/drbd
+[2] https://lore.kernel.org/linux-block/20260923140608.1116713-1-christoph.boehmwalder@linbit.com/
+[3] https://lore.kernel.org/linux-block/20261111083505.3998706-1-christoph.boehmwalder@linbit.com/
 
-For comparison, I could not reproduce this on a Coffee Lake system
-(i7-8700, Cannon Lake PCH AHCI) where both DRHDs report SLLPS =3D 2M|1G
-(dmar1 cap d2008c40660462, ecap f050da). On 7.4.0-rc1 with
-intel_iommu=3Don and max_sectors_kb =3D 4096, against a SATA SSD:
+v3: https://lore.kernel.org/linux-block/20261110162646.3028472-1-christoph.boehmwalder@linbit.com/
+v2: https://lore.kernel.org/linux-block/20261006154607.3936501-1-christoph.boehmwalder@linbit.com/
 
-  - O_DIRECT 2M/4M reads and 2M writes from hugepage-backed buffers
-    (~15k I/Os); domain_translation_struct confirms 2 MiB leaf PDEs
-    were installed (e.g. 0x000000039c200082, PS set)
-  - 60s of concurrent 2M sequential + 4k random O_DIRECT reads
-  - buffered XFS write/read/copy of 8 GiB, with ~2000 4 MiB mappings
-    in the iommu:map trace
+Changes since v3:
+- Fixed the problems that the kernel test robot and the sashiko review
+  found in v3 in code that is new with this series, mostly in the
+  version-1 netlink compatibility layer and the drbd2 family: among
+  others, string attributes longer than their buffer, the 8.4 peer slot
+  and history UUIDs in 8.4 meta-data, the peer commands before the
+  first connect, the resource-name filter of the drbd2 resource dump,
+  and the notification error paths
+- Fixed the link failures with NET_HANDSHAKE=n and with BLK_DEV_DRBD=y
+  and DEV_DAX_PMEM=m: TLS for the TCP transport is now its own option,
+  BLK_DEV_DRBD_TCP_TLS, which a new patch allows to enable
+  NET_HANDSHAKE; the DAX meta-data code now depends on FS_DAX instead
+  of the device-dax driver
+- The link failure with CRYPTO=n is in the current in-tree DRBD as
+  well; it is fixed by a separate patch [3]. This series applies with
+  and without it
+- Dropped drbd_transport_template.c, which did not compile and was not
+  built
+- Removed the userspace branches of the #ifdef __KERNEL__ blocks in
+  the protocol and meta-data headers
+- Fixed kernel-doc warnings
+- Synced with the current out-of-tree state
 
-all completed without DMAR or ATA errors. A 6.12-based kernel with
-the larger cap was also clean. That is consistent with the problem
-being specific to the dmar0/dmar1 superpage asymmetry on Haswell with
-the iGPU enabled, as Thorsten's report suggests.
+Changes since v2:
+- Rebased onto for-7.5/block, now that the preparation patches are
+  applied there; v2 no longer applied
+- Kept the in-tree DRBD changes that went into v7.4: the explicit
+  linux/umh.h include and the conversion to sk_set_nospace()
+- Synced with the current out-of-tree state
 
-Tobias, if you have time, a confirmation test: on a 6.13-6.16 kernel,
-raising max_sectors_kb to 4096 via sysfs on the SSD should reproduce
-the faults, while 6.12 with the same setting should not.
 
-Lu, is there a known Haswell erratum here? If so, a platform quirk
-that disables superpages (or restores the common-denominator rule)
-when the igfx DRHD lacks superpage support seems like the right fix,
-along the lines of the earlier Geminilake igfx superpage quirk,
-rather than limiting max_sectors in libata.
+Christoph Böhmwalder (21):
+  drbd: mark as BROKEN during DRBD 9 rework
+  drbd: extend wire protocol definitions for DRBD 9
+  drbd: introduce DRBD 9 on-disk metadata format
+  drbd: add transport layer abstraction
+  drbd: add TCP transport implementation
+  net/handshake: allow the DRBD TCP transport to enable NET_HANDSHAKE
+  drbd: add DAX/PMEM support for metadata access
+  drbd: add optional compatibility layer for DRBD 8.4
+  drbd: add application/resync IO synchronization documentation
+  drbd: rework sender for DRBD 9 multi-peer
+  drbd: replace per-device state model with multi-peer data structures
+  drbd: rewrite state machine for DRBD 9 multi-peer clusters
+  drbd: rework activity log and bitmap for multi-peer replication
+  drbd: rework request processing for DRBD 9 multi-peer IO
+  drbd: rework module core for DRBD 9 transport and multi-peer
+  drbd: rework receiver for DRBD 9 transport and multi-peer protocol
+  drbd: rework the netlink core for DRBD 9
+  drbd: serve the "drbd" genl family at version 1 for existing userspace
+  drbd: add the "drbd2" genl family
+  drbd: update monitoring interfaces for multi-peer topology
+  drbd: remove BROKEN for DRBD
 
-Regards,
-Laurence
+ .../application-resync-synchronization.rst    |   208 +
+ .../admin-guide/blockdev/drbd/index.rst       |     1 +
+ Documentation/netlink/specs/drbd2.yaml        |  2615 +++
+ drivers/block/drbd/Kconfig                    |    63 +
+ drivers/block/drbd/Makefile                   |     9 +-
+ drivers/block/drbd/drbd2_nl_gen.c             |   815 +
+ drivers/block/drbd/drbd2_nl_gen.h             |   114 +
+ drivers/block/drbd/drbd_actlog.c              |  1419 +-
+ drivers/block/drbd/drbd_bitmap.c              |  2075 +-
+ drivers/block/drbd/drbd_config.h              |    46 +-
+ drivers/block/drbd/drbd_dax_pmem.c            |   175 +
+ drivers/block/drbd/drbd_dax_pmem.h            |    43 +
+ drivers/block/drbd/drbd_debugfs.c             |  1760 +-
+ drivers/block/drbd/drbd_debugfs.h             |     2 +
+ drivers/block/drbd/drbd_int.h                 |  4041 ++--
+ drivers/block/drbd/drbd_interval.c            |    39 +-
+ drivers/block/drbd/drbd_interval.h            |   130 +-
+ drivers/block/drbd/drbd_legacy_84.c           |   651 +
+ drivers/block/drbd/drbd_legacy_84.h           |   129 +
+ drivers/block/drbd/drbd_main.c                |  7032 +++++--
+ drivers/block/drbd/drbd_meta_data.h           |   163 +
+ drivers/block/drbd/drbd_nl.c                  | 10355 ++++++---
+ drivers/block/drbd/drbd_nl.h                  |   416 +
+ drivers/block/drbd/drbd_nl_84.c               |  4048 ++++
+ drivers/block/drbd/drbd_nl_defaults.c         |   168 +
+ drivers/block/drbd/drbd_nl_drbd2.c            |  2669 +++
+ drivers/block/drbd/drbd_nl_types.h            |   406 +
+ drivers/block/drbd/drbd_polymorph_printk.h    |    42 +-
+ drivers/block/drbd/drbd_proc.c                |   327 +-
+ drivers/block/drbd/drbd_protocol.h            |   620 +-
+ drivers/block/drbd/drbd_receiver.c            | 17563 ++++++++++++----
+ drivers/block/drbd/drbd_req.c                 |  3208 ++-
+ drivers/block/drbd/drbd_req.h                 |   332 +-
+ drivers/block/drbd/drbd_sender.c              |  4565 ++--
+ drivers/block/drbd/drbd_state.c               |  9242 ++++++--
+ drivers/block/drbd/drbd_state.h               |   334 +-
+ drivers/block/drbd/drbd_state_change.h        |    80 +-
+ drivers/block/drbd/drbd_strings.c             |   103 +-
+ drivers/block/drbd/drbd_strings.h             |     4 +-
+ drivers/block/drbd/drbd_transport.c           |   550 +
+ drivers/block/drbd/drbd_transport.h           |   516 +
+ drivers/block/drbd/drbd_transport_tcp.c       |  1828 ++
+ include/uapi/linux/drbd.h                     |   305 +-
+ include/uapi/linux/drbd2.h                    |  1046 +
+ include/uapi/linux/drbd_limits.h              |   138 +-
+ net/Kconfig                                   |     2 +-
+ 46 files changed, 63195 insertions(+), 17202 deletions(-)
+ create mode 100644 Documentation/admin-guide/blockdev/drbd/application-resync-synchronization.rst
+ create mode 100644 Documentation/netlink/specs/drbd2.yaml
+ create mode 100644 drivers/block/drbd/drbd2_nl_gen.c
+ create mode 100644 drivers/block/drbd/drbd2_nl_gen.h
+ create mode 100644 drivers/block/drbd/drbd_dax_pmem.c
+ create mode 100644 drivers/block/drbd/drbd_dax_pmem.h
+ create mode 100644 drivers/block/drbd/drbd_legacy_84.c
+ create mode 100644 drivers/block/drbd/drbd_legacy_84.h
+ create mode 100644 drivers/block/drbd/drbd_meta_data.h
+ create mode 100644 drivers/block/drbd/drbd_nl.h
+ create mode 100644 drivers/block/drbd/drbd_nl_84.c
+ create mode 100644 drivers/block/drbd/drbd_nl_defaults.c
+ create mode 100644 drivers/block/drbd/drbd_nl_drbd2.c
+ create mode 100644 drivers/block/drbd/drbd_nl_types.h
+ create mode 100644 drivers/block/drbd/drbd_transport.c
+ create mode 100644 drivers/block/drbd/drbd_transport.h
+ create mode 100644 drivers/block/drbd/drbd_transport_tcp.c
+ create mode 100644 include/uapi/linux/drbd2.h
+
+
+base-commit: aa7014f8d7565cfea117eac36a5de0a05eba65a4
+-- 
+2.56.0
+
