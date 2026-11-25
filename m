@@ -1,119 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=170.10.133.124
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795598234;
-	b=v25PXRSwf2FbnyOzvBqOmhFyNU5RVVgFd11aQ1LHcqG//OxbHwih32vy1jZa9M4XgURB
-	 EW2yVx7rCnUGje8IMWsJtqT3EzptZPbyja+1WI9FnwEfm+swuqlL4duqP7j7X27d9IfgK
-	 oreavajvWyMrFwWps/AiZ61X6XoDkkQivgaMiiSLkTWwnSz/9RHILIPu++KGZgcgDm+gJ
-	 fRnql2nD87JPOosZNEiuqIGTE+e0S/I8DmZE9worwKDbkeBh85OMDqlJgyxGM8m+3Mew4
-	 m2Lgb4cXwPEtPi6cHvHl8ymxhCjmb7KSlUqiTODfQ49ten0Oq8ZZ4mjC4T3HO3QaPsg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795598234;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:
-	 Cc:Content-Type:Content-Transfer-Encoding;
-	bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
-	b=vq4g3REMqZwkq0IC4n/wT1qwOsl3UB11tz1+yY2jB/tCzt53WsPH2r4zMrsxbUHvWVlk
-	 9QJjtNRE0v7dVGNWO/GI+9X5IhwUJZ5J7pz7a5XTi07veigCSxKjofQ6+lcgWtUa8gv50
-	 IHn4kp2SmdaYy74czs2SxjRGWqDF/JXsffZsMTTSFFyfuqj28Bl9G+BYZIHBMlGfNHaWz
-	 sRka9dlEVcCIyIEBc8gOljf10+SCKuLTKBq2cbF+bI0gFfa/imNHsKDW7MXhvM0nXYa2j
-	 yvD3Qq/86kp0GVaNcSZbtqQc2RFQBNHysVGKHLtRDg/XwU9FRWpOgp+yqz6VSVkByHA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ciGEVnWH;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=JudkF65J;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=170.10.133.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.199
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795602214;
+	b=WsqdPNhNqhpeIqCozB1B1JJfnAVrq6ig/1l+Oo+hAPtmv0SWLKV036R+xmb7b5INoKm6
+	 Ejr3LySlapQKCDR+iqK9DwPtLax+VPFMUS9gE6HYtLbaL+gAhNXoYY3bAE5KP+a1WmNPq
+	 NON4IrcCjAt0C+4go8leTKvgFXSk288FYqevK/mwNfmcMoAGwCkvJSzj/kwIwXE2N7xZC
+	 3me18/BxQSC3QlfS4Wy5cxzKLESy8/pvl2HfyuBrfR9FAJM9U8wRk5ue0hNr2zALJ23r3
+	 yKcnBKTM/ayGt2y7gvmD+RFcbJikneWuHhd1jh4Ukp2lUKNcRAwhAuL7RSIq1Vq8tEA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795602214;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:In-Reply-To:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Cc:Content-Type;
+	bh=nAwEpdk8W5zOz8dRUea8wq0PG12t8rrSsYABB8slUxU=;
+	b=m2GjdPIgvB/IPNAhp1GpYddubcbWkJGElZ7d4gColfBK2iHf8+Gm10Btl//9w2IcoQuF
+	 wcFkJeJijebWB3GHdZYSlWs3ii5XhrYLVNodNzogmQaw1or9yL4J79oRQqeQvenJHz3SN
+	 tocXeZetkonsXWveaiSgGQdRGGJRXkpz42UFxioj1GHi/oIy4jnXkK2h2K03qCfbFBfLe
+	 Ts9wRB0SXvK0O1Bv5hEbr03Xy8hOi7frfgHnce+DzTFgIlzQjWk+2o2bzXZDabXZUpoW+
+	 IztDAu7svZkLlXArygrL5AcfLpJ+yr5bDcQQJBLiLU2TKlYf3hsfWGDoGCozLw7gxzA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.199
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D2F606A680
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 09:17:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2D2F606A680
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ciGEVnWH;
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=JudkF65J
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1795598232;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
-	b=ciGEVnWHm+m6pmaqeVd7C4zNrSasb5/wyhZP9jyIabcJ7+O+bSbHDGQLXuL1LUSFgqgl0B
-	umFC8NXHXe/TE0DSNV5kE+wJvOLcoiIZNFoARE6BbWMkGegSv/VaxX1sllsNp0ND0AiFEj
-	sWL9mx0JdcvSzslgMKWP/8azpLPkGC8=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-522-onaxC6DTN8mqdXzNA2HhGQ-1; Wed, 25 Nov 2026 09:17:10 +0000
-X-MC-Unique: onaxC6DTN8mqdXzNA2HhGQ-1
-X-Mimecast-MFC-AGG-ID: onaxC6DTN8mqdXzNA2HhGQ_1795598230
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-85d630e451aso5140266a34.2
-        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 01:17:10 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795598230; cv=none;
-        d=google.com; s=arc-20260327;
-        b=UgttoKgkehTjKfkx7q3KeVnxga1fIGcV4XLB76ESSyx2Dwx0gNCY/weTCORCqN60jE
-         tlcXfHydoK+Y6tzbRclECZ+u9TuUIDJB15mFzPcF5NUGHzNeGFkmAB8yHqHp2x60J0HP
-         nJB73raIXZI9Zai89XQyf4kOid1g1y6kI1+0GiVsQSJa/co6vwoet8V0hz1qKzMJjOvp
-         CzH80Q7XOtPjLJCTbxM1cmYWeh6pCDyqG6FjlJwhWnA8kSdJshS6kN1xZqn9H5mQuwoQ
-         jNvaPriI4LnQne0Xw/V0CBRmTv2AseW6ncfJx7lsRfEz2fHrnC2PZkmDYkiXvBgdUcsX
-         Mo4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
-        fh=V1/e7DCuAHjTHdJreWSiSwxzCwkdwNjA75uJc8tVDuo=;
-        b=hlj99rlSuzFOF12SWCdK2utQsZ3ODocYQRsihdv81qw4t4916RPTWkpB0x/RCcb4cQ
-         qJxqqa/PCSuEF1mygObxiFvsqyDs9CuCYoagJ7G9X4PCLAPry2j/Akp7nWH5530ycTfw
-         tHzN2Z38s7ioGa9YrVpxPIPBtCc21SZ6ID4+C28wPFWFjlqvE1XnW07WxNnHOv8uXqZS
-         BHwgc6GqVaMMe3thDM9wR92XYqTyt47YpbuJpVCadtlQ5QBzUgnzSZfpYVCwVG0xiY8V
-         7ANU+fQ9k2w+sJy1190VSYaebPiafbs3AecTQTHziJm0Njj6lbBW9KK3LzJeVIY4cG+r
-         bNVg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1795598230; x=1796203030; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
-        b=JudkF65JwYvbeb5GQWVmPLdEHPSFf2+gNky2kvpZc2DGvjUf1O+EG0ZrDaj1mFmCHx
-         NhYmFNfgKv+3QPOP4L/nax4E8dJUax8cODhz1kupNoQeSTQM8+J6eVokJPBTzKyf0sD2
-         o/N0AEWyZ3Ygs8yKoPiXFsDRNHT4E6Br4XQQUYIPL7YsSZXGyvbc1W1DTMR/vUBR/KIF
-         HI1TgRO8Pz/EeOOfHh/EUURmVZw+JTRnG3tIt/Sunr6scHaG08kHoolJS8CMKkrii1eP
-         aQdgiD6VutyvftdrR2XLK6vQlYfp5TT6bqf4vQhvkb9XUwd0bmnMcPxIx5lgVPoChVHf
-         uDew==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4D5606A32A
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 10:23:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7E4D5606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-4cbf700ddccso4137578b6e.0
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 02:23:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795598230; x=1796203030;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cAYdqBNBEgg5h2s+5Nw6P6avYopE1k6reY3QHsLhPtk=;
-        b=zcA4NkXo7P/rQnpRmptUKm+kVTidJROZ24tXy4EimxqIYAzSgWHAVcxQmq8WsFF+H6
-         CiN/D7fTCay+jY98UpIKSbcP7JHnCNt6N53QnodgzAojphfqGx2v8mWZeYh3GtqQ8uvV
-         kVgrjrVc9AK/47MsLYN2HNXWGztHTDvMIAIXfcPVkvwzU5nDFvSm4AetGLIaAjLmOytJ
-         XcR/TAqXF2nwu6PtPGUa5STwVTxmimi805ErB2PfAPct/+wQXX2+C2OuLlq1ceB3rLe3
-         LZyMIe6Cr4Y0p6GrkSqAinTGU+eq5HLDaD+2FTHV/Y357BPL/H40kxyuxLZXntGrUOdS
-         Cq0A==
-X-Gm-Message-State: APuU4Z/AUNcF2qBQn8g4oyYIvxyEDAlnjio2Xn809rXxYDh87tHC6Xcs
-	xoB48Jk1nnWyJNuaxXdnd23OfZ5D0SxWiTe1TVjqjDH2VGly0u3N7DyoP+oSN+6bzK6b/prZniU
-	eOMmXKJCq//I/1OZAR++PpTFC29wrXqMeXX/mLT6rFt4CxR+4HWR1EdBZiCd4sk6x/2lg/ZnXxB
-	I7mK1ZeldgriQ2tuSmUXSEfJpoVXzpmn60LwNJGnA=
-X-Gm-Gg: AZFdTZeD6hyxPpmYIY+TFDCFneIt/Q7f3MZMuGCqR63EZFhxJ74WONdbOrgufDiSgvs
-	cHJhxTusti490nljD/wyETfyApScTRufILS7TZm5ouPJRONUnbVP6udBnQH1Q2+v3KQWumHepnW
-	MfbT9u6uUzqwiCOP+MzOV72c2Imb19ykz9sLQ//SoLVwBBpNtEYkLulJdkFO42eSXRvVl55larZ
-	CEYEDMv7HvCeZZ4
-X-Received: by 2002:a05:6830:6816:b0:862:c3f1:634c with SMTP id 46e09a7af769-86315a059cbmr19500996a34.25.1795598229901;
-        Wed, 25 Nov 2026 01:17:09 -0800 (PST)
-X-Received: by 2002:a05:6830:6816:b0:862:c3f1:634c with SMTP id
- 46e09a7af769-86315a059cbmr19500980a34.25.1795598229514; Wed, 25 Nov 2026
- 01:17:09 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795602211; x=1796207011;
+        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=nAwEpdk8W5zOz8dRUea8wq0PG12t8rrSsYABB8slUxU=;
+        b=XucVUKo8Lu4KooaiJ2p+iba5lkfbn0/4tGhWT06JIhhKR69ZUNoHPuf2ZM/VRCLDIp
+         VV8PBBIvkt9z/7rh8SXEQXFMtMV6GHNIreOZ2iD9y0pZhGJKjxv5SDcqt0QuFbYIiqJ+
+         ixHe7l+7RRdjYDRufpz/ZAgZB5IgIbrm9Ta9hBRK3dKPPGqjvweTaWknexeMve9REVoP
+         oTUMk64OJzbSOaCnxmHc7VC0HaSQyrK7m+Io/AT2D1ivq5CGTFMvw+7nEMX4hu6pgbtL
+         YE5qL7p0T5GFo2xoo4S3apYmPdoeHqdxt0L8leUyhedq+oPtmkcbFVBHqD5iOT/kyL+l
+         I2Bg==
+X-Forwarded-Encrypted: i=1; AL+hErGYAn2iMKY8qj2b30SE1G8GbX7rOj8hxVTL8wDcGNbY4fE/0QSZp5ai+g4Pui7lL0WcEYOyUmw0Sjyrhg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/OzhSXgLKLF/pDfPYIIiLjW5f4vmLUusEguEzjxSjF7HQEWJfp
+	+JDGs9aQcM5ZqFyKEh1xNgBoP9gNrCfYujlPCCrDjuFkslNsO8qv1JWSaLi5pGrl8q8XyHHzSqV
+	vVJptXzkMJidB0aCuJRUND5/kF3517xQH61ceCHOZVPPnKIUL29rDKaIu/dI=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -123,39 +58,153 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261125083947.263216-1-afaria@redhat.com> <20261125083947.263216-2-afaria@redhat.com>
- <ad36d8e4-27af-4c6a-b3af-984118434797@wdc.com>
-In-Reply-To: <ad36d8e4-27af-4c6a-b3af-984118434797@wdc.com>
-From: Alberto Faria <afaria@redhat.com>
-Date: Wed, 25 Nov 2026 09:16:33 +0000
-X-Gm-Features: Aa3M54oSeBIW-vwAXD8TpkpgkEkcEGIL-t9H6mGs9BbDZ7mXBgrqV757jr0lyIM
-Message-ID: <CAELaAXwH8-gn+nuD96gDSeKZMgKZjX22Q-hVywXbQL8si6S1Pw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] virtio_blk: add fua write support
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc: linux-block@vger.kernel.org, virtualization@lists.linux.dev, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jens Axboe <axboe@kernel.dk>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jason Wang <jasowangio@gmail.com>, dlemoal@kernel.org
+X-Received: by 2002:a05:6808:c2be:b0:4d6:90f3:74b1 with SMTP id
+ 5614622812f47-57a0ba5a8e4mr18256405b6e.49.1795602211468; Wed, 25 Nov 2026
+ 02:23:31 -0800 (PST)
+Date: Wed, 25 Nov 2026 02:23:31 -0800
+In-Reply-To: <20261120010655.467825-1-lrizzo@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6b06b723.588a1920.b1e98.0003.GAE@google.com>
+Subject: [syzbot ci] Re: PISA: Pre-mapped IOVA Superpage Allocator for DMA and CoCo
+From: syzbot ci <syzbot+ci910cdb42d3006024@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, aleksander.lobakin@intel.com, axboe@kernel.dk, 
+	brendan.jackman@linux.dev, catalin.marinas@arm.com, cl@gentwo.org, 
+	corbet@lwn.net, dakr@kernel.org, davem@davemloft.net, david@kernel.org, 
+	driver-core@lists.linux.dev, dtatulea@nvidia.com, edumazet@kernel.org, 
+	gregkh@linuxfoundation.org, hannes@cmpxchg.org, hao.li@linux.dev, 
+	harry@kernel.org, hawk@kernel.org, hch@lst.de, horms@kernel.org, 
+	hramamurthy@google.com, ilias.apalodimas@linaro.org, iommu@lists.linux.dev, 
+	jack@suse.cz, jannh@google.com, jgg@ziepe.ca, joro@8bytes.org, 
+	joshwash@google.com, kuba@kernel.org, kuniyu@google.com, liam@infradead.org, 
+	linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, ljs@kernel.org, lrizzo@google.com, 
+	m.szyprowski@samsung.com, mhocko@suse.com, namangulati@google.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, praan@google.com, 
+	rafael@kernel.org, rdunlap@infradead.org, rientjes@google.com, 
+	rizzo.unipi@gmail.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 25, 2026 at 9:07=E2=80=AFAM Johannes Thumshirn
-<johannes.thumshirn@wdc.com> wrote:
-> On 11/25/26 9:39 AM, Alberto Faria wrote:
-> > +     /*
-> > +      * Do not advertise FUA when the device is zoned, since we
-> > +      * would not be able to handle it on REQ_OP_ZONE_APPEND.
-> > +      */
-> > +     if (virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS) &&
-> > +         virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA) &&
-> > +         !(lim.features & BLK_FEAT_ZONED))
-> > +             lim.features |=3D BLK_FEAT_FUA;
-> > +
->
-> Can you elaborate why?
+syzbot ci has tested the following series
 
-The virtio spec currently only defines FUA for OUT requests, so there
-would be no way to pass on the REQ_FUA to the device on a zone append.
+[v3] PISA: Pre-mapped IOVA Superpage Allocator for DMA and CoCo
+https://lore.kernel.org/all/20261120010655.467825-1-lrizzo@google.com
+* [RFC PATCH v3 01/25] mm: Introduce CONFIG_PISA and metadata table
+* [RFC PATCH v3 02/25] mm: Add PISA allocator lifecycle and page recycle hook
+* [RFC PATCH v3 03/25] mm: Add per-NUMA-node PISA page reservoir
+* [RFC PATCH v3 04/25] mm/page_alloc: Extend alloc_pages() to __GFP_PISA and PISA block allocation
+* [RFC PATCH v3 05/25] mm: Add global cap and shrinker for PISA pages
+* [RFC PATCH v3 06/25] iommu/dma: Map PISA memory in a per-domain IOVA window
+* [RFC PATCH v3 07/25] driver core: Add per-device pisa_* sysfs attributes for PISA optin
+* [RFC PATCH v3 08/25] iommu/dma: Use PISA for coherent DMA allocations
+* [RFC PATCH v3 09/25] mm: Add per-CPU block caches to PISA allocators
+* [RFC PATCH v3 10/25] mm: Add background page scrubber for PISA allocators
+* [RFC PATCH v3 11/25] mm: Migrate user pages into PISA
+* [RFC PATCH v3 12/25] block, mm: Support PISA for disk I/O and scrub migration
+* [RFC PATCH v3 13/25] net: Cache leaf PISA TX flags on struct net_device
+* [RFC PATCH v3 14/25] net: Use per-node PISA allocators for skb_page_frag_refill()
+* [RFC PATCH v3 15/25] net: Use PISA for page_pool memory
+* [RFC PATCH v3 16/25] mm/slub: Add SLAB_CACHE_PISA_RO for PISA-backed slab caches
+* [RFC PATCH v3 17/25] net: Allocate small skb heads from PISA
+* [RFC PATCH v3 18/25] net: Migrate user pages into PISA for MSG_ZEROCOPY
+* [RFC PATCH v3 19/25] mm, iommu/dma: Support decrypted PISA pages
+* [RFC PATCH v3 20/25] arm64/mm, mm: Support decrypted PISA pages in Realms
+* [RFC PATCH v3 21/25] mm: Add PISA statistics and debugfs
+* [RFC PATCH v3 22/25] net/libeth: Use GFP_KERNEL when pre-filling RX rings
+* [RFC PATCH v3 23/25] net/gve: Use GFP_KERNEL when pre-filling RX rings
+* [RFC PATCH v3 24/25] net/gve: Use PISA memory for RX buffers
+* [RFC PATCH v3 25/25] Documentation: Add PISA architecture documentation
 
-Alberto
+and found the following issue:
+WARNING in __alloc_workqueue
 
+Full report is available here:
+https://ci.syzbot.org/series/80fa818b-452d-4361-bfc6-33c65f928f71
+
+***
+
+WARNING in __alloc_workqueue
+
+tree:      axboe
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/axboe/linux.git
+base:      20eef29b7c8465ac98d7dd6d6f2ac07a8d8056ca
+arch:      amd64
+compiler:  Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+config:    https://ci.syzbot.org/builds/1b1679cb-3959-4df9-8546-bc04ba6e5cd3/config
+
+smpboot: CPU0: Intel QEMU Virtual CPU version 2.5+ (family: 0xf, model: 0x6b, stepping: 0x1)
+Performance Events: unsupported Netburst CPU model 107 no PMU driver, software events only.
+signal: max sigframe size: 1440
+rcu: Hierarchical SRCU implementation.
+rcu: 	Max phase no-delay instances is 1000.
+Timer migration: 1 hierarchy levels; 8 children per group; 0 crossnode level
+NMI watchdog: Perf NMI watchdog permanently disabled
+smp: Bringing up secondary CPUs ...
+smpboot: x86: Booting SMP configuration:
+.... node  #1, CPUs:      #1
+smp: Brought up 2 nodes, 2 CPUs
+smpboot: Total of 2 processors activated (11200.80 BogoMIPS)
+Memory: 5553400K/7339508K available (181131K kernel code, 30788K rwdata, 59468K rodata, 27564K init, 120564K bss, 1621204K reserved, 0K cma-reserved)
+devtmpfs: initialized
+x86/mm: Memory block size: 128MB
+Running RCU synchronous self tests
+Running RCU synchronous self tests
+Running RCU Tasks wait API self tests
+Running RCU Tasks Trace wait API self tests
+posixtimers hash table entries: 1024 (order: 5, 73728 bytes, vmalloc)
+futex hash table entries: 256 (32768 bytes on 2 NUMA nodes, total 64 KiB, linear).
+PM: RTC time: 20:32:46, date: 2026-11-24
+NET: Registered PF_NETLINK/PF_ROUTE protocol family
+audit: initializing netlink subsys (disabled)
+thermal_sys: Registered thermal governor 'step_wise'
+cpuidle: using governor menu
+NET: Registered PF_QIPCRTR protocol family
+dca service started, version 1.12.1
+PCI: ECAM [mem 0xb0000000-0xbfffffff] (base 0xb0000000) for domain 0000 [bus 00-ff]
+PCI: ECAM [mem 0xb0000000-0xbfffffff] reserved as E820 entry
+PCI: Using configuration type 1 for base access
+HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+------------[ cut here ]------------
+workqueue: pisa is using neither WQ_PERCPU or WQ_UNBOUND. Setting WQ_PERCPU.
+WARNING: kernel/workqueue.c:6151 at __alloc_workqueue+0x1e4b/0x21d0, CPU#1: swapper/0/1
+Modules linked in:
+CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:__alloc_workqueue+0x1e4e/0x21d0
+Code: 18 89 39 00 90 0f 0b 90 e9 87 fd ff ff e8 0a 89 39 00 90 0f 0b 90 e9 79 fd ff ff e8 fc 88 39 00 48 8d 3d 65 52 32 10 4c 89 f6 <67> 48 0f b9 3a 8b 5c 24 20 81 cb 00 01 00 00 e9 99 e4 ff ff e8 d9
+RSP: 0000:ffffc90000067750 EFLAGS: 00010293
+RAX: ffffffff818fa174 RBX: 0000000000000000 RCX: ffff888102aa5ac0
+RDX: 0000000000000000 RSI: ffff888162ab5d78 RDI: ffffffff91c1f3e0
+RBP: ffffc900000678a0 R08: ffff888102aa5ac0 R09: 0000000000000002
+R10: 0000000000000102 R11: 0000000000000000 R12: dffffc0000000000
+R13: ffff888162ab5c00 R14: ffff888162ab5d78 R15: ffff888162ab5d18
+FS:  0000000000000000(0000) GS:ffff8882a77e4000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000000ff48000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ alloc_workqueue_noprof+0xe3/0x210
+ pisa_init+0x127/0x260
+ do_one_initcall+0x250/0x870
+ do_initcall_level+0x10a/0x1a0
+ do_initcalls+0x59/0xa0
+ kernel_init_freeable+0x29d/0x3e0
+ kernel_init+0x22/0x1d0
+ ret_from_fork+0x514/0xb70
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
