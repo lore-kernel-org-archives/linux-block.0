@@ -1,66 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.20
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795626037;
-	b=yzJ9ZBSAf8AevUCtFz55vtfp3kqTflU+sKR352gTvusLVzp5PjeRzCUIJDQFWhodbdrv
-	 G19JmLvSi10dpVYyuFDWGwcrMpY1fecUerBDWczfLkKd4kovJ1QEJCGWLtnQntNsKZ7OE
-	 QrybyHNxRTYGq7Eipmy3s9CqTJF99xjSb6Vf5aNcDt7semRx4WpN2gSsYrnYjO/9v1JCb
-	 1Y78fvZO0TEtkw8H5Dtrqx28R2ZNzz7u07+EyV4K2PJi9JIt+NiNv9VTwyy+UEhhXdI03
-	 Dcf7vtIsG4BYrrcD7JcnMa0wanfJXbI9Nhj/38EXKKerp4+wlBEi7bvx2mMJE20UN3g==
+	t=1795627018;
+	b=GaCmiQhqJFoCsxqzkU2mGYNQTQ3VILrV2oKg5e+yTnnDFPKKKQH1PiGhePHPHzfDHEWz
+	 pfKpuVzCceZBqQa7Ta6KfikdD6p1TnbsDZPOnkFegGPYUPzkOagkZs9uBsup8mJiRcYmB
+	 6DU0BHhkN0YFmw4VBI6UzyYeyxPmeFW0/aSMkkZBY7yEfSuuXUljMVDUm9GDCZBsEW1JV
+	 nR6+W1knUZAJdzxzArKz7dlj674dTvpFDYq5wn8Y4Ceguj6CLg+LwmbgaYoa5xM06R4X6
+	 ZjFFTGTl9/BlJPWezrYQTMzyUzMzFCwjx2wH1bdlHiM5hsyzMTNe6/yAWEbNGWH1FzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795626037;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795627018;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=81ysONsKPZIISOGu9Pqswa58i6DCZs85AkXLBqCpQR8=;
-	b=1+CpCxqhDnEKYu46CCCCl746+0wckxcDH/4RAG7pQ4LIqSW0XZOvJrDmIvS46ul+NQsO
-	 n/Hi7/6tmvRkeGy8m19MA0SFPmedU5cDXjBIUO6AgiXhK02ycrn+g7CaygRQjyMqFJ4aE
-	 IpBwfYvFuw/rBv2uaAFxRXwwvXfoaqEqaAc81yGIC/iK8b9IC4qZd793U79uncjAtqVe+
-	 5/bBcffW3CSH97LBGnpxKflEXBGzNs6vvCHgVCM4vwaBP1ccILUUN7Lc44sY4MtMEeioJ
-	 raIWIP0/Yrgn1Rqhzsf4xJITwlq6IStBcfLC/vSv/LnejUC7XBqw2PcxXw+Z3YXgAsw==
+	bh=306Y2BAJ0mk9ljp12eAtknlDVkrB39bi49HCqrOE2pE=;
+	b=cDgA4ccXDYnPsofB+Mnwx3pA20XwkU49zOg2+PROh9lhVe8uP6Ar/rl8rVGWnJLlvyoe
+	 nIOs/RgJO7U9SjOntn0xH0ERvc95HYrwdkwkuOwdrZN4QOYhpOZb4i4fq28c/Ms5Nu91U
+	 fqQ9NbW7rKkCLBPad0+dK39fHY6vuq2uE5vVNVKgvWm98EKrzse3tMJvnq40Ygn0Qxmh5
+	 wmRhkKINQzC/mKLaB49Kq1NjjmvgnWOV6s5fYKDmRJUIrtCfIxK5wR9l1bLKVfI6KT619
+	 kvRHhIhmgWyLqqr3Oho4n/ogv3UwMPv3RcHDWg6EilK61gDPBuvcZVX1TMXzXMXCSlg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=acm.org;
-	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=tB8ad5CA;
-	arc=none smtp.remote-ip=199.89.1.16
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	dmarc=pass header.from=a7snv.com;
+	spf=pass smtp.mailfrom=a7snv.com;
+	dkim=pass header.d=a7snv.com header.i=@a7snv.com header.a=rsa-sha256 header.s=protonmail header.b=Isn+fec1;
+	arc=none smtp.remote-ip=185.70.43.20
+Received: from mail-4320.protonmail.ch (mail-4320.protonmail.ch [185.70.43.20])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23350606A31E
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 17:00:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 23350606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8837606A31E;
+	Wed, 25 Nov 2026 17:16:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8837606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=a7snv.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a7snv.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=tB8ad5CA
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jZQsp3XW0zlfclp;
-	Wed, 25 Nov 2026 17:00:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1795626027; x=1798218028; bh=81ysONsKPZIISOGu9Pqswa58
-	i6DCZs85AkXLBqCpQR8=; b=tB8ad5CAKUvTIy46PZ5XrUgsXfOuRK7dmpMROVqx
-	wJJKbQqjTVN40PsvloTv2S0cQE73EShWnPT50eMq2OhR7t7FAgEop0o7zT15o44Y
-	7rQXVvpJ0mHht4+6TvAOwf0xkf2m/k5NsOx/yBsnrYwqz4qHVFz1RAjuTGu8UDOM
-	nLfiIQMG7me2d/WiC/H1kYr3p6HQMZxmeohRx5V6EPqv5fUKvKZmDMnUA61H/R8P
-	4GAUjo0c5N1fuEZGovgTXWMOhYLMbnWNqWb1CA9uMn0UV7BzM7E2ebrK0A3yNvIE
-	Fh6eJeIC6YICWcwYuAJjA/SAidbHqDDwou2UeLamqgYPwQ==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 8E4kmIvQ8fKG; Wed, 25 Nov 2026 17:00:27 +0000 (UTC)
-Received: from [192.168.0.215] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jZQsl1NytzlfclG;
-	Wed, 25 Nov 2026 17:00:27 +0000 (UTC)
-Message-ID: <4149778a-99ac-4193-b06d-b032184953f9@acm.org>
-Date: Wed, 25 Nov 2026 09:00:26 -0800
+	dkim=pass (2048-bit key, unprotected) header.d=a7snv.com header.i=@a7snv.com header.a=rsa-sha256 header.s=protonmail header.b=Isn+fec1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=a7snv.com;
+	s=protonmail; t=1795627004; x=1795886204;
+	bh=306Y2BAJ0mk9ljp12eAtknlDVkrB39bi49HCqrOE2pE=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=Isn+fec1ecOxy1pHM8uYQ2tCVBhQsV3SY7qVL+OD6TT25GSpjBygkLsgXcAooSS/z
+	 f4TztsrhUXRHoYkbUDWzk/wrbiOCgFnPZ2aWMuDVIfaJvhypaK7JiWeFt2PHvIJkad
+	 zl6zmCNft9hgo+9H6dSp3r3d31vWneEExVaLfCv950INz1tUBSV1mw464DWNqU3p/y
+	 lpq7RNBIwC/hwanegqotjj68CdEsDhlwHHjDfipBcm2B/InGkFFeZYjtGOjUIxM5pE
+	 dmhet2534yuefhIkBSmvCHG5Zplu/DngDDKHbgeYvEIrDUQp0GJ8kxYzIEQa9Mn1W1
+	 A7UrtyIBBesPA==
+Date: Wed, 25 Nov 2026 17:16:25 +0000
+To: Mengmeng Zhao <mengmeng.zhao@linux.dev>
+From: Yun Wang <arsenova@a7snv.com>
+Cc: hch@lst.de, anuj1072538@gmail.com, anuj20.g@samsung.com, nj.shetty@samsung.com, axboe@kernel.dk, sumit.semwal@linaro.org, christian.koenig@amd.com, phasta@kernel.org, djbw@kernel.org, willy@infradead.org, jack@suse.cz, viro@zeniv.linux.org.uk, brauner@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca, libaokun@linux.alibaba.com, ojaswin@linux.ibm.com, ritesh.list@gmail.com, yi.zhang@huawei.com, asml.silence@gmail.com, corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, liwang@kylinos.cn, zhaomengmeng@kylinos.cn, mcgrof@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, nvdimm@lists.linux.dev, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org, linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Subject: Re: [RFC PATCH v2 2/8] iomap: add dma-buf direct I/O guards
+Message-ID: <20261125171600.4053585-1-arsenova@a7snv.com>
+Feedback-ID: 235448903:user:proton
+X-Pm-Message-ID: 37ce9f54f53aabca1ce9dc5fb89af8077900c77a
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,115 +61,387 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] block: don't wait for all RCU callbacks when freeing
- zone write plugs
-To: Qiliang Yuan <qiliang.yuan@linux.dev>, Damien Le Moal
- <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-References: <20261125-feat-blk-zoned-rcu-barrier-v3-1-707f65bae05a@linux.dev>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20261125-feat-blk-zoned-rcu-barrier-v3-1-707f65bae05a@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 11/25/26 00:41, Qiliang Yuan wrote:
- > Removing 32 zoned null_blk or scsi_debug devices, base and patched
- > kernels alternating over 2 rounds of 3 runs, median of the 6 runs and
- > range in parentheses; "with plugs" leaves four partially written zones,
- > and so four zone write plugs, on each null_blk device:
- >
- >   devices                      before (ms)      after (ms)   change
- >   null_blk                   820 (805-885)   438 (424-454)     -47%
- >   null_blk, with plugs       876 (852-883)   844 (805-877)      -4%
- >   scsi_debug, host-managed   958 (945-991)   642 (630-652)     -33%
+On Fri, Nov 13, 2026 at 03:06:15PM +0800, Mengmeng Zhao wrote:
+>  static int iomap_dio_hole_iter(struct iomap_iter *iter, struct iomap_dio=
+ *dio)
+>  {
+> -=09loff_t copied =3D iov_iter_zero(iomap_length(iter), dio->submit.iter)=
+;
+> +=09loff_t copied;
+> +
+> +=09/* zero-filling walks the data pages */
+> +=09if (iov_iter_is_dmabuf_map(dio->submit.iter))
+> +=09=09return -EOPNOTSUPP;
 
-Real zoned drives taken offline on a storage node typically have
-partially written zones and therefore still have active zone write plugs
-in disk->zone_wplugs_hash at teardown time. The reason "null_blk, with
-plugs" only improves by 4% is that disk_destroy_zone_wplugs_hash_table()
-frees those remaining plugs via disk_mark_zone_wplug_dead() ->
-disk_free_zone_wplug() -> call_rcu(), which still forces an RCU grace
-period wait for every disk that had at least one active plug.
+This also fails reads that run past EOF.  The filesystem maps the range
+beyond the last block as a hole too, so a dma-buf read that starts
+before EOF and ends past the last block of the file fails as a whole,
+while the same O_DIRECT read into user memory returns the bytes up to
+EOF.
 
-By the time disk_destroy_zone_wplugs_hash_table() runs from
-disk_release(), no RCU readers can still be accessing
-disk->zone_wplugs_hash (the function already iterates the hash table
-without zone_wplugs_hash_lock, assumes every plug has ref == 1, and
-frees disk->zone_wplugs_hash synchronously with kfree()). Nor is
-updating disk->zones_state needed, as disk_release_zone_resources()
-clears it immediately afterward.
+I found it while testing the series for fastsafetensors' dma-buf copier
+[1], which loads model weights from NVMe into GPU memory with READ_FIXED
+into registered dma-bufs.  I ran v2 on top of v7.4-rc2 in a QEMU guest
+with an emulated NVMe namespace, reading into udmabufs.  With a
+5000-byte file on ext4 with 4 KiB blocks, reading [4096, 12288):
 
-Have you considered unhashing and freeing the plugs still in
-disk->zone_wplugs_hash directly with mempool_free() (keeping the
-WARN_ON_ONCE() checks) instead of going through call_rcu()? Then
-nr_zone_wplugs_freeing would only wait for plugs that were already
-queued for RCU freeing shortly before disk_release(), and the "with
-plugs" case would skip the RCU wait as well.
+  READ_FIXED into a registered udmabuf -> -EOPNOTSUPP
+  O_DIRECT pread() into user memory    -> 904
 
- > diff --git a/block/blk-zoned.c b/block/blk-zoned.c
- > index 4c58892961912..2e61a9f23b270 100644
- > --- a/block/blk-zoned.c
- > +++ b/block/blk-zoned.c
- > @@ -724,8 +725,11 @@ static void disk_free_zone_wplug_rcu(struct 
-rcu_head *rcu_head)
- >  {
- >  	struct blk_zone_wplug *zwplug =
- >  		container_of(rcu_head, struct blk_zone_wplug, rcu_head);
- > +	struct gendisk *disk = zwplug->disk;
- >
- > -	mempool_free(zwplug, zwplug->disk->zone_wplugs_pool);
- > +	mempool_free(zwplug, disk->zone_wplugs_pool);
- > +	if (atomic_dec_and_test(&disk->nr_zone_wplugs_freeing))
- > +		wake_up_var(&disk->nr_zone_wplugs_freeing);
- >  }
+It fails the same way whether the read is the first one on the buffer,
+is issued inline once the map exists, or is forced to io-wq with
+IOSQE_ASYNC.
 
-If keeping wait_var_event(), this can be simplified with
-atomic_dec_and_wake_up(&disk->nr_zone_wplugs_freeing) from
-<linux/wait_bit.h>.
+Reading a file in fixed-size chunks hits this on the last chunk unless
+the file size is a multiple of the chunk size.  With 1 KiB blocks it
+also breaks the copier's normal pattern, 4 KiB-aligned reads up to
+round_up(i_size, 4096): the last read fails.
 
- >  static void disk_free_zone_wplug(struct blk_zone_wplug *zwplug)
- > @@ -745,6 +749,7 @@ static void disk_free_zone_wplug(struct 
-blk_zone_wplug *zwplug)
- >  	atomic_dec(&disk->nr_zone_wplugs);
- >  	spin_unlock_irqrestore(&disk->zone_wplugs_hash_lock, flags);
- >
- > +	atomic_inc(&disk->nr_zone_wplugs_freeing);
- >  	call_rcu(&zwplug->rcu_head, disk_free_zone_wplug_rcu);
- >  }
- >
- > @@ -2149,7 +2155,8 @@ static void 
-disk_destroy_zone_wplugs_hash_table(struct gendisk *disk)
- >  	 * Wait for the zone write plugs to be RCU-freed before destroying the
- >  	 * mempool.
- >  	 */
- > -	rcu_barrier();
- > +	wait_var_event(&disk->nr_zone_wplugs_freeing,
- > +		       !atomic_read_acquire(&disk->nr_zone_wplugs_freeing));
- >  	mempool_destroy(disk->zone_wplugs_pool);
- >  	disk->zone_wplugs_pool = NULL;
- >  }
+Nothing past EOF is reported to the caller anyway: __iomap_dio_rw()
+reverts the iterator to i_size and iomap_dio_complete() truncates the
+result to it.  So a hole that starts at or after EOF can be stepped
+over; a hole inside the file still needs zeroes and still fails.
+Something like this on top of the series, or folded into this patch:
 
-There is a regression here with CONFIG_RCU_LAZY=y on rcu_nocbs CPUs:
-call_rcu() queues disk_free_zone_wplug_rcu() lazily, which can delay
-starting the grace period by up to LAZY_FLUSH_JIFFIES (10 seconds).
-Previously, rcu_barrier() explicitly hurried all pending lazy callbacks
-(via rcu_nocb_flush_bypass()), whereas wait_var_event() does not, so
-removing a zoned disk with pending callbacks can stall for up to 10
-seconds per disk.
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index 83fda6973bb9..2de6d379f811 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -596,9 +596,20 @@ static int iomap_dio_hole_iter(struct iomap_iter *iter=
+, struct iomap_dio *dio)
+ {
+ =09loff_t copied;
+=20
+-=09/* zero-filling walks the data pages */
+-=09if (iov_iter_is_dmabuf_map(dio->submit.iter))
+-=09=09return -EOPNOTSUPP;
++=09if (iov_iter_is_dmabuf_map(dio->submit.iter)) {
++=09=09u64 length =3D iomap_length(iter);
++
++=09=09/* zero-filling walks the data pages */
++=09=09if (iter->pos < dio->i_size)
++=09=09=09return -EOPNOTSUPP;
++=09=09/*
++=09=09 * Past EOF there is nothing to zero: the read is truncated to
++=09=09 * i_size before it is reported, so step over the hole.
++=09=09 */
++=09=09iov_iter_advance(dio->submit.iter, length);
++=09=09dio->size +=3D length;
++=09=09return iomap_iter_advance(iter, length);
++=09}
+=20
+ =09copied =3D iov_iter_zero(iomap_length(iter), dio->submit.iter);
+=20
 
-Either:
-- switch disk_free_zone_wplug() to call_rcu_hurry(), or
-- keep call_rcu() and conditionally call rcu_barrier() only when
-   atomic_read_acquire(&disk->nr_zone_wplugs_freeing) is non-zero (with
-   smp_mb__before_atomic() before atomic_dec() in
-   disk_free_zone_wplug_rcu()). Combined with freeing remaining hashed
-   plugs synchronously in disk_destroy_zone_wplugs_hash_table(), that
-   preserves lazy RCU batching during normal operation, avoids
-   wake_up_var() on every zone free, and still hurries lazy callbacks
-   if any happen to be in flight at teardown.
+Signed-off-by: Yun Wang <arsenova@a7snv.com>
+
+With it, the read above returns 904 with the right data in all three
+cases.  Holes and unwritten extents inside the file still return
+-EOPNOTSUPP, including a hole that straddles EOF after the file was
+extended with ftruncate().
+
+The rest of the series behaved as the cover letter describes in that
+setup, with 4 KiB and 1 KiB blocks: registration on an O_DIRECT file,
+reads into arbitrary offsets of the buffer, reads through a dup()ed fd,
+-EBADF through another file's slot, -EINVAL when registering a buffered
+fd, -EOPNOTSUPP after F_SETFL clears O_DIRECT and success again once it
+is set back, WRITE_FIXED including a write that extends the file, and a
+clean e2fsck afterwards.  I have not run it on real NVMe hardware or
+xfstests yet.
+
+This report and the reproducer below were drafted with the help of an
+AI coding assistant (Claude Opus 5.5); the fix is mine.
+
+[1] https://github.com/foundation-model-stack/fastsafetensors/issues/139
 
 Thanks,
+Yun
 
-Bart.
+Reproducer.  It needs /dev/udmabuf and a filesystem with this series
+on an NVMe namespace:
+
+  head -c 5000 /dev/urandom > /mnt/f && sync
+  ./dmabuf_eof_read /mnt/f 4096 8192             # first read on the buffer
+  ./dmabuf_eof_read /mnt/f 4096 8192 warm        # map exists, inline issue
+  ./dmabuf_eof_read /mnt/f 4096 8192 warm async  # IOSQE_ASYNC
+
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Read a file range into a udmabuf that is registered against the file as
+ * an io_uring fixed buffer, and compare with an O_DIRECT pread() of the
+ * same range into user memory.
+ *
+ *   dmabuf_eof_read <file> <offset> <length> [warm] [async]
+ *
+ *   warm   first read [0, 4096) through the same buffer, so the dma-buf ma=
+p
+ *          exists and the measured read can be issued inline (nonblocking)
+ *   async  set IOSQE_ASYNC on the measured read (issue it from io-wq)
+ *
+ * Exits 0 when READ_FIXED returns what pread() returns and the bytes match=
+.
+ * Needs /dev/udmabuf, and a kernel and filesystem with io_uring dma-buf
+ * registered buffers.  The UAPI bits are declared locally because they are
+ * newer than most installed headers.
+ */
+#define _GNU_SOURCE
+#include <errno.h>
+#include <fcntl.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/syscall.h>
+#include <unistd.h>
+#include <linux/udmabuf.h>
+
+#define IORING_OFF_SQ_RING=09=090ULL
+#define IORING_OFF_SQES=09=09=090x10000000ULL
+#define IORING_ENTER_GETEVENTS=09=09(1U << 0)
+#define IORING_REGISTER_BUFFERS2=0915
+#define IORING_REGISTER_BUFFERS_UPDATE=0916
+#define IORING_RSRC_REGISTER_SPARSE=09(1U << 0)
+#define IORING_RSRC_UPDATE_EXTENDED=09(1U << 1)
+#define IO_REGBUF_TYPE_DMABUF=09=092
+#define IORING_OP_READ_FIXED=09=094
+#define IOSQE_ASYNC=09=09=09(1U << 4)
+
+struct sqe {
+=09uint8_t opcode, flags;
+=09uint16_t ioprio;
+=09int32_t fd;
+=09uint64_t off, addr;
+=09uint32_t len, rw_flags;
+=09uint64_t user_data;
+=09uint16_t buf_index, personality;
+=09int32_t splice_fd_in;
+=09uint64_t addr3, pad2;
+};
+
+struct cqe {
+=09uint64_t user_data;
+=09int32_t res;
+=09uint32_t flags;
+};
+
+struct sq_offsets {
+=09uint32_t head, tail, ring_mask, ring_entries, flags, dropped, array, res=
+v1;
+=09uint64_t user_addr;
+};
+
+struct cq_offsets {
+=09uint32_t head, tail, ring_mask, ring_entries, overflow, cqes, flags, res=
+v1;
+=09uint64_t user_addr;
+};
+
+struct params {
+=09uint32_t sq_entries, cq_entries, flags, sq_thread_cpu, sq_thread_idle;
+=09uint32_t features, wq_fd, resv[3];
+=09struct sq_offsets sq_off;
+=09struct cq_offsets cq_off;
+};
+
+struct rsrc_register {
+=09uint32_t nr, flags;
+=09uint64_t resv2, data, tags;
+};
+
+struct rsrc_update2 {
+=09uint32_t offset, flags;
+=09uint64_t data, tags;
+=09uint32_t nr, resv2;
+};
+
+struct regbuf_desc {
+=09uint32_t type, flags;
+=09uint64_t size, uaddr;
+=09int32_t dmabuf_fd, target_fd;
+=09uint64_t resv[6];
+};
+
+_Static_assert(sizeof(struct sqe) =3D=3D 64, "io_uring_sqe");
+_Static_assert(sizeof(struct cqe) =3D=3D 16, "io_uring_cqe");
+_Static_assert(sizeof(struct params) =3D=3D 120, "io_uring_params");
+_Static_assert(sizeof(struct rsrc_register) =3D=3D 32, "io_uring_rsrc_regis=
+ter");
+_Static_assert(sizeof(struct rsrc_update2) =3D=3D 32, "io_uring_rsrc_update=
+2");
+_Static_assert(sizeof(struct regbuf_desc) =3D=3D 80, "io_uring_regbuf_desc"=
+);
+
+struct ring {
+=09int fd;
+=09struct params p;
+=09char *rings;
+=09struct sqe *sqes;
+};
+
+static void die(const char *what)
+{
+=09perror(what);
+=09exit(2);
+}
+
+static void ring_init(struct ring *r)
+{
+=09size_t sq_size, cq_size;
+
+=09memset(r, 0, sizeof(*r));
+=09r->fd =3D syscall(SYS_io_uring_setup, 4, &r->p);
+=09if (r->fd < 0)
+=09=09die("io_uring_setup");
+=09sq_size =3D r->p.sq_off.array + r->p.sq_entries * sizeof(uint32_t);
+=09cq_size =3D r->p.cq_off.cqes + r->p.cq_entries * sizeof(struct cqe);
+=09/* SQ and CQ rings share one mapping (IORING_FEAT_SINGLE_MMAP) */
+=09r->rings =3D mmap(NULL, sq_size > cq_size ? sq_size : cq_size,
+=09=09=09PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, r->fd,
+=09=09=09IORING_OFF_SQ_RING);
+=09r->sqes =3D mmap(NULL, r->p.sq_entries * sizeof(struct sqe),
+=09=09       PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, r->fd,
+=09=09       IORING_OFF_SQES);
+=09if (r->rings =3D=3D MAP_FAILED || r->sqes =3D=3D MAP_FAILED)
+=09=09die("mmap ring");
+}
+
+/* one READ_FIXED from slot 0; addr is the byte offset into the dma-buf */
+static int read_fixed(struct ring *r, int fd, off_t off, size_t len,
+=09=09      uint64_t buf_off, uint8_t sqe_flags)
+{
+=09uint32_t *sq_tail =3D (uint32_t *)(r->rings + r->p.sq_off.tail);
+=09uint32_t sq_mask =3D *(uint32_t *)(r->rings + r->p.sq_off.ring_mask);
+=09uint32_t *sq_array =3D (uint32_t *)(r->rings + r->p.sq_off.array);
+=09uint32_t *cq_head =3D (uint32_t *)(r->rings + r->p.cq_off.head);
+=09uint32_t *cq_tail =3D (uint32_t *)(r->rings + r->p.cq_off.tail);
+=09uint32_t cq_mask =3D *(uint32_t *)(r->rings + r->p.cq_off.ring_mask);
+=09uint32_t tail =3D *sq_tail, idx =3D tail & sq_mask, head;
+=09struct cqe *cqe;
+=09int res;
+
+=09memset(&r->sqes[idx], 0, sizeof(struct sqe));
+=09r->sqes[idx].opcode =3D IORING_OP_READ_FIXED;
+=09r->sqes[idx].flags =3D sqe_flags;
+=09r->sqes[idx].fd =3D fd;
+=09r->sqes[idx].off =3D off;
+=09r->sqes[idx].addr =3D buf_off;
+=09r->sqes[idx].len =3D len;
+=09r->sqes[idx].buf_index =3D 0;
+=09sq_array[idx] =3D idx;
+=09__atomic_store_n(sq_tail, tail + 1, __ATOMIC_RELEASE);
+=09if (syscall(SYS_io_uring_enter, r->fd, 1, 1, IORING_ENTER_GETEVENTS,
+=09=09    NULL, 0) < 0)
+=09=09die("io_uring_enter");
+=09head =3D *cq_head;
+=09if (head =3D=3D __atomic_load_n(cq_tail, __ATOMIC_ACQUIRE)) {
+=09=09fprintf(stderr, "no completion\n");
+=09=09exit(2);
+=09}
+=09cqe =3D (struct cqe *)(r->rings + r->p.cq_off.cqes) + (head & cq_mask);
+=09res =3D cqe->res;
+=09__atomic_store_n(cq_head, head + 1, __ATOMIC_RELEASE);
+=09return res;
+}
+
+int main(int argc, char **argv)
+{
+=09struct rsrc_register reg =3D { .nr =3D 1, .flags =3D IORING_RSRC_REGISTE=
+R_SPARSE };
+=09struct regbuf_desc desc =3D { .type =3D IO_REGBUF_TYPE_DMABUF };
+=09struct rsrc_update2 up =3D { .flags =3D IORING_RSRC_UPDATE_EXTENDED, .nr=
+ =3D 1 };
+=09struct udmabuf_create create =3D { .flags =3D UDMABUF_FLAGS_CLOEXEC };
+=09int fd, ufd, memfd, dmabuf, res, warm =3D 0, async =3D 0, i;
+=09unsigned char *view, *host;
+=09size_t length, size;
+=09ssize_t expect;
+=09struct ring r;
+=09off_t offset;
+
+=09if (argc < 4) {
+=09=09fprintf(stderr, "usage: %s <file> <offset> <length> [warm] [async]\n"=
+,
+=09=09=09argv[0]);
+=09=09return 2;
+=09}
+=09for (i =3D 4; i < argc; i++) {
+=09=09if (!strcmp(argv[i], "warm"))
+=09=09=09warm =3D 1;
+=09=09else if (!strcmp(argv[i], "async"))
+=09=09=09async =3D 1;
+=09}
+=09offset =3D strtoll(argv[2], NULL, 0);
+=09length =3D strtoull(argv[3], NULL, 0);
+=09size =3D (length + 4095) & ~4095UL;
+=09if (size < 4096)
+=09=09size =3D 4096;
+
+=09fd =3D open(argv[1], O_RDONLY | O_DIRECT);
+=09if (fd < 0)
+=09=09die("open");
+
+=09/* the reference: the same range read into user memory */
+=09if (posix_memalign((void **)&host, 4096, size))
+=09=09die("posix_memalign");
+=09expect =3D pread(fd, host, length, offset);
+=09if (expect < 0)
+=09=09die("pread");
+
+=09/* a udmabuf over a sealed memfd */
+=09memfd =3D memfd_create("dmabuf-eof", MFD_ALLOW_SEALING);
+=09if (memfd < 0 || ftruncate(memfd, size) ||
+=09    fcntl(memfd, F_ADD_SEALS, F_SEAL_SHRINK))
+=09=09die("memfd");
+=09view =3D mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, memfd, 0);
+=09if (view =3D=3D MAP_FAILED)
+=09=09die("mmap memfd");
+=09ufd =3D open("/dev/udmabuf", O_RDWR);
+=09if (ufd < 0)
+=09=09die("open /dev/udmabuf");
+=09create.memfd =3D memfd;
+=09create.size =3D size;
+=09dmabuf =3D ioctl(ufd, UDMABUF_CREATE, &create);
+=09if (dmabuf < 0)
+=09=09die("UDMABUF_CREATE");
+
+=09/* a ring with one sparse buffer slot holding the dma-buf */
+=09ring_init(&r);
+=09if (syscall(SYS_io_uring_register, r.fd, IORING_REGISTER_BUFFERS2, &reg,
+=09=09    sizeof(reg)) < 0)
+=09=09die("IORING_REGISTER_BUFFERS2");
+=09desc.dmabuf_fd =3D dmabuf;
+=09desc.target_fd =3D fd;
+=09up.data =3D (uint64_t)(uintptr_t)&desc;
+=09if (syscall(SYS_io_uring_register, r.fd, IORING_REGISTER_BUFFERS_UPDATE,
+=09=09    &up, sizeof(up)) < 0)
+=09=09die("register dma-buf");
+
+=09if (warm) {
+=09=09res =3D read_fixed(&r, fd, 0, 4096, 0, 0);
+=09=09if (res !=3D 4096) {
+=09=09=09fprintf(stderr, "warm-up read returned %d\n", res);
+=09=09=09return 2;
+=09=09}
+=09}
+=09memset(view, 0xa5, size);
+=09res =3D read_fixed(&r, fd, offset, length, 0, async ? IOSQE_ASYNC : 0);
+
+=09printf("READ_FIXED into dma-buf (%s, %s): %d%s%s, O_DIRECT pread(): %zd\=
+n",
+=09       warm ? "map ready" : "first read", async ? "IOSQE_ASYNC" : "inlin=
+e",
+=09       res, res < 0 ? " " : "", res < 0 ? strerror(-res) : "", expect);
+=09if (res !=3D expect)
+=09=09return 1;
+=09if (res > 0 && memcmp(view, host, res)) {
+=09=09printf("data differs\n");
+=09=09return 1;
+=09}
+=09return 0;
+}
+
