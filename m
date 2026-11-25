@@ -1,81 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795593266;
-	b=d8nmGFIteN4lo0EPP9VIUqmfni9uRpvZdbsK7dza0BarTvx9wKXizcgITSyM4+TeXA7e
-	 tPOStFSbERdn6jwkrBZUrZ/GWu7PvVCBLgQX4axUCNiWLe0pV2DBq+j6avfgo3P+2cGfn
-	 76dbHH0AR+ix7yrfmX6AKT3SSAvAJiZpjg2JtIErI+hZz0cz48sxCQpn/RJ7ixR6TZUWC
-	 l5KwXk/ZROqfT6xBWs+2RqetlhTGkl+jilOL/3XVENfCsSTzeZCxya1TE5sjsX7DeAL3e
-	 WV9eDn1TFwd3JcbR0gkiRCpN2ffFPyQGgmVyC1iqvPYWDwsMbSKvJ3gt52ip0mAES1Q==
+	t=1795594272;
+	b=NhhUg1bHQvm2GIfLPWRAcg8WAkgCqFdBZwUXgaKGEXcwQXt8D8YmZ79KkhNZYy3LO7jk
+	 cN46cKuDTr7r/dffEdAd50VlOgurlWkxtInI/Z3/lVkYVjTECdMEhdp1yGe/hGko0GndZ
+	 TrW0V/YLYLXj37cthp8vLH2QaX1wAbfja3d1CIAjOxa+FJuAUCUnMDMOKgNF0ERq1LTrf
+	 WVjQrodW77vhZ+xpTaEJVu8lk9rxKnRwtst5LIUwgu3iJ7pSr7eQ56fKD1uhgEaw5jsJV
+	 i6VvurTWbYY9UlIN5O76H5L+7Raa8lSruPTxLKrJ6GnaNpQSdRuAZZMG/QqtCVzTR6g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795593266;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Scanned-By;
-	bh=Z1Wd0+tIRxlELqrNUF2pEQYgQp20wMSK4suuq0p4MX4=;
-	b=YNfKJ/7qvC2TL7l3VWBATexVJkpmYdIDjLP/h1Mq1PZCijbg7bsSJSryI13ESiF0GjiV
-	 iCuTPr0Yv28aOA5KbGqOvikW3q81t3r4ufwBq8evZEy3r9n/xeNFz62OEZ5w1+jc3NIan
-	 SRVm0koNknYJhXxfbCK4PWRIVtNzewZ0FFe8kpX4TE5yo0a4zhSPL2rgjteFxqYKnNzbH
-	 GwGAaK6CEYXXNGyEWN7xWSi07dpyKGDKFyZxH+9rBdyDgqIqoXw3XGwljJMD/VQbqEnf3
-	 nI+bYQckFTVjNTIiT4zjHJbu/6h6TUHj0DoBTIq9Ear3g6JUrE/J/0W9ZR6fnlL9rBg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795594272;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Spamd-Result:X-Spam-Score:
+	 X-Spam-Level:X-Spam-Flag;
+	bh=vaKq5fGXOIrrDQX1oaRN9vtHHZA9dCiuDgGNV9bO81o=;
+	b=5P5UE6adBBGqfO3HziX9ElqgAdwjxBVkYoG6RonIMsvjcm7YqY9r+B+4wrvM84MgGXAM
+	 egHMUbkOKLRC+JoaLmWL1vRRLOnAmRi+E1ewIgLbLOmyGmJ56zJ/jcW7rBYNuaONAo72E
+	 ztntlTLJGoXSTtuoPhSD/zK9tFrdTvAVp138Vvu4SNjYICryvx7vZdIt8PHO319iwltZG
+	 aH4VinRr+dcP9wEExe/+sCVusZGkLlub0bQ0BKF75xkGk8m8S4cEUZcbbK0chtW5M3PaL
+	 PG67XF7JKApGI3WBVoMLAlkTOYoL/E0LB4Fq96wTSrstq/JoTm515bE+20UzxCeEnkw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b="iuG/fKUr";
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=eOMDSvrr;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=rU2SmRPx;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=jlwpXr3+;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=sS0U0Rpu;
+	arc=none smtp.remote-ip=195.135.223.130
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECD9606A321
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 07:54:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BECD9606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04915606A31E
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 08:11:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 04915606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=iuG/fKUr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1795593264;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=eOMDSvrr;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=rU2SmRPx;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=jlwpXr3+;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=sS0U0Rpu
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E025A2233F;
+	Wed, 25 Nov 2026 08:11:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1795594270; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z1Wd0+tIRxlELqrNUF2pEQYgQp20wMSK4suuq0p4MX4=;
-	b=iuG/fKUrFR2UBnqpNHPV1Kop0hORQe5Bi6hKxzBt8Qlf0yZmQfY2Lv5i8o5yXJPejovU4S
-	2NZOODeUTREpHhmWZBISL6KYwS4f3z6kr3mGu/BO8orGjAnGadr1X+VqGXbw92ghLCZFox
-	FjAxJncT7f9CBQqkjOX9nh6E443m54o=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-39-D89MiEf-O_m6eYyRxcg2xw-1; Wed,
- 25 Nov 2026 07:54:21 +0000
-X-MC-Unique: D89MiEf-O_m6eYyRxcg2xw-1
-X-Mimecast-MFC-AGG-ID: D89MiEf-O_m6eYyRxcg2xw_1795593260
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	bh=vaKq5fGXOIrrDQX1oaRN9vtHHZA9dCiuDgGNV9bO81o=;
+	b=eOMDSvrrEHM9UXTqVfuUJMk1aaqYWqrfzLkDIOu42v085/PkYnESN7fzeVpoaAG3BWofS8
+	ONZMgHR88vujKtcoG3z7JfZ2sU/lmlIdlKOYrc9bGz8l4ZmoDyxnsgKE1nbg+FYn6tVATa
+	tXTrC9L6BtMmbyp6ahmY1gU2x3g88jQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1795594270;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vaKq5fGXOIrrDQX1oaRN9vtHHZA9dCiuDgGNV9bO81o=;
+	b=rU2SmRPxpXFDKOtk6h8gVXbtz/UUIWugMDPgp/bcZyeqMwvXRRrNKxqDd5y6vFiu3T91pM
+	6dLNnZX4JGi67kBA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1795594269; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vaKq5fGXOIrrDQX1oaRN9vtHHZA9dCiuDgGNV9bO81o=;
+	b=jlwpXr3+OoodkR0/m8aELTAjxz2R3Gyj0hTPsHr/OHw+6PvUo8AMsoSaHRakh1jeI6jEo8
+	mGbdSDOvHABfXzRTPYnHpd1wPSJGsQ9cq/vSZ7rWFjTNA/SaBB7vutgAUTGpliRHrAdbAW
+	fznuP+NGEe0Q7EJs5xSrtwrwdqlU4kQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1795594269;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vaKq5fGXOIrrDQX1oaRN9vtHHZA9dCiuDgGNV9bO81o=;
+	b=sS0U0RpuzgyLb1ZpOiMaQW6psaV3G5o6JouBLgPXCuQblcIvECSZsTx+HmxpjOExubmQ7u
+	4tyyY0B9jmVRKVBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 301B01953988;
-	Wed, 25 Nov 2026 07:54:20 +0000 (UTC)
-Received: from desktop (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 642101800543;
-	Wed, 25 Nov 2026 07:54:17 +0000 (UTC)
-From: Alberto Faria <afaria@redhat.com>
-To: linux-block@vger.kernel.org
-Cc: virtualization@lists.linux.dev,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jason Wang <jasowangio@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Alberto Faria <afaria@redhat.com>
-Subject: [PATCH v2 2/2] vdpa_sim_blk: add support for FUA writes
-Date: Wed, 25 Nov 2026 07:54:08 +0000
-Message-ID: <20261125075408.226762-3-afaria@redhat.com>
-In-Reply-To: <20261125075408.226762-1-afaria@redhat.com>
-References: <20261125075408.226762-1-afaria@redhat.com>
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 97A84134CA;
+	Wed, 25 Nov 2026 08:11:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ZZ01Gx2YBmtfVwAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 25 Nov 2026 08:11:09 +0000
+Message-ID: <562f7e29-5613-41fd-be2b-960aaa8b10ec@suse.de>
+Date: Wed, 25 Nov 2026 09:11:01 +0100
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -85,107 +106,75 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] blk-mq: scope the no-sleep requirement in
+ blk_mq_alloc_request_hctx()
+To: hmi.jeon@samsung.com, "hch@infradead.org" <hch@infradead.org>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: =?UTF-8?B?7KCV7J6s7JuF?= <jaew.jung@samsung.com>
+References: <CGME20261125073914epcms2p653a329ef9213d5a9e2f74ec5401a3018@epcms2p6>
+ <20261125073914epcms2p653a329ef9213d5a9e2f74ec5401a3018@epcms2p6>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20261125073914epcms2p653a329ef9213d5a9e2f74ec5401a3018@epcms2p6>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [-13.29 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-0.997];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	ARC_NA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
+X-Spam-Score: -13.29
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-Expose VIRTIO_BLK_F_REQ_FLAGS and VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA to
-drivers. The simulator is a ramdisk, so it handles FUA and non-FUA
-writes in the same way.
+On 11/25/26 8:39 AM, 전민식 wrote:
+> BLK_MQ_REQ_NOWAIT is mandatory in blk_mq_alloc_request_hctx() only to
+> keep blk_mq_get_tag() from re-picking data->hctx after io_schedule().
+> But the same flags value is passed on to blk_queue_enter(), so a caller
+> also takes -EAGAIN for a transient freeze that has no bearing on hctx
+> selection. There is no way to ask for the hctx guarantee without also
+> opting out of waiting.
+> 
+> Force BLK_MQ_REQ_NOWAIT on the tag allocation alone, right before
+> blk_mq_get_tag(), and let blk_queue_enter() honour the caller's flags.
+> nr_hw_queues/queue_hw_ctx and alloc_time_ns move after blk_queue_enter()
+> now that it can sleep through such an update.
+> 
+> Co-authored-by: Jaewoong Jung <jaew.jung@samsung.com>
+> Signed-off-by: Minsik Jeon <hmi.jeon@samsung.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+> Changes since v2:
+> - resend only; the v2 mail had the patch headers pasted into the message
+>    body. No changes to the code or the commit message.
+>   block/blk-mq.c | 40 ++++++++++++++++++++++++++--------------
+>   1 file changed, 26 insertions(+), 14 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-Signed-off-by: Alberto Faria <afaria@redhat.com>
----
- drivers/vdpa/vdpa_sim/vdpa_sim.c     | 13 +++++++++++++
- drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
- drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 14 +++++++++++++-
- 3 files changed, 27 insertions(+), 1 deletion(-)
+Cheers,
 
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 97d437d89524a..888ea80f6e0af 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -209,6 +209,12 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
- 		if (config->device_features &
- 		    ~dev_attr->supported_features)
- 			return ERR_PTR(-EINVAL);
-+		if (dev_attr->validate_features) {
-+			ret = dev_attr->validate_features(
-+				config->device_features);
-+			if (ret)
-+				return ERR_PTR(ret);
-+		}
- 		dev_attr->supported_features =
- 			config->device_features;
- 	}
-@@ -442,11 +448,18 @@ static u64 vdpasim_get_backend_features(const struct vdpa_device *vdpa)
- static int vdpasim_set_driver_features(struct vdpa_device *vdpa, u64 features)
- {
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+	int ret;
- 
- 	/* DMA mapping must be done by driver */
- 	if (!(features & (1ULL << VIRTIO_F_ACCESS_PLATFORM)))
- 		return -EINVAL;
- 
-+	if (vdpasim->dev_attr.validate_features) {
-+		ret = vdpasim->dev_attr.validate_features(features);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	vdpasim->features = features & vdpasim->dev_attr.supported_features;
- 
- 	return 0;
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-index bb137e4797633..70890974b6e56 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-@@ -45,6 +45,7 @@ struct vdpasim_dev_attr {
- 	u32 nas;
- 
- 	void (*work_fn)(struct vdpasim *vdpasim);
-+	int (*validate_features)(u64 features);
- 	void (*get_config)(struct vdpasim *vdpasim, void *config);
- 	void (*set_config)(struct vdpasim *vdpasim, const void *config);
- 	int (*get_stats)(struct vdpasim *vdpasim, u16 idx,
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-index 4d3e36fb59d50..e0ed9eb729cf3 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-@@ -32,7 +32,9 @@
- 				 (1ULL << VIRTIO_BLK_F_TOPOLOGY) | \
- 				 (1ULL << VIRTIO_BLK_F_MQ)       | \
- 				 (1ULL << VIRTIO_BLK_F_DISCARD)  | \
--				 (1ULL << VIRTIO_BLK_F_WRITE_ZEROES))
-+				 (1ULL << VIRTIO_BLK_F_WRITE_ZEROES)  | \
-+				 (1ULL << VIRTIO_BLK_F_REQ_FLAGS)  | \
-+				 (1ULL << VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA))
- 
- #define VDPASIM_BLK_CAPACITY	0x40000
- #define VDPASIM_BLK_SIZE_MAX	0x1000
-@@ -371,6 +373,15 @@ static void vdpasim_blk_work(struct vdpasim *vdpasim)
- 		vdpasim_schedule_work(vdpasim);
- }
- 
-+static int vdpasim_blk_validate_features(u64 features)
-+{
-+	if ((features & BIT_ULL(VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA)) &&
-+	    !(features & BIT_ULL(VIRTIO_BLK_F_REQ_FLAGS)))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static void vdpasim_blk_get_config(struct vdpasim *vdpasim, void *config)
- {
- 	struct virtio_blk_config *blk_config = config;
-@@ -424,6 +435,7 @@ static int vdpasim_blk_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
- 	dev_attr.nas = VDPASIM_BLK_AS_NUM;
- 	dev_attr.alloc_size = sizeof(struct vdpasim_blk);
- 	dev_attr.config_size = sizeof(struct virtio_blk_config);
-+	dev_attr.validate_features = vdpasim_blk_validate_features;
- 	dev_attr.get_config = vdpasim_blk_get_config;
- 	dev_attr.work_fn = vdpasim_blk_work;
- 	dev_attr.free = vdpasim_blk_free;
+Hannes
 -- 
-2.56.1
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
