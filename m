@@ -1,153 +1,128 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795634657;
-	b=ugJwJXITrFT14t6BKAsla8IZZgmySPvA+vfeqpS0rRvqHhegtePsU4hnTO9MsrjSGCM6
-	 UwsHSmR3CtNVzOKqPny/qoltNjj96/RMRK/0/Tv5+E96092UGTdt6sw+xVohiIblcCVeq
-	 /xJRImVjDpgXqJ8Al6reoC3hfMGJPoOI1auYcdXsBb/nGEE4rfm3/jT3co/MVy1rEfZXo
-	 xpur65XX0ppjouQ2tdse9w7FXswe5la1ypeCMipMF2zPHgobsCsXSZNfPkpOjFEXm0c2w
-	 F676KtE56QLpGWuhQragMKe0uClk11ZQvk9z7xvCcpfXdineu4Cx99E3LFT+IbJh6Pg==
+	t=1795634767;
+	b=2Vsv3oi1P8OO62iYCMKTAbNIffvc+6PgWegeBedSBW1Or/RkSJ1RL23stgoCxYarfCBa
+	 EUMc1LDlFAldu6Nu11yIE+e+ls+sN0grD8w++qffjsEi3BSqNeKNLmLPYhFOPDdgFslR7
+	 cXFaw1i73oC/fRDd/kz0OyuyUy54wKYU9Bernns5rJjCjZ/S/tKENJ36Xfi/jEx+z0qZq
+	 BaPh4/B/AftnIoBbEPnhC6DGqrlIz9PuNEr4GOHU6UF+WcKRYimLVRUfFKMpBQrAVtGf1
+	 EUuMP6MslAtKgJnkJzsD9BRqbuKphtnARK8gcP8lGIj4Y6u8RUx5o/5rSwUNeYnoESw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795634657;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=N55gjPKFtoyQEkpZ+mulBFdiGvAn3buEDUMJWwRWBLA=;
-	b=TCcjTm0FJWpu3P/mP/PCmcNgatoejjH2VFNv3ZGCzm8Fv5ME07O6/xd6la+utbreBXUk
-	 cYDiEF2iGpEv59qHDAjzQHmeuLgdWvE+9Iv9mipm3yGQznrMDHqxmrx7IMwASMEO1fBhx
-	 Ikc0Zcq0LI1Fhjg1B6HAdjlyuvJ5TCl61BuzWaXf3vjEIySUlv5GTkLCTFV0hNKDpKCaP
-	 mstIkAdK0M9+v1k16HmGA5MVHdBQVdJDtQgu0s+ceSgVpmQriY7X4JYvcpEjffWF4XJhn
-	 d6h71vA0qa8pjOFVdH99lrT3X97EIO/88k6lwCpJUv26sIyH1WN3TnRwmxYJP62vtbA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795634767;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 X-Received:Received:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
+	 References:Content-Type:Content-Transfer-Encoding:User-Agent:
+	 MIME-Version;
+	bh=v6NmbSBdWpSm2uVrOp8tpZ65xhznrbrVh6qn8OyPhJ8=;
+	b=aD2s40cvuXWga/rZJisb/XERjzNUKWqVdTnSy2L20mElnUFahrQbuBtnT4QV4JioH5mA
+	 N8hfdbU7+t8yyPkBniWXVGlPz0zvD/j+H594A2UBFXG885dDndMp4YHkyssPDR27StucN
+	 dTzKnuGvmK6NJFcLtyC1ra8bqLMYLthZWHKeF7YmJB+JTklzkxPT2CDPBVd1F2xFAL8hu
+	 gPxlMfFxMJcZKKtFHZl4sz6CLF87RaaWL9sqjbdN/D8RmF3/Ajt2sOdm5l0Y3GIXBF2G9
+	 bnlz9PkBu/SA8T8Ad2eErZ+fvbt4zePlqQGRo4o2z3ygX3VkINHq6wrRYgIe+MU9XiA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=PQxZQo0T;
-	arc=none smtp.remote-ip=209.85.210.171
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=O+VUfJBu;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=h05KInbD;
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFAD606A331
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 19:24:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3FFAD606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB774606A327
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 19:26:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB774606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=PQxZQo0T
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8b29b83fdf1so3290952b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 11:24:16 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=O+VUfJBu;
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=h05KInbD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1795634765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v6NmbSBdWpSm2uVrOp8tpZ65xhznrbrVh6qn8OyPhJ8=;
+	b=O+VUfJBuUwvfCTh6UMFrjpPdFelDUWFhfNRQrnQDvTRgdFV5i4JOlyugv/ls/77E1ZNloZ
+	fxMe8v5LQWA//MDvIl7oR1a+cnowRAjsCwF81GJpD8wVthmBs8+KKqabfqEpFuG08/Xycx
+	UVqd/isMtyXcQiZpYbXdpntUWdZVpfg=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-682-gY3-xMI9PpiCUZNWngYYAw-1; Wed, 25 Nov 2026 19:26:03 +0000
+X-MC-Unique: gY3-xMI9PpiCUZNWngYYAw-1
+X-Mimecast-MFC-AGG-ID: gY3-xMI9PpiCUZNWngYYAw_1795634763
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-949b0d322fbso870843185a.3
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 11:26:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795634655; x=1796239455; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=N55gjPKFtoyQEkpZ+mulBFdiGvAn3buEDUMJWwRWBLA=;
-        b=PQxZQo0TTqoCAQqV96+d5EoAEWVnLcJP15L/GDv397QjtUn2t3l5136UUhvM4tv/Ye
-         /o1K4Z5hEm9bYDztTZbC2tXo1IU4+GUmeoqyiuDiGsKdVLefuFWDdbvvuSPIyscCxFoP
-         Cz4ZSeO5vANruk+8Am3i2DzZ4yo4APgqe8I/txsx9lJPZVEtO9eDX/jJ0NvmuTWbmBfh
-         /V2lhq+B/jWKFHoehpwQtNkrtDkVscLJPhf1ctnG7DF99Uz2LPxpw1SR5D67WU3cM393
-         fLAlhmwaFKwppT+9uL1ESlPHR8gqRsgEzs/ToyHZbUgXX/nL83IF07v5cJH14tA3PxVU
-         eIEQ==
+        d=redhat.com; s=google; t=1795634763; x=1796239563; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:content-type
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=v6NmbSBdWpSm2uVrOp8tpZ65xhznrbrVh6qn8OyPhJ8=;
+        b=h05KInbD86wfThg4dMAc096QIRLQ5/B7awsf5C2xH+PwlMMalzRWcFw4lh1Fs4P6ed
+         gK5tgJKkOjF49Ec04S/4skSHFhwePE7JT29OUQhUyA5+o7+AhIPsetEEils4g4+dpErg
+         BWEBF5ZbnAXHw3kpSiKaU6Fll8YtkbyMBdenz53JXa1+2RxL8IrcLMIP4eMpj1Xe6Yn2
+         FuKXhp85tnaeXojCtdaJp+x7iOEQkt36kokNGQP2yDGtfxEeSXr3L1PI60/qybTlfP5F
+         Tl006Elxdt4DFhnEgR79rKatGOvTpcCceYyaDUqbjBhJ25b0XCsi2u1GPvc402tSG6/6
+         9w8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795634655; x=1796239455;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20260707; t=1795634763; x=1796239563;
+        h=mime-version:user-agent:content-transfer-encoding:content-type
+         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=N55gjPKFtoyQEkpZ+mulBFdiGvAn3buEDUMJWwRWBLA=;
-        b=x8VF6SHTRoT2JrtGbG7+B1VLoOCaBVeYO12btKM9n3NX3AYEs1ZLpsZeKmeT8k97Jy
-         01AA3X55yhS9iv+m1xSuuHLmwJtvUU3jM3G+zuVfwZVYMd3TSTmWLJUwXZiXRmP7Og2M
-         N+tvAz7BogLOyiMJ20mnX835j8CNvF1NTu+c1GIiO4ZupqC32/AvmSN0U0vff5EHXcCu
-         R8dsh2MoyQG8ujfd54adGvC4yWDtHgFls+LOiB7k32mwTNB/5W0CwBg7VKRcPY79qLXS
-         W1QZJg+gPFmBFNs8aDzsR6A7l5xn2fXY42AlcNaLaT1KwvCF+oM7EIlKRvmUJJe1GCjE
-         l/dw==
-X-Forwarded-Encrypted: i=1; AL+hErEDeJEsdep6QfemskrpMu4uycKDez5HQTlZuFcmLSeOfq4pvjg3Cx+RelqGHH6Ln+SMprJ6jH6a/+pVsQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9BY1JoxNBWWpLHoFLnMbcM5W261nHpcv4ZCdV2wAzAvqn8Lopg
-	4HcbC3c73De3NmKVLZKYnKZsrM24FH5rmQAOcaf3DALEuTwr8T94nHMyIf31/7bHow==
-X-Gm-Gg: AZFdTZd5K78m2a/jEJsqeTQQHhMJ4Dua3tESknuoZIgYmXZtCa5IpsLyB1e4aZ7Sp2l
-	ZS2PcVRN6RPnVBsmI2JlAQcuEU+6EQizsHX2Tx6P+7tx0f1phuE1YElAwrQ9Pb/BpV1v8ynXCqn
-	awCH+1XYUFkbhR871HsBzA15dLHvDwpFHUQ/2CZW7AN+XPQNFlw3eFXVrpKVJEKnEQEkjYZHu6N
-	xU8nJX6bPxY35Xkg8fnOajjlLSh1NuIPMLv1KP+6Kvth05KM4p6vA8hgLUMKJj61haZ7SOV/1Yr
-	AfIscFlxvCszwadITMREbZ9F1UQi1Wv5KJadMpvqMcaU+HF7vu4ZZud90vE8ht118mHKWXITIeI
-	fO4y4O/bGo2+CpZegYF1dXLzMh9Yx6I/a/8E1JkBwhYGEqjSO/sj3sZKDjJGybJ2r/aN2rBsY1Z
-	CwU/9R4pjKwS7pogUezSbdxDMQUdiHh5cF1a86dktMF7UM8LkdEf9Wx2YTW1d65U/4aETdLPQk1
-	DzAg0mdnVJdHQoHUTtkfe3hlkp41KDHt5usNCtLtM9RSN3DCRA3lQ6TtfEp8zhq98LOUkecvhZP
-	FvHYCz4Y0KU961pGabQptPSigVKjkpj/4jb3gisidFztjzjifLEP25+wKrVYBiRFI5MCASnvDk6
-	FkF7qEHe6ogAsm3xclMGKL5JXPhu+1R+E/ClSi+sPlt1Lc43stBd88GgIQr8JYIu//aqL7HU2BC
-	JrToWOL6nVLA==
-X-Received: by 2002:a05:6a00:a908:b0:886:773d:a6a with SMTP id d2e1a72fcca58-8c87c199463mr15925448b3a.28.1795634654761;
-        Wed, 25 Nov 2026 11:24:14 -0800 (PST)
-Received: from google.com (196.126.197.35.bc.googleusercontent.com. [35.197.126.196])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c87077bc47sm9717494b3a.6.2026.11.25.11.24.13
+        bh=v6NmbSBdWpSm2uVrOp8tpZ65xhznrbrVh6qn8OyPhJ8=;
+        b=cf96PeTNRbxawcfo18shxztnWY2VvmfRgW8qM4w9HAgeV2QAiW3FIaKlIRsD15+mu2
+         bI62fx2vOEEiz/Z3ivhExhsdl0ELJIRYZI+sdnqciZzF4ZaynEBjQ0oX+3sYLmLfU1nE
+         vk+u+1cT9LT/eYLEZEvemk6O4/rSs1fV2WoC+klD1udIkwZ5nbqJuA81omyYaWRI4J32
+         s6a/8VLcjOJfHwhv9soiktO06q5UWO5ZSFXe6EHHdN+/TIVkB1AYEvSqV/cmnwHghKf1
+         dwMjQLowJAHGhxD22tO8jVdxGN19az6N76InaHIyAFCPeDZE17KRKlEtenhz032/XvhS
+         5uUw==
+X-Forwarded-Encrypted: i=1; AL+hErGCdMWoLrjgNJ71NiEjj4dGrPp4/8GW8ldYlPNjeTh/yVxSf7Dw3opZh8ZNhDWy0uxdL/JNOExp24g4bg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9B3COWt8T0EEmg05uBXIctJN73JzFKV9M2v6LbXNIUumAnGqqE
+	+WS4vy60ax2TU99UweQkM5xdcQ6OfjAEFaHPY1CUxlqkgsI4N2BFX333WMk1yONFoSkNaxdjzWe
+	n4a77/YnixJj4uaP8ty3p0glTrLimsHAjfpCdlOPzh1DbyZuEDnuYfr/8Bb8CPBCs
+X-Gm-Gg: AZFdTZfu/RMTZ+GDPbPDvB1uK6odPzuvhSw7GZYZf41iTBnx2SUqArbCaemJKCFZ14+
+	OLT49gfIfdFeKwFJxstzATM9yNSUZ5F77pI5a67iCx8/CMy5FI6ZpHH2JDu+SJ3zlVZ3wEf9eFP
+	Udip/yUPSeHp4tMGQgsP53RR5Vh5DlZhEmA1Tlxue2jEgwHmC/BMiSw1V3D0mj1cud4E4WsM47S
+	gs9emYW/hzdLjz4/uwvsPldk78WoO7wKTzeR67m01UY4IaZgE4DVj+Lpp9tcyFcDsSQrD/jAuLe
+	CJ0YRY0RQP8SO2De0afg6DOsLZSGK5DdVjaHufgFzDcOxJoFpCQ0MgY/xa9sbS7D3LSSOOl1OsT
+	54EP+z8HmDc4e/7OhtIcL6xxkyTMKnhC0vyHuNr6BWVquyRb6M342C2dHSj03h6GUAcHUak4bHd
+	Ayhun88lT8rLTwYaJ7U4ZMougAaxBERGyaKYYlZTN6b4FsemP6EAYdxbOnLUpNs12Q06Hjfwk=
+X-Received: by 2002:a05:620a:462a:b0:949:3302:1d9f with SMTP id af79cd13be357-949bab350e3mr3218671885a.78.1795634762678;
+        Wed, 25 Nov 2026 11:26:02 -0800 (PST)
+X-Received: by 2002:a05:620a:462a:b0:949:3302:1d9f with SMTP id af79cd13be357-949bab350e3mr3218663985a.78.1795634761937;
+        Wed, 25 Nov 2026 11:26:01 -0800 (PST)
+Received: from loberman-thinkpadp16gen3.rmtusma.csb ([2600:6c65:2440:d8c:aa2b:ddff:fe88:da74])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9213515f467sm168088266d6.41.2026.11.25.11.26.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 11:24:13 -0800 (PST)
-Date: Wed, 25 Nov 2026 11:24:10 -0800
-From: Benson Leung <bleung@google.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org,
-	David Hildenbrand <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-mm@kvack.org,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	linux-sound@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowangio@gmail.com>, David Heidelberg <david@ixit.cz>,
-	oe-linux-nfc@lists.linux.dev, Chas Williams <3chas3@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Helge Deller <deller@gmx.de>,
-	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	MPT-FusionLinux.pdl@broadcom.com,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	linux-mtd@lists.infradead.org, Neill Kapron <nkapron@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-usb@vger.kernel.org, Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	xen-devel@lists.xenproject.org, Hans de Goede <hansg@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-	linux-ext4@vger.kernel.org, Mike Marshall <hubcap@omnibond.com>,
-	devel@lists.orangefs.org, Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Benson Leung <bleung@chromium.org>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	amd-gfx@lists.freedesktop.org,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	intel-gfx@lists.freedesktop.org,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-xe@lists.freedesktop.org
-Subject: Re: [PATCH v3 11/12] docs: ioctl-number: update platform entries
-Message-ID: <awc12oWB5WDJi8XZ@google.com>
-References: <20261125061340.3402300-1-rdunlap@infradead.org>
- <20261125061340.3402300-12-rdunlap@infradead.org>
+        Wed, 25 Nov 2026 11:26:01 -0800 (PST)
+Message-ID: <2adaf0ef9e1a2fa18590f7d8dbf203c0f7de2be7.camel@redhat.com>
+Subject: Re: [REGRESSION] DMAR fault by Intel H97 SATA controller since
+ "block: Increase BLK_DEF_MAX_SECTORS_CAP" (6.17-rc1)
+From: Laurence Oberman <loberman@redhat.com>
+To: Bart Van Assche <bvanassche@acm.org>, Thorsten Leemhuis
+	 <regressions@leemhuis.info>, Tobias Laas <tobias.laas@posteo.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	regressions@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-ide@vger.kernel.org, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org,  David Woodhouse <dwmw2@infradead.org>, Lu
+ Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, Will
+ Deacon <will@kernel.org>, Niklas Cassel <cassel@kernel.org>, 70sp
+ <70sp@protonmail.com>
+Date: Wed, 25 Nov 2026 14:26:00 -0500
+In-Reply-To: <a0ff3156-add0-4f7d-8373-09f95bd7036b@acm.org>
+References: <5ad27a97aafbc08a8702d5b90d09cd59@posteo.de>
+	 <awSs5Cw3hFkf4O4T@ryzen>
+	 <ec36d13e-e4c2-4bfb-8b50-69d4a1628839@leemhuis.info>
+	 <87b1bbd8-8113-4890-8623-738b19a9cc7b@leemhuis.info>
+	 <a0ff3156-add0-4f7d-8373-09f95bd7036b@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-3.fc44) 
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -157,90 +132,198 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Kk3dCghKBQNrocaf"
-Content-Disposition: inline
-In-Reply-To: <20261125061340.3402300-12-rdunlap@infradead.org>
 
-
---Kk3dCghKBQNrocaf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Nov 24, 2026 at 10:13:38PM -0800, Randy Dunlap wrote:
-> Update the list of platform/ files where ioctls are defined and update
-> the ranges of function numbers that are used.
+On Wed, 2026-11-25 at 10:29 -0800, Bart Van Assche wrote:
+> On 11/25/26 12:52 AM, Thorsten Leemhuis wrote:
+> > For completeness, =C5=A0imon Posp=C3=ADchal (now CCed) shared findings =
+and a
+> > WIP
+> > fix (both with the help of a LLM) meanwhile here:
+> >=20
+> > https://lore.kernel.org/all/QISmXFlpPMgvFUKmdIBDwqn4JHHXt2NZeJzerMLHF_5=
+icLo0lPKVlN0Ig9v8Vb52NmCeSFdyrao4x8KoN1DCXtDlnZS7eRIClC6vZyu-hPU%3D@protonm=
+ail.com/
 >=20
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Acked-by: Tzung-Bi Shih <tzungbi@kernel.org> # cros_ec
-
-For cros_ec as well:
-
-Reviewed-by: Benson Leung <bleung@chromium.org>
-
-
+> Thanks Thorsten for having shared that link. The LLM I'm using
+> doesn't
+> like that patch and came up with the patch shown below. Untested.
+>=20
+> Bart.
+>=20
+>=20
+> Subject: [PATCH] iommu/vt-d: Disable superpages on Haswell with=20
+> integrated graphics
+>=20
+> Disable Intel VT-d superpages on bare-metal Haswell client systems
+> when
+> integrated graphics (0000:00:02.0) is enabled and an active remapping
+> unit advertises superpage support (CAP.SLLPS).
+>=20
+> Per the 4th Generation Intel Core Processor Family datasheets
+> (document
+> 328897, section 3.1.2), the integrated graphics VT-d engine does not
+> support super-pages and BIOS must disable super-pages in the default
+> VT-d engine when integrated graphics is enabled. Several Haswell
+> BIOSes
+> leave CAP.SLLPS set on the default engine (dmar1). Whenever Linux
+> installs
+> a 2 MiB or 1 GiB leaf entry (PS=3D1) on dmar1, hardware aborts DMA with
+> fault reason 0x0c ("non-zero reserved fields in PTE"), breaking VFIO
+> passthrough, discrete GPUs, audio, and AHCI storage (exposed by
+> default
+> once BLK_DEF_MAX_SECTORS_CAP increased to 4 MiB in v6.17).
+>=20
+> Prior to commit c376a3456d8b ("iommu/vt-d: Remove
+> domain_update_iommu_cap()"), domain_update_iommu_superpage()
+> intersected
+> superpage support across all active IOMMUs, so the IGD unit (SLLPS=3D0)
+> masked off superpages on dmar1. After that commit, dmar1 domains
+> started
+> honoring dmar1's advertised CAP.SLLPS.
+>=20
+> Detect bare-metal Haswell client CPUs (INTEL_HASWELL,
+> INTEL_HASWELL_L,
+> INTEL_HASWELL_G), verify that the Intel integrated graphics device at
+> 0000:00:02.0 is present and not on an untrusted PCI link, and clear
+> intel_iommu_superpage during intel_iommu_init() before allocating any
+> paging domains if an active IOMMU advertises CAP.SLLPS.
+>=20
+> Fixes: c376a3456d8b ("iommu/vt-d: Remove domain_update_iommu_cap()")
+> Reported-by: Tobias Laas <tobias.laas@posteo.de>
+> Closes:=20
+> https://lore.kernel.org/linux-block/5ad27a97aafbc08a8702d5b90d09cd59@post=
+eo.de/
+> Reported-by: =C5=A0imon Posp=C3=ADchal <70sp@protonmail.com>
+> Closes:=20
+> https://lore.kernel.org/r/HYhMd0Klo0XE_yiVY7XmsgyKKFDwKHfKRy22KrycLcYd0V_=
+ykA4xdbBMJXkA07YX3os6qK-NhMIVi6ITo-CkNIIF0e-GcI0UwwZmdDhAJ0I=3D@protonmail.=
+com
+> Cc: stable@vger.kernel.org
 > ---
-> v2: no change
-> v3: rebase
+> =C2=A0 drivers/iommu/intel/iommu.c | 53
+> +++++++++++++++++++++++++++++++++++++
+> =C2=A0 1 file changed, 53 insertions(+)
 >=20
-> [Since having multiple maintainers trying to merge these would
-> cause some conflicts, it would be more manageable for Jon to
-> take all of these through the docs-next tree.]
+> diff --git a/drivers/iommu/intel/iommu.c
+> b/drivers/iommu/intel/iommu.c
+> index 5a2e705a2f2e..dd37aa25e287 100644
+> --- a/drivers/iommu/intel/iommu.c
+> +++ b/drivers/iommu/intel/iommu.c
+> @@ -24,6 +24,8 @@
+> =C2=A0 #include <linux/tboot.h>
+> =C2=A0 #include <uapi/linux/iommufd.h>
 >=20
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Shuah Khan <skhan@linuxfoundation.org>
-> Cc: linux-doc@vger.kernel.org
-> Cc: Florian Fainelli <florian.fainelli@broadcom.com>
-> Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadc=
-om.com>
-> Cc: Tzung-Bi Shih <tzungbi@kernel.org>
-> Cc: Benson Leung <bleung@chromium.org>
+> +#include <asm/cpu_device_id.h>
+> +
+> =C2=A0 #include "iommu.h"
+> =C2=A0 #include "../dma-iommu.h"
+> =C2=A0 #include "../irq_remapping.h"
+> @@ -43,6 +45,7 @@
 >=20
->  Documentation/userspace-api/ioctl/ioctl-number.rst |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> =C2=A0 #define DEFAULT_DOMAIN_ADDRESS_WIDTH 57
 >=20
-> --- linux-next-20261123.orig/Documentation/userspace-api/ioctl/ioctl-numb=
-er.rst
-> +++ linux-next-20261123/Documentation/userspace-api/ioctl/ioctl-number.rst
-> @@ -434,6 +434,7 @@ Code  Seq#    Include File
->  0xBA  00-0F  uapi/linux/liveupdate.h                                   P=
-asha Tatashin
->                                                                         <=
-mailto:pasha.tatashin@soleen.com>
->  0xC0  00-0F  linux/usb/iowarrior.h
-> +0xC4  00-1F  platform/raspberrypi/vchiq-interface/vchiq_ioctl.h
->  0xCA  00-0F  uapi/misc/cxl.h                                           D=
-ead since 6.15
->  0xCA  10-2F  uapi/misc/ocxl.h
->  0xCA  80-BF  uapi/scsi/cxlflash_ioctl.h                                D=
-ead since 6.15
-> @@ -446,7 +447,7 @@ Code  Seq#    Include File
->  0xDD  00-3F                                                            Z=
-FCP device driver see drivers/s390/scsi/
->                                                                         <=
-mailto:aherrman@de.ibm.com>
->  0xE5  00-3F  linux/fuse.h
-> -0xEC  00-01  linux/platform_data/cros_ec_chardev.h                     C=
-hromeOS EC driver
-> +0xEC  00-02  linux/platform_data/cros_ec_chardev.h                     C=
-hromeOS EC driver
->  0xEE  00-09  uapi/linux/pfrut.h                                        P=
-latform Firmware Runtime Update and Telemetry
->  0xEF  00-0F  uapi/linux/ntfs.h                                         N=
-TFS
->  0xF3  00-3F  drivers/usb/misc/sisusbvga/sisusb.h                       s=
-isfb
+> +static void __init check_haswell_igfx_superpage(void);
+> =C2=A0 static void __init check_tylersburg_isoch(void);
+> =C2=A0 static int intel_iommu_set_dirty_tracking(struct iommu_domain
+> *domain,
+> =C2=A0=C2=A0					=C2=A0 bool enable);
+> @@ -2762,6 +2765,7 @@ int __init intel_iommu_init(void)
+> =C2=A0=C2=A0		pr_info("No SATC found\n");
+>=20
+> =C2=A0=C2=A0	init_no_remapping_devices();
+> +	check_haswell_igfx_superpage();
+>=20
+> =C2=A0=C2=A0	ret =3D init_dmars();
+> =C2=A0=C2=A0	if (ret) {
+> @@ -4266,6 +4270,55 @@ static void __init
+> check_tylersburg_isoch(void)
+> =C2=A0=C2=A0	=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vtisochctrl);
+> =C2=A0 }
+>=20
+> +static const struct x86_cpu_id haswell_cpu_ids[] __initconst =3D {
+> +	X86_MATCH_VFM(INTEL_HASWELL, NULL),
+> +	X86_MATCH_VFM(INTEL_HASWELL_L, NULL),
+> +	X86_MATCH_VFM(INTEL_HASWELL_G, NULL),
+> +	{}
+> +};
+> +
+> +/*
+> + * Per the 4th Generation Intel Core Processor Family datasheets
+> (e.g.
+> + * document 328897, section 3.1.2), the integrated graphics VT-d
+> engine
+> + * does not support super-pages and BIOS must disable super-pages in
+> the
+> + * default VT-d engine when integrated graphics is enabled. Some
+> Haswell
+> + * BIOSes leave CAP.SLLPS set on the default engine, causing fault
+> reason
+> + * 0x0c (non-zero reserved fields in PTE) when a 2 MiB or 1 GiB
+> superpage
+> + * mapping is used.
+> + */
+> +static void __init check_haswell_igfx_superpage(void)
+> +{
+> +	struct dmar_drhd_unit *drhd;
+> +	struct intel_iommu *iommu;
+> +	struct pci_dev *pdev;
+> +
+> +	if (!intel_iommu_superpage)
+> +		return;
+> +
+> +	if (cpu_feature_enabled(X86_FEATURE_HYPERVISOR) ||
+> +	=C2=A0=C2=A0=C2=A0 !x86_match_cpu(haswell_cpu_ids))
+> +		return;
+> +
+> +	pdev =3D pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(2, 0));
+> +	if (!pdev)
+> +		return;
+> +
+> +	if (pdev->vendor !=3D PCI_VENDOR_ID_INTEL ||
+> !IS_GFX_DEVICE(pdev) ||
+> +	=C2=A0=C2=A0=C2=A0 risky_device(pdev)) {
+> +		pci_dev_put(pdev);
+> +		return;
+> +	}
+> +	pci_dev_put(pdev);
+> +
+> +	for_each_active_iommu(iommu, drhd) {
+> +		if (cap_super_page_val(iommu->cap)) {
+> +			intel_iommu_superpage =3D 0;
+> +			pr_info("Disabling superpages on Haswell
+> with integrated graphics\n");
+> +			break;
+> +		}
+> +	}
+> +}
+> +
+> =C2=A0 /*
+> =C2=A0=C2=A0 * Here we deal with a device TLB defect where device may=20
+> inadvertently issue ATS
+> =C2=A0=C2=A0 * invalidation completion before posted writes initiated wit=
+h=20
+> translated address
 
---Kk3dCghKBQNrocaf
-Content-Type: application/pgp-signature; name=signature.asc
 
------BEGIN PGP SIGNATURE-----
+Hi Bart,
 
-iHUEABYKAB0WIQQCtZK6p/AktxXfkOlzbaomhzOwwgUCawc12gAKCRBzbaomhzOw
-wuvSAP9FFr45oXAv5Psc3n5xsSYyPFouusI/XwRnWy3tYxQspAD+KIeOTWQfcOeC
-TWeqyAANog5rg68r7xNPxeH8I/R6xAQ=
-=Fk2v
------END PGP SIGNATURE-----
+Tested-by: Laurence Oberman <loberman@redhat.com>
 
---Kk3dCghKBQNrocaf--
+Tested on a non-affected platform to check the quirk does not
+misfire: Coffee Lake i7-8700, Cannon Lake PCH AHCI, both DRHDs report
+SLLPS =3D 2M|1G (dmar0 cap 1c0000c40660462, dmar1 cap d2008c40660462),
+7.4.0-rc1 with intel_iommu=3Don. The quirk does not trigger, superpages
+remain in use (2 MiB leaf PDEs, e.g. 0x000000018f400082, confirmed via
+domain_translation_struct during 2M O_DIRECT reads), and there are no
+DMAR or ATA errors. I don't have Haswell hardware, so Tobias's test is
+the one that confirms the fix itself.
+
+The Fixes: tag looks right to me. c376a3456d8b is the commit that
+stopped intersecting superpage support across IOMMUs at attach time.
+In my earlier mail I pointed at 5bdd86ec5d19, which only removed the
+remaining hotplug user of domain_update_iommu_superpage(); both are in
+v6.13-rc1.
+
+Regards,
+Laurence
+
