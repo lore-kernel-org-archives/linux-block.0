@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795620926;
-	b=Hx5umg4EANmefZfaxbRt1nGRWHLYUMts6vmd1GJZZjMJA3yOCUx6ZVJyGnhFqDF4oxQ5
-	 0UfuX5lVcoRciYjftZTR212Tv2X344L1uyul243Ikc42Wz0o61da9tx2ddyu9GIj05j1W
-	 /cUE8wOhQdfQOZZn4nliRhcBpYpUMbfhoLnzzY+YKFDsF+T4jHtkOPX3oVOS2fGv9/QVR
-	 /ZlrtdanhqnsZR0cTnM/7WyClFjy0I019jrT5RoF73E0+FolDSDcU27tGsu27Bq/7au2p
-	 sliShvHI1GlYvKio1VQTkXeSf6d51/2+6CrJcodXpzSZYT//o9bcQHiEd630rkLLyMA==
+	t=1795620929;
+	b=zH/NLnEmy9ZaJtfnjrTENPVHxQT/tfIcLgf99q86bn94lbELBnu4xiTIdsX7HRpQclpU
+	 YIpP0pCvk766N/uGloHWGhiqjEVlM2aoAVJTrzvwkx4mpQnSbDhMvtMCfhbUaDn/cQe8R
+	 t5ziC2LFmrmDMsZfS1opgEDQuLcla58Hm2uWYacR1HPvci4LRIyZ6wwSK/JSZiKWQaB2c
+	 NXLY7BCAQOXjtToFVBEMFJ+f2L7AyJhqZdq5PG7ctJFTv1PuW2he5N1L9oK1ipBKXbBkT
+	 tr4zxVkdoNzeiE6ZK+CyptMb+P2GvCH9hF3FBeEecj/aKwaipOEIq2901EsZB3iE6lA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795620926;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795620929;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=RaW8x3wy2dy9KRWxzMBJFya20NKzKWRFujyB0bIcDJk=;
-	b=1gKhKFNYF80AY9j3NqatzQBSVRf6FxSkxXkXU2VaJZhmpfXmhpMlkXECoVJ+1lQ6RupV
-	 NcxfbuO6fwWyG85vrhwi8vhNXWrWxJcDzcBS5PBfEoaSn1muTG6mFPfZnWeK+UgOqNecW
-	 qQJAa9ZdjWWSpeySSYX+E8O2yxn1UxQLTNWLm90xrFU0Mo5GqB3tqhMOnrDXvpjz9fNG7
-	 CAwAWHCe1atQDK2RPN5MPnBFJeNbIAKmEKs9VQ6PHfJrqa6PUHorQfXT3CBPMN1tbsVKG
-	 k8mbuR4mwy2L7LAdjWWxiLmcvANhj23CfoYDnd6VLQks1MUHthAkX4NxRAvu0O2pvhw==
+	bh=PHlfHCanLBUgXLcjMAN9WrRjg41amRWejQtzvmb5XPE=;
+	b=Cz1yeusn/SHo93Ch1TO69kiMkfx8fSVe3aIiQwGqQvprvMHOuz0URQR21+HVzOaq1GUi
+	 zeU6c3VYlKghY8d5RM26txY5XEt6Fb2G4gvyv4gsDO2cZ5sFceVAxRGTFL4YUphgEf1f2
+	 5ed1oUvie5pbmXR4nPlcGABPWA3iR/QMSRB6ZKoeCPScSEEWiZkztp9oCJnWWf1XLdICD
+	 EJZ2ixKqJSRGmhxt3YVSZms7JrtCpvEj+yIMBodA0K7pW+boonHmPEUq/wzqW7+qG3PNi
+	 7qgV1SrLXh0dXTjxziDXYXfMBS6pAiK2XccgABPYUyE+F+rJcg1Xu0oP8CmF/tM/jrQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linbit.com;
 	spf=pass smtp.mailfrom=linbit.com;
-	dkim=pass header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=rjIL0cbT;
-	arc=none smtp.remote-ip=209.85.128.49
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	dkim=pass header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=u4moNExQ;
+	arc=none smtp.remote-ip=209.85.221.41
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44C7606A33A
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 15:35:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E44C7606A33A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C044460A2621
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 15:35:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C044460A2621
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=rjIL0cbT
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a1fbd52ab6so40379415e9.0
-        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 07:35:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linbit.com header.i=@linbit.com header.a=rsa-sha256 header.s=google header.b=u4moNExQ
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-48e20ed3b9dso5230913f8f.2
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 07:35:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit.com; s=google; t=1795620923; x=1796225723; darn=vger.kernel.org;
+        d=linbit.com; s=google; t=1795620926; x=1796225726; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=RaW8x3wy2dy9KRWxzMBJFya20NKzKWRFujyB0bIcDJk=;
-        b=rjIL0cbT0oNZNA2goGo6xIOOUyHMaIJc3CCNC0cQ9u3F8Ll2tMJuAW03iB3ZwRv5eR
-         pkEIwRRc9XJrttGZTRAR/aadihv8X4HXW435F4AfkAppOFQf/Z6qg1zZfSSZeiLsC5gx
-         xsCeb1MVAXDrkPWqYH74GOtfIPa9DBsgGxuyn2oVIVh26jIv8Nbx/ecSKyjhSuJees+v
-         gBL9I/MLVZMs30lUZfDuEKMUQc4pzhnkZsjZZQbaZ+a9aIEAiq4idPMsBQeIwCu+HL3d
-         XlYiT1Qfv0Rtsx95kwkXSJ0qEYsEcFWtJAOKrHMT/uY0KPwKPWruO1wmUSektPsfEInw
-         Kcdw==
+        bh=PHlfHCanLBUgXLcjMAN9WrRjg41amRWejQtzvmb5XPE=;
+        b=u4moNExQzY1+u/33nVAeOxyUhrF99OUA6hRAH4kr9ODUHSzvotWTRuyZXnIAaKLGtc
+         sHGYOtQ/+zGbxRuMYuSWexGF7w+wCv189pKlaPqyhADtxz1+RRRVtOwM21DVWE2505H3
+         W+EzCsA7i9NoGlDSTiOOtEtT/4Wduv7mpDmTJeHxSpGWkZVMABR1pejmubcVLiQTPLNw
+         3S+pSQ1A4nXLh++e4atX8cVzH2xXwuR8Rf2HR8PqMHUjpbL40hWryVAsbpiiHeEiuilw
+         SkrPaxBMl9A3aA0cne8EuPDhroVqEka5L53DC2HuZB7gNj4hwuujWSCDzynizk7dz3Xh
+         c7Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795620923; x=1796225723;
+        d=1e100.net; s=20260707; t=1795620926; x=1796225726;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=RaW8x3wy2dy9KRWxzMBJFya20NKzKWRFujyB0bIcDJk=;
-        b=EEuWRKfWWSdsAWly67SC956NHqjxxf3WnoXiRBAahsxzmjmHgaW+27xcO9rhEVBcRl
-         wWfbXfKXdx8s3ErihXA8EAXLRQyWs+mu6rb4A0Z1w8y9DhcNkg8hp6XNP2q8WaCKHqKV
-         UMrb6YfmwO7Zkl631aNtJdSkJfvwOBgNkSbEygtHoJPyK04L0OR6wGRzhfkQo0DHhuIh
-         yD7JUvzPfQ+dQ2e6AV3VU2YXQMrupq6R5cdn19xGC1CwMvh/xIyL9tgXKp8GupdDs57x
-         e4KuHKaRZmubIfVMc5FbLRPkd5A/Jk/OEFCEEgRBux1DSRaT4BONUoBB9OLHd+nkv5Kc
-         EXcQ==
-X-Forwarded-Encrypted: i=1; AL+hErFax++OyGlrzyw/uSwIDfDo1Liy721O5TM5k47Pf6+kEka89YOH1GuurOZxnm165loPEcNmrq429XIcfg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8gQbJcbkPATyGRrIFZCAeTgVsuRkVJs1Yr5wj3D2Pgc+JLGHe1
-	5fUpwf1+uqdryfaoU26OeZLVZohfY5vKcykouKS5ElpjmGT09ldrFMI6NaZ+p7nYVvI=
-X-Gm-Gg: AZFdTZfcvPZ0ayLhMBLVHABqCdUNXrDEZJKwXpP/BuKH99YxQge2CjliVJ7qEi8Fpqf
-	W+yza86xr7mO8QL3Tlh/BoxlnstgAFc0FHbMLbtPLGXA3hEC+AMXDG8TPyWHzhhQipzb347Dxg7
-	0smZK9E0o+J6TxWkBE71SF6QVYnZXAQ4jsPCxJi+4PqaW2rcPbRO98s5MI7eRVey4a2iu0dLZJl
-	gSeEvwvqemtYx7K6LEVCAz+CiE16fqYNBghu2j6auxuMJ+HqSTuM/8SMVfc/gs9zkOZOjJ0jxxK
-	TZy6DPhS/FitMV2Bsno0AvRZ1w9Y+IV6p95kCylKqqNx8f/iG4NG/SHoHf4+00+roqk+QBcu0QS
-	1AISRp1rlK7HJvQvGjRSgw52QqYfNoKTRP+6FiSjEmUqOyBk0US/Vv8xmgSV2spO22rWglgWsMg
-	gLijsws9wOCuNBXrDgkZyQOOxYSyJ39mJvR9v88t3aJMRwd2t2px09ax/8KkkYDnfGxMHtfkFCM
-	Wm589dni03qgK/n8RJPxeF0VQqoA7nHTXlvWrC9EUbo6EsdAu83tUjzia5PYB89j9rQuuvvvdig
-	z7aEyXLv7VhKKXT6PpMn6BiTcg8cGlsQzPwTX3rZAsN0JKCf2IQMC80UdTg8KIxDSkGFmX0Fn6v
-	/wRtIttba87GNkWVtx+4=
-X-Received: by 2002:a05:600c:3b8c:b0:4b7:6c16:7b43 with SMTP id 5b1f17b1804b1-4bb8881d019mr364067455e9.10.1795620922993;
-        Wed, 25 Nov 2026 07:35:22 -0800 (PST)
+        bh=PHlfHCanLBUgXLcjMAN9WrRjg41amRWejQtzvmb5XPE=;
+        b=dYTn7iv6Y4l8eCA02AHitzT0lEn+gCfPumfQaL81gq+7Po7aJDztOCFjCS4qBnXpvr
+         50CkAnW3tgYtgpJgMSSM7souiRSTFBDOZq/p/itwohdS1uV0PJjHIQFucmHaecVwdi53
+         5eHEM6U76TNyGuHKl1UkGwrwQrwphaNzAHA0FOP+NEh2obcr9wvxDDiFA/eLoiSReLeR
+         7f1MqR3CkLQwvXcYtUNnFpN9JgWQW9tvaX3YzyLP25sumkMD+QIB6T8uN9/fLY8Yp91i
+         2FJuuK6RupILZwYo2fRDeo3jeN3jIyUG3A8hgba7oSRN2qwyUPTGIJi6kGwHAzfvY4Ez
+         NpjA==
+X-Forwarded-Encrypted: i=1; AL+hErFfoMGZxqNrEIw9DO+FDhQMsLW2gdR8YO+jbt0nz21Oo33u9hM8MOjFZ94yi+mCwZHecMMDQJm9TtuExw==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8zvLJSq/dv1YTiNLmtbBmWdV3MwwcdXiFVd3GwaVWft3XObABZ
+	lroEeaTSlb2BAXjDSZbM+8QthLGZPTiHkBPpTeFyl0nMvDgyKdF/x/k5JJEE0+cOHDY=
+X-Gm-Gg: AZFdTZeF818kfuyhT8czzisD5CInqINWUV5ZHcSXMIoFEeZqT2OKJi7RVy1rOx/5Gr9
+	FxPbEsxQc9TdSXb21gs2Ql6NDkReaPUKvVMukEDl/tUhxkb7cjvf+UDjY6HtcwLiznCSm5s6ZpV
+	MVojSuajfAevhXJZ8PkBfZ2sz1RRn/FqwfWPZJHCPEl/pZr1WkFeHRTkpxsiBy5OD7GfmgfXoSo
+	AjzdIGY+L/Uvy5GAvRJ+zwaUNlkXlzcnNiyshjgbqp5YJx0bK+vGv+8zZGrt3UmJgYh1gg3wath
+	N6Kf/Pys07Q2HpVFzVX/ffVXYbb4YvkdQV3FX4AucoE7bHMYIIzMof6VFiP930kasYidMLxSPFx
+	fQJSGqoORBynflRqjdd8n/eMG3XbahUGoHej6LqAefn/nfbrAwhE3ZHMHTtvXF6uX9ilVQu8+Hj
+	TjSdMuNydjCx9/8bPrvpdtI3zy4c1rfnaRBQJiZmZR9n6w/DUP+z+brmANswZK3yYdN6QsCyEwq
+	p8+Pzmm39oA8wLX/yzjsafCWRTAh95b7HX6m6j+N0FPJ0ZVxy++VJFu7CS/Uqzn9fE11jHO6VTJ
+	s8QbbgnBjzNwPSjA/zqUKa5DAzqJCnj54k7bqm/YYF8ux2jvYiqmTUqZXTTZfFUACTqaSbw6nIV
+	H03Cxw9nTWsIc0KYvHyk=
+X-Received: by 2002:a5d:5d87:0:b0:4b8:db69:1b4a with SMTP id ffacd0b85a97d-4b8db691b7fmr7708623f8f.55.1795620925913;
+        Wed, 25 Nov 2026 07:35:25 -0800 (PST)
 Received: from linbit.com (h082218129081.host.wavenet.at. [82.218.129.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab658e2d60sm35816275f8f.3.2026.11.25.07.35.21
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab658e2d60sm35816275f8f.3.2026.11.25.07.35.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 07:35:22 -0800 (PST)
+        Wed, 25 Nov 2026 07:35:24 -0800 (PST)
 From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: drbd-dev@lists.linux.dev,
@@ -88,17 +88,10 @@ Cc: drbd-dev@lists.linux.dev,
 	Philipp Reisner <philipp.reisner@linbit.com>,
 	Lars Ellenberg <lars.ellenberg@linbit.com>,
 	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Chuck Lever <cel@kernel.org>,
-	kernel-tls-handshake@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH v4 06/21] net/handshake: allow the DRBD TCP transport to enable NET_HANDSHAKE
-Date: Wed, 25 Nov 2026 16:34:56 +0100
-Message-ID: <20261125153511.3060599-7-christoph.boehmwalder@linbit.com>
+	Joel Colledge <joel.colledge@linbit.com>
+Subject: [PATCH v4 08/21] drbd: add optional compatibility layer for DRBD 8.4
+Date: Wed, 25 Nov 2026 16:34:58 +0100
+Message-ID: <20261125153511.3060599-9-christoph.boehmwalder@linbit.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261125153511.3060599-1-christoph.boehmwalder@linbit.com>
 References: <20261125153511.3060599-1-christoph.boehmwalder@linbit.com>
@@ -114,33 +107,871 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-NET_HANDSHAKE is available only to the subsystems it lists: the SUNRPC
-client and the NVMe/TCP host and target. The DRBD TCP transport uses
-the handshake API for TLS-encrypted replication in the same way as
-NVMe/TCP: its BLK_DEV_DRBD_TCP_TLS option selects NET_HANDSHAKE.
+Introduce a Kconfig option, DRBD_COMPAT_84, that enables a
+self-contained source module that encapsulates everything needed to
+interoperate with the userspace and on-disk formats of DRBD 8.4 (the
+version that has been shipped with the kernel until now).
 
-Add BLK_DEV_DRBD_TCP to the list, as NVME_TCP is there for
-NVME_TCP_TLS. Otherwise that select would enable NET_HANDSHAKE with
-an unmet dependency.
+This ensures compatibility with existing userspace tooling is kept.
 
+The main DRBD code is deliberately kept as clean as possible from any
+backward compatibility hacks, so that this acts as the "main switch" for
+enabling compatibility with old DRBD userspace utilities.
+
+Co-developed-by: Philipp Reisner <philipp.reisner@linbit.com>
+Signed-off-by: Philipp Reisner <philipp.reisner@linbit.com>
+Co-developed-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Co-developed-by: Joel Colledge <joel.colledge@linbit.com>
+Signed-off-by: Joel Colledge <joel.colledge@linbit.com>
 Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
 ---
- net/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/drbd/Kconfig          |  26 ++
+ drivers/block/drbd/Makefile         |   1 +
+ drivers/block/drbd/drbd_legacy_84.c | 651 ++++++++++++++++++++++++++++
+ drivers/block/drbd/drbd_legacy_84.h | 129 ++++++
+ 4 files changed, 807 insertions(+)
+ create mode 100644 drivers/block/drbd/drbd_legacy_84.c
+ create mode 100644 drivers/block/drbd/drbd_legacy_84.h
 
-diff --git a/net/Kconfig b/net/Kconfig
-index 76ab44aa439a..db53f7474b7f 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -92,7 +92,7 @@ source "net/xdp/Kconfig"
+diff --git a/drivers/block/drbd/Kconfig b/drivers/block/drbd/Kconfig
+index fbf1d5011aa3..19c56590df7a 100644
+--- a/drivers/block/drbd/Kconfig
++++ b/drivers/block/drbd/Kconfig
+@@ -103,3 +103,29 @@ config BLK_DEV_DRBD_TCP_TLS
+ config DRBD_DAX
+ 	def_bool y
+ 	depends on BLK_DEV_DRBD && FS_DAX && ARCH_HAS_PMEM_API
++
++config DRBD_COMPAT_84
++	bool "Enable legacy (8.4) /proc/drbd and metadata compatibility"
++	depends on BLK_DEV_DRBD
++	default y
++	help
++
++	  This option enables the DRBD-8.4 style representation of
++	  DRBD devices in /proc/drbd. With DRBD 9.0, released in 2015,
++	  we deprecated this interface. The replacement is `drbdsetup
++	  status [--json] <resname>`. The new interface is optionally
++	  machine-readable, extensible, and scales to 1000s of
++	  resources. The deprecated interface had issues with all
++	  three areas.
++	  At the same time, this option also enables the DRBD driver
++	  to read and write the deprecated 8.4 version of the
++	  metadata.
++	  Only when you create a DRBD resource in the legacy way
++	  `drbdsetup new-resource <resname>` (no node-id positional
++	  argument), then the resource is put into legacy mode, and
++	  shows up in /proc/drbd, is capable of reading and writing
++	  the 8.4 metadata, and can have only a single peer. Without
++	  this compile-time option, creating a resource without a node
++	  ID is not possible.
++
++	  If unsure, say Y.
+diff --git a/drivers/block/drbd/Makefile b/drivers/block/drbd/Makefile
+index 750202bce516..9aa3d91040af 100644
+--- a/drivers/block/drbd/Makefile
++++ b/drivers/block/drbd/Makefile
+@@ -7,6 +7,7 @@ drbd-y += drbd_nl_gen.o
+ drbd-y += drbd_transport.o
+ drbd-$(CONFIG_DRBD_DAX) += drbd_dax_pmem.o
+ drbd-$(CONFIG_DEBUG_FS) += drbd_debugfs.o
++drbd-$(CONFIG_DRBD_COMPAT_84) += drbd_legacy_84.o
  
- config NET_HANDSHAKE
- 	bool
--	depends on SUNRPC || NVME_TARGET_TCP || NVME_TCP
-+	depends on SUNRPC || NVME_TARGET_TCP || NVME_TCP || BLK_DEV_DRBD_TCP
- 	default y
- 
- config NET_HANDSHAKE_KUNIT_TEST
+ obj-$(CONFIG_BLK_DEV_DRBD)     += drbd.o
+ obj-$(CONFIG_BLK_DEV_DRBD_TCP) += drbd_transport_tcp.o
+diff --git a/drivers/block/drbd/drbd_legacy_84.c b/drivers/block/drbd/drbd_legacy_84.c
+new file mode 100644
+index 000000000000..70a71605a22e
+--- /dev/null
++++ b/drivers/block/drbd/drbd_legacy_84.c
+@@ -0,0 +1,651 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2025, LINBIT HA-Solutions GmbH.
++ */
++
++#include "drbd_legacy_84.h"
++#include "drbd_meta_data.h"
++
++/* MDF_84_* masks and the flags table they encode are declared in
++ * drbd_legacy_84.h, shared with drbd_nl_84.c (GET_STATUS's disk_flags).
++ */
++
++struct meta_data_on_disk_84 {
++	u64 la_size_sect;      /* last agreed size. */
++	u64 uuid[UI_SIZE];   /* UUIDs. */
++	u64 device_uuid;
++	u64 reserved_u64_1;
++	u32 flags;             /* MDF */
++	u32 magic;
++	u32 md_size_sect;
++	u32 al_offset;         /* offset to this block */
++	u32 al_nr_extents;     /* important for restoring the AL (userspace) */
++	      /* `-- act_log->nr_elements <-- ldev->dc.al_extents */
++	u32 bm_offset;         /* offset to the bitmap, from here */
++	u32 bm_bytes_per_bit;  /* 4k. Treat as magic number, must keep it compatible. */
++	u32 la_peer_max_bio_size;   /* last peer max_bio_size */
++
++	/* see al_tr_number_to_on_disk_sector() */
++	u32 al_stripes;
++	u32 al_stripe_size_4k;
++
++	u8 reserved_u8[4096 - (7*8 + 10*4)];
++} __packed;
++
++
++static const char * const drbd_conn_s_names[] = {
++	[C_STANDALONE]       = "StandAlone",
++	[C_DISCONNECTING]    = "Disconnecting",
++	[C_UNCONNECTED]      = "Unconnected",
++	[C_TIMEOUT]          = "Timeout",
++	[C_BROKEN_PIPE]      = "BrokenPipe",
++	[C_NETWORK_FAILURE]  = "NetworkFailure",
++	[C_PROTOCOL_ERROR]   = "ProtocolError",
++	[C_CONNECTING]       = "WFConnection",
++	/* [C_WF_REPORT_PARAMS] = "WFReportParams", does no longer exist in drbd-9.x */
++	[C_TEAR_DOWN]        = "TearDown",
++	[C_CONNECTED]        = "WFReportParams", /* drbd-8.4 for "Negotiating" or "Off" */
++	[L_ESTABLISHED]      = "Connected",
++	[L_STARTING_SYNC_S]  = "StartingSyncS",
++	[L_STARTING_SYNC_T]  = "StartingSyncT",
++	[L_WF_BITMAP_S]      = "WFBitMapS",
++	[L_WF_BITMAP_T]      = "WFBitMapT",
++	[L_WF_SYNC_UUID]     = "WFSyncUUID",
++	[L_SYNC_SOURCE]      = "SyncSource",
++	[L_SYNC_TARGET]      = "SyncTarget",
++	[L_PAUSED_SYNC_S]    = "PausedSyncS",
++	[L_PAUSED_SYNC_T]    = "PausedSyncT",
++	[L_VERIFY_S]         = "VerifyS",
++	[L_VERIFY_T]         = "VerifyT",
++	[L_AHEAD]            = "Ahead",
++	[L_BEHIND]           = "Behind",
++};
++
++static const char write_ordering_chars[] = {
++	[WO_NONE] = 'n',
++	[WO_DRAIN_IO] = 'd',
++	[WO_BDEV_FLUSH] = 'f',
++	[WO_BIO_BARRIER] = 'b',
++};
++
++
++static int seq_print_device_proc_drbd(struct seq_file *m, struct drbd_device *device);
++
++atomic_t nr_drbd8_devices;
++
++/*
++ * 8.4 meta-data has one peer slot and no node ids. Before the first connect
++ * (my_node_id == -1) decode it into slot 0; drbd_setup_node_ids_84() moves
++ * it to the peer's slot. Once the node ids are set, decode it there right
++ * away, where drbd_md_peer_84() finds it once attach has set md->node_id.
++ */
++void drbd_md_decode_84(struct meta_data_on_disk_84 *on_disk, struct drbd_md *md,
++		       int my_node_id)
++{
++	struct drbd_peer_md *peer_md;
++	const int peer_node_id = my_node_id == 0 ? 1 : 0;
++	u32 on_disk_flags;
++	unsigned long flags;
++	int i;
++
++	md->effective_size = be64_to_cpu(on_disk->la_size_sect);
++	md->current_uuid = be64_to_cpu(on_disk->uuid[UI_CURRENT]);
++	md->prev_members = 0;
++	md->prev_features = 0; /* no features field in the drbd-8.4 meta-data */
++	md->device_uuid = be64_to_cpu(on_disk->device_uuid);
++	md->md_size_sect = be32_to_cpu(on_disk->md_size_sect);
++	md->al_offset = be32_to_cpu(on_disk->al_offset);
++
++	md->bm_offset = be32_to_cpu(on_disk->bm_offset);
++
++	on_disk_flags = be32_to_cpu(on_disk->flags);
++	md->flags = on_disk_flags & MDF_84_MASK;
++
++	md->max_peers = 1;
++	md->bm_block_size = be32_to_cpu(on_disk->bm_bytes_per_bit);
++	md->node_id = -1; /* no node_id in the drbd-8.4 meta-data */
++	md->al_stripes = be32_to_cpu(on_disk->al_stripes);
++	md->al_stripe_size_4k = be32_to_cpu(on_disk->al_stripe_size_4k);
++
++
++	for (i = 0; i < DRBD_NODE_ID_MAX; i++) {
++		peer_md = &md->peers[i];
++
++		peer_md->bitmap_uuid = 0;
++		peer_md->bitmap_dagtag = 0;
++		peer_md->flags = 0;
++		peer_md->bitmap_index = -1;
++	}
++
++	peer_md = &md->peers[peer_node_id];
++	peer_md->bitmap_index = 0;
++
++	flags = (on_disk_flags & MDF_84_PEER_MASK) | MDF_HAVE_BITMAP;
++	flags |= on_disk_flags & MDF_84_PEER_OUTDATED ? MDF_PEER_OUTDATED : 0;
++	flags |= on_disk_flags & MDF_84_CONNECTED_IND ? MDF_PEER_CONNECTED : 0;
++	peer_md->flags = flags;
++	/* An 8.4 bitmap fully records the divergence; set the UUID (and its
++	 * divergence flag) after the other flags so it is not overwritten.
++	 */
++	drbd_set_peer_bitmap_uuid(peer_md, be64_to_cpu(on_disk->uuid[UI_BITMAP]), 0);
++
++
++	for (i = 0; i < HISTORY_UUIDS_V08; i++)
++		md->history_uuids[i] = be64_to_cpu(on_disk->uuid[UI_HISTORY_START + i]);
++}
++
++void drbd_md_encode_84(struct drbd_device *device, struct meta_data_on_disk_84 *buffer)
++{
++	struct drbd_md *md = &device->ldev->md;
++	struct drbd_peer_md *peer_md = drbd_md_peer_84(md);
++	u32 flags = (md->flags & MDF_84_MASK) | (peer_md->flags & MDF_84_PEER_MASK);
++	int i;
++
++	if (device->bitmap == NULL)
++		flags |= MDF_PEER_FULL_SYNC;
++
++	flags |= test_bit(__MDF_PEER_OUTDATED, &peer_md->flags) ? MDF_84_PEER_OUTDATED : 0;
++	flags |= test_bit(__MDF_PEER_CONNECTED, &peer_md->flags) ? MDF_84_CONNECTED_IND : 0;
++	buffer->la_size_sect = cpu_to_be64(md->effective_size);
++	buffer->device_uuid = cpu_to_be64(md->device_uuid);
++	buffer->uuid[UI_CURRENT] = cpu_to_be64(md->current_uuid);
++	buffer->uuid[UI_BITMAP] = cpu_to_be64(peer_md->bitmap_uuid);
++	for (i = 0; i < HISTORY_UUIDS_V08; i++)
++		buffer->uuid[UI_HISTORY_START + i] = cpu_to_be64(md->history_uuids[i]);
++	buffer->reserved_u64_1 = 0;
++	buffer->flags = cpu_to_be32(flags);
++	buffer->magic = cpu_to_be32(DRBD_MD_MAGIC_84_UNCLEAN);
++	buffer->md_size_sect = cpu_to_be32(md->md_size_sect);
++	buffer->al_offset = cpu_to_be32(md->al_offset);
++	buffer->al_nr_extents = cpu_to_be32(device->act_log->nr_elements);
++	buffer->bm_offset = cpu_to_be32(md->bm_offset);
++	buffer->bm_bytes_per_bit = cpu_to_be32(BM_BLOCK_SIZE_4k); /* treat as magic number */
++	buffer->la_peer_max_bio_size = cpu_to_be32(device->device_conf.max_bio_size);
++
++	buffer->al_stripes = cpu_to_be32(md->al_stripes);
++	buffer->al_stripe_size_4k = cpu_to_be32(md->al_stripe_size_4k);
++}
++
++
++/*
++ * This is DRBD 8 userspace compatibility mode, so we do not have a node ID
++ * yet. We derive our own node ID from the peer node ID. drbdsetup gives us the
++ * peer-node-id, which it determines by comparing the IP addresses.
++ */
++int drbd_setup_node_ids_84(struct drbd_connection *connection, struct drbd_path *path,
++			    unsigned int peer_node_id)
++{
++	int vnr, my_node_id, nr_legacy = 0, nr_v9 = 0;
++	struct drbd_resource *resource = connection->resource;
++	struct drbd_peer_device *peer_device;
++	struct drbd_device *device;
++
++	my_node_id = !peer_node_id;
++	idr_for_each_entry(&resource->devices, device, vnr) {
++		if (test_bit(LEGACY_84_MD, &device->flags)) {
++			nr_legacy++;
++		} else {
++			nr_v9++;
++			if (get_ldev(device)) {
++				int md_my_node_id = device->ldev->md.node_id;
++
++				put_ldev(device);
++				if (my_node_id != md_my_node_id) {
++					drbd_err(connection, "inconsistent node_ids %d %d\n",
++						 my_node_id, md_my_node_id);
++					return -ENOTUNIQ;
++				}
++			}
++		}
++	}
++
++	if (nr_legacy && nr_v9)
++		drbd_warn(connection, "legacy-84 and drbd-9 metadata in one resource\n");
++
++	drbd_info(connection, "drbd8 userspace compat mode: setting my node id to %d\n",
++		  my_node_id);
++
++	/* setting up all node_ids*/
++	resource->res_opts.node_id = my_node_id;
++	connection->peer_node_id = peer_node_id;
++	idr_for_each_entry(&resource->devices, device, vnr) {
++		peer_device = list_first_entry_or_null(&device->peer_devices,
++						       struct drbd_peer_device, peer_devices);
++		peer_device->node_id = peer_node_id;
++
++		/* A diskless device gets its bitmap index at attach. */
++		if (get_ldev(device)) {
++			const struct drbd_peer_md clear = { .bitmap_index = -1 };
++			struct drbd_md *md = &device->ldev->md;
++			struct drbd_peer_md *to = &md->peers[peer_node_id];
++			int i;
++
++			peer_device->bitmap_index = 0;
++			md->node_id = my_node_id;
++
++			for (i = 0; i < DRBD_NODE_ID_MAX; i++) {
++				struct drbd_peer_md *from = &md->peers[i];
++
++				if (from->bitmap_index != -1) {
++					if (from != to) {
++						*to = *from;
++						*from = clear;
++					}
++					break;
++				}
++			}
++			put_ldev(device);
++		}
++	}
++
++	return 0;
++}
++
++
++/*
++ * Some resources may be operating in "DRBD 8 compatibility mode", where the
++ * user created the resource using the old drbd8-style drbdsetup command line
++ * syntax.
++ * This implies that the user probably also expects the old drbd8-style
++ * /proc/drbd output showing the device state.
++ * If the flag is set for a resource, we show the old-style output for that
++ * resource.
++ * If any resource is in DRBD 8 compatibility mode, this function returns true.
++ */
++bool drbd_show_legacy_device(struct seq_file *seq, void *v)
++{
++	struct drbd_device *device;
++	int i, prev_i = -1;
++
++	if (!atomic_read(&nr_drbd8_devices))
++		return false;
++
++	rcu_read_lock();
++	idr_for_each_entry(&drbd_devices, device, i) {
++		if (!device->resource->res_opts.drbd8_compat_mode)
++			continue;
++
++		if (prev_i != i - 1)
++			seq_putc(seq, '\n');
++		prev_i = i;
++
++		seq_print_device_proc_drbd(seq, device);
++	}
++	rcu_read_unlock();
++	return true;
++}
++
++static void seq_printf_with_thousands_grouping(struct seq_file *seq, long v)
++{
++	/* v is in kB/sec. We don't expect TiByte/sec yet.
++	 * v can be negative: while the resync loses ground to incoming
++	 * application writes the out-of-sync count grows, so the rate at
++	 * which it shrinks is negative. Show that honestly.
++	 */
++	if (v < 0) {
++		seq_putc(seq, '-');
++		v = -v;
++	}
++	if (unlikely(v >= 1000000)) {
++		/* cool: > GiByte/s */
++		seq_printf(seq, "%ld,", v / 1000000);
++		v %= 1000000;
++		seq_printf(seq, "%03ld,%03ld", v/1000, v % 1000);
++	} else if (likely(v >= 1000))
++		seq_printf(seq, "%ld,%03ld", v/1000, v % 1000);
++	else
++		seq_printf(seq, "%ld", v);
++}
++
++/* like bit_to_kb(), but accepts a signed bit count so we can express a
++ * negative kB/sec rate when the out-of-sync set is growing.
++ */
++static long signed_bit_to_kb(long bits, unsigned int bm_block_shift)
++{
++	if (bits < 0)
++		return -(long)bit_to_kb(-bits, bm_block_shift);
++	return bit_to_kb(bits, bm_block_shift);
++}
++
++void drbd_get_syncer_progress_84(struct drbd_peer_device *pd,
++		enum drbd_repl_state repl_state, unsigned long *rs_total,
++		unsigned long *bits_left, unsigned int *per_mil_done)
++{
++	/* this is to break it at compile time when we change that, in case we
++	 * want to support more than (1<<32) bits on a 32bit arch.
++	 */
++	typecheck(unsigned long, pd->rs_total);
++	*rs_total = pd->rs_total;
++
++	/* note: both rs_total and rs_left are in bits, i.e. in
++	 * units of BM_BLOCK_SIZE.
++	 * for the percentage, we don't care.
++	 */
++
++	if (repl_state == L_VERIFY_S || repl_state == L_VERIFY_T)
++		*bits_left = atomic64_read(&pd->ov_left);
++	else
++		*bits_left = drbd_bm_total_weight(pd) - pd->rs_failed;
++	/* >> 10 to prevent overflow,
++	 * +1 to prevent division by zero
++	 */
++	if (*bits_left > *rs_total) {
++		/* D'oh. Maybe a logic bug somewhere.  More likely just a race
++		 * between state change and reset of rs_total.
++		 */
++		*bits_left = *rs_total;
++		*per_mil_done = *rs_total ? 0 : 1000;
++	} else {
++		/* Make sure the division happens in long context.
++		 * We allow up to one petabyte storage right now,
++		 * at a granularity of 4k per bit that is 2**38 bits.
++		 * After shift right and multiplication by 1000,
++		 * this should still fit easily into a 32bit long,
++		 * so we don't need a 64bit division on 32bit arch.
++		 * Note: currently we don't support such large bitmaps on 32bit
++		 * arch anyways, but no harm done to be prepared for it here.
++		 */
++		unsigned int shift = *rs_total > UINT_MAX ? 16 : 10;
++		unsigned long left = *bits_left >> shift;
++		unsigned long total = 1UL + (*rs_total >> shift);
++		unsigned long tmp = 1000UL - left * 1000UL/total;
++		*per_mil_done = tmp;
++	}
++}
++
++static void drbd_syncer_progress(struct drbd_peer_device *pd, struct seq_file *seq,
++		enum drbd_repl_state repl_state)
++{
++	unsigned long dt, rt, rs_total, rs_left;
++	long db, dbdt;
++	unsigned int res;
++	int i, x, y;
++	int stalled = 0;
++	unsigned int bm_block_shift = pd->device->last_bm_block_shift;
++
++	drbd_get_syncer_progress_84(pd, repl_state, &rs_total, &rs_left, &res);
++
++	x = res/50;
++	y = 20-x;
++	seq_puts(seq, "\t[");
++	for (i = 1; i < x; i++)
++		seq_putc(seq, '=');
++	seq_putc(seq, '>');
++	for (i = 0; i < y; i++)
++		seq_putc(seq, '.');
++	seq_puts(seq, "] ");
++
++	if (repl_state == L_VERIFY_S || repl_state == L_VERIFY_T)
++		seq_puts(seq, "verified:");
++	else
++		seq_puts(seq, "sync'ed:");
++	seq_printf(seq, "%3u.%u%% ", res / 10, res % 10);
++
++	/* if more than a few GB, display in MB */
++	if (rs_total > (4UL << (30 - bm_block_shift)))
++		seq_printf(seq, "(%llu/%llu)M",
++			    bit_to_kb(rs_left >> 10, bm_block_shift),
++			    bit_to_kb(rs_total >> 10, bm_block_shift));
++	else
++		seq_printf(seq, "(%llu/%llu)K",
++			    bit_to_kb(rs_left, bm_block_shift),
++			    bit_to_kb(rs_total, bm_block_shift));
++
++	seq_puts(seq, "\n\t");
++
++	/* see drivers/md/md.c
++	 * We do not want to overflow, so the order of operands and
++	 * the * 100 / 100 trick are important. We do a +1 to be
++	 * safe against division by zero. We only estimate anyway.
++	 *
++	 * dt: time from mark until now
++	 * db: blocks written from mark until now
++	 * rt: remaining time
++	 */
++	/* Rolling marks. last_mark+1 may just now be modified.  last_mark+2 is
++	 * at least (DRBD_SYNC_MARKS-2)*DRBD_SYNC_MARK_STEP old, and has at
++	 * least DRBD_SYNC_MARK_STEP time before it will be modified.
++	 */
++	/* ------------------------ ~18s average ------------------------ */
++	i = (pd->rs_last_mark + 2) % DRBD_SYNC_MARKS;
++	dt = (jiffies - pd->rs_mark_time[i]) / HZ;
++	if (dt > 180)
++		stalled = 1;
++
++	if (!dt)
++		dt++;
++	db = (long)pd->rs_mark_left[i] - (long)rs_left;
++	if (db <= 0) {
++		/* out-of-sync is not shrinking: under this write load the
++		 * resync is not converging, so there is no finish time.
++		 */
++		seq_puts(seq, "finish: ∞");
++	} else {
++		rt = (dt * (rs_left / ((unsigned long)db/100+1)))/100; /* seconds */
++		seq_printf(seq, "finish: %lu:%02lu:%02lu",
++			rt / 3600, (rt % 3600) / 60, rt % 60);
++	}
++
++	dbdt = signed_bit_to_kb(db / (long)dt, bm_block_shift);
++	seq_puts(seq, " speed: ");
++	seq_printf_with_thousands_grouping(seq, dbdt);
++	seq_puts(seq, " (");
++	/* ------------------------- ~3s average ------------------------ */
++	if (1) {
++		/* this is what drbd_rs_should_slow_down() uses */
++		i = (pd->rs_last_mark + DRBD_SYNC_MARKS-1) % DRBD_SYNC_MARKS;
++		dt = (jiffies - pd->rs_mark_time[i]) / HZ;
++		if (!dt)
++			dt++;
++		db = (long)pd->rs_mark_left[i] - (long)rs_left;
++		dbdt = signed_bit_to_kb(db / (long)dt, bm_block_shift);
++		seq_printf_with_thousands_grouping(seq, dbdt);
++		seq_puts(seq, " -- ");
++	}
++
++	/* --------------------- long term average ---------------------- */
++	/* mean speed since syncer started we do account for PausedSync periods */
++	dt = (jiffies - pd->rs_start - pd->rs_paused) / HZ;
++	if (dt == 0)
++		dt = 1;
++	db = (long)rs_total - (long)rs_left;
++	dbdt = signed_bit_to_kb(db / (long)dt, bm_block_shift);
++	seq_printf_with_thousands_grouping(seq, dbdt);
++	seq_putc(seq, ')');
++
++	if (repl_state == L_SYNC_TARGET ||
++	    repl_state == L_VERIFY_S) {
++		seq_puts(seq, " want: ");
++		seq_printf_with_thousands_grouping(seq, pd->c_sync_rate);
++	}
++	seq_printf(seq, " K/sec%s\n", stalled ? " (stalled)" : "");
++
++	{
++		/* 64 bit: we convert to sectors in the display below. */
++		unsigned long bm_bits = drbd_bm_bits(pd->device);
++		unsigned long bit_pos;
++		unsigned long long stop_sector = 0;
++
++		if (repl_state == L_VERIFY_S ||
++		    repl_state == L_VERIFY_T) {
++			bit_pos = bm_bits - (unsigned long)atomic64_read(&pd->ov_left);
++			if (verify_can_do_stop_sector(pd))
++				stop_sector = pd->ov_stop_sector;
++		} else
++			bit_pos = pd->resync_next_bit;
++		/* Total sectors may be slightly off for oddly sized devices. So what. */
++		seq_printf(seq,
++			"\t%3d%% sector pos: %llu/%llu",
++			(int)(bit_pos / (bm_bits/100+1)),
++			(unsigned long long)bit_pos * sect_per_bit(bm_block_shift),
++			(unsigned long long)bm_bits * sect_per_bit(bm_block_shift));
++		if (stop_sector != 0 && stop_sector != ULLONG_MAX)
++			seq_printf(seq, " stop sector: %llu", stop_sector);
++		seq_putc(seq, '\n');
++	}
++}
++
++static const char *drbd_conn_str_84(enum drbd_conn_state s)
++{
++	/* enums are unsigned... */
++	return (int)s > (int)L_BEHIND ? "TOO_LARGE" : drbd_conn_s_names[s];
++}
++
++/*
++ * Select an 8.4-mode device's peer device (there is at most one: an
++ * 8.4-mode resource has one connection, which creates a peer device for
++ * every device) and fetch the raw state: the peer device's if one exists,
++ * else the device's own.
++ *
++ * The result is DRBD 9's unpacked union drbd_state, with DRBD 9's own
++ * disk/pdsk numbering and quorum bit still in place; drbd_pack_state_84()
++ * applies the v1 wire remap on top, seq_print_device_proc_drbd() feeds it
++ * to DRBD 9's own name lookups and must not.
++ *
++ * The caller holds rcu_read_lock() across this call and for as long as it
++ * keeps using *peer_device_r: the peer device is found without taking a
++ * reference.
++ *
++ * @peer_device_r: the selected peer device or NULL; may be NULL.
++ */
++static union drbd_state drbd_get_state_84(struct drbd_device *device,
++					  struct drbd_peer_device **peer_device_r)
++{
++	struct drbd_peer_device *peer_device;
++
++	peer_device = list_first_or_null_rcu(&device->peer_devices, struct drbd_peer_device,
++					     peer_devices);
++	if (peer_device_r)
++		*peer_device_r = peer_device;
++
++	return peer_device ? drbd_get_peer_device_state(peer_device, NOW)
++			    : drbd_get_device_state(device, NOW);
++}
++
++/*
++ * Pack a device's current state into an 8.4 wire state word (union
++ * drbd_state as u32).
++ *
++ * conn/repl numbering needs no translation: DRBD 9 split 8.4's enum
++ * drbd_conns into drbd_conn_state and drbd_repl_state but kept the numeric
++ * values. disk/pdsk do: DRBD 9 inserted D_DETACHING at index 2, so
++ * drbd_disk_state_84() shifts everything above it by one, the same remap
++ * send_state() uses for a pre-9.0 peer. s.quorum (bit 23) is _pad on 8.4
++ * and must read as 0.
++ *
++ * The result carries 8.4 numbering: do not feed it to drbd_disk_str() and
++ * friends.
++ */
++u32 drbd_pack_state_84(struct drbd_device *device)
++{
++	union drbd_state s;
++
++	rcu_read_lock();
++	s = drbd_get_state_84(device, NULL);
++	rcu_read_unlock();
++
++	s.disk = drbd_disk_state_84(s.disk);
++	s.pdsk = drbd_disk_state_84(s.pdsk);
++	s.quorum = 0;	/* bit 23 is _pad to 8.4 */
++
++	return s.i;
++}
++
++static int seq_print_device_proc_drbd(struct seq_file *m, struct drbd_device *device)
++{
++	unsigned int send_kb, recv_kb, pending_cnt, unacked_cnt, epochs;
++	struct drbd_connection *connection = NULL;
++	struct drbd_peer_device *peer_device;
++	union drbd_state state;
++	const char *sn;
++	bool have_ldev;
++	int local_cnt;
++	char wp;
++
++	/*
++	 * Unpacked on purpose: state.disk/state.pdsk go to DRBD 9's own
++	 * drbd_disk_str() below. The caller holds rcu_read_lock().
++	 */
++	state = drbd_get_state_84(device, &peer_device);
++
++	if (peer_device) {
++		connection = peer_device->connection;
++		send_kb = peer_device->send_cnt/2;
++		recv_kb = peer_device->recv_cnt/2;
++		pending_cnt = atomic_read(&peer_device->ap_pending_cnt) +
++			atomic_read(&peer_device->rs_pending_cnt);
++		unacked_cnt = atomic_read(&peer_device->unacked_cnt);
++	} else {
++		connection = list_first_or_null_rcu(&device->resource->connections,
++						    struct drbd_connection, connections);
++		send_kb = 0;
++		recv_kb = 0;
++		pending_cnt = 0;
++		unacked_cnt = 0;
++	}
++	if (connection) {
++		struct drbd_net_conf *nc = rcu_dereference(connection->transport.net_conf);
++
++		wp = nc ? nc->wire_protocol - DRBD_PROT_A + 'A' : ' ';
++		epochs = connection->epochs;
++	} else {
++		wp = 'C';
++		epochs = 0;
++	}
++
++	sn = drbd_conn_str_84(state.conn);
++	/* Read before taking our own reference, which lo: must not count. */
++	local_cnt = atomic_read(&device->local_cnt);
++	have_ldev = get_ldev_if_state(device, D_FAILED);
++
++	if (state.conn == C_STANDALONE &&
++	    state.disk == D_DISKLESS &&
++	    state.role == R_SECONDARY) {
++		seq_printf(m, "%2d: cs:Unconfigured\n", device->minor);
++	} else {
++		seq_printf(m,
++			   "%2d: cs:%s ro:%s/%s ds:%s/%s %c %c%c%c%c%c%c\n"
++			   "    ns:%u nr:%u dw:%u dr:%u al:%u bm:%u "
++			   "lo:%d pe:%d ua:%d ap:%d ep:%d wo:%c",
++			   device->minor, sn,
++			   drbd_role_str(state.role),
++			   drbd_role_str(state.peer),
++			   drbd_disk_str(state.disk),
++			   drbd_disk_str(state.pdsk),
++			   wp,
++			   drbd_suspended(device) ? 's' : 'r',
++			   state.aftr_isp ? 'a' : '-',
++			   state.peer_isp ? 'p' : '-',
++			   state.user_isp ? 'u' : '-',
++			   '-' /* congestion reason... FIXME */,
++			   test_bit(AL_SUSPENDED, &device->flags) ? 's' : '-',
++			   send_kb,
++			   recv_kb,
++			   device->writ_cnt/2,
++			   device->read_cnt/2,
++			   device->al_writ_cnt,
++			   device->bm_writ_cnt,
++			   local_cnt,
++			   pending_cnt,
++			   unacked_cnt,
++			   atomic_read(&device->ap_bio_cnt[WRITE]) +
++			   atomic_read(&device->ap_bio_cnt[READ]),
++			   epochs,
++			   write_ordering_chars[device->resource->write_ordering]
++			);
++		seq_printf(m, " oos:%llu\n", (peer_device && have_ldev) ?
++				device_bit_to_kb(device, drbd_bm_total_weight(peer_device)) : 0);
++	}
++	if (have_ldev) {
++		if (state.conn == L_SYNC_SOURCE ||
++		    state.conn == L_SYNC_TARGET ||
++		    state.conn == L_VERIFY_S ||
++		    state.conn == L_VERIFY_T)
++			drbd_syncer_progress(peer_device, m, state.conn);
++
++		put_ldev(device);
++	}
++	/* drbd_proc_details 1 or 2 missing */
++
++	return 0;
++}
+diff --git a/drivers/block/drbd/drbd_legacy_84.h b/drivers/block/drbd/drbd_legacy_84.h
+new file mode 100644
+index 000000000000..686e76fb2645
+--- /dev/null
++++ b/drivers/block/drbd/drbd_legacy_84.h
+@@ -0,0 +1,129 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2025, LINBIT HA-Solutions GmbH.
++ */
++
++#ifndef __DRBD_LEGACY_84_H
++#define __DRBD_LEGACY_84_H
++
++#include "drbd_int.h"
++
++struct meta_data_on_disk_84;
++
++/*
++ *   drbd-8.4                      drbd-9 md.flags                   drbd-9 peer-md.flags
++ * MDF_CONSISTENT      1 << 0  MDF_CONSISTENT =        1 << 0,   MDF_PEER_CONNECTED =    1 << 0,
++ * MDF_PRIMARY_IND     1 << 1  MDF_PRIMARY_IND =       1 << 1,   MDF_PEER_OUTDATED =     1 << 1,
++ * MDF_CONNECTED_IND   1 << 2                                    MDF_PEER_FENCING =      1 << 2,
++ * MDF_FULL_SYNC       1 << 3                                    MDF_PEER_FULL_SYNC =    1 << 3,
++ * MDF_WAS_UP_TO_DATE  1 << 4  MDF_WAS_UP_TO_DATE =    1 << 4,   MDF_PEER_DEVICE_SEEN =  1 << 4,
++ * MDF_PEER_OUT_DATED  1 << 5                                    MDF_PEER_DIVERGENCE_BITMAP = 1 << 5
++ * MDF_CRASHED_PRIMARY 1 << 6  MDF_CRASHED_PRIMARY =   1 << 6,   MDF_PEER_BITMAP_AUTHORITATIVE
++ *                                                                                       = 1 << 6
++ * MDF_AL_CLEAN        1 << 7  MDF_AL_CLEAN =          1 << 7,
++ * MDF_AL_DISABLED     1 << 8  MDF_AL_DISABLED =       1 << 8,
++ *                             MDF_PRIMARY_LOST_QUORUM = 1 << 9,
++ *                             MDF_HAVE_QUORUM =       1 << 10,
++ *                                                                MDF_NODE_EXISTS =      1 << 16,
++ */
++
++#define MDF_84_MASK (MDF_CONSISTENT | MDF_PRIMARY_IND | MDF_WAS_UP_TO_DATE | \
++		     MDF_CRASHED_PRIMARY | MDF_AL_CLEAN | MDF_AL_DISABLED)
++#define MDF_84_PEER_MASK (MDF_PEER_FULL_SYNC)
++#define MDF_84_CONNECTED_IND (1<<2)
++#define MDF_84_PEER_OUTDATED (1<<5)
++
++/*
++ * Mask for the v1 DEVICE_STATISTICS dev_disk_flags and
++ * PEER_DEVICE_STATISTICS peer_dev_flags attributes. DRBD 9 keeps 8.4's
++ * bit positions for every bit 8.4 knows about, so masking off the newer
++ * bits is enough; nothing needs remapping.
++ */
++#define PEER_DEV_FLAGS_84_MASK (MDF_PEER_CONNECTED | MDF_PEER_OUTDATED | \
++				 MDF_PEER_FENCING | MDF_PEER_FULL_SYNC)
++
++/*
++ * The md.peers[] slot of the one 8.4 peer, where it is now: slot 0 while
++ * md->node_id is -1, the peer's slot once drbd_setup_node_ids_84() has set
++ * it. Attach sets md->node_id from the resource's node id. A failed first
++ * connect resets only the latter, and the slot stays where md->node_id says.
++ */
++static inline struct drbd_peer_md *drbd_md_peer_84(struct drbd_md *md)
++{
++	return &md->peers[md->node_id == 0 ? 1 : 0];
++}
++
++#ifdef CONFIG_DRBD_COMPAT_84
++extern atomic_t nr_drbd8_devices;
++
++void drbd_md_decode_84(struct meta_data_on_disk_84 *on_disk, struct drbd_md *md,
++		       int my_node_id);
++void drbd_md_encode_84(struct drbd_device *device, struct meta_data_on_disk_84 *buffer);
++int drbd_setup_node_ids_84(struct drbd_connection *connection, struct drbd_path *path,
++			   unsigned int peer_node_id);
++bool drbd_show_legacy_device(struct seq_file *seq, void *v);
++u32 drbd_pack_state_84(struct drbd_device *device);
++void drbd_get_syncer_progress_84(struct drbd_peer_device *pd,
++		enum drbd_repl_state repl_state, unsigned long *rs_total,
++		unsigned long *bits_left, unsigned int *per_mil_done);
++
++/*
++ * Remap a DRBD 9 enum drbd_state_rv value to one 8.4 userland's own SS_*
++ * string table can render truthfully. SS_UNKNOWN_ERROR (0) through
++ * SS_O_VOL_PEER_PRI (-20), every success code and every enum drbd_ret_code
++ * are numerically identical in both dialects. From SS_INTERRUPTED (-21)
++ * down, DRBD 9 has nine codes 8.4 numbers differently (SS_INTERRUPTED
++ * collides with 8.4's SS_OUTDATE_WO_CONN) or lacks entirely (8.4 ends at
++ * SS_AFTER_LAST_ERROR = -22); passed through raw they would print a wrong
++ * message or "unknown error code". Map each to the nearest 8.4 code whose
++ * string does not mislead: the interrupted, timed-out and retried
++ * handshake cases to SS_IN_TRANSIENT_STATE ("retry"), a blocking
++ * read-only opener to SS_DEVICE_IN_USE, a handshake-forced disconnect to
++ * SS_CW_FAILED_BY_PEER, and the quorum, weak-connectivity, bitmap
++ * negotiation and sentinel codes, which have no 8.4 meaning, to
++ * SS_UNKNOWN_ERROR. compat84_put_outcome() is the only place a
++ * drbd_state_rv reaches the v1 wire.
++ */
++static inline enum drbd_state_rv drbd_state_rv_84(enum drbd_state_rv rv)
++{
++	switch (rv) {
++	case SS_INTERRUPTED:
++	case SS_TIMEOUT:
++	case SS_HANDSHAKE_RETRY:
++		return SS_IN_TRANSIENT_STATE;
++	case SS_PRIMARY_READER:
++		return SS_DEVICE_IN_USE;
++	case SS_HANDSHAKE_DISCONNECT:
++		return SS_CW_FAILED_BY_PEER;
++	case SS_WEAKLY_CONNECTED:
++	case SS_NO_QUORUM:
++	case SS_ATTACH_NO_BITMAP:
++	case SS_AFTER_LAST_ERROR:
++		return SS_UNKNOWN_ERROR;
++	default:
++		return rv;
++	}
++}
++
++/*
++ * Fused v1 SIB_SYNC_PROGRESS event, called from update_on_disk_bitmap()
++ * (drbd_sender.c), mainline 8.4's own call site; already throttled there
++ * by drbd_lazy_bitmap_update_due().
++ */
++void compat84_notify_sync_progress(struct drbd_peer_device *peer_device);
++#else
++static inline void drbd_md_decode_84(struct meta_data_on_disk_84 *on_disk, struct drbd_md *md,
++				     int my_node_id) {};
++static inline void drbd_md_encode_84(struct drbd_device *device,
++	struct meta_data_on_disk_84 *buffer) {};
++static inline int drbd_setup_node_ids_84(struct drbd_connection *connection, struct drbd_path *path,
++			   unsigned int peer_node_id) { return 0; };
++static inline bool drbd_show_legacy_device(struct seq_file *seq, void *v) { return false; };
++static inline u32 drbd_pack_state_84(struct drbd_device *device) { return 0; };
++static inline void drbd_get_syncer_progress_84(struct drbd_peer_device *pd,
++		enum drbd_repl_state repl_state, unsigned long *rs_total,
++		unsigned long *bits_left, unsigned int *per_mil_done) {};
++static inline void compat84_notify_sync_progress(struct drbd_peer_device *peer_device) {};
++#endif  /* CONFIG_DRBD_COMPAT_84 */
++
++#endif  /* __DRBD_LEGACY_84_H */
 -- 
 2.56.0
 
