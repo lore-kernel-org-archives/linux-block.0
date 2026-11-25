@@ -1,57 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.20
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795627018;
-	b=GaCmiQhqJFoCsxqzkU2mGYNQTQ3VILrV2oKg5e+yTnnDFPKKKQH1PiGhePHPHzfDHEWz
-	 pfKpuVzCceZBqQa7Ta6KfikdD6p1TnbsDZPOnkFegGPYUPzkOagkZs9uBsup8mJiRcYmB
-	 6DU0BHhkN0YFmw4VBI6UzyYeyxPmeFW0/aSMkkZBY7yEfSuuXUljMVDUm9GDCZBsEW1JV
-	 nR6+W1knUZAJdzxzArKz7dlj674dTvpFDYq5wn8Y4Ceguj6CLg+LwmbgaYoa5xM06R4X6
-	 ZjFFTGTl9/BlJPWezrYQTMzyUzMzFCwjx2wH1bdlHiM5hsyzMTNe6/yAWEbNGWH1FzQ==
+	t=1795631401;
+	b=svHqzj7/DIlFQbuDsr//eWb8G7bl4y/LAgHJNVy519+IhLwjY3WkYnlFQgX8oEZ9TIKb
+	 iJREX4wPQpEqy83xgyMQydbZSlPj2EyMacSHgiN/My6vUetE0MjEG9KdXys3P9r3hS7Us
+	 DMWh+HqsQKTQV38giFFoRZ0YJl4JlUCmBKVzCKz3NTlWYEonuPNzZCwUB1oyU3s/qE9+i
+	 D21+Z6sDHZQQ1/z3zfDyQ37rkOl1T7qrOqUuk7SVSRq7uNQJU7749D7cz8WowL5Pc2qPy
+	 W1sxCmMMtv6mQLH45FhjHWcCSvcLnrms6Ww89N8hOaWETsHRaVJiJuy5EhT64Hgu78w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795627018;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795631401;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
+	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 References:Content-Language:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=306Y2BAJ0mk9ljp12eAtknlDVkrB39bi49HCqrOE2pE=;
-	b=cDgA4ccXDYnPsofB+Mnwx3pA20XwkU49zOg2+PROh9lhVe8uP6Ar/rl8rVGWnJLlvyoe
-	 nIOs/RgJO7U9SjOntn0xH0ERvc95HYrwdkwkuOwdrZN4QOYhpOZb4i4fq28c/Ms5Nu91U
-	 fqQ9NbW7rKkCLBPad0+dK39fHY6vuq2uE5vVNVKgvWm98EKrzse3tMJvnq40Ygn0Qxmh5
-	 wmRhkKINQzC/mKLaB49Kq1NjjmvgnWOV6s5fYKDmRJUIrtCfIxK5wR9l1bLKVfI6KT619
-	 kvRHhIhmgWyLqqr3Oho4n/ogv3UwMPv3RcHDWg6EilK61gDPBuvcZVX1TMXzXMXCSlg==
+	bh=thRt5lrTBHxA5kWjyhVc/0X4QbDWjOzyTASo1GnS3q4=;
+	b=ytIU68Q+O6InTaCRyNTJcc5mGi6p1ZDbuibLG4VQMKkPumQCGcReUPGd5V4186cd+N3s
+	 FzPcpIR+VaDy8kWyC1ZweotgkqR0FF8iZjDw+h95VwGh0BCVslBcE3BOmJt8/1N1dI6ii
+	 nVdJW2jNjUymnoKl8NoONP+GZVoQNCwZIu16Kh5uCxr3e8O4wDit3xoa/nZsuTi4bXzc9
+	 0dXP/UV9CVludjXSCfRx7gX43XalC9vLP1wFLhDKBzFelpkrhu7huXrhYXqtD6JQOosJs
+	 yKpvSXdodamSkE5WBWdBHJ/kytxVlk1y1Sla8Fo4FgcaSYb/NUaqSF/U1PL+zlsedmg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=a7snv.com;
-	spf=pass smtp.mailfrom=a7snv.com;
-	dkim=pass header.d=a7snv.com header.i=@a7snv.com header.a=rsa-sha256 header.s=protonmail header.b=Isn+fec1;
-	arc=none smtp.remote-ip=185.70.43.20
-Received: from mail-4320.protonmail.ch (mail-4320.protonmail.ch [185.70.43.20])
+	dmarc=pass header.from=acm.org;
+	spf=pass smtp.mailfrom=acm.org;
+	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=hel+7fhM;
+	arc=none smtp.remote-ip=199.89.1.16
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8837606A31E;
-	Wed, 25 Nov 2026 17:16:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8837606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=a7snv.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a7snv.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87CC606A323;
+	Wed, 25 Nov 2026 18:30:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B87CC606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=a7snv.com header.i=@a7snv.com header.a=rsa-sha256 header.s=protonmail header.b=Isn+fec1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=a7snv.com;
-	s=protonmail; t=1795627004; x=1795886204;
-	bh=306Y2BAJ0mk9ljp12eAtknlDVkrB39bi49HCqrOE2pE=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=Isn+fec1ecOxy1pHM8uYQ2tCVBhQsV3SY7qVL+OD6TT25GSpjBygkLsgXcAooSS/z
-	 f4TztsrhUXRHoYkbUDWzk/wrbiOCgFnPZ2aWMuDVIfaJvhypaK7JiWeFt2PHvIJkad
-	 zl6zmCNft9hgo+9H6dSp3r3d31vWneEExVaLfCv950INz1tUBSV1mw464DWNqU3p/y
-	 lpq7RNBIwC/hwanegqotjj68CdEsDhlwHHjDfipBcm2B/InGkFFeZYjtGOjUIxM5pE
-	 dmhet2534yuefhIkBSmvCHG5Zplu/DngDDKHbgeYvEIrDUQp0GJ8kxYzIEQa9Mn1W1
-	 A7UrtyIBBesPA==
-Date: Wed, 25 Nov 2026 17:16:25 +0000
-To: Mengmeng Zhao <mengmeng.zhao@linux.dev>
-From: Yun Wang <arsenova@a7snv.com>
-Cc: hch@lst.de, anuj1072538@gmail.com, anuj20.g@samsung.com, nj.shetty@samsung.com, axboe@kernel.dk, sumit.semwal@linaro.org, christian.koenig@amd.com, phasta@kernel.org, djbw@kernel.org, willy@infradead.org, jack@suse.cz, viro@zeniv.linux.org.uk, brauner@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca, libaokun@linux.alibaba.com, ojaswin@linux.ibm.com, ritesh.list@gmail.com, yi.zhang@huawei.com, asml.silence@gmail.com, corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, liwang@kylinos.cn, zhaomengmeng@kylinos.cn, mcgrof@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, nvdimm@lists.linux.dev, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org, linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
-Subject: Re: [RFC PATCH v2 2/8] iomap: add dma-buf direct I/O guards
-Message-ID: <20261125171600.4053585-1-arsenova@a7snv.com>
-Feedback-ID: 235448903:user:proton
-X-Pm-Message-ID: 37ce9f54f53aabca1ce9dc5fb89af8077900c77a
+	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=hel+7fhM
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4jZSs413Jwzlfcpr;
+	Wed, 25 Nov 2026 18:30:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1795631391; x=1798223392; bh=thRt5lrTBHxA5kWjyhVc/0X4
+	QbDWjOzyTASo1GnS3q4=; b=hel+7fhMgAhDpO9lwN3vQjdkpPRQrMNgfcBdIYk7
+	Zym/OZdROp3JG3JHpJMLGxC0mmVte9UVjvSJaixDzEVLbtNGgVMTnjofBT3tindB
+	GqsVOF7E4qZHAWSVGKW6Z6crfPq3eTUiUdn41wuZ8gP0d6nmyX+RXuLrVdcNACoB
+	CI0fL6arkDFbUhOwaGnibDuLOEaxhxwUhWHQX6cZD7NCHnUzbLpaw9BhLVgntxL8
+	7fXBdqo+vOq51+jBwyxV2q6MImdGAZgTynFgJOiYu+nFYA7dP9l3i11slgsySrOt
+	MdUwqbzLXa12iVgZR0TRB6vyxTGVh9h06EMUCfv59gpGGQ==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 7EqdZkBp2pxE; Wed, 25 Nov 2026 18:29:51 +0000 (UTC)
+Received: from [192.168.0.215] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4jZSrt62HMzlfvpT;
+	Wed, 25 Nov 2026 18:29:50 +0000 (UTC)
+Message-ID: <a0ff3156-add0-4f7d-8373-09f95bd7036b@acm.org>
+Date: Wed, 25 Nov 2026 10:29:49 -0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -61,387 +70,175 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] DMAR fault by Intel H97 SATA controller since
+ "block: Increase BLK_DEF_MAX_SECTORS_CAP" (6.17-rc1)
+To: Thorsten Leemhuis <regressions@leemhuis.info>,
+ Tobias Laas <tobias.laas@posteo.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ regressions@lists.linux.dev, linux-block@vger.kernel.org,
+ linux-ide@vger.kernel.org, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
+ Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ 70sp <70sp@protonmail.com>, Laurence Oberman <loberman@redhat.com>
+References: <5ad27a97aafbc08a8702d5b90d09cd59@posteo.de>
+ <awSs5Cw3hFkf4O4T@ryzen> <ec36d13e-e4c2-4bfb-8b50-69d4a1628839@leemhuis.info>
+ <87b1bbd8-8113-4890-8623-738b19a9cc7b@leemhuis.info>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <87b1bbd8-8113-4890-8623-738b19a9cc7b@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 13, 2026 at 03:06:15PM +0800, Mengmeng Zhao wrote:
->  static int iomap_dio_hole_iter(struct iomap_iter *iter, struct iomap_dio=
- *dio)
->  {
-> -=09loff_t copied =3D iov_iter_zero(iomap_length(iter), dio->submit.iter)=
-;
-> +=09loff_t copied;
-> +
-> +=09/* zero-filling walks the data pages */
-> +=09if (iov_iter_is_dmabuf_map(dio->submit.iter))
-> +=09=09return -EOPNOTSUPP;
+On 11/25/26 12:52 AM, Thorsten Leemhuis wrote:
+> For completeness, =C5=A0imon Posp=C3=ADchal (now CCed) shared findings =
+and a WIP
+> fix (both with the help of a LLM) meanwhile here:
+>=20
+> https://lore.kernel.org/all/QISmXFlpPMgvFUKmdIBDwqn4JHHXt2NZeJzerMLHF_5=
+icLo0lPKVlN0Ig9v8Vb52NmCeSFdyrao4x8KoN1DCXtDlnZS7eRIClC6vZyu-hPU%3D@proto=
+nmail.com/
 
-This also fails reads that run past EOF.  The filesystem maps the range
-beyond the last block as a hole too, so a dma-buf read that starts
-before EOF and ends past the last block of the file fails as a whole,
-while the same O_DIRECT read into user memory returns the bytes up to
-EOF.
+Thanks Thorsten for having shared that link. The LLM I'm using doesn't
+like that patch and came up with the patch shown below. Untested.
 
-I found it while testing the series for fastsafetensors' dma-buf copier
-[1], which loads model weights from NVMe into GPU memory with READ_FIXED
-into registered dma-bufs.  I ran v2 on top of v7.4-rc2 in a QEMU guest
-with an emulated NVMe namespace, reading into udmabufs.  With a
-5000-byte file on ext4 with 4 KiB blocks, reading [4096, 12288):
+Bart.
 
-  READ_FIXED into a registered udmabuf -> -EOPNOTSUPP
-  O_DIRECT pread() into user memory    -> 904
 
-It fails the same way whether the read is the first one on the buffer,
-is issued inline once the map exists, or is forced to io-wq with
-IOSQE_ASYNC.
+Subject: [PATCH] iommu/vt-d: Disable superpages on Haswell with=20
+integrated graphics
 
-Reading a file in fixed-size chunks hits this on the last chunk unless
-the file size is a multiple of the chunk size.  With 1 KiB blocks it
-also breaks the copier's normal pattern, 4 KiB-aligned reads up to
-round_up(i_size, 4096): the last read fails.
+Disable Intel VT-d superpages on bare-metal Haswell client systems when
+integrated graphics (0000:00:02.0) is enabled and an active remapping
+unit advertises superpage support (CAP.SLLPS).
 
-Nothing past EOF is reported to the caller anyway: __iomap_dio_rw()
-reverts the iterator to i_size and iomap_dio_complete() truncates the
-result to it.  So a hole that starts at or after EOF can be stepped
-over; a hole inside the file still needs zeroes and still fails.
-Something like this on top of the series, or folded into this patch:
+Per the 4th Generation Intel Core Processor Family datasheets (document
+328897, section 3.1.2), the integrated graphics VT-d engine does not
+support super-pages and BIOS must disable super-pages in the default
+VT-d engine when integrated graphics is enabled. Several Haswell BIOSes
+leave CAP.SLLPS set on the default engine (dmar1). Whenever Linux install=
+s
+a 2 MiB or 1 GiB leaf entry (PS=3D1) on dmar1, hardware aborts DMA with
+fault reason 0x0c ("non-zero reserved fields in PTE"), breaking VFIO
+passthrough, discrete GPUs, audio, and AHCI storage (exposed by default
+once BLK_DEF_MAX_SECTORS_CAP increased to 4 MiB in v6.17).
 
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index 83fda6973bb9..2de6d379f811 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -596,9 +596,20 @@ static int iomap_dio_hole_iter(struct iomap_iter *iter=
-, struct iomap_dio *dio)
- {
- =09loff_t copied;
-=20
--=09/* zero-filling walks the data pages */
--=09if (iov_iter_is_dmabuf_map(dio->submit.iter))
--=09=09return -EOPNOTSUPP;
-+=09if (iov_iter_is_dmabuf_map(dio->submit.iter)) {
-+=09=09u64 length =3D iomap_length(iter);
+Prior to commit c376a3456d8b ("iommu/vt-d: Remove
+domain_update_iommu_cap()"), domain_update_iommu_superpage() intersected
+superpage support across all active IOMMUs, so the IGD unit (SLLPS=3D0)
+masked off superpages on dmar1. After that commit, dmar1 domains started
+honoring dmar1's advertised CAP.SLLPS.
+
+Detect bare-metal Haswell client CPUs (INTEL_HASWELL, INTEL_HASWELL_L,
+INTEL_HASWELL_G), verify that the Intel integrated graphics device at
+0000:00:02.0 is present and not on an untrusted PCI link, and clear
+intel_iommu_superpage during intel_iommu_init() before allocating any
+paging domains if an active IOMMU advertises CAP.SLLPS.
+
+Fixes: c376a3456d8b ("iommu/vt-d: Remove domain_update_iommu_cap()")
+Reported-by: Tobias Laas <tobias.laas@posteo.de>
+Closes:=20
+https://lore.kernel.org/linux-block/5ad27a97aafbc08a8702d5b90d09cd59@post=
+eo.de/
+Reported-by: =C5=A0imon Posp=C3=ADchal <70sp@protonmail.com>
+Closes:=20
+https://lore.kernel.org/r/HYhMd0Klo0XE_yiVY7XmsgyKKFDwKHfKRy22KrycLcYd0V_=
+ykA4xdbBMJXkA07YX3os6qK-NhMIVi6ITo-CkNIIF0e-GcI0UwwZmdDhAJ0I=3D@protonmai=
+l.com
+Cc: stable@vger.kernel.org
+---
+  drivers/iommu/intel/iommu.c | 53 +++++++++++++++++++++++++++++++++++++
+  1 file changed, 53 insertions(+)
+
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index 5a2e705a2f2e..dd37aa25e287 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -24,6 +24,8 @@
+  #include <linux/tboot.h>
+  #include <uapi/linux/iommufd.h>
+
++#include <asm/cpu_device_id.h>
 +
-+=09=09/* zero-filling walks the data pages */
-+=09=09if (iter->pos < dio->i_size)
-+=09=09=09return -EOPNOTSUPP;
-+=09=09/*
-+=09=09 * Past EOF there is nothing to zero: the read is truncated to
-+=09=09 * i_size before it is reported, so step over the hole.
-+=09=09 */
-+=09=09iov_iter_advance(dio->submit.iter, length);
-+=09=09dio->size +=3D length;
-+=09=09return iomap_iter_advance(iter, length);
-+=09}
-=20
- =09copied =3D iov_iter_zero(iomap_length(iter), dio->submit.iter);
-=20
+  #include "iommu.h"
+  #include "../dma-iommu.h"
+  #include "../irq_remapping.h"
+@@ -43,6 +45,7 @@
 
-Signed-off-by: Yun Wang <arsenova@a7snv.com>
+  #define DEFAULT_DOMAIN_ADDRESS_WIDTH 57
 
-With it, the read above returns 904 with the right data in all three
-cases.  Holes and unwritten extents inside the file still return
--EOPNOTSUPP, including a hole that straddles EOF after the file was
-extended with ftruncate().
++static void __init check_haswell_igfx_superpage(void);
+  static void __init check_tylersburg_isoch(void);
+  static int intel_iommu_set_dirty_tracking(struct iommu_domain *domain,
+  					  bool enable);
+@@ -2762,6 +2765,7 @@ int __init intel_iommu_init(void)
+  		pr_info("No SATC found\n");
 
-The rest of the series behaved as the cover letter describes in that
-setup, with 4 KiB and 1 KiB blocks: registration on an O_DIRECT file,
-reads into arbitrary offsets of the buffer, reads through a dup()ed fd,
--EBADF through another file's slot, -EINVAL when registering a buffered
-fd, -EOPNOTSUPP after F_SETFL clears O_DIRECT and success again once it
-is set back, WRITE_FIXED including a write that extends the file, and a
-clean e2fsck afterwards.  I have not run it on real NVMe hardware or
-xfstests yet.
+  	init_no_remapping_devices();
++	check_haswell_igfx_superpage();
 
-This report and the reproducer below were drafted with the help of an
-AI coding assistant (Claude Opus 5.5); the fix is mine.
+  	ret =3D init_dmars();
+  	if (ret) {
+@@ -4266,6 +4270,55 @@ static void __init check_tylersburg_isoch(void)
+  	       vtisochctrl);
+  }
 
-[1] https://github.com/foundation-model-stack/fastsafetensors/issues/139
-
-Thanks,
-Yun
-
-Reproducer.  It needs /dev/udmabuf and a filesystem with this series
-on an NVMe namespace:
-
-  head -c 5000 /dev/urandom > /mnt/f && sync
-  ./dmabuf_eof_read /mnt/f 4096 8192             # first read on the buffer
-  ./dmabuf_eof_read /mnt/f 4096 8192 warm        # map exists, inline issue
-  ./dmabuf_eof_read /mnt/f 4096 8192 warm async  # IOSQE_ASYNC
-
-// SPDX-License-Identifier: GPL-2.0
-/*
- * Read a file range into a udmabuf that is registered against the file as
- * an io_uring fixed buffer, and compare with an O_DIRECT pread() of the
- * same range into user memory.
- *
- *   dmabuf_eof_read <file> <offset> <length> [warm] [async]
- *
- *   warm   first read [0, 4096) through the same buffer, so the dma-buf ma=
-p
- *          exists and the measured read can be issued inline (nonblocking)
- *   async  set IOSQE_ASYNC on the measured read (issue it from io-wq)
- *
- * Exits 0 when READ_FIXED returns what pread() returns and the bytes match=
-.
- * Needs /dev/udmabuf, and a kernel and filesystem with io_uring dma-buf
- * registered buffers.  The UAPI bits are declared locally because they are
- * newer than most installed headers.
- */
-#define _GNU_SOURCE
-#include <errno.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/syscall.h>
-#include <unistd.h>
-#include <linux/udmabuf.h>
-
-#define IORING_OFF_SQ_RING=09=090ULL
-#define IORING_OFF_SQES=09=09=090x10000000ULL
-#define IORING_ENTER_GETEVENTS=09=09(1U << 0)
-#define IORING_REGISTER_BUFFERS2=0915
-#define IORING_REGISTER_BUFFERS_UPDATE=0916
-#define IORING_RSRC_REGISTER_SPARSE=09(1U << 0)
-#define IORING_RSRC_UPDATE_EXTENDED=09(1U << 1)
-#define IO_REGBUF_TYPE_DMABUF=09=092
-#define IORING_OP_READ_FIXED=09=094
-#define IOSQE_ASYNC=09=09=09(1U << 4)
-
-struct sqe {
-=09uint8_t opcode, flags;
-=09uint16_t ioprio;
-=09int32_t fd;
-=09uint64_t off, addr;
-=09uint32_t len, rw_flags;
-=09uint64_t user_data;
-=09uint16_t buf_index, personality;
-=09int32_t splice_fd_in;
-=09uint64_t addr3, pad2;
-};
-
-struct cqe {
-=09uint64_t user_data;
-=09int32_t res;
-=09uint32_t flags;
-};
-
-struct sq_offsets {
-=09uint32_t head, tail, ring_mask, ring_entries, flags, dropped, array, res=
-v1;
-=09uint64_t user_addr;
-};
-
-struct cq_offsets {
-=09uint32_t head, tail, ring_mask, ring_entries, overflow, cqes, flags, res=
-v1;
-=09uint64_t user_addr;
-};
-
-struct params {
-=09uint32_t sq_entries, cq_entries, flags, sq_thread_cpu, sq_thread_idle;
-=09uint32_t features, wq_fd, resv[3];
-=09struct sq_offsets sq_off;
-=09struct cq_offsets cq_off;
-};
-
-struct rsrc_register {
-=09uint32_t nr, flags;
-=09uint64_t resv2, data, tags;
-};
-
-struct rsrc_update2 {
-=09uint32_t offset, flags;
-=09uint64_t data, tags;
-=09uint32_t nr, resv2;
-};
-
-struct regbuf_desc {
-=09uint32_t type, flags;
-=09uint64_t size, uaddr;
-=09int32_t dmabuf_fd, target_fd;
-=09uint64_t resv[6];
-};
-
-_Static_assert(sizeof(struct sqe) =3D=3D 64, "io_uring_sqe");
-_Static_assert(sizeof(struct cqe) =3D=3D 16, "io_uring_cqe");
-_Static_assert(sizeof(struct params) =3D=3D 120, "io_uring_params");
-_Static_assert(sizeof(struct rsrc_register) =3D=3D 32, "io_uring_rsrc_regis=
-ter");
-_Static_assert(sizeof(struct rsrc_update2) =3D=3D 32, "io_uring_rsrc_update=
-2");
-_Static_assert(sizeof(struct regbuf_desc) =3D=3D 80, "io_uring_regbuf_desc"=
-);
-
-struct ring {
-=09int fd;
-=09struct params p;
-=09char *rings;
-=09struct sqe *sqes;
-};
-
-static void die(const char *what)
-{
-=09perror(what);
-=09exit(2);
-}
-
-static void ring_init(struct ring *r)
-{
-=09size_t sq_size, cq_size;
-
-=09memset(r, 0, sizeof(*r));
-=09r->fd =3D syscall(SYS_io_uring_setup, 4, &r->p);
-=09if (r->fd < 0)
-=09=09die("io_uring_setup");
-=09sq_size =3D r->p.sq_off.array + r->p.sq_entries * sizeof(uint32_t);
-=09cq_size =3D r->p.cq_off.cqes + r->p.cq_entries * sizeof(struct cqe);
-=09/* SQ and CQ rings share one mapping (IORING_FEAT_SINGLE_MMAP) */
-=09r->rings =3D mmap(NULL, sq_size > cq_size ? sq_size : cq_size,
-=09=09=09PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, r->fd,
-=09=09=09IORING_OFF_SQ_RING);
-=09r->sqes =3D mmap(NULL, r->p.sq_entries * sizeof(struct sqe),
-=09=09       PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, r->fd,
-=09=09       IORING_OFF_SQES);
-=09if (r->rings =3D=3D MAP_FAILED || r->sqes =3D=3D MAP_FAILED)
-=09=09die("mmap ring");
-}
-
-/* one READ_FIXED from slot 0; addr is the byte offset into the dma-buf */
-static int read_fixed(struct ring *r, int fd, off_t off, size_t len,
-=09=09      uint64_t buf_off, uint8_t sqe_flags)
-{
-=09uint32_t *sq_tail =3D (uint32_t *)(r->rings + r->p.sq_off.tail);
-=09uint32_t sq_mask =3D *(uint32_t *)(r->rings + r->p.sq_off.ring_mask);
-=09uint32_t *sq_array =3D (uint32_t *)(r->rings + r->p.sq_off.array);
-=09uint32_t *cq_head =3D (uint32_t *)(r->rings + r->p.cq_off.head);
-=09uint32_t *cq_tail =3D (uint32_t *)(r->rings + r->p.cq_off.tail);
-=09uint32_t cq_mask =3D *(uint32_t *)(r->rings + r->p.cq_off.ring_mask);
-=09uint32_t tail =3D *sq_tail, idx =3D tail & sq_mask, head;
-=09struct cqe *cqe;
-=09int res;
-
-=09memset(&r->sqes[idx], 0, sizeof(struct sqe));
-=09r->sqes[idx].opcode =3D IORING_OP_READ_FIXED;
-=09r->sqes[idx].flags =3D sqe_flags;
-=09r->sqes[idx].fd =3D fd;
-=09r->sqes[idx].off =3D off;
-=09r->sqes[idx].addr =3D buf_off;
-=09r->sqes[idx].len =3D len;
-=09r->sqes[idx].buf_index =3D 0;
-=09sq_array[idx] =3D idx;
-=09__atomic_store_n(sq_tail, tail + 1, __ATOMIC_RELEASE);
-=09if (syscall(SYS_io_uring_enter, r->fd, 1, 1, IORING_ENTER_GETEVENTS,
-=09=09    NULL, 0) < 0)
-=09=09die("io_uring_enter");
-=09head =3D *cq_head;
-=09if (head =3D=3D __atomic_load_n(cq_tail, __ATOMIC_ACQUIRE)) {
-=09=09fprintf(stderr, "no completion\n");
-=09=09exit(2);
-=09}
-=09cqe =3D (struct cqe *)(r->rings + r->p.cq_off.cqes) + (head & cq_mask);
-=09res =3D cqe->res;
-=09__atomic_store_n(cq_head, head + 1, __ATOMIC_RELEASE);
-=09return res;
-}
-
-int main(int argc, char **argv)
-{
-=09struct rsrc_register reg =3D { .nr =3D 1, .flags =3D IORING_RSRC_REGISTE=
-R_SPARSE };
-=09struct regbuf_desc desc =3D { .type =3D IO_REGBUF_TYPE_DMABUF };
-=09struct rsrc_update2 up =3D { .flags =3D IORING_RSRC_UPDATE_EXTENDED, .nr=
- =3D 1 };
-=09struct udmabuf_create create =3D { .flags =3D UDMABUF_FLAGS_CLOEXEC };
-=09int fd, ufd, memfd, dmabuf, res, warm =3D 0, async =3D 0, i;
-=09unsigned char *view, *host;
-=09size_t length, size;
-=09ssize_t expect;
-=09struct ring r;
-=09off_t offset;
-
-=09if (argc < 4) {
-=09=09fprintf(stderr, "usage: %s <file> <offset> <length> [warm] [async]\n"=
-,
-=09=09=09argv[0]);
-=09=09return 2;
-=09}
-=09for (i =3D 4; i < argc; i++) {
-=09=09if (!strcmp(argv[i], "warm"))
-=09=09=09warm =3D 1;
-=09=09else if (!strcmp(argv[i], "async"))
-=09=09=09async =3D 1;
-=09}
-=09offset =3D strtoll(argv[2], NULL, 0);
-=09length =3D strtoull(argv[3], NULL, 0);
-=09size =3D (length + 4095) & ~4095UL;
-=09if (size < 4096)
-=09=09size =3D 4096;
-
-=09fd =3D open(argv[1], O_RDONLY | O_DIRECT);
-=09if (fd < 0)
-=09=09die("open");
-
-=09/* the reference: the same range read into user memory */
-=09if (posix_memalign((void **)&host, 4096, size))
-=09=09die("posix_memalign");
-=09expect =3D pread(fd, host, length, offset);
-=09if (expect < 0)
-=09=09die("pread");
-
-=09/* a udmabuf over a sealed memfd */
-=09memfd =3D memfd_create("dmabuf-eof", MFD_ALLOW_SEALING);
-=09if (memfd < 0 || ftruncate(memfd, size) ||
-=09    fcntl(memfd, F_ADD_SEALS, F_SEAL_SHRINK))
-=09=09die("memfd");
-=09view =3D mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, memfd, 0);
-=09if (view =3D=3D MAP_FAILED)
-=09=09die("mmap memfd");
-=09ufd =3D open("/dev/udmabuf", O_RDWR);
-=09if (ufd < 0)
-=09=09die("open /dev/udmabuf");
-=09create.memfd =3D memfd;
-=09create.size =3D size;
-=09dmabuf =3D ioctl(ufd, UDMABUF_CREATE, &create);
-=09if (dmabuf < 0)
-=09=09die("UDMABUF_CREATE");
-
-=09/* a ring with one sparse buffer slot holding the dma-buf */
-=09ring_init(&r);
-=09if (syscall(SYS_io_uring_register, r.fd, IORING_REGISTER_BUFFERS2, &reg,
-=09=09    sizeof(reg)) < 0)
-=09=09die("IORING_REGISTER_BUFFERS2");
-=09desc.dmabuf_fd =3D dmabuf;
-=09desc.target_fd =3D fd;
-=09up.data =3D (uint64_t)(uintptr_t)&desc;
-=09if (syscall(SYS_io_uring_register, r.fd, IORING_REGISTER_BUFFERS_UPDATE,
-=09=09    &up, sizeof(up)) < 0)
-=09=09die("register dma-buf");
-
-=09if (warm) {
-=09=09res =3D read_fixed(&r, fd, 0, 4096, 0, 0);
-=09=09if (res !=3D 4096) {
-=09=09=09fprintf(stderr, "warm-up read returned %d\n", res);
-=09=09=09return 2;
-=09=09}
-=09}
-=09memset(view, 0xa5, size);
-=09res =3D read_fixed(&r, fd, offset, length, 0, async ? IOSQE_ASYNC : 0);
-
-=09printf("READ_FIXED into dma-buf (%s, %s): %d%s%s, O_DIRECT pread(): %zd\=
-n",
-=09       warm ? "map ready" : "first read", async ? "IOSQE_ASYNC" : "inlin=
-e",
-=09       res, res < 0 ? " " : "", res < 0 ? strerror(-res) : "", expect);
-=09if (res !=3D expect)
-=09=09return 1;
-=09if (res > 0 && memcmp(view, host, res)) {
-=09=09printf("data differs\n");
-=09=09return 1;
-=09}
-=09return 0;
-}
++static const struct x86_cpu_id haswell_cpu_ids[] __initconst =3D {
++	X86_MATCH_VFM(INTEL_HASWELL, NULL),
++	X86_MATCH_VFM(INTEL_HASWELL_L, NULL),
++	X86_MATCH_VFM(INTEL_HASWELL_G, NULL),
++	{}
++};
++
++/*
++ * Per the 4th Generation Intel Core Processor Family datasheets (e.g.
++ * document 328897, section 3.1.2), the integrated graphics VT-d engine
++ * does not support super-pages and BIOS must disable super-pages in the
++ * default VT-d engine when integrated graphics is enabled. Some Haswell
++ * BIOSes leave CAP.SLLPS set on the default engine, causing fault reaso=
+n
++ * 0x0c (non-zero reserved fields in PTE) when a 2 MiB or 1 GiB superpag=
+e
++ * mapping is used.
++ */
++static void __init check_haswell_igfx_superpage(void)
++{
++	struct dmar_drhd_unit *drhd;
++	struct intel_iommu *iommu;
++	struct pci_dev *pdev;
++
++	if (!intel_iommu_superpage)
++		return;
++
++	if (cpu_feature_enabled(X86_FEATURE_HYPERVISOR) ||
++	    !x86_match_cpu(haswell_cpu_ids))
++		return;
++
++	pdev =3D pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(2, 0));
++	if (!pdev)
++		return;
++
++	if (pdev->vendor !=3D PCI_VENDOR_ID_INTEL || !IS_GFX_DEVICE(pdev) ||
++	    risky_device(pdev)) {
++		pci_dev_put(pdev);
++		return;
++	}
++	pci_dev_put(pdev);
++
++	for_each_active_iommu(iommu, drhd) {
++		if (cap_super_page_val(iommu->cap)) {
++			intel_iommu_superpage =3D 0;
++			pr_info("Disabling superpages on Haswell with integrated graphics\n")=
+;
++			break;
++		}
++	}
++}
++
+  /*
+   * Here we deal with a device TLB defect where device may=20
+inadvertently issue ATS
+   * invalidation completion before posted writes initiated with=20
+translated address
 
