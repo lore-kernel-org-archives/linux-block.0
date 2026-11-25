@@ -1,47 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795597757;
-	b=LkyhhrXXmWfudKCBivmIt5Jz9DWAhgnN+mI97qugbmjMSgL7B09lUcxX2ek6TV3PetZz
-	 /Sx8NcklX4j8P5ijR2Waq4A4uBs9931I3WosCVYIoqtPp2uh6kG7VDs+vfPziQTV8Msi1
-	 N5nBFkAz/XlXmke6mVBjQL3t4L84UkIiWs/+EsAgTn6oZ4RWa6ctdnab0yGhsbKqWcbrr
-	 1ZsWzXF2Mhf/rpJOp29c8m6aR07pzuQkR57eQa3uuDsXq2vJBjWdFjhH8XJFQrQTFmKWm
-	 L5D6IMF8B5X4FvEWRUhkm75fAYzCu5FKC6maXlqz/S/t7R9t5rzg1tyS1OYI3SZZsIQ==
+	t=1795597941;
+	b=vpKyEjhN/Zxfdc+XSKlZ3E7tZaE6YwkRQnud5q8fzNo9VKLc5FmM1S0uHj6/egnEFuck
+	 m2Rhz3VZId5TJ0qszufjhvsSWTosN73ak6/xunpv7vZ/s0VV3J0Q567ooI5qJJeegpziG
+	 e856y+Dpo7QDIoxkW0VJz19OVpTcqD/ZeYETbedBoZ30mFEd6C9VeqKHnO3NKYxOveZDb
+	 DJ/I2LLNtBUOs6FJM6T8AZ7zCjYgBUFkaQq364BFDVRcWAX1ORGLAN6WbLpq9m57ttqMx
+	 /r9gjMjyv58WClGRgF/jz/O/NRcWg2ljMavsID6nJwCR2v4vI65ZWE5Kg0zn8hcBHgA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795597757;
-	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:From:Content-Language:Organization:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=vt+EhBcZZWmdLvvCDDQxXdt+x1JKxTJJeVjjo8w0SQY=;
-	b=1hCB+PQac4UKmVwqzLWCE5MiLCYwZwGqz2uUFdlpAWYCjCSssghEUd9/ua0XQNNrNez6
-	 Cii3KfrA5yboTyCSXRffMJFrF0ZniE8Iy2CjkK1555c6Cv2FPRWLlyp+NSZMPL3EJPrlB
-	 Ev8yQpfBy2DkwhZZKaVW8vmoY3GelNWsGJi+Th10sjKM7hYFKfWh+uRIiISYeIem1jmwf
-	 LPr5bcR8nCGuQBbIPdHYLl+7TTrYSkxk7dKVc4RPqRNyGNFBia/++FyBTD645xO7+Q2m/
-	 ChlrzDHaJV1bP0imoHWZ3eOmZX93fmnDaFcIhRfaBzZa53a+rkC5ytbjocpNAEffmQw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795597941;
+	h=DMARC-Filter:Received:Received:Received:Received:From:To:CC:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=mvTE/jYYGVeN6Jqeco/QZgTO0HeF19oQmNCmoulMWNo=;
+	b=bpfSGUD/gD7p7RoIoZ7Ioza/5mVdZAagY5my/7cpkRZ4rD6NNUtmbO0gfqdS7KoEJ8hG
+	 Zs/76S0kUp0/tYF5SkLjwpIYHeNupFu9W4AvDWlpSK2nMizxG/fOvRE7T6o0SU8y4tXLp
+	 3VkN68wOYNdVuIMWMzaAIqeCYoSCy05spWuDPGG/8gQ5Cr/R45dXLsHTUbCWmHXsjNri7
+	 WL5M69navQwiNglMDkqgOuPEL5ZsGdGFkffGop2Dn8l9SvupInk4BSWBvMS2Md+mpehiy
+	 nppZwIdpX7HEMNVGL96U1sPAn4EwQMJAgyfdjL261X06JisfdJnebeXevnWd1H8KLsQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=U4ohL1Mo;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB6D606A32E;
-	Wed, 25 Nov 2026 09:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=U4ohL1Mo
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51FA91F000CA;
-	Wed, 25 Nov 2026 09:09:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795597756;
-	bh=vt+EhBcZZWmdLvvCDDQxXdt+x1JKxTJJeVjjo8w0SQY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=U4ohL1MoCwf/mUMK44EMt6WtVaZ3YkM38HV+QAE+i0sC8sqwrCUS+08Gq/OdlKSyy
-	 chbyQ5/rdMxKL4cWo5zaLrlZDJ7iy7/EG917JBRcPL8vRuc34EuquSue04doeKK3jD
-	 jRevyzrv1kxTZEvPUfN3ZEaUztY49Pexi+IusSPfCmlcGGwq7kYVcGs1rD/MfrhfCs
-	 WOkGeu7pxhP20u+6eTJHAzZExkELZWmcQY6a4WRgowtoPF8/63789TItYLaVUmw8DH
-	 Gu+l/oFVKWUT0xG4Pr+rFux5kD2MCyqjIrQwf0WIWd8SWGkNunfIfvuRwqbOncnUPI
-	 dvlhjrqB8ayXg==
-Message-ID: <b274eaac-4bf3-4d6e-8451-461c02c1fad7@kernel.org>
-Date: Wed, 25 Nov 2026 18:09:13 +0900
+	dmarc=pass header.from=hygon.cn;
+	spf=pass smtp.mailfrom=hygon.cn;
+	arc=none smtp.remote-ip=101.204.27.37
+Received: from spam01.hygon.cn (unknown [101.204.27.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8885F606A323;
+	Wed, 25 Nov 2026 09:12:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8885F606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
+Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTS292kzVhfS;
+	Wed, 25 Nov 2026 17:12:12 +0800 (CST)
+Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTR4QkXzVhfS;
+	Wed, 25 Nov 2026 17:12:11 +0800 (CST)
+Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
+	by maildlp1.hygon.cn (Postfix) with ESMTPS id EA7BF1662;
+	Wed, 25 Nov 2026 17:12:04 +0800 (CST)
+Received: from hsj-2U-Workstation.hygon.cn (172.19.24.226) by
+ cncheex04.Hygon.cn (172.23.18.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 25 Nov 2026 17:12:09 +0800
+From: Huang Shijie <huangsj@hygon.cn>
+To: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
+	<hch@infradead.org>, <agruenba@redhat.com>, <mic@digikod.net>,
+	<axboe@kernel.dk>
+CC: <gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
+	<serge@hallyn.com>, <legion@kernel.org>, <aleksa@amutable.com>,
+	<libaokun@linux.alibaba.com>, <ebiggers@kernel.org>, <djwong@kernel.org>,
+	<sandeen@redhat.com>, <zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>,
+	<yingzhiwei@hygon.cn>, <wujianyong@hygon.cn>, <shijie8@gmail.com>,
+	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
+	<linux-security-module@vger.kernel.org>, Huang Shijie <huangsj@hygon.cn>
+Subject: [PATCH v4 02/11] vfs: add sb_inode_iter_locked()
+Date: Wed, 25 Nov 2026 17:11:48 +0800
+Message-ID: <20261125091157.1822521-3-huangsj@hygon.cn>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261125091157.1822521-1-huangsj@hygon.cn>
+References: <20261125091157.1822521-1-huangsj@hygon.cn>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -51,151 +68,63 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] virtio_blk: add fua write support
-To: Alberto Faria <afaria@redhat.com>, linux-block@vger.kernel.org
-Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Jason Wang <jasowangio@gmail.com>
-References: <20261125083947.263216-1-afaria@redhat.com>
- <20261125083947.263216-2-afaria@redhat.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20261125083947.263216-2-afaria@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
+ (172.23.18.114)
 
-On 2026/11/25 17:39, Alberto Faria wrote:
-> Add the new virtio-blk request FUA flag uapi definitions and
-> corresponding virtio-blk support.
-> 
-> Signed-off-by: Alberto Faria <afaria@redhat.com>
-> ---
->  drivers/block/virtio_blk.c      | 29 +++++++++++++++++++++++++++--
->  include/uapi/linux/virtio_blk.h | 13 +++++++++++--
->  2 files changed, 38 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 2b462005cdb68..7ee2e6a6a591b 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -248,7 +248,10 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
->  		return BLK_STS_NOTSUPP;
->  
->  	/* Set fields for all request types */
-> -	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
-> +	if (virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS))
-> +		vbr->out_hdr.flags = 0;
-> +	else
-> +		vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
->  
->  	switch (req_op(req)) {
->  	case REQ_OP_READ:
-> @@ -258,6 +261,11 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
->  	case REQ_OP_WRITE:
->  		type = VIRTIO_BLK_T_OUT;
->  		sector = blk_rq_pos(req);
-> +		if ((req->cmd_flags & REQ_FUA) &&
-> +		    virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS) &&
-> +		    virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA))
-> +			vbr->out_hdr.flags |= cpu_to_virtio32(vdev,
-> +				BIT(VIRTIO_BLK_REQ_FLAG_OUT_FUA));
->  		break;
->  	case REQ_OP_FLUSH:
->  		type = VIRTIO_BLK_T_FLUSH;
-> @@ -1151,10 +1159,17 @@ cache_type_store(struct device *dev, struct device_attribute *attr,
->  	virtio_cwrite8(vdev, offsetof(struct virtio_blk_config, wce), i);
->  
->  	lim = queue_limits_start_update(disk->queue);
-> +
+Add sb_inode_iter_locked(), which keeps sb->s_inode_list_lock held
+across the whole walk and takes no reference, so each callback only gets
+an existence guarantee.  It must do its own inode state checks and must
+not block.
 
-White line change.
+It lives in fs/internal.h as a static inline rather than being exported,
+so that it stays a VFS internal facility and the small callbacks inline
+into their callers.  A callback returns a negative value to stop the walk
+with that error, and 0 to continue.
 
->  	if (virtblk_get_cache_mode(vdev))
->  		lim.features |= BLK_FEAT_WRITE_CACHE;
->  	else
->  		lim.features &= ~BLK_FEAT_WRITE_CACHE;
-> +
-> +	if (virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS) &&
-> +	    virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA) &&
-> +	    !(lim.features & BLK_FEAT_ZONED))
-> +		lim.features |= BLK_FEAT_FUA;
-> +
->  	i = queue_limits_commit_update_frozen(disk->queue, &lim);
->  	if (i)
->  		return i;
-> @@ -1575,6 +1590,15 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	if (virtblk_get_cache_mode(vdev))
->  		lim.features |= BLK_FEAT_WRITE_CACHE;
->  
-> +	/*
-> +	 * Do not advertise FUA when the device is zoned, since we
-> +	 * would not be able to handle it on REQ_OP_ZONE_APPEND.
-> +	 */
+Signed-off-by: Huang Shijie <huangsj@hygon.cn>
+---
+ fs/internal.h | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-Why is that? I do not see any reason for this.
-
-> +	if (virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS) &&
-> +	    virtio_has_feature(vdev, VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA) &&
-> +	    !(lim.features & BLK_FEAT_ZONED))
-> +		lim.features |= BLK_FEAT_FUA;
-> +
->  	vblk->disk = blk_mq_alloc_disk(&vblk->tag_set, &lim, vblk);
->  	if (IS_ERR(vblk->disk)) {
->  		err = PTR_ERR(vblk->disk);
-> @@ -1740,7 +1764,8 @@ static unsigned int features[] = {
->  	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
->  	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
->  	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-> -	VIRTIO_BLK_F_SECURE_ERASE, VIRTIO_BLK_F_ZONED,
-> +	VIRTIO_BLK_F_SECURE_ERASE, VIRTIO_BLK_F_ZONED, VIRTIO_BLK_F_REQ_FLAGS,
-> +	VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA,
->  };
->  
->  static struct virtio_driver virtio_blk = {
-> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-> index 3744e4da1b2a7..c5047e6a9a9bc 100644
-> --- a/include/uapi/linux/virtio_blk.h
-> +++ b/include/uapi/linux/virtio_blk.h
-> @@ -42,6 +42,8 @@
->  #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
->  #define VIRTIO_BLK_F_SECURE_ERASE	16 /* Secure Erase is supported */
->  #define VIRTIO_BLK_F_ZONED		17	/* Zoned block device */
-> +#define VIRTIO_BLK_F_REQ_FLAGS		18	/* Request flags supported */
-> +#define VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA	19	/* FUA flag supported */
->  
->  /* Legacy feature bits */
->  #ifndef VIRTIO_BLK_NO_LEGACY
-> @@ -211,6 +213,9 @@ struct virtio_blk_config {
->  #define VIRTIO_BLK_T_BARRIER	0x80000000
->  #endif /* !VIRTIO_BLK_NO_LEGACY */
->  
-> +/* Request flag bits */
-> +#define VIRTIO_BLK_REQ_FLAG_OUT_FUA	0
-> +
->  /*
->   * This comes first in the read scatter-gather list.
->   * For legacy virtio, if VIRTIO_F_ANY_LAYOUT is not negotiated,
-> @@ -219,8 +224,12 @@ struct virtio_blk_config {
->  struct virtio_blk_outhdr {
->  	/* VIRTIO_BLK_T* */
->  	__virtio32 type;
-> -	/* io priority. */
-> -	__virtio32 ioprio;
-> +	union {
-> +		/* io priority. */
-> +		__virtio32 ioprio;
-> +		/* Request flags. */
-> +		__virtio32 flags;
-> +	};
->  	/* Sector (ie. 512 byte offset) */
->  	__virtio64 sector;
->  };
-
-
+diff --git a/fs/internal.h b/fs/internal.h
+index 967c8556c17f..0479094e1330 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -139,6 +139,31 @@ struct super_block *user_get_super(dev_t, bool excl);
+ void put_super(struct super_block *sb);
+ extern bool mount_capable(struct fs_context *);
+ 
++/*
++ * Iteration for internal VFS use only, with sb->s_inode_list_lock held
++ * across the whole walk and no inode reference taken.  @iter_fn runs in
++ * atomic context with only an inode existence guarantee, so it must not
++ * block and must perform its own inode state checks.
++ *
++ * Return a negative value to stop the walk with that error, 0 to continue.
++ */
++static inline int sb_inode_iter_locked(struct super_block *sb,
++		int (*iter_fn)(struct inode *inode, void *priv), void *priv)
++{
++	struct inode *inode;
++	int ret = 0;
++
++	spin_lock(&sb->s_inode_list_lock);
++	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++		ret = iter_fn(inode, priv);
++		if (ret)
++			break;
++	}
++	spin_unlock(&sb->s_inode_list_lock);
++
++	return ret;
++}
++
+ /*
+  * Prepare superblock for changing its read-only state (i.e., either remount
+  * read-write superblock read-only or vice versa). After this function returns
 -- 
-Damien Le Moal
-Western Digital Research
+2.53.0
+
+
