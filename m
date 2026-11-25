@@ -1,21 +1,21 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.95.11.211
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795582705;
-	b=45OSMNbtrgoBHS0vqJ+Z4zgRuoOSnNPiR3Ps7g6yfFZWb3+Mw6n8qK/eZEYlSwGqjcuF
-	 xQQfITHCuDwQB61xTJWlmSzl51B3XJSgiaTt3nWU7Sd/kP9HSSKUYz7b6T9Ws3gM/gzR7
-	 n3E2Hw9/egR1rIXNvfesQeBxad0r4EULMp7Bcr5YgTpHQGjtCUtSrxydsfIBbmdmkyalM
-	 87v3asZBpZkYHCpCFWsuJjucVvfFbps0v+ZTZl0G/92B4G9Jo9OxW7tC/O2rWIr6IvTb1
-	 pQHTAoOJJrZkDEbg0yTH/dze/HS3YZohsObI1rDOV4mlBrR5J3+Z2JGW+W80Ykp5mSw==
+	t=1795584593;
+	b=c/vjbcm5+nc+iw/JJxdLMdOqTOokF13c74tVYWVXwN8lTYa8AHuF9+2i59/ExS8QDJci
+	 rO71d45pKptzIDW34xxKE1K8tVa5O2u8Nx3YuatLjHlAudFOCWaydcwKuhug6qvtYCEHR
+	 633RHLIIrjUWkebrmXXBeQf9kwm59rcTeh+0md0ZsIs7bfa1Pk+Ea4Yyxb3dKHwxOjAZw
+	 BLE4AtSSQv0da3g/lu8ytiPrCQJmvG6vsk2S9+l7oMSm/CSl8QIHHI1iAMn1CHwEHQxQr
+	 r+D4kBtrB7zSEjQr+ELjAsZIEVnv3vhx3KhaIcv94I86KkklgJd25YldBFf1G+9qh9A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795582705;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795584593;
 	h=DMARC-Filter:Received:Date:From:To:Cc:Subject:Message-ID:References:
 	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
-	bh=4Ts0Ui5cQbaoxXzxrwfsqcGKfEAcHWFH9/pz1vnV6iA=;
-	b=1uZHs493ZWxfUXox6I+iGzDlQj+duQ3GLrzsYYdIXT2BE1YNmYw6sY8HwrWjtDtkfUXx
-	 M2aEz/JIkvTgih8ods41WJq3bssCG7hNF2KAHbRGAijp+EaTsl+naI9igBEDenDRCH/ye
-	 19ejOEzKEO3dAeJWY0yGA5ogHGx0B8c4BpXxzFN6Rgn+cKUMZ2PcpPwH2gbxVgK2KspC8
-	 vvvnIiU1pRXe27KiQYr0wCYyUb6TPrJe7ipBzwLAWir7h6xUvYggMhouSzlGrtli3aSxb
-	 KpwUQtGMmYH0fqkBVq0T0Q8L+Ovbgp8wvPrtkMwAzT1TSNcNKNDtznjRXK82SloRMmw==
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	b=e3wyAnld0cja08o+K8kc6TksLNWRmfmK6BdoyJ+NbF+fv7NpLzJ4bZpXpJRGV9WSjJ5K
+	 Gpj7bZxBfKDS22FyTR34h9huzUjKGhPQJuQushkeRZ0UlCgxwhrgm4bsUaisGdFaMgX6C
+	 pczBpo8kJPDIQ/0PjoVNPnUdT046azJ9QE4ZpvALUTqetj1xLwSb8f493Fc8dqQ5TT2Uv
+	 Ew+i9JuvM8DkP4rw06qtBzWC/atkEqSgZRfXhTKQyDQoyWKPEif9BrG9o/W2hWM9Z70hu
+	 Bxc89lKkeiAVrnTzUJXN5vg2UjIMZNNv7z1UUupe3BPdN9FSvcfEca6QShvOf2W4aFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=lst.de;
 	spf=pass smtp.mailfrom=lst.de;
@@ -23,26 +23,36 @@ ARC-Authentication-Results: i=1; smtp.subspace.kernel.org;
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55A6606A31E
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 04:58:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A55A6606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EAD5606A327;
+	Wed, 25 Nov 2026 05:29:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EAD5606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id CA30368AFE; Wed, 25 Nov 2026 05:58:20 +0100 (CET)
-Date: Wed, 25 Nov 2026 05:58:20 +0100
+	id C928B68AFE; Wed, 25 Nov 2026 06:29:48 +0100 (CET)
+Date: Wed, 25 Nov 2026 06:29:48 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>,
-	Hannes Reinecke <hare@suse.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Niklas Cassel <cassel@kernel.org>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Subject: Re: [PATCH 1/5] blktrace: add ioprio field to struct blk_io_trace2
-Message-ID: <20261125045820.GD19878@lst.de>
-References: <20261124133553.152463-1-johannes.thumshirn@wdc.com> <20261124133553.152463-2-johannes.thumshirn@wdc.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Dave Kleikamp <shaggy@kernel.org>,
+	jfs-discussion@lists.sourceforge.net,
+	Edward Adam Davis <eadavis@qq.com>, Jens Axboe <axboe@kernel.dk>,
+	Ming Lei <tom.leiming@gmail.com>, Hillf Danton <hdanton@sina.com>,
+	Tao Cui <cui.tao@linux.dev>, Al Viro <viro@zeniv.linux.org.uk>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	linux-rt-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	stable@vger.kernel.org,
+	syzbot+cd8a9a308e879a4e2c28@syzkaller.appspotmail.com,
+	syzbot+ecf51a7ccb6b1394e90c@syzkaller.appspotmail.com,
+	syzbot+bc273027d5643e48e5b3@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/2] jfs: wait for lbmDONE under LCACHE_LOCK in
+ lbmRead()
+Message-ID: <20261125052948.GB20286@lst.de>
+References: <20261123-work-loop-backing-file-v1-0-48f83eaf2499@kernel.org> <20261123-work-loop-backing-file-v1-1-48f83eaf2499@kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -54,18 +64,10 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261124133553.152463-2-johannes.thumshirn@wdc.com>
+In-Reply-To: <20261123-work-loop-backing-file-v1-1-48f83eaf2499@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Nov 24, 2026 at 02:35:49PM +0100, Johannes Thumshirn wrote:
-> Add the UAPI definitions for passing I/O priorities, and with them SCSI
-> command duration limit (CDL) hints, to user space:
+Looks good:
 
-Before we start encoding this too hard we really need to fix how CDL
-is used in the kernel.  The whole idea of the user configures the
-CDL descriptor and then the I/O issuers magically knows an I/O
-priority maps to it is completely broken.
-
-We need a way for the FS to know or even configure the CDL descriptor
-and then use that.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
