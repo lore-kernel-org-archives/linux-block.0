@@ -1,54 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.137
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795602214;
-	b=WsqdPNhNqhpeIqCozB1B1JJfnAVrq6ig/1l+Oo+hAPtmv0SWLKV036R+xmb7b5INoKm6
-	 Ejr3LySlapQKCDR+iqK9DwPtLax+VPFMUS9gE6HYtLbaL+gAhNXoYY3bAE5KP+a1WmNPq
-	 NON4IrcCjAt0C+4go8leTKvgFXSk288FYqevK/mwNfmcMoAGwCkvJSzj/kwIwXE2N7xZC
-	 3me18/BxQSC3QlfS4Wy5cxzKLESy8/pvl2HfyuBrfR9FAJM9U8wRk5ue0hNr2zALJ23r3
-	 yKcnBKTM/ayGt2y7gvmD+RFcbJikneWuHhd1jh4Ukp2lUKNcRAwhAuL7RSIq1Vq8tEA==
+	t=1795604653;
+	b=UTtWXz4RTiD64g+ENkvpswLNGqnUK13ASTsmpgEqu6r6hOHEo++EayvTqQkFxHeN80Xw
+	 vrNaLKxJy0fwj+UnzUFDw1Fd43i8z3XflOOTm0xArb5ckU+BXEgAerpCZGUQ3SwStlw3J
+	 n4zCG60BLPEU9PMOb8pVMJzRpff8ElFyp9Q6qy6HtG2PnLXxU/H5JDOZCfwmARjs1kJXr
+	 YJU26yKLLF7+5EzClujDhTH5fvgqCFVc8/3Yg4yikO7XlHevZnQ+X5ni14Lnz/HksUY0N
+	 rA76wwUbjJh31vxgiRgMWTyDa+xtRrIt+bDzSYdF7DhuKMiNvwdGyMGW6CdojfBZTXw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795602214;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:MIME-Version:X-Received:Date:In-Reply-To:
-	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
-	 Subject:From:To:Cc:Content-Type;
-	bh=nAwEpdk8W5zOz8dRUea8wq0PG12t8rrSsYABB8slUxU=;
-	b=m2GjdPIgvB/IPNAhp1GpYddubcbWkJGElZ7d4gColfBK2iHf8+Gm10Btl//9w2IcoQuF
-	 wcFkJeJijebWB3GHdZYSlWs3ii5XhrYLVNodNzogmQaw1or9yL4J79oRQqeQvenJHz3SN
-	 tocXeZetkonsXWveaiSgGQdRGGJRXkpz42UFxioj1GHi/oIy4jnXkK2h2K03qCfbFBfLe
-	 Ts9wRB0SXvK0O1Bv5hEbr03Xy8hOi7frfgHnce+DzTFgIlzQjWk+2o2bzXZDabXZUpoW+
-	 IztDAu7svZkLlXArygrL5AcfLpJ+yr5bDcQQJBLiLU2TKlYf3hsfWGDoGCozLw7gxzA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795604653;
+	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
+	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=3Ed/dwsYEtwCWH9KjuZt1ohLbpuZvRwKKfK5cvZH8Hs=;
+	b=OWJApgaTZyIL0fXINOIz0mmfGNevKjeSFDV9K9pAz+MteKfNASiuaQO9vy3ioafk6WDE
+	 x7IUWuRuUQoh4WZOtIA1ywffkJPwp0qXr3uaa48Wl26oQZDWvucf74Yg8cqQ+5j0+h39F
+	 iFZ+yYoBHZax+Z4hMGgHdhaTzyctvzd4Nnbxm3h00lD2Jqnmz6H9FBwhdptVYnIMnuRgu
+	 3y2qK+zijtqkgitkVPZvSO7r+pNTGrf41N3Ht/UMpTgVlcbl2ItH97AMIQRruhrvQJGJ7
+	 oW559ExG1xFz8UA668+BBJvvBonLtjwkw20lJGWiqceg9+hPftRWTFqMHgKCuIhPYqA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.167.199
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4D5606A32A
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 10:23:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7E4D5606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-4cbf700ddccso4137578b6e.0
-        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 02:23:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795602211; x=1796207011;
-        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=nAwEpdk8W5zOz8dRUea8wq0PG12t8rrSsYABB8slUxU=;
-        b=XucVUKo8Lu4KooaiJ2p+iba5lkfbn0/4tGhWT06JIhhKR69ZUNoHPuf2ZM/VRCLDIp
-         VV8PBBIvkt9z/7rh8SXEQXFMtMV6GHNIreOZ2iD9y0pZhGJKjxv5SDcqt0QuFbYIiqJ+
-         ixHe7l+7RRdjYDRufpz/ZAgZB5IgIbrm9Ta9hBRK3dKPPGqjvweTaWknexeMve9REVoP
-         oTUMk64OJzbSOaCnxmHc7VC0HaSQyrK7m+Io/AT2D1ivq5CGTFMvw+7nEMX4hu6pgbtL
-         YE5qL7p0T5GFo2xoo4S3apYmPdoeHqdxt0L8leUyhedq+oPtmkcbFVBHqD5iOT/kyL+l
-         I2Bg==
-X-Forwarded-Encrypted: i=1; AL+hErGYAn2iMKY8qj2b30SE1G8GbX7rOj8hxVTL8wDcGNbY4fE/0QSZp5ai+g4Pui7lL0WcEYOyUmw0Sjyrhg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/OzhSXgLKLF/pDfPYIIiLjW5f4vmLUusEguEzjxSjF7HQEWJfp
-	+JDGs9aQcM5ZqFyKEh1xNgBoP9gNrCfYujlPCCrDjuFkslNsO8qv1JWSaLi5pGrl8q8XyHHzSqV
-	vVJptXzkMJidB0aCuJRUND5/kF3517xQH61ceCHOZVPPnKIUL29rDKaIu/dI=
+	dmarc=pass header.from=cmss.chinamobile.com;
+	spf=pass smtp.mailfrom=cmss.chinamobile.com;
+	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=w7TuWmIZ;
+	arc=none smtp.remote-ip=111.22.67.137
+Received: from cmccmta4.chinamobile.com (cmccmta4.chinamobile.com [111.22.67.137])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DEB5606A32A;
+	Wed, 25 Nov 2026 11:04:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2DEB5606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=w7TuWmIZ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=cmss.chinamobile.com; s=default; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=w7TuWmIZi9CEgr3hX7ejxjWTpnz5EjVSaZSyLxdk1dkcvgyPOAUImfSiCOvRWKzOsBoSjREZEp1az
+	 bAIszhVj4oJ6GXTy31b46dX4PUoYwTjATYZC1opVgdXCTohawZ8FYJpzYDYoJkB+CqWcTz3rbsIRM1
+	 oPeWtxk/0pqT41u8=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app04-12004 (RichMail) with SMTP id 2ee46b06c0a3b3e-f23db;
+	Wed, 25 Nov 2026 19:04:06 +0800 (CST)
+X-RM-TRANSID:2ee46b06c0a3b3e-f23db
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from localhost.localdomain (unknown[10.55.1.72])
+	by rmsmtp-syy-appsvr09-12009 (RichMail) with SMTP id 2ee96b06c0a3c87-442e4;
+	Wed, 25 Nov 2026 19:04:06 +0800 (CST)
+X-RM-TRANSID:2ee96b06c0a3c87-442e4
+From: tongzhiwei <tongzhiwei@cmss.chinamobile.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: tongzhiwei@cmss.chinamobile.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] block: fix divide by zero in queue_limit_discard_alignment()
+Date: Wed, 25 Nov 2026 19:03:51 +0800
+Message-ID: <20261125110353.366-1-tongzhiwei@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.45.0.windows.1
+In-Reply-To: <20261120103040.610-1-tongzhiwei@cmss.chinamobile.com>
+References: <20261120103040.610-1-tongzhiwei@cmss.chinamobile.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,153 +72,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:c2be:b0:4d6:90f3:74b1 with SMTP id
- 5614622812f47-57a0ba5a8e4mr18256405b6e.49.1795602211468; Wed, 25 Nov 2026
- 02:23:31 -0800 (PST)
-Date: Wed, 25 Nov 2026 02:23:31 -0800
-In-Reply-To: <20261120010655.467825-1-lrizzo@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6b06b723.588a1920.b1e98.0003.GAE@google.com>
-Subject: [syzbot ci] Re: PISA: Pre-mapped IOVA Superpage Allocator for DMA and CoCo
-From: syzbot ci <syzbot+ci910cdb42d3006024@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, aleksander.lobakin@intel.com, axboe@kernel.dk, 
-	brendan.jackman@linux.dev, catalin.marinas@arm.com, cl@gentwo.org, 
-	corbet@lwn.net, dakr@kernel.org, davem@davemloft.net, david@kernel.org, 
-	driver-core@lists.linux.dev, dtatulea@nvidia.com, edumazet@kernel.org, 
-	gregkh@linuxfoundation.org, hannes@cmpxchg.org, hao.li@linux.dev, 
-	harry@kernel.org, hawk@kernel.org, hch@lst.de, horms@kernel.org, 
-	hramamurthy@google.com, ilias.apalodimas@linaro.org, iommu@lists.linux.dev, 
-	jack@suse.cz, jannh@google.com, jgg@ziepe.ca, joro@8bytes.org, 
-	joshwash@google.com, kuba@kernel.org, kuniyu@google.com, liam@infradead.org, 
-	linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, ljs@kernel.org, lrizzo@google.com, 
-	m.szyprowski@samsung.com, mhocko@suse.com, namangulati@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, praan@google.com, 
-	rafael@kernel.org, rdunlap@infradead.org, rientjes@google.com, 
-	rizzo.unipi@gmail.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot ci has tested the following series
+Hi Christoph,
 
-[v3] PISA: Pre-mapped IOVA Superpage Allocator for DMA and CoCo
-https://lore.kernel.org/all/20261120010655.467825-1-lrizzo@google.com
-* [RFC PATCH v3 01/25] mm: Introduce CONFIG_PISA and metadata table
-* [RFC PATCH v3 02/25] mm: Add PISA allocator lifecycle and page recycle hook
-* [RFC PATCH v3 03/25] mm: Add per-NUMA-node PISA page reservoir
-* [RFC PATCH v3 04/25] mm/page_alloc: Extend alloc_pages() to __GFP_PISA and PISA block allocation
-* [RFC PATCH v3 05/25] mm: Add global cap and shrinker for PISA pages
-* [RFC PATCH v3 06/25] iommu/dma: Map PISA memory in a per-domain IOVA window
-* [RFC PATCH v3 07/25] driver core: Add per-device pisa_* sysfs attributes for PISA optin
-* [RFC PATCH v3 08/25] iommu/dma: Use PISA for coherent DMA allocations
-* [RFC PATCH v3 09/25] mm: Add per-CPU block caches to PISA allocators
-* [RFC PATCH v3 10/25] mm: Add background page scrubber for PISA allocators
-* [RFC PATCH v3 11/25] mm: Migrate user pages into PISA
-* [RFC PATCH v3 12/25] block, mm: Support PISA for disk I/O and scrub migration
-* [RFC PATCH v3 13/25] net: Cache leaf PISA TX flags on struct net_device
-* [RFC PATCH v3 14/25] net: Use per-node PISA allocators for skb_page_frag_refill()
-* [RFC PATCH v3 15/25] net: Use PISA for page_pool memory
-* [RFC PATCH v3 16/25] mm/slub: Add SLAB_CACHE_PISA_RO for PISA-backed slab caches
-* [RFC PATCH v3 17/25] net: Allocate small skb heads from PISA
-* [RFC PATCH v3 18/25] net: Migrate user pages into PISA for MSG_ZEROCOPY
-* [RFC PATCH v3 19/25] mm, iommu/dma: Support decrypted PISA pages
-* [RFC PATCH v3 20/25] arm64/mm, mm: Support decrypted PISA pages in Realms
-* [RFC PATCH v3 21/25] mm: Add PISA statistics and debugfs
-* [RFC PATCH v3 22/25] net/libeth: Use GFP_KERNEL when pre-filling RX rings
-* [RFC PATCH v3 23/25] net/gve: Use GFP_KERNEL when pre-filling RX rings
-* [RFC PATCH v3 24/25] net/gve: Use PISA memory for RX buffers
-* [RFC PATCH v3 25/25] Documentation: Add PISA architecture documentation
+thanks for the review.  Please withdraw this patch.
 
-and found the following issue:
-WARNING in __alloc_workqueue
+I do agree with the design to fix it on setup.
 
-Full report is available here:
-https://ci.syzbot.org/series/80fa818b-452d-4361-bfc6-33c65f928f71
-
-***
-
-WARNING in __alloc_workqueue
-
-tree:      axboe
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/axboe/linux.git
-base:      20eef29b7c8465ac98d7dd6d6f2ac07a8d8056ca
-arch:      amd64
-compiler:  Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
-config:    https://ci.syzbot.org/builds/1b1679cb-3959-4df9-8546-bc04ba6e5cd3/config
-
-smpboot: CPU0: Intel QEMU Virtual CPU version 2.5+ (family: 0xf, model: 0x6b, stepping: 0x1)
-Performance Events: unsupported Netburst CPU model 107 no PMU driver, software events only.
-signal: max sigframe size: 1440
-rcu: Hierarchical SRCU implementation.
-rcu: 	Max phase no-delay instances is 1000.
-Timer migration: 1 hierarchy levels; 8 children per group; 0 crossnode level
-NMI watchdog: Perf NMI watchdog permanently disabled
-smp: Bringing up secondary CPUs ...
-smpboot: x86: Booting SMP configuration:
-.... node  #1, CPUs:      #1
-smp: Brought up 2 nodes, 2 CPUs
-smpboot: Total of 2 processors activated (11200.80 BogoMIPS)
-Memory: 5553400K/7339508K available (181131K kernel code, 30788K rwdata, 59468K rodata, 27564K init, 120564K bss, 1621204K reserved, 0K cma-reserved)
-devtmpfs: initialized
-x86/mm: Memory block size: 128MB
-Running RCU synchronous self tests
-Running RCU synchronous self tests
-Running RCU Tasks wait API self tests
-Running RCU Tasks Trace wait API self tests
-posixtimers hash table entries: 1024 (order: 5, 73728 bytes, vmalloc)
-futex hash table entries: 256 (32768 bytes on 2 NUMA nodes, total 64 KiB, linear).
-PM: RTC time: 20:32:46, date: 2026-11-24
-NET: Registered PF_NETLINK/PF_ROUTE protocol family
-audit: initializing netlink subsys (disabled)
-thermal_sys: Registered thermal governor 'step_wise'
-cpuidle: using governor menu
-NET: Registered PF_QIPCRTR protocol family
-dca service started, version 1.12.1
-PCI: ECAM [mem 0xb0000000-0xbfffffff] (base 0xb0000000) for domain 0000 [bus 00-ff]
-PCI: ECAM [mem 0xb0000000-0xbfffffff] reserved as E820 entry
-PCI: Using configuration type 1 for base access
-HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
-HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
-------------[ cut here ]------------
-workqueue: pisa is using neither WQ_PERCPU or WQ_UNBOUND. Setting WQ_PERCPU.
-WARNING: kernel/workqueue.c:6151 at __alloc_workqueue+0x1e4b/0x21d0, CPU#1: swapper/0/1
-Modules linked in:
-CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:__alloc_workqueue+0x1e4e/0x21d0
-Code: 18 89 39 00 90 0f 0b 90 e9 87 fd ff ff e8 0a 89 39 00 90 0f 0b 90 e9 79 fd ff ff e8 fc 88 39 00 48 8d 3d 65 52 32 10 4c 89 f6 <67> 48 0f b9 3a 8b 5c 24 20 81 cb 00 01 00 00 e9 99 e4 ff ff e8 d9
-RSP: 0000:ffffc90000067750 EFLAGS: 00010293
-RAX: ffffffff818fa174 RBX: 0000000000000000 RCX: ffff888102aa5ac0
-RDX: 0000000000000000 RSI: ffff888162ab5d78 RDI: ffffffff91c1f3e0
-RBP: ffffc900000678a0 R08: ffff888102aa5ac0 R09: 0000000000000002
-R10: 0000000000000102 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffff888162ab5c00 R14: ffff888162ab5d78 R15: ffff888162ab5d18
-FS:  0000000000000000(0000) GS:ffff8882a77e4000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000000ff48000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- alloc_workqueue_noprof+0xe3/0x210
- pisa_init+0x127/0x260
- do_one_initcall+0x250/0x870
- do_initcall_level+0x10a/0x1a0
- do_initcalls+0x59/0xa0
- kernel_init_freeable+0x29d/0x3e0
- kernel_init+0x22/0x1d0
- ret_from_fork+0x514/0xb70
- ret_from_fork_asm+0x1a/0x30
- </TASK>
+Sorry for the noise, and thanks for the quick review.
 
 
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
