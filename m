@@ -1,46 +1,46 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795597955;
-	b=MPZBKmeQHDEuQ1VlV7fW/WWLgM6E7cVHQjp12jGCrVMuCGjh9NLhFO1iXgCtwGberWqz
-	 4nY4xg/CymPmYuLC1FpgmzuU4ibCQZ4afbPEL344KbpZS/l0223PuEvd/9heY0mNxdlCE
-	 eDWLcjl0jgT2T8G/vNxd2jGn4nepj/E1ftD6QOy56y/SGRGN13I5jn8YY9KrMn8+hSzhV
-	 tFSwI9XvqIxThgh1zG0MpRjurUkxdwfKy6mEt1WaP/dGADXWeiyY9qEzb68ZJeZLkZbbK
-	 mx2m5sDLzUqgdxDy+U7sktOKYk0TIeD0dbV23kyqLpnWJMyG2lA5mGiLXw2pCCepT5w==
+	t=1795597948;
+	b=MvpDK7c9ssx9YzYYY/4EbtWxuG7h/UDzeMj4rqfD8zYirnjPhVO3eJY/ImdXEgMmqLJ0
+	 eJQ225tTGaXxJ2iCPciTe42eqVoJHZfc0VMyTl/trutQYFYFV/+qB36wrmGO9Jw+FBEjb
+	 bq8BP0UY8sVYA51iHD5jDizBXSPoIlA6QiB7Ibhcfg8YUnpGSjtWGmPJ3ztTufpgggrZc
+	 ZT0tkd/5N/Jcm/pxJ3f5GHbz8JahU52HKqWU9wzzxqONgJKaCGbHg3c2WMc2PpCySId5E
+	 A8Ci+EPSy4BlgSPzjSHd8JUIUpekwisJ88StWKEBYUFi5BenpyH9CGSsNk2iaB0F3kA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795597955;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795597948;
 	h=DMARC-Filter:Received:Received:Received:Received:From:To:CC:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
 	 X-ClientProxiedBy;
-	bh=fm6gr307MsdGQsF6kVhe4Pd7zQc9SvxpRFmgnheb0qE=;
-	b=3A6B4WtsqK/2QLmWrLdu/wUCTj4uRrC43OWG9XEt2h+ZLBO3OBGZ8k51mtVGWHHVMSeW
-	 LXAR8Yo3JvaN44x3O8WVSU2HGEDjZcRi6rbNItZnyGDP+/wGe0KIYuLv5pWAiMCj8obNe
-	 fXkm3yoWvU1f8ZJ0kyxivwDHvtwa8vMRnjWIs85mzo15j4BAIbsdEQqe4OeMiTlw3DXPB
-	 eWtdwN99zg73cPja9EXoUVwHprI5V7MmJi/sqp7WZGEv9vNdXQrxUHAEKR0Iya8HAOvvg
-	 RKUJ2Jhk+x7XxzThQQeT9NoNC0D373ALK1lGx0IBJVZ5yr+QaTMnP02YLSI9vvpU/MQ==
+	bh=/6O+blZWFeGtJIpYuxgB4qiZ+0l3PmKkDlPDd+QWUBU=;
+	b=NpVNQ9s6Imh+lmzhwFZLAPxjJaKmJEcEzBwKy5/NbhyWrStckIrZ08DO+3Av/XMMP/TS
+	 xT/HB6XKL5dGMV6seVXFgPe1ZkDI9JI0jRsH37IoZLaLFMgH6bjk0RYzmED0qe89MvOkN
+	 tm/DMxZxSDCWnGxgUR8ceRAd1GXrk+zy29ytS63AzFaDHVV1kga//8ZlWMSQNTvxBS3ha
+	 oxUVXG/S6LKfhDUveNLhmuExK+q99pKQCKQIcjhUAL0uJq+Q89YgjaBjBflLO6adM3P8B
+	 LVq3rPUKBHO56sVook/tBxPAFPXXe7rUtmZSaC5F7E54EIRn8vZkeDA/B8PwBAF6/Aw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=hygon.cn;
 	spf=pass smtp.mailfrom=hygon.cn;
 	arc=none smtp.remote-ip=101.204.27.37
 Received: from spam01.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C592160A2612;
-	Wed, 25 Nov 2026 09:12:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C592160A2612
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BEE606A326;
+	Wed, 25 Nov 2026 09:12:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 78BEE606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
 Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTs2KbTzVcBV;
-	Wed, 25 Nov 2026 17:12:33 +0800 (CST)
-Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTp4vJgzVcBD;
-	Wed, 25 Nov 2026 17:12:30 +0800 (CST)
-Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp1.hygon.cn (Postfix) with ESMTPS id 095A61548;
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTh29FjzVcBJ;
 	Wed, 25 Nov 2026 17:12:24 +0800 (CST)
+Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jZDTd2x4vzVcBC;
+	Wed, 25 Nov 2026 17:12:21 +0800 (CST)
+Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
+	by maildlp1.hygon.cn (Postfix) with ESMTPS id B62751548;
+	Wed, 25 Nov 2026 17:12:14 +0800 (CST)
 Received: from hsj-2U-Workstation.hygon.cn (172.19.24.226) by
  cncheex04.Hygon.cn (172.23.18.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 25 Nov 2026 17:12:28 +0800
+ 15.2.1544.36; Wed, 25 Nov 2026 17:12:19 +0800
 From: Huang Shijie <huangsj@hygon.cn>
 To: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
 	<hch@infradead.org>, <agruenba@redhat.com>, <mic@digikod.net>,
@@ -53,9 +53,9 @@ CC: <gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
 	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
 	<linux-security-module@vger.kernel.org>, Huang Shijie <huangsj@hygon.cn>
-Subject: [PATCH v4 10/11] landlock: convert hook_sb_delete() to sb_inode_iter
-Date: Wed, 25 Nov 2026 17:11:56 +0800
-Message-ID: <20261125091157.1822521-11-huangsj@hygon.cn>
+Subject: [PATCH v4 06/11] fs/inode: convert evict_inodes() to sb_inode_iter
+Date: Wed, 25 Nov 2026 17:11:52 +0800
+Message-ID: <20261125091157.1822521-7-huangsj@hygon.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261125091157.1822521-1-huangsj@hygon.cn>
 References: <20261125091157.1822521-1-huangsj@hygon.cn>
@@ -73,115 +73,76 @@ Content-Type: text/plain
 X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
  (172.23.18.114)
 
-Convert hook_sb_delete() to sb_inode_iter.
-No functional change.
+Use sb_inode_iter with %INO_ITER_F_NOREF | %INO_ITER_F_NOIGET, which
+hands out only zero-count inodes and takes no reference on them.
 
 Signed-off-by: Huang Shijie <huangsj@hygon.cn>
 ---
- security/landlock/fs.c | 67 ++++++++++--------------------------------
- 1 file changed, 16 insertions(+), 51 deletions(-)
+ fs/inode.c | 33 ++++++++++-----------------------
+ 1 file changed, 10 insertions(+), 23 deletions(-)
 
-diff --git a/security/landlock/fs.c b/security/landlock/fs.c
-index 2ab67bcad198..36e22be99acc 100644
---- a/security/landlock/fs.c
-+++ b/security/landlock/fs.c
-@@ -1380,49 +1380,35 @@ static void hook_inode_free_security_rcu(void *inode_security)
-  *
-  * Cf. fsnotify_unmount_inodes() and evict_inodes()
-  */
-+static bool release_inode_eligible(struct inode *inode, void *priv)
+diff --git a/fs/inode.c b/fs/inode.c
+index f63535ee3629..0830a11a37e9 100644
+--- a/fs/inode.c
++++ b/fs/inode.c
+@@ -865,6 +865,13 @@ static void dispose_list(struct list_head *head)
+ 	}
+ }
+ 
++static bool evict_inode_eligible(struct inode *inode, void *data)
 +{
-+	bool ret;
-+
-+	rcu_read_lock();
-+	ret = !!rcu_dereference(landlock_inode(inode)->object);
-+	rcu_read_unlock();
-+
-+	return ret;
++	inode_state_set(inode, I_FREEING);
++	inode_lru_list_del(inode);
++	return true;
 +}
 +
- static void hook_sb_delete(struct super_block *const sb)
- {
--	struct inode *inode, *prev_inode = NULL;
-+	struct inode *inode;
- 
- 	if (!landlock_initialized)
- 		return;
+ /**
+  * evict_inodes	- evict all evictable inodes for a superblock
+  * @sb:		superblock to operate on
+@@ -879,40 +886,20 @@ void evict_inodes(struct super_block *sb)
+ 	struct inode *inode;
+ 	LIST_HEAD(dispose);
  
 -	spin_lock(&sb->s_inode_list_lock);
 -	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
-+	CLASS(sb_inode_iter, iter)(sb, release_inode_eligible, NULL,
-+				   INO_ITER_F_REFERENCED);
-+	while ((inode = sb_inode_iter_next(&iter))) {
- 		struct landlock_object *object;
- 
--		/* Only handles referenced inodes. */
--		if (!icount_read_once(inode))
+-		if (icount_read_once(inode))
 -			continue;
 -
--		/*
--		 * Protects against concurrent modification of inode (e.g.
--		 * from get_inode_object()).
--		 */
 -		spin_lock(&inode->i_lock);
--		/*
--		 * Checks I_FREEING and I_WILL_FREE  to protect against a race
--		 * condition when release_inode() just called iput(), which
--		 * could lead to a NULL dereference of inode->security or a
--		 * second call to iput() for the same Landlock object.  Also
--		 * checks I_NEW because such inode cannot be tied to an object.
--		 */
--		if (inode_state_read(inode) &
--		    (I_FREEING | I_WILL_FREE | I_NEW)) {
+-		if (icount_read(inode)) {
+-			spin_unlock(&inode->i_lock);
+-			continue;
+-		}
+-		if (inode_state_read(inode) & (I_NEW | I_FREEING | I_WILL_FREE)) {
 -			spin_unlock(&inode->i_lock);
 -			continue;
 -		}
 -
- 		rcu_read_lock();
- 		object = rcu_dereference(landlock_inode(inode)->object);
- 		if (!object) {
- 			rcu_read_unlock();
--			spin_unlock(&inode->i_lock);
- 			continue;
- 		}
--		/* Keeps a reference to this inode until the next loop walk. */
--		__iget(inode);
+-		inode_state_set(inode, I_FREEING);
+-		inode_lru_list_del(inode);
 -		spin_unlock(&inode->i_lock);
- 
- 		/*
- 		 * If there is no concurrent release_inode() ongoing, then we
-@@ -1455,30 +1441,9 @@ static void hook_sb_delete(struct super_block *const sb)
- 			spin_unlock(&object->lock);
- 			rcu_read_unlock();
- 		}
 -
--		if (prev_inode) {
--			/*
--			 * At this point, we still own the __iget() reference
--			 * that we just set in this loop walk.  Therefore we
--			 * can drop the list lock and know that the inode won't
--			 * disappear from under us until the next loop walk.
--			 */
++	CLASS(sb_inode_iter, iter)(sb, evict_inode_eligible, &dispose,
++				   INO_ITER_F_NOREF | INO_ITER_F_NOIGET);
++	while ((inode = sb_inode_iter_next(&iter))) {
+ 		/*
+ 		 * Keep this inode out of dispose so it stays on s_inodes while
+ 		 * the list lock is dropped. I_FREEING prevents new references
+ 		 * and leaves eviction to us, so we can resume the walk from it.
+ 		 */
+ 		if (need_resched()) {
 -			spin_unlock(&sb->s_inode_list_lock);
--			/*
--			 * We can now actually put the inode reference from the
--			 * previous loop walk, which is not needed anymore.
--			 */
--			iput(prev_inode);
--			cond_resched();
+ 			cond_resched();
+ 			dispose_list(&dispose);
 -			spin_lock(&sb->s_inode_list_lock);
--		}
--		prev_inode = inode;
-+		cond_resched();
+ 		}
+ 		list_add(&inode->i_lru, &dispose);
  	}
 -	spin_unlock(&sb->s_inode_list_lock);
- 
--	/* Puts the inode reference from the last loop walk, if any. */
--	if (prev_inode)
--		iput(prev_inode);
- 	/* Waits for pending iput() in release_inode(). */
- 	wait_var_event(&landlock_superblock(sb)->inode_refs,
- 		       !atomic_long_read(&landlock_superblock(sb)->inode_refs));
+-
+ 	dispose_list(&dispose);
+ }
+ EXPORT_SYMBOL_GPL(evict_inodes);
 -- 
 2.53.0
 
