@@ -1,81 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795596004;
-	b=PaamJnp3W2yDxkgTqgrhI8th6FR5JhsRmAisSjJ5FbD6SlEk3SwQq1ao/BlqqCKxO2lx
-	 PwZ9pMW6h9uzmUFYtdSDWlS7wz0AEbg8TDdKCZi+klES7MQW3TTm51D21NbdheIRqRmi7
-	 pft7agJ0Cg70Pdw3ZfwyZYNLH6mD+PZRoaCSBYXx9RyYqzyiAqEa4xuxs1aVfWaea1LZ5
-	 9VTsh8uI5RsSUl2fggtCZispVqEJkq144FPetL3mLDE+FOm/M7w9Ow0l95IZwv0ABssES
-	 T1J2ErG+XJp3NSR/RUW0+u9Z1Hy1L2+0gDNNQAq5OpuD3wy7icIrYq1iSNFbyI4sh1w==
+	t=1795596104;
+	b=uVHIKvGN5nth+eZwj19BAAyHnrcnGkWXUkqq818sVuwMpg/6HyXiQTIbuzlEFjAbiTBK
+	 vr88iUXbEKQmQSV7u2EuGhMqn+FMR9suNyEkilZSH0i1VD7qFyPVLUE/oDYuCbTUYwh2j
+	 xIZwWsybgpNHtpEvStnGKh4X4vGlT7Gk4G36/3A6Cjef5WnV9uT5TdjOEI29mFKUTOEyA
+	 TSRAi/oWRxjfXQuocRv7f95t9YC64JZ+X6UTP3KcgU1FAbpzG3iqCnifCadX+r7lDeqb9
+	 SeW6Ao3nwK9ycXloz77MlRtSkohA76UAmtMCsZvsIcDXGJobWSFnQdhGZbM1t8X5qaw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795596004;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Scanned-By;
-	bh=Cba8fS/ZVsj+QyvAYm2ReLCTwOe+j7JjbC25csY6/oU=;
-	b=eCMSdT1ZlErz0TD8fz0HL3RDrepMvFCsYWa2L9lB//Gwj5P3hSAuiwtNapbxqqdS0md6
-	 dHD//HQQq8TesW2SpLH66xy310o5FFR85bjcSwsPQXCABCCfyx/TiXxDe6gsQqD38GW/e
-	 41Hevir3XkCNnc06KNH+tCaMBO+wUBR1Z7dFEZzsh2gBhkX3ZDj6TFvnve8frPkyf8Wt5
-	 HFGQa6O/iyJBrLxJtfw1KVeqp21C4JFBY6RrPbmJYBTul9JCYOT7gJTBEhBMm0kkmEnis
-	 krTf/L522nQ/5u83R4xxJ+bAt5+ivlBYGQJx6xqi3VfN2JiJoq/dld5w6IA+zPBVHfQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795596104;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:Date:Subject:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:Message-Id:X-B4-Tracking:To:Cc:
+	 X-Mailer;
+	bh=0loQZHPBjLNYdasA1EMZfMX85Vaac5IkP7Fw5i4r2dI=;
+	b=nqnDj6URljEIDR82uUjjqPLykdkwUpCWQ0CmVupMakzR9sTyw/1L2o9DNNwpBP64IZAI
+	 F/qf1Hr1qy9cAzBHB/ZbMPDzmM0a4cnsEzU8A30Pfhk/Itbu4NMjef1i46tpPrQzinROC
+	 bw/2+6igAshPptQg77bpSk/gSaUk6OiVWVbg9MdWD+LXAuy5HW/i+CXFNBLgTVMcFy6zH
+	 PhuURNOFdgwZqG2dnTL+kNWhPGj2z4jmynohvggHT8SdM2u8i/mai7MQe3qelFX5rf1S5
+	 ACl3bENdBHITmjJ8C/CeNUPO3LJdRy6EU8L7N/D/K/Rhv14lBujM/I3ovd89fuzG3/g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=GMoBgYIv;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=xGwLo4wE;
+	arc=none smtp.remote-ip=91.218.175.37
+Received: from mta0.migadu.com (out-37.mta0.migadu.com [91.218.175.37])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC40C606A31E
-	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 08:40:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AC40C606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45C2606A31E
+	for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 08:41:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A45C2606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=GMoBgYIv
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1795596002;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cba8fS/ZVsj+QyvAYm2ReLCTwOe+j7JjbC25csY6/oU=;
-	b=GMoBgYIvcUBzRywqLmhMMGJSK411i4cUw//zAYbwhgLK9NctgmjGG3e9TfF/LeWppKrekm
-	OeZS/ONc6hGRZ42+8UHg/r52NBzY/FQdb0sRvqwxrB1y9StCg2CMeKEsHt5/b+fgnBwZ1T
-	SgBZViVX21X4Jy5Yf0rFbkg6JlfHFF4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-173-6jyNqfDFPs630dUezLSwdg-1; Wed,
- 25 Nov 2026 08:39:58 +0000
-X-MC-Unique: 6jyNqfDFPs630dUezLSwdg-1
-X-Mimecast-MFC-AGG-ID: 6jyNqfDFPs630dUezLSwdg_1795595997
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A016C195604E;
-	Wed, 25 Nov 2026 08:39:57 +0000 (UTC)
-Received: from desktop (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B12841800550;
-	Wed, 25 Nov 2026 08:39:54 +0000 (UTC)
-From: Alberto Faria <afaria@redhat.com>
-To: linux-block@vger.kernel.org
-Cc: virtualization@lists.linux.dev,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jason Wang <jasowangio@gmail.com>,
-	Alberto Faria <afaria@redhat.com>
-Subject: [PATCH v3 2/2] vdpa_sim_blk: add support for FUA writes
-Date: Wed, 25 Nov 2026 08:39:47 +0000
-Message-ID: <20261125083947.263216-3-afaria@redhat.com>
-In-Reply-To: <20261125083947.263216-1-afaria@redhat.com>
-References: <20261125083947.263216-1-afaria@redhat.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=xGwLo4wE
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=sERThpnRkKY48QAqz89vLAJFHQqh6vsXe+M60btYjZY=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795596101; v=1; x=1796200901;
+ b=xGwLo4wEaxrU5CInGeA7c4e9uw/CXWn+0nJSVQDRi4SmU6apH1j+hmQI/5cIJS1A/PpfaXCK
+ BFulhbOFLbRhISiS6U9tbrhqJpDCvUvfTUgiaIJAmqqcgfyWVl4RM4DnOfR68Ww5IbWidDR5L2b
+ lEDjuUkoNHqB8dfXbxTuN4xk=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 8ce7b261336591e2;
+	Wed, 25 Nov 2026 08:41:41 +0000
+X-Mizu-Trace-ID: 8ce7b261336591e2
+X-Migadu-Flow: FLOW_OUT
+From: Qiliang Yuan <qiliang.yuan@linux.dev>
+Date: Wed, 25 Nov 2026 03:41:36 -0500
+Subject: [PATCH v3] block: don't wait for all RCU callbacks when freeing
+ zone write plugs
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -85,116 +60,127 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261125-feat-blk-zoned-rcu-barrier-v3-1-707f65bae05a@linux.dev>
+X-B4-Tracking: v=1; b=H4sIAD+fBmsC/33NSw6CMBSF4a2Qjr2GXmhBR+7DOOjjIo0ETIEGJ
+ ezdQmLCiOF/Bt+ZWU/eUc+uycw8Bde7ro2RnRJmatU+CZyNzTBFyTmmUJEaQDcv+HYtWfBmBK1
+ 8NDwYfUnznGShdMYi8PZUuWnD74/YteuHzn+2r8DX9c/yIzZw4FBIWRZCCxSabo1rx+lsKbCVD
+ bin8kMKIyUtIkeVl0aYPbUsyw/TjuQ8DwEAAA==
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Qiliang Yuan <qiliang.yuan@linux.dev>
+X-Mailer: b4 0.13.0
 
-Expose VIRTIO_BLK_F_REQ_FLAGS and VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA to
-drivers. The simulator is a ramdisk, so it handles FUA and non-FUA
-writes in the same way.
+Zone write plugs are allocated from a per-disk mempool and freed with
+call_rcu(). Before destroying the mempool, which happens every time a
+zoned disk is released, disk_destroy_zone_wplugs_hash_table() calls
+rcu_barrier() so that no zone write plug is still waiting to be returned
+to it.
 
-Signed-off-by: Alberto Faria <afaria@redhat.com>
+rcu_barrier() waits for the RCU callbacks queued on every CPU by anyone,
+which usually takes a grace period or more, even when the disk had no
+zone write plug left to free. Removing many zoned disks, such as the SMR
+drives of a storage node taken offline, pays this once per disk.
+
+Count the zone write plugs of the disk that wait for their RCU callback,
+and wait only for that count to drop to zero.
+
+Removing 32 zoned null_blk or scsi_debug devices, base and patched
+kernels alternating over 2 rounds of 3 runs, median of the 6 runs and
+range in parentheses; "with plugs" leaves four partially written zones,
+and so four zone write plugs, on each null_blk device:
+
+  devices                      before (ms)      after (ms)   change
+  null_blk                   820 (805-885)   438 (424-454)     -47%
+  null_blk, with plugs       876 (852-883)   844 (805-877)      -4%
+  scsi_debug, host-managed   958 (945-991)   642 (630-652)     -33%
+
+Signed-off-by: Qiliang Yuan <qiliang.yuan@linux.dev>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 ---
- drivers/vdpa/vdpa_sim/vdpa_sim.c     | 15 ++++++++++++++-
- drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
- drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 14 +++++++++++++-
- 3 files changed, 28 insertions(+), 2 deletions(-)
+V2 -> V3:
+- Initialize nr_zone_wplugs_freeing in disk_init_zone_resources() (Damien Le Moal)
 
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 97d437d89524a..bec348d3dd7d1 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -198,7 +198,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
- 	struct vdpa_device *vdpa;
- 	struct vdpasim *vdpasim;
- 	struct device *dev;
--	int i, ret = -ENOMEM;
-+	int i, ret = -ENOMEM, ret2;
+V1 -> V2:
+- Keep the original comment above the wait (Damien Le Moal)
+- Add Reviewed-by (Damien Le Moal)
+
+v2: https://lore.kernel.org/r/20261124-feat-blk-zoned-rcu-barrier-v2-1-6d2212a48c5c@linux.dev
+v1: https://lore.kernel.org/r/20261121-feat-blk-zoned-rcu-barrier-v1-1-766875b525be@linux.dev
+---
+ block/blk-zoned.c      | 11 +++++++++--
+ include/linux/blkdev.h |  1 +
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 4c58892961912..2e61a9f23b270 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -18,6 +18,7 @@
+ #include <linux/mempool.h>
+ #include <linux/kthread.h>
+ #include <linux/freezer.h>
++#include <linux/wait_bit.h>
  
- 	if (!dev_attr->alloc_size)
- 		return ERR_PTR(-EINVAL);
-@@ -209,6 +209,12 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
- 		if (config->device_features &
- 		    ~dev_attr->supported_features)
- 			return ERR_PTR(-EINVAL);
-+		if (dev_attr->validate_features) {
-+			ret2 = dev_attr->validate_features(
-+				config->device_features);
-+			if (ret2)
-+				return ERR_PTR(ret2);
-+		}
- 		dev_attr->supported_features =
- 			config->device_features;
- 	}
-@@ -442,11 +448,18 @@ static u64 vdpasim_get_backend_features(const struct vdpa_device *vdpa)
- static int vdpasim_set_driver_features(struct vdpa_device *vdpa, u64 features)
+ #include <trace/events/block.h>
+ 
+@@ -724,8 +725,11 @@ static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
  {
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+	int ret;
+ 	struct blk_zone_wplug *zwplug =
+ 		container_of(rcu_head, struct blk_zone_wplug, rcu_head);
++	struct gendisk *disk = zwplug->disk;
  
- 	/* DMA mapping must be done by driver */
- 	if (!(features & (1ULL << VIRTIO_F_ACCESS_PLATFORM)))
- 		return -EINVAL;
- 
-+	if (vdpasim->dev_attr.validate_features) {
-+		ret = vdpasim->dev_attr.validate_features(features);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	vdpasim->features = features & vdpasim->dev_attr.supported_features;
- 
- 	return 0;
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-index bb137e4797633..70890974b6e56 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-@@ -45,6 +45,7 @@ struct vdpasim_dev_attr {
- 	u32 nas;
- 
- 	void (*work_fn)(struct vdpasim *vdpasim);
-+	int (*validate_features)(u64 features);
- 	void (*get_config)(struct vdpasim *vdpasim, void *config);
- 	void (*set_config)(struct vdpasim *vdpasim, const void *config);
- 	int (*get_stats)(struct vdpasim *vdpasim, u16 idx,
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-index 4d3e36fb59d50..e0ed9eb729cf3 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-@@ -32,7 +32,9 @@
- 				 (1ULL << VIRTIO_BLK_F_TOPOLOGY) | \
- 				 (1ULL << VIRTIO_BLK_F_MQ)       | \
- 				 (1ULL << VIRTIO_BLK_F_DISCARD)  | \
--				 (1ULL << VIRTIO_BLK_F_WRITE_ZEROES))
-+				 (1ULL << VIRTIO_BLK_F_WRITE_ZEROES)  | \
-+				 (1ULL << VIRTIO_BLK_F_REQ_FLAGS)  | \
-+				 (1ULL << VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA))
- 
- #define VDPASIM_BLK_CAPACITY	0x40000
- #define VDPASIM_BLK_SIZE_MAX	0x1000
-@@ -371,6 +373,15 @@ static void vdpasim_blk_work(struct vdpasim *vdpasim)
- 		vdpasim_schedule_work(vdpasim);
+-	mempool_free(zwplug, zwplug->disk->zone_wplugs_pool);
++	mempool_free(zwplug, disk->zone_wplugs_pool);
++	if (atomic_dec_and_test(&disk->nr_zone_wplugs_freeing))
++		wake_up_var(&disk->nr_zone_wplugs_freeing);
  }
  
-+static int vdpasim_blk_validate_features(u64 features)
-+{
-+	if ((features & BIT_ULL(VIRTIO_BLK_F_REQ_FLAGS_OUT_FUA)) &&
-+	    !(features & BIT_ULL(VIRTIO_BLK_F_REQ_FLAGS)))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static void vdpasim_blk_get_config(struct vdpasim *vdpasim, void *config)
+ static void disk_free_zone_wplug(struct blk_zone_wplug *zwplug)
+@@ -745,6 +749,7 @@ static void disk_free_zone_wplug(struct blk_zone_wplug *zwplug)
+ 	atomic_dec(&disk->nr_zone_wplugs);
+ 	spin_unlock_irqrestore(&disk->zone_wplugs_hash_lock, flags);
+ 
++	atomic_inc(&disk->nr_zone_wplugs_freeing);
+ 	call_rcu(&zwplug->rcu_head, disk_free_zone_wplug_rcu);
+ }
+ 
+@@ -2022,6 +2027,7 @@ void disk_init_zone_resources(struct gendisk *disk)
  {
- 	struct virtio_blk_config *blk_config = config;
-@@ -424,6 +435,7 @@ static int vdpasim_blk_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
- 	dev_attr.nas = VDPASIM_BLK_AS_NUM;
- 	dev_attr.alloc_size = sizeof(struct vdpasim_blk);
- 	dev_attr.config_size = sizeof(struct virtio_blk_config);
-+	dev_attr.validate_features = vdpasim_blk_validate_features;
- 	dev_attr.get_config = vdpasim_blk_get_config;
- 	dev_attr.work_fn = vdpasim_blk_work;
- 	dev_attr.free = vdpasim_blk_free;
+ 	mutex_init(&disk->zone_revalidate_mutex);
+ 	atomic_set(&disk->nr_zone_wplugs, 0);
++	atomic_set(&disk->nr_zone_wplugs_freeing, 0);
+ 	spin_lock_init(&disk->zone_wplugs_hash_lock);
+ 	spin_lock_init(&disk->zone_wplugs_list_lock);
+ 	INIT_LIST_HEAD(&disk->zone_wplugs_list);
+@@ -2149,7 +2155,8 @@ static void disk_destroy_zone_wplugs_hash_table(struct gendisk *disk)
+ 	 * Wait for the zone write plugs to be RCU-freed before destroying the
+ 	 * mempool.
+ 	 */
+-	rcu_barrier();
++	wait_var_event(&disk->nr_zone_wplugs_freeing,
++		       !atomic_read_acquire(&disk->nr_zone_wplugs_freeing));
+ 	mempool_destroy(disk->zone_wplugs_pool);
+ 	disk->zone_wplugs_pool = NULL;
+ }
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 215753171cef0..b3b356f832267 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -204,6 +204,7 @@ struct gendisk {
+ 	u8 __rcu		*zones_state;
+ 	unsigned int		zone_wplugs_hash_bits;
+ 	atomic_t		nr_zone_wplugs;
++	atomic_t		nr_zone_wplugs_freeing;
+ 	spinlock_t		zone_wplugs_hash_lock;
+ 	struct mempool		*zone_wplugs_pool;
+ 	struct hlist_head	*zone_wplugs_hash;
+
+---
+base-commit: 5f22fb20497f4983094131f00a734362300d22d2
+change-id: 20261120-feat-blk-zoned-rcu-barrier-cb9044e67ab3
+
+Best regards,
 -- 
-2.56.1
+Qiliang Yuan <qiliang.yuan@linux.dev>
 
