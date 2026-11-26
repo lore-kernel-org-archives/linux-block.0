@@ -1,54 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.125
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795656375;
-	b=CTjQFnEE/nhV3AU/P+73oE4o0EbmXj0W3RXC5Cj+VIdeO3sA2bBg7GAveQ3LBvTZEEbx
-	 21vqXQgANF5YwJelAY47Pwbm6G0IouBTdkH4Yuzc7T0ovKE65FWuISlWc5MedsNpeCSjo
-	 CB+KM+VkFC4ZFX6zX5GV8mtTm8p5v8bqAsnLtLf1aLtCg89KrhuTc2CPq3tyK4SeXKbBd
-	 LEP1Lwpt8yWauRa848OW0zqBpv0NDGwq660HhLVDmUQDPjcUmTGtTLsn69vd0K3/zPck/
-	 +CexPkVopPV/OFcg69JOrAt4IIM6RomC9J9d/hp5ib5L1g9VNT0Efe+zZ9FATMNgWDQ==
+	t=1795657802;
+	b=1hBtCfRL5JZgqEeIqRZdt49dU2DTSvElncs7NCTGVJekkGY2fFkeO0D21GzUjcyA4bAV
+	 WMsZCcbm+XbUIDrXOAf4xaFW7pIrphsu7UG7auDQYlL9ZOfrm6T2t1cv7gcFSdXww4Qra
+	 UL7gozEkOgeK28sy0PIznf+2MM5ayyMnJNEf82dFCYJq8xO3mEbDM+2DftY12652M1BU4
+	 YZQzJF4ShFwtJzARaCoE+yJYIenYnq8H929EWq3nZi4Ph8kZA6bkalQ4RqzzDwYYk0lnk
+	 JxPUQ8CcWmDcnIPJfBpF9KxW2wgHIxkPRACwop+as3Vee3tzXSpZ27cNTFTR3T2hRQA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795656375;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=Z/SO45JEq1Tj9RqYNIrS64ldH+SeEVWmw+AWikVk48g=;
-	b=eCA7jjgu9UKkipdZg4a9rV3BnlN1phWSr2KWyznbYUWjjYSfaF0ZdGEPNaqPsyLjCI0K
-	 Y0aOQswy5rY0HcPVZ+zMy8Q12mJKjXD+qvPnvw1h4xMwAArEL4rHW0iUVwUrj4c8sX+Cc
-	 VY4xBqk8DaAMkqnAQMYGGx+k61kgMaQcEtcErbh5fAN3uIEHEbG0X+rE/D1C5d0VJcDKA
-	 02dnnadPmmWZDHH4DZktSaS2NtmbybIWsLG3RDuFXrqdQl6lL+0SDCSctTUF3R0VAO/Bv
-	 lLl/O4Mg2OUEoG8nQX8YngEjAYF0/IGVXHBb0mL2WJB3HFL27I4tC0JH7zEbIZzBheQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795657802;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=/tpzHtlkGwh77klAgQ3+7vDN5VnMY54g4sCcJN12BCU=;
+	b=qD52Sa/sJ546BxPCMYdhAqJuYibp/EMBOpnktygcDCT5y4Ui5tUNu44M871XQ4/xmZPl
+	 UiBs/qcgU51RdTqFL+8zr4O5psV9kFkH2k9/26GZ7GSNhXiPsivY2Jdc8R3lKTcOkdIf4
+	 4grAmtM/BZnFZglMJjZkHpt10sHw6dOoD3cA5YZL9bf/94F7bb5E/XNLLCdr26EhQ6+EJ
+	 EktYJy3vGhU5CVD05W1SaJjySRB1Qvw5j3i9QNqSqSEGRfAy8FrIgHWkjKsvIiQkfGgzB
+	 yy9IMB+GCkt9eJQMti0gSKLbqKqG7uREMAcABAR826UDD09D+RWxb8sErreU/cIK5cQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=L6bYfjcN;
-	arc=none smtp.remote-ip=91.218.175.125
-Received: from mta0.migadu.com (out-125.mta0.migadu.com [91.218.175.125])
+	dmarc=pass header.from=kernel.dk;
+	spf=pass smtp.mailfrom=kernel.dk;
+	dkim=pass header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=HTnZrZZA;
+	arc=none smtp.remote-ip=74.125.82.174
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBCC606A330
-	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 01:26:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7CBCC606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66CA606A327
+	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 01:50:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A66CA606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=L6bYfjcN
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=D1UHaW0a6adTmdkfzXoJGoIQXD78CQO3jmkmbRoDsZs=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795656371; v=1; x=1796261171;
- b=L6bYfjcNYybhhuAVVhb7iBrxhLzwKq7EhTzcqEdESqr11X8cdCB5XjO3qbSpeZWBTjZ4xss/
- liRSHvH+4jDFcp65egpcgJst3HGCejvq1kqdvJViI4JVAeyIt/BHdA3vvTW5pZhYgH0LBVB4Cjc
- BmQYa4wSViD9pFO+KwXTAlZo=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id f65ccc0d161a6465;
-	Thu, 26 Nov 2026 01:26:10 +0000
-X-Mizu-Trace-ID: f65ccc0d161a6465
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <3bce3a69-e41c-4683-b1ca-9477dd41a7e0@linux.dev>
-Date: Thu, 26 Nov 2026 09:25:51 +0800
+	dkim=pass (2048-bit key) header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=HTnZrZZA
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-38190551625so12732101eec.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 17:50:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel.dk; s=google; t=1795657801; x=1796262601; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/tpzHtlkGwh77klAgQ3+7vDN5VnMY54g4sCcJN12BCU=;
+        b=HTnZrZZAk1fimzpf7glBUawWrfz/uu9E4sN4bkzRxUwK+9JNC+YgbwMC26RHCqMaVV
+         g1fAWikYyKwGlWsTuWlSm2tdpfSKYlMaqe4J+NBvOWJ1jzJWjfQHmb3QSnoQYXG8Pd99
+         X2PnM1cNcu1HnNj+AlEXCYovWFuJCKZwJX7DtAQF3HyEZDGF/aM56unH5RHMBqVP3dac
+         jQxzA4XpDOCLQq6+kw7Diak3FdD46upCx2ml4v0Tx91BRDlr/leBM44VeK33SH6Y5FnW
+         oe6KSxmzGH9/CltxMd6DCGpdsFAFwLxUn8cFI61gpgbeyf0ySiKbkzXmcWDHv+nqIJGr
+         pdxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795657801; x=1796262601;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/tpzHtlkGwh77klAgQ3+7vDN5VnMY54g4sCcJN12BCU=;
+        b=rTEUx7rYc2nYtBKFQfq9sZGIt9GA6JChiwNVQiN/ZxCkfszvvzVOAp0Q4u7EC5v6aV
+         gA6PAEO96m/fcT/QYJzGFnGxrE2P/HYH1tBkt5eIVGSxKcTgp3cIeb0OS4YfKiATxwct
+         VxMIua4hlshtF0v+B2466ortH3LDJEDNanwmP33ilCo+ulYSWmSt1RBW7TmCfqRMYC1N
+         GWlqQS1uvJjfEsXS+asMGLf9Fk6tXsLts7Aq2odUe3XKBUYHi7XUQvig+wi9Vc9CBGv3
+         V+EDOSOvr2jWsv7FPQrcBsNBprzIsd7MAz0gMkOx+0XsUSujnz6By7AiYN+ksDo0WSY5
+         xgBQ==
+X-Gm-Message-State: APuU4Z8Im/xBBEdSeh2x1yi7kvfTaxSEIvOYPTTklngwGZ9PY0fC0oOd
+	WE4isl1tXU6lTgVDR2wbF1q0RwZB98zMBr0pagk5IL0B3TrLEGZ9e4u2t+Sf8B8D3qQ=
+X-Gm-Gg: AZFdTZeV9kp0Ohr68QOA3cdUpwCVFl1jqDiPbHpt3Kpal+sc1+Rgw8ZE95TymctVcfL
+	2hd5xC2GT+fAbcSl7NaSlU7zipvlaskuRpHb/QmD5vIheLmC2Hpwf7Ngk1z8t0NnpI3dvvlbX2z
+	4lJC2oXy4NkCwqCSRHebetafvDRdI+gJEvVzh06btOnrvxn/3OzihjkrYzQl7iWQGqrv6x8KXHL
+	5vA7RCJvHcB3UDvWNIH/Ic1nuxhhr6IwYjGEqAxoCZAEfrcNVfktyAlFHvHd5KSPAr7uGjUCsyh
+	Wf/lsJqjkFT35lXEFxAI1BsgsCjM/QW2m7/7HshoqQm8Hx4HbrAaicfWvXbsIKQuTv1fupXE5BS
+	OHTShUE7sFA7x/LYMDNczYSi58e30x5HC4HCAOlZT0nakB5T1H2t9rl7u9qXHFqnPNH2IUNtLVC
+	TQoe53JGoO/fMqhXa9OVrwuKzI1MNsJSqtNZASD6IKwDjCN0Kth9JZwST3ol1uHX0hDnjZW6usg
+	0w/2DmjQwRoc+2pLga2D38LwR19wfNjsgi5kifmXLL7WpisPtAcCm2Y3o9vnBnqfHK78DsyVTWA
+	8h771Zh2dNyiOtlE5fQB4FxZb9Co6OygxYL91qa/7zQcsyRrizvHkbnPfHUxNP1MQLuJSHVHPgy
+	Exgx1lfURl1othiLb8A4jqUC/oS4GZrrUtw7vb7yTDRrLxD0yDkmEkL4vl00Pmpfpa9NAnQ==
+X-Received: by 2002:a05:693c:8042:b0:379:8df3:d2c9 with SMTP id 5a478bee46e88-3856f14ca78mr21362842eec.13.1795657800466;
+        Wed, 25 Nov 2026 17:50:00 -0800 (PST)
+Received: from [192.168.1.142] ([198.8.77.135])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385672ce402sm54208971eec.16.2026.11.25.17.49.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Nov 2026 17:49:59 -0800 (PST)
+Message-ID: <1cf30693-44c6-4761-9900-e36259082e4e@kernel.dk>
+Date: Wed, 25 Nov 2026 18:49:59 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -59,72 +92,52 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 0/8] ext4: Add dma-buf read/write support
-To: Anuj Gupta <anuj20.g@samsung.com>, Christoph Hellwig <hch@lst.de>,
- Pavel Begunkov <asml.silence@gmail.com>,
- Christian Brauner <brauner@kernel.org>
-Cc: Anuj Gupta <anuj1072538@gmail.com>, Nitesh Shetty
- <nj.shetty@samsung.com>, Jens Axboe <axboe@kernel.dk>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- Christian Koenig <christian.koenig@amd.com>,
- Philipp Stanner <phasta@kernel.org>, Dan Williams <djbw@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
- Alexander Viro <viro@zeniv.linux.org.uk>, Theodore Ts'o <tytso@mit.edu>,
- Andreas Dilger <adilger.kernel@dilger.ca>,
- Baokun Li <libaokun@linux.alibaba.com>, Ojaswin Mujoo
- <ojaswin@linux.ibm.com>, Ritesh Harjani <ritesh.list@gmail.com>,
- Zhang Yi <yi.zhang@huawei.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
- <rdunlap@infradead.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- nvdimm@lists.linux.dev, linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, Li Wang <liwang@kylinos.cn>,
- Mengmeng Zhao <zhaomengmeng@kylinos.cn>
-References: <20261113070621.273953-1-mengmeng.zhao@linux.dev>
- <20261120154153.GC28611@lst.de>
- <361c4312-f77b-495f-9ee4-e0b9612b4463@linux.dev>
- <CGME20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d@epcas5p3.samsung.com>
- <20261124084025.2101804-1-anuj20.g@samsung.com>
-From: Mengmeng Zhao <mengmeng.zhao@linux.dev>
-In-Reply-To: <20261124084025.2101804-1-anuj20.g@samsung.com>
+Subject: Re: [v4 0/3] block: delay support for error injection
+To: Haris Iqbal <haris.iqbal@linux.dev>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org
+References: <20261111215838.103356-1-haris.iqbal@linux.dev>
+ <179501806989.17649.3138860274842922761.b4-ty@b4>
+ <20261120164416.GA32719@lst.de>
+ <edb8249a-7bc3-430e-bbb7-243e1881a0b8@linux.dev>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <edb8249a-7bc3-430e-bbb7-243e1881a0b8@linux.dev>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 11/24/26 16:40, Anuj Gupta wrote:
-> On Mon, Nov 23, 2026 at 09:51:41AM +0800, Mengmeng Zhao wrote:
->> Hi Anuj, I'd be happy to help pull our patches together into a single
->> unified series and send it out for review, if you're okay with that—and
->> would appreciate your review once it's posted as well. Please let me know how
->> you'd like to coordinate, or if you have any updates in progress on your
->> side before I put the series together.
+On 11/21/26 4:27 AM, Haris Iqbal wrote:
 > 
-> Hi Mengmeng,
 > 
-> We already have updates in progress on the XFS side.
+> On 11/20/26 17:44, Christoph Hellwig wrote:
+>> On Wed, Nov 18, 2026 at 09:07:49AM -0700, Jens Axboe wrote:
+>>>
+>>> On Wed, 11 Nov 2026 22:58:35 +0100, Md Haris Iqbal wrote:
+>>>> Error injection can only fail a bio today.  This adds a delay_us option so
+>>>> that a rule can hold a bio back first, to model a slow device.  The delay
+>>>> happens above the driver, so it tests the code waiting above the block
+>>>> layer, not the blk-mq timeout handler.
+>>>>
+>>>> A delayed bio is marked with a new BIO_ERROR_INJECTED flag so the rules
+>>>> are not applied to it again, even after a split.  Christoph asked on v2
+>>>> to avoid the flag by allowing a delay only together with an error.  I kept
+>>>> delay-only rules, as a slow device that succeeds is the more useful case,
+>>>> so the flag question is still open.
+>>>>
+>>>> [...]
+>>>
+>>> Applied, thanks!
+>>>
+>>
+>> Hmm.  This still has rela issues as pointed out by Sashiko.  I'd very
+>> much expect a resend to address them.
 > 
-> We will consolidate the combined series along with your ext4 work and
-> related patches, keeping your authorship.
-> 
-> One more thing that we are looking at combining is the ability to share
-> the registration across files. Pavel had mentioned this earlier in our
-> xfs series [1] and posted a series too [2] which needs some more work.
-> 
-> FWIW, we also had ext4 changes, but intentionally started with one
-> filesystem (XFS) so that the common interface could settle first.
-> 
-> [1] https://lore.kernel.org/linux-block/4649a20f-aba9-418e-987f-66f21ab24410@gmail.com/
-> [2] https://lore.kernel.org/linux-block/cover.1793751001.git.asml.silence@gmail.com/
+> I can resend with the fix, or send just the fix to be patched above
+> this, since these are already picked. Let me know whats preferable.
 
-Hi Anuj,
+Send a fix please, that should always be the default as otherwise
+I have to rebase the tree.
 
-Sounds good, that makes sense given the ongoing XFS and shared registration
-updates. Thanks for including our ext4 patches and keeping the authorship.
-Feel free to loop me in once you post the combined series—I'd be happy to
-help review and test it.
-
-I looked at Pavel's patchset as well, and noticed it adds a new f_dma_io_tag
-field to struct file, whereas Christoph and Christian want to avoid bloating
-struct file. Did I miss something, or do you have a different approach in mind
-to avoid adding fields to struct file?
+-- 
+Jens Axboe
