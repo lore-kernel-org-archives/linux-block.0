@@ -1,98 +1,67 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.6.134.125
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=13.77.154.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795664015;
-	b=nBntq7VgHPNtm76FQvZcFE0eCVb+npgSyUuQjyYygjuEuCB4LwwPqK9iVPz5C0srPvAD
-	 mjX2Fro4pkStktFHG/9LwxDCA4VVpo68JfIK3FOBRgNbRxdXoXCfgGIw00CswgzjK0MCP
-	 zLFRawINPmp0Bp1USDiDHy/w6iNwlRBXA0QK7x2bWtU3N7t9pla6iqH8C435+X+n1YJOB
-	 p6/TP5ykYiuKV30+NOCiRhczN+7GXSWPIAIuOYFjL9qdNt0uR8XtNNRycZexbHfUzIgHy
-	 428Pnkntcg8XSoQKQyarCDLY+DEMps6iuzuB9/38azkrjYYMVus6Vi2VTNU3SVzJWBQ==
+	t=1795671285;
+	b=bdzT4CxQvL6n1bKU9ycX76CNTjPABsEK3wWeDd2yfchBx7u5r/VtC6Fo8lGgY/qcvRJL
+	 MzZZYUdz6+O0SgE2FdaaK+d35NCjbsjX0vlcLM99qZrGhMCb8O465sLzWOt3AGV1R+QcJ
+	 6CHEW/WofaGOojaVBnlWBmKhO1MJgBwVEDP44Jhmxx5LMJ9D3zoXufhj8h0da21SPXrDL
+	 tepTTbZZ9xD58WHmdNni9FqndUZ8kq48Odf4cqAzYHHXc5dmkSVDUYYb7mZrqyeyqJruq
+	 T162qHN/xXERdimUlsv+E8HT4Hpviwfiy54lBAeOGDqm9aqQ8LNID1MmJXNE66I64oQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795664015;
-	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
-	 X-Sonic-ID:Received:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=YcM9NeytmDEp3ZHnhl05h0wZi5zVcYRHE8yN3GpV/uk=;
-	b=YqCdEnbj3aIsv9P2ORDKJPDy8lbkNX86RUt0Pq3xHEr+/KGPV40YVdxTir7kMrz3jxSm
-	 F2CXGVyQZ/iPfOIpz48FRqS77S5Bp98fRl0HG4UVUE9h/jQeEEqZNzQ5qSYQ9bhdPuZNi
-	 5DDSnj0UJ0wjcpeMC02TQHPKSfMc59k5tQJSm9RHAGBiBScrVfdap7KT4py8kgHjelhl0
-	 4LG5DuKG8tzg26VhxD7SzXPaKCV9npymOYrNPK/Z0f1o1ssODzOvDKqO4NUKVkA8t83WF
-	 V575oD00+RNVn2KRb5YJaMQVi5L4TioSzNTLXsN6RT7ZpHk8VTDtGORqVWeQDtPm5DA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795671285;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-Spam-Status:X-Spam-Checker-Version;
+	bh=UJ+8MsoQlMt7ippaBHIRpOExH3OMdJs3rL46l0+BjYY=;
+	b=hDU1yjiK3R6BaEF2jEP+6D2Ccj3qtCtbWOxYCAFsIBZZjuDeWuSRUa4Al2uPbDzDvPLP
+	 Btwt4IvkPwn0jJM54cIHWwQ7ESDbxi5KInUDA9L+bZjJrns57J5Wpg2itwANCoUeOKngP
+	 CHtXuO62fpq8lcdiRdOy4YMUtCXIQ9oEoF61EuQtbVPPO/6hCEP8IgAjAknMheQRbYWjl
+	 HxuWpssU/dNxzxWZoTb4PhaLOTg/HpKraPTjEXJnxOSyU7EjdvyQ18qGriRrobxHc0zcQ
+	 BXcX/xnbal/R0nghqucL7m5mz62gzxsKVPG3alp8Ba0g3QzCjuNlbS/UI5avmit2KaQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=yahoo.com;
-	spf=pass smtp.mailfrom=yahoo.com;
-	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=o8rJxBu4;
-	arc=none smtp.remote-ip=74.6.134.125
-Received: from sonic315-15.consmr.mail.bf2.yahoo.com (sonic315-15.consmr.mail.bf2.yahoo.com [74.6.134.125])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0FF606A334
-	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 03:33:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B0FF606A334
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	dmarc=pass header.from=linux.microsoft.com;
+	spf=pass smtp.mailfrom=linux.microsoft.com;
+	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=NsK73AF1;
+	arc=none smtp.remote-ip=13.77.154.182
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3921E606A31E;
+	Thu, 26 Nov 2026 05:34:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3921E606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=o8rJxBu4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1795664014; bh=YcM9NeytmDEp3ZHnhl05h0wZi5zVcYRHE8yN3GpV/uk=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To:Content-Type; b=o8rJxBu4ne1hHkdEfFFiMFwmWQ6R1ylvamcmZW9MQBZlRRdt+SmIgJ3Rp/0pzH3sPruKsyQKVg4LeyhjfxR0dc14XYX1hL/IzojXfg1iUCibMa0RTRPn8y2UGw1YOrME/KOV/ET2+O9EZcj7hyWboCsofxWmSmKk/uWpl2+yj6Q55mLndl985lTe2iUTgK0a2hMJFZS8SDqHohR3iiAuqJKUUMDHzKBWW/djteHwD42Bl5yaMjMMlFumX4Uymb+aEt5RmK5QKU87l62MIWVvgN7PgKH8HP4ltXiMwlUomK8CzAjvj+8KZ4ZEdFXckp6T9uD6itIo3tGB/AVmJDP9SQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1795664014; bh=/2Tlz5ND402ydS4wmF0R/ar/qtdz/i2oGCpEaZnYDZ5=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=Dg6+ljCRiE/2w9KXXZ8Lsivx32O2Xto0K217sQEXMCB929R8gw9YdXhYOf4Pb6HkcZ5AVPdaBKzCivm1gEvqi9IKocJqWVu1diI5CscKaiJmGqklkq1wUz1o4qPdv4vClxfxIyDYin0gU1E0AgPrh5mCSf8O81GGeqwdRl5wORJ8Bhh4Kk9RFVpHzpN6H3vjgYXEH54dODQY1RONiGxDqzbrwI8eYPJd/dukc8SijUfavp31vv/idt0pqeihxaiFSTxqzPK613DVKe+OtdbzSkux7QTQ4MBDc/WwJEw+2IoDUl1Bjhn1rFwhYeKLpG0pziAhXzUimgN9UiE9EKoxpg==
-X-YMail-OSG: CP1AjuIVM1ltWqCiIJXJ_jVj5a0za5zPAFcSWULMECVOwF3fXdsBlPO24_0jDlR
- NiGJdU2.T.sVjVaVnkzx6p.AtKDPsKUO_G2P_kgn2Z994nAr.7bW9i2cF9Sp9T8XmuFG8Fch3DPx
- 2zO8JmAEqpgeQAvmMjMMKjcSq8WBLIw9nVMWucCr_8O8H8k2lxmj6FO6UFY92JNpXecgdh7z5wBS
- R7clQ7FSlKzSwP1EbvoHHvwt1mg1lbDc.nGT480c2enbzsMsXbSQBB56sYOJiVKHPTkuEioflBNG
- KW_7qw1MI8BdLPIkO9jqApxsntjQTNpc8bF.4GCJeDxtX8K__atPk.YNxuxI52H4Q31C5K2VEcww
- 72fQAMi88C18lsb1e6gRj4TsdvJkFqG5rJ1VQVockeLIBe5HZgPKCCUTBTIiDMAzixWbpAbxDYcB
- XxA_Jk6PKR4.6toggNOdATGBacXP0U6zrOfGCbPHONhKmSI3Yug1CPsWgKQi8EtZwaxAZZuCodT6
- ILQzkRkuS42T32iIXmV6QAg1GmarezR_4.bc78luGRuLf67ejEmE0xBbGn4bNJ6TcaAfXpxvrzrx
- rL8vj6dBEhfnRVp92qwyzJ9CsTICt2JV2zWyXp2OHHv9P8o3DbeDihXnv9nuoJrreI94bL8WuZ7d
- 9DxUxrnrv_TpD1AAw4K22mENQJBK7gL6H9gBiS8fPeblpnJxYOt0foGAOm4G4sW_t9sv._Qb7rQU
- nsVH8gGi4jJbSnRDv2J2k_LsHrE4iWgIRRODaZTv7X.F_Qfb5kmKPyeu2fC6k7sWuTOSfcCLDN97
- JfUGY.Zi5w84HqIi_OCmLMKLB8TLuODrD3POMWV07zX44dbW0deE7gdv0MzQLMlDABzu8kSKvcX5
- Ma9G88FX3XUvcG1V0OHKUBp9wOiXUTfpOsxaEcRdr0_svU8kLISG8Lc3thJf6fjdL6LQPIFjritd
- gAoX4ycfhq53ZsYBaLXSgev2WuKh7iQ_YpqArgj_z1aFRI7fG77u8ToVNCyqRqYISB3u0dBFQ4Ja
- uD2tdPPQgGKwf0.PKDUJWMeHXH1M2doKgTQVuCjgNAO4Bzyi0iD_ZO6OZLmP_7i6yT4ZhsdK_t73
- komPcy0TnTR64fg6wLugpGoY3POnElLhB5IFCaA.DaNid5t26noiWm8eWl9sHsL1lsVChyzJtwbq
- bMzP9M6kDg8s3QT6LeTvro_AjsuSAerIGExppMrldUJHwhGa5K1Tuc_9iUcqQ4yFz0DQhtB5jiwR
- EQfsDHExSlLAOwOYc4e1b2f8Pq38afZlhaKUNIKOtoYh1xz3KbQ1.iv2xHLFPpfgx44mezkBhD4a
- pg87NC7_cTt7g1NuEi7jsQ5r1PuEM4Ej6wn_SG213f3gEB5RM0RSEXrxFyZorMArUjrNOi4OyVBY
- _BsEXK5tubGtjhW_zRCvVc.Mj7QcLanSVYWfmj_UKMXQKqY5phQ0pQU5upOxQCh3s1ur_7k3fasq
- sjz62Ky4_2A4kZuQGIUTmdWjJRoFiRMbTiHPYVS3OeIzwK.I7ijRf8lYgSo5_tSG3tk9GcynmRO_
- P76HcX7IiEMWQ_yhf6cgiJtU.uvoS1Og.G8YTFW3.BEkziRvtZg88MM2ICqAx2jVlOhGeewwsTQV
- nMv4aoljAf1216rN819muqIe109Ynl8z3u7QC5tmIvxyBewS0ATp_.OJzwX0MhwFUk8T6XZ1GoBE
- tJHOUZwjTacQnGT.lAQVRo5fnkQ581CHZ6fPdvDvjdYpVDzls8iv8BBS0HFkuTLjO2BFkkbEwcgq
- Gr4IYl8lOJ4mdaohYSIWaV.y60OCccq3RWikLymRGTCV5IBaDhWsmOsR2lzycj5XkTBnncexgcCu
- rIwEG3SmzoYUpsCBgz7VsNhDl3RNkTXXmNDd4nrKCpyhN5vdIARjHElXA4ygLZfIIloIqb4tP8eT
- xU2jRpi_PLNJkncvjzTzCi2z9KQC3xCw4lWgf2zoaSIpgigCjPrZSakerfcH9sow.uX2s07y.ZBY
- QCC2TjVO_HGfD4OCfXZI6AmSsSzUKspWDIlZNdYBsLrXzBC8pv8Qs5O5pCIEB1OLwkT0EWC8ZwNu
- PBuFHiAwPRKCFniup0IRx9zPy_43TagBhDNdFPnZC.dBrVHkWGhkXJggsdmIjLV4Hee_bkqO1srM
- lt_IPPWcmtkMfzxqNnfiEseUa4FZi7cU9fE2NX0xqSwMO8LJQmDeuNGFxkYwFPvVQF9oeB4_FRyg
- M4MiSgvDs5ZheEEydnUG0y5H_YytPyl7jqQonB.bfzH.mMB7KAA--
-X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: 0b7a824f-7bf0-4139-a5b5-2ff63710ff0d
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.bf2.yahoo.com with HTTP; Thu, 26 Nov 2026 03:33:34 +0000
-Received: by hermes--production-bf1-8768df57c-64qn4 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 28e7f0a650024974c67d26ee33943d03;
-          Thu, 26 Nov 2026 03:33:29 +0000 (UTC)
-From: Jeremy Dean Clifton <deaner92@yahoo.com>
-To: syzbot+4507914ec56d21bb39ed@syzkaller.appspotmail.com
-Cc: brauner@kernel.org,
-	clm@fb.com,
-	dsterba@suse.com,
-	jack@suse.cz,
-	josef@toxicpanda.com,
-	viro@zeniv.linux.org.uk,
-	hdanton@sina.com,
+	dkim=pass (1024-bit key, unprotected) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=NsK73AF1
+Received: from CPC-namja-026ON.localdomain (unknown [4.213.232.22])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 4B42420B7166;
+	Wed, 25 Nov 2026 21:34:35 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4B42420B7166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1795671279;
+	bh=UJ+8MsoQlMt7ippaBHIRpOExH3OMdJs3rL46l0+BjYY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NsK73AF1/58D1ommrNJwFydZ1fP6q4zi10VfDT6LGHko+x/GK/EjL+6Z83cVawBi9
+	 rWanWfrNs3ylGDS8BN/WX9mgTXEymSNGibKse2E6DyFzNoc7TFHzIDb3e9Qh3T0RtH
+	 sBNHopDrk+M2KR5asloqhpWjOGdMWOdbCkK9/weM=
+From: Naman Jain <namjain@linux.microsoft.com>
+To: Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: David Hildenbrand <david@kernel.org>,
+	Oscar Salvador <osalvador@suse.de>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Keith Busch <kbusch@kernel.org>,
 	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-cxl@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [block?] [ext4?] [btrfs?] INFO: rcu detected stall in sys_mount (8)
-Date: Thu, 26 Nov 2026 03:33:27 +0000
-Message-ID: <20261126033327.416414-1-deaner92@yahoo.com>
+	linux-fsdevel@vger.kernel.org,
+	stable@vger.kernel.org,
+	namjain@linux.microsoft.com
+Subject: [PATCH] iov_iter: Fix direct I/O across compatible device pgmaps
+Date: Thu, 26 Nov 2026 05:34:33 +0000
+Message-ID: <20261126053433.88531-1-namjain@linux.microsoft.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <68af0313.a70a0220.3cafd4.0020.GAE@google.com>
-References: <68af0313.a70a0220.3cafd4.0020.GAE@google.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,17 +73,118 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-#syz fix: fix the softlockups in attach_recursive_mnt()
+Commit 38446014648c ("block: don't merge different kinds of P2P transfers
+in a single bio") made bio_add_page() reject pages from different
+dev_pagemaps. This was needed for PCI P2PDMA, but also rejected pages
+with compatible DMA mapping requirements.
 
-The original arm64 report (soft lockup in skip_mnt_tree() via
-commit_tree()/attach_recursive_mnt()) is fixed by commit 0ddfb62f5d01
-("fix the softlockups in attach_recursive_mnt()"). Hillf's test of the
-vfs fixes branch on 2025-08-27 already showed the reproducer no longer
-triggers.
+Commit 41c665aae2b5 ("block: relax pgmap check in bio_add_page for
+compatible zone device pages") allows these pages in separate bvecs.
+Commit 13920e4b7b784 ("block: add pgmap check to biovec_phys_mergeable")
+prevents physically contiguous bvecs from different pgmaps from being
+merged into one segment.
 
-I also ran that reproducer on current mainline (7.4-rc4, arm64 QEMU,
-2 vCPUs, KASAN + lockdep), with a debug print timing the mount_lock
-section of attach_recursive_mnt(). The largest attach (32768 copies)
-held mount_lock for 16-19 ms, and no soft lockup or RCU stall
-appeared in 300 s, including after killing the reproducer to tear the
-namespace down.
+But direct I/O now fills a bio using iov_iter_extract_bvecs(), which
+retained the original restriction and bypasses bio_add_page().
+For a non-atomic request handled by a single bio, only the data before
+the pgmap boundary is submitted. The rest is not transferred, and the
+request completes with fewer bytes than requested.
+
+Fix this by moving zone_device_pages_compatible() from blk.h to
+memremap.h and using it in iov_iter_extract_bvecs(). This allows
+compatible pages to be added as separate bvecs without relaxing the
+same-pgmap requirement for PCI P2PDMA.
+
+Fixes: 38446014648c ("block: don't merge different kinds of P2P transfers in a single bio")
+Cc: stable@vger.kernel.org
+Signed-off-by: Naman Jain <namjain@linux.microsoft.com>
+---
+ block/blk.h              | 19 -------------------
+ include/linux/memremap.h | 19 +++++++++++++++++++
+ lib/iov_iter.c           |  3 ++-
+ 3 files changed, 21 insertions(+), 20 deletions(-)
+
+diff --git a/block/blk.h b/block/blk.h
+index 50abfd9328861..460c064f1d1b0 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -142,25 +142,6 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
+ 	return true;
+ }
+ 
+-/*
+- * Check if two pages from potentially different zone device pgmaps can
+- * coexist as separate bvec entries in the same bio.
+- *
+- * The block DMA iterator (blk_dma_map_iter_start) caches the P2PDMA mapping
+- * state from the first segment and applies it to all subsequent segments, so
+- * P2PDMA pages from different pgmaps must not be mixed in the same bio.
+- *
+- * Other zone device types (FS_DAX, GENERIC) use the same dma_map_phys() path
+- * as normal RAM.  PRIVATE and COHERENT pages never appear in bios.
+- */
+-static inline bool zone_device_pages_compatible(const struct page *a,
+-						const struct page *b)
+-{
+-	if (is_pci_p2pdma_page(a) || is_pci_p2pdma_page(b))
+-		return zone_device_pages_have_same_pgmap(a, b);
+-	return true;
+-}
+-
+ static inline bool __bvec_gap_to_prev(const struct queue_limits *lim,
+ 		struct bio_vec *bprv, unsigned int offset)
+ {
+diff --git a/include/linux/memremap.h b/include/linux/memremap.h
+index c8a4979d4c780..a1d447a847990 100644
+--- a/include/linux/memremap.h
++++ b/include/linux/memremap.h
+@@ -202,6 +202,25 @@ static inline bool is_pci_p2pdma_page(const struct page *page)
+ 		folio_is_pci_p2pdma(page_folio(page));
+ }
+ 
++/*
++ * Check if two pages from potentially different zone device pgmaps can
++ * coexist as separate bvec entries in the same bio.
++ *
++ * The block DMA iterator (blk_dma_map_iter_start) caches the P2PDMA mapping
++ * state from the first segment and applies it to all subsequent segments, so
++ * P2PDMA pages from different pgmaps must not be mixed in the same bio.
++ *
++ * Other zone device types (FS_DAX, GENERIC) use the same dma_map_phys() path
++ * as normal RAM.  PRIVATE and COHERENT pages never appear in bios.
++ */
++static inline bool zone_device_pages_compatible(const struct page *a,
++						const struct page *b)
++{
++	if (is_pci_p2pdma_page(a) || is_pci_p2pdma_page(b))
++		return zone_device_pages_have_same_pgmap(a, b);
++	return true;
++}
++
+ static inline bool folio_is_device_coherent(const struct folio *folio)
+ {
+ 	return folio_is_zone_device(folio) &&
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 56c59a2b589d3..a0c76b40a4f90 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -4,6 +4,7 @@
+ #include <linux/fault-inject-usercopy.h>
+ #include <linux/uio.h>
+ #include <linux/pagemap.h>
++#include <linux/memremap.h>
+ #include <linux/highmem.h>
+ #include <linux/slab.h>
+ #include <linux/vmalloc.h>
+@@ -1968,7 +1969,7 @@ ssize_t iov_iter_extract_bvecs(struct iov_iter *iter, struct bio_vec *bv,
+ 		unsigned int nr_to_add;
+ 
+ 		if (*nr_vecs > 0 &&
+-		    !zone_device_pages_have_same_pgmap(bv[*nr_vecs - 1].bv_page,
++		    !zone_device_pages_compatible(bv[*nr_vecs - 1].bv_page,
+ 				pages[i]))
+ 			break;
+ 
+-- 
+2.43.0
+
