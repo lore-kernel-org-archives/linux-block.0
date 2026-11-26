@@ -1,81 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.202.193.197
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795712158;
-	b=N9mkl0X6bSulddt6QERaod68M0FPGOcvsJ5PHBWWzF2MXA3dEKBmyhpYMFlK9uQPvMK4
-	 uf3e/X94May1KWjQ9jh8X4arYfW5qG8zfaw9RJm81sH3vpE+SziGf1rILhw5SKDMYWeUA
-	 dVUqHlTAmlbSJMGLm+FshC5C860AodfaFcMzCpQp2/WuvSNqHlxUqUay3eCKrxZWyDBv9
-	 dYf1FGBAu4TNVVur13FMqfpwJOPp2kP0R4naFTWVhuIsoUA2PCq3VSWlaUhIejqg6LiNz
-	 Itusn8Gij2U7rU7XsyYARATI2AvJ0e629fIGkYWzPCnhaJeMtLjNfT7bYUkWffIn1mg==
+	t=1795724656;
+	b=MgB2uV8iIA7CcB6WUoMfDvxnzHnRt/ELVid99ebIg41BkQ2CX+ak68/TTRGerWbEtn3H
+	 CgMk2aqxqDPD9tIYuCzKlykk69uyOv1vQS4iGv+UNUHAruGGZ5uVhj7WSBEQKmIiKTOuY
+	 ByfBb0378qCDJT7YZdLZHjimVF1uIw5XIXTuEkoAiTML/Ktv9Iij6k1P+dXZZnmYW4Q6x
+	 Vb+neT+KTY/IBNgflhHcQBCEp9NbOTfYqgkpxhpbbndirssusIj/3+OUbkP0zzlPv0zsi
+	 C4NMbQqF3WqvxA+GVX1Xxgby+5Q7kJwgIFWIpF4Hm7EEXhrRyUYR3Ru9xdScxZ4UJEQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795712158;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=7UMJ5fq59vACu6YIC6Tb/A5NemhqR9H7sJxjwk062+A=;
-	b=ImQwNw0cyIzNqdIIafl96dkwx746Z02FQi5H64MpdbFPuuZx3EfVOxN8KsrPqhfHtSA4
-	 NEPeDqNn2yjxVCxENhZbN+M7qTB5tGOdsFsRmFz4B313x7UW8r8MKDW0y1et1ZDce0tMM
-	 yo2eytR1DK3x9l5FzqmvrPvdACgSMpPeyv7m+ydnzwxkBKsQybmh5t0p9UdFCMaZIit7y
-	 a89OvSSEPkfxS9dGq9tg/4+/5ImsFlEjpZhs40A5gsFsfsqVF+SDpArbs4yj+1XuiEgVg
-	 NjA5j1TWCc8wsCJXyVi9xfhI34k671fQOZpIDaj1FYFjvSrjFQ1YSbo9xc8gIElk4Dg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795724656;
+	h=DMARC-Filter:DKIM-Signature:DKIM-Signature:Feedback-ID:
+	 X-Pm-Original-To:Received:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=qlDtvByb+h+v2PeUfKsYekOy95yt8JgKZ2ji6G3aweE=;
+	b=AajjOZyCGhn193Qp0U7qYib2Yf5dGMcSSQ2PPxjFfURgaA0H0jJSqkot5HC7pyJK/3I6
+	 vRE4gXOpfWD8+ErjhW9JDsWw2viFLHCGN/X0eOBHq4qJYFhLtsIKB3BvjRO0ctSpRJJFS
+	 ToceN+pomj91kqXzA0hb22ugsRpuwYkJldtaH8W+ZPv6BeOrKKT3taI8eValzwlragULi
+	 ziiIQoFTr676o1QFmrVh8BpcjdCYqvF4h0svchw3lHu5cuUA93w3Dum9g84pVM2aHMas9
+	 c9ldSIBsOeH2XuYFjko0Z++TEBkxnvTnbDjhgZSRhrcDyKuba65PpeXybrO946PjhDQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b="QC2DL/P2";
-	arc=none smtp.remote-ip=192.198.163.13
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=atomlin.com;
+	spf=pass smtp.mailfrom=atomlin.com;
+	dkim=pass header.d=atomlin.com header.i=@atomlin.com header.a=rsa-sha256 header.s=purelymail3 header.b=akTKKui8;
+	dkim=pass header.d=purelymail.com header.i=@purelymail.com header.a=rsa-sha256 header.s=purelymail3 header.b=nRatYBdr;
+	arc=none smtp.remote-ip=34.202.193.197
+Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F46606A321;
-	Thu, 26 Nov 2026 16:55:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96F46606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA82606A31C
+	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 20:24:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1FA82606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=QC2DL/P2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795712158; x=1827248158;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=37k69uxyRJzVO9uddzYhhEnx5L7zKQsrBkRXxwOZKbw=;
-  b=QC2DL/P2hcdzxwbJJSTnCrQ03QDs5lPS9vX2Gj93TZRGEpzZIkbJqwnn
-   aR/2es/ne9Dc80ggm+Q6ZH8XMj+3AYfb/E+jl7nkbc/er4nMsdNa8zUCN
-   lqaUvN507Y7HiY8lC8LZuz2xl4jGfTyPq9VbzSV2XHypJ2TXYfXeJJgOH
-   HLR/GljUVUIO1Cr2CbjywVMkIAMRa0gbM7no0JFhnplKP6MXFIK19GrBz
-   LNtgO9r2QKVoV4Fc0dZXlSebPsZFy5IyTmo9UOdw2WfN6b8UWD+98SpnG
-   ix7evuDS3ZqGBO+GAngK5wzkqLJdmmGv+MzMGJi+mlKHhMAYjdTy3ZaNx
-   w==;
-X-CSE-ConnectionGUID: acTgpQUSQfyXlxGOdRiHvA==
-X-CSE-MsgGUID: 1rOZXWRaRcCv6J8ZaNq3yg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11978"; a="4596261"
-X-IronPort-AV: E=Sophos;i="6.27,235,1787036400"; 
-   d="scan'208";a="4596261"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2026 08:55:57 -0800
-X-CSE-ConnectionGUID: p+r39IeoTeS/5WhFAxkNHQ==
-X-CSE-MsgGUID: 5FAT+iOpSeq7ciSi986WGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,235,1787036400"; 
-   d="scan'208";a="12536476"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 26 Nov 2026 08:55:56 -0800
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xWclE-00000001UVe-2lJt;
-	Thu, 26 Nov 2026 16:55:52 +0000
-Date: Fri, 27 Nov 2026 00:55:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yingjie Wang <x-professor@outlook.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dlemoal@kernel.org" <dlemoal@kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] null_blk: reject device size overflow
-Message-ID: <20261127004636.Zw6bu9Dk-lkp@intel.com>
-References: <20261126074748.1076774-2-x-professor@outlook.com>
+	dkim=pass (2048-bit key, unprotected) header.d=atomlin.com header.i=@atomlin.com header.a=rsa-sha256 header.s=purelymail3 header.b=akTKKui8;
+	dkim=pass (2048-bit key, unprotected) header.d=purelymail.com header.i=@purelymail.com header.a=rsa-sha256 header.s=purelymail3 header.b=nRatYBdr
+DKIM-Signature: a=rsa-sha256; b=akTKKui8+8+YY3cMWxcBXhzvhVE4ZB8bVH6aX+GRCrz84HHLVcU+pJQw3tmZd7k+vxMhzKILHtv6ET8wuSt/eyRgUATDGTXyz498d8fm+9xfvcrG4uQNBS9U3ALVpt46QWqIt8rluVbcRNR1Hdfn+H3rHrAizV3qwblMMdeyjE+GOt/NBb0DC0wz3aTo7iARc0mSEn85H3LrJv4LjQe6X/CmxGikGbqUmN4uBPFa9zIFHXZyuD+lhKyK5BE9WumjxU2oq3Atdn+VloR2I5pyQ/cGlAfjJ+sIEzhVFw9+nsEKaQAeISPlGShPdJS0vVTxwVrw36rqU6UUIgZSSF3Izw==; s=purelymail3; d=atomlin.com; v=1; bh=fVY6CisFDNCM3VjlaM/7t4uq5vP89xYRwO7bUsN7UJY=; h=Received:Date:From:To:Subject:Message-ID;
+DKIM-Signature: a=rsa-sha256; b=nRatYBdrQcz28rFzoW0PRZLJwUHBoOJvTbN6DcBo3H2PpXUR5j5QgHR+LqRjUf6hccupScUOkdFHMQ7cm556LMUjDKeGlK1AT5qFnLHNlxSNRO/psnc8JKukYyjPGHSgU9In1DqTO2CdTB+7PmvV/zrUhfGKCGCqYR4D9kWlraMB2qnwhrugxsv9LM+V8I5R0pcPWUOz8/4Wq/P68iT9cAKS/WxfvevfbLoszKG7Z0hvfKlPn4Y0hfqaRhs3SeihrWtUnl6FDHSM56s0YjlYGxvHYquidoN8kBEMsFJX1EvOnbS1Quksfh+x6R+CLiTpTAWzsxlmpofV4GW1/izupA==; s=purelymail3; d=purelymail.com; v=1; bh=fVY6CisFDNCM3VjlaM/7t4uq5vP89xYRwO7bUsN7UJY=; h=Feedback-ID:Received:Date:From:To:Subject:Message-ID;
+Feedback-ID: 1802931:67223:null:purelymail
+X-Pm-Original-To: linux-block@vger.kernel.org
+Authentication-Results: purelymail.com; auth=pass
+Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 1058859251;
+          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+          Thu, 26 Nov 2026 20:23:32 +0000 (UTC)
+Date: Thu, 26 Nov 2026 15:23:31 -0500
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
+Cc: axboe@kernel.dk, bigeasy@linutronix.de, corbet@lwn.net, 
+	frederic@kernel.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org, marco.crivellari@suse.com, 
+	mingo@redhat.com, mkp@kernel.org, neelx@suse.com, peterz@infradead.org, 
+	tglx@kernel.org, vincent.guittot@linaro.org
+Subject: Re: [PATCH v16 0/9] blk: honor isolcpus configuration
+Message-ID: <rfppj6h3dfwsyvstju6k62cigzicdhoqy7j6yo7fnne7tcy3no@fvjpn5glg73m>
+References: <ul7xqsblqnrzx67s7urmtc34qpemuf3jeduxmsuwxwlnky7eli@mzdpwwgug3hg>
+ <20261005152449.468696-1-ionut.nechita@windriver.com>
+ <20261006135749.348637-1-ionut.nechita@windriver.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -85,89 +65,184 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261126074748.1076774-2-x-professor@outlook.com>
+In-Reply-To: <20261006135749.348637-1-ionut.nechita@windriver.com>
 
-Hi Yingjie,
+On Tue, Oct 06, 2026 at 04:57:44PM +0300, Ionut Nechita (Wind River) wrote:
+> Hi Aaron,
+> 
+> Follow-up with the controlled data I promised, and a correction. I was
+> wrong to point at your series in my first mail. After a clean A/B the
+> control-plane stall is a shared blk-mq queue-contention problem on a
+> shared disk, reproducible on *plain* managed_irq. Your series does not
+> introduce it -- but it does remove the per-CPU-queue separation that
+> otherwise keeps it from happening, so I think there is still a real
+> I/O-QoS question for you. Details below, each claim backed by a debugfs
+> capture.
 
-kernel test robot noticed the following build warnings:
+Hi Ionut,
 
-[auto build test WARNING on 5a29cfaf51105039d156dd8a61d2783e8b653667]
+First of all, please accept my sincere apologies for the delay in getting
+back to you.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yingjie-Wang/null_blk-reject-device-size-overflow/20261126-074752
-base:   5a29cfaf51105039d156dd8a61d2783e8b653667
-patch link:    https://lore.kernel.org/r/20261126074748.1076774-2-x-professor%40outlook.com
-patch subject: [PATCH v2 1/3] null_blk: reject device size overflow
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20261127/20261127004636.Zw6bu9Dk-lkp@intel.com/config)
-compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project fb29ca8163c3309160711e5a14eb46bc6d4fdad2)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261127/20261127004636.Zw6bu9Dk-lkp@intel.com/reproduce)
+Thank you for following up with such a thorough, well-instrumented A/B
+comparison and for taking the time to trace the per-hctx behaviour down to
+the exact queue mappings.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/20261127004636.Zw6bu9Dk-lkp@intel.com/
+> 
+> Setup
+> -----
+>   Kernel:   6.18.15-rt (PREEMPT_RT), v16 applied
+>   CPU:      2x Intel Xeon Gold 6338N, 128 CPUs, 2 NUMA nodes
+>             112 isolated, 16 housekeeping (8 carrying managed IRQs)
+>   Storage:  Dell PERC / MegaRAID (megaraid_sas) fronting a SATA SSD
+>             (Samsung PM893), passthrough. etcd and the fio target share
+>             the SAME physical disk (sda4 / cgts-vg).
+>   Workload: one fio pod, libaio iodepth=256 numjobs=4 direct=1,
+>             SCHED_OTHER (NOT RT -- RT is not required to reproduce),
+>             pinned to one isolated CPU (CPU 2) via the StarlingX
+>             isolcpus device-plugin label (verified with ps -eLo psr).
+>   Method:   per-hctx in-flight snapshot from
+>             /sys/kernel/debug/block/sda/hctx*/busy during the run,
+>             cross-referenced with each queue's mq/*/cpu_list and with
+>             etcd's CPU set (ps psr).
+> 
+> The decisive observable is not "etcd alive/dead" but which single
+> blk-mq queue the isolated pod's I/O lands on, and whether one of etcd's
+> CPUs is mapped to that same queue.
+> 
+> The clean A/B (identical kernel = plain managed_irq, identical fio 4k
+> randread, identical nr_requests=5089, fio always on isolated CPU 2;
+> only the device's blk-mq queue count differs)
+> ----------------------------------------------------------------------
+> 
+>   (B) default MSI-X -> 120 blk-mq queues, ~1 CPU per queue
+>       All ~35 in-flight land on hctx61, a queue mapped to the isolated
+>       submitter and NOT used by any etcd CPU.
+>       -> no collision. etcd healthy. Device load ~82k IOPS 4k,
+>          sda aqu-sz ~1020, r_await ~12.3 ms.
+> 
+>   (C) megaraid_sas.msix_vectors=16 -> 15 blk-mq queues, ~8 CPUs each
+>       All ~33 in-flight land on hctx7, mapped to CPUs {0,4,64,68}.
+>       etcd runs on CPU0 and CPU68 -> same queue.
+>       -> collision. etcd apply 2-7 s, "request timed out",
+>          "context deadline exceeded", /registry/health failing.
+>          Control plane down -- on plain managed_irq, WITHOUT your series.
+> 
+> Same kernel, same disk, same fio, same depth; the only thing that
+> changed is whether there were enough hardware queues for the isolated
+> CPU to get one that etcd does not also use. That is the whole bug.
+> 
+> Supporting data point on the strict kernel
+> ------------------------------------------
+> I also have one capture on the managed_irq_strict image (earlier run,
+> so not parameter-matched to B/C: it was a 64 KB read profile, and
+> /sys/block/sda/queue/nr_requests was already capped to 64 -- that cap
+> was my doing, the only way I could keep etcd / kube-apiserver alive
+> enough for the node to stay up and for me to collect the capture at
+> all; the default 5089 took the control plane down hard). It is still
+> informative directionally: with 0006 active, sda is confined to 16
+> blk-mq queues on the HK CPUs, fio on isolated CPU 2 funnels all ~30
+> in-flight onto hctx0 == CPU1, and CPU1 is an etcd CPU -> even with that
+> nr_requests=64 cap in place, etcd apply still blows out to multi-second
+> with context-deadline / health-probe failures. So strict reproduces the
+> same collision by construction, and the nr_requests knob only partially
+> masks it there.
+> 
+> Conclusion
+> ----------
+> The failure is not strict-vs-non-strict. It is whether the isolated
+> pod's submission queue coincides with a queue an etcd CPU also uses:
+> 
+>   - On a device with enough hardware queues, plain managed_irq gives
+>     the isolated CPU its own blk-mq queue, disjoint from etcd's, and
+>     the heavy pod I/O does not head-of-line-block etcd (B).
+>   - Shrink the queue count until CPUs must share a queue -- via a low
+>     MSI-X count (C), or via your 0006 "use HK CPUs only" confinement
+>     (strict) -- and the isolated pod's deep queue lands on a queue etcd
+>     uses, and etcd starves.
+> 
+> So this is pre-existing shared-queue contention on a shared slow disk,
+> not a bug your series introduces. I retract the implication in my
+> previous mail. (It is also device-level, not CPU: during the stall 7 of
+> 8 IRQ-HK cores are idle and the backlog is pure block-layer queueing,
+> aqu-sz ~1020 at ~70% util.)
 
-All warnings (new ones prefixed by >>):
+Your diagnosis makes complete sense, and the A/B comparison between (B) and
+(C) illustrates the mechanics very clearly.
 
->> drivers/block/null_blk/main.c:1896:16: warning: result of comparison of constant 8796093022207 with expression of type 'unsigned long' is always false [-Wtautological-constant-out-of-range-compare]
-    1896 |         if (dev->size > LLONG_MAX / SZ_1M) {
-         |             ~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~
-   1 warning generated.
+It is worth noting why configuration (B) gave isolated CPU 2 its own
+disjoint hardware context (ctx61) in the first place. With 120 queues
+distributed across 128 CPUs under the legacy post-allocation
+"isolcpus=managed_irq" behaviour, group_cpus_evenly() assigned hctx61's
+managed interrupt affinity mask solely to isolated CPUs. Because that
+vector's affinity mask had no intersection with the housekeeping mask, the
+genirq steering logic could not move the interrupt off the isolated core.
+In other words, configuration (B) only avoided sharing a queue with etcd by
+leaving the hardware queue and its completion interrupt on the isolated
+CPU, which is the exact isolation failure this series addresses.
+
+Also, following discussions at the Linux Plumbers Conference, the consensus
+is to drop the separate "managed_irq_strict" flag and instead upgrade
+"isolcpus=managed_irq" directly in place to enforce strict pre-allocation
+queue and interrupt confinement. I will also fold in your pre/post
+reserved vector patch under HK_TYPE_MANAGED_IRQ in the next iteration.
+
+> 
+> Where I think the series is still relevant
+> ------------------------------------------
+> 0006 confines blk-mq to the HK CPUs unconditionally. On a
+> well-provisioned device (B, 120 queues) that is exactly the config that
+> *removes* the per-CPU-queue separation which was keeping isolated bulk
+> I/O off etcd's queues. In other words, strict turns a
+> "only on queue-starved devices" problem into "always, because every
+> isolated submission is forced onto the HK queue set the control plane
+> also lives on." That is a deliberate and correct part of the design --
+> isolated CPUs must not host the queues -- but it makes an I/O-QoS gap
+> unavoidable rather than incidental.
+> 
+> Mitigation
+> ----------
+> Capping /sys/block/sda/queue/nr_requests on this device (megaraid_sas
+> with the SATA SSD exposed transparently / passthrough, e.g. 5089 -> a
+> small value in the 32-64 range -- lower for a slower disk) shortens the
+> head-of-line backlog and helps, but note it is weaker under strict/low-
+> queue configs: when all submissions pile on one etcd-shared queue, even
+> a depth of 32-64 on that single queue still hurts etcd. For production I'd
+> prefer cgroup v2 io.max / io.latency to protect control-plane I/O, or a
+> dedicated device for etcd.
+> 
+> Questions
+> ---------
+>   1. When 0006 forces all isolated-pod block I/O onto the HK queue set,
+>      do you consider protecting co-located latency-critical services
+>      (etcd/kube-apiserver) from that I/O an operator concern
+>      (io.latency/io.weight, dedicated device), or is there a case for
+>      the series to leave a per-CPU submission path / reserved HK queue
+>      so bulk isolated I/O cannot head-of-line-block them?
+
+I view this as an operator and configuration concern. We cannot give
+isolated CPUs their own hardware queues without either routing interrupts
+back to them or using up housekeeping vectors. Reserving a dedicated
+housekeeping queue in blk-mq would also put workload policy into the queue
+mapping code, when the block layer has no way of knowing which I/O is
+latency-sensitive. Since all queues still hit the same underlying disk,
+using cgroup v2 I/O limits (such as io.latency or io.max) or putting etcd
+on a separate drive is the right way to handle this.
+
+>   2. Is there an assumed minimum HK queue count relative to the
+>      aggregate block I/O of isolated pods? 8 IRQ-HK vs 112 isolated on
+>      one shared disk makes the HK queue set trivial to saturate on
+>      depth even while it is CPU-idle.
+
+The kernel assumes no minimum beyond at least one online housekeeping CPU.
+However, when many isolated CPUs fan into a small number of queues on a
+slow shared disk, an unthrottled high-iodepth workload will saturate the
+shared hctx request pool long before the housekeeping CPU is busy, making
+cgroup I/O throttling or storage separation essential.
 
 
-vim +1896 drivers/block/null_blk/main.c
-
-  1893	
-  1894	static int null_validate_conf(struct nullb_device *dev)
-  1895	{
-> 1896		if (dev->size > LLONG_MAX / SZ_1M) {
-  1897			pr_err("Device size is too large\n");
-  1898			return -EINVAL;
-  1899		}
-  1900	
-  1901		if (dev->queue_mode == NULL_Q_RQ) {
-  1902			pr_err("legacy IO path is no longer available\n");
-  1903			return -EINVAL;
-  1904		}
-  1905		if (dev->queue_mode == NULL_Q_BIO) {
-  1906			pr_err("BIO-based IO path is no longer available, using blk-mq instead.\n");
-  1907			dev->queue_mode = NULL_Q_MQ;
-  1908		}
-  1909	
-  1910		if (dev->use_per_node_hctx) {
-  1911			if (dev->submit_queues != nr_online_nodes)
-  1912				dev->submit_queues = nr_online_nodes;
-  1913		} else if (dev->submit_queues > nr_cpu_ids)
-  1914			dev->submit_queues = nr_cpu_ids;
-  1915		else if (dev->submit_queues == 0)
-  1916			dev->submit_queues = 1;
-  1917		dev->prev_submit_queues = dev->submit_queues;
-  1918	
-  1919		if (dev->poll_queues > g_poll_queues)
-  1920			dev->poll_queues = g_poll_queues;
-  1921		dev->prev_poll_queues = dev->poll_queues;
-  1922		dev->irqmode = min_t(unsigned int, dev->irqmode, NULL_IRQ_TIMER);
-  1923	
-  1924		/* Do memory allocation, so set blocking */
-  1925		if (dev->memory_backed)
-  1926			dev->blocking = true;
-  1927		else /* cache is meaningless */
-  1928			dev->cache_size = 0;
-  1929		dev->cache_size = min_t(unsigned long, ULONG_MAX / 1024 / 1024,
-  1930							dev->cache_size);
-  1931		dev->mbps = min_t(unsigned int, 1024 * 40, dev->mbps);
-  1932	
-  1933		if (dev->zoned &&
-  1934		    (!dev->zone_size || !is_power_of_2(dev->zone_size))) {
-  1935			pr_err("zone_size must be power-of-two\n");
-  1936			return -EINVAL;
-  1937		}
-  1938	
-  1939		return 0;
-  1940	}
-  1941	
-
+Kind regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Aaron Tomlin
