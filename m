@@ -1,113 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795693004;
-	b=ulIMP/EQ9421Hy66wRxd2By4my/TYpHlAk7sNqD4SeNFlopOPBZikM61oBiGtUUxp8hT
-	 HcfF5av2pI8ptrugjf9rhYPOpH9IgniOOnNiR+358f0czOyQG63KVvXnua5Ix2dACgHh7
-	 ifOVljEx/Bq+57vJipw+tTwSTpFw0etNKoPmI6zgZeFPmaJvse0tCfaZuyAZrtV171x14
-	 yuQVScQ+3BBWCUpWh9blM5rBUGrfPYmsWU2stulUsNdMbHS7Z/jzHdQ0rMGK7l3JHX1hx
-	 /LGxn7fCti2coLFEJ+t6XPJp7FgGhZq7EYE0rt+72RZ7d+Nnf8eh/2VKRogSTKFyCvg==
+	t=1795695363;
+	b=W0EmjVoW/Lt/NFl17cyxcOi0UJI0nkwJRd5aV2lUOfAb8r80sz+DNxpnXB3OJmQTvm2i
+	 rOmfE4J6KX9EeKSuRwrm+BTuy/6PvI3wvc3nWiOxJ19CDdSEMwU9MPdmCLWuCdadUl64c
+	 sqXRskc9lLdPqSDH19wsG7C5asMs/mbP0jXOfhcGUbA4DssLFwep+g17ONvKfObU98DzH
+	 AXDdMy7r4LqRcGIpM2bEBYjwJVfIblWxQ/75x+JmbmwwvhbHnN2nnLeuvGx5m1zWDHTnG
+	 OWwkbIK0MgjlX8rVSjF+QfU6FlcI4BToDxLGQzDIoejfqQJqxldaKmH63xizD5kWEdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795693004;
-	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To:X-Spamd-Result:X-Spam-Score:
-	 X-Spam-Level:X-Spam-Flag;
-	bh=WXXZdtfXKLM3zYE0qG9EJihyMbjCoUyvjBI3IiYPtjE=;
-	b=YMr6hCRpDqHEZ8BhGp/o8r094VfH0ekrQP2pav3ca/VmmmD/sE/rSs3ILcjmVw54r9UI
-	 xcNE+8YyTpDygEpDWY8C3S/H9EHuqM7I6Ve1POrzFH3iCsuELOZ5uUtybY60bQIHWUtjC
-	 NWTPfCu9hm9eR9AlW+wU/0ruTrgUZiS3gRzJRdOZ1VGTYe6z14YZrQNM5k7fDflL8DiXG
-	 bjViw+NIF47/BExhvPN2MDz9Z9w05MN+aPCJ3ik8lEWf7S+4X5h95jiVPSj4o/lfYaD2Y
-	 3ciUMFNf6yHgsgFpEJHj0ulnjUuA0zVaLUXaLW8ZQlNDXzQOLj3tLraDazxlWJWT13Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795695363;
+	h=DMARC-Filter:Received:Received:Received:Received:Date:From:To:CC:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
+	 X-Originating-IP:X-ClientProxiedBy;
+	bh=vVi+hjHGX0RzAqKFCQt8csRr2KRMwhIJaCDqR21Qs38=;
+	b=yUcueqCqF4ACdD3yhshY4otKC5033ufgrNeTDwBx2b0SO0LyC/QOM3z0d2dThHKmO6rc
+	 O3cKUvYwpcZCPsHtp7vdXQ7EPABSDDOm+b91Ld/eV5w55BvNcRWho9CxURj9iylV0V2mI
+	 GhgPH+XJ/1efqg8gNu5Dz35hTY1vMRcgf8Ey6A+ddzo+6ZTw9O47Ln0vHhpXv2FSc86dC
+	 TU1/FINOuiJZvYzcDt3EVNbwLtGFH/J+mF3HHw8IgFE3SuqlYeA3iNVJ8tBl75gwV7iQJ
+	 kM2WhoUSs8YVhSN/E7uc77DzQPQiCNboAO0OxajFF6O/jHOGWnHehZTaF1la8bivy8w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=suse.cz;
-	spf=pass smtp.mailfrom=suse.cz;
-	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=KrNh25BV;
-	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=lDeIZ5aP;
-	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=KrNh25BV;
-	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=lDeIZ5aP;
-	arc=none smtp.remote-ip=195.135.223.130
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9688B606A323;
-	Thu, 26 Nov 2026 11:36:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9688B606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=KrNh25BV;
-	dkim=pass header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=lDeIZ5aP;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.a=rsa-sha256 header.s=susede2_rsa header.b=KrNh25BV;
-	dkim=neutral header.d=suse.cz header.i=@suse.cz header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=lDeIZ5aP
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D04DF223E5;
-	Thu, 26 Nov 2026 11:36:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1795693001; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WXXZdtfXKLM3zYE0qG9EJihyMbjCoUyvjBI3IiYPtjE=;
-	b=KrNh25BVC2/OYPvpReolTZb5rac9a7ixkcRpJgsakyctIYmY8FB9/Vs095h+ahZbB0GdxN
-	rFq1npRLL4t3h3d5fEtDA3Xfpo2jD7sgVJqHjQX43ndqnx1mbIRElhHjY1JxiwbcvsKWi9
-	NRweTstgQcYPiLdEF9q1+R7OSKvtqRk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1795693001;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WXXZdtfXKLM3zYE0qG9EJihyMbjCoUyvjBI3IiYPtjE=;
-	b=lDeIZ5aPYmEBynilgJWe+CqP5UKEI2XdNd68R402BpY8aHkY1qsA//qpz1mAJV92XKru4O
-	4Zf+JqhJbYPj/uDg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1795693001; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WXXZdtfXKLM3zYE0qG9EJihyMbjCoUyvjBI3IiYPtjE=;
-	b=KrNh25BVC2/OYPvpReolTZb5rac9a7ixkcRpJgsakyctIYmY8FB9/Vs095h+ahZbB0GdxN
-	rFq1npRLL4t3h3d5fEtDA3Xfpo2jD7sgVJqHjQX43ndqnx1mbIRElhHjY1JxiwbcvsKWi9
-	NRweTstgQcYPiLdEF9q1+R7OSKvtqRk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1795693001;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WXXZdtfXKLM3zYE0qG9EJihyMbjCoUyvjBI3IiYPtjE=;
-	b=lDeIZ5aPYmEBynilgJWe+CqP5UKEI2XdNd68R402BpY8aHkY1qsA//qpz1mAJV92XKru4O
-	4Zf+JqhJbYPj/uDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A77BB134C3;
-	Thu, 26 Nov 2026 11:36:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id xH+xIMkZCGspbAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 26 Nov 2026 11:36:41 +0000
-Received: by quack.suse.cz (Postfix, from userid 1000)
-	id 3989A27DED; Thu, 26 Nov 2026 12:36:37 +0100 (CET)
-Date: Thu, 26 Nov 2026 12:36:37 +0100
-From: Jan Kara <jack@suse.cz>
-To: =?utf-8?B?5p2o6L2255SE?= <yangyizhen3198@phytium.com.cn>
-Cc: Christian Brauner <brauner@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/1] block: long udev open waits during cache teardown
-Message-ID: <hvxissqup3n5tti6as2csdducwz6ywju4awgfozdwjimoplmst@shps625lugoq>
-References: <20261117105107.14236-1-yangyizhen3198@phytium.com.cn>
- <20261120-hassliebe-arena-kaufvertrag-3ac58fd0483a@brauner>
- <4effe3b8.6085.1a217879319.Coremail.yangyizhen3198@phytium.com.cn>
+	dmarc=pass header.from=hygon.cn;
+	spf=pass smtp.mailfrom=hygon.cn;
+	arc=none smtp.remote-ip=101.204.27.37
+Received: from spam01.hygon.cn (unknown [101.204.27.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BB5606A326;
+	Thu, 26 Nov 2026 12:15:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 66BB5606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
+Received: from maildlp1.hygon.cn (unknown [127.0.0.1])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jZwVl4CwLzVcB6;
+	Thu, 26 Nov 2026 20:15:43 +0800 (CST)
+Received: from maildlp1.hygon.cn (unknown [172.23.18.60])
+	by spam01.hygon.cn (Postfix) with ESMTP id 4jZwVh6m9YzVcB6;
+	Thu, 26 Nov 2026 20:15:40 +0800 (CST)
+Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
+	by maildlp1.hygon.cn (Postfix) with ESMTPS id 952E9DC23;
+	Thu, 26 Nov 2026 20:15:33 +0800 (CST)
+Received: from hsj-2U-Workstation (172.19.24.226) by cncheex04.Hygon.cn
+ (172.23.18.114) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 26 Nov
+ 2026 20:15:39 +0800
+Date: Thu, 26 Nov 2026 20:15:37 +0800
+From: Huang Shijie <huangsj@hygon.cn>
+To: Andreas Gruenbacher <agruenba@redhat.com>
+CC: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
+	<hch@infradead.org>, <mic@digikod.net>, <axboe@kernel.dk>,
+	<gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
+	<serge@hallyn.com>, <legion@kernel.org>, <aleksa@amutable.com>,
+	<libaokun@linux.alibaba.com>, <ebiggers@kernel.org>, <djwong@kernel.org>,
+	<sandeen@redhat.com>, <zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>,
+	<yingzhiwei@hygon.cn>, <wujianyong@hygon.cn>, <shijie8@gmail.com>,
+	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
+	<linux-security-module@vger.kernel.org>
+Subject: Re: [PATCH v4 00/11] vfs: add inode iteration methods
+Message-ID: <awgi6a0Hayug7RJH@hsj-2U-Workstation>
+References: <20261125091157.1822521-1-huangsj@hygon.cn>
+ <CAHc6FU4h-FRvLkO_0ouTey9MbX=n61t3abt4hPNFOthsRGG9mQ@mail.gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -117,94 +67,153 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4effe3b8.6085.1a217879319.Coremail.yangyizhen3198@phytium.com.cn>
-X-Spamd-Result: default: False [-12.80 / 50.00];
-	SUSE_INTERNAL_BYPASS(-9.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Score: -12.80
-X-Spam-Level: 
-X-Spam-Flag: NO
+In-Reply-To: <CAHc6FU4h-FRvLkO_0ouTey9MbX=n61t3abt4hPNFOthsRGG9mQ@mail.gmail.com>
+X-ClientProxiedBy: cncheex05.Hygon.cn (172.23.18.115) To cncheex04.Hygon.cn
+ (172.23.18.114)
 
-On Thu 26-11-26 19:04:50, 杨轶甄 wrote:
-> Hi Christian,
+在 Wed, Nov 25, 2026 at 11:25:12PM +0100，Andreas Gruenbacher 写道：
+> Huang,
 > 
-> > If that still reproduces on mainline it's a question
-> > about the bdev release locking.
+> I have some thoughts ...
 > 
-> I reproduced the long udev open wait on upstream Linux v6.6 and on
-> Linux v7.0.14. On both kernels, udev blocked while trying to open the
-> device as mkfs.ntfs was closing it after a full format.
+> On Wed, 25 Nov 2026 at 10:18, Huang Shijie <huangsj@hygon.cn> wrote:
+> > This series adds a superblock inode iterator and converts the open-coded
+> > sb->s_inodes walks in the VFS to it.  The design follows the cursor-based
+> > construct proposed by Christian Brauner:
+> >
+> >   https://lore.kernel.org/all/20261120-mitverantwortlich-drehbaren-kantholz-241300d20168@brauner/
+> >
+> > and is the same direction as Dave Chinner's patch set:
+> >
+> >   "vfs: improving inode cache iteration scalability"
+> >   https://lore.kernel.org/all/20241002014017.3801899-1-david@fromorbit.com/
+> >
+> > The caller owns the iterator state and drives the walk itself:
+> >
+> >   CLASS(sb_inode_iter, iter)(sb, eligible, priv, flags);
+> >   while ((inode = sb_inode_iter_next(&iter)))
+> >           /* do stuff */;
 > 
-> Thanks for pointing out the impact on other openers. I agree that a
-> udev probe closing its own file could trigger writeback and evict
-> cache that another opener is still using. I'll drop the __fput()
-> proposal.
+> The pattern should be:
 > 
-> I'd like to understand the locking requirements in the block device
-> last-close path. In particular, why does kill_bdev() need to complete
-> while open_mutex is held? What state and ordering requirements does
-> the lock protect during this cleanup?
-
-The page cache cleanup in kill_bdev() needs to complete before we allow new
-openers to open the device and open_mutex serializes that. If the cleanup
-would race, we could destroy data the new opener has written to the page
-cache of the device. 
-
-> I'm asking because the device mapping can still contain a large
-> amount of clean page cache after the early sync. In my tests on the
-> vendor 6.6 kernel, about 805 GiB remained at final teardown, and
-> the truncate took roughly seven minutes while udev was waiting.
-> Could the release path be changed to reduce the time open_mutex is
-> held while preserving those requirements?
-
-Perhaps. We currently do:
-
-        if (atomic_read(&bdev->bd_openers) == 1)
-                sync_blockdev(bdev);
-
-in bdev_release(). We could enhance it to:
-
-        if (atomic_read(&bdev->bd_openers) == 1) {
-                sync_blockdev(bdev);
-		/* Still the only opener after the writeback? */
-        	if (atomic_read(&bdev->bd_openers) == 1)
-			invalidate_mapping_pages(bdev->bd_mapping, 0, -1);
-	}
-
-This is safe to run without open_mutex and should get rid of 99.9% of pages
-before we take open_mutex and do a reliable cleanup. Feel free to submit a
-patch with this change describing your motivation.
-
-> > And mkfs can just fsync() and POSIX_FADV_DONTNEED the device itself
-> > before it closes it.
+>   for (CLASS(...); ...; ...) {
+>       /* ... */
+>       if (/* end iteration early */)
+>           break;
+>       /* ... */
+>   }
 > 
-> I've submitted a patch to the ntfs-3g project that calls fsync()
-> and then posix_fadvise(..., POSIX_FADV_DONTNEED) in userspace
-> before closing the device.
+> so that the iterator goes out of scope immediately when the loop ends.
+> Hide the details of the loop header in a macro and that this becomes:
+> 
+>   for_each_inode(inode, sb) {
 
-Good.
+The fs/jffs2/build.c has used this for_each_inode.
+Maybe change to for_each_sb_inode?
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>       /* inode is referenced and unlocked here */
+>   }
+> 
+> Use that to convert the simple cases.
+> 
+> And then we've got preconditions that are checked while the inode is
+> locked. Those can probably go in an expression:
+> 
+>   for_each_inode(inode, sb, expression) {
+We still need add flags here.
+
+In evict_inodes() and hook_sb_delete(), only the expression is not enough.
+
+How about add a raw code like this:
+
+    for_each_inode_raw(inode, sb, expression, flags) {
+    }
+
+And add a macro for_each_inode:
+  #define for_each_inode(inode, sb, expression)	 for_each_inode_raw(inode, sb, expression, 0)
+
+Most of the cases, we can use the for_each_inode.
+
+But in the evict_inodes() and hook_sb_delete() we can use the for_each_inode_raw. 
+
+
+>       /* expression was true */
+>       /* inode is referenced and unlocked here */
+>   }
+> 
+> This unfortunately cannot be implemented on top of the
+> sb_inode_iter_next() pattern, at least not in a reasonable way, so we
+> actually shouldn't use that pattern.
+> 
+> The locked iterator would look like this:
+> 
+>   for_each_inode_locked(inode, sb) {
+	
+I tried this way today.
+
+The macro for_each_inode_locked is complicated.	
+When I tried to add more hooks to super_operations to implement the
+procfs issue, the for_each_inode_locked becomes more complicated.
+
+BTW: the procfs issue see the link:
+  https://lore.kernel.org/all/20260920072811.2064247-1-huangsj@hygon.cn/
+
+>       /* inode is locked here */
+>   }
+> 
+> This doesn't cover all existing cases, but that's okay. Don't force
+> things into this pattern that are not a match.
+> 
+> We can always extend things further if it makes sense.
+> 
+> > The lock does not span iterations.  sb_inode_iter_next() takes
+> > sb->s_inode_list_lock, takes a reference on the next inode, drops the lock
+> > again and hands the inode out; the reference is what keeps the cursor on
+> > sb->s_inodes so that the next call can resume from it.  As the iterator
+> > is a cleanup class, a caller that breaks out early does not have to call
+> > sb_inode_iter_end() explicitly.
+> >
+> > Two optional channels let a caller keep its own state instead of filling in
+> > a shared context:
+> >
+> >   - iter->eligible is called with inode->i_lock held, so that a caller can
+> >     reject an inode before a reference is paid for.
+> >
+> >   - iter->status carries an error out of the walk.  Setting it to a
+> >     negative value makes sb_inode_iter_next() return NULL.
+> 
+> Nobody needs that. Just break out of the loop.
+> 
+> > Most callers just want a referenced inode and use no flags at all.  Three
+> > flags cover the walks that need something else:
+> >
+> >   - %INO_ITER_F_REFERENCED restricts the walk to inodes that still have a
+> >     reference, preserving the "only handle referenced inodes" rule of
+> >     landlock's sb-delete walk.
+> >
+> >   - %INO_ITER_F_NOREF hands out only inodes whose reference count has
+> >     already reached zero, and %INO_ITER_F_NOIGET suppresses the reference.
+> >     Neither keeps the inode alive, so the caller has to make the inode
+> >     unclaimable itself.
+> 
+> No flags.
+If we do not add flags, we cannot convert the evict_inodes() and hook_sb_delete().
+
+We'd better convert evict_inodes/hook_sb_delete this time, and then
+we can add more hooks to super_operations{}, such as sb_add_inode/sb_del_inode/sb_iter_inode.
+With these hooks in super_operations, we can add more optimization code for different FSs.
+For example:
+  
+  "vfs: improving inode cache iteration scalability"
+  https://lore.kernel.org/all/20241002014017.3801899-1-david@fromorbit.com/
+  
+  and 
+  https://lore.kernel.org/all/20260920072811.2064247-1-huangsj@hygon.cn/
+
+
+Thanks
+Huang Shijie
+
