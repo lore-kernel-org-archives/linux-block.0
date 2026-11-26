@@ -1,65 +1,142 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.159
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795671763;
-	b=ufQ4RzmUISddFEPi+9g7anakvJpj63+24qMZNKJpG5QAbj4HOP8UbvT5Ei+QNZiZMwQc
-	 Ogc2CSAi/n6OIyW/ZnBqr+GkD/ePlucg+H5p26AAxcvm/r+4GhMKlIEGp5x8IVvaHgwRI
-	 4kKT7dHwFLletdcztDl2mwoXMCa6PW3Neb04ni92tWfV9tdHGniGGqOERZE3k/TPzj2vW
-	 l5Nk0c/JtqCi1Bi6MhTzURapDnIs3ZYHJOD5C7EvHbTM8u+gaV8rO/9o3PmAmBOYnHRME
-	 jWHXIpTCY4/iGbfIlWnjosS67ZPV9dqWAQGiOMidIwFcLx2qdbjOSt5lZmDu1xx7sMQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795671763;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=KDqQNEtQd+6jLTv721CtUFemKZb8effCJHvw+bLNXTQ=;
-	b=qPSomNyTwFrn/ZMAHn32HvaaEnm0a98LtnCUvSHXqQA8nuxQ/G7w4/h1KZmdF5niAwq3
-	 c1PyHYLvMbi0/2sX7vFOa/WURgcc66514j9EwP7fljrehSVq9cLGg/i+4zChc8TftI0E7
-	 wp3JCFTb12KUqGKDGeSh8oLlxgFFnzWeYoRRaPgHkfkUkGz3ucEaFyqPDcs3UyIl8kPI0
-	 s+6mC1g4wR3Cajv1S8w8I0+Qg6sebdjER+ubwAfCv2mocKRnJRACITU9O4X96Li1+mcAY
-	 bj2lcLNEG9y6p+zD07+QqDjdgBEZWT/Nn3Zk6xwvjBcIJw8d79V1fxLYbuXT7iyweeA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=eNU4T4YD;
-	arc=none smtp.remote-ip=95.215.58.159
-Received: from mta1.migadu.com (out-159.mta1.migadu.com [95.215.58.159])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.103.2.23
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795674852;
+	b=AHrhyrGZBHFDiWPK9Umg9WFayvOzu0svsad8Cv0uGhWscn6wEm8MAHFOsPVhxSgNHVD5
+	 WkBHZCNAg3LveVz27RLlMosFEQthkHz6BbNnQZB2Z2evKfZFx4eSAGZ4JiZgYgw2qI/v4
+	 zQFISAti52e4lRhLKedljo/vPuy/eIFBrkgMbn64CLAMBUVPS/XPdnLDK1ySk2NSNJWor
+	 WPL6TEdoVPx/IWLVsMbNsw9rx5jRL3/G9P+frzCf/nk1sS4gy5NKovPTJdElYrkYX4h4h
+	 ruVK6v9NJ2He97wyRVBrGiQM/iFRdcR1QlrsepJwKZKjP2x7pLrMwIBNFTlOAUscJKQ==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795674852;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:CC:Subject:
+	 Thread-Topic:Thread-Index:Date:Message-ID:Accept-Language:
+	 Content-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:
+	 x-ms-publictraffictype:x-ms-traffictypediagnostic:
+	 x-ms-office365-filtering-correlation-id:x-microsoft-antispam:
+	 x-microsoft-antispam-message-info:
+	 x-ms-exchange-antispam-messagedata-chunkcount:
+	 x-ms-exchange-antispam-messagedata-0:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-AuthAs:X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-originalarrivaltime:
+	 X-MS-Exchange-CrossTenant-fromentityheader:
+	 X-MS-Exchange-CrossTenant-id:
+	 X-MS-Exchange-CrossTenant-rms-persistedconsumerorg:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=RcFIhebJuYsPlu8jCOTHpyE4kMtQkvgusNtZfNQwVxQ=;
+	b=l4io3aaj3iZyOPtLr8j1I5P4kicy1PSliHUjGxCdimEylll1m7qLjNppIur5DRuqMTLQ
+	 r3xGdqXtiscCdxVjJN5703CpU02/IaY8VV6dEYtDSFdRnkqUi15rA1pygYKte2FvtRfOC
+	 O3iTe/z4XyFA9Wn7oxalxnvzecea9bDY77mCknTWkIf2CpATHPKC8zmAL0M3UELRt5MPa
+	 Cmby01SybnQNtUba2zZ5VRbal6yxTJRcxMYxSl0lMM8NKm4eMnH76y0M3UB+k/zhHt8Jl
+	 3aJ34b++qDOqiNb26R1d13VSC756TY9bM/yZs+zAnN44TTTCoSWdtL42q0QNvTmQ2ow==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=outlook.com;
+	spf=pass smtp.mailfrom=outlook.com;
+	dkim=pass header.d=outlook.com header.i=@outlook.com header.a=rsa-sha256 header.s=selector1 header.b=Qe9jUQcM;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.103.2.23
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazolkn19010023.outbound.protection.outlook.com [52.103.2.23])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B7E606A31C
-	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 05:42:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A0B7E606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C5C606A31E;
+	Thu, 26 Nov 2026 06:34:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F1C5C606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=eNU4T4YD
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=T/D/ipZeoT1JY+2pYK8EBjpZvR47x2HelHbDUPah5nQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795671760; v=1; x=1796276560;
- b=eNU4T4YDa+uzIViBA/92ub72RdYtnCpJ/UinaRX696eF6S260xWb6PBsaAvDpABjwMtblIp9
- ZN70vbUMB6Tq0jZhexwL0DJ8Dk4UXqulR86uXX8wBnMXJ2UFLOEs5N6FsAd22W9g8Wq5tV8gtmM
- rSdXHJUcHeTT5eoVAPyN2TyU=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id d6142d2087cb271f;
-	Thu, 26 Nov 2026 05:42:40 +0000
-X-Mizu-Trace-ID: d6142d2087cb271f
-X-Migadu-Flow: FLOW_OUT
-From: Tao Cui <cui.tao@linux.dev>
-To: Bart Van Assche <bvanassche@acm.org>,
-	axboe@kernel.dk,
-	hch@lst.de,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: cuitao@kylinos.cn,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cui.tao@linux.dev,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH v8] loop: defer the queue limits clear to a workqueue
-Date: Thu, 26 Nov 2026 13:42:23 +0800
-Message-ID: <20261126054223.176824-1-cui.tao@linux.dev>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key, unprotected) header.d=outlook.com header.i=@outlook.com header.a=rsa-sha256 header.s=selector1 header.b=Qe9jUQcM
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OeUPcJiEbREnBM5wmcrHb8tRTTgWQK/xLEMOha0tcrMUBeO9SDNe4cdC5KkafdorviWjkPGvaQ41Y9kR9HbAWmH9MT7x0kQO+InndeZPSjsRYc3m7akt3vCOfYJ2a8YKXFgX6FiN3IUd59isGaJ19Pk3U+RoA7wo/6bBWyitnPaeeT7oWBVQuh+rqRxUAwcCBcz/2e3WPMb297iHdHsR5rZ/i5p8CArG6XkKfrL0ICg90wKZUHe84VpRAZUXCDunnkq0/mj1WtegyCbo6iCbcDremWE0xIUX2XzlibbX2t4qimZQGm14CT1xgkauFpp+JAmtxus1JdkglPcwiWHoaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001; h=From:Date:Subject:Message-ID:MIME-Version;
+ bh=RcFIhebJuYsPlu8jCOTHpyE4kMtQkvgusNtZfNQwVxQ=;
+ b=UO4VNA+AzFTt3xrYGby2fGSODSVVslG7EX8zUWD/FrcZ/5gjNFvpptvYsgOuXczPoayL9gp047/0uzl59iu2zxTY5pRJps3oQuCxS28JO8mnKkY6urzskDXM6Fgt0fB/1bexrm/uPK+Rpsjf74EuGS0n5nwcbLEe6SZKh9/ZvtVmhNXmZ1REB0u3NZOF5XUwdqP7DVjlDUYHwAPa4FA+7CzyzbPgarjzgaBgVNKX8ECcNbeaMDXYN5rIFu9jz6UAeVzfFC/kpbcFt8zgBtjN9bn/N0bv4zeEaju/uATdmCpjEhwoFIvKe6B17MFZhoFRhAV8hymoP19Nb5VSJ4K1eA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RcFIhebJuYsPlu8jCOTHpyE4kMtQkvgusNtZfNQwVxQ=;
+ b=Qe9jUQcMu7jIGbFzxRx+kEDq5ZG7M1c9nGBIA24qfGqAD4FZRNpC7mByR2Cpf8d3y8oLHuwofFn2GfIWHQUl5m60mRoVmWn9r1jM3BXnQ71+2vEqRKkOUSf3lzthbG0Lnm5qwtx1i47q21QuhYio+TyiaBr9LNb89/b5L+cflwAq49tbxV3HVsAXPE6ttM9zMGnqZzGR2Um/pOCVzM+Y4QK/xjpyfQX1hD3093zzjEIgEdDlRXKLs4ygr75pJf6VJR1PbgB6LfbyfHjMcgl9WPnIC++m8W1MDEJDX0qOLqNJiirWqW7AaVdxGWpvytq+EovUhAI8P+DkXw5QgsDDpQ==
+Received: from BN6PR05MB3281.namprd05.prod.outlook.com (2603:10b6:405:40::35)
+ by BY3PR05MB8273.namprd05.prod.outlook.com (2603:10b6:a03:3b4::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.662.7; Thu, 26 Nov
+ 2026 06:34:10 +0000
+Received: from BN6PR05MB3281.namprd05.prod.outlook.com
+ ([fe80::5b9b:67c7:5397:c42]) by BN6PR05MB3281.namprd05.prod.outlook.com
+ ([fe80::5b9b:67c7:5397:c42%5]) with mapi id 15.21.0662.004; Thu, 26 Nov 2026
+ 06:34:09 +0000
+From: Yingjie Wang <x-professor@outlook.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"dlemoal@kernel.org" <dlemoal@kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: [PATCH 0/3] null_blk: validate configfs values before power-on
+Thread-Topic: [PATCH 0/3] null_blk: validate configfs values before power-on
+Thread-Index: AQHdfXAkVEpYEZsQq0W4K5IKarlSFg==
+Date: Thu, 26 Nov 2026 06:34:09 +0000
+Message-ID: <20261126063404.1051061-1-x-professor@outlook.com>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN6PR05MB3281:EE_|BY3PR05MB8273:EE_
+x-ms-office365-filtering-correlation-id: d51086b7-f7c2-4bc1-b7f3-08df4b87471c
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|24021099003|19110799012|31061999003|38102599003|25010399006|8060799015|8062599012|15080799012|24121999003|22091999003|8022599003|26121999007|3071699003|102099032|3412199025|440099028;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?4hAWmbuvXCJ90lpJbxmzJJZr8TMvrl05lyd6uuTE7NK8qed+7B6z6r6zAu?=
+ =?iso-8859-1?Q?kz/8GhXBGL6Be0k0se5/JqyGA+9EdJBRL1Yu0M2sk99XiQhCtecQX0/UON?=
+ =?iso-8859-1?Q?0ihF8bdhCjgK37hUUPeTShbaG3DW56geQzfo+fCdn/ubvrN4H5UXgdveiK?=
+ =?iso-8859-1?Q?yF4Pzype/qLXt79btMBd6DZJU4i7QU7K1sTaizuOlTErNLHEXAl45KpbyF?=
+ =?iso-8859-1?Q?pRlqFS2skwDcgJRsBKuq3xwWET8wXRHuvJwRgQ+iOwjMWvwuEbEZTBSNeK?=
+ =?iso-8859-1?Q?gRmsnYQw86i7mcnxZOvzT3eyzFOc82ARDfOymzn9UQelsqjOJJZinoGb4r?=
+ =?iso-8859-1?Q?ZxZ7SIVYnVPRQRR32ofGNfy/8yROdT7+YANW1/YBERh7DkvO/2ELOGcdL4?=
+ =?iso-8859-1?Q?xQEtvBBAJkA6aQhxXokoNt7OMkYAUYtwZLntfHnUtcVYZ8IdRQzEQi9+Gp?=
+ =?iso-8859-1?Q?SZ7I9llRVKOnZXRZgt+ceqSQqdi8/kUmYy+qmSNB8ellcAMs8dw+JUzke3?=
+ =?iso-8859-1?Q?j5V4heQ9QdZAkSfBPymzguf6oDdMrHa/8cKXe5fksjQ1+OY0ETPji/OdLN?=
+ =?iso-8859-1?Q?B5joI/B9df6pDhm7njZ9xXZBcMg46tWIAw0QWZYwTDt5JNDxJwKsmRdIDw?=
+ =?iso-8859-1?Q?nwm0Di7lNeVgKkBswSGkY8kPks5N97NA3WPMCBHUvPjZlnvLwOfzrGYxzu?=
+ =?iso-8859-1?Q?DZSGeCgyYKuUNnNa5sxs5H7EUu6NYN3lp0Uojid3vLl3s/91uo1PGg2B7l?=
+ =?iso-8859-1?Q?qOCoxaLvc6Qniy3grOkJqxqs5KcZPXlpqtJX3M5HnMyC9pWZLfRKkT7HH8?=
+ =?iso-8859-1?Q?EhGNOqaVVEUt4YB6PH2nrAs0VAMrBXZTZcP2rAkVD35nWuXkARS5wz0+ts?=
+ =?iso-8859-1?Q?kcJVCjhDynye6ulEmci5fmr8vIB2pT8LQihzXc68ToIzzQB/cmg+jRsdZF?=
+ =?iso-8859-1?Q?6xKyz4MMjZsPt979ZT3z3Ce6DTpCGYuqOsk9eS8c5wAPXeKQKtPkpGAKRp?=
+ =?iso-8859-1?Q?c5bDsj6hYPfDzxlW5XXTKNSBgVnfUQb0toN26k5GftzGSBFljOQ5RfKNKX?=
+ =?iso-8859-1?Q?Esu0og7om703mf1xd/zWNm7Akr1VoLlx8BMC+2LBUlgK?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?TRdr6WyEPyX+gZ4IXs32jg2E0a4yNhiPfVu/DCb5YTcDrcmWZF4bRJETKw?=
+ =?iso-8859-1?Q?/SP6cGpeGUMd1s0Z1WMYw3PUDV7iY+eV8MKLpI8WoBUkX1vGKRVRsOUtlS?=
+ =?iso-8859-1?Q?bHgOK+sB+t8DeltCyFiYRHLFqtscKk+hs/e6vDj/6KV4Kw5KGrCwHmXTf4?=
+ =?iso-8859-1?Q?G3iuGO4ZfX7Gdj8mEnfUUQpf9yOiE2xeh8lNsFd2YyhWWFxaWuzOrJyM9D?=
+ =?iso-8859-1?Q?EKy65sTgHVc/5rhmpSFcT/JQ+x5aTa08zr6wteiYi4NBL30F+vcIZA+mry?=
+ =?iso-8859-1?Q?dE5nftU6leFQsyjeQAtTt11eDztcDw3EPvBbFFUJ+28z7JhzYIeJUJIpWs?=
+ =?iso-8859-1?Q?vu955NLc/mCZpUZaI+XLTJNkLHA01DY+3YR0VB+OYtAhqFU+lxcLGSN+Rj?=
+ =?iso-8859-1?Q?y4Qw0zV+XTEp9hbqpWoc7VesIxIaxRUPmwRbGkSHRq9KwZolHuehWDKXgo?=
+ =?iso-8859-1?Q?MN9RBildj8yQAHCv2Bk307+PLLL3hlLOuyxjjgEuxLbv+xTMHjA+iL23ow?=
+ =?iso-8859-1?Q?WK5tdLjlg/CINn/xDzkFgLes8a+tJdNMf4+xVLFLP4BQipyyUOVOqykH4K?=
+ =?iso-8859-1?Q?MfTJyUoht/eXwmnszCrjenKsnj0ZRrEqsOPTMkGJj4hOl96fo39uB8zoTb?=
+ =?iso-8859-1?Q?5/K/8kyiKKIL4vJOEqTCy9Gg3dPxLl79hNhm53ImG7S9oU9z7fmFUiZDZs?=
+ =?iso-8859-1?Q?df+9bbi3GkEOQd6DXTxq5Vl6x7W0Z3t5wp1RXzMnyhYAJDk9TmWngc0MQ/?=
+ =?iso-8859-1?Q?bf/oeYgnp6ARoE4fbvELggqaSaEgX2csP00lN1W0VuUBEcFgUzjBYPMEJn?=
+ =?iso-8859-1?Q?Uv8LOtyz3UTQ4ACvhAeWiJ0OOQWCsUAR4b33Y2XH70zeKyaxYuEWzWCiiY?=
+ =?iso-8859-1?Q?/vFf0tkLK3WhxaHSPUPixwa8jJmNOl8Akigw4Ylw+rgRXFPyPhivC6RvhS?=
+ =?iso-8859-1?Q?KGkg0f63D/Fp8OyP01XiG6DdYRUL0xzoBRstrfu0FrLQ+ChAVLFr44NJkt?=
+ =?iso-8859-1?Q?g0foUN+ck7JwmQE1tFgtAxTAI4FLyS+l1US7iVjgS45mpJI8APvkbrN1ft?=
+ =?iso-8859-1?Q?o7LDLH7mr4xQ5d1UvW4rykVaNywsDq8b88VUjqvS7VQDac4xcypMrr7ogo?=
+ =?iso-8859-1?Q?6hiIoPL6+X/zoUQqrllIcIFSVVPBHsKqPiSIIq9oekShX/SGnrdUXhQfW9?=
+ =?iso-8859-1?Q?Nn+6nka5wQgk6NfMycNssrO336MO6MX1qusen8ipr4w6VJ5cs/mIUAI0jZ?=
+ =?iso-8859-1?Q?GpBs/87tjJHgdYDUa+9I8Fzdm4J1nHLIUI3dB8y0tL0XiTxYN/mvsZeSxX?=
+ =?iso-8859-1?Q?X9Zj0GCgei02Q2oXRItEJvSTgM6tpUsonlyCRcQJoOQh+Tt2FyDIdgAArI?=
+ =?iso-8859-1?Q?RjWCVh+knq0RAu5wPVh7isdsjaZ/sCq81mL0PtaIs7Y0SJVnAObaNpXtyY?=
+ =?iso-8859-1?Q?qL/lq6KdIaPVY3o3?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -69,264 +146,62 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN6PR05MB3281.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: d51086b7-f7c2-4bc1-b7f3-08df4b87471c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Nov 2026 06:34:09.5360
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR05MB8273
 
-From: Tao Cui <cuitao@kylinos.cn>
-
-loop_clear_limits() calls queue_limits_commit_update() directly from
-the loop workqueue that processes the request.  That does a
-non-atomic struct assignment to q->limits without freezing the queue,
-which races with lockless readers of q->limits on other CPUs, such
-as bio splitting reading max_hw_sectors and the discard path reading
-max_hw_discard_sectors, letting them observe torn values.  The
-trigger is a discard or write-zeroes request on a loop device whose
-backing file does not support the corresponding fallocate operation.
-
-The code already has an XXX comment saying this should move to a
-workqueue.  Do that: schedule a work item on the system workqueue,
-where it is safe to freeze the queue around the limits update.  The
-unsupported modes live under a new mutex, lo->clear_limits_lock,
-guarded by a backing-file check that drops records from a racing
-unbind or rebind.  The work item is scheduled while holding that
-lock, so an unbind resets the verdicts under the lock before calling
-cancel_work_sync() and cannot miss a schedule from a request that is
-still in flight.  Requests that arrive while the clear is in flight
-fail quietly, so the console report stays at the first failure.
-loop_remove() also cancels the work item before the queue becomes
-unreachable.
-
-Fixes: 5f75e081ab5c ("loop: Disable fallocate() zero and discard if not supported")
-Suggested-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
----
-Changes since v7:
-- quiet repeated failures at the point of failure instead of at
-  queue_rq() time: verdicts are recorded per mode for the lifetime of
-  the backing file and loop_clear_limits() reports whether a verdict
-  is new, so repeats mark only their own request quiet.  Under
-  concurrent dispatch this keeps exactly the first failure per mode on
-  the console (sashiko review; eight-thread write-zeroes on a
-  tmpfs-backed loop device: v7 logged two errors where loop/011
-  expects one, this logs one)
-- schedule the clear work while holding clear_limits_lock and reset
-  the verdicts before cancel_work_sync() in __loop_clr_fd(): a verdict
-  that passed the backing-file check now queues the work before the
-  lock is released, so the cancel cannot miss a schedule from a
-  request still in flight, which previously could touch a loop_device
-  already freed (Bart)
-- skip the fallocate probe when the mode is already known to be
-  unsupported, instead of repeating it while the limits commit is in
-  flight (Bart)
-- return early from the work item when no verdict is left to commit,
-  instead of freezing the queue and committing unchanged limits (Bart)
-- drop the verdict reset in loop_assign_backing_file(): since the
-  LOOP_CHANGE_FD removal (d4fabede1da0) its only caller is
-  loop_configure(), which requires an unbound device, so it was dead;
-  one reset site remains, so no helper was added (Bart)
-
-Changes since v6:
-- fix the __loop_clr_fd() comment: asynchronous I/O can be in flight
-  across an unbind, and loop_remove()'s cancel is the backstop for
-  work scheduled after __loop_clr_fd()'s
-- drop the cancel_work_sync() from lo_free_disk(): no reachable path
-  needs it
-- reword the loop_remove() comment accordingly
-
- drivers/block/loop.c | 123 ++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 111 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 194f51d9dab6..8c2ef0c327d4 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -67,6 +67,9 @@ struct loop_device {
- 	struct list_head        rootcg_cmd_list;
- 	struct list_head        idle_worker_list;
- 	struct rb_root          worker_tree;
-+	struct work_struct      clear_limits_work;
-+	struct mutex		clear_limits_lock;
-+	unsigned int		clear_limits_seen;
- 	struct timer_list       timer;
- 	bool			sysfs_inited;
- 
-@@ -222,9 +225,31 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
- 		kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
- }
- 
--static void loop_clear_limits(struct loop_device *lo, int mode)
-+static void loop_clear_limits_workfn(struct work_struct *work)
- {
--	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
-+	struct loop_device *lo =
-+		container_of(work, struct loop_device, clear_limits_work);
-+	struct queue_limits lim;
-+	unsigned int memflags;
-+	int mode;
-+
-+	/*
-+	 * Snapshot the recorded modes without clearing them; verdicts stay
-+	 * for the life of the backing file.  The freeze drains in-flight
-+	 * requests, so everything scheduled before it is visible here.
-+	 */
-+	memflags = blk_mq_freeze_queue(lo->lo_queue);
-+	mutex_lock(&lo->clear_limits_lock);
-+	mode = lo->clear_limits_seen;
-+	mutex_unlock(&lo->clear_limits_lock);
-+
-+	/* A racing unbind may have reset the verdicts; nothing to commit. */
-+	if (!mode) {
-+		blk_mq_unfreeze_queue(lo->lo_queue, memflags);
-+		return;
-+	}
-+
-+	lim = queue_limits_start_update(lo->lo_queue);
- 
- 	if (mode & FALLOC_FL_ZERO_RANGE)
- 		lim.max_write_zeroes_sectors = 0;
-@@ -234,14 +259,65 @@ static void loop_clear_limits(struct loop_device *lo, int mode)
- 		lim.discard_granularity = 0;
- 	}
- 
--	/*
--	 * XXX: this updates the queue limits without freezing the queue, which
--	 * is against the locking protocol and dangerous.  But we can't just
--	 * freeze the queue as we're inside the ->queue_rq method here.  So this
--	 * should move out into a workqueue unless we get the file operations to
--	 * advertise if they support specific fallocate operations.
--	 */
- 	queue_limits_commit_update(lo->lo_queue, &lim);
-+	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
-+}
-+
-+/*
-+ * Record that the backing file does not support @mode.  Returns true
-+ * for a first verdict or a dropped stale record, false for a repeat.
-+ */
-+static bool loop_clear_limits(struct loop_device *lo, struct file *file,
-+			      int mode)
-+{
-+	bool first;
-+
-+	mutex_lock(&lo->clear_limits_lock);
-+	if (lo->lo_backing_file != file) {
-+		/* Stale record from a racing unbind or rebind; drop it. */
-+		mutex_unlock(&lo->clear_limits_lock);
-+		return true;
-+	}
-+	first = (mode & ~lo->clear_limits_seen) != 0;
-+	lo->clear_limits_seen |= mode;
-+	/* Scheduled under the lock so cancel_work_sync() cannot miss it. */
-+	if (first)
-+		schedule_work(&lo->clear_limits_work);
-+	mutex_unlock(&lo->clear_limits_lock);
-+
-+	return first;
-+}
-+
-+/*
-+ * Record the verdict and return -EOPNOTSUPP; repeats stay quiet so only
-+ * the first failure per mode reports.
-+ */
-+static int lo_unsupported(struct loop_device *lo, struct request *rq,
-+			  struct file *file, int mode)
-+{
-+	if (!loop_clear_limits(lo, file, mode))
-+		rq->rq_flags |= RQF_QUIET;
-+
-+	return -EOPNOTSUPP;
-+}
-+
-+/*
-+ * Return true when @mode is already recorded as unsupported, so the
-+ * fallocate probe can be skipped.
-+ */
-+static bool loop_mode_unsupported(struct loop_device *lo, struct file *file,
-+				  int mode)
-+{
-+	bool known;
-+
-+	mode &= FALLOC_FL_ZERO_RANGE | FALLOC_FL_PUNCH_HOLE;
-+
-+	mutex_lock(&lo->clear_limits_lock);
-+	known = lo->lo_backing_file == file &&
-+		(mode & lo->clear_limits_seen);
-+	mutex_unlock(&lo->clear_limits_lock);
-+
-+	return known;
- }
- 
- static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
-@@ -256,8 +332,16 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
- 
- 	mode |= FALLOC_FL_KEEP_SIZE;
- 
--	if (!bdev_max_discard_sectors(lo->lo_device))
--		return -EOPNOTSUPP;
-+	if (!bdev_max_discard_sectors(lo->lo_device)) {
-+		/*
-+		 * Limits already committed; record the op's bit to keep
-+		 * the per-mode quiet accounting.
-+		 */
-+		return lo_unsupported(lo, rq, file, mode);
-+	}
-+
-+	if (loop_mode_unsupported(lo, file, mode))
-+		return lo_unsupported(lo, rq, file, mode);
- 
- 	scoped_guard(file_write, file)
- 		ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
-@@ -269,7 +353,7 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
- 	 * supported and clear them here if that turns out not to be true.
- 	 */
- 	if (unlikely(ret == -EOPNOTSUPP))
--		loop_clear_limits(lo, mode);
-+		return lo_unsupported(lo, rq, file, mode);
- 
- 	return ret;
- }
-@@ -1035,6 +1119,15 @@ static void __loop_clr_fd(struct loop_device *lo)
- 	lo->lo_backing_file = NULL;
- 	spin_unlock_irq(&lo->lo_lock);
- 
-+	/*
-+	 * Requests may still be in flight across this unbind; reset the
-+	 * verdicts before the cancel so it cannot miss the work item.
-+	 */
-+	mutex_lock(&lo->clear_limits_lock);
-+	lo->clear_limits_seen = 0;
-+	mutex_unlock(&lo->clear_limits_lock);
-+	cancel_work_sync(&lo->clear_limits_work);
-+
- 	lo->lo_device = NULL;
- 	lo->lo_offset = 0;
- 	lo->lo_sizelimit = 0;
-@@ -1700,6 +1793,7 @@ static void lo_free_disk(struct gendisk *disk)
- 	loop_free_idle_workers(lo, true);
- 	timer_shutdown_sync(&lo->timer);
- 	mutex_destroy(&lo->lo_mutex);
-+	mutex_destroy(&lo->clear_limits_lock);
- 	kfree(lo);
- }
- 
-@@ -2018,6 +2112,8 @@ static int loop_add(int i)
- 	spin_lock_init(&lo->lo_lock);
- 	spin_lock_init(&lo->lo_work_lock);
- 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
-+	INIT_WORK(&lo->clear_limits_work, loop_clear_limits_workfn);
-+	mutex_init(&lo->clear_limits_lock);
- 	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
- 	disk->major		= LOOP_MAJOR;
- 	disk->first_minor	= i << part_shift;
-@@ -2056,6 +2152,9 @@ static int loop_add(int i)
- 
- static void loop_remove(struct loop_device *lo)
- {
-+	/* Cancel before the queue becomes unreachable. */
-+	cancel_work_sync(&lo->clear_limits_work);
-+
- 	/* Make this loop device unreachable from pathname. */
- 	del_gendisk(lo->lo_disk);
- 	blk_mq_free_tag_set(&lo->tag_set);
--- 
-2.53.0
-
+This series fixes three bugs found while fuzzing null_blk's configfs=0A=
+interface. Setting size or home_node to the values below and writing 1=0A=
+to power triggers a crash:=0A=
+=0A=
+  1/3  size=3D2^44 MiB with zoned=3D1 wraps the byte capacity to zero.=0A=
+       The resulting zero zone count causes zone_nr_conv to underflow.=0A=
+  2/3  size=3D2^40 MiB with zoned=3D1 and the default 256 MiB zone size=0A=
+       requires 2^32 zones. Storing this count in nr_zones truncates=0A=
+       it to zero, leading to the same failure.=0A=
+  3/3  home_node=3D2147483647 is passed to kzalloc_node() without=0A=
+       validation, causing an out-of-bounds access in SLUB.=0A=
+=0A=
+The zone count overflow still occurs with only patch 1 applied.=0A=
+=0A=
+Testing used x86_64 with KASAN, CONFIG_NUMA=3Dy, a two-node QEMU guest,=0A=
+oops=3Dpanic panic_on_warn=3D1, and null_blk built as a module:=0A=
+- The unpatched module crashes for all three cases above.=0A=
+- With only patch 1 applied, the size=3D2^40 MiB zoned case still crashes.=
+=0A=
+- With the full series, writing 1 to power fails with EINVAL for all=0A=
+  three cases and leaves power at 0. Correcting the value and retrying=0A=
+  succeeds.=0A=
+- Valid non-zoned devices were tested at 0, 1 and LLONG_MAX / SZ_1M MiB;=0A=
+  valid zoned devices were tested at 256, 257 and 512 MiB. Tests also=0A=
+  covered memory-backed read/write, zone reports and a conventional zone.=
+=0A=
+- home_node values NUMA_NO_NODE, 0 and 1 succeed. Values 2, 63, 64 and=0A=
+  2147483647 are rejected on power-on.=0A=
+=0A=
+Testing was limited to x86_64. Sparse NUMA node numbering was not tested.=
+=0A=
+The reproducers are available on request.=0A=
+=0A=
+Yingjie Wang (3):=0A=
+  null_blk: reject device size overflow=0A=
+  null_blk: reject zone counts that overflow unsigned int=0A=
+  null_blk: validate the configfs home_node attribute=0A=
+=0A=
+ drivers/block/null_blk/main.c  | 11 +++++++++++=0A=
+ drivers/block/null_blk/zoned.c |  8 +++++++-=0A=
+ 2 files changed, 18 insertions(+), 1 deletion(-)=0A=
+=0A=
+=0A=
+base-commit: 5a29cfaf51105039d156dd8a61d2783e8b653667=0A=
+-- =0A=
+2.43.0=0A=
+=0A=
