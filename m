@@ -1,66 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.33
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795707141;
-	b=f3BJMha96nzS05RKVYXS0ypalDV7fcweghDyoqYvg4BBPyyzbyVLA2/s8DHWZTK7CVku
-	 JdmEquO6gC1Q4/5BJNLmzhrqN7sqTjn8Xk+wi5kegIhQPUDFqYINTIybbKTBEvZG4lBwH
-	 qutlhX9BNlm3P1bAMADS8WLbodmpaVd5P9026fyu9CK1QpY9wdC2Ds9Q/ccMbA0ShfgNN
-	 hoQNO/eKH17rjiMQza1dXHzbToksEitJawrxcx+SEjltFY5hw8AXRP5DE44MaIMEAN5Pj
-	 pIjGJjVcPwuELmDw9amtjOoEazFH9jmlM4icPd+K7YJxxNgyystJbag0mvGHDWWLBLg==
+	t=1795708494;
+	b=Q+yljGyNguYFAuw4jrJ6DmcjC2zQx8z5M/AgGiRWlUU7Cp12yF7q3i2ja9SzYR1WXXi9
+	 iDFfgcVoKluW6aa6RWWld3Sfg+Ou7t3Gjs65+VISR3DgZ9MxI2BUPAiK1FaQn2uwrHJ7g
+	 XYjiRE8lfrs+PlUYt7i6lszfn6IWY39ZvtGyhD1WDZMzIpGyKc5nJJkFKFNsxx2e37iml
+	 /1XzLFQgwSc6ILLq2dcyedNAhKdPc3cvAtgPfRMg2L8cSxtSOWqXWkaOwwABXA4kAH/oI
+	 WeyJpPotrQDYEeCz8Ylo5pfG+24qG7EmVrO8uNjwXRmWyotibtcRW0phyTA1YuajlCw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795707141;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Virus-Scanned:Received:
-	 Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=PNRTFodZeg3klhEIHpNcqT1+QKIt6csRkW2GBELWkCs=;
-	b=Z9zqDLNLITZVLl+hvGuZNv09ZYgigtRIpMf3MXPx/BJi2msND8Sx9za78BMtkFTqEiZt
-	 Sy77F+ZvJX0aKTToR5IOTk1ZTquAzf+o7dd5lY3E30T3t4qPC3bu4hIjzF6gLDgiUhPEX
-	 9VzqEFdlW5d2ltUyzKKl4MHQve74K2CGkYifhPC8InDEB6oFPzhvrjUaCCkTNOFaRjAge
-	 sOuPW+Kx2dQRqjsXRnKUbt7Y7PxaZSVWLPLI71IRg21iHWtKnvMs1iS82B5fukbY7SP4/
-	 GFcJN/xfUjkWXXB76+sce4TbdDkWTfhZVfodeeGBr33JmwdvveyJ7u47YSMmtM3vanQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795708494;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
+	 Received:Received:Date:From:To:Cc:Subject:Message-ID:MIME-Version:
+	 In-Reply-To:X-CMS-MailID:X-Msg-Generator:Content-Type:
+	 X-Sendblock-Type:CMS-TYPE:cpgsPolicy:X-CFilter-Loop:X-CMS-RootMailID:
+	 References;
+	bh=5M9xtfTWt/rD6V3Yq9/gJOzmL0PuY9q0JOmTonMrkYc=;
+	b=tTMXDsUPkUve7LOve57bQ+wovpB8krKhrLyTc2oyUo8bfPs8UHFbmkkco6wY5rUJEBCc
+	 lE+81OIQ7Ujy+oNovCftuduV39P0ZmAG49Ss5d/+y9n7difPoAhPry+QMhEoKV6Huu17k
+	 tq8APb3vqE5uV3xVgtma9mFc+kD96vEUiyg4L/6TCmwFPkoqlZmIE0eM5pDVi5d/QJLQO
+	 b2XRjuLzax61GYeJkPbDoMG98zNLcW4Fy3Hz8UpeEYmB1BwFV/a4nw3YGWN3k7pXmCoRg
+	 j7w9xpNL7V6XUdK4uONuQzToO5ywGHZ7UIeTlrJmuLhhJLhuX1x/697xHlzApjUmR1g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=acm.org;
-	spf=pass smtp.mailfrom=acm.org;
-	dkim=pass header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b="38CVG2/u";
-	arc=none smtp.remote-ip=199.89.1.14
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=samsung.com;
+	spf=pass smtp.mailfrom=samsung.com;
+	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=S8Q+2CV4;
+	arc=none smtp.remote-ip=203.254.224.33
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51566606A31E;
-	Thu, 26 Nov 2026 15:32:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 51566606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A23606A31E;
+	Thu, 26 Nov 2026 15:54:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 03A23606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=acm.org header.i=@acm.org header.a=rsa-sha256 header.s=mr01 header.b=38CVG2/u
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4jb0sc4lYZz1XLwXS;
-	Thu, 26 Nov 2026 15:32:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1795707134; x=1798299135; bh=PNRTFodZeg3klhEIHpNcqT1+
-	QKIt6csRkW2GBELWkCs=; b=38CVG2/uMumHKcw/S8mzwUmeTxIHZL3YTBVvnCBD
-	4UvbmY20qQttqp7QYeiaI3lNjsB3pBGO1UHCvy3I+uWcLZ1o+dPWNaQiFQtDay+g
-	Weruj3T/U02BoK1usxsOdwpKvDb4JcJ60x/kFhO0pjPJ74J8yFdQzC0WC+NE55X/
-	pF0VejWN644e2bGhcTRpzVG/5HPmXVuxZSh/LC62s0r8+01037Kljjjg53U8K25A
-	Qogqx8HmcLIQILl2UK62GQa5krp+I2iDh7FTlx5hI/L1JVE865w+5Y7pjkAOVXPf
-	82yIknVm2IFzPW9835lFHaB7VtVbM0X5OSjoHE3tI7LEpQ==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id zjxEdK-9Tc2n; Thu, 26 Nov 2026 15:32:14 +0000 (UTC)
-Received: from [192.168.51.14] (c-24-6-239-25.hsd1.ca.comcast.net [24.6.239.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4jb0sT6v67z1XLyhd;
-	Thu, 26 Nov 2026 15:32:13 +0000 (UTC)
-Message-ID: <46cefe96-a193-40f9-bc1a-facc73cf6afa@acm.org>
-Date: Thu, 26 Nov 2026 07:32:12 -0800
+	dkim=pass (1024-bit key, unprotected) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=S8Q+2CV4
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20261126155444epoutp03dcd4ec9596cec66ed694dc1c2cd611a1~ro1pFr0S32621526215epoutp032;
+	Thu, 26 Nov 2026 15:54:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20261126155444epoutp03dcd4ec9596cec66ed694dc1c2cd611a1~ro1pFr0S32621526215epoutp032
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1795708484;
+	bh=5M9xtfTWt/rD6V3Yq9/gJOzmL0PuY9q0JOmTonMrkYc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=S8Q+2CV47r+jcyB/hxRZQoNdHuxQ/gWyvqpTmqCCGD4I8E1N/8Sp5R2e+BT1h5Dit
+	 Id45RW2ZS5AZJEl/R4M3H3tcJ9xLhuBNVHLz9LrKcWbkmclmhrryoUfbwW/+ukJYtW
+	 oFWXu+LFCdF+trLev1upv67SG1axo8gAriR3T9dQ=
+Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
+	20261126155443epcas5p3efe33a75b41143a93560ac14ae0acd78~ro1oKmgN02527325273epcas5p3D;
+	Thu, 26 Nov 2026 15:54:43 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.95]) by
+	epsnrtp03.localdomain (Postfix) with ESMTP id 4jb1MQ68Ssz3hhT3; Thu, 26 Nov
+	2026 15:54:42 +0000 (GMT)
+Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20261126140745epcas5p4f87a6186091785f4d3de4b69734aed88~rnYO8DwMQ2019420194epcas5p43;
+	Thu, 26 Nov 2026 14:07:45 +0000 (GMT)
+Received: from green245.gost (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20261126140741epsmtip24d507cb1363ab8b6b8b6b2fe8c81b878~rnYK24Eeh1787017870epsmtip2c;
+	Thu, 26 Nov 2026 14:07:41 +0000 (GMT)
+Date: Thu, 26 Nov 2026 19:36:51 +0530
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mengmeng Zhao <mengmeng.zhao@linux.dev>, Anuj Gupta
+	<anuj20.g@samsung.com>, Christoph Hellwig <hch@lst.de>, Christian Brauner
+	<brauner@kernel.org>, Anuj Gupta <anuj1072538@gmail.com>, Jens Axboe
+	<axboe@kernel.dk>, Sumit Semwal <sumit.semwal@linaro.org>, Christian Koenig
+	<christian.koenig@amd.com>, Philipp Stanner <phasta@kernel.org>, Dan
+	Williams <djbw@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jan Kara
+	<jack@suse.cz>, Alexander Viro <viro@zeniv.linux.org.uk>, Theodore Ts'o
+	<tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Baokun Li
+	<libaokun@linux.alibaba.com>, Ojaswin Mujoo <ojaswin@linux.ibm.com>, Ritesh
+	Harjani <ritesh.list@gmail.com>, Zhang Yi <yi.zhang@huawei.com>, Jonathan
+	Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Randy
+	Dunlap <rdunlap@infradead.org>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, Li Wang <liwang@kylinos.cn>, Mengmeng Zhao
+	<zhaomengmeng@kylinos.cn>
+Subject: Re: [RFC PATCH v2 0/8] ext4: Add dma-buf read/write support
+Message-ID: <20261126140651.vzs2gdwajemvf6kt@green245.gost>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -70,160 +92,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9] loop: defer the queue limits clear to a workqueue
-To: Tao Cui <cui.tao@linux.dev>, axboe@kernel.dk, hch@lst.de,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: cuitao@kylinos.cn, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20261126054223.176824-1-cui.tao@linux.dev>
- <20261126135628.495497-1-cui.tao@linux.dev>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20261126135628.495497-1-cui.tao@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <0b76171b-7f2e-41d2-8a5c-102dbe4cb85b@gmail.com>
+X-CMS-MailID: 20261126140745epcas5p4f87a6186091785f4d3de4b69734aed88
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----sfnc.NZyIOBfLTiZTLswaXBSL0w4GQC52Zj1LhBq2cHN2.MV=_ad66_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d
+References: <20261113070621.273953-1-mengmeng.zhao@linux.dev>
+	<20261120154153.GC28611@lst.de>
+	<361c4312-f77b-495f-9ee4-e0b9612b4463@linux.dev>
+	<CGME20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d@epcas5p3.samsung.com>
+	<20261124084025.2101804-1-anuj20.g@samsung.com>
+	<3bce3a69-e41c-4683-b1ca-9477dd41a7e0@linux.dev>
+	<0b76171b-7f2e-41d2-8a5c-102dbe4cb85b@gmail.com>
 
-On 11/26/26 5:56 AM, Tao Cui wrote:
-> loop_clear_limits() calls queue_limits_commit_update() directly from
-> the loop workqueue that processes the request.  That does a
-> non-atomic struct assignment to q->limits without freezing the queue,
-> which races with lockless readers of q->limits on other CPUs, such
-> as bio splitting reading max_hw_sectors and the discard path reading
-> max_hw_discard_sectors, letting them observe torn values.  The
-> trigger is a discard or write-zeroes request on a loop device whose
-> backing file does not support the corresponding fallocate operation.
-> 
-> The code already has an XXX comment saying this should move to a
-> workqueue.  Do that: schedule a work item on the system workqueue,
-> where it is safe to freeze the queue around the limits update.  The
-> work item takes the queue limits lock before freezing, matching the
-> order used by loop_set_dio() and loop_set_block_size().  The
-> unsupported modes live under a new mutex, lo->clear_limits_lock,
-> guarded by a backing-file check that drops records from a racing
-> unbind or rebind.  The work item is scheduled while holding that
-> lock, so an unbind resets the verdicts under the lock before calling
-> cancel_work_sync() and cannot miss a schedule from a request that is
-> still in flight.  Requests that arrive while the clear is in flight
-> fail quietly, so the console report stays at the first failure.
-> loop_remove() also cancels the work item before the queue becomes
-> unreachable.
+------sfnc.NZyIOBfLTiZTLswaXBSL0w4GQC52Zj1LhBq2cHN2.MV=_ad66_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-This patch is more complicated and harder to verify than it should. Has
-it been considered to allocate memory dynamically instead of adding new
-members to struct loop_device, as is done in the untested patch below?
+On 26/11/26 10:44AM, Pavel Begunkov wrote:
+>I'll resend it later, how to store the tag is the least interesting
+>part, it can just move inside the block/ext4/etc code, which would
+>be uglier, but whatever.
+>
 
-Thanks,
+What about the f_op method instead of storing the
+tag in multiple users that we support now i.e., block/ext4/xfs code?
+We refined your patches with this approach and it seemed to fit well.
 
-Bart.
+--
+Nitesh
+
+------sfnc.NZyIOBfLTiZTLswaXBSL0w4GQC52Zj1LhBq2cHN2.MV=_ad66_
+Content-Type: text/plain; charset="utf-8"
 
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d122cb008811..bd9c453a9b8c 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -222,26 +222,76 @@ static void loop_set_size(struct loop_device *lo, 
-loff_t size)
-  		kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
-  }
-
--static void loop_clear_limits(struct loop_device *lo, int mode)
-+/*
-+ * Information passed from lo_fallocate() to loop_clear_limits_workfn().
-+ * @lo_backing_file holds a reference to prevent that the backing file is
-+ * freed and its address is reused by another backing file before
-+ * loop_clear_limits_workfn() has finished.
-+ */
-+struct loop_clear_limits_work {
-+	struct work_struct	clear_limits_work;
-+	struct loop_device	*lo;
-+	struct file		*lo_backing_file;
-+	int			mode;
-+};
-+
-+static void loop_clear_limits_workfn(struct work_struct *work)
-  {
--	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
-+	struct loop_clear_limits_work *w = container_of(work,
-+				struct loop_clear_limits_work, clear_limits_work);
-+	struct loop_device *lo = w->lo;
-+	struct queue_limits lim;
-+	unsigned int memflags;
-+	bool changed = false;
-
--	if (mode & FALLOC_FL_ZERO_RANGE)
--		lim.max_write_zeroes_sectors = 0;
-+	mutex_lock(&lo->lo_mutex);
-+	/* Skip the update if the loop device has been unbound or rebound. */
-+	if (lo->lo_state != Lo_bound || lo->lo_backing_file != w->lo_backing_file)
-+		goto unlock;
-
--	if (mode & FALLOC_FL_PUNCH_HOLE) {
-+	lim = queue_limits_start_update(lo->lo_queue);
-+	if ((w->mode & FALLOC_FL_ZERO_RANGE) && lim.max_write_zeroes_sectors) {
-+		lim.max_write_zeroes_sectors = 0;
-+		changed = true;
-+	}
-+	if ((w->mode & FALLOC_FL_PUNCH_HOLE) && lim.max_hw_discard_sectors) {
-  		lim.max_hw_discard_sectors = 0;
-  		lim.discard_granularity = 0;
-+		changed = true;
-  	}
--
--	/*
--	 * XXX: this updates the queue limits without freezing the queue, which
--	 * is against the locking protocol and dangerous.  But we can't just
--	 * freeze the queue as we're inside the ->queue_rq method here.  So this
--	 * should move out into a workqueue unless we get the file operations to
--	 * advertise if they support specific fallocate operations.
--	 */
-+	if (!changed) {
-+		queue_limits_cancel_update(lo->lo_queue);
-+		goto unlock;
-+	}
-+	memflags = blk_mq_freeze_queue(lo->lo_queue);
-  	queue_limits_commit_update(lo->lo_queue, &lim);
-+	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
-+
-+unlock:
-+	mutex_unlock(&lo->lo_mutex);
-+	fput(w->lo_backing_file);
-+	kfree(w);
-+}
-+
-+/*
-+ * The queue limits can't be modified from inside lo_fallocate() since that
-+ * would require freezing the queue while a request is being processed. 
-Hence
-+ * defer the queue limits update to a work item. The work item is queued on
-+ * lo->workqueue such that lo_free_disk() waits for it to finish.
-+ */
-+static void loop_clear_limits(struct loop_device *lo, struct file *file,
-+			      int mode)
-+{
-+	struct loop_clear_limits_work *w;
-+
-+	w = kmalloc_obj(*w, GFP_NOIO);
-+	if (!w)
-+		return;
-+	INIT_WORK(&w->clear_limits_work, loop_clear_limits_workfn);
-+	w->lo = lo;
-+	w->lo_backing_file = get_file(file);
-+	w->mode = mode;
-+	queue_work(lo->workqueue, &w->clear_limits_work);
-  }
-
-  static int lo_fallocate(struct loop_device *lo, struct request *rq, 
-loff_t pos,
-@@ -268,7 +318,7 @@ static int lo_fallocate(struct loop_device *lo, 
-struct request *rq, loff_t pos,
-  	 * supported and clear them here if that turns out not to be true.
-  	 */
-  	if (unlikely(ret == -EOPNOTSUPP))
--		loop_clear_limits(lo, mode);
-+		loop_clear_limits(lo, file, mode);
-
-  	return ret;
-  }
-
+------sfnc.NZyIOBfLTiZTLswaXBSL0w4GQC52Zj1LhBq2cHN2.MV=_ad66_--
