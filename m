@@ -1,67 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.159
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795671285;
-	b=bdzT4CxQvL6n1bKU9ycX76CNTjPABsEK3wWeDd2yfchBx7u5r/VtC6Fo8lGgY/qcvRJL
-	 MzZZYUdz6+O0SgE2FdaaK+d35NCjbsjX0vlcLM99qZrGhMCb8O465sLzWOt3AGV1R+QcJ
-	 6CHEW/WofaGOojaVBnlWBmKhO1MJgBwVEDP44Jhmxx5LMJ9D3zoXufhj8h0da21SPXrDL
-	 tepTTbZZ9xD58WHmdNni9FqndUZ8kq48Odf4cqAzYHHXc5dmkSVDUYYb7mZrqyeyqJruq
-	 T162qHN/xXERdimUlsv+E8HT4Hpviwfiy54lBAeOGDqm9aqQ8LNID1MmJXNE66I64oQ==
+	t=1795671763;
+	b=ufQ4RzmUISddFEPi+9g7anakvJpj63+24qMZNKJpG5QAbj4HOP8UbvT5Ei+QNZiZMwQc
+	 Ogc2CSAi/n6OIyW/ZnBqr+GkD/ePlucg+H5p26AAxcvm/r+4GhMKlIEGp5x8IVvaHgwRI
+	 4kKT7dHwFLletdcztDl2mwoXMCa6PW3Neb04ni92tWfV9tdHGniGGqOERZE3k/TPzj2vW
+	 l5Nk0c/JtqCi1Bi6MhTzURapDnIs3ZYHJOD5C7EvHbTM8u+gaV8rO/9o3PmAmBOYnHRME
+	 jWHXIpTCY4/iGbfIlWnjosS67ZPV9dqWAQGiOMidIwFcLx2qdbjOSt5lZmDu1xx7sMQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795671285;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-Spam-Status:X-Spam-Checker-Version;
-	bh=UJ+8MsoQlMt7ippaBHIRpOExH3OMdJs3rL46l0+BjYY=;
-	b=hDU1yjiK3R6BaEF2jEP+6D2Ccj3qtCtbWOxYCAFsIBZZjuDeWuSRUa4Al2uPbDzDvPLP
-	 Btwt4IvkPwn0jJM54cIHWwQ7ESDbxi5KInUDA9L+bZjJrns57J5Wpg2itwANCoUeOKngP
-	 CHtXuO62fpq8lcdiRdOy4YMUtCXIQ9oEoF61EuQtbVPPO/6hCEP8IgAjAknMheQRbYWjl
-	 HxuWpssU/dNxzxWZoTb4PhaLOTg/HpKraPTjEXJnxOSyU7EjdvyQ18qGriRrobxHc0zcQ
-	 BXcX/xnbal/R0nghqucL7m5mz62gzxsKVPG3alp8Ba0g3QzCjuNlbS/UI5avmit2KaQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795671763;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=KDqQNEtQd+6jLTv721CtUFemKZb8effCJHvw+bLNXTQ=;
+	b=qPSomNyTwFrn/ZMAHn32HvaaEnm0a98LtnCUvSHXqQA8nuxQ/G7w4/h1KZmdF5niAwq3
+	 c1PyHYLvMbi0/2sX7vFOa/WURgcc66514j9EwP7fljrehSVq9cLGg/i+4zChc8TftI0E7
+	 wp3JCFTb12KUqGKDGeSh8oLlxgFFnzWeYoRRaPgHkfkUkGz3ucEaFyqPDcs3UyIl8kPI0
+	 s+6mC1g4wR3Cajv1S8w8I0+Qg6sebdjER+ubwAfCv2mocKRnJRACITU9O4X96Li1+mcAY
+	 bj2lcLNEG9y6p+zD07+QqDjdgBEZWT/Nn3Zk6xwvjBcIJw8d79V1fxLYbuXT7iyweeA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.microsoft.com;
-	spf=pass smtp.mailfrom=linux.microsoft.com;
-	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=NsK73AF1;
-	arc=none smtp.remote-ip=13.77.154.182
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3921E606A31E;
-	Thu, 26 Nov 2026 05:34:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3921E606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=eNU4T4YD;
+	arc=none smtp.remote-ip=95.215.58.159
+Received: from mta1.migadu.com (out-159.mta1.migadu.com [95.215.58.159])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B7E606A31C
+	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 05:42:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A0B7E606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=NsK73AF1
-Received: from CPC-namja-026ON.localdomain (unknown [4.213.232.22])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 4B42420B7166;
-	Wed, 25 Nov 2026 21:34:35 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4B42420B7166
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1795671279;
-	bh=UJ+8MsoQlMt7ippaBHIRpOExH3OMdJs3rL46l0+BjYY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NsK73AF1/58D1ommrNJwFydZ1fP6q4zi10VfDT6LGHko+x/GK/EjL+6Z83cVawBi9
-	 rWanWfrNs3ylGDS8BN/WX9mgTXEymSNGibKse2E6DyFzNoc7TFHzIDb3e9Qh3T0RtH
-	 sBNHopDrk+M2KR5asloqhpWjOGdMWOdbCkK9/weM=
-From: Naman Jain <namjain@linux.microsoft.com>
-To: Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: David Hildenbrand <david@kernel.org>,
-	Oscar Salvador <osalvador@suse.de>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Keith Busch <kbusch@kernel.org>,
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=eNU4T4YD
+X-Envelope-To: linux-block@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=T/D/ipZeoT1JY+2pYK8EBjpZvR47x2HelHbDUPah5nQ=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795671760; v=1; x=1796276560;
+ b=eNU4T4YDa+uzIViBA/92ub72RdYtnCpJ/UinaRX696eF6S260xWb6PBsaAvDpABjwMtblIp9
+ ZN70vbUMB6Tq0jZhexwL0DJ8Dk4UXqulR86uXX8wBnMXJ2UFLOEs5N6FsAd22W9g8Wq5tV8gtmM
+ rSdXHJUcHeTT5eoVAPyN2TyU=
+X-Envelope-To: linux-block@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id d6142d2087cb271f;
+	Thu, 26 Nov 2026 05:42:40 +0000
+X-Mizu-Trace-ID: d6142d2087cb271f
+X-Migadu-Flow: FLOW_OUT
+From: Tao Cui <cui.tao@linux.dev>
+To: Bart Van Assche <bvanassche@acm.org>,
+	axboe@kernel.dk,
+	hch@lst.de,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: cuitao@kylinos.cn,
 	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-cxl@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	stable@vger.kernel.org,
-	namjain@linux.microsoft.com
-Subject: [PATCH] iov_iter: Fix direct I/O across compatible device pgmaps
-Date: Thu, 26 Nov 2026 05:34:33 +0000
-Message-ID: <20261126053433.88531-1-namjain@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.0
+	cui.tao@linux.dev,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH v8] loop: defer the queue limits clear to a workqueue
+Date: Thu, 26 Nov 2026 13:42:23 +0800
+Message-ID: <20261126054223.176824-1-cui.tao@linux.dev>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -73,118 +71,262 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 38446014648c ("block: don't merge different kinds of P2P transfers
-in a single bio") made bio_add_page() reject pages from different
-dev_pagemaps. This was needed for PCI P2PDMA, but also rejected pages
-with compatible DMA mapping requirements.
+From: Tao Cui <cuitao@kylinos.cn>
 
-Commit 41c665aae2b5 ("block: relax pgmap check in bio_add_page for
-compatible zone device pages") allows these pages in separate bvecs.
-Commit 13920e4b7b784 ("block: add pgmap check to biovec_phys_mergeable")
-prevents physically contiguous bvecs from different pgmaps from being
-merged into one segment.
+loop_clear_limits() calls queue_limits_commit_update() directly from
+the loop workqueue that processes the request.  That does a
+non-atomic struct assignment to q->limits without freezing the queue,
+which races with lockless readers of q->limits on other CPUs, such
+as bio splitting reading max_hw_sectors and the discard path reading
+max_hw_discard_sectors, letting them observe torn values.  The
+trigger is a discard or write-zeroes request on a loop device whose
+backing file does not support the corresponding fallocate operation.
 
-But direct I/O now fills a bio using iov_iter_extract_bvecs(), which
-retained the original restriction and bypasses bio_add_page().
-For a non-atomic request handled by a single bio, only the data before
-the pgmap boundary is submitted. The rest is not transferred, and the
-request completes with fewer bytes than requested.
+The code already has an XXX comment saying this should move to a
+workqueue.  Do that: schedule a work item on the system workqueue,
+where it is safe to freeze the queue around the limits update.  The
+unsupported modes live under a new mutex, lo->clear_limits_lock,
+guarded by a backing-file check that drops records from a racing
+unbind or rebind.  The work item is scheduled while holding that
+lock, so an unbind resets the verdicts under the lock before calling
+cancel_work_sync() and cannot miss a schedule from a request that is
+still in flight.  Requests that arrive while the clear is in flight
+fail quietly, so the console report stays at the first failure.
+loop_remove() also cancels the work item before the queue becomes
+unreachable.
 
-Fix this by moving zone_device_pages_compatible() from blk.h to
-memremap.h and using it in iov_iter_extract_bvecs(). This allows
-compatible pages to be added as separate bvecs without relaxing the
-same-pgmap requirement for PCI P2PDMA.
-
-Fixes: 38446014648c ("block: don't merge different kinds of P2P transfers in a single bio")
-Cc: stable@vger.kernel.org
-Signed-off-by: Naman Jain <namjain@linux.microsoft.com>
+Fixes: 5f75e081ab5c ("loop: Disable fallocate() zero and discard if not supported")
+Suggested-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 ---
- block/blk.h              | 19 -------------------
- include/linux/memremap.h | 19 +++++++++++++++++++
- lib/iov_iter.c           |  3 ++-
- 3 files changed, 21 insertions(+), 20 deletions(-)
+Changes since v7:
+- quiet repeated failures at the point of failure instead of at
+  queue_rq() time: verdicts are recorded per mode for the lifetime of
+  the backing file and loop_clear_limits() reports whether a verdict
+  is new, so repeats mark only their own request quiet.  Under
+  concurrent dispatch this keeps exactly the first failure per mode on
+  the console (sashiko review; eight-thread write-zeroes on a
+  tmpfs-backed loop device: v7 logged two errors where loop/011
+  expects one, this logs one)
+- schedule the clear work while holding clear_limits_lock and reset
+  the verdicts before cancel_work_sync() in __loop_clr_fd(): a verdict
+  that passed the backing-file check now queues the work before the
+  lock is released, so the cancel cannot miss a schedule from a
+  request still in flight, which previously could touch a loop_device
+  already freed (Bart)
+- skip the fallocate probe when the mode is already known to be
+  unsupported, instead of repeating it while the limits commit is in
+  flight (Bart)
+- return early from the work item when no verdict is left to commit,
+  instead of freezing the queue and committing unchanged limits (Bart)
+- drop the verdict reset in loop_assign_backing_file(): since the
+  LOOP_CHANGE_FD removal (d4fabede1da0) its only caller is
+  loop_configure(), which requires an unbound device, so it was dead;
+  one reset site remains, so no helper was added (Bart)
 
-diff --git a/block/blk.h b/block/blk.h
-index 50abfd9328861..460c064f1d1b0 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -142,25 +142,6 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
- 	return true;
+Changes since v6:
+- fix the __loop_clr_fd() comment: asynchronous I/O can be in flight
+  across an unbind, and loop_remove()'s cancel is the backstop for
+  work scheduled after __loop_clr_fd()'s
+- drop the cancel_work_sync() from lo_free_disk(): no reachable path
+  needs it
+- reword the loop_remove() comment accordingly
+
+ drivers/block/loop.c | 123 ++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 111 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 194f51d9dab6..8c2ef0c327d4 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -67,6 +67,9 @@ struct loop_device {
+ 	struct list_head        rootcg_cmd_list;
+ 	struct list_head        idle_worker_list;
+ 	struct rb_root          worker_tree;
++	struct work_struct      clear_limits_work;
++	struct mutex		clear_limits_lock;
++	unsigned int		clear_limits_seen;
+ 	struct timer_list       timer;
+ 	bool			sysfs_inited;
+ 
+@@ -222,9 +225,31 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
+ 		kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
  }
  
--/*
-- * Check if two pages from potentially different zone device pgmaps can
-- * coexist as separate bvec entries in the same bio.
-- *
-- * The block DMA iterator (blk_dma_map_iter_start) caches the P2PDMA mapping
-- * state from the first segment and applies it to all subsequent segments, so
-- * P2PDMA pages from different pgmaps must not be mixed in the same bio.
-- *
-- * Other zone device types (FS_DAX, GENERIC) use the same dma_map_phys() path
-- * as normal RAM.  PRIVATE and COHERENT pages never appear in bios.
-- */
--static inline bool zone_device_pages_compatible(const struct page *a,
--						const struct page *b)
--{
--	if (is_pci_p2pdma_page(a) || is_pci_p2pdma_page(b))
--		return zone_device_pages_have_same_pgmap(a, b);
--	return true;
--}
--
- static inline bool __bvec_gap_to_prev(const struct queue_limits *lim,
- 		struct bio_vec *bprv, unsigned int offset)
+-static void loop_clear_limits(struct loop_device *lo, int mode)
++static void loop_clear_limits_workfn(struct work_struct *work)
  {
-diff --git a/include/linux/memremap.h b/include/linux/memremap.h
-index c8a4979d4c780..a1d447a847990 100644
---- a/include/linux/memremap.h
-+++ b/include/linux/memremap.h
-@@ -202,6 +202,25 @@ static inline bool is_pci_p2pdma_page(const struct page *page)
- 		folio_is_pci_p2pdma(page_folio(page));
- }
+-	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
++	struct loop_device *lo =
++		container_of(work, struct loop_device, clear_limits_work);
++	struct queue_limits lim;
++	unsigned int memflags;
++	int mode;
++
++	/*
++	 * Snapshot the recorded modes without clearing them; verdicts stay
++	 * for the life of the backing file.  The freeze drains in-flight
++	 * requests, so everything scheduled before it is visible here.
++	 */
++	memflags = blk_mq_freeze_queue(lo->lo_queue);
++	mutex_lock(&lo->clear_limits_lock);
++	mode = lo->clear_limits_seen;
++	mutex_unlock(&lo->clear_limits_lock);
++
++	/* A racing unbind may have reset the verdicts; nothing to commit. */
++	if (!mode) {
++		blk_mq_unfreeze_queue(lo->lo_queue, memflags);
++		return;
++	}
++
++	lim = queue_limits_start_update(lo->lo_queue);
  
-+/*
-+ * Check if two pages from potentially different zone device pgmaps can
-+ * coexist as separate bvec entries in the same bio.
-+ *
-+ * The block DMA iterator (blk_dma_map_iter_start) caches the P2PDMA mapping
-+ * state from the first segment and applies it to all subsequent segments, so
-+ * P2PDMA pages from different pgmaps must not be mixed in the same bio.
-+ *
-+ * Other zone device types (FS_DAX, GENERIC) use the same dma_map_phys() path
-+ * as normal RAM.  PRIVATE and COHERENT pages never appear in bios.
-+ */
-+static inline bool zone_device_pages_compatible(const struct page *a,
-+						const struct page *b)
-+{
-+	if (is_pci_p2pdma_page(a) || is_pci_p2pdma_page(b))
-+		return zone_device_pages_have_same_pgmap(a, b);
-+	return true;
+ 	if (mode & FALLOC_FL_ZERO_RANGE)
+ 		lim.max_write_zeroes_sectors = 0;
+@@ -234,14 +259,65 @@ static void loop_clear_limits(struct loop_device *lo, int mode)
+ 		lim.discard_granularity = 0;
+ 	}
+ 
+-	/*
+-	 * XXX: this updates the queue limits without freezing the queue, which
+-	 * is against the locking protocol and dangerous.  But we can't just
+-	 * freeze the queue as we're inside the ->queue_rq method here.  So this
+-	 * should move out into a workqueue unless we get the file operations to
+-	 * advertise if they support specific fallocate operations.
+-	 */
+ 	queue_limits_commit_update(lo->lo_queue, &lim);
++	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
 +}
 +
- static inline bool folio_is_device_coherent(const struct folio *folio)
++/*
++ * Record that the backing file does not support @mode.  Returns true
++ * for a first verdict or a dropped stale record, false for a repeat.
++ */
++static bool loop_clear_limits(struct loop_device *lo, struct file *file,
++			      int mode)
++{
++	bool first;
++
++	mutex_lock(&lo->clear_limits_lock);
++	if (lo->lo_backing_file != file) {
++		/* Stale record from a racing unbind or rebind; drop it. */
++		mutex_unlock(&lo->clear_limits_lock);
++		return true;
++	}
++	first = (mode & ~lo->clear_limits_seen) != 0;
++	lo->clear_limits_seen |= mode;
++	/* Scheduled under the lock so cancel_work_sync() cannot miss it. */
++	if (first)
++		schedule_work(&lo->clear_limits_work);
++	mutex_unlock(&lo->clear_limits_lock);
++
++	return first;
++}
++
++/*
++ * Record the verdict and return -EOPNOTSUPP; repeats stay quiet so only
++ * the first failure per mode reports.
++ */
++static int lo_unsupported(struct loop_device *lo, struct request *rq,
++			  struct file *file, int mode)
++{
++	if (!loop_clear_limits(lo, file, mode))
++		rq->rq_flags |= RQF_QUIET;
++
++	return -EOPNOTSUPP;
++}
++
++/*
++ * Return true when @mode is already recorded as unsupported, so the
++ * fallocate probe can be skipped.
++ */
++static bool loop_mode_unsupported(struct loop_device *lo, struct file *file,
++				  int mode)
++{
++	bool known;
++
++	mode &= FALLOC_FL_ZERO_RANGE | FALLOC_FL_PUNCH_HOLE;
++
++	mutex_lock(&lo->clear_limits_lock);
++	known = lo->lo_backing_file == file &&
++		(mode & lo->clear_limits_seen);
++	mutex_unlock(&lo->clear_limits_lock);
++
++	return known;
+ }
+ 
+ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+@@ -256,8 +332,16 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+ 
+ 	mode |= FALLOC_FL_KEEP_SIZE;
+ 
+-	if (!bdev_max_discard_sectors(lo->lo_device))
+-		return -EOPNOTSUPP;
++	if (!bdev_max_discard_sectors(lo->lo_device)) {
++		/*
++		 * Limits already committed; record the op's bit to keep
++		 * the per-mode quiet accounting.
++		 */
++		return lo_unsupported(lo, rq, file, mode);
++	}
++
++	if (loop_mode_unsupported(lo, file, mode))
++		return lo_unsupported(lo, rq, file, mode);
+ 
+ 	scoped_guard(file_write, file)
+ 		ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
+@@ -269,7 +353,7 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+ 	 * supported and clear them here if that turns out not to be true.
+ 	 */
+ 	if (unlikely(ret == -EOPNOTSUPP))
+-		loop_clear_limits(lo, mode);
++		return lo_unsupported(lo, rq, file, mode);
+ 
+ 	return ret;
+ }
+@@ -1035,6 +1119,15 @@ static void __loop_clr_fd(struct loop_device *lo)
+ 	lo->lo_backing_file = NULL;
+ 	spin_unlock_irq(&lo->lo_lock);
+ 
++	/*
++	 * Requests may still be in flight across this unbind; reset the
++	 * verdicts before the cancel so it cannot miss the work item.
++	 */
++	mutex_lock(&lo->clear_limits_lock);
++	lo->clear_limits_seen = 0;
++	mutex_unlock(&lo->clear_limits_lock);
++	cancel_work_sync(&lo->clear_limits_work);
++
+ 	lo->lo_device = NULL;
+ 	lo->lo_offset = 0;
+ 	lo->lo_sizelimit = 0;
+@@ -1700,6 +1793,7 @@ static void lo_free_disk(struct gendisk *disk)
+ 	loop_free_idle_workers(lo, true);
+ 	timer_shutdown_sync(&lo->timer);
+ 	mutex_destroy(&lo->lo_mutex);
++	mutex_destroy(&lo->clear_limits_lock);
+ 	kfree(lo);
+ }
+ 
+@@ -2018,6 +2112,8 @@ static int loop_add(int i)
+ 	spin_lock_init(&lo->lo_lock);
+ 	spin_lock_init(&lo->lo_work_lock);
+ 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
++	INIT_WORK(&lo->clear_limits_work, loop_clear_limits_workfn);
++	mutex_init(&lo->clear_limits_lock);
+ 	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
+ 	disk->major		= LOOP_MAJOR;
+ 	disk->first_minor	= i << part_shift;
+@@ -2056,6 +2152,9 @@ static int loop_add(int i)
+ 
+ static void loop_remove(struct loop_device *lo)
  {
- 	return folio_is_zone_device(folio) &&
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 56c59a2b589d3..a0c76b40a4f90 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -4,6 +4,7 @@
- #include <linux/fault-inject-usercopy.h>
- #include <linux/uio.h>
- #include <linux/pagemap.h>
-+#include <linux/memremap.h>
- #include <linux/highmem.h>
- #include <linux/slab.h>
- #include <linux/vmalloc.h>
-@@ -1968,7 +1969,7 @@ ssize_t iov_iter_extract_bvecs(struct iov_iter *iter, struct bio_vec *bv,
- 		unsigned int nr_to_add;
- 
- 		if (*nr_vecs > 0 &&
--		    !zone_device_pages_have_same_pgmap(bv[*nr_vecs - 1].bv_page,
-+		    !zone_device_pages_compatible(bv[*nr_vecs - 1].bv_page,
- 				pages[i]))
- 			break;
- 
++	/* Cancel before the queue becomes unreachable. */
++	cancel_work_sync(&lo->clear_limits_work);
++
+ 	/* Make this loop device unreachable from pathname. */
+ 	del_gendisk(lo->lo_disk);
+ 	blk_mq_free_tag_set(&lo->tag_set);
 -- 
-2.43.0
+2.53.0
 
