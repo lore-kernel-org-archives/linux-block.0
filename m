@@ -1,87 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795657802;
-	b=1hBtCfRL5JZgqEeIqRZdt49dU2DTSvElncs7NCTGVJekkGY2fFkeO0D21GzUjcyA4bAV
-	 WMsZCcbm+XbUIDrXOAf4xaFW7pIrphsu7UG7auDQYlL9ZOfrm6T2t1cv7gcFSdXww4Qra
-	 UL7gozEkOgeK28sy0PIznf+2MM5ayyMnJNEf82dFCYJq8xO3mEbDM+2DftY12652M1BU4
-	 YZQzJF4ShFwtJzARaCoE+yJYIenYnq8H929EWq3nZi4Ph8kZA6bkalQ4RqzzDwYYk0lnk
-	 JxPUQ8CcWmDcnIPJfBpF9KxW2wgHIxkPRACwop+as3Vee3tzXSpZ27cNTFTR3T2hRQA==
+	t=1795658392;
+	b=snSLfjXhhY+ppTaQ+XV2LFqYbRPLVxWCtdO0T83atVjnM5aTkkzvE+MW4TbbXwB9D8Rk
+	 QNjbN9I1pYaR0z0qgCHQPrkL5n/j5Kt0ciPp6UMaSlSVWkRf6leavMuPCtHR1ee29Nwv6
+	 cf2w5FMy2g/MuGTo7RfZwT4MRmLXnd/bwI6CrDvJ6+cCERaVCESSAGU04+KUJrfkmDbWj
+	 BK8f+BxyyhU6DmfRwQ+Q5Kf0BrBd8zjOhjsNq+uWGfZTTNwEEKzTRKmuQGxar7jZXpKRZ
+	 QPwYzjzjntebcFuIIQk0AK36Oy9fgSJTy/yejq8biwXK4AoEpPzGIfXev+EYaPlWp+w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795657802;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795658392;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=/tpzHtlkGwh77klAgQ3+7vDN5VnMY54g4sCcJN12BCU=;
-	b=qD52Sa/sJ546BxPCMYdhAqJuYibp/EMBOpnktygcDCT5y4Ui5tUNu44M871XQ4/xmZPl
-	 UiBs/qcgU51RdTqFL+8zr4O5psV9kFkH2k9/26GZ7GSNhXiPsivY2Jdc8R3lKTcOkdIf4
-	 4grAmtM/BZnFZglMJjZkHpt10sHw6dOoD3cA5YZL9bf/94F7bb5E/XNLLCdr26EhQ6+EJ
-	 EktYJy3vGhU5CVD05W1SaJjySRB1Qvw5j3i9QNqSqSEGRfAy8FrIgHWkjKsvIiQkfGgzB
-	 yy9IMB+GCkt9eJQMti0gSKLbqKqG7uREMAcABAR826UDD09D+RWxb8sErreU/cIK5cQ==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=cwYQ9S4xNOhgMpsr/2Fw0/uwY52gpltHLNu3ahogehA=;
+	b=a+nMlvu3woxQR+6v4XVcFFVQ/SSzhWN0Dd19OvihRu31WhLg9gfeOmSuWY4Yl2g+UaYB
+	 5w0lia2ZKYsSfLkvrA/Ji6R6avkbgT/6Sb8Q17qUVS8gJGlJ6ee8GQTG43OEGJMaNT2FB
+	 MAHh8Ir8zYObBNmwtGMhlH2x3LfnOCKOtrvSlHA+Ejtb7zo0hsa/dHauldkiFzOAv/c84
+	 2KmX06KyVDQ3+hvwOkR0wpo0GVPwIqZ2PkSOOckF6CqnvH4IIz6jbPbOxYphBz6KlCr+9
+	 LzOmESXDrTX9LB19h3Dz4B1htRRb090DV352c7ctEfIksdKzW4EDd688DFgL+DnMHJA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=HTnZrZZA;
-	arc=none smtp.remote-ip=74.125.82.174
-Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b="VyH5ZPW/";
+	arc=none smtp.remote-ip=209.85.215.181
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66CA606A327
-	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 01:50:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A66CA606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5484606A321
+	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 01:59:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A5484606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=HTnZrZZA
-Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-38190551625so12732101eec.1
-        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 17:50:01 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=VyH5ZPW/
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-cdd9d0c9bbdso3718825a12.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2026 17:59:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel.dk; s=google; t=1795657801; x=1796262601; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/tpzHtlkGwh77klAgQ3+7vDN5VnMY54g4sCcJN12BCU=;
-        b=HTnZrZZAk1fimzpf7glBUawWrfz/uu9E4sN4bkzRxUwK+9JNC+YgbwMC26RHCqMaVV
-         g1fAWikYyKwGlWsTuWlSm2tdpfSKYlMaqe4J+NBvOWJ1jzJWjfQHmb3QSnoQYXG8Pd99
-         X2PnM1cNcu1HnNj+AlEXCYovWFuJCKZwJX7DtAQF3HyEZDGF/aM56unH5RHMBqVP3dac
-         jQxzA4XpDOCLQq6+kw7Diak3FdD46upCx2ml4v0Tx91BRDlr/leBM44VeK33SH6Y5FnW
-         oe6KSxmzGH9/CltxMd6DCGpdsFAFwLxUn8cFI61gpgbeyf0ySiKbkzXmcWDHv+nqIJGr
-         pdxg==
+        d=chromium.org; s=google; t=1795658391; x=1796263191; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=cwYQ9S4xNOhgMpsr/2Fw0/uwY52gpltHLNu3ahogehA=;
+        b=VyH5ZPW/di937qaf+QYD6ib8MkxkHDc4mCHkWBpY5RY/jGABHw8rWQPHapKW9puJc2
+         e4mWvTsOemVXHeDlvCrgsq6qVEmCsMr/nZboKPp5HvfoHlb97Ogg2y8/TvYCLtb+vnCd
+         NJ5PIaSEMKROT/sUMLWAaTAAXEWwR4IgEKnS8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795657801; x=1796262601;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20260707; t=1795658391; x=1796263191;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=/tpzHtlkGwh77klAgQ3+7vDN5VnMY54g4sCcJN12BCU=;
-        b=rTEUx7rYc2nYtBKFQfq9sZGIt9GA6JChiwNVQiN/ZxCkfszvvzVOAp0Q4u7EC5v6aV
-         gA6PAEO96m/fcT/QYJzGFnGxrE2P/HYH1tBkt5eIVGSxKcTgp3cIeb0OS4YfKiATxwct
-         VxMIua4hlshtF0v+B2466ortH3LDJEDNanwmP33ilCo+ulYSWmSt1RBW7TmCfqRMYC1N
-         GWlqQS1uvJjfEsXS+asMGLf9Fk6tXsLts7Aq2odUe3XKBUYHi7XUQvig+wi9Vc9CBGv3
-         V+EDOSOvr2jWsv7FPQrcBsNBprzIsd7MAz0gMkOx+0XsUSujnz6By7AiYN+ksDo0WSY5
-         xgBQ==
-X-Gm-Message-State: APuU4Z8Im/xBBEdSeh2x1yi7kvfTaxSEIvOYPTTklngwGZ9PY0fC0oOd
-	WE4isl1tXU6lTgVDR2wbF1q0RwZB98zMBr0pagk5IL0B3TrLEGZ9e4u2t+Sf8B8D3qQ=
-X-Gm-Gg: AZFdTZeV9kp0Ohr68QOA3cdUpwCVFl1jqDiPbHpt3Kpal+sc1+Rgw8ZE95TymctVcfL
-	2hd5xC2GT+fAbcSl7NaSlU7zipvlaskuRpHb/QmD5vIheLmC2Hpwf7Ngk1z8t0NnpI3dvvlbX2z
-	4lJC2oXy4NkCwqCSRHebetafvDRdI+gJEvVzh06btOnrvxn/3OzihjkrYzQl7iWQGqrv6x8KXHL
-	5vA7RCJvHcB3UDvWNIH/Ic1nuxhhr6IwYjGEqAxoCZAEfrcNVfktyAlFHvHd5KSPAr7uGjUCsyh
-	Wf/lsJqjkFT35lXEFxAI1BsgsCjM/QW2m7/7HshoqQm8Hx4HbrAaicfWvXbsIKQuTv1fupXE5BS
-	OHTShUE7sFA7x/LYMDNczYSi58e30x5HC4HCAOlZT0nakB5T1H2t9rl7u9qXHFqnPNH2IUNtLVC
-	TQoe53JGoO/fMqhXa9OVrwuKzI1MNsJSqtNZASD6IKwDjCN0Kth9JZwST3ol1uHX0hDnjZW6usg
-	0w/2DmjQwRoc+2pLga2D38LwR19wfNjsgi5kifmXLL7WpisPtAcCm2Y3o9vnBnqfHK78DsyVTWA
-	8h771Zh2dNyiOtlE5fQB4FxZb9Co6OygxYL91qa/7zQcsyRrizvHkbnPfHUxNP1MQLuJSHVHPgy
-	Exgx1lfURl1othiLb8A4jqUC/oS4GZrrUtw7vb7yTDRrLxD0yDkmEkL4vl00Pmpfpa9NAnQ==
-X-Received: by 2002:a05:693c:8042:b0:379:8df3:d2c9 with SMTP id 5a478bee46e88-3856f14ca78mr21362842eec.13.1795657800466;
-        Wed, 25 Nov 2026 17:50:00 -0800 (PST)
-Received: from [192.168.1.142] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385672ce402sm54208971eec.16.2026.11.25.17.49.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Nov 2026 17:49:59 -0800 (PST)
-Message-ID: <1cf30693-44c6-4761-9900-e36259082e4e@kernel.dk>
-Date: Wed, 25 Nov 2026 18:49:59 -0700
+        bh=cwYQ9S4xNOhgMpsr/2Fw0/uwY52gpltHLNu3ahogehA=;
+        b=Gu5lmaxvvEmNPUF93iJ8FlETo+8Qfhod9l5MsX5tjI1W86W66ma05eiNPaxU+r8Hl1
+         DN15z9g/lWIEkfu7hta8cSUpBKAG4VO1v+XbFtj+Lbj4BXYulbGRpOIu0tlJW8td5/P3
+         9laDuPS3Rmv0g5DqcztGcnydPmQBaIRQvsPhtaosMS/Qop3ls3/IC6TO7irUN9Z1c2Iv
+         Z6NeKORkUndttxGRaTQbWLF5iWPKH/ZY5ddhqNso/Jivor5klblAb9/96G+HPQrrAZqp
+         1UEDyoeJJE94M60MK7WpMImhLkRnutuWPZSJM9SHFBvmGcEjw4bYHWjhwH2SryYDJV2m
+         MNdg==
+X-Forwarded-Encrypted: i=1; AL+hErHKEW9miH4Y8Ckn+KolgM1MgLskw+NlLZQogKcVpadk+bIfot4MqIx/4sL01XrBAV91U1Xp81QQI15uOQ==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/d0kMkog0KZ/VfQiDHjs+3rQsVeI3SOxAVvV54/l8Kji0avYfm
+	BMf8No3SM3jtVdjfjyu4wY3nVrJRQYJTCmYKiNjQbT0BJkb1g62YC+Q2qzAt2X4OZQ==
+X-Gm-Gg: AZFdTZdy0ft3hebl4Z1a0ZqwHDFCZ2ujCOD9h3xbxsikem4kqgLi2lNk/ngXIuSFNPB
+	DirOF31rV9O+ZE0pp9dA/dvf4tOTSTzWavjG6F5627c10HRX1PyeZFbwuaVw0gSA99Bs6WQhoB5
+	PbL9NP1gPzI3i3YUazmtowEFEKZ00/6s6UI8m5p8G0MC2fYMFykiHRU3mzr0+6s66bOYwXYjM5e
+	GebjPQAFrexisrnW3Tup8Sm1c/sXBj5+vb497Re3QjV4C5REam0eIO+o0ROKcSKGyw4oEYOs/I0
+	eiDTup4DtDTR8qKGAZe8otY4K3a6gsEI+JpJtggFTZGZH26GpQUmAYYbT4ikl7MF4A30aoiUHwK
+	oNAgkCropGJlFowmh40NuNTxXfVzXUpV3WUURXhOtcMaEk1RxpZUh5zEVX9gEsabe1MMIMCeVcn
+	DkhLkNAqiInL6pzwcQBedxJqCKFhjZ6NoTtkPXI1hb+/PY/Nz1cMwinIjmEtCLAd7mBC7kzmSwk
+	2hfu7lNXjCNrD+4JAgYwutFjTLZgOJy+EdDIHi4PyP+E/aa7hAzSz5jNlzGH8tzL/qWjza88EPR
+	TzNCFi8kN1JaW3pdr98jSDS0PUMopqAbrqXmG/Ulp6fGzvAzCMi3jjGn7U5p3E6ckLPGOsXqioJ
+	xqRMmMKHuDFMzPQ==
+X-Received: by 2002:a17:90a:ec86:b0:3b4:889:883a with SMTP id 98e67ed59e1d1-3b41c9bacbbmr19770542a91.66.1795658390973;
+        Wed, 25 Nov 2026 17:59:50 -0800 (PST)
+Received: from tigeriii.tok.corp.google.com ([2a00:79e0:2031:6:59ac:90a:64:4bd7])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b4afeaaa84sm14344902a91.10.2026.11.25.17.59.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2026 17:59:50 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Minchan Kim <minchan@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Alejandro Colomar <alx@kernel.org>
+Subject: [PATCH] zram: do not modify cont sysfs store buffers
+Date: Thu, 26 Nov 2026 10:45:07 +0900
+Message-ID: <20261126014518.1318583-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.56.1.839.g22a8290db9-goog
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -91,53 +96,113 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [v4 0/3] block: delay support for error injection
-To: Haris Iqbal <haris.iqbal@linux.dev>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Keith Busch <kbusch@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org
-References: <20261111215838.103356-1-haris.iqbal@linux.dev>
- <179501806989.17649.3138860274842922761.b4-ty@b4>
- <20261120164416.GA32719@lst.de>
- <edb8249a-7bc3-430e-bbb7-243e1881a0b8@linux.dev>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <edb8249a-7bc3-430e-bbb7-243e1881a0b8@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/21/26 4:27 AM, Haris Iqbal wrote:
-> 
-> 
-> On 11/20/26 17:44, Christoph Hellwig wrote:
->> On Wed, Nov 18, 2026 at 09:07:49AM -0700, Jens Axboe wrote:
->>>
->>> On Wed, 11 Nov 2026 22:58:35 +0100, Md Haris Iqbal wrote:
->>>> Error injection can only fail a bio today.  This adds a delay_us option so
->>>> that a rule can hold a bio back first, to model a slow device.  The delay
->>>> happens above the driver, so it tests the code waiting above the block
->>>> layer, not the blk-mq timeout handler.
->>>>
->>>> A delayed bio is marked with a new BIO_ERROR_INJECTED flag so the rules
->>>> are not applied to it again, even after a split.  Christoph asked on v2
->>>> to avoid the flag by allowing a delay only together with an error.  I kept
->>>> delay-only rules, as a slow device that succeeds is the more useful case,
->>>> so the flag question is still open.
->>>>
->>>> [...]
->>>
->>> Applied, thanks!
->>>
->>
->> Hmm.  This still has rela issues as pointed out by Sashiko.  I'd very
->> much expect a resend to address them.
-> 
-> I can resend with the fix, or send just the fix to be patched above
-> this, since these are already picked. Let me know whats preferable.
+zram sysfs handlers that accept key=value arguments (e.g.
+algorithm_params_store(), etc.) pass their const char *buf
+parameter through skip_spaces(), discarding const, and then
+mutate it in-place via next_arg().  This is not dangerous
+per se because kernfs_fop_write_iter() passes a temp copy
+of user string to zram, however it is still probably worth
+fixing, just for the sake of correctness.
 
-Send a fix please, that should always be the default as otherwise
-I have to rebase the tree.
+Allocate a temp non-const buffer for args tokenisation.
 
+Link: https://lore.kernel.org/all/awcpkJD6K1xtx_Pe@devuan/
+Reported-by: Alejandro Colomar <alx@kernel.org>
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ drivers/block/zram/zram_drv.c | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 96b135e3f727..ca12c1918aec 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1279,10 +1279,15 @@ static ssize_t writeback_store(struct device *dev,
+ 	unsigned long lo = 0, hi;
+ 	struct zram_pp_ctl *pp_ctl = NULL;
+ 	struct zram_wb_ctl *wb_ctl = NULL;
++	char *kbuf __free(kfree) = NULL;
+ 	char *args, *param, *val;
+ 	ssize_t ret = len;
+ 	int err, mode = 0;
+ 
++	kbuf = kstrndup(buf, len, GFP_KERNEL);
++	if (!kbuf)
++		return -ENOMEM;
++
+ 	guard(rwsem_write)(&zram->dev_lock);
+ 	if (!init_done(zram))
+ 		return -EINVAL;
+@@ -1303,7 +1308,7 @@ static ssize_t writeback_store(struct device *dev,
+ 		goto out;
+ 	}
+ 
+-	args = skip_spaces(buf);
++	args = skip_spaces(kbuf);
+ 	while (*args) {
+ 		args = next_arg(args, &param, &val);
+ 
+@@ -1779,12 +1784,17 @@ static ssize_t algorithm_params_store(struct device *dev,
+ 	char *args, *param, *val, *algo = NULL, *dict_path = NULL;
+ 	struct deflate_params deflate_params;
+ 	struct zram *zram = dev_to_zram(dev);
++	char *kbuf __free(kfree) = NULL;
+ 	bool prio_param = false;
+ 	int ret;
+ 
+ 	deflate_params.winbits = ZCOMP_PARAM_NOT_SET;
+ 
+-	args = skip_spaces(buf);
++	kbuf = kstrndup(buf, len, GFP_KERNEL);
++	if (!kbuf)
++		return -ENOMEM;
++
++	args = skip_spaces(kbuf);
+ 	while (*args) {
+ 		args = next_arg(args, &param, &val);
+ 
+@@ -1899,12 +1909,17 @@ static ssize_t recomp_algorithm_store(struct device *dev,
+ 				      size_t len)
+ {
+ 	struct zram *zram = dev_to_zram(dev);
++	char *kbuf __free(kfree) = NULL;
+ 	int prio = ZRAM_SECONDARY_COMP;
+ 	char *args, *param, *val;
+ 	char *alg = NULL;
+ 	int ret;
+ 
+-	args = skip_spaces(buf);
++	kbuf = kstrndup(buf, len, GFP_KERNEL);
++	if (!kbuf)
++		return -ENOMEM;
++
++	args = skip_spaces(kbuf);
+ 	while (*args) {
+ 		args = next_arg(args, &param, &val);
+ 
+@@ -2578,6 +2593,7 @@ static ssize_t recompress_store(struct device *dev,
+ 	struct zram *zram = dev_to_zram(dev);
+ 	char *args, *param, *val, *algo = NULL;
+ 	u64 num_recomp_pages = ULLONG_MAX;
++	char *kbuf __free(kfree) = NULL;
+ 	struct zram_pp_ctl *ctl = NULL;
+ 	s32 prio = ZRAM_SECONDARY_COMP;
+ 	u32 mode = 0, threshold = 0;
+@@ -2586,7 +2602,11 @@ static ssize_t recompress_store(struct device *dev,
+ 	bool prio_param = false;
+ 	ssize_t ret;
+ 
+-	args = skip_spaces(buf);
++	kbuf = kstrndup(buf, len, GFP_KERNEL);
++	if (!kbuf)
++		return -ENOMEM;
++
++	args = skip_spaces(kbuf);
+ 	while (*args) {
+ 		args = next_arg(args, &param, &val);
+ 
 -- 
-Jens Axboe
+2.56.1.839.g22a8290db9-goog
+
