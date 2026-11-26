@@ -1,59 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.96
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795691097;
-	b=RunnG10CjVuJrd2v8852JW2UdtWH0xxAn4gS0AJPwEWbmJFI90tEMlVvdzNgfHMbcyeh
-	 z9EWpbH8As+K+EZBW6Nl7sySvs4petp8twGt3CvCYqRxZoHEuLn8foXDAC80VzpJfyZfO
-	 CxZmt+muVaVoJDVWeOz4/6ur4U/5RvzREmpqiogiayK4fBGcM/oYQFpRDk9TaIKZos/uG
-	 YFbDbooq+RcoT8aw2YoWzvNi9HAGyTAZkEQFe1rX8Yp2L40htC/Vpqzv1Hz8dDczSO1IY
-	 A4r+JJwx0h8TYlQAAiWyNa5a2HrHxd2zaJJWcMKDXAIuyTtypdrFqnAERHCMzxmx2ew==
+	t=1795692065;
+	b=5BN010ACv7nMlvyCjHZpG6KEupb1RF8nhYbDahjBj0X8zfftCPEopcEvadtL/eQzR8Gu
+	 Gbsj8L1cEjtoM6ec6cGaIaJ/QCzTJtpRIgJXWgN7G3XSEjqgCJxSIu892MxBqUq4Rt9S1
+	 jEs0r0ffEUtxe5NJIp/CBB6Rt1+VViBTggnzXU+/93vriMj2yy5dgSDBP8uSmlv5FNzZ+
+	 BC3l4vzoR33VX0G1YOs9RHpZ0PpQQJON+u4uY3y4FgghQCpsZZeetJ9FipjdIocvbztHw
+	 hVZZZCYRohM3hJlcFd767m2+XeK2c20fdd2BjeG5+RULUiGSys/XEadZrTzaPvjehdA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795691097;
-	h=DMARC-Filter:Received:Received:X-Originating-IP:Date:
-	 X-CM-HeaderCharset:From:To:Cc:Subject:X-Priority:X-Mailer:In-Reply-To:
-	 References:Content-Transfer-Encoding:X-CM-CTRLDATA:Content-Type:
-	 MIME-Version:Message-ID:X-Coremail-Locale:X-CM-TRANSID:
-	 X-CM-SenderInfo:X-Coremail-Antispam;
-	bh=7WZrC5amErdAZUKH3zA00f9ty+dy4dlRNgU1aieOoRU=;
-	b=EV0EsMFzZGuwkK83jHawFIj/tiA+X1LzGmzTOdOcePtAkP+q0U7avZBKWvtrwv8esfqj
-	 B9S/GC3X38c1sXKhT6BKKfFWJ5K+6oWCTI9/g0qDL60LoSZncpM8/elDhdd/iSN9VFD0c
-	 C+gvkpSKcTwt+n419l9oFurKK4lOw+Q62N1BozBEfYcLcnIMIGqd4IHuI4Zzu51cwFR4Q
-	 54t2XDfuZkaGKI6UpcmxGIy5Ddd5jYbCXX7SHiVLTmr82gC6W+q50HsTEnKIusMiA37uy
-	 sBFBTllNdFVEJGfzYl4MMEnUznUvvTdGqEdDP38zMtTRqpWQ9ov96Lh6ZApD5AQWvrg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795692065;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=zIHuFarcS6Fh+RV7UoaafACerN1VwcUrnwEg4Ma6T9A=;
+	b=O4VuOlloBU7gaWICuYMFyfHrX1yIP94NreJyICz8SFuvVhTyk2SU4b8tqLrEoNfVHpcv
+	 oZ74VJ8Gmu5IdCGkXOzXRcUirN6RpBN4KNI/WNgzb3+KccislN2ZciBaOMelkq+51VaRV
+	 1ZNQqcnVDcFKfP7sxlAXQtL+dqWu9YbMTQe+vjKaNIXhW1CR/QjuikAPeQu17MQgIUq4G
+	 CZqqDOVv4VTUjLYpIw/b3Kq/OH9AYRxQwTyJhDFHTQU1a2ioxU1g8e4l83QhGVCG+IwAT
+	 2PnIIdAMM7/lO/vPcPx4JQ0ropa+JeBVR/A8Dgg3Rpp2eLqwFyv9SzrkcCalhlOhEAw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=phytium.com.cn;
-	spf=pass smtp.mailfrom=phytium.com.cn;
-	arc=none smtp.remote-ip=162.243.164.118
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C1D606A31C;
-	Thu, 26 Nov 2026 11:04:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60C1D606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phytium.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phytium.com.cn
-Received: from prodtpl.icoremail.net (unknown [10.12.1.20])
-	by hzbj-icmmx-7 (Coremail) with UTF8SMTP id AQAAfwBXXqZTEghrctX5Bg--.11306S2;
-	Thu, 26 Nov 2026 19:04:51 +0800 (CST)
-Received: from yangyizhen3198$phytium.com.cn ( [218.76.62.144] ) by
- ajax-webmail-mail (Coremail) ; Thu, 26 Nov 2026 19:04:50 +0800 (GMT+08:00)
-Date: Thu, 26 Nov 2026 19:04:50 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5p2o6L2255SE?= <yangyizhen3198@phytium.com.cn>
-To: "Christian Brauner" <brauner@kernel.org>
-Cc: "Jens Axboe" <axboe@kernel.dk>,
-	"Alexander Viro" <viro@zeniv.linux.org.uk>,
-	"Jan Kara" <jack@suse.cz>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Re: [RFC PATCH 0/1] block: long udev open waits during cache
- teardown
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
- 20250512(e7b47ee3) Copyright (c) 2002-2026 www.mailtech.cn OP_ICM_ICMVM
-In-Reply-To: <20261120-hassliebe-arena-kaufvertrag-3ac58fd0483a@brauner>
-References: <20261117105107.14236-1-yangyizhen3198@phytium.com.cn>
- <20261120-hassliebe-arena-kaufvertrag-3ac58fd0483a@brauner>
-Content-Transfer-Encoding: base64
-X-CM-CTRLDATA: Lc7SY2Zvb3Rlcl90eHQ9MTM4NzozODM=
-Content-Type: text/plain; charset=UTF-8
+	dmarc=pass header.from=a7snv.com;
+	spf=pass smtp.mailfrom=a7snv.com;
+	dkim=pass header.d=a7snv.com header.i=@a7snv.com header.a=rsa-sha256 header.s=protonmail header.b="p1g/GpoD";
+	arc=none smtp.remote-ip=185.70.43.96
+Received: from mail-4396.protonmail.ch (mail-4396.protonmail.ch [185.70.43.96])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E96606A31C
+	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 11:21:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E8E96606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=a7snv.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a7snv.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=a7snv.com header.i=@a7snv.com header.a=rsa-sha256 header.s=protonmail header.b=p1g/GpoD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=a7snv.com;
+	s=protonmail; t=1795692062; x=1795951262;
+	bh=zIHuFarcS6Fh+RV7UoaafACerN1VwcUrnwEg4Ma6T9A=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=p1g/GpoDV6p7G8RLn4E9/ZRlEjWREq/H7gMEJDVN8w2qTVpNiYpGtLrnfZ2w/Jq2b
+	 YjLex073ORmJ96TZskqlPlWefWjlWF66QwRQgFFV8jyPQSoysKBXlQLrBCgWsqhC9c
+	 qYtJtNtDZNH5G8Ipy3xHuO2j9zAUoh242AE/A4nQmsfxl3ryFIDOiaZKHb2uc08hIg
+	 Z+W60M0z1dGneIWDqYHEbqnbxQtXznj7h3FwDO85GbyNpmSed0gI8ztf8Fennn8Sao
+	 EjAWQWHNIthrKSbYAlC1t7XgYlZNMG7kBB9YdylUGEZvTaW0U7xasX6w82/xANjPUU
+	 s8R1iDb55pnMA==
+Date: Thu, 26 Nov 2026 11:20:51 +0000
+To: Mengmeng Zhao <mengmeng.zhao@linux.dev>
+From: arsenova@a7snv.com
+Cc: Anuj Gupta <anuj1072538@gmail.com>, Nitesh Shetty <nj.shetty@samsung.com>, hch@lst.de, anuj20.g@samsung.com, axboe@kernel.dk, sumit.semwal@linaro.org, christian.koenig@amd.com, phasta@kernel.org, djbw@kernel.org, willy@infradead.org, jack@suse.cz, viro@zeniv.linux.org.uk, brauner@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca, libaokun@linux.alibaba.com, ojaswin@linux.ibm.com, ritesh.list@gmail.com, yi.zhang@huawei.com, asml.silence@gmail.com, corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, liwang@kylinos.cn, zhaomengmeng@kylinos.cn, mcgrof@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, nvdimm@lists.linux.dev, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org, linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Subject: Re: [RFC PATCH v2 2/8] iomap: add dma-buf direct I/O guards
+Message-ID: <XNQ-E6Q8GZFQ7mImRSSv-9Rn2rFxrM6VjLvIp5yb01GOtKLUp6q5lc7ZLXO-gylrW13D6rxO-KSHTrnWFowX8zKQnZvpm0QYHBHGDjyn-ZE=@a7snv.com>
+In-Reply-To: <bff85d7b-84dd-4f4a-91c1-7f5c9ef2e51a@linux.dev>
+References: <20261125171600.4053585-1-arsenova@a7snv.com> <bff85d7b-84dd-4f4a-91c1-7f5c9ef2e51a@linux.dev>
+Feedback-ID: 235448903:user:proton
+X-Pm-Message-ID: 61e994b372b81e8b5a2d310c657a2284db10d784
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -63,51 +64,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Message-ID: <4effe3b8.6085.1a217879319.Coremail.yangyizhen3198@phytium.com.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:AQAAf8Dw8nVSEghrOBUAAQ--.52298W
-X-CM-SenderInfo: 51dqw5pl2kv0atrzmqxsk13x1xpou0fpof0/1tbiAQALDWsHN0wEe
-	QABss
-Authentication-Results: hzbj-icmmx-7; spf=neutral smtp.mail=yangyizhen
-	3198@phytium.com.cn;
-X-Coremail-Antispam: 1Uk129KBjvJXoWxZw4xXr18Zr4rAF1xtrWkWFg_yoWrXryUp3
-	W8t3W8Aw1UGw17G3ySgw18ZryUC3yUGr47Ja10y3sFywnrJrnIqrnxKFW8J3WjgFyYyrWD
-	tw17Z398Xr1UtrUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-	DUYxn0WfASr-VFAU7a7-sFnT9fnUUIcSsGvfJ3UbIYCTnIWIevJa73UjIFyTuYvj4RJUUU
-	UUUUU
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-SGkgQ2hyaXN0aWFuLAoKPiBJZiB0aGF0IHN0aWxsIHJlcHJvZHVjZXMgb24gbWFpbmxpbmUgaXQn
-cyBhIHF1ZXN0aW9uCj4gYWJvdXQgdGhlIGJkZXYgcmVsZWFzZSBsb2NraW5nLgoKSSByZXByb2R1
-Y2VkIHRoZSBsb25nIHVkZXYgb3BlbiB3YWl0IG9uIHVwc3RyZWFtIExpbnV4IHY2LjYgYW5kIG9u
-CkxpbnV4IHY3LjAuMTQuIE9uIGJvdGgga2VybmVscywgdWRldiBibG9ja2VkIHdoaWxlIHRyeWlu
-ZyB0byBvcGVuIHRoZQpkZXZpY2UgYXMgbWtmcy5udGZzIHdhcyBjbG9zaW5nIGl0IGFmdGVyIGEg
-ZnVsbCBmb3JtYXQuCgpUaGFua3MgZm9yIHBvaW50aW5nIG91dCB0aGUgaW1wYWN0IG9uIG90aGVy
-IG9wZW5lcnMuIEkgYWdyZWUgdGhhdCBhCnVkZXYgcHJvYmUgY2xvc2luZyBpdHMgb3duIGZpbGUg
-Y291bGQgdHJpZ2dlciB3cml0ZWJhY2sgYW5kIGV2aWN0CmNhY2hlIHRoYXQgYW5vdGhlciBvcGVu
-ZXIgaXMgc3RpbGwgdXNpbmcuIEknbGwgZHJvcCB0aGUgX19mcHV0KCkKcHJvcG9zYWwuCgpJJ2Qg
-bGlrZSB0byB1bmRlcnN0YW5kIHRoZSBsb2NraW5nIHJlcXVpcmVtZW50cyBpbiB0aGUgYmxvY2sg
-ZGV2aWNlCmxhc3QtY2xvc2UgcGF0aC4gSW4gcGFydGljdWxhciwgd2h5IGRvZXMga2lsbF9iZGV2
-KCkgbmVlZCB0byBjb21wbGV0ZQp3aGlsZSBvcGVuX211dGV4IGlzIGhlbGQ/IFdoYXQgc3RhdGUg
-YW5kIG9yZGVyaW5nIHJlcXVpcmVtZW50cyBkb2VzCnRoZSBsb2NrIHByb3RlY3QgZHVyaW5nIHRo
-aXMgY2xlYW51cD8KCkknbSBhc2tpbmcgYmVjYXVzZSB0aGUgZGV2aWNlIG1hcHBpbmcgY2FuIHN0
-aWxsIGNvbnRhaW4gYSBsYXJnZQphbW91bnQgb2YgY2xlYW4gcGFnZSBjYWNoZSBhZnRlciB0aGUg
-ZWFybHkgc3luYy4gSW4gbXkgdGVzdHMgb24gdGhlCnZlbmRvciA2LjYga2VybmVsLCBhYm91dCA4
-MDUgR2lCIHJlbWFpbmVkIGF0IGZpbmFsIHRlYXJkb3duLCBhbmQKdGhlIHRydW5jYXRlIHRvb2sg
-cm91Z2hseSBzZXZlbiBtaW51dGVzIHdoaWxlIHVkZXYgd2FzIHdhaXRpbmcuCkNvdWxkIHRoZSBy
-ZWxlYXNlIHBhdGggYmUgY2hhbmdlZCB0byByZWR1Y2UgdGhlIHRpbWUgb3Blbl9tdXRleCBpcwpo
-ZWxkIHdoaWxlIHByZXNlcnZpbmcgdGhvc2UgcmVxdWlyZW1lbnRzPwoKPiBBbmQgbWtmcyBjYW4g
-anVzdCBmc3luYygpIGFuZCBQT1NJWF9GQURWX0RPTlRORUVEIHRoZSBkZXZpY2UgaXRzZWxmCj4g
-YmVmb3JlIGl0IGNsb3NlcyBpdC4KCkkndmUgc3VibWl0dGVkIGEgcGF0Y2ggdG8gdGhlIG50ZnMt
-M2cgcHJvamVjdCB0aGF0IGNhbGxzIGZzeW5jKCkKYW5kIHRoZW4gcG9zaXhfZmFkdmlzZSguLi4s
-IFBPU0lYX0ZBRFZfRE9OVE5FRUQpIGluIHVzZXJzcGFjZQpiZWZvcmUgY2xvc2luZyB0aGUgZGV2
-aWNlLgoKVGhhbmtzLApFdGhhbg0KDQrkv6Hmga/lronlhajlo7DmmI7vvJrmnKzpgq7ku7bljIXl
-kKvkv6Hmga/lvZLlj5Hku7bkurrmiYDlnKjnu4Tnu4fmiYDmnIks5Y+R5Lu25Lq65omA5Zyo57uE
-57uH5a+56K+l6YKu5Lu25oul5pyJ5omA5pyJ5p2D5Yip44CC6K+35o6l5pS26ICF5rOo5oSP5L+d
-5a+GLOacque7j+WPkeS7tuS6uuS5pumdouiuuOWPryzkuI3lvpflkJHku7vkvZXnrKzkuInmlrnn
-u4Tnu4flkozkuKrkurrpgI/pnLLmnKzpgq7ku7bmiYDlkKvkv6Hmga/jgIINCkluZm9ybWF0aW9u
-IFNlY3VyaXR5IE5vdGljZTogVGhlIGluZm9ybWF0aW9uIGNvbnRhaW5lZCBpbiB0aGlzIG1haWwg
-aXMgc29sZWx5IHByb3BlcnR5IG9mIHRoZSBzZW5kZXIncyBvcmdhbml6YXRpb24uVGhpcyBtYWls
-IGNvbW11bmljYXRpb24gaXMgY29uZmlkZW50aWFsLlJlY2lwaWVudHMgbmFtZWQgYWJvdmUgYXJl
-IG9ibGlnYXRlZCB0byBtYWludGFpbiBzZWNyZWN5IGFuZCBhcmUgbm90IHBlcm1pdHRlZCB0byBk
-aXNjbG9zZSB0aGUgY29udGVudHMgb2YgdGhpcyBjb21tdW5pY2F0aW9uIHRvIG90aGVycy4=
+On Thu, Nov 26, 2026 at 06:23:06PM +0800, Mengmeng Zhao wrote:
+> Since Anuj is currently consolidating the XFS and ext4 dma-buf work
+> (along with the cross-file registration sharing updates) into a unified
+> series, I fold your diff into this patch and send a seperated V3 version
+> with your Co-developed-by and Signed-off-by (if you're okay with that)[1]=
+.
 
+Yes, I'm fine with the Co-developed-by and Signed-off-by, both in v3
+and in Anuj's unified series.  Good to hear it holds up on real NVMe.
+
+Thanks,
+Yun
