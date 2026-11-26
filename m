@@ -1,88 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.13
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795708494;
-	b=Q+yljGyNguYFAuw4jrJ6DmcjC2zQx8z5M/AgGiRWlUU7Cp12yF7q3i2ja9SzYR1WXXi9
-	 iDFfgcVoKluW6aa6RWWld3Sfg+Ou7t3Gjs65+VISR3DgZ9MxI2BUPAiK1FaQn2uwrHJ7g
-	 XYjiRE8lfrs+PlUYt7i6lszfn6IWY39ZvtGyhD1WDZMzIpGyKc5nJJkFKFNsxx2e37iml
-	 /1XzLFQgwSc6ILLq2dcyedNAhKdPc3cvAtgPfRMg2L8cSxtSOWqXWkaOwwABXA4kAH/oI
-	 WeyJpPotrQDYEeCz8Ylo5pfG+24qG7EmVrO8uNjwXRmWyotibtcRW0phyTA1YuajlCw==
+	t=1795712158;
+	b=N9mkl0X6bSulddt6QERaod68M0FPGOcvsJ5PHBWWzF2MXA3dEKBmyhpYMFlK9uQPvMK4
+	 uf3e/X94May1KWjQ9jh8X4arYfW5qG8zfaw9RJm81sH3vpE+SziGf1rILhw5SKDMYWeUA
+	 dVUqHlTAmlbSJMGLm+FshC5C860AodfaFcMzCpQp2/WuvSNqHlxUqUay3eCKrxZWyDBv9
+	 dYf1FGBAu4TNVVur13FMqfpwJOPp2kP0R4naFTWVhuIsoUA2PCq3VSWlaUhIejqg6LiNz
+	 Itusn8Gij2U7rU7XsyYARATI2AvJ0e629fIGkYWzPCnhaJeMtLjNfT7bYUkWffIn1mg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795708494;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
-	 Received:Received:Date:From:To:Cc:Subject:Message-ID:MIME-Version:
-	 In-Reply-To:X-CMS-MailID:X-Msg-Generator:Content-Type:
-	 X-Sendblock-Type:CMS-TYPE:cpgsPolicy:X-CFilter-Loop:X-CMS-RootMailID:
-	 References;
-	bh=5M9xtfTWt/rD6V3Yq9/gJOzmL0PuY9q0JOmTonMrkYc=;
-	b=tTMXDsUPkUve7LOve57bQ+wovpB8krKhrLyTc2oyUo8bfPs8UHFbmkkco6wY5rUJEBCc
-	 lE+81OIQ7Ujy+oNovCftuduV39P0ZmAG49Ss5d/+y9n7difPoAhPry+QMhEoKV6Huu17k
-	 tq8APb3vqE5uV3xVgtma9mFc+kD96vEUiyg4L/6TCmwFPkoqlZmIE0eM5pDVi5d/QJLQO
-	 b2XRjuLzax61GYeJkPbDoMG98zNLcW4Fy3Hz8UpeEYmB1BwFV/a4nw3YGWN3k7pXmCoRg
-	 j7w9xpNL7V6XUdK4uONuQzToO5ywGHZ7UIeTlrJmuLhhJLhuX1x/697xHlzApjUmR1g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795712158;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=7UMJ5fq59vACu6YIC6Tb/A5NemhqR9H7sJxjwk062+A=;
+	b=ImQwNw0cyIzNqdIIafl96dkwx746Z02FQi5H64MpdbFPuuZx3EfVOxN8KsrPqhfHtSA4
+	 NEPeDqNn2yjxVCxENhZbN+M7qTB5tGOdsFsRmFz4B313x7UW8r8MKDW0y1et1ZDce0tMM
+	 yo2eytR1DK3x9l5FzqmvrPvdACgSMpPeyv7m+ydnzwxkBKsQybmh5t0p9UdFCMaZIit7y
+	 a89OvSSEPkfxS9dGq9tg/4+/5ImsFlEjpZhs40A5gsFsfsqVF+SDpArbs4yj+1XuiEgVg
+	 NjA5j1TWCc8wsCJXyVi9xfhI34k671fQOZpIDaj1FYFjvSrjFQ1YSbo9xc8gIElk4Dg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=samsung.com;
-	spf=pass smtp.mailfrom=samsung.com;
-	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=S8Q+2CV4;
-	arc=none smtp.remote-ip=203.254.224.33
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b="QC2DL/P2";
+	arc=none smtp.remote-ip=192.198.163.13
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A23606A31E;
-	Thu, 26 Nov 2026 15:54:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 03A23606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F46606A321;
+	Thu, 26 Nov 2026 16:55:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96F46606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=S8Q+2CV4
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20261126155444epoutp03dcd4ec9596cec66ed694dc1c2cd611a1~ro1pFr0S32621526215epoutp032;
-	Thu, 26 Nov 2026 15:54:44 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20261126155444epoutp03dcd4ec9596cec66ed694dc1c2cd611a1~ro1pFr0S32621526215epoutp032
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1795708484;
-	bh=5M9xtfTWt/rD6V3Yq9/gJOzmL0PuY9q0JOmTonMrkYc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=S8Q+2CV47r+jcyB/hxRZQoNdHuxQ/gWyvqpTmqCCGD4I8E1N/8Sp5R2e+BT1h5Dit
-	 Id45RW2ZS5AZJEl/R4M3H3tcJ9xLhuBNVHLz9LrKcWbkmclmhrryoUfbwW/+ukJYtW
-	 oFWXu+LFCdF+trLev1upv67SG1axo8gAriR3T9dQ=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
-	20261126155443epcas5p3efe33a75b41143a93560ac14ae0acd78~ro1oKmgN02527325273epcas5p3D;
-	Thu, 26 Nov 2026 15:54:43 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.95]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4jb1MQ68Ssz3hhT3; Thu, 26 Nov
-	2026 15:54:42 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20261126140745epcas5p4f87a6186091785f4d3de4b69734aed88~rnYO8DwMQ2019420194epcas5p43;
-	Thu, 26 Nov 2026 14:07:45 +0000 (GMT)
-Received: from green245.gost (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20261126140741epsmtip24d507cb1363ab8b6b8b6b2fe8c81b878~rnYK24Eeh1787017870epsmtip2c;
-	Thu, 26 Nov 2026 14:07:41 +0000 (GMT)
-Date: Thu, 26 Nov 2026 19:36:51 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Mengmeng Zhao <mengmeng.zhao@linux.dev>, Anuj Gupta
-	<anuj20.g@samsung.com>, Christoph Hellwig <hch@lst.de>, Christian Brauner
-	<brauner@kernel.org>, Anuj Gupta <anuj1072538@gmail.com>, Jens Axboe
-	<axboe@kernel.dk>, Sumit Semwal <sumit.semwal@linaro.org>, Christian Koenig
-	<christian.koenig@amd.com>, Philipp Stanner <phasta@kernel.org>, Dan
-	Williams <djbw@kernel.org>, Matthew Wilcox <willy@infradead.org>, Jan Kara
-	<jack@suse.cz>, Alexander Viro <viro@zeniv.linux.org.uk>, Theodore Ts'o
-	<tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Baokun Li
-	<libaokun@linux.alibaba.com>, Ojaswin Mujoo <ojaswin@linux.ibm.com>, Ritesh
-	Harjani <ritesh.list@gmail.com>, Zhang Yi <yi.zhang@huawei.com>, Jonathan
-	Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Randy
-	Dunlap <rdunlap@infradead.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, Li Wang <liwang@kylinos.cn>, Mengmeng Zhao
-	<zhaomengmeng@kylinos.cn>
-Subject: Re: [RFC PATCH v2 0/8] ext4: Add dma-buf read/write support
-Message-ID: <20261126140651.vzs2gdwajemvf6kt@green245.gost>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=QC2DL/P2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1795712158; x=1827248158;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=37k69uxyRJzVO9uddzYhhEnx5L7zKQsrBkRXxwOZKbw=;
+  b=QC2DL/P2hcdzxwbJJSTnCrQ03QDs5lPS9vX2Gj93TZRGEpzZIkbJqwnn
+   aR/2es/ne9Dc80ggm+Q6ZH8XMj+3AYfb/E+jl7nkbc/er4nMsdNa8zUCN
+   lqaUvN507Y7HiY8lC8LZuz2xl4jGfTyPq9VbzSV2XHypJ2TXYfXeJJgOH
+   HLR/GljUVUIO1Cr2CbjywVMkIAMRa0gbM7no0JFhnplKP6MXFIK19GrBz
+   LNtgO9r2QKVoV4Fc0dZXlSebPsZFy5IyTmo9UOdw2WfN6b8UWD+98SpnG
+   ix7evuDS3ZqGBO+GAngK5wzkqLJdmmGv+MzMGJi+mlKHhMAYjdTy3ZaNx
+   w==;
+X-CSE-ConnectionGUID: acTgpQUSQfyXlxGOdRiHvA==
+X-CSE-MsgGUID: 1rOZXWRaRcCv6J8ZaNq3yg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11978"; a="4596261"
+X-IronPort-AV: E=Sophos;i="6.27,235,1787036400"; 
+   d="scan'208";a="4596261"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2026 08:55:57 -0800
+X-CSE-ConnectionGUID: p+r39IeoTeS/5WhFAxkNHQ==
+X-CSE-MsgGUID: 5FAT+iOpSeq7ciSi986WGg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,235,1787036400"; 
+   d="scan'208";a="12536476"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 26 Nov 2026 08:55:56 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xWclE-00000001UVe-2lJt;
+	Thu, 26 Nov 2026 16:55:52 +0000
+Date: Fri, 27 Nov 2026 00:55:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yingjie Wang <x-professor@outlook.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"dlemoal@kernel.org" <dlemoal@kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] null_blk: reject device size overflow
+Message-ID: <20261127004636.Zw6bu9Dk-lkp@intel.com>
+References: <20261126074748.1076774-2-x-professor@outlook.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -92,43 +85,89 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-In-Reply-To: <0b76171b-7f2e-41d2-8a5c-102dbe4cb85b@gmail.com>
-X-CMS-MailID: 20261126140745epcas5p4f87a6186091785f4d3de4b69734aed88
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----sfnc.NZyIOBfLTiZTLswaXBSL0w4GQC52Zj1LhBq2cHN2.MV=_ad66_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d
-References: <20261113070621.273953-1-mengmeng.zhao@linux.dev>
-	<20261120154153.GC28611@lst.de>
-	<361c4312-f77b-495f-9ee4-e0b9612b4463@linux.dev>
-	<CGME20261124084131epcas5p3098eab1bc134da7aefcc83c646b54a9d@epcas5p3.samsung.com>
-	<20261124084025.2101804-1-anuj20.g@samsung.com>
-	<3bce3a69-e41c-4683-b1ca-9477dd41a7e0@linux.dev>
-	<0b76171b-7f2e-41d2-8a5c-102dbe4cb85b@gmail.com>
-
-------sfnc.NZyIOBfLTiZTLswaXBSL0w4GQC52Zj1LhBq2cHN2.MV=_ad66_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20261126074748.1076774-2-x-professor@outlook.com>
 
-On 26/11/26 10:44AM, Pavel Begunkov wrote:
->I'll resend it later, how to store the tag is the least interesting
->part, it can just move inside the block/ext4/etc code, which would
->be uglier, but whatever.
->
+Hi Yingjie,
 
-What about the f_op method instead of storing the
-tag in multiple users that we support now i.e., block/ext4/xfs code?
-We refined your patches with this approach and it seemed to fit well.
+kernel test robot noticed the following build warnings:
 
---
-Nitesh
+[auto build test WARNING on 5a29cfaf51105039d156dd8a61d2783e8b653667]
 
-------sfnc.NZyIOBfLTiZTLswaXBSL0w4GQC52Zj1LhBq2cHN2.MV=_ad66_
-Content-Type: text/plain; charset="utf-8"
+url:    https://github.com/intel-lab-lkp/linux/commits/Yingjie-Wang/null_blk-reject-device-size-overflow/20261126-074752
+base:   5a29cfaf51105039d156dd8a61d2783e8b653667
+patch link:    https://lore.kernel.org/r/20261126074748.1076774-2-x-professor%40outlook.com
+patch subject: [PATCH v2 1/3] null_blk: reject device size overflow
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20261127/20261127004636.Zw6bu9Dk-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project fb29ca8163c3309160711e5a14eb46bc6d4fdad2)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261127/20261127004636.Zw6bu9Dk-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/20261127004636.Zw6bu9Dk-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/block/null_blk/main.c:1896:16: warning: result of comparison of constant 8796093022207 with expression of type 'unsigned long' is always false [-Wtautological-constant-out-of-range-compare]
+    1896 |         if (dev->size > LLONG_MAX / SZ_1M) {
+         |             ~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~
+   1 warning generated.
 
 
-------sfnc.NZyIOBfLTiZTLswaXBSL0w4GQC52Zj1LhBq2cHN2.MV=_ad66_--
+vim +1896 drivers/block/null_blk/main.c
+
+  1893	
+  1894	static int null_validate_conf(struct nullb_device *dev)
+  1895	{
+> 1896		if (dev->size > LLONG_MAX / SZ_1M) {
+  1897			pr_err("Device size is too large\n");
+  1898			return -EINVAL;
+  1899		}
+  1900	
+  1901		if (dev->queue_mode == NULL_Q_RQ) {
+  1902			pr_err("legacy IO path is no longer available\n");
+  1903			return -EINVAL;
+  1904		}
+  1905		if (dev->queue_mode == NULL_Q_BIO) {
+  1906			pr_err("BIO-based IO path is no longer available, using blk-mq instead.\n");
+  1907			dev->queue_mode = NULL_Q_MQ;
+  1908		}
+  1909	
+  1910		if (dev->use_per_node_hctx) {
+  1911			if (dev->submit_queues != nr_online_nodes)
+  1912				dev->submit_queues = nr_online_nodes;
+  1913		} else if (dev->submit_queues > nr_cpu_ids)
+  1914			dev->submit_queues = nr_cpu_ids;
+  1915		else if (dev->submit_queues == 0)
+  1916			dev->submit_queues = 1;
+  1917		dev->prev_submit_queues = dev->submit_queues;
+  1918	
+  1919		if (dev->poll_queues > g_poll_queues)
+  1920			dev->poll_queues = g_poll_queues;
+  1921		dev->prev_poll_queues = dev->poll_queues;
+  1922		dev->irqmode = min_t(unsigned int, dev->irqmode, NULL_IRQ_TIMER);
+  1923	
+  1924		/* Do memory allocation, so set blocking */
+  1925		if (dev->memory_backed)
+  1926			dev->blocking = true;
+  1927		else /* cache is meaningless */
+  1928			dev->cache_size = 0;
+  1929		dev->cache_size = min_t(unsigned long, ULONG_MAX / 1024 / 1024,
+  1930							dev->cache_size);
+  1931		dev->mbps = min_t(unsigned int, 1024 * 40, dev->mbps);
+  1932	
+  1933		if (dev->zoned &&
+  1934		    (!dev->zone_size || !is_power_of_2(dev->zone_size))) {
+  1935			pr_err("zone_size must be power-of-two\n");
+  1936			return -EINVAL;
+  1937		}
+  1938	
+  1939		return 0;
+  1940	}
+  1941	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
