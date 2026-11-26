@@ -1,54 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.6.134.125
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795658970;
-	b=yTQt64r24JWD+ewDC7MKflNdmHBqqSNDB0Xvx4ZBxHzj5iiSYsFhBWJUMOrOUzTjPN3D
-	 m/Uhaib2faPbWNA1oIxEGiQ2/y20NeLrzgle+zGMxmmofGDwrzKUl1+efy5RZACiNve4b
-	 UrObQBztJdFalmKq8OeyKPKF9AZr0oeegi+iYQ0nbWajpfNBixR1AFGT8XvOpue10hUdR
-	 NbY/xF2JaLiVH8dKL7OCbe9iTskbVYdrnCEI/Un1YgJOKDX0RDzCshj42tXSxD0XjiBcI
-	 pFPAjCx8OjKzimhOdNy+wYFlN7iUh0kKE6abWF/S8eBqUfX1OVKAzfh0jUk0FRP28bw==
+	t=1795664015;
+	b=nBntq7VgHPNtm76FQvZcFE0eCVb+npgSyUuQjyYygjuEuCB4LwwPqK9iVPz5C0srPvAD
+	 mjX2Fro4pkStktFHG/9LwxDCA4VVpo68JfIK3FOBRgNbRxdXoXCfgGIw00CswgzjK0MCP
+	 zLFRawINPmp0Bp1USDiDHy/w6iNwlRBXA0QK7x2bWtU3N7t9pla6iqH8C435+X+n1YJOB
+	 p6/TP5ykYiuKV30+NOCiRhczN+7GXSWPIAIuOYFjL9qdNt0uR8XtNNRycZexbHfUzIgHy
+	 428Pnkntcg8XSoQKQyarCDLY+DEMps6iuzuB9/38azkrjYYMVus6Vi2VTNU3SVzJWBQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795658970;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Cc:Subject:To:References:From:In-Reply-To:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795664015;
+	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
+	 X-Sonic-ID:Received:Received:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=mmQ9TdwufADSMjphoIOqHkpU1Ow14KEhoo6cBeI4n9s=;
-	b=1AAJYvBPfSP9ABOt8jF2nNxb6l5HyyfE9aeh+cfuib4nEoK8mWzj2FU0zvJMNyl8miUB
-	 3v/FhQocp+KhW2wlf/R/lINRfv/GQ+JkHxVJMtAsA8T2eMvhWFarQiDUBPnvI7WopXxDq
-	 PtGNQMZCGhwe4IdIG2qsZ4JZUwyLneaIOB8iQbZTJduLAYuikGGTR4SiLNx+YaYi109o5
-	 NMY2+nuXQl095dTAXuO3GzRl7E80yEFmtb0K1nBTIC/HES9WdOlGJPb2npuZCvItY52cz
-	 TWkecFlFl/9MiVneg6Ic+rAvZMLwSFq1zEpqX6Yh4fQoVnQUTxu0qHfbvcO4OJdvIvw==
+	bh=YcM9NeytmDEp3ZHnhl05h0wZi5zVcYRHE8yN3GpV/uk=;
+	b=YqCdEnbj3aIsv9P2ORDKJPDy8lbkNX86RUt0Pq3xHEr+/KGPV40YVdxTir7kMrz3jxSm
+	 F2CXGVyQZ/iPfOIpz48FRqS77S5Bp98fRl0HG4UVUE9h/jQeEEqZNzQ5qSYQ9bhdPuZNi
+	 5DDSnj0UJ0wjcpeMC02TQHPKSfMc59k5tQJSm9RHAGBiBScrVfdap7KT4py8kgHjelhl0
+	 4LG5DuKG8tzg26VhxD7SzXPaKCV9npymOYrNPK/Z0f1o1ssODzOvDKqO4NUKVkA8t83WF
+	 V575oD00+RNVn2KRb5YJaMQVi5L4TioSzNTLXsN6RT7ZpHk8VTDtGORqVWeQDtPm5DA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=SLk4fzfy;
-	arc=none smtp.remote-ip=91.218.175.124
-Received: from mta0.migadu.com (out-124.mta0.migadu.com [91.218.175.124])
+	dmarc=pass header.from=yahoo.com;
+	spf=pass smtp.mailfrom=yahoo.com;
+	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=o8rJxBu4;
+	arc=none smtp.remote-ip=74.6.134.125
+Received: from sonic315-15.consmr.mail.bf2.yahoo.com (sonic315-15.consmr.mail.bf2.yahoo.com [74.6.134.125])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75E8606A323
-	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 02:09:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D75E8606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0FF606A334
+	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 03:33:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B0FF606A334
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=SLk4fzfy
-X-Envelope-To: linux-block@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=lSkU19aRfOotCaRJSikienAlcbDkSFi5RTcpkW9r2Zw=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795658968; v=1; x=1796263768;
- b=SLk4fzfyor6ze6Lu2/F0CvwYwEg3J6jIS8IILtzG1MZr5iYPJCa/RN/PH2Ff+9PMcg2vhlUJ
- rr9WraRUcl6BSWO4Xfb5dAzVjQY96AElgWWgUXnhIWjaHnnNoBvsM+qoJZn8ciSL8LNCxcvdOOi
- anU7Dg8LiMKahrE4Kg18dyks=
-X-Envelope-To: linux-block@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 62c2b253538906c5;
-	Thu, 26 Nov 2026 02:09:27 +0000
-X-Mizu-Trace-ID: 62c2b253538906c5
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <a4f6abfa-0415-4b8b-bc5a-fb05c02ff7ac@linux.dev>
-Date: Thu, 26 Nov 2026 10:09:22 +0800
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=o8rJxBu4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1795664014; bh=YcM9NeytmDEp3ZHnhl05h0wZi5zVcYRHE8yN3GpV/uk=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To:Content-Type; b=o8rJxBu4ne1hHkdEfFFiMFwmWQ6R1ylvamcmZW9MQBZlRRdt+SmIgJ3Rp/0pzH3sPruKsyQKVg4LeyhjfxR0dc14XYX1hL/IzojXfg1iUCibMa0RTRPn8y2UGw1YOrME/KOV/ET2+O9EZcj7hyWboCsofxWmSmKk/uWpl2+yj6Q55mLndl985lTe2iUTgK0a2hMJFZS8SDqHohR3iiAuqJKUUMDHzKBWW/djteHwD42Bl5yaMjMMlFumX4Uymb+aEt5RmK5QKU87l62MIWVvgN7PgKH8HP4ltXiMwlUomK8CzAjvj+8KZ4ZEdFXckp6T9uD6itIo3tGB/AVmJDP9SQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1795664014; bh=/2Tlz5ND402ydS4wmF0R/ar/qtdz/i2oGCpEaZnYDZ5=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=Dg6+ljCRiE/2w9KXXZ8Lsivx32O2Xto0K217sQEXMCB929R8gw9YdXhYOf4Pb6HkcZ5AVPdaBKzCivm1gEvqi9IKocJqWVu1diI5CscKaiJmGqklkq1wUz1o4qPdv4vClxfxIyDYin0gU1E0AgPrh5mCSf8O81GGeqwdRl5wORJ8Bhh4Kk9RFVpHzpN6H3vjgYXEH54dODQY1RONiGxDqzbrwI8eYPJd/dukc8SijUfavp31vv/idt0pqeihxaiFSTxqzPK613DVKe+OtdbzSkux7QTQ4MBDc/WwJEw+2IoDUl1Bjhn1rFwhYeKLpG0pziAhXzUimgN9UiE9EKoxpg==
+X-YMail-OSG: CP1AjuIVM1ltWqCiIJXJ_jVj5a0za5zPAFcSWULMECVOwF3fXdsBlPO24_0jDlR
+ NiGJdU2.T.sVjVaVnkzx6p.AtKDPsKUO_G2P_kgn2Z994nAr.7bW9i2cF9Sp9T8XmuFG8Fch3DPx
+ 2zO8JmAEqpgeQAvmMjMMKjcSq8WBLIw9nVMWucCr_8O8H8k2lxmj6FO6UFY92JNpXecgdh7z5wBS
+ R7clQ7FSlKzSwP1EbvoHHvwt1mg1lbDc.nGT480c2enbzsMsXbSQBB56sYOJiVKHPTkuEioflBNG
+ KW_7qw1MI8BdLPIkO9jqApxsntjQTNpc8bF.4GCJeDxtX8K__atPk.YNxuxI52H4Q31C5K2VEcww
+ 72fQAMi88C18lsb1e6gRj4TsdvJkFqG5rJ1VQVockeLIBe5HZgPKCCUTBTIiDMAzixWbpAbxDYcB
+ XxA_Jk6PKR4.6toggNOdATGBacXP0U6zrOfGCbPHONhKmSI3Yug1CPsWgKQi8EtZwaxAZZuCodT6
+ ILQzkRkuS42T32iIXmV6QAg1GmarezR_4.bc78luGRuLf67ejEmE0xBbGn4bNJ6TcaAfXpxvrzrx
+ rL8vj6dBEhfnRVp92qwyzJ9CsTICt2JV2zWyXp2OHHv9P8o3DbeDihXnv9nuoJrreI94bL8WuZ7d
+ 9DxUxrnrv_TpD1AAw4K22mENQJBK7gL6H9gBiS8fPeblpnJxYOt0foGAOm4G4sW_t9sv._Qb7rQU
+ nsVH8gGi4jJbSnRDv2J2k_LsHrE4iWgIRRODaZTv7X.F_Qfb5kmKPyeu2fC6k7sWuTOSfcCLDN97
+ JfUGY.Zi5w84HqIi_OCmLMKLB8TLuODrD3POMWV07zX44dbW0deE7gdv0MzQLMlDABzu8kSKvcX5
+ Ma9G88FX3XUvcG1V0OHKUBp9wOiXUTfpOsxaEcRdr0_svU8kLISG8Lc3thJf6fjdL6LQPIFjritd
+ gAoX4ycfhq53ZsYBaLXSgev2WuKh7iQ_YpqArgj_z1aFRI7fG77u8ToVNCyqRqYISB3u0dBFQ4Ja
+ uD2tdPPQgGKwf0.PKDUJWMeHXH1M2doKgTQVuCjgNAO4Bzyi0iD_ZO6OZLmP_7i6yT4ZhsdK_t73
+ komPcy0TnTR64fg6wLugpGoY3POnElLhB5IFCaA.DaNid5t26noiWm8eWl9sHsL1lsVChyzJtwbq
+ bMzP9M6kDg8s3QT6LeTvro_AjsuSAerIGExppMrldUJHwhGa5K1Tuc_9iUcqQ4yFz0DQhtB5jiwR
+ EQfsDHExSlLAOwOYc4e1b2f8Pq38afZlhaKUNIKOtoYh1xz3KbQ1.iv2xHLFPpfgx44mezkBhD4a
+ pg87NC7_cTt7g1NuEi7jsQ5r1PuEM4Ej6wn_SG213f3gEB5RM0RSEXrxFyZorMArUjrNOi4OyVBY
+ _BsEXK5tubGtjhW_zRCvVc.Mj7QcLanSVYWfmj_UKMXQKqY5phQ0pQU5upOxQCh3s1ur_7k3fasq
+ sjz62Ky4_2A4kZuQGIUTmdWjJRoFiRMbTiHPYVS3OeIzwK.I7ijRf8lYgSo5_tSG3tk9GcynmRO_
+ P76HcX7IiEMWQ_yhf6cgiJtU.uvoS1Og.G8YTFW3.BEkziRvtZg88MM2ICqAx2jVlOhGeewwsTQV
+ nMv4aoljAf1216rN819muqIe109Ynl8z3u7QC5tmIvxyBewS0ATp_.OJzwX0MhwFUk8T6XZ1GoBE
+ tJHOUZwjTacQnGT.lAQVRo5fnkQ581CHZ6fPdvDvjdYpVDzls8iv8BBS0HFkuTLjO2BFkkbEwcgq
+ Gr4IYl8lOJ4mdaohYSIWaV.y60OCccq3RWikLymRGTCV5IBaDhWsmOsR2lzycj5XkTBnncexgcCu
+ rIwEG3SmzoYUpsCBgz7VsNhDl3RNkTXXmNDd4nrKCpyhN5vdIARjHElXA4ygLZfIIloIqb4tP8eT
+ xU2jRpi_PLNJkncvjzTzCi2z9KQC3xCw4lWgf2zoaSIpgigCjPrZSakerfcH9sow.uX2s07y.ZBY
+ QCC2TjVO_HGfD4OCfXZI6AmSsSzUKspWDIlZNdYBsLrXzBC8pv8Qs5O5pCIEB1OLwkT0EWC8ZwNu
+ PBuFHiAwPRKCFniup0IRx9zPy_43TagBhDNdFPnZC.dBrVHkWGhkXJggsdmIjLV4Hee_bkqO1srM
+ lt_IPPWcmtkMfzxqNnfiEseUa4FZi7cU9fE2NX0xqSwMO8LJQmDeuNGFxkYwFPvVQF9oeB4_FRyg
+ M4MiSgvDs5ZheEEydnUG0y5H_YytPyl7jqQonB.bfzH.mMB7KAA--
+X-Sonic-MF: <deaner92@yahoo.com>
+X-Sonic-ID: 0b7a824f-7bf0-4139-a5b5-2ff63710ff0d
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.bf2.yahoo.com with HTTP; Thu, 26 Nov 2026 03:33:34 +0000
+Received: by hermes--production-bf1-8768df57c-64qn4 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 28e7f0a650024974c67d26ee33943d03;
+          Thu, 26 Nov 2026 03:33:29 +0000 (UTC)
+From: Jeremy Dean Clifton <deaner92@yahoo.com>
+To: syzbot+4507914ec56d21bb39ed@syzkaller.appspotmail.com
+Cc: brauner@kernel.org,
+	clm@fb.com,
+	dsterba@suse.com,
+	jack@suse.cz,
+	josef@toxicpanda.com,
+	viro@zeniv.linux.org.uk,
+	hdanton@sina.com,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [block?] [ext4?] [btrfs?] INFO: rcu detected stall in sys_mount (8)
+Date: Thu, 26 Nov 2026 03:33:27 +0000
+Message-ID: <20261126033327.416414-1-deaner92@yahoo.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <68af0313.a70a0220.3cafd4.0020.GAE@google.com>
+References: <68af0313.a70a0220.3cafd4.0020.GAE@google.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -58,110 +102,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cui.tao@linux.dev, cuitao@kylinos.cn, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH v7] loop: defer the queue limits clear to a workqueue
-To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, hch@lst.de,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <20261124031238.555291-1-cui.tao@linux.dev>
- <b48806fb-22a5-40da-a682-22e010c8316d@linux.dev>
- <f8d3056d-2950-428c-b5f3-c41b5fa10eb2@acm.org>
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <f8d3056d-2950-428c-b5f3-c41b5fa10eb2@acm.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hello, Bart,
+#syz fix: fix the softlockups in attach_recursive_mnt()
 
-在 2026/11/25 00:56, Bart Van Assche 写道:
-> On 11/24/26 12:10 AM, Tao Cui wrote:
->> For v8, my plan is to stop deciding whether to quiet a request at
->> queue_rq() time and instead quiet repeated failures at the point of
->> failure. The verdicts remain recorded for the lifetime of the backing
->> file and are cleared only on rebind or unbind. loop_clear_limits()
->> reports whether a verdict is new, and repeated failures mark only
->> their own request quiet. That guarantees the first failure for each
->> mode is reported, regardless of how dispatch and queue freezing
->> interleave.
->>
->> [ ... ]
->>
->> Does this approach look reasonable to you? If so, I'll send the
->> already tested patch as v8.
-> 
-> That approach sounds reasonable to me. If the verdicts are kept for the
-> lifetime of the backing file, I think the following simplifications are
-> possible:
-> - The clear_limits_pending member variable is no longer needed. The
->   work function can read the mask with the unsupported modes without
->   resetting it.
-> - lo_fallocate() can return -EOPNOTSUPP without calling
->   file->f_op->fallocate() if the mode is already known to be
->   unsupported.
-> 
-Thanks.  v8 follows with all of this addressed.
+The original arm64 report (soft lockup in skip_mnt_tree() via
+commit_tree()/attach_recursive_mnt()) is fixed by commit 0ddfb62f5d01
+("fix the softlockups in attach_recursive_mnt()"). Hillf's test of the
+vfs fixes branch on 2025-08-27 already showed the reproducer no longer
+triggers.
 
-Both are in: the work item reads the mask without resetting it, and
-lo_fallocate() skips the fallocate probe when the mode is already
-known to be unsupported.
-
-> Tracking the verdicts per mode also fixes the following issue in v7:
-> clear_limits_pending is not per mode, so a failed discard suppresses
-> the error message for the first write-zeroes failure.
-> 
-Right.  The verdicts are per mode and stay recorded for the lifetime
-of the backing file, so a failed discard no longer suppresses the
-first write-zeroes report.
-> A few more comments about v7 that also apply to v8:
-> - loop_clear_limits() calls schedule_work() after clear_limits_lock has
->   been unlocked. Can a request that passed the lo->lo_backing_file
->   check queue the work item after cancel_work_sync() has been called
->   by __loop_clr_fd() or loop_remove()? Since lo_free_disk() no longer
->   cancels the work item, I think that would result in a use-after-free.
->   How about calling schedule_work() while holding clear_limits_lock and
->   resetting the state before calling cancel_work_sync() in
->   __loop_clr_fd()?
-v8 does exactly that: schedule_work() now happens while
-clear_limits_lock is held, and __loop_clr_fd() resets the verdicts
-before calling cancel_work_sync().  A verdict that passes the
-backing-file check queues the work item before the lock is released,
-so the reset is ordered after any pending schedule and
-cancel_work_sync() cannot miss it.  loop_remove() needs no
-reordering: after __loop_clr_fd() has reset the verdicts no further
-schedule can happen, so its cancel stays as the backstop it already
-was.
-
-> - The code that resets clear_limits_mode occurs three times. Please
->   introduce a helper function. Is the reset in
->   loop_assign_backing_file() needed since __loop_clr_fd() already
->   resets the state and since loop_clear_limits() ignores failures for
->   a backing file that is no longer current?
-I dropped the reset in loop_assign_backing_file() instead of moving
-it: since d4fabede1da0 ("loop: remove support for swapping loop fds")
-its only caller is loop_configure(), which requires an unbound device,
-so the verdicts are always zero there.  That leaves __loop_clr_fd()
-as the only reset site, so there is no helper to add anymore.
-
-> - The work function freezes the queue and commits the queue limits even
->   if no mode has been recorded. Please return early in that case.
-> - The changelog for v7 is missing. Please include a "Changes since v7"
->   and a "Changes since v6" section in v8.
-> 
-Both done: the work item returns early when the verdicts are already
-reset, and the changelog has both "Changes since v6" and "Changes
-since v7" sections.
-
-Re-tested after these changes: a concurrency sweep at 2, 4, 8, 16 and
-32 threads logs exactly one error per run, whereas v7 starts reporting
-duplicate errors at eight threads.  Sixty rounds of mkfs-kill/unbind
-stress also completed without warnings.
-
-Thanks,
-Tao.
-
-> Thanks,
-> 
-> Bart.
-
+I also ran that reproducer on current mainline (7.4-rc4, arm64 QEMU,
+2 vCPUs, KASAN + lockdep), with a debug print timing the mount_lock
+section of attach_recursive_mnt(). The largest attach (32768 copies)
+held mount_lock for 16-19 ms, and no soft lockup or RCU stall
+appeared in 300 s, including after killing the reproducer to tear the
+namespace down.
