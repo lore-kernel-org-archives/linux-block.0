@@ -1,49 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795752346;
-	b=gpvis/d+Qef8fjzXwk1sZJKgnUBpdXM4BYp0m/U4Orkq8HAbPZe55gJopnf1Vomw50J0
-	 sUOC/d3dY0sQu/FO5TdjaR/3m+ueHi4mhgacR/nyxvvjq8gxLB0UDcRqUFs9yvz12GNn2
-	 GsWa3ih9QN62bmfttOOH52Rtb/vyRg1Bw0D4AH9pRPBDTP2Q7+ABzXsYYhVOHoqqfXFyU
-	 ZMm7hSr8EIQkhVxmFCjJLpSDIEjK4lYQTS7tiWjRGb2POGKdMW+qPunX2VkaNQX9ybUmD
-	 SyfToWFroeMChuXAIs/uJXPXn2LAXefqtsioFdYe/NpKnq2ayaclykrJ1ujBAfhQ7fw==
+	t=1795755361;
+	b=UTjsJjnjH4uVT/cg5MWCfcV2hepUKusDYl9/0JmuNndUkbkVOQnKOQcgRJGwc0qiy3im
+	 KzciUgHXwgZp3oARb3matMEPqd8Qmb/yeh0njof5GmyaJZK8rlGD1rUYFGgOH6EBFUmZg
+	 ziiGtI1DZSbRYZ0EmufwWB7gPf1ld1W84pZJJMBQLdftDLgte+aZwfADGPRX4DLVfagQA
+	 mcW9HVDLp/1OCEOeCXDOHKAa81rYrm4OlpRmRGqpSiyUqmGwGziYbINp0PWdc9zTN68tU
+	 DSIrvt8RGPcpi2HeRMYyauySYVok3nI8Id233ag9daZCK8oOkDvOSFQy7xpAszXjYDQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795752346;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Spam-Status:
-	 X-Spam-Checker-Version;
-	bh=Ma+f5p80haJszFPPAIIEC1l3WLdFdBqpV7MIoNSrF48=;
-	b=YNxnj9mVSoZOHp2szQzNGUxYK5QlsbGOKBP6MNHw2La7sxopmRqV6l257NuvbC7aEJmP
-	 Egq4TnKkgug6vQkdyp70nITRAFyUBmRjJBBQUgky6vRyGG9/Fnmq+pJQG5IhKftCMI+KF
-	 Eu5VqUk/3KZym38pANVcvuoLeekUOvUYCXQ3mqo6E9nuWc4xgT9nVl11f3UwbEG7qrlZu
-	 /VAI+ccXa8osjKh581uEq5byU71q03tkYEpPG00KpMYm5hgrTXVBuW+FQlb1qPMs0PN4z
-	 UhvTPU+QBzVpiYnkRQL+c3nq7+9RYAfPqYij+SuMi2KluumMwiQ0uRkqz4lxPJBk57Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795755361;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:Organization:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=YktmMxH0HB2xEuGy1iPd+pNCryqr6cfRSM7tW5CcM7w=;
+	b=RI3R6QcsD8IjFF4w81iUCxGIbVYwn24Dlt089EZ20k+RxxsQsXtGBXnKe3UkcjL/8Ny7
+	 5fDPU7g/gaLZAG1fjwOm6o+1IxmDV6ZQxi5sy+TrU1xeIzP8E1zPHj67gaVKT3iElMA+c
+	 9T2fU7JVpgPAycyEeE9SFZ+aBb876XeTT9fjbjcLFNHAku7518uGfUeYVHTSIzbhzcfAN
+	 wH8R/uCnOE5/GwQsLIh6qBR+ExDD24nM6uCaPk7TUYwdP9xRY3Me4F8HQwao7HrRs74ZV
+	 JINhwgeNn1VbaE0VTOv2WlRqcE0ORnWMYtfX7uk9qROYPAGGAWk1MO8XlJx350Qp3tQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.microsoft.com;
-	spf=pass smtp.mailfrom=linux.microsoft.com;
-	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=omijfA5C;
-	arc=none smtp.remote-ip=13.77.154.182
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555EE606A31C;
-	Fri, 27 Nov 2026 04:05:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 555EE606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=a2ylGTye;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8843F606A31C;
+	Fri, 27 Nov 2026 04:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=omijfA5C
-Received: from [192.168.1.70] (unknown [52.172.102.222])
-	by linux.microsoft.com (Postfix) with ESMTPSA id B8EB620B7166;
-	Thu, 26 Nov 2026 20:05:30 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B8EB620B7166
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1795752334;
-	bh=Ma+f5p80haJszFPPAIIEC1l3WLdFdBqpV7MIoNSrF48=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=omijfA5Cc+HumzTDcN5RSmmeizr3nKcpgIVYDhAvwS//fyO3Q0ZVB9vJcRC2PgeEF
-	 wHmv+J2D80WDkMAfjOng7PYGhhK8l6++MR12DNtgPLS4XD/KyuXdoc345KtLyBkKrL
-	 aqpWukiJnUHIJRehA/GrQzwhk3naYp9gHsqHHn9Y=
-Message-ID: <74edd490-26bd-41a4-81ee-cd18b9f28154@linux.microsoft.com>
-Date: Fri, 27 Nov 2026 09:35:34 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=a2ylGTye
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 948A41F00893;
+	Fri, 27 Nov 2026 04:56:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795755361;
+	bh=YktmMxH0HB2xEuGy1iPd+pNCryqr6cfRSM7tW5CcM7w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=a2ylGTyehjgJ/Uui7Rqd/AoGOUXn9T7OumV5NAucmXoIXSnHRaXhDpX3AvodjfEn3
+	 QYXWYhwEh7RNhhUBcu/MMDsM2lgnwWr9OstP5HKbsXMRssTHVtcy7RL+lWk+pd9FP8
+	 EVtFpVdcvZ14yw1MpzoXF7Ej4iIbSG4pHH9FA+qw1GIMM4IiTDTPVkA9TBun38j1WQ
+	 jMPw3k70Gb8CHRG9Zxo1XyhfQZoewWge8JKYdPnj8TIT/uFaf6wLE9voJLw+pG/Z3m
+	 Hevey4RzUJKO90wE4R160cgszi9hTBDkE+4qJdWlznsGDig6BIcRhda8g0sxLDhx7Z
+	 oiP9ZE8iwekRw==
+Message-ID: <9b1e64e4-873d-4743-96c4-0f893e8cc506@kernel.org>
+Date: Fri, 27 Nov 2026 13:55:59 +0900
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -54,140 +52,41 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] iov_iter: Fix direct I/O across compatible device pgmaps
-To: "David Hildenbrand (Arm)" <david@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Andrew Morton <akpm@linux-foundation.org>,
- Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Oscar Salvador <osalvador@suse.de>, Logan Gunthorpe
- <logang@deltatee.com>, Leon Romanovsky <leon@kernel.org>,
- Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-cxl@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, stable@vger.kernel.org
-References: <20261126053433.88531-1-namjain@linux.microsoft.com>
- <5cc60faa-002c-4c96-97e3-46d3002718c9@kernel.org>
+Subject: Re: [PATCH v2 1/3] null_blk: reject device size overflow
+To: Yingjie Wang <x-professor@outlook.com>, "axboe@kernel.dk"
+ <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>
+References: <20261126074748.1076774-1-x-professor@outlook.com>
+ <20261126074748.1076774-2-x-professor@outlook.com>
+ <fa532123-2fcf-4236-90c1-a47d5438502c@kernel.org>
+ <20261127024601.1465996-1-x-professor@outlook.com>
 Content-Language: en-US
-From: Naman Jain <namjain@linux.microsoft.com>
-In-Reply-To: <5cc60faa-002c-4c96-97e3-46d3002718c9@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20261127024601.1465996-1-x-professor@outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 11/26/2026 6:42 PM, David Hildenbrand (Arm) wrote:
-> On 11/26/26 06:34, Naman Jain wrote:
->> Commit 38446014648c ("block: don't merge different kinds of P2P transfers
->> in a single bio") made bio_add_page() reject pages from different
->> dev_pagemaps. This was needed for PCI P2PDMA, but also rejected pages
->> with compatible DMA mapping requirements.
+On 11/27/26 11:46, Yingjie Wang wrote:
+> On 11/26/26 16:56, Damien Le Moal wrote:
+>>> Reject sizes above LLONG_MAX / SZ_1M in null_validate_conf(), before
 >>
->> Commit 41c665aae2b5 ("block: relax pgmap check in bio_add_page for
->> compatible zone device pages") allows these pages in separate bvecs.
->> Commit 13920e4b7b784 ("block: add pgmap check to biovec_phys_mergeable")
->> prevents physically contiguous bvecs from different pgmaps from being
->> merged into one segment.
->>
->> But direct I/O now fills a bio using iov_iter_extract_bvecs(), which
->> retained the original restriction and bypasses bio_add_page().
->> For a non-atomic request handled by a single bio, only the data before
->> the pgmap boundary is submitted. The rest is not transferred, and the
->> request completes with fewer bytes than requested.
->>
->> Fix this by moving zone_device_pages_compatible() from blk.h to
->> memremap.h and using it in iov_iter_extract_bvecs(). This allows
->> compatible pages to be added as separate bvecs without relaxing the
->> same-pgmap requirement for PCI P2PDMA.
->>
->> Fixes: 38446014648c ("block: don't merge different kinds of P2P transfers in a single bio")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Naman Jain <namjain@linux.microsoft.com>
->> ---
->>   block/blk.h              | 19 -------------------
->>   include/linux/memremap.h | 19 +++++++++++++++++++
->>   lib/iov_iter.c           |  3 ++-
->>   3 files changed, 21 insertions(+), 20 deletions(-)
->>
->> diff --git a/block/blk.h b/block/blk.h
->> index 50abfd9328861..460c064f1d1b0 100644
->> --- a/block/blk.h
->> +++ b/block/blk.h
->> @@ -142,25 +142,6 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
->>   	return true;
->>   }
->>   
->> -/*
->> - * Check if two pages from potentially different zone device pgmaps can
->> - * coexist as separate bvec entries in the same bio.
->> - *
->> - * The block DMA iterator (blk_dma_map_iter_start) caches the P2PDMA mapping
->> - * state from the first segment and applies it to all subsequent segments, so
->> - * P2PDMA pages from different pgmaps must not be mixed in the same bio.
->> - *
->> - * Other zone device types (FS_DAX, GENERIC) use the same dma_map_phys() path
->> - * as normal RAM.  PRIVATE and COHERENT pages never appear in bios.
->> - */
->> -static inline bool zone_device_pages_compatible(const struct page *a,
->> -						const struct page *b)
->> -{
->> -	if (is_pci_p2pdma_page(a) || is_pci_p2pdma_page(b))
->> -		return zone_device_pages_have_same_pgmap(a, b);
->> -	return true;
->> -}
->> -
->>   static inline bool __bvec_gap_to_prev(const struct queue_limits *lim,
->>   		struct bio_vec *bprv, unsigned int offset)
->>   {
->> diff --git a/include/linux/memremap.h b/include/linux/memremap.h
->> index c8a4979d4c780..a1d447a847990 100644
->> --- a/include/linux/memremap.h
->> +++ b/include/linux/memremap.h
->> @@ -202,6 +202,25 @@ static inline bool is_pci_p2pdma_page(const struct page *page)
->>   		folio_is_pci_p2pdma(page_folio(page));
->>   }
->>   
->> +/*
->> + * Check if two pages from potentially different zone device pgmaps can
->> + * coexist as separate bvec entries in the same bio.
->> + *
->> + * The block DMA iterator (blk_dma_map_iter_start) caches the P2PDMA mapping
->> + * state from the first segment and applies it to all subsequent segments, so
->> + * P2PDMA pages from different pgmaps must not be mixed in the same bio.
->> + *
->> + * Other zone device types (FS_DAX, GENERIC) use the same dma_map_phys() path
->> + * as normal RAM.  PRIVATE and COHERENT pages never appear in bios.
->> + */
->>
+>> Why not ULLONG_MAX / SZ_1M ?
+>> Any particular reason?
 > 
-> Can you convert this to proper kernel doc while at it?
-> 
-> Also this should all be working on folios instead of pages. But that will need a
-> zone_device_folios_have_same_pgmap() so we can defer it, not suitable for this fix.
-> 
+> ULLONG_MAX / SZ_1M would avoid the wrap, but the block layer cannot
+> represent a disk that large. A block device's size in bytes is a loff_t,
+> and set_capacity() truncates anything above BLK_DEV_MAX_SECTORS
+> (LLONG_MAX >> SECTOR_SHIFT) with a warning. With a ULLONG_MAX / SZ_1M
+> limit, null_blk would register a disk smaller than the configured size.
+> LLONG_MAX / SZ_1M is the largest size in MiB that fits.
 
-IIUC, you want me to change this comment to kernel doc, something like this.
+Then compare everything as a number of sectors against BLK_DEV_MAX_SECTORS.
+That will avoid using directly LLONG_MAX. BLK_DEV_MAX_SECTORS is ever changed,
+the code will still work.
 
-/**
-  * zone_device_pages_compatible() - Check if pages can share a bio
-  * @a: First page
-  * @b: Second page
-  *
-  * Check if two pages from potentially different zone device pgmaps can
-  * coexist as separate bvec entries in the same bio.
-  *
-  * The block DMA iterator (blk_dma_map_iter_start()) caches the P2PDMA
-  * mapping state from the first segment and applies it to all subsequent
-  * segments, so P2PDMA pages from different pgmaps must not be mixed in
-  * the same bio.
-  *
-  * Other zone device types (FS_DAX, GENERIC) use the same dma_map_phys()
-  * path as normal RAM.  PRIVATE and COHERENT pages never appear in bios.
-  *
-  * Return: %true if the pages can coexist as separate bvec entries in the
-  * same bio, otherwise %false.
-  */
 
-I can do that in next version. Thanks.
-
-Regards,
-Naman
-
+-- 
+Damien Le Moal
+Western Digital Research
