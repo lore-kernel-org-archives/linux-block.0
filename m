@@ -1,100 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=205.220.166.238
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795782569;
-	b=Okg/452xMb/LH1gOpKavbdTPFo+xdMYFpTLMCZn1rEGCzrCCOtMsi4x3YmGdt6LU0CmE
-	 GlAt54/uXLIvHywgQdxpEL+dw4Lj28rsq/TE9Lpp3VoH8XmkQB5IvelAR/HOU2fvH5JI3
-	 YIgT5IyNTSmSYMylomnQX61wRE6oV+llCrStSoLZ3S6D5AxZ28PUFWS1YyJc9VPt0YX5y
-	 HoBNCHnkbZgcSEn+/7/ckz+qTHY98erU985jrAr6rTt1/Br3omvTIrqE2mS4U/Cji8UzO
-	 WPAqkiQzf/wY4w68Fak/Tl/iuCJjwgdy/5OOxouwr+3DLIKdouwx/EUOtUOiyRbzDtg==
+	t=1795783775;
+	b=R4VfNAR1FI0dbq1dNIy6YuxsVvKQtd+XEXjAI7s5bAMM4LAuof7FSzXtypg6xAPdZ+Gh
+	 ZXIUJLNxHewmr/0f0hoDMnwUU6o7CygzjPEli2k3RL1X/hQU23Cd5Kzp4ALOwmEwH1KZe
+	 o9v65eRykBba2yy2UGo7gh2HcgpKPFDCluhMhGmC5ET6d+2kuA7Rm/ovsc9IMhaI4yGvv
+	 5K0SJlsyv/okae5urq3NvrgsA6QJg5JexEwJz//sSpJOCrbnN+ipxC2BPc0X95VeQNRP7
+	 An49glbbQgePFVtSXkRTTA4giSfmNWWn5WwLzp0hSFGRvXgpW4FS1NPvShsv+eaAMlQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795782569;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=gXf5stEDIYuDZVQjUcNyW733hx6qDRKNZoyJXoBIROc=;
-	b=SybE7eZZ1X1tMvbsZtdS0dY7ZVBXSYSwnkUdiijvlHOpcpi90Ln8OBG6puWX+1PgTqMp
-	 NyNdXlgO0JDgRHVD3r4AnFFW3iPBeWXituw/uu+AmSBtbyeCRgFpu9MUIC7LPsiIGrGxN
-	 LhXaZTxhB3cMN41l7P2Ng/oYzdzRD0OV5c1lShmGU80kUJsUbQgCWTyntmVLyzVOqKluI
-	 9ngGc5pZW1+Q4/5bRHv8YPcMT98Hywv7397wiOPdcSIXuYGm85hUhVgR7U9/k/IzB3NFC
-	 rCX81pDz2n077ZbDRbMhPv72S65RFgKN5iVfdW4CE92kBZbvn6mc7JeMpohNvg2SGjg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795783775;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 Content-Transfer-Encoding:Content-Type:X-ClientProxiedBy:MIME-Version:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-Exchange-RoutingPolicyChecked:
+	 X-OriginatorOrg:X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Authority-Analysis:X-Proofpoint-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=qX2QxydGOWQ0foSOYe+aF/9HCH/m0/YglsA+X/KctSA=;
+	b=5XnJQCu2tv+TQyljhifRJhy5KywqtghGCsxPYdnFBXDDTju+6/8XHAttALR2lx8OR9oV
+	 louJg8v04EnGdHo9La1gKmBPvXbvPoNSB4d55JuY9mp7mDu+lA7xkf2xGCx47wdqpTRlN
+	 OE6ZZZ09vbAXQiLVxWFxjLpAAvXlEI5mu0YzmQY+95ovEWTmIZpRVH8I4jjkk3dHeUJV7
+	 S1kgoK90k9/hZXJnqud7s/ZZa8dvx5YZaRELeEJgMfORQgi++Ey8viyg/0Y3ZlW72SCfr
+	 y9KOYr9opHt+wtiiaSRFRxG8G4MVwbnIRpQiIr/vboU9lcbHJRorOUIQwn4td9kebIg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=IDtGKepm;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.169
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=windriver.com;
+	spf=pass smtp.mailfrom=windriver.com;
+	dkim=pass header.d=windriver.com header.i=@windriver.com header.a=rsa-sha256 header.s=PPS06212021 header.b=WRREZ3ml;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=205.220.166.238
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C244606A326
-	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 12:29:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5C244606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C2E606A31F;
+	Fri, 27 Nov 2026 12:49:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D5C2E606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=IDtGKepm
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-55be673e029so1832161cf.1
-        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 04:29:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795782568; cv=none;
-        d=google.com; s=arc-20260327;
-        b=N7IJlQt0A2hjKpy4aHj+YFCJGb/I7WHgi8yqpbJcUvicoAaNrSp0v4dh1P/7bPV6JY
-         h6MRLDWJJBvqGb/bpqc169Uoklw+0wGB05k9Veo3c7lHdrbR4kqhO4djzprDmrtuqnq4
-         wD4SKkGjDdveqG15oJgKhPxvrfMBRShOgg3B1bfGO9VgQ2W0qIwuLH7rH+k0vLle4JyY
-         x2pE1u12Gk7pkuem0br9v8AhSpI3ubxOf6DaaUPk9LUuC9uSdbKoYWYrjtnbwopgJcp3
-         BKVVRcrT6gTu6mg5qnKfoInyA2UD5qZMuyiAbFU9CltBikG+ONyW009GLGTlH25ySSgd
-         /xQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gXf5stEDIYuDZVQjUcNyW733hx6qDRKNZoyJXoBIROc=;
-        fh=ZosvrFKr8Fpy2oXHy9pCuVjKetm95B3IbKwfVcf/xKo=;
-        b=QvYA5eS/vfDJIFEnkVcsLWj4bexnJA7LpOhqE8TuSSbc2UwEBQaLkYYb4GAo/4du8w
-         S03Iam2/qJXZYaxFXl8Z5F83o0ZMtT9tKTYjdq0beDIgXvXPWy7DcpwuGZ8xzRFizXrA
-         Aej9Xb/ciPWOJH8Xfft8UoWYLYxbi7UGIGDtrHfc2VHVdQWvYvHu+TQ1kc75Q4iG3DHg
-         aa1G3ECAeDLuw42+3Mq4tUeqJ4qu//Vun1B5GcgngCH4RGTH2AGQQ/jizEOGKdxWPrMr
-         DGUQa2Rznm0ZqSUjpkJf1VzJt807y7dE2xAZdu1z1FlkH5Cv0sxhCbkXGI2vhPQBeCQh
-         MHig==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795782568; x=1796387368; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=gXf5stEDIYuDZVQjUcNyW733hx6qDRKNZoyJXoBIROc=;
-        b=IDtGKepmhQShYR7D/olwV/obTk+1pmvySEjMhbDi/ma/1i93QiS/JtjUrgxBSMhQ0k
-         JL+ilsf6MgB7rL0RhzqkxVfHwpWehnk7Fk4Q747FAHE3PcGDe+yn84ff6jYRMPlMbx0e
-         QokdEvRzq0preycHEpMBQ2Lohvx+Zw/uSsx2DMrkiT1qcSSKYLtRImSCVnyuzNksYALX
-         NtWTa/1okzanV5FHK0NJqjKm441asfoZ8MYagjrt+QkZuqm+fqNCuiCSxrGhrELhPKIE
-         fk/8Dwyrnu3Us/ZvtQsa36mEXHtFs/36/ZYUVzpvU3JIUzDhbiIDtqOBlvidXDxzNxSY
-         eJ7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795782568; x=1796387368;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gXf5stEDIYuDZVQjUcNyW733hx6qDRKNZoyJXoBIROc=;
-        b=nhI8Nz60c5oylNNvaKS24xSpg2WfiOORsWAPkNzlccaozRPLbVBkn9EPPDB2NdzMg9
-         NufBJwmaalnx0HpO3SHF89IFzGp74Zn+Shqv2HyL+Kno0R9BfM+fhkbNm6mEswyAfaPQ
-         4c9/sG2QlCVCRzb8EDy1E9IIElXULrhJGIZ6XGOhI+7O650gINndUjRAu9Fv/tKs2sg6
-         v4z25KKTA+lIBq/8D9CkdSPfEApZli/MvZc+2rpxKvO1mnien8BdL9n7peN9Lgqre/j/
-         H6AwGgRy46KCOE02JFDBJzxtdaS+jaR9C+j3Ck2oPc2fJbbxGYFsVqxfEMENNY8qBQIY
-         H1SQ==
-X-Forwarded-Encrypted: i=1; AL+hErGRez9R0G0NF7kI6kiMYioHd2+V9DYTT1gzJFWMjUNnNUwlYgoxORWsw9nD0adVlvZr+tu7D6atr/Udpw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+lEbdWT2+THyp/nklh9jyeCbFKuPq/v4lvRiJys226bXMsBnup
-	tVLweaXOSQ5VEmSSusl0DCO2vN9MHz0pRxoSjPZpxf8B6hxyN4VM8/6X1ck8APBNY+c3Y3vkENP
-	T5creqXHEmrbq+tMVPaqbqWbPwC8OjyEuk4AN+4Z+
-X-Gm-Gg: AZFdTZcMx5uHOR0RQgYvAHCRkaoWZSIFGu8xyBhpWi2uR4hNVGBxwlt3J3OKI4Yj4j6
-	Ida8hFCOdGaN+t9XBOr7k3QBJcOf/p2GzGzdigGnXhsQk60Xmcv4HX0lKuicKRAa3YNz1wmbfW6
-	FtEzL7C8GfUP4VArEB14Mzq2wuKpj3QgOBdiHMd1PDRQHhznfx5JMCIJn0BGeS80vffVGGB7dw1
-	OjrMu8nl5AXsYEypiINsffmPXkXEG5M2EGvr+lChHsV6SoYCntvdvs8V5ZWIhCSoADkiRNzzAfn
-	oDwdB+OxJSR90nnMxSNrn/m56MnG5kQ7Vl+fxo82qf8/uE4ibVuedBeDig1P9JWXbkGKHGZGc97
-	UA7fX1pbqJxGIoFZmkuLEa2WL30WgiXBobYapyg==
-X-Received: by 2002:a05:622a:a14:b0:536:6ae9:f55f with SMTP id
- d75a77b69052e-55d8900bdcfmr34062041cf.7.1795782567558; Fri, 27 Nov 2026
- 04:29:27 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=windriver.com header.i=@windriver.com header.a=rsa-sha256 header.s=PPS06212021 header.b=WRREZ3ml
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARCgDoo1163933;
+	Fri, 27 Nov 2026 04:48:48 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=qX2QxydGOWQ0foSOYe+aF/9HCH/m0/YglsA+X/KctSA=; b=
+	WRREZ3mlLgJuhE69lh/foBz11vZ1iap0BfINWFbeDwzueE6Xz9VkMBPMR3vM+KhQ
+	UYlbbUV7j7KLVmcMukJwbEI3QBWoqwQ4PGzm3XdbZXHBVEMKHsHFne1ANokkeLVq
+	SmZpldINhsYROCqUXjMNXaqB8fBa5Y7k04/pBAjrlrZiYJlbANxcMwyNdLo1YhEC
+	SPw6eskYeZ6/CShMMqOuitoNatPoto7w0zAXNZ5uLxaIvk2VtZqVQg3BUq22GUhh
+	Y5tcX32s4nNnD7dTBXH2zOwUic5oLfVwPqVdi96xmGoRxUhAy+ufsevtkyYv7SFN
+	gprF0+WkWuBUvUlmDMoVlA==
+Received: from dm1pr04cu001.outbound.protection.outlook.com (mail-centralusazon11020089.outbound.protection.outlook.com [52.101.61.89])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4j516x05jm-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 27 Nov 2026 04:48:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JpeDPCRt4WxwVqiFF9NpjwNAYNBq87EX235wHoK6WksweuBsBaPEQ2yuQS9HLNQMp9TAsf93hC9QI5bXIFqiH779jc1a5pGzIe5VwPM/MSBOk3HcUmpJE8m9Qg6jnXxwZkVH3dJJS6Aoo0CjRntQrgt92V4X4NR2Kw3UUOdZljvYmuQORQXkswGpDz4JZ0aYY9Ux8SLhIs30PhAoC/TIpZWMpcivQR8UizfLUsU84AVWMUUPtwBAFKaje9Kv6z8i/Dc09NAXx4hBCrNpPRf7oWsXzhr0XUnSLx0cFGayJ4NERe2rF/RuT3iCqh/L88Vy6JKRxyUqGX+GN9mqFI87RQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qX2QxydGOWQ0foSOYe+aF/9HCH/m0/YglsA+X/KctSA=;
+ b=mhEpsMHF4rtJzw4nCDzGXGbJVSh2T/wyE9pp0lu4q/J9JmJobSYIBMO7fVGA8HvQdbOeFIsIzUVUMSq96VXZc5RyCcjNXKTEoh7bojpQdc2HfdbarlFRVtazLsu2FOzyWEHnU/e7FPAXfyq+U4W1sZoBTXnFnVS/N9tpWWaAZrkdj38A+qG4+uQR6Cpf+kZn6lsfI8CkuPN+jJ+ajI5kFTfQ9sBQ4vBf0j3at1MC34A5WR2lZ5eUVlsFf5eeL80zQXArbl7Bu+TYodTXYy5U2p4/t9ml6ZMbCYnt5qPReHCJrMmqYUfxraTEzQg+Q+aROsoXNOT3mdAEJOtIoEbgTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=windriver.com;
+Received: from SJ2PR11MB7546.namprd11.prod.outlook.com (2603:10b6:a03:4cc::8)
+ by DM6PR11MB4642.namprd11.prod.outlook.com (2603:10b6:5:2a2::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.662.6; Fri, 27 Nov
+ 2026 12:48:44 +0000
+Received: from SJ2PR11MB7546.namprd11.prod.outlook.com
+ ([fe80::ca9b:dcf:8881:bced]) by SJ2PR11MB7546.namprd11.prod.outlook.com
+ ([fe80::ca9b:dcf:8881:bced%4]) with mapi id 15.21.0662.004; Fri, 27 Nov 2026
+ 12:48:43 +0000
+From: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, bigeasy@linutronix.de, corbet@lwn.net,
+        frederic@kernel.org, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, marco.crivellari@suse.com,
+        mingo@redhat.com, mkp@kernel.org, neelx@suse.com, peterz@infradead.org,
+        tglx@kernel.org, vincent.guittot@linaro.org, wagi@kernel.org,
+        Ionut Nechita <ionut.nechita@windriver.com>
+Subject: Re: [PATCH v16 0/9] blk: honor isolcpus configuration
+Date: Fri, 27 Nov 2026 14:48:16 +0200
+Message-ID: <20261127124817.15699-1-ionut.nechita@windriver.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <rfppj6h3dfwsyvstju6k62cigzicdhoqy7j6yo7fnne7tcy3no@fvjpn5glg73m>
+References: <rfppj6h3dfwsyvstju6k62cigzicdhoqy7j6yo7fnne7tcy3no@fvjpn5glg73m>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VIUP296CA0040.AUTP296.PROD.OUTLOOK.COM
+ (2603:10a6:800:34d::18) To SJ2PR11MB7546.namprd11.prod.outlook.com
+ (2603:10b6:a03:4cc::8)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,139 +116,141 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261109182533.3594984-1-lrizzo@google.com> <20261120010655.467825-1-lrizzo@google.com>
- <20261120135013.GO3115493@ziepe.ca> <CAMOZA0LmZ9PFzxLcc1SuS8piFyZu6P=vX_qR2jy-3QRUoNCUKA@mail.gmail.com>
- <1f10002ea9ee16a17087bd06e4a1685a973fdf6e.camel@linux.ibm.com>
- <CAMP57yVZx=s-JXHfQfd_ouv2jV6MMsJXpxVLkQQHG=7qfFVJfA@mail.gmail.com> <d42bd9452d00a0b2a5b7d6652d556c9fc8d2c830.camel@linux.ibm.com>
-In-Reply-To: <d42bd9452d00a0b2a5b7d6652d556c9fc8d2c830.camel@linux.ibm.com>
-From: Luigi Rizzo <lrizzo@google.com>
-Date: Fri, 27 Nov 2026 13:28:50 +0100
-X-Gm-Features: Aa3M54o01jhZM9dCQYVFb8_-yMQWCkVYamRB04RwDLjyCo_Cf-5r3I24fRo_Jr4
-Message-ID: <CAMOZA0JMZ8wUrV08YznFUH7AkmyqXcNdzfd26KsoTtzqt69SVA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 00/25] PISA: Pre-mapped IOVA Superpage Allocator
- for DMA and CoCo
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Naman Gulati <namangulati@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Vlastimil Babka <vbabka@kernel.org>, Joerg Roedel <joro@8bytes.org>, 
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe <axboe@kernel.dk>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Luigi Rizzo <rizzo.unipi@gmail.com>, 
-	Lorenzo Stoakes <ljs@kernel.org>, "Liam R . Howlett" <liam@infradead.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Brendan Jackman <brendan.jackman@linux.dev>, Zi Yan <ziy@nvidia.com>, Harry Yoo <harry@kernel.org>, 
-	Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Hao Li <hao.li@linux.dev>, 
-	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>, Jann Horn <jannh@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J . Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Joshua Washington <joshwash@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Christoph Hellwig <hch@lst.de>, Dragos Tatulea <dtatulea@nvidia.com>, Pranjal Shrivastava <praan@google.com>, 
-	Mostafa Saleh <smostafa@google.com>, Randy Dunlap <rdunlap@infradead.org>, linux-mm@kvack.org, 
-	iommu@lists.linux.dev, netdev@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, driver-core@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-api@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR11MB7546:EE_|DM6PR11MB4642:EE_
+X-MS-Office365-Filtering-Correlation-Id: a43e2ed9-4da5-4993-7c20-08df4c84c525
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|52116014|23010399003|38350700014|10067099003|11063799006|56012099006|261021121427099003|261102123227099003|261026140227099003|261022075727099003|261022105027099003|261028144727099003|22082099003|18002099003|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	cIw+/Bfw5bpGDGLwIsXnqOYwPhmfoz6n2wkXQ7NkOizXEN9jmMVUKEnK6oQO7JFUlIwOj/IWSPQfXC7jqIfa8vOPSTA9Sk7xbqqjskXGJevQhSfiy1uLASvPUQk2pJvu3ueMwoo9ZtuvG8LJFDdSkTDg4UHmyw7ai6Ir2m65B/AVfAbVAojL6IyGhS8OZ+gSgQp3UbMAxbiANwbobYLfqvmkJbjoXO6c4nxWFkPpC9/EWWOhU3fByFY2A1/E9Oz5jNPNl9Yb5zyTUdNoG9BdJqqqo7V1Rc8xa9TzuBwj9h5QVL76k7IyTLbefL/RLYfnMpYJI5fLBB3iTGD+Hpop8LPyBwCpMtQLvteLJJTR2e108J0Y2ataid5DdUU1VFvijNB8RA5XV03XMI6eAa637nhkZl6iE+i8zb3dnJhI5zgr8MU8eXZBKJAMl8aerOy1RiEocwnXPZrUAAzVD8qKdEtdhor+pZa7EsKqXDdqYH//TtVVPKKKhNAi4K7Ve5PyoEgaegOTp1grNkN0fHFPp3sO/jC1JL16CO4hKK63U537oB3oAmQr1NEa7mgRjisQ6YeZIKJ42CzUs3vrz+jVtpnweArcQ2MgURPFjpVmMMk2FJfCOREj3O8mBM+kUObWjCusLwC6gZkIHkDLKuYfxLnXBmhyTkvM/ocv0E7ZjQuFa/7UDTeBe0FOTJ1XfOi90F77lRe6IkBLgn0pL68PpzNk2muxiTHHONxncK3cNgE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7546.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(52116014)(23010399003)(38350700014)(10067099003)(11063799006)(56012099006)(261021121427099003)(261102123227099003)(261026140227099003)(261022075727099003)(261022105027099003)(261028144727099003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?X05ZTiSkyDqOfdvBN6JWJbwInRKM4iDvLHOcscgoDgQQdYovnComDxR6gaWE?=
+ =?us-ascii?Q?ILTKJgaBnahZbh5We76XB4hlUJwj26jTcBpgnr0pZ+JbrzAWnUfmEiZVIPT1?=
+ =?us-ascii?Q?BCy4CWAorFjRCtkGyOfjo8LWKcGLX0UqzMRxTTfM8pC/FlomeHBATD08+HNo?=
+ =?us-ascii?Q?pr0YxFFemfsD67bmC/nfcjZ2SDc57T5Z75b0xPYZog32H2M0cW2xE82A7xB3?=
+ =?us-ascii?Q?qMYmxbC2/wPdC6hVce5e9mJrKq0dusrAV+Bek7DnSqI8oto+AUxUGtjJ/Kaq?=
+ =?us-ascii?Q?zbzG4yb1/YrEKCbKfIX6/t/yKmHroJVJ41SIPn4hf013srN32Xuu8fsP1/g6?=
+ =?us-ascii?Q?/z5+M3neROLWSQf9Ap+ThrvQRxro13ZU0NtZ525duSdVhcTWDzc9isGpWM09?=
+ =?us-ascii?Q?PlrdLqRLk5zBO2+6sHTMgihm/FCz44RAo1USsrIRg8uR5SRcmwfHwjMl4OAw?=
+ =?us-ascii?Q?4NAdbQywKP+Os1p/lU15ghcHWw+cCmIvnRHeWy2GE5RlB0u0N7+XsdWDY8ka?=
+ =?us-ascii?Q?Ai9ofCSR4BrKKPPiHdHt1V1LcZgfqVsOtGCLB66JFPgu0ifpxUJwIDOfGjmy?=
+ =?us-ascii?Q?Uw9HojNj1Vh4AXTkfeN65xdvHKvoKxvMTr0s5PoyXpBfdhUxJGio3JOm86M+?=
+ =?us-ascii?Q?zz1NFmLL4oCZtqVTlfHVVT7NeICwzSi5uruSAiu9WYmmJ4w8iDKPPfoXQPNB?=
+ =?us-ascii?Q?AlBLnltiok0xD96uvSM4VInqPUgm8pfQu0lQXDEljcpJy69cWpqEkxCuT0My?=
+ =?us-ascii?Q?PN7t/5IKeo1V5aaKtuIkSl8WhTcrZkmrJDmR5vfbk59EGpx07uInsocUyEai?=
+ =?us-ascii?Q?e6qk6WId1LAf37+YYHQVOSt8SLzLaM8P+V/72lXODGmLmhE9spz83IOXLdzN?=
+ =?us-ascii?Q?So1oOxBWDaIsLxyblDsKJD1Qz5F/W4cH6EbBrgsoLksF6XOuTbHoLbltVZHg?=
+ =?us-ascii?Q?0pZ2qGn3gr6QmlJsBhsYKNn6dc5ms+PM5S+XnnF2xEhHIhezqetncmrEeTOc?=
+ =?us-ascii?Q?WZEUWV1wQC5SyK4sS28GBS8qAKpWl+dXYzUXsypelAP1/bvF3+Z8neRT+N52?=
+ =?us-ascii?Q?AF1XLpUTlyoXbjj1eyOLAibQlIj67VL/tOJgvjhBM/IGaWTjLKKzUCstbD5r?=
+ =?us-ascii?Q?5qGiM8NhmikSqlSvfnH/ZExQjOF1KKsYqGY0YE3dgn1YwLjDgjxstukB5o4i?=
+ =?us-ascii?Q?14ixbKA9Xr2xapouBVuLY0qGtgLeBEDyrYNvovQAYmar7lNRV7ChJ3CDY+tk?=
+ =?us-ascii?Q?wN+MmoFG4AFJcJ8ti3tNtJbr8YNRM01mpJJ8LbdN/RSpNvYqmxEYrDyRdEmc?=
+ =?us-ascii?Q?VlJh5IDFpspORFw56wRUCeKVUOPMX8LaMR/V1VGSO7HGss732YJbI7TlWK7s?=
+ =?us-ascii?Q?F1dWlCnfUOpXtNaCk2THCbuKc8REYq67rSHdtywEmuYsBo+/yij94mTQjvMz?=
+ =?us-ascii?Q?R+LkLVHJoBKs6qD/Euqcyfk5b4fcgXfC7ZS7U9NItHo6oWoqfMQJ8C5E1KWg?=
+ =?us-ascii?Q?fookWnGiM+0wjOI4mP5BhJA8W8RFQbHNhPC/bkWgZJpWSLJWOyP90A3Vj11A?=
+ =?us-ascii?Q?yxtnsnj47RLOS7B3CaPz+3JoTK/lpCYWZGslhkOZOQmXR3JulMn0yV+qWyRA?=
+ =?us-ascii?Q?agaTVwk6BRBqxEVIXauAFbFMYANeT7UhWmrypfCvcEd98PohQkou+7qBj4Jf?=
+ =?us-ascii?Q?9rXrcdfXVj/3882KsfYGw5L/iQc1hC0d2G9qtq79A2QzTbPoG8A2AoL0YlZr?=
+ =?us-ascii?Q?WXLVr8zNhXZ6aXKPbAYIogz5xAi/6YY=3D?=
+X-Exchange-RoutingPolicyChecked:
+	eroycWP/X43IENP94kZ8DZCkxwoey2wlr7Z/9xWKUBS24gQsV8jdCA35ZAMfRypkbMObeelSTBsTFApPK6CNL2SmMpvt3Ar0LtS2MWXVPKmD3zJLYAAPCyKNi0e3kBs2JWZSZ9Tjfsa1C5zfM+nSHDEV9NB7ms5CmUZbJeR0FM7dOBA1Vk8RmlUaAdSzyV3pFHOW6mocum1i1Okfnf5KoV6gHKK7xwRpnsHECrFKfPTVbrblDT56++buJ8Vk2ipB7kVZ7u50fkMhfbYTe2DxhN3PlRhgmUf/nl+2qonK9pgZOA47sLts0fIwP1R7cVMoaSgWsZpbtbMJ9LTAOrv7IA==
+X-OriginatorOrg: windriver.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a43e2ed9-4da5-4993-7c20-08df4c84c525
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7546.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2026 12:48:43.9230
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lvdd7RPzSIhuyQNLy9l309PF42UxPSwoFkOiR5cW1pa/yyuTcv75NApNAb6M0rcnz8ktHd28I4MFPXvJW7aJWn03P4HXAqhCrTwzOvv6oSQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4642
+X-Proofpoint-ORIG-GUID: cEjXajEMjIPfAiI1n_2pgOxMan2oPiKV
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA1MCBTYWx0ZWRfX6dsfyOFgvFkP
+ TJRaS1MrOs63N3RVBZficCneyW2TApeivjY+ADFFwIdKs3yIJ61NLjFBA/aPRpcSe4ia15T1JNp
+ ruYXp2W5s3u2qXA2LxjniXxW6w1nIW4vuubWBsKLMifsQDiOZPLh
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA1MCBTYWx0ZWRfXzKWcYSyFzAWC
+ BmP0WluyIxj7+vvimeix9s/I6f3qWeSbhsNbCI6sHfmZNsPr239fPoaXBHlTrAXD3EJK/d2TVC2
+ A6xyzp1+E/jOOLMMe+tSahcoviA8B06QDnBxyzGOx1K/5g6KTooIqvXyEIELBW08hAbvOwTjQpq
+ UBhrztXjA1HAQPFvpJvLLZucwDbkWvxFa+MRBXhPiieSBrroqXP3ZmRwlb1mx2A79UosEw4P4tr
+ ccwjeXW+9g+maFGJAT/I3uucUNZuaQBzzatfM+8GkJ4lorj29AAoZhutE6riEggc2mjA3t1CuHH
+ egukvlvg/QStJUXUAmxkU9M9WNXRGJUp3K0KLC+IwknQab6fYGWi+1oYkQXnt211qpABG89mbQs
+ 8jkkbfiHqpcv8y/RA7z78K3ROYI3MXpyfWtunBcJw4RirZloqxbZ9qxp8hbJKfDiBxdf9iO9MH4
+ FVBG/a2JbND1gdRkXog==
+X-Authority-Analysis: v=2.4 cv=bofZl0ai c=1 sm=1 tr=0 ts=6b097c2f cx=c_pps
+ a=Od3vHKP1JmY3AU3jrO4qiQ==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=bi6dqmuHe4P4UrxVR6um:22 a=iKiJcTA2PjBS6x5JeXcw:22 a=t7CeM3EgAAAA:8
+ a=CY6fKGm0NjnL2UNsXdoA:9 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-GUID: cEjXajEMjIPfAiI1n_2pgOxMan2oPiKV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-27_02,2026-11-27_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 impostorscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ phishscore=0 bulkscore=0 spamscore=0 suspectscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611270050
 
-Catching up on a few comments:
+On Thu, Nov 26, 2026 at 03:23:31PM -0500, Aaron Tomlin wrote:
+> It is worth noting why configuration (B) gave isolated CPU 2 its own
+> disjoint hardware context (ctx61) in the first place. With 120 queues
+> distributed across 128 CPUs under the legacy post-allocation
+> "isolcpus=managed_irq" behaviour, group_cpus_evenly() assigned hctx61's
+> managed interrupt affinity mask solely to isolated CPUs.
 
-On Thu, Nov 26, 2026 at 9:46=E2=80=AFPM Niklas Schnelle <schnelle@linux.ibm=
-.com> wrote:
->
-> On Mon, 2026-11-23 at 09:50 -0800, Naman Gulati wrote:
-> > On Mon, Nov 23, 2026 at 2:10=E2=80=AFAM Niklas Schnelle <schnelle@linux=
-.ibm.com> wrote:
-...
-> > > I think that approach would also align with Jason's idea to keep thin=
-gs
-> > > within the network stack and to work with the tools we have until the=
-ir
-> > > limits become very clear.
-> >
-> > Hi Niklas,
-> >
-> > I have been working on this idea exactly - extending the network
-> > page-pool with a memory provider that allocates large pages, splitting
-> > them into N smaller pages that all share a single IOMMU entry. I
-> > breifly shared my approach in the v1 PMD series [1]. I'm readying a
-> > short RFC to share shortly, would appreciate your feedback.
-> >
-> >
-> > [1] https://lore.kernel.org/netdev/CAMP57yWvHO0pWCR3-9q1gtwVe8WV4Y6i69t=
-rmw+BJRVYf3JB1g@mail.gmail.com/
-> >
->
-> Hi Naman,
->
-> This does look more contained, but I'd say you should still go simpler
-> and fewer steps per series. Some thoughts:
-...
-> - This is still a LOT of churn, my gut says much of the benefit should
-> be possible with much less churn. It's really too much to follow but a
-> cursory look makes me feel like there is duplication between rx and tx,
-> which is weird since for the pre-mapping they should be quite similar.
-> There also seems to be very little integration with the existing page
-> pool, rather it seems to set up a parallel mechanism for the pre-mapped
-> buffers. Really in a first step I think we "just" want to use a more
-> efficient DMA mapping and contiguous memory chunks for the page pool
-> and also keep the page pool API unchanged as much as possible.
+Hi Aaron,
 
-The implementations seem large because they expose limitations
-in the current kernel code (or our understanding of it;
-but the proof is in the pudding). Networking for one, since you
-mention it: the tx path allocates memory in many places without any
-hint on how the memory will be used (loopback or device with IOMMU ?
-cleartext or encrypted?).
+Thanks a lot for the detailed answer and for your help throughout this
+series.
 
-If we limit to the easy parts (e.g. just network RX) we may avoid
-some churn but we will not resolve the problems arising
-from reasonably strict IOMMU deployments on large systems:
-- IOTLB thrashing (network traffic uses separate PTEs for
-  rx buffers, rx headers, tx_buffers, tx headers). Rx buffers
-  are only 25..50% of the total. See [1] for some data.
-- per-buffer VM exits on overcommitted VMs (same problem as above)
-- IOMMU unmap serialization (with strict DMA, I measured over 10us under lo=
-ad)
-- swiotlb copy cost (on tx and a backlogged queue, most of the copies
-  happen on the TX softirq handler).
+Good point on (B). I had treated it as the healthy baseline, but as you
+say it only avoided etcd because hctx61's completion interrupt stayed
+on the isolated CPU, which is the isolation failure the series fixes.
+So the comparison really shows the cost of correct isolation on a
+shared slow disk, not something the series should avoid.
 
-Also we will not be able to see what is lacking in the current kernel
-code to address all the above.
+An update from our side: the v16 managed_irq_strict backport is now in
+our extended test cycle, on the PREEMPT_RT platform builds. For the
+control-plane I/O case we are handling it on the host side, as you
+suggest, starting with the I/O scheduler on the controller root disk.
 
-What I wanted to do with my series (Request-For-Comment, for a reason)
-was to identify the components we presumably need (meaning: implement,
-or figure out where they already exist and actually do what we need)
-and get an idea of how intrusive the changes would be.
+> Also, following discussions at the Linux Plumbers Conference, the
+> consensus is to drop the separate "managed_irq_strict" flag and instead
+> upgrade "isolcpus=managed_irq" directly in place to enforce strict
+> pre-allocation queue and interrupt confinement.
 
-Then it is completely fair to say that the goal is not worth the effort
-and should not be pursued, or to take the low-hanging fruits out of it.
+That works for us. My preference for a separate flag was only about
+not changing behaviour silently for existing users. With the Plumbers
+discussion and the OpenShift side on board, fixing managed_irq in place
+is the simpler result. We will move our command line back to plain
+managed_irq when we pick up v17.
 
-cheers
-luigi
+> I will also fold in your pre/post reserved vector patch under
+> HK_TYPE_MANAGED_IRQ in the next iteration.
 
-[1] Here is an experiment with a system using bidirectional TCP
-traffic on multiple NICs, where IOTLB thrashing becomes a bottleneck.
-Below is how total throughput (TCP payload TX+RX across all NICs)
-changes using 2MB mappings for different regions.
-We really need to cover them all to recover the performance
-of identity mode
+Thanks. A question on attribution for that part: would you add a
+Co-developed-by for me on patch 8, or keep it as a separate patch? I'm
+fine either way. For Co-developed-by, you can use:
 
-Use of 2MB mappings         total TCP throughput Gbps
------------------------------------------------------
-none                                  440
-rings                                 572
-rx_buf rings                          577
-rx_buf tx_hdr                         572
-rx_buf tx_buf                         649
-rx_buf rx_hdr                         674
-rx_buf rx_hdr tx_buf                  716
-rx_buf tx_buf tx_hdr                  734
-rx_buf rx_hdr tx_buf tx_hdr rings     744
-identity mode                         744
-------------------------------------------------------
+Co-developed-by: Ionut Nechita <ionut.nechita@windriver.com>
+Signed-off-by: Ionut Nechita <ionut.nechita@windriver.com>
+
+Once v17 is out I'll test it on 6.18-rt and 7.3-rt (PREEMPT_RT), on
+the same machines as for v16 (the Granite Rapids NVMe box and the dual
+Ice Lake MegaRAID box). I'll rerun the queue mapping, effective
+affinity, hotplug guard and completion locality checks. I'll also
+cover the negative control I still owe you: the same isolcpus= with and
+without managed_irq, on the same kernel, to show the difference. I'll
+report back with a Tested-by.
+
+Thanks,
+Ionut
