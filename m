@@ -1,93 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795740256;
-	b=ICG1I14L8EcWQAUrgU2PneD9OVWY4t05lGXj4eo/IPHKh9jZVAFnVrV0BD9aDcOWdc5U
-	 c7uzvBXpPDaBjyMc3/g+rB15U6jj9vGXWag/NpDPtf66rGrXVm3ju4fpl53CRHuefsJq6
-	 djpWhxe+2Dv6OCXqUhHEJEH9daAN2rRPMXjfTmiiFZURuJLmp8dWdaEfOFSOH9h29xr5M
-	 w+UjqvDotzabaeJ8Ts4TCHOdnZs5AHt/bvdYNbDgPbneA1gxkaHQsG3in9HrVUTMmVggs
-	 yyYGmRRXxMsEl9Zkfy592e/tSS0Ct8I7EeOPEClD7dvNSRn547qTRzHfsxNkseJCpjQ==
+	t=1795740641;
+	b=nV5ZVX9h9TCpUB5pTnJAbdbzRUoXXWUU2obm1V+fU2wHuNgsNWaGRIb8SiJVYagYJypu
+	 U0FDZGWoTiI3MgH3RDzqlLjUTABNomrgQgfFLLNowAWlvmymtSxxfaGIrouKp2R9JBsP3
+	 QPowQhQfQpOamqFGJtBhNQxichZWU9no2XFK+kciHpT47IExeNKOQN7DwHpApo1rb7wFi
+	 UtHKA4yb6LffBx0f/CCVQHNVbz1A7gbhUBQZBYiyTZz4MopuubacQ1q8Hl9qP2jO/Y/g8
+	 xRx0UHpccLwqEYucbpwYKAVpZiOsgtsR3AHxwoQXdZBJdJU+F8D/tW1IY4aBld2Ohvw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795740256;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795740641;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=5BhoDhUWCXvxES6P2SRNLdbuhC6XbJmVLMpNmgfMiH0=;
-	b=IbYyHSSwOGZu+MEztXzLNO0DaqQvnWVr3d751fi84cl9Zytifr97jJs4i4JesgA2wD9y
-	 djXVnVsPXW7u/evY0mXDbPjryWJaw8yxQXkluWOnyBfJsTBBrwyj9qzQHMyM+IP7KQNFR
-	 pfGswU4ff/22IkYGR3mqW+Sm1/RhUhPEW6gr0lzY9LSjK8H7AnSiHuxVurmQt50VpLAN1
-	 FR6V4VKvD1sm+Ytqui41Xr+hCXYESjeeZU64cBDAu4dvx9HKhkfepdCf008IqnzqaopaL
-	 Gkj3+3R3DxYLW8SPf8j5V5fJDD1FqMb2XYO7JrLxwaCHSCnfpc/l2GvbWh3YKhuurQw==
+	 Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References;
+	bh=x0Mp5Txn9dhWnd7kNaeyrGhDTXOo7utFqS5hhFOq2io=;
+	b=W8HvTL5iesJJSfY9m7XUavEiOl4M+jBdy93fvlRVC7+TlV/GIgE22MfX1WDeoqto2siQ
+	 Zwp2YGUnM9Et1DS2okhL/WQps1omoRFzIk5Bb+sOgjnyAHVzINuuRhFmmim88LzfL4ib8
+	 c2N2KoVO+/J1Z3k7gTR/2kborxcA7S9hdB2we5OFOlvliuJ9uNPLKVO44h3QxhALkm87s
+	 Y6n+i5+bXh6nHS27OLHklTy5qPUXlJT8tfaoSc99dwOfGBIMfe5Agl7rljeNlfuMQvIqS
+	 INAbaI1nRrpml5qufcM79yBhPSbR/BgsUVyEfOKnvR/m5OVKpipgY949ccc9A1EZNVA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YdojfcN9;
-	arc=none smtp.remote-ip=209.85.216.52
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K1tEEi0C;
+	arc=none smtp.remote-ip=209.85.222.169
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD08606A31E
-	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 00:44:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4DD08606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5226E606A323
+	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 00:50:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5226E606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YdojfcN9
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3b439e37813so3904542a91.3
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 16:44:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K1tEEi0C
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-9495e8ae239so828169285a.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 16:50:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795740255; x=1796345055; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5BhoDhUWCXvxES6P2SRNLdbuhC6XbJmVLMpNmgfMiH0=;
-        b=YdojfcN99XJY6bVMYCvqTSaKN/CKxMLX1l2MW9xbE50iyGFHt6ZjHTYRrnhoVCBywy
-         Xorz8vOkP5ORSZSMW8R0qLsu1uFrgRire5CqM/ly0ss8gfGyUoFjpTNJu121HOKNhsFW
-         3/7jJs01CkIdOErM9SX/3Wi/Bpk1VsbT+9/DBAuFUCmY/aq0CMaPKkHFvz4T0eeZKvvM
-         mLvWu0tTWtUafUayIbHpWv/ZsF7m8Jp0PYstLGgDj08cd3dhgLHuyrHvaB/D2QlsHCrE
-         wwytiH7x4FTlGoVDBo2RMQ7lw/SUhlK1QjhnmeHWa7gPHy5Pe1N8MWy3Heodd2TzgrL7
-         n+Qg==
+        d=gmail.com; s=20260707; t=1795740640; x=1796345440; darn=vger.kernel.org;
+        h=references:in-reply-to:subject:cc:to:from:message-id:date:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=x0Mp5Txn9dhWnd7kNaeyrGhDTXOo7utFqS5hhFOq2io=;
+        b=K1tEEi0CKdL//6rYPHcqQGCm7O0J2ly60eWlW+M9HTfuVDK6FL91RNDcDxOxAxtiTp
+         oI7sUzz6QMfcVvFq4csJ6S083G2fdGSO+96r+9wFfux6cu46po3ovanEv6MSYhrNRPuh
+         IQRkruV5OXzzvS8TSq91jU/dMUZz4WKqyxCeQSHwpqqP2n004NI2x8HjUvKRpMdohSJp
+         LKJFj1bPEwjjKwdlmGJ5cwFR20a2FvFJ29hffy5GBV619FNLpZmc+rU9hunaxkLwu96q
+         tJfPopPK/Hbxyq1qO4pmcgcT6uFv67XSRGyn7viNKf9DaddfZHEz+68SomD6h69VsuMX
+         axBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795740255; x=1796345055;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=5BhoDhUWCXvxES6P2SRNLdbuhC6XbJmVLMpNmgfMiH0=;
-        b=PbTB+gwZh5GG4khpaTDQ1PM4pOm8aisyxeRMjIxE7m/0OR+z0sYLk6myx6HStzvQiC
-         sMsQY/4jR5LzWQ6Hr0jNqPHCap1zubuqwe4ljG+fN73xW6sbOP7huCC6wM8g2O7B3jjk
-         3MxTpVFNZU08mEtqFN6O3M4/Ym2jtXlwmRsMXMa0AiPkw94m/PL+pPSpsozcydAbr0ql
-         bHwEk0EJjOR9NvxbbwZc78CEkNOf1siqmT8jv3dsky37luH2dp6+UBkCXA5GYUI229Ot
-         j1NcRK0BNyNQ7qYMwQJfavukPRhP1+IjQmVVleqjecn0nmAAQi/rwmIgbA05c2SLJ2z9
-         30/g==
-X-Forwarded-Encrypted: i=1; AL+hErHbBtKI+JZ1a7W42UMsb6BRD6hLQEdLDAPqJRNMv6NoJTeURsvDndJsthGV6fEfBK8IObC0MMOWk4t+kA==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9T+fysRruJN8Q6xgjiEsWaB5nowR9Muy4tuH7S7MBAVKHqkLNE
-	PiDaEMPkqlYSJqRRAcmkvOO6aRUFc/8R4qSviiIbPwObIYwywA8udgp0
-X-Gm-Gg: AZFdTZcfhdBbUF6q5fIeslG4lOOY71UtoNA1P+lZLGHBPcPqtxz9eGG1/NCWlIy1gjK
-	BoNi8tf3O3eXhUytWMbDYzC8FMLVbYxsmSXlNwQhqpGbm5QhpnebRuxB2tNV7sAfvdDOvYoJ+1d
-	Ga/nNqWm19v4B8Lc0F1ZVhPsBj+u2UOuaigtnGJXPN8ZuQHawe0//JT2urlv5AZizdraAlNTEiV
-	hGgXLtmbFGWlzRji6aJXM9lqGcrRKtqJzmAneIJjymplAocbQRlSZFI/myFWGks7czlGbdEeRnE
-	ZWXWM/eyfIn4Dau0Ju/7JJk1F+xexPRe3YmIqKUmKrhMUmJw1iZi3qL/2pRZ1S+W72KkMjQC5mQ
-	jZNm8lvIedYFxNQSVF8rfHgN9CqmNCEPt3S4dX2XsIF4NmSnAMsSlsNKuHkgrIHil8eHeY/8t+C
-	I0Iiul1OgqaGmRZ/8DvcrVr8I8rfbTx4tt4zlyrtzLGxvMOfe4j+nfAa5fu7G53WoWrVAwcFNMa
-	9/A9gOtc51wCs/fJTlqP0k+0pAJnceMSYSp6v5DhGWADcI8/7z+x8I86T+a4yaBCM4eX98dM9uH
-	5CuYhVQixrapO8Q+we7Gn0yGcs00OvlUEz55hVFEJITWpDtIvw==
-X-Received: by 2002:a17:90b:268f:b0:3b3:afdc:2e5 with SMTP id 98e67ed59e1d1-3b41c9cf56bmr17169964a91.30.1795740254579;
-        Thu, 26 Nov 2026 16:44:14 -0800 (PST)
-Received: from fedora.tailc1fb0a.ts.net ([172.219.65.15])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b4b3c71192sm19113711a91.5.2026.11.26.16.44.13
+        d=1e100.net; s=20260707; t=1795740640; x=1796345440;
+        h=references:in-reply-to:subject:cc:to:from:message-id:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=x0Mp5Txn9dhWnd7kNaeyrGhDTXOo7utFqS5hhFOq2io=;
+        b=yxOS3fzpBQ/8d6ZK+5wDzKgyE6GGeSx545chyBjg011VurYZpTNqm9zInEt4ldIxjb
+         /xH44098QkRW4roqbUJVuQJthA8iPmGL4aCFUaBfaBS8yzV6zvX2wF1R7lHd8OtUMCEw
+         cb8GUpD4YWA9GDI5p70iOJZcAWSGyfgdhln2WcEvmJaC3jd5fHVDb1VJcsDE/TWs1d23
+         E7WoSYhJuJzwJ6Vd8uvL7WE6GEV4xikTwiyopUqTPl+zdKy8/XOYvupw872jmUK75I4Y
+         6EKBOmUZ0Vjxu3omUcfonutzeS0q1bXjEP7Zf7crw6jPOqyqV4Zi0XsVpK3sbMRy8A9g
+         5oBA==
+X-Forwarded-Encrypted: i=1; AL+hErHgMvRlCADu2Ls0IHFA2q6Mm+IS2+wYEI9JqbM1DZAuDrH2V1ngYn/t0XoqDVqn5tdIEDE4d6Piywe+xg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z+HVyrclcuECy6AbE2lw5LaGIC4gQwnsOCuYPV8SwQ+mk+LHcTw
+	6mFRduSgUEfo/pdY71Cbj8geUGAy0oMEFKCTHw50wOtPRl39vv6ZFqmy
+X-Gm-Gg: AZFdTZf9BGj9+Abv/5lqbVpKrYqQyOsr5QE6oy1mDyhSJT5HufD4x7eD1VS1SAGP29E
+	HPnAb/W9x6G8bohxOJEL+4gbIPTIlVJz8LE3XqmAPxCKkrSVK1GzxvmSlzzsLDuIhxHBN2JWl9G
+	w5Wd2fgLpaighaD03yMMvgSQGhsB79bofcL75pCXW2l/5RtOo7o2kqy9J/SjJowQ7Uv+m1RGWg9
+	szKYLrvgAV4H4LUN7/HaKX2OqZu+RhF1PYNNXUpuKZMR+ItKAOZ8fLBFHz2dO+PjNNQTfYIZMT6
+	tzBulvys7+seVA+UocVwTTgcH/kqTNBIxKypDCT9/a9Dg2SxxCE/z0zTOjXUHcKlJm42JGUqcta
+	ey363A9aq9Zbr0XYjDYIh0V/ZY2xGk+weuy58mjPU8v9otclg9eBaew7bsztAkJYRNUrUpZelvo
+	3A90uqohEh5Aasv+Ybshu/DQ/VoSw7v/MREC0w0Z2wtkJ72uMa9C3kEWcrU0IneJtNxJPcJ1qXY
+	aeAgX1Iq23VnximKAe/TT1wcoxyjquhbLJ5CZ0swRasq7SPtUpE2CWRwE52RLBreK2XRzflP39i
+	KQNsxLaWmRaKYH5NC0GK2l9Dj0CVCraDQ+7zRQJRBoha49mqubYAHHfQUTCu74JY+aq23sgeRzM
+	hJsvxGCpcFe3RhNA1CRe4mIKjgQ==
+X-Received: by 2002:a05:620a:2907:b0:949:72c3:dee6 with SMTP id af79cd13be357-949ba99cbf7mr4043850085a.19.1795740640134;
+        Thu, 26 Nov 2026 16:50:40 -0800 (PST)
+Received: from localhost ([138.197.109.108])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-949bb34ac11sm1703987985a.14.2026.11.26.16.50.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2026 16:44:14 -0800 (PST)
-From: Artem Novak <artem122novak@gmail.com>
-To: minchan@kernel.org,
-	senozhatsky@chromium.org
-Cc: axboe@kernel.dk,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Artem Novak <artem122novak@gmail.com>
-Subject: [PATCH] zram: validate decompressed page size
-Date: Thu, 26 Nov 2026 18:44:11 -0600
-Message-ID: <20261127004411.109585-1-artem122novak@gmail.com>
-X-Mailer: git-send-email 2.56.1
+        Thu, 26 Nov 2026 16:50:39 -0800 (PST)
+Date: Fri, 27 Nov 2026 03:50:37 +0300
+Message-ID: <a424da14ad9f0fcda6988f558432d10e.ndokutovich@gmail.com>
+From: Nikolai Dokutovich <ndokutovich@gmail.com>
+To: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ Benjamin Marzinski <bmarzins@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH] fs: tolerate an unfrozen superblock in the
+ block-layer thaw
+In-Reply-To: <20261127003902.48-1-ndokutovich@gmail.com>
+References: <20261127003902.48-1-ndokutovich@gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -96,123 +100,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Several zram compression backends do not update dst_len after
-decompression, leaving it at the destination buffer capacity
-rather than reporting the actual decompressed size.
+Please disregard this patch.  The same issue is already fixed by the
+"super: fixes for freezing, reconfiguration and error reporting" series
+([PATCH 09/15] fs: don't keep a device frozen when its freeze is already
+gone), which I missed when preparing this.  Sorry for the noise.
 
-Update the 842, DEFLATE, LZ4, LZ4HC and Zstandard backends to
-record the decompressed length. Afterwards reject successful
-decompression operations that do not produce exactly PAGE_SIZE
-bytes;
-
-Prevents zram from accepting decompressed data whose size
-does not match the expected page size.
-
-Signed-off-by: Artem Novak <artem122novak@gmail.com>
----
- drivers/block/zram/backend_842.c     | 6 +++++-
- drivers/block/zram/backend_deflate.c | 1 +
- drivers/block/zram/backend_lz4.c     | 1 +
- drivers/block/zram/backend_lz4hc.c   | 1 +
- drivers/block/zram/backend_zstd.c    | 1 +
- drivers/block/zram/zcomp.c           | 2 ++
- drivers/block/zram/zcomp.h           | 1 +
- 7 files changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/zram/backend_842.c b/drivers/block/zram/backend_842.c
-index 3846a04c69d7..aa6ca77333c9 100644
---- a/drivers/block/zram/backend_842.c
-+++ b/drivers/block/zram/backend_842.c
-@@ -56,8 +56,12 @@ static int decompress_842(struct zcomp_params *params, struct zcomp_ctx *ctx,
- 			  struct zcomp_req *req)
- {
- 	unsigned int dlen = req->dst_len;
-+	int ret;
- 
--	return sw842_decompress(req->src, req->src_len, req->dst, &dlen);
-+	ret = sw842_decompress(req->src, req->src_len, req->dst, &dlen);
-+	if (!ret)
-+		req->dst_len = dlen;
-+	return ret;
- }
- 
- const struct zcomp_ops backend_842 = {
-diff --git a/drivers/block/zram/backend_deflate.c b/drivers/block/zram/backend_deflate.c
-index f71b11bcac78..54638d2c119e 100644
---- a/drivers/block/zram/backend_deflate.c
-+++ b/drivers/block/zram/backend_deflate.c
-@@ -155,6 +155,7 @@ static int deflate_decompress(struct zcomp_params *params,
- 	if (ret != Z_STREAM_END)
- 		return -EINVAL;
- 
-+	req->dst_len = inflate->total_out;
- 	return 0;
- }
- 
-diff --git a/drivers/block/zram/backend_lz4.c b/drivers/block/zram/backend_lz4.c
-index 1e4ad31d39a6..36401651fce8 100644
---- a/drivers/block/zram/backend_lz4.c
-+++ b/drivers/block/zram/backend_lz4.c
-@@ -144,6 +144,7 @@ static int lz4_decompress(struct zcomp_params *params, struct zcomp_ctx *ctx,
- 	}
- 	if (ret < 0)
- 		return -EINVAL;
-+	req->dst_len = ret;
- 	return 0;
- }
- 
-diff --git a/drivers/block/zram/backend_lz4hc.c b/drivers/block/zram/backend_lz4hc.c
-index d8aa01bb258f..017e08038107 100644
---- a/drivers/block/zram/backend_lz4hc.c
-+++ b/drivers/block/zram/backend_lz4hc.c
-@@ -128,6 +128,7 @@ static int lz4hc_decompress(struct zcomp_params *params, struct zcomp_ctx *ctx,
- 	}
- 	if (ret < 0)
- 		return -EINVAL;
-+	req->dst_len = ret;
- 	return 0;
- }
- 
-diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
-index 08da3810cffd..31f07ee3797f 100644
---- a/drivers/block/zram/backend_zstd.c
-+++ b/drivers/block/zram/backend_zstd.c
-@@ -208,6 +208,7 @@ static int zstd_decompress(struct zcomp_params *params, struct zcomp_ctx *ctx,
- 						  req->src_len, zp->ddict);
- 	if (zstd_is_error(ret))
- 		return -EINVAL;
-+	req->dst_len = ret;
- 	return 0;
- }
- 
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 028e2f0f587e..72a253adae84 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -185,6 +185,8 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
- 	ret = comp->ops->decompress(comp->params, &zstrm->ctx, &req);
- 	if (src)
- 		kunmap_local(src);
-+	if (!ret && req.dst_len != PAGE_SIZE)
-+		ret = -EINVAL;
- 	return ret;
- }
- 
-diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-index f38fd31f9e4e..37af71a7db1a 100644
---- a/drivers/block/zram/zcomp.h
-+++ b/drivers/block/zram/zcomp.h
-@@ -53,6 +53,7 @@ struct zcomp_req {
- 	const size_t src_len;
- 
- 	unsigned char *dst;
-+	/* Destination capacity on input, decompressed size on success. */
- 	size_t dst_len;
- };
- 
--- 
-2.56.1
-
+Thanks,
+Nikolai Dokutovich
