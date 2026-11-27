@@ -1,100 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795743276;
-	b=Dh0WlSX3vw+0OVq038ectWO/1YWXBHuO1W5MsEcX+d2uNxiPGUGlAQ1XCJUpDT6hX7bW
-	 nqI0oT6te+t59cCwp+1AfW0MESAPgo30pJCuaZT7p2Ggy+w4bJ/QJpjGAjRSn+djNyCgD
-	 Ns0VkkZvsnbjnEXaQ2yiBoMAmalohx+HSQrN6JNutAIFClHUiM87Mu7Esh03UN4qdI4E7
-	 PkxynpVqvBGkliZpzspVnws4G+ubDCvv7ZxgP2w6KBQtBKnfQuPTGtaG1ZTPkqA+XxiRY
-	 cWt74zGkasg93zR9vDdrL87Uuq7lU/wHChoCCJHzM8hIkgC1GznRuDA+Szho1dl1UUw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795743276;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=hU2U5lk2837LuV+creZT1TNKTOC/1AOVTgldGOkkXaw=;
-	b=GVv8bgf9G5j1+7v2sUcMq+tGWMxgCtYZAaopFUd52Qctnh9kX9shogJLgvzRK9eZLXzA
-	 ckK+luo4uaDSXeYbvxUPYnzddV6+B7XpSOVzjkfcRM8kDPhTUCuQedSP0psjAag3JAiZN
-	 TkNyvae9ZM6d6LWKcUOHDQgIxMcaN1nO7RY1qsqAyFW0vdZzBsIVD4mWhOO5/h7ZwQGop
-	 3eqg3qqbDy/BlEUy7LP2V1CI996VE0XnPW1PGk6NaCivKCSHrRq3LtAAifMkkFSF7ma75
-	 wG221mK8WjhVMRjU/AgppS2+5GGvQ1SISqGWs+KKUrxyXiOQvNB4IO6syv3wQKlc/nA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z9jPlAPf;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.71.93.112
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795743396;
+	b=B1jxln++NKlUDXEN7JvD1084WwU5/rWEN4mEzB8oGjkqG0Nh54/q/VXLpwz6mOzGxKik
+	 F9LN1Stl24YTn9vBbX4uDvdlIOhm1ocVV5WW8lNCtRWuVeMmaXmbyvaQZHLpmHUZddbFY
+	 zJCfz0Jwryb3Fhz3iqkcK4C6XI6pUs7aCEO9bnnGXJp/mvXt8ifmzm/bIE0FmIeZIVzzl
+	 eMvwnSTCt3BJeyMEbJRXpjSQxKNF85wLn/FvTNNETztxMuY+xn0SOtRurypQSf15PkZVF
+	 F+niVy2abV/4DHNarlbP+q++P+HKXfi3ezhy8PeqvdfckBLSZKQkBe7JxXPRwhoW/CQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795743396;
+	h=DMARC-Filter:Received:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:
+	 X-CM-SenderInfo;
+	bh=boKDsOS3kLPQnJNVcXGwCI31PgCeu6/+157VDRHp3gg=;
+	b=KA8N38YYQXHyiiseTUpbKhIAZsyzvL1ygcmMv48dJrJb8bitMzKAKvV/PaAT7CKcD117
+	 Jaa3D7H4T4QEvYUJgFiQOs/W4lcXxL2KxRl7FL/LPjXovmHlRSyIsa2OmGDji19tCNgiJ
+	 rtCYXWPR/ZPEnqrKufADWFZFAiOW0MMYkH4j1Q1CFl+/KsjEH92h8YexHU9a53GPExmP8
+	 bouCD9hc4UfAsNqsrrCmc6xG8offIGXfPsXCrkKHgl2Xag4/kwjpi54MZ74ZeEjUcg4Or
+	 VQ2HxxE/gNdTKtN3FjdCuFAMUswUJVDc7dAy+ChgVvqgr9XTmTlBxe3ghgbc746bj4g==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=none header.from=huaweicloud.com;
+	spf=pass smtp.mailfrom=huaweicloud.com;
+	arc=none smtp.remote-ip=124.71.93.112
+Received: from dggmsgout12.his.huawei.com (dggmsgout12.his.huawei.com [124.71.93.112])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02E9606A324
-	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 01:34:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C02E9606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z9jPlAPf
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-9213f004a14so93985736d6.3
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 17:34:35 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795743275; cv=none;
-        d=google.com; s=arc-20260327;
-        b=DcDXPoE1wQuone76WIBO/1qEJiYeaTWcf6wJ5F16YYriESSZAxdKnsRO3NQtl+QxAR
-         uLe5FIIT55F7VPtLdzB15jUktSl8NZibDU8YjeIsD0dUpLq8E3FigaE0Rwstn5YGY7aZ
-         GEMTwo0CFQkK8S14d8WNHLeIHuZcZTngNLeg1gAUINvmlH+3AT3sNzcLt3GLrt4yaglP
-         6myUb1q3vGiLOYKkRgHbM//6GskPGMjq+49gr7x7qu098WdvmcKqlRVJVPtgCWtfmFrn
-         sO4s8DewTb5lj/yWTc/bAVJdycqkClHNhF8cZr4PQDucbSUFdhHrRonUSxhUlKP7gxV/
-         JIyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=hU2U5lk2837LuV+creZT1TNKTOC/1AOVTgldGOkkXaw=;
-        fh=Xh/6nyMYLF9k8fXH9Z0GOVRhvaq83LM6i0omeFFr7sk=;
-        b=HRIuk8EOZnRmH4UwSR8uTJFSfv5kplipX99OXVMvLm8yxIVCmL6G6pFSmQyS8CsXiu
-         Qzx/olKLq7VjCglUM9tGiV1ipf6lNp/J3EX7+AC3z2U0O2DLE35wvU3uSAUeXeM8tLb6
-         P1k1SoHSF7xFCSqJOpJj+pPHk2Bq20i8gtH8nuGz9gqs0T01aLHEhno24iqMisYm0s0v
-         KjrFCXNU9Xfdsfcuf6tbRZrfcaH67jPGCOqlhQ+y9KVSHeuyoStLJw+D0UWKUr1j64tf
-         iFknvCgDp1RWkZDERT0fMvorzVnEZnEs1e128IYZs1kcuwTgEixDTs6lZSnBDTdb9JiC
-         KnvQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795743275; x=1796348075; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=hU2U5lk2837LuV+creZT1TNKTOC/1AOVTgldGOkkXaw=;
-        b=Z9jPlAPfbk11RA9ZLquc0hQutA2zNbigq3YWXDATzqziE2qrm0/T2BCT8UE1dGGhZv
-         Py7XYzq309HhSZvBcQ6Z3S/09YJH+SoNOa0amq9U86WBx0G1Q7bj+UZFv5+oVbvqHcdG
-         91JJgW0Qc7j6CpnhiO7VlylYkVuWWUKRSJYN/IFA2jPIdpgsns3PpwYNKs1kHTm/KPwM
-         Cv+AGWCnatJOXWoBwMes4DY3EgADioFGvE8nYqS8udCNcXaVnp1XFqJcCEBeorvGZmwH
-         tL9onYYGc0c8U+bAgZay58nUbfOIz6/7h831VhX0qxuN7J6FQqpKw888dhyp+jQsfiIm
-         sjdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795743275; x=1796348075;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=hU2U5lk2837LuV+creZT1TNKTOC/1AOVTgldGOkkXaw=;
-        b=nqBIpX61d3OI6d+en5fsO7ttDKZN67B5Jf8tV+HmlLWM6Ht0tsfiOgFMGy4+EQ3scT
-         Gt1sWCwpaCbfeWwxBQNhsxs1R8MwaUL7yS4wJnES+CLPMy9gy2dlUyupf8CCEJdhwg8y
-         HaffnjDU62LV/fuVAJWMz80MOPgAifGUPpbNQrZZeKuceFshOcsLIpNUoh3fBZC7NSPe
-         Dp4addofNVdrh38uBBr/ws2P6ZPO5nf+ByfKKFjchTTaNiQ3UE2mRs87ts6FMynFdkkv
-         sQDbKbFOd62MV3WIoIivKGBE4DvlS0FIRb3K52fYYpLTPn3MHD0NiFT361B34F61mn/m
-         NBnQ==
-X-Forwarded-Encrypted: i=1; AL+hErESCJt98m9aDdSccfKCuQ4kS77vgnyxMzfkXUPlErl29lxJ+tCZV9xUEKaZX6HL7QI0JGvoU8VWjbv8gg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9P+m1ylVPBqQtaUJK7MXNxXos6muzXTwdlk2/v/enk1lqD2nJg
-	JUHkJMr9ES8uJiEk6wkO2Ux1C7h3gE8rrLjCNZ/JGgGD+G+XMl16XI1zY6Ows6lqlyiLXAzv0qz
-	uZF1cVVq9dCPNjAvMogTClQ1Y6OfKxu0rDL1aZLCq3A==
-X-Gm-Gg: AZFdTZdKixN0zc3T5LubIbY/yc4TFn0TF9FmcZL91RywWi1PVr5A1EslCTDDW2yLFZ9
-	8ajvzeU1v6ongndXQaU5BoaDZVvUHnsrNFhQh7FI/ijboICNRBzfolxMtho1o/ENGnzMXSv73M/
-	uPWSFohexAqpwPvQIuftCmW51vE0b5N33APQzC244PuB6bn9KF0XLpAm9bd0hn5mvDSu61S71GY
-	KvY9q98p4pspbNCoSu0RZL7tIaQ+oiZpiZaSlFQodd/6jSt5EUXOD/UepsrR+OrtH7uIju9eXpH
-	7Mh/U10urPls29qumgs3jvYVkab6A9rH6tU99N8J6YD6QlDMrQ7y0rNhXoMNENTBateskAXZKYw
-	eSWtqOTIy0Dax5ZlD74y3GHZUchCGJCFAipFz
-X-Received: by 2002:a05:6214:5f07:b0:921:3867:1bb0 with SMTP id
- 6a1803df08f44-9214220c37amr376789406d6.24.1795743274810; Thu, 26 Nov 2026
- 17:34:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73365606A31E;
+	Fri, 27 Nov 2026 01:36:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 73365606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggmsgout12.his.huawei.com (SkyGuard) with ESMTP id 4jbGGd1f8xz20DH;
+	Fri, 27 Nov 2026 09:36:25 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 904AD40573;
+	Fri, 27 Nov 2026 09:36:31 +0800 (CST)
+Received: from [10.174.178.164] (unknown [10.174.178.164])
+	by APP4 (Coremail) with UTF8SMTPSA id gCh0CgCn4O+d3ghrspnPFw--.33092S3;
+	Fri, 27 Nov 2026 09:36:31 +0800 (CST)
+Message-ID: <7a6c6a0b-9296-4ed7-acf1-f909cd8f9298@huaweicloud.com>
+Date: Fri, 27 Nov 2026 09:36:27 +0800
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,46 +51,114 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261127004411.109585-1-artem122novak@gmail.com> <awjaHB2ugCG_F3Io@google.com>
-In-Reply-To: <awjaHB2ugCG_F3Io@google.com>
-From: Artem Novak <artem122novak@gmail.com>
-Date: Thu, 26 Nov 2026 19:34:23 -0600
-X-Gm-Features: Aa3M54r2A9iEKs22yG_w3K42aATDwZjN-MFk4H_IHS7ixiYAkVkVNmajCvdJ7Gs
-Message-ID: <CAPufuhb9txcosy48VXtfxwnC7Ct448J=_HbR00JnZR1QG-NfHg@mail.gmail.com>
-Subject: Re: [PATCH] zram: validate decompressed page size
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: minchan@kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND V2] block: fix BLKSECDISCARD zero-length range
+ causing page cache invalidation
+To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
+ hch@lst.de, yukuai@fygo.io, linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com,
+ chengzhihao1@huawei.com
+References: <20261102080420.3774409-1-wozizhi@huaweicloud.com>
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+In-Reply-To: <20261102080420.3774409-1-wozizhi@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCn4O+d3ghrspnPFw--.33092S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXw4DWFWDArWDCr4rGw1xXwb_yoW5WrWxpr
+	W5GFy5Gr4DWr9ruF48K3W7uFy093WjgF4xC345twn3ZrZFyrnIgFyrCrySgay0qr97J3y8
+	XF4YvFyfK3429a7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkv14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_Jw0_
+	GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Hey Sergey,
+Hi Jens,
 
-On Thu, Nov 26, 2026 at 7:19=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
-> Yeah, I don't think we should do this.  We only ever compress PAGE_SIZE
-> buffers, if some backend decompresses it to a something that is not
-> PAGE_SIZE and doesn't signal an error via "ret" then it's a bug in the
-> backend and zram should not cover it up.
+Friendly ping on this patch. It has been reviewed and is ready for
+picking up when you have a chance.
 
-I see.
+Thanks,
+Zizhi Wo
 
-I thought it might be worth having a defensive check here,
-since allowing an incorrectly sized result to propagate seems a bit sloppy.
+在 2026/11/2 16:04, Zizhi Wo 写道:
+> From: Zizhi Wo <wozizhi@huawei.com>
+> 
+> Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") fixed
+> the start+len overflow via check_add_overflow() but did not handle the
+> start=0, len=0 case. There, start + len = 0, so end = 0 passes all checks,
+> and truncate_bdev_range()->truncate_inode_pages_range() is then called with
+> lend=UINT64_MAX, whitch is the "truncate to the end of file" sentinel, so
+> the entire page cache is invalidated.
+> 
+> Fix this by replacing the validation with blk_validate_byte_range(), which
+> already rejects a zero-length range and is what BLKDISCARD uses. This also
+> switches the alignment check from a hardcoded 512 to
+> bdev_logical_block_size().
+> 
+> Fixes: 0bd1ed4860d0 ("block: pass inclusive 'lend' parameter to truncate_inode_pages_range")
+> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+> Reviewed-by: Yu Kuai <yukuai@fygo.io>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+> v2:
+> Add the fixtag.
+> 
+> v1:
+> https://lore.kernel.org/all/20260704073942.3760597-1-wozizhi@huaweicloud.com/
+> ---
+>   block/ioctl.c | 13 +++++--------
+>   1 file changed, 5 insertions(+), 8 deletions(-)
+> 
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index 64b4e6c0f696..53558963d9d7 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -175,12 +175,11 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+>   }
+>   
+>   static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+>   		void __user *argp)
+>   {
+> -	uint64_t start, len, end;
+> -	uint64_t range[2];
+> +	uint64_t range[2], start, len;
+>   	int err;
+>   
+>   	if (!(mode & BLK_OPEN_WRITE))
+>   		return -EBADF;
+>   	if (!bdev_max_secure_erase_sectors(bdev))
+> @@ -188,19 +187,17 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+>   	if (copy_from_user(range, argp, sizeof(range)))
+>   		return -EFAULT;
+>   
+>   	start = range[0];
+>   	len = range[1];
+> -	if ((start & 511) || (len & 511))
+> -		return -EINVAL;
+> -	if (check_add_overflow(start, len, &end) ||
+> -	    end > bdev_nr_bytes(bdev))
+> -		return -EINVAL;
+> +	err = blk_validate_byte_range(bdev, start, len);
+> +	if (err)
+> +		return err;
+>   
+>   	inode_lock(bdev->bd_mapping->host);
+>   	filemap_invalidate_lock(bdev->bd_mapping);
+> -	err = truncate_bdev_range(bdev, mode, start, end - 1);
+> +	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+>   	if (!err)
+>   		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
+>   						GFP_KERNEL);
+>   	filemap_invalidate_unlock(bdev->bd_mapping);
+>   	inode_unlock(bdev->bd_mapping->host);
 
-Do you consider this useful, or should I rely completely on the
-backend contract?
-
->
-> On (26/11/26 18:44), Artem Novak wrote:
-> [..]
-> > @@ -185,6 +185,8 @@ int zcomp_decompress(struct zcomp *comp, struct zco=
-mp_strm *zstrm,
-> >       ret =3D comp->ops->decompress(comp->params, &zstrm->ctx, &req);
-> >       if (src)
-> >               kunmap_local(src);
-> > +     if (!ret && req.dst_len !=3D PAGE_SIZE)
-> > +             ret =3D -EINVAL;
-> >       return ret;
-> >  }
->
