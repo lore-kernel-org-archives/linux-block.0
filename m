@@ -1,48 +1,48 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=117.135.210.8
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=117.135.210.9
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795768133;
-	b=5Oe8ivlk5jAWG38mGucnaVxzZdnwYsE5j23WAcS8bdto97XsBtFQ1SxW7yOq0wChTgDk
-	 ni9CCzjJjf3jXcLQskbFSKcoBcAQpXHyEpzeEInGmgcXbHYvh4Mr7bmlJM/H98X2V3vpg
-	 thiRjVxqA0aQERVNGtoun7WFtFgThFFIrPN7hbmYh7WjWIB5Vji2w1cf3TEkBhDyMd7Qb
-	 CaBUgqANoKUPJyJGp1+rRrouT/i8Sen8gvpZdGSx5mY7s2COwZLLkLo3TLwYpo6509w73
-	 o4fQyCDTScbjNSch8cLy3EccX2bIfiHAFg6i1OLLsaT9M8QEesEeuJ/11x3Bq7do03Q==
+	b=eLvnNLEBzReBSpoeNH/anJfHYrnLTbTVcLbP31efw/M7tywJDMV87ADDv2pmDu8JjA+M
+	 cSjJJ8C0ZbElr5UglFu4wbcU+q0Syfykl0npd9zQXmZvJehkOMjmjK3vQPWOHGz7S1wFT
+	 bHbGuXuAHoITkedEJ/17aqGP9LXAaOzt7mNtSCwBjHqp6HypBuBnJ3c3uas7UqtCOSST+
+	 4ekm8HQY59/7lGSbKgbKkqz4ONQ3+d97ammBxfYw/q7ly3JX5NUyRwopmGDBAkn2kxQWq
+	 GAOf+cT6+lMjUhMfjXVIVAZ3lnaznT1JFe4t/hrmiTsnivmqp/jIjLDGaGY/KRAz0NA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795768133;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:Sender:
 	 X-CM-SenderInfo;
-	bh=mc1AjUFz08l5NWa5nSsq48XQe3osLZopmAouGxSLMYs=;
-	b=GX0GGeI9zAFWTpSaSwX3rPiTHGfJPcCSRz6go5zRTK7OvSL2mwVRD4JJu5Qq33Yrblp1
-	 Pt6Qk33IGxl3MbyiJRcpv/TG3qgjffcc6DhyuUUBPFYHdw+2f01lzvMkl3ezPdza6X5v4
-	 IzL0FqUi+EmEggfbU0zjXajxWk9iC+NfEcu86wrKgoNzXeH/i7d2ubDg2m7TMsx4bzflu
-	 szEtX08u974rLfYtcE9qLS2b6QGd5TUV1jeL6NTrHYJBM7cvEveW+6BTusPO/2fBdqczu
-	 V4bMUFvHI3LtMkx7zyunHVBnu492R7+BBFTsQmqgRogbj2mX3u/RN+5h2kVPkBFYE0w==
+	bh=1sIJUe4O4CsWbtMbQNi4aeXjMyQYal1HiWg977wjesI=;
+	b=5ZXVPmKHwmLjp7hKj9z4f72mnU1MskvNiYmL9LgilH0n4iN9fonAQOKXMfsG9nrengZ4
+	 X4qJPaoCcibek5UzjsANTmbij0mbiZxa9ngLDGgr5X6Fn84za1iYhUe62L7F75bcF/K9M
+	 BXpUmbc5ee9XgG7LZ439xfiherPl0O420tM1h04tprn8vryutTO4yXTvrCvsvS7207MwU
+	 r4pkkU47Z4RYlKYsrEVlqQrw4ozjkWGiQwf4u8K51nkD19/Cckk0JXqu698OWe0tub00L
+	 wqw1MlJtVFdI9duHDaTpGVW5OPrB2Lz7rrvWhJ0shqoQweg+bl+zfzS3d4yYzzI+HGQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=fail header.from=xiaomi.com;
 	spf=pass smtp.mailfrom=126.com;
-	dkim=pass header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=L1aw4Yxh;
-	arc=none smtp.remote-ip=117.135.210.8
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.8])
+	dkim=pass header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=AHFaJuEh;
+	arc=none smtp.remote-ip=117.135.210.9
+Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA91606A32A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0586A606A31E;
 	Fri, 27 Nov 2026 08:28:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9AA91606A32A
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0586A606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=xiaomi.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=L1aw4Yxh
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=AHFaJuEh
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=mc
-	1AjUFz08l5NWa5nSsq48XQe3osLZopmAouGxSLMYs=; b=L1aw4Yxh705ARFxiJM
-	L3FHnFN2FHrn27dS0jGDazV8PaUiFx5OtOhnnG5BB2E+/TzSRwcRMhVkhBAtAbjD
-	4ENm/cSy7u4dmNR/MaXDoUIvTj0jaobtFbxcbYGdGA2CRDeJnHMlMQjtHmLj+QhQ
-	rB9k+5nzhmPsp7nNTmOwCYb5M=
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=1s
+	IJUe4O4CsWbtMbQNi4aeXjMyQYal1HiWg977wjesI=; b=AHFaJuEh0EIkAkyo2c
+	ZVBqUZ9yupduHxWzUtjdjRTae0SDHFnaZIZf1Cj8HuqZGfghrCYnrxiuplKwyjLP
+	kJJ9i4K8NXTV3yo5ESq/c2u3G1GsZ1QOUjIoY6Wfh1KN2jHQ0jDCNjFtfWmRwUw5
+	dOeKubTHbfksoYyH1iOaTPaQo=
 Received: from nzzhao-ThinkCentre-M760t.mioffice.cn (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wD3n8ToPglrpDfcDA--.16205S2;
-	Fri, 27 Nov 2026 16:27:21 +0800 (CST)
+	by gzsmtp3 (Coremail) with SMTP id PikvCgDnz+_cPglrqen2EA--.50878S2;
+	Fri, 27 Nov 2026 16:27:09 +0800 (CST)
 From: Nanzhe Zhao <zhaonanzhe@xiaomi.com>
 To: sashiko-bot@kernel.org
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -72,8 +72,8 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Bo Zhang <zhangbo56@xiaomi.com>,
 	sashiko-reviews@lists.linux.dev
 Subject: Re: [RFC PATCH v4 2/4] zram: support compression at the granularity of multi-pages
-Date: Fri, 27 Nov 2026 16:27:17 +0800
-Message-ID: <20261127082719.3624596-1-zhaonanzhe@xiaomi.com>
+Date: Fri, 27 Nov 2026 16:27:06 +0800
+Message-ID: <20261127082707.3624358-1-zhaonanzhe@xiaomi.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <sashiko-outbox-216089@kernel.org>
 References: <20261115024455.1465726-1-zhaonanzhe@xiaomi.com> <20261115024455.1465726-3-zhaonanzhe@xiaomi.com> <sashiko-outbox-216089@kernel.org>
@@ -87,61 +87,67 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3n8ToPglrpDfcDA--.16205S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Kr1ftry3tr43Wr4DZw18Zrb_yoW8KF4xpF
-	WrKayFyFykJry5urn2va18Zryjk3yxGay7ZryrtryxWF1rJFy2qFy2ya1rZa4UArs7ZrZI
-	qa1Fy3y8A3yqv3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UkGYLUUUUU=
+X-CM-TRANSID:PikvCgDnz+_cPglrqen2EA--.50878S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJF1DAFWrCryxWry5KryUKFg_yoW5Xr4UpF
+	y7Ga42yr4kJF1IqFsrCFZ7u3s2yr4S9ay8Gry8tr47Wa4rX34qqFWqgwnYka1UCrWfW39I
+	gws5ArZ5J3WUZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UvksDUUUUU=
 Sender: nzzhao@126.com
-X-CM-SenderInfo: xq22xtbr6rjloofrz/xtbBsQnmtmsJPulG7gAA31
+X-CM-SenderInfo: xq22xtbr6rjloofrz/xtbBsR3js2sJPt1GbgAA3V
 
 > [Severity: High]
-> Can concurrent zram_slot_free_notify() calls on sibling sub-slots leak the
-> multi-page object?
+> Does passing bio as parent to zram_read_page_size() cause a use-after-free
+> of page when ZRAM_WB is set?
 >
-> __test_multi_pages_comp() counts ZRAM_COMP_MULTI_PAGES across the group
-> while only holding slot_trylock(zram, index) on the current sub-slot:
+> When test_slot_flag(zram, index, ZRAM_WB) is true, zram_read_page_size()
+> calls read_from_bdev(zram, page, index, blk_idx, parent) with a non-NULL
+> parent bio:
 > ...
-> In addition, when comp_count == 1, clearing ZRAM_COMP_MULTI_PAGES and
-> unlocking index before slot_trylock(zram, head) means that if
-> slot_trylock(zram, head) fails, the last ZRAM_COMP_MULTI_PAGES flag has
-> already been cleared, and another CPU can also reallocate and write to
-> head in the unlocked window before slot_trylock(zram, head) runs.
+> read_from_bdev_async() submits an asynchronous child bio referencing page
+> (inheriting REQ_OP_WRITE from the write bio) and returns 0 immediately,
+> after which zram_bvec_write_multi_pages_partial() frees page via
+> __free_pages() while the backing-device I/O and completion work are still
+> using it.
 
-These are valid issues. The locking and lifecycle model for compound slots in
-v4 had inconsistent semantics between slot_free() and slot_free_notify(), and
-lacked a unified locking boundary across sub-slots. I will redesign the
-concurrency model for multi-page slots in the next RFC version.
-
-> [Severity: High]
-> Does setting ZRAM_COMP_MULTI_PAGES on index + 1 .. index + nr_pages - 1
-> without locking or freeing those tail slots corrupt the slot bit-lock and
-> leak existing objects?
->
-> zram_write_page(), write_same_filled_page(), and
-> write_incompressible_page() only lock and call slot_free() on the head
-> slot index:
->
-> 1. Because table[index + i].attr.flags aliases table[index + i].__lock,
->    the unlocked non-atomic |= in set_slot_flag(zram, index + i, ...) races
->    with concurrent slot_lock() / slot_unlock() on tail slots and can
->    corrupt ZRAM_ENTRY_LOCK_BIT, hanging waiters in wait_on_bit_lock().
-> 2. Any single-page zsmalloc handles already stored in the tail slots are
->    never freed before ZRAM_COMP_MULTI_PAGES is set on them, leaking those
->    objects.
-
-Same here.
+Both writeback and recompression currently assume that each slot holds a
+single PAGE_SIZE object, which conflicts with multi-page slots, so I plan
+to temporarily make CONFIG_ZRAM_MULTI_PAGES mutually exclusive with
+CONFIG_ZRAM_WRITEBACK and CONFIG_ZRAM_MULTI_COMP via Kconfig.
 
 > [Severity: High]
-> Can two concurrent partial writes to different sub-slots in the same
-> multi-page group overwrite each other?
+> Can post-processing a multi-page slot overflow ctl->pp_buckets[] and
+> req->page?
 >
-> zram_read_page_size() unlocks slot_lock(zram, index) after reading the
-> multi-page into the temporary page, and zram_write_page() only re-acquires
-> slot_lock(zram, index) after compressing the updated buffer.  If two CPUs
-> concurrently perform partial writes to different offsets of the same head
-> index, both read the old multi-page before either writes back, so the
-> second writer overwrites the first writer's sub-page with stale data.
+> Neither scan_slots_for_writeback() nor scan_slots_for_recompress() skips
+> ZRAM_COMP_MULTI_PAGES slots, where get_slot_size() can be up to
+> ZCOMP_MULTI_PAGES_SIZE.  In place_pp_slot(), NUM_PP_BUCKETS is sized for
+> PAGE_SIZE:
+> ...
+> When a multi-page slot's compressed size exceeds PAGE_SIZE, bid exceeds
+> NUM_PP_BUCKETS and corrupts memory past struct zram_pp_ctl.  In
+> zram_writeback_slots(), req->page is a single PAGE_SIZE page, so
+> read_from_zspool_raw() also overflows req->page and wraps PAGE_SIZE - size
+> in memzero_page(), while uncompressed writeback and recompress_slot() pass
+> PAGE_SIZE for a multi-page object.
 
-Same here.
+Same here. With writeback and recompression disabled under
+CONFIG_ZRAM_MULTI_PAGES, scan_slots_for_writeback(),
+scan_slots_for_recompress(), and place_pp_slot() will not be built or
+called on multi-page slots.
+
+Also regarding the related zs_rebind_handle() issue from the patch 1 review:
+
+> [Severity: High]
+> Does zs_rebind_handle() also need to mask the object offset with
+> page_size - 1 instead of offset_in_page()?
+>
+> When a non-huge multi-page object sits at an offset >= PAGE_SIZE within its
+> zpdesc, zs_rebind_handle() overwrites 8 bytes in the first subpage and leaves
+> the object's own header pointing to the old src handle, so later compaction
+> updates src instead of dst.
+
+This is tied to the same recompression issue: zs_rebind_handle() is only
+called by zram's recompress_slot(). With CONFIG_ZRAM_MULTI_COMP and
+CONFIG_ZRAM_MULTI_PAGES mutually exclusive via Kconfig, multi-page objects
+will never reach zs_rebind_handle().
 
