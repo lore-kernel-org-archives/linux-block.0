@@ -1,84 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795769335;
-	b=tZc0DXA/Ji7mmu4QRxTmmkTPwx/8DdOewgOFXk2z2HSeAK5y+nGBRJgxbispYc3h436H
-	 9GKoo+r6zHdmLgQuwo9/3iJFtnOEjXoqA5SHgJU0xJogUQl4/qMnffGSADsAZORduf+Dm
-	 jKnwkX4Ie/EcltjOz3zo3XOvpLuhfn+WT8I7VrDtA0Q6zb4xcFsYN4uR6yXkh5uxCbCxk
-	 cE5R1Fbu2LQfYWZUJyxDFOWwRMrEe2C4AbQewWsmi2IlIBbyDAoU5f6IYVh+2LNVy9+tn
-	 qldAoGkEyhU5OnuAKlC3/EcDAzHBe2WzHyt8txqfx3dDyBssFJuEVhJo3fHYWkTB1zw==
+	t=1795769340;
+	b=ZAJSxKSLkz1m2G/d6V2ofHcu4Exht60L84KAAuhGLEDf/Yp5B/zs+wHDXs0bB3scV7m8
+	 e9OfMlUv3kYCeFNY2tEildw5uFnM/RjU2lrAmF/2n65Esf07ptjaq6lZAm8BtnmnSp+nk
+	 wHoi0p2rHlaKq4XAaOfwTnyrD6ehD3fqDSdmNmrP0h0i5F9AjFFCWaPyytWPyvlvXFNkN
+	 PsApCPsWevbvVKY3StyOz2Da51HRzx3tloR2Cv9zhWnqr3xtWUf9FdXRvoSNLpTp6mDg6
+	 EHxCCGaUpUKqLsSAy0iAa4l5QKAGkHG5yQHgdPlQnOGypwSmd5oNtEmqo1sxP+StEfw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795769335;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795769340;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:X-Google-Original-From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=V20sSYH+TxrCV4unQJ7dg7ZdaFxiFFR+LbaIUnR8j9c=;
-	b=0c81MWnQzPHUMJvbE+ClKBaVpaA50KXYatm2sg9gVdk6T9o0DFJej3+V+t3mPuMiYtf6
-	 0Llci/FJd95eqJ6Lrs2s7zNWd3L1nCKsIx9/KjVv+81qBUKxxbX4AjVpAjr070gDP6Bu5
-	 zNKwHkQ7SHnYA7PFXUnfmlatDqA/1Z5rioA6+RcrGLocgcv9gdVc+yeGFkvHEUY2N0WjV
-	 w/fpkNC2QDkq3m9Z1n5WYtEuqvO/UAvdQu99TxQFoR383skWFEFw3V+kDgVS+66BoFKVA
-	 y1knyO2+wAvHvTEANrE++3SvLKWzVVLekmQ8TTLteMJQB3pEHalSmlk7UpmUzDZa3Hw==
+	bh=aSulb1ZKSxB82Q0DHVFpLluzjXlQ4n39cXbO7GHm4Hg=;
+	b=tkLLdrmxYRvl1DQdiXRbDQd5nk63eEKi73vnM9EXMGOr76qcrC/ZQXgnZ8fFzqkKRId9
+	 91e8j1RXTcUXYv/NQGLivwLhjywblexPiTmWMBu/H4rhvm54pN2J9PYjIsdNsREefCioE
+	 H7QQlKWYYSAqZkxgZGbCJZp/FEHbPsjtnTDjbLhMmWZW+pq7O+8j+KsJ2vZSRlfdsI19k
+	 u44Bkhf8rrbeBfsMmNrd+eWlZSQjh73YS8lowQw9cgjG8r/3I3LUgwKm3WR4r31c+Nfam
+	 QcZGQPP4fdmzEXDDrSM/xjjAf59o0rscUhD1DOXIb218l22CDnmsSrgbIgRMiaWnO7Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rv1OPzlL;
-	arc=none smtp.remote-ip=209.85.216.44
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=jaXo+qjx;
+	arc=none smtp.remote-ip=209.85.214.172
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F347B606A323
-	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 08:48:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F347B606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F21C60A2601
+	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 08:49:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F21C60A2601
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rv1OPzlL
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3b51a9606e8so921769a91.3
-        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 00:48:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=jaXo+qjx
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2f05b465cd1so1491085ad.3
+        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 00:49:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795769334; x=1796374134; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795769340; x=1796374140; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=V20sSYH+TxrCV4unQJ7dg7ZdaFxiFFR+LbaIUnR8j9c=;
-        b=rv1OPzlLkeMojQwNzlK+naiity0+ZhuvitsfuYoiZykqG7hyKze1YUcsQxa5pVh7pB
-         ClC8NqEi2LoX9Gu5KsdHslyQwBffNItV2Phv1HQuYFabj0PurZIHGu8upGbDJQQ3gafV
-         6/FGJ83mkeV+P7Te5KQuDrIt2OupsaKqUeuqEibGamitTgM4lnwh34YE5mrTNvAriFpn
-         4yfPfS/jmW++py4tRKwH/wMfr7FMbNCfo8nkn4VF9BTYeTH56WUpJ/3F2mXsZ14xUY1L
-         k8jyhUVgICEsnwAaJhL3pKJlPsGSQvwC+W4u3dZiXGqzcpnPpVGtCVio4chZikqXbDbH
-         e/Lg==
+        bh=aSulb1ZKSxB82Q0DHVFpLluzjXlQ4n39cXbO7GHm4Hg=;
+        b=jaXo+qjxS4fzoJ1sRQ8Yi81AgRWhimCxet1u+2ypHmWVaS4F6bD4yNr48nufv3HKEd
+         pBuvi91xlP2kgry/49Zibz3buJuD3yv+nFgstbLMZWbv6FIEqVoOgzgtfIGKMqmfyEAs
+         exUFaN1Vb5eB1op9z7SruKPxs3jk4eq4fe35/q9m8jSAZqh+jhIXQIfjD55LG/5Lgzlk
+         k4gzG5VzILL+/MablkEU1WzCDIm2tVf1seXgNRskbhviWLdrizUghgXqkPF5kN1xOQRh
+         /x0cI0WdKXCfxTXYXH6OprpaNmImqlEly/ESj6RiS2UD918BLS2MxJ3CmRtYY4RU40SO
+         7D8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795769334; x=1796374134;
+        d=1e100.net; s=20260707; t=1795769340; x=1796374140;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=V20sSYH+TxrCV4unQJ7dg7ZdaFxiFFR+LbaIUnR8j9c=;
-        b=VaYSGpDdjlvkZSMiRPpPtA/onuUnJKIPegr/4ONM7zxqARw9B8+ZjHQqT6oqeG+hOM
-         ZBc2Kjn50F9mSQGLtDQODc43y6eRP8g751GJzp0TQs7S4HovK5U8m63qKFVGxDVf3UTE
-         vbWv5MumEwEwTyFKe9CgRY3FmcwVhR6A5JI2BfvY+PO2LzPU9xvnS5Bb2KuUy9y+c5uK
-         QAJDVToqdZMLEqVC/u8kGb/UpgBdqJZUuE8rT/Dvi+SOOZI4eBG3z6shFg5WRyo+j6LI
-         mSajf9Sy6oNeolPycOu2lA5uuVheUFX4Egq08K1P8JsCgyWXm2MO1Lm1rB065WMcmycf
-         Brig==
-X-Forwarded-Encrypted: i=1; AL+hErE2q7c013zCdmnfwOYxsVkW5yMGSpBqHqpulvQRInKuhlkqFRvoFWHq5KxFJTIgo5N0IeLsAQsiA1s5QQ==@vger.kernel.org
-X-Gm-Message-State: APuU4Z/J7v0S0kahHQGDrVg9SC8VrmKvlbi64jYWnNpyNns3nQW0BcZp
-	ubFeA2buvq8PIdh4NCMeMGEv93ep72e/j18GOmnsXJWSRFSOXj96Qtq2
-X-Gm-Gg: AZFdTZcLyJ/nZdq9zoAcPZFcSDrYoJvYgQDzo4UQjKkD4Zyahua96juRRwpv+SlUECr
-	Fv9m7LDqLhTwh3njjScnOUgTHxZwbi26vJxoSvE44eBwoezFcKNtsrNBfAv0smQcAjD+iGwO7nI
-	Owhw2dmjRDt4j9C83UYTV3gCuftbOfKrLKHjKHaVHIFVFbOGQxhUMTCh/nsArwCiL8t1dEwxfSZ
-	WYuxTH+ZumXLBwMXeC5X9/lBD+m9OzELPiCpZr0JGJKfSRPyIaUzXdCO2In1IkTqZJW7dQE96Dl
-	INNMmR56gj0SBndEsfoQKiHbpKSbbO2vBI6Djevu0WbTDcU7rzulJPo934qwEm6ktTJT6//h+uf
-	XSo3QcCzidy8LvjpCOVpz2P6pDspSBn2otO2gGd2LYkQ8yzF1h8Vd7RQq0mHSNkpD2NUObr9kqP
-	RowJJkop7dNGAKS6BXPlzJZfzMEJJOMPVs94rPRV7wD0SfDSzZG2hFzc7l5S9di74KfwIf7WQXO
-	yb+tgQipg3x4EztrpAb4AcAMxbC8enyxLRz1bLRrEf4uBSGWaEMXfgVZtc/J20+EidlmfV51NBE
-	6BjDSiQ3iCOpVawGR0r3o46f/zQQoEWY+XN2FKPm55HCJ4GIuplIkBZncbTEqHIMarAMFarNsnR
-	r+Ba/MRSPybo=
-X-Received: by 2002:a17:90b:390e:b0:3b4:fcba:8f7d with SMTP id 98e67ed59e1d1-3b4fcba9627mr7869895a91.29.1795769334244;
-        Fri, 27 Nov 2026 00:48:54 -0800 (PST)
+        bh=aSulb1ZKSxB82Q0DHVFpLluzjXlQ4n39cXbO7GHm4Hg=;
+        b=Ym+u+hfgH1DB8i+380BVqdRFS4FAuXJoJT97/d1sMVWFXsiygdK9PanpjIpSrhzN2w
+         0hyDMZhPXfF3VTQ0ssxAU69CGGhcUhbzTwNJIatV8FRpGLieAedSvwyBDTouXTqmRbxk
+         A/qozYx0zpt2k57eoi2wFSbPsKEz49iDiqb/aovCGalv11Y6AVhb+yaaS3yla86i1HIT
+         t50H9RfeIEymIemR0cstrCJNOsv6sj+Me+L/kHDIpR8N8yA6gCahhcLbY5S7MaXhLe8y
+         0gIey8ophlfkJqkrRx3dq5psjOKaiCBvOHKnnhnpbrjcs/8R820DIm2eNlUvc/d08ZqY
+         O76A==
+X-Forwarded-Encrypted: i=1; AL+hErG+ko7sD/adxhXyY5pK57JLme2kOtwArEAuvic0TrGchq0yxN7MVPDYu/EJdoXbJQRQE/Qzow8VRMnN0g==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/AQTByFfeKTgEFCbtgEc/tmEHaZj/OOGli1IhAHd4o37t1mXt8
+	LfoXWaCUhyoQT6m3D5x8NN1JwBJ2APus2dVB7JPJwTzcPSewl+6qp7gLkVZ8EVv6
+X-Gm-Gg: AZFdTZf18D1WJOknzuBxO3YJ2WkWUkrnfDyX4wKueiFZIGj+RrhLWAs1+gpNIjayAN0
+	MWuBaPISjg6o7RfkwNCCeVQzg4Pt7+OvgwJ+m7DNTLTdNneOQYgpMgJTgWXpnTTvnY2kWZXBW37
+	6ATDQEg+Oi+w3wamSVtEH4CHcxOuN39FdP3PO5gA/12qsJ++2+d95mKoh7XO9Ua+beABTGne5Uz
+	uVU1VU9RREwEnssZH00pHCnH4xAHrdr+Aqo/DD5K8z71EHTHrUSBmVxPkW0KZ/mGNNsT5HdjFzV
+	CwyNCM2WSu3QuOSfhxplq0HOBRs4/AFAo+P+rBDmkhCvxUKHwV6mGBLze+nHl/lYqUaxLDzavqt
+	GuqGWMNAKqAoGUlJNjzvD7imvwi4VFRcnmtBTblCCjhHUhA7pU7N8tnbTZe32ce9YvoMKijb15v
+	7YWHHyENHDB/I8FN6MNYPJ8KVEb+Z4JH148vuMv8md9n1qV4d1Bso70QaMcUaqNTMafG9bP/VMf
+	jvwMuODYuxlNk7YUzz9I9jBcXHrDi6m42uqehRyEIyZI4BPduYEHeDibR/lGbPg4cP6O1n+fjOL
+	ACrNdTTDAOBhm8Q5PjUTPwPzwHlM68Ce0eMPVJQn7vlNlFuUjDa40G9/yH42Wj9DNQ==
+X-Received: by 2002:a17:903:22c8:b0:2ef:e563:d2a2 with SMTP id d9443c01a7336-2f11414c317mr10473615ad.57.1795769339572;
+        Fri, 27 Nov 2026 00:48:59 -0800 (PST)
 Received: from qiwenjie-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde6d0818c1sm12289058a12.30.2026.11.27.00.48.50
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde6d0818c1sm12289058a12.30.2026.11.27.00.48.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 00:48:53 -0800 (PST)
+        Fri, 27 Nov 2026 00:48:59 -0800 (PST)
 From: Wenjie Qi <qwjhust@gmail.com>
 X-Google-Original-From: Wenjie Qi <qiwenjie@xiaomi.com>
 To: jaegeuk@kernel.org,
@@ -95,12 +94,12 @@ Cc: linux-f2fs-devel@lists.sourceforge.net,
 	linux-mm@kvack.org,
 	qiwenjie@xiaomi.com,
 	qwjhust@gmail.com
-Subject: [PATCH v6 0/2] f2fs: enable buffered RWF_DONTCACHE
-Date: Fri, 27 Nov 2026 16:48:43 +0800
-Message-ID: <cover.1795746008.git.qiwenjie@xiaomi.com>
+Subject: [PATCH v6 1/2] f2fs: complete dropbehind write bios in task context
+Date: Fri, 27 Nov 2026 16:48:44 +0800
+Message-ID: <323235fbdeb5131f83569541c602ddc88f412b18.1795746008.git.qiwenjie@xiaomi.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1788795700.git.qiwenjie@xiaomi.com>
-References: <cover.1788438786.git.qiwenjie@xiaomi.com> <cover.1788795700.git.qiwenjie@xiaomi.com>
+In-Reply-To: <cover.1795746008.git.qiwenjie@xiaomi.com>
+References: <cover.1788438786.git.qiwenjie@xiaomi.com> <cover.1788795700.git.qiwenjie@xiaomi.com> <cover.1795746008.git.qiwenjie@xiaomi.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -112,72 +111,58 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series enables buffered RWF_DONTCACHE on F2FS for one-pass streaming
-I/O, where retaining the transferred data can displace more useful cache.
+Mark dropbehind write bios BIO_COMPLETE_IN_TASK so the block layer can
+defer their completion to task context before folio invalidation.
 
-Patch 1 marks dropbehind write bios with BIO_COMPLETE_IN_TASK. Normal and
-dropbehind folios may share otherwise mergeable IPU and OPU bios; the flag
-is set when a dropbehind folio joins a bio. The block layer handles
-deferral from unsafe completion contexts.
+Allow normal and dropbehind folios to share IPU and OPU bios. Set the
+flag after a dropbehind folio is successfully added, checking the original
+page-cache folio rather than an encrypted or compressed replacement.
 
-Patch 2 passes FGP_DONTCACHE to the buffered write folio lookup and
-advertises FOP_DONTCACHE, enabling buffered reads and writes. Internal
-write_begin callers that pass a NULL kiocb remain supported.
+Exclude metadata-cache I/O, which may not have a file-data folio. Leave
+the existing large-ATC completion path unchanged.
 
-Tests used x86-64 QEMU/KVM with two vCPUs, 2 GiB RAM, and an NVMe-backed
-F2FS image. Each attempt transferred a 1-GiB file sequentially in a fresh
-guest, with memory.max=255852544 (244 MiB) and memory.swap.max=0. Normal
-and dontcache each ran ten counterbalanced rounds. Values below are
-arithmetic means of the ten runs per mode. Write throughput excludes the
-final fdatasync().
-
-Throughput was:
-
- Operation  I/O       Normal MiB/s  Dontcache MiB/s  Change
- Read       1 MiB         4137.96          5869.38  +41.84%
- Write      8 KiB          686.09          1752.24 +155.39%
- Write      1 MiB          714.91          2161.02 +202.28%
-
-Average memory.current was:
-
- Operation  I/O       Normal MiB  Dontcache MiB  Change
- Read       1 MiB         197.26          13.70 -93.06%
- Write      8 KiB         214.22          13.15 -93.86%
- Write      1 MiB         215.20          19.52 -90.93%
-
-Mean reclaim counters per run were:
-
- Operation  I/O       pgscan normal/DC   pgsteal normal/DC
- Read       1 MiB          200999.7/0          200888.4/0
- Write      8 KiB          201136.8/0          201120.8/0
- Write      1 MiB          200899.3/0          200883.3/0
-
-Scan counts pages examined by reclaim; steal counts pages reclaimed.
-memory.current includes all memory charged to the workload, not only
-file-cache pages.
-
-Dontcache left zero target pages resident after reads and one 4-KiB page
-after write synchronization.
-
+Signed-off-by: Wenjie Qi <qiwenjie@xiaomi.com>
+---
 Changes since v5:
 
-- Rebase onto the F2FS dev branch, adapting the bio tagging to the
-  sub-folio merge paths and excluding metadata-cache I/O.
-- Drop the Android 6.12 backport results, as its dropbehind implementation
-  differs substantially from that in the current dev branch.
-- Add memory-limited read results and update the write results,
-  reporting arithmetic means of ten runs per mode.
+- Rebase onto dev, preserving the updated bio_len/bio_offset merge paths.
+- Skip metadata-cache I/O before testing the original folio's hint.
 
-Wenjie Qi (2):
-  f2fs: complete dropbehind write bios in task context
-  f2fs: enable buffered RWF_DONTCACHE
+ fs/f2fs/data.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
- fs/f2fs/data.c | 10 ++++++++++
- fs/f2fs/file.c |  2 +-
- 2 files changed, 11 insertions(+), 1 deletion(-)
-
-
-base-commit: b61a029304bb5531312ebc133b2a895d14dc3fee
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index cdc9e6e8633c..37d74afc8b26 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -624,6 +624,9 @@ static struct bio *__bio_alloc(struct f2fs_io_info *fio, int npages)
+ 	bio = bio_alloc_bioset(bdev, npages,
+ 				fio->op | fio->op_flags | f2fs_io_flags(fio),
+ 				GFP_NOIO, &f2fs_bioset);
++	if (!is_read_io(fio->op) && !fio->is_cache &&
++	    folio_test_dropbehind(fio->folio))
++		bio_set_flag(bio, BIO_COMPLETE_IN_TASK);
+ 	bio->bi_iter.bi_sector = sector;
+ 	F2FS_BIO(bio)->entry = NULL;
+ 	bio->bi_private = NULL;
+@@ -1077,6 +1080,8 @@ static int add_ipu_page(struct f2fs_io_info *fio, struct bio **bio,
+ 					fio_folio->mapping->host,
+ 					fio_lblk, fio) &&
+ 			    bio_add_folio(*bio, folio, bio_len, bio_offset)) {
++				if (folio_test_dropbehind(fio->folio))
++					bio_set_flag(*bio, BIO_COMPLETE_IN_TASK);
+ 				ret = 0;
+ 				break;
+ 			}
+@@ -1359,6 +1364,8 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
+ 		__submit_merged_bio(io);
+ 		goto alloc_new;
+ 	}
++	if (folio_test_dropbehind(fio->folio))
++		bio_set_flag(io->bio, BIO_COMPLETE_IN_TASK);
+ 
+ 	F2FS_BIO(io->bio)->entry_cnt++;
+ 
 -- 
 2.43.0
 
