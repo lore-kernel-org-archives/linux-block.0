@@ -1,70 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795760800;
-	b=JXyUHNw3bNCbnq3sx5PamlddZNZ+w6e0JO6b8+D0Ytsuvt3kLJAxCPdeYSslqWVbbP7Q
-	 TDnBzVTz88dyODhozdqOVQMOQlblzPKCgXM+D8iMJfLpmwuKJMrLM5ZeFXsUtxW/3KLeq
-	 SRj2gk2pgTWwf7Ym72+wB+Wq6RlBP/SiufwaSohqeBC7bxpzGgaCMOAybMlEpNTaK0NUy
-	 PUDJnlPBVs7TssbTLy0DnlG3dYXJ0bJbIEIFvZMUjFitH0GELyuYKSmLbKea//oFF8RXN
-	 gu7nnklGLmC2bV53MI2eeGA7TZone6LG6VX3exAp2vDYgt4fYS2I7ryUbNiyTrfxQNw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795760800;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-ZohoMailClient;
-	bh=bCNn9r8VG4aa0r4Am+eSfDy/QqMZMCKrbKXiHll/bkU=;
-	b=E/CjVHqSjax6FIhUmI52ts6VXfOiexYoQxnwnxzXr01+mCRGxk4uBg2AJOqKsTUu2tMY
-	 8dks4cL5yYSzKbqVJlv7PouJOc/L8ghQtZ4bDXBf4GNGqZyoY0RkdJ+sqd7hn2QWP5Cah
-	 BNexw484BQz81LnGGAjG6JKUaHnZXMWW0D+wgxBw0bK+S+1dTkUpmwlzuO0gACQklAznp
-	 q3xe6hV2W72quiYK/T2J/OgejEjN0ok0fSfJuWw8wuLFqRKA4xNEX1Zs6KUDwAGAomhER
-	 PKLzIncxKhe4PF0fli3b667fNk0giCHej3XHbDiM81gmT9GGw4UTqXwIAD9YrjInsRQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=laveeshbansal.com;
-	spf=pass smtp.mailfrom=laveeshbansal.com;
-	dkim=pass header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=TiQ3U15R;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
-Received: from sender5-op-o15.zoho.com (sender5-op-o15.zoho.com [165.173.182.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.127.230.114
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795764252;
+	b=HkgLdwovboyhnTcP8gIglWzuN1vKNK5uHBqNp388AU7C3U0uah30NOcdpEulWvz4gqR7
+	 wkE+g8VveeD09qkbmWOMqJhJg5ZtvQEHFsVDrSkIu6I1ocl2LXjN8MVtAB9Y3Ncw2qlbZ
+	 7mq+kSEJO2J75MxQtdY8wixKOcyZMKOi2sZ87vo4ybTQB5PV4uLI4ZCc5uuMmAe8fudAF
+	 gzgv8tAyqccjKK2Xn/OpaXOakfKH35m3wxNGTFGzRlqjc4FWRN07JzEgidCttZ1eaDPS+
+	 yUrS/QPw4+BbA34RFJa+Njs89XSOWpBBC9u1lfSY3oSyZIoEFqWAEC96cwDN2MQleLg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795764252;
+	h=DMARC-Filter:DKIM-Signature:Subject:Message-Id:
+	 Content-Transfer-Encoding:X-Original-From:X-Lms-Return-Path:
+	 Content-Type:From:Mime-Version:Date:X-Mailer:Cc:To;
+	bh=6Q8n/+0yzOS8zRUOgySzo3szziagZeOEeZ2s5FzRuXA=;
+	b=KpyWqWbENsXkFOFLFT9NrABSyVjhI0mKmAmicCZJ0zjtWwCXWP22lk6FDs1c1pQJkjte
+	 MgdX/Id3Ygf7TdnlU7pDCMp+4bMe5NxxNSSU/gCXxLn1RVqUfgrvjpp3iOPfYwwvHHQMx
+	 y1rCYPxe1c1CMPZTACOiwxMM0cM1LL106y50EZ3A76eSQ83OVYdUxwaCD7rjQC8FJJdqS
+	 2Uq/a4G4sbjfLvvPsNCEDLhjktrpdnGQCYJSFYe1mCW/T2zCbiF+pTBppuUXhNvC4my0U
+	 n+HxQC6vpGNyyC/owT2x4fxStFYHIoz2RXLa25GgNbhhZ9dReZ2n9lgWV9E+IPUSlEg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=bytedance.com;
+	spf=pass smtp.mailfrom=bytedance.com;
+	dkim=pass header.d=bytedance.com header.i=@bytedance.com header.a=rsa-sha256 header.s=2212171451 header.b=ipFr4Whr;
+	arc=none smtp.remote-ip=209.127.230.114
+Received: from va-1-114.ptr.blmpb.com (va-1-114.ptr.blmpb.com [209.127.230.114])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F04606A31C;
-	Fri, 27 Nov 2026 06:26:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 01F04606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C91606A324
+	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 07:24:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E1C91606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=TiQ3U15R
-ARC-Seal: i=1; a=rsa-sha256; t=1795760783; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Iq8+3O6SVynT2p7WX05aK+b7q9YoMkkRNFV3sfhmUDfefXMc9GdZKVzfp/G0qBb1pOMuqmV/5+IHeRerNmIZm5po6BzF/fMCCOhdyI3qgjiPB4wkQDxMYUV+sHdKFHroRNu3ak2OD32zXAtp151sSQvwnJgECfySt0Zo1vmy6+Y=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1795760783; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=bCNn9r8VG4aa0r4Am+eSfDy/QqMZMCKrbKXiHll/bkU=; 
-	b=jJlsb++oCttRggNA3bAp3KJoKJ1RkFzyGC50RoUTVTkfejfzP9YOJTUtyWcUATRbLTPS37mCMA479lREhVRYJpOuhpsqUP7iLn6GRW0yVnlTHE1IK1FnKZn1gqLWc6gtN9d0dNg3gLz5yCKHXlyQ3UPFzpYswkr1XcYIoZVH/k4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=laveeshbansal.com;
-	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
-	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
-DKIM-Signature: a=rsa-sha256; b=TiQ3U15RQrizMzkNM3/UKGIzpdsVJHRMduzq6A5gQoelzNgKqo8ooAwP+xzJq5kblOfAfid1MiquAAU9ljG7zIJZT1EH54+nKavCqm0BIEdy6FfPeGk6yRjCfsLl3WW0eZ1ofQgZMGdhKvFcpUpDkQlLUl8xClgnQanoHNLTCwM=; c=relaxed/relaxed; s=zoho; d=laveeshbansal.com; v=1; bh=bCNn9r8VG4aa0r4Am+eSfDy/QqMZMCKrbKXiHll/bkU=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
-Received: by smtp.zohomail.com with SMTPS id 1795760780464754.4038009804824;
-	Thu, 26 Nov 2026 22:26:20 -0800 (PST)
-From: Laveesh Bansal <laveeshb@laveeshbansal.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com,
-	linux-block@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] blk-crypto: use a NOIO scope while holding profile->lock
-Date: Thu, 26 Nov 2026 22:26:17 -0800
-Message-ID: <20261127062617.29510-1-laveeshb@laveeshbansal.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20261125053308.GA20407@lst.de>
-References: <20261125053308.GA20407@lst.de>
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.a=rsa-sha256 header.s=2212171451 header.b=ipFr4Whr
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1795764242; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=6Q8n/+0yzOS8zRUOgySzo3szziagZeOEeZ2s5FzRuXA=;
+ b=ipFr4WhrIKSWDXWwamevVqpXU1lnOUkO6qAfltgOeDtDTRmyfzNj5kaoiy+Z85vCEi2d0V
+ ohNrTMQqSr3KI4j4PLVMvJBuSenuJs3CTd+6l5ir1WYfOkxVXVDWSbFrvUbe5UeUvs6Tx/
+ 7anRgRtnfNGnNw7QcawIwLPjs3lSatnBU9PrJPs40oAzg3KPS1uzcehbi0+XCYTp6qH7az
+ yHP9E+SeVSq4+7Er4+vZipLg+odSeRaMCehM1PAwUKlv1poyy8V8eJg6Ux3Y/+GRU6Gy2s
+ SQfwASnnv4S+UTRcjbS90hYT4gnMcpcfSetxvVESGwDlmivLy39L3V8yoQnpmQ==
+Subject: [PATCH] mm/readahead: read folio order limits under the invalidate lock
+Message-Id: <20261127072340.73758-1-zhaogongyi@bytedance.com>
+Content-Transfer-Encoding: 7bit
+X-Original-From: Zhao Gongyi <zhaogongyi@bytedance.com>
+X-Lms-Return-Path: <lba+26b093010+be7b16+vger.kernel.org+zhaogongyi@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+From: "Zhao Gongyi" <zhaogongyi@bytedance.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -73,22 +58,81 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Mime-Version: 1.0
+Date: Fri, 27 Nov 2026 15:23:40 +0800
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+Cc: "Jens Axboe" <axboe@kernel.dk>, 
+	"Jinchao Wang" <wangjinchao600@gmail.com>, <linux-mm@kvack.org>, 
+	<linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
+To: "Matthew Wilcox" <willy@infradead.org>, "Jan Kara" <jack@suse.cz>, 
+	"Andrew Morton" <akpm@linux-foundation.org>
 
-Hi Christoph
+Block device mmap readahead can race with set_blocksize(), which updates
+the block size and minimum folio order under the exclusive invalidate
+lock. page_cache_ra_order() reads the minimum before taking the shared
+lock and can allocate a folio smaller than the new block size. On the
+buffer-head path this can cause a NULL dereference in guard_bio_eod().
 
-I sent v3 to address Eric's comments on v2.
+Take the existing shared invalidate lock before computing the folio order
+limits so they stay valid through allocation and I/O submission.
 
-blk_crypto_hw_enter() now returns the saved flags and
-blk_crypto_hw_exit() takes them, instead of keeping them in the profile.
-The comment is reworded and the version is gone from the stable tag:
+Fixes: 47dd67532303 ("block/bdev: lift block size restrictions to 64k")
+Cc: stable@vger.kernel.org # 7.3+
+Signed-off-by: Zhao Gongyi <zhaogongyi@bytedance.com>
+---
+Earlier proposals:
+  https://lkml.iu.edu/hypermail/linux/kernel/2511.3/04090.html
+  https://lore.kernel.org/r/aUN9BFdxHQj8ThMS@ndev
 
-https://lore.kernel.org/r/20261125081417.77674-1-laveeshb@laveeshbansal.com
+The earlier syzbot retest hit a bug in the fallback path. Since
+b244c89a70b3, the caller holds invalidate_lock before the fallback reads
+min_nrpages. This patch covers the remaining mmap readahead path.
 
-I did not carry over your Reviewed-by since the code changed. If you
-are ok with v3, please re-add it.
+A/B testing on arm64/QEMU at the declared base commit gave 10/10
+baseline hits via madvise and 6/10 via MAP_POPULATE. Both paths had
+0/10 hits with this patch. The 20 patched serial logs showed no kernel
+warnings or crashes.
 
-Thanks
-Laveesh
+ mm/readahead.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/mm/readahead.c b/mm/readahead.c
+index 6e5563290..80f3e141d 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -484,7 +484,7 @@ void page_cache_ra_order(struct readahead_control *ractl,
+ 	struct address_space *mapping = ractl->mapping;
+ 	pgoff_t start = readahead_index(ractl);
+ 	pgoff_t index = start;
+-	unsigned int min_order = mapping_min_folio_order(mapping);
++	unsigned int min_order;
+ 	pgoff_t limit = (i_size_read(mapping->host) - 1) >> PAGE_SHIFT;
+ 	pgoff_t mark;
+ 	unsigned int nofs;
+@@ -506,15 +506,17 @@ void page_cache_ra_order(struct readahead_control *ractl,
+ 		mark = ULONG_MAX;
+ 	}
+ 
++	/* See comment in page_cache_ra_unbounded() */
++	nofs = memalloc_nofs_save();
++	filemap_invalidate_lock_shared(mapping);
++
++	/* Serialize with set_blocksize() updating the minimum folio order. */
++	min_order = mapping_min_folio_order(mapping);
+ 	new_order = min(mapping_max_folio_order(mapping), new_order);
+ 	new_order = min_t(unsigned int, new_order, ilog2(ra->size));
+ 	new_order = max(new_order, min_order);
+-
+ 	ra->order = new_order;
+ 
+-	/* See comment in page_cache_ra_unbounded() */
+-	nofs = memalloc_nofs_save();
+-	filemap_invalidate_lock_shared(mapping);
+ 	/*
+ 	 * If the new_order is greater than min_order and index is
+ 	 * already aligned to new_order, then this will be noop as index
+
+base-commit: 29378f5cd79a27718ead9717fe7b094b651a8e1e
+-- 
+2.39.5 (Apple Git-154)
