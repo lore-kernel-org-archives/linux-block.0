@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=117.135.210.9
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795768133;
-	b=eLvnNLEBzReBSpoeNH/anJfHYrnLTbTVcLbP31efw/M7tywJDMV87ADDv2pmDu8JjA+M
-	 cSjJJ8C0ZbElr5UglFu4wbcU+q0Syfykl0npd9zQXmZvJehkOMjmjK3vQPWOHGz7S1wFT
-	 bHbGuXuAHoITkedEJ/17aqGP9LXAaOzt7mNtSCwBjHqp6HypBuBnJ3c3uas7UqtCOSST+
-	 4ekm8HQY59/7lGSbKgbKkqz4ONQ3+d97ammBxfYw/q7ly3JX5NUyRwopmGDBAkn2kxQWq
-	 GAOf+cT6+lMjUhMfjXVIVAZ3lnaznT1JFe4t/hrmiTsnivmqp/jIjLDGaGY/KRAz0NA==
+	t=1795768147;
+	b=4jDZmSp9L0qS2gQw8pcfg5ecaoPWUL2xp/zTgz3Oboi2rrgHb3HC2pVxVCfbtdEOq0iP
+	 OqZOQvAJFUtZwG3lSXeTFZ9ANpgg8B7pcSIC7sPB/fJy5gYtQ+Zx3fTMV+uNCgF+qhMg6
+	 vyxhfev/A8jmTxs8OS4+EVtlLy1bLbFg2oK7GHMgXc7xvWC841vYheMyP62H/P7P0KwwS
+	 cvlHWfNxWBPfrJZJ46VbdFXLAgqoa2RCXUe/lnSUy8CE/i8iuxlUrsOHPYZOfVPfIIdsF
+	 QNDlcQnc8+D4opRg2+TMCtgWnxs+ATqn1TVfkP7x9t7QDhU2H+pjU6C9sB5mTRfsoGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795768133;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795768147;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:Sender:
 	 X-CM-SenderInfo;
-	bh=1sIJUe4O4CsWbtMbQNi4aeXjMyQYal1HiWg977wjesI=;
-	b=5ZXVPmKHwmLjp7hKj9z4f72mnU1MskvNiYmL9LgilH0n4iN9fonAQOKXMfsG9nrengZ4
-	 X4qJPaoCcibek5UzjsANTmbij0mbiZxa9ngLDGgr5X6Fn84za1iYhUe62L7F75bcF/K9M
-	 BXpUmbc5ee9XgG7LZ439xfiherPl0O420tM1h04tprn8vryutTO4yXTvrCvsvS7207MwU
-	 r4pkkU47Z4RYlKYsrEVlqQrw4ozjkWGiQwf4u8K51nkD19/Cckk0JXqu698OWe0tub00L
-	 wqw1MlJtVFdI9duHDaTpGVW5OPrB2Lz7rrvWhJ0shqoQweg+bl+zfzS3d4yYzzI+HGQ==
+	bh=MNESWvGb/p8QvPX1KB368WqOrHE4U6ua3L78fMFioCY=;
+	b=GM1iGxpMHhkbyJfzqFS8Y+3f5Ch9wg39ydkiSkAEtzPmgtHGRvi2fktsFUCb6/k3k6TO
+	 tC7AcMH3adUFraYgXky7LFj+DfnnIL21UncIP4ZtIktHT5baWjGwyY7o2NBxqRSPRyufU
+	 p6LTnEqArIcEGiKUcfRXOc2Oefgpya3QzAOqfsQ5//KkieOYs+Bx3vb6usUhCafHFyHj7
+	 FSlES68GtNhPl9HVI7rm5+vEroiDlQ91BR86qexm0hR4DmYcL0f7vONnbCiDDBc/oipH4
+	 EGeqM3wVpim43QeU0GCIjMnqatBsn/mNn4RSrPpJCv5WITzG65F02MNdNGIIm+6tRSA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=fail header.from=xiaomi.com;
 	spf=pass smtp.mailfrom=126.com;
-	dkim=pass header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=AHFaJuEh;
+	dkim=pass header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=Na11z4Rd;
 	arc=none smtp.remote-ip=117.135.210.9
 Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0586A606A31E;
-	Fri, 27 Nov 2026 08:28:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0586A606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C492606A31C;
+	Fri, 27 Nov 2026 08:29:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8C492606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=xiaomi.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=AHFaJuEh
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=Na11z4Rd
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=1s
-	IJUe4O4CsWbtMbQNi4aeXjMyQYal1HiWg977wjesI=; b=AHFaJuEh0EIkAkyo2c
-	ZVBqUZ9yupduHxWzUtjdjRTae0SDHFnaZIZf1Cj8HuqZGfghrCYnrxiuplKwyjLP
-	kJJ9i4K8NXTV3yo5ESq/c2u3G1GsZ1QOUjIoY6Wfh1KN2jHQ0jDCNjFtfWmRwUw5
-	dOeKubTHbfksoYyH1iOaTPaQo=
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=MN
+	ESWvGb/p8QvPX1KB368WqOrHE4U6ua3L78fMFioCY=; b=Na11z4Rdnwl9QXmS8e
+	1efoGbbFTVPBgBQqTT0lkwpM1iGTYD4q+1EhGH/sDKeWu/5lk65gh/cM/mTFTgzY
+	ADuhw8PHciWuclvVQbMoHGPMju7QM0XeIWJpCsjyYtHJRZuuWZM806OTX0ZOnFRX
+	IS54+HJgxDhLUUS23gFSrfJkY=
 Received: from nzzhao-ThinkCentre-M760t.mioffice.cn (unknown [])
-	by gzsmtp3 (Coremail) with SMTP id PikvCgDnz+_cPglrqen2EA--.50878S2;
-	Fri, 27 Nov 2026 16:27:09 +0800 (CST)
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD3F9_xPglrbhBtEA--.48132S2;
+	Fri, 27 Nov 2026 16:27:30 +0800 (CST)
 From: Nanzhe Zhao <zhaonanzhe@xiaomi.com>
 To: sashiko-bot@kernel.org
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -72,8 +72,8 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Bo Zhang <zhangbo56@xiaomi.com>,
 	sashiko-reviews@lists.linux.dev
 Subject: Re: [RFC PATCH v4 2/4] zram: support compression at the granularity of multi-pages
-Date: Fri, 27 Nov 2026 16:27:06 +0800
-Message-ID: <20261127082707.3624358-1-zhaonanzhe@xiaomi.com>
+Date: Fri, 27 Nov 2026 16:27:27 +0800
+Message-ID: <20261127082728.3624874-1-zhaonanzhe@xiaomi.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <sashiko-outbox-216089@kernel.org>
 References: <20261115024455.1465726-1-zhaonanzhe@xiaomi.com> <20261115024455.1465726-3-zhaonanzhe@xiaomi.com> <sashiko-outbox-216089@kernel.org>
@@ -87,67 +87,157 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PikvCgDnz+_cPglrqen2EA--.50878S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJF1DAFWrCryxWry5KryUKFg_yoW5Xr4UpF
-	y7Ga42yr4kJF1IqFsrCFZ7u3s2yr4S9ay8Gry8tr47Wa4rX34qqFWqgwnYka1UCrWfW39I
-	gws5ArZ5J3WUZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UvksDUUUUU=
+X-CM-TRANSID:_____wD3F9_xPglrbhBtEA--.48132S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxtFykAr1ftw4rtrW8KFWkCrg_yoWxJr4DpF
+	48Cay2kr48XFyUZr4UZws3ur1Dta1fuFWjqryFkw1F9FWfAr93ZFyUtryfXay2gryxCa9a
+	qrs0qrZ5JF1UZ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UkGYLUUUUU=
 Sender: nzzhao@126.com
-X-CM-SenderInfo: xq22xtbr6rjloofrz/xtbBsR3js2sJPt1GbgAA3V
+X-CM-SenderInfo: xq22xtbr6rjloofrz/xtbBsRLouGsJPvJHQAAA3a
 
-> [Severity: High]
-> Does passing bio as parent to zram_read_page_size() cause a use-after-free
-> of page when ZRAM_WB is set?
+> [Severity: Medium]
+> Can zstrm->excl_lock and zstrm->buf_lock be acquired in opposite orders?
 >
-> When test_slot_flag(zram, index, ZRAM_WB) is true, zram_read_page_size()
-> calls read_from_bdev(zram, page, index, blk_idx, parent) with a non-NULL
-> parent bio:
-> ...
-> read_from_bdev_async() submits an asynchronous child bio referencing page
-> (inheriting REQ_OP_WRITE from the write bio) and returns 0 immediately,
-> after which zram_bvec_write_multi_pages_partial() frees page via
-> __free_pages() while the backing-device I/O and completion work are still
-> using it.
-
-Both writeback and recompression currently assume that each slot holds a
-single PAGE_SIZE object, which conflicts with multi-page slots, so I plan
-to temporarily make CONFIG_ZRAM_MULTI_PAGES mutually exclusive with
-CONFIG_ZRAM_WRITEBACK and CONFIG_ZRAM_MULTI_COMP via Kconfig.
-
-> [Severity: High]
-> Can post-processing a multi-page slot overflow ctl->pp_buckets[] and
-> req->page?
+> In zram_read_partial_from_zspool(), an exclusive decompression backend
+> (ZCOMP_DSTRM_EXCLUSIVE) takes zstrm->excl_lock inside zcomp_dstrm_get()
+> and then locks zstrm->buf_lock.  A shared decompression backend
+> (ZCOMP_DSTRM_SHARED) locks zstrm->buf_lock first and then calls
+> zcomp_decompress(), which locks zstrm->excl_lock when a two-page object
+> falls back to zstrm->local_copy:
 >
-> Neither scan_slots_for_writeback() nor scan_slots_for_recompress() skips
-> ZRAM_COMP_MULTI_PAGES slots, where get_slot_size() can be up to
-> ZCOMP_MULTI_PAGES_SIZE.  In place_pp_slot(), NUM_PP_BUCKETS is sized for
-> PAGE_SIZE:
-> ...
-> When a multi-page slot's compressed size exceeds PAGE_SIZE, bid exceeds
-> NUM_PP_BUCKETS and corrupts memory past struct zram_pp_ctl.  In
-> zram_writeback_slots(), req->page is a single PAGE_SIZE page, so
-> read_from_zspool_raw() also overflows req->page and wraps PAGE_SIZE - size
-> in memzero_page(), while uncompressed writeback and recompress_slot() pass
-> PAGE_SIZE for a multi-page object.
-
-Same here. With writeback and recompression disabled under
-CONFIG_ZRAM_MULTI_PAGES, scan_slots_for_writeback(),
-scan_slots_for_recompress(), and place_pp_slot() will not be built or
-called on multi-page slots.
-
-Also regarding the related zs_rebind_handle() issue from the patch 1 review:
-
-> [Severity: High]
-> Does zs_rebind_handle() also need to mask the object offset with
-> page_size - 1 instead of offset_in_page()?
+> CPU0                              CPU1
+> ----                              ----
+> lock(&zstrm->excl_lock)
+>                                   lock(&zstrm->buf_lock)
+> lock(&zstrm->buf_lock)
+>                                   lock(&zstrm->excl_lock)
 >
-> When a non-huge multi-page object sits at an offset >= PAGE_SIZE within its
-> zpdesc, zs_rebind_handle() overwrites 8 bytes in the first subpage and leaves
-> the object's own header pointing to the old src handle, so later compaction
-> updates src instead of dst.
+>  *** DEADLOCK ***
 
-This is tied to the same recompression issue: zs_rebind_handle() is only
-called by zram's recompress_slot(). With CONFIG_ZRAM_MULTI_COMP and
-CONFIG_ZRAM_MULTI_PAGES mutually exclusive via Kconfig, multi-page objects
-will never reach zs_rebind_handle().
+This is a valid issue. I think I can eliminate the lock inversion by
+dropping buf_lock entirely and letting partial reads always acquire the
+stream in ZCOMP_DSTRM_EXCLUSIVE mode, where decomp_buf is already
+serialized under excl_lock.
+
+With patch 4 (allowing direct reclaim for synchronous multi-page swapin
+in do_swap_page()), I found partial reads are quite rare. So using
+exclusive mode here will not cause heavy lock contention.
+
+--- a/drivers/block/zram/zcomp.h
++++ b/drivers/block/zram/zcomp.h
+@@ -79,7 +79,6 @@ struct zcomp_dstrm {
+ 	void *local_copy;
+ #ifdef CONFIG_ZRAM_MULTI_PAGES
+ 	void *decomp_buf;
+-	struct mutex buf_lock;
+ #endif
+ };
+
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -120,7 +120,6 @@ static int zcomp_dstrm_init(struct zcomp *comp, struct zcomp_dstrm *zstrm)
+ 		zcomp_dstrm_free(comp, zstrm);
+ 		return -ENOMEM;
+ 	}
+-	mutex_init(&zstrm->buf_lock);
+ #endif
+ 	return 0;
+ }
+
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -2907,17 +2907,13 @@ static int zram_read_partial_from_zspool(struct zram *zram, struct page *page,
+ 		prio = get_slot_comp_priority(zram, index);
+-		mode = ZCOMP_DSTRM_EXCLUSIVE;
+-		if (zcomp_shared_decomp(zram->comps[prio]))
+-			mode = ZCOMP_DSTRM_SHARED;
+-
+-		zstrm = zcomp_dstrm_get(zram->comps[prio], mode);
+-		mutex_lock(&zstrm->buf_lock);
++		zstrm = zcomp_dstrm_get(zram->comps[prio], ZCOMP_DSTRM_EXCLUSIVE);
+ 		ret = zcomp_decompress(zram->comps[prio], zstrm, sg, size,
+ 				       zstrm->decomp_buf, page_size);
+ 		if (!ret) {
+ 			dst = kmap_local_page(page);
+ 			memcpy(dst, zstrm->decomp_buf + offset, PAGE_SIZE);
+ 			kunmap_local(dst);
+ 		}
+-		mutex_unlock(&zstrm->buf_lock);
+-		zcomp_dstrm_put(zram->comps[prio], zstrm, mode);
++		zcomp_dstrm_put(zram->comps[prio], zstrm, ZCOMP_DSTRM_EXCLUSIVE);
+ 	}
+
+> [Severity: Medium]
+> Can __test_multi_pages_comp() access past the end of zram->table when
+> disksize is not a multiple of ZCOMP_MULTI_PAGES_SIZE?
+>
+> disksize_store() only aligns disksize with PAGE_ALIGN(disksize).  When
+> num_pages is not a multiple of ZCOMP_MULTI_PAGES_NR, an access to the
+> final slots has head + i >= num_pages, so __test_multi_pages_comp() and
+> the set_slot_flag() loops in the multi-page write path read and write past
+> the end of zram->table.
+
+This is a valid issue (and was also caught by syzbot KASAN). I will align
+disksize to ZCOMP_MULTI_PAGES_SIZE in disksize_store() so that multi-page
+groups never cross the end of zram->table.
+
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -3298,7 +3298,7 @@ static ssize_t disksize_store(struct device *dev, struct device_attribute *attr,
+ 	if (init_done(zram)) {
+ 		pr_info("Cannot change disksize for initialized device\n");
+ 		return -EBUSY;
+ 	}
+
+-	disksize = PAGE_ALIGN(disksize);
++	disksize = ALIGN(disksize, ZCOMP_MULTI_PAGES_SIZE);
+ 	num_pages = disksize >> PAGE_SHIFT;
+
+> [Severity: Medium]
+> Does ZRAM_FLAG_SHIFT overflow the 32-bit attr.flags field when
+> PAGE_SHIFT + CONFIG_ZSMALLOC_MULTI_PAGES_ORDER > 21?
+>
+> CONFIG_ZSMALLOC_MULTI_PAGES_ORDER allows values up to 9, and enum
+> zram_pageflags defines 10 flag bits above ZRAM_FLAG_SHIFT.  On 16K or 64K
+> page configurations with larger orders (for example, PAGE_SHIFT == 16 with
+> order >= 6), __NR_ZRAM_PAGEFLAGS exceeds 32 and triggers
+> BUILD_BUG_ON(__NR_ZRAM_PAGEFLAGS > sizeof(zram_te.attr.flags) * 8) in
+> zram_init().
+
+This is valid. While configurations exceeding the 32-bit limit are already
+rejected at build time, I will replace BUILD_BUG_ON() with an informative
+static_assert() and add comments documenting the bit budget (PAGE_SHIFT +
+ZSMALLOC_MULTI_PAGES_ORDER <= 21).
+
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -3680,2 +3680,3 @@ static int __init zram_init(void)
+-	BUILD_BUG_ON(__NR_ZRAM_PAGEFLAGS > sizeof(zram_te.attr.flags) * 8);
++	static_assert(__NR_ZRAM_PAGEFLAGS <= sizeof(zram_te.attr.flags) * 8,
++		      "zram pageflags overflow: PAGE_SHIFT + ZSMALLOC_MULTI_PAGES_ORDER must be <= 21");
+
+> [Severity: Low]
+> Should this find_alloced_obj() change be folded into the preceding commit
+> "mm: zsmalloc: support objects compressed based on multiple pages" so the
+> series stays bisectable?
+>
+> Also, the commit message ends with "The following data illustrates the
+> time and compressed data for typical anonymous pages gathered from Android
+> phones." without including the data table, and multi_pages_debug_stat_show()
+> is missing a colon or space before "%8llu" on the failed and partial count
+> lines.
+
+Agreed. I will fold the find_alloced_obj() change into patch 1, drop the
+sentence that promises a data table which is not included, and fix the
+missing delimiter in multi_pages_debug_stat_show:
+
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -2011,3 +2011,3 @@ static ssize_t multi_pages_debug_stat_show(struct device *dev,
+-			"multi_pages_failed_writes%8llu\n"
+-			"zram_bio_write_multi_pages_partial_count%8llu\n"
+-			"zram_bio_read_multi_pages_partial_count%8llu\n"
++			"multi_pages_failed_writes: %8llu\n"
++			"zram_bio_write_multi_pages_partial_count: %8llu\n"
++			"zram_bio_read_multi_pages_partial_count: %8llu\n"
 
