@@ -1,101 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.182
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795766983;
-	b=g4t9qz1vuC0jg+YJ0oiyJa8ioI7DerQMmciE949BIbTbIQmeNW/Ra7mPfOKuZ9hnzcwj
-	 A32UgGucVa9Mq3oqtlSDsBrHyezEh6Y5b39MqRgLBFCL6UIx3/HyOSDhzp+blAq5EzIE5
-	 uMNwXhwKfp/o9Z5dOrfoAqhYKsF05y6r6QlHigmULZb11qHMSjUQkhGt46Xgy3CjB0Aqt
-	 95tlhZtQxjlV+OZWgbhPc34pE6qck6zmVzKeieiInGqDrwsx4/5YouZCyT1YGgYCZNEZP
-	 uSyGEqVTeypZAGeJE/3+okHj3v+nl3aI05xYeWXpzRtT/pDkSVG/94NZgxzucxotYpg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795766983;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=lfAZ+eV95Jshg9Xk+E5kfkX1skkeC9iTSDENSIQrVdQ=;
-	b=eDssu7snPKy/NwbXIFz2mivz+9nckt4iHihC+gb+lR78nxQtwhHRMV9g9OqCbc19CQS3
-	 Bc/DXwcjCVXCJnBeVSY2fcOB8QIBie2zYaq9czDoqqBhSLJOV+xQHntcBxdhozvXMcOdL
-	 xMM4oOQhndneaJl4WAFDXmbr+efBDZwn8Jgf1yTMwrAGosfrhs4ZMiSbv2CXMJM3gpXmK
-	 mP7lRDU5/2yifd4GP6SxnJbHXoRSovd5Pq6lHVSy2XwLZhtt2A3CEdd5niRpQWBj04qbA
-	 TWFjbLr0LrsUQ7zSyNwL9nkrZXEjqSAsOoE8CsiOnE9OvChoLbO/gnDA2Nh6JHrmqeg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="UJfo/M9Y";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.182
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=117.135.210.8
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795767024;
+	b=Ou8ndJ3lJf681GndtemXacWu+8ICvEWwqjJQhBxMB307HTUI7SJuYufbtrmcJLE2/SSL
+	 ONKP91ujSdbuFW4dUzck5IN3jym2lwW/EGBYwI4GgtJ9A4isgjjo70PoWuVvy1Y8z3wvk
+	 1ATQTo2brgUH+IQTNKlDpKuwLeEQhej+p6cm7S6u/SrPTpUP4OPsWps0cPatMlHKM+Ta4
+	 shipYRC4+iEvN1M01w4YZnms1sDXeNivGFHPdBb6UtYYdmeWgFdqiW8qalfQ/77HcFcZW
+	 J5N/p/pmqTvwSa/FRUBh+L0AKlopbzjxVKR/0b0AE5mcfnEcbmidJstJO5S0vgy1B1g==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795767024;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:Sender:
+	 X-CM-SenderInfo;
+	bh=z2WPS4JyLBQjVa8az6zNUmfoJeGYnzi48maeQui2YGk=;
+	b=oMSGjN8ua4YW2xoCPcmXplch6KIdHGg3vmP2wUJ2Z4h3KY7ONYyzxBTt+mVhjNdqzjrI
+	 /fsKKL9aOI9bLDhV0T43RKkzsOjkFvFBmXMRT8oXBIgJf2dsOkTHjeMvaL4ZZNN1Yy9sk
+	 O6gnTxLW5M+60Oa656ZfS/5zawG33kZbYj3eXLVF3Jj3qWyhLXvSCjONkLz08luAjAIf1
+	 kSJnGtzDRd/PHq9lIUBAObY6MFbxwUEuCTVf2uUTTdtl/S4ZEW+IkB5NaUhqPPmyl4uXw
+	 vlHv9WZBam03fqbn0BhEIgOUYnaByo7BoqXTSZHeno2+XE0XOWO3EIwZ0Q43j63WQAA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=fail header.from=xiaomi.com;
+	spf=pass smtp.mailfrom=126.com;
+	dkim=pass header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=V4DWH0yz;
+	arc=none smtp.remote-ip=117.135.210.8
+Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC61E606A682
-	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 08:09:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AC61E606A682
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16494606A321;
+	Fri, 27 Nov 2026 08:10:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 16494606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=xiaomi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=UJfo/M9Y
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-4e4a4d77e5bso5453509b6e.0
-        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 00:09:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795766981; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Cf6JgXUWjs98R1G4KNFID3UYIdXEMTrPOVceUCxP/kRo536cNvSPu9hUe2eOWxrxJ4
-         WlIIDryG9V5Wz+WzYoUaU9KIbmfXbQACtMSIPyMb+NCrkfRrW7x6SYmI+a5uS2UHsjzd
-         4/fuFQFZfsJsUTsfgLZQMJAAcHyPrrWHaPgtS9wIAReik1ps8TBxXsgb58jcobISy5aA
-         H2mtqWuxDHU7bhZW4tR0pDKLMcumnGM6wHeBn4ca0GdpO6tcf/lsYWNnKlxFEIIw5BMs
-         r9a9CiyQSx+beD9cOiLV2mZp2nMsf6QTssSTQ0pPLh39yf5INczo7K5Rka+yRtQLyjnq
-         eeHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=lfAZ+eV95Jshg9Xk+E5kfkX1skkeC9iTSDENSIQrVdQ=;
-        fh=iPrA/NbSiIexJ1H1HAVt0fZthCKo3QdtjPftVduZfus=;
-        b=J/aJdfT66n9FIFgMdSUQE13fha9SJisLVxjXIRvN5nRzpXoRioBn08UmFcTH/+GJv0
-         4TT57XvLVtSwXHsr2IhGLAEjTETrk6W0uWOerwVNTFuE247atfDb495svRiFiR2t6ZJK
-         oZTc/w9IwJ9ioVy/aGNHyVCaKDlMB1tZKfU09yIsCo2gRXI9LCuCYh/APNzKeMk5UxPC
-         5CtDHxNy0x9pkzSi0HZMsMaggO1q0iGvIxtGT+5Uwg9WWuNy1ab3H3MA9TuJypuGv4cP
-         cauJ5crED5vBHy7YVN67ORehXp2OP+qyr74IcMBRcYzo/Enpbes2cNTCBHMLang1fKns
-         6fCg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795766981; x=1796371781; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=lfAZ+eV95Jshg9Xk+E5kfkX1skkeC9iTSDENSIQrVdQ=;
-        b=UJfo/M9Y+aH86agR5L+WdNAthAJZBgv1KW4YobBsiUHeT+8DGstD3A9sa8KmEbAD6D
-         2/wVonWaFRqXqx5jFQ79Lb0+IqD6mS70s6tGB+XHyzaOJwmvwalQnxmgyDqOlTNqSwRe
-         N1U3kwrgZHkw09myz5Diuf+QmYXI6OhMr+ADY5Pel+gfP9pnMAq32CSNZCdD5rSM7o3T
-         gCRoJjVC7qabX1Q6sYeQkwvd5YgM7DdXBY6E139+zfhTlCWNNKFEpbpEYuyWk9YeiZTC
-         RW7GZv7g2wX3QdW4UqwmxBsbvQGsMjDaQAXXFdIVR9QXglZ5bINkcnfZgmJnCe3+1+fQ
-         Rdsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795766981; x=1796371781;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=lfAZ+eV95Jshg9Xk+E5kfkX1skkeC9iTSDENSIQrVdQ=;
-        b=iHbeLdegXO+Gr7cV8/GYoPxCv0BD0E9E4IlOS21tWMuDBOghcofxxKT+sqKV2l+KDj
-         VjFqQwFTj9kQdhpWHX4KOH2J6sM9vJgs99PTo1lellkgttqUkmS1uIswutvgkrOE6PV/
-         6Bs5UMWKuh23U4LOhQ9NdENTeHw0BNEmuW4PWaVsTvdE14/JRZ/lcebGsY1WcOT/Y9tX
-         OOz6LtcQCaye1VFdGwuUbnX7TpXOXJTLz7wNUdBS85LblesOqMDZR7lW1bU6DO/OzIk4
-         riB0GHk6b08KqbK7q/o6ceGiLUi42KVpIvAl06FSMM/6mx5JaoOSV9e5mKTkeeHMOrHf
-         tA0g==
-X-Forwarded-Encrypted: i=1; AL+hErHaM26ZCS1MvKI5alPNm9IFMC+ZZMqSdQ88zZ7MzeRKqaZm7Eq27V9nJLWrcBQQTX4v9E0dwS2LWNg2Sg==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8YgAkvRGZRhMZwJdS4U8tZSuidK2HYCGHbFbt5tr8H9HuV9nW+
-	pAYM5HibthhNMQLnTZ8RMzj018xHH25/bRbsDsS7Y9AcL0Z6+Qn7vi5EJ8Kc9vqjM2Ngks4uOVa
-	0YC+SX2EcwbdMRW+5a4GqyTXhnlq2ytA=
-X-Gm-Gg: AZFdTZcwQewM9A/VyMbMFRvMdkxAFAuJaKBd8aFZZ02iID2tabuBfd3/6shJx3fwuN3
-	7WnwM3Rm/cCkN93cCVxuGyKBQkk24s2ZNL1GJytNfrF4Efbq1uKLc72uGognmLL/GbLleHtvBjq
-	t4J/duFGdlrtlhC+YUAN7LtMW13iVNKbOyqOILbJ+pSgDKbqxsNNOcIADmqCSGIk7qgDAQmi1lc
-	OFZ1OJoWGWjkrEHvsr7nwob4fLROWEH69Ej8vohBxs2NNHLTauStr3587ew9b169UGEM80qvo5u
-	Z+0bg6OjJe1pIETgyxoq6IuoqS4JAJBoXa6mLF4A2eJi/YQ4FvhRntaOOtaGpSLn8a2ppl/15fi
-	agmi9y/LURQGtE7G4WrxSXVS0vqLXREt6nW17JTMPIWmyqbAIoHPhE6TxHPbjNTrzduvyMSg8ss
-	PJM8jvfuOxoTU3Gh1YyS2DNZmQ0XSW0i9cOEMC
-X-Received: by 2002:a05:6808:250f:b0:564:57c3:2b28 with SMTP id
- 5614622812f47-57a095fcf70mr17846706b6e.8.1795766981639; Fri, 27 Nov 2026
- 00:09:41 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.a=rsa-sha256 header.s=s110527 header.b=V4DWH0yz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=z2
+	WPS4JyLBQjVa8az6zNUmfoJeGYnzi48maeQui2YGk=; b=V4DWH0yz4Hxc2E44OV
+	3qnKP624PPmfYc2UKZj/j4RHu4IvoUIlpmO4VdqRjF/UWsiC6ipP9NCGzYEstCXs
+	HCFGgJBFVTQQZc0ZdJmp4U6pUC/wM8d+QVCuYrTD8zDZT+VZwOIZN47swrwxwiTp
+	PQuOVlTqiJeXWHPT0Ss5MOh1Y=
+Received: from nzzhao-ThinkCentre-M760t.mioffice.cn (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD3Pwd_OglrliZsEA--.60259S2;
+	Fri, 27 Nov 2026 16:08:33 +0800 (CST)
+From: Nanzhe Zhao <zhaonanzhe@xiaomi.com>
+To: sashiko-bot@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Tangquan Zheng <zhengtangquan@oppo.com>,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Minchan Kim <minchan@kernel.org>,
+	Kairui Song <kasong@tencent.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Nhat Pham <nphamcs@gmail.com>,
+	Usama Arif <usama.arif@linux.dev>,
+	Yosry Ahmed <yosry@kernel.org>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Chris Li <chrisl@kernel.org>,
+	David Hildenbrand <david@kernel.org>,
+	Ying Huang <ying.huang@intel.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
+	Wajdi K Feghali <wajdi.k.feghali@intel.com>,
+	Bala Seshasayee <bala.seshasayee@linux.intel.com>,
+	Nick Terrell <terrelln@fb.com>,
+	Barry Song <baohua@kernel.org>,
+	Bo Zhang <zhangbo56@xiaomi.com>,
+	sashiko-reviews@lists.linux.dev
+Subject: Re: [RFC PATCH v4 1/4] mm: zsmalloc: support objects compressed based on multiple pages
+Date: Fri, 27 Nov 2026 16:08:22 +0800
+Message-ID: <20261127080831.3599864-1-zhaonanzhe@xiaomi.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <sashiko-outbox-216088@kernel.org>
+References: <20261115024455.1465726-1-zhaonanzhe@xiaomi.com> <20261115024455.1465726-2-zhaonanzhe@xiaomi.com> <sashiko-outbox-216088@kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -105,50 +86,177 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261126231706.1303486-1-sashal@kernel.org>
-In-Reply-To: <20261126231706.1303486-1-sashal@kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Fri, 27 Nov 2026 02:09:30 -0600
-X-Gm-Features: Aa3M54o9OdJEVwey50VSDsmvCuHgnyt-id-FpKGF0N0f936dbtzbMBmFg508QQA
-Message-ID: <CACVXFVPGY42hY9qF9485H49xh_ZQm5nPEU-hX2gNVeJ8QBKoiA@mail.gmail.com>
-Subject: Re: [PATCH v2] selftests/ublk: use the configured kernel UAPI headers
-To: Sasha Levin <sashal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3Pwd_OglrliZsEA--.60259S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxuFykWr4rXFyxtrykWr47CFg_yoWxXFWDp3
+	WxCanrAr4rXFy8J3y7Ar4kAanIywsxKF48KayrurWfuFWrJ3s2gFy7Kry3XF48ArsrA3yx
+	Xws2yw43Aa1rCw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U9XocUUUUU=
+Sender: nzzhao@126.com
+X-CM-SenderInfo: xq22xtbr6rjloofrz/xtbBowHLm2sJOoG5ZwAA31
 
-On Thu, Nov 26, 2026 at 5:17=E2=80=AFPM Sasha Levin <sashal@kernel.org> wro=
-te:
+> [Severity: High]
+> Does this break compilation at this commit?
 >
-> With generated headers in an output directory, the hardcoded source-tree
-> include path falls through to distribution headers. New ublk flags and
-> structure members, including UBLK_F_IO_DESC_SIZE, are then missing.
->
-> Use KHDR_INCLUDES to consume the headers from the kernel under test, and
-> add the headers target as an order-only prerequisite of the ublk
-> programs, as nolibc-test does, so that a standalone build installs them
-> first. Baseline builds fail on the missing definitions; GCC 14 and Clang
-> 21 builds succeed with the output-directory headers and target liburing
-> development files available.
->
-> Fixes: e371b9d3368c ("selftests: ublk: kublk: fix include path")
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
-> Changes since v1:
-> - Rebased onto v7.4-rc3, where 3197517875fd ("selftests: ublk: fix the
->   build and file offsets on 32-bit") touches the same lines. No other
->   change.
->
-> KernelCI's kselftest builds of mainline 9437ee8b6cf6 still fail on
-> kublk, metadata_size and ublk_cancel_ready without this, with gcc and
-> clang on arm64 and x86 and with gcc on arm, on undefined UBLK_F_* flags,
-> struct ublk_param_integrity and FS_IOC_GETLBMD_CAP.
->
-> v1: https://lore.kernel.org/r/20261014200144.1364828-1-sashal@kernel.org
+> obj_allocated() only takes two arguments (zpdesc and obj) and returns the
+> handle pointer, so passing &handle fails to build until commit "zram: support
+> compression at the granularity of multi-pages" reverts this line back to the
+> two-argument call.
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+Yes, patch 1 breaks compilation on its own. I will fold the mm/zsmalloc.c
+change from patch 2 into patch 1 to keep bisectability intact:
 
-Thanks,
-Ming Lei
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -1698,2 +1698,3 @@ static struct zs_handle *find_alloced_obj(struct size_class *class,
+-		if (obj_allocated(zpdesc, addr + offset, &handle))
++		handle = obj_allocated(zpdesc, addr + offset);
++		if (handle)
+ 			break;
+
+> [Severity: High]
+> Does calling memcpy_to_page() here trigger VM_BUG_ON(offset + len > PAGE_SIZE)
+> when writing a multi-page object that spans two zpdescs?
+>
+> For a multi-page class, page_size is larger than PAGE_SIZE, so off + sizes[0]
+> equals page_size and exceeds PAGE_SIZE in the first memcpy_to_page() call
+> (and sizes[1] can also exceed PAGE_SIZE in the second call).
+
+Agreed. I will replace it with kmap_local_zpdesc() and memcpy():
+
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -1270,16 +1270,18 @@ static void obj_write(struct size_class *class, struct zspage *zspage,
+ 	} else {
+ 		/* this object spans two pages */
+ 		size_t sizes[2];
++		void *dst;
+ 
+ 		sizes[0] = page_size - off;
+ 		sizes[1] = size - sizes[0];
+ 
+-		memcpy_to_page(zpdesc_page(zpdesc), off, src, sizes[0]);
++		dst = kmap_local_zpdesc(zpdesc);
++		memcpy(dst + off, src, sizes[0]);
++		kunmap_local(dst);
+ 		zpdesc = get_next_zpdesc(zpdesc);
+-		memcpy_to_page(zpdesc_page(zpdesc), 0, src + sizes[0], sizes[1]);
++		dst = kmap_local_zpdesc(zpdesc);
++		memcpy(dst, src + sizes[0], sizes[1]);
++		kunmap_local(dst);
+ 	}
+
+> [Severity: Medium]
+> Should these helpers use zone_stat_add_folio() and zone_stat_sub_folio()
+> instead of the double-underscore variants?
+>
+> __zone_stat_add_folio() and __zone_stat_sub_folio() require preemption or
+> interrupts to be disabled, whereas alloc_zspage(), zs_free() ->
+> __free_zspage_lockless(), and zs_page_migrate() call these helpers in
+> preemptible context with no locks held, triggering preemption-disabled
+> assertions and racy per-CPU vmstat updates.
+
+Agreed. I will switch to the non-preemption-disabled variants:
+
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -345,4 +345,4 @@ static inline void zpdesc_inc_zone_page_state(struct zpdesc *zpdesc)
+ {
+-	__zone_stat_add_folio(zpdesc_folio(zpdesc), NR_ZSPAGES);
++	zone_stat_add_folio(zpdesc_folio(zpdesc), NR_ZSPAGES);
+ }
+
+ static inline void zpdesc_dec_zone_page_state(struct zpdesc *zpdesc)
+ {
+-	__zone_stat_sub_folio(zpdesc_folio(zpdesc), NR_ZSPAGES);
++	zone_stat_sub_folio(zpdesc_folio(zpdesc), NR_ZSPAGES);
+ }
+
+> [Severity: Medium]
+> Can ZSMALLOC_MULTI_PAGES_ORDER=9 overflow the 24-bit first_obj_offset field
+> on 64 KiB page systems?
+>
+> With 64 KiB pages, order 9 gives a 32 MiB zpdesc, while
+> set_first_obj_offset() masks offsets with FIRST_OBJ_PAGE_TYPE_MASK (16 MiB)
+> and only checks BUILD_BUG_ON(PAGE_SIZE > SZ_16M):
+
+Agreed. I will check ZS_MAX_ALLOC_SIZE instead of PAGE_SIZE:
+
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -551,3 +551,3 @@ static void set_first_obj_offset(struct zpdesc *zpdesc, unsigned int offset)
+ {
+ 	/* With 24 bits available, we can support offsets into 16 MiB pages. */
+-	BUILD_BUG_ON(PAGE_SIZE > SZ_16M);
++	BUILD_BUG_ON(ZS_MAX_ALLOC_SIZE > SZ_16M);
+
+> [Severity: High]
+> Can the last base-page size class exceed PAGE_SIZE when
+> CONFIG_ZSMALLOC_MULTI_PAGES is enabled?
+>
+> Previously, ZS_MAX_ALLOC_SIZE was PAGE_SIZE, which clamped class
+> ZS_PAGE_SIZE_CLASSES - 1 to PAGE_SIZE when PAGE_SIZE - ZS_MIN_ALLOC_SIZE was
+> not a multiple of ZS_SIZE_CLASS_DELTA (such as on 16 KiB and 64 KiB page
+> kernels). With ZS_MAX_ALLOC_SIZE raised to ZSMALLOC_MULTI_PAGES_SIZE, class
+> ZS_PAGE_SIZE_CLASSES - 1 gets size == PAGE_SIZE + 32 on 16 KiB and 64 KiB
+> page systems...
+>
+> Should sizes for i < ZS_PAGE_SIZE_CLASSES be clamped to PAGE_SIZE, and should
+> the multi-page classes start at i - ZS_PAGE_SIZE_CLASSES + 1?
+
+Yes. I will clamp base size classes to PAGE_SIZE, start multi-page classes
+at i - ZS_PAGE_SIZE_CLASSES + 1, and adjust get_size_class_index() accordingly:
+
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -211,4 +211,4 @@
+ #define ZS_MULTI_PAGES_SIZE_CLASS_DELTA	(ZSMALLOC_MULTI_PAGES_SIZE >> (CLASS_BITS - 1))
+ #define ZS_MULTI_PAGES_SIZE_CLASSES	(DIV_ROUND_UP(ZS_MAX_ALLOC_SIZE - PAGE_SIZE, \
+-					      ZS_MULTI_PAGES_SIZE_CLASS_DELTA) + 1)
++					      ZS_MULTI_PAGES_SIZE_CLASS_DELTA))
+ #define ZS_SIZE_CLASSES		(ZS_PAGE_SIZE_CLASSES + ZS_MULTI_PAGES_SIZE_CLASSES)
+
+@@ -586,5 +586,5 @@ static int get_size_class_index(int size)
+ 		idx = ZS_PAGE_SIZE_CLASSES;
+-		idx += DIV_ROUND_UP(size - PAGE_SIZE,
+-				    ZS_MULTI_PAGES_SIZE_CLASS_DELTA);
++		idx += DIV_ROUND_UP(size - PAGE_SIZE,
++				    ZS_MULTI_PAGES_SIZE_CLASS_DELTA) - 1;
+ 		return min_t(int, ZS_SIZE_CLASSES - 1, idx);
+ 	}
+
+@@ -2305,4 +2305,4 @@ struct zs_pool *zs_create_pool(const char *name)
+ 		if (i < ZS_PAGE_SIZE_CLASSES)
+-			size = ZS_MIN_ALLOC_SIZE + i * ZS_SIZE_CLASS_DELTA;
++			size = min_t(int, ZS_MIN_ALLOC_SIZE + i * ZS_SIZE_CLASS_DELTA, PAGE_SIZE);
+ #ifdef CONFIG_ZSMALLOC_MULTI_PAGES
+ 		if (i >= ZS_PAGE_SIZE_CLASSES)
+-			size = PAGE_SIZE + (i - ZS_PAGE_SIZE_CLASSES) *
++			size = PAGE_SIZE + (i - ZS_PAGE_SIZE_CLASSES + 1) *
+ 			       ZS_MULTI_PAGES_SIZE_CLASS_DELTA;
+
+> [Severity: Low]
+> Does the format string need a trailing space after the third "%5u" to match
+> the header and Total lines? Without it, all subsequent columns in each
+> class row are shifted left by one character.
+
+Agreed. I will add the trailing space:
+
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -670,2 +670,2 @@ static int zs_stats_size_show(struct seq_file *s, void *v)
+-		seq_printf(s, " %5u %5u %5u", i, class->size,
++		seq_printf(s, " %5u %5u %5u ", i, class->size,
+
+> [Severity: Low]
+> The kernel-doc comment above zs_huge_class_size() is missing an @type entry
+> for the new parameter.
+
+Agreed. I will document @type:
+
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -1292,2 +1292,3 @@
+  * @pool: zsmalloc pool to use
++ * @type: zsmalloc type (base page or multi-page)
+
