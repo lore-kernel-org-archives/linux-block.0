@@ -1,89 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.175
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795742361;
-	b=lWb4ZSujzB1jxvxPe/nUF/R4Rvs//mg+c6gdZOggNQ/IjM1Uya7HGGXoiyUdGMxJi1mG
-	 XoW96VI/41regZ5L+eqtKxEtnZEBrD+93d62tMabt8W3rjA0JtRPDxA7yC5fkkvf0dNz3
-	 TdHJoCbvkirmWgz8ObW2clEy/zd1c3t8EqHA+nQ95ZsT0tHKd4bt9zeWRs/FPrSoNzYvu
-	 oVNhWeydnuUcVmisVPgqUjl2pl87ZBoEXh35r4mq9w8stMynwFSjOkzkSwVGhpJ+Q4gUs
-	 36Ik9xh0K03Dh6jfiOxQ5wKR33EiRqZBMbnSxc6+m6yIqXZzQRCw1aTlYG1uhsBlP7w==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795742361;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795743276;
+	b=Dh0WlSX3vw+0OVq038ectWO/1YWXBHuO1W5MsEcX+d2uNxiPGUGlAQ1XCJUpDT6hX7bW
+	 nqI0oT6te+t59cCwp+1AfW0MESAPgo30pJCuaZT7p2Ggy+w4bJ/QJpjGAjRSn+djNyCgD
+	 Ns0VkkZvsnbjnEXaQ2yiBoMAmalohx+HSQrN6JNutAIFClHUiM87Mu7Esh03UN4qdI4E7
+	 PkxynpVqvBGkliZpzspVnws4G+ubDCvv7ZxgP2w6KBQtBKnfQuPTGtaG1ZTPkqA+XxiRY
+	 cWt74zGkasg93zR9vDdrL87Uuq7lU/wHChoCCJHzM8hIkgC1GznRuDA+Szho1dl1UUw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795743276;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=9S2wD3u5c8Swjbtm9qjZJok1wpzb9JsdrrAA8lW58GI=;
-	b=t9vHrjVZxatOeoDsV0Rpko+agd/G0UKbUnNp5FUJ5gvZQL7hfnoBSwd25G1s5CTQfj2S
-	 4oyFA1yI2QsOafLEmWP2RYLAtttOEhfjvRea+kZ79A/mC/4lpYLAT/FW+vrMBzFKElxiI
-	 7AqZ9vEIuFm7HQvaFWQx+3YHyRu85s2KYcFgROjD4bNN1a9LSdjM2JEGgyPXt09WcyDra
-	 0guH43YJo/IIcxpGethiOg2119aihasUDHf7lVskMxmWDN+tqhx5Km5hheYRxU+73/vew
-	 Qr0kj/q0GVzoYt8vFhAIjS2qlMKY+/FPIn5WnJPx4jN8RfLOzLBWHrRsaeYoEJ45oWw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=gqesYc00;
-	arc=none smtp.remote-ip=209.85.215.175
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=hU2U5lk2837LuV+creZT1TNKTOC/1AOVTgldGOkkXaw=;
+	b=GVv8bgf9G5j1+7v2sUcMq+tGWMxgCtYZAaopFUd52Qctnh9kX9shogJLgvzRK9eZLXzA
+	 ckK+luo4uaDSXeYbvxUPYnzddV6+B7XpSOVzjkfcRM8kDPhTUCuQedSP0psjAag3JAiZN
+	 TkNyvae9ZM6d6LWKcUOHDQgIxMcaN1nO7RY1qsqAyFW0vdZzBsIVD4mWhOO5/h7ZwQGop
+	 3eqg3qqbDy/BlEUy7LP2V1CI996VE0XnPW1PGk6NaCivKCSHrRq3LtAAifMkkFSF7ma75
+	 wG221mK8WjhVMRjU/AgppS2+5GGvQ1SISqGWs+KKUrxyXiOQvNB4IO6syv3wQKlc/nA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z9jPlAPf;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.47
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC60606A32A
-	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 01:19:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0FC60606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02E9606A324
+	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 01:34:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C02E9606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=gqesYc00
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-cde827b7b95so2419177a12.0
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 17:19:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z9jPlAPf
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-9213f004a14so93985736d6.3
+        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 17:34:35 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795743275; cv=none;
+        d=google.com; s=arc-20260327;
+        b=DcDXPoE1wQuone76WIBO/1qEJiYeaTWcf6wJ5F16YYriESSZAxdKnsRO3NQtl+QxAR
+         uLe5FIIT55F7VPtLdzB15jUktSl8NZibDU8YjeIsD0dUpLq8E3FigaE0Rwstn5YGY7aZ
+         GEMTwo0CFQkK8S14d8WNHLeIHuZcZTngNLeg1gAUINvmlH+3AT3sNzcLt3GLrt4yaglP
+         6myUb1q3vGiLOYKkRgHbM//6GskPGMjq+49gr7x7qu098WdvmcKqlRVJVPtgCWtfmFrn
+         sO4s8DewTb5lj/yWTc/bAVJdycqkClHNhF8cZr4PQDucbSUFdhHrRonUSxhUlKP7gxV/
+         JIyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hU2U5lk2837LuV+creZT1TNKTOC/1AOVTgldGOkkXaw=;
+        fh=Xh/6nyMYLF9k8fXH9Z0GOVRhvaq83LM6i0omeFFr7sk=;
+        b=HRIuk8EOZnRmH4UwSR8uTJFSfv5kplipX99OXVMvLm8yxIVCmL6G6pFSmQyS8CsXiu
+         Qzx/olKLq7VjCglUM9tGiV1ipf6lNp/J3EX7+AC3z2U0O2DLE35wvU3uSAUeXeM8tLb6
+         P1k1SoHSF7xFCSqJOpJj+pPHk2Bq20i8gtH8nuGz9gqs0T01aLHEhno24iqMisYm0s0v
+         KjrFCXNU9Xfdsfcuf6tbRZrfcaH67jPGCOqlhQ+y9KVSHeuyoStLJw+D0UWKUr1j64tf
+         iFknvCgDp1RWkZDERT0fMvorzVnEZnEs1e128IYZs1kcuwTgEixDTs6lZSnBDTdb9JiC
+         KnvQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1795742360; x=1796347160; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20260707; t=1795743275; x=1796348075; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=9S2wD3u5c8Swjbtm9qjZJok1wpzb9JsdrrAA8lW58GI=;
-        b=gqesYc0000eL7XF1wi7BtoTw2Ip7GPQcmU04rUbun+G8KmplMt+t9cAguF7JirI2RI
-         ONKpvLSgAVZE/I6dak814vwqahXhxa/KEO1a+PWxcLPT717PCTdfIQ8w4TuWM/Es+zoi
-         vs1Xvn9hM75mbx+7MkCTeuWnQH5nf1BYqH/yo=
+        bh=hU2U5lk2837LuV+creZT1TNKTOC/1AOVTgldGOkkXaw=;
+        b=Z9jPlAPfbk11RA9ZLquc0hQutA2zNbigq3YWXDATzqziE2qrm0/T2BCT8UE1dGGhZv
+         Py7XYzq309HhSZvBcQ6Z3S/09YJH+SoNOa0amq9U86WBx0G1Q7bj+UZFv5+oVbvqHcdG
+         91JJgW0Qc7j6CpnhiO7VlylYkVuWWUKRSJYN/IFA2jPIdpgsns3PpwYNKs1kHTm/KPwM
+         Cv+AGWCnatJOXWoBwMes4DY3EgADioFGvE8nYqS8udCNcXaVnp1XFqJcCEBeorvGZmwH
+         tL9onYYGc0c8U+bAgZay58nUbfOIz6/7h831VhX0qxuN7J6FQqpKw888dhyp+jQsfiIm
+         sjdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795742360; x=1796347160;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20260707; t=1795743275; x=1796348075;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=9S2wD3u5c8Swjbtm9qjZJok1wpzb9JsdrrAA8lW58GI=;
-        b=v06cTSsiK/6ou2/8XHxSwrZujOy3RlVTrYFzWwPpjRYGe50WbKHMhec7tjavSJXukY
-         MPoSo7cinNHCz+H1+qOLv95MgRkTTbo95qSctdnaGiqn8kAableoQKdyH/aA0O6NlMXf
-         z6g4uXivSdlo9iam/iZt2m9ERVMNHnMWJsLUNWcSNxbzxTpW3QN5zWZjJAlKXsx3Q0G0
-         spQRCF0IJIaV/fZ/JXo2lz1N8XjRWp33voLVWTGNBGfSfwNWYktoekBzmKTeK2a+2n22
-         QNEMDw53Ej3m97zagRFPu16cSocSt2QhckQ/hUfUwZs4JA0pOSwTb1xnmLunFTULP7uq
-         7RXQ==
-X-Forwarded-Encrypted: i=1; AL+hErGfJvDinR4JGtZxkBKMa75joFIl2vT0T6NQmUFeBbjCY8Uw/uLERHWMOnFbf9jRDee+E8Sx7MYxUDf5Ag==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9Domfvc3XSPmCMSQIEI5V9C7+2uUgC6tJOmViFDcbT/AOzJqqB
-	9pz00agvIr27JijtQtG5sytaCbl+3mDwzQGMPFQjpNwy/SNlT3pyFrQR8IgP+vbVyQ==
-X-Gm-Gg: AZFdTZf9NwifHAdzzmpCUCZBxDut52FqZjao2R3p+Rwbb0beBLGwMIbqGN7UK3MU2KM
-	Bx78wjxUk6owaQgIzenld71LG4e3R/+a356f0OZFIGxHKqCmmGrSErxfpaqUDhrYejIMwjSkOlC
-	IxQWEpVF0yCbKfPZF+u50ZivtNb+xGNz8jCJjCkiVZx4vWbnLWSvJbf1CaPGcgSoiGyIxMA3qkJ
-	YuJlL7lwl5RMh4Qe6bjgG9EPIdk1U3G5UCVubJASkDUpMqn/WD6LH6yGR/rWQuPMy9LNxqnZbWB
-	/qIDLY2tZs+E3QdXYil9DsIBZ/nrh+vCNOwIMiS2BKOT/iyEvR3EOoaLgo72WPBaztAJmcWbrlo
-	VxOtlhFdOwDa0gdr3xuzIMdrmhuEQWjQ3qrOdaV/2Evuipb++vmVds58jRDoul6H4OsBDvDAERJ
-	MCyIkwcoAqJSkc5QPJ5hjOGujCTxF/DopwWhkWc08C0OvCokL5qdmht/RQXb2zT6XUBgRXupHHK
-	BQRRwc4DJcd5MVEVFX9wtl5T4n0UEEAzKIHuqjM6Q3BBn9jOach5wnJa3sYbF8i0iqut1KFcIXO
-	oiOG5TLA9DhulDAkyPqcU7y1v13HHFCPwjxfc4dRnkYuQfEEXpkjjpu0qzdjjEdJ3FZY
-X-Received: by 2002:a17:90b:3f0f:b0:3b4:393:452a with SMTP id 98e67ed59e1d1-3b41c9120c3mr23694154a91.23.1795742359875;
-        Thu, 26 Nov 2026 17:19:19 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:5bf8:984e:5bb:e51d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b41ad0a33fsm35954294a91.6.2026.11.26.17.19.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2026 17:19:19 -0800 (PST)
-Date: Fri, 27 Nov 2026 10:19:14 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Artem Novak <artem122novak@gmail.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: validate decompressed page size
-Message-ID: <awjaHB2ugCG_F3Io@google.com>
-References: <20261127004411.109585-1-artem122novak@gmail.com>
+        bh=hU2U5lk2837LuV+creZT1TNKTOC/1AOVTgldGOkkXaw=;
+        b=nqBIpX61d3OI6d+en5fsO7ttDKZN67B5Jf8tV+HmlLWM6Ht0tsfiOgFMGy4+EQ3scT
+         Gt1sWCwpaCbfeWwxBQNhsxs1R8MwaUL7yS4wJnES+CLPMy9gy2dlUyupf8CCEJdhwg8y
+         HaffnjDU62LV/fuVAJWMz80MOPgAifGUPpbNQrZZeKuceFshOcsLIpNUoh3fBZC7NSPe
+         Dp4addofNVdrh38uBBr/ws2P6ZPO5nf+ByfKKFjchTTaNiQ3UE2mRs87ts6FMynFdkkv
+         sQDbKbFOd62MV3WIoIivKGBE4DvlS0FIRb3K52fYYpLTPn3MHD0NiFT361B34F61mn/m
+         NBnQ==
+X-Forwarded-Encrypted: i=1; AL+hErESCJt98m9aDdSccfKCuQ4kS77vgnyxMzfkXUPlErl29lxJ+tCZV9xUEKaZX6HL7QI0JGvoU8VWjbv8gg==@vger.kernel.org
+X-Gm-Message-State: APuU4Z9P+m1ylVPBqQtaUJK7MXNxXos6muzXTwdlk2/v/enk1lqD2nJg
+	JUHkJMr9ES8uJiEk6wkO2Ux1C7h3gE8rrLjCNZ/JGgGD+G+XMl16XI1zY6Ows6lqlyiLXAzv0qz
+	uZF1cVVq9dCPNjAvMogTClQ1Y6OfKxu0rDL1aZLCq3A==
+X-Gm-Gg: AZFdTZdKixN0zc3T5LubIbY/yc4TFn0TF9FmcZL91RywWi1PVr5A1EslCTDDW2yLFZ9
+	8ajvzeU1v6ongndXQaU5BoaDZVvUHnsrNFhQh7FI/ijboICNRBzfolxMtho1o/ENGnzMXSv73M/
+	uPWSFohexAqpwPvQIuftCmW51vE0b5N33APQzC244PuB6bn9KF0XLpAm9bd0hn5mvDSu61S71GY
+	KvY9q98p4pspbNCoSu0RZL7tIaQ+oiZpiZaSlFQodd/6jSt5EUXOD/UepsrR+OrtH7uIju9eXpH
+	7Mh/U10urPls29qumgs3jvYVkab6A9rH6tU99N8J6YD6QlDMrQ7y0rNhXoMNENTBateskAXZKYw
+	eSWtqOTIy0Dax5ZlD74y3GHZUchCGJCFAipFz
+X-Received: by 2002:a05:6214:5f07:b0:921:3867:1bb0 with SMTP id
+ 6a1803df08f44-9214220c37amr376789406d6.24.1795743274810; Thu, 26 Nov 2026
+ 17:34:34 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -93,22 +104,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261127004411.109585-1-artem122novak@gmail.com>
+References: <20261127004411.109585-1-artem122novak@gmail.com> <awjaHB2ugCG_F3Io@google.com>
+In-Reply-To: <awjaHB2ugCG_F3Io@google.com>
+From: Artem Novak <artem122novak@gmail.com>
+Date: Thu, 26 Nov 2026 19:34:23 -0600
+X-Gm-Features: Aa3M54r2A9iEKs22yG_w3K42aATDwZjN-MFk4H_IHS7ixiYAkVkVNmajCvdJ7Gs
+Message-ID: <CAPufuhb9txcosy48VXtfxwnC7Ct448J=_HbR00JnZR1QG-NfHg@mail.gmail.com>
+Subject: Re: [PATCH] zram: validate decompressed page size
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: minchan@kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (26/11/26 18:44), Artem Novak wrote:
-[..]
-> @@ -185,6 +185,8 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
->  	ret = comp->ops->decompress(comp->params, &zstrm->ctx, &req);
->  	if (src)
->  		kunmap_local(src);
-> +	if (!ret && req.dst_len != PAGE_SIZE)
-> +		ret = -EINVAL;
->  	return ret;
->  }
+Hey Sergey,
 
-Yeah, I don't think we should do this.  We only ever compress PAGE_SIZE
-buffers, if some backend decompresses it to a something that is not
-PAGE_SIZE and doesn't signal an error via "ret" then it's a bug in the
-backend and zram should not cover it up.
+On Thu, Nov 26, 2026 at 7:19=E2=80=AFPM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+> Yeah, I don't think we should do this.  We only ever compress PAGE_SIZE
+> buffers, if some backend decompresses it to a something that is not
+> PAGE_SIZE and doesn't signal an error via "ret" then it's a bug in the
+> backend and zram should not cover it up.
+
+I see.
+
+I thought it might be worth having a defensive check here,
+since allowing an incorrectly sized result to propagate seems a bit sloppy.
+
+Do you consider this useful, or should I rely completely on the
+backend contract?
+
+>
+> On (26/11/26 18:44), Artem Novak wrote:
+> [..]
+> > @@ -185,6 +185,8 @@ int zcomp_decompress(struct zcomp *comp, struct zco=
+mp_strm *zstrm,
+> >       ret =3D comp->ops->decompress(comp->params, &zstrm->ctx, &req);
+> >       if (src)
+> >               kunmap_local(src);
+> > +     if (!ret && req.dst_len !=3D PAGE_SIZE)
+> > +             ret =3D -EINVAL;
+> >       return ret;
+> >  }
+>
