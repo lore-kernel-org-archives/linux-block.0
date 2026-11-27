@@ -1,13 +1,13 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.209.21
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795820514;
-	b=4+ySV+pYth/6CQKYSwIyKlt9lQ504/b5Oz3gOg9KMFVTORhSNDuFKbXLOjdnkG5ZD7YT
-	 Zf+1SM+jdCdcAM/GyA6j+GJ38Ye8gpwvrowaFcaPQsL3G2yde5z2mNL6HkwNGnKZfHA1B
-	 b9pAd01dNTlfNSTlX/OrvMgopeCd5fGeKJ3SpPI/B9YovFjm7VplalsQID8STAOalz4EN
-	 aqGoCww3vaeFHKj7BTEkygn89mQhgTHb1ws4bu/e2doAf/Si/+SorTyLSo1O3wDgAKWCm
-	 Vl7b4vUn6dpxtMisyZxlXCcdf1O5IgSdnKorvrdTRJrycaieI5uL4lEJ2jE/sxJ268Q==
+	t=1795820521;
+	b=cUGldo12Mwyt8SBIBAIvr5gagtzXSiFDyD5P2wmSf0u71bHj1FkOFZqpL8M82kMyDtMs
+	 eiXDDryP8Zp3QPy/CgU4F8ftaJhNv3E3mdytaLxalUKPj19ht1/RIcOXCUneCkCmKk1Nf
+	 pqBIoxO+EohC2fBfzJRTF4mHKNFNaLB9+T2eaQySQywsIoPjLyYlpitRpnRq8i1fVlORc
+	 6Sya4LMP0VlFUs+1PRcvb315Gr0VcYgxdJvEJ32K//eksWEwYd+L7Kbb7h1Cd1M9zcjg7
+	 AJvw0V47OVrqreH4GehS3yt3ZI/mu5k3dOXUvLOnI8bKaHIplF1WdVjIwbva/K7wCXQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795820514;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795820521;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 Content-Transfer-Encoding:Content-Type:X-ClientProxiedBy:MIME-Version:
@@ -24,54 +24,54 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=5LdIclwL+xLdb9Xm2DjTbHZfjZsM7rhR8+SV2mixmrU=;
-	b=LZFfFtA26Q6kOYliLx1s6QU8pFLbeeLgGzwsLax0OoVW8f6eM5aeKctE0daQ5m9E9CDi
-	 D5MmdNbH/Xdk7BaD32qQECg7j0WxofXxJPtSSd4lRDzxrpnJjW0jxfxPD2xugbdNU5n0i
-	 CheJQYll8DanqNfZup9YyzbrfIvhRR13VTNc30cVxnpXcHZQmWa0c6+19ZxXzMGxCiV2w
-	 BG4omzyPGB9lDNj8TYCOT0KvcoT2/G3ZHW91kQ+4MRtwEe+cHTwZ2VRGrTYpF+rZSBvKY
-	 FMiYRj9ay9RSuB5rYwWodvN4Aq1zyfqEOmNwQivHYtmxuTncm/lUexJ5WrJsUSa794A==
+	bh=XsH1WKtrnwQZjeA+vFe7DopHLw0EI5pezzqohdo1lck=;
+	b=p/UhdzkIY0UkrKA3eE3pWNyQULAw1I9GBrsF7/VRpIrPmcgAXIv1QuwjAl1bT6JfJJok
+	 YzuEk1wSe/M3mgEXT2YZkNeE9sBuy74gNCqUDLO0KcfF41QoYeKxQlLcGUCIGcBJGbtET
+	 6gdRy7ORo2yriKsqQ8BCJZDS8sxyMqjf6NR/QX8GEQj6mxEWdBxb8gYs9Q0IwHknPYYBF
+	 eqNUmeC66EzuWAYvq5S5Kxz1/RX95NlL5HlXRVuhHBJCrZ/R/cmj4happbMBMy5U2aZkc
+	 Xel17eAPBikVpb3QzP7924V2wHJIOKsdHMblaU7+mIPeIPusVvNl8yzhqKTDXKrzgLw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=nvidia.com;
 	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=Hj0dEVtF;
+	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=foI8rJbi;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.209.21
 Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012021.outbound.protection.outlook.com [40.107.209.21])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92A4606A31C;
-	Fri, 27 Nov 2026 23:01:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E92A4606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B1960A381E;
+	Fri, 27 Nov 2026 23:02:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 15B1960A381E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=Hj0dEVtF
+	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=foI8rJbi
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TiIcy8txKfWUujE96eQ6dqqmy4aE1hDxo6H3qWPo31YF5+NZ8vE4uY2pVbnVWVQbrJPxtyuD+hNXVGxxtwGKAa+35CmLdk0T8AJXmjgg2VM/ZfqoH7PMqzDH/qJJj4b8QX2p7buusdlx6YNWZEg8gliZHsKwo7gsDgR22P8FAXOKjwnG8pEEdkp5OFkBxAJB5sJzfY4iGJDQlyRNUoPva10diX9mOYUxHktbVK+C026LHOqsjEI9VXRA0KdBhLWBD4uNvOJsgdMJFI3+qGH7tBgX8CgE8KItbpHdy7c+q8NzkatmYogL57q5ArIi3x3aFRKrHuM2gC+kCw6x0Fcqsg==
+ b=RxMYXKpWkQFvYIEOaGp/oV6dvQ8SCW/UqtTtHQrHjesF5eiPtAxYrrZVmEKjye+lHuC4Z2OcMwOZ4jsp+ty+zCcNDesl+ovvWimiE/PA8txBcg5qTnQ42DXn8rOE6U+qaoamDncpy6zAaW58OrJ/le6R9yK7AA8SNomF/UbA060D3P53trTzQj5lQ6IGz2fTlf1HVQWIq6AN8fkB4HIVMDiURuOCoHzxIcbGLHMsCWhrODCdYnhlsC2i83c/nzt8o73WYhcGy9t4dh/c7xmxez5haRlm6i63E9kDJ81WXqhLUctvaDVwnN5M+u0QAV+QAkB04tMmYV5YvFbSVXImxA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5LdIclwL+xLdb9Xm2DjTbHZfjZsM7rhR8+SV2mixmrU=;
- b=O6j8pWY1bkFDzdHCJowZvELMxpSaSFJdNiyxWN0yDRHBba6IvvQTUlIkYxfYSgnPtbZ7fuL+9lhRYM54G2HGSl1oKqhKw6FhNyNo9JyYYiRv+GiLRqHylxFvT2WuUpVQqIhW5uChzsIUnRktAU4gKHhif/9TbfkPx4YRlEge3S6n1hGYGpc2ECDL7Gbg66MTOZhbqQTDkzvBqG6aoIq8W26Nho81LESd6joEKlEcKz0v2SOAA1+Mw1qMI1muwsVU1a9zUnxYzV3Q0efmXfKgKczAeW7KynH0My4ZyyuoQ7cpZCA0owpENnfJ7Nb4/DYGOWj4lzwEngNhK6N1iaTZlA==
+ bh=XsH1WKtrnwQZjeA+vFe7DopHLw0EI5pezzqohdo1lck=;
+ b=SMWMQYPVqxpl9XnEMEFIFXH52ANOPfB65XZoBJ68d+ByO4UAvL0OSYnj8t/FP4As6qBGxNRe80klYxYiHjOUyrOAYWicumaYBuyUQmUZVLbzmzyqBcA1rQOT2azaXf9oPHLStmgZ0BgLtB+o6AkTPYxWWVEsGChdu3mQjv50e/LBnnrTBSkhtOT/1iVW0fyEJCA4lpnI+McfZCUyyOiKB3z2R4wmRuOpQWNbiCZSd+ay1a+tAckVQTmaVqv9r7iRp7EaCKrcRTLGTbmp+GN1A/v8krNqU8GZQTn7caRZw9m4tJMPHU3g8yk1sE4pRI9s/wxH9gp+G0dPHCLqmcnV5w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5LdIclwL+xLdb9Xm2DjTbHZfjZsM7rhR8+SV2mixmrU=;
- b=Hj0dEVtFNzD4492YR5xQsssfdb6mw/ou+ypmsIne1PijjZCCts1foti3qNtRBNSBdqvcq1eNSr7q+caJWlno8ijZ6E7xjWrPw4w8KccwNIJBmxgBiyPGYmGFKpdZrqm42hCWOUsGmYCdyXHLUysMm9zpDrslVTWLxzBtlAzkqF0btfnF6R8iyAjVWZxswf5aLZgINTsqpCfS9p5pDZbdARxS/wXS2RAkpRGjdTjfwBmLVu1A5xjOntO/GkipxWe/jeDPmYAFY+vvwGzri74zyq1FwsCkZ8vOmjHNs7JNewIz7IYZ+QpQRNmqAcXSTitppFrUxFpWM9ST0EmAuz5f7Q==
+ bh=XsH1WKtrnwQZjeA+vFe7DopHLw0EI5pezzqohdo1lck=;
+ b=foI8rJbipfTxjhOsX0P+HYJ5zyb7Zzg+eVRGPLb/te1ZxF08uJ87d4YX+Bx0tBKTb96XjTK6Bsq7hVYPednqiudgmUdvanmYnmQh0VAg0Sqf9A1B73f3Y7OCXH3Q7FjAs0szjANLWuNxWA/LQi/5o8lFh4+GUP3yryI3hGl8kJC8oGKbvj3FjHQJYqF7Irp+FrwrPIPAs8nBgssVJXS3gZZo94Q2HqtjK0MTHtU+hUMWrSYLR9kbv5PTz6FUNzKS42SjvvXhtk2qZGbC7kt1oXbZn4YpvM+1AxxZYUINabGp+Mt7WUxPY+CqvPu3fXx1F20Itts6dwm/hCmzLegrXw==
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SN6PR12MB2814.namprd12.prod.outlook.com (2603:10b6:805:72::33)
  by IA0PR12MB7505.namprd12.prod.outlook.com (2603:10b6:208:443::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.662.11; Fri, 27 Nov
- 2026 23:01:49 +0000
+ 2026 23:01:54 +0000
 Received: from SN6PR12MB2814.namprd12.prod.outlook.com
  ([fe80::9a18:413c:9702:8f59]) by SN6PR12MB2814.namprd12.prod.outlook.com
  ([fe80::9a18:413c:9702:8f59%6]) with mapi id 15.21.0662.004; Fri, 27 Nov 2026
- 23:01:49 +0000
+ 23:01:54 +0000
 From: Yury Norov <ynorov@nvidia.com>
 To: linux-kernel@vger.kernel.org,
 	Andrew Morton <akpm@linux-foundation.org>,
@@ -117,16 +117,16 @@ Cc: Yury Norov <ynorov@nvidia.com>,
 	Wei Xu <weixugc@google.com>,
 	Yuanchu Xie <yuanchu@google.com>,
 	Yury Norov <yury.norov@gmail.com>
-Subject: [PATCH 08/11] mtip32xx: switch next_online_node() to runtime nodemask length
-Date: Fri, 27 Nov 2026 18:01:25 -0500
-Message-ID: <20261127230128.111933-9-ynorov@nvidia.com>
+Subject: [PATCH 11/11] nodemask: add cpumask-style operation size bounds
+Date: Fri, 27 Nov 2026 18:01:28 -0500
+Message-ID: <20261127230128.111933-12-ynorov@nvidia.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261127230128.111933-1-ynorov@nvidia.com>
 References: <20261127230128.111933-1-ynorov@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BL1PR13CA0295.namprd13.prod.outlook.com
- (2603:10b6:208:2bc::30) To SN6PR12MB2814.namprd12.prod.outlook.com
+X-ClientProxiedBy: BN9PR03CA0698.namprd03.prod.outlook.com
+ (2603:10b6:408:ef::13) To SN6PR12MB2814.namprd12.prod.outlook.com
  (2603:10b6:805:72::33)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -139,80 +139,353 @@ Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SN6PR12MB2814:EE_|IA0PR12MB7505:EE_
-X-MS-Office365-Filtering-Correlation-Id: 45cfd8ba-4f86-4232-98a1-08df4cda6ac6
+X-MS-Office365-Filtering-Correlation-Id: 3f5f7e50-0df7-4416-6d2c-08df4cda6e23
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|366016|23010399003|1800799024|376014|7416014|921020|10067099003|56012099006|261026140227099003|261028144727099003|261021121427099003|261022105027099003|261021123027099003|261102123227099003|261009223027099003|18002099003|22082099003|11063799006|6133799003;
+	BCL:0;ARA:13230040|10070799003|366016|23010399003|1800799024|376014|7416014|921020|10067099003|56012099006|261026140227099003|261026121527099003|261028144727099003|261021121427099003|261022105027099003|261021123027099003|261102123227099003|261009223027099003|18002099003|22082099003|11063799006;
 X-Microsoft-Antispam-Message-Info:
-	WBaaKObIIjnHpbix3rre1aZEKkRpm82vs791DiYpjhKny2zIAUt6VPtYXYNr2qgHaEBxIMXhuflCoUCsa0iK+6aReyK9ko93Rf5dKi8rxhEAov2KfHyfTNy2zKqM60GAlIekKYup+2Y+YGUBQeEsLc9xI5uZKXVAcAIltonkTnaM5tVjJ1M3VRN/7Acdwhbl7+cY0JO6SWShOsqS0YwxaA6fCqOqNGYnkJt7/t6vtXEXoLeO9EjT+YZBStaB/rGjLaTR0wV6DyZarXeSv3m/hXluQfJyTcuLlcpbOtRJFlxp7XR1Kdq2QQBZQa7tcanlGfSJtu6d76QFci880bKwuoMFDWpwtgcHjfIT5uRNWnSIXAgTpgs6I7v/ePP7TCBkv5//kV7rQt4XC8+iydp8QX96n7f1PSlqqlDeG77ShvDVFkTlmUJW1QM0JbMn06N6a5Gygt/NDXYDOEMf/KeC1M6eC/o4w2HsRrXMJM/Vyree2CsMSlrfHu1hced8vQ1/dxElQ9SkZglG4U9VbHHzr0Ot+V6WeN3S2e7Nh5LEUQOg8NIrxX+Egwi2aVXwTbPGtn3jbByL+yxJcBmpvCtba0gJTi4vcIIZon5BpOwJTJMdWG7G4dngInfqz8Wugl2CcAvOwcdEXP9gaPP0jRGRaeOW+bTZ1vIkPoKZ6dMHSWFUg37g4X/Edw5Vl3qJYfHpztAnDNdAOkM15J4Y8+hPgw==
+	yrdn2LVXZ7jitEY/hB+EFcnScIs8CbW4nrqsXmFuoTzglBvnsRbWiZVt2HpmwDqaptK+Dj4e6ijqEW03xCa/6vgIWKC/93MBF6t56kqoJTDWoEOCFZIhNNdydSgrCNCOkFQtIWVZW4kbglMRDPtM2HlCAPlLxBB28NUIJiYk+jFpE12MVA5QhVKituU7jPsD2VlxMF4aJ77WSNMMLisEO0NkUYVeWAGOUTmVqryi/2nVyDVghuFgbJG0vus1SvphIpIoUB9Ji8qfRgWEU/nDySQE3nEK64EgPpEfisMJ4tGHazC3iobNU7R5TC6tUDa+MgqgooMIdInxqOHr8WvH8qvgwh6kOHNpvI1R7934L1keH04goxc93YRdF37GAlbKqk1lht4/UsDF9Oti2Nlh1cm0Z7OS3KAP2bAL6MmCvS7jrrnM22QYinwQ3Edn3qBBTAkjNfUUoji7nK8PVnESsKrQ8154BZ/aEYwjST6cbWIypSO1uboNjpt+yRmwaIFHonuVCbbM/eQxtQEUYv0GtNGDd8mQbPNhcPFtRRcmqT2Si2Be345jQA0xlVLqGltBrTCk//L+Tc8m+3DdK4l29KnvS2oGugE+FCy+/gEzmizkJy4BhZiuDPIclsbKv1vRxidBrd9ICqThj3j7QLEktOniVSGpbHVDErxoOATnmx3PSt6jWxKdBpjTWGEvHPQIa/T3EuA8dikhk4o6/fpqfg==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2814.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(366016)(23010399003)(1800799024)(376014)(7416014)(921020)(10067099003)(56012099006)(261026140227099003)(261028144727099003)(261021121427099003)(261022105027099003)(261021123027099003)(261102123227099003)(261009223027099003)(18002099003)(22082099003)(11063799006)(6133799003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2814.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(366016)(23010399003)(1800799024)(376014)(7416014)(921020)(10067099003)(56012099006)(261026140227099003)(261026121527099003)(261028144727099003)(261021121427099003)(261022105027099003)(261021123027099003)(261102123227099003)(261009223027099003)(18002099003)(22082099003)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?GBPrSzxPykbd1Hr3ekzw+SwZhkuQ+1l9kM4EbhIp21SNwY6LJOfw+PCjxWim?=
- =?us-ascii?Q?Iqy4V4YijeieOaNnljbvp+Cw1l4uSK4hRNa4KmhSUdjP07nUuWPwI1hRRul2?=
- =?us-ascii?Q?3B+oF3xwfNmpYvRngi7pEKAdanfSv6PRpikqNLcaBoFWfRocM5736YYeqjB5?=
- =?us-ascii?Q?NKo1ZY6gLIezj4JLA9zwrRie5aCJua8mRGaU58F4DROKXavKuvHh0Uah7081?=
- =?us-ascii?Q?4uO6zyWRMmSWpkHcRvy7zxafETkKyWWfMkNLOCNnniUXBJ/auwFqI7M0eCBi?=
- =?us-ascii?Q?iZFlKZaEwcnOQ31hupYj8vdB6ZuKF7fihODeqLjrvS0U32m6wbvy4ma1af2T?=
- =?us-ascii?Q?YUWCzP9r0EDh6Pj1cuQZlrisfbwzVksfAIVqz7CmpAvgaSFfRxq6nJToJEUG?=
- =?us-ascii?Q?rH44BYxJTiFnR/a3PpO2VfvG2HgBPJdA8wxqxOtPpx7UE4PngFeCcdXcjMAM?=
- =?us-ascii?Q?C5eKXPhb4rClHmQGGhmcYYn369eV/sM8/VVfBEH+NmedrzKQWpDqrFdfDv/F?=
- =?us-ascii?Q?MM1JKT3brFb7ujDCkF8pQ2X3drl5mfXG9PFb9V3haJxa9G82438D1avHq3/0?=
- =?us-ascii?Q?PKN16NnzS5k1JRn/zXiuUyhvyAet614T3xfI0Ik3h5iyY5xXAjMwkfrRh87b?=
- =?us-ascii?Q?OHoamGvfoGtstoeuQoQPCy1badVkO36/AC9pjpzFPv4ms4kkZaovQBFu0xla?=
- =?us-ascii?Q?FB/xdfhgL96rNQ1tbcJuDB6/QPz/wHJglAwawptYEbfItVAG4rBfSUKl+9I5?=
- =?us-ascii?Q?Djam88KLtQcdUaICMRIvDJkCTPM09M8qkPs09J8K6NTADw0kXtP7YywPh7ge?=
- =?us-ascii?Q?M30bCgZb6gv1NTrF+GoVE7rPw1QAmzvqxlLCbgE2hKpNLXp2mv7sif5bmwsB?=
- =?us-ascii?Q?QTsgzxhoNdq1iEIJSghFgA+qg0hTvY17/V8TlOyE/p4letBpvxfqwpwYiw/g?=
- =?us-ascii?Q?nSN3bx0O7Su0dauQEwLW8BFY4n9MqiZjZ+vDvqKMJSNIArtbDQf9pNToPYkW?=
- =?us-ascii?Q?Voo2+cVZi8UJIk2nynXj20p8AEFXBYym9RG+XJCvXTzs+3cB9doqRumSIvCo?=
- =?us-ascii?Q?SwA+RvR4gvzZjHv3bXanoesyvsa19cqxQ69Bt+V3KJdZiAj37M1kNyIEk45y?=
- =?us-ascii?Q?1VsB/4IR8QptSHdkaNd2saDc6x26iVjGkCpvcIoZsQNrKDCy2rkDCSMk/rTP?=
- =?us-ascii?Q?jl97lJ8fu/xvItJF+C/7GaO2Y0wrpWO7BAh0FmHvY8a64+qHGBSUTXmPaGLb?=
- =?us-ascii?Q?+lfQ3SILEELswk/qALjaiLlfJ2g2gc4OW3KdKEByXYVjNvbP3NottmB6xZ5z?=
- =?us-ascii?Q?DoW2FQcZYFZjOT6Fyh0emQDJEoxV+SOZXJ+KuVHnpV6dmxdqAYrKj5pw4VJN?=
- =?us-ascii?Q?1MZZWdW+PPgdVPZHA6ZdbKrgH8D4QR1nansyYIVXqwLfWbYUYXi9iyYelUP8?=
- =?us-ascii?Q?7zmSyg7QGebfK4BbDvrsDmvUkAOG+td/B5+1h1QriOoKuT8c02bIbK8cx+CJ?=
- =?us-ascii?Q?RTz9xo/yVWfV8t3WlCbM4QVOF/Ev+7mC1JLw8Pf6rNA1RF7i+uwEb8b0vCCm?=
- =?us-ascii?Q?lVAkip8MiD0dfZZEpfBZYLcht6eMA40yzhq+TDaLUP9z9zqRHyFEYBkrPTSQ?=
- =?us-ascii?Q?VzbAN0iJ78nYfkgXCHz1l4tMTZP00dCs0irk/suWRmGuu1LhBn6DNdcrEhvR?=
- =?us-ascii?Q?hg1pclbbWcBRrgx70SE/rAa4C/sP0LCkZJ2CIhcit1hx0S/F9aBo/96rs4U0?=
- =?us-ascii?Q?fYKAKjLonktxQoB0HFqD9j4PI+1Faqgp5AHuMuel1p77hJz+XVWR?=
+	=?us-ascii?Q?5t5z9GTy3uCe0LSX9OT/dZ3DDrVcMVerCzL0ll2/RoEJwsZkiTcDBWB5o0dg?=
+ =?us-ascii?Q?RnKdRzmlUBOk7XG2VVSASC9wcULpAgXrYSsYbx74/avfE63HKVqs6xsMsDCC?=
+ =?us-ascii?Q?/t2aYREoDH+UQdUqv/GIjWbJhDE1sanKHtmClJNkcuz+c6Isw8OPxQfIavko?=
+ =?us-ascii?Q?9SHlMSm9/O8Sn/O7CL867dkP/XNwTAydEZBzrA0GP8xJBn6bu7KcOLj5bohC?=
+ =?us-ascii?Q?V0IKtmWiNoGi4YVeoDSmYOKlaRJVeXHgz0WxBIpLTRPq4icCBF8SjCz7iR28?=
+ =?us-ascii?Q?nnRERKI0W3Fzy24mtS2rlpLXImOdwoGq0CQyrysnoYZF42kCEtrvJCVkM8qw?=
+ =?us-ascii?Q?Nd2sJujnrzTB3MGArM0/oDwRAVepBeahsDjPQKzAcfLPGMPVtef5sQfbCW5J?=
+ =?us-ascii?Q?9i+mC0zcfSvGlUJ40zwotAtdxt9rspuMLJF9FiSdDETpPPf5juu8Fsmf16lj?=
+ =?us-ascii?Q?JFv+NgbKE3S6T4+negwt5XmNifu7yykEuypHYgDXCiW7FtwoXA+Nq6ta9HDP?=
+ =?us-ascii?Q?g42Y59DHn7u8vtk7O9csJvK7WguFNZgwD5dm19bCvNuLZL7SAQc9ADa7DEKY?=
+ =?us-ascii?Q?8tNaEToJAtZf2F5CgaCBfr1T+nafNnhMjUhsrzFu+GeuVOiHB21F/FGN8kkM?=
+ =?us-ascii?Q?QWEmbVrOOiX4fTxxBHfMIpb3gG2O99WNvayBB/OGeIhlAmFSWeyuHi0UNyOu?=
+ =?us-ascii?Q?8Si5Ls/B/gmDLZZ1fX4wSi52xP3v+2y/FiU+PVI6U5+ctYxu8/sF6EcTRSab?=
+ =?us-ascii?Q?gWEEYb6eeLhFzXB3D2bvqatkKgnBtzCmW6mO4NuutNqXmU5MKld7MNlZ9WlN?=
+ =?us-ascii?Q?FmvCWoU1oGf9OSyK1Cy3kPyykwYcpAYeaVCk9SAsg4qZNUgcpzVD5JHsFOIh?=
+ =?us-ascii?Q?PP+4D7U8EVcdea0nyTaS5aVdNw9IYMJbr5ZKjyAY2lUiz5IwrhesaoDHXgac?=
+ =?us-ascii?Q?8OzXgs4j5wZZXEfHRAErB/CQiyctmzb1N3YGWLVe6fvRWdirETGA8xkS6TmL?=
+ =?us-ascii?Q?CmquwqE6/wUbbzgUR1TBrlowAHGkFOY4Y5UofthHJzziVDEiUQwuUn46QiId?=
+ =?us-ascii?Q?xwMNc/jz7rqHBHL08fAyVqNJsxjsoA9ipf71569cAbIrzH+9SttMdrC+mH7h?=
+ =?us-ascii?Q?HnxxGlz86T8Gj8baTXvd2o5SgPSJTFAyQzVvOkKAuWhir7MA7Z5y9nqMCUmC?=
+ =?us-ascii?Q?K4C/iC9HFoWi6ysdd/I73X/u46ttUuUa4S60FuKP0j52H6k8lM4tuXahbO5z?=
+ =?us-ascii?Q?JBTx8MiM1pWZbJA7wrc12PuxJRAcbOkZjHmFe9pNLqh1YCkLnml5X9D+RIVX?=
+ =?us-ascii?Q?uYpikucxDW4W/e+IRLFzVgSeWtEqu3m+DEFWP4AnQL7AxqEQIqL7M6LRm30/?=
+ =?us-ascii?Q?Vu+ezQV1cITAav6mXBlN7067czGJY4W2ihqx9m4bMYhho6q/0AdolLoshJuM?=
+ =?us-ascii?Q?HFdu++n1f7iRpj3/rCbGYMnrjg8tf1zNwHWlwtDExECPcgOoahpnHR1dS5DE?=
+ =?us-ascii?Q?K6CoreJ7re7imuLKXgOx2opizUw+yY2a7d787wi6q+aFJngZtAI65RoVXbFr?=
+ =?us-ascii?Q?6PqMMGKudtVl2hq8Jo9VgI4OgOaw68dY8Gv6CmIZfGaTt6FemucW2izJy48C?=
+ =?us-ascii?Q?AzXDSfuk1Q0+IpXm10knRrFGZa+XSuPCkleYO0PP/7m5mjPGBUugFLtSQiIF?=
+ =?us-ascii?Q?Ix+FubuFQltVH7yRjyhUkY4pJOa43QhMM2Iit2bASXWVbkWKcZf7S43fLS3B?=
+ =?us-ascii?Q?XnKbAgrvqzKxAAoSs7ns4f70PVMDosmK4wnJsYEl9UsKA+fmMydD?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45cfd8ba-4f86-4232-98a1-08df4cda6ac6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f5f7e50-0df7-4416-6d2c-08df4cda6e23
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2814.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2026 23:01:49.0375
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2026 23:01:54.7849
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y85Iaz7QgIWM/FAw51ooaRgvncSiGtTBQE24pbKR1GpiGKpgJEpPDdFm2Gi+S33vFPHmYbhNVvxYKTEDyJZ3cA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: D/l9wJgYmr748efETGzCySesCAvBF22ZH1VpkNYTTsjQdlu6x6kOOCXfgbsnUZjxjNSQ+XHgkXB0cqZsqfGunA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7505
 
-In preparation for switching nodemask API to runtime nr_node_ids,
-update the boundary checking condition.
+Nodemasks have a compile-time capacity of MAX_NUMNODES, and
+nr_node_ids describes the runtime node ID usage.
+
+Modern distros like Ubuntu default MAX_NUMNODES to 1024, while the
+actual number of nodes is typically smaller. All nodemask operations
+currently refer to the MAX_NUMNODES, which adds a substantial overhead
+on every traversing operation.
+
+Simple switch to the runtime nr_node_ids might hurt users configuring
+their MAX_NUMNODES to reasonable small values because the runtime value
+breaks compile-time optimizations in the underlying bitmap API.
+
+Thus, switch to using small_nodemask_bits, large_nodemask_bits, or
+the precise nr_node_ids, as appropriate.
+
+Bloat-o-meter reports 1-8KB decrease of .text, depending on NR_CPUS
+and MAX_NUMNODES. With nr_node_ids == 2 and MAX_NUMNODES == 1024, basic
+operations like nodes_copy() are ~4x faster
 
 Signed-off-by: Yury Norov <ynorov@nvidia.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/nodemask.h | 80 +++++++++++++++++++++-------------------
+ 1 file changed, 42 insertions(+), 38 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 113bdb868c46..8b8b4211e41a 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -3630,7 +3630,7 @@ static inline int mtip_get_next_rr_node(void)
- 	}
+diff --git a/include/linux/nodemask.h b/include/linux/nodemask.h
+index 4ef6ca642054..67ad972b8942 100644
+--- a/include/linux/nodemask.h
++++ b/include/linux/nodemask.h
+@@ -40,12 +40,12 @@
+  * bool nodes_full(mask)		Is mask full (all bits sets)?
+  * int nodes_weight(mask)		Hamming weight - number of set bits
+  *
+- * unsigned int first_node(mask)	Number lowest set bit, or MAX_NUMNODES
+- * unsigned int next_node(node, mask)	Next node past 'node', or MAX_NUMNODES
++ * unsigned int first_node(mask)	Number lowest set bit, or >= nr_node_ids
++ * unsigned int next_node(node, mask)	Next node past 'node', or >= nr_node_ids
+  * unsigned int next_node_in(node, mask) Next node past 'node', or wrap to first,
+- *					or MAX_NUMNODES
++ *					or >= nr_node_ids
+  * unsigned int first_unset_node(mask)	First node not set in mask, or
+- *					MAX_NUMNODES
++ *					>= nr_node_ids
+  *
+  * nodemask_t nodemask_of_node(node)	Return nodemask with bit 'node' set
+  * NODE_MASK_ALL			Initializer - all bits set
+@@ -90,7 +90,6 @@
  
- 	next_node = next_online_node(next_node);
--	if (next_node == MAX_NUMNODES)
-+	if (next_node >= nr_node_ids)
- 		next_node = first_online_node;
- 	return next_node;
+ #include <linux/threads.h>
+ #include <linux/bitmap.h>
+-#include <linux/minmax.h>
+ #include <linux/nodemask_types.h>
+ #include <linux/random.h>
+ 
+@@ -158,13 +157,17 @@ static __always_inline void __node_clear(int node, volatile nodemask_t *dstp)
+ 	clear_bit(node, dstp->bits);
  }
+ 
+-#define nodes_setall(dst) __nodes_setall(&(dst), MAX_NUMNODES)
++#define nodes_setall(dst) __nodes_setall(&(dst), nr_node_ids)
+ static __always_inline void __nodes_setall(nodemask_t *dstp, unsigned int nbits)
+ {
++	if (small_const_nbits(small_nodemask_bits)) {
++		dstp->bits[0] = BITMAP_LAST_WORD_MASK(nbits);
++		return;
++	}
+ 	bitmap_fill(dstp->bits, nbits);
+ }
+ 
+-#define nodes_clear(dst) __nodes_clear(&(dst), MAX_NUMNODES)
++#define nodes_clear(dst) __nodes_clear(&(dst), large_nodemask_bits)
+ static __always_inline void __nodes_clear(nodemask_t *dstp, unsigned int nbits)
+ {
+ 	bitmap_zero(dstp->bits, nbits);
+@@ -181,7 +184,7 @@ static __always_inline bool __node_test_and_set(int node, nodemask_t *addr)
+ }
+ 
+ #define nodes_and(dst, src1, src2) \
+-			__nodes_and(&(dst), &(src1), &(src2), MAX_NUMNODES)
++			__nodes_and(&(dst), &(src1), &(src2), small_nodemask_bits)
+ static __always_inline bool __nodes_and(nodemask_t *dstp, const nodemask_t *src1p,
+ 					const nodemask_t *src2p, unsigned int nbits)
+ {
+@@ -189,7 +192,7 @@ static __always_inline bool __nodes_and(nodemask_t *dstp, const nodemask_t *src1
+ }
+ 
+ #define nodes_or(dst, src1, src2) \
+-			__nodes_or(&(dst), &(src1), &(src2), MAX_NUMNODES)
++			__nodes_or(&(dst), &(src1), &(src2), small_nodemask_bits)
+ static __always_inline void __nodes_or(nodemask_t *dstp, const nodemask_t *src1p,
+ 					const nodemask_t *src2p, unsigned int nbits)
+ {
+@@ -197,7 +200,7 @@ static __always_inline void __nodes_or(nodemask_t *dstp, const nodemask_t *src1p
+ }
+ 
+ #define nodes_xor(dst, src1, src2) \
+-			__nodes_xor(&(dst), &(src1), &(src2), MAX_NUMNODES)
++			__nodes_xor(&(dst), &(src1), &(src2), small_nodemask_bits)
+ static __always_inline void __nodes_xor(nodemask_t *dstp, const nodemask_t *src1p,
+ 					const nodemask_t *src2p, unsigned int nbits)
+ {
+@@ -205,14 +208,14 @@ static __always_inline void __nodes_xor(nodemask_t *dstp, const nodemask_t *src1
+ }
+ 
+ #define nodes_andnot(dst, src1, src2) \
+-			__nodes_andnot(&(dst), &(src1), &(src2), MAX_NUMNODES)
++			__nodes_andnot(&(dst), &(src1), &(src2), small_nodemask_bits)
+ static __always_inline bool __nodes_andnot(nodemask_t *dstp, const nodemask_t *src1p,
+ 					const nodemask_t *src2p, unsigned int nbits)
+ {
+ 	return bitmap_andnot(dstp->bits, src1p->bits, src2p->bits, nbits);
+ }
+ 
+-#define nodes_copy(dst, src) __nodes_copy(&(dst), &(src), MAX_NUMNODES)
++#define nodes_copy(dst, src) __nodes_copy(&(dst), &(src), large_nodemask_bits)
+ static __always_inline void __nodes_copy(nodemask_t *dstp,
+ 					const nodemask_t *srcp, unsigned int nbits)
+ {
+@@ -230,15 +233,19 @@ static __always_inline void __nodes_copy_and_extend(nodemask_t *dstp,
+ }
+ 
+ #define nodes_complement(dst, src) \
+-			__nodes_complement(&(dst), &(src), MAX_NUMNODES)
++			__nodes_complement(&(dst), &(src), nr_node_ids)
+ static __always_inline void __nodes_complement(nodemask_t *dstp,
+ 					const nodemask_t *srcp, unsigned int nbits)
+ {
++	if (small_const_nbits(small_nodemask_bits)) {
++		dstp->bits[0] = ~srcp->bits[0] & BITMAP_LAST_WORD_MASK(nbits);
++		return;
++	}
+ 	bitmap_complement(dstp->bits, srcp->bits, nbits);
+ }
+ 
+ #define nodes_equal(src1, src2) \
+-			__nodes_equal(&(src1), &(src2), MAX_NUMNODES)
++			__nodes_equal(&(src1), &(src2), small_nodemask_bits)
+ static __always_inline bool __nodes_equal(const nodemask_t *src1p,
+ 					const nodemask_t *src2p, unsigned int nbits)
+ {
+@@ -246,7 +253,7 @@ static __always_inline bool __nodes_equal(const nodemask_t *src1p,
+ }
+ 
+ #define nodes_intersects(src1, src2) \
+-			__nodes_intersects(&(src1), &(src2), MAX_NUMNODES)
++			__nodes_intersects(&(src1), &(src2), small_nodemask_bits)
+ static __always_inline bool __nodes_intersects(const nodemask_t *src1p,
+ 					const nodemask_t *src2p, unsigned int nbits)
+ {
+@@ -254,53 +261,50 @@ static __always_inline bool __nodes_intersects(const nodemask_t *src1p,
+ }
+ 
+ #define nodes_subset(src1, src2) \
+-			__nodes_subset(&(src1), &(src2), MAX_NUMNODES)
++			__nodes_subset(&(src1), &(src2), small_nodemask_bits)
+ static __always_inline bool __nodes_subset(const nodemask_t *src1p,
+ 					const nodemask_t *src2p, unsigned int nbits)
+ {
+ 	return bitmap_subset(src1p->bits, src2p->bits, nbits);
+ }
+ 
+-#define nodes_empty(src) __nodes_empty(&(src), MAX_NUMNODES)
++#define nodes_empty(src) __nodes_empty(&(src), small_nodemask_bits)
+ static __always_inline bool __nodes_empty(const nodemask_t *srcp, unsigned int nbits)
+ {
+ 	return bitmap_empty(srcp->bits, nbits);
+ }
+ 
+-#define nodes_full(nodemask) __nodes_full(&(nodemask), MAX_NUMNODES)
++#define nodes_full(nodemask) __nodes_full(&(nodemask), nr_node_ids)
+ static __always_inline bool __nodes_full(const nodemask_t *srcp, unsigned int nbits)
+ {
+ 	return bitmap_full(srcp->bits, nbits);
+ }
+ 
+-#define nodes_weight(nodemask) __nodes_weight(&(nodemask), MAX_NUMNODES)
++#define nodes_weight(nodemask) __nodes_weight(&(nodemask), small_nodemask_bits)
+ static __always_inline int __nodes_weight(const nodemask_t *srcp, unsigned int nbits)
+ {
+ 	return bitmap_weight(srcp->bits, nbits);
+ }
+ 
+-/* FIXME: better would be to fix all architectures to never return
+-          > MAX_NUMNODES, then the silly min()s could be dropped. */
+-
+-#define first_node(src) __first_node(&(src), MAX_NUMNODES)
++#define first_node(src) __first_node(&(src), small_nodemask_bits)
+ static __always_inline unsigned int __first_node(const nodemask_t *srcp,
+ 						unsigned int nbits)
+ {
+-	return min(nbits, find_first_bit(srcp->bits, nbits));
++	return find_first_bit(srcp->bits, nbits);
+ }
+ 
+-#define next_node(n, src) __next_node((n), &(src), MAX_NUMNODES)
++#define next_node(n, src) __next_node((n), &(src), small_nodemask_bits)
+ static __always_inline unsigned int __next_node(int n, const nodemask_t *srcp,
+ 					       unsigned int nbits)
+ {
+-	return min(nbits, find_next_bit(srcp->bits, nbits, n + 1));
++	return find_next_bit(srcp->bits, nbits, n + 1);
+ }
+ 
+ /*
+  * Find the next present node in src, starting after node n, wrapping around to
+- * the first node in src if needed.  Returns MAX_NUMNODES if src is empty.
++ * the first node in src if needed.  Returns >= nr_node_ids if src is empty.
+  */
+-#define next_node_in(n, src) __next_node_in((n), &(src), MAX_NUMNODES)
++#define next_node_in(n, src) __next_node_in((n), &(src), small_nodemask_bits)
+ static __always_inline unsigned int __next_node_in(int node, const nodemask_t *srcp,
+ 						  unsigned int nbits)
+ {
+@@ -331,7 +335,7 @@ static __always_inline void init_nodemask_of_node(nodemask_t *mask, int node)
+ #define first_unset_node(mask) __first_unset_node(&(mask))
+ static __always_inline unsigned int __first_unset_node(const nodemask_t *maskp)
+ {
+-	return min(MAX_NUMNODES, find_first_zero_bit(maskp->bits, MAX_NUMNODES));
++	return find_first_zero_bit(maskp->bits, small_nodemask_bits);
+ }
+ 
+ #define NODE_MASK_LAST_WORD BITMAP_LAST_WORD_MASK(MAX_NUMNODES)
+@@ -361,21 +365,21 @@ static __always_inline unsigned int __first_unset_node(const nodemask_t *maskp)
+ #define nodes_addr(src) ((src).bits)
+ 
+ #define nodemask_parse_user(ubuf, ulen, dst) \
+-		__nodemask_parse_user((ubuf), (ulen), &(dst), MAX_NUMNODES)
++		__nodemask_parse_user((ubuf), (ulen), &(dst), nr_node_ids)
+ static __always_inline int __nodemask_parse_user(const char __user *buf, int len,
+ 					nodemask_t *dstp, int nbits)
+ {
+ 	return bitmap_parse_user(buf, len, dstp->bits, nbits);
+ }
+ 
+-#define nodelist_parse(buf, dst) __nodelist_parse((buf), &(dst), MAX_NUMNODES)
++#define nodelist_parse(buf, dst) __nodelist_parse((buf), &(dst), nr_node_ids)
+ static __always_inline int __nodelist_parse(const char *buf, nodemask_t *dstp, int nbits)
+ {
+ 	return bitmap_parselist(buf, dstp->bits, nbits);
+ }
+ 
+ #define node_remap(oldbit, old, new) \
+-		__node_remap((oldbit), &(old), &(new), MAX_NUMNODES)
++		__node_remap((oldbit), &(old), &(new), nr_node_ids)
+ static __always_inline int __node_remap(int oldbit,
+ 		const nodemask_t *oldp, const nodemask_t *newp, int nbits)
+ {
+@@ -383,7 +387,7 @@ static __always_inline int __node_remap(int oldbit,
+ }
+ 
+ #define nodes_remap(dst, src, old, new) \
+-		__nodes_remap(&(dst), &(src), &(old), &(new), MAX_NUMNODES)
++		__nodes_remap(&(dst), &(src), &(old), &(new), nr_node_ids)
+ static __always_inline void __nodes_remap(nodemask_t *dstp, const nodemask_t *srcp,
+ 		const nodemask_t *oldp, const nodemask_t *newp, int nbits)
+ {
+@@ -391,7 +395,7 @@ static __always_inline void __nodes_remap(nodemask_t *dstp, const nodemask_t *sr
+ }
+ 
+ #define nodes_onto(dst, orig, relmap) \
+-		__nodes_onto(&(dst), &(orig), &(relmap), MAX_NUMNODES)
++		__nodes_onto(&(dst), &(orig), &(relmap), nr_node_ids)
+ static __always_inline void __nodes_onto(nodemask_t *dstp, const nodemask_t *origp,
+ 		const nodemask_t *relmapp, int nbits)
+ {
+@@ -399,7 +403,7 @@ static __always_inline void __nodes_onto(nodemask_t *dstp, const nodemask_t *ori
+ }
+ 
+ #define nodes_fold(dst, orig, sz) \
+-		__nodes_fold(&(dst), &(orig), sz, MAX_NUMNODES)
++		__nodes_fold(&(dst), &(orig), sz, nr_node_ids)
+ static __always_inline void __nodes_fold(nodemask_t *dstp, const nodemask_t *origp,
+ 		int sz, int nbits)
+ {
+@@ -409,7 +413,7 @@ static __always_inline void __nodes_fold(nodemask_t *dstp, const nodemask_t *ori
+ #if MAX_NUMNODES > 1
+ #define for_each_node_mask(node, mask)				    \
+ 	for ((node) = first_node(mask);				    \
+-	     (node) < MAX_NUMNODES;				    \
++	     (node) < small_nodemask_bits;			    \
+ 	     (node) = next_node((node), (mask)))
+ #else /* MAX_NUMNODES == 1 */
+ #define for_each_node_mask(node, mask)                                  \
+@@ -524,9 +528,9 @@ static __always_inline int num_node_state(enum node_states state)
+ static __always_inline int node_random(const nodemask_t *maskp)
+ {
+ #if defined(CONFIG_NUMA) && (MAX_NUMNODES > 1)
+-	int node = find_random_bit(maskp->bits, MAX_NUMNODES);
++	int node = find_random_bit(maskp->bits, nr_node_ids);
+ 
+-	return node < MAX_NUMNODES ? node : NUMA_NO_NODE;
++	return node < nr_node_ids ? node : NUMA_NO_NODE;
+ #else
+ 	return 0;
+ #endif
 -- 
 2.53.0
 
