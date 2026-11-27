@@ -1,146 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=128.30.2.78
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.126.103.232
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795769464;
-	b=3vmcZn7Jpe8VKDy7Ay8xuQmiIfOAl6kZO6UQuc3+Pyo8jGm7v/fRuMDD9Xj/oHJvxrv8
-	 cLXJLtNXdAyK6fjz+6gB8eSEiGpNUBlW2Z/6EBFinZ9Cv9UgOO+ooPc66TPrCEOd4HCAc
-	 fcz2KGuvH2bc1uqsRa5mNaonMTDmkECgosdmoIvDauL4pha6Lrj1Kb7V4fgihrUjcvdF8
-	 h6Lm/v+YvEU6Qspd1dxzgd9S0IQtadoVKQsRQ00LuruHWhvQaWClHmyMDOlWbnjeIsEqB
-	 sZ8KJ47GhtgYshTDfyKNDQj9Qimm2MFc7vaUJ1rKpr7BVFRLY98aqw9Zho1BIAlWjzw==
+	t=1795770266;
+	b=OQKFHdCenCu1HV9U6fOv1LAxPU+ltqFSHwr3sqb4KzZkpImrzJDFFOOsRIEZEOp7m6uu
+	 s/8PGVKuZWNZ70fkdob17OfiqVce+Qt8HphPXCJOPmmCC/FequFTEiLRN+8LygxNtNDvs
+	 //eBh+G643k616Pn3cgJJ2aVyFv2e/jv/EanFZ8H7Db5hJRkRrA0sZMTx6Ay2oi3UmBMb
+	 Os54cd/eHBqoXLN7NXa9p6RzhZKpoTx9imU9Zq8HIywkOo2OVKRvMCCgLRwJLxIhvyXKZ
+	 ZiRGjhpqWCnJBGldBBxtigcclt5NAio3mLma9UGxf67DpARWKoNMTmdDa0qLNxB0JaA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795769464;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To;
-	bh=njh3SQBBAQE61UxliWgOlIeTiJ2q96ejV3+knyCCvnY=;
-	b=d1DXSzToQ+NSWw3JPfbbCrAQhkNYUaW9zaQ0Kq36JP/8woKgKUTQgShqaZ81EMafXCG8
-	 DiMpPZ97OccqrKo7UFt334tkVjALPM2IZ1xomiHQXsloYBKIPjRZgTPZkfTXEgIuMKm9Q
-	 b7sz4NZ/jrYEC4SK/QralyrpABcEM3c4IqS4+t1BQJ4t0IGFt36KPGh/71hEPyzFmrovC
-	 nxc+Wj+vndn+a79SArUDt7iPLwuEgjZVc4EU2LwUiuG5EFKMkjzbdHTWlbJk9g5Ghhk3i
-	 +gyaUSwMT4DyVt4FMfzdvMPL6rGzFmLXNPqHEwk7ssXWB+RiqyGc5V3rVm/N0hQbEkQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795770266;
+	h=DMARC-Filter:X-UUID:X-CTIC-Tags:X-CID-P-RULE:X-CID-O-INFO:X-CID-INFO:
+	 X-CID-META:X-CID-BVR:X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:X-User:
+	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=Cl+0jXGFWVsq2Q/pJnbTR+X0LiDZPA8pH1tuLmYf+54=;
+	b=18ba8otQFdONyvmeha4hVbdIHDo65OSQaSJMPH+dULxVVilbxU/D1Qp+8F7jKgWt9T/D
+	 lOm17Un+n2/8GVlZYB5cwGSjCXKtXgKIXYJqxfw1Ga4hhmDL5VPulW5HCghfDow8EfpJl
+	 MHtCUMm1v+xr03pDSaw29frmt6PMSfoWmebSEcWx2o5nQcsOqPfQoKmYyIh7Kd6gIwny6
+	 uhPzqqc8Kbme0K/RDNQ18mqLZWoNDHqBtB3q+PrC1heZ0m+95XWJxG7ZFsvUXs8ghT0aV
+	 SgPoN4Gx5YbNZ6bgAkuRVtU6llmY3vKgMbkmaDfBXdYSIGt1UMSi+WfQX1mOCqH1kDA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=csail.mit.edu;
-	spf=pass smtp.mailfrom=csail.mit.edu;
-	dkim=pass header.d=outgoing.csail.mit.edu header.i=@outgoing.csail.mit.edu header.a=rsa-sha256 header.s=test20231205 header.b=xCF78GQE;
-	arc=none smtp.remote-ip=128.30.2.78
-Received: from outgoing2021.csail.mit.edu (outgoing2021.csail.mit.edu [128.30.2.78])
+	dmarc=none header.from=kylinos.cn;
+	spf=pass smtp.mailfrom=kylinos.cn;
+	arc=none smtp.remote-ip=124.126.103.232
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CD4606A31C;
-	Fri, 27 Nov 2026 08:51:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 48CD4606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=csail.mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csail.mit.edu
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=outgoing.csail.mit.edu header.i=@outgoing.csail.mit.edu header.a=rsa-sha256 header.s=test20231205 header.b=xCF78GQE
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=outgoing.csail.mit.edu; s=test20231205; h=In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=njh3SQBBAQE61UxliWgOlIeTiJ2q96ejV3+knyCCvnY=; t=1795769464; x=1796633464; 
-	b=xCF78GQEoFuR5VSaFZJwsaQMsUqzxgkhr09s1AQlGBjs9gBHC90OExhT7yjx4EsH4WivLTHbGpI
-	p1E/a5+X4T4RCZDkcyYHblwO39qcnCS/jX+2rUBbwS1mQZgFvoM/x2kdWTDEyGuqBWjJm6feGtK2Z
-	wFpefSVLt7txJoZA0iIqI5jyU1zgPndu9WsOj6WeNxR3WovhoLSiXmJUNYFRfVro1Za1MGilJ19PW
-	Hz4feHPtbiuyFMlqUrY+NSp8E4S+LNWmiuwiqTCvoNSDozbzEFxQ7prI17GmZtzkMkrajaIxy6L5f
-	r/0Om6ynlQj5DoUoMwLx+tY8sfilr31FNhtg==;
-Received: from [167.220.238.14] (helo=csail.mit.edu)
-	by outgoing2021.csail.mit.edu with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <srivatsa@csail.mit.edu>)
-	id 1xWreR-007Btx-5B;
-	Fri, 27 Nov 2026 03:49:51 -0500
-Date: Fri, 27 Nov 2026 14:19:20 +0530
-From: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-To: Richard Cheng <icheng@nvidia.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>, Chanwoo Choi <cw00.choi@samsung.com>,
-	MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Heiko Stuebner <heiko@sntech.de>, Xu Yilun <yilun.xu@intel.com>,
-	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mike Leach <mike.leach@arm.com>,
-	James Clark <james.clark@linaro.org>, Leo Yan <leo.yan@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Sizhe Liu <liusizhe5@huawei.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai@fygo.io>, Li Nan <magiclinan@didiglobal.com>,
-	Xiao Ni <xiao@kernel.org>, Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowangio@gmail.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Dan Williams <djbw@kernel.org>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Alison Schofield <alison.schofield@intel.com>,
-	Ira Weiny <iweiny@kernel.org>,
-	Shuai Xue <xueshuai@linux.alibaba.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Jing Zhang <renyu.zj@linux.alibaba.com>,
-	Frank Li <Frank.li@nxp.com>, Xu Yang <xu.yang_2@nxp.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Yushan Wang <wangyushan12@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Gowthami Thiagarajan <gthiagarajan@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Justin Tee <justin.tee@broadcom.com>,
-	Paul Ely <paul.ely@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <mkp@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Yosry Ahmed <yosry@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-fpga@vger.kernel.org,
-	coresight@lists.linaro.org, iommu@lists.linux.dev,
-	linux-raid@vger.kernel.org, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, virtualization@lists.linux.dev,
-	nvdimm@lists.linux.dev, linux-perf-users@vger.kernel.org,
-	linux-cxl@vger.kernel.org, imx@lists.linux.dev,
-	linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-mm@kvack.org,
-	Prasanna Kumar T S M <ptsm@linux.microsoft.com>,
-	Saurabh Sengar <ssengar@linux.microsoft.com>
-Subject: Re: [PATCH] cpu/hotplug: Rename cpuhp_remove_multi_state to be
- symmetric with setup
-Message-ID: <awlEEAmT4k7fvQck@csail.mit.edu>
-References: <20261127-fix-rename_cpuhp_remove_multi_state-v1-1-097db4564cbd@csail.mit.edu>
- <awk6TGp9riwDD55i@MWDK4CY14F>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93727606A334;
+	Fri, 27 Nov 2026 09:04:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 93727606A334
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 840e4c98ea4111f19a56ed5b684f684d-20261127
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_DIGIT_LEN
+	HR_FROM_NAME, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
+	SA_TRUSTED, SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS
+	DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF
+	GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:5fe1450d-d965-41cb-bdc2-3ec61e54416d,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:10
+X-CID-INFO: VERSION:1.3.19,REQID:5fe1450d-d965-41cb-bdc2-3ec61e54416d,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:10
+X-CID-META: VersionHash:7db8b62,CLOUDID:8db16c2b2a8aed48d356be515fd4f0f8,BulkI
+	D:261127170418Q51N47MI,BulkQuantity:0,SF:17|19|38|66|78|102|127|153|850|86
+	5|898,TC:nil,Content:0|15|50|99,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:ni
+	l,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE
+	:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 840e4c98ea4111f19a56ed5b684f684d-20261127
+X-User: liuzhe1@kylinos.cn
+Received: from localhost.localdomain [(223.104.39.167)] by mailgw.kylinos.cn
+	(envelope-from <liuzhe1@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 841913415; Fri, 27 Nov 2026 17:04:13 +0800
+From: Zhe Liu <liuzhe1@kylinos.cn>
+To: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Zhe Liu <liuzhe1@kylinos.cn>
+Subject: [PATCH] blk-iolatency: remove stale latency samples when a group goes offline
+Date: Fri, 27 Nov 2026 17:03:58 +0800
+Message-Id: <20261127090358.749096-1-liuzhe1@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -150,35 +83,84 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <awk6TGp9riwDD55i@MWDK4CY14F>
+Content-Transfer-Encoding: 8bit
 
-Hi Richard,
+Each iolatency group tracks its last contribution to the parent's
+nr_samples so that subsequent latency checks can replace it. However,
+this contribution is not removed when the group goes offline.
 
-On Fri, Nov 27, 2026 at 04:09:11PM +0800, Richard Cheng wrote:
-> On Fri, Nov 27, 2026 at 01:07:40PM +0800, Srivatsa S. Bhat (Microsoft) wrote:
-> > The multi-instance CPU hotplug state setup API is named as
-> > cpuhp_setup_state_multi(), whereas the corresponding remove API is
-> > currently named as cpuhp_remove_multi_state(). Rename the latter as
-> > cpuhp_remove_state_multi() to fix the asymmetry. This also helps
-> > maintain consistency in the API names by letting them share a common
-> > prefix, i.e., cpuhp_setup/remove_state_*() across all the variants
-> > [none|nocalls|nocalls_cpuslocked].
-> > 
-> > Signed-off-by: Srivatsa S. Bhat (Microsoft) <srivatsa@csail.mit.edu>
-> 
-> Hi Srivatsa,
-> 
-> Not sure whether this is really needed, it doesn't harm anything,
-> but IMHO it doesn't really brings us benefit.
-> 
+Repeatedly creating and removing cgroups can therefore inflate the
+sample threshold used by check_scale_change(), causing active groups
+to incorrectly skip queue-depth reductions and weakening latency
+protection for their peers.
 
-I agree, this is not intended to be a functional change. The cleanup benefit is
-on the side of the CPU hotplug core API to provide better consistency in terms
-of the API naming pattern, but the current callsites that consume this API
-should see no functional difference as a result of this change. The consistency
-will help future callsites though!
+Remove the group's contribution from the parent's nr_samples and clear
+its own nr_samples under the parent's child_lat.lock in
+iolatency_pd_offline().
 
-Regards,
-Srivatsa
+Recheck min_lat_nsec under the same lock in iolatency_check_latencies()
+to prevent an in-flight bio completion from adding samples back after
+the offline cleanup.
+
+Tested on next-20261126 in an x86_64 QEMU guest with
+cgroup v2 and null_blk.
+
+After 10 cycles in each run of creating a child cgroup with a latency
+target, issuing direct reads and removing it, the unpatched parent
+retained 973 and 814 stale samples in two runs. With the patch, the
+parent's sample count matched the surviving child's contribution
+after every removal.
+
+In a scale-down test, a competing sibling contributed 11 samples
+while the protected group missed its target. Without the patch, the
+parent had 880 samples, the threshold was 44 and the sibling remained
+at depth=max. With the patch, the parent had 128 samples, the threshold
+was 6 and the sibling's depth dropped to 32.
+
+Removing a child with an in-flight read also left no stale samples
+after I/O completion with the patch. The completion observed a
+cleared latency target in this test.
+
+Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
+Signed-off-by: Zhe Liu <liuzhe1@kylinos.cn>
+---
+
+ block/blk-iolatency.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index a3bd153c67be..44e5015d2295 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -547,6 +547,10 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
+ 	/* Somebody beat us to the punch, just bail. */
+ 	spin_lock_irqsave(&lat_info->lock, flags);
+ 
++	/* An in-flight bio may complete after the group went offline. */
++	if (!iolat->min_lat_nsec)
++		goto out;
++
+ 	latency_stat_sum(iolat, &iolat->cur_stat, &stat);
+ 	lat_info->nr_samples -= iolat->nr_samples;
+ 	lat_info->nr_samples += latency_stat_samples(iolat, &iolat->cur_stat);
+@@ -1028,9 +1032,18 @@ static void iolatency_pd_offline(struct blkg_policy_data *pd)
+ {
+ 	struct iolatency_grp *iolat = pd_to_lat(pd);
+ 	struct blkcg_gq *blkg = lat_to_blkg(iolat);
++	struct iolatency_grp *parent = blkg_to_lat(blkg->parent);
++	unsigned long flags;
+ 
+ 	iolatency_set_min_lat_nsec(blkg, 0);
+ 	iolatency_clear_scaling(blkg);
++
++	if (parent) {
++		spin_lock_irqsave(&parent->child_lat.lock, flags);
++		parent->child_lat.nr_samples -= iolat->nr_samples;
++		iolat->nr_samples = 0;
++		spin_unlock_irqrestore(&parent->child_lat.lock, flags);
++	}
+ }
+ 
+ static void iolat_release(struct rcu_head *rcu)
+
+base-commit: a9c48428cbd8d96b26f92631d0db6f8519c5fcc5
