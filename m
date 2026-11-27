@@ -1,65 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.204.27.37
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795745120;
-	b=s5w2gqIa2as+wnLHUkYe0//mKq/DbgcVIQi7Lb3FAPigLZ6ZmRuDRYHseKi+hADaoufi
-	 5IbG9O3DCSbYlfTl5wD8MQ58qFaEY1WxbUrDT9BXCq9lmZi414t/590+eu2pQFURCpMtI
-	 7PxPInVmM/9gU47vkwkTYCFdaNIO0qMjfaWMEO/WLJFuE79Av+CWynERrT2Ccch2TAcrk
-	 bN7wRT0KdbbOId1NWaA8FWNvoGJeF+oJVMRaIjpmoydMiZDCIxHhxe1lN1FEfy+sIAcuO
-	 L6wl1peV3h7lqC//PSHlXoWW8d7x1Iq6e8oLxLaMp3n+AoePhiBJQhk7fGshgPzKSlg==
+	t=1795745461;
+	b=vbItWGiGHhxo+RYOUE0IadxWlck6NZ8wAODJWp6auVk2e2Xi2WUM4S5QpqHEdqCqBl/n
+	 0Bq/BnrL9LOnHAt/IOxxaSaz1r+vK+xyDWJlkISQ1jxCVSoPwt/jqrmh/Sl3dgHsB9brt
+	 EWVxMRQao7Wqbcwe1TbP2WH1X4YYYN3sjK8d0Qo2pCOvbTbOAeAAlcE69vAaEe3JtQG1C
+	 e1XvCk5+PQoHxaRQuuARucHqkBZ+tTlYm6H//n+GZoe8CABoXWAhhS3CJuRNsIu3leOxk
+	 wrAyIUXs2I++3drpR1DnLbwGnTocq+RTDgZr9wB4EyIduF9zATSi5qUMoAYQCHmsMTw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795745120;
-	h=DMARC-Filter:Received:Received:Received:Received:Date:From:To:CC:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
-	 X-Originating-IP:X-ClientProxiedBy;
-	bh=Vt8/L4ecYvwNmeRLxuD0Q0YLKG91gPCwqmvKaWbtGcE=;
-	b=Yf3ExdkJ8piBUjEKEaQ8z1b1ivPavd1GqHy4KCPqJPDYpLsUJFp1dQ2ObdR44kJ4G/G/
-	 Kd3PtYKGMhjVOvsQ7YeDECLlzguieosCQq6MFIBJMruUz5CT0dEwke7A7py57hTFMxpMP
-	 s7Apk1Wy16Et6Ke3Gw0Ln4G3eqsqTpY7CR8c2ThD15UF/7yT+OXJlYIvioszOZQAYd6mT
-	 5CcwQVbmP3TFW3gzZSjSAXsEyWcuA/QIfcPWCCmvOGiTBIEVsP27bl0mjQ1ygObPk7TM6
-	 /3erUebAj7KTuidgaPqqQxnpMnuyQbuqpfXhyaZluaHkprla8dcRznZlkUfQ43rpV5g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795745461;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
+	 In-Reply-To;
+	bh=BHCahoKy2PJzUedVB7T1cTYvXickwh+vDtpwXOtC6wA=;
+	b=uAF3aY7xnzmqjMJphpM8BGxL5+fXIIccXgkXpcwVMyqR4gs7slbQURcVaT9RVfq+3YXf
+	 t/LK09Q7Olzz48Vnn1W+HSQxn4BOfnu+9JK7VVShkZKpuvIZa2JKpRyc50zd5TxtQR1uM
+	 dfnIaZRrnXw6RR76EobAw9MVu6uvdaCgJqCvRWm3yhMCXWQxxPeec8dGCduEpWIrQyY55
+	 2JkqtTOp+deln4vj4Sf8wLaXznpnnSkDItp7AgJynaUGZfFj2sa8Pfdf7TzgUhLVAWEBL
+	 XAaky045tFNliatyDBdjee8WrQPUkpmx0kxQWyBLtKPTay2J9Epy3y9/S020GzKCPXw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=hygon.cn;
-	spf=pass smtp.mailfrom=hygon.cn;
-	arc=none smtp.remote-ip=101.204.27.37
-Received: from spam01.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE55606A31E;
-	Fri, 27 Nov 2026 02:05:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EE55606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jbGvf4vHdzg1cV;
-	Fri, 27 Nov 2026 10:05:02 +0800 (CST)
-Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
-	by spam01.hygon.cn (Postfix) with ESMTP id 4jbGvd6sBVzg1cV;
-	Fri, 27 Nov 2026 10:05:01 +0800 (CST)
-Received: from cncheex04.Hygon.cn (unknown [172.23.18.114])
-	by maildlp2.hygon.cn (Postfix) with ESMTPS id 40151300B6ED;
-	Fri, 27 Nov 2026 10:03:47 +0800 (CST)
-Received: from hsj-2U-Workstation (172.19.24.226) by cncheex04.Hygon.cn
- (172.23.18.114) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Fri, 27 Nov
- 2026 10:05:00 +0800
-Date: Fri, 27 Nov 2026 10:04:58 +0800
-From: Huang Shijie <huangsj@hygon.cn>
-To: Andreas Gruenbacher <agruenba@redhat.com>
-CC: <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
-	<hch@infradead.org>, <mic@digikod.net>, <axboe@kernel.dk>,
-	<gnoack@google.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<serge@hallyn.com>, <legion@kernel.org>, <aleksa@amutable.com>,
-	<libaokun@linux.alibaba.com>, <ebiggers@kernel.org>, <djwong@kernel.org>,
-	<sandeen@redhat.com>, <zhongyuan@hygon.cn>, <fangbaoshun@hygon.cn>,
-	<yingzhiwei@hygon.cn>, <wujianyong@hygon.cn>, <shijie8@gmail.com>,
-	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, <gfs2@lists.linux.dev>,
-	<linux-security-module@vger.kernel.org>
-Subject: Re: [PATCH v4 00/11] vfs: add inode iteration methods
-Message-ID: <awjlSpzDdAXAt2-k@hsj-2U-Workstation>
-References: <20261125091157.1822521-1-huangsj@hygon.cn>
- <CAHc6FU4h-FRvLkO_0ouTey9MbX=n61t3abt4hPNFOthsRGG9mQ@mail.gmail.com>
- <awgi6a0Hayug7RJH@hsj-2U-Workstation>
- <CAHc6FU4KLxzoQ6NJQUnFfcbKufqwqdhfcGhva9V44K=J7HCXRg@mail.gmail.com>
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b="E7NhiTW/";
+	arc=none smtp.remote-ip=209.85.214.174
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAADA606A321
+	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 02:11:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BAADA606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=E7NhiTW/
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2f066274caeso35709895ad.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 18:11:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1795745460; x=1796350260; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=BHCahoKy2PJzUedVB7T1cTYvXickwh+vDtpwXOtC6wA=;
+        b=E7NhiTW/ePZcJTVjS9gCw0DveB6YX2Lh9H5t3MqtptrNPMx1MvFpK/Ol+p59LcWWGi
+         lko2I2G9D30i58Ps5lhPPG7ywL3139h/z7HuMDUoExqJqc/e3aKwi7SBP3G8gGbID/8d
+         uj81oS5dBFuC5ctOWpMpoi5QF7/tu8uPq/aNA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795745460; x=1796350260;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=BHCahoKy2PJzUedVB7T1cTYvXickwh+vDtpwXOtC6wA=;
+        b=zQgtn+2UkhtQy3ek+efPGe95kkqP3/sdg1ftms59QovC+ce26nFaNE4E0S288q/I1p
+         Vv3PzE4LGe6kJCbzJbJGDZVYMyslg6T6Y0rkJhcazhrtDwQIIjD2qdv1Ci7bjVtaV2rp
+         pTiACJJVJZSm3AVOPGR31dMe+ZzAmmEiOn+SG7r+MQFD4mc4uoMKCrKIpqNlX9QdN5sD
+         zH/UIaPWI0FNlgLUKYGhQxwfri2qo1po32DQVPw9WALRc2CXPB1covLOjR9v4PxC3Zn/
+         0xLw3h7TiCGM5tDHkMdKy3NwAdzh9yGO2EfHuA3dDbIalqv3VrPJ1lghbmGm+yctTCfz
+         ooKw==
+X-Forwarded-Encrypted: i=1; AL+hErF47KbpMk+tocWrv53T7p/GEvJEtTtpyUBPKH5JWyf7RRSjLjkjDXjhfcERKY9zZoxZJEL+aBVdBplK1w==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8uM57vwKaWjD/hvG0HuXpq0YiJRqIrtMR/F/aDqdPJ3UTts2SB
+	srOzhdIuGqgcQFXN0DHF6Gz3+BPxLIs6My/WZZdkJESSJnK42qwkHkX40t9FaXv8lg==
+X-Gm-Gg: AZFdTZdL5r2Dy5+kEmxcO8Ly9otJ8t3QQ+looyz6jPSe0uvDDjHeATdpzhGOoARUhmE
+	oFDNgng2FA40Mj1XDrTloTy00mOIHp/nY6D11kROci7uDpBJb9U7TNSmSXNf55WiAX7wIcmbMWC
+	NhVP7iju34rpxYFhgLU6dnuUHBA5e+aqwPGWPwMTi34EHg/nL1GhVK9i+CG/Czw8w1CNvTkcuNj
+	q4T9zcnTCW5zmYyZgc4Sh4T96Jf27hz5axS+Zc8ifxLxF24NqCmQWCr3fJfvhyd6vCWJuMxjWNa
+	F8Mmjj6/HMXetZB0ccfuD15AVINXzZR9tO8zhGBaRryRHKcs20yAcKPUXwuNLX1ZY+KwBPMwuIY
+	QZFTmd8usjp6Mfl4Hb5Dy5w+CjAG/paHxS38IEmoGvYUGD0oEbUsid0jpT7P+qYa7Izr6IXyOry
+	k/LL6WTD1S7gGtJHwmaeoP1kO1t7d532bwfxluM2V25Wfm1VOPs4DpcHqPkZgRh8UXSzzbz5ua2
+	lGDP5Bx2vER3Xo7p08IBe+eSZLx77ZAbiGGGrlZp0pDgbNVdNqJzTK5ZcQTIVgu6OcD1TaEbGDt
+	/NSDlb7nqAdvfZEJpyk4lhSiQTixPbCywkHqIIr+/gpGQgrCguhSfDcn2cRJbgEAgkR+NQ==
+X-Received: by 2002:a17:902:f645:b0:2ef:dc42:10a9 with SMTP id d9443c01a7336-2f03ef3d32dmr240566145ad.7.1795745460078;
+        Thu, 26 Nov 2026 18:11:00 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:5bf8:984e:5bb:e51d])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f0c42b1sm110269495ad.17.2026.11.26.18.10.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Nov 2026 18:10:58 -0800 (PST)
+Date: Fri, 27 Nov 2026 11:10:51 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Artem Novak <artem122novak@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, minchan@kernel.org, 
+	axboe@kernel.dk, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] zram: validate decompressed page size
+Message-ID: <awjlpLnyVmKRqhmQ@google.com>
+References: <20261127004411.109585-1-artem122novak@gmail.com>
+ <awjaHB2ugCG_F3Io@google.com>
+ <CAPufuhb9txcosy48VXtfxwnC7Ct448J=_HbR00JnZR1QG-NfHg@mail.gmail.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -69,165 +96,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHc6FU4KLxzoQ6NJQUnFfcbKufqwqdhfcGhva9V44K=J7HCXRg@mail.gmail.com>
-X-ClientProxiedBy: cncheex06.Hygon.cn (172.23.18.116) To cncheex04.Hygon.cn
- (172.23.18.114)
+In-Reply-To: <CAPufuhb9txcosy48VXtfxwnC7Ct448J=_HbR00JnZR1QG-NfHg@mail.gmail.com>
 
-在 Thu, Nov 26, 2026 at 03:32:08PM +0100，Andreas Gruenbacher 写道：
-> On Thu, 26 Nov 2026 at 13:20, Huang Shijie <huangsj@hygon.cn> wrote:
-> > 在 Wed, Nov 25, 2026 at 11:25:12PM +0100，Andreas Gruenbacher 写道：
-> > > Huang,
-> > >
-> > > I have some thoughts ...
-> > >
-> > > On Wed, 25 Nov 2026 at 10:18, Huang Shijie <huangsj@hygon.cn> wrote:
-> > > > This series adds a superblock inode iterator and converts the open-coded
-> > > > sb->s_inodes walks in the VFS to it.  The design follows the cursor-based
-> > > > construct proposed by Christian Brauner:
-> > > >
-> > > >   https://lore.kernel.org/all/20261120-mitverantwortlich-drehbaren-kantholz-241300d20168@brauner/
-> > > >
-> > > > and is the same direction as Dave Chinner's patch set:
-> > > >
-> > > >   "vfs: improving inode cache iteration scalability"
-> > > >   https://lore.kernel.org/all/20241002014017.3801899-1-david@fromorbit.com/
-> > > >
-> > > > The caller owns the iterator state and drives the walk itself:
-> > > >
-> > > >   CLASS(sb_inode_iter, iter)(sb, eligible, priv, flags);
-> > > >   while ((inode = sb_inode_iter_next(&iter)))
-> > > >           /* do stuff */;
-> > >
-> > > The pattern should be:
-> > >
-> > >   for (CLASS(...); ...; ...) {
-> > >       /* ... */
-> > >       if (/* end iteration early */)
-> > >           break;
-> > >       /* ... */
-> > >   }
-> > >
-> > > so that the iterator goes out of scope immediately when the loop ends.
-> > > Hide the details of the loop header in a macro and that this becomes:
-> > >
-> > >   for_each_inode(inode, sb) {
-> >
-> > The fs/jffs2/build.c has used this for_each_inode.
-> > Maybe change to for_each_sb_inode?
-> 
-> That's the least of all problems; just rename the jfs macro.
-> 
-> > >       /* inode is referenced and unlocked here */
-> > >   }
-> > >
-> > > Use that to convert the simple cases.
-> > >
-> > > And then we've got preconditions that are checked while the inode is
-> > > locked. Those can probably go in an expression:
-> > >
-> > >   for_each_inode(inode, sb, expression) {
-> > We still need add flags here.
-> >
-> > In evict_inodes() and hook_sb_delete(), only the expression is not enough.
-> 
-> I know, these are the two cases that check i_count before the inode is
-> even locked. Leave them as they are for now; we can get back to that
-> later.
-okay.
+Hi Artem,
 
+On (26/11/26 19:34), Artem Novak wrote:
+> Hey Sergey,
 > 
-> > How about add a raw code like this:
-> >
-> >     for_each_inode_raw(inode, sb, expression, flags) {
-> >     }
-> >
-> > And add a macro for_each_inode:
-> >   #define for_each_inode(inode, sb, expression)  for_each_inode_raw(inode, sb, expression, 0)
-> >
-> > Most of the cases, we can use the for_each_inode.
-> >
-> > But in the evict_inodes() and hook_sb_delete() we can use the for_each_inode_raw.
+> On Thu, Nov 26, 2026 at 7:19 PM Sergey Senozhatsky
+> <senozhatsky@chromium.org> wrote:
+> > Yeah, I don't think we should do this.  We only ever compress PAGE_SIZE
+> > buffers, if some backend decompresses it to a something that is not
+> > PAGE_SIZE and doesn't signal an error via "ret" then it's a bug in the
+> > backend and zram should not cover it up.
 > 
-> No. Convert the simple cases first, with iterator constructs that are
-> as simple as possible. Later, worry about the more complicated cases.
-Got it.
+> I see.
+> 
+> I thought it might be worth having a defensive check here,
+> since allowing an incorrectly sized result to propagate seems a bit sloppy.
+> 
+> Do you consider this useful, or should I rely completely on the
+> backend contract?
 
-> 
-> > >       /* expression was true */
-> > >       /* inode is referenced and unlocked here */
-> > >   }
-> > >
-> > > This unfortunately cannot be implemented on top of the
-> > > sb_inode_iter_next() pattern, at least not in a reasonable way, so we
-> > > actually shouldn't use that pattern.
-> > >
-> > > The locked iterator would look like this:
-> > >
-> > >   for_each_inode_locked(inode, sb) {
-> >
-> > I tried this way today.
-> >
-> > The macro for_each_inode_locked is complicated.
-> > When I tried to add more hooks to super_operations to implement the
-> > procfs issue, the for_each_inode_locked becomes more complicated.
-> >
-> > BTW: the procfs issue see the link:
-> >   https://lore.kernel.org/all/20260920072811.2064247-1-huangsj@hygon.cn/
-> 
-> Introducing reasonable inode iteration constructs is a completely
-> separate problem from introducing per-super block inode iterators.
-> Please keep those issues apart.
-okay.
-
-> 
-> > >       /* inode is locked here */
-> > >   }
-> > >
-> > > This doesn't cover all existing cases, but that's okay. Don't force
-> > > things into this pattern that are not a match.
-> > >
-> > > We can always extend things further if it makes sense.
-> > >
-> > > > The lock does not span iterations.  sb_inode_iter_next() takes
-> > > > sb->s_inode_list_lock, takes a reference on the next inode, drops the lock
-> > > > again and hands the inode out; the reference is what keeps the cursor on
-> > > > sb->s_inodes so that the next call can resume from it.  As the iterator
-> > > > is a cleanup class, a caller that breaks out early does not have to call
-> > > > sb_inode_iter_end() explicitly.
-> > > >
-> > > > Two optional channels let a caller keep its own state instead of filling in
-> > > > a shared context:
-> > > >
-> > > >   - iter->eligible is called with inode->i_lock held, so that a caller can
-> > > >     reject an inode before a reference is paid for.
-> > > >
-> > > >   - iter->status carries an error out of the walk.  Setting it to a
-> > > >     negative value makes sb_inode_iter_next() return NULL.
-> > >
-> > > Nobody needs that. Just break out of the loop.
-> > >
-> > > > Most callers just want a referenced inode and use no flags at all.  Three
-> > > > flags cover the walks that need something else:
-> > > >
-> > > >   - %INO_ITER_F_REFERENCED restricts the walk to inodes that still have a
-> > > >     reference, preserving the "only handle referenced inodes" rule of
-> > > >     landlock's sb-delete walk.
-> > > >
-> > > >   - %INO_ITER_F_NOREF hands out only inodes whose reference count has
-> > > >     already reached zero, and %INO_ITER_F_NOIGET suppresses the reference.
-> > > >     Neither keeps the inode alive, so the caller has to make the inode
-> > > >     unclaimable itself.
-> > >
-> > > No flags.
-> > If we do not add flags, we cannot convert the evict_inodes() and hook_sb_delete().
-> 
-> No flags.
-
-Okay. I will start the V5 right now.
-
-Thanks
-Huang Shijie
-
+I would probably prefer to do nothing about it, IOW rely on the
+backend contract.  Most of those compression libraries are used
+in other places in the kernel (f2fs, squashfs, etc. etc.), zram
+is not the only one to rely on them.
