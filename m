@@ -1,94 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795736238;
-	b=scQTZrr7ZXJSJpRYi9sdHqePSgN5QOHzbDqtWMbe+3Y07yfDXfewo5CfALoGO3dUhScn
-	 dMRudNUSWVDY8pImf/o0G+W877R6dAFrmaTZdXIMRipdCepTHk+BrLBKTQqdxAKezLZRd
-	 yHTrx2kUnPmR2zkWoQ70Chgmgt7EUEShZ1wAViV0SmHzCn3GfAoevVxn/woQ5+Mp2JuGu
-	 iNpahWqzVIu8q4yMwuobhT7G5BkaN2Bf8euo/ZXEDSsozdU/Ppwqg9nQs/ZHmBdWT4JzK
-	 DJUIfJxUcWO7mqpzGkp+hOlBciWdWjbb9G9RDSoIr9OSPr53TZWOmL4oyVBo5gfIK8g==
+	t=1795739947;
+	b=z1L0ONpfjFGjBNlcCCAECY+D3LNls6Q4zGbOwcHfz2wJuKWvh7Jn+j0pueHSk2YboyIG
+	 miRkTPccOvt48MUXjdv2RZxqWp1qVCwXQA+t1a97Y3Nkm6Itd93eL73INh5LW7b147Q+u
+	 k3dxC/RoeuCiJk+AASmqKaWALYY+PEW2hLU10mMny4mKEH1i073n0lY5eAGAV8zk+6xzx
+	 Kc2ncNlJYfGHHAu/URq1NJ/e3qyvgROIvJULpEno+MnlBjmihc77UHWOmx8Ff46ZomOfV
+	 i1d1lfKmZ0bVwrSwL2TO/LzUYb3WAyK3ASvREb3a6t01n4zcgDAx8TfI/NZuEmoJL4A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795736238;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795739947;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=LDm3bBcnTnKtfKRSJliMl96Xk4mD8qAAxIPVCJmwuZQ=;
-	b=iyyPdoj7vLmK4voZ6ohe1U7kYkn1a9TTsXkPS9OYa0vOscs+/gZhWPzo5cEhn0TjNuAA
-	 8+ssR6SejlJsVWVuCHJhxsFKF/F3u0VpQn55000y5q+YiWUDVagR/ayQYeAKkQmLVk5+d
-	 avbA17W/pTPb3qg/MuGkvKYryNwTSNZ++dmyCPnpKujXn1XnPVg/XnqWdkLvlOqdrcf74
-	 PVC6lljYbYymgbgrfGc+dXg+rZ3UfZXomY8QpEnsMPL1Mjz0QgIUlu7xjHT3E4IPGfKtR
-	 w3Ra4m/IXq5asce1tf4/A4/5JVk+i8MdECcyUr7uRJRiEkK49zSXz6sgilsgsK84QtA==
+	bh=OvwsNYV9K/LXXZpGZnFqU4JXKALJmJzA8uLyf3/RYp8=;
+	b=gwcxGvSiatkT+87skSwyse62NuPcjubjhz3jOP73l0e/vIg9kbgGrlrS+MvZXUTxD/Yt
+	 faniPXncLonO8sALLoI7+FbXvHiRzV4Xp9j8uUZuOEWQrcyzpCRVZpEXtIsRSXfsMPrCU
+	 25FZAOFnhxDSiFLoA3echWPUU/t+xkuubWXpYF6SOTXjuttEwXokXEoOFmqq4PaH3IVk9
+	 OeKUkScmPv9fWbiMR5lSnyw+26r2a9JAk7IN5+GqXYug6s5BwtnWUdTvX9xbzYAaQ+e8W
+	 ewmwWbXTsUv4t5sCT8RH3onabzka56lJneZilIUNCr0+pFq7c/+5V+vO23LdR08x4iw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Qcoco8Qk;
-	arc=none smtp.remote-ip=209.85.221.43
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0HLkjDly;
+	arc=none smtp.remote-ip=209.85.219.52
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE0A606A31E
-	for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 23:37:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5BE0A606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF464606A31C
+	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 00:39:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF464606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Qcoco8Qk
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4acb44dcd7bso6760884f8f.0
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 15:37:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0HLkjDly
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-921276742e3so69129716d6.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 16:39:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795736237; x=1796341037; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LDm3bBcnTnKtfKRSJliMl96Xk4mD8qAAxIPVCJmwuZQ=;
-        b=Qcoco8QkasuK/e53iBKD2sD2ghxxpi0c7lgK88dZuX7Xjr7fCAdxBuFDgZi0npMr6l
-         OLlZ/WL4pPrbmoifO8P6RydTtVS7soXQNWmBD364Jc5KpuP/cXQAkpeRZeoQ5E3pLze0
-         cq1k216au9JWBWmAcSfG2BWX9GqrY3W2CcBfVl2AnkvAuFVL7mZBB+UuzU8hrUfI8+Wj
-         uPlhGu4mZqvuvztRqVEeGSzIJb0Lvi0tmg8xsTaho6kb4iaKOfz+MTO7t5lABLS8IBKJ
-         XivmiSZB1VwTWQnErL8ZpmGUmxKL5NbYd86WxuQU5OLsmxpg+Uy+SLvltxNwW/aNNUlQ
-         MLmQ==
+        d=gmail.com; s=20260707; t=1795739946; x=1796344746; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=OvwsNYV9K/LXXZpGZnFqU4JXKALJmJzA8uLyf3/RYp8=;
+        b=0HLkjDlyNv1L0j/syzitLwcg571pG03B3AT3w+IaHzH1wQN753d0d1Imvf6t6spOM5
+         9iB74sWWyJCbFMZ5Jho0FRsyFBFB0PpvPBLcywajuZnsSSrvW2dMseU7Gclrb11dIdx9
+         zy+eD8IKbTc+9GLLSM6zocvnZ3nkwPdIYT85vHAcIX2+V+8GxS0e6X/NEgmlBd750qd/
+         URRT5rc8DmJyKAobSr1d/Ca9Dths9uOUUIljRDSI0dXQC9jtvkTw9yKq1NKPqc8vk0iF
+         9YFKKc8u6m53mYmK+FTiMGYw80r0ofR12//5B3cy/YPutbtMP+GlrfECxk6Hq4rF7YWK
+         oQrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795736237; x=1796341037;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=LDm3bBcnTnKtfKRSJliMl96Xk4mD8qAAxIPVCJmwuZQ=;
-        b=yUWlK/94rB00D4+ojCGMqYC+MwuwDsf/jlwR/j7VgUFO9mAb7sF2Qzsd7+j6GdViH7
-         UZNOJZlEapItGJkyf/brFpTsCcSwqcM5iuz0fZPc3ZDbuwKp/RafqIONpIPY+leIHElD
-         65rT8iSAB0J2CLP2aYmIsV7hwTqmxQh3H5XioYu4/bIRwz+9sYkj12fra+puiyvVdeKK
-         3XZTpTnILxfKyxgLAhwRuZlHPYzSMP83ZHrC+82X4RrNFI88HYN5PTy93Qa2p0Nn3Pxq
-         LeIemEPXOv3tSs9llxFkQ1A5L8xfH/hA3UBNv8g8yCNWIWnKKOhLZJjolrPcNJZbb+3c
-         NyNg==
-X-Gm-Message-State: APuU4Z9+CUeEYBhjfsO2A4QFJHxuR5c5L0fubcjSCxf9uRoxJp9lm59b
-	yTJfg/eYnYo8s51WiJUVCYDc4p3v6M+UL2mnH86rHnor3aLqt4/dpK66
-X-Gm-Gg: AZFdTZea6p5EVtDvqaDA0FM6YLMR+xNP7R4XSd2jXXbtDH72HSlJwFolgsr7Ed6hvY0
-	xr1d59ntwE53XnJvyCdX/Wyk5GY55LfcH4zhDgh7HImv4ofu9Xz4VuR3oEIknGKMJ/aDKtlyMI2
-	vGE9aTzYTgAN4Ldqql55rbDZIiezqPevfP2u6/A3yLpZjiBF+T/8gUbw20ksySYK24LKCfdxWAs
-	7S2pFgcuGXINvvah1763rWwrEvXLxW7No+PlGLRlr77Ns0t6gRde4B49reWXE6euzSlFQYaRJDL
-	9IyOC5UZQWj+SyyKjaBn3sY/MYNMJbqspolpreLSgtIVkpK3AEO3X44dMSQBh1QzBHvOprHLIdb
-	AcV0Cmt4/LUhOcBMq8vvREbm0Y1v27Sl+PGeVDYpunTEO/MummRZ+HeaOuFA/lK9qK88nQkq+wD
-	8LHG32v8Od69jaLL0MTLPP9DiSet4HeoofEyyTn5MkcuepjQbN5VLXr4D8dwRxdatFD2ybd9W4O
-	IOvlIERzqFcvSSmdMipw7QxdjVfVKgIYoPO95Z2LPHnYyWJ7d7QJO1szyK4zgxkk1ZeWivznQ3N
-	N25CM+rO6XU7rNF8gMfJbg9ex8IXgByTa4FVxMC7qu0yaXKotA4Q3nDQHR5odGUsYo20OH5o1+4
-	w1kQXU3PS
-X-Received: by 2002:a05:600c:3b94:b0:4bb:6f41:39be with SMTP id 5b1f17b1804b1-4bb8880ca3cmr564837615e9.15.1795736236738;
-        Thu, 26 Nov 2026 15:37:16 -0800 (PST)
-Received: from Mac ([2a01:599:843:3686:f8c1:c9a5:9d66:c45e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884a3a3dsm630189005e9.10.2026.11.26.15.37.14
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 26 Nov 2026 15:37:15 -0800 (PST)
-From: =?UTF-8?q?J=C3=A1nos=20Szathm=C3=A1ry?= <szathmary.janos89@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	=?UTF-8?q?J=C3=A1nos=20Szathm=C3=A1ry?= <szathmary.janos89@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] loop: only write back the backing file when direct I/O is used
-Date: Fri, 27 Nov 2026 00:37:10 +0100
-Message-ID: <20261126233710.42048-1-szathmary.janos89@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        d=1e100.net; s=20260707; t=1795739946; x=1796344746;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=OvwsNYV9K/LXXZpGZnFqU4JXKALJmJzA8uLyf3/RYp8=;
+        b=B8WIZcmiP+02oWCQA34DIB5A6yeaGQHGox1lrJQhcnquwmsaDk/pw4/EKig6iryqHk
+         ioitQbKXmlqySrHyvc08NdD0OkFD1COvzy1tKdR8IPz2Wcv+52GKFyL1vigeZMd/PKaR
+         98DKFsu77kkjYbgdQha+2QBkRdZwZNQVVDSxNlwdKKuiXKt5HhP7862Zh2BbbyMcbbx4
+         Cqcl7Zu0n46Z3CnG5ViJY6955nJuqbIcgwyFXFldxQ0xIWPe+iCv1Z6BJuEcHr4z0Z53
+         dvc7R2i6l09h0pLXDJS8hRjghJE0aasqutauMPx5mT1NUBO025aMQqcdbyzLKinleJnX
+         BqkQ==
+X-Forwarded-Encrypted: i=1; AL+hErEnlEgdbKZrNsqr3KT27OI+UvkSGwSx/s4rI1XUZLGK0+V47zS4Sytuw/UmCqUGL/XKbFURfXgA0iqBTA==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/rz7yF9Ajs1iVkET1sHx/0kZnlvLKKt1LYpGfoGozHClRxuI40
+	YtKlE8UePeCs/9vOfyiOMNnVt9Km5GK+Iq7e+jg0HTqVS5SISjCrffnW
+X-Gm-Gg: AZFdTZe0EdyKoZa/9UsAEor0LRQwlecUp1vcqueBPz3hi1o57bwFa577SzLj+v0PIbm
+	KkmhhLhAd//sE3OVeLMSbGkR7hEMsMs50hnCFecGOiH6zATznp+KovfhF0wtDZFS5FWTat+3q7h
+	JxwGOFO0Ew0rEnZCF79U4qZsJqTABrfUCea92w9pjUa0rDyWY4YVUdW0A59A8+vv6HReJNrljTE
+	u8NnKaYZkQTRcGfZOcnhcX2NYu2W2GDp6Umni/ZmjMq61WAzF1PKpWKXwbqLM0AYKhkgMgTRDHA
+	rEqvG2yjbM9+oJKos6cbCWKw18e6apanbKfbXoKV8IP0hFnep1vNd6WosEscRUgpPH193zQNO9k
+	rk+UlpqOTNcL7GNeCR7zzQrAyiPWPlVrJdUgPJ0kF6wSxHr5WQ8zsRwHm/ole8MICAReEb+94Jz
+	arwV2Bdrgrc8sbkhSlTfb5wKwABwHN5O7U42zdx0wxd9BLuzQ/G+SSHFtAtDSLrNtMiewm8ie+a
+	u51nAOY+jSiAqNepgCqIWmlO2wbl+FzhIeIgdZUOzIo/XYKGOqV3nDAVIyfcYaVUon57awo4wf/
+	w6FSvP/0020jqbZmfLb3oS1OJCo5tQdfUZRQUpikTYtj1kcpIAKQ8QVDdhW6NrVWcrVAiweNENh
+	eT5h8M5L72ymvkQYPyK+0cqSuPg==
+X-Received: by 2002:a05:6214:3bc9:b0:921:89a9:d5c4 with SMTP id 6a1803df08f44-92189a9d8cdmr68634676d6.11.1795739945651;
+        Thu, 26 Nov 2026 16:39:05 -0800 (PST)
+Received: from localhost ([138.197.109.108])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-92134a058aasm200373866d6.33.2026.11.26.16.39.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Nov 2026 16:39:05 -0800 (PST)
+From: Nikolai Dokutovich <ndokutovich@gmail.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [RFC PATCH] fs: tolerate an unfrozen superblock in the block-layer thaw
+Date: Fri, 27 Nov 2026 03:39:02 +0300
+Message-ID: <20261127003902.48-1-ndokutovich@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -98,113 +104,103 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Commit 86947bdc2889 ("loop: move vfs_fsync() out of loop_update_dio()")
-moved the vfs_fsync() of the backing file out of loop_update_dio(), so
-that it no longer runs with the queue frozen.  In loop_configure() the
-call became unconditional: every loop device setup now writes back all
-dirty data of the backing file, also for a device that uses buffered
-I/O.
+The in-tree selftest tools/testing/selftests/filesystems/freeze fails in
+shared_bdev.unmounted_sharer on v7.4-rc1 and v7.4-rc3.
 
-Before that commit the backing file was only written back when the
-device started to use direct I/O.  A buffered loop device reads the
-backing file through the page cache, where the dirty data is, so it has
-no use for the write back.
+DM suspend locks filesystems by default, so lock_fs() calls bdev_freeze(),
+which freezes the superblock through fs_bdev_freeze() -> fs_super_freeze()
+with FREEZE_HOLDER_USERSPACE.  A userspace FITHAW thaws that same credit.
+On resume bdev_thaw() calls fs_bdev_thaw() -> fs_super_thaw(); the
+superblock is already thawed, thaw_super() returns -EINVAL, and
+fs_bdev_thaw() propagates the error when a single superblock uses the
+device.  bdev_thaw() drops bd_fsfreeze_count only on success, so the count
+stays elevated and every later mount that registers a superblock on the
+device fails in super_dev_add() with -EBUSY.
 
-With the unconditional call, setting up a loop device on a file that
-was written just before waits for that file to reach the disk.  In VMs
-running 6.18 with a rate limited virtio block device, mounting a
-squashfs image through a loop device (LOOP_CONFIGURE, then mount(2))
-right after the image was downloaded takes:
+The same condition is already tolerated when more than one superblock
+uses the device.  Tolerate it for the single-superblock case too.
 
-  image size   time for the mount
-  0.4 GB       0.8 - 1.4 s
-  1.1 GB       3.2 - 5.2 s
-  2.1 GB       2.2 - 2.7 s  (larger VM with a higher rate limit)
-  4.5 GB       6.1 - 11.0 s
+Add FREEZE_SKIP_UNFROZEN, set only by fs_super_thaw(), the holder thaw of
+fs_bdev_thaw().  thaw_super_locked() returns success instead of -EINVAL
+when the superblock is SB_UNFROZEN and the flag is set; a partially
+frozen superblock, a superblock frozen by a different holder, and a
+filesystem thaw error still fail, so the block-device reference is
+released only when the holder thaw succeeds.
 
-The same mount takes 4 - 9 ms for a 0.3 - 0.4 GB image that was written
-minutes earlier, and 4 - 7 ms for a 2.1 GB image that is fdatasync()ed
-while it downloads.
+Filesystems with a custom ->thaw_super (gfs2) are not changed.
 
-Call vfs_fsync() after loop_update_dio() and only when the device ends
-up with LO_FLAGS_DIRECT_IO set.  loop_update_dio() can only clear the
-flag, so it is final at that point.  The device is not bound and the
-queue is not frozen there, so the write back stays out of the frozen
-section, which is what the commit above was about.
+Block-layer freezes remain marked FREEZE_HOLDER_USERSPACE, so a userspace
+FITHAW can still consume a device-manager freeze credit.  Marking them
+FREEZE_HOLDER_KERNEL was considered but would change FITHAW behaviour
+during a suspend.
 
-A device that is switched to direct I/O later with LOOP_SET_DIRECT_IO
-is still covered: loop_set_dio() writes back the backing file before it
-enables direct I/O.
+Verified with the in-tree selftest: 5/6 before, 6/6 after.
 
-Fixes: 86947bdc2889 ("loop: move vfs_fsync() out of loop_update_dio()")
-Cc: stable@vger.kernel.org
-Signed-off-by: János Szathmáry <szathmary.janos89@gmail.com>
+Fixes: ea4e4cc26301 ("block: allow making a block device unfreezable")
+Signed-off-by: Nikolai Dokutovich <ndokutovich@gmail.com>
 ---
-Tested on arm64 under KVM (QEMU 8.2, 4 CPUs, 8 GiB), mainline at
-9437ee8b6cf6 with and without this patch.  The backing file is 512 MiB,
-written with dd just before on ext4 on a virtio disk whose writes are
-throttled to 150 MB/s (QEMU throttling.bps-write), several runs each:
+ fs/super.c                     | 11 +++++++++--
+ include/linux/fs/super_types.h |  2 ++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-                                  before          after
-  losetup (buffered)              3.42 - 3.65 s   0.04 - 0.08 s
-  losetup --direct-io=on          3.40 - 3.56 s   3.40 - 3.68 s
-  buffered, then --direct-io=on   -               3.53 s at the switch
-
-Dirty in /proc/meminfo goes from 512 MiB to 0 in every case that takes
-seconds, and stays at 512 MiB in the buffered case after the patch.  A
-squashfs image written just before reads back identical through a
-buffered loop device, before and after.
-
-blktests loop group, same result before and after: 001-003, 005,
-007-009 and 011 pass; 004 and 012 are not run (no scsi_debug module,
-systemd older than 259); 010 and 013 fail in both, because the test VM
-has no systemd or udev.
-
-A W=1 build of drivers/block/loop.o is clean.
-
-The times in the changelog are from VMs on 6.18 and cover the whole
-mount as the caller sees it; LOOP_CONFIGURE was not timed on its own
-there.
-
-The cause was found and this patch was drafted with the help of an AI
-coding assistant (Claude), from reading the loop driver at v6.12, v6.18
-and mainline and from the timings in the changelog.  The tests above
-were run with its help.
-
- drivers/block/loop.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index a3325ce..0c84eb7 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -986,14 +986,16 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 	if (error)
+diff --git a/fs/super.c b/fs/super.c
+index c5a0658f7aaf..5d850736c8d9 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1457,7 +1457,8 @@ static int fs_super_thaw(struct super_block *sb)
+ 	if (sb->s_op->thaw_super)
+ 		return sb->s_op->thaw_super(sb,
+ 				FREEZE_MAY_NEST | FREEZE_HOLDER_USERSPACE, NULL);
+-	return thaw_super(sb, FREEZE_MAY_NEST | FREEZE_HOLDER_USERSPACE, NULL);
++	return thaw_super(sb, FREEZE_MAY_NEST | FREEZE_HOLDER_USERSPACE |
++			       FREEZE_SKIP_UNFROZEN, NULL);
+ }
+ 
+ static void fs_bdev_mark_dead(struct block_device *bdev, bool surprise)
+@@ -2025,7 +2026,8 @@ static int wait_for_partially_frozen(struct super_block *sb)
+ }
+ 
+ #define FREEZE_HOLDERS (FREEZE_HOLDER_KERNEL | FREEZE_HOLDER_USERSPACE)
+-#define FREEZE_FLAGS (FREEZE_HOLDERS | FREEZE_MAY_NEST | FREEZE_EXCL)
++#define FREEZE_FLAGS (FREEZE_HOLDERS | FREEZE_MAY_NEST | FREEZE_EXCL | \
++		      FREEZE_SKIP_UNFROZEN)
+ 
+ static inline int freeze_inc(struct super_block *sb, enum freeze_holder who)
+ {
+@@ -2296,6 +2298,11 @@ static int thaw_super_locked(struct super_block *sb, enum freeze_holder who,
+ {
+ 	int error = -EINVAL;
+ 
++	if (sb->s_writers.frozen == SB_UNFROZEN) {
++		if (who & FREEZE_SKIP_UNFROZEN)
++			error = 0;
++		goto out_unlock;
++	}
+ 	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE)
  		goto out_unlock;
  
-+	loop_update_dio(lo);
-+
- 	/*
--	 * We might switch to direct I/O mode for the loop device, write back
--	 * all dirty data the page cache now that so that the individual I/O
--	 * operations don't have to do that.
-+	 * Direct I/O bypasses the page cache, so write back all dirty data of
-+	 * the backing file before the device starts to use it.  With buffered
-+	 * I/O the device reads that data from the page cache.
- 	 */
--	vfs_fsync(file, 0);
-+	if (lo->lo_flags & LO_FLAGS_DIRECT_IO)
-+		vfs_fsync(file, 0);
+diff --git a/include/linux/fs/super_types.h b/include/linux/fs/super_types.h
+index 6ce105fe8359..434cdc338360 100644
+--- a/include/linux/fs/super_types.h
++++ b/include/linux/fs/super_types.h
+@@ -64,6 +64,7 @@ struct sb_writers {
+  * @FREEZE_HOLDER_USERSPACE: userspace wants to freeze or thaw filesystem
+  * @FREEZE_MAY_NEST: whether nesting freeze and thaw requests is allowed
+  * @FREEZE_EXCL: a freeze that can only be undone by the owner
++ * @FREEZE_SKIP_UNFROZEN: tolerate thawing a superblock that is not frozen
+  *
+  * Indicate who the owner of the freeze or thaw request is and whether
+  * the freeze needs to be exclusive or can nest.
+@@ -78,6 +79,7 @@ enum freeze_holder {
+ 	FREEZE_HOLDER_USERSPACE	= (1U << 1),
+ 	FREEZE_MAY_NEST		= (1U << 2),
+ 	FREEZE_EXCL		= (1U << 3),
++	FREEZE_SKIP_UNFROZEN	= (1U << 4),
+ };
  
--	loop_update_dio(lo);
- 	loop_sysfs_init(lo);
- 
- 	size = lo_calculate_size(lo, file);
-
-base-commit: 9437ee8b6cf607e883b36e44bd755968daaebd48
+ struct super_operations {
 -- 
-2.50.1 (Apple Git-155)
+2.43.0
 
