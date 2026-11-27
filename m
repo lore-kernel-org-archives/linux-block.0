@@ -1,85 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795813794;
-	b=hRJNRy/esW2RjioQnRkCbRi6e6PDoKD8E+X+AcGvzi5U0Ovat7OkNJOQzRKDMGnJq1wO
-	 Ig3QIqdnNmSR/DP0H6zk8PugxqCkl4Am+9cgtO2sDIfidqJkuFhD1QYbPOgiW5fMBvS0h
-	 IJD/haUeAR8TgKq4v16k/HorpIPOGbZzZGQtJcA4QUFamaQ9IPmuk1GwWRnsLYlenoRwa
-	 gk/nt5EcH6JYcW0NzzkVysryRBDqUZcS0YLoNZ92Dk3qUjAMxIBvu/x0nX0ZRu9ZY95Wt
-	 fSVXNaV4xZdMzwcmmV9bgJkWqhM+xmZGZV7kBa3wGVbJjreKATHm+9AQgl69JcWtlAQ==
+	t=1795816653;
+	b=AQbi1lYMWkeWgaoXM9Hj98YbYO8LrFPIY4o0+T8m8uGent16KOJMwc8dd9AfMf1h+bSA
+	 UpD4fu3Z3bZZddDSS9GtYNYNymKtEX5T6oQ9DNKOe7yrDHba3kPkKc/hhb3KtTEiz/q/n
+	 zzzKD1HHmWKxXmfh6XNMfvvI5dKCRI6jGUd5OSNwB2b/kFkz40e+MRrhLgmAsTZ+tS1Te
+	 Ws2T7MnVwdV1JwGgxczQHAKm8RhQQB4BGy58OVanTNC9jQSCZb2cQ1sgskNhsnhudkhV9
+	 p1LrQc3aBmXXE7N18tUyPHFOwWlBYWkSmkhOnznfCEdThi/1g3Oxyfw4FwON7HKcMCw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795813794;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=b8wN83zNuLdxfhURbP01LmD8RetsAxNhZ3b+B2xuzOQ=;
-	b=nGHakKg5rYWzDP5cmEwBN1tUOrQV6T++UmWcEJB3MYyi3ZLeXuXAh139cUp0uQSYmN1q
-	 awmZ7+U0BokPvzgziujMouCBSr7DjxceDDyzmi0Tk2wkY/yFEVbV4Gcd/9lhnlchSRDPL
-	 pnFJBaS/IiiIObU4MVuvmamqgaVcOsFm/BcZYhJHtBk7psjJp7dK46y2QRuwn03KsyAQb
-	 WGILD1oKYseuvDDnDCbeQn1Sb99aECqvzkPura0fibuuPY6f/R3etNnL7ZlBnBfR8NR+N
-	 R+mDcLusA0TGCKk2wVyZfA7nl6dMjRfehVVBgvyXdxyyNh11f5Xxd8uVFvPBqHhIZ+g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795816653;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Content-Type;
+	bh=6h2Be5vq4BhohYg0FpSh9pBi8qTo4Axywk+YvYQQYPk=;
+	b=TESANnPzcsmv4KXOH9ZN7+Xgem6+FdNqYZnts6PuE1Kp3poIELmRrikdrJGNPEAySLRc
+	 kV4KkqgEYdFRVlSuMEKXF6dySyXylbncPD1h1l8TJRuQ14/PBBWrTPBywHM5J34oFzu8n
+	 23zsx7BSHD6eGePCqNMbyC4BiottkqMxoZEgEKXdBD1A65aaVxqEyTIyyJoGfZAB+/9zP
+	 l8kTV75iTppBiQ/uo4tryVK2LfFreNXvFPG5U2mYbqUnN5WPYatMJD1/lpx1TMphhOGEY
+	 YHK2dkPPEvcSYxqflpMrx1N4S5j69tgWv1G3tnAwsxb/bXqd47SQq+e2cLtgEFmkTjA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Bz2qE0Z8;
-	arc=none smtp.remote-ip=198.175.65.20
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.198
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E83606A31C;
-	Fri, 27 Nov 2026 21:09:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B0E83606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Bz2qE0Z8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795813793; x=1827349793;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ru+ziasidtLhoZH/GxyiIw2iqMUGXKKo8SAN9rrYi48=;
-  b=Bz2qE0Z8F35I0AI5hpuNVh0zJzp0PmUrm1wMo7QkN3YR/PCYULPFS/KE
-   8dIfUT59SU0wjnuGlsNv8Y1b7U2b50jqawFhwm4eJ9DfQA5lAAxdrkdfy
-   NZubV2WGUrbSbs5raA3osIl8K1JAhXthCZTLxfdW+mGmrDeu4i++4A/FG
-   cGTCmebiBox6vmq8ZDOYqBpi9XMXuUgNUT49OQ9RlLfHzxNN/41J4XQhY
-   v9ySPRnqbYQxkLhUm+riaqpQamrh7RSnDWfJoxPRTsDxsuWe3StlO5Zuu
-   PFs3Yg8bijhkPy1aMTqXC/xxlhj9rbi+y/UCQQ3LCm/O7jeXVKkE1iuVN
-   A==;
-X-CSE-ConnectionGUID: //g4Z98DRcGshyrU12exrQ==
-X-CSE-MsgGUID: 7w0rklRuTs6kSAHIorjkXA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11979"; a="4776488"
-X-IronPort-AV: E=Sophos;i="6.27,237,1787036400"; 
-   d="scan'208";a="4776488"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2026 13:09:52 -0800
-X-CSE-ConnectionGUID: VRJ92++kS6CCUGYFQ2Sx3w==
-X-CSE-MsgGUID: x53bdMfHS3O+GlqFeCSmGw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,237,1787036400"; 
-   d="scan'208";a="12622127"
-Received: from igk-lkp-server01.igk.intel.com (HELO 146cf1e082f1) ([10.211.93.152])
-  by orviesa001.jf.intel.com with ESMTP; 27 Nov 2026 13:09:50 -0800
-Received: from kbuild by 146cf1e082f1 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xX3CV-000000000M6-3Fca;
-	Fri, 27 Nov 2026 21:09:47 +0000
-Date: Fri, 27 Nov 2026 22:08:57 +0100
-From: kernel test robot <lkp@intel.com>
-To: Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: oe-kbuild-all@lists.linux.dev, drbd-dev@lists.linux.dev,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Andreas Gruenbacher <agruen@linbit.com>,
-	Joel Colledge <joel.colledge@linbit.com>
-Subject: Re: [PATCH v4 02/21] drbd: extend wire protocol definitions for DRBD
- 9
-Message-ID: <20261127215935.7Z22nJ4s-lkp@intel.com>
-References: <20261125153511.3060599-3-christoph.boehmwalder@linbit.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750B0606A31C
+	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 21:57:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 750B0606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-4fb73e868aaso9074672b6e.0
+        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 13:57:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795816652; x=1796421452;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=6h2Be5vq4BhohYg0FpSh9pBi8qTo4Axywk+YvYQQYPk=;
+        b=dtcseavChLRSQU7TW90ILg14ZXd1ZZG3lCGbLWVBhyH9I/D3Nz4z+kFOjTQp8SJ4AS
+         CEhz83VJvVKsI3mQR9lHFUUliTJ0Augj5/5FfoRWDf/dzu2VNJpIQ09ZWEgle3VZmzoi
+         LjOgbs5UrDVNPEEe9HCrbHo4Xx4wUWolRV4tcspf5Ey6kkZ0uYgzkI8yYPycTc4Yz1CH
+         nfL8KNhh/4Em6jpOAyrlsy4untPfmFPrNwIbySEjkAg840RQfn+OCGU5gpS2qnCgdBAC
+         cF7+yHaNnjEHjeRWnKvifpmsllM5OTr9ZcWTpdpUgMjATXhJcIctry6kdDUdYp5o3OEQ
+         EiAg==
+X-Forwarded-Encrypted: i=1; AL+hErFZl8YI67Yye7A2723aLFJBLGGhZIfVQRIFDQWQslGey7OFSrQecZ+OmFTX48KlSq8zgblbi3+9Cqcicw==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8bVgFhsF0o2gBdYOvaUWiac/f2iaq/IPcB49Wnc0akOAidmNIB
+	p7zqeZ3vaAIx3QEkLz9m/xtsVOepof0uSkK8RsyvTi+IWL+CN1z7/Vg0o6IdCgOi70m/EXLSlIM
+	b7JSML4FW74UOFMaa1oym1tsNCZJm9wJxyV0RIhLAnFD5LqdKiw4tCT4GekE=
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -89,44 +58,66 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261125153511.3060599-3-christoph.boehmwalder@linbit.com>
+X-Received: by 2002:a05:6808:1911:b0:4df:5cd0:89c1 with SMTP id
+ 5614622812f47-57a095040ffmr27187642b6e.23.1795816652578; Fri, 27 Nov 2026
+ 13:57:32 -0800 (PST)
+Date: Fri, 27 Nov 2026 13:57:32 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6b09fccc.15291bde.1a1328.0230.GAE@google.com>
+Subject: [syzbot] [block?] WARNING: lock held when returning to user space in blk_mq_freeze_queue_nomemsave
+From: syzbot <syzbot+0c1cc7a4dd90af186bc8@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Christoph,
+Hello,
 
-kernel test robot noticed the following build warnings:
+syzbot found the following issue on:
 
-[auto build test WARNING on aa7014f8d7565cfea117eac36a5de0a05eba65a4]
+HEAD commit:    822ba3a89c78 Merge tag 'arm64-fixes' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17f77865580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=284ed4d28353a6ff
+dashboard link: https://syzkaller.appspot.com/bug?extid=0c1cc7a4dd90af186bc8
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=113c81bd580000
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-B-hmwalder/drbd-mark-as-BROKEN-during-DRBD-9-rework/20261125-163451
-base:   aa7014f8d7565cfea117eac36a5de0a05eba65a4
-patch link:    https://lore.kernel.org/r/20261125153511.3060599-3-christoph.boehmwalder%40linbit.com
-patch subject: [PATCH v4 02/21] drbd: extend wire protocol definitions for DRBD 9
-compiler: clang version 22.1.8 (https://github.com/llvm/llvm-project ca7933e47d3a3451d81e72ac174dcb5aa28b59d1)
-docutils: docutils (Docutils 0.23, Python 3.13.5, on linux)
-sphinx: sphinx-build 9.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20261127/20261127215935.7Z22nJ4s-lkp@intel.com/reproduce)
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/98fce4d0b21b/non_bootable_disk-822ba3a8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/69ce5f1e81fa/vmlinux-822ba3a8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/21de7918f654/bzImage-822ba3a8.xz
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/20261127215935.7Z22nJ4s-lkp@intel.com/
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0c1cc7a4dd90af186bc8@syzkaller.appspotmail.com
 
-All warnings (new ones prefixed by >>):
+device-mapper: ioctl: device has been removed from the dev hash table.
+================================================
+WARNING: lock held when returning to user space!
+syzkaller #0 Not tainted
+------------------------------------------------
+syz.3.98/6416 is leaving the kernel with locks still held!
+locks held by syz.3.98/6416: 1, on CPU#1:
+ #0: ffff8880587709e8 (&q->q_usage_counter(queue)#59){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0x15/0x20 block/blk-mq.c:206
 
-   Warning: Documentation/translations/zh_CN/networking/xfrm_proc.rst references a file that doesn't exist: Documentation/networking/xfrm_proc.rst
-   Warning: Documentation/translations/zh_CN/scsi/scsi_mid_low_api.rst references a file that doesn't exist: Documentation/Configure.help
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/display/bridge/megachips-stdpxxxx-ge-b850v3-fw.txt
-   Warning: arch/arm/xen/enlighten.c references a file that doesn't exist: Documentation/devicetree/bindings/arm/xen.txt
-   Warning: arch/powerpc/sysdev/mpic.c references a file that doesn't exist: Documentation/devicetree/bindings/powerpc/fsl/mpic.txt
->> Warning: drivers/block/drbd/drbd_protocol.h references a file that doesn't exist: Documentation/application-resync-synchronization.rst
-   Warning: rust/kernel/sync/atomic/ordering.rs references a file that doesn't exist: srctree/tools/memory-model/Documentation/explanation.txt
-   Warning: tools/docs/documentation-file-ref-check references a file that doesn't exist: Documentation/virtual/lguest/lguest.c
-   Warning: tools/docs/documentation-file-ref-check references a file that doesn't exist: m,\b(\S*)(Documentation/[A-Za-z0-9
-   Warning: tools/docs/documentation-file-ref-check references a file that doesn't exist: Documentation/devicetree/dt-object-internal.txt
-   Warning: tools/docs/documentation-file-ref-check references a file that doesn't exist: m,^Documentation/scheduler/sched-pelt
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
