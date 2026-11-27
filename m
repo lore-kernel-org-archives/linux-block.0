@@ -1,92 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.174
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795745461;
-	b=vbItWGiGHhxo+RYOUE0IadxWlck6NZ8wAODJWp6auVk2e2Xi2WUM4S5QpqHEdqCqBl/n
-	 0Bq/BnrL9LOnHAt/IOxxaSaz1r+vK+xyDWJlkISQ1jxCVSoPwt/jqrmh/Sl3dgHsB9brt
-	 EWVxMRQao7Wqbcwe1TbP2WH1X4YYYN3sjK8d0Qo2pCOvbTbOAeAAlcE69vAaEe3JtQG1C
-	 e1XvCk5+PQoHxaRQuuARucHqkBZ+tTlYm6H//n+GZoe8CABoXWAhhS3CJuRNsIu3leOxk
-	 wrAyIUXs2I++3drpR1DnLbwGnTocq+RTDgZr9wB4EyIduF9zATSi5qUMoAYQCHmsMTw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795745461;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.45
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795747320;
+	b=crU0TAIJvBzcgS2eVVPwCn5XpQTzjYUPmek11YCHtpGR8tQtOY1ZmveCVVdJmeVrbRNX
+	 9a5xYo5QZ8JV/L+BvzHDyKo4o8uU8GgYoywDUbb0myBZXFy7Iyf+U2OrcqZX9fbz/TRPv
+	 BterJud3dSLFrr4HgHRCsi/m78TNZ7y+11hPRBERdKjDIzkwuUAumVH2yNBxzI9esG49a
+	 cTfpRkCmKOONwo+/zPDyvXkWQHZiRuGJtAbTn6mS/6HY7CWOtU7I7AnhybUc6kcHnXTds
+	 5TUFjnBlzx2mTJ5WhrRSEuhGdh7wswP+JGjPpeNw+t9oOqBr+/yeJD4pErphh54MI6A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795747320;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
-	 In-Reply-To;
-	bh=BHCahoKy2PJzUedVB7T1cTYvXickwh+vDtpwXOtC6wA=;
-	b=uAF3aY7xnzmqjMJphpM8BGxL5+fXIIccXgkXpcwVMyqR4gs7slbQURcVaT9RVfq+3YXf
-	 t/LK09Q7Olzz48Vnn1W+HSQxn4BOfnu+9JK7VVShkZKpuvIZa2JKpRyc50zd5TxtQR1uM
-	 dfnIaZRrnXw6RR76EobAw9MVu6uvdaCgJqCvRWm3yhMCXWQxxPeec8dGCduEpWIrQyY55
-	 2JkqtTOp+deln4vj4Sf8wLaXznpnnSkDItp7AgJynaUGZfFj2sa8Pfdf7TzgUhLVAWEBL
-	 XAaky045tFNliatyDBdjee8WrQPUkpmx0kxQWyBLtKPTay2J9Epy3y9/S020GzKCPXw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b="E7NhiTW/";
-	arc=none smtp.remote-ip=209.85.214.174
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=mjTKmUue8uDRgqqOrMpuy+EJyNp8jfd045TOjApN2+M=;
+	b=ZdFZXxnZq2f8oGPwm6xd6qBouo77AdYiqrY+/kyJYairig3Zjxncq86LCZcP/qQPx5EB
+	 BvlgD6vcVddLFCSbEVgoAstW/jWMQeo78Oifvdb0RJSDaSCM1dKl+0yr3hBX1M2bFalfp
+	 wck/3pQ0ZYqB/CiTIWIGOMu4di7O4YLhFeXOjIG+nAGw+7aN6UkalFWZk4EVrpvug3ski
+	 NIo5LkUQjG9HxLPj5dwI2FNGKakcopB0W5uLwjv+4itxMS9Ptv4kXfn/eOQ9hUQcpD41C
+	 qvm3WOdWZRRhVZjl/GPN/UoANuBrHMv1VwUFPRFcpHucLHvKJ7UPkPdPYx7kP25c7rg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LymxqVqE;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.45
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAADA606A321
-	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 02:11:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BAADA606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2CB606A31E
+	for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 02:41:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F2CB606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=E7NhiTW/
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2f066274caeso35709895ad.2
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 18:11:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LymxqVqE
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-91c1f548f87so100808806d6.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2026 18:41:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795747319; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Z8qbckPXeOOoM82su9QLLn3Hx4w6EPxfuo+4Tjh92tOSLu4wdRMt7LaCOwuxFzB4nf
+         prBXAuP/SoFr1rsSCNSzB0tU5wPFQWA4aqOVpt69rhsBixOSiS83gS+zdwvUkv3jGBra
+         MhZc7D5iJSYG3aZlpERpLoir24Ho5pn0heviW/p+Cd25ikYYyaZRNV5eL91IRH8qukat
+         UHHnxVBFJnkI/CKjtSe7KYGtK9BunA+dV5ntoof6v23ZWJC2zZna8Nz/fKh1iDXAbx0e
+         LNrb0UO1psr5KvxgPDx+RTqygzofCtbhBpDhk801zSVuiT6p87bLBkURjG8IT7FycIO0
+         wn/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mjTKmUue8uDRgqqOrMpuy+EJyNp8jfd045TOjApN2+M=;
+        fh=zLdBfBsA9Lzo0M6Hi3EYeQQ5TMiveieWqRaAIpl5N6I=;
+        b=qhcfbe88sVH7LcphTivbQ/GZVCL/Zldy+ja3Ga6nJYw6SUeO+OpkWBN+zhR1tUkSZZ
+         5/xGzN70yesTQq0dafdKb4UYliihBAyeCNkhIU3m1CNIKgzDZSz42DHER8z1KgnJnvWB
+         pwUg+Lub2jFcNVN+JQV2ZlcTHgAWHZTFRAllaQdq6pGUavzbH7H0iLWPwYVws9ZW0bem
+         bz5TE4DQwUAv/M/8NpuvoehEtStcrqt5i62Y7HI2/FIW5USDD/L+3d+cJzJGnw/JAz1C
+         KjXsLrMkUYYtIN0fQLzWog14c8ESF5D7R9oSue9hn8T5hD9jXpw5oe5cUg01TP6ZSdYk
+         cgAg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1795745460; x=1796350260; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=BHCahoKy2PJzUedVB7T1cTYvXickwh+vDtpwXOtC6wA=;
-        b=E7NhiTW/ePZcJTVjS9gCw0DveB6YX2Lh9H5t3MqtptrNPMx1MvFpK/Ol+p59LcWWGi
-         lko2I2G9D30i58Ps5lhPPG7ywL3139h/z7HuMDUoExqJqc/e3aKwi7SBP3G8gGbID/8d
-         uj81oS5dBFuC5ctOWpMpoi5QF7/tu8uPq/aNA=
+        d=gmail.com; s=20260707; t=1795747319; x=1796352119; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=mjTKmUue8uDRgqqOrMpuy+EJyNp8jfd045TOjApN2+M=;
+        b=LymxqVqE8yKkfvLJxa/4Kw1dQnzxd5RBz0e9MwTAJSaII/nSUMUacLxA9zWn8EPWwe
+         zpFBNAZV3BfX3VZc1Hj8PZ+ulZlE8v/3GYsYir0nI+k5hWw6F/yAfbVWLpRb+M+8ErMx
+         iyQmK4V13fSsxWaCEGvkvPt8FZdL7ZVe5QDsG5E/dAsmYgUI6r5U9szA+GiibPhPtL54
+         RXZWP0mZxAwCevEKiik7qpqlYgCAAvWBjlkp17PfAmqWk3eLX2mK06ZFqlhGMUYkP/1P
+         Igik/ouRyJ1oa86D0IM+0Bh4bQFIK/+szJkBgG40sOaWrTlENmsGeXYvK8ToxUtAV3S8
+         xt8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795745460; x=1796350260;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=BHCahoKy2PJzUedVB7T1cTYvXickwh+vDtpwXOtC6wA=;
-        b=zQgtn+2UkhtQy3ek+efPGe95kkqP3/sdg1ftms59QovC+ce26nFaNE4E0S288q/I1p
-         Vv3PzE4LGe6kJCbzJbJGDZVYMyslg6T6Y0rkJhcazhrtDwQIIjD2qdv1Ci7bjVtaV2rp
-         pTiACJJVJZSm3AVOPGR31dMe+ZzAmmEiOn+SG7r+MQFD4mc4uoMKCrKIpqNlX9QdN5sD
-         zH/UIaPWI0FNlgLUKYGhQxwfri2qo1po32DQVPw9WALRc2CXPB1covLOjR9v4PxC3Zn/
-         0xLw3h7TiCGM5tDHkMdKy3NwAdzh9yGO2EfHuA3dDbIalqv3VrPJ1lghbmGm+yctTCfz
-         ooKw==
-X-Forwarded-Encrypted: i=1; AL+hErF47KbpMk+tocWrv53T7p/GEvJEtTtpyUBPKH5JWyf7RRSjLjkjDXjhfcERKY9zZoxZJEL+aBVdBplK1w==@vger.kernel.org
-X-Gm-Message-State: APuU4Z8uM57vwKaWjD/hvG0HuXpq0YiJRqIrtMR/F/aDqdPJ3UTts2SB
-	srOzhdIuGqgcQFXN0DHF6Gz3+BPxLIs6My/WZZdkJESSJnK42qwkHkX40t9FaXv8lg==
-X-Gm-Gg: AZFdTZdL5r2Dy5+kEmxcO8Ly9otJ8t3QQ+looyz6jPSe0uvDDjHeATdpzhGOoARUhmE
-	oFDNgng2FA40Mj1XDrTloTy00mOIHp/nY6D11kROci7uDpBJb9U7TNSmSXNf55WiAX7wIcmbMWC
-	NhVP7iju34rpxYFhgLU6dnuUHBA5e+aqwPGWPwMTi34EHg/nL1GhVK9i+CG/Czw8w1CNvTkcuNj
-	q4T9zcnTCW5zmYyZgc4Sh4T96Jf27hz5axS+Zc8ifxLxF24NqCmQWCr3fJfvhyd6vCWJuMxjWNa
-	F8Mmjj6/HMXetZB0ccfuD15AVINXzZR9tO8zhGBaRryRHKcs20yAcKPUXwuNLX1ZY+KwBPMwuIY
-	QZFTmd8usjp6Mfl4Hb5Dy5w+CjAG/paHxS38IEmoGvYUGD0oEbUsid0jpT7P+qYa7Izr6IXyOry
-	k/LL6WTD1S7gGtJHwmaeoP1kO1t7d532bwfxluM2V25Wfm1VOPs4DpcHqPkZgRh8UXSzzbz5ua2
-	lGDP5Bx2vER3Xo7p08IBe+eSZLx77ZAbiGGGrlZp0pDgbNVdNqJzTK5ZcQTIVgu6OcD1TaEbGDt
-	/NSDlb7nqAdvfZEJpyk4lhSiQTixPbCywkHqIIr+/gpGQgrCguhSfDcn2cRJbgEAgkR+NQ==
-X-Received: by 2002:a17:902:f645:b0:2ef:dc42:10a9 with SMTP id d9443c01a7336-2f03ef3d32dmr240566145ad.7.1795745460078;
-        Thu, 26 Nov 2026 18:11:00 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:5bf8:984e:5bb:e51d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f0c42b1sm110269495ad.17.2026.11.26.18.10.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2026 18:10:58 -0800 (PST)
-Date: Fri, 27 Nov 2026 11:10:51 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Artem Novak <artem122novak@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, minchan@kernel.org, 
-	axboe@kernel.dk, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: validate decompressed page size
-Message-ID: <awjlpLnyVmKRqhmQ@google.com>
-References: <20261127004411.109585-1-artem122novak@gmail.com>
- <awjaHB2ugCG_F3Io@google.com>
- <CAPufuhb9txcosy48VXtfxwnC7Ct448J=_HbR00JnZR1QG-NfHg@mail.gmail.com>
+        d=1e100.net; s=20260707; t=1795747319; x=1796352119;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=mjTKmUue8uDRgqqOrMpuy+EJyNp8jfd045TOjApN2+M=;
+        b=Z2D4Yu9CvCeFOl4AOMkv9BE+Y9hqY2cppk09iUm1BOAZWfmoLzJwZaQrLLwQTHPiUJ
+         uqUq2ih09ynttEPP26afnubY9iyppxYBY/0rXLlQdnsG/262UTWmfzUHp3ptA2ESR9//
+         fXnRuF4czGfZ+KcoRJ5+pir6TEthnhiAj7YXEfw9fC5auQY0FYyQWEcVnYejs/rfYz+f
+         WpLfmHmRGa29ObQpvSecJ6c+893HOcoICPZH9OnO4TMp7IMjewEQwGv2EA5v1UJZ+cBT
+         0HBfyXwee8OO6fPwCj7OPArWgPG7+uo9CBEYUp4lc8F5YvZsZdl96mj38jEhIfB4jf5Z
+         iVDw==
+X-Forwarded-Encrypted: i=1; AL+hErFhc2SF0mkCCCdYHTJih0IqUK/oSsXNXIjQtN12ZxggOTS69+8XLfXPbbIeK5EZAOojLbEMqcOOlXo01A==@vger.kernel.org
+X-Gm-Message-State: APuU4Z8I0X2LUW27+zK3IhmdhQxNDEL5u4i182EMN91qeXIJ32INJjyI
+	W5IusjCWUKRNFwzURK/jVjfSEZMMBWGs+wqu8DtqCJYFdhnxOvYZa0ZfSES0U89osa3sHUVxn8J
+	5F6kSkDxQUGrlvwZu2fFHcV6f91bt38A=
+X-Gm-Gg: AZFdTZeImJ2SaaN3tRiypp9bKehot2fHaSBr1AZXa+88V85YPdg2b+MDRdh6Z7MZ2Jh
+	YnJvg2jvxkpNqimACz+/YEHVAumH7hMdsQhtv32Hb4hCytUpNZ1m5NlURJ6gKS4dujlYkYjTjTL
+	3Z8duYzuZapp4k94QIYyzDD8s8Do60+qgPUtrEKDFucLpb5FTN90xab+Imo5x3xj5ZfhE+JXs2v
+	QNJvzSd/CfEQCZoor8ZDTNTEMZxsIiD2cqcYa7Hahe0CXxkCzP6MTB+Tgpdl7KMCygAtxnkhO6B
+	5q1pdTiicyxaioE84SrUb6asCwuOFa8Op2A9HQZ2RpMW8pnvZ8mzBYm94rKovbppQfYB/R9ATKf
+	xILz8vGIoqZj+epsRCI+9Zz9fkSF+r+Bx+HQ/
+X-Received: by 2002:a05:6214:27c6:b0:921:7f88:9af2 with SMTP id
+ 6a1803df08f44-9217f889d57mr115043886d6.16.1795747318873; Thu, 26 Nov 2026
+ 18:41:58 -0800 (PST)
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -96,32 +104,57 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPufuhb9txcosy48VXtfxwnC7Ct448J=_HbR00JnZR1QG-NfHg@mail.gmail.com>
+References: <20261127004411.109585-1-artem122novak@gmail.com>
+ <awjaHB2ugCG_F3Io@google.com> <CAPufuhb9txcosy48VXtfxwnC7Ct448J=_HbR00JnZR1QG-NfHg@mail.gmail.com>
+ <awjlpLnyVmKRqhmQ@google.com>
+In-Reply-To: <awjlpLnyVmKRqhmQ@google.com>
+From: Artem Novak <artem122novak@gmail.com>
+Date: Thu, 26 Nov 2026 20:41:48 -0600
+X-Gm-Features: Aa3M54qy0vNlqas6YULOPcsNSCZ7uefCUSENGQM7ReO8lLzeNpabTmpK4rgiuJU
+Message-ID: <CAPufuhYd8daR2EPB=fE+g=Bejt=85pB3qvmOBdA-QzyO1Qx-yg@mail.gmail.com>
+Subject: Re: [PATCH] zram: validate decompressed page size
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: minchan@kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Artem,
+Hello again,
 
-On (26/11/26 19:34), Artem Novak wrote:
-> Hey Sergey,
-> 
-> On Thu, Nov 26, 2026 at 7:19 PM Sergey Senozhatsky
-> <senozhatsky@chromium.org> wrote:
-> > Yeah, I don't think we should do this.  We only ever compress PAGE_SIZE
-> > buffers, if some backend decompresses it to a something that is not
-> > PAGE_SIZE and doesn't signal an error via "ret" then it's a bug in the
-> > backend and zram should not cover it up.
-> 
-> I see.
-> 
-> I thought it might be worth having a defensive check here,
-> since allowing an incorrectly sized result to propagate seems a bit sloppy.
-> 
-> Do you consider this useful, or should I rely completely on the
-> backend contract?
+> I would probably prefer to do nothing about it, IOW rely on the
+> backend contract.  Most of those compression libraries are used
+> in other places in the kernel (f2fs, squashfs, etc. etc.), zram
+> is not the only one to rely on them.
+LGTM; I'll drop this change.
 
-I would probably prefer to do nothing about it, IOW rely on the
-backend contract.  Most of those compression libraries are used
-in other places in the kernel (f2fs, squashfs, etc. etc.), zram
-is not the only one to rely on them.
+Thanks for the explanation.
+
+Artem
+
+
+On Thu, Nov 26, 2026 at 8:11=E2=80=AFPM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+>
+> Hi Artem,
+>
+> On (26/11/26 19:34), Artem Novak wrote:
+> > Hey Sergey,
+> >
+> > On Thu, Nov 26, 2026 at 7:19=E2=80=AFPM Sergey Senozhatsky
+> > <senozhatsky@chromium.org> wrote:
+> > > Yeah, I don't think we should do this.  We only ever compress PAGE_SI=
+ZE
+> > > buffers, if some backend decompresses it to a something that is not
+> > > PAGE_SIZE and doesn't signal an error via "ret" then it's a bug in th=
+e
+> > > backend and zram should not cover it up.
+> >
+> > I see.
+> >
+> > I thought it might be worth having a defensive check here,
+> > since allowing an incorrectly sized result to propagate seems a bit slo=
+ppy.
+> >
+> > Do you consider this useful, or should I rely completely on the
+> > backend contract?
+>
