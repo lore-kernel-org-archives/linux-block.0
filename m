@@ -1,97 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.171
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795834784;
-	b=u7GXMiv0kydEb9FBG92XN5PbTkBMFhbVkv/yz4is0j8xfnicnH/IxZgYb2f7I62vwkeC
-	 NR5M0WPv/QBM7kwIdfkeXqi5slMR8sHt/YWmQKt5mozSzXKUs7MhG/AtqnKxt4L86y8tW
-	 8LmS2KULnR0JSqaNfQrzwj00kE2SAY6hxNKvMD89jJCpZn5s5JwG/j93+vFHbuofmHXCq
-	 WOwJ9aW9w2G3ylDOJOXeB1HPPATJK+nQAVRw+SMg7OmCi8hzEFMrULfqxEQM+fzAlDsd1
-	 43NULkgJifMzLPODZo9CklZV8xo8AofyiDa85G2V1awYQrUEgfA49DVA9e3Blc5AouQ==
+	t=1795835782;
+	b=ic225zPmsMz7sh5q+svONIEyKgjdsCSXuVdk9askBF6HiX4afUWywF2lSZkNurVShHjA
+	 4A40Gv+5gnp9IijjM8mg/+KZgTLOHCSwkOc8Jz9V/8+GA+lreNvt8kY/VYFvf/HynNdNP
+	 +TaH08NC40G+VSdME7gHpGUEovHXfH5RGcvX6rowhJXCLw6BDKVw7ODPd0tWYKE7DWWNH
+	 U/7HSobqjfrjfPXnbatr9krlw2nsU8cOtOh67RV0HsVRAnzxJ/mB/jTAV6a8olVfrvQ9w
+	 EsPTfuvCMqQ3lYRYpsKtqSL/1F8o47DypljODhpdvWFPje3rhHqYYJW4cAosn0H35DQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795834784;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795835782;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=B3XjVPGi1d0sqXZUZmpjBaglDj36IEF4UV/CSJOQiR8=;
-	b=BNhQCefLnTrY1m0AJ4mwD9OIHDHP5Fts49aO2hPvvQYhJWfoGP3PE0BrUiUmPibBM1Ru
-	 GGm7QBn28QpIiDzkZBEV8M2INeImd4fm3OMqvmENrDa2mDcbUe1OlkDdh7l21dH/PHtNL
-	 x4dbu+XwCvO53Fj1d7hUuWPuiSRnfqFrMcgmoEbq9+YxkhzK8iUXz4yRCvRCaHhksRRW3
-	 nWdbwKq/20JF46fLWeHWq4SYUcBPW6TiHvPyBgkSpPh8Bufr04Drup7EGys1zmxQGFKeB
-	 hpijeZ6tlMTx8Bm3avrS+WwNpOrC0RxCL8aPWIVcY6mEObjqvAgmnC90xeNnFKI3MGw==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:In-Reply-To:
+	 References:Subject:Message-Id:Date:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-Mailer;
+	bh=yvCt1gdskx/Y0jOYT6LmJ91002gzEPa4iXQSvGo7T/w=;
+	b=I578Qe7XHw5xqC5vYbRSD9ep5ZhQsHxdQSy36yIk72ktSW9MS83XcZzyM3AMGh1xcjf2
+	 g0E4jSxZdQWOFmxNzjskkublyIYkBsPJBBtZVFH3DsBapZu3DCUaJweOOVXrFyfU4E8WG
+	 8WcW3cXvS/qGWSRTZguuY3ILl4nwJRB55be2lmDSWTZ0sakYeuiH/Xqdj4+igqCW+3GoE
+	 8RZ//wnxwhOf3JAFCsjDsmYGzRL6L8O4SA0oczQMfbCllvOlkcTKU7+T/L66tCNToVdRK
+	 Zla5FsVMlPamzxOQz1EDbLaut4cry+K1vAFmpNLQyh1XKm1RUzkp2LauyvAzUvH5Qjg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=Cr+VyVUk;
-	arc=none smtp.remote-ip=209.85.214.181
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	dkim=pass header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=nDu9lVQt;
+	arc=none smtp.remote-ip=74.125.82.171
+Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA91606A31C
-	for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 02:59:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4DA91606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A22C606A31E
+	for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 03:16:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A22C606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=Cr+VyVUk
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2f0464dd6b6so53243965ad.1
-        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 18:59:43 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=nDu9lVQt
+Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-38431138772so11441550eec.1
+        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 19:16:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel.dk; s=google; t=1795834783; x=1796439583; darn=vger.kernel.org;
+        d=kernel.dk; s=google; t=1795835780; x=1796440580; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :subject:references:in-reply-to:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=B3XjVPGi1d0sqXZUZmpjBaglDj36IEF4UV/CSJOQiR8=;
-        b=Cr+VyVUkagr1zC+gj5lZErmLf5XArrUd08mF03ewcdXumJg3FG/J3dkMjgpAfjlg8/
-         3KE25aEOk5gv9uxUi4bpZo1KB+2kEVWAz+23FciQrixoY8x18qeFKoTdfJIzetF7C6kV
-         Yi0nJtts5yHZq5hI0jwIukVwgNUGYfsnzcUjhylbfvXNFaI/j9T13XT4s+5qy8rEevUa
-         2Ck8qHh153GiblCyCIbtT6QWX/ZB+qloRCDFDz+Btqn1Lq5kEwZI9UGB2xolxq8BDHZr
-         2l0FBrf9UYweVAjxGgfRwljBo8WK/6+Vfu1y0IgzLdLkdJIcCfKsJrzUUq3IIwaAkUEG
-         4iGA==
+        bh=yvCt1gdskx/Y0jOYT6LmJ91002gzEPa4iXQSvGo7T/w=;
+        b=nDu9lVQtkryVMSZeb0kvkG3170q+2QAclKnT7mGciWVBndJFoBkISt5ECqvVgW73f+
+         B/vFwxyyKwhlV/gQgdeagWaouoK+N4XfZ3HG8dQKeH8wd1YMEO0Rzhse4hHitkp1akBY
+         QJhW2MEUGaOntTblnwaQfAyXjLSN+xCyLcIUCkbjCjTxnZT7kAoPlYaPNJ+zfoE5DNI3
+         xyCeQm9M8YzfUWZ2yvdZ6D0o2vD3AMrSk2xswASGN36o28s3OR9bAqFAF4UIk3diU3FB
+         xRCpKv7cmR6Xgp7A+UhcjpweZ0ycwJ2kTP9cO2OqeNaG6yxXfwsw0tl63k6cxFVyHplD
+         FWAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795834783; x=1796439583;
+        d=1e100.net; s=20260707; t=1795835780; x=1796440580;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=B3XjVPGi1d0sqXZUZmpjBaglDj36IEF4UV/CSJOQiR8=;
-        b=IGL1GVaHvgQ4Y2NXRDWsSx5laJjHwR9ONwSiP3dTdoUD1AzPWyO5xc0Za4L3uYWZUD
-         3wysBEZgV6U8O6NAJkL5ihUsddy0csbyOLHlMHl8aZgrwq8XmBKEJ/xn/VMvNybrQIcE
-         z7iFGCACBtpKQY5RNElChff3dzk4V3QDG25DEq0q+Ib8mjwmSVuYiNByb5OhFxDTw5FS
-         vpnOkFWlvT74fSDzsrRR4UP3hoYr2UHivBq1IfqcJu5ndl9/TwXa3sSHRB1DzSVqFi6Y
-         2gkfgeQ2oF0Lx5fKHYlzfyY1IsRncRU6C1aneRj8Wyf/Bk2UkF/k1pTq4Ar3zcEvjsrQ
-         f8lA==
-X-Forwarded-Encrypted: i=1; AL+hErFVnubyKqLEsCXY66qpRyOA8epEiX2IK3aeVCzCPTMmFwhp6e1008dLlGK2v4qUb/IJgMdBECabjOnETw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+ebgWoOO1cJoJpfAFnfWPPi/tyC03F/9blaU4EH/6+/JROr4lN
-	tnLQ+yx6sWHV4XJEBfdUhEUKwmPXmNaZG++POXbzynrMn26zvsfF69ymUTgo/Ht0o2IBNWJi80g
-	iVmZ9G4Y=
-X-Gm-Gg: AZFdTZfPlWRJ2Eyo3ZVVZsgV9/HuU2dzMZMKvI+Pg/5vXGDHZyAMqWitjsxAD/sSjjp
-	qIST+KKbBz8I5c86NTWwJIlkQg4qBFwUaVRlAPKYSw/2HGEY+k0DOV33VQP0HtA9fX0Nc2bYOHE
-	2l0+nOly4wmAnMT7vuEkRMLtG132sbdkgvShyy4cLwiPAJxdw9dIm0JVFpkjqGIuqe7J678XkJl
-	IT0YMqiCyT3IOc4thL1dCKRwGBSuHqnF2+Sk8u3Rir0nP0udGcmU0rxXZD2PoLW5HPViXqgIt0h
-	4sDdrMz/hHK4UTA9Yl6c3On52TpE+kFVnGlXJo4EWKHKIljh6hmIfjXNaOZJfpJPRnikM7lYi+M
-	I4DhwnKLLoJHLl9Az2hy/9I6Ukp2tNOcxbMhpPk9xpVt7MAhpKhzC2N56VzK+rkHRL0wkQPXPsf
-	Dwq8qBgxIqCoOmEW4GiCzlGO0kmk7GPmdO/yfIUm5HSXyMljgALudiUGMgPkKvkoPorJ7hB3EzH
-	lc+ROFlN/cSZtXkRsdpeAHJCXUc0Ko0USuJIPmzWLL9TyjIzhJS1xVFjTtUWwk77eT7+Lyug9f8
-	mPy8kEIlxMVTN/rHNbU7plTNMtqKCe9vLEYyId4gvaAK7c9PnMtBsNtaYI1+6FFy8bPW27h1/tM
-	BcOuqBKUM1L3aGOvqciMVVU2hFAsvA9C/6aqJwEMbFKHuwtnBY/hS/+T4nodLSz73ueE2dQ==
-X-Received: by 2002:a17:903:1c9:b0:2ef:fcd8:df75 with SMTP id d9443c01a7336-2f03f18847fmr296857175ad.36.1795834782691;
-        Fri, 27 Nov 2026 18:59:42 -0800 (PST)
+         :subject:references:in-reply-to:to:from:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=yvCt1gdskx/Y0jOYT6LmJ91002gzEPa4iXQSvGo7T/w=;
+        b=flBsf6HP3wa9cCfec7OuKXnD6bjlBkuwB5Fk5vHQrJW6oybIiXe8ekwY/Q77tujKdH
+         8Zb1IW7bQa1fN/4yjKXXdw5Q5WHyYRCArtt+uz2mWbVXkKKbCCmrY2RcY8a4EKjtGItt
+         OZ67b2bvINdNN6q8f+Y/z+f6Gso1cyApt7FMrmC0jJ6LFzZD2oXRhIb5cOP/nn37J93w
+         4oOLvMqR02sZP44fS6kZ01O/5TDUv7Au/EbijxiMnFZj7ciBEcmjJFTR5/Mxky+rI96P
+         jpb4Xs8lM4CN398QXTHil1qXllHv6qVz5BqkbyX6sh/VOeuIK3PW/cTnPGme2tlBjlls
+         /Faw==
+X-Gm-Message-State: APuU4Z/NqwvxEQaKB9Lv9kr16XUSgn7n5R4aPMIKKFSSLgwNEbL5o8ap
+	kvVT5XQ49S5DBlKWyark4mkG00r8xywbVcAaD99CeOooNa5RYB+zaDhq3+Ejr0gxQDugOqIsHCM
+	2JmsP/aw=
+X-Gm-Gg: AZFdTZcjYgXDvCElxP1MaA+W7nk01R2Sa27JS3xYpWVcwEv6KpUE3kQfjH/cpuchoy0
+	iIJUpRgUZ2P6dGVKXLDb6NwIBg/0zLSdfs+U5JWjsIaquzqhsydF/wqtBI4OXJLPDZJ4b4/Kc+K
+	JJzqaIVeLlN/iaNRZffWchuIq43HVFS1a7iFHebeVPQLogjzUKe7KxaB3IsHYhnuzylEMc+8ZyM
+	OQaReqRlxr5sSM5OtZaKobgxJZR79qPdFTMIGk1N+uujaRC+C2Iq1+dPpItNvFeodUZoMrUt878
+	JZ5GXSNKsuLk69ih/J1PO/+oJiQQIOe4Sl5mToZEybKW5zYaq+A54hl6qeMxSzmO4qSAVOV6qKM
+	7AORvqI5K+YAnadnTW3mds88G0jy+raAlxaWzNJ40nP3l8CaXujO3Qv5CUH6SCCO5+wO6N2VtqS
+	X1mAkpqB9spWNqxKu1Tw4EwLTaG7X1qlnLgqTbqR/mf8kHe7+GDLfBVI77/sep6hSAUD5c7f6PE
+	Z4iTUMoViJ7aJJXo+Uyr0m0CpPDPI/oRqEYR+hl6ETTlamEDzCBJzmKQrAazudmCL8I+SurwB1f
+	NMXFPxUo0xvz1V13YAAZyscMEWbkXjhVmwBDC8kafpVOkwpbDh0sy1NQ3+g9RK8QRbtb5BEGOJz
+	MnRTNU2PG7GP0NwSgR1sTTUJOBG13e6bdRVkHHYzGBdLqLx2ZZoDfGSqGh0ku7P5qzDA+RQ==
+X-Received: by 2002:a05:7301:e103:b0:385:496e:80ac with SMTP id 5a478bee46e88-3856fe59334mr29203520eec.8.1795835780240;
+        Fri, 27 Nov 2026 19:16:20 -0800 (PST)
 Received: from [192.168.1.142] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f0d537a522sm57771515ad.47.2026.11.27.18.59.41
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-386c7c62a91sm36623124eec.17.2026.11.27.19.16.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 18:59:42 -0800 (PST)
+        Fri, 27 Nov 2026 19:16:19 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: =?utf-8?q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>, 
- Lars Ellenberg <lars.ellenberg@linbit.com>, drbd-dev@lists.linux.dev, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20261126145257.592085-1-christoph.boehmwalder@linbit.com>
-References: <20261126145257.592085-1-christoph.boehmwalder@linbit.com>
-Subject: Re: [PATCH 0/4] drbd: assorted fixes for discard limits, bitmap IO
- and resize
-Message-Id: <179583478160.90611.15435460552982220308.b4-ty@b4>
-Date: Fri, 27 Nov 2026 19:59:41 -0700
+To: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+ linux-scsi@vger.kernel.org, "Martin K. Petersen" <mkp@kernel.org>, 
+ Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20261120210651.580511-1-dlemoal@kernel.org>
+References: <20261120210651.580511-1-dlemoal@kernel.org>
+Subject: Re: [PATCH v13 00/13] Add support for storage element depopulation
+Message-Id: <179583577931.94675.15322542567681929533.b4-ty@b4>
+Date: Fri, 27 Nov 2026 20:16:19 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -102,33 +98,48 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Thu, 26 Nov 2026 15:52:53 +0100, Christoph Böhmwalder wrote:
-> a few DRBD fixes for for-7.5/block:
+On Sat, 21 Nov 2026 06:06:38 +0900, Damien Le Moal wrote:
+> Jens,
 > 
-> - Assume a capable peer for the discard limit before the first handshake,
->   so devices stacked on top of DRBD don't latch the 4 MiB limit.
-> - Fix a lost bitmap-work wakeup on weakly ordered CPUs (seen on aarch64)
->   that froze application IO until the connection timed out.
-> - Two resize fixes: don't silently truncate the device after rejecting a
->   too small peer, and refuse implicit shrinks on resize unless an explicit
->   size is given.
+> These patches define a new set of block device operations for generically
+> using from the block layer the storage element depopulation feature of
+> zoned block devices. Support for this feature is added to the SCSI disk
+> driver and an emulation of this feature added to the zloop driver.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/4] drbd: assume a capable peer for the discard limit before the handshake
-      commit: 69fdea8a039d6078609e0aaa7efafed4b34c7251
-[2/4] drbd: fix lost bitmap-work wakeup on weakly ordered CPUs
-      commit: f2d3c2a06548aed8def25c16e772ace4774a3896
-[3/4] drbd: resize: do not silently "truncate" the effective size
-      commit: cc547179b6fdb93dac3cb8813b57460cdecef9e2
-[4/4] drbd: refuse to shrink on resize unless an explicit size is requested
-      commit: 86226accf58873f70163e34820423ced87a8d980
+[01/13] block: introduce disk_zone_is_offline()
+        commit: 0f485d3ca937c4ee689cbe8ed91820baf3e2a87c
+[02/13] block: refactor blk_revalidate_disk_zones()
+        commit: 66c66cedc2cea679210879a30c4b79c760fc3884
+[03/13] block: allow dropping all zone write plugs on revalidation
+        commit: 0de926d244f23fa9fc88dc93874fc9366be291cd
+[04/13] block: introduce storage element management
+        commit: 5848abdc4e80e4690ded2dbfc0d1ec4b24513c87
+[05/13] block: add storage element management ioctls
+        commit: a2333b0f548a23bdc63b440311344da3caf4064e
+[06/13] zloop: fix ordered zone append handling
+        commit: 506dba8f5cd91b9cb8a113f0ef18cc8f27616ac2
+[07/13] zloop: fix zone reporting consistency
+        commit: c61ee1e7f15161a1a4a870c2d417685bed77db14
+[08/13] zloop: add storage element emulation
+        commit: fbff47f53afd4c9b2697f3e92f5c73cbd7538872
+[09/13] zloop: add degrade_element control command
+        commit: e0ec1629c269bad515d88398f4b2a474d4416402
+[10/13] scsi: scsi_proto: refine the definition of storage element health
+        commit: 9bb8df1a44f6c52d4360bd93f9e3076d422058cf
+[11/13] scsi: sd_zbc: always revalidate zones for disks supporting head depopulation
+        commit: 926c932a9e1483b4d5a1a058c147e4d18ff14be0
+[12/13] scsi: sd_zbc: define storage element management operations
+        commit: 4745c9c7b359dd27e5a256da81b69a4a42bd673f
+[13/13] scsi: sd: fail read commands to offline zones early
+        commit: efe346b1854e230970e2aebf734d916bdd28ea57
 
 Best regards,
 -- 
