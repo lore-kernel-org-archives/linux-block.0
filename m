@@ -1,96 +1,97 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795834039;
-	b=mshNDOWOoQgsmRbenbz9Jw/+wxK0hGzcef8368yRGQ25vFSoItbvn5B+JEUSoPbKRiIL
-	 xOLAR9e997TlbDaILvfMBRqC8NWCS2EaskhYXKU1bFv0a8/pQ4o5G1e7REfx8qo0F6ec/
-	 2SDfypYPNS3bjJobnXOeva3p5W2dgpr92hR3b+QoMbNfBZU91XuqbRhJVkzBmGSjL11wj
-	 G4EUbqLGuhMkFtneV2SCkyDO2ZArbKMW2BCfCyfkkRVTlESVHynpYXKWRwdQfY6QCZxrB
-	 m2N/tedtl9UP2ejIRD4Elg3lz2XPAITdnxnc+g3TWKxB7NRPAOqYb17ulSGkD2wgMrg==
+	t=1795834144;
+	b=qyvqt+IJuRvHc7/w9ZFf6BWsVlJWkabb+oImQyNH3c0MJsm85g95nOLxspu/4rwWRx8V
+	 TBqg4aIwlUKZXHYeIQJ+tVerxm9w9ouqSCMh38rv482CM4/LykZRSTwKXXFaYe99USaar
+	 ksDxXwX2CeWgJ2IwU5CSYyev+KKZeQ5eUvPtn3zSW90mSrTtJvPYq26Zyjyf0HHmOGDdp
+	 zyvOAdhD0thbI7ZqJ9yHQWba7JK0N2hMh0hedBPl+13fCRKzzXuchP3zb66U9+U0Bcj7a
+	 QnrwmRQ/2qg6cLvG8BgNDeyT29QyioIXSoObn3yHJIScutsd6LzOQIhQ6sLhX9FYJUw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795834039;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795834144;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=6WKT27fdX/tFqhewESdRPtk5HTiyQzUxICUqNBuVX0M=;
-	b=StRtRjRYDwjfdYn3uXsGk+ne/iS3KcsrR9ni03k9BPR/Dr5EzLVaWDdWtW9BtE2aMWFd
-	 VEYi8HhWgg9Vx7To8PLkteqF8RzpuQAxpNWMr51vg6xB5Gr90r+RzLVpghs+YHF6bQm7j
-	 aWbkm8YwJqqzeFOPOM8PibLToYiE17FwHg3D1X7/RDTUtOBqTdEB1r7eqG5w2f2Z2uBV+
-	 1CfEDhkn7OQMZyOanW1ZlvVf9nptKOgrveOkpEhp7d0Rcp5xPh0bxGFAk37sqC9GI7iFI
-	 IOdMq4SFcUX25jdBHmu9bM2nTsto1uVl7XovtkwcFyXFL9i3YZE8WgUCMglbkiSLjJA==
+	bh=epHX4+IRmuNiGKc20qQXYTxzY88O7Spqzl8rwSurgAM=;
+	b=gjn1LgoFs4mcIut8n9bsRSH4KsIKj0pLY8Hf3EyA5r2lHIUsMDDRF+EZxnKvIDBPVTTU
+	 YNz/oVJ3LPn1V5zEFYYEsmV9Gsr1yOR12e0Wy9B/s2tx0RZ80uTSgFzvijaKnhUnqkDqV
+	 8yM49UWtqbalBRojmMfe8LdYkXSB1J7m3XIWWmLaCfAz7X/1s48qpka91OEjKl8moX207
+	 vQug48tjt+anxuR5u+FuLhC+lgNUuNlOw7vF0G5+03Nac+086oSGqWOtJNMl/PAff9f2J
+	 JMRk894tkwcOu1Tl63yH+7AHLAc8AwtvcqHniCHHVvR84hKRtYQoduWnwH/slVIJ/ag==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=kernel.dk;
 	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=FiuhkhtQ;
+	dkim=pass header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b="LV/h0dgw";
 	arc=none smtp.remote-ip=74.125.82.175
 Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A842606A31F
-	for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 02:47:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A842606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2284A606A323
+	for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 02:49:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2284A606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=FiuhkhtQ
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-386c336eab8so5169950eec.0
-        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 18:47:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=LV/h0dgw
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-38699cf08dfso11183841eec.1
+        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 18:49:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel.dk; s=google; t=1795834037; x=1796438837; darn=vger.kernel.org;
+        d=kernel.dk; s=google; t=1795834143; x=1796438943; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=6WKT27fdX/tFqhewESdRPtk5HTiyQzUxICUqNBuVX0M=;
-        b=FiuhkhtQpTj02YUL2JydJxu7pP80ao7UIcx71q2j7NDWqv8zjwSqfHsgdYc/vNm9uZ
-         OwV4iQpfm60T48BM7zkX30KHYk8NM75Q6QpM3dWv8XQvpRIyXqzZ9SFzsEIx9wgE9mp9
-         gbnHoXfhWqG9nzd1ItBNVhu3rrmCjBYaAc0Jk+TW1ufAbAe//L/36bk2jNkDRQQXdJec
-         Inf/Fj2kKa3TtaMFUbRAbCfsa+qypmduCT+3CZpkFVDNn6KnVRSBoTqqqYQh7oFQ9q1p
-         nHgQJ3LwwMoHLHOJ3j4nVjJkhWMaov75Zvp1GyPiFADc942jmTe3Z3EwST7PFtLDNbDr
-         S4Fw==
+        bh=epHX4+IRmuNiGKc20qQXYTxzY88O7Spqzl8rwSurgAM=;
+        b=LV/h0dgwgnVLBXCfc3PU4g/VVkNz6uYCMB8wCp/Cvospu89xjwxpoDvuklb+t5KBQo
+         OFoGjPTP1IdC+2gxK/4sVmxArHSoQgbSn68seK+Vq3x+JHBPnHxYRtG/WAuf8uRdUFdz
+         krnh6ZRBsbDoBtx4jg64PpYYQWeBGiiQGPq1RA+6wS1bgd2ZDAvWfzllC+QLRdx21/jc
+         w8MPeIUuK8TKvZ1joWojIURXG2xoXRRDZcKPrjvNLTunlEhVkrqTQwhDGelXSr9c0Wg1
+         b+9EFRK0YjL/o0LpQPQgbGPUm9Idw0qbX0tfOR4nM2M/MP93oJoGMuzoR7rX6nem+6ff
+         215Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795834037; x=1796438837;
+        d=1e100.net; s=20260707; t=1795834143; x=1796438943;
         h=content-transfer-encoding:content-type:mime-version:date:message-id
          :subject:references:in-reply-to:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=6WKT27fdX/tFqhewESdRPtk5HTiyQzUxICUqNBuVX0M=;
-        b=GZ+/DdCbej7FMZGZXm7CSEGCkviCtZOg/xkeEmfh4c9Lb2JWcWWdu01suqeZAVhv7z
-         8dSoMMVJWp1Evv22okfuhyxRnYGZlboYHrp/fatLpx6BOVkuuKCSXZuWkm9+X3YnTJiR
-         G067QgNnBTljPtvQc5i9qAn5FewbRzuu/CjZEgWqoIQ+jJYk0b8kuMNjljYi38acY0im
-         h/SylLip1ABAaQnEMmhLe962PWE3akg7lPcH9PWU3pEdWiJu0vZk3OJVcQY5c5Y6kvhW
-         B232ulaxEUC6M4LG9CqulJxlKMbsOuip8Awo1o6+O1fCTAM16arBEbQXR56ilCgRu3Wz
-         LjKQ==
-X-Forwarded-Encrypted: i=1; AL+hErF98CNr+XITQZaU4GEdofATCYAuhGDxHDP3wO9uHAs94SjZDRAla7s7ZsOKXBr3/OEJtaHLErnNHN0Vfw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z+FOzWK38yU1j74XgBTS6O6NByfuvQ1l/EXOVT71R4gSHCpcMJz
-	Hdp9Fbj/QEAVpjLClXc7csIy51h3E73qHu1+xjxqvAro5H+l28+B3+v2zM1waDL2WLk=
-X-Gm-Gg: AZFdTZetNSo+xUI38l/wxuh2BUEfvI3Gr+/ltfb8E6T3XXMl5defycK8LECYpryChNR
-	YOecaz58XiPqFMTke/8FCtt5kvmYRCBhVn3ZqvjJiCKsDvE5UeKvW2l0Vbwy1YeG6YIOvTojOFe
-	Zg4B+iLVJHbVs3JGdG1tBmFTxR8tgvqxEMtC/sxrnZm9y74/CHR32wkBD9ySY7ekx6Hf9/IACPJ
-	AXz6Z29msBJlPjppGWT6TtZuce9oY2R1bvOSaaEKKYALJkXSP/3klXhYrdgMpBnjEzVoCCzA1HJ
-	WySVa9NtISqYLdk1dobkbvnLTKvfc0WW5/vqiOjgcpB8hObhFU+f6bmgo2fzq15YpJfQ2I6ojHL
-	n7kmIT9asEBYd6j/7/zTbXt9nUDDGaiBx68AF+IYOy/mSbGBlf6nXBtRzK4VUr+ucWC5mgbGHT2
-	pAmE1nWau3Rz01RtFm5qYlodKWG+aLoT2WItKpzBnewdxmcPU71P0IGpvlPfrf57868OYDrehj1
-	dMuZaR1n2UDgovfV9Zo4S8tLKanxsZTIF+AbUwV2AnBXdRT7TdeLZc5I2qH7g9Q8X93rzHZoHZ5
-	p+dh2L65Rg2HXrkdVyKobDTLMPeP9STwTXC3XyzWk/HQoWQlEEKSoyzwlGiTMrh+8Cy6oUWkp/2
-	0TA5MTGuCCzuSrV478tSM69yaRKW2tL7e9ClstK+pwkEbeYth
-X-Received: by 2002:a05:693c:88d5:10b0:386:9e9c:867 with SMTP id 5a478bee46e88-3869e9c2df2mr21137020eec.10.1795834037229;
-        Fri, 27 Nov 2026 18:47:17 -0800 (PST)
+        bh=epHX4+IRmuNiGKc20qQXYTxzY88O7Spqzl8rwSurgAM=;
+        b=NOlra9Yv4hvMnFov4krEypRoqQWSGLo0lEg4a0khqvsMEE2p2U+cW6VMP0jAOzwTMN
+         E72kIRtx0JIl4aNledv99woW3qioHx+KzbzFpQT+RG3rB94Dyw2XNYBvFjsRFVUfpxbF
+         7a9tocNuMlhZZim1VRZcnox0Hlqd6yGrtIrtp9V5YxTIdVshDSEdEJbF82nJo1aH2+6n
+         JnuGyGLBzLt3tzlMPqUJmQozyJnUUDxyN7NIgcC2TVIG3tWy7VyCDodIRU/5eLAyx3L7
+         d9+M410EqALnAHp/CCAA1A2Y8Xnokg5fwlQFyG2l8Xkna/mDhceiIjeq7SZRMAWxtORX
+         cvPA==
+X-Forwarded-Encrypted: i=1; AL+hErHMEYArzF+F2Tlh3fpwd7hlCbDtPiCvPO7fT6+vhO4eCMG/pc8rbyOsPqEwvB4WOj1tvkxy6EH6TWsT3w==@vger.kernel.org
+X-Gm-Message-State: APuU4Z/10Z/K6n2EfqQLiJXKAGaMREwDYTl/vpN/a2CDQHA7m0JUP9gZ
+	WkrBz6Qq/bDqz360TBP+Ua05nUZsupC4hHIUDP0aDgmV5LYG9hwLd45essBGnp3NcTzdBljkgxI
+	Vgv8VLZw=
+X-Gm-Gg: AZFdTZd+ERzaiqfPHDJHXxnJF1+DmyT5xlWT0zSx/kJiNH5A14z+ewIWZfcZT5/i4j9
+	EoANoVwXAXzeIeThaQ0SMN5oRE+VGQSnhv4d7RFBudHhYWej6ytTNROL7/QpfJetWzrnKmSKbq3
+	REiofiRFBQccBLgEqkCaUBKD1xbDtYVzX0ocvNyVXL1W42m9OZJzqeyOWYU+0CYXwuGIbdxymzx
+	bxdpZnhqhQtafvVHAIWxwBZkIALsF2IVg/b6SrG+ff70RJO9OlRxlGblX/QPGml4fSugXQ/LNga
+	wp/Oxab3bIBr1s8FVVGauv1cg2+4mK6YhDz/LI0GsKItYrADPPVEhzhN5EmrwxbiA/Y50gDzQ5n
+	P+BT3VSmrICrniY3gbW6L6XWBFAGtro+LCtkD7ALk8N9ZsU7i+gsZMh0sJo/bxEPZ421/aiyG17
+	ax1f1exoF1TeZlCdkr6lSZl9lvEXxkGmq157BPdizQvv08pA8rS6PSHy/beVDTQ+aWbjKysQROr
+	9ISHcEN9E4T4uMLPpURXIqVUDE6OnbYu3Y8u9sD1iOYY11Ql2iKiavcQiCg/22sgZmGJJGh3FJf
+	PVJjSN6LAp42HiRHuv91nDfDO6Eq220JZrDIsYy9TwvBkj8/e3c35ed70kqeM1NtoW3GmdF8zr4
+	Bp8IKcDRxbYtkyAWi+DhtDpLNMWM2dUJ3LLHViAOqhszroweH
+X-Received: by 2002:a05:7300:d083:b0:380:f112:3cc9 with SMTP id 5a478bee46e88-3857093f06cmr25201689eec.38.1795834143147;
+        Fri, 27 Nov 2026 18:49:03 -0800 (PST)
 Received: from [192.168.1.142] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385646633d0sm134059672eec.3.2026.11.27.18.47.16
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385672ce402sm72691991eec.16.2026.11.27.18.49.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 18:47:16 -0800 (PST)
+        Fri, 27 Nov 2026 18:49:02 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Hungyu Lin <dennylin0707@gmail.com>
-Cc: hch@infradead.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, mtsai@redhat.com, 
- stable@vger.kernel.org, hch@lst.de
-In-Reply-To: <20261120101758.45513-1-dennylin0707@gmail.com>
-References: <20261120101758.45513-1-dennylin0707@gmail.com>
-Subject: Re: [PATCH v4] block: fix discard alignment for non-power-of-two
- granularities
-Message-Id: <179583403624.86956.1820367114895807728.b4-ty@b4>
-Date: Fri, 27 Nov 2026 19:47:16 -0700
+To: bvanassche@acm.org, hch@lst.de, yukuai@fygo.io, 
+ linux-block@vger.kernel.org, Zizhi Wo <wozizhi@huaweicloud.com>
+Cc: linux-kernel@vger.kernel.org, yangerkun@huawei.com, 
+ chengzhihao1@huawei.com, wozizhi@huawei.com
+In-Reply-To: <20261102080420.3774409-1-wozizhi@huaweicloud.com>
+References: <20261102080420.3774409-1-wozizhi@huaweicloud.com>
+Subject: Re: [PATCH RESEND V2] block: fix BLKSECDISCARD zero-length range
+ causing page cache invalidation
+Message-Id: <179583414229.87894.14203257367547275323.b4-ty@b4>
+Date: Fri, 27 Nov 2026 19:49:02 -0700
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -105,22 +106,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Fri, 20 Nov 2026 10:17:58 +0000, Hungyu Lin wrote:
-> bio_discard_limit() uses round_up() and round_down(), which require a
-> power-of-two alignment. However, discard_granularity need not be a power
-> of two. For example, dm-thin supports data block sizes that are arbitrary
-> multiples of 64 KiB and advertises the block size as its granularity.
-> 
-> With a 192 KiB granularity, discarding one complete block at offset
-> 384 KiB is split into 128 KiB and 64 KiB bios. Neither covers a complete
-> thin block, so dm-thin ignores both and the mapping remains allocated.
+On Mon, 02 Nov 2026 16:04:20 +0800, Zizhi Wo wrote:
+> Commit 697ba0b6ec4a ("block: fix integer overflow in BLKSECDISCARD") fixed
+> the start+len overflow via check_add_overflow() but did not handle the
+> start=0, len=0 case. There, start + len = 0, so end = 0 passes all checks,
+> and truncate_bdev_range()->truncate_inode_pages_range() is then called with
+> lend=UINT64_MAX, whitch is the "truncate to the end of file" sentinel, so
+> the entire page cache is invalidated.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: fix discard alignment for non-power-of-two granularities
-      commit: f6ce3d09d6480b56e357336ac080952f9525eab0
+[1/1] block: fix BLKSECDISCARD zero-length range causing page cache invalidation
+      commit: aea1c2ec03b399434ff1bafbb2f0d5076f74ce03
 
 Best regards,
 -- 
