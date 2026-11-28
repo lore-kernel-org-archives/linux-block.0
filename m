@@ -1,75 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.54.127.90
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.177
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795856135;
-	b=R/26lAsivymRCMpD5FZBwF9o6/J+RRrDvxqApTKECBy6Arlo1VyuxahhGgzUsu1rphbZ
-	 QNln27hBxovwafFYDfVFte2dGyuNZlSakoxNgoH2ieh/0v61nehJboJDmKVIS/5peS+89
-	 CkV7tDweEjCpFtKZxV896mECYjdtYbkmWaO01sJH+oQ/o1zbIL5qdixvGMyMsgKD+mCI7
-	 CpV9v9h9VOY4G43z4OzaQ4ZUMqjT3cpzWZ4ZfEuBuky4/1i8u7WjT+Hzs+MYArAz3TYKV
-	 ZbxShIHkiN29wOI9ZnfbMyAedgUwYHj1NOstfc5t3DeM7l6wOM25VdD3vHlGeM1UROg==
+	t=1795874806;
+	b=kegm6VB+ZygbXxPi+PO382q808cOtMXQYiNFXDh8N/wmHxT+R83wM4lmAFP5DUH3pNYg
+	 R8Jt+52gIWDoMvXWo/HCRwvZvgO2MKYuZb0LvYv+/294oFcNABBbameu8YwLUqlwQ6Ggk
+	 4FZzSCmoQwbcEnSJM6XLicZyK6qkZohpbb2VaVns9QRrHRHB8/lXGVQRTh68dKs2Miqvi
+	 zePAHYHBVV3Lqn1dDhNruoQTHI+1FNTxB+hSWW01orP03UfIQRX2DpgNW/JvrmFX8QmjR
+	 5zM2TExqdiZVFmNGRG0N9Hn9xytiInVh0D+xxuhMoQwbAJCc/K8Dr73esG19LzlFt9g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795856135;
-	h=DMARC-Filter:Received:DKIM-Signature:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Envelope-From;
-	bh=65UtGJ7fSwzMVurIhv/cFm1+CfEydmPsrjASwnr1vJ8=;
-	b=LfbrKa0wWOYEvuSoBi7o7xtnsLX7zihw3IMF0ZCq87rF4CG8VJ24BABAwzwX3fa6Bg5P
-	 pCb/stwQoOUNsKseAkK211awO3iqjiojHQv9i82esWw7JHso5RXNkUi9Y4IltmmtstwXa
-	 Bqy5z6+12gcXQZq7pO3KimbWgioQOj2CzO9o9xBEkbgEa3SI49R0Cua8ODNr+yGQzK9WX
-	 5OVg8oYDdyhepn2oeNVRN7X9xaGED2htiGGVlE3BySWNutCnW1xczxiUEd+VgUd53drjI
-	 Aop+pavtlWswuxI1eZ21WDn4IH6jRP3V/qaO0AiwwTAJiuEtrnZFSEU7EJpsAJ+isPg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795874806;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=f0hioqx1j+KUgblrL2ZDwN/5Mn/iMyAHXCN5l/EZKpw=;
+	b=lkfPlmkCW96YtjZ8sFI8VDkM9g9+Ju6DKkd7xYPoKBmbS/68RPC40t32MDRbbca/+/n8
+	 h/8EMGg8iiVglQRPMDBTGhvHs5DLuO8RTU1hyI5/Ldgabvd8ATC7Pl0RU620niJ3Rqx18
+	 DY+lnANmv7ZszNTTkbC3jEsHvFVpeewmAXPEtEQtIHAIsDXgjG/rHaE4Cx1n2othlLvP4
+	 piDyoibT1ruyxNefGvsPAXOlPscLn9oj2qwpz9EL+s6aIzrrUV/mNKKj6QyBiClfW6nmP
+	 CsiCbRow+RxZJVDiaBZmFPKFy6FDmuvh2ks/9eMLPsEcMKILKO0j/gw9jQ2bCvyFGnw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=tychen.cc;
-	spf=pass smtp.mailfrom=tychen.cc;
-	dkim=pass header.d=tychen.cc header.i=@tychen.cc header.a=rsa-sha256 header.s=spacemail header.b=mkoxgApY;
-	arc=none smtp.remote-ip=198.54.127.90
-Received: from out-zbxj-a90.jellyfish.systems (out-zbxj-a90.jellyfish.systems [198.54.127.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xeoKZniw;
+	arc=none smtp.remote-ip=209.85.222.177
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4083D606A327
-	for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 08:55:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4083D606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tychen.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tychen.cc
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E54606A337
+	for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 14:06:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41E54606A337
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tychen.cc header.i=@tychen.cc header.a=rsa-sha256 header.s=spacemail header.b=mkoxgApY
-Received: from fedora (ec2-52-197-241-54.ap-northeast-1.compute.amazonaws.com [52.197.241.54])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4jc3yZ1Yt4z8sWP;
-	Sat, 28 Nov 2026 08:55:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tychen.cc;
-	s=spacemail; t=1795856122;
-	bh=65UtGJ7fSwzMVurIhv/cFm1+CfEydmPsrjASwnr1vJ8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mkoxgApYS+ZL4enwNdAbQMK6dYarH0tdwlh2dGq+pccuYgjo1YPaHiyymVV3+Ikuo
-	 8s8leiu5BJ0wXTNjUR3vwdKu4j/tVjRqoKh1Nvvg+5hO27J/rdyBuNlDN1Q53ZhD/r
-	 qEtkGtYYQ0iRC+1db2+X+Pe0lTM7SHf53x9rI2mDIZaSk/i6X7RD1sKXzBOScEklJU
-	 i0nm3mK7g4Ij1YNAbWyhBw+S5S3K7e5ULs4+O5NFsN5vTXyL04ljfOU5f2WunUUzSz
-	 E0LdyDzLilk3IEP7LoD2GSmTrt8ZUIIz8VG5NqGmluZMOzYVUY1uYJMu3uEGQGC2ne
-	 3kwefu17eNm3A==
-From: Tianyi Chen <hi@tychen.cc>
-To: Qu Wenruo <quwenruo.btrfs@gmx.com>,
-	David Sterba <dsterba@suse.com>,
-	Qu Wenruo <wqu@suse.com>,
-	Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: Chris Mason <mason@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Yu Kuai <yukuai@fygo.io>,
-	Mark Korenberg <socketpair@gmail.com>,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	hi@tychen.cc
-Subject: Re: btrfs, blk-throttle: cross-subvolume fsync stalls behind throttled write_dev_flush()
-Date: Sat, 28 Nov 2026 17:55:08 +0900
-Message-ID: <20261128085508.2227850-1-hi@tychen.cc>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <a0ae6351-2eb1-41b9-b085-db924442c685@gmx.com>
-References: <20261127121458.2090454-1-hi@tychen.cc> <a0ae6351-2eb1-41b9-b085-db924442c685@gmx.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xeoKZniw
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-94961ed97bcso895750685a.1
+        for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 06:06:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795874805; x=1796479605; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=f0hioqx1j+KUgblrL2ZDwN/5Mn/iMyAHXCN5l/EZKpw=;
+        b=xeoKZniwi3Fxx+vnNKT7mtaC68WAs4KWt3ivJMAk9YhSZGrrOCX3Hai/RZ+lLMT0dK
+         1Nj5JtUYkbHIGbg1nDWGqu5vfl5BR6D8I1QW0VXM16owsNrfeaI4rsT2Zyj6sup5iS4u
+         9W/V4sTkd36pA1nLZ/PwcFZoHsEubC9rS3udNp25AfGV4/mykb7J9PC3tyR5OO3DjwY7
+         ZfpSvwGx+/JtaJdDwoK3Q5Gd69/7oIK/yc4V4bccydCQ27qF+q1b/Y3Idmr+pv3tCIoa
+         /Hoy/2p9aeqyfutvstRE6F8p7R9kQYBmaj6Wm7Fxf3kS48taV0PKXGW/xjNOgx3DHLG/
+         g99Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795874805; x=1796479605;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=f0hioqx1j+KUgblrL2ZDwN/5Mn/iMyAHXCN5l/EZKpw=;
+        b=R5aNOdz9Ny6Hrw+PB2leaJRE1k5SxRT8S8pVcsIHr2K4Lqbr2TUvHuDhyp6pVZIp/K
+         cVZKblyf8U+hStMw30UkYLeyGCV2+0WH7R+r11CbVlw3mJB1SPsVarR9Xb96qUUjrEkM
+         WUxBR/mAPZrqIaTlmZBJX9d8YpTMYGv7FmbVvub3UdOgQ5LF3Hp5NuU8C7+tMqDEM4Bx
+         v72ulWZxez9O8Uol+B4kxFCErnKor84B4tlUfxG6whP3vKf3DlU8NJ2fZkap1Yj73z7w
+         klMXNWt1s6KhdI4ueAMwqH4T9TKgvILYNJ8j5XzOdcGoHhzdcyhclRGel8oIHN9slEA0
+         uBPw==
+X-Gm-Message-State: APuU4Z+locSFBYsb3ZaGOWKreANdTdjyZfJf0K+hXdmPQanB2GNFGxJp
+	kvuAi+hGNSjiwvlx+n7aUsDN4Dd826SToiHLJvftHA8122kYNifgwl7s
+X-Gm-Gg: AZFdTZdPITq8CNyIN43SOa4MdsZj4sZ5DB87x2Te6wBVXD5wJaBZoB40FEpnWRUpu37
+	dR/68xBEg6MnBs4ryaoHRhFUNPib/YoVCgFj1tdq6LwODCEfcrEVNMlCP07N5zsQwmzYQp9PofT
+	FIu1mbw9i58eb/sgFuheUxVdEtmne/cnkgTa2GtdH2V4ZImIwR1mou3AMgWDAZSIK8WjKX9rppA
+	gpDBNoTGSeVTzDhKWohinmOMDBqyGVP5XEoFV83VaXL798NdLsREiBNLRa7XBi6Rn/nXwzeyFxx
+	2gIMFJkBOF1J5pRV7B2EVYZWyK1YctiLR+0G9w1JR+J2OCtd08o1ro1UVnt1VxVDBHqKGI3WlsU
+	GtkMLSzSsX61XQbR0q+CupWsERK6296UXiRvLN/6As2Cbjf+sSpMbq4uuf2MAFriXksBHCvNaoW
+	149T1KmJY6PxbX5Nm7NFL8ldvWCi3WEwBzbdYkMyvnav27gH7X2QTJcYLdiIgHoLb0MEZdFzHdP
+	0PGip+7fNrgwmRgBzfz8tKimYB0WUGjZ1RmMCxOHay0s4UrpDDEqMbBbC2mc5dCcFPRru2M8ays
+	lGaDwpg/sD/hODmr2eRgandRsCYn+5JDrQUKjtDGSXTjTCiwjpfdSFn5xTp0g26Y9cEe4+t+0PE
+	Z7Suk
+X-Received: by 2002:a05:620a:f0f:b0:949:57b4:388b with SMTP id af79cd13be357-949bab0eb6cmr5353856985a.41.1795874805196;
+        Sat, 28 Nov 2026 06:06:45 -0800 (PST)
+Received: from localhost ([138.197.109.108])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-949bb34ac11sm2086323785a.14.2026.11.28.06.06.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Nov 2026 06:06:44 -0800 (PST)
+From: Nikolai Dokutovich <ndokutovich@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Nikolai Dokutovich <ndokutovich@gmail.com>
+Subject: [PATCH] block: use READ_ONCE() for the PF_EXITING check in set_task_ioprio()
+Date: Sat, 28 Nov 2026 17:06:42 +0300
+Message-ID: <20261128140642.57-1-ndokutovich@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -80,34 +95,58 @@ List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Envelope-From: hi@tychen.cc
 
-On 2026/11/28 07:37, Qu Wenruo wrote:
-> What's the point here? The series (older or merged version) has never
-> touched the barrier part, nor my comment.
->
-> This looks like some unrelated LLM word salad.
->
-> And again, make LLM generated reports shorter for human readers.
+set_task_ioprio() can be called on a running kernel thread: ext4 calls
+it on the journal thread from ext4_fill_super().  kjournald2() records
+journal->j_task and wakes the mount path first, and only then calls
+memalloc_nofs_save(), which does
 
-Sorry, you're right. Neither the series nor your comment is about the
-flush, and that paragraph should not have been in the report.
+	current->flags |= PF_MEMALLOC_NOFS
 
-[...]
+without any lock, while set_task_ioprio() reads task->flags under
+task_lock(task):
 
-> I'd prefer more advice from block layer on such separate flush and sb
-> writes.
-> Is it recommended to use the same flags for such cases?
+  data-race in kjournald2 / set_task_ioprio
 
-One result that matters for this question: with the super block flags
-on the flush, a cgroup can escape io.max. One process under wiops=32
-doing create + 64-byte write + fsync in a loop (the files stay inline)
-ran at 2542 io.stat wios/s over 60s, 79x the cap; under wbps=512KiB/s
-it ran at 55x in io.stat wbytes. Stock stays within the cap (0.94x and
-1.00x). One run per kernel. The flush flags are the only difference
-between the two kernels, so on this path the untagged flush is what
-keeps the group at its cap. This is the unpaced fsync loop my first
-mail listed as not tested.
+  read to ... of 4 bytes by task 103 on cpu 0:
+   set_task_ioprio+0x17d/0x210
+   ext4_fill_super+0x4954/0x5600
+   get_tree_bdev_flags+0x218/0x320
+   ...
+  write to ... of 4 bytes by task 251 on cpu 1:
+   kjournald2+0xbc/0x3e0
+   kthread+0x1db/0x220
 
-Thanks,
-Tianyi
+task_lock() does not order task->flags against the owner updating its
+own flags; here it protects the io_context handoff against
+exit_io_context(), which runs after PF_EXITING is set, and PF_EXITING
+itself is set under sighand->siglock.  Mark the check as the snapshot
+it is.  This adds no synchronization.
+
+The racing write sets PF_MEMALLOC_NOFS, which this check does not read,
+and flags is a naturally aligned unsigned int, so the snapshot cannot
+tear and the observed race does not change the outcome; the check only
+decides whether to allocate an io_context for a task that could be
+exiting.
+
+Signed-off-by: Nikolai Dokutovich <ndokutovich@gmail.com>
+---
+ block/blk-ioc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index d15918d7fabb..a3662e709bd9 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -270,7 +270,7 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
+ 			return -ENOMEM;
+ 
+ 		task_lock(task);
+-		if (task->flags & PF_EXITING) {
++		if (READ_ONCE(task->flags) & PF_EXITING) {
+ 			kmem_cache_free(iocontext_cachep, ioc);
+ 			goto out;
+ 		}
+-- 
+2.43.0
+
