@@ -1,100 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.54.127.90
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795835782;
-	b=tvWfDYoYKUnvhYFLkf1vs/CtvYhNXUcxjit3MzWwV7hL59Wvr5PyVVeGI1Ez0u/3bjc2
-	 wSlpnTWDNY3qKQBrzIUCJ/OwtbJHQI39JsR8XUbxKyWxjrXLSQ9yzjm60MODDWywdbmDj
-	 qTm+ZhHB25nXoXahZ568KGEYZqnPBvbJeKY1+rYRuO+WD+tpOiALE0W+YAB9EuLJygvJ0
-	 WJu4ICuUYQxJbmgR4pxBkn12Y+IvY7Z3nmshpflEFaCqETqZ3eoYWLusDzMUfAbqIQXrY
-	 31V1GsQ2Woi77GO/chCl6/+F7j+pcIWEUiHAwgtWzpDL5RFEdD8l0EVMt/ybi8vQB8Q==
+	t=1795856135;
+	b=R/26lAsivymRCMpD5FZBwF9o6/J+RRrDvxqApTKECBy6Arlo1VyuxahhGgzUsu1rphbZ
+	 QNln27hBxovwafFYDfVFte2dGyuNZlSakoxNgoH2ieh/0v61nehJboJDmKVIS/5peS+89
+	 CkV7tDweEjCpFtKZxV896mECYjdtYbkmWaO01sJH+oQ/o1zbIL5qdixvGMyMsgKD+mCI7
+	 CpV9v9h9VOY4G43z4OzaQ4ZUMqjT3cpzWZ4ZfEuBuky4/1i8u7WjT+Hzs+MYArAz3TYKV
+	 ZbxShIHkiN29wOI9ZnfbMyAedgUwYHj1NOstfc5t3DeM7l6wOM25VdD3vHlGeM1UROg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795835782;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-Mailer;
-	bh=3Ok5Lrv8H0htPRrt5HaRVW8ZGBYCsHXaIAgQkyhQ8Io=;
-	b=og1Fcn1Hy3TLggFEsnqAR9bg2qxItR7PZcol48w5LQHQ+C0N3J0iewkJWHG3BXBnq4rf
-	 1MJ73qEJMS6yuWiB1KqLm0oUQljjps/W0zgqcHaU5G88dW4rBoVxQ+WoeI0EuudiBoVK5
-	 WEdKMgoLStbeNouRiKsQPAVgwF7DIsp9jnY8ZTAfeYd4i1c/eLxSy3I/tgC6AP8S00HuH
-	 34oOw3o4sfxRfkrTktQFmihMjipZpW4bHIBWxRTGDkWMeYTNTpV4cSYsDWMiMguXSIJ+s
-	 Bjn8JKlxsCGC2cMj4JUv6OzVqPl5CuO3Odutu/BczEftYgjYUY5cn2m6gq5lIyZiA2g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795856135;
+	h=DMARC-Filter:Received:DKIM-Signature:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-Envelope-From;
+	bh=65UtGJ7fSwzMVurIhv/cFm1+CfEydmPsrjASwnr1vJ8=;
+	b=LfbrKa0wWOYEvuSoBi7o7xtnsLX7zihw3IMF0ZCq87rF4CG8VJ24BABAwzwX3fa6Bg5P
+	 pCb/stwQoOUNsKseAkK211awO3iqjiojHQv9i82esWw7JHso5RXNkUi9Y4IltmmtstwXa
+	 Bqy5z6+12gcXQZq7pO3KimbWgioQOj2CzO9o9xBEkbgEa3SI49R0Cua8ODNr+yGQzK9WX
+	 5OVg8oYDdyhepn2oeNVRN7X9xaGED2htiGGVlE3BySWNutCnW1xczxiUEd+VgUd53drjI
+	 Aop+pavtlWswuxI1eZ21WDn4IH6jRP3V/qaO0AiwwTAJiuEtrnZFSEU7EJpsAJ+isPg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=kernel.dk;
-	spf=pass smtp.mailfrom=kernel.dk;
-	dkim=pass header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=WR3iI+MZ;
-	arc=none smtp.remote-ip=74.125.82.181
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=tychen.cc;
+	spf=pass smtp.mailfrom=tychen.cc;
+	dkim=pass header.d=tychen.cc header.i=@tychen.cc header.a=rsa-sha256 header.s=spacemail header.b=mkoxgApY;
+	arc=none smtp.remote-ip=198.54.127.90
+Received: from out-zbxj-a90.jellyfish.systems (out-zbxj-a90.jellyfish.systems [198.54.127.90])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2E8606A31F
-	for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 03:16:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5D2E8606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4083D606A327
+	for <linux-block@vger.kernel.org>; Sat, 28 Nov 2026 08:55:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4083D606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tychen.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tychen.cc
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.dk header.i=@kernel.dk header.a=rsa-sha256 header.s=google header.b=WR3iI+MZ
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-3863db981d4so12283562eec.0
-        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2026 19:16:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel.dk; s=google; t=1795835781; x=1796440581; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=3Ok5Lrv8H0htPRrt5HaRVW8ZGBYCsHXaIAgQkyhQ8Io=;
-        b=WR3iI+MZM8Sx695G4+b7/SPK73hGU4cE4Qu1+7lznzVRy9uR5PJ35VG6f5pTrbRFyY
-         AIVQjcLeImXwpU8a+tF/IWC4L8BIhkXR/j3cTsB4AKSNdyAEf6y07NrQ4xW7C4Y5Jwey
-         tdUuSSdI7epNQciLkyqg45/y0f0f9n9lYSa7JCftlaQYlIZ6iwyHLqEdJwlujqcQFtlg
-         nrYoxbd2x7LeKtljtZqE3S8Fy0gRmiwSGLkYTfgcx6jz/E5B+KAwO4fhqs8dcGezw1jL
-         Hry9F2MwN03ja63mizJg66neaADF7CYPIxRS5+14C3mK4xZZd35pUou7h+UqUUyRtTo1
-         yFVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795835781; x=1796440581;
-        h=content-transfer-encoding:content-type:mime-version:date:message-id
-         :subject:references:in-reply-to:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=3Ok5Lrv8H0htPRrt5HaRVW8ZGBYCsHXaIAgQkyhQ8Io=;
-        b=rEQre6wxJDMTOy/2HqTFhaAW6Da2MsOhDNxs5/Ru1Acheqx6hr0bmtV06G0u+Sc1NX
-         W/q9QQBp9d3SzlnM7BbqtTbuQ6SfI1yhYnSLH05aa3llXZpO87TAd5dQl+8MqGwrx2Ka
-         nwh1uPeel0ivROMPyXxBtzSIiIia+g20dgsbQGT6L2HOWFDu+p+ysS7Y48Kg2zYYsr9s
-         Ql0B0Qs5NXRVbD7F9nrw7+81V9AnJ3y5rFOP14lz+FzzJoPJjegerTH8X6a9dA15BZkk
-         3jeD2KRcVO0mSxLBEPceciMsWJTXcF5l3mUW1uwvFeq3Z3xPB+pi17WpXEP4XCo9EH8L
-         THEA==
-X-Forwarded-Encrypted: i=1; AL+hErE60YcKfffq6w53OUo65bZ0V+GDCz3fmznDIyqvXP0/BXZ8mDZCMc4PfD9N7DHkrFPjEtyuzqAC55QoLw==@vger.kernel.org
-X-Gm-Message-State: APuU4Z9Ic6mLIwhZXnw5mojDx1gv+Lzzzv0ylYwOKWXwkgc8oM46OyOq
-	8GFT+cGfQdXgPH56YSKFDjeEL7v+V7cngcbI2XDIUPVinVOUZfXUFQW1vIOzTpVUpus=
-X-Gm-Gg: AZFdTZdLMGeaM7KsBxxXPpTYAXwVUzdHSfGSArF3I4ooutH0R+L+/+dGGcVl+eIlSID
-	CfpWPGM6mkAsKtzl2l4mtt7HXnnU8DiJ4u4GKd7kM1ohX3lFzIygnAa9T/Zc90xMur/DYGcAdyy
-	1YcxPPvQXH/YKdUKNs5REqXXTwSctMZPdkbCO0tALb0Tb+V3YXX6xue7aEcLoAe+CN4/sHYVSmm
-	YM9QvzxJiYOZmDMwNmkzZP6K70hAIPlbrRtX9ogZYN8zvCiEFcTgdLglo7n7nHTslXTkmqAacEX
-	PYCyhn4RladklcnNDcRJXjqH8OtPWYThnsru7oJwygNkyiTROEyPVmNc5GlLalyquG4JCBo11oy
-	Y7nhiAGFW+ZKmAPjjWNydnNJ2zsrR35ePfeehrqhG9J/dXgT1wJtUhn9kjhzaI7v9Ew4LsOGA46
-	Eix3LwobqYshCGfphkx/HZVHxbEO5tonl+lZFLp5tbyJa2c0qBDa9I+2c/yQID7TsnE+kEVb8XC
-	R+c0m29yjebVmf5eZRe8gw4yo3V2W05c3mQCk1ompxWbWJS90wD0XqyyYOFtbLC97D7X/0eNfYz
-	4jFz3oq5SNA74QHAs4kwHE+0c0wrGa619AtZLLwximTzqZzlAeE+bRrybKNIAa9TVJ6pinlBOpC
-	Cf7l+ckcvnNvCOXlyATHSsejWfi4eJjlq4IUxEo/4rv50AEIQ
-X-Received: by 2002:a05:693c:69d4:b0:386:5adb:ac25 with SMTP id 5a478bee46e88-3865adbb1d2mr20378523eec.22.1795835781504;
-        Fri, 27 Nov 2026 19:16:21 -0800 (PST)
-Received: from [192.168.1.142] ([198.8.77.135])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-386c7c62a91sm36623124eec.17.2026.11.27.19.16.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 19:16:21 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Zakaria Belkadi <zakaria.belkadi@inria.fr>
-Cc: Christoph Hellwig <hch@infradead.org>, 
- Caleb Sander Mateos <csander@purestorage.com>, 
- Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
- Kanchan Joshi <joshi.k@samsung.com>, Anuj Gupta <anuj20.g@samsung.com>, 
- florence.schadle@ssi.gouv.fr, frederic.tronel@centralesupelec.fr, 
- louis.rilling@irisa.fr
-In-Reply-To: <20261120195644.19511-1-zakaria.belkadi@inria.fr>
-References: <20261120195644.19511-1-zakaria.belkadi@inria.fr>
-Subject: Re: [PATCH v2] block: bounce user PI when writes may remap
- reference tags
-Message-Id: <179583578039.94675.216278078774861873.b4-ty@b4>
-Date: Fri, 27 Nov 2026 20:16:20 -0700
+	dkim=pass (2048-bit key) header.d=tychen.cc header.i=@tychen.cc header.a=rsa-sha256 header.s=spacemail header.b=mkoxgApY
+Received: from fedora (ec2-52-197-241-54.ap-northeast-1.compute.amazonaws.com [52.197.241.54])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4jc3yZ1Yt4z8sWP;
+	Sat, 28 Nov 2026 08:55:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tychen.cc;
+	s=spacemail; t=1795856122;
+	bh=65UtGJ7fSwzMVurIhv/cFm1+CfEydmPsrjASwnr1vJ8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mkoxgApYS+ZL4enwNdAbQMK6dYarH0tdwlh2dGq+pccuYgjo1YPaHiyymVV3+Ikuo
+	 8s8leiu5BJ0wXTNjUR3vwdKu4j/tVjRqoKh1Nvvg+5hO27J/rdyBuNlDN1Q53ZhD/r
+	 qEtkGtYYQ0iRC+1db2+X+Pe0lTM7SHf53x9rI2mDIZaSk/i6X7RD1sKXzBOScEklJU
+	 i0nm3mK7g4Ij1YNAbWyhBw+S5S3K7e5ULs4+O5NFsN5vTXyL04ljfOU5f2WunUUzSz
+	 E0LdyDzLilk3IEP7LoD2GSmTrt8ZUIIz8VG5NqGmluZMOzYVUY1uYJMu3uEGQGC2ne
+	 3kwefu17eNm3A==
+From: Tianyi Chen <hi@tychen.cc>
+To: Qu Wenruo <quwenruo.btrfs@gmx.com>,
+	David Sterba <dsterba@suse.com>,
+	Qu Wenruo <wqu@suse.com>,
+	Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: Chris Mason <mason@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Yu Kuai <yukuai@fygo.io>,
+	Mark Korenberg <socketpair@gmail.com>,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	hi@tychen.cc
+Subject: Re: btrfs, blk-throttle: cross-subvolume fsync stalls behind throttled write_dev_flush()
+Date: Sat, 28 Nov 2026 17:55:08 +0900
+Message-ID: <20261128085508.2227850-1-hi@tychen.cc>
+X-Mailer: git-send-email 2.56.1
+In-Reply-To: <a0ae6351-2eb1-41b9-b085-db924442c685@gmx.com>
+References: <20261127121458.2090454-1-hi@tychen.cc> <a0ae6351-2eb1-41b9-b085-db924442c685@gmx.com>
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Post: <mailto:linux-block@vger.kernel.org>
@@ -104,33 +79,35 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-block+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
+X-Envelope-From: hi@tychen.cc
 
+On 2026/11/28 07:37, Qu Wenruo wrote:
+> What's the point here? The series (older or merged version) has never
+> touched the barrier part, nor my comment.
+>
+> This looks like some unrelated LLM word salad.
+>
+> And again, make LLM generated reports shorter for human readers.
 
-On Fri, 20 Nov 2026 20:56:44 +0100, Zakaria Belkadi wrote:
-> On an io_uring O_DIRECT write, bio_integrity_map_user() can attach the
-> caller's protection information (PI) buffer directly to the bio. The
-> block layer pins the pages for reading, but reference-tag remapping can
-> write to those same pages.
-> 
-> A caller with write access to a block device whose integrity profile
-> enables reference-tag remapping can therefore modify a page it can
-> only map for reading. In testing, remapping changed a tag in the page
-> cache of a read-only file. With a PI buffer backed by the shared zero
-> page, the kernel faulted during remapping.
-> 
-> [...]
+Sorry, you're right. Neither the series nor your comment is about the
+flush, and that paragraph should not have been in the report.
 
-Applied, thanks!
+[...]
 
-[1/1] block: bounce user PI when writes may remap reference tags
-      commit: 348d25516523c3edfec477d56abde2b2491dbf9d
+> I'd prefer more advice from block layer on such separate flush and sb
+> writes.
+> Is it recommended to use the same flags for such cases?
 
-Best regards,
--- 
-Jens Axboe
+One result that matters for this question: with the super block flags
+on the flush, a cgroup can escape io.max. One process under wiops=32
+doing create + 64-byte write + fsync in a loop (the files stay inline)
+ran at 2542 io.stat wios/s over 60s, 79x the cap; under wbps=512KiB/s
+it ran at 55x in io.stat wbytes. Stock stays within the cap (0.94x and
+1.00x). One run per kernel. The flush flags are the only difference
+between the two kernels, so on this path the untagged flush is what
+keeps the group at its cap. This is the unpaced fsync loop my first
+mail listed as not tested.
 
-
-
+Thanks,
+Tianyi
